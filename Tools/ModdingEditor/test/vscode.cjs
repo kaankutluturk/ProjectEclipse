@@ -101,11 +101,23 @@ exports.run = async function () {
         const controlDeadline=Date.now()+30000;
         while(Date.now()<controlDeadline) {
             const result=await vscode.commands.executeCommand('vscode.executeCompletionItemProvider',controlUri,new vscode.Position(2,9));
-            if(['set_control_blocked','end_round','move_by','play_move','mark_rect','overlaps_rect'].every(name=>result?.items.some(item=>String(typeof item.label==='string'?item.label:item.label.label).startsWith(name)))){controlFound=true;break;}
+            if(['set_control_blocked','end_round','move_by','play_move','projectiles','mark_rect','overlaps_rect'].every(name=>result?.items.some(item=>String(typeof item.label==='string'?item.label:item.label.label).startsWith(name)))){controlFound=true;break;}
             await new Promise(resolve=>setTimeout(resolve,500));
         }
         assert(controlFound,'Player control restriction completion missing');
         passed.push('PASS: fighter control restriction, round outcome, movement and playback completion');
+
+        const projectileUri=vscode.Uri.joinPath(folder.uri,'scripts','projectile-completion.lua');
+        fs.writeFileSync(projectileUri.fsPath,'local sf2=require("sf2")\nsf2.behaviors.register {id="projectiles",on_tick=function(_,fighter)\n local list=fighter:projectiles();if not list then return end\n for _,projectile in ipairs(list) do\n projectile:\n end\nend}');
+        await vscode.workspace.openTextDocument(projectileUri);
+        let projectileFound=false;const projectileDeadline=Date.now()+30000;
+        while(Date.now()<projectileDeadline){
+            const result=await vscode.commands.executeCommand('vscode.executeCompletionItemProvider',projectileUri,new vscode.Position(4,12));
+            if(['snapshot','move_by','remove'].every(name=>result?.items.some(item=>String(typeof item.label==='string'?item.label:item.label.label).startsWith(name)))){projectileFound=true;break;}
+            await new Promise(resolve=>setTimeout(resolve,500));
+        }
+        assert(projectileFound,'Callback-scoped projectile completion missing');
+        passed.push('PASS: owned projectile snapshot/movement/removal completion from fighter query');
 
         const uri = vscode.Uri.joinPath(folder.uri, 'scripts', 'editor-test.lua');
         fs.writeFileSync(uri.fsPath, 'local sf2 = require("sf2")\nsf2.assets.sprite("sprites/weapon")\nsf2.localization.key("weapon.training_blade")\n');

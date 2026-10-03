@@ -8,6 +8,15 @@ const { createMod } = require('../src/scaffold.cjs');
 const template = path.resolve(__dirname, '../templates/weapon');
 const header = 'local sf2 = require("sf2")\n';
 
+test('return dart starter validates owned projectile graph and mirrors complete assets',async()=>{
+    const directory=path.resolve(__dirname,'../../../Mods/example.return-dart');
+    const mod=await p.indexMod(directory);const text=await fs.readFile(path.join(directory,'scripts/main.lua'),'utf8');
+    assert.deepEqual(mod.issues,[]);assert.deepEqual(p.analyze(text,mod).issues,[]);
+    for(const file of ['mod.toml','README.md','scripts/main.lua',...['ranged_light_player','ranged_light_weapon','shuriken_fly'].map(n=>'assets/animations/'+n+'.bytes')])
+        assert.deepEqual(await fs.readFile(path.resolve(__dirname,'../templates/return-dart',file)),await fs.readFile(path.join(directory,file)));
+    assert(p.analyze(text,{...mod,data:{...mod.data,capabilities:mod.data.capabilities.filter(c=>c!=='combat.projectiles')}}).issues.some(i=>i.capability==='combat.projectiles'));
+});
+
 test('arc dart starter validates owned projectile graph and mirrors complete assets',async()=>{
     const directory=path.resolve(__dirname,'../../../Mods/example.arc-dart');
     const mod=await p.indexMod(directory);const text=await fs.readFile(path.join(directory,'scripts/main.lua'),'utf8');

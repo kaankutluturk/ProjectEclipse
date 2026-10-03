@@ -1,0 +1,42 @@
+using System;
+using System.Collections.Generic;
+
+namespace Eclipse.Modding
+{
+    public static class ModProjectileLimits
+    {
+        public const int DefaultLifetimeFrames = 180, MaximumLifetimeFrames = 600;
+        public const int MaximumPerMod = 16, MaximumPerFight = 64, MaximumQueriesPerCallback = 32;
+        public const int MaximumRequestsPerStep = 32;
+        public const double MaximumDisplacement = 100;
+        public static bool ValidDisplacement(double x, double y, double z) =>
+            Valid(x) && Valid(y) && Valid(z);
+        private static bool Valid(double value) => !double.IsNaN(value) && !double.IsInfinity(value) &&
+            Math.Abs(value) <= MaximumDisplacement;
+    }
+
+    // Copied observations contain no native model or Unity objects.
+    public sealed class ModProjectileSnapshot
+    {
+        public string Id { get; } public string Name { get; } public string Animation { get; }
+        public double X { get; } public double Y { get; } public double Z { get; }
+        public int AgeFrames { get; } public int LifetimeFrames { get; }
+        public ModProjectileSnapshot(string id, string name, string animation, double x, double y, double z,
+            int ageFrames, int lifetimeFrames)
+        {
+            Id = id; Name = name; Animation = animation; X = x; Y = y; Z = z;
+            AgeFrames = ageFrames; LifetimeFrames = lifetimeFrames;
+        }
+    }
+
+    public interface IModProjectile
+    {
+        bool TrySnapshot(out ModProjectileSnapshot snapshot, out string error);
+        bool TryMoveBy(double x, double y, double z, out string error);
+        bool TryRemove(out string error);
+    }
+    public interface IModFighterProjectiles
+    {
+        bool TryGetProjectiles(ModId owner, out IReadOnlyList<IModProjectile> projectiles, out string error);
+    }
+}

@@ -11,6 +11,7 @@ namespace Eclipse.Modding
             new Dictionary<ModEffectEvent, HashSet<DefinitionId>>();
         private readonly List<ModDiagnostic> _stateDiagnostics = new List<ModDiagnostic>();
 
+        public bool IsDisposed { get; private set; }
         public string RuntimeName { get; }
         public IReadOnlyList<ModDescriptor> ActiveMods { get; }
         public IReadOnlyList<ModDiagnostic> Diagnostics { get; }
@@ -258,6 +259,8 @@ namespace Eclipse.Modding
 
         public void Dispose()
         {
+            if (IsDisposed) return;
+            IsDisposed = true;
             _extensions.Dispose();
             _subscriptions.Clear();
             for (int i = _contexts.Count - 1; i >= 0; i--)

@@ -863,3 +863,68 @@ projects compile; 19 interpolation checks and wiki types/build/search with 6249
 links across 60 pages pass. Input/AI/spacing are controlled. Geometry remains
 rough, with seams and flat cloth/head panels; all equipment/forms/arenas, mod
 visual integration, physical input, exported players and performance are open.
+
+## 2026-10-04: programmable owned native projectiles
+
+Typed projectile actions now project action-declaring ownership and a bounded
+simulation lifetime (1..600 frames, default 180) into ActionCreateModel. Native
+Model.SpawnWeaponModel checks capacity/eligibility before construction and records
+ownership before the create event. The new FightProjectiles partial owns bounded
+references, queued additive motion/deletion, TTL and round/form/session cleanup.
+Native deletion also removes newborn-list membership, so a removed child cannot
+be added back from the pending birth list. Two narrowly inferred native names
+(SpawnWeaponModel and RequestModelRemoval) carry the required best-guess comment;
+existing callers/event registrations are updated. Session disposal is explicit.
+
+The pure shared contract is ModProjectiles.cs. Lua gains fighter:projectiles(),
+projectile:snapshot(), projectile:move_by() and projectile:remove(), guarded by
+combat.projectiles and callback scope. Queries select the calling mod and root
+fighter, never by actor name. Commands recheck owner, session, root, round,
+membership and native deletion; 16 children/mod, 64/fight, 32 queries/callback,
+32 nonzero commands/child/step and 100-unit per-axis aggregate movement bounds.
+Translation uses the existing native rig/keyframe/buffer path after collision,
+preparing the next discrete contact step; this does not supply swept collision.
+Nondefault lifetime is fingerprinted; old default fingerprint encoding remains.
+The new Return Dart example/starter performs a turn-and-return trajectory in
+ordinary Lua with a zero-velocity looping native flight and a 120-frame safety
+lifetime. It returns to recorded launch X, not to a moving hand. Native attack
+edges/damage/strike deletion still perform contact. The public wiki, reference
+inventory/sidebar and editor authored/generated contracts update in this change.
+
+Verification: 166 actual MoonSharp/complete production native tracker checks with
+controlled membership/translation cover ownership, stale/forged/retained methods,
+argument/query/request/aggregate bounds, pause, removal, TTL, per-mod/global
+capacity, round/session/disposal/root/death/owner retirement. 797 cumulative actual
+Lua/projection/native action-parser checks cover metadata, strict lifetime fields,
+archive compatibility and fingerprints. 492 existing playback checks pass. Four
+managed assemblies compile through the ignored Unity 6.6 reference remapping;
+root generated projects still contain Linux-local analyzer paths, so the parser
+runner's build was redirected to the equivalent ignored compile project and
+actual Unity managed references were preloaded. Existing standalone MoonSharp
+loader reflection/native-call warnings remain.
+
+Full-game Unity 6.6 Campaign Tournament 3 acceptance passes 32 checks: typed
+cast/child rig/item/rendering, native hit (1 -> .9836771 health), caster Lua
+attribution, paused lifetime/position/contact, guided missed flight travelling
+254.75 sampled native units then reversing/returning/removing, cooldown and
+surrender with a live child (owned references retired, rendering destroyed).
+Inputs/AI/spacing are controlled; the hit target is held at a controlled X after
+launch. Initial fixture root, reverse-direction measurement and surrender/current-
+fight lifetime assumptions were corrected. The first hit scenario's moving
+native enemy made travel unreliable; target spacing is now explicitly controlled.
+An interrupted fixture left a scene-backup dialog; its backup was preserved in
+that marked Temp fixture before rerunning. Root scene/profile were untouched.
+
+Editor generate/check/build and 52 unit tests pass (232 bindings, 74 constants,
+283 structures). Actual LuaLS 3.19.1 includes the complete Return Dart script;
+actual VS Code passes 15 checks including inferred projectile methods. Wiki
+build/types/search and 6412 local links/assets across 61 pages pass, with the
+existing duplicate 404 warning. All fixture output remains ignored.
+
+This closes the scoped live-control seam for typed native projectiles, not a
+general actor platform. Native-world TTL under script failure, all arenas,
+exported players, physical input, complicated trajectories, competing native
+projectile motion and general rig imports retain broader acceptance work.
+Arbitrary actor spawning/AI/contacts, original character rig authoring and the
+remaining G01–G14/E1–E8 requirements remain open. The user's requested procedural
+3D refinement follows this feature's commit/push before creator work continues.

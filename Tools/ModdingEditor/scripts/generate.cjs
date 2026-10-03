@@ -6,13 +6,14 @@ const sources=fs.readdirSync(dir).filter(n=>/^MoonSharpScriptRuntime.*\.cs$/.tes
 const tables=new Map();
 for(const s of sources) for(const [,name,variable] of s.matchAll(/root\.Set\("(\w+)"\s*,\s*DynValue\.NewTable\((\w+)\)/g)) tables.set(variable,[name]);
 for(const s of sources) for(const [,list] of s.matchAll(/foreach\s*\(string name in new\[\]\s*\{([^}]+)\}/g)) tables.set('module',[...list.matchAll(/"(\w+)"/g)].map(m=>m[1]));
+tables.set('projectileTable',['projectile']);
 tables.set('fighterTable',['fighter']);tables.set('targetTable',['fighter.opponent']);
 const exported=new Set(['require']),constants={};
 for(const s of sources){
     for(const [,v,n] of s.matchAll(/(\w+)\.Set\("(\w+)"\s*,\s*DynValue\.NewCallback\(/g)){
         if(v==='Globals'&&n==='require'||v==='Table')continue;
         assert(tables.has(v),`Unmapped runtime table ${v}.${n}`);
-        for(const t of tables.get(v))exported.add(t.startsWith('fighter')?`${t}:${n}`:`sf2.${t}.${n}`);
+        for(const t of tables.get(v))exported.add((t.startsWith('fighter')||t==='projectile')?`${t}:${n}`:`sf2.${t}.${n}`);
     }
     for(const [,m,n] of s.matchAll(/root\.Get\("(\w+)"\)\.Table\.Set\("(\w+)"\s*,\s*DynValue\.NewCallback\(/g))exported.add(`sf2.${m}.${n}`);
     for(const [,v,n] of s.matchAll(/(\w+)\.Set\("(\w+)"\s*,\s*\w+\.Get\("\w+"\)\)/g)) for(const m of tables.get(v)??[])exported.add(`sf2.${m}.${n}`);
@@ -24,7 +25,7 @@ for(const name of ['on_click','on_close','on_change','on_back','on_decide','on_p
 if (sources.some(source => source.includes('definition.Get("on_complete")'))) exported.add('on_complete');
 if (sources.some(source => source.includes('definition.Get("on_cancel")'))) exported.add('on_cancel');
 if (sources.some(source => source.includes('":on_before_fight"'))) exported.add('on_before_fight');
-const covered=new Set(['require',...Object.keys(schema.functions),...Object.keys(schema.aliases),...schema.callbacks,...schema.storyCallbacks,...schema.modeCallbacks,...schema.uiCallbacks,...schema.aiCallbacks,...Object.keys(schema.fighterMethods).map(n=>'fighter:'+n),'fighter.opponent:change_health','fighter.opponent:add_magic_charge','fighter.opponent:move_by','fighter.opponent:play_move','fighter.opponent:overlaps_rect']);
+const covered=new Set([...Object.keys(schema.projectileMethods).map(n=>'projectile:'+n),'require',...Object.keys(schema.functions),...Object.keys(schema.aliases),...schema.callbacks,...schema.storyCallbacks,...schema.modeCallbacks,...schema.uiCallbacks,...schema.aiCallbacks,...Object.keys(schema.fighterMethods).map(n=>'fighter:'+n),'fighter.opponent:change_health','fighter.opponent:add_magic_charge','fighter.opponent:move_by','fighter.opponent:play_move','fighter.opponent:overlaps_rect']);
 assert.deepEqual([...covered].sort(),[...exported].sort(),'LuaLS schema must cover every runtime function, alias and callback exactly.');
 const docs={};
 for(const file of fs.readdirSync(path.join(repo,'Docs/Modding/src/content/docs/api'))){
@@ -63,8 +64,13 @@ for(const [name,f] of Object.entries(schema.fighterMethods))for(const opponent o
     if(f.returns)out+=`---@return ${f.returns}\n`;
     out+=`function ${opponent?'Opponent':name==='scale_incoming_damage'?'ResolvingFighter':['scale_outgoing_damage','add_outgoing_damage'].includes(name)?'OutgoingFighter':'Fighter'}:${name}(${Object.keys(f.params).join(', ')}) end\n\n`;
 }
+for(const [name,f] of Object.entries(schema.projectileMethods)){
+    out+=comment('projectile:'+name);
+    for(const [p,t] of Object.entries(f.params))out+=`---@param ${p} ${t}\n`;
+    out+=`---@return ${f.returns}\nfunction Projectile:${name}(${Object.keys(f.params).join(', ')}) end\n\n`;
+}
 out+=`return { ${modules.map(m=>`${m} = ${m}`).join(', ')} }\n`;
-const metadata={functions:Object.fromEntries(Object.entries(schema.functions).map(([n,f])=>[n,{...f,...docs[n]}])),aliases:schema.aliases,constants,callbacks:schema.callbacks,storyCallbacks:schema.storyCallbacks,modeCallbacks:schema.modeCallbacks,uiCallbacks:schema.uiCallbacks,aiCallbacks:schema.aiCallbacks,fighterMethods:schema.fighterMethods,types:schema.types};
+const metadata={functions:Object.fromEntries(Object.entries(schema.functions).map(([n,f])=>[n,{...f,...docs[n]}])),aliases:schema.aliases,constants,callbacks:schema.callbacks,storyCallbacks:schema.storyCallbacks,modeCallbacks:schema.modeCallbacks,uiCallbacks:schema.uiCallbacks,aiCallbacks:schema.aiCallbacks,fighterMethods:schema.fighterMethods,projectileMethods:schema.projectileMethods,types:schema.types};
 fs.mkdirSync(path.join(root,'data'),{recursive:true});
 for(const [file,content] of [['library/sf2.d.lua',out],['data/api.json',JSON.stringify(metadata,null,2)+'\n']]){
     if(process.argv.includes('--check'))assert.equal(fs.readFileSync(path.join(root,file),'utf8').replace(/\r\n/g,'\n'),content,`${file} is stale; run npm run generate`);

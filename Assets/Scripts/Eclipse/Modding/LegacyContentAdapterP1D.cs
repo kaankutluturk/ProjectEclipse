@@ -240,7 +240,7 @@ namespace Eclipse.Modding
             if (definition.Looped) Set(node, "Looped", "1");
             if (definition.EndsStage) Set(node, "EndsStage", "1");
             AppendEvents(document, node, definition.Events);
-            AppendMovePresentation(document, node, definition.Graph.Presentation);
+            AppendMovePresentation(document, node, definition.Graph.Presentation, definition.Id.Namespace);
             AppendConditions(document, node, definition.Conditions, "Conditions");
             AppendConditions(document,node,definition.Graph.Locks,"Locks");
             if(definition.Graph.Transitions.Count!=0)
@@ -387,7 +387,7 @@ namespace Eclipse.Modding
             parent.AppendChild(conditions);
         }
 
-        private void AppendMovePresentation(XmlDocument document, XmlElement node, ModMovePresentation value)
+        private void AppendMovePresentation(XmlDocument document, XmlElement node, ModMovePresentation value, ModId owner)
         {
             if (value.NoMagicRecharge) Set(node, "NoMagicRecharge", "1");
             if (value.Velocity != null)
@@ -459,6 +459,8 @@ namespace Eclipse.Modding
                 {
                     var projectile = action.Projectile;
                     Set(entry, "Name", projectile.Name);
+                    Set(entry, "EclipseProjectileOwner", owner.Value);
+                    Set(entry, "EclipseProjectileLifetime", projectile.LifetimeFrames.ToString(CultureInfo.InvariantCulture));
                     string start = projectile.StartMove.HasValue ? MoveRuntimeName(projectile.StartMove.Value) : projectile.CoreStartAnimation;
                     if (start.Length != 0) Set(entry, "StartAnimation", start);
                     var skeleton = document.CreateElement("Item"); Set(skeleton, "Type", "Skeleton");

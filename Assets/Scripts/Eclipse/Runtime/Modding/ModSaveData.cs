@@ -1425,6 +1425,8 @@ namespace Eclipse.Modding
                 if (action.Projectile != null)
                 {
                     var projectile = action.Projectile; Append(canonical, "move-projectile-v1");
+                    if (projectile.LifetimeFrames != ModProjectileLimits.DefaultLifetimeFrames)
+                    { Append(canonical, "move-projectile-lifetime-v1"); Append(canonical, projectile.LifetimeFrames); }
                     Append(canonical, projectile.Name); Append(canonical, projectile.CoreSkeleton); Append(canonical, projectile.CopyParentType ?? string.Empty);
                     Append(canonical, projectile.CoreStartAnimation); Append(canonical, projectile.StartMove?.ToString() ?? string.Empty);
                     if (projectile.Item.HasValue) { Append(canonical, "move-projectile-item-v1"); Append(canonical, projectile.Item.Value.ToString()); }

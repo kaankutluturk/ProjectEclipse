@@ -2187,6 +2187,11 @@
       "returns": "boolean, string|nil",
       "capability": "combat.motion"
     },
+    "projectiles": {
+      "params": {},
+      "returns": "Eclipse.Projectile[]|nil, string|nil",
+      "capability": "combat.projectiles"
+    },
     "play_move": {
       "params": {
         "move": "Eclipse.MoveHandle"
@@ -2235,6 +2240,27 @@
         "key": "string"
       },
       "capability": "combat.effects"
+    }
+  },
+  "projectileMethods": {
+    "snapshot": {
+      "params": {},
+      "returns": "Eclipse.ProjectileSnapshot|nil, string|nil",
+      "capability": "combat.projectiles"
+    },
+    "move_by": {
+      "params": {
+        "x": "number",
+        "y": "number",
+        "z": "number?"
+      },
+      "returns": "boolean, string|nil",
+      "capability": "combat.projectiles"
+    },
+    "remove": {
+      "params": {},
+      "returns": "boolean, string|nil",
+      "capability": "combat.projectiles"
     }
   },
   "types": {
@@ -4262,6 +4288,10 @@
     },
     "MoveProjectile": {
       "fields": {
+        "lifetime_frames?": [
+          "integer",
+          "1-600 simulation frames from spawn, default 180."
+        ],
         "name": "string",
         "core_skeleton": "string",
         "copy_parent_type?": "\"Weapon\"|\"Ranged\"|\"Magic\"",
@@ -5650,6 +5680,19 @@
           "string[]",
           "Qualified lower-case perk IDs of the current enchantments, in native order; unknown perks are omitted."
         ]
+      }
+    },
+    "Projectile": {
+      "fields": {}
+    },
+    "ProjectileSnapshot": {
+      "fields": {
+        "id": "string",
+        "name": "string",
+        "animation_name": "string",
+        "position": "Eclipse.CombatPosition",
+        "age_frames": "integer",
+        "lifetime_frames": "integer"
       }
     }
   }

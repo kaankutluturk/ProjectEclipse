@@ -479,6 +479,10 @@ Scheduled projectile lifecycle actions use the same timeline keys:
   Names are symbolic, not paths. This API describes this native child-actor path;
   it does not register a warrior or load a new skeleton. Copying equipment retains
   native item properties instead of supplying a replacement damage value.
+- Optional `projectile.lifetime_frames`: integer 1..600 simulation frames from
+  creation, default 180. Typed children belong to the action’s declaring mod,
+  bounded to 16 per mod/64 per fight. [Live projectiles](../projectiles/) explains
+  Lua control and round/form/session retirement.
 - Optional `projectile.start_move` is a registered move handle in this mod or an
   accessible dependency; register the child move first. Alternatively use
   `projectile.core_start_animation` for an exact existing native animation name.

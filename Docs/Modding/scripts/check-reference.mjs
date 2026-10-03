@@ -24,10 +24,11 @@ for (const source of sources) {
     tableNames.set('module', [...list.matchAll(/"(\w+)"/g)].map((match) => `sf2.${match[1]}`));
   }
 }
+tableNames.set('projectileTable', ['projectile']);
 tableNames.set('fighterTable', ['fighter']);
 tableNames.set('targetTable', ['fighter.opponent']);
 const exported = new Set(['require']);
-const separator = (namespace) => namespace.startsWith('fighter') ? ':' : '.';
+const separator = (namespace) => (namespace.startsWith('fighter') || namespace === 'projectile') ? ':' : '.';
 for (const source of sources) {
   for (const [, variable, name] of source.matchAll(/(\w+)\.Set\("(\w+)"\s*,\s*DynValue\.NewCallback\(/g)) {
     if (variable === 'Globals' && name === 'require') continue;
@@ -55,7 +56,7 @@ if (sources.some(source => source.includes('":on_before_fight"'))) exported.add(
 const parser = unified().use(remarkParse);
 const documented = new Map();
 const failures = [];
-const symbol = /^(?:sf2\.[\w.]+|fighter(?:\.opponent)?:\w+|require|on_\w+)$/;
+const symbol = /^(?:sf2\.[\w.]+|(?:fighter(?:\.opponent)?|projectile):\w+|require|on_\w+)$/;
 for (const filename of readdirSync(docs, { recursive: true })) {
   if (!/\.(md|mdx)$/.test(filename) || filename === 'reference.md') continue;
   const text = readFileSync(path.join(docs, filename), 'utf8').replace(/^---\r?\n[\s\S]*?\r?\n---\r?\n/, '');
@@ -68,7 +69,7 @@ for (const filename of readdirSync(docs, { recursive: true })) {
       failures.push(`${filename}: internal milestone label in reader-facing content`);
     }
     if (node.type === 'code' && node.lang === 'lua') {
-      for (const [, name] of node.value.matchAll(/\b(sf2\.[\w.]+|fighter(?:\.opponent)?:\w+)\s*[({]/g)) {
+      for (const [, name] of node.value.matchAll(/\b(sf2\.[\w.]+|(?:fighter(?:\.opponent)?|projectile):\w+)\s*[({]/g)) {
         if (!exported.has(name)) failures.push(`${filename}: example calls an unknown public function: ${name}`);
       }
     }

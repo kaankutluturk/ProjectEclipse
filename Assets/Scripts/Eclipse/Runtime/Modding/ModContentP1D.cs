@@ -686,6 +686,7 @@ namespace Eclipse.Modding
 
     public sealed class ModMoveProjectile
     {
+        public int LifetimeFrames { get; }
         public string Name { get; }
         public string CoreSkeleton { get; }
         public string CopyParentType { get; }
@@ -693,7 +694,7 @@ namespace Eclipse.Modding
         public string CoreStartAnimation { get; }
         public DefinitionId? StartMove { get; }
         public ModMoveProjectile(string name, string coreSkeleton, string copyParentType,
-            string coreStartAnimation = null, DefinitionId? startMove = null, DefinitionId? item = null)
+            string coreStartAnimation = null, DefinitionId? startMove = null, DefinitionId? item = null, int lifetimeFrames = ModProjectileLimits.DefaultLifetimeFrames)
         {
             ModMoveScheduledAction.ValidateSymbol(name, "projectile actor");
             ModMoveScheduledAction.ValidateSymbol(coreSkeleton, "core skeleton");
@@ -706,6 +707,9 @@ namespace Eclipse.Modding
             if (coreStartAnimation != null) ModMoveScheduledAction.ValidateSymbol(coreStartAnimation, "core start animation");
             if (startMove.HasValue && (startMove.Value.Category != "moves" || coreStartAnimation != null))
                 throw new ModContentException("Projectile accepts either start_move or core_start_animation.");
+            if (lifetimeFrames < 1 || lifetimeFrames > ModProjectileLimits.MaximumLifetimeFrames)
+                throw new ModContentException("Projectile lifetime_frames must be an integer in 1..600.");
+            LifetimeFrames = lifetimeFrames;
             Name = name; CoreSkeleton = coreSkeleton; CopyParentType = copyParentType; Item = item;
             CoreStartAnimation = coreStartAnimation ?? string.Empty; StartMove = startMove;
         }

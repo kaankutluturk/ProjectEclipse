@@ -1526,6 +1526,7 @@ local MoveEffectAttachment = {}
 local MoveEffect = {}
 
 ---@class (exact) Eclipse.MoveProjectile
+---@field lifetime_frames? integer 1-600 simulation frames from spawn, default 180.
 ---@field name string
 ---@field core_skeleton string
 ---@field copy_parent_type? "Weapon"|"Ranged"|"Magic"
@@ -2284,6 +2285,18 @@ local QuestSuppression = {}
 ---@field upgrade? integer
 ---@field enchantments string[] Qualified lower-case perk IDs of the current enchantments, in native order; unknown perks are omitted.
 local ProfileEquipmentSnapshot = {}
+
+---@class (exact) Eclipse.Projectile
+local Projectile = {}
+
+---@class (exact) Eclipse.ProjectileSnapshot
+---@field id string
+---@field name string
+---@field animation_name string
+---@field position Eclipse.CombatPosition
+---@field age_frames integer
+---@field lifetime_frames integer
+local ProjectileSnapshot = {}
 
 ---@class Eclipse.Module_achievements
 local achievements = {}
@@ -4265,6 +4278,14 @@ function Fighter:move_by(x, y, z) end
 ---@return boolean, string|nil
 function Opponent:move_by(x, y, z) end
 
+---Query this mod's live typed projectiles for the callback's fighter.
+---Requires: `combat.projectiles`.
+---When: Active simulation callbacks, including `on_tick`. Removing children are excluded. Reads see native state before queued commands apply.
+---Returns: A dense array in spawn order and `nil`, or `nil, error` when the host is unavailable/ineligible. An empty array means no live owned children. At most 32 queries per callback; exceeding that limit raises an error.
+---[Full reference](https://dawc17.github.io/ProjectEclipse/api/projectiles/#fighterprojectiles)
+---@return Eclipse.Projectile[]|nil, string|nil
+function Fighter:projectiles() end
+
 ---Request explicit playback of an authored move on this main fighter.
 ---Requires: `combat.animation`. `move` must be a handle returned by this mod's `sf2.moves.register` or `sf2.moves.replace`; raw names, forged handles and another script context's handles are rejected.
 ---When: Active simulation callbacks with a living main fighter in an offline round. Unavailable in `on_fight_begin`, `on_round_begin`, `on_round_end`, `on_fight_end`, while paused, in training/title sparring, local versus, legacy PvP or online raids. Offline mod raids are eligible. Requests during the native playback boundary reject to prevent recursive start/end chains.
@@ -4335,5 +4356,32 @@ function Fighter:show_status_icon(key, sprite, frames, stacks?) end
 ---[Full reference](https://dawc17.github.io/ProjectEclipse/api/fighter/#fighterclear_status_icon)
 ---@param key string
 function Fighter:clear_status_icon(key) end
+
+---Copy a live child's position and lifetime observation.
+---Requires: `combat.projectiles`.
+---When: Inside the acquiring callback. Copied observations remain usable later; reference methods expire when the callback ends. Editing a snapshot does not change the child.
+---Returns: `snapshot, nil`, or `nil, error` after expiry/removal. Fields: string `id`, `name`, `animation_name` (native move or empty); `position = { x, y, z }` in native fighter units; `age_frames` since creation and `lifetime_frames` limit.
+---[Full reference](https://dawc17.github.io/ProjectEclipse/api/projectiles/#projectilesnapshot)
+---@return Eclipse.ProjectileSnapshot|nil, string|nil
+function Projectile:snapshot() end
+
+---Queue additive translation of the entire native rig, running keyframes and interpolation buffers. Declared native velocity still applies; use zero velocity when Lua supplies forward motion.
+---Requires: `combat.projectiles`.
+---When: Inside the acquiring simulation callback. Applies once after native model/collision/animation processing, before round arbitration. Collision sees that translated pose on the next step. Motion is discrete, without swept collision; large steps can skip contact. Pause freezes commands and lifetime. Ownership, session, root, round and membership are rechecked at application. Accepted commands can be discarded after hit/expiry/retirement. Native constraints can adjust the result. Later Lua errors do not roll back accepted commands.
+---Returns: `true, nil` when queued, or `false, error` when rejected. Finite numbers must be within -100..100 per axis; invalid arguments raise an error. Omitted/nil `z` defaults to zero. Combined pending displacement is also limited to 100 per axis per child per step, with at most 32 nonzero requests. Zero is a successful no-op for a valid child.
+---[Full reference](https://dawc17.github.io/ProjectEclipse/api/projectiles/#projectilemove_by)
+---@param x number
+---@param y number
+---@param z number?
+---@return boolean, string|nil
+function Projectile:move_by(x, y, z) end
+
+---Request native deletion and make this child unavailable immediately.
+---Requires: `combat.projectiles`.
+---When: Inside the acquiring simulation callback. Native deletion uses the normal deletion pass to preserve list iteration. Round end, surrender, form transitions, session changes and owner/fighter retirement also retire children. Native strike/delete actions remain effective.
+---Returns: `true, nil` when accepted or `false, error` after expiry/removal or host rejection. Repeated removal returns false. Pending motion is cancelled. It does not synthesize a hit, damage or animation callback.
+---[Full reference](https://dawc17.github.io/ProjectEclipse/api/projectiles/#projectileremove)
+---@return boolean, string|nil
+function Projectile:remove() end
 
 return { achievements = achievements, assets = assets, audio = audio, battles = battles, behaviors = behaviors, counters = counters, enchantments = enchantments, events = events, extensions = extensions, fights = fights, forge = forge, fx = fx, items = items, itemsets = itemsets, locales = locales, localization = localization, locations = locations, log = log, mod = mod, modes = modes, moves = moves, perks = perks, price = price, profile = profile, progression = progression, quests = quests, raids = raids, random = random, rewards = rewards, rules = rules, scenes = scenes, services = services, settings = settings, shop = shop, state = state, story = story, tactics = tactics, timers = timers, ui = ui, underworld = underworld, visuals = visuals, warriors = warriors, world = world, zones = zones }

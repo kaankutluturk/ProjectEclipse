@@ -65,6 +65,7 @@ export default defineConfig({
           { slug: 'api/extensions' },
           { slug: 'api/combat-callbacks' },
           { slug: 'api/fighter' },
+          { slug: 'api/projectiles' },
           { slug: 'api/round-outcomes' },
           { slug: 'api/profile' },
           { slug: 'api/story' },

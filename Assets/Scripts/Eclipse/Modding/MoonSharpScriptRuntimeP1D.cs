@@ -618,12 +618,13 @@ namespace Eclipse.Modding
                         {
                             if (entry.Get("projectile").Type != DataType.Table) throw new ModContentException("Projectile action requires a projectile table.");
                             var spec = entry.Get("projectile").Table;
-                            ValidateFields(spec, function + ".projectile", "name", "core_skeleton", "copy_parent_type", "item", "core_start_animation", "start_move");
+                            ValidateFields(spec, function + ".projectile", "name", "core_skeleton", "copy_parent_type", "item", "core_start_animation", "start_move", "lifetime_frames");
                             projectile = new ModMoveProjectile(RequiredString(spec, "name", function), RequiredString(spec, "core_skeleton", function),
                                 spec.Get("copy_parent_type").IsNil() ? null : RequiredString(spec, "copy_parent_type", function),
                                 spec.Get("core_start_animation").IsNil() ? null : RequiredString(spec, "core_start_animation", function),
                                 spec.Get("start_move").IsNil() ? (DefinitionId?)null : RequiredHandle(spec, "start_move", _moveHandles, "move", function),
-                                spec.Get("item").IsNil() ? (DefinitionId?)null : RequiredHandle(spec, "item", _itemHandles, "item", function));
+                                spec.Get("item").IsNil() ? (DefinitionId?)null : RequiredHandle(spec, "item", _itemHandles, "item", function),
+                                spec.Get("lifetime_frames").IsNil() ? ModProjectileLimits.DefaultLifetimeFrames : RequiredInt(spec, "lifetime_frames", function));
                         }
                         ModMoveBulletChange bullets = null;
                         if (kind == "add_bullets")

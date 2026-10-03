@@ -3479,7 +3479,8 @@ public class Model : global::EventDispatcher<object>
 
 	public void OPPIKLBKMPN(ActionCreateModel IBODMPMJELJ)
 	{
-		EGFIFHKBNML(IBODMPMJELJ.DJBOFEEKJMP(), IBODMPMJELJ.AEGHBDJDPNA(), IBODMPMJELJ.StartAnimation);
+		SpawnWeaponModel(IBODMPMJELJ.DJBOFEEKJMP(), IBODMPMJELJ.AEGHBDJDPNA(), IBODMPMJELJ.StartAnimation,
+            IBODMPMJELJ.EclipseProjectileOwner, IBODMPMJELJ.EclipseProjectileLifetime);
 	}
 
 	public void OPPIKLBKMPN(ActionDelete IBODMPMJELJ)
@@ -3699,8 +3700,13 @@ public class Model : global::EventDispatcher<object>
 		return true;
 	}
 
-	public WeaponModel EGFIFHKBNML(List<CopyItemInfo> HELFDCAIJNE = null, string JLHDJLHLGND = "", string startAnimation = "")
+	// best guess for name
+	public WeaponModel SpawnWeaponModel(List<CopyItemInfo> HELFDCAIJNE = null, string JLHDJLHLGND = "", string startAnimation = "", string projectileOwner = null,
+        int lifetimeFrames = Eclipse.Modding.ModProjectileLimits.DefaultLifetimeFrames)
 	{
+        var ownedFight = string.IsNullOrEmpty(projectileOwner) ? null : Fight.GetCurrentFight();
+        if (!string.IsNullOrEmpty(projectileOwner) && (ownedFight == null ||
+            !ownedFight.CanSpawnEclipseProjectile(this, projectileOwner, lifetimeFrames))) return null;
 		if (HELFDCAIJNE == null)
 		{
 			HELFDCAIJNE = new List<CopyItemInfo>();
@@ -3717,6 +3723,7 @@ public class Model : global::EventDispatcher<object>
 		gKIANLDJFCH.SetImpulseFactor(ODCOKJKEDOJ);
 		gKIANLDJFCH.PFIJCCKDAAB(LJCFIOPBNKD());
 		JLDBGHLBJEL.Add(gKIANLDJFCH);
+        ownedFight?.RegisterEclipseProjectile(this, gKIANLDJFCH, projectileOwner, lifetimeFrames);
 		CallEvent(6, gKIANLDJFCH);
 		return gKIANLDJFCH;
 	}

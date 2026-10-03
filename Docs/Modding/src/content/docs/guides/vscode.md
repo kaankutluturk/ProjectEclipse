@@ -192,3 +192,9 @@ The manual `Tools/ModdingEditor/templates/arc-dart/` starter connects typed
 projectile item/start-move handles to an owned cast, launch and flight. Its HUD
 uses deferred playback receipts. See [Create a projectile ability](../projectile-abilities/).
 Editor diagnostics cannot establish native travel, contact, expiry or child damage attribution.
+
+The `return-dart` starter uses `combat.projectiles`. `fighter:projectiles()`
+returns callback-scoped `Projectile` references with typed `snapshot()`,
+`move_by(x, y, z?)` and `remove()` returns. `lifetime_frames` is 1..600, default 180.
+Store copied IDs/positions and reacquire references each callback. Ordinary Lua
+turns the trajectory after 28 guided ticks; native attack edges handle contact.

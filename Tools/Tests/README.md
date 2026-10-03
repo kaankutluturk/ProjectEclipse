@@ -210,3 +210,13 @@ through an explicit Unity editor command; they are not imported into the main
 project automatically. Follow the runner's instructions for fixture setup.
 Managed checks and static audits do not prove native sprite import, rendering
 or gameplay. Report native validation and playtests separately.
+
+`Combat/TestProjectiles.ps1` compiles production Lua bindings and the complete
+owned-projectile native tracker against controlled membership/translation. It
+checks callback expiry, ownership, finite/aggregate/request/query limits, pause,
+TTL, native deletion and round/session/owner retirement. `TestReturnDartUnity.ps1`
+uses a marked full-game Unity fixture and fresh isolated profile to check the
+shipped Lua trajectory, native contact, miss reversal, pause and live-child
+surrender cleanup. The fixture controls inputs/AI/spacing; it is not an all-arena
+or exported-player claim. Generated DLLs, fixture assets, logs and captures stay
+in ignored `Temp/`.

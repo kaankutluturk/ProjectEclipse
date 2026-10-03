@@ -19,7 +19,9 @@ $sourceNodes=@($archive.SelectSingleNode('//Move[@Name="Sphere1Player"]/Actions/
  $archive.SelectSingleNode('//Move[@Name="Sphere1Start"]/Actions/Delete'))
 Check ($nodes.Count -eq 3) 'Projectile actions lost.'
 for($i=0;$i -lt 3;$i++) {
- Check ((Shape $nodes[$i]) -ceq (Shape $sourceNodes[$i])) 'Archive projectile action differs.'
+ $comparison=$nodes[$i].CloneNode($true)
+ if($i -eq 0) {$comparison.RemoveAttribute('EclipseProjectileOwner');$comparison.RemoveAttribute('EclipseProjectileLifetime')}
+ Check ((Shape $comparison) -ceq (Shape $sourceNodes[$i])) 'Archive projectile action differs beyond typed ownership/lifetime metadata.'
  if($i -eq 0) {continue} # ItemInfo needs Unity native calls; covered by isolated native harness.
  $native=[ActionsParser]::Create($nodes[$i]);$source=[ActionsParser]::Create($sourceNodes[$i])
  Check ($native.GetType() -eq $source.GetType()) 'Native projectile action type differs.'
@@ -38,6 +40,11 @@ foreach($choice in @('projectile.core_start_animation="ShopMagicSphere1"','proje
  Check ($native.GetAttribute('StartAnimation') -ceq $expectedName) 'Explicit child starting move lost.'
 }
 $baseline=Fingerprint $catalog
+$spawn=(Project $catalog).SelectSingleNode("//Move[contains(@Name,'cast')]/Actions/CreatePlayer")
+Check ($spawn.GetAttribute('EclipseProjectileOwner') -ceq 'fixture.moves' -and $spawn.GetAttribute('EclipseProjectileLifetime') -ceq '180') 'Typed creation lost action-owner/default lifetime.'
+$customLua=$projectileLua.Replace('sf2.moves.register {id="cast"',('projectile.lifetime_frames=120'+"`n"+'sf2.moves.register {id="cast"'))
+$custom=(Project (Load-Lua $customLua)).SelectSingleNode("//Move[contains(@Name,'cast')]/Actions/CreatePlayer")
+Check ($custom.GetAttribute('EclipseProjectileLifetime') -ceq '120') 'Custom native lifetime was not projected.'
 $namedItemLua=$projectileLua.Replace('copy_parent_type="Magic"', 'item=sf2.items.get("core:items/magic/MAGIC_BUTCHER_EARTHQUAKE")')
 $manifest=Join-Path $package 'mod.toml'
 $oldManifest=Get-Content -LiteralPath $manifest -Raw
@@ -62,13 +69,13 @@ foreach($mutation in @('projectile.copy_parent_type="Magic"','projectile.item=ni
 }
 Set-Content -LiteralPath $manifest -Value $oldManifest
 $mod=[Eclipse.Modding.ModDiscovery]::DiscoverLoose((Join-Path $fixture 'Mods')).Mods[0]
-foreach($mutation in @('projectile.name="Other"','projectile.core_skeleton="OtherSkeleton"','projectile.copy_parent_type="Ranged"',
+foreach($mutation in @('projectile.lifetime_frames=120','projectile.name="Other"','projectile.core_skeleton="OtherSkeleton"','projectile.copy_parent_type="Ranged"',
  'projectile.core_start_animation="ShopMagicSphere1"','projectile.start_move=child','actions[7].add_bullets="RaidChargeBullet"',
  'actions[7].amount=-2','actions.strike.delete_actor="Child"')) {
  $changed=$projectileLua.Replace('sf2.moves.register {id="cast"',($mutation+"`n"+'sf2.moves.register {id="cast"'))
  Check ($baseline -cne (Fingerprint (Load-Lua $changed))) ('Projectile fingerprint omitted: '+$mutation)
 }
-foreach($mutation in @('projectile.name=""','projectile.name="bad/path"','projectile.core_skeleton="bad/path"',
+foreach($mutation in @('projectile.lifetime_frames=0','projectile.lifetime_frames=601','projectile.lifetime_frames=0.5','projectile.lifetime_frames=1/0','projectile.lifetime_frames="120"','projectile.name=""','projectile.name="bad/path"','projectile.core_skeleton="bad/path"',
  'projectile.copy_parent_type="Armor"','projectile.copy_parent_type=nil','projectile.start_move="fixture.moves:moves/child"',
  'projectile.start_move=animation','projectile.start_move=child;projectile.core_start_animation="ShopMagicSphere1"',
  'projectile.core_start_animation="../bad"','projectile.extra=true','actions[2].projectile=nil','actions[2].projectile="bad"',

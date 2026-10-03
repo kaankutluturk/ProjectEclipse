@@ -206,6 +206,8 @@ The event is detached data; changing its fields cannot change combat. A current
 `fighter:snapshot()` may describe a later animation if dispatch was deferred.
 `other` does not identify a projectile's owner and does not expose an actor
 mutation capability. Filter the exact move name and relationship you need.
+To guide this mod’s typed children, query [live projectiles](../projectiles/)
+inside the callback; the event payload itself remains detached.
 The host bounds each pending queue and delivery cascade to 256 events; overflow
 is logged and discarded. Events queued for a round that has ended are discarded.
 

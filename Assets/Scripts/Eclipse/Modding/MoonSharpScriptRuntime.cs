@@ -191,6 +191,7 @@ namespace Eclipse.Modding
                     }
                     var fighterTable = new Table(_script);
                     var arenaQueryBudget = new ArenaQueryBudget();
+                    var projectileQueryBudget = new ProjectileQueryBudget();
                     if (context != null)
                     {
                         foreach (KeyValuePair<string, string> pair in context)
@@ -198,6 +199,8 @@ namespace Eclipse.Modding
                     }
                     if (fighter != null)
                     {
+                        fighterTable.Set("projectiles", DynValue.NewCallback((ctx, args) =>
+                            GetFighterProjectiles(args, fighterTable, fighter, effectEvent, () => invocationActive, projectileQueryBudget)));
                         fighterTable.Set("overlaps_rect", DynValue.NewCallback((ctx, args) =>
                             OverlapRect(args, fighterTable, fighter, invocationActive, false, arenaQueryBudget)));
                         fighterTable.Set("mark_rect", DynValue.NewCallback((ctx, args) =>

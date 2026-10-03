@@ -127,3 +127,23 @@ receipts, round reset and native damage attribution. Native child attacks report
 their root main fighter as the Lua attacker; native damage still uses the child's
 actual equipment and animation. Animation actions raised while another queued
 action runs are deferred to the next selection pass.
+
+## Guide a live projectile with Lua
+
+The [Return Dart example](https://github.com/dawc17/ProjectEclipse/tree/main/Mods/example.return-dart)
+extends the same graph with a zero-velocity looping flight and
+`lifetime_frames = 120`. Its `on_tick` reacquires `fighter:projectiles()`, reads
+`projectile:snapshot()` and queues 10-unit `move_by()` steps. After 28 guided ticks
+it reverses toward its launch X and calls `remove()` nearby. Declare
+`combat.projectiles`; see [live projectiles](../../api/projectiles/) for ownership,
+callback scope and collision timing. Store copied IDs/path data between ticks,
+not references. Contact still uses native attack edges. Native lifetime expires
+a stuck child even if Lua stops guiding it. Test misses as well as hits: native
+strike deletion can remove it before it starts returning.
+
+Return Dart has passed a Unity 6.6 Campaign Tournament 3 run with native contact,
+caster attribution, pause, a missed flight turning/returning/removing, cooldown
+and surrender with a live child. Inputs, AI and target spacing were controlled.
+Managed tests separately check ownership, TTL, capacity and callback-reference
+expiry. Native safety expiry under script failure, all arenas, physical input
+and exported players still need broader acceptance.

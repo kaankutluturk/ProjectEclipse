@@ -82,6 +82,7 @@ const fighterMethods = {
     remove_damage_shield:{params:{key:'string'},capability:'combat.effects'},
     set_control_blocked:{params:{control:enumOf('punch','kick','ranged','magic','raid_charge'),blocked:'boolean'},capability:'combat.effects'},
     move_by:{params:{x:'number',y:'number',z:'number?'},returns:'boolean, string|nil',capability:'combat.motion'},
+    projectiles:{params:{},returns:E('Projectile')+'[]|nil, string|nil',capability:'combat.projectiles'},
     play_move:{params:{move:H('Move')},returns:E('PlayMoveRequest'),capability:'combat.animation'},
     end_round:{params:{outcome:enumOf('win','loss')},returns:'boolean, string|nil',capability:'combat.round_outcome'},
     set_flag:{params:{key:'string'},returns:'string',capability:'combat.effects'},
@@ -259,7 +260,7 @@ type('MoveShortEvent',{...Object.fromEntries(['interval_end','interval_start','r
 const move={id:'string','templates?':H('MoveTemplate')+'[]','core_templates?':'string[]','events?':`"controlled"|(${moveEvent}|${E('MoveShortEvent')})[]`,'conditions?':`(${moveCondition}|table[])[]`,'intervals?':E('MoveInterval')+'[]','locks?':`(${moveCondition}|table[])[]`,'align?':E('MoveAlignment'),'direction?':`${E('MoveDirection')}|"face_enemy"`,...Object.fromEntries(['type','mirror_node','tactic_equivalent','tactic_weapon'].map(k=>[k+'?','string'])),...Object.fromEntries(['priority','mid_frames','first_frame','end_frame'].map(k=>[k+'?','integer'])),'looped?':'boolean','ends_stage?':'boolean'};
 type('MoveEffectAttachment',{player:enumOf('Me','Enemy','Parent','Child','EnemyChild'),root_point:'string',attach_point:'string','offset_x?':'number','offset_y?':'number','start_rotation?':'number'});
 type('MoveEffect',{name:'string',core_sequence:'string','scale?':'number','time_scale?':'number','looped?':'boolean','on_background?':'boolean','position?':point,'follow?':'boolean','attach?':E('MoveEffectAttachment')});
-type('MoveProjectile',{name:'string',core_skeleton:'string','copy_parent_type?':enumOf('Weapon','Ranged','Magic'),'item?':H('Item'),'core_start_animation?':'string','start_move?':H('Move')});
+type('MoveProjectile',{'lifetime_frames?':['integer','1-600 simulation frames from spawn, default 180.'],name:'string',core_skeleton:'string','copy_parent_type?':enumOf('Weapon','Ranged','Magic'),'item?':H('Item'),'core_start_animation?':'string','start_move?':H('Move')});
 
 
 type('MoveShake',{'pause_time?':'integer','effect_time?':'integer','amplitude_x?':'number','amplitude_y?':'number','frequency_x?':'number','frequency_y?':'number'});
@@ -362,4 +363,11 @@ type('FxStainDefinition',{...fxCommon,'trigger?':[enumOf('hit','critical','ko'),
 fn('fx.stain',{definition:E('FxStainDefinition')},'string','presentation.visuals');
 type("QuestSuppression",{target:"string"});reg("quests.suppress","QuestSuppression",null,"content.patch");
 type('ProfileEquipmentSnapshot',{'item?':'string','type?':'string','subtype?':'string',owned:'boolean',count:'integer','upgrade?':'integer',enchantments:['string[]','Qualified lower-case perk IDs of the current enchantments, in native order; unknown perks are omitted.']});fn('profile.equipment',{},E('ProfileEquipmentSnapshot')+'[]','profile.read');
-module.exports={types,functions,aliases,callbacks,storyCallbacks:['on_before_fight'],modeCallbacks:['on_result','on_prepare'],uiCallbacks:['on_complete','on_cancel','on_click','on_close','on_change','on_back'],aiCallbacks:['on_decide'],fighterMethods};
+type('Projectile',{});
+type('ProjectileSnapshot',{id:'string',name:'string',animation_name:'string',position:E('CombatPosition'),age_frames:'integer',lifetime_frames:'integer'});
+const projectileMethods = {
+    snapshot:{params:{},returns:E('ProjectileSnapshot')+'|nil, string|nil',capability:'combat.projectiles'},
+    move_by:{params:{x:'number',y:'number',z:'number?'},returns:'boolean, string|nil',capability:'combat.projectiles'},
+    remove:{params:{},returns:'boolean, string|nil',capability:'combat.projectiles'},
+};
+module.exports={projectileMethods,types,functions,aliases,callbacks,storyCallbacks:['on_before_fight'],modeCallbacks:['on_result','on_prepare'],uiCallbacks:['on_complete','on_cancel','on_click','on_close','on_change','on_back'],aiCallbacks:['on_decide'],fighterMethods};

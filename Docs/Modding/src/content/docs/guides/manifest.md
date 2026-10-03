@@ -81,6 +81,7 @@ A capability permits an operation; a dependency permits references to another ow
 | `ui.settings` | Register on/off switches shown under Options > Mod settings. |
 | `presentation.visuals` | Turn on and tune optional fight visuals, such as weapon trails, bloom and depth haze; create/recolor/remove owned arena markers. |
 | `combat.motion` | Queue relative main-fighter displacement for movement abilities; see [fighter motion](../fighter-motion/). |
+| `combat.projectiles` | Query and guide this mod’s typed native children; see [live projectiles](../../api/projectiles/). |
 | `combat.animation` | Queue explicit playback of a registered move on a main fighter; see [playback](../../api/fighter/#fighterplay_move). |
 | `combat.target` | Use supported operations on the opposing fighter. |
 | `progression.read`, `progression.write` | Read and update achievement counters. |

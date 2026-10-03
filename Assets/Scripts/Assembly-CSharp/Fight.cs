@@ -355,6 +355,7 @@ public partial class Fight
 
     private void CloseModelTransitions()
     {
+        CancelEclipseProjectiles();
         CancelEclipseFighterMotion();
         CancelEclipseFighterPlayback();
         _modelTransitionsClosed = true;
@@ -490,7 +491,7 @@ public partial class Fight
 		public int OGOLNFLBLBD;
 	}
 
-		private sealed class EclipseFighterOperations : IModFighterOperations, IModDamageEventSource, IModFighterTargets, IModIncomingHitSource, IModFighterEffects, IModCombatSnapshotSource, IModCombatActivitySource, IModFighterForms, IModFighterStatusIcons, IModAnimationLifecycleSource, IModFighterFlags, IModFighterControls, IModRoundOutcomes, IModFighterMotion, IModFighterPlayback, IModFighterRegions
+		private sealed class EclipseFighterOperations : IModFighterOperations, IModDamageEventSource, IModFighterTargets, IModIncomingHitSource, IModFighterEffects, IModCombatSnapshotSource, IModCombatActivitySource, IModFighterForms, IModFighterStatusIcons, IModAnimationLifecycleSource, IModFighterFlags, IModFighterControls, IModRoundOutcomes, IModFighterMotion, IModFighterPlayback, IModFighterRegions, IModFighterProjectiles
 	{
 		private readonly Fight _fight;
 		private readonly Model _model;
@@ -513,6 +514,12 @@ public partial class Fight
                 () => GetCurrentFight() == _fight && _fight.round.processing && _fight.round.round == roundNumber &&
                     !_fight._eclipseFightEndDispatched && _fight._eclipseEndedRound != roundNumber,
                 () => _fight.GetPlayerModel()?.GetRenderObject()?.transform, out marker, out error);
+        }
+
+        public bool TryGetProjectiles(ModId owner, out IReadOnlyList<IModProjectile> projectiles, out string error)
+        {
+            if (_fight != null) return _fight.TryGetEclipseProjectiles(_model, owner, out projectiles, out error);
+            projectiles = null; error = "Fight is unavailable."; return false;
         }
 
         public bool TryPlayMove(DefinitionId move, Action<bool, string> complete, out string error)
@@ -599,7 +606,7 @@ public partial class Fight
             var opponent = _model == _fight._playerModel ? _fight.CKNCPOABFBO : _fight._playerModel;
             return new ModCombatSnapshot(self, Capture(opponent), _fight.fightTimeInFrame, _fight.round.processing);
         }
-        private static ModFighterSnapshot Capture(Model model)
+        internal static ModFighterSnapshot Capture(Model model)
         {
             if (model == null || model.Parameters == null || model.CLDMEJKGLBA() == null) return null;
             var position = model.PLBNCDCFPML();
@@ -1156,6 +1163,7 @@ public partial class Fight
         _eclipseInnateInstances.Clear();
         _eclipseBattleRules = new ModBattleRuleInstances();
         _eclipseRoundOutcomes.BeginRound(-1, null);
+        CancelEclipseProjectiles();
         CancelEclipseFighterMotion();
         CancelEclipseFighterPlayback();
 		MNEOALEBNNA = true;
@@ -1789,6 +1797,7 @@ public partial class Fight
 			if (round.processing)
 			{
 				fightTimeInFrame++;
+                UpdateEclipseProjectiles();
 				UpdateEclipseStatusIcons();
 	            // Simulation time only: pause disables RenderFight, and round boundaries
             // disable processing. Run before model/collision updates for this frame.
@@ -1866,6 +1875,7 @@ public partial class Fight
 			PEOIALGBJFB = false;
 			KGKPLKJPDAI();
 		}
+		ApplyEclipseProjectiles();
 		ApplyEclipseFighterMotion();
 		ApplyEclipseFighterPlayback();
 		RenderRound();
@@ -2852,7 +2862,7 @@ public partial class Fight
 				{
 					ActionCreateModel kPFLDMNAFAP = (ActionCreateModel)gELPMIAIGDF;
 					Model fGCODGKLHED = LBNICNOLFGO(ACENLMONNPA, kPFLDMNAFAP.DJBOFEEKJMP(), kPFLDMNAFAP.AEGHBDJDPNA());
-					EILHKFPKMOF(fGCODGKLHED);
+					RequestModelRemoval(fGCODGKLHED);
 					HCPGFOCGDAA.Remove(fGCODGKLHED);
 				}
 			}
@@ -3016,7 +3026,8 @@ public partial class Fight
 		StartVS();
 	}
 
-	private void EILHKFPKMOF(object data)
+	// best guess for name
+	private void RequestModelRemoval(object data)
 	{
 		Model fGCODGKLHED = (Model)data;
 		if (!fGCODGKLHED.LLBJPPAJOHE())
@@ -3100,7 +3111,7 @@ public partial class Fight
 			item.MKAEDALPGDI();
 			if (item.NJDJHGDMCIJ() != null)
 			{
-				EILHKFPKMOF(item);
+				RequestModelRemoval(item);
 			}
 		}
 		EPBDEDGLHJE.Reset();
@@ -3212,6 +3223,7 @@ public partial class Fight
 		DOANFKMFJFK = false;
 		round.round++;
         _eclipseRoundOutcomes.BeginRound(-1, null);
+        CancelEclipseProjectiles();
         CancelEclipseFighterMotion();
         CancelEclipseFighterPlayback();
 		if (preFight != null)
@@ -3841,6 +3853,7 @@ public partial class Fight
 
 	private void FinishRound()
 	{
+        CancelEclipseProjectiles();
 		if (_eclipseFightBeginDispatched && _eclipseEndedRound != round.round)
 		{
 			_eclipseEndedRound = round.round;
@@ -4196,7 +4209,7 @@ public partial class Fight
 		ACENLMONNPA.AddEventListener(0, OnIntervalStart);
 		ACENLMONNPA.AddEventListener(1, OnIntervalEnd);
 		ACENLMONNPA.AddEventListener(4, OnEveryFrame);
-		ACENLMONNPA.AddEventListener(5, EILHKFPKMOF);
+		ACENLMONNPA.AddEventListener(5, RequestModelRemoval);
 		ACENLMONNPA.AddEventListener(6, DEIOPLMPOHK);
 		ACENLMONNPA.AddEventListener(12, PPDEKDMGIMH);
 		ACENLMONNPA.AddEventListener(18, BHBGIMOHFPI);
@@ -4341,7 +4354,7 @@ public partial class Fight
         model.RemoveEventListener(0, OnIntervalStart);
         model.RemoveEventListener(1, OnIntervalEnd);
         model.RemoveEventListener(4, OnEveryFrame);
-        model.RemoveEventListener(5, EILHKFPKMOF);
+        model.RemoveEventListener(5, RequestModelRemoval);
         model.RemoveEventListener(6, DEIOPLMPOHK);
         model.RemoveEventListener(12, PPDEKDMGIMH);
         model.RemoveEventListener(18, BHBGIMOHFPI);
@@ -4708,6 +4721,7 @@ public partial class Fight
 	private void HCNDAFDHACI(GameOverTypes MHNEKAEGNBO)
 	{
         _eclipseRoundOutcomes.Cancel();
+        CancelEclipseProjectiles();
         CancelEclipseFighterMotion();
         CancelEclipseFighterPlayback();
 		if (IsLocalVersus)
@@ -4799,7 +4813,7 @@ public partial class Fight
 		{
 			HELFDCAIJNE = new List<CopyItemInfo>();
 		}
-		return MDKDAHCNCMC.EGFIFHKBNML(HELFDCAIJNE, JLHDJLHLGND);
+		return MDKDAHCNCMC.SpawnWeaponModel(HELFDCAIJNE, JLHDJLHLGND);
 	}
 
 	private void DEIOPLMPOHK(object data)
@@ -4819,6 +4833,11 @@ public partial class Fight
 
 	private void RemoveModel(Model ACENLMONNPA)
 	{
+        if (ACENLMONNPA != null)
+        {
+            HCPGFOCGDAA.Remove(ACENLMONNPA);
+            ForgetEclipseProjectile(ACENLMONNPA);
+        }
 		if (ACENLMONNPA == null)
 		{
 			LLLOJBFMONN.Error("Fight::removeModel - cant find model");

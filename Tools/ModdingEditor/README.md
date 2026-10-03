@@ -643,3 +643,9 @@ a complete original WAV/HUD example. Playback starts from runtime callbacks;
 instances follow scene/mod teardown and optional UI closure. Game-clock audio
 follows combat pause at normal playback rate. The analyzer checks literal
 volume bounds and capabilities; native audio and audibility need game checks.
+
+The `return-dart` starter uses `combat.projectiles`. `fighter:projectiles()`
+returns callback-scoped `Projectile` references with typed `snapshot()`,
+`move_by(x, y, z?)` and `remove()` returns. `lifetime_frames` is 1..600, default 180.
+Store copied IDs/positions and reacquire references each callback. Ordinary Lua
+turns the trajectory after 28 guided ticks; native attack edges handle contact.

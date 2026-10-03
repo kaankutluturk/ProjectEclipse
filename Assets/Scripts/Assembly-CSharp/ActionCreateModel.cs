@@ -51,6 +51,9 @@ public class ActionCreateModel : ActionAnimation
 		}
 	}
 
+	public string EclipseProjectileOwner { get; private set; }
+    public int EclipseProjectileLifetime { get; private set; }
+
 	public string StartAnimation
 	{
 		get { return _StartAnimation; }
@@ -85,6 +88,10 @@ public class ActionCreateModel : ActionAnimation
 	protected override void Parse(XmlNode node)
 	{
 		base.Parse(node);
+        EclipseProjectileOwner = ((XmlElement)node).GetAttribute("EclipseProjectileOwner");
+        EclipseProjectileLifetime = Eclipse.Modding.ModProjectileLimits.DefaultLifetimeFrames;
+        if (int.TryParse(((XmlElement)node).GetAttribute("EclipseProjectileLifetime"), out var lifetime))
+            EclipseProjectileLifetime = lifetime;
 		_Name = node.Attributes["Name"].CIPOICEEIBK(string.Empty);
 		_StartAnimation = node.Attributes["StartAnimation"].CIPOICEEIBK(string.Empty);
 		XmlElement xmlElement = node["Model"];
