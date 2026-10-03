@@ -235,7 +235,7 @@ public partial class Fight
                     if (model != null)
                         foreach (var weapon in model.KGGIDBLBMDJ()) observers.Add(weapon);
                 foreach (var observer in observers)
-                    if (observer != null && observer != replacement && observer.BDJBNOPNCNB() != expected &&
+                    if (observer != null && observer != replacement && observer.GetRootModel() != expected &&
                         observer._Enemies.Contains(expected))
                         _restoreEnemyTargets.Add(observer.ReplaceEnemyForm(expected, replacement));
                 if (!fight._SelectAnimation.ReplaceModel(expected, replacement))
@@ -2242,6 +2242,9 @@ public partial class Fight
 	{
 		Model.StrikeResult gHHCDAFIKJE = EGHPHELLOGO.KJDFJPBIGJC.GHHCDAFIKJE;
 		IntervalAttack hFIIPNLCIEE = EGHPHELLOGO.Data as IntervalAttack;
+		// Only Lua attribution uses the root fighter. Native calculations retain
+		// the actual contact actor, its animation, equipment and collision edges.
+		Model eclipseAttacker = (EGHPHELLOGO.GAIBPAGPEGK ?? gHHCDAFIKJE.GAIBPAGPEGK)?.GetRootModel();
 		if (hFIIPNLCIEE.HPLOFLKCLHG())
 		{
 			gHHCDAFIKJE.DNGKOMPMPCD = false;
@@ -2315,9 +2318,9 @@ public partial class Fight
         {
             var outgoing = new ModIncomingHit(() => gHHCDAFIKJE.EEDJBBOCFNL,
                 amount => gHHCDAFIKJE.EEDJBBOCFNL = (float)amount, gHHCDAFIKJE.DFOHNJEBDED, gHHCDAFIKJE.DNGKOMPMPCD);
-            if (EGHPHELLOGO.GAIBPAGPEGK == _playerModel)
+            if (eclipseAttacker == _playerModel)
                 DispatchEclipseCombatEvent(ModEffectEvent.DamageDealing, null, outgoing);
-            else if (EGHPHELLOGO.GAIBPAGPEGK == CKNCPOABFBO)
+            else if (eclipseAttacker == CKNCPOABFBO)
                 DispatchEclipseOpponent(ModEffectEvent.DamageDealing, null, outgoing);
         }
 		if (preFight != null)
@@ -2358,21 +2361,21 @@ public partial class Fight
 			{
 				if (observation.Damage > 0) DispatchEclipseCombatEvent(ModEffectEvent.DamageReceived, observation);
 				if (observation.Blocked) DispatchEclipseCombatEvent(ModEffectEvent.Block, observation);
-                if (EGHPHELLOGO.GAIBPAGPEGK == CKNCPOABFBO)
+                if (eclipseAttacker == CKNCPOABFBO)
                 {
                     if (observation.Damage > 0) DispatchEclipseOpponent(ModEffectEvent.DamageDealt, observation);
                     if (observation.Critical) DispatchEclipseOpponent(ModEffectEvent.Critical, observation);
                 }
 			}
-			else if (EGHPHELLOGO.GAIBPAGPEGK == _playerModel)
+			else if (EGHPHELLOGO.KJDFJPBIGJC == CKNCPOABFBO)
 			{
-				if (observation.Damage > 0) DispatchEclipseCombatEvent(ModEffectEvent.DamageDealt, observation);
-				if (observation.Critical) DispatchEclipseCombatEvent(ModEffectEvent.Critical, observation);
-                if (EGHPHELLOGO.KJDFJPBIGJC == CKNCPOABFBO)
+                if (eclipseAttacker == _playerModel)
                 {
-                    if (observation.Damage > 0) DispatchEclipseOpponent(ModEffectEvent.DamageReceived, observation);
-                    if (observation.Blocked) DispatchEclipseOpponent(ModEffectEvent.Block, observation);
+                    if (observation.Damage > 0) DispatchEclipseCombatEvent(ModEffectEvent.DamageDealt, observation);
+                    if (observation.Critical) DispatchEclipseCombatEvent(ModEffectEvent.Critical, observation);
                 }
+                if (observation.Damage > 0) DispatchEclipseOpponent(ModEffectEvent.DamageReceived, observation);
+                if (observation.Blocked) DispatchEclipseOpponent(ModEffectEvent.Block, observation);
 			}
 		}
 		KDMDOBOKAIB(EGHPHELLOGO.KJDFJPBIGJC.EGGEACCDAEK(), gHHCDAFIKJE.EEDJBBOCFNL);
@@ -3252,7 +3255,7 @@ public partial class Fight
 	{
 		if (IsLocalVersus || !_eclipseFightBeginDispatched || eventModel == null || strike == null || ModRuntime.Scripts == null) return;
 		Model target = eventModel.KJDFJPBIGJC;
-		Model attacker = eventModel.GAIBPAGPEGK ?? strike.GAIBPAGPEGK;
+		Model attacker = (eventModel.GAIBPAGPEGK ?? strike.GAIBPAGPEGK)?.GetRootModel();
 		InfoAnimation animation = strike.PBPDKJNKFCJ;
 		bool weapon = animation != null && animation.CNPFHBMGDFP("Weapon");
 		bool unarmed = animation != null && animation.CNPFHBMGDFP("Unarmed");
@@ -4251,8 +4254,8 @@ public partial class Fight
             replacement.NFOOGKCGFAB = expected.KFCNPADAMHA();
             var enemies = new HashSet<Model>();
             foreach (var enemy in expected._Enemies)
-                if (enemy != null && enemy.BDJBNOPNCNB() != expected &&
-                    enemy.BDJBNOPNCNB() == enemy && enemies.Add(enemy))
+                if (enemy != null && enemy.GetRootModel() != expected &&
+                    enemy.GetRootModel() == enemy && enemies.Add(enemy))
                     replacement.CJNGMIMHFCC(enemy);
             using (var bindings = new FormRenderBindings(this, expected, replacement))
             {
@@ -4277,11 +4280,11 @@ public partial class Fight
 
         var retired = new HashSet<Model> { expected };
         foreach (var model in LNDLFINJHDB)
-            if (model != null && model.BDJBNOPNCNB() == expected) retired.Add(model);
+            if (model != null && model.GetRootModel() == expected) retired.Add(model);
         foreach (var model in HCPGFOCGDAA)
-            if (model != null && model.BDJBNOPNCNB() == expected) retired.Add(model);
+            if (model != null && model.GetRootModel() == expected) retired.Add(model);
         foreach (var model in JLEFIKJODGG)
-            if (model != null && model.BDJBNOPNCNB() == expected) retired.Add(model);
+            if (model != null && model.GetRootModel() == expected) retired.Add(model);
         var bodies = new List<Model> { expected };
         foreach (var body in retired) if (body != expected) bodies.Add(body);
         for (int index = 0; index < bodies.Count; index++)

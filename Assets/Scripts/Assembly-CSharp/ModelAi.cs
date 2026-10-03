@@ -667,7 +667,7 @@ public class ModelAi
 		Model fGCODGKLHED = _Model.EGGEACCDAEK();
 		if (fGCODGKLHED != null)
 		{
-			Model fNKFIMEDNLP = fGCODGKLHED.BDJBNOPNCNB();
+			Model fNKFIMEDNLP = fGCODGKLHED.GetRootModel();
 			TacticFactors fJCBLOKOBBD = SetFactors(fNKFIMEDNLP);
 			return GIBODDNLGJH.SelectAnimationWithWeights(MAHEJFLCCHP, CGPDPHJIDPA, fJCBLOKOBBD);
 		}
@@ -1900,7 +1900,7 @@ public class ModelAi
 						}
 						if (-1 < num17)
 						{
-							float num20 = GetNodeX(hOGFLOLGGOL, _Model, FNKFIMEDNLP.BDJBNOPNCNB());
+							float num20 = GetNodeX(hOGFLOLGGOL, _Model, FNKFIMEDNLP.GetRootModel());
 							float oIOMNNFMDOO2 = (float)num16 * (num20 - num15) + OCCHDKNLAON;
 							Intervals gOOGNIPMCEM2 = null;
 							gOOGNIPMCEM2 = ((num17 >= item3.OCFKLCDIEBF.Count) ? item3.OCFKLCDIEBF[0] : item3.OCFKLCDIEBF[num17]);
@@ -2129,7 +2129,7 @@ public class ModelAi
 	private bool TestWall(InfoAnimation DBOLBEOCEME, Model ACENLMONNPA, Model FNKFIMEDNLP)
 	{
 		bool flag = true;
-		Model fNKFIMEDNLP = FNKFIMEDNLP.BDJBNOPNCNB();
+		Model fNKFIMEDNLP = FNKFIMEDNLP.GetRootModel();
 		return flag && TestWall(DBOLBEOCEME, _Model, fNKFIMEDNLP, "NPivot");
 	}
 
@@ -2252,10 +2252,10 @@ public class ModelAi
 
 	private float GetDistanceToEnemy(Model ACENLMONNPA)
 	{
-		int aOJJBKLCHJO = GetModelDirection(ACENLMONNPA, ACENLMONNPA.EGGEACCDAEK().BDJBNOPNCNB());
-		int aOJJBKLCHJO2 = GetModelDirection(ACENLMONNPA.EGGEACCDAEK().BDJBNOPNCNB(), ACENLMONNPA);
+		int aOJJBKLCHJO = GetModelDirection(ACENLMONNPA, ACENLMONNPA.EGGEACCDAEK().GetRootModel());
+		int aOJJBKLCHJO2 = GetModelDirection(ACENLMONNPA.EGGEACCDAEK().GetRootModel(), ACENLMONNPA);
 		ModelNode lCDGOCIAIDK = ACENLMONNPA.OCPMJKIEPIG().EGHIDHMENEF(AiData.get_DistanceNode(), aOJJBKLCHJO);
-		ModelNode lCDGOCIAIDK2 = ACENLMONNPA.EGGEACCDAEK().BDJBNOPNCNB().OCPMJKIEPIG()
+		ModelNode lCDGOCIAIDK2 = ACENLMONNPA.EGGEACCDAEK().GetRootModel().OCPMJKIEPIG()
 			.EGHIDHMENEF(AiData.get_DistanceNode(), aOJJBKLCHJO2);
 		if (lCDGOCIAIDK != null && lCDGOCIAIDK2 != null)
 		{

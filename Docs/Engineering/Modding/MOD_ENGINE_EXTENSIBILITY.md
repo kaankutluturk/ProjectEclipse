@@ -568,3 +568,14 @@ the timed hazard/telegraph proof for that controlled scenario, not closure of E6
 or the Minecraft-style objective. Solid/swept physics, arbitrary actors, general
 camera controls, all-arena/form and exported-platform acceptance remain open.
 See the creator work log and public arena reference for source and limits.
+
+## Creator projectile ability delivered
+
+Arc Dart composes existing typed content, queued fighter playback, scheduled
+child creation and attack/deletion actions into a native projectile. Lua controls
+activation and cooldown. Full-game controlled Campaign acceptance verifies
+visible flight, real native damage with main-caster Lua attribution, pause,
+hit deletion and miss expiry. Native scheduled actions now retain reentrant
+events for the next pass. This is a finite compatible missile graph; live child
+handles, general actors, homing/bouncing, arbitrary physics and original rig
+acceptance remain open. See the creator work log and projectile guide.

@@ -8,6 +8,15 @@ const { createMod } = require('../src/scaffold.cjs');
 const template = path.resolve(__dirname, '../templates/weapon');
 const header = 'local sf2 = require("sf2")\n';
 
+test('arc dart starter validates owned projectile graph and mirrors complete assets',async()=>{
+    const directory=path.resolve(__dirname,'../../../Mods/example.arc-dart');
+    const mod=await p.indexMod(directory);const text=await fs.readFile(path.join(directory,'scripts/main.lua'),'utf8');
+    assert.deepEqual(mod.issues,[]);assert.deepEqual(p.analyze(text,mod).issues,[]);
+    for(const file of ['mod.toml','README.md','scripts/main.lua',...['ranged_light_player','ranged_light_weapon','shuriken_fly'].map(n=>'assets/animations/'+n+'.bytes')])
+        assert.deepEqual(await fs.readFile(path.resolve(__dirname,'../templates/arc-dart',file)),await fs.readFile(path.join(directory,file)));
+    assert(p.analyze(text,{...mod,data:{...mod.data,capabilities:mod.data.capabilities.filter(c=>c!=='combat.animation')}}).issues.some(i=>i.capability==='combat.animation'));
+});
+
 test('active strike starter validates playback capabilities, timing, handles and mirrored assets',async()=>{
     const directory=path.resolve(__dirname,'../../../Mods/example.active-strike');
     const mod=await p.indexMod(directory);const text=await fs.readFile(path.join(directory,'scripts/main.lua'),'utf8');

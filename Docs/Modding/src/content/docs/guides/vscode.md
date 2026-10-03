@@ -187,3 +187,8 @@ recoloring and lifetime queries. Opponent sensors require `combat.target`; marke
 operations require `presentation.visuals`. Copy the manual `pulse-arena` starter
 for a complete timed hazard. See [Arena regions and markers](../../api/arena/).
 Editor checks cannot prove rendered alignment, native contacts or pause cleanup.
+
+The manual `Tools/ModdingEditor/templates/arc-dart/` starter connects typed
+projectile item/start-move handles to an owned cast, launch and flight. Its HUD
+uses deferred playback receipts. See [Create a projectile ability](../projectile-abilities/).
+Editor diagnostics cannot establish native travel, contact, expiry or child damage attribution.

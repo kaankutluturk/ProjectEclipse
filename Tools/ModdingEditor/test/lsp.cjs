@@ -214,6 +214,12 @@ async function main() {
     notify('textDocument/didChange',{textDocument:{uri:activeUri,version:2},contentChanges:[{text:activeText}]});
     await until(()=>diagnostics.has(activeKey)&&diagnostics.get(activeKey).length===0,'clean active strike diagnostics');
     console.log('PASS: fighter/opponent playback, typed receipt/hover and complete Active Strike script');
+    const dartText=fs.readFileSync(path.resolve(__dirname,'../../../Mods/example.arc-dart/scripts/main.lua'),'utf8');
+    const dartUri=open('arc-dart.lua',dartText+'\nsf2.price.coins("bad")\n');const dartKey=decodeURIComponent(dartUri).toLowerCase();
+    await until(()=>diagnostics.get(dartKey)?.some(d=>d.code==='param-type-mismatch'),'arc dart diagnostic publication');
+    notify('textDocument/didChange',{textDocument:{uri:dartUri,version:2},contentChanges:[{text:dartText}]});
+    await until(()=>diagnostics.has(dartKey)&&diagnostics.get(dartKey).length===0,'clean arc dart diagnostics');
+    console.log('PASS: complete Arc Dart cast/launch/flight/ability script');
     const arenaOptions=probe('arena-options.lua','local sf2=require("sf2")\nsf2.behaviors.register {id="x",on_tick=function(_,fighter)\n fighter:mark_rect { | }\nend}');
     await until(async()=>{const found=labels(await request('textDocument/completion',arenaOptions));return ['x','y','width','height'].every(key=>found.some(n=>n.startsWith(key)));},'arena rectangle fields');
     const arenaTarget=probe('arena-target.lua','local sf2=require("sf2")\nsf2.behaviors.register {id="x",on_tick=function(_,fighter)\n fighter.opponent:|\nend}');

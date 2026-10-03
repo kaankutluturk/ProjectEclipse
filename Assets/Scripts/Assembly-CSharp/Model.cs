@@ -1275,7 +1275,7 @@ public class Model : global::EventDispatcher<object>
 	{
 		get
 		{
-			return BDJBNOPNCNB();
+			return GetRootModel();
 		}
 	}
 
@@ -2889,10 +2889,10 @@ public class Model : global::EventDispatcher<object>
 		Model fGCODGKLHED = EGGEACCDAEK();
 		if (fGCODGKLHED != null)
 		{
-			Model fGCODGKLHED2 = fGCODGKLHED.BDJBNOPNCNB();
+			Model fGCODGKLHED2 = fGCODGKLHED.GetRootModel();
 			fGCODGKLHED2.DKFGOHCNIKL.PIOIIIMCFMJ(true, dBOLBEOCEME);
 		}
-		Model fGCODGKLHED3 = BDJBNOPNCNB();
+		Model fGCODGKLHED3 = GetRootModel();
 		fGCODGKLHED3.DKFGOHCNIKL.PIOIIIMCFMJ(false, dBOLBEOCEME);
 	}
 
@@ -2958,10 +2958,10 @@ public class Model : global::EventDispatcher<object>
 			Model fGCODGKLHED = EGGEACCDAEK();
 			if (fGCODGKLHED != null)
 			{
-				Model fGCODGKLHED2 = fGCODGKLHED.BDJBNOPNCNB();
+				Model fGCODGKLHED2 = fGCODGKLHED.GetRootModel();
 				fGCODGKLHED2.DKFGOHCNIKL.NFPKBOGGPBA(true, dBOLBEOCEME);
 			}
-			Model fGCODGKLHED3 = BDJBNOPNCNB();
+			Model fGCODGKLHED3 = GetRootModel();
 			fGCODGKLHED3.DKFGOHCNIKL.NFPKBOGGPBA(false, dBOLBEOCEME);
 		}
 	}
@@ -3303,11 +3303,12 @@ public class Model : global::EventDispatcher<object>
 		GDGHBKAENHK = false;
 	}
 
-	public Model BDJBNOPNCNB()
+	// best guess for name
+	public Model GetRootModel()
 	{
 		if (BFFLLGHDPEB != null)
 		{
-			return BFFLLGHDPEB.BDJBNOPNCNB();
+			return BFFLLGHDPEB.GetRootModel();
 		}
 		return this;
 	}
@@ -3383,7 +3384,7 @@ public class Model : global::EventDispatcher<object>
 		Model fGCODGKLHED = EGGEACCDAEK();
 		if (fGCODGKLHED != null)
 		{
-			Model fGCODGKLHED2 = fGCODGKLHED.BDJBNOPNCNB();
+			Model fGCODGKLHED2 = fGCODGKLHED.GetRootModel();
 			if (fGCODGKLHED2.FGKAFKFBFEM())
 			{
 				fGCODGKLHED2.HJOGNGDMAKJ.StartRangedEnemy();
@@ -3859,7 +3860,7 @@ public class Model : global::EventDispatcher<object>
 		}
 		else if (MJEJFBHOJKB == 0)
 		{
-			HFGPAELCNMF = HFGPAELCNMF.BDJBNOPNCNB();
+			HFGPAELCNMF = HFGPAELCNMF.GetRootModel();
 			float num = 0f;
 			float num2 = 0f;
 			float num3 = 0f;
@@ -4393,7 +4394,7 @@ public class Model : global::EventDispatcher<object>
 		Model fGCODGKLHED = EGGEACCDAEK();
 		if (fGCODGKLHED != null)
 		{
-			Model fGCODGKLHED2 = fGCODGKLHED.BDJBNOPNCNB();
+			Model fGCODGKLHED2 = fGCODGKLHED.GetRootModel();
 			fGCODGKLHED2.HJOGNGDMAKJ.SetWeaponEnemy(dJKEECEOCJB.EffectiveTacticSubtype);
 		}
 		HJOGNGDMAKJ.SetWeaponBot(dJKEECEOCJB.EffectiveTacticSubtype);
@@ -4622,8 +4623,8 @@ public class Model : global::EventDispatcher<object>
 
 	private void HEEHFLHNPOH(Model KKCCDBPOFOC, InfoAnimation DBOLBEOCEME, float CKKFKEIELCP, StrikeResult PPIAOBPLGOK)
 	{
-		Model fGCODGKLHED = BDJBNOPNCNB();
-		Model fGCODGKLHED2 = KKCCDBPOFOC.BDJBNOPNCNB();
+		Model fGCODGKLHED = GetRootModel();
+		Model fGCODGKLHED2 = KKCCDBPOFOC.GetRootModel();
 		fGCODGKLHED.DKFGOHCNIKL.LPCJBPFDFLD(true, DBOLBEOCEME, CKKFKEIELCP);
 		fGCODGKLHED2.DKFGOHCNIKL.LPCJBPFDFLD(false, DBOLBEOCEME, CKKFKEIELCP);
 		fGCODGKLHED2.DKFGOHCNIKL.AddRaidHitInfo(GHHCDAFIKJE.DFOHNJEBDED, GHHCDAFIKJE.DNGKOMPMPCD);

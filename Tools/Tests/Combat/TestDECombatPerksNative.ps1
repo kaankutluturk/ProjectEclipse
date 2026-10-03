@@ -42,6 +42,12 @@ $update = Extract-Block $fight 'private void UpdateEclipseStatusIcons()'
 $eventEnum = Extract-Block $runtime 'public enum ModEffectEvent'
 $hitEvent = Extract-Block $runtime 'public sealed class ModHitEvent'
 $incomingHit = Extract-Block $runtime 'public sealed class ModIncomingHit'
+$damageEvent = Extract-Block $runtime 'public sealed class ModDamageEvent'
+$outgoingStart = $postHit.LastIndexOf('if (_eclipseFightBeginDispatched)', $postHit.IndexOf('var outgoing = new ModIncomingHit'))
+$resolvedStart = $postHit.LastIndexOf('if (_eclipseFightBeginDispatched)', $postHit.IndexOf('var observation = new ModDamageEvent'))
+if ($outgoingStart -lt 0 -or $resolvedStart -le $outgoingStart) { throw 'Projectile attribution seams missing.' }
+$outgoing = Extract-Block $postHit.Substring($outgoingStart) 'if (_eclipseFightBeginDispatched)'
+$resolved = Extract-Block $postHit.Substring($resolvedStart) 'if (_eclipseFightBeginDispatched)'
 
 $source = @"
 using System;
@@ -52,6 +58,7 @@ namespace Eclipse.Modding {
 $eventEnum
 $hitEvent
 $incomingHit
+$damageEvent
 public readonly struct AssetId {
     public string Namespace { get; } public string Path { get; }
     private AssetId(string ns,string path){Namespace=ns;Path=path;}
@@ -65,13 +72,15 @@ public sealed class InfoAnimation {
 }
 public sealed class Model {
     public string Name;
+    public Model Owner; public Model GetRootModel()=>Owner==null?this:Owner.GetRootModel();
+    public float Health=1; public float KKMCHCNOHMB()=>Health;
     public sealed class EventModel { public Model KJDFJPBIGJC; public Model GAIBPAGPEGK; }
     public sealed class StrikeResult { public Model GAIBPAGPEGK; public InfoAnimation PBPDKJNKFCJ; public float EEDJBBOCFNL; public bool DFOHNJEBDED; public bool DNGKOMPMPCD; }
 }
 public static class PerksStage { public sealed class ActionPerk { public Model KJDFJPBIGJC; public Model BIKLKJMNGKP; public string NHKMCLPOMFK=""; public bool FLNCPBKBJBL; public int KGNDJOLBBJF; public int FLNLMIHEDCI; public int EclipseStackCount; } }
 public static class ModRuntime { public static object Scripts=new object(); }
 public sealed class FightHarness {
-    public sealed class Seen { public string Side; public Eclipse.Modding.ModEffectEvent Type; public Eclipse.Modding.ModIncomingHit Hit; }
+    public sealed class Seen { public string Side; public Eclipse.Modding.ModEffectEvent Type; public Eclipse.Modding.ModIncomingHit Hit; public ModDamageEvent Damage; }
     public readonly List<Seen> Events=new List<Seen>();
     public Model Player { get=>_playerModel; set=>_playerModel=value; } public Model Opponent { get=>CKNCPOABFBO; set=>CKNCPOABFBO=value; }
     public bool LocalVersus { get=>IsLocalVersus; set=>IsLocalVersus=value; }
@@ -80,14 +89,23 @@ public sealed class FightHarness {
     public int VisibleAdds,VisibleRemoves;
     private sealed class EclipseStatusIcon { public PerksStage.ActionPerk Action; public int ExpiresAt; }
     private readonly Dictionary<(Model,object),EclipseStatusIcon> _eclipseStatusIcons=new Dictionary<(Model,object),EclipseStatusIcon>();
-    private void DispatchEclipseCombatEvent(Eclipse.Modding.ModEffectEvent type,Eclipse.Modding.ModDamageEvent ignored=null,Eclipse.Modding.ModIncomingHit hit=null,object activity=null){Events.Add(new Seen{Side="player",Type=type,Hit=hit});}
-    private void DispatchEclipseOpponent(Eclipse.Modding.ModEffectEvent type,Eclipse.Modding.ModDamageEvent ignored=null,Eclipse.Modding.ModIncomingHit hit=null,object activity=null){Events.Add(new Seen{Side="opponent",Type=type,Hit=hit});}
+    private void DispatchEclipseCombatEvent(Eclipse.Modding.ModEffectEvent type,Eclipse.Modding.ModDamageEvent ignored=null,Eclipse.Modding.ModIncomingHit hit=null,object activity=null){Events.Add(new Seen{Side="player",Type=type,Hit=hit,Damage=ignored});}
+    private void DispatchEclipseOpponent(Eclipse.Modding.ModEffectEvent type,Eclipse.Modding.ModDamageEvent ignored=null,Eclipse.Modding.ModIncomingHit hit=null,object activity=null){Events.Add(new Seen{Side="opponent",Type=type,Hit=hit,Damage=ignored});}
     private void CKCCBJKIGIO(Model model,PerksStage.ActionPerk action,bool remove){if(remove)VisibleRemoves++;else VisibleAdds++;}
 $dispatch
 $show
 $clear
 $update
     public void Hit(Model.EventModel e,Model.StrikeResult s,Eclipse.Modding.ModEffectEvent type)=>DispatchEclipseHitPhase(e,s,type);
+    sealed class Round { public int round=1; } readonly Round round=new Round();
+    public void Outgoing(Model.EventModel EGHPHELLOGO,Model.StrikeResult gHHCDAFIKJE) {
+        Model eclipseAttacker=(EGHPHELLOGO.GAIBPAGPEGK??gHHCDAFIKJE.GAIBPAGPEGK)?.GetRootModel();
+$outgoing
+    }
+    public void Resolved(Model.EventModel EGHPHELLOGO,Model.StrikeResult gHHCDAFIKJE,float eclipseHealthBefore) {
+        Model eclipseAttacker=(EGHPHELLOGO.GAIBPAGPEGK??gHHCDAFIKJE.GAIBPAGPEGK)?.GetRootModel();
+$resolved
+    }
     public bool Show(Model m,object key,Eclipse.Modding.AssetId sprite,int frames,int stacks,out string error)=>TryShowEclipseStatusIcon(m,key,sprite,frames,stacks,out error);
     public bool Clear(Model m,object key,out string error)=>TryClearEclipseStatusIcon(m,key,out error);
     public void Advance(int frames){for(int i=0;i<frames;i++){fightTimeInFrame++;UpdateEclipseStatusIcons();}}
@@ -96,8 +114,6 @@ $update
 }
 "@
 
-# ModDamageEvent is only a dispatch-parameter type in the extracted helper fixture.
-$source = $source.Replace('namespace Eclipse.Modding {', 'namespace Eclipse.Modding { public sealed class ModDamageEvent {}')
 $source | Set-Content -Encoding UTF8 (Join-Path $fixture 'ProductionExtract.cs')
 Copy-Item -LiteralPath (Join-Path $root 'Tools/Tests/Combat/DECombatPerksNativeTests.cs') -Destination (Join-Path $fixture 'Program.cs') -Force
 '<Project Sdk="Microsoft.NET.Sdk"><PropertyGroup><OutputType>Exe</OutputType><TargetFramework>net10.0</TargetFramework><EnableDefaultCompileItems>true</EnableDefaultCompileItems><Nullable>disable</Nullable><LangVersion>latest</LangVersion></PropertyGroup></Project>' | Set-Content -Encoding UTF8 (Join-Path $fixture 'DECombatPerksNative.csproj')

@@ -319,17 +319,18 @@ public class SelectAnimation
 	{
 		HKOBFBADDJN.Clear();
 		CheckEventsForModels(BPIFJBJBKHA, AGKKIGDCPOD);
-		foreach (EventModelDelayed item in CFKGCLIKKOC)
+		// A scheduled PlayAnimation can emit start/end/interval events while these
+		// actions run. Drain only this batch and retain newly queued events for the
+		// next selection pass instead of mutating an enumerator or discarding them.
+		var actionEvents = CFKGCLIKKOC.ToArray();
+		CFKGCLIKKOC.Clear();
+		foreach (EventModelDelayed item in actionEvents)
 		{
 			if (item.KJDFJPBIGJC != null)
 			{
 				item.KJDFJPBIGJC.OCPMJKIEPIG().PJDPCLCOGFP(item.Type);
 			}
 		}
-		foreach (EventModelDelayed item2 in CFKGCLIKKOC)
-		{
-		}
-		CFKGCLIKKOC.Clear();
 		foreach (TriggerStruct item3 in IJIHPHBMEOI)
 		{
 			Model kJDFJPBIGJC = item3.KJDFJPBIGJC;

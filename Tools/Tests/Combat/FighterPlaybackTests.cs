@@ -92,6 +92,7 @@ static class Program
         Check(source.Split("CancelEclipseFighterPlayback();").Length-1==4,"Missing teardown hook");
         Check(source.IndexOf("ApplyEclipseFighterMotion();")<source.IndexOf("ApplyEclipseFighterPlayback();")&&source.IndexOf("ApplyEclipseFighterPlayback();")<source.IndexOf("RenderRound();"),"Wrong simulation boundary");
         Shipped();
+        ArcDart();
         Console.WriteLine("PASS: "+checks+" fighter-playback checks; actual MoonSharp and production motion/playback queues; native model, asset contents, clock and session controlled.");
     }
     static void Shipped()
@@ -110,5 +111,39 @@ static class Program
         for(int i=0;i<119;i++){fight.Clock++;Event(ModEffectEvent.Tick);}Check(!hud.Read("cast").Enabled,"Cooldown too short");fight.Clock++;Event(ModEffectEvent.Tick);Check(hud.Read("cast").Enabled&&hud.Read("status").Text=="Active Strike ready","Cooldown failed to recharge");
         fight.Player.Animations.Clear();Check(hud.TryClick("cast"),"Ready click rejected");Event(ModEffectEvent.Tick);fight.Clock++;Event(ModEffectEvent.Tick);Check(hud.Read("cast").Enabled&&hud.Read("status").Text=="Strike unavailable","Failed receipt did not reenable button");fight.PlaybackStep();Check(fight.Player.Plays==1,"Rejected cast played");
         Event(ModEffectEvent.RoundEnd);Check(hud.IsClosed,"Round end retained HUD");fight.round.round++;Event(ModEffectEvent.RoundBegin);var next=surfaces.Last();Check(next!=hud&&next.Read("cast").Enabled&&next.Read("status").Text=="Active Strike ready","Next round did not reset");Event(ModEffectEvent.FightEnd);Check(next.IsClosed,"Fight end retained HUD");
+    }
+    static void ArcDart()
+    {
+        var mod=ModDiscovery.DiscoverLoose(Path.Combine(repo,"Mods")).Mods.Single(m=>m.Manifest.Id.Value=="example.arc-dart");
+        var content=new ModContentCatalog();var stages=new XmlDocument();stages.Load(Path.Combine(repo,"Assets/vanillaXml/stages.xml"));CoreContentImporter.ImportStages(content,stages.SelectSingleNode("Stages/Zones"));
+        var items=new XmlDocument();items.Load(Path.Combine(repo,"Assets/vanillaXml/list.xml"));
+        CoreContentImporter.ImportRanged(content,items.SelectNodes("//Item[@Name='RANGED_C2_Z2_MONK_SHURIKEN']").Cast<XmlNode>(),new Dictionary<string,XmlDocument>());
+        var surfaces=new List<ModUiSurface>();
+        using var tx=content.BeginRegistration(mod);var api=new ModApiFacade(mod,new AssetResolver(new IAssetProvider[]{new LooseModProvider(mod)}),tx,new ModStateRuntime(),null);
+        using var context=new MoonSharpScriptRuntime(surfaces.Add).CreateContext(mod,api);context.ExecuteEntrypoint();tx.Commit();
+        Check(content.Moves.Count()==3,"Arc Dart graph lost a move");
+        var cast=content.Moves.Single(m=>m.Id.LocalId=="cast");
+        var flight=content.Moves.Single(m=>m.Id.LocalId=="flight");
+        var launch=content.Moves.Single(m=>m.Id.LocalId=="launch");
+        var projectile=cast.Graph.Presentation.Actions.Single(a=>a.Kind=="create_projectile");
+        Check(projectile.Frame==5&&projectile.Projectile.StartMove==launch.Id&&projectile.Projectile.Item==DefinitionId.Parse("core:items/ranged/RANGED_C2_Z2_MONK_SHURIKEN"),"Typed projectile source/timing/owned start link lost");
+        Check(flight.Graph.Presentation.Actions.Count(a=>a.Kind=="delete_actor")==2,"Flight needs contact and expiry deletion");
+        var loaded=new Loaded{Content=content};var fight=Native(loaded);var doc=new XmlDocument();doc.LoadXml("<BehaviorInstance/>");
+        var rule=content.FightRules.Single();var operations=(Fight.EclipseFighterOperations)fight.Operations();var fighter=new ModInstanceFighter(operations,doc.DocumentElement,rule);
+        void Event(ModEffectEvent kind,ModAnimationLifecycleEvent animation=null,ModDamageEvent damage=null){
+            var data=new Dictionary<string,string>{{"source","rule"},{"round",fight.round.round.ToString()},{"fight_id","fixture"}};
+            operations.AnimationEvent=animation;operations.DamageEvent=damage;
+            Check(((IModInteractiveBehaviorScriptContext)context).TryInvokeBehavior(rule.Behavior,kind,null,data,fighter,out var error),error);
+        }
+        Event(ModEffectEvent.RoundBegin);var hud=surfaces.Single();Check(hud.Read("cast").Enabled&&hud.Read("counts").Text=="Flights: 0 | Hits: 0","Initial Arc Dart HUD");
+        Check(hud.TryClick("cast"),"Arc Dart button rejected");Event(ModEffectEvent.Tick);Check(fight.Player.Plays==0&&hud.Read("status").Text=="Cast queued","Cast ran recursively");
+        fight.PlaybackStep();fight.Clock++;Event(ModEffectEvent.Tick);Check(fight.Player.Playing==cast.RuntimeName&&!hud.Read("cast").Enabled,"Cast receipt/cooldown");
+        Event(ModEffectEvent.AnimationStart,new ModAnimationLifecycleEvent(ModEffectEvent.AnimationStart,cast.RuntimeName,"self",fight.Clock));Check(hud.Read("counts").Text=="Flights: 0 | Hits: 0","Caster counted as flight");
+        Event(ModEffectEvent.AnimationStart,new ModAnimationLifecycleEvent(ModEffectEvent.AnimationStart,flight.RuntimeName,"other",fight.Clock));Check(hud.Read("counts").Text=="Flights: 1 | Hits: 0","Flight observation lost");
+        Event(ModEffectEvent.DamageDealt,damage:new ModDamageEvent(1,1,.9,false,false));Check(hud.Read("counts").Text=="Flights: 1 | Hits: 1","Attributed damage not displayed");
+        for(int i=0;i<179;i++){fight.Clock++;Event(ModEffectEvent.Tick);}Check(!hud.Read("cast").Enabled,"Arc Dart cooldown too short");fight.Clock++;Event(ModEffectEvent.Tick);Check(hud.Read("cast").Enabled&&hud.Read("status").Text=="Arc Dart ready","Cooldown never recovered");
+        fight.Player.Animations.Clear();Check(hud.TryClick("cast"),"Second intent rejected");Event(ModEffectEvent.Tick);fight.Clock++;Event(ModEffectEvent.Tick);Check(hud.Read("cast").Enabled&&hud.Read("status").Text=="Cast unavailable","Failed receipt left disabled HUD");
+        Event(ModEffectEvent.RoundEnd);Check(hud.IsClosed,"Arc Dart HUD leaked");fight.round.round++;Event(ModEffectEvent.RoundBegin);var next=surfaces.Last();Check(next.Read("counts").Text=="Flights: 0 | Hits: 0"&&next.Read("cast").Enabled,"Round state not reset");
+        next.Close();Event(ModEffectEvent.Tick);Event(ModEffectEvent.FightEnd);Check(next.IsClosed,"Closed HUD callback guard");
     }
 }

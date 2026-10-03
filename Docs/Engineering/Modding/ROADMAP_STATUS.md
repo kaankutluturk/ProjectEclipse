@@ -406,3 +406,11 @@ three-hit objective and matching editor starter pass production Lua/native-metho
 checks and isolated Unity HUD/font/render/fade checks. Full native end-animation,
 reward/save and real-contact acceptance remain open; this does not close E2 or
 the broader vision. See the creator-platform work log for source and limits.
+
+2026-10-04: Arc Dart now demonstrates a complete native projectile ability with
+owned cast/launch/flight moves, resolved child equipment, native contact damage,
+finite miss expiry and Lua cooldown/HUD. Full-game controlled Campaign acceptance
+passes 28 checks. Reentrant scheduled events and root caster Lua attribution were
+fixed in native source. No new API binding is implied; general live actors,
+steering, original rigs and broader platform/game acceptance remain open. See
+the creator work log and public projectile guide for source and limits.

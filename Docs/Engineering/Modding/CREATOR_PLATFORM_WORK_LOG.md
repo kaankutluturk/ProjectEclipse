@@ -780,3 +780,63 @@ This provides a rendered timed hazard with real geometric contact for one native
 arena. General actors, solid/swept physics, arbitrary camera/lighting control,
 all-arena/form behavior, physical input, exported platforms and independent
 newcomer acceptance remain required parts of the active objective.
+
+## 2026-10-04: native projectile ability and caster attribution
+
+Arc Dart (`Mods/example.arc-dart`, mirrored editor starter) completes a native
+projectile ability using existing typed move registration, explicit queued
+playback, scheduled projectile creation, resolved core equipment, native attack
+edges, lifecycle callbacks and owned HUD. Lua owns activation intent and a
+180-simulation-frame cooldown; static graphs own cast/launch/flight, contact
+attacks and hit/miss deletion. No new public binding or operation DSL was added.
+The three bundled animation binaries are unchanged base exports. The guide,
+callbacks reference, example index, sidebar and editor guide explain the contract.
+
+Source changes fix two failures found in the actual game. SelectAnimation now
+snapshots and clears its pending action batch before executing it; reentrant
+animation events survive for the following selection pass without invalidating
+the current enumerator. Fight resolves Lua attacker identity through the native
+child's root main fighter, including event/strike fallback and both sides' damage
+notifications. Native contact actor, equipment, damage arithmetic and target stay
+unchanged. Model.GetRootModel is a narrow descriptive guess with the required
+comment; existing callers and three character-form fixtures use that name.
+
+Verification: TestArcDartUnity passes 28 full-game Unity 6.6 checks in Campaign
+normal Tournament 3: native WeaponModel/SkeletonMissile and resolved shuriken,
+visible child, launch/flight lifecycle, 213.9264 units observed travel, contact
+health loss from 1 to 0.9836771 and caster Lua callback, pause/resume, hit deletion,
+miss expiry without extra damage, cooldown and surrender after expiry/HUD cleanup.
+The early-flight PNG was inspected. Input, AI and spacing are controlled and a
+fresh profile begins after tutorial; the root project/profile is untouched.
+The runner shares immutable TAR cache data through a junction in a marked Temp
+fixture and checks unique profiles, process completion and fresh result/log data.
+
+Managed playback passes 492 checks, including actual shipped Lua and graph,
+receipts, cooldown, failed-start recovery and round reset. The production-method
+perk/damage fixture passes 58 checks for nested roots, both sides, fallback,
+mutation and unrelated-root/NPC exclusions. Scheduled event batching passes five
+checks; all three affected character-form fixtures pass. Assembly-CSharp compiles
+against the ignored Unity 6.6 remapped project. Managed providers are controlled;
+these checks are distinct from the full-game run.
+
+Early attempts exposed a fixture mod-root mismatch, an unsupported direct
+cross-rig hand alignment (native index error), the queue crash and missing caster
+attribution. The example uses compatible native launch-origin alignment followed
+by its missile's own flight point. No general rig-alignment fix is claimed.
+Harness assumptions about the NoRanged placeholder and querying a deleted model
+were corrected without changing production behavior. Unity's unrelated Search
+startup exception remains; logs are not claimed error-free. The existing
+MoonSharp loader reflection warning remains in the passing managed fixture.
+
+This proves one creator-owned native projectile graph. Live child handles,
+steering/homing/bouncing, original rig import, reverse-facing/interrupted-cast
+and live-child surrender acceptance, all arenas, physical input and exported
+players remain open. G01–G14 and E1–E8 retain their broader scope.
+
+Final tooling checks: all four managed projects compile through ignored Unity
+6.6 reference remapping. Editor generate/check/build and 51 unit tests pass
+(228 bindings, 74 constants, 281 structures); actual LuaLS 3.19.1 integration
+includes the complete Arc Dart script, and actual VS Code integration passes its
+14 checks. Wiki types/build/search and 6249 links/assets across 60 pages pass;
+the existing duplicate 404 route warning remains. Generated editor contract
+changes are description updates, not newly supported functions.

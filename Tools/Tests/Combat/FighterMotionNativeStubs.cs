@@ -52,11 +52,13 @@ public partial class Fight
     public bool QueuePlayback(Model body,DefinitionId move,Action<bool,string> complete,out string reason)=>TryQueueEclipseFighterPlayback(body,move,complete,out reason);
     public void Cancel()=>CancelEclipseFighterMotion();
     public IModFighterOperations Operations()=>new EclipseFighterOperations(this,Player);
-    public sealed class EclipseFighterOperations : IModFighterOperations, IModFighterMotion, IModFighterPlayback, IModFighterTargets, IModCombatSnapshotSource
+    public sealed class EclipseFighterOperations : IModFighterOperations, IModFighterMotion, IModFighterPlayback, IModFighterTargets, IModCombatSnapshotSource, IModAnimationLifecycleSource, IModDamageEventSource
     {
         readonly Fight fight; readonly Model body;
         public EclipseFighterOperations(Fight fight,Model body){this.fight=fight;this.body=body;}
         public double Health=>body.Health;
+        public ModAnimationLifecycleEvent AnimationEvent { get; set; }
+        public ModDamageEvent DamageEvent { get; set; }
         public ModCombatSnapshot CaptureCombatSnapshot(){var other=body==fight.Player?fight.Enemy:fight.Player;return new ModCombatSnapshot(new ModFighterSnapshot(body.Health,1,1,body.X,body.Y,body.Z),new ModFighterSnapshot(other.Health,1,1,other.X,other.Y,other.Z),fight.Clock,fight.round.processing);}
         public IModFighterOperations Opponent=>new EclipseFighterOperations(fight,body==fight.Player?fight.Enemy:fight.Player);
         public bool TryMoveBy(double x,double y,double z,out string error)=>fight.Queue(body,x,y,z,out error);

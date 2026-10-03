@@ -31,6 +31,13 @@ Damage uses the runtime's life units; do not assume it is a health percentage,
 raw weapon damage, or the entire pool of a boss with multiple health bars.
 Pending damage has not been applied yet.
 
+For native child projectiles, attacker-side `on_hit_post_crit`, `on_post_hit`,
+`on_damage_dealing`, `on_damage_dealt` and `on_critical` route to the current root
+main fighter. The original child animation determines ranged/magic classification
+and the native contact/damage calculation. Fighter methods target the main fighter;
+these events do not expose a child handle. Defender notifications remain attached
+to the actual opposing main fighter who was hit.
+
 Fight-attached [behavior rules](../rules/#sf2rulesbehavior) also receive these callbacks, before each side's equipment/perk callbacks. Rule state is independent of equipped items.
 
 Player perk callbacks use active learned perks and equipped enchantments; opponent
@@ -450,7 +457,12 @@ on_damage_dealt = function(parameters, fighter, event)
 end,
 ```
 
-The health fields describe the opponent who was hit, not the attacker. Unrelated NPC hits are excluded. Do not treat this as a notification for every attempted attack.
+The health fields describe the opposing main fighter who was hit, not the
+attacker. Native child projectiles attribute damage to their current root fighter;
+the callback's fighter handle is that main fighter, not the child. Unrelated or
+retired roots cannot impersonate it. Damage to unrelated NPCs is excluded.
+Do not treat this as a notification for every attempted attack or as a
+projectile-instance identity. See [Create a projectile ability](../../guides/projectile-abilities/).
 
 ## on_block
 

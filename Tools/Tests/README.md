@@ -63,6 +63,20 @@ their help and docstrings for required inputs and execution behavior.
 
 ## PowerShell entry points
 
+`Combat/TestArcDartUnity.ps1` boots an isolated full-game Unity project/profile
+with only Arc Dart enabled. The native HUD casts an owned launch/flight graph
+through typed projectile actions: actual rig/item, rendering, travel, contact,
+caster damage attribution, pause, strike removal, miss expiry and cooldown are
+checked. `-ExistingFixture` accepts marked projectile/playback projects inside
+repository Temp. Immutable TAR cache sharing avoids repeated system-drive data;
+profiles/caches are not deleted. Controls/AI/spacing and post-tutorial state are
+controlled; physical inputs, reverse facing, Eclipse mode and exports are separate.
+`Combat/TestFighterPlayback.ps1` also exercises the shipped Lua graph and ability
+lifecycle with controlled models. `Combat/TestScheduledMoveEvents.ps1` checks
+the actual native action batch retains events raised by scheduled playback;
+`Combat/TestDECombatPerksNative.ps1` covers child-owner hit/outgoing/resolved
+routing in both directions, nested children and unrelated/retired roots.
+
 `Combat/TestFighterPlayback.ps1` compiles the production Lua bindings and complete
 playback/motion queues with controlled native dependencies. It checks typed owned
 move handles, capability/timing/lifetime guards, competing mods, receipts,

@@ -12,6 +12,8 @@ internal static class DECombatPerksNativeTests
     {
         CheckHitClassificationAndLiveDamage();
         CheckReverseSidesAndLocalVersus();
+        CheckChildAttackerRouting();
+        CheckResolvedChildDamage();
         CheckOutgoingArithmetic();
         CheckStatusIcons();
         Console.WriteLine("DE combat perks native PASS: " + _checks + " checks; extracted current hit-phase/status-icon methods and current hit contract.");
@@ -72,6 +74,57 @@ internal static class DECombatPerksNativeTests
         double before = damage;
         Check(!hit.TryAddOutgoing(-.01, out _) && damage == before, "Negative additive damage was accepted.");
         Check(!hit.TryAddOutgoing(1.01, out _) && damage == before, "Oversized additive damage was accepted.");
+    }
+
+    private static void CheckChildAttackerRouting()
+    {
+        foreach (bool reverse in new[] { false, true })
+        {
+            var fight = new FightHarness { Player = new Model { Name = "player" }, Opponent = new Model { Name = "opponent" } };
+            var root = reverse ? fight.Opponent : fight.Player;
+            var victim = reverse ? fight.Player : fight.Opponent;
+            var child = new Model { Name = "projectile", Owner = new Model { Owner = root } };
+            var strike = new Model.StrikeResult { GAIBPAGPEGK = child, PBPDKJNKFCJ = new InfoAnimation("RangedMissile"), EEDJBBOCFNL = .2f };
+            // Strike fallback and event actor both route through the current root.
+            foreach (bool fallback in new[] { false, true })
+            {
+                fight.Events.Clear();
+                fight.Hit(new Model.EventModel { KJDFJPBIGJC = victim, GAIBPAGPEGK = fallback ? null : child }, strike, ModEffectEvent.PostHit);
+                Check(fight.Events.Count == 2 && fight.Events[0].Side == (reverse ? "opponent" : "player"), "Nested child lost main attacker attribution.");
+                Check(fight.Events.All(e => e.Hit.HitEvent.Ranged) && !fight.Events[0].Hit.HitEvent.Incoming && fight.Events[1].Hit.HitEvent.Incoming, "Child tags or recipient perspective changed.");
+                Check(fight.Events[0].Hit.TryScaleOutgoing(2, out _), "Child outgoing modifier unavailable.");
+                Check(Math.Abs(strike.EEDJBBOCFNL - (fallback ? .8f : .4f)) < .00001 && strike.GAIBPAGPEGK == child, "Attribution changed native source or pending damage.");
+            }
+            fight.Events.Clear(); child.Owner = new Model { Name = "retired or unrelated" };
+            fight.Hit(new Model.EventModel { KJDFJPBIGJC = victim, GAIBPAGPEGK = child }, strike, ModEffectEvent.HitPostCrit);
+            Check(fight.Events.Count == 1 && fight.Events[0].Hit.HitEvent.Incoming, "Unrelated root impersonated current attacker.");
+            fight.Events.Clear(); fight.Hit(new Model.EventModel { KJDFJPBIGJC = new Model(), GAIBPAGPEGK = child }, strike, ModEffectEvent.PostHit);
+            Check(fight.Events.Count == 0, "Unrelated actor pair delivered main-fighter phase.");
+        }
+    }
+
+    private static void CheckResolvedChildDamage()
+    {
+        foreach (bool reverse in new[] { false, true })
+        {
+            var fight = new FightHarness { Player = new Model(), Opponent = new Model() };
+            var root = reverse ? fight.Opponent : fight.Player;
+            var victim = reverse ? fight.Player : fight.Opponent;
+            var child = new Model { Owner = root };
+            var strike = new Model.StrikeResult { GAIBPAGPEGK = child, EEDJBBOCFNL = .2f };
+            var contact = new Model.EventModel { GAIBPAGPEGK = child, KJDFJPBIGJC = victim };
+            fight.Outgoing(contact, strike);
+            Check(fight.Events.Count == 1 && fight.Events[0].Side == (reverse ? "opponent" : "player") && fight.Events[0].Type == ModEffectEvent.DamageDealing, "Child outgoing damage seam lost owner.");
+            Check(fight.Events[0].Hit.TryScaleOutgoing(2, out _) && Math.Abs(strike.EEDJBBOCFNL - .4f) < .00001, "Outgoing child mutation did not affect native strike.");
+            fight.Events.Clear(); victim.Health = .8f; strike.DFOHNJEBDED = true; strike.DNGKOMPMPCD = true;
+            fight.Resolved(contact, strike, 1);
+            Check(fight.Events.Count == 4 && fight.Events.Count(e => e.Type == ModEffectEvent.DamageDealt) == 1 && fight.Events.Count(e => e.Type == ModEffectEvent.DamageReceived) == 1 && fight.Events.Count(e => e.Type == ModEffectEvent.Block) == 1 && fight.Events.Count(e => e.Type == ModEffectEvent.Critical) == 1, "Child resolved damage duplicated or omitted events.");
+            Check(fight.Events.Single(e => e.Type == ModEffectEvent.DamageDealt).Side == (reverse ? "opponent" : "player") && fight.Events.All(e => Math.Abs(e.Damage.Damage - .2f) < .00001), "Wrong damage owner or observed amount.");
+            fight.Events.Clear(); child.Owner = new Model(); fight.Resolved(contact, strike, .8f);
+            Check(fight.Events.Count == 1 && fight.Events[0].Type == ModEffectEvent.Block, "Unrelated source/no health loss credited main attacker.");
+            fight.Events.Clear(); contact.KJDFJPBIGJC = new Model { Health = .5f }; child.Owner = root; fight.Resolved(contact, strike, 1);
+            Check(fight.Events.Count == 0, "Damage to unrelated NPC credited main-fighter pair.");
+        }
     }
 
     private static void CheckStatusIcons()

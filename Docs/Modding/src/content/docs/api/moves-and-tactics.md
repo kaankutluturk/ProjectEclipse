@@ -526,6 +526,12 @@ and scheduling with archived actions; this alone does not prove live projectile
 contact, cleanup or rendering. These optional action payloads participate in
 fingerprints; older action declarations retain their representation.
 
+See [Create a projectile ability](../../guides/projectile-abilities/) for the
+complete Arc Dart cast/launch/flight example. It uses native child contact damage
+and explicit miss expiry. The native action queue retains events raised during
+scheduled animation transitions for the following selection pass. Typed actions
+do not return a live child handle, supply arbitrary physics or prove rig compatibility.
+
 Core sound/icon names are exact symbolic names of 1–128 letters, digits, `_`,
 `-`, or `.`; they are not file paths or owned asset handles. Registration checks
 syntax, not resource availability. Missing core assets still follow the native

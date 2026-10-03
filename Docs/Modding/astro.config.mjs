@@ -25,6 +25,7 @@ export default defineConfig({
           { slug: 'guides/programmable-rules' },
           { slug: 'guides/fighter-motion' },
             { slug: 'guides/move-abilities' },
+          { slug: 'guides/projectile-abilities' },
           { slug: 'guides/combine-mods' },
           { slug: 'guides/character-authoring' },
           { slug: 'guides/gymnast' },
