@@ -20,6 +20,18 @@ Mods can change how fights look in two ways:
 Everything is off until a mod asks for it. The engine does the drawing; a mod
 describes effects with typed tables when it loads. No Lua runs per frame.
 
+The built-in **Options > Display > 3D fighters (experimental)** switch is a
+separate player preference, off by default. It uses the fight rig's actual depth
+coordinates with reduced depth separation, solid rounded limbs, thickened triangle surfaces and a lit
+perspective pass. It applies immediately to fighters and native child models in
+the active fight; turning it off restores the original silhouette rendering.
+The arena, HUD and menu previews retain their original projection. This is an
+early geometry experiment, with visible seams and flat equipment surfaces, not a
+complete textured/skinned character or 3D arena pipeline. Existing effects still
+use their documented native presentation paths, so overlays, trails, markers and
+post-processing are not guaranteed to match the perspective geometry. No new Lua
+camera or mesh-authoring function is exposed by this switch.
+
 Mod settings are simple on/off switches that appear under
 **Options > Mod settings**, labelled with your mod's name. Link an effect to a
 switch and players can turn it off without disabling your mod.

@@ -840,3 +840,26 @@ includes the complete Arc Dart script, and actual VS Code integration passes its
 14 checks. Wiki types/build/search and 6249 links/assets across 60 pages pass;
 the existing duplicate 404 route warning remains. Generated editor contract
 changes are description updates, not newly supported functions.
+
+## 2026-10-04: requested experimental perspective rendering
+
+After committing/pushing Arc Dart, the user requested a 3D rendering experiment
+before broader API work continued. Options > Display now has an off-by-default,
+immediate persistent 3D fighters switch. Recovered interpolated XYZ, rounded
+solid limbs, thickened native polygons and a lit perspective camera supply a
+first approximation. Presentation depth separation is attenuated to 35% so
+panels authored for flat overlap remain closer to the solid body. The active
+fight viewer exclusively owns the additional pass; arena/HUD/menu projection
+and native simulation remain unchanged. No public Lua function was added and
+this does not close the arbitrary camera/actor/character pipeline requirements.
+
+See Docs/Engineering/EXPERIMENTAL_FIGHTER_3D.md for the exact source, geometry,
+camera reflection/ownership, limits and failed attempts. Full-game Unity 6.6
+Campaign acceptance passes 26 checks, including actual Settings click/save,
+projection orientation, native depth, 176 volume meshes/normals, menu isolation,
+paused pose invariance, off restoration, animation resume, default reset and
+camera teardown. Final before/after/Settings PNGs were inspected. Four managed
+projects compile; 19 interpolation checks and wiki types/build/search with 6249
+links across 60 pages pass. Input/AI/spacing are controlled. Geometry remains
+rough, with seams and flat cloth/head panels; all equipment/forms/arenas, mod
+visual integration, physical input, exported players and performance are open.

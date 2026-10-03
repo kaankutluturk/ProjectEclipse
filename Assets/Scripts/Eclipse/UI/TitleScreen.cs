@@ -690,17 +690,20 @@ namespace Eclipse.UI
             {
                 Row("Window mode", () => mode == FullScreenMode.Windowed ? "Windowed" : "Borderless fullscreen", 244, () =>
                 { mode = mode == FullScreenMode.Windowed ? FullScreenMode.FullScreenWindow : FullScreenMode.Windowed; });
-                Row("Resolution", () => resolution.x + " x " + resolution.y, 296, () =>
+                Row("Resolution", () => resolution.x + " x " + resolution.y, 288, () =>
                 { resolution = resolutions[(resolutions.IndexOf(resolution) + 1) % resolutions.Count]; });
-                Row("Frame limit", () => SF2DisplayFrameRate.MaxFrameRate == 0 ? "Display / VSync" : SF2DisplayFrameRate.MaxFrameRate + " FPS", 348, () =>
+                Row("Frame limit", () => SF2DisplayFrameRate.MaxFrameRate == 0 ? "Display / VSync" : SF2DisplayFrameRate.MaxFrameRate + " FPS", 332, () =>
                 { SF2DisplayFrameRate.SetMaxFrameRate(Caps[(Array.IndexOf(Caps, SF2DisplayFrameRate.MaxFrameRate) + 1) % Caps.Length]); });
-                Row("Frame interpolation", () => OnOff(SF2DisplayFrameRate.InterpolationEnabled), 400, () =>
+                Row("Frame interpolation", () => OnOff(SF2DisplayFrameRate.InterpolationEnabled), 376, () =>
                 { SF2DisplayFrameRate.ToggleInterpolation(); });
-                Row("Motion blur", () => OnOff(SF2DisplayFrameRate.MotionBlurEnabled), 452, () =>
+                Row("Motion blur", () => OnOff(SF2DisplayFrameRate.MotionBlurEnabled), 420, () =>
                 { SF2DisplayFrameRate.ToggleMotionBlur(); });
-                Row("Anti-aliasing", () => SF2DisplayFrameRate.AntiAliasingLabel(SF2DisplayFrameRate.AntiAliasing), 504, () =>
+                Row("Anti-aliasing", () => SF2DisplayFrameRate.AntiAliasingLabel(SF2DisplayFrameRate.AntiAliasing), 464, () =>
                 { SF2DisplayFrameRate.CycleAntiAliasing(); });
-                Row("Performance overlay (F3)", () => Eclipse.Diagnostics.PerformanceOverlay.ModeLabel(Eclipse.Diagnostics.PerformanceOverlay.CurrentMode), 556, () =>
+                var depthOption = Row("3D fighters (experimental)", () => OnOff(SF2DisplayFrameRate.Experimental3DEnabled), 508, () =>
+                { SF2DisplayFrameRate.ToggleExperimental3D(); });
+                depthOption.GetComponentInParent<Button>().name = "Experimental 3D fighters";
+                Row("Performance overlay (F3)", () => Eclipse.Diagnostics.PerformanceOverlay.ModeLabel(Eclipse.Diagnostics.PerformanceOverlay.CurrentMode), 552, () =>
                 { Eclipse.Diagnostics.PerformanceOverlay.CycleMode(); });
                 var apply = Button(page, "Apply display", 852, 604, 340, 48, ApplyDisplay);
                 apply.interactable = !Application.isMobilePlatform;
@@ -773,9 +776,10 @@ namespace Eclipse.UI
 
         private Text Row(string name, Func<string> value, float y, Action action)
         {
-            Label(page, name, 76, y, 500, 48, 25, Ink);
+            float height = currentPage == "Display" ? 40f : 48f;
+            Label(page, name, 76, y, 500, height, 25, Ink);
             Text label = null;
-            var button = Button(page, value() + "   >", 686, y, 506, 48, () =>
+            var button = Button(page, value() + "   >", 686, y, 506, height, () =>
             {
                 action();
                 label.text = value() + "   >";

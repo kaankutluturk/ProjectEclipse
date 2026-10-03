@@ -29,6 +29,7 @@ namespace Nekki.SF2.Core.Fights.Renders.Model
 
 		private MaterialPropertyBlock _RimBlock;
 		private Eclipse.Rendering.RimFeather _RimFeather;
+		private Eclipse.Rendering.FighterVolume _Volume;
 
 		public Color get_Color()
 		{
@@ -86,7 +87,7 @@ namespace Nekki.SF2.Core.Fights.Renders.Model
 		private void UpdateRim()
 		{
 			if (_RimRenderer == null) return;
-			bool active = Eclipse.Rendering.RimLight.Active;
+			bool active = Eclipse.Rendering.RimLight.Active && (_Volume == null || !_Volume.gameObject.activeSelf);
 			if (_RimRenderer.gameObject.activeSelf != active) _RimRenderer.gameObject.SetActive(active);
 			if (!active) return;
 			_RimRenderer.transform.localPosition = Eclipse.Rendering.RimLight.LocalOffset(base.transform);
@@ -125,8 +126,14 @@ namespace Nekki.SF2.Core.Fights.Renders.Model
 		{
 			if (JBLMEBBICJI != null)
 			{
-				JBLMEBBICJI.Render(Eclipse.Rendering.ModelPresentation.AlphaFor(_Presentation));
+				bool solid = Eclipse.Rendering.ExperimentalFighterCamera.ActiveFor(transform);
+				if (solid && _Volume == null) _Volume = Eclipse.Rendering.FighterVolume.Create(transform);
+				solid = solid && _Volume != null;
+				if (_Volume != null) _Volume.gameObject.SetActive(solid);
+				_Renderer.enabled = !solid;
+				JBLMEBBICJI.Render(Eclipse.Rendering.ModelPresentation.AlphaFor(_Presentation), solid);
 				ApplyTint();
+				if (solid) _Volume.Surface(JBLMEBBICJI.Vertices, JBLMEBBICJI.Triangles, _Presentation != null ? _Presentation.Tint ?? _Color : _Color);
 				_Mesh.vertices = JBLMEBBICJI.Vertices;
 				_Mesh.RecalculateBounds();
 				UpdateRim();

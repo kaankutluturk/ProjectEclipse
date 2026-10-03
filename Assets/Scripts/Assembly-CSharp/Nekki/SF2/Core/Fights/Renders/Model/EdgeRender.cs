@@ -45,6 +45,7 @@ namespace Nekki.SF2.Core.Fights.Renders.Model
 
 		private void Update()
 		{
+			_Line.enabled = !Eclipse.Rendering.ExperimentalFighterCamera.ActiveFor(transform);
 			if (!_PresentationResolved)
 			{
 				_Presentation = GetComponentInParent<Eclipse.Rendering.ModelPresentation>();

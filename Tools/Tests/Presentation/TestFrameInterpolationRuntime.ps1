@@ -36,12 +36,12 @@ $frameRateFiles = @(
 )
 
 Assert-True ($mesh.Contains('FightInterpolation.SamplePosition')) 'Visible mesh does not use interpolation'
-Assert-True ($interpolation.Contains('node.ICLEOFDKDIF()')) 'Interpolation does not read the authoritative current pose'
-Assert-True ($interpolation.Contains('node.FOGHEPNAPLC()')) 'Interpolation does not read the previous pose'
+Assert-True ($interpolation.Contains('node.GetStart()')) 'Interpolation does not read the authoritative current pose'
+Assert-True ($interpolation.Contains('node.GetEnd()')) 'Interpolation does not read the previous pose'
 Assert-True (!$physics.Contains('FightInterpolation')) 'Model physics depends on render interpolation'
 Assert-True (!$collision.Contains('FightInterpolation')) 'Collision depends on render interpolation'
-Assert-True (!$interpolation.Contains('AMPCKAIPIHH(')) 'Interpolation writes the authoritative current pose'
-Assert-True (!$interpolation.Contains('LAHLFIKENPP(')) 'Interpolation writes the authoritative previous pose'
+Assert-True (!$interpolation.Contains('node.SetStart(')) 'Interpolation writes the authoritative current pose'
+Assert-True (!$interpolation.Contains('node.SetEnd(')) 'Interpolation writes the authoritative previous pose'
 foreach ($relative in $frameRateFiles) {
     $source = Get-Content -Raw (Join-Path $projectPath $relative)
     Assert-True ($source.Contains('SF2DisplayFrameRate.Apply()')) "Frame cap remains in $relative"

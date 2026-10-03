@@ -189,6 +189,16 @@ spacing are controlled; this does not prove solid/swept physics or all arenas.
 
 ## Native validators
 
+`Presentation/TestExperimental3DUnity.ps1` launches the full game in an isolated
+Unity 6.6 fixture with a unique post-tutorial profile and no enabled mods. It
+clicks the actual Display/3D fighters toggle, captures before/after and Settings
+PNGs, and checks native depth, volume normals, shader/perspective orientation,
+viewer ownership, paused pose isolation, off restore, resumed animation,
+preference reset and camera teardown. AI/input/spacing are controlled; this is
+not all equipment/arenas, physical input, performance or exported-player proof.
+Use `-ExistingFixture` only with its rendering marker or a fighter-playback marker
+inside repository Temp. See the experimental rendering engineering note.
+
 `Runtime/TestUnity6Workflows.ps1` uses the matching Unity 6.6 editor in an isolated
 project to test input devices across Play Mode frames, modern UI modules and
 native Build Profile/Multiplayer Play Mode scenario serialization. It does not

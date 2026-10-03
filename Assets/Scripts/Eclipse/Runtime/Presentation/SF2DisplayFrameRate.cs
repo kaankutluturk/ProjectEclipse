@@ -19,6 +19,21 @@ public static class SF2DisplayFrameRate
 	private const string MotionBlurPlayerPref = "SF2.MotionBlur";
 
 	private const string AntiAliasingPlayerPref = "SF2.AntiAliasing";
+	private const string Experimental3DPlayerPref = "Eclipse.ExperimentalFighter3D";
+	private static bool _experimental3DEnabled;
+
+	public static bool Experimental3DEnabled
+	{
+		get { LoadSettings(); return _experimental3DEnabled; }
+	}
+
+	public static void ToggleExperimental3D()
+	{
+		LoadSettings();
+		_experimental3DEnabled = !_experimental3DEnabled;
+		PlayerPrefs.SetInt(Experimental3DPlayerPref, _experimental3DEnabled ? 1 : 0);
+		PlayerPrefs.Save();
+	}
 
 
 	// MSAA sample counts offered by the settings UIs (0 = off).
@@ -176,11 +191,13 @@ public static class SF2DisplayFrameRate
 		_interpolationEnabled = DefaultInterpolationEnabled;
 		_maxFrameRate = DefaultMaxFrameRate;
 		_motionBlurEnabled = DefaultMotionBlurEnabled;
+		_experimental3DEnabled = false;
 		_antiAliasing = NormalizeAntiAliasing(DefaultAntiAliasing);
 		PlayerPrefs.DeleteKey(AntiAliasingPlayerPref);
 		PlayerPrefs.DeleteKey(InterpolationPlayerPref);
 		PlayerPrefs.DeleteKey(MaxFrameRatePlayerPref);
 		PlayerPrefs.DeleteKey(MotionBlurPlayerPref);
+		PlayerPrefs.DeleteKey(Experimental3DPlayerPref);
 		Apply();
 	}
 
@@ -193,6 +210,7 @@ public static class SF2DisplayFrameRate
 		_interpolationEnabled = PlayerPrefs.GetInt(InterpolationPlayerPref, DefaultInterpolationEnabled ? 1 : 0) != 0;
 		_maxFrameRate = Mathf.Max(0, PlayerPrefs.GetInt(MaxFrameRatePlayerPref, DefaultMaxFrameRate));
 		_motionBlurEnabled = PlayerPrefs.GetInt(MotionBlurPlayerPref, DefaultMotionBlurEnabled ? 1 : 0) != 0;
+		_experimental3DEnabled = PlayerPrefs.GetInt(Experimental3DPlayerPref, 0) != 0;
 		_antiAliasing = NormalizeAntiAliasing(PlayerPrefs.GetInt(AntiAliasingPlayerPref, DefaultAntiAliasing));
 		_settingsLoaded = true;
 	}

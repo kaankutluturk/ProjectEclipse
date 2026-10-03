@@ -39,7 +39,7 @@ public class MeshNode
 		_TrianglesList = null;
 	}
 
-	public void Render(float alpha)
+	public void Render(float alpha, bool preserveDepth = false)
 	{
 		for (int i = 0; i < Vertices.Length; i++)
 		{
@@ -47,7 +47,7 @@ public class MeshNode
 			float y;
 			float z;
 			FightInterpolation.SamplePosition(MFONEBKEMAD[i], alpha, out x, out y, out z);
-			Vertices[i].Set(x, y, 0f);
+			Vertices[i].Set(x, y, preserveDepth ? z : 0f);
 		}
 	}
 }

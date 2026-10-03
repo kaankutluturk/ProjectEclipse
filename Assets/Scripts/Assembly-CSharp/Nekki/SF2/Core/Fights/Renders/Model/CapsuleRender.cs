@@ -27,6 +27,7 @@ namespace Nekki.SF2.Core.Fights.Renders.Model
 		private Color _OriginalEndColor;
 
 		private LineRenderer _RimLine;
+		private Eclipse.Rendering.FighterVolume _Volume;
 
 		public float NFOMECHPEOP
 		{
@@ -79,7 +80,7 @@ namespace Nekki.SF2.Core.Fights.Renders.Model
 		// Experimental rim light: an offset, rim-coloured twin line behind this one.
 		private void UpdateRim(Vector3 start, Vector3 end)
 		{
-			bool active = Eclipse.Rendering.RimLight.Active;
+			bool active = Eclipse.Rendering.RimLight.Active && (_Volume == null || !_Volume.gameObject.activeSelf);
 			if (!active)
 			{
 				if (_RimLine != null && _RimLine.gameObject.activeSelf) _RimLine.gameObject.SetActive(false);
@@ -187,6 +188,13 @@ namespace Nekki.SF2.Core.Fights.Renders.Model
 				}
 				_LineRender.SetPosition(0, new Vector3(x, y, 0f));
 				_LineRender.SetPosition(1, new Vector3(x2, y2, 0f));
+				bool solid = Eclipse.Rendering.ExperimentalFighterCamera.ActiveFor(transform);
+				if (solid && _Volume == null) _Volume = Eclipse.Rendering.FighterVolume.Create(transform);
+				solid = solid && _Volume != null;
+				if (_Volume != null) _Volume.gameObject.SetActive(solid);
+				_LineRender.enabled = !solid;
+				if (solid) _Volume.Capsule(Vector3.LerpUnclamped(start, end, _Base.JAEOCMCOEFE()),
+					Vector3.LerpUnclamped(start, end, 1f - _Base.PLFEEBJMGAK()), _Stroke, _LineRender.startColor);
 				UpdateRim(new Vector3(x, y, 0f), new Vector3(x2, y2, 0f));
 			}
 		}
