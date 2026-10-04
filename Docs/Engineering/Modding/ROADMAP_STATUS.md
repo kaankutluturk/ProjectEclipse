@@ -2,6 +2,18 @@
 
 Last broad reconciliation: 2026-09-12. Scope remains **G01–G14 plus E1–E8**.
 
+2026-10-04 atomic target integration: an internal root/weapon-child transaction
+installs explicit hostile roots and selected cached/event/animation targets,
+invalidates previous-target AI observation/waits/throttle and supports synchronous
+failure rollback. The corrected full-game targeting mode passes 303 checks:
+autonomous contact after a new attack start following first contact, extra-root
+incoming native damage after retarget, unchanged excluded player health, shared
+node bindings and original-duel restoration/removal. The earlier 180-check repeat
+assertion could count starts before first contact and is superseded by this
+stronger acceptance. Construction remains legacy mutual hostility; no public
+actors/teams, owner lifetimes, arbitrary rigs/tactics or alternate outcomes ship.
+See ACTOR_FEASIBILITY.md and the creator work log. E1/E2/E5 progress; broad scope open.
+
 2026-10-04 third-root AI readiness/routing: native controllers joining an ongoing
 Campaign fight now initialize their running own move; animation starts observe
 the actual source and each distinct registered root targeting it. Strict native

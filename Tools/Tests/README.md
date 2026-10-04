@@ -77,12 +77,25 @@ The probe also checks actual shared native move-point bindings across the live
 roots and repeats those observations after removing the extra root.
 Pass `-RequireAutonomous` to forbid fixture-requested attack playback, allow up to
 600 simulation frames for the first native AI contact and require a second
-distinct attack start/contact. This mode checks current own/target AI observations
+  distinct attack start after first contact and later damage sampled after that
+  start. This mode checks current own/target AI observations
 before knockout/removal. Its core cloned rig/tactic scenario is not broad AI,
 team or mod-owned actor acceptance.
 Reuse requires a marked project inside repository Temp; an open fixture is
 rejected and compiler errors fail early. See the actor feasibility record under
 `Docs/Engineering/Modding/` for the native boundaries and remaining proof work.
+
+Pass `-RequireTargeting` to include the strict autonomous scenario, immediate
+transactional target rollback, explicit hostile-root binding changes, incoming
+native damage on the extra root with unchanged excluded player health, current
+new-target node/AI observations and original-duel target restoration before removal.
+This mode has core cloned-rig acceptance; it does not expose a Lua actor/team API.
+
+`Combat/TestCombatTargetBindings.ps1` extracts production hostile-root and AI-target
+transaction methods. Controlled services exercise exact synchronous rollback,
+source/target validation, child propagation, selected-first ordering, old-target
+observation/wait/throttle invalidation, empty/unarmed targets, mapping failure
+before mutation and child-binding failure rollback. It is not a Unity playtest.
 
 `Combat/TestAnimationObserverRouting.ps1` extracts the production animation-start
 methods and checks own/source/observer identity with controlled native services:

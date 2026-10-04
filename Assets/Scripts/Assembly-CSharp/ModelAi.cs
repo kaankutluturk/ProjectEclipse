@@ -642,6 +642,39 @@ public class ModelAi
         return () => HCJOIHLKOKJ = weapon;
     }
 
+    // Changing an actor's target invalidates observations and waits belonging to
+    // the previous body. Seed the new observation on the next ordinary AI tick;
+    // do not draw random values or invoke tactics inside a targeting transaction.
+    internal System.Action ResetCombatTarget(string weaponSubtype)
+    {
+        var weapon = AiData.GetItemEquivalent(weaponSubtype);
+        var oldWeapon = HCJOIHLKOKJ;
+        var observed = COKFBIJAFLH;
+        var response = EBEHPENMJLK;
+        var frame = MEHOEEIGCEP;
+        var wait = NHIPFEIIPKG;
+        var deferred = BEEPJNOFDCK;
+        var waitKind = PLDABIGHHFG;
+        var decisionFrame = _modDecisionFrame;
+        var decisionOwned = _modDecisionOwned;
+        HCJOIHLKOKJ = weapon;
+        COKFBIJAFLH = null;
+        EBEHPENMJLK = 0;
+        MEHOEEIGCEP = -1;
+        NHIPFEIIPKG = 1;
+        BEEPJNOFDCK = false;
+        PLDABIGHHFG = CBGBLIPAMGA.SetWaitNone;
+        _modDecisionFrame = -1;
+        _modDecisionOwned = false;
+        return () =>
+        {
+            HCJOIHLKOKJ = oldWeapon; COKFBIJAFLH = observed;
+            EBEHPENMJLK = response; MEHOEEIGCEP = frame; NHIPFEIIPKG = wait;
+            BEEPJNOFDCK = deferred; PLDABIGHHFG = waitKind;
+            _modDecisionFrame = decisionFrame; _modDecisionOwned = decisionOwned;
+        };
+    }
+
 	public void SetWeaponBot(string PPIEODBOOJA)
 	{
 		EIMKBOMDAAE = AiData.GetItemEquivalent(PPIEODBOOJA);

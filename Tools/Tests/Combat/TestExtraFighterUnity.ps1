@@ -1,4 +1,4 @@
-param([string]$Unity = '', [string]$ExistingFixture = '', [switch]$RequireAutonomous)
+param([string]$Unity = '', [string]$ExistingFixture = '', [switch]$RequireAutonomous, [switch]$RequireTargeting)
 $ErrorActionPreference = 'Stop'
 $root = Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $PSScriptRoot))
 $versionFile = Join-Path $root 'ProjectSettings/ProjectVersion.txt'
@@ -38,7 +38,8 @@ New-Item -ItemType Directory -Force -Path $actorProbeCacheTarget | Out-Null
 New-Item -ItemType Directory -Force -Path (Split-Path -Parent $actorProbeCache) | Out-Null
 New-Item -ItemType Junction -Path $actorProbeCache -Target $actorProbeCacheTarget | Out-Null
 $arguments = @('-projectPath',('"'+$fixture+'"'),'-executeMethod','ExtraFighterUnity.Run','-extraFighterAcceptanceProductName',$actorProbeProduct,'-logFile',('"'+$log+'"'))
-if ($RequireAutonomous) { $arguments += '-requireAutonomousExtraFighter' }
+if ($RequireAutonomous -or $RequireTargeting) { $arguments += '-requireAutonomousExtraFighter' }
+if ($RequireTargeting) { $arguments += '-requireTargetingExtraFighter' }
 $process = Start-Process -FilePath $Unity -ArgumentList $arguments -WindowStyle Hidden -PassThru
 Write-Host "Native extra-root process: $($process.Id)"
 $deadline = [DateTime]::UtcNow.AddMinutes(15)

@@ -16,14 +16,16 @@ public static class ExtraFighterUnity
     const BindingFlags Hidden = BindingFlags.Instance | BindingFlags.NonPublic;
     static double started, report;
     static bool campaign, entered;
-    static int phase, checks, births, phaseFrame, attackStarts;
+    static int phase, checks, births, phaseFrame, attackStarts, firstContactAttackStarts;
     static Model actor;
     static bool explicitAttack;
+    static bool targetingAccepted;
     static float playerBefore, enemyBefore, actorBefore, firstContactHealth, secondAttackBeforeHealth;
     static string failure;
     static readonly System.Collections.Generic.HashSet<string> animations = new System.Collections.Generic.HashSet<string>();
     static string Root => Path.GetDirectoryName(Application.dataPath);
     static bool RequireAutonomous => Environment.GetCommandLineArgs().Contains("-requireAutonomousExtraFighter");
+    static bool RequireTargeting => Environment.GetCommandLineArgs().Contains("-requireTargetingExtraFighter");
 
     static ExtraFighterUnity()
     {
@@ -84,7 +86,8 @@ public static class ExtraFighterUnity
             if (fight == null || fight.get_FightTimeInFrames() < 100) return;
             var player = fight.GetPlayerModel(); var enemy = fight.GetEnemyModel();
             if (player == null || enemy == null) return;
-            player.Parameters.UserControlled = false; player.Parameters.AiControlled = false; enemy.Parameters.AiControlled = false;
+            player.Parameters.UserControlled = false; player.Parameters.AiControlled = false;
+            if (phase != 8) enemy.Parameters.AiControlled = false;
             int frame = fight.get_FightTimeInFrames();
             if (actor != null && fight.LNDLFINJHDB.Contains(actor) && actor.GetCurrentAnimation() != null) animations.Add(actor.GetCurrentAnimation().Name);
             switch (phase)
@@ -107,7 +110,8 @@ public static class ExtraFighterUnity
                             if (animation.Type == InfoAnimation.MGHNBEPCKIF.AnimationAttack)
                             {
                                 attackStarts++;
-                                if (attackStarts == 2) secondAttackBeforeHealth = Fight.GetCurrentFight().GetPlayerModel().KKMCHCNOHMB();
+                                if (firstContactAttackStarts > 0 && attackStarts == firstContactAttackStarts + 1)
+                                    secondAttackBeforeHealth = Fight.GetCurrentFight().GetPlayerModel().KKMCHCNOHMB();
                             }
                         }
                     });
@@ -163,16 +167,46 @@ public static class ExtraFighterUnity
                         CheckAiObservations(actor);
                     }
                     firstContactHealth = player.KKMCHCNOHMB();
+                    firstContactAttackStarts = attackStarts;
+                    secondAttackBeforeHealth = float.NaN;
                     Next(fight); break;
                 case 4:
-                    if (RequireAutonomous && (attackStarts < 2 || player.KKMCHCNOHMB() >= secondAttackBeforeHealth - .00001f)) return;
+                    if (RequireAutonomous && !(attackStarts > firstContactAttackStarts && player.KKMCHCNOHMB() < secondAttackBeforeHealth - .00001f)) return;
                     if (RequireAutonomous)
                     {
-                        Check(!explicitAttack && actor.Parameters.AiControlled && attackStarts >= 2, "Sustained autonomous attack required fixture playback or lost AI");
+                        Check(!explicitAttack && actor.Parameters.AiControlled && attackStarts > firstContactAttackStarts, "Sustained autonomous attack required fixture playback or lost AI");
                         Check(((Model.StrikeResult)Field(player, "GHHCDAFIKJE")).AttackerModel == actor, "Second native contact came from another attacker");
                         Check(Math.Abs(enemy.KKMCHCNOHMB() - enemyBefore) < .00001, "Sustained AI contact damaged original opponent");
                         CheckAiObservations(actor);
                         Debug.Log("[ExtraFighterUnity] Sustained autonomous contact: " + firstContactHealth + " -> " + player.KKMCHCNOHMB() + "; animations=" + string.Join(",", animations));
+                    }
+                    if (RequireTargeting && !targetingAccepted)
+                    {
+                        actor.Parameters.AiControlled = false;
+                        var previousTarget = enemy.EGGEACCDAEK();
+                        var previousAnimation = enemy.OCPMJKIEPIG().OJKLPPNCONP();
+                        var previousObservation = Field(Field(enemy, "HJOGNGDMAKJ"), "COKFBIJAFLH");
+                        var rollback = (Action)Invoke(enemy, "ReplaceCombatEnemies", new Model[] { actor }, actor);
+                        CheckTargetBindings(enemy, actor, player);
+                        Check(Field(Field(enemy, "HJOGNGDMAKJ"), "COKFBIJAFLH") == null, "Retarget retained previous opponent observation");
+                        rollback();
+                        Check(enemy.EGGEACCDAEK() == previousTarget && enemy.OCPMJKIEPIG().OJKLPPNCONP() == previousAnimation &&
+                            ReferenceEquals(Field(Field(enemy, "HJOGNGDMAKJ"), "COKFBIJAFLH"), previousObservation), "Synchronous native rollback lost target/animation/observation");
+                        Invoke(enemy, "ReplaceCombatEnemies", new Model[] { actor }, actor);
+                        Invoke(actor, "ReplaceCombatEnemies", new Model[] { enemy }, enemy);
+                        Invoke(player, "ReplaceCombatEnemies", new Model[] { enemy }, enemy);
+                        CheckTargetBindings(enemy, actor, player);
+                        CheckTargetBindings(actor, enemy, player);
+                        CheckTargetBindings(player, enemy, actor);
+                        fight.SetLife(actor, actor.Parameters.MaxLife);
+                        var actorPoint = actor.PLBNCDCFPML();
+                        enemy.ShiftModelPosition(new Vector3f(actorPoint.GetX() + 180 - enemy.PLBNCDCFPML().GetX(), 0, 0), true);
+                        actorBefore = actor.KKMCHCNOHMB(); playerBefore = player.KKMCHCNOHMB();
+                        enemy.Parameters.AiControlled = true;
+                        enemy.BHAFOEICJPE(0);
+                        phase = 8; phaseFrame = frame;
+                        Debug.Log("[ExtraFighterUnity] Atomic targeting: original enemy now targets extra root; original player excluded from its hostile registry.");
+                        break;
                     }
                     actor.Parameters.AiControlled = false;
                     fight.UpdateLife(actor, -actor.Parameters.MaxLife);
@@ -196,8 +230,37 @@ public static class ExtraFighterUnity
                 case 7:
                     if (frame - phaseFrame < 10) return;
                     Check(player.GetCurrentAnimation() != null && enemy.GetCurrentAnimation() != null, "Original duel cannot continue after third root");
-                    File.WriteAllText(Path.Combine(Root, "extra-fighter-result.txt"), "PASS: " + checks + " full-game native extra-root feasibility checks. Independent cloned health, native rig/rendering and shared point bindings, native contact attribution (explicit attack requested=" + explicitAttack + "; sustained autonomous acceptance required=" + RequireAutonomous + "), insertion-order mutual enemies, main-duel-only round result and requested removal. Reflection/controlled spacing/inputs and fresh profile; not a public actor API, teams, arbitrary rigs/loadouts, multiplayer or export acceptance.");
+                    File.WriteAllText(Path.Combine(Root, "extra-fighter-result.txt"), "PASS: " + checks + " full-game native extra-root feasibility checks. Independent cloned health, native rig/rendering and shared point bindings, native contact attribution (explicit attack requested=" + explicitAttack + "; sustained autonomous acceptance required=" + RequireAutonomous + "; atomic targeting and incoming native contact accepted=" + targetingAccepted + "), initial insertion-order mutual enemies, main-duel-only round result and requested removal. Reflection/controlled spacing/inputs and fresh profile; not a public actor API, general teams, arbitrary rigs/loadouts, multiplayer or export acceptance.");
                     Debug.Log("[ExtraFighterUnity] PASS: " + checks + " checks"); Finish(0); break;
+                case 8:
+                    if (Math.Abs(player.KKMCHCNOHMB() - playerBefore) >= .00001)
+                        throw new Exception("Retargeted enemy damaged excluded original player");
+                    if (actor.KKMCHCNOHMB() >= actorBefore)
+                    {
+                        if (frame - phaseFrame >= 600) throw new Exception("Retargeted native AI did not strike extra root within 600 frames");
+                        return;
+                    }
+                    Check(Math.Abs(player.KKMCHCNOHMB() - playerBefore) < .00001, "Excluded original player health changed");
+                    Check(((Model.StrikeResult)Field(actor, "GHHCDAFIKJE")).AttackerModel == enemy, "Incoming extra-root damage has wrong native attacker identity");
+                    CheckTargetBindings(enemy, actor, player);
+                    CheckAiObservations(enemy);
+                    CheckNodeBindings(player, enemy, actor);
+                    Debug.Log("[ExtraFighterUnity] Incoming native contact after retarget: actor=" + actorBefore + " -> " + actor.KKMCHCNOHMB() + "; original player unchanged; attacker=" + enemy.get_Name());
+                    enemy.Parameters.AiControlled = false;
+                    Invoke(player, "ReplaceCombatEnemies", new Model[] { enemy, actor }, enemy);
+                    Invoke(enemy, "ReplaceCombatEnemies", new Model[] { player, actor }, player);
+                    Invoke(actor, "ReplaceCombatEnemies", new Model[] { player, enemy }, player);
+                    CheckTargetBindings(player, enemy, null);
+                    CheckTargetBindings(enemy, player, null);
+                    CheckTargetBindings(actor, player, null);
+                    targetingAccepted = true;
+                    // Rejoin the ordinary knockout/removal path without crediting
+                    // the incoming-contact scenario as another autonomous attack.
+                    actor.Parameters.AiControlled = false;
+                    fight.UpdateLife(actor, -actor.Parameters.MaxLife);
+                    Check(actor.KKMCHCNOHMB() == 0 && actor.Parameters.PCALDKCJGCK, "Retargeted extra root knockout not recorded");
+                    phase = 5; phaseFrame = frame;
+                    break;
             }
         }
         catch (Exception error) { Debug.LogError("[ExtraFighterUnity] FAIL: " + error); Finish(1); }
@@ -248,6 +311,14 @@ public static class ExtraFighterUnity
         var other = target?.GetCurrentAnimation();
         if (other != null && target.OCPMJKIEPIG().NMEEPBDJHMG())
             Check(ReferenceEquals(Field(controller, "COKFBIJAFLH"), other.IMFGMAAEMIC() ?? other), "Third-root controller did not observe its actual target's move");
+    }
+    static void CheckTargetBindings(Model model, Model target, Model excluded)
+    {
+        Check(model.EGGEACCDAEK() == target && model._Enemies[0] == target, "Cached/insertion target disagrees with explicit selection");
+        Check(model.OCPMJKIEPIG().OJKLPPNCONP() == target.OCPMJKIEPIG(), "Native animation retains old enemy body");
+        Check(((Model.EventModel)Field(model, "KDAHHIMLJGG")).GAIBPAGPEGK == target, "Native event target disagrees with selection");
+        if (excluded != null) Check(!model._Enemies.Contains(excluded), "Explicit hostile roots retained excluded ally");
+        foreach (var child in model.KGGIDBLBMDJ()) CheckTargetBindings(child, target, excluded);
     }
     static void Finish(int code)
     {

@@ -599,3 +599,16 @@ contact attribution, correct own/target observations and removal. This supersede
 the earlier idle observation for that core cloned fighter. It remains feasibility
 groundwork: no public actor definition/instance/behavior or team API is delivered,
 and arbitrary rigs/tactics, owner/child lifetimes and encounter policies remain.
+
+The target follow-up adds an internal transactional hostile-root/target binding
+seam for a root and its existing weapon children. It aligns cached target,
+animation and event identity; clears old-target AI observations/waits/throttle;
+and restores exact touched state on synchronous failure. Selected-first registry
+order keeps the legacy fallback aligned. It does not select the nearest enemy,
+change construction's mutual hostility or restart the current move/collision phase.
+The corrected 303-check native run requires a subsequent attack start after first
+contact, then proves incoming extra-root damage after redirecting the original
+opponent, unchanged excluded player health, new-target node bindings, immediate
+rollback and original-duel restoration/removal. The prior 180-check repeat claim
+had a weaker start/contact ordering assertion and is superseded. General actor
+ownership, public targeting, teams, different rigs and lifecycle remain open.

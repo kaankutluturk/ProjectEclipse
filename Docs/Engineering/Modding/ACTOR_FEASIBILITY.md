@@ -3,7 +3,8 @@
 This records the recovered engine boundaries for a future typed actor API.
 Projectiles are `WeaponModel` children; they are not substitutes for independently
 living fighters. This investigation supplies a repeatable isolated native probe,
-model-identity binding repair and native AI readiness/notification repairs,
+model-identity binding repair, native AI readiness/notification repairs and an
+internal transactional hostile-root/target binding seam,
 without shipping a Lua actor namespace.
 
 ## Existing native seams
@@ -13,7 +14,7 @@ without shipping a Lua actor namespace.
 | Construction | `Fight.AddModel(ModelParameters)` constructs a root `Model`, initializes it and registers camera, events, perks and animation selection. | A third root has a plausible native construction seam. Creation must be deferred outside model iteration and made transactional. |
 | Health | A copied `ModelParameters` owns its own current/max life. `Fight.UpdateLife(Model, amount)` acts on that model. | Independent health does not require pretending to be a child weapon. Definition/instance identity, bounded values and death lifetime still need a contract. |
 | Enemy registration | `AddModel` adds every existing model as a mutual enemy through `Model.CJNGMIMHFCC`. | There are no teams or explicit hostility rules at this seam. Friendly summons cannot use this unchanged. |
-| Target selection | `SetNearestEnemy` takes `_Enemies[0]`; collision, facing and AI use the cached `EGGEACCDAEK()` target. | Registration order wins over distance. Retargeting must update collision, animation, AI and event state together. Merely editing a Lua target ID is insufficient. |
+| Target selection | Legacy `SetNearestEnemy` takes `_Enemies[0]`; collision, facing and AI use the cached `EGGEACCDAEK()` target. Internal `ReplaceCombatEnemies` installs explicit hostile roots and the selected target together. | The integration seam updates cached/event/animation targets and invalidates old-target AI observations, waits and handler throttles, including existing owned weapon children. The selected root is first for legacy fallback. This is not a public targeting/team API or a nearest-target policy. |
 | Distance helper | `FindNearestEnemy` uses signed horizontal distance, includes every enemy entry and has no C# callers in the tracked source. | It is not an existing working nearest-target implementation. Do not expose or activate it as one without new tests. |
 | Simulation | `RenderFight` iterates live model lists for rendering, collision and AI. Native controllers now seed an already-running own move in any fight mode. Root animation starts update the starter's controller and registered root enemies that currently target it. | Active stage/action state and an eligible entry animation still need explicit initialization. Core third-root autonomous contacts now have native acceptance; general actor ownership/behavior remains unfinished. |
 | Round results | `RenderRound` checks the main player/opponent parameters; `GetWinner`, control and campaign settlement retain duel semantics. | Actor knockout must have a separate lifecycle. Teams, alternate victory policies and encounter completion need explicit integration. |
@@ -81,7 +82,40 @@ controlled core scenario, not arbitrary AI/rigs, universal throws or an actor AP
 The earlier short idle observations are historical evidence, not current behavior.
 The final log is recorded in the creator platform work log. Static observations
 above are distinct from native acceptance.
-No teams, native incoming-strike proof on the extra root, original custom rig,
+The earlier repeat-attack assertion counted two starts and damage, but did not
+require a new start after the first observed contact. The targeting follow-up
+closes that acceptance gap: it records the attack-start count at first contact,
+then requires a subsequent start and health loss after that start. It also avoids
+counting frame-poll iterations as separate checks.
+
+`-RequireTargeting` includes that corrected autonomous requirement, applies the
+internal target seam and immediately tests synchronous rollback of target,
+animation and observed opponent. It then sets explicit hostile roots:
+the original opponent and extra fighter target each other; the original player
+is excluded from their registries. Native opponent AI attacks the extra root,
+whose separate health decreases with that opponent as the recorded native source.
+The original player's health remains unchanged. Existing shared point bindings
+are checked against the new actual target, then the original target policy is
+restored before knockout/removal and continued duel acceptance.
+
+The accepted run passes 303 checks. Autonomous extra-root contact changes player
+life .9220222 -> .4270475, then .4270475 -> .3931057 after a new attack start.
+`ThrowThroughTheBack` and `AxeKick` are observed. Following retargeting, native
+opponent contact changes extra-root life 1 -> .8020738 while player life stays
+unchanged. This is controlled core rig/tactic evidence, not universal paired-throw
+or team-combat acceptance. Construction still uses the legacy mutual-enemy seam.
+
+`TestCombatTargetBindings.ps1` passes 43 extracted production checks with controlled
+AI/animation services: explicit root validation, child expansion and propagation,
+selected-first ordering, stale AI invalidation, unarmed/empty targets, exact
+synchronous rollback, item-mapping failure before mutation and child-binding
+failure rollback. Target changes do not restart a current move or clear its
+already-used collision interval. `CheckCollision` now safely declines contact
+when there is no target. The empty-hostility path has controlled coverage, not a
+full-game idle/no-enemy acceptance. Rollback must occur before any simulation,
+animation callback or subsequent targeting change; it is not time reversal.
+
+No general teams, mod-owned actor instances, original custom rig,
 paired throw, form exchange, all equipment/modes, physical input, exported build,
 rollback or long-run performance acceptance is implied.
 
@@ -94,9 +128,11 @@ motion/playback/health commands, an owned behavior host and death/removal events
 Use a separate ownership record from the native parent link. Exclude competitive
 and rollback modes until their feasibility is demonstrated.
 
-Before making that public, prove atomic target changes and same-side animation
-bindings with two differently equipped/rigged actors; verify incoming/outgoing
+The core cloned scenario now proves atomic target changes and incoming/outgoing
+native contact. Before making that public, broaden same-side animation and target
+bindings to two differently equipped/rigged actors; verify
 damage identity, projectile children, death, round reset, form replacement,
 owner disable and fight teardown. Preserve ordinary duel behavior. Explicitly
 separate summons that die without ending a duel from encounters whose teams
-determine the winner. None of these contracts is implemented by this probe.
+determine the winner. The internal targeting seam does not supply those public
+actor contracts.

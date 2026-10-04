@@ -2309,6 +2309,7 @@ public class Model : global::EventDispatcher<object>
 			{
 				HFGPAELCNMF = EGGEACCDAEK();
 			}
+			if (HFGPAELCNMF == null) return false;
 			if (!PairedGrabAllowsStrike(HFGPAELCNMF))
 			{
 				return false;
@@ -2479,6 +2480,73 @@ public class Model : global::EventDispatcher<object>
 	{
 		_Enemies.Remove(ACENLMONNPA);
 	}
+
+    // Internal actor integration seam. Call only between simulation passes.
+    // Hostile roots are explicit; the selected root is first so the recovered
+    // insertion-order fallback retains that selection. Existing owned weapon
+    // children must receive the same change. Rollback is synchronous only.
+    internal System.Action ReplaceCombatEnemies(IReadOnlyList<Model> roots, Model selected)
+    {
+        if (roots == null || KIAFPPHPEEK() || NJDJHGDMCIJ() != null)
+            throw new System.ArgumentException("Combat enemies require a root fighter and an explicit root list.");
+        var unique = new HashSet<Model>();
+        foreach (var root in roots)
+            if (root == null || root == this || root.KIAFPPHPEEK() || root.NJDJHGDMCIJ() != null ||
+                root._Animation == null || !unique.Add(root))
+                throw new System.ArgumentException("Combat enemies must be distinct live roots other than this fighter.");
+        if ((selected == null) != (roots.Count == 0) || selected != null && !unique.Contains(selected))
+            throw new System.ArgumentException("The selected target must be a hostile root, or null for an empty list.");
+        var next = new List<Model>();
+        if (selected != null) AppendCombatEnemy(next, selected);
+        foreach (var root in roots) if (root != selected) AppendCombatEnemy(next, root);
+        var rollbacks = new List<System.Action>();
+        try
+        {
+            rollbacks.Add(ReplaceCombatEnemyBindings(next, selected));
+            foreach (var child in KGGIDBLBMDJ())
+                rollbacks.Add(child.ReplaceCombatEnemyBindings(next, selected));
+        }
+        catch
+        {
+            for (int index = rollbacks.Count - 1; index >= 0; index--) rollbacks[index]();
+            throw;
+        }
+        return () => { for (int index = rollbacks.Count - 1; index >= 0; index--) rollbacks[index](); };
+    }
+
+    private static void AppendCombatEnemy(List<Model> result, Model root)
+    {
+        result.Add(root);
+        foreach (var child in root.KGGIDBLBMDJ()) if (!result.Contains(child)) result.Add(child);
+    }
+
+    private System.Action ReplaceCombatEnemyBindings(List<Model> enemies, Model selected)
+    {
+        if (_Animation == null || HJOGNGDMAKJ == null)
+            throw new System.InvalidOperationException("Combat target bindings require a live model.");
+        var original = _Enemies.ToArray();
+        var animation = _Animation.OJKLPPNCONP();
+        var target = PNNMOKIBOPP;
+        var eventTarget = KDAHHIMLJGG?.GAIBPAGPEGK;
+        var delay = APOHBENDEKO;
+        var restoreAi = HJOGNGDMAKJ.ResetCombatTarget(selected?.Parameters.Weapon?.EffectiveTacticSubtype);
+        System.Action restore = () =>
+        {
+            _Enemies.Clear(); _Enemies.AddRange(original);
+            _Animation.NFEGCGJIICB(animation); PNNMOKIBOPP = target;
+            if (KDAHHIMLJGG != null) KDAHHIMLJGG.GAIBPAGPEGK = eventTarget;
+            APOHBENDEKO = delay; restoreAi();
+        };
+        try
+        {
+            _Enemies.Clear(); _Enemies.AddRange(enemies);
+            _Animation.NFEGCGJIICB(selected?._Animation); PNNMOKIBOPP = selected;
+            if (KDAHHIMLJGG != null) KDAHHIMLJGG.GAIBPAGPEGK = selected;
+            APOHBENDEKO = 0;
+        }
+        catch { restore(); throw; }
+        return restore;
+    }
 
     // Synchronous form exchange only. The caller must also update each surviving
     // weapon model that targets this fighter and retain the rollback until commit.

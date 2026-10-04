@@ -1335,3 +1335,82 @@ Lua behavior hosts, teams/hostility and atomic targeting, child ownership, death
 round/form/disable/teardown and alternate victory policies. Arbitrary rigs/outfits,
 all tactics/modes/throws, physical input, exports and rollback remain unaccepted.
 G01-G14/E1-E8 and the full Minecraft-style objective stay active.
+
+## 2026-10-04: transactional native actor target integration
+
+Previous turn classification: progress. The binding and AI prerequisites were
+committed/pushed. This follow-up advances a reusable native actor integration
+boundary; it does not expose unfinished ownership/team/behavior contracts to Lua.
+
+Model.ReplaceCombatEnemies accepts distinct live hostile roots and an explicit
+selected root, or an empty list/null target. It expands their weapon children,
+places the selected root first for the legacy insertion-order fallback and updates
+the root plus existing owned weapon children transactionally. Cached, animation
+and event targets change together. ModelAi.ResetCombatTarget computes the new
+weapon equivalent before mutation, invalidates old-target move observation,
+response/frame/wait state and mod-handler decision throttle, while retaining the
+own-move observation and tactic. Ordinary AI rendering initializes the new target
+observation; the transaction invokes no tactic or random draw. Native decision
+delay wakes. Item-mapping or child binding failures restore touched registries,
+targets and controller state. The returned rollback is strictly synchronous,
+before subsequent simulation/callback/target changes, not network rollback.
+CheckCollision safely returns false when no target exists. A target change does
+not restart a move or reset its already-used collision interval.
+
+The new internal seam does not alter legacy AddModel's mutual-enemy construction,
+automatically enforce teams, choose the nearest enemy or change duel settlement.
+Round/session/mod ownership and transactional native creation still need separate
+integration. Weapon propagation is production-source tested with controlled
+children; full-game child retarget/form/disable/teardown acceptance remains open.
+No new Lua binding/schema, asset format, save field or Unity GUID changes.
+
+Verification:
+
+- TestCombatTargetBindings.ps1 extracts all three production model methods and
+  the AI invalidation method; 43 checks pass with controlled animation/AI services.
+  These cover exact rollback, root/source/target validation, selected-first order,
+  child expansion/propagation, stale observation/wait/throttle invalidation,
+  unarmed/empty targets, mapping failure before mutation, child binding failure
+  rollback and missing event context. It is not a Unity playtest.
+- Existing controlled regressions pass: 15 animation observer routing, 23 weak
+  model-identity point bindings, 80 form animation entry/readiness, 14 native AI
+  eligibility and 56 AI snapshots. All four matching Unity 6.6 Windows-reference
+  managed builds pass through the ignored portable compile projects.
+- ExtraFighterUnity -RequireTargeting includes autonomous outgoing contact, an
+  immediate target/animation/observed-opponent rollback, actual hostile-root
+  changes and incoming native AI contact. It checks all actual target bindings,
+  new-target point observations, separate actor health, unchanged excluded player
+  health, source identity, restored main targets, knockout policy, removal and
+  continued original duel. The accepted corrected run passes 303 checks. Native
+  extra-root contacts change player life .9220222 -> .4270475, then .4270475 ->
+  .3931057 after a subsequent attack start; ThrowThroughTheBack and AxeKick are
+  observed. Retargeted original opponent contact changes actor life 1 -> .8020738
+  while excluded player life remains unchanged. Explicit attack requested=False.
+  Fresh result timestamp and successful Unity exit verified. Final log:
+  Temp/FighterPlaybackUnity-d997a2c104cd4564b9767ae6eb4b68d8/validation-810bdabfa927423bb880431fad662aea.log.
+- The earlier 180-check repeat assertion recorded a second start but did not
+  require that start to follow the first observed contact. The new fixture records
+  the start count at first contact, requires a later start and samples life at
+  that start before requiring further damage. This closes an acceptance gap;
+  historical logs do not establish this stronger ordering. Poll iterations do
+  not inflate the new check count. The first targeting run failed because the
+  fixture kept disabling original opponent AI each update; that fixture guard
+  is corrected, and the failed run is not counted as acceptance.
+- Return Dart's full-game native regression passes all 45 checks after the target
+  changes: flight/source identity, pause/return, direct three-child receipts and
+  placement, unchanged caster-start count, contact health and teardown. Fresh
+  result timestamp and successful Unity exit verified. Final log:
+  Temp/FighterPlaybackUnity-d997a2c104cd4564b9767ae6eb4b68d8/validation-91657ee405f6478da742493ad81e7165.log.
+- Public projectile limits, actor feasibility/extensibility/roadmap records and
+  test index update together. Wiki reference coverage remains 234 public bindings;
+  types/build/search pass with 0 type errors/warnings/hints and 6435 links/assets
+  across 61 pages. The existing duplicate-404 warning remains. No public member
+  change requires editor contract regeneration. Existing unrelated native Unity
+  startup/title warnings remain; no claim of error-free logs or exported builds.
+
+Core cloned rigs/tactics, controlled spacing/input and a fresh isolated profile
+bound this native evidence. Empty hostility has controlled coverage only. General
+teams, asymmetric animation observer registries, arbitrary rigs/loadouts/throws,
+mod-owned actor handles/behavior, death/round/form/disable/teardown, encounter
+victory policies, physical input, exported players, multiplayer/rollback and
+performance still need work. G01-G14/E1-E8 and the full objective remain active.
