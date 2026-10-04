@@ -157,4 +157,38 @@ These are fields inside a move definition, not a standalone Lua script. Attack e
 
 ## Verify in a fight
 
+For a complete source example, see
+[Authored Fighter Lab](https://github.com/dawc17/ProjectEclipse/tree/main/Mods/example.authored-fighter).
+Its mod-owned body keeps the standard 67-point binding layout; a connected sash
+adds six weighted helper points after equipment. Its original strike is generated
+through the existing baker rather than copied from a core clip. The Lua move
+declares attack frames and native contact edges, and public actor commands start
+it from either side. The HUD also supports a spacing reset, repeated strikes
+with Lua approach movement, and dismissal. Native hit reactions can change the
+pair's positions; reset spacing before inspecting a controlled single strike.
+
+Reproduce its assets using a fresh directory, then open the generated
+`preview.html` to scrub the point motion:
+
+```powershell
+python Tools/Animation/BuildAuthoredFighterExample.py --body Mods/example.authored-fighter/assets/models/body.xml --output Temp/MyAuthoredFighter
+python Tools/Animation/CharacterPipeline.py validate --rig Temp/MyAuthoredFighter/body.xml --skin Temp/MyAuthoredFighter/sash.xml --animation Temp/MyAuthoredFighter/strike.bytes
+```
+
+The source generator is a small editable example, not a replacement for
+Blender/Gymnast or a general animation importer. Its body geometry is authored
+on the compatible native rig; core idle, walking and hit reactions remain in use.
+Equipment may add many further helper points without changing the animation's
+67 ordered points. Read the sample README for installation and controls. The
+experimental 3D renderer approximates standard anatomy and can change the look
+of custom silhouette details.
+
+The repository's `Tools/Tests/CharacterForms/TestAuthoredFighterUnity.ps1`
+tests this complete installed example in an isolated Unity fight. It checks
+native clip decoding, moving skin helpers, mirrored attack contact in both
+directions, repeated Lua attacks, actor-specific callbacks, pause and cleanup.
+This establishes the sample's compatible procedural export; it does not validate
+every Blender/Gymnast export, custom rig, outfit or platform. Run comparable
+fight checks on your own character.
+
 Check the character at idle, mirrored on each side, walking, attacking, hit, and knocked down. Confirm equipment follows the rig, the intended key selects the move only for this warrior, the attack deals damage during its intended frames, and unrelated fighters retain their controls. Test the skin under the largest bends. The repository's `Tools/Animation/TestCharacterPipeline.ps1` exercises Blender export, the unchanged native animation reader, and Lua/native-XML projection; those checks cannot establish visual or combat correctness for your authored content.

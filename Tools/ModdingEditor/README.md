@@ -1,5 +1,12 @@
 # Eclipse Modding for VS Code
 
+The `authored-fighter` starter mirrors Authored Fighter Lab: mod-owned native body
+and connected weighted skin, an original 61-sample point animation, typed attack
+intervals and callback-scoped actor playback. Its source generator lives in
+`Tools/Animation/BuildAuthoredFighterExample.py`. The standard 67-point rig keeps
+core movement/equipment compatibility; this is not an arbitrary mesh importer.
+Handle completion and project diagnostics are distinct from native contact tests.
+
 Authored body/skin geometry receives runtime point/edge/helper validation before
 native model parsing. XML element/field diagnostics occur when loading the
 fighter; handle completion and editor asset-kind checks cannot establish those

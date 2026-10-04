@@ -1,0 +1,18 @@
+<?xml version='1.0' encoding='utf-8'?>
+<Scene>
+  <Nodes>
+    <AuthoredSashV0 Type="MacroNode" NodesCount="4" X="0" Y="0" Z="0" ChildNode1="NShoulder_1" LCC1="32.9571751131" ChildNode2="NShoulder_2" LCC2="40.1533470125" ChildNode3="NPivot" LCC3="43.6593625734" ChildNode4="NChestF" LCC4="-115.769884699" />
+    <AuthoredSashV1 Type="MacroNode" NodesCount="4" X="0" Y="0" Z="0" ChildNode1="NShoulder_1" LCC1="33.3691056082" ChildNode2="NShoulder_2" LCC2="38.2859927814" ChildNode3="NPivot" LCC3="42.7691143892" ChildNode4="NChestF" LCC4="-113.424212779" />
+    <AuthoredSashV2 Type="MacroNode" NodesCount="4" X="0" Y="0" Z="0" ChildNode1="NShoulder_1" LCC1="43.0211938496" ChildNode2="NShoulder_2" LCC2="52.436175966" ChildNode3="NPivot" LCC3="58.2280353662" ChildNode4="NChestF" LCC4="-152.685405182" />
+    <AuthoredSashV3 Type="MacroNode" NodesCount="4" X="0" Y="0" Z="0" ChildNode1="NShoulder_1" LCC1="43.5267449118" ChildNode2="NShoulder_2" LCC2="50.144423046" ChildNode3="NPivot" LCC3="57.1354580493" ChildNode4="NChestF" LCC4="-149.806626007" />
+    <AuthoredSashV4 Type="MacroNode" NodesCount="4" X="0" Y="0" Z="0" ChildNode1="NShoulder_1" LCC1="53.0852125861" ChildNode2="NShoulder_2" LCC2="64.7190049195" ChildNode3="NPivot" LCC3="72.7967081591" ChildNode4="NChestF" LCC4="-189.600925665" />
+    <AuthoredSashV5 Type="MacroNode" NodesCount="4" X="0" Y="0" Z="0" ChildNode1="NShoulder_1" LCC1="53.6843842154" ChildNode2="NShoulder_2" LCC2="62.0028533106" ChildNode3="NPivot" LCC3="71.5018017094" ChildNode4="NChestF" LCC4="-186.189039235" />
+  </Nodes>
+  <Edges />
+  <Figures>
+    <AuthoredSash-Triangle0 Type="Triangle" Node1="AuthoredSashV0" Node2="AuthoredSashV1" Node3="AuthoredSashV2" />
+    <AuthoredSash-Triangle1 Type="Triangle" Node1="AuthoredSashV1" Node2="AuthoredSashV3" Node3="AuthoredSashV2" />
+    <AuthoredSash-Triangle2 Type="Triangle" Node1="AuthoredSashV2" Node2="AuthoredSashV3" Node3="AuthoredSashV4" />
+    <AuthoredSash-Triangle3 Type="Triangle" Node1="AuthoredSashV3" Node2="AuthoredSashV5" Node3="AuthoredSashV4" />
+  </Figures>
+</Scene>

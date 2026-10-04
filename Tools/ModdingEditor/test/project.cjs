@@ -8,6 +8,19 @@ const { createMod } = require('../src/scaffold.cjs');
 const template = path.resolve(__dirname, '../templates/weapon');
 const header = 'local sf2 = require("sf2")\n';
 
+test('authored fighter starter mirrors native models and original point animation',async()=>{
+ const directory=path.resolve(__dirname,'../../../Mods/example.authored-fighter');
+ const mod=await p.indexMod(directory); assert.deepEqual(mod.issues,[]);
+ const source=await fs.readFile(path.join(directory,'scripts/main.lua'),'utf8');
+ assert.deepEqual(p.analyze(source,mod).issues,[]);
+ for(const file of ['mod.toml','README.md','scripts/main.lua','assets/models/body.xml','assets/models/sash.xml','assets/animations/strike.bytes','assets/animations/strike.rig.json'])
+  assert.deepEqual(await fs.readFile(path.join(directory,file)),await fs.readFile(path.resolve(__dirname,'../templates/authored-fighter',file)));
+ const binary=await fs.readFile(path.join(directory,'assets/animations/strike.bytes'));
+ assert.equal(binary.readInt32LE(0),61); assert.equal(binary.readInt32LE(5),67);
+ const missing={...mod,data:{...mod.data,capabilities:mod.data.capabilities.filter(c=>c!=='combat.actors')}};
+ assert(p.analyze(source,missing).issues.some(i=>i.capability==='combat.actors'));
+});
+
 test('actor companion starter mirrors playable files, scopes capabilities and lifecycle timing',async()=>{
  const dir=path.resolve(__dirname,'../../../Mods/example.actor-companions'),mod=await p.indexMod(dir);
  assert.deepEqual(mod.issues,[]);

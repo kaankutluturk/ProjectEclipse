@@ -1,5 +1,14 @@
 # Regression tests and validators
 
+Original authored fighter: `CharacterForms/TestAuthoredFighterUnity.ps1` installs
+the actual Authored Fighter Lab mod in a marked isolated Unity fixture. It checks
+owned body/skin composition, preserved binary point count, the original clip's
+native reader/playback, root-relative helper deformation, both facing directions,
+real contact source/damage, receipts, pause and actor/HUD cleanup. It uses compatible
+core equipment/idle and controlled spacing/profile, not arbitrary rig acceptance.
+`Tools/Animation/TestAuthoredFighterExample.py` reproduces the shipped geometry,
+binary and sidecar and checks source motion/skin structure.
+
 Authored character geometry: `CharacterForms/TestAuthoredGeometry.ps1` checks
 the production body/skin validator and extracted loader with controlled native
 parsing, including path/field diagnostics, composition limits, helper bindings,

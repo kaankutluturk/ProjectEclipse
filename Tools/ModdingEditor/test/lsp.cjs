@@ -275,6 +275,12 @@ async function main() {
     const rangedProbe=probe('ranged-host.lua','local sf2=require("sf2")\nsf2.behaviors.register{id="ranged",on_actor_spawn=function(_,fighter)\n fighter:|\nend}');
     await until(async()=>{const found=labels(await request('textDocument/completion',rangedProbe));return ['spawn_projectile','projectiles'].every(name=>found.some(label=>label.startsWith(name)));},'actor-host projectile completion');
     console.log('PASS: actor-host projectile methods and complete Ranged Companion Duel source');
+    const authoredText=fs.readFileSync(path.resolve(__dirname,'../../../Mods/example.authored-fighter/scripts/main.lua'),'utf8');
+    const authoredUri=open('authored-fighter.lua',authoredText+'\nsf2.price.coins("bad")\n');const authoredKey=decodeURIComponent(authoredUri).toLowerCase();
+    await until(()=>diagnostics.get(authoredKey)?.some(d=>d.code==='param-type-mismatch'),'authored fighter diagnostic publication');
+    notify('textDocument/didChange',{textDocument:{uri:authoredUri,version:2},contentChanges:[{text:authoredText}]});
+    try { await until(()=>diagnostics.has(authoredKey)&&diagnostics.get(authoredKey).length===0,'clean authored fighter diagnostics'); } catch(error) { throw new Error(error.message+'\n'+JSON.stringify(diagnostics.get(authoredKey),null,2)); }
+    console.log('PASS: complete Authored Fighter Lab body/skin/playback script has no LuaLS diagnostics');
     const arenaOptions=probe('arena-options.lua','local sf2=require("sf2")\nsf2.behaviors.register {id="x",on_tick=function(_,fighter)\n fighter:mark_rect { | }\nend}');
     await until(async()=>{const found=labels(await request('textDocument/completion',arenaOptions));return ['x','y','width','height'].every(key=>found.some(n=>n.startsWith(key)));},'arena rectangle fields');
     const arenaTarget=probe('arena-target.lua','local sf2=require("sf2")\nsf2.behaviors.register {id="x",on_tick=function(_,fighter)\n fighter.opponent:|\nend}');

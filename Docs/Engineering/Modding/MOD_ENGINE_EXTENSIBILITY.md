@@ -1,5 +1,12 @@
 # Eclipse as a general Shadow Fight 2 mod engine
 
+The [authored fighter example](AUTHORED_FIGHTER_ACCEPTANCE.md) combines mod-owned
+body geometry, connected weighted clothing, an original point animation and
+public Lua actor playback. A full installed-mod fight proves deformation,
+bidirectional contact and repeated attacks on the standard compatible rig.
+This narrows E5/E8 authoring gaps; arbitrary rigs, general importers and complete
+creator/platform acceptance remain open.
+
 The [actor projectile extension](ACTOR_PROJECTILES_ACCEPTANCE.md) supports
 typed native ranged abilities on independent roots, with scoped queries,
 Lua guidance, caster provenance and retirement cleanup. Ranged Companion Duel

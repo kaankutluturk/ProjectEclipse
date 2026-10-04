@@ -17,6 +17,26 @@ exports.run = async function () {
         assert(extension, 'Preview extension was not loaded');
         const library = path.join(extension.extensionUri.fsPath, 'library');
         await extension.activate();
+        const authoredRoot=vscode.Uri.joinPath(folder.uri,'authored-lab');
+        fs.cpSync(path.join(root,'templates/authored-fighter'),authoredRoot.fsPath,{recursive:true});
+        const authoredUri=vscode.Uri.joinPath(authoredRoot,'scripts','main.lua');
+        const authoredDocument=await vscode.workspace.openTextDocument(authoredUri);
+        await vscode.window.showTextDocument(authoredDocument);
+        await extension.exports.refresh();
+        const authoredManifest=path.join(authoredRoot.fsPath,'mod.toml');
+        const authoredManifestText=fs.readFileSync(authoredManifest,'utf8');
+        fs.writeFileSync(authoredManifest,authoredManifestText.replace(', "combat.actors"',''));
+        await extension.exports.refresh();
+        const authoredDeadline=Date.now()+15000;
+        while(!vscode.languages.getDiagnostics(authoredUri).some(d=>d.code==='capability:combat.actors')&&Date.now()<authoredDeadline)
+            await new Promise(resolve=>setTimeout(resolve,100));
+        assert(vscode.languages.getDiagnostics(authoredUri).some(d=>d.code==='capability:combat.actors'),'Authored starter was not analyzed in its own manifest scope');
+        fs.writeFileSync(authoredManifest,authoredManifestText);await extension.exports.refresh();
+        const authoredCleanDeadline=Date.now()+15000;
+        while(vscode.languages.getDiagnostics(authoredUri).length&&Date.now()<authoredCleanDeadline)
+            await new Promise(resolve=>setTimeout(resolve,100));
+        assert.deepEqual(vscode.languages.getDiagnostics(authoredUri),[],'Complete authored starter has VS Code project diagnostics');
+        passed.push('PASS: Authored Fighter Lab native assets/script validate and actor permission follows its own manifest');
         await vscode.commands.executeCommand('eclipseModding.enable');
         await vscode.commands.executeCommand('eclipseModding.enable');
         const expected = [otherLibrary, library];

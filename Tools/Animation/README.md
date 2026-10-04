@@ -1,5 +1,14 @@
 # Character and animation tools
 
+`BuildAuthoredFighterExample.py` reproducibly authors the original point strike
+and connected weighted sash in `Mods/example.authored-fighter` from its owned
+body XML. It uses the existing baker/binary writer, preserves the standard 67
+point bindings and emits editable `strike.frames.json`, native assets, fingerprints
+and a point preview to a fresh directory. Run `TestAuthoredFighterExample.py` for
+asset reproduction, motion/limb lengths and connected/deforming helper contracts.
+The example's public Lua/HUD and real native loading/contact are checked separately
+by `Tools/Tests/CharacterForms/TestAuthoredFighterUnity.ps1`.
+
 For new SF2 characters and motions, start with the [Gymnast workflow](../../Docs/Modding/src/content/docs/guides/gymnast.md).
 `OpenGymnast.ps1` prepares and opens the upstream visible IK body; `GymnastBridge.py`
 validates native node bindings and exports evaluated motion. `PackageCharacter.py`
