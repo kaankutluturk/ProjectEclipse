@@ -2889,7 +2889,10 @@
     },
     "FormRequest": {
       "fields": {
-        "status": "\"queued\"|\"applied\"|\"failed\"",
+        "status": [
+          "\"queued\"|\"applied\"|\"failed\"",
+          "Applied main-fighter form swaps preserve owned companions and their remaining lifetime; actor handles remain callback-scoped."
+        ],
         "error?": "string"
       }
     },

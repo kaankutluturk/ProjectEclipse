@@ -79,6 +79,28 @@ public partial class Fight
     private long _eclipseActorSequence,_eclipseActorEventSequence;
     private bool _applyingEclipseActors,_eclipseActorTeamsActive,_eclipseActorDispatching;
 
+    // Form replacement changes the main body, not the companions it owns.
+    // Stage ownership and explicit targets alongside the reversible native bindings.
+    internal Action BindEclipseActorOwnerForm(Model expected, Model replacement)
+    {
+        if (expected == null || replacement == null || expected == replacement)
+            throw new ArgumentException("Actor owner binding requires distinct models.");
+        var owners = _eclipseActors.Values.Where(a => a.Root == expected).ToArray();
+        var targets = _eclipseActors.Values.Where(a => a.TargetRequest == expected).ToArray();
+        var births = new HashSet<PendingActor>(_eclipseActorSpawns.Where(p => p.Root == expected));
+        foreach (var actor in _eclipseActors.Values)
+            if (actor.Birth != null && actor.Birth.Root == expected) births.Add(actor.Birth);
+        foreach (var actor in owners) actor.Root = replacement;
+        foreach (var actor in targets) actor.TargetRequest = replacement;
+        foreach (var birth in births) birth.Root = replacement;
+        return () =>
+        {
+            foreach (var birth in births) birth.Root = expected;
+            foreach (var actor in targets) actor.TargetRequest = expected;
+            foreach (var actor in owners) actor.Root = expected;
+        };
+    }
+
     private bool ActorOwnerValid(Model root,ModScriptSession session,ModId owner) =>
         ReferenceEquals(session,ModRuntime.Scripts)&&ProjectileOwnerActive(session,owner)&&CanMoveEclipseFighter(root)&&!get_IsRaidFight();
     private bool TryQueueEclipseActor(Model root,ModId owner,DefinitionId definition,double x,double y,double z,Action<string,string> complete,out string error)

@@ -670,6 +670,9 @@ end,
 
 ## fighter:change_form
 
+Change a main fighter's character while retaining its combat state and owned
+companions.
+
 **Signature:** `local request = fighter:change_form(character)`
 
 **Returns:** A live result table with `status = "queued"`. At the simulation
@@ -695,6 +698,14 @@ an eligible native idle or transition animation for the current round, without
 restarting the fight/round or editing saved player equipment. The first animation
 frame runs after the replacement commits.
 It does not resume an in-progress attack across different rigs.
+
+Live [companions](../actors/) stay attached to the replacement main fighter.
+Their IDs, bodies, health, behavior state and lifetime are retained without
+respawning; their age continues normally. Queued/initializing actor spawns retain
+their owner, and explicit actor targets pointing to the old main body follow the
+new one. A failed binding restores these references with the other form state.
+Reacquire actor references each callback; the swap does not extend handle scope.
+This does not support transforming an actor's own body.
 
 Animation node and pivot bindings follow the actual body and target identities
 during a form change or rollback. Optional equipment points absent on that body

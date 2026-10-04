@@ -3,20 +3,29 @@ $root=Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $PSScriptRoot))
 $source=Get-Content -Raw -LiteralPath (Join-Path $root 'Assets/Scripts/Assembly-CSharp/Fight.cs')
 $stage=[regex]::Match($source,'(?s)    internal sealed class FormRenderBindings.*?(?=    private readonly Dictionary<Model, PendingModelTransition>)').Value
 if(!$stage){throw 'Form binding stage extraction failed.'}
+$actors=Get-Content -Raw -LiteralPath (Join-Path $root 'Assets/Scripts/Eclipse/Modding/FightActors.cs')
+$stage += [regex]::Match($actors,'(?s)    internal Action BindEclipseActorOwnerForm.*?(?=    private bool ActorOwnerValid)').Value
 $fixture=Join-Path $root ('Temp/FormBindings-'+[Guid]::NewGuid().ToString('N'))
 New-Item -ItemType Directory -Path $fixture | Out-Null
 $code=@'
 using System;
 using System.Collections.Generic;
+using System.Linq;
 class Model{public Action TransferFormCombatState(Model next){return()=>{};}public Model Owner;public List<Model> _Enemies=new List<Model>(),Weapons=new List<Model>();public bool RejectEnemy,RejectEnemyRestore;public int Exchanges;public Model GetRootModel()=>Owner??this;public List<Model> GetWeaponModels()=>Weapons;public Action ReplaceEnemyForm(Model old,Model next){if(RejectEnemy)throw new InvalidOperationException("enemy exchange");int index=_Enemies.IndexOf(old);_Enemies[index]=next;Exchanges++;return()=>{if(RejectEnemyRestore)throw new InvalidOperationException("enemy restore");_Enemies[index]=old;};}}
 class Binding{public Model Current,Original;public bool Reject,RejectRestore;public int Calls,EventRestores;public Action CapturePendingEvents(){var captured=Current;return()=>{if(Current!=captured)throw new Exception("events restored before registration");EventRestores++;};}public bool ReplaceModel(Model old,Model next,bool player=false){Calls++;if(Reject||(RejectRestore&&next==Original)||Current!=old)return false;Current=next;return true;}}
 class Rules{public Model Current;public bool Reject;public Action PrepareModelRebind(Model old,Model next){if(Reject||Current!=old)throw new InvalidOperationException("rules");return()=>Current=next;}}
 class Perks{public Model Current,AttributeTarget,Registration;public Action ReplaceFormRegistration(Model old,Model next){Registration=next;return()=>Registration=old;}public Action TransferFormEffects(Model old,Model next){AttributeTarget=next;return()=>AttributeTarget=old;}public Action RebindQueuedFormActions(Model old,Model next){Current=next;return()=>Current=old;}}
+class PendingActor{public Model Root;}
+class OwnedActor{public Model Root,TargetRequest,Model;public PendingActor Birth;public object BehaviorInstance=new object();public int Born=27;public bool Removing;}
 class Fight{
+ List<PendingActor> _eclipseActorSpawns=new List<PendingActor>();
+ Dictionary<Model,OwnedActor> _eclipseActors=new Dictionary<Model,OwnedActor>();
+ bool RejectPresentation;
+
  Model _playerModel=new Model(),CKNCPOABFBO=new Model();Binding _Camera=new Binding(),_SelectAnimation=new Binding();Rules _rulesInspector=new Rules();
  List<Model> LNDLFINJHDB=new List<Model>();
  Perks EPBDEDGLHJE=new Perks();
- Action BindFormPresentation(Model expected,Model replacement,bool player){return()=>{};} Action BindFormParticipant(Model expected,Model replacement){_playerModel=replacement;return()=>_playerModel=expected;}
+ Action BindFormPresentation(Model expected,Model replacement,bool player){if(RejectPresentation)throw new InvalidOperationException("presentation");return()=>{};} Action BindFormParticipant(Model expected,Model replacement){_playerModel=replacement;return()=>_playerModel=expected;}
  public Fight(){_Camera.Current=_Camera.Original=_SelectAnimation.Current=_SelectAnimation.Original=_rulesInspector.Current=_playerModel;LNDLFINJHDB.AddRange(new[]{_playerModel,CKNCPOABFBO});CKNCPOABFBO._Enemies.Add(_playerModel);}
  STAGE
  static void Check(bool x,string why){if(!x)throw new Exception(why);}
@@ -57,7 +66,28 @@ class Fight{
   stage=new FormRenderBindings(f,f._playerModel,next);stage.Commit();stage.Dispose();Check(weapon._Enemies[0]==next,"commit retains enemy targeting");
   f=new Fight();stage=new FormRenderBindings(f,f._playerModel,next);f.CKNCPOABFBO.RejectEnemyRestore=true;failed=false;try{stage.Dispose();}catch(AggregateException){failed=true;}
   Check(failed&&f._Camera.Current==f._playerModel&&f._SelectAnimation.Current==f._playerModel,"target rollback failure still attempts other registrations");
-  Console.WriteLine("PASS: production form registration orchestration; preparation, staged exchange, commit, rollback, partial rejection and rollback-failure reporting. Camera/selector/rule services controlled.");
+  // Use the production owner helper and coordinator, including a late rejection.
+  f=new Fight();var old=f._playerModel;var other=f.CKNCPOABFBO;
+  var birth=new PendingActor{Root=old};var queued=new PendingActor{Root=old};var foreign=new PendingActor{Root=other};
+  var live=new OwnedActor{Model=new Model(),Root=old,TargetRequest=other,Birth=birth};
+  var hostile=new OwnedActor{Model=new Model(),Root=other,TargetRequest=old};
+  var removing=new OwnedActor{Model=new Model(),Root=old,Removing=true};
+  f._eclipseActors.Add(live.Model,live);f._eclipseActors.Add(hostile.Model,hostile);f._eclipseActors.Add(removing.Model,removing);
+  f._eclipseActorSpawns.AddRange(new[]{queued,birth,foreign});var behavior=live.BehaviorInstance;
+  stage=new FormRenderBindings(f,old,next);
+  Check(live.Root==next&&removing.Root==next&&removing.Removing&&hostile.Root==other,"owner binding preserves removal intent and unrelated ownership");
+  Check(hostile.TargetRequest==next&&live.TargetRequest==other,"explicit main targets follow replacement independently of owner");
+  Check(birth.Root==next&&queued.Root==next&&foreign.Root==other,"queued and initializing births follow only replaced owner");
+  Check(live.Born==27&&live.BehaviorInstance==behavior&&f._eclipseActors[live.Model]==live,"actor body, private state and lifetime are preserved");
+  stage.Dispose();Check(live.Root==old&&hostile.TargetRequest==old&&birth.Root==old&&queued.Root==old,"owner/target/birth binding rollback");
+  f.RejectPresentation=true;failed=false;try{new FormRenderBindings(f,old,next);}catch(InvalidOperationException){failed=true;}
+  Check(failed&&f._playerModel==old&&live.Root==old&&hostile.TargetRequest==old&&birth.Root==old&&queued.Root==old,"late presentation rejection restores participant and all actor references");
+  f.RejectPresentation=false;stage=new FormRenderBindings(f,old,next);stage.Commit();stage.Dispose();
+  Check(live.Root==next&&hostile.TargetRequest==next&&queued.Root==next,"committed owner binding survives disposal");
+  var opponentNext=new Model();var restore=f.BindEclipseActorOwnerForm(other,opponentNext);
+  Check(hostile.Root==opponentNext&&live.TargetRequest==opponentNext&&foreign.Root==opponentNext,"opponent ownership/explicit target/pending birth transfer");
+  restore();Check(hostile.Root==other&&live.TargetRequest==other&&foreign.Root==other,"opponent reference rollback");
+  Console.WriteLine("PASS: production form registration orchestration; preparation, staged exchange, commit, rollback, partial rejection and rollback-failure reporting. Actor ownership/explicit targets/queued births preserved through commit and late rollback; camera/selector/rule services controlled.");
  }
 }
 '@

@@ -208,9 +208,17 @@ end
 Kinds are `spawned`, `removed`, `expired`, `died`, `owner_changed`, `round_ended`
 and `spawn_failed`. Sequence numbers increase within a fight; queries do not
 consume events. Polling can miss old events after the 64-event window rolls over.
-Removal is automatic on death, expiry, round teardown, owner body replacement
-or loss of the spawning mod/session. This API is an observation log, not an
-actor callback subscription.
+Removal is automatic on death, expiry, round teardown, unsupported owner
+replacement or loss of the spawning mod/session. A successful supported
+[`fighter:change_form`](../combat-callbacks/#fighterchange_form) transfers the
+main fighter's companions to its replacement body. Their IDs, bodies, health,
+behavior state and lifetime remain intact; their age keeps advancing. Explicit
+main-fighter targets also follow the new body, and queued/initializing spawns
+keep their owner. Failed form binding restores the prior references. This
+handover emits no new `spawned` or `owner_changed` event. Actor references still
+expire at callback end: reacquire them with `fighter:actors()` on later callbacks.
+Changing an actor's own form remains unsupported. This API is an observation
+log, not an actor callback subscription.
 
 ## actor:snapshot
 

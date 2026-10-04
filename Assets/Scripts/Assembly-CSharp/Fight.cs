@@ -212,6 +212,7 @@ public partial class Fight
         private Action _restoreActiveEffects;
         private Action _restorePerkRegistration;
         private Action _restoreParticipant;
+        private Action _restoreActorOwners;
         private Action _restoreCombatState;
         private Action _restorePresentation;
         private readonly List<Action> _restoreEnemyTargets = new List<Action>();
@@ -248,6 +249,7 @@ public partial class Fight
                 rules(); _rules = true;
                 _restoreCombatState = expected.TransferFormCombatState(replacement);
                 _restoreParticipant = fight.BindFormParticipant(expected, replacement);
+                _restoreActorOwners = fight.BindEclipseActorOwnerForm(expected, replacement);
                 _restorePresentation = fight.BindFormPresentation(expected, replacement, _player);
             }
             catch (Exception original)
@@ -276,6 +278,8 @@ public partial class Fight
             if (fight == null) return;
             var failures = new List<Exception>();
             if (_restorePresentation != null) try { _restorePresentation(); }
+                catch (Exception exception) { failures.Add(exception); }
+            if (_restoreActorOwners != null) try { _restoreActorOwners(); }
                 catch (Exception exception) { failures.Add(exception); }
             if (_restoreParticipant != null) try { _restoreParticipant(); }
                 catch (Exception exception) { failures.Add(exception); }

@@ -97,7 +97,7 @@ const fighterMethods = {
     show_status_icon:{params:{key:'string',sprite:H('Sprite'),frames:'integer','stacks?':'integer'},capability:'combat.effects'},
     clear_status_icon:{params:{key:'string'},capability:'combat.effects'},
 };
-type('FormRequest',{status:enumOf('queued','applied','failed'),'error?':'string'});
+type('FormRequest',{status:[enumOf('queued','applied','failed'),'Applied main-fighter form swaps preserve owned companions and their remaining lifetime; actor handles remain callback-scoped.'],'error?':'string'});
 type('ProjectileSpawnRequest',{status:enumOf('queued','applied','failed'),'projectile_id?':'string','error?':'string'});
 type('ProjectileDefinition',{id:'string',name:'string',core_skeleton:'string',start_move:H('Move'),'item?':H('Item'),'copy_parent_type?':enumOf('Weapon','Ranged','Magic'),'lifetime_frames?':['integer','1-600, default 180; starts after native birth initialization.']});
 reg('projectiles.register','ProjectileDefinition','ProjectileDefinition');

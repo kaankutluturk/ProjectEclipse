@@ -199,6 +199,10 @@ includes native key presses and eligible animation/interval endings;
 `controllable` prevents starting the move during an uninterruptible action.
 The example's HUD calls `fighter:change_form(character)` from its player rule's
 tick callback and displays the live result. This needs `combat.transform`.
+Try it while the pair is alive: the companions retain their IDs, behavior state,
+health and remaining lifetime, then continue attacking each other. The owner
+changes form; the companions keep their existing bodies. Actor references must
+still be reacquired in each callback.
 Its **Try core comparison form** button selects another registered warrior
 without the authored body. That is a comparison character, not a snapshot or
 restoration of your original equipment. The owned lab uses its prepared

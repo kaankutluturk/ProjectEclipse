@@ -219,6 +219,64 @@ This selects a temporary encounter character, not a persistent profile loadout.
 Native entry is launched through the registered fight fixture; full map
 navigation, native process restart/resume and exported platforms remain open.
 
+## Companion retention through owner form changes (2026-10-04)
+
+The native pre-change reproduction in `validation-51e934ba46784041a7e048a9997d804b.log`
+ends both live actors with `owner_changed` after the public player form request.
+`FightActors.BindEclipseActorOwnerForm` now stages the actor owner root, explicit
+main-body targets, queued spawn roots and initializing birth roots alongside
+`Fight.FormRenderBindings`. The participant is rebound before actor ownership;
+a later rejection restores actor references before restoring the participant.
+No actor body, behavior instance, birth frame, pending command or native child
+is recreated. Unsupported owner loss/session changes retain ordinary retirement.
+
+The production-source managed binding fixture checks both main sides,
+independent owner/target relationships, queued and shared initializing birth
+requests, untouched foreign owners, removal intent, successful commit and late
+presentation rejection. Existing participant, prepared-request, commit and
+258 initialization checks pass. The transition-boundary fixture's controlled
+services now include the previously missing actor/projectile cancellation hooks;
+it checks that ordinary form requests do not cancel them and closing transitions
+still invokes both cleanups with the round-end reason. Four managed assemblies compile with the
+ignored Windows-remapped projects; default Visual Studio SDK resolution remains
+unavailable. The Python adapter was attempted but includes Windows native DLLs
+as metadata references, so its compile attempt fails before assertions; the
+PowerShell production-method fixtures provide the relevant managed acceptance.
+
+The installed Authored Fighter Lab now tests a form swap while its pair is alive.
+The fixture retains the exact actor models/internal references, IDs, private
+behavior XML instances, birth frames and mutual targets; it then requires new
+starts and source-attributed native damage in both directions before ordinary
+public dismissal. Actor health cannot refill and main health percentage remains
+unchanged. The shared rule HUD stays open. The pause test must allow its queued
+stop-repeat click to be consumed after resume before issuing a form command:
+overwriting that pending click leaves repeating enabled, making a later toggle
+stop combat instead of restarting it. The first post-fix attempt exposed this
+fixture sequence; it was corrected without forcing playback or scripted damage.
+
+The authored-entry run passes **96 native checks**, exit 0, in
+`validation-928e4813dba14bf0bd1bcf2b14b6c73e.log` in the marked FighterPlaybackUnity
+fixture. The core-comparison entry also passes **96 native checks**, exit 0,
+in `validation-422308185bda49b6b9b0d5a5c8fcdd88.log`, including its actual core-to-authored
+owner body change. A live-owner capture is visually reviewed from the second run.
+The demo and mirrored starter use a 3,600-frame lifetime (60 simulation
+seconds) to leave room for sustained contact and form comparisons; the swap
+preserves its original birth frame rather than renewing this lifetime. Public
+actor/form references and authoring guidance describe the supported handover.
+The wiki builds 63 pages, validates 246 public function sections and 6,831 local
+links; current-branch source links and the three source-link regressions pass.
+Generated editor schema/definitions and the mirrored starter pass generation,
+check, 58 project tests and actual LuaLS checks. A cold VS Code run timed out on
+player-character field completion; the subsequent isolated-profile run passes
+all 25 checks. These editor checks do not establish native gameplay.
+
+Native evidence covers a player owner, compatible core equipment and the
+example's manual Lua actor playback. Opponent ownership/explicit main targets,
+queued-birth transfer and failed binding are covered with controlled managed
+services, not an additional full-game race. Arbitrary rigs, actor-body form
+changes, autonomous AI memory across swaps, physical devices, exports and all
+platforms remain unaccepted by this follow-up.
+
 ## Limits
 
 This is the standard compatible rig with custom silhouette geometry and skin,

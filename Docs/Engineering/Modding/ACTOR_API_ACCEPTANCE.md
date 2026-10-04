@@ -6,6 +6,10 @@ This advances the creator platform without closing G01–G14 or E1–E8.
 The [reactive actor follow-up](ACTOR_BEHAVIORS_ACCEPTANCE.md) adds direct behavior
 attachments and per-instance native callbacks. Earlier host limitations in this
 record refer to the initial actor API snapshot.
+The [owner form follow-up](AUTHORED_FIGHTER_ACCEPTANCE.md#companion-retention-through-owner-form-changes-2026-10-04)
+retains companion ownership/identity/state/lifetime through supported main-fighter
+form replacement. Its native and managed scopes are recorded separately; owner
+form limitations below describe the original snapshot.
 
 `ModActors.cs` supplies immutable transactional definitions, copied observations,
 events and shared capability interfaces. `FightActors.cs` owns native root

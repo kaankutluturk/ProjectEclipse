@@ -86,8 +86,8 @@ local host = sf2.behaviors.register {
         sf2.log.info("AUTHORED-FIGHTER:ended:" .. fighter.actor_id .. ":" .. fighter.actor_end_reason)
     end,
 }
-local left = sf2.actors.register { id = "left", character = character, behavior = host, ai = false, max_health = 10, lifetime_frames = 1800 }
-local right = sf2.actors.register { id = "right", character = character, behavior = host, ai = false, team = "opponent", max_health = 10, lifetime_frames = 1800 }
+local left = sf2.actors.register { id = "left", character = character, behavior = host, ai = false, max_health = 10, lifetime_frames = 3600 }
+local right = sf2.actors.register { id = "right", character = character, behavior = host, ai = false, team = "opponent", max_health = 10, lifetime_frames = 3600 }
 local function close()
     if hud and sf2.ui.is_open(hud) then sf2.ui.close(hud) end
     hud, command, paired, automatic, pending = nil, nil, false, false, {}

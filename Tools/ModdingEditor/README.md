@@ -8,7 +8,10 @@ core movement/equipment compatibility; this is not an arbitrary mesh importer.
 Handle completion and project diagnostics are distinct from native contact tests.
 Its player-form buttons use `combat.transform`; the authored strike also has a
 character-specific native Punch binding. The core comparison form is a registered
-test character, not a saved-loadout restore operation.
+test character, not a saved-loadout restore operation. Supported main-fighter
+form swaps preserve live companions, their private state and lifetime. Use either
+form button while the pair repeats strikes to exercise the composition; actor
+references remain callback-scoped and an actor's own form is unsupported.
 Its owned Campaign fight and repeatable mode declare `player_character` with a
 warrior handle, so the authored fighter starts in the player slot. Omission
 keeps the saved player's setup. This is a `content.register` fight field;

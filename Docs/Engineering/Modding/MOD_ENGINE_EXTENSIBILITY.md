@@ -32,6 +32,13 @@ player selection in the same authored-fighter record. This advances reusable
 mode composition while persistent profile loadouts, arbitrary rigs and complete
 creator/platform acceptance remain open.
 
+Supported main-fighter form swaps now preserve owned companions, their bodies,
+IDs, private behavior state and existing lifetime. Explicit targets and pending
+birth ownership transfer reversibly with the participant. The authored-fighter
+record accepts continued native contact after a player owner swap and managed
+rollback/queued-birth cases. This advances feature composition; actor-body forms,
+arbitrary rigs and general creator/platform acceptance remain open.
+
 The [actor projectile extension](ACTOR_PROJECTILES_ACCEPTANCE.md) supports
 typed native ranged abilities on independent roots, with scoped queries,
 Lua guidance, caster provenance and retirement cleanup. Ranged Companion Duel

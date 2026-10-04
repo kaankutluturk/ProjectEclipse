@@ -11,7 +11,8 @@ use your normal Punch control for its original strike. The fight declares
 player setup does not change saved equipment and needs `content.register`.
 The example also registers a repeatable Eclipse Mode entry and adds its HUD
 to Act I Tournament 3 in either mode. Its HUD summons an independent pair, lets each fighter perform
-the authored strike, resets pair spacing, toggles repeated strikes, and dismisses the pair. They have
+the authored strike, resets pair spacing, toggles repeated strikes, and dismisses the pair. Their lifetime is 3,600 simulation frames (60 seconds at 60 frames/second),
+paused with the fight. They have
 their own health and target each other. Main fighters remain playable, so leave
 room for the pair; the example does not reserve or freeze the arena.
 Native reactions can move or turn a fighter. Use **Reset pair spacing** before a
@@ -27,7 +28,11 @@ gets the authored strike. Choose **Try core comparison form** to switch to a
 registered kung-fu character using the core body. This comparison is not a
 snapshot of your original loadout. Form changes are temporary combat operations;
 they retain health percentage and input ownership without editing saved
-equipment. The owned lab uses the character chosen for its prepared encounter;
+equipment. Try either form button while the summoned pair is alive: both keep
+their actor IDs, health, private behavior state, targets and remaining lifetime.
+Repeated strikes continue through the owner swap; changing an actor's own body
+is still unsupported. The HUD reacquires actor references each callback.
+The owned lab uses the character chosen for its prepared encounter;
 restart Tournament 3 to use your saved player's ordinary setup. A resolved owned
 encounter opens the chooser again on the next entry. Failed
 requests display their error in the HUD. This requires `combat.transform` in

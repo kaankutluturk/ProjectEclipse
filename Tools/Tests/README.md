@@ -12,7 +12,12 @@ contact/callbacks and character-specific selection after a comparison swap.
 Pass `-PlayerEntry` to choose its authored player through the native setup UI,
 or `-ComparisonEntry` for the comparison warrior. Both check Back/reopening,
 saved player choice, isolated generated-instance/blueprint parameters and
-player/control flags before any form request. The fight launches directly;
+player/control flags before any form request. With the pair alive, an owner form
+swap must preserve actor handles/IDs, bodies, private behavior instances, birth
+frames and mutual targets, followed by further native contact in both directions.
+`CharacterForms/TestFormRenderBindings.ps1` additionally checks production actor
+owner/explicit-target/queued-birth binding, commit and late presentation rollback
+with controlled services. The fight launches directly;
 map/mode menu clicks are outside this acceptance runner.
 `Tools/Animation/TestAuthoredFighterExample.py` reproduces the shipped geometry,
 binary and sidecar and checks source motion/skin structure.

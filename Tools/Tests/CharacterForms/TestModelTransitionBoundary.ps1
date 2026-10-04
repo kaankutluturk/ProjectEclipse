@@ -30,6 +30,9 @@ RENDER
     // This fixture controls motion; the full production motion queue has its own tests.
     int motionCancels; void CancelEclipseFighterMotion(){motionCancels++;}
     int playbackCancels; void CancelEclipseFighterPlayback() { playbackCancels++; }
+    int projectileCancels,actorCancels; string actorEndReason;
+    void CancelEclipseProjectiles(){projectileCancels++;}
+    void CancelEclipseActors(string reason){actorCancels++;actorEndReason=reason;}
     Round round=new Round(); Model _playerModel=new Model(),CKNCPOABFBO=new Model();
     bool _eclipseFightEndDispatched=false,isRenderFight=true,isRenderCamera=true,IsLocalVersus; int frame;
     Action Step=()=>{}; List<string> order=new List<string>();
@@ -62,7 +65,8 @@ RENDER
         bool failed=false;f.QueueModelTransition(f._playerModel,()=>throw new InvalidOperationException(),e=>failed=e is InvalidOperationException);f.Render();Check(failed,"failure completion");
         f.QueueModelTransition(f._playerModel,()=>{},e=>throw new Exception("completion error"));f.Render();
         f.QueueModelTransition(f._playerModel,()=>{},e=>{Check(e is OperationCanceledException,"unload cancellation");canceled++;});
-        f.CloseModelTransitions();f.CloseModelTransitions();Check(canceled==4,"unload exactly once"); Check(f.motionCancels==2,"each close clears pending motion"); Check(f.playbackCancels==2,"each close cancels pending playback");
+        Check(f.actorCancels==0&&f.projectileCancels==0,"ordinary successful/rejected model transitions do not close actor/projectile lifetime");
+        f.CloseModelTransitions();f.CloseModelTransitions();Check(f.actorCancels==2&&f.projectileCancels==2&&f.actorEndReason=="round_ended","each close cancels companions and projectiles with round reason");Check(canceled==4,"unload exactly once"); Check(f.motionCancels==2,"each close clears pending motion"); Check(f.playbackCancels==2,"each close cancels pending playback");
         Check(!f.QueueModelTransition(f._playerModel,()=>{},e=>{}),"closed queue");
         var g=new Fight();int other=0,done=0;
         g.QueueModelTransition(g._playerModel,()=>g.CloseModelTransitions(),e=>done++);
