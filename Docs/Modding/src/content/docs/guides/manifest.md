@@ -79,6 +79,7 @@ A capability permits an operation; a dependency permits references to another ow
 | `ui.create` | Open mod-owned UI layouts; returned handles can update and close that script's views. |
 | `audio.play` | Play, query, update and stop mod-owned [audio instances](../../api/audio/). |
 | `ui.settings` | Register on/off switches shown under Options > Mod settings. |
+| `presentation.camera` | Acquire exclusive fight-camera framing, update pan/zoom and release ownership; see [camera control](../../api/camera/). |
 | `presentation.visuals` | Turn on and tune optional fight visuals, such as weapon trails, bloom and depth haze; create/recolor/remove owned arena markers. |
 | `combat.motion` | Queue relative main-fighter displacement for movement abilities; see [fighter motion](../fighter-motion/). |
 | `combat.actors` | Spawn, observe, guide and dismiss this mod’s independent fighters; see [actors](../../api/actors/). |

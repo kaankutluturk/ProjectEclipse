@@ -1,3 +1,4 @@
+using System;
 using MoonSharp.Interpreter;
 
 namespace Eclipse.Modding
@@ -6,6 +7,9 @@ namespace Eclipse.Modding
     {
         private sealed partial class MoonSharpScriptContext
         {
+            private readonly ModCameraScope _cameras = new ModCameraScope();
+            private readonly System.Runtime.CompilerServices.ConditionalWeakTable<Table, ModCameraInstance> _cameraHandles =
+                new System.Runtime.CompilerServices.ConditionalWeakTable<Table, ModCameraInstance>();
             private readonly ModArenaMarkerScope _arenaMarkers = new ModArenaMarkerScope();
             private readonly System.Runtime.CompilerServices.ConditionalWeakTable<Table, ModArenaMarkerInstance> _markerHandles =
                 new System.Runtime.CompilerServices.ConditionalWeakTable<Table, ModArenaMarkerInstance>();
@@ -35,7 +39,58 @@ namespace Eclipse.Modding
                     bool changed = marker.TrySetSprite(ArenaSprite(args[1]), out var error);
                     return DynValue.NewTuple(DynValue.NewBoolean(changed), error == null ? DynValue.Nil : DynValue.NewString(error));
                 })));
+                world.Set("release_camera", DynValue.NewCallback((ctx, args) => ApiCall("sf2.world.release_camera", () =>
+                    DynValue.NewBoolean(CameraHandle(args, 1).Release()))));
+                world.Set("is_camera_active", DynValue.NewCallback((ctx, args) => ApiCall("sf2.world.is_camera_active", () =>
+                    DynValue.NewBoolean(CameraHandle(args, 1).IsActive))));
+                world.Set("set_camera", DynValue.NewCallback((ctx, args) => ApiCall("sf2.world.set_camera", () =>
+                {
+                    var camera = CameraHandle(args, 2);
+                    bool changed = camera.TrySet(CameraSettings(args[1]), out var error);
+                    return DynValue.NewTuple(DynValue.NewBoolean(changed), error == null ? DynValue.Nil : DynValue.NewString(error));
+                })));
                 root.Set("world", DynValue.NewTable(world));
+            }
+            private ModCameraInstance CameraHandle(CallbackArguments args, int count)
+            {
+                ThrowIfDisposed(); _api.RequireCapability("presentation.camera");
+                if (args.Count != count || args[0].Type != DataType.Table || !_cameraHandles.TryGetValue(args[0].Table, out var camera))
+                    throw new ModContentException("Expected a camera owned by this script and exactly " + count + " arguments.");
+                return camera;
+            }
+            private ModCameraSettings CameraSettings(DynValue value)
+            {
+                if (value.IsNil()) return new ModCameraSettings();
+                if (value.Type != DataType.Table) throw new ModContentException("Camera settings must be a table.");
+                var spec = value.Table; ValidateFields(spec, "camera settings", "center_x", "offset_y", "zoom");
+                double? Number(string name)
+                {
+                    var n = spec.Get(name);
+                    if (n.IsNil()) return null;
+                    if (n.Type != DataType.Number) throw new ModContentException("Camera " + name + " must be a number.");
+                    return n.Number;
+                }
+                return new ModCameraSettings(Number("center_x"), Number("offset_y") ?? 0, Number("zoom"));
+            }
+            private DynValue AcquireCamera(CallbackArguments args, Table handle, IModFighterOperations fighter, ModEffectEvent kind, Func<bool> active)
+            {
+                if (!active()) throw new ScriptRuntimeException("Fighter operations have expired.");
+                ThrowIfDisposed();
+                _api.RequireCapability("presentation.camera");
+                if (_api.Registration != null && !_api.Registration.IsCatalogFrozen)
+                    throw new ModContentException("Camera ownership requires all mod registration to be complete.");
+                if (_uiCloseDepth != 0)
+                    throw new ModContentException("Camera acquisition is unavailable during UI cleanup.");
+                if (kind == ModEffectEvent.FightBegin || kind == ModEffectEvent.RoundBegin || kind == ModEffectEvent.RoundEnd ||
+                    kind == ModEffectEvent.FightEnd || kind == ModEffectEvent.ActorEnd)
+                    throw new ScriptRuntimeException("Camera acquisition requires an active combat callback.");
+                int offset = args[0].Type == DataType.Table && args[0].Table == handle ? 1 : 0;
+                if (args.Count - offset > 1) throw new ModContentException("acquire_camera expects at most one settings table.");
+                var settings = CameraSettings(args.Count == offset ? DynValue.Nil : args[offset]);
+                if (!_cameras.TryAcquire(fighter as IModFighterCamera, _api.Mod.Id, settings, out var camera, out var error))
+                    return DynValue.NewTuple(DynValue.Nil, DynValue.NewString(error ?? "Camera acquisition failed."));
+                var table = new Table(_script); _cameraHandles.Add(table, camera);
+                return DynValue.NewTuple(DynValue.NewTable(table), DynValue.Nil);
             }
             private ModArenaMarkerInstance Marker(CallbackArguments args, int count)
             {

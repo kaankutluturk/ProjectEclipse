@@ -36,7 +36,7 @@ $sources = @(
     'Assets/Scripts/Eclipse/Runtime/Modding/ModRoundOutcomes.cs',
     'Assets/Scripts/Eclipse/Runtime/Modding/ModUiRuntime.cs',
     'Assets/Scripts/Eclipse/Runtime/Modding/ModProjectiles.cs','Assets/Scripts/Eclipse/Runtime/Modding/ModActors.cs',
-    'Assets/Scripts/Eclipse/Runtime/Modding/ModArenaRuntime.cs',
+    'Assets/Scripts/Eclipse/Runtime/Modding/ModArenaRuntime.cs','Assets/Scripts/Eclipse/Runtime/Modding/ModCameraRuntime.cs',
     'Assets/Scripts/Eclipse/Runtime/Modding/ModAudioRuntime.cs',
     'Assets/Scripts/Eclipse/Runtime/Modding/ModStoryEvents.cs','Assets/Scripts/Eclipse/Runtime/Modding/ModFightEntry.cs',
     'Assets/Scripts/Eclipse/Runtime/Modding/ModScriptingP1C.cs',

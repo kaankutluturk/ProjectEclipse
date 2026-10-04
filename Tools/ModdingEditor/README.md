@@ -1,5 +1,15 @@
 # Eclipse Modding for VS Code
 
+Camera control uses `fighter:acquire_camera(settings?)` and
+`sf2.world.set_camera`, `is_camera_active`, `release_camera`, with the separate
+`presentation.camera` capability. `CameraSettings` completes absolute arena
+`center_x`, positive-down `offset_y` and absolute game-layer `zoom`. Updates
+replace the whole settings table; native viewport/arena clamps apply. Opaque
+`CameraHandle` values cannot be substituted with marker or asset handles.
+Timing diagnostics reject creation during fight/round begin/end or actor end.
+The manual `camera-lab` starter mirrors Camera Lab, including animated sweep and
+HUD/round cleanup. Editor validation does not prove native rendering.
+
 Arena artwork supports `fighter:mark_sprite`, `sf2.world.set_marker_rect` and
 `sf2.world.set_marker_sprite`. Typed sprite handles, the existing marker handle
 and rectangle schema cover creation and updates; Lua owns movement/animation

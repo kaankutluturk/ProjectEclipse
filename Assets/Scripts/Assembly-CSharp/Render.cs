@@ -5,6 +5,7 @@ using UnityEngine;
 
 public class Render
 {
+    private readonly Eclipse.Modding.ModCameraProjection _eclipseCameraProjection = new Eclipse.Modding.ModCameraProjection();
 	private enum HNGOJLFBLME
 	{
 		Z_DARKNESS = 0,
@@ -347,9 +348,11 @@ public class Render
 
 	public void UpdatePosition(Vector3f GJKIKGKCGIA, Vector3f JEBIHODAIKM, float DHDMNHCIPEH, float BGEEALIPKCC, float JPJGNKGEHPI = 0f)
 	{
+        _eclipseCameraProjection.Begin();
+        var camera = Fight.GetCurrentFight()?.GetEclipseCameraSettings(this);
 		RefreshViewportMetrics();
-		JALEODAIDEO = _location.JMLAKAKDBBL / 2f - GJKIKGKCGIA.GetX();
-		NIKDOKGPFOI = ((!(JPJGNKGEHPI > 0f)) ? KMMOLDBJBIG() : JPJGNKGEHPI);
+		JALEODAIDEO = _location.JMLAKAKDBBL / 2f - (camera?.CenterX.HasValue == true ? (float)camera.CenterX.Value : GJKIKGKCGIA.GetX());
+		NIKDOKGPFOI = camera?.Zoom.HasValue == true ? (float)camera.Zoom.Value : ((!(JPJGNKGEHPI > 0f)) ? KMMOLDBJBIG() : JPJGNKGEHPI);
 		float num = 1f;
 		if (GameUtils.LEPANPKBBKI().IMHPAHJDAFP > 0f)
 		{
@@ -364,7 +367,7 @@ public class Render
 			float num5 = DHDMNHCIPEH - _location.JMLAKAKDBBL / 2f;
 			float pHKGOBGNDEC = GameUtils.LEPANPKBBKI().PHKGOBGNDEC;
 			float num6 = num5 - num4;
-			if (Mathf.Abs(num6) + pHKGOBGNDEC > num3)
+			if (camera?.CenterX.HasValue != true && Mathf.Abs(num6) + pHKGOBGNDEC > num3)
 			{
 				int num7 = ((num6 > 0f) ? 1 : (-1));
 				float num8 = (float)(-num7) * (Mathf.Abs(num6) - num3 + pHKGOBGNDEC);
@@ -404,6 +407,7 @@ public class Render
 				factor = Eclipse.Modding.ModVisuals.BackgroundLayerFactor(factor);
 			}
 			item.SetPositionX(JALEODAIDEO * factor);
+            if (camera != null) _eclipseCameraProjection.ApplyVertical(item, camera.OffsetY, NIKDOKGPFOI, factor);
 		}
 		float dHDMNHCIPEH = JALEODAIDEO - (_location.JMLAKAKDBBL / 2f - DHDMNHCIPEH) * NIKDOKGPFOI;
 		float bGEEALIPKCC = _location.gameLayer.MJNPBMOAFML().transform.localPosition.y - 2f * KKICFAMLAAK * NIKDOKGPFOI - 10f;

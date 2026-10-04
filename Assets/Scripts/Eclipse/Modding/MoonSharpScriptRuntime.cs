@@ -211,6 +211,8 @@ namespace Eclipse.Modding
                             GetFighterProjectiles(args, fighterTable, fighter, effectEvent, () => invocationActive, projectileQueryBudget)));
                         fighterTable.Set("overlaps_rect", DynValue.NewCallback((ctx, args) =>
                             OverlapRect(args, fighterTable, fighter, invocationActive, false, arenaQueryBudget)));
+                        fighterTable.Set("acquire_camera", DynValue.NewCallback((ctx, args) =>
+                            AcquireCamera(args, fighterTable, fighter, effectEvent, () => invocationActive)));
                         fighterTable.Set("mark_sprite", DynValue.NewCallback((ctx, args) =>
                             MarkRect(args, fighterTable, fighter, effectEvent, invocationActive, true)));
                         fighterTable.Set("mark_rect", DynValue.NewCallback((ctx, args) =>
@@ -762,6 +764,7 @@ namespace Eclipse.Modding
                 if (_disposed) return;
                 _callbackWorkers.Clear();
                 _disposed = true;
+                _cameras.Dispose();
                 _arenaMarkers.Dispose();
                 _audio.Dispose();
                 _audioInstances = new System.Runtime.CompilerServices.ConditionalWeakTable<Table, ModAudioInstance>();

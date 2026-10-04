@@ -8,6 +8,22 @@ const { createMod } = require('../src/scaffold.cjs');
 const template = path.resolve(__dirname, '../templates/weapon');
 const header = 'local sf2 = require("sf2")\n';
 
+test('camera ownership has distinct handles/capability, lifecycle gates and a mirrored starter',async()=>{
+ const directory=path.resolve(__dirname,'../../../Mods/example.camera-lab');
+ const mod=await p.indexMod(directory);assert.deepEqual(mod.issues,[]);
+ const source=await fs.readFile(path.join(directory,'scripts/main.lua'),'utf8');assert.deepEqual(p.analyze(source,mod).issues,[]);
+ for(const file of ['mod.toml','README.md','scripts/main.lua'])assert.deepEqual(await fs.readFile(path.join(directory,file)),await fs.readFile(path.resolve(__dirname,'../templates/camera-lab',file)));
+ const api=require('../data/api.json');assert.equal(api.fighterMethods.acquire_camera.capability,'presentation.camera');
+ for(const name of ['set_camera','is_camera_active','release_camera'])assert.equal(api.functions['sf2.world.'+name].capability,'presentation.camera');
+ const missing={...mod,data:{...mod.data,capabilities:['content.register','presentation.visuals']}};
+ assert(p.analyze(header+'sf2.behaviors.register{id="x",on_tick=function(_,fighter) fighter:acquire_camera{} end}',missing).issues.some(i=>i.capability==='presentation.camera'));
+ for(const callback of ['on_fight_begin','on_round_begin','on_round_end','on_fight_end','on_actor_end']){
+  const issues=p.analyze(header+'sf2.behaviors.register{id="x",'+callback+'=function(_,fighter) fighter:acquire_camera{} end}',mod).issues;
+  assert(issues.some(i=>i.code==='callback-timing'),callback);
+ }
+ for(const callback of ['on_tick','on_actor_spawn'])assert(!p.analyze(header+'sf2.behaviors.register{id="x",'+callback+'=function(_,fighter) fighter:acquire_camera{} end}',mod).issues.some(i=>i.code==='callback-timing'));
+});
+
 test('authored fighter starter mirrors native models and original point animation',async()=>{
  const directory=path.resolve(__dirname,'../../../Mods/example.authored-fighter');
  const mod=await p.indexMod(directory); assert.deepEqual(mod.issues,[]);

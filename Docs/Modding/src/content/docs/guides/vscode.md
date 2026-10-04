@@ -187,6 +187,14 @@ and HUD example. See the [audio reference](../../api/audio/); editor checks cann
 verify native pause, source output or device audibility.
 
 
+Camera settings complete for `fighter:acquire_camera(settings?)` and
+`sf2.world.set_camera(camera, settings)`: `center_x`, `offset_y` and `zoom`.
+The retained `CameraHandle` is separate from markers and assets; these operations
+need `presentation.camera`. Creation diagnostics reject fight/round begin/end
+and actor end. Copy the manual `camera-lab` starter to explore ownership,
+simulation-timed motion and cleanup. See [camera control](../../api/camera/)
+for defaults and native clamps. Editor completion is separate from a playtest.
+
 Rectangle fields complete for `fighter:overlaps_rect`, `fighter:mark_rect` and
 `fighter:mark_sprite(sprite, rectangle)`. Sprite arguments require typed sprite
 handles.

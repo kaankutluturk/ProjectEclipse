@@ -98,9 +98,9 @@ public partial class Fight
         EPBDEDGLHJE.PAHPCIFKDEA();
         // Native magic effects are manually ticked by RenderFight, rather than
         // CocosAnimation.Update. Title combat needs the same advance/expiry pass.
-        _Camera.KKFIJLOMOJI().GOCPBKNDKMC().DHOMHKADCFG();
-        _Camera.KKFIJLOMOJI().GDBMKMFFOCF().DHOMHKADCFG();
-        _Camera.KKFIJLOMOJI().IFDHBLGKEHN();
+        _Camera.GetRender().GOCPBKNDKMC().DHOMHKADCFG();
+        _Camera.GetRender().GDBMKMFFOCF().DHOMHKADCFG();
+        _Camera.GetRender().IFDHBLGKEHN();
         BELLAEIMEAB();
         ResetModelsHitData();
         frame++;
@@ -117,7 +117,7 @@ public partial class Fight
         {
             // The renderer survives title rematches; its old looping effects
             // must not survive the fighters that owned them.
-            _Camera?.KKFIJLOMOJI()?.JPPGJBHLAGC();
+            _Camera?.GetRender()?.JPPGJBHLAGC();
             var models = new HashSet<Model>(LNDLFINJHDB);
             models.UnionWith(HCPGFOCGDAA);
             models.UnionWith(JLEFIKJODGG);
@@ -362,6 +362,7 @@ public partial class Fight
 
     private void CloseModelTransitions()
     {
+        _eclipseCamera.Clear();
         CancelEclipseProjectiles();
         CancelEclipseActors("round_ended");
         CancelEclipseFighterMotion();
@@ -499,7 +500,7 @@ public partial class Fight
 		public int OGOLNFLBLBD;
 	}
 
-		private sealed class EclipseFighterOperations : IModFighterOperations, IModDamageEventSource, IModFighterTargets, IModIncomingHitSource, IModFighterEffects, IModCombatSnapshotSource, IModCombatActivitySource, IModFighterForms, IModFighterStatusIcons, IModAnimationLifecycleSource, IModFighterFlags, IModFighterControls, IModRoundOutcomes, IModFighterMotion, IModFighterPlayback, IModFighterRegions, IModFighterArtwork, IModFighterProjectiles, IModFighterProjectileSpawning, IModFighterActors, IModActorBehaviorSource
+		private sealed class EclipseFighterOperations : IModFighterOperations, IModDamageEventSource, IModFighterTargets, IModIncomingHitSource, IModFighterEffects, IModCombatSnapshotSource, IModCombatActivitySource, IModFighterForms, IModFighterStatusIcons, IModAnimationLifecycleSource, IModFighterFlags, IModFighterControls, IModRoundOutcomes, IModFighterMotion, IModFighterPlayback, IModFighterRegions, IModFighterArtwork, IModFighterCamera, IModFighterProjectiles, IModFighterProjectileSpawning, IModFighterActors, IModActorBehaviorSource
 	{
 		private readonly Fight _fight;
 		private readonly Model _model;
@@ -515,6 +516,8 @@ public partial class Fight
             if (!ArenaAvailable) { overlaps = false; error = "Arena geometry requires a current main fighter in an active offline round."; return false; }
             return ModArenaGeometry.TryOverlap(_model, rect, out overlaps, out error);
         }
+        public bool TryAcquireCamera(ModId owner, ModCameraSettings settings, out IModCameraControl camera, out string error)
+        { return _fight.TryAcquireEclipseCamera(_model, owner, settings, out camera, out error); }
         public bool TryMarkRect(ModArenaRect rect, ModUiColor color, out IModArenaMarker marker, out string error)
         {
             return TryCreateArenaArtwork(rect, color, null, out marker, out error);
@@ -1638,7 +1641,7 @@ public partial class Fight
 		IntervalAnimation mNOIEOBBCMI = (IntervalAnimation)oJDOHGBGPFK.Data;
 		if (mNOIEOBBCMI.Type == IntervalAnimation.NGAJJDIEDGF.INTERVAL_INVISIBLE)
 		{
-			_Camera.KKFIJLOMOJI().FPNKBJPKKGB().NGPIALAGGBI(oJDOHGBGPFK.KJDFJPBIGJC.CLDMEJKGLBA(), false);
+			_Camera.GetRender().FPNKBJPKKGB().NGPIALAGGBI(oJDOHGBGPFK.KJDFJPBIGJC.CLDMEJKGLBA(), false);
 		}
 		KCACCJNMOFM(oJDOHGBGPFK);
 	}
@@ -1649,7 +1652,7 @@ public partial class Fight
 		IntervalAnimation mNOIEOBBCMI = (IntervalAnimation)oJDOHGBGPFK.Data;
 		if (mNOIEOBBCMI.Type == IntervalAnimation.NGAJJDIEDGF.INTERVAL_INVISIBLE)
 		{
-			_Camera.KKFIJLOMOJI().FPNKBJPKKGB().NGPIALAGGBI(oJDOHGBGPFK.KJDFJPBIGJC.CLDMEJKGLBA(), true);
+			_Camera.GetRender().FPNKBJPKKGB().NGPIALAGGBI(oJDOHGBGPFK.KJDFJPBIGJC.CLDMEJKGLBA(), true);
 		}
 		EPBDEDGLHJE.OFKIKABKDFD()["Interval"] = mNOIEOBBCMI;
 		EPBDEDGLHJE.JALOHCICLGN(oJDOHGBGPFK.KJDFJPBIGJC, PerkEvent.KNKIIEPDCPN.EVENT_INTERVAL_END, true);
@@ -1716,7 +1719,7 @@ public partial class Fight
 		CheckFightRules(FightEvent.AnimationStartEvent, ((Model.EventModel)data).KJDFJPBIGJC.EPCNJLEHJCB() ? RuleAppliance.AppliancePlayer : RuleAppliance.ApplianceOpponent);
 		if (!oJDOHGBGPFK.KJDFJPBIGJC.NMPHACPBHKO())
 		{
-			_Camera.KKFIJLOMOJI().FPNKBJPKKGB().NGPIALAGGBI(oJDOHGBGPFK.KJDFJPBIGJC.CLDMEJKGLBA(), true);
+			_Camera.GetRender().FPNKBJPKKGB().NGPIALAGGBI(oJDOHGBGPFK.KJDFJPBIGJC.CLDMEJKGLBA(), true);
 			oJDOHGBGPFK.KJDFJPBIGJC.KKLMIAFFKNE(true);
 		}
 	}
@@ -1912,9 +1915,9 @@ public partial class Fight
 			CheckFightRules(FightEvent.RenderEvent, RuleAppliance.ApplianceAll);
 			_Camera.OMPFAMELAII();
 			_Camera.GDOPCJEGPFL();
-			_Camera.KKFIJLOMOJI().GOCPBKNDKMC().DHOMHKADCFG();
-			_Camera.KKFIJLOMOJI().GDBMKMFFOCF().DHOMHKADCFG();
-			_Camera.KKFIJLOMOJI().IFDHBLGKEHN();
+			_Camera.GetRender().GOCPBKNDKMC().DHOMHKADCFG();
+			_Camera.GetRender().GDBMKMFFOCF().DHOMHKADCFG();
+			_Camera.GetRender().IFDHBLGKEHN();
 		}
 		if (PEOIALGBJFB)
 		{
@@ -1992,12 +1995,12 @@ public partial class Fight
 
 	public void CreateRingout(float HIKKOEOGMEK, float NMMCJGHAJBB, float DKJCJBAGKIL, string AJBGJNMLMKE)
 	{
-		_Camera.KKFIJLOMOJI().BFLMJIEIIFM(HIKKOEOGMEK, NMMCJGHAJBB, DKJCJBAGKIL, AJBGJNMLMKE);
+		_Camera.GetRender().BFLMJIEIIFM(HIKKOEOGMEK, NMMCJGHAJBB, DKJCJBAGKIL, AJBGJNMLMKE);
 	}
 
 	public void LCDPAAFCLPB()
 	{
-		_Camera.KKFIJLOMOJI().DKLLNGOMCHN();
+		_Camera.GetRender().DKLLNGOMCHN();
 	}
 
 	public void CreateHotGround(string AJBGJNMLMKE, float ABKMCKDJCGB)
@@ -2012,7 +2015,7 @@ public partial class Fight
 	{
 		LKNILKJACGJ = true;
 		EJOIBPNPMFK = JMLAKAKDBBL;
-		_Camera.KKFIJLOMOJI().CreatePerkActivationArea(JMLAKAKDBBL, KHPKDMGDMAB, ADONPNOBBDE);
+		_Camera.GetRender().CreatePerkActivationArea(JMLAKAKDBBL, KHPKDMGDMAB, ADONPNOBBDE);
 	}
 
 	public void UpdatePerkActivationArea(float MGMMDGFPBLP, float KGJALFLDIBG, bool EBKPFEFCIIH)
@@ -2020,13 +2023,13 @@ public partial class Fight
 		ICDHAHADCEH = MGMMDGFPBLP - EJOIBPNPMFK / 2f + _location.JMLAKAKDBBL / 2f;
 		JCCDMOJKANN = MGMMDGFPBLP + EJOIBPNPMFK / 2f + _location.JMLAKAKDBBL / 2f;
 		NCAEOKCFBFD = EBKPFEFCIIH;
-		_Camera.KKFIJLOMOJI().UpdatePerkActivationArea(MGMMDGFPBLP, KGJALFLDIBG);
+		_Camera.GetRender().UpdatePerkActivationArea(MGMMDGFPBLP, KGJALFLDIBG);
 	}
 
 	public void NPFHCPAAIFJ()
 	{
 		LKNILKJACGJ = false;
-		_Camera.KKFIJLOMOJI().NPFHCPAAIFJ();
+		_Camera.GetRender().NPFHCPAAIFJ();
 	}
 
 	public void JKPOGNMHDNK(RuleAppliance EJPOJJKKICO, bool KFIECNIMAOA)
@@ -2076,22 +2079,22 @@ public partial class Fight
 
 	public void DBIHABKLFHP(float KGJALFLDIBG)
 	{
-		_Camera.KKFIJLOMOJI().DBIHABKLFHP(KGJALFLDIBG);
+		_Camera.GetRender().DBIHABKLFHP(KGJALFLDIBG);
 	}
 
 	public void HKOMIIDELBC()
 	{
-		_Camera.KKFIJLOMOJI().HKOMIIDELBC();
+		_Camera.GetRender().HKOMIIDELBC();
 	}
 
 	public void OBICGGFDMLN()
 	{
-		_Camera.KKFIJLOMOJI().OBICGGFDMLN();
+		_Camera.GetRender().OBICGGFDMLN();
 	}
 
 	public void CreateLightInTheDarkness()
 	{
-		_Camera.KKFIJLOMOJI().CreateLightInTheDarkness();
+		_Camera.GetRender().CreateLightInTheDarkness();
 	}
 
 	public void UpdateLightInTheDarkness(RuleAppliance target, float radius, float shape)
@@ -2099,13 +2102,13 @@ public partial class Fight
 		Model model = target == RuleAppliance.ApplianceOpponent ? CKNCPOABFBO : _playerModel;
 		if (model != null)
 		{
-			_Camera.KKFIJLOMOJI().UpdateLightInTheDarkness(model, radius, shape);
+			_Camera.GetRender().UpdateLightInTheDarkness(model, radius, shape);
 		}
 	}
 
 	public void RemoveLightInTheDarkness()
 	{
-		_Camera.KKFIJLOMOJI().RemoveLightInTheDarkness();
+		_Camera.GetRender().RemoveLightInTheDarkness();
 	}
 
 	public void DNJMJGFGHBC(Model ACENLMONNPA, PerkTrigger CPBHKJFPFJB)
@@ -2114,7 +2117,7 @@ public partial class Fight
 
 	public void PHNCLBJKCOE(Model ACENLMONNPA, bool CCBEDPIHKAD)
 	{
-		_Camera.KKFIJLOMOJI().FPNKBJPKKGB().NGPIALAGGBI(ACENLMONNPA.CLDMEJKGLBA(), CCBEDPIHKAD);
+		_Camera.GetRender().FPNKBJPKKGB().NGPIALAGGBI(ACENLMONNPA.CLDMEJKGLBA(), CCBEDPIHKAD);
 	}
 
 	public void CKCCBJKIGIO(Model ACENLMONNPA, PerksStage.ActionPerk IBODMPMJELJ, bool CCBEDPIHKAD)
@@ -3280,7 +3283,7 @@ public partial class Fight
 		JOEADOFBDOC.JAOMELOGOOJ = CKNCPOABFBO.LJCFIOPBNKD();
 		JOEADOFBDOC.OGOLNFLBLBD = IDAAONBIBJM[ADJAMFGBOAP].RoundsWon;
 		Sound.StopLoopedSounds();
-		_Camera.KKFIJLOMOJI().JPPGJBHLAGC();
+		_Camera.GetRender().JPPGJBHLAGC();
 		KFGCODDPNJP();
 		isStopFight = false;
 		isFirstStrike = false;
@@ -5350,7 +5353,7 @@ public partial class Fight
 	{
 		if (MKCLBJEIIHN)
 		{
-			_Camera.KKFIJLOMOJI().GOCNEMPBJIH(GPEGBHMKKJL);
+			_Camera.GetRender().GOCNEMPBJIH(GPEGBHMKKJL);
 		}
 	}
 

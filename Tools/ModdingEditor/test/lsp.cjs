@@ -292,6 +292,13 @@ async function main() {
     await until(()=>diagnostics.get(decodeURIComponent(wrongPlan).toLowerCase())?.some(d=>d.code==='assign-type-mismatch'),'prepared player character rejects a battle handle');
     console.log('PASS: prepared player_character completion and typed-handle diagnostic');
     const arenaOptions=probe('arena-options.lua','local sf2=require("sf2")\nsf2.behaviors.register {id="x",on_tick=function(_,fighter)\n fighter:mark_rect { | }\nend}');
+    const cameraOptions=probe('camera-options.lua','local sf2=require("sf2")\nsf2.behaviors.register{id="x",on_tick=function(_,fighter)\n fighter:acquire_camera { | }\nend}');
+    await until(async()=>{const found=labels(await request('textDocument/completion',cameraOptions));return ['center_x','offset_y','zoom'].every(key=>found.some(n=>n.startsWith(key)));},'camera settings completion');
+    const cameraUpdate=probe('camera-update.lua','local sf2=require("sf2")\nsf2.behaviors.register{id="x",on_tick=function(_,fighter)\n local camera=fighter:acquire_camera()\n sf2.world.set_camera(camera,{ | })\nend}');
+    await until(async()=>{const found=labels(await request('textDocument/completion',cameraUpdate));return ['center_x','offset_y','zoom'].every(key=>found.some(n=>n.startsWith(key)));},'camera update settings completion');
+    const wrongCamera=open('camera-handle-type.lua','local sf2=require("sf2")\nsf2.world.release_camera(sf2.assets.sprite("sprites/art"))');
+    await until(()=>diagnostics.get(decodeURIComponent(wrongCamera).toLowerCase())?.some(d=>d.code==='param-type-mismatch'),'camera rejects sprite handle');
+    console.log('PASS: camera acquisition/update settings completion and distinct opaque handle diagnostic');
     await until(async()=>{const found=labels(await request('textDocument/completion',arenaOptions));return ['x','y','width','height'].every(key=>found.some(n=>n.startsWith(key)));},'arena rectangle fields');
     const arenaTarget=probe('arena-target.lua','local sf2=require("sf2")\nsf2.behaviors.register {id="x",on_tick=function(_,fighter)\n fighter.opponent:|\nend}');
     await until(async()=>labels(await request('textDocument/completion',arenaTarget)).some(n=>n.startsWith('overlaps_rect')),'opponent native capsule sensor');

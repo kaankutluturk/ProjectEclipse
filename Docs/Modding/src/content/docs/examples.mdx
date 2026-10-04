@@ -71,6 +71,18 @@ art and HUD. See
 and budget limits. This uses pose sampling and direct health changes, without
 solid/swept collision or the native attack/block/armor/reaction pipeline.
 
+## Camera Lab
+
+[Camera Lab](https://github.com/dawc17/ProjectEclipse/tree/main/Mods/example.camera-lab)
+adds a HUD to Act I Tournament 3 in both modes. Follow the player with zoom,
+animate an arena sweep from simulation frames, restore automatic native framing
+while keeping ownership, or release it immediately. Acquisition and movement
+run from `on_tick`; the Release button and HUD cleanup use the retained handle.
+Conflicts appear in the HUD. See
+<a href={pageUrl('api/camera')}>Camera control</a> for settings, native clamps,
+exclusive ownership and lifetime. This changes presentation rather than fighter
+positions or physics. The manual `camera-lab` editor starter mirrors its source.
+
 ## Larger connected mods
 
 ### A framework with a gameplay add-on

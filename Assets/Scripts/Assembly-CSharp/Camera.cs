@@ -78,7 +78,7 @@ public class Camera : global::EventDispatcher<object>
 	{
 		get
 		{
-			return KKFIJLOMOJI();
+			return GetRender();
 		}
 	}
 
@@ -150,7 +150,8 @@ public class Camera : global::EventDispatcher<object>
 		PMJCGFONEPA = true;
 	}
 
-	public Render KKFIJLOMOJI()
+	// best guess for name
+	public Render GetRender()
 	{
 		return BMBGCIEFJGB;
 	}

@@ -1,5 +1,39 @@
 {
   "functions": {
+    "sf2.world.set_camera": {
+      "params": {
+        "camera": "Eclipse.CameraHandle",
+        "settings": "Eclipse.CameraSettings|nil"
+      },
+      "returns": "`true, nil` when changed, or `false, error` after release/expiry or backend rejection. Invalid settings or a foreign/forged handle raise an error. The settings replace every previous field; omitted values return to their defaults.",
+      "capability": "presentation.camera",
+      "url": "https://dawc17.github.io/ProjectEclipse/api/camera/#sf2worldset_camera",
+      "summary": "",
+      "requires": "`presentation.camera`; a camera created by this script.",
+      "when": "After acquisition, including later combat or UI callbacks. The next presentation pass applies the requested settings with native clamps."
+    },
+    "sf2.world.release_camera": {
+      "params": {
+        "camera": "Eclipse.CameraHandle"
+      },
+      "returns": "`true` on this handle's first release, even if its native ownership has expired; `false` on subsequent releases. A foreign or forged handle raises an error. It never clears a different script's current ownership.",
+      "capability": "presentation.camera",
+      "url": "https://dawc17.github.io/ProjectEclipse/api/camera/#sf2worldrelease_camera",
+      "summary": "",
+      "requires": "`presentation.camera`; a camera created by this script.",
+      "when": "After acquisition, including UI teardown and round/fight end cleanup."
+    },
+    "sf2.world.is_camera_active": {
+      "params": {
+        "camera": "Eclipse.CameraHandle"
+      },
+      "returns": "`true` while ownership is live; `false` after release or expiry. A foreign or forged handle raises an error.",
+      "capability": "presentation.camera",
+      "url": "https://dawc17.github.io/ProjectEclipse/api/camera/#sf2worldis_camera_active",
+      "summary": "",
+      "requires": "`presentation.camera`; a camera created by this script.",
+      "when": "After acquisition, including paused UI callbacks and cleanup."
+    },
     "sf2.world.set_marker_rect": {
       "params": {
         "marker": "Eclipse.ArenaMarkerHandle",
@@ -2148,6 +2182,13 @@
     "on_decide"
   ],
   "fighterMethods": {
+    "acquire_camera": {
+      "params": {
+        "settings?": "Eclipse.CameraSettings"
+      },
+      "returns": "Eclipse.CameraHandle|nil, string|nil",
+      "capability": "presentation.camera"
+    },
     "spawn_actor": {
       "params": {
         "definition": "Eclipse.ActorDefinitionHandle",
@@ -2600,6 +2641,27 @@
     "ArenaMarkerHandle": {
       "fields": {
         "private __eclipseArenaMarker": "true"
+      }
+    },
+    "CameraHandle": {
+      "fields": {
+        "private __eclipseCamera": "true"
+      }
+    },
+    "CameraSettings": {
+      "fields": {
+        "center_x?": [
+          "number",
+          "Absolute arena X, finite -10000..10000; omitted uses native duel following."
+        ],
+        "offset_y?": [
+          "number",
+          "Positive-down camera pan, finite -1000..1000; default 0."
+        ],
+        "zoom?": [
+          "number",
+          "Absolute game-layer scale, finite 0.25..4; omitted uses native zoom. Viewport/location clamps still apply."
+        ]
       }
     },
     "ArenaRect": {

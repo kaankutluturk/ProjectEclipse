@@ -161,6 +161,16 @@ local ExtensionHandle = {}
 ---@field private __eclipseArenaMarker true
 local ArenaMarkerHandle = {}
 
+---@class (exact) Eclipse.CameraHandle
+---@field private __eclipseCamera true
+local CameraHandle = {}
+
+---@class (exact) Eclipse.CameraSettings
+---@field center_x? number Absolute arena X, finite -10000..10000; omitted uses native duel following.
+---@field offset_y? number Positive-down camera pan, finite -1000..1000; default 0.
+---@field zoom? number Absolute game-layer scale, finite 0.25..4; omitted uses native zoom. Viewport/location clamps still apply.
+local CameraSettings = {}
+
 ---@class (exact) Eclipse.ArenaRect
 ---@field x number Finite -10000..10000, arena minimum X.
 ---@field y number Finite -10000..10000, native positive-down Y.
@@ -2530,6 +2540,31 @@ local world = {}
 ---@class Eclipse.Module_zones
 local zones = {}
 
+---Requires: `presentation.camera`; a camera created by this script.
+---When: After acquisition, including later combat or UI callbacks. The next presentation pass applies the requested settings with native clamps.
+---Returns: `true, nil` when changed, or `false, error` after release/expiry or backend rejection. Invalid settings or a foreign/forged handle raise an error. The settings replace every previous field; omitted values return to their defaults.
+---[Full reference](https://dawc17.github.io/ProjectEclipse/api/camera/#sf2worldset_camera)
+---@param camera Eclipse.CameraHandle
+---@param settings Eclipse.CameraSettings|nil
+---@return boolean, string|nil
+function world.set_camera(camera, settings) end
+
+---Requires: `presentation.camera`; a camera created by this script.
+---When: After acquisition, including UI teardown and round/fight end cleanup.
+---Returns: `true` on this handle's first release, even if its native ownership has expired; `false` on subsequent releases. A foreign or forged handle raises an error. It never clears a different script's current ownership.
+---[Full reference](https://dawc17.github.io/ProjectEclipse/api/camera/#sf2worldrelease_camera)
+---@param camera Eclipse.CameraHandle
+---@return boolean
+function world.release_camera(camera) end
+
+---Requires: `presentation.camera`; a camera created by this script.
+---When: After acquisition, including paused UI callbacks and cleanup.
+---Returns: `true` while ownership is live; `false` after release or expiry. A foreign or forged handle raises an error.
+---[Full reference](https://dawc17.github.io/ProjectEclipse/api/camera/#sf2worldis_camera_active)
+---@param camera Eclipse.CameraHandle
+---@return boolean
+function world.is_camera_active(camera) end
+
 ---Move/resize existing rectangle or sprite art without replacing the marker, resetting its lifetime or changing its tint/sprite. Update the rectangle passed to `overlaps_rect` separately if a hazard should follow the art.
 ---Requires: `presentation.visuals`; a marker created by this script context.
 ---When: After creation in the owning script's runtime callbacks. Use `on_tick` for movement that follows combat pause. A closed marker cannot restart.
@@ -4263,6 +4298,14 @@ tactics.LINEAR = "linear"
 
 ---@type "exponential"
 tactics.EXPONENTIAL = "exponential"
+
+---Requires: `presentation.camera`; a supported living fighter and settings matching the table above.
+---When: In a supported active combat callback after registration has finished, including an initialized actor's `on_actor_spawn` or `on_tick`. Fight/round begin and end, `on_actor_end`, UI cleanup and paused acquisition are rejected. The fighter reference itself expires at callback exit; the returned camera can persist.
+---Returns: `camera, nil`, or `nil, error` when the host is unsupported, the fighter/round is inactive, another owner holds the camera, or this script already has an active handle. Invalid arguments or expired callback references raise an error. No competing owner is displaced.
+---[Full reference](https://dawc17.github.io/ProjectEclipse/api/camera/#fighteracquire_camera)
+---@param settings? Eclipse.CameraSettings
+---@return Eclipse.CameraHandle|nil, string|nil
+function Fighter:acquire_camera(settings?) end
 
 ---Queue an instance owned by this mod and this spawning fighter.
 ---Requires: `combat.actors`; a definition registered by the calling mod.

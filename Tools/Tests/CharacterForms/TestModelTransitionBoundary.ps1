@@ -27,6 +27,8 @@ class Round { public bool processing=true; public int round=1; }
 class Fight {
 QUEUE
 RENDER
+    sealed class CameraSlot { public int Clears; public void Clear(){Clears++;} }
+    readonly CameraSlot _eclipseCamera=new CameraSlot();
     // This fixture controls motion; the full production motion queue has its own tests.
     int motionCancels; void CancelEclipseFighterMotion(){motionCancels++;}
     int playbackCancels; void CancelEclipseFighterPlayback() { playbackCancels++; }
@@ -69,6 +71,7 @@ RENDER
         f.QueueModelTransition(f._playerModel,()=>{},e=>{Check(e is OperationCanceledException,"unload cancellation");canceled++;});
         Check(f.actorCancels==0&&f.projectileCancels==0,"ordinary successful/rejected model transitions do not close actor/projectile lifetime");
         f.CloseModelTransitions();f.CloseModelTransitions();Check(f.actorCancels==2&&f.projectileCancels==2&&f.actorEndReason=="round_ended","each close cancels companions and projectiles with round reason");Check(canceled==4,"unload exactly once"); Check(f.motionCancels==2,"each close clears pending motion"); Check(f.playbackCancels==2,"each close cancels pending playback");
+        Check(f._eclipseCamera.Clears==2,"each close clears camera ownership");
         Check(!f.QueueModelTransition(f._playerModel,()=>{},e=>{}),"closed queue");
         var g=new Fight();int other=0,done=0;
         g.QueueModelTransition(g._playerModel,()=>g.CloseModelTransitions(),e=>done++);

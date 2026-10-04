@@ -1,5 +1,15 @@
 # Regression tests and validators
 
+Camera control: `Modding/TestCameraRuntime.ps1` executes actual Lua capability,
+settings, ownership, callback/registration/cleanup and shipped Camera Lab HUD
+tests with a controlled provider. `TestCameraNativePolicies.ps1` compiles the
+production native helper/runtime with controlled eligibility, actor/session and
+rounded layer services; repeated draws check pan restoration without drift.
+`TestCameraUnity.ps1` runs the installed example in an isolated Unity 6.6 fight,
+checking native pan/zoom, pause, retained defaults/release, host conflict, HUD
+and unclaimed surrender cleanup, then captures a focus view. Camera form/actor
+lifetime and all-arena/platform/performance acceptance have separate limits.
+
 Actor form changes: `CharacterForms/TestActorFormBindings.ps1` executes production
 actor preparation/participant methods with controlled native services. It checks
 both teams, instance/state/lifetime retention, shield/status/behavior-key transfer,

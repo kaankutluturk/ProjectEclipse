@@ -21,6 +21,15 @@ const schema = `table<string,${E('FieldSchema')}|${enumOf('number','integer','bo
 const values = 'table<string,any>'; // Runtime schemas determine these keys/types; do not invent static types.
 type('ExtensionHandle', { 'private __eclipseExtension': 'true' });
 type('ArenaMarkerHandle', { 'private __eclipseArenaMarker': 'true' });
+type('CameraHandle', { 'private __eclipseCamera': 'true' });
+type('CameraSettings', {
+    'center_x?':['number','Absolute arena X, finite -10000..10000; omitted uses native duel following.'],
+    'offset_y?':['number','Positive-down camera pan, finite -1000..1000; default 0.'],
+    'zoom?':['number','Absolute game-layer scale, finite 0.25..4; omitted uses native zoom. Viewport/location clamps still apply.'],
+});
+fn('world.set_camera',{camera:H('Camera'),'settings':E('CameraSettings')+'|nil'},'boolean, string|nil','presentation.camera');
+fn('world.release_camera',{camera:H('Camera')},'boolean','presentation.camera');
+fn('world.is_camera_active',{camera:H('Camera')},'boolean','presentation.camera');
 type('ArenaRect', { x:['number','Finite -10000..10000, arena minimum X.'],y:['number','Finite -10000..10000, native positive-down Y.'],width:['number','Positive, at most 4000.'],height:['number','Positive, at most 4000.'] });
 fn('world.set_marker_rect',{marker:H('ArenaMarker'),rectangle:E('ArenaRect')},'boolean, string|nil','presentation.visuals');
 fn('world.set_marker_sprite',{marker:H('ArenaMarker'),sprite:H('Sprite')},'boolean, string|nil','presentation.visuals');
@@ -73,6 +82,7 @@ type('CombatSnapshot', {self:E('FighterSnapshot'),'opponent?':E('FighterSnapshot
 type('ResolvingFighter',{},'Fighter');
 type('OutgoingFighter',{},'Fighter');
 const fighterMethods = {
+    acquire_camera:{params:{'settings?':E('CameraSettings')},returns:H('Camera')+'|nil, string|nil',capability:'presentation.camera'},
     spawn_actor:{params:{definition:H('ActorDefinition'),x:'number',y:'number',z:'number?'},returns:E('ActorSpawnRequest'),capability:'combat.actors'},
     actors:{params:{},returns:E('Actor')+'[]|nil, string|nil',capability:'combat.actors'},
     actor_events:{params:{},returns:E('ActorEvent')+'[]|nil, string|nil',capability:'combat.actors'},

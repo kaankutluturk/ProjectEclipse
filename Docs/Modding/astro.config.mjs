@@ -75,6 +75,7 @@ export default defineConfig({
           { slug: 'api/ui' },
           { slug: 'api/audio' },
           { slug: 'api/arena' },
+          { slug: 'api/camera' },
           { slug: 'api/visuals' },
           { slug: 'api/mod-state' },
           { slug: 'api/random' },

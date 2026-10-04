@@ -1,5 +1,12 @@
 # Eclipse as a general Shadow Fight 2 mod engine
 
+The [owned camera API](CAMERA_CONTROL_ACCEPTANCE.md) lets a combat script acquire
+exclusive encounter framing, animate pan/zoom and restore native behavior with
+explicit release/expiry. Camera Lab demonstrates the public HUD, pause and
+cleanup paths in a full installed-mod Unity fight. Native arena clamps remain;
+arbitrary projection, all scenes and complete creator-platform acceptance remain
+open. This narrows the world/presentation gap alongside moving arena artwork.
+
 The [authored fighter example](AUTHORED_FIGHTER_ACCEPTANCE.md) combines mod-owned
 body geometry, connected weighted clothing, an original point animation and
 public Lua actor playback. A full installed-mod fight proves deformation,

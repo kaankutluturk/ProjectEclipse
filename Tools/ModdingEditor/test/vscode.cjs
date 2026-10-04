@@ -193,7 +193,7 @@ exports.run = async function () {
         const controlDeadline=Date.now()+30000;
         while(Date.now()<controlDeadline) {
             const result=await vscode.commands.executeCommand('vscode.executeCompletionItemProvider',controlUri,new vscode.Position(2,9));
-            if(['set_control_blocked','end_round','move_by','play_move','projectiles','mark_rect','mark_sprite','overlaps_rect'].every(name=>result?.items.some(item=>String(typeof item.label==='string'?item.label:item.label.label).startsWith(name)))){controlFound=true;break;}
+            if(['set_control_blocked','end_round','move_by','play_move','projectiles','mark_rect','mark_sprite','acquire_camera','overlaps_rect'].every(name=>result?.items.some(item=>String(typeof item.label==='string'?item.label:item.label.label).startsWith(name)))){controlFound=true;break;}
             await new Promise(resolve=>setTimeout(resolve,500));
         }
         assert(controlFound,'Player control restriction completion missing');
