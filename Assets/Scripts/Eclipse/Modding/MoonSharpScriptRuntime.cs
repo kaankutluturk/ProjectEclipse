@@ -2373,7 +2373,7 @@ namespace Eclipse.Modding
                 {
                     ValidateFields(table, function, "id", "battle", "replays", "replay_interval", "power", "rounds",
                         "round_time", "location", "music", "evaluated_rating", "health_recovery", "description",
-                        "locked", "reward_image", "warriors", "rules", "rewards");
+                        "locked", "reward_image", "warriors", "rules", "rewards", "player_character");
                     FightDefinition definition = _api.RegisterFight(
                         RequiredString(table, "id", function),
                         RequiredHandle(table, "battle", _battleHandles, "battle", function),
@@ -2391,7 +2391,9 @@ namespace Eclipse.Modding
                         OptionalStringAllowEmpty(table, "reward_image", string.Empty, function),
                         OptionalHandleArray(table, "warriors", _warriorHandles, "warrior", function),
                         OptionalHandleArray(table, "rules", _ruleHandles, "rule", function),
-                        OptionalHandleArray(table, "rewards", _rewardHandles, "reward", function));
+                        OptionalHandleArray(table, "rewards", _rewardHandles, "reward", function),
+                        table.Get("player_character").IsNil() ? (DefinitionId?)null :
+                            RequiredHandle(table, "player_character", _warriorHandles, "warrior", function));
                     return NewHandle(_fightHandles, definition.Id);
                 });
             }

@@ -281,6 +281,11 @@ async function main() {
     notify('textDocument/didChange',{textDocument:{uri:authoredUri,version:2},contentChanges:[{text:authoredText}]});
     try { await until(()=>diagnostics.has(authoredKey)&&diagnostics.get(authoredKey).length===0,'clean authored fighter diagnostics'); } catch(error) { throw new Error(error.message+'\n'+JSON.stringify(diagnostics.get(authoredKey),null,2)); }
     console.log('PASS: complete Authored Fighter Lab body/skin/playback script has no LuaLS diagnostics');
+    const playerField=probe('fight-player-field.lua','local sf2=require("sf2")\nsf2.fights.register { id="test", | }');
+    await until(async()=>labels(await request('textDocument/completion',playerField)).some(label=>label.replace(/\?$/,'')==='player_character'),'owned fight player character completion');
+    const wrongPlayer=open('fight-player-type.lua','local sf2=require("sf2")\nlocal zone=sf2.zones.register{id="zone",file="Map1.1"}\nlocal battle=sf2.battles.register{id="battle",zone=zone,type=sf2.battles.STORY,x=0,y=0}\nsf2.fights.register{id="fight",battle=battle,player_character=battle}');
+    await until(()=>diagnostics.get(decodeURIComponent(wrongPlayer).toLowerCase())?.some(d=>d.code==='assign-type-mismatch'),'player character rejects a battle handle');
+    console.log('PASS: owned fight player_character completion and typed-handle diagnostic');
     const arenaOptions=probe('arena-options.lua','local sf2=require("sf2")\nsf2.behaviors.register {id="x",on_tick=function(_,fighter)\n fighter:mark_rect { | }\nend}');
     await until(async()=>{const found=labels(await request('textDocument/completion',arenaOptions));return ['x','y','width','height'].every(key=>found.some(n=>n.startsWith(key)));},'arena rectangle fields');
     const arenaTarget=probe('arena-target.lua','local sf2=require("sf2")\nsf2.behaviors.register {id="x",on_tick=function(_,fighter)\n fighter.opponent:|\nend}');

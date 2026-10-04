@@ -9,6 +9,10 @@ Handle completion and project diagnostics are distinct from native contact tests
 Its player-form buttons use `combat.transform`; the authored strike also has a
 character-specific native Punch binding. The core comparison form is a registered
 test character, not a saved-loadout restore operation.
+Its owned Campaign fight and repeatable mode declare `player_character` with a
+warrior handle, so the authored fighter starts in the player slot. Omission
+keeps the saved player's setup. This is a `content.register` fight field;
+`combat.transform` is required separately for its later HUD form changes.
 
 Authored body/skin geometry receives runtime point/edge/helper validation before
 native model parsing. XML element/field diagnostics occur when loading the

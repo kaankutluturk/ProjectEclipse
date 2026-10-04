@@ -697,6 +697,10 @@ namespace Eclipse.Modding
                 Append(canonical, fight.EvaluatedRating); Append(canonical, fight.HealthRecovery);
                 Append(canonical, fight.Description); Append(canonical, fight.Locked);
                 Append(canonical, fight.RewardImage);
+                if (fight.PlayerCharacter.HasValue)
+                {
+                    Append(canonical, "player-character"); Append(canonical, fight.PlayerCharacter.Value.ToString());
+                }
                 if (fight.ReplacesLegacyRules) Append(canonical, "replace-legacy-rules");
                 if (fight.RewardDrops.Count > 0)
                 {

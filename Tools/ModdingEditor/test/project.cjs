@@ -21,6 +21,10 @@ test('authored fighter starter mirrors native models and original point animatio
  assert(p.analyze(source,missing).issues.some(i=>i.capability==='combat.actors'));
  const withoutForms={...mod,data:{...mod.data,capabilities:mod.data.capabilities.filter(c=>c!=='combat.transform')}};
  assert(p.analyze(source,withoutForms).issues.some(i=>i.capability==='combat.transform'));
+ assert(source.includes('player_character = character'));
+ const schema=require('../scripts/api-schema.cjs');
+ assert.equal(schema.types.FightDefinition.fields['player_character?'][0],'Eclipse.WarriorHandle');
+ assert(!schema.types.FightPatch.fields['player_character?']);
 });
 
 test('actor companion starter mirrors playable files, scopes capabilities and lifecycle timing',async()=>{

@@ -30,6 +30,8 @@ public static class AuthoredFighterUnity
     static float formRatio;
     static int formFrame, playerStarts, playerHits, formApplied;
     static bool inputStrike, playerCaptured, enemyUsedAuthored, comparisonUsedAuthored, corePunchSeen;
+    static bool initialPlayerChecked;
+    static bool PlayerEntry => Environment.GetCommandLineArgs().Contains("-authoredPlayerEntry");
     static readonly Dictionary<string,int> starts = new Dictionary<string,int>(), dealt = new Dictionary<string,int>();
     static readonly HashSet<string> receipts = new HashSet<string>(), ended = new HashSet<string>();
     static string Root => Path.GetDirectoryName(Application.dataPath);
@@ -105,10 +107,18 @@ public static class AuthoredFighterUnity
                 Check(!ModRuntime.Host.HasErrors,ModRuntime.Host.FormatReport());
                 Check(ModRuntime.Scripts.ActiveMods.Any(m=>m.Id.Value==Owner),"Authored mod did not finish registration");
                 Check(ModRuntime.Host.EnabledMods.All(m=>m.Id.Value=="core"||m.Id.Value==Owner),"Unexpected mods enabled");
-                var encounter=ListSF.CHMCKGCDGCM(new FightIDS(ModRuntime.Scripts.Content.RuntimeFightId(DefinitionId.Parse("core:fights/zone_1/tournament/3"))));
+                var encounterId=PlayerEntry?Owner+":fights/playable":"core:fights/zone_1/tournament/3";
+                var encounter=ListSF.CHMCKGCDGCM(new FightIDS(ModRuntime.Scripts.Content.RuntimeFightId(DefinitionId.Parse(encounterId))));
                 Check(encounter!=null,"Core encounter missing");entered=GameUtils.StartFight(encounter,false,null,true,false);return;
             }
             var fight=Fight.GetCurrentFight();var player=fight?.GetPlayerModel();var enemy=fight?.GetEnemyModel();if(player==null||enemy==null)return;
+            if(PlayerEntry&&!initialPlayerChecked)
+            {
+                Check(player.Parameters.EclipseCharacterId==Owner+":warriors/sash_fighter"&&player.Parameters.EclipseBodyModel==Owner+":models/body","Encounter did not start as its declared player character");
+                Check(player.Parameters.IsPlayer&&player.Parameters.UserControlled&&!player.Parameters.AiControlled,"Declared player entered without native player/input ownership");
+                Check(formApplied==0,"Declared player depended on a live form request");
+                initialPlayerChecked=true;
+            }
             if(phase<8)player.Parameters.UserControlled=false;
             player.Parameters.AiControlled=false;enemy.Parameters.UserControlled=false;enemy.Parameters.AiControlled=false;
             int frame=fight.get_FightTimeInFrames();if(frame<100)return;
@@ -187,7 +197,7 @@ public static class AuthoredFighterUnity
                     Click("player");Check(fight.GetPlayerModel()==originalPlayer,"Form committed recursively inside HUD callback");Next(fight);break;
                 case 9:
                     if(frame-phaseFrame>240)throw new Exception("Authored player form did not settle: "+surface.Read("form_status").Text);
-                    if(player==originalPlayer||formApplied<1)return;
+                    if(player==originalPlayer||formApplied<1||Eclipse.UI.Modding.ModUiGameBridge.BlocksGameplayInput)return;
                     authoredPlayer=player;
                     Check(player.Parameters.EclipseCharacterId==Owner+":warriors/sash_fighter"&&player.Parameters.EclipseBodyModel==Owner+":models/body","Wrong authored player form");
                     Check(player.Parameters.IsPlayer&&player.Parameters.UserControlled&&!player.Parameters.AiControlled,"Player form lost input eligibility");
@@ -198,9 +208,12 @@ public static class AuthoredFighterUnity
                     Invoke(player,"TrainingMoveToX",450f);Invoke(enemy,"TrainingMoveToX",550f);beforeHit=Life(enemy);
                     Invoke(fight.Controller,"SendGamepadControlEvent",0,FightCID.Punch);Next(fight);break;
                 case 10:
-                    Invoke(fight.Controller,"SendGamepadControlEvent",1,FightCID.Punch);
+                    // Editor update callbacks can run twice before a game tick.
+                    // Hold across native frames so release cannot erase a tap
+                    // before the real input/move-selection pipeline consumes it.
+                    if(frame-phaseFrame>=3)Invoke(fight.Controller,"SendGamepadControlEvent",1,FightCID.Punch);
                     inputStrike|=player.GetCurrentAnimation()?.Name==Move;
-                    if(frame-phaseFrame>240)throw new Exception("Native Punch did not make authored player contact: "+player.GetCurrentAnimation()?.Name+" starts="+playerStarts+" hits="+playerHits);
+                    if(frame-phaseFrame>240)throw new Exception("Native Punch did not make authored player contact: "+player.GetCurrentAnimation()?.Name+" starts="+playerStarts+" hits="+playerHits+" playerControl="+Field(player,"HCPHOJKFIDM")+" fightInput="+Field(fight,"IOPJDMCBIMM")+" controller="+fight.Controller.IsQuadrantEnabled(FightCID.Punch)+" stage="+Field(fight,"stageType")+" char="+player.Parameters.EclipseCharacterId);
                     if(!inputStrike||Life(enemy)>=beforeHit||player.GetCurrentAnimation()?.Name==Move)return;
                     CheckSource(enemy,player);Check(playerStarts>0&&playerHits>0,"Player input lacked ordinary animation/damage callbacks");
                     Invoke(enemy,"TrainingMoveToX",950f);enemy.PressAnyKey(FightCID.Punch);enemy.ReleaseAnyKey(FightCID.Punch);
@@ -214,14 +227,14 @@ public static class AuthoredFighterUnity
                     formRatio=Life(player)/player.Parameters.MaxLife;formFrame=frame;Click("core");Next(fight);break;
                 case 12:
                     if(frame-phaseFrame>240)throw new Exception("Core comparison form did not settle: "+surface.Read("form_status").Text);
-                    if(player==authoredPlayer||formApplied<2)return;
+                    if(player==authoredPlayer||formApplied<2||Eclipse.UI.Modding.ModUiGameBridge.BlocksGameplayInput)return;
                     Check(player.Parameters.EclipseCharacterId==Owner+":warriors/core_comparison"&&string.IsNullOrEmpty(player.Parameters.EclipseBodyModel),"Comparison retained authored body identity");
                     Check(player.Parameters.IsPlayer&&player.Parameters.UserControlled&&Math.Abs(Life(player)/player.Parameters.MaxLife-formRatio)<.001&&frame>=formFrame,"Comparison form lost player state");
                     Check(!player.GetModelObject().NAMKCLGOPDD().Any(n=>n.GetName()=="AuthoredSashV5"),"Comparison retained authored sash geometry");
                     Invoke(player,"TrainingMoveToX",450f);Invoke(enemy,"TrainingMoveToX",550f);
                     Invoke(fight.Controller,"SendGamepadControlEvent",0,FightCID.Punch);Next(fight);break;
                 case 13:
-                    Invoke(fight.Controller,"SendGamepadControlEvent",1,FightCID.Punch);
+                    if(frame-phaseFrame>=3)Invoke(fight.Controller,"SendGamepadControlEvent",1,FightCID.Punch);
                     comparisonUsedAuthored|=player.GetCurrentAnimation()?.Name==Move;
                     // AnimationAttack is native category 2. Confirm a real core
                     // action, rather than passing just because no input worked.

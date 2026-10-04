@@ -191,3 +191,22 @@ local rule = sf2.rules.behavior { id = "lab", behavior = controller, target = sf
 for _, fight in ipairs { "core:fights/zone_1/tournament/3", "core:fights/zone_1/tournament_eclipsemode/3" } do
     sf2.fights.patch { target = fight, append_rules = { rule } }
 end
+
+-- The owned encounter starts with this character; no form request is needed.
+sf2.localization.register { id = "entry", language = "eng", value = "Authored Fighter Lab" }
+local entry = sf2.mod.id .. ":localization/entry"
+local zone = sf2.zones.register { id = "lab", file = "Map1.1", start = false }
+local battle = sf2.battles.register {
+    id = "playable", zone = zone, type = sf2.battles.STORY, x = 0, y = 0,
+    alias = entry, title = entry, description = entry, location = "arena",
+}
+local no_reward = sf2.rewards.register { id = "lab_loss", items = {} }
+local win_reward = sf2.rewards.register { id = "lab_win", items = {} }
+local playable = sf2.fights.register {
+    id = "playable", battle = battle, location = "arena", rounds = 1, round_time = 99,
+    player_character = character, warriors = { core_form }, rules = { rule },
+    rewards = { no_reward, win_reward },
+}
+sf2.modes.register { id = "playable", fights = { playable }, repeatable = true }
+sf2.quests.register { id = "entry", place = "map", events = { "session" },
+    actions = { { type = "show_battle", battle = battle, locked = false } } }

@@ -1,4 +1,4 @@
-param([string]$Unity = '', [string]$ExistingFixture = '')
+param([string]$Unity = '', [string]$ExistingFixture = '', [switch]$PlayerEntry)
 $ErrorActionPreference = 'Stop'
 $root = Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $PSScriptRoot))
 $versionFile = Join-Path $root 'ProjectSettings/ProjectVersion.txt'
@@ -46,6 +46,7 @@ New-Item -ItemType Directory -Force -Path $actorProbeCacheTarget | Out-Null
 New-Item -ItemType Directory -Force -Path (Split-Path -Parent $actorProbeCache) | Out-Null
 New-Item -ItemType Junction -Path $actorProbeCache -Target $actorProbeCacheTarget | Out-Null
 $arguments = @('-projectPath',('"'+$fixture+'"'),'-executeMethod','AuthoredFighterUnity.Run','-actorAcceptanceProductName',$actorProbeProduct,'-logFile',('"'+$log+'"'))
+if ($PlayerEntry) { $arguments += '-authoredPlayerEntry' }
 $process = Start-Process -FilePath $Unity -ArgumentList $arguments -WindowStyle Hidden -PassThru
 Write-Host "Native authored fighter process: $($process.Id)"
 $deadline = [DateTime]::UtcNow.AddMinutes(15)

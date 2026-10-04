@@ -1765,6 +1765,14 @@ public static class GameUtils
         parameters.SetCurrentLife(maxHealth);
         return parameters;
     }
+    internal static void InitializePlayerCharacterParameters(ModelParameters parameters)
+    {
+        if (parameters == null) throw new ArgumentNullException(nameof(parameters));
+        InitializeCombatParameters(parameters);
+        parameters.IsPlayer = true;
+        parameters.UserControlled = true;
+        parameters.AiControlled = false;
+    }
     internal static void InitializeLocalVersusParameters(ModelParameters parameters, bool playerOne)
     {
         if (parameters == null) throw new ArgumentNullException(nameof(parameters));
@@ -1862,7 +1870,7 @@ public static class GameUtils
 				return localMatch.CreateFight(preFight, LPGANKOAPJL);
 		FightList jDIPBIHBGPF = (FightList)data;
 		ModelParameters kIKOGDEPGHB = null;
-		kIKOGDEPGHB = LBMPHBNJMGG().Clone();
+		kIKOGDEPGHB = Eclipse.Modding.ModRuntime.BuildFightPlayerParameters(jDIPBIHBGPF) ?? LBMPHBNJMGG().Clone();
 		List<ModelParameters> list = new List<ModelParameters>();
 		BattleType pJMEMGHKKBM = jDIPBIHBGPF.get_Type();
 		if (pJMEMGHKKBM == BattleType.FightPeriodic)
@@ -2634,7 +2642,7 @@ public static class GameUtils
 	public static float JEILJMPPEGL(FightList fight)
 	{
 		List<ModelParameters> list = IGNNMAKHBFF(fight.OFKJMHPMCCD());
-		ModelParameters kIKOGDEPGHB = LBMPHBNJMGG().Clone();
+		ModelParameters kIKOGDEPGHB = Eclipse.Modding.ModRuntime.BuildFightPlayerParameters(fight) ?? LBMPHBNJMGG().Clone();
 		kIKOGDEPGHB.KMPACCIOOLE(fight.EHGIKANKJNJ(), true);
 		kIKOGDEPGHB.NOBKKLBJFIL();
 		float result = fight.MPNBGBIMEIP(kIKOGDEPGHB, list);

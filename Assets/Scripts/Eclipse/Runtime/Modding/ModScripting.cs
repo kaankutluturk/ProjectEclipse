@@ -462,12 +462,12 @@ namespace Eclipse.Modding
         public FightDefinition RegisterFight(string localId, DefinitionId battle, int replays, int replayInterval,
             int power, int rounds, int roundTime, string location, string music, float evaluatedRating,
             float healthRecovery, string description, bool locked, string rewardImage, DefinitionId[] warriors,
-            DefinitionId[] rules, DefinitionId[] rewards)
+            DefinitionId[] rules, DefinitionId[] rewards, DefinitionId? playerCharacter = null)
         {
             RequireCapability("content.register");
             return RequireRegistration().RegisterFight(localId, battle, replays, replayInterval, power, rounds,
                 roundTime, location, music, evaluatedRating, healthRecovery, description, locked, rewardImage,
-                warriors, rules, rewards);
+                warriors, rules, rewards, playerCharacter);
         }
 
         public DefinitionId PatchFightLocation(string target, string value)

@@ -393,7 +393,8 @@ warrior nine rows. Omit the field to inherit the parent's rows as they are.
 
 ## sf2.warriors.register
 
-Define an opponent, optionally inheriting from a core template.
+Define a character, optionally inheriting from a core template. Use its handle
+for an opponent, an independent actor or an owned fight's `player_character`.
 
 **Signature:** `sf2.warriors.register(definition)`
 
@@ -680,7 +681,7 @@ local victory_reward = sf2.rewards.register { id = "victory_reward", gems = 5 }
 
 ## sf2.fights.register
 
-Connect a battle to opponents, rounds, rules, and rewards.
+Connect a battle to characters, rounds, rules, and rewards.
 
 **Signature:** `sf2.fights.register(definition)`
 
@@ -695,6 +696,7 @@ Connect a battle to opponents, rounds, rules, and rewards.
 | `id` | String | Required | Local fight ID. |
 | `battle` | Battle handle | Required | Map entry this fight belongs to. |
 | `warriors` | Warrior-handle array | Empty | Opponent definitions. |
+| `player_character` | Warrior handle | Omitted | Optional temporary player character for this owned fight. Omit to use the saved player's normal combat setup. |
 | `rules` | Rule-handle array | Empty | Fight rules from `sf2.rules`. |
 | `rewards` | Reward-handle array | Empty | Reward slots indexed by wins; see below. |
 | `rounds` | Integer, 1–100 | `3` | Number of rounds. |
@@ -707,6 +709,19 @@ Connect a battle to opponents, rounds, rules, and rewards.
 | `description`, `reward_image` | Strings | `""` | Presentation references. |
 | `locked` | Boolean | `false` | Initial lock setting. |
 
+`player_character` chooses the player at encounter creation, including its body,
+skins, level, attributes, equipment, perks, name and portrait. The fighter owns
+the native player slot and normal controls; its tactic does not turn it into an
+AI player. This is temporary combat content and does not equip items or replace
+the saved profile's character. Native round rules still apply. Use an explicit
+character level and a compatible rig/move set. A referenced character must be
+registered and accessible when the content transaction commits.
+
+This field belongs to owned `sf2.fights.register` definitions. It is not a
+`sf2.fights.patch` field or a general profile/loadout selection operation. A mode
+using the fight, including a generated encounter based on it, keeps this declared
+player character. Use `fighter:change_form` for a later in-fight transition.
+
 ```lua
 local fight = sf2.fights.register {
     id = "training_fight", battle = battle,
@@ -716,6 +731,20 @@ local fight = sf2.fights.register {
     rewards = { no_reward, victory_reward },
 }
 ```
+
+To start this owned encounter as a different playable character, register it
+before the fight and add `player_character = hero` to that fight table:
+
+```lua
+local hero = sf2.warriors.register {
+    id = "training_hero", level = 3,
+    template = sf2.warriors.get_template("core:warrior-templates/man_kungfu"),
+}
+-- In the existing sf2.fights.register table: player_character = hero
+```
+
+For a complete playable body, skin and character-specific Punch example, see
+[Authored Fighter Lab](../../guides/character-authoring/#verify-in-a-fight).
 
 **Reward order matters.** The first Lua element is the zero-win result slot.
 For a one-round fight, use `{ no_reward, victory_reward }` so a loss does not

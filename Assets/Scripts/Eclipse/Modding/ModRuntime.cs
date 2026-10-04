@@ -303,6 +303,20 @@ namespace Eclipse.Modding
             return _legacyContent.BuildFormParameters(character, player);
         }
 
+        internal static ModelParameters BuildFightPlayerParameters(FightList fight)
+        {
+            if (fight == null || _scripts == null) return null;
+            foreach (var definition in _scripts.Content.Fights)
+            {
+                if (definition.IsCore || !definition.PlayerCharacter.HasValue ||
+                    _scripts.Content.RuntimeFightId(definition.Id) != fight.FightId.ToString()) continue;
+                var parameters = BuildFormParameters(definition.PlayerCharacter.Value, true);
+                GameUtils.InitializePlayerCharacterParameters(parameters);
+                return parameters;
+            }
+            return null;
+        }
+
         private static long _coreImportMs;
 
         // Load profiling: sections of the mod content load add their time here, and

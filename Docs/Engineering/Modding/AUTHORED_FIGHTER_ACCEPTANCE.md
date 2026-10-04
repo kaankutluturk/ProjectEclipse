@@ -122,6 +122,48 @@ devices. The form test runs after dismissing the pair; simultaneous owned
 actors during a player swap, other loadouts/effects, saving/reloading during
 a fight and exported players are not covered by this follow-up.
 
+## Declared encounter player follow-up
+
+Authored Fighter Lab 1.2 registers its own fight and repeatable mode. The optional
+`sf2.fights.register.player_character` takes a warrior handle, defaults to the
+saved player's ordinary combat setup, and belongs to owned registration rather
+than a core fight patch. `ModContent` validates category/dependency references
+and committed existence; all fight copy operations retain the declaration.
+`ModSaveData` includes a tagged character reference only when supplied, keeping
+omitted/nil fingerprints compatible with the prior stream.
+
+The MoonSharp binding forwards the typed reference through the facade and
+transaction. `ModRuntime.BuildFightPlayerParameters` resolves the installed
+fight's registered runtime identity and uses the existing warrior/form builder.
+`GameUtils` initializes those parameters as the canonical controlled player,
+both for native fight construction and difficulty evaluation. Core encounters
+and definitions without this field keep their prior setup; local versus takes
+its existing separate factory path. The character's own tactic does not give
+the player AI ownership. Profile equipment is not rewritten.
+
+The actual public Lua contract runner passes registration, wrong-handle/scalar
+rejection, transactional rollback, defaults, deterministic/changed fingerprints
+and retained character identity in copied fights. All four portable managed
+assemblies compile. Editor generation/check/build and all 58 project tests pass;
+actual LuaLS verifies field completion and wrong Battle-handle rejection. All
+24 VS Code checks pass, including this field in the mirrored authored starter.
+The public guide/reference/example index, starter and tool guide change together.
+
+The `-PlayerEntry` native route verifies the declared player identity, body and
+control flags before any form request, then runs the original actor, form and
+native Punch checks. The probe waits until the lab click no longer captures
+gameplay input and holds Punch across native frames: editor callbacks can share
+a rendered frame with a HUD click or precede a game tick. It does not bypass UI
+capture, force move playback or substitute scripted damage for contact.
+The runner launches the registered fight directly. Map/mode menu navigation,
+save/reload during combat, arbitrary rigs and exported platforms remain open.
+
+Final native acceptance: **66 owned-entry checks**, fresh log
+`Temp/FighterPlaybackUnity-d997a2c104cd4564b9767ae6eb4b68d8/validation-d46b7b64b0134e50a6c19bcd945abffa.log`.
+The default Tournament route also passes **63 checks** in
+`validation-254cda1ebc1944ed8b603e46842d4736.log`. Both require process exit 0.
+The wiki builds 63 pages and validates 6,826 local links/assets and fragments.
+
 ## Limits
 
 This is the standard compatible rig with custom silhouette geometry and skin,

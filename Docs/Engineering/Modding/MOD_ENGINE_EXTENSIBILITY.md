@@ -14,6 +14,14 @@ Switching to a registered core comparison form removes that binding. This is
 native controller-dispatch acceptance, not physical-device or general loadout
 selection acceptance. See the same authored-fighter evidence record.
 
+Owned fight registration can now declare a typed `player_character` warrior.
+Native encounter creation and difficulty evaluation use that character's
+parameters while preserving normal player control and round rules. Authored
+Fighter Lab supplies a standalone owned fight and repeatable mode alongside its
+form comparison HUD. This narrows playable encounter composition; it does not
+close general profile selection, arbitrary rigs, menu navigation or exported
+platform acceptance.
+
 The [actor projectile extension](ACTOR_PROJECTILES_ACCEPTANCE.md) supports
 typed native ranged abilities on independent roots, with scoped queries,
 Lua guidance, caster provenance and retirement cleanup. Ranged Companion Duel

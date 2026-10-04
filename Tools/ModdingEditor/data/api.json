@@ -676,7 +676,7 @@
       "returns": "A warrior handle.",
       "capability": "content.register",
       "url": "https://dawc17.github.io/ProjectEclipse/api/content-graph/#sf2warriorsregister",
-      "summary": "Define an opponent, optionally inheriting from a core template.",
+      "summary": "Define a character, optionally inheriting from a core template. Use its handle for an opponent, an independent actor or an owned fight's `player_character`.",
       "requires": "`content.register`.",
       "when": "Entrypoint, before registering the fight."
     },
@@ -709,7 +709,7 @@
       "returns": "A fight handle.",
       "capability": "content.register",
       "url": "https://dawc17.github.io/ProjectEclipse/api/content-graph/#sf2fightsregister",
-      "summary": "Connect a battle to opponents, rounds, rules, and rewards.",
+      "summary": "Connect a battle to characters, rounds, rules, and rewards.",
       "requires": "`content.register`.",
       "when": "Entrypoint, after the referenced definitions."
     },
@@ -3426,6 +3426,10 @@
       "fields": {
         "id": "string",
         "battle": "Eclipse.BattleHandle",
+        "player_character?": [
+          "Eclipse.WarriorHandle",
+          "Temporary player character for this owned encounter. Omit for the saved player. Does not edit profile equipment. Native player controls and round rules apply."
+        ],
         "warriors?": "Eclipse.WarriorHandle[]",
         "rules?": "Eclipse.RuleHandle[]",
         "rewards?": [

@@ -199,6 +199,47 @@ internal static class Program
         }
     }
 
+    private static void PlayerCharacterContracts(ModDescriptor mod)
+    {
+        var entrypoint=Path.Combine(mod.RootPath,mod.Manifest.Entrypoint);
+        var original=File.ReadAllText(entrypoint);
+        try
+        {
+            ModContentCatalog Run(string field, bool reject=false)
+            {
+                File.WriteAllText(entrypoint,@"local sf2=require('sf2')
+local hero=sf2.warriors.register{id='hero',level=3}
+local foe=sf2.warriors.register{id='foe',level=2}
+local zone=sf2.zones.register{id='test',file='Map1.1'}
+local battle=sf2.battles.register{id='test',zone=zone,type=sf2.battles.STORY,x=0,y=0}
+sf2.fights.register{id='test',battle=battle,warriors={foe},"+field+"}");
+                var content=new ModContentCatalog();
+                var assets=new AssetResolver(new IAssetProvider[]{new EmptyCoreProvider(),new LooseModProvider(mod)});
+                using(var registration=content.BeginRegistration(mod))
+                using(var context=new MoonSharpScriptRuntime().CreateContext(mod,new ModApiFacade(mod,assets,registration,new ModStateRuntime(),null)))
+                {
+                    try { context.ExecuteEntrypoint(); registration.Commit(); Assert(!reject,"Invalid player character committed"); }
+                    catch(ModScriptException) { Assert(reject,"Valid player character rejected"); }
+                }
+                Assert(content.Fights.Count==(reject?0:1)&&content.Warriors.Count==(reject?0:2),"Player character registration was not atomic");
+                return content;
+            }
+            var owned=Run("player_character=hero");var fight=owned.Fights.Single();
+            var heroId=DefinitionId.Parse(mod.Id.Value+":warriors/hero");
+            Assert(fight.PlayerCharacter==heroId,"Public warrior handle was not retained as the player");
+            Assert(Run("").Fights.Single().PlayerCharacter==null&&Run("player_character=nil").Fights.Single().PlayerCharacter==null,"Omitted/nil player character changed the default contract");
+            Run("player_character=battle",true);Run("player_character='hero'",true);Run("player_character=false",true);
+            string Fingerprint(ModContentCatalog value)=>ModSaveData.ComputeContentSetFingerprint(new[]{mod},value);
+            Assert(Fingerprint(owned)==Fingerprint(Run("player_character=hero")),"Declared player fingerprint is not deterministic");
+            Assert(Fingerprint(owned)!=Fingerprint(Run("player_character=foe"))&&Fingerprint(owned)!=Fingerprint(Run("")),"Player choice is absent from content identity");
+            Assert(Fingerprint(Run(""))==Fingerprint(Run("player_character=nil")),"Unset player changed previous content fingerprints");
+            foreach(var copy in new[]{fight.WithDescription("changed"),fight.WithRounds(2),fight.WithRoundTime(30),fight.WithPresentation("arena","track"),fight.WithRules(Array.Empty<DefinitionId>(),false),fight.WithWarriors(fight.Warriors.ToArray())})
+                Assert(copy.PlayerCharacter==heroId,"Fight copy discarded its declared player");
+            Console.WriteLine("PASS: owned player character public Lua registration, wrong-handle/scalar rejection, transaction rollback, defaults, fingerprint and fight-copy contracts.");
+        }
+        finally { File.WriteAllText(entrypoint,original); }
+    }
+
     public static int Main(string[] args)
     {
         string modsRoot = Path.GetFullPath(args[0]);
@@ -294,6 +335,7 @@ internal static class Program
         Assert(catalog.ForgeEconomicProfiles.Count == coreProfilesBefore && catalog.WarriorTemplates.Count == coreTemplatesBefore,
             "Rollback/teardown changed base-owned core fixtures.");
 
+        PlayerCharacterContracts(mod);
         Console.WriteLine("Phase 1 showcase MoonSharp runtime PASS: discovery, localization load, public Lua execution, transactional commit, duplicate rollback, context teardown, core fixtures unchanged.");
         return 0;
     }

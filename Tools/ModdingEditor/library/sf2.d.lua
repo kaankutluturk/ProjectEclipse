@@ -748,6 +748,7 @@ local RewardDefinition = {}
 ---@class (exact) Eclipse.FightDefinition
 ---@field id string
 ---@field battle Eclipse.BattleHandle
+---@field player_character? Eclipse.WarriorHandle Temporary player character for this owned encounter. Omit for the saved player. Does not edit profile equipment. Native player controls and round rules apply.
 ---@field warriors? Eclipse.WarriorHandle[]
 ---@field rules? Eclipse.RuleHandle[]
 ---@field rewards? Eclipse.RewardHandle[] First slot is the zero-win result; second slot is one win.
@@ -3038,7 +3039,7 @@ function battles.focus(battle) end
 ---@return Eclipse.WarriorTemplateHandle
 function warriors.get_template(reference) end
 
----Define an opponent, optionally inheriting from a core template.
+---Define a character, optionally inheriting from a core template. Use its handle for an opponent, an independent actor or an owned fight's `player_character`.
 ---Requires: `content.register`.
 ---When: Entrypoint, before registering the fight.
 ---Returns: A warrior handle.
@@ -3065,7 +3066,7 @@ function warriors.register_template(definition) end
 ---@return Eclipse.RewardHandle
 function rewards.register(definition) end
 
----Connect a battle to opponents, rounds, rules, and rewards.
+---Connect a battle to characters, rounds, rules, and rewards.
 ---Requires: `content.register`.
 ---When: Entrypoint, after the referenced definitions.
 ---Returns: A fight handle.

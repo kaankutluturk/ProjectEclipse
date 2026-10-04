@@ -1046,6 +1046,7 @@ namespace Eclipse.Modding
         public bool Locked { get; }
         public string RewardImage { get; }
         public IReadOnlyList<DefinitionId> Warriors => Array.AsReadOnly(_warriors);
+        public DefinitionId? PlayerCharacter { get; }
         public IReadOnlyList<DefinitionId> Rules => Array.AsReadOnly(_rules);
         public IReadOnlyList<DefinitionId> Rewards => Array.AsReadOnly(_rewards);
         public bool IsCore => Id.Namespace.Value == "core";
@@ -1056,7 +1057,7 @@ namespace Eclipse.Modding
         internal FightDefinition(DefinitionId id, DefinitionId battle, string legacyName, int replays,
             int replayInterval, int power, int rounds, int roundTime, string location, string music,
             float evaluatedRating, float healthRecovery, string description, bool locked, string rewardImage,
-            DefinitionId[] warriors, DefinitionId[] rules, DefinitionId[] rewards, string legacyXml = null, bool replacesLegacyRules = false, RewardDropEdit[] rewardDrops = null)
+            DefinitionId[] warriors, DefinitionId[] rules, DefinitionId[] rewards, string legacyXml = null, bool replacesLegacyRules = false, RewardDropEdit[] rewardDrops = null, DefinitionId? playerCharacter = null)
         {
             if (replays < 0) throw new ModContentException("Fight replays must not be negative.");
             if (replayInterval < 0) throw new ModContentException("Fight replay interval must not be negative.");
@@ -1082,6 +1083,7 @@ namespace Eclipse.Modding
             Description = description ?? string.Empty;
             Locked = locked;
             RewardImage = rewardImage ?? string.Empty;
+            PlayerCharacter = playerCharacter;
             _warriors = warriors == null ? Array.Empty<DefinitionId>() : (DefinitionId[])warriors.Clone();
             _rules = rules == null ? Array.Empty<DefinitionId>() : (DefinitionId[])rules.Clone();
             _rewards = rewards == null ? Array.Empty<DefinitionId>() : (DefinitionId[])rewards.Clone();
@@ -1094,27 +1096,27 @@ namespace Eclipse.Modding
         {
             return new FightDefinition(Id, Battle, LegacyName, Replays, ReplayInterval, Power, Rounds, RoundTime,
                 Location, Music, EvaluatedRating, HealthRecovery, description, Locked, RewardImage,
-                _warriors, _rules, _rewards, LegacyXml, ReplacesLegacyRules, new List<RewardDropEdit>(RewardDrops).ToArray());
+                _warriors, _rules, _rewards, LegacyXml, ReplacesLegacyRules, new List<RewardDropEdit>(RewardDrops).ToArray(), PlayerCharacter);
         }
 
         internal FightDefinition WithRounds(int rounds)
         {
             return new FightDefinition(Id, Battle, LegacyName, Replays, ReplayInterval, Power, rounds, RoundTime,
                 Location, Music, EvaluatedRating, HealthRecovery, Description, Locked, RewardImage,
-                _warriors, _rules, _rewards, LegacyXml, ReplacesLegacyRules, new List<RewardDropEdit>(RewardDrops).ToArray());
+                _warriors, _rules, _rewards, LegacyXml, ReplacesLegacyRules, new List<RewardDropEdit>(RewardDrops).ToArray(), PlayerCharacter);
         }
 
         internal FightDefinition WithRoundTime(int roundTime)
         {
             return new FightDefinition(Id, Battle, LegacyName, Replays, ReplayInterval, Power, Rounds, roundTime,
                 Location, Music, EvaluatedRating, HealthRecovery, Description, Locked, RewardImage,
-                _warriors, _rules, _rewards, LegacyXml, ReplacesLegacyRules, new List<RewardDropEdit>(RewardDrops).ToArray());
+                _warriors, _rules, _rewards, LegacyXml, ReplacesLegacyRules, new List<RewardDropEdit>(RewardDrops).ToArray(), PlayerCharacter);
         }
         internal FightDefinition WithPresentation(string location, string music)
         {
             return new FightDefinition(Id, Battle, LegacyName, Replays, ReplayInterval, Power, Rounds, RoundTime,
                 location, music, EvaluatedRating, HealthRecovery, Description, Locked, RewardImage,
-                _warriors, _rules, _rewards, LegacyXml, ReplacesLegacyRules, new List<RewardDropEdit>(RewardDrops).ToArray());
+                _warriors, _rules, _rewards, LegacyXml, ReplacesLegacyRules, new List<RewardDropEdit>(RewardDrops).ToArray(), PlayerCharacter);
         }
 
         internal FightDefinition WithRules(DefinitionId[] rules, bool append)
@@ -1128,7 +1130,7 @@ namespace Eclipse.Modding
             if (combined.Count > 100) throw new ModContentException("A patched fight supports at most 100 rule handles.");
             return new FightDefinition(Id, Battle, LegacyName, Replays, ReplayInterval, Power, Rounds, RoundTime,
                 Location, Music, EvaluatedRating, HealthRecovery, Description, Locked, RewardImage,
-                _warriors, combined.ToArray(), _rewards, LegacyXml, ReplacesLegacyRules || !append, new List<RewardDropEdit>(RewardDrops).ToArray());
+                _warriors, combined.ToArray(), _rewards, LegacyXml, ReplacesLegacyRules || !append, new List<RewardDropEdit>(RewardDrops).ToArray(), PlayerCharacter);
         }
 
         internal FightDefinition WithRewardDrop(RewardDropEdit edit)
@@ -1136,7 +1138,7 @@ namespace Eclipse.Modding
             var edits = new List<RewardDropEdit>(RewardDrops) { edit };
             return new FightDefinition(Id, Battle, LegacyName, Replays, ReplayInterval, Power, Rounds, RoundTime,
                 Location, Music, EvaluatedRating, HealthRecovery, Description, Locked, RewardImage,
-                _warriors, _rules, _rewards, LegacyXml, ReplacesLegacyRules, edits.ToArray());
+                _warriors, _rules, _rewards, LegacyXml, ReplacesLegacyRules, edits.ToArray(), PlayerCharacter);
         }
 
         internal FightDefinition WithWarriors(DefinitionId[] warriors)
@@ -1145,7 +1147,7 @@ namespace Eclipse.Modding
                 throw new ModContentException("Patched warriors must contain 1..100 handles.");
             return new FightDefinition(Id, Battle, LegacyName, Replays, ReplayInterval, Power, Rounds, RoundTime,
                 Location, Music, EvaluatedRating, HealthRecovery, Description, Locked, RewardImage,
-                warriors, _rules, _rewards, LegacyXml, ReplacesLegacyRules, new List<RewardDropEdit>(RewardDrops).ToArray());
+                warriors, _rules, _rewards, LegacyXml, ReplacesLegacyRules, new List<RewardDropEdit>(RewardDrops).ToArray(), PlayerCharacter);
         }
     }
 
@@ -2194,6 +2196,9 @@ namespace Eclipse.Modding
                 FightDefinition fight = fights[i];
                 if (!battleIds.Contains(fight.Battle))
                     throw new ModContentException("Fight '" + fight.Id + "' references missing battle '" + fight.Battle + "'.");
+                if (fight.PlayerCharacter.HasValue && !warriorIds.Contains(fight.PlayerCharacter.Value) &&
+                    !_warriors.TryGet(fight.PlayerCharacter.Value, out WarriorDefinition ignoredPlayerCharacter))
+                    throw new ModContentException("Fight '" + fight.Id + "' references missing player character '" + fight.PlayerCharacter.Value + "'.");
                 for (int j = 0; j < fight.Warriors.Count; j++)
                     if (!warriorIds.Contains(fight.Warriors[j]) && !_warriors.TryGet(fight.Warriors[j], out WarriorDefinition ignoredWarrior))
                         throw new ModContentException("Fight '" + fight.Id + "' references missing warrior '" + fight.Warriors[j] + "'.");
@@ -3257,7 +3262,7 @@ namespace Eclipse.Modding
         public FightDefinition RegisterFight(string localId, DefinitionId battle, int replays, int replayInterval,
             int power, int rounds, int roundTime, string location, string music, float evaluatedRating,
             float healthRecovery, string description, bool locked, string rewardImage,
-            DefinitionId[] warriors, DefinitionId[] rules, DefinitionId[] rewards)
+            DefinitionId[] warriors, DefinitionId[] rules, DefinitionId[] rewards, DefinitionId? playerCharacter = null)
         {
             ThrowIfCompleted();
             DefinitionId id = Qualify("fights", localId);
@@ -3269,12 +3274,14 @@ namespace Eclipse.Modding
             rewards = rewards ?? Array.Empty<DefinitionId>();
             if (warriors.Length == 0) throw new ModContentException("External fight must reference at least one warrior.");
             ValidateDefinitionReferences(warriors, "warriors", id, "warrior");
+            if (playerCharacter.HasValue)
+                ValidateDefinitionReferences(new[] { playerCharacter.Value }, "warriors", id, "player character");
             ValidateDefinitionReferences(rules, "rules", id, "rule");
             ValidateDefinitionReferences(rewards, "rewards", id, "reward");
             EnsureCapacityForNewRegistration();
             var definition = new FightDefinition(id, battle, id.ToString(), replays, replayInterval, power, rounds,
                 roundTime, location, music, evaluatedRating, healthRecovery, description, locked, rewardImage,
-                warriors, rules, rewards);
+                warriors, rules, rewards, playerCharacter: playerCharacter);
             _fights.Add(id, definition);
             _fightOrder.Add(id);
             return definition;

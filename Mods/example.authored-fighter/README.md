@@ -1,7 +1,12 @@
 # Authored Fighter Lab
 
-Enable this mod and **Apply & Restart**. Enter Act I Tournament 3 in Campaign
-or Eclipse Mode. Its HUD summons an independent pair, lets each fighter perform
+Enable this mod and **Apply & Restart**. In Campaign, open **Authored Fighter Lab**
+on the Act I map. This owned encounter starts you as the authored character;
+use your normal Punch control for its original strike. The fight declares
+`player_character = character` through `sf2.fights.register`. This temporary
+player setup does not change saved equipment and needs `content.register`.
+The example also registers a repeatable Eclipse Mode entry and adds its HUD
+to Act I Tournament 3 in either mode. Its HUD summons an independent pair, lets each fighter perform
 the authored strike, resets pair spacing, toggles repeated strikes, and dismisses the pair. They have
 their own health and target each other. Main fighters remain playable, so leave
 room for the pair; the example does not reserve or freeze the arena.
@@ -18,7 +23,8 @@ gets the authored strike. Choose **Try core comparison form** to switch to a
 registered kung-fu character using the core body. This comparison is not a
 snapshot of your original loadout. Form changes are temporary combat operations;
 they retain health percentage and input ownership without editing saved
-equipment. Restart the fight to use the ordinary player setup again. Failed
+equipment. Restart the owned lab fight to use its declared authored character;
+restart Tournament 3 to use your saved player's ordinary setup. Failed
 requests display their error in the HUD. This requires `combat.transform` in
 addition to the actor demonstration's capabilities.
 

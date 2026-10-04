@@ -49,6 +49,18 @@ exports.run = async function () {
         assert.deepEqual(vscode.languages.getDiagnostics(authoredUri),[],'Restored player form capability did not clear diagnostics');
         passed.push('PASS: authored player form permission is independently validated');
         passed.push('PASS: Authored Fighter Lab native assets/script validate and actor permission follows its own manifest');
+        const playerFieldUri=vscode.Uri.joinPath(authoredRoot,'scripts','player-field.lua');
+        const playerFieldText='local sf2=require("sf2")\nsf2.fights.register { id="test",  }';
+        fs.writeFileSync(playerFieldUri.fsPath,playerFieldText);
+        await vscode.workspace.openTextDocument(playerFieldUri);
+        let playerFieldFound=false;const playerFieldDeadline=Date.now()+30000;
+        while(Date.now()<playerFieldDeadline){
+            const result=await vscode.commands.executeCommand('vscode.executeCompletionItemProvider',playerFieldUri,new vscode.Position(1,playerFieldText.split('\n')[1].indexOf('  }')+1));
+            if(result?.items.some(item=>String(typeof item.label==='string'?item.label:item.label.label).replace(/\?$/,'')==='player_character')){playerFieldFound=true;break;}
+            await new Promise(resolve=>setTimeout(resolve,300));
+        }
+        assert(playerFieldFound,'Owned fight player_character completion missing');
+        passed.push('PASS: owned fight player character field completes in the authored starter');
         await vscode.commands.executeCommand('eclipseModding.enable');
         await vscode.commands.executeCommand('eclipseModding.enable');
         const expected = [otherLibrary, library];
