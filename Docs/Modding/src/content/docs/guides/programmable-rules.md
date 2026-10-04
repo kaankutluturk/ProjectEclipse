@@ -17,7 +17,7 @@ another fight, without rewriting the callback.
 3. Register a rule referencing the behavior.
 4. Add the rule handle to your fight's `rules` array.
 
-The complete [Third Strike Trial source](https://github.com/dawc17/ProjectEclipse/tree/main/Mods/example.battle-rules)
+The complete [Third Strike Trial source](https://github.com/dawc17/ProjectEclipse/tree/main/ArchivedMods/example.battle-rules)
 includes the manifest, localization, map entry, opponent, and repeatable fight.
 The tracked source in your checkout is authoritative while changes are unpublished.
 Enable it, restart from the title screen, and select its map entry in Campaign.

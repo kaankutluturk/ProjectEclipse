@@ -22,9 +22,20 @@ npm run build
 npm run preview
 ```
 
-The build audits reference coverage against the Lua bindings, runs Astro's checks, builds the static
-site and search index, then checks every local HTML link, fragment, and asset
-path against the GitHub Pages base. Output is in `Docs/Modding/dist/`.
+The build audits reference coverage against the Lua bindings, runs the source-link
+regression tests and Astro's checks, builds the static site and search index, then
+checks every local HTML link, fragment, and asset path against the GitHub Pages
+base. Output is in `Docs/Modding/dist/`.
+
+Rendered links to this repository's current branch also require a tracked Git
+file (`blob`) or directory (`tree`), with exact casing. The check uses the index
+so it works in the documentation CI's sparse checkout; ignored/local files do
+not establish published source. Deleting or moving an example now fails the
+build until its public links are updated. Full-commit historical snapshots are
+explicitly outside this current-index check: review their Git tree separately
+and label the content as historical. Other unverified branch refs are rejected.
+`npm test` exercises this validator independently, including a real sparse Git
+fixture, deleted/untracked targets and encoded paths.
 
 ## Where to edit
 

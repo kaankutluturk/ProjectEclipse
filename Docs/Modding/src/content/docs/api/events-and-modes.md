@@ -173,7 +173,7 @@ implies settlement is waiting for its buttons.
 Linear completion bricks and the linear count suffix are hidden for modes with
 this callback: jumping to roster entry three does not mean two fights were won.
 The map still resolves each owned battle to the saved selected encounter.
-See the complete [Branching Trial example](https://github.com/dawc17/ProjectEclipse/tree/main/Mods/example.branching-trial).
+See the complete [Branching Trial example](https://github.com/dawc17/ProjectEclipse/tree/main/ArchivedMods/example.branching-trial).
 Use [on_prepare](#on_prepare) for generated encounters and pre-entry choices,
 and [saved random streams](../random/) for repeatable draws. A complete custom
 result/lobby lifecycle remains outside this contract.

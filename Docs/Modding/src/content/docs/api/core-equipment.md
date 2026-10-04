@@ -27,6 +27,6 @@ Use `sf2.items.get` for items, `sf2.assets.model` for models, and `sf2.assets.sp
 
 ## Find suitable references
 
-Start with the [equipment example](https://github.com/dawc17/ProjectEclipse/tree/main/Mods/example.loadout), which pairs armor, helm, ranged, and magic icons with models and supported subtypes. To research other core equipment, use the canonical [vanilla XML](https://github.com/dawc17/ProjectEclipse/tree/main/Assets/vanillaXml) and validate the exact reference in Eclipse. Display names are translated text and are not reliable IDs.
+Start with the [equipment example](https://github.com/dawc17/ProjectEclipse/tree/main/ArchivedMods/example.loadout), which pairs armor, helm, ranged, and magic icons with models and supported subtypes. To research other core equipment, use the canonical [vanilla XML](https://github.com/dawc17/ProjectEclipse/tree/main/Assets/vanillaXml) and validate the exact reference in Eclipse. Display names are translated text and are not reliable IDs.
 
 Duplicate legacy names can have disambiguated IDs. The two ranged definitions named `GlaivebowArrow` resolve to `core:items/ranged/glaivebowarrow` and `core:items/ranged/glaivebowarrow/riflebullet`. Do not assume every legacy name can be converted by lowercasing it alone.

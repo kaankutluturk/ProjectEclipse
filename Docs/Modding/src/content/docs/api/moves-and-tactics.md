@@ -1120,7 +1120,7 @@ AI state. Callback errors, invalid/stale actions and instruction-budget overruns
 native fallback; the first failure is diagnosed. Other fighters keep their own
 AI. This callback is not a coroutine.
 
-The [programmable AI example](https://github.com/dawc17/ProjectEclipse/tree/main/Mods/example.programmable-ai)
+The [programmable AI example](https://github.com/dawc17/ProjectEclipse/tree/main/ArchivedMods/example.programmable-ai)
 includes four opponents. The fourth, **Reactive Guardian**, uses active attack
 intervals to choose backward movement and nominal clip timing to choose a quick
 kick, without matching move names. Isolated Lua tests cover

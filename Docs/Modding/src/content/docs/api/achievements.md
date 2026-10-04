@@ -129,7 +129,7 @@ this counter API has no rename/migration function.
 
 ### An encounter-and-equipment condition
 
-The [Katana Achievement example](https://github.com/dawc17/ProjectEclipse/tree/main/Mods/example.katana-achievement)
+The [Katana Achievement example](https://github.com/dawc17/ProjectEclipse/tree/main/ArchivedMods/example.katana-achievement)
 uses the `battle_result` event instead of attaching a counting perk. It checks
 an exact Butcher encounter ID, a win, and captured `Weapon` / `Katana` equipment
 before advancing its owned counter. The normal and Eclipse boss fights are number

@@ -444,7 +444,7 @@ its descendants from activating. Disabling a root does not close its modal backd
 sf2.ui.set_enabled(view, "arm", charge >= 1 and not armed)
 ```
 
-The [Charged Strike example](https://github.com/dawc17/ProjectEclipse/tree/main/Mods/example.charge-ui)
+The [Charged Strike example](https://github.com/dawc17/ProjectEclipse/tree/main/ArchivedMods/example.charge-ui)
 combines a live HUD, a click handler, simulation ticks and a fresh outgoing-hit
 callback. Managed Lua and isolated Unity fixtures cover these components; full
 gameplay, physical input and visual acceptance remain pending.

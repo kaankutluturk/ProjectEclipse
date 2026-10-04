@@ -5,9 +5,10 @@
   "engines": { "node": ">=22.12.0" },
   "scripts": {
     "check:reference": "node scripts/check-reference.mjs",
+    "test": "node --test scripts/repository-links.test.mjs",
     "predev": "npm run check:reference",
     "dev": "astro dev --host 127.0.0.1",
-    "prebuild": "npm run check:reference",
+    "prebuild": "npm run check:reference && npm test",
     "build": "astro check && astro build && node scripts/check-links.mjs",
     "preview": "astro preview --host 127.0.0.1"
   },

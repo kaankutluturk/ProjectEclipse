@@ -7,6 +7,14 @@ import { pageUrl } from '../../../site.config.mjs';
 
 Start with <a href={pageUrl('guides/first-weapon')}>Your first weapon</a> for complete files and step-by-step instructions. The examples below show how the API's pieces fit together in larger mods. Their repository folders contain manifests, scripts, localization, and any required assets.
 
+Examples under `Mods/` are in the game's loose mod directory. Older examples
+under `ArchivedMods/` are kept outside discovery: copy the whole example folder
+into your installation's `Mods/` directory before enabling it. Use a test profile
+and follow that example's README and verification limits. The
+<a href={pageUrl('guides/vscode')}>modding editor</a> also creates complete starter
+folders for supported examples. An archived source link is a reference, not a
+claim of a fresh game playtest.
+
 ## Equipment and behavior
 
 [Authored Fighter Lab](https://github.com/dawc17/ProjectEclipse/tree/main/Mods/example.authored-fighter)
@@ -28,10 +36,10 @@ rig or mesh importer.
 
 | Example source | What to learn |
 | --- | --- |
-| [One weapon](https://github.com/dawc17/ProjectEclipse/tree/main/Mods/example.weapon) | A weapon, loose sprite, core model, shop listing, and item identity migration. |
-| [A complete loadout](https://github.com/dawc17/ProjectEclipse/tree/main/Mods/example.loadout) | Armor, helm, ranged, and magic using matching core assets. |
-| [Third Strike Trial](https://github.com/dawc17/ProjectEclipse/tree/main/Mods/example.battle-rules) | Equipment-independent Lua battle rules with isolated round state. |
-| [Perks and enchantments](https://github.com/dawc17/ProjectEclipse/tree/main/Mods/example.enchantment) | Reusable typed behavior shared by a perk and an item enchantment. |
+| [One weapon](https://github.com/dawc17/ProjectEclipse/tree/main/ArchivedMods/example.weapon) | A weapon, loose sprite, core model, shop listing, and item identity migration. |
+| [A complete loadout](https://github.com/dawc17/ProjectEclipse/tree/main/ArchivedMods/example.loadout) | Armor, helm, ranged, and magic using matching core assets. |
+| [Third Strike Trial](https://github.com/dawc17/ProjectEclipse/tree/main/ArchivedMods/example.battle-rules) | Equipment-independent Lua battle rules with isolated round state. |
+| [Perks and enchantments](https://github.com/dawc17/ProjectEclipse/tree/main/ArchivedMods/example.enchantment) | Reusable typed behavior shared by a perk and an item enchantment. |
 
 ## A procedural projectile burst
 
@@ -81,10 +89,14 @@ saved meter and bonus while the objective requests round wins/losses. Separate
 HUD placements keep both labels visible. See <a href={pageUrl('guides/combine-mods')}>Combine mods</a>
 for setup, ordering, conflicts, removal/reinstallation and verification limits.
 
-### Definitive Edition foundation
+### Historical Definitive Edition foundation
 
-[DE128 source](https://github.com/dawc17/ProjectEclipse/tree/main/Mods/de128)
+[DE128 source snapshot](https://github.com/dawc17/ProjectEclipse/tree/379c6726f09ceb3605837989e58dea7aea6c25db/Mods/de128)
 shows a downstream mod split into Lua modules with an explicit startup order.
+This package was removed from the current branch in September 2026. The
+description below records that historical snapshot and its verification limits;
+it is not a currently bundled mod or base-game authority. Consult the public API
+reference for today's supported contracts before adapting its source.
 Its Underworld battles use <a href={pageUrl('api/assets')}>audio asset handles</a>
 for all 29 music IDs in the reviewed raid data. The mod ships PCM16 WAV files
 and resolves them by their archive IDs, so battles do not depend on the base
@@ -151,11 +163,11 @@ not a playable restored campaign.
 The earlier Ascension prototype is disabled and is no longer part of the active
 DE restoration path. Its generic public rule and encounter-plan APIs remain
 documented because they are reusable modding features, but the DE package should
-not be treated as currently restoring or demonstrating Ascension. Current DE work
-has returned to XML-evidenced Definitive Edition content instead of substituting
+not be treated as restoring or demonstrating Ascension at that snapshot. Its DE work
+had returned to XML-evidenced Definitive Edition content instead of substituting
 prototype progression or economy behavior.
 
-The active package now restores the archived **Master of Style** and **Relentless**
+The historical package restored the archived **Master of Style** and **Relentless**
 level-4 perk branch from `CharacterProgress.xml`, including paired upgrade choices
 at levels 8, 11, 14 and 17 and the five XML rank values for each perk. Their Lua
 behaviors follow the trigger definitions in `perks.xml`, not inferred aliases or
@@ -232,9 +244,9 @@ fighters reuse native portraits and equipment.
 
 | Example source | What you should see |
 | --- | --- |
-| [Pulse Guardian](https://github.com/dawc17/ProjectEclipse/tree/main/Mods/example.pulse-guardian) | A staff guardian's shield alternates every three combat seconds. A HUD meter and stopped/landed counters track the rule: incoming damage is zero during SHIELD UP and normal during SHIELD DOWN. |
-| [Tactic Gallery](https://github.com/dawc17/ProjectEclipse/tree/main/Mods/example.tactic-gallery) | Four differently equipped opponents use patient kicks, footwork, alternating kicks and attack-window reactions. A live HUD reports the AI's requested action or native fallback. Win to reach the next brain. |
-| [Arena Draft](https://github.com/dawc17/ProjectEclipse/tree/main/Mods/example.arena-draft) | A shuffled three-column opponent selector, Veteran toggle and timer slider determine the actual next fight. BACK cancels preparation; confirmed encounter plans persist through the normal save flow. |
+| [Pulse Guardian](https://github.com/dawc17/ProjectEclipse/tree/main/ArchivedMods/example.pulse-guardian) | A staff guardian's shield alternates every three combat seconds. A HUD meter and stopped/landed counters track the rule: incoming damage is zero during SHIELD UP and normal during SHIELD DOWN. |
+| [Tactic Gallery](https://github.com/dawc17/ProjectEclipse/tree/main/ArchivedMods/example.tactic-gallery) | Four differently equipped opponents use patient kicks, footwork, alternating kicks and attack-window reactions. A live HUD reports the AI's requested action or native fallback. Win to reach the next brain. |
+| [Arena Draft](https://github.com/dawc17/ProjectEclipse/tree/main/ArchivedMods/example.arena-draft) | A shuffled three-column opponent selector, Veteran toggle and timer slider determine the actual next fight. BACK cancels preparation; confirmed encounter plans persist through the normal save flow. |
 
 Each folder includes a step-by-step acceptance checklist. The examples award no
 items or currency, but save mode progress; use a test profile. The AI display
@@ -243,7 +255,7 @@ it does not generate new meshes or animations. Automated checks execute the exac
 Lua scripts and mount the UI in an isolated Unity fixture; full-game combat and
 physical-controller acceptance remain separate checks.
 
-The [Grid UI Showcase](https://github.com/dawc17/ProjectEclipse/tree/main/Mods/example.grid-ui)
+The [Grid UI Showcase](https://github.com/dawc17/ProjectEclipse/tree/main/ArchivedMods/example.grid-ui)
 opens an original-style equipment selector when you enter a non-combat scene.
 Enable it and restart, then enter the map to test three-column layout, scrolling,
 selection, hidden/disabled cells and keyboard/controller navigation. It demonstrates
@@ -263,31 +275,31 @@ seeded choice either includes or skips Needlehand. These reuse native character
 templates while registering separate mod-owned warriors. Existing saved route
 positions and seeds survive the example update.
 
-The [Charged Strike HUD](https://github.com/dawc17/ProjectEclipse/tree/main/Mods/example.charge-ui)
+The [Charged Strike HUD](https://github.com/dawc17/ProjectEclipse/tree/main/ArchivedMods/example.charge-ui)
 shows an anchored, localized HUD, live UI updates and a click that arms behavior for a fresh combat callback. Closing the HUD cancels the armed bonus.
 
 | Example source | What to learn |
 | --- | --- |
-| [Branching Trial](https://github.com/dawc17/ProjectEclipse/tree/main/Mods/example.branching-trial) | Choose fight routes using Lua results and saved completion counts. |
-| [Seeded Trial](https://github.com/dawc17/ProjectEclipse/tree/main/Mods/example.seeded-trial) | Choose a shortcut using a saved random stream that resumes across profile reloads. |
+| [Branching Trial](https://github.com/dawc17/ProjectEclipse/tree/main/ArchivedMods/example.branching-trial) | Choose fight routes using Lua results and saved completion counts. |
+| [Seeded Trial](https://github.com/dawc17/ProjectEclipse/tree/main/ArchivedMods/example.seeded-trial) | Choose a shortcut using a saved random stream that resumes across profile reloads. |
 | [Generated Expedition starter](https://github.com/dawc17/ProjectEclipse/tree/main/Tools/ModdingEditor/templates/generated-expedition) | Generate the opponent and fight parameters after a native-styled toggle/slider preparation screen. Choices persist across reloads. |
-| [AI Dojo](https://github.com/dawc17/ProjectEclipse/tree/main/Mods/example.programmable-ai) | Four distinct fighters demonstrate patient attacks, distance-based footwork, alternating attacks, and reactions to live attack windows using input/timing metadata. |
-| [Timed combo reserve](https://github.com/dawc17/ProjectEclipse/tree/main/Mods/example.combo-reserve) | Combine native combo events, round state and the fight clock for a timed damage bonus. |
-| [Outgoing battle rule](https://github.com/dawc17/ProjectEclipse/tree/main/Mods/example.outgoing-rule) | Double every third unblocked hit using an attacker-side Lua callback. |
-| [Perk upgrades](https://github.com/dawc17/ProjectEclipse/tree/main/Mods/example.perk-upgrades) | Learn and upgrade a Lua guard with level-specific parameters and descriptions. |
-| [Eclipse item reward](https://github.com/dawc17/ProjectEclipse/tree/main/Mods/example.eclipse-reward) | Replace a scoped item reward on the separate Lynx Eclipse replay encounter while preserving native currency rewards. |
-| [Existing campaign rules](https://github.com/dawc17/ProjectEclipse/tree/main/Mods/example.core-fight) | Append a health-dependent Lua rule and change presentation on an existing encounter. |
-| [Content and battles](https://github.com/dawc17/ProjectEclipse/tree/main/Mods/example.phase1) | Connect maps, battles, opponents, quests, equipment, forging, locations, moves, and tactics. |
-| [Combat and offline modes](https://github.com/dawc17/ProjectEclipse/tree/main/Mods/example.phase2) | Stateful behaviors, damage events, scheduled content, Ascension, and a multi-bar raid boss. |
-| [Achievements and asset replacement](https://github.com/dawc17/ProjectEclipse/tree/main/Mods/example.phase3) | Saved counters, achievements, and replacing existing assets explicitly. |
-| [Custom FX Showcase](https://github.com/dawc17/ProjectEclipse/tree/main/Mods/example.custom-fx) | Builds weapon-tip sparks, player kick trails, ground fog, a dojo light wash and a screen grade from <a href={pageUrl('api/visuals')}>sf2.fx building blocks</a>, each with its own switch. |
+| [AI Dojo](https://github.com/dawc17/ProjectEclipse/tree/main/ArchivedMods/example.programmable-ai) | Four distinct fighters demonstrate patient attacks, distance-based footwork, alternating attacks, and reactions to live attack windows using input/timing metadata. |
+| [Timed combo reserve](https://github.com/dawc17/ProjectEclipse/tree/main/ArchivedMods/example.combo-reserve) | Combine native combo events, round state and the fight clock for a timed damage bonus. |
+| [Outgoing battle rule](https://github.com/dawc17/ProjectEclipse/tree/main/ArchivedMods/example.outgoing-rule) | Double every third unblocked hit using an attacker-side Lua callback. |
+| [Perk upgrades](https://github.com/dawc17/ProjectEclipse/tree/main/ArchivedMods/example.perk-upgrades) | Learn and upgrade a Lua guard with level-specific parameters and descriptions. |
+| [Eclipse item reward](https://github.com/dawc17/ProjectEclipse/tree/main/ArchivedMods/example.eclipse-reward) | Replace a scoped item reward on the separate Lynx Eclipse replay encounter while preserving native currency rewards. |
+| [Existing campaign rules](https://github.com/dawc17/ProjectEclipse/tree/main/ArchivedMods/example.core-fight) | Append a health-dependent Lua rule and change presentation on an existing encounter. |
+| [Content and battles](https://github.com/dawc17/ProjectEclipse/tree/main/ArchivedMods/example.phase1) | Connect maps, battles, opponents, quests, equipment, forging, locations, moves, and tactics. |
+| [Combat and offline modes](https://github.com/dawc17/ProjectEclipse/tree/main/ArchivedMods/example.phase2) | Stateful behaviors, damage events, scheduled content, Ascension, and a multi-bar raid boss. |
+| [Achievements and asset replacement](https://github.com/dawc17/ProjectEclipse/tree/main/ArchivedMods/example.phase3) | Saved counters, achievements, and replacing existing assets explicitly. |
+| [Custom FX Showcase](https://github.com/dawc17/ProjectEclipse/tree/main/ArchivedMods/example.custom-fx) | Builds weapon-tip sparks, player kick trails, ground fog, a dojo light wash and a screen grade from <a href={pageUrl('api/visuals')}>sf2.fx building blocks</a>, each with its own switch. |
 | [Chiaroscuro - Cinematic Visuals](https://github.com/dawc17/ProjectEclipse/tree/main/Mods/chiaroscuro) | Background depth, weapon trails, depth haze, an ink-turning rim light, light shafts with dust, a slow-motion knockout fade, film halation and grain, floor stains, and light from weapons and magic, with one Options > Mod settings switch each. Everything but depth, haze and the rim light is built from <a href={pageUrl('api/visuals')}>sf2.fx blocks</a>. |
 
 These larger examples combine many features. Read one feature at a time and consult its <a href={pageUrl('reference')}>function reference</a> for fields and requirements. The example's manifest tells you which capabilities and dependencies it needs.
 
 ## Equipment-based achievement
 
-[Katana Achievement](https://github.com/dawc17/ProjectEclipse/tree/main/Mods/example.katana-achievement) combines battle-result equipment with a saved counter and Profile achievement.
+[Katana Achievement](https://github.com/dawc17/ProjectEclipse/tree/main/ArchivedMods/example.katana-achievement) combines battle-result equipment with a saved counter and Profile achievement.
 
 ## Repulse Trial
 

@@ -2,12 +2,15 @@ import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parse } from 'parse5';
-import { base, site } from '../site.config.mjs';
+import { base, site, repository, branch } from '../site.config.mjs';
+import { checkRepositoryLink, repositoryInventory } from './repository-links.mjs';
 
 const directory = fileURLToPath(new URL('../dist/', import.meta.url));
 const pages = new Map();
 const errors = [];
 let checked = 0;
+let sourceLinks = 0, historicalLinks = 0;
+const inventory = repositoryInventory(fileURLToPath(new URL('../../../', import.meta.url)));
 
 function walk(node, visit) {
   visit(node);
@@ -38,6 +41,12 @@ for (const page of pages.values()) {
     for (const attribute of node.attrs ?? []) {
       if (!['href', 'src'].includes(attribute.name) || !attribute.value) continue;
       const url = new URL(attribute.value, current);
+      const source = checkRepositoryLink(url, repository, branch, inventory);
+      if (source) {
+        if (source.historical) historicalLinks++;
+        else sourceLinks++;
+        if (source.error) errors.push(`${page.filename}: ${source.error}`);
+      }
       if (url.origin !== current.origin) continue;
       checked++;
       const prefix = `${base}/`;
@@ -62,3 +71,4 @@ for (const page of pages.values()) {
 if (errors.length) throw new Error(`Broken wiki links:\n${[...new Set(errors)].join('\n')}`);
 if (!existsSync(path.join(directory, 'pagefind', 'pagefind.js'))) throw new Error('Search index was not generated.');
 console.log(`Checked ${checked} local links/assets across ${pages.size} HTML pages, including fragments and the Pages base. Search index exists.`);
+console.log(`Checked ${sourceLinks} current-branch repository source links against tracked Git paths. ${historicalLinks} pinned historical snapshot links are outside this check.`);
