@@ -8,12 +8,20 @@ local character = sf2.warriors.register {
     body_model = sf2.assets.model("models/body"),
     skin_models = { sf2.assets.model("models/sash") },
 }
+-- A registered comparison form, not a saved loadout or original-body snapshot.
+local core_form = sf2.warriors.register {
+    id = "core_comparison", level = 1, skeleton = "Skeleton",
+    template = sf2.warriors.get_template("core:warrior-templates/man_kungfu"),
+}
 local strike = sf2.moves.register {
     id = "sash_strike", animation = sf2.assets.binary("animations/strike"),
     type = "ATTACK", priority = 150, mid_frames = 0,
     first_frame = 0, end_frame = 60, mirror_node = "NHeel_1", direction = "face_enemy",
     locks = { { item = "Skeleton", subtype = "Skeleton" } },
-    conditions = { { character = character } },
+    events = "controlled",
+    conditions = {
+        { character = character }, { key = "Punch" }, { controllable = true },
+    },
     align = { axes = { "X", "Z" }, pivot = { node = "NHeel_2" }, position = { pivot = "Me" } },
     intervals = {
         { type = "Uninterrupt", from = 0, to = 60 },
@@ -26,6 +34,7 @@ local strike = sf2.moves.register {
     },
 }
 local hud, command, paired, automatic, reforming, formation_origin
+local form_request, form_message
 local pending = {}
 local host = sf2.behaviors.register {
     id = "authored_body",
@@ -83,6 +92,7 @@ local function close()
     if hud and sf2.ui.is_open(hud) then sf2.ui.close(hud) end
     hud, command, paired, automatic, pending = nil, nil, false, false, {}
     reforming, formation_origin = false, nil
+    form_request, form_message = nil, ""
 end
 local function form_pair(actors)
     local complete = true
@@ -103,9 +113,12 @@ local controller = sf2.behaviors.register {
     id = "lab",
     on_round_begin = function()
         close()
-        hud = sf2.ui.open { id = "authored", mount = "hud", placement = { anchor = "top_right", x = -24, y = 328 },
-            root = { id = "root", kind = "column", width = 300, height = 280, children = {
+        hud = sf2.ui.open { id = "authored", mount = "hud", placement = { anchor = "top_right", x = -24, y = 220 },
+            root = { id = "root", kind = "column", width = 300, height = 400, children = {
                 { id = "status", kind = "text", text = "Authored Fighter Lab ready", height = 40 },
+                { id = "form_status", kind = "text", text = "Player form: unchanged", height = 40 },
+                { id = "player", kind = "button", text = "Try authored player (Punch)", height = 40 },
+                { id = "core", kind = "button", text = "Try core comparison form", height = 40 },
                 { id = "summon", kind = "button", text = "Summon authored pair", height = 40 },
                 { id = "reform", kind = "button", text = "Reset pair spacing", height = 40 },
                 { id = "left", kind = "button", text = "Left fighter: authored strike", height = 40 },
@@ -117,8 +130,17 @@ local controller = sf2.behaviors.register {
     end,
     on_tick = function(_, fighter)
         if not hud or not sf2.ui.is_open(hud) then return end
+        if form_request and form_request.status ~= "queued" then
+            form_message = form_request.status
+            if form_request.error then form_message = form_message .. ": " .. form_request.error end
+            sf2.log.info("AUTHORED-FIGHTER:form:" .. form_request.status)
+            form_request = nil
+        end
         local actors = assert(fighter:actors())
-        if command == "summon" and #actors == 0 then
+        if (command == "player" or command == "core") and not form_request then
+            form_request = fighter:change_form(command == "player" and character or core_form)
+            form_message = "queued"
+        elseif command == "summon" and #actors == 0 then
             fighter:spawn_actor(left, 180, 0)
             fighter:spawn_actor(right, 280, 0)
         elseif command == "dismiss" then
@@ -150,8 +172,20 @@ local controller = sf2.behaviors.register {
         elseif #actors < 2 then paired, reforming = false, false end
         if reforming then reforming = not form_pair(actors) end
         sf2.ui.set_text(hud, "status", "Authored fighters: " .. #actors .. (reforming and " | spacing" or automatic and " | repeating" or " | manual"))
+        sf2.ui.set_text(hud, "form_status", "Player form: " .. form_message)
     end,
     on_round_end = close, on_fight_end = close,
+    on_animation_start = function(_, _, event)
+        if event.target == "self" and event.animation_name == sf2.mod.id .. ":moves/sash_strike" then
+            sf2.log.info("AUTHORED-FIGHTER:player-start")
+        end
+    end,
+    on_damage_dealt = function(_, fighter, event)
+        if event.attack and event.attack.animation_name == sf2.mod.id .. ":moves/sash_strike" then
+            assert(fighter.actor_id == nil and event.attack.actor_id == nil)
+            sf2.log.info("AUTHORED-FIGHTER:player-dealt")
+        end
+    end,
 }
 local rule = sf2.rules.behavior { id = "lab", behavior = controller, target = sf2.rules.PLAYER }
 for _, fight in ipairs { "core:fights/zone_1/tournament/3", "core:fights/zone_1/tournament_eclipsemode/3" } do

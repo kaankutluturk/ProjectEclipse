@@ -1,10 +1,10 @@
 schema = 1
 id = "example.authored-fighter"
 name = "Authored Fighter Lab"
-version = "1.0.0"
+version = "1.1.0"
 authors = ["Eclipse"]
 entrypoint = "scripts/main.lua"
-capabilities = ["content.register", "content.patch", "combat.actors", "ui.create"]
+capabilities = ["content.register", "content.patch", "combat.actors", "combat.transform", "ui.create"]
 
 [[dependencies]]
 id = "core"

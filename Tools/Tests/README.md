@@ -6,6 +6,9 @@ owned body/skin composition, preserved binary point count, the original clip's
 native reader/playback, root-relative helper deformation, both facing directions,
 real contact source/damage, receipts, pause and actor/HUD cleanup. It uses compatible
 core equipment/idle and controlled spacing/profile, not arbitrary rig acceptance.
+Player-form coverage changes the canonical player through the public HUD,
+dispatches Punch through the native controller, and checks original-strike
+contact/callbacks and character-specific selection after a comparison swap.
 `Tools/Animation/TestAuthoredFighterExample.py` reproduces the shipped geometry,
 binary and sidecar and checks source motion/skin structure.
 

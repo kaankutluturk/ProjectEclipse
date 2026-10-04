@@ -19,6 +19,8 @@ test('authored fighter starter mirrors native models and original point animatio
  assert.equal(binary.readInt32LE(0),61); assert.equal(binary.readInt32LE(5),67);
  const missing={...mod,data:{...mod.data,capabilities:mod.data.capabilities.filter(c=>c!=='combat.actors')}};
  assert(p.analyze(source,missing).issues.some(i=>i.capability==='combat.actors'));
+ const withoutForms={...mod,data:{...mod.data,capabilities:mod.data.capabilities.filter(c=>c!=='combat.transform')}};
+ assert(p.analyze(source,withoutForms).issues.some(i=>i.capability==='combat.transform'));
 });
 
 test('actor companion starter mirrors playable files, scopes capabilities and lifecycle timing',async()=>{

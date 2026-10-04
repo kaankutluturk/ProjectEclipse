@@ -167,6 +167,29 @@ it from either side. The HUD also supports a spacing reset, repeated strikes
 with Lua approach movement, and dismissal. Native hit reactions can change the
 pair's positions; reset spacing before inspecting a controlled single strike.
 
+To play the character yourself, choose **Try authored player (Punch)** and wait
+for **Player form: applied**. Use your normal Punch control to select the strike.
+The example declares its input and readiness checks in the move definition:
+
+```lua
+-- Fields within sf2.moves.register; character is the registered warrior handle.
+events = "controlled",
+conditions = {
+    { character = character }, { key = "Punch" }, { controllable = true },
+},
+```
+
+The character condition keeps this binding off other warriors. `controlled`
+includes native key presses and eligible animation/interval endings;
+`controllable` prevents starting the move during an uninterruptible action.
+The example's HUD calls `fighter:change_form(character)` from its player rule's
+tick callback and displays the live result. This needs `combat.transform`.
+Its **Try core comparison form** button selects another registered warrior
+without the authored body. That is a comparison character, not a snapshot or
+restoration of your original equipment. Restart the fight for the usual player
+setup. Read [form changes](../../api/combat-callbacks/#fighterchange_form) for
+state retention, failure handling and supported limits.
+
 Reproduce its assets using a fresh directory, then open the generated
 `preview.html` to scrub the point motion:
 
@@ -187,6 +210,9 @@ The repository's `Tools/Tests/CharacterForms/TestAuthoredFighterUnity.ps1`
 tests this complete installed example in an isolated Unity fight. It checks
 native clip decoding, moving skin helpers, mirrored attack contact in both
 directions, repeated Lua attacks, actor-specific callbacks, pause and cleanup.
+It also changes the player through the public form request, dispatches native
+controller Punch events, checks the authored attack's real contact/callbacks,
+and verifies that the comparison form uses core Punch selection.
 This establishes the sample's compatible procedural export; it does not validate
 every Blender/Gymnast export, custom rig, outfit or platform. Run comparable
 fight checks on your own character.

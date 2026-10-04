@@ -6,6 +6,9 @@ intervals and callback-scoped actor playback. Its source generator lives in
 `Tools/Animation/BuildAuthoredFighterExample.py`. The standard 67-point rig keeps
 core movement/equipment compatibility; this is not an arbitrary mesh importer.
 Handle completion and project diagnostics are distinct from native contact tests.
+Its player-form buttons use `combat.transform`; the authored strike also has a
+character-specific native Punch binding. The core comparison form is a registered
+test character, not a saved-loadout restore operation.
 
 Authored body/skin geometry receives runtime point/edge/helper validation before
 native model parsing. XML element/field diagnostics occur when loading the

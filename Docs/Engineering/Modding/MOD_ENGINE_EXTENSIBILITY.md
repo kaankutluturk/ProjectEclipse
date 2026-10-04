@@ -7,6 +7,13 @@ bidirectional contact and repeated attacks on the standard compatible rig.
 This narrows E5/E8 authoring gaps; arbitrary rigs, general importers and complete
 creator/platform acceptance remain open.
 
+The player-form follow-up makes that owned character playable through native
+Punch selection. A public HUD form request retains canonical player ownership
+and combat state; the original strike uses a character-specific input condition.
+Switching to a registered core comparison form removes that binding. This is
+native controller-dispatch acceptance, not physical-device or general loadout
+selection acceptance. See the same authored-fighter evidence record.
+
 The [actor projectile extension](ACTOR_PROJECTILES_ACCEPTANCE.md) supports
 typed native ranged abilities on independent roots, with scoped queries,
 Lua guidance, caster provenance and retirement cleanup. Ranged Companion Duel

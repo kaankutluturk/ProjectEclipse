@@ -36,6 +36,18 @@ exports.run = async function () {
         while(vscode.languages.getDiagnostics(authoredUri).length&&Date.now()<authoredCleanDeadline)
             await new Promise(resolve=>setTimeout(resolve,100));
         assert.deepEqual(vscode.languages.getDiagnostics(authoredUri),[],'Complete authored starter has VS Code project diagnostics');
+        fs.writeFileSync(authoredManifest,authoredManifestText.replace(', "combat.transform"',''));
+        await extension.exports.refresh();
+        const formDeadline=Date.now()+15000;
+        while(!vscode.languages.getDiagnostics(authoredUri).some(d=>d.code==='capability:combat.transform')&&Date.now()<formDeadline)
+            await new Promise(resolve=>setTimeout(resolve,100));
+        assert(vscode.languages.getDiagnostics(authoredUri).some(d=>d.code==='capability:combat.transform'),'Player form calls did not require their own capability');
+        fs.writeFileSync(authoredManifest,authoredManifestText);await extension.exports.refresh();
+        const formCleanDeadline=Date.now()+15000;
+        while(vscode.languages.getDiagnostics(authoredUri).length&&Date.now()<formCleanDeadline)
+            await new Promise(resolve=>setTimeout(resolve,100));
+        assert.deepEqual(vscode.languages.getDiagnostics(authoredUri),[],'Restored player form capability did not clear diagnostics');
+        passed.push('PASS: authored player form permission is independently validated');
         passed.push('PASS: Authored Fighter Lab native assets/script validate and actor permission follows its own manifest');
         await vscode.commands.executeCommand('eclipseModding.enable');
         await vscode.commands.executeCommand('eclipseModding.enable');

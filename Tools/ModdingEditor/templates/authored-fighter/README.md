@@ -11,6 +11,17 @@ in bounded three-unit steps between attacks, then starts the clip when in range.
 Spacing resets use successive requests of at most 100 units per axis; the HUD
 shows **spacing** until the pair is formed. Wait for **manual** before casting.
 
+Choose **Try authored player (Punch)** to change your current fighter to this
+character. Wait for **Player form: applied**, then use the normal Punch action
+(your configured keyboard/gamepad binding or touch button). Only this character
+gets the authored strike. Choose **Try core comparison form** to switch to a
+registered kung-fu character using the core body. This comparison is not a
+snapshot of your original loadout. Form changes are temporary combat operations;
+they retain health percentage and input ownership without editing saved
+equipment. Restart the fight to use the ordinary player setup again. Failed
+requests display their error in the HUD. This requires `combat.transform` in
+addition to the actor demonstration's capabilities.
+
 The body contains the canonical 67-point binding layout with authored capsule
 and torso geometry. Six weighted helper points form a connected four-triangle
 sash. It appends after equipment without changing the animation point count.

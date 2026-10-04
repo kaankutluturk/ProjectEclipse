@@ -79,6 +79,49 @@ contract and installation, reproduction and verification limits together.
 - The wiki builds 63 pages, covers all 246 public functions/aliases/callbacks,
   and validates 6,822 local links/assets, fragments and GitHub Pages paths.
 
+## Player-form and native input follow-up
+
+Authored Fighter Lab 1.1 adds player/comparison form buttons and
+`combat.transform`. The player rule requests `fighter:change_form` only from
+its active tick callback, retains the live result temporarily, and displays
+queued/applied/failed status. The move now declares `events = "controlled"`,
+the owned character condition, native Punch and `controllable` readiness.
+Actor playback remains explicit and the existing actor checks still pass.
+The comparison is a newly registered core-body kung-fu warrior, not a restore
+of the original profile loadout. No production runtime changes or new Lua API
+members were required; the public form/input contracts supply this behavior.
+
+The expanded native fixture passes **63 checks**. After actor contact/pause/
+dismissal it arranges 65% health and requests the player form through the real
+HUD. It verifies retained percentage, player/control flags, non-reset clock,
+canonical model-list membership, opponent target rebinding and the same rule
+HUD. The authored skin is present on the player. Input is sent through
+`GameController.SendGamepadControlEvent`, which reaches the existing controller
+and fight input routing; the fixture never calls `PlayAnimation` for this
+strike. Native selection, contact health loss, attacker-root attribution and
+main-player animation/damage callbacks are observed.
+
+An unrelated fighter does not select the owned clip. The comparison swap
+removes the authored body/skin and preserves player state. Its native Punch
+selects a real core attack while the owned clip remains absent throughout the
+observation window. This positive core-action check prevents an inert input
+path from passing the negative character-binding test. Round teardown closes
+the retained HUD, and Lua callback failures remain absent.
+
+Final fresh log:
+`Temp/FighterPlaybackUnity-d997a2c104cd4564b9767ae6eb4b68d8/validation-b5c7f7339b8b42d3b0a704d3e7e91246.log`.
+The separate `authored-player-native.png` was visually inspected; the applied
+player and all eight lab buttons fit the native HUD. Managed assemblies and
+the three reproducibility tests pass. Editor generation/check/build, all
+58 project tests, actual LuaLS and **23 VS Code checks** pass; the editor now
+tests the player form capability independently of actor permission. Public
+guides/reference/examples, mirrored starter and tool guide change together.
+
+This verifies native controller dispatch, not physical keyboard/gamepad/touch
+devices. The form test runs after dismissing the pair; simultaneous owned
+actors during a player swap, other loadouts/effects, saving/reloading during
+a fight and exported players are not covered by this follow-up.
+
 ## Limits
 
 This is the standard compatible rig with custom silhouette geometry and skin,

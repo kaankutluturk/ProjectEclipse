@@ -722,6 +722,16 @@ active stolen magic can fail the request before retirement. Current-side move/pe
 restriction inheritance also remains unfinished. Check the result rather than
 treating `queued` as success.
 
+**Verified authored player case:** Authored Fighter Lab changes the canonical
+player to its mod-owned body and weighted skin, retains health percentage and
+player input eligibility, and selects its original attack through native Punch
+dispatch. Its rule HUD and opponent target survive the swap. A second request
+selects a registered core comparison form; the authored Punch binding stops
+matching that character. This is a controlled Unity fight test using native
+controller events, not a physical keyboard/gamepad test or a restore of the
+original saved loadout. See [Character authoring](../../guides/character-authoring/)
+for source and controls.
+
 ```lua
 -- second_form is a warrior handle registered before these callbacks run.
 local pending
