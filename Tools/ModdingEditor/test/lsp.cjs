@@ -108,6 +108,14 @@ async function main() {
     fs.writeFileSync(path.join(workspace, 'modules.json'), JSON.stringify(await request('textDocument/completion', moduleProbe), null, 2));
     console.log('PASS: require("sf2") resolves and completes API modules');
 
+    const identityProbe=probe('actor-identity.lua','local sf2=require("sf2")\nsf2.tactics.register{id="brain",on_decide=function(memory,event)\n local actor=event.self.actor\n if actor then actor.| end\nend}');
+    await until(async()=>{const found=labels(await request('textDocument/completion',identityProbe));return ['id','definition','owner','team'].every(name=>found.includes(name));},'AI actor identity fields');
+    const scriptedText=fs.readFileSync(path.resolve(__dirname,'../../../Mods/example.scripted-actors/scripts/main.lua'),'utf8');
+    const scriptedUri=open('scripted-actors.lua',scriptedText+'\nsf2.price.coins("bad")\n');const scriptedKey=decodeURIComponent(scriptedUri).toLowerCase();
+    await until(()=>diagnostics.get(scriptedKey)?.some(d=>d.code==='param-type-mismatch'),'scripted actors diagnostic publication');
+    notify('textDocument/didChange',{textDocument:{uri:scriptedUri,version:2},contentChanges:[{text:scriptedText}]});
+    await until(()=>diagnostics.has(scriptedKey)&&diagnostics.get(scriptedKey).length===0,'clean scripted actor diagnostics');
+    console.log('PASS: actor identity/owner/team completion and complete Scripted Actor Sparring source');
     const actorFieldsProbe = probe('actor-fields.lua', 'local sf2=require("sf2")\nsf2.actors.register {\n |\n}');
     await until(async()=>{
         const found=labels(await request('textDocument/completion',actorFieldsProbe));

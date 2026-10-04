@@ -362,12 +362,20 @@ local AnimationIntervalSnapshot = {}
 ---@field intervals Eclipse.AnimationIntervalSnapshot[]
 local AnimationSnapshot = {}
 
+---@class (exact) Eclipse.ActorIdentity
+---@field id string
+---@field definition string
+---@field owner string
+---@field team "player"|"opponent"
+local ActorIdentity = {}
+
 ---@class (exact) Eclipse.FighterSnapshot
 ---@field health number
 ---@field max_health number
 ---@field health_bars integer
 ---@field position Eclipse.CombatPosition
 ---@field animation? Eclipse.AnimationSnapshot
+---@field actor? Eclipse.ActorIdentity
 local FighterSnapshot = {}
 
 ---@class (exact) Eclipse.CombatSnapshot

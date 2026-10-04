@@ -614,6 +614,15 @@ namespace Eclipse.Modding
                     animation.Set("intervals", DynValue.NewTable(intervals));
                     result.Set("animation", DynValue.NewTable(animation));
                 }
+                if(snapshot.Actor!=null)
+                {
+                    var actor=new Table(_script);
+                    actor.Set("id",DynValue.NewString(snapshot.Actor.Id));
+                    actor.Set("definition",DynValue.NewString(snapshot.Actor.Definition));
+                    actor.Set("owner",DynValue.NewString(snapshot.Actor.Owner));
+                    actor.Set("team",DynValue.NewString(snapshot.Actor.Team));
+                    result.Set("actor",DynValue.NewTable(actor));
+                }
                 return DynValue.NewTable(result);
             }
 

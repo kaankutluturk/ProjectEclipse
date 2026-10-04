@@ -1,12 +1,13 @@
 # Real compiled parser/reader/adapter with shipped vanilla XML and clip bytes.
 # Prewarming the native cache bypasses Unity resource I/O only. No combat model is run.
-param([string]$OutputPath)
+param([string]$OutputPath, [string]$CompileProject="", [string]$AssemblyDirectory="", [string]$UnityManagedDirectory="")
 $ErrorActionPreference = 'Stop'
 $root = Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $PSScriptRoot))
-dotnet msbuild (Join-Path $root 'Assembly-CSharp.csproj') /nologo /v:quiet /clp:ErrorsOnly
+if(!$CompileProject){$CompileProject=Join-Path $root 'Assembly-CSharp.csproj'}
+dotnet msbuild $CompileProject /nologo /v:quiet /clp:ErrorsOnly
 if ($LASTEXITCODE -ne 0) { throw 'Native AI content test requires a current managed build.' }
 . (Join-Path $PSScriptRoot '../Shared/LoadUnityManagedAssemblies.ps1')
-$assembly = Import-SF2ManagedRuntime $root
+$assembly = Import-SF2ManagedRuntime $root $AssemblyDirectory $UnityManagedDirectory
 [MovesMaps]::Init()
 $source = [xml](Get-Content -Raw -LiteralPath (Join-Path $root 'Assets/vanillaXml/animations/moves.xml'))
 $document = [xml]'<Movesxml><Moves/><Triggers/></Movesxml>'

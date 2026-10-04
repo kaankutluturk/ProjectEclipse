@@ -27,6 +27,13 @@ namespace Eclipse.Modding
             MaxHealth=(float)maxHealth;
         }
     }
+    // Detached provenance for actor roots in combat and AI observations.
+    public sealed class ModActorIdentity
+    {
+        public string Id { get; } public string Definition { get; } public string Owner { get; } public string Team { get; }
+        public ModActorIdentity(string id,string definition,string owner,string team)
+        {Id=id;Definition=definition;Owner=owner;Team=team;}
+    }
     public sealed class ModActorSnapshot
     {
         public string Id { get; } public string Definition { get; } public string Team { get; } public string Target { get; }

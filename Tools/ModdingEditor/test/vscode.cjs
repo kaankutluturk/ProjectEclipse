@@ -66,6 +66,18 @@ exports.run = async function () {
         while(Date.now()<audioDeadline){const result=await vscode.commands.executeCommand('vscode.executeCompletionItemProvider',audioUri,new vscode.Position(1,10));const labels=result?.items.map(item=>String(typeof item.label==='string'?item.label:item.label.label))??[];if(['play','stop','set_volume','is_playing'].every(name=>labels.some(label=>label===name||label.startsWith(name+'(')))){audioFound=true;break;}await new Promise(resolve=>setTimeout(resolve,500));}
         assert(audioFound,'Owned audio function completion missing');passed.push('PASS: owned audio play/query/volume/stop completion');
 
+        const identityUri=vscode.Uri.joinPath(folder.uri,'scripts','identity-completion.lua');
+        const identityLine=' if actor then actor. end';
+        fs.writeFileSync(identityUri.fsPath,'local sf2=require("sf2")\nsf2.tactics.register{id="brain",on_decide=function(memory,event)\n local actor=event.self.actor\n'+identityLine+'\nend}');
+        await vscode.workspace.openTextDocument(identityUri);
+        let identityFound=false;const identityDeadline=Date.now()+30000;
+        while(Date.now()<identityDeadline){
+            const result=await vscode.commands.executeCommand('vscode.executeCompletionItemProvider',identityUri,new vscode.Position(3,identityLine.indexOf('actor.')+6));
+            const labels=(result?.items||[]).map(item=>typeof item.label==='string'?item.label:item.label.label);
+            if(['id','definition','owner','team'].every(name=>labels.includes(name))){identityFound=true;break;}
+            await new Promise(resolve=>setTimeout(resolve,500));
+        }
+        assert(identityFound,'Copied AI actor identity completion missing');passed.push('PASS: AI actor identity/owner/team completion');
         const actorUri=vscode.Uri.joinPath(folder.uri,'scripts','actor-completion.lua');
         const actorLine=' for _,actor in ipairs(fighter:actors() or {}) do actor: end';
         fs.writeFileSync(actorUri.fsPath,'local sf2=require("sf2")\nsf2.behaviors.register{id="probe",on_tick=function(_,fighter)\n'+actorLine+'\nend}');

@@ -21,6 +21,8 @@ static class Program
         string mods = args[0], entry = Path.Combine(mods,"example.charge-ui/scripts/main.lua");
         foreach (string body in new[] {
             "memory.calls=(memory.calls or 0)+1; assert(event.self.health==40 and event.opponent.health==30); if memory.calls==1 then return event.actions[2] end; return 'wait'",
+            "local identity=event.self.actor; assert(identity.id=='a1' and identity.definition=='fixture:actors/ally' and identity.owner=='fixture' and identity.team=='player'); assert(event.opponent.actor.id=='a2' and event.opponent.actor.team=='opponent'); identity.id='forged'; identity.owner='forged'; event.opponent.actor.team='player'; return event.actions[1]",
+            "assert(event.self.actor==nil and event.opponent.actor==nil); return event.actions[1]",
             "return nil", "return {}", "while true do end",
             "return event.opponent.animation",
             "local observed=event.opponent.animation; assert(event.self.animation==nil and observed.name=='opponent kick' and observed.type=='attack' and observed.facing==-1); for _,interval in ipairs(observed.intervals) do if interval.type=='attack' then assert(interval.name=='contact'); interval.type='none'; observed.name='edited'; return event.actions[1] end end; error('missing attack observation')",
@@ -41,7 +43,7 @@ static class Program
                 string tactic = "example.charge-ui:tactics/brain";
                 Check(ai.HasAiHandler(tactic) && !ai.HasAiHandler("other.mod:tactics/brain"),"AI owner isolation failed");
                 var observed = new ModAnimationSnapshot("opponent kick","attack",-1,new[]{new ModAnimationIntervalSnapshot("contact","attack")});
-                var snapshot = new ModCombatSnapshot(new ModFighterSnapshot(40,50,1,10,0,0),new ModFighterSnapshot(30,50,1,60,0,0,observed),60,true,250);
+                var snapshot = new ModCombatSnapshot(new ModFighterSnapshot(40,50,1,10,0,0,actor:body.StartsWith("local identity")?new ModActorIdentity("a1","fixture:actors/ally","fixture","player"):null),new ModFighterSnapshot(30,50,1,60,0,0,observed,body.StartsWith("local identity")?new ModActorIdentity("a2","fixture:actors/rival","fixture","opponent"):null),60,true,250);
                 var instance = new object();
                 var candidates = new[] { new ModAiActionSnapshot("punch","move",3), new ModAiActionSnapshot("kick","attack",7,
                     new ModAiActionTiming(3,12,2,false),new[]{new ModAiActionInput("Kick","tap"),new ModAiActionInput("Back","hold")}) };
@@ -72,6 +74,13 @@ static class Program
                 }
                 else if (body.StartsWith("assert(event.back_wall_distance"))
                     Check(valid && first==0,"Back-wall observation failed: "+error);
+                else if(body.StartsWith("local identity"))
+                {
+                    Check(valid&&first==0,"Actor identity observation failed: "+error);
+                    Check(snapshot.Self.Actor.Id=="a1"&&snapshot.Self.Actor.Owner=="fixture"&&snapshot.Opponent.Actor.Team=="opponent","Lua mutated native actor provenance");
+                    Check(ai.TryDecideAi(tactic,instance,snapshot,candidates,out var again,out error)&&again==0,"Identity edits leaked across decisions: "+error);
+                }
+                else if(body.StartsWith("assert(event.self.actor"))Check(valid&&first==0,"Main fighter actor metadata was not nil: "+error);
                 else if (body=="return nil") Check(valid && first==null,"Native fallback failed");
                 else if (body.StartsWith("if memory.saved"))
                 {
@@ -86,7 +95,9 @@ static class Program
                 context.Dispose(); Check(!ai.HasAiHandler(tactic),"Disposed context retained AI");
             }
         }
-        var shipped=ModDiscovery.DiscoverLoose(Path.Combine(args[1],"Mods")).Mods.Single(m=>m.Id.Value=="example.programmable-ai");
+        ScriptedActorChecks(mods,entry,args[1]);
+        var examples=Directory.Exists(Path.Combine(args[1],"Mods/example.programmable-ai"))?"Mods":"ArchivedMods";
+        var shipped=ModDiscovery.DiscoverLoose(Path.Combine(args[1],examples)).Mods.Single(m=>m.Id.Value=="example.programmable-ai");
         var content=new ModContentCatalog(); var stages=new XmlDocument(); stages.Load(Path.Combine(args[1],"Assets/vanillaXml/stages.xml"));
         CoreContentImporter.ImportWarriorTemplates(content,stages.SelectSingleNode("Stages/Warriors/Templates"));
         var resolver=new AssetResolver(new IAssetProvider[]{new Core(),new LooseModProvider(shipped)});
@@ -112,7 +123,61 @@ static class Program
             }
             ReactiveChecks(ai,shipped.Id.ToString(),ReadNativeCandidates(args[2]));
         }
-        Console.WriteLine("PASS: "+checks+" actual Lua AI decision, shipped AI Dojo, state isolation, action lifetime, fallback and instruction-budget checks. Native combat playtest remains separate.");
+        Console.WriteLine("PASS: "+checks+" actual Lua AI decision, shipped AI Dojo/scripted actor policy, state isolation, action lifetime, fallback and instruction-budget checks. Native combat playtest remains separate.");
+    }
+
+    static void ScriptedActorChecks(string mods,string entry,string root)
+    {
+        // Load the public policy unchanged; the remaining example registers its
+        // character, HUD and fight patch and is covered by the native playtest.
+        string source=File.ReadAllText(Path.Combine(root,"Mods/example.scripted-actors/scripts/main.lua"));
+        int end=source.IndexOf("local character = sf2.warriors.register",StringComparison.Ordinal);
+        Check(end>0,"Public scripted-actor policy boundary is missing");
+        File.WriteAllText(entry,source.Substring(0,end));
+        var mod=ModDiscovery.DiscoverLoose(mods).Mods.Single();
+        var catalog=new ModContentCatalog();
+        using(var tx=catalog.BeginRegistration(mod))
+        using(var context=new MoonSharpScriptRuntime().CreateContext(mod,new ModApiFacade(mod,new AssetResolver(new IAssetProvider[]{new LooseModProvider(mod)}),tx,new ModStateRuntime(),null)))
+        {
+            context.ExecuteEntrypoint(); tx.Commit();
+            var ai=(IModAiScriptContext)context;
+            string tactic=mod.Id+":tactics/sparring";
+            ModAiActionSnapshot Action(string name,string type,int duration,bool looped,params string[] controls)=>
+                new ModAiActionSnapshot(name,type,1,new ModAiActionTiming(0,duration-1,0,looped),controls.Select(c=>new ModAiActionInput(c,"tap")).ToArray());
+            var actions=new[]{
+                Action("short forward","move",40,false,"Forward"),
+                Action("short backward","move",30,false,"Back"),
+                Action("long double step","move",80,false,"Forward"),
+                Action("quick punch","attack",12,false,"Punch"),
+                Action("slower kick","attack",18,false,"Kick"),
+                Action("looping punch","attack",1,true,"Punch"),
+                Action("forward jump","move",5,false,"Forward","Up"),
+            };
+            ModFighterSnapshot Self(int facing,string id="a1",bool actor=true)=>new ModFighterSnapshot(10,10,1,0,0,0,
+                new ModAnimationSnapshot("idle","none",facing,Array.Empty<ModAnimationIntervalSnapshot>()),
+                actor?new ModActorIdentity(id,"fixture:actors/ally","fixture","player"):null);
+            ModFighterSnapshot Target(float x,string team="opponent",bool actor=true)=>new ModFighterSnapshot(10,10,1,x,0,0,
+                actor:actor?new ModActorIdentity("a2","fixture:actors/rival","fixture",team):null);
+            void Decide(object controller,ModFighterSnapshot self,ModFighterSnapshot target,int frame,ModAiActionSnapshot[] available,int expected,string message)
+            {
+                Check(ai.TryDecideAi(tactic,controller,new ModCombatSnapshot(self,target,frame,true),available,out var choice,out var error)&&choice==expected,message+": "+error);
+            }
+            var controller=new object();
+            Decide(controller,Self(1),Target(200),60,actions,0,"Public actor policy did not choose the shortest forward approach");
+            Decide(controller,Self(1),Target(-200),66,actions,1,"Crossing a right-facing actor did not choose backward approach");
+            Decide(controller,Self(-1),Target(-200),72,actions,0,"Left-facing forward approach was reversed");
+            Decide(controller,Self(-1),Target(200),78,actions,1,"Crossing a left-facing actor did not choose backward approach");
+            Decide(controller,Self(1),Target(95),84,actions,3,"Public actor policy did not choose the shortest non-looping contact attack");
+            Decide(controller,Self(1),Target(50),153,actions,-1,"Actor voluntary cooldown ended early");
+            Decide(controller,Self(1),Target(50),154,actions,3,"Actor did not resume after its voluntary cooldown");
+            Decide(new object(),Self(1,"a3"),Target(50),90,actions,3,"Replacement actor inherited another controller's identity or cooldown");
+            Decide(new object(),Self(1),Target(200,"player"),60,actions,-1,"Public actor policy attacked its own team");
+            Decide(new object(),Self(1),Target(50,actor:false),60,actions,-1,"Public actor policy attacked a main fighter");
+            Decide(new object(),Self(1,actor:false),Target(50),60,actions,-1,"Main fighter ran the actor policy");
+            Decide(new object(),Self(1),null,60,actions,-1,"Missing target did not request wait");
+            Decide(new object(),Self(1),Target(50),60,Array.Empty<ModAiActionSnapshot>(),-1,"Empty actor shortlist did not request wait");
+            Decide(new object(),Self(1),Target(50),60,new[]{actions[5]},-1,"Looping attack was selected by the public actor policy");
+        }
     }
 
     static ModAiActionSnapshot[] ReadNativeCandidates(string path)

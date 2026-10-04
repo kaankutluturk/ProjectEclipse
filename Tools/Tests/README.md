@@ -6,6 +6,16 @@ registration, bounds, strict fields, rollback and fingerprints.
 Unity project, checking scoped commands, independent root state, teams,
 death/removal, pause/TTL and surrender cleanup on a controlled core encounter.
 
+Scripted actors: `Combat/TestScriptedActorsUnity.ps1` runs the complete public
+sparring mod/HUD in an isolated Unity fixture. It forbids fixture or Lua manual
+playback and requires Lua-selected native attacks, source-attributed contact in
+both directions, repeated damage after subsequent starts, independent memory/
+identity, unchanged main health and pause/replacement/teardown. Core rig/equipment
+and controlled spacing/input bound the evidence. `Modding/TestModAi.ps1` covers
+copied actor provenance, memory isolation, action lifetime, fallback/budgets and
+real native clip metadata; optional compile/assembly/Unity-reference paths allow
+portable managed builds. Archived original AI/charge fixtures stay supported.
+
 Procedural fighter rendering: `Presentation/TestSculptedSkinRuntime.ps1` checks
 production geometry, cap bounds, normals and animation topology with Unity
 managed math. `Presentation/TestExperimental3DUnity.ps1` runs the full game in a

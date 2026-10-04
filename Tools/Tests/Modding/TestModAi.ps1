@@ -1,3 +1,4 @@
+param([string]$CompileProject='', [string]$AssemblyDirectory='', [string]$UnityManagedDirectory='')
 $ErrorActionPreference = 'Stop'
 $root = Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $PSScriptRoot))
 & (Join-Path $PSScriptRoot 'TestModAiEligibility.ps1')
@@ -7,9 +8,11 @@ $fixture = Join-Path $root ('Temp/ModAi-' + [Guid]::NewGuid().ToString('N'))
 New-Item -ItemType Directory -Force -Path (Join-Path $fixture 'Mods') | Out-Null
 $nativeActions = Join-Path $fixture 'native-actions.json'
 # Keep real compiled native types separate from the controlled eligibility fixtures.
-& (Get-Process -Id $PID).Path -NoProfile -File (Join-Path $PSScriptRoot 'TestModAiNativeContent.ps1') -OutputPath $nativeActions
+& (Get-Process -Id $PID).Path -NoProfile -File (Join-Path $PSScriptRoot 'TestModAiNativeContent.ps1') -OutputPath $nativeActions -CompileProject $CompileProject -AssemblyDirectory $AssemblyDirectory -UnityManagedDirectory $UnityManagedDirectory
 if ($LASTEXITCODE -ne 0) { throw 'Native AI content fixture failed.' }
-Copy-Item -LiteralPath (Join-Path $root 'Mods/example.charge-ui') -Destination (Join-Path $fixture 'Mods') -Recurse
+$chargeExample=Join-Path $root 'Mods/example.charge-ui'
+if(!(Test-Path -LiteralPath $chargeExample)){$chargeExample=Join-Path $root 'ArchivedMods/example.charge-ui'}
+Copy-Item -LiteralPath $chargeExample -Destination (Join-Path $fixture 'Mods') -Recurse
 Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'ValidateModAi.cs') -Destination (Join-Path $fixture 'Program.cs')
 $production = [Security.SecurityElement]::Escape((Join-Path $root 'Temp/Phase1ShowcaseRuntime/bin/Debug/net10.0/Phase1ShowcaseRuntime.dll'))
 $moon = [Security.SecurityElement]::Escape((Join-Path $root 'Library/ScriptAssemblies/MoonSharp.Interpreter.dll'))

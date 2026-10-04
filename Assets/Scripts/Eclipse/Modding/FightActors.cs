@@ -242,6 +242,11 @@ public partial class Fight
         }
         finally{_applyingEclipseActors=false;}
     }
+    internal ModActorIdentity CaptureEclipseActorIdentity(Model model)
+    {
+        if(model==null||!_eclipseActors.TryGetValue(model,out var actor)||actor.Birth!=null||actor.Removing)return null;
+        return new ModActorIdentity(actor.Id,actor.Definition.Id.ToString(),actor.Owner.ToString(),actor.PlayerTeam?"player":"opponent");
+    }
     private bool ActorTeam(Model model) => _eclipseActors.TryGetValue(model,out var actor)?actor.PlayerTeam:model==GetPlayerModel();
     private string ActorTargetId(Model target) => target==null?null:target==GetPlayerModel()?"player":target==GetEnemyModel()?"opponent":_eclipseActors.TryGetValue(target,out var actor)?actor.Id:null;
     // Return a rollback for staging only. Ordinary simulation commits immediately.

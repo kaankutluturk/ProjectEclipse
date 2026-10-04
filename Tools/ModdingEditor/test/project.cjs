@@ -587,3 +587,12 @@ test('Pulse Arena ships mirrored typed marker/sensor example and capabilities',a
  const missing={...mod,data:{...mod.data,capabilities:['content.register']}};const issues=p.analyze('local sf2=require("sf2")\nsf2.behaviors.register{id="x",on_round_begin=function(_,fighter) fighter:mark_rect{x=0,y=0,width=1,height=1} end}\nsf2.world.remove_marker({})',missing).issues;
  assert(issues.some(i=>i.capability==='presentation.visuals'));assert(issues.some(i=>i.code==='callback-timing'));
 });
+
+
+test('scripted actors expose copied provenance and ship a mirrored programmable starter',async()=>{
+ const api=require('../data/api.json');assert.equal(api.types.FighterSnapshot.fields['actor?'],'Eclipse.ActorIdentity');
+ assert.deepEqual(Object.keys(api.types.ActorIdentity.fields),['id','definition','owner','team']);
+ const dir=path.resolve(__dirname,'../../../Mods/example.scripted-actors');const mod=await p.indexMod(dir);assert.deepEqual(mod.issues,[]);
+ assert.deepEqual(p.analyze(await fs.readFile(path.join(dir,'scripts/main.lua'),'utf8'),mod).issues,[]);
+ for(const file of ['mod.toml','README.md','scripts/main.lua'])assert.deepEqual(await fs.readFile(path.join(dir,file)),await fs.readFile(path.resolve(__dirname,'../templates/scripted-actors',file)));
+});

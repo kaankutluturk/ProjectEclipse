@@ -630,7 +630,7 @@ public partial class Fight
             var parameters = model.Parameters;
             return new ModFighterSnapshot(model.KKMCHCNOHMB(), parameters.MaxLife,
                 parameters.HealthBarCount, position.GetX(), position.GetY(), position.GetZ(),
-                ModRuntime.CaptureAnimationSnapshot(model));
+                ModRuntime.CaptureAnimationSnapshot(model),GetCurrentFight()?.CaptureEclipseActorIdentity(model));
         }
         public double Health => _model == null ? 0 : _model.KKMCHCNOHMB();
         public IModFighterOperations Opponent => _fight == null ? null :

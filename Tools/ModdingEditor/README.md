@@ -6,6 +6,12 @@ move playback and dismissal. The `templates/actor-companions` example mirrors
 the playable mod. `combat.actors` is separate from projectile permissions;
 offline non-raid support and native rig limits are described in the wiki.
 
+The `scripted-actors` starter combines actor spawning with `sf2.tactics.register`
+Lua decision callbacks. Fighter/AI observations have optional copied
+`actor = { id, definition, owner, team }` data; main fighters omit it. Completion
+covers those fields, including the absolute player/opponent team. Controller
+`memory` isolates cooldowns per fighter; see the scripted companions wiki guide.
+
 Native hit/damage/block/critical callback event types now include optional
 `attack`: copied kind, contact actor/move, hit point and owned projectile ID/mod.
 Return Dart filters its hit counter using that source. Editor completion covers

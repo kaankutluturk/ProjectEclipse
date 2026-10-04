@@ -15,6 +15,14 @@ or knockout slow mode. `MoonSharpScriptRuntimeActors.cs` exposes registration,
 receipts, scoped actor queries and snapshot/motion/target/health/playback/removal.
 Store plain Lua data by actor ID and reacquire references each callback.
 
+The scripted follow-up adds copied actor provenance to fighter/AI snapshots.
+The public Scripted Actor Sparring example uses the existing Lua tactic callback
+with per-controller memory; actual native acceptance requires Lua-selected
+attacks and repeated bidirectional contact without manual playback. See
+[SCRIPTED_ACTORS_ACCEPTANCE.md](SCRIPTED_ACTORS_ACCEPTANCE.md) for the separate
+30-check run and its limits. This advances programmable actor AI, rather than
+claiming a general per-actor combat callback host.
+
 No separate actor Lua behavior host ships yet. Typed projectile commands retain
 their main-root guard; actors can use native equipment children. Copied attack
 sources identify actor root ID/owner separately from child kind. Definitions

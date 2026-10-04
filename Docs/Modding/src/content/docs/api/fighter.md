@@ -54,6 +54,21 @@ multi-bar opponents, incoming damage operations use single-bar units; do not
 equate the normalized pool with damage points. Divide health by max health for
 a fraction, guarding against a zero maximum.
 
+Each fighter snapshot may also have an `actor` table when the observed root is
+an initialized independent fighter. Main fighters omit it. This applies to
+[actor snapshots](../actors/#actorsnapshot) and [Lua AI observations](../moves-and-tactics/#sf2tacticsregister).
+
+| Actor field | Meaning |
+| --- | --- |
+| `id` | Live fight-local actor instance ID, such as `a1`; changes when a replacement is spawned. |
+| `definition` | Qualified actor definition ID, such as `my.mod:actors/helper`. |
+| `owner` | Mod that owns this actor instance. |
+| `team` | Absolute `"player"` or `"opponent"` team, irrespective of who receives this observation. |
+
+These are copied observations, not actor handles or permissions. Editing them
+cannot retarget, transfer ownership or change a team. Retained snapshots remain
+historical data; reacquire a live scoped actor reference for commands.
+
 Each fighter snapshot also has an optional `animation` table.
 It is `nil` when the native controller is absent, stopped, or cannot provide a
 valid bounded observation. The rest of the fighter snapshot remains available.

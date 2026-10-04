@@ -28,6 +28,7 @@ export default defineConfig({
           { slug: 'guides/projectile-abilities' },
           { slug: 'guides/combine-mods' },
           { slug: 'guides/character-authoring' },
+          { slug: 'guides/scripted-actors' },
           { slug: 'guides/gymnast' },
           { slug: 'api/installing-mods' },
           { slug: 'guides/troubleshooting' },

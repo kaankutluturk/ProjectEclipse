@@ -858,14 +858,15 @@ namespace Eclipse.Modding
         public double Y { get; }
         public double Z { get; }
         public ModAnimationSnapshot Animation { get; }
+        public ModActorIdentity Actor { get; }
         public ModFighterSnapshot(double health, double maxHealth, int healthBars, double x, double y, double z,
-            ModAnimationSnapshot animation = null)
+            ModAnimationSnapshot animation = null, ModActorIdentity actor = null)
         {
             foreach (double value in new[] { health, maxHealth, x, y, z })
                 if (double.IsNaN(value) || double.IsInfinity(value)) throw new ArgumentOutOfRangeException(nameof(health));
             if (health < 0 || maxHealth < 0 || healthBars < 1) throw new ArgumentOutOfRangeException(nameof(health));
             Health = health; MaxHealth = maxHealth; HealthBars = healthBars; X = x; Y = y; Z = z;
-            Animation = animation;
+            Animation = animation;Actor=actor;
         }
     }
 

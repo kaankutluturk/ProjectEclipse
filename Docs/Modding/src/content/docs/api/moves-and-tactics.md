@@ -1102,6 +1102,15 @@ need to restart the fight just to establish those observations. This readiness
 behavior also supports [independent fighters](../actors/) registered and spawned
 through the actor API. Actor-specific Lua behavior hosts remain separate work.
 
+Initialized [independent fighters](../actors/) also expose optional copied
+`event.self.actor` and `event.opponent.actor` tables with `id`, `definition`,
+`owner` and absolute `team` (`"player"` or `"opponent"`). Main fighter roots omit
+this field. Actor IDs identify live instances within this fight, not saved
+characters. Editing the table cannot change ownership, targets or teams.
+Use a nil check when the current target may be a main fighter. The
+[scripted companions guide](../../guides/scripted-actors/) combines this data
+with per-controller memory and native action selection.
+
 `memory` is a plain Lua table private to this native fighter controller and this
 tactic. It survives decisions on that controller, not save/reload or controller
 replacement. Persist deliberate profile data through the owned state API.

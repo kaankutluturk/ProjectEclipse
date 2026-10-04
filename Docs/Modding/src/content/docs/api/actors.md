@@ -4,7 +4,7 @@ description: Summon, observe, guide and dismiss fighters owned by your mod.
 ---
 
 Actors are additional native fighters, with independent health, equipment,
-animation and optional native AI. Register a warrior, describe an actor using
+animation and optional native or Lua-directed AI. Register a warrior, describe an actor using
 that warrior, then spawn it from a main fighter's combat callback. An actor can
 be an ally or an adversary. Use ordinary Lua to guide it; no operation language
 or native model access is needed.
@@ -15,8 +15,11 @@ and a living main fighter. Local versus, PvP, raids and encounters containing
 unmanaged extra fighters reject spawning. Definitions are not permission to
 spawn during menu or round lifecycle callbacks.
 
-Native AI uses the warrior's tactic and equipment. There is no independent Lua
-behavior host attached to each actor yet: run your logic in the spawning fighter's
+AI uses the warrior's tactic and equipment. A tactic registered with
+`on_decide` runs with private memory for each actor's native controller. Its
+`event.self.actor` and `event.opponent.actor` provide copied identity/owner/team
+observations; see [scripted companions](../../guides/scripted-actors/). A general
+Lua combat behavior host is not attached to each actor yet: run your logic in the spawning fighter's
 behavior, reacquire actor references on each callback, and store plain data keyed
 by snapshot IDs. Actors are separate from [weapon-child projectiles](../projectiles/).
 Typed projectile spawning/queries currently require a main fighter; an actor
@@ -55,7 +58,7 @@ local ally = sf2.actors.register {
 | `id` | Required local definition ID; becomes `<mod-id>:actors/<id>`. |
 | `character` | Required registered warrior handle, visible through declared dependencies. |
 | `team` | `"owner"` (default) or `"opponent"`, relative to the spawning main fighter. |
-| `ai` | Boolean, default `true`. Uses the warrior's native tactic; `false` allows manual Lua guidance. |
+| `ai` | Boolean, default `true`. Uses the warrior's native or Lua-directed tactic; `false` allows manual Lua guidance. |
 | `lifetime_frames` | Integer 1–36000, default 1800; simulation frames starting after native birth initialization. |
 | `max_health` | Finite number 0.01–100, default 1. Native health units: 1 is a full normal fighter's health pool. |
 
