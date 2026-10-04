@@ -1,5 +1,17 @@
 # Regression tests and validators
 
+Generated character packages: `Animation/TestGymnastPipeline.ps1` (under Tools)
+verifies Blender/Gymnast pose export, watched/playable roles, exact payloads and
+real Lua registration, then the recovered Unity reader. `CharacterForms/
+TestPackagedCharacterUnity.ps1 -Package <generated integration mod>` runs that
+unchanged package in a marked full-game project/fresh profile, checking native
+Punch playback in both facings, wrist motion, planar weighted skin helpers,
+opponent Lua AI and cleanup. Use `-OpponentOnly` for the default package role.
+This fixture expects the supplied integration scene/skin, not an arbitrary mod.
+`Modding/TestTacticProjection.ps1` separately projects actual standalone and
+templated definitions into the native tactic compiler/parser. See
+[packaged character acceptance](../../Docs/Engineering/Modding/PACKAGED_CHARACTER_ACCEPTANCE.md).
+
 Editable mod UI: `Modding/TestModUiRuntime.ps1` covers typed text validation,
 state/ownership, notifications and input eligibility; `TestModUiLua.ps1` exercises
 actual Lua bindings, malformed values, handles and callback budgets.

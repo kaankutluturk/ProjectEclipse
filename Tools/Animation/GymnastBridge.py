@@ -137,7 +137,7 @@ def export(args):
         args.output.with_suffix('.export.json').write_text(json.dumps(report, indent=2), encoding='utf-8')
         if args.package:
             PackageCharacter.package(args.rig, args.output, args.skin, args.package,
-                                     args.mod_id, args.title, args.mid_frames)
+                                     args.mod_id, args.title, args.mid_frames, playable=args.playable)
         print('GYMNAST EXPORT VERIFIED:', json.dumps(report))
     finally:
         scene.frame_set(previous)
@@ -154,7 +154,10 @@ def main():
     parser.add_argument('--mod-id')
     parser.add_argument('--title', default='Character Preview')
     parser.add_argument('--mid-frames', type=int, choices=range(9), default=0)
+    parser.add_argument('--playable', action='store_true', help='Package a player-controlled exported character preview')
     args = parser.parse_args(sys.argv[sys.argv.index('--') + 1:])
+    if args.playable and (args.command != 'export' or not args.package):
+        parser.error('--playable requires export and --package')
     if args.command == 'open':
         addon(args.suite)
         bindings(pipeline.model(args.rig))

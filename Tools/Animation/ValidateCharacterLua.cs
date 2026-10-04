@@ -17,6 +17,7 @@ static class Program
         var catalog=new ModContentCatalog(); var stages=new XmlDocument(); stages.Load(args[1]);
         CoreContentImporter.ImportWarriorTemplates(catalog,stages.SelectSingleNode("Stages/Warriors/Templates"));
         bool packaged=args.Length>2 && bool.Parse(args[2]);
+        bool playable=args.Length>3 && bool.Parse(args[3]);
         var assets=new AssetResolver(new IAssetProvider[]{new PreviewCore(),new LooseModProvider(mod)});
         using(var tx=catalog.BeginRegistration(mod))
         using(var script=new MoonSharpScriptRuntime().CreateContext(mod,new ModApiFacade(mod,assets,tx,new ModStateRuntime(),null)))
@@ -32,6 +33,8 @@ static class Program
                     throw new Exception("Move bounds must index native samples independently of interpolation spacing");
                 var mode=catalog.Modes.Single();
                 var fight=catalog.Fights.Single();
+                if(fight.PlayerCharacter!=(playable?(DefinitionId?)warrior.Id:null))
+                    throw new Exception("Packaged player selection differs from the requested preview role");
                 if(fight.Warriors.Single()!=warrior.Id || mode.Fights.Single()!=fight.Id || !mode.Repeatable || catalog.Quests.Count!=1)
                     throw new Exception("Packaged character is not connected to its repeatable map preview");
                 var ai=(IModAiScriptContext)script;

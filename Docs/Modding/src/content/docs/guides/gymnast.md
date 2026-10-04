@@ -61,6 +61,35 @@ python Tools/Animation/PackageCharacter.py --rig Temp/CharacterCore/models/mdl_s
 
 This path validates file structure; only the Blender bridge can compare the output with its source pose. Neither path rescales, reorders or rewrites the animation bytes. Eclipse stores the same payload as `assets/animations/authored.bytes`.
 
+### Play your exported character
+
+Add `--playable` to the bridge's `export --package` command, or to the standalone
+packager. The generated fight then uses your owned warrior as its player and as
+its AI opponent. Without the flag, the player keeps the normal campaign character
+and only the opponent uses the export. The option defaults to false; it does not
+change the model or animation bytes, rig order, timing, or campaign profile.
+
+```powershell
+python Tools/Animation/PackageCharacter.py --rig Temp/CharacterCore/models/mdl_skeleton.xml --animation Temp/MyGymnast/punch.bin --skin Temp/MyGymnast/skin.xml --output Temp/MyGymnast/local.playable-character --mod-id local.playable-character --playable
+```
+
+Enable the complete generated mod and enter its map preview. Punch plays your
+primary clip; additional clips use their declared controls. The opponent uses
+its generated Lua tactic to choose eligible authored clips. The generated move
+conditions, events and intervals use the current declarative Lua format. Moves
+use `direction = "face_enemy"` to face the opponent when playback starts. For
+example, `{ character = character }` restricts your Punch override to this
+warrior. The encounter's [`player_character`](../../api/content-graph/#sf2fightsregister)
+selects the owned warrior; no combat form-swap or persistent profile replacement
+is needed. Use a fresh package path to preserve earlier authored work.
+
+`--playable` on the Blender bridge requires `export` and `--package`; using it for
+prepare/open or an unpackaged binary is an error. It combines with standalone
+`--clip` packaging, including each clip's control and timing. It changes only the
+generated encounter role and player instructions. The primary and additional
+preview moves have no attack intervals; inherited native attacks can still deal
+damage. To build a combat moveset, add the typed attacks and hit timing in Lua.
+
 ### Package several animations together
 
 Export each motion separately with the same dependency rig, then add named clips
@@ -100,13 +129,13 @@ The package contains a manifest, native assets, localization, `scripts/character
 
 Copy the complete `local.character-preview` folder into Eclipse's `Mods` directory, preserving any existing work under that ID. Enable it through **Mods → Apply & Restart** and find **Character Preview** using the bottom map-page dots.
 
-The repeatable fight uses your authored warrior. Its Lua AI selects eligible authored clips with a pause between requests. This allows you to watch the export without creating another fight script. Preview moves do no attack damage; entry costs and rewards are empty.
+The repeatable fight uses your authored warrior as the opponent, and also as the player when packaged with `--playable`. Its Lua AI selects eligible authored clips with a pause between requests. This allows you to watch the export without creating another fight script. Authored preview moves have no attack intervals; inherited native moves can still deal damage. Entry costs and rewards are empty.
 
 Edit `scripts/character.lua` to add the [typed attack intervals](../../api/moves-and-tactics/), change input conditions or supply your own tactic. `scripts/main.lua` is ordinary mod code and can be replaced by your own battles. Inspect both facing directions, rig/skin deformation, equipment attachment, movement, hit reactions and contact timing. A successful binary read does not establish all of those behaviors.
 
 ## Verification and limits
 
-`Tools/Animation/TestGymnastPipeline.ps1 -Blender <executable> -Suite <checkout>` exercises the supplied IK/body scene, an authored hand motion, upstream model and animation exports, source-pose comparison, packaging, real Lua map/mode/AI bindings, and the unchanged Unity animation reader. It writes an inspection render and test artifacts under `Temp`.
+`Tools/Animation/TestGymnastPipeline.ps1 -Blender <executable> -Suite <checkout>` exercises the supplied IK/body scene, an authored hand motion, upstream model and animation exports, source-pose comparison, packaging, real Lua map/mode/AI bindings, the watched and playable package roles, and the unchanged Unity animation reader. It writes an inspection render and test artifacts under `Temp`.
 
 `Tools/Tests/Modding/TestModAiEligibility.ps1` executes the recovered AI shortlist and priority
 methods with controlled model/animation services. It checks that character
@@ -116,3 +145,19 @@ exercise Lua clip cycling, pacing and unavailable-clip fallback. Neither test
 simulates contact physics or proves that authored geometry looks correct in a fight.
 
 The [low-level point-rig tools](../character-authoring/) remain available for format work. They also include [explicit armature retargeting](../character-authoring/#retarget-motion-from-another-blender-armature) using a creator-supplied bone mapping and calibration frame. They are not the recommended visual authoring interface. Automatic skeleton matching, arbitrary Blender shaders, complete custom character controllers/forms and full-game visual/combat acceptance remain separate requirements.
+
+The full-game `Tools/Tests/CharacterForms/TestPackagedCharacterUnity.ps1` runner
+accepts a generated Gymnast integration package. It uses a marked isolated
+project and fresh profile to check native models/weighted skin helpers, player
+selection, native Punch dispatch, both facing directions, exported point motion,
+opponent Lua AI and cleanup. Its controlled test uses the canonical 67-point
+rig and the integration scene/skin; it is not arbitrary mesh/rig, attack-contact,
+physical-device, mobile, or exported-platform acceptance. Existing format and
+reader checks remain narrower than a game playtest.
+
+Both generated roles have full-game acceptance in Unity 6.6: 28 checks for the
+playable package and 16 for the default opponent-only package. The exported test
+skin is a small original triangle bound to head landmarks. Native macro-node
+weights update XY only; these checks do not prove animated skin depth or a
+complete original outfit. Exported preview clips still need authored attack
+intervals before they become damaging combat moves.

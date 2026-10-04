@@ -31,7 +31,8 @@ class PackageTests(unittest.TestCase):
         self.assertIn('mid_frames = 2', module)
         self.assertIn('end_frame = 1', module)
         self.assertIn('on_decide', module)
-        self.assertIn('type = "character"', module)
+        self.assertIn('{ character = character }', module)
+        self.assertIn('direction = "face_enemy"', module)
         self.assertIn('sf2.quests.register', (target / 'scripts/main.lua').read_text())
         report = json.loads((target / 'assets/animations/authored.rig.json').read_text())
         self.assertEqual(report['nodes'], ['NHeel_1', 'NTop'])
@@ -46,6 +47,36 @@ class PackageTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'NTop'):
             packager.package(self.rig, self.clip, [], target, 'test.character')
         self.assertFalse(target.exists())
+
+    def test_playable_preview_selects_owned_player_without_rewriting_assets(self):
+        target = self.root / 'test.character'
+        packager.package(self.rig, self.clip, [], target, 'test.character', playable=True)
+        main = (target / 'scripts/main.lua').read_text(encoding='utf-8')
+        self.assertIn('player_character = authored.warrior', main)
+        self.assertIn('warriors = { authored.warrior }', main)
+        self.assertNotIn('player_character', packager.preview_main(False))
+        self.assertEqual((target / 'assets/animations/authored.bytes').read_bytes(), self.clip.read_bytes())
+        self.assertEqual((target / 'assets/models/body.xml').read_bytes(), self.rig.read_bytes())
+        self.assertIn('You control the exported character', (target / 'README.md').read_text(encoding='utf-8'))
+        self.assertIn('Play the authored character', (target / 'localizations/eng.toml').read_text(encoding='utf-8'))
+        for value in (1, None, 'true'):
+            with self.subTest(value=value), self.assertRaisesRegex(ValueError, 'boolean'):
+                packager.package(self.rig, self.clip, [], self.root / 'test.invalid', 'test.invalid', playable=value)
+        self.assertFalse((self.root / 'test.invalid').exists())
+
+    def test_playable_cli_keeps_multiple_clip_controls_and_atomic_rejection(self):
+        target = self.root / 'test.character'
+        subprocess.run([sys.executable, str(Path(packager.__file__)), '--rig', str(self.rig),
+                        '--animation', str(self.clip), '--output', str(target), '--mod-id', 'test.character',
+                        '--playable', '--clip', 'kick', 'Kick', '2', str(self.clip)], check=True, capture_output=True)
+        self.assertIn('player_character = authored.warrior', (target / 'scripts/main.lua').read_text(encoding='utf-8'))
+        metadata = json.loads((target / 'assets/animations/kick.rig.json').read_text(encoding='utf-8'))
+        self.assertEqual((metadata['control'], metadata['mid_frames']), ('Kick', 2))
+        failed = self.root / 'test.failed'
+        with self.assertRaisesRegex(ValueError, 'Clip kick'):
+            packager.package(self.rig, self.clip, [], failed, 'test.failed', playable=True,
+                             extra_clips=[{'name': 'kick', 'path': self.root / 'missing.bin', 'key': 'Kick', 'mid_frames': 0}])
+        self.assertFalse(failed.exists())
 
     def test_invalid_identity_and_incompatible_skin(self):
         for name in ['core', '../bad', 'Uppercase']:

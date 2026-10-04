@@ -684,6 +684,14 @@ namespace Eclipse.Modding
             AppendTacticValue(document, node, "DodgeMagicChance", definition.DodgeMagic);
             AppendTacticAnimationList(document, node, "QuickAttacks", "QuickAttackChance", definition.QuickAttacks);
             AppendTacticAnimationList(document, node, "Evades", "EvadeChance", definition.Evades);
+            if (definition.CoreTemplate.Length == 0)
+            {
+                // The native parser requires these containers even when a Lua
+                // tactic declares no native attack/evade scoring entries. Leave
+                // templated omissions intact so the compiler can inherit them.
+                if (node["QuickAttacks"] == null) node.AppendChild(document.CreateElement("QuickAttacks"));
+                if (node["Evades"] == null) node.AppendChild(document.CreateElement("Evades"));
+            }
             AppendTacticAnimationList(document, node, "ExpectedWait", "Animation", definition.ExpectedWait);
             if (definition.MemoryStrikes != 0 || definition.MemoryRoundFactor != 0f)
             {

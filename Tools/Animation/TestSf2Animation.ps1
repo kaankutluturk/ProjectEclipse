@@ -4,7 +4,7 @@ param(
     [int]$ExpectedNodes = 67,
     [switch]$WithMovePreview,
     [int]$TimeoutSeconds = 180,
-    [string]$Unity = 'F:\UnityInstalls\2022.3.62f3\Editor\Unity.exe'
+    [string]$Unity = 'F:\UnityInstalls\6000.6.0f1\Editor\Unity.exe'
 )
 
 $ErrorActionPreference = 'Stop'
@@ -16,14 +16,14 @@ foreach ($directory in @('Assets/Editor','Packages','ProjectSettings')) {
     New-Item -ItemType Directory -Path (Join-Path $fixture $directory) -Force | Out-Null
 }
 [IO.File]::WriteAllText((Join-Path $fixture 'Packages/manifest.json'), '{"dependencies":{}}')
-[IO.File]::WriteAllText((Join-Path $fixture 'ProjectSettings/ProjectVersion.txt'), "m_EditorVersion: 2022.3.62f3`n")
+[IO.File]::WriteAllText((Join-Path $fixture 'ProjectSettings/ProjectVersion.txt'), "m_EditorVersion: 6000.6.0f1`n")
 
 # Compile the exact recovered reader method, extracted from the working tree.
 # Only its containing class is reduced to the two fields the method uses.
 $source = Get-Content -Raw -LiteralPath (Join-Path $root 'Assets/Scripts/Assembly-CSharp/InfoAnimation.cs')
 $method = [regex]::Match($source, '(?s)\tprivate void ReadAnimation\(byte\[\] data\).*?(?=\r?\n\tprivate void BAIMGDMKILA)')
 if (!$method.Success) { throw 'Recovered reader boundary changed; review the fixture extractor.' }
-$reader = "using UnityEngine;`npublic class RecoveredAnimationReader {`npublic Vector3[][] _AnimationContainer;`npublic int LHHAGECFIOL;`npublic void Read(byte[] data) { ReadAnimation(data); }`n" + $method.Value + "`n}`n"
+$reader = "using UnityEngine;`npublic class RecoveredAnimationReader {`npublic Vector3[][] _AnimationContainer;`npublic int AnimationEndFrame;`npublic void Read(byte[] data) { ReadAnimation(data); }`n" + $method.Value + "`n}`n"
 [IO.File]::WriteAllText((Join-Path $fixture 'Assets/Editor/RecoveredAnimationReader.cs'), $reader)
 Copy-Item -LiteralPath (Join-Path $root 'Assets/Scripts/Assembly-CSharp/BinaryReaderNekki.cs') -Destination (Join-Path $fixture 'Assets/Editor/BinaryReaderNekki.cs')
 Copy-Item -LiteralPath $animationPath -Destination (Join-Path $fixture 'Assets/sample.bytes')

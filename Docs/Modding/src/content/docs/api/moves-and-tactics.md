@@ -12,8 +12,8 @@ Native equipment can use a different AI table group from its animation subtype. 
 Use plain declarative tables to describe moves. A condition names its kind,
 points name the rig object, and a timeline groups actions by their frame or event.
 The C# binding validates these tables and projects them into native move data;
-no Lua helper library is required. Long-form move tables remain temporarily
-accepted while test fixtures are migrated. New content should use the short form.
+no Lua helper library is required. Move declarations use the short form; obsolete
+long-form fields are rejected as described below.
 
 ```lua
 local sf2 = require("sf2")
@@ -907,7 +907,7 @@ Triggers use these supported native actions. For procedural gameplay logic, use 
 
 **Requires:** `content.register`.
 
-Requires `id`. `type` defaults to `"tabular"` (`sf2.tactics.TABULAR`); `"random"` (`RANDOM`) is also supported. `template` optionally names an existing native tactic to inherit, such as `"Standard"`. Optional `memory` has `strikes` (integer, default `0`) and `round_factor` (number, default `0`).
+Requires `id`. `type` defaults to `"tabular"` (`sf2.tactics.TABULAR`); `"random"` (`RANDOM`) is also supported. `template` optionally names an existing native tactic to inherit, such as `"Standard"`. When no template is supplied, empty quick-attack and evade scoring lists are valid and initialize without inheriting native entries. Use an explicit template for native fallback scoring, or supply your own lists/handler. Optional `memory` has `strikes` (integer, default `0`) and `round_factor` (number, default `0`).
 
 ```lua
 local training_ai = sf2.tactics.register {

@@ -23,9 +23,17 @@ an AI opponent that cycles through eligible authored moves. Add clips with
 output files and the shared rig requirements. The supplied upstream checkout
 is loaded unchanged; no third-party add-on or scene is bundled here.
 
+Add `--playable` to `PackageCharacter.py` or `GymnastBridge.py export --package`
+to use the exported warrior as the preview's player, with the same generated
+opponent. Default watched previews retain the campaign player. This reuses the
+public fight player_character selection and current move short-form tables;
+it leaves source/native asset bytes, profile and timing intact. Authored preview
+moves have no attack intervals; inherited moves can still deal damage.
+
 Run `TestGymnastPipeline.ps1 -Blender <exe> -Suite <checkout>` for the real Blender,
-Lua and Unity-reader integration fixture. Full-game deformation, input and hit
-contact remain separate acceptance checks. The older `BlenderCharacter.py` tool
+Lua and Unity-reader integration fixture. The full-game `Tools/Tests/CharacterForms/TestPackagedCharacterUnity.ps1` checks
+controlled generated Gymnast player input, both facings, point/skin binding and
+AI playback. Hit contacts, physical devices and arbitrary rigs remain separate. The older `BlenderCharacter.py` tool
 is a low-level point-rig workflow, not the primary visual authoring experience.
 
 The offline `CharacterPipeline.py` model validator matches the runtime authored

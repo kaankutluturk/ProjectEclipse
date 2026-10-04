@@ -467,6 +467,11 @@ The generated package includes ordinary `scripts/character.lua` and `scripts/mai
 using the public API; no new Lua binding or editor schema is introduced. Blender scene
 preparation, node/pose validation and native export tests are separate from editor
 completion and diagnostics. Keep source scenes outside the distributed mod.
+The bridge's `export --package --playable` and standalone packager's `--playable`
+select the exported warrior for the generated fight's player through the existing
+typed `player_character` field. Default packages retain the normal campaign
+player. Generated moves use current short-form conditions, controlled events and
+typed interval bounds; packaging does not alter the exported animation payload.
 
 
 Adds `sf2.quests.suppress { target = "..." }` with `content.patch`.

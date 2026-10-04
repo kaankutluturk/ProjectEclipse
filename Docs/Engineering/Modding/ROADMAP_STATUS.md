@@ -2,6 +2,13 @@
 
 Last broad reconciliation: 2026-09-12. Scope remains **G01–G14 plus E1–E8**.
 
+2026-10-04 playable export workflow: Blender/Gymnast and standalone packaging
+now offer `--playable`, using the owned fight player-character contract. Current
+short-form generation, explicit native facing and standalone tactic initialization
+are repaired. Complete Blender/Lua/reader checks and a controlled full-game
+playable package pass; arbitrary rigs/skins/controllers, exported platforms and
+the complete creator acceptance remain open. See PACKAGED_CHARACTER_ACCEPTANCE.md.
+
 2026-10-04 actor projectile abilities: settled independent roots now use typed
 projectile spawning/queries and Lua motion. Retirement cancels queued births and
 live children while preserving siblings. Ranged Companion Duel passes 49 native

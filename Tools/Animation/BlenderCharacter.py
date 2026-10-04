@@ -170,13 +170,13 @@ local move = sf2.moves.register {
     id = "authored_move", animation = sf2.assets.binary("animations/authored"),
     core_templates = { "Controlled", "NotTitan" }, type = "MOVE", priority = 150,
     mid_frames = 0, first_frame = 0, end_frame = LAST, mirror_node = "NHeel_1",
-    events = { "key_pressed" },
+    events = "controlled", direction = "face_enemy",
     conditions = {
-        { type = "character", warrior = character },
-        { type = "keys", keys = { { key = "Punch", press = "Tap" } } },
-        { type = "current_interval", name = "Uninterrupt", ["not"] = true },
+        { character = character },
+        { key = "Punch" },
+        { not_interval = "Uninterrupt" }, { controllable = true },
     },
-    intervals = { { name = "Uninterrupt", start = 0, ["end"] = LAST } },
+    intervals = { { name = "Uninterrupt", to = LAST } },
 }
 return { warrior = character, move = move }
 '''.replace('SKINS', 'skin_models = { sf2.assets.model("models/skin") },' if skin is not None else '').replace('LAST', str(len(clip['frames']) - 1))

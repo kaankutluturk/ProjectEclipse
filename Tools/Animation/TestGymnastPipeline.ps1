@@ -1,6 +1,7 @@
 param(
     [Parameter(Mandatory=$true)][string]$Blender,
-    [Parameter(Mandatory=$true)][string]$Suite
+    [Parameter(Mandatory=$true)][string]$Suite,
+    [string]$Unity = 'F:\UnityInstalls\6000.6.0f1\Editor\Unity.exe'
 )
 $ErrorActionPreference='Stop'
 $root=Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
@@ -27,5 +28,11 @@ $spaced=Join-Path $fixture 'local.gymnast-spaced'
 python (Join-Path $PSScriptRoot 'PackageCharacter.py') --rig $rig --animation $clip --skin (Join-Path $authored 'skin.xml') --output $spaced --mod-id local.gymnast-spaced --mid-frames 2
 if ($LASTEXITCODE -ne 0) { throw 'Interpolated sample packaging failed.' }
 & (Join-Path $PSScriptRoot 'TestCharacterLua.ps1') -Package $spaced -Packaged
-& (Join-Path $PSScriptRoot 'TestSf2Animation.ps1') -Animation $clip -ExpectedFrames 60 -ExpectedNodes 67
+$playable=Join-Path $fixture 'local.gymnast-playable'
+$playableClip=Join-Path $authored 'playable.bin'
+& $Blender --background --factory-startup (Join-Path $authored 'authored.blend') --python-exit-code 1 --python $bridge -- export --suite $Suite --rig $rig --output $playableClip --skin (Join-Path $authored 'skin.xml') --package $playable --mod-id local.gymnast-playable --playable
+if ($LASTEXITCODE -ne 0) { throw 'Playable Gymnast export/package failed.' }
+if ((Get-FileHash -LiteralPath $clip).Hash -ne (Get-FileHash -LiteralPath $playableClip).Hash) { throw 'Playable packaging rewrote the native animation.' }
+& (Join-Path $PSScriptRoot 'TestCharacterLua.ps1') -Package $playable -Packaged -Playable
+& (Join-Path $PSScriptRoot 'TestSf2Animation.ps1') -Animation $clip -ExpectedFrames 60 -ExpectedNodes 67 -Unity $Unity
 Write-Output "Gymnast acceptance fixture: $fixture"

@@ -1,5 +1,6 @@
-param([Parameter(Mandatory=$true)][string]$Package, [switch]$Packaged)
+param([Parameter(Mandatory=$true)][string]$Package, [switch]$Packaged, [switch]$Playable)
 $ErrorActionPreference='Stop'
+if ($Playable -and !$Packaged) { throw '-Playable requires -Packaged.' }
 $root=Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
 & (Join-Path $root 'Tools/Tests/Modding/TestPhase1ShowcaseRuntime.ps1')
 $fixture=Join-Path $root ('Temp/CharacterLua-'+[Guid]::NewGuid().ToString('N'))
@@ -28,7 +29,7 @@ sf2.moves.register {
     id='attack',animation=sf2.assets.binary('animations/authored'),type='ATTACK',end_frame=59,
     events={'key_pressed'},
     conditions={{character=authored.warrior},{key='Kick',press='Tap'}},
-    intervals={{type='Attack',start=6,['end']=8,attack={edges={'ECalf_2'},damage=0.12,impulse={x=245,z=350}}}},
+    intervals={{type='Attack',from=6,to=8,attack={edges={'ECalf_2'},damage=0.12,impulse={x=245,z=350}}}},
 }
 '@ | Set-Content -Encoding UTF8 -LiteralPath (Join-Path $mod 'scripts/main.lua')
 if ($Packaged) { Copy-Item -LiteralPath (Join-Path $Package 'scripts/main.lua') -Destination (Join-Path $mod 'scripts/main.lua') -Force }
@@ -41,5 +42,5 @@ $moon=[Security.SecurityElement]::Escape((Join-Path $root 'Library/ScriptAssembl
 <Reference Include="MoonSharp.Interpreter"><HintPath>$moon</HintPath></Reference>
 </ItemGroup></Project>
 "@ | Set-Content -Encoding UTF8 -LiteralPath (Join-Path $fixture 'CharacterLua.csproj')
-dotnet run --project (Join-Path $fixture 'CharacterLua.csproj') -- (Join-Path $fixture 'Mods') (Join-Path $root 'Assets/vanillaXml/stages.xml') $Packaged.IsPresent
+dotnet run --project (Join-Path $fixture 'CharacterLua.csproj') -- (Join-Path $fixture 'Mods') (Join-Path $root 'Assets/vanillaXml/stages.xml') $Packaged.IsPresent $Playable.IsPresent
 if ($LASTEXITCODE -ne 0) { throw 'Authored character Lua test failed.' }

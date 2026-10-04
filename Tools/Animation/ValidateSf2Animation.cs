@@ -1,4 +1,4 @@
-// Compiled only by TestSf2Animation.ps1 in an isolated Unity 2022.3 project.
+// Compiled only by TestSf2Animation.ps1 in an isolated matching Unity editor project.
 using System;
 using System.IO;
 using UnityEditor;
@@ -25,7 +25,7 @@ public static class ValidateSf2Animation
             reader.Read(data);
             Vector3[][] frames = reader._AnimationContainer;
             Require(frames.Length == frameCount, "Frame count mismatch");
-            Require(reader.LHHAGECFIOL == frameCount - 1, "EndFrame mismatch");
+            Require(reader.AnimationEndFrame == frameCount - 1, "EndFrame mismatch");
             Require(data.Length == 4 + frameCount * (5 + nodeCount * 12), "Binary length mismatch");
             int checks = 4;
             for (int i = 0; i < frames.Length; i++)

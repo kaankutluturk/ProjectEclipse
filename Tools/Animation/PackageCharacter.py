@@ -47,13 +47,13 @@ local move = sf2.moves.register {
     id = "authored_move", animation = sf2.assets.binary("animations/authored"),
     core_templates = { "Controlled", "NotTitan" }, type = "MOVE", priority = 150,
     mid_frames = SPACING, first_frame = 0, end_frame = LAST, mirror_node = "NHeel_1",
-    events = { "key_pressed" },
+    events = "controlled", direction = "face_enemy",
     conditions = {
-        { type = "character", warrior = character },
-        { type = "keys", keys = { { key = "Punch", press = "Tap" } } },
-        { type = "current_interval", name = "Uninterrupt", ["not"] = true },
+        { character = character },
+        { key = "Punch" },
+        { not_interval = "Uninterrupt" }, { controllable = true },
     },
-    intervals = { { type = "Uninterrupt", start = 0, ["end"] = LAST } },
+    intervals = { { name = "Uninterrupt", to = LAST } },
 }
 return { warrior = character, move = move }
 '''.replace('SKINS', skins).replace('SPACING', str(mid_frames)).replace('LAST', str(frame_count - 1))
@@ -66,13 +66,13 @@ return { warrior = character, move = move }
     id = NAME, animation = sf2.assets.binary(ASSET),
     core_templates = { "Controlled", "NotTitan" }, type = "MOVE", priority = 150,
     mid_frames = SPACING, first_frame = 0, end_frame = LAST, mirror_node = "NHeel_1",
-    events = { "key_pressed" },
+    events = "controlled", direction = "face_enemy",
     conditions = {
-        { type = "character", warrior = character },
-        { type = "keys", keys = { { key = KEY, press = "Tap" } } },
-        { type = "current_interval", name = "Uninterrupt", ["not"] = true },
+        { character = character },
+        { key = KEY },
+        { not_interval = "Uninterrupt" }, { controllable = true },
     },
-    intervals = { { type = "Uninterrupt", start = 0, ["end"] = LAST } },
+    intervals = { { name = "Uninterrupt", to = LAST } },
 }'''.replace('NAME', json.dumps(clip['name'])).replace('ASSET', json.dumps('animations/' + clip['name']))
                          .replace('KEY', json.dumps(clip['key'])).replace('SPACING', str(clip['mid_frames']))
                          .replace('LAST', str(clip['frames'] - 1)))
@@ -114,8 +114,17 @@ sf2.quests.register {
 '''
 
 
-def package(rig_path, animation_path, skins, destination, mod_id, title='Character Preview', mid_frames=0, extra_clips=()):
+def preview_main(playable):
+    if not playable:
+        return PREVIEW_MAIN
+    return PREVIEW_MAIN.replace('location = location, warriors = { authored.warrior }',
+                                'location = location, player_character = authored.warrior, warriors = { authored.warrior }')
+
+
+def package(rig_path, animation_path, skins, destination, mod_id, title='Character Preview', mid_frames=0, extra_clips=(), playable=False):
     destination = Path(destination).resolve()
+    if type(playable) is not bool:
+        raise ValueError('playable must be a boolean')
     if not re.fullmatch(r'[a-z0-9][a-z0-9_.-]{0,127}', mod_id) or mod_id in ('core', 'sf2de'):
         raise ValueError('Choose a non-reserved lowercase mod ID')
     if destination.name != mod_id:
@@ -176,16 +185,17 @@ def package(rig_path, animation_path, skins, destination, mod_id, title='Charact
             shutil.copyfile(path, staging / f'assets/models/skin{i}.xml')
         module = character_module(len(clip['frames']), len(skins), mid_frames, clips[1:])
         (staging / 'scripts/character.lua').write_text(module, encoding='utf-8')
-        (staging / 'scripts/main.lua').write_text(PREVIEW_MAIN, encoding='utf-8')
+        (staging / 'scripts/main.lua').write_text(preview_main(playable), encoding='utf-8')
         (staging / 'mod.toml').write_text(
             f'schema = 1\nid = {json.dumps(mod_id)}\nname = {json.dumps(title, ensure_ascii=False)}\n'
             'version = "1.0.0"\nauthors = ["Local author"]\n'
             'entrypoint = "scripts/main.lua"\ncapabilities = ["content.register"]\n'
             '[[dependencies]]\nid = "core"\nversion = ">=1.0 <2.0"\n', encoding='utf-8')
         label = json.dumps(title, ensure_ascii=False)
+        description = 'Play the authored character against its AI counterpart.' if playable else 'Watch the authored motion.'
         (staging / 'localizations/eng.toml').write_text(
             f'title = {label}\nzones/preview = {label}\nfighter = "Authored Fighter"\n'
-            'description = "Watch the authored motion. This preview move deals no damage."\n', encoding='utf-8')
+            f'description = "{description} Authored preview moves deal no damage."\n', encoding='utf-8')
         for entry in clips:
             metadata = {'version': 1, 'fps': 60, 'mid_frames': entry['mid_frames'], 'frames': entry['frames'], 'control': entry['key'],
                         'nodes': entry['clip']['names'], 'rig_sha256': hashlib.sha256(Path(rig_path).read_bytes()).hexdigest(),
@@ -194,10 +204,15 @@ def package(rig_path, animation_path, skins, destination, mod_id, title='Charact
             preview_clip = dict(entry['clip'], fps=60 / (entry['mid_frames'] + 1))
             preview_name = 'preview.html' if entry['name'] == 'authored' else f"preview-{entry['name']}.html"
             pipeline.preview(staging / preview_name, rig, preview_clip)
+        player_guide = ('You control the exported character; the opponent uses the same warrior with its AI tactic. '
+                        'Punch plays the primary export; additional clips use the controls listed below. '
+                        'The encounter selection does not change your campaign character or equipment. '
+                        if playable else 'The player keeps the normal campaign character. ')
         (staging / 'README.md').write_text(
             f'# {title}\n\nEnable `{mod_id}` in Eclipse and Apply & Restart. Find **{title}** '
             'using the bottom map-page dots. The opponent cycles through eligible authored clips. '
-            'This movement preview has no attack damage, entry cost or rewards.\n\n'
+            'Authored preview moves have no attack intervals; native inherited moves may still deal damage. '
+            'There is no entry cost or reward. ' + player_guide + '\n\n'
             'Edit scripts/character.lua to add attack intervals or change controls/tactics. '
             'Keep your source Blender scene separately. Validate facing, deformation, equipment and '
             'contact timing in the game. Check third-party asset permissions before sharing a package.\n\n'
@@ -231,11 +246,13 @@ def main():
     parser.add_argument('--mod-id', required=True)
     parser.add_argument('--title', default='Character Preview')
     parser.add_argument('--mid-frames', type=int, choices=range(9), default=0)
+    parser.add_argument('--playable', action='store_true',
+                        help='Use the exported warrior as this preview fight\'s player as well as its AI opponent')
     parser.add_argument('--clip', nargs=4, action='append', default=[], metavar=('NAME', 'KEY', 'MID_FRAMES', 'FILE'),
                         help='Add a named animation with a distinct control and sample spacing; repeat for more clips')
     args = parser.parse_args()
     extra_clips = [{'name': name, 'key': key, 'mid_frames': int(spacing), 'path': Path(path)} for name, key, spacing, path in args.clip]
-    print('PACKAGED:', package(args.rig, args.animation, args.skin, args.output, args.mod_id, args.title, args.mid_frames, extra_clips))
+    print('PACKAGED:', package(args.rig, args.animation, args.skin, args.output, args.mod_id, args.title, args.mid_frames, extra_clips, args.playable))
 
 
 if __name__ == '__main__':

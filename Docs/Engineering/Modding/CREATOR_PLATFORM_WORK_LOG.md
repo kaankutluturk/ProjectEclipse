@@ -1,5 +1,13 @@
 # Creator platform implementation record
 
+2026-10-04: exported Blender/Gymnast packages can select their own playable
+warrior through `--playable` and the existing owned encounter field. Generated
+move conditions/intervals now match the current Lua contract and face the enemy
+at playback; standalone Lua tactics initialize required empty native lists.
+See [packaged character acceptance](PACKAGED_CHARACTER_ACCEPTANCE.md) for source,
+complete authoring/reader/native evidence and remaining arbitrary-rig/platform
+limits. Experimental 3D stays deferred and the full creator objective stays open.
+
 2026-10-04: actor behavior hosts now create and guide their own typed native
 projectiles. Queries stay mod/caster-scoped; retirement fails pending receipts,
 releases reservations and removes live children. Ranged Companion Duel supplies

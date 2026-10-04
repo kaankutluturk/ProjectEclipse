@@ -1,5 +1,12 @@
 # Eclipse as a general Shadow Fight 2 mod engine
 
+The [playable export workflow](PACKAGED_CHARACTER_ACCEPTANCE.md) connects
+Blender/Gymnast packages to owned player selection, native input and Lua opponent
+playback. Generated syntax/facing and standalone tactic initialization are
+repaired. Controlled full-game watched/playable packages pass alongside the
+source-pose and reader pipeline. Arbitrary rigs/meshes, complete combat movesets,
+platforms and full creator acceptance remain open; experimental 3D is deferred.
+
 The [editable text UI extension](UI_TEXT_INPUT_ACCEPTANCE.md) supports names,
 search/seed forms and multiline drafts using native themed fields, string change
 callbacks and an owned getter. Installed Lua/Unity focus, input-capture and
