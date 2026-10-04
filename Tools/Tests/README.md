@@ -75,9 +75,19 @@ players or physical input. A fallback explicitly starts a native knife attack if
 AI produces no contact within 120 simulation frames; results record that choice.
 The probe also checks actual shared native move-point bindings across the live
 roots and repeats those observations after removing the extra root.
+Pass `-RequireAutonomous` to forbid fixture-requested attack playback, allow up to
+600 simulation frames for the first native AI contact and require a second
+distinct attack start/contact. This mode checks current own/target AI observations
+before knockout/removal. Its core cloned rig/tactic scenario is not broad AI,
+team or mod-owned actor acceptance.
 Reuse requires a marked project inside repository Temp; an open fixture is
 rejected and compiler errors fail early. See the actor feasibility record under
 `Docs/Engineering/Modding/` for the native boundaries and remaining proof work.
+
+`Combat/TestAnimationObserverRouting.ps1` extracts the production animation-start
+methods and checks own/source/observer identity with controlled native services:
+ordinary pairs, extra roots, retargeting, duplicate/null/self/weapon exclusions and
+native AI flags. It is separate from full-game autonomous contact acceptance.
 
 `Combat/TestProjectiles.ps1` compiles the production Lua bindings and complete
 projectile queue/tracker with controlled native models. It covers reusable

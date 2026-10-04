@@ -1,4 +1,4 @@
-param([string]$Unity = '', [string]$ExistingFixture = '')
+param([string]$Unity = '', [string]$ExistingFixture = '', [switch]$RequireAutonomous)
 $ErrorActionPreference = 'Stop'
 $root = Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $PSScriptRoot))
 $versionFile = Join-Path $root 'ProjectSettings/ProjectVersion.txt'
@@ -37,7 +37,9 @@ $actorProbeCacheTarget = Join-Path $fixture 'audio-tar-cache'
 New-Item -ItemType Directory -Force -Path $actorProbeCacheTarget | Out-Null
 New-Item -ItemType Directory -Force -Path (Split-Path -Parent $actorProbeCache) | Out-Null
 New-Item -ItemType Junction -Path $actorProbeCache -Target $actorProbeCacheTarget | Out-Null
-$process = Start-Process -FilePath $Unity -ArgumentList @('-projectPath',('"'+$fixture+'"'),'-executeMethod','ExtraFighterUnity.Run','-extraFighterAcceptanceProductName',$actorProbeProduct,'-logFile',('"'+$log+'"')) -WindowStyle Hidden -PassThru
+$arguments = @('-projectPath',('"'+$fixture+'"'),'-executeMethod','ExtraFighterUnity.Run','-extraFighterAcceptanceProductName',$actorProbeProduct,'-logFile',('"'+$log+'"'))
+if ($RequireAutonomous) { $arguments += '-requireAutonomousExtraFighter' }
+$process = Start-Process -FilePath $Unity -ArgumentList $arguments -WindowStyle Hidden -PassThru
 Write-Host "Native extra-root process: $($process.Id)"
 $deadline = [DateTime]::UtcNow.AddMinutes(15)
 while (!$process.WaitForExit(20000)) {

@@ -16,13 +16,14 @@ public static class ExtraFighterUnity
     const BindingFlags Hidden = BindingFlags.Instance | BindingFlags.NonPublic;
     static double started, report;
     static bool campaign, entered;
-    static int phase, checks, births, phaseFrame;
+    static int phase, checks, births, phaseFrame, attackStarts;
     static Model actor;
     static bool explicitAttack;
-    static float playerBefore, enemyBefore, actorBefore;
+    static float playerBefore, enemyBefore, actorBefore, firstContactHealth, secondAttackBeforeHealth;
     static string failure;
     static readonly System.Collections.Generic.HashSet<string> animations = new System.Collections.Generic.HashSet<string>();
     static string Root => Path.GetDirectoryName(Application.dataPath);
+    static bool RequireAutonomous => Environment.GetCommandLineArgs().Contains("-requireAutonomousExtraFighter");
 
     static ExtraFighterUnity()
     {
@@ -100,7 +101,15 @@ public static class ExtraFighterUnity
                     actor.AddEventListener(2, value =>
                     {
                         births++;
-                        if (value is Model.EventModel notification && notification.Data is InfoAnimation animation) animations.Add(animation.Name);
+                        if (value is Model.EventModel notification && notification.Data is InfoAnimation animation)
+                        {
+                            animations.Add(animation.Name);
+                            if (animation.Type == InfoAnimation.MGHNBEPCKIF.AnimationAttack)
+                            {
+                                attackStarts++;
+                                if (attackStarts == 2) secondAttackBeforeHealth = Fight.GetCurrentFight().GetPlayerModel().KKMCHCNOHMB();
+                            }
+                        }
                     });
                     Check(!(actor is WeaponModel) && actor.NJDJHGDMCIJ() == null && actor.GetRootModel() == actor, "Probe is a weapon child");
                     Check(fight.LNDLFINJHDB.Count(m => !(m is WeaponModel)) == 3, "No third root");
@@ -126,11 +135,13 @@ public static class ExtraFighterUnity
                     playerBefore = player.KKMCHCNOHMB(); enemyBefore = enemy.KKMCHCNOHMB();
                     Next(fight); break;
                 case 2:
-                    if (player.KKMCHCNOHMB() >= playerBefore && frame - phaseFrame < 120) return;
+                    int observationFrames = RequireAutonomous ? 600 : 120;
+                    if (player.KKMCHCNOHMB() >= playerBefore && frame - phaseFrame < observationFrames) return;
                     Check(actor.GetCurrentAnimation() != null && animations.Count > 0, "Third root did not start native AI animation");
                     Debug.Log("[ExtraFighterUnity] Bounded AI observation: starts=" + births + "; animations=" + string.Join(",", animations) + "; contact=" + (player.KKMCHCNOHMB() < playerBefore) + "; decisionDelay=" + Field(actor, "APOHBENDEKO"));
                     if (player.KKMCHCNOHMB() >= playerBefore)
                     {
+                        Check(!RequireAutonomous, "Third-root AI did not make native contact within 600 frames; explicit playback is forbidden in this acceptance run");
                         actor.Parameters.AiControlled = false;
                         var attacks = actor.GetAvailableAnimations().Where(m => m.Name.StartsWith("Knives", StringComparison.Ordinal) && m.MoveData.Intervals.OfType<IntervalAttack>().Any() && !m.Name.Contains("Throw")).ToArray();
                         Check(attacks.Length > 0, "No native knife attack for controlled contact proof");
@@ -146,18 +157,35 @@ public static class ExtraFighterUnity
                     Check(((Model.StrikeResult)Field(player, "GHHCDAFIKJE")).AttackerModel == actor, "Player health loss was not an extra-root native strike");
                     Check(Math.Abs(enemy.KKMCHCNOHMB() - enemyBefore) < .00001, "Third root strike damaged wrong target");
                     Debug.Log("[ExtraFighterUnity] Native third-root contact: player=" + playerBefore + " -> " + player.KKMCHCNOHMB() + "; explicit=" + explicitAttack);
+                    if (RequireAutonomous)
+                    {
+                        Check(attackStarts >= 1, "First autonomous contact lacks a native attack start");
+                        CheckAiObservations(actor);
+                    }
+                    firstContactHealth = player.KKMCHCNOHMB();
+                    Next(fight); break;
+                case 4:
+                    if (RequireAutonomous && (attackStarts < 2 || player.KKMCHCNOHMB() >= secondAttackBeforeHealth - .00001f)) return;
+                    if (RequireAutonomous)
+                    {
+                        Check(!explicitAttack && actor.Parameters.AiControlled && attackStarts >= 2, "Sustained autonomous attack required fixture playback or lost AI");
+                        Check(((Model.StrikeResult)Field(player, "GHHCDAFIKJE")).AttackerModel == actor, "Second native contact came from another attacker");
+                        Check(Math.Abs(enemy.KKMCHCNOHMB() - enemyBefore) < .00001, "Sustained AI contact damaged original opponent");
+                        CheckAiObservations(actor);
+                        Debug.Log("[ExtraFighterUnity] Sustained autonomous contact: " + firstContactHealth + " -> " + player.KKMCHCNOHMB() + "; animations=" + string.Join(",", animations));
+                    }
                     actor.Parameters.AiControlled = false;
                     fight.UpdateLife(actor, -actor.Parameters.MaxLife);
                     Check(actor.KKMCHCNOHMB() == 0 && actor.Parameters.PCALDKCJGCK, "Extra root knockout not recorded");
                     Next(fight); break;
-                case 4:
+                case 5:
                     if (frame - phaseFrame < 10) return;
                     Check(fight.GetPlayerModel() == player && fight.GetEnemyModel() == enemy && fight.LNDLFINJHDB.Contains(actor), "Extra root knockout changed main identities");
                     Check(!(bool)Field(fight, "isGameOver") && !(bool)Field(fight, "isStopFight"), "Extra root knockout incorrectly ended duel");
                     Check(actor.GetRenderObject() != null && actor.GetRenderObject().activeInHierarchy, "Extra root unexpectedly retired itself");
                     Invoke(fight, "RequestModelRemoval", actor);
                     Next(fight); break;
-                case 5:
+                case 6:
                     if (fight.LNDLFINJHDB.Contains(actor)) return;
                     Check(!player._Enemies.Contains(actor) && !enemy._Enemies.Contains(actor), "Removal retained targeting references");
                     Check(actor.GetRenderObject() == null || !actor.GetRenderObject().activeInHierarchy, "Removal retained rendering");
@@ -165,10 +193,10 @@ public static class ExtraFighterUnity
                     Check(fight.LNDLFINJHDB.Count(m => !(m is WeaponModel)) == 2, "Removal lost original roots");
                     CheckNodeBindings(player, enemy);
                     Next(fight); break;
-                case 6:
+                case 7:
                     if (frame - phaseFrame < 10) return;
                     Check(player.GetCurrentAnimation() != null && enemy.GetCurrentAnimation() != null, "Original duel cannot continue after third root");
-                    File.WriteAllText(Path.Combine(Root, "extra-fighter-result.txt"), "PASS: " + checks + " full-game native extra-root feasibility checks. Independent cloned health, native rig/rendering, bounded AI observation, native contact attribution (explicit attack requested=" + explicitAttack + "), insertion-order mutual enemies, main-duel-only round result and requested removal. Reflection/controlled spacing/inputs and fresh profile; not a public actor API, reliable autonomous attack selection, teams, custom rig or multiplayer acceptance.");
+                    File.WriteAllText(Path.Combine(Root, "extra-fighter-result.txt"), "PASS: " + checks + " full-game native extra-root feasibility checks. Independent cloned health, native rig/rendering and shared point bindings, native contact attribution (explicit attack requested=" + explicitAttack + "; sustained autonomous acceptance required=" + RequireAutonomous + "), insertion-order mutual enemies, main-duel-only round result and requested removal. Reflection/controlled spacing/inputs and fresh profile; not a public actor API, teams, arbitrary rigs/loadouts, multiplayer or export acceptance.");
                     Debug.Log("[ExtraFighterUnity] PASS: " + checks + " checks"); Finish(0); break;
             }
         }
@@ -209,6 +237,17 @@ public static class ExtraFighterUnity
         }
         Check(observations > 0, "No real shared native node conditions observed");
         Debug.Log("[ExtraFighterUnity] Verified " + observations + " shared native node bindings across " + models.Length + " roots");
+    }
+    static void CheckAiObservations(Model model)
+    {
+        var controller = Field(model, "HJOGNGDMAKJ");
+        var own = model.GetCurrentAnimation();
+        if (own != null && model.OCPMJKIEPIG().NMEEPBDJHMG())
+            Check(ReferenceEquals(Field(controller, "CGPDPHJIDPA"), own.IMFGMAAEMIC() ?? own), "Third-root controller did not observe its own actual move");
+        var target = model.EGGEACCDAEK();
+        var other = target?.GetCurrentAnimation();
+        if (other != null && target.OCPMJKIEPIG().NMEEPBDJHMG())
+            Check(ReferenceEquals(Field(controller, "COKFBIJAFLH"), other.IMFGMAAEMIC() ?? other), "Third-root controller did not observe its actual target's move");
     }
     static void Finish(int code)
     {

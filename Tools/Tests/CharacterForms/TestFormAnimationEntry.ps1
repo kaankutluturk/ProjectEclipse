@@ -327,8 +327,12 @@ static class ValidateFormAnimationEntry {
             Check(ai.Render(enemy,190)==ai.Result&&ai.OwnObserved==null,"nonplaying own move does not seed observation");
         }
         Fight.Current=new Fight();owner=new Model();owner._Animation.Current=Move("campaign own",0);ai=new ModelAi(owner);
-        Check(ai.Render(enemy,191)==ai.Result&&ai.OwnObserved==null,"campaign readiness does not use versus/title own-observation hook");
+        Check(ai.Render(enemy,191)==ai.Result&&ai.OwnObserved==owner._Animation.Current,"campaign controller joining a running move observes itself through the native hook");
+        var remembered=ai.OwnObserved;owner._Animation.Current=Move("next own motion",0);
+        Check(ai.Render(enemy,192)==ai.Result&&ai.OwnObserved==remembered,"readiness does not replace an existing own observation or replay its start");
         Fight.Current=null;
+        owner=new Model();owner._Animation.Current=Move("outside a fight",0);ai=new ModelAi(owner);
+        Check(ai.Render(enemy,193)==ai.Result&&ai.OwnObserved==null,"no active fight does not seed own observation");
     }
     public static void Main(){
         Selection();Rejections();Readiness();

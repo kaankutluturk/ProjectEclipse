@@ -590,3 +590,12 @@ Its 27 checks are not an actor API: bounded AI observation remained in idle, and
 native enemy registration, cached targets, side-based node bindings, callback
 identity, death ownership and round results still need explicit integration.
 See ACTOR_FEASIBILITY.md for source seams, the accepted scenario and next proofs.
+
+The follow-up repairs own-move initialization for controllers joining any active
+fight and animation-start routing to the actual starter plus registered root
+enemies currently targeting it. Strict full-game acceptance now forbids explicit
+attack playback and passes 180 checks, including two distinct native attacks,
+contact attribution, correct own/target observations and removal. This supersedes
+the earlier idle observation for that core cloned fighter. It remains feasibility
+groundwork: no public actor definition/instance/behavior or team API is delivered,
+and arbitrary rigs/tactics, owner/child lifetimes and encounter policies remain.

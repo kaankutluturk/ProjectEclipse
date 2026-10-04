@@ -2915,11 +2915,19 @@ public class Model : global::EventDispatcher<object>
 		_Collision.ResetInterval();
 		KDAHHIMLJGG.Data = EMBBNNBFODN;
 		CallEvent(2, KDAHHIMLJGG);
-		Model fGCODGKLHED = EGGEACCDAEK();
-		if (fGCODGKLHED != null && !KIAFPPHPEEK())
+		if (!KIAFPPHPEEK())
 		{
-			fGCODGKLHED.FDDIAFGKODA(_Animation.NNMAFFCCMHC());
-			fGCODGKLHED.BHAFOEICJPE(0);
+            // Several roots can target this model. Notify those controllers,
+            // rather than inferring an observer from our own selected enemy.
+            for (int index = 0; index < _Enemies.Count; index++)
+            {
+                var observer = _Enemies[index];
+                if (observer != null && observer != this && !observer.KIAFPPHPEEK() &&
+                    observer.EGGEACCDAEK() == this && _Enemies.IndexOf(observer) == index)
+                    observer.ObserveEnemyAnimationStarted(this);
+            }
+            if (FGKAFKFBFEM() || AiData.get_BothBotEnabled())
+                HJOGNGDMAKJ.StartAnimationBot(_Animation.NNMAFFCCMHC());
 		}
 	}
 
@@ -4318,20 +4326,12 @@ public class Model : global::EventDispatcher<object>
 		JLDBGHLBJEL.Clear();
 	}
 
-	protected void FDDIAFGKODA(InfoAnimation DBOLBEOCEME)
+    // best guess for name
+	protected void ObserveEnemyAnimationStarted(Model source)
 	{
-		Model fGCODGKLHED = EGGEACCDAEK();
-		if (fGCODGKLHED != null)
-		{
-			if (FGKAFKFBFEM() || AiData.get_BothBotEnabled())
-			{
-				HJOGNGDMAKJ.StartAnimationEnemy(fGCODGKLHED);
-			}
-			if (fGCODGKLHED.FGKAFKFBFEM() || AiData.get_BothBotEnabled())
-			{
-				fGCODGKLHED.HJOGNGDMAKJ.StartAnimationBot(DBOLBEOCEME);
-			}
-		}
+        if (FGKAFKFBFEM() || AiData.get_BothBotEnabled())
+            HJOGNGDMAKJ.StartAnimationEnemy(source);
+        BHAFOEICJPE(0);
 	}
 
 	protected float EOGCPJJHCCA()

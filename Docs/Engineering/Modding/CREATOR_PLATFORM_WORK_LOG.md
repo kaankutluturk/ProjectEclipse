@@ -1260,3 +1260,78 @@ remains. This is E1/E2/E5 groundwork, not closure of general actor support. Type
 actor definitions/receipts, behavior/lifetime, team targeting, autonomous attacks,
 broader rig/equipment/paired/contact/form/teardown, physical input/export and
 rollback acceptance remain open. G01-G14/E1-E8 and the broad objective stay active.
+
+
+## 2026-10-04 — independent native AI readiness and animation observers
+
+The binding repair was committed/pushed separately as e13e297f before this
+feature. This follow-up makes the third root act autonomously in a controlled
+native fight, rather than describing an explicitly requested attack as AI proof.
+
+ModelAi.Render's missed-own-move initialization previously applied only to
+versus/title fights. An extra root joining Campaign could have a current idle
+animation but no own-move observation, causing native decision eligibility to
+reject it. The same initialization now applies in any active fight; existing
+observations, nonplaying moves, missing fights and global/per-model AI guards
+remain effective. No move is forced by this readiness hook.
+
+Model.PAMICDLAMHC previously inferred the starting controller through its selected
+enemy's target. That round trip works for a mutual duel, but an additional root
+can target the player while the player still targets the original opponent. The
+starter now observes its actual own animation once. Distinct non-weapon roots in
+its native enemy registry whose cached target is that starter observe the actual
+source and wake native decision delay. Null/self/duplicate/weapon entries and
+roots watching other sources are excluded. ObserveEnemyAnimationStarted replaces
+the narrowly used obfuscated helper; its inferred declaration has the required
+best-guess comment. All source/tool/docs references were searched; no confirmed
+recovery mapping, serialized asset or meta is changed. Native enemy registration
+remains mutual; asymmetric team targeting/ownership is still future API work.
+
+Verification:
+
+- The production form-entry/readiness fixture passes 80 checks, including Campaign
+  own-move initialization, retained observations, nonplaying state, no fight and
+  native eligibility. New TestAnimationObserverRouting.ps1 extracts both production
+  methods and passes 15 source/observer/own-identity, pair/third-root, retarget,
+  duplicate/null/self/weapon and native AI-flag checks with controlled services.
+  Existing AI eligibility passes 14 and snapshot adaptation 56 controlled checks.
+- All four matching Unity 6.6 Windows-reference managed builds pass after the final
+  runtime changes. No separate passing combined Lua/native-parser suite is claimed.
+- ExtraFighterUnity -RequireAutonomous forbids fixture-requested attack playback.
+  It allows at most 600 simulation frames for first native contact (the default
+  research fallback remains 120), then records health at a second distinct attack
+  start and requires later native contact. It checks the controller's own and
+  actual target observations, source attribution, separate health, 84/56 real
+  shared node bindings, third-root knockout without ending the original duel,
+  explicit removal and original-pair continuation. The accepted full-game run
+  passes 180 checks: KnivesLowSlash changes player life 1 -> .9220222; later contact
+  changes it to .4270475. StepForward and ThrowForward are also observed. Explicit
+  attack requested=False, sustained autonomous acceptance required=True. Final log:
+  Temp/FighterPlaybackUnity-d997a2c104cd4564b9767ae6eb4b68d8/validation-044991f0b10346999ede9a553c06295c.log.
+- The intermediate widened-readiness run passed 172 checks with native
+  KnivesHeavySlash contact and no explicit request. The later routing run chose
+  evade/advance moves and failed the original 120-frame contact window; it is not
+  accepted. Increasing the strict bounded observation window accommodates ordinary
+  native tactical timing rather than forcing an attack. Two separate attack starts
+  and the health sampled at the second start prevent counting a multi-hit move as
+  two autonomous decisions. This is one controlled core tactic/rig scenario, not
+  deterministic universal attack timing or general AI/paired-throw acceptance.
+- Return Dart's 45-check full-game regression passes after the final AI/routing
+  source: flight/source IDs, pause/return, direct three-child queued burst, spacing,
+  unchanged caster-start count, contact health and live-child teardown. Log:
+  Temp/FighterPlaybackUnity-d997a2c104cd4564b9767ae6eb4b68d8/validation-feef2eb714934bc1b199acc38f3fae68.log.
+  Both final native runs have fresh result timestamps and successful Unity exits.
+  Fresh post-tutorial profiles, empty/owned mod roots, original controls/AI and
+  spacing are controlled. Root scenes/saves remain untouched. Existing unrelated
+  Unity startup/title warnings remain.
+- Public AI guidance, actor feasibility/extensibility/roadmap records and test
+  index update together. Wiki types/build/search and 6435 links/assets across
+  61 pages pass; coverage remains 234 public bindings and the duplicate-404 warning
+  remains. No public member/schema change requires editor contract regeneration.
+
+This establishes native actor AI readiness/observation prerequisites for E1/E2/E5.
+General actors still need typed definitions and owned instances, deferred receipts,
+Lua behavior hosts, teams/hostility and atomic targeting, child ownership, death/
+round/form/disable/teardown and alternate victory policies. Arbitrary rigs/outfits,
+all tactics/modes/throws, physical input, exports and rollback remain unaccepted.
+G01-G14/E1-E8 and the full Minecraft-style objective stay active.

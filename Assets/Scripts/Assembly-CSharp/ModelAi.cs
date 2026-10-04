@@ -338,11 +338,10 @@ public class ModelAi
             StartAnimationEnemy(FNKFIMEDNLP);
             if (COKFBIJAFLH == null) return null;
         }
-        // Likewise for the controller's own move: a fighter handed to the AI after its idle
-        // loop began (the Eclipse training dummy) never gets that start notification, and
-        // IsFitIntervalAndMove refuses every decision until it does.
-        if (CGPDPHJIDPA == null && _ModelAnimation.NMEEPBDJHMG() && Fight.GetCurrentFight() != null &&
-            (Fight.GetCurrentFight().IsLocalVersus || Fight.GetCurrentFight().IsTitleSparring))
+        // A controller joining an ongoing fight may miss its own animation-start
+        // notification. Seed that observation in every fight mode; otherwise
+        // IsFitIntervalAndMove refuses its decisions despite a running idle move.
+        if (CGPDPHJIDPA == null && _ModelAnimation.NMEEPBDJHMG() && Fight.GetCurrentFight() != null)
         {
             StartAnimationBot(_ModelAnimation.NNMAFFCCMHC());
         }

@@ -2,8 +2,9 @@
 
 This records the recovered engine boundaries for a future typed actor API.
 Projectiles are `WeaponModel` children; they are not substitutes for independently
-living fighters. This investigation supplies a repeatable isolated native probe
-and a model-identity binding repair, without shipping a Lua actor namespace.
+living fighters. This investigation supplies a repeatable isolated native probe,
+model-identity binding repair and native AI readiness/notification repairs,
+without shipping a Lua actor namespace.
 
 ## Existing native seams
 
@@ -14,7 +15,7 @@ and a model-identity binding repair, without shipping a Lua actor namespace.
 | Enemy registration | `AddModel` adds every existing model as a mutual enemy through `Model.CJNGMIMHFCC`. | There are no teams or explicit hostility rules at this seam. Friendly summons cannot use this unchanged. |
 | Target selection | `SetNearestEnemy` takes `_Enemies[0]`; collision, facing and AI use the cached `EGGEACCDAEK()` target. | Registration order wins over distance. Retargeting must update collision, animation, AI and event state together. Merely editing a Lua target ID is insufficient. |
 | Distance helper | `FindNearestEnemy` uses signed horizontal distance, includes every enemy entry and has no C# callers in the tracked source. | It is not an existing working nearest-target implementation. Do not expose or activate it as one without new tests. |
-| Simulation | `RenderFight` iterates live model lists for rendering, collision and AI. New roots still require active stage/action state and an eligible entry animation. | List support is useful, but successful insertion alone does not prove a functioning fighter. |
+| Simulation | `RenderFight` iterates live model lists for rendering, collision and AI. Native controllers now seed an already-running own move in any fight mode. Root animation starts update the starter's controller and registered root enemies that currently target it. | Active stage/action state and an eligible entry animation still need explicit initialization. Core third-root autonomous contacts now have native acceptance; general actor ownership/behavior remains unfinished. |
 | Round results | `RenderRound` checks the main player/opponent parameters; `GetWinner`, control and campaign settlement retain duel semantics. | Actor knockout must have a separate lifecycle. Teams, alternate victory policies and encounter completion need explicit integration. |
 | Lua routing | `EclipseFighterOperations` and damage/lifecycle dispatch distinguish main player/opponent identities. | Existing fighter callbacks do not automatically become actor behavior hosts. Actor events need their own instance identity and safe scoped handles. |
 | Removal | `RemoveModel` removes camera, enemy references, perks, animation selection and native resources. A non-null parent assumes a `WeaponModel`. | Independent actors must remain roots; ownership cannot be implemented with the native weapon-parent pointer. Owned children and pending commands must be retired too. |
@@ -56,7 +57,28 @@ form rollback, legacy side fallback, helper isolation and retired-root collectio
 Return Dart's 45-check native regression still passes after this repair. The
 follow-up AI observation still stayed in idle under the core tabular tactic;
 the binding defect is proven fixed, but it did not establish autonomous attacks.
-Reliable autonomous selection remains open.
+At that binding-only stage, autonomous selection remained unverified.
+
+The AI follow-up fixes two additional native issues. `ModelAi.Render` previously
+initialized a missed own-move observation only for versus/title fights, leaving
+the Campaign extra root's controller without a ready own move. That readiness
+now applies to every active fight. `Model.PAMICDLAMHC` now supplies its actual move
+to its own controller exactly once and notifies distinct non-weapon registered
+enemies whose cached target is this source. The renamed inferred helper
+`ObserveEnemyAnimationStarted` observes the actual source and wakes its native
+decision delay. It no longer infers a source controller from an observer's target.
+The native root enemy registry is still mutual; asymmetric team hostility is not
+implemented by this change.
+
+`-RequireAutonomous` forbids fixture-requested attack playback, allows at most
+600 simulation frames for the first contact, then requires a second distinct
+native attack start and subsequent contact. The accepted run passes 180 checks:
+`KnivesLowSlash` changes player life 1 -> .9220222, then a later attack changes it
+to .4270475. `StepForward` and `ThrowForward` are observed. The fixture checks own
+and target animation observations, 84/56 shared node bindings, separate health,
+main-duel result policy and retirement. This accepts autonomous attacks in that
+controlled core scenario, not arbitrary AI/rigs, universal throws or an actor API.
+The earlier short idle observations are historical evidence, not current behavior.
 The final log is recorded in the creator platform work log. Static observations
 above are distinct from native acceptance.
 No teams, native incoming-strike proof on the extra root, original custom rig,

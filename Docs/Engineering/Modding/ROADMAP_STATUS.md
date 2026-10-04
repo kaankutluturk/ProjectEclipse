@@ -2,6 +2,15 @@
 
 Last broad reconciliation: 2026-09-12. Scope remains **G01–G14 plus E1–E8**.
 
+2026-10-04 third-root AI readiness/routing: native controllers joining an ongoing
+Campaign fight now initialize their running own move; animation starts observe
+the actual source and each distinct registered root targeting it. Strict native
+acceptance forbids explicit attack playback and passes 180 checks, including two
+distinct attacks/contact attribution and current own/target observations. This
+fixes the earlier idle scenario; it is not a public actor/team API or acceptance
+for every rig/tactic/mode. Actor ownership/behavior, teams, broader content and
+physical/export/rollback work remain open. See the actor record and creator log.
+
 2026-10-04 actor binding repair: shared animation points now retain root/target
 node and pivot bindings by weak model identity, preserving context-free side
 fallback and existing helpers. The original same-side overwrite is reproduced

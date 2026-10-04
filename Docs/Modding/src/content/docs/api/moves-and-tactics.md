@@ -1094,6 +1094,13 @@ Native eligibility and the six-frame decision throttle still apply. This is a
 reaction policy, not a guarantee of evading a hit. The observation describes the
 current animation state; it is not a candidate you may return from `on_decide`.
 
+A native controller joining an ongoing fight initializes from the fighter's
+already-running move and its current opponent's move before considering a
+decision. Animation starts then update the starter's own controller and the
+controllers currently targeting that fighter. A form or AI handover does not
+need to restart the fight just to establish those observations. This readiness
+behavior does not provide an API for spawning additional independent fighters.
+
 `memory` is a plain Lua table private to this native fighter controller and this
 tactic. It survives decisions on that controller, not save/reload or controller
 replacement. Persist deliberate profile data through the owned state API.
