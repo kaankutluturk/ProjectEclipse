@@ -323,14 +323,17 @@ type('UiHandle', { 'private __eclipseUi': 'true' });
 type('UiStyle', { 'font_size?':'integer','text_align?':enumOf('left','center','right'),
     'text_color?':'string','background_color?':'string','fill_color?':'string',
     'frame?':[enumOf('scroll'),'Root stack on a menu or modal; uses the recovered game scroll artwork.'] });
-type('UiNode', { id:'string', kind:enumOf('stack','row','column','scroll','text','button','progress','toggle','slider','image','grid'),
+type('UiNode', { id:'string', kind:enumOf('stack','row','column','scroll','text','button','progress','toggle','slider','image','grid','text_input'),
     'width?':'number','height?':'number','gap?':'number','text?':'string','value?':'number','checked?':'boolean',
     'visible?':'boolean','enabled?':'boolean','children?':E('UiNode')+'[]','style?':E('UiStyle'),'sprite?':H('Sprite'),'mirrored?':['boolean','Image only. Defaults to false; horizontally reflects the artwork without changing layout size.'],
-    'columns?':'integer','cell_width?':'number','cell_height?':'number' });
+    'columns?':'integer','cell_width?':'number','cell_height?':'number',
+    'max_chars?':['integer','Text input only. Default 128; 1..8192 UTF-16 code units.'],
+    'placeholder?':['string','Text input only. Default empty; plain text, up to 8192 UTF-16 code units.'],
+    'multiline?':['boolean','Text input only. Default false; true allows line breaks.'] });
 type('UiPlacement', { 'anchor?':enumOf('top_left','top','top_right','left','center','right','bottom_left','bottom','bottom_right'),'x?':'number','y?':'number' });
 type('UiDefinition', { id:'string',mount:enumOf('menu','modal','hud'),root:E('UiNode'),'placement?':E('UiPlacement'),
     'on_back?':`fun(view:${H('Ui')})`,
-    'on_change?':`fun(view:${H('Ui')},widget_id:string,value:boolean|number)`,
+    'on_change?':`fun(view:${H('Ui')},widget_id:string,value:boolean|number|string)`,
     'on_click?':`fun(view:${H('Ui')},widget_id:string)`,
     'on_close?':`fun(view:${H('Ui')},reason:${enumOf('script','back','scene','error','destroyed')})` });
 type('ActScreenLine', {text:H('Localization'),frames:['integer','Required duration at 60 frames per second, 1..3600.']});
@@ -342,6 +345,7 @@ fn('ui.story_dialog',{definition:E('StoryDialogDefinition')},'boolean','ui.creat
 fn('ui.open',{definition:E('UiDefinition')},H('Ui'),'ui.create');
 fn('ui.close',{view:H('Ui')},'nil',null);
 fn('ui.is_open',{view:H('Ui')},'boolean',null);
+fn('ui.get_text',{view:H('Ui'),widget_id:'string'},'string',null);
 fn('ui.set_text',{view:H('Ui'),widget_id:'string',text:'string'},'nil',null);
 fn('ui.set_sprite',{view:H('Ui'),widget_id:'string',sprite:H('Sprite')},'nil',null);
 fn('ui.set_value',{view:H('Ui'),widget_id:'string',value:'number'},'nil',null,{bounds:{value:[0,1]}});

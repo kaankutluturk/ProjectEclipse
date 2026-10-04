@@ -95,6 +95,31 @@ static class Program
         foreach(string imageFields in new[]{"width=160,height=80", "width=160,height=80,sprite={}","width=160,height=80,sprite='example.charge-ui:sprites/ui-test'","width=0,height=80,sprite=icon"})
             Run(prefix+imageSource+"sf2.ui.open{id='art',mount='menu',root={id='art',kind='image',"+imageFields+"}}",true,
                 (ctx,cat,views)=>Check(views.Count==0,"Invalid image reached renderer"));
+        const string inputRoot="{id='name',kind='text_input',width=300,height=44,text='old',placeholder='Your name',max_chars=8}";
+        string inputOpen="sf2.ui.open{id='input',mount='hud',root="+inputRoot+"}";
+        Run(prefix+"local changes=0; local view=sf2.ui.open{id='input',mount='hud',root="+inputRoot+@",on_change=function(v,id,value)
+            changes=changes+1; assert(id=='name' and type(value)=='string')
+            assert(sf2.ui.get_text(v,id)==value)
+            assert(changes==1 and value=='new')
+            sf2.ui.set_text(v,id,'accepted')
+        end}; assert(sf2.ui.get_text(view,'name')=='old')
+        sf2.ui.set_text(view,'name','ready'); assert(changes==0)",false,(ctx,cat,views)=>{
+            Check(views[0].Root.MaxChars==8 && views[0].Root.Placeholder=="Your name","Lua text input configuration lost");
+            Check(views[0].TryChangeText("name","new") && views[0].GetText("name")=="accepted","String callback/getter/silent setter failed");
+            Check(!views[0].TryChangeText("name","too long!"),"Oversized native text accepted");
+        });
+        foreach(string bad in new[]{"max_chars=0","max_chars=-1","max_chars=8193","max_chars=1.5","max_chars='8'","max_chars=false","max_chars=0/0","placeholder=5","multiline=1","text=5","text='123456789'","text='a\\nb'","text='a\\tb'"})
+            Run(prefix+inputOpen.Replace(bad.StartsWith("text=") ? "text='old'" : bad.StartsWith("placeholder=") ? "placeholder='Your name'" : "max_chars=8",bad),true,(ctx,cat,views)=>Check(views.Count==0,"Malformed input mounted"));
+        Run(prefix+inputOpen.Replace("max_chars=8","multiline=true").Replace("text='old'","text='a\\nb'"),false,
+            (ctx,cat,views)=>Check(views[0].GetText("name")=="a\nb" && views[0].Root.MaxChars==128,"Multiline/default limit failed"));
+        foreach(string option in new[]{"max_chars=128","placeholder=''","multiline=false"})
+            Run(prefix+"sf2.ui.open{id='bad',mount='menu',root={id='label',kind='text',width=200,height=40,"+option+"}}",true);
+        foreach(string getter in new[]{"sf2.ui.get_text({},'name')","sf2.ui.get_text(view,'missing')","sf2.ui.get_text(view,1)","sf2.ui.get_text(view)","sf2.ui.get_text(view,'name',true)","sf2.ui.close(view);sf2.ui.get_text(view,'name')","sf2.ui.set_text(view,'name','too long!')","sf2.ui.set_text(view,'name','a\\nb')"})
+            Run(prefix+"local view="+inputOpen+";"+getter,true);
+        Run(prefix+"local view="+"sf2.ui.open{id=\"test\",mount=\"menu\",root="+root+"}"+"; assert(sf2.ui.get_text(view,'label')=='old'); assert(sf2.ui.get_text(view,'go')=='Go');sf2.ui.get_text(view,'root')",true);
+        foreach(string body in new[]{"error('text failure')","while true do end"})
+            Run(prefix+"sf2.ui.open{id='input',mount='hud',root="+inputRoot+",on_change=function() "+body+" end}",false,
+                (ctx,cat,views)=>Check(!views[0].TryChangeText("name","new") && views[0].IsClosed,"Failed text callback retained view"));
         const string controlRoot="{id='root',kind='column',width=300,height=140,children={{id='toggle',kind='toggle',width=300,height=40,text='Challenge',checked=true},{id='slider',kind='slider',width=300,height=40,value=0.25}}}";
         const string gridRoot="{id='grid',kind='grid',width=220,height=100,columns=2,cell_width=100,cell_height=40,gap=10,children={{id='a',kind='button',text='A'},{id='b',kind='button',text='B'}}}";
         Run(prefix+"sf2.ui.open{id='grid',mount='menu',root="+gridRoot+",on_click=function(view,id) sf2.ui.set_text(view,id,'Selected') end}",false,

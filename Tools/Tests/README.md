@@ -1,5 +1,13 @@
 # Regression tests and validators
 
+Editable mod UI: `Modding/TestModUiRuntime.ps1` covers typed text validation,
+state/ownership, notifications and input eligibility; `TestModUiLua.ps1` exercises
+actual Lua bindings, malformed values, handles and callback budgets.
+`Modding/TestTextInputUnity.ps1` installs Text Input Lab in a marked isolated
+Unity 6.6 project/profile, exercising native fields, Lua callbacks/getter,
+HUD capture, multiline, Tab/Back, ancestor/dialog and owner cleanup. Synthetic
+native key Events do not establish physical keyboard/IME or mobile acceptance.
+
 Camera control: `Modding/TestCameraRuntime.ps1` executes actual Lua capability,
 settings, ownership, callback/registration/cleanup and shipped Camera Lab HUD
 tests with a controlled provider. `TestCameraNativePolicies.ps1` compiles the

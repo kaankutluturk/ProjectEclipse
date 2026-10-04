@@ -42,7 +42,7 @@ namespace Eclipse.Modding
 
     // Engine-independent UI ownership and state, consumed by the Lua binding,
     // Unity renderer, input coordinator and script-context teardown.
-    public enum ModUiKind { Stack, Row, Column, Scroll, Text, Button, Progress, Toggle, Slider, Image, Grid }
+    public enum ModUiKind { Stack, Row, Column, Scroll, Text, Button, Progress, Toggle, Slider, Image, Grid, TextInput }
     public enum ModUiMount { Menu, Modal, CombatHud }
 
     public sealed class ModUiPlacement
@@ -116,8 +116,8 @@ namespace Eclipse.Modding
         }
         internal void ValidateFor(ModUiKind kind)
         {
-            if (kind != ModUiKind.Text && kind != ModUiKind.Button && kind != ModUiKind.Toggle && (TextColor != null || FontSize.HasValue || TextAlign != null))
-                throw new ArgumentException("Only text, buttons and toggles accept text styling.");
+            if (kind != ModUiKind.Text && kind != ModUiKind.Button && kind != ModUiKind.Toggle && kind != ModUiKind.TextInput && (TextColor != null || FontSize.HasValue || TextAlign != null))
+                throw new ArgumentException("Only text, buttons, toggles and text inputs accept text styling.");
             if (kind != ModUiKind.Progress && kind != ModUiKind.Slider && FillColor != null)
                 throw new ArgumentException("Only progress widgets and sliders accept fill color.");
             if ((kind == ModUiKind.Text || kind == ModUiKind.Image) && BackgroundColor != null)
@@ -138,6 +138,9 @@ namespace Eclipse.Modding
         public double CellWidth { get; }
         public double CellHeight { get; }
         public string Text { get; }
+        public int MaxChars { get; }
+        public string Placeholder { get; }
+        public bool Multiline { get; }
         public AssetId? Sprite { get; }
         public bool Mirrored { get; }
         public double Value { get; }
@@ -149,7 +152,8 @@ namespace Eclipse.Modding
         public ModUiNode(string id, ModUiKind kind, double width, double height,
             string text = "", double value = 0, bool visible = true, bool enabled = true,
             double gap = 0, IEnumerable<ModUiNode> children = null, ModUiStyle style = null, AssetId? sprite = null,
-            int columns = 0, double cellWidth = 0, double cellHeight = 0, bool mirrored = false)
+            int columns = 0, double cellWidth = 0, double cellHeight = 0, bool mirrored = false,
+            int maxChars = 0, string placeholder = "", bool multiline = false)
         {
             ValidateId(id);
             if (!Enum.IsDefined(typeof(ModUiKind), kind)) throw new ArgumentOutOfRangeException(nameof(kind));
@@ -157,6 +161,16 @@ namespace Eclipse.Modding
             ValidateNumber(height, 0, 8192, nameof(height));
             ValidateNumber(gap, 0, 1024, nameof(gap));
             ValidateText(text);
+            ValidateText(placeholder);
+            if (kind == ModUiKind.TextInput)
+            {
+                if (maxChars == 0) maxChars = 128;
+                if (maxChars < 1 || maxChars > 8192) throw new ArgumentOutOfRangeException(nameof(maxChars), "Text input max_chars must be 1..8192.");
+                ValidateEditableText(text, maxChars, multiline);
+            }
+            else if (maxChars != 0 || placeholder.Length != 0 || multiline)
+                throw new ArgumentException("Only text inputs accept max_chars, placeholder and multiline.");
+            MaxChars = maxChars; Placeholder = placeholder; Multiline = multiline;
             ValidateNumber(value, 0, 1, nameof(value));
             if (kind == ModUiKind.Grid)
             {
@@ -186,8 +200,8 @@ namespace Eclipse.Modding
             bool container = kind == ModUiKind.Stack || kind == ModUiKind.Row || kind == ModUiKind.Column || kind == ModUiKind.Scroll || kind == ModUiKind.Grid;
             if (!container && copy.Count != 0) throw new ArgumentException("Leaf widgets cannot have children.");
             if (kind == ModUiKind.Scroll && copy.Count != 1) throw new ArgumentException("Scroll requires one content child.");
-            if (kind != ModUiKind.Text && kind != ModUiKind.Button && kind != ModUiKind.Toggle && text.Length != 0)
-                throw new ArgumentException("Only text and button widgets have text.");
+            if (kind != ModUiKind.Text && kind != ModUiKind.Button && kind != ModUiKind.Toggle && kind != ModUiKind.TextInput && text.Length != 0)
+                throw new ArgumentException("Only text, button, toggle and text input widgets have text.");
             if (kind != ModUiKind.Progress && kind != ModUiKind.Slider && kind != ModUiKind.Toggle && value != 0)
                 throw new ArgumentException("Only progress, slider and toggle widgets have a value.");
             if (kind == ModUiKind.Toggle && value != 0 && value != 1) throw new ArgumentException("Toggle values are zero or one.");
@@ -214,6 +228,23 @@ namespace Eclipse.Modding
         internal static void ValidateText(string text)
         {
             if (text == null || text.Length > 8192) throw new ArgumentException("UI text permits at most 8192 UTF-16 code units.");
+        }
+
+        internal static void ValidateEditableText(string text, int maxChars, bool multiline)
+        {
+            ValidateText(text);
+            if (text.Length > maxChars) throw new ArgumentException("Text exceeds this input's max_chars limit.");
+            for (int i = 0; i < text.Length; i++)
+            {
+                char c = text[i];
+                bool newline = c == '\r' || c == '\n' || c == '\u2028' || c == '\u2029';
+                if (newline ? !multiline : char.IsControl(c)) throw new ArgumentException("Text input contains an unsupported control character or line break.");
+                if (char.IsHighSurrogate(c))
+                {
+                    if (++i >= text.Length || !char.IsLowSurrogate(text[i])) throw new ArgumentException("Text input requires valid UTF-16.");
+                }
+                else if (char.IsLowSurrogate(c)) throw new ArgumentException("Text input requires valid UTF-16.");
+            }
         }
 
         internal static void ValidateNumber(double value, double min, double max, string name)
@@ -248,14 +279,15 @@ namespace Eclipse.Modding
         { if (string.IsNullOrEmpty(owner.Value)) throw new ArgumentException("UI scope requires a mod owner."); Owner = owner; this.report = report; }
 
         public ModUiSurface Open(string id, ModUiMount mount, ModUiNode root, Action<string> onClick = null, ModUiPlacement placement = null,
-            Action<ModUiCloseReason> onClose = null, Action<string, double> onChange = null, Action onBack = null)
+            Action<ModUiCloseReason> onClose = null, Action<string, double> onChange = null, Action onBack = null,
+            Action<string, string> onTextChange = null)
         {
             if (closed) throw new ObjectDisposedException(nameof(ModUiScope));
             ModUiNode.ValidateId(id);
             if (!Enum.IsDefined(typeof(ModUiMount), mount)) throw new ArgumentOutOfRangeException(nameof(mount));
             if (surfaces.ContainsKey(id)) throw new InvalidOperationException("UI surface is already open: " + id);
             if (surfaces.Count >= 8) throw new InvalidOperationException("A scope permits at most eight open surfaces.");
-            var surface = new ModUiSurface(this, id, mount, root, onClick, placement, onClose, onChange, onBack);
+            var surface = new ModUiSurface(this, id, mount, root, onClick, placement, onClose, onChange, onBack, onTextChange);
             surfaces.Add(id, surface);
             return surface;
         }
@@ -284,6 +316,7 @@ namespace Eclipse.Modding
         private readonly Dictionary<string, Widget> widgets = new Dictionary<string, Widget>(StringComparer.Ordinal);
         private Action<string> click;
         private Action<string, double> change;
+        private Action<string, string> textChange;
         private Action<ModUiCloseReason> close;
         private Action back;
         private bool dispatching;
@@ -301,7 +334,7 @@ namespace Eclipse.Modding
         public event Action Closed;
 
         internal ModUiSurface(ModUiScope scope, string id, ModUiMount mount, ModUiNode root, Action<string> onClick, ModUiPlacement placement,
-            Action<ModUiCloseReason> onClose, Action<string, double> onChange, Action onBack)
+            Action<ModUiCloseReason> onClose, Action<string, double> onChange, Action onBack, Action<string, string> onTextChange)
         {
             this.scope = scope; Id = id; Mount = mount;
             Root = root ?? throw new ArgumentNullException(nameof(root));
@@ -314,6 +347,7 @@ namespace Eclipse.Modding
             click = onClick;
             close = onClose;
             change = onChange;
+            textChange = onTextChange;
             back = onBack;
         }
 
@@ -343,15 +377,24 @@ namespace Eclipse.Modding
 
         public ModUiWidgetState Read(string id) => Get(id).State;
 
+        public string GetText(string id)
+        {
+            var w = Get(id);
+            if (w.Node.Kind != ModUiKind.Text && w.Node.Kind != ModUiKind.Button && w.Node.Kind != ModUiKind.Toggle && w.Node.Kind != ModUiKind.TextInput)
+                throw new InvalidOperationException("This widget has no text.");
+            return w.State.Text;
+        }
+
         // Coordinator gate, independent of the mod-authored enabled/visible values.
         public void SetInputAllowed(bool allowed) { inputAllowed = allowed && !IsClosed; }
 
         public void SetText(string id, string text)
         {
             var widget = Get(id);
-            if (widget.Node.Kind != ModUiKind.Text && widget.Node.Kind != ModUiKind.Button && widget.Node.Kind != ModUiKind.Toggle)
+            if (widget.Node.Kind != ModUiKind.Text && widget.Node.Kind != ModUiKind.Button && widget.Node.Kind != ModUiKind.Toggle && widget.Node.Kind != ModUiKind.TextInput)
                 throw new InvalidOperationException("This widget has no text.");
             ModUiNode.ValidateText(text);
+            if (widget.Node.Kind == ModUiKind.TextInput) ModUiNode.ValidateEditableText(text, widget.Node.MaxChars, widget.Node.Multiline);
             Update(widget, text, widget.State.Value, widget.State.Visible, widget.State.Enabled);
         }
 
@@ -385,15 +428,38 @@ namespace Eclipse.Modding
         }
 
         public bool CanInteract(string id)
+            => !dispatching && CanFocus(id);
+
+        // Focus remains valid while an input notification is being dispatched.
+        public bool CanFocus(string id)
         {
-            if (IsClosed || !inputAllowed || dispatching || id == null || !widgets.TryGetValue(id, out var w)) return false;
-            if (w.Node.Kind != ModUiKind.Button && w.Node.Kind != ModUiKind.Toggle && w.Node.Kind != ModUiKind.Slider) return false;
+            if (IsClosed || !inputAllowed || id == null || !widgets.TryGetValue(id, out var w)) return false;
+            if (w.Node.Kind != ModUiKind.Button && w.Node.Kind != ModUiKind.Toggle && w.Node.Kind != ModUiKind.Slider && w.Node.Kind != ModUiKind.TextInput) return false;
             for (var ancestor = w; ancestor != null; ancestor = ancestor.Parent)
                 if (!ancestor.State.Visible || !ancestor.State.Enabled) return false;
             return true;
         }
 
         // User changes commit before notification. Script setters never echo callbacks.
+        public bool TryChangeText(string id, string text)
+        {
+            if (!CanInteract(id)) return false;
+            var w = Get(id);
+            if (w.Node.Kind != ModUiKind.TextInput || text == w.State.Text) return false;
+            try { ModUiNode.ValidateEditableText(text, w.Node.MaxChars, w.Node.Multiline); }
+            catch (ArgumentException) { return false; }
+            dispatching = true;
+            try
+            {
+                Update(w, text, w.State.Value, w.State.Visible, w.State.Enabled);
+                if (IsClosed) return false;
+                textChange?.Invoke(id, text);
+                return true;
+            }
+            catch (Exception error) { Close(ModUiCloseReason.Error); scope.Report(error); return false; }
+            finally { dispatching = false; }
+        }
+
         public bool TryChange(string id, double value)
         {
             if (!CanInteract(id)) return false;
@@ -462,6 +528,7 @@ namespace Eclipse.Modding
             scope.Remove(this);
             click = null;
             change = null;
+            textChange = null;
             back = null;
             widgets.Clear();
             var listeners = Closed;

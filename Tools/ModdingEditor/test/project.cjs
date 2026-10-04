@@ -8,6 +8,18 @@ const { createMod } = require('../src/scaffold.cjs');
 const template = path.resolve(__dirname, '../templates/weapon');
 const header = 'local sf2 = require("sf2")\n';
 
+test('text input example and starter share an owned string UI contract',async()=>{
+ const directory=path.resolve(__dirname,'../../../Mods/example.text-input-lab');
+ const mod=await p.indexMod(directory);assert.deepEqual(mod.issues,[]);
+ const source=await fs.readFile(path.join(directory,'scripts/main.lua'),'utf8');assert.deepEqual(p.analyze(source,mod).issues,[]);
+ for(const file of ['mod.toml','README.md','scripts/main.lua'])assert.deepEqual(await fs.readFile(path.join(directory,file)),await fs.readFile(path.resolve(__dirname,'../templates/text-input-lab',file)));
+ const schema=require('../scripts/api-schema.cjs');
+ assert(schema.types.UiNode.fields.kind.includes('text_input'));
+ for(const key of ['max_chars?','placeholder?','multiline?'])assert(schema.types.UiNode.fields[key]);
+ assert(schema.types.UiDefinition.fields['on_change?'].includes('string'));
+ assert.equal(schema.functions['sf2.ui.get_text'].returns,'string');
+});
+
 test('camera ownership has distinct handles/capability, lifecycle gates and a mirrored starter',async()=>{
  const directory=path.resolve(__dirname,'../../../Mods/example.camera-lab');
  const mod=await p.indexMod(directory);assert.deepEqual(mod.issues,[]);

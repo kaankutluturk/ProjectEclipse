@@ -19,6 +19,7 @@ static class Program
     });
     static void Main()
     {
+        TextInputs();
         var grid = new ModUiNode("grid", ModUiKind.Grid, 220, 100, gap: 10, columns: 2, cellWidth: 100, cellHeight: 40,
             children: new[] { new ModUiNode("a", ModUiKind.Button, 0, 0, text: "A"), new ModUiNode("b", ModUiKind.Button, 0, 0, text: "B") });
         Check(grid.Columns == 2 && grid.CellWidth == 100 && grid.CellHeight == 40 && grid.Children.Count == 2, "Grid lost layout contract");
@@ -279,6 +280,55 @@ static class Program
             broken.Changed+=_=>throw new Exception("renderer failure");
             broken.SetText("title","changed");Check(reason==ModUiCloseReason.Error,"Renderer failure reported normal close");
         }
+    }
+
+    static void TextInputs()
+    {
+        var input=new ModUiNode("input",ModUiKind.TextInput,300,48,placeholder:"Enter a name");
+        Check(input.MaxChars==128&&!input.Multiline&&input.Placeholder=="Enter a name","Input defaults");
+        foreach(var text in new[]{new string('x',129),"line\nnext","line\rnext","tab\t","null\0","\u2028","\ud800","\udc00"})
+            Reject(()=>new ModUiNode("input",ModUiKind.TextInput,300,48,text:text),"Bad editable text accepted");
+        Check(new ModUiNode("input",ModUiKind.TextInput,300,48,text:"🙂é",maxChars:3).Text.Length==3,"UTF-16 limits accept complete surrogate pair");
+        Check(new ModUiNode("input",ModUiKind.TextInput,300,100,text:"line\nnext\r\nlast\u2028",multiline:true).Multiline,"Multiline text");
+        foreach(var limit in new[]{-1,8193})Reject(()=>new ModUiNode("input",ModUiKind.TextInput,300,48,maxChars:limit),"Bad input limit");
+        foreach(var kind in new[]{ModUiKind.Text,ModUiKind.Button,ModUiKind.Toggle})
+        {
+            Reject(()=>new ModUiNode("other",kind,300,48,maxChars:2),"Non-input limit");
+            Reject(()=>new ModUiNode("other",kind,300,48,placeholder:"Hint"),"Non-input placeholder");
+            Reject(()=>new ModUiNode("other",kind,300,48,multiline:true),"Non-input multiline");
+        }
+        using var scope=new ModUiScope(ModId.Parse("example.input"));
+        var root=new ModUiNode("root",ModUiKind.Column,300,200,children:new[]{input,new ModUiNode("label",ModUiKind.Text,300,40,text:"Ready"),new ModUiNode("bar",ModUiKind.Progress,300,20)});
+        ModUiSurface surface=null;int changes=0;
+        surface=scope.Open("input",ModUiMount.CombatHud,root,onTextChange:(id,text)=>{
+            changes++;Check(id=="input"&&surface.GetText(id)==text,"Committed text precedes callback");
+            Check(surface.CanFocus(id)&&!surface.CanInteract(id),"Focus survives callback dispatch while recursive input is gated");
+            Check(!surface.TryChangeText(id,"recursive"),"Recursive text input rejected");
+            surface.SetText("label",text);
+        });
+        Check(surface.TryChangeText("input","é🙂")&&changes==1&&surface.GetText("label")=="é🙂","Text edit and string notification");
+        Check(!surface.TryChangeText("input","é🙂")&&changes==1,"Unchanged edit not echoed");
+        surface.SetText("input","script");Check(changes==1&&surface.GetText("input")=="script","Script setter is silent");
+        foreach(var text in new[]{new string('x',129),"bad\nline","\ud800",null})
+        {
+            Check(!surface.TryChangeText("input",text)&&surface.GetText("input")=="script","Rejected user edit retains value");
+            Reject(()=>surface.SetText("input",text),"Rejected script edit must throw");
+        }
+        Check(!surface.TryChange("input",1)&&!surface.TryClick("input"),"Text input is separate from numeric/click events");
+        Reject(()=>surface.GetText("bar"),"Non-text getter");Reject(()=>surface.GetText("missing"),"Missing text widget");
+        surface.SetEnabled("root",false);Check(!surface.CanFocus("input")&&!surface.TryChangeText("input","disabled"),"Disabled ancestor gates editing/focus");
+        surface.SetEnabled("root",true);surface.SetVisible("root",false);Check(!surface.TryChangeText("input","hidden"),"Hidden ancestor gates editing");surface.SetVisible("root",true);
+        surface.SetInputAllowed(false);Check(!surface.CanFocus("input")&&!surface.TryChangeText("input","background"),"Background/native block gates editing");surface.SetInputAllowed(true);
+        using(var layers=new ModUiLayerStack())
+        {
+            layers.Add(surface);var modal=scope.Open("modal",ModUiMount.Modal,root);layers.Add(modal);
+            Check(!surface.TryChangeText("input","blocked")&&modal.TryChangeText("input","modal"),"Cross-surface foreground text ownership");
+            modal.Close();Check(surface.TryChangeText("input","resumed"),"Foreground restored");
+        }
+        Check(surface.IsClosed&&!surface.TryChangeText("input","closed"),"Layer teardown closes editing");
+        ModUiCloseReason? closed=null;
+        var broken=scope.Open("broken",ModUiMount.Menu,root,onClose:r=>closed=r,onTextChange:(_,__)=>throw new Exception("callback"));
+        Check(!broken.TryChangeText("input","fail")&&broken.IsClosed&&closed==ModUiCloseReason.Error,"Text callback failure closes view");
     }
 
     static void Layers()

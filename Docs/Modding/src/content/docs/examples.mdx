@@ -417,3 +417,11 @@ adds a native HUD to Act I Tournament stage 3. Play an original beacon with game
 or real clock, lower its volume, and stop it. The UI owns the voice, so closing
 it also stops playback. See the <a href={pageUrl('api/audio')}>audio reference</a> for limits and
 lifetime. Native source acceptance does not imply device-listening acceptance.
+
+## Text Input Lab
+
+Enable `example.text-input-lab` and enter Tournament 3 in normal or Eclipse mode.
+Its HUD name field sends string change callbacks; its multiline modal reads the
+current introduction when Apply is clicked. Values remain in Lua memory. Typing
+captures fighter controls; combat continues. See the <a href={pageUrl('api/ui')}>custom UI reference</a>
+for text limits, focus behavior, and a standalone form example.

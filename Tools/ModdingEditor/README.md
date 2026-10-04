@@ -749,3 +749,8 @@ are supported. Registration needs `content.register`; spawning needs
 Completion covers definitions, owned handles, commands and receipts. Timing
 diagnostics reject fight/round begin/end calls. Controlled native acceptance
 and editor validation have different scopes; arbitrary rigs are not proven.
+
+The manual `text-input-lab` starter mirrors the installed Text Input Lab. Its HUD
+name field and multiline modal exercise string `on_change` and `ui.get_text`.
+Generated `UiNode` definitions include max_chars, placeholder and multiline; the
+game enforces UTF-16 limits and text/focus rules. Editor checks are not playtests.

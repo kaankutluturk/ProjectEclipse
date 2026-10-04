@@ -88,6 +88,12 @@ namespace Eclipse.UI.Modding
                 if (backHandledFrame != Time.frameCount)
                 { backHandledFrame = Time.frameCount; current.coordinator.Back(); }
             }
+            else if (current.coordinator.IsEditingText)
+            {
+                // Native text editing owns arrows, spaces and Enter. Tab can move
+                // to another widget; Back leaves editing before closing the view.
+                if (sequential && move != 0) current.coordinator.MoveFocus(move);
+            }
             else if (submit) current.coordinator.ActivateSelected();
             else if (move != 0)
             {

@@ -2023,7 +2023,7 @@ local UiStyle = {}
 
 ---@class (exact) Eclipse.UiNode
 ---@field id string
----@field kind "stack"|"row"|"column"|"scroll"|"text"|"button"|"progress"|"toggle"|"slider"|"image"|"grid"
+---@field kind "stack"|"row"|"column"|"scroll"|"text"|"button"|"progress"|"toggle"|"slider"|"image"|"grid"|"text_input"
 ---@field width? number
 ---@field height? number
 ---@field gap? number
@@ -2039,6 +2039,9 @@ local UiStyle = {}
 ---@field columns? integer
 ---@field cell_width? number
 ---@field cell_height? number
+---@field max_chars? integer Text input only. Default 128; 1..8192 UTF-16 code units.
+---@field placeholder? string Text input only. Default empty; plain text, up to 8192 UTF-16 code units.
+---@field multiline? boolean Text input only. Default false; true allows line breaks.
 local UiNode = {}
 
 ---@class (exact) Eclipse.UiPlacement
@@ -2053,7 +2056,7 @@ local UiPlacement = {}
 ---@field root Eclipse.UiNode
 ---@field placement? Eclipse.UiPlacement
 ---@field on_back? fun(view:Eclipse.UiHandle)
----@field on_change? fun(view:Eclipse.UiHandle,widget_id:string,value:boolean|number)
+---@field on_change? fun(view:Eclipse.UiHandle,widget_id:string,value:boolean|number|string)
 ---@field on_click? fun(view:Eclipse.UiHandle,widget_id:string)
 ---@field on_close? fun(view:Eclipse.UiHandle,reason:"script"|"back"|"scene"|"error"|"destroyed")
 local UiDefinition = {}
@@ -3861,8 +3864,17 @@ function ui.close(view) end
 ---@return boolean
 function ui.is_open(view) end
 
----Requires: An open owned view and a text/button/toggle ID; no additional capability.
----When: Update a text, button or toggle label. The string may be empty and is limited to 8192 UTF-16 code units. Updates do not rebuild the layout tree.
+---Requires: An open owned view and a text/button/toggle/text_input ID; no additional capability. Unknown IDs, other widget kinds, closed or forged view handles, and argument counts other than two are errors.
+---When: Read a text input on Apply/Submit, or inspect a text/button/toggle label. During `on_change`, the getter already returns the newly committed value. It returns an input's value, never its placeholder. Hidden and disabled widgets can still be read by their owner.
+---Returns: The current plain string, including `""` for an empty value.
+---[Full reference](https://dawc17.github.io/ProjectEclipse/api/ui/#sf2uiget_text)
+---@param view Eclipse.UiHandle
+---@param widget_id string
+---@return string
+function ui.get_text(view, widget_id) end
+
+---Requires: An open owned view and a text/button/toggle/text_input ID; no additional capability.
+---When: Update a text, button or toggle label, or replace a text input value without triggering `on_change`. Input values also obey their `max_chars`, multiline and valid-text rules. Invalid values leave the old value intact. The string may be empty and is limited to 8192 UTF-16 code units. Updates do not rebuild the layout tree.
 ---Returns: Nothing.
 ---[Full reference](https://dawc17.github.io/ProjectEclipse/api/ui/#sf2uiset_text)
 ---@param view Eclipse.UiHandle

@@ -23,9 +23,9 @@ pending choices and release Lua references after a live view closes.
 Mounts are `menu`, `modal`, and `hud`. Modals have priority over menus, then HUDs;
 the newest view wins within a priority. Only the foreground view accepts input.
 Menu/modal backdrops block pointer input outside their content and capture
-keyboard/controller navigation. Back closes their foreground view. HUDs do not
-capture keyboard navigation automatically; their buttons currently use pointer
-input. Opening any view **does not pause combat**.
+keyboard/controller navigation. Back closes their foreground view. HUDs capture gameplay input while their foreground text field is being edited.
+Otherwise they do not capture keyboard navigation automatically; their buttons
+currently use pointer input. Opening any view **does not pause combat**.
 
 Eclipse uses Unity's Input System for keyboard, mouse, touch and gamepad input.
 Existing bindings retain their meanings. Gamepad buttons use their semantic
@@ -61,13 +61,16 @@ Each node is a table:
 | Field | Required/default | Meaning |
 | --- | --- | --- |
 | `id` | Required | Unique within this view; 1–64 ASCII letters, digits, `_` or `-`. View IDs use the same syntax. |
-| `kind` | Required | `stack`, `row`, `column`, `scroll`, `text`, `button`, `progress`, `toggle`, `slider`, `image`, or `grid`. |
+| `kind` | Required | `stack`, `row`, `column`, `scroll`, `text`, `button`, `progress`, `toggle`, `slider`, `image`, `grid`, or `text_input`. |
 | `width`, `height` | `0` | Finite 0–8192 reference units. Both must be positive on the root. Zero gives flexible size in a row/column; use explicit dimensions inside stacks. |
 | `children` | Empty | Dense array of nodes. Only containers accept children; `scroll` requires exactly one content node. |
 | `gap` | `0` | Row/column/grid spacing, finite 0–1024. Other kinds require zero. Grid uses this spacing on both axes. |
 | `columns` | Required for grid | Integer 1–256, only on `grid`. Children fill each row from left to right. |
 | `cell_width`, `cell_height` | Required for grid | Finite 1–8192 reference units, only on `grid`. The grid controls each direct child's size. |
-| `text` | `""` | Text/button/toggle label, up to 8192 UTF-16 code units. Other kinds require empty text. Plain text, wrapped and clipped; rich text is disabled. |
+| `text` | `""` | Text/button/toggle label or text input initial value, up to 8192 UTF-16 code units. Inputs also obey `max_chars`; other kinds require empty text. Plain text, wrapped and clipped; rich text is disabled. |
+| `max_chars` | `128` | Text inputs only; integer 1–8192 UTF-16 code units. A surrogate pair (such as an emoji) takes two units. |
+| `placeholder` | `""` | Text inputs only; plain hint text, up to 8192 UTF-16 code units. Shown while empty; never returned as the field value. |
+| `multiline` | `false` | Text inputs only; boolean. True permits line breaks and Enter inserts a new line. |
 | `value` | `0` | Progress/slider fraction, finite 0–1. Toggles reject this field; other kinds require zero. |
 | `checked` | `false` | Boolean, toggles only. |
 | `sprite` | Required for image | Typed handle from `sf2.assets.sprite`. Only image widgets accept this field. Images require positive width and height, preserve aspect ratio, and do not receive clicks. |
@@ -91,6 +94,59 @@ are errors. Dynamic text accepts plain strings. Use
 [`sf2.localization.text`](../localization-patches/#sf2localizationtext) to resolve
 translation handles during UI refreshes. Custom fonts and virtualized lists are not
 supported yet.
+
+### Editable text
+
+Use `kind = "text_input"` for names, search boxes, seed entry, and other forms.
+Fields use the native parchment artwork, game font and Unity text editing.
+`text` is the initial value; `placeholder` is a hint. Single-line fields reject
+line breaks. Multiline fields accept CR, LF and Unicode line/paragraph separators.
+Tabs, other control characters, malformed UTF-16 and values over `max_chars` are
+rejected. Script setters reject invalid values without changing the old value;
+native editing enforces the limit and restores the previous valid value if an
+edit violates the contract. These rules also apply to the initial value.
+
+Click a field to edit. While editing, arrows, Space and Enter belong to text
+editing; Tab/Shift+Tab move to another control. Back first leaves editing;
+a subsequent Back dismisses a menu/modal or calls its `on_back`. Opening a
+menu/modal may focus its first interactive field automatically. Hidden or
+disabled ancestors, a foreground replacement, native dialogs and view closure
+stop editing. A HUD captures fighter controls only while its field is focused;
+a menu/modal captures them throughout. Combat continues unless your separate
+workflow pauses it. Prefer a modal for a complete keyboard-operated form.
+
+`on_change` receives a string after a user edit. Read the current value with
+[`sf2.ui.get_text`](#sf2uiget_text), or set it silently with
+[`sf2.ui.set_text`](#sf2uiset_text). Validate application-specific rules in Lua;
+text input is not a numeric widget or a password field. The game font determines
+which glyphs display; emoji rendering, physical keyboard/IME composition and
+mobile software keyboards have not been accepted by the controlled Unity test.
+Custom fonts are not supported.
+
+```lua
+local sf2 = require("sf2")
+sf2.ui.open {
+    id = "name_form", mount = "modal",
+    root = { id = "panel", kind = "column", width = 400, height = 104, gap = 8,
+        children = {
+            { id = "name", kind = "text_input", height = 48,
+              placeholder = "Fighter name", max_chars = 24 },
+            { id = "apply", kind = "button", height = 48, text = "Apply" },
+        } },
+    on_click = function(view, id)
+        if id == "apply" then
+            local name = sf2.ui.get_text(view, "name")
+            if name ~= "" then sf2.log.info("Chosen name: " .. name) end
+        end
+    end,
+}
+```
+
+For a complete combat example, enable **Text Input Lab**
+(`Mods/example.text-input-lab`), restart, and enter Tournament 3 in normal or
+Eclipse mode. It provides a HUD name field and a multiline introduction modal.
+Names and introductions remain in Lua memory; the example does not rename the
+native fighter or write a save.
 
 ### Grid layouts
 
@@ -222,9 +278,9 @@ sf2.ui.set_checked(view, "challenge", true)
 
 **Returns:** Ignored.
 
-**When:** A visible, enabled toggle or slider in the foreground view changes
+**When:** A visible, enabled toggle, slider or text input in the foreground view changes
 through user input. `value` is a boolean for toggles, a number from 0 to 1 for
-sliders. The new value is committed before notification. Repeated identical
+sliders, and a string for text inputs. The new value is committed before notification. Repeated identical
 values and programmatic setters do not notify. Hidden/disabled ancestors and
 native dialogs block input. A callback may update widgets or close its view.
 
@@ -259,9 +315,9 @@ They affect presentation only; they do not enable rich text or change input rule
 
 | Field | Default | Applies to |
 | --- | --- | --- |
-| `font_size` | `22` | Text/buttons/toggles; integer 8–128 reference units. Does not enlarge the layout box. |
-| `text_align` | `center` | Text/buttons/toggles; `left`, `center`, or `right`, vertically centered. |
-| `text_color` | Native dark text on parchment/buttons; pale gold on HUD labels | Text/buttons/toggles. |
+| `font_size` | `22` | Text/buttons/toggles/text inputs; integer 8–128 reference units. Does not enlarge the layout box. |
+| `text_align` | `center` | Text/buttons/toggles/text inputs; `left`, `center`, or `right`; labels are vertically centered, multiline inputs start at the top. Inputs default to left alignment. |
+| `text_color` | Native dark text on parchment/buttons; pale gold on HUD labels | Text/buttons/toggles/text inputs. |
 | `background_color` | Native sprite colors | Containers, buttons, toggles, progress and slider tracks. Use a container behind text. |
 | `fill_color` | Native combat bar colors | Progress widgets and sliders. |
 | `frame` | No extra frame | `scroll` on a menu/modal root `stack` only. Uses the profile scroll's paper for the root area, with torn sides hanging about 55 units outside the left and right edges and 74-unit rolls overlapping the top and bottom. Nothing opaque is drawn outside the paper and roll artwork. A nested vertical scroll gets the desktop scrollbar. Inset content at least 75 units from the top and bottom; it may use the full width. |
@@ -356,16 +412,39 @@ closed the view. An invalid or foreign handle raises an error, rather than false
 if view and sf2.ui.is_open(view) then sf2.ui.set_text(view, "count", "Ready") end
 ```
 
+## sf2.ui.get_text
+
+**Signature:** `sf2.ui.get_text(view, widget_id)`
+
+**Returns:** The current plain string, including `""` for an empty value.
+
+**When:** Read a text input on Apply/Submit, or inspect a text/button/toggle label.
+During `on_change`, the getter already returns the newly committed value.
+It returns an input's value, never its placeholder. Hidden and disabled widgets
+can still be read by their owner.
+
+**Requires:** An open owned view and a text/button/toggle/text_input ID; no
+additional capability. Unknown IDs, other widget kinds, closed or forged view
+handles, and argument counts other than two are errors.
+
+```lua
+-- view is an open owned form with a text_input named "name".
+local name = sf2.ui.get_text(view, "name")
+if name == "" then sf2.log.info("Please enter a name") end
+```
+
 ## sf2.ui.set_text
 
 **Signature:** `sf2.ui.set_text(view, widget_id, text)`
 
 **Returns:** Nothing.
 
-**When:** Update a text, button or toggle label. The string may be empty and is limited
+**When:** Update a text, button or toggle label, or replace a text input value without
+triggering `on_change`. Input values also obey their `max_chars`, multiline and
+valid-text rules. Invalid values leave the old value intact. The string may be empty and is limited
 to 8192 UTF-16 code units. Updates do not rebuild the layout tree.
 
-**Requires:** An open owned view and a text/button/toggle ID; no additional capability.
+**Requires:** An open owned view and a text/button/toggle/text_input ID; no additional capability.
 
 ```lua
 sf2.ui.set_text(view, "count", "Charge: " .. tostring(charge))

@@ -1,5 +1,11 @@
 # Eclipse as a general Shadow Fight 2 mod engine
 
+The [editable text UI extension](UI_TEXT_INPUT_ACCEPTANCE.md) supports names,
+search/seed forms and multiline drafts using native themed fields, string change
+callbacks and an owned getter. Installed Lua/Unity focus, input-capture and
+cleanup acceptance narrows E4/E8; physical keyboard/IME, software keyboards,
+custom fonts and complete creator/platform acceptance remain open.
+
 The [owned camera API](CAMERA_CONTROL_ACCEPTANCE.md) lets a combat script acquire
 exclusive encounter framing, animate pan/zoom and restore native behavior with
 explicit release/expiry. Camera Lab demonstrates the public HUD, pause and

@@ -108,6 +108,17 @@ async function main() {
     fs.writeFileSync(path.join(workspace, 'modules.json'), JSON.stringify(await request('textDocument/completion', moduleProbe), null, 2));
     console.log('PASS: require("sf2") resolves and completes API modules');
 
+    const textNode=probe('text-input-node.lua','---@type Eclipse.UiNode\nlocal node={kind="text_input",|}');
+    await until(async()=>{const found=labels(await request('textDocument/completion',textNode));return ['max_chars','placeholder','multiline'].every(name=>found.some(label=>label.startsWith(name)));},'text input fields');
+    const uiGetter=probe('ui-getter.lua','local sf2=require("sf2")\nsf2.ui.|');
+    await until(async()=>labels(await request('textDocument/completion',uiGetter)).some(label=>label.startsWith('get_text')),'UI getter completion');
+    const inputText=fs.readFileSync(path.resolve(__dirname,'../../../Mods/example.text-input-lab/scripts/main.lua'),'utf8');
+    const inputUri=open('text-input-lab.lua',inputText+'\nsf2.price.coins("bad")\n');const inputKey=decodeURIComponent(inputUri).toLowerCase();
+    await until(()=>diagnostics.get(inputKey)?.some(d=>d.code==='param-type-mismatch'),'text input diagnostics publication');
+    notify('textDocument/didChange',{textDocument:{uri:inputUri,version:2},contentChanges:[{text:inputText}]});
+    await until(()=>diagnostics.has(inputKey)&&diagnostics.get(inputKey).length===0,'clean text input example diagnostics');
+    console.log('PASS: text input fields/getter completion and complete HUD/multiline example');
+
     const identityProbe=probe('actor-identity.lua','local sf2=require("sf2")\nsf2.tactics.register{id="brain",on_decide=function(memory,event)\n local actor=event.self.actor\n if actor then actor.| end\nend}');
     await until(async()=>{const found=labels(await request('textDocument/completion',identityProbe));return ['id','definition','owner','team'].every(name=>found.includes(name));},'AI actor identity fields');
     const scriptedText=fs.readFileSync(path.resolve(__dirname,'../../../Mods/example.scripted-actors/scripts/main.lua'),'utf8');

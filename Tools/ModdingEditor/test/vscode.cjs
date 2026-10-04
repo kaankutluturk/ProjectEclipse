@@ -186,6 +186,19 @@ exports.run = async function () {
         assert(stainsFound, 'Stain flight and accumulation completion missing');
         passed.push('PASS: stain flight and accumulation completion');
 
+        const inputUri=vscode.Uri.joinPath(folder.uri,'scripts','text-input-completion.lua');
+        fs.writeFileSync(inputUri.fsPath,'---@type Eclipse.UiNode\nlocal node={kind="text_input",\n    \n}');
+        await vscode.workspace.openTextDocument(inputUri);
+        let inputFound=false;const inputDeadline=Date.now()+30000;
+        while(Date.now()<inputDeadline){
+            const result=await vscode.commands.executeCommand('vscode.executeCompletionItemProvider',inputUri,new vscode.Position(2,4));
+            const names=(result?.items??[]).map(item=>typeof item.label==='string'?item.label:item.label.label);
+            if(['max_chars','placeholder','multiline'].every(name=>names.some(label=>label.startsWith(name)))){inputFound=true;break;}
+            await new Promise(resolve=>setTimeout(resolve,500));
+        }
+        assert(inputFound,'Text input field completion missing');
+        passed.push('PASS: text input max_chars, placeholder and multiline completion');
+
         const controlUri=vscode.Uri.joinPath(folder.uri,'scripts','control-completion.lua');
         fs.writeFileSync(controlUri.fsPath,'local sf2=require("sf2")\nsf2.behaviors.register { id="controls",on_round_begin=function(_,fighter)\n fighter:\nend }');
         await vscode.workspace.openTextDocument(controlUri);

@@ -9,6 +9,7 @@ namespace Eclipse.UI.Modding
 {
     // Scene-owned canvas/input arbitration. The game bridge supplies native blocking
     // and routes input; this class does not poll keys or grant combat pause authority.
+    [DefaultExecutionOrder(-9900)]
     public sealed class ModUiCoordinator : MonoBehaviour
     {
         private sealed class Entry
@@ -31,7 +32,9 @@ namespace Eclipse.UI.Modding
         private Rect lastSafeArea;
         private Vector2Int lastScreen;
         public ModUiSurface Foreground => layers.Foreground;
-        public bool CapturesInput => !disposed && layers.HasExclusiveInput;
+        public bool IsEditingText => !disposed && layers.Foreground != null &&
+            entries.TryGetValue(layers.Foreground, out var editing) && editing.View.IsEditingText;
+        public bool CapturesInput => !disposed && (layers.HasExclusiveInput || IsEditingText);
 
         public static ModUiCoordinator Create()
         {
@@ -115,6 +118,7 @@ namespace Eclipse.UI.Modding
                 entry.Root.SetActive(visible);
                 bool foreground = visible && entry.Surface == layers.Foreground;
                 entry.Group.interactable = entry.Group.blocksRaycasts = foreground;
+                if (!foreground) entry.View.StopEditingText();
             }
             // Compact ranks prevent sort-order overflow after repeated open/close.
             var ordered = new List<Entry>(entries.Values);
@@ -158,7 +162,8 @@ namespace Eclipse.UI.Modding
             return entry.View.ActivateSelected();
         }
 
-        public bool Back() => !disposed && layers.Back();
+        public bool Back() => !disposed &&
+            (IsEditingText ? entries[layers.Foreground].View.StopEditingText() : layers.Back());
 
         public bool AdjustSelected(int direction)
         {

@@ -233,3 +233,11 @@ to its core comparison, then requests the authored return from its own behavior;
 its identity, private state, health and remaining lifetime survive. Read
 [actor form changes](../../api/actors/#actorchange_form) for native timing and
 verification limits; editor diagnostics do not establish gameplay acceptance.
+
+The manual `text-input-lab` starter provides a HUD name field and a multiline
+modal in Tournament 3. `UiNode` completes `kind = "text_input"`, `max_chars`,
+`placeholder`, and `multiline`; `on_change` may receive a string, and
+`sf2.ui.get_text(view, widget_id)` returns the current string. The game enforces
+field limits and owns focus; editor diagnostics do not verify keyboard/IME or
+software-keyboard behavior. See the [UI reference](../../api/ui/) for limits and
+input capture behavior.

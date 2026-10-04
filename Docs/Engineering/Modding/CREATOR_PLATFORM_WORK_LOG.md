@@ -1440,3 +1440,28 @@ teams, asymmetric animation observer registries, arbitrary rigs/loadouts/throws,
 mod-owned actor handles/behavior, death/round/form/disable/teardown, encounter
 victory policies, physical input, exported players, multiplayer/rollback and
 performance still need work. G01-G14/E1-E8 and the full objective remain active.
+
+
+## 2026-10-04: editable owned mod UI
+
+Added text_input nodes (placeholder, 1..8192 UTF-16 max_chars, multiline),
+string on_change notifications and owned sf2.ui.get_text. Native themed fields
+preserve focus across model updates; HUD editing captures fighter controls,
+Tab traverses controls and Back leaves editing before view dismissal. Field
+ownership, ancestors, foreground/native blocking, errors and context disposal
+reuse existing UI lifetime gates. Installed Text Input Lab and its mirrored
+manual starter show public Lua HUD and multiline form workflows without changing
+native fighter names or saves. Public wiki/schema/generated/editor guides update
+with source; no recovered identity or renderer experiment changes.
+
+Verification: 203 managed UI checks/source guards; 996 actual Lua UI checks;
+four matching Windows-reference assemblies; 61 editor project tests; actual LuaLS
+completion/clean sample diagnostics and 26 isolated VS Code integration checks;
+wiki 255 binding coverage, types/build/search, 7036 local links across 64 pages,
+64 tracked current-branch source links and three link tests. Final isolated Unity
+installed-mod run passes 35 checks and exits successfully with a fresh result.
+Synthetic native keyboard Events prove component-to-Lua/editing/capture behavior;
+physical keyboards, IME/software keyboard/glyph coverage and exported platform
+acceptance remain open. Screenshot waits for the modal entrance fade to finish
+before capture. See UI_TEXT_INPUT_ACCEPTANCE.md for exact source and evidence.
+G01-G14/E1-E8 remain open. The human has deferred experimental procedural 3D.

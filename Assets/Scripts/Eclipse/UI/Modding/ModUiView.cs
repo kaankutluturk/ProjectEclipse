@@ -22,6 +22,7 @@ namespace Eclipse.UI.Modding
             public Selectable Control;
             public Toggle Toggle;
             public Slider Slider;
+            public InputField Input;
             public Image Artwork;
             public AssetId? LoadedSprite;
         }
@@ -99,7 +100,7 @@ namespace Eclipse.UI.Modding
             var label = rect.gameObject.AddComponent<Text>();
             label.font = font; label.fontSize = node.Style.FontSize ?? 22; label.text = node.Text;
             label.supportRichText = false;
-            Color normal = node.Kind == ModUiKind.Button ? new Color32(50,50,50,255) :
+            Color normal = node.Kind == ModUiKind.Button || node.Kind == ModUiKind.TextInput ? new Color32(50,50,50,255) :
                 surface.Mount == ModUiMount.CombatHud ? new Color32(223,207,177,255) : new Color32(47,37,27,255);
             label.color = ColorOf(node.Style.TextColor, normal);
             label.horizontalOverflow = HorizontalWrapMode.Wrap;
@@ -199,6 +200,38 @@ namespace Eclipse.UI.Modding
                 paper.color = ColorOf(node.Style.BackgroundColor,paper.color); paper.raycastTarget = false;
             }
             if (node.Kind == ModUiKind.Text) view.Label = Label(rect, node);
+            if (node.Kind == ModUiKind.TextInput)
+            {
+                var background = rect.gameObject.AddComponent<Image>();
+                Skin(background, "DialogScroll.Background_Center", new Color32(223,207,177,255));
+                background.color = ColorOf(node.Style.BackgroundColor, background.color);
+                view.Input = rect.gameObject.AddComponent<InputField>();
+                view.Control = view.Input;
+                view.Input.targetGraphic = background;
+                view.Input.navigation = new Navigation { mode = Navigation.Mode.None };
+                view.Input.characterLimit = node.MaxChars;
+                view.Input.lineType = node.Multiline ? InputField.LineType.MultiLineNewline : InputField.LineType.SingleLine;
+                var textRect = Rect("Value", rect, 0, 0); Stretch(textRect);
+                textRect.offsetMin = new Vector2(10, 5); textRect.offsetMax = new Vector2(-10, -5);
+                view.Label = Label(textRect, node);
+                if (node.Style.TextAlign == null) view.Label.alignment = node.Multiline ? TextAnchor.UpperLeft : TextAnchor.MiddleLeft;
+                else if (node.Multiline) view.Label.alignment = node.Style.TextAlign == "right" ? TextAnchor.UpperRight :
+                    node.Style.TextAlign == "center" ? TextAnchor.UpperCenter : TextAnchor.UpperLeft;
+                view.Label.horizontalOverflow = node.Multiline ? HorizontalWrapMode.Wrap : HorizontalWrapMode.Overflow;
+                view.Input.textComponent = view.Label;
+                var hintRect = Rect("Placeholder", rect, 0, 0); Stretch(hintRect);
+                hintRect.offsetMin = textRect.offsetMin; hintRect.offsetMax = textRect.offsetMax;
+                var hint = Label(hintRect, node); hint.text = node.Placeholder;
+                hint.alignment = view.Label.alignment;
+                var color = hint.color; color.a *= .55f; hint.color = color;
+                view.Input.placeholder = hint;
+                view.Input.selectionColor = new Color(.6f, .2f, .1f, .25f);
+                view.Input.onValueChanged.AddListener(text => {
+                    if (!surface.TryChangeText(node.Id, text) && !surface.IsClosed)
+                        view.Input.SetTextWithoutNotify(surface.GetText(node.Id));
+                });
+                buttons.Add(node.Id);
+            }
             if (node.Kind == ModUiKind.Image)
             {
                 var artwork = rect.gameObject.AddComponent<Image>();
@@ -329,11 +362,15 @@ namespace Eclipse.UI.Modding
             if (id == surface.Root.Id && GetComponent<Image>() is Image paper) paper.enabled = state.Visible;
             view.Rect.gameObject.SetActive(state.Visible);
             view.Group.interactable = state.Enabled;
-            if (view.Label != null) view.Label.text = state.Text;
+            if (view.Input != null) view.Input.SetTextWithoutNotify(state.Text);
+            else if (view.Label != null) view.Label.text = state.Text;
             if (view.Fill != null) view.Fill.anchorMax = new Vector2((float)state.Value, 1);
             if (view.Control != null) view.Control.interactable = state.Enabled;
             if (view.Toggle != null) view.Toggle.SetIsOnWithoutNotify(state.Value != 0);
             if (view.Slider != null) view.Slider.SetValueWithoutNotify((float)state.Value);
+            foreach (var field in widgets)
+                if (field.Value.Input != null && field.Value.Input.isFocused && !surface.CanFocus(field.Key))
+                    field.Value.Input.DeactivateInputField();
             if (view.Artwork != null && view.LoadedSprite != state.Sprite)
             {
                 if (!ModRuntime.IsInitialized) throw new InvalidOperationException("Image UI requires the asset host.");
@@ -376,6 +413,27 @@ namespace Eclipse.UI.Modding
         }
 
         // Input is routed here only for the foreground surface by its coordinator.
+        public bool IsEditingText
+        {
+            get
+            {
+                if (disposed || surface.IsClosed || EventSystem.current == null) return false;
+                var selected = EventSystem.current.currentSelectedGameObject;
+                foreach (var widget in widgets)
+                    if (widget.Value.Input != null && widget.Value.Input.gameObject == selected &&
+                        widget.Value.Input.isFocused && surface.CanFocus(widget.Key)) return true;
+                return false;
+            }
+        }
+        public bool StopEditingText()
+        {
+            bool stopped = false;
+            foreach (var widget in widgets.Values)
+                if (widget.Input != null && widget.Input.isFocused)
+                { widget.Input.DeactivateInputField(); stopped = true; }
+            return stopped;
+        }
+
         public bool MoveFocus(int direction)
         {
             if (disposed || surface.IsClosed || EventSystem.current == null || buttons.Count == 0) return false;
@@ -454,7 +512,14 @@ namespace Eclipse.UI.Modding
             var selected = EventSystem.current.currentSelectedGameObject;
             foreach (string id in buttons)
                 if (widgets[id].Control.gameObject == selected)
+                {
+                    if (widgets[id].Input != null)
+                    {
+                        if (!surface.CanFocus(id)) return false;
+                        widgets[id].Input.ActivateInputField(); return true;
+                    }
                     return widgets[id].Toggle != null ? surface.TryChange(id, surface.Read(id).Value == 0 ? 1 : 0) : surface.TryClick(id);
+                }
             return false;
         }
 

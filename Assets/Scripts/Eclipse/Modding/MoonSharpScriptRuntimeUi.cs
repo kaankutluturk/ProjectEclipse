@@ -29,6 +29,10 @@ namespace Eclipse.Modding
                     UiHandle(args, "sf2.ui.set_text").SetText(UiString(args, 1, "sf2.ui.set_text"), UiString(args, 2, "sf2.ui.set_text"));
                     return DynValue.Nil;
                 })));
+                ui.Set("get_text", DynValue.NewCallback((ctx, args) => ApiCall("sf2.ui.get_text", () => {
+                    if (args.Count != 2) throw new ModContentException("sf2.ui.get_text requires a view and widget ID.");
+                    return DynValue.NewString(UiHandle(args, "sf2.ui.get_text").GetText(UiString(args, 1, "sf2.ui.get_text")));
+                })));
                 ui.Set("set_value", DynValue.NewCallback((ctx, args) => ApiCall("sf2.ui.set_value", () => {
                     UiHandle(args, "sf2.ui.set_value").SetValue(UiString(args, 1, "sf2.ui.set_value"), UiArgument(args,2,DataType.Number,"sf2.ui.set_value").Number);
                     return DynValue.Nil;
@@ -272,6 +276,11 @@ namespace Eclipse.Modding
                     ThrowIfDisposed();
                     if (!ready) throw new ModContentException("UI input arrived before mounting completed.");
                     RunBounded(onBack, Mod.Id + ":ui/" + id + ":on_back", MaxBehaviorInstructionSlices, new[] { handle });
+                }, onChange.IsNil() ? (Action<string, string>)null : (widget, text) => {
+                    ThrowIfDisposed();
+                    if (!ready) throw new ModContentException("UI input arrived before mounting completed.");
+                    RunBounded(onChange, Mod.Id + ":ui/" + id + ":on_change", MaxBehaviorInstructionSlices,
+                        new[] { handle, DynValue.NewString(widget), DynValue.NewString(text) });
                 });
                 try
                 {
@@ -290,7 +299,7 @@ namespace Eclipse.Modding
                 if (value.Type != DataType.Table) throw new ModContentException("UI nodes must be tables.");
                 const string function = "UI node";
                 var node = value.Table;
-                ValidateFields(node, function, "id", "kind", "width", "height", "gap", "text", "value", "checked", "visible", "enabled", "children", "style", "sprite", "columns", "cell_width", "cell_height", "mirrored");
+                ValidateFields(node, function, "id", "kind", "width", "height", "gap", "text", "value", "checked", "visible", "enabled", "children", "style", "sprite", "columns", "cell_width", "cell_height", "mirrored", "max_chars", "placeholder", "multiline");
                 ModUiKind kind;
                 switch (RequiredString(node, "kind", function))
                 {
@@ -305,6 +314,7 @@ namespace Eclipse.Modding
                     case "slider": kind = ModUiKind.Slider; break;
                     case "image": kind = ModUiKind.Image; break;
                     case "grid": kind = ModUiKind.Grid; break;
+                    case "text_input": kind = ModUiKind.TextInput; break;
                     default: throw new ModContentException("Unsupported UI widget kind.");
                 }
                 if (kind != ModUiKind.Toggle && !node.Get("checked").IsNil()) throw new ModContentException("Only toggles accept checked.");
@@ -312,6 +322,10 @@ namespace Eclipse.Modding
                 if (kind != ModUiKind.Image && !node.Get("sprite").IsNil()) throw new ModContentException("Only image widgets accept a sprite.");
                 AssetId? sprite = kind == ModUiKind.Image ? RequiredHandle(node,"sprite",_spriteHandles,"sprite",function) : (AssetId?)null;
                 if (kind != ModUiKind.Image && !node.Get("mirrored").IsNil()) throw new ModContentException("Only image widgets accept mirrored.");
+                if (kind != ModUiKind.TextInput && (!node.Get("max_chars").IsNil() || !node.Get("placeholder").IsNil() || !node.Get("multiline").IsNil()))
+                    throw new ModContentException("Only text inputs accept max_chars, placeholder and multiline.");
+                int maxChars = kind == ModUiKind.TextInput ? (node.Get("max_chars").IsNil() ? 128 : RequiredInt(node, "max_chars", function)) : 0;
+                if (kind == ModUiKind.TextInput && (maxChars < 1 || maxChars > 8192)) throw new ModContentException("Text input max_chars must be 1..8192.");
                 if (kind != ModUiKind.Grid && (!node.Get("columns").IsNil() || !node.Get("cell_width").IsNil() || !node.Get("cell_height").IsNil()))
                     throw new ModContentException("Only grids accept columns and cell dimensions.");
                 double columns = UiNumber(node,"columns");
@@ -337,7 +351,8 @@ namespace Eclipse.Modding
                     UiNumber(node,"width"), UiNumber(node,"height"), OptionalStringAllowEmpty(node,"text","",function),
                     kind == ModUiKind.Toggle ? (OptionalBool(node,"checked",false,function) ? 1 : 0) : UiNumber(node,"value"), OptionalBool(node,"visible",true,function), OptionalBool(node,"enabled",true,function),
                     UiNumber(node,"gap"), children, ReadUiStyle(node.Get("style")), sprite,
-                    (int)columns, UiNumber(node,"cell_width"), UiNumber(node,"cell_height"), OptionalBool(node,"mirrored",false,function));
+                    (int)columns, UiNumber(node,"cell_width"), UiNumber(node,"cell_height"), OptionalBool(node,"mirrored",false,function),
+                    maxChars, OptionalStringAllowEmpty(node,"placeholder","",function), OptionalBool(node,"multiline",false,function));
             }
 
             private static ModUiNode FindUiNode(ModUiNode node, string id)
