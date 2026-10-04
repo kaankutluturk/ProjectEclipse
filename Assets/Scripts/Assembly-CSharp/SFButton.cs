@@ -62,6 +62,7 @@ public class SFButton : Button, global::IEventDispatcher<object>
 	protected override void Awake()
 	{
 		base.Awake();
+		Eclipse.UI.ControlTexturePacks.ApplyToSpriteSwap(this);
 		base.onClick.AddListener(() =>
 		{
 			if (IsOneShot)
