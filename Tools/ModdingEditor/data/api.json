@@ -1178,6 +1178,17 @@
       "requires": "`content.patch`, `content.register` for handle lookups, and a declared `core` dependency.",
       "when": "During mod loading."
     },
+    "sf2.forge.register_profile": {
+      "params": {
+        "definition": "Eclipse.ForgePriceProfile"
+      },
+      "returns": "A forge economy-profile handle, usable as a recipe's `economic_profile`.",
+      "capability": "content.register",
+      "url": "https://dawc17.github.io/ProjectEclipse/api/items-progression-forge/#sf2forgeregister_profile",
+      "summary": "",
+      "requires": "`content.register`.",
+      "when": "During mod loading, before the recipes that use it."
+    },
     "sf2.forge.register_recipe": {
       "params": {
         "definition": "Eclipse.ForgeRecipe"
@@ -1484,6 +1495,17 @@
       "summary": "Remove one exact direct perk lock from an existing native move.",
       "requires": "`content.patch`, plus access to the referenced perk through core or a declared dependency.",
       "when": "During mod registration. The patch is applied when the active content set is projected into the recovered move runtime and is restored when that overlay is removed or rolled back."
+    },
+    "sf2.moves.extend_perk_lock": {
+      "params": {
+        "definition": "Eclipse.MovePerkLockExtension"
+      },
+      "returns": "Nothing (`nil`).",
+      "capability": "content.patch",
+      "url": "https://dawc17.github.io/ProjectEclipse/api/moves-and-tactics/#sf2movesextend_perk_lock",
+      "summary": "",
+      "requires": "`content.patch`, plus access to both perks through core, a declared dependency or your own mod.",
+      "when": "During registration. Applied to the loaded native moves together with the other lock patches, before fighters are built. Use Apply & Restart when changing enabled content."
     },
     "sf2.moves.register_trigger": {
       "params": {
@@ -2305,6 +2327,20 @@
       "params": {
         "control": "\"punch\"|\"kick\"|\"ranged\"|\"magic\"|\"raid_charge\"",
         "blocked": "boolean"
+      },
+      "capability": "combat.effects"
+    },
+    "set_button_cooldown": {
+      "params": {
+        "control": "\"punch\"|\"kick\"|\"ranged\"|\"raid_charge\"",
+        "frames": "integer"
+      },
+      "capability": "combat.effects"
+    },
+    "set_control_visible": {
+      "params": {
+        "control": "\"raid_charge\"",
+        "visible": "boolean"
       },
       "capability": "combat.effects"
     },
@@ -4151,6 +4187,38 @@
         "equipment": "\"weapon\"|\"armor\"|\"helm\"|\"ranged\"|\"magic\""
       }
     },
+    "ForgePriceRow": {
+      "fields": {
+        "level?": [
+          "integer",
+          "Exact item level; use instead of min_level/max_level."
+        ],
+        "min_level?": [
+          "integer",
+          "First item level, default 1."
+        ],
+        "max_level?": [
+          "integer",
+          "Last item level; omitted means every higher level."
+        ],
+        "materials": [
+          "integer[]",
+          "ForgeMaterial1..3 counts, 1-3 entries."
+        ]
+      }
+    },
+    "ForgePriceTable": {
+      "fields": {
+        "equipment": "\"weapon\"|\"armor\"|\"helm\"|\"ranged\"|\"magic\"",
+        "rows": "Eclipse.ForgePriceRow[]"
+      }
+    },
+    "ForgePriceProfile": {
+      "fields": {
+        "id": "string",
+        "prices": "Eclipse.ForgePriceTable[]"
+      }
+    },
     "ForgeItem": {
       "fields": {
         "equipment": "\"weapon\"|\"armor\"|\"helm\"|\"ranged\"|\"magic\"",
@@ -4848,6 +4916,19 @@
       "fields": {
         "move": "string",
         "perk": "Eclipse.PerkHandle"
+      }
+    },
+    "MovePerkLockExtension": {
+      "fields": {
+        "move": "string",
+        "source_perk": [
+          "Eclipse.PerkHandle",
+          "Perk already locking the move, directly or inside a top-level OR group."
+        ],
+        "perk": [
+          "Eclipse.PerkHandle",
+          "Alternative perk that also unlocks the move."
+        ]
       }
     },
     "SoundAction": {

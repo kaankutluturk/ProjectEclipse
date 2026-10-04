@@ -1023,7 +1023,20 @@ namespace Eclipse.Modding
             profiles.Sort((left, right) => CompareIds(left.Id, right.Id));
             Append(canonical, "forge-profiles"); Append(canonical, profiles.Count);
             for (int i = 0; i < profiles.Count; i++)
-            { Append(canonical, profiles[i].Id.ToString()); Append(canonical, profiles[i].RuntimeRecipeName); }
+            {
+                Append(canonical, profiles[i].Id.ToString()); Append(canonical, profiles[i].RuntimeRecipeName);
+                if (!profiles[i].IsModOwned) continue;
+                Append(canonical, "prices"); Append(canonical, profiles[i].PriceBlocks.Count);
+                foreach (ModForgePriceBlock block in profiles[i].PriceBlocks)
+                {
+                    Append(canonical, (int)block.Equipment); Append(canonical, block.Prices.Count);
+                    foreach (ModForgePrice price in block.Prices)
+                    {
+                        Append(canonical, price.MinLevel); Append(canonical, price.MaxLevel); Append(canonical, price.Materials.Count);
+                        for (int k = 0; k < price.Materials.Count; k++) Append(canonical, price.Materials[k]);
+                    }
+                }
+            }
 
             var recipes = new List<ForgeRecipeFamilyDefinition>(content.ForgeRecipeFamilies);
             recipes.Sort((left, right) => CompareIds(left.Id, right.Id));
@@ -1302,6 +1315,14 @@ namespace Eclipse.Modding
                 Append(canonical,"move-item-lock-extensions-v1"); Append(canonical,extensions.Count);
                 foreach (var entry in extensions)
                 { Append(canonical,entry.MoveName); Append(canonical,entry.ItemType); Append(canonical,entry.SourceSubtype); Append(canonical,entry.Subtype); }
+            }
+            if (content.MovePerkLockExtensions.Count > 0)
+            {
+                var extensions = new List<MovePerkLockExtension>(content.MovePerkLockExtensions);
+                extensions.Sort((a,b) => string.CompareOrdinal(a.ConflictKey,b.ConflictKey));
+                Append(canonical,"move-perk-lock-extensions-v1"); Append(canonical,extensions.Count);
+                foreach (var entry in extensions)
+                { Append(canonical,entry.MoveName); Append(canonical,entry.SourcePerk.ToString()); Append(canonical,entry.Perk.ToString()); }
             }
 
             if (content.MovePerkLockRemovals.Count > 0)

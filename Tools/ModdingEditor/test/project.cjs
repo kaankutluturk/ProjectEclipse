@@ -419,12 +419,16 @@ test('DE combat perk callbacks and fighter operations are typed', () => {
     assert.deepEqual(api.fighterMethods.show_status_icon,{params:{key:'string',sprite:'Eclipse.SpriteHandle',frames:'integer','stacks?':'integer'},capability:'combat.effects'});
     assert.deepEqual(api.fighterMethods.clear_status_icon,{params:{key:'string'},capability:'combat.effects'});
     assert.deepEqual(api.fighterMethods.set_control_blocked,{params:{control:'"punch"|"kick"|"ranged"|"magic"|"raid_charge"',blocked:'boolean'},capability:'combat.effects'});
+    assert.deepEqual(api.fighterMethods.set_control_visible,{params:{control:'"raid_charge"',visible:'boolean'},capability:'combat.effects'});
+    assert.deepEqual(api.fighterMethods.set_button_cooldown,{params:{control:'"punch"|"kick"|"ranged"|"raid_charge"',frames:'integer'},capability:'combat.effects'});
 });
 
 test('move perk-lock removal and initial perk rank are typed', () => {
     const api=require('../scripts/api-schema.cjs');
     assert.deepEqual(api.types.MovePerkLockRemoval.fields,{move:'string',perk:'Eclipse.PerkHandle'});
     assert.equal(api.functions['sf2.moves.remove_perk_lock'].capability,'content.patch');
+    assert.equal(api.functions['sf2.moves.extend_perk_lock'].capability,'content.patch');
+    assert.deepEqual(Object.keys(api.types.MovePerkLockExtension.fields),['move','source_perk','perk']);
     assert.equal(api.types.PerkDefinition.fields['initial_upgrade?'],'integer');
     assert.equal(api.types.TemplatePerk.fields['initial_upgrade?'],'integer');
 });

@@ -17,7 +17,7 @@ internal static class DE128FoundationTests
         { "paid_offers", "battle_pass", "ads", "rewarded_video", "online_services", "payments" };
     private static readonly UTF8Encoding Utf8 = new UTF8Encoding(false);
     private static readonly string[] Capabilities =
-        { "policy.services", "policy.timers", "content.register", "content.patch", "combat.modify_outgoing_hit", "combat.effects", "story.events", "story.progression", "profile.read", "state.read", "state.write", "ui.create", "presentation.navigate", "presentation.dojo", "assets.replace" };
+        { "policy.services", "policy.timers", "content.register", "content.patch", "combat.modify_outgoing_hit", "combat.modify_hit", "combat.effects", "story.events", "story.progression", "profile.read", "state.read", "state.write", "ui.create", "presentation.navigate", "presentation.dojo", "assets.replace" };
     private static readonly HashSet<string> CallTimeCapabilities = new HashSet<string> { "profile.read", "state.read", "ui.create", "presentation.navigate" };
     private static readonly DefinitionId Sword = DefinitionId.Parse("de128:items/weapon/titans_desolator");
     private static readonly DefinitionId CoreSword = CoreContentImporter.WeaponId("WEAPON_TITAN_GIANT_SWORD");
@@ -45,6 +45,18 @@ internal static class DE128FoundationTests
 
     // Resolves only the declared core references. Native art decoding is a
     // separate check; arbitrary or misspelled asset IDs must not pass this fixture.
+    // content/boss_abilities.lua key -> the archived perk's <Set FlagName>.
+    private static readonly Dictionary<string, string> AbilityRechargeFlags = new Dictionary<string, string> {
+        ["rat_wave"] = "RatWaveRecharge", ["fear_ray"] = "FearRecharge", ["lightning_chain"] = "LightningChainCD",
+        ["assistants"] = "AssistantsRecharge" };
+
+    // Ready and cooldown (_Red) icons of the Special Recipe abilities; all present in
+    // the packaged art catalog under UI/Skills.
+    private static readonly HashSet<string> AbilityIcons = new HashSet<string>(
+        new[] { "iconascetism", "iconcruelty", "iconaccuracy", "iconchargesteal", "iconirongrip", "iconmagicattack",
+            "iconsyphon", "iconlightning", "iconelementalprecision", "iconcriticalchance", "iconlifesteal" }
+            .SelectMany(name => new[] { "ui/skills/" + name, "ui/skills/" + name + "_red" }), StringComparer.Ordinal);
+
     private sealed class CoreMetadata : IAssetProvider
     {
         private readonly string _missing;
@@ -59,7 +71,7 @@ internal static class DE128FoundationTests
             else if (id.Path == "ui/items/weapon17.img_weapon_boss_giant_sword") kind = AssetKind.Sprite;
             else if (id.Path == "ui/skills/iconmasterofstyle" || id.Path == "ui/skills/iconmasterofstyle_blue" ||
                 id.Path == "ui/skills/iconcrackedapple" || id.Path == "ui/skills/iconcrackedapple_blue") kind = AssetKind.Sprite;
-            else if (CorePortraits.Contains(id.Path)) kind = AssetKind.Sprite;
+            else if (CorePortraits.Contains(id.Path) || AbilityIcons.Contains(id.Path)) kind = AssetKind.Sprite;
             else if (!RestoredAssets.TryGetValue(id.Path, out kind)) return false;
             metadata = new AssetMetadata(id, kind, AssetSourceKind.Core, string.Empty, -1, "DE128 metadata fixture");
             return true;
@@ -563,7 +575,8 @@ internal static class DE128FoundationTests
     private static void CheckDE(ModContentCatalog catalog)
     {
         ModPolicies.Content = catalog;
-        Check(catalog.TimerPolicies.Count == 2 && catalog.TryGetTimer("forge", out var timer) &&
+        // battle, raid and forge (content/timers.lua).
+        Check(catalog.TimerPolicies.Count == 3 && catalog.TryGetTimer("forge", out var timer) &&
             timer.Owner.Value == "de128", "The forge policy is not exclusively owned by DE128.");
         Check(catalog.TryGetTimer("battle", out var battleTimer) && battleTimer.Owner.Value == "de128" &&
             ModPolicies.BattleSeconds(99) == 150 && ModPolicies.BattleSeconds(999) == 150 &&
@@ -571,8 +584,31 @@ internal static class DE128FoundationTests
         Check(ModPolicies.DeliverySeconds("forge", 120) == 0, "New forge orders are not instant.");
         Check(ModPolicies.SkipEnabled("forge"), "Already-pending orders lost their normal skip path.");
         Check(ModPolicies.CompletePending("forge"), "DE pending orders are not eligible for normal settlement.");
-        Check(catalog.ForgeRecipeFamilies.Count == 2 && catalog.ForgeCandidateExclusions.Count == 40 &&
+        Check(catalog.ForgeRecipeFamilies.Count == 5 && catalog.ForgeCandidateExclusions.Count == 40 &&
             catalog.ForgeDeviations.Count == 5, "DE forge pools or deviations are incomplete.");
+        // Special Recipes I-III: archived forge.xml Abilities* pools at their own price table.
+        Check(catalog.TryGetForgeEconomicProfile(DefinitionId.Parse("de128:forge-profiles/special_recipes"), out var special) &&
+            special.IsModOwned && special.PriceBlocks.Count == 5 && special.PriceBlocks.All(block => block.Prices.Count == 51 &&
+                block.Prices[0].MinLevel == 1 && block.Prices[0].MaxLevel == 2 &&
+                block.Prices[50].MinLevel == 52 && block.Prices[50].MaxLevel == ModRegistrationTransaction.UnboundedForgeLevel),
+            "The Special Recipe price profile is missing or incomplete.");
+        var weaponPrices = special.PriceBlocks.Single(block => block.Equipment == ModEquipmentKind.Weapon).Prices;
+        Check(weaponPrices[0].Materials.SequenceEqual(new[] { 38, 10, 5 }) &&
+            weaponPrices[50].Materials.SequenceEqual(new[] { 337441, 101232, 60739 }),
+            "Special Recipe weapon prices differ from forge.xml.");
+        foreach (var (localId, perks) in new[] {
+            ("abilities_1", new[] { "hermit_storm", "earthquake", "wasp_fly" }),
+            ("abilities_2", new[] { "teleportation", "assistants", "rat_wave", "war_whirl" }),
+            ("abilities_3", new[] { "lightning_chain", "fear_ray", "power_field", "grasp_of_darkness", "titans_shield" }) })
+        {
+            var recipe = catalog.ForgeRecipeFamilies.SingleOrDefault(row => row.Id.LocalId == localId);
+            Check(recipe != null && recipe.EconomicProfile == special.Id && recipe.Items.Count == 5 &&
+                recipe.Items.All(item => item.Enchantments == 1 && item.BarScale == "Enchantment") &&
+                recipe.Candidates.Count == perks.Length * 5 &&
+                perks.All(key => catalog.TryGetPerk(DefinitionId.Parse("de128:perks/" + key), out var perk) &&
+                    perk.Kind == ModPerkKind.Combo && recipe.Candidates.Count(row => row.Perk == perk.Id) == 5),
+                "Special Recipe '" + localId + "' differs from forge.xml.");
+        }
         Check(Services.All(service => !ModPolicies.FeatureEnabled(service)), "A DE service gate is missing.");
         Check(ModPolicies.FeatureEnabled("campaign"), "An unrelated feature was disabled.");
         Check(catalog.ItemCombatSubtypes.Count == 5 && catalog.ItemTacticSubtypes.Count == 0,
@@ -593,9 +629,20 @@ internal static class DE128FoundationTests
             backKick?.IntervalEnd?.Name == "SemiUninterrupt" && backKick.IntervalEnd.Expected == 4 && backKick.IntervalEnd.Value == 6 &&
             backKick.IntervalStart?.Name == "Uninterrupt" && backKick.IntervalStart.Expected == 5 && backKick.IntervalStart.Value == 7,
             "Double-kick starters lost their cancel windows.");
-        Check(catalog.Moves.Count == 61 && catalog.MoveItemLockExtensions.Count == 10 && catalog.MoveCombatPatches.Count == 37 &&
+        Check(catalog.Moves.Count == 61 && catalog.MoveItemLockExtensions.Count == 10 && catalog.MoveCombatPatches.Count == 41 &&
             catalog.MoveCombatPatches.Count(patch => patch.Disable) == 15,
             "Archived move registrations, boss ability replacements or lock extensions are incomplete.");
+        // Native boss-ability casts stay unlocked by the core boss perk and also by the player's enchantment.
+        var abilityLocks = new Dictionary<string, string> {
+            ["LightingChainPlayer"] = "lightning_chain", ["RatWavePlayer"] = "rat_wave", ["PerkFearRayPlayer"] = "fear_ray",
+            ["AssistantLongKatanaPlayer"] = "assistants", ["AssistantBigNaginataPlayer"] = "assistants",
+            ["AssistantBigMagariYariPlayer"] = "assistants", ["AssistantUniqGlaivePlayer"] = "assistants" };
+        Check(catalog.MovePerkLockExtensions.Count == abilityLocks.Count && abilityLocks.All(entry =>
+                catalog.MovePerkLockExtensions.Any(lockExtension => lockExtension.MoveName == entry.Key &&
+                    lockExtension.SourcePerk.Namespace.Value == "core" &&
+                    lockExtension.Perk == DefinitionId.Parse("de128:perks/" + entry.Value))) &&
+            abilityLocks.All(entry => catalog.MoveCombatPatches.Single(patch => patch.MoveName == entry.Key).Conditions.Count > 0),
+            "Native boss-ability casts lost their enchantment lock or recharge condition.");
         Check(catalog.Tactics.Count == 21 && catalog.Tactics.Any(tactic => tactic.RuntimeName == "de128:tactics/wasp_fly" && tactic.CoreTemplate == "Aggressive") &&
             catalog.TryGetFight(DefinitionId.Parse("de128:fights/uw_survival_demon_1"), out var waspFight) &&
             catalog.TryGetWarrior(waspFight.Warriors[3], out var waspWarrior) &&
@@ -844,7 +891,10 @@ internal static class DE128FoundationTests
         var mindInnate=catalog.ItemInnatePerks.Single(value=>value.Item.ToString()=="de128:items/magic/mind_throw");
         Check(mindInnate.Entries.Count==1 && mindInnate.Entries[0].Perk.ToString()=="de128:perks/mind_throw",
             "MindThrow lost its innate Lua behavior");
-        Check(catalog.Perks.Count(perk => !perk.IsCore) == 3 && catalog.Behaviors.Count(value => value.Id.LocalId != "sensei_raid_charge") == 3 && catalog.Behaviors.Count == 4,
+        // Three combat/innate perks plus twelve Special Recipe abilities (two shared behaviors).
+        Check(catalog.Perks.Count(perk => !perk.IsCore) == 15 && catalog.Behaviors.Count(value => value.Id.LocalId != "sensei_raid_charge") == 5 && catalog.Behaviors.Count == 6 &&
+            catalog.Behaviors.Any(value => value.Id.ToString() == "de128:behaviors/boss_ability") &&
+            catalog.Behaviors.Any(value => value.Id.ToString() == "de128:behaviors/titans_shield"),
             "DE combat perk definitions are missing or unexpected behaviors were registered.");
         foreach (int level in new[] { 4, 8, 11, 14, 17 })
             Check(catalog.TryGetProgressionBranch(level, out var branch) && branch.Entries.Count == 2,
@@ -876,7 +926,10 @@ internal static class DE128FoundationTests
                 condition.Name == "de128:moves/wasp_fly_" + range)) &&
             start.Conditions.Count(condition => condition.Kind == ModMoveConditionKind.Direction) == 1 &&
             start.Conditions.All(condition => condition.Kind != ModMoveConditionKind.Distance) &&
-            start.Graph.Locks.Count == 1 && start.Graph.Locks[0].Kind == ModMoveConditionKind.Perk &&
+            // Unlocked by the core boss perk (opponents) or the player's Special Recipe enchantment.
+            start.Graph.Locks.Count == 1 && start.Graph.Locks[0].Kind == ModMoveConditionKind.Any &&
+            start.Graph.Locks[0].Children.Count == 2 &&
+            start.Graph.Locks[0].Children.All(child => child.Kind == ModMoveConditionKind.Perk) &&
             finish.Conditions.Count(condition => condition.Kind == ModMoveConditionKind.CurrentAnimation &&
                 condition.Player == "Enemy" && condition.Not) == 19 &&
             finish.Graph.Align.ShiftModelNode == "NPivot" && finish.Graph.Align.Position.ShiftX == 100,
@@ -986,6 +1039,13 @@ internal static class DE128FoundationTests
                         condition.Name == "LightningChain" && !condition.Not &&
                         newMove.SelectSingleNode("Locks/Perk[@Name='PERK_LIGHTING_CHAIN']") != null,
                         "Spawned chain actor guard is not supported by the archived phase.");
+                else if (condition.Name.StartsWith("de128:behaviors/boss_ability:", StringComparison.Ordinal))
+                    // The player's enchantment recharge stands in for the archived perk's native
+                    // recharge flag, which the DE move tests in the same way.
+                    Check(condition.Kind == ModMoveConditionKind.ModExists && condition.Not &&
+                        AbilityRechargeFlags.TryGetValue(condition.Name.Substring("de128:behaviors/boss_ability:".Length), out var nativeFlag) &&
+                        newMove.SelectSingleNode("Conditions/ModExists[@Name='" + nativeFlag + "' and @Not='1']") != null,
+                        "Ability recharge condition has no archived native recharge flag.");
                 else
                     Check(condition.Kind == ModMoveConditionKind.ModExists && condition.Name == "Stun" && condition.Not &&
                         newMove.SelectSingleNode("Conditions/ModExists[@Name='Stun' and @Not='1']") != null &&
@@ -1672,6 +1732,16 @@ end}
         {
             string retained = "[" + string.Join(", ", Capabilities.Where(value => value != missing).Select(value => "\"" + value + "\"")) + "]";
             var restricted = CopyPackage(source, fixture, "missing-" + missing, retained);
+            // Only Hex Shield's incoming-hit callback needs combat.modify_hit; the host refuses
+            // scale_incoming_damage at call time, so registration itself is unaffected.
+            if (missing == "combat.modify_hit")
+            {
+                var shieldOnly = new ModContentCatalog();
+                Load(restricted, shieldOnly);
+                Check(shieldOnly.TryGetPerk(DefinitionId.Parse("de128:perks/titans_shield"), out _),
+                    "Missing combat.modify_hit changed registration.");
+                continue;
+            }
             // Combat capabilities are enforced when invoking the effect, not at registration.
             if (missing.StartsWith("combat."))
             {

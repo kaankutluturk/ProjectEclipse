@@ -751,6 +751,55 @@ The runtime must find exactly one positive direct item lock, or one positive top
 
 Different additions to the same group compose. The source selector must exist before the batch; it cannot depend on a subtype another pending extension adds. The same move/type/additional-subtype combination is a registration conflict, including across mods, even if the source selector differs. Subtype matching is exact and case-sensitive. The selector and addition are fingerprinted. Native teardown restores the original condition objects; unrelated sibling edits are preserved. This endpoint supplies no missing animations, attacks or preview behavior by itself.
 
+## sf2.moves.extend_perk_lock
+
+**Signature:** `sf2.moves.extend_perk_lock { move, source_perk, perk }`
+
+**Returns:** Nothing (`nil`).
+
+**When:** During registration. Applied to the loaded native moves together with
+the other lock patches, before fighters are built. Use Apply & Restart when
+changing enabled content.
+
+**Requires:** `content.patch`, plus access to both perks through core, a declared
+dependency or your own mod.
+
+Let a second perk unlock a native move that a perk already locks, without taking
+the move away from fighters who have the original perk. A *perk lock* is the
+move's requirement that the fighter has a particular perk; the move is missing
+from the fighter's move list without it.
+
+| Field | Type | Meaning |
+| --- | --- | --- |
+| `move` | String | Required exact, case-sensitive native move name, e.g. `RatWavePlayer`. |
+| `source_perk` | Perk handle | Required. A perk that already locks the move. |
+| `perk` | Perk handle | Required. The alternative perk to add; it must differ from `source_perk`. |
+
+```lua
+local sf2 = require("sf2")
+local boss_wave = sf2.perks.get("core:perks/PERK_RAT_WAVE")
+-- my_rat_wave is a perk handle from sf2.perks.register.
+sf2.moves.extend_perk_lock {
+    move = "RatWavePlayer",
+    source_perk = boss_wave,
+    perk = my_rat_wave,
+}
+```
+
+The runtime must find exactly one positive direct `source_perk` lock, or one
+positive top-level OR group that contains it. A direct lock becomes an OR group of
+both perks; an existing OR group keeps its perks and gains the new one. Other
+locks on the move (equipment, skeleton, screen) still apply, and nested, negated
+or AND-only matches are not changed. A missing or ambiguous source lock, or a perk
+that is already an alternative, fails the whole native batch before any lock
+changes.
+
+The same move and added perk cannot be registered twice, including across mods.
+The move, both perks and the addition are part of the compatibility fingerprint,
+and removing the content restores the original lock. To drop a lock instead of
+widening it, use [`sf2.moves.remove_perk_lock`](#sf2movesremove_perk_lock). For
+moves you register yourself, write `locks = { { any = { { perk = a }, { perk = b } } } }`.
+
 ## sf2.moves.patch
 
 **Signature:** `sf2.moves.patch { move, disable?, conditions?, interval_start?, interval_end?, hit?, sound_frame?, input?, priority?, animation?, remove_interval?, add_interval? }`

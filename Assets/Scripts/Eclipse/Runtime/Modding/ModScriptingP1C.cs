@@ -85,6 +85,12 @@ namespace Eclipse.Modding
             return RequireRegistration().GetForgeEconomicProfile(reference);
         }
 
+        public ForgeEconomicProfileDefinition RegisterForgeEconomicProfile(string localId, ModForgePriceBlock[] blocks)
+        {
+            RequireCapability("content.register");
+            return RequireRegistration().RegisterForgeEconomicProfile(localId, blocks);
+        }
+
         public ForgeRecipeFamilyDefinition RegisterForgeRecipeFamily(string localId, string alias,
             DefinitionId economicProfile, ModForgeRecipeItem[] items, ModForgeRecipeCandidate[] candidates)
         {

@@ -12,8 +12,15 @@ using Eclipse.Modding;
 internal static class DECombatPerksTests
 {
     private sealed class Fighter : IModFighterOperations, IModIncomingHitSource,
-        IModCombatSnapshotSource, IModCombatActivitySource, IModFighterStatusIcons, IModFighterFlags, IModAnimationLifecycleSource
+        IModCombatSnapshotSource, IModCombatActivitySource, IModFighterStatusIcons, IModFighterFlags, IModAnimationLifecycleSource,
+        IModFighterButtons
     {
+        internal readonly List<(string Control, int Frames)> Cooldowns = new List<(string, int)>();
+        internal bool RaidChargeVisible;
+        public bool TrySetButtonCooldown(string control, int frames, out string error)
+        { error = ""; Cooldowns.Add((control, frames)); return true; }
+        public bool TrySetControlVisible(string control, bool visible, out string error)
+        { error = ""; if (control == "raid_charge") RaidChargeVisible = visible; return control == "raid_charge"; }
         public ModAnimationLifecycleEvent AnimationEvent { get; set; }
         internal readonly HashSet<string> Flags = new HashSet<string>();
         internal int Sets, Clears;
@@ -189,8 +196,59 @@ internal static class DECombatPerksTests
             }
             TestIsolation(script, catalog, check);
             CheckMoveLocks(catalog, repository, check);
+            CheckBossAbilities(script, catalog, xmlPerks, check);
         }
         TestDamageBounds(check);
+    }
+
+    // Special Recipe abilities (content/boss_abilities.lua) against their archived <Set>.
+    private static void CheckBossAbilities(IModScriptContext script, ModContentCatalog catalog, XmlDocument xmlPerks,
+        Action<bool, string> check)
+    {
+        foreach (var (key, perkName, trigger) in new[] {
+            ("earthquake", "PERK_EARTHQUAKE", "de128:moves/butcher_earthquake_player"),
+            ("lightning_chain", "PERK_LIGHTING_CHAIN", "LightingChainPlayer"),
+            ("assistants", "PERK_ASSISTANTS", "AssistantUniqGlaivePlayer") })
+        {
+            var set = (XmlElement)xmlPerks.SelectSingleNode("//Perk[@Name='" + perkName + "']/Set");
+            int frames = int.Parse(set.GetAttribute("Frames"), CultureInfo.InvariantCulture);
+            int initial = set.HasAttribute("InitialFrames") ? int.Parse(set.GetAttribute("InitialFrames"), CultureInfo.InvariantCulture) : frames;
+            string flag = "de128:behaviors/boss_ability:" + key;
+            var trace = new Trace(script, catalog, key, 0, check);
+            check(catalog.TryGetPerk(DefinitionId.Parse("de128:perks/" + key), out var perk) && perk.Kind == ModPerkKind.Combo,
+                key + " is not a combo enchantment.");
+            trace.Tick(1);
+            check(trace.Fighter.Flags.Contains(flag) && trace.Fighter.RaidChargeVisible &&
+                trace.Fighter.Cooldowns.Count == 1 && trace.Fighter.Cooldowns[0] == ("raid_charge", initial) &&
+                trace.Fighter.Icons.Values.Any(icon => icon.Frames == initial),
+                key + " did not start its archived initial recharge on RaidCharge.");
+            for (int frame = 2; frame <= initial; frame++) trace.Tick(frame);
+            check(trace.Fighter.Flags.Contains(flag), key + " recharge ended early.");
+            trace.Tick(initial + 1);
+            check(!trace.Fighter.Flags.Contains(flag), key + " recharge did not end after " + initial + " frames.");
+            Action<string, string> animation = (target, name) =>
+            {
+                trace.Fighter.AnimationEvent = new ModAnimationLifecycleEvent(ModEffectEvent.AnimationStart, name, target, 10);
+                trace.Call(ModEffectEvent.AnimationStart);
+            };
+            animation("opponent", trigger);
+            check(!trace.Fighter.Flags.Contains(flag), key + " recharged from the opponent's cast.");
+            animation("self", trigger);
+            check(trace.Fighter.Flags.Contains(flag) && trace.Fighter.Cooldowns.Last() == ("raid_charge", frames),
+                key + " cast did not start its archived " + frames + "-frame recharge.");
+        }
+
+        var shield = new Trace(script, catalog, "titans_shield", 0, check);
+        int cooldown = int.Parse(((XmlElement)xmlPerks.SelectSingleNode("//Perk[@Name='PERK_TITANS_SHIELD']/Set"))
+            .GetAttribute("Cooldown"), CultureInfo.InvariantCulture);
+        shield.Tick(1);
+        shield.Hit(ModEffectEvent.DamageResolving, true, false, "weapon", 0.2);
+        check(Near(shield.Fighter.Damage, 0.2), "Hex Shield absorbed a hit while recharging.");
+        for (int frame = 2; frame <= cooldown + 1; frame++) shield.Tick(frame);
+        shield.Hit(ModEffectEvent.DamageResolving, true, false, "weapon", 0.2);
+        check(Near(shield.Fighter.Damage, 0), "Hex Shield did not absorb the first hit after recharging.");
+        shield.Hit(ModEffectEvent.DamageResolving, true, false, "weapon", 0.2);
+        check(Near(shield.Fighter.Damage, 0.2), "Hex Shield absorbed a second hit without recharging.");
     }
 
     private static void CheckMoveLocks(ModContentCatalog catalog, string repository, Action<bool, string> check)

@@ -1215,6 +1215,23 @@ local ForgeDeviation = {}
 ---@field equipment "weapon"|"armor"|"helm"|"ranged"|"magic"
 local ForgeCandidateExclusion = {}
 
+---@class (exact) Eclipse.ForgePriceRow
+---@field level? integer Exact item level; use instead of min_level/max_level.
+---@field min_level? integer First item level, default 1.
+---@field max_level? integer Last item level; omitted means every higher level.
+---@field materials integer[] ForgeMaterial1..3 counts, 1-3 entries.
+local ForgePriceRow = {}
+
+---@class (exact) Eclipse.ForgePriceTable
+---@field equipment "weapon"|"armor"|"helm"|"ranged"|"magic"
+---@field rows Eclipse.ForgePriceRow[]
+local ForgePriceTable = {}
+
+---@class (exact) Eclipse.ForgePriceProfile
+---@field id string
+---@field prices Eclipse.ForgePriceTable[]
+local ForgePriceProfile = {}
+
 ---@class (exact) Eclipse.ForgeItem
 ---@field equipment "weapon"|"armor"|"helm"|"ranged"|"magic"
 ---@field enchantments? integer
@@ -1828,6 +1845,12 @@ local MovePatch = {}
 ---@field move string
 ---@field perk Eclipse.PerkHandle
 local MovePerkLockRemoval = {}
+
+---@class (exact) Eclipse.MovePerkLockExtension
+---@field move string
+---@field source_perk Eclipse.PerkHandle Perk already locking the move, directly or inside a top-level OR group.
+---@field perk Eclipse.PerkHandle Alternative perk that also unlocks the move.
+local MovePerkLockExtension = {}
 
 ---@class (exact) Eclipse.SoundAction
 ---@field type "sound"
@@ -3451,6 +3474,14 @@ function forge.override_deviation(definition) end
 function forge.exclude_candidate(definition) end
 
 ---Requires: `content.register`.
+---When: During mod loading, before the recipes that use it.
+---Returns: A forge economy-profile handle, usable as a recipe's `economic_profile`.
+---[Full reference](https://dawc17.github.io/ProjectEclipse/api/items-progression-forge/#sf2forgeregister_profile)
+---@param definition Eclipse.ForgePriceProfile
+---@return Eclipse.ForgeProfileHandle
+function forge.register_profile(definition) end
+
+---Requires: `content.register`.
 ---When: During mod loading.
 ---Returns: A forge-recipe handle.
 ---[Full reference](https://dawc17.github.io/ProjectEclipse/api/items-progression-forge/#sf2forgeregister_recipe)
@@ -3668,6 +3699,13 @@ function moves.patch(definition) end
 ---[Full reference](https://dawc17.github.io/ProjectEclipse/api/moves-and-tactics/#sf2movesremove_perk_lock)
 ---@param definition Eclipse.MovePerkLockRemoval
 function moves.remove_perk_lock(definition) end
+
+---Requires: `content.patch`, plus access to both perks through core, a declared dependency or your own mod.
+---When: During registration. Applied to the loaded native moves together with the other lock patches, before fighters are built. Use Apply & Restart when changing enabled content.
+---Returns: Nothing (`nil`).
+---[Full reference](https://dawc17.github.io/ProjectEclipse/api/moves-and-tactics/#sf2movesextend_perk_lock)
+---@param definition Eclipse.MovePerkLockExtension
+function moves.extend_perk_lock(definition) end
 
 ---Requires: `content.register`.
 ---When: During mod loading.
@@ -4485,6 +4523,24 @@ function Fighter:remove_damage_shield(key) end
 ---@param control "punch"|"kick"|"ranged"|"magic"|"raid_charge"
 ---@param blocked boolean
 function Fighter:set_control_blocked(control, blocked) end
+
+---Start a recharge animation on one of this fighter's combat buttons.
+---Requires: `combat.effects`.
+---When: A supported callback during an active round, with a currently registered fighter. The method expires when the callback returns.
+---Returns: `nil`. Unknown controls, out-of-range frames, an inactive round or an expired fighter raise a Lua error.
+---[Full reference](https://dawc17.github.io/ProjectEclipse/api/fighter/#fighterset_button_cooldown)
+---@param control "punch"|"kick"|"ranged"|"raid_charge"
+---@param frames integer
+function Fighter:set_button_cooldown(control, frames) end
+
+---Show the RaidCharge button in a fight that would otherwise hide it.
+---Requires: `combat.effects`.
+---When: A supported callback during an active round, with a currently registered fighter. The method expires when the callback returns.
+---Returns: `nil`. An unsupported control, a non-boolean `visible`, an inactive round or an expired fighter raises a Lua error.
+---[Full reference](https://dawc17.github.io/ProjectEclipse/api/fighter/#fighterset_control_visible)
+---@param control "raid_charge"
+---@param visible boolean
+function Fighter:set_control_visible(control, visible) end
 
 ---Queue an additive displacement of the current main fighter.
 ---Requires: `combat.motion`.

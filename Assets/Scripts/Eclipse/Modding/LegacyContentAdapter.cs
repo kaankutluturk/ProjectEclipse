@@ -13,6 +13,7 @@ namespace Eclipse.Modding
         private readonly List<string> _perkNames = new List<string>();
         private readonly List<string> _itemSetNames = new List<string>();
         private readonly List<string> _forgeRecipeNames = new List<string>();
+        private readonly List<string> _forgeProfileNames = new List<string>();
         private readonly List<IDisposable> _forgeExclusionLifetimes = new List<IDisposable>();
         private readonly List<IDisposable> _forgeDeviationLifetimes = new List<IDisposable>();
         private readonly List<IDisposable> _defaultEnchantmentLifetimes = new List<IDisposable>();
@@ -205,6 +206,14 @@ namespace Eclipse.Modding
                 ApplyInnatePerks();
                 ApplyTacticSubtypes();
                 ApplyCombatSubtypes();
+
+                foreach (ForgeEconomicProfileDefinition profile in _content.ForgeEconomicProfiles)
+                {
+                    if (!profile.IsModOwned) continue;
+                    if (!_forge.AddExternalEconomicProfile(BuildForgeProfileNode(profile)))
+                        throw new InvalidOperationException("Could not add forge price profile '" + profile.Id + "'.");
+                    _forgeProfileNames.Add(profile.RuntimeRecipeName);
+                }
 
                 foreach (ForgeRecipeFamilyDefinition definition in _content.ForgeRecipeFamilies)
                 {
@@ -1577,9 +1586,12 @@ namespace Eclipse.Modding
                 }
                 for (int i = _forgeRecipeNames.Count - 1; i >= 0; i--)
                     _forge.RemoveExternalRecipeFamily(_forgeRecipeNames[i]);
+                for (int i = _forgeProfileNames.Count - 1; i >= 0; i--)
+                    _forge.RemoveExternalEconomicProfile(_forgeProfileNames[i]);
             }
             _enchantmentBindings.Clear();
             _forgeRecipeNames.Clear();
+            _forgeProfileNames.Clear();
             if (_perks != null)
                 for (int i = _perkNames.Count - 1; i >= 0; i--) _perks.RemoveExternalBasePerk(_perkNames[i]);
             _perkNames.Clear();
@@ -1665,6 +1677,43 @@ namespace Eclipse.Modding
             if (definition.SilentReceive) Set(item, "SilentRecieve", "1");
             if (definition.SpendAfterUse) Set(item, "SpendAfterUse", "1");
             return item;
+        }
+
+        // forge.xml shape for a price-only profile: one Item and PriceBlock per category.
+        private static XmlElement BuildForgeProfileNode(ForgeEconomicProfileDefinition profile)
+        {
+            var document = new XmlDocument();
+            XmlElement recipe = document.CreateElement("Recipe");
+            recipe.SetAttribute("Name", profile.RuntimeRecipeName);
+            XmlElement items = document.CreateElement("Items");
+            XmlElement prices = document.CreateElement("Prices");
+            recipe.AppendChild(items);
+            recipe.AppendChild(prices);
+            foreach (ModForgePriceBlock block in profile.PriceBlocks)
+            {
+                string type = EquipmentType(block.Equipment);
+                string blockName = "Prices_" + type;
+                XmlElement item = document.CreateElement("Item");
+                item.SetAttribute("Type", type);
+                item.SetAttribute("Prices", blockName);
+                items.AppendChild(item);
+                XmlElement priceBlock = document.CreateElement("PriceBlock");
+                priceBlock.SetAttribute("Name", blockName);
+                prices.AppendChild(priceBlock);
+                foreach (ModForgePrice price in block.Prices)
+                {
+                    XmlElement row = document.CreateElement("Price");
+                    row.SetAttribute("MinLevel", price.MinLevel.ToString(CultureInfo.InvariantCulture));
+                    if (price.MaxLevel != ModRegistrationTransaction.UnboundedForgeLevel)
+                        row.SetAttribute("MaxLevel", price.MaxLevel.ToString(CultureInfo.InvariantCulture));
+                    for (int i = 0; i < price.Materials.Count; i++)
+                        if (price.Materials[i] > 0)
+                            row.SetAttribute("ForgeMaterial" + (i + 1), price.Materials[i].ToString(CultureInfo.InvariantCulture));
+                    priceBlock.AppendChild(row);
+                }
+            }
+            document.AppendChild(recipe);
+            return recipe;
         }
 
         private XmlElement BuildItemSetNode(ItemSetDefinition definition)

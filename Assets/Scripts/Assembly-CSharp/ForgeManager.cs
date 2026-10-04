@@ -36,6 +36,9 @@ public class ForgeManager : global::EventDispatcher<object>
 	private static Action<UserItem> _onItemEnchanted;
 	private readonly List<ForgeAspect> _aspects = new List<ForgeAspect>();
 	private readonly List<Recipe> _recipes = new List<Recipe>();
+	// Eclipse: price-only profiles declared by mods. They are never listed as forge recipes;
+	// a mod's recipe family copies their price blocks like a host profile.
+	private readonly List<Recipe> _externalProfiles = new List<Recipe>();
 	private bool _parsed;
 	private int _aspectLevelOverride = -1;
 
@@ -115,10 +118,34 @@ public class ForgeManager : global::EventDispatcher<object>
 		EnsureParsed();
 		if (string.IsNullOrEmpty(name) || string.IsNullOrEmpty(economicProfileName) || GetRecipeByName(name) != null)
 			return false;
-		Recipe profile = GetRecipeByName(economicProfileName);
+		Recipe profile = GetRecipeByName(economicProfileName) ?? GetExternalProfile(economicProfileName);
 		if (profile == null) return false;
 		_recipes.Add(new Recipe(name, alias, profile, items));
 		return true;
+	}
+
+	public bool AddExternalEconomicProfile(XmlNode recipeNode)
+	{
+		EnsureParsed();
+		if (recipeNode == null) return false;
+		var profile = new Recipe(recipeNode);
+		if (string.IsNullOrEmpty(profile.Name) || GetRecipeByName(profile.Name) != null || GetExternalProfile(profile.Name) != null)
+			return false;
+		_externalProfiles.Add(profile);
+		return true;
+	}
+
+	public bool RemoveExternalEconomicProfile(string name)
+	{
+		Recipe profile = GetExternalProfile(name);
+		return profile != null && _externalProfiles.Remove(profile);
+	}
+
+	private Recipe GetExternalProfile(string name)
+	{
+		for (int i = 0; i < _externalProfiles.Count; i++)
+			if (string.Equals(_externalProfiles[i].Name, name, StringComparison.OrdinalIgnoreCase)) return _externalProfiles[i];
+		return null;
 	}
 
 	public bool RemoveExternalRecipeFamily(string name)
@@ -227,6 +254,7 @@ public class ForgeManager : global::EventDispatcher<object>
 		List<PerkStruct> enchantments = recipe.GetEnchantmentsForItem(userItem, itemLevel);
 		if (enchantments.Count == 0) return false;
 
+		var activeSets = Eclipse.UI.SetBonusNotice.ActiveCombos();
 		int previousOverride = _aspectLevelOverride;
 		_aspectLevelOverride = playerLevel;
 		try
@@ -240,6 +268,7 @@ public class ForgeManager : global::EventDispatcher<object>
 			_aspectLevelOverride = previousOverride;
 		}
 		NotifyItemEnchanted(userItem, recipe);
+		Eclipse.UI.SetBonusNotice.AnnounceNew(activeSets);
 		return true;
 	}
 

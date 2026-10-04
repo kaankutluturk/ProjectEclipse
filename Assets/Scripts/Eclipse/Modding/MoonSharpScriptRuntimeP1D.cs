@@ -150,6 +150,7 @@ namespace Eclipse.Modding
                 moves.Set("replace", DynValue.NewCallback(ReplaceMove));
                 moves.Set("register_trigger", DynValue.NewCallback(RegisterMoveTrigger));
                 moves.Set("remove_perk_lock", DynValue.NewCallback(RemoveMovePerkLock));
+                moves.Set("extend_perk_lock", DynValue.NewCallback(ExtendMovePerkLock));
                 root.Set("moves", DynValue.NewTable(moves));
 
                 var tactics = new Table(_script);
@@ -929,6 +930,20 @@ namespace Eclipse.Modding
                     candidates[i] = new ModAiActionSnapshot(actions[i]);
                 }
                 return TryDecideAi(tactic, instance, snapshot, candidates, out selection, out error);
+            }
+
+            private DynValue ExtendMovePerkLock(ScriptExecutionContext context, CallbackArguments args)
+            {
+                const string function = "sf2.moves.extend_perk_lock";
+                Table table = args.AsType(0, function, DataType.Table, false).Table;
+                return ApiCall(function, () =>
+                {
+                    ValidateFields(table, function, "move", "source_perk", "perk");
+                    _api.ExtendMovePerkLock(RequiredString(table, "move", function),
+                        RequiredHandle(table, "source_perk", _perkHandles, "perk", function),
+                        RequiredHandle(table, "perk", _perkHandles, "perk", function));
+                    return DynValue.Nil;
+                });
             }
 
             private DynValue RemoveMovePerkLock(ScriptExecutionContext context, CallbackArguments args)

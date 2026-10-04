@@ -13,12 +13,16 @@ public class ItemSet
 
 	public List<ItemSetItem> OJIAKDDCGLB;
 
+	// Eclipse: the combo enchantment this set grants (list.xml DefaultComboPerk).
+	public string DefaultComboPerk;
+
 	public ItemSet(XmlNode node)
 	{
 		Name = node.Attributes["Name"].CIPOICEEIBK(string.Empty);
 		Title = node.Attributes["Title"].CIPOICEEIBK(string.Empty);
 		GGDJIPKMKFC = node.Attributes["Text"].CIPOICEEIBK(string.Empty);
 		LHOJGHFGLFD = node.Attributes["Brief"].CIPOICEEIBK(string.Empty);
+		DefaultComboPerk = node.Attributes["DefaultComboPerk"].CIPOICEEIBK(string.Empty);
 		OJIAKDDCGLB = new List<ItemSetItem>();
 		foreach (XmlNode childNode in node.ChildNodes)
 		{

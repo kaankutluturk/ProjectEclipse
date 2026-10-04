@@ -751,6 +751,11 @@ async function main() {
         const result=labels(await request('textDocument/completion',deviationProbe));
         return ['profile','equipment','minimum','maximum'].every(field=>result.some(name=>name === field || name.startsWith(field + ' ')));
     },'forge deviation fields');
+    const priceProbe=probe('forge-profile.lua','local sf2=require("sf2")\nsf2.forge.register_profile { prices = { { rows = { { | } } } } }');
+    await until(async()=>{
+        const result=labels(await request('textDocument/completion',priceProbe));
+        return ['level','min_level','max_level','materials'].every(field=>result.some(name=>name === field || name === field+'?' || name.startsWith(field + ' ')));
+    },'forge price row fields');
     const forgeProbe=probe('forge-exclusion.lua','local sf2=require("sf2")\nsf2.forge.exclude_candidate { | }');
     await until(async()=>{
         const result=labels(await request('textDocument/completion',forgeProbe));

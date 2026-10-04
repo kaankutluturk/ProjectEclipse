@@ -11,6 +11,7 @@ namespace Eclipse.Modding
         private readonly List<string> _p1dTactics = new List<string>();
         private ExternalCombatContentRuntime.MovePerkLockRollback _p1dMovePerkLockRollback;
         private ExternalCombatContentRuntime.MoveItemLockRollback _moveItemLockRollback;
+        private ExternalCombatContentRuntime.MoveItemLockRollback _movePerkLockExtensionRollback;
         private MoveCombatPatchRuntime.Lifetime _moveCombatPatchLifetime;
         private AnimationData.ExternalMoveReplacementLifetime _moveReplacementLifetime;
         private bool _p1dApplied;
@@ -163,7 +164,7 @@ namespace Eclipse.Modding
         private void ApplyMoves()
         {
             if (_content.MoveTemplates.Count == 0 && _content.Moves.Count == 0 && _content.MoveTriggers.Count == 0 &&
-                _content.MovePerkLockRemovals.Count == 0 && _content.MoveItemLockExtensions.Count == 0 && _content.MoveCombatPatches.Count == 0)
+                _content.MovePerkLockRemovals.Count == 0 && _content.MoveItemLockExtensions.Count == 0 && _content.MovePerkLockExtensions.Count == 0 && _content.MoveCombatPatches.Count == 0)
                 return;
             var expectedFiles = new Dictionary<string, string>(StringComparer.Ordinal);
             var replacementDocument = new XmlDocument { XmlResolver = null };
@@ -194,6 +195,7 @@ namespace Eclipse.Modding
             ModRuntime.LoadTimings.Mark("move combat patches");
             _p1dMovePerkLockRollback = ExternalCombatContentRuntime.ApplyMovePerkLocks(_content.MovePerkLockRemovals);
             _moveItemLockRollback = ExternalCombatContentRuntime.ApplyItemLockExtensions(AnimationData.Animations,_content.MoveItemLockExtensions);
+            _movePerkLockExtensionRollback = ExternalCombatContentRuntime.ApplyPerkLockExtensions(AnimationData.Animations,_content.MovePerkLockExtensions);
             ModRuntime.LoadTimings.Mark("move locks");
             if (_content.MoveTemplates.Count != 0 || _content.Moves.Count > expectedFiles.Count || _content.MoveTriggers.Count != 0)
                 ExternalCombatContentRuntime.ApplyMoves(BuildMovesDocument());
@@ -765,6 +767,8 @@ namespace Eclipse.Modding
             _moveCombatPatchLifetime = null;
             _moveReplacementLifetime?.Dispose();
             _moveReplacementLifetime = null;
+            _movePerkLockExtensionRollback?.Dispose();
+            _movePerkLockExtensionRollback = null;
             _moveItemLockRollback?.Dispose();
             _moveItemLockRollback = null;
             ExternalCombatContentRuntime.RemoveMovePerkLocks(_p1dMovePerkLockRollback);

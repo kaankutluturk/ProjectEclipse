@@ -113,10 +113,13 @@ namespace Nekki.SF2.Core.Fights.Controller
 		private void Awake()
 		{
 			_Current = this;
-            Eclipse.UI.BattleTouchControls.ApplyPlatformVisibility(_joystick.gameObject);
+            // Hide the stick's container: the layout editor owns the Stick's own CanvasGroup
+            // alpha, and the raid charge button lives beside the stick.
+            Eclipse.UI.BattleTouchControls.ApplyPlatformVisibility(_leftContainer != null ? _leftContainer : _joystick.gameObject);
             Eclipse.UI.BattleTouchControls.ApplyPlatformVisibility(_actionButtons.gameObject);
             Eclipse.UI.BattleTouchControls.ApplyTouchLeniency(_joystick.gameObject);
             Eclipse.UI.BattleTouchControls.ApplyTouchLeniency(_actionButtons.gameObject);
+            Eclipse.UI.BattleCooldownHud.Attach((RectTransform)transform, _actionButtons);
 		}
 
 		private void OnDestroy()

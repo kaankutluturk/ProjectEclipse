@@ -286,6 +286,34 @@ namespace Eclipse.Modding
                             return DynValue.Nil;
                         }));
                     }
+                    if (fighter is IModFighterButtons buttons)
+                    {
+                        fighterTable.Set("set_button_cooldown", DynValue.NewCallback((ctx, args) =>
+                        {
+                            if (!invocationActive) throw new ScriptRuntimeException("Cooldown operations have expired.");
+                            _api.RequireCapability("combat.effects");
+                            int offset = args[0].Type == DataType.Table && args[0].Table == fighterTable ? 1 : 0;
+                            string control = args.AsType(offset, "set_button_cooldown", DataType.String, false).String;
+                            if (control != "punch" && control != "kick" && control != "ranged" && control != "raid_charge")
+                                throw new ScriptRuntimeException("Unknown cooldown control.");
+                            double frames = args.AsType(offset + 1, "set_button_cooldown", DataType.Number, false).Number;
+                            if (frames != Math.Floor(frames) || frames < 1 || frames > 3600)
+                                throw new ScriptRuntimeException("frames must be an integer from 1 through 3600.");
+                            if (!buttons.TrySetButtonCooldown(control, (int)frames, out var failure)) throw new ScriptRuntimeException(failure);
+                            return DynValue.Nil;
+                        }));
+                        fighterTable.Set("set_control_visible", DynValue.NewCallback((ctx, args) =>
+                        {
+                            if (!invocationActive) throw new ScriptRuntimeException("Button operations have expired.");
+                            _api.RequireCapability("combat.effects");
+                            int offset = args[0].Type == DataType.Table && args[0].Table == fighterTable ? 1 : 0;
+                            string control = args.AsType(offset, "set_control_visible", DataType.String, false).String;
+                            if (control != "raid_charge") throw new ScriptRuntimeException("Only the raid_charge button visibility can be changed.");
+                            if (args[offset + 1].Type != DataType.Boolean) throw new ScriptRuntimeException("visible must be a boolean.");
+                            if (!buttons.TrySetControlVisible(control, args[offset + 1].Boolean, out var failure)) throw new ScriptRuntimeException(failure);
+                            return DynValue.Nil;
+                        }));
+                    }
                     if (fighter is IModRoundOutcomes outcomes)
                     {
                         fighterTable.Set("end_round", DynValue.NewCallback((ctx, args) =>
@@ -1047,6 +1075,7 @@ namespace Eclipse.Modding
                 forge.Set("RANGED", DynValue.NewString("ranged"));
                 forge.Set("MAGIC", DynValue.NewString("magic"));
                 forge.Set("profile", DynValue.NewCallback(GetForgeEconomicProfile));
+                forge.Set("register_profile", DynValue.NewCallback(RegisterForgeEconomicProfile));
                 forge.Set("register_recipe", DynValue.NewCallback(RegisterForgeRecipeFamily));
                 forge.Set("exclude_candidate", DynValue.NewCallback(ExcludeForgeCandidate));
                 forge.Set("override_deviation", DynValue.NewCallback(OverrideForgeDeviation));
@@ -1681,6 +1710,20 @@ namespace Eclipse.Modding
                         RequiredHandle(table, "perk", _perkHandles, "perk", function),
                         ParseEquipmentKind(RequiredString(table, "equipment", function), function));
                     return DynValue.Nil;
+                });
+            }
+
+            private DynValue RegisterForgeEconomicProfile(ScriptExecutionContext context, CallbackArguments args)
+            {
+                const string function = "sf2.forge.register_profile";
+                Table table = args.AsType(0, function, DataType.Table, false).Table;
+                return ApiCall(function, () =>
+                {
+                    ValidateFields(table, function, "id", "prices");
+                    ModForgePriceBlock[] blocks = ReadForgePriceBlocks(table.Get("prices"), function + ".prices");
+                    ForgeEconomicProfileDefinition definition = _api.RegisterForgeEconomicProfile(
+                        RequiredString(table, "id", function), blocks);
+                    return NewHandle(_forgeProfileHandles, definition.Id);
                 });
             }
 
@@ -3207,6 +3250,65 @@ namespace Eclipse.Modding
                         OptionalInt(item, "min_deviation", 0, itemFunction),
                         OptionalInt(item, "max_deviation", 0, itemFunction),
                         OptionalBool(item, "random_aspect", false, itemFunction)));
+                }
+                EnsureDenseArray(value.Table, result.Count, function);
+                return result.ToArray();
+            }
+
+            private ModForgePriceBlock[] ReadForgePriceBlocks(DynValue value, string function)
+            {
+                if (value.Type != DataType.Table) throw new ModContentException(function + " must be an array table.");
+                var result = new List<ModForgePriceBlock>();
+                for (int i = 1; ; i++)
+                {
+                    DynValue entry = value.Table.Get(i);
+                    if (entry.IsNil()) break;
+                    if (entry.Type != DataType.Table) throw new ModContentException(function + " entries must be tables.");
+                    Table block = entry.Table;
+                    string blockFunction = function + "[" + i + "]";
+                    ValidateFields(block, blockFunction, "equipment", "rows");
+                    DynValue rowsValue = block.Get("rows");
+                    if (rowsValue.Type != DataType.Table) throw new ModContentException(blockFunction + ".rows must be an array table.");
+                    var rows = new List<ModForgePrice>();
+                    for (int j = 1; ; j++)
+                    {
+                        DynValue rowValue = rowsValue.Table.Get(j);
+                        if (rowValue.IsNil()) break;
+                        if (rowValue.Type != DataType.Table) throw new ModContentException(blockFunction + ".rows entries must be tables.");
+                        Table row = rowValue.Table;
+                        string rowFunction = blockFunction + ".rows[" + j + "]";
+                        ValidateFields(row, rowFunction, "level", "min_level", "max_level", "materials");
+                        int minLevel, maxLevel;
+                        if (!row.Get("level").IsNil())
+                        {
+                            if (!row.Get("min_level").IsNil() || !row.Get("max_level").IsNil())
+                                throw new ModContentException(rowFunction + " uses either level or min_level/max_level.");
+                            minLevel = maxLevel = RequiredInt(row, "level", rowFunction);
+                        }
+                        else
+                        {
+                            minLevel = OptionalInt(row, "min_level", 1, rowFunction);
+                            maxLevel = OptionalInt(row, "max_level", ModRegistrationTransaction.UnboundedForgeLevel, rowFunction);
+                        }
+                        DynValue materialsValue = row.Get("materials");
+                        if (materialsValue.Type != DataType.Table) throw new ModContentException(rowFunction + ".materials must be an array of integers.");
+                        var materials = new List<int>();
+                        for (int k = 1; ; k++)
+                        {
+                            DynValue material = materialsValue.Table.Get(k);
+                            if (material.IsNil()) break;
+                            if (material.Type != DataType.Number || material.Number != Math.Floor(material.Number) ||
+                                material.Number < 0 || material.Number > ModRegistrationTransaction.MaxForgeMaterialCount)
+                                throw new ModContentException(rowFunction + ".materials entries must be integers from 0 through " +
+                                    ModRegistrationTransaction.MaxForgeMaterialCount + ".");
+                            materials.Add((int)material.Number);
+                        }
+                        EnsureDenseArray(materialsValue.Table, materials.Count, rowFunction + ".materials");
+                        rows.Add(new ModForgePrice(minLevel, maxLevel, materials.ToArray()));
+                    }
+                    EnsureDenseArray(rowsValue.Table, rows.Count, blockFunction + ".rows");
+                    result.Add(new ModForgePriceBlock(
+                        ParseEquipmentKind(RequiredString(block, "equipment", blockFunction), blockFunction), rows.ToArray()));
                 }
                 EnsureDenseArray(value.Table, result.Count, function);
                 return result.ToArray();

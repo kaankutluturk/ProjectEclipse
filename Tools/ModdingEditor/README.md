@@ -166,6 +166,8 @@ including nested points and axes. Templates support these fields except
 `transitions`, which the native parser does not inherit. The scoped
 `sf2.moves.extend_item_lock` patch adds an alternative item subtype while
 preserving the move's other requirements; it requires `content.patch`.
+`sf2.moves.extend_perk_lock { move, source_perk, perk }` likewise adds an
+alternative perk to an existing perk lock, so either perk unlocks the move.
 
 Direct move registrations also complete scheduled `actions` (core random sounds
 and shop completion), `profile`, `tactic_distance`, `tactic_conditions`, `no_wall_repulsion`, and
@@ -192,6 +194,10 @@ Adds `sf2.forge.override_deviation { profile, equipment, minimum, maximum }`
 for an existing random-aspect recipe category. Its typed table requires integer bounds.
 Adds `sf2.forge.exclude_candidate { profile, perk, equipment }` with
 typed core profile/perk handles and a `content.patch` capability diagnostic.
+Adds `sf2.forge.register_profile { id, prices }`: each `prices` entry is
+`{ equipment, rows }` and each row is `{ level? | min_level?, max_level?, materials }`
+with 1-3 integer forge-material counts. It returns a profile handle that only
+this mod's `sf2.forge.register_recipe` calls accept.
 Adds optional `animation` observations to both sides of AI decisions
 and `fighter:snapshot()`: current name/type, facing and active named intervals.
 AI action completion respects authored native `tactic_conditions` and
@@ -686,6 +692,12 @@ It requires `combat.effects` and a player callback during an active round.
 Restrictions belong to the attached behavior instance and clear at round setup
 or fight end. Releasing one does not override other restrictions or grant an
 unavailable action. Reapply persistent conditions in `on_round_begin`.
+
+`fighter:set_button_cooldown(control, frames)` completes `punch`, `kick`, `ranged`
+and `raid_charge`; `frames` is an integer from 1 through 3600. It requires
+`combat.effects` and only refills the button's progress ring; gate the move
+itself with a flag. `fighter:set_control_visible("raid_charge", visible)` shows
+the RaidCharge button outside raids for an equipped RaidCharge ability.
 
 Image nodes accept `mirrored = true` to reflect a portrait horizontally. The
 boolean defaults to false and is fixed for the view's lifetime. It changes

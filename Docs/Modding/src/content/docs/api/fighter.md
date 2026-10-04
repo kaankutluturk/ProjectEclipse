@@ -464,6 +464,78 @@ Repeated calls are idempotent. Ownership includes the behavior and its attached
 perk/rule instance. At most 256 instances can hold restrictions per controller;
 each can block all five actions. Releasing an instance's last block frees its slot.
 
+## fighter:set_button_cooldown
+
+Start a recharge animation on one of this fighter's combat buttons.
+
+**Signature:** `fighter:set_button_cooldown(control, frames)`
+
+**Requires:** `combat.effects`.
+
+**When:** A supported callback during an active round, with a currently registered
+fighter. The method expires when the callback returns.
+
+**Returns:** `nil`. Unknown controls, out-of-range frames, an inactive round or an
+expired fighter raise a Lua error.
+
+| Argument | Type and bounds | Meaning |
+| --- | --- | --- |
+| `control` | String | `"punch"`, `"kick"`, `"ranged"` or `"raid_charge"`. |
+| `frames` | Integer, 1–3600 | Native combat frames (60 per second) for the button's progress ring to refill. |
+
+```lua
+-- After the ability is used, show a ten-second recharge on the RaidCharge button.
+on_animation_start = function(self, fighter, event)
+    if event.target == "self" and event.animation_name == "SummonAssistant" then
+        fighter:set_button_cooldown("raid_charge", 600)
+    end
+end,
+```
+
+This is the same presentation as the native `SetCooldown` perk action: the button
+empties and refills over `frames`. It only changes what the button shows. It does
+not stop the move from being used; gate the move itself with a timed
+[flag](#fighterset_flag) and a `not_mod` move condition. Calling it again restarts
+the ring. Only the player's buttons are drawn, so an opponent's call has no visible
+effect. The magic button's ring follows the magic charge and is not supported here.
+
+## fighter:set_control_visible
+
+Show the RaidCharge button in a fight that would otherwise hide it.
+
+**Signature:** `fighter:set_control_visible(control, visible)`
+
+**Requires:** `combat.effects`.
+
+**When:** A supported callback during an active round, with a currently registered
+fighter. The method expires when the callback returns.
+
+**Returns:** `nil`. An unsupported control, a non-boolean `visible`, an inactive
+round or an expired fighter raises a Lua error.
+
+| Argument | Type | Meaning |
+| --- | --- | --- |
+| `control` | String | `"raid_charge"`. Other buttons follow their equipment and are not supported. |
+| `visible` | Boolean | `true` shows the button, `false` hides it again. |
+
+```lua
+-- An equipped ability uses the RaidCharge input, so show its button.
+on_tick = function(self, fighter, event)
+    if not self.state.shown then
+        self.state.shown = true
+        fighter:set_control_visible("raid_charge", true)
+    end
+end,
+```
+
+The game normally shows the RaidCharge button only in raid fights where the
+player carries raid charges. Use this when your perk or enchantment adds a move
+on the RaidCharge input in other fights. The raid charge count is not shown on a
+button made visible this way. A [control restriction](#fighterset_control_blocked)
+still hides a blocked button. Only the player's button is drawn: for an opponent
+or in Local Versus the call succeeds and changes nothing. The next fight starts
+with the game's own visibility again.
+
 ## fighter:show_status_icon
 
 Show or refresh a transient status icon owned by this behavior instance.

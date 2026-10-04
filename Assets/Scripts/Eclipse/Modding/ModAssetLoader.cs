@@ -662,6 +662,62 @@ namespace Eclipse.Modding
             return rollback;
         }
 
+        // Same batch/rollback contract as ApplyItemLockExtensions, for perk alternatives.
+        internal static MoveItemLockRollback ApplyPerkLockExtensions(IReadOnlyList<InfoAnimation> moves,
+            IReadOnlyList<MovePerkLockExtension> extensions)
+        {
+            if (extensions == null || extensions.Count == 0) return null;
+            var byName=new Dictionary<string,InfoAnimation>(StringComparer.Ordinal);
+            foreach (var move in moves)
+                if (move != null && !string.IsNullOrEmpty(move.Name))
+                {
+                    if (byName.ContainsKey(move.Name)) throw new InvalidOperationException("Ambiguous live move name: " + move.Name);
+                    byName.Add(move.Name,move);
+                }
+            var rollback=new MoveItemLockRollback();
+            var pending=new Dictionary<List<ConditionAnimation>,List<ConditionAnimation>>();
+            var document=new XmlDocument { XmlResolver=null };
+            foreach (var extension in extensions)
+            {
+                if (!byName.TryGetValue(extension.MoveName,out var move) || move.MoveData == null)
+                    throw new InvalidOperationException("Perk lock extension references unavailable move '"+extension.MoveName+"'.");
+                var live=move.MoveData.Locks;
+                if (!pending.TryGetValue(live,out var locks)) pending.Add(live,locks=new List<ConditionAnimation>(live));
+                int match=-1;
+                for(int i=0;i<live.Count;i++)
+                {
+                    var candidate=live[i];
+                    bool found=MatchesPerkLock(candidate,extension.SourceRuntimePerkName);
+                    if (candidate is ConditionList group && !group.IsNot && group.get_Type()==ConditionList.OperatorType.OR)
+                        foreach (var child in group.GetConditions()) found |= MatchesPerkLock(child,extension.SourceRuntimePerkName);
+                    if (!found) continue;
+                    if (match>=0) throw new InvalidOperationException("Ambiguous perk lock clause for '"+extension.MoveName+"'.");
+                    match=i;
+                }
+                if (match<0) throw new InvalidOperationException("No positive perk lock '"+extension.SourceRuntimePerkName+"' on '"+extension.MoveName+"'.");
+                var original=locks[match];
+                var children=original is ConditionList existing ? new List<ConditionAnimation>(existing.GetConditions()) : new List<ConditionAnimation>{original};
+                foreach (var child in children)
+                    if (MatchesPerkLock(child,extension.RuntimePerkName))
+                        throw new InvalidOperationException("Perk lock alternative already exists for '"+extension.MoveName+"'.");
+                var perk=document.CreateElement("Perk"); perk.SetAttribute("Name",extension.RuntimePerkName);
+                var added=new ConditionPerk(perk); added.Parse(perk); children.Add(added);
+                var op=document.CreateElement("Operator"); op.SetAttribute("Type","Or");
+                var replacement=new ConditionList(op,children); replacement.Parse(op);
+                locks[match]=replacement;
+            }
+            foreach (var pair in pending)
+                for(int i=0;i<pair.Key.Count;i++)
+                    if (!ReferenceEquals(pair.Key[i],pair.Value[i]))
+                        rollback.Replacements.Add(new MoveItemLockRollback.Replacement {
+                            Locks=pair.Key,Index=i,Original=pair.Key[i],Applied=pair.Value[i] });
+            foreach(var entry in rollback.Replacements) entry.Locks[entry.Index]=entry.Applied;
+            return rollback;
+        }
+
+        private static bool MatchesPerkLock(ConditionAnimation condition,string perkName)
+            => condition is ConditionPerk perk && !perk.IsNot && string.Equals(perk.get_Name(),perkName,StringComparison.Ordinal);
+
         private static bool MatchesItemLock(ConditionAnimation condition,string itemType,string subtype)
             => condition is ConditionItemInfo item && !item.IsNot && item.get_Type()==itemType &&
                 item.GetSubType()==subtype && string.IsNullOrEmpty(item.get_Name());

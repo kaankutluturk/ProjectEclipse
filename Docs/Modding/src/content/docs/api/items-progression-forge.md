@@ -336,7 +336,76 @@ Looks up an existing profile that supplies the forge's costs and timing. A short
 local economy = sf2.forge.profile("Simple")
 ```
 
-The handle is an input for a recipe. It is not a table of editable prices.
+The handle is an input for a recipe. It is not a table of editable prices. To give
+your own recipes their own prices, register a profile with
+[`sf2.forge.register_profile`](#sf2forgeregister_profile).
+
+## sf2.forge.register_profile
+
+**Signature:** `sf2.forge.register_profile(definition)`
+
+**Returns:** A forge economy-profile handle, usable as a recipe's `economic_profile`.
+
+**When:** During mod loading, before the recipes that use it.
+
+**Requires:** `content.register`.
+
+Declares the forge-material prices for your own recipe families. A forge *price
+profile* says how many of each forge material (ForgeMaterial1, 2 and 3) one
+enchantment costs, depending on the level of the item being enchanted. Core
+profiles such as `Simple` and `Complex` keep their prices: a profile you register
+is used only by recipes from your mod, never by core recipes or another mod's.
+
+| Field | Type | Meaning |
+| --- | --- | --- |
+| `id` | String | Required local identifier, such as `abilities`. Becomes `<your mod>:forge-profiles/<id>`. |
+| `prices` | Array | Required. One price table per equipment category, each category at most once. |
+
+Each `prices` entry has:
+
+| Field | Type | Meaning |
+| --- | --- | --- |
+| `equipment` | Equipment constant | Required: `sf2.forge.WEAPON`, `ARMOR`, `HELM`, `RANGED` or `MAGIC`. |
+| `rows` | Array | Required, 1–64 rows in ascending, non-overlapping level order. |
+
+Each row covers a range of item levels:
+
+| Field | Type | Default | Meaning |
+| --- | --- | --- | --- |
+| `level` | Integer | — | One exact item level. Use this *or* `min_level`/`max_level`, not both. |
+| `min_level` | Integer | `1` | First item level the row applies to, 1–1000. |
+| `max_level` | Integer | No upper limit | Last item level, up to 1000. Omit it on the final row to cover every higher level. |
+| `materials` | Integer array | Required | 1–3 counts for ForgeMaterial1, 2 and 3, each 0–10,000,000. At least one must be above zero. |
+
+A recipe item can only use a category the profile prices, so give every
+equipment category in your recipe's `items` a table here. An item whose level no
+row covers cannot be enchanted with that recipe. Rows have no delivery timer: the
+enchantment completes immediately.
+
+```lua
+local abilities_price = sf2.forge.register_profile {
+    id = "abilities",
+    prices = {
+        { equipment = sf2.forge.WEAPON, rows = {
+            { max_level = 2, materials = { 38, 10, 5 } },  -- levels 1-2
+            { level = 3, materials = { 46, 13, 6 } },
+            { min_level = 4, materials = { 56, 17, 8 } },   -- level 4 and above
+        } },
+    },
+}
+
+sf2.forge.register_recipe {
+    id = "abilities",
+    economic_profile = abilities_price,
+    items = { { equipment = sf2.forge.WEAPON } },
+    candidates = { { perk = my_ability_perk, equipment = sf2.forge.WEAPON } },
+}
+```
+
+`sf2.forge.exclude_candidate` and `sf2.forge.override_deviation` still target core
+profiles only. Profile prices are part of the content compatibility fingerprint,
+so changing them is a content change. Disabling the mod removes the profile
+together with its recipes.
 
 ## sf2.forge.register_recipe
 
@@ -354,7 +423,7 @@ Creates a recipe using an existing economy profile and a pool of eligible enchan
 | --- | --- |
 | `id` | Required local identifier. |
 | `alias` | Optional compatibility alias; defaults to an empty string. |
-| `economic_profile` | Required handle from `sf2.forge.profile`. |
+| `economic_profile` | Required handle from `sf2.forge.profile`, or from `sf2.forge.register_profile` in this mod. |
 | `items` | Required array of equipment-category settings. |
 | `candidates` | Required array of eligible perks/enchantments. |
 

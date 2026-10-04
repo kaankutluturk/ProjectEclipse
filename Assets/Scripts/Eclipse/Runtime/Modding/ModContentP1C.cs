@@ -120,12 +120,56 @@ namespace Eclipse.Modding
 
     public sealed class ForgeEconomicProfileDefinition
     {
+        private static readonly ModForgePriceBlock[] NoPrices = new ModForgePriceBlock[0];
+        private readonly ModForgePriceBlock[] _priceBlocks;
+
         public DefinitionId Id { get; }
         public string RuntimeRecipeName { get; }
+        // Empty for host profiles imported from forge.xml; a mod-declared profile carries
+        // its own price table, used only by that mod's recipe families.
+        public IReadOnlyList<ModForgePriceBlock> PriceBlocks => _priceBlocks;
+        public bool IsModOwned => _priceBlocks.Length > 0;
+
         internal ForgeEconomicProfileDefinition(DefinitionId id, string runtimeRecipeName)
+            : this(id, runtimeRecipeName, null)
+        {
+        }
+
+        internal ForgeEconomicProfileDefinition(DefinitionId id, string runtimeRecipeName, ModForgePriceBlock[] priceBlocks)
         {
             Id = id;
             RuntimeRecipeName = runtimeRecipeName ?? string.Empty;
+            _priceBlocks = priceBlocks ?? NoPrices;
+        }
+    }
+
+    // One price row of a mod-declared forge profile: an inclusive item-level range and
+    // the ForgeMaterial1..3 counts charged for one enchantment at those levels.
+    public sealed class ModForgePrice
+    {
+        private readonly int[] _materials;
+        public int MinLevel { get; }
+        public int MaxLevel { get; }
+        public IReadOnlyList<int> Materials => _materials;
+
+        public ModForgePrice(int minLevel, int maxLevel, int[] materials)
+        {
+            MinLevel = minLevel;
+            MaxLevel = maxLevel;
+            _materials = materials == null ? new int[0] : (int[])materials.Clone();
+        }
+    }
+
+    public sealed class ModForgePriceBlock
+    {
+        private readonly ModForgePrice[] _prices;
+        public ModEquipmentKind Equipment { get; }
+        public IReadOnlyList<ModForgePrice> Prices => _prices;
+
+        public ModForgePriceBlock(ModEquipmentKind equipment, ModForgePrice[] prices)
+        {
+            Equipment = equipment;
+            _prices = prices == null ? new ModForgePrice[0] : (ModForgePrice[])prices.Clone();
         }
     }
 
@@ -602,8 +646,14 @@ namespace Eclipse.Modding
 
         internal void CommitP1C(IEnumerable<NonEquipmentItemDefinition> items, IEnumerable<ItemSetDefinition> sets,
             IEnumerable<ForgeRecipeFamilyDefinition> recipes, IEnumerable<ItemAvailabilityPolicyDefinition> availability,
-            IEnumerable<ProgressionBranchOverlayDefinition> progression, IEnumerable<ForgeCandidateExclusionDefinition> exclusions, IEnumerable<ForgeDeviationDefinition> deviations)
+            IEnumerable<ProgressionBranchOverlayDefinition> progression, IEnumerable<ForgeCandidateExclusionDefinition> exclusions, IEnumerable<ForgeDeviationDefinition> deviations,
+            IEnumerable<ForgeEconomicProfileDefinition> profiles)
         {
+            foreach (ForgeEconomicProfileDefinition profile in profiles)
+            {
+                _forgeProfiles.Add(profile.Id, profile);
+                _forgeProfileValues.Add(profile);
+            }
             foreach (var deviation in deviations)
             {
                 var record = new ModContentPatchRecord(deviation.Owner, deviation.Profile, deviation.Field, ModContentPatchOperation.Replace);
@@ -662,6 +712,8 @@ namespace Eclipse.Modding
         private readonly Dictionary<DefinitionId, ItemSetDefinition> _p1cSets = new Dictionary<DefinitionId, ItemSetDefinition>();
         private readonly Dictionary<DefinitionId, ForgeRecipeFamilyDefinition> _p1cForgeRecipes =
             new Dictionary<DefinitionId, ForgeRecipeFamilyDefinition>();
+        private readonly Dictionary<DefinitionId, ForgeEconomicProfileDefinition> _p1cForgeProfiles =
+            new Dictionary<DefinitionId, ForgeEconomicProfileDefinition>();
         private readonly Dictionary<ModContentPatchKey, ForgeCandidateExclusionDefinition> _p1cForgeExclusions =
             new Dictionary<ModContentPatchKey, ForgeCandidateExclusionDefinition>();
         private readonly Dictionary<DefinitionId, ItemAvailabilityPolicyDefinition> _p1cAvailability =
@@ -805,7 +857,7 @@ namespace Eclipse.Modding
             _p1cTacticSubtypes.Add(target.Id, new ItemTacticSubtypeDefinition(Mod.Id, target.Id, group));
         }
 
-        private int P1CRegistrationCount => _p1cCombatSubtypes.Count + _p1cTacticSubtypes.Count + _p1cInitialProfiles.Count + _p1cShopPrices.Count + _p1cPresentations.Count + _p1cInnatePerks.Count + _p1cDefaultEnchantments.Count + _p1cItems.Count + _p1cSets.Count + _p1cForgeRecipes.Count +
+        private int P1CRegistrationCount => _p1cCombatSubtypes.Count + _p1cTacticSubtypes.Count + _p1cInitialProfiles.Count + _p1cShopPrices.Count + _p1cPresentations.Count + _p1cInnatePerks.Count + _p1cDefaultEnchantments.Count + _p1cItems.Count + _p1cSets.Count + _p1cForgeRecipes.Count + _p1cForgeProfiles.Count +
             _p1cAvailability.Count + _p1cProgression.Count + _p1cForgeExclusions.Count + _p1cForgeDeviations.Count;
 
         private readonly Dictionary<ModContentPatchKey, ForgeDeviationDefinition> _p1cForgeDeviations =
@@ -946,8 +998,62 @@ namespace Eclipse.Modding
             if (id.Category != "forge-profiles" || !CanReferenceNamespace(id.Namespace))
                 throw new ModContentException("Forge profile belongs to an invalid or undeclared namespace: '" + id + "'.");
             ForgeEconomicProfileDefinition profile;
-            if (_catalog.TryGetForgeEconomicProfile(id, out profile)) return profile;
+            if (_p1cForgeProfiles.TryGetValue(id, out profile) || _catalog.TryGetForgeEconomicProfile(id, out profile)) return profile;
             throw new ModContentException("Forge economic profile is not registered: '" + id + "'.");
+        }
+
+        public const int MaxForgePriceRows = 64, MaxForgeLevel = 1000, MaxForgeMaterialCount = 10000000;
+        // A row whose MaxLevel is UnboundedForgeLevel applies to every higher level.
+        public const int UnboundedForgeLevel = int.MaxValue;
+
+        public ForgeEconomicProfileDefinition RegisterForgeEconomicProfile(string localId, ModForgePriceBlock[] blocks)
+        {
+            ThrowIfCompleted();
+            DefinitionId id = Qualify("forge-profiles", localId);
+            if (_p1cForgeProfiles.ContainsKey(id) || _catalog.TryGetForgeEconomicProfile(id, out ForgeEconomicProfileDefinition ignored))
+                throw new ModContentException("Duplicate forge price profile: '" + id + "'.");
+            if (blocks == null || blocks.Length == 0) throw new ModContentException("Forge price profile requires at least one equipment price table.");
+            var seen = new HashSet<ModEquipmentKind>();
+            for (int i = 0; i < blocks.Length; i++)
+            {
+                ModForgePriceBlock block = blocks[i];
+                if (block == null || !Enum.IsDefined(typeof(ModEquipmentKind), block.Equipment) || !seen.Add(block.Equipment))
+                    throw new ModContentException("Forge price profile contains an invalid or duplicate equipment category.");
+                if (block.Prices.Count == 0 || block.Prices.Count > MaxForgePriceRows)
+                    throw new ModContentException("Forge price table for " + block.Equipment + " requires 1.." + MaxForgePriceRows + " rows.");
+                int previousMax = 0;
+                for (int j = 0; j < block.Prices.Count; j++)
+                {
+                    ModForgePrice price = block.Prices[j];
+                    if (price == null || price.MinLevel < 1 || price.MinLevel > MaxForgeLevel || price.MinLevel > price.MaxLevel ||
+                        (price.MaxLevel > MaxForgeLevel && price.MaxLevel != UnboundedForgeLevel))
+                        throw new ModContentException("Forge price rows require 1 <= min_level <= max_level <= " + MaxForgeLevel + " (or an open max_level).");
+                    if (price.MinLevel <= previousMax)
+                        throw new ModContentException("Forge price rows for " + block.Equipment + " must be in ascending, non-overlapping level order.");
+                    previousMax = price.MaxLevel;
+                    if (price.Materials.Count == 0 || price.Materials.Count > 3)
+                        throw new ModContentException("Forge price rows list 1..3 forge material counts.");
+                    bool any = false;
+                    for (int k = 0; k < price.Materials.Count; k++)
+                    {
+                        if (price.Materials[k] < 0 || price.Materials[k] > MaxForgeMaterialCount)
+                            throw new ModContentException("Forge material counts must be 0.." + MaxForgeMaterialCount + ".");
+                        any |= price.Materials[k] > 0;
+                    }
+                    if (!any) throw new ModContentException("Forge price rows must charge at least one material.");
+                }
+            }
+            EnsureCapacityForNewRegistration();
+            var definition = new ForgeEconomicProfileDefinition(id, id.ToString(), (ModForgePriceBlock[])blocks.Clone());
+            _p1cForgeProfiles.Add(id, definition);
+            return definition;
+        }
+
+        private static bool HasPriceBlock(ForgeEconomicProfileDefinition profile, ModEquipmentKind equipment)
+        {
+            for (int i = 0; i < profile.PriceBlocks.Count; i++)
+                if (profile.PriceBlocks[i].Equipment == equipment) return true;
+            return false;
         }
 
         public ForgeRecipeFamilyDefinition RegisterForgeRecipeFamily(string localId, string alias,
@@ -957,8 +1063,11 @@ namespace Eclipse.Modding
             DefinitionId id = Qualify("forge-recipes", localId);
             if (_p1cForgeRecipes.ContainsKey(id)) throw new ModContentException("Duplicate forge recipe family: '" + id + "'.");
             ForgeEconomicProfileDefinition profile;
-            if (!_catalog.TryGetForgeEconomicProfile(economicProfile, out profile) || !CanReferenceNamespace(economicProfile.Namespace))
-                throw new ModContentException("Forge recipe must reference an immutable host/dependency economic profile.");
+            bool ownProfile = _p1cForgeProfiles.TryGetValue(economicProfile, out profile);
+            if (!ownProfile && (!_catalog.TryGetForgeEconomicProfile(economicProfile, out profile) || !CanReferenceNamespace(economicProfile.Namespace)))
+                throw new ModContentException("Forge recipe must reference a host/dependency economic profile or one registered by this mod.");
+            if (!ownProfile && profile.IsModOwned)
+                throw new ModContentException("Forge recipe cannot use another mod's price profile: '" + profile.Id + "'.");
             if (items == null || items.Length == 0) throw new ModContentException("Forge recipe family requires at least one item binding.");
             var seen = new HashSet<ModEquipmentKind>();
             for (int i = 0; i < items.Length; i++)
@@ -968,6 +1077,8 @@ namespace Eclipse.Modding
                     throw new ModContentException("Forge recipe contains an invalid or duplicate equipment binding.");
                 if (item.Enchantments < 1 || item.Enchantments > 8) throw new ModContentException("Forge enchantment count must be 1..8.");
                 if (item.MinDeviation > item.MaxDeviation) throw new ModContentException("Forge deviation minimum exceeds maximum.");
+                if (profile.IsModOwned && !HasPriceBlock(profile, item.Equipment))
+                    throw new ModContentException("Forge price profile '" + profile.Id + "' has no prices for " + item.Equipment + ".");
             }
             if (candidates == null || candidates.Length == 0)
                 throw new ModContentException("Forge recipe family requires at least one candidate.");
@@ -1010,6 +1121,8 @@ namespace Eclipse.Modding
                 if (_catalog.TryGetItem(id, out ItemDefinition ignored)) throw new ModContentException("Duplicate item definition: '" + id + "'.");
             foreach (DefinitionId id in _p1cSets.Keys)
                 if (_catalog.TryGetItemSet(id, out ItemSetDefinition ignored)) throw new ModContentException("Duplicate item set: '" + id + "'.");
+            foreach (DefinitionId id in _p1cForgeProfiles.Keys)
+                if (_catalog.TryGetForgeEconomicProfile(id, out ForgeEconomicProfileDefinition ignored)) throw new ModContentException("Duplicate forge price profile: '" + id + "'.");
             foreach (DefinitionId id in _p1cForgeRecipes.Keys)
                 if (_catalog.TryGetForgeRecipeFamily(id, out ForgeRecipeFamilyDefinition ignored)) throw new ModContentException("Duplicate forge recipe family: '" + id + "'.");
             foreach (DefinitionId item in _p1cAvailability.Keys)
@@ -1031,7 +1144,8 @@ namespace Eclipse.Modding
             _catalog.CommitItemPresentations(_p1cPresentations.Values);
             _catalog.CommitItemDefaultEnchantments(_p1cDefaultEnchantments.Values);
             _catalog.CommitP1C(_p1cItems.Values, _p1cSets.Values, _p1cForgeRecipes.Values,
-                _p1cAvailability.Values, _p1cProgression.Values, _p1cForgeExclusions.Values, _p1cForgeDeviations.Values);
+                _p1cAvailability.Values, _p1cProgression.Values, _p1cForgeExclusions.Values, _p1cForgeDeviations.Values,
+                _p1cForgeProfiles.Values);
         }
 
         private void ClearP1CPending()
@@ -1046,6 +1160,7 @@ namespace Eclipse.Modding
             _p1cItems.Clear();
             _p1cSets.Clear();
             _p1cForgeRecipes.Clear();
+            _p1cForgeProfiles.Clear();
             _p1cForgeExclusions.Clear();
             _p1cForgeDeviations.Clear();
             _p1cAvailability.Clear();

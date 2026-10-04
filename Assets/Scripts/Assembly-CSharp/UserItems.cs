@@ -208,10 +208,12 @@ public class UserItems
 			UserItem dKCHDHMLKHN2 = CMGOCLGHNLH(item);
 			if (dKCHDHMLKHN2 != null)
 			{
+				var activeSets = IsPlayerItems() ? Eclipse.UI.SetBonusNotice.ActiveCombos() : null;
 				dKCHDHMLKHN2.JBLKCIBKMKB(false);
 				dKCHDHMLKHN.JBLKCIBKMKB(true);
 				ListSF.CCDKHLAMKKO().BMADIJMPENJ(dKCHDHMLKHN);
 				ListSF.CCDKHLAMKKO().GGGEHAGCLGC();
+				Eclipse.UI.SetBonusNotice.AnnounceNew(activeSets);
 			}
 		}
 	}
@@ -230,6 +232,7 @@ public class UserItems
 		UserItem dKCHDHMLKHN = CMGOCLGHNLH(item);
 		if (dKCHDHMLKHN != null && dKCHDHMLKHN.GKGIKMCMCPB())
 		{
+			var activeSets = IsPlayerItems() ? Eclipse.UI.SetBonusNotice.ActiveCombos() : null;
 			List<UserItem> list = HOPBBLJLHOB(item.Type, string.Empty);
 			list.ForEach((UserItem DHDMNHCIPEH) =>
 			{
@@ -238,7 +241,14 @@ public class UserItems
 			dKCHDHMLKHN.JBLKCIBKMKB(true);
 			ListSF.CCDKHLAMKKO().BMADIJMPENJ(dKCHDHMLKHN);
 			ListSF.CCDKHLAMKKO().GGGEHAGCLGC();
+			Eclipse.UI.SetBonusNotice.AnnounceNew(activeSets);
 		}
+	}
+
+	private bool IsPlayerItems()
+	{
+		Roster roster = ListSF.CCDKHLAMKKO();
+		return roster != null && ReferenceEquals(this, roster.KHCNHPCPFII());
 	}
 
 	public void HOMCPNCGPDB(List<ItemInfo> HELFDCAIJNE)

@@ -1238,7 +1238,7 @@ namespace Eclipse.Modding
         private readonly Dictionary<DefinitionId, TacticDefinition> _p1dTactics = new Dictionary<DefinitionId, TacticDefinition>();
 
         private int P1DRegistrationCount => _pendingActors.Count + _pendingProjectiles.Count + _p1dLocales.Count + _p1dLocations.Count + _p1dMoveTemplates.Count +
-            _p1dMoves.Count + _p1dMoveTriggers.Count + _p1dTactics.Count + MovePerkLockRegistrationCount + _moveItemLockExtensions.Count + _moveCombatPatches.Count;
+            _p1dMoves.Count + _p1dMoveTriggers.Count + _p1dTactics.Count + MovePerkLockRegistrationCount + _moveItemLockExtensions.Count + _movePerkLockExtensions.Count + _moveCombatPatches.Count;
 
         public LocaleMetadataDefinition RegisterLocaleMetadata(string localId, string name, string locale, string alias,
             string fileIcon, string fileIconSelected, string loaderImage, string preloaderImage, bool isAsian,
@@ -1365,6 +1365,7 @@ namespace Eclipse.Modding
             ValidateProjectileCommit();
             ValidateActorCommit();
             _catalog.ValidateItemLockExtensions(_moveItemLockExtensions);
+            _catalog.ValidatePerkLockExtensions(_movePerkLockExtensions);
             _catalog.ValidateCombatPatches(_moveCombatPatches);
             foreach (var patch in _moveCombatPatches) ValidateMovePerkRefs(patch.Conditions);
             for (int i = 0; i < templates.Length; i++) ValidateTemplateRefs(templates[i]);
@@ -1387,6 +1388,7 @@ namespace Eclipse.Modding
             ApplyProjectileCommit();
             ApplyActorCommit();
             _catalog.AddItemLockExtensions(_moveItemLockExtensions);
+            _catalog.AddPerkLockExtensions(_movePerkLockExtensions);
             _catalog.AddCombatPatches(_moveCombatPatches);
         }
 
@@ -1398,6 +1400,7 @@ namespace Eclipse.Modding
             _pendingProjectiles.Clear();
             _pendingActors.Clear();
             _moveItemLockExtensions.Clear();
+            _movePerkLockExtensions.Clear();
             _moveCombatPatches.Clear();
         }
 

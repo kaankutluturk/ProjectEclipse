@@ -151,6 +151,16 @@ namespace Nekki.SF2.Core.Fights.Controller
 			return _btnRaidCharge;
 		}
 
+        public ProgressButton GetButtonMagic()
+        {
+            return _btnMagic;
+        }
+
+        public ProgressButton GetButtonMissile()
+        {
+            return _btnMissile;
+        }
+
 		public void SetButtonRaidChargePos(float DHDMNHCIPEH, float BGEEALIPKCC)
 		{
 			_btnRaidCharge.transform.position = new Vector2(DHDMNHCIPEH, BGEEALIPKCC);
@@ -181,6 +191,14 @@ namespace Nekki.SF2.Core.Fights.Controller
 		{
 			SetRequestedVisibility(FightCID.RaidChargeButton, OPPBHOOBHOE);
 		}
+
+        // Eclipse: an equipped ability on RaidCharge outside a raid. The raid charge
+        // count belongs to raid items, so its label stays hidden.
+        public void ShowRaidChargeAbility(bool visible)
+        {
+            SetRequestedVisibility(FightCID.RaidChargeButton, visible);
+            if (_lblRaidChargeCount != null) _lblRaidChargeCount.gameObject.SetActive(false);
+        }
 
 		public void SetNeededPercentageToActBtn(FightCID DGECPBJDPNL, float NDFGBDLLMGB, float _Duration = 0.5f)
 		{

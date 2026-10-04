@@ -768,6 +768,15 @@ namespace Eclipse.Modding
         bool TrySetControlBlocked(object owner, string control, bool blocked, out string error);
     }
 
+    // Combat button presentation. A cooldown refills the button's progress ring over
+    // the given native frames, as the legacy SetCooldown perk action does. Visibility
+    // shows a button the fight setup hid (currently only RaidCharge outside raids).
+    public interface IModFighterButtons
+    {
+        bool TrySetButtonCooldown(string control, int frames, out string error);
+        bool TrySetControlVisible(string control, bool visible, out string error);
+    }
+
     // The event's animation is captured at notification time, not queried later
     // from a controller which may already have selected the next move.
     public sealed class ModAnimationLifecycleEvent
@@ -1069,7 +1078,7 @@ namespace Eclipse.Modding
         IModFighterOperations Opponent { get; }
     }
 
-    public sealed class ModInstanceFighter : IModFighterOperations, IModDamageEventSource, IModBehaviorInstanceSource, IModFighterTargets, IModIncomingHitSource, IModFighterEffects, IModCombatSnapshotSource, IModCombatActivitySource, IModFighterForms, IModFighterStatusIcons, IModAnimationLifecycleSource, IModFighterFlags, IModFighterControls, IModRoundOutcomes, IModFighterMotion, IModFighterPlayback, IModFighterRegions, IModFighterArtwork, IModFighterCamera, IModFighterProjectiles, IModFighterProjectileSpawning, IModFighterActors, IModActorBehaviorSource
+    public sealed class ModInstanceFighter : IModFighterOperations, IModDamageEventSource, IModBehaviorInstanceSource, IModFighterTargets, IModIncomingHitSource, IModFighterEffects, IModCombatSnapshotSource, IModCombatActivitySource, IModFighterForms, IModFighterStatusIcons, IModAnimationLifecycleSource, IModFighterFlags, IModFighterControls, IModFighterButtons, IModRoundOutcomes, IModFighterMotion, IModFighterPlayback, IModFighterRegions, IModFighterArtwork, IModFighterCamera, IModFighterProjectiles, IModFighterProjectileSpawning, IModFighterActors, IModActorBehaviorSource
     {
         private readonly IModFighterOperations _inner;
         public IModActor Actor => (_inner as IModActorBehaviorSource)?.Actor;
@@ -1085,6 +1094,18 @@ namespace Eclipse.Modding
             if (SavedInstance != null && _inner is IModFighterControls controls)
                 return controls.TrySetControlBlocked((SavedInstance, owner), control, blocked, out error);
             error = "Control restrictions are unavailable."; return false;
+        }
+        public bool TrySetButtonCooldown(string control, int frames, out string error)
+        {
+            if (_inner is IModFighterButtons buttons)
+                return buttons.TrySetButtonCooldown(control, frames, out error);
+            error = "Button cooldowns are unavailable."; return false;
+        }
+        public bool TrySetControlVisible(string control, bool visible, out string error)
+        {
+            if (_inner is IModFighterButtons buttons)
+                return buttons.TrySetControlVisible(control, visible, out error);
+            error = "Button visibility is unavailable."; return false;
         }
         public bool TrySetFlag(object owner, string behavior, string name, out string error)
         {

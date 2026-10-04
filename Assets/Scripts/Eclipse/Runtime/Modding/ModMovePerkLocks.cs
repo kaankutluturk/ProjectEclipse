@@ -355,3 +355,87 @@ namespace Eclipse.Modding
         }
     }
 }
+
+namespace Eclipse.Modding
+{
+    // Adds an alternative perk to one existing perk lock of a native move, so either
+    // perk makes the move available. The source lock may be a direct perk lock or a
+    // perk inside a positive top-level OR group.
+    public sealed class MovePerkLockExtension
+    {
+        public string MoveName { get; }
+        public DefinitionId SourcePerk { get; }
+        public string SourceRuntimePerkName { get; }
+        public DefinitionId Perk { get; }
+        public string RuntimePerkName { get; }
+
+        public MovePerkLockExtension(string moveName, DefinitionId sourcePerk, string sourceRuntimePerkName,
+            DefinitionId perk, string runtimePerkName)
+        {
+            if (string.IsNullOrWhiteSpace(moveName) || moveName != moveName.Trim() || moveName.Length > 128)
+                throw new ModContentException("Perk lock extension requires an exact move name of 1..128 characters.");
+            if (sourcePerk.Category != "perks" || perk.Category != "perks")
+                throw new ModContentException("Perk lock extension requires perk definitions.");
+            if (sourcePerk == perk || string.Equals(sourceRuntimePerkName, runtimePerkName, StringComparison.Ordinal))
+                throw new ModContentException("Perk lock extension must add a different perk.");
+            MoveName = moveName;
+            SourcePerk = sourcePerk;
+            SourceRuntimePerkName = sourceRuntimePerkName;
+            Perk = perk;
+            RuntimePerkName = runtimePerkName;
+        }
+
+        internal string ConflictKey => MoveName + "\n" + Perk;
+    }
+
+    public sealed partial class ModContentCatalog
+    {
+        private readonly List<MovePerkLockExtension> _movePerkLockExtensions = new List<MovePerkLockExtension>();
+        public IReadOnlyList<MovePerkLockExtension> MovePerkLockExtensions => _movePerkLockExtensions.AsReadOnly();
+        internal void ValidatePerkLockExtensions(IReadOnlyList<MovePerkLockExtension> extensions)
+        {
+            var keys = new HashSet<string>(StringComparer.Ordinal);
+            foreach (var entry in _movePerkLockExtensions) keys.Add(entry.ConflictKey);
+            foreach (var entry in extensions)
+                if (!keys.Add(entry.ConflictKey)) throw new ModContentException("Duplicate perk lock extension for '" + entry.MoveName + "' and '" + entry.Perk + "'.");
+        }
+        internal void AddPerkLockExtensions(IEnumerable<MovePerkLockExtension> extensions) => _movePerkLockExtensions.AddRange(extensions);
+    }
+
+    public sealed partial class ModRegistrationTransaction
+    {
+        private readonly List<MovePerkLockExtension> _movePerkLockExtensions = new List<MovePerkLockExtension>();
+
+        public void ExtendMovePerkLock(string moveName, DefinitionId sourcePerk, DefinitionId perk)
+        {
+            ThrowIfCompleted();
+            string sourceName = ResolveLockPerkName(sourcePerk);
+            string perkName = ResolveLockPerkName(perk);
+            var value = new MovePerkLockExtension(moveName, sourcePerk, sourceName, perk, perkName);
+            foreach (var prior in _movePerkLockExtensions)
+                if (prior.ConflictKey == value.ConflictKey)
+                    throw new ModContentException("Duplicate perk lock extension for '" + moveName + "' and '" + perk + "'.");
+            EnsureCapacityForNewRegistration();
+            _movePerkLockExtensions.Add(value);
+        }
+
+        private string ResolveLockPerkName(DefinitionId perk)
+        {
+            if (perk.Category != "perks" || !CanReferenceNamespace(perk.Namespace))
+                throw new ModContentException("Perk lock extension references an inaccessible perk '" + perk + "'.");
+            PerkDefinition resolved = GetPerk(perk.ToString());
+            if (resolved.Id != perk)
+                throw new ModContentException("Perk lock extension could not resolve perk '" + perk + "'.");
+            return resolved.IsCore && !string.IsNullOrEmpty(resolved.LegacyName) ? resolved.LegacyName : resolved.Id.ToString();
+        }
+    }
+
+    public sealed partial class ModApiFacade
+    {
+        public void ExtendMovePerkLock(string moveName, DefinitionId sourcePerk, DefinitionId perk)
+        {
+            RequireCapability("content.patch");
+            RequireRegistration().ExtendMovePerkLock(moveName, sourcePerk, perk);
+        }
+    }
+}

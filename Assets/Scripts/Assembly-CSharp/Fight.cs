@@ -500,7 +500,7 @@ public partial class Fight
 		public int OGOLNFLBLBD;
 	}
 
-		private sealed class EclipseFighterOperations : IModFighterOperations, IModDamageEventSource, IModFighterTargets, IModIncomingHitSource, IModFighterEffects, IModCombatSnapshotSource, IModCombatActivitySource, IModFighterForms, IModFighterStatusIcons, IModAnimationLifecycleSource, IModFighterFlags, IModFighterControls, IModRoundOutcomes, IModFighterMotion, IModFighterPlayback, IModFighterRegions, IModFighterArtwork, IModFighterCamera, IModFighterProjectiles, IModFighterProjectileSpawning, IModFighterActors, IModActorBehaviorSource
+		private sealed class EclipseFighterOperations : IModFighterOperations, IModDamageEventSource, IModFighterTargets, IModIncomingHitSource, IModFighterEffects, IModCombatSnapshotSource, IModCombatActivitySource, IModFighterForms, IModFighterStatusIcons, IModAnimationLifecycleSource, IModFighterFlags, IModFighterControls, IModFighterButtons, IModRoundOutcomes, IModFighterMotion, IModFighterPlayback, IModFighterRegions, IModFighterArtwork, IModFighterCamera, IModFighterProjectiles, IModFighterProjectileSpawning, IModFighterActors, IModActorBehaviorSource
 	{
 		private readonly Fight _fight;
 		private readonly Model _model;
@@ -601,6 +601,51 @@ public partial class Fight
                     default: throw new ArgumentException("Unknown combat control.", nameof(control));
                 }
                 _fight.Controller.SetScriptControlBlocked(owner, action, blocked);
+                error = string.Empty;
+                return true;
+            }
+            catch (Exception exception) { error = exception.Message; return false; }
+        }
+
+        public bool TrySetButtonCooldown(string control, int frames, out string error)
+        {
+            try
+            {
+                if (_fight == null || _model == null || !_fight.round.processing || _fight._eclipseFightEndDispatched ||
+                    (_model != _fight._playerModel && _model != _fight.CKNCPOABFBO))
+                    throw new InvalidOperationException("Button cooldowns require an active fighter and round.");
+                if (frames < 1 || frames > 3600) throw new ArgumentOutOfRangeException(nameof(frames), "frames must be 1..3600.");
+                FightCID action;
+                switch (control)
+                {
+                    case "punch": action = FightCID.Punch; break;
+                    case "kick": action = FightCID.Kick; break;
+                    case "ranged": action = FightCID.MissileButton; break;
+                    case "raid_charge": action = FightCID.RaidChargeButton; break;
+                    default: throw new ArgumentException("Unknown cooldown control.", nameof(control));
+                }
+                // Same sequence as the legacy SetCooldown perk action (InfoPerk).
+                _model.OBJCCBMMDJH(action, 0);
+                _model.PJGPCDPPOHA(action, frames);
+                error = string.Empty;
+                return true;
+            }
+            catch (Exception exception) { error = exception.Message; return false; }
+        }
+
+        public bool TrySetControlVisible(string control, bool visible, out string error)
+        {
+            try
+            {
+                if (_fight == null || _model == null || !_fight.round.processing || _fight._eclipseFightEndDispatched ||
+                    (_model != _fight._playerModel && _model != _fight.CKNCPOABFBO))
+                    throw new InvalidOperationException("Button visibility requires an active fighter and round.");
+                if (control != "raid_charge") throw new ArgumentException("Only the raid_charge button visibility can be changed.", nameof(control));
+                error = string.Empty;
+                // Only the single-player HUD draws buttons, and only for the player.
+                if (_model != _fight._playerModel || _fight.IsLocalVersus || _fight.Controller == null) return true;
+                // Fight setup (FELJFJOEJNC) recomputes raid visibility for the next fight.
+                _fight.Controller.GetActionButtons().ShowRaidChargeAbility(visible);
                 error = string.Empty;
                 return true;
             }

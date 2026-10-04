@@ -68,6 +68,8 @@ namespace Eclipse.UI
         {
             if (closingAt >= 0f) return;
             closingAt = Time.unscaledTime;
+            // Update is switched off once the entrance settles; the fade-out needs it again.
+            enabled = true;
             whole.interactable = false;
             whole.blocksRaycasts = false;
         }
