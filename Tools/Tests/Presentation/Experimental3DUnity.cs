@@ -78,9 +78,11 @@ public static class Experimental3DUnity
                 var encounter = ListSF.CHMCKGCDGCM(new FightIDS(ModRuntime.Scripts.Content.RuntimeFightId(DefinitionId.Parse("core:fights/zone_1/tournament/3"))));
                 Check(encounter != null, "Core encounter missing"); entered = GameUtils.StartFight(encounter, false, null, true, false); return;
             }
-            var fight = Fight.GetCurrentFight(); if (fight == null || fight.get_FightTimeInFrames() < 100) return;
+            var fight = Fight.GetCurrentFight(); if (fight == null) return;
             var player = fight.GetPlayerModel(); var enemy = fight.GetEnemyModel(); if (player == null || enemy == null) return;
-            player.Parameters.UserControlled = false; enemy.Parameters.AiControlled = false;
+            player.Parameters.UserControlled = false; player.Parameters.AiControlled=false;
+            enemy.Parameters.UserControlled=false; enemy.Parameters.AiControlled = false;
+            if(fight.get_FightTimeInFrames()<100)return;
             double elapsed = EditorApplication.timeSinceStartup - phaseAt;
             var volumes = UnityEngine.Object.FindObjectsByType<FighterVolume>(FindObjectsInactive.Include, FindObjectsSortMode.None);
             var perspective = UnityEngine.Object.FindObjectsByType<UnityEngine.Camera>(FindObjectsInactive.Include, FindObjectsSortMode.None).FirstOrDefault(c => c.name == "Eclipse experimental perspective camera");
@@ -151,16 +153,28 @@ public static class Experimental3DUnity
                     Check(UnityEngine.Camera.main.cullingMask == mask && player._MeshRender.get_Base().Vertices.All(v => v.z == 0), "Original rendering not restored");
                     Check(player._MeshRender.GetComponent<MeshRenderer>().enabled, "Original body mesh hidden");
                     Check(Pose(player).SequenceEqual(pose) && fight.get_FightTimeInFrames() == frame, "Toggle changed native pose/time");
-                    SF2DisplayFrameRate.ToggleExperimental3D(); fight.SetPaused(false); Next(); break;
+                    SF2DisplayFrameRate.ToggleExperimental3D();
+                    Check(player.PlayAnimation("HighKick"),"Native high kick unavailable for articulation capture");
+                    fight.SetPaused(false); Next(); break;
                 case 7:
-                    if (fight.get_FightTimeInFrames() < frame + 90) return;
+                    if (fight.get_FightTimeInFrames() < frame + 12) return;
                     Check(perspective.enabled && !Pose(player).SequenceEqual(pose), "Animation did not resume in 3D");
                     fight.SetPaused(true); Capture("fighters-3d-animation.png"); Next(); break;
                 case 8:
                     if (captured < 5) return;
+                    if(captured==5 && FighterVolume.ReviewExposure==1){FighterVolume.ReviewExposure=4;Capture("fighters-3d-bright-animation.png");return;}
+                    if(captured<6)return;
+                    FighterVolume.ReviewExposure=1;
                     var bodies=UnityEngine.Object.FindObjectsByType<ProceduralFighterBody>(FindObjectsInactive.Include,FindObjectsSortMode.None).Where(b=>b.Ready).ToArray();
                     Check(bodies.Length == 2,"Standard fighter bodies were not reconstructed");
                     Check(bodies.All(b=>b.GetComponentsInChildren<FighterVolume>().Any(v=>v.GetComponent<MeshFilter>().sharedMesh.vertexCount>3000)),"Dedicated continuous body skins missing");
+                    foreach(var body in bodies)
+                    {
+                        var bodyMesh=body.SurfaceMesh;
+                        CheckClosedSkin(bodyMesh);
+                        Check(bodyMesh.normals.All(n=>!float.IsNaN(n.x)&&n.sqrMagnitude>.9f),"Deformed skin lighting normals invalid");
+                        Debug.Log("[Experimental3DUnity] Blended skin vertices="+bodyMesh.vertexCount+" build ms="+body.LastBuildMilliseconds.ToString("F2")+" deform ms="+body.LastDeformMilliseconds.ToString("F2"));
+                    }
                     var panelTest=FighterVolume.Create(player.GetRenderObject().transform);
                     var quad=new[]{new Vector3(0,0,0),new Vector3(50,0,0),new Vector3(50,50,0),new Vector3(0,50,0)};
                     var quadFaces=new[]{0,1,2,0,2,3};
@@ -192,6 +206,27 @@ public static class Experimental3DUnity
         catch (Exception error) { Debug.LogError("[Experimental3DUnity] FAIL: " + error); Finish(1); }
     }
     public static void Captured() { captured++; }
+    static void CheckClosedSkin(Mesh mesh)
+    {
+        var edges=new System.Collections.Generic.Dictionary<long,int>();
+        var adjacency=new System.Collections.Generic.Dictionary<int,System.Collections.Generic.List<int>>();
+        var indices=mesh.triangles;var points=mesh.vertices;
+        for(int i=0;i<indices.Length;i+=3)
+        {
+            int a=indices[i],b=indices[i+1],c=indices[i+2];
+            if(Vector3.Cross(points[b]-points[a],points[c]-points[a]).sqrMagnitude==0)throw new Exception("Degenerate skin triangle");
+            for(int side=0;side<3;side++)
+            {
+                a=indices[i+side];b=indices[i+(side+1)%3];
+                long key=((long)Math.Min(a,b)<<32)|(uint)Math.Max(a,b);edges.TryGetValue(key,out int count);edges[key]=count+1;
+                if(!adjacency.TryGetValue(a,out var list)){list=new System.Collections.Generic.List<int>();adjacency.Add(a,list);}list.Add(b);
+            }
+        }
+        Check(edges.Values.All(n=>n==2),"Body skin has open seams or internal overlapping patch edges: "+string.Join(",",edges.Values.GroupBy(n=>n).Select(g=>g.Key+"="+g.Count()))+"; "+string.Join(" | ",edges.Where(pair=>pair.Value!=2).Take(5).Select(pair=>points[(int)(pair.Key>>32)]+" -> "+points[(int)(uint)pair.Key])));
+        var seen=new System.Collections.Generic.HashSet<int>();var queue=new System.Collections.Generic.Queue<int>();queue.Enqueue(indices[0]);
+        while(queue.Count>0){int vertex=queue.Dequeue();if(!seen.Add(vertex))continue;foreach(int neighbor in adjacency[vertex])queue.Enqueue(neighbor);}
+        Check(seen.Count==adjacency.Count,"Body regions remain disconnected primitives");
+    }
     static void Log(string message, string stack, LogType type)
     { if (entered && type == LogType.Exception && (stack.Contains("Fight.") || stack.Contains("Model.") || stack.Contains("Rendering"))) renderException = message + "\n" + stack; }
     static void Finish(int code) { SessionState.SetBool(Active, false); EditorApplication.update -= Update; Application.logMessageReceived -= Log; EditorApplication.Exit(code); }

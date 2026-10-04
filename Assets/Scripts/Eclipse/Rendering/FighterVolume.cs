@@ -71,7 +71,7 @@ namespace Eclipse.Rendering
         void Colorize(Color color)
         {
             // Preserve perk/arena colour, with a neutral near-black diffuse floor.
-            Color ink = new Color(.045f,.041f,.035f,color.a);
+            Color ink = new Color(.035f,.033f,.03f,color.a);
             color = new Color(ink.r+color.r*.08f, ink.g+color.g*.08f, ink.b+color.b*.08f, color.a);
             tint.SetColor("_Color", color);
             Color rim = RimLight.SceneColor ?? new Color(.85f,.75f,.58f,1);
@@ -81,12 +81,13 @@ namespace Eclipse.Rendering
             draw.SetPropertyBlock(tint);
         }
 
-        public void Geometry(List<Vector3> points, List<int> indices, Color color)
+        public void UpdateTint(Color color) => Colorize(color);
+        public void Geometry(List<Vector3> points, List<int> indices, Color color, List<Vector3> surfaceNormals = null, bool topologyChanged = true)
         {
-            if(vertices==null||vertices.Length!=points.Count){mesh.Clear();vertices=new Vector3[points.Count];}
-            if(triangles==null||triangles.Length!=indices.Count)triangles=new int[indices.Count];
-            points.CopyTo(vertices);indices.CopyTo(triangles);
-            mesh.vertices=vertices;mesh.triangles=triangles;mesh.RecalculateNormals();mesh.RecalculateBounds();Colorize(color);
+            if(topologyChanged){mesh.Clear();mesh.indexFormat=points.Count>65535?IndexFormat.UInt32:IndexFormat.UInt16;}
+            mesh.SetVertices(points);if(topologyChanged)mesh.SetTriangles(indices,0);
+            if(surfaceNormals!=null)mesh.SetNormals(surfaceNormals);else mesh.RecalculateNormals();
+            mesh.RecalculateBounds();Colorize(color);
         }
 
         static long Edge(int a,int b) => ((long)Math.Min(a,b)<<32)|(uint)Math.Max(a,b);
@@ -183,13 +184,18 @@ namespace Eclipse.Rendering
             float t=delta.sqrMagnitude<.00001f?0:Mathf.Clamp01(Vector2.Dot(p-x,delta)/delta.sqrMagnitude);
             return Vector2.Distance(p,x+delta*t);
         }
-        public void Surface(Vector3[] source,int[] faces,Color color,string[] names=null,bool body=false)
+        public void Surface(Vector3[] source,int[] faces,Color color,string[] names=null,bool body=false,float depthAnchor=0)
         {
             if(sourceFaces!=faces||sourceCount!=source.Length||sourceBody!=body)BuildPanels(source,faces,names,body);
             foreach(var panel in panels)
             {
                 int count=panel.Points.Count;
-                for(int i=0;i<count;i++)panel.Pose[i]=SurfacePoint(panel.Points[i].Sample(source),panel.Rigid?.95f:.65f);
+                for(int i=0;i<count;i++)
+                {
+                    Vector3 point=panel.Points[i].Sample(source);
+                    point.z=depthAnchor+(point.z-depthAnchor)*(panel.Rigid?.95f:.75f);
+                    panel.Pose[i]=point;
+                }
                 for(int i=0;i<count;i++)
                 {
                     Vector3 point=panel.Pose[i];float distance=100;
@@ -197,9 +203,9 @@ namespace Eclipse.Rendering
                     // Thin rolled perimeter, fuller curved interior. Broad folds deform
                     // with the same native anchors, rather than triangular plate walls.
                     float fullness=1-Mathf.Exp(-distance/9);
-                    float depth=panel.Rigid?2.5f:1.3f+8*fullness;
+                    float depth=panel.Rigid?2.5f:1.2f+5.5f*fullness;
                     Vector2 uv=panel.UV[i];
-                    float fold=panel.Rigid?0:Mathf.Sin(uv.x*Mathf.PI*3+uv.y*.7f)*2.4f*fullness;
+                    float fold=panel.Rigid?0:Mathf.Sin(uv.x*Mathf.PI*3+uv.y*.7f)*1.2f*fullness;
                     vertices[panel.Offset+i]=point+Vector3.forward*(depth+fold);
                     vertices[panel.Offset+count+i]=point-Vector3.forward*(depth-fold);
                 }

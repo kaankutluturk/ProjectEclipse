@@ -10,14 +10,24 @@ The shared Options UI serves startup and in-game Settings.
 - `SF2DisplayFrameRate` owns preference/load/reset in Eclipse.Runtime.
 - `ModelPresentation` retains the native Model. Project-owned
   `ProceduralFighterBody` reads standard Skeleton anchors through presentation
-  interpolation and builds tapered elliptical lofts: dedicated torso/pelvis,
-  head, hand and foot profiles; continuous elbow and knee/ankle/heel/forefoot
-  surfaces. Hermite paths and varying sections replace uniform stroke capsules.
-  Shared vertices smooth normals within each section. Torso/head, arms and legs
-  use separate depth factors around native pivot (.85/.9, .65, .7). Standard male
-  and BODY_WOMAN outlines are hidden when this skin is available. Shoulder/hip
-  attachments remain inset intersections, not a globally manifold anatomical
-  skin. Missing-anchor rigs retain the panel/detail-stroke fallback.
+  interpolation. `SculptedFighterSkin` blends tapered elliptical sections into
+  one signed-distance surface and extracts shared topology with marching
+  tetrahedra. Shoulder and hip sections extend into the chest and pelvis;
+  elbow/knee/ankle/foot transitions share that surface. Skull and jaw have
+  dedicated oriented ellipsoids; hands use smaller flattened profiles.
+  Field-gradient normals smooth lighting independently of triangle shapes.
+  Coordinates are relative to the native pivot during extraction, avoiding
+  tiny-triangle precision loss at large arena coordinates. Section bounds cover
+  both ends in both directions, including caps and blending margins.
+- A connected seed surface binds each vertex to up to three nearby native
+  sections. Subsequent interpolated poses deform positions and normals; topology
+  uploads happen only when the rig changes. Unchanged poses reuse geometry while
+  still updating tint/exposure. A disconnected initial surface keeps rebuilding
+  until a connected seed is available. This is linear procedural skinning, not
+  anatomical muscles, joint constraints or a general character importer.
+  Torso/head, arms and legs use separate depth factors around native pivot
+  (.85/.9, .65, .7). Standard male and BODY_WOMAN outlines are hidden when the
+  skin is available. Missing-anchor rigs retain the panel/detail-stroke fallback.
 - `MeshNode.AddTriangle` carries recovered figure names beside unchanged native
   node identities and triangle indices; ModelLoader supplies the names. The
   inferred method name has the required best-guess comment. `MeshNode.Render`
@@ -26,16 +36,16 @@ The shared Options UI serves startup and in-game Settings.
 - `FighterVolume` groups triangles by recovered figure provenance, preserves
   shared native node identity, consistently winds faces and closes perimeter
   edges only. Cloth has two shared-edge subdivision levels, thin rolled hems,
-  curved interiors and broad procedural folds. Independently animated coincident
+  curved interiors and gentle procedural folds. Independently animated coincident
   vertices are never welded by position. Recognized weapon/blade/helmet-name
   groups keep unsubdivided faces and separate sharp perimeter normals. Native
   equipment identifiers outside these groups remain a limitation: this is not
-  complete semantic armour classification. Cloth/equipment depth (.65/.95)
-  replaces blanket .35 attenuation. Fallback strokes are elliptical.
+  complete semantic armour classification. Cloth/equipment depth (.75/.95) is relative to the native body pivot,
+  with reduced soft thickness and fold amplitude. Fallback strokes are elliptical.
 - The shared resource shader uses a matte near-black base, broad soft diffuse
   shading and faint directional arena-coloured edge light. Specular highlights
   and the blue rim are removed; native arena/perk tint has a small influence.
-  `ReviewExposure`, default 1, is an acceptance-capture multiplier. The 4x image
+  `ReviewExposure`, default 1, is an acceptance-capture multiplier. The 4x images
   uses the same geometry under brighter shading, not a Settings/Lua lighting API.
 - `ExperimentalFighterCamera` belongs to the active player's native ViewerModel.
   Only that viewer's descendants acquire volumes; menu/shop/title previews remain
@@ -50,12 +60,14 @@ The shared Options UI serves startup and in-game Settings.
 
 ## Scope and limits
 
-This approximates recovered drawings. Head/hand anatomy is simple; shoulder/hip
-joins can intersect. Shared standard body proportions do not reconstruct every
-fighter's anatomy. Complex armour, helmets and skirt panels can still look
-angular, noisy or separate under bright light; outfit-specific shapes/depth and
-semantic equipment classification need more work. Dark shading is the intended
-style, not evidence that these remaining geometry defects are solved.
+This approximates recovered drawings. The body is a connected surface in the
+accepted native poses, but head/hand anatomy and shared proportions remain
+simple. Binding depends on the initial native pose; extreme bends, intersecting
+limbs, large form changes and all outfits are not accepted by these checks.
+Complex armour, helmets and skirt panels can still look angular or separate under
+bright light. Outfit-specific shapes/depth and semantic equipment classification
+need more work. Dark shading is the intended style; bright captures remain part
+of geometry review.
 
 There are no UVs/textures, custom skinned-character imports, 3D arenas, orbit
 controls, gameplay depth movement, world shadows or public Lua camera API.
@@ -72,29 +84,43 @@ shared immutable project-drive TAR cache. Campaign Tournament 3 has controlled
 input/AI/spacing. Root scene/profile are untouched; fresh logs/results and process
 exit are required.
 
-Final refinement passes **34 checks**: defaults, actual Options button/label/
-preference, supported shader/normals, original camera direction and reflected
-projection, exclusive viewer ownership, paused frame/health/pose invariance, live
-off restore, resumed animation and camera/mask teardown. Both standard bodies
-have over 3000 vertices. Six volumes remain (two bodies, two native panel meshes,
-two weapon strokes), with no old body capsules covering the new skin. A connected
-two-triangle cloth fixture yields 50 vertices/288 indices without internal walls;
-a rigid fixture yields 24 vertices/36 indices with sharp perimeter normals.
-Coincident fallback geometry remains finite. Native source depth is
--13.49503..40.14708 before presentation adjustment.
+The sculpted refinement passes **41 full-game checks**: defaults, actual Options
+button/label/preference, supported shader/normals, original camera direction and
+reflected projection, exclusive viewer ownership, paused frame/health/pose
+invariance, live off restore, native HighKick playback and camera/mask teardown.
+Both bodies have closed edge incidence (two faces per edge), one connected
+component, noncollapsed triangles and finite unit lighting normals after the kick.
+Six volumes remain (two bodies, two native panel meshes, two weapon strokes),
+with no old body capsules covering the skin. A connected two-triangle cloth
+fixture yields 50 vertices/288 indices without internal walls; a rigid fixture
+yields 24 vertices/36 indices with sharp perimeter normals. Coincident fallback
+geometry remains finite. Final native log: `Temp/FighterPlaybackUnity-d997a2c104cd4564b9767ae6eb4b68d8/validation-d2771178b3ca470fb08ada44de54e034.log`.
 
-Orthographic, default perspective, 4x bright, resumed animation and Settings PNGs
-were visually inspected and saved to ignored `Temp/Procedural3DReview-20261004/`.
-Review corrected a nonexistent hand anchor, disconnected ankles/feet and female
-figure prefixes initially leaving old body capsules visible. Complex outfit
-defects remain visible in the bright capture and are not claimed solved.
+A separate production-source managed runner,
+`Tools/Tests/Presentation/TestSculptedSkinRuntime.ps1`, passes **58 checks**:
+closed finite surfaces, positive/negative section direction and cap extents,
+large-coordinate anchors, lighting normals, rigid rotation/translation and
+unchanged animation topology. It uses Unity managed math, without a graphics
+engine; the full-game run separately checks actual rendering.
 
-All four managed projects compile through ignored Unity 6.6 reference remapping;
-19 frame-interpolation assertions pass with Unity managed references preloaded
-and remapped assemblies in the runner's ignored directory. Wiki build/types/search
-and links are recorded in the creator work log. Native rendering acceptance is
-separate from managed compilation. Unrelated Search startup exceptions and title
-preview warnings remain; logs are not claimed error-free.
+Measured editor samples including final capture: approximately 95-104 ms for initial
+surface extraction and binding per fighter, then 3.6-4.0 ms per animated body
+for deformation (excluding Unity mesh upload and other rendering work). The
+initial toggle can hitch. These samples are not sustained CPU/GPU acceptance;
+all equipment, simultaneous mod actors and exported players remain unmeasured.
+
+Orthographic, default perspective, 4x bright, native kick, bright kick and Settings
+PNGs were visually inspected and saved to ignored
+`Temp/Sculpted3DReview-20261004/`. The bright images retain visible outfit defects;
+no claim of complete clothing or anatomical reconstruction is made. The fixture
+now disables both fighters' control before the initial timing gate, avoiding an
+opponent attack being queued before the controlled screenshot setup.
+
+All four managed projects compile through ignored Unity 6.6 Windows-reference
+remapping. The wiki build/type/search/reference and internal-link checks also
+pass. Native rendering acceptance is separate from managed compilation.
+Unrelated Search startup exceptions and title preview warnings remain; logs are
+not claimed error-free.
 
 ## Initial experiment history
 

@@ -22,17 +22,19 @@ describes effects with typed tables when it loads. No Lua runs per frame.
 
 The built-in **Options > Display > 3D fighters (experimental)** switch is a
 separate player preference, off by default. Standard recovered fighter rigs use
-tapered, elliptical body surfaces, continuous elbow/knee/ankle transitions and
-dedicated torso, head, hand and foot profiles. Clothing uses connected curved
-panels with thin perimeters; weapons retain sharp edges. A matte near-black
-material gives broad soft shading and faint directional edge light. Perspective
-keeps the original camera direction, with depth adjusted by body region or
-equipment group. It applies immediately to fighters and native child models in
-the active fight; turning it off restores the original silhouette rendering.
-The arena, HUD and menu previews retain their original projection. This is an
-procedural approximation: shoulders/hips and separate body sections can still
-intersect, and complex outfits need further work. Rigs missing the standard
-anchors retain the panel and elliptical-stroke fallback. It does not supply
+one continuous sculpted skin, with tapered elliptical limbs, blended shoulders
+and hips, and dedicated torso, head, hand and foot profiles. The connected skin
+follows the native animation with smooth lighting normals. Clothing uses shared
+curved panels with thin perimeters and gentle folds; weapons retain sharp edges.
+A matte near-black material gives broad soft shading and faint directional edge
+light. Perspective keeps the original camera direction, with depth adjusted by
+body region or equipment group around the fighter's pivot. It applies immediately
+to fighters and native child models in the active fight; turning it off restores
+the original silhouette rendering. The arena, HUD and menu previews retain their
+original projection. This is a procedural approximation: anatomy remains simple,
+extreme poses can deform imperfectly, and complex outfits need further work.
+Rigs missing the standard anchors retain the panel and elliptical-stroke fallback.
+The first skin build can briefly increase frame time. It does not supply
 textured character skins, a custom rig importer or 3D arenas. Existing effects still
 use their documented native presentation paths, so overlays, trails, markers and
 post-processing are not guaranteed to match the perspective geometry. No new Lua

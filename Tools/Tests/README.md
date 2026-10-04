@@ -6,6 +6,13 @@ registration, bounds, strict fields, rollback and fingerprints.
 Unity project, checking scoped commands, independent root state, teams,
 death/removal, pause/TTL and surrender cleanup on a controlled core encounter.
 
+Procedural fighter rendering: `Presentation/TestSculptedSkinRuntime.ps1` checks
+production geometry, cap bounds, normals and animation topology with Unity
+managed math. `Presentation/TestExperimental3DUnity.ps1` runs the full game in a
+marked isolated Unity 6.6 fixture, checks the real experimental Settings toggle,
+connected skins, native high-kick deformation, restore and teardown, and captures
+normal/bright screenshots. These checks do not cover every outfit or performance.
+
 Run these commands from the repository root. Runners and their C# fixtures stay
 together here; generated sources, binaries, logs and isolated projects go under
 ignored `Temp/`. Tool-specific suites in `Tools/Animation/`, `Tools/ModdingEditor/`,

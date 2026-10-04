@@ -12,6 +12,7 @@ if ($ExistingFixture) {
     if (!$fixture.StartsWith($tempRoot,[StringComparison]::OrdinalIgnoreCase) -or !((Test-Path -LiteralPath (Join-Path $fixture 'experimental-3d-fixture.marker')) -or (Test-Path -LiteralPath (Join-Path $fixture 'fighter-playback-fixture.marker')))) { throw 'Existing fixture must be a marked rendering project inside repository Temp.' }
 }
 Write-Host "Full-game rendering fixture: $fixture"
+if(Get-CimInstance Win32_Process -Filter "Name='Unity.exe'" | Where-Object {$_.CommandLine -and $_.CommandLine.Contains($fixture)}){throw 'The isolated rendering project is already open.'}
 foreach ($folder in @('Assets','Packages','ProjectSettings','Library/PackageCache')) {
     New-Item -ItemType Directory -Force -Path (Join-Path $fixture $folder) | Out-Null
     & robocopy (Join-Path $root $folder) (Join-Path $fixture $folder) /E /COPY:DAT /R:1 /W:1 /NFL /NDL /NJH /NJS | Out-Null
@@ -19,6 +20,10 @@ foreach ($folder in @('Assets','Packages','ProjectSettings','Library/PackageCach
 }
 New-Item -ItemType Directory -Force -Path (Join-Path $fixture 'render-mods') | Out-Null
 Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'Experimental3DUnity.cs') -Destination (Join-Path $fixture 'Assets/Editor') -Force
+foreach($validation in Get-ChildItem -LiteralPath (Join-Path $root 'Tools/Tests') -Recurse -Filter '*.cs' -File){
+    $destination=Join-Path $fixture ('Assets/Editor/'+$validation.Name)
+    if(Test-Path -LiteralPath $destination){Copy-Item -LiteralPath $validation.FullName -Destination $destination -Force}
+}
 [IO.File]::WriteAllText((Join-Path $fixture 'experimental-3d-fixture.marker'),'Isolated full-game native rendering acceptance')
 $log = Join-Path $fixture ('validation-'+[Guid]::NewGuid().ToString('N')+'.log')
 Write-Host "Native rendering log: $log"
@@ -36,6 +41,7 @@ $process = Start-Process -FilePath $Unity -ArgumentList @('-projectPath',('"'+$f
 Write-Host "Native rendering process: $($process.Id)"
 $deadline = [DateTime]::UtcNow.AddMinutes(15)
 while (!$process.WaitForExit(20000)) {
+    if((Test-Path -LiteralPath $log) -and (Select-String -LiteralPath $log -Pattern 'error CS\d+:' -Quiet)){$process.Kill();throw "Rendering fixture failed compilation: $log"}
     if ([DateTime]::UtcNow -gt $deadline) { $process.Kill(); throw "Native rendering timed out: $log" }
 }
 Select-String -LiteralPath $log -Pattern '\[Experimental3DUnity\]|error CS' | ForEach-Object { Write-Host $_.Line }

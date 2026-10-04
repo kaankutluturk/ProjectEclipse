@@ -137,7 +137,8 @@ namespace Nekki.SF2.Core.Fights.Renders.Model
                 {
                     Color color = _Presentation != null ? _Presentation.Tint ?? _Color : _Color;
                     bool body = Eclipse.Rendering.ProceduralFighterBody.RenderFor(_Presentation, color);
-                    _Volume.Surface(JBLMEBBICJI.Vertices, JBLMEBBICJI.Triangles, color, JBLMEBBICJI.FigureNames, body);
+                    float depthAnchor = body ? _Presentation.GetComponent<Eclipse.Rendering.ProceduralFighterBody>().DepthAnchor : 0;
+                    _Volume.Surface(JBLMEBBICJI.Vertices, JBLMEBBICJI.Triangles, color, JBLMEBBICJI.FigureNames, body, depthAnchor);
                 }
 				_Mesh.vertices = JBLMEBBICJI.Vertices;
 				_Mesh.RecalculateBounds();
