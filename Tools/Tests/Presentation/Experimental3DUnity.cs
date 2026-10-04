@@ -110,9 +110,12 @@ public static class Experimental3DUnity
                     Check(toggle.GetComponentInChildren<Text>().text.StartsWith("On"), "Settings label not refreshed"); Next(); break;
                 case 2:
                     if (elapsed < .7 || perspective == null) return;
+                    Check(Quaternion.Angle(perspective.transform.rotation,UnityEngine.Camera.main.transform.rotation)<.01f,"Camera changed original composition");
                     Check(!perspective.orthographic && perspective.enabled && perspective.cullingMask == 1 << ExperimentalFighterCamera.Layer, "Perspective camera missing");
                     Check(UnityEngine.Object.FindObjectsByType<ExperimentalFighterCamera>(FindObjectsInactive.Include, FindObjectsSortMode.None).Length == 1, "Menu preview acquired a fight perspective pass");
-                    Check(volumes.Length > 10 && volumes.All(v => v.gameObject.activeInHierarchy), "Solid renderers missing");
+                    Check(volumes.Count(v => v.gameObject.activeInHierarchy) >= 2, "Solid renderers missing");
+                    Check(ProceduralFighterBody.IsBodyOutline("BODY_WOMAN-Capsule-1_EArm_1") && !ProceduralFighterBody.IsBodyOutline("WEAPON_KNIVES-Capsule-Edge17_1"), "Body provenance includes equipment or misses female rig");
+                    Check(!volumes.Any(v => v.gameObject.activeInHierarchy && ProceduralFighterBody.IsBodyOutline(v.transform.parent.name)), "Recovered body capsules still cover lofted skin");
                     Check(volumes.All(v => v.transform.IsChildOf(player.GetRenderObject().transform.parent)), "Menu preview leaked 3D volumes into fight");
                     Check(volumes.All(v => v.GetComponent<MeshRenderer>().sharedMaterial.shader.isSupported), "Volume shader unsupported");
                     Check(volumes.Any(v => v.GetComponent<MeshFilter>().sharedMesh.bounds.size.z > 10), "No actual geometry depth");
@@ -126,6 +129,8 @@ public static class Experimental3DUnity
                     Check(volumes.All(v => v.GetComponent<MeshFilter>().sharedMesh.normals.Length == v.GetComponent<MeshFilter>().sharedMesh.vertexCount), "Missing lighting normals");
                     Check(Pose(player).SequenceEqual(pose) && enemy.KKMCHCNOHMB() == health && fight.get_FightTimeInFrames() == frame, "Renderer mutated native simulation");
                     Debug.Log("[Experimental3DUnity] Volumes=" + volumes.Length + "; native depth=" + player._MeshRender.get_Base().Vertices.Min(v => v.z) + ".." + player._MeshRender.get_Base().Vertices.Max(v => v.z) + "; perspective=" + perspective.transform.position + "; source=" + UnityEngine.Camera.main.transform.position + " size=" + UnityEngine.Camera.main.orthographicSize);
+                    File.WriteAllLines(Path.Combine(Path.GetDirectoryName(Application.dataPath),"procedural3d-parts.txt"),
+                        player._MeshRender.get_Base().FigureNames.Distinct().Concat(enemy._MeshRender.get_Base().FigureNames.Distinct()).Concat(new[]{"ACTIVE VOLUME PARENTS"}).Concat(volumes.Where(v=>v.gameObject.activeInHierarchy).Select(v=>v.transform.parent.name)));
                     Capture("experimental-3d-settings.png"); Next(); break;
                 case 3:
                     if (captured < 2) return;
@@ -136,6 +141,9 @@ public static class Experimental3DUnity
                     Capture("fighters-perspective-3d.png"); Next(); break;
                 case 5:
                     if (captured < 3) return;
+                    if(FighterVolume.ReviewExposure == 1) { FighterVolume.ReviewExposure = 4; Capture("fighters-3d-bright-inspection.png"); return; }
+                    if(captured < 4)return;
+                    FighterVolume.ReviewExposure = 1;
                     SF2DisplayFrameRate.ToggleExperimental3D(); Next(); break;
                 case 6:
                     if (elapsed < .4) return;
@@ -149,12 +157,28 @@ public static class Experimental3DUnity
                     Check(perspective.enabled && !Pose(player).SequenceEqual(pose), "Animation did not resume in 3D");
                     fight.SetPaused(true); Capture("fighters-3d-animation.png"); Next(); break;
                 case 8:
-                    if (captured < 4) return;
+                    if (captured < 5) return;
+                    var bodies=UnityEngine.Object.FindObjectsByType<ProceduralFighterBody>(FindObjectsInactive.Include,FindObjectsSortMode.None).Where(b=>b.Ready).ToArray();
+                    Check(bodies.Length == 2,"Standard fighter bodies were not reconstructed");
+                    Check(bodies.All(b=>b.GetComponentsInChildren<FighterVolume>().Any(v=>v.GetComponent<MeshFilter>().sharedMesh.vertexCount>3000)),"Dedicated continuous body skins missing");
+                    var panelTest=FighterVolume.Create(player.GetRenderObject().transform);
+                    var quad=new[]{new Vector3(0,0,0),new Vector3(50,0,0),new Vector3(50,50,0),new Vector3(0,50,0)};
+                    var quadFaces=new[]{0,1,2,0,2,3};
+                    panelTest.Surface(quad,quadFaces,Color.black,new[]{"Cloth-Triangle1","Cloth-Triangle2"});
+                    var panelMesh=panelTest.GetComponent<MeshFilter>().sharedMesh;
+                    Check(panelMesh.vertexCount==50&&panelMesh.triangles.Length==288,"Cloth did not share subdivision edges or emitted internal walls");
+                    Check(panelMesh.vertices.Max(v=>v.z)-panelMesh.vertices.Min(v=>v.z)>10,"Cloth interior stayed a flat slab");
+                    panelTest.Surface(quad,quadFaces,Color.black,new[]{"WEAPON-Triangle1","WEAPON-Triangle2"},true);
+                    // The cache key includes native topology/body selection; use a new
+                    // immutable topology array when the owning native mesh changes.
+                    panelTest.Surface(quad,(int[])quadFaces.Clone(),Color.black,new[]{"WEAPON-Triangle1","WEAPON-Triangle2"},true);
+                    Check(panelMesh.vertexCount==24&&panelMesh.triangles.Length==36,"Rigid panel lost sharp boundary normals or emitted internal walls");
+                    UnityEngine.Object.Destroy(panelTest.gameObject);
                     // Exercise geometry at coincident endpoints as well as live native poses.
                     var test = FighterVolume.Create(player.GetRenderObject().transform);
                     test.Capsule(Vector3.zero, Vector3.zero, 25f, Color.black);
                     var mesh = test.GetComponent<MeshFilter>().sharedMesh;
-                    Check(mesh.bounds.size.x > 24 && mesh.bounds.size.z > 24 && mesh.vertices.All(v => !float.IsNaN(v.x)), "Degenerate capsule not a finite sphere");
+                    Check(mesh.bounds.size.x > 24 && mesh.bounds.size.z > 17 && mesh.vertices.All(v => !float.IsNaN(v.x)), "Degenerate fallback is not a finite ellipsoid");
                     UnityEngine.Object.Destroy(test.gameObject);
                     SF2DisplayFrameRate.ResetRenderSettings(); Check(!SF2DisplayFrameRate.Experimental3DEnabled && !PlayerPrefs.HasKey("Eclipse.ExperimentalFighter3D"), "Reset defaults did not clear 3D");
                     var driver = UnityEngine.Object.FindFirstObjectByType<ExperimentalFighterCamera>(); UnityEngine.Object.Destroy(driver.gameObject); Next(); break;

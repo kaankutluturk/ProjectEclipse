@@ -58,11 +58,11 @@ namespace Eclipse.Rendering
             perspective.targetTexture = source.targetTexture; perspective.targetDisplay = source.targetDisplay;
             perspective.depth = source.depth + .1f;
             // Match the original framing at the central fighter plane, then view
-            // the real XYZ pose obliquely. Simulation/collision stay in native XY.
+            // the real XYZ pose without changing the original viewing direction.
             Vector3 forward = source.transform.forward;
             Vector3 focus = source.transform.position + forward * Vector3.Dot(transform.position - source.transform.position, forward);
             float distance = source.orthographicSize / Mathf.Tan(perspective.fieldOfView * Mathf.Deg2Rad * .5f);
-            Quaternion angle = source.transform.rotation * Quaternion.Euler(8f, -22f, 0f);
+            Quaternion angle = source.transform.rotation;
             perspective.transform.SetPositionAndRotation(focus - angle * Vector3.forward * distance, angle);
         }
         void RestoreSource()

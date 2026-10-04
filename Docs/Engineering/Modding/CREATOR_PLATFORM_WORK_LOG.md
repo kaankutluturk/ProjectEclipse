@@ -928,3 +928,57 @@ projectile motion and general rig imports retain broader acceptance work.
 Arbitrary actor spawning/AI/contacts, original character rig authoring and the
 remaining G01–G14/E1–E8 requirements remain open. The user's requested procedural
 3D refinement follows this feature's commit/push before creator work continues.
+
+
+## 2026-10-04: sculpted procedural fighter refinement
+
+After committing/pushing owned projectile control and Return Dart as d1740b84,
+the requested rendering refinement replaces uniform body capsules with standard
+Skeleton anchor-driven tapered elliptical lofts. Arms continue through elbows;
+legs continue through knees, ankles and feet. Torso/pelvis/head/hands have separate
+profiles. Region-specific depth replaces global .35 attenuation. The native
+ModelPresentation retains its Model; MeshNode/ModelLoader carry figure provenance
+without changing node identities, triangle indices or serialized assets. The
+narrowly inferred AddTriangle name has the required best-guess declaration comment.
+New Eclipse-owned ProceduralFighterBody source has a fresh meta GUID; existing
+metas, recovered assets, physics and collision remain unchanged.
+
+FighterVolume constructs connected clothing panels with shared subdivision and
+normal vertices, thin perimeter walls, curved interiors and broad folds, rather
+than extruding every triangle. Recognized weapon-name groups retain sharp edges;
+unknown native equipment identifiers still need classification. The shader uses
+near-black matte diffuse shading and faint directional arena-coloured edge light,
+removing steel grey/specular/blue rim. Perspective keeps the original camera
+rotation. Native child/custom rigs missing standard anchors retain fallback
+panel/elliptical-stroke geometry. Public visual docs and the engineering rendering
+record update in this change; no Lua bindings/editor contracts change.
+
+Final Unity 6.6 full-game acceptance passes 34 checks with both standard bodies
+(over 3000 vertices each) and six volumes, no old body capsules underneath.
+Coverage includes actual Settings toggle/default/persistence, original camera
+rotation/reflected orientation, isolated viewer ownership, paused native frame/
+health/pose, live off restore, resumed animation and camera/mask teardown.
+Connected cloth and rigid quad fixtures verify shared topology and no internal
+walls; coincident fallback geometry is finite. The final log is
+Temp/FighterPlaybackUnity-d997a2c104cd4564b9767ae6eb4b68d8/validation-6b95ef7fa60943668a135f8b57f135b7.log.
+Inputs/AI/spacing are controlled in Campaign Tournament 3 with empty mod root,
+fresh isolated profile and shared immutable TAR cache. Root scene/profile are
+untouched. Existing Search/preview warnings remain.
+
+Screenshot review corrected nonexistent hand-node assumptions, disconnected
+ankle/foot primitives and BODY_WOMAN prefixes leaving old opponent capsules
+visible. Orthographic, default 3D, 4x bright inspection, resumed animation and
+Settings images were inspected and copied to ignored Temp/Procedural3DReview-20261004.
+The brighter image uses the same geometry with an acceptance-only exposure
+multiplier; it deliberately reveals remaining outfit defects. Shoulder/hip
+section intersections, simple head/hand shapes and noisy/separate complex armour
+are not claimed solved. No complete skinned-character importer, textures, 3D
+arena or effect integration is supplied. All outfits/arenas/forms, physical input,
+exported builds and sustained performance remain broader acceptance work.
+
+All four managed compile projects pass using ignored Unity 6.6 reference
+remapping; 19 frame-interpolation assertions pass after matching Unity references
+are preloaded and remapped assemblies copied to the runner's ignored directory.
+Wiki build/types/search and 6412 local links/assets across 61 pages pass (existing
+duplicate 404 warning). This is a renderer experiment refinement, not closure of
+the broad Minecraft-style creator-platform goal; G01-G14/E1-E8 remain open.

@@ -8,6 +8,8 @@ namespace Eclipse.Rendering
 	// fighter only, instead of the static materials all fighters share.
 	public sealed class ModelPresentation : MonoBehaviour
 	{
+		public Model SourceModel { get; private set; }
+
 		private int _slowFactor = 1;
 		private int _slowFrame;
 
@@ -21,10 +23,12 @@ namespace Eclipse.Rendering
 		// Incremented on every tint change so renderers can apply it lazily.
 		public int TintVersion { get; private set; }
 
-		public static ModelPresentation Attach(GameObject root)
+		public static ModelPresentation Attach(GameObject root, Model model = null)
 		{
 			var presentation = root.GetComponent<ModelPresentation>();
-			return presentation != null ? presentation : root.AddComponent<ModelPresentation>();
+			if (presentation == null) presentation = root.AddComponent<ModelPresentation>();
+            if (model != null) presentation.SourceModel = model;
+            return presentation;
 		}
 
 		public void SetTint(Color? tint)

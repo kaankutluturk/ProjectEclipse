@@ -5,6 +5,8 @@ using UnityEngine;
 public class MeshNode
 {
 	public int[] Triangles;
+    public string[] FigureNames;
+    private List<string> _FigureNames = new List<string>();
 
 	public Vector3[] Vertices;
 
@@ -12,7 +14,8 @@ public class MeshNode
 
 	private List<int> _TrianglesList = new List<int>();
 
-	public void LPEPFNNPCBK(ModelNode FJKBEFJGAHF, ModelNode GMHJFPCFFMM, ModelNode PNMPELDMCJF)
+	// best guess for name
+	public void AddTriangle(ModelNode FJKBEFJGAHF, ModelNode GMHJFPCFFMM, ModelNode PNMPELDMCJF, string figureName = "")
 	{
 		int item = ENNKELDABMG(FJKBEFJGAHF);
 		int item2 = ENNKELDABMG(GMHJFPCFFMM);
@@ -20,6 +23,7 @@ public class MeshNode
 		_TrianglesList.Add(item);
 		_TrianglesList.Add(item2);
 		_TrianglesList.Add(item3);
+        _FigureNames.Add(figureName);
 	}
 
 	private int ENNKELDABMG(ModelNode MEEAKLDGLDF)
@@ -35,6 +39,8 @@ public class MeshNode
 	public void Init()
 	{
 		Triangles = _TrianglesList.ToArray();
+        FigureNames = _FigureNames.ToArray();
+        _FigureNames = null;
 		Vertices = new Vector3[MFONEBKEMAD.Count];
 		_TrianglesList = null;
 	}

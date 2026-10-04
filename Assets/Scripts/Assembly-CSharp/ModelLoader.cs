@@ -329,7 +329,7 @@ public class ModelLoader
 			{
 				Triangle item = new Triangle(lCDGOCIAIDK, lCDGOCIAIDK2, lCDGOCIAIDK3, node.Name);
 				ACENLMONNPA.ELOGKMHEBGA().Add(item);
-				ACENLMONNPA.GetModel()._MeshRender.get_Base().LPEPFNNPCBK(lCDGOCIAIDK, lCDGOCIAIDK2, lCDGOCIAIDK3);
+				ACENLMONNPA.GetModel()._MeshRender.get_Base().AddTriangle(lCDGOCIAIDK, lCDGOCIAIDK2, lCDGOCIAIDK3, node.Name);
 			}
 		}
 	}

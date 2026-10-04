@@ -189,11 +189,13 @@ namespace Nekki.SF2.Core.Fights.Renders.Model
 				_LineRender.SetPosition(0, new Vector3(x, y, 0f));
 				_LineRender.SetPosition(1, new Vector3(x2, y2, 0f));
 				bool solid = Eclipse.Rendering.ExperimentalFighterCamera.ActiveFor(transform);
-				if (solid && _Volume == null) _Volume = Eclipse.Rendering.FighterVolume.Create(transform);
-				solid = solid && _Volume != null;
-				if (_Volume != null) _Volume.gameObject.SetActive(solid);
+				bool bodyOutline = solid && Eclipse.Rendering.ProceduralFighterBody.IsBodyOutline(gameObject.name) &&
+                    Eclipse.Rendering.ProceduralFighterBody.RenderFor(_Presentation, _LineRender.startColor);
+                if (solid && !bodyOutline && _Volume == null) _Volume = Eclipse.Rendering.FighterVolume.Create(transform);
+				solid = solid && (bodyOutline || _Volume != null);
+				if (_Volume != null) _Volume.gameObject.SetActive(solid && !bodyOutline);
 				_LineRender.enabled = !solid;
-				if (solid) _Volume.Capsule(Vector3.LerpUnclamped(start, end, _Base.JAEOCMCOEFE()),
+				if (solid && !bodyOutline) _Volume.Capsule(Vector3.LerpUnclamped(start, end, _Base.JAEOCMCOEFE()),
 					Vector3.LerpUnclamped(start, end, 1f - _Base.PLFEEBJMGAK()), _Stroke, _LineRender.startColor);
 				UpdateRim(new Vector3(x, y, 0f), new Vector3(x2, y2, 0f));
 			}

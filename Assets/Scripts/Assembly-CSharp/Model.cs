@@ -1409,7 +1409,7 @@ public class Model : global::EventDispatcher<object>
 		GameObject gameObject = new GameObject("Mesh");
 		gameObject.transform.SetParent(_UnityObject.transform, false);
 		_MeshRender = gameObject.AddComponent<MeshRender>();
-		_presentation = Eclipse.Rendering.ModelPresentation.Attach(_UnityObject);
+		_presentation = Eclipse.Rendering.ModelPresentation.Attach(_UnityObject, this);
 		Eclipse.Rendering.WeaponTrail.Attach(_UnityObject, this);
 		Eclipse.Rendering.FighterParticles.Attach(_UnityObject, this);
 		NPKHMEHKFMM = 0;
