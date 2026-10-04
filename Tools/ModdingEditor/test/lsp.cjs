@@ -118,7 +118,7 @@ async function main() {
     catch(error) { throw new Error(error.message+'\n'+JSON.stringify(diagnostics.get(scriptedKey),null,2)); }
     console.log('PASS: actor identity/owner/team completion and complete Scripted Actor Sparring source');
     const actorHostProbe=probe('actor-host.lua','local sf2=require("sf2")\nsf2.behaviors.register{id="host",on_actor_spawn=function(_,fighter)\n if fighter.actor then fighter.actor:| end\nend}');
-    await until(async()=>{const found=labels(await request('textDocument/completion',actorHostProbe));return ['snapshot','move_by','remove','set_target','change_health','play_move'].every(name=>found.some(label=>label===name||label.startsWith(name+'(')));},'actor behavior self-reference methods');
+    await until(async()=>{const found=labels(await request('textDocument/completion',actorHostProbe));return ['snapshot','move_by','remove','set_target','change_health','play_move','change_form'].every(name=>found.some(label=>label===name||label.startsWith(name+'(')));},'actor behavior self-reference methods');
     const actorEndProbe=probe('actor-end.lua','local sf2=require("sf2")\nsf2.behaviors.register{id="host",on_actor_end=function(_,fighter)\n fighter.|\nend}');
     await until(async()=>{const found=labels(await request('textDocument/completion',actorEndProbe));return ['actor_id','actor_end_reason','actor_definition','actor_owner'].every(name=>found.includes(name));},'actor end context');
     console.log('PASS: actor spawn self-reference methods and terminal identity/reason context');
@@ -130,7 +130,7 @@ async function main() {
     const actorMethodsProbe = probe('actor-methods.lua', 'local sf2=require("sf2")\nsf2.behaviors.register{id="probe",on_tick=function(_,fighter)\n for _,actor in ipairs(fighter:actors() or {}) do actor:| end\nend}');
     await until(async()=>{
         const found=labels(await request('textDocument/completion',actorMethodsProbe));
-        return ['snapshot','move_by','set_target','remove','change_health','play_move'].every(method=>found.some(n=>n===method||n.startsWith(method+'(')));
+        return ['snapshot','move_by','set_target','remove','change_health','play_move','change_form'].every(method=>found.some(n=>n===method||n.startsWith(method+'(')));
     },'callback-scoped actor methods');
     console.log('PASS: actor definition and queried actor command completion');
     const functionProbe = probe('functions.lua', 'local sf2 = require("sf2")\nsf2.items.|');

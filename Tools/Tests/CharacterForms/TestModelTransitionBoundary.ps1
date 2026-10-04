@@ -33,6 +33,8 @@ RENDER
     int projectileCancels,actorCancels; string actorEndReason;
     void CancelEclipseProjectiles(){projectileCancels++;}
     void CancelEclipseActors(string reason){actorCancels++;actorEndReason=reason;}
+    HashSet<Model> actors=new HashSet<Model>();
+    bool IsEclipseFormParticipant(Model model)=>model==_playerModel||model==CKNCPOABFBO||actors.Contains(model);
     Round round=new Round(); Model _playerModel=new Model(),CKNCPOABFBO=new Model();
     bool _eclipseFightEndDispatched=false,isRenderFight=true,isRenderCamera=true,IsLocalVersus; int frame;
     Action Step=()=>{}; List<string> order=new List<string>();
@@ -78,6 +80,11 @@ RENDER
         Check(confirmed==0&&finished==0,"speculative versus step retains transition");
         Eclipse.Multiplayer.VersusTickDriver.Speculative=false;local.Render();local.Render();
         Check(confirmed==1&&finished==1,"confirmed versus step applies exactly once");
+        var actorFight=new Fight();var actorBody=new Model();actorFight.actors.Add(actorBody);int actorApplied=0,actorFailed=0;
+        Check(actorFight.QueueModelTransition(actorBody,()=>actorApplied++,e=>Check(e==null,"actor completion")),"owned actor queues");actorFight.Render();Check(actorApplied==1,"actor transition applied at boundary");
+        actorFight.QueueModelTransition(actorBody,()=>actorApplied++,e=>{Check(e is OperationCanceledException,"removed actor cancellation");actorFailed++;});
+        actorFight.actors.Remove(actorBody);actorFight.Render();Check(actorApplied==1&&actorFailed==1,"actor removed before boundary cannot transform");
+        Check(!actorFight.QueueModelTransition(new Model(),()=>{},e=>{}),"unmanaged root rejected");
         Console.WriteLine("PASS: production transition queue/Render boundary; deferred apply, interpolation order, pause, duplicate, stale round/model, death, reentrancy, failure, unload and speculative-versus barrier. Model/simulation/camera/interpolation services controlled.");
     }
 }

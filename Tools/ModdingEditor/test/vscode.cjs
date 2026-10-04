@@ -141,7 +141,7 @@ exports.run = async function () {
         while(Date.now()<actorHostDeadline){
             const result=await vscode.commands.executeCommand('vscode.executeCompletionItemProvider',actorHostUri,new vscode.Position(2,actorHostLine.indexOf('fighter.actor:')+14));
             const labels=(result?.items||[]).map(item=>typeof item.label==='string'?item.label:item.label.label);
-            if(['snapshot','move_by','remove','set_target','change_health','play_move'].every(name=>labels.some(label=>label===name||label.startsWith(name+'(')))){actorHostFound=true;break;}
+            if(['snapshot','move_by','remove','set_target','change_health','play_move','change_form'].every(name=>labels.some(label=>label===name||label.startsWith(name+'(')))){actorHostFound=true;break;}
             await new Promise(resolve=>setTimeout(resolve,500));
         }
         assert(actorHostFound,'Actor behavior self-reference completion missing');passed.push('PASS: actor spawn callback self-reference methods');
@@ -153,7 +153,7 @@ exports.run = async function () {
         while(Date.now()<actorsDeadline){
             const result=await vscode.commands.executeCommand('vscode.executeCompletionItemProvider',actorUri,new vscode.Position(2,actorLine.indexOf('actor:')+6));
             const labels=result?.items.map(item=>String(typeof item.label==='string'?item.label:item.label.label))??[];
-            if(['snapshot','move_by','set_target','remove','change_health','play_move'].every(name=>labels.some(label=>label===name||label.startsWith(name+'(')))){actorsFound=true;break;}
+            if(['snapshot','move_by','set_target','remove','change_health','play_move','change_form'].every(name=>labels.some(label=>label===name||label.startsWith(name+'(')))){actorsFound=true;break;}
             await new Promise(resolve=>setTimeout(resolve,500));
         }
         assert(actorsFound,'Queried independent fighter completion missing');passed.push('PASS: queried actor snapshot/motion/target/health/playback/removal completion');

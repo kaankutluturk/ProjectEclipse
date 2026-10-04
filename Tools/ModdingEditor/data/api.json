@@ -2386,6 +2386,13 @@
       "returns": "Eclipse.PlayMoveRequest",
       "capability": "combat.actors"
     },
+    "change_form": {
+      "params": {
+        "character": "Eclipse.WarriorHandle"
+      },
+      "returns": "Eclipse.FormRequest",
+      "capability": "combat.transform"
+    },
     "remove": {
       "params": {},
       "returns": "boolean, string|nil",
@@ -2924,7 +2931,7 @@
       "fields": {
         "status": [
           "\"queued\"|\"applied\"|\"failed\"",
-          "Applied main-fighter form swaps preserve owned companions and their remaining lifetime; actor handles remain callback-scoped."
+          "Applied forms preserve actor identity, private behavior and remaining lifetime. Actor forms retain max health; main forms retain companions. Actor handles remain callback-scoped."
         ],
         "error?": "string"
       }

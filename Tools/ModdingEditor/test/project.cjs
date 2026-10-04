@@ -29,6 +29,17 @@ test('authored fighter starter mirrors native models and original point animatio
  assert(!schema.types.FightPatch.fields['player_character?']);
 });
 
+test('actor forms require both capabilities and a scoped runtime callback',()=>{
+ const source=header+'sf2.behaviors.register{id="host",on_tick=function(_,fighter) fighter.actor:change_form(character) end}';
+ for(const missing of ['combat.actors','combat.transform']){
+  const mod={data:{capabilities:['content.register','combat.actors','combat.transform'].filter(c=>c!==missing)},assets:new Map()};
+  assert(p.analyze(source,mod).issues.some(i=>i.capability===missing));
+ }
+ const mod={data:{capabilities:['content.register','combat.actors','combat.transform']},assets:new Map()};
+ assert(!p.analyze(source,mod).issues.some(i=>i.code==='callback-timing'));
+ assert(p.analyze(source.replace('on_tick','on_actor_end'),mod).issues.some(i=>i.code==='callback-timing'));
+});
+
 test('actor companion starter mirrors playable files, scopes capabilities and lifecycle timing',async()=>{
  const dir=path.resolve(__dirname,'../../../Mods/example.actor-companions'),mod=await p.indexMod(dir);
  assert.deepEqual(mod.issues,[]);
@@ -36,7 +47,7 @@ test('actor companion starter mirrors playable files, scopes capabilities and li
  assert.deepEqual(p.analyze(source,mod).issues,[]);
  for(const file of ['mod.toml','README.md','scripts/main.lua','assets/animations/high_punch.bytes'])assert.deepEqual(await fs.readFile(path.join(dir,file)),await fs.readFile(path.resolve(__dirname,'../templates/actor-companions',file)));
  const api=require('../data/api.json');assert.equal(require('../scripts/api-schema.cjs').functions['sf2.actors.register'].returns,'Eclipse.ActorDefinitionHandle');
- for(const method of Object.values(api.actorMethods))assert.equal(method.capability,'combat.actors');
+ for(const [name,method] of Object.entries(api.actorMethods))assert.equal(method.capability,name==='change_form'?'combat.transform':'combat.actors');
  const missing={...mod,data:{...mod.data,capabilities:['content.register']}};
  const issues=p.analyze(header+'sf2.behaviors.register{id="test",on_round_begin=function(_,fighter) local actors=fighter:actors(); for _,actor in ipairs(actors) do actor:remove() end end}',missing).issues;
  assert(issues.some(i=>i.capability==='combat.actors'));assert(issues.filter(i=>i.code==='callback-timing').length>=2);

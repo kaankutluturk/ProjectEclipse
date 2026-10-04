@@ -30,8 +30,9 @@ snapshot of your original loadout. Form changes are temporary combat operations;
 they retain health percentage and input ownership without editing saved
 equipment. Try either form button while the summoned pair is alive: both keep
 their actor IDs, health, private behavior state, targets and remaining lifetime.
-Repeated strikes continue through the owner swap; changing an actor's own body
-is still unsupported. The HUD reacquires actor references each callback.
+Repeated strikes continue through the owner swap. The separate **Left form:
+core / authored** button changes that actor's own body while retaining its
+identity and state. The HUD reacquires actor references each callback.
 The owned lab uses the character chosen for its prepared encounter;
 restart Tournament 3 to use your saved player's ordinary setup. A resolved owned
 encounter opens the chooser again on the next entry. Failed
@@ -65,3 +66,14 @@ decisions and cooldowns are ordinary Lua behavior code. No operation DSL is used
 The experimental 3D option is an approximation of compatible rigs; its generated
 anatomy does not preserve every custom silhouette detail. Test authored visuals
 and equipment in both rendering modes before publishing your own character.
+
+Use **Left form: core / authored** to switch the left companion between the
+registered comparison and authored warriors. The actor keeps its identity,
+private behavior, team, health and remaining lifetime. This stops repeated
+strikes; return to the authored form before using its authored strike again.
+Reset spacing and toggle repeated strikes to test continued native combat.
+The core switch uses `actor:change_form`; the return is requested by the actor
+behavior using `fighter:change_form`. Actor references require `combat.actors`
+and form requests require `combat.transform`; changing
+form removes owned projectiles from the retired body and starts a fresh native
+AI controller rather than transferring its memory.

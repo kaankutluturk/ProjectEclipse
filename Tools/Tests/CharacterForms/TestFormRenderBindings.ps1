@@ -4,7 +4,7 @@ $source=Get-Content -Raw -LiteralPath (Join-Path $root 'Assets/Scripts/Assembly-
 $stage=[regex]::Match($source,'(?s)    internal sealed class FormRenderBindings.*?(?=    private readonly Dictionary<Model, PendingModelTransition>)').Value
 if(!$stage){throw 'Form binding stage extraction failed.'}
 $actors=Get-Content -Raw -LiteralPath (Join-Path $root 'Assets/Scripts/Eclipse/Modding/FightActors.cs')
-$stage += [regex]::Match($actors,'(?s)    internal Action BindEclipseActorOwnerForm.*?(?=    private bool ActorOwnerValid)').Value
+$stage += [regex]::Match($actors,'(?ms)^    internal Action BindEclipseActorOwnerForm.*?^    \}').Value
 $fixture=Join-Path $root ('Temp/FormBindings-'+[Guid]::NewGuid().ToString('N'))
 New-Item -ItemType Directory -Path $fixture | Out-Null
 $code=@'
@@ -25,7 +25,10 @@ class Fight{
  Model _playerModel=new Model(),CKNCPOABFBO=new Model();Binding _Camera=new Binding(),_SelectAnimation=new Binding();Rules _rulesInspector=new Rules();
  List<Model> LNDLFINJHDB=new List<Model>();
  Perks EPBDEDGLHJE=new Perks();
- Action BindFormPresentation(Model expected,Model replacement,bool player){if(RejectPresentation)throw new InvalidOperationException("presentation");return()=>{};} Action BindFormParticipant(Model expected,Model replacement){_playerModel=replacement;return()=>_playerModel=expected;}
+ Action BindFormPresentation(Model expected,Model replacement,bool player,bool actor=false){if(RejectPresentation)throw new InvalidOperationException("presentation");return()=>{};} Action BindFormParticipant(Model expected,Model replacement){_playerModel=replacement;return()=>_playerModel=expected;}
+ bool IsEclipseActorModel(Model model)=>model!=null&&_eclipseActors.ContainsKey(model);
+ bool IsEclipseFormParticipant(Model model)=>model==_playerModel||model==CKNCPOABFBO||IsEclipseActorModel(model);
+ Action BindEclipseActorFormParticipant(Model old,Model next){var actor=_eclipseActors[old];_eclipseActors.Remove(old);_eclipseActors.Add(next,actor);actor.Model=next;return()=>{_eclipseActors.Remove(next);_eclipseActors.Add(old,actor);actor.Model=old;};}
  public Fight(){_Camera.Current=_Camera.Original=_SelectAnimation.Current=_SelectAnimation.Original=_rulesInspector.Current=_playerModel;LNDLFINJHDB.AddRange(new[]{_playerModel,CKNCPOABFBO});CKNCPOABFBO._Enemies.Add(_playerModel);}
  STAGE
  static void Check(bool x,string why){if(!x)throw new Exception(why);}
@@ -87,6 +90,16 @@ class Fight{
   var opponentNext=new Model();var restore=f.BindEclipseActorOwnerForm(other,opponentNext);
   Check(hostile.Root==opponentNext&&live.TargetRequest==opponentNext&&foreign.Root==opponentNext,"opponent ownership/explicit target/pending birth transfer");
   restore();Check(hostile.Root==other&&live.TargetRequest==other&&foreign.Root==other,"opponent reference rollback");
+  f=new Fight();var main=f._playerModel;var actorBody=new Model();var actorRecord=new OwnedActor{Model=actorBody,Root=main};
+  f._eclipseActors.Add(actorBody,actorRecord);f.LNDLFINJHDB.Add(actorBody);
+  f._Camera.Current=f._Camera.Original=f._SelectAnimation.Current=f._SelectAnimation.Original=actorBody;
+  f._rulesInspector.Reject=true;f.CKNCPOABFBO._Enemies.Add(actorBody);
+  stage=new FormRenderBindings(f,actorBody,next);
+  Check(f._playerModel==main&&f._rulesInspector.Current==main&&actorRecord.Model==next,"actor form skips canonical identity/rule inspector");
+  Check(f.CKNCPOABFBO._Enemies.Contains(next),"actor form rebinds native observers");
+  stage.Dispose();Check(actorRecord.Model==actorBody&&f.CKNCPOABFBO._Enemies.Contains(actorBody),"actor coordinator restores identity and observers");
+  f.RejectPresentation=true;failed=false;try{new FormRenderBindings(f,actorBody,next);}catch(InvalidOperationException){failed=true;}
+  Check(failed&&actorRecord.Model==actorBody&&f._Camera.Current==actorBody&&f._rulesInspector.Current==main,"late actor form rejection restores all actor registrations");
   Console.WriteLine("PASS: production form registration orchestration; preparation, staged exchange, commit, rollback, partial rejection and rollback-failure reporting. Actor ownership/explicit targets/queued births preserved through commit and late rollback; camera/selector/rule services controlled.");
  }
 }

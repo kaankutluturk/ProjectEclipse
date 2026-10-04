@@ -18,6 +18,10 @@ internal class PreparedFormModel:IDisposable{public Model Model;public Model Tak
 internal class FormRenderBindings{public Fight Fight;public Model Old,Next;public bool Committed;public bool Owns(Fight fight,Model old,Model next)=>!Committed&&Fight==fight&&Old==old&&Next==next;public void Commit(){Committed=true;}}
 Model _playerModel,CKNCPOABFBO=new Model();HashSet<Model> _retiredFormBodies=new HashSet<Model>();
 List<Model> LNDLFINJHDB=new List<Model>(),HCPGFOCGDAA=new List<Model>(),JLEFIKJODGG=new List<Model>();Perks EPBDEDGLHJE=new Perks();
+Model ActorBody,CancelledCaster;bool FailCancel;int ProjectileCancels;
+bool IsEclipseFormParticipant(Model model)=>model==_playerModel||model==CKNCPOABFBO||model==ActorBody;
+bool IsEclipseActorModel(Model model)=>model==ActorBody;
+void CancelEclipseActorProjectiles(Model model){CancelledCaster=model;ProjectileCancels++;if(FailCancel)throw new Exception("projectile cleanup");}
 void RemoveModel(Model model){model.IMFOFFFLGOM();}
 static void Check(bool value,string message){if(!value)throw new Exception(message);}
 static void Main(){
@@ -42,6 +46,12 @@ static void Main(){
  var prepared=new PreparedFormModel{Model=active};var registration=new FormRenderBindings{Fight=cleanup,Old=retired,Next=active};
  cleanup.CommitPreparedForm(retired,prepared,registration);prepared.Dispose();
  Check(UnityEngine.Debug.Errors==1&&registration.Committed&&active.Disposals==0,"post-commit cleanup failure cannot dispose or reject replacement");
+ var actorFight=new Fight();var oldActor=new Model();var nextActor=new Model();actorFight.ActorBody=nextActor;actorFight.LNDLFINJHDB.Add(nextActor);
+ var actorPrepared=new PreparedFormModel{Model=nextActor};var actorBinding=new FormRenderBindings{Fight=actorFight,Old=oldActor,Next=nextActor};
+ actorFight.EPBDEDGLHJE.Reject=true;bool actorRejected=false;try{actorFight.CommitPreparedForm(oldActor,actorPrepared,actorBinding);}catch(InvalidOperationException){actorRejected=true;}
+ Check(actorRejected&&actorFight.ProjectileCancels==0&&actorPrepared.Model==nextActor,"rejected actor form keeps old caster projectiles and preparation");
+ actorFight.EPBDEDGLHJE.Reject=false;actorFight.FailCancel=true;actorFight.CommitPreparedForm(oldActor,actorPrepared,actorBinding);actorPrepared.Dispose();
+ Check(actorFight.ProjectileCancels==1&&actorFight.CancelledCaster==oldActor&&actorBinding.Committed&&actorPrepared.Model==null&&nextActor.Disposals==0&&oldActor.Disposals==1,"committed actor form cancels old caster only; cancellation failure cannot reject or destroy active body");
  Console.WriteLine("PASS: production form commit; reference/visibility rejection, invisibility, ownership transfer, helper/queue retirement, duplicate commit and cleanup failure. Native object and registration services controlled.");
 }
 }

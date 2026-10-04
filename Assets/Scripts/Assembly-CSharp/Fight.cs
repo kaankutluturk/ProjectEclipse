@@ -205,7 +205,7 @@ public partial class Fight
     {
         private Fight _fight;
         private readonly Model _expected, _replacement;
-        private readonly bool _player;
+        private readonly bool _player, _actor;
         private bool _camera, _animation, _rules;
         private Action _restoreAnimationEvents;
         private Action _restoreQueuedPerks;
@@ -221,13 +221,14 @@ public partial class Fight
         {
             if (fight == null || expected == null || replacement == null || expected == replacement)
                 throw new ArgumentException("Form binding requires two distinct models and a fight.");
-            if (expected != fight._playerModel && expected != fight.CKNCPOABFBO)
+            if (!fight.IsEclipseFormParticipant(expected))
                 throw new InvalidOperationException("The original fighter is no longer active.");
             _fight = fight; _expected = expected; _replacement = replacement;
             _player = expected == fight._playerModel;
+            _actor = fight.IsEclipseActorModel(expected);
             try
             {
-                var rules = fight._rulesInspector.PrepareModelRebind(expected, replacement);
+                var rules = _actor ? null : fight._rulesInspector.PrepareModelRebind(expected, replacement);
                 _restoreAnimationEvents = fight._SelectAnimation.CapturePendingEvents();
                 if (!fight._Camera.ReplaceModel(expected, replacement, _player))
                     throw new InvalidOperationException("Camera rejected the form replacement.");
@@ -246,11 +247,12 @@ public partial class Fight
                 _restoreQueuedPerks = fight.EPBDEDGLHJE.RebindQueuedFormActions(expected, replacement);
                 _restoreActiveEffects = fight.EPBDEDGLHJE.TransferFormEffects(expected, replacement);
                 _restorePerkRegistration = fight.EPBDEDGLHJE.ReplaceFormRegistration(expected, replacement);
-                rules(); _rules = true;
+                if (rules != null) { rules(); _rules = true; }
                 _restoreCombatState = expected.TransferFormCombatState(replacement);
-                _restoreParticipant = fight.BindFormParticipant(expected, replacement);
+                _restoreParticipant = _actor ? fight.BindEclipseActorFormParticipant(expected, replacement) :
+                    fight.BindFormParticipant(expected, replacement);
                 _restoreActorOwners = fight.BindEclipseActorOwnerForm(expected, replacement);
-                _restorePresentation = fight.BindFormPresentation(expected, replacement, _player);
+                _restorePresentation = fight.BindFormPresentation(expected, replacement, _player, _actor);
             }
             catch (Exception original)
             {
@@ -320,7 +322,7 @@ public partial class Fight
     internal bool QueueModelTransition(Model model, Action apply, Action<Exception> complete)
     {
         if (_modelTransitionsClosed || model == null || apply == null || complete == null || !round.processing ||
-            _eclipseFightEndDispatched || (model != _playerModel && model != CKNCPOABFBO) ||
+            _eclipseFightEndDispatched || !IsEclipseFormParticipant(model) ||
             model.KKMCHCNOHMB() <= 0 || _modelTransitions.ContainsKey(model)) return false;
         _modelTransitions.Add(model, new PendingModelTransition {
             Model = model, Round = round.round, Apply = apply, Complete = complete });
@@ -344,7 +346,7 @@ public partial class Fight
                 try
                 {
                     if (_modelTransitionsClosed || !round.processing || _eclipseFightEndDispatched || request.Round != round.round ||
-                        (request.Model != _playerModel && request.Model != CKNCPOABFBO) || request.Model.KKMCHCNOHMB() <= 0)
+                        !IsEclipseFormParticipant(request.Model) || request.Model.KKMCHCNOHMB() <= 0)
                         throw new OperationCanceledException("Fighter or round ended before the model transition.");
                     _applyingModelTransition = request;
                     request.Apply();
@@ -4300,6 +4302,7 @@ public partial class Fight
 
     internal bool TryQueueCharacterForm(Model expected, DefinitionId character, Action<Exception> complete, out string error)
     {
+        if (IsEclipseActorModel(expected)) return TryQueueEclipseActorForm(expected, character, complete, out error);
         error = string.Empty;
         if (expected == null || complete == null || !round.processing || _modelTransitionsClosed ||
             _eclipseFightEndDispatched || (expected != _playerModel && expected != CKNCPOABFBO) ||
@@ -4366,7 +4369,7 @@ public partial class Fight
         var replacement = prepared == null ? null : prepared.Model;
         if (expected == null || replacement == null || bindings == null ||
             !bindings.Owns(this, expected, replacement) ||
-            (replacement != _playerModel && replacement != CKNCPOABFBO) ||
+            !IsEclipseFormParticipant(replacement) ||
             expected == _playerModel || expected == CKNCPOABFBO || _retiredFormBodies.Contains(expected))
             throw new InvalidOperationException("Prepared form does not own the active replacement.");
 
@@ -4402,6 +4405,9 @@ public partial class Fight
         bindings.Commit();
         prepared.Take();
         _retiredFormBodies.Add(expected);
+        if (IsEclipseActorModel(replacement))
+            try { CancelEclipseActorProjectiles(expected); }
+            catch (Exception exception) { UnityEngine.Debug.LogException(exception); }
 
         // Ownership has committed. Cleanup failures must not report the swap as
         // rejected or let disposing the preparation destroy the active fighter.
@@ -4443,10 +4449,10 @@ public partial class Fight
         model.RemoveEventListener(17, EPLCECBMOOB);
     }
 
-    internal Action BindFormPresentation(Model expected, Model replacement, bool player)
+    internal Action BindFormPresentation(Model expected, Model replacement, bool player, bool actor = false)
     {
         var viewer = preFight == null ? null : preFight.get_ViewerFight();
-        var panel = viewer == null ? null : (player ? viewer.get_LeftModel() : viewer.get_RightModel());
+        var panel = actor || viewer == null ? null : (player ? viewer.get_LeftModel() : viewer.get_RightModel());
         bool attached = false, detached = false, refreshed = false;
         Action restore = () =>
         {

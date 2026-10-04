@@ -17,7 +17,9 @@ character-specific native Punch binding. The core comparison form is a registere
 test character, not a saved-loadout restore operation. Supported main-fighter
 form swaps preserve live companions, their private state and lifetime. Use either
 form button while the pair repeats strikes to exercise the composition; actor
-references remain callback-scoped and an actor's own form is unsupported.
+references remain callback-scoped. **Left form: core / authored** changes the
+left actor's body while retaining its ID, private state, max health and remaining
+lifetime. It requires both `combat.actors` and `combat.transform`.
 Its owned Campaign fight and repeatable mode declare `player_character` with a
 warrior handle, so the authored fighter starts in the player slot. Omission
 keeps the saved player's setup. This is a `content.register` fight field;

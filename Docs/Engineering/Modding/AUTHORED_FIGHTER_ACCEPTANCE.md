@@ -277,6 +277,21 @@ services, not an additional full-game race. Arbitrary rigs, actor-body form
 changes, autonomous AI memory across swaps, physical devices, exports and all
 platforms remain unaccepted by this follow-up.
 
+## Actor body forms (2026-10-04)
+
+Authored Fighter Lab 1.5 adds a core/authored form switch on its live companion.
+The main rule uses `actor:change_form`; the return is requested by the actor's
+own behavior using `fighter:change_form`. Its ID, private XML state, owner/team,
+health and birth frame survive both body replacements. The native fixture then
+requires fresh attack starts and actual contact/damage in both directions before
+dismissal. The current authored entry passes 125 checks, exit 0, in
+`validation-2d8f7580c6bb491d86f7fd487e8b7d0c.log`. Final core comparison entry
+also passes 125 checks, exit 0, in
+`validation-70ff7c5f3afd409daa000a30b2ddbff5.log`. The detailed source and managed,
+Lua/editor and native verification limits are recorded in
+[ACTOR_FORMS_ACCEPTANCE.md](ACTOR_FORMS_ACCEPTANCE.md). Actor-body limitations in
+the earlier owner-form section describe that historical snapshot.
+
 ## Limits
 
 This is the standard compatible rig with custom silhouette geometry and skin,

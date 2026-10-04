@@ -36,8 +36,9 @@ Supported main-fighter form swaps now preserve owned companions, their bodies,
 IDs, private behavior state and existing lifetime. Explicit targets and pending
 birth ownership transfer reversibly with the participant. The authored-fighter
 record accepts continued native contact after a player owner swap and managed
-rollback/queued-birth cases. This advances feature composition; actor-body forms,
-arbitrary rigs and general creator/platform acceptance remain open.
+rollback/queued-birth cases. Actor-body forms were delivered subsequently, as
+recorded below. Arbitrary rigs and general creator/platform acceptance remain
+open.
 
 The [actor projectile extension](ACTOR_PROJECTILES_ACCEPTANCE.md) supports
 typed native ranged abilities on independent roots, with scoped queries,
@@ -62,6 +63,19 @@ behaviors. Phase 4 (the downstream DE port) remains deferred pending its assets.
 This is an engine-wide extension of the parity roadmap, not a claim that DE or
 all engine domains are complete. Missing DE art does not block the work below:
 prove mechanics with core assets and purpose-made minimal fixtures.
+
+## Actor character forms delivered
+
+Independent actors can change to a warrior registered by their owning mod through
+`actor:change_form` or their own attached behavior's `fighter:change_form`.
+The actor keeps identity, private behavior, team, owner, max/current health and
+remaining lifetime; main participant/rule/HUD slots stay separate. Explicit and
+native targets follow the replacement, and failed binding rolls back. Native
+AI memory/attacks and retired-caster projectiles do not transfer. Authored Fighter
+Lab demonstrates both routes and renewed bidirectional native contact. See
+[ACTOR_FORMS_ACCEPTANCE.md](ACTOR_FORMS_ACCEPTANCE.md) for source, scopes and limits.
+This narrows character composition gaps; arbitrary rigs, general authoring and
+complete creator/platform acceptance remain open.
 
 ## Assessment
 

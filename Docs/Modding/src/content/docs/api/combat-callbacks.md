@@ -670,8 +670,9 @@ end,
 
 ## fighter:change_form
 
-Change a main fighter's character while retaining its combat state and owned
-companions.
+Change the callback fighter's character while retaining its combat state.
+Supported main fighters keep their owned companions; actor hosts keep their
+existing actor instance.
 
 **Signature:** `local request = fighter:change_form(character)`
 
@@ -705,7 +706,11 @@ respawning; their age continues normally. Queued/initializing actor spawns retai
 their owner, and explicit actor targets pointing to the old main body follow the
 new one. A failed binding restores these references with the other form state.
 Reacquire actor references each callback; the swap does not extend handle scope.
-This does not support transforming an actor's own body.
+An attached actor behavior may also transform its own body. It retains actor
+identity, private behavior state, age and definition max health; its native AI
+controller starts fresh. Retired-body owned projectiles are removed. See
+[`actor:change_form`](../actors/#actorchange_form) for actor-specific lifetime,
+health and cancellation details.
 
 Animation node and pivot bindings follow the actual body and target identities
 during a form change or rollback. Optional equipment points absent on that body

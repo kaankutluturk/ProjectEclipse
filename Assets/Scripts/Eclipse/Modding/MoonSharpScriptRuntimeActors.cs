@@ -141,6 +141,19 @@ namespace Eclipse.Modding
                     if(!actor.TryPlayMove(move,Complete,out var failure))Complete(false,failure);
                     return DynValue.NewTable(receipt);
                 }));
+                actorTable.Set("change_form",DynValue.NewCallback((ctx,args)=>
+                {
+                    int offset=Offset(args);_api.RequireCapability("combat.transform");
+                    if(kind==ModEffectEvent.ActorEnd)throw new ScriptRuntimeException("Actor forms require a living actor, before its end callback.");
+                    if(args.Count!=offset+1||args[offset].Type!=DataType.Table||!_warriorHandles.TryGetValue(args[offset].Table,out var character))
+                        throw new ScriptRuntimeException("Actor change_form expects a warrior handle registered by this mod.");
+                    var receipt=new Table(_script);receipt.Set("status",DynValue.NewString("queued"));receipt.Set("error",DynValue.Nil);
+                    void Complete(bool success,string error)
+                    {receipt.Set("status",DynValue.NewString(success?"applied":"failed"));receipt.Set("error",success?DynValue.Nil:DynValue.NewString(error??"Actor form change rejected."));}
+                    if(!(actor is IModActorForms forms))Complete(false,"Actor form changes are unavailable.");
+                    else if(!forms.TryChangeForm(character,Complete,out var failure))Complete(false,failure);
+                    return DynValue.NewTable(receipt);
+                }));
                 actorTable.Set("remove",DynValue.NewCallback((ctx,args)=>
                 {if(args.Count!=Offset(args))throw new ScriptRuntimeException("Actor remove expects no arguments.");return Result(actor.TryRemove(out var error),error);}));
                 return DynValue.NewTable(actorTable);

@@ -214,3 +214,14 @@ covers the definition, owned handle and `status`, `projectile_id`, `error` recei
 fields. See [Live projectiles](../../api/projectiles/) for timing and ownership.
 
 The **Actor Companions** starter in `templates/actor-companions` includes the playable summon/guide/health/playback/dismiss HUD. Completion covers actor definitions, retained spawn receipts, copied snapshots/events and callback-scoped commands. Declare `combat.actors`; see [Independent fighters](../../api/actors/) for timing, limits and native acceptance scope.
+
+The **Authored Fighter Lab** starter in `templates/authored-fighter` also shows
+live actor form changes. Completion offers `actor:change_form(character)` with a
+warrior handle and a `FormRequest` receipt (`queued`, `applied`, `failed`, optional
+`error`). The validator requires both `combat.actors` and `combat.transform` for
+actor reference calls, and flags terminal callback use. An attached actor's own
+`fighter:change_form` uses `combat.transform`. The sample switches the companion
+to its core comparison, then requests the authored return from its own behavior;
+its identity, private state, health and remaining lifetime survive. Read
+[actor form changes](../../api/actors/#actorchange_form) for native timing and
+verification limits; editor diagnostics do not establish gameplay acceptance.

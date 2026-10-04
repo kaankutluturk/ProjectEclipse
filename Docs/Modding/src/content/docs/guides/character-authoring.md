@@ -203,6 +203,17 @@ Try it while the pair is alive: the companions retain their IDs, behavior state,
 health and remaining lifetime, then continue attacking each other. The owner
 changes form; the companions keep their existing bodies. Actor references must
 still be reacquired in each callback.
+
+Use **Left form: core / authored** to change the companion's own body. The
+core switch uses `actor:change_form(core_form)` from the main rule; the return
+uses `fighter:change_form(character)` inside that actor's private behavior.
+The actor keeps its ID, state, team, maximum/current health and remaining
+lifetime. The button stops repeated strikes; restore the authored character,
+reset spacing and restart repetition to verify its native attack again.
+Actor references require `combat.actors`, and either form method requires
+`combat.transform`. Native AI memory and ongoing attacks are not transferred;
+owned projectiles from the retired actor body are removed. Read
+[actor forms](../../api/actors/#actorchange_form) for timing and receipts.
 Its **Try core comparison form** button selects another registered warrior
 without the authored body. That is a comparison character, not a snapshot or
 restoration of your original equipment. The owned lab uses its prepared

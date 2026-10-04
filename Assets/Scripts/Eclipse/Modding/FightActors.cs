@@ -12,7 +12,7 @@ public partial class Fight
         public ActorDefinition Definition; public int Round; public double X,Y,Z;
         public Action<string,string> Complete;
     }
-    private sealed class OwnedActor : IModActor
+    private sealed class OwnedActor : IModActor, IModActorForms
     {
         public Fight Fight; public Model Model,Root,TargetRequest; public bool PlayerTeam,OwnerPlayer,Removing;
         public ModId Owner; public ModScriptSession Session; public ActorDefinition Definition;
@@ -68,6 +68,13 @@ public partial class Fight
             if(Playback!=null){error="This actor already has a move request pending this step.";return false;}
             Playback=new PendingFighterPlayback{Name=definition.RuntimeName,Complete=complete,Session=Session,Round=Round};return true;
         }
+        public bool TryChangeForm(DefinitionId character,Action<bool,string> complete,out string error)
+        {
+            if(!Fight.ActorValid(this,true,out error)||Birth!=null||Fight._applyingEclipseActors)
+            {error=error??"Actor is still initializing or applying commands.";return false;}
+            if(complete==null){error="Form change requires a completion callback.";return false;}
+            return Fight.TryQueueCharacterForm(Model,character,failure=>complete(failure==null,failure?.Message),out error);
+        }
         public bool TryRemove(out string error)
         {if(!Fight.ActorValid(this,true,out error))return false;Removing=true;X=Y=Z=0;return true;}
     }
@@ -98,6 +105,68 @@ public partial class Fight
             foreach (var birth in births) birth.Root = expected;
             foreach (var actor in targets) actor.TargetRequest = expected;
             foreach (var actor in owners) actor.Root = expected;
+        };
+    }
+
+    private bool IsEclipseActorModel(Model model) => model != null && _eclipseActors.ContainsKey(model);
+    private bool IsEclipseFormParticipant(Model model) => model != null &&
+        (model == _playerModel || model == CKNCPOABFBO ||
+         _eclipseActors.TryGetValue(model,out var actor) && actor.Birth == null && ActorValid(actor,false,out _));
+
+    private bool TryQueueEclipseActorForm(Model expected,DefinitionId character,Action<Exception> complete,out string error)
+    {
+        error=null;
+        if(complete==null||!_eclipseActors.TryGetValue(expected,out var actor)||actor.Birth!=null||
+            !ActorValid(actor,true,out error)||_applyingEclipseActors||_modelTransitionsClosed||_modelTransitions.ContainsKey(expected))
+        {error=error??"Actor is unavailable for a form change.";return false;}
+        if(character.Namespace!=actor.Owner)
+        {error="Actor forms require a warrior registered by the owning mod.";return false;}
+        PreparedFormModel prepared=null;
+        try
+        {
+            var parameters=ModRuntime.BuildFormParameters(character,actor.PlayerTeam);
+            GameUtils.InitializeActorParameters(parameters,actor.PlayerTeam,actor.Definition.AiControlled,actor.Definition.MaxHealth);
+            prepared=new PreparedFormModel(parameters);
+            prepared.Model.set_Name(actor.Definition.Id.ToString());
+            if(QueuePreparedFighterForm(expected,prepared,complete))return true;
+            error="Actor became unavailable while preparing the form.";
+        }
+        catch(Exception failure){error=failure.Message;}
+        prepared?.Dispose();return false;
+    }
+
+    // Keep the instance, behavior and lifetime; only its native body changes.
+    internal Action BindEclipseActorFormParticipant(Model expected,Model replacement)
+    {
+        if(expected==null||replacement==null||expected==replacement||
+            !_eclipseActors.TryGetValue(expected,out var actor)||actor.Birth!=null||!ActorValid(actor,false,out _)||
+            _eclipseActors.ContainsKey(replacement)||LNDLFINJHDB.Contains(replacement))
+            throw new InvalidOperationException("Actor form participant identity is stale.");
+        int index=LNDLFINJHDB.IndexOf(expected);
+        if(index<0||replacement.Parameters.IsPlayer!=actor.PlayerTeam||replacement.Parameters.UserControlled||
+            replacement.Parameters.AiControlled!=actor.Definition.AiControlled||replacement.Parameters.MaxLife!=actor.Definition.MaxHealth||
+            _eclipseShields.ContainsKey(replacement)||_eclipseStatusIcons.Keys.Any(k=>k.Item1==replacement))
+            throw new InvalidOperationException("Actor form parameters or combat state are incompatible.");
+        var opponentState=CaptureFormBehaviorKeys(_eclipseOpponentInstances,expected,replacement);
+        var innateState=CaptureFormBehaviorKeys(_eclipseInnateInstances,expected,replacement);
+        var icons=_eclipseStatusIcons.Where(p=>p.Key.Item1==expected).ToArray();
+        bool hasShield=_eclipseShields.TryGetValue(expected,out var shield);
+        _eclipseActors.Remove(expected);_eclipseActors.Add(replacement,actor);actor.Model=replacement;
+        LNDLFINJHDB[index]=replacement;
+        if(hasShield){_eclipseShields.Remove(expected);_eclipseShields.Add(replacement,shield);}
+        MoveFormBehaviorKeys(_eclipseOpponentInstances,opponentState,expected,replacement);
+        MoveFormBehaviorKeys(_eclipseInnateInstances,innateState,expected,replacement);
+        foreach(var icon in icons){_eclipseStatusIcons.Remove(icon.Key);_eclipseStatusIcons.Add((replacement,icon.Key.Item2),icon.Value);}
+        bool restored=false;
+        return()=>
+        {
+            if(restored)return;restored=true;
+            foreach(var icon in icons){_eclipseStatusIcons.Remove((replacement,icon.Key.Item2));_eclipseStatusIcons.Add(icon.Key,icon.Value);}
+            MoveFormBehaviorKeys(_eclipseInnateInstances,innateState,replacement,expected);
+            MoveFormBehaviorKeys(_eclipseOpponentInstances,opponentState,replacement,expected);
+            if(hasShield){_eclipseShields.Remove(replacement);_eclipseShields.Add(expected,shield);}
+            LNDLFINJHDB[index]=expected;actor.Model=expected;
+            _eclipseActors.Remove(replacement);_eclipseActors.Add(expected,actor);
         };
     }
 

@@ -160,6 +160,8 @@ class Fight
         Queued = prepared;
         return AcceptQueue;
     }
+    bool IsEclipseActorModel(Model model)=>false;
+    bool TryQueueEclipseActorForm(Model model,DefinitionId character,Action<Exception> complete,out string error){error="unavailable";return false;}
     REQUEST_METHOD
 }
 class ValidateFormInitialization

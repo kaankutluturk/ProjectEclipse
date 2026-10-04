@@ -402,7 +402,7 @@ local ResolvingFighter = {}
 local OutgoingFighter = {}
 
 ---@class (exact) Eclipse.FormRequest
----@field status "queued"|"applied"|"failed" Applied main-fighter form swaps preserve owned companions and their remaining lifetime; actor handles remain callback-scoped.
+---@field status "queued"|"applied"|"failed" Applied forms preserve actor identity, private behavior and remaining lifetime. Actor forms retain max health; main forms retain companions. Actor handles remain callback-scoped.
 ---@field error? string
 local FormRequest = {}
 
@@ -4292,7 +4292,7 @@ function Fighter:actors() end
 ---@return Eclipse.ActorEvent[]|nil, string|nil
 function Fighter:actor_events() end
 
----Change a main fighter's character while retaining its combat state and owned companions.
+---Change the callback fighter's character while retaining its combat state. Supported main fighters keep their owned companions; actor hosts keep their existing actor instance.
 ---Requires: `combat.transform` and a handle returned by this mod's `sf2.warriors.register`. This changes the callback's fighter. It is not exposed on `fighter.opponent`; use an opponent-targeted rule to transform an opponent. Only one request can be pending per fighter.
 ---When: Inside an active combat behavior callback. The change applies after the current simulation step. Pause delays application. Round end, death or unloading fails a pending request. Fighter handles still expire at the end of their callback; retaining this result does not extend their lifetime.
 ---Returns: A live result table with `status = "queued"`. At the simulation boundary, status becomes `"applied"` or `"failed"`; failures include an `error` string. Preparation errors or duplicate requests return an already failed result. Invalid handles or missing capabilities raise a Lua error. Treat result fields as game-owned observations. Keep this table in temporary Lua memory, not a saved state schema.
@@ -4616,6 +4616,15 @@ function Actor:change_health(amount) end
 ---@param move Eclipse.MoveHandle
 ---@return Eclipse.PlayMoveRequest
 function Actor:play_move(move) end
+
+---Replace a living actor's character while keeping the same actor instance.
+---Requires: Both `combat.actors` and `combat.transform`, plus a warrior handle returned by **this mod's** `sf2.warriors.register`. The definition must produce a compatible native fighter with an eligible entry animation.
+---When: From a current actor reference in an active offline, non-raid combat callback, including its own spawn, tick, contact or animation callback. Application occurs after the current simulation step. Creation/initialization must have finished; pause rejects a new actor form request and delays one already queued. Removal, death, expiry, owner/session loss or round end cancels a pending request. The actor end callback cannot request a form.
+---Returns: A live receipt with `status = "queued"`, then `"applied"` or `"failed"` and an optional `error` string. Unavailable actors, duplicate requests, unsupported backends and preparation failures return an already failed receipt. Invalid/foreign handles, wrong argument counts, missing capabilities and expired callback references raise a Lua error. Keep receipts in temporary Lua memory; they are not save data and do not extend the actor reference's lifetime.
+---[Full reference](https://dawc17.github.io/ProjectEclipse/api/actors/#actorchange_form)
+---@param character Eclipse.WarriorHandle
+---@return Eclipse.FormRequest
+function Actor:change_form(character) end
 
 ---Dismiss an actor and retire its native children.
 ---Requires: `combat.actors`.

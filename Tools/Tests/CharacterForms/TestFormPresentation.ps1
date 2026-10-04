@@ -34,6 +34,12 @@ static void Main(){
   Check(failed&&panel.Parameters==unrelated&&old.Listening&&!next.Listening,"stale HUD precondition preserves unrelated panel");
  }
  var absent=new Fight{preFight=null};var a=new Model{Listening=true};var b=new Model();var restore=absent.BindFormPresentation(a,b,true);Check(b.Listening&&!a.Listening,"headless event transfer");restore();
+ foreach(bool player in new[]{true,false}){
+  var f=new Fight();var old=new Model{Listening=true};var next=new Model();var left=f.preFight.Viewer.Left.Parameters=new object();var right=f.preFight.Viewer.Right.Parameters=new object();
+  var undo=f.BindFormPresentation(old,next,player,true);
+  Check(next.Listening&&!old.Listening&&f.preFight.Viewer.Left.Parameters==left&&f.preFight.Viewer.Right.Parameters==right&&f.preFight.Viewer.Left.Refreshes==0&&f.preFight.Viewer.Right.Refreshes==0,"actor form transfers events without touching either main HUD");
+  undo();Check(old.Listening&&!next.Listening,"actor event rollback");
+ }
  Console.WriteLine("PASS: production presentation transaction; both panels, listener ownership, post-assignment render failure, stale HUD, headless and idempotent rollback. Panel/events controlled; all 13 production listener pairs audited.");
 }
 }

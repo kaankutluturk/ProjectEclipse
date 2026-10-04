@@ -115,7 +115,7 @@ requires `combat.target`. A lethal applied hit still notifies the actor host,
 but cannot be reversed by queued healing. References expire after each callback.
 
 Actor callbacks cannot spawn additional actors, query main-fighter
-actor collections, change forms, set native combat flags, block player
+actor collections, set native combat flags, block player
 controls, or claim round-outcome authority. Those host operations remain limited
 to their existing supported contexts. Native equipment can still create children.
 The complete [Scripted Actor Sparring example](../../guides/scripted-actors/)
@@ -218,8 +218,9 @@ main-fighter targets also follow the new body, and queued/initializing spawns
 keep their owner. Failed form binding restores the prior references. This
 handover emits no new `spawned` or `owner_changed` event. Actor references still
 expire at callback end: reacquire them with `fighter:actors()` on later callbacks.
-Changing an actor's own form remains unsupported. This API is an observation
-log, not an actor callback subscription.
+An actor's own form can change through [`actor:change_form`](#actorchange_form)
+without spawning or ending the instance. This API is an observation log, not an
+actor callback subscription.
 
 ## actor:snapshot
 
@@ -299,6 +300,80 @@ Manual targets remain selected while valid. Changes wait until a current native
 attack can safely finish; they do not restart it or reset collision phases.
 Team enemy lists include all hostile roots and native weapon children, and
 exclude friends. The canonical main fighters retain camera/profile identity.
+
+## actor:change_form
+
+Replace a living actor's character while keeping the same actor instance.
+
+**Signature:** `local request = actor:change_form(character)`
+
+**Returns:** A live receipt with `status = "queued"`, then `"applied"` or
+`"failed"` and an optional `error` string. Unavailable actors, duplicate requests,
+unsupported backends and preparation failures return an already failed receipt.
+Invalid/foreign handles, wrong argument counts, missing capabilities and expired
+callback references raise a Lua error. Keep receipts in temporary Lua memory;
+they are not save data and do not extend the actor reference's lifetime.
+
+**When:** From a current actor reference in an active offline, non-raid combat
+callback, including its own spawn, tick, contact or animation callback. Application
+occurs after the current simulation step. Creation/initialization must have
+finished; pause rejects a new actor form request and delays one already queued.
+Removal, death, expiry, owner/session loss or round end cancels a pending request.
+The actor end callback cannot request a form.
+
+**Requires:** Both `combat.actors` and `combat.transform`, plus a warrior handle
+returned by **this mod's** `sf2.warriors.register`. The definition must produce a
+compatible native fighter with an eligible entry animation.
+
+The actor keeps its ID, definition, team, owner, private attached behavior state,
+age and original lifetime. Its maximum health remains the actor definition's
+`max_health`; current health percentage is captured at the application boundary,
+so changing form does not heal it. Explicit and native enemy targets follow the
+new body. Main fighter identity, health panels and encounter results stay with
+the main fighters. No new spawn/end event is emitted for the swap.
+
+The destination supplies body, clothing, equipment, moves and tactic. The
+original actor definition still controls whether AI is enabled, and the actor
+never becomes player-controlled. Native AI controller memory starts fresh;
+private Lua behavior state is retained. Current attacks do not resume on the
+new rig. Queued projectile births and live owned projectiles from the retired
+body are canceled/removed; they are not transferred to the new caster. Supported
+combat state/effects use the existing reversible form handover. Failed binding
+restores the original actor and target references before returning failure.
+
+Inside its attached behavior, `fighter:change_form(character)` changes that
+same actor using `combat.transform`. Using `fighter.actor:change_form` instead
+also requires `combat.actors`, like the other actor reference methods.
+
+```lua
+-- Fragment: alternate is a warrior registered by this mod before callbacks.
+local requests = {}
+local transform = sf2.behaviors.register {
+    id = "transform_companion",
+    state = { lifetime = "round", fields = {
+        requested = { type = "boolean", default = false },
+    } },
+    on_tick = function(self, fighter)
+        if not self.state.requested then
+            self.state.requested = true
+            requests[fighter.actor_id] = fighter.actor:change_form(alternate)
+        else
+            local request = requests[fighter.actor_id]
+            if request and request.status ~= "queued" then
+                if request.error then sf2.log.warn(request.error) end
+                requests[fighter.actor_id] = nil
+            end
+        end
+    end,
+    on_actor_end = function(_, fighter) requests[fighter.actor_id] = nil end,
+}
+-- Attach transform to an actor definition with behavior = transform.
+```
+
+Authored Fighter Lab's **Left form: core / authored** button exercises this
+contract. The native accepted case uses the standard compatible skeleton,
+manual Lua playback and core equipment; arbitrary rigs, AI memory transfer,
+all outfits and exported platforms remain unverified.
 
 ## actor:remove
 

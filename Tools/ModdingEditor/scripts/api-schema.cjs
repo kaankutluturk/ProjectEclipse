@@ -100,7 +100,7 @@ const fighterMethods = {
     show_status_icon:{params:{key:'string',sprite:H('Sprite'),frames:'integer','stacks?':'integer'},capability:'combat.effects'},
     clear_status_icon:{params:{key:'string'},capability:'combat.effects'},
 };
-type('FormRequest',{status:[enumOf('queued','applied','failed'),'Applied main-fighter form swaps preserve owned companions and their remaining lifetime; actor handles remain callback-scoped.'],'error?':'string'});
+type('FormRequest',{status:[enumOf('queued','applied','failed'),'Applied forms preserve actor identity, private behavior and remaining lifetime. Actor forms retain max health; main forms retain companions. Actor handles remain callback-scoped.'],'error?':'string'});
 type('ProjectileSpawnRequest',{status:enumOf('queued','applied','failed'),'projectile_id?':'string','error?':'string'});
 type('ProjectileDefinition',{id:'string',name:'string',core_skeleton:'string',start_move:H('Move'),'item?':H('Item'),'copy_parent_type?':enumOf('Weapon','Ranged','Magic'),'lifetime_frames?':['integer','1-600, default 180; starts after native birth initialization.']});
 reg('projectiles.register','ProjectileDefinition','ProjectileDefinition');
@@ -394,6 +394,7 @@ const actorMethods={
     set_target:{params:{target:enumOf('player','opponent','nearest')+'|'+E('Actor')},returns:'boolean, string|nil',capability:'combat.actors'},
     change_health:{params:{amount:'number'},returns:'boolean, string|nil',capability:'combat.actors'},
     play_move:{params:{move:H('Move')},returns:E('PlayMoveRequest'),capability:'combat.actors'},
+    change_form:{params:{character:H('Warrior')},returns:E('FormRequest'),capability:'combat.transform'},
     remove:{params:{},returns:'boolean, string|nil',capability:'combat.actors'},
 };
 module.exports={actorMethods,projectileMethods,types,functions,aliases,callbacks,storyCallbacks:['on_before_fight'],modeCallbacks:['on_result','on_prepare'],uiCallbacks:['on_complete','on_cancel','on_click','on_close','on_change','on_back'],aiCallbacks:['on_decide'],fighterMethods};

@@ -34,6 +34,7 @@ local strike = sf2.moves.register {
     },
 }
 local hud, command, paired, automatic, reforming, formation_origin
+local actor_form_request, actor_restore_id, actor_core = nil, nil, false
 local form_request, form_message
 local pending = {}
 local host = sf2.behaviors.register {
@@ -49,6 +50,11 @@ local host = sf2.behaviors.register {
     end,
     on_tick = function(self, fighter)
         assert(self.state.id == fighter.actor_id)
+        if actor_restore_id == fighter.actor_id then
+            actor_restore_id = nil
+            -- A behavior can transform its own fighter without a collection query.
+            actor_form_request = fighter:change_form(character)
+        end
         self.state.cooldown = math.max(0, self.state.cooldown - 1)
         local request = pending[fighter.actor_id]
         if request and request.status ~= "queued" then
@@ -93,6 +99,7 @@ local function close()
     hud, command, paired, automatic, pending = nil, nil, false, false, {}
     reforming, formation_origin = false, nil
     form_request, form_message = nil, ""
+    actor_form_request, actor_restore_id, actor_core = nil, nil, false
 end
 local function form_pair(actors)
     local complete = true
@@ -114,7 +121,7 @@ local controller = sf2.behaviors.register {
     on_round_begin = function()
         close()
         hud = sf2.ui.open { id = "authored", mount = "hud", placement = { anchor = "top_right", x = -24, y = 220 },
-            root = { id = "root", kind = "column", width = 300, height = 400, children = {
+            root = { id = "root", kind = "column", width = 300, height = 440, children = {
                 { id = "status", kind = "text", text = "Authored Fighter Lab ready", height = 40 },
                 { id = "form_status", kind = "text", text = "Player form: unchanged", height = 40 },
                 { id = "player", kind = "button", text = "Try authored player (Punch)", height = 40 },
@@ -124,6 +131,7 @@ local controller = sf2.behaviors.register {
                 { id = "left", kind = "button", text = "Left fighter: authored strike", height = 40 },
                 { id = "right", kind = "button", text = "Right fighter: authored strike", height = 40 },
                 { id = "auto", kind = "button", text = "Toggle repeated strikes", height = 40 },
+                { id = "actor_form", kind = "button", text = "Left form: core / authored", height = 40 },
                 { id = "dismiss", kind = "button", text = "Dismiss pair", height = 40 },
             } }, on_click = function(_, widget) command = widget end,
         }
@@ -136,11 +144,29 @@ local controller = sf2.behaviors.register {
             sf2.log.info("AUTHORED-FIGHTER:form:" .. form_request.status)
             form_request = nil
         end
+        if actor_form_request and actor_form_request.status ~= "queued" then
+            if actor_form_request.status == "applied" then actor_core = not actor_core end
+            sf2.log.info("AUTHORED-FIGHTER:actor-form:" .. actor_form_request.status)
+            if actor_form_request.error then sf2.log.warn(actor_form_request.error) end
+            actor_form_request = nil
+        end
         local actors = assert(fighter:actors())
         if (command == "player" or command == "core") and not form_request then
             form_request = fighter:change_form(command == "player" and character or core_form)
             form_message = "queued"
+        elseif command == "actor_form" and not actor_form_request and not actor_restore_id then
+            automatic = false
+            for _, actor in ipairs(actors) do
+                if assert(actor:snapshot()).team == "player" then
+                    if actor_core then
+                        actor_restore_id = assert(actor:snapshot()).id
+                    else
+                        actor_form_request = actor:change_form(core_form)
+                    end
+                end
+            end
         elseif command == "summon" and #actors == 0 then
+            actor_core = false
             fighter:spawn_actor(left, 180, 0)
             fighter:spawn_actor(right, 280, 0)
         elseif command == "dismiss" then

@@ -63,6 +63,10 @@ namespace Eclipse.Modding
         bool TrySetTarget(string mainTarget, IModActor actorTarget, out string error);
         bool TryRemove(out string error);
     }
+    public interface IModActorForms
+    {
+        bool TryChangeForm(DefinitionId character, Action<bool,string> complete, out string error);
+    }
     public interface IModActorBehaviorSource { IModActor Actor { get; } }
     public interface IModFighterActors
     {

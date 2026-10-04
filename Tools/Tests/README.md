@@ -1,5 +1,15 @@
 # Regression tests and validators
 
+Actor form changes: `CharacterForms/TestActorFormBindings.ps1` executes production
+actor preparation/participant methods with controlled native services. It checks
+both teams, instance/state/lifetime retention, shield/status/behavior-key transfer,
+role/collision preflight and preparation disposal. Form coordinator, presentation
+and transition fixtures cover late rollback, untouched main panels and removal
+before application. `Combat/TestActorDefinitions.ps1` also verifies actual Lua
+form capabilities, typed arguments, receipts, unsupported backend and expiry.
+The authored Unity run changes the live actor core and back, then requires fresh
+bidirectional native attacks/contact with the same actor identities.
+
 Arena artwork: `Modding/TestArenaRuntime.ps1` checks production Lua sprite/marker
 creation, updates, typed handles, scopes, shared limits, malformed input and the
 complete Pulse Arena schedule with controlled services. `Modding/TestArenaUnity.ps1`

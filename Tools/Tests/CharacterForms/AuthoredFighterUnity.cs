@@ -30,6 +30,10 @@ public static class AuthoredFighterUnity
     static Model originalPlayer, authoredPlayer;
     static float formRatio;
     static int formFrame, playerStarts, playerHits, formApplied, inputReadyFrame=-1;
+    static int actorFormApplied;
+    static Model retiredActor;
+    static ModelParameters actorMainPlayer, actorMainEnemy;
+    static float actorLifeBefore, actorPlayerLifeBefore, actorEnemyLifeBefore;
     static int ownerFormPhase, ownerFormApplied, ownerLeftStarts, ownerRightStarts, ownerLeftHits, ownerRightHits;
     static IModActor ownerLeftActor, ownerRightActor;
     static object ownerLeftBehavior, ownerRightBehavior;
@@ -277,11 +281,52 @@ public static class AuthoredFighterUnity
                         new GameObject("Companion owner form capture").AddComponent<AuthoredOwnerFormCapture>();
                         Click("auto");ownerFormPhase=2;phaseFrame=frame;return;
                     }
-                    if(frame-phaseFrame>720)throw new Exception("Retained companions stopped producing public Lua/native contact: "+surface.Read("status").Text+" left="+left.GetCurrentAnimation()?.Name+" right="+right.GetCurrentAnimation()?.Name);
-                    if(Count(starts,leftId)<=ownerLeftStarts||Count(starts,rightId)<=ownerRightStarts||Count(dealt,leftId)<=ownerLeftHits||Count(dealt,rightId)<=ownerRightHits||Life(left)>=autoLeftLife||Life(right)>=autoRightLife)return;
-                    CheckSource(left,right);CheckSource(right,left);
-                    Check(ended.Count==0,"Retained companions ended during continued combat");
-                    Click("dismiss");Next(fight);break;
+                    if(ownerFormPhase==2 || ownerFormPhase==7)
+                    {
+                        if(frame-phaseFrame>720)throw new Exception("Retained companions stopped producing public Lua/native contact: "+surface.Read("status").Text+" left="+left.GetCurrentAnimation()?.Name+" right="+right.GetCurrentAnimation()?.Name);
+                        if(Count(starts,leftId)<=ownerLeftStarts||Count(starts,rightId)<=ownerRightStarts||Count(dealt,leftId)<=ownerLeftHits||Count(dealt,rightId)<=ownerRightHits||Life(left)>=autoLeftLife||Life(right)>=autoRightLife)return;
+                        CheckSource(left,right);CheckSource(right,left);Check(ended.Count==0,"Retained companions ended during continued combat");
+                        if(ownerFormPhase==7){Click("dismiss");Next(fight);break;}
+                        Click("auto");ownerFormPhase=3;phaseFrame=frame;return;
+                    }
+                    if(ownerFormPhase==3)
+                    {
+                        if(frame-phaseFrame<3)return;
+                        retiredActor=left;actorLifeBefore=Life(left);actorMainPlayer=player.Parameters;actorMainEnemy=enemy.Parameters;
+                        actorPlayerLifeBefore=Life(player);actorEnemyLifeBefore=Life(enemy);
+                        Click("actor_form");Check(Field(ownerLeftActor,"Model")==left,"Actor form committed recursively in HUD callback");
+                        ownerFormPhase=4;phaseFrame=frame;return;
+                    }
+                    if(ownerFormPhase==4 || ownerFormPhase==5)
+                    {
+                        bool restored=ownerFormPhase==5;int required=restored?2:1;
+                        if(frame-phaseFrame>240)throw new Exception("Actor form did not settle: applied="+actorFormApplied);
+                        var replacement=(Model)Field(ownerLeftActor,"Model");
+                        if(replacement==retiredActor||actorFormApplied<required||frame-phaseFrame<6)return;
+                        left=replacement;
+                        Check(ReferenceEquals(Actor(fight,left),ownerLeftActor)&&Id(fight,left)==leftId&&Actors(fight).Length==2,"Actor form recreated instance/ID or lost body registration");
+                        Check(Field(ownerLeftActor,"Root")==player&&ReferenceEquals(Field(ownerLeftActor,"BehaviorInstance"),ownerLeftBehavior)&&(int)Field(ownerLeftActor,"Born")==ownerLeftBorn,"Actor form lost owner/private behavior/lifetime");
+                        Check(left.Parameters.EclipseCharacterId==Owner+":warriors/"+(restored?"sash_fighter":"core_comparison"),"Actor form did not bind requested character");
+                        Check((left.GetModelObject().GetNodeIDByName("AuthoredSashV0")>=0)==restored,"Actor form did not replace authored skin");
+                        Check(left.Parameters.IsPlayer&&!left.Parameters.UserControlled&&!left.Parameters.AiControlled&&left.Parameters.MaxLife==10&&Life(left)<=actorLifeBefore+.001,"Actor form changed team/control/health or healed");
+                        Check(left.GetCombatTarget()==right&&right.GetCombatTarget()==left&&Field(ownerRightActor,"TargetRequest")==left,"Actor form did not rebind explicit/native hostile targets");
+                        Check(player.Parameters==actorMainPlayer&&enemy.Parameters==actorMainEnemy&&Math.Abs(Life(player)-actorPlayerLifeBefore)<.001&&Math.Abs(Life(enemy)-actorEnemyLifeBefore)<.001,"Actor form changed main parameters/health");
+                        Check(!fight.LNDLFINJHDB.Contains(retiredActor)&&!((IDictionary)Field(fight,"_eclipseActors")).Contains(retiredActor)&&ended.Count==0,"Actor form left retired root registered or emitted end");
+                        Check(Surface()==surface&&!surface.IsClosed&&ModRuntime.Scripts.CallbackDiagnostics.RecentFailures.Count==0,"Actor form damaged HUD or Lua callbacks");
+                        if(!restored)
+                        {
+                            retiredActor=left;actorLifeBefore=Life(left);Click("actor_form");ownerFormPhase=5;phaseFrame=frame;return;
+                        }
+                        Click("reform");ownerFormPhase=6;phaseFrame=frame;return;
+                    }
+                    if(ownerFormPhase==6)
+                    {
+                        if(frame-phaseFrame<30||surface.Read("status").Text.Contains("spacing"))return;
+                        autoLeftLife=Life(left);autoRightLife=Life(right);
+                        ownerLeftStarts=Count(starts,leftId);ownerRightStarts=Count(starts,rightId);ownerLeftHits=Count(dealt,leftId);ownerRightHits=Count(dealt,rightId);
+                        Click("auto");ownerFormPhase=7;phaseFrame=frame;return;
+                    }
+                    break;
                 case 8:
                     if(Actors(fight).Length!=0)return;
                     Check(ended.Count==2&&surface!=null&&!surface.IsClosed,"Authored dismissal lifecycle incorrect");
@@ -353,7 +398,7 @@ public static class AuthoredFighterUnity
                     Check(corePunchSeen,"Comparison form lost ordinary Punch selection");
                     Check(Surface()==surface&&ModRuntime.Scripts.CallbackDiagnostics.RecentFailures.Count==0,"Player form callbacks/HUD failed");
                     Invoke(fight,"OBNEDPKCNKJ");Check(surface.IsClosed,"Round teardown retained authored HUD");
-                    File.WriteAllText(Path.Combine(Root,"authored-fighter-result.txt"),"PASS: "+checks+" full-game authored fighter checks; original 61x67 native clip/skin, both actor facings and repeated Lua contact, pause/dismissal, owner form retaining companion handles/IDs/behavior/lifetimes/targets and continued bidirectional native contact, public player/comparison form swaps preserving health/input/timer/HUD/target identity, native controller Punch selects authored attack with contact/callbacks and stays character-specific. Controlled Campaign/standard rig/core equipment; not physical devices, arbitrary rigs, all exports/platforms.");
+                    File.WriteAllText(Path.Combine(Root,"authored-fighter-result.txt"),"PASS: "+checks+" full-game authored fighter checks; original 61x67 native clip/skin, both actor facings and repeated Lua contact, pause/dismissal, owner and actor form changes retaining companion handles/IDs/behavior/lifetimes/targets and continued bidirectional native contact, public player/comparison form swaps preserving health/input/timer/HUD/target identity, native controller Punch selects authored attack with contact/callbacks and stays character-specific. Controlled Campaign/standard rig/core equipment; not physical devices, arbitrary rigs, all exports/platforms.");
                     Debug.Log("[AuthoredFighterUnity] PASS: "+checks);Finish(0);break;
             }
         }
@@ -373,6 +418,7 @@ public static class AuthoredFighterUnity
                 if(tokens[1]=="receipt"&&tokens.Length>=4&&tokens[3]=="applied")receipts.Add(tokens[2]);
                 if(tokens[1]=="ended")ended.Add(tokens[2]);
                 if(tokens[1]=="form"&&tokens[2]=="applied")formApplied++;
+                if(tokens[1]=="actor-form"&&tokens[2]=="applied")actorFormApplied++;
             }
             if(tokens.Length>=2&&tokens[1]=="player-start")playerStarts++;
             if(tokens.Length>=2&&tokens[1]=="player-dealt")playerHits++;

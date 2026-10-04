@@ -60,9 +60,10 @@ static class Program
             Load(host+definition+","+field+"}",false);
         Load(host.Replace("lifetime='round'","lifetime='saved'")+definition+",behavior=host}",false);
         HostChecks(definition);
+        FormChecks(definition);
         Console.WriteLine("PASS: "+checks+" production Lua actor definition/default/bound/strict-field/handle/duplicate/rollback/fingerprint checks. Native lifetime/combat is verified separately in Unity.");
     }
-    sealed class Actor : IModActor
+    class Actor : IModActor
     {
         public string Id;
         public bool TrySnapshot(out ModActorSnapshot snapshot,out string error)
@@ -129,4 +130,57 @@ end};";
             Invoke(replacement,"a4",ModEffectEvent.Tick,1);Invoke(replacement,"a4",ModEffectEvent.ActorEnd,1);
         });
     }
+    sealed class FormActor : Actor,IModActorForms
+    {
+        public int Calls;public bool Reject;public DefinitionId Character;public Action<bool,string> Complete;
+        public bool TryChangeForm(DefinitionId character,Action<bool,string> complete,out string error)
+        {Calls++;Character=character;error=Reject?"controlled rejection":null;Complete=complete;return !Reject;}
+    }
+    static void FormChecks(string definition)
+    {
+        const string capabilities="content.register\",\"combat.actors\",\"combat.transform";
+        const string callback=@"
+local saved,request
+local host=sf2.behaviors.register{id='host',on_tick=function(_,fighter)
+ if fighter.action=='poll' then assert(request.status==fighter.expected)
+ elseif fighter.action=='escape' then saved:change_form(warrior)
+ else saved=fighter.actor;request=saved:change_form(warrior);assert(request.status==fighter.expected) end
+end,on_actor_end=function(_,fighter) fighter.actor:change_form(warrior) end};";
+        void Run(IModInteractiveBehaviorScriptContext context,ActorDefinition actor,IModActor backend,Action<Action<string,string,ModEffectEvent,bool>> test)
+        {
+            var xml=new XmlDocument();xml.LoadXml("<Instance/>");var instance=new ModInstanceFighter(new Body{Actor=backend},xml.DocumentElement);
+            test((action,expected,kind,valid)=>
+            {
+                bool ok=context.TryInvokeBehavior(actor.Behavior.Value,kind,actor.InitialParameters,
+                    new System.Collections.Generic.Dictionary<string,string>{{"source","actor"},{"fight_id","f"},{"round","1"},{"actor_id","a1"},{"action",action},{"expected",expected}},instance,out var error);
+                Check(ok==valid,"Actor form Lua scope/receipt failed: "+error);
+            });
+        }
+        Load(callback+definition+",behavior=host}",caps:capabilities,verify:(context,actor)=>
+        {
+            var backend=new FormActor{Id="a1"};
+            Run(context,actor,backend,invoke=>
+            {
+                invoke("queue","queued",ModEffectEvent.Tick,true);Check(backend.Calls==1&&backend.Character.ToString()=="fixture.actors:warriors/unit","Typed actor form did not reach backend");
+                backend.Complete(true,null);invoke("poll","applied",ModEffectEvent.Tick,true);
+                invoke("escape","",ModEffectEvent.Tick,false);Check(backend.Calls==1,"Expired actor form reached backend");
+                backend.Reject=true;invoke("queue","failed",ModEffectEvent.Tick,true);
+                backend.Reject=false;invoke("queue","queued",ModEffectEvent.Tick,true);backend.Complete(false,"late failure");invoke("poll","failed",ModEffectEvent.Tick,true);
+                invoke("queue","",ModEffectEvent.ActorEnd,false);
+            });
+        });
+        Load(callback+definition+",behavior=host}",caps:capabilities,verify:(context,actor)=>
+            Run(context,actor,new Actor{Id="a1"},invoke=>invoke("queue","failed",ModEffectEvent.Tick,true)));
+        foreach(string cap in new[]{"content.register\",\"combat.actors","content.register\",\"combat.transform"})
+            Load(callback+definition+",behavior=host}",caps:cap,verify:(context,actor)=>
+            {
+                var backend=new FormActor{Id="a1"};Run(context,actor,backend,invoke=>invoke("queue","",ModEffectEvent.Tick,false));Check(backend.Calls==0,"Missing capability reached actor form backend");
+            });
+        foreach(string arguments in new[]{"{}","1","'warrior'","nil","warrior,warrior"})
+            Load(callback.Replace("request=saved:change_form(warrior)","request=saved:change_form("+arguments+")")+definition+",behavior=host}",caps:capabilities,verify:(context,actor)=>
+            {
+                var backend=new FormActor{Id="a1"};Run(context,actor,backend,invoke=>invoke("queue","",ModEffectEvent.Tick,false));Check(backend.Calls==0,"Malformed form arguments reached backend");
+            });
+    }
+
 }
