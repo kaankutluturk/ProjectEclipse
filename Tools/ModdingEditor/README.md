@@ -1,5 +1,11 @@
 # Eclipse Modding for VS Code
 
+Arena artwork supports `fighter:mark_sprite`, `sf2.world.set_marker_rect` and
+`sf2.world.set_marker_sprite`. Typed sprite handles, the existing marker handle
+and rectangle schema cover creation and updates; Lua owns movement/animation
+timing. Pulse Arena includes cropped atlas art and moves its sensor and marker
+together. Editor typing does not prove native rendering.
+
 The `authored-fighter` starter mirrors Authored Fighter Lab: mod-owned native body
 and connected weighted skin, an original 61-sample point animation, typed attack
 intervals and callback-scoped actor playback. Its source generator lives in

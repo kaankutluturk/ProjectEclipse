@@ -22,6 +22,8 @@ const values = 'table<string,any>'; // Runtime schemas determine these keys/type
 type('ExtensionHandle', { 'private __eclipseExtension': 'true' });
 type('ArenaMarkerHandle', { 'private __eclipseArenaMarker': 'true' });
 type('ArenaRect', { x:['number','Finite -10000..10000, arena minimum X.'],y:['number','Finite -10000..10000, native positive-down Y.'],width:['number','Positive, at most 4000.'],height:['number','Positive, at most 4000.'] });
+fn('world.set_marker_rect',{marker:H('ArenaMarker'),rectangle:E('ArenaRect')},'boolean, string|nil','presentation.visuals');
+fn('world.set_marker_sprite',{marker:H('ArenaMarker'),sprite:H('Sprite')},'boolean, string|nil','presentation.visuals');
 fn('world.remove_marker',{marker:H('ArenaMarker')},'boolean','presentation.visuals');
 fn('world.is_marker_active',{marker:H('ArenaMarker')},'boolean','presentation.visuals');
 fn('world.set_marker_color',{marker:H('ArenaMarker'),color:'string'},'boolean','presentation.visuals');
@@ -76,6 +78,7 @@ const fighterMethods = {
     actor_events:{params:{},returns:E('ActorEvent')+'[]|nil, string|nil',capability:'combat.actors'},
     change_form:{params:{character:H('Warrior')},returns:E('FormRequest'),capability:'combat.transform'},
     overlaps_rect:{params:{rectangle:E('ArenaRect')},returns:'boolean|nil, string|nil',capability:null},
+    mark_sprite:{params:{sprite:H('Sprite'),rectangle:E('ArenaRect'),color:'string?'},returns:H('ArenaMarker')+'|nil, string|nil',capability:'presentation.visuals'},
     mark_rect:{params:{rectangle:E('ArenaRect'),color:'string?'},returns:H('ArenaMarker')+'|nil, string|nil',capability:'presentation.visuals'},
     snapshot:{params:{},returns:`${E('CombatSnapshot')}|nil`,capability:null},
     change_health:{params:{amount:'number'},capability:'combat.change_life'},

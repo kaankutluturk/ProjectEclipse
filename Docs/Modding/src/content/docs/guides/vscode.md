@@ -187,11 +187,13 @@ and HUD example. See the [audio reference](../../api/audio/); editor checks cann
 verify native pause, source output or device audibility.
 
 
-Rectangle fields complete for `fighter:overlaps_rect` and `fighter:mark_rect`.
+Rectangle fields complete for `fighter:overlaps_rect`, `fighter:mark_rect` and
+`fighter:mark_sprite(sprite, rectangle)`. Sprite arguments require typed sprite
+handles.
 Marker handles are distinct from UI/audio handles; `sf2.world` completes removal,
-recoloring and lifetime queries. Opponent sensors require `combat.target`; marker
+recoloring, geometry/sprite updates and lifetime queries. Opponent sensors require `combat.target`; marker
 operations require `presentation.visuals`. Copy the manual `pulse-arena` starter
-for a complete timed hazard. See [Arena regions and markers](../../api/arena/).
+for a complete moving hazard with cropped atlas animation. See [Arena regions and artwork](../../api/arena/).
 Editor checks cannot prove rendered alignment, native contacts or pause cleanup.
 
 The manual `Tools/ModdingEditor/templates/arc-dart/` starter connects typed

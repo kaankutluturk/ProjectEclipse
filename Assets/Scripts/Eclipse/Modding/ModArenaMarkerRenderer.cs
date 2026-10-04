@@ -7,7 +7,7 @@ namespace Eclipse.Modding
     // Arena-local geometry, independent of the fighter's animation and lifetime.
     // The current player render transform supplies the native coordinate mapping,
     // including mirrored arenas and a replacement model after a form change.
-    internal sealed class ModArenaMarkerRenderer : MonoBehaviour, IModArenaMarker
+    internal sealed class ModArenaMarkerRenderer : MonoBehaviour, IModArenaArtwork
     {
         internal const int MaximumMarkers = 64;
         private static readonly HashSet<ModArenaMarkerRenderer> markers = new HashSet<ModArenaMarkerRenderer>();
@@ -16,9 +16,13 @@ namespace Eclipse.Modding
         private Mesh mesh;
         private Material material;
         private bool closed;
+        private ModArenaRect rectangle;
+        private Vector2[] shape = { Vector2.zero, Vector2.right, Vector2.one, Vector2.up };
+        private Vector2[] textureCoordinates = { Vector2.zero, Vector2.right, Vector2.one, Vector2.up };
+        private int[] triangles = { 0, 1, 2, 0, 2, 3 };
 
         internal static bool TryCreate(ModArenaRect rect, ModUiColor color, Func<bool> alive, Func<Transform> coordinates,
-            out IModArenaMarker result, out string error)
+            out IModArenaMarker result, out string error, AssetId? sprite = null)
         {
             result = null; error = null;
             foreach (var old in new List<ModArenaMarkerRenderer>(markers))
@@ -33,13 +37,9 @@ namespace Eclipse.Modding
             {
                 marker.alive = alive; marker.coordinates = coordinates;
                 marker.material = new Material(shader); marker.SetColor(color);
-                marker.mesh = new Mesh { name = "Eclipse arena rectangle",
-                    vertices = new[] { new Vector3((float)rect.X, (float)rect.Y, -.25f), new Vector3((float)(rect.X+rect.Width), (float)rect.Y, -.25f),
-                        new Vector3((float)(rect.X+rect.Width), (float)(rect.Y+rect.Height), -.25f), new Vector3((float)rect.X, (float)(rect.Y+rect.Height), -.25f) },
-                    uv = new[] { Vector2.zero, Vector2.right, Vector2.one, Vector2.up },
-                    colors = new[] { Color.white, Color.white, Color.white, Color.white },
-                    triangles = new[] { 0, 1, 2, 0, 2, 3 } };
-                marker.mesh.RecalculateBounds();
+                marker.mesh = new Mesh { name = "Eclipse arena artwork" };
+                marker.rectangle = rect;
+                if (sprite.HasValue) marker.SetSprite(sprite.Value); else marker.SetRect(rect);
                 host.AddComponent<MeshFilter>().sharedMesh = marker.mesh;
                 host.AddComponent<MeshRenderer>().sharedMaterial = marker.material;
                 markers.Add(marker); marker.Refresh(); result = marker; return true;
@@ -58,6 +58,36 @@ namespace Eclipse.Modding
         public void SetColor(ModUiColor color)
         {
             if (material != null) material.color = new Color32(color.R, color.G, color.B, color.A);
+        }
+        public void SetRect(ModArenaRect rect)
+        {
+            if (rect == null) throw new ArgumentNullException(nameof(rect));
+            rectangle = rect; RebuildGeometry();
+        }
+        public void SetSprite(AssetId asset)
+        {
+            var sprite = ModRuntime.Host?.TypedAssets?.LoadSprite(asset);
+            if (sprite == null) throw new InvalidOperationException("Arena sprite is unavailable: " + asset);
+            var vertices = sprite.vertices; var uv = sprite.uv; var indices = sprite.triangles;
+            if (vertices.Length < 3 || vertices.Length > 2048 || uv.Length != vertices.Length || indices.Length == 0)
+                throw new InvalidOperationException("Arena sprite requires 3..2048 native vertices and matching UVs.");
+            var normalized = new Vector2[vertices.Length];
+            for (int i = 0; i < vertices.Length; i++)
+                normalized[i] = new Vector2((vertices[i].x * sprite.pixelsPerUnit + sprite.pivot.x) / sprite.rect.width,
+                    1 - (vertices[i].y * sprite.pixelsPerUnit + sprite.pivot.y) / sprite.rect.height);
+            var converted = new int[indices.Length];
+            for (int i = 0; i < indices.Length; i++) converted[i] = indices[i];
+            shape = normalized; textureCoordinates = uv; triangles = converted;
+            material.mainTexture = sprite.texture; RebuildGeometry();
+        }
+        private void RebuildGeometry()
+        {
+            var vertices = new Vector3[shape.Length];
+            for (int i = 0; i < vertices.Length; i++) vertices[i] = new Vector3(
+                (float)(rectangle.X + shape[i].x * rectangle.Width), (float)(rectangle.Y + shape[i].y * rectangle.Height), -.25f);
+            var colors = new Color[vertices.Length];
+            for (int i = 0; i < colors.Length; i++) colors[i] = Color.white;
+            mesh.Clear(); mesh.vertices = vertices; mesh.colors = colors; mesh.uv = textureCoordinates; mesh.triangles = triangles; mesh.RecalculateBounds();
         }
         private void LateUpdate() { if (IsActive) Refresh(); }
         private void Refresh()

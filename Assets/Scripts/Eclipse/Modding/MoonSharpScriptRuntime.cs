@@ -211,6 +211,8 @@ namespace Eclipse.Modding
                             GetFighterProjectiles(args, fighterTable, fighter, effectEvent, () => invocationActive, projectileQueryBudget)));
                         fighterTable.Set("overlaps_rect", DynValue.NewCallback((ctx, args) =>
                             OverlapRect(args, fighterTable, fighter, invocationActive, false, arenaQueryBudget)));
+                        fighterTable.Set("mark_sprite", DynValue.NewCallback((ctx, args) =>
+                            MarkRect(args, fighterTable, fighter, effectEvent, invocationActive, true)));
                         fighterTable.Set("mark_rect", DynValue.NewCallback((ctx, args) =>
                             MarkRect(args, fighterTable, fighter, effectEvent, invocationActive)));
                         fighterTable.Set("snapshot", DynValue.NewCallback((ctx, args) =>

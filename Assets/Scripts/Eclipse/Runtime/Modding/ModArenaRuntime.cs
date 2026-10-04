@@ -61,6 +61,15 @@ namespace Eclipse.Modding
         bool IsActive { get; }
         void SetColor(ModUiColor color);
     }
+    public interface IModArenaArtwork : IModArenaMarker
+    {
+        void SetRect(ModArenaRect rect);
+        void SetSprite(AssetId sprite);
+    }
+    public interface IModFighterArtwork
+    {
+        bool TryMarkSprite(AssetId sprite, ModArenaRect rect, ModUiColor color, out IModArenaMarker marker, out string error);
+    }
     public interface IModFighterRegions
     {
         bool TryOverlapRect(ModArenaRect rect, out bool overlaps, out string error);
@@ -74,16 +83,29 @@ namespace Eclipse.Modding
         public bool TryCreate(IModFighterRegions source, ModArenaRect rect, ModUiColor color,
             out ModArenaMarkerInstance result, out string error)
         {
+            return TryAllocate(rect, color, source == null ? (CreateMarker)null :
+                (out IModArenaMarker native, out string failure) => source.TryMarkRect(rect, color, out native, out failure), out result, out error);
+        }
+        public bool TryCreateSprite(IModFighterArtwork source, AssetId sprite, ModArenaRect rect, ModUiColor color,
+            out ModArenaMarkerInstance result, out string error)
+        {
+            return TryAllocate(rect, color, source == null ? (CreateMarker)null :
+                (out IModArenaMarker native, out string failure) => source.TryMarkSprite(sprite, rect, color, out native, out failure), out result, out error);
+        }
+        private delegate bool CreateMarker(out IModArenaMarker marker, out string error);
+        private bool TryAllocate(ModArenaRect rect, ModUiColor color, CreateMarker create,
+            out ModArenaMarkerInstance result, out string error)
+        {
             result = null; error = null;
             if (closed) { error = "Arena marker scope is closed."; return false; }
             if (rect == null || color == null) throw new ArgumentNullException();
             foreach (var old in new List<ModArenaMarkerInstance>(markers)) if (!old.IsActive) old.Remove();
             if (markers.Count >= MaximumMarkers) { error = "This mod already has 16 active arena markers."; return false; }
-            if (source == null) { error = "Arena markers are unavailable in this host."; return false; }
+            if (create == null) { error = "Arena markers are unavailable in this host."; return false; }
             IModArenaMarker native = null;
             try
             {
-                if (!source.TryMarkRect(rect, color, out native, out error) || native == null)
+                if (!create(out native, out error) || native == null)
                 { native?.Dispose(); error = error ?? "Arena marker creation failed."; return false; }
                 result = new ModArenaMarkerInstance(native, value => markers.Remove(value));
                 markers.Add(result); return true;
@@ -109,6 +131,23 @@ namespace Eclipse.Modding
             if (color == null) throw new ArgumentNullException(nameof(color));
             if (!IsActive) { Remove(); return false; }
             native.SetColor(color); return true;
+        }
+        public bool TrySetRect(ModArenaRect rect, out string error)
+        {
+            if (rect == null) throw new ArgumentNullException(nameof(rect));
+            return TryUpdate(artwork => artwork.SetRect(rect), out error);
+        }
+        public bool TrySetSprite(AssetId sprite, out string error)
+        {
+            return TryUpdate(artwork => artwork.SetSprite(sprite), out error);
+        }
+        private bool TryUpdate(Action<IModArenaArtwork> update, out string error)
+        {
+            error = null;
+            if (!IsActive) { Remove(); return false; }
+            if (!(native is IModArenaArtwork artwork)) { error = "This backend cannot update arena artwork."; return false; }
+            try { update(artwork); return true; }
+            catch (Exception failure) { error = failure.Message; return false; }
         }
         public bool Remove()
         {

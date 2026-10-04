@@ -54,7 +54,7 @@ end
 
 ## sf2.assets.sprite
 
-Get a sprite handle for an item icon, achievement, location image, battle preview or opponent portrait.
+Get a sprite handle for an item icon, achievement, location image, battle preview, opponent portrait or live arena artwork.
 
 **Signature:** `sf2.assets.sprite(reference)`
 

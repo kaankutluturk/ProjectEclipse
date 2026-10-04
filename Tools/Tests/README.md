@@ -1,5 +1,13 @@
 # Regression tests and validators
 
+Arena artwork: `Modding/TestArenaRuntime.ps1` checks production Lua sprite/marker
+creation, updates, typed handles, scopes, shared limits, malformed input and the
+complete Pulse Arena schedule with controlled services. `Modding/TestArenaUnity.ps1`
+runs the installed sample in an isolated Unity project/profile, checking cropped
+atlas UV animation, in-place motion, sensor/direct health loss, pause, shared
+native budgets and cleanup. It captures warning and active art; this is not
+solid/swept physics acceptance.
+
 Original authored fighter: `CharacterForms/TestAuthoredFighterUnity.ps1` installs
 the actual Authored Fighter Lab mod in a marked isolated Unity fixture. It checks
 owned body/skin composition, preserved binary point count, the original clip's

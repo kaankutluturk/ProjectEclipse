@@ -11,14 +11,16 @@ if ($ExistingFixture) {
     $tempRoot = [IO.Path]::GetFullPath((Join-Path $root 'Temp')) + [IO.Path]::DirectorySeparatorChar
     if (!$fixture.StartsWith($tempRoot,[StringComparison]::OrdinalIgnoreCase) -or !((Test-Path -LiteralPath (Join-Path $fixture 'arena-fixture.marker')) -or (Test-Path -LiteralPath (Join-Path $fixture 'audio-fixture.marker')))) { throw 'Existing fixture must be a marked arena project inside repository Temp.' }
 }
+$existingProbe=Get-CimInstance Win32_Process -Filter "Name='Unity.exe'" | Where-Object {$_.CommandLine -and $_.CommandLine.Contains($fixture)}
+if($existingProbe){throw 'The isolated arena fixture is already open; finish that run before reusing it.'}
 Write-Host "Full-game arena fixture: $fixture"
 foreach ($folder in @('Assets','Packages','ProjectSettings','Library/PackageCache')) {
     New-Item -ItemType Directory -Force -Path (Join-Path $fixture $folder) | Out-Null
     & robocopy (Join-Path $root $folder) (Join-Path $fixture $folder) /E /COPY:DAT /R:1 /W:1 /NFL /NDL /NJH /NJS | Out-Null
     if ($LASTEXITCODE -ge 8) { throw "Fixture copy failed: $folder" }
 }
-New-Item -ItemType Directory -Force -Path (Join-Path $fixture 'Mods') | Out-Null
-& robocopy (Join-Path $root 'Mods/example.pulse-arena') (Join-Path $fixture 'Mods/example.pulse-arena') /E /COPY:DAT /R:1 /W:1 /NFL /NDL /NJH /NJS | Out-Null
+New-Item -ItemType Directory -Force -Path (Join-Path $fixture 'arena-mods') | Out-Null
+& robocopy (Join-Path $root 'Mods/example.pulse-arena') (Join-Path $fixture 'arena-mods/example.pulse-arena') /E /COPY:DAT /R:1 /W:1 /NFL /NDL /NJH /NJS | Out-Null
 if ($LASTEXITCODE -ge 8) { throw 'Mod fixture copy failed.' }
 
 Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'ArenaUnity.cs') -Destination (Join-Path $fixture 'Assets/Editor') -Force
@@ -39,6 +41,7 @@ $process = Start-Process -FilePath $Unity -ArgumentList @('-projectPath',('"'+$f
 Write-Host "Native arena process: $($process.Id)"
 $deadline = [DateTime]::UtcNow.AddMinutes(15)
 while (!$process.WaitForExit(20000)) {
+    if ((Test-Path -LiteralPath $log) -and (Select-String -LiteralPath $log -Pattern 'error CS\d+:' -Quiet)) {$process.Kill();throw "Native arena fixture failed compilation: $log"}
     if ([DateTime]::UtcNow -gt $deadline) { $process.Kill(); throw "Native arena timed out: $log" }
 }
 Select-String -LiteralPath $log -Pattern '\[ArenaUnity\]|error CS' | ForEach-Object { Write-Host $_.Line }

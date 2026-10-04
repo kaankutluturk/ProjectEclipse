@@ -1069,7 +1069,7 @@ namespace Eclipse.Modding
         IModFighterOperations Opponent { get; }
     }
 
-    public sealed class ModInstanceFighter : IModFighterOperations, IModDamageEventSource, IModBehaviorInstanceSource, IModFighterTargets, IModIncomingHitSource, IModFighterEffects, IModCombatSnapshotSource, IModCombatActivitySource, IModFighterForms, IModFighterStatusIcons, IModAnimationLifecycleSource, IModFighterFlags, IModFighterControls, IModRoundOutcomes, IModFighterMotion, IModFighterPlayback, IModFighterRegions, IModFighterProjectiles, IModFighterProjectileSpawning, IModFighterActors, IModActorBehaviorSource
+    public sealed class ModInstanceFighter : IModFighterOperations, IModDamageEventSource, IModBehaviorInstanceSource, IModFighterTargets, IModIncomingHitSource, IModFighterEffects, IModCombatSnapshotSource, IModCombatActivitySource, IModFighterForms, IModFighterStatusIcons, IModAnimationLifecycleSource, IModFighterFlags, IModFighterControls, IModRoundOutcomes, IModFighterMotion, IModFighterPlayback, IModFighterRegions, IModFighterArtwork, IModFighterProjectiles, IModFighterProjectileSpawning, IModFighterActors, IModActorBehaviorSource
     {
         private readonly IModFighterOperations _inner;
         public IModActor Actor => (_inner as IModActorBehaviorSource)?.Actor;
@@ -1115,6 +1115,11 @@ namespace Eclipse.Modding
         {
             if (_inner is IModFighterRegions regions) return regions.TryOverlapRect(rect, out overlaps, out error);
             overlaps = false; error = "Arena geometry is unavailable."; return false;
+        }
+        public bool TryMarkSprite(AssetId sprite, ModArenaRect rect, ModUiColor color, out IModArenaMarker marker, out string error)
+        {
+            if (_inner is IModFighterArtwork artwork) return artwork.TryMarkSprite(sprite, rect, color, out marker, out error);
+            marker = null; error = "Arena sprites are unavailable."; return false;
         }
         public bool TryMarkRect(ModArenaRect rect, ModUiColor color, out IModArenaMarker marker, out string error)
         {

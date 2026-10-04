@@ -497,7 +497,7 @@ public partial class Fight
 		public int OGOLNFLBLBD;
 	}
 
-		private sealed class EclipseFighterOperations : IModFighterOperations, IModDamageEventSource, IModFighterTargets, IModIncomingHitSource, IModFighterEffects, IModCombatSnapshotSource, IModCombatActivitySource, IModFighterForms, IModFighterStatusIcons, IModAnimationLifecycleSource, IModFighterFlags, IModFighterControls, IModRoundOutcomes, IModFighterMotion, IModFighterPlayback, IModFighterRegions, IModFighterProjectiles, IModFighterProjectileSpawning, IModFighterActors, IModActorBehaviorSource
+		private sealed class EclipseFighterOperations : IModFighterOperations, IModDamageEventSource, IModFighterTargets, IModIncomingHitSource, IModFighterEffects, IModCombatSnapshotSource, IModCombatActivitySource, IModFighterForms, IModFighterStatusIcons, IModAnimationLifecycleSource, IModFighterFlags, IModFighterControls, IModRoundOutcomes, IModFighterMotion, IModFighterPlayback, IModFighterRegions, IModFighterArtwork, IModFighterProjectiles, IModFighterProjectileSpawning, IModFighterActors, IModActorBehaviorSource
 	{
 		private readonly Fight _fight;
 		private readonly Model _model;
@@ -515,12 +515,20 @@ public partial class Fight
         }
         public bool TryMarkRect(ModArenaRect rect, ModUiColor color, out IModArenaMarker marker, out string error)
         {
+            return TryCreateArenaArtwork(rect, color, null, out marker, out error);
+        }
+        public bool TryMarkSprite(AssetId sprite, ModArenaRect rect, ModUiColor color, out IModArenaMarker marker, out string error)
+        {
+            return TryCreateArenaArtwork(rect, color, sprite, out marker, out error);
+        }
+        private bool TryCreateArenaArtwork(ModArenaRect rect, ModUiColor color, AssetId? sprite, out IModArenaMarker marker, out string error)
+        {
             if (!ArenaAvailable) { marker = null; error = "Arena markers require a current main fighter in an active offline round."; return false; }
             int roundNumber = _fight.round.round;
             return ModArenaMarkerRenderer.TryCreate(rect, color,
                 () => GetCurrentFight() == _fight && _fight.round.processing && _fight.round.round == roundNumber &&
                     !_fight._eclipseFightEndDispatched && _fight._eclipseEndedRound != roundNumber,
-                () => _fight.GetPlayerModel()?.GetRenderObject()?.transform, out marker, out error);
+                () => _fight.GetPlayerModel()?.GetRenderObject()?.transform, out marker, out error, sprite);
         }
 
         public bool TrySpawnActor(ModId owner, DefinitionId definition, double x, double y, double z, Action<string,string> complete, out string error)

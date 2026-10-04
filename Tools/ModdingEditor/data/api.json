@@ -1,5 +1,29 @@
 {
   "functions": {
+    "sf2.world.set_marker_rect": {
+      "params": {
+        "marker": "Eclipse.ArenaMarkerHandle",
+        "rectangle": "Eclipse.ArenaRect"
+      },
+      "returns": "`true, nil` on success, `false, nil` for a closed marker, or `false, error` if the native backend cannot update it. Invalid rectangles, forged/foreign handles and extra arguments raise a Lua error.",
+      "capability": "presentation.visuals",
+      "url": "https://dawc17.github.io/ProjectEclipse/api/arena/#sf2worldset_marker_rect",
+      "summary": "Move/resize existing rectangle or sprite art without replacing the marker, resetting its lifetime or changing its tint/sprite. Update the rectangle passed to `overlaps_rect` separately if a hazard should follow the art.",
+      "requires": "`presentation.visuals`; a marker created by this script context.",
+      "when": "After creation in the owning script's runtime callbacks. Use `on_tick` for movement that follows combat pause. A closed marker cannot restart."
+    },
+    "sf2.world.set_marker_sprite": {
+      "params": {
+        "marker": "Eclipse.ArenaMarkerHandle",
+        "sprite": "Eclipse.SpriteHandle"
+      },
+      "returns": "`true, nil` on success, `false, nil` for a closed marker, or `false, error` for an unavailable/unsupported native sprite/backend. Invalid sprite types, forged/foreign handles and extra arguments raise a Lua error.",
+      "capability": "presentation.visuals",
+      "url": "https://dawc17.github.io/ProjectEclipse/api/arena/#sf2worldset_marker_sprite",
+      "summary": "Switch owned art to a typed sprite while retaining rectangle, tint and lifetime. Works on sprite markers or converts a filled rectangle to sprite art. Lua owns the frame sequence and timing; imported sprite layouts/textures are not modified.",
+      "requires": "`presentation.visuals`; marker and sprite handles from this script context. Obtain sprite handles during registration.",
+      "when": "After creation in the owning script's runtime callbacks. Frame changes from `on_tick` follow combat pause; UI callbacks may change art while paused. Failed sprite loading keeps the prior art and cannot reopen a closed marker."
+    },
     "sf2.world.remove_marker": {
       "params": {
         "marker": "Eclipse.ArenaMarkerHandle"
@@ -341,7 +365,7 @@
       "capability": null,
       "referenceKind": "sprite",
       "url": "https://dawc17.github.io/ProjectEclipse/api/assets/#sf2assetssprite",
-      "summary": "Get a sprite handle for an item icon, achievement, location image, battle preview or opponent portrait.",
+      "summary": "Get a sprite handle for an item icon, achievement, location image, battle preview, opponent portrait or live arena artwork.",
       "requires": "No capability; cross-mod references require a dependency.",
       "when": "Usually during registration, before passing the handle to a definition."
     },
@@ -2157,6 +2181,15 @@
       },
       "returns": "boolean|nil, string|nil",
       "capability": null
+    },
+    "mark_sprite": {
+      "params": {
+        "sprite": "Eclipse.SpriteHandle",
+        "rectangle": "Eclipse.ArenaRect",
+        "color": "string?"
+      },
+      "returns": "Eclipse.ArenaMarkerHandle|nil, string|nil",
+      "capability": "presentation.visuals"
     },
     "mark_rect": {
       "params": {

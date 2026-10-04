@@ -17,13 +17,14 @@ public static class ArenaUnity
     const BindingFlags Hidden=BindingFlags.Instance|BindingFlags.NonPublic;
     static double started,lastReport,phaseAt; static bool campaign,entered;
     static int checks,phase,pausedFrame; static ModUiSurface surface; static string combatException;
+    static Vector2[] initialUV;static Mesh initialMesh;static Material initialMaterial;static float initialX;static int movementFrame;static Vector3[] pausedVertices;static Vector2[] pausedUV;
     static ModArenaRect region; static float health; static IModFighterRegions sensor; static IModArenaMarker orphan; static ModArenaMarkerScope scope;
     static ArenaUnity(){if(SessionState.GetBool(Active,false)){started=EditorApplication.timeSinceStartup;EditorApplication.update+=Update;Application.logMessageReceived+=Log;}}
     public static void Run()
     {
         var root=Path.GetDirectoryName(Application.dataPath);
         if(!File.Exists(Path.Combine(root,"arena-fixture.marker")))throw new Exception("Requires isolated audio fixture.");
-        Environment.SetEnvironmentVariable("ECLIPSE_MODS_ROOT",Path.Combine(root,"Mods"));
+        Environment.SetEnvironmentVariable("ECLIPSE_MODS_ROOT",Path.Combine(root,"arena-mods"));
         var arguments=Environment.GetCommandLineArgs();int productIndex=Array.IndexOf(arguments,"-arenaAcceptanceProductName");
         if(productIndex<0||productIndex+1>=arguments.Length||!System.Text.RegularExpressions.Regex.IsMatch(arguments[productIndex+1],"^ArenaUnity-[0-9a-f]{32}$"))throw new Exception("Pass the generated acceptance product through the runner.");
         PlayerSettings.companyName="EclipseAcceptance";PlayerSettings.productName=arguments[productIndex+1];
@@ -54,13 +55,14 @@ public static class ArenaUnity
                 campaign=true;return;
             }
             if(!entered){
-                if(ModRuntime.Scripts==null||Module.GetInstance()==null)return;
+                if(ModRuntime.Scripts==null||Module.GetInstance()==null||Eclipse.UI.TitleScreen.IsOpen||UnityEngine.Object.FindFirstObjectByType<Eclipse.UI.EclipseLoadingOverlay>()!=null)return;
                 var screen=Module.GetInstance().GetCurrentScreenType();if(screen!=ScreenType.ModuleDojo&&screen!=ScreenType.ModuleMap)return;
                 Check(!ModRuntime.Host.HasErrors,ModRuntime.Host.FormatReport());Check(ModRuntime.Host.EnabledMods.Any(m=>m.Id.Value=="example.pulse-arena"),"Pulse Arena not enabled");Check(!ModRuntime.Scripts.HasErrors,"Startup mod errors");
                 var encounter=ListSF.CHMCKGCDGCM(new FightIDS(ModRuntime.Scripts.Content.RuntimeFightId(DefinitionId.Parse("core:fights/zone_1/tournament/3"))));
                 Check(encounter!=null,"Core encounter missing");entered=GameUtils.StartFight(encounter,false,null,true,false);return;
             }
             var fight=Fight.GetCurrentFight();if(fight==null||fight.get_FightTimeInFrames()<10)return;
+            if(fight.GetFightDefinition()?.FightId.ToString()!=ModRuntime.Scripts.Content.RuntimeFightId(DefinitionId.Parse("core:fights/zone_1/tournament/3")))return;
             var player=fight.GetPlayerModel();var enemy=fight.GetEnemyModel();if(player==null||enemy==null)return;
             player.Parameters.UserControlled=false;enemy.Parameters.AiControlled=false;player.Parameters.set_IsImmortalityEnabled(false);
             double elapsed=EditorApplication.timeSinceStartup-phaseAt;
@@ -69,8 +71,12 @@ public static class ArenaUnity
             case 0:
                 ModRuntime.Scripts.CallbackDiagnostics.Recording=true;surface=Surface();if(surface==null||Markers().Length!=1)return;
                 Check(surface.Read("status").Text=="Warning: leave the column","Shipped warning schedule/HUD");
-                var bounds=Markers()[0].GetComponent<MeshFilter>().sharedMesh.vertices;
-                region=new ModArenaRect(bounds[0].x,bounds[0].y,bounds[2].x-bounds[0].x,bounds[2].y-bounds[0].y);
+                initialMesh=Markers()[0].GetComponent<MeshFilter>().sharedMesh;initialMaterial=Markers()[0].sharedMaterial;
+                initialUV=initialMesh.uv;initialX=initialMesh.bounds.min.x;movementFrame=fight.get_FightTimeInFrames();
+                var bounds=initialMesh.bounds;
+                region=new ModArenaRect(bounds.min.x,bounds.min.y,bounds.size.x,bounds.size.y);
+                Check(initialMaterial.mainTexture!=null&&initialMaterial.mainTexture.width==256&&initialMaterial.mainTexture.height==1024,"Original sprite atlas did not load through typed assets");
+                Check(initialUV.Max(v=>v.y)-initialUV.Min(v=>v.y)<.251f,"Sprite crop expanded into whole atlas");
                 var type=typeof(Fight).GetNestedType("EclipseFighterOperations",BindingFlags.NonPublic);
                 sensor=(IModFighterRegions)Activator.CreateInstance(type,new object[]{fight,player,null,null,null,null,false});
                 var pos=player.PLBNCDCFPML();player.ShiftModelPosition(new Vector3f((float)(region.X+80)-pos.GetX(),0,0),true);
@@ -88,12 +94,18 @@ public static class ArenaUnity
                 Check(Markers().Length==1&&Markers()[0].sharedMaterial.color.g<.3f,"Shipped active warning recolor");
                 Check(player.KKMCHCNOHMB()<health,"Actual Lua hazard failed native health loss");
                 Check(surface.Read("contacts").Text!="Contacts: 0","Actual Lua capsule sensor/contact counter: "+surface.Read("contacts").Text+" failures="+string.Join(";",ModRuntime.Scripts.CallbackDiagnostics.RecentFailures.Select(f=>f.ToString())));
+                Check(Markers()[0].GetComponent<MeshFilter>().sharedMesh==initialMesh&&Markers()[0].sharedMaterial==initialMaterial,"Artwork update respawned geometry/material");
+                Check(!initialMesh.uv.SequenceEqual(initialUV),"Native atlas UVs did not animate across warning/active phases");
+                Check(Math.Abs(initialMesh.bounds.min.x-initialX)>1&&fight.get_FightTimeInFrames()>movementFrame,"Native sprite rectangle did not follow Lua sweep");
+                pausedVertices=initialMesh.vertices;pausedUV=initialMesh.uv;
+                new GameObject("Active pulse capture").AddComponent<ArenaActiveCapture>();
                 fight.SetPaused(true);health=player.KKMCHCNOHMB();pausedFrame=fight.get_FightTimeInFrames();Next();break;
             case 2:
                 if(elapsed<.5)return;
                 Check(fight.get_FightTimeInFrames()==pausedFrame,"Paused simulation advanced hazard clock");
                 Check(Math.Abs(player.KKMCHCNOHMB()-health)<.00001,"Paused hazard damaged fighter");
                 Check(Markers().Length==1&&Markers()[0].sharedMaterial.color.g<.3f,"Pause lost current marker");
+                Check(initialMesh.vertices.SequenceEqual(pausedVertices)&&initialMesh.uv.SequenceEqual(pausedUV),"Pause advanced Lua sprite geometry or atlas frame");
                 fight.SetPaused(false);Next();break;
             case 3:
                 if(surface.Read("status").Text!="Safe: pulse recovering")return;
@@ -125,7 +137,7 @@ public static class ArenaUnity
                 if(elapsed<.2)return;Check(Markers().Length==0,"Surrender left native marker objects");
                 Check(ModRuntime.Scripts.CallbackDiagnostics.RecentFailures.Count==0,"Shipped callback failures: "+string.Join(";",ModRuntime.Scripts.CallbackDiagnostics.RecentFailures.Select(f=>f.Error)));
                 Check(File.Exists(Path.Combine(Path.GetDirectoryName(Application.dataPath),"pulse-arena-native.png")),"Native rendered capture missing");
-                File.WriteAllText(Path.Combine(Path.GetDirectoryName(Application.dataPath),"arena-result.txt"),"PASS: "+checks+" native full-game arena checks; shipped Lua warning/active/recovery clock, native rectangle projection/recolor and capsule sensor, direct health loss, pose displacement, pause/resume, recurring schedule, 64-marker shared bound, script-scope and surrender cleanup, post-end tick suppression. Controls/profile isolated; no swept/solid physics or hit-reaction claim.");
+                File.WriteAllText(Path.Combine(Path.GetDirectoryName(Application.dataPath),"arena-result.txt"),"PASS: "+checks+" native full-game arena checks; shipped Lua warning/active/recovery clock, typed atlas sprite crop/UV animation, in-place rectangle sweep/recolor and capsule sensor, direct health loss, pose displacement, pause/resume, recurring schedule, 64-marker shared bound, script-scope and surrender cleanup, post-end tick suppression. Controls/profile isolated; no swept/solid physics or hit-reaction claim.");
                 Debug.Log("[ArenaUnity] PASS: "+checks+" full-game checks");Finish(0);break;
             }
         }catch(Exception error){Debug.LogError("[ArenaUnity] FAIL: "+error);Finish(1);}
@@ -133,6 +145,10 @@ public static class ArenaUnity
     static ModUiSurface Surface(){foreach(var context in (IEnumerable)Field(ModRuntime.Scripts,"_contexts")){var scope=context.GetType().GetProperty("UiScope").GetValue(context) as ModUiScope;if(scope==null||scope.Owner.Value!="example.pulse-arena")continue;foreach(ModUiSurface s in ((IDictionary)Field(scope,"surfaces")).Values)if(s.Id=="pulse")return s;}return null;}
     static void Log(string message,string stack,LogType type){if(entered&&type==LogType.Exception&&(stack.Contains("Fight.")||stack.Contains("Model.")||stack.Contains("Modding")))combatException=message+"\n"+stack;}
     static void Finish(int code){SessionState.SetBool(Active,false);EditorApplication.update-=Update;Application.logMessageReceived-=Log;EditorApplication.Exit(code);}
+}
+public sealed class ArenaActiveCapture : MonoBehaviour
+{
+    IEnumerator Start(){yield return new WaitForEndOfFrame();var texture=ScreenCapture.CaptureScreenshotAsTexture();File.WriteAllBytes(Path.Combine(Path.GetDirectoryName(Application.dataPath),"pulse-arena-active-native.png"),texture.EncodeToPNG());UnityEngine.Object.Destroy(texture);UnityEngine.Object.Destroy(gameObject);}
 }
 public sealed class ArenaCapture : MonoBehaviour
 {

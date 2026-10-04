@@ -9,25 +9,29 @@ static class Program
 {
     static int checks; static string fixture,repo;
     static void Check(bool value,string message){checks++;if(!value)throw new Exception(message);}
-    sealed class Marker : IModArenaMarker
+    sealed class Marker : IModArenaArtwork
     {
-        public bool Active=true;public int Removed; public ModUiColor Color;
+        public bool Active=true,RejectUpdate;public int Removed,SpriteChanges,RectChanges; public ModUiColor Color;public ModArenaRect Rect;public AssetId Sprite;
         public bool IsActive=>Active;
         public void SetColor(ModUiColor color){Color=color;}
+        public void SetRect(ModArenaRect rect){if(RejectUpdate)throw new Exception("update failed");Rect=rect;RectChanges++;}
+        public void SetSprite(AssetId sprite){if(RejectUpdate)throw new Exception("update failed");Sprite=sprite;SpriteChanges++;}
         public void Dispose(){Active=false;Removed++;}
     }
-    sealed class Fighter : IModFighterOperations, IModFighterRegions, IModCombatSnapshotSource, IModFighterTargets
+    sealed class Fighter : IModFighterOperations, IModFighterRegions, IModFighterArtwork, IModCombatSnapshotSource, IModFighterTargets
     {
-        public readonly List<Marker> Markers=new List<Marker>();public bool Inside=true,Reject,Throws;public int Queries,Changes;
+        public readonly List<Marker> Markers=new List<Marker>();public bool Inside=true,Reject,Throws,PartialThrows;public int Queries,Changes;
         public double Health{get;private set;}=1;public Fighter Peer;public IModFighterOperations Opponent=>Peer;
         public ModCombatSnapshot CaptureCombatSnapshot()=>new ModCombatSnapshot(new ModFighterSnapshot(Health,1,1,0,0,0),null,1,true);
         public bool TryChangeHealth(double amount,out string error){Changes++;Health+=amount;error=null;return true;}
         public bool TryAddMagicCharge(double amount,out string error){error=null;return true;}
         public bool TryOverlapRect(ModArenaRect rect,out bool hit,out string error){Queries++;hit=Inside;error=Reject?"unavailable":null;return !Reject;}
+        public bool TryMarkSprite(AssetId sprite,ModArenaRect rect,ModUiColor color,out IModArenaMarker result,out string error)
+        {if(!TryMarkRect(rect,color,out result,out error))return false;((Marker)result).SetSprite(sprite);return true;}
         public bool TryMarkRect(ModArenaRect rect,ModUiColor color,out IModArenaMarker result,out string error)
         {
             result=null;error=null;if(Throws)throw new Exception("render failed");if(Reject){error="inactive round";return false;}
-            var marker=new Marker{Color=color};Markers.Add(marker);result=marker;return true;
+            var marker=new Marker{Color=color,Rect=rect};Markers.Add(marker);result=marker;if(PartialThrows)throw new Exception("partial allocation failed");return true;
         }
     }
     sealed class Loaded : IDisposable
@@ -38,8 +42,12 @@ static class Program
     static Loaded Load(string body,string caps="content.register,presentation.visuals,combat.target",bool freeze=true)
     {
         var parent=Path.Combine(fixture,Guid.NewGuid().ToString("N"));var folder=Path.Combine(parent,"fixture.arena");Directory.CreateDirectory(Path.Combine(folder,"scripts"));
+        Directory.CreateDirectory(Path.Combine(folder,"assets/sprites"));Directory.CreateDirectory(Path.Combine(folder,"assets/textures"));Directory.CreateDirectory(Path.Combine(folder,"assets/models"));
+        File.WriteAllBytes(Path.Combine(folder,"assets/textures/one.png"),Convert.FromBase64String("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAusB9Wl2nVsAAAAASUVORK5CYII="));
+        File.Copy(Path.Combine(folder,"assets/textures/one.png"),Path.Combine(folder,"assets/textures/two.png"));
+        foreach(var name in new[]{"one","two"})File.WriteAllText(Path.Combine(folder,"assets/sprites/"+name+".asset"),"type=sprite\ntexture=textures/"+name+".png\n");File.WriteAllText(Path.Combine(folder,"assets/models/wrong.xml"),"<Model/>");
         File.WriteAllText(Path.Combine(folder,"mod.toml"),"schema=1\nid=\"fixture.arena\"\nname=\"Arena\"\nversion=\"1.0.0\"\nauthors=[\"Fixture\"]\nentrypoint=\"scripts/main.lua\"\ncapabilities=["+string.Join(",",caps.Split(',').Select(c=>"\""+c+"\""))+"]\n");
-        File.WriteAllText(Path.Combine(folder,"scripts/main.lua"),"local sf2=require('sf2');local rect={x=0,y=0,width=20,height=40};local saved,marker;local calls=0;local function run(_,fighter) calls=calls+1;"+body+" end;sf2.behaviors.register{id='test',on_tick=run,on_round_begin=run,on_round_end=run,on_fight_begin=run,on_fight_end=run};");
+        File.WriteAllText(Path.Combine(folder,"scripts/main.lua"),"local sf2=require('sf2');local rect={x=0,y=0,width=20,height=40};local saved,marker;local one=sf2.assets.sprite('sprites/one');local two=sf2.assets.sprite('sprites/two');local wrong=sf2.assets.model('models/wrong');local calls=0;local function run(_,fighter) calls=calls+1;"+body+" end;sf2.behaviors.register{id='test',on_tick=run,on_round_begin=run,on_round_end=run,on_fight_begin=run,on_fight_end=run};");
         var discovery=ModDiscovery.DiscoverLoose(parent);Check(discovery.Diagnostics.Count==0,"Bad manifest");var mod=discovery.Mods.Single();var content=new ModContentCatalog();using var tx=content.BeginRegistration(mod);
         var api=new ModApiFacade(mod,new AssetResolver(new IAssetProvider[]{new LooseModProvider(mod)}),tx,new ModStateRuntime(),null);
         var context=new MoonSharpScriptRuntime(surface=>{}).CreateContext(mod,api);context.ExecuteEntrypoint();tx.Commit();if(freeze)content.Freeze();
@@ -80,7 +88,28 @@ static class Program
         {Event(a);var flags=System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.NonPublic;var sa=(MoonSharp.Interpreter.Script)a.Context.GetType().GetField("_script",flags).GetValue(a.Context);var sb=(MoonSharp.Interpreter.Script)b.Context.GetType().GetField("_script",flags).GetValue(b.Context);bool blocked=false;try{sb.Globals.Set("foreign",sa.Globals.Get("foreign"));}catch(MoonSharp.Interpreter.ScriptRuntimeException e){blocked=e.Message.Contains("different scripts");}Check(blocked&&a.Fighter.Markers[0].Active,"MoonSharp foreign marker ownership");}
         using(var l=Load("marker=assert(fighter:mark_rect(rect))",freeze:false)){Check(!Invoke(l,out var error)&&error.Contains("registration")&&l.Fighter.Markers.Count==0,"Marker created while dependent registration open");l.Content.Freeze();Event(l);}
         using(var l=Load("local hud=sf2.ui.open{id='owner',mount='hud',root={id='text',kind='text',text='Owner',width=100,height=40},on_close=function() fighter:mark_rect(rect) end};sf2.ui.close(hud)","content.register,presentation.visuals,ui.create")){Event(l);Check(l.Fighter.Markers.Count==0,"UI cleanup created a marker");}
-        Shipped();Console.WriteLine("Arena runtime PASS: "+checks+" checks; production geometry/Lua/scopes and shipped hazard with controlled native rig/markers/clock.");
+        Artwork();Shipped();Console.WriteLine("Arena runtime PASS: "+checks+" checks; production geometry/Lua/scopes and shipped hazard with controlled native rig/markers/clock.");
+    }
+    static void Artwork()
+    {
+        using(var l=Load("marker=assert(fighter:mark_sprite(one,rect));assert(sf2.world.set_marker_rect(marker,{x=10,y=-30,width=50,height=60}));assert(sf2.world.set_marker_sprite(marker,two));assert(sf2.world.set_marker_color(marker,'#ffcc3388'));assert(sf2.world.remove_marker(marker));local a,e=sf2.world.set_marker_rect(marker,rect);assert(a==false and e==nil);assert(sf2.world.set_marker_sprite(marker,one)==false)"))
+        {Event(l);var m=l.Fighter.Markers.Single();Check(m.Sprite.Path=="sprites/two"&&m.Rect.X==10&&m.Rect.Width==50&&m.SpriteChanges==2&&m.RectChanges==1&&m.Removed==1,"Typed sprite/update/remove contract");}
+        using(var l=Load("for i=1,8 do assert(fighter:mark_sprite(one,rect));assert(fighter:mark_rect(rect)) end;local m,e=fighter:mark_sprite(two,rect);assert(m==nil and e:find('16'))")){Event(l);Check(l.Fighter.Markers.Count==16,"Sprites and rectangles share scope capacity");}
+        using(var l=Load("if calls==1 then marker=assert(fighter:mark_sprite(one,rect)) else local ok,e=sf2.world.set_marker_sprite(marker,two);assert(not ok and e=='update failed');ok,e=sf2.world.set_marker_rect(marker,{x=1,y=2,width=3,height=4});assert(not ok and e=='update failed') end"))
+        {Event(l);var m=l.Fighter.Markers[0];m.RejectUpdate=true;Event(l);Check(m.Active&&m.Sprite.Path=="sprites/one"&&m.Rect.X==0&&m.Rect.Width==20,"Failed updates retain live prior artwork");}
+        using(var l=Load("local m,e=fighter:mark_sprite(one,rect);assert(m==nil and e:find('partial allocation'))")){l.Fighter.PartialThrows=true;Event(l);Check(l.Fighter.Markers.Single().Removed==1,"Partial native allocation is disposed after throwing");}
+        using(var l=Load("marker=assert(fighter:mark_sprite(one,rect))")){Event(l);l.Dispose();Check(l.Fighter.Markers[0].Removed==1,"Sprite script teardown");}
+        foreach(var bad in new[]{"fighter:mark_sprite()","fighter:mark_sprite(one)","fighter:mark_sprite({},rect)","fighter:mark_sprite('sprites/one',rect)","fighter:mark_sprite(wrong,rect)","fighter:mark_sprite(one,rect,'bad')","fighter:mark_sprite(one,rect,nil,1)","fighter:mark_sprite(one,{x=0,y=0,width=-1,height=1})","sf2.world.set_marker_rect({},rect)","sf2.world.set_marker_sprite({},one)"})
+        using(var l=Load(bad)){Check(!Invoke(l,out var error)&&error.Length>0,"Invalid artwork arguments: "+bad);Check(l.Fighter.Markers.Count==0,"Invalid artwork allocated");}
+        foreach(var bad in new[]{"sf2.world.set_marker_rect(marker)","sf2.world.set_marker_rect(marker,{},1)","sf2.world.set_marker_rect(marker,{x=0,y=0,width=0,height=1})","sf2.world.set_marker_sprite(marker,wrong)","sf2.world.set_marker_sprite(marker,'sprites/one')","sf2.world.set_marker_sprite(marker,one,2)"})
+        using(var l=Load("marker=assert(fighter:mark_sprite(one,rect));"+bad)){Check(!Invoke(l,out var error),"Invalid retained artwork update accepted");Check(l.Fighter.Markers[0].Active&&l.Fighter.Markers[0].SpriteChanges==1,"Invalid artwork update mutated existing art");}
+        using(var l=Load("fighter:mark_sprite(one,rect)","content.register")){Check(!Invoke(l,out var error)&&error.Contains("capability"),"Sprite presentation permission");}
+        using(var l=Load("if calls==1 then saved=fighter.mark_sprite else saved(one,rect) end")){Event(l);Check(!Invoke(l,out var error)&&error.Contains("expired"),"Sprite creation callable escaped callback");}
+        foreach(var kind in new[]{ModEffectEvent.FightBegin,ModEffectEvent.RoundBegin,ModEffectEvent.RoundEnd,ModEffectEvent.FightEnd})
+        using(var l=Load("fighter:mark_sprite(one,rect)")){Check(!Invoke(l,out var error,kind)&&error.Contains("simulation"),"Sprite creation forbidden lifecycle");}
+        using(var l=Load("local m,e=fighter:mark_sprite(one,rect);assert(m==nil and e=='inactive round')")){l.Fighter.Reject=true;Event(l);}
+        using(var l=Load("marker=assert(fighter:mark_sprite(one,rect))",freeze:false)){Check(!Invoke(l,out var error)&&error.Contains("registration")&&l.Fighter.Markers.Count==0,"Sprite registration gate");}
+        using(var l=Load("local hud=sf2.ui.open{id='owner',mount='hud',root={id='text',kind='text',text='Owner',width=100,height=40},on_close=function() fighter:mark_sprite(one,rect) end};sf2.ui.close(hud)","content.register,presentation.visuals,ui.create")){Event(l);Check(l.Fighter.Markers.Count==0,"Sprite UI cleanup gate");}
     }
     static void Geometry()
     {

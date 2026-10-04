@@ -1,7 +1,7 @@
 schema = 1
 id = "example.pulse-arena"
 name = "Pulse Arena"
-version = "1.0.0"
+version = "1.1.0"
 authors = ["Eclipse contributors"]
 entrypoint = "scripts/main.lua"
 capabilities = ["content.register", "content.patch", "presentation.visuals", "combat.target", "combat.change_life", "ui.create"]

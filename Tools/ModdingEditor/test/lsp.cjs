@@ -295,6 +295,13 @@ async function main() {
     await until(async()=>{const found=labels(await request('textDocument/completion',arenaOptions));return ['x','y','width','height'].every(key=>found.some(n=>n.startsWith(key)));},'arena rectangle fields');
     const arenaTarget=probe('arena-target.lua','local sf2=require("sf2")\nsf2.behaviors.register {id="x",on_tick=function(_,fighter)\n fighter.opponent:|\nend}');
     await until(async()=>labels(await request('textDocument/completion',arenaTarget)).some(n=>n.startsWith('overlaps_rect')),'opponent native capsule sensor');
+    const arenaSprite=probe('arena-sprite-options.lua','local sf2=require("sf2")\nsf2.behaviors.register{id="x",on_tick=function(_,fighter)\n fighter:mark_sprite(sf2.assets.sprite("sprites/art"),{ | })\nend}');
+    await until(async()=>{const found=labels(await request('textDocument/completion',arenaSprite));return ['x','y','width','height'].every(key=>found.some(n=>n.startsWith(key)));},'sprite rectangle completion');
+    const arenaWorld=probe('arena-artwork-methods.lua','local sf2=require("sf2")\nsf2.world.|');
+    await until(async()=>{const found=labels(await request('textDocument/completion',arenaWorld));return ['set_marker_rect','set_marker_sprite'].every(name=>found.some(n=>n.startsWith(name)));},'artwork updates completion');
+    const wrongArena=open('arena-sprite-type.lua','local sf2=require("sf2")\nsf2.behaviors.register{id="x",on_tick=function(_,fighter) fighter:mark_sprite(sf2.assets.model("models/body"),{x=0,y=0,width=1,height=1}) end}');
+    await until(()=>diagnostics.get(decodeURIComponent(wrongArena).toLowerCase())?.some(d=>d.code==='param-type-mismatch'),'arena sprite rejects a model handle');
+    console.log('PASS: arena artwork update/frame completion and sprite handle type safety');
     const arenaText=fs.readFileSync(path.resolve(__dirname,'../../../Mods/example.pulse-arena/scripts/main.lua'),'utf8');
     const arenaUri=open('pulse-arena.lua',arenaText+'\nsf2.price.coins("bad")\n');const arenaKey=decodeURIComponent(arenaUri).toLowerCase();
     await until(()=>diagnostics.get(arenaKey)?.some(d=>d.code==='param-type-mismatch'),'arena diagnostic publication');

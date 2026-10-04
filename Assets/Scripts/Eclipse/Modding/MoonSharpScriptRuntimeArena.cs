@@ -23,6 +23,18 @@ namespace Eclipse.Modding
                     if (args[1].Type != DataType.String) throw new ModContentException("Marker color must be #RRGGBB or #RRGGBBAA.");
                     return DynValue.NewBoolean(marker.SetColor(new ModUiColor(args[1].String)));
                 })));
+                world.Set("set_marker_rect", DynValue.NewCallback((ctx, args) => ApiCall("sf2.world.set_marker_rect", () =>
+                {
+                    var marker = Marker(args, 2);
+                    bool changed = marker.TrySetRect(ArenaRect(args[1]), out var error);
+                    return DynValue.NewTuple(DynValue.NewBoolean(changed), error == null ? DynValue.Nil : DynValue.NewString(error));
+                })));
+                world.Set("set_marker_sprite", DynValue.NewCallback((ctx, args) => ApiCall("sf2.world.set_marker_sprite", () =>
+                {
+                    var marker = Marker(args, 2);
+                    bool changed = marker.TrySetSprite(ArenaSprite(args[1]), out var error);
+                    return DynValue.NewTuple(DynValue.NewBoolean(changed), error == null ? DynValue.Nil : DynValue.NewString(error));
+                })));
                 root.Set("world", DynValue.NewTable(world));
             }
             private ModArenaMarkerInstance Marker(CallbackArguments args, int count)
@@ -31,6 +43,12 @@ namespace Eclipse.Modding
                 if (args.Count != count || args[0].Type != DataType.Table || !_markerHandles.TryGetValue(args[0].Table, out var marker))
                     throw new ModContentException("Expected an arena marker owned by this script and exactly " + count + " arguments.");
                 return marker;
+            }
+            private AssetId ArenaSprite(DynValue value)
+            {
+                if (value.Type != DataType.Table || !_spriteHandles.TryGetValue(value.Table, out var sprite))
+                    throw new ModContentException("Arena artwork requires a sprite handle from this script context.");
+                return sprite;
             }
             private ModArenaRect ArenaRect(DynValue value)
             {
@@ -58,7 +76,7 @@ namespace Eclipse.Modding
                     return DynValue.NewTuple(DynValue.Nil, DynValue.NewString(error ?? "Arena geometry is unavailable."));
                 return DynValue.NewTuple(DynValue.NewBoolean(overlaps), DynValue.Nil);
             }
-            private DynValue MarkRect(CallbackArguments args, Table handle, IModFighterOperations fighter, ModEffectEvent kind, bool active)
+            private DynValue MarkRect(CallbackArguments args, Table handle, IModFighterOperations fighter, ModEffectEvent kind, bool active, bool spriteArtwork = false)
             {
                 if (!active) throw new ScriptRuntimeException("Fighter operations have expired.");
                 _api.RequireCapability("presentation.visuals");
@@ -67,11 +85,17 @@ namespace Eclipse.Modding
                 if (_uiCloseDepth != 0 || kind == ModEffectEvent.FightBegin || kind == ModEffectEvent.RoundBegin || kind == ModEffectEvent.RoundEnd || kind == ModEffectEvent.FightEnd)
                     throw new ModContentException("Arena markers require an active simulation callback outside cleanup.");
                 int offset = args[0].Type == DataType.Table && args[0].Table == handle ? 1 : 0;
-                if (args.Count - offset < 1 || args.Count - offset > 2) throw new ModContentException("mark_rect requires a rectangle and optional color.");
+                int required = spriteArtwork ? 2 : 1;
+                if (args.Count - offset < required || args.Count - offset > required + 1)
+                    throw new ModContentException(spriteArtwork ? "mark_sprite requires a sprite handle, rectangle and optional color." : "mark_rect requires a rectangle and optional color.");
+                AssetId sprite = spriteArtwork ? ArenaSprite(args[offset++]) : default(AssetId);
                 var rect = ArenaRect(args[offset]); var color = args[offset + 1];
                 if (!color.IsNil() && color.Type != DataType.String) throw new ModContentException("Marker color must be #RRGGBB or #RRGGBBAA.");
-                if (!_arenaMarkers.TryCreate(fighter as IModFighterRegions, rect, new ModUiColor(color.IsNil() ? "#ffcc3366" : color.String), out var marker, out var error))
-                    return DynValue.NewTuple(DynValue.Nil, DynValue.NewString(error));
+                var tint = new ModUiColor(color.IsNil() ? (spriteArtwork ? "#ffffffff" : "#ffcc3366") : color.String);
+                ModArenaMarkerInstance marker; string error;
+                bool created = spriteArtwork ? _arenaMarkers.TryCreateSprite(fighter as IModFighterArtwork, sprite, rect, tint, out marker, out error)
+                    : _arenaMarkers.TryCreate(fighter as IModFighterRegions, rect, tint, out marker, out error);
+                if (!created) return DynValue.NewTuple(DynValue.Nil, DynValue.NewString(error));
                 var table = new Table(_script); _markerHandles.Add(table, marker);
                 return DynValue.NewTuple(DynValue.NewTable(table), DynValue.Nil);
             }

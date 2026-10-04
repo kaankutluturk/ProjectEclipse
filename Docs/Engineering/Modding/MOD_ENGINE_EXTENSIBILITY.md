@@ -626,6 +626,20 @@ or the Minecraft-style objective. Solid/swept physics, arbitrary actors, general
 camera controls, all-arena/form and exported-platform acceptance remain open.
 See the creator work log and public arena reference for source and limits.
 
+## Moving sprite artwork delivered
+
+The arena marker contract now supports typed sprite creation and live geometry/
+sprite updates. Markers share the existing script/session limits and round
+lifetime; ordinary Lua supplies motion and frame selection. Pulse Arena uses
+original four-frame atlas crops, a bounded sinusoidal sweep, synchronized sensor
+geometry and pause-following warning/active/recovery timing. This advances E6
+presentation and hazard composition without raw renderer/texture access.
+
+See [ARENA_ARTWORK_ACCEPTANCE.md](ARENA_ARTWORK_ACCEPTANCE.md) for source contracts,
+629 managed checks, native 110-check acceptance, captured warning/active art and
+editor/wiki verification. Arbitrary physics, camera/depth ownership, all arenas,
+platform exports and aggregate performance remain open.
+
 ## Creator projectile ability delivered
 
 Arc Dart composes existing typed content, queued fighter playback, scheduled

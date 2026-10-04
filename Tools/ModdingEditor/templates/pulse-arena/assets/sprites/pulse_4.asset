@@ -1,0 +1,6 @@
+type=sprite
+texture=textures/pulse.png
+rect=[0, 768, 256, 256]
+filter="bilinear"
+wrap="clamp"
+mipmaps=false

@@ -1,5 +1,10 @@
 # Character and animation tools
 
+`BuildPulseArenaArtwork.py --output Temp/PulseArtwork/assets` generates the
+original four-frame atlas and cropped sprite descriptors used by Pulse Arena.
+It needs only Python standard-library modules. Live sprite animation and motion
+are Lua behavior; see the arena API and native acceptance runner.
+
 `BuildAuthoredFighterExample.py` reproducibly authors the original point strike
 and connected weighted sash in `Mods/example.authored-fighter` from its owned
 body XML. It uses the existing baker/binary writer, preserves the standard 67

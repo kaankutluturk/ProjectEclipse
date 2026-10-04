@@ -151,7 +151,8 @@ arena units. Positive X is right; positive Y is down. Optional Z defaults to 0.
 Each axis must be finite in −1000..1000. Capacity includes queued births:
 **4 actors per mod across both main fighters, 8 per fight**. Rejections settle
 as failed receipts; malformed Lua arguments throw. A failed birth never becomes
-a live query result. Owner/session/body/round changes cancel pending births.
+a live query result. Unsupported owner replacement, session loss and round changes cancel pending births.
+Supported main-fighter form changes transfer pending birth ownership.
 
 ## fighter:actors
 

@@ -2530,6 +2530,26 @@ local world = {}
 ---@class Eclipse.Module_zones
 local zones = {}
 
+---Move/resize existing rectangle or sprite art without replacing the marker, resetting its lifetime or changing its tint/sprite. Update the rectangle passed to `overlaps_rect` separately if a hazard should follow the art.
+---Requires: `presentation.visuals`; a marker created by this script context.
+---When: After creation in the owning script's runtime callbacks. Use `on_tick` for movement that follows combat pause. A closed marker cannot restart.
+---Returns: `true, nil` on success, `false, nil` for a closed marker, or `false, error` if the native backend cannot update it. Invalid rectangles, forged/foreign handles and extra arguments raise a Lua error.
+---[Full reference](https://dawc17.github.io/ProjectEclipse/api/arena/#sf2worldset_marker_rect)
+---@param marker Eclipse.ArenaMarkerHandle
+---@param rectangle Eclipse.ArenaRect
+---@return boolean, string|nil
+function world.set_marker_rect(marker, rectangle) end
+
+---Switch owned art to a typed sprite while retaining rectangle, tint and lifetime. Works on sprite markers or converts a filled rectangle to sprite art. Lua owns the frame sequence and timing; imported sprite layouts/textures are not modified.
+---Requires: `presentation.visuals`; marker and sprite handles from this script context. Obtain sprite handles during registration.
+---When: After creation in the owning script's runtime callbacks. Frame changes from `on_tick` follow combat pause; UI callbacks may change art while paused. Failed sprite loading keeps the prior art and cannot reopen a closed marker.
+---Returns: `true, nil` on success, `false, nil` for a closed marker, or `false, error` for an unavailable/unsupported native sprite/backend. Invalid sprite types, forged/foreign handles and extra arguments raise a Lua error.
+---[Full reference](https://dawc17.github.io/ProjectEclipse/api/arena/#sf2worldset_marker_sprite)
+---@param marker Eclipse.ArenaMarkerHandle
+---@param sprite Eclipse.SpriteHandle
+---@return boolean, string|nil
+function world.set_marker_sprite(marker, sprite) end
+
 ---Release owned arena art. Repeated removal is safe.
 ---Requires: `presentation.visuals`; a marker created by this script context.
 ---When: After creation, including round/fight cleanup callbacks. Automatic round/script cleanup still runs if the mod forgets to remove a marker.
@@ -2780,7 +2800,7 @@ function price.coins(amount) end
 ---@return Eclipse.PriceHandle
 function price.gems(amount) end
 
----Get a sprite handle for an item icon, achievement, location image, battle preview or opponent portrait.
+---Get a sprite handle for an item icon, achievement, location image, battle preview, opponent portrait or live arena artwork.
 ---Requires: No capability; cross-mod references require a dependency.
 ---When: Usually during registration, before passing the handle to a definition.
 ---Returns: A sprite handle. Missing assets and assets of another type raise errors.
@@ -4299,7 +4319,18 @@ function Fighter:overlaps_rect(rectangle) end
 ---@return boolean|nil, string|nil
 function Opponent:overlaps_rect(rectangle) end
 
----Create an owned filled rectangle in the arena. The art stays fixed as fighters move. Keep the returned marker for later recoloring or removal.
+---Create owned sprite art in arena coordinates. Sprite and rectangle markers share ownership, lifetime and the 16-per-script/64-session capacity.
+---Requires: `presentation.visuals`; a sprite handle obtained in this script with `sf2.assets.sprite`, including assets visible through declared dependencies.
+---When: An active simulation callback, such as `on_tick`, after registration. Creation is forbidden during fight/round begin/end and UI cleanup. The fighter callable expires at callback exit; the marker lasts until removal or teardown.
+---Returns: `ArenaMarkerHandle, nil`, or `nil, error` for unavailable host/round/transform/shader/sprite or exhausted capacity. The default tint is opaque white `#ffffffff`. Invalid handles, fields or argument counts raise an error.
+---[Full reference](https://dawc17.github.io/ProjectEclipse/api/arena/#fightermark_sprite)
+---@param sprite Eclipse.SpriteHandle
+---@param rectangle Eclipse.ArenaRect
+---@param color string?
+---@return Eclipse.ArenaMarkerHandle|nil, string|nil
+function Fighter:mark_sprite(sprite, rectangle, color) end
+
+---Create an owned filled rectangle in the arena. The art stays fixed as fighters move unless you update it. Keep the marker for geometry, sprite, color updates or removal.
 ---Requires: `presentation.visuals`.
 ---When: During an active simulation callback, such as `on_tick`. Fight/round begin and end callbacks, registration and UI cleanup cannot create markers. The marker lasts through the current round, including pause; the fighter callable expires at callback exit. The handle may be kept until the marker closes.
 ---Returns: `ArenaMarkerHandle, nil` on creation, or `nil, error` for an unavailable host/round/render transform/shader or exhausted marker budget. The default color is translucent yellow `#ffcc3366`.
