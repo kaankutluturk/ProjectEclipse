@@ -40,6 +40,7 @@ across launches. Disabling a mod retains its saved progress.
 ## Content and reference
 
 - [Repulse Trial](example.repulse/README.md) demonstrates a Lua movement ability using queued fighter displacement.
+- [Scripted Burst Trial](example.scripted-burst/README.md) queues three native projectiles directly from Lua and guides owned references.
 - [Active Strike Trial](example.active-strike/README.md) starts an authored move through a Lua HUD ability and observes its playback receipt.
 - [Audio Lab](example.audio-lab/README.md) plays an original beacon through owned sound instances, with volume, stop and game/real pause clocks.
 - [Chiaroscuro](chiaroscuro/README.md) is the cinematic visuals mod kept here.

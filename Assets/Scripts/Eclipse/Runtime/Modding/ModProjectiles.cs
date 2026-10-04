@@ -60,4 +60,60 @@ namespace Eclipse.Modding
     {
         bool TryGetProjectiles(ModId owner, out IReadOnlyList<IModProjectile> projectiles, out string error);
     }
+
+    public interface IModFighterProjectileSpawning
+    {
+        bool TrySpawnProjectile(ModId owner, DefinitionId definition, double x, double y, double z,
+            Action<string, string> complete, out string error);
+    }
+
+    public sealed class ProjectileDefinition
+    {
+        public DefinitionId Id { get; }
+        public ModMoveProjectile Specification { get; }
+        public ProjectileDefinition(DefinitionId id, ModMoveProjectile specification)
+        {
+            if (id.Category != "projectiles" || specification == null || !specification.StartMove.HasValue)
+                throw new ModContentException("A registered projectile requires a projectiles ID and explicit start_move.");
+            Id = id; Specification = specification;
+        }
+    }
+
+    public sealed partial class ModContentCatalog
+    {
+        private readonly DefinitionRegistry<ProjectileDefinition> _projectileDefinitions =
+            new DefinitionRegistry<ProjectileDefinition>(value => value.Id);
+        public IReadOnlyList<ProjectileDefinition> Projectiles => _projectileDefinitions.Values;
+        public bool TryGetProjectile(DefinitionId id, out ProjectileDefinition definition) => _projectileDefinitions.TryGet(id, out definition);
+        internal void ValidateProjectiles(ProjectileDefinition[] definitions) => _projectileDefinitions.ValidateCanAdd(definitions);
+        internal void AddProjectiles(ProjectileDefinition[] definitions) => _projectileDefinitions.AddRange(definitions);
+    }
+
+    public sealed partial class ModRegistrationTransaction
+    {
+        private readonly Dictionary<DefinitionId, ProjectileDefinition> _pendingProjectiles = new Dictionary<DefinitionId, ProjectileDefinition>();
+        public ProjectileDefinition RegisterProjectile(string localId, ModMoveProjectile specification)
+        {
+            ThrowIfCompleted();
+            var id = Qualify("projectiles", localId);
+            var definition = new ProjectileDefinition(id, specification);
+            AddP1D(_pendingProjectiles, id, definition);
+            return definition;
+        }
+        private void ValidateProjectileCommit()
+        {
+            _catalog.ValidateProjectiles(SortedValues(_pendingProjectiles));
+            foreach (var definition in _pendingProjectiles.Values) ValidateProjectileReferences(definition.Specification);
+        }
+        private void ApplyProjectileCommit() => _catalog.AddProjectiles(SortedValues(_pendingProjectiles));
+    }
+
+    public sealed partial class ModApiFacade
+    {
+        public ProjectileDefinition RegisterProjectile(string localId, ModMoveProjectile specification)
+        {
+            RequireCapability("content.register");
+            return RequireRegistration().RegisterProjectile(localId, specification);
+        }
+    }
 }

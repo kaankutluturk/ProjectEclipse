@@ -118,6 +118,12 @@ exports.run = async function () {
         }
         assert(projectileFound,'Callback-scoped projectile completion missing');
         passed.push('PASS: owned projectile snapshot/movement/removal completion from fighter query');
+        const spawnUri=vscode.Uri.joinPath(folder.uri,'scripts','spawn-completion.lua');
+        fs.writeFileSync(spawnUri.fsPath,'local sf2=require("sf2")\nlocal flight=sf2.moves.register{id="flight",animation="animations/flight"}\nlocal dart=sf2.projectiles.register{id="dart",name="dart",core_skeleton="SkeletonMissile",start_move=flight,copy_parent_type="Weapon"}\nsf2.behaviors.register{id="spawn",on_tick=function(_,fighter)\n local receipt=fighter:spawn_projectile(dart,0,0)\n local value=receipt.\nend}');
+        const spawnDoc=await vscode.workspace.openTextDocument(spawnUri);const spawnPosition=spawnDoc.positionAt(spawnDoc.getText().indexOf('receipt.\n')+8);
+        let spawnFound=false;const spawnDeadline=Date.now()+30000;
+        while(Date.now()<spawnDeadline){const result=await vscode.commands.executeCommand('vscode.executeCompletionItemProvider',spawnUri,spawnPosition);if(['status','error','projectile_id'].every(key=>result?.items.some(item=>String(typeof item.label==='string'?item.label:item.label.label).startsWith(key)))){spawnFound=true;break;}await new Promise(resolve=>setTimeout(resolve,500));}
+        assert(spawnFound,'Direct projectile spawn receipt completion missing');passed.push('PASS: direct projectile spawn receipt completion');
         const attackUri=vscode.Uri.joinPath(folder.uri,'scripts','attack-completion.lua');
         fs.writeFileSync(attackUri.fsPath,'local sf2=require("sf2")\nsf2.behaviors.register {id="attack",on_damage_dealt=function(_,fighter,event)\n local attack=event.attack;if attack then local value=attack. end\nend}');
         const attackDoc=await vscode.workspace.openTextDocument(attackUri);

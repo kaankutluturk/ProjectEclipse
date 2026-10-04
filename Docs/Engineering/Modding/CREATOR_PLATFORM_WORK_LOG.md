@@ -1052,3 +1052,101 @@ reflection loader warnings, unrelated Unity Search/preview warnings and the wiki
 contacts, expiry/miss notifications, swept collision, all arenas/forms, physical
 input/export and independent creator acceptance remain open. G01-G14/E1-E8 and
 the broad Minecraft-style objective remain active.
+
+
+## 2026-10-04 — reusable projectiles and direct procedural spawning
+
+This turn adds a complete direct-spawn slice rather than treating native weapon
+children as general fighters. `sf2.projectiles.register` supplies an owned,
+transactional definition (rig, equipment, explicit start move, bounded lifetime).
+`fighter:spawn_projectile(definition, x, y, z?)` queues a callback-scoped command
+and supplies a retainable queued/applied/failed receipt. Applied receipts carry a
+copied ID matching live queries/contact provenance. Ordinary Lua creates patterns;
+no arithmetic/operation DSL, raw-model access or downstream DE policy is added.
+
+Source: ModProjectiles adds the shared immutable definition, catalog/registration
+and pure spawning interface. ModContentP1D reuses projectile reference validation,
+counts definitions in the transaction limit and commits/clears them atomically.
+ModSaveData adds a sorted definition block only when nonempty, preserving older
+content fingerprints for catalogs without this feature. Live children/receipts
+are ephemeral. ModScripting and Fight's operation wrapper forward the command;
+MoonSharpScriptRuntimeProjectiles owns genuine definition handles, registration,
+argument/capability/timing checks and receipt updates. There is no opponent method
+or lookup exposing another mod's definitions.
+
+FightProjectiles queues with round/session/owner/root guards and shared 16/mod,
+64/fight reservations, including both root fighters and timeline spawns.
+Fight materializes after collisions and before native animation selection, then
+initializes after native birth. LegacyContentAdapterP1D shares the existing item,
+rig, owner/lifetime/start-move projection between timeline and direct creation.
+ModRuntime forwards to the installed adapter. Model exposes whether explicit
+birth playback actually started; legacy fallback remains available but does not
+produce a falsely applied direct receipt. Creation-listener exceptions after
+registration are retired even when the factory never returns a model.
+
+Native acceptance found two important placement facts. WeaponModel first-keyframe
+render precedes cached-center refresh; a zero native translation refreshes it.
+The native constraint solver can change that center slightly after translation.
+Birth corrects residual translation in at most four passes and accepts only
+within .05 native units per axis; impossible/nonfinite placement fails and retires
+the child. Coordinates mean weighted center of mass at application, not a floor,
+pivot, hand or request-time point. Subsequent animation can move this observation.
+Birth first-frame actions occur before final offset placement; this limitation is
+publicly documented. Ownership attaches before create listeners, and initializing
+children do not appear in Lua queries. TTL begins at successful initialization.
+
+Scripted Burst is a complete manifest/flight binary/Lua/HUD example and mirrored
+editor starter. Lua computes three offsets, correlates receipt IDs with reacquired
+references, guides native contacts, counts only owned hits and accepts partial
+bursts with an explicit cooldown. It does not request main-fighter playback.
+Public projectile/ability/editor/example docs, editor schema/generated contracts
+and relevant starter/diagnostic/completion tests update in this change. Coverage
+is 234 public bindings, 74 constants and 287 typed structures.
+
+Verification:
+
+- 557 production MoonSharp/full queue/tracker checks with controlled native
+  models pass: genuine handles, arguments, capabilities, callback expiry/timing,
+  deferred creation, initialization visibility, receipts, bounded constraint
+  correction/failure, shared reservations across roots and global slots,
+  creation-listener exceptions, TTL/pause, cancellation, content fingerprint and
+  transactional reference failure. The actual Scripted Burst source registers
+  against imported canonical items/stages and runs its HUD, three-child receipts,
+  Lua motion, source counter, cooldown, partial burst and round/fight reset.
+  This harness controls native geometry, clock and contact events.
+- Unity 6.6 Campaign/core Tournament 3 passes 45 native checks. The fixture adds
+  a private direct three-child probe after two shipped Return Dart casts. It
+  observes three applied IDs, real rig/equipment/rendering, 60-unit spacing,
+  equal vertical placement, exactly two caster starts, native contact health
+  .9836771 -> .9673543 and live-child surrender retirement. Earlier cast contact,
+  eight copied-source notifications, pause, cooldown and out/return remain passing.
+  Placement postconditions run at the actual birth boundary. Final log:
+  Temp/FighterPlaybackUnity-d997a2c104cd4564b9767ae6eb4b68d8/validation-e1f29793eed9447e97d646db4065f949.log.
+  Inputs/AI/spacing and fresh post-tutorial save identity are controlled. The
+  complete Scripted Burst HUD was exercised in the managed harness, separately
+  from this native probe; no arbitrary loadout/mode acceptance is implied.
+- All four managed assemblies compile using ignored matching Unity 6.6 Windows
+  reference remapping. Fighter playback regression passes 492 checks. Native XML/
+  projectile-parser regression passes 211 assertions across 136 attack intervals;
+  scheduled-event batching passes five checks. The optional combined
+  TestMoveProjectiles chain could not run its automatic root-project rebuild:
+  exported csprojs still reference unavailable Linux analyzer paths. This is not
+  presented as a passing combined suite; remapped compilation and the above
+  parser/native scenarios have separate evidence.
+- Editor generate/check/build and 53 unit tests pass. Actual LuaLS completes the
+  registration and receipt and checks the entire Scripted Burst source with no
+  diagnostics; all previous integration checks pass. Real VS Code passes 17
+  checks including direct receipt completion. Wiki types/build/search and 6435
+  links/assets across 61 pages pass; the existing duplicate-404 warning remains.
+
+Initial native probes exposed asynchronous all-side fixture assertions, retained
+ended-animation names, cached birth centers and constraint residuals; checks and
+production positioning were corrected. Interrupted isolated scene recovery was
+preserved under ignored fixture directories. No root scene/save, serialized
+assets, metas or confirmed deobfuscation maps were changed. Existing standalone
+MoonSharp reflection-loader and unrelated Unity preview/Search warnings remain.
+
+This advances programmable child spawning and E2/E8 acceptance. Independent
+health/AI/team actors, original custom rigs, miss/expiry notifications, solid/swept
+world physics, broader arena/form/loadout, physical input/export and independent
+creator acceptance remain open. G01-G14/E1-E8 and the broad objective stay active.

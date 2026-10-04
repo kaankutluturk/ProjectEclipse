@@ -10,7 +10,7 @@ const fn = (name, params, returns = 'nil', capability = 'content.register', opti
 };
 const reg = (name, shape, result, capability) => fn(name, { definition: E(shape) }, result ? H(result) : 'nil', capability);
 const lookup = (name, result) => fn(name, { reference: 'string' }, H(result));
-for (const name of ['Sprite','Model','Audio','Binary','Localization','Item','Price','Perk','Behavior','Zone','Battle','WarriorTemplate','Warrior','Reward','Fight','Rule','Quest','ItemSet','ForgeProfile','ForgeRecipe','Location','MoveTemplate','Move','Trigger','Tactic','Counter','Setting']) {
+for (const name of ['Sprite','Model','Audio','Binary','Localization','Item','Price','Perk','Behavior','Zone','Battle','WarriorTemplate','Warrior','Reward','Fight','Rule','Quest','ItemSet','ForgeProfile','ForgeRecipe','Location','MoveTemplate','Move','Trigger','Tactic','Counter','Setting','ProjectileDefinition']) {
     type(`${name}Handle`, { [`private __eclipse${name}`]: 'true' });
 }
 for (const name of ['Weapon','Armor','Helm','Ranged','Magic','Consumable','Free','Seal']) type(`${name}Handle`, {}, 'ItemHandle');
@@ -83,6 +83,7 @@ const fighterMethods = {
     remove_damage_shield:{params:{key:'string'},capability:'combat.effects'},
     set_control_blocked:{params:{control:enumOf('punch','kick','ranged','magic','raid_charge'),blocked:'boolean'},capability:'combat.effects'},
     move_by:{params:{x:'number',y:'number',z:'number?'},returns:'boolean, string|nil',capability:'combat.motion'},
+    spawn_projectile:{params:{definition:H('ProjectileDefinition'),x:'number',y:'number',z:'number?'},returns:E('ProjectileSpawnRequest'),capability:'combat.projectiles'},
     projectiles:{params:{},returns:E('Projectile')+'[]|nil, string|nil',capability:'combat.projectiles'},
     play_move:{params:{move:H('Move')},returns:E('PlayMoveRequest'),capability:'combat.animation'},
     end_round:{params:{outcome:enumOf('win','loss')},returns:'boolean, string|nil',capability:'combat.round_outcome'},
@@ -93,6 +94,9 @@ const fighterMethods = {
     clear_status_icon:{params:{key:'string'},capability:'combat.effects'},
 };
 type('FormRequest',{status:enumOf('queued','applied','failed'),'error?':'string'});
+type('ProjectileSpawnRequest',{status:enumOf('queued','applied','failed'),'projectile_id?':'string','error?':'string'});
+type('ProjectileDefinition',{id:'string',name:'string',core_skeleton:'string',start_move:H('Move'),'item?':H('Item'),'copy_parent_type?':enumOf('Weapon','Ranged','Magic'),'lifetime_frames?':['integer','1-600, default 180; starts after native birth initialization.']});
+reg('projectiles.register','ProjectileDefinition','ProjectileDefinition');
 type('PlayMoveRequest',{status:enumOf('queued','applied','failed'),'error?':'string'});
 const equipment = { id:'string', display_name:H('Localization'), icon:H('Sprite'), model:H('Model') };
 const initialStatFields = {Weapon:['weapon_damage'],Armor:['body_defense','head_defense','unarmed_damage'],Helm:['head_defense'],Ranged:['ranged_damage','weapon_damage'],Magic:['magic_damage']};

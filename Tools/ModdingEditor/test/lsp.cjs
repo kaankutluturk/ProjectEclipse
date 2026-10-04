@@ -232,6 +232,16 @@ async function main() {
     notify('textDocument/didChange',{textDocument:{uri:returnUri,version:2},contentChanges:[{text:returnText}]});
     try { await until(()=>diagnostics.has(returnKey)&&diagnostics.get(returnKey).length===0,'clean return dart diagnostics'); } catch(error) { console.error(JSON.stringify(diagnostics.get(returnKey))); throw error; }
     console.log('PASS: complete Return Dart callback-scoped projectile trajectory script');
+    const spawnFields=probe('projectile-definition.lua','local sf2=require("sf2")\nsf2.projectiles.register { | }');
+    await until(async()=>{const found=labels(await request('textDocument/completion',spawnFields));return ['id','name','core_skeleton','item','copy_parent_type','start_move','lifetime_frames'].every(key=>found.some(label=>label.replace(/\?$/,'')===key));},'registered projectile definition fields');
+    const spawnReceipt=probe('projectile-spawn.lua','local sf2=require("sf2")\nlocal flight=sf2.moves.register{id="flight",animation="animations/flight"}\nlocal dart=sf2.projectiles.register{id="dart",name="dart",core_skeleton="SkeletonMissile",start_move=flight,copy_parent_type="Weapon"}\nsf2.behaviors.register{id="spawn",on_tick=function(_,fighter)\n local result=fighter:spawn_projectile(dart,0,0)\n local value=result.|\nend}');
+    await until(async()=>{const found=labels(await request('textDocument/completion',spawnReceipt));return ['status','projectile_id','error'].every(key=>found.some(label=>label.replace(/\?$/,'')===key));},'projectile spawn receipt fields');
+    const burstText=fs.readFileSync(path.resolve(__dirname,'../../../Mods/example.scripted-burst/scripts/main.lua'),'utf8');
+    const burstUri=open('scripted-burst.lua',burstText+'\nsf2.price.coins("bad")\n');const burstKey=decodeURIComponent(burstUri).toLowerCase();
+    await until(()=>diagnostics.get(burstKey)?.some(d=>d.code==='param-type-mismatch'),'scripted burst diagnostic publication');
+    notify('textDocument/didChange',{textDocument:{uri:burstUri,version:2},contentChanges:[{text:burstText}]});
+    try { await until(()=>diagnostics.has(burstKey)&&diagnostics.get(burstKey).length===0,'clean scripted burst diagnostics'); } catch(error) { console.error(JSON.stringify(diagnostics.get(burstKey))); throw error; }
+    console.log('PASS: projectile registration/receipt completion and complete Scripted Burst source');
     const arenaOptions=probe('arena-options.lua','local sf2=require("sf2")\nsf2.behaviors.register {id="x",on_tick=function(_,fighter)\n fighter:mark_rect { | }\nend}');
     await until(async()=>{const found=labels(await request('textDocument/completion',arenaOptions));return ['x','y','width','height'].every(key=>found.some(n=>n.startsWith(key)));},'arena rectangle fields');
     const arenaTarget=probe('arena-target.lua','local sf2=require("sf2")\nsf2.behaviors.register {id="x",on_tick=function(_,fighter)\n fighter.opponent:|\nend}');

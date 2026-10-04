@@ -457,18 +457,7 @@ namespace Eclipse.Modding
                 }
                 if (action.Projectile != null)
                 {
-                    var projectile = action.Projectile;
-                    Set(entry, "Name", projectile.Name);
-                    Set(entry, "EclipseProjectileOwner", owner.Value);
-                    Set(entry, "EclipseProjectileLifetime", projectile.LifetimeFrames.ToString(CultureInfo.InvariantCulture));
-                    string start = projectile.StartMove.HasValue ? MoveRuntimeName(projectile.StartMove.Value) : projectile.CoreStartAnimation;
-                    if (start.Length != 0) Set(entry, "StartAnimation", start);
-                    var skeleton = document.CreateElement("Item"); Set(skeleton, "Type", "Skeleton");
-                    Set(skeleton, "Name", projectile.CoreSkeleton); entry.AppendChild(skeleton);
-                    var weapon = document.CreateElement("Item"); Set(weapon, "Type", "Weapon");
-                    if (projectile.Item.HasValue) Set(weapon, "Name", LegacyItemName(projectile.Item.Value));
-                    else Set(weapon, "CopyParentType", projectile.CopyParentType);
-                    entry.AppendChild(weapon);
+                    AppendProjectileSpecification(document, entry, action.Projectile, owner);
                 }
                 foreach (var created in action.CreatedItems)
                 {
@@ -514,6 +503,33 @@ namespace Eclipse.Modding
                     var sound = document.CreateElement("Sound"); Set(sound, "Name", name); entry.AppendChild(sound);
                 }
             }
+        }
+
+        private void AppendProjectileSpecification(XmlDocument document, XmlElement entry, ModMoveProjectile projectile, ModId owner)
+        {
+            Set(entry, "Name", projectile.Name);
+            Set(entry, "EclipseProjectileOwner", owner.Value);
+            Set(entry, "EclipseProjectileLifetime", projectile.LifetimeFrames.ToString(CultureInfo.InvariantCulture));
+            string start = projectile.StartMove.HasValue ? MoveRuntimeName(projectile.StartMove.Value) : projectile.CoreStartAnimation;
+            if (start.Length != 0) Set(entry, "StartAnimation", start);
+            var skeleton = document.CreateElement("Item"); Set(skeleton, "Type", "Skeleton");
+            Set(skeleton, "Name", projectile.CoreSkeleton); entry.AppendChild(skeleton);
+            var weapon = document.CreateElement("Item"); Set(weapon, "Type", "Weapon");
+            if (projectile.Item.HasValue) Set(weapon, "Name", LegacyItemName(projectile.Item.Value));
+            else Set(weapon, "CopyParentType", projectile.CopyParentType);
+            entry.AppendChild(weapon);
+        }
+
+        internal WeaponModel SpawnProjectile(Model parent, ProjectileDefinition definition)
+        {
+            var document = new XmlDocument();
+            var entry = document.CreateElement("CreatePlayer");
+            AppendProjectileSpecification(document, entry, definition.Specification, definition.Id.Namespace);
+            var items = new List<CopyItemInfo>();
+            foreach (XmlElement item in entry.ChildNodes)
+                items.Add(new CopyItemInfo(item, item.GetAttribute("CopyParentType"), item.GetAttribute("CopyParentSubtype")));
+            return parent.SpawnWeaponModel(items, entry.GetAttribute("Name"), entry.GetAttribute("StartAnimation"),
+                definition.Id.Namespace.Value, definition.Specification.LifetimeFrames);
         }
 
         private static XmlElement BuildMovePoint(XmlDocument document,string name,ModMovePoint point)

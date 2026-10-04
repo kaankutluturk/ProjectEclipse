@@ -63,6 +63,19 @@ their help and docstrings for required inputs and execution behavior.
 
 ## PowerShell entry points
 
+`Combat/TestProjectiles.ps1` compiles the production Lua bindings and complete
+projectile queue/tracker with controlled native models. It covers reusable
+registered definitions, direct spawn receipts/placement, shared timeline/queued
+capacity, constraints and cancellation, and the actual Scripted Burst HUD/source,
+receipt-ID trajectory, partial bursts, cooldown and next-round reset.
+`Combat/TestReturnDartUnity.ps1` also adds a private direct three-child probe to
+its isolated shipped Return Dart scenario: applied IDs, native birth/rendering,
+spacing, no extra caster start, actual contact and live-child surrender cleanup.
+Use a marked existing fixture only inside repository Temp. Inputs, AI, spacing
+and fresh post-tutorial profiles are controlled; this native probe and the managed
+complete Scripted Burst scenario have different scopes. Arbitrary actors/rigs,
+all loadouts/modes, physical input and exports are separate acceptance work.
+
 `Combat/TestArcDartUnity.ps1` boots an isolated full-game Unity project/profile
 with only Arc Dart enabled. The native HUD casts an owned launch/flight graph
 through typed projectile actions: actual rig/item, rendering, travel, contact,

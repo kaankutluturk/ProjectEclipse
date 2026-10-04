@@ -20,6 +20,8 @@ public static class ReturnDartUnity
     static int phase, checks, castFrame, pauseFrame;
     static bool campaign, entered, captured;
     static Model dart;
+    static bool directApplied;
+    static int casterStarts;
     static Fight acceptedFight;
     static float before, launchX, pauseX, travel, peak, targetX;
     static bool reversed;
@@ -45,11 +47,14 @@ public static class ReturnDartUnity
         if (patchAt < 0) throw new Exception("Shipped example patch block missing.");
         File.WriteAllText(probeScript, shippedScript.Substring(0,patchAt) + @"
 -- Native acceptance-only provenance probe; the runner copies the shipped mod afresh.
-local known = {}
+local known, darts_seen = {}, {}
+local burst = sf2.projectiles.register { id = 'direct_burst', name = sf2.mod.id .. '.burst',
+    core_skeleton = 'SkeletonMissile', item = dart_item, start_move = flight, lifetime_frames = 120 }
+local requests, sent
 local function inspect(_, fighter, event)
     local attack = event.attack
     if not attack or attack.kind ~= 'projectile' then return end
-    assert(attack.projectile_owner == sf2.mod.id and attack.model_name == sf2.mod.id .. '.dart')
+    assert(attack.projectile_owner == sf2.mod.id and (attack.model_name == sf2.mod.id .. '.dart' or attack.model_name == sf2.mod.id .. '.burst'))
     assert(attack.animation_name == sf2.mod.id .. ':moves/flight')
     assert(known[attack.projectile_id], 'Contact ID does not match a previously observed live child')
     assert(attack.point and attack.point.x == attack.point.x and attack.point.y == attack.point.y and attack.point.z == attack.point.z)
@@ -60,7 +65,26 @@ end
 local probe = sf2.behaviors.register {
     id = 'source_probe', on_tick = function(_, fighter)
         local list = fighter:projectiles()
-        if list then for _, child in ipairs(list) do local view = child:snapshot(); if view then known[view.id] = true end end end
+        local darts, seen_count = 0, 0
+        if list then for _, child in ipairs(list) do local view = child:snapshot(); if view then
+            known[view.id] = true
+            if view.name == sf2.mod.id .. '.dart' then darts = darts + 1; darts_seen[view.id] = true end
+        end end end
+        for _ in pairs(darts_seen) do seen_count = seen_count + 1 end
+        if fighter.side == 'player' and seen_count == 2 and darts == 0 and not sent then
+            requests = {}; sent = true
+            for i=1,3 do requests[i] = fighter:spawn_projectile(burst, (i-1)*60, 0) end
+            for _, request in ipairs(requests) do assert(request.status == 'queued') end
+            sf2.log.info('DIRECT-PROBE:queued')
+        elseif requests and fighter.side == 'player' then
+            for _, request in ipairs(requests) do
+                assert(request.status == 'applied' and request.projectile_id and known[request.projectile_id], request.error)
+            end
+            sf2.log.info('DIRECT-PROBE:applied'); requests = nil
+        end
+    end,
+    on_animation_start = function(_, fighter, event)
+        if fighter.side == 'player' and event.target == 'self' and event.animation_name == sf2.mod.id .. ':moves/cast' then sf2.log.info('CAST-PROBE') end
     end,
     on_hit_post_crit = inspect, on_post_hit = inspect,
     on_damage_dealing = inspect, on_damage_resolving = inspect,
@@ -84,6 +108,7 @@ end
     static object Field(object value, string name) => value.GetType().GetField(name, Hidden | BindingFlags.Public).GetValue(value);
     static void Check(bool value, string message) { checks++; if (!value) throw new Exception(message); }
     static Model[] Darts(Fight fight) => ((IEnumerable)Field(fight, "LNDLFINJHDB")).Cast<Model>().Concat(((IEnumerable)Field(fight, "HCPGFOCGDAA")).Cast<Model>()).Where(m => m.get_Name() == Actor).ToArray();
+    static Model[] Bursts(Fight fight) => ((IEnumerable)Field(fight,"LNDLFINJHDB")).Cast<Model>().Concat(((IEnumerable)Field(fight,"HCPGFOCGDAA")).Cast<Model>()).Where(m=>m.get_Name()=="example.return-dart.burst").ToArray();
     static void Next() { phase++; phaseAt = EditorApplication.timeSinceStartup; }
     static void Click()
     {
@@ -127,7 +152,7 @@ end
                 Check(((IDictionary)Field(acceptedFight,"_eclipseProjectiles")).Count == 0, "Surrender retained owned references");
                 Check(dart.GetRenderObject() == null || !dart.GetRenderObject().activeInHierarchy, "Surrender retained live child rendering");
                 Check(ModRuntime.Scripts.CallbackDiagnostics.RecentFailures.Count == 0, "Lua callback failures");
-                File.WriteAllText(Path.Combine(Path.GetDirectoryName(Application.dataPath), "return-dart-result.txt"), "PASS: " + checks + " full-game native Return Dart checks; typed owned cast/child flight, item/rig/rendering, native travel/contact damage/attribution, pause, hit deletion, Lua out-and-return trajectory, cooldown and live-child surrender cleanup. Controls/AI/spacing and fresh post-tutorial profile controlled.");
+                File.WriteAllText(Path.Combine(Path.GetDirectoryName(Application.dataPath), "return-dart-result.txt"), "PASS: " + checks + " full-game native Return Dart checks; typed owned cast/child flight, item/rig/rendering, native travel/contact damage/attribution, pause, hit deletion, Lua out-and-return trajectory, cooldown, direct queued three-child burst initialization/placement/receipts without caster playback, native burst contact damage and live-child surrender cleanup. Controls/AI/spacing and fresh post-tutorial profile controlled.");
                 Debug.Log("[ReturnDartUnity] PASS: " + checks + " full-game checks"); Finish(0); return;
             }
             var fight = Fight.GetCurrentFight(); if (fight == null || fight.get_FightTimeInFrames() < 100) return;
@@ -192,19 +217,29 @@ end
                     Check(reversed && peak > 150, "Lua trajectory did not travel out and return");
                     Check(frame > castFrame && frame - castFrame < 120, "Returned projectile cleanup unbounded");
                     Check(Math.Abs(enemy.KKMCHCNOHMB() - before) < .00001, "Miss caused health damage");
-                    Check(surface.Read("counts").Text == "Flights: 2 | Hits: 1", "Miss counted as hit");
+                    Check(surface.Read("counts").Text.EndsWith(" | Hits: 1",StringComparison.Ordinal), "Miss counted as hit");
                     Debug.Log("[ReturnDartUnity] Miss turned and returned: outward=" + peak);
                     Next(); break;
                 case 7:
-                    if (!surface.Read("cast").Enabled) return;
-                    pos = player.PLBNCDCFPML(); other = enemy.PLBNCDCFPML();
-                    enemy.ShiftModelPosition(new Vector3f(pos.GetX()+500-other.GetX(),0,0),true);
-                    Click(); Next(); break;
+                    var bursts=Bursts(fight);if(bursts.Length!=3||!directApplied)return;
+                    Check(casterStarts==2,"Direct spawn restarted the caster animation");
+                    var ordered=bursts.OrderBy(m=>m.PLBNCDCFPML().GetX()).ToArray();
+                    Check(ordered.All(m=>m is WeaponModel&&m.ExplicitBirthAnimationStarted&&m.GetCurrentAnimation()?.Name==Flight&&m.GetRenderObject().activeInHierarchy),"Direct burst did not initialize/render native children");
+                    Check(Math.Abs(ordered[1].PLBNCDCFPML().GetX()-ordered[0].PLBNCDCFPML().GetX()-60)<1&&Math.Abs(ordered[2].PLBNCDCFPML().GetX()-ordered[1].PLBNCDCFPML().GetX()-60)<1,"Direct spawn offsets not preserved");
+                    Check(ordered.All(m=>Math.Abs(m.PLBNCDCFPML().GetY()-ordered[0].PLBNCDCFPML().GetY())<1),"Direct burst vertical positions diverged");
+                    Debug.Log("[ReturnDartUnity] Direct current geometry centers: playerY="+player.PLBNCDCFPML().GetY()+"; childY="+ordered[0].PLBNCDCFPML().GetY());
+                    before=enemy.KKMCHCNOHMB();targetX=ordered[0].PLBNCDCFPML().GetX()-220;
+                    enemy.ShiftModelPosition(new Vector3f(targetX-enemy.PLBNCDCFPML().GetX(),0,0),true);
+                    Debug.Log("[ReturnDartUnity] Direct burst: three applied receipts and initialized native actors without caster playback");
+                    Next();break;
                 case 8:
-                    if (Darts(fight).Length == 0) return;
-                    dart = Darts(fight).Single(); acceptedFight = fight;
-                    typeof(Fight).GetMethod("HCNDAFDHACI", Hidden).Invoke(fight, new object[] { GameOverTypes.GAME_OVER_SURRENDER });
-                    Check(surface.IsClosed, "Surrender retained HUD"); Next(); break;
+                    if(enemy.KKMCHCNOHMB()>=before){enemy.ShiftModelPosition(new Vector3f(targetX-enemy.PLBNCDCFPML().GetX(),0,0),true);return;}
+                    Check(Bursts(fight).Length>0,"Direct burst left no live child for teardown proof");
+                    Check(ModRuntime.Scripts.CallbackDiagnostics.RecentFailures.Count==0,"Direct spawn callback failures");
+                    dart=Bursts(fight)[0];acceptedFight=fight;
+                    Debug.Log("[ReturnDartUnity] Direct native contact damage: "+before+" -> "+enemy.KKMCHCNOHMB());
+                    typeof(Fight).GetMethod("HCNDAFDHACI", Hidden).Invoke(fight,new object[]{GameOverTypes.GAME_OVER_SURRENDER});
+                    Check(surface.IsClosed,"Surrender retained HUD");Next();break;
 
             }
         }
@@ -221,7 +256,7 @@ end
         return null;
     }
     public static void Captured() { captured = true; }
-    static void Log(string message, string stack, LogType type) { int probe = message.IndexOf("SOURCE-PROBE:",StringComparison.Ordinal); if(probe>=0)sourceEvents.Add(message.Substring(probe+13).Trim()); if (entered && type == LogType.Exception && (stack.Contains("Fight.") || stack.Contains("Model.") || stack.Contains("Modding"))) combatException = message + "\n" + stack; }
+    static void Log(string message, string stack, LogType type) { if(message.Contains("Tick failed for rule example.return-dart:rules/source_probe"))combatException=message; if(message.Contains("DIRECT-PROBE:applied"))directApplied=true;if(message.Contains("CAST-PROBE"))casterStarts++; int probe = message.IndexOf("SOURCE-PROBE:",StringComparison.Ordinal); if(probe>=0)sourceEvents.Add(message.Substring(probe+13).Trim()); if (entered && type == LogType.Exception && (stack.Contains("Fight.") || stack.Contains("Model.") || stack.Contains("Modding"))) combatException = message + "\n" + stack; }
     static void Finish(int code) { SessionState.SetBool(Active, false); EditorApplication.update -= Update; Application.logMessageReceived -= Log; EditorApplication.Exit(code); }
 }
 public sealed class ReturnDartCapture : MonoBehaviour

@@ -1237,7 +1237,7 @@ namespace Eclipse.Modding
         private readonly Dictionary<DefinitionId, MoveTriggerDefinition> _p1dMoveTriggers = new Dictionary<DefinitionId, MoveTriggerDefinition>();
         private readonly Dictionary<DefinitionId, TacticDefinition> _p1dTactics = new Dictionary<DefinitionId, TacticDefinition>();
 
-        private int P1DRegistrationCount => _p1dLocales.Count + _p1dLocations.Count + _p1dMoveTemplates.Count +
+        private int P1DRegistrationCount => _pendingProjectiles.Count + _p1dLocales.Count + _p1dLocations.Count + _p1dMoveTemplates.Count +
             _p1dMoves.Count + _p1dMoveTriggers.Count + _p1dTactics.Count + MovePerkLockRegistrationCount + _moveItemLockExtensions.Count + _moveCombatPatches.Count;
 
         public LocaleMetadataDefinition RegisterLocaleMetadata(string localId, string name, string locale, string alias,
@@ -1362,6 +1362,7 @@ namespace Eclipse.Modding
             TacticDefinition[] tactics = SortedValues(_p1dTactics);
             _catalog.ValidateP1DCanAdd(locales, locations, templates, moves, triggers, tactics);
             ValidateMovePerkLockCommit();
+            ValidateProjectileCommit();
             _catalog.ValidateItemLockExtensions(_moveItemLockExtensions);
             _catalog.ValidateCombatPatches(_moveCombatPatches);
             foreach (var patch in _moveCombatPatches) ValidateMovePerkRefs(patch.Conditions);
@@ -1382,6 +1383,7 @@ namespace Eclipse.Modding
             _catalog.AddP1D(SortedValues(_p1dLocales), SortedValues(_p1dLocations), SortedValues(_p1dMoveTemplates),
                 SortedValues(_p1dMoves), SortedValues(_p1dMoveTriggers), SortedValues(_p1dTactics));
             ApplyMovePerkLockCommit();
+            ApplyProjectileCommit();
             _catalog.AddItemLockExtensions(_moveItemLockExtensions);
             _catalog.AddCombatPatches(_moveCombatPatches);
         }
@@ -1391,8 +1393,27 @@ namespace Eclipse.Modding
             _p1dLocales.Clear(); _p1dLocations.Clear(); _p1dMoveTemplates.Clear(); _p1dMoves.Clear();
             _p1dMoveTriggers.Clear(); _p1dTactics.Clear();
             ClearMovePerkLockPending();
+            _pendingProjectiles.Clear();
             _moveItemLockExtensions.Clear();
             _moveCombatPatches.Clear();
+        }
+
+        private void ValidateProjectileReferences(ModMoveProjectile projectile)
+        {
+            if (projectile.Item.HasValue)
+            {
+                var item = projectile.Item.Value;
+                if (!CanReferenceNamespace(item.Namespace) ||
+                    (!TryGetPendingItem(item, out ItemDefinition pendingItem) && !_catalog.TryResolveItem(item, out pendingItem)))
+                    throw new ModContentException("Projectile references missing or inaccessible item: " + item);
+                if (!(pendingItem is WeaponDefinition) && !(pendingItem is RangedDefinition) && !(pendingItem is MagicDefinition))
+                    throw new ModContentException("Projectile item requires weapon, ranged or magic equipment: " + item);
+            }
+            if (!projectile.StartMove.HasValue) return;
+            var id = projectile.StartMove.Value;
+            if (!CanReferenceNamespace(id.Namespace) ||
+                (!_p1dMoves.ContainsKey(id) && !_catalog.TryGetMove(id, out MoveDefinition ignored)))
+                throw new ModContentException("Projectile references missing or inaccessible start_move: " + id);
         }
 
         private void ValidateTemplateRefs(MoveNodeDefinition node)
@@ -1400,23 +1421,7 @@ namespace Eclipse.Modding
             if (node.Graph.Presentation.Profile?.DisplayName != null)
                 GetLocalization(node.Graph.Presentation.Profile.DisplayName.Value.ToString());
             foreach (var action in node.Graph.Presentation.Actions)
-            {
-                if (action.Projectile == null) continue;
-                if (action.Projectile.Item.HasValue)
-                {
-                    var item = action.Projectile.Item.Value;
-                    if (!CanReferenceNamespace(item.Namespace) ||
-                        (!TryGetPendingItem(item, out ItemDefinition pendingItem) && !_catalog.TryResolveItem(item, out pendingItem)))
-                        throw new ModContentException("Projectile references missing or inaccessible item: " + item);
-                    if (!(pendingItem is WeaponDefinition) && !(pendingItem is RangedDefinition) && !(pendingItem is MagicDefinition))
-                        throw new ModContentException("Projectile item requires weapon, ranged or magic equipment: " + item);
-                }
-                if (!action.Projectile.StartMove.HasValue) continue;
-                var id = action.Projectile.StartMove.Value;
-                if (!CanReferenceNamespace(id.Namespace) ||
-                    (!_p1dMoves.ContainsKey(id) && !_catalog.TryGetMove(id, out MoveDefinition ignored)))
-                    throw new ModContentException("Projectile references missing or inaccessible start_move: " + id);
-            }
+                if (action.Projectile != null) ValidateProjectileReferences(action.Projectile);
             foreach (var interval in node.Intervals)
             {
                 if (interval.Attack?.HitMove == null) continue;

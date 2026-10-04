@@ -1066,7 +1066,7 @@ namespace Eclipse.Modding
         IModFighterOperations Opponent { get; }
     }
 
-    public sealed class ModInstanceFighter : IModFighterOperations, IModDamageEventSource, IModBehaviorInstanceSource, IModFighterTargets, IModIncomingHitSource, IModFighterEffects, IModCombatSnapshotSource, IModCombatActivitySource, IModFighterForms, IModFighterStatusIcons, IModAnimationLifecycleSource, IModFighterFlags, IModFighterControls, IModRoundOutcomes, IModFighterMotion, IModFighterPlayback, IModFighterRegions, IModFighterProjectiles
+    public sealed class ModInstanceFighter : IModFighterOperations, IModDamageEventSource, IModBehaviorInstanceSource, IModFighterTargets, IModIncomingHitSource, IModFighterEffects, IModCombatSnapshotSource, IModCombatActivitySource, IModFighterForms, IModFighterStatusIcons, IModAnimationLifecycleSource, IModFighterFlags, IModFighterControls, IModRoundOutcomes, IModFighterMotion, IModFighterPlayback, IModFighterRegions, IModFighterProjectiles, IModFighterProjectileSpawning
     {
         private readonly IModFighterOperations _inner;
         private readonly FightRuleDefinition _outcomeRule;
@@ -1123,6 +1123,13 @@ namespace Eclipse.Modding
             if (_inner is IModFighterMotion motion) return motion.TryMoveBy(x, y, z, out error);
             error = "Fighter motion is unavailable."; return false;
         }
+        public bool TrySpawnProjectile(ModId owner, DefinitionId definition, double x, double y, double z,
+            Action<string, string> complete, out string error)
+        {
+            if (_inner is IModFighterProjectileSpawning spawning) return spawning.TrySpawnProjectile(owner, definition, x, y, z, complete, out error);
+            error = "Projectile spawning is unavailable."; return false;
+        }
+
         public bool TryGetProjectiles(ModId owner, out IReadOnlyList<IModProjectile> projectiles, out string error)
         {
             if (_inner is IModFighterProjectiles provider) return provider.TryGetProjectiles(owner, out projectiles, out error);

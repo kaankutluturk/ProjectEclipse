@@ -2,6 +2,16 @@
 
 Last broad reconciliation: 2026-09-12. Scope remains **G01–G14 plus E1–E8**.
 
+2026-10-04 procedural child spawning: owned projectile definitions can now be
+spawned directly from Lua through queued commands and applied/failed ID receipts,
+without a caster move. Shared capacity includes pending and timeline children;
+native birth placement, contact and retirement pass a controlled 45-check Campaign
+scenario. The complete Scripted Burst example additionally has actual Lua/HUD,
+partial-burst/cooldown/reset and editor acceptance. This advances E2/E8; these
+remain native child weapons, not independent health/AI/team actors. Original rigs,
+general world/swept physics, wider arena/forms/input/export and creator acceptance
+remain open. See the creator work log for source changes and verification limits.
+
 2026-10-04 contact provenance: native hit, damage, block and critical callbacks
 now carry optional copied attack-source observations: actual actor/contact move,
 hit point and tracked typed projectile ID/owner. Return Dart counts only its own

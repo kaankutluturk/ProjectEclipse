@@ -655,3 +655,21 @@ returns callback-scoped `Projectile` references with typed `snapshot()`,
 `move_by(x, y, z?)` and `remove()` returns. `lifetime_frames` is 1..600, default 180.
 Store copied IDs/positions and reacquire references each callback. Ordinary Lua
 turns the trajectory after 28 guided ticks; native attack edges handle contact.
+
+
+### Direct projectile patterns
+
+The `scripted-burst` starter registers `sf2.projectiles.register` with explicit
+rig, equipment and `start_move`, then calls
+`fighter:spawn_projectile(definition, x, y, z?)` inside `on_tick`.
+Offsets are finite world-axis values within -1000..1000, relative to the fighter
+at application, with positive Y down. Queues reserve shared 16/mod, 64/fight
+capacity. A receipt becomes applied after native birth and positioning,
+supplying a copied `projectile_id`; reacquire its callback-scoped live reference
+with `fighter:projectiles()`. Requests can fail independently; partial bursts
+are supported. Registration needs `content.register`; spawning needs
+`combat.projectiles`, without requesting a caster animation. See the
+[projectile reference](https://dawc17.github.io/ProjectEclipse/api/projectiles/).
+Completion covers definitions, owned handles, commands and receipts. Timing
+diagnostics reject fight/round begin/end calls. Controlled native acceptance
+and editor validation have different scopes; arbitrary rigs are not proven.

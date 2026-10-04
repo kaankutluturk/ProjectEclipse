@@ -25,6 +25,7 @@ namespace Eclipse.Modding
                 _moveHandles.Clear();
                 _moveTriggerHandles.Clear();
                 _tacticHandles.Clear();
+                _projectileDefinitionHandles.Clear();
             }
 
             private void AddP1DModules(Table root)
@@ -45,6 +46,8 @@ namespace Eclipse.Modding
                 locations.Set("selected_dojo", DynValue.NewCallback(SelectedDojo));
                 locations.Set("dojo_picker", DynValue.NewCallback(DojoPicker));
                 root.Set("locations", DynValue.NewTable(locations));
+
+                AddProjectileModule(root);
 
                 var moves = new Table(_script);
                 moves.Set("ANIMATION_END", DynValue.NewString("animation_end"));

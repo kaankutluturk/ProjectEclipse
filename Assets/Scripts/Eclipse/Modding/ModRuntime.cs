@@ -9,6 +9,12 @@ namespace Eclipse.Modding
 {
     public static partial class ModRuntime
     {
+        internal static Model SpawnProjectile(Model parent, ProjectileDefinition definition)
+        {
+            if (_legacyContent == null) throw new InvalidOperationException("Native mod content is unavailable.");
+            return _legacyContent.SpawnProjectile(parent, definition);
+        }
+
         private static ModHost _host;
         private static ModScriptSession _scripts;
         private static LegacyContentAdapter _legacyContent;

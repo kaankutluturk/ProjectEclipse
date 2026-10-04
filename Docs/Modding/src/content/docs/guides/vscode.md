@@ -204,3 +204,9 @@ returns callback-scoped `Projectile` references with typed `snapshot()`,
 `move_by(x, y, z?)` and `remove()` returns. `lifetime_frames` is 1..600, default 180.
 Store copied IDs/positions and reacquire references each callback. Ordinary Lua
 turns the trajectory after 28 guided ticks; native attack edges handle contact.
+
+
+The **Scripted Burst** starter uses `sf2.projectiles.register` and
+`fighter:spawn_projectile` for procedural native projectile patterns. Completion
+covers the definition, owned handle and `status`, `projectile_id`, `error` receipt
+fields. See [Live projectiles](../../api/projectiles/) for timing and ownership.

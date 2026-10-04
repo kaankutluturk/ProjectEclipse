@@ -199,6 +199,8 @@ namespace Eclipse.Modding
                     }
                     if (fighter != null)
                     {
+                        fighterTable.Set("spawn_projectile", DynValue.NewCallback((ctx, args) =>
+                            SpawnFighterProjectile(args, fighterTable, fighter, effectEvent, () => invocationActive)));
                         fighterTable.Set("projectiles", DynValue.NewCallback((ctx, args) =>
                             GetFighterProjectiles(args, fighterTable, fighter, effectEvent, () => invocationActive, projectileQueryBudget)));
                         fighterTable.Set("overlaps_rect", DynValue.NewCallback((ctx, args) =>

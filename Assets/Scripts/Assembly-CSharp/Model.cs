@@ -3730,9 +3730,12 @@ public class Model : global::EventDispatcher<object>
 		return gKIANLDJFCH;
 	}
 
+    public bool ExplicitBirthAnimationStarted { get; private set; }
+
 	public void SetExplicitBirthAnimation(string animationName)
 	{
 		_ExplicitBirthAnimation = animationName;
+        ExplicitBirthAnimationStarted = false;
 	}
 
 	public bool HasExplicitBirthAnimation()
@@ -3768,6 +3771,7 @@ public class Model : global::EventDispatcher<object>
 			return false;
 		}
 		bool started = PlayAnimation(animation);
+        ExplicitBirthAnimationStarted = started;
 		Debug.Log("[MagicTrace] explicit-start actor=" + get_Name() +
 			" animation=" + animationName + " started=" + started +
 			" items=" + GetMagicTraceItems());

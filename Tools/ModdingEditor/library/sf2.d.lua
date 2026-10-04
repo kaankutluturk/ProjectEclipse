@@ -111,6 +111,10 @@ local CounterHandle = {}
 ---@field private __eclipseSetting true
 local SettingHandle = {}
 
+---@class (exact) Eclipse.ProjectileDefinitionHandle
+---@field private __eclipseProjectileDefinition true
+local ProjectileDefinitionHandle = {}
+
 ---@class (exact) Eclipse.WeaponHandle: Eclipse.ItemHandle
 local WeaponHandle = {}
 
@@ -378,6 +382,22 @@ local OutgoingFighter = {}
 ---@field status "queued"|"applied"|"failed"
 ---@field error? string
 local FormRequest = {}
+
+---@class (exact) Eclipse.ProjectileSpawnRequest
+---@field status "queued"|"applied"|"failed"
+---@field projectile_id? string
+---@field error? string
+local ProjectileSpawnRequest = {}
+
+---@class (exact) Eclipse.ProjectileDefinition
+---@field id string
+---@field name string
+---@field core_skeleton string
+---@field start_move Eclipse.MoveHandle
+---@field item? Eclipse.ItemHandle
+---@field copy_parent_type? "Weapon"|"Ranged"|"Magic"
+---@field lifetime_frames? integer 1-600, default 180; starts after native birth initialization.
+local ProjectileDefinition = {}
 
 ---@class (exact) Eclipse.PlayMoveRequest
 ---@field status "queued"|"applied"|"failed"
@@ -2386,6 +2406,9 @@ local profile = {}
 ---@class Eclipse.Module_progression
 local progression = {}
 
+---@class Eclipse.Module_projectiles
+local projectiles = {}
+
 ---@class Eclipse.Module_quests
 local quests = {}
 
@@ -2543,6 +2566,15 @@ function extensions.call(extension, request) end
 ---@param request table<string,number|boolean|string>
 ---@return table<string,number|boolean|string>|nil, string|nil
 function extensions.try_call(extension, request) end
+
+---Declare a reusable native child-weapon definition. Ordinary Lua decides when, where and how often to spawn it; a main-fighter cast move is optional.
+---Requires: `content.register`. Spawning separately needs `combat.projectiles`.
+---When: Mod startup, before registration commits. Required: local `id`, native actor `name`, `core_skeleton`, a registered `start_move`, and exactly one of `item` or `copy_parent_type`. Optional `lifetime_frames` defaults to 180.
+---Returns: An opaque projectile **definition handle**, owned by this mod. This reusable recipe is distinct from a callback-scoped live projectile reference. Invalid fields, duplicate IDs or missing/inaccessible references fail transactional registration; a failed mod adds no definitions.
+---[Full reference](https://dawc17.github.io/ProjectEclipse/api/projectiles/#sf2projectilesregister)
+---@param definition Eclipse.ProjectileDefinition
+---@return Eclipse.ProjectileDefinitionHandle
+function projectiles.register(definition) end
 
 ---Create a new weapon definition owned by your mod.
 ---Requires: `content.register` and dependencies for referenced content.
@@ -4288,9 +4320,21 @@ function Fighter:move_by(x, y, z) end
 ---@return boolean, string|nil
 function Opponent:move_by(x, y, z) end
 
+---Queue one native child from a definition registered by this mod.
+---Requires: `combat.projectiles`. Register the definition with `content.register`. No `combat.animation` is needed, and spawning does not request a caster move.
+---When: Active simulation callbacks such as `on_tick`, on the callback's own main fighter. Offsets are relative to its weighted native center of mass at **application**, not request time. They use world axes: positive Y points down; X is not automatically mirrored. Omitted/nil Z is zero. Creation runs after native collisions and before animation selection. Native birth starts the move, then the entire rig and running keyframes are positioned before the first collision pass on the next step. Native constraints that prevent placement fail the receipt; subsequent animation can move the weighted center even with zero declared velocity. Applied means initialization/positioning succeeded, not that the child hit anything or remains alive later.
+---Returns: A retainable receipt with `status = "queued"`, `"applied"` or `"failed"`. Success supplies string `projectile_id`, matching the child's snapshot and copied attack source; failure supplies string `error` and no ID. A queued receipt is not a live handle or proof of birth. Invalid handles/types, nonfinite offsets, offsets outside -1000..1000 per axis or expired callback references raise an error. Host/eligibility/capacity rejection immediately fails the receipt.
+---[Full reference](https://dawc17.github.io/ProjectEclipse/api/projectiles/#fighterspawn_projectile)
+---@param definition Eclipse.ProjectileDefinitionHandle
+---@param x number
+---@param y number
+---@param z number?
+---@return Eclipse.ProjectileSpawnRequest
+function Fighter:spawn_projectile(definition, x, y, z) end
+
 ---Query this mod's live typed projectiles for the callback's fighter.
 ---Requires: `combat.projectiles`.
----When: Active simulation callbacks, including `on_tick`. Removing children are excluded. Reads see native state before queued commands apply.
+---When: Active simulation callbacks, including `on_tick`. Removing and still-initializing direct children are excluded. Reads see native state before queued commands apply.
 ---Returns: A dense array in spawn order and `nil`, or `nil, error` when the host is unavailable/ineligible. An empty array means no live owned children. At most 32 queries per callback; exceeding that limit raises an error.
 ---[Full reference](https://dawc17.github.io/ProjectEclipse/api/projectiles/#fighterprojectiles)
 ---@return Eclipse.Projectile[]|nil, string|nil
@@ -4394,4 +4438,4 @@ function Projectile:move_by(x, y, z) end
 ---@return boolean, string|nil
 function Projectile:remove() end
 
-return { achievements = achievements, assets = assets, audio = audio, battles = battles, behaviors = behaviors, counters = counters, enchantments = enchantments, events = events, extensions = extensions, fights = fights, forge = forge, fx = fx, items = items, itemsets = itemsets, locales = locales, localization = localization, locations = locations, log = log, mod = mod, modes = modes, moves = moves, perks = perks, price = price, profile = profile, progression = progression, quests = quests, raids = raids, random = random, rewards = rewards, rules = rules, scenes = scenes, services = services, settings = settings, shop = shop, state = state, story = story, tactics = tactics, timers = timers, ui = ui, underworld = underworld, visuals = visuals, warriors = warriors, world = world, zones = zones }
+return { achievements = achievements, assets = assets, audio = audio, battles = battles, behaviors = behaviors, counters = counters, enchantments = enchantments, events = events, extensions = extensions, fights = fights, forge = forge, fx = fx, items = items, itemsets = itemsets, locales = locales, localization = localization, locations = locations, log = log, mod = mod, modes = modes, moves = moves, perks = perks, price = price, profile = profile, progression = progression, projectiles = projectiles, quests = quests, raids = raids, random = random, rewards = rewards, rules = rules, scenes = scenes, services = services, settings = settings, shop = shop, state = state, story = story, tactics = tactics, timers = timers, ui = ui, underworld = underworld, visuals = visuals, warriors = warriors, world = world, zones = zones }

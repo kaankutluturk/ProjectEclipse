@@ -8,6 +8,17 @@ const { createMod } = require('../src/scaffold.cjs');
 const template = path.resolve(__dirname, '../templates/weapon');
 const header = 'local sf2 = require("sf2")\n';
 
+test('scripted burst starter mirrors assets and validates direct projectile commands',async()=>{
+    const directory=path.resolve(__dirname,'../../../Mods/example.scripted-burst');
+    const mod=await p.indexMod(directory);const text=await fs.readFile(path.join(directory,'scripts/main.lua'),'utf8');
+    assert.deepEqual(mod.issues,[]);assert.deepEqual(p.analyze(text,mod).issues,[]);
+    for(const file of ['mod.toml','README.md','scripts/main.lua','assets/animations/shuriken_fly.bytes'])
+        assert.deepEqual(await fs.readFile(path.resolve(__dirname,'../templates/scripted-burst',file)),await fs.readFile(path.join(directory,file)));
+    assert(p.analyze(text,{...mod,data:{...mod.data,capabilities:mod.data.capabilities.filter(c=>c!=='combat.projectiles')}}).issues.some(i=>i.capability==='combat.projectiles'));
+    const lifecycle='local sf2=require("sf2");sf2.behaviors.register{id="test",on_round_end=function(_,fighter) fighter:spawn_projectile({},0,0) end}';
+    assert(p.analyze(lifecycle,mod).issues.some(i=>i.code==='callback-timing'&&i.message.includes('spawn_projectile')));
+});
+
 test('return dart starter validates owned projectile graph and mirrors complete assets',async()=>{
     const directory=path.resolve(__dirname,'../../../Mods/example.return-dart');
     const mod=await p.indexMod(directory);const text=await fs.readFile(path.join(directory,'scripts/main.lua'),'utf8');

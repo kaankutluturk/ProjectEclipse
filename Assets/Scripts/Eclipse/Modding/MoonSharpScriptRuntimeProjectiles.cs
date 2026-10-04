@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using MoonSharp.Interpreter;
 
 namespace Eclipse.Modding
@@ -7,6 +8,58 @@ namespace Eclipse.Modding
     {
         private sealed partial class MoonSharpScriptContext
         {
+            private readonly Dictionary<Table, DefinitionId> _projectileDefinitionHandles = new Dictionary<Table, DefinitionId>();
+            private void AddProjectileModule(Table root)
+            {
+                var projectiles = new Table(_script);
+                projectiles.Set("register", DynValue.NewCallback((ctx, args) =>
+                {
+                    const string function = "sf2.projectiles.register";
+                    var spec = args.AsType(0, function, DataType.Table, false).Table;
+                    return ApiCall(function, () =>
+                    {
+                        if (args.Count != 1) throw new ModContentException("Projectile registration expects exactly one definition table.");
+                        ValidateFields(spec, function, "id", "name", "core_skeleton", "item", "copy_parent_type", "start_move", "lifetime_frames");
+                        var definition = _api.RegisterProjectile(RequiredString(spec, "id", function),
+                            new ModMoveProjectile(RequiredString(spec, "name", function), RequiredString(spec, "core_skeleton", function),
+                                spec.Get("copy_parent_type").IsNil() ? null : RequiredString(spec, "copy_parent_type", function),
+                                startMove: RequiredHandle(spec, "start_move", _moveHandles, "move", function),
+                                item: spec.Get("item").IsNil() ? (DefinitionId?)null : RequiredHandle(spec, "item", _itemHandles, "item", function),
+                                lifetimeFrames: spec.Get("lifetime_frames").IsNil() ? ModProjectileLimits.DefaultLifetimeFrames : RequiredInt(spec, "lifetime_frames", function)));
+                        return NewHandle(_projectileDefinitionHandles, definition.Id);
+                    });
+                }));
+                root.Set("projectiles", DynValue.NewTable(projectiles));
+            }
+
+            private DynValue SpawnFighterProjectile(CallbackArguments args, Table fighterTable,
+                IModFighterOperations fighter, ModEffectEvent kind, Func<bool> active)
+            {
+                CheckProjectileCallback(kind, active);
+                int offset = args[0].Type == DataType.Table && args[0].Table == fighterTable ? 1 : 0;
+                int count = args.Count - offset;
+                if (count < 3 || count > 4 || args[offset].Type != DataType.Table ||
+                    !_projectileDefinitionHandles.TryGetValue(args[offset].Table, out var definition) ||
+                    args[offset + 1].Type != DataType.Number || args[offset + 2].Type != DataType.Number ||
+                    count == 4 && !args[offset + 3].IsNil() && args[offset + 3].Type != DataType.Number)
+                    throw new ScriptRuntimeException("spawn_projectile expects an owned projectile definition handle, numeric x, y and optional z offsets.");
+                double x = args[offset + 1].Number, y = args[offset + 2].Number,
+                    z = count == 4 && !args[offset + 3].IsNil() ? args[offset + 3].Number : 0;
+                if (!ModFighterMotionLimits.IsValid(x, y, z))
+                    throw new ScriptRuntimeException("Projectile spawn offset must be finite and within -1000..1000 per axis.");
+                var receipt = new Table(_script);
+                receipt.Set("status", DynValue.NewString("queued"));
+                void Complete(string id, string error)
+                {
+                    receipt.Set("status", DynValue.NewString(id != null ? "applied" : "failed"));
+                    receipt.Set("projectile_id", id == null ? DynValue.Nil : DynValue.NewString(id));
+                    receipt.Set("error", id != null ? DynValue.Nil : DynValue.NewString(error ?? "Projectile spawn failed."));
+                }
+                if (!(fighter is IModFighterProjectileSpawning spawning)) Complete(null, "Projectile spawning is unavailable.");
+                else if (!spawning.TrySpawnProjectile(_api.Mod.Id, definition, x, y, z, Complete, out var failure)) Complete(null, failure);
+                return DynValue.NewTable(receipt);
+            }
+
             private Table AttackSourceTable(ModAttackSource source)
             {
                 var attack = new Table(_script);

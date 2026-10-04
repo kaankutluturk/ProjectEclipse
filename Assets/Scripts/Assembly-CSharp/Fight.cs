@@ -491,7 +491,7 @@ public partial class Fight
 		public int OGOLNFLBLBD;
 	}
 
-		private sealed class EclipseFighterOperations : IModFighterOperations, IModDamageEventSource, IModFighterTargets, IModIncomingHitSource, IModFighterEffects, IModCombatSnapshotSource, IModCombatActivitySource, IModFighterForms, IModFighterStatusIcons, IModAnimationLifecycleSource, IModFighterFlags, IModFighterControls, IModRoundOutcomes, IModFighterMotion, IModFighterPlayback, IModFighterRegions, IModFighterProjectiles
+		private sealed class EclipseFighterOperations : IModFighterOperations, IModDamageEventSource, IModFighterTargets, IModIncomingHitSource, IModFighterEffects, IModCombatSnapshotSource, IModCombatActivitySource, IModFighterForms, IModFighterStatusIcons, IModAnimationLifecycleSource, IModFighterFlags, IModFighterControls, IModRoundOutcomes, IModFighterMotion, IModFighterPlayback, IModFighterRegions, IModFighterProjectiles, IModFighterProjectileSpawning
 	{
 		private readonly Fight _fight;
 		private readonly Model _model;
@@ -514,6 +514,13 @@ public partial class Fight
                 () => GetCurrentFight() == _fight && _fight.round.processing && _fight.round.round == roundNumber &&
                     !_fight._eclipseFightEndDispatched && _fight._eclipseEndedRound != roundNumber,
                 () => _fight.GetPlayerModel()?.GetRenderObject()?.transform, out marker, out error);
+        }
+
+        public bool TrySpawnProjectile(ModId owner, DefinitionId definition, double x, double y, double z,
+            Action<string, string> complete, out string error)
+        {
+            if (_fight == null) { error = "Fight is unavailable."; return false; }
+            return _fight.TryQueueEclipseProjectileSpawn(_model, owner, definition, x, y, z, complete, out error);
         }
 
         public bool TryGetProjectiles(ModId owner, out IReadOnlyList<IModProjectile> projectiles, out string error)
@@ -1859,7 +1866,9 @@ public partial class Fight
 			}
 		}
 		IGLLNGNGPOA();
+        ApplyEclipseProjectileSpawns();
 		_SelectAnimation.Render();
+        InitializeEclipseProjectileBirths();
 		EPBDEDGLHJE.PAHPCIFKDEA();
 		if (MKCLBJEIIHN)
 		{

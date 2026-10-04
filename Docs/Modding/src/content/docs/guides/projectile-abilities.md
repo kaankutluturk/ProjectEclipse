@@ -153,3 +153,20 @@ and surrender with a live child. Inputs, AI and target spacing were controlled.
 Managed tests separately check ownership, TTL, capacity and callback-reference
 expiry. Native safety expiry under script failure, all arenas, physical input
 and exported players still need broader acceptance.
+
+
+## Create a pattern directly in Lua
+
+[Scripted Burst](https://github.com/dawc17/ProjectEclipse/tree/main/Mods/example.scripted-burst)
+queues three native children from `sf2.projectiles.register` without a caster
+move. Its `on_tick` computes offsets, retains receipt IDs, reacquires live
+references and supplies motion. Each spawn can independently fail; the sample
+logs errors and keeps the cooldown for partial bursts.
+
+Register a compatible flight move first, then a definition with `name`,
+`core_skeleton`, `start_move`, an `item` (or `copy_parent_type`) and optional
+`lifetime_frames`. Call `fighter:spawn_projectile(definition, x, y, z?)` during
+active simulation callbacks. [Live projectiles](../../api/projectiles/) explains
+coordinate timing, shared capacity, receipts and birth/action limits. Managed
+and editor validation of the example and controlled native acceptance have
+different scopes; neither proves general summons with health, AI or teams.

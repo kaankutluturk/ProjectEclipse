@@ -1067,6 +1067,21 @@ namespace Eclipse.Modding
 
         private static void AppendP1D(StringBuilder canonical, ModContentCatalog content)
         {
+            // Omit the new block when empty: existing content fingerprints remain stable.
+            if (content.Projectiles.Count != 0)
+            {
+                var projectiles = new List<ProjectileDefinition>(content.Projectiles);
+                projectiles.Sort((left, right) => CompareIds(left.Id, right.Id));
+                Append(canonical, "registered-projectiles-v1"); Append(canonical, projectiles.Count);
+                foreach (var definition in projectiles)
+                {
+                    var spec = definition.Specification;
+                    Append(canonical, definition.Id.ToString()); Append(canonical, spec.Name);
+                    Append(canonical, spec.CoreSkeleton); Append(canonical, spec.CopyParentType ?? string.Empty);
+                    Append(canonical, spec.Item?.ToString() ?? string.Empty); Append(canonical, spec.StartMove.Value.ToString());
+                    Append(canonical, spec.LifetimeFrames);
+                }
+            }
             var locales = new List<LocaleMetadataDefinition>(content.LocaleMetadata);
             locales.Sort((left, right) => CompareIds(left.Id, right.Id));
             Append(canonical, "locale-metadata"); Append(canonical, locales.Count);
