@@ -39,7 +39,10 @@ portable managed builds. Archived original AI/charge fixtures stay supported.
 
 Procedural fighter rendering: `Presentation/TestSculptedSkinRuntime.ps1` checks
 production geometry, cap bounds, normals and animation topology with Unity
-managed math. `Presentation/TestExperimental3DUnity.ps1` runs the full game in a
+managed math, including an independent reference pose that preserves native
+limb lengths while separating guarding hands and touching legs. The native
+probe also rebuilds the skin during a paused high kick and checks pose isolation.
+`Presentation/TestExperimental3DUnity.ps1` runs the full game in a
 marked isolated Unity 6.6 fixture, checks the real experimental Settings toggle,
 connected skins, native high-kick deformation, restore and teardown, and captures
 normal/bright screenshots. These checks do not cover every outfit or performance.

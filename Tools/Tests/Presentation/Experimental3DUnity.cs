@@ -17,8 +17,8 @@ public static class Experimental3DUnity
     const BindingFlags Hidden = BindingFlags.Instance | BindingFlags.NonPublic;
     static double started, report, phaseAt;
     static int phase, checks, captured, frame;
-    static bool campaign, entered, optionsShown, spacingSet;
-    static float[] pose;
+    static bool campaign, entered, optionsShown, spacingSet, referenceRebuilt;
+    static float[] pose, poseAtRebuild;
     static float health;
     static int mask;
     static Button toggle;
@@ -167,6 +167,20 @@ public static class Experimental3DUnity
                     FighterVolume.ReviewExposure=1;
                     var bodies=UnityEngine.Object.FindObjectsByType<ProceduralFighterBody>(FindObjectsInactive.Include,FindObjectsSortMode.None).Where(b=>b.Ready).ToArray();
                     Check(bodies.Length == 2,"Standard fighter bodies were not reconstructed");
+                    Check(bodies.All(b=>b.ReferencePoseBound),"Body bound from contacting live limbs instead of a separated reference");
+                    if (!referenceRebuilt)
+                    {
+                        poseAtRebuild = Pose(player);
+                        // Recreate topology while the fighter is already paused in a
+                        // high kick: enabling during an attack must also bind safely.
+                        foreach (var body in bodies)
+                        {
+                            ((SculptedFighterSkin)typeof(ProceduralFighterBody).GetField("skin",Hidden).GetValue(body)).Reset();
+                            ((System.Collections.Generic.List<Vector3>)typeof(ProceduralFighterBody).GetField("vertices",Hidden).GetValue(body)).Clear();
+                        }
+                        referenceRebuilt = true; return;
+                    }
+                    Check(Pose(player).SequenceEqual(poseAtRebuild),"Reference rebuild changed native kick pose");
                     Check(bodies.All(b=>b.GetComponentsInChildren<FighterVolume>().Any(v=>v.GetComponent<MeshFilter>().sharedMesh.vertexCount>3000)),"Dedicated continuous body skins missing");
                     foreach(var body in bodies)
                     {
@@ -199,7 +213,7 @@ public static class Experimental3DUnity
                 case 9:
                     if (elapsed < .3) return;
                     Check(perspective == null && UnityEngine.Camera.main.cullingMask == mask, "Viewer teardown leaked camera/mask");
-                    File.WriteAllText(Path.Combine(Path.GetDirectoryName(Application.dataPath), "experimental-3d-result.txt"), "PASS: " + checks + " full-game experimental 3D checks; native depth, solid meshes/normals, perspective pass, real Settings toggle, persistence/defaults, live restore, pause/pose isolation, resumed animation and camera teardown. Controlled Campaign Tournament 3; not all arenas, equipment, physical inputs or exported players.");
+                    File.WriteAllText(Path.Combine(Path.GetDirectoryName(Application.dataPath), "experimental-3d-result.txt"), "PASS: " + checks + " full-game experimental 3D checks; native depth, solid meshes/normals, separated reference binding/rebuild during paused kick, perspective pass, real Settings toggle, persistence/defaults, live restore, pause/pose isolation, resumed animation and camera teardown. Controlled Campaign Tournament 3; not all arenas, equipment, physical inputs or exported players.");
                     Debug.Log("[Experimental3DUnity] PASS: " + checks); Finish(0); break;
             }
         }

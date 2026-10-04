@@ -18,6 +18,7 @@ namespace Eclipse.Rendering
         readonly SculptedFighterSkin skin = new SculptedFighterSkin();
         int rendered = -1;
         public bool Ready { get; private set; }
+        public bool ReferencePoseBound { get; private set; }
         public double LastBuildMilliseconds => skin.LastBuildMilliseconds;
         public double LastDeformMilliseconds => skin.LastDeformMilliseconds;
         public Mesh SurfaceMesh => volume != null ? volume.GetComponent<MeshFilter>().sharedMesh : null;
@@ -56,7 +57,7 @@ namespace Eclipse.Rendering
             var current = presentation.SourceModel.GetModelObject();
             if (current != source)
             {
-                source = current; nodes.Clear();pose.Clear();vertices.Clear();skin.Reset(); Ready = source != null;
+                source = current; nodes.Clear();pose.Clear();vertices.Clear();skin.Reset(); ReferencePoseBound = false; Ready = source != null;
                 if (source != null) foreach (string name in Anchors)
                 {
                     var node = source.FindNodeOrParent(name);
@@ -81,6 +82,28 @@ namespace Eclipse.Rendering
             }
             volume.UpdateTint(color);
             if(!changed)return true;
+            bool topologyChanged = false;
+            if (vertices.Count == 0)
+            {
+                var reference = FighterReferencePose.Create(pose);
+                BuildSections(reference);
+                skin.Build(reference["NPivot"], vertices, faces);
+                ReferencePoseBound = skin.HasBinding;
+                topologyChanged = skin.TopologyChanged;
+            }
+            BuildSections(pose);
+            skin.Build(P("NPivot",1),vertices,faces);
+            volume.transform.localPosition=P("NPivot",1);
+            volume.Geometry(vertices, faces, color,skin.Normals,topologyChanged || skin.TopologyChanged);
+            return true;
+        }
+        void BuildSections(IReadOnlyDictionary<string, Vector3> sampled)
+        {
+            Vector3 P(string name, float depth)
+            {
+                Vector3 value = sampled[name]; float anchor = sampled["NPivot"].z;
+                value.z = anchor + (value.z - anchor) * depth; return value;
+            }
             skin.Clear();
             // Neck/chest/waist/pelvis have dedicated proportions rather than stroke widths.
             Vector3 neck = P("NNeck", .85f), chest = P("NChest", .85f), waist = P("NStomach", .85f), pelvis = P("NPivot", .85f);
@@ -111,10 +134,6 @@ namespace Eclipse.Rendering
                     new[] { 14f, 16f, 15f, 9f, 12f, 8f, 5.5f, 4.5f, 5f, 2f },
                     new[] { 11f, 12f, 11f, 7f, 9f, 6f, 5f, 6f, 9f, 4f });
             }
-            skin.Build(P("NPivot",1),vertices,faces);
-            volume.transform.localPosition=P("NPivot",1);
-            volume.Geometry(vertices, faces, color,skin.Normals,skin.TopologyChanged);
-            return true;
         }
         Vector3 P(string name, float depth)
         {

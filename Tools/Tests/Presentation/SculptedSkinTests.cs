@@ -53,6 +53,44 @@ static class SculptedSkinTests
         skin.Ellipsoid(new Vector3(0,76,0),new Vector3(.3f,1,0),10,16,9);
         skin.Build(Vector3.zero,vertices,faces);Closed(vertices,faces,skin.Normals);
         Check(skin.TopologyChanged,"Rig reset failed to rebuild new anatomy");
-        Console.WriteLine("PASS: "+checks+" sculpted skin assertions: closed finite geometry, bidirectional cap bounds, large-coordinate anchors, smooth normals, rigid animation and topology reuse.");
+        ReferencePose();
+        Console.WriteLine("PASS: "+checks+" sculpted skin assertions: closed finite geometry, bidirectional cap bounds, large-coordinate anchors, smooth normals, rigid animation/topology reuse and separated length-preserving reference poses.");
+    }
+    static void ReferencePose()
+    {
+        var live = new Dictionary<string, Vector3> {
+            {"NPivot",new Vector3(1000,2000,77)}, {"NStomach",new Vector3(1000,1970,77)},
+            {"NChest",new Vector3(1000,1920,77)}, {"NNeck",new Vector3(1000,1890,77)},
+            {"NHead",new Vector3(1000,1865,77)} };
+        for(int side=1;side<=2;side++)
+        {
+            string s="_"+side;float sign=side==1?1:-1;
+            live["NShoulder"+s]=new Vector3(1000+20*sign,1920,77);
+            live["NElbow"+s]=new Vector3(1000+55*sign,1950,80);
+            // A hand can be directly against the chest in a guarding pose.
+            live["NWrist"+s]=new Vector3(1000+4*sign,1920,77);
+            live["NFingertips"+s]=new Vector3(1000,1900,77);
+            live["NHip"+s]=new Vector3(1000+16*sign,2000,77);
+            live["NKnee"+s]=new Vector3(1000+20*sign,2075,77);
+            live["NAnkle"+s]=new Vector3(1000+25*sign,2140,77);
+            live["NHeel"+s]=new Vector3(1000+25*sign,2145,77);
+            live["NToeTip"+s]=new Vector3(1000+50*sign,2145,77);
+        }
+        var before=live.ToDictionary(p=>p.Key,p=>p.Value);
+        var reference=FighterReferencePose.Create(live);
+        Check(live.All(p=>p.Value==before[p.Key]),"Reference construction mutated native pose input");
+        Check(reference["NPivot"]==live["NPivot"],"Reference root anchor moved");
+        Check(reference.Count==live.Count&&reference.Values.All(p=>float.IsFinite(p.x)&&float.IsFinite(p.y)&&float.IsFinite(p.z)),"Reference bindings incomplete or nonfinite");
+        foreach(var pair in new[]{("NPivot","NStomach"),("NStomach","NChest"),("NChest","NNeck"),("NNeck","NHead")})
+            Check(Math.Abs(Vector3.Distance(reference[pair.Item1],reference[pair.Item2])-Vector3.Distance(live[pair.Item1],live[pair.Item2]))<.001f,"Torso reference changed native section length");
+        for(int side=1;side<=2;side++)
+        {
+            string s="_"+side;
+            foreach(var pair in new[]{("NShoulder","NElbow"),("NElbow","NWrist"),("NWrist","NFingertips"),("NHip","NKnee"),("NKnee","NAnkle"),("NAnkle","NHeel"),("NHeel","NToeTip")})
+                Check(Math.Abs(Vector3.Distance(reference[pair.Item1+s],reference[pair.Item2+s])-Vector3.Distance(live[pair.Item1+s],live[pair.Item2+s]))<.001f,"Limb reference changed native section length");
+            Check(Math.Abs(reference["NWrist"+s].x-reference["NChest"].x)>50,"Guard hand remained against torso in reference pose");
+        }
+        Check(Vector3.Distance(reference["NKnee_1"],reference["NKnee_2"])>40,"Reference thighs remain in contact");
+        Check(Vector3.Distance(reference["NToeTip_1"],reference["NToeTip_2"])>60,"Reference feet overlap");
     }
 }

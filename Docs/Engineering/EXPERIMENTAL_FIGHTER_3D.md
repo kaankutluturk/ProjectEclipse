@@ -20,7 +20,13 @@ The shared Options UI serves startup and in-game Settings.
   tiny-triangle precision loss at large arena coordinates. Section bounds cover
   both ends in both directions, including caps and blending margins.
 - A connected seed surface binds each vertex to up to three nearby native
-  sections. Subsequent interpolated poses deform positions and normals; topology
+  sections. `FighterReferencePose` constructs that seed with separated arms and
+  legs while retaining sampled torso/limb lengths and the native pivot. Mesh
+  construction no longer fuses a guarding hand to the chest merely because the
+  toggle was enabled during contact. `ProceduralFighterBody` binds in this
+  reference, then deforms to the live pose in the same frame. The initial topology
+  upload flag survives both steps; native pose data is only read. Subsequent
+  interpolated poses deform positions and normals; topology
   uploads happen only when the rig changes. Unchanged poses reuse geometry while
   still updating tint/exposure. A disconnected initial surface keeps rebuilding
   until a connected seed is available. This is linear procedural skinning, not
@@ -62,7 +68,7 @@ The shared Options UI serves startup and in-game Settings.
 
 This approximates recovered drawings. The body is a connected surface in the
 accepted native poses, but head/hand anatomy and shared proportions remain
-simple. Binding depends on the initial native pose; extreme bends, intersecting
+simple. Reference proportions use sampled native lengths; extreme bends, intersecting
 limbs, large form changes and all outfits are not accepted by these checks.
 Complex armour, helmets and skirt panels can still look angular or separate under
 bright light. Outfit-specific shapes/depth and semantic equipment classification
@@ -84,34 +90,40 @@ shared immutable project-drive TAR cache. Campaign Tournament 3 has controlled
 input/AI/spacing. Root scene/profile are untouched; fresh logs/results and process
 exit are required.
 
-The sculpted refinement passes **41 full-game checks**: defaults, actual Options
+The sculpted refinement passes **45 full-game checks**: defaults, actual Options
 button/label/preference, supported shader/normals, original camera direction and
 reflected projection, exclusive viewer ownership, paused frame/health/pose
 invariance, live off restore, native HighKick playback and camera/mask teardown.
+The native probe requires separated reference binding on both fighters and
+forces a fresh topology build during a paused high kick. Native point positions
+remain unchanged, and the regenerated skins still pass the closed connected
+surface and lighting checks. Reference construction is verified independently
+with guarding hands deliberately placed against the chest.
 Both bodies have closed edge incidence (two faces per edge), one connected
 component, noncollapsed triangles and finite unit lighting normals after the kick.
 Six volumes remain (two bodies, two native panel meshes, two weapon strokes),
 with no old body capsules covering the skin. A connected two-triangle cloth
 fixture yields 50 vertices/288 indices without internal walls; a rigid fixture
 yields 24 vertices/36 indices with sharp perimeter normals. Coincident fallback
-geometry remains finite. Final native log: `Temp/FighterPlaybackUnity-d997a2c104cd4564b9767ae6eb4b68d8/validation-d2771178b3ca470fb08ada44de54e034.log`.
+geometry remains finite. Final native log: `Temp/FighterPlaybackUnity-d997a2c104cd4564b9767ae6eb4b68d8/validation-ffef7dcdef9e480fae268c951330d981.log`.
 
 A separate production-source managed runner,
-`Tools/Tests/Presentation/TestSculptedSkinRuntime.ps1`, passes **58 checks**:
+`Tools/Tests/Presentation/TestSculptedSkinRuntime.ps1`, passes **83 checks**:
 closed finite surfaces, positive/negative section direction and cap extents,
 large-coordinate anchors, lighting normals, rigid rotation/translation and
-unchanged animation topology. It uses Unity managed math, without a graphics
+unchanged animation topology, separated reference limbs, preserved section
+lengths/large-coordinate root and unchanged input poses. It uses Unity managed math, without a graphics
 engine; the full-game run separately checks actual rendering.
 
-Measured editor samples including final capture: approximately 95-104 ms for initial
-surface extraction and binding per fighter, then 3.6-4.0 ms per animated body
+Measured editor samples including final capture: approximately 96-103 ms for initial
+surface extraction and binding per fighter, then 3.8-4.0 ms per animated body
 for deformation (excluding Unity mesh upload and other rendering work). The
 initial toggle can hitch. These samples are not sustained CPU/GPU acceptance;
 all equipment, simultaneous mod actors and exported players remain unmeasured.
 
 Orthographic, default perspective, 4x bright, native kick, bright kick and Settings
 PNGs were visually inspected and saved to ignored
-`Temp/Sculpted3DReview-20261004/`. The bright images retain visible outfit defects;
+`Temp/Sculpted3DReferenceReview-20261004/`. The bright images retain visible outfit defects;
 no claim of complete clothing or anatomical reconstruction is made. The fixture
 now disables both fighters' control before the initial timing gate, avoiding an
 opponent attack being queued before the controlled screenshot setup.

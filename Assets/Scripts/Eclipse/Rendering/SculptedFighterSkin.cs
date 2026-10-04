@@ -4,6 +4,43 @@ using UnityEngine;
 
 namespace Eclipse.Rendering
 {
+    // Mesh construction must not weld a guarding hand to the chest, or touching
+    // legs together. Keep native lengths but separate limbs before skin binding.
+    internal static class FighterReferencePose
+    {
+        internal static Dictionary<string, Vector3> Create(IReadOnlyDictionary<string, Vector3> live)
+        {
+            var pose = new Dictionary<string, Vector3>();
+            float Length(string a, string b) => Mathf.Max(.01f, Vector3.Distance(live[a], live[b]));
+            Vector3 root = live["NPivot"];
+            pose["NPivot"] = root;
+            pose["NStomach"] = root + Vector3.down * Length("NPivot", "NStomach");
+            pose["NChest"] = pose["NStomach"] + Vector3.down * Length("NStomach", "NChest");
+            pose["NNeck"] = pose["NChest"] + Vector3.down * Length("NChest", "NNeck");
+            pose["NHead"] = pose["NNeck"] + Vector3.down * Length("NNeck", "NHead");
+            float shoulders = Mathf.Clamp(Length("NShoulder_1", "NShoulder_2") * .5f, 14, 28);
+            float hips = Mathf.Clamp(Length("NHip_1", "NHip_2") * .5f, 12, 22);
+            for (int side = 1; side <= 2; side++)
+            {
+                string s = "_" + side;
+                float sign = side == 1 ? 1 : -1;
+                var arm = new Vector3(sign * .7f, .7f, 0).normalized;
+                var forearm = new Vector3(sign * .18f, .98f, 0).normalized;
+                var leg = new Vector3(sign * .12f, 1, 0).normalized;
+                pose["NShoulder" + s] = pose["NChest"] + Vector3.right * (sign * shoulders);
+                pose["NElbow" + s] = pose["NShoulder" + s] + arm * Length("NShoulder" + s, "NElbow" + s);
+                pose["NWrist" + s] = pose["NElbow" + s] + forearm * Length("NElbow" + s, "NWrist" + s);
+                pose["NFingertips" + s] = pose["NWrist" + s] + forearm * Length("NWrist" + s, "NFingertips" + s);
+                pose["NHip" + s] = root + Vector3.right * (sign * hips);
+                pose["NKnee" + s] = pose["NHip" + s] + leg * Length("NHip" + s, "NKnee" + s);
+                pose["NAnkle" + s] = pose["NKnee" + s] + leg * Length("NKnee" + s, "NAnkle" + s);
+                pose["NHeel" + s] = pose["NAnkle" + s] + Vector3.up * Length("NAnkle" + s, "NHeel" + s);
+                pose["NToeTip" + s] = pose["NHeel" + s] + Vector3.right * (sign * Length("NHeel" + s, "NToeTip" + s));
+            }
+            return pose;
+        }
+    }
+
     // A single blended surface follows the native pose. The field is entirely
     // presentation data: it never writes bones, physics, collisions or animation.
     public sealed class SculptedFighterSkin
@@ -33,6 +70,7 @@ namespace Eclipse.Rendering
         }
         Influence[] binding;
         int boundSections;
+        internal bool HasBinding => binding != null;
         public double LastDeformMilliseconds { get; private set; }
         public bool TopologyChanged { get; private set; }
         public void Reset() { binding=null; }

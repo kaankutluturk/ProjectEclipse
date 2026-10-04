@@ -26,6 +26,8 @@ one continuous sculpted skin, with tapered elliptical limbs, blended shoulders
 and hips, and dedicated torso, head, hand and foot profiles. The connected skin
 follows the native animation with smooth lighting normals. Clothing uses shared
 curved panels with thin perimeters and gentle folds; weapons retain sharp edges.
+The body mesh is built with separated limbs before it is bound to the live pose,
+so a guarding hand touching the chest does not become a new mesh connection.
 A matte near-black material gives broad soft shading and faint directional edge
 light. Perspective keeps the original camera direction, with depth adjusted by
 body region or equipment group around the fighter's pivot. It applies immediately
