@@ -2225,7 +2225,7 @@ public partial class Fight
 	public void LNKBHDFPODI(Model ACENLMONNPA, Model.StrikeResult BNBAOJOJDGJ, PerkEvent.KNKIIEPDCPN LFLGCDNKNJI)
 	{
 		string text = ((BNBAOJOJDGJ.CMGLHHEJEBN == null) ? string.Empty : BNBAOJOJDGJ.CMGLHHEJEBN.NLLGDDMMJJN());
-		InfoAnimation pBPDKJNKFCJ = BNBAOJOJDGJ.PBPDKJNKFCJ;
+		InfoAnimation pBPDKJNKFCJ = BNBAOJOJDGJ.AttackAnimation;
 		EPBDEDGLHJE.OFKIKABKDFD()["Defense"] = BNBAOJOJDGJ.DefenceAttribute;
 		EPBDEDGLHJE.OFKIKABKDFD()["Animation"] = pBPDKJNKFCJ;
 		EPBDEDGLHJE.OFKIKABKDFD()["Critical"] = BNBAOJOJDGJ.DNGKOMPMPCD;
@@ -2254,13 +2254,14 @@ public partial class Fight
 		IntervalAttack hFIIPNLCIEE = EGHPHELLOGO.Data as IntervalAttack;
 		// Only Lua attribution uses the root fighter. Native calculations retain
 		// the actual contact actor, its animation, equipment and collision edges.
-		Model eclipseAttacker = (EGHPHELLOGO.GAIBPAGPEGK ?? gHHCDAFIKJE.GAIBPAGPEGK)?.GetRootModel();
+		Model eclipseAttacker = (gHHCDAFIKJE.AttackerModel ?? EGHPHELLOGO.GAIBPAGPEGK)?.GetRootModel();
+        ModAttackSource eclipseAttackSource = CaptureEclipseAttackSource(gHHCDAFIKJE.AttackerModel ?? EGHPHELLOGO.GAIBPAGPEGK, gHHCDAFIKJE);
 		if (hFIIPNLCIEE.HPLOFLKCLHG())
 		{
 			gHHCDAFIKJE.DNGKOMPMPCD = false;
 		}
 		LNKBHDFPODI(EGHPHELLOGO.KJDFJPBIGJC, gHHCDAFIKJE, PerkEvent.KNKIIEPDCPN.EVENT_POST_HIT);
-		DispatchEclipseHitPhase(EGHPHELLOGO, gHHCDAFIKJE, ModEffectEvent.PostHit);
+		DispatchEclipseHitPhase(EGHPHELLOGO, gHHCDAFIKJE, ModEffectEvent.PostHit, eclipseAttackSource);
 		if (hFIIPNLCIEE.HPLOFLKCLHG())
 		{
 			gHHCDAFIKJE.DNGKOMPMPCD = false;
@@ -2327,7 +2328,7 @@ public partial class Fight
         if (_eclipseFightBeginDispatched)
         {
             var outgoing = new ModIncomingHit(() => gHHCDAFIKJE.EEDJBBOCFNL,
-                amount => gHHCDAFIKJE.EEDJBBOCFNL = (float)amount, gHHCDAFIKJE.DFOHNJEBDED, gHHCDAFIKJE.DNGKOMPMPCD);
+                amount => gHHCDAFIKJE.EEDJBBOCFNL = (float)amount, gHHCDAFIKJE.DFOHNJEBDED, gHHCDAFIKJE.DNGKOMPMPCD, attackSource: eclipseAttackSource);
             if (eclipseAttacker == _playerModel)
                 DispatchEclipseCombatEvent(ModEffectEvent.DamageDealing, null, outgoing);
             else if (eclipseAttacker == CKNCPOABFBO)
@@ -2335,7 +2336,7 @@ public partial class Fight
         }
 		if (preFight != null)
 		{
-			preFight.ViewerStrike(gHHCDAFIKJE.PBPDKJNKFCJ, gHHCDAFIKJE.EEDJBBOCFNL, gHHCDAFIKJE.Target, gHHCDAFIKJE.LOONMILKCFK, gHHCDAFIKJE.JMDIIIFJMFH, gHHCDAFIKJE.DNGKOMPMPCD, gHHCDAFIKJE.DFOHNJEBDED, gHHCDAFIKJE.APCAKCCOMLO);
+			preFight.ViewerStrike(gHHCDAFIKJE.AttackAnimation, gHHCDAFIKJE.EEDJBBOCFNL, gHHCDAFIKJE.Target, gHHCDAFIKJE.LOONMILKCFK, gHHCDAFIKJE.JMDIIIFJMFH, gHHCDAFIKJE.DNGKOMPMPCD, gHHCDAFIKJE.DFOHNJEBDED, gHHCDAFIKJE.APCAKCCOMLO);
 		}
 		if (EGHPHELLOGO.KJDFJPBIGJC.IJINDLLEGKA())
 		{
@@ -2345,10 +2346,10 @@ public partial class Fight
             gHHCDAFIKJE.EEDJBBOCFNL *= (float)eclipseShields.Scale(fightTimeInFrame);
 		if (_eclipseFightBeginDispatched && EGHPHELLOGO.KJDFJPBIGJC == _playerModel)
 			DispatchEclipseCombatEvent(ModEffectEvent.DamageResolving, null,
-				new ModIncomingHit(() => gHHCDAFIKJE.EEDJBBOCFNL, amount => gHHCDAFIKJE.EEDJBBOCFNL = (float)amount, gHHCDAFIKJE.DFOHNJEBDED, gHHCDAFIKJE.DNGKOMPMPCD));
+				new ModIncomingHit(() => gHHCDAFIKJE.EEDJBBOCFNL, amount => gHHCDAFIKJE.EEDJBBOCFNL = (float)amount, gHHCDAFIKJE.DFOHNJEBDED, gHHCDAFIKJE.DNGKOMPMPCD, attackSource: eclipseAttackSource));
         if (_eclipseFightBeginDispatched && EGHPHELLOGO.KJDFJPBIGJC == CKNCPOABFBO)
             DispatchEclipseOpponent(ModEffectEvent.DamageResolving, null,
-                new ModIncomingHit(() => gHHCDAFIKJE.EEDJBBOCFNL, amount => gHHCDAFIKJE.EEDJBBOCFNL = (float)amount, gHHCDAFIKJE.DFOHNJEBDED, gHHCDAFIKJE.DNGKOMPMPCD));
+                new ModIncomingHit(() => gHHCDAFIKJE.EEDJBBOCFNL, amount => gHHCDAFIKJE.EEDJBBOCFNL = (float)amount, gHHCDAFIKJE.DFOHNJEBDED, gHHCDAFIKJE.DNGKOMPMPCD, attackSource: eclipseAttackSource));
 		if (IsLocalVersus && gHHCDAFIKJE.DFOHNJEBDED)
 			gHHCDAFIKJE.EEDJBBOCFNL = Eclipse.Multiplayer.PvpBalanceCombat.ClampBlocked(this, EGHPHELLOGO.KJDFJPBIGJC, gHHCDAFIKJE.EEDJBBOCFNL);
 		EGHPHELLOGO.KJDFJPBIGJC.LogDamage(gHHCDAFIKJE.EEDJBBOCFNL, BHLIBKKJNKH(hFIIPNLCIEE), gHHCDAFIKJE.DefenceAttribute);
@@ -2359,14 +2360,14 @@ public partial class Fight
 		// Eclipse training and replay readouts (damage, combos, frame advantage).
 		if (IsLocalVersus && Eclipse.Multiplayer.VersusTraining.Observing)
 			Eclipse.Multiplayer.VersusTraining.OnHit(EGHPHELLOGO.GAIBPAGPEGK, EGHPHELLOGO.KJDFJPBIGJC, gHHCDAFIKJE.EEDJBBOCFNL,
-				gHHCDAFIKJE.DFOHNJEBDED, gHHCDAFIKJE.DNGKOMPMPCD, gHHCDAFIKJE.PBPDKJNKFCJ != null ? gHHCDAFIKJE.PBPDKJNKFCJ.Name : null);
+				gHHCDAFIKJE.DFOHNJEBDED, gHHCDAFIKJE.DNGKOMPMPCD, gHHCDAFIKJE.AttackAnimation != null ? gHHCDAFIKJE.AttackAnimation.Name : null);
 		// Presentation only: sf2.fx hit bursts and hit/critical/ko screen effects.
 		Eclipse.Rendering.FighterParticles.Hit(EGHPHELLOGO.KJDFJPBIGJC, gHHCDAFIKJE.Point, gHHCDAFIKJE.DNGKOMPMPCD, gHHCDAFIKJE.DFOHNJEBDED,
 			eclipseHealthBefore > 0f && EGHPHELLOGO.KJDFJPBIGJC.KKMCHCNOHMB() <= 0f, EGHPHELLOGO.GAIBPAGPEGK, gHHCDAFIKJE.Impulse);
 		if (_eclipseFightBeginDispatched)
 		{
 			var observation = new ModDamageEvent(round.round, eclipseHealthBefore,
-				EGHPHELLOGO.KJDFJPBIGJC.KKMCHCNOHMB(), gHHCDAFIKJE.DFOHNJEBDED, gHHCDAFIKJE.DNGKOMPMPCD);
+				EGHPHELLOGO.KJDFJPBIGJC.KKMCHCNOHMB(), gHHCDAFIKJE.DFOHNJEBDED, gHHCDAFIKJE.DNGKOMPMPCD, eclipseAttackSource);
 			if (EGHPHELLOGO.KJDFJPBIGJC == _playerModel)
 			{
 				if (observation.Damage > 0) DispatchEclipseCombatEvent(ModEffectEvent.DamageReceived, observation);
@@ -2389,7 +2390,7 @@ public partial class Fight
 			}
 		}
 		KDMDOBOKAIB(EGHPHELLOGO.KJDFJPBIGJC.EGGEACCDAEK(), gHHCDAFIKJE.EEDJBBOCFNL);
-		if (!gHHCDAFIKJE.PBPDKJNKFCJ.BKGIEPOEBOF())
+		if (!gHHCDAFIKJE.AttackAnimation.BKGIEPOEBOF())
 		{
 			float num2 = EGHPHELLOGO.KJDFJPBIGJC.GetMagicCharges();
 			float num3 = EGHPHELLOGO.GAIBPAGPEGK.GetMagicCharges();
@@ -3263,20 +3264,23 @@ public partial class Fight
 
 	private readonly Dictionary<(Model, DefinitionId), System.Xml.XmlNode> _eclipseOpponentInstances = new Dictionary<(Model, DefinitionId), System.Xml.XmlNode>();
 	private readonly Dictionary<(Model, DefinitionId), System.Xml.XmlNode> _eclipseInnateInstances = new Dictionary<(Model, DefinitionId), System.Xml.XmlNode>();
-	private void DispatchEclipseHitPhase(Model.EventModel eventModel, Model.StrikeResult strike, ModEffectEvent effectEvent)
+	private void DispatchEclipseHitPhase(Model.EventModel eventModel, Model.StrikeResult strike, ModEffectEvent effectEvent, ModAttackSource attackSource = null)
 	{
 		if (IsLocalVersus || !_eclipseFightBeginDispatched || eventModel == null || strike == null || ModRuntime.Scripts == null) return;
 		Model target = eventModel.KJDFJPBIGJC;
-		Model attacker = (eventModel.GAIBPAGPEGK ?? strike.GAIBPAGPEGK)?.GetRootModel();
-		InfoAnimation animation = strike.PBPDKJNKFCJ;
+		// Post-critical dispatch precedes refresh of the reusable EventModel target.
+        // The current strike supplies the actual attacker in every hit phase.
+		Model attacker = (strike.AttackerModel ?? eventModel.GAIBPAGPEGK)?.GetRootModel();
+		attackSource = attackSource ?? CaptureEclipseAttackSource(strike.AttackerModel ?? eventModel.GAIBPAGPEGK, strike);
+		InfoAnimation animation = strike.AttackAnimation;
 		bool weapon = animation != null && animation.CNPFHBMGDFP("Weapon");
 		bool unarmed = animation != null && animation.CNPFHBMGDFP("Unarmed");
 		bool ranged = animation != null && animation.CNPFHBMGDFP("RangedMissile");
 		bool magic = animation != null && animation.CNPFHBMGDFP("MagicMissile");
 		var attackerHit = new ModIncomingHit(() => strike.EEDJBBOCFNL, amount => strike.EEDJBBOCFNL = (float)amount,
-			strike.DFOHNJEBDED, strike.DNGKOMPMPCD, new ModHitEvent(false, weapon, unarmed, ranged, magic));
+			strike.DFOHNJEBDED, strike.DNGKOMPMPCD, new ModHitEvent(false, weapon, unarmed, ranged, magic), attackSource);
 		var targetHit = new ModIncomingHit(() => strike.EEDJBBOCFNL, amount => strike.EEDJBBOCFNL = (float)amount,
-			strike.DFOHNJEBDED, strike.DNGKOMPMPCD, new ModHitEvent(true, weapon, unarmed, ranged, magic));
+			strike.DFOHNJEBDED, strike.DNGKOMPMPCD, new ModHitEvent(true, weapon, unarmed, ranged, magic), attackSource);
 		if (attacker == _playerModel) DispatchEclipseCombatEvent(effectEvent, null, attackerHit);
 		else if (attacker == CKNCPOABFBO) DispatchEclipseOpponent(effectEvent, null, attackerHit);
 		if (target == _playerModel) DispatchEclipseCombatEvent(effectEvent, null, targetHit);

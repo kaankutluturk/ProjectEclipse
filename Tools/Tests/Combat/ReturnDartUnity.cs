@@ -25,6 +25,7 @@ public static class ReturnDartUnity
     static bool reversed;
     static ModUiSurface surface;
     static string combatException;
+    static readonly System.Collections.Generic.HashSet<string> sourceEvents = new System.Collections.Generic.HashSet<string>();
 
     static ReturnDartUnity()
     {
@@ -38,6 +39,38 @@ public static class ReturnDartUnity
         var root = Path.GetDirectoryName(Application.dataPath);
         if (!File.Exists(Path.Combine(root, "return-dart-fixture.marker"))) throw new Exception("Requires isolated projectile fixture.");
         Environment.SetEnvironmentVariable("ECLIPSE_MODS_ROOT", Path.Combine(root, "return-projectile-mods"));
+        var probeScript = Path.Combine(root,"return-projectile-mods/example.return-dart/scripts/main.lua");
+        string shippedScript = File.ReadAllText(probeScript);
+        int patchAt = shippedScript.IndexOf("for _, fight in ipairs", StringComparison.Ordinal);
+        if (patchAt < 0) throw new Exception("Shipped example patch block missing.");
+        File.WriteAllText(probeScript, shippedScript.Substring(0,patchAt) + @"
+-- Native acceptance-only provenance probe; the runner copies the shipped mod afresh.
+local known = {}
+local function inspect(_, fighter, event)
+    local attack = event.attack
+    if not attack or attack.kind ~= 'projectile' then return end
+    assert(attack.projectile_owner == sf2.mod.id and attack.model_name == sf2.mod.id .. '.dart')
+    assert(attack.animation_name == sf2.mod.id .. ':moves/flight')
+    assert(known[attack.projectile_id], 'Contact ID does not match a previously observed live child')
+    assert(attack.point and attack.point.x == attack.point.x and attack.point.y == attack.point.y and attack.point.z == attack.point.z)
+    sf2.log.info('SOURCE-PROBE:' .. event.type .. ':' .. fighter.side)
+    -- A later callback/side must still receive the original copied values.
+    attack.model_name = 'mutated'; attack.point.x = 0/0
+end
+local probe = sf2.behaviors.register {
+    id = 'source_probe', on_tick = function(_, fighter)
+        local list = fighter:projectiles()
+        if list then for _, child in ipairs(list) do local view = child:snapshot(); if view then known[view.id] = true end end end
+    end,
+    on_hit_post_crit = inspect, on_post_hit = inspect,
+    on_damage_dealing = inspect, on_damage_resolving = inspect,
+    on_damage_dealt = inspect, on_damage_received = inspect,
+}
+local probe_rule = sf2.rules.behavior { id = 'source_probe', behavior = probe, target = sf2.rules.ALL }
+for _, fight in ipairs { 'core:fights/zone_1/tournament/3', 'core:fights/zone_1/tournament_eclipsemode/3' } do
+    sf2.fights.patch { target = fight, append_rules = {rule, probe_rule} }
+end
+");
         var args = Environment.GetCommandLineArgs();
         int index = Array.IndexOf(args, "-returnDartAcceptanceProductName");
         if (index < 0 || index + 1 >= args.Length || !System.Text.RegularExpressions.Regex.IsMatch(args[index + 1], "^ReturnDartUnity-[0-9a-f]{32}$"))
@@ -83,7 +116,7 @@ public static class ReturnDartUnity
             {
                 if (ModRuntime.Scripts == null || Module.GetInstance() == null) return;
                 var screen = Module.GetInstance().GetCurrentScreenType(); if (screen != ScreenType.ModuleDojo && screen != ScreenType.ModuleMap) return;
-                Check(!ModRuntime.Host.HasErrors, ModRuntime.Host.FormatReport()); Check(!ModRuntime.Scripts.HasErrors, "Startup script errors");
+                Check(!ModRuntime.Host.HasErrors, ModRuntime.Host.FormatReport()); Check(!ModRuntime.Scripts.HasErrors, ModRuntime.Scripts.FormatReport());
                 Check(ModRuntime.Host.EnabledMods.Count(m => m.Id.Value != "core") == 1 && ModRuntime.Host.EnabledMods.Any(m => m.Id.Value == "example.return-dart"), "Fixture must enable only Return Dart");
                 var encounter = ListSF.CHMCKGCDGCM(new FightIDS(ModRuntime.Scripts.Content.RuntimeFightId(DefinitionId.Parse("core:fights/zone_1/tournament/3"))));
                 Check(encounter != null, "Core encounter missing"); entered = GameUtils.StartFight(encounter, false, null, true, false); return;
@@ -138,6 +171,8 @@ public static class ReturnDartUnity
                     Check(enemy.KKMCHCNOHMB() < before, "Native flight made no contact damage");
                     Check(surface.Read("counts").Text == "Flights: 1 | Hits: 1", "Child damage not attributed to main fighter: " + surface.Read("counts").Text);
                     Check(travel > 30, "Projectile never travelled");
+                    foreach (string notification in new[]{"HitPostCrit:player","HitPostCrit:opponent","PostHit:player","PostHit:opponent","DamageDealing:player","DamageResolving:opponent","DamageDealt:player","DamageReceived:opponent"})
+                        Check(sourceEvents.Contains(notification),"Missing copied native attack source: "+notification);
                     Debug.Log("[ReturnDartUnity] Native hit: " + before + " -> " + enemy.KKMCHCNOHMB() + "; sampled travel=" + travel); Next(); break;
                 case 4:
                     if (!surface.Read("cast").Enabled) return;
@@ -186,7 +221,7 @@ public static class ReturnDartUnity
         return null;
     }
     public static void Captured() { captured = true; }
-    static void Log(string message, string stack, LogType type) { if (entered && type == LogType.Exception && (stack.Contains("Fight.") || stack.Contains("Model.") || stack.Contains("Modding"))) combatException = message + "\n" + stack; }
+    static void Log(string message, string stack, LogType type) { int probe = message.IndexOf("SOURCE-PROBE:",StringComparison.Ordinal); if(probe>=0)sourceEvents.Add(message.Substring(probe+13).Trim()); if (entered && type == LogType.Exception && (stack.Contains("Fight.") || stack.Contains("Model.") || stack.Contains("Modding"))) combatException = message + "\n" + stack; }
     static void Finish(int code) { SessionState.SetBool(Active, false); EditorApplication.update -= Update; Application.logMessageReceived -= Log; EditorApplication.Exit(code); }
 }
 public sealed class ReturnDartCapture : MonoBehaviour

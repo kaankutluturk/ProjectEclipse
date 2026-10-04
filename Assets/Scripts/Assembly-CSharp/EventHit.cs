@@ -16,7 +16,7 @@ public class EventHit : EventAnimation
 		else
 		{
 			Model.StrikeResult jEGHAGLEJCB = (Model.StrikeResult)FOPOKALJIIJ.JIFAHHGNPFH.StrikeResult;
-			Model gAIBPAGPEGK = jEGHAGLEJCB.GAIBPAGPEGK;
+			Model gAIBPAGPEGK = jEGHAGLEJCB.AttackerModel;
 			IntervalAttack hFIIPNLCIEE = (IntervalAttack)gAIBPAGPEGK.OCPMJKIEPIG().HDJBHPOGKNJ(IntervalAnimation.NGAJJDIEDGF.INTERVAL_ATTACK);
 			if (hFIIPNLCIEE != null)
 			{

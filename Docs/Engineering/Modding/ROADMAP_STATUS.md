@@ -2,6 +2,18 @@
 
 Last broad reconciliation: 2026-09-12. Scope remains **G01–G14 plus E1–E8**.
 
+2026-10-04 contact provenance: native hit, damage, block and critical callbacks
+now carry optional copied attack-source observations: actual actor/contact move,
+hit point and tracked typed projectile ID/owner. Return Dart counts only its own
+projectile contacts. Current-strike attribution fixes stale event targets during
+the early post-critical seam. Native Campaign Tournament 3 passes 40 checks,
+including eight attacker/defender phase notifications, ID correlation and copied-
+table isolation. Controlled Lua/tracker and extracted native routing tests cover
+additional kinds and lifecycle cases. This advances E2/E8; general actors, arbitrary
+world contacts/swept collision, wider arenas/forms, physical input/export and
+independent creator acceptance remain open. See the creator work log.
+
+
 2026-10-04 creator-platform arenas: Lua can sample main-fighter collision capsules
 against bounded rectangles and own round-bound warning markers. Pulse Arena runs
 an equipment-free warning/active/recovery hazard through normal Campaign/core

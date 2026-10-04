@@ -982,3 +982,73 @@ are preloaded and remapped assemblies copied to the runner's ignored directory.
 Wiki build/types/search and 6412 local links/assets across 61 pages pass (existing
 duplicate 404 warning). This is a renderer experiment refinement, not closure of
 the broad Minecraft-style creator-platform goal; G01-G14/E1-E8 remain open.
+
+
+## 2026-10-04: copied native attack-source observations
+
+The API could route child projectile damage to its caster but could not distinguish
+that contact from a punch or another child. Native hit/damage/block/critical events
+now expose optional `event.attack`: kind (fighter/projectile/native_child), actual
+model name, strike animation, finite native contact point, and tracked typed
+projectile observation ID/declaring mod. IDs match live projectile snapshots and
+are fight-local data, not handles. Reading needs no extra capability; acquiring
+or controlling live children retains combat.projectiles/owner/lifetime guards.
+
+The immutable pure ModAttackSource contract lives in ModProjectiles.cs. Optional
+source fields on ModIncomingHit and ModDamageEvent preserve existing source callers.
+FightProjectiles captures ownership from its tracker and copies the point/move.
+Fight captures source before PostHit callbacks and retains it through outgoing,
+incoming and resolved damage. MoonSharpScriptRuntime copies a fresh nested table
+for each callback via the projectile partial; table mutation cannot alter a later
+side/event or retain the native actor. Missing native/synthetic producer data
+omits attack. Untracked native children supply no invented projectile ID/owner.
+
+Native acceptance exposed a real early-phase attribution bug: Model.Strike fills
+StrikeResult.AttackerModel before OnModelPostCrit but refreshes the reusable
+EventModel target later. Lua attribution now prefers the current strike, with
+EventModel only a fallback. Native damage/perk calculations and event order are
+unchanged. The StrikeResult attacker/animation fields are narrowly named
+AttackerModel/AttackAnimation with best-guess comments; actual owning type/callers
+and reflection-name use were checked. Model, Fight, EventHit and PerkInfoItem
+callers update; unrelated instances of the shared obfuscated attacker token are
+preserved. No confirmed deobfuscation mappings or serialized assets change.
+
+Return Dart and its mirrored editor starter filter applied-damage observations by
+source kind, owner and actor name. The public callback/projectile/ability/editor
+pages, editor guide, authored schema and generated definitions update together
+(232 public bindings, 74 constants, 284 structures).
+
+Verification: 184 production MoonSharp/full tracker checks with controlled native
+models cover copied source data in all eight callback types, absent producers,
+root/unowned-child kinds, IDs, invalid points, data surviving child retirement,
+callback mutation isolation and existing projectile ownership/lifetime/limits.
+No geometry/contact claim is made for that fixture. Sixty extracted current
+hit-phase/status-icon/routing checks pass, including stale event targets on both
+sides, native ordering/reentrancy/versus guards and outgoing arithmetic.
+
+Unity 6.6 full-game Campaign Tournament 3 passes 40 Return Dart checks. An
+acceptance-only second rule observes the same live child ID across HitPostCrit,
+PostHit, DamageDealing/DamageResolving and DamageDealt/DamageReceived on both
+sides; it mutates its copied actor/point and later callbacks retain original data.
+Native contact reduces health 1 -> .9836771; missed flight turns/returns, pause,
+cooldown, strike deletion and live-child surrender cleanup remain passing.
+Input/AI/spacing and fresh post-tutorial profile are controlled; the marked Temp
+fixture adds its probe to the same single fight patch, leaving shipped Lua and
+root scene/profile untouched. Initial duplicate probe patch and stale-event
+attribution failures were corrected. Final log:
+Temp/FighterPlaybackUnity-d997a2c104cd4564b9767ae6eb4b68d8/validation-4a3530fd9d294d5aa9c4ffc1dfde7d76.log.
+Native critical/block notifications beyond the unblocked/no-critical dart are
+covered by controlled events, not this full-game contact scenario.
+
+All four managed assemblies compile through ignored Unity 6.6 reference remapping.
+Editor generate/check/build and 52 unit tests pass. Actual LuaLS verifies source
+completion across all eight callbacks and the complete shipped example; actual
+VS Code passes 16 checks including inferred attack fields. Wiki build/types/search and 6418 local links/assets across 61 pages pass.
+The Underworld runtime has 1282 passing assertions with matching Unity managed
+references preloaded; its asset audit retains the previously documented missing
+fungus_raid /layer_0_2 resource. No location assets changed. Existing standalone MoonSharp
+reflection loader warnings, unrelated Unity Search/preview warnings and the wiki
+404 warning remain; logs are not claimed clean. General actors, arbitrary world
+contacts, expiry/miss notifications, swept collision, all arenas/forms, physical
+input/export and independent creator acceptance remain open. G01-G14/E1-E8 and
+the broad Minecraft-style objective remain active.

@@ -31,11 +31,11 @@ if ($postHit.IndexOf('EVENT_POST_HIT') -lt 0 -or
     $postHit.IndexOf('DispatchEclipseHitPhase') -le $postHit.IndexOf('EVENT_POST_HIT')) {
     throw 'PostHit callback must follow recovered EVENT_POST_HIT processing.'
 }
-$nativeHit = $fight.IndexOf('DispatchEclipseHitPhase(EGHPHELLOGO, gHHCDAFIKJE, ModEffectEvent.PostHit)')
+$nativeHit = $fight.IndexOf('DispatchEclipseHitPhase(EGHPHELLOGO, gHHCDAFIKJE, ModEffectEvent.PostHit, eclipseAttackSource)')
 $laterDamage = $fight.IndexOf('DispatchEclipseCombatEvent(ModEffectEvent.DamageDealing', $nativeHit)
 if ($nativeHit -lt 0 -or $laterDamage -le $nativeHit) { throw 'PostHit callback moved after the existing outgoing-damage seam.' }
 
-$dispatch = Extract-Block $fight 'private void DispatchEclipseHitPhase(Model.EventModel eventModel, Model.StrikeResult strike, ModEffectEvent effectEvent)'
+$dispatch = Extract-Block $fight 'private void DispatchEclipseHitPhase(Model.EventModel eventModel, Model.StrikeResult strike, ModEffectEvent effectEvent, ModAttackSource attackSource = null)'
 $show = Extract-Block $fight 'private bool TryShowEclipseStatusIcon(Model model, object key, AssetId sprite, int frames, int stacks, out string error)'
 $clear = Extract-Block $fight 'private bool TryClearEclipseStatusIcon(Model model, object key, out string error)'
 $update = Extract-Block $fight 'private void UpdateEclipseStatusIcons()'
@@ -43,6 +43,7 @@ $eventEnum = Extract-Block $runtime 'public enum ModEffectEvent'
 $hitEvent = Extract-Block $runtime 'public sealed class ModHitEvent'
 $incomingHit = Extract-Block $runtime 'public sealed class ModIncomingHit'
 $damageEvent = Extract-Block $runtime 'public sealed class ModDamageEvent'
+$attackSource = Extract-Block (Get-Content -Raw -Encoding UTF8 (Join-Path $root 'Assets/Scripts/Eclipse/Runtime/Modding/ModProjectiles.cs')) 'public sealed class ModAttackSource'
 $outgoingStart = $postHit.LastIndexOf('if (_eclipseFightBeginDispatched)', $postHit.IndexOf('var outgoing = new ModIncomingHit'))
 $resolvedStart = $postHit.LastIndexOf('if (_eclipseFightBeginDispatched)', $postHit.IndexOf('var observation = new ModDamageEvent'))
 if ($outgoingStart -lt 0 -or $resolvedStart -le $outgoingStart) { throw 'Projectile attribution seams missing.' }
@@ -59,6 +60,7 @@ $eventEnum
 $hitEvent
 $incomingHit
 $damageEvent
+$attackSource
 public readonly struct AssetId {
     public string Namespace { get; } public string Path { get; }
     private AssetId(string ns,string path){Namespace=ns;Path=path;}
@@ -75,7 +77,7 @@ public sealed class Model {
     public Model Owner; public Model GetRootModel()=>Owner==null?this:Owner.GetRootModel();
     public float Health=1; public float KKMCHCNOHMB()=>Health;
     public sealed class EventModel { public Model KJDFJPBIGJC; public Model GAIBPAGPEGK; }
-    public sealed class StrikeResult { public Model GAIBPAGPEGK; public InfoAnimation PBPDKJNKFCJ; public float EEDJBBOCFNL; public bool DFOHNJEBDED; public bool DNGKOMPMPCD; }
+    public sealed class StrikeResult { public Model AttackerModel; public InfoAnimation AttackAnimation; public float EEDJBBOCFNL; public bool DFOHNJEBDED; public bool DNGKOMPMPCD; }
 }
 public static class PerksStage { public sealed class ActionPerk { public Model KJDFJPBIGJC; public Model BIKLKJMNGKP; public string NHKMCLPOMFK=""; public bool FLNCPBKBJBL; public int KGNDJOLBBJF; public int FLNLMIHEDCI; public int EclipseStackCount; } }
 public static class ModRuntime { public static object Scripts=new object(); }
@@ -92,6 +94,7 @@ public sealed class FightHarness {
     private void DispatchEclipseCombatEvent(Eclipse.Modding.ModEffectEvent type,Eclipse.Modding.ModDamageEvent ignored=null,Eclipse.Modding.ModIncomingHit hit=null,object activity=null){Events.Add(new Seen{Side="player",Type=type,Hit=hit,Damage=ignored});}
     private void DispatchEclipseOpponent(Eclipse.Modding.ModEffectEvent type,Eclipse.Modding.ModDamageEvent ignored=null,Eclipse.Modding.ModIncomingHit hit=null,object activity=null){Events.Add(new Seen{Side="opponent",Type=type,Hit=hit,Damage=ignored});}
     private void CKCCBJKIGIO(Model model,PerksStage.ActionPerk action,bool remove){if(remove)VisibleRemoves++;else VisibleAdds++;}
+private ModAttackSource CaptureEclipseAttackSource(Model actor,Model.StrikeResult strike)=>null; // Contact provenance has separate full tracker/native acceptance.
 $dispatch
 $show
 $clear
@@ -99,11 +102,13 @@ $update
     public void Hit(Model.EventModel e,Model.StrikeResult s,Eclipse.Modding.ModEffectEvent type)=>DispatchEclipseHitPhase(e,s,type);
     sealed class Round { public int round=1; } readonly Round round=new Round();
     public void Outgoing(Model.EventModel EGHPHELLOGO,Model.StrikeResult gHHCDAFIKJE) {
-        Model eclipseAttacker=(EGHPHELLOGO.GAIBPAGPEGK??gHHCDAFIKJE.GAIBPAGPEGK)?.GetRootModel();
+        Model eclipseAttacker=(gHHCDAFIKJE.AttackerModel??EGHPHELLOGO.GAIBPAGPEGK)?.GetRootModel();
+        ModAttackSource eclipseAttackSource=null;
 $outgoing
     }
     public void Resolved(Model.EventModel EGHPHELLOGO,Model.StrikeResult gHHCDAFIKJE,float eclipseHealthBefore) {
-        Model eclipseAttacker=(EGHPHELLOGO.GAIBPAGPEGK??gHHCDAFIKJE.GAIBPAGPEGK)?.GetRootModel();
+        Model eclipseAttacker=(gHHCDAFIKJE.AttackerModel??EGHPHELLOGO.GAIBPAGPEGK)?.GetRootModel();
+        ModAttackSource eclipseAttackSource=null;
 $resolved
     }
     public bool Show(Model m,object key,Eclipse.Modding.AssetId sprite,int frames,int stacks,out string error)=>TryShowEclipseStatusIcon(m,key,sprite,frames,stacks,out error);

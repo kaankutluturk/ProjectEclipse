@@ -13,8 +13,9 @@ lifetime removes a stuck/missed projectile even if Lua stops guiding it.
 
 This is a return to the launch position, not a hand catch; movement does not
 supply swept collision or rotate the rig toward the trajectory. Lua stores copied
-IDs/path state, not callback-scoped projectile references. Hit counts include
-ordinary fighter damage. Round/fight endings close the HUD and retire the child.
+IDs/path state, not callback-scoped projectile references. Hit counts filter copied
+`event.attack` by projectile kind, declaring mod and actor name, so ordinary
+fighter damage and other projectile sources do not count. Round/fight endings close the HUD and retire the child.
 
 The copied base animation binaries retain their original geometry. See the public
 [projectile guide](https://dawc17.github.io/ProjectEclipse/guides/projectile-abilities/).

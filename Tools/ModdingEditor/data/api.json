@@ -2536,6 +2536,22 @@
         "state": "table<string,any>"
       }
     },
+    "AttackSource": {
+      "fields": {
+        "kind": "\"fighter\"|\"projectile\"|\"native_child\"",
+        "model_name": "string",
+        "animation_name": "string",
+        "point": "Eclipse.CombatPosition",
+        "projectile_id?": [
+          "string",
+          "Round/fight observation ID matching an owned projectile snapshot. Not a handle."
+        ],
+        "projectile_owner?": [
+          "string",
+          "Declaring mod ID; only present for a tracked typed projectile."
+        ]
+      }
+    },
     "CombatEvent": {
       "fields": {
         "type": "string",
@@ -2545,7 +2561,11 @@
         "health_after?": "number",
         "blocked?": "boolean",
         "critical?": "boolean",
-        "won?": "boolean"
+        "won?": "boolean",
+        "attack?": [
+          "Eclipse.AttackSource",
+          "Copied native contact provenance for hit/damage/block/critical callbacks; absent without a native contact."
+        ]
       }
     },
     "DamageEvent": {

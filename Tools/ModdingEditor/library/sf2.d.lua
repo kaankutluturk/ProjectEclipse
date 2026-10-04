@@ -199,6 +199,15 @@ local BehaviorState = {}
 ---@field state table<string,any>
 local BehaviorSelf = {}
 
+---@class (exact) Eclipse.AttackSource
+---@field kind "fighter"|"projectile"|"native_child"
+---@field model_name string
+---@field animation_name string
+---@field point Eclipse.CombatPosition
+---@field projectile_id? string Round/fight observation ID matching an owned projectile snapshot. Not a handle.
+---@field projectile_owner? string Declaring mod ID; only present for a tracked typed projectile.
+local AttackSource = {}
+
 ---@class (exact) Eclipse.CombatEvent
 ---@field type string
 ---@field round? integer
@@ -208,6 +217,7 @@ local BehaviorSelf = {}
 ---@field blocked? boolean
 ---@field critical? boolean
 ---@field won? boolean
+---@field attack? Eclipse.AttackSource Copied native contact provenance for hit/damage/block/critical callbacks; absent without a native contact.
 local CombatEvent = {}
 
 ---@class (exact) Eclipse.DamageEvent: Eclipse.CombatEvent

@@ -48,6 +48,18 @@ public partial class Fight
     }
     private readonly Dictionary<Model, OwnedProjectile> _eclipseProjectiles = new Dictionary<Model, OwnedProjectile>();
     private long _eclipseProjectileSequence;
+    private ModAttackSource CaptureEclipseAttackSource(Model attacker, Model.StrikeResult strike)
+    {
+        if (attacker == null || strike?.Point == null) return null;
+        double x = strike.Point.GetX(), y = strike.Point.GetY(), z = strike.Point.GetZ();
+        if (double.IsNaN(x) || double.IsInfinity(x) || double.IsNaN(y) || double.IsInfinity(y) || double.IsNaN(z) || double.IsInfinity(z)) return null;
+        bool owned = _eclipseProjectiles.TryGetValue(attacker, out var entry) &&
+            ReferenceEquals(entry.Session, ModRuntime.Scripts) && ProjectileOwnerActive(entry.Session, entry.Owner) &&
+            entry.Round == round.round && entry.Root == attacker.GetRootModel();
+        string kind = owned ? "projectile" : attacker == attacker.GetRootModel() ? "fighter" : "native_child";
+        return new ModAttackSource(kind, attacker.get_Name(), strike.AttackAnimation?.Name, x, y, z,
+            owned ? entry.Sequence.ToString(CultureInfo.InvariantCulture) : null, owned ? entry.Owner.ToString() : null);
+    }
     private bool ProjectileOwnerActive(ModScriptSession session, ModId owner) => session != null && !session.IsDisposed &&
         session.ActiveMods.Any(mod => mod.Id == owner);
 

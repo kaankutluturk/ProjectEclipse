@@ -1118,7 +1118,7 @@ public class PerkInfoItem
 		case "Animations":
 		{
 			StringBuilder stringBuilder = new StringBuilder();
-			List<string> list = fKGAAFNNCNE.PBPDKJNKFCJ.FOLOOGCLPNE();
+			List<string> list = fKGAAFNNCNE.AttackAnimation.FOLOOGCLPNE();
 			int i = 0;
 			for (int count = list.Count; i < count; i++)
 			{
@@ -1147,11 +1147,11 @@ public class PerkInfoItem
 				num = Mathf.Pow(2f, (float)OEMALIFPGPO * aMKPAGCFMIN);
 			}
 			float num2 = 1f;
-			if (fKGAAFNNCNE.DNGKOMPMPCD && fKGAAFNNCNE.GAIBPAGPEGK != null)
+			if (fKGAAFNNCNE.DNGKOMPMPCD && fKGAAFNNCNE.AttackerModel != null)
 			{
 				int OEMALIFPGPO2 = 0;
 				string nJFGLOECJEK2 = GameUtils.IOGOPCABLON().Attribute;
-				fKGAAFNNCNE.GAIBPAGPEGK.Parameters.IBLHIAHECLK.Get(nJFGLOECJEK2, ref OEMALIFPGPO2);
+				fKGAAFNNCNE.AttackerModel.Parameters.IBLHIAHECLK.Get(nJFGLOECJEK2, ref OEMALIFPGPO2);
 				float aMKPAGCFMIN2 = GameUtils.IOGOPCABLON().Base;
 				num2 = Mathf.Pow(2f, (float)OEMALIFPGPO2 * aMKPAGCFMIN2);
 			}

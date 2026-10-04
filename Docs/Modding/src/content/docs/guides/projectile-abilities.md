@@ -141,6 +141,12 @@ not references. Contact still uses native attack edges. Native lifetime expires
 a stuck child even if Lua stops guiding it. Test misses as well as hits: native
 strike deletion can remove it before it starts returning.
 
+The example's hit counter reads copied `event.attack` in `on_damage_dealt` and
+checks `kind`, `projectile_owner` and `model_name`. Ordinary punches and other
+projectiles therefore do not count. `projectile_id` also matches the live query's
+snapshot ID, allowing Lua to correlate a contact with its own saved trajectory
+data. See [attack-source fields](../../api/combat-callbacks/#identify-the-attack-that-made-contact).
+
 Return Dart has passed a Unity 6.6 Campaign Tournament 3 run with native contact,
 caster attribution, pause, a missed flight turning/returning/removing, cooldown
 and surrender with a live child. Inputs, AI and target spacing were controlled.

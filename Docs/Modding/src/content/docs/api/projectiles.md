@@ -17,6 +17,13 @@ begin and end callbacks reject operations. Reacquire each callback; retain copie
 snapshots and IDs for Lua state. IDs are strings unique within a fight, not save
 identifiers. These references never expose native models or arbitrary actors.
 
+Native contact callbacks supply a copied
+[`event.attack`](../combat-callbacks/#identify-the-attack-that-made-contact).
+For tracked typed children, its `projectile_id` matches `snapshot().id` and
+`projectile_owner` names the declaring mod. Use those observations to distinguish
+your own projectile's hit from ordinary attacks or another mod's child. They stay
+readable after deletion but grant no live handle, and do not change query ownership.
+
 ## fighter:projectiles
 
 Query this mod's live typed projectiles for the callback's fighter.

@@ -14,9 +14,10 @@ namespace Eclipse.Modding
 public static class StageType { public enum FDBBPEGEGMK { STAGE_FIGHT, STAGE_END_STANCE } }
 public sealed class FightList { public BattleType Type=BattleType.FightTournament; public BattleType get_Type()=>Type; }
 public sealed class RoundData { public int round=1; public bool processing=true; }
-public sealed class Vector3f { public float X,Y,Z; public Vector3f(float x,float y,float z){X=x;Y=y;Z=z;} }
+public sealed class Vector3f { public float X,Y,Z; public float GetX()=>X; public float GetY()=>Y; public float GetZ()=>Z; public Vector3f(float x,float y,float z){X=x;Y=y;Z=z;} }
 public sealed class Model
 {
+    public sealed class StrikeResult { public Vector3f Point; public InfoAnimation AttackAnimation; }
     public Model Parent; public string Name = "fixture.dart";
     public Model GetRootModel()=>Parent?.GetRootModel()??this;
     public string get_Name()=>Name;
@@ -42,6 +43,7 @@ public partial class Fight
     public void ProjectileStep(){ApplyEclipseProjectiles();foreach(var child in JLEFIKJODGG){LNDLFINJHDB.Remove(child);HCPGFOCGDAA.Remove(child);ForgetEclipseProjectile(child);}JLEFIKJODGG.Clear();}
     public void Age(){Clock++;UpdateEclipseProjectiles();}
     public void CancelProjectiles()=>CancelEclipseProjectiles();
+    public ModAttackSource Attack(Model actor, Model.StrikeResult strike)=>CaptureEclipseAttackSource(actor,strike);
     public bool Query(Model body,ModId owner,out IReadOnlyList<IModProjectile> values,out string error)=>TryGetEclipseProjectiles(body,owner,out values,out error);
     public Model Spawn(Model body,string owner,int life=180){if(!CanSpawnEclipseProjectile(body,owner,life))return null;var child=new Model{Parent=body};RegisterEclipseProjectile(body,child,owner,life);HCPGFOCGDAA.Add(child);return child;}
     public Model Player=new Model(),Enemy=new Model();
@@ -64,7 +66,7 @@ public partial class Fight
     public bool QueuePlayback(Model body,DefinitionId move,Action<bool,string> complete,out string reason)=>TryQueueEclipseFighterPlayback(body,move,complete,out reason);
     public void Cancel()=>CancelEclipseFighterMotion();
     public IModFighterOperations Operations()=>new EclipseFighterOperations(this,Player);
-    public sealed class EclipseFighterOperations : IModFighterOperations, IModFighterMotion, IModFighterPlayback, IModFighterTargets, IModCombatSnapshotSource, IModAnimationLifecycleSource, IModDamageEventSource, IModFighterProjectiles
+    public sealed class EclipseFighterOperations : IModFighterOperations, IModFighterMotion, IModFighterPlayback, IModFighterTargets, IModCombatSnapshotSource, IModAnimationLifecycleSource, IModDamageEventSource, IModIncomingHitSource, IModFighterProjectiles
     {
         readonly Fight fight; readonly Model body;
         public EclipseFighterOperations(Fight fight,Model body){this.fight=fight;this.body=body;}
@@ -73,6 +75,7 @@ public partial class Fight
         public double Health=>body.Health;
         public ModAnimationLifecycleEvent AnimationEvent { get; set; }
         public ModDamageEvent DamageEvent { get; set; }
+        public ModIncomingHit IncomingHit { get; set; }
         public ModCombatSnapshot CaptureCombatSnapshot(){var other=body==fight.Player?fight.Enemy:fight.Player;return new ModCombatSnapshot(new ModFighterSnapshot(body.Health,1,1,body.X,body.Y,body.Z),new ModFighterSnapshot(other.Health,1,1,other.X,other.Y,other.Z),fight.Clock,fight.round.processing);}
         public IModFighterOperations Opponent=>new EclipseFighterOperations(fight,body==fight.Player?fight.Enemy:fight.Player);
         public bool TryMoveBy(double x,double y,double z,out string error)=>fight.Queue(body,x,y,z,out error);

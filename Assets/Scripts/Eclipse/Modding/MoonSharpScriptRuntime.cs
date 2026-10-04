@@ -428,6 +428,8 @@ namespace Eclipse.Modding
                         eventTable.Set("critical", DynValue.NewBoolean(damage.Critical));
                     }
                     var incoming = (fighter as IModIncomingHitSource)?.IncomingHit;
+                    var attackSource = damage?.AttackSource ?? incoming?.AttackSource;
+                    if (attackSource != null) eventTable.Set("attack", DynValue.NewTable(AttackSourceTable(attackSource)));
                     if (incoming != null && (effectEvent == ModEffectEvent.DamageDealing || effectEvent == ModEffectEvent.DamageResolving ||
                         effectEvent == ModEffectEvent.HitPostCrit || effectEvent == ModEffectEvent.PostHit))
                     {

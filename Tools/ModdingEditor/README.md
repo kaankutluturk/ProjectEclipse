@@ -1,5 +1,11 @@
 # Eclipse Modding for VS Code
 
+Native hit/damage/block/critical callback event types now include optional
+`attack`: copied kind, contact actor/move, hit point and owned projectile ID/mod.
+Return Dart filters its hit counter using that source. Editor completion covers
+all eight contact callbacks; IDs are observations, not native handles. See the
+wiki's combat callback reference for timing and nil cases.
+
 `sf2.fights.patch { target = fight, append_rules = { rule } }` composes compatible
 additions from different mods in dependency load order. `rules` replacements stay
 exclusive; duplicate handles, aggregate limits and overlapping round controllers

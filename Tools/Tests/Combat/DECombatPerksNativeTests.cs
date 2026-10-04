@@ -27,7 +27,7 @@ internal static class DECombatPerksNativeTests
         fight.Opponent = new Model { Name = "opponent" };
         var animation = new InfoAnimation("Weapon", "Unarmed");
         var strike = new Model.StrikeResult {
-            GAIBPAGPEGK = fight.Player, PBPDKJNKFCJ = animation, EEDJBBOCFNL = 0.20f,
+            AttackerModel = fight.Player, AttackAnimation = animation, EEDJBBOCFNL = 0.20f,
             DFOHNJEBDED = false, DNGKOMPMPCD = true
         };
         fight.BeginDispatched = false;
@@ -47,7 +47,7 @@ internal static class DECombatPerksNativeTests
 
         fight.Events.Clear();
         animation = new InfoAnimation("RangedMissile", "MagicMissile");
-        strike.PBPDKJNKFCJ = animation; strike.EEDJBBOCFNL = 0.4f;
+        strike.AttackAnimation = animation; strike.EEDJBBOCFNL = 0.4f;
         fight.Hit(new Model.EventModel { KJDFJPBIGJC = fight.Opponent, GAIBPAGPEGK = fight.Player }, strike, ModEffectEvent.HitPostCrit);
         Check(fight.Events.All(e => e.Hit.HitEvent.Ranged && e.Hit.HitEvent.Magic && !e.Hit.HitEvent.Weapon && !e.Hit.HitEvent.Unarmed),
             "Ranged/magic cancellation tags are not exact recovered predicates.");
@@ -56,7 +56,7 @@ internal static class DECombatPerksNativeTests
     private static void CheckReverseSidesAndLocalVersus()
     {
         var fight = new FightHarness { Player = new Model { Name = "player" }, Opponent = new Model { Name = "opponent" } };
-        var strike = new Model.StrikeResult { GAIBPAGPEGK = fight.Opponent, PBPDKJNKFCJ = new InfoAnimation("Weapon"), EEDJBBOCFNL = .2f };
+        var strike = new Model.StrikeResult { AttackerModel = fight.Opponent, AttackAnimation = new InfoAnimation("Weapon"), EEDJBBOCFNL = .2f };
         fight.Hit(new Model.EventModel { KJDFJPBIGJC = fight.Player, GAIBPAGPEGK = fight.Opponent }, strike, ModEffectEvent.PostHit);
         Check(fight.Events.Count == 2 && fight.Events[0].Side == "opponent" && !fight.Events[0].Hit.HitEvent.Incoming &&
             fight.Events[1].Side == "player" && fight.Events[1].Hit.HitEvent.Incoming, "Opponent attack side routing is wrong.");
@@ -84,7 +84,7 @@ internal static class DECombatPerksNativeTests
             var root = reverse ? fight.Opponent : fight.Player;
             var victim = reverse ? fight.Player : fight.Opponent;
             var child = new Model { Name = "projectile", Owner = new Model { Owner = root } };
-            var strike = new Model.StrikeResult { GAIBPAGPEGK = child, PBPDKJNKFCJ = new InfoAnimation("RangedMissile"), EEDJBBOCFNL = .2f };
+            var strike = new Model.StrikeResult { AttackerModel = child, AttackAnimation = new InfoAnimation("RangedMissile"), EEDJBBOCFNL = .2f };
             // Strike fallback and event actor both route through the current root.
             foreach (bool fallback in new[] { false, true })
             {
@@ -93,8 +93,12 @@ internal static class DECombatPerksNativeTests
                 Check(fight.Events.Count == 2 && fight.Events[0].Side == (reverse ? "opponent" : "player"), "Nested child lost main attacker attribution.");
                 Check(fight.Events.All(e => e.Hit.HitEvent.Ranged) && !fight.Events[0].Hit.HitEvent.Incoming && fight.Events[1].Hit.HitEvent.Incoming, "Child tags or recipient perspective changed.");
                 Check(fight.Events[0].Hit.TryScaleOutgoing(2, out _), "Child outgoing modifier unavailable.");
-                Check(Math.Abs(strike.EEDJBBOCFNL - (fallback ? .8f : .4f)) < .00001 && strike.GAIBPAGPEGK == child, "Attribution changed native source or pending damage.");
+                Check(Math.Abs(strike.EEDJBBOCFNL - (fallback ? .8f : .4f)) < .00001 && strike.AttackerModel == child, "Attribution changed native source or pending damage.");
             }
+            fight.Events.Clear();
+            // Native post-critical processing has not refreshed EventModel's attacker yet.
+            fight.Hit(new Model.EventModel { KJDFJPBIGJC = victim, GAIBPAGPEGK = victim }, strike, ModEffectEvent.HitPostCrit);
+            Check(fight.Events.Count == 2 && fight.Events[0].Side == (reverse ? "opponent" : "player"), "Stale event target overrode current strike attacker.");
             fight.Events.Clear(); child.Owner = new Model { Name = "retired or unrelated" };
             fight.Hit(new Model.EventModel { KJDFJPBIGJC = victim, GAIBPAGPEGK = child }, strike, ModEffectEvent.HitPostCrit);
             Check(fight.Events.Count == 1 && fight.Events[0].Hit.HitEvent.Incoming, "Unrelated root impersonated current attacker.");
@@ -111,7 +115,7 @@ internal static class DECombatPerksNativeTests
             var root = reverse ? fight.Opponent : fight.Player;
             var victim = reverse ? fight.Player : fight.Opponent;
             var child = new Model { Owner = root };
-            var strike = new Model.StrikeResult { GAIBPAGPEGK = child, EEDJBBOCFNL = .2f };
+            var strike = new Model.StrikeResult { AttackerModel = child, EEDJBBOCFNL = .2f };
             var contact = new Model.EventModel { GAIBPAGPEGK = child, KJDFJPBIGJC = victim };
             fight.Outgoing(contact, strike);
             Check(fight.Events.Count == 1 && fight.Events[0].Side == (reverse ? "opponent" : "player") && fight.Events[0].Type == ModEffectEvent.DamageDealing, "Child outgoing damage seam lost owner.");

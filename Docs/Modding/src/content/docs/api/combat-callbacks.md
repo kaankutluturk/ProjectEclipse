@@ -35,8 +35,54 @@ For native child projectiles, attacker-side `on_hit_post_crit`, `on_post_hit`,
 `on_damage_dealing`, `on_damage_dealt` and `on_critical` route to the current root
 main fighter. The original child animation determines ranged/magic classification
 and the native contact/damage calculation. Fighter methods target the main fighter;
-these events do not expose a child handle. Defender notifications remain attached
+these events do not expose a child handle. Their copied `event.attack` identifies
+the actual contact source. Defender notifications remain attached
 to the actual opposing main fighter who was hit.
+
+### Identify the attack that made contact
+
+`on_hit_post_crit`, `on_post_hit`, `on_damage_dealing`, `on_damage_resolving`,
+`on_damage_dealt`, `on_damage_received`, `on_block` and `on_critical` can supply
+`event.attack`. Reading it requires no extra capability. Check for `nil`: older
+or synthetic event producers, or unavailable native contact data, may omit it.
+This is copied observation data; editing it does not change damage, the actor,
+another callback's event, or a saved native snapshot.
+
+| Field | Meaning |
+| --- | --- |
+| `kind` | `"fighter"` for a root fighter, `"projectile"` for a tracked typed projectile, or `"native_child"` for another native child. |
+| `model_name` | Actual contact actor's native name; it need not be unique. |
+| `animation_name` | Native move used for this contact, rather than the caster's current move; empty when unavailable. Owned move names are qualified IDs. |
+| `point` | Copied `{ x, y, z }` native contact position. Positive Y points downward. It is a hit point, not the actor's origin or a hurtbox. |
+| `projectile_id` | Only for `kind = "projectile"`: string matching that child's `projectile:snapshot().id`. Unique within the fight; do not treat it as a profile-wide ID. |
+| `projectile_owner` | Only for `kind = "projectile"`: declaring mod ID. |
+
+Both attacker and defender see the same source identity. `on_post_hit` and the
+later damage phases retain the source captured before their Lua handlers, even
+if a handler requests removal or native strike cleanup deletes the child. A
+retained attack table stays readable but does not retain a live projectile.
+Reacquire this mod's live children with `fighter:projectiles()` when you need to
+act on one; that operation still requires `combat.projectiles` and its normal
+ownership/lifetime checks. A foreign mod's ID grants no control over its child.
+
+For a projectile-specific hit counter, use ordinary Lua filtering:
+
+```lua
+on_damage_dealt = function(self, _, event)
+    local attack = event.attack
+    if attack and attack.kind == "projectile" and
+        attack.projectile_owner == sf2.mod.id and
+        attack.model_name == sf2.mod.id .. ".dart" then
+        self.state.hits = self.state.hits + 1
+    end
+end,
+```
+
+This field belongs inside a behavior with a declared integer `hits` state field.
+It observes applied damage; it does not inflict a second hit. Blocked or zero-life-
+loss contacts may not call `on_damage_dealt`; inspect `on_post_hit` when contact
+rather than life loss is the trigger. Hit data does not report misses, expiry or
+arbitrary world collisions, and does not add swept collision.
 
 Fight-attached [behavior rules](../rules/#sf2rulesbehavior) also receive these callbacks, before each side's equipment/perk callbacks. Rule state is independent of equipped items.
 

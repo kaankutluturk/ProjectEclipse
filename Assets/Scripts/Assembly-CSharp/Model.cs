@@ -321,7 +321,8 @@ public class Model : global::EventDispatcher<object>
 
 		public ModelEdge ALIHGFIJEDN;
 
-		public InfoAnimation PBPDKJNKFCJ;
+		// best guess for name
+		public InfoAnimation AttackAnimation;
 
 		public float HMOLHIEDINK;
 
@@ -351,7 +352,8 @@ public class Model : global::EventDispatcher<object>
 
 		public Model KJDFJPBIGJC;
 
-		public Model GAIBPAGPEGK;
+		// best guess for name
+		public Model AttackerModel;
 
 		public List<int> ProcedPerks = new List<int>();
 
@@ -3013,12 +3015,12 @@ public class Model : global::EventDispatcher<object>
 		}
 		GHHCDAFIKJE.ProcedPerks.Clear();
 		GHHCDAFIKJE.KJDFJPBIGJC = this;
-		GHHCDAFIKJE.GAIBPAGPEGK = HFGPAELCNMF;
+		GHHCDAFIKJE.AttackerModel = HFGPAELCNMF;
 		GHHCDAFIKJE.Target = ((!Parameters.IsPlayer) ? 1 : 0);
 		GHHCDAFIKJE.CMGLHHEJEBN = GCFJNDJBBOI;
 		GHHCDAFIKJE.Impulse.Set(KKIKIDNALOL);
 		GHHCDAFIKJE.ALIHGFIJEDN = AOBJMMHGMPG;
-		GHHCDAFIKJE.PBPDKJNKFCJ = HFGPAELCNMF._Animation.NNMAFFCCMHC();
+		GHHCDAFIKJE.AttackAnimation = HFGPAELCNMF._Animation.NNMAFFCCMHC();
 		GHHCDAFIKJE.Point = NAAPALOFBCI;
 		GHHCDAFIKJE.AOFLADELDFB = GKCGDDBMHNJ;
 		GHHCDAFIKJE.HMOLHIEDINK = hFIIPNLCIEE.GHGGNMBCMNM();
@@ -3077,7 +3079,7 @@ public class Model : global::EventDispatcher<object>
 			Fight.GetCurrentFight().OnModelHit(KDAHHIMLJGG);
 		}
 		KDAHHIMLJGG.GAIBPAGPEGK = EGGEACCDAEK();
-		HEEHFLHNPOH(HFGPAELCNMF, GHHCDAFIKJE.PBPDKJNKFCJ, GHHCDAFIKJE.EEDJBBOCFNL, GHHCDAFIKJE);
+		HEEHFLHNPOH(HFGPAELCNMF, GHHCDAFIKJE.AttackAnimation, GHHCDAFIKJE.EEDJBBOCFNL, GHHCDAFIKJE);
 	}
 
 	public void StrikePhysics(List<string> NIKHAICFGNM, StrikeResult PPIAOBPLGOK)

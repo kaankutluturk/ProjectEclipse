@@ -118,6 +118,19 @@ exports.run = async function () {
         }
         assert(projectileFound,'Callback-scoped projectile completion missing');
         passed.push('PASS: owned projectile snapshot/movement/removal completion from fighter query');
+        const attackUri=vscode.Uri.joinPath(folder.uri,'scripts','attack-completion.lua');
+        fs.writeFileSync(attackUri.fsPath,'local sf2=require("sf2")\nsf2.behaviors.register {id="attack",on_damage_dealt=function(_,fighter,event)\n local attack=event.attack;if attack then local value=attack. end\nend}');
+        const attackDoc=await vscode.workspace.openTextDocument(attackUri);
+        const attackPosition=attackDoc.positionAt(attackDoc.getText().indexOf('attack. end')+7);
+        let attackFound=false;const attackDeadline=Date.now()+30000;
+        while(Date.now()<attackDeadline){
+            const result=await vscode.commands.executeCommand('vscode.executeCompletionItemProvider',attackUri,attackPosition);
+            if(['kind','model_name','animation_name','point','projectile_id','projectile_owner'].every(key=>result?.items.some(item=>String(typeof item.label==='string'?item.label:item.label.label).startsWith(key)))){attackFound=true;break;}
+            await new Promise(resolve=>setTimeout(resolve,500));
+        }
+        assert(attackFound,'Copied native attack source completion missing');
+        passed.push('PASS: native attack source fields infer from damage callback');
+
 
         const uri = vscode.Uri.joinPath(folder.uri, 'scripts', 'editor-test.lua');
         fs.writeFileSync(uri.fsPath, 'local sf2 = require("sf2")\nsf2.assets.sprite("sprites/weapon")\nsf2.localization.key("weapon.training_blade")\n');

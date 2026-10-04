@@ -19,18 +19,50 @@ static class Program
         string parent=Path.Combine(fixture,Guid.NewGuid().ToString("N")),dir=Path.Combine(parent,id);
         Directory.CreateDirectory(Path.Combine(dir,"scripts"));
         File.WriteAllText(Path.Combine(dir,"mod.toml"),"schema=1\nid=\""+id+"\"\nname=\"Projectiles\"\nversion=\"1.0.0\"\nauthors=[\"Fixture\"]\nentrypoint=\"scripts/main.lua\"\ncapabilities=["+string.Join(",",caps.Split(',').Select(c=>"\""+c+"\""))+"]\n");
-        File.WriteAllText(Path.Combine(dir,"scripts/main.lua"),"local sf2=require('sf2');local saved;local calls=0;local function callback(_,fighter) calls=calls+1; "+body+" end;sf2.behaviors.register{id='test',on_tick=callback,on_round_begin=callback,on_round_end=callback,on_fight_begin=callback,on_fight_end=callback}");
+        File.WriteAllText(Path.Combine(dir,"scripts/main.lua"),"local sf2=require('sf2');local saved;local calls=0;local function callback(_,fighter,event) calls=calls+1; "+body+" end;sf2.behaviors.register{id='test',on_tick=callback,on_round_begin=callback,on_round_end=callback,on_fight_begin=callback,on_fight_end=callback,on_damage_dealt=callback,on_damage_received=callback,on_damage_dealing=callback,on_damage_resolving=callback,on_block=callback,on_critical=callback,on_hit_post_crit=callback,on_post_hit=callback}");
         var mod=ModDiscovery.DiscoverLoose(parent).Mods.Single();var content=new ModContentCatalog();
         using var tx=content.BeginRegistration(mod);
         var ctx=new MoonSharpScriptRuntime().CreateContext(mod,new ModApiFacade(mod,new AssetResolver(new IAssetProvider[]{new LooseModProvider(mod)}),tx,new ModStateRuntime(),null));ctx.ExecuteEntrypoint();tx.Commit();
         return new Loaded{Context=ctx,Mod=mod,Behavior=DefinitionId.Parse(id+":behaviors/test")};
     }
     static Fight Native(params Loaded[] loaded){var fight=new Fight();ModRuntime.Scripts.ActiveMods.AddRange(loaded.Select(x=>x.Mod));return fight;}
-    static bool Invoke(Loaded loaded,Fight fight,out string error,ModEffectEvent kind=ModEffectEvent.Tick){var doc=new XmlDocument();doc.LoadXml("<BehaviorInstance/>");return ((IModInteractiveBehaviorScriptContext)loaded.Context).TryInvokeBehavior(loaded.Behavior,kind,null,new Dictionary<string,string>{{"side","player"}},new ModInstanceFighter(fight.Operations(),doc.DocumentElement),out error);}
+    static bool Invoke(Loaded loaded,Fight fight,out string error,ModEffectEvent kind=ModEffectEvent.Tick,IModFighterOperations operations=null){var doc=new XmlDocument();doc.LoadXml("<BehaviorInstance/>");return ((IModInteractiveBehaviorScriptContext)loaded.Context).TryInvokeBehavior(loaded.Behavior,kind,null,new Dictionary<string,string>{{"side","player"}},new ModInstanceFighter(operations??fight.Operations(),doc.DocumentElement),out error);}
     static void Event(Loaded l,Fight f){Check(Invoke(l,f,out var error),error);}
     static void Main(string[] args)
     {
         fixture=args[0];
+        using(var l=Load("local a=event.attack;assert(a.kind=='projectile' and a.projectile_owner==sf2.mod.id and a.projectile_id=='1');assert(a.model_name=='fixture.dart' and a.animation_name=='contact' and a.point.x==12 and a.point.y==-4 and a.point.z==3);if saved then assert(saved.point.x==999) end;saved=a;a.point.x=999;a.projectile_id='fake'", "content.register"))
+        {
+            var f=Native(l);var child=f.Spawn(f.Player,l.Mod.Id.Value);
+            var strike=new Model.StrikeResult{Point=new Vector3f(12,-4,3),AttackAnimation=new InfoAnimation{Name="contact"}};
+            var attack=f.Attack(child,strike);Check(attack.Kind=="projectile"&&attack.ProjectileId=="1","Owned native contact attribution");
+            var ops=new Fight.EclipseFighterOperations(f,f.Player){DamageEvent=new ModDamageEvent(1,1,.9,false,true,attack)};
+            foreach(var kind in new[]{ModEffectEvent.DamageDealt,ModEffectEvent.DamageReceived,ModEffectEvent.Block,ModEffectEvent.Critical})
+                Check(Invoke(l,f,out var error,kind,ops),error);
+            ops.DamageEvent=null;
+            ops.IncomingHit=new ModIncomingHit(()=>.1,_=>{},false,true,new ModHitEvent(false,false,false,true,false),attack);
+            foreach(var kind in new[]{ModEffectEvent.DamageDealing,ModEffectEvent.DamageResolving,ModEffectEvent.HitPostCrit,ModEffectEvent.PostHit})
+                Check(Invoke(l,f,out var error,kind,ops),error);
+            Check(attack.ProjectileId=="1"&&attack.X==12,"Lua mutation escaped copied attack data");
+            f.CancelProjectiles();f.ProjectileStep();
+            ops.DamageEvent=new ModDamageEvent(1,1,.9,false,true,attack);ops.IncomingHit=null;
+            Check(Invoke(l,f,out var finalError,ModEffectEvent.DamageDealt,ops),finalError);
+            Check(f.Attack(child,strike).Kind=="native_child","Retired child still claims owned capability provenance");
+            Check(f.Attack(f.Player,strike).Kind=="fighter","Root contact classification");
+            Check(f.Attack(child,new Model.StrikeResult{Point=new Vector3f(float.NaN,0,0)})==null,"Invalid contact point leaked");
+            Check(f.Attack(child,new Model.StrikeResult())==null,"Missing contact point invented");
+        }
+        foreach(string kind in new[]{"fighter","native_child"})
+        using(var l=Load("assert(event.attack.kind=='"+kind+"' and not event.attack.projectile_id and not event.attack.projectile_owner)","content.register"))
+        {
+            var f=Native(l);var actor=kind=="fighter"?f.Player:new Model{Parent=f.Player};
+            var attack=f.Attack(actor,new Model.StrikeResult{Point=new Vector3f(0,0,0)});
+            var ops=new Fight.EclipseFighterOperations(f,f.Player){DamageEvent=new ModDamageEvent(1,1,.9,false,false,attack)};
+            Check(Invoke(l,f,out var error,ModEffectEvent.DamageDealt,ops),error);
+        }
+        using(var l=Load("assert(event.attack==nil)","content.register"))
+        {var f=Native(l);var ops=new Fight.EclipseFighterOperations(f,f.Player){DamageEvent=new ModDamageEvent(1,1,.9,false,false)};Check(Invoke(l,f,out var error,ModEffectEvent.DamageDealt,ops),error);}
+
         using(var l=Load("local list,e=fighter:projectiles();assert(#list==1 and not e);local p=list[1];local v=p:snapshot();assert(v.name=='fixture.dart' and v.age_frames==0 and v.lifetime_frames==180);v.position.x=999;assert(p:snapshot().position.x==0);assert(p:move_by(10,2));assert(p.move_by(3,0,nil));assert(p:snapshot().position.x==0)"))
         {var f=Native(l);var child=f.Spawn(f.Player,l.Mod.Id.Value);Event(l,f);Check(child.Translations==0,"Lua moved synchronously");f.ProjectileStep();Check(child.X==13&&child.Y==2&&child.AnimationShifted,"Queued additive displacement failed");f.ProjectileStep();Check(child.Translations==1,"Command repeated");}
         using(var l=Load("local list=fighter:projectiles();assert(#list==1);assert(#(fighter:projectiles())==1)"))

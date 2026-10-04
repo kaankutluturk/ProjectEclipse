@@ -182,6 +182,12 @@ async function main() {
     const stateful = probe('stateful.lua', 'local sf2=require("sf2")\nsf2.behaviors.register { id="test", state={fields={hits={type="integer",default=0}}}, on_damage_received=function(self, fighter, event)\n local value=self.|\nend }');
     await until(async () => labels(await request('textDocument/completion', stateful)).includes('state'), 'stateful callback inference');
     console.log('PASS: inline callbacks infer fighter methods, damage events, and stateful self');
+    for (const callback of ['on_hit_post_crit','on_post_hit','on_damage_dealing','on_damage_resolving','on_damage_dealt','on_damage_received','on_block','on_critical']) {
+        const attackProbe=probe(`attack-${callback}.lua`,`local sf2=require("sf2")\nsf2.behaviors.register {id="attack",${callback}=function(_,fighter,event)\n local attack=event.attack;if attack then local value=attack.| end\nend}`);
+        await until(async()=>{const found=labels(await request('textDocument/completion',attackProbe));return ['kind','model_name','animation_name','point','projectile_id','projectile_owner'].every(key=>found.some(label=>label.replace(/\?$/,'')===key));},`${callback} copied attack source completion`);
+    }
+    console.log('PASS: all eight native contact callbacks infer copied attack source fields');
+
     const snapshot = probe('snapshot.lua', 'local sf2=require("sf2")\nsf2.behaviors.register { id="test", on_round_begin=function(_, fighter)\n local combat=fighter:snapshot()\n if combat then local value=combat.self.| end\nend }');
     await until(async () => {
         const found=labels(await request('textDocument/completion',snapshot));

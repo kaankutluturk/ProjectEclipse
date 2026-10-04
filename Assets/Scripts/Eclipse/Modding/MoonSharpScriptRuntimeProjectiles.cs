@@ -7,6 +7,20 @@ namespace Eclipse.Modding
     {
         private sealed partial class MoonSharpScriptContext
         {
+            private Table AttackSourceTable(ModAttackSource source)
+            {
+                var attack = new Table(_script);
+                attack.Set("kind", DynValue.NewString(source.Kind));
+                attack.Set("model_name", DynValue.NewString(source.ModelName));
+                attack.Set("animation_name", DynValue.NewString(source.AnimationName));
+                if (source.ProjectileId != null) attack.Set("projectile_id", DynValue.NewString(source.ProjectileId));
+                if (source.ProjectileOwner != null) attack.Set("projectile_owner", DynValue.NewString(source.ProjectileOwner));
+                var point = new Table(_script);
+                point.Set("x", DynValue.NewNumber(source.X)); point.Set("y", DynValue.NewNumber(source.Y)); point.Set("z", DynValue.NewNumber(source.Z));
+                attack.Set("point", DynValue.NewTable(point));
+                return attack;
+            }
+
             private sealed class ProjectileQueryBudget { public int Used; }
             private DynValue GetFighterProjectiles(CallbackArguments args, Table fighterTable,
                 IModFighterOperations fighter, ModEffectEvent kind, Func<bool> active, ProjectileQueryBudget budget)

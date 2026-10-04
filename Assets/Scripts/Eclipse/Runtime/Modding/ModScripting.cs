@@ -800,12 +800,14 @@ namespace Eclipse.Modding
         public double Damage => System.Math.Max(0, HealthBefore - HealthAfter);
         public bool Blocked { get; }
         public bool Critical { get; }
-        public ModDamageEvent(int round, double before, double after, bool blocked, bool critical)
+        public ModAttackSource AttackSource { get; }
+        public ModDamageEvent(int round, double before, double after, bool blocked, bool critical, ModAttackSource attackSource = null)
         {
             if (round < 1 || double.IsNaN(before) || double.IsInfinity(before) ||
                 double.IsNaN(after) || double.IsInfinity(after) || before < 0 || after < 0)
                 throw new System.ArgumentOutOfRangeException(nameof(before));
             Round = round; HealthBefore = before; HealthAfter = after; Blocked = blocked; Critical = critical;
+            AttackSource = attackSource;
         }
     }
 
@@ -1026,9 +1028,10 @@ namespace Eclipse.Modding
         public bool Blocked { get; }
         public bool Critical { get; }
         public ModHitEvent HitEvent { get; }
+        public ModAttackSource AttackSource { get; }
         public ModIncomingHit(Func<double> read, Action<double> write, bool blocked = false, bool critical = false,
-            ModHitEvent hitEvent = null)
-        { _read = read; _write = write; Blocked = blocked; Critical = critical; HitEvent = hitEvent; }
+            ModHitEvent hitEvent = null, ModAttackSource attackSource = null)
+        { _read = read; _write = write; Blocked = blocked; Critical = critical; HitEvent = hitEvent; AttackSource = attackSource; }
         public bool TryScale(double scale, out string error)
         {
             error = "";

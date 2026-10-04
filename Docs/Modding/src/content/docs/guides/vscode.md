@@ -7,6 +7,12 @@ description: Explore the API, check your mod, and create a complete starter in V
 API. Explore functions as you type, look up real assets, and catch common mistakes
 before starting the game.
 
+Inside native hit, damage, block and critical callbacks, completion includes
+optional `event.attack` with contact actor/move, hit point and tracked projectile
+ID/owner. Guard against `nil`, then use these copied fields to distinguish your
+projectile's hits. See [combat callbacks](../../api/combat-callbacks/#identify-the-attack-that-made-contact)
+for timing and ownership limits. Editor checks do not prove a native contact.
+
 The fight patch fields explain their composition contract in hover:
 `append_rules` combines compatible additions across mods; `rules` remains an
 exclusive replacement. The Focus and objective starters can run together with

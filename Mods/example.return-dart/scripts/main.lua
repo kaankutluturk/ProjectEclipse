@@ -159,9 +159,11 @@ local behavior = sf2.behaviors.register {
             update_counts(self.state)
         end
     end,
-    on_damage_dealt = function(self)
-        -- Counts all damage attributed to this fighter, including normal attacks.
-        -- This is an observation, not a command to damage the target.
+    on_damage_dealt = function(self, _, event)
+        local attack = event.attack
+        if not attack or attack.kind ~= "projectile" or
+            attack.projectile_owner ~= sf2.mod.id or attack.model_name ~= actor then return end
+        -- This observes native contact; it does not damage the target again.
         self.state.hits = self.state.hits + 1
         update_counts(self.state)
     end,
