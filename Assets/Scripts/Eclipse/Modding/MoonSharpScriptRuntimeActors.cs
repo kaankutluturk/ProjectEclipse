@@ -19,16 +19,20 @@ namespace Eclipse.Modding
                     const string fn="sf2.actors.register";
                     if(args.Count!=1)throw new ModContentException("Actor registration expects exactly one table.");
                     var spec=args.AsType(0,fn,DataType.Table,false).Table;
-                    ValidateFields(spec,fn,"id","character","team","ai","lifetime_frames","max_health");
+                    ValidateFields(spec,fn,"id","character","team","ai","lifetime_frames","max_health","behavior","parameters");
                     string team=spec.Get("team").IsNil()?"owner":RequiredString(spec,"team",fn);
                     if(team!="owner"&&team!="opponent")throw new ModContentException("Actor team must be owner or opponent, relative to the spawning fighter.");
                     if(!spec.Get("ai").IsNil()&&spec.Get("ai").Type!=DataType.Boolean)throw new ModContentException("Actor ai must be boolean.");
                     var health=spec.Get("max_health");
                     if(!health.IsNil()&&health.Type!=DataType.Number)throw new ModContentException("Actor max_health must be numeric.");
+                    ModBehaviorDefinition behavior=null;
+                    if(!spec.Get("behavior").IsNil())behavior=RequiredHandle(spec,"behavior",_behaviorHandles,"behavior",fn);
+                    if(behavior==null&&!spec.Get("parameters").IsNil())throw new ModContentException("Actor parameters require a behavior.");
                     var definition=_api.RegisterActor(RequiredString(spec,"id",fn),RequiredHandle(spec,"character",_warriorHandles,"warrior",fn),
                         team=="opponent",spec.Get("ai").IsNil()||spec.Get("ai").Boolean,
                         spec.Get("lifetime_frames").IsNil()?ModActorLimits.DefaultLifetimeFrames:RequiredInt(spec,"lifetime_frames",fn),
-                        health.IsNil()?1:health.Number);
+                        health.IsNil()?1:health.Number,behavior?.Id,
+                        behavior==null?null:OptionalTypedParameterMap(spec,"parameters",behavior.Parameters,fn));
                     return NewHandle(_actorDefinitions,definition.Id);
                 })));
                 root.Set("actors",DynValue.NewTable(actors));

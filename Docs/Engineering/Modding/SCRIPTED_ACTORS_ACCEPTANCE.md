@@ -1,5 +1,10 @@
 # Lua-directed independent fighters
 
+This records the 1.0.0 autonomous-policy slice. The public example is now 1.1.0;
+[actor behavior acceptance](ACTOR_BEHAVIORS_ACCEPTANCE.md) records its reactive
+host, damage modifiers and current verification. Earlier general-host limitations
+below describe this historical slice, not the current supported API.
+
 2026-10-04. This closes a concrete public-content integration gap: creators can
 summon a reusable warrior with a Lua tactic and prove its independent decisions
 produce native damage. It advances E1/E2/E5; G01–G14/E1–E8 remain open.

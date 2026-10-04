@@ -596,3 +596,14 @@ test('scripted actors expose copied provenance and ship a mirrored programmable 
  assert.deepEqual(p.analyze(await fs.readFile(path.join(dir,'scripts/main.lua'),'utf8'),mod).issues,[]);
  for(const file of ['mod.toml','README.md','scripts/main.lua'])assert.deepEqual(await fs.readFile(path.join(dir,file)),await fs.readFile(path.resolve(__dirname,'../templates/scripted-actors',file)));
 });
+
+test('actor behavior callbacks infer self references and enforce their capability and terminal lifetime',()=>{
+ const api=require('../data/api.json');for(const callback of ['on_actor_spawn','on_actor_end'])assert(api.callbacks.includes(callback));
+ assert.equal(api.types.ActorDefinition.fields['behavior?'][0],'Eclipse.BehaviorHandle');
+ const mod={data:{id:'fixture',capabilities:['content.register']},assets:new Map(),localizations:new Map()};
+ const source='local sf2=require("sf2");sf2.behaviors.register{id="host",on_actor_spawn=function(_,fighter) local own=fighter.actor; own:snapshot() end,on_actor_end=function(_,fighter) fighter.actor:remove() end}';
+ const result=p.analyze(source,mod);
+ assert.equal(result.issues.filter(issue=>issue.capability==='combat.actors').length,2);
+ assert(result.issues.some(issue=>issue.code==='callback-timing'&&issue.message.includes('remove')));
+ assert.deepEqual(result.contexts.map(context=>context.callback),['on_actor_spawn','on_actor_end']);
+});

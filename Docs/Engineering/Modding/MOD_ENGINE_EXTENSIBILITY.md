@@ -2,8 +2,10 @@
 
 The 2026-10-04 [owned actor API](ACTOR_API_ACCEPTANCE.md) adds a reusable
 companion/adversary foundation with native lifecycle, teams and procedural Lua
-commands. This narrows E1/E2/E5 gaps; actor-specific Lua hosts, arbitrary rigs
-and complete encounter/platform acceptance remain open.
+commands. The [reactive actor follow-up](ACTOR_BEHAVIORS_ACCEPTANCE.md) adds private
+behavior state and native contact/damage/lifecycle/animation events. This narrows
+E1/E2/E5 gaps; unsupported actor operations, arbitrary rigs and complete
+encounter/platform acceptance remain open.
 
 The [scripted actor follow-up](SCRIPTED_ACTORS_ACCEPTANCE.md) proves public
 actor spawning and Lua tactic decisions together, including sustained native

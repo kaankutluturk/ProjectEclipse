@@ -290,6 +290,8 @@ local FightEndEvent = {}
 ---@field id string
 ---@field parameters? table<string,Eclipse.FieldSchema|"number"|"integer"|"boolean"|"string">
 ---@field state? nil
+---@field on_actor_spawn? fun(parameters:table<string,any>, fighter:Eclipse.Fighter, event:Eclipse.CombatEvent)
+---@field on_actor_end? fun(parameters:table<string,any>, fighter:Eclipse.Fighter, event:Eclipse.CombatEvent)
 ---@field on_animation_start? fun(parameters:table<string,any>, fighter:Eclipse.Fighter, event:Eclipse.AnimationLifecycleEvent)
 ---@field on_animation_end? fun(parameters:table<string,any>, fighter:Eclipse.Fighter, event:Eclipse.AnimationLifecycleEvent)
 ---@field on_fight_begin? fun(parameters:table<string,any>, fighter:Eclipse.Fighter, event:Eclipse.CombatEvent)
@@ -313,6 +315,8 @@ local BehaviorDefinition = {}
 ---@field id string
 ---@field parameters? table<string,Eclipse.FieldSchema|"number"|"integer"|"boolean"|"string">
 ---@field state Eclipse.BehaviorState
+---@field on_actor_spawn? fun(self:Eclipse.BehaviorSelf, fighter:Eclipse.Fighter, event:Eclipse.CombatEvent)
+---@field on_actor_end? fun(self:Eclipse.BehaviorSelf, fighter:Eclipse.Fighter, event:Eclipse.CombatEvent)
 ---@field on_animation_start? fun(self:Eclipse.BehaviorSelf, fighter:Eclipse.Fighter, event:Eclipse.AnimationLifecycleEvent)
 ---@field on_animation_end? fun(self:Eclipse.BehaviorSelf, fighter:Eclipse.Fighter, event:Eclipse.AnimationLifecycleEvent)
 ---@field on_fight_begin? fun(self:Eclipse.BehaviorSelf, fighter:Eclipse.Fighter, event:Eclipse.CombatEvent)
@@ -338,6 +342,11 @@ local StatefulBehavior = {}
 ---@field source? string
 ---@field rule_id? string
 ---@field opponent? Eclipse.Opponent
+---@field actor? Eclipse.Actor Callback-scoped self reference on an actor behavior. Commands need combat.actors.
+---@field actor_id? string
+---@field actor_definition? string
+---@field actor_owner? string
+---@field actor_end_reason? string Only on_actor_end; actor commands are unavailable while retiring.
 local Fighter = {}
 
 ---@class (exact) Eclipse.Opponent
@@ -2374,6 +2383,8 @@ local ActorSpawnRequest = {}
 ---@field ai? boolean Default true; native warrior tactic.
 ---@field lifetime_frames? integer 1-36000, default 1800 simulation frames from initialized birth.
 ---@field max_health? number Finite 0.01-100, default 1 native health pool.
+---@field behavior? Eclipse.BehaviorHandle Own behavior registered in this transaction; separate instance state per actor, fight/round only.
+---@field parameters? table<string,any> Resolved against the behavior schema; requires behavior.
 local ActorDefinition = {}
 
 ---@class Eclipse.Module_achievements
@@ -4297,7 +4308,7 @@ function Fighter:mark_rect(rectangle, color) end
 
 ---Read fresh combat observations, including both fighters and the engine's elapsed fight clock. Use this when making a health or distance decision; the older `fighter.health` field is captured at callback entry.
 ---Requires: No additional capability. Observing the opponent does not require `combat.target`; changing the opponent still requires the normal capabilities.
----When: Inside any supported combat behavior callback, including battle rules, perks, enchantments, and warrior behaviors. Each call samples the current state. The callable reference expires when that callback returns; the returned data may be retained as an observation, but will not update itself.
+---When: Inside any supported combat behavior callback, including battle rules, perks, enchantments, warrior behaviors and attached actor behaviors. Each call samples the current state. The callable reference expires when that callback returns; the returned data may be retained as an observation, but will not update itself.
 ---Returns: A `CombatSnapshot` table, or `nil` if the fighter cannot be observed.
 ---[Full reference](https://dawc17.github.io/ProjectEclipse/api/fighter/#fightersnapshot)
 ---@return Eclipse.CombatSnapshot|nil

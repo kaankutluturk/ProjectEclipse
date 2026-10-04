@@ -344,7 +344,11 @@ share one Lua tactic while keeping separate controller memory. They approach,
 choose eligible punch/kick actions and wait between attacks. Copied actor IDs,
 owners and teams distinguish the pair from main fighters. Actual Unity acceptance
 includes bidirectional contact and repeated damage after later attack starts,
-unchanged main health, pause, fresh replacement memory and teardown. Core
+unchanged main health, pause, fresh replacement memory and teardown.
+Each actor also has private reactive behavior state: outgoing damage bonuses,
+incoming mitigation, contact/animation observations and spawn/end callbacks.
+The modified damage matches native health loss, and replacement behavior state
+starts fresh. Core
 Skeleton/knife content and controlled spacing/input bound that evidence. See
 <a href={pageUrl('guides/scripted-actors')}>script companions with Lua AI</a>.
 

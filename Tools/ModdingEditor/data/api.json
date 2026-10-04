@@ -2085,6 +2085,8 @@
     "sf2.tactics.EXPONENTIAL": "exponential"
   },
   "callbacks": [
+    "on_actor_spawn",
+    "on_actor_end",
     "on_animation_start",
     "on_animation_end",
     "on_fight_begin",
@@ -2757,6 +2759,8 @@
         "id": "string",
         "parameters?": "table<string,Eclipse.FieldSchema|\"number\"|\"integer\"|\"boolean\"|\"string\">",
         "state?": "nil",
+        "on_actor_spawn?": "fun(parameters:table<string,any>, fighter:Eclipse.Fighter, event:Eclipse.CombatEvent)",
+        "on_actor_end?": "fun(parameters:table<string,any>, fighter:Eclipse.Fighter, event:Eclipse.CombatEvent)",
         "on_animation_start?": "fun(parameters:table<string,any>, fighter:Eclipse.Fighter, event:Eclipse.AnimationLifecycleEvent)",
         "on_animation_end?": "fun(parameters:table<string,any>, fighter:Eclipse.Fighter, event:Eclipse.AnimationLifecycleEvent)",
         "on_fight_begin?": "fun(parameters:table<string,any>, fighter:Eclipse.Fighter, event:Eclipse.CombatEvent)",
@@ -2781,6 +2785,8 @@
         "id": "string",
         "parameters?": "table<string,Eclipse.FieldSchema|\"number\"|\"integer\"|\"boolean\"|\"string\">",
         "state": "Eclipse.BehaviorState",
+        "on_actor_spawn?": "fun(self:Eclipse.BehaviorSelf, fighter:Eclipse.Fighter, event:Eclipse.CombatEvent)",
+        "on_actor_end?": "fun(self:Eclipse.BehaviorSelf, fighter:Eclipse.Fighter, event:Eclipse.CombatEvent)",
         "on_animation_start?": "fun(self:Eclipse.BehaviorSelf, fighter:Eclipse.Fighter, event:Eclipse.AnimationLifecycleEvent)",
         "on_animation_end?": "fun(self:Eclipse.BehaviorSelf, fighter:Eclipse.Fighter, event:Eclipse.AnimationLifecycleEvent)",
         "on_fight_begin?": "fun(self:Eclipse.BehaviorSelf, fighter:Eclipse.Fighter, event:Eclipse.CombatEvent)",
@@ -2806,7 +2812,18 @@
         "side?": "string",
         "source?": "string",
         "rule_id?": "string",
-        "opponent?": "Eclipse.Opponent"
+        "opponent?": "Eclipse.Opponent",
+        "actor?": [
+          "Eclipse.Actor",
+          "Callback-scoped self reference on an actor behavior. Commands need combat.actors."
+        ],
+        "actor_id?": "string",
+        "actor_definition?": "string",
+        "actor_owner?": "string",
+        "actor_end_reason?": [
+          "string",
+          "Only on_actor_end; actor commands are unavailable while retiring."
+        ]
       }
     },
     "Opponent": {
@@ -5905,6 +5922,14 @@
         "max_health?": [
           "number",
           "Finite 0.01-100, default 1 native health pool."
+        ],
+        "behavior?": [
+          "Eclipse.BehaviorHandle",
+          "Own behavior registered in this transaction; separate instance state per actor, fight/round only."
+        ],
+        "parameters?": [
+          "table<string,any>",
+          "Resolved against the behavior schema; requires behavior."
         ]
       }
     }

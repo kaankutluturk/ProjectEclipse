@@ -702,7 +702,9 @@ namespace Eclipse.Modding
         HitPostCrit = 13,
         PostHit = 14,
         AnimationStart = 15,
-        AnimationEnd = 16
+        AnimationEnd = 16,
+        ActorSpawn = 17,
+        ActorEnd = 18
     }
 
     public interface IModScriptContext : IDisposable
@@ -1067,9 +1069,10 @@ namespace Eclipse.Modding
         IModFighterOperations Opponent { get; }
     }
 
-    public sealed class ModInstanceFighter : IModFighterOperations, IModDamageEventSource, IModBehaviorInstanceSource, IModFighterTargets, IModIncomingHitSource, IModFighterEffects, IModCombatSnapshotSource, IModCombatActivitySource, IModFighterForms, IModFighterStatusIcons, IModAnimationLifecycleSource, IModFighterFlags, IModFighterControls, IModRoundOutcomes, IModFighterMotion, IModFighterPlayback, IModFighterRegions, IModFighterProjectiles, IModFighterProjectileSpawning, IModFighterActors
+    public sealed class ModInstanceFighter : IModFighterOperations, IModDamageEventSource, IModBehaviorInstanceSource, IModFighterTargets, IModIncomingHitSource, IModFighterEffects, IModCombatSnapshotSource, IModCombatActivitySource, IModFighterForms, IModFighterStatusIcons, IModAnimationLifecycleSource, IModFighterFlags, IModFighterControls, IModRoundOutcomes, IModFighterMotion, IModFighterPlayback, IModFighterRegions, IModFighterProjectiles, IModFighterProjectileSpawning, IModFighterActors, IModActorBehaviorSource
     {
         private readonly IModFighterOperations _inner;
+        public IModActor Actor => (_inner as IModActorBehaviorSource)?.Actor;
         private readonly FightRuleDefinition _outcomeRule;
         public bool TryEndRound(DefinitionId ignored, bool playerWins, out string error)
         {

@@ -18,6 +18,7 @@ public partial class Fight
         public ModId Owner; public ModScriptSession Session; public ActorDefinition Definition;
         public int Round,Born,Requests; public long Sequence; public double X,Y,Z; public PendingActor Birth;
         public double HealthChange; public int HealthRequests; public PendingFighterPlayback Playback;
+        public bool Spawned; public System.Xml.XmlNode BehaviorInstance;
         public string Id => "a" + Sequence.ToString(CultureInfo.InvariantCulture);
         public bool TrySnapshot(out ModActorSnapshot snapshot,out string error)
         {
@@ -76,7 +77,7 @@ public partial class Fight
     private readonly Dictionary<Model,OwnedActor> _eclipseActors=new Dictionary<Model,OwnedActor>();
     private readonly List<ActorEventRecord> _eclipseActorEvents=new List<ActorEventRecord>();
     private long _eclipseActorSequence,_eclipseActorEventSequence;
-    private bool _applyingEclipseActors,_eclipseActorTeamsActive;
+    private bool _applyingEclipseActors,_eclipseActorTeamsActive,_eclipseActorDispatching;
 
     private bool ActorOwnerValid(Model root,ModScriptSession session,ModId owner) =>
         ReferenceEquals(session,ModRuntime.Scripts)&&ProjectileOwnerActive(session,owner)&&CanMoveEclipseFighter(root)&&!get_IsRaidFight();
@@ -170,6 +171,7 @@ public partial class Fight
                 actor.Model.GetRenderObject()?.SetActive(true);
                 actor.Birth=null;actor.Born=fightTimeInFrame;
                 ActorEvent(actor,"spawned");FinishActorSpawn(request,actor.Id,null);
+                actor.Spawned=true;DispatchEclipseActor(actor,ModEffectEvent.ActorSpawn);
             }
             catch(Exception failure){actor.Birth=null;FinishActorSpawn(request,null,"Native actor initialization failed: "+failure.Message);RetireEclipseActor(actor,"spawn_failed");}
         }
@@ -247,6 +249,96 @@ public partial class Fight
         if(model==null||!_eclipseActors.TryGetValue(model,out var actor)||actor.Birth!=null||actor.Removing)return null;
         return new ModActorIdentity(actor.Id,actor.Definition.Id.ToString(),actor.Owner.ToString(),actor.PlayerTeam?"player":"opponent");
     }
+    private void DispatchEclipseActor(Model model,ModEffectEvent kind,ModDamageEvent damage=null,ModIncomingHit incoming=null,
+        ModAnimationLifecycleEvent animation=null)
+    {
+        if(model!=null&&_eclipseActors.TryGetValue(model,out var actor))DispatchEclipseActor(actor,kind,damage,incoming,animation);
+    }
+    private void DispatchEclipseActor(OwnedActor actor,ModEffectEvent kind,ModDamageEvent damage=null,ModIncomingHit incoming=null,
+        ModAnimationLifecycleEvent animation=null,string endReason=null)
+    {
+        // Applied lethal contacts still reach this host. Commands cannot resurrect
+        // it: ActorValid rejects defeated bodies before the next cleanup pass.
+        if(_eclipseActorDispatching||actor.Birth!=null||!actor.Spawned||!actor.Definition.Behavior.HasValue||
+            !_eclipseActors.TryGetValue(actor.Model,out var current)||current!=actor||
+            actor.Removing&&kind!=ModEffectEvent.ActorEnd||!ReferenceEquals(actor.Session,ModRuntime.Scripts)||
+            !ProjectileOwnerActive(actor.Session,actor.Owner))return;
+        var behaviorId=actor.Definition.Behavior.Value;
+        if(!actor.Session.HasBehaviorHandler(behaviorId,kind))return;
+        _eclipseActorDispatching=true;
+        try
+        {
+            if(actor.BehaviorInstance==null)
+            {
+                var document=new System.Xml.XmlDocument();document.LoadXml("<ActorBehaviorInstance/>");
+                actor.BehaviorInstance=document.DocumentElement;
+            }
+            var context=new Dictionary<string,string>
+            {
+                {"source","actor"},{"side",actor.PlayerTeam?"player":"opponent"},{"actor_id",actor.Id},
+                {"actor_definition",actor.Definition.Id.ToString()},{"actor_owner",actor.Owner.ToString()},
+                {"fight_id",_eclipseFightId},{"round",actor.Round.ToString(CultureInfo.InvariantCulture)}
+            };
+            if(endReason!=null)context["actor_end_reason"]=endReason;
+            var fighter=new ModInstanceFighter(new EclipseFighterOperations(this,actor.Model,damage,incoming,animation:animation),actor.BehaviorInstance);
+            if(!actor.Session.TryInvokeBehavior(behaviorId,kind,actor.Definition.InitialParameters,context,fighter,out var error))
+                UnityEngine.Debug.LogWarning("[ModCombat] "+kind+" failed for actor "+actor.Id+": "+error);
+        }
+        catch(Exception failure){UnityEngine.Debug.LogWarning("[ModCombat] Actor dispatch failed: "+failure.Message);}
+        finally{_eclipseActorDispatching=false;DrainEclipseAnimationEvents();}
+    }
+    private void DispatchEclipseActorTicks()
+    {
+        foreach(var actor in _eclipseActors.Values.OrderBy(a=>a.Sequence).ToArray())
+        {
+            if(!round.processing||_eclipseFightEndDispatched||_eclipseEndedRound==round.round)break;
+            DispatchEclipseActor(actor,ModEffectEvent.Tick);
+        }
+    }
+    private void NotifyEclipseResolvedContact(Model model,ModEffectEvent kind,ModDamageEvent damage)
+    {
+        if(model==GetPlayerModel())DispatchEclipseCombatEvent(kind,damage);
+        else if(model==GetEnemyModel())DispatchEclipseOpponent(kind,damage);
+        else DispatchEclipseActor(model,kind,damage);
+    }
+    private void NotifyEclipseAppliedContact(Model victim,Model attacker,ModDamageEvent observation)
+    {
+        void Defender()
+        {
+            if(observation.Damage>0)NotifyEclipseResolvedContact(victim,ModEffectEvent.DamageReceived,observation);
+            if(observation.Blocked)NotifyEclipseResolvedContact(victim,ModEffectEvent.Block,observation);
+        }
+        void Attacker()
+        {
+            if(observation.Damage>0)NotifyEclipseResolvedContact(attacker,ModEffectEvent.DamageDealt,observation);
+            if(observation.Critical)NotifyEclipseResolvedContact(attacker,ModEffectEvent.Critical,observation);
+        }
+        // Keep the established player-before-opponent ordering for the canonical
+        // duel while routing actor contacts independently of that pair.
+        if(attacker==GetPlayerModel()&&victim!=attacker){Attacker();Defender();}
+        else{Defender();Attacker();}
+    }
+    private List<(OwnedActor Actor,ModAnimationLifecycleEvent Event)> CaptureEclipseActorAnimations(Model source,ModAnimationLifecycleEvent observed)
+    {
+        if(_eclipseActors.Count==0)return null;
+        var result=new List<(OwnedActor,ModAnimationLifecycleEvent)>();
+        foreach(var actor in _eclipseActors.Values.OrderBy(a=>a.Sequence))
+        {
+            if(!actor.Spawned||actor.Removing||!actor.Definition.Behavior.HasValue)continue;
+            var target=source==actor.Model?"self":source==actor.Model.GetCombatTarget()?"opponent":"other";
+            result.Add((actor,new ModAnimationLifecycleEvent(observed.Type,observed.AnimationName,target,observed.Frame)));
+        }
+        return result;
+    }
+    private void DispatchEclipseActorAnimations(List<(OwnedActor Actor,ModAnimationLifecycleEvent Event)> observations)
+    {
+        if(observations==null)return;
+        foreach(var observed in observations)
+        {
+            if(!round.processing||_eclipseFightEndDispatched)break;
+            DispatchEclipseActor(observed.Actor,observed.Event.Type,animation:observed.Event);
+        }
+    }
     private bool ActorTeam(Model model) => _eclipseActors.TryGetValue(model,out var actor)?actor.PlayerTeam:model==GetPlayerModel();
     private string ActorTargetId(Model target) => target==null?null:target==GetPlayerModel()?"player":target==GetEnemyModel()?"opponent":_eclipseActors.TryGetValue(target,out var actor)?actor.Id:null;
     // Return a rollback for staging only. Ordinary simulation commits immediately.
@@ -278,8 +370,12 @@ public partial class Fight
     }
     private void RetireEclipseActor(OwnedActor actor,string reason,bool requestRemoval=true)
     {
-        if(!_eclipseActors.Remove(actor.Model))return;
+        if(!_eclipseActors.TryGetValue(actor.Model,out var current)||current!=actor)return;
         actor.Removing=true;
+        DispatchEclipseActor(actor,ModEffectEvent.ActorEnd,endReason:reason);
+        _eclipseActors.Remove(actor.Model);
+        _eclipseShields.Remove(actor.Model);
+        foreach(var key in _eclipseStatusIcons.Keys.Where(key=>key.Item1==actor.Model).ToArray())TryClearEclipseStatusIcon(actor.Model,key.Item2,out _);
         if(actor.Playback!=null)FinishEclipseFighterPlayback(actor.Playback,false,"Actor retired before move playback.");
         actor.Playback=null;
         if(actor.Birth!=null)FinishActorSpawn(actor.Birth,null,"Actor retired before initialization.");

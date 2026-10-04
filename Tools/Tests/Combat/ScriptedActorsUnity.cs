@@ -62,6 +62,11 @@ public static class ScriptedActorsUnity
     static readonly System.Collections.Generic.Dictionary<Model,float> nextStartHealth=new System.Collections.Generic.Dictionary<Model,float>();
     static readonly System.Collections.Generic.Dictionary<string,System.Collections.Generic.HashSet<string>> choices=new System.Collections.Generic.Dictionary<string,System.Collections.Generic.HashSet<string>>();
     static readonly System.Collections.Generic.HashSet<string> born=new System.Collections.Generic.HashSet<string>();
+    static readonly System.Collections.Generic.HashSet<string> hostEvents=new System.Collections.Generic.HashSet<string>();
+    static readonly System.Collections.Generic.Dictionary<string,double> outgoing=new System.Collections.Generic.Dictionary<string,double>();
+    static readonly System.Collections.Generic.Dictionary<string,double> expectedDamage=new System.Collections.Generic.Dictionary<string,double>();
+    static readonly System.Collections.Generic.Dictionary<string,int> modifiedContacts=new System.Collections.Generic.Dictionary<string,int>();
+    static readonly System.Collections.Generic.Dictionary<string,int> ended=new System.Collections.Generic.Dictionary<string,int>();
     static string[] originalIds;
     static ModFighterSnapshot Capture(Model model)
     {
@@ -148,6 +153,14 @@ public static class ScriptedActorsUnity
                     if(frame-phaseFrame>900)throw new Exception("No second contact after a subsequent Lua-selected attack start");
                     if(!actors.All(m=>nextStartHealth.ContainsKey(m)&&Life(Peer(m))<nextStartHealth[m]-.00001f))return;
                     foreach(var model in actors){CheckSource(model);Check(starts[model]>firstStarts[model],"Repeated contact lacked a later native start");}
+                    foreach(var id in originalIds)
+                    {
+                        foreach(var kind in new[]{"host_spawn","host_tick","host_outgoing","host_resolving","host_received","host_dealt","host_animation"})
+                            Check(hostEvents.Contains(kind+":"+id),"Actor behavior callback missing: "+kind+":"+id);
+                        foreach(var kind in new[]{"HitPostCrit","PostHit"})foreach(var side in new[]{"self","opponent"})
+                            Check(hostEvents.Contains("host_contact:"+id+":"+kind+":"+side),"Actor hit-phase perspective missing");
+                        Check(modifiedContacts.TryGetValue(id,out var count)&&count>=2,"Outgoing bonus/incoming scaling did not match repeated native health loss");
+                    }
                     Check(Math.Abs(Life(player)-playerHealth)<.00001&&Math.Abs(Life(enemy)-enemyHealth)<.00001,"Sustained sparring changed main life");
                     Debug.Log("[ScriptedActorsUnity] Repeated contact health="+string.Join(",",actors.Select(m=>Life(m)))+" starts="+string.Join(",",actors.Select(m=>starts[m])));
                     Actor(fight,actors[0]).TrySnapshot(out paused,out _);fight.SetPaused(true);pauseFrame=frame;pauseAt=EditorApplication.timeSinceStartup;Next(fight);break;
@@ -158,6 +171,7 @@ public static class ScriptedActorsUnity
                 case 5:
                     if(Models(fight).Length!=0)return;
                     Check(((IDictionary)Field(fight,"_eclipseActors")).Count==0,"Dismissal retained native actors");
+                    Check(originalIds.All(id=>hostEvents.Contains("host_end:"+id+":removed")),"Dismissal did not end each actor behavior");
                     Check(player.GetCombatTarget()==enemy&&enemy.GetCombatTarget()==player,"Dismissal retained actor target bindings");
                     Click("summon");Next(fight);break;
                 case 6:
@@ -166,11 +180,13 @@ public static class ScriptedActorsUnity
                     if(ids.Any(id=>id==null||!born.Contains(id)))return;
                     Check(ids.All(id=>!originalIds.Contains(id)),"Replacement actors reused runtime identities");
                     Check(born.Count==4,"Replacement Lua controller memory was not fresh");
+                    Check(ids.All(id=>hostEvents.Contains("host_spawn:"+id)),"Replacement behavior instances did not start with fresh state");
                     Invoke(fight,"OBNEDPKCNKJ");Next(fight);break;
                 case 7:
                     if(Models(fight).Length!=0)return;
                     Check(((IDictionary)Field(fight,"_eclipseActors")).Count==0&&surface.IsClosed,"Surrender retained actors or HUD");
-                    File.WriteAllText(Path.Combine(Root,"scripted-actors-result.txt"),"PASS: "+checks+" full-game scripted actor checks: actual Lua/HUD registration and spawning, independent AI memories/identity, Lua-selected native attacks, bidirectional contact and repeated contact after subsequent starts, unchanged main health, pause, dismissal, fresh replacement controllers and surrender cleanup. Core Skeleton/knives and controlled spacing/input/profile only; arbitrary rigs, general actor behavior hosts, exports, raids and multiplayer remain open.");
+                    Check(ended.Count==4&&ended.Values.All(count=>count==1),"Surrender did not end replacement actor behaviors exactly once");
+                    File.WriteAllText(Path.Combine(Root,"scripted-actors-result.txt"),"PASS: "+checks+" full-game scripted actor checks: actual Lua/HUD registration and spawning, independent AI and behavior state/identity, Lua-selected native attacks, hit-phase perspectives, outgoing bonus/incoming mitigation matched to native health loss, repeated contact after subsequent starts, unchanged main health, pause, dismissal, fresh replacement instances and exactly-once end/surrender cleanup. Core Skeleton/knives and controlled spacing/input/profile only; arbitrary rigs, unsupported actor-host operations, exports, raids and multiplayer remain open.");
                     Debug.Log("[ScriptedActorsUnity] PASS: "+checks);Finish(0);break;
             }
         }
@@ -185,9 +201,29 @@ public static class ScriptedActorsUnity
             if(tokens.Length>=4&&tokens[1]=="born")born.Add(tokens[2]);
             if(tokens.Length>=6&&tokens[1]=="choose")
             {if(!choices.TryGetValue(tokens[2],out var names))choices.Add(tokens[2],names=new System.Collections.Generic.HashSet<string>());names.Add(string.Join(":",tokens.Skip(5)));}
+            if(tokens.Length>=3&&tokens[1].StartsWith("host_",StringComparison.Ordinal))
+            {
+                hostEvents.Add(string.Join(":",tokens.Skip(1)));
+                hostEvents.Add(tokens[1]+":"+tokens[2]);
+                if(tokens[1]=="host_end"){ended.TryGetValue(tokens[2],out var prior);ended[tokens[2]]=prior+1;}
+                double Number(int position)=>double.Parse(tokens[position],System.Globalization.CultureInfo.InvariantCulture);
+                if(tokens[1]=="host_outgoing")outgoing[tokens[2]]=Number(3)+Number(4);
+                if(tokens[1]=="host_resolving")
+                {
+                    if(!outgoing.TryGetValue(tokens[3],out var value)||Math.Abs(value-Number(4))>.000005)failure="Actor incoming callback did not observe the outgoing bonus";
+                    expectedDamage[tokens[2]]=Number(4)*.5;
+                }
+                if(tokens[1]=="host_received")
+                {
+                    double damage=Number(3),before=Number(4),after=Number(5);
+                    if(!expectedDamage.TryGetValue(tokens[2],out var expected)||Math.Abs(expected-damage)>.000005||Math.Abs(before-after-damage)>.000005)
+                        failure="Actor Lua damage modifiers did not match native applied health loss";
+                    modifiedContacts.TryGetValue(tokens[2],out var count);modifiedContacts[tokens[2]]=count+1;
+                }
+            }
             Debug.Log("[ScriptedActorsUnity] "+message.Substring(index));
         }
-        if(entered&&(type==LogType.Exception&&(stack.Contains("Fight.")||stack.Contains("Model."))||message.Contains("[ModAI]")||message.Contains("[ModActors]")||message.Contains("Native actor initialization failed:")||message.Contains("Native actor creation failed:")))failure=message;
+        if(entered&&(type==LogType.Exception&&(stack.Contains("Fight.")||stack.Contains("Model."))||message.Contains("[ModAI]")||message.Contains("[ModActors]")||message.Contains("[ModCombat]")||message.Contains("Native actor initialization failed:")||message.Contains("Native actor creation failed:")))failure=message;
     }
     static void Finish(int code){SessionState.SetBool(Active,false);EditorApplication.update-=Update;Application.logMessageReceived-=Log;EditorApplication.Exit(code);}
 }

@@ -23,7 +23,13 @@ references each combat tick; retain plain IDs and spawn receipts instead.
 
 Actors have independent health pools of 10 and expire after 1800 active simulation
 frames. Dismissal, main-round teardown and surrender remove the pair and HUD.
+Each also owns a `reactive_sparring` behavior with private ID/tick/hit state.
+The ally adds 0.01 and rival 0.02 to outgoing native damage; both halve incoming
+damage. The manifest declares the corresponding outgoing/incoming hit capabilities.
+Actor spawn/end, hit-phase, damage and animation callbacks illustrate the reactive
+host separately from the tactic's decision memory. Replacement state starts fresh.
 This controlled core-content example is accepted in Unity with autonomous
 bidirectional contact, repeated contact after later attack starts, unchanged main
-health, pause and replacement-memory/teardown checks. Arbitrary rigs/outfits,
-general actor behavior hosts, custom outcomes, raids and multiplayer remain open.
+health, native damage modifiers, pause and replacement-memory/teardown checks.
+Actor-authored projectiles, arbitrary rigs/outfits, custom outcomes, exports,
+raids and multiplayer remain open.

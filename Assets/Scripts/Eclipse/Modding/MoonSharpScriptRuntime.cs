@@ -200,6 +200,8 @@ namespace Eclipse.Modding
                     }
                     if (fighter != null)
                     {
+                        if(fighter is IModActorBehaviorSource actorHost&&actorHost.Actor!=null)
+                            fighterTable.Set("actor",ActorTable(actorHost.Actor,effectEvent,()=>invocationActive,actorQueryBudget));
                         fighterTable.Set("spawn_actor", DynValue.NewCallback((ctx,args)=>SpawnFighterActor(args,fighterTable,fighter,effectEvent,()=>invocationActive)));
                         fighterTable.Set("actors", DynValue.NewCallback((ctx,args)=>GetFighterActors(args,fighterTable,fighter,effectEvent,()=>invocationActive,actorQueryBudget,false)));
                         fighterTable.Set("actor_events", DynValue.NewCallback((ctx,args)=>GetFighterActors(args,fighterTable,fighter,effectEvent,()=>invocationActive,actorQueryBudget,true)));

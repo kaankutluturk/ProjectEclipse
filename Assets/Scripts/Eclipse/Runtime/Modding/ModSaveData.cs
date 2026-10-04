@@ -1094,6 +1094,16 @@ namespace Eclipse.Modding
                     Append(canonical, actor.OpposingTeam); Append(canonical, actor.AiControlled); Append(canonical, actor.LifetimeFrames);
                     Append(canonical,actor.MaxHealth);
                 }
+                var hosts=actors.FindAll(actor=>actor.Behavior.HasValue);
+                if(hosts.Count!=0)
+                {
+                    Append(canonical,"actor-behaviors-v1");Append(canonical,hosts.Count);
+                    foreach(var actor in hosts)
+                    {
+                        Append(canonical,actor.Id.ToString());Append(canonical,actor.Behavior.Value.ToString());
+                        AppendParameterValues(canonical,actor.InitialParameters);
+                    }
+                }
             }
             locales.Sort((left, right) => CompareIds(left.Id, right.Id));
             Append(canonical, "locale-metadata"); Append(canonical, locales.Count);

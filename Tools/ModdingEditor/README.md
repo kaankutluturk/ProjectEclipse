@@ -12,6 +12,15 @@ Lua decision callbacks. Fighter/AI observations have optional copied
 covers those fields, including the absolute player/opponent team. Controller
 `memory` isolates cooldowns per fighter; see the scripted companions wiki guide.
 
+Actor definitions can attach an owned `behavior` with typed `parameters`. The
+starter demonstrates per-instance state and `on_actor_spawn`/`on_actor_end`, plus
+native damage/contact and animation callbacks. Completion covers the scoped
+`fighter.actor` methods and actor identity/end reason fields. The validator
+recognizes direct/aliased self references, requires `combat.actors` for their
+methods, and flags actor commands in terminal callbacks. Separate fighter damage
+capabilities still apply to bonuses and mitigation. Actor state is fight/round
+state; it is not persisted.
+
 Native hit/damage/block/critical callback event types now include optional
 `attack`: copied kind, contact actor/move, hit point and owned projectile ID/mod.
 Return Dart filters its hit counter using that source. Editor completion covers

@@ -22,7 +22,7 @@ and `self.state`, instead.
 | `fighter.health` | Health snapshot, when the current fighter capability supplies it. |
 | `fighter.opponent` | Opponent capability, when available; check it before using it. |
 | `fighter.rule_id` | Qualified rule identity for fight-attached behavior callbacks; absent on equipment/perk instances. |
-| `fighter.source` | Host provenance, including `rule`, `perk`, `enchantment`, or `warrior`. |
+| `fighter.source` | Host provenance, including `rule`, `perk`, `enchantment`, `warrior`, or `actor`. |
 | `fighter.side` | Fighter context string, such as `player` or `opponent`, when supplied. |
 
 Resolved hit events supply `damage`, `health_before`, `health_after`, `blocked`,
@@ -59,9 +59,11 @@ another callback's event, or a saved native snapshot.
 | `actor_id` | Present when the contact root is a mod-owned independent fighter, including its native children. Matches an actor snapshot ID. |
 | `actor_owner` | Declaring actor mod ID; paired with `actor_id`. |
 
-Independent actors do not receive their own Lua combat callback host yet. A main
-fighter hit by an actor receives its ordinary defender callbacks and copied
-actor provenance; that actor is not attributed to the spawning main fighter.
+Independent actors with an attached [behavior](../actors/#give-each-actor-its-own-reactive-logic)
+receive their own hit/damage/block/critical notifications. A main fighter hit by
+an actor receives its ordinary defender callbacks and copied actor provenance;
+an actor's attacks are not attributed to the spawning main fighter. Main-fighter
+attacks against actors likewise notify the actual main attacker and actor victim.
 Actor-only contacts retain native health, perks and move reactions, but do not
 award the canonical duel's profile counters or trigger its legacy hit/strike
 rules. Victory and rewards still depend on the two main fighters.
@@ -100,6 +102,61 @@ callbacks use active behavior-backed warrior perks. Normal fight rules may
 suppress a perk. The dojo punchbag does not use this normal fight lifecycle.
 The title screen's background CPU sparring also does not dispatch these callbacks;
 it uses detached preview fighters without mod save state, progress, or rewards.
+
+## on_actor_spawn
+
+**Signature:** `on_actor_spawn(parameters, fighter, event)` or
+`on_actor_spawn(self, fighter, event)` for stateful behaviors.
+
+**Returns:** Nothing; return values are ignored.
+
+**When:** Once for each successfully initialized actor with this behavior,
+after native entry/placement and its applied spawn receipt. Failed births omit
+this callback. This is the actor's lifetime start, even if the round is underway.
+The same behavior on a perk, rule or enchantment does not receive it.
+
+**Requires:** `content.register` and an actor definition's `behavior` attachment.
+Reading context/state
+needs no extra capability; actor self-reference methods need `combat.actors`.
+
+```lua
+on_actor_spawn = function(self, fighter)
+    self.state.id = fighter.actor_id -- Declare an id string state field.
+    sf2.log.info("Companion joined: " .. fighter.actor_id)
+end,
+```
+
+`fighter.source == "actor"`, `fighter.actor_id`, `actor_definition`, `actor_owner`
+and absolute `side` identify the host. `fighter.actor` is a callback-scoped self
+reference. State is private to this spawned instance and is not persisted.
+
+## on_actor_end
+
+**Signature:** `on_actor_end(parameters, fighter, event)` or
+`on_actor_end(self, fighter, event)` for stateful behaviors.
+
+**Returns:** Nothing; return values are ignored.
+
+**When:** Once when an initialized actor retires: death, expiration, requested
+removal, owner change, or round/fight teardown. The active script session must
+still own the handler; an already-disposed script cannot receive a callback.
+This runs before native removal and ends the actor's transient instance.
+
+**Requires:** `content.register` and an actor definition's `behavior` attachment.
+Other operations
+such as closing owned UI use their usual capabilities.
+
+```lua
+on_actor_end = function(_, fighter)
+    sf2.log.info(fighter.actor_id .. " ended: " .. fighter.actor_end_reason)
+end,
+```
+
+`fighter.actor_end_reason` is `"removed"`, `"died"`, `"expired"`, `"owner_changed"`
+or `"round_ended"`. A surrender currently uses `"round_ended"`; this is not a
+victory/result callback. Retiring actor commands and self-reference snapshots
+are unavailable, and no opponent command reference is supplied. Copied IDs,
+final health and state remain readable. A callback failure cannot cancel cleanup.
 
 Keep callbacks short. Fighter and effect methods expire at callback return.
 A failing callback is logged and isolated; successful gameplay operations that
@@ -191,7 +248,9 @@ receive `self` instead of `parameters`.
 **When:** Once per active combat simulation frame, after the combat clock advances
 and before model movement, collisions, AI and round settlement for that frame.
 Player callbacks run before opponent callbacks; rules run before that side's
-equipped behavior callbacks. It starts after the round-begin callbacks. Paused
+equipped behavior callbacks. Actor hosts follow the main fighters in spawn order
+and start ticking after their native birth completes. Main fighter ticking
+starts after the round-begin callbacks. Paused
 combat, round transitions and finished fights do not tick. This is the engine's
 60-frame combat clock, not wall time or a Unity display-frame callback.
 
@@ -234,9 +293,11 @@ stateful behaviors receive `self` instead of `parameters`.
 
 **When:** During an active round, immediately after native animation-start perk
 notification. Both sides receive the event: player callbacks first, then opponent
-callbacks, with rules before equipment/perks on each side. Events raised inside
+callbacks, with rules before equipment/perks on each side. Actor hosts follow the
+main callbacks; their self/target relationship is captured before any handler
+runs. Events raised inside
 another Lua combat callback wait until that dispatch returns; nested animation
-events are delivered in order after both sides of the current animation event.
+events are delivered in order after all recipients of the current animation event.
 Round transitions, completed fights and Local Versus do not deliver these events.
 
 **Requires:** `content.register` to register the behavior; no extra capability

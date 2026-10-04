@@ -114,12 +114,18 @@ async function main() {
     const scriptedUri=open('scripted-actors.lua',scriptedText+'\nsf2.price.coins("bad")\n');const scriptedKey=decodeURIComponent(scriptedUri).toLowerCase();
     await until(()=>diagnostics.get(scriptedKey)?.some(d=>d.code==='param-type-mismatch'),'scripted actors diagnostic publication');
     notify('textDocument/didChange',{textDocument:{uri:scriptedUri,version:2},contentChanges:[{text:scriptedText}]});
-    await until(()=>diagnostics.has(scriptedKey)&&diagnostics.get(scriptedKey).length===0,'clean scripted actor diagnostics');
+    try { await until(()=>diagnostics.has(scriptedKey)&&diagnostics.get(scriptedKey).length===0,'clean scripted actor diagnostics'); }
+    catch(error) { throw new Error(error.message+'\n'+JSON.stringify(diagnostics.get(scriptedKey),null,2)); }
     console.log('PASS: actor identity/owner/team completion and complete Scripted Actor Sparring source');
+    const actorHostProbe=probe('actor-host.lua','local sf2=require("sf2")\nsf2.behaviors.register{id="host",on_actor_spawn=function(_,fighter)\n if fighter.actor then fighter.actor:| end\nend}');
+    await until(async()=>{const found=labels(await request('textDocument/completion',actorHostProbe));return ['snapshot','move_by','remove','set_target','change_health','play_move'].every(name=>found.some(label=>label===name||label.startsWith(name+'(')));},'actor behavior self-reference methods');
+    const actorEndProbe=probe('actor-end.lua','local sf2=require("sf2")\nsf2.behaviors.register{id="host",on_actor_end=function(_,fighter)\n fighter.|\nend}');
+    await until(async()=>{const found=labels(await request('textDocument/completion',actorEndProbe));return ['actor_id','actor_end_reason','actor_definition','actor_owner'].every(name=>found.includes(name));},'actor end context');
+    console.log('PASS: actor spawn self-reference methods and terminal identity/reason context');
     const actorFieldsProbe = probe('actor-fields.lua', 'local sf2=require("sf2")\nsf2.actors.register {\n |\n}');
     await until(async()=>{
         const found=labels(await request('textDocument/completion',actorFieldsProbe));
-        return ['id','character','team','ai','lifetime_frames','max_health'].every(field=>found.some(n=>n===field||n===field+'?'||n.startsWith(field+' ')));
+        return ['id','character','team','ai','lifetime_frames','max_health','behavior','parameters'].every(field=>found.some(n=>n===field||n===field+'?'||n.startsWith(field+' ')));
     },'actor definition fields');
     const actorMethodsProbe = probe('actor-methods.lua', 'local sf2=require("sf2")\nsf2.behaviors.register{id="probe",on_tick=function(_,fighter)\n for _,actor in ipairs(fighter:actors() or {}) do actor:| end\nend}');
     await until(async()=>{

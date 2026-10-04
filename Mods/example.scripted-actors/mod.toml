@@ -1,10 +1,10 @@
 schema = 1
 id = "example.scripted-actors"
 name = "Scripted Actor Sparring"
-version = "1.0.0"
+version = "1.1.0"
 authors = ["Eclipse"]
 entrypoint = "scripts/main.lua"
-capabilities = ["content.register", "content.patch", "combat.actors", "ui.create"]
+capabilities = ["content.register", "content.patch", "combat.actors", "combat.modify_hit", "combat.modify_outgoing_hit", "ui.create"]
 
 [[dependencies]]
 id = "core"

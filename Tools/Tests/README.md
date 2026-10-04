@@ -1,7 +1,8 @@
 # Regression tests and validators
 
 Independent fighters: `Combat/TestActorDefinitions.ps1` checks production Lua
-registration, bounds, strict fields, rollback and fingerprints.
+registration, bounds, strict fields, typed behavior attachments/parameters,
+rollback/fingerprints, private instance state and callback-scoped self references.
 `Combat/TestActorsUnity.ps1` runs the actual companion mod/HUD in an isolated
 Unity project, checking scoped commands, independent root state, teams,
 death/removal, pause/TTL and surrender cleanup on a controlled core encounter.
@@ -10,7 +11,9 @@ Scripted actors: `Combat/TestScriptedActorsUnity.ps1` runs the complete public
 sparring mod/HUD in an isolated Unity fixture. It forbids fixture or Lua manual
 playback and requires Lua-selected native attacks, source-attributed contact in
 both directions, repeated damage after subsequent starts, independent memory/
-identity, unchanged main health and pause/replacement/teardown. Core rig/equipment
+identity, reactive behavior callbacks, outgoing/incoming modifiers matched to
+native health loss, unchanged main health and exactly-once replacement/teardown
+callbacks. Core rig/equipment
 and controlled spacing/input bound the evidence. `Modding/TestModAi.ps1` covers
 copied actor provenance, memory isolation, action lifetime, fallback/budgets and
 real native clip metadata; optional compile/assembly/Unity-reference paths allow

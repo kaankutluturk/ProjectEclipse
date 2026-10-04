@@ -51,7 +51,7 @@ type('StyleEvent',{style_rank:'integer',style_name:'string',style_gain:'number',
 type('AnimationLifecycleEvent',{animation_name:'string',target:enumOf('self','opponent','other'),frame:'integer'},'CombatEvent');
 type('TickEvent',{frame:'integer',seconds:'number',delta_frames:'integer',delta_seconds:'number'},'CombatEvent');
 type('FightEndEvent',{won:'boolean',player_result:enumOf('win','loss','surrender','timeout')},'CombatEvent');
-const callbacks = ['on_animation_start','on_animation_end','on_fight_begin','on_round_begin','on_tick','on_damage_resolving','on_damage_dealing','on_hit_post_crit','on_post_hit','on_damage_received','on_damage_dealt','on_block','on_critical','on_combo_changed','on_style_changed','on_round_end','on_fight_end'];
+const callbacks = ['on_actor_spawn','on_actor_end','on_animation_start','on_animation_end','on_fight_begin','on_round_begin','on_tick','on_damage_resolving','on_damage_dealing','on_hit_post_crit','on_post_hit','on_damage_received','on_damage_dealt','on_block','on_critical','on_combo_changed','on_style_changed','on_round_end','on_fight_end'];
 for (const stateful of [false,true]) {
     const fields = { id:'string', 'parameters?':schema, ...(stateful ? { state:E('BehaviorState') } : { 'state?':'nil' }) };
     for (const name of callbacks) {
@@ -60,7 +60,7 @@ for (const stateful of [false,true]) {
     }
     type(stateful ? 'StatefulBehavior' : 'BehaviorDefinition', fields);
 }
-type('Fighter', { 'health?':'number', 'side?':'string', 'source?':'string', 'rule_id?':'string', 'opponent?':E('Opponent') });
+type('Fighter', { 'health?':'number', 'side?':'string', 'source?':'string', 'rule_id?':'string', 'opponent?':E('Opponent'), 'actor?':[E('Actor'),'Callback-scoped self reference on an actor behavior. Commands need combat.actors.'], 'actor_id?':'string', 'actor_definition?':'string', 'actor_owner?':'string', 'actor_end_reason?':['string','Only on_actor_end; actor commands are unavailable while retiring.'] });
 type('Opponent', {'health?':'number'});
 type('CombatPosition', {x:'number',y:'number',z:'number'});
 type('AnimationIntervalSnapshot',{name:'string',type:enumOf('none','unstable','uninterrupt','self_uninterrupt','attack','block','invulnerable','invisible')});
@@ -383,7 +383,7 @@ type('Actor',{});
 type('ActorSnapshot',{id:'string',definition:'string',team:enumOf('player','opponent'),'target_id?':'string',age_frames:'integer',lifetime_frames:'integer'},'FighterSnapshot');
 type('ActorEvent',{sequence:'integer',actor_id:'string',kind:enumOf('spawned','removed','expired','died','owner_changed','round_ended','spawn_failed'),frame:'integer'});
 type('ActorSpawnRequest',{status:enumOf('queued','applied','failed'),'actor_id?':'string','error?':'string'});
-type('ActorDefinition',{id:'string',character:H('Warrior'),'team?':[enumOf('owner','opponent'),'Relative to spawner; default owner.'],'ai?':['boolean','Default true; native warrior tactic.'],'lifetime_frames?':['integer','1-36000, default 1800 simulation frames from initialized birth.'],'max_health?':['number','Finite 0.01-100, default 1 native health pool.']});
+type('ActorDefinition',{id:'string',character:H('Warrior'),'team?':[enumOf('owner','opponent'),'Relative to spawner; default owner.'],'ai?':['boolean','Default true; native warrior tactic.'],'lifetime_frames?':['integer','1-36000, default 1800 simulation frames from initialized birth.'],'max_health?':['number','Finite 0.01-100, default 1 native health pool.'],'behavior?':[H('Behavior'),'Own behavior registered in this transaction; separate instance state per actor, fight/round only.'],'parameters?':[values,'Resolved against the behavior schema; requires behavior.']});
 reg('actors.register','ActorDefinition','ActorDefinition');
 const actorMethods={
     snapshot:{params:{},returns:E('ActorSnapshot')+'|nil, string|nil',capability:'combat.actors'},

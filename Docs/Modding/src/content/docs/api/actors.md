@@ -18,10 +18,10 @@ spawn during menu or round lifecycle callbacks.
 AI uses the warrior's tactic and equipment. A tactic registered with
 `on_decide` runs with private memory for each actor's native controller. Its
 `event.self.actor` and `event.opponent.actor` provide copied identity/owner/team
-observations; see [scripted companions](../../guides/scripted-actors/). A general
-Lua combat behavior host is not attached to each actor yet: run your logic in the spawning fighter's
-behavior, reacquire actor references on each callback, and store plain data keyed
-by snapshot IDs. Actors are separate from [weapon-child projectiles](../projectiles/).
+observations; see [scripted companions](../../guides/scripted-actors/). Attach an
+optional `behavior` for per-actor state, ticks, contact/damage and animation
+callbacks, plus explicit spawn/end notifications. Actors are separate from
+[weapon-child projectiles](../projectiles/).
 Typed projectile spawning/queries currently require a main fighter; an actor
 does not expose those methods. Native equipment moves may still create their
 ordinary weapon children.
@@ -61,11 +61,65 @@ local ally = sf2.actors.register {
 | `ai` | Boolean, default `true`. Uses the warrior's native or Lua-directed tactic; `false` allows manual Lua guidance. |
 | `lifetime_frames` | Integer 1–36000, default 1800; simulation frames starting after native birth initialization. |
 | `max_health` | Finite number 0.01–100, default 1. Native health units: 1 is a full normal fighter's health pool. |
+| `behavior` | Optional behavior handle registered by this mod in the same transaction. Each spawned actor has its own instance state. |
+| `parameters` | Optional typed configuration resolved against that behavior's schema, including defaults. Requires `behavior`; unknown fields or wrong types reject registration. |
 
 An actor starts at its own maximum health. Equipment/tactic/rig must form a
 usable native warrior; field validation does not guarantee every recovered rig
 or outfit can run. Definition content participates in the mod compatibility
 fingerprint. Live actors and IDs are round state and are not saved.
+
+### Give each actor its own reactive logic
+
+An attachment receives `on_actor_spawn`, `on_actor_end`, `on_tick`, the eight
+hit/damage/block/critical callbacks, and `on_animation_start`/`on_animation_end`.
+It does not receive main-fight/round, combo or style callbacks. Use spawn/end for
+the actor's own lifetime; AI decisions remain in the warrior's separate tactic.
+See the [callback reference](../combat-callbacks/#on_actor_spawn).
+
+```lua
+local ward = sf2.behaviors.register {
+    id = "companion_ward",
+    state = { lifetime = "round", fields = {
+        ready = { type = "boolean", default = true },
+    } },
+    on_damage_resolving = function(self, fighter)
+        if self.state.ready then
+            fighter:scale_incoming_damage(0.5)
+            self.state.ready = false
+        end
+    end,
+}
+-- Fragment: companion is the registered warrior above.
+local guarded = sf2.actors.register { id = "guarded", character = companion, behavior = ward }
+```
+
+This example needs `combat.modify_hit`; registration itself needs
+`content.register`. Spawn it using `combat.actors`. `round` and `fight` state are
+supported and isolated per actor instance, even when actors share the same
+behavior. State disappears with the actor; `saved` lifetime is rejected.
+
+The callback's `fighter.source` is `"actor"`; `actor_id`, `actor_definition`,
+`actor_owner` and absolute `side` describe its host. `fighter.actor` is a scoped
+self reference supporting the actor methods below with `combat.actors`.
+`fighter:snapshot().opponent` and `fighter.opponent` observe its current native
+target, which may be another actor. Target-changing commands remain deferred to
+safe native transitions. IDs and copied observations grant no command authority.
+
+Existing fighter damage modifiers use their normal capabilities and native
+timing. Self `change_health`, `move_by` and `play_move` use the actor's queued
+commands and limits; they require the corresponding fighter capabilities
+(`combat.change_life`, `combat.motion`, `combat.playback`). Alternatively use the
+scoped `fighter.actor` methods with `combat.actors`. Opponent mutation additionally
+requires `combat.target`. A lethal applied hit still notifies the actor host,
+but cannot be reversed by queued healing. References expire after each callback.
+
+Actor callbacks cannot spawn additional actors/projectiles, query main-fighter
+actor/projectile collections, change forms, set native combat flags, block player
+controls, or claim round-outcome authority. Those host operations remain limited
+to their existing supported contexts. Native equipment can still create children.
+The complete [Scripted Actor Sparring example](../../guides/scripted-actors/)
+demonstrates separate state, outgoing bonuses, incoming mitigation and cleanup.
 
 ## fighter:spawn_actor
 

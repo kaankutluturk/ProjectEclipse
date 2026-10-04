@@ -49,8 +49,62 @@ local character = sf2.warriors.register {
     level = 1, tactic = sf2.tactics.name(brain), skeleton = "Skeleton",
     items = { sf2.items.get("core:items/weapon/WEAPON_KNIVES") },
 }
-local ally = sf2.actors.register { id = "ally", character = character, max_health = 10, lifetime_frames = 1800 }
-local rival = sf2.actors.register { id = "rival", character = character, team = "opponent", max_health = 10, lifetime_frames = 1800 }
+local reactive = sf2.behaviors.register {
+    id = "reactive_sparring",
+    parameters = { bonus = { type = "number", default = 0.01 } },
+    state = { lifetime = "round", fields = {
+        ticks = { type = "integer", default = 0 },
+        hits = { type = "integer", default = 0 },
+        id = { type = "string", default = "" },
+    } },
+    on_actor_spawn = function(self, fighter)
+        assert(self.state.id == "" and self.state.ticks == 0 and self.state.hits == 0)
+        self.state.id = fighter.actor_id
+        local own = assert(fighter.actor:snapshot())
+        assert(own.id == fighter.actor_id and own.health == own.max_health)
+        sf2.log.info("SCRIPTED-ACTOR:host_spawn:" .. fighter.actor_id)
+    end,
+    on_tick = function(self, fighter)
+        assert(self.state.id == fighter.actor_id, "Actor behavior state crossed between instances")
+        self.state.ticks = self.state.ticks + 1
+        local view = assert(fighter:snapshot())
+        assert(view.self.actor.id == fighter.actor_id)
+        if self.state.ticks == 1 then sf2.log.info("SCRIPTED-ACTOR:host_tick:" .. fighter.actor_id) end
+    end,
+    on_damage_dealing = function(self, fighter, event)
+        assert(event.attack.actor_id == fighter.actor_id)
+        fighter:add_outgoing_damage(self.params.bonus)
+        sf2.log.info("SCRIPTED-ACTOR:host_outgoing:" .. fighter.actor_id .. ":" .. event.damage .. ":" .. self.params.bonus)
+    end,
+    on_damage_resolving = function(_, fighter, event)
+        fighter:scale_incoming_damage(0.5)
+        sf2.log.info("SCRIPTED-ACTOR:host_resolving:" .. fighter.actor_id .. ":" .. event.attack.actor_id .. ":" .. event.damage)
+    end,
+    on_damage_received = function(self, fighter, event)
+        self.state.hits = self.state.hits + 1
+        assert(event.damage > 0 and event.attack.actor_id ~= fighter.actor_id)
+        sf2.log.info("SCRIPTED-ACTOR:host_received:" .. fighter.actor_id .. ":" .. event.damage .. ":" .. event.health_before .. ":" .. event.health_after)
+    end,
+    on_damage_dealt = function(_, fighter, event)
+        assert(event.damage > 0 and event.attack.actor_id == fighter.actor_id)
+        sf2.log.info("SCRIPTED-ACTOR:host_dealt:" .. fighter.actor_id)
+    end,
+    on_hit_post_crit = function(_, fighter, event)
+        sf2.log.info("SCRIPTED-ACTOR:host_contact:" .. fighter.actor_id .. ":" .. event.type .. ":" .. event.target)
+    end,
+    on_post_hit = function(_, fighter, event)
+        sf2.log.info("SCRIPTED-ACTOR:host_contact:" .. fighter.actor_id .. ":" .. event.type .. ":" .. event.target)
+    end,
+    on_animation_start = function(_, fighter, event)
+        if event.target == "self" then sf2.log.info("SCRIPTED-ACTOR:host_animation:" .. fighter.actor_id) end
+    end,
+    on_actor_end = function(self, fighter)
+        assert(self.state.id == fighter.actor_id)
+        sf2.log.info("SCRIPTED-ACTOR:host_end:" .. fighter.actor_id .. ":" .. fighter.actor_end_reason)
+    end,
+}
+local ally = sf2.actors.register { id = "ally", character = character, behavior = reactive, max_health = 10, lifetime_frames = 1800 }
+local rival = sf2.actors.register { id = "rival", character = character, behavior = reactive, parameters = { bonus = 0.02 }, team = "opponent", max_health = 10, lifetime_frames = 1800 }
 local hud, command, pending, last_event, paired
 local function close()
     if hud and sf2.ui.is_open(hud) then sf2.ui.close(hud) end

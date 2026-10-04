@@ -17,7 +17,10 @@ namespace Eclipse.Modding
         public bool AiControlled { get; }
         public int LifetimeFrames { get; }
         public float MaxHealth { get; }
-        internal ActorDefinition(DefinitionId id, DefinitionId character, bool opposingTeam, bool ai, int lifetime, double maxHealth)
+        public DefinitionId? Behavior { get; }
+        public IReadOnlyDictionary<string,ModParameterValue> InitialParameters { get; }
+        internal ActorDefinition(DefinitionId id, DefinitionId character, bool opposingTeam, bool ai, int lifetime, double maxHealth,
+            DefinitionId? behavior = null, IDictionary<string,ModParameterValue> parameters = null)
         {
             if (character.Category != "warriors" || lifetime < 1 || lifetime > ModActorLimits.MaximumLifetimeFrames)
                 throw new ModContentException("Actors require a warrior and lifetime_frames in 1..36000.");
@@ -25,6 +28,9 @@ namespace Eclipse.Modding
                 throw new ModContentException("Actor max_health must be finite in 0.01..100.");
             Id = id; Character = character; OpposingTeam = opposingTeam; AiControlled = ai; LifetimeFrames = lifetime;
             MaxHealth=(float)maxHealth;
+            Behavior=behavior;
+            InitialParameters=new System.Collections.ObjectModel.ReadOnlyDictionary<string,ModParameterValue>(
+                new Dictionary<string,ModParameterValue>(parameters??new Dictionary<string,ModParameterValue>()));
         }
     }
     // Detached provenance for actor roots in combat and AI observations.
@@ -57,6 +63,7 @@ namespace Eclipse.Modding
         bool TrySetTarget(string mainTarget, IModActor actorTarget, out string error);
         bool TryRemove(out string error);
     }
+    public interface IModActorBehaviorSource { IModActor Actor { get; } }
     public interface IModFighterActors
     {
         bool TrySpawnActor(ModId owner, DefinitionId definition, double x, double y, double z, Action<string,string> complete, out string error);
@@ -74,11 +81,20 @@ namespace Eclipse.Modding
     public sealed partial class ModRegistrationTransaction
     {
         private readonly Dictionary<DefinitionId,ActorDefinition> _pendingActors = new Dictionary<DefinitionId,ActorDefinition>();
-        public ActorDefinition RegisterActor(string localId, DefinitionId character, bool opposingTeam, bool ai, int lifetime, double maxHealth)
+        public ActorDefinition RegisterActor(string localId, DefinitionId character, bool opposingTeam, bool ai, int lifetime, double maxHealth,
+            DefinitionId? behavior = null, IDictionary<string,ModParameterValue> parameters = null)
         {
             ThrowIfCompleted(); var id = Qualify("actors", localId);
             ValidateDefinitionReferences(new[] { character }, "warriors", id, "character");
-            var definition = new ActorDefinition(id, character, opposingTeam, ai, lifetime, maxHealth);
+            Dictionary<string,ModParameterValue> initial=null;
+            if(behavior.HasValue)
+            {
+                var host=RequirePendingBehavior(behavior.Value,"Actor");
+                if(host.StateLifetime=="saved")throw new ModContentException("Actor behaviors support fight/round state; live actors are not saved.");
+                initial=host.Parameters.ResolveValues(parameters==null?null:new Dictionary<string,ModParameterValue>(parameters));
+            }
+            else if(parameters!=null&&parameters.Count!=0)throw new ModContentException("Actor parameters require a behavior.");
+            var definition = new ActorDefinition(id, character, opposingTeam, ai, lifetime, maxHealth,behavior,initial);
             AddP1D(_pendingActors, id, definition); return definition;
         }
         private void ValidateActorCommit() => _catalog.ValidateActors(SortedValues(_pendingActors));
@@ -86,7 +102,8 @@ namespace Eclipse.Modding
     }
     public sealed partial class ModApiFacade
     {
-        public ActorDefinition RegisterActor(string id, DefinitionId character, bool opposingTeam, bool ai, int lifetime, double maxHealth)
-        { RequireCapability("content.register"); return RequireRegistration().RegisterActor(id, character, opposingTeam, ai, lifetime, maxHealth); }
+        public ActorDefinition RegisterActor(string id, DefinitionId character, bool opposingTeam, bool ai, int lifetime, double maxHealth,
+            DefinitionId? behavior = null, IDictionary<string,ModParameterValue> parameters = null)
+        { RequireCapability("content.register"); return RequireRegistration().RegisterActor(id, character, opposingTeam, ai, lifetime, maxHealth,behavior,parameters); }
     }
 }

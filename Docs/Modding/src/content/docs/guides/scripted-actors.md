@@ -27,6 +27,11 @@ fight, and `ui.create` for the example HUD. Actor spawning requires an active
 offline, non-raid round and a living main fighter. Follow the
 [independent fighter reference](../../api/actors/) for capacities and lifetimes.
 
+The complete example also declares `combat.modify_outgoing_hit` and
+`combat.modify_hit`. Its actor behavior adds 0.01 outgoing damage for the ally,
+0.02 for the rival, then halves each actor's incoming damage. These values are
+native health units. The original main fighters do not receive this attachment.
+
 ## Separate a character from its decisions
 
 The native rig and equipment supply animation, eligible moves, collision and hit
@@ -117,6 +122,33 @@ copied identity data, stale actions, memory isolation, native fallback and
 instruction limits. Editor checks validate the starter and
 complete identity fields; those checks are not game playtests.
 
-This is a reusable autonomous-fighter foundation. General per-actor combat
-behavior callbacks, custom rigs/outfits, every arena/weapon pairing, custom
+## Add reactive abilities to each instance
+
+AI chooses a move; an actor's optional `behavior` reacts to what happens. They
+have separate memory/state. The example's `reactive_sparring` behavior uses a
+typed `bonus` parameter and private `id`, `ticks` and `hits` state for each actor.
+`on_actor_spawn` initializes it, `on_tick` advances it, outgoing and incoming
+damage callbacks change the current native hit, and `on_actor_end` finishes it.
+Replacement actors begin with defaults even when their definition is unchanged.
+
+Attach the same behavior to multiple definitions with different `parameters`.
+Their state remains separate. Register the behavior before the actor, in the
+same mod transaction. `round`/`fight` state works; `saved` actor state is rejected
+because these bodies belong to the current round.
+
+Use `fighter.actor` for callback-scoped self commands with `combat.actors`.
+Use `fighter:snapshot()` to observe this actor and its current target, and copied
+`fighter.actor_id`/`actor_definition`/`actor_owner` for bookkeeping. End callbacks
+retain those copied fields and an `actor_end_reason`, but retiring actor commands
+are unavailable. [Actor behaviors](../../api/actors/#give-each-actor-its-own-reactive-logic)
+list supported callbacks and operation limits.
+
+The complete behavior has native acceptance for spawn/tick/animation events,
+both hit-phase perspectives, resolved damage in each direction, outgoing bonuses
+and incoming scaling matching actual health loss, fresh replacement state and
+exactly-once end callbacks on dismissal/surrender. Managed checks additionally
+exercise expired self references, copied observations and failed-state rollback.
+
+This is a reusable autonomous and reactive fighter foundation. Actor-authored
+projectiles, custom rigs/outfits, every arena/weapon pairing, custom
 victory conditions, exported players, raids and multiplayer need separate work.

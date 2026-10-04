@@ -3,6 +3,10 @@
 2026-10-04. Public actors now ship; the earlier feasibility record is historical.
 This advances the creator platform without closing G01–G14 or E1–E8.
 
+The [reactive actor follow-up](ACTOR_BEHAVIORS_ACCEPTANCE.md) adds direct behavior
+attachments and per-instance native callbacks. Earlier host limitations in this
+record refer to the initial actor API snapshot.
+
 `ModActors.cs` supplies immutable transactional definitions, copied observations,
 events and shared capability interfaces. `FightActors.cs` owns native root
 instances by calling mod, spawning main body, round and script session. It uses

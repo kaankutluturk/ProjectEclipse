@@ -493,11 +493,12 @@ public partial class Fight
 		public int OGOLNFLBLBD;
 	}
 
-		private sealed class EclipseFighterOperations : IModFighterOperations, IModDamageEventSource, IModFighterTargets, IModIncomingHitSource, IModFighterEffects, IModCombatSnapshotSource, IModCombatActivitySource, IModFighterForms, IModFighterStatusIcons, IModAnimationLifecycleSource, IModFighterFlags, IModFighterControls, IModRoundOutcomes, IModFighterMotion, IModFighterPlayback, IModFighterRegions, IModFighterProjectiles, IModFighterProjectileSpawning, IModFighterActors
+		private sealed class EclipseFighterOperations : IModFighterOperations, IModDamageEventSource, IModFighterTargets, IModIncomingHitSource, IModFighterEffects, IModCombatSnapshotSource, IModCombatActivitySource, IModFighterForms, IModFighterStatusIcons, IModAnimationLifecycleSource, IModFighterFlags, IModFighterControls, IModRoundOutcomes, IModFighterMotion, IModFighterPlayback, IModFighterRegions, IModFighterProjectiles, IModFighterProjectileSpawning, IModFighterActors, IModActorBehaviorSource
 	{
 		private readonly Fight _fight;
 		private readonly Model _model;
         private readonly bool _controlSetup;
+        public IModActor Actor => _fight != null && _model != null && _fight._eclipseActors.TryGetValue(_model,out var actor) ? actor : null;
         private bool ArenaAvailable => _fight != null && GetCurrentFight() == _fight && !_fight.IsLocalVersus && !_fight.IsTitleSparring &&
             _fight.FightDefinition != null && _fight.FightDefinition.get_Type() != BattleType.FightNone &&
             _fight.FightDefinition.get_Type() != BattleType.FightPVP && (!_fight.get_IsRaidFight() || ModModeRuntime.IsRaid(_fight.FightDefinition)) &&
@@ -541,11 +542,13 @@ public partial class Fight
         public bool TryPlayMove(DefinitionId move, Action<bool, string> complete, out string error)
         {
             if (_fight == null) { error = "Fight is unavailable."; return false; }
+            if (Actor is OwnedActor actor) return actor.TryPlayMove(move,complete,out error);
             return _fight.TryQueueEclipseFighterPlayback(_model, move, complete, out error);
         }
         public bool TryMoveBy(double x, double y, double z, out string error)
         {
             if (_fight == null) { error = "Fight is unavailable."; return false; }
+            if (Actor is OwnedActor actor) return actor.TryMoveBy(x,y,z,out error);
             return _fight.TryQueueEclipseFighterMotion(_model, x, y, z, out error);
         }
         public bool TryEndRound(DefinitionId rule, bool playerWins, out string error)
@@ -619,7 +622,7 @@ public partial class Fight
             if (_fight == null || _model == null || _model.Parameters == null) return null;
             var self = Capture(_model);
             if (self == null) return null;
-            var opponent = _model == _fight._playerModel ? _fight.CKNCPOABFBO : _fight._playerModel;
+            var opponent = _model.GetCombatTarget();
             return new ModCombatSnapshot(self, Capture(opponent), _fight.fightTimeInFrame, _fight.round.processing);
         }
         internal static ModFighterSnapshot Capture(Model model)
@@ -633,8 +636,8 @@ public partial class Fight
                 ModRuntime.CaptureAnimationSnapshot(model),GetCurrentFight()?.CaptureEclipseActorIdentity(model));
         }
         public double Health => _model == null ? 0 : _model.KKMCHCNOHMB();
-        public IModFighterOperations Opponent => _fight == null ? null :
-            new EclipseFighterOperations(_fight, _model == _fight._playerModel ? _fight.CKNCPOABFBO : _fight._playerModel);
+        public IModFighterOperations Opponent => _fight == null || Actor is OwnedActor actor && actor.Removing ? null :
+            new EclipseFighterOperations(_fight, _model?.GetCombatTarget());
 		public EclipseFighterOperations(Fight fight, Model model, ModDamageEvent damageEvent = null, ModIncomingHit incomingHit = null, ModCombatActivityEvent activity = null, ModAnimationLifecycleEvent animation = null, bool controlSetup = false)
 		{
 			_fight = fight;
@@ -648,6 +651,7 @@ public partial class Fight
 
 		public bool TrySetDamageShield(object key, double fraction, int frames, out string error)
         {
+            if (Actor is OwnedActor actor && !_fight.ActorValid(actor,true,out error)) return false;
             if (_fight == null || _model == null || _model.KKMCHCNOHMB() <= 0) { error = "Fighter is unavailable."; return false; }
             if (!_fight._eclipseShields.TryGetValue(_model, out var shields)) _fight._eclipseShields[_model] = shields = new ModDamageShields();
             return shields.TrySet(key, fraction, frames, _fight.fightTimeInFrame, out error);
@@ -661,6 +665,7 @@ public partial class Fight
 
 		public bool TryShowStatusIcon(object key, AssetId sprite, int frames, int stacks, out string error)
 		{
+            if (Actor is OwnedActor actor && !_fight.ActorValid(actor,true,out error)) return false;
 			if (_fight == null || _model == null || key == null || string.IsNullOrEmpty(sprite.Path) ||
 				frames < 1 || frames > 3600 || stacks < 0 || stacks > 10000)
 			{ error = "Invalid or unavailable status icon."; return false; }
@@ -676,6 +681,7 @@ public partial class Fight
 		public bool TryChangeHealth(double amount, out string error)
 		{
 			error = string.Empty;
+            if (Actor is OwnedActor actor) return actor.TryChangeHealth(amount,out error);
 			if (_model != null && _model.KKMCHCNOHMB() <= 0)
 			{
 				error = "A resolved lethal hit cannot be reversed by a damage callback.";
@@ -706,6 +712,7 @@ public partial class Fight
 
 		public bool TryAddMagicCharge(double amount, out string error)
 		{
+            if (Actor is OwnedActor actor && !_fight.ActorValid(actor,true,out error)) return false;
 			error = string.Empty;
 			if (_model == null)
 			{
@@ -1824,6 +1831,7 @@ public partial class Fight
             {
                 DispatchEclipseCombatEvent(ModEffectEvent.Tick);
                 if (round.processing) DispatchEclipseOpponent(ModEffectEvent.Tick);
+                if (round.processing) DispatchEclipseActorTicks();
             }
 		}
 		if (DODCPKOADGF)
@@ -2359,6 +2367,7 @@ public partial class Fight
                 DispatchEclipseCombatEvent(ModEffectEvent.DamageDealing, null, outgoing);
             else if (eclipseAttacker == CKNCPOABFBO)
                 DispatchEclipseOpponent(ModEffectEvent.DamageDealing, null, outgoing);
+            else DispatchEclipseActor(eclipseAttacker,ModEffectEvent.DamageDealing,incoming:outgoing);
         }
 		if (preFight != null && !eclipseActorContact)
 		{
@@ -2376,6 +2385,10 @@ public partial class Fight
         if (_eclipseFightBeginDispatched && EGHPHELLOGO.KJDFJPBIGJC == CKNCPOABFBO)
             DispatchEclipseOpponent(ModEffectEvent.DamageResolving, null,
                 new ModIncomingHit(() => gHHCDAFIKJE.EEDJBBOCFNL, amount => gHHCDAFIKJE.EEDJBBOCFNL = (float)amount, gHHCDAFIKJE.DFOHNJEBDED, gHHCDAFIKJE.DNGKOMPMPCD, attackSource: eclipseAttackSource));
+        if (_eclipseFightBeginDispatched && _eclipseActors.ContainsKey(EGHPHELLOGO.KJDFJPBIGJC))
+            DispatchEclipseActor(EGHPHELLOGO.KJDFJPBIGJC,ModEffectEvent.DamageResolving,incoming:
+                new ModIncomingHit(() => gHHCDAFIKJE.EEDJBBOCFNL, amount => gHHCDAFIKJE.EEDJBBOCFNL = (float)amount,
+                    gHHCDAFIKJE.DFOHNJEBDED,gHHCDAFIKJE.DNGKOMPMPCD,attackSource:eclipseAttackSource));
 		if (IsLocalVersus && gHHCDAFIKJE.DFOHNJEBDED)
 			gHHCDAFIKJE.EEDJBBOCFNL = Eclipse.Multiplayer.PvpBalanceCombat.ClampBlocked(this, EGHPHELLOGO.KJDFJPBIGJC, gHHCDAFIKJE.EEDJBBOCFNL);
 		EGHPHELLOGO.KJDFJPBIGJC.LogDamage(gHHCDAFIKJE.EEDJBBOCFNL, BHLIBKKJNKH(hFIIPNLCIEE), gHHCDAFIKJE.DefenceAttribute);
@@ -2394,26 +2407,7 @@ public partial class Fight
 		{
 			var observation = new ModDamageEvent(round.round, eclipseHealthBefore,
 				EGHPHELLOGO.KJDFJPBIGJC.KKMCHCNOHMB(), gHHCDAFIKJE.DFOHNJEBDED, gHHCDAFIKJE.DNGKOMPMPCD, eclipseAttackSource);
-			if (EGHPHELLOGO.KJDFJPBIGJC == _playerModel)
-			{
-				if (observation.Damage > 0) DispatchEclipseCombatEvent(ModEffectEvent.DamageReceived, observation);
-				if (observation.Blocked) DispatchEclipseCombatEvent(ModEffectEvent.Block, observation);
-                if (eclipseAttacker == CKNCPOABFBO)
-                {
-                    if (observation.Damage > 0) DispatchEclipseOpponent(ModEffectEvent.DamageDealt, observation);
-                    if (observation.Critical) DispatchEclipseOpponent(ModEffectEvent.Critical, observation);
-                }
-			}
-			else if (EGHPHELLOGO.KJDFJPBIGJC == CKNCPOABFBO)
-			{
-                if (eclipseAttacker == _playerModel)
-                {
-                    if (observation.Damage > 0) DispatchEclipseCombatEvent(ModEffectEvent.DamageDealt, observation);
-                    if (observation.Critical) DispatchEclipseCombatEvent(ModEffectEvent.Critical, observation);
-                }
-                if (observation.Damage > 0) DispatchEclipseOpponent(ModEffectEvent.DamageReceived, observation);
-                if (observation.Blocked) DispatchEclipseOpponent(ModEffectEvent.Block, observation);
-			}
+            NotifyEclipseAppliedContact(EGHPHELLOGO.KJDFJPBIGJC,eclipseAttacker,observation);
 		}
 		KDMDOBOKAIB(eclipseActorContact ? eclipseAttacker : EGHPHELLOGO.KJDFJPBIGJC.GetCombatTarget(), gHHCDAFIKJE.EEDJBBOCFNL);
 		if (!gHHCDAFIKJE.AttackAnimation.BKGIEPOEBOF())
@@ -3345,13 +3339,15 @@ public partial class Fight
 			strike.DFOHNJEBDED, strike.DNGKOMPMPCD, new ModHitEvent(true, weapon, unarmed, ranged, magic), attackSource);
 		if (attacker == _playerModel) DispatchEclipseCombatEvent(effectEvent, null, attackerHit);
 		else if (attacker == CKNCPOABFBO) DispatchEclipseOpponent(effectEvent, null, attackerHit);
+        else DispatchEclipseActor(attacker,effectEvent,incoming:attackerHit);
 		if (target == _playerModel) DispatchEclipseCombatEvent(effectEvent, null, targetHit);
 		else if (target == CKNCPOABFBO) DispatchEclipseOpponent(effectEvent, null, targetHit);
+        else DispatchEclipseActor(target,effectEvent,incoming:targetHit);
 	}
 
 	private bool _eclipseOpponentDispatching;
-    private readonly Queue<(int Round, ModAnimationLifecycleEvent Player, ModAnimationLifecycleEvent Opponent)> _eclipseAnimationEvents =
-        new Queue<(int, ModAnimationLifecycleEvent, ModAnimationLifecycleEvent)>();
+    private readonly Queue<(int Round, ModAnimationLifecycleEvent Player, ModAnimationLifecycleEvent Opponent, List<(OwnedActor Actor, ModAnimationLifecycleEvent Event)> Actors)> _eclipseAnimationEvents =
+        new Queue<(int, ModAnimationLifecycleEvent, ModAnimationLifecycleEvent, List<(OwnedActor, ModAnimationLifecycleEvent)>)>();
     private bool _drainingEclipseAnimationEvents;
 
     private void NotifyEclipseAnimation(Model actor, InfoAnimation animation, ModEffectEvent kind)
@@ -3369,13 +3365,13 @@ public partial class Fight
             UnityEngine.Debug.LogWarning("[ModCombat] Animation callback queue limit reached; event discarded.");
             return;
         }
-        _eclipseAnimationEvents.Enqueue((round.round, player, opponent));
+        _eclipseAnimationEvents.Enqueue((round.round, player, opponent, CaptureEclipseActorAnimations(actor,player)));
         DrainEclipseAnimationEvents();
     }
 
     private void DrainEclipseAnimationEvents()
     {
-        if (_drainingEclipseAnimationEvents || _eclipseCombatDispatching || _eclipseOpponentDispatching ||
+        if (_drainingEclipseAnimationEvents || _eclipseCombatDispatching || _eclipseOpponentDispatching || _eclipseActorDispatching ||
             _eclipseAnimationEvents.Count == 0) return;
         _drainingEclipseAnimationEvents = true;
         try
@@ -3394,6 +3390,8 @@ public partial class Fight
                 DispatchEclipseCombatEvent(next.Player.Type, animation: next.Player);
                 if (round.processing && !_eclipseFightEndDispatched && next.Round == round.round)
                     DispatchEclipseOpponent(next.Opponent.Type, animation: next.Opponent);
+                if (round.processing && !_eclipseFightEndDispatched && next.Round == round.round)
+                    DispatchEclipseActorAnimations(next.Actors);
             }
         }
         finally { _drainingEclipseAnimationEvents = false; }
@@ -3403,7 +3401,7 @@ public partial class Fight
     {
         if (IsLocalVersus) return;
         if (effectEvent == ModEffectEvent.Tick && (_eclipseEndedRound == round.round || _eclipseFightEndDispatched)) return;
-        if (_eclipseOpponentDispatching || _eclipseCombatDispatching || CKNCPOABFBO == null || ModRuntime.Scripts == null) return;
+        if (_eclipseOpponentDispatching || _eclipseCombatDispatching || _eclipseActorDispatching || CKNCPOABFBO == null || ModRuntime.Scripts == null) return;
         if (effectEvent == ModEffectEvent.FightBegin && round.round != 1) return;
         _eclipseOpponentDispatching = true;
         try
@@ -3470,7 +3468,7 @@ public partial class Fight
 	{
 		if (IsLocalVersus) return;
         if (effectEvent == ModEffectEvent.Tick && (_eclipseEndedRound == round.round || _eclipseFightEndDispatched)) return;
-		if (_eclipseCombatDispatching || _eclipseOpponentDispatching) return;
+		if (_eclipseCombatDispatching || _eclipseOpponentDispatching || _eclipseActorDispatching) return;
 		if (effectEvent == ModEffectEvent.FightBegin)
 		{
 			if (_eclipseFightBeginDispatched || round.round != 1) return;

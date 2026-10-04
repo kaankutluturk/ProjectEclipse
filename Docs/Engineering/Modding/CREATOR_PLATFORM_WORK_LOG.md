@@ -1,5 +1,12 @@
 # Creator platform implementation record
 
+2026-10-04: independent actor definitions now attach owned stateful behaviors,
+with spawn/end, tick, contact/damage and animation callbacks. Native bonuses and
+mitigation match actual health loss; each replacement has fresh state. See
+[actor behavior acceptance](ACTOR_BEHAVIORS_ACCEPTANCE.md) for source/API, 57 native
+checks, 81 definition/state/scope checks, creator tooling and limits. The full
+Minecraft-style creator objective and G01–G14/E1–E8 scope stay open.
+
 2026-10-04: shipped the owned independent fighter API and companion HUD example.
 See [actor API acceptance](ACTOR_API_ACCEPTANCE.md) for source, inferred native
 names, actual Lua/native evidence (42 checks), definition/fingerprint checks

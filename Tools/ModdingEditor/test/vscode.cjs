@@ -78,6 +78,18 @@ exports.run = async function () {
             await new Promise(resolve=>setTimeout(resolve,500));
         }
         assert(identityFound,'Copied AI actor identity completion missing');passed.push('PASS: AI actor identity/owner/team completion');
+        const actorHostUri=vscode.Uri.joinPath(folder.uri,'scripts','actor-host-completion.lua');
+        const actorHostLine=' if fighter.actor then fighter.actor: end';
+        fs.writeFileSync(actorHostUri.fsPath,'local sf2=require("sf2")\nsf2.behaviors.register{id="host",on_actor_spawn=function(_,fighter)\n'+actorHostLine+'\nend}');
+        await vscode.workspace.openTextDocument(actorHostUri);
+        let actorHostFound=false;const actorHostDeadline=Date.now()+30000;
+        while(Date.now()<actorHostDeadline){
+            const result=await vscode.commands.executeCommand('vscode.executeCompletionItemProvider',actorHostUri,new vscode.Position(2,actorHostLine.indexOf('fighter.actor:')+14));
+            const labels=(result?.items||[]).map(item=>typeof item.label==='string'?item.label:item.label.label);
+            if(['snapshot','move_by','remove','set_target','change_health','play_move'].every(name=>labels.some(label=>label===name||label.startsWith(name+'(')))){actorHostFound=true;break;}
+            await new Promise(resolve=>setTimeout(resolve,500));
+        }
+        assert(actorHostFound,'Actor behavior self-reference completion missing');passed.push('PASS: actor spawn callback self-reference methods');
         const actorUri=vscode.Uri.joinPath(folder.uri,'scripts','actor-completion.lua');
         const actorLine=' for _,actor in ipairs(fighter:actors() or {}) do actor: end';
         fs.writeFileSync(actorUri.fsPath,'local sf2=require("sf2")\nsf2.behaviors.register{id="probe",on_tick=function(_,fighter)\n'+actorLine+'\nend}');

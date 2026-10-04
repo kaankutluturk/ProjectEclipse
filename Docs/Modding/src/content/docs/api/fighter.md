@@ -31,7 +31,7 @@ decision; the older `fighter.health` field is captured at callback entry.
 **Returns:** A `CombatSnapshot` table, or `nil` if the fighter cannot be observed.
 
 **When:** Inside any supported combat behavior callback, including battle rules,
-perks, enchantments, and warrior behaviors. Each call samples the current state.
+perks, enchantments, warrior behaviors and attached actor behaviors. Each call samples the current state.
 The callable reference expires when that callback returns; the returned data may
 be retained as an observation, but will not update itself.
 
@@ -41,7 +41,7 @@ be retained as an observation, but will not update itself.
 | Field | Meaning |
 | --- | --- |
 | `self` | The fighter receiving this callback, even when it is the enemy. |
-| `opponent` | The opposing fighter's snapshot, or `nil` when unavailable. |
+| `opponent` | This fighter's current native target snapshot, or `nil` when unavailable. It can be a main fighter or an independent actor. |
 | `frame` | Nonnegative elapsed active-fight frame count, shared by both sides. |
 | `seconds` | `frame / 60`, using the recovered engine's simulation rate. |
 | `round_active` | Whether the engine is processing the round at capture time. |

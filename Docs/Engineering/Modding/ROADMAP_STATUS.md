@@ -2,21 +2,31 @@
 
 Last broad reconciliation: 2026-09-12. Scope remains **G01–G14 plus E1–E8**.
 
+2026-10-04 reactive actor hosts: definitions attach owned behaviors and typed
+parameters; each spawn has independent transient state and spawn/end, tick,
+contact/damage and animation callbacks. Scripted Actor Sparring 1.1.0 proves
+native bonuses/mitigation, repeated damage and terminal lifecycle (57 checks).
+Definition/state/scope checks pass 81; original actor/projectile regressions pass.
+See ACTOR_BEHAVIORS_ACCEPTANCE.md. E1/E2/E5 advance; unsupported actor operations,
+arbitrary content/platform, multiplayer and complete creator acceptance stay open.
+
 2026-10-04 scripted actor follow-up: independent fighters can use existing
 Lua tactics with separate controller memory and copied ID/definition/owner/team
 observations. Scripted Actor Sparring passes 30 actual Lua/HUD/native checks,
 including attacks selected by Lua, bidirectional contact, later-start repeated
-contact, unchanged main life, pause and replacement/teardown. 80 managed Lua AI
+contact, unchanged main life, pause and replacement/teardown. 95 managed Lua AI
 checks cover metadata copies, memory/action lifetime, fallback and budgets.
 See SCRIPTED_ACTORS_ACCEPTANCE.md. E1/E2/E5 advance; general actor behavior
-hosts, custom rigs/content, platform/multiplayer and full creator acceptance stay open.
+hosts were still open at that snapshot and are addressed above. Custom rigs/content,
+platform/multiplayer and full creator acceptance stay open.
 
 2026-10-04 owned actor API: registration, spawn receipts, scoped queries,
 independent native health/AI/team roots, target/motion/health/playback, death,
 TTL and teardown ship with a companion example, wiki and editor contracts.
 Actual Lua/HUD/native acceptance passes 42 checks; definition/transaction/
 fingerprint checks pass 50. See ACTOR_API_ACCEPTANCE.md for bounded evidence.
-Actor behavior hosts, arbitrary content, exports, raids, multiplayer and custom
+At that initial acceptance, actor behavior hosts were still open; the follow-up
+above adds them. Arbitrary content, exports, raids, multiplayer and custom
 outcomes remain open. This supersedes the earlier no-public-actors status below.
 
 2026-10-04 atomic target integration: an internal root/weapon-child transaction
