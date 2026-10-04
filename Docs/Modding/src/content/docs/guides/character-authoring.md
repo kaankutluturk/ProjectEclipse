@@ -92,6 +92,27 @@ Open `preview.html` locally. It previews motion and rig edges; native materials,
 
 The validator checks model references, helper dependency order, finite coordinates, animation node counts, truncated payloads, and sidecar fingerprints. It rejects XML DTDs/entities. Model XML is limited to 16 MiB; animation export permits 2–36,000 frames and at most two million node samples. A changed rig or changed clip requires rebaking its sidecar.
 
+### Geometry checks when the game loads your character
+
+The game also validates mod-authored `body_model` and `skin_models` before constructing their native geometry. A model handle checks that an asset exists; it does not validate every point binding during Lua registration. Geometry errors appear when the character is loaded or prepared. The diagnostic names the model, XML element, and field, for example:
+
+```text
+Authored character model 'my.mod:models/skin.xml' /Scene/Nodes/SkinTip @ChildNode1: unresolved or forward binding 'MissingPoint'; dependencies must appear earlier.
+```
+
+Fix the named field in your source model and export again. A failed character preparation does not replace a live fighter. An actor that fails preparation reports the error through its spawn receipt.
+
+| Geometry rule | Supported values and defaults |
+| --- | --- |
+| Root structure | `Scene` with a `Figures` element, including an empty one. |
+| Nodes | Unique composed names; `Type` is `Node`, `MacroNode`, or `CenterOfMass`. The complete character permits 1–4,096 nodes. |
+| Numeric fields | Finite values within ±100,000. Missing ordinary coordinates, mass, radii, lengths, and margins default to zero. Mass, lengths, and radii cannot be negative. |
+| Helper nodes | `NodesCount` is required, 1–128; every `ChildNode1`…`ChildNodeN` must resolve to a node declared earlier in the composition. Each `MacroNode` requires its corresponding finite `LCC1`…`LCCN` weight. `CenterOfMass` children need positive total mass. |
+| Edges | `Type` is `Edge` or `Muscle`; `End1` and `End2` must resolve. `Iterations` defaults to 1 and permits 1–32. Extra iterations are named `EdgeNameCI1`, `EdgeNameCI2`, and so on; those expanded names must also be unique. The complete character permits at most 8,192 expanded edges. |
+| Figures | Unique names within each authored document; `Type` is `Triangle` or `Capsule`. Triangles require resolved `Node1`, `Node2`, and `Node3`; capsules require a resolved `Edge`, including expanded iteration names. |
+
+Body documents precede equipment; skins follow it in their listed order. Give overlay nodes and edges distinct names instead of redeclaring body bindings. These strict authoring checks apply to your mod's body/skin and declared dependency models. Core model handles and recovered equipment retain their legacy loading behavior. This preflight does not prove good deformation, animation compatibility, or hit contact; those still need the fight checks below.
+
 Other authoring tools can produce `frames.json` with `version = 1`, `fps`, `names`, and `frames`. Each frame is an array of `[x,y,z]` points matching `names`. Names must match the rig exactly; the baker reorders them to native order and resamples input at 1–240 fps to 60 Hz:
 
 ```powershell

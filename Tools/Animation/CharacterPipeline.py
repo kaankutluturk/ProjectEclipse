@@ -37,23 +37,52 @@ def model(path, base=None):
         raise ValueError('A composed model requires 1..4096 nodes')
     for node in nodes:
         count = int(node.get('NodesCount', 0))
-        if not 0 <= count <= 128:
+        helper = node.get('Type') in ('MacroNode', 'CenterOfMass')
+        if helper and not 1 <= count <= 128:
             raise ValueError('Invalid helper node dependency count')
+        if not helper:
+            continue
+        total_mass = 0
         for i in range(1, count + 1):
             child = node.get('ChildNode' + str(i))
             if child not in names or names.index(child) >= names.index(node.tag):
                 raise ValueError(f'{node.tag}: helper dependency must exist earlier: {child}')
             if node.get('Type') == 'MacroNode':
-                finite(node.get('LCC' + str(i), '0'), node.tag + '.weight')
-    edges = {} if base is None else {e.tag: e for e in base.find('Edges')}
+                weight = node.get('LCC' + str(i))
+                if weight is None:
+                    raise ValueError(f'{node.tag}: missing LCC{i}')
+                finite(weight, node.tag + '.weight')
+            child_node = inherited.get(child)
+            if child_node is None:
+                child_node = next(n for n in nodes if n.tag == child)
+            total_mass += float(child_node.get('Mass', '0'))
+        if node.get('Type') == 'CenterOfMass' and total_mass <= 0:
+            raise ValueError(node.tag + ': center of mass dependencies need positive total mass')
+    edges = {}
+    def expanded(edge):
+        count = int(edge.get('Iterations', '1'))
+        if not 1 <= count <= 32:
+            raise ValueError(edge.tag + ': Iterations must be in 1..32')
+        return [edge.tag + (f'CI{i}' if i else '') for i in range(count)]
+    if base is not None and base.find('Edges') is not None:
+        for edge in base.find('Edges'):
+            for name in expanded(edge):
+                edges[name] = edge
     for edge in (root.find('Edges') if root.find('Edges') is not None else []):
-        if edge.tag in edges or edge.get('Type') not in ('Edge', 'Muscle'):
+        if edge.get('Type') not in ('Edge', 'Muscle'):
             raise ValueError(f'Duplicate edge or unsupported type: {edge.tag}')
         if edge.get('End1') not in names or edge.get('End2') not in names:
             raise ValueError(f'{edge.tag}: unresolved endpoint')
         for key in ('Length', 'Radius', 'Margin1', 'Margin2'):
-            finite(edge.get(key, '0'), edge.tag + '.' + key)
-        edges[edge.tag] = edge
+            number = finite(edge.get(key, '0'), edge.tag + '.' + key)
+            if key in ('Length', 'Radius') and number < 0:
+                raise ValueError(edge.tag + '.' + key + ': cannot be negative')
+        for name in expanded(edge):
+            if name in edges:
+                raise ValueError('Duplicate expanded edge: ' + name)
+            edges[name] = edge
+    if len(edges) > 8192:
+        raise ValueError('A composed model permits at most 8192 expanded edges')
     seen = set()
     for figure in root.find('Figures'):
         if figure.tag in seen:
@@ -66,7 +95,9 @@ def model(path, base=None):
             if figure.get('Edge') not in edges:
                 raise ValueError(figure.tag + ': unresolved capsule edge')
             for key in ('Radius1', 'Radius2', 'Margin1', 'Margin2'):
-                finite(figure.get(key, '0'), figure.tag + '.' + key)
+                number = finite(figure.get(key, '0'), figure.tag + '.' + key)
+                if key.startswith('Radius') and number < 0:
+                    raise ValueError(figure.tag + '.' + key + ': cannot be negative')
         else:
             raise ValueError('Unsupported figure type: ' + str(figure.get('Type')))
     return root

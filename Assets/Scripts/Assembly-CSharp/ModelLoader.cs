@@ -47,6 +47,23 @@ public class ModelLoader
 			return;
 		}
 		XmlDocument xmlDocument = null;
+
+        // Opt into authored body/skin contracts without changing archival model
+        // parsing or first-definition bindings for recovered equipment.
+        var parameters = ACENLMONNPA.GetModel()?.Parameters;
+        if (parameters != null && (!string.IsNullOrEmpty(parameters.EclipseBodyModel) || parameters.EclipseSkinModels.Length != 0))
+        {
+            var authored = new HashSet<string>(System.StringComparer.Ordinal);
+            if (IsAuthoredModel(parameters.EclipseBodyModel)) authored.Add(AuthoredModelPath(parameters.EclipseBodyModel));
+            foreach (var skin in parameters.EclipseSkinModels) if (IsAuthoredModel(skin)) authored.Add(AuthoredModelPath(skin));
+            if (authored.Count != 0)
+            {
+                var documents = new List<XmlDocument>(CBHAEPCLDFG.Count);
+                foreach (string path in CBHAEPCLDFG)
+                    documents.Add(path == "assets/models/.xml" ? null : FHGHPCACAKJ.JBJDPDOEGFO(SF2Paths.BNHLPKEDMOM(), path));
+                Eclipse.Modding.ModCharacterGeometry.Validate(CBHAEPCLDFG, documents, authored);
+            }
+        }
 		string text = "assets/models/.xml";
 		foreach (string item in CBHAEPCLDFG)
 		{
@@ -68,6 +85,9 @@ public class ModelLoader
 		ACENLMONNPA.MDDBGGPHNLF();
 		ACENLMONNPA.KJIEPFHIIKM();
 	}
+
+    private static string AuthoredModelPath(string path) => path.EndsWith(".xml", System.StringComparison.OrdinalIgnoreCase) ? path : path + ".xml";
+    private static bool IsAuthoredModel(string path) => !string.IsNullOrEmpty(path) && path.IndexOf(':') > 0 && !path.StartsWith("core:", System.StringComparison.Ordinal);
 
     // Form preparation must not accept the legacy loader's log-and-continue
     // behavior for absent assets. Populate the same document cache before any

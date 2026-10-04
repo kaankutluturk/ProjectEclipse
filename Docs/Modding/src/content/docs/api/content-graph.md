@@ -423,6 +423,14 @@ Define an opponent, optionally inheriting from a core template.
 | `health_bars` | Integer | `0` | Additional health-pool configuration; `0` keeps the template setting; `1` explicitly selects one pool. |
 | `skeleton` | String | Inherit | Native body item such as `"Skeleton"` or `"SkeletonHeavy"`, added to the loadout. |
 
+Mod-authored `body_model` and `skin_models` receive a geometry preflight when
+the game loads the fighter. Unresolved points/edges, duplicate composed node or
+edge names, invalid helper definitions and unsafe numeric values reject before
+native geometry parsing, with a model/element/field diagnostic. Core handles keep
+legacy compatibility. See the [geometry rules](../../guides/character-authoring/#geometry-checks-when-the-game-loads-your-character)
+for defaults, limits and composition order. A valid model handle alone does not
+prove animation or collision compatibility.
+
 ```lua
 local opponent = sf2.warriors.register {
     id = "sparring_partner",

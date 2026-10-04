@@ -14,6 +14,17 @@ Lua and Unity-reader integration fixture. Full-game deformation, input and hit
 contact remain separate acceptance checks. The older `BlenderCharacter.py` tool
 is a low-level point-rig workflow, not the primary visual authoring experience.
 
+The offline `CharacterPipeline.py` model validator matches the runtime authored
+body/skin preflight for helper counts/weights, positive COM mass, nonnegative
+lengths/radii, expanded edge iteration names and composition limits. Run
+`python Tools/Animation/TestCharacterPipeline.py` and `TestPackageCharacter.py`
+for these contracts and packaging. `Tools/Tests/CharacterForms/TestAuthoredGeometry.ps1`
+exercises the production C# validator and loader integration with a controlled
+native parser. `TestAuthoredGeometryUnity.ps1` uses the full game and real native
+model preparation, with cached test body/skin documents. That controlled loader
+test does not establish public mod registration, authored animation/contact or
+visual correctness.
+
 ## Tekken 8 to SF2 animation experiment
 
 The first conversion produced a **format-compatible prototype**, not a finished

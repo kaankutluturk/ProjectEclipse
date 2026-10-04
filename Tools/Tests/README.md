@@ -1,5 +1,14 @@
 # Regression tests and validators
 
+Authored character geometry: `CharacterForms/TestAuthoredGeometry.ps1` checks
+the production body/skin validator and extracted loader with controlled native
+parsing, including path/field diagnostics, composition limits, helper bindings,
+iteration names and archival core compatibility. `TestAuthoredGeometryUnity.ps1`
+boots a full-game isolated Unity 6.6 fixture and exercises real hidden model
+preparation/disposal and invalid-binding rejection against cached authored
+body/skin documents. It does not prove a public authored mod, new animation,
+contact or visual quality. Python export/packager tests remain in `Tools/Animation/`.
+
 Ranged independent fighters: `Combat/TestRangedActorsUnity.ps1` runs the actual
 Ranged Companion Duel Lua/HUD and native child geometry/contact in an isolated
 Unity fixture. It checks actor-root provenance/receipts, repeated bidirectional

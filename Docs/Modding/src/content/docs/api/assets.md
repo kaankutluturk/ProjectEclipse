@@ -112,6 +112,12 @@ Use `sf2.assets.model("models/my-model")` for either form. The editor indexes
 the file and its kind; the game checks decoding and model compatibility when it
 loads the geometry.
 
+For an authored warrior body or skin, loading includes the
+[character geometry checks](../../guides/character-authoring/#geometry-checks-when-the-game-loads-your-character).
+They validate composed point/edge references and report the offending XML field.
+Core assets retain legacy parsing. The character export tool's 16 MiB source
+limit is stricter than the general model decoder's 64 MiB limit.
+
 ## sf2.assets.audio
 
 Get an audio handle for location, battle or fight music, a move's sound action,

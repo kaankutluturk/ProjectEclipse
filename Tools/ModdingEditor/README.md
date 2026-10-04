@@ -1,5 +1,13 @@
 # Eclipse Modding for VS Code
 
+Authored body/skin geometry receives runtime point/edge/helper validation before
+native model parsing. XML element/field diagnostics occur when loading the
+fighter; handle completion and editor asset-kind checks cannot establish those
+composed bindings. Run `Tools/Animation/CharacterPipeline.py validate` on exports
+before packaging; the wiki's character-authoring guide lists the matching
+numeric, helper, iteration and composition limits. Core handles retain legacy
+compatibility.
+
 The `ranged-actors` starter gives two independent fighters their own typed Lua
 cooldown state and native projectile abilities. Actor-host `spawn_projectile`
 and `projectiles` use `combat.projectiles`; queries stay scoped to that actor and

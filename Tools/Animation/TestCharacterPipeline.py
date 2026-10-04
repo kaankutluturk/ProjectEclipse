@@ -54,6 +54,34 @@ class PipelineTests(unittest.TestCase):
         self.assertEqual(pipeline.model(skin, self.rig).tag, 'Scene')
         with self.assertRaises(ValueError): pipeline.model(skin)
 
+    def test_expanded_edges_and_inherited_capsules(self):
+        self.rig_file.write_text(ET.tostring(self.rig, encoding='unicode').replace('End2="B"', 'End2="B" Iterations="2"').replace('Edge="AB"', 'Edge="ABCI1"'))
+        base = pipeline.model(self.rig_file)
+        skin = self.path / 'skin.xml'
+        skin.write_text('<Scene><Nodes/><Edges/><Figures><C Type="Capsule" Edge="ABCI1"/></Figures></Scene>')
+        self.assertEqual(pipeline.model(skin, base).tag, 'Scene')
+        skin.write_text('<Scene><Nodes/><Edges><ABCI1 Type="Edge" End1="A" End2="B"/></Edges><Figures/></Scene>')
+        with self.assertRaisesRegex(ValueError, 'Duplicate expanded edge'): pipeline.model(skin, base)
+
+    def test_runtime_geometry_contract(self):
+        source = ET.tostring(self.rig, encoding='unicode')
+        for old, new in [('NodesCount="2"', 'NodesCount="0"'),
+                         ('LCC1="0.5"', ''),
+                         ('Radius1="2"', 'Radius1="-1"'),
+                         ('End2="B"', 'End2="B" Length="-1"'),
+                         ('End2="B"', 'End2="B" Iterations="33"'),
+                         ('End2="B"', 'End2="B" Iterations="0"'),
+                         ('Type="MacroNode"', 'Type="CenterOfMass"'),
+                         ('Mass="1"', 'Mass="0"')]:
+            invalid = source.replace(old, new)
+            # Positive-mass COM is valid; exercise its zero-total rejection.
+            if old == 'Type="MacroNode"':
+                invalid = invalid.replace('Mass="1"', 'Mass="0"')
+            elif old == 'Mass="1"':
+                invalid = invalid.replace('Type="MacroNode"', 'Type="CenterOfMass"')
+            self.rig_file.write_text(invalid)
+            with self.assertRaises(ValueError): pipeline.model(self.rig_file)
+
 
 if __name__ == '__main__':
     unittest.main()
