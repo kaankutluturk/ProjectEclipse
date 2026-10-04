@@ -1205,3 +1205,58 @@ per-instance bindings, autonomous attacks, incoming-hit identity, owned children
 forms, death/reset/disable/teardown, alternate victory policies, original rigs,
 all equipment/modes, physical input, exports and rollback acceptance remain open.
 G01-G14/E1-E8 and the broad Minecraft-style objective remain active.
+
+
+## 2026-10-04 — model-identity animation point bindings
+
+This turn fixes a demonstrated native prerequisite for independent fighters:
+shared DistancePoint definitions had one root node/pivot slot per side. A third
+same-side root overwrote the existing root, and opposite-side lookup could not
+represent a same-side target. The extended extracted production regression first
+failed on the old source's same-side node assertion, then passed after the repair.
+
+DistancePoint.cs adds a ConditionalWeakTable<ModelObject, PointNode> for roots.
+UpdateNode preserves each root's own resolved optional node and pivot; lookup uses
+the live self/target ModelObject from ModelConditions rather than IsPlayer alone.
+A live unbound root receives an empty point instead of another body's cached node.
+Archival context-free callers preserve the original two-side fallback. Existing
+helper identity lists, parent paths and child-reset semantics are unchanged. Weak
+keys preserve form rollback bindings while allowing retired node-owner cycles to
+collect. No assets, GUIDs, serialized formats, public API/schema or confirmed name
+mappings change.
+
+TestAnimationNodeRebind.ps1 passes 23 production-field/method checks with controlled
+native geometry: legacy fallback, helpers, optional ranged points, multiple roots
+on one side, distinct pivots, same-side/cross-side target identity, rebind/form
+rollback, unknown-root isolation and GC collection of a retired root whose node
+references its owner. This is real production extraction, not a copied algorithm.
+Form animation entry/readiness passes 78 checks; the existing form commit and
+render-registration orchestration suites also pass with their controlled services.
+All four managed assemblies compile through matching Unity 6.6 Windows reference
+remapping in ignored Temp projects.
+
+The full-game ExtraFighterUnity probe now verifies actual shared native move-point
+bindings for each live model, then rechecks after third-root retirement. Unity 6.6
+passes 174 checks, including 84 real node observations across three roots and 56
+across the remaining pair. Its core tactic is tabular; the bounded AI observation
+still remains in StanceIdle, with native decision-delay field zero. Explicit
+KnivesSlash contact changes player health .9604013 -> .9084162 with the third root
+as native attacker. This proves the binding repair and confirms autonomous attack
+readiness remains a separate gap. Final accepted log:
+Temp/FighterPlaybackUnity-d997a2c104cd4564b9767ae6eb4b68d8/validation-30aad9efc187447c90e210af7c6a6693.log.
+
+Return Dart's complete native regression still passes 45 checks: actual child
+flight/contact/source IDs, pause, out-and-return, queued direct three-child burst,
+spacing, no extra caster animation, contact health and live-child teardown. Log:
+Temp/FighterPlaybackUnity-d997a2c104cd4564b9767ae6eb4b68d8/validation-8a420b19628f4535b6154707cea5d401.log.
+Both runners have fresh result timestamps and successful Unity exits. Profiles,
+original input/AI and spacing are controlled, and root scenes/saves are untouched.
+Existing unrelated Unity startup/title warnings remain.
+
+Actor feasibility/roadmap/test documentation and the public form-change guide
+update with this contract. Wiki types/build/search and 6435 links/assets across
+61 pages pass; coverage remains 234 public bindings and the duplicate-404 warning
+remains. This is E1/E2/E5 groundwork, not closure of general actor support. Typed
+actor definitions/receipts, behavior/lifetime, team targeting, autonomous attacks,
+broader rig/equipment/paired/contact/form/teardown, physical input/export and
+rollback acceptance remain open. G01-G14/E1-E8 and the broad objective stay active.

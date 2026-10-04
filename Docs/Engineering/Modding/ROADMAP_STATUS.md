@@ -2,6 +2,14 @@
 
 Last broad reconciliation: 2026-09-12. Scope remains **G01–G14 plus E1–E8**.
 
+2026-10-04 actor binding repair: shared animation points now retain root/target
+node and pivot bindings by weak model identity, preserving context-free side
+fallback and existing helpers. The original same-side overwrite is reproduced
+and fixed; 23 controlled binding checks, 174 full-game third-root checks and the
+45-check Return Dart regression pass. All four remapped managed builds pass.
+AI still stayed in idle in this scenario; no public actor API, autonomous attack
+or team contract is accepted. See ACTOR_FEASIBILITY.md and the creator work log.
+
 2026-10-04 independent-actor feasibility: a repeatable isolated full-game probe
 now verifies a third native root's separate health, rendering, explicitly started
 native attack/contact attribution, knockout without ending the main duel and

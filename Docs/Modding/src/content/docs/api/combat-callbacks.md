@@ -626,6 +626,11 @@ restarting the fight/round or editing saved player equipment. The first animatio
 frame runs after the replacement commits.
 It does not resume an in-progress attack across different rigs.
 
+Animation node and pivot bindings follow the actual body and target identities
+during a form change or rollback. Optional equipment points absent on that body
+remain absent; they are not borrowed from another character. This does not make
+additional independently controlled fighters available through the mod API.
+
 Perk cooldown flags and variable modifiers keep their existing action and timer.
 Variables retain their current values, including changes made since the effect
 started; the swap does not evaluate their initial expressions again. Clearing

@@ -116,6 +116,8 @@ public static class ExtraFighterUnity
                     animations.Add(actor.GetCurrentAnimation().Name);
                     Check(actor.GetRenderObject() != null && actor.GetRenderObject().activeInHierarchy, "Third root did not render");
                     Check(actor.Parameters.AiControlled && actor.JMHJDHLBHLK == 2, "Third root not in active AI stage");
+                    CheckNodeBindings(player, enemy, actor);
+                    Debug.Log("[ExtraFighterUnity] Third-root tactic=" + actor.Parameters.HBFMBOHLKPJ.get_Type() + "; decisionDelay=" + Field(actor, "APOHBENDEKO"));
                     var origin = player.PLBNCDCFPML();
                     enemy.ShiftModelPosition(new Vector3f(origin.GetX() + 700 - enemy.PLBNCDCFPML().GetX(), 0, 0), true);
                     actor.ShiftModelPosition(new Vector3f(origin.GetX() + 180 - actor.PLBNCDCFPML().GetX(), 0, 0), true);
@@ -126,7 +128,7 @@ public static class ExtraFighterUnity
                 case 2:
                     if (player.KKMCHCNOHMB() >= playerBefore && frame - phaseFrame < 120) return;
                     Check(actor.GetCurrentAnimation() != null && animations.Count > 0, "Third root did not start native AI animation");
-                    Debug.Log("[ExtraFighterUnity] Bounded AI observation: starts=" + births + "; animations=" + string.Join(",", animations) + "; contact=" + (player.KKMCHCNOHMB() < playerBefore));
+                    Debug.Log("[ExtraFighterUnity] Bounded AI observation: starts=" + births + "; animations=" + string.Join(",", animations) + "; contact=" + (player.KKMCHCNOHMB() < playerBefore) + "; decisionDelay=" + Field(actor, "APOHBENDEKO"));
                     if (player.KKMCHCNOHMB() >= playerBefore)
                     {
                         actor.Parameters.AiControlled = false;
@@ -161,6 +163,7 @@ public static class ExtraFighterUnity
                     Check(actor.GetRenderObject() == null || !actor.GetRenderObject().activeInHierarchy, "Removal retained rendering");
                     Check(player.EGGEACCDAEK() == enemy && enemy.EGGEACCDAEK() == player, "Removal corrupted original duel targets");
                     Check(fight.LNDLFINJHDB.Count(m => !(m is WeaponModel)) == 2, "Removal lost original roots");
+                    CheckNodeBindings(player, enemy);
                     Next(fight); break;
                 case 6:
                     if (frame - phaseFrame < 10) return;
@@ -174,6 +177,38 @@ public static class ExtraFighterUnity
     static void Log(string message, string stack, LogType type)
     {
         if (entered && type == LogType.Exception && (stack.Contains("Fight.") || stack.Contains("Model.") || stack.Contains("SelectAnimation."))) failure = message + "\n" + stack;
+    }
+    static void CheckNodeBindings(params Model[] models)
+    {
+        int observations = 0;
+        var lookup = typeof(DistancePoint).GetMethod("MHIDGNCKHON", Hidden);
+        foreach (var model in models)
+        {
+            var conditions = model.EBABHGHPLFK();
+            Check(conditions.IHJJBIDMEMB.CBAECAAKAIA == model.GetModelObject(), "Native conditions lost own model identity");
+            foreach (var move in model.GetAvailableAnimations())
+            foreach (var distance in move.SelectionConditions.OfType<ConditionDistance>())
+            foreach (var member in typeof(ConditionDistance).GetFields(Hidden).Where(f => f.FieldType == typeof(DistancePoint)))
+            {
+                var point = (DistancePoint)member.GetValue(distance);
+                if (point.HLGJJGHDEAP != DistancePoint.Object.OBJECT_NODES) continue;
+                Model root;
+                switch (point.OOFFOILONLO)
+                {
+                    case ModelType.KEIDBIOIFGA.MODEL_NULL:
+                    case ModelType.KEIDBIOIFGA.MODEL_THIS: root = model; break;
+                    case ModelType.KEIDBIOIFGA.MODEL_OTHER:
+                    case ModelType.KEIDBIOIFGA.MODEL_OTHER_CHILD: root = model.EGGEACCDAEK(); break;
+                    default: continue;
+                }
+                if (root == null) continue;
+                var bound = (DistancePoint.PointNode)lookup.Invoke(point, new object[] { conditions });
+                Check(bound.Node == root.GetModelObject().EGHIDHMENEF(point.Part), "Shared native point borrowed another body: " + model.get_Name() + "/" + move.Name + "/" + point.Part);
+                observations++;
+            }
+        }
+        Check(observations > 0, "No real shared native node conditions observed");
+        Debug.Log("[ExtraFighterUnity] Verified " + observations + " shared native node bindings across " + models.Length + " roots");
     }
     static void Finish(int code)
     {

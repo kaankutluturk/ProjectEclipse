@@ -73,6 +73,8 @@ post-tutorial profile. This is not a Lua actor API or acceptance for teams,
 different rigs, reliable autonomous attacks, paired attacks, multiplayer, exported
 players or physical input. A fallback explicitly starts a native knife attack if
 AI produces no contact within 120 simulation frames; results record that choice.
+The probe also checks actual shared native move-point bindings across the live
+roots and repeats those observations after removing the extra root.
 Reuse requires a marked project inside repository Temp; an open fixture is
 rejected and compiler errors fail early. See the actor feasibility record under
 `Docs/Engineering/Modding/` for the native boundaries and remaining proof work.

@@ -69,6 +69,12 @@ public class DistancePoint
 
 	private PointNode IHJJBIDMEMB = new PointNode();
 
+    // Shared moves may be evaluated by several roots on the same native side.
+    // Weak keys keep node/pivot bindings with the actual body without retaining
+    // retired forms through a node's reference back to its owning ModelObject.
+    private readonly System.Runtime.CompilerServices.ConditionalWeakTable<ModelObject, PointNode> _rootPoints =
+        new System.Runtime.CompilerServices.ConditionalWeakTable<ModelObject, PointNode>();
+
 	public DistancePoint()
 	{
 		IsBackWall = false;
@@ -225,6 +231,12 @@ public class DistancePoint
 		else
 		{
 			bKHJJICJODB = ((!EKBOGDKIHIH) ? ABDKBCLJAME : IHJJBIDMEMB);
+            if (OECPEDPMKCD != null)
+            {
+                var rootPoint = _rootPoints.GetValue(OECPEDPMKCD, _ => new PointNode());
+                if (HLGJJGHDEAP == Object.OBJECT_NODES) rootPoint.Node = resolved;
+                rootPoint.CHEKEGGJDBL = AECCPADGGPG;
+            }
 		}
 		if (HLGJJGHDEAP == Object.OBJECT_NODES)
 		{
@@ -342,6 +354,26 @@ public class DistancePoint
 		{
 			return PAPCNMHMBOO(conditions);
 		}
+        ModelObject root = null;
+        switch (OOFFOILONLO)
+        {
+            case ModelType.KEIDBIOIFGA.MODEL_NULL:
+            case ModelType.KEIDBIOIFGA.MODEL_THIS:
+                root = conditions.IHJJBIDMEMB.CBAECAAKAIA;
+                break;
+            case ModelType.KEIDBIOIFGA.MODEL_OTHER:
+            case ModelType.KEIDBIOIFGA.MODEL_OTHER_CHILD:
+                root = conditions.GAIBPAGPEGK.CBAECAAKAIA;
+                break;
+        }
+        if (root != null)
+        {
+            if (_rootPoints.TryGetValue(root, out var point)) return point;
+            // A live but unbound root must not read a different body's side slot.
+            return new PointNode();
+        }
+        // Some archival callers supply only a side, without live model context.
+        // Keep their original lookup while live combat uses identity above.
 		switch (OOFFOILONLO)
 		{
 		case ModelType.KEIDBIOIFGA.MODEL_NULL:

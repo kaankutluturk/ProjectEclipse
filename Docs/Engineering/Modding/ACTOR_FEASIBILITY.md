@@ -2,8 +2,8 @@
 
 This records the recovered engine boundaries for a future typed actor API.
 Projectiles are `WeaponModel` children; they are not substitutes for independently
-living fighters. This investigation adds a repeatable isolated native probe,
-without shipping a Lua actor namespace or changing recovered fight behavior.
+living fighters. This investigation supplies a repeatable isolated native probe
+and a model-identity binding repair, without shipping a Lua actor namespace.
 
 ## Existing native seams
 
@@ -18,7 +18,7 @@ without shipping a Lua actor namespace or changing recovered fight behavior.
 | Round results | `RenderRound` checks the main player/opponent parameters; `GetWinner`, control and campaign settlement retain duel semantics. | Actor knockout must have a separate lifecycle. Teams, alternate victory policies and encounter completion need explicit integration. |
 | Lua routing | `EclipseFighterOperations` and damage/lifecycle dispatch distinguish main player/opponent identities. | Existing fighter callbacks do not automatically become actor behavior hosts. Actor events need their own instance identity and safe scoped handles. |
 | Removal | `RemoveModel` removes camera, enemy references, perks, animation selection and native resources. A non-null parent assumes a `WeaponModel`. | Independent actors must remain roots; ownership cannot be implemented with the native weapon-parent pointer. Owned children and pending commands must be retired too. |
-| Animation bindings | Form replacement already documents native definitions caching node bindings by side. | A same-side clone is a narrow feasibility scenario, not proof of arbitrary same-side rigs/loadouts or paired attacks. |
+| Animation bindings | `DistancePoint` now keeps weak root-identity bindings alongside legacy side-only fallback. Native helper bindings retain their existing identity lists. | Same-side node/pivot overwrite is repaired. Differently equipped/rigged actors, paired attacks and complete animation-state independence still need acceptance. |
 
 ## Acceptance boundary
 
@@ -42,9 +42,21 @@ Fresh result timestamps and a successful Unity process exit are required.
 The accepted run passes 27 checks: AI remained in `StanceIdle` during the bounded
 observation. An explicitly requested `KnivesSlash` reduced player life from
 .9220222 to .8700371, with the native strike naming the extra root as its attacker.
-Reliable autonomous attack selection remains open. `DistancePoint` stores root
-node bindings in two side slots; this is a concrete per-instance binding concern,
-but its role in the observed idle behavior has not been isolated experimentally.
+That was the initial feasibility run. The binding follow-up passes 174 native
+checks, including 84 actual shared move-point observations across three roots and
+56 across the remaining pair after removal. `DistancePoint` now selects nodes and
+pivots by the live root/target's ModelObject identity; a weak table avoids retaining
+retired bodies through node-owner cycles. Unbound live roots do not borrow another
+body's side slot. Context-free archival callers retain the legacy side fallback;
+existing helper lists and child-reset semantics are preserved.
+
+The extracted regression first failed on the original same-side overwrite, then
+passed 23 checks covering root/target/pivot identity, optional node absence,
+form rollback, legacy side fallback, helper isolation and retired-root collection.
+Return Dart's 45-check native regression still passes after this repair. The
+follow-up AI observation still stayed in idle under the core tabular tactic;
+the binding defect is proven fixed, but it did not establish autonomous attacks.
+Reliable autonomous selection remains open.
 The final log is recorded in the creator platform work log. Static observations
 above are distinct from native acceptance.
 No teams, native incoming-strike proof on the extra root, original custom rig,
