@@ -33,6 +33,12 @@ Create a map page for your battles.
 `""`; `start` is a boolean defaulting to `false`. Reuse a known map file when
 starting out; a zone ID is not the map-art filename.
 
+The default story backgrounds are `"Map1.1"`, `"Map1.2"`, `"Map1.3"`, `"Map2.4"`,
+`"Map2.5"`, `"Map2.6"`, and `"Map3.7"`, in act order. They use Eclipse's packaged
+2040 by 972 overworld artwork, so a mod zone reusing one of these names gets the
+same background as the base game. The legacy first-act name `"Map0.1"` and the
+standalone seventh-act name `"7"` also work in the map UI.
+
 `underworld` is a boolean defaulting to `false`. `true` places the page on the
 **Underworld** map (the raid map the player reaches with the map's Underworld
 toggle) instead of the story map, next to the game's own raid pages. An

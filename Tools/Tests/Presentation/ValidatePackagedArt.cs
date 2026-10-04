@@ -72,6 +72,8 @@ public static class ValidatePackagedArt
         Require(catalog.bundles.Length == 95 && archives == 94 && fonts == 10,
             "Unexpected TAR/LZ4 catalog coverage");
 
+        checks += ValidateOverworldMaps.Check();
+
         Sprite agnis = PackagedArtCatalog.Load<Sprite>("UI/Items/AgnisSeal.helm");
         Require(agnis != null && agnis.texture != null && agnis.rect.width > 0 && agnis.rect.height > 0,
             "AgnisSeal sprite lookup failed");

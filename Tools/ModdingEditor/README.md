@@ -107,6 +107,10 @@ requires `story.progression`. Reapply on map entry. `duration` is 0–5 seconds.
 `sf2.timers.set { subsystem = "battle", seconds = 150 }` requires `policy.timers`
 at startup and overrides timed battle rounds; training and untimed fights are excluded.
 Battle seconds are 1–86400; omit the forge-only completion/skip options.
+Use `sf2.timers.set { subsystem = "raid", seconds = 999 }` to override the battle
+policy for native raids, mod Underworld pages, and `sf2.raids.register` modes.
+Normal and Power Mode rounds are covered; other fights keep their existing limit.
+Raid seconds are also 1–86400, and training/untimed fights remain excluded.
 
 `sf2.battles.set_locked(battle, locked)` requires `story.progression` and an owned
 battle handle. It changes a revealed entry on an initialized, unblocked map and

@@ -5029,18 +5029,18 @@
     },
     "TimerPolicy": {
       "fields": {
-        "subsystem": "\"forge\"|\"battle\"",
+        "subsystem": "\"forge\"|\"battle\"|\"raid\"",
         "seconds": [
           "integer",
-          "Forge: 0..31536000; battle: 1..86400."
+          "Forge: 0..31536000; battle and raid: 1..86400. Raid overrides battle for raid rounds."
         ],
         "skip_enabled?": [
           "boolean",
-          "Forge only; leave true for battle."
+          "Forge only; leave true for battle and raid."
         ],
         "complete_pending?": [
           "boolean",
-          "Forge only; leave false for battle."
+          "Forge only; leave false for battle and raid."
         ]
       }
     },

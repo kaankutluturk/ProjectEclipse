@@ -20520,9 +20520,9 @@
       "name": "ZONE_1",
       "namespaceId": "core",
       "file": "ZONE_1.tar.lz4",
-      "sha256": "402efa1bb3ca8a07caccc650904e2de2ce46672bc8c5608e187b90e7cd758587",
-      "size": 68729632,
-      "unpackedSize": 70513664,
+      "sha256": "a9565fa372c9f9cf1231db16b5b9c035aa1878ce5cd14bf7e029f869bf71c0e4",
+      "size": 87211881,
+      "unpackedSize": 88999424,
       "assets": [
         {
           "address": "Textures/Effects/Magic/mgc_effect_time_bomb",
@@ -25239,9 +25239,9 @@
       "name": "ZONE_6",
       "namespaceId": "core",
       "file": "ZONE_6.tar.lz4",
-      "sha256": "6417c8dfd4ee32369966f51636f2bb112ed060f362365fa82e903e6a38da163e",
-      "size": 110674757,
-      "unpackedSize": 111828992,
+      "sha256": "f37e245b2d3174406bf22c9a25d794bbbce9f3eccc48734649a661d73445399d",
+      "size": 112555937,
+      "unpackedSize": 113710592,
       "assets": [
         {
           "address": "Textures/Effects/Magic/mgc_magic_wave_end",
@@ -31858,9 +31858,9 @@
       "name": "ZONES",
       "namespaceId": "core",
       "file": "ZONES.tar.lz4",
-      "sha256": "72b68cbfc9852d29a1ee39d6bf042d7b74310f802d3769482719fa9019999d52",
-      "size": 12802823,
-      "unpackedSize": 12810240,
+      "sha256": "d8630866175c429556b7b21791f68cf4cec4b0f397606b1607d34b917485d1ad",
+      "size": 14682800,
+      "unpackedSize": 14691840,
       "assets": [
         {
           "address": "UI/zones/Map2_old",
@@ -31899,6 +31899,13 @@
         },
         {
           "address": "UI/zones/Raid4_2",
+          "texture": "",
+          "sprites": "",
+          "audio": "",
+          "font": ""
+        },
+        {
+          "address": "UI/zones/7",
           "texture": "",
           "sprites": "",
           "audio": "",

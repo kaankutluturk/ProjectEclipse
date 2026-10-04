@@ -42,6 +42,7 @@ Copy-Item -LiteralPath (Join-Path $root 'Assets/Scripts/Assembly-CSharp/AtlasCac
 Copy-Item -Exclude ModModeRuntime.cs -Path (Join-Path $root 'Assets/Scripts/Eclipse/Modding/*.cs') -Destination (Join-Path $fixture 'Assets/Scripts/Eclipse/Modding') -Force
 Copy-Item -Path (Join-Path $root 'Assets/Scripts/Eclipse/Runtime/Modding/*.cs') -Destination (Join-Path $fixture 'Assets/Scripts/Eclipse/Runtime/Modding') -Force
 Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'ValidatePackagedArt.cs') -Destination (Join-Path $fixture 'Assets/ValidatePackagedArt.cs')
+Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'ValidateOverworldMaps.cs') -Destination (Join-Path $fixture 'Assets/ValidateOverworldMaps.cs')
 Copy-Item -LiteralPath (Join-Path $PSScriptRoot '../Shared/LegacyModdingStubs.cs') -Destination (Join-Path $fixture 'Assets/LegacyModdingStubs.cs')
 Copy-Item -LiteralPath (Join-Path $PSScriptRoot '../Shared/NormalEditorPlayModeContext.cs') -Destination (Join-Path $fixture 'Assets/NormalEditorPlayModeContext.cs')
 Copy-Item -Path (Join-Path $root 'Mods/example.enchantment/*') -Destination (Join-Path $fixture 'Assets/TestMods/example.enchantment') -Recurse -Force

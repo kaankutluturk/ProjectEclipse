@@ -35,10 +35,16 @@ hand. Fixture editor versions are independent of Eclipse's current Unity 6.6 tar
 | [PrepareNativeArt.py](PrepareNativeArt.py) | `--source` research bundles and `--fixture` isolated project; stages texture/audio/font inputs and a manifest | Writes the fixture; requires the existing UnityPy installation, historically Python 3.12 |
 | [ImportNativeArt.cs](ImportNativeArt.cs) | Staged native-art manifest inside the isolated Unity 2022.3 project | `ImportNativeArt.Run` creates/reimports native assets and catalog entries in the fixture; not a main-project setup script |
 
-## Location, portrait and soundtrack imports
+## Map, location, portrait and soundtrack imports
 
 These tools retain reviewed owner-drop assumptions. A default invocation is not
 necessarily a dry run: select the documented inspection mode explicitly.
+
+`ImportOverworldMaps.py plan | apply | check` imports `ResearchSources/maps/Map01.png`
+through `Map07.png` into the existing `ZONE_1`, `ZONE_6`, and `ZONES` core archives.
+It preserves normal/low atlas member names and the standalone `UI/zones/7` lookup,
+copies source PNG bytes unchanged, and updates catalog integrity records. `plan`
+and `check` only stage under `Temp/OverworldMapImport`; `apply` writes installed art.
 
 | Tool | Inputs and outputs | Behavior |
 | --- | --- | --- |

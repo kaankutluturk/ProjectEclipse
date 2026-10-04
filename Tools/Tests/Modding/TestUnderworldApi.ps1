@@ -192,6 +192,49 @@ try {
     Check (Fails 'sf2.timers.set{subsystem="battle",seconds=150,complete_pending=true}' 'Battle timer') 'Battle policy accepted pending forge completion.'
     Check (Fails 'sf2.timers.set{subsystem="battle",seconds=150,skip_enabled=false}' 'Battle timer') 'Battle policy accepted forge skip control.'
     Check (Fails 'sf2.timers.set{subsystem="battle",seconds=150};sf2.timers.set{subsystem="battle",seconds=200}' 'Duplicate timer') 'Duplicate timer policy accepted.'
+    $policy = Load-Lua 'sf2.timers.set{subsystem="battle",seconds=150};sf2.timers.set{subsystem="raid",seconds=999}'
+    [Eclipse.Modding.ModPolicies]::Content = $policy
+    Check ([Eclipse.Modding.ModPolicies]::BattleSeconds(99,$true) -eq 999) 'Raid policy did not override battle policy.'
+    Check ([Eclipse.Modding.ModPolicies]::BattleSeconds(99,$false) -eq 150) 'Raid policy changed story battles.'
+    Check ([Eclipse.Modding.ModPolicies]::BattleSeconds(0,$true) -eq 0 -and [Eclipse.Modding.ModPolicies]::BattleSeconds(-1,$true) -eq -1) 'Raid policy changed untimed fights.'
+    $nativeRaid = [FightList]::new()
+    $nativeRaid.RoundTime = 99
+    $nativeRaid.set_Type([BattleType]::FightRaid)
+    Check ($nativeRaid.EffectiveRoundTime -eq 999) 'Native raid fight ignored raid policy.'
+    $nativeRaid.set_Type([BattleType]::FightNone)
+    Check ($nativeRaid.EffectiveRoundTime -eq 99) 'Raid policy changed training.'
+    foreach ($seconds in @(0,-1,86401)) { Check (Fails ('sf2.timers.set{subsystem="raid",seconds=' + $seconds + '}') 'timer') 'Invalid raid duration accepted.' }
+    Check (Fails 'sf2.timers.set{subsystem="raid",seconds=999,complete_pending=true}' 'Raid timer') 'Raid policy accepted pending forge completion.'
+    Check (Fails 'sf2.timers.set{subsystem="raid",seconds=999,skip_enabled=false}' 'Raid timer') 'Raid policy accepted forge skip control.'
+    Check (Fails 'sf2.timers.set{subsystem="raid",seconds=999};sf2.timers.set{subsystem="raid",seconds=150}' 'Duplicate timer') 'Duplicate raid policy accepted.'
+    $policy = Load-Lua 'sf2.timers.set{subsystem="raid",seconds=999}'
+    [Eclipse.Modding.ModPolicies]::Content = $policy
+    Check ([Eclipse.Modding.ModPolicies]::BattleSeconds(99,$false) -eq 99) 'Raid-only policy changed story battles.'
+    Check ([Eclipse.Modding.ModPolicies]::BattleSeconds(99,$true) -eq 999) 'Raid-only policy not applied.'
+    $policy = Load-Lua 'sf2.timers.set{subsystem="battle",seconds=150}'
+    [Eclipse.Modding.ModPolicies]::Content = $policy
+    Check ([Eclipse.Modding.ModPolicies]::BattleSeconds(999,$true) -eq 150) 'Legacy battle policy no longer covers raids.'
+    $policy = Load-Lua (Get-Content -LiteralPath (Join-Path $root 'Mods/de128/scripts/content/timers.lua') -Raw)
+    [Eclipse.Modding.ModPolicies]::Content = $policy
+    Check ([Eclipse.Modding.ModPolicies]::BattleSeconds(999,$true) -eq 999 -and [Eclipse.Modding.ModPolicies]::BattleSeconds(99,$false) -eq 150) 'Shipped DE128 timer declarations differ from the intended policy.'
+    Check ((Fingerprint $policy) -ne (Fingerprint (Load-Lua 'sf2.timers.set{subsystem="battle",seconds=150};sf2.timers.set{subsystem="raid",seconds=998};sf2.timers.set{subsystem="forge",seconds=0,skip_enabled=true,complete_pending=true}'))) 'Fingerprint ignored raid duration.'
+    $raidCases = @'
+sf2.timers.set{subsystem="battle",seconds=150}
+sf2.timers.set{subsystem="raid",seconds=999}
+local story_b=sf2.battles.register{id="story_raid",zone=story,type="raid"}
+local story_f=sf2.fights.register{id="story_raid_f",battle=story_b,rounds=1,round_time=99,warriors={w}}
+sf2.raids.register{id="story_raid_mode",fights={story_f}}
+'@
+    $policy = Load-Lua ($base + $raidCases)
+    [Eclipse.Modding.ModPolicies]::Content = $policy
+    foreach ($id in @('boss_1','boss_1_hard','story_raid')) {
+        # Only the battle name is read by the timer resolver; avoid scene/native setup.
+        $battle = [Runtime.CompilerServices.RuntimeHelpers]::GetUninitializedObject([Battle])
+        [Battle].GetField('_name', [Reflection.BindingFlags]'Instance,NonPublic').SetValue($battle, (One $policy.Battles $id).LegacyName)
+        $nativeRaid.Battle = $battle
+        $nativeRaid.set_Type([BattleType]::FightFinal)
+        Check ($nativeRaid.EffectiveRoundTime -eq 999) ('Registered raid timer differs: ' + $id)
+    }
     [Eclipse.Modding.ModPolicies]::Content = $null
     Check ([Eclipse.Modding.ModPolicies]::BattleSeconds(99) -eq 99) 'Removing policy did not restore base duration.'
 } finally {

@@ -22,5 +22,7 @@ projection, and runtime rule selection. A full Unity encounter playtest is pendi
 
 To apply a shared limit to timed battles, add `policy.timers` to your manifest and
 call `sf2.timers.set { subsystem = "battle", seconds = 150 }` during loading.
+An additional `sf2.timers.set { subsystem = "raid", seconds = 999 }` gives raid
+rounds a separate limit while other timed battles keep 150 seconds.
 This overrides individual `round_time` values; training and untimed fights remain
 unchanged. For a change to only this encounter, use `round_time` in its fight patch.

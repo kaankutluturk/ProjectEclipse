@@ -87,6 +87,17 @@ is required by `Sprite.OverrideGeometry`.
 
 ## Browsing and deliberate edits
 
+The seven default overworld backgrounds are the owner-supplied `Map01.png` through
+`Map07.png` (2040 by 972), copied unchanged into the existing `ZONE_1`, `ZONE_6`, and
+`ZONES` archives. Their normal and legacy `_low` atlas members keep the names
+`Map1.1`, `Map1.2`, `Map1.3`, `Map2.4`, `Map2.5`, `Map2.6`, and `Map3.7`; act seven
+also resolves through `UI/zones/7`, as used by the map UI. Pixels per unit preserve
+the former sprite widths, and map layout/battle coordinates remain unchanged.
+Recovered loose maps and their Unity GUIDs remain as archival fallbacks. Use
+`python Tools/Recovery/ImportOverworldMaps.py plan | apply | check` to preview,
+install, or verify this source drop. Only import-time verification needs the local
+research files; normal runtime loading uses the shipped archives.
+
 `Tools/AssetPacker` is the archive browser/editor helper. It does not require Unity:
 
 ```powershell
@@ -125,6 +136,11 @@ python Tools/Audits/AuditNativeContent.py --refresh --deep
   inventory and parses all 281 location atlas records. `-BuildPlayer` additionally builds and runs a
   Windows content smoke player that resolves all 562 `CORE_LOCATIONS` addresses inside the player
   loop and explicitly verifies Moon's 98-vertex `layer3` tight mesh.
+- `Tools/Tests/Presentation/TestOverworldMaps.ps1 -Unity <matching-editor-path>`
+  stages only the three map archives and checks all seven backgrounds, the
+  act-seven standalone alias, legacy low members, native sprite UVs, and sizing.
+  It uses the production catalog/TAR loader and stubs the inactive mod routing boundary;
+  it does not verify active mod replacements or the in-game map layout.
 - `Tools/Recovery/MigrateNativeArtToTar.py` is the reproducible one-time bridge from the former native v2
   tree. `generate` is non-destructive, `verify-generated` checks the complete generated set, and
   `commit` removes the old imported groups only after validation.

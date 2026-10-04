@@ -22,8 +22,8 @@ set a shared time limit for timed battles.
 
 | Field | Type | Default | Meaning |
 | --- | --- | --- | --- |
-| `subsystem` | String | Required | `"forge"` or `"battle"`. |
-| `seconds` | Integer | Required | Forge: 0–31536000, zero is instant. Battle: 1–86400 seconds per round. |
+| `subsystem` | String | Required | `"forge"`, `"battle"`, or `"raid"`. |
+| `seconds` | Integer | Required | Forge: 0–31536000, zero is instant. Battle and raid: 1–86400 seconds per round. |
 | `skip_enabled` | Boolean | `true` | Forge early completion; leave at its default for battle timers. |
 | `complete_pending` | Boolean | `false` | With `seconds = 0`, make saved, already-paid forge orders eligible for normal completion on the next delivery update. Rejected for nonzero durations. |
 
@@ -39,6 +39,7 @@ rather than choosing the last-loaded mod.
 
 ```lua
 sf2.timers.set { subsystem = "battle", seconds = 150 }
+sf2.timers.set { subsystem = "raid", seconds = 999 }
 ```
 
 The battle policy overrides positive round limits in core and mod fights when
@@ -48,6 +49,14 @@ does not rewrite its definition or save. Disabling the mod restores the original
 limit. The policy does not change simulation speed, animation timing or raid
 session deadlines. Battle policies reject `skip_enabled = false` and
 `complete_pending = true`; those options belong to forge delivery.
+
+The `"raid"` policy overrides the `"battle"` policy for native `FightRaid`
+battles, fights on mod Underworld pages, and fights registered through
+`sf2.raids.register`. It covers normal and Power Mode rounds. Without a raid policy,
+these fights keep the battle policy or their original limit. A raid-only policy
+leaves other battles unchanged. Training and untimed fights remain excluded;
+raid policies have the same duration limits and forge-option restrictions as
+battle policies. Raid session deadlines are separate from per-round limits.
 
 For forge policies, with the default `complete_pending = false`,
 existing saved deadlines retain their original behavior. With `true`, their displayed

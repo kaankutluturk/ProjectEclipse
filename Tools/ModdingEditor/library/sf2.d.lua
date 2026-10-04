@@ -1987,10 +1987,10 @@ local ModeDefinition = {}
 local RaidDefinition = {}
 
 ---@class (exact) Eclipse.TimerPolicy
----@field subsystem "forge"|"battle"
----@field seconds integer Forge: 0..31536000; battle: 1..86400.
----@field skip_enabled? boolean Forge only; leave true for battle.
----@field complete_pending? boolean Forge only; leave false for battle.
+---@field subsystem "forge"|"battle"|"raid"
+---@field seconds integer Forge: 0..31536000; battle and raid: 1..86400. Raid overrides battle for raid rounds.
+---@field skip_enabled? boolean Forge only; leave true for battle and raid.
+---@field complete_pending? boolean Forge only; leave false for battle and raid.
 local TimerPolicy = {}
 
 ---@class (exact) Eclipse.CounterDefinition
