@@ -1,5 +1,10 @@
 # Eclipse as a general Shadow Fight 2 mod engine
 
+The 2026-10-04 [owned actor API](ACTOR_API_ACCEPTANCE.md) adds a reusable
+companion/adversary foundation with native lifecycle, teams and procedural Lua
+commands. This narrows E1/E2/E5 gaps; actor-specific Lua hosts, arbitrary rigs
+and complete encounter/platform acceptance remain open.
+
 Review date: 2026-09-11. This change adds battle
 behaviors. Phase 4 (the downstream DE port) remains deferred pending its assets.
 This is an engine-wide extension of the parity roadmap, not a claim that DE or

@@ -21,7 +21,7 @@ $capture
 class WeaponModel:Model{}
 class Model{
  public List<Model> _Enemies=new List<Model>();public List<WeaponModel> Weapons=new List<WeaponModel>();
- public List<WeaponModel> KGGIDBLBMDJ()=>Weapons;
+ public List<WeaponModel> GetWeaponModels()=>Weapons;
  public Animation _Animation=new Animation();public Model PNNMOKIBOPP;public Event KDAHHIMLJGG=new Event();public Ai HJOGNGDMAKJ=new Ai();public Parameters Parameters=new Parameters();
 $method
  static void Check(bool x,string why){if(!x)throw new Exception(why);}

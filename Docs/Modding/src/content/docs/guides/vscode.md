@@ -210,3 +210,5 @@ The **Scripted Burst** starter uses `sf2.projectiles.register` and
 `fighter:spawn_projectile` for procedural native projectile patterns. Completion
 covers the definition, owned handle and `status`, `projectile_id`, `error` receipt
 fields. See [Live projectiles](../../api/projectiles/) for timing and ownership.
+
+The **Actor Companions** starter in `templates/actor-companions` includes the playable summon/guide/health/playback/dismiss HUD. Completion covers actor definitions, retained spawn receipts, copied snapshots/events and callback-scoped commands. Declare `combat.actors`; see [Independent fighters](../../api/actors/) for timing, limits and native acceptance scope.

@@ -1,5 +1,11 @@
 # Eclipse Modding for VS Code
 
+Independent fighter completion covers `sf2.actors.register`, spawn receipts,
+owned actor/event queries and callback-scoped snapshot, motion, target, health,
+move playback and dismissal. The `templates/actor-companions` example mirrors
+the playable mod. `combat.actors` is separate from projectile permissions;
+offline non-raid support and native rig limits are described in the wiki.
+
 Native hit/damage/block/critical callback event types now include optional
 `attack`: copied kind, contact actor/move, hit point and owned projectile ID/mod.
 Return Dart filters its hit counter using that source. Editor completion covers

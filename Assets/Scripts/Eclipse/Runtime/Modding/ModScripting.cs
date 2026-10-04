@@ -1066,7 +1066,7 @@ namespace Eclipse.Modding
         IModFighterOperations Opponent { get; }
     }
 
-    public sealed class ModInstanceFighter : IModFighterOperations, IModDamageEventSource, IModBehaviorInstanceSource, IModFighterTargets, IModIncomingHitSource, IModFighterEffects, IModCombatSnapshotSource, IModCombatActivitySource, IModFighterForms, IModFighterStatusIcons, IModAnimationLifecycleSource, IModFighterFlags, IModFighterControls, IModRoundOutcomes, IModFighterMotion, IModFighterPlayback, IModFighterRegions, IModFighterProjectiles, IModFighterProjectileSpawning
+    public sealed class ModInstanceFighter : IModFighterOperations, IModDamageEventSource, IModBehaviorInstanceSource, IModFighterTargets, IModIncomingHitSource, IModFighterEffects, IModCombatSnapshotSource, IModCombatActivitySource, IModFighterForms, IModFighterStatusIcons, IModAnimationLifecycleSource, IModFighterFlags, IModFighterControls, IModRoundOutcomes, IModFighterMotion, IModFighterPlayback, IModFighterRegions, IModFighterProjectiles, IModFighterProjectileSpawning, IModFighterActors
     {
         private readonly IModFighterOperations _inner;
         private readonly FightRuleDefinition _outcomeRule;
@@ -1122,6 +1122,21 @@ namespace Eclipse.Modding
         {
             if (_inner is IModFighterMotion motion) return motion.TryMoveBy(x, y, z, out error);
             error = "Fighter motion is unavailable."; return false;
+        }
+        public bool TrySpawnActor(ModId owner, DefinitionId definition, double x, double y, double z, Action<string,string> complete, out string error)
+        {
+            if (_inner is IModFighterActors actors) return actors.TrySpawnActor(owner, definition, x, y, z, complete, out error);
+            error="Actor spawning is unavailable."; return false;
+        }
+        public bool TryGetActors(ModId owner, out IReadOnlyList<IModActor> actors, out string error)
+        {
+            if (_inner is IModFighterActors provider) return provider.TryGetActors(owner, out actors, out error);
+            actors=null; error="Actor observations are unavailable."; return false;
+        }
+        public bool TryGetActorEvents(ModId owner, out IReadOnlyList<ModActorEvent> events, out string error)
+        {
+            if (_inner is IModFighterActors provider) return provider.TryGetActorEvents(owner, out events, out error);
+            events=null; error="Actor events are unavailable."; return false;
         }
         public bool TrySpawnProjectile(ModId owner, DefinitionId definition, double x, double y, double z,
             Action<string, string> complete, out string error)

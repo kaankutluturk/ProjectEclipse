@@ -56,7 +56,7 @@ public static class DevRaidHealthBarValidator
                 rect.anchorMin = rect.anchorMax = new Vector2(0.5f, 0.5f);
                 rect.anchoredPosition = new Vector2(290, 170 - row * 110);
                 var parameters = new ModelParameters { MaxLife = 1, ShieldTotal = 40 };
-                parameters.GFNCMLFKBGP(1);
+                parameters.SetCurrentLife(1);
                 life.Init(parameters);
                 life.SetRaidStyle(true);
 				var counter = UnderworldRaidShieldBar.Attach(rect, parameters, font);
@@ -138,7 +138,7 @@ public static class DevRaidHealthBarValidator
         {
             life.gameObject.SetActive(true);
             var parameters = new ModelParameters { MaxLife = 1, ShieldTotal = 2 };
-            parameters.GFNCMLFKBGP(1f);
+            parameters.SetCurrentLife(1f);
             life.Init(parameters);
             life.SetRaidStyle(true);
 

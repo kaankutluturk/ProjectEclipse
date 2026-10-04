@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using CodeStage.AntiCheat.ObscuredTypes;
 using Nekki.SF2.Core.Fights.Controller;
 using Nekki.SF2.GUI.Fight;
@@ -233,7 +234,7 @@ public partial class Fight
                 var observers = new HashSet<Model>(fight.LNDLFINJHDB);
                 foreach (var model in fight.LNDLFINJHDB)
                     if (model != null)
-                        foreach (var weapon in model.KGGIDBLBMDJ()) observers.Add(weapon);
+                        foreach (var weapon in model.GetWeaponModels()) observers.Add(weapon);
                 foreach (var observer in observers)
                     if (observer != null && observer != replacement && observer.GetRootModel() != expected &&
                         observer._Enemies.Contains(expected))
@@ -356,6 +357,7 @@ public partial class Fight
     private void CloseModelTransitions()
     {
         CancelEclipseProjectiles();
+        CancelEclipseActors("round_ended");
         CancelEclipseFighterMotion();
         CancelEclipseFighterPlayback();
         _modelTransitionsClosed = true;
@@ -491,7 +493,7 @@ public partial class Fight
 		public int OGOLNFLBLBD;
 	}
 
-		private sealed class EclipseFighterOperations : IModFighterOperations, IModDamageEventSource, IModFighterTargets, IModIncomingHitSource, IModFighterEffects, IModCombatSnapshotSource, IModCombatActivitySource, IModFighterForms, IModFighterStatusIcons, IModAnimationLifecycleSource, IModFighterFlags, IModFighterControls, IModRoundOutcomes, IModFighterMotion, IModFighterPlayback, IModFighterRegions, IModFighterProjectiles, IModFighterProjectileSpawning
+		private sealed class EclipseFighterOperations : IModFighterOperations, IModDamageEventSource, IModFighterTargets, IModIncomingHitSource, IModFighterEffects, IModCombatSnapshotSource, IModCombatActivitySource, IModFighterForms, IModFighterStatusIcons, IModAnimationLifecycleSource, IModFighterFlags, IModFighterControls, IModRoundOutcomes, IModFighterMotion, IModFighterPlayback, IModFighterRegions, IModFighterProjectiles, IModFighterProjectileSpawning, IModFighterActors
 	{
 		private readonly Fight _fight;
 		private readonly Model _model;
@@ -515,6 +517,13 @@ public partial class Fight
                     !_fight._eclipseFightEndDispatched && _fight._eclipseEndedRound != roundNumber,
                 () => _fight.GetPlayerModel()?.GetRenderObject()?.transform, out marker, out error);
         }
+
+        public bool TrySpawnActor(ModId owner, DefinitionId definition, double x, double y, double z, Action<string,string> complete, out string error)
+        { return _fight.TryQueueEclipseActor(_model, owner, definition, x, y, z, complete, out error); }
+        public bool TryGetActors(ModId owner, out IReadOnlyList<IModActor> actors, out string error)
+        { return _fight.TryGetEclipseActors(_model, owner, out actors, out error); }
+        public bool TryGetActorEvents(ModId owner, out IReadOnlyList<ModActorEvent> events, out string error)
+        { return _fight.TryGetEclipseActorEvents(_model, owner, out events, out error); }
 
         public bool TrySpawnProjectile(ModId owner, DefinitionId definition, double x, double y, double z,
             Action<string, string> complete, out string error)
@@ -1171,6 +1180,7 @@ public partial class Fight
         _eclipseBattleRules = new ModBattleRuleInstances();
         _eclipseRoundOutcomes.BeginRound(-1, null);
         CancelEclipseProjectiles();
+        CancelEclipseActors("round_ended");
         CancelEclipseFighterMotion();
         CancelEclipseFighterPlayback();
 		MNEOALEBNNA = true;
@@ -1697,7 +1707,7 @@ public partial class Fight
 		EPBDEDGLHJE.OFKIKABKDFD()["Animation"] = value;
 		EPBDEDGLHJE.JALOHCICLGN(oJDOHGBGPFK.KJDFJPBIGJC, PerkEvent.KNKIIEPDCPN.EVENT_ANIMATION_END, true);
         NotifyEclipseAnimation(oJDOHGBGPFK.SourceModel, value, ModEffectEvent.AnimationEnd);
-		Model fGCODGKLHED = oJDOHGBGPFK.KJDFJPBIGJC.EGGEACCDAEK();
+		Model fGCODGKLHED = oJDOHGBGPFK.KJDFJPBIGJC.GetCombatTarget();
 		bool flag = oJDOHGBGPFK.KJDFJPBIGJC.CDMBCHOJKPH() && fGCODGKLHED != null && fGCODGKLHED.CDMBCHOJKPH();
 		if (stageType == StageType.FDBBPEGEGMK.STAGE_START_STANCE && flag)
 		{
@@ -1805,6 +1815,7 @@ public partial class Fight
 			{
 				fightTimeInFrame++;
                 UpdateEclipseProjectiles();
+                UpdateEclipseActors();
 				UpdateEclipseStatusIcons();
 	            // Simulation time only: pause disables RenderFight, and round boundaries
             // disable processing. Run before model/collision updates for this frame.
@@ -1854,6 +1865,8 @@ public partial class Fight
 			HCPGFOCGDAA.Clear();
 		}
 		PAIOMLKCNOP();
+        InitializeEclipseActorBirths();
+        RefreshEclipseActorTeams();
 		if (!NHKKFGFNANI())
 		{
 			RenderCollisions();
@@ -1867,8 +1880,10 @@ public partial class Fight
 		}
 		IGLLNGNGPOA();
         ApplyEclipseProjectileSpawns();
+        ApplyEclipseActorSpawns();
 		_SelectAnimation.Render();
         InitializeEclipseProjectileBirths();
+        InitializeEclipseActorBirths();
 		EPBDEDGLHJE.PAHPCIFKDEA();
 		if (MKCLBJEIIHN)
 		{
@@ -1885,6 +1900,7 @@ public partial class Fight
 			KGKPLKJPDAI();
 		}
 		ApplyEclipseProjectiles();
+        ApplyEclipseActors();
 		ApplyEclipseFighterMotion();
 		ApplyEclipseFighterPlayback();
 		RenderRound();
@@ -2264,6 +2280,7 @@ public partial class Fight
 		// Only Lua attribution uses the root fighter. Native calculations retain
 		// the actual contact actor, its animation, equipment and collision edges.
 		Model eclipseAttacker = (gHHCDAFIKJE.AttackerModel ?? EGHPHELLOGO.GAIBPAGPEGK)?.GetRootModel();
+        bool eclipseActorContact = eclipseAttacker != null && _eclipseActors.ContainsKey(eclipseAttacker) || _eclipseActors.ContainsKey(EGHPHELLOGO.KJDFJPBIGJC.GetRootModel());
         ModAttackSource eclipseAttackSource = CaptureEclipseAttackSource(gHHCDAFIKJE.AttackerModel ?? EGHPHELLOGO.GAIBPAGPEGK, gHHCDAFIKJE);
 		if (hFIIPNLCIEE.HPLOFLKCLHG())
 		{
@@ -2343,7 +2360,7 @@ public partial class Fight
             else if (eclipseAttacker == CKNCPOABFBO)
                 DispatchEclipseOpponent(ModEffectEvent.DamageDealing, null, outgoing);
         }
-		if (preFight != null)
+		if (preFight != null && !eclipseActorContact)
 		{
 			preFight.ViewerStrike(gHHCDAFIKJE.AttackAnimation, gHHCDAFIKJE.EEDJBBOCFNL, gHHCDAFIKJE.Target, gHHCDAFIKJE.LOONMILKCFK, gHHCDAFIKJE.JMDIIIFJMFH, gHHCDAFIKJE.DNGKOMPMPCD, gHHCDAFIKJE.DFOHNJEBDED, gHHCDAFIKJE.APCAKCCOMLO);
 		}
@@ -2398,7 +2415,7 @@ public partial class Fight
                 if (observation.Blocked) DispatchEclipseOpponent(ModEffectEvent.Block, observation);
 			}
 		}
-		KDMDOBOKAIB(EGHPHELLOGO.KJDFJPBIGJC.EGGEACCDAEK(), gHHCDAFIKJE.EEDJBBOCFNL);
+		KDMDOBOKAIB(eclipseActorContact ? eclipseAttacker : EGHPHELLOGO.KJDFJPBIGJC.GetCombatTarget(), gHHCDAFIKJE.EEDJBBOCFNL);
 		if (!gHHCDAFIKJE.AttackAnimation.BKGIEPOEBOF())
 		{
 			float num2 = EGHPHELLOGO.KJDFJPBIGJC.GetMagicCharges();
@@ -2437,13 +2454,16 @@ public partial class Fight
 		EGHPHELLOGO.KJDFJPBIGJC.POCBCFMBKLO = gHHCDAFIKJE.DNGKOMPMPCD;
 		EGHPHELLOGO.KJDFJPBIGJC.set_IsShock(gHHCDAFIKJE.APCAKCCOMLO);
 		RuleAppliance eJPOJJKKICO = ((!EGHPHELLOGO.KJDFJPBIGJC.EPCNJLEHJCB()) ? RuleAppliance.AppliancePlayer : RuleAppliance.ApplianceOpponent);
-		UpdateFightDataDamage(gHHCDAFIKJE, eJPOJJKKICO);
+		if (!eclipseActorContact) UpdateFightDataDamage(gHHCDAFIKJE, eJPOJJKKICO);
 		_SelectAnimation.CheckEvent(EventAnimation.EECEJKADLCK.EVENT_HIT, EGHPHELLOGO);
 		_SelectAnimation.CheckEvent(EventAnimation.EECEJKADLCK.EVENT_STRIKE, EGHPHELLOGO);
 		if (!Module.GetInstance().OMDLOOFIJDF() && EGHPHELLOGO.KJDFJPBIGJC.OKDDOLCHDCM == GameUtils.JOODENKAECE)
 		{
 			EGHPHELLOGO.KJDFJPBIGJC.ABAOJIMJIDG();
 		}
+        // Extra fighters retain native hit reactions, health, perks and move events.
+        // The archival duel rules/counters cannot represent an additional side.
+        if (eclipseActorContact) return;
 		CheckFightRules(FightEvent.HitEvent, EGHPHELLOGO.KJDFJPBIGJC.EPCNJLEHJCB() ? RuleAppliance.AppliancePlayer : RuleAppliance.ApplianceOpponent);
 		CheckFightRules(FightEvent.StrikeEvent, (!EGHPHELLOGO.KJDFJPBIGJC.EPCNJLEHJCB()) ? RuleAppliance.AppliancePlayer : RuleAppliance.ApplianceOpponent);
 		bool lGNDOAHHHNP = (ObscuredFloat)(kMMJCHDKBDO.KKMCHCNOHMB()) == 0f;
@@ -2690,7 +2710,7 @@ public partial class Fight
 				flag = true;
 				if (KIDOEGEPDKL)
 				{
-					item.EGGEACCDAEK().Parameters.RoundsWon = round.roundTotal;
+					item.GetCombatTarget().Parameters.RoundsWon = round.roundTotal;
 				}
 			}
 		}
@@ -2791,7 +2811,7 @@ public partial class Fight
 			ResetParameters();
 			round.round--;
 			BHOPDEJOKOJ(CKNCPOABFBO);
-			IDAAONBIBJM[ADJAMFGBOAP].GFNCMLFKBGP(JOEADOFBDOC.PPFGEADDLNN);
+			IDAAONBIBJM[ADJAMFGBOAP].SetCurrentLife(JOEADOFBDOC.PPFGEADDLNN);
 			IDAAONBIBJM[ADJAMFGBOAP].RoundsWon = JOEADOFBDOC.OGOLNFLBLBD;
 			AKBNKDBHCEO = IDAAONBIBJM[ADJAMFGBOAP];
 			GINNOLEJDFM = AKBNKDBHCEO.HBFMBOHLKPJ;
@@ -2806,7 +2826,7 @@ public partial class Fight
 			CKNCPOABFBO.PFIJCCKDAAB(JOEADOFBDOC.JAOMELOGOOJ);
 			ADCBNMPOKOJ();
 			ModelParameters kMMJCHDKBDO = _playerModel.Parameters;
-			kMMJCHDKBDO.GFNCMLFKBGP(JEBNOLKKCIK.PPFGEADDLNN);
+			kMMJCHDKBDO.SetCurrentLife(JEBNOLKKCIK.PPFGEADDLNN);
 			kMMJCHDKBDO.RoundsWon = JEBNOLKKCIK.OGOLNFLBLBD;
 			_playerModel.OGHAMAGPFLF(JEBNOLKKCIK.BNMFCPPJIAG);
 			_playerModel.FLBDBIHFJAI(JEBNOLKKCIK.CPOOPPKHFHB);
@@ -2886,7 +2906,7 @@ public partial class Fight
 		int OEMALIFPGPO = 0;
 		if (ACENLMONNPA.Parameters.IBLHIAHECLK.Get(nJFGLOECJEK, ref OEMALIFPGPO))
 		{
-			float num = (float)OEMALIFPGPO * GameUtils.PPAEHBGNDNF().Base * CKKFKEIELCP * (ACENLMONNPA.EGGEACCDAEK().LJCFIOPBNKD() / ACENLMONNPA.LJCFIOPBNKD());
+			float num = (float)OEMALIFPGPO * GameUtils.PPAEHBGNDNF().Base * CKKFKEIELCP * (ACENLMONNPA.GetCombatTarget().LJCFIOPBNKD() / ACENLMONNPA.LJCFIOPBNKD());
 			if (num != 0f)
 			{
 				UpdateLife(ACENLMONNPA, num);
@@ -2941,6 +2961,37 @@ public partial class Fight
 		LNDLFINJHDB.Add(fGCODGKLHED);
 		return fGCODGKLHED;
 	}
+
+    private Model[] NativeActorModels() => LNDLFINJHDB.Concat(HCPGFOCGDAA).Distinct().ToArray();
+
+    // Prepared models own their native resources until this registration commits.
+    // Actor team identity must not replace the canonical camera focus identity.
+    private Action RegisterActorNative(Model model)
+    {
+        bool camera = false, perks = false, animation = false;
+        Action undo = () =>
+        {
+            LNDLFINJHDB.Remove(model);
+            if (animation) _SelectAnimation.RemoveModel(model);
+            if (perks) EPBDEDGLHJE.RemoveModel(model);
+            if (camera) _Camera.RemoveObject(model);
+            model.RemoveAllEventListener();
+        };
+        try
+        {
+            model.Index = _Camera.AddModel(model, false, true); camera = true;
+            SetModelOnListening(model);
+            EPBDEDGLHJE.AddModel(model); perks = true;
+            _SelectAnimation.AddModel(model); animation = true;
+            LNDLFINJHDB.Add(model);
+            model.JMHJDHLBHLK = (int)stageType;
+            model.AHBNPODMIOD(true);
+        }
+        catch { undo(); throw; }
+        return undo;
+    }
+
+    private void PrepareActorNative(Model model) => _SelectAnimation.PrepareFormAnimation(model);
 
 	private void EABCJLKKPCL()
 	{
@@ -3116,6 +3167,7 @@ public partial class Fight
 
 	private void ResetModels(bool ABFHKKILGOP)
 	{
+        CancelEclipseActors("round_ended");
 		foreach (Model item in LNDLFINJHDB)
 		{
 			item.MKAEDALPGDI();
@@ -3234,6 +3286,7 @@ public partial class Fight
 		round.round++;
         _eclipseRoundOutcomes.BeginRound(-1, null);
         CancelEclipseProjectiles();
+        CancelEclipseActors("round_ended");
         CancelEclipseFighterMotion();
         CancelEclipseFighterPlayback();
 		if (preFight != null)
@@ -3867,6 +3920,7 @@ public partial class Fight
 	private void FinishRound()
 	{
         CancelEclipseProjectiles();
+        CancelEclipseActors("round_ended");
 		if (_eclipseFightBeginDispatched && _eclipseEndedRound != round.round)
 		{
 			_eclipseEndedRound = round.round;
@@ -3971,6 +4025,8 @@ public partial class Fight
 	private void KCACCJNMOFM(Model.EventModel EGHPHELLOGO)
 	{
 		if (IsTitleSparring) return;
+        if (_eclipseActors.ContainsKey(EGHPHELLOGO.KJDFJPBIGJC.GetRootModel()) ||
+            EGHPHELLOGO.GAIBPAGPEGK != null && _eclipseActors.ContainsKey(EGHPHELLOGO.GAIBPAGPEGK.GetRootModel())) return;
 		if (!round.processing || FightDefinition.get_Type() == BattleType.FightNone || FCCPOLAMJNO || LKCNBFEINCM || !EGHPHELLOGO.KJDFJPBIGJC.LLBJPPAJOHE())
 		{
 			return;
@@ -4273,7 +4329,7 @@ public partial class Fight
             var parameters = replacement.Parameters;
             if (original.MaxLife <= 0 || parameters.MaxLife <= 0)
                 throw new InvalidOperationException("Form health pools must be positive.");
-            parameters.GFNCMLFKBGP(expected.KKMCHCNOHMB() / original.MaxLife * parameters.MaxLife);
+            parameters.SetCurrentLife(expected.KKMCHCNOHMB() / original.MaxLife * parameters.MaxLife);
             parameters.RoundsWon = original.RoundsWon;
             parameters.IsWinner = original.IsWinner;
             replacement.SetModelPosition(new Vector3f(expected.PLBNCDCFPML()));
@@ -4314,7 +4370,7 @@ public partial class Fight
         var bodies = new List<Model> { expected };
         foreach (var body in retired) if (body != expected) bodies.Add(body);
         for (int index = 0; index < bodies.Count; index++)
-            foreach (var child in bodies[index].KGGIDBLBMDJ())
+            foreach (var child in bodies[index].GetWeaponModels())
                 if (child != null && retired.Add(child)) bodies.Add(child);
         EPBDEDGLHJE.RequireFormReferencesTransferred(retired);
 
@@ -4735,6 +4791,7 @@ public partial class Fight
 	{
         _eclipseRoundOutcomes.Cancel();
         CancelEclipseProjectiles();
+        CancelEclipseActors("round_ended");
         CancelEclipseFighterMotion();
         CancelEclipseFighterPlayback();
 		if (IsLocalVersus)
@@ -4837,11 +4894,11 @@ public partial class Fight
 
 	private void BELLAEIMEAB()
 	{
-		foreach (Model item in JLEFIKJODGG)
+		while (JLEFIKJODGG.Count != 0)
 		{
+            var item = JLEFIKJODGG[0]; JLEFIKJODGG.RemoveAt(0);
 			BHOPDEJOKOJ(item);
 		}
-		JLEFIKJODGG.Clear();
 	}
 
 	private void RemoveModel(Model ACENLMONNPA)
@@ -4850,6 +4907,7 @@ public partial class Fight
         {
             HCPGFOCGDAA.Remove(ACENLMONNPA);
             ForgetEclipseProjectile(ACENLMONNPA);
+            ForgetEclipseActor(ACENLMONNPA);
         }
 		if (ACENLMONNPA == null)
 		{

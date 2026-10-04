@@ -108,6 +108,17 @@ async function main() {
     fs.writeFileSync(path.join(workspace, 'modules.json'), JSON.stringify(await request('textDocument/completion', moduleProbe), null, 2));
     console.log('PASS: require("sf2") resolves and completes API modules');
 
+    const actorFieldsProbe = probe('actor-fields.lua', 'local sf2=require("sf2")\nsf2.actors.register {\n |\n}');
+    await until(async()=>{
+        const found=labels(await request('textDocument/completion',actorFieldsProbe));
+        return ['id','character','team','ai','lifetime_frames','max_health'].every(field=>found.some(n=>n===field||n===field+'?'||n.startsWith(field+' ')));
+    },'actor definition fields');
+    const actorMethodsProbe = probe('actor-methods.lua', 'local sf2=require("sf2")\nsf2.behaviors.register{id="probe",on_tick=function(_,fighter)\n for _,actor in ipairs(fighter:actors() or {}) do actor:| end\nend}');
+    await until(async()=>{
+        const found=labels(await request('textDocument/completion',actorMethodsProbe));
+        return ['snapshot','move_by','set_target','remove','change_health','play_move'].every(method=>found.some(n=>n===method||n.startsWith(method+'(')));
+    },'callback-scoped actor methods');
+    console.log('PASS: actor definition and queried actor command completion');
     const functionProbe = probe('functions.lua', 'local sf2 = require("sf2")\nsf2.items.|');
     await until(async () => {
         const result = await request('textDocument/completion', functionProbe);

@@ -1099,7 +1099,8 @@ already-running move and its current opponent's move before considering a
 decision. Animation starts then update the starter's own controller and the
 controllers currently targeting that fighter. A form or AI handover does not
 need to restart the fight just to establish those observations. This readiness
-behavior does not provide an API for spawning additional independent fighters.
+behavior also supports [independent fighters](../actors/) registered and spawned
+through the actor API. Actor-specific Lua behavior hosts remain separate work.
 
 `memory` is a plain Lua table private to this native fighter controller and this
 tactic. It survives decisions on that controller, not save/reload or controller

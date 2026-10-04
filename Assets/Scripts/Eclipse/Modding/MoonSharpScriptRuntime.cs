@@ -192,6 +192,7 @@ namespace Eclipse.Modding
                     var fighterTable = new Table(_script);
                     var arenaQueryBudget = new ArenaQueryBudget();
                     var projectileQueryBudget = new ProjectileQueryBudget();
+                    var actorQueryBudget = new ActorQueryBudget();
                     if (context != null)
                     {
                         foreach (KeyValuePair<string, string> pair in context)
@@ -199,6 +200,9 @@ namespace Eclipse.Modding
                     }
                     if (fighter != null)
                     {
+                        fighterTable.Set("spawn_actor", DynValue.NewCallback((ctx,args)=>SpawnFighterActor(args,fighterTable,fighter,effectEvent,()=>invocationActive)));
+                        fighterTable.Set("actors", DynValue.NewCallback((ctx,args)=>GetFighterActors(args,fighterTable,fighter,effectEvent,()=>invocationActive,actorQueryBudget,false)));
+                        fighterTable.Set("actor_events", DynValue.NewCallback((ctx,args)=>GetFighterActors(args,fighterTable,fighter,effectEvent,()=>invocationActive,actorQueryBudget,true)));
                         fighterTable.Set("spawn_projectile", DynValue.NewCallback((ctx, args) =>
                             SpawnFighterProjectile(args, fighterTable, fighter, effectEvent, () => invocationActive)));
                         fighterTable.Set("projectiles", DynValue.NewCallback((ctx, args) =>
@@ -785,6 +789,7 @@ namespace Eclipse.Modding
                 _zoneHandles.Clear();
                 _battleHandles.Clear();
                 _warriorHandles.Clear();
+                _actorDefinitions.Clear();
                 _warriorTemplateHandles.Clear();
                 _ruleHandles.Clear();
                 _rewardHandles.Clear();

@@ -10,7 +10,7 @@ using System;
 using System.Collections.Generic;
 namespace UnityEngine{static class Debug{public static int Errors;public static void LogException(Exception e){Errors++;}}}
 class Surface{public bool activeSelf=true,FailNext;public void SetActive(bool value){if(FailNext){FailNext=false;throw new Exception("visibility");}activeSelf=value;}}
-class Model{public Model Owner;public Surface Surface=new Surface();public List<Model> Children=new List<Model>();public int Disposals;public bool FailDispose;public Model GetRootModel()=>Owner==null?this:Owner.GetRootModel();public List<Model>KGGIDBLBMDJ()=>Children;public Surface MJNPBMOAFML()=>Surface;public void FKIBECCHIJC(){}public void IMFOFFFLGOM(){Disposals++;if(FailDispose)throw new Exception("cleanup");}}
+class Model{public Model Owner;public Surface Surface=new Surface();public List<Model> Children=new List<Model>();public int Disposals;public bool FailDispose;public Model GetRootModel()=>Owner==null?this:Owner.GetRootModel();public List<Model>GetWeaponModels()=>Children;public Surface MJNPBMOAFML()=>Surface;public void FKIBECCHIJC(){}public void IMFOFFFLGOM(){Disposals++;if(FailDispose)throw new Exception("cleanup");}}
 class Perks{public bool Reject;public HashSet<Model> Seen;public void RequireFormReferencesTransferred(ISet<Model> retired){Seen=new HashSet<Model>(retired);if(Reject)throw new InvalidOperationException("effect still references old body");}}
 class Fight{
 METHOD

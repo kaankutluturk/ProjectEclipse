@@ -51,6 +51,8 @@ public sealed class Model
 public sealed class InfoAnimation { public string Name; }
 public partial class Fight
 {
+    private sealed class OwnedActor { public string Id; public ModId Owner; }
+    private readonly Dictionary<Model,OwnedActor> _eclipseActors=new Dictionary<Model,OwnedActor>();
     public static Fight Current;
     public readonly List<Model> LNDLFINJHDB=new List<Model>(),HCPGFOCGDAA=new List<Model>(),JLEFIKJODGG=new List<Model>();
     private int fightTimeInFrame=>Clock;

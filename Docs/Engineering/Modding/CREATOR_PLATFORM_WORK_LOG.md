@@ -1,5 +1,11 @@
 # Creator platform implementation record
 
+2026-10-04: shipped the owned independent fighter API and companion HUD example.
+See [actor API acceptance](ACTOR_API_ACCEPTANCE.md) for source, inferred native
+names, actual Lua/native evidence (42 checks), definition/fingerprint checks
+(50), wiki/editor verification and limits. Broad creator work remains open;
+next user-prioritized work is procedural 3D fighter refinement.
+
 The objective is Minecraft-style creative freedom for Shadow Fight 2: creators
 should be able to introduce gameplay systems, share frameworks, compose packs,
 and ship substantial new experiences through a documented, usable API. One

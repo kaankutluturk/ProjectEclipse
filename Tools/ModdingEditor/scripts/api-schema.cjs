@@ -10,7 +10,7 @@ const fn = (name, params, returns = 'nil', capability = 'content.register', opti
 };
 const reg = (name, shape, result, capability) => fn(name, { definition: E(shape) }, result ? H(result) : 'nil', capability);
 const lookup = (name, result) => fn(name, { reference: 'string' }, H(result));
-for (const name of ['Sprite','Model','Audio','Binary','Localization','Item','Price','Perk','Behavior','Zone','Battle','WarriorTemplate','Warrior','Reward','Fight','Rule','Quest','ItemSet','ForgeProfile','ForgeRecipe','Location','MoveTemplate','Move','Trigger','Tactic','Counter','Setting','ProjectileDefinition']) {
+for (const name of ['Sprite','Model','Audio','Binary','Localization','Item','Price','Perk','Behavior','Zone','Battle','WarriorTemplate','Warrior','Reward','Fight','Rule','Quest','ItemSet','ForgeProfile','ForgeRecipe','Location','MoveTemplate','Move','Trigger','Tactic','Counter','Setting','ProjectileDefinition','ActorDefinition']) {
     type(`${name}Handle`, { [`private __eclipse${name}`]: 'true' });
 }
 for (const name of ['Weapon','Armor','Helm','Ranged','Magic','Consumable','Free','Seal']) type(`${name}Handle`, {}, 'ItemHandle');
@@ -41,7 +41,7 @@ const migrations = `table<integer,fun(old:${values}):${values}|nil>`;
 type('StateDefinition', { version:'integer', 'fields?':schema, 'aliases?':'table<string,string>', 'tombstones?':'string[]', 'migrations?':migrations });
 type('BehaviorState', { 'fields?':schema, 'lifetime?':enumOf('round','fight','saved'), 'version?':'integer', 'migrations?':migrations });
 type('BehaviorSelf', { params:values, state:values });
-type('AttackSource', {kind:enumOf('fighter','projectile','native_child'),model_name:'string',animation_name:'string',point:E('CombatPosition'),'projectile_id?':['string','Round/fight observation ID matching an owned projectile snapshot. Not a handle.'],'projectile_owner?':['string','Declaring mod ID; only present for a tracked typed projectile.']});
+type('AttackSource', {'actor_id?':['string','Owned independent root observation ID, including native children.'],'actor_owner?':['string','Declaring actor mod; paired with actor_id.'],kind:enumOf('fighter','projectile','native_child','actor'),model_name:'string',animation_name:'string',point:E('CombatPosition'),'projectile_id?':['string','Round/fight observation ID matching an owned projectile snapshot. Not a handle.'],'projectile_owner?':['string','Declaring mod ID; only present for a tracked typed projectile.']});
 type('CombatEvent', { type:'string', 'round?':'integer', 'damage?':'number', 'health_before?':'number', 'health_after?':'number', 'blocked?':'boolean', 'critical?':'boolean', 'won?':'boolean', 'attack?':[E('AttackSource'),'Copied native contact provenance for hit/damage/block/critical callbacks; absent without a native contact.'] });
 type('DamageEvent',{damage:'number',health_before:'number',health_after:'number',blocked:'boolean',critical:'boolean',round:'integer'},'CombatEvent');
 type('IncomingDamageEvent',{damage:'number',blocked:'boolean',critical:'boolean'},'CombatEvent');
@@ -70,6 +70,9 @@ type('CombatSnapshot', {self:E('FighterSnapshot'),'opponent?':E('FighterSnapshot
 type('ResolvingFighter',{},'Fighter');
 type('OutgoingFighter',{},'Fighter');
 const fighterMethods = {
+    spawn_actor:{params:{definition:H('ActorDefinition'),x:'number',y:'number',z:'number?'},returns:E('ActorSpawnRequest'),capability:'combat.actors'},
+    actors:{params:{},returns:E('Actor')+'[]|nil, string|nil',capability:'combat.actors'},
+    actor_events:{params:{},returns:E('ActorEvent')+'[]|nil, string|nil',capability:'combat.actors'},
     change_form:{params:{character:H('Warrior')},returns:E('FormRequest'),capability:'combat.transform'},
     overlaps_rect:{params:{rectangle:E('ArenaRect')},returns:'boolean|nil, string|nil',capability:null},
     mark_rect:{params:{rectangle:E('ArenaRect'),color:'string?'},returns:H('ArenaMarker')+'|nil, string|nil',capability:'presentation.visuals'},
@@ -375,4 +378,18 @@ const projectileMethods = {
     move_by:{params:{x:'number',y:'number',z:'number?'},returns:'boolean, string|nil',capability:'combat.projectiles'},
     remove:{params:{},returns:'boolean, string|nil',capability:'combat.projectiles'},
 };
-module.exports={projectileMethods,types,functions,aliases,callbacks,storyCallbacks:['on_before_fight'],modeCallbacks:['on_result','on_prepare'],uiCallbacks:['on_complete','on_cancel','on_click','on_close','on_change','on_back'],aiCallbacks:['on_decide'],fighterMethods};
+type('Actor',{});
+type('ActorSnapshot',{id:'string',definition:'string',team:enumOf('player','opponent'),'target_id?':'string',age_frames:'integer',lifetime_frames:'integer'},'FighterSnapshot');
+type('ActorEvent',{sequence:'integer',actor_id:'string',kind:enumOf('spawned','removed','expired','died','owner_changed','round_ended','spawn_failed'),frame:'integer'});
+type('ActorSpawnRequest',{status:enumOf('queued','applied','failed'),'actor_id?':'string','error?':'string'});
+type('ActorDefinition',{id:'string',character:H('Warrior'),'team?':[enumOf('owner','opponent'),'Relative to spawner; default owner.'],'ai?':['boolean','Default true; native warrior tactic.'],'lifetime_frames?':['integer','1-36000, default 1800 simulation frames from initialized birth.'],'max_health?':['number','Finite 0.01-100, default 1 native health pool.']});
+reg('actors.register','ActorDefinition','ActorDefinition');
+const actorMethods={
+    snapshot:{params:{},returns:E('ActorSnapshot')+'|nil, string|nil',capability:'combat.actors'},
+    move_by:{params:{x:'number',y:'number',z:'number?'},returns:'boolean, string|nil',capability:'combat.actors'},
+    set_target:{params:{target:enumOf('player','opponent','nearest')+'|'+E('Actor')},returns:'boolean, string|nil',capability:'combat.actors'},
+    change_health:{params:{amount:'number'},returns:'boolean, string|nil',capability:'combat.actors'},
+    play_move:{params:{move:H('Move')},returns:E('PlayMoveRequest'),capability:'combat.actors'},
+    remove:{params:{},returns:'boolean, string|nil',capability:'combat.actors'},
+};
+module.exports={actorMethods,projectileMethods,types,functions,aliases,callbacks,storyCallbacks:['on_before_fight'],modeCallbacks:['on_result','on_prepare'],uiCallbacks:['on_complete','on_cancel','on_click','on_close','on_change','on_back'],aiCallbacks:['on_decide'],fighterMethods};

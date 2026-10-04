@@ -1754,6 +1754,17 @@ public static class GameUtils
         parameters.AiControlled = current.AiControlled;
         return parameters;
     }
+    internal static ModelParameters InitializeActorParameters(ModelParameters parameters, bool playerTeam, bool ai, float maxHealth)
+    {
+        if (parameters == null) throw new ArgumentNullException(nameof(parameters));
+        InitializeCombatParameters(parameters);
+        parameters.IsPlayer = playerTeam;
+        parameters.UserControlled = false;
+        parameters.AiControlled = ai;
+        parameters.MaxLife = maxHealth;
+        parameters.SetCurrentLife(maxHealth);
+        return parameters;
+    }
     internal static void InitializeLocalVersusParameters(ModelParameters parameters, bool playerOne)
     {
         if (parameters == null) throw new ArgumentNullException(nameof(parameters));

@@ -239,7 +239,7 @@ public static class ValidateDE128CombatNative
             throw new Exception(Spell + " cleanup failed; count=" + sphereCount + " child=" + sphere?.OCPMJKIEPIG()?.NNMAFFCCMHC()?.Name);
         if (sphereDeleted && frame > spellFrame + 240)
         {
-            if (sphereCount != 1 || (!sphereMiddle && Spell != "MindThrowNormal") || !chargeConsumed || actor.KGGIDBLBMDJ().Contains(sphere as WeaponModel))
+            if (sphereCount != 1 || (!sphereMiddle && Spell != "MindThrowNormal") || !chargeConsumed || actor.GetWeaponModels().Contains(sphere as WeaponModel))
                 throw new Exception("Incomplete live Sphere1: count=" + sphereCount + " middle=" + sphereMiddle + " consumed=" + chargeConsumed);
             Debug.Log("[DE128Native] PASS: prior Jian acceptance plus " + Spell + " native Magic-input selection, one inherited-equipment projectile, attack-phase selection, charge consumption and child deletion. No numerical damage, audible-output or shop-preview claim.");
             foreach (var phase in new[] { "AnimationStart", "AnimationEnd" })

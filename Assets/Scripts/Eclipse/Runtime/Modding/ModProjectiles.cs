@@ -8,19 +8,24 @@ namespace Eclipse.Modding
     {
         public string Kind { get; } public string ModelName { get; } public string AnimationName { get; }
         public string ProjectileId { get; } public string ProjectileOwner { get; }
+        public string ActorId { get; } public string ActorOwner { get; }
         public double X { get; } public double Y { get; } public double Z { get; }
         public ModAttackSource(string kind, string modelName, string animationName, double x, double y, double z,
-            string projectileId = null, string projectileOwner = null)
+            string projectileId = null, string projectileOwner = null, string actorId = null, string actorOwner = null)
         {
-            if (kind != "fighter" && kind != "projectile" && kind != "native_child")
+            if (kind != "fighter" && kind != "projectile" && kind != "native_child" && kind != "actor")
                 throw new ArgumentException("Unknown native attack source kind.", nameof(kind));
             if (double.IsNaN(x) || double.IsInfinity(x) || double.IsNaN(y) || double.IsInfinity(y) || double.IsNaN(z) || double.IsInfinity(z))
                 throw new ArgumentOutOfRangeException(nameof(x));
             if ((kind == "projectile") != (!string.IsNullOrEmpty(projectileId) && !string.IsNullOrEmpty(projectileOwner)) ||
                 kind != "projectile" && (projectileId != null || projectileOwner != null))
                 throw new ArgumentException("Only an owned projectile source supplies its ID and owner.");
+            if ((actorId==null)!=(actorOwner==null)||actorId!=null&&(string.IsNullOrEmpty(actorId)||string.IsNullOrEmpty(actorOwner))||
+                kind=="actor"&&actorId==null||kind=="fighter"&&actorId!=null)
+                throw new ArgumentException("Actor provenance requires both actor ID and owner; a main fighter cannot supply them.");
             Kind = kind; ModelName = modelName ?? string.Empty; AnimationName = animationName ?? string.Empty;
             ProjectileId = projectileId; ProjectileOwner = projectileOwner; X = x; Y = y; Z = z;
+            ActorId=actorId;ActorOwner=actorOwner;
         }
     }
 

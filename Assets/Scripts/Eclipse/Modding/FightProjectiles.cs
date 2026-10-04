@@ -190,9 +190,11 @@ public partial class Fight
         bool owned = _eclipseProjectiles.TryGetValue(attacker, out var entry) &&
             ReferenceEquals(entry.Session, ModRuntime.Scripts) && ProjectileOwnerActive(entry.Session, entry.Owner) &&
             entry.Round == round.round && entry.Root == attacker.GetRootModel();
-        string kind = owned ? "projectile" : attacker == attacker.GetRootModel() ? "fighter" : "native_child";
+        _eclipseActors.TryGetValue(attacker.GetRootModel(),out var actor);
+        string kind = owned ? "projectile" : attacker == attacker.GetRootModel() ? actor==null?"fighter":"actor" : "native_child";
         return new ModAttackSource(kind, attacker.get_Name(), strike.AttackAnimation?.Name, x, y, z,
-            owned ? entry.Sequence.ToString(CultureInfo.InvariantCulture) : null, owned ? entry.Owner.ToString() : null);
+            owned ? entry.Sequence.ToString(CultureInfo.InvariantCulture) : null, owned ? entry.Owner.ToString() : null,
+            actor?.Id,actor?.Owner.ToString());
     }
     private bool ProjectileOwnerActive(ModScriptSession session, ModId owner) => session != null && !session.IsDisposed &&
         session.ActiveMods.Any(mod => mod.Id == owner);

@@ -709,7 +709,7 @@ public class Model : global::EventDispatcher<object>
 	{
 		get
 		{
-			return EGGEACCDAEK();
+			return GetCombatTarget();
 		}
 	}
 
@@ -761,7 +761,7 @@ public class Model : global::EventDispatcher<object>
 	{
 		get
 		{
-			return KGGIDBLBMDJ();
+			return GetWeaponModels();
 		}
 	}
 
@@ -1475,7 +1475,8 @@ public class Model : global::EventDispatcher<object>
 		BNFCCKBIIDB.AddEventListener(0, KPAPLCPCOBE);
 	}
 
-	public Model EGGEACCDAEK()
+	// best guess for name
+	public Model GetCombatTarget()
 	{
 		return PNNMOKIBOPP;
 	}
@@ -1516,7 +1517,8 @@ public class Model : global::EventDispatcher<object>
 		return HCPHOJKFIDM;
 	}
 
-	public List<WeaponModel> KGGIDBLBMDJ()
+	// best guess for name
+	public List<WeaponModel> GetWeaponModels()
 	{
 		return JLDBGHLBJEL;
 	}
@@ -2207,7 +2209,7 @@ public class Model : global::EventDispatcher<object>
 	{
 		if (!_perkCollisionDisabled && HIPJNBEFGHN() && !Parameters.BHHLEBHLBLH && _Animation.NNMAFFCCMHC() != null && !NLHFJIEHKMM())
 		{
-			return CheckCollision(EGGEACCDAEK(), FHPKEJMDFLK);
+			return CheckCollision(GetCombatTarget(), FHPKEJMDFLK);
 		}
 		return false;
 	}
@@ -2239,7 +2241,7 @@ public class Model : global::EventDispatcher<object>
 
 	public void FNLFMFNNOIF()
 	{
-		Model fNKFIMEDNLP = EGGEACCDAEK();
+		Model fNKFIMEDNLP = GetCombatTarget();
 		ModelConditions oADECAPBOND = _ModelConditions;
 		InfoAnimation pJAHIOELGGD = null;
 		if (oADECAPBOND == null)
@@ -2307,7 +2309,7 @@ public class Model : global::EventDispatcher<object>
 		{
 			if (HFGPAELCNMF == null)
 			{
-				HFGPAELCNMF = EGGEACCDAEK();
+				HFGPAELCNMF = GetCombatTarget();
 			}
 			if (HFGPAELCNMF == null) return false;
 			if (!PairedGrabAllowsStrike(HFGPAELCNMF))
@@ -2401,9 +2403,9 @@ public class Model : global::EventDispatcher<object>
 		List<ItemInfo> oJIAKDDCGLB = MPBIEICCBMM.OJIAKDDCGLB;
 		List<PerkInfoItem> mAFPBEFKNGE = MPBIEICCBMM.JBIOECDAAKP();
 		List<PerkInfoItem> cFKCGBEONAM = null;
-		if (EGGEACCDAEK() != null && EGGEACCDAEK().Parameters != null)
+		if (GetCombatTarget() != null && GetCombatTarget().Parameters != null)
 		{
-			cFKCGBEONAM = EGGEACCDAEK().Parameters.JBIOECDAAKP();
+			cFKCGBEONAM = GetCombatTarget().Parameters.JBIOECDAAKP();
 		}
 		GMFOJPHEHHI(oJIAKDDCGLB, mAFPBEFKNGE, cFKCGBEONAM);
 	}
@@ -2503,7 +2505,7 @@ public class Model : global::EventDispatcher<object>
         try
         {
             rollbacks.Add(ReplaceCombatEnemyBindings(next, selected));
-            foreach (var child in KGGIDBLBMDJ())
+            foreach (var child in GetWeaponModels())
                 rollbacks.Add(child.ReplaceCombatEnemyBindings(next, selected));
         }
         catch
@@ -2517,8 +2519,22 @@ public class Model : global::EventDispatcher<object>
     private static void AppendCombatEnemy(List<Model> result, Model root)
     {
         result.Add(root);
-        foreach (var child in root.KGGIDBLBMDJ()) if (!result.Contains(child)) result.Add(child);
+        foreach (var child in root.GetWeaponModels()) if (!result.Contains(child)) result.Add(child);
     }
+
+    internal bool CombatEnemiesMatch(IReadOnlyList<Model> roots, Model selected)
+    {
+        if (PNNMOKIBOPP != selected || _Animation.OJKLPPNCONP() != selected?._Animation) return false;
+        var expected = new List<Model>();
+        if (selected != null) AppendCombatEnemy(expected, selected);
+        foreach (var root in roots) if (root != selected) AppendCombatEnemy(expected, root);
+        if (_Enemies.Count != expected.Count) return false;
+        for (int i = 0; i < expected.Count; i++) if (_Enemies[i] != expected[i]) return false;
+        foreach (var child in GetWeaponModels()) if (!child.CombatEnemiesMatch(roots, selected)) return false;
+        return true;
+    }
+
+    internal bool CanChangeCombatTarget => GetCurrentAnimation()?.Type != InfoAnimation.MGHNBEPCKIF.AnimationAttack;
 
     private System.Action ReplaceCombatEnemyBindings(List<Model> enemies, Model selected)
     {
@@ -2559,14 +2575,14 @@ public class Model : global::EventDispatcher<object>
             throw new System.InvalidOperationException("Enemy form identity is stale or already registered.");
         var original = _Enemies.ToArray();
         var next = new List<Model>();
-        var oldWeapons = expected.KGGIDBLBMDJ();
+        var oldWeapons = expected.GetWeaponModels();
         foreach (var enemy in original)
         {
             if (enemy == expected)
             {
                 if (next.Contains(replacement)) continue;
                 next.Add(replacement);
-                foreach (var weapon in replacement.KGGIDBLBMDJ())
+                foreach (var weapon in replacement.GetWeaponModels())
                     if (!next.Contains(weapon)) next.Add(weapon);
             }
             else if (!(enemy is WeaponModel oldWeapon && oldWeapons.Contains(oldWeapon)))
@@ -2622,7 +2638,7 @@ public class Model : global::EventDispatcher<object>
 	{
 		if (CHOJGIFFEMB == 0)
 		{
-			Model fGCODGKLHED = EGGEACCDAEK();
+			Model fGCODGKLHED = GetCombatTarget();
 			if (fGCODGKLHED != null)
 			{
 				NFOOGKCGFAB = ((!(_ModelObject.CJELIBMCCMA().GetStart().GetX() > fGCODGKLHED._ModelObject.CJELIBMCCMA().GetStart().GetX())) ? 1 : (-1));
@@ -2705,7 +2721,7 @@ public class Model : global::EventDispatcher<object>
 			return;
 		}
 		_Enemies.Add(HFGPAELCNMF);
-		List<WeaponModel> list = HFGPAELCNMF.KGGIDBLBMDJ();
+		List<WeaponModel> list = HFGPAELCNMF.GetWeaponModels();
 		foreach (WeaponModel item in list)
 		{
 			_Enemies.Add(item);
@@ -2956,7 +2972,7 @@ public class Model : global::EventDispatcher<object>
 	public void NFADDANANJL()
 	{
 		InfoAnimation dBOLBEOCEME = GetCurrentAnimation();
-		Model fGCODGKLHED = EGGEACCDAEK();
+		Model fGCODGKLHED = GetCombatTarget();
 		if (fGCODGKLHED != null)
 		{
 			Model fGCODGKLHED2 = fGCODGKLHED.GetRootModel();
@@ -2991,7 +3007,7 @@ public class Model : global::EventDispatcher<object>
             {
                 var observer = _Enemies[index];
                 if (observer != null && observer != this && !observer.KIAFPPHPEEK() &&
-                    observer.EGGEACCDAEK() == this && _Enemies.IndexOf(observer) == index)
+                    observer.GetCombatTarget() == this && _Enemies.IndexOf(observer) == index)
                     observer.ObserveEnemyAnimationStarted(this);
             }
             if (FGKAFKFBFEM() || AiData.get_BothBotEnabled())
@@ -3033,7 +3049,7 @@ public class Model : global::EventDispatcher<object>
 		if (mNOIEOBBCMI.Name == "Uninterrupt")
 		{
 			InfoAnimation dBOLBEOCEME = _Animation.NNMAFFCCMHC();
-			Model fGCODGKLHED = EGGEACCDAEK();
+			Model fGCODGKLHED = GetCombatTarget();
 			if (fGCODGKLHED != null)
 			{
 				Model fGCODGKLHED2 = fGCODGKLHED.GetRootModel();
@@ -3154,7 +3170,7 @@ public class Model : global::EventDispatcher<object>
 		{
 			Fight.GetCurrentFight().OnModelHit(KDAHHIMLJGG);
 		}
-		KDAHHIMLJGG.GAIBPAGPEGK = EGGEACCDAEK();
+		KDAHHIMLJGG.GAIBPAGPEGK = GetCombatTarget();
 		HEEHFLHNPOH(HFGPAELCNMF, GHHCDAFIKJE.AttackAnimation, GHHCDAFIKJE.EEDJBBOCFNL, GHHCDAFIKJE);
 	}
 
@@ -3286,7 +3302,7 @@ public class Model : global::EventDispatcher<object>
         bool blocked, // best guess for name
         bool OOGIBOBMGJA, ModelEdge GCFJNDJBBOI)
 	{
-		Model fGCODGKLHED = EGGEACCDAEK();
+		Model fGCODGKLHED = GetCombatTarget();
 		if (fGCODGKLHED == null)
 		{
 			Debug.LogError("attacker is null");
@@ -3345,7 +3361,7 @@ public class Model : global::EventDispatcher<object>
 	public virtual void CGEKLPLKIDC(Model MDKDAHCNCMC = null)
 	{
 		BFFLLGHDPEB = MDKDAHCNCMC;
-		PNNMOKIBOPP = ((MDKDAHCNCMC == null) ? null : MDKDAHCNCMC.EGGEACCDAEK());
+		PNNMOKIBOPP = ((MDKDAHCNCMC == null) ? null : MDKDAHCNCMC.GetCombatTarget());
 		_Strike = null;
 		_Physics = null;
 		_Animation = null;
@@ -3400,7 +3416,7 @@ public class Model : global::EventDispatcher<object>
 		case ModelType.KEIDBIOIFGA.MODEL_PARENT:
 			return NJDJHGDMCIJ();
 		case ModelType.KEIDBIOIFGA.MODEL_OTHER:
-			return EGGEACCDAEK();
+			return GetCombatTarget();
 		case ModelType.KEIDBIOIFGA.MODEL_CHILD:
 			if (JLDBGHLBJEL.Count != 0)
 			{
@@ -3409,7 +3425,7 @@ public class Model : global::EventDispatcher<object>
 			return null;
 		case ModelType.KEIDBIOIFGA.MODEL_OTHER_CHILD:
 		{
-			Model other = EGGEACCDAEK();
+			Model other = GetCombatTarget();
 			return (other == null) ? null : other.NMGNPBMFJKP(ModelType.KEIDBIOIFGA.MODEL_CHILD);
 		}
 		default:
@@ -3459,7 +3475,7 @@ public class Model : global::EventDispatcher<object>
 
 	public void KNCKHDNGKFO(WeaponModel LGCMGHAFEDD)
 	{
-		Model fGCODGKLHED = EGGEACCDAEK();
+		Model fGCODGKLHED = GetCombatTarget();
 		if (fGCODGKLHED != null)
 		{
 			Model fGCODGKLHED2 = fGCODGKLHED.GetRootModel();
@@ -3713,7 +3729,7 @@ public class Model : global::EventDispatcher<object>
 		Model target = null;
 		if (!string.IsNullOrEmpty(IBODMPMJELJ.ChildName))
 		{
-			foreach (WeaponModel child in KGGIDBLBMDJ())
+			foreach (WeaponModel child in GetWeaponModels())
 			{
 				if (child.get_Name() == IBODMPMJELJ.ChildName)
 				{
@@ -3797,7 +3813,7 @@ public class Model : global::EventDispatcher<object>
 		gKIANLDJFCH.MABELGMBHEA(HOOKPFLBFPD);
 		gKIANLDJFCH.Parameters.IBBALIJOJMC = SceneTypes.SceneFight;
 		gKIANLDJFCH.CGEKLPLKIDC(this);
-		gKIANLDJFCH.CJNGMIMHFCC(EGGEACCDAEK());
+		gKIANLDJFCH.CJNGMIMHFCC(GetCombatTarget());
 		gKIANLDJFCH.SetImpulseFactor(ODCOKJKEDOJ);
 		gKIANLDJFCH.PFIJCCKDAAB(LJCFIOPBNKD());
 		JLDBGHLBJEL.Add(gKIANLDJFCH);
@@ -4035,7 +4051,7 @@ public class Model : global::EventDispatcher<object>
 
 	public void GFNCMLFKBGP(float DLEDDPFNPOH)
 	{
-		Parameters.GFNCMLFKBGP(DLEDDPFNPOH);
+		Parameters.SetCurrentLife(DLEDDPFNPOH);
 	}
 
 	public float KKMCHCNOHMB()
@@ -4320,9 +4336,9 @@ public class Model : global::EventDispatcher<object>
 	{
 		List<PerkInfoItem> mAFPBEFKNGE = Parameters.JBIOECDAAKP();
 		List<PerkInfoItem> cFKCGBEONAM = null;
-		if (EGGEACCDAEK() != null && EGGEACCDAEK().Parameters != null)
+		if (GetCombatTarget() != null && GetCombatTarget().Parameters != null)
 		{
-			cFKCGBEONAM = EGGEACCDAEK().Parameters.JBIOECDAAKP();
+			cFKCGBEONAM = GetCombatTarget().Parameters.JBIOECDAAKP();
 		}
 		List<ItemInfo> fJKCMJNAFJD = Parameters.PJNJIJIODHE();
 		BJLLJHDFMOO(fJKCMJNAFJD, false, Parameters.DANNKMJOOOH, Parameters.IBBALIJOJMC, mAFPBEFKNGE, cFKCGBEONAM);
@@ -4338,9 +4354,9 @@ public class Model : global::EventDispatcher<object>
 		List<ItemInfo> oJIAKDDCGLB = GetModelConditionItems();
 		_ModelConditions.OJIAKDDCGLB = oJIAKDDCGLB;
 		List<PerkInfoItem> cFKCGBEONAM = null;
-		if (EGGEACCDAEK() != null && EGGEACCDAEK().Parameters != null)
+		if (GetCombatTarget() != null && GetCombatTarget().Parameters != null)
 		{
-			cFKCGBEONAM = EGGEACCDAEK().Parameters.JBIOECDAAKP();
+			cFKCGBEONAM = GetCombatTarget().Parameters.JBIOECDAAKP();
 		}
 		LBEFFCACPJL(oJIAKDDCGLB, false, Parameters.IBBALIJOJMC, mAFPBEFKNGE, cFKCGBEONAM);
 	}
@@ -4433,9 +4449,9 @@ public class Model : global::EventDispatcher<object>
 			List<ItemInfo> hELFDCAIJNE = Parameters.PJNJIJIODHE();
 			List<PerkInfoItem> mAFPBEFKNGE = Parameters.JBIOECDAAKP();
 			List<PerkInfoItem> cFKCGBEONAM = null;
-			if (EGGEACCDAEK() != null && EGGEACCDAEK().Parameters != null)
+			if (GetCombatTarget() != null && GetCombatTarget().Parameters != null)
 			{
-				cFKCGBEONAM = EGGEACCDAEK().Parameters.JBIOECDAAKP();
+				cFKCGBEONAM = GetCombatTarget().Parameters.JBIOECDAAKP();
 			}
 			GMFOJPHEHHI(hELFDCAIJNE, mAFPBEFKNGE, cFKCGBEONAM);
 		}
@@ -4472,7 +4488,7 @@ public class Model : global::EventDispatcher<object>
 				item.GetStart().Add(lHNJJFDIJKK, fFFHIOALHGM, pDCENMEKIAP);
 			}
 		}
-		Model fGCODGKLHED = EGGEACCDAEK();
+		Model fGCODGKLHED = GetCombatTarget();
 		if (fGCODGKLHED != null)
 		{
 			Model fGCODGKLHED2 = fGCODGKLHED.GetRootModel();
@@ -4588,7 +4604,7 @@ public class Model : global::EventDispatcher<object>
 		{
 			return 100f;
 		}
-		Model fGCODGKLHED = EGGEACCDAEK();
+		Model fGCODGKLHED = GetCombatTarget();
 		if (Fight.GetCurrentFight().MBEJJCKIIHK() != BattleType.FightRaid || !fGCODGKLHED.EPCNJLEHJCB() || fGCODGKLHED.DKFGOHCNIKL.FMGDKLFNKGM())
 		{
 			return GameUtils.HHCEIEOOHCJ.JJNCDHOKEIA(fGCODGKLHED);
@@ -4604,9 +4620,9 @@ public class Model : global::EventDispatcher<object>
 			return;
 		}
 		int OEMALIFPGPO = 0;
-		if (Parameters.IBLHIAHECLK.Get(GameUtils.DMLPOANHHFI().Attribute, ref OEMALIFPGPO) && EGGEACCDAEK() != null)
+		if (Parameters.IBLHIAHECLK.Get(GameUtils.DMLPOANHHFI().Attribute, ref OEMALIFPGPO) && GetCombatTarget() != null)
 		{
-			float num = (float)OEMALIFPGPO * GameUtils.DMLPOANHHFI().Base * EGGEACCDAEK().LJCFIOPBNKD();
+			float num = (float)OEMALIFPGPO * GameUtils.DMLPOANHHFI().Base * GetCombatTarget().LJCFIOPBNKD();
 			if (num != 0f && (num > 0f || !HOOKPFLBFPD))
 			{
 				gDBOMJODDEA.UpdateLife(this, num);

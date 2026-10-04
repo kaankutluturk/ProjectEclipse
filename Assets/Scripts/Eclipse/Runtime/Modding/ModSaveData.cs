@@ -1083,6 +1083,18 @@ namespace Eclipse.Modding
                 }
             }
             var locales = new List<LocaleMetadataDefinition>(content.LocaleMetadata);
+            if (content.Actors.Count != 0)
+            {
+                var actors = new List<ActorDefinition>(content.Actors);
+                actors.Sort((left, right) => CompareIds(left.Id, right.Id));
+                Append(canonical, "registered-actors-v1"); Append(canonical, actors.Count);
+                foreach (var actor in actors)
+                {
+                    Append(canonical, actor.Id.ToString()); Append(canonical, actor.Character.ToString());
+                    Append(canonical, actor.OpposingTeam); Append(canonical, actor.AiControlled); Append(canonical, actor.LifetimeFrames);
+                    Append(canonical,actor.MaxHealth);
+                }
+            }
             locales.Sort((left, right) => CompareIds(left.Id, right.Id));
             Append(canonical, "locale-metadata"); Append(canonical, locales.Count);
             for (int i = 0; i < locales.Count; i++)

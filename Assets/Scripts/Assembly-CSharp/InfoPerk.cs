@@ -473,7 +473,7 @@ public partial class InfoPerk
 		Model target = action.KJDFJPBIGJC;
 		if (target == null)
 			return;
-		Model enemy = target.EGGEACCDAEK();
+		Model enemy = target.GetCombatTarget();
 		if (enemy == null)
 			return;
 		Vector3f position = new Vector3f(target.PLBNCDCFPML());
@@ -542,7 +542,7 @@ public partial class InfoPerk
 			PerkActionLifesteal gGFKBGKDALP = (PerkActionLifesteal)IBODMPMJELJ.AMKJNPOCODK;
 			Model.StrikeResult gHHCDAFIKJE = IBODMPMJELJ.BIKLKJMNGKP.GHHCDAFIKJE;
 			float num = (ObscuredFloat)(IBODMPMJELJ.KJDFJPBIGJC.Parameters.KKMCHCNOHMB());
-			float aACBFABMADJ = gGFKBGKDALP.NIBCOALEIDN() * gHHCDAFIKJE.EEDJBBOCFNL * (IBODMPMJELJ.KJDFJPBIGJC.EGGEACCDAEK().LJCFIOPBNKD() / gHHCDAFIKJE.KJDFJPBIGJC.LJCFIOPBNKD());
+			float aACBFABMADJ = gGFKBGKDALP.NIBCOALEIDN() * gHHCDAFIKJE.EEDJBBOCFNL * (IBODMPMJELJ.KJDFJPBIGJC.GetCombatTarget().LJCFIOPBNKD() / gHHCDAFIKJE.KJDFJPBIGJC.LJCFIOPBNKD());
 			gDBOMJODDEA.UpdateLife(IBODMPMJELJ.KJDFJPBIGJC, aACBFABMADJ);
 		}
 	}

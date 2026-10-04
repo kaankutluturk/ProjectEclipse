@@ -53,7 +53,7 @@ class Model {
  public List<WeaponModel> Children=new List<WeaponModel>();
  public bool KIAFPPHPEEK()=>this is WeaponModel;
  public Model NJDJHGDMCIJ()=>Parent;
- public List<WeaponModel> KGGIDBLBMDJ()=>Children;
+ public List<WeaponModel> GetWeaponModels()=>Children;
  public void SetNearestEnemy(){PNNMOKIBOPP=_Enemies.FirstOrDefault();}
  METHODS
 }

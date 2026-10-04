@@ -115,6 +115,10 @@ local SettingHandle = {}
 ---@field private __eclipseProjectileDefinition true
 local ProjectileDefinitionHandle = {}
 
+---@class (exact) Eclipse.ActorDefinitionHandle
+---@field private __eclipseActorDefinition true
+local ActorDefinitionHandle = {}
+
 ---@class (exact) Eclipse.WeaponHandle: Eclipse.ItemHandle
 local WeaponHandle = {}
 
@@ -204,7 +208,9 @@ local BehaviorState = {}
 local BehaviorSelf = {}
 
 ---@class (exact) Eclipse.AttackSource
----@field kind "fighter"|"projectile"|"native_child"
+---@field actor_id? string Owned independent root observation ID, including native children.
+---@field actor_owner? string Declaring actor mod; paired with actor_id.
+---@field kind "fighter"|"projectile"|"native_child"|"actor"
 ---@field model_name string
 ---@field animation_name string
 ---@field point Eclipse.CombatPosition
@@ -2328,8 +2334,45 @@ local Projectile = {}
 ---@field lifetime_frames integer
 local ProjectileSnapshot = {}
 
+---@class (exact) Eclipse.Actor
+local Actor = {}
+
+---@class (exact) Eclipse.ActorSnapshot: Eclipse.FighterSnapshot
+---@field id string
+---@field definition string
+---@field team "player"|"opponent"
+---@field target_id? string
+---@field age_frames integer
+---@field lifetime_frames integer
+local ActorSnapshot = {}
+
+---@class (exact) Eclipse.ActorEvent
+---@field sequence integer
+---@field actor_id string
+---@field kind "spawned"|"removed"|"expired"|"died"|"owner_changed"|"round_ended"|"spawn_failed"
+---@field frame integer
+local ActorEvent = {}
+
+---@class (exact) Eclipse.ActorSpawnRequest
+---@field status "queued"|"applied"|"failed"
+---@field actor_id? string
+---@field error? string
+local ActorSpawnRequest = {}
+
+---@class (exact) Eclipse.ActorDefinition
+---@field id string
+---@field character Eclipse.WarriorHandle
+---@field team? "owner"|"opponent" Relative to spawner; default owner.
+---@field ai? boolean Default true; native warrior tactic.
+---@field lifetime_frames? integer 1-36000, default 1800 simulation frames from initialized birth.
+---@field max_health? number Finite 0.01-100, default 1 native health pool.
+local ActorDefinition = {}
+
 ---@class Eclipse.Module_achievements
 local achievements = {}
+
+---@class Eclipse.Module_actors
+local actors = {}
 
 ---@class Eclipse.Module_assets
 local assets = {}
@@ -3949,6 +3992,15 @@ function quests.suppress(definition) end
 ---@return Eclipse.ProfileEquipmentSnapshot[]
 function profile.equipment() end
 
+---Describe a fighter that your mod may summon. Definitions are immutable.
+---Requires: `content.register`.
+---When: During script registration, before combat callbacks.
+---Returns: An opaque actor definition handle. Invalid fields or references raise a registration error and roll back the mod's registration transaction.
+---[Full reference](https://dawc17.github.io/ProjectEclipse/api/actors/#sf2actorsregister)
+---@param definition Eclipse.ActorDefinition
+---@return Eclipse.ActorDefinitionHandle
+function actors.register(definition) end
+
 ---@type "number"
 state.NUMBER = "number"
 
@@ -4170,6 +4222,34 @@ tactics.LINEAR = "linear"
 
 ---@type "exponential"
 tactics.EXPONENTIAL = "exponential"
+
+---Queue an instance owned by this mod and this spawning fighter.
+---Requires: `combat.actors`; a definition registered by the calling mod.
+---When: Active simulation combat callbacks. Native creation is deferred until model/collision iteration finishes; entry and placement finish on a later step.
+---Returns: A retained observation receipt with `status = "queued"`, `"applied"` or `"failed"`. Applied receipts have `actor_id`; failed receipts have `error`. Editing a receipt does not change the request.
+---[Full reference](https://dawc17.github.io/ProjectEclipse/api/actors/#fighterspawn_actor)
+---@param definition Eclipse.ActorDefinitionHandle
+---@param x number
+---@param y number
+---@param z number?
+---@return Eclipse.ActorSpawnRequest
+function Fighter:spawn_actor(definition, x, y, z) end
+
+---Reacquire this mod's live actors spawned by the callback's main fighter.
+---Requires: `combat.actors`.
+---When: Active simulation combat callbacks. References expire when that callback returns, even if the native actor remains alive.
+---Returns: An ordered array of actor references, or `nil, error` if unavailable. Pending births, retiring actors and other mods' actors are omitted.
+---[Full reference](https://dawc17.github.io/ProjectEclipse/api/actors/#fighteractors)
+---@return Eclipse.Actor[]|nil, string|nil
+function Fighter:actors() end
+
+---Read copied lifecycle observations for this mod and spawning side.
+---Requires: `combat.actors`.
+---When: Combat callbacks, including round/fight lifecycle callbacks while the main fighter and script session are still current.
+---Returns: An array of copied `{ sequence, actor_id, kind, frame }` tables, or `nil, error`. The latest 64 events per mod and spawning side are retained.
+---[Full reference](https://dawc17.github.io/ProjectEclipse/api/actors/#fighteractor_events)
+---@return Eclipse.ActorEvent[]|nil, string|nil
+function Fighter:actor_events() end
 
 ---Requires: `combat.transform` and a handle returned by this mod's `sf2.warriors.register`. This changes the callback's fighter. It is not exposed on `fighter.opponent`; use an opponent-targeted rule to transform an opponent. Only one request can be pending per fighter.
 ---When: Inside an active combat behavior callback. The change applies after the current simulation step. Pause delays application. Round end, death or unloading fails a pending request. Fighter handles still expire at the end of their callback; retaining this result does not extend their lifetime.
@@ -4438,4 +4518,58 @@ function Projectile:move_by(x, y, z) end
 ---@return boolean, string|nil
 function Projectile:remove() end
 
-return { achievements = achievements, assets = assets, audio = audio, battles = battles, behaviors = behaviors, counters = counters, enchantments = enchantments, events = events, extensions = extensions, fights = fights, forge = forge, fx = fx, items = items, itemsets = itemsets, locales = locales, localization = localization, locations = locations, log = log, mod = mod, modes = modes, moves = moves, perks = perks, price = price, profile = profile, progression = progression, projectiles = projectiles, quests = quests, raids = raids, random = random, rewards = rewards, rules = rules, scenes = scenes, services = services, settings = settings, shop = shop, state = state, story = story, tactics = tactics, timers = timers, ui = ui, underworld = underworld, visuals = visuals, warriors = warriors, world = world, zones = zones }
+---Read a copy of an actor's current native state.
+---Requires: `combat.actors`.
+---When: The active callback that obtained the actor reference.
+---Returns: A copied snapshot, or `nil, error` after retirement. It contains the usual [fighter snapshot](../fighter/#fightersnapshot) fields plus `id`, `definition`, `team`, `target_id`, `age_frames` and `lifetime_frames`.
+---[Full reference](https://dawc17.github.io/ProjectEclipse/api/actors/#actorsnapshot)
+---@return Eclipse.ActorSnapshot|nil, string|nil
+function Actor:snapshot() end
+
+---Queue a displacement without replacing native animation or collision state.
+---Requires: `combat.actors`.
+---When: The active simulation callback that obtained the actor reference; displacement applies after that step's native model/collision work.
+---Returns: `true, nil` if queued, or `false, error` if the live command is rejected. Nonfinite/out-of-range individual coordinates throw.
+---[Full reference](https://dawc17.github.io/ProjectEclipse/api/actors/#actormove_by)
+---@param x number
+---@param y number
+---@param z number?
+---@return boolean, string|nil
+function Actor:move_by(x, y, z) end
+
+---Choose a hostile target for this actor or return to automatic selection.
+---Requires: `combat.actors`.
+---When: The active callback that obtained both actor references.
+---Returns: `true, nil` if accepted, or `false, error` for friendly, defeated, self or unavailable targets. Forged/expired actor tables throw.
+---[Full reference](https://dawc17.github.io/ProjectEclipse/api/actors/#actorset_target)
+---@param target "player"|"opponent"|"nearest"|Eclipse.Actor
+---@return boolean, string|nil
+function Actor:set_target(target) end
+
+---Queue damage (negative) or healing (positive) on the actor's own health pool.
+---Requires: `combat.actors`.
+---When: The active simulation callback that obtained the actor reference.
+---Returns: `true, nil` if queued, or `false, error` if invalid or unavailable.
+---[Full reference](https://dawc17.github.io/ProjectEclipse/api/actors/#actorchange_health)
+---@param amount number
+---@return boolean, string|nil
+function Actor:change_health(amount) end
+
+---Queue a registered move on this actor's existing native rig and equipment.
+---Requires: `combat.actors`; a registered move handle available on this actor.
+---When: The active simulation callback that obtained the actor reference; playback applies after native collision work.
+---Returns: A retained receipt with `status = "queued"`, `"applied"` or `"failed"`; failures have `error`. Applied means native playback accepted the move, not that its whole animation or attack succeeded.
+---[Full reference](https://dawc17.github.io/ProjectEclipse/api/actors/#actorplay_move)
+---@param move Eclipse.MoveHandle
+---@return Eclipse.PlayMoveRequest
+function Actor:play_move(move) end
+
+---Dismiss an actor and retire its native children.
+---Requires: `combat.actors`.
+---When: The active simulation callback that obtained the actor reference.
+---Returns: `true, nil` if queued, or `false, error` if already unavailable.
+---[Full reference](https://dawc17.github.io/ProjectEclipse/api/actors/#actorremove)
+---@return boolean, string|nil
+function Actor:remove() end
+
+return { achievements = achievements, actors = actors, assets = assets, audio = audio, battles = battles, behaviors = behaviors, counters = counters, enchantments = enchantments, events = events, extensions = extensions, fights = fights, forge = forge, fx = fx, items = items, itemsets = itemsets, locales = locales, localization = localization, locations = locations, log = log, mod = mod, modes = modes, moves = moves, perks = perks, price = price, profile = profile, progression = progression, projectiles = projectiles, quests = quests, raids = raids, random = random, rewards = rewards, rules = rules, scenes = scenes, services = services, settings = settings, shop = shop, state = state, story = story, tactics = tactics, timers = timers, ui = ui, underworld = underworld, visuals = visuals, warriors = warriors, world = world, zones = zones }

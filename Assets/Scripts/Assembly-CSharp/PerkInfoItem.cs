@@ -616,7 +616,7 @@ public class PerkInfoItem
 		Model fGCODGKLHED = ((ELPJBGIPEIB() == null) ? null : ELPJBGIPEIB());
 		if (fGCODGKLHED != null && nAGGNMIFFGK.DCJLKCFKCOM.Equals("Enemy"))
 		{
-			fGCODGKLHED = fGCODGKLHED.EGGEACCDAEK();
+			fGCODGKLHED = fGCODGKLHED.GetCombatTarget();
 		}
 		switch (gLBAFLLMOOH.FJLOLCPJACB)
 		{
@@ -871,7 +871,7 @@ public class PerkInfoItem
 			}
 			if (oGHICEHKFOL.OOFFOILONLO == ModelType.KEIDBIOIFGA.MODEL_OTHER)
 			{
-				ModelNode lCDGOCIAIDK2 = ACENLMONNPA.EGGEACCDAEK().CLDMEJKGLBA().EGHIDHMENEF(text);
+				ModelNode lCDGOCIAIDK2 = ACENLMONNPA.GetCombatTarget().CLDMEJKGLBA().EGHIDHMENEF(text);
 				num = lCDGOCIAIDK2.GetStart().GetX();
 			}
 		}
@@ -908,7 +908,7 @@ public class PerkInfoItem
 			}
 			if (oGHICEHKFOL.OOFFOILONLO == ModelType.KEIDBIOIFGA.MODEL_OTHER)
 			{
-				ModelNode lCDGOCIAIDK2 = ACENLMONNPA.EGGEACCDAEK().CLDMEJKGLBA().EGHIDHMENEF(text);
+				ModelNode lCDGOCIAIDK2 = ACENLMONNPA.GetCombatTarget().CLDMEJKGLBA().EGHIDHMENEF(text);
 				num = lCDGOCIAIDK2.GetStart().GetY();
 			}
 		}
@@ -945,7 +945,7 @@ public class PerkInfoItem
 			}
 			if (oGHICEHKFOL.OOFFOILONLO == ModelType.KEIDBIOIFGA.MODEL_OTHER)
 			{
-				ModelNode lCDGOCIAIDK2 = ACENLMONNPA.EGGEACCDAEK().CLDMEJKGLBA().EGHIDHMENEF(text);
+				ModelNode lCDGOCIAIDK2 = ACENLMONNPA.GetCombatTarget().CLDMEJKGLBA().EGHIDHMENEF(text);
 				num = lCDGOCIAIDK2.GetStart().GetZ();
 			}
 		}

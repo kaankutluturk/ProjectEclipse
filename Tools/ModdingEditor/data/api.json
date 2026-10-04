@@ -1994,6 +1994,17 @@
       "summary": "Inspect the active profile's equipped records without knowing their item IDs in advance.",
       "requires": "`profile.read`. No item handles or `content.register` capability. An unavailable profile raises an error. Enumeration includes all native equipped records, including records from other mods. Passing a returned ID to a separate `profile.item` query still requires that namespace's declared dependency.",
       "when": "After an active game profile has loaded, including UI and story callbacks."
+    },
+    "sf2.actors.register": {
+      "params": {
+        "definition": "Eclipse.ActorDefinition"
+      },
+      "returns": "An opaque actor definition handle. Invalid fields or references raise a registration error and roll back the mod's registration transaction.",
+      "capability": "content.register",
+      "url": "https://dawc17.github.io/ProjectEclipse/api/actors/#sf2actorsregister",
+      "summary": "Describe a fighter that your mod may summon. Definitions are immutable.",
+      "requires": "`content.register`.",
+      "when": "During script registration, before combat callbacks."
     }
   },
   "aliases": {},
@@ -2111,6 +2122,26 @@
     "on_decide"
   ],
   "fighterMethods": {
+    "spawn_actor": {
+      "params": {
+        "definition": "Eclipse.ActorDefinitionHandle",
+        "x": "number",
+        "y": "number",
+        "z": "number?"
+      },
+      "returns": "Eclipse.ActorSpawnRequest",
+      "capability": "combat.actors"
+    },
+    "actors": {
+      "params": {},
+      "returns": "Eclipse.Actor[]|nil, string|nil",
+      "capability": "combat.actors"
+    },
+    "actor_events": {
+      "params": {},
+      "returns": "Eclipse.ActorEvent[]|nil, string|nil",
+      "capability": "combat.actors"
+    },
     "change_form": {
       "params": {
         "character": "Eclipse.WarriorHandle"
@@ -2284,6 +2315,48 @@
       "capability": "combat.projectiles"
     }
   },
+  "actorMethods": {
+    "snapshot": {
+      "params": {},
+      "returns": "Eclipse.ActorSnapshot|nil, string|nil",
+      "capability": "combat.actors"
+    },
+    "move_by": {
+      "params": {
+        "x": "number",
+        "y": "number",
+        "z": "number?"
+      },
+      "returns": "boolean, string|nil",
+      "capability": "combat.actors"
+    },
+    "set_target": {
+      "params": {
+        "target": "\"player\"|\"opponent\"|\"nearest\"|Eclipse.Actor"
+      },
+      "returns": "boolean, string|nil",
+      "capability": "combat.actors"
+    },
+    "change_health": {
+      "params": {
+        "amount": "number"
+      },
+      "returns": "boolean, string|nil",
+      "capability": "combat.actors"
+    },
+    "play_move": {
+      "params": {
+        "move": "Eclipse.MoveHandle"
+      },
+      "returns": "Eclipse.PlayMoveRequest",
+      "capability": "combat.actors"
+    },
+    "remove": {
+      "params": {},
+      "returns": "boolean, string|nil",
+      "capability": "combat.actors"
+    }
+  },
   "types": {
     "SpriteHandle": {
       "fields": {
@@ -2425,6 +2498,11 @@
         "private __eclipseProjectileDefinition": "true"
       }
     },
+    "ActorDefinitionHandle": {
+      "fields": {
+        "private __eclipseActorDefinition": "true"
+      }
+    },
     "WeaponHandle": {
       "fields": {},
       "parent": "ItemHandle"
@@ -2564,7 +2642,15 @@
     },
     "AttackSource": {
       "fields": {
-        "kind": "\"fighter\"|\"projectile\"|\"native_child\"",
+        "actor_id?": [
+          "string",
+          "Owned independent root observation ID, including native children."
+        ],
+        "actor_owner?": [
+          "string",
+          "Declaring actor mod; paired with actor_id."
+        ],
+        "kind": "\"fighter\"|\"projectile\"|\"native_child\"|\"actor\"",
         "model_name": "string",
         "animation_name": "string",
         "point": "Eclipse.CombatPosition",
@@ -5760,6 +5846,57 @@
         "position": "Eclipse.CombatPosition",
         "age_frames": "integer",
         "lifetime_frames": "integer"
+      }
+    },
+    "Actor": {
+      "fields": {}
+    },
+    "ActorSnapshot": {
+      "fields": {
+        "id": "string",
+        "definition": "string",
+        "team": "\"player\"|\"opponent\"",
+        "target_id?": "string",
+        "age_frames": "integer",
+        "lifetime_frames": "integer"
+      },
+      "parent": "FighterSnapshot"
+    },
+    "ActorEvent": {
+      "fields": {
+        "sequence": "integer",
+        "actor_id": "string",
+        "kind": "\"spawned\"|\"removed\"|\"expired\"|\"died\"|\"owner_changed\"|\"round_ended\"|\"spawn_failed\"",
+        "frame": "integer"
+      }
+    },
+    "ActorSpawnRequest": {
+      "fields": {
+        "status": "\"queued\"|\"applied\"|\"failed\"",
+        "actor_id?": "string",
+        "error?": "string"
+      }
+    },
+    "ActorDefinition": {
+      "fields": {
+        "id": "string",
+        "character": "Eclipse.WarriorHandle",
+        "team?": [
+          "\"owner\"|\"opponent\"",
+          "Relative to spawner; default owner."
+        ],
+        "ai?": [
+          "boolean",
+          "Default true; native warrior tactic."
+        ],
+        "lifetime_frames?": [
+          "integer",
+          "1-36000, default 1800 simulation frames from initialized birth."
+        ],
+        "max_health?": [
+          "number",
+          "Finite 0.01-100, default 1 native health pool."
+        ]
       }
     }
   }

@@ -24,7 +24,7 @@ class Model {
  public ModelAi HJOGNGDMAKJ=new ModelAi(); public ModelAnimation _Animation=new ModelAnimation();
  public Collision _Collision=new Collision(); public Model Target; public bool Ai=true,Weapon;
  public int Wait=9,Events; public object EventData;
- public Model EGGEACCDAEK()=>Target; public bool KIAFPPHPEEK()=>Weapon; public bool FGKAFKFBFEM()=>Ai;
+ public Model GetCombatTarget()=>Target; public bool KIAFPPHPEEK()=>Weapon; public bool FGKAFKFBFEM()=>Ai;
  public void BHAFOEICJPE(int value)=>Wait=value;
  public void CallEvent(int kind,EventModel data){if(kind!=2)throw new Exception("Wrong event");Events++;EventData=data.Data;}
  METHODS

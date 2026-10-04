@@ -8,6 +8,19 @@ const { createMod } = require('../src/scaffold.cjs');
 const template = path.resolve(__dirname, '../templates/weapon');
 const header = 'local sf2 = require("sf2")\n';
 
+test('actor companion starter mirrors playable files, scopes capabilities and lifecycle timing',async()=>{
+ const dir=path.resolve(__dirname,'../../../Mods/example.actor-companions'),mod=await p.indexMod(dir);
+ assert.deepEqual(mod.issues,[]);
+ const source=await fs.readFile(path.join(dir,'scripts/main.lua'),'utf8');
+ assert.deepEqual(p.analyze(source,mod).issues,[]);
+ for(const file of ['mod.toml','README.md','scripts/main.lua','assets/animations/high_punch.bytes'])assert.deepEqual(await fs.readFile(path.join(dir,file)),await fs.readFile(path.resolve(__dirname,'../templates/actor-companions',file)));
+ const api=require('../data/api.json');assert.equal(require('../scripts/api-schema.cjs').functions['sf2.actors.register'].returns,'Eclipse.ActorDefinitionHandle');
+ for(const method of Object.values(api.actorMethods))assert.equal(method.capability,'combat.actors');
+ const missing={...mod,data:{...mod.data,capabilities:['content.register']}};
+ const issues=p.analyze(header+'sf2.behaviors.register{id="test",on_round_begin=function(_,fighter) local actors=fighter:actors(); for _,actor in ipairs(actors) do actor:remove() end end}',missing).issues;
+ assert(issues.some(i=>i.capability==='combat.actors'));assert(issues.filter(i=>i.code==='callback-timing').length>=2);
+});
+
 test('scripted burst starter mirrors assets and validates direct projectile commands',async()=>{
     const directory=path.resolve(__dirname,'../../../Mods/example.scripted-burst');
     const mod=await p.indexMod(directory);const text=await fs.readFile(path.join(directory,'scripts/main.lua'),'utf8');

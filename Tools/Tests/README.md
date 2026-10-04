@@ -1,5 +1,11 @@
 # Regression tests and validators
 
+Independent fighters: `Combat/TestActorDefinitions.ps1` checks production Lua
+registration, bounds, strict fields, rollback and fingerprints.
+`Combat/TestActorsUnity.ps1` runs the actual companion mod/HUD in an isolated
+Unity project, checking scoped commands, independent root state, teams,
+death/removal, pause/TTL and surrender cleanup on a controlled core encounter.
+
 Run these commands from the repository root. Runners and their C# fixtures stay
 together here; generated sources, binaries, logs and isolated projects go under
 ignored `Temp/`. Tool-specific suites in `Tools/Animation/`, `Tools/ModdingEditor/`,

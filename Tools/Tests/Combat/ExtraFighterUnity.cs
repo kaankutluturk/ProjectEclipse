@@ -118,7 +118,7 @@ public static class ExtraFighterUnity
                     Check(!(actor is WeaponModel) && actor.NJDJHGDMCIJ() == null && actor.GetRootModel() == actor, "Probe is a weapon child");
                     Check(fight.LNDLFINJHDB.Count(m => !(m is WeaponModel)) == 3, "No third root");
                     Check(actor._Enemies.Contains(player) && actor._Enemies.Contains(enemy) && player._Enemies.Contains(actor) && enemy._Enemies.Contains(actor), "Native insertion did not make mutual enemies");
-                    Check(actor.EGGEACCDAEK() == player && player.EGGEACCDAEK() == enemy, "Insertion-order target assumption changed");
+                    Check(actor.GetCombatTarget() == player && player.GetCombatTarget() == enemy, "Insertion-order target assumption changed");
                     playerBefore = player.KKMCHCNOHMB(); enemyBefore = enemy.KKMCHCNOHMB(); actorBefore = actor.KKMCHCNOHMB();
                     fight.UpdateLife(actor, -parameters.MaxLife * .2f);
                     Check(actor.KKMCHCNOHMB() < actorBefore && Math.Abs(player.KKMCHCNOHMB() - playerBefore) < .00001 && Math.Abs(enemy.KKMCHCNOHMB() - enemyBefore) < .00001, "Extra root health is shared");
@@ -134,7 +134,7 @@ public static class ExtraFighterUnity
                     var origin = player.PLBNCDCFPML();
                     enemy.ShiftModelPosition(new Vector3f(origin.GetX() + 700 - enemy.PLBNCDCFPML().GetX(), 0, 0), true);
                     actor.ShiftModelPosition(new Vector3f(origin.GetX() + 180 - actor.PLBNCDCFPML().GetX(), 0, 0), true);
-                    Check(player.EGGEACCDAEK() == enemy, "Native targeting unexpectedly selected nearest root");
+                    Check(player.GetCombatTarget() == enemy, "Native targeting unexpectedly selected nearest root");
                     Debug.Log("[ExtraFighterUnity] Native target remains first registered enemy despite nearer third root; actor=" + actor.get_Name() + " life=" + actor.KKMCHCNOHMB());
                     playerBefore = player.KKMCHCNOHMB(); enemyBefore = enemy.KKMCHCNOHMB();
                     Next(fight); break;
@@ -183,14 +183,14 @@ public static class ExtraFighterUnity
                     if (RequireTargeting && !targetingAccepted)
                     {
                         actor.Parameters.AiControlled = false;
-                        var previousTarget = enemy.EGGEACCDAEK();
+                        var previousTarget = enemy.GetCombatTarget();
                         var previousAnimation = enemy.OCPMJKIEPIG().OJKLPPNCONP();
                         var previousObservation = Field(Field(enemy, "HJOGNGDMAKJ"), "COKFBIJAFLH");
                         var rollback = (Action)Invoke(enemy, "ReplaceCombatEnemies", new Model[] { actor }, actor);
                         CheckTargetBindings(enemy, actor, player);
                         Check(Field(Field(enemy, "HJOGNGDMAKJ"), "COKFBIJAFLH") == null, "Retarget retained previous opponent observation");
                         rollback();
-                        Check(enemy.EGGEACCDAEK() == previousTarget && enemy.OCPMJKIEPIG().OJKLPPNCONP() == previousAnimation &&
+                        Check(enemy.GetCombatTarget() == previousTarget && enemy.OCPMJKIEPIG().OJKLPPNCONP() == previousAnimation &&
                             ReferenceEquals(Field(Field(enemy, "HJOGNGDMAKJ"), "COKFBIJAFLH"), previousObservation), "Synchronous native rollback lost target/animation/observation");
                         Invoke(enemy, "ReplaceCombatEnemies", new Model[] { actor }, actor);
                         Invoke(actor, "ReplaceCombatEnemies", new Model[] { enemy }, enemy);
@@ -223,7 +223,7 @@ public static class ExtraFighterUnity
                     if (fight.LNDLFINJHDB.Contains(actor)) return;
                     Check(!player._Enemies.Contains(actor) && !enemy._Enemies.Contains(actor), "Removal retained targeting references");
                     Check(actor.GetRenderObject() == null || !actor.GetRenderObject().activeInHierarchy, "Removal retained rendering");
-                    Check(player.EGGEACCDAEK() == enemy && enemy.EGGEACCDAEK() == player, "Removal corrupted original duel targets");
+                    Check(player.GetCombatTarget() == enemy && enemy.GetCombatTarget() == player, "Removal corrupted original duel targets");
                     Check(fight.LNDLFINJHDB.Count(m => !(m is WeaponModel)) == 2, "Removal lost original roots");
                     CheckNodeBindings(player, enemy);
                     Next(fight); break;
@@ -289,7 +289,7 @@ public static class ExtraFighterUnity
                     case ModelType.KEIDBIOIFGA.MODEL_NULL:
                     case ModelType.KEIDBIOIFGA.MODEL_THIS: root = model; break;
                     case ModelType.KEIDBIOIFGA.MODEL_OTHER:
-                    case ModelType.KEIDBIOIFGA.MODEL_OTHER_CHILD: root = model.EGGEACCDAEK(); break;
+                    case ModelType.KEIDBIOIFGA.MODEL_OTHER_CHILD: root = model.GetCombatTarget(); break;
                     default: continue;
                 }
                 if (root == null) continue;
@@ -307,18 +307,18 @@ public static class ExtraFighterUnity
         var own = model.GetCurrentAnimation();
         if (own != null && model.OCPMJKIEPIG().NMEEPBDJHMG())
             Check(ReferenceEquals(Field(controller, "CGPDPHJIDPA"), own.IMFGMAAEMIC() ?? own), "Third-root controller did not observe its own actual move");
-        var target = model.EGGEACCDAEK();
+        var target = model.GetCombatTarget();
         var other = target?.GetCurrentAnimation();
         if (other != null && target.OCPMJKIEPIG().NMEEPBDJHMG())
             Check(ReferenceEquals(Field(controller, "COKFBIJAFLH"), other.IMFGMAAEMIC() ?? other), "Third-root controller did not observe its actual target's move");
     }
     static void CheckTargetBindings(Model model, Model target, Model excluded)
     {
-        Check(model.EGGEACCDAEK() == target && model._Enemies[0] == target, "Cached/insertion target disagrees with explicit selection");
+        Check(model.GetCombatTarget() == target && model._Enemies[0] == target, "Cached/insertion target disagrees with explicit selection");
         Check(model.OCPMJKIEPIG().OJKLPPNCONP() == target.OCPMJKIEPIG(), "Native animation retains old enemy body");
         Check(((Model.EventModel)Field(model, "KDAHHIMLJGG")).GAIBPAGPEGK == target, "Native event target disagrees with selection");
         if (excluded != null) Check(!model._Enemies.Contains(excluded), "Explicit hostile roots retained excluded ally");
-        foreach (var child in model.KGGIDBLBMDJ()) CheckTargetBindings(child, target, excluded);
+        foreach (var child in model.GetWeaponModels()) CheckTargetBindings(child, target, excluded);
     }
     static void Finish(int code)
     {

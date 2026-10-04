@@ -68,6 +68,8 @@ namespace Eclipse.Modding
                 attack.Set("animation_name", DynValue.NewString(source.AnimationName));
                 if (source.ProjectileId != null) attack.Set("projectile_id", DynValue.NewString(source.ProjectileId));
                 if (source.ProjectileOwner != null) attack.Set("projectile_owner", DynValue.NewString(source.ProjectileOwner));
+                if (source.ActorId != null) attack.Set("actor_id",DynValue.NewString(source.ActorId));
+                if (source.ActorOwner != null) attack.Set("actor_owner",DynValue.NewString(source.ActorOwner));
                 var point = new Table(_script);
                 point.Set("x", DynValue.NewNumber(source.X)); point.Set("y", DynValue.NewNumber(source.Y)); point.Set("z", DynValue.NewNumber(source.Z));
                 attack.Set("point", DynValue.NewTable(point));

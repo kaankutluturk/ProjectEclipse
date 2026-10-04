@@ -108,7 +108,7 @@ const fields=n=>Object.fromEntries((n?.fields??[]).filter(f=>f.type==='TableKeyS
 function parse(text){try{return lua.parse(text,{luaVersion:'5.2',locations:true,ranges:true,comments:false});}catch{return null;}}
 function analyze(text,mod){
     const ast=parse(text),issues=[],calls=[],contexts=[];if(!ast)return {issues,calls,contexts};
-    function resolve(n,env){if(!n)return null;if(n.type==='Identifier')return env.get(n.name);if(n.type==='MemberExpression'){const base=resolve(n.base,env);return typeof base==='string'?`${base}.${n.identifier.name}`:null;}return null;}
+    function resolve(n,env){if(!n)return null;if(n.type==='Identifier')return env.get(n.name);if(n.type==='MemberExpression'){const base=resolve(n.base,env);return typeof base==='string'?`${base}.${n.identifier.name}`:null;}if(n.type==='IndexExpression'&&resolve(n.base,env)==='actor-list')return 'actor';if(n.type==='CallExpression'){if(resolve(n.base,env)==='fighter.actors')return 'actor-list';if(n.base.type==='Identifier'&&n.base.name==='ipairs'&&resolve(n.arguments[0],env)==='actor-list')return 'actor-iterator';}return null;}
     function add(n,code,message,capability){issues.push({range:n.range,code,message,capability});}
     const caps=new Set(mod.data.capabilities??[]),dependencies=new Set((mod.data.dependencies??[]).map(d=>d.id));
     function required(n,cap){if(Array.isArray(cap)){for(const item of cap)required(n,item);}else if(cap&&!caps.has(cap))add(n,'capability',`Declare "${cap}" in mod.toml to use this operation.`,cap);}
@@ -144,7 +144,8 @@ function analyze(text,mod){
                     }
                 }
             }
-            if(typeof symbol==='string'&&symbol.startsWith('fighter.')){const method=symbol.split('.').at(-1),target=symbol.startsWith('fighter.opponent.');const spec=api.fighterMethods[method];if(spec){required(n,spec.capability);if(target)required(n,'combat.target');if(['move_by','play_move','mark_rect','projectiles','spawn_projectile'].includes(method)&&['on_fight_begin','on_round_begin','on_round_end','on_fight_end'].includes(callback))add(n,'callback-timing',method+' requires an active simulation callback.');if(method==='scale_incoming_damage'&&callback!=='on_damage_resolving')add(n,'callback-timing','scale_incoming_damage is available only in on_damage_resolving.');}}
+            if(typeof symbol==='string'&&symbol.startsWith('fighter.')){const method=symbol.split('.').at(-1),target=symbol.startsWith('fighter.opponent.');const spec=api.fighterMethods[method];if(spec){required(n,spec.capability);if(target)required(n,'combat.target');if(['move_by','play_move','mark_rect','projectiles','spawn_projectile','actors','spawn_actor'].includes(method)&&['on_fight_begin','on_round_begin','on_round_end','on_fight_end'].includes(callback))add(n,'callback-timing',method+' requires an active simulation callback.');if(method==='scale_incoming_damage'&&callback!=='on_damage_resolving')add(n,'callback-timing','scale_incoming_damage is available only in on_damage_resolving.');}}
+            if(typeof symbol==='string'&&symbol.startsWith('actor.')){const method=symbol.slice(6),spec=api.actorMethods[method];if(spec){required(n,spec.capability);if(['on_fight_begin','on_round_begin','on_round_end','on_fight_end'].includes(callback))add(n,'callback-timing',method+' requires an active actor callback reference.');}}
             for(const arg of args){if(info&&name==='sf2.behaviors.register'&&arg===args[0]){for(const f of arg.fields??[])if(!api.callbacks.includes(f.key?.name))expression(f.value,env,callback);}else expression(arg,env,callback);}return;
         }
         if(n.type==='FunctionDeclaration'){const next=new Map(env);for(const p of n.parameters)next.set(p.name,null);block(n.body,next,callback);return;}
@@ -155,7 +156,7 @@ function analyze(text,mod){
             for(const init of node.init)expression(init,env,callback);
             node.variables.forEach((variable,i)=>{if(variable.type!=='Identifier')return;const init=node.init[i];const name=init?.type==='CallExpression'&&init.base.type==='Identifier'&&init.base.name==='require'&&literal(init.arguments[0])==='sf2'&&!env.has('require')?'sf2':resolve(init,env);env.set(variable.name,name);});
         }else if(node.type==='IfStatement'){for(const clause of node.clauses){expression(clause.condition,env,callback);block(clause.body,new Map(env),callback);}}
-        else if(['DoStatement','WhileStatement','RepeatStatement','ForNumericStatement','ForGenericStatement'].includes(node.type)){const next=new Map(env);if(node.variable)next.set(node.variable.name,null);for(const v of node.variables??[])next.set(v.name,null);block(node.body,next,callback);}
+        else if(['DoStatement','WhileStatement','RepeatStatement','ForNumericStatement','ForGenericStatement'].includes(node.type)){const next=new Map(env);if(node.variable)next.set(node.variable.name,null);for(const v of node.variables??[])next.set(v.name,null);for(const iterator of node.iterators??[])expression(iterator,env,callback);if(node.type==='ForGenericStatement'&&node.variables.length>=2&&resolve(node.iterators[0],env)==='actor-iterator')next.set(node.variables[1].name,'actor');block(node.body,next,callback);}
         else expression(node,env,callback);
     }}
     block(ast.body,new Map(),null);return {issues,calls,contexts};

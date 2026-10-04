@@ -2,6 +2,14 @@
 
 Last broad reconciliation: 2026-09-12. Scope remains **G01–G14 plus E1–E8**.
 
+2026-10-04 owned actor API: registration, spawn receipts, scoped queries,
+independent native health/AI/team roots, target/motion/health/playback, death,
+TTL and teardown ship with a companion example, wiki and editor contracts.
+Actual Lua/HUD/native acceptance passes 42 checks; definition/transaction/
+fingerprint checks pass 50. See ACTOR_API_ACCEPTANCE.md for bounded evidence.
+Actor behavior hosts, arbitrary content, exports, raids, multiplayer and custom
+outcomes remain open. This supersedes the earlier no-public-actors status below.
+
 2026-10-04 atomic target integration: an internal root/weapon-child transaction
 installs explicit hostile roots and selected cached/event/animation targets,
 invalidates previous-target AI observation/waits/throttle and supports synchronous

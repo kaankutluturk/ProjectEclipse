@@ -19,13 +19,10 @@ snapshots and IDs for Lua state. IDs are strings unique within a fight, not save
 identifiers. These references never expose native models or arbitrary actors.
 
 Projectiles are native weapon children: they have no independent fighter health,
-AI controller or team membership. A creature, companion or additional opponent
-needs an independent actor API, which is not currently available. Internal tests
-demonstrate extra native fighters dealing and taking damage, changing targets and
-being removed while the original duel continues. That does not provide a mod
-contract: actor definitions, owned instances, team policy, callback identity,
-death cleanup and encounter victory rules still need dedicated support. Use this
-API for attacks and guided projectiles.
+AI controller or team membership. Use [independent fighters](../actors/) for
+companions or additional opponents with their own health, native AI and teams.
+Projectile queries remain scoped to the spawning main fighter; actor roots do
+not expose typed projectile methods yet.
 
 Native contact callbacks supply a copied
 [`event.attack`](../combat-callbacks/#identify-the-attack-that-made-contact).

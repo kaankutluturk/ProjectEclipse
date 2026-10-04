@@ -15,7 +15,7 @@ foreach ($count in @(0, 1, 15, 20, 23, 28, 36, 57)) {
     $model.MaxLife = 1
     $model.ShieldTotal = $count
     $model.HasShieldTotalOverride = $true
-    $model.GFNCMLFKBGP(1)
+    $model.SetCurrentLife(1)
     $bars = [Math]::Max(1, $count)
     Assert-Near $model.RemainingHealthBars $bars 'initial count'
     Assert-Near $model.CurrentHealthBarFraction 1 'initial bar'
@@ -52,7 +52,7 @@ foreach ($count in @(0, 1, 15, 40, 57)) {
         $model = New-Object ModelParameters
         $model.MaxLife = 1
         $model.ShieldTotal = $count
-        $model.GFNCMLFKBGP(1)
+        $model.SetCurrentLife(1)
         $bars = [Math]::Max(1, $count)
         $expectedHits = [int][Math]::Ceiling($bars / $rawDamage)
         for ($hit = 0; $hit -lt $expectedHits; $hit++) {
@@ -76,15 +76,15 @@ $model = New-Object ModelParameters
 $model.MaxLife = 1
 $model.ShieldTotal = 40
 foreach ($remainingBars in @(40.0, 20.0, 5.0, 1.0, 0.5)) {
-    $model.GFNCMLFKBGP($remainingBars / 40)
+    $model.SetCurrentLife($remainingBars / 40)
     $overkill = $false
     Assert-Near $model.ResolveStrikeDamage(0.25, [ref]$overkill) 0.25 'same quarter-bar hit at all health levels'
     if ($overkill) { throw 'Last-bar ordinary hit incorrectly clamped' }
 }
 # Reproduce the old unit mismatch at one bar left: 0.25 was reduced to 0.035.
-$model.GFNCMLFKBGP(1.0 / 40)
+$model.SetCurrentLife(1.0 / 40)
 Assert-Near ($model.HABJPOFCIHA() + 0.01) 0.035 'old normalized-life cap reproduction'
-$model.GFNCMLFKBGP(0.1 / 40)
+$model.SetCurrentLife(0.1 / 40)
 $overkill = $false
 Assert-Near $model.ResolveStrikeDamage(0.25, [ref]$overkill) 0.11 'last partial bar is killable in one hit'
 $priorCulture = [Threading.Thread]::CurrentThread.CurrentCulture

@@ -136,7 +136,7 @@ public abstract class PerkCondition : PerkObject
 		}
 		if (IHJJBIDMEMB == PlayerType.PLAYER_ENEMY)
 		{
-			return ACENLMONNPA.EGGEACCDAEK();
+			return ACENLMONNPA.GetCombatTarget();
 		}
 		return null;
 	}

@@ -167,7 +167,7 @@ class Model {
     public ModelConditions EBABHGHPLFK()=>Conditions;
     public ModelAnimation OCPMJKIEPIG()=>_Animation;
     public InfoAnimation GetCurrentAnimation()=>_Animation.Current;
-    public Model EGGEACCDAEK()=>Enemy;
+    public Model GetCombatTarget()=>Enemy;
     public Model NJDJHGDMCIJ()=>Owner;
     public Model NMGNPBMFJKP(ModelType.KEIDBIOIFGA kind)=>null;
     public bool EDJFLMILEBA()=>false;

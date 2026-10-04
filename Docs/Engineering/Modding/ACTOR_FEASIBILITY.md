@@ -1,5 +1,9 @@
 # Independent combat actors: native feasibility
 
+The later [owned actor API acceptance](ACTOR_API_ACCEPTANCE.md) records the
+shipped contract. Statements below about unavailable public actors describe
+the earlier investigation and remain historical evidence.
+
 This records the recovered engine boundaries for a future typed actor API.
 Projectiles are `WeaponModel` children; they are not substitutes for independently
 living fighters. This investigation supplies a repeatable isolated native probe,
@@ -14,7 +18,7 @@ without shipping a Lua actor namespace.
 | Construction | `Fight.AddModel(ModelParameters)` constructs a root `Model`, initializes it and registers camera, events, perks and animation selection. | A third root has a plausible native construction seam. Creation must be deferred outside model iteration and made transactional. |
 | Health | A copied `ModelParameters` owns its own current/max life. `Fight.UpdateLife(Model, amount)` acts on that model. | Independent health does not require pretending to be a child weapon. Definition/instance identity, bounded values and death lifetime still need a contract. |
 | Enemy registration | `AddModel` adds every existing model as a mutual enemy through `Model.CJNGMIMHFCC`. | There are no teams or explicit hostility rules at this seam. Friendly summons cannot use this unchanged. |
-| Target selection | Legacy `SetNearestEnemy` takes `_Enemies[0]`; collision, facing and AI use the cached `EGGEACCDAEK()` target. Internal `ReplaceCombatEnemies` installs explicit hostile roots and the selected target together. | The integration seam updates cached/event/animation targets and invalidates old-target AI observations, waits and handler throttles, including existing owned weapon children. The selected root is first for legacy fallback. This is not a public targeting/team API or a nearest-target policy. |
+| Target selection | Legacy `SetNearestEnemy` takes `_Enemies[0]`; collision, facing and AI use the cached `GetCombatTarget()` target. Internal `ReplaceCombatEnemies` installs explicit hostile roots and the selected target together. | The integration seam updates cached/event/animation targets and invalidates old-target AI observations, waits and handler throttles, including existing owned weapon children. The selected root is first for legacy fallback. This is not a public targeting/team API or a nearest-target policy. |
 | Distance helper | `FindNearestEnemy` uses signed horizontal distance, includes every enemy entry and has no C# callers in the tracked source. | It is not an existing working nearest-target implementation. Do not expose or activate it as one without new tests. |
 | Simulation | `RenderFight` iterates live model lists for rendering, collision and AI. Native controllers now seed an already-running own move in any fight mode. Root animation starts update the starter's controller and registered root enemies that currently target it. | Active stage/action state and an eligible entry animation still need explicit initialization. Core third-root autonomous contacts now have native acceptance; general actor ownership/behavior remains unfinished. |
 | Round results | `RenderRound` checks the main player/opponent parameters; `GetWinner`, control and campaign settlement retain duel semantics. | Actor knockout must have a separate lifecycle. Teams, alternate victory policies and encounter completion need explicit integration. |

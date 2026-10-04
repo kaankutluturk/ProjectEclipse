@@ -156,7 +156,7 @@ public class SelectAnimation
         {
             Type = EventAnimation.EECEJKADLCK.EVENT_ANIMATION_END,
             KJDFJPBIGJC = model,
-            GAIBPAGPEGK = model.EGGEACCDAEK()
+            GAIBPAGPEGK = model.GetCombatTarget()
         };
         CheckAnimations(entry, model, model.CEOOLFLLIMC.NCNDKFCPLEH(entry.Type), index, selections);
         if (selections[index].Count == 0)
@@ -770,7 +770,7 @@ public class SelectAnimation
 	private void UpdateConditions(ModelConditions conditions, Model ACENLMONNPA)
 	{
 		Fight gDBOMJODDEA = Fight.GetCurrentFight();
-		Model fGCODGKLHED = ACENLMONNPA.EGGEACCDAEK();
+		Model fGCODGKLHED = ACENLMONNPA.GetCombatTarget();
 		Model fGCODGKLHED2 = ACENLMONNPA.NMGNPBMFJKP(ModelType.KEIDBIOIFGA.MODEL_PARENT);
 		Model fGCODGKLHED3 = ACENLMONNPA.NMGNPBMFJKP(ModelType.KEIDBIOIFGA.MODEL_CHILD);
 		// A strike can delete a projectile and create its child in the same frame.
@@ -951,7 +951,7 @@ public class SelectAnimation
 					continue;
 				}
 				_ModelsConditions[index].PDKPGKPBBIL = pJAHIOELGGD.FOLOOGCLPNE();
-				_ModelsConditions[index].PCAOCHAIBJC = ((ACENLMONNPA.EGGEACCDAEK() == null) ? 1 : pJAHIOELGGD.CEDEDCLGJDE(_ModelsConditions[index], ACENLMONNPA.OCPMJKIEPIG().KFCNPADAMHA()));
+				_ModelsConditions[index].PCAOCHAIBJC = ((ACENLMONNPA.GetCombatTarget() == null) ? 1 : pJAHIOELGGD.CEDEDCLGJDE(_ModelsConditions[index], ACENLMONNPA.OCPMJKIEPIG().KFCNPADAMHA()));
 				_ModelsConditions[index].FOIHIKCEBJF = (int)pJAHIOELGGD.MoveData.ILOEBFFAEAN.OLBDPMKCJIF;
 				if (PEADINOKLKN.Type == EventAnimation.EECEJKADLCK.EVENT_KEY_PRESSED && PEADINOKLKN.IsRandom)
 				{
@@ -980,7 +980,7 @@ public class SelectAnimation
 				{
 					if (PEADINOKLKN.IsRandom && pJAHIOELGGD.Type == InfoAnimation.MGHNBEPCKIF.AnimationAttack)
 					{
-						Model fGCODGKLHED = ACENLMONNPA.EGGEACCDAEK();
+						Model fGCODGKLHED = ACENLMONNPA.GetCombatTarget();
 						if (ACENLMONNPA.FGKAFKFBFEM() && ACENLMONNPA.Parameters.KMNLACDHAFE && fGCODGKLHED != null)
 						{
 							float num = (ObscuredFloat)(fGCODGKLHED.Parameters.KKMCHCNOHMB());

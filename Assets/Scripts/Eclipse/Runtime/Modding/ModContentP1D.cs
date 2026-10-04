@@ -1237,7 +1237,7 @@ namespace Eclipse.Modding
         private readonly Dictionary<DefinitionId, MoveTriggerDefinition> _p1dMoveTriggers = new Dictionary<DefinitionId, MoveTriggerDefinition>();
         private readonly Dictionary<DefinitionId, TacticDefinition> _p1dTactics = new Dictionary<DefinitionId, TacticDefinition>();
 
-        private int P1DRegistrationCount => _pendingProjectiles.Count + _p1dLocales.Count + _p1dLocations.Count + _p1dMoveTemplates.Count +
+        private int P1DRegistrationCount => _pendingActors.Count + _pendingProjectiles.Count + _p1dLocales.Count + _p1dLocations.Count + _p1dMoveTemplates.Count +
             _p1dMoves.Count + _p1dMoveTriggers.Count + _p1dTactics.Count + MovePerkLockRegistrationCount + _moveItemLockExtensions.Count + _moveCombatPatches.Count;
 
         public LocaleMetadataDefinition RegisterLocaleMetadata(string localId, string name, string locale, string alias,
@@ -1363,6 +1363,7 @@ namespace Eclipse.Modding
             _catalog.ValidateP1DCanAdd(locales, locations, templates, moves, triggers, tactics);
             ValidateMovePerkLockCommit();
             ValidateProjectileCommit();
+            ValidateActorCommit();
             _catalog.ValidateItemLockExtensions(_moveItemLockExtensions);
             _catalog.ValidateCombatPatches(_moveCombatPatches);
             foreach (var patch in _moveCombatPatches) ValidateMovePerkRefs(patch.Conditions);
@@ -1384,6 +1385,7 @@ namespace Eclipse.Modding
                 SortedValues(_p1dMoves), SortedValues(_p1dMoveTriggers), SortedValues(_p1dTactics));
             ApplyMovePerkLockCommit();
             ApplyProjectileCommit();
+            ApplyActorCommit();
             _catalog.AddItemLockExtensions(_moveItemLockExtensions);
             _catalog.AddCombatPatches(_moveCombatPatches);
         }
@@ -1394,6 +1396,7 @@ namespace Eclipse.Modding
             _p1dMoveTriggers.Clear(); _p1dTactics.Clear();
             ClearMovePerkLockPending();
             _pendingProjectiles.Clear();
+            _pendingActors.Clear();
             _moveItemLockExtensions.Clear();
             _moveCombatPatches.Clear();
         }

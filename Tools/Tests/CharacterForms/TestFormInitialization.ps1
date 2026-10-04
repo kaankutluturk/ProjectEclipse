@@ -10,7 +10,7 @@ $initializer += [regex]::Match($gameSource,'(?ms)^\tprivate static List<int> Loa
 $parameters=[regex]::Match($parameterSource,'(?ms)^\tpublic ObscuredInt OJLKDEHMIAC\(.*?^\t\}').Value
 $parameters += [regex]::Match($parameterSource,'(?ms)^\tpublic ObscuredFloat KKMCHCNOHMB\(.*?^\t\}').Value
 $parameters += [regex]::Match($parameterSource,'(?ms)^\tpublic bool AGICDDJBPLB\(.*?^\t\}').Value
-$parameters += [regex]::Match($parameterSource,'(?ms)^\tpublic void GFNCMLFKBGP\(.*?^\t\}').Value
+$parameters += [regex]::Match($parameterSource,'(?ms)^\tpublic void SetCurrentLife\(.*?^\t\}').Value
 $parameters += [regex]::Match($parameterSource,'(?ms)^\tpublic void BCLGFKDDNKH\(.*?^\t\}').Value
 $parameters += [regex]::Match($parameterSource,'(?ms)^\tpublic void PPFDLIBLNDG\(.*?^\t\}').Value
 $parameters += [regex]::Match($parameterSource,'(?ms)^\tprivate string OKALHAKMOLI\(.*?^\t\}').Value
@@ -27,6 +27,7 @@ using System.Collections.Generic;
 using System.Linq;
 using ObscuredInt = System.Int32;
 using ObscuredFloat = System.Single;
+static class Mathf { public static float Clamp(float value,float min,float max)=>Math.Clamp(value,min,max); public static float Min(float a,float b)=>Math.Min(a,b); public static float Max(float a,float b)=>Math.Max(a,b); }
 
 // Production health/path/initialization/request methods are inserted below.
 // XML projection, attributes, item rules, native body construction and queuing
@@ -55,7 +56,7 @@ class ModelParameters
 {
     public bool IsPlayer, UserControlled, AiControlled, EAJHPCJJCDI, ABLMGLAKJBL, LNHMCKNCGDP;
     public int RoundsWon, DEGCGHDAMDA = -1;
-    public float MaxLife, _CurrentLife;
+    public float MaxLife, _CurrentLife, RecoverableLife;
     public Tactic HBFMBOHLKPJ;
     public ItemInfo Skeleton, Weapon, Armor, Helm;
     public string EclipseBodyModel;
@@ -259,7 +260,7 @@ class ValidateFormInitialization
             Check(p.IAIHFLGBIPB.SequenceEqual(Enumerable.Range(0, AnimationData.Count)) && p.IAIHFLGBIPB != staleMoves &&
                 staleMoves.SequenceEqual(new[] { 87 }), "native move indices replace detached stale list");
             Check(State(current) == before && current.IAIHFLGBIPB == liveMoves, "current participant is untouched");
-            p.GFNCMLFKBGP(maximum * .375f);
+            p.SetCurrentLife(maximum * .375f);
             Check(p.KKMCHCNOHMB() == maximum * .375f, "initialized pool permits boundary health fraction assignment");
         }
     }

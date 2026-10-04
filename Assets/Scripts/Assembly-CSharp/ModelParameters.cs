@@ -1195,7 +1195,8 @@ public class ModelParameters
 		LNHMCKNCGDP = value;
 	}
 
-	public void GFNCMLFKBGP(float value)
+	// best guess for name
+	public void SetCurrentLife(float value)
 	{
 		if (AGICDDJBPLB())
 		{
@@ -1223,7 +1224,7 @@ public class ModelParameters
 		// bar and prevent death even after the exact pool has been depleted.
 		if (HealthBarCount > 1 && value < 0f && next * HealthBarCount < 0.0001f)
 			next = 0f;
-		GFNCMLFKBGP(next);
+		SetCurrentLife(next);
 	}
 
 	private int AIHCLEKCBPF(string name, List<string> OEMALIFPGPO)
@@ -1324,12 +1325,12 @@ public class ModelParameters
 		num += AOGLLMEFEJB;
 		num = Mathf.Min(num, MaxLife);
 		num = Mathf.Max(0f, num);
-		GFNCMLFKBGP(num);
+		SetCurrentLife(num);
 	}
 
 	public void BCLGFKDDNKH()
 	{
-		GFNCMLFKBGP(MaxLife);
+		SetCurrentLife(MaxLife);
 	}
 
 	private bool FDDBPFJBHEB()

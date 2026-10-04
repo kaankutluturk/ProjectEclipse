@@ -66,6 +66,19 @@ exports.run = async function () {
         while(Date.now()<audioDeadline){const result=await vscode.commands.executeCommand('vscode.executeCompletionItemProvider',audioUri,new vscode.Position(1,10));const labels=result?.items.map(item=>String(typeof item.label==='string'?item.label:item.label.label))??[];if(['play','stop','set_volume','is_playing'].every(name=>labels.some(label=>label===name||label.startsWith(name+'(')))){audioFound=true;break;}await new Promise(resolve=>setTimeout(resolve,500));}
         assert(audioFound,'Owned audio function completion missing');passed.push('PASS: owned audio play/query/volume/stop completion');
 
+        const actorUri=vscode.Uri.joinPath(folder.uri,'scripts','actor-completion.lua');
+        const actorLine=' for _,actor in ipairs(fighter:actors() or {}) do actor: end';
+        fs.writeFileSync(actorUri.fsPath,'local sf2=require("sf2")\nsf2.behaviors.register{id="probe",on_tick=function(_,fighter)\n'+actorLine+'\nend}');
+        await vscode.workspace.openTextDocument(actorUri);
+        let actorsFound=false;const actorsDeadline=Date.now()+30000;
+        while(Date.now()<actorsDeadline){
+            const result=await vscode.commands.executeCommand('vscode.executeCompletionItemProvider',actorUri,new vscode.Position(2,actorLine.indexOf('actor:')+6));
+            const labels=result?.items.map(item=>String(typeof item.label==='string'?item.label:item.label.label))??[];
+            if(['snapshot','move_by','set_target','remove','change_health','play_move'].every(name=>labels.some(label=>label===name||label.startsWith(name+'(')))){actorsFound=true;break;}
+            await new Promise(resolve=>setTimeout(resolve,500));
+        }
+        assert(actorsFound,'Queried independent fighter completion missing');passed.push('PASS: queried actor snapshot/motion/target/health/playback/removal completion');
+
         const policyUri=vscode.Uri.joinPath(folder.uri,'scripts','rule-policy.lua');
         const policyLine='sf2.fights.patch { target="core:fights/zone_1/tournament/3", append_rules={} }';
         fs.writeFileSync(policyUri.fsPath,'local sf2=require("sf2")\n'+policyLine);

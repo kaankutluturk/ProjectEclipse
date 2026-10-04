@@ -9,7 +9,7 @@ function Near($a, $b, $label) { Check ([Math]::Abs($a-$b) -lt .000002) $label }
 $rules = (New-Object Eclipse.Multiplayer.Balance.PvpBalanceProfile).Compile()
 $model = New-Object ModelParameters
 $model.MaxLife = 1
-$model.GFNCMLFKBGP(1)
+$model.SetCurrentLife(1)
 for ($i=0; $i -lt 100; $i++) {
     $before = $model.RemainingHealthInDamageUnits
     $damage = [Eclipse.Multiplayer.Balance.PvpRecoverableHealth]::ClampBlockedDamage(.23, $before, $model.MaxLife, $rules.MinimumLifeOnBlock)
@@ -45,9 +45,9 @@ $state.Left = $fighter
 Check ([Eclipse.Multiplayer.VersusStateHash]::Hash([ref]$state) -ne $beforeHash) 'Grey health missing from simulation hash'
 $model.BCLGFKDDNKH()
 Near $model.RecoverableLife 0 'Round reset clears grey pool'
-$model.GFNCMLFKBGP(.5)
+$model.SetCurrentLife(.5)
 $model.RecoverableLife = .5
-$model.GFNCMLFKBGP(.8)
+$model.SetCurrentLife(.8)
 Near $model.RecoverableLife .2 'External healing clamps grey pool'
 $model.GEACPINOAAN(-1)
 Check ($model.OJMIFOAHKBK()) 'Direct hit remains lethal'

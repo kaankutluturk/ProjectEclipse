@@ -533,9 +533,9 @@ public class ModelAi
 	{
 		int num = 0;
 		int i = 0;
-		for (int count = ACENLMONNPA.KGGIDBLBMDJ().Count; i < count; i++)
+		for (int count = ACENLMONNPA.GetWeaponModels().Count; i < count; i++)
 		{
-			WeaponModel gKIANLDJFCH = ACENLMONNPA.KGGIDBLBMDJ()[i];
+			WeaponModel gKIANLDJFCH = ACENLMONNPA.GetWeaponModels()[i];
 			if (gKIANLDJFCH != null)
 			{
 				int num2 = gKIANLDJFCH.OCPMJKIEPIG().JFGEHNHLDJM();
@@ -696,7 +696,7 @@ public class ModelAi
 
 	public int SelectAnimationWithWeights(List<InfoAnimation> MAHEJFLCCHP)
 	{
-		Model fGCODGKLHED = _Model.EGGEACCDAEK();
+		Model fGCODGKLHED = _Model.GetCombatTarget();
 		if (fGCODGKLHED != null)
 		{
 			Model fNKFIMEDNLP = fGCODGKLHED.GetRootModel();
@@ -889,13 +889,13 @@ public class ModelAi
 
 	private bool GetUseChildrenDodge(Model FNKFIMEDNLP, MFHIONPNAGO LFLGCDNKNJI)
 	{
-		if (FNKFIMEDNLP.KGGIDBLBMDJ().Count == 0 || _Model == null)
+		if (FNKFIMEDNLP.GetWeaponModels().Count == 0 || _Model == null)
 		{
 			return false;
 		}
 		bool result = false;
 		int num = GetModelDirection(_Model, FNKFIMEDNLP);
-		foreach (WeaponModel item in FNKFIMEDNLP.KGGIDBLBMDJ())
+		foreach (WeaponModel item in FNKFIMEDNLP.GetWeaponModels())
 		{
 			if (item.OCPMJKIEPIG() != null && (item.OCPMJKIEPIG() == null || item.OCPMJKIEPIG().JJBEAOPDGCO() != null) && (IsMissileAnimation(item.OCPMJKIEPIG().NNMAFFCCMHC()) || LFLGCDNKNJI != MFHIONPNAGO.SimpleMissile) && (IsMagicAnimation(item.OCPMJKIEPIG().NNMAFFCCMHC()) || LFLGCDNKNJI != MFHIONPNAGO.MagicMissile))
 			{
@@ -2025,9 +2025,9 @@ public class ModelAi
 		List<Decision> list = new List<Decision>();
 		List<Decision> list2 = new List<Decision>(NCBNEMAOHJE);
 		int i = 0;
-		for (int count = FNKFIMEDNLP.KGGIDBLBMDJ().Count; i < count; i++)
+		for (int count = FNKFIMEDNLP.GetWeaponModels().Count; i < count; i++)
 		{
-			WeaponModel gKIANLDJFCH = FNKFIMEDNLP.KGGIDBLBMDJ()[i];
+			WeaponModel gKIANLDJFCH = FNKFIMEDNLP.GetWeaponModels()[i];
 			List<Decision> jOJBDADJOAP = new List<Decision>(list);
 			if ((IsMissileAnimation(gKIANLDJFCH.OCPMJKIEPIG().NNMAFFCCMHC()) || OKIFFDGBGDA != MFHIONPNAGO.SimpleMissile) && (IsMagicAnimation(gKIANLDJFCH.OCPMJKIEPIG().NNMAFFCCMHC()) || OKIFFDGBGDA != MFHIONPNAGO.MagicMissile) && gKIANLDJFCH.OCPMJKIEPIG().NNMAFFCCMHC() != null)
 			{
@@ -2284,10 +2284,10 @@ public class ModelAi
 
 	private float GetDistanceToEnemy(Model ACENLMONNPA)
 	{
-		int aOJJBKLCHJO = GetModelDirection(ACENLMONNPA, ACENLMONNPA.EGGEACCDAEK().GetRootModel());
-		int aOJJBKLCHJO2 = GetModelDirection(ACENLMONNPA.EGGEACCDAEK().GetRootModel(), ACENLMONNPA);
+		int aOJJBKLCHJO = GetModelDirection(ACENLMONNPA, ACENLMONNPA.GetCombatTarget().GetRootModel());
+		int aOJJBKLCHJO2 = GetModelDirection(ACENLMONNPA.GetCombatTarget().GetRootModel(), ACENLMONNPA);
 		ModelNode lCDGOCIAIDK = ACENLMONNPA.OCPMJKIEPIG().EGHIDHMENEF(AiData.get_DistanceNode(), aOJJBKLCHJO);
-		ModelNode lCDGOCIAIDK2 = ACENLMONNPA.EGGEACCDAEK().GetRootModel().OCPMJKIEPIG()
+		ModelNode lCDGOCIAIDK2 = ACENLMONNPA.GetCombatTarget().GetRootModel().OCPMJKIEPIG()
 			.EGHIDHMENEF(AiData.get_DistanceNode(), aOJJBKLCHJO2);
 		if (lCDGOCIAIDK != null && lCDGOCIAIDK2 != null)
 		{

@@ -48,6 +48,7 @@ namespace Eclipse.Modding
                 root.Set("locations", DynValue.NewTable(locations));
 
                 AddProjectileModule(root);
+                AddActorModule(root);
 
                 var moves = new Table(_script);
                 moves.Set("ANIMATION_END", DynValue.NewString("animation_end"));

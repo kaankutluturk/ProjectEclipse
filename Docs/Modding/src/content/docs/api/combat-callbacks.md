@@ -50,12 +50,21 @@ another callback's event, or a saved native snapshot.
 
 | Field | Meaning |
 | --- | --- |
-| `kind` | `"fighter"` for a root fighter, `"projectile"` for a tracked typed projectile, or `"native_child"` for another native child. |
+| `kind` | `"fighter"` for a main root fighter, `"actor"` for a mod-owned independent root, `"projectile"` for a tracked typed projectile, or `"native_child"` for another native child. |
 | `model_name` | Actual contact actor's native name; it need not be unique. |
 | `animation_name` | Native move used for this contact, rather than the caster's current move; empty when unavailable. Owned move names are qualified IDs. |
 | `point` | Copied `{ x, y, z }` native contact position. Positive Y points downward. It is a hit point, not the actor's origin or a hurtbox. |
 | `projectile_id` | Only for `kind = "projectile"`: string matching that child's `projectile:snapshot().id`. Unique within the fight; do not treat it as a profile-wide ID. |
 | `projectile_owner` | Only for `kind = "projectile"`: declaring mod ID. |
+| `actor_id` | Present when the contact root is a mod-owned independent fighter, including its native children. Matches an actor snapshot ID. |
+| `actor_owner` | Declaring actor mod ID; paired with `actor_id`. |
+
+Independent actors do not receive their own Lua combat callback host yet. A main
+fighter hit by an actor receives its ordinary defender callbacks and copied
+actor provenance; that actor is not attributed to the spawning main fighter.
+Actor-only contacts retain native health, perks and move reactions, but do not
+award the canonical duel's profile counters or trigger its legacy hit/strike
+rules. Victory and rewards still depend on the two main fighters.
 
 Both attacker and defender see the same source identity. `on_post_hit` and the
 later damage phases retain the source captured before their Lua handlers, even
@@ -629,7 +638,8 @@ It does not resume an in-progress attack across different rigs.
 Animation node and pivot bindings follow the actual body and target identities
 during a form change or rollback. Optional equipment points absent on that body
 remain absent; they are not borrowed from another character. This does not make
-additional independently controlled fighters available through the mod API.
+actor definitions by itself. Use the separate [independent fighter API](../actors/)
+for owned additional fighters.
 
 Perk cooldown flags and variable modifiers keep their existing action and timer.
 Variables retain their current values, including changes made since the effect
