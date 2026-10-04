@@ -216,6 +216,11 @@ Equipment may add many further helper points without changing the animation's
 67 ordered points. Read the sample README for installation and controls. The
 experimental 3D renderer approximates standard anatomy and can change the look
 of custom silhouette details.
+Its connected body now uses native top/face/knuckle landmarks for the head and
+hands. Missing those compatible bindings keeps the recovered surface/stroke
+fallback. Clothing thickness follows the animated panel's local surface;
+complex outfits can still need individual treatment. This presentation option
+does not change the animation's point order or native collision geometry.
 
 The repository's `Tools/Tests/CharacterForms/TestAuthoredFighterUnity.ps1`
 tests this complete installed example in an isolated Unity fight. It checks

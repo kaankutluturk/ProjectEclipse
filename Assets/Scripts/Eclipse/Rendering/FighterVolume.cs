@@ -32,6 +32,7 @@ namespace Eclipse.Rendering
             public readonly List<int> Faces = new List<int>();
             public readonly List<int[]> Boundary = new List<int[]>();
             public Vector3[] Pose;
+            public Vector3[] SurfaceNormals;
             public Vector2[] UV;
             public int Offset, WallOffset;
         }
@@ -153,7 +154,7 @@ namespace Eclipse.Rendering
                     counts.TryGetValue(key,out int n);counts[key]=n+1;edges[key]=new[]{a,b};
                 }
                 foreach(var pair in counts)if(pair.Value==1)panel.Boundary.Add(edges[pair.Key]);
-                panel.Pose=new Vector3[panel.Points.Count];panel.UV=new Vector2[panel.Points.Count];
+                panel.Pose=new Vector3[panel.Points.Count];panel.SurfaceNormals=new Vector3[panel.Points.Count];panel.UV=new Vector2[panel.Points.Count];
                 var bounds=new Bounds(panel.Points[0].Sample(source),Vector3.zero);
                 foreach(var point in panel.Points)bounds.Encapsulate(point.Sample(source));
                 for(int i=0;i<panel.Points.Count;i++)
@@ -180,9 +181,9 @@ namespace Eclipse.Rendering
         }
         static float DistanceToEdge(Vector3 point,Vector3 a,Vector3 b)
         {
-            Vector2 p=new Vector2(point.x,point.y),x=new Vector2(a.x,a.y),y=new Vector2(b.x,b.y),delta=y-x;
-            float t=delta.sqrMagnitude<.00001f?0:Mathf.Clamp01(Vector2.Dot(p-x,delta)/delta.sqrMagnitude);
-            return Vector2.Distance(p,x+delta*t);
+            Vector3 delta=b-a;
+            float t=delta.sqrMagnitude<.00001f?0:Mathf.Clamp01(Vector3.Dot(point-a,delta)/delta.sqrMagnitude);
+            return Vector3.Distance(point,a+delta*t);
         }
         public void Surface(Vector3[] source,int[] faces,Color color,string[] names=null,bool body=false,float depthAnchor=0)
         {
@@ -195,6 +196,15 @@ namespace Eclipse.Rendering
                     Vector3 point=panel.Points[i].Sample(source);
                     point.z=depthAnchor+(point.z-depthAnchor)*(panel.Rigid?.95f:.75f);
                     panel.Pose[i]=point;
+                    panel.SurfaceNormals[i]=Vector3.zero;
+                }
+                // Extrude a connected garment in its own animated surface frame.
+                // Fixed Z walls become broad slabs when the native panel turns.
+                for(int i=0;i<panel.Faces.Count;i+=3)
+                {
+                    int a=panel.Faces[i],b=panel.Faces[i+1],c=panel.Faces[i+2];
+                    Vector3 normal=Vector3.Cross(panel.Pose[b]-panel.Pose[a],panel.Pose[c]-panel.Pose[a]);
+                    panel.SurfaceNormals[a]+=normal;panel.SurfaceNormals[b]+=normal;panel.SurfaceNormals[c]+=normal;
                 }
                 for(int i=0;i<count;i++)
                 {
@@ -206,8 +216,9 @@ namespace Eclipse.Rendering
                     float depth=panel.Rigid?2.5f:1.2f+5.5f*fullness;
                     Vector2 uv=panel.UV[i];
                     float fold=panel.Rigid?0:Mathf.Sin(uv.x*Mathf.PI*3+uv.y*.7f)*1.2f*fullness;
-                    vertices[panel.Offset+i]=point+Vector3.forward*(depth+fold);
-                    vertices[panel.Offset+count+i]=point-Vector3.forward*(depth-fold);
+                    Vector3 direction=panel.SurfaceNormals[i].sqrMagnitude>1e-8f?panel.SurfaceNormals[i].normalized:Vector3.forward;
+                    vertices[panel.Offset+i]=point+direction*(depth+fold);
+                    vertices[panel.Offset+count+i]=point-direction*(depth-fold);
                 }
                 if(panel.Rigid)for(int i=0;i<panel.Boundary.Count;i++)
                 {

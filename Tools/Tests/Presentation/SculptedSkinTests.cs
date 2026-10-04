@@ -53,6 +53,16 @@ static class SculptedSkinTests
         skin.Ellipsoid(new Vector3(0,76,0),new Vector3(.3f,1,0),10,16,9);
         skin.Build(Vector3.zero,vertices,faces);Closed(vertices,faces,skin.Normals);
         Check(skin.TopologyChanged,"Rig reset failed to rebuild new anatomy");
+        skin.Reset();skin.Clear();
+        skin.Section(Vector3.zero,Vector3.up*60,12,9,4,3,4,Vector3.right);
+        skin.Build(Vector3.zero,vertices,faces);Closed(vertices,faces,skin.Normals);
+        Check(vertices.Max(v=>Math.Abs(v.z))>10&&vertices.Max(v=>Math.Abs(v.x))<5,"Explicit native face frame did not orient elliptical depth");
+        var oriented=vertices.ToArray();var orientedNormals=skin.Normals.ToArray();
+        skin.Clear();skin.Section(Vector3.zero,Vector3.up*60,12,9,4,3,4,Vector3.forward);
+        skin.Build(Vector3.zero,vertices,faces);
+        Check(!skin.TopologyChanged,"Turning native face frame rebuilt skin");
+        Check(vertices.Select((v,i)=>Vector3.Distance(v,new Vector3(-oriented[i].z,oriented[i].y,oriented[i].x))).All(d=>d<.01f),"Head frame turn distorted bound geometry");
+        Check(skin.Normals.Select((v,i)=>Vector3.Distance(v,new Vector3(-orientedNormals[i].z,orientedNormals[i].y,orientedNormals[i].x))).All(d=>d<.01f),"Turned geometry has stale lighting normals");
         ReferencePose();
         Console.WriteLine("PASS: "+checks+" sculpted skin assertions: closed finite geometry, bidirectional cap bounds, large-coordinate anchors, smooth normals, rigid animation/topology reuse and separated length-preserving reference poses.");
     }
@@ -92,5 +102,11 @@ static class SculptedSkinTests
         }
         Check(Vector3.Distance(reference["NKnee_1"],reference["NKnee_2"])>40,"Reference thighs remain in contact");
         Check(Vector3.Distance(reference["NToeTip_1"],reference["NToeTip_2"])>60,"Reference feet overlap");
+        live["NTop"]=live["NHead"]+new Vector3(3,-22,4);
+        live["NHeadF"]=live["NHead"]+new Vector3(11,1,2);
+        for(int side=1;side<=2;side++)live["NKnuckles_"+side]=live["NWrist_"+side]+new Vector3(4,-6,2);
+        reference=FighterReferencePose.Create(live);
+        foreach(var pair in new[]{("NHead","NTop"),("NHead","NHeadF"),("NWrist_1","NKnuckles_1"),("NWrist_2","NKnuckles_2")})
+            Check(Math.Abs(Vector3.Distance(reference[pair.Item1],reference[pair.Item2])-Vector3.Distance(live[pair.Item1],live[pair.Item2]))<.001f,"Head or hand landmark length changed in reference");
     }
 }

@@ -24,9 +24,9 @@ namespace Eclipse.Rendering
         public Mesh SurfaceMesh => volume != null ? volume.GetComponent<MeshFilter>().sharedMesh : null;
         public float DepthAnchor => Ready && pose.TryGetValue("NPivot",out var pivot) ? pivot.z : 0;
         static readonly string[] Anchors = {
-            "NNeck", "NHead", "NChest", "NStomach", "NPivot",
-            "NShoulder_1", "NElbow_1", "NWrist_1", "NFingertips_1",
-            "NShoulder_2", "NElbow_2", "NWrist_2", "NFingertips_2",
+            "NNeck", "NHead", "NTop", "NHeadF", "NChest", "NStomach", "NPivot",
+            "NShoulder_1", "NElbow_1", "NWrist_1", "NKnuckles_1", "NFingertips_1",
+            "NShoulder_2", "NElbow_2", "NWrist_2", "NKnuckles_2", "NFingertips_2",
             "NHip_1", "NKnee_1", "NAnkle_1", "NHeel_1", "NToeTip_1",
             "NHip_2", "NKnee_2", "NAnkle_2", "NHeel_2", "NToeTip_2" };
 
@@ -109,10 +109,20 @@ namespace Eclipse.Rendering
             Vector3 neck = P("NNeck", .85f), chest = P("NChest", .85f), waist = P("NStomach", .85f), pelvis = P("NPivot", .85f);
             Loft(new[] { pelvis + (pelvis-waist).normalized*8, pelvis, waist, chest, neck },
                 new[] { 9f, 20f, 15f, 21f, 7f }, new[] { 8f, 13f, 11f, 14f, 6f });
-            Vector3 head = P("NHead", .9f), up = (head-neck).normalized;
-            skin.Section(neck,head-up*5,6,7,5,6,4);
-            skin.Ellipsoid(head+up*4,up,11,14,9.5f);
-            skin.Ellipsoid(head-up*6,up,8.5f,8,8);
+            Vector3 head = P("NHead", .9f), top=P("NTop",.9f), up = (top-head).normalized;
+            // Native top landmarks can stretch during physics reactions. Keep
+            // the presentation crown proportional while retaining its direction.
+            top=head+up*Mathf.Clamp(Vector3.Distance(head,top)*.78f,12f,18f);
+            Vector3 front=P("NHeadF",.9f)-head;
+            front=(front-up*Vector3.Dot(front,up)).normalized;
+            if(front.sqrMagnitude<.01f)front=Vector3.forward;
+            // Tapered jaw, cheek, brow and crown share a connected skull skin.
+            // Its depth frame follows the native face landmark through turns.
+            skin.Section(neck,head-up*9,5.5f,6.5f,5f,6f,3,front);
+            Loft(new[] {head-up*9+front*1.5f,head-up*3+front,head+up*5,
+                Vector3.Lerp(head,top,.72f),top-up*2},
+                new[] {6.5f,9.5f,10.5f,9f,5f},new[] {7f,9f,9.5f,8.5f,5f},front);
+            skin.Section(head+front*8+up,head+front*11.5f+up*.5f,2.4f,1.8f,2.2f,1.7f,2,up);
             for (int side = 1; side <= 2; side++)
             {
                 string suffix = "_"+side;
@@ -121,9 +131,9 @@ namespace Eclipse.Rendering
                 Loft(new[] { chest, shoulder, Vector3.Lerp(shoulder,elbow,.48f), elbow,
                     Vector3.Lerp(elbow,wrist,.35f), wrist },
                     new[] { 12f, 13f, 11f, 7f, 9f, 5f }, new[] { 10f, 10f, 8f, 6f, 7f, 4f });
-                Vector3 fingers=P("NFingertips"+suffix,.65f), hand=Vector3.Lerp(wrist,fingers,.45f);
-                Loft(new[] { wrist, hand, Vector3.Lerp(hand,fingers,.65f), fingers },
-                    new[] { 4.5f, 6.5f, 6f, 3.5f }, new[] { 3.5f, 4.5f, 4f, 3f });
+                Vector3 fingers=P("NFingertips"+suffix,.65f), knuckles=P("NKnuckles"+suffix,.65f);
+                Loft(new[] { wrist,Vector3.Lerp(wrist,knuckles,.55f),knuckles,fingers },
+                    new[] { 4.5f,6.5f,6f,3f }, new[] { 3.5f,3.5f,3.2f,2.5f });
                 Vector3 hip=P("NHip"+suffix,.7f), knee=P("NKnee"+suffix,.7f), ankle=P("NAnkle"+suffix,.7f);
                 Vector3 heel=P("NHeel"+suffix,.7f), toe=P("NToeTip"+suffix,.7f);
                 // The same skin continues through the ankle into a flattened
@@ -140,12 +150,12 @@ namespace Eclipse.Rendering
             Vector3 value = pose[name]; float anchor=pose["NPivot"].z;
             value.z=anchor+(value.z-anchor)*depth; return value;
         }
-        void Loft(Vector3[] path, float[] width, float[] depth)
+        void Loft(Vector3[] path, float[] width, float[] depth,Vector3? depthAxis=null)
         {
             // Cross sections contribute to one blended field. Shoulders, hips,
             // elbows and ankles no longer carry separate intersecting end caps.
             for(int segment=0;segment<path.Length-1;segment++)
-                skin.Section(path[segment],path[segment+1],width[segment],width[segment+1],depth[segment],depth[segment+1],4);
+                skin.Section(path[segment],path[segment+1],width[segment],width[segment+1],depth[segment],depth[segment+1],4,depthAxis);
         }
         void LateUpdate()
         {

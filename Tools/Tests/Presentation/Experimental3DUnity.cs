@@ -145,6 +145,8 @@ public static class Experimental3DUnity
                     if (captured < 3) return;
                     if(FighterVolume.ReviewExposure == 1) { FighterVolume.ReviewExposure = 4; Capture("fighters-3d-bright-inspection.png"); return; }
                     if(captured < 4)return;
+                    if(FighterVolume.ReviewExposure == 4) { FighterVolume.ReviewExposure = 8; Capture("fighters-3d-brighter-inspection.png"); return; }
+                    if(captured < 5)return;
                     FighterVolume.ReviewExposure = 1;
                     SF2DisplayFrameRate.ToggleExperimental3D(); Next(); break;
                 case 6:
@@ -161,9 +163,11 @@ public static class Experimental3DUnity
                     Check(perspective.enabled && !Pose(player).SequenceEqual(pose), "Animation did not resume in 3D");
                     fight.SetPaused(true); Capture("fighters-3d-animation.png"); Next(); break;
                 case 8:
-                    if (captured < 5) return;
-                    if(captured==5 && FighterVolume.ReviewExposure==1){FighterVolume.ReviewExposure=4;Capture("fighters-3d-bright-animation.png");return;}
-                    if(captured<6)return;
+                    if (captured < 6) return;
+                    if(captured==6 && FighterVolume.ReviewExposure==1){FighterVolume.ReviewExposure=4;Capture("fighters-3d-bright-animation.png");return;}
+                    if(captured<7)return;
+                    if(captured==7 && FighterVolume.ReviewExposure==4){FighterVolume.ReviewExposure=8;Capture("fighters-3d-brighter-animation.png");return;}
+                    if(captured<8)return;
                     FighterVolume.ReviewExposure=1;
                     var bodies=UnityEngine.Object.FindObjectsByType<ProceduralFighterBody>(FindObjectsInactive.Include,FindObjectsSortMode.None).Where(b=>b.Ready).ToArray();
                     Check(bodies.Length == 2,"Standard fighter bodies were not reconstructed");
@@ -196,6 +200,10 @@ public static class Experimental3DUnity
                     var panelMesh=panelTest.GetComponent<MeshFilter>().sharedMesh;
                     Check(panelMesh.vertexCount==50&&panelMesh.triangles.Length==288,"Cloth did not share subdivision edges or emitted internal walls");
                     Check(panelMesh.vertices.Max(v=>v.z)-panelMesh.vertices.Min(v=>v.z)>10,"Cloth interior stayed a flat slab");
+                    var rotatedQuad=quad.Select(p=>new Vector3(p.z,p.y,-p.x)).ToArray();
+                    panelTest.Surface(rotatedQuad,quadFaces,Color.black,new[]{"Cloth-Triangle1","Cloth-Triangle2"});
+                    Check(panelMesh.vertices.Max(v=>v.x)-panelMesh.vertices.Min(v=>v.x)>10,"Turned cloth lost its curved local thickness");
+                    Check(panelMesh.vertices.Max(v=>v.z)-panelMesh.vertices.Min(v=>v.z)<39,"Turned cloth extruded along world depth instead of its surface normal");
                     panelTest.Surface(quad,quadFaces,Color.black,new[]{"WEAPON-Triangle1","WEAPON-Triangle2"},true);
                     // The cache key includes native topology/body selection; use a new
                     // immutable topology array when the owning native mesh changes.

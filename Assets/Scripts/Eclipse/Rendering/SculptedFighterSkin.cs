@@ -18,6 +18,10 @@ namespace Eclipse.Rendering
             pose["NChest"] = pose["NStomach"] + Vector3.down * Length("NStomach", "NChest");
             pose["NNeck"] = pose["NChest"] + Vector3.down * Length("NChest", "NNeck");
             pose["NHead"] = pose["NNeck"] + Vector3.down * Length("NNeck", "NHead");
+            // Keep head landmarks on their own frame, rather than treating the
+            // skull as an oval at a single rig point.
+            if(live.ContainsKey("NTop"))pose["NTop"]=pose["NHead"]+Vector3.down*Length("NHead","NTop");
+            if(live.ContainsKey("NHeadF"))pose["NHeadF"]=pose["NHead"]+Vector3.forward*Length("NHead","NHeadF");
             float shoulders = Mathf.Clamp(Length("NShoulder_1", "NShoulder_2") * .5f, 14, 28);
             float hips = Mathf.Clamp(Length("NHip_1", "NHip_2") * .5f, 12, 22);
             for (int side = 1; side <= 2; side++)
@@ -31,6 +35,8 @@ namespace Eclipse.Rendering
                 pose["NElbow" + s] = pose["NShoulder" + s] + arm * Length("NShoulder" + s, "NElbow" + s);
                 pose["NWrist" + s] = pose["NElbow" + s] + forearm * Length("NElbow" + s, "NWrist" + s);
                 pose["NFingertips" + s] = pose["NWrist" + s] + forearm * Length("NWrist" + s, "NFingertips" + s);
+                if(live.ContainsKey("NKnuckles"+s))
+                    pose["NKnuckles"+s]=pose["NWrist"+s]+forearm*Length("NWrist"+s,"NKnuckles"+s);
                 pose["NHip" + s] = root + Vector3.right * (sign * hips);
                 pose["NKnee" + s] = pose["NHip" + s] + leg * Length("NHip" + s, "NKnee" + s);
                 pose["NAnkle" + s] = pose["NKnee" + s] + leg * Length("NKnee" + s, "NAnkle" + s);
@@ -83,14 +89,18 @@ namespace Eclipse.Rendering
         public readonly List<Vector3> Normals = new List<Vector3>(16000);
         int nx,ny,nz;
         float cell;
+        int[] skinFaces;
+        Vector3[] normalSums;
+        List<int>[] skinNeighbors;
         const float Blend=5f;
         public double LastBuildMilliseconds { get; private set; }
         public void Clear()=>sections.Clear();
-        public void Section(Vector3 start,Vector3 end,float widthA,float widthB,float depthA,float depthB,float cap=6)
+        public void Section(Vector3 start,Vector3 end,float widthA,float widthB,float depthA,float depthB,float cap=6,Vector3? depthAxis=null)
         {
             Vector3 axis=end-start;float length=axis.magnitude;
             axis=length>.001f?axis/length:Vector3.up;
-            Vector3 across=Vector3.Cross(axis,Vector3.forward).normalized;
+            Vector3 across=Vector3.Cross(axis,depthAxis??Vector3.forward).normalized;
+            if(across.sqrMagnitude<.01f)across=Vector3.Cross(axis,Vector3.up).normalized;
             if(across.sqrMagnitude<.01f)across=Vector3.right;
             Vector3 deep=Vector3.Cross(across,axis).normalized;
             float width=Mathf.Max(widthA,widthB),depth=Mathf.Max(depthA,depthB);
@@ -196,7 +206,13 @@ namespace Eclipse.Rendering
                     }
                 }
             }
-            if(Connected(vertices.Count,faces))Bind(vertices);
+            if(Connected(vertices.Count,faces))
+            {
+                skinNeighbors=SmoothSeed(vertices,faces);
+                skinFaces=faces.ToArray();normalSums=new Vector3[vertices.Count];
+                RefreshNormals(vertices);
+                Bind(vertices);
+            }
             timer.Stop();LastBuildMilliseconds=timer.Elapsed.TotalMilliseconds;
         }
         static bool Connected(int count,List<int> faces)
@@ -207,6 +223,53 @@ namespace Eclipse.Rendering
             {int root=Root(faces[i]);parent[Root(faces[i+1])]=root;parent[Root(faces[i+2])]=root;}
             int component=Root(faces[0]);foreach(int vertex in faces)if(Root(vertex)!=component)return false;
             return true;
+        }
+        static List<int>[] SmoothSeed(List<Vector3> vertices,List<int> faces)
+        {
+            // Remove extraction-grid ridges before binding. Alternating steps
+            // soften the surface without the shrinkage of repeated averaging.
+            var neighbors=new List<int>[vertices.Count];
+            for(int i=0;i<neighbors.Length;i++)neighbors[i]=new List<int>(12);
+            for(int i=0;i<faces.Count;i+=3)for(int corner=0;corner<3;corner++)
+            {
+                int a=faces[i+corner],b=faces[i+(corner+1)%3];
+                if(!neighbors[a].Contains(b))neighbors[a].Add(b);
+                if(!neighbors[b].Contains(a))neighbors[b].Add(a);
+            }
+            var next=new Vector3[vertices.Count];
+            for(int pass=0;pass<4;pass++)
+            {
+                float amount=pass%2==0?.42f:-.44f;
+                for(int i=0;i<vertices.Count;i++)
+                {
+                    Vector3 mean=Vector3.zero;foreach(int n in neighbors[i])mean+=vertices[n];
+                    next[i]=neighbors[i].Count==0?vertices[i]:vertices[i]+amount*(mean/neighbors[i].Count-vertices[i]);
+                }
+                for(int i=0;i<vertices.Count;i++)vertices[i]=next[i];
+            }
+            return neighbors;
+        }
+        void RefreshNormals(List<Vector3> vertices)
+        {
+            Array.Clear(normalSums,0,normalSums.Length);
+            for(int i=0;i<skinFaces.Length;i+=3)
+            {
+                int a=skinFaces[i],b=skinFaces[i+1],c=skinFaces[i+2];
+                Vector3 normal=Vector3.Cross(vertices[b]-vertices[a],vertices[c]-vertices[a]);
+                normalSums[a]+=normal;normalSums[b]+=normal;normalSums[c]+=normal;
+            }
+            for(int i=0;i<vertices.Count;i++)
+                if(normalSums[i].sqrMagnitude>1e-12f)Normals[i]=normalSums[i].normalized;
+            // Keep broad sculpted lighting across the extraction triangles,
+            // while preserving pronounced changes such as the jaw and nose.
+            for(int i=0;i<vertices.Count;i++)
+            {
+                Vector3 sum=Normals[i];int count=1;
+                foreach(int neighbor in skinNeighbors[i])
+                    if(Vector3.Dot(Normals[i],Normals[neighbor])>.5f){sum+=Normals[neighbor];count++;}
+                normalSums[i]=Vector3.Lerp(Normals[i],sum/count,.65f).normalized;
+            }
+            for(int i=0;i<vertices.Count;i++)Normals[i]=normalSums[i];
         }
         void Bind(List<Vector3> vertices)
         {
@@ -259,6 +322,9 @@ namespace Eclipse.Rendering
                 }
                 vertices[v]=point;Normals[v]=normal.normalized;
             }
+            // Joint blending changes the surface, not just section orientation.
+            // Light the actual deformed skin instead of a rotated rest normal.
+            RefreshNormals(vertices);
             timer.Stop();LastDeformMilliseconds=timer.Elapsed.TotalMilliseconds;
         }
         float[] bindLengths;
