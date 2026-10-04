@@ -267,6 +267,14 @@ async function main() {
     notify('textDocument/didChange',{textDocument:{uri:burstUri,version:2},contentChanges:[{text:burstText}]});
     try { await until(()=>diagnostics.has(burstKey)&&diagnostics.get(burstKey).length===0,'clean scripted burst diagnostics'); } catch(error) { console.error(JSON.stringify(diagnostics.get(burstKey))); throw error; }
     console.log('PASS: projectile registration/receipt completion and complete Scripted Burst source');
+    const rangedText=fs.readFileSync(path.resolve(__dirname,'../../../Mods/example.ranged-actors/scripts/main.lua'),'utf8');
+    const rangedUri=open('ranged-actors.lua',rangedText+'\nsf2.price.coins("bad")\n');const rangedKey=decodeURIComponent(rangedUri).toLowerCase();
+    await until(()=>diagnostics.get(rangedKey)?.some(d=>d.code==='param-type-mismatch'),'ranged actors diagnostic publication');
+    notify('textDocument/didChange',{textDocument:{uri:rangedUri,version:2},contentChanges:[{text:rangedText}]});
+    try { await until(()=>diagnostics.has(rangedKey)&&diagnostics.get(rangedKey).length===0,'clean ranged actor diagnostics'); } catch(error) { throw new Error(error.message+'\n'+JSON.stringify(diagnostics.get(rangedKey),null,2)); }
+    const rangedProbe=probe('ranged-host.lua','local sf2=require("sf2")\nsf2.behaviors.register{id="ranged",on_actor_spawn=function(_,fighter)\n fighter:|\nend}');
+    await until(async()=>{const found=labels(await request('textDocument/completion',rangedProbe));return ['spawn_projectile','projectiles'].every(name=>found.some(label=>label.startsWith(name)));},'actor-host projectile completion');
+    console.log('PASS: actor-host projectile methods and complete Ranged Companion Duel source');
     const arenaOptions=probe('arena-options.lua','local sf2=require("sf2")\nsf2.behaviors.register {id="x",on_tick=function(_,fighter)\n fighter:mark_rect { | }\nend}');
     await until(async()=>{const found=labels(await request('textDocument/completion',arenaOptions));return ['x','y','width','height'].every(key=>found.some(n=>n.startsWith(key)));},'arena rectangle fields');
     const arenaTarget=probe('arena-target.lua','local sf2=require("sf2")\nsf2.behaviors.register {id="x",on_tick=function(_,fighter)\n fighter.opponent:|\nend}');

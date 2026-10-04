@@ -63,14 +63,21 @@ public partial class Fight
     private bool _applyingEclipseProjectileSpawns;
     private PendingProjectileSpawn _materializingEclipseProjectile;
 
+    // Do not broaden the main-fighter motion/playback authority. Projectiles
+    // additionally accept a settled, living owned actor, whose original main
+    // owner, round, session and native body must still be valid.
+    private bool CanUseEclipseProjectileRoot(Model root) => CanMoveEclipseFighter(root) ||
+        root != null && _eclipseActors.TryGetValue(root, out var actor) && actor.Spawned &&
+        actor.Birth == null && ActorValid(actor, false, out _);
+
     private bool TryQueueEclipseProjectileSpawn(Model root, ModId owner, DefinitionId definition,
         double x, double y, double z, Action<string, string> complete, out string error)
     {
         error = null;
         var session = ModRuntime.Scripts;
-        if (_applyingEclipseProjectileSpawns || session == null || !CanMoveEclipseFighter(root) || IsPaused() ||
+        if (_applyingEclipseProjectileSpawns || session == null || !CanUseEclipseProjectileRoot(root) || IsPaused() ||
             !ProjectileOwnerActive(session, owner))
-        { error = "Projectile spawning requires a living main fighter during an active offline simulation callback."; return false; }
+        { error = "Projectile spawning requires a living main fighter or initialized actor during an active offline simulation callback."; return false; }
         if (definition.Namespace != owner || !session.Content.TryGetProjectile(definition, out var prefab))
         { error = "Projectile definition must be registered by the calling mod."; return false; }
         if (!ModFighterMotionLimits.IsValid(x, y, z))
@@ -85,7 +92,7 @@ public partial class Fight
 
     private bool ProjectileSpawnValid(PendingProjectileSpawn request) => request.Round == round.round &&
         ReferenceEquals(request.Session, ModRuntime.Scripts) && ProjectileOwnerActive(request.Session, request.Owner) &&
-        CanMoveEclipseFighter(request.Root);
+        CanUseEclipseProjectileRoot(request.Root);
 
     private static void FinishEclipseProjectileSpawn(PendingProjectileSpawn request, string id, string error)
     {
@@ -204,7 +211,7 @@ public partial class Fight
         bool accepted = ModId.TryParse(ownerName, out var owner) &&
             lifetime >= 1 && lifetime <= ModProjectileLimits.MaximumLifetimeFrames &&
             ModRuntime.Scripts != null && ProjectileOwnerActive(ModRuntime.Scripts, owner) &&
-            CanMoveEclipseFighter(parent?.GetRootModel()) && !IsPaused() &&
+            CanUseEclipseProjectileRoot(parent?.GetRootModel()) && !IsPaused() &&
             _eclipseProjectiles.Count + _eclipseProjectileSpawns.Count < ModProjectileLimits.MaximumPerFight &&
             _eclipseProjectiles.Values.Count(p => p.Owner == owner) + _eclipseProjectileSpawns.Count(p => p.Owner == owner) < ModProjectileLimits.MaximumPerMod;
         if (!accepted) UnityEngine.Debug.LogWarning("[ModProjectiles] Spawn rejected for " + ownerName + ": active offline fighter, valid lifetime and available ownership capacity required.");
@@ -228,7 +235,7 @@ public partial class Fight
             entry.Removing || JLEFIKJODGG.Contains(entry.Model) ||
             (!LNDLFINJHDB.Contains(entry.Model) && !HCPGFOCGDAA.Contains(entry.Model)) ||
             !ReferenceEquals(entry.Session, ModRuntime.Scripts) || !ProjectileOwnerActive(entry.Session, entry.Owner) ||
-            entry.Round != round.round || !CanMoveEclipseFighter(entry.Root) ||
+            entry.Round != round.round || !CanUseEclipseProjectileRoot(entry.Root) ||
             entry.Model.GetRootModel() != entry.Root || entry.Birth == null && fightTimeInFrame - entry.Born >= entry.Lifetime ||
             (mutation && IsPaused()))
         { error = "Projectile has expired, is removing, or is outside its active offline owner/round."; return false; }
@@ -237,8 +244,8 @@ public partial class Fight
     private bool TryGetEclipseProjectiles(Model root, ModId owner, out IReadOnlyList<IModProjectile> projectiles, out string error)
     {
         projectiles = null; error = null;
-        if (!CanMoveEclipseFighter(root) || !ProjectileOwnerActive(ModRuntime.Scripts, owner))
-        { error = "Projectile observations require a living main fighter during an active offline round."; return false; }
+        if (!CanUseEclipseProjectileRoot(root) || !ProjectileOwnerActive(ModRuntime.Scripts, owner))
+        { error = "Projectile observations require a living main fighter or initialized actor during an active offline round."; return false; }
         projectiles = _eclipseProjectiles.Values.Where(p => p.Root == root && p.Owner == owner && p.Birth == null && ProjectileValid(p, false, out _))
             .OrderBy(p => p.Sequence).Cast<IModProjectile>().ToArray();
         return true;
@@ -280,5 +287,12 @@ public partial class Fight
         var pending = _eclipseProjectileSpawns.ToArray(); _eclipseProjectileSpawns.Clear();
         foreach (var request in pending) FinishEclipseProjectileSpawn(request, null, "Projectile spawn cancelled by round/fight teardown.");
         foreach (var entry in _eclipseProjectiles.Values.ToArray()) RetireEclipseProjectile(entry);
+    }
+    private void CancelEclipseActorProjectiles(Model root)
+    {
+        var pending = _eclipseProjectileSpawns.Where(request => request.Root == root).ToArray();
+        _eclipseProjectileSpawns.RemoveAll(request => request.Root == root);
+        foreach (var request in pending) FinishEclipseProjectileSpawn(request, null, "Actor retired before projectile creation.");
+        foreach (var entry in _eclipseProjectiles.Values.Where(entry => entry.Root == root).ToArray()) RetireEclipseProjectile(entry);
     }
 }

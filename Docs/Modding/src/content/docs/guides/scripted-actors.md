@@ -149,6 +149,7 @@ and incoming scaling matching actual health loss, fresh replacement state and
 exactly-once end callbacks on dismissal/surrender. Managed checks additionally
 exercise expired self references, copied observations and failed-state rollback.
 
-This is a reusable autonomous and reactive fighter foundation. Actor-authored
-projectiles, custom rigs/outfits, every arena/weapon pairing, custom
+For actor-authored projectiles, continue with
+[companion ranged abilities](../projectile-abilities/#give-a-companion-a-ranged-ability).
+This is a reusable autonomous and reactive fighter foundation. Custom rigs/outfits, every arena/weapon pairing, custom
 victory conditions, exported players, raids and multiplayer need separate work.

@@ -2,6 +2,13 @@
 
 Last broad reconciliation: 2026-09-12. Scope remains **G01–G14 plus E1–E8**.
 
+2026-10-04 actor projectile abilities: settled independent roots now use typed
+projectile spawning/queries and Lua motion. Retirement cancels queued births and
+live children while preserving siblings. Ranged Companion Duel passes 49 native
+checks; projectile managed acceptance passes 585. See
+ACTOR_PROJECTILES_ACCEPTANCE.md. Ranged companion/enemy/turret authoring advances
+E1/E2/E5; broad creator/content/platform gates remain open.
+
 2026-10-04 reactive actor hosts: definitions attach owned behaviors and typed
 parameters; each spawn has independent transient state and spawn/end, tick,
 contact/damage and animation callbacks. Scripted Actor Sparring 1.1.0 proves

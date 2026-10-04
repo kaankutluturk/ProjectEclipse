@@ -170,3 +170,53 @@ active simulation callbacks. [Live projectiles](../../api/projectiles/) explains
 coordinate timing, shared capacity, receipts and birth/action limits. Managed
 and editor validation of the example and controlled native acceptance have
 different scopes; neither proves general summons with health, AI or teams.
+
+## Give a companion a ranged ability
+
+[Ranged Companion Duel](https://github.com/dawc17/ProjectEclipse/tree/main/Mods/example.ranged-actors)
+combines independent fighters with live projectiles. Install the example, enter
+Act I Tournament 3 and summon the pair. Each actor's attached Lua behavior keeps
+its own cooldown/shot/hit state, queues a registered shuriken, checks the applied
+receipt, and guides only that actor's children each tick. The main fighter does
+not cast or control those darts. Hold fire stops new shots; dismissal retires
+both actors and all their children.
+
+The behavior needs `combat.projectiles` in addition to the controller's
+`combat.actors`. Register a compatible flight and projectile definition before
+the attached behavior. The host's `fighter:snapshot()` supplies the actor's
+position and current target. Use that to choose an X offset and flight direction;
+world X does not mirror automatically. Actor behaviors use the same
+`fighter:spawn_projectile`, `fighter:projectiles`, `projectile:snapshot` and
+`projectile:move_by` methods as a main fighter.
+
+```lua
+-- Fragment: dart is an owned projectile definition; cooldown is a declared
+-- integer state field. Put this in an actor's attached behavior.
+on_tick = function(self, fighter)
+    local body = fighter:snapshot()
+    if not body or not body.opponent then return end
+    self.state.cooldown = self.state.cooldown - 1
+    if self.state.cooldown <= 0 then
+        local direction = body.opponent.position.x >= body.self.position.x and 1 or -1
+        local receipt = fighter:spawn_projectile(dart, direction * 75, 0)
+        if receipt.status == "failed" then sf2.log.warn(receipt.error) end
+        self.state.cooldown = 90
+    end
+end,
+```
+
+The complete example retains receipts until a later callback can match their IDs
+to initialized live children. Queries filter by both calling mod and actual
+caster root: a main summoner or another actor cannot guide this actor's children.
+Copied contact observations supply both projectile and actor identity. Native
+attack geometry and hostility decide contact; Lua displacement is not swept
+collision. Actor removal/death/expiry cancels its queued births and removes live
+children. `on_actor_end` cannot issue projectile operations.
+
+The complete example passes native acceptance for actor-root births/receipts,
+rendered child flight, repeated contact in both directions, caster provenance,
+unchanged main health, hold/resume, pause, replacement and live-child teardown.
+A controlled retirement race also checks failed queued births and preserves a
+sibling's children. These checks use the bundled core missile rig/flight and a
+controlled Campaign encounter. Arbitrary outfits, every stance/arena, native equipment casts on
+actors, exported players, raids and multiplayer need separate acceptance.

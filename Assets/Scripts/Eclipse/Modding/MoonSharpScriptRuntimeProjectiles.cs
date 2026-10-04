@@ -98,7 +98,7 @@ namespace Eclipse.Modding
                 if (!active()) throw new ScriptRuntimeException("Projectile references have expired; reacquire inside the current callback.");
                 _api.RequireCapability("combat.projectiles");
                 if (kind == ModEffectEvent.FightBegin || kind == ModEffectEvent.RoundBegin ||
-                    kind == ModEffectEvent.RoundEnd || kind == ModEffectEvent.FightEnd)
+                    kind == ModEffectEvent.RoundEnd || kind == ModEffectEvent.FightEnd || kind == ModEffectEvent.ActorEnd)
                     throw new ScriptRuntimeException("Projectile operations require an active simulation callback.");
             }
             private DynValue ProjectileTable(IModProjectile projectile, ModEffectEvent kind, Func<bool> active)

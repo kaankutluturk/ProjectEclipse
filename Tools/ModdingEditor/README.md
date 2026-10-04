@@ -1,5 +1,12 @@
 # Eclipse Modding for VS Code
 
+The `ranged-actors` starter gives two independent fighters their own typed Lua
+cooldown state and native projectile abilities. Actor-host `spawn_projectile`
+and `projectiles` use `combat.projectiles`; queries stay scoped to that actor and
+calling mod. Copied attacks carry both projectile and actor IDs. Actor retirement
+cancels pending births and removes live children; `on_actor_end` rejects projectile
+operations. Registration and editor diagnostics do not replace native contact tests.
+
 Independent fighter completion covers `sf2.actors.register`, spawn receipts,
 owned actor/event queries and callback-scoped snapshot, motion, target, health,
 move playback and dismissal. The `templates/actor-companions` example mirrors

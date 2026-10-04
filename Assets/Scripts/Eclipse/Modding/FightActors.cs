@@ -373,6 +373,7 @@ public partial class Fight
         if(!_eclipseActors.TryGetValue(actor.Model,out var current)||current!=actor)return;
         actor.Removing=true;
         DispatchEclipseActor(actor,ModEffectEvent.ActorEnd,endReason:reason);
+        CancelEclipseActorProjectiles(actor.Model);
         _eclipseActors.Remove(actor.Model);
         _eclipseShields.Remove(actor.Model);
         foreach(var key in _eclipseStatusIcons.Keys.Where(key=>key.Item1==actor.Model).ToArray())TryClearEclipseStatusIcon(actor.Model,key.Item2,out _);

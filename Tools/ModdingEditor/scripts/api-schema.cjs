@@ -373,7 +373,7 @@ fn('fx.stain',{definition:E('FxStainDefinition')},'string','presentation.visuals
 type("QuestSuppression",{target:"string"});reg("quests.suppress","QuestSuppression",null,"content.patch");
 type('ProfileEquipmentSnapshot',{'item?':'string','type?':'string','subtype?':'string',owned:'boolean',count:'integer','upgrade?':'integer',enchantments:['string[]','Qualified lower-case perk IDs of the current enchantments, in native order; unknown perks are omitted.']});fn('profile.equipment',{},E('ProfileEquipmentSnapshot')+'[]','profile.read');
 type('Projectile',{});
-type('ProjectileSnapshot',{id:'string',name:'string',animation_name:'string',position:E('CombatPosition'),age_frames:'integer',lifetime_frames:'integer'});
+type('ProjectileSnapshot',{id:['string','Fight-local child identity. Queries are scoped to the calling mod and actual main/actor caster root.'],name:'string',animation_name:'string',position:E('CombatPosition'),age_frames:'integer',lifetime_frames:'integer'});
 const projectileMethods = {
     snapshot:{params:{},returns:E('ProjectileSnapshot')+'|nil, string|nil',capability:'combat.projectiles'},
     move_by:{params:{x:'number',y:'number',z:'number?'},returns:'boolean, string|nil',capability:'combat.projectiles'},

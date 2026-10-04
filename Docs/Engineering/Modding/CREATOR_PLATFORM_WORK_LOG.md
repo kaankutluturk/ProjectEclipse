@@ -1,5 +1,13 @@
 # Creator platform implementation record
 
+2026-10-04: actor behavior hosts now create and guide their own typed native
+projectiles. Queries stay mod/caster-scoped; retirement fails pending receipts,
+releases reservations and removes live children. Ranged Companion Duel supplies
+actual public Lua/native contact and a mirrored starter. See
+[actor projectile acceptance](ACTOR_PROJECTILES_ACCEPTANCE.md) for source/API,
+49 native checks, 585 controlled production checks, creator tooling and limits.
+The full Minecraft-style creator objective remains open.
+
 2026-10-04: independent actor definitions now attach owned stateful behaviors,
 with spawn/end, tick, contact/damage and animation callbacks. Native bonuses and
 mitigation match actual health loss; each replacement has fresh state. See

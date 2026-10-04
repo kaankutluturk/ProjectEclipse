@@ -607,3 +607,13 @@ test('actor behavior callbacks infer self references and enforce their capabilit
  assert(result.issues.some(issue=>issue.code==='callback-timing'&&issue.message.includes('remove')));
  assert.deepEqual(result.contexts.map(context=>context.callback),['on_actor_spawn','on_actor_end']);
 });
+
+test('ranged actor starter mirrors flight assets and terminal projectile commands are rejected',async()=>{
+ const dir=path.resolve(__dirname,'../../../Mods/example.ranged-actors');const mod=await p.indexMod(dir);assert.deepEqual(mod.issues,[]);
+ const source=await fs.readFile(path.join(dir,'scripts/main.lua'),'utf8');assert.deepEqual(p.analyze(source,mod).issues,[]);
+ for(const file of ['mod.toml','README.md','scripts/main.lua','assets/animations/shuriken_fly.bytes'])assert.deepEqual(await fs.readFile(path.join(dir,file)),await fs.readFile(path.resolve(__dirname,'../templates/ranged-actors',file)));
+ const missing={...mod,data:{...mod.data,capabilities:mod.data.capabilities.filter(cap=>cap!=='combat.projectiles')}};
+ assert(p.analyze(source,missing).issues.some(issue=>issue.capability==='combat.projectiles'));
+ const terminal='local sf2=require("sf2");sf2.behaviors.register{id="x",on_actor_end=function(_,fighter) fighter:projectiles();fighter:spawn_projectile(dart,0,0) end}';
+ assert.equal(p.analyze(terminal,mod).issues.filter(issue=>issue.code==='callback-timing').length,2);
+});

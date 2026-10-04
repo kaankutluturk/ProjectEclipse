@@ -1,5 +1,14 @@
 # Regression tests and validators
 
+Ranged independent fighters: `Combat/TestRangedActorsUnity.ps1` runs the actual
+Ranged Companion Duel Lua/HUD and native child geometry/contact in an isolated
+Unity fixture. It checks actor-root provenance/receipts, repeated bidirectional
+damage, unchanged main life, pause, hold/resume, live-child teardown and a
+controlled queued-birth retirement race with sibling children preserved.
+`Combat/TestProjectiles.ps1` complements it with production Lua/partial-source
+ownership, eligibility, capacity, lifetime, expiry and cancellation checks using
+controlled native inputs. These scopes do not imply arbitrary rig/platform support.
+
 Independent fighters: `Combat/TestActorDefinitions.ps1` checks production Lua
 registration, bounds, strict fields, typed behavior attachments/parameters,
 rollback/fingerprints, private instance state and callback-scoped self references.

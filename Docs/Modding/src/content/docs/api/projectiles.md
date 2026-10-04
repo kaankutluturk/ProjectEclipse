@@ -9,32 +9,40 @@ projectile spawned with `fighter:spawn_projectile`. Its owner is the mod declari
 the action or definition, even when `start_move` belongs to a dependency.
 Names do not grant ownership. Vanilla children and legacy `create_player` actions
 are not exposed. Queries return only this mod's children rooted in the callback's
-main fighter. There is no opponent query.
+fighter root, including an independent actor's attached behavior. A main fighter
+cannot query its companions' children, and sibling actors cannot query each
+other's children. There is no opponent query.
 
 Declare `combat.projectiles` in `mod.toml`. Operations require a living main
-fighter in an active offline round. Local versus, title sparring, PvP and network
+fighter or successfully initialized live actor in an active offline round.
+An actor also requires its original main owner, body, round and script session to
+remain valid. Local versus, title sparring, PvP and network
 raids are excluded; supported offline mod raids use the same guard. Fight/round
-begin and end callbacks reject operations. Reacquire each callback; retain copied
+begin and end callbacks, including `on_actor_end`, reject operations.
+`on_actor_spawn` can queue a child after the actor has settled. Reacquire each callback; retain copied
 snapshots and IDs for Lua state. IDs are strings unique within a fight, not save
 identifiers. These references never expose native models or arbitrary actors.
 
 Projectiles are native weapon children: they have no independent fighter health,
 AI controller or team membership. Use [independent fighters](../actors/) for
 companions or additional opponents with their own health, native AI and teams.
-Projectile queries remain scoped to the spawning main fighter; actor roots do
-not expose typed projectile methods yet.
+An actor behavior uses the same typed spawning/query methods and capabilities.
+Native equipment timeline spawns also register against their actual actor root.
+Children inherit that root's hostility and current native target. They do not
+become separate team members or transfer attack credit to the main summoner.
 
 Native contact callbacks supply a copied
 [`event.attack`](../combat-callbacks/#identify-the-attack-that-made-contact).
 For tracked typed children, its `projectile_id` matches `snapshot().id` and
-`projectile_owner` names the declaring mod. Use those observations to distinguish
+`projectile_owner` names the declaring mod. Actor-cast children also supply
+`actor_id` and `actor_owner` for their caster. Use those observations to distinguish
 your own projectile's hit from ordinary attacks or another mod's child. They stay
 readable after deletion but grant no live handle, and do not change query ownership.
 
 ## sf2.projectiles.register
 
 Declare a reusable native child-weapon definition. Ordinary Lua decides when,
-where and how often to spawn it; a main-fighter cast move is optional.
+where and how often to spawn it; a caster move is optional.
 
 **Signature:** `sf2.projectiles.register(definition)`
 
@@ -96,7 +104,7 @@ references raise an error. Host/eligibility/capacity rejection immediately fails
 the receipt.
 
 **When:** Active simulation callbacks such as `on_tick`, on the callback's own
-main fighter. Offsets are relative to its weighted native center of mass at **application**, not
+main fighter or live actor host. Offsets are relative to that root's weighted native center of mass at **application**, not
 request time. They use world axes: positive Y points down; X is not automatically
 mirrored. Omitted/nil Z is zero. Creation runs after native collisions and before
 animation selection. Native birth starts the move, then the entire rig and
@@ -125,9 +133,11 @@ end
 ```
 
 Accepted queues reserve shared capacity: **16 children/requests per mod across
-both fighters, 64 per fight**, including timeline spawns. Initializing/removing
+all main and actor roots, 64 per fight**, including timeline spawns. Initializing/removing
 children occupy capacity until retirement. Each request settles independently;
 a loop can produce a partial burst. Pause freezes queued work and lifetime.
+Actor retirement immediately cancels its pending requests, fails their receipts
+and retires its live/initializing children. They cannot outlive their actor root.
 Round/fight exit, death, form replacement, owner/session loss or native birth
 failure cancels pending initialization and settles receipts. Failure removes any
 registered child through native cleanup. Queries exclude direct children still
@@ -156,6 +166,10 @@ At most 32 queries per callback; exceeding that limit raises an error.
 
 **When:** Active simulation callbacks, including `on_tick`. Removing and still-initializing direct children
 are excluded. Reads see native state before queued commands apply.
+
+For an actor behavior this returns only this mod's children rooted in that actor;
+its main summoner's children and its siblings' children are excluded. An unborn,
+defeated, expired or retiring actor rejects the query.
 
 **Requires:** `combat.projectiles`.
 
@@ -260,7 +274,7 @@ earlier. Nondefault lifetime affects the content compatibility fingerprint;
 existing default fingerprints are preserved. Children do not survive rounds or
 save reloads.
 
-At most 16 live typed children per mod across both fighters and 64 per fight.
+At most 16 live typed children per mod across all main and actor roots and 64 per fight.
 Extra scheduled spawns are rejected before construction with a
 `[ModProjectiles]` game-log warning. Pending native deletion may retain a capacity
 slot until retirement. These limits apply without `combat.projectiles` too; the

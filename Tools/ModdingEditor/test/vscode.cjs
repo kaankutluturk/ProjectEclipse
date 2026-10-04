@@ -155,6 +155,17 @@ exports.run = async function () {
         }
         assert(projectileFound,'Callback-scoped projectile completion missing');
         passed.push('PASS: owned projectile snapshot/movement/removal completion from fighter query');
+        const rangedUri=vscode.Uri.joinPath(folder.uri,'scripts','ranged-host.lua');
+        fs.writeFileSync(rangedUri.fsPath,'local sf2=require("sf2")\nsf2.behaviors.register{id="ranged",on_actor_spawn=function(_,fighter)\n fighter:\nend}');
+        await vscode.workspace.openTextDocument(rangedUri);
+        let rangedFound=false;const rangedDeadline=Date.now()+30000;
+        while(Date.now()<rangedDeadline){
+            const result=await vscode.commands.executeCommand('vscode.executeCompletionItemProvider',rangedUri,new vscode.Position(2,9));
+            if(['spawn_projectile','projectiles'].every(name=>result?.items.some(item=>String(typeof item.label==='string'?item.label:item.label.label).startsWith(name)))){rangedFound=true;break;}
+            await new Promise(resolve=>setTimeout(resolve,500));
+        }
+        assert(rangedFound,'Actor-host projectile methods missing');
+        passed.push('PASS: actor spawn projectile creation/query completion');
         const spawnUri=vscode.Uri.joinPath(folder.uri,'scripts','spawn-completion.lua');
         fs.writeFileSync(spawnUri.fsPath,'local sf2=require("sf2")\nlocal flight=sf2.moves.register{id="flight",animation="animations/flight"}\nlocal dart=sf2.projectiles.register{id="dart",name="dart",core_skeleton="SkeletonMissile",start_move=flight,copy_parent_type="Weapon"}\nsf2.behaviors.register{id="spawn",on_tick=function(_,fighter)\n local receipt=fighter:spawn_projectile(dart,0,0)\n local value=receipt.\nend}');
         const spawnDoc=await vscode.workspace.openTextDocument(spawnUri);const spawnPosition=spawnDoc.positionAt(spawnDoc.getText().indexOf('receipt.\n')+8);

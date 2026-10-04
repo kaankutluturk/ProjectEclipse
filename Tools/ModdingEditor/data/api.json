@@ -141,7 +141,7 @@
       "returns": "An opaque projectile **definition handle**, owned by this mod. This reusable recipe is distinct from a callback-scoped live projectile reference. Invalid fields, duplicate IDs or missing/inaccessible references fail transactional registration; a failed mod adds no definitions.",
       "capability": "content.register",
       "url": "https://dawc17.github.io/ProjectEclipse/api/projectiles/#sf2projectilesregister",
-      "summary": "Declare a reusable native child-weapon definition. Ordinary Lua decides when, where and how often to spawn it; a main-fighter cast move is optional.",
+      "summary": "Declare a reusable native child-weapon definition. Ordinary Lua decides when, where and how often to spawn it; a caster move is optional.",
       "requires": "`content.register`. Spawning separately needs `combat.projectiles`.",
       "when": "Mod startup, before registration commits. Required: local `id`, native actor `name`, `core_skeleton`, a registered `start_move`, and exactly one of `item` or `copy_parent_type`. Optional `lifetime_frames` defaults to 180."
     },
@@ -5866,7 +5866,10 @@
     },
     "ProjectileSnapshot": {
       "fields": {
-        "id": "string",
+        "id": [
+          "string",
+          "Fight-local child identity. Queries are scoped to the calling mod and actual main/actor caster root."
+        ],
         "name": "string",
         "animation_name": "string",
         "position": "Eclipse.CombatPosition",

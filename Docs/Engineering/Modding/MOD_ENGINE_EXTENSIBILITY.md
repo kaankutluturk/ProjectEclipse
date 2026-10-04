@@ -1,5 +1,11 @@
 # Eclipse as a general Shadow Fight 2 mod engine
 
+The [actor projectile extension](ACTOR_PROJECTILES_ACCEPTANCE.md) supports
+typed native ranged abilities on independent roots, with scoped queries,
+Lua guidance, caster provenance and retirement cleanup. Ranged Companion Duel
+proves controlled native contact and lifecycle; arbitrary content and complete
+creator/platform acceptance remain open.
+
 The 2026-10-04 [owned actor API](ACTOR_API_ACCEPTANCE.md) adds a reusable
 companion/adversary foundation with native lifecycle, teams and procedural Lua
 commands. The [reactive actor follow-up](ACTOR_BEHAVIORS_ACCEPTANCE.md) adds private

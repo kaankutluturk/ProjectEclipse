@@ -1,5 +1,10 @@
 # Reactive independent fighter behaviors
 
+Historical actor-host snapshot: the subsequent
+[actor projectile extension](ACTOR_PROJECTILES_ACCEPTANCE.md) adds typed spawning
+and queries on these hosts. The projectile limitation below applied at this
+initial acceptance; other listed limits retain their stated verification scope.
+
 2026-10-04. Owned actor definitions can attach reusable Lua behavior instances.
 This advances E1/E2/E5 beyond AI decisions: each actor can react to native events
 and maintain typed state. G01–G14/E1–E8 remain open.

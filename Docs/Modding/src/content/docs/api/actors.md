@@ -22,9 +22,9 @@ observations; see [scripted companions](../../guides/scripted-actors/). Attach a
 optional `behavior` for per-actor state, ticks, contact/damage and animation
 callbacks, plus explicit spawn/end notifications. Actors are separate from
 [weapon-child projectiles](../projectiles/).
-Typed projectile spawning/queries currently require a main fighter; an actor
-does not expose those methods. Native equipment moves may still create their
-ordinary weapon children.
+An attached behavior can create and guide its own typed projectiles with
+`combat.projectiles`; see [live projectiles](../projectiles/). Its query is scoped
+to that actor and mod. Native equipment moves can also create weapon children.
 
 ## sf2.actors.register
 
@@ -114,12 +114,16 @@ scoped `fighter.actor` methods with `combat.actors`. Opponent mutation additiona
 requires `combat.target`. A lethal applied hit still notifies the actor host,
 but cannot be reversed by queued healing. References expire after each callback.
 
-Actor callbacks cannot spawn additional actors/projectiles, query main-fighter
-actor/projectile collections, change forms, set native combat flags, block player
+Actor callbacks cannot spawn additional actors, query main-fighter
+actor collections, change forms, set native combat flags, block player
 controls, or claim round-outcome authority. Those host operations remain limited
 to their existing supported contexts. Native equipment can still create children.
 The complete [Scripted Actor Sparring example](../../guides/scripted-actors/)
 demonstrates separate state, outgoing bonuses, incoming mitigation and cleanup.
+[Ranged Companion Duel](../../guides/projectile-abilities/#give-a-companion-a-ranged-ability)
+uses the same actor host to spawn and guide native children. Actor death,
+expiration, dismissal or teardown cancels queued projectile births and removes
+live children; callbacks cannot retain them past the caster's lifetime.
 
 ## fighter:spawn_actor
 

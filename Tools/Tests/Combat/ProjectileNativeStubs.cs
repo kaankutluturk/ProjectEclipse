@@ -51,8 +51,14 @@ public sealed class Model
 public sealed class InfoAnimation { public string Name; }
 public partial class Fight
 {
-    private sealed class OwnedActor { public string Id; public ModId Owner; }
+    // ActorValid is a controlled prerequisite here; the separate native actor
+    // fixture exercises the actual actor owner/body/lifetime implementation.
+    private sealed class OwnedActor { public string Id; public ModId Owner; public bool Spawned, Available=true; public object Birth; public Model Body; }
     private readonly Dictionary<Model,OwnedActor> _eclipseActors=new Dictionary<Model,OwnedActor>();
+    private bool ActorValid(OwnedActor actor,bool mutation,out string error){error=null;return actor.Available&&actor.Body.Health>0&&CanMoveEclipseFighter(Player);}
+    public Model AddActor(ModId owner,bool spawned=true,bool birth=false){var body=new Model();_eclipseActors[body]=new OwnedActor{Id="a"+(_eclipseActors.Count+1),Owner=owner,Body=body,Spawned=spawned,Birth=birth?new object():null};return body;}
+    public void MakeActorUnavailable(Model body)=>_eclipseActors[body].Available=false;
+    public void RetireActor(Model body){MakeActorUnavailable(body);CancelEclipseActorProjectiles(body);_eclipseActors.Remove(body);}
     public static Fight Current;
     public readonly List<Model> LNDLFINJHDB=new List<Model>(),HCPGFOCGDAA=new List<Model>(),JLEFIKJODGG=new List<Model>();
     private int fightTimeInFrame=>Clock;
@@ -85,7 +91,7 @@ public partial class Fight
     public void Materialize(){ApplyEclipseProjectileSpawns();}
     public void InitializeBirths(){InitializeEclipseProjectileBirths();}
     public bool QueueSpawn(Model root,ModId owner,DefinitionId definition,double x,double y,double z,Action<string,string> done,out string error)=>TryQueueEclipseProjectileSpawn(root,owner,definition,x,y,z,done,out error);
-    public IModFighterOperations Operations()=>new EclipseFighterOperations(this,Player);
+    public IModFighterOperations Operations(Model body=null)=>new EclipseFighterOperations(this,body??Player);
     public sealed class EclipseFighterOperations : IModFighterOperations, IModFighterMotion, IModFighterPlayback, IModFighterTargets, IModCombatSnapshotSource, IModAnimationLifecycleSource, IModDamageEventSource, IModIncomingHitSource, IModFighterProjectiles, IModFighterProjectileSpawning
     {
         readonly Fight fight; readonly Model body;

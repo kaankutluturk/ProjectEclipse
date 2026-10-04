@@ -19,7 +19,7 @@ static class Program
         string parent=Path.Combine(fixture,Guid.NewGuid().ToString("N")),dir=Path.Combine(parent,id);
         Directory.CreateDirectory(Path.Combine(dir,"scripts"));Directory.CreateDirectory(Path.Combine(dir,"assets/animations"));File.WriteAllBytes(Path.Combine(dir,"assets/animations/flight.bytes"),new byte[]{1,2,3});
         File.WriteAllText(Path.Combine(dir,"mod.toml"),"schema=1\nid=\""+id+"\"\nname=\"Projectiles\"\nversion=\"1.0.0\"\nauthors=[\"Fixture\"]\nentrypoint=\"scripts/main.lua\"\ncapabilities=["+string.Join(",",caps.Split(',').Select(c=>"\""+c+"\""))+"]\n");
-        File.WriteAllText(Path.Combine(dir,"scripts/main.lua"),"local sf2=require('sf2');local saved,request;local calls=0;"+prefix+";local function callback(_,fighter,event) calls=calls+1; "+body+" end;sf2.behaviors.register{id='test',on_tick=callback,on_round_begin=callback,on_round_end=callback,on_fight_begin=callback,on_fight_end=callback,on_damage_dealt=callback,on_damage_received=callback,on_damage_dealing=callback,on_damage_resolving=callback,on_block=callback,on_critical=callback,on_hit_post_crit=callback,on_post_hit=callback}");
+        File.WriteAllText(Path.Combine(dir,"scripts/main.lua"),"local sf2=require('sf2');local saved,request;local calls=0;"+prefix+";local function callback(_,fighter,event) calls=calls+1; "+body+" end;sf2.behaviors.register{id='test',on_tick=callback,on_round_begin=callback,on_round_end=callback,on_fight_begin=callback,on_fight_end=callback,on_damage_dealt=callback,on_damage_received=callback,on_damage_dealing=callback,on_damage_resolving=callback,on_block=callback,on_critical=callback,on_hit_post_crit=callback,on_post_hit=callback,on_actor_spawn=callback,on_actor_end=callback}");
         var mod=ModDiscovery.DiscoverLoose(parent).Mods.Single();var content=new ModContentCatalog();
         using var tx=content.BeginRegistration(mod);
         var ctx=new MoonSharpScriptRuntime().CreateContext(mod,new ModApiFacade(mod,new AssetResolver(new IAssetProvider[]{new LooseModProvider(mod)}),tx,new ModStateRuntime(),null));ctx.ExecuteEntrypoint();tx.Commit();
@@ -95,6 +95,43 @@ static class Program
         }
     }
 
+    static void ActorRoots()
+    {
+        string prefix=Flight+Prefab;
+        using(var l=Load("if calls==1 then request=fighter:spawn_projectile(prefab,12,-30);assert(request.status=='queued') else assert(request.status=='applied');local list=assert(fighter:projectiles());assert(#list==1 and list[1]:snapshot().position.x==112);assert(list[1]:move_by(8,0));saved=list[1] end",prefix:prefix))
+        {
+            var f=Native(l);var body=f.AddActor(l.Mod.Id);body.X=100;
+            Check(Invoke(l,f,out var error,ModEffectEvent.ActorSpawn,f.Operations(body)),error);
+            f.ProjectileStep();Check(f.HCPGFOCGDAA.Single().GetRootModel()==body,"Child rooted in main instead of actor");
+            Check(f.Query(f.Player,l.Mod.Id,out var main,out _)&&main.Count==0,"Main query leaked actor children");
+            var peer=f.AddActor(l.Mod.Id);Check(f.Query(peer,l.Mod.Id,out var empty,out _)&&empty.Count==0,"Sibling query leaked actor children");
+            Check(Invoke(l,f,out error,operations:f.Operations(body)),error);f.ProjectileStep();Check(f.HCPGFOCGDAA.Single().X==120,"Actor child motion did not apply");
+            var source=f.Attack(f.HCPGFOCGDAA.Single(),new Model.StrikeResult{Point=new Vector3f(0,0,0),AttackAnimation=new InfoAnimation{Name="flight"}});
+            Check(source.Kind=="projectile"&&source.ActorId=="a1"&&source.ProjectileId=="1"&&source.ActorOwner==l.Mod.Id.Value,"Actor/projectile provenance missing");
+            Check(!Invoke(l,f,out error,ModEffectEvent.ActorEnd,f.Operations(body))&&error.Contains("simulation"),"Terminal actor callback acquired projectile authority");
+            f.RetireActor(body);f.ProjectileStep();Check(f.HCPGFOCGDAA.Count==0,"Actor retirement retained initialized child");
+        }
+        foreach(string state in new[]{"unborn","birth","unavailable","owner-death","actor-death","pause","round","retire-before-create","retire-before-init"})
+        using(var l=Load("request=fighter:spawn_projectile(prefab,0,0)",prefix:prefix))
+        {
+            var f=Native(l);var body=f.AddActor(l.Mod.Id,state!="unborn",state=="birth");
+            string receiptId=null,receiptError=null;bool completed=false;
+            if(state=="unavailable")f.MakeActorUnavailable(body);
+            if(state=="owner-death")f.Player.Health=0;
+            if(state=="actor-death")body.Health=0;
+            if(state=="pause")f.Paused=true;
+            bool queued=f.QueueSpawn(body,l.Mod.Id,l.Content.Projectiles.Single().Id,0,0,0,(id,error)=>{receiptId=id;receiptError=error;completed=true;},out _);
+            bool shouldQueue=state=="round"||state.StartsWith("retire-");Check(queued==shouldQueue,"Actor eligibility mismatch: "+state);
+            if(!queued){Check(f.HCPGFOCGDAA.Count==0,"Rejected actor reached factory");continue;}
+            if(state=="round")f.round.round++;
+            if(state=="retire-before-init")f.Materialize();
+            if(state.StartsWith("retire-"))f.RetireActor(body);
+            f.ProjectileStep();Check(completed&&receiptId==null&&receiptError!=null&&f.HCPGFOCGDAA.Count==0,"Actor cancellation did not fail receipt/clean child: "+state);
+        }
+        using(var l=Load("fighter:projectiles()", "content.register",prefix:prefix))
+        {var f=Native(l);var body=f.AddActor(l.Mod.Id);Check(!Invoke(l,f,out var error,operations:f.Operations(body))&&error.Contains("capability"),"Actor bypassed combat.projectiles");}
+    }
+
     static void ShippedBurst(string repo)
     {
         var mod=ModDiscovery.DiscoverLoose(Path.Combine(repo,"Mods")).Mods.Single(m=>m.Id.Value=="example.scripted-burst");
@@ -133,6 +170,7 @@ static class Program
     {
         fixture=args[0];
         SpawnTests();
+        ActorRoots();
         ShippedBurst(args[1]);
         using(var l=Load("local a=event.attack;assert(a.kind=='projectile' and a.projectile_owner==sf2.mod.id and a.projectile_id=='1');assert(a.model_name=='fixture.dart' and a.animation_name=='contact' and a.point.x==12 and a.point.y==-4 and a.point.z==3);if saved then assert(saved.point.x==999) end;saved=a;a.point.x=999;a.projectile_id='fake'", "content.register"))
         {
