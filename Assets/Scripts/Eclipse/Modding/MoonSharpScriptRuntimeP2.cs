@@ -187,7 +187,7 @@ namespace Eclipse.Modding
             {
                 if (value.Type != DataType.Table) throw new ModContentException("Encounter plan must be a table.");
                 var table = value.Table;
-                ValidateFields(table,"encounter plan","warriors","level","rounds","round_time","rules","description");
+                ValidateFields(table,"encounter plan","warriors","level","rounds","round_time","rules","description","player_character");
                 var warriors = new List<DefinitionId>();
                 var list = table.Get("warriors");
                 if (!list.IsNil())
@@ -223,11 +223,18 @@ namespace Eclipse.Modding
                         rules.Add(id);
                     }
                 }
+                DefinitionId? playerCharacter=null;
+                if(!table.Get("player_character").IsNil())
+                {
+                    var id=RequiredHandle(table,"player_character",_warriorHandles,"warrior","encounter plan");
+                    if(id.Namespace!=Mod.Id)throw new ModContentException("Generated encounters require an owned player character.");
+                    playerCharacter=id;
+                }
                 return new ModEncounterPlan(warriors,
                     table.Get("level").IsNil() ? (int?)null : RequiredInt(table,"level","encounter plan"),
                     table.Get("rounds").IsNil() ? (int?)null : RequiredInt(table,"rounds","encounter plan"),
                     table.Get("round_time").IsNil() ? (int?)null : RequiredInt(table,"round_time","encounter plan"), rules,
-                    table.Get("description").IsNil() ? null : OptionalStringAllowEmpty(table,"description",null,"encounter plan"));
+                    table.Get("description").IsNil() ? null : OptionalStringAllowEmpty(table,"description",null,"encounter plan"),playerCharacter);
             }
 
             public bool TryPrepareMode(ModModeDefinition mode, int step, int completions, ModModeRequest request, out string error)

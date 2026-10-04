@@ -1932,6 +1932,7 @@ local ModeRequest = {}
 
 ---@class (exact) Eclipse.EncounterPlan
 ---@field warriors? Eclipse.WarriorHandle[]
+---@field player_character? Eclipse.WarriorHandle Owned playable character for this prepared encounter. Omit/nil to inherit the blueprint player; level changes opponents only. Saved with the plan.
 ---@field level? integer
 ---@field rounds? integer
 ---@field round_time? integer

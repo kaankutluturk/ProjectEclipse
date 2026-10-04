@@ -18,6 +18,11 @@ namespace Eclipse.Modding
         private static ModHost _host;
         private static ModScriptSession _scripts;
         private static LegacyContentAdapter _legacyContent;
+        // Selection belongs to a generated FightList instance, not its shared
+        // blueprint/runtime ID. Previews and another prepared instance stay isolated.
+        private sealed class EncounterPlayer { internal DefinitionId Character; }
+        private static System.Runtime.CompilerServices.ConditionalWeakTable<FightList,EncounterPlayer> EncounterPlayers =
+            new System.Runtime.CompilerServices.ConditionalWeakTable<FightList,EncounterPlayer>();
         private static readonly ModDojoSelection DojoSelection = new ModDojoSelection();
         internal static readonly ModStoryEvents StoryEvents = new ModStoryEvents(
             (owner, message) => Debug.LogWarning("[ModStory] " + owner + ": " + message));
@@ -213,6 +218,7 @@ namespace Eclipse.Modding
 
         public static ModScriptSession StartScripts()
         {
+            EncounterPlayers=new System.Runtime.CompilerServices.ConditionalWeakTable<FightList,EncounterPlayer>();
             StoryEvents.Clear();
             _profileRoster = null;
             ModProfileAccess.Clear();
@@ -275,10 +281,12 @@ namespace Eclipse.Modding
                 var original = ListSF.CHMCKGCDGCM(new FightIDS(_scripts.Content.RuntimeFightId(definition.Id)));
                 if (original == null) throw new ModContentException("Generated encounter blueprint is unavailable.");
                 var node = _legacyContent.BuildEncounterNode(definition,plan);
+                if(plan.PlayerCharacter.HasValue)BuildPlayerCharacterParameters(plan.PlayerCharacter.Value);
                 var result = new FightList();
                 ListSF.GetInstance().FOKCPLOMLOK(result,node,original.get_Type(),original.Location,original.Music,original.Battle);
                 result.FightId = new FightIDS(original.FightId.ToString());
                 result.Battle = original.Battle; result.Index = original.Index;
+                if(plan.PlayerCharacter.HasValue)EncounterPlayers.Add(result,new EncounterPlayer {Character=plan.PlayerCharacter.Value});
                 return result;
             };
             ModModeRuntime.SelectNext = (mode,won,step,completions) => {
@@ -306,15 +314,20 @@ namespace Eclipse.Modding
         internal static ModelParameters BuildFightPlayerParameters(FightList fight)
         {
             if (fight == null || _scripts == null) return null;
+            if(EncounterPlayers.TryGetValue(fight,out var selection))return BuildPlayerCharacterParameters(selection.Character);
             foreach (var definition in _scripts.Content.Fights)
             {
                 if (definition.IsCore || !definition.PlayerCharacter.HasValue ||
                     _scripts.Content.RuntimeFightId(definition.Id) != fight.FightId.ToString()) continue;
-                var parameters = BuildFormParameters(definition.PlayerCharacter.Value, true);
-                GameUtils.InitializePlayerCharacterParameters(parameters);
-                return parameters;
+                return BuildPlayerCharacterParameters(definition.PlayerCharacter.Value);
             }
             return null;
+        }
+        private static ModelParameters BuildPlayerCharacterParameters(DefinitionId character)
+        {
+            var parameters=BuildFormParameters(character,true);
+            GameUtils.InitializePlayerCharacterParameters(parameters);
+            return parameters;
         }
 
         private static long _coreImportMs;
@@ -1742,6 +1755,7 @@ namespace Eclipse.Modding
 
         public static void Shutdown()
         {
+            EncounterPlayers=new System.Runtime.CompilerServices.ConditionalWeakTable<FightList,EncounterPlayer>();
             StoryEvents.Clear();
             _profileRoster = null;
             ModProfileAccess.Clear();

@@ -286,7 +286,7 @@ namespace Eclipse.Modding
             if (plans.Count == 0) return null;
             var plan = (XmlElement)plans[0];
             string version = plan.GetAttribute("Version");
-            if ((version != "1" && version != "2") || plan.GetAttribute("Step") != Step.ToString(CultureInfo.InvariantCulture))
+            if ((version != "1" && version != "2" && version != "3") || plan.GetAttribute("Step") != Step.ToString(CultureInfo.InvariantCulture))
                 throw new ModContentException("Unsupported or stale saved encounter; data preserved.");
             var warriors = new List<DefinitionId>();
             List<DefinitionId> rules = null;
@@ -298,7 +298,7 @@ namespace Eclipse.Modding
                     warriors.Add(DefinitionId.Parse(child.GetAttribute("Id")));
                     if (warriors.Count > 64) throw new ModContentException("Saved encounter exceeds 64 warriors.");
                 }
-                else if (version == "2" && child.Name == "Rules" && rules == null)
+                else if (version != "1" && child.Name == "Rules" && rules == null)
                 {
                     rules = new List<DefinitionId>();
                     foreach (XmlNode ruleNode in child.ChildNodes)
@@ -313,8 +313,11 @@ namespace Eclipse.Modding
             }
             if (version == "1" && plan.HasAttribute("Description"))
                 throw new ModContentException("Encounter description requires save version 2.");
+            if (version != "3" && plan.HasAttribute("PlayerCharacter"))
+                throw new ModContentException("Encounter player character requires save version 3; data preserved.");
             return new ModEncounterPlan(warriors, PlanNumber(plan,"Level"), PlanNumber(plan,"Rounds"),
-                PlanNumber(plan,"RoundTime"), rules, plan.HasAttribute("Description") ? plan.GetAttribute("Description") : null);
+                PlanNumber(plan,"RoundTime"), rules, plan.HasAttribute("Description") ? plan.GetAttribute("Description") : null,
+                plan.HasAttribute("PlayerCharacter") ? (DefinitionId?)DefinitionId.Parse(plan.GetAttribute("PlayerCharacter")) : null);
         }
         private static int? PlanNumber(XmlElement node, string name)
         {
@@ -327,7 +330,7 @@ namespace Eclipse.Modding
         {
             if (Entered || ReadPlan() != null) throw new ModContentException("An encounter is already prepared or entered.");
             var node = _node.OwnerDocument.CreateElement("Encounter");
-            node.SetAttribute("Version",plan.Rules != null || plan.Description != null ? "2" : "1");
+            node.SetAttribute("Version",plan.PlayerCharacter.HasValue ? "3" : plan.Rules != null || plan.Description != null ? "2" : "1");
             node.SetAttribute("Step",Step.ToString(CultureInfo.InvariantCulture));
             if (plan.Level.HasValue) node.SetAttribute("Level",plan.Level.Value.ToString(CultureInfo.InvariantCulture));
             if (plan.Rounds.HasValue) node.SetAttribute("Rounds",plan.Rounds.Value.ToString(CultureInfo.InvariantCulture));
@@ -343,6 +346,7 @@ namespace Eclipse.Modding
                 node.AppendChild(rules);
             }
             if (plan.Description != null) node.SetAttribute("Description",plan.Description);
+            if (plan.PlayerCharacter.HasValue) node.SetAttribute("PlayerCharacter",plan.PlayerCharacter.Value.ToString());
             _node.AppendChild(node);
         }
         public void Complete(ModModeDefinition mode, bool won)
@@ -375,14 +379,17 @@ namespace Eclipse.Modding
         // Null inherits the blueprint; an explicit empty list removes its rules.
         public IReadOnlyList<DefinitionId> Rules { get; }
         public string Description { get; }
+        public DefinitionId? PlayerCharacter { get; }
         public ModEncounterPlan(IEnumerable<DefinitionId> warriors = null, int? level = null, int? rounds = null,
-            int? roundTime = null, IEnumerable<DefinitionId> rules = null, string description = null)
+            int? roundTime = null, IEnumerable<DefinitionId> rules = null, string description = null, DefinitionId? playerCharacter = null)
         {
             var copy = warriors == null ? new List<DefinitionId>() : new List<DefinitionId>(warriors);
             if (copy.Count > 64 || level < 1 || level > 1000 || rounds < 1 || rounds > 99 || roundTime < 1 || roundTime > 3600)
                 throw new ModContentException("Encounter permits up to 64 warriors, level 1..1000, rounds 1..99 and round_time 1..3600.");
             foreach (var warrior in copy)
                 if (warrior.Category != "warriors") throw new ModContentException("Encounter requires warrior definition IDs.");
+            if (playerCharacter.HasValue && playerCharacter.Value.Category != "warriors")
+                throw new ModContentException("Encounter player character requires a warrior definition ID.");
             if (rules != null)
             {
                 var ruleCopy = new List<DefinitionId>(rules);
@@ -397,6 +404,7 @@ namespace Eclipse.Modding
                 throw new ModContentException("Encounter description must be at most 1024 characters.");
             Warriors = copy.AsReadOnly(); Level = level; Rounds = rounds; RoundTime = roundTime;
             Description = description;
+            PlayerCharacter = playerCharacter;
         }
     }
 

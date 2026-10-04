@@ -170,7 +170,12 @@ pair's positions; reset spacing before inspecting a controlled single strike.
 Enable the mod, apply and restart, then open **Authored Fighter Lab** on the
 Act I Campaign map. Its owned fight declares `player_character = character`
 alongside its opponent handles. The character occupies the native player slot
-at encounter creation; no later form request is needed. This field requires
+at encounter creation; no later form request is needed. Its setup screen lets
+you choose the authored fighter or core comparison character before launching.
+The callback resolves a prepared plan with `player_character = selected`, so
+the choice is saved with the encounter and retained for a launch retry. Back
+cancels the pending choice without starting combat. The blueprint remains the
+authored character. This field requires
 `content.register`, keeps saved equipment intact, and also applies when a mode
 uses that fight. Omit it to use the saved player's ordinary setup. See
 [fight registration](../../api/content-graph/#sf2fightsregister) for defaults
@@ -196,8 +201,8 @@ The example's HUD calls `fighter:change_form(character)` from its player rule's
 tick callback and displays the live result. This needs `combat.transform`.
 Its **Try core comparison form** button selects another registered warrior
 without the authored body. That is a comparison character, not a snapshot or
-restoration of your original equipment. Restart the owned lab for its declared
-character, or Tournament 3 for the saved player setup. Read
+restoration of your original equipment. The owned lab uses its prepared
+character choice; Tournament 3 uses the saved player setup on restart. Read
 [form changes](../../api/combat-callbacks/#fighterchange_form) for
 state retention, failure handling and supported limits.
 
@@ -229,8 +234,10 @@ directions, repeated Lua attacks, actor-specific callbacks, pause and cleanup.
 It also changes the player through the public form request, dispatches native
 controller Punch events, checks the authored attack's real contact/callbacks,
 and verifies that the comparison form uses core Punch selection.
-Pass `-PlayerEntry` to start the owned lab fight and also check that its declared
-body and player control flags are present before any form request. The runner
+Pass `-PlayerEntry` to choose the authored character through the native lab
+setup screen, or `-ComparisonEntry` to choose its core comparison. These routes
+also check cancellation, saved choice, isolated blueprint/instance parameters,
+and player control flags before any form request. The runner
 starts the registered fight directly; it does not verify clicking the map or
 mode menu entry.
 This establishes the sample's compatible procedural export; it does not validate

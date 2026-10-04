@@ -205,14 +205,16 @@ internal static class Program
         var original=File.ReadAllText(entrypoint);
         try
         {
-            ModContentCatalog Run(string field, bool reject=false)
+            ModEncounterPlan preparedPlan=null;
+            ModContentCatalog Run(string field, bool reject=false, string preparation=null, bool rejectPreparation=false)
             {
                 File.WriteAllText(entrypoint,@"local sf2=require('sf2')
 local hero=sf2.warriors.register{id='hero',level=3}
 local foe=sf2.warriors.register{id='foe',level=2}
 local zone=sf2.zones.register{id='test',file='Map1.1'}
 local battle=sf2.battles.register{id='test',zone=zone,type=sf2.battles.STORY,x=0,y=0}
-sf2.fights.register{id='test',battle=battle,warriors={foe},"+field+"}");
+local fight=sf2.fights.register{id='test',battle=battle,warriors={foe},"+field+"}"+
+                    (preparation==null?"":"\nsf2.modes.register{id='test',fights={fight},on_prepare=function()return {"+preparation+"} end}"));
                 var content=new ModContentCatalog();
                 var assets=new AssetResolver(new IAssetProvider[]{new EmptyCoreProvider(),new LooseModProvider(mod)});
                 using(var registration=content.BeginRegistration(mod))
@@ -220,6 +222,14 @@ sf2.fights.register{id='test',battle=battle,warriors={foe},"+field+"}");
                 {
                     try { context.ExecuteEntrypoint(); registration.Commit(); Assert(!reject,"Invalid player character committed"); }
                     catch(ModScriptException) { Assert(reject,"Valid player character rejected"); }
+                    if(preparation!=null)
+                    {
+                        var request=new ModModeRequest();
+                        bool valid=((IModModePrepareScriptContext)context).TryPrepareMode(content.Modes.Single(),0,0,request,out var error);
+                        Assert(valid!=rejectPreparation,"Unexpected player choice preparation result: "+error);
+                        Assert(!request.IsPending&&(valid?request.Plan!=null:request.Plan==null),"Preparation retained an invalid request");
+                        preparedPlan=request.Plan;
+                    }
                 }
                 Assert(content.Fights.Count==(reject?0:1)&&content.Warriors.Count==(reject?0:2),"Player character registration was not atomic");
                 return content;
@@ -236,6 +246,29 @@ sf2.fights.register{id='test',battle=battle,warriors={foe},"+field+"}");
             foreach(var copy in new[]{fight.WithDescription("changed"),fight.WithRounds(2),fight.WithRoundTime(30),fight.WithPresentation("arena","track"),fight.WithRules(Array.Empty<DefinitionId>(),false),fight.WithWarriors(fight.Warriors.ToArray())})
                 Assert(copy.PlayerCharacter==heroId,"Fight copy discarded its declared player");
             Console.WriteLine("PASS: owned player character public Lua registration, wrong-handle/scalar rejection, transaction rollback, defaults, fingerprint and fight-copy contracts.");
+            var modeCatalog=Run("player_character=foe",preparation:"player_character=hero,rules={},description='choice'");
+            var chosen=preparedPlan;Assert(chosen.PlayerCharacter==heroId,"Prepared player choice lost its typed handle");
+            var mode=modeCatalog.Modes.Single();var save=new XmlDocument();save.LoadXml("<Warrior/>");
+            new ModModeProgress(save.DocumentElement,mode).SavePlan(chosen);
+            Assert(save.SelectSingleNode("Warrior/EclipseModes/Mode/Encounter").Attributes["Version"].Value=="3","Player choice did not use the new save version");
+            var clone=new XmlDocument();clone.LoadXml(save.OuterXml);
+            var restored=new ModModeProgress(clone.DocumentElement,mode).ReadPlan();
+            Assert(restored.PlayerCharacter==heroId&&restored.Rules.Count==0&&restored.Description=="choice","Player/rules/description did not survive plan reload");
+            clone.SelectSingleNode("Warrior/EclipseModes/Mode/Encounter").Attributes["Version"].Value="2";
+            string preserved=clone.OuterXml;bool rejectedOld=false;
+            try{new ModModeProgress(clone.DocumentElement,mode).ReadPlan();}catch(ModContentException){rejectedOld=true;}
+            Assert(rejectedOld&&clone.OuterXml==preserved,"Older save version silently interpreted a new player field");
+            clone.LoadXml(save.OuterXml);var progress=new ModModeProgress(clone.DocumentElement,mode);
+            progress.Enter();progress.Complete(mode,false);Assert(progress.ReadPlan()==null,"Resolved loss retained the previous chosen character plan");
+            foreach(var input in new[]{"","player_character=nil","description='legacy'"})
+            {
+                var c=Run("",preparation:input);var old=new XmlDocument();old.LoadXml("<Warrior/>");
+                var p=new ModModeProgress(old.DocumentElement,c.Modes.Single());p.SavePlan(preparedPlan);
+                Assert(p.ReadPlan().PlayerCharacter==null,"Omitted/nil prepared player changed inheritance");
+                Assert(old.SelectSingleNode("Warrior/EclipseModes/Mode/Encounter").Attributes["Version"].Value==(input.StartsWith("description")?"2":"1"),"Unchanged plan format was needlessly upgraded");
+            }
+            foreach(var input in new[]{"player_character=battle","player_character='hero'","player_character=false"})Run("",preparation:input,rejectPreparation:true);
+            Console.WriteLine("PASS: prepared player choice public Lua validation, defaults, version-3 save/reload, version-1/2 compatibility, preserved rejection and loss consumption.");
         }
         finally { File.WriteAllText(entrypoint,original); }
     }

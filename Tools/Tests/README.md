@@ -9,7 +9,9 @@ core equipment/idle and controlled spacing/profile, not arbitrary rig acceptance
 Player-form coverage changes the canonical player through the public HUD,
 dispatches Punch through the native controller, and checks original-strike
 contact/callbacks and character-specific selection after a comparison swap.
-Pass `-PlayerEntry` to launch its owned fight and verify the authored body and
+Pass `-PlayerEntry` to choose its authored player through the native setup UI,
+or `-ComparisonEntry` for the comparison warrior. Both check Back/reopening,
+saved player choice, isolated generated-instance/blueprint parameters and
 player/control flags before any form request. The fight launches directly;
 map/mode menu clicks are outside this acceptance runner.
 `Tools/Animation/TestAuthoredFighterExample.py` reproduces the shipped geometry,

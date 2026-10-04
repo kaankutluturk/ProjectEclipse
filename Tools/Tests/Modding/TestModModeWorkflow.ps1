@@ -3,7 +3,8 @@ $root = Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $PSScriptRoot
 & (Join-Path $PSScriptRoot 'TestPhase1ShowcaseRuntime.ps1')
 $fixture = Join-Path $root ('Temp/ModModeWorkflow-' + [Guid]::NewGuid().ToString('N'))
 New-Item -ItemType Directory -Force -Path (Join-Path $fixture 'Mods') | Out-Null
-Copy-Item -LiteralPath (Join-Path $root 'Mods/example.generated-expedition') -Destination (Join-Path $fixture 'Mods') -Recurse
+# The generated expedition is an authored, tracked editor starter.
+Copy-Item -LiteralPath (Join-Path $root 'Tools/ModdingEditor/templates/generated-expedition') -Destination (Join-Path $fixture 'Mods/example.generated-expedition') -Recurse
 Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'ValidateModModeWorkflow.cs') -Destination (Join-Path $fixture 'Program.cs')
 $production = [Security.SecurityElement]::Escape((Join-Path $root 'Temp/Phase1ShowcaseRuntime/bin/Debug/net10.0/Phase1ShowcaseRuntime.dll'))
 $moon = [Security.SecurityElement]::Escape((Join-Path $root 'Library/ScriptAssemblies/MoonSharp.Interpreter.dll'))

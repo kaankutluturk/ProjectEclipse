@@ -24,6 +24,8 @@ test('authored fighter starter mirrors native models and original point animatio
  assert(source.includes('player_character = character'));
  const schema=require('../scripts/api-schema.cjs');
  assert.equal(schema.types.FightDefinition.fields['player_character?'][0],'Eclipse.WarriorHandle');
+ assert.equal(schema.types.EncounterPlan.fields['player_character?'][0],'Eclipse.WarriorHandle');
+ assert(source.includes('sf2.modes.resolve(request, { player_character = selected })'));
  assert(!schema.types.FightPatch.fields['player_character?']);
 });
 

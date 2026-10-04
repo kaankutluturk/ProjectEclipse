@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Xml;
 using Eclipse.Modding;
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -28,10 +29,16 @@ public static class AuthoredFighterUnity
     static bool sashDeformed, readerChecked, mirroredRight;
     static Model originalPlayer, authoredPlayer;
     static float formRatio;
-    static int formFrame, playerStarts, playerHits, formApplied;
+    static int formFrame, playerStarts, playerHits, formApplied, inputReadyFrame=-1;
     static bool inputStrike, playerCaptured, enemyUsedAuthored, comparisonUsedAuthored, corePunchSeen;
     static bool initialPlayerChecked;
+    static bool entryRequested,entryCanceled,choiceCaptureStarted,contentChecked;
+    static float choiceOpenedAt=-1;
+    static ModModeDefinition choiceMode;
     static bool PlayerEntry => Environment.GetCommandLineArgs().Contains("-authoredPlayerEntry");
+    static bool ComparisonEntry => Environment.GetCommandLineArgs().Contains("-comparisonPlayerEntry");
+    static XmlNode Profile => (XmlNode)typeof(ModModeRuntime).GetField("_warrior",BindingFlags.Static|BindingFlags.NonPublic).GetValue(null);
+    static ModelParameters EntryPlayer(FightList fight)=>(ModelParameters)typeof(ModRuntime).GetMethod("BuildFightPlayerParameters",BindingFlags.Static|BindingFlags.NonPublic).Invoke(null,new object[]{fight});
     static readonly Dictionary<string,int> starts = new Dictionary<string,int>(), dealt = new Dictionary<string,int>();
     static readonly HashSet<string> receipts = new HashSet<string>(), ended = new HashSet<string>();
     static string Root => Path.GetDirectoryName(Application.dataPath);
@@ -59,19 +66,19 @@ public static class AuthoredFighterUnity
         var body=model.GetModelObject(); var root=body.FindNodeOrParent("NPivot").GetEnd();
         return new[]{0,1,4,5}.SelectMany(i=>{var point=body.FindNodeOrParent("AuthoredSashV"+i).GetEnd();return new[]{point.GetX()-root.GetX(),point.GetY()-root.GetY(),point.GetZ()-root.GetZ()};}).ToArray();
     }
-    static ModUiSurface Surface()
+    static ModUiSurface Surface(string id="authored")
     {
         foreach(var context in (IEnumerable)Field(ModRuntime.Scripts,"_contexts"))
         {
             var scope=context.GetType().GetProperty("UiScope").GetValue(context) as ModUiScope;
             if(scope==null||scope.Owner.Value!=Owner)continue;
-            foreach(ModUiSurface value in ((IDictionary)Field(scope,"surfaces")).Values)if(value.Id=="authored")return value;
+            foreach(ModUiSurface value in ((IDictionary)Field(scope,"surfaces")).Values)if(value.Id==id)return value;
         }
         return null;
     }
-    static void Click(string id)
+    static void Click(string id,ModUiSurface selected=null)
     {
-        var view=UnityEngine.Object.FindObjectsByType<Eclipse.UI.Modding.ModUiView>(FindObjectsInactive.Include,FindObjectsSortMode.None).Single(v=>ReferenceEquals(Field(v,"surface"),surface));
+        var view=UnityEngine.Object.FindObjectsByType<Eclipse.UI.Modding.ModUiView>(FindObjectsInactive.Include,FindObjectsSortMode.None).Single(v=>ReferenceEquals(Field(v,"surface"),selected??surface));
         var button=(Button)Field(((IDictionary)Field(view,"widgets"))[id],"Button");
         Check(button.gameObject.activeInHierarchy&&button.interactable,"Authored lab button unavailable"); button.onClick.Invoke();
     }
@@ -104,23 +111,65 @@ public static class AuthoredFighterUnity
             {
                 if(ModRuntime.Scripts==null||Module.GetInstance()==null)return;
                 var screen=Module.GetInstance().GetCurrentScreenType();if(screen!=ScreenType.ModuleDojo&&screen!=ScreenType.ModuleMap)return;
-                Check(!ModRuntime.Host.HasErrors,ModRuntime.Host.FormatReport());
-                Check(ModRuntime.Scripts.ActiveMods.Any(m=>m.Id.Value==Owner),"Authored mod did not finish registration");
-                Check(ModRuntime.Host.EnabledMods.All(m=>m.Id.Value=="core"||m.Id.Value==Owner),"Unexpected mods enabled");
+                if(Eclipse.UI.TitleScreen.IsOpen||UnityEngine.Object.FindFirstObjectByType<Eclipse.UI.EclipseLoadingOverlay>()!=null)return;
+                if(!contentChecked)
+                {
+                    Check(!ModRuntime.Host.HasErrors,ModRuntime.Host.FormatReport());
+                    Check(ModRuntime.Scripts.ActiveMods.Any(m=>m.Id.Value==Owner),"Authored mod did not finish registration");
+                    Check(ModRuntime.Host.EnabledMods.All(m=>m.Id.Value=="core"||m.Id.Value==Owner),"Unexpected mods enabled");
+                    if(PlayerEntry)Check(ModRuntime.Scripts.Content.TryGetMode(DefinitionId.Parse(Owner+":modes/playable"),out choiceMode),"Playable mode missing");
+                    contentChecked=true;
+                }
+                if(PlayerEntry&&entryRequested)
+                {
+                    var choice=Surface("choose_player");if(choice==null)return;
+                    if(choiceOpenedAt<0){choiceOpenedAt=Time.unscaledTime;return;}
+                    if(Time.unscaledTime-choiceOpenedAt<.4f)return;
+                    if(!entryCanceled)
+                    {
+                        Check((Fight.GetCurrentFight()==null||Fight.GetCurrentFight().GetFightDefinition().get_Type()==BattleType.FightNone)&&new ModModeProgress(Profile,choiceMode).ReadPlan()==null,"Pending choice launched or saved early");
+                        Check(Eclipse.UI.Modding.ModUiGameBridge.TryHandleBack(),"Setup did not route Back");
+                        Check(choice.IsClosed,"Back retained chooser");
+                        entryCanceled=true;entryRequested=false;choiceOpenedAt=-1;return;
+                    }
+                    if(!choiceCaptureStarted){choiceCaptureStarted=true;captured=false;new GameObject("Character chooser capture").AddComponent<AuthoredChoiceCapture>();return;}
+                    if(!captured)return;
+                    Click(ComparisonEntry?"comparison":"authored",choice);
+                    Check(choice.IsClosed&&(Fight.GetCurrentFight()==null||Fight.GetCurrentFight().GetFightDefinition().get_Type()==BattleType.FightNone),"Choice launched recursively or retained lobby");
+                    entered=true;return;
+                }
                 var encounterId=PlayerEntry?Owner+":fights/playable":"core:fights/zone_1/tournament/3";
                 var encounter=ListSF.CHMCKGCDGCM(new FightIDS(ModRuntime.Scripts.Content.RuntimeFightId(DefinitionId.Parse(encounterId))));
-                Check(encounter!=null,"Core encounter missing");entered=GameUtils.StartFight(encounter,false,null,true,false);return;
+                Check(encounter!=null,"Core encounter missing");entered=GameUtils.StartFight(encounter,false,null,true,false);
+                if(PlayerEntry)entryRequested=Surface("choose_player")!=null;
+                return;
             }
             var fight=Fight.GetCurrentFight();var player=fight?.GetPlayerModel();var enemy=fight?.GetEnemyModel();if(player==null||enemy==null)return;
+            // The pending UI resolves before the scene loader retires the dojo.
+            // Inspect only the requested encounter, never its transient training fight.
+            string requestedId=ModRuntime.Scripts.Content.RuntimeFightId(DefinitionId.Parse(PlayerEntry?Owner+":fights/playable":"core:fights/zone_1/tournament/3"));
+            if(fight.GetFightDefinition().FightId.ToString()!=requestedId)return;
             if(PlayerEntry&&!initialPlayerChecked)
             {
-                Check(player.Parameters.EclipseCharacterId==Owner+":warriors/sash_fighter"&&player.Parameters.EclipseBodyModel==Owner+":models/body","Encounter did not start as its declared player character");
+                string expected=Owner+":warriors/"+(ComparisonEntry?"core_comparison":"sash_fighter");
+                Check(player.Parameters.EclipseCharacterId==expected&&(ComparisonEntry?string.IsNullOrEmpty(player.Parameters.EclipseBodyModel):player.Parameters.EclipseBodyModel==Owner+":models/body"),"Encounter did not start as its chosen player character: expected="+expected+" actual="+player.Parameters.EclipseCharacterId+" body="+player.Parameters.EclipseBodyModel+" fight="+fight.GetFightDefinition().FightId+" selected="+EntryPlayer(fight.GetFightDefinition())?.EclipseCharacterId+" canonical="+((ModelParameters)Field(fight,"NMNCKBPFCCP")).EclipseCharacterId+" screen="+Module.GetInstance().GetCurrentScreenType()+" plan="+Profile?.SelectSingleNode("EclipseModes/Mode/Encounter")?.OuterXml+" canceled="+entryCanceled+" choice="+choiceCaptureStarted);
                 Check(player.Parameters.IsPlayer&&player.Parameters.UserControlled&&!player.Parameters.AiControlled,"Declared player entered without native player/input ownership");
                 Check(formApplied==0,"Declared player depended on a live form request");
+                Check(ModRuntime.Scripts.Content.TryGetMode(DefinitionId.Parse(Owner+":modes/playable"),out var mode),"Playable mode missing after entry");
+                var plan=new ModModeProgress(Profile,mode).ReadPlan();
+                Check(plan?.PlayerCharacter?.ToString()==expected,"Chosen character not retained in saved plan");
+                var blueprint=ListSF.CHMCKGCDGCM(new FightIDS(ModRuntime.Scripts.Content.RuntimeFightId(mode.Fights[0])));
+                Check(EntryPlayer(blueprint).EclipseCharacterId==Owner+":warriors/sash_fighter","Prepared character leaked into shared blueprint");
+                var alternate=ModModeRuntime.BuildEncounter(mode,0,new ModEncounterPlan(playerCharacter:DefinitionId.Parse(Owner+":warriors/"+(ComparisonEntry?"sash_fighter":"core_comparison"))));
+                Check(EntryPlayer(alternate).EclipseCharacterId!=expected&&player.Parameters.EclipseCharacterId==expected,"Separate generated instance did not isolate player selection");
+                var missing=new ModEncounterPlan(playerCharacter:DefinitionId.Parse(Owner+":warriors/missing"));
+                bool rejected=false;string before=Profile.OuterXml;
+                try{ModModeRuntime.BuildEncounter(mode,0,missing);}catch(ModContentException){rejected=true;}
+                Check(rejected&&Profile.OuterXml==before,"Unavailable character changed saved preparation");
                 initialPlayerChecked=true;
             }
             if(phase<8)player.Parameters.UserControlled=false;
-            player.Parameters.AiControlled=false;enemy.Parameters.UserControlled=false;enemy.Parameters.AiControlled=false;
+            player.Parameters.AiControlled=false;enemy.Parameters.UserControlled=phase>=10;enemy.Parameters.AiControlled=false;
             int frame=fight.get_FightTimeInFrames();if(frame<100)return;
             switch(phase)
             {
@@ -198,6 +247,10 @@ public static class AuthoredFighterUnity
                 case 9:
                     if(frame-phaseFrame>240)throw new Exception("Authored player form did not settle: "+surface.Read("form_status").Text);
                     if(player==originalPlayer||formApplied<1||Eclipse.UI.Modding.ModUiGameBridge.BlocksGameplayInput)return;
+                    if(inputReadyFrame<0){inputReadyFrame=frame;return;}
+                    // Let the replacement's first native stance initialize before input.
+                    if(frame-inputReadyFrame<6)return;
+                    inputReadyFrame=-1;
                     authoredPlayer=player;
                     Check(player.Parameters.EclipseCharacterId==Owner+":warriors/sash_fighter"&&player.Parameters.EclipseBodyModel==Owner+":models/body","Wrong authored player form");
                     Check(player.Parameters.IsPlayer&&player.Parameters.UserControlled&&!player.Parameters.AiControlled,"Player form lost input eligibility");
@@ -216,11 +269,15 @@ public static class AuthoredFighterUnity
                     if(frame-phaseFrame>240)throw new Exception("Native Punch did not make authored player contact: "+player.GetCurrentAnimation()?.Name+" starts="+playerStarts+" hits="+playerHits+" playerControl="+Field(player,"HCPHOJKFIDM")+" fightInput="+Field(fight,"IOPJDMCBIMM")+" controller="+fight.Controller.IsQuadrantEnabled(FightCID.Punch)+" stage="+Field(fight,"stageType")+" char="+player.Parameters.EclipseCharacterId);
                     if(!inputStrike||Life(enemy)>=beforeHit||player.GetCurrentAnimation()?.Name==Move)return;
                     CheckSource(enemy,player);Check(playerStarts>0&&playerHits>0,"Player input lacked ordinary animation/damage callbacks");
-                    Invoke(enemy,"TrainingMoveToX",950f);enemy.PressAnyKey(FightCID.Punch);enemy.ReleaseAnyKey(FightCID.Punch);
+                    Invoke(enemy,"TrainingMoveToX",950f);enemy.PressAnyKey(FightCID.Punch);
                     Next(fight);break;
                 case 11:
+                    if(frame-phaseFrame>=3)enemy.ReleaseAnyKey(FightCID.Punch);
                     enemyUsedAuthored|=enemy.GetCurrentAnimation()?.Name==Move;
-                    if(frame-phaseFrame<20)return;
+                    // Let the deliberate opponent Punch and the player's hit/block
+                    // reaction finish before testing input on the comparison form.
+                    if(frame-phaseFrame>240)throw new Exception("Opponent comparison action did not settle: "+enemy.GetCurrentAnimation()?.Name+" player="+player.GetCurrentAnimation()?.Name);
+                    if(frame-phaseFrame<60||enemy.NMEEPBDJHMG()&&enemy.GetCurrentAnimation()!=null&&(int)enemy.GetCurrentAnimation().Type==2)return;
                     if(!playerCaptured)Check(!enemyUsedAuthored,"Character-specific Punch leaked to the other fighter");
                     if(!playerCaptured){playerCaptured=true;captured=false;new GameObject("Authored player capture").AddComponent<AuthoredPlayerCapture>();return;}
                     if(!captured)return;
@@ -228,6 +285,10 @@ public static class AuthoredFighterUnity
                 case 12:
                     if(frame-phaseFrame>240)throw new Exception("Core comparison form did not settle: "+surface.Read("form_status").Text);
                     if(player==authoredPlayer||formApplied<2||Eclipse.UI.Modding.ModUiGameBridge.BlocksGameplayInput)return;
+                    if(player.GetCurrentAnimation()?.Name!="StanceIdle")return;
+                    if(inputReadyFrame<0){inputReadyFrame=frame;return;}
+                    if(frame-inputReadyFrame<6)return;
+                    inputReadyFrame=-1;
                     Check(player.Parameters.EclipseCharacterId==Owner+":warriors/core_comparison"&&string.IsNullOrEmpty(player.Parameters.EclipseBodyModel),"Comparison retained authored body identity");
                     Check(player.Parameters.IsPlayer&&player.Parameters.UserControlled&&Math.Abs(Life(player)/player.Parameters.MaxLife-formRatio)<.001&&frame>=formFrame,"Comparison form lost player state");
                     Check(!player.GetModelObject().NAMKCLGOPDD().Any(n=>n.GetName()=="AuthoredSashV5"),"Comparison retained authored sash geometry");
@@ -282,5 +343,9 @@ public sealed class AuthoredFighterCapture : MonoBehaviour
 public sealed class AuthoredPlayerCapture : MonoBehaviour
 {
     IEnumerator Start(){yield return new WaitForEndOfFrame();var texture=ScreenCapture.CaptureScreenshotAsTexture();File.WriteAllBytes(Path.Combine(Path.GetDirectoryName(Application.dataPath),"authored-player-native.png"),texture.EncodeToPNG());UnityEngine.Object.Destroy(texture);AuthoredFighterUnity.Captured();}
+}
+public sealed class AuthoredChoiceCapture : MonoBehaviour
+{
+    IEnumerator Start(){yield return new WaitForEndOfFrame();var texture=ScreenCapture.CaptureScreenshotAsTexture();File.WriteAllBytes(Path.Combine(Path.GetDirectoryName(Application.dataPath),"authored-character-choice.png"),texture.EncodeToPNG());UnityEngine.Object.Destroy(texture);AuthoredFighterUnity.Captured();}
 }
 #endif

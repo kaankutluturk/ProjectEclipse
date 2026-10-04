@@ -164,6 +164,61 @@ The default Tournament route also passes **63 checks** in
 `validation-254cda1ebc1944ed8b603e46842d4736.log`. Both require process exit 0.
 The wiki builds 63 pages and validates 6,826 local links/assets and fragments.
 
+## Prepared player choice follow-up
+
+Authored Fighter Lab 1.3 supplies a public `on_prepare` menu for its owned
+encounter. Back cancels the pending request; choosing the authored or core
+comparison warrior resolves `{ player_character = warrior }` through
+`sf2.modes.resolve`, closes the view and defers native entry until the callback
+returns. Omission/nil inherits the registered fight's player character.
+
+`ModEncounterPlan` stores the optional typed warrior identity. The Lua reader
+rejects scalar, wrong-category and foreign handles; `LegacyContentAdapter`
+checks installed ownership/existence, and native construction validates the
+warrior parameters before the plan is saved. `ModRuntime` associates the choice
+with each generated `FightList` using a weak table, rather than changing the
+shared registered blueprint or choosing by fight ID alone. The existing player
+factory and difficulty paths consume that instance selection.
+
+`ModModeProgress` writes version 3 only when a player choice exists. Versions 1/2
+remain readable and unchanged plans retain their previous format. The managed
+public-Lua fixture verifies typed choice, malformed input rejection, omission/nil,
+save/reload with rules and description, preserved rejection of the new field in
+an old format, and plan consumption on loss. The mode workflow passes 33 checks
+using its tracked editor starter; its runner no longer depends on a missing
+`Mods/example.generated-expedition` directory. All four managed assemblies and
+the wiki build pass. Editor schema/definitions, actual LuaLS and VS Code tests
+cover the encounter-plan field and stay synchronized with the example starter.
+
+Both entry choices pass 78 full-game native checks. The fixture exercises actual choice UI
+cancellation and reopening, both player selections, retained saved selection,
+unchanged shared blueprint, independent generated-instance choices and rejection
+of an unavailable player without save mutation. It must wait for the requested
+fight ID: the dojo training fight can briefly coexist with the loading screen.
+Form-input tests allow the first stance and the deliberate opponent action to
+settle before delivering a real controller Punch, without forcing move playback
+or substituting scripted damage for contact.
+The controlled opponent receives a native control role for its deliberate Punch
+and return to stance; disabling both AI and control leaves no ordinary controller
+to choose the next stance. Menu captures wait for the campaign loading overlay
+and entrance fade, and visual review corrects a clipped hint in the shared sample
+and editor starter.
+
+Authored entry passes in
+`Temp/FighterPlaybackUnity-d997a2c104cd4564b9767ae6eb4b68d8/validation-80f8a50680aa4b86a35e920ce5d4f720.log`;
+comparison entry passes in `validation-8156850303354d559c03e5c389706d45.log`.
+Both finish with process exit 0. The final comparison run also verifies the
+corrected hint. The chooser and player captures are visually reviewed and saved
+to ignored `Temp/AuthoredCharacterChoiceReview-20261004/`. The existing Tournament
+regression passes 63 checks with process exit 0 in
+`validation-c6945061226a47cca4633e529e5adb26.log`. The wiki builds 63 pages and
+validates 6,828 local links/assets and fragments. The editor project suite passes
+58 checks; actual LuaLS and all 25 VS Code integration checks pass.
+
+This selects a temporary encounter character, not a persistent profile loadout.
+Native entry is launched through the registered fight fixture; full map
+navigation, native process restart/resume and exported platforms remain open.
+
 ## Limits
 
 This is the standard compatible rig with custom silhouette geometry and skin,

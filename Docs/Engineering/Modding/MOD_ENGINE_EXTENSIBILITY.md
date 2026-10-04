@@ -22,6 +22,16 @@ form comparison HUD. This narrows playable encounter composition; it does not
 close general profile selection, arbitrary rigs, menu navigation or exported
 platform acceptance.
 
+Prepared encounter plans can also select a typed owned `player_character` from
+a Lua preparation menu. The chosen identity is saved with the plan and bound to
+the generated fight instance; other instances and the shared blueprint keep
+their own selection. Authored Fighter Lab demonstrates cancellation, deferred
+entry and a choice between authored and core-compatible characters. Public Lua,
+save compatibility and editor contracts pass, alongside 78 native checks for each
+player selection in the same authored-fighter record. This advances reusable
+mode composition while persistent profile loadouts, arbitrary rigs and complete
+creator/platform acceptance remain open.
+
 The [actor projectile extension](ACTOR_PROJECTILES_ACCEPTANCE.md) supports
 typed native ranged abilities on independent roots, with scoped queries,
 Lua guidance, caster provenance and retirement cleanup. Ranged Companion Duel

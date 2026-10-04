@@ -1,7 +1,11 @@
 # Authored Fighter Lab
 
 Enable this mod and **Apply & Restart**. In Campaign, open **Authored Fighter Lab**
-on the Act I map. This owned encounter starts you as the authored character;
+on the Act I map. Choose the authored fighter or core comparison in the setup
+screen. The Lua `on_prepare` callback resolves `player_character = selected`
+through `sf2.modes.resolve`; the choice is saved with this encounter, reused
+for a launch retry, and consumed when its result resolves. Back cancels the
+pending choice. This owned fight's default is the authored character;
 use your normal Punch control for its original strike. The fight declares
 `player_character = character` through `sf2.fights.register`. This temporary
 player setup does not change saved equipment and needs `content.register`.
@@ -23,8 +27,9 @@ gets the authored strike. Choose **Try core comparison form** to switch to a
 registered kung-fu character using the core body. This comparison is not a
 snapshot of your original loadout. Form changes are temporary combat operations;
 they retain health percentage and input ownership without editing saved
-equipment. Restart the owned lab fight to use its declared authored character;
-restart Tournament 3 to use your saved player's ordinary setup. Failed
+equipment. The owned lab uses the character chosen for its prepared encounter;
+restart Tournament 3 to use your saved player's ordinary setup. A resolved owned
+encounter opens the chooser again on the next entry. Failed
 requests display their error in the HUD. This requires `combat.transform` in
 addition to the actor demonstration's capabilities.
 

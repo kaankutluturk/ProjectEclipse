@@ -207,6 +207,31 @@ local playable = sf2.fights.register {
     player_character = character, warriors = { core_form }, rules = { rule },
     rewards = { no_reward, win_reward },
 }
-sf2.modes.register { id = "playable", fights = { playable }, repeatable = true }
+sf2.modes.register {
+    id = "playable", fights = { playable }, repeatable = true,
+    on_prepare = function(request)
+        sf2.ui.open {
+            id = "choose_player", mount = "menu",
+            root = { id = "root", kind = "column", width = 440, height = 240, gap = 12,
+                children = {
+                    { id = "title", kind = "text", width = 440, height = 48,
+                      text = "Choose your lab character", style = { font_size = 26 } },
+                    { id = "hint", kind = "text", width = 440, height = 54,
+                      text = "This encounter only.\nSaved equipment stays yours.", style = { font_size = 18 } },
+                    { id = "authored", kind = "button", width = 440, height = 48, text = "AUTHORED FIGHTER (PUNCH)" },
+                    { id = "comparison", kind = "button", width = 440, height = 48, text = "CORE COMPARISON FIGHTER" },
+                },
+            },
+            on_click = function(view, id)
+                if not sf2.modes.is_pending(request) then return end
+                local selected = id == "authored" and character or id == "comparison" and core_form
+                if not selected then return end
+                sf2.modes.resolve(request, { player_character = selected })
+                sf2.ui.close(view)
+            end,
+            on_close = function() sf2.modes.cancel(request) end,
+        }
+    end,
+}
 sf2.quests.register { id = "entry", place = "map", events = { "session" },
     actions = { { type = "show_battle", battle = battle, locked = false } } }

@@ -234,6 +234,7 @@ fight blueprint. All fields are optional:
 | Field | Meaning |
 | --- | --- |
 | `warriors` | Dense array of 1–64 owned warrior handles. Order and repetitions are retained. Omit to inherit the blueprint roster. |
+| `player_character` | Owned warrior handle. Omit or use `nil` to inherit the blueprint's player character, or its normal saved-player setup when none is declared. |
 | `level` | Integer 1–1000 applied to the encounter's warriors. Omit to retain their declared levels. |
 | `rounds` | Integer 1–99; omit to inherit. |
 | `round_time` | Integer 1–3600 seconds; omit to inherit. |
@@ -247,14 +248,34 @@ fight. Native reward settlement and entry tickets remain under host control. Onl
 the generated instance changes; definitions and other fights keep their values.
 The host validates native construction before saving the plan and entering combat.
 
+`player_character` lets a setup screen choose who the player controls. It uses
+that character's declared body, skins, level, equipment and attributes for this
+encounter. Normal player controls and round rules apply, and saved equipment is
+not rewritten. The plan's `level` field changes **opponents only**. Register the
+playable warrior in this mod before preparing the encounter; foreign handles,
+strings, booleans and unavailable characters are rejected. An explicit player
+choice affects only this generated instance, including its difficulty preview.
+The shared fight blueprint and other prepared instances keep their own setup.
+
+```lua
+-- In a setup view callback; hero is this mod's registered warrior handle.
+sf2.modes.resolve(request, { player_character = hero })
+sf2.ui.close(view)
+```
+
+[Authored Fighter Lab](../../guides/character-authoring/#verify-in-a-fight)
+provides a complete two-character chooser using these public callbacks.
+
 Completed plans are stored with the mode's step in the player save, including
-rule selections and the description override. Reload and failed scene-launch
+rule selections, the description override and any player-character choice. Reload and failed scene-launch
 retries reuse the same plan without running `on_prepare` or drawing random numbers
 again. Resolving a fight consumes its plan, including a loss that retries the same
 step. Pending UI/closures are not saved: leaving the scene, changing profile or
 disabling scripts cancels preparation. Press Fight again to recreate a pending
-choice. The host reads older version-1 encounter plans that predate rules and
-description. Unknown newer versions, changed rosters/rules or missing owned
+choice. Plans with a player choice use save version 3. The host also reads
+version-1 plans and version-2 plans containing rules/description; omitting a
+player choice retains the existing version-1/2 save format. Unknown newer
+versions, changed rosters/rules or missing owned
 content are rejected with saved data preserved.
 
 Random draws and other state writes made by Lua are not rolled back if a later
@@ -315,7 +336,7 @@ if sf2.modes.is_pending(request) then
 end
 ```
 
-The [Generated Expedition example](https://github.com/dawc17/ProjectEclipse/tree/main/Mods/example.generated-expedition)
+The [Generated Expedition starter](https://github.com/dawc17/ProjectEclipse/tree/main/Tools/ModdingEditor/templates/generated-expedition)
 combines a saved random stream, generated opponent roster and asynchronous game-
 styled setup UI. Its runtime fixture tests the shipped Lua, cancellation,
 deferred entry and save/reload. Full-game combat acceptance remains a playtest.

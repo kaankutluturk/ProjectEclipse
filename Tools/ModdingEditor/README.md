@@ -13,6 +13,11 @@ Its owned Campaign fight and repeatable mode declare `player_character` with a
 warrior handle, so the authored fighter starts in the player slot. Omission
 keeps the saved player's setup. This is a `content.register` fight field;
 `combat.transform` is required separately for its later HUD form changes.
+Its preparation UI can override that blueprint with an owned warrior handle in
+`sf2.modes.resolve(request, { player_character = selected })`. Completion and
+LuaLS typing cover the plan field; it inherits on omission/nil and saves the
+choice with the encounter. A generated opponent `level` does not change the
+player's declared level.
 
 Authored body/skin geometry receives runtime point/edge/helper validation before
 native model parsing. XML element/field diagnostics occur when loading the

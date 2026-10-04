@@ -286,6 +286,11 @@ async function main() {
     const wrongPlayer=open('fight-player-type.lua','local sf2=require("sf2")\nlocal zone=sf2.zones.register{id="zone",file="Map1.1"}\nlocal battle=sf2.battles.register{id="battle",zone=zone,type=sf2.battles.STORY,x=0,y=0}\nsf2.fights.register{id="fight",battle=battle,player_character=battle}');
     await until(()=>diagnostics.get(decodeURIComponent(wrongPlayer).toLowerCase())?.some(d=>d.code==='assign-type-mismatch'),'player character rejects a battle handle');
     console.log('PASS: owned fight player_character completion and typed-handle diagnostic');
+    const playerPlan=probe('encounter-player-field.lua','local sf2=require("sf2")\nsf2.modes.register{id="test",fights={},on_prepare=function(request)\n sf2.modes.resolve(request,{ | })\nend}');
+    await until(async()=>labels(await request('textDocument/completion',playerPlan)).some(label=>label.replace(/\?$/,'')==='player_character'),'prepared encounter player character completion');
+    const wrongPlan=open('encounter-player-type.lua','local sf2=require("sf2")\nlocal zone=sf2.zones.register{id="zone",file="Map1.1"}\nlocal battle=sf2.battles.register{id="battle",zone=zone,type=sf2.battles.STORY,x=0,y=0}\nsf2.modes.register{id="test",fights={},on_prepare=function(request) sf2.modes.resolve(request,{player_character=battle}) end}');
+    await until(()=>diagnostics.get(decodeURIComponent(wrongPlan).toLowerCase())?.some(d=>d.code==='assign-type-mismatch'),'prepared player character rejects a battle handle');
+    console.log('PASS: prepared player_character completion and typed-handle diagnostic');
     const arenaOptions=probe('arena-options.lua','local sf2=require("sf2")\nsf2.behaviors.register {id="x",on_tick=function(_,fighter)\n fighter:mark_rect { | }\nend}');
     await until(async()=>{const found=labels(await request('textDocument/completion',arenaOptions));return ['x','y','width','height'].every(key=>found.some(n=>n.startsWith(key)));},'arena rectangle fields');
     const arenaTarget=probe('arena-target.lua','local sf2=require("sf2")\nsf2.behaviors.register {id="x",on_tick=function(_,fighter)\n fighter.opponent:|\nend}');

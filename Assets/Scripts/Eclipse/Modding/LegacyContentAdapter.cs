@@ -808,6 +808,9 @@ namespace Eclipse.Modding
 
         public XmlElement BuildEncounterNode(FightDefinition fight, ModEncounterPlan plan)
         {
+            if(plan.PlayerCharacter.HasValue && (plan.PlayerCharacter.Value.Namespace!=fight.Id.Namespace ||
+                !_content.TryGetWarrior(plan.PlayerCharacter.Value,out var playerCharacter)))
+                throw new ModContentException("Generated encounter references an unavailable or foreign player character: "+plan.PlayerCharacter.Value);
             var document = new XmlDocument();
             var node = BuildFightNode(document,fight); document.AppendChild(node);
             var warriors = node["Warriors"];

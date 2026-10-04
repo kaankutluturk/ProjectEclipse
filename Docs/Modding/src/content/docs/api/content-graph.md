@@ -720,7 +720,9 @@ registered and accessible when the content transaction commits.
 This field belongs to owned `sf2.fights.register` definitions. It is not a
 `sf2.fights.patch` field or a general profile/loadout selection operation. A mode
 using the fight, including a generated encounter based on it, keeps this declared
-player character. Use `fighter:change_form` for a later in-fight transition.
+player character unless its [prepared encounter plan](../events-and-modes/#on_prepare)
+supplies an owned `player_character` override. Use `fighter:change_form` for a
+later in-fight transition.
 
 ```lua
 local fight = sf2.fights.register {

@@ -61,6 +61,17 @@ exports.run = async function () {
         }
         assert(playerFieldFound,'Owned fight player_character completion missing');
         passed.push('PASS: owned fight player character field completes in the authored starter');
+        const playerPlanUri=vscode.Uri.joinPath(authoredRoot,'scripts','player-plan.lua');
+        const playerPlanText='local sf2=require("sf2")\nsf2.modes.register{id="test",fights={},on_prepare=function(request)\n sf2.modes.resolve(request,{  })\nend}';
+        fs.writeFileSync(playerPlanUri.fsPath,playerPlanText);await vscode.workspace.openTextDocument(playerPlanUri);
+        let playerPlanFound=false;const playerPlanDeadline=Date.now()+30000;
+        while(Date.now()<playerPlanDeadline){
+            const result=await vscode.commands.executeCommand('vscode.executeCompletionItemProvider',playerPlanUri,new vscode.Position(2,playerPlanText.split('\n')[2].indexOf('  }')+1));
+            if(result?.items.some(item=>String(typeof item.label==='string'?item.label:item.label.label).replace(/\?$/,'')==='player_character')){playerPlanFound=true;break;}
+            await new Promise(resolve=>setTimeout(resolve,300));
+        }
+        assert(playerPlanFound,'Prepared encounter player_character completion missing');
+        passed.push('PASS: prepared player character field completes inside the real mode callback');
         await vscode.commands.executeCommand('eclipseModding.enable');
         await vscode.commands.executeCommand('eclipseModding.enable');
         const expected = [otherLibrary, library];
