@@ -19,6 +19,7 @@ static class Program
         bool packaged=args.Length>2 && bool.Parse(args[2]);
         bool playable=args.Length>3 && bool.Parse(args[3]);
         bool imported=args.Length>4 && bool.Parse(args[4]);
+        bool importedMotion=args.Length>5 && bool.Parse(args[5]);
         if(imported){
             var items=new XmlDocument();items.Load(Path.Combine(Path.GetDirectoryName(args[1]),"list.xml"));
             CoreContentImporter.ImportWeapons(catalog,items.SelectNodes("List/Items/Item[@Name='Fists']").Cast<XmlNode>(),new System.Collections.Generic.Dictionary<string,XmlDocument>());
@@ -32,9 +33,30 @@ static class Program
             if(warrior.BodyModel.Namespace!=mod.Id || warrior.SkinModels.Count!=1) throw new Exception("Authored model handles did not reach character definition");
             if(imported){
                 var fight=catalog.Fights.Single();var mode=catalog.Modes.Single();
-                if(catalog.Moves.Count!=0||warrior.Tactic.ToString()!="Standard"||warrior.Skeleton!="Skeleton"||warrior.Items.Count!=3||
+                if((!importedMotion&&(catalog.Moves.Count!=0||warrior.Tactic.ToString()!="Standard"))||warrior.Skeleton!="Skeleton"||warrior.Items.Count!=3||
                    fight.PlayerCharacter!=warrior.Id||fight.Warriors.Single()!=warrior.Id||mode.Fights.Single()!=fight.Id||!mode.Repeatable)
                     throw new Exception("Imported character lost normal loadout, tactic or playable encounter");
+                if(importedMotion){
+                    if(catalog.Moves.Count==0)throw new Exception("No source actions were registered");
+                    foreach(var move in catalog.Moves){
+                        var file=Path.Combine(mod.RootPath,"assets/animations/"+move.Id.LocalId+".bytes");
+                        int count=BitConverter.ToInt32(File.ReadAllBytes(file),0);
+                        if(move.EndFrame!=count-1||move.MidFrames!=0||!move.Conditions.Any(c=>c.Kind==ModMoveConditionKind.Character)||
+                           !move.Conditions.SelectMany(c=>c.Keys).Any()||move.Intervals.Any(i=>i.Attack!=null))
+                            throw new Exception("Imported action lost controls, scope, 60 Hz bounds or no-inferred-hit policy");
+                        var ai=(IModAiScriptContext)script;
+                        var snapshot=new ModCombatSnapshot(new ModFighterSnapshot(1,1,1,0,0,0),null,60,true);
+                        var actor=new object();
+                        if(!ai.TryDecideAi(warrior.Tactic,actor,snapshot,new[]{move.RuntimeName},out var choice,out var error)||choice!=0)
+                            throw new Exception("Imported action not selected by owned Lua AI: "+error);
+                        var cooldown=new ModCombatSnapshot(snapshot.Self,snapshot.Opponent,61,true);
+                        if(!ai.TryDecideAi(warrior.Tactic,actor,cooldown,Array.Empty<string>(),out choice,out error)||choice!=null)
+                            throw new Exception("Missing eligible source actions must defer to native AI even during cooldown: "+error);
+                        if(!ai.TryDecideAi(warrior.Tactic,actor,cooldown,new[]{move.RuntimeName},out choice,out error)||choice!=-1)
+                            throw new Exception("Eligible source action ignored preview pacing: "+error);
+                    }
+                    Console.WriteLine("PASS: imported evaluated source actions, public Lua controls/scoping/sample bounds and AI selection without inferred attacks.");return;
+                }
                 Console.WriteLine("PASS: imported weighted-rig public Lua, logical armor/helm slots, core Fists, Standard tactic and playable encounter without authored default clips.");
                 return;
             }

@@ -6,7 +6,10 @@ humanoids with automatic names or clear hierarchy inference, source-weighted
 native segment skins and inherited normal unarmed combat. A real downloaded
 Cesium rig imports without a manual mapping and passes native control/contact/AI;
 visual review caught and fixed display-bone calibration. Arbitrary body plans,
-independent extra bones, imported actions and complete custom movesets remain
+independent extra bones and complete custom movesets remain open. Selected
+source actions now retarget through the same semantic map, with native controls
+and Lua AI; see [motion acceptance](IMPORTED_MOTION_ACCEPTANCE.md). This supersedes
+the previous action omission, with contact IK and broad action interchange still
 open. Experimental 3D stays deferred; unrelated input callback work is parked.
 
 The [playable export workflow](PACKAGED_CHARACTER_ACCEPTANCE.md) connects

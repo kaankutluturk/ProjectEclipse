@@ -54,6 +54,11 @@ vertices with weighted native segment attachments. Editor asset completion does
 not parse these bindings; offline/runtime geometry validation and a game test
 remain required. See the wiki's character-authoring import guide for automatic
 matching, override roles, mesh limits and unsupported body plans.
+Optional source actions (`--clip NAME ACTION KEY`) generate ordinary scoped move
+declarations, binary assets and timing/fingerprint sidecars. LuaLS completion uses
+the existing moves contract; it does not validate source animation deformation,
+retargeting or native contact timing. Author typed attack intervals in the generated
+Lua before treating an imported motion as a combat move.
 
 The `ranged-actors` starter gives two independent fighters their own typed Lua
 cooldown state and native projectile abilities. Actor-host `spawn_projectile`

@@ -12,6 +12,15 @@ Standard AI, weighted skin coordinates/bounds and cleanup, then captures images.
 Inspect the images; numerical checks alone do not establish visual correctness.
 See [import acceptance](../../Docs/Engineering/Modding/IMPORTED_RIG_ACCEPTANCE.md).
 
+Imported source actions: `Animation/TestHumanoidMotionPipeline.ps1 -Blender <exe>
+-Rig <canonical-model>` authors original strike/jump actions, checks partial-action
+isolation/state restoration, unchanged source files, 60 Hz native samples, core
+lengths/source directions, root height and actual Lua controls/AI. Full-game
+`CharacterForms/TestPackagedCharacterUnity.ps1 -ImportedMotionClip <name> -Package
+<mod>` checks a Punch-bound source action's exact payload, native input/facing,
+visible motion, weighted skin bounds and public Lua AI. It does not configure or
+accept authored attack contact. Review screenshots separately.
+
 Generated character packages: `Animation/TestGymnastPipeline.ps1` (under Tools)
 verifies Blender/Gymnast pose export, watched/playable roles, exact payloads and
 real Lua registration, then the recovered Unity reader. `CharacterForms/

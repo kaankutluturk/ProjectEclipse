@@ -1,7 +1,8 @@
-param([Parameter(Mandatory=$true)][string]$Package, [switch]$Packaged, [switch]$Playable, [switch]$ImportedRig)
+param([Parameter(Mandatory=$true)][string]$Package, [switch]$Packaged, [switch]$Playable, [switch]$ImportedRig, [switch]$ImportedMotion)
 $ErrorActionPreference='Stop'
 if ($Playable -and !$Packaged) { throw '-Playable requires -Packaged.' }
 if ($ImportedRig -and (!$Packaged -or !$Playable)) { throw '-ImportedRig requires -Packaged -Playable.' }
+if ($ImportedMotion -and !$ImportedRig) { throw '-ImportedMotion requires -ImportedRig.' }
 $root=Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
 & (Join-Path $root 'Tools/Tests/Modding/TestPhase1ShowcaseRuntime.ps1')
 $fixture=Join-Path $root ('Temp/CharacterLua-'+[Guid]::NewGuid().ToString('N'))
@@ -43,5 +44,5 @@ $moon=[Security.SecurityElement]::Escape((Join-Path $root 'Library/ScriptAssembl
 <Reference Include="MoonSharp.Interpreter"><HintPath>$moon</HintPath></Reference>
 </ItemGroup></Project>
 "@ | Set-Content -Encoding UTF8 -LiteralPath (Join-Path $fixture 'CharacterLua.csproj')
-dotnet run --project (Join-Path $fixture 'CharacterLua.csproj') -- (Join-Path $fixture 'Mods') (Join-Path $root 'Assets/vanillaXml/stages.xml') $Packaged.IsPresent $Playable.IsPresent $ImportedRig.IsPresent
+dotnet run --project (Join-Path $fixture 'CharacterLua.csproj') -- (Join-Path $fixture 'Mods') (Join-Path $root 'Assets/vanillaXml/stages.xml') $Packaged.IsPresent $Playable.IsPresent $ImportedRig.IsPresent $ImportedMotion.IsPresent
 if ($LASTEXITCODE -ne 0) { throw 'Authored character Lua test failed.' }

@@ -2,6 +2,14 @@
 
 Last broad reconciliation: 2026-09-12. Scope remains **G01–G14 plus E1–E8**.
 
+2026-10-04 humanoid source actions: automatic rig imports can now sample selected
+Blender actions into native clips with controls and eligible-action Lua AI.
+Original strike/jump state/geometry/Lua checks and downloaded Cesium animation
+native playback pass. See IMPORTED_MOTION_ACCEPTANCE.md. This supersedes source
+action omission in the preceding mesh-import snapshot. Contact IK, arbitrary body
+plans and complete custom combat replacement remain open; experimental 3D stays
+deferred.
+
 2026-10-04 weighted humanoid import: the human has prioritized arbitrary rigs
 and complete custom combat movesets. Blender/FBX/glTF sources can generate a
 playable silhouette with automatic names or clear hierarchy inference, source

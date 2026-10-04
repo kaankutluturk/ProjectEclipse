@@ -4,7 +4,7 @@
 fresh playable mod using core unarmed combat and Standard AI. `RigMapping.py`
 matches semantic regions automatically, with explicit overrides for unknown or
 ambiguous names. Source weights become rotating native SkinnedNode attachments;
-extra bones follow mapped ancestors. Source actions/materials, unusual body
+extra bones follow mapped ancestors. Source materials, unusual body
 plans and custom collision proportions are not imported. Read the
 [import guide](../../Docs/Modding/src/content/docs/guides/character-authoring.md#import-a-weighted-humanoid-character)
 for commands, limits and the mapping format. `CreateImportedRigFixture.py`
@@ -12,6 +12,18 @@ authors original weighted Blender/FBX/glTF fixtures; `TestRigMapping.py` checks
 name matching and rejection. Full-game acceptance uses
 `Tools/Tests/CharacterForms/TestPackagedCharacterUnity.ps1 -ImportedRig` with a
 generated package.
+
+`ImportCharacter.py --list-actions --source <file>` lists source animation names.
+Repeat `--clip NAME ACTION KEY` during import to retarget selected evaluated
+humanoid actions using the same automatic region map. `HumanoidMotion.py` keeps
+core lengths, evaluated directions/rotations and forward/up root travel, with
+constant rest-floor calibration. Generated scoped Lua moves have no inferred
+attacks; author timing/contact through the public move tables. Use
+`TestHumanoidMotionPipeline.ps1 -Blender <exe> -Rig <canonical-model>` for original
+strike/jump, partial-action isolation, source preservation, binary geometry and
+actual Lua input/AI contracts. `TestPackagedCharacterUnity.ps1 -ImportedMotionClip
+<name>` separately checks a Punch-bound clip's native playback on both controlled
+facings, weighted skin and AI; screenshots still require visual review.
 
 `BuildPulseArenaArtwork.py --output Temp/PulseArtwork/assets` generates the
 original four-frame atlas and cropped sprite descriptors used by Pulse Arena.

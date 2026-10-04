@@ -1517,3 +1517,48 @@ duplicate-404 warning remains. Physical input, exported platforms, performance,
 all outcome/throw states, unusual body plans, source animation import and complete
 custom movesets remain open. Core collision proportions still bound this adapter;
 this feature does not establish arbitrary-rig completion or close the broad goal.
+
+## 2026-10-04: evaluated actions on automatically imported humanoids
+
+ImportCharacter --list-actions discovers source animations and repeatable --clip
+NAME ACTION KEY retargets selected evaluated actions through the same semantic
+bone map, without per-native-point binding work. HumanoidMotion preserves core
+segment lengths, transfers directions/relative rotations and forward/up root
+travel, keeps a constant rest-floor offset for jumps, recalculates native helpers
+and isolates partial actions from old pose channels. Source scene state restores;
+source files are not saved. Fresh packages include native binaries, editable
+samples, fingerprints/source observations and scoped Lua controls/eligible-action
+AI with Standard fallback. Attack intervals remain authored through existing Lua
+move declarations; no new bindings, capabilities or save policy are introduced.
+
+Original strike/jump Blender 3.6.23 integration passes with 61 samples each:
+Temp/HumanoidMotion-4e668e2d8d6746c6909b99fc48842213. Direction/length, arm motion,
+jump height, partial-action isolation, state restoration, unchanged source hash,
+empty/missing/duplicate/unknown-control rejection and actual Lua controls/AI are
+checked. Current mesh-only Blender/FBX/glTF/reduced pipeline and six mapping,
+six point-pipeline and nine package regressions pass. Downloaded Cesium Man's
+Anim_0_Armature exports 119 samples without overrides and passes the full-game
+native probe (18070 assertions, mostly binary points/weighted vertices), fresh
+result and successful Unity exit. Final log validation-74be8fa143624d7d9f3debb3c9e83d2d.log
+in Temp/FighterPlaybackUnity-d997a2c104cd4564b9767ae6eb4b68d8. Exact exported payload,
+native input on both controlled facings, visible wrist motion, weighted geometry
+bounds, public Lua AI and surrender cleanup pass. Earlier probes timed out on an
+over-specific StanceIdle gate; waiting for the actual fight stage/input readiness
+lets the unchanged package pass. Capture inspected and retained as
+Temp/ImportedRigReview-20261004/cesium-source-motion-final.png. Foot contact and shoulders
+remain imperfect. External geometry/actions remain ignored local evidence.
+
+Wiki types/build/search/255 binding coverage/three link tests pass: 0 type
+diagnostics, 7049 links/assets, 64 pages and 64 tracked current-branch source links.
+Editor generate/check/61 tests pass; existing schema/generated members are
+unchanged. LuaLS/VS Code integration is not repeated. Native test and actual Lua
+validator compile; production C# assemblies are unchanged this feature. See
+IMPORTED_MOTION_ACCEPTANCE.md. Complete combat replacement/contact/reaction/throw
+coverage, arbitrary body plans/independent extra bones, contact IK, source scene
+interchange, physical devices, exports/performance/multiplayer and broad goal
+acceptance remain open. Experimental 3D stays deferred.
+
+The source-action tactic's cooldown wait is now conditional on an eligible
+imported action, preserving Standard fallback when the source actions are
+unavailable. Actual Lua checks selection, eligible cooldown wait and empty-action
+fallback; the final native acceptance uses the regenerated v3 package.

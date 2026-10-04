@@ -3,9 +3,11 @@ title: Character imports and point-rig tools
 description: Import weighted humanoid characters with normal combat defaults, or author native SF2 point motion and geometric skins.
 ---
 
-For visual authoring, start with [Gymnast Tool Suite and Eclipse packaging](../gymnast/). It provides a visible body and IK controls. This page documents the earlier low-level point importer for format experiments; its point objects alone are not a complete character authoring interface.
+To bring in a weighted humanoid from another tool, use the character importer below. For authoring native SF2 motion with a visible body and IK controls, start with [Gymnast Tool Suite and Eclipse packaging](../gymnast/). The lower-level point tools later on this page support format experiments; their point objects alone are not a complete character authoring interface.
 
 Eclipse characters use SF2's point-based physics rig. An animation stores the positions of those points in a fixed order; body and equipment models attach geometry to them. These low-level tools require Python 3 and Blender 3.6 or newer. Blender 3.6.23 is the tested version for this importer only.
+
+Use Blender 3.6.23 for the source-action workflow below; newer Blender action APIs are unverified.
 
 The point pipeline supports body proportions, native geometry overlays, animation import, constrained or keyframed point motion, baking, validation, a local preview, and runtime registration. The imported-character adapter below adds automatic matching for recognized humanoid rigs. Neither tool turns Blender materials into game shaders. Preserve the native rig's names and point order when sharing the game's moves, equipment, and physics.
 
@@ -40,9 +42,29 @@ Matching recognizes common Mixamo, Blender-style and Unreal-style names, includi
 
 Source bones outside these regions, such as fingers and twist bones, follow their nearest mapped ancestor. The report lists these substitutions. Positive weights on an unrelated bone, unweighted vertices, zero-length anatomical segments and multiple armatures on one mesh reject with a diagnostic. Meshes need an Armature modifier pointing at the chosen armature. Non-bone vertex groups are ignored.
 
-The adapter fits source geometry in anatomical segment frames and renders a weighted **silhouette**, normalizes its limbs to the core combat rig, and replaces visible armor and helmet meshes with empty models on owned logical equipment. It preserves core collision proportions, equipment anchors and animation ordering. Source textures, materials, actions, independent extra-bone motion and custom hitbox proportions are not imported. This is a humanoid compatibility adapter, not support for arbitrary quadrupeds, wings, tails or unusual locomotion. Inspect deformation, both facings and collision fit in the game before sharing. Custom combat moves can target the generated warrior through the [moves API](../../api/moves-and-tactics/); importing a mesh does not author those moves or their hit timing.
+The adapter fits source geometry in anatomical segment frames and renders a weighted **silhouette**, normalizes its limbs to the core combat rig, and replaces visible armor and helmet meshes with empty models on owned logical equipment. It preserves core collision proportions, equipment anchors and animation ordering. Source textures, materials, independent extra-bone motion and custom hitbox proportions are not imported. Actions are optional, as described below. This is a humanoid compatibility adapter, not support for arbitrary quadrupeds, wings, tails or unusual locomotion. Inspect deformation, both facings and collision fit in the game before sharing. Custom combat moves can target the generated warrior through the [moves API](../../api/moves-and-tactics/); importing a mesh does not author those moves or their hit timing.
 
 The original synthetic 19-bone fixture exercises Blender, FBX and glTF import without a hand-authored point mapping. A downloaded [Cesium Man sample](https://github.com/KhronosGroup/glTF-Sample-Assets/tree/edc7c9e67c639d230715049ee31f9a96a6babbbe/Models/CesiumMan) also imports through hierarchy matching without overrides and passes native movement, Punch/contact/reaction, controlled mirrored Kick and Standard AI contact. Source joint positions and weighted region extents determine calibration; display-bone tails are not trusted. These are bounded tests, not evidence that every rig or outfit works. Keep attribution and licensing with any third-party asset you distribute.
+
+### Import source actions
+
+An **action** is a Blender animation with keyed object or bone channels. FBX and glTF importers can create actions from the source file's animations. List their exact names without creating a package:
+
+```powershell
+& $blender --background --factory-startup --python-exit-code 1 --python Tools/Animation/ImportCharacter.py -- --source Temp/MyCharacter/fighter.glb --list-actions
+```
+
+Add `--clip NAME ACTION KEY` for each action you want to bring into a fresh character package. `NAME` is a unique lowercase identifier (1–48 characters, letters/digits/underscores, starting with a letter); `ACTION` is the exact source action name; `KEY` is a distinct control from `Punch`, `Kick`, `Ranged`, `Magic`, `Up`, `Down`, `Forward`, or `Back`. Quote action names containing spaces. For example:
+
+```powershell
+& $blender --background --factory-startup --python-exit-code 1 --python Tools/Animation/ImportCharacter.py -- --source Temp/MyCharacter/fighter.blend --rig Temp/CharacterCore/models/mdl_skeleton.xml --mod-id local.my-motion --output Mods/local.my-motion --clip strike "My Strike" Punch --clip jump "My Jump" Kick
+```
+
+The importer reuses semantic bone matching; no per-SF2-point mapping is required. It evaluates selected armature actions and constraints at 60 samples per second, keeps core segment lengths and hand/foot shapes, and recalculates derived points in native order. Forward and vertical root travel are retained; sideways root translation is removed for the arena plane. A fixed rest-floor offset preserves jumps; it is not foot-contact IK. Unkeyed bone channels begin at rest so a partial action does not borrow an old pose. The selected action replaces armature NLA blending during sampling; separately animated constraint targets remain evaluated. Inspect their timing when exporting an action in isolation.
+
+Each clip needs positive duration, a scene rate of 1–240 fps, 2–36,000 output samples, and at most two million native point samples across the package. Tracks that do not resolve on the selected armature reject. Empty, missing, degenerate or over-limit actions fail before publication. Source files are not saved. Binary assets, editable `.frames.json`, `.rig.json` fingerprints and `.retarget.json` source observations are written under `assets/animations/`; `import.json` records the actions and controls.
+
+Generated Lua moves are scoped to the character, face the opponent and use `mid_frames = 0`. The generated tactic cycles eligible imported clips, then falls back to Standard AI when none is eligible. Without `--clip`, the character keeps Standard AI and normal core controls. Imported clips have **no attack intervals** and hold `Uninterrupt` for their duration. They are motion previews, not a complete combat moveset; inherited core moves still exist. In `scripts/character.lua`, edit their [typed move declarations](../../api/moves-and-tactics/) to add attack edges, damage, hit reactions, active frames, recovery/cancel conditions, combos and appropriate AI decisions. Do not treat an animation's visual contact as proof that native damage or collision is configured.
 
 ## Create an authoring scene
 

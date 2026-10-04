@@ -1,5 +1,6 @@
-param([Parameter(Mandatory=$true)][string]$Package, [string]$Unity = '', [string]$ExistingFixture = '', [switch]$OpponentOnly, [switch]$ImportedRig)
+param([Parameter(Mandatory=$true)][string]$Package, [string]$Unity = '', [string]$ExistingFixture = '', [switch]$OpponentOnly, [switch]$ImportedRig, [string]$ImportedMotionClip = '')
 $ErrorActionPreference = 'Stop'
+if($ImportedMotionClip -and ($ImportedMotionClip -notmatch '^[a-z][a-z0-9_]{0,47}$' -or $ImportedRig -or $OpponentOnly)){throw 'ImportedMotionClip requires a valid clip identifier and its own player acceptance mode.'}
 $root = Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $PSScriptRoot))
 $versionFile = Join-Path $root 'ProjectSettings/ProjectVersion.txt'
 $version = (Select-String -LiteralPath $versionFile -Pattern '^m_EditorVersion: (.+)$').Matches[0].Groups[1].Value
@@ -44,6 +45,7 @@ New-Item -ItemType Junction -Path $characterCache -Target $characterCacheTarget 
 $arguments=@('-projectPath',('"'+$fixture+'"'),'-executeMethod','PackagedCharacterUnity.Run','-packaged-characterAcceptanceProductName',$characterProduct,'-characterPackageModId',$characterModId,'-characterPackageModsRoot',('"'+$characterMods+'"'),'-logFile',('"'+$log+'"'))
 if($OpponentOnly){$arguments+='-packagedOpponentOnly'}
 if($ImportedRig){$arguments+='-importedRigAcceptance'}
+if($ImportedMotionClip){$arguments+=@('-importedMotionAcceptance','-importedMotionClip',$ImportedMotionClip)}
 $process = Start-Process -FilePath $Unity -ArgumentList $arguments -WindowStyle Hidden -PassThru
 Write-Host "Native packaged-character process: $($process.Id)"
 $deadline = [DateTime]::UtcNow.AddMinutes(15)

@@ -19,6 +19,7 @@ from mathutils import Vector
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import CharacterPipeline as pipeline
 import PackageCharacter
+import HumanoidMotion
 from RigMapping import match_bones, infer_humanoid
 
 TARGETS = {'pelvis': ('NPivot', 'NStomach'), 'spine': ('NStomach', 'NChest'),
@@ -228,6 +229,45 @@ return { warrior = character }
 '''
 
 
+def motion_module(clips):
+    module = CHARACTER.replace('return { warrior = character }', '')
+    # Add a native-fallback tactic that selects only currently eligible actions.
+    tactic = '''local preview_moves = NAMES
+local tactic = sf2.tactics.register {
+    id = "imported_motion", template = "Standard",
+    on_decide = function(memory, event)
+        for offset = 0, #preview_moves - 1 do
+            local index = ((memory.next_clip or 1) - 1 + offset) % #preview_moves + 1
+            for _, action in ipairs(event.actions) do
+                if action.name == sf2.mod.id .. ":moves/" .. preview_moves[index] then
+                    if event.seconds < (memory.ready or 0) then return "wait" end
+                    memory.ready = event.seconds + 1.5
+                    memory.next_clip = index % #preview_moves + 1
+                    return action
+                end
+            end
+        end
+        return nil
+    end,
+}
+'''.replace('NAMES','{ '+', '.join(json.dumps(c['name']) for c in clips)+' }')
+    module = module.replace('local character =',tactic+'local character =').replace('tactic = "Standard"','tactic = tactic')
+    module += 'local moves = {}\n'
+    for clip in clips:
+        module += '''moves[NAME] = sf2.moves.register {
+    id = NAME, animation = ASSET, type = "MOVE", priority = 150,
+    core_templates = { "Controlled", "NotTitan" },
+    mid_frames = 0, first_frame = 0, end_frame = LAST, mirror_node = "NHeel_1",
+    direction = "face_enemy", events = "controlled",
+    conditions = { { character = character }, { key = KEY }, { controllable = true } },
+    locks = { { item = "Skeleton", subtype = "Skeleton" } },
+    intervals = { { name = "Uninterrupt", from = 0, to = LAST } },
+}
+'''.replace('NAME',json.dumps(clip['name'])).replace('ASSET',json.dumps('animations/'+clip['name']))\
+    .replace('KEY',json.dumps(clip['key'])).replace('LAST',str(len(clip['clip']['frames'])-1))
+    return module+'return { warrior = character, moves = moves }\n'
+
+
 def run(args):
     destination = args.output.resolve()
     if not re.fullmatch(r'[a-z0-9][a-z0-9_.-]{0,127}', args.mod_id) or args.mod_id in ('core', 'sf2de'):
@@ -270,6 +310,23 @@ def run(args):
     for obj in meshes:
         if any(m.type == 'ARMATURE' and m.object != armature for m in obj.modifiers):
             raise ValueError(obj.name + ': multiple armature targets are unsupported')
+    clips = []; used_names = set(); used_keys = set(); total_samples = 0
+    for name, action_name, key in args.clip:
+        if not re.fullmatch(r'[a-z][a-z0-9_]{0,47}',name) or name in used_names:
+            raise ValueError('Clip names must be unique lowercase identifiers')
+        if key not in ('Punch','Kick','Ranged','Magic','Up','Down','Forward','Back') or key in used_keys:
+            raise ValueError('Clips need distinct native controls: Punch, Kick, Ranged, Magic, Up, Down, Forward, Back')
+        action = bpy.data.actions.get(action_name)
+        if action is None:
+            raise ValueError('Source action not found: '+action_name+'; available: '+', '.join(a.name for a in bpy.data.actions))
+        for curve in action.fcurves:
+            try: armature.path_resolve(curve.data_path)
+            except (ValueError,KeyError): raise ValueError('Action track does not bind to selected armature: '+curve.data_path)
+        clip, report = HumanoidMotion.sample(rig,armature,mapping,action)
+        total_samples += len(clip['frames'])*len(clip['names'])
+        if total_samples > 2000000: raise ValueError('Imported clips exceed two million node samples')
+        clips.append({'name':name,'key':key,'clip':clip,'report':report})
+        used_names.add(name); used_keys.add(key)
     skin, report, inherited = convert(armature, meshes, mapping, args.max_vertices, rig)
     # Preserve gameplay node identity, masses, edges and order. Source geometry
     # replaces the visible body; inherited armor/helm meshes are not mounted.
@@ -284,7 +341,17 @@ def run(args):
         ET.ElementTree(skin).write(skin_path, encoding='utf-8', xml_declaration=True)
         (staging / 'assets/models/empty.xml').write_text('<Scene><Nodes/><Edges/><Figures/></Scene>', encoding='utf-8')
         pipeline.model(skin_path, pipeline.model(body_path))
-        (staging / 'scripts/character.lua').write_text(CHARACTER, encoding='utf-8')
+        (staging / 'scripts/character.lua').write_text(motion_module(clips) if clips else CHARACTER, encoding='utf-8')
+        for entry in clips:
+            animation_path = staging / ('assets/animations/'+entry['name']+'.bytes')
+            animation_path.parent.mkdir(parents=True,exist_ok=True)
+            pipeline.write_animation(animation_path,entry['clip'])
+            animation_path.with_suffix('.frames.json').write_text(json.dumps(entry['clip']),encoding='utf-8')
+            animation_path.with_suffix('.rig.json').write_text(json.dumps({
+                'version':1,'fps':60,'mid_frames':0,'frames':len(entry['clip']['frames']),'control':entry['key'],
+                'nodes':entry['clip']['names'],'rig_sha256':hashlib.sha256(body_path.read_bytes()).hexdigest(),
+                'animation_sha256':hashlib.sha256(animation_path.read_bytes()).hexdigest()},indent=2),encoding='utf-8')
+            animation_path.with_suffix('.retarget.json').write_text(json.dumps(entry['report']),encoding='utf-8')
         (staging / 'scripts/main.lua').write_text(PackageCharacter.preview_main(True), encoding='utf-8')
         (staging / 'mod.toml').write_text(
             f'schema = 1\nid = {json.dumps(args.mod_id)}\nname = {json.dumps(args.title, ensure_ascii=False)}\n'
@@ -299,7 +366,8 @@ def run(args):
                     'inherited_bones': inherited, 'meshes': report, 'max_vertices': args.max_vertices,
                     'rig_sha256': hashlib.sha256(args.rig.read_bytes()).hexdigest(),
                     'combat': 'core unarmed defaults', 'renderer': 'planar weighted silhouette',
-                    'limitations': ['Source animation, textures and materials are not imported.',
+                    'clips':[{'name':c['name'],'control':c['key'],'action':c['report']['action'],'samples':c['report']['samples']} for c in clips],
+                    'limitations': ['Textures and materials are not imported. Clip attack timing is not inferred.',
                                     'Extra bones follow mapped ancestors; they have no independent animation.',
                                     'Core collision proportions remain unchanged. Non-humanoid locomotion is not inferred.']}
         (staging / 'import.json').write_text(json.dumps(metadata, indent=2) + '\n', encoding='utf-8')
@@ -309,7 +377,8 @@ def run(args):
             'The encounter does not replace campaign equipment.\n\n'
             'Keep your source scene separately. import.json records matching and topology reduction. '
             'Inspect shoulders, wrists, knees, facing and contact fit in game before sharing. '
-            'The adapter normalizes limbs to the native combat rig. Source materials, animations and independent extra-bone motion are not imported. '
+            'The adapter normalizes limbs to the native combat rig. Source materials and independent extra-bone motion are not imported. '
+            'Selected actions are sampled at 60 Hz; generated moves have no attack intervals. Add typed attack timing in scripts/character.lua. '
             'Custom moves can be registered for this warrior in scripts/character.lua using the public moves API.\n', encoding='utf-8')
         staging.rename(destination)
     finally:
@@ -321,14 +390,26 @@ def run(args):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    for name in ('source', 'rig', 'output'):
-        parser.add_argument('--' + name, type=Path, required=True)
-    parser.add_argument('--mod-id', required=True)
+    parser.add_argument('--source',type=Path,required=True)
+    for name in ('rig', 'output'):
+        parser.add_argument('--' + name, type=Path)
+    parser.add_argument('--mod-id')
     parser.add_argument('--title', default='Imported Fighter')
     parser.add_argument('--armature')
     parser.add_argument('--mapping', type=Path)
     parser.add_argument('--max-vertices', type=int, default=2048)
-    run(parser.parse_args(sys.argv[sys.argv.index('--') + 1:]))
+    parser.add_argument('--clip',nargs=3,action='append',default=[],metavar=('NAME','ACTION','KEY'))
+    parser.add_argument('--list-actions',action='store_true')
+    args = parser.parse_args(sys.argv[sys.argv.index('--') + 1:])
+    if args.list_actions:
+        load_source(args.source.resolve())
+        print(json.dumps({'fps':bpy.context.scene.render.fps/bpy.context.scene.render.fps_base,
+                          'actions':[{'name':a.name,'first':a.frame_range[0],'last':a.frame_range[1]}
+                                     for a in bpy.data.actions]},indent=2))
+        return
+    if args.rig is None or args.output is None or args.mod_id is None:
+        parser.error('Import requires --rig, --output and --mod-id')
+    run(args)
 
 
 if __name__ == '__main__':

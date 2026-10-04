@@ -23,6 +23,9 @@ public static class PackagedCharacterUnity
     static string Character=>owner+":warriors/authored_character";
     static bool OpponentOnly=>Environment.GetCommandLineArgs().Contains("-packagedOpponentOnly");
     static bool ImportedRig=>Environment.GetCommandLineArgs().Contains("-importedRigAcceptance");
+    static bool ImportedMotion=>Environment.GetCommandLineArgs().Contains("-importedMotionAcceptance");
+    static string MotionMove=>owner+":moves/"+Argument("-importedMotionClip");
+    static int motionSamples;static bool motionPayloadChecked;
     static float importedEnemyLife,importedPlayerLife,importedStartX; static bool importedAttack,importedReaction,importedAi;
     static int importedReadyFrame=-1;
     static bool importedPunchCaptured,importedIdleCaptured;
@@ -49,7 +52,13 @@ public static class PackagedCharacterUnity
             if(ModRuntime.Scripts!=null&&ModRuntime.Scripts.HasErrors)throw new Exception("Generated package script registration failed");
             if(combatException!=null)throw new Exception(combatException);
             if(EditorApplication.timeSinceStartup-started>300)throw new Exception("Timed out phase "+phase);
-            if(EditorApplication.timeSinceStartup-lastReport>20){lastReport=EditorApplication.timeSinceStartup;Debug.Log("[PackagedCharacterUnity] Waiting entered="+entered+" phase="+phase);}
+            if(EditorApplication.timeSinceStartup-lastReport>20){
+                lastReport=EditorApplication.timeSinceStartup;Debug.Log("[PackagedCharacterUnity] Waiting entered="+entered+" phase="+phase);
+                if(ImportedMotion&&Fight.GetCurrentFight()?.GetPlayerModel()!=null){
+                    var waiting=Fight.GetCurrentFight();
+                    Debug.Log("[PackagedCharacterUnity] Motion readiness stage="+waiting.stageType+" current="+waiting.GetPlayerModel().GetCurrentAnimation()?.Name+" frame="+waiting.get_FightTimeInFrames()+" punch="+waiting.Controller.IsQuadrantEnabled(FightCID.Punch)+" overlay="+(UnityEngine.Object.FindFirstObjectByType<Eclipse.UI.EclipseLoadingOverlay>()!=null));
+                }
+            }
             if(!campaign&&Eclipse.UI.TitleScreen.IsOpen){
                 var title=UnityEngine.Object.FindFirstObjectByType<Eclipse.UI.TitleScreen>();
                 if((bool)Field(title,"splashing")||(string)Field(title,"currentPage")!="Home")return;
@@ -76,6 +85,7 @@ public static class PackagedCharacterUnity
             player.Parameters.set_IsImmortalityEnabled(!ImportedRig);enemy.Parameters.set_IsImmortalityEnabled(!ImportedRig);
 
             int frame=fight.get_FightTimeInFrames();
+            if(ImportedMotion){UpdateMotion(fight,player,enemy,frame);return;}
             if(ImportedRig){UpdateImported(fight,player,enemy,frame);return;}
             switch(phase){
             case 0:
@@ -131,6 +141,74 @@ public static class PackagedCharacterUnity
     }
     static void Position(Model model,float x)=>model.GetType().GetMethod("TrainingMoveToX",Hidden|BindingFlags.Public).Invoke(model,new object[]{x});
     static void Control(Fight fight,int action,FightCID key)=>fight.Controller.GetType().GetMethod("SendGamepadControlEvent",Hidden|BindingFlags.Public).Invoke(fight.Controller,new object[]{action,key});
+    static void UpdateMotion(Fight fight,Model player,Model enemy,int frame)
+    {
+        switch(phase){
+        case 0:
+            if(fight.stageType!=StageType.FDBBPEGEGMK.STAGE_FIGHT)return;
+            enemy.Parameters.AiControlled=false;
+            if(UnityEngine.Object.FindFirstObjectByType<Eclipse.UI.EclipseLoadingOverlay>()!=null||!fight.Controller.IsQuadrantEnabled(FightCID.Punch))return;
+            Check(player.Parameters.EclipseCharacterId==Character&&enemy.Parameters.EclipseCharacterId==Character,"Imported motion uses public player/opponent identities");
+            Check(player.Parameters.UserControlled&&!player.Parameters.AiControlled,"Imported motion retains native player input");
+            var move=ModRuntime.Scripts.Content.Moves.Single(m=>m.Id.ToString()==MotionMove);
+            Check(move.Conditions.SelectMany(c=>c.Keys).Single().Key=="Punch","This native fixture selects a Punch-bound source clip");
+            Check(move.MidFrames==0&&!move.Intervals.Any(i=>i.Attack!=null),"Source clip keeps 60 Hz spacing and does not invent attacks");
+            motionSamples=move.EndFrame+1;
+            Check(player.GetAvailableAnimations().Any(m=>m.Name==MotionMove),"Native source-action eligibility");
+            ValidateImportedSkin(player);Position(player,450);Position(enemy,1000);Send(fight,0);phase=1;phaseFrame=frame;break;
+        case 1:
+        case 3:
+            if(frame-phaseFrame>=3)Send(fight,1);
+            if(player.GetCurrentAnimation()?.Name==MotionMove){
+                if(!sawMove)Check(player.FacingSign==(phase==1?1:-1),"Source action faces the opponent under native input");
+                sawMove=true;
+                if(!motionPayloadChecked){CheckMotionPayload(player.GetCurrentAnimation());motionPayloadChecked=true;}
+                var wrist=player.GetModelObject().FindNodeOrParent("NWrist_1").GetStart().GetX();
+                minWrist=Math.Min(minWrist,wrist);maxWrist=Math.Max(maxWrist,wrist);
+                if(!captured&&frame-phaseFrame>motionSamples/3){
+                    captured=true;PackagedCharacterCapture.Done=false;
+                    new GameObject("Imported source action capture").AddComponent<PackagedCharacterCapture>().FileName="imported-source-motion.png";
+                }
+            }
+            if(frame-phaseFrame<motionSamples+90)return;
+            Check(sawMove&&maxWrist-minWrist>1,"Evaluated source action drives native visible wrist motion");ValidateImportedSkin(player);
+            if(phase==1){Position(player,1000);Position(enemy,450);player.PlayAnimation("StanceIdle",-1);phase=2;phaseFrame=frame;}
+            else{enemy.Parameters.AiControlled=true;sawMove=false;phase=4;phaseFrame=frame;}
+            break;
+        case 2:
+            if(frame-phaseFrame<30)return;
+            sawMove=false;minWrist=float.PositiveInfinity;maxWrist=float.NegativeInfinity;Send(fight,0);phase=3;phaseFrame=frame;break;
+        case 4:
+            sawMove|=enemy.GetCurrentAnimation()?.Name==MotionMove;
+            if(frame-phaseFrame>480)throw new Exception("Imported source action was not selected by native Lua AI");
+            if(!sawMove)return;
+            Check(sawMove,"Source action reaches native opponent through public Lua AI");ValidateImportedSkin(enemy);
+            phase=5;break;
+        case 5:
+            if(!PackagedCharacterCapture.Done)return;
+            typeof(Fight).GetMethod("HCNDAFDHACI",Hidden).Invoke(fight,new object[]{GameOverTypes.GAME_OVER_SURRENDER});phase=6;break;
+        case 6:
+            Check(ModRuntime.Scripts.CallbackDiagnostics.RecentFailures.Count==0&&!Eclipse.UI.Modding.ModUiGameBridge.BlocksGameplayInput,"Imported motion cleanup");
+            File.WriteAllText(Path.Combine(Path.GetDirectoryName(Application.dataPath),"packaged-character-result.txt"),"PASS: "+checks+" imported source-motion assertions; unchanged exported payload, public Lua/native player input on both controlled facings, visible wrist movement, weighted skin bounds, eligible-action Lua AI and surrender cleanup. Most assertions compare binary points. No authored attacks, physical devices, arbitrary actions/body plans or exported platforms are accepted; screenshot requires inspection.");
+            Debug.Log("[PackagedCharacterUnity] PASS imported motion: "+checks);Finish(0);break;
+        }
+    }
+    static void CheckMotionPayload(InfoAnimation move)
+    {
+        var actual=(Vector3[][])Field(move,"_AnimationContainer");
+        string path=Path.Combine(Argument("-characterPackageModsRoot"),owner,"assets/animations",Argument("-importedMotionClip")+".bytes");
+        using(var reader=new BinaryReader(File.OpenRead(path))){
+            Check(reader.ReadInt32()==motionSamples&&actual.Length==motionSamples,"Native source clip duration");
+            for(int f=0;f<motionSamples;f++){
+                reader.ReadByte();int nodes=reader.ReadInt32();Check(nodes==67&&actual[f].Length==nodes,"Native source clip point order/count");
+                for(int n=0;n<nodes;n++){
+                    var expected=new Vector3(reader.ReadSingle(),-reader.ReadSingle(),reader.ReadSingle());
+                    Check(Vector3.Distance(expected,actual[f][n])<.0002,"Actual native reader preserves imported source motion");
+                }
+            }
+            Check(reader.BaseStream.Position==reader.BaseStream.Length,"Complete source payload consumed");
+        }
+    }
     static void UpdateImported(Fight fight,Model player,Model enemy,int frame)
     {
         switch(phase){
