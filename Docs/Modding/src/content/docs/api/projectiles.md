@@ -18,6 +18,13 @@ begin and end callbacks reject operations. Reacquire each callback; retain copie
 snapshots and IDs for Lua state. IDs are strings unique within a fight, not save
 identifiers. These references never expose native models or arbitrary actors.
 
+Projectiles are native weapon children: they have no independent fighter health,
+AI controller or team membership. A creature, companion or additional opponent
+needs an independent actor API, which is not currently available. Internal tests
+can insert extra native fighter models, but that does not provide a mod contract:
+target selection, callback identity, death cleanup and encounter victory rules
+still need dedicated support. Use this API for attacks and guided projectiles.
+
 Native contact callbacks supply a copied
 [`event.attack`](../combat-callbacks/#identify-the-attack-that-made-contact).
 For tracked typed children, its `projectile_id` matches `snapshot().id` and

@@ -63,6 +63,20 @@ their help and docstrings for required inputs and execution behavior.
 
 ## PowerShell entry points
 
+`Combat/TestExtraFighterUnity.ps1` is a full-game feasibility probe for a third
+native root fighter. It clones the core opponent's parameters/rig/tactic and
+enters recovered construction and animation seams through reflection. It checks
+independent health, rendering, bounded AI observation/contact attribution, insertion-order
+targeting, extra-root knockout, explicit removal and original-duel continuation.
+It runs with controlled input/spacing, an empty user-mod root and a unique fresh
+post-tutorial profile. This is not a Lua actor API or acceptance for teams,
+different rigs, reliable autonomous attacks, paired attacks, multiplayer, exported
+players or physical input. A fallback explicitly starts a native knife attack if
+AI produces no contact within 120 simulation frames; results record that choice.
+Reuse requires a marked project inside repository Temp; an open fixture is
+rejected and compiler errors fail early. See the actor feasibility record under
+`Docs/Engineering/Modding/` for the native boundaries and remaining proof work.
+
 `Combat/TestProjectiles.ps1` compiles the production Lua bindings and complete
 projectile queue/tracker with controlled native models. It covers reusable
 registered definitions, direct spawn receipts/placement, shared timeline/queued

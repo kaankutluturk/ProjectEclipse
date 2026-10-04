@@ -2,6 +2,16 @@
 
 Last broad reconciliation: 2026-09-12. Scope remains **G01–G14 plus E1–E8**.
 
+2026-10-04 independent-actor feasibility: a repeatable isolated full-game probe
+now verifies a third native root's separate health, rendering, explicitly started
+native attack/contact attribution, knockout without ending the main duel and
+requested removal. It passes 27 checks. Its bounded AI observation stayed in idle;
+autonomous attack selection is not accepted. Insertion-order mutual enemies,
+two-side node binding caches, main-duel callback/result routing and owned actor
+lifetime are concrete remaining integration boundaries. This is engineering
+evidence for E1/E2/E5, not a public actor API or team-combat delivery. See
+ACTOR_FEASIBILITY.md and the creator work log. The broad scope remains open.
+
 2026-10-04 procedural child spawning: owned projectile definitions can now be
 spawned directly from Lua through queued commands and applied/failed ID receipts,
 without a caster move. Shared capacity includes pending and timeline children;

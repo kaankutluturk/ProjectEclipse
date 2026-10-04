@@ -1150,3 +1150,58 @@ This advances programmable child spawning and E2/E8 acceptance. Independent
 health/AI/team actors, original custom rigs, miss/expiry notifications, solid/swept
 world physics, broader arena/form/loadout, physical input/export and independent
 creator acceptance remain open. G01-G14/E1-E8 and the broad objective stay active.
+
+
+## 2026-10-04 — independent native actor feasibility
+
+This turn adds engineering evidence for general actors without presenting native
+weapon children as independent fighters or inventing a public actor contract.
+Tools/Tests/Combat/ExtraFighterUnity.cs and TestExtraFighterUnity.ps1 construct a
+third real root through recovered native construction/entry seams in an isolated
+full-game fixture. The probe clones the core opponent parameters, rig, equipment
+and tactic, gives it independent health and active native stage/action state,
+and observes actual rendering, targeting, contact and removal. Runtime source,
+serialized assets, metas and public Lua bindings are unchanged.
+
+Unity 6.6 passes 27 checks. The bounded 120-frame AI observation stayed in
+StanceIdle and made no contact. The fixture then explicitly starts KnivesSlash;
+player health changes .9220222 -> .8700371 and the native StrikeResult names the
+extra root as attacker. Original opponent health is unchanged. The extra root's
+zero health does not end the main duel or retire it automatically; requested
+removal clears rendering and both original enemy lists, restores their mutual
+targets and permits continued native animation. This proves a controlled attack
+and life/removal seam, not reliable autonomous attack selection or full animation
+binding restoration. Final successful log:
+Temp/FighterPlaybackUnity-d997a2c104cd4564b9767ae6eb4b68d8/validation-25386ebda3bd4e948921160be9a3ed83.log.
+A fresh result timestamp and successful Unity process exit were verified.
+
+The fixture controls original input/AI and spacing, uses an empty user-mod root,
+a unique fresh post-tutorial acceptance profile and shared immutable TAR cache.
+Earlier probes exposed an overstrict animation-diversity assumption, a nested
+fixture event-type compilation mistake and overlapping isolated editors. Those
+runs are not accepted. Only known owned processes were stopped; interrupted
+isolated scene backups were preserved. The authored runner now rejects an open
+fixture and fails early on compiler errors. Root Unity, scenes and user saves
+were untouched. Existing unrelated Unity Search/title-preview warnings remain.
+
+ACTOR_FEASIBILITY.md records concrete integration gaps: AddModel makes all roots
+mutual enemies; SetNearestEnemy chooses the first registration; the unused
+FindNearestEnemy helper uses signed distance; DistancePoint caches root nodes in
+two side slots; Lua fighter/damage routing and round settlement still identify
+only the main pair; a native parent assumes WeaponModel. Side caching is a source
+risk, not an experimentally isolated explanation of the idle observation. The
+public projectile guide now explicitly distinguishes children from unavailable
+independent actors. Test index, extensibility and roadmap status update together.
+
+Wiki types/build/search and 6435 local links/assets across 61 pages pass;
+reference coverage remains 234 public bindings. Existing duplicate-404 warning
+remains. Matching Unity imported/compiled the full native probe and game; no new
+runtime API/editor schema requires regeneration and no separate managed-only
+compile or Lua suite is credited for this test/documentation change.
+
+This is concrete feasibility progress for E1/E2/E5. Typed actor definitions,
+round-owned instances/receipts, behavior hosts, team/hostility targeting, safe
+per-instance bindings, autonomous attacks, incoming-hit identity, owned children,
+forms, death/reset/disable/teardown, alternate victory policies, original rigs,
+all equipment/modes, physical input, exports and rollback acceptance remain open.
+G01-G14/E1-E8 and the broad Minecraft-style objective remain active.

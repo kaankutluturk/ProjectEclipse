@@ -579,3 +579,14 @@ hit deletion and miss expiry. Native scheduled actions now retain reentrant
 events for the next pass. This is a finite compatible missile graph; live child
 handles, general actors, homing/bouncing, arbitrary physics and original rig
 acceptance remain open. See the creator work log and projectile guide.
+
+## Independent actor feasibility evidence
+
+The native model lists support a third root with separate cloned health, visible
+rig/equipment and an explicitly started attack that damages the player with the
+correct native attacker identity. A controlled full-game probe now verifies those
+facts, third-root knockout without ending the main duel and requested removal.
+Its 27 checks are not an actor API: bounded AI observation remained in idle, and
+native enemy registration, cached targets, side-based node bindings, callback
+identity, death ownership and round results still need explicit integration.
+See ACTOR_FEASIBILITY.md for source seams, the accepted scenario and next proofs.
