@@ -3587,7 +3587,7 @@ public class Model : global::EventDispatcher<object>
 
 	public void OPPIKLBKMPN(ActionSound IBODMPMJELJ)
 	{
-		if (IBODMPMJELJ.SameGender(Parameters.OLPCELPEDKD))
+		if (IBODMPMJELJ.SameGender(Parameters.EclipseVoice))
 		{
 			Sound.IFKCCDAIADF(IBODMPMJELJ.get_Name(), IBODMPMJELJ.DBIOMDEIIKI(), IBODMPMJELJ.AFKMLMCCJLI());
 		}
@@ -3600,7 +3600,7 @@ public class Model : global::EventDispatcher<object>
 
 	public void OPPIKLBKMPN(ActionRandomSound IBODMPMJELJ)
 	{
-		if (IBODMPMJELJ.SameGender(Parameters.OLPCELPEDKD))
+		if (IBODMPMJELJ.SameGender(Parameters.EclipseVoice))
 		{
 			Sound.IFKCCDAIADF(IBODMPMJELJ.get_Name());
 		}

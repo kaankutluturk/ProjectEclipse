@@ -2,10 +2,24 @@
 
 `ImportCharacter.py` imports weighted `.blend`, FBX and glTF humanoids into a
 fresh playable mod using core unarmed combat and Standard AI. `RigMapping.py`
-matches semantic regions automatically, with explicit overrides for unknown or
-ambiguous names. Source weights become rotating native SkinnedNode attachments;
-extra bones follow mapped ancestors. Source materials, unusual body
-plans and custom collision proportions are not imported. Read the
+(`map_rig`) matches limbs and the head by name words (Mixamo, Unreal, Rigify,
+VRoid, Biped, Character Creator, Daz), derives pelvis/spine/chest/neck from the
+hierarchy, and falls back to topology for unfamiliar names; explicit overrides
+remain available. Source weights become rotating native SkinnedNode attachments
+posed in 3D on frames from the native pose (front helpers, twist-free limb
+swings) and projected orthographically, at one height-fitting scale. The skin's `<Proportions>`
+keeps the source's own segment lengths on a visual-only rig
+(`CharacterPipeline.visual_joints`, `SkinProportionRig.cs`) whose hands and feet
+stay on the native wrists/ankles; extra bones follow mapped ancestors and root bones follow the pelvis.
+Source materials, unusual body plans and custom collision proportions are not
+imported. The game's **Mods > Characters** page runs this importer through the
+user's Blender (`Assets/Scripts/Eclipse/Modding/CharacterImporter.cs`) and can
+apply any loaded warrior's `skin_models` as Shadow's look; desktop builds copy
+the five importer scripts to `<Data>/CharacterImport`
+(`Assets/Editor/CharacterImporterBuildProcessor.cs`). `SkinPreview.py` draws the preview strip the
+game shows after an import. `TestRealRigs.py --blender <exe> --rig <mdl_skeleton.xml> --models <folder>
+--output Temp/<report>` re-imports a local folder of third-party rigs (never copied into the repository),
+checks reach/budget/meshes and writes a preview per model. Read the
 [import guide](../../Docs/Modding/src/content/docs/guides/character-authoring.md#import-a-weighted-humanoid-character)
 for commands, limits and the mapping format. `CreateImportedRigFixture.py`
 authors original weighted Blender/FBX/glTF fixtures; `TestRigMapping.py` checks

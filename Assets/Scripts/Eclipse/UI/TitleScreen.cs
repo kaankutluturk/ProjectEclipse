@@ -960,6 +960,9 @@ namespace Eclipse.UI
             else if (currentPage == "Home" || currentPage == "Outdated") QuitPrompt();
             else if (currentPage == "Mod details") DrawMods();
             else if (currentPage == "Mod ZIP") CancelModZip();
+            else if (currentPage == "Characters" || currentPage == "Import character" ||
+                     currentPage == "Importing character" || currentPage == "Character imported" ||
+                     currentPage == "Import animations" || currentPage == "Match skeleton" || currentPage == "Pick bone") CharactersBack();
             else if (currentPage == "New campaign" || currentPage == "Rename campaign" || currentPage == "Delete campaign") DrawCampaignSaves();
             else Home();
         }
@@ -993,6 +996,7 @@ namespace Eclipse.UI
             UpdateGust();
             UpdateEclipse();
             UpdateInputDevice();
+            PollCharacterImport();
             if (GameSessionRestart.IsRestarting || splashing || ControlLayoutEditor.BlocksInput) return;
             if (showcasing) return;
             if (currentPage == "Checking")

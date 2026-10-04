@@ -2059,7 +2059,7 @@ public class ListSF
 		ModelParameters kIKOGDEPGHB = ((NENHLHHFDCN == null) ? new ModelParameters() : NENHLHHFDCN.Clone());
 		if (node.Attributes["Voice"] != null)
 		{
-			kIKOGDEPGHB.OLPCELPEDKD = node.Attributes["Voice"].CIPOICEEIBK(string.Empty);
+			kIKOGDEPGHB.Voice = node.Attributes["Voice"].CIPOICEEIBK(string.Empty);
 		}
 		if (node.Attributes["Number"] != null)
 		{
@@ -2431,9 +2431,9 @@ public class ListSF
 		{
 			OEMALIFPGPO.MEECPNMPFPG = BBNKIBKPBLO.MEECPNMPFPG;
 		}
-		if (BBNKIBKPBLO.OLPCELPEDKD.Length != 0)
+		if (BBNKIBKPBLO.Voice.Length != 0)
 		{
-			OEMALIFPGPO.OLPCELPEDKD = BBNKIBKPBLO.OLPCELPEDKD;
+			OEMALIFPGPO.Voice = BBNKIBKPBLO.Voice;
 		}
 		if (BBNKIBKPBLO.Skeleton != null)
 		{

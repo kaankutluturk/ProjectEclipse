@@ -3,7 +3,7 @@ title: Character imports and point-rig tools
 description: Import weighted humanoid characters with normal combat defaults, or author native SF2 point motion and geometric skins.
 ---
 
-To bring in a weighted humanoid from another tool, use the character importer below. For authoring native SF2 motion with a visible body and IK controls, start with [Gymnast Tool Suite and Eclipse packaging](../gymnast/). The lower-level point tools later on this page support format experiments; their point objects alone are not a complete character authoring interface.
+To bring in a weighted humanoid from another tool, use the character importer below. Players can run it from the game itself (**Mods > Characters > Import model...**) and use the result as Shadow's look; see [Replace Shadow's look](#replace-shadows-look). For authoring native SF2 motion with a visible body and IK controls, start with [Gymnast Tool Suite and Eclipse packaging](../gymnast/). The lower-level point tools later on this page support format experiments; their point objects alone are not a complete character authoring interface.
 
 Eclipse characters use SF2's point-based physics rig. An animation stores the positions of those points in a fixed order; body and equipment models attach geometry to them. These low-level tools require Python 3 and Blender 3.6 or newer. Blender 3.6.23 is the tested version for this importer only.
 
@@ -30,21 +30,54 @@ Enable the mod, Apply & Restart, and choose **My Fighter** on the map. Both part
 | `--rig` | Required canonical `mdl_skeleton.xml`; default combat depends on its ordered 67 points. |
 | `--mod-id`, `--output` | Required non-reserved lowercase mod ID and fresh directory with that name. |
 | `--title` | `Imported Fighter`; 1–80 characters. |
-| `--armature` | Optional exact object name; required if the scene contains multiple armatures. Only meshes bound to this armature participate. |
+| `--voice` | `Male` or `Female`; default `Male`. Chooses the character's gendered combat sounds (grunts and hit cries) and is written as the warrior's `voice`. |
+| `--armature` | Optional exact object name. Without it, the armature that deforms the most mesh vertices is used. Only meshes bound to this armature participate. |
 | `--mapping` | Optional JSON object from semantic role to exact source bone name. Overrides automatic matching; unfamiliar clear humanoid hierarchies can be inferred without this file. |
-| `--max-vertices` | `2048`; 3–3500 total output vertices. Dense meshes receive seam welding and automatic decimation, which can change topology and interpolated weights. Export rejects if reduction cannot satisfy the budget. |
+| `--max-vertices` | `3000`; 3–3500 total output vertices. Dense meshes receive seam welding and automatic decimation, which can change topology and interpolated weights. If the first pass is over budget, the importer retries with stricter reduction before rejecting. |
 
-Matching recognizes common Mixamo, Blender-style and Unreal-style names, including namespace prefixes and left/right suffixes. It requires `pelvis`, `chest`, `head`, and each side's `upper_arm`, `forearm`, `hand`, `thigh`, `shin`, and `foot`. `spine` and `neck` are optional additional regions. If names are unfamiliar, a conservative hierarchy/rest-position fallback looks for a pelvis with two leg branches, a trunk/chest with two three-segment arm branches, and a central head branch. It supports three- or four-segment leg chains. The report records `mapping_method` as `names` or `hierarchy`. Unusual or ambiguous layouts still need overrides. Names and topology are hints, not proof of anatomy: ambiguous matches fail with the role and candidate names instead of choosing silently. For unfamiliar names, supply only the missing or ambiguous roles, for example:
+Matching splits bone names into words, so it recognizes Mixamo (`mixamorig:LeftForeArm`), Unreal (`lowerarm_l`), Blender/Rigify (`DEF-forearm.L`), VRoid (`J_Bip_L_LowerArm`), 3ds Max Biped (`Bip01 L Forearm`), Character Creator (`CC_Base_L_Forearm`) and Daz (`lForearmBend`) conventions, with namespace prefixes and left/right markers anywhere in the name. A leading word that at least 80% of the bones share, such as a model ID (`4jtr01t0 l thigh`), is ignored like a namespace; `import.json` notes it. It requires `pelvis`, `chest`, `head`, and each side's `upper_arm`, `forearm`, `hand`, `thigh`, `shin`, and `foot`; `spine` and `neck` are optional additional regions. Names identify the limbs and head. The hierarchy then derives the rest: the chest is where the two arms branch, the pelvis is the nearest pelvis/hips bone above both thighs (or their junction; when the legs hang from a bare root beside a bone named pelvis or hips, that bone is used), and the spine and neck are the first bones on the way from pelvis to chest and from chest to head. Numbered spine chains, clavicles, twist bones and end/nub bones therefore need no mapping file.
+
+If limb names are unfamiliar, a conservative hierarchy/rest-position fallback looks for a pelvis with two downward leg branches, a trunk/chest with two arm branches, and a central head branch. Arm and leg chains may start with a clavicle or hip bone and continue into fingers or toes; the importer picks the upper/lower segments with comparable lengths. Unweighted leaf bones (end markers, IK targets) and short side branches such as twist bones are ignored. The report records `mapping_method` as `names` or `hierarchy`. Unusual or ambiguous layouts still need overrides: ambiguous matches fail with the role and candidate names instead of choosing silently. For unfamiliar names, supply only the missing or ambiguous roles, for example:
 
 ```json
 { "pelvis": "Joint_001", "left_forearm": "Joint_014" }
 ```
 
-Source bones outside these regions, such as fingers and twist bones, follow their nearest mapped ancestor. The report lists these substitutions. Positive weights on an unrelated bone, unweighted vertices, zero-length anatomical segments and multiple armatures on one mesh reject with a diagnostic. Meshes need an Armature modifier pointing at the chosen armature. Non-bone vertex groups are ignored.
+Source bones outside these regions, such as fingers and twist bones, follow their nearest mapped ancestor; bones above the pelvis (a root or hip helper) and unrelated top-level props follow the pelvis. The report lists these substitutions. Meshes participate when they have an Armature modifier pointing at the chosen armature, or when they are parented directly to one of its bones (rigid props such as a helmet or visor follow that bone). Mesh shapes are read in the armature's rest pose with the Armature modifier applied, as Blender shows them. Small meshes (under a quarter of the stature) that are enclosed by other geometry in all six axis directions, such as teeth, tongues and eyeballs, are skipped: they never reach the silhouette. The vertex budget is shared by each mesh's visible surface area as well as its detail, seams and doubled shells finer than 0.15% of the stature are welded, detached specks under 0.8% of the stature are removed, and an underused budget gets one more, finer pass. `import.json` reports every skipped mesh and removed speck. A mesh whose rest vertices mostly lie farther from their own bones than 60% of the character's height is skipped and listed in `import.json`: some game exports keep interior parts such as teeth at the origin and move them only with an animation pose the file does not contain. Meshes hidden from rendering and lower levels of detail (`LOD1`, `LOD2`, … when an `LOD0` exists) are skipped. Vertices without bone weights follow the nearest anatomical segment, and a negligible weight on a far-away bone is dropped; `import.json` counts these as `repaired_vertices`. Zero-length anatomical segments and meshes bound to two armatures reject with a diagnostic. Non-bone vertex groups are ignored.
 
-The adapter fits source geometry in anatomical segment frames and renders a weighted **silhouette**, normalizes its limbs to the core combat rig, and replaces visible armor and helmet meshes with empty models on owned logical equipment. It preserves core collision proportions, equipment anchors and animation ordering. Source textures, materials, independent extra-bone motion and custom hitbox proportions are not imported. Actions are optional, as described below. This is a humanoid compatibility adapter, not support for arbitrary quadrupeds, wings, tails or unusual locomotion. Inspect deformation, both facings and collision fit in the game before sharing. Custom combat moves can target the generated warrior through the [moves API](../../api/moves-and-tactics/); importing a mesh does not author those moves or their hit timing.
+The adapter **poses the source mesh in 3D** and draws its orthographic projection with the game's flat silhouette renderer, so you see what a profile camera would see of the posed model. The native skeleton is three-dimensional: SF2's stance turns the torso toward the camera, and heads, arms and legs move in depth. Each body region follows a 3D frame built from the native pose. The torso, neck and head take their facing from the native front points (`NPelvisF`, `NStomachF`, `NChestF`, `NHeadF`); arms and legs swing from their parent segment; feet use the ankle. Turned torsos, helmets, skirts and limbs pointing at the camera therefore keep their real outline. **Fingers follow the native hand**: SF2 animates each hand's knuckle bend (open for chops and handsprings, closed for fists and weapon grips), and the importer turns each finger's last three bones into phalanges that fold about the knuckle line by that amount, distal joint first, for a real fist at full curl. The thumb and any metacarpal bones stay on the palm, and the hand faces along the palm (wrist to knuckles) so a closing fist does not tilt it. Native animation has no forearm twist or thumb motion, so those stay at their rest orientation. The character keeps its **own proportions**: the importer picks one scale that makes it as tall as a standard SF2 fighter and applies it to every part, so a big head, short legs or long arms stay that way. Gameplay still runs on the standard 67-point skeleton (moves, reach, collision and equipment are unchanged); only the drawing uses a *visual proportion rig* built each frame from the native pose. The torso, neck and head follow the native directions at the character's own lengths. Hands stay on the native wrists and feet on the native ankles and heels, so held weapons, hits and floor contact line up; elbows and knees bend to the same side as the native elbow and knee, judged against the native limb itself, with the character's own limb lengths. A nearly straight native limb bends like a real one (elbows back, knees forward), and a limb that cannot reach is straightened and stretched. The pelvis moves along the body by the difference in leg length. Because hands and feet are pinned, a character with much shorter or longer limbs than Shadow strikes from the same places as Shadow, not from where its own limbs would reach. Reduction protects vertices where two body regions blend, so elbows and knees keep a bend. The adapter replaces visible armor and helmet meshes with empty models on owned logical equipment. It preserves core collision proportions, equipment anchors and animation ordering. Source textures, materials, independent extra-bone motion and custom hitbox proportions are not imported. Actions are optional, as described below. This is a humanoid compatibility adapter, not support for arbitrary quadrupeds, wings, tails or unusual locomotion. Inspect deformation, both facings and collision fit in the game before sharing. Custom combat moves can target the generated warrior through the [moves API](../../api/moves-and-tactics/); importing a mesh does not author those moves or their hit timing.
 
 The original synthetic 19-bone fixture exercises Blender, FBX and glTF import without a hand-authored point mapping. A downloaded [Cesium Man sample](https://github.com/KhronosGroup/glTF-Sample-Assets/tree/edc7c9e67c639d230715049ee31f9a96a6babbbe/Models/CesiumMan) also imports through hierarchy matching without overrides and passes native movement, Punch/contact/reaction, controlled mirrored Kick and Standard AI contact. Source joint positions and weighted region extents determine calibration; display-bone tails are not trusted. These are bounded tests, not evidence that every rig or outfit works. Keep attribution and licensing with any third-party asset you distribute.
+
+### Import from the game
+
+Desktop builds and the editor can run the importer for you. Install [Blender](https://www.blender.org/) 3.6 or newer; Eclipse does not bundle it. Then open **Mods > Characters > Import model...**, choose a `.glb`, `.gltf`, `.fbx` or `.blend` file, give the character a name, pick a **Voice** (Male or Female; select it to switch), and choose **Import**.
+
+- Eclipse looks for Blender in the standard install folders (`Program Files\Blender Foundation\Blender x.y`, Steam, `/Applications/Blender.app`, `/usr/bin`) and on `PATH`, newest version first. Use **Locate Blender...** to choose `blender.exe` yourself; the choice is remembered.
+- Blender runs in the background with the same importer and the game's own combat skeleton. The page shows its progress; **Cancel import** stops it.
+- **Animations** lists the file's animations (Blender reads them in the background). Select an animation to bind it to a control, cycling through Punch, Kick, Ranged, Magic, Up, Down, Forward and Back, or leave it not imported. Bound animations become [source actions](#import-source-actions): they play on that control but deal no damage until you add attack timing in the mod's `scripts/character.lua`.
+- The new mod is written to your Mods folder as `local.<name>` (a number is added if the name is taken) and is chosen as Shadow's look. The result page shows a **preview**: your model from the side, then the fighter in the idle stance, a front kick and a back handspring, drawn exactly as the game will. **Apply & Restart** keeps and loads it, **Discard** deletes the new mod, and **Share as ZIP** packages it.
+- If the skeleton cannot be matched automatically, choose **Match skeleton...**. Each body part shows the bone matched by name, if any; parts in red still need one. Select a part to pick its bone from the skeleton (indented by hierarchy), then **Import with this skeleton**. Spine and neck are optional. This writes the same [mapping file](#import-a-weighted-humanoid-character) the command line accepts.
+- Other failures show the importer's message; the full Blender output is in the game log.
+
+The in-game importer uses core combat and at most 3,000 vertices. The file picker is available in the editor and Windows builds. Released Windows, Linux and macOS players include the importer scripts in their data folder (`CharacterImport`). Blender 3.6.23 is the tested version.
+
+### Replace Shadow's look
+
+**Mods > Characters** lists every loaded mod warrior that declares `skin_models` (such as imported characters), plus imported characters installed since the last restart. Choose **Use** to make that warrior's skins Shadow's look; choose **Shadow** to go back.
+
+| Behavior | Details |
+| --- | --- |
+| What changes | Shadow's armor and helmet still load (the same points, edges and physics) but their geometry is not drawn, unless **Armor: shown** is selected on the Characters page; then it is drawn over the chosen character, fitted to Shadow's body. The chosen warrior's `skin_models` are drawn over Shadow's own body. If the warrior declares a `voice`, Shadow's gendered combat sounds use it; otherwise Shadow keeps his voice. |
+| What stays | Shadow's items, stats, perks, moves, skeleton, collision and weapon, ranged and magic visuals. Armor and helmets still give their stats. |
+| Where it applies | Campaign fights, the shop and other screens built from your profile's fighter. A fight that sets its own `player_character`, or a form change to another character, uses that character's models. |
+| Versus | Your own fighter uses your look on your device: player one in local versus and training, and your side online. Other players see the original look because looks are not sent over the network. A look changes only drawing, never points or physics, so rollback and replays stay in sync. Replays and spectating show the original look. |
+| Where it does not apply | The title screen's sparring preview is unchanged. |
+| Sharing | **Share** on an imported character (or **Share as ZIP** after importing) writes `<mod id>.zip` to an `Eclipse characters` folder on your desktop and opens it. Others install it with **Mods > Install ZIP**. Only share models you have the right to share; keep the source's license with it. |
+| Storage | A local preference on this device, not part of your save. Missing or disabled mods fall back to Shadow's look with a log warning. |
+| Restart | Switching between loaded looks applies to the next fighter the game builds. A newly imported or newly enabled mod needs **Apply & Restart**. |
+
+The skins are fitted to the skeleton of the warrior that declared them. Imported characters use the canonical skeleton, which is the same as Shadow's, and draw with their own proportions as described above. Skins made for a different `body_model` still bind to the same native point names but can fit less well.
 
 ### Import source actions
 
@@ -165,7 +198,7 @@ Fix the named field in your source model and export again. A failed character pr
 | Nodes | Unique composed names; `Type` is `Node`, `MacroNode`, `CenterOfMass`, or `SkinnedNode`. The complete character permits 1–4,096 nodes. |
 | Numeric fields | Finite values within ±100,000. Missing ordinary coordinates, mass, radii, lengths, and margins default to zero. Mass, lengths, and radii cannot be negative. |
 | Helper nodes | `NodesCount` is required, 1–128; every `ChildNode1`…`ChildNodeN` must resolve to a node declared earlier in the composition. Each `MacroNode` requires its corresponding finite `LCC1`…`LCCN` weight. `CenterOfMass` children need positive total mass. |
-| Weighted skin nodes | `SkinnedNode` requires `BonesCount` 1–16. Each influence requires distinct earlier `BoneStartN`/`BoneEndN` names, `WeightN` in 0–1, and `AlongN`/`AcrossN` in ±100. Weights must sum to 1 within 0.0001. |
+| Weighted skin nodes | `SkinnedNode` requires `BonesCount` 1–16. Each influence requires distinct earlier `BoneStartN`/`BoneEndN` names, `WeightN` in 0–1, `AlongN` in ±100, and exactly one of `AcrossN` (relative, ±100), `OffsetN` (absolute, ±1,000), or a 3D `LocalXN`/`LocalYN`/`LocalZN` position (±1,000; then without `AlongN`). `ExtendN` (absolute, ±1,000, default 0) is allowed only with `OffsetN`. Weights must sum to 1 within 0.0001. |
 | Edges | `Type` is `Edge` or `Muscle`; `End1` and `End2` must resolve. `Iterations` defaults to 1 and permits 1–32. Extra iterations are named `EdgeNameCI1`, `EdgeNameCI2`, and so on; those expanded names must also be unique. The complete character permits at most 8,192 expanded edges. |
 | Figures | Unique names within each authored document; `Type` is `Triangle` or `Capsule`. Triangles require resolved `Node1`, `Node2`, and `Node3`; capsules require a resolved `Edge`, including expanded iteration names. |
 
@@ -173,11 +206,74 @@ Body documents precede equipment; skins follow it in their listed order. Give ov
 
 `SkinnedNode` is a derived planar mesh vertex. For each influence, the file-space position is `start + Along × (end − start) + Across × perpendicular(end − start)`, then weighted and summed. `perpendicular(x, y) = (-y, x)`. Along/across values are fractions of that segment's current length. The runtime handles file/runtime Y conversion and reverses across with fighter facing, so the silhouette mirrors with the fighter. Z is zero. Unlike `MacroNode` landmark coefficients, the across offset rotates with the limb. These nodes follow native animation and physics; they are not additional independently animated bones or collision edges.
 
+An influence can instead give absolute distances in native units. With `OffsetN` (and optional `ExtendN`), the position is `start + Along × (end − start) + Extend × u + Offset × perpendicular(u)`, where `u` is the segment's on-screen direction scaled to unit length. When a segment points toward the camera, its on-screen length is taken as at least 35% of its full 3D length, so absolute offsets shrink smoothly instead of jumping. Use absolute offsets for thickness that should not grow or shrink with a segment's length; the character importer writes them. Relative and absolute influences can be mixed in one node and one document.
+
+A skin document can add a `<Proportions Version="1">` element beside `Nodes` and `Figures`. Its skinned nodes then bind to a visual rig instead of the native points: gameplay is unchanged, and only that document's drawing uses the listed lengths. It must contain one `<Segment Start End Length/>` for each of these 21 segments, with `Length` in native units from 0.01 to 1,000:
+
+| Segments | How the visual rig uses them |
+| --- | --- |
+| `NPivot`→`NStomach`→`NChest`→`NNeck`→`NHead`→`NTop` | Torso chain from the visual pelvis, along the native directions. |
+| `NNeck`→`NShoulder_1`/`_2`, `NPivot`→`NHip_1`/`_2` | Shoulder and hip offsets from the visual neck and pelvis. |
+| `NShoulder_N`→`NElbow_N`→`NWrist_N` | Two-bone IK from the visual shoulder to the native wrist. The elbow goes to the side the native elbow bends to, relative to the native shoulder–wrist line; a nearly straight native arm bends backward, away from `NChestF`. |
+| `NHip_N`→`NKnee_N`→`NAnkle_N` | Two-bone IK from the visual hip to the native ankle. The knee goes to the side the native knee bends to, relative to the native hip–ankle line; a nearly straight native leg bends forward, toward `NPelvisF`. |
+| `NWrist_N`→`NFingertips_N`, `NHeel_N`→`NToeTip_N` | Hand and foot from the native wrist and heel. |
+
+The body must also contain `NChestF` and `NPelvisF` for these bend directions. The visual pelvis moves from the native pelvis toward the feet (along the neck-to-pelvis axis) by the native average thigh-plus-shin length minus the listed one. Without `<Proportions>`, skinned nodes bind to the native points as before.
+
+```xml
+<Proportions Version="1">
+  <Segment Start="NPivot" End="NStomach" Length="11.5" />
+  <!-- ...one Segment for each of the 21 segments above... -->
+</Proportions>
+```
+
+With `<Proportions>`, a document can also add `<Rest Version="1">` and use **3D influences**. When `<Rest>` also lists a `<Frame>` for every segment a node uses, the node's influences are blended as dual quaternions instead of averaged points, so elbows, knees and shoulders keep their volume instead of pinching. Each 3D influence gives `LocalXN`, `LocalYN`, `LocalZN`: the vertex's position in the segment's frame at the source rest pose, in native units. The runtime builds a right-handed frame for each segment on the visual rig, places the point, and keeps only its X and Y (orthographic projection); facing left mirrors the result. The segments and their frames:
+
+| Segment | First axis | Second axis |
+| --- | --- | --- |
+| `NPivot`→`NStomach`, `NStomach`→`NChest`, `NChest`→`NNeck` | Along the segment. | Toward `NPelvisF`, `NStomachF`, `NChestF` from the segment start. |
+| `NNeck`→`NHead`, `NHead`→`NTop` | Along the segment. | From `NHead` toward `NHeadF`. |
+| `NShoulder_N`→`NElbow_N`→`NWrist_N`→`NFingertips_N`, `NHip_N`→`NKnee_N`→`NAnkle_N` | The parent frame turned by the shortest rotation from the `Rest` direction to the current direction. | Parents: arm from `NChest`→`NNeck`, leg from `NPivot`→`NStomach`, then each previous segment. |
+| `NHeel_N`→`NToeTip_N` | Along the foot. | Toward the native ankle. |
+
+Before posing, each arm and leg chain is put on its anatomical side. SF2 keeps `_1` points on the `up × front` side of the torso (front from `NChestF` for arms, `NPelvisF` for legs), but some native clips are authored with left/right labels reversed, and a fighter facing left can have its pairs swapped by the game. The native rig is symmetric so this never shows there; a 3D skin would hang one limb's mesh on the other limb. A chain found on the wrong side is swapped back; near edge-on poses keep their previous choice so a chain cannot flicker.
+
+Optional `<Rest>` children:
+
+| Element | Meaning |
+| --- | --- |
+| `<Frame Start End O A B/>` or `<Frame Dynamic="k" O A B/>` | A segment's source rest frame: origin `O` (`x,y,z`, ±100,000) and orthonormal first and second axes `A`, `B`. Enables dual-quaternion blending. |
+| `<Dynamic Id Parent Head Dir Length Stiffness Damping/>` | A spring bone (coat tail, hair, cloth), numbered from 0. `Parent` is a segment (`NStomach-NChest`) or an earlier spring (`#2`); `Head` is its start in the parent frame, `Dir` its unit rest direction, `Length` 0.01–1,000, `Stiffness` (default 0.15) and `Damping` (default 0.9) 0–1. The runtime simulates its tip each step (gravity, lag behind the parent, fixed length) and snaps it back when the fighter turns or teleports. Influences on a spring add `DynamicN="k"`; their `BoneStartN`/`BoneEndN` name the chain's root segment. Drawing only. |
+| `Twist` on a hand `Bone` | The native rest pose's hand roll in degrees, measured from `NKnucklesS`. The hand turns by the difference from it (at most ±150°), and the forearm follows with a share that grows toward the wrist. |
+
+The importer writes all of these. It makes spring bones from unmapped rope-like chains (each bone with at most one child) of two or more weighted bones, or single bones named like hair, cloth, coat, skirt, cape, tail and similar. Face rigs, twist helpers and props stay rigid. The body must also contain `NKnucklesS_1`/`_2`.
+
+`<Rest>` needs one `<Bone Start End X Y Z/>` for each of the ten arm and leg segments: the segment's rest direction as a unit vector in its parent's frame. The body must contain the four front points and `NKnuckles_1`/`_2`. The third axis is always the first crossed with the second. The hand frame's current direction is wrist to knuckles, so its `Rest` direction is the source palm (wrist to the finger bases).
+
+A hand influence (on `NWrist_N`→`NFingertips_N`) can add `CurlN` (1–3, the phalanx level) and `PivotN`: one `x,y,z` hand-local joint position per level, proximal first, separated by spaces (each value ±1,000). The runtime measures the native knuckle bend (wrist→knuckles against knuckles→fingertips), subtracts the hand bone's optional `Curl` attribute in `<Rest>` (the source's own rest finger bend in degrees, 0–180), and divides by 75° for a curl share from 0 to 1. The point then rotates about each pivot from the deepest level up, by the share times 90°, 100° and 70° for levels 1, 2 and 3, about the native knuckle line.
+
+```xml
+<Rest Version="1">
+  <Bone Start="NShoulder_1" End="NElbow_1" X="0.02" Y="-0.11" Z="0.99" />
+  <!-- ...one Bone for each arm and leg segment... -->
+</Rest>
+<ImportedVertex3 Type="SkinnedNode" X="0" Y="0" Z="0" BonesCount="1"
+  BoneStart1="NElbow_1" BoneEnd1="NWrist_1" Weight1="1" LocalX1="12" LocalY1="3.5" LocalZ1="-1" />
+<!-- A fingertip on the second phalanx: folds at both knuckle joints. -->
+<ImportedVertex4 Type="SkinnedNode" X="0" Y="0" Z="0" BonesCount="1"
+  BoneStart1="NWrist_1" BoneEnd1="NFingertips_1" Weight1="1" LocalX1="9" LocalY1="0.4" LocalZ1="1.1"
+  Curl1="2" Pivot1="6.2,0.3,1.0 7.9,0.3,1.1" />
+```
+
 ```xml
 <!-- Skin document: both endpoints already exist in the body. -->
 <ImportedVertex Type="SkinnedNode" X="0" Y="0" Z="0" BonesCount="1"
   BoneStart1="NElbow_1" BoneEnd1="NWrist_1"
   Weight1="1" Along1="0.5" Across1="0.12" />
+<!-- Absolute: halfway along the forearm, 4 units in front of it. -->
+<ImportedVertex2 Type="SkinnedNode" X="0" Y="0" Z="0" BonesCount="1"
+  BoneStart1="NElbow_1" BoneEnd1="NWrist_1"
+  Weight1="1" Along1="0.5" Extend1="0" Offset1="4" />
 ```
 
 Other authoring tools can produce `frames.json` with `version = 1`, `fps`, `names`, and `frames`. Each frame is an array of `[x,y,z]` points matching `names`. Names must match the rig exactly; the baker reorders them to native order and resamples input at 1–240 fps to 60 Hz:

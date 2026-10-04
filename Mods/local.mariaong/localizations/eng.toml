@@ -1,0 +1,4 @@
+title = "MariaOng"
+zones/preview = "MariaOng"
+fighter = "MariaOng"
+description = "Play the imported fighter with normal SF2 controls and combat."

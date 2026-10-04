@@ -86,6 +86,9 @@ namespace Eclipse.Multiplayer
             parameters.WarriorPerks.Clear();
             parameters.LearnedPerks.Clear();
             parameters.Perks.Clear();
+            // This device's own fighter shows the player's chosen look, drawn locally only
+            // (geometry, not physics), so peers and replays stay in sync.
+            parameters.EclipseVersusLook = IsOwnFighter(left, aiTactic);
             GameUtils.InitializeLocalVersusParameters(parameters, left);
             if (!string.IsNullOrEmpty(aiTactic))
             {
@@ -101,6 +104,13 @@ namespace Eclipse.Multiplayer
             }
             ModelLoader.RequireModelDocuments(parameters.ModelDocuments);
             return parameters;
+        }
+
+        private static bool IsOwnFighter(bool left, string aiTactic)
+        {
+            if (!string.IsNullOrEmpty(aiTactic) || LocalVersusSession.IsReplay || LocalVersusSession.IsSpectating) return false;
+            if (LocalVersusSession.IsOnline) return OnlineVersusSession.Current != null && OnlineVersusSession.Current.IsHost == left; // host plays left
+            return left;
         }
 
         internal static ModelParameters PrepareTitleFighter(VersusLoadout loadout, bool left, string tactic)

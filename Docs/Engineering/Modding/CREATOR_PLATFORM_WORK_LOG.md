@@ -1562,3 +1562,15 @@ The source-action tactic's cooldown wait is now conditional on an eligible
 imported action, preserving Standard fallback when the source actions are
 unavailable. Actual Lua checks selection, eligible cooldown wait and empty-action
 fallback; the final native acceptance uses the regenerated v3 package.
+
+## 2026-10-04: imported characters as Shadow's look, broader rig support
+
+Mods > Characters chooses any loaded warrior's `skin_models` as Shadow's look
+(local preference; armor/helmet geometry hidden, stats/items/moves unchanged;
+versus excluded) and imports a rigged humanoid through the user's Blender with
+progress, cancel and restart. Rig matching now handles complete Mixamo, Unreal,
+Rigify, VRoid, Biped, Character Creator and Daz conventions and derives the trunk
+from the hierarchy. The importer draws side-view (sagittal) silhouettes with
+absolute body-scaled thickness (new optional `Offset`/`Extend` SkinnedNode fields),
+protects joints during decimation and repairs unweighted/unstable vertices.
+See SHADOW_LOOK_ACCEPTANCE.md for checks and limits; Unity sessions were not run.

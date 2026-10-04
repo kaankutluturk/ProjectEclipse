@@ -420,7 +420,7 @@ for an opponent, an independent actor or an owned fight's `player_character`.
 | `attributes` | Name-to-number table | Empty | Finite native attribute values. |
 | `attribute_alignments` | Alignment array | Empty | Rows described below. |
 | `body_model` | Model handle | Inherit skeleton | Native body model, including its ordered point rig. |
-| `skin_models` | Model handle array | Empty | Up to 16 native geometry overlays, appended after equipment. |
+| `skin_models` | Model handle array | Empty | Up to 16 native geometry overlays, appended after equipment. A warrior with skins is also offered as a look for Shadow in **Mods > Characters**; see [Replace Shadow's look](../../guides/character-authoring/#replace-shadows-look). |
 | `health_bars` | Integer | `0` | Additional health-pool configuration; `0` keeps the template setting; `1` explicitly selects one pool. |
 | `skeleton` | String | Inherit | Native body item such as `"Skeleton"` or `"SkeletonHeavy"`, added to the loadout. |
 

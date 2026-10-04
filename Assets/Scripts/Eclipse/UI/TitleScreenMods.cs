@@ -94,9 +94,10 @@ namespace Eclipse.UI
                 Button(page, "Next", 446, 552, 190, 40, () => { modPage = (modPage + 1) % pages; DrawMods(); }, UiSound.Tab);
             }
             if (issues.Count > 0) Button(page, "Details (" + issues.Count + ")", 742, 552, 450, 40, () => DrawModIssues(issues, 0));
-            Button(page, "Back / Cancel", 76, 604, 320, 48, Home, UiSound.Back);
-            Button(page, "Install ZIP", 418, 604, 300, 48, PickModZip);
-            var apply = Button(page, "Apply & Restart", 742, 604, 450, 48, ApplyMods);
+            Button(page, "Back / Cancel", 76, 604, 290, 48, Home, UiSound.Back);
+            Button(page, "Install ZIP", 380, 604, 240, 48, PickModZip);
+            Button(page, "Characters", 634, 604, 260, 48, OpenCharacters, UiSound.Open);
+            var apply = Button(page, "Apply & Restart", 908, 604, 284, 48, ApplyMods);
             apply.interactable = !resolution.HasErrors;
             FocusFirst();
             if (focus < controls.Count) controls[focus].Select();

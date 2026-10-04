@@ -7,10 +7,16 @@ namespace Eclipse.UI
 {
     internal static class ModZipPicker
     {
-        public static string PickDesktop()
+        public static string PickDesktop() =>
+            PickDesktop("Install Eclipse mod ZIP", "ZIP archives", "zip");
+
+        /// <summary>Native open-file dialog; null when canceled. Editor and Windows builds.</summary>
+        public static string PickDesktop(string title, string filterName, params string[] extensions)
         {
 #if UNITY_EDITOR
-            return UnityEditor.EditorUtility.OpenFilePanel("Install Eclipse mod ZIP", "", "zip");
+            string picked = UnityEditor.EditorUtility.OpenFilePanelWithFilters(title, "",
+                new[] { filterName, string.Join(",", extensions) });
+            return string.IsNullOrEmpty(picked) ? null : picked;
 #elif UNITY_STANDALONE_WIN
             IntPtr fileBuffer = Marshal.AllocHGlobal(4096 * sizeof(char));
             try
@@ -20,10 +26,10 @@ namespace Eclipse.UI
                 {
                     size = Marshal.SizeOf(typeof(OpenFileName)),
                     owner = GetActiveWindow(),
-                    filter = "ZIP archives\0*.zip\0\0",
+                    filter = filterName + "\0*." + string.Join(";*.", extensions) + "\0\0",
                     file = fileBuffer,
                     maxFile = 4096,
-                    title = "Install Eclipse mod ZIP",
+                    title = title,
                     flags = 0x00000008 | 0x00000800 | 0x00001000 | 0x00080000
                 };
                 if (GetOpenFileName(ref dialog)) return Marshal.PtrToStringUni(fileBuffer);
@@ -33,7 +39,7 @@ namespace Eclipse.UI
             }
             finally { Marshal.FreeHGlobal(fileBuffer); }
 #else
-            throw new PlatformNotSupportedException("ZIP selection is available in the editor, Windows and Android builds.");
+            throw new PlatformNotSupportedException("File selection is available in the editor, Windows and Android builds.");
 #endif
         }
 

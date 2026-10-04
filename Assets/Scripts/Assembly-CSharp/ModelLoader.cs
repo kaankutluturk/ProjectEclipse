@@ -51,11 +51,10 @@ public class ModelLoader
         // Opt into authored body/skin contracts without changing archival model
         // parsing or first-definition bindings for recovered equipment.
         var parameters = ACENLMONNPA.GetModel()?.Parameters;
-        if (parameters != null && (!string.IsNullOrEmpty(parameters.EclipseBodyModel) || parameters.EclipseSkinModels.Length != 0))
+        if (parameters != null && parameters.HasEclipseAuthoredModels)
         {
             var authored = new HashSet<string>(System.StringComparer.Ordinal);
-            if (IsAuthoredModel(parameters.EclipseBodyModel)) authored.Add(AuthoredModelPath(parameters.EclipseBodyModel));
-            foreach (var skin in parameters.EclipseSkinModels) if (IsAuthoredModel(skin)) authored.Add(AuthoredModelPath(skin));
+            foreach (var model in parameters.EclipseAuthoredModels()) if (IsAuthoredModel(model)) authored.Add(AuthoredModelPath(model));
             if (authored.Count != 0)
             {
                 var documents = new List<XmlDocument>(CBHAEPCLDFG.Count);
@@ -72,7 +71,7 @@ public class ModelLoader
 				xmlDocument = FHGHPCACAKJ.JBJDPDOEGFO(SF2Paths.BNHLPKEDMOM(), item);
 				if (xmlDocument != null)
 				{
-					Parse(ACENLMONNPA, xmlDocument);
+					Parse(ACENLMONNPA, xmlDocument, parameters != null && parameters.HidesEclipseFigures(item));
 					continue;
 				}
 				LLLOJBFMONN.Error("File '{0}' not found", item);
@@ -112,7 +111,7 @@ public class ModelLoader
             throw new System.IO.InvalidDataException("Prepared form requires at least one model document.");
     }
 
-	private static void Parse(ModelObject ACENLMONNPA, XmlDocument EELFNMOHGJL)
+	private static void Parse(ModelObject ACENLMONNPA, XmlDocument EELFNMOHGJL, bool hideFigures = false)
 	{
 		XmlNode eELFNMOHGJL = EELFNMOHGJL["Scene"];
 		if (!PICNEPHDGGG(ACENLMONNPA, eELFNMOHGJL))
@@ -123,6 +122,8 @@ public class ModelLoader
 		{
 			LLLOJBFMONN.Write("Edges was not parsed");
 		}
+		// An Eclipse look keeps hidden equipment's nodes and edges but draws no figures.
+		if (hideFigures) return;
 		if (!LDPLPKPLNEJ(ACENLMONNPA, eELFNMOHGJL))
 		{
 			LLLOJBFMONN.Write("Capsules was not parsed");

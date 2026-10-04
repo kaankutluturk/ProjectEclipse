@@ -1,0 +1,10 @@
+schema = 1
+id = "local.jotaro-kujo-part-4"
+name = "Jotaro Kujo (Part 4)"
+version = "1.0.0"
+authors = ["Local author"]
+entrypoint = "scripts/main.lua"
+capabilities = ["content.register"]
+[[dependencies]]
+id = "core"
+version = ">=1.0 <2.0"

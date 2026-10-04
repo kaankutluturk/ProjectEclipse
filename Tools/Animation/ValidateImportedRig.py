@@ -21,12 +21,12 @@ def main():
         assert not list(body.find('Figures')), 'Original visible body should be replaced'
         report = json.loads((package / 'import.json').read_text(encoding='utf-8'))
         assert len(report['mapping']) == 17 and len(report['inherited_bones']) == 2
-        count = sum(row['vertices'] for row in report['meshes'])
+        count = sum(row.get('vertices', 0) for row in report['meshes'])
         assert count == len(skin.find('Nodes')) and count <= report['max_vertices']
         assert kind == 'reduced' or any(n.get('BonesCount') == '2' for n in skin.find('Nodes')), 'Mixed source weights lost'
         positions = {n.tag: [float(n.get(axis, 0)) for axis in 'XYZ'] for n in body.find('Nodes')}
         combined = ET.fromstring(ET.tostring(body)); combined.find('Nodes').extend(list(skin.find('Nodes')))
-        pipeline.helper_positions(combined, positions)
+        pipeline.helper_positions(combined, positions, pipeline.read_proportions(skin), pipeline.read_rest(skin))
         assert all(len(p) == 3 for p in positions.values())
         assert all(p[2] == 0 for name, p in positions.items() if name.startswith('Imported'))
         assert not (package / 'assets/animations').exists(), 'Default combat needs no generated source clips'

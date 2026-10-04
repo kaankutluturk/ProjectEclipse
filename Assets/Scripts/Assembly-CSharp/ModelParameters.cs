@@ -3,7 +3,7 @@ using System.Xml;
 using CodeStage.AntiCheat.ObscuredTypes;
 using UnityEngine;
 
-public class ModelParameters
+public partial class ModelParameters
 {
 	public enum EGDGFNAFELM
 	{
@@ -75,7 +75,8 @@ public class ModelParameters
 
 	public int EHFNCDPPIAF;
 
-	public string OLPCELPEDKD;
+	// best guess for name
+	public string Voice;
 
 	public XmlNode Node;
 
@@ -450,7 +451,7 @@ public class ModelParameters
 		FLGGADFNNDK = 0;
 		KMNLACDHAFE = false;
 		HGHDBNPIFEJ = false;
-		OLPCELPEDKD = string.Empty;
+		Voice = string.Empty;
 		PMHHMDAIOGL = false;
 		HBFMBOHLKPJ = null;
 		KKFBCOKMNDF = false;
@@ -488,6 +489,11 @@ public class ModelParameters
         EclipseBodyModel = NBMGOEMJJAF.EclipseBodyModel;
         EclipseCharacterId = NBMGOEMJJAF.EclipseCharacterId;
         EclipseSkinModels = (string[])NBMGOEMJJAF.EclipseSkinModels.Clone();
+        EclipseRosterPlayer = NBMGOEMJJAF.EclipseRosterPlayer;
+        EclipseVersusLook = NBMGOEMJJAF.EclipseVersusLook;
+        _eclipseHiddenFigures.UnionWith(NBMGOEMJJAF._eclipseHiddenFigures);
+        _eclipseAppearanceSkins = NBMGOEMJJAF._eclipseAppearanceSkins;
+        _eclipseAppearanceVoice = NBMGOEMJJAF._eclipseAppearanceVoice;
 		Weapon = NBMGOEMJJAF.Weapon;
 		Armor = NBMGOEMJJAF.Armor;
 		Helm = NBMGOEMJJAF.Helm;
@@ -521,7 +527,7 @@ public class ModelParameters
 		FLGGADFNNDK = NBMGOEMJJAF.FLGGADFNNDK;
 		KMNLACDHAFE = NBMGOEMJJAF.KMNLACDHAFE;
 		HGHDBNPIFEJ = NBMGOEMJJAF.KMNLACDHAFE;
-		OLPCELPEDKD = NBMGOEMJJAF.OLPCELPEDKD;
+		Voice = NBMGOEMJJAF.Voice;
 		PMHHMDAIOGL = NBMGOEMJJAF.PMHHMDAIOGL;
 		HBFMBOHLKPJ = NBMGOEMJJAF.HBFMBOHLKPJ;
 		KKFBCOKMNDF = NBMGOEMJJAF.KKFBCOKMNDF;
@@ -754,6 +760,8 @@ public class ModelParameters
 	public void PPFDLIBLNDG()
 	{
 		ModelDocuments.Clear();
+        // A chosen player look replaces armor/helmet geometry only; their stats stay.
+        bool eclipseLook = ResolveEclipseAppearance();
         if (!string.IsNullOrEmpty(EclipseBodyModel))
             ModelDocuments.Add(EclipseBodyModel.EndsWith(".xml",System.StringComparison.OrdinalIgnoreCase) ? EclipseBodyModel : OKALHAKMOLI(EclipseBodyModel));
 		else if (Skeleton != null && !string.IsNullOrEmpty(Skeleton.ModelFileName))
@@ -764,13 +772,18 @@ public class ModelParameters
 		{
 			ModelDocuments.Add(OKALHAKMOLI(Weapon.ModelFileName));
 		}
+		// Under a look, armor and helmet still load (same nodes, edges and physics) but
+		// their figures are not drawn unless the player shows armor.
+		bool eclipseHideArmor = eclipseLook && !Eclipse.Modding.PlayerAppearance.ShowArmor;
 		if (Armor != null && !string.IsNullOrEmpty(Armor.ModelFileName))
 		{
-			ModelDocuments.Add(OKALHAKMOLI(Armor.ModelFileName));
+			string path = OKALHAKMOLI(Armor.ModelFileName);
+			ModelDocuments.Add(eclipseHideArmor ? HideEclipseFigures(path) : path);
 		}
 		if (Helm != null && !string.IsNullOrEmpty(Helm.ModelFileName))
 		{
-			ModelDocuments.Add(OKALHAKMOLI(Helm.ModelFileName));
+			string path = OKALHAKMOLI(Helm.ModelFileName);
+			ModelDocuments.Add(eclipseHideArmor ? HideEclipseFigures(path) : path);
 		}
 		for (int i = 0; i < HEKILHEHMMH.Count; i++)
 		{
@@ -778,6 +791,8 @@ public class ModelParameters
 		}
         foreach (var skin in EclipseSkinModels)
             ModelDocuments.Add(skin.EndsWith(".xml",System.StringComparison.OrdinalIgnoreCase) ? skin : OKALHAKMOLI(skin));
+        foreach (var skin in _eclipseAppearanceSkins)
+            ModelDocuments.Add(EclipseModelPath(skin));
 	}
 
 	public int DGLDFMCEDDO(string name, ref bool GMEMHMOHFGG)

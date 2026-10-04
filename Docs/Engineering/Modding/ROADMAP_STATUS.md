@@ -533,3 +533,9 @@ passes 28 checks. Reentrant scheduled events and root caster Lua attribution wer
 fixed in native source. No new API binding is implied; general live actors,
 steering, original rigs and broader platform/game acceptance remain open. See
 the creator work log and public projectile guide for source and limits.
+
+2026-10-04: imported humanoids can replace Shadow's look from Mods > Characters,
+which also runs the Blender importer in-game. Complete Mixamo/Unreal/VRoid-style
+rigs now map without overrides, and skins use the side-view plane with absolute
+thickness. Unity/native acceptance is pending the owner's playtest; armor fitting,
+versus looks and non-humanoid bodies remain open. See SHADOW_LOOK_ACCEPTANCE.md.

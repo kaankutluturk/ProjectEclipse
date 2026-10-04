@@ -51,9 +51,35 @@ namespace Eclipse.Modding
                             double weight = Number(node, "Weight" + suffix, path, where, true, required: true);
                             if (weight < 0 || weight > 1) Fail(path, where + " @Weight" + suffix, "must be in 0..1");
                             total += weight;
-                            foreach (string field in new[] { "Along", "Across" })
-                                if (Math.Abs(Number(node, field + suffix, path, where, true, required: true)) > 100)
-                                    Fail(path, where + " @" + field + suffix, "must be in -100..100");
+                            if (node.HasAttribute("LocalX" + suffix))
+                            {
+                                // 3D binding: a source-rest point in a posed segment frame.
+                                foreach (string field in new[] { "Along", "Across", "Offset", "Extend" })
+                                    if (node.HasAttribute(field + suffix)) Fail(path, where + " @" + field + suffix, "cannot be combined with LocalX" + suffix);
+                                var frameKey = (node.GetAttribute("BoneStart" + suffix), node.GetAttribute("BoneEnd" + suffix));
+                                if (scene["Proportions"] == null || scene["Rest"] == null || !new List<(string, string)>(SkinProportionRig.FrameKeys()).Contains(frameKey))
+                                    Fail(path, where, "3D binding " + suffix + " needs Proportions, Rest and a supported segment");
+                                foreach (string axis in new[] { "X", "Y", "Z" })
+                                    if (Math.Abs(Number(node, "Local" + axis + suffix, path, where, true, required: true)) > 1000)
+                                        Fail(path, where + " @Local" + axis + suffix, "must be in -1000..1000");
+                                if (node.HasAttribute("Curl" + suffix) || node.HasAttribute("Pivot" + suffix))
+                                    ValidateFinger(node, suffix, frameKey.Item1, path, where);
+                                continue;
+                            }
+                            if (Math.Abs(Number(node, "Along" + suffix, path, where, true, required: true)) > 100)
+                                Fail(path, where + " @Along" + suffix, "must be in -100..100");
+                            // Relative bindings use Across; absolute bindings use Offset and optional Extend.
+                            bool absolute = node.HasAttribute("Offset" + suffix);
+                            if (absolute == node.HasAttribute("Across" + suffix))
+                                Fail(path, where, "binding " + suffix + " needs exactly one of Across or Offset");
+                            if (!absolute && node.HasAttribute("Extend" + suffix))
+                                Fail(path, where + " @Extend" + suffix, "requires Offset" + suffix);
+                            if (!absolute && Math.Abs(Number(node, "Across" + suffix, path, where, true, required: true)) > 100)
+                                Fail(path, where + " @Across" + suffix, "must be in -100..100");
+                            if (absolute)
+                                foreach (string field in new[] { "Offset", "Extend" })
+                                    if (Math.Abs(Number(node, field + suffix, path, where, true, required: field == "Offset")) > 1000)
+                                        Fail(path, where + " @" + field + suffix, "must be in -1000..1000");
                         }
                         if (Math.Abs(total - 1) > .0001) Fail(path, where, "skin weights must sum to 1");
                     }
@@ -124,10 +150,145 @@ namespace Eclipse.Modding
                     else Fail(path, where + " @Type", "must be Triangle or Capsule");
                 }
                 if (nodes.Count == 0) Fail(path, "/Scene/Nodes", "composed model needs at least one node");
+                if (scene["Proportions"] != null) ValidateProportions(scene["Proportions"], nodes, path);
+                if (scene["Rest"] != null) ValidateRest(scene["Rest"], nodes, path);
             }
             if (nodes.Count > 4096 || expandedEdges > 8192)
                 Fail(paths.Count == 0 ? "<composition>" : paths[paths.Count - 1], "/Scene", "composed authored character exceeds 4096 nodes or 8192 expanded edges");
         }
+        // Visual proportion rig for a skin: every supported segment exactly once.
+        private static void ValidateProportions(XmlElement element, Dictionary<string, double> nodes, string path)
+        {
+            const string where = "/Scene/Proportions";
+            if (element.GetAttribute("Version") != "1") Fail(path, where + " @Version", "must be 1");
+            var required = new HashSet<(string, string)>(SkinProportionRig.Segments());
+            var seen = new HashSet<(string, string)>();
+            foreach (XmlNode value in element.ChildNodes)
+            {
+                if (!(value is XmlElement segment)) continue;
+                var key = (segment.GetAttribute("Start"), segment.GetAttribute("End"));
+                string at = where + "/" + segment.Name + "[" + key.Item1 + "-" + key.Item2 + "]";
+                if (segment.Name != "Segment" || !required.Contains(key) || !seen.Add(key))
+                    Fail(path, at, "must be one unique supported Segment");
+                double length = Number(segment, "Length", path, at, true, required: true);
+                if (length < .01 || length > 1000) Fail(path, at + " @Length", "must be in 0.01..1000");
+            }
+            foreach (var key in required)
+            {
+                if (!seen.Contains(key)) Fail(path, where, "missing Segment " + key.Item1 + "-" + key.Item2);
+                if (!nodes.ContainsKey(key.Item1) || !nodes.ContainsKey(key.Item2))
+                    Fail(path, where, "needs native points " + key.Item1 + " and " + key.Item2 + " in the body");
+            }
+            foreach (string hint in new[] { "NChestF", "NPelvisF" }) // elbow/knee bend hints
+                if (!nodes.ContainsKey(hint)) Fail(path, where, "needs native point " + hint + " in the body");
+        }
+
+        // Finger phalanx binding: Curl 1..3 on a hand segment, one x,y,z pivot per level.
+        private static double[] Triple(XmlElement element, string field, string path, string where, double limit)
+        {
+            var parts = element.GetAttribute(field).Split(',');
+            var values = new double[3];
+            if (parts.Length != 3) Fail(path, where + " @" + field, "must be x,y,z");
+            for (int i = 0; i < 3; i++)
+                if (!double.TryParse(parts[i], NumberStyles.Float, CultureInfo.InvariantCulture, out values[i]) ||
+                    double.IsNaN(values[i]) || Math.Abs(values[i]) > limit)
+                    Fail(path, where + " @" + field, "values must be finite within -" + limit + ".." + limit);
+            return values;
+        }
+
+        private static void ValidateFinger(XmlElement node, string suffix, string start, string path, string where)
+        {
+            string curl = node.GetAttribute("Curl" + suffix);
+            if (!start.StartsWith("NWrist_", StringComparison.Ordinal) || (curl != "1" && curl != "2" && curl != "3"))
+                Fail(path, where + " @Curl" + suffix, "must be 1..3 on a hand (NWrist-NFingertips) binding");
+            var points = node.GetAttribute("Pivot" + suffix).Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            if (points.Length != curl[0] - '0') Fail(path, where + " @Pivot" + suffix, "needs one x,y,z point per Curl level");
+            foreach (string point in points)
+            {
+                var values = point.Split(',');
+                if (values.Length != 3) Fail(path, where + " @Pivot" + suffix, "entries must be x,y,z");
+                foreach (string value in values)
+                    if (!double.TryParse(value, NumberStyles.Float, CultureInfo.InvariantCulture, out double number) ||
+                        double.IsNaN(number) || Math.Abs(number) > 1000)
+                        Fail(path, where + " @Pivot" + suffix, "values must be finite within -1000..1000");
+            }
+        }
+
+        // Limb rest directions (unit vectors in the parent frame) for 3D skin bindings.
+        private static void ValidateRest(XmlElement element, Dictionary<string, double> nodes, string path)
+        {
+            const string where = "/Scene/Rest";
+            if (element.GetAttribute("Version") != "1") Fail(path, where + " @Version", "must be 1");
+            var required = new HashSet<(string, string)>();
+            foreach (var (child, _) in SkinProportionRig.LimbParents()) required.Add(child);
+            var seen = new HashSet<(string, string)>();
+            int springs = 0;
+            foreach (XmlNode value in element.ChildNodes)
+            {
+                if (!(value is XmlElement bone)) continue;
+                if (bone.Name == "Dynamic")
+                {   // spring bone: earlier parent, finite head, unit direction, sane length/coefficients
+                    string at2 = where + "/Dynamic[" + springs + "]";
+                    if (bone.GetAttribute("Id") != springs.ToString(CultureInfo.InvariantCulture)) Fail(path, at2 + " @Id", "must count up from 0");
+                    string parent = bone.GetAttribute("Parent");
+                    bool earlier = parent.StartsWith("#", StringComparison.Ordinal) &&
+                        int.TryParse(parent.Substring(1), out int parentSpring) && parentSpring >= 0 && parentSpring < springs;
+                    int dash = parent.IndexOf('-');
+                    bool native = dash > 0 && new List<(string, string)>(SkinProportionRig.FrameKeys()).Contains((parent.Substring(0, dash), parent.Substring(dash + 1)));
+                    if (!earlier && !native) Fail(path, at2 + " @Parent", "must be a supported segment or an earlier #spring");
+                    var head = Triple(bone, "Head", path, at2, 1000);
+                    var direction = Triple(bone, "Dir", path, at2, 1000);
+                    if (Math.Abs(Math.Sqrt(direction[0] * direction[0] + direction[1] * direction[1] + direction[2] * direction[2]) - 1) > .01)
+                        Fail(path, at2 + " @Dir", "must be a unit vector");
+                    double length = Number(bone, "Length", path, at2, true, required: true);
+                    double stiffness = Number(bone, "Stiffness", path, at2, true), damping = Number(bone, "Damping", path, at2, true);
+                    if (length < .01 || length > 1000 || stiffness < 0 || stiffness > 1 || damping < 0 || damping > 1)
+                        Fail(path, at2, "Length 0.01..1000, Stiffness and Damping 0..1");
+                    springs++;
+                    continue;
+                }
+                if (bone.Name == "Frame")
+                {   // source rest frame: origin and two orthonormal axes
+                    string at2 = where + "/Frame";
+                    Triple(bone, "O", path, at2, 100000);
+                    var a = Triple(bone, "A", path, at2, 1.01); var b = Triple(bone, "B", path, at2, 1.01);
+                    double la = Math.Sqrt(a[0] * a[0] + a[1] * a[1] + a[2] * a[2]), lb = Math.Sqrt(b[0] * b[0] + b[1] * b[1] + b[2] * b[2]);
+                    if (Math.Abs(la - 1) > .01 || Math.Abs(lb - 1) > .01 || Math.Abs(a[0] * b[0] + a[1] * b[1] + a[2] * b[2]) > .01)
+                        Fail(path, at2, "axes must be orthonormal");
+                    if (bone.HasAttribute("Dynamic"))
+                    {
+                        if (!int.TryParse(bone.GetAttribute("Dynamic"), out int spring) || spring < 0 || spring >= springs)
+                            Fail(path, at2 + " @Dynamic", "must name an earlier Dynamic");
+                    }
+                    else if (!new List<(string, string)>(SkinProportionRig.FrameKeys()).Contains((bone.GetAttribute("Start"), bone.GetAttribute("End"))))
+                        Fail(path, at2, "must name a supported segment");
+                    continue;
+                }
+                var key = (bone.GetAttribute("Start"), bone.GetAttribute("End"));
+                string at = where + "/" + bone.Name + "[" + key.Item1 + "-" + key.Item2 + "]";
+                if (bone.HasAttribute("Twist"))
+                {
+                    double twist = Number(bone, "Twist", path, at, true, required: true);
+                    if (!key.Item2.StartsWith("NFingertips_", StringComparison.Ordinal) || twist < -180 || twist > 180)
+                        Fail(path, at + " @Twist", "is a hand bone angle in -180..180");
+                }
+                if (bone.Name != "Bone" || !required.Contains(key) || !seen.Add(key)) Fail(path, at, "must be one unique supported Bone");
+                double x = Number(bone, "X", path, at, true, required: true), y = Number(bone, "Y", path, at, true, required: true),
+                    z = Number(bone, "Z", path, at, true, required: true);
+                if (Math.Abs(Math.Sqrt(x * x + y * y + z * z) - 1) > .01) Fail(path, at, "direction must be a unit vector");
+                if (bone.HasAttribute("Curl"))
+                {
+                    double curl = Number(bone, "Curl", path, at, true, required: true);
+                    if (!key.Item2.StartsWith("NFingertips_", StringComparison.Ordinal) || curl < 0 || curl > 180)
+                        Fail(path, at + " @Curl", "is a hand bone angle in 0..180");
+                }
+            }
+            foreach (var key in required) if (!seen.Contains(key)) Fail(path, where, "missing Bone " + key.Item1 + "-" + key.Item2);
+            foreach (string helper in new[] { "NPelvisF", "NStomachF", "NChestF", "NHeadF", "NKnuckles_1", "NKnuckles_2", "NKnucklesS_1", "NKnucklesS_2" })
+                if (!nodes.ContainsKey(helper)) Fail(path, where, "needs native front helper " + helper + " in the body");
+            if (element.ParentNode?["Proportions"] == null) Fail(path, where, "requires Proportions");
+        }
+
         private static XmlNodeList EmptyNodes() => new XmlDocument().ChildNodes;
         private static int LegacyIterations(XmlElement edge) => int.TryParse(edge.GetAttribute("Iterations"), out var value) ? Math.Max(0, Math.Min(8193, value)) : 1;
         private static int Integer(XmlElement value, string field, int fallback, string path, string where, int min, int max)

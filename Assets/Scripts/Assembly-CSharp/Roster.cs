@@ -689,6 +689,7 @@ public class Roster : MELBIBHDPCE
 		HCMLOIDALKC(node.Attributes["ServerUserID"].CIPOICEEIBK(string.Empty));
 		AJCCEFKDKIO(node.Attributes["AskedForDumps"].ParseBool());
 		HEGIABHIPHA = JCICKLIMBEF;
+		if (JCICKLIMBEF != null) JCICKLIMBEF.EclipseRosterPlayer = true;
 		PLELELJIKEL();
 		_indexSlider = node.Attributes["IndexSlider"].ParseUint();
 		NBBNANIILBL = node.Attributes["CoinIcon"].CIPOICEEIBK("MiscSprites.gold");
