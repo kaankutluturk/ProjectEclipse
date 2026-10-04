@@ -234,12 +234,13 @@ public class ModelLoader
 			}
 			ACENLMONNPA.LMBNDIPLBJA().Add(Node);
 		}
-		else if (value == "MacroNode")
+		else if (value == "MacroNode" || value == "SkinnedNode")
 		{
 			Position.SetX(Position.GetX() * -1f);
 			ModelMacroNode gDNAJOODAGP = new ModelMacroNode(name, Position);
 			Node = gDNAJOODAGP;
-			EADLCHAFKDC(gDNAJOODAGP, node);
+			if (value == "SkinnedNode") gDNAJOODAGP.LoadSkinBindings(ACENLMONNPA, node);
+			else EADLCHAFKDC(gDNAJOODAGP, node);
 			ACENLMONNPA.BLFJJAEFKKP().Add(gDNAJOODAGP);
 		}
 		if (Node != null)

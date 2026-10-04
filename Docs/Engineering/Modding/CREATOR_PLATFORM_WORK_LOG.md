@@ -1473,3 +1473,47 @@ physical keyboards, IME/software keyboard/glyph coverage and exported platform
 acceptance remain open. Screenshot waits for the modal entrance fade to finish
 before capture. See UI_TEXT_INPUT_ACCEPTANCE.md for exact source and evidence.
 G01-G14/E1-E8 remain open. The human has deferred experimental procedural 3D.
+
+## 2026-10-04: external weighted humanoid imports with native combat
+
+Prioritized the human's arbitrary-rig request over the parked input callback
+draft. Added Blender/FBX/glTF character import, semantic bone matching and a
+conservative hierarchy fallback, rest-space calibration, weighted planar skin
+nodes and automatic dense-mesh reduction. Generated playable packages inherit
+core movement, unarmed combat, reactions and Standard AI through owned logical
+equipment; source actions and independent extra-bone motion are not imported.
+Recovered MacroNode math and canonical combat node/edge identity stay intact.
+Public character-authoring wiki, editor guide, tool/test indexes and engineering
+status update in the same change. Experimental 3D remains deferred.
+
+At the human's explicit request, fetched pinned CC BY 4.0 Cesium Man from the
+primary Khronos repository, retaining credit/license locally. Its unfamiliar
+19-joint hierarchy imports without overrides or source edits; 3273 vertices
+reduce to 1244. Initial name matching failed, then hierarchy inference enabled
+the import. Initial bone-tail calibration passed numerical combat assertions
+but produced unusably large geometry; screenshot inspection rejected it.
+Anatomical joint heads and weighted region extents repair calibration, and the
+native test now checks independent geometry bounds. External source/derived
+assets remain ignored local evidence, not vendored project content.
+
+Verification: six mapping tests, six point-pipeline and nine package regressions;
+42 production C# geometry validator/loader checks; actual Blender 3.6.23 imports
+of original mixed-weight .blend/.fbx/.glb fixtures and a 59-vertex reduction case;
+real Lua registration; all four Unity 6.6 managed assemblies through the ignored
+portable compile projects. The downloaded rig passes controlled native movement,
+Punch damage/reaction, mirrored stance/Kick, Standard AI incoming contact,
+weighted coordinates/bounds on both facings and surrender cleanup. Final native
+run exits successfully with a fresh result and 17446 assertions (mostly per-vertex
+coordinate checks), log validation-c8bdb8ed0ce94b009a1d22260a953394.log in
+Temp/FighterPlaybackUnity-d997a2c104cd4564b9767ae6eb4b68d8. Idle/contact screenshots
+inspected and retained in Temp/ImportedRigReview-20261004; shoulder/foot
+deformation remains imperfect. See IMPORTED_RIG_ACCEPTANCE.md for exact evidence.
+
+Editor generate/check/test pass (255 bindings, 74 constants, 296 structures,
+61 project tests); unchanged Lua contract does not require new integration
+coverage. Wiki types/build/search pass with 0 type diagnostics, 7045 links/assets,
+64 pages, 64 tracked current-branch source links and three link tests. Existing
+duplicate-404 warning remains. Physical input, exported platforms, performance,
+all outcome/throw states, unusual body plans, source animation import and complete
+custom movesets remain open. Core collision proportions still bound this adapter;
+this feature does not establish arbitrary-rig completion or close the broad goal.

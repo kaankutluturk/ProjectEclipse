@@ -18,6 +18,11 @@ static class Program
         CoreContentImporter.ImportWarriorTemplates(catalog,stages.SelectSingleNode("Stages/Warriors/Templates"));
         bool packaged=args.Length>2 && bool.Parse(args[2]);
         bool playable=args.Length>3 && bool.Parse(args[3]);
+        bool imported=args.Length>4 && bool.Parse(args[4]);
+        if(imported){
+            var items=new XmlDocument();items.Load(Path.Combine(Path.GetDirectoryName(args[1]),"list.xml"));
+            CoreContentImporter.ImportWeapons(catalog,items.SelectNodes("List/Items/Item[@Name='Fists']").Cast<XmlNode>(),new System.Collections.Generic.Dictionary<string,XmlDocument>());
+        }
         var assets=new AssetResolver(new IAssetProvider[]{new PreviewCore(),new LooseModProvider(mod)});
         using(var tx=catalog.BeginRegistration(mod))
         using(var script=new MoonSharpScriptRuntime().CreateContext(mod,new ModApiFacade(mod,assets,tx,new ModStateRuntime(),null)))
@@ -25,6 +30,14 @@ static class Program
             ModLocalizationLoader.Load(mod,assets,tx); script.ExecuteEntrypoint(); tx.Commit();
             var warrior=catalog.Warriors.Single();
             if(warrior.BodyModel.Namespace!=mod.Id || warrior.SkinModels.Count!=1) throw new Exception("Authored model handles did not reach character definition");
+            if(imported){
+                var fight=catalog.Fights.Single();var mode=catalog.Modes.Single();
+                if(catalog.Moves.Count!=0||warrior.Tactic.ToString()!="Standard"||warrior.Skeleton!="Skeleton"||warrior.Items.Count!=3||
+                   fight.PlayerCharacter!=warrior.Id||fight.Warriors.Single()!=warrior.Id||mode.Fights.Single()!=fight.Id||!mode.Repeatable)
+                    throw new Exception("Imported character lost normal loadout, tactic or playable encounter");
+                Console.WriteLine("PASS: imported weighted-rig public Lua, logical armor/helm slots, core Fists, Standard tactic and playable encounter without authored default clips.");
+                return;
+            }
             if(packaged)
             {
                 var move=catalog.Moves.Single(m=>m.Id.LocalId=="authored_move");

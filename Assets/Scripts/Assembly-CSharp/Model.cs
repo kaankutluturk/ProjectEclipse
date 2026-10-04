@@ -1177,7 +1177,8 @@ public class Model : global::EventDispatcher<object>
 		}
 	}
 
-	public int GFHOIKMBNHF
+	// best guess for name
+	public int FacingSign
 	{
 		get
 		{

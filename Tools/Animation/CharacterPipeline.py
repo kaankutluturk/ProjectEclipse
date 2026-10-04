@@ -26,7 +26,7 @@ def model(path, base=None):
     nodes = list(root.find('Nodes')) if root.find('Nodes') is not None else []
     names = list(inherited)
     for node in nodes:
-        if node.tag in names or node.get('Type') not in ('Node', 'MacroNode', 'CenterOfMass'):
+        if node.tag in names or node.get('Type') not in ('Node', 'MacroNode', 'CenterOfMass', 'SkinnedNode'):
             raise ValueError(f'Duplicate node or unsupported type: {node.tag}')
         names.append(node.tag)
         for axis in 'XYZ':
@@ -36,6 +36,25 @@ def model(path, base=None):
     if not names or len(names) > 4096:
         raise ValueError('A composed model requires 1..4096 nodes')
     for node in nodes:
+        if node.get('Type') == 'SkinnedNode':
+            count = int(node.get('BonesCount', 0))
+            if not 1 <= count <= 16:
+                raise ValueError(node.tag + ': BonesCount must be in 1..16')
+            total = 0
+            for i in range(1, count + 1):
+                start, end = node.get('BoneStart' + str(i)), node.get('BoneEnd' + str(i))
+                if start == end or any(n not in names or names.index(n) >= names.index(node.tag) for n in (start, end)):
+                    raise ValueError(node.tag + ': skin endpoints must differ and exist earlier')
+                weight = finite(node.get('Weight' + str(i), 'nan'), node.tag + '.weight')
+                if not 0 <= weight <= 1:
+                    raise ValueError(node.tag + ': skin weight must be in 0..1')
+                total += weight
+                for field in ('Along', 'Across'):
+                    if abs(finite(node.get(field + str(i), 'nan'), node.tag + '.' + field)) > 100:
+                        raise ValueError(node.tag + ': attachment must be in -100..100')
+            if abs(total - 1) > .0001:
+                raise ValueError(node.tag + ': skin weights must sum to 1')
+            continue
         count = int(node.get('NodesCount', 0))
         helper = node.get('Type') in ('MacroNode', 'CenterOfMass')
         if helper and not 1 <= count <= 128:
@@ -108,6 +127,17 @@ def helper_positions(rig, positions):
     by_name = {node.tag: node for node in rig.find('Nodes')}
     for node in rig.find('Nodes'):
         kind = node.get('Type')
+        if kind == 'SkinnedNode':
+            point = [0.0, 0.0, 0.0]
+            for i in range(1, int(node.get('BonesCount')) + 1):
+                start = positions[node.get('BoneStart' + str(i))]
+                end = positions[node.get('BoneEnd' + str(i))]
+                weight, along, across = (float(node.get(field + str(i))) for field in ('Weight', 'Along', 'Across'))
+                dx, dy = end[0] - start[0], end[1] - start[1]
+                point[0] += weight * (start[0] + along * dx - across * dy)
+                point[1] += weight * (start[1] + along * dy + across * dx)
+            positions[node.tag] = point
+            continue
         count = int(node.get('NodesCount', 0))
         if kind not in ('MacroNode', 'CenterOfMass') or count == 0:
             continue

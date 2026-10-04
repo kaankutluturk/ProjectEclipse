@@ -2,6 +2,15 @@
 
 Last broad reconciliation: 2026-09-12. Scope remains **G01–G14 plus E1–E8**.
 
+2026-10-04 weighted humanoid import: the human has prioritized arbitrary rigs
+and complete custom combat movesets. Blender/FBX/glTF sources can generate a
+playable silhouette with automatic names or clear hierarchy inference, source
+weights and native unarmed defaults. Downloaded Cesium Man requires no mapping
+file and passes native movement/Punch/contact/reaction/mirrored Kick/Standard AI.
+See IMPORTED_RIG_ACCEPTANCE.md for visual calibration repair and explicit limits.
+Arbitrary body plans, independent extra bones, source actions and complete custom
+movesets remain open; experimental 3D and unrelated input callbacks are deferred.
+
 2026-10-04 playable export workflow: Blender/Gymnast and standalone packaging
 now offer `--playable`, using the owned fight player-character contract. Current
 short-form generation, explicit native facing and standalone tactic initialization

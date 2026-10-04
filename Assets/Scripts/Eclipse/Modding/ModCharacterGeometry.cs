@@ -31,12 +31,32 @@ namespace Eclipse.Modding
                     string kind = node.GetAttribute("Type");
                     if (strict && nodes.ContainsKey(node.Name)) Fail(path, where, "duplicate node; use a unique authored binding");
                     if (nodes.ContainsKey(node.Name)) continue; // native recovered first-wins rule
-                    if (strict && kind != "Node" && kind != "MacroNode" && kind != "CenterOfMass")
-                        Fail(path, where + " @Type", "must be Node, MacroNode or CenterOfMass");
-                    if (kind != "Node" && kind != "MacroNode" && kind != "CenterOfMass") continue;
+                    if (strict && kind != "Node" && kind != "MacroNode" && kind != "CenterOfMass" && kind != "SkinnedNode")
+                        Fail(path, where + " @Type", "must be Node, MacroNode, CenterOfMass or SkinnedNode");
+                    if (kind != "Node" && kind != "MacroNode" && kind != "CenterOfMass" && kind != "SkinnedNode") continue;
                     double mass = Number(node, "Mass", path, where, strict);
                     foreach (string axis in new[] { "X", "Y", "Z" }) Number(node, axis, path, where, strict);
                     if (strict && mass < 0) Fail(path, where + " @Mass", "cannot be negative");
+                    if (strict && kind == "SkinnedNode")
+                    {
+                        int count = Integer(node, "BonesCount", 0, path, where, 1, 16);
+                        double total = 0;
+                        for (int bone = 1; bone <= count; bone++)
+                        {
+                            string suffix = bone.ToString(CultureInfo.InvariantCulture);
+                            RequireNode(node, "BoneStart" + suffix, nodes, path, where);
+                            RequireNode(node, "BoneEnd" + suffix, nodes, path, where);
+                            if (node.GetAttribute("BoneStart" + suffix) == node.GetAttribute("BoneEnd" + suffix))
+                                Fail(path, where, "skin bone endpoints must differ");
+                            double weight = Number(node, "Weight" + suffix, path, where, true, required: true);
+                            if (weight < 0 || weight > 1) Fail(path, where + " @Weight" + suffix, "must be in 0..1");
+                            total += weight;
+                            foreach (string field in new[] { "Along", "Across" })
+                                if (Math.Abs(Number(node, field + suffix, path, where, true, required: true)) > 100)
+                                    Fail(path, where + " @" + field + suffix, "must be in -100..100");
+                        }
+                        if (Math.Abs(total - 1) > .0001) Fail(path, where, "skin weights must sum to 1");
+                    }
                     if (strict && (kind == "MacroNode" || kind == "CenterOfMass"))
                     {
                         int count = Integer(node, "NodesCount", 0, path, where, 1, 128);

@@ -48,6 +48,7 @@ public partial class ModelMacroNode : ModelNode
 		}
 		_End.Set(_Start);
 		_Start.Reset();
+		if (UpdateSkinBindings()) return;
 		global::Pair<ModelNode, float> cCKLNOPEKHO = null;
 		int count = _nodeWeights.Count;
 		for (int i = 0; i < count; i++)

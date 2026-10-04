@@ -1,5 +1,14 @@
 # Eclipse as a general Shadow Fight 2 mod engine
 
+The human now prioritizes arbitrary rigs and complete custom combat movesets.
+The [weighted import adapter](IMPORTED_RIG_ACCEPTANCE.md) accepts Blender/FBX/glTF
+humanoids with automatic names or clear hierarchy inference, source-weighted
+native segment skins and inherited normal unarmed combat. A real downloaded
+Cesium rig imports without a manual mapping and passes native control/contact/AI;
+visual review caught and fixed display-bone calibration. Arbitrary body plans,
+independent extra bones, imported actions and complete custom movesets remain
+open. Experimental 3D stays deferred; unrelated input callback work is parked.
+
 The [playable export workflow](PACKAGED_CHARACTER_ACCEPTANCE.md) connects
 Blender/Gymnast packages to owned player selection, native input and Lua opponent
 playback. Generated syntax/facing and standalone tactic initialization are

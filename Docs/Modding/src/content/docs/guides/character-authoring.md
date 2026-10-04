@@ -1,13 +1,48 @@
 ---
-title: Low-level point-rig tools
-description: Import a native SF2 rig into Blender, author its motion and geometric skin, and install a character with playable controls.
+title: Character imports and point-rig tools
+description: Import weighted humanoid characters with normal combat defaults, or author native SF2 point motion and geometric skins.
 ---
 
 For visual authoring, start with [Gymnast Tool Suite and Eclipse packaging](../gymnast/). It provides a visible body and IK controls. This page documents the earlier low-level point importer for format experiments; its point objects alone are not a complete character authoring interface.
 
 Eclipse characters use SF2's point-based physics rig. An animation stores the positions of those points in a fixed order; body and equipment models attach geometry to them. These low-level tools require Python 3 and Blender 3.6 or newer. Blender 3.6.23 is the tested version for this importer only.
 
-The pipeline supports body proportions, native geometry overlays, animation import, constrained or keyframed point motion, baking, validation, a local preview, and runtime registration. It does not automatically retarget an arbitrary FBX skeleton or turn Blender materials into game shaders. Preserve the native rig's names and point order when sharing the game's moves, equipment, and physics. Substantially different skeletons also need compatible moves and equipment.
+The point pipeline supports body proportions, native geometry overlays, animation import, constrained or keyframed point motion, baking, validation, a local preview, and runtime registration. The imported-character adapter below adds automatic matching for recognized humanoid rigs. Neither tool turns Blender materials into game shaders. Preserve the native rig's names and point order when sharing the game's moves, equipment, and physics.
+
+## Import a weighted humanoid character
+
+`Tools/Animation/ImportCharacter.py` accepts a `.blend`, `.fbx`, `.glb`, or `.gltf` with an armature and meshes weighted to it. It builds a fresh, installable mod with a playable fighter and an AI counterpart. You do not need to rename the source bones to SF2 points or author the default animations. The generated warrior uses normal core unarmed movement, attacks, hit reactions and the `Standard` tactic. It keeps the native combat skeleton behind the imported silhouette.
+
+Extract the canonical skeleton using the command in the next section, then run:
+
+```powershell
+$blender = 'C:\Program Files\Blender Foundation\Blender 3.6\blender.exe'
+& $blender --background --factory-startup --python-exit-code 1 --python Tools/Animation/ImportCharacter.py -- --source Temp/MyCharacter/fighter.glb --rig Temp/CharacterCore/models/mdl_skeleton.xml --mod-id local.my-fighter --output Mods/local.my-fighter --title "My Fighter"
+```
+
+Enable the mod, Apply & Restart, and choose **My Fighter** on the map. Both participants use the imported character. The encounter leaves your campaign equipment alone. Keep the source file separately; the importer does not save changes to it. The output directory must not exist and its name must equal the mod ID. `import.json` records bone matching, inherited extra bones, mesh reduction, source fingerprint and Blender version.
+
+| Option | Requirement/default |
+| --- | --- |
+| `--source` | Required source file. The importer reads rest bones and mesh weights, independently of the current animation pose. |
+| `--rig` | Required canonical `mdl_skeleton.xml`; default combat depends on its ordered 67 points. |
+| `--mod-id`, `--output` | Required non-reserved lowercase mod ID and fresh directory with that name. |
+| `--title` | `Imported Fighter`; 1–80 characters. |
+| `--armature` | Optional exact object name; required if the scene contains multiple armatures. Only meshes bound to this armature participate. |
+| `--mapping` | Optional JSON object from semantic role to exact source bone name. Overrides automatic matching; unfamiliar clear humanoid hierarchies can be inferred without this file. |
+| `--max-vertices` | `2048`; 3–3500 total output vertices. Dense meshes receive seam welding and automatic decimation, which can change topology and interpolated weights. Export rejects if reduction cannot satisfy the budget. |
+
+Matching recognizes common Mixamo, Blender-style and Unreal-style names, including namespace prefixes and left/right suffixes. It requires `pelvis`, `chest`, `head`, and each side's `upper_arm`, `forearm`, `hand`, `thigh`, `shin`, and `foot`. `spine` and `neck` are optional additional regions. If names are unfamiliar, a conservative hierarchy/rest-position fallback looks for a pelvis with two leg branches, a trunk/chest with two three-segment arm branches, and a central head branch. It supports three- or four-segment leg chains. The report records `mapping_method` as `names` or `hierarchy`. Unusual or ambiguous layouts still need overrides. Names and topology are hints, not proof of anatomy: ambiguous matches fail with the role and candidate names instead of choosing silently. For unfamiliar names, supply only the missing or ambiguous roles, for example:
+
+```json
+{ "pelvis": "Joint_001", "left_forearm": "Joint_014" }
+```
+
+Source bones outside these regions, such as fingers and twist bones, follow their nearest mapped ancestor. The report lists these substitutions. Positive weights on an unrelated bone, unweighted vertices, zero-length anatomical segments and multiple armatures on one mesh reject with a diagnostic. Meshes need an Armature modifier pointing at the chosen armature. Non-bone vertex groups are ignored.
+
+The adapter fits source geometry in anatomical segment frames and renders a weighted **silhouette**, normalizes its limbs to the core combat rig, and replaces visible armor and helmet meshes with empty models on owned logical equipment. It preserves core collision proportions, equipment anchors and animation ordering. Source textures, materials, actions, independent extra-bone motion and custom hitbox proportions are not imported. This is a humanoid compatibility adapter, not support for arbitrary quadrupeds, wings, tails or unusual locomotion. Inspect deformation, both facings and collision fit in the game before sharing. Custom combat moves can target the generated warrior through the [moves API](../../api/moves-and-tactics/); importing a mesh does not author those moves or their hit timing.
+
+The original synthetic 19-bone fixture exercises Blender, FBX and glTF import without a hand-authored point mapping. A downloaded [Cesium Man sample](https://github.com/KhronosGroup/glTF-Sample-Assets/tree/edc7c9e67c639d230715049ee31f9a96a6babbbe/Models/CesiumMan) also imports through hierarchy matching without overrides and passes native movement, Punch/contact/reaction, controlled mirrored Kick and Standard AI contact. Source joint positions and weighted region extents determine calibration; display-bone tails are not trusted. These are bounded tests, not evidence that every rig or outfit works. Keep attribution and licensing with any third-party asset you distribute.
 
 ## Create an authoring scene
 
@@ -105,13 +140,23 @@ Fix the named field in your source model and export again. A failed character pr
 | Geometry rule | Supported values and defaults |
 | --- | --- |
 | Root structure | `Scene` with a `Figures` element, including an empty one. |
-| Nodes | Unique composed names; `Type` is `Node`, `MacroNode`, or `CenterOfMass`. The complete character permits 1–4,096 nodes. |
+| Nodes | Unique composed names; `Type` is `Node`, `MacroNode`, `CenterOfMass`, or `SkinnedNode`. The complete character permits 1–4,096 nodes. |
 | Numeric fields | Finite values within ±100,000. Missing ordinary coordinates, mass, radii, lengths, and margins default to zero. Mass, lengths, and radii cannot be negative. |
 | Helper nodes | `NodesCount` is required, 1–128; every `ChildNode1`…`ChildNodeN` must resolve to a node declared earlier in the composition. Each `MacroNode` requires its corresponding finite `LCC1`…`LCCN` weight. `CenterOfMass` children need positive total mass. |
+| Weighted skin nodes | `SkinnedNode` requires `BonesCount` 1–16. Each influence requires distinct earlier `BoneStartN`/`BoneEndN` names, `WeightN` in 0–1, and `AlongN`/`AcrossN` in ±100. Weights must sum to 1 within 0.0001. |
 | Edges | `Type` is `Edge` or `Muscle`; `End1` and `End2` must resolve. `Iterations` defaults to 1 and permits 1–32. Extra iterations are named `EdgeNameCI1`, `EdgeNameCI2`, and so on; those expanded names must also be unique. The complete character permits at most 8,192 expanded edges. |
 | Figures | Unique names within each authored document; `Type` is `Triangle` or `Capsule`. Triangles require resolved `Node1`, `Node2`, and `Node3`; capsules require a resolved `Edge`, including expanded iteration names. |
 
 Body documents precede equipment; skins follow it in their listed order. Give overlay nodes and edges distinct names instead of redeclaring body bindings. These strict authoring checks apply to your mod's body/skin and declared dependency models. Core model handles and recovered equipment retain their legacy loading behavior. This preflight does not prove good deformation, animation compatibility, or hit contact; those still need the fight checks below.
+
+`SkinnedNode` is a derived planar mesh vertex. For each influence, the file-space position is `start + Along × (end − start) + Across × perpendicular(end − start)`, then weighted and summed. `perpendicular(x, y) = (-y, x)`. Along/across values are fractions of that segment's current length. The runtime handles file/runtime Y conversion and reverses across with fighter facing, so the silhouette mirrors with the fighter. Z is zero. Unlike `MacroNode` landmark coefficients, the across offset rotates with the limb. These nodes follow native animation and physics; they are not additional independently animated bones or collision edges.
+
+```xml
+<!-- Skin document: both endpoints already exist in the body. -->
+<ImportedVertex Type="SkinnedNode" X="0" Y="0" Z="0" BonesCount="1"
+  BoneStart1="NElbow_1" BoneEnd1="NWrist_1"
+  Weight1="1" Along1="0.5" Across1="0.12" />
+```
 
 Other authoring tools can produce `frames.json` with `version = 1`, `fps`, `names`, and `frames`. Each frame is an array of `[x,y,z]` points matching `names`. Names must match the rig exactly; the baker reorders them to native order and resamples input at 1–240 fps to 60 Hz:
 

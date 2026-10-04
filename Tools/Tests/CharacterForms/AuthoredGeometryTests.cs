@@ -20,6 +20,16 @@ static class AuthoredGeometryTests
     public static void Main(string[] args)
     {
         Validate(Rig); Check(true, "Valid expanded capsule binding");
+        const string skinned = "<Scene><Nodes><A Type='Node'/><B Type='Node'/><S Type='SkinnedNode' BonesCount='1' BoneStart1='A' BoneEnd1='B' Weight1='1' Along1='.5' Across1='.2'/></Nodes><Figures/></Scene>";
+        Validate(skinned); Check(true, "Valid rotational skin attachment");
+        foreach (var pair in new[] {
+            ("BonesCount='1'", "BonesCount='17'", "@BonesCount"),
+            ("BoneEnd1='B'", "BoneEnd1='missing'", "@BoneEnd1"),
+            ("BoneEnd1='B'", "BoneEnd1='A'", "endpoints"),
+            ("Weight1='1'", "Weight1='-1'", "@Weight1"),
+            ("Weight1='1'", "Weight1='.2'", "sum to 1"),
+            ("Along1='.5'", "Along1='101'", "@Along1"),
+            ("Across1='.2'", "Across1='NaN'", "@Across1") }) Reject(skinned.Replace(pair.Item1, pair.Item2), pair.Item3);
         foreach (var pair in new[] {
             ("End2='B'", "End2='missing'", "@End2"),
             ("Mass='1'", "Mass='-1'", "@Mass"),

@@ -1,4 +1,4 @@
-param([Parameter(Mandatory=$true)][string]$Package, [string]$Unity = '', [string]$ExistingFixture = '', [switch]$OpponentOnly)
+param([Parameter(Mandatory=$true)][string]$Package, [string]$Unity = '', [string]$ExistingFixture = '', [switch]$OpponentOnly, [switch]$ImportedRig)
 $ErrorActionPreference = 'Stop'
 $root = Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $PSScriptRoot))
 $versionFile = Join-Path $root 'ProjectSettings/ProjectVersion.txt'
@@ -43,6 +43,7 @@ New-Item -ItemType Directory -Force -Path (Split-Path -Parent $characterCache) |
 New-Item -ItemType Junction -Path $characterCache -Target $characterCacheTarget | Out-Null
 $arguments=@('-projectPath',('"'+$fixture+'"'),'-executeMethod','PackagedCharacterUnity.Run','-packaged-characterAcceptanceProductName',$characterProduct,'-characterPackageModId',$characterModId,'-characterPackageModsRoot',('"'+$characterMods+'"'),'-logFile',('"'+$log+'"'))
 if($OpponentOnly){$arguments+='-packagedOpponentOnly'}
+if($ImportedRig){$arguments+='-importedRigAcceptance'}
 $process = Start-Process -FilePath $Unity -ArgumentList $arguments -WindowStyle Hidden -PassThru
 Write-Host "Native packaged-character process: $($process.Id)"
 $deadline = [DateTime]::UtcNow.AddMinutes(15)

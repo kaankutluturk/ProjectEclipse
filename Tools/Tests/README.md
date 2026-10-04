@@ -1,5 +1,17 @@
 # Regression tests and validators
 
+Imported humanoid rigs: `Tools/Animation/TestImportedRigPipeline.ps1 -Blender
+<exe> -Rig <canonical mdl_skeleton.xml>` authors an original weighted armature,
+imports actual Blender/FBX/glTF sources, tests reduction and verifies core rig
+identity, mixed/inherited weights, offline geometry and public Lua. The explicit
+`Tools/Animation/FetchOnlineRig.py --output <fresh directory>` downloads a pinned
+credited Cesium sample for an unfamiliar external rig. The separate full-game
+`CharacterForms/TestPackagedCharacterUnity.ps1 -ImportedRig -Package <mod>` checks
+normal native movement, attacks/contact/reaction, controlled mirrored stance,
+Standard AI, weighted skin coordinates/bounds and cleanup, then captures images.
+Inspect the images; numerical checks alone do not establish visual correctness.
+See [import acceptance](../../Docs/Engineering/Modding/IMPORTED_RIG_ACCEPTANCE.md).
+
 Generated character packages: `Animation/TestGymnastPipeline.ps1` (under Tools)
 verifies Blender/Gymnast pose export, watched/playable roles, exact payloads and
 real Lua registration, then the recovered Unity reader. `CharacterForms/

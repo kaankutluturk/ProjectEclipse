@@ -48,6 +48,13 @@ before packaging; the wiki's character-authoring guide lists the matching
 numeric, helper, iteration and composition limits. Core handles retain legacy
 compatibility.
 
+The weighted humanoid import adapter accepts Blender, FBX and glTF sources and
+generates the same warrior/fight Lua contracts. Its model XML uses SkinnedNode
+vertices with weighted native segment attachments. Editor asset completion does
+not parse these bindings; offline/runtime geometry validation and a game test
+remain required. See the wiki's character-authoring import guide for automatic
+matching, override roles, mesh limits and unsupported body plans.
+
 The `ranged-actors` starter gives two independent fighters their own typed Lua
 cooldown state and native projectile abilities. Actor-host `spawn_projectile`
 and `projectiles` use `combat.projectiles`; queries stay scoped to that actor and

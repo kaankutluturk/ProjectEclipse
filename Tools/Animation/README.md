@@ -1,5 +1,18 @@
 # Character and animation tools
 
+`ImportCharacter.py` imports weighted `.blend`, FBX and glTF humanoids into a
+fresh playable mod using core unarmed combat and Standard AI. `RigMapping.py`
+matches semantic regions automatically, with explicit overrides for unknown or
+ambiguous names. Source weights become rotating native SkinnedNode attachments;
+extra bones follow mapped ancestors. Source actions/materials, unusual body
+plans and custom collision proportions are not imported. Read the
+[import guide](../../Docs/Modding/src/content/docs/guides/character-authoring.md#import-a-weighted-humanoid-character)
+for commands, limits and the mapping format. `CreateImportedRigFixture.py`
+authors original weighted Blender/FBX/glTF fixtures; `TestRigMapping.py` checks
+name matching and rejection. Full-game acceptance uses
+`Tools/Tests/CharacterForms/TestPackagedCharacterUnity.ps1 -ImportedRig` with a
+generated package.
+
 `BuildPulseArenaArtwork.py --output Temp/PulseArtwork/assets` generates the
 original four-frame atlas and cropped sprite descriptors used by Pulse Arena.
 It needs only Python standard-library modules. Live sprite animation and motion
