@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 public partial class PerksStage : global::EventDispatcher<PerksStage.PerkEventStruct>
 {
-	public enum CECEBJIFBHD
+	public enum PerkParentType
 	{
 		PERK_PARENT_NONE = 0,
 		PERK_PARENT_ITEM = 1,
@@ -12,25 +12,25 @@ public partial class PerksStage : global::EventDispatcher<PerksStage.PerkEventSt
 
 	public class ActionPerk
 	{
-		public bool PLNNKKBPDJK;
+		public bool IsExpired;
 
-		public Model BIKLKJMNGKP;
+		public Model SourceModel;
 
-		public Model KJDFJPBIGJC;
+		public Model TargetModel;
 
-		public PerkAction AMKJNPOCODK;
+		public PerkAction Action;
 
-		public int KGNDJOLBBJF;
+		public int ElapsedFrames;
 
-		public int FLNLMIHEDCI;
+		public int DurationFrames;
 
-		public string NHKMCLPOMFK = string.Empty;
+		public string IconPath = string.Empty;
 
-		public string GJONJADIAJM = string.Empty;
+		public string StackKey = string.Empty;
 
-		public bool FLNCPBKBJBL;
+		public bool ShowExpiration;
 
-			public int MGDCIODPHCH;
+			public int ExpirationVersion;
 
 			// Eclipse-authored status icons use this because the recovered ApplyModEffect
 			// parser omitted DE's XML StackCount handling.
@@ -39,19 +39,19 @@ public partial class PerksStage : global::EventDispatcher<PerksStage.PerkEventSt
 		public ItemInfo PreviousMagic;
         public Dictionary<string, int> AppliedAttributes;
 
-		public string KGPDHIKOEKF
+		public string PerkName
 		{
 			get
 			{
-				return LGMFEIFGGDG();
+				return GetPerkName();
 			}
 		}
 
-		public string AOOJOKOHAHA
+		public string ModName
 		{
 			get
 			{
-				return DDBPICENEJE();
+				return GetModName();
 			}
 		}
 
@@ -61,79 +61,79 @@ public partial class PerksStage : global::EventDispatcher<PerksStage.PerkEventSt
 
 		public ActionPerk(ActionPerk IBODMPMJELJ)
 		{
-			PLNNKKBPDJK = IBODMPMJELJ.PLNNKKBPDJK;
-			BIKLKJMNGKP = IBODMPMJELJ.BIKLKJMNGKP;
-			KJDFJPBIGJC = IBODMPMJELJ.KJDFJPBIGJC;
-			AMKJNPOCODK = IBODMPMJELJ.AMKJNPOCODK;
-			KGNDJOLBBJF = IBODMPMJELJ.KGNDJOLBBJF;
-			FLNLMIHEDCI = IBODMPMJELJ.FLNLMIHEDCI;
-			NHKMCLPOMFK = IBODMPMJELJ.NHKMCLPOMFK;
-			GJONJADIAJM = IBODMPMJELJ.GJONJADIAJM;
-			FLNCPBKBJBL = IBODMPMJELJ.FLNCPBKBJBL;
-				MGDCIODPHCH = IBODMPMJELJ.MGDCIODPHCH;
+			IsExpired = IBODMPMJELJ.IsExpired;
+			SourceModel = IBODMPMJELJ.SourceModel;
+			TargetModel = IBODMPMJELJ.TargetModel;
+			Action = IBODMPMJELJ.Action;
+			ElapsedFrames = IBODMPMJELJ.ElapsedFrames;
+			DurationFrames = IBODMPMJELJ.DurationFrames;
+			IconPath = IBODMPMJELJ.IconPath;
+			StackKey = IBODMPMJELJ.StackKey;
+			ShowExpiration = IBODMPMJELJ.ShowExpiration;
+				ExpirationVersion = IBODMPMJELJ.ExpirationVersion;
 				EclipseStackCount = IBODMPMJELJ.EclipseStackCount;
 			PreviousMagic = IBODMPMJELJ.PreviousMagic;
             AppliedAttributes = IBODMPMJELJ.AppliedAttributes == null ? null :
                 new Dictionary<string, int>(IBODMPMJELJ.AppliedAttributes);
 		}
 
-		public string LGMFEIFGGDG()
+		public string GetPerkName()
 		{
-			return AMKJNPOCODK.JMDLAMHAJLN().Name;
+			return Action.GetPerk().Name;
 		}
 
-		public string DDBPICENEJE()
+		public string GetModName()
 		{
-			return AMKJNPOCODK.get_Name();
+			return Action.get_Name();
 		}
 	}
 
 	public class PerkEventStruct
 	{
-		public Model KJDFJPBIGJC;
+		public Model Model;
 
 		public object Data;
 
-		public PerkEvent.KNKIIEPDCPN DJPLGDJCMPI;
+		public PerkEvent.PerkEventType EventType;
 	}
 
 	private Dictionary<string, object> _PerkMap = new Dictionary<string, object>();
 
-	private List<PerkModelStruct> MPJMCCGKEOD = new List<PerkModelStruct>();
+	private List<PerkModelStruct> modelRegistrations = new List<PerkModelStruct>();
 
-	private List<ActionPerk> JLAKGOEOHMN = new List<ActionPerk>();
+	private List<ActionPerk> expiredActions = new List<ActionPerk>();
 
-	private static Dictionary<string, List<ActionPerk>> PNAALKAHAKG = new Dictionary<string, List<ActionPerk>>();
+	private static Dictionary<string, List<ActionPerk>> actionsByNamespace = new Dictionary<string, List<ActionPerk>>();
 
 	private static Dictionary<string, int> PerkUsesLeft = new Dictionary<string, int>();
 
-	public Dictionary<string, object> OILMNCIGCNI
+	public Dictionary<string, object> PerkMap
 	{
 		get
 		{
-			return OFKIKABKDFD();
+			return GetPerkMap();
 		}
 	}
 
-	public Dictionary<string, object> OFKIKABKDFD()
+	public Dictionary<string, object> GetPerkMap()
 	{
 		return _PerkMap;
 	}
 
 	public void Run()
 	{
-		foreach (PerkModelStruct item in MPJMCCGKEOD)
+		foreach (PerkModelStruct item in modelRegistrations)
 		{
-			foreach (InfoPerk item2 in item.HIPOGANEPMI())
+			foreach (InfoPerk item2 in item.GetInfoPerks())
 			{
 				item2.Run();
 			}
 		}
 	}
 
-	public void MIPABIOGDBH(List<Model> INNLAFHKJNI)
+	public void SetModels(List<Model> INNLAFHKJNI)
 	{
-		JBOGMAPDLHG();
+		ClearModels();
 		foreach (Model item in INNLAFHKJNI)
 		{
 			AddModel(item);
@@ -144,29 +144,29 @@ public partial class PerksStage : global::EventDispatcher<PerksStage.PerkEventSt
 	{
 		var prepared = PrepareModelRegistration(ACENLMONNPA);
 		RemoveModel(ACENLMONNPA);
-		MPJMCCGKEOD.Add(prepared);
+		modelRegistrations.Add(prepared);
 	}
 
     internal System.Action ReplaceFormRegistration(Model expected, Model replacement)
     {
         if (expected == null || replacement == null || expected == replacement)
             throw new System.ArgumentException("Form perk registration requires distinct models.");
-        int index = MPJMCCGKEOD.FindIndex(value => value.get_Model() == expected);
-        if (index < 0 || MPJMCCGKEOD.Exists(value => value.get_Model() == replacement))
+        int index = modelRegistrations.FindIndex(value => value.get_Model() == expected);
+        if (index < 0 || modelRegistrations.Exists(value => value.get_Model() == replacement))
             throw new System.InvalidOperationException("Form perk registration identity is stale.");
-        var original = MPJMCCGKEOD[index];
+        var original = modelRegistrations[index];
         var prepared = PrepareModelRegistration(replacement);
         // Existing effect containers own timers, queued work and expiry history.
         // New trigger tables come from the replacement's loadout, while effects
         // already started continue through those same containers exactly once.
-        prepared.HIPOGANEPMI().AddRange(original.HIPOGANEPMI());
-        foreach (var data in prepared.ANPCFJGEJPO())
+        prepared.GetInfoPerks().AddRange(original.GetInfoPerks());
+        foreach (var data in prepared.GetPerkDataList())
         {
-            var previous = original.ANPCFJGEJPO().Find(value => value.MBDDKGIOOGD == data.MBDDKGIOOGD);
+            var previous = original.GetPerkDataList().Find(value => value.PerkInfo == data.PerkInfo);
             if (previous != null) data.Enabled = previous.Enabled;
         }
-        MPJMCCGKEOD[index] = prepared;
-        return () => MPJMCCGKEOD[index] = original;
+        modelRegistrations[index] = prepared;
+        return () => modelRegistrations[index] = original;
     }
 
     internal System.Action TransferFormEffects(Model expected, Model replacement)
@@ -180,44 +180,44 @@ public partial class PerksStage : global::EventDispatcher<PerksStage.PerkEventSt
         try
         {
             undo.Add(replacement.CopyFormModifiersFrom(expected));
-            foreach (var registration in MPJMCCGKEOD)
-                foreach (var perk in registration.HIPOGANEPMI())
-                    foreach (var action in perk.HIPOGANEPMI())
+            foreach (var registration in modelRegistrations)
+                foreach (var perk in registration.GetInfoPerks())
+                    foreach (var action in perk.GetActiveActions())
                     {
                         if (!seen.Add(action)) continue;
-                        if (action.KJDFJPBIGJC == expected && action.AMKJNPOCODK is PerkActionSetAttributes)
+                        if (action.TargetModel == expected && action.Action is PerkActionSetAttributes)
                             undo.Add(perk.TransferAttributeEffect(action, expected, replacement));
-                        else if (action.AMKJNPOCODK is ModHealthChange &&
-                            (action.KJDFJPBIGJC == expected || action.BIKLKJMNGKP == expected))
+                        else if (action.Action is ModHealthChange &&
+                            (action.TargetModel == expected || action.SourceModel == expected))
                             undo.Add(perk.TransferHealthEffect(action, expected, replacement));
-                        else if (action.KJDFJPBIGJC == expected && IsFormBodyModifier(action.AMKJNPOCODK.get_Type()))
+                        else if (action.TargetModel == expected && IsFormBodyModifier(action.Action.get_Type()))
                         {
-                            var source = action.BIKLKJMNGKP;
-                            action.KJDFJPBIGJC = replacement;
-                            if (source == expected) action.BIKLKJMNGKP = replacement;
-                            undo.Add(() => { action.KJDFJPBIGJC = expected; action.BIKLKJMNGKP = source; });
+                            var source = action.SourceModel;
+                            action.TargetModel = replacement;
+                            if (source == expected) action.SourceModel = replacement;
+                            undo.Add(() => { action.TargetModel = expected; action.SourceModel = source; });
                         }
-                        else if (action.BIKLKJMNGKP == expected && action.KJDFJPBIGJC != expected)
+                        else if (action.SourceModel == expected && action.TargetModel != expected)
                         {
                             // Source-only references carry attribution, not an
                             // applied modification on the retiring body.
-                            action.BIKLKJMNGKP = replacement;
-                            undo.Add(() => action.BIKLKJMNGKP = expected);
+                            action.SourceModel = replacement;
+                            undo.Add(() => action.SourceModel = expected);
                         }
                     }
-            var history = new HashSet<ActionPerk>(JLAKGOEOHMN);
+            var history = new HashSet<ActionPerk>(expiredActions);
             foreach (var action in history)
             {
                 // CLBPEANCNOA records expired actions here. Live aliases still
                 // take the effect-specific path. Namespace-only records are not
                 // proof of expiry and remain subject to the retirement gate.
                 if (action == null || seen.Contains(action)) continue;
-                var target = action.KJDFJPBIGJC;
-                var source = action.BIKLKJMNGKP;
+                var target = action.TargetModel;
+                var source = action.SourceModel;
                 if (target != expected && source != expected) continue;
-                undo.Add(() => { action.KJDFJPBIGJC = target; action.BIKLKJMNGKP = source; });
-                if (target == expected) action.KJDFJPBIGJC = replacement;
-                if (source == expected) action.BIKLKJMNGKP = replacement;
+                undo.Add(() => { action.TargetModel = target; action.SourceModel = source; });
+                if (target == expected) action.TargetModel = replacement;
+                if (source == expected) action.SourceModel = replacement;
             }
         }
         catch { restore(); throw; }
@@ -252,18 +252,18 @@ public partial class PerksStage : global::EventDispatcher<PerksStage.PerkEventSt
 
     internal void RequireFormReferencesTransferred(ISet<Model> retired)
     {
-        var actions = new HashSet<ActionPerk>(JLAKGOEOHMN);
-        foreach (var values in PNAALKAHAKG.Values) actions.UnionWith(values);
-        foreach (var registration in MPJMCCGKEOD)
-            foreach (var perk in registration.HIPOGANEPMI())
+        var actions = new HashSet<ActionPerk>(expiredActions);
+        foreach (var values in actionsByNamespace.Values) actions.UnionWith(values);
+        foreach (var registration in modelRegistrations)
+            foreach (var perk in registration.GetInfoPerks())
             {
-                actions.UnionWith(perk.MNLNLKOJPHO());
-                actions.UnionWith(perk.HIPOGANEPMI());
+                actions.UnionWith(perk.GetPendingActions());
+                actions.UnionWith(perk.GetActiveActions());
             }
         foreach (var action in actions)
-            if (action != null && (retired.Contains(action.KJDFJPBIGJC) || retired.Contains(action.BIKLKJMNGKP)))
+            if (action != null && (retired.Contains(action.TargetModel) || retired.Contains(action.SourceModel)))
                 throw new System.InvalidOperationException("Form still owns an untransferred perk action: " +
-                    (action.AMKJNPOCODK == null ? "unknown" : action.AMKJNPOCODK.get_Type().ToString()));
+                    (action.Action == null ? "unknown" : action.Action.get_Type().ToString()));
     }
 
     // Only pending actions are safe to retarget without transferring effects that
@@ -273,29 +273,29 @@ public partial class PerksStage : global::EventDispatcher<PerksStage.PerkEventSt
         if (expected == null || replacement == null || expected == replacement)
             throw new System.ArgumentException("Queued perk rebinding requires distinct models.");
         var pending = new HashSet<ActionPerk>();
-        var active = new HashSet<ActionPerk>(JLAKGOEOHMN);
-        foreach (var registration in MPJMCCGKEOD)
-            foreach (var perk in registration.HIPOGANEPMI())
+        var active = new HashSet<ActionPerk>(expiredActions);
+        foreach (var registration in modelRegistrations)
+            foreach (var perk in registration.GetInfoPerks())
             {
-                pending.UnionWith(perk.MNLNLKOJPHO());
-                active.UnionWith(perk.HIPOGANEPMI());
+                pending.UnionWith(perk.GetPendingActions());
+                active.UnionWith(perk.GetActiveActions());
             }
-        foreach (var actions in PNAALKAHAKG.Values) active.UnionWith(actions);
+        foreach (var actions in actionsByNamespace.Values) active.UnionWith(actions);
         var restore = new List<System.Action>();
         foreach (var action in pending)
         {
             if (action == null || active.Contains(action)) continue;
-            var target = action.KJDFJPBIGJC;
-            var source = action.BIKLKJMNGKP;
+            var target = action.TargetModel;
+            var source = action.SourceModel;
             if (target != expected && source != expected) continue;
-            restore.Add(() => { action.KJDFJPBIGJC = target; action.BIKLKJMNGKP = source; });
+            restore.Add(() => { action.TargetModel = target; action.SourceModel = source; });
         }
         // Capture every reference before mutation; no action execution is involved.
         foreach (var action in pending)
         {
             if (action == null || active.Contains(action)) continue;
-            if (action.KJDFJPBIGJC == expected) action.KJDFJPBIGJC = replacement;
-            if (action.BIKLKJMNGKP == expected) action.BIKLKJMNGKP = replacement;
+            if (action.TargetModel == expected) action.TargetModel = replacement;
+            if (action.SourceModel == expected) action.SourceModel = replacement;
         }
         return () => { foreach (var undo in restore) undo(); };
     }
@@ -308,33 +308,33 @@ public partial class PerksStage : global::EventDispatcher<PerksStage.PerkEventSt
         var prepared = new PerkModelStruct();
         prepared.set_Model(model);
         foreach (var perk in model.Parameters.Perks)
-            OPACOCIKEOL(prepared, perk);
+            RegisterPerkTriggers(prepared, perk);
         return prepared;
     }
 
 	public void RemoveModel(Model ACENLMONNPA)
 	{
-		foreach (PerkModelStruct item in MPJMCCGKEOD)
+		foreach (PerkModelStruct item in modelRegistrations)
 		{
 			if (item.get_Model() == ACENLMONNPA)
 			{
-				MPJMCCGKEOD.Remove(item);
+				modelRegistrations.Remove(item);
 				break;
 			}
 		}
 	}
 
-	public void JBOGMAPDLHG()
+	public void ClearModels()
 	{
-		MPJMCCGKEOD.Clear();
+		modelRegistrations.Clear();
 	}
 
 	public void Reset()
 	{
 		PerkUsesLeft.Clear();
-		foreach (PerkModelStruct item in MPJMCCGKEOD)
+		foreach (PerkModelStruct item in modelRegistrations)
 		{
-			foreach (InfoPerk item2 in item.HIPOGANEPMI())
+			foreach (InfoPerk item2 in item.GetInfoPerks())
 			{
 				bool gIBIGPCELOB = true;
 				item2.ClearActions(gIBIGPCELOB);
@@ -342,39 +342,39 @@ public partial class PerksStage : global::EventDispatcher<PerksStage.PerkEventSt
 		}
 	}
 
-	public bool JALOHCICLGN(Model FAJBDBKEHJL, PerkEvent.KNKIIEPDCPN LFLGCDNKNJI, bool GMFCKPBJNLC = false, PerkTrigger CPBHKJFPFJB = null)
+	public bool FireEvent(Model FAJBDBKEHJL, PerkEvent.PerkEventType LFLGCDNKNJI, bool GMFCKPBJNLC = false, PerkTrigger CPBHKJFPFJB = null)
 	{
-		DBHDFPCPHEH(FAJBDBKEHJL, LFLGCDNKNJI);
-		object obj = ((!OFKIKABKDFD().ContainsKey("Namespace")) ? null : OFKIKABKDFD()["Namespace"]);
+		DispatchEvent(FAJBDBKEHJL, LFLGCDNKNJI);
+		object obj = ((!GetPerkMap().ContainsKey("Namespace")) ? null : GetPerkMap()["Namespace"]);
 		string fILIJOFBNMA = string.Empty;
 		if (obj != null)
 		{
 			fILIJOFBNMA = (string)obj;
 		}
-		foreach (PerkModelStruct item in MPJMCCGKEOD)
+		foreach (PerkModelStruct item in modelRegistrations)
 		{
 			if (CPBHKJFPFJB != null)
 			{
 				if (FAJBDBKEHJL == item.get_Model())
 				{
-					FOMKDCMBDJD(item, FAJBDBKEHJL, null, CPBHKJFPFJB, true);
+					ProcessTrigger(item, FAJBDBKEHJL, null, CPBHKJFPFJB, true);
 				}
 				continue;
 			}
-			List<PerkTrigger> list = item.ILLIKOPBPIK(LFLGCDNKNJI);
+			List<PerkTrigger> list = item.GetTriggersForEvent(LFLGCDNKNJI);
 			if (list == null)
 			{
 				continue;
 			}
 			PerkEvent.EventStruct pJEJIOPNBIJ = new PerkEvent.EventStruct();
 			pJEJIOPNBIJ.Type = LFLGCDNKNJI;
-			pJEJIOPNBIJ.Info = ((!GMFCKPBJNLC) ? null : OFKIKABKDFD());
-			pJEJIOPNBIJ.BMIGEFANCCC = item.get_Model();
-			pJEJIOPNBIJ.BIKLKJMNGKP = FAJBDBKEHJL;
+			pJEJIOPNBIJ.Info = ((!GMFCKPBJNLC) ? null : GetPerkMap());
+			pJEJIOPNBIJ.PerkOwnerModel = item.get_Model();
+			pJEJIOPNBIJ.EventModel = FAJBDBKEHJL;
 			pJEJIOPNBIJ.Namespace = fILIJOFBNMA;
 			foreach (PerkTrigger item2 in list)
 			{
-				FOMKDCMBDJD(item, FAJBDBKEHJL, pJEJIOPNBIJ, item2);
+				ProcessTrigger(item, FAJBDBKEHJL, pJEJIOPNBIJ, item2);
 			}
 		}
 		if (CPBHKJFPFJB == null)
@@ -384,49 +384,49 @@ public partial class PerksStage : global::EventDispatcher<PerksStage.PerkEventSt
 		return true;
 	}
 
-	private void FOMKDCMBDJD(PerkModelStruct MAEPLNACFKD, Model FAJBDBKEHJL, PerkEvent.EventStruct EJMEALJNNIL, PerkTrigger CPBHKJFPFJB, bool CAPNMPNNBHF = false)
+	private void ProcessTrigger(PerkModelStruct MAEPLNACFKD, Model FAJBDBKEHJL, PerkEvent.EventStruct EJMEALJNNIL, PerkTrigger CPBHKJFPFJB, bool CAPNMPNNBHF = false)
 	{
-		PerkData mFKICNALNFB = MAEPLNACFKD.DCGNMCFLDFD(CPBHKJFPFJB.JMDLAMHAJLN());
+		PerkData mFKICNALNFB = MAEPLNACFKD.FindPerkData(CPBHKJFPFJB.GetPerk());
 		if (mFKICNALNFB != null && mFKICNALNFB.Enabled)
 		{
-			InfoPerk bPDFFLADJMJ = BELALEGDCDM(MAEPLNACFKD, CPBHKJFPFJB.JMDLAMHAJLN());
-			List<string> nIKHAICFGNM = ((bPDFFLADJMJ == null) ? new List<string>() : bPDFFLADJMJ.BFKDLIMHGFA());
-			CPBHKJFPFJB.JMDLAMHAJLN().LPHBKEKMPEH(MAEPLNACFKD.get_Model());
-			if ((EJMEALJNNIL == null || CPBHKJFPFJB.MIMBCGNGGHO(EJMEALJNNIL)) && CPBHKJFPFJB.IPFOGLIBLLB(MAEPLNACFKD.get_Model(), nIKHAICFGNM))
+			InfoPerk bPDFFLADJMJ = FindInfoPerk(MAEPLNACFKD, CPBHKJFPFJB.GetPerk());
+			List<string> nIKHAICFGNM = ((bPDFFLADJMJ == null) ? new List<string>() : bPDFFLADJMJ.GetActiveActionNames());
+			CPBHKJFPFJB.GetPerk().SetOwnerModel(MAEPLNACFKD.get_Model());
+			if ((EJMEALJNNIL == null || CPBHKJFPFJB.MatchesEvent(EJMEALJNNIL)) && CPBHKJFPFJB.AreConditionsMet(MAEPLNACFKD.get_Model(), nIKHAICFGNM))
 			{
-				MHHNIPBJNAD(MAEPLNACFKD, FAJBDBKEHJL, CPBHKJFPFJB, CAPNMPNNBHF);
+				ExecuteTriggerActions(MAEPLNACFKD, FAJBDBKEHJL, CPBHKJFPFJB, CAPNMPNNBHF);
 			}
 		}
 	}
 
 	public void Render()
 	{
-		GGKJFBGBDGM();
-		foreach (PerkModelStruct item in MPJMCCGKEOD)
+		ClearExpiredActions();
+		foreach (PerkModelStruct item in modelRegistrations)
 		{
-			foreach (InfoPerk item2 in item.HIPOGANEPMI())
+			foreach (InfoPerk item2 in item.GetInfoPerks())
 			{
 				item2.Render();
 			}
 		}
 	}
 
-	public void AINGCNFDFMM(Model ACENLMONNPA, List<ActionPerk> FFFLNOBCBGL)
+	public void CollectActiveActions(Model ACENLMONNPA, List<ActionPerk> FFFLNOBCBGL)
 	{
 		FFFLNOBCBGL.Clear();
 		PerkModelStruct iAIBLEELGNK = null;
 		InfoPerk bPDFFLADJMJ = null;
 		ActionPerk oAJGINIDKJD = null;
-		for (int i = 0; i < MPJMCCGKEOD.Count; i++)
+		for (int i = 0; i < modelRegistrations.Count; i++)
 		{
-			iAIBLEELGNK = MPJMCCGKEOD[i];
-			for (int j = 0; j < iAIBLEELGNK.HIPOGANEPMI().Count; j++)
+			iAIBLEELGNK = modelRegistrations[i];
+			for (int j = 0; j < iAIBLEELGNK.GetInfoPerks().Count; j++)
 			{
-				bPDFFLADJMJ = iAIBLEELGNK.HIPOGANEPMI()[j];
-				for (int k = 0; k < bPDFFLADJMJ.HIPOGANEPMI().Count; k++)
+				bPDFFLADJMJ = iAIBLEELGNK.GetInfoPerks()[j];
+				for (int k = 0; k < bPDFFLADJMJ.GetActiveActions().Count; k++)
 				{
-					oAJGINIDKJD = bPDFFLADJMJ.HIPOGANEPMI()[k];
-					if (oAJGINIDKJD.KJDFJPBIGJC == ACENLMONNPA)
+					oAJGINIDKJD = bPDFFLADJMJ.GetActiveActions()[k];
+					if (oAJGINIDKJD.TargetModel == ACENLMONNPA)
 					{
 						FFFLNOBCBGL.Add(oAJGINIDKJD);
 					}
@@ -435,31 +435,31 @@ public partial class PerksStage : global::EventDispatcher<PerksStage.PerkEventSt
 		}
 	}
 
-	public void KCEBAJBMJGF(Model ACENLMONNPA, List<ActionPerk> FFFLNOBCBGL)
+	public void CollectExpiredActions(Model ACENLMONNPA, List<ActionPerk> FFFLNOBCBGL)
 	{
 		FFFLNOBCBGL.Clear();
 		ActionPerk oAJGINIDKJD = null;
-		for (int i = 0; i < JLAKGOEOHMN.Count; i++)
+		for (int i = 0; i < expiredActions.Count; i++)
 		{
-			oAJGINIDKJD = JLAKGOEOHMN[i];
-			if (oAJGINIDKJD.KJDFJPBIGJC == ACENLMONNPA)
+			oAJGINIDKJD = expiredActions[i];
+			if (oAJGINIDKJD.TargetModel == ACENLMONNPA)
 			{
 				FFFLNOBCBGL.Add(oAJGINIDKJD);
 			}
 		}
 	}
 
-	public InfoPerk BELALEGDCDM(Model ACENLMONNPA, PerkInfoItem AEFFHJGMNFI)
+	public InfoPerk FindInfoPerk(Model ACENLMONNPA, PerkInfoItem AEFFHJGMNFI)
 	{
-		foreach (PerkModelStruct item in MPJMCCGKEOD)
+		foreach (PerkModelStruct item in modelRegistrations)
 		{
 			if (ACENLMONNPA != item.get_Model())
 			{
 				continue;
 			}
-			foreach (InfoPerk item2 in item.HIPOGANEPMI())
+			foreach (InfoPerk item2 in item.GetInfoPerks())
 			{
-				if (item2.DCMHONAFOGI.MBDDKGIOOGD == AEFFHJGMNFI)
+				if (item2.Data.PerkInfo == AEFFHJGMNFI)
 				{
 					return item2;
 				}
@@ -468,91 +468,91 @@ public partial class PerksStage : global::EventDispatcher<PerksStage.PerkEventSt
 		return null;
 	}
 
-	public InfoPerk BELALEGDCDM(PerkModelStruct ACENLMONNPA, PerkInfoItem AEFFHJGMNFI)
+	public InfoPerk FindInfoPerk(PerkModelStruct ACENLMONNPA, PerkInfoItem AEFFHJGMNFI)
 	{
-		return BELALEGDCDM(ACENLMONNPA.get_Model(), AEFFHJGMNFI);
+		return FindInfoPerk(ACENLMONNPA.get_Model(), AEFFHJGMNFI);
 	}
 
-	public void HLIOEELKFCP(object data)
+	public void OnDisarm(object data)
 	{
 		Model.DisarmData aADFODEJPHG = (Model.DisarmData)data;
-		PerkModelStruct iAIBLEELGNK = FMHMIJIPBFG(aADFODEJPHG.KJDFJPBIGJC);
-		foreach (PerkInfoItem item in aADFODEJPHG.NHBIJEEKALC)
+		PerkModelStruct iAIBLEELGNK = FindModelRegistration(aADFODEJPHG.Owner);
+		foreach (PerkInfoItem item in aADFODEJPHG.LostPerks)
 		{
-			foreach (InfoPerk item2 in iAIBLEELGNK.HIPOGANEPMI())
+			foreach (InfoPerk item2 in iAIBLEELGNK.GetInfoPerks())
 			{
-				if (item2.DCMHONAFOGI.MBDDKGIOOGD == item)
+				if (item2.Data.PerkInfo == item)
 				{
 					item2.ClearActions(true);
 				}
 			}
-			iAIBLEELGNK.ANHEJBMHGIL(item, false);
+			iAIBLEELGNK.SetPerkEnabled(item, false);
 		}
 	}
 
-	public void DEHPKPPDIIA()
+	public void EnableAllPerks()
 	{
-		foreach (PerkModelStruct item in MPJMCCGKEOD)
+		foreach (PerkModelStruct item in modelRegistrations)
 		{
-			item.ANPCFJGEJPO().ForEach((PerkData DHDMNHCIPEH) =>
+			item.GetPerkDataList().ForEach((PerkData DHDMNHCIPEH) =>
 			{
 				DHDMNHCIPEH.Enabled = true;
 			});
 		}
 	}
 
-	public void PAHPCIFKDEA()
+	public void ResetInfoPerks()
 	{
-		foreach (PerkModelStruct item in MPJMCCGKEOD)
+		foreach (PerkModelStruct item in modelRegistrations)
 		{
-			item.HIPOGANEPMI().ForEach((InfoPerk DHDMNHCIPEH) =>
+			item.GetInfoPerks().ForEach((InfoPerk DHDMNHCIPEH) =>
 			{
-				DHDMNHCIPEH.PANKENFPNPN();
+				DHDMNHCIPEH.ResetExpiredMods();
 			});
 		}
 	}
 
-	public static void HKMMGCLNJCN(ActionPerk IBODMPMJELJ)
+	public static void RegisterNamespaceAction(ActionPerk IBODMPMJELJ)
 	{
-		if (IBODMPMJELJ.AMKJNPOCODK.NKAEEFNNBEN())
+		if (IBODMPMJELJ.Action.GetModificator())
 		{
-			PerkActionModificator cKCICHAIMFL = (PerkActionModificator)IBODMPMJELJ.AMKJNPOCODK;
-			if (cKCICHAIMFL != null && !string.IsNullOrEmpty(cKCICHAIMFL.IONIEDIPEGB()))
+			PerkActionModificator cKCICHAIMFL = (PerkActionModificator)IBODMPMJELJ.Action;
+			if (cKCICHAIMFL != null && !string.IsNullOrEmpty(cKCICHAIMFL.GetNamespace()))
 			{
-				if (!PNAALKAHAKG.ContainsKey(cKCICHAIMFL.IONIEDIPEGB()))
-					PNAALKAHAKG.Add(cKCICHAIMFL.IONIEDIPEGB(), new List<ActionPerk>());
-				List<ActionPerk> oMKIGJOLJJE = PNAALKAHAKG[cKCICHAIMFL.IONIEDIPEGB()];
+				if (!actionsByNamespace.ContainsKey(cKCICHAIMFL.GetNamespace()))
+					actionsByNamespace.Add(cKCICHAIMFL.GetNamespace(), new List<ActionPerk>());
+				List<ActionPerk> oMKIGJOLJJE = actionsByNamespace[cKCICHAIMFL.GetNamespace()];
 				oMKIGJOLJJE.AddIfNotExist(IBODMPMJELJ);
 			}
 		}
 	}
 
-	public static void AEMBNMFGDBN(ActionPerk IBODMPMJELJ)
+	public static void UnregisterNamespaceAction(ActionPerk IBODMPMJELJ)
 	{
-		if (IBODMPMJELJ.AMKJNPOCODK.NKAEEFNNBEN())
+		if (IBODMPMJELJ.Action.GetModificator())
 		{
-			PerkActionModificator cKCICHAIMFL = (PerkActionModificator)IBODMPMJELJ.AMKJNPOCODK;
-			if (cKCICHAIMFL != null && PNAALKAHAKG.ContainsKey(cKCICHAIMFL.IONIEDIPEGB()))
+			PerkActionModificator cKCICHAIMFL = (PerkActionModificator)IBODMPMJELJ.Action;
+			if (cKCICHAIMFL != null && actionsByNamespace.ContainsKey(cKCICHAIMFL.GetNamespace()))
 			{
-				List<ActionPerk> list = PNAALKAHAKG[cKCICHAIMFL.IONIEDIPEGB()];
+				List<ActionPerk> list = actionsByNamespace[cKCICHAIMFL.GetNamespace()];
 				list.Remove(IBODMPMJELJ);
 			}
 		}
 	}
 
-	public static void EHFKNCOOCAA()
+	public static void ClearNamespaceActions()
 	{
-		PNAALKAHAKG.Clear();
+		actionsByNamespace.Clear();
 	}
 
 	public static bool CheckModNameInNamespace(string GBHAIILPKFC, string PJPJIBOAFKF)
 	{
-		if (PNAALKAHAKG.ContainsKey(PJPJIBOAFKF))
+		if (actionsByNamespace.ContainsKey(PJPJIBOAFKF))
 		{
-			List<ActionPerk> list = PNAALKAHAKG[PJPJIBOAFKF];
+			List<ActionPerk> list = actionsByNamespace[PJPJIBOAFKF];
 			foreach (ActionPerk item in list)
 			{
-				if (item.AMKJNPOCODK.get_Name().Equals(GBHAIILPKFC))
+				if (item.Action.get_Name().Equals(GBHAIILPKFC))
 				{
 					return true;
 				}
@@ -561,16 +561,16 @@ public partial class PerksStage : global::EventDispatcher<PerksStage.PerkEventSt
 		return false;
 	}
 
-	public static ActionPerk AFAGHKFHHIF(string GBHAIILPKFC, string PJPJIBOAFKF)
+	public static ActionPerk FindNamespaceAction(string GBHAIILPKFC, string PJPJIBOAFKF)
 	{
-		if (!PNAALKAHAKG.ContainsKey(PJPJIBOAFKF))
+		if (!actionsByNamespace.ContainsKey(PJPJIBOAFKF))
 		{
 			return null;
 		}
-		List<ActionPerk> list = PNAALKAHAKG[PJPJIBOAFKF];
+		List<ActionPerk> list = actionsByNamespace[PJPJIBOAFKF];
 		foreach (ActionPerk item in list)
 		{
-			if (item.AMKJNPOCODK.get_Name().Equals(GBHAIILPKFC))
+			if (item.Action.get_Name().Equals(GBHAIILPKFC))
 			{
 				return item;
 			}
@@ -578,12 +578,12 @@ public partial class PerksStage : global::EventDispatcher<PerksStage.PerkEventSt
 		return null;
 	}
 
-	public static List<ActionPerk> DOAECFNPKIO(string PJPJIBOAFKF)
+	public static List<ActionPerk> GetNamespaceActions(string PJPJIBOAFKF)
 	{
-		return (!PNAALKAHAKG.ContainsKey(PJPJIBOAFKF)) ? null : PNAALKAHAKG[PJPJIBOAFKF];
+		return (!actionsByNamespace.ContainsKey(PJPJIBOAFKF)) ? null : actionsByNamespace[PJPJIBOAFKF];
 	}
 
-	public static void ANPAFFMJMNG(string name)
+	public static void IncrementPerkUse(string name)
 	{
 		if (string.IsNullOrEmpty(name))
 			return;
@@ -602,42 +602,42 @@ public partial class PerksStage : global::EventDispatcher<PerksStage.PerkEventSt
 		return true;
 	}
 
-	public void MHHNIPBJNAD(Model FAJBDBKEHJL, PerkTrigger CPBHKJFPFJB, bool CAPNMPNNBHF = false)
+	public void ExecuteTriggerActions(Model FAJBDBKEHJL, PerkTrigger CPBHKJFPFJB, bool CAPNMPNNBHF = false)
 	{
-		foreach (PerkModelStruct item in MPJMCCGKEOD)
+		foreach (PerkModelStruct item in modelRegistrations)
 		{
 			if (FAJBDBKEHJL == item.get_Model())
 			{
-				MHHNIPBJNAD(item, FAJBDBKEHJL, CPBHKJFPFJB, CAPNMPNNBHF);
+				ExecuteTriggerActions(item, FAJBDBKEHJL, CPBHKJFPFJB, CAPNMPNNBHF);
 				break;
 			}
 		}
 	}
 
-	public void MHHNIPBJNAD(PerkModelStruct MAEPLNACFKD, Model FAJBDBKEHJL, PerkTrigger CPBHKJFPFJB, bool CAPNMPNNBHF = false)
+	public void ExecuteTriggerActions(PerkModelStruct MAEPLNACFKD, Model FAJBDBKEHJL, PerkTrigger CPBHKJFPFJB, bool CAPNMPNNBHF = false)
 	{
-		InfoPerk bPDFFLADJMJ = BELALEGDCDM(MAEPLNACFKD, CPBHKJFPFJB.JMDLAMHAJLN());
+		InfoPerk bPDFFLADJMJ = FindInfoPerk(MAEPLNACFKD, CPBHKJFPFJB.GetPerk());
 		if (bPDFFLADJMJ == null)
 		{
 			bPDFFLADJMJ = new InfoPerk();
-			bPDFFLADJMJ.DCMHONAFOGI = new PerkData(CPBHKJFPFJB.JMDLAMHAJLN());
-			MAEPLNACFKD.HIPOGANEPMI().Add(bPDFFLADJMJ);
+			bPDFFLADJMJ.Data = new PerkData(CPBHKJFPFJB.GetPerk());
+			MAEPLNACFKD.GetInfoPerks().Add(bPDFFLADJMJ);
 		}
 		List<ActionPerk> list = new List<ActionPerk>();
-		List<PerkAction> list2 = CPBHKJFPFJB.HIPOGANEPMI();
+		List<PerkAction> list2 = CPBHKJFPFJB.GetActions();
 		foreach (PerkAction item in list2)
 		{
 			ActionPerk oAJGINIDKJD = new ActionPerk();
-			oAJGINIDKJD.KJDFJPBIGJC = item.NKLMKGFAGFG(MAEPLNACFKD.get_Model());
-			oAJGINIDKJD.BIKLKJMNGKP = FAJBDBKEHJL;
-			oAJGINIDKJD.AMKJNPOCODK = item;
-			oAJGINIDKJD.PLNNKKBPDJK = false;
-			oAJGINIDKJD.KGNDJOLBBJF = 0;
-			oAJGINIDKJD.FLNLMIHEDCI = 0;
-			if (item.BFJEFNHKPJI() != null)
+			oAJGINIDKJD.TargetModel = item.ResolveTargetModel(MAEPLNACFKD.get_Model());
+			oAJGINIDKJD.SourceModel = FAJBDBKEHJL;
+			oAJGINIDKJD.Action = item;
+			oAJGINIDKJD.IsExpired = false;
+			oAJGINIDKJD.ElapsedFrames = 0;
+			oAJGINIDKJD.DurationFrames = 0;
+			if (item.GetFrames() != null)
 			{
-				FunctionResult dEIHAOLOPLC = item.BFJEFNHKPJI().IBCPKBBAFNH();
-				oAJGINIDKJD.FLNLMIHEDCI = dEIHAOLOPLC.ToInt();
+				FunctionResult dEIHAOLOPLC = item.GetFrames().Calculate();
+				oAJGINIDKJD.DurationFrames = dEIHAOLOPLC.ToInt();
 			}
 			if (CAPNMPNNBHF)
 			{
@@ -645,61 +645,61 @@ public partial class PerksStage : global::EventDispatcher<PerksStage.PerkEventSt
 			}
 			else
 			{
-				bPDFFLADJMJ.MNLNLKOJPHO().Add(oAJGINIDKJD);
+				bPDFFLADJMJ.GetPendingActions().Add(oAJGINIDKJD);
 			}
 		}
 		if (list.Count > 0)
 		{
-			bPDFFLADJMJ.MHHNIPBJNAD(list);
+			bPDFFLADJMJ.ExecuteActions(list);
 		}
 	}
 
-	public void OPACOCIKEOL(PerkModelStruct ACENLMONNPA, PerkInfoItem AEFFHJGMNFI)
+	public void RegisterPerkTriggers(PerkModelStruct ACENLMONNPA, PerkInfoItem AEFFHJGMNFI)
 	{
 		if (AEFFHJGMNFI != null)
 		{
-			AEFFHJGMNFI.EIKAGOOJOCN(ACENLMONNPA.GBMCKIKMDNH(), PerkEvent.KNKIIEPDCPN.EVENT_COMBO);
-			AEFFHJGMNFI.EIKAGOOJOCN(ACENLMONNPA.DEAADEMBDGN(), PerkEvent.KNKIIEPDCPN.EVENT_EVERY_FRAME);
-			AEFFHJGMNFI.EIKAGOOJOCN(ACENLMONNPA.GMCIFKOLPDH(), PerkEvent.KNKIIEPDCPN.EVENT_HIT_PRECRIT);
-			AEFFHJGMNFI.EIKAGOOJOCN(ACENLMONNPA.MPMNMFBBDJF(), PerkEvent.KNKIIEPDCPN.EVENT_HIT_POSTCRIT);
-			AEFFHJGMNFI.EIKAGOOJOCN(ACENLMONNPA.CPIGPEHCCAJ(), PerkEvent.KNKIIEPDCPN.EVENT_POST_HIT);
-			AEFFHJGMNFI.EIKAGOOJOCN(ACENLMONNPA.KBNLBEPMEHH(), PerkEvent.KNKIIEPDCPN.EVENT_MAGIC_CHARGED);
-			AEFFHJGMNFI.EIKAGOOJOCN(ACENLMONNPA.GHMGNHPKPGF(), PerkEvent.KNKIIEPDCPN.EVENT_ROUND_STAGE_START);
-			AEFFHJGMNFI.EIKAGOOJOCN(ACENLMONNPA.CDLEEPDEFJP(), PerkEvent.KNKIIEPDCPN.EVENT_STYLE);
-			AEFFHJGMNFI.EIKAGOOJOCN(ACENLMONNPA.NJOFBEBLCCB(), PerkEvent.KNKIIEPDCPN.EVENT_ANIMATION_START);
-			AEFFHJGMNFI.EIKAGOOJOCN(ACENLMONNPA.DOAAGFIINIE(), PerkEvent.KNKIIEPDCPN.EVENT_ANIMATION_END);
-			AEFFHJGMNFI.EIKAGOOJOCN(ACENLMONNPA.CFFBHLIPDDF(), PerkEvent.KNKIIEPDCPN.EVENT_MOD_EXPIRES);
-			AEFFHJGMNFI.EIKAGOOJOCN(ACENLMONNPA.HHMPEODCJBI(), PerkEvent.KNKIIEPDCPN.EVENT_AREA_ENTER);
-			AEFFHJGMNFI.EIKAGOOJOCN(ACENLMONNPA.EIJABICDDFO(), PerkEvent.KNKIIEPDCPN.EVENT_AREA_EXIT);
-			AEFFHJGMNFI.EIKAGOOJOCN(ACENLMONNPA.GetIntervalEndTriggers(), PerkEvent.KNKIIEPDCPN.EVENT_INTERVAL_END);
+			AEFFHJGMNFI.CollectTriggersForEvent(ACENLMONNPA.GetComboTriggers(), PerkEvent.PerkEventType.EVENT_COMBO);
+			AEFFHJGMNFI.CollectTriggersForEvent(ACENLMONNPA.GetEveryFrameTriggers(), PerkEvent.PerkEventType.EVENT_EVERY_FRAME);
+			AEFFHJGMNFI.CollectTriggersForEvent(ACENLMONNPA.GetHitPreCritTriggers(), PerkEvent.PerkEventType.EVENT_HIT_PRECRIT);
+			AEFFHJGMNFI.CollectTriggersForEvent(ACENLMONNPA.GetHitPostCritTriggers(), PerkEvent.PerkEventType.EVENT_HIT_POSTCRIT);
+			AEFFHJGMNFI.CollectTriggersForEvent(ACENLMONNPA.GetPostHitTriggers(), PerkEvent.PerkEventType.EVENT_POST_HIT);
+			AEFFHJGMNFI.CollectTriggersForEvent(ACENLMONNPA.GetMagicChargedTriggers(), PerkEvent.PerkEventType.EVENT_MAGIC_CHARGED);
+			AEFFHJGMNFI.CollectTriggersForEvent(ACENLMONNPA.GetRoundStageStartTriggers(), PerkEvent.PerkEventType.EVENT_ROUND_STAGE_START);
+			AEFFHJGMNFI.CollectTriggersForEvent(ACENLMONNPA.GetStyleTriggers(), PerkEvent.PerkEventType.EVENT_STYLE);
+			AEFFHJGMNFI.CollectTriggersForEvent(ACENLMONNPA.GetAnimationStartTriggers(), PerkEvent.PerkEventType.EVENT_ANIMATION_START);
+			AEFFHJGMNFI.CollectTriggersForEvent(ACENLMONNPA.GetAnimationEndTriggers(), PerkEvent.PerkEventType.EVENT_ANIMATION_END);
+			AEFFHJGMNFI.CollectTriggersForEvent(ACENLMONNPA.GetModExpiresTriggers(), PerkEvent.PerkEventType.EVENT_MOD_EXPIRES);
+			AEFFHJGMNFI.CollectTriggersForEvent(ACENLMONNPA.GetAreaEnterTriggers(), PerkEvent.PerkEventType.EVENT_AREA_ENTER);
+			AEFFHJGMNFI.CollectTriggersForEvent(ACENLMONNPA.GetAreaExitTriggers(), PerkEvent.PerkEventType.EVENT_AREA_EXIT);
+			AEFFHJGMNFI.CollectTriggersForEvent(ACENLMONNPA.GetIntervalEndTriggers(), PerkEvent.PerkEventType.EVENT_INTERVAL_END);
 			PerkData item = new PerkData(AEFFHJGMNFI);
-			ACENLMONNPA.ANPCFJGEJPO().Add(item);
+			ACENLMONNPA.GetPerkDataList().Add(item);
 		}
 	}
 
-	public void CLBPEANCNOA(ActionPerk DIMEFLGFIME)
+	public void AddExpiredAction(ActionPerk DIMEFLGFIME)
 	{
-		JLAKGOEOHMN.Add(DIMEFLGFIME);
+		expiredActions.Add(DIMEFLGFIME);
 	}
 
-	private void GGKJFBGBDGM()
+	private void ClearExpiredActions()
 	{
-		JLAKGOEOHMN.Clear();
+		expiredActions.Clear();
 	}
 
-	private PerkModelStruct FMHMIJIPBFG(Model ACENLMONNPA)
+	private PerkModelStruct FindModelRegistration(Model ACENLMONNPA)
 	{
-		return MPJMCCGKEOD.Find((PerkModelStruct DHDMNHCIPEH) => DHDMNHCIPEH.get_Model() == ACENLMONNPA);
+		return modelRegistrations.Find((PerkModelStruct DHDMNHCIPEH) => DHDMNHCIPEH.get_Model() == ACENLMONNPA);
 	}
 
-	private void DBHDFPCPHEH(Model ACENLMONNPA, PerkEvent.KNKIIEPDCPN LFLGCDNKNJI)
+	private void DispatchEvent(Model ACENLMONNPA, PerkEvent.PerkEventType LFLGCDNKNJI)
 	{
 		PerkEventStruct nFFNFAAPEPF = new PerkEventStruct();
-		nFFNFAAPEPF.KJDFJPBIGJC = ACENLMONNPA;
-		nFFNFAAPEPF.DJPLGDJCMPI = LFLGCDNKNJI;
-		if (LFLGCDNKNJI == PerkEvent.KNKIIEPDCPN.EVENT_MOD_EXPIRES)
+		nFFNFAAPEPF.Model = ACENLMONNPA;
+		nFFNFAAPEPF.EventType = LFLGCDNKNJI;
+		if (LFLGCDNKNJI == PerkEvent.PerkEventType.EVENT_MOD_EXPIRES)
 		{
-			nFFNFAAPEPF.Data = ((!OFKIKABKDFD().ContainsKey("ModExpires")) ? null : OFKIKABKDFD()["ModExpires"]);
+			nFFNFAAPEPF.Data = ((!GetPerkMap().ContainsKey("ModExpires")) ? null : GetPerkMap()["ModExpires"]);
 			CallEvent((int)LFLGCDNKNJI, nFFNFAAPEPF);
 		}
 	}

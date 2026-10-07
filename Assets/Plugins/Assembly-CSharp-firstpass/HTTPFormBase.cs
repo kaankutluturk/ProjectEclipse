@@ -8,116 +8,116 @@ public class HTTPFormBase
 	private const int LongLength = 256;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private List<HTTPFieldData> CIIOOOFFJHD;
+	private List<HTTPFieldData> fields;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private bool LIGGKJHGBKE;
+	private bool isChanged;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private bool LADEJCEHFCJ;
+	private bool hasBinary;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private bool CNEGAADGHGH;
+	private bool hasLongValue;
 
-	public List<HTTPFieldData> JMKBOELCNPO
+	public List<HTTPFieldData> Fields
 	{
 		get
 		{
-			return CKOJIABCEBP();
+			return GetFields();
 		}
 		set
 		{
-			EOJFFGAAGOA(value);
+			SetFields(value);
 		}
 	}
 
-	public bool OOPMAAHJMCE
+	public bool IsEmpty
 	{
 		get
 		{
-			return DAIAOBAEDCB();
+			return GetIsEmpty();
 		}
 	}
 
-	public bool OIOLLLGHBPP
+	public bool IsChanged
 	{
 		get
 		{
-			return JODDPBJOEJN();
+			return GetIsChanged();
 		}
 		protected set
 		{
-			AKIGPOBCEOC(value);
+			SetIsChanged(value);
 		}
 	}
 
-	public bool MGIABBEFIGL
+	public bool HasBinary
 	{
 		get
 		{
-			return MNLGNEHBCJK();
+			return GetHasBinary();
 		}
 		protected set
 		{
-			NABPLGNDELE(value);
+			SetHasBinary(value);
 		}
 	}
 
-	public bool LEMLMNHBLLF
+	public bool HasLongValue
 	{
 		get
 		{
-			return FJPFFNEKKOL();
+			return GetHasLongValue();
 		}
 		protected set
 		{
-			PNJDEHAHOJC(value);
+			SetHasLongValue(value);
 		}
 	}
 
-	public List<HTTPFieldData> CKOJIABCEBP()
+	public List<HTTPFieldData> GetFields()
 	{
-		return CIIOOOFFJHD;
+		return fields;
 	}
 
-	public void EOJFFGAAGOA(List<HTTPFieldData> value)
+	public void SetFields(List<HTTPFieldData> value)
 	{
-		CIIOOOFFJHD = value;
+		fields = value;
 	}
 
-	public bool DAIAOBAEDCB()
+	public bool GetIsEmpty()
 	{
-		return CKOJIABCEBP() == null || CKOJIABCEBP().Count == 0;
+		return GetFields() == null || GetFields().Count == 0;
 	}
 
-	public bool JODDPBJOEJN()
+	public bool GetIsChanged()
 	{
-		return LIGGKJHGBKE;
+		return isChanged;
 	}
 
-	protected void AKIGPOBCEOC(bool value)
+	protected void SetIsChanged(bool value)
 	{
-		LIGGKJHGBKE = value;
+		isChanged = value;
 	}
 
-	public bool MNLGNEHBCJK()
+	public bool GetHasBinary()
 	{
-		return LADEJCEHFCJ;
+		return hasBinary;
 	}
 
-	protected void NABPLGNDELE(bool value)
+	protected void SetHasBinary(bool value)
 	{
-		LADEJCEHFCJ = value;
+		hasBinary = value;
 	}
 
-	public bool FJPFFNEKKOL()
+	public bool GetHasLongValue()
 	{
-		return CNEGAADGHGH;
+		return hasLongValue;
 	}
 
-	protected void PNJDEHAHOJC(bool value)
+	protected void SetHasLongValue(bool value)
 	{
-		CNEGAADGHGH = value;
+		hasLongValue = value;
 	}
 
 	public void AddBinaryData(string LKABGPANBMH, byte[] DMNBDBJNKME)
@@ -132,33 +132,33 @@ public class HTTPFormBase
 
 	public void AddBinaryData(string LKABGPANBMH, byte[] DMNBDBJNKME, string PMFEIPCHENB, string KIDMMGJIEHJ)
 	{
-		if (CKOJIABCEBP() == null)
+		if (GetFields() == null)
 		{
-			EOJFFGAAGOA(new List<HTTPFieldData>());
+			SetFields(new List<HTTPFieldData>());
 		}
 		HTTPFieldData iIMHHCDGJOL = new HTTPFieldData();
 		iIMHHCDGJOL.set_Name(LKABGPANBMH);
 		if (PMFEIPCHENB == null)
 		{
-			iIMHHCDGJOL.IMMLGNKJPKA(LKABGPANBMH + ".dat");
+			iIMHHCDGJOL.SetFileName(LKABGPANBMH + ".dat");
 		}
 		else
 		{
-			iIMHHCDGJOL.IMMLGNKJPKA(PMFEIPCHENB);
+			iIMHHCDGJOL.SetFileName(PMFEIPCHENB);
 		}
 		if (KIDMMGJIEHJ == null)
 		{
-			iIMHHCDGJOL.KLHEONGIINC("application/octet-stream");
+			iIMHHCDGJOL.SetMimeType("application/octet-stream");
 		}
 		else
 		{
-			iIMHHCDGJOL.KLHEONGIINC(KIDMMGJIEHJ);
+			iIMHHCDGJOL.SetMimeType(KIDMMGJIEHJ);
 		}
 		iIMHHCDGJOL.set_Binary(DMNBDBJNKME);
-		CKOJIABCEBP().Add(iIMHHCDGJOL);
+		GetFields().Add(iIMHHCDGJOL);
 		bool bAINMLLIKOL = true;
-		AKIGPOBCEOC(bAINMLLIKOL);
-		NABPLGNDELE(bAINMLLIKOL);
+		SetIsChanged(bAINMLLIKOL);
+		SetHasBinary(bAINMLLIKOL);
 	}
 
 	public void AddField(string LKABGPANBMH, string value)
@@ -168,27 +168,27 @@ public class HTTPFormBase
 
 	public void AddField(string LKABGPANBMH, string value, Encoding FOPOKALJIIJ)
 	{
-		if (CKOJIABCEBP() == null)
+		if (GetFields() == null)
 		{
-			EOJFFGAAGOA(new List<HTTPFieldData>());
+			SetFields(new List<HTTPFieldData>());
 		}
 		HTTPFieldData iIMHHCDGJOL = new HTTPFieldData();
 		iIMHHCDGJOL.set_Name(LKABGPANBMH);
-		iIMHHCDGJOL.IMMLGNKJPKA(null);
-		iIMHHCDGJOL.KLHEONGIINC("text/plain; charset=\"" + FOPOKALJIIJ.WebName + "\"");
-		iIMHHCDGJOL.MHMDIMIEPLL(value);
+		iIMHHCDGJOL.SetFileName(null);
+		iIMHHCDGJOL.SetMimeType("text/plain; charset=\"" + FOPOKALJIIJ.WebName + "\"");
+		iIMHHCDGJOL.SetText(value);
 		iIMHHCDGJOL.set_Encoding(FOPOKALJIIJ);
-		CKOJIABCEBP().Add(iIMHHCDGJOL);
-		AKIGPOBCEOC(true);
-		PNJDEHAHOJC(FJPFFNEKKOL() | (value.Length > 256));
+		GetFields().Add(iIMHHCDGJOL);
+		SetIsChanged(true);
+		SetHasLongValue(GetHasLongValue() | (value.Length > 256));
 	}
 
 	public virtual void CopyFrom(HTTPFormBase KHGIIFDIHHA)
 	{
-		EOJFFGAAGOA(new List<HTTPFieldData>(KHGIIFDIHHA.CKOJIABCEBP()));
-		AKIGPOBCEOC(true);
-		NABPLGNDELE(KHGIIFDIHHA.MNLGNEHBCJK());
-		PNJDEHAHOJC(KHGIIFDIHHA.FJPFFNEKKOL());
+		SetFields(new List<HTTPFieldData>(KHGIIFDIHHA.GetFields()));
+		SetIsChanged(true);
+		SetHasBinary(KHGIIFDIHHA.GetHasBinary());
+		SetHasLongValue(KHGIIFDIHHA.GetHasLongValue());
 	}
 
 	public virtual void PrepareRequest(HTTPRequest ONOCIELLAPL)
@@ -196,7 +196,7 @@ public class HTTPFormBase
 		throw new NotImplementedException();
 	}
 
-	public virtual byte[] GDENFGNLFKL()
+	public virtual byte[] GetData()
 	{
 		throw new NotImplementedException();
 	}

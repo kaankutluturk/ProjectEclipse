@@ -2,18 +2,18 @@ using System.Collections.Generic;
 
 internal class EmitterState
 {
-	private readonly HashSet<string> ACKBBMGKMPD = new HashSet<string>();
+	private readonly HashSet<string> emittedAnchors = new HashSet<string>();
 
-	public HashSet<string> EJCKPAEOOOL
+	public HashSet<string> EmittedAnchors
 	{
 		get
 		{
-			return OPMMAOBDGLG();
+			return GetEmittedAnchors();
 		}
 	}
 
-	public HashSet<string> OPMMAOBDGLG()
+	public HashSet<string> GetEmittedAnchors()
 	{
-		return ACKBBMGKMPD;
+		return emittedAnchors;
 	}
 }

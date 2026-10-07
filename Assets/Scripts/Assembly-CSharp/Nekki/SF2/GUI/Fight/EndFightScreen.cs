@@ -22,13 +22,13 @@ namespace Nekki.SF2.GUI.Fight
 
 		private EndFightContent _endFightContent;
 
-		private FightResult MPFLHOFEOGI;
+		private FightResult fightResult;
 
-		private string GLNMNCPDNFJ = "FightUI.Label_Win";
+		private string winSpriteName = "FightUI.Label_Win";
 
-		private string ADGALAFHMHH = "FightUI.Label_Lose";
+		private string loseSpriteName = "FightUI.Label_Lose";
 
-		private string IBAIBAAPGDG = "FightUI.Label_Timesup";
+		private string timesUpSpriteName = "FightUI.Label_Timesup";
 
 		public void Init(FightResult HEIADONEACH)
 		{
@@ -43,12 +43,12 @@ namespace Nekki.SF2.GUI.Fight
 				background.offsetMin = background.offsetMax = Vector2.zero;
 			}
 			EnableFinishButton(false);
-			MPFLHOFEOGI = HEIADONEACH;
+			fightResult = HEIADONEACH;
 			if (_resultHeader != null)
 			{
-				bool flag = MPFLHOFEOGI.IsWinner();
-				bool flag2 = MPFLHOFEOGI.EKBAHCGBNEM();
-				_resultHeader.set_SpriteName(flag ? GLNMNCPDNFJ : ((!flag2) ? ADGALAFHMHH : IBAIBAAPGDG));
+				bool flag = fightResult.IsWinner();
+				bool flag2 = fightResult.IsRaidRoundTimeout();
+				_resultHeader.set_SpriteName(flag ? winSpriteName : ((!flag2) ? loseSpriteName : timesUpSpriteName));
 				_resultHeader.SetNativeSize();
 				Eclipse.UI.UiReveal.Play(_resultHeader.rectTransform, 0f, .45f, new Vector2(0f, 45f), 1.18f);
 			}
@@ -58,12 +58,12 @@ namespace Nekki.SF2.GUI.Fight
 				_endFightContent.gameObject.SetActive(true);
 				Transform parent = ((!(_content != null)) ? base.transform : _content);
 				_endFightContent.transform.SetParent(parent, false);
-				_endFightContent.Init(MPFLHOFEOGI, _contentLayout.GetComponent<VerticalLayoutGroup>(), _animationFinishButton);
+				_endFightContent.Init(fightResult, _contentLayout.GetComponent<VerticalLayoutGroup>(), _animationFinishButton);
 				_endFightContent.CloseEvent.AddListener(() =>
 				{
-					GameUtils.FKMEIHGOFDD(MPFLHOFEOGI);
+					GameUtils.HandleSurrender(fightResult);
 				});
-				_endFightContent.AnimationEndEvent.AddListener(MLPIMHGLKDI);
+				_endFightContent.AnimationEndEvent.AddListener(OnAnimationEnded);
 				Eclipse.UI.UiReveal.Play(_endFightContent.transform as RectTransform, .12f, .45f, Vector2.zero, .96f);
 			}
 		}
@@ -76,7 +76,7 @@ namespace Nekki.SF2.GUI.Fight
 			}
 		}
 
-		private void MLPIMHGLKDI()
+		private void OnAnimationEnded()
 		{
 			EnableFinishButton(false);
 		}
@@ -102,7 +102,7 @@ namespace Nekki.SF2.GUI.Fight
 
 		public void OnBackKeyClicked(object GHDPPHAAPCA)
 		{
-			GameUtils.FKMEIHGOFDD(MPFLHOFEOGI);
+			GameUtils.HandleSurrender(fightResult);
 		}
 	}
 }

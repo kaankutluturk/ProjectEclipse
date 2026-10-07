@@ -8,110 +8,110 @@ using UnityEngine;
 
 public static class GlobalPaths
 {
-	public struct CJBHPHFBBKP
+	public struct PathInfo
 	{
-		public string FKPKHCBIKBG;
+		public string ResourcePath;
 
-		public string OIBCCCHONFF;
+		public string ExternalPath;
 
-		public string PKLNJHNAPCA;
+		public string BundlePath;
 
-		public string JFMBIGDDPNG;
+		public string RawPath;
 
-		public bool OHOKEGGOJBH;
+		public bool HasBundlePath;
 
-		public bool CFELJJPPPFG;
+		public bool HasResourcePath;
 
-		public bool JFGGPBKFAFP;
+		public bool HasExternalPath;
 
-		public static CJBHPHFBBKP Empty = new CJBHPHFBBKP(string.Empty, string.Empty, string.Empty, string.Empty);
+		public static PathInfo Empty = new PathInfo(string.Empty, string.Empty, string.Empty, string.Empty);
 
-		public bool LPGLCGMMPHN
+		public bool IsEmpty
 		{
 			get
 			{
-				return DCIFFHJCIJD();
+				return GetIsEmpty();
 			}
 		}
 
-		public CJBHPHFBBKP(string IDGLPJGEFKB, string NEPCCFPPPIG, string bundle, string IMFLNPNECCO)
+		public PathInfo(string IDGLPJGEFKB, string NEPCCFPPPIG, string bundle, string IMFLNPNECCO)
 		{
 			if (string.IsNullOrEmpty(IDGLPJGEFKB))
 			{
-				CFELJJPPPFG = false;
-				FKPKHCBIKBG = string.Empty;
+				HasResourcePath = false;
+				ResourcePath = string.Empty;
 			}
 			else
 			{
-				CFELJJPPPFG = true;
-				FKPKHCBIKBG = IDGLPJGEFKB.Trim('/').Trim('\\');
+				HasResourcePath = true;
+				ResourcePath = IDGLPJGEFKB.Trim('/').Trim('\\');
 			}
 			if (string.IsNullOrEmpty(NEPCCFPPPIG))
 			{
-				JFGGPBKFAFP = false;
-				OIBCCCHONFF = string.Empty;
+				HasExternalPath = false;
+				ExternalPath = string.Empty;
 			}
 			else
 			{
-				JFGGPBKFAFP = true;
-				OIBCCCHONFF = NEPCCFPPPIG.Trim('/').Trim('\\');
+				HasExternalPath = true;
+				ExternalPath = NEPCCFPPPIG.Trim('/').Trim('\\');
 			}
 			if (string.IsNullOrEmpty(bundle))
 			{
-				OHOKEGGOJBH = false;
-				PKLNJHNAPCA = string.Empty;
+				HasBundlePath = false;
+				BundlePath = string.Empty;
 			}
 			else
 			{
-				OHOKEGGOJBH = true;
-				PKLNJHNAPCA = bundle.Trim('/').Trim('\\');
+				HasBundlePath = true;
+				BundlePath = bundle.Trim('/').Trim('\\');
 			}
-			JFMBIGDDPNG = IMFLNPNECCO.Trim('/').Trim('\\');
+			RawPath = IMFLNPNECCO.Trim('/').Trim('\\');
 		}
 
-		public bool DCIFFHJCIJD()
+		public bool GetIsEmpty()
 		{
-			return !CFELJJPPPFG && !JFGGPBKFAFP && !OHOKEGGOJBH;
+			return !HasResourcePath && !HasExternalPath && !HasBundlePath;
 		}
 
-		public CJBHPHFBBKP JJMAGODLBBI(string ALHKHJOJECK)
+		public PathInfo Append(string ALHKHJOJECK)
 		{
-			if (CFELJJPPPFG)
+			if (HasResourcePath)
 			{
-				FKPKHCBIKBG = FKPKHCBIKBG + "/" + ALHKHJOJECK;
+				ResourcePath = ResourcePath + "/" + ALHKHJOJECK;
 			}
-			if (JFGGPBKFAFP)
+			if (HasExternalPath)
 			{
-				OIBCCCHONFF = OIBCCCHONFF + "/" + ALHKHJOJECK;
+				ExternalPath = ExternalPath + "/" + ALHKHJOJECK;
 			}
-			if (OHOKEGGOJBH)
+			if (HasBundlePath)
 			{
-				PKLNJHNAPCA = PKLNJHNAPCA + "/" + ALHKHJOJECK;
+				BundlePath = BundlePath + "/" + ALHKHJOJECK;
 			}
 			return this;
 		}
 
 		[SpecialName]
-		public static string op_Explicit(CJBHPHFBBKP PIIEECCHMAC)
+		public static string op_Explicit(PathInfo PIIEECCHMAC)
 		{
-			return PIIEECCHMAC.OIBCCCHONFF;
+			return PIIEECCHMAC.ExternalPath;
 		}
 	}
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private static YamlDocumentNekki LMGNAMMFLBF;
+	private static YamlDocumentNekki configYaml;
 
 	private static readonly Dictionary<string, string> Pathes;
 
 	private const string PathToResourcesFolder = "gamedata/Resources";
 
-	private const string PIDKJDBEDJM = "gamedata/Bundles";
+	private const string PathToBundlesFolder = "gamedata/Bundles";
 
-	public static YamlDocumentNekki PNLGKAMCBKF
+	public static YamlDocumentNekki ConfigYamlDocument
 	{
 		get
 		{
-			return BAMNPCEMNCM();
+			return GetConfigYaml();
 		}
 		private set
 		{
@@ -119,43 +119,43 @@ public static class GlobalPaths
 		}
 	}
 
-	public static string POHBMFIKMCP
+	public static string InternalResourcesPath
 	{
 		get
 		{
-			return IJNKMAPOJGJ();
+			return GetInternalResourcesPath();
 		}
 	}
 
-	public static string EKBALHCKKFO
+	public static string ExternalResourcesPath
 	{
 		get
 		{
-			return MNACDIFKBDG();
+			return GetExternalResourcesPath();
 		}
 	}
 
-	public static string BAAIALFLGJL
+	public static string ExternalBundlesPath
 	{
 		get
 		{
-			return CJAAKDKKHFD();
+			return GetExternalBundlesPath();
 		}
 	}
 
-	public static string CALAEHKMGLE
+	public static string CurrentResolution
 	{
 		get
 		{
-			return EPLPHDJLFBD();
+			return GetCurrentResolution();
 		}
 	}
 
-	public static string OAOBEMPIMLM
+	public static string AssetServerPath
 	{
 		get
 		{
-			return CNPDIADGBPA();
+			return GetAssetServerPath();
 		}
 	}
 
@@ -165,45 +165,45 @@ public static class GlobalPaths
 		Pathes = new Dictionary<string, string>();
 	}
 
-	public static YamlDocumentNekki BAMNPCEMNCM()
+	public static YamlDocumentNekki GetConfigYaml()
 	{
-		return LMGNAMMFLBF;
+		return configYaml;
 	}
 
 	private static void set_ConfigYaml(YamlDocumentNekki value)
 	{
-		LMGNAMMFLBF = value;
+		configYaml = value;
 	}
 
-	public static string IJNKMAPOJGJ()
+	public static string GetInternalResourcesPath()
 	{
 		return string.Format("{0}/{1}", Application.dataPath, "gamedata/Resources");
 	}
 
-	public static string MNACDIFKBDG()
+	public static string GetExternalResourcesPath()
 	{
-		if (SystemProperties.GAAMHGCDANB())
+		if (SystemProperties.IsMobilePlatform())
 		{
 			return string.Format("{0}/{1}", Application.persistentDataPath, "gamedata/Resources");
 		}
 		return string.Format("{0}/{1}", Application.dataPath.Replace("Assets", string.Empty).TrimEnd('/'), "gamedata/Resources");
 	}
 
-	public static string CJAAKDKKHFD()
+	public static string GetExternalBundlesPath()
 	{
-		if (SystemProperties.GAAMHGCDANB())
+		if (SystemProperties.IsMobilePlatform())
 		{
 			return string.Format("{0}/{1}", Application.persistentDataPath, "gamedata/Bundles");
 		}
 		return string.Format("{0}/{1}", Application.dataPath.Replace("Assets", string.Empty).TrimEnd('/'), "gamedata/Bundles");
 	}
 
-	public static string EPLPHDJLFBD()
+	public static string GetCurrentResolution()
 	{
-		return (SystemProperties.NICPICAMAOH().ACHKMBJANGN != SystemProperties.LOHALAKNGFB.PATH_BIG) ? "768" : "1536";
+		return (SystemProperties.GetDeviceInfo().GuiResolution != SystemProperties.PathType.PATH_BIG) ? "768" : "1536";
 	}
 
-	public static string LIJOKOHJBGP()
+	public static string GetGameDataPath()
 	{
 		if (Application.isMobilePlatform)
 		{
@@ -216,57 +216,57 @@ public static class GlobalPaths
 		return Application.dataPath + Path.DirectorySeparatorChar + "gamedata";
 	}
 
-	public static string CNPDIADGBPA()
+	public static string GetAssetServerPath()
 	{
-		return DILAKCHLHDL("AssetServer");
+		return GetPath("AssetServer");
 	}
 
-	public static string KABLNHKINNG(string name)
-	{
-		if (Pathes.ContainsKey(name))
-		{
-			return Pathes[name].Replace("EXTERNAL_PATH", MNACDIFKBDG()).Replace("CURRENT_RESOLUTION", EPLPHDJLFBD()).TrimEnd('/')
-				.Trim('\\');
-		}
-		AdvLog.CCOFFJPPAKC(string.Format("path not found: {0}", name));
-		return string.Empty;
-	}
-
-	public static string DILAKCHLHDL(string name)
+	public static string GetAbsolutePath(string name)
 	{
 		if (Pathes.ContainsKey(name))
 		{
-			return Pathes[name].Replace("EXTERNAL_PATH", MNACDIFKBDG()).Replace("CURRENT_RESOLUTION", EPLPHDJLFBD()).Trim('/')
+			return Pathes[name].Replace("EXTERNAL_PATH", GetExternalResourcesPath()).Replace("CURRENT_RESOLUTION", GetCurrentResolution()).TrimEnd('/')
 				.Trim('\\');
 		}
-		AdvLog.CCOFFJPPAKC(string.Format("path not found: {0}", name));
+		AdvLog.LogError(string.Format("path not found: {0}", name));
 		return string.Empty;
 	}
 
-	public static string MIMCIMJEGMA(string name)
+	public static string GetPath(string name)
+	{
+		if (Pathes.ContainsKey(name))
+		{
+			return Pathes[name].Replace("EXTERNAL_PATH", GetExternalResourcesPath()).Replace("CURRENT_RESOLUTION", GetCurrentResolution()).Trim('/')
+				.Trim('\\');
+		}
+		AdvLog.LogError(string.Format("path not found: {0}", name));
+		return string.Empty;
+	}
+
+	public static string GetRawPath(string name)
 	{
 		if (Pathes.ContainsKey(name))
 		{
 			return Pathes[name].Trim('/').Trim('\\');
 		}
-		AdvLog.CCOFFJPPAKC(string.Format("path not found: {0}", name));
+		AdvLog.LogError(string.Format("path not found: {0}", name));
 		return string.Empty;
 	}
 
-	public static CJBHPHFBBKP HFGMHHDBHMH(string name)
+	public static PathInfo GetPathInfo(string name)
 	{
 		if (Pathes.ContainsKey(name))
 		{
 			string text = Pathes[name];
-			return new CJBHPHFBBKP(text.Replace("EXTERNAL_PATH/", string.Empty).Replace("CURRENT_RESOLUTION/", string.Empty), text.Replace("EXTERNAL_PATH", MNACDIFKBDG()).Replace("CURRENT_RESOLUTION", EPLPHDJLFBD()), text.Replace("EXTERNAL_PATH/", string.Empty).Replace("CURRENT_RESOLUTION/", EPLPHDJLFBD()), text);
+			return new PathInfo(text.Replace("EXTERNAL_PATH/", string.Empty).Replace("CURRENT_RESOLUTION/", string.Empty), text.Replace("EXTERNAL_PATH", GetExternalResourcesPath()).Replace("CURRENT_RESOLUTION", GetCurrentResolution()), text.Replace("EXTERNAL_PATH/", string.Empty).Replace("CURRENT_RESOLUTION/", GetCurrentResolution()), text);
 		}
-		AdvLog.CCOFFJPPAKC(string.Format("path not found: {0}", name));
-		return CJBHPHFBBKP.Empty;
+		AdvLog.LogError(string.Format("path not found: {0}", name));
+		return PathInfo.Empty;
 	}
 
-	public static CJBHPHFBBKP PAOGAEOEFLP(string OKJFMFILPOB)
+	public static PathInfo CreateExternalPathInfo(string OKJFMFILPOB)
 	{
 		OKJFMFILPOB = "EXTERNAL_PATH/" + OKJFMFILPOB;
-		return new CJBHPHFBBKP(OKJFMFILPOB.Replace("EXTERNAL_PATH/", string.Empty).Replace("CURRENT_RESOLUTION/", string.Empty), OKJFMFILPOB.Replace("EXTERNAL_PATH", MNACDIFKBDG()).Replace("CURRENT_RESOLUTION", EPLPHDJLFBD()), OKJFMFILPOB.Replace("EXTERNAL_PATH/", string.Empty).Replace("CURRENT_RESOLUTION/", EPLPHDJLFBD()), OKJFMFILPOB);
+		return new PathInfo(OKJFMFILPOB.Replace("EXTERNAL_PATH/", string.Empty).Replace("CURRENT_RESOLUTION/", string.Empty), OKJFMFILPOB.Replace("EXTERNAL_PATH", GetExternalResourcesPath()).Replace("CURRENT_RESOLUTION", GetCurrentResolution()), OKJFMFILPOB.Replace("EXTERNAL_PATH/", string.Empty).Replace("CURRENT_RESOLUTION/", GetCurrentResolution()), OKJFMFILPOB);
 	}
 }

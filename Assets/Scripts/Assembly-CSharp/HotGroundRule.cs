@@ -9,48 +9,48 @@ public class HotGroundRule : AnimationListRule
 
 		public string name;
 
-		public float MMIKMPNLJGN;
+		public float MaxX;
 
-		public float GGINDPCJGEI;
+		public float MaxY;
 
-		public float HPIKHPEIJHM;
+		public float MinX;
 
-		public float JELMLMPIGHN;
+		public float MinY;
 
 		public LimitedNode(XmlNode EABJIAHGLEO)
 		{
-			MMIKMPNLJGN = float.MaxValue;
-			HPIKHPEIJHM = float.MinValue;
-			GGINDPCJGEI = float.MaxValue;
-			JELMLMPIGHN = float.MinValue;
+			MaxX = float.MaxValue;
+			MinX = float.MinValue;
+			MaxY = float.MaxValue;
+			MinY = float.MinValue;
 			name = string.Empty;
 			node = null;
-			name = EABJIAHGLEO.Attributes["Name"].CIPOICEEIBK(string.Empty);
-			string text = EABJIAHGLEO.Attributes["Axis"].CIPOICEEIBK(string.Empty);
+			name = EABJIAHGLEO.Attributes["Name"].GetStringOrDefault(string.Empty);
+			string text = EABJIAHGLEO.Attributes["Axis"].GetStringOrDefault(string.Empty);
 			if (text == "X")
 			{
-				MMIKMPNLJGN = EABJIAHGLEO.Attributes["Max"].ParseFloat(float.MaxValue);
-				HPIKHPEIJHM = EABJIAHGLEO.Attributes["Min"].ParseFloat(float.MinValue);
+				MaxX = EABJIAHGLEO.Attributes["Max"].ParseFloat(float.MaxValue);
+				MinX = EABJIAHGLEO.Attributes["Min"].ParseFloat(float.MinValue);
 			}
 			if (text == "Y")
 			{
-				GGINDPCJGEI = EABJIAHGLEO.Attributes["Max"].ParseFloat(float.MaxValue);
-				JELMLMPIGHN = EABJIAHGLEO.Attributes["Min"].ParseFloat(float.MinValue);
+				MaxY = EABJIAHGLEO.Attributes["Max"].ParseFloat(float.MaxValue);
+				MinY = EABJIAHGLEO.Attributes["Min"].ParseFloat(float.MinValue);
 			}
 		}
 	}
 
 	public const int FRAMES_IN_SECOND = 60;
 
-	private List<LimitedNode> CFPIOKDFJCH = new List<LimitedNode>();
+	private List<LimitedNode> limitedNodes = new List<LimitedNode>();
 
     internal override System.Action PrepareModelRebind(Model expected, Model replacement)
     {
         var assignments = new List<System.Action>();
-        foreach (LimitedNode point in CFPIOKDFJCH)
+        foreach (LimitedNode point in limitedNodes)
         {
-            if (point.node == null || expected == null || expected.CLDMEJKGLBA().EGHIDHMENEF(point.name) != point.node) continue;
-            ModelNode target = replacement?.CLDMEJKGLBA()?.EGHIDHMENEF(point.name);
+            if (point.node == null || expected == null || expected.GetBodyObject().GetNodeByName(point.name) != point.node) continue;
+            ModelNode target = replacement?.GetBodyObject()?.GetNodeByName(point.name);
             if (target == null) throw new System.InvalidOperationException("Form is missing HotGroundRule node: " + point.name);
             assignments.Add(() => point.node = target);
         }
@@ -59,182 +59,182 @@ public class HotGroundRule : AnimationListRule
 
 	private string _sequenceName;
 
-	private bool DGNPODNAMDA;
+	private bool hasSequence;
 
-	private float LNDJNKGFDII;
+	private float sequenceWidth;
 
-	public bool HADLDHHEOKM;
+	public bool timerChanged;
 
-	private bool CIGIBFFPICM;
+	private bool isAnimationMatched;
 
-	private bool OIKCMPFPACL;
+	private bool isTimerReset;
 
-	private int HJOHKOEICAP;
+	private int remainingSeconds;
 
-	private int LAHIFBDMIJC;
+	private int maxSeconds;
 
 	private float _frames;
 
-	private float OHNHMIDDOPA;
+	private float totalFrames;
 
-	private float GNBJFBPFAMM;
+	private float offsetX;
 
-	private float MOLFLBBKAOE;
+	private float offsetY;
 
-	private int GPBICDOPGAC;
+	private int slowModeDivisor;
 
 	public HotGroundRule(XmlNode node, RuleAppliance EJPOJJKKICO)
-		: base(BCBLLMPAMLP.RuleHotGround, EJPOJJKKICO, node)
+		: base(RuleType.RuleHotGround, EJPOJJKKICO, node)
 	{
-		HADLDHHEOKM = true;
-		GNBJFBPFAMM = 0f;
-		MOLFLBBKAOE = 0f;
-		CIGIBFFPICM = false;
-		OIKCMPFPACL = false;
-		GPBICDOPGAC = 1;
-		LNDJNKGFDII = 0f;
-		DGNPODNAMDA = false;
-		EBJIKKBLBEM(FightEvent.AnimationStartEvent);
-		EBJIKKBLBEM(FightEvent.RenderEvent);
+		timerChanged = true;
+		offsetX = 0f;
+		offsetY = 0f;
+		isAnimationMatched = false;
+		isTimerReset = false;
+		slowModeDivisor = 1;
+		sequenceWidth = 0f;
+		hasSequence = false;
+		SubscribeEvent(FightEvent.AnimationStartEvent);
+		SubscribeEvent(FightEvent.RenderEvent);
 		Parse(node);
 		Reset();
 	}
 
-	public int NNOHILNKJEN()
+	public int GetRemainingSeconds()
 	{
-		return HJOHKOEICAP;
+		return remainingSeconds;
 	}
 
-	public int KFKJEMCAMNF()
+	public int GetMaxSeconds()
 	{
-		return LAHIFBDMIJC;
+		return maxSeconds;
 	}
 
 	public override void Reset()
 	{
-		HJOHKOEICAP = LAHIFBDMIJC;
+		remainingSeconds = maxSeconds;
 		_frames = 0f;
-		HADLDHHEOKM = true;
+		timerChanged = true;
 	}
 
 	public override void InitRule(object data)
 	{
 		RuleInitData oIFPCFEGFOB = (RuleInitData)data;
-		if (oIFPCFEGFOB.LPJNEDFCBOI != null)
+		if (oIFPCFEGFOB.FightLocation != null)
 		{
-			GNBJFBPFAMM = (0f - oIFPCFEGFOB.LPJNEDFCBOI.JMLAKAKDBBL) / 2f;
-			MOLFLBBKAOE = 0f - oIFPCFEGFOB.LPJNEDFCBOI.GBNPHCHGKDO;
+			offsetX = (0f - oIFPCFEGFOB.FightLocation.width) / 2f;
+			offsetY = 0f - oIFPCFEGFOB.FightLocation.floorHeight;
 		}
 		Model fGCODGKLHED = null;
-		switch (NDBMMPENJNJ)
+		switch (appliance)
 		{
 		case RuleAppliance.AppliancePlayer:
-			fGCODGKLHED = oIFPCFEGFOB.DLPKDAIDCBF;
+			fGCODGKLHED = oIFPCFEGFOB.PlayerModel;
 			break;
 		case RuleAppliance.ApplianceOpponent:
-			fGCODGKLHED = oIFPCFEGFOB.OGBHDKKOIGH;
+			fGCODGKLHED = oIFPCFEGFOB.OpponentModel;
 			break;
 		}
 		if (fGCODGKLHED != null)
 		{
-			foreach (LimitedNode item in CFPIOKDFJCH)
+			foreach (LimitedNode item in limitedNodes)
 			{
-				item.node = fGCODGKLHED.CLDMEJKGLBA().EGHIDHMENEF(item.name);
+				item.node = fGCODGKLHED.GetBodyObject().GetNodeByName(item.name);
 				if (item.node == null)
 				{
-					LLLOJBFMONN.Error("RingoutRule::initRule error - no ModelNode found with name " + item.name);
+					GameLog.Error("RingoutRule::initRule error - no ModelNode found with name " + item.name);
 				}
 			}
 		}
 		Reset();
 	}
 
-	public bool BFOJOGLCIBB()
+	public bool HasSequence()
 	{
-		return DGNPODNAMDA;
+		return hasSequence;
 	}
 
-	public string OCJHHNFNHMK()
+	public string GetSequenceName()
 	{
 		return _sequenceName;
 	}
 
-	public float APDIONCLEDH()
+	public float GetSequenceWidth()
 	{
-		return LNDJNKGFDII;
+		return sequenceWidth;
 	}
 
 	protected override bool CompareSingle(object data)
 	{
 		FightData hCPJJKMNMCE = (FightData)data;
-		switch (hCPJJKMNMCE.KOJNCHKPLLN)
+		switch (hCPJJKMNMCE.FightEventType)
 		{
 		case FightEvent.RenderEvent:
-			if (CIGIBFFPICM && KEPMMNOBIIL())
+			if (isAnimationMatched && AreAllNodesOutsideLimits())
 			{
-				if (!OIKCMPFPACL)
+				if (!isTimerReset)
 				{
-					HJOHKOEICAP = LAHIFBDMIJC;
+					remainingSeconds = maxSeconds;
 					_frames = 0f;
-					HADLDHHEOKM = true;
-					OIKCMPFPACL = true;
+					timerChanged = true;
+					isTimerReset = true;
 				}
 				break;
 			}
-			_frames += 1f / (float)GPBICDOPGAC;
+			_frames += 1f / (float)slowModeDivisor;
 			if (_frames >= 60f)
 			{
 				_frames = 0f;
-				if (HJOHKOEICAP > 0)
+				if (remainingSeconds > 0)
 				{
-					HJOHKOEICAP--;
-					HADLDHHEOKM = true;
+					remainingSeconds--;
+					timerChanged = true;
 				}
 			}
 			break;
 		case FightEvent.AnimationStartEvent:
-			OIKCMPFPACL = false;
-			CIGIBFFPICM = CheckAnimation(hCPJJKMNMCE.LKLHCEEMINM);
+			isTimerReset = false;
+			isAnimationMatched = CheckAnimation(hCPJJKMNMCE.CurrentAnimation);
 			break;
 		}
-		return HJOHKOEICAP <= 0;
+		return remainingSeconds <= 0;
 	}
 
-	protected override void AGCBHKBNMKL(object data)
+	protected override void PrepareCompare(object data)
 	{
 		PlayersFightData jNGGHELCPFM = (PlayersFightData)data;
-		GPBICDOPGAC = jNGGHELCPFM.SlowMode;
+		slowModeDivisor = jNGGHELCPFM.SlowMode;
 	}
 
 	protected override void Parse(XmlNode node)
 	{
 		base.Parse(node);
-		PICNEPHDGGG(node);
-		OHNHMIDDOPA = node.Attributes["Frames"].ParseFloat();
-		LAHIFBDMIJC = (int)(OHNHMIDDOPA / 60f);
-		DGNPODNAMDA = !node.Attributes["Sequence"].Empty();
-		if (DGNPODNAMDA)
+		ParseLimitedNodes(node);
+		totalFrames = node.Attributes["Frames"].ParseFloat();
+		maxSeconds = (int)(totalFrames / 60f);
+		hasSequence = !node.Attributes["Sequence"].Empty();
+		if (hasSequence)
 		{
-			_sequenceName = node.Attributes["Sequence"].CIPOICEEIBK(string.Empty);
-			LNDJNKGFDII = node.Attributes["SequenceWidth"].ParseFloat();
+			_sequenceName = node.Attributes["Sequence"].GetStringOrDefault(string.Empty);
+			sequenceWidth = node.Attributes["SequenceWidth"].ParseFloat();
 		}
 	}
 
-	protected void PICNEPHDGGG(XmlNode node)
+	protected void ParseLimitedNodes(XmlNode node)
 	{
 		foreach (XmlNode item in node.SelectNodes("Node"))
 		{
-			CFPIOKDFJCH.Add(new LimitedNode(item));
+			limitedNodes.Add(new LimitedNode(item));
 		}
 	}
 
-	protected bool KEPMMNOBIIL()
+	protected bool AreAllNodesOutsideLimits()
 	{
-		foreach (LimitedNode item in CFPIOKDFJCH)
+		foreach (LimitedNode item in limitedNodes)
 		{
 			Vector3f eMAFACPEPDK = item.node.GetStart();
-			eMAFACPEPDK = new Vector3f(eMAFACPEPDK.GetX() + GNBJFBPFAMM, 0f - eMAFACPEPDK.GetY(), eMAFACPEPDK.GetZ());
-			if (!(eMAFACPEPDK.GetX() >= item.MMIKMPNLJGN) && !(eMAFACPEPDK.GetX() <= item.HPIKHPEIJHM) && !(eMAFACPEPDK.GetY() >= item.GGINDPCJGEI) && !(eMAFACPEPDK.GetY() <= item.JELMLMPIGHN))
+			eMAFACPEPDK = new Vector3f(eMAFACPEPDK.GetX() + offsetX, 0f - eMAFACPEPDK.GetY(), eMAFACPEPDK.GetZ());
+			if (!(eMAFACPEPDK.GetX() >= item.MaxX) && !(eMAFACPEPDK.GetX() <= item.MinX) && !(eMAFACPEPDK.GetY() >= item.MaxY) && !(eMAFACPEPDK.GetY() <= item.MinY))
 			{
 				return false;
 			}

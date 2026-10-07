@@ -2,37 +2,37 @@ using Nekki.Social;
 
 public interface ISocialNetwork
 {
-	bool PHKJIMLOFBA { get; }
+	bool IsSupported { get; }
 
-	bool OJNBOLKNEPO { get; }
+	bool HasPayments { get; }
 
-	DFIPCKIEILP FAAHDOEMDCJ { get; }
+	SocialNetworkType NetworkType { get; }
 
 	void Init(SocialWrapper OBPHBNCBNCN);
 
-	void PGAMICBKPMF(string AOKMNKOIMHI);
+	void GetUser(string AOKMNKOIMHI);
 
 	void GetUsers(string[] JAIEEFOCDAA);
 
-	void LHCBELEDOEP();
+	void RequestFriends();
 
-	void OPDGBGPEEEE();
+	void InviteFriends();
 
-	void PAFIGDDLACE();
+	void CheckBookmark();
 
-	void DNNNAMJBEPE();
+	void AddBookmark();
 
-	void CLALKCGLFFM();
+	void CheckGroupMembership();
 
-	void DNCCPGDMLON(string AOKMNKOIMHI, string LIOGIBJBHAH, string DMNBDBJNKME);
+	void PostToWall(string AOKMNKOIMHI, string LIOGIBJBHAH, string DMNBDBJNKME);
 
 	void Buy(int item);
 
 	void Buy(string item);
 
-	bool CMBNMEACMMK();
+	bool GetIsSupported();
 
-	bool CEELEFHIJKK();
+	bool GetHasPayments();
 
-	DFIPCKIEILP CCOHIOKHFKI();
+	SocialNetworkType GetNetworkType();
 }

@@ -15,7 +15,7 @@ class Program {
  sealed class Item {public string FileName,Type;}
  sealed class Catalog {public Dictionary<string,Item> Items=new Dictionary<string,Item>();public Item GetItemByName(string name)=>Items.TryGetValue(name,out var item)?item:null;}
  static class ListSF {public static Catalog Catalog=new Catalog();public static Catalog GetItems()=>Catalog;}
- static class SF2Paths {public static string LFIIMPEAMFG()=>"UI/Items/";public static string BHCPOOOJAAK()=>"UI/Users/";}
+ static class SF2Paths {public static string GetItemsUiPath()=>"UI/Items/";public static string GetUsersUiPath()=>"UI/Users/";}
  static class Debug {public static int Warnings;public static void LogWarning(string text){Warnings++;}}
  sealed class Loader {public HashSet<string> Available=new HashSet<string>(StringComparer.OrdinalIgnoreCase);public string Broken;public object LoadSprite(AssetId id){if(id.ToString()==Broken)throw new InvalidDataException("malformed sprite");return Available.Contains(id.ToString())?this:null;}}
  sealed class HostState {public Loader TypedAssets=new Loader();}

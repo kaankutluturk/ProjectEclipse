@@ -16,7 +16,7 @@ public sealed class AssetBundleSample : MonoBehaviour
 
 	private void OnGUI()
 	{
-		GUIHelper.ECMOBPFHNPN(GUIHelper.ClientArea, true, () =>
+		GUIHelper.DrawArea(GUIHelper.ClientArea, true, () =>
 		{
 			GUILayout.Label("Status: " + status);
 			if (texture != null)
@@ -25,64 +25,64 @@ public sealed class AssetBundleSample : MonoBehaviour
 			}
 			if (!downloading && GUILayout.Button("Start Download"))
 			{
-				KLFHODHCNIP();
-				StartCoroutine(MMCCPDJCJMP());
+				UnloadBundle();
+				StartCoroutine(DownloadAssetBundle());
 			}
 		});
 	}
 
 	private void OnDestroy()
 	{
-		KLFHODHCNIP();
+		UnloadBundle();
 	}
 
-	private IEnumerator MMCCPDJCJMP()
+	private IEnumerator DownloadAssetBundle()
 	{
 		downloading = true;
 		HTTPRequest iPLGNIDJDCF = new HTTPRequest(new Uri("http://besthttp.azurewebsites.net/Content/AssetBundle.html")).Send();
 		status = "Download started";
-		while (iPLGNIDJDCF.FLBBFDNHJAJ() < CFGBMHKCENK.Finished)
+		while (iPLGNIDJDCF.GetState() < HTTPRequestStates.Finished)
 		{
 			yield return new WaitForSeconds(0.1f);
 			status += ".";
 		}
-		switch (iPLGNIDJDCF.FLBBFDNHJAJ())
+		switch (iPLGNIDJDCF.GetState())
 		{
-		case CFGBMHKCENK.Finished:
-			if (iPLGNIDJDCF.POGDKNCHIBG().AICKPAMONBH())
+		case HTTPRequestStates.Finished:
+			if (iPLGNIDJDCF.GetResponse().GetIsSuccess())
 			{
-				status = string.Format("AssetBundle downloaded! Loaded from local cache: {0}", iPLGNIDJDCF.POGDKNCHIBG().LOHDBJLLKEE().ToString());
-				AssetBundleCreateRequest assetBundleCreateRequest = AssetBundle.LoadFromMemoryAsync(iPLGNIDJDCF.POGDKNCHIBG().CHIGLEKCFFN());
+				status = string.Format("AssetBundle downloaded! Loaded from local cache: {0}", iPLGNIDJDCF.GetResponse().GetIsFromCache().ToString());
+				AssetBundleCreateRequest assetBundleCreateRequest = AssetBundle.LoadFromMemoryAsync(iPLGNIDJDCF.GetResponse().GetData());
 				yield return assetBundleCreateRequest;
-				yield return StartCoroutine(EKBJIEECGLA(assetBundleCreateRequest.assetBundle));
+				yield return StartCoroutine(ProcessAssetBundle(assetBundleCreateRequest.assetBundle));
 			}
 			else
 			{
-				status = string.Format("Request finished Successfully, but the server sent an error. Status Code: {0}-{1} Message: {2}", iPLGNIDJDCF.POGDKNCHIBG().KNMDPGBPNED(), iPLGNIDJDCF.POGDKNCHIBG().DCKPMHKDLEJ(), iPLGNIDJDCF.POGDKNCHIBG().DPBLPGKOEJB());
-				AdvLog.LOPHFKMOPAA(status);
+				status = string.Format("Request finished Successfully, but the server sent an error. Status Code: {0}-{1} Message: {2}", iPLGNIDJDCF.GetResponse().GetStatusCode(), iPLGNIDJDCF.GetResponse().GetMessage(), iPLGNIDJDCF.GetResponse().GetDataAsText());
+				AdvLog.LogWarning(status);
 			}
 			break;
-		case CFGBMHKCENK.Error:
-			status = "Request Finished with Error! " + ((iPLGNIDJDCF.IEFGFKFHNMD() == null) ? "No Exception" : (iPLGNIDJDCF.IEFGFKFHNMD().Message + "\n" + iPLGNIDJDCF.IEFGFKFHNMD().StackTrace));
-			AdvLog.CCOFFJPPAKC(status);
+		case HTTPRequestStates.Error:
+			status = "Request Finished with Error! " + ((iPLGNIDJDCF.GetException() == null) ? "No Exception" : (iPLGNIDJDCF.GetException().Message + "\n" + iPLGNIDJDCF.GetException().StackTrace));
+			AdvLog.LogError(status);
 			break;
-		case CFGBMHKCENK.Aborted:
+		case HTTPRequestStates.Aborted:
 			status = "Request Aborted!";
-			AdvLog.LOPHFKMOPAA(status);
+			AdvLog.LogWarning(status);
 			break;
-		case CFGBMHKCENK.ConnectionTimedOut:
+		case HTTPRequestStates.ConnectionTimedOut:
 			status = "Connection Timed Out!";
-			AdvLog.CCOFFJPPAKC(status);
+			AdvLog.LogError(status);
 			break;
-		case CFGBMHKCENK.TimedOut:
+		case HTTPRequestStates.TimedOut:
 			status = "Processing the request Timed Out!";
-			AdvLog.CCOFFJPPAKC(status);
+			AdvLog.LogError(status);
 			break;
 		}
 		downloading = false;
 	}
 
-	private IEnumerator EKBJIEECGLA(AssetBundle bundle)
+	private IEnumerator ProcessAssetBundle(AssetBundle bundle)
 	{
 		if (!(bundle == null))
 		{
@@ -93,7 +93,7 @@ public sealed class AssetBundleSample : MonoBehaviour
 		}
 	}
 
-	private void KLFHODHCNIP()
+	private void UnloadBundle()
 	{
 		if (cachedBundle != null)
 		{

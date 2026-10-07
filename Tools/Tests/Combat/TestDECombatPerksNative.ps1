@@ -70,30 +70,30 @@ public readonly struct AssetId {
 }
 public sealed class InfoAnimation {
     private readonly HashSet<string> _tags; public InfoAnimation(params string[] tags){_tags=new HashSet<string>(tags);}
-    public bool CNPFHBMGDFP(string name)=>_tags.Contains(name);
+    public bool HasName(string name)=>_tags.Contains(name);
 }
 public sealed class Model {
     public string Name;
     public Model Owner; public Model GetRootModel()=>Owner==null?this:Owner.GetRootModel();
-    public float Health=1; public float KKMCHCNOHMB()=>Health;
-    public sealed class EventModel { public Model KJDFJPBIGJC; public Model GAIBPAGPEGK; }
-    public sealed class StrikeResult { public Model AttackerModel; public InfoAnimation AttackAnimation; public float EEDJBBOCFNL; public bool DFOHNJEBDED; public bool DNGKOMPMPCD; }
+    public float Health=1; public float GetLife()=>Health;
+    public sealed class EventModel { public Model KJDFJPBIGJC; public Model Opponent; }
+    public sealed class StrikeResult { public Model AttackerModel; public InfoAnimation AttackAnimation; public float FinalDamage; public bool IsBlocked; public bool IsCritical; }
 }
-public static class PerksStage { public sealed class ActionPerk { public Model KJDFJPBIGJC; public Model BIKLKJMNGKP; public string NHKMCLPOMFK=""; public bool FLNCPBKBJBL; public int KGNDJOLBBJF; public int FLNLMIHEDCI; public int EclipseStackCount; } }
+public static class PerksStage { public sealed class ActionPerk { public Model TargetModel; public Model SourceModel; public string IconPath=""; public bool ShowExpiration; public int ElapsedFrames; public int DurationFrames; public int EclipseStackCount; } }
 public static class ModRuntime { public static object Scripts=new object(); }
 public sealed class FightHarness {
     public sealed class Seen { public string Side; public Eclipse.Modding.ModEffectEvent Type; public Eclipse.Modding.ModIncomingHit Hit; public ModDamageEvent Damage; }
     public readonly List<Seen> Events=new List<Seen>();
-    public Model Player { get=>_playerModel; set=>_playerModel=value; } public Model Opponent { get=>CKNCPOABFBO; set=>CKNCPOABFBO=value; }
+    public Model Player { get=>_playerModel; set=>_playerModel=value; } public Model Opponent { get=>_enemyModel; set=>_enemyModel=value; }
     public bool LocalVersus { get=>IsLocalVersus; set=>IsLocalVersus=value; }
-    private bool IsLocalVersus; private bool _eclipseFightBeginDispatched=true; private Model _playerModel; private Model CKNCPOABFBO; private int fightTimeInFrame;
+    private bool IsLocalVersus; private bool _eclipseFightBeginDispatched=true; private Model _playerModel; private Model _enemyModel; private int fightTimeInFrame;
     public bool BeginDispatched { get=>_eclipseFightBeginDispatched; set=>_eclipseFightBeginDispatched=value; }
     public int VisibleAdds,VisibleRemoves;
     private sealed class EclipseStatusIcon { public PerksStage.ActionPerk Action; public int ExpiresAt; }
     private readonly Dictionary<(Model,object),EclipseStatusIcon> _eclipseStatusIcons=new Dictionary<(Model,object),EclipseStatusIcon>();
     private void DispatchEclipseCombatEvent(Eclipse.Modding.ModEffectEvent type,Eclipse.Modding.ModDamageEvent ignored=null,Eclipse.Modding.ModIncomingHit hit=null,object activity=null){Events.Add(new Seen{Side="player",Type=type,Hit=hit,Damage=ignored});}
     private void DispatchEclipseOpponent(Eclipse.Modding.ModEffectEvent type,Eclipse.Modding.ModDamageEvent ignored=null,Eclipse.Modding.ModIncomingHit hit=null,object activity=null){Events.Add(new Seen{Side="opponent",Type=type,Hit=hit,Damage=ignored});}
-    private void CKCCBJKIGIO(Model model,PerksStage.ActionPerk action,bool remove){if(remove)VisibleRemoves++;else VisibleAdds++;}
+    private void NotifyPerkAction(Model model,PerksStage.ActionPerk action,bool remove){if(remove)VisibleRemoves++;else VisibleAdds++;}
 private ModAttackSource CaptureEclipseAttackSource(Model actor,Model.StrikeResult strike)=>null; // Contact provenance has separate full tracker/native acceptance.
 $dispatch
 $show
@@ -102,12 +102,12 @@ $update
     public void Hit(Model.EventModel e,Model.StrikeResult s,Eclipse.Modding.ModEffectEvent type)=>DispatchEclipseHitPhase(e,s,type);
     sealed class Round { public int round=1; } readonly Round round=new Round();
     public void Outgoing(Model.EventModel EGHPHELLOGO,Model.StrikeResult gHHCDAFIKJE) {
-        Model eclipseAttacker=(gHHCDAFIKJE.AttackerModel??EGHPHELLOGO.GAIBPAGPEGK)?.GetRootModel();
+        Model eclipseAttacker=(gHHCDAFIKJE.AttackerModel??EGHPHELLOGO.Opponent)?.GetRootModel();
         ModAttackSource eclipseAttackSource=null;
 $outgoing
     }
     public void Resolved(Model.EventModel EGHPHELLOGO,Model.StrikeResult gHHCDAFIKJE,float eclipseHealthBefore) {
-        Model eclipseAttacker=(gHHCDAFIKJE.AttackerModel??EGHPHELLOGO.GAIBPAGPEGK)?.GetRootModel();
+        Model eclipseAttacker=(gHHCDAFIKJE.AttackerModel??EGHPHELLOGO.Opponent)?.GetRootModel();
         ModAttackSource eclipseAttackSource=null;
 $resolved
     }

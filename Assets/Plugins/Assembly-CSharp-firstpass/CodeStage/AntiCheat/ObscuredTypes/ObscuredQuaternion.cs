@@ -87,25 +87,25 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 			return result;
 		}
 
-		public void PKOKLDGAPEI()
+		public void ApplyNewCryptoKey()
 		{
 			if (currentCryptoKey != cryptoKey)
 			{
-				hiddenValue = Encrypt(GEKBGBJOMIA(), cryptoKey);
+				hiddenValue = Encrypt(InternalDecrypt(), cryptoKey);
 				currentCryptoKey = cryptoKey;
 			}
 		}
 
-		public void GMCADPGOCHM()
+		public void RandomizeCryptoKey()
 		{
-			Quaternion bAINMLLIKOL = GEKBGBJOMIA();
+			Quaternion bAINMLLIKOL = InternalDecrypt();
 			currentCryptoKey = UnityEngine.Random.Range(int.MinValue, int.MaxValue);
 			hiddenValue = Encrypt(bAINMLLIKOL, currentCryptoKey);
 		}
 
-		public RawEncryptedQuaternion ECEBFGCJIDA()
+		public RawEncryptedQuaternion GetEncrypted()
 		{
-			PKOKLDGAPEI();
+			ApplyNewCryptoKey();
 			return hiddenValue;
 		}
 
@@ -113,13 +113,13 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 		{
 			inited = true;
 			hiddenValue = ANGFOBEKKKD;
-			if (ObscuredCheatingDetector.NMACGEJHPDN())
+			if (ObscuredCheatingDetector.GetIsRunning())
 			{
-				fakeValue = GEKBGBJOMIA();
+				fakeValue = InternalDecrypt();
 			}
 		}
 
-		private Quaternion GEKBGBJOMIA()
+		private Quaternion InternalDecrypt()
 		{
 			if (!inited)
 			{
@@ -133,14 +133,14 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 			quaternion.y = ObscuredFloat.Decrypt(hiddenValue.y, currentCryptoKey);
 			quaternion.z = ObscuredFloat.Decrypt(hiddenValue.z, currentCryptoKey);
 			quaternion.w = ObscuredFloat.Decrypt(hiddenValue.w, currentCryptoKey);
-			if (ObscuredCheatingDetector.NMACGEJHPDN() && !fakeValue.Equals(initialFakeValue) && !FHCMDNDNDGH(quaternion, fakeValue))
+			if (ObscuredCheatingDetector.GetIsRunning() && !fakeValue.Equals(initialFakeValue) && !CompareQuaternionsWithTolerance(quaternion, fakeValue))
 			{
-				ObscuredCheatingDetector.get_Instance().MCDANNDOEIK();
+				ObscuredCheatingDetector.get_Instance().OnCheatingDetected();
 			}
 			return quaternion;
 		}
 
-		private bool FHCMDNDNDGH(Quaternion GOFJCIABOEC, Quaternion ENPEGNEGAPE)
+		private bool CompareQuaternionsWithTolerance(Quaternion GOFJCIABOEC, Quaternion ENPEGNEGAPE)
 		{
 			float quaternionEpsilon = ObscuredCheatingDetector.get_Instance().quaternionEpsilon;
 			return Math.Abs(GOFJCIABOEC.x - ENPEGNEGAPE.x) < quaternionEpsilon && Math.Abs(GOFJCIABOEC.y - ENPEGNEGAPE.y) < quaternionEpsilon && Math.Abs(GOFJCIABOEC.z - ENPEGNEGAPE.z) < quaternionEpsilon && Math.Abs(GOFJCIABOEC.w - ENPEGNEGAPE.w) < quaternionEpsilon;
@@ -149,7 +149,7 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 		public static implicit operator ObscuredQuaternion(Quaternion value)
 		{
 			ObscuredQuaternion result = new ObscuredQuaternion(Encrypt(value));
-			if (ObscuredCheatingDetector.NMACGEJHPDN())
+			if (ObscuredCheatingDetector.GetIsRunning())
 			{
 				result.fakeValue = value;
 			}
@@ -158,22 +158,22 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 
 		public static implicit operator Quaternion(ObscuredQuaternion value)
 		{
-			return value.GEKBGBJOMIA();
+			return value.InternalDecrypt();
 		}
 
 		public override int GetHashCode()
 		{
-			return GEKBGBJOMIA().GetHashCode();
+			return InternalDecrypt().GetHashCode();
 		}
 
 		public override string ToString()
 		{
-			return GEKBGBJOMIA().ToString();
+			return InternalDecrypt().ToString();
 		}
 
 		public string ToString(string LBOHOKIBHOH)
 		{
-			return GEKBGBJOMIA().ToString(LBOHOKIBHOH);
+			return InternalDecrypt().ToString(LBOHOKIBHOH);
 		}
 	}
 }

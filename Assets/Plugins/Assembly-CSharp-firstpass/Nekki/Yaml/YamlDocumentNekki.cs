@@ -22,20 +22,20 @@ namespace Nekki.Yaml
 			_yamlStream = new YamlStream();
 		}
 
-		public static YamlDocumentNekki IBKNALEEBNI(string PMFEIPCHENB)
+		public static YamlDocumentNekki LoadFromFile(string PMFEIPCHENB)
 		{
 			if (!File.Exists(PMFEIPCHENB))
 			{
-				AdvLog.CCOFFJPPAKC("YAML file is not exists!!!");
+				AdvLog.LogError("YAML file is not exists!!!");
 				return null;
 			}
 			using (TextReader textReader = new StreamReader(PMFEIPCHENB))
 			{
-				return LGCMPFBMDFJ(textReader.ReadToEnd());
+				return LoadFromString(textReader.ReadToEnd());
 			}
 		}
 
-		public static YamlDocumentNekki LGCMPFBMDFJ(string DNHDOEEDDBD)
+		public static YamlDocumentNekki LoadFromString(string DNHDOEEDDBD)
 		{
 			YamlDocumentNekki yamlDocumentNekki = new YamlDocumentNekki();
 			yamlDocumentNekki._yamlStream.Load(new StringReader(DNHDOEEDDBD));
@@ -53,7 +53,7 @@ namespace Nekki.Yaml
 			return _yamlDocument.ToString();
 		}
 
-		public void GGGEHAGCLGC(string PMFEIPCHENB, bool EENMGCCBIHF = true)
+		public void SaveToFile(string PMFEIPCHENB, bool EENMGCCBIHF = true)
 		{
 			using (TextWriter jGEEEDKMKKH = new StreamWriter(PMFEIPCHENB, false, Encoding.UTF8))
 			{
@@ -61,7 +61,7 @@ namespace Nekki.Yaml
 			}
 		}
 
-		public string GOGLGIJMFGG()
+		public string SaveToString()
 		{
 			StringWriter stringWriter = new StringWriter();
 			_yamlStream.Save(stringWriter);

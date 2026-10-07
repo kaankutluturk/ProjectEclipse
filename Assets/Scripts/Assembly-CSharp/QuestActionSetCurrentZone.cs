@@ -2,22 +2,22 @@ using System.Xml;
 
 public class QuestActionSetCurrentZone : QuestAction
 {
-	private string CODCAENBFHK = string.Empty;
+	private string zoneNameExpression = string.Empty;
 
 	public override void Parse(XmlNode EPKLCPOEELO)
 	{
 		base.Parse(EPKLCPOEELO);
-		CODCAENBFHK = EPKLCPOEELO.Attributes["Name"].CIPOICEEIBK(string.Empty);
+		zoneNameExpression = EPKLCPOEELO.Attributes["Name"].GetStringOrDefault(string.Empty);
 	}
 
-	public override void DEJMHFMLKIC(QuestParameters GFIHPBCEEOB)
+	public override void Execute(QuestParameters GFIHPBCEEOB)
 	{
-		base.DEJMHFMLKIC(GFIHPBCEEOB);
+		base.Execute(GFIHPBCEEOB);
 		QuestCondition kKDGLNECFHA = new QuestCondition();
-		kKDGLNECFHA.LIMHBJBEEIA(GFIHPBCEEOB);
+		kKDGLNECFHA.SetParameters(GFIHPBCEEOB);
 		ConditionExtension.CompareResult lNIDLHOIHIM = new ConditionExtension.CompareResult();
-		kKDGLNECFHA.MCPIOGALBMK(CODCAENBFHK, lNIDLHOIHIM);
-		ListSF.CCDKHLAMKKO().AOIBKCOBABL(lNIDLHOIHIM.ToString());
-		OGIJONMKABB();
+		kKDGLNECFHA.SetValue(zoneNameExpression, lNIDLHOIHIM);
+		ListSF.GetRoster().SetCurrentZone(lNIDLHOIHIM.ToString());
+		FinishAction();
 	}
 }

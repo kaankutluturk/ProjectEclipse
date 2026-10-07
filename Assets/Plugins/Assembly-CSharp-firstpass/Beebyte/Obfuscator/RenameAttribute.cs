@@ -16,7 +16,7 @@ namespace Beebyte.Obfuscator
 			this.target = target;
 		}
 
-		public string JMMBNMFPFMK()
+		public string GetTarget()
 		{
 			return target;
 		}

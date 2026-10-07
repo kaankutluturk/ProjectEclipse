@@ -2,7 +2,7 @@ public interface IHub
 {
 	Connection PEBFDIFIMBO { get; set; }
 
-	Connection BAFGHLCPPHM { get; }
+	Connection HubConnection { get; }
 
 	void GNLCPJFBAJE(Connection value);
 

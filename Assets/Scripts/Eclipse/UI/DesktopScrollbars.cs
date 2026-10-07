@@ -29,8 +29,8 @@ namespace Eclipse.UI
             bar.handleRect = handleRect; bar.targetGraphic = image;
             bar.direction = horizontal ? Scrollbar.Direction.LeftToRight : Scrollbar.Direction.BottomToTop;
             if (cancelMotion != null) bar.onValueChanged.AddListener(_ => cancelMotion());
-            if (horizontal) { scroll.set_horizontalScrollbar(bar); scroll.set_horizontalScrollbarVisibility(SFScrollRect.JJDKHMPDLNC.AutoHide); }
-            else { scroll.set_verticalScrollbar(bar); scroll.set_verticalScrollbarVisibility(SFScrollRect.JJDKHMPDLNC.AutoHide); }
+            if (horizontal) { scroll.set_horizontalScrollbar(bar); scroll.set_horizontalScrollbarVisibility(SFScrollRect.ScrollbarVisibilityMode.AutoHide); }
+            else { scroll.set_verticalScrollbar(bar); scroll.set_verticalScrollbarVisibility(SFScrollRect.ScrollbarVisibilityMode.AutoHide); }
         }
     }
 }

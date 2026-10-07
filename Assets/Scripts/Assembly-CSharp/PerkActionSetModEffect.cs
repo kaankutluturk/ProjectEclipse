@@ -3,23 +3,23 @@ using System.Xml;
 
 internal class PerkActionSetModEffect : PerkAction
 {
-	public enum COLPJOBKGEI
+	public enum ModEffectType
 	{
 		EFFECT_NONE = 0,
 		EFFECT_PULSE = 1
 	}
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private string OPAFELFOFFB;
+	private string _modName;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private COLPJOBKGEI KLKJOHCLJCH;
+	private ModEffectType _effectType;
 
-	public string POLPHCDNLEL
+	public string EffectModName
 	{
 		get
 		{
-			return CMKKGFDBBJF();
+			return GetModName();
 		}
 		protected set
 		{
@@ -27,15 +27,15 @@ internal class PerkActionSetModEffect : PerkAction
 		}
 	}
 
-	public COLPJOBKGEI EOKLCEHFGDC
+	public ModEffectType EffectType
 	{
 		get
 		{
-			return CKEDENENELC();
+			return GetEffectType();
 		}
 		protected set
 		{
-			GKKKNLKBHNJ(value);
+			SetEffectType(value);
 		}
 	}
 
@@ -46,44 +46,44 @@ internal class PerkActionSetModEffect : PerkAction
 	public PerkActionSetModEffect(PerkActionSetModEffect NOLFMPDGCOC)
 		: base(NOLFMPDGCOC)
 	{
-		set_ModName(NOLFMPDGCOC.CMKKGFDBBJF());
-		GKKKNLKBHNJ(NOLFMPDGCOC.CKEDENENELC());
+		set_ModName(NOLFMPDGCOC.GetModName());
+		SetEffectType(NOLFMPDGCOC.GetEffectType());
 	}
 
-	public string CMKKGFDBBJF()
+	public string GetModName()
 	{
-		return OPAFELFOFFB;
+		return _modName;
 	}
 
 	protected void set_ModName(string value)
 	{
-		OPAFELFOFFB = value;
+		_modName = value;
 	}
 
-	public COLPJOBKGEI CKEDENENELC()
+	public ModEffectType GetEffectType()
 	{
-		return KLKJOHCLJCH;
+		return _effectType;
 	}
 
-	protected void GKKKNLKBHNJ(COLPJOBKGEI value)
+	protected void SetEffectType(ModEffectType value)
 	{
-		KLKJOHCLJCH = value;
+		_effectType = value;
 	}
 
 	public override void Parse(XmlNode node)
 	{
 		base.Parse(node);
 		set_Type(ActionType.ACTION_MOD_EFFECT);
-		set_ModName(node.Attributes["Name"].CIPOICEEIBK(string.Empty));
-		GKKKNLKBHNJ(AFFIICKHKKN(node.Attributes["Type"].CIPOICEEIBK(string.Empty)));
+		set_ModName(node.Attributes["Name"].GetStringOrDefault(string.Empty));
+		SetEffectType(ParseEffectType(node.Attributes["Type"].GetStringOrDefault(string.Empty)));
 	}
 
-	private COLPJOBKGEI AFFIICKHKKN(string CNKBLODAFDO)
+	private ModEffectType ParseEffectType(string CNKBLODAFDO)
 	{
 		if (CNKBLODAFDO.Equals("Pulse"))
 		{
-			return COLPJOBKGEI.EFFECT_PULSE;
+			return ModEffectType.EFFECT_PULSE;
 		}
-		return COLPJOBKGEI.EFFECT_NONE;
+		return ModEffectType.EFFECT_NONE;
 	}
 }

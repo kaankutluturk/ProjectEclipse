@@ -2,39 +2,39 @@ using UnityEngine;
 
 internal class TypedDemoHub : Hub
 {
-	private string HIJMAONIMJB = string.Empty;
+	private string typedEchoResult = string.Empty;
 
-	private string NHIKDBMALBH = string.Empty;
+	private string typedEchoClientResult = string.Empty;
 
 	public TypedDemoHub()
 		: base("typeddemohub")
 	{
-		JPJAFMLNALO("Echo", OBHMNCMCEIO);
+		On("Echo", Echo);
 	}
 
-	private void OBHMNCMCEIO(Hub CGFIJCNNCKP, MethodCallMessage BOPGDKGIGHM)
+	private void Echo(Hub CGFIJCNNCKP, MethodCallMessage BOPGDKGIGHM)
 	{
-		NHIKDBMALBH = string.Format("{0} #{1} triggered!", BOPGDKGIGHM.FNKPHEHFKEI()[0], BOPGDKGIGHM.FNKPHEHFKEI()[1]);
+		typedEchoClientResult = string.Format("{0} #{1} triggered!", BOPGDKGIGHM.GetArguments()[0], BOPGDKGIGHM.GetArguments()[1]);
 	}
 
-	public void OBHMNCMCEIO(string CKEHOEGLMBM)
+	public void Echo(string CKEHOEGLMBM)
 	{
-		Call("echo", BOANOIDOPEK, CKEHOEGLMBM);
+		Call("echo", OnEchoDone, CKEHOEGLMBM);
 	}
 
-	private void BOANOIDOPEK(Hub CGFIJCNNCKP, ClientMessage BKNEELNMDHH, ResultMessage DCJLKCFKCOM)
+	private void OnEchoDone(Hub CGFIJCNNCKP, ClientMessage BKNEELNMDHH, ResultMessage DCJLKCFKCOM)
 	{
-		HIJMAONIMJB = "TypedDemoHub.Echo(string message) invoked!";
+		typedEchoResult = "TypedDemoHub.Echo(string message) invoked!";
 	}
 
-	public void MCAIPGEPMDE()
+	public void Draw()
 	{
 		GUILayout.Label("Typed callback");
 		GUILayout.BeginHorizontal();
 		GUILayout.Space(20f);
 		GUILayout.BeginVertical();
-		GUILayout.Label(HIJMAONIMJB);
-		GUILayout.Label(NHIKDBMALBH);
+		GUILayout.Label(typedEchoResult);
+		GUILayout.Label(typedEchoClientResult);
 		GUILayout.EndVertical();
 		GUILayout.EndHorizontal();
 		GUILayout.Space(10f);

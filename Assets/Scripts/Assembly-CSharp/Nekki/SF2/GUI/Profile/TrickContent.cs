@@ -7,7 +7,7 @@ namespace Nekki.SF2.GUI.Profile
 {
 	public class TrickContent : Content
 	{
-		public enum PMJPELIOMIL
+		public enum TrickContentLayer
 		{
 			zText = 0,
 			zSlider = 1,
@@ -15,19 +15,19 @@ namespace Nekki.SF2.GUI.Profile
 			zGradient = 3
 		}
 
-		private const int OAKHGJGOGHE = -294;
+		private const int SHOW_BUTTON_Y = -294;
 
-		private const int BMGBEAOHCIP = 400;
+		private const int MAX_CONTENT_HEIGHT = 400;
 
-		private const string JMONPFHPBJK = "ComboButtons.base_damage";
+		private const string DAMAGE_ICON_SPRITE = "ComboButtons.base_damage";
 
-		private const int LBGJODHJBHJ = 40;
+		private const int DAMAGE_LABEL_PADDING = 40;
 
-		private const int KGOONNMIPBM = -20;
+		private const int DAMAGE_LABEL_X = -20;
 
-		private const int APMECJNLMCL = 10;
+		private const int DAMAGE_LABEL_Y = 10;
 
-		private const int AIHFCFGEDHB = -20;
+		private const int DESCRIPTION_OFFSET_Y = -20;
 
 		[SerializeField]
 		private LabelAlias _valueLabel;
@@ -45,30 +45,30 @@ namespace Nekki.SF2.GUI.Profile
 
 		private string _description;
 
-		private InfoAnimation BJONHDGCNFE;
+		private InfoAnimation infoAnimation;
 
-		private Action<object> FNOECGMEKGL;
+		private Action<object> showCallback;
 
 		private void Start()
 		{
-			_btnShow.onClick.AddListener(KLEKOHHGAEM);
+			_btnShow.onClick.AddListener(OnShowClicked);
 		}
 
 		public void Init(InfoAnimation EMBBNNBFODN, List<float> CKKFKEIELCP, Action<object> ODDEOFKLIAG = null, string EMDJGBHIAIA = "")
 		{
-			BJONHDGCNFE = EMBBNNBFODN;
+			infoAnimation = EMBBNNBFODN;
 			_value = CKKFKEIELCP;
-			FNOECGMEKGL = ODDEOFKLIAG;
+			showCallback = ODDEOFKLIAG;
 			_description = EMDJGBHIAIA;
-			IOKIOGIMEBC();
-			PHKIJLEICHE();
-			JILNGKIPLIK();
+			InitDescriptionLabel();
+			InitShowButton();
+			UpdateDamageLabel();
 			bool flag = _descriptionLabel.gameObject.activeSelf && _descriptionLabel.preferredHeight + _valueLabel.preferredHeight > 400f;
 			bool flag2 = _valueLabel.preferredHeight > 400f;
 			if (flag || flag2)
 			{
 			}
-			JPFEBFEBFMF();
+			LayoutDescription();
 		}
 
 		public override void SetUpBorder(float BGEEALIPKCC)
@@ -77,7 +77,7 @@ namespace Nekki.SF2.GUI.Profile
 			{
 				float num = _btnShow.transform.localPosition.y + _btnShow.GetComponent<RectTransform>().rect.height / 2f;
 				float bAINMLLIKOL = BGEEALIPKCC - (BGEEALIPKCC - num) / 2f;
-				_valueLabel.transform.BGNJGIACJBG(bAINMLLIKOL);
+				_valueLabel.transform.SetLocalY(bAINMLLIKOL);
 			}
 		}
 
@@ -86,18 +86,18 @@ namespace Nekki.SF2.GUI.Profile
 			return _btnShow;
 		}
 
-		private void IOKIOGIMEBC()
+		private void InitDescriptionLabel()
 		{
 			_descriptionLabel.gameObject.SetActive(false);
 			if (!(_description == string.Empty))
 			{
 				_descriptionLabel.set_LabelFontSize(104);
-				_descriptionLabel.color = Constants.PJJIMHMJPAL;
+				_descriptionLabel.color = Constants.DialogTextColor;
 				_descriptionLabel.set_Alias(_description);
 			}
 		}
 
-		private void JILNGKIPLIK()
+		private void UpdateDamageLabel()
 		{
 			var hits = new List<string>();
 			for (int i = 0; i < _value.Count;)
@@ -118,7 +118,7 @@ namespace Nekki.SF2.GUI.Profile
 				node.transform.SetParent(_valueLabel.transform, false);
 				icon = node.GetComponent<ResolutionImage>();
 				icon.set_TexturePath("UI/Atlases/");
-				icon.set_SpriteName(JMONPFHPBJK);
+				icon.set_SpriteName(DAMAGE_ICON_SPRITE);
 				icon.raycastTarget = false;
 				icon.preserveAspect = true;
 			}
@@ -129,50 +129,50 @@ namespace Nekki.SF2.GUI.Profile
 			icon.rectTransform.anchorMin = icon.rectTransform.anchorMax = new Vector2(0.5f, 0.5f);
 			icon.rectTransform.sizeDelta = new Vector2(64f, 64f);
 			icon.gameObject.SetActive(_value.Count > 0);
-			_valueLabel.transform.OKHPLHPBPKJ(-20f);
-			_valueLabel.transform.BGNJGIACJBG(10f);
-			_valueLabel.color = Constants.PJJIMHMJPAL;
+			_valueLabel.transform.SetLocalX(-20f);
+			_valueLabel.transform.SetLocalY(10f);
+			_valueLabel.color = Constants.DialogTextColor;
 			_valueLabel.set_text(text);
 			icon.rectTransform.anchoredPosition = new Vector2(-_valueLabel.preferredWidth * 0.5f - 42f, 0f);
 			_valueLabel.SetVerticesDirty();
-			IEFFLCBGJJM();
+			OnDamageLabelUpdated();
 			_slider.ScrollToItem(0);
 		}
 
-		private void PHKIJLEICHE()
+		private void InitShowButton()
 		{
-			_btnShow.transform.OKHPLHPBPKJ(0f);
-			_btnShow.transform.BGNJGIACJBG(-294f);
-			if (BJONHDGCNFE == null || !BJONHDGCNFE.NHNEJKIBPJG)
+			_btnShow.transform.SetLocalX(0f);
+			_btnShow.transform.SetLocalY(-294f);
+			if (infoAnimation == null || !infoAnimation.ShowInTricks)
 			{
 				_btnShow.gameObject.SetActive(false);
 			}
 		}
 
-		private void JPFEBFEBFMF()
+		private void LayoutDescription()
 		{
 			if (_descriptionLabel != null && _slider != null && _value.Count > 0)
 			{
 				if (_valueLabel.rectTransform.rect.height + _descriptionLabel.rectTransform.rect.height < 400f)
 				{
-					_descriptionLabel.transform.BGNJGIACJBG(-20f + _valueLabel.rectTransform.rect.height / 2f);
+					_descriptionLabel.transform.SetLocalY(-20f + _valueLabel.rectTransform.rect.height / 2f);
 				}
 				else
 				{
-					_descriptionLabel.transform.BGNJGIACJBG(155f);
+					_descriptionLabel.transform.SetLocalY(155f);
 				}
 			}
 		}
 
-		private void KLEKOHHGAEM()
+		private void OnShowClicked()
 		{
-			if (FNOECGMEKGL != null)
+			if (showCallback != null)
 			{
-				FNOECGMEKGL(null);
+				showCallback(null);
 			}
 		}
 
-		private void IEFFLCBGJJM()
+		private void OnDamageLabelUpdated()
 		{
 		}
 	}

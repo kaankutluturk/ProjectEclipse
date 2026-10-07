@@ -4,16 +4,16 @@ namespace Nekki.SF2.GUI.Profile
 {
 	public class TrickCell : ProfileCell
 	{
-		private const int DADLDEKKDKP = 2;
+		private const int CELL_KIND_ID = 2;
 
 		[SerializeField]
 		private TrickSubItem _trickSubItem;
 
-		private void BHNDDBGCBNP()
+		private void BindSubItem()
 		{
 			_trickSubItem.ParentCell = this;
-			_trickSubItem.transform.BGNJGIACJBG(0f);
-			_trickSubItem.transform.OKHPLHPBPKJ(-240f);
+			_trickSubItem.transform.SetLocalY(0f);
+			_trickSubItem.transform.SetLocalX(-240f);
 			_trickSubItem.RemoveAllEventListener();
 			_trickSubItem.AddEventListener(2, OnSubItemClick);
 			_trickSubItem.AddEventListener(10, Scene<ProfileScene>.get_Current().OnSubItemClick);
@@ -23,8 +23,8 @@ namespace Nekki.SF2.GUI.Profile
 		public void Init(Trick KPKPFFGEFGI, int BIPGPCAHKIG)
 		{
 			Clear();
-			BHNDDBGCBNP();
-			string nHKMCLPOMFK = KPKPFFGEFGI.NHKMCLPOMFK;
+			BindSubItem();
+			string nHKMCLPOMFK = KPKPFFGEFGI.Icon;
 			int oKNNNLIPODI = 20000 + BIPGPCAHKIG * 10;
 			_trickSubItem.Init(nHKMCLPOMFK, KPKPFFGEFGI, oKNNNLIPODI);
 			Scene<ProfileScene>.get_Current().SubItems.Add(_trickSubItem);

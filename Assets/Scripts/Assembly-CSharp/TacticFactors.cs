@@ -1,38 +1,38 @@
 public class TacticFactors
 {
-	public float EOGLBDCLMBM;
+	public float FactorsCount;
 
-	public float KFMJMBANIGF;
+	public float Damage;
 
-	public float MGICNNKKCAN;
+	public float Health;
 
-	public float DDGNCMJGDAG;
+	public float EnemyHealth;
 
-	public int OLCKGMBDGOG;
+	public int AnimationFrames;
 
-	public int DNPPDCPPGLM;
+	public int MissileBullets;
 
-	public int JJDNDOLCMMN;
+	public int MagicBullets;
 
-	public int KHDBLNPFDPE;
+	public int ExtraCount;
 
-	public float AAKOCIPFDNM;
+	public float Hits;
 
-	public int NGMLGDJGBCD;
+	public int ChildFrames;
 
-	public float DDFBIOFIDIH;
+	public float Distance;
 
-	public InfoAnimation HDCPIAPMFNO;
+	public InfoAnimation CurrentAnimation;
 
-	public InfoAnimation PBDLLNEOIDG;
+	public InfoAnimation EnemyCurrentAnimation;
 
-	public ModelStatistics FAKEJAAEPJG;
+	public ModelStatistics Statistics;
 
 	public TacticFactors(ModelStatistics PNEPMGPIEIH, int IIAALGOFJJJ, int CPOOPPKHFHB)
 	{
-		DNPPDCPPGLM = IIAALGOFJJJ;
-		JJDNDOLCMMN = CPOOPPKHFHB;
-		FAKEJAAEPJG = PNEPMGPIEIH;
+		MissileBullets = IIAALGOFJJJ;
+		MagicBullets = CPOOPPKHFHB;
+		Statistics = PNEPMGPIEIH;
 	}
 
 	public TacticFactors(TacticFactors FJCBLOKOBBD)
@@ -42,19 +42,19 @@ public class TacticFactors
 
 	public void CopyFrom(TacticFactors JFMALLHPPMH)
 	{
-		EOGLBDCLMBM = JFMALLHPPMH.EOGLBDCLMBM;
-		KFMJMBANIGF = JFMALLHPPMH.KFMJMBANIGF;
-		MGICNNKKCAN = JFMALLHPPMH.MGICNNKKCAN;
-		DDGNCMJGDAG = JFMALLHPPMH.DDGNCMJGDAG;
-		OLCKGMBDGOG = JFMALLHPPMH.OLCKGMBDGOG;
-		DNPPDCPPGLM = JFMALLHPPMH.DNPPDCPPGLM;
-		JJDNDOLCMMN = JFMALLHPPMH.JJDNDOLCMMN;
-		KHDBLNPFDPE = JFMALLHPPMH.KHDBLNPFDPE;
-		AAKOCIPFDNM = JFMALLHPPMH.AAKOCIPFDNM;
-		FAKEJAAEPJG = JFMALLHPPMH.FAKEJAAEPJG;
-		NGMLGDJGBCD = JFMALLHPPMH.NGMLGDJGBCD;
-		DDFBIOFIDIH = JFMALLHPPMH.DDFBIOFIDIH;
-		HDCPIAPMFNO = JFMALLHPPMH.HDCPIAPMFNO;
-		PBDLLNEOIDG = JFMALLHPPMH.PBDLLNEOIDG;
+		FactorsCount = JFMALLHPPMH.FactorsCount;
+		Damage = JFMALLHPPMH.Damage;
+		Health = JFMALLHPPMH.Health;
+		EnemyHealth = JFMALLHPPMH.EnemyHealth;
+		AnimationFrames = JFMALLHPPMH.AnimationFrames;
+		MissileBullets = JFMALLHPPMH.MissileBullets;
+		MagicBullets = JFMALLHPPMH.MagicBullets;
+		ExtraCount = JFMALLHPPMH.ExtraCount;
+		Hits = JFMALLHPPMH.Hits;
+		Statistics = JFMALLHPPMH.Statistics;
+		ChildFrames = JFMALLHPPMH.ChildFrames;
+		Distance = JFMALLHPPMH.Distance;
+		CurrentAnimation = JFMALLHPPMH.CurrentAnimation;
+		EnemyCurrentAnimation = JFMALLHPPMH.EnemyCurrentAnimation;
 	}
 }

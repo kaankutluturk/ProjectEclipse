@@ -5,11 +5,11 @@ using UnityEngine;
 
 public class NewsButtonMaker : global::EventDispatcher<object>
 {
-	private float HJHOFGOGALD;
+	private float _nextButtonX;
 
-	private float LIOPDGKHGBI;
+	private float _buttonY;
 
-	private float JGLILCEKKOA;
+	private float _buttonSpacing;
 
 	private int _id;
 
@@ -27,9 +27,9 @@ public class NewsButtonMaker : global::EventDispatcher<object>
 
 	public void Init(float FNDOOJNDJDC, float GBCONNBABLL, float KDGOIIIHPCL, GameObject KPAICOOKACB, Action<object> ODDEOFKLIAG, NewsDialog MDOHPMBJFIL)
 	{
-		HJHOFGOGALD = FNDOOJNDJDC;
-		LIOPDGKHGBI = GBCONNBABLL;
-		JGLILCEKKOA = KDGOIIIHPCL;
+		_nextButtonX = FNDOOJNDJDC;
+		_buttonY = GBCONNBABLL;
+		_buttonSpacing = KDGOIIIHPCL;
 		_parent = KPAICOOKACB;
 		_buttons.Clear();
 		_dlg = ODDEOFKLIAG;
@@ -37,7 +37,7 @@ public class NewsButtonMaker : global::EventDispatcher<object>
 		_id = 0;
 	}
 
-	public void EEFFNHNGDEH()
+	public void ClearButtons()
 	{
 		foreach (LabelButton item in _labelButtons)
 		{
@@ -47,7 +47,7 @@ public class NewsButtonMaker : global::EventDispatcher<object>
 		_labelButtons.Clear();
 	}
 
-	public void IOCIJAODGKE(NewsButton HJNAHNICGMH)
+	public void AddButton(NewsButton HJNAHNICGMH)
 	{
 		if (_labelButtonPrefab == null)
 		{
@@ -58,15 +58,15 @@ public class NewsButtonMaker : global::EventDispatcher<object>
 			LabelButton labelButton = UnityEngine.Object.Instantiate(_labelButtonPrefab);
 			labelButton.name = "LabelButton";
 			labelButton.SetColor(HJNAHNICGMH.Color);
-			labelButton.SetAlias(HJNAHNICGMH.GGDJIPKMKFC);
+			labelButton.SetAlias(HJNAHNICGMH.LabelAliasName);
 			labelButton.ButtonId = _id;
 			labelButton.AddEventListener(2, OnClickButton);
 			labelButton.transform.SetParent(_parent.transform);
-			labelButton.transform.OKHPLHPBPKJ(HJHOFGOGALD);
-			labelButton.transform.BGNJGIACJBG(LIOPDGKHGBI);
+			labelButton.transform.SetLocalX(_nextButtonX);
+			labelButton.transform.SetLocalY(_buttonY);
 			labelButton.transform.localScale = new Vector3(1f, 1f, 1f);
 			_id++;
-			HJHOFGOGALD += JGLILCEKKOA;
+			_nextButtonX += _buttonSpacing;
 			_buttons.Add(HJNAHNICGMH);
 			_labelButtons.Add(labelButton);
 		}
@@ -89,15 +89,15 @@ public class NewsButtonMaker : global::EventDispatcher<object>
 			OfflineServices.OpenExternalUrl(fBKMFDJBJIB.Url);
 			return;
 		}
-		if (fBKMFDJBJIB.EGBHELMJJKO && _dialog != null)
+		if (fBKMFDJBJIB.GoShop && _dialog != null)
 		{
 			_dialog.GoShopAfterClose = true;
-			_dialog.RedirectShopAfterClose = fBKMFDJBJIB.COIGFENOMJD;
+			_dialog.RedirectShopAfterClose = fBKMFDJBJIB.RedirectShop;
 		}
-		if (fBKMFDJBJIB.KCBCGDFKNME && _dialog != null)
+		if (fBKMFDJBJIB.BuyItem && _dialog != null)
 		{
 			_dialog.BuyItemAfterClose = true;
-			_dialog.RedirectShopAfterClose = fBKMFDJBJIB.COIGFENOMJD;
+			_dialog.RedirectShopAfterClose = fBKMFDJBJIB.RedirectShop;
 		}
 		_dlg(data);
 	}

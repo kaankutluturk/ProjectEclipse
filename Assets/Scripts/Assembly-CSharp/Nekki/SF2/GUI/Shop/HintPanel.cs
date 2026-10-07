@@ -22,11 +22,11 @@ namespace Nekki.SF2.GUI.Shop
 		[SerializeField]
 		private GameObject hintBoxPrefab;
 
-		private GameObject DBEKMNDHBCG;
+		private GameObject hintSource;
 
-		private IEnumerator OPCLGOHELNO;
+		private IEnumerator hideCoroutine;
 
-		private HintBox FLAPNMIDCAM;
+		private HintBox hintBox;
 
 		private GameObject listAnchor;
 
@@ -35,13 +35,13 @@ namespace Nekki.SF2.GUI.Shop
 			if (hintBoxPrefab != null)
 			{
 				GameObject gameObject = Object.Instantiate(hintBoxPrefab);
-				FLAPNMIDCAM = gameObject.GetComponent<HintBox>();
-				RectTransform rectTransform = FLAPNMIDCAM.transform as RectTransform;
+				hintBox = gameObject.GetComponent<HintBox>();
+				RectTransform rectTransform = hintBox.transform as RectTransform;
 				gameObject.transform.SetParent(base.transform, false);
-				if (FLAPNMIDCAM != null && rectTransform != null)
+				if (hintBox != null && rectTransform != null)
 				{
 					rectTransform.sizeDelta = new Vector2(hintBoxWidth, hintBoxHeight);
-					FLAPNMIDCAM.Init();
+					hintBox.Init();
 				}
 				gameObject.SetActive(false);
 				showingHint = false;
@@ -50,23 +50,23 @@ namespace Nekki.SF2.GUI.Shop
 
 		public void ShowPerkHint(PerkInfoItem AEFFHJGMNFI, Vector2 MGMMDGFPBLP, Vector2 IPCOBJBKNAO, GameObject AOMLCBHAJJH)
 		{
-			if (AEFFHJGMNFI == null || false || FLAPNMIDCAM == null)
+			if (AEFFHJGMNFI == null || false || hintBox == null)
 			{
 				return;
 			}
-			if (DBEKMNDHBCG == AOMLCBHAJJH)
+			if (hintSource == AOMLCBHAJJH)
 			{
 				HideHintAndStopCorutine();
 				return;
 			}
-			if (DBEKMNDHBCG != null && DBEKMNDHBCG != AOMLCBHAJJH && showingHint)
+			if (hintSource != null && hintSource != AOMLCBHAJJH && showingHint)
 			{
 				HideHintAndStopCorutine();
 			}
-				DBEKMNDHBCG = AOMLCBHAJJH;
-				FLAPNMIDCAM.gameObject.SetActive(true);
-				string title = AEFFHJGMNFI.HBCNKNFPAIM;
-				string description = AEFFHJGMNFI.PDLPHLNCOMJ(AEFFHJGMNFI.MGNNJPBCOGD);
+				hintSource = AOMLCBHAJJH;
+				hintBox.gameObject.SetActive(true);
+				string title = AEFFHJGMNFI.Alias;
+				string description = AEFFHJGMNFI.ResolveDescriptionText(AEFFHJGMNFI.DescriptionKey);
 				// Public mod presentation belongs to the Eclipse definition, not to the
 				// recovered PerkInfoItem compatibility projection. Saved/cloned enchantment
 				// instances can carry legacy presentation metadata, so prefer the canonical
@@ -78,12 +78,12 @@ namespace Nekki.SF2.GUI.Shop
 					title = modTitle;
 					description = modDescription;
 				}
-				FLAPNMIDCAM.SetText(title, description);
+				hintBox.SetText(title, description);
 			if (AnchorToIcon(AOMLCBHAJJH))
 			{
 				showingHint = true;
-				OPCLGOHELNO = WaitAndHideHint();
-				StartCoroutine(OPCLGOHELNO);
+				hideCoroutine = WaitAndHideHint();
+				StartCoroutine(hideCoroutine);
 				return;
 			}
 			bool flag = false;
@@ -93,38 +93,38 @@ namespace Nekki.SF2.GUI.Shop
 				Vector2 vector = new Vector2(0f, (0f - component.sizeDelta.y) * 0.5f);
 				Vector2 vector2 = MGMMDGFPBLP + IPCOBJBKNAO;
 				vector2 = base.transform.InverseTransformPoint(vector2);
-				flag = Mathf.Abs((vector - vector2).y) < FLAPNMIDCAM.get_RectTransform().sizeDelta.y;
+				flag = Mathf.Abs((vector - vector2).y) < hintBox.get_RectTransform().sizeDelta.y;
 			}
 			if (flag)
 			{
-				FLAPNMIDCAM.transform.position = MGMMDGFPBLP - IPCOBJBKNAO;
-				FLAPNMIDCAM.Flip();
+				hintBox.transform.position = MGMMDGFPBLP - IPCOBJBKNAO;
+				hintBox.Flip();
 			}
 			else
 			{
-				FLAPNMIDCAM.transform.position = MGMMDGFPBLP + IPCOBJBKNAO;
-				FLAPNMIDCAM.ResetFlip();
+				hintBox.transform.position = MGMMDGFPBLP + IPCOBJBKNAO;
+				hintBox.ResetFlip();
 			}
 			showingHint = true;
-			OPCLGOHELNO = WaitAndHideHint();
-			StartCoroutine(OPCLGOHELNO);
+			hideCoroutine = WaitAndHideHint();
+			StartCoroutine(hideCoroutine);
 		}
 
 		public void ShowListHint(string titleAlias, string content, GameObject source, GameObject anchor)
 		{
-			if (FLAPNMIDCAM == null || source == null || anchor == null) return;
-			bool toggleOff = showingHint && DBEKMNDHBCG == source;
+			if (hintBox == null || source == null || anchor == null) return;
+			bool toggleOff = showingHint && hintSource == source;
 			HideHintAndStopCorutine();
 			if (toggleOff) return;
-			DBEKMNDHBCG = source;
+			hintSource = source;
 			listAnchor = anchor;
-			FLAPNMIDCAM.ResetFlip();
-			FLAPNMIDCAM.gameObject.SetActive(true);
-			FLAPNMIDCAM.SetListContent(titleAlias, content);
+			hintBox.ResetFlip();
+			hintBox.gameObject.SetActive(true);
+			hintBox.SetListContent(titleAlias, content);
 			AnchorToIcon(anchor);
 			showingHint = true;
-			OPCLGOHELNO = WaitAndHideHint();
-			StartCoroutine(OPCLGOHELNO);
+			hideCoroutine = WaitAndHideHint();
+			StartCoroutine(hideCoroutine);
 		}
 
 		// Called after the forge drawer docks during canvas layout.
@@ -145,7 +145,7 @@ namespace Nekki.SF2.GUI.Shop
 		{
 			RectTransform iconRect = (icon != null) ? (icon.transform as RectTransform) : null;
 			RectTransform root = base.transform.root as RectTransform;
-			RectTransform box = FLAPNMIDCAM.get_RectTransform();
+			RectTransform box = hintBox.get_RectTransform();
 			if (iconRect == null || root == null || box == null)
 			{
 				return false;
@@ -164,15 +164,15 @@ namespace Nekki.SF2.GUI.Shop
 			}
 			if (flip)
 			{
-				FLAPNMIDCAM.Flip();
+				hintBox.Flip();
 			}
 			else
 			{
-				FLAPNMIDCAM.ResetFlip();
+				hintBox.ResetFlip();
 			}
 			box.localPosition = new Vector3(x, y, box.localPosition.z);
 			float arrowShift = iconBounds.center.x - x;
-			FLAPNMIDCAM.SetArrowOffset(flip ? -arrowShift : arrowShift, half - 60f);
+			hintBox.SetArrowOffset(flip ? -arrowShift : arrowShift, half - 60f);
 			return true;
 		}
 
@@ -193,9 +193,9 @@ namespace Nekki.SF2.GUI.Shop
 
 		public void HideHintAndStopCorutine()
 		{
-			if (OPCLGOHELNO != null)
+			if (hideCoroutine != null)
 			{
-				StopCoroutine(OPCLGOHELNO);
+				StopCoroutine(hideCoroutine);
 			}
 			HideHint();
 		}
@@ -203,10 +203,10 @@ namespace Nekki.SF2.GUI.Shop
 		public void HideHint()
 		{
 			showingHint = false;
-			if (FLAPNMIDCAM != null) FLAPNMIDCAM.gameObject.SetActive(false);
+			if (hintBox != null) hintBox.gameObject.SetActive(false);
 			listAnchor = null;
-			DBEKMNDHBCG = null;
-			OPCLGOHELNO = null;
+			hintSource = null;
+			hideCoroutine = null;
 		}
 
 		public IEnumerator WaitAndHideHint()
@@ -217,7 +217,7 @@ namespace Nekki.SF2.GUI.Shop
 
 		public void Update()
 		{
-			if (showingHint && (Eclipse.Input.EclipseInput.touchCount > 0 || Eclipse.Input.EclipseInput.anyKeyDown) && (EventSystem.current == null || DBEKMNDHBCG != EventSystem.current.currentSelectedGameObject))
+			if (showingHint && (Eclipse.Input.EclipseInput.touchCount > 0 || Eclipse.Input.EclipseInput.anyKeyDown) && (EventSystem.current == null || hintSource != EventSystem.current.currentSelectedGameObject))
 			{
 				HideHintAndStopCorutine();
 			}

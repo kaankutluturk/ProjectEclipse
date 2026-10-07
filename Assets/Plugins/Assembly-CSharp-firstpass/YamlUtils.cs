@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class YamlUtils
 {
-	public static Vector2 GPKICIBEBJD(Sequence KKMBOLHOLLP)
+	public static Vector2 ParseVector2(Sequence KKMBOLHOLLP)
 	{
 		Vector2 vector = default(Vector2);
 		vector = Vector2.zero;

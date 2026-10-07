@@ -5,11 +5,11 @@ namespace Nekki.SF2.GUI.Fight
 {
 	public class PointsTable : MonoBehaviour
 	{
-		private int DJGPHOLGJDA;
+		private int leftScore;
 
-		private int HBOFMJCFOKK;
+		private int rightScore;
 
-		private int LOMKKEAMMIG;
+		private int maxScore;
 
 		private Vector2 textSizeDelta = new Vector2(200f, 200f);
 
@@ -23,9 +23,9 @@ namespace Nekki.SF2.GUI.Fight
 		private LabelAlias rightScoreText;
 
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		private PointsTableType KAHHEBMBCFA;
+		private PointsTableType tableType;
 
-		public int LJKGBLBEGAM
+		public int LeftPoints
 		{
 			get
 			{
@@ -37,7 +37,7 @@ namespace Nekki.SF2.GUI.Fight
 			}
 		}
 
-		public int KDENPNFJNJL
+		public int RightPoints
 		{
 			get
 			{
@@ -51,55 +51,55 @@ namespace Nekki.SF2.GUI.Fight
 
 		public int get_LeftScore()
 		{
-			return DJGPHOLGJDA;
+			return leftScore;
 		}
 
 		public void set_LeftScore(int value)
 		{
-			if (DJGPHOLGJDA != value && leftScoreText != null)
+			if (leftScore != value && leftScoreText != null)
 			{
-				DJGPHOLGJDA = value;
-				leftScoreText.set_text(DJGPHOLGJDA.ToString());
+				leftScore = value;
+				leftScoreText.set_text(leftScore.ToString());
 			}
 		}
 
 		public int get_RightScore()
 		{
-			return HBOFMJCFOKK;
+			return rightScore;
 		}
 
 		public void set_RightScore(int value)
 		{
-			if (HBOFMJCFOKK != value && rightScoreText != null)
+			if (rightScore != value && rightScoreText != null)
 			{
-				HBOFMJCFOKK = value;
-				rightScoreText.set_text(HBOFMJCFOKK.ToString());
+				rightScore = value;
+				rightScoreText.set_text(rightScore.ToString());
 			}
 		}
 
 		public PointsTableType get_Type()
 		{
-			return KAHHEBMBCFA;
+			return tableType;
 		}
 
 		private void set_Type(PointsTableType value)
 		{
-			KAHHEBMBCFA = value;
+			tableType = value;
 		}
 
 		public void Init(PointsTableType LFLGCDNKNJI, int LOMKKEAMMIG = 0, int CFMPJLLNCFF = 120)
 		{
 			set_Type(LFLGCDNKNJI);
-			this.LOMKKEAMMIG = LOMKKEAMMIG;
+			this.maxScore = LOMKKEAMMIG;
 			switch (LFLGCDNKNJI)
 			{
 			case PointsTableType.POINTS_TABLE_CONTEST:
-				leftScoreText.set_text(DJGPHOLGJDA.ToString());
-				rightScoreText.set_text(HBOFMJCFOKK.ToString());
+				leftScoreText.set_text(leftScore.ToString());
+				rightScoreText.set_text(rightScore.ToString());
 				delimiterText.set_text(":");
 				break;
 			case PointsTableType.POINTS_TABLE_SCORE:
-				leftScoreText.set_text(DJGPHOLGJDA.ToString());
+				leftScoreText.set_text(leftScore.ToString());
 				rightScoreText.set_text(LOMKKEAMMIG.ToString());
 				delimiterText.set_text("/");
 				break;

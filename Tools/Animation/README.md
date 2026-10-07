@@ -127,17 +127,17 @@ it does not substitute the older, limited Tekken 7 0xC8 importer.
 
 Local evidence:
 
-- `Assets/Scripts/Assembly-CSharp/InfoAnimation.cs`: `ABEGFBOKPOI`,
-  `ReadAnimation`, `Init`, and `HAILLLEPCHP`.
+- `Assets/Scripts/Assembly-CSharp/InfoAnimation.cs`: `LoadAnimationClip`,
+  `ReadAnimation`, `Init`, and `FillKeyFrames`.
 - `Assets/Scripts/Assembly-CSharp/BinaryReaderNekki.cs`: little-endian integers
   and floats through `BitConverter`.
-- `Assets/Scripts/Assembly-CSharp/ModelLoader.cs`: `GLNMJNFLLIN` assigns node IDs
+- `Assets/Scripts/Assembly-CSharp/ModelLoader.cs`: `ParseNode` assigns node IDs
   in XML order and negates file Y.
 - `Assets/Scripts/Assembly-CSharp/ModelAnimation.cs`: `DrawFrame`,
   `SetBufferFrame`, `PlayInfo`, `MirrorNodes`, and `SetAttackingEdges`.
-- `Assets/Scripts/Assembly-CSharp/ModelMacroNode.cs`: `FPKMHOMMFKB` weighted helpers.
-- `Assets/Scripts/Assembly-CSharp/ModelObject.cs`: `NDDMFBCIHPC` mass-weighted COM.
-- `Assets/Scripts/Assembly-CSharp/SF2Paths.cs`: `CBKLONCNPCP` animation path.
+- `Assets/Scripts/Assembly-CSharp/ModelMacroNode.cs`: `UpdateFromWeights` weighted helpers.
+- `Assets/Scripts/Assembly-CSharp/ModelObject.cs`: `UpdateCenterOfMass` mass-weighted COM.
+- `Assets/Scripts/Assembly-CSharp/SF2Paths.cs`: `GetBinaryAnimationsPath` animation path.
 - `Assets/Scripts/Assembly-CSharp/MovesParser.cs`: file, interval, and frame metadata.
 - `Assets/Resources/SF2Content/Art/catalog.json`: `MODELS` archive authority.
 

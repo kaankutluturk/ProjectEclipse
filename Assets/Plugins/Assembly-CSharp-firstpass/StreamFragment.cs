@@ -3,40 +3,40 @@ using System.Collections.Generic;
 
 public sealed class StreamFragment : IYamlSerializable
 {
-	private readonly List<ParsingEvent> DNBFFLFBDOB = new List<ParsingEvent>();
+	private readonly List<ParsingEvent> events = new List<ParsingEvent>();
 
-	public IList<ParsingEvent> AJCMBMJGJEG
+	public IList<ParsingEvent> Events
 	{
 		get
 		{
-			return PHLLJJNCEIH();
+			return GetEvents();
 		}
 	}
 
-	public IList<ParsingEvent> PHLLJJNCEIH()
+	public IList<ParsingEvent> GetEvents()
 	{
-		return DNBFFLFBDOB;
+		return events;
 	}
 
 	void IYamlSerializable.ReadYaml(IParser BPGMNGAJMKK)
 	{
-		DNBFFLFBDOB.Clear();
+		events.Clear();
 		int num = 0;
 		do
 		{
-			if (!BPGMNGAJMKK.PCCMLADDNDG())
+			if (!BPGMNGAJMKK.MoveNext())
 			{
 				throw new InvalidOperationException("The parser has reached the end before deserialization completed.");
 			}
-			DNBFFLFBDOB.Add(BPGMNGAJMKK.AOJJOEHEPGM());
-			num += BPGMNGAJMKK.AOJJOEHEPGM().DPIMLJJFMCO();
+			events.Add(BPGMNGAJMKK.GetCurrent());
+			num += BPGMNGAJMKK.GetCurrent().GetNestingIncrease();
 		}
 		while (num > 0);
 	}
 
-	void IYamlSerializable.WriteYaml(NEKGJNOFOFN NPIDIMCLNEM)
+	void IYamlSerializable.WriteYaml(IEmitter NPIDIMCLNEM)
 	{
-		foreach (ParsingEvent item in DNBFFLFBDOB)
+		foreach (ParsingEvent item in events)
 		{
 			NPIDIMCLNEM.Emit(item);
 		}

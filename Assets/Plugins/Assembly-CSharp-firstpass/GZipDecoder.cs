@@ -3,7 +3,7 @@ using Unity.IO.Compression;
 
 internal class GZipDecoder : IFileFormatReader
 {
-	internal enum LKOONNNEIMK
+	internal enum GzipHeaderState
 	{
 		ReadingID1 = 0,
 		ReadingID2 = 1,
@@ -25,7 +25,7 @@ internal class GZipDecoder : IFileFormatReader
 	}
 
 	[Flags]
-	internal enum JKHEMHLDMFD
+	internal enum GZipOptionalHeaderFlags
 	{
 		CRCFlag = 2,
 		ExtraFieldsFlag = 4,
@@ -33,21 +33,21 @@ internal class GZipDecoder : IFileFormatReader
 		CommentFlag = 0x10
 	}
 
-	private LKOONNNEIMK LKFCDEHOOCP;
+	private GzipHeaderState gzipHeaderSubstate;
 
-	private LKOONNNEIMK JNBHMAJIKLC;
+	private GzipHeaderState gzipFooterSubstate;
 
-	private int BHBDNLEACPM;
+	private int gzip_header_flag;
 
-	private int OLNPJMKFACP;
+	private int gzip_header_xlen;
 
-	private uint GHMJIHKFBFJ;
+	private uint expectedCrc32;
 
-	private uint FPPEOFLDECJ;
+	private uint expectedOutputStreamSizeModulo;
 
-	private int DOLKGPHFKPJ;
+	private int loopCounter;
 
-	private uint NGBENFAENID;
+	private uint actualCrc32;
 
 	private long actualStreamSizeModulo;
 
@@ -58,17 +58,17 @@ internal class GZipDecoder : IFileFormatReader
 
 	public void Reset()
 	{
-		LKFCDEHOOCP = LKOONNNEIMK.ReadingID1;
-		JNBHMAJIKLC = LKOONNNEIMK.ReadingCRC;
-		GHMJIHKFBFJ = 0u;
-		FPPEOFLDECJ = 0u;
+		gzipHeaderSubstate = GzipHeaderState.ReadingID1;
+		gzipFooterSubstate = GzipHeaderState.ReadingCRC;
+		expectedCrc32 = 0u;
+		expectedOutputStreamSizeModulo = 0u;
 	}
 
-	public bool DJJBPAJHJFI(InputBuffer NILNDHEKNLJ)
+	public bool ReadHeader(InputBuffer NILNDHEKNLJ)
 	{
-		switch (LKFCDEHOOCP)
+		switch (gzipHeaderSubstate)
 		{
-		case LKOONNNEIMK.ReadingID1:
+		case GzipHeaderState.ReadingID1:
 		{
 			int num = NILNDHEKNLJ.GetBits(8);
 			if (num < 0)
@@ -79,10 +79,10 @@ internal class GZipDecoder : IFileFormatReader
 			{
 				throw new InvalidDataException(SR.GetString("Corrupted gzip header"));
 			}
-			LKFCDEHOOCP = LKOONNNEIMK.ReadingID2;
-			goto case LKOONNNEIMK.ReadingID2;
+			gzipHeaderSubstate = GzipHeaderState.ReadingID2;
+			goto case GzipHeaderState.ReadingID2;
 		}
-		case LKOONNNEIMK.ReadingID2:
+		case GzipHeaderState.ReadingID2:
 		{
 			int num = NILNDHEKNLJ.GetBits(8);
 			if (num < 0)
@@ -93,10 +93,10 @@ internal class GZipDecoder : IFileFormatReader
 			{
 				throw new InvalidDataException(SR.GetString("Corrupted gzip header"));
 			}
-			LKFCDEHOOCP = LKOONNNEIMK.ReadingCM;
-			goto case LKOONNNEIMK.ReadingCM;
+			gzipHeaderSubstate = GzipHeaderState.ReadingCM;
+			goto case GzipHeaderState.ReadingCM;
 		}
-		case LKOONNNEIMK.ReadingCM:
+		case GzipHeaderState.ReadingCM:
 		{
 			int num = NILNDHEKNLJ.GetBits(8);
 			if (num < 0)
@@ -107,104 +107,104 @@ internal class GZipDecoder : IFileFormatReader
 			{
 				throw new InvalidDataException(SR.GetString("Unknown compression mode"));
 			}
-			LKFCDEHOOCP = LKOONNNEIMK.ReadingFLG;
-			goto case LKOONNNEIMK.ReadingFLG;
+			gzipHeaderSubstate = GzipHeaderState.ReadingFLG;
+			goto case GzipHeaderState.ReadingFLG;
 		}
-		case LKOONNNEIMK.ReadingFLG:
+		case GzipHeaderState.ReadingFLG:
 		{
 			int num = NILNDHEKNLJ.GetBits(8);
 			if (num < 0)
 			{
 				return false;
 			}
-			BHBDNLEACPM = num;
-			LKFCDEHOOCP = LKOONNNEIMK.ReadingMMTime;
-			DOLKGPHFKPJ = 0;
-			goto case LKOONNNEIMK.ReadingMMTime;
+			gzip_header_flag = num;
+			gzipHeaderSubstate = GzipHeaderState.ReadingMMTime;
+			loopCounter = 0;
+			goto case GzipHeaderState.ReadingMMTime;
 		}
-		case LKOONNNEIMK.ReadingMMTime:
+		case GzipHeaderState.ReadingMMTime:
 		{
 			int num = 0;
-			while (DOLKGPHFKPJ < 4)
+			while (loopCounter < 4)
 			{
 				num = NILNDHEKNLJ.GetBits(8);
 				if (num < 0)
 				{
 					return false;
 				}
-				DOLKGPHFKPJ++;
+				loopCounter++;
 			}
-			LKFCDEHOOCP = LKOONNNEIMK.ReadingXFL;
-			DOLKGPHFKPJ = 0;
-			goto case LKOONNNEIMK.ReadingXFL;
+			gzipHeaderSubstate = GzipHeaderState.ReadingXFL;
+			loopCounter = 0;
+			goto case GzipHeaderState.ReadingXFL;
 		}
-		case LKOONNNEIMK.ReadingXFL:
+		case GzipHeaderState.ReadingXFL:
 		{
 			int num = NILNDHEKNLJ.GetBits(8);
 			if (num < 0)
 			{
 				return false;
 			}
-			LKFCDEHOOCP = LKOONNNEIMK.ReadingOS;
-			goto case LKOONNNEIMK.ReadingOS;
+			gzipHeaderSubstate = GzipHeaderState.ReadingOS;
+			goto case GzipHeaderState.ReadingOS;
 		}
-		case LKOONNNEIMK.ReadingOS:
+		case GzipHeaderState.ReadingOS:
 		{
 			int num = NILNDHEKNLJ.GetBits(8);
 			if (num < 0)
 			{
 				return false;
 			}
-			LKFCDEHOOCP = LKOONNNEIMK.ReadingXLen1;
-			goto case LKOONNNEIMK.ReadingXLen1;
+			gzipHeaderSubstate = GzipHeaderState.ReadingXLen1;
+			goto case GzipHeaderState.ReadingXLen1;
 		}
-		case LKOONNNEIMK.ReadingXLen1:
+		case GzipHeaderState.ReadingXLen1:
 		{
-			if ((BHBDNLEACPM & 4) == 0)
+			if ((gzip_header_flag & 4) == 0)
 			{
-				goto case LKOONNNEIMK.ReadingFileName;
+				goto case GzipHeaderState.ReadingFileName;
 			}
 			int num = NILNDHEKNLJ.GetBits(8);
 			if (num < 0)
 			{
 				return false;
 			}
-			OLNPJMKFACP = num;
-			LKFCDEHOOCP = LKOONNNEIMK.ReadingXLen2;
-			goto case LKOONNNEIMK.ReadingXLen2;
+			gzip_header_xlen = num;
+			gzipHeaderSubstate = GzipHeaderState.ReadingXLen2;
+			goto case GzipHeaderState.ReadingXLen2;
 		}
-		case LKOONNNEIMK.ReadingXLen2:
+		case GzipHeaderState.ReadingXLen2:
 		{
 			int num = NILNDHEKNLJ.GetBits(8);
 			if (num < 0)
 			{
 				return false;
 			}
-			OLNPJMKFACP |= num << 8;
-			LKFCDEHOOCP = LKOONNNEIMK.ReadingXLenData;
-			DOLKGPHFKPJ = 0;
-			goto case LKOONNNEIMK.ReadingXLenData;
+			gzip_header_xlen |= num << 8;
+			gzipHeaderSubstate = GzipHeaderState.ReadingXLenData;
+			loopCounter = 0;
+			goto case GzipHeaderState.ReadingXLenData;
 		}
-		case LKOONNNEIMK.ReadingXLenData:
+		case GzipHeaderState.ReadingXLenData:
 		{
 			int num = 0;
-			while (DOLKGPHFKPJ < OLNPJMKFACP)
+			while (loopCounter < gzip_header_xlen)
 			{
 				num = NILNDHEKNLJ.GetBits(8);
 				if (num < 0)
 				{
 					return false;
 				}
-				DOLKGPHFKPJ++;
+				loopCounter++;
 			}
-			LKFCDEHOOCP = LKOONNNEIMK.ReadingFileName;
-			DOLKGPHFKPJ = 0;
-			goto case LKOONNNEIMK.ReadingFileName;
+			gzipHeaderSubstate = GzipHeaderState.ReadingFileName;
+			loopCounter = 0;
+			goto case GzipHeaderState.ReadingFileName;
 		}
-		case LKOONNNEIMK.ReadingFileName:
-			if ((BHBDNLEACPM & 8) == 0)
+		case GzipHeaderState.ReadingFileName:
+			if ((gzip_header_flag & 8) == 0)
 			{
-				LKFCDEHOOCP = LKOONNNEIMK.ReadingComment;
+				gzipHeaderSubstate = GzipHeaderState.ReadingComment;
 			}
 			else
 			{
@@ -218,13 +218,13 @@ internal class GZipDecoder : IFileFormatReader
 					}
 				}
 				while (num != 0);
-				LKFCDEHOOCP = LKOONNNEIMK.ReadingComment;
+				gzipHeaderSubstate = GzipHeaderState.ReadingComment;
 			}
-			goto case LKOONNNEIMK.ReadingComment;
-		case LKOONNNEIMK.ReadingComment:
-			if ((BHBDNLEACPM & 0x10) == 0)
+			goto case GzipHeaderState.ReadingComment;
+		case GzipHeaderState.ReadingComment:
+			if ((gzip_header_flag & 0x10) == 0)
 			{
-				LKFCDEHOOCP = LKOONNNEIMK.ReadingCRC16Part1;
+				gzipHeaderSubstate = GzipHeaderState.ReadingCRC16Part1;
 			}
 			else
 			{
@@ -238,74 +238,74 @@ internal class GZipDecoder : IFileFormatReader
 					}
 				}
 				while (num != 0);
-				LKFCDEHOOCP = LKOONNNEIMK.ReadingCRC16Part1;
+				gzipHeaderSubstate = GzipHeaderState.ReadingCRC16Part1;
 			}
-			goto case LKOONNNEIMK.ReadingCRC16Part1;
-		case LKOONNNEIMK.ReadingCRC16Part1:
+			goto case GzipHeaderState.ReadingCRC16Part1;
+		case GzipHeaderState.ReadingCRC16Part1:
 		{
-			if ((BHBDNLEACPM & 2) == 0)
+			if ((gzip_header_flag & 2) == 0)
 			{
-				LKFCDEHOOCP = LKOONNNEIMK.Done;
-				goto case LKOONNNEIMK.Done;
+				gzipHeaderSubstate = GzipHeaderState.Done;
+				goto case GzipHeaderState.Done;
 			}
 			int num = NILNDHEKNLJ.GetBits(8);
 			if (num < 0)
 			{
 				return false;
 			}
-			LKFCDEHOOCP = LKOONNNEIMK.ReadingCRC16Part2;
-			goto case LKOONNNEIMK.ReadingCRC16Part2;
+			gzipHeaderSubstate = GzipHeaderState.ReadingCRC16Part2;
+			goto case GzipHeaderState.ReadingCRC16Part2;
 		}
-		case LKOONNNEIMK.ReadingCRC16Part2:
+		case GzipHeaderState.ReadingCRC16Part2:
 		{
 			int num = NILNDHEKNLJ.GetBits(8);
 			if (num < 0)
 			{
 				return false;
 			}
-			LKFCDEHOOCP = LKOONNNEIMK.Done;
-			goto case LKOONNNEIMK.Done;
+			gzipHeaderSubstate = GzipHeaderState.Done;
+			goto case GzipHeaderState.Done;
 		}
-		case LKOONNNEIMK.Done:
+		case GzipHeaderState.Done:
 			return true;
 		default:
 			throw new InvalidDataException(SR.GetString("Unknown state"));
 		}
 	}
 
-	public bool BEPMEBNFAEL(InputBuffer NILNDHEKNLJ)
+	public bool ReadFooter(InputBuffer NILNDHEKNLJ)
 	{
-		NILNDHEKNLJ.KHMFPEJHFHC();
-		if (JNBHMAJIKLC == LKOONNNEIMK.ReadingCRC)
+		NILNDHEKNLJ.SkipToByteBoundary();
+		if (gzipFooterSubstate == GzipHeaderState.ReadingCRC)
 		{
-			while (DOLKGPHFKPJ < 4)
+			while (loopCounter < 4)
 			{
 				int num = NILNDHEKNLJ.GetBits(8);
 				if (num < 0)
 				{
 					return false;
 				}
-				GHMJIHKFBFJ |= (uint)(num << 8 * DOLKGPHFKPJ);
-				DOLKGPHFKPJ++;
+				expectedCrc32 |= (uint)(num << 8 * loopCounter);
+				loopCounter++;
 			}
-			JNBHMAJIKLC = LKOONNNEIMK.ReadingFileSize;
-			DOLKGPHFKPJ = 0;
+			gzipFooterSubstate = GzipHeaderState.ReadingFileSize;
+			loopCounter = 0;
 		}
-		if (JNBHMAJIKLC == LKOONNNEIMK.ReadingFileSize)
+		if (gzipFooterSubstate == GzipHeaderState.ReadingFileSize)
 		{
-			if (DOLKGPHFKPJ == 0)
+			if (loopCounter == 0)
 			{
-				FPPEOFLDECJ = 0u;
+				expectedOutputStreamSizeModulo = 0u;
 			}
-			while (DOLKGPHFKPJ < 4)
+			while (loopCounter < 4)
 			{
 				int num2 = NILNDHEKNLJ.GetBits(8);
 				if (num2 < 0)
 				{
 					return false;
 				}
-				FPPEOFLDECJ |= (uint)(num2 << 8 * DOLKGPHFKPJ);
-				DOLKGPHFKPJ++;
+				expectedOutputStreamSizeModulo |= (uint)(num2 << 8 * loopCounter);
+				loopCounter++;
 			}
 		}
 		return true;
@@ -313,7 +313,7 @@ internal class GZipDecoder : IFileFormatReader
 
 	public void UpdateWithBytesRead(byte[] buffer, int IPCOBJBKNAO, int KKBGGFLOLMB)
 	{
-		NGBENFAENID = Crc32Helper.JDBNFCAIBHC(NGBENFAENID, buffer, IPCOBJBKNAO, KKBGGFLOLMB);
+		actualCrc32 = Crc32Helper.UpdateCrc32(actualCrc32, buffer, IPCOBJBKNAO, KKBGGFLOLMB);
 		long num = actualStreamSizeModulo + (uint)KKBGGFLOLMB;
 		if (num >= 4294967296L)
 		{
@@ -322,13 +322,13 @@ internal class GZipDecoder : IFileFormatReader
 		actualStreamSizeModulo = num;
 	}
 
-	public void FGCBJJKKILH()
+	public void Validate()
 	{
-		if (GHMJIHKFBFJ != NGBENFAENID)
+		if (expectedCrc32 != actualCrc32)
 		{
 			throw new InvalidDataException(SR.GetString("Invalid CRC"));
 		}
-		if (actualStreamSizeModulo != FPPEOFLDECJ)
+		if (actualStreamSizeModulo != expectedOutputStreamSizeModulo)
 		{
 			throw new InvalidDataException(SR.GetString("Invalid stream size"));
 		}

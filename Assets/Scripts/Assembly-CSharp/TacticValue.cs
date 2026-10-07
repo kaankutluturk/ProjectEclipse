@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class TacticValue
 {
-	private enum NJDJLPHNAKG
+	private enum FactorType
 	{
 		Exponential = 0,
 		Linear = 1
@@ -12,39 +12,39 @@ public class TacticValue
 
 	private float _base;
 
-	private float FJNMMCGLOJH;
+	private float _counterFactor;
 
-	private float KCPECJLPBAH;
+	private float _damageFactor;
 
-	private float MEOEEBFJHAA;
+	private float _healthFactor;
 
-	private float BFCLFALKDJE;
+	private float _enemyHealthFactor;
 
-	private float MPJNDEEMEAC;
+	private float _animationFramesFactor;
 
-	private float GIGOKAGAAHE;
+	private float _magicBulletFactor;
 
-	private float KAMCPBICLNJ;
+	private float _missileBulletFactor;
 
-	private float AIFFLEEOLHG;
+	private float _hitFactor;
 
-	private float PBLKIFMDEHC;
+	private float _childFramesFactor;
 
-	private float FLLAGMNBGLB;
+	private float _distanceFactor;
 
 	private float _limit;
 
-	private float LFCOMPLOFIM;
+	private float _antiLimit;
 
-	private float HAOPIJJPNBD;
+	private float _shift;
 
-	private NJDJLPHNAKG MJKHAOMOOMK = NJDJLPHNAKG.Linear;
+	private FactorType _factorType = FactorType.Linear;
 
-	private List<global::Pair<string, TacticValue>> BMPNBKLELPH = new List<global::Pair<string, TacticValue>>();
+	private List<global::Pair<string, TacticValue>> _animationFactors = new List<global::Pair<string, TacticValue>>();
 
-	private List<global::Pair<InfoAnimation, float>> GKNOGDMPNHC = new List<global::Pair<InfoAnimation, float>>();
+	private List<global::Pair<InfoAnimation, float>> _myAnimationFactors = new List<global::Pair<InfoAnimation, float>>();
 
-	private List<global::Pair<InfoAnimation, float>> MHMDMMGJLEH = new List<global::Pair<InfoAnimation, float>>();
+	private List<global::Pair<InfoAnimation, float>> _enemyAnimationFactors = new List<global::Pair<InfoAnimation, float>>();
 
 	public TacticValue()
 	{
@@ -65,50 +65,50 @@ public class TacticValue
 		if (node != null)
 		{
 			_base = node.Attributes["Base"].ParseFloat();
-			FJNMMCGLOJH = node.Attributes["CounterFactor"].ParseFloat();
-			KCPECJLPBAH = node.Attributes["DamageFactor"].ParseFloat();
-			MEOEEBFJHAA = node.Attributes["HealthFactor"].ParseFloat();
-			BFCLFALKDJE = node.Attributes["EnemyHealthFactor"].ParseFloat();
-			MPJNDEEMEAC = node.Attributes["AnimationFramesFactor"].ParseFloat();
-			PBLKIFMDEHC = node.Attributes["ChildFramesFactor"].ParseFloat();
-			GIGOKAGAAHE = node.Attributes["MagicBulletFactor"].ParseFloat();
-			KAMCPBICLNJ = node.Attributes["MissileBulletFactor"].ParseFloat();
-			AIFFLEEOLHG = node.Attributes["HitFactor"].ParseFloat();
-			FLLAGMNBGLB = node.Attributes["DistanceFactor"].ParseFloat();
-			HAOPIJJPNBD = node.Attributes["Shift"].ParseFloat();
+			_counterFactor = node.Attributes["CounterFactor"].ParseFloat();
+			_damageFactor = node.Attributes["DamageFactor"].ParseFloat();
+			_healthFactor = node.Attributes["HealthFactor"].ParseFloat();
+			_enemyHealthFactor = node.Attributes["EnemyHealthFactor"].ParseFloat();
+			_animationFramesFactor = node.Attributes["AnimationFramesFactor"].ParseFloat();
+			_childFramesFactor = node.Attributes["ChildFramesFactor"].ParseFloat();
+			_magicBulletFactor = node.Attributes["MagicBulletFactor"].ParseFloat();
+			_missileBulletFactor = node.Attributes["MissileBulletFactor"].ParseFloat();
+			_hitFactor = node.Attributes["HitFactor"].ParseFloat();
+			_distanceFactor = node.Attributes["DistanceFactor"].ParseFloat();
+			_shift = node.Attributes["Shift"].ParseFloat();
 			_limit = node.Attributes["Limit"].ParseFloat();
-			LFCOMPLOFIM = node.Attributes["AntiLimit"].ParseFloat();
-			SetFactorType(node.Attributes["FactorType"].CIPOICEEIBK(string.Empty));
+			_antiLimit = node.Attributes["AntiLimit"].ParseFloat();
+			SetFactorType(node.Attributes["FactorType"].GetStringOrDefault(string.Empty));
 			ParseAnimations(node);
 		}
 	}
 
 	public void ParseAnimations(XmlNode node)
 	{
-		BMPNBKLELPH.Clear();
+		_animationFactors.Clear();
 		int num = 0;
 		foreach (XmlNode childNode in node.ChildNodes)
 		{
 			if (childNode.Name == "AnimationFactors")
 			{
-				BMPNBKLELPH.Add(new global::Pair<string, TacticValue>(string.Empty, new TacticValue()));
-				BMPNBKLELPH[num].First = childNode.Attributes["Animation"].CIPOICEEIBK(string.Empty);
-				BMPNBKLELPH[num].Second.Parse(childNode);
+				_animationFactors.Add(new global::Pair<string, TacticValue>(string.Empty, new TacticValue()));
+				_animationFactors[num].First = childNode.Attributes["Animation"].GetStringOrDefault(string.Empty);
+				_animationFactors[num].Second.Parse(childNode);
 				num++;
 			}
 			else if (childNode.Name == "CurrentAnimation")
 			{
 				global::Pair<InfoAnimation, float> cCKLNOPEKHO = new global::Pair<InfoAnimation, float>(null, 0f);
-				cCKLNOPEKHO.First = AnimationData.BCIFKBJAFEC(childNode.Attributes["Animation"].CIPOICEEIBK(string.Empty));
+				cCKLNOPEKHO.First = AnimationData.GetAnimationByName(childNode.Attributes["Animation"].GetStringOrDefault(string.Empty));
 				cCKLNOPEKHO.Second = childNode.Attributes["Factor"].ParseFloat();
-				string text = childNode.Attributes["Player"].CIPOICEEIBK("Me");
+				string text = childNode.Attributes["Player"].GetStringOrDefault("Me");
 				if (text == "Enemy")
 				{
-					MHMDMMGJLEH.Add(cCKLNOPEKHO);
+					_enemyAnimationFactors.Add(cCKLNOPEKHO);
 				}
 				else if (text == "Me")
 				{
-					GKNOGDMPNHC.Add(cCKLNOPEKHO);
+					_myAnimationFactors.Add(cCKLNOPEKHO);
 				}
 			}
 		}
@@ -116,35 +116,35 @@ public class TacticValue
 
 	public float GetValue(TacticFactors JCICKLIMBEF)
 	{
-		float num = JCICKLIMBEF.EOGLBDCLMBM * FJNMMCGLOJH;
-		float num2 = JCICKLIMBEF.KFMJMBANIGF * KCPECJLPBAH;
-		float num3 = (1f - JCICKLIMBEF.MGICNNKKCAN) * MEOEEBFJHAA;
-		float num4 = (1f - JCICKLIMBEF.DDGNCMJGDAG) * BFCLFALKDJE;
-		float num5 = (float)JCICKLIMBEF.OLCKGMBDGOG * MPJNDEEMEAC;
-		float num6 = (float)JCICKLIMBEF.JJDNDOLCMMN * GIGOKAGAAHE;
-		float num7 = (float)JCICKLIMBEF.DNPPDCPPGLM * KAMCPBICLNJ;
-		float num8 = JCICKLIMBEF.AAKOCIPFDNM * AIFFLEEOLHG;
-		float num9 = (float)JCICKLIMBEF.NGMLGDJGBCD * PBLKIFMDEHC;
-		float num10 = JCICKLIMBEF.DDFBIOFIDIH * FLLAGMNBGLB;
-		float num11 = num + num2 + num3 + num4 + num5 + num6 + num7 + num8 + num9 + num10 + HAOPIJJPNBD;
-		foreach (global::Pair<string, TacticValue> item in BMPNBKLELPH)
+		float num = JCICKLIMBEF.FactorsCount * _counterFactor;
+		float num2 = JCICKLIMBEF.Damage * _damageFactor;
+		float num3 = (1f - JCICKLIMBEF.Health) * _healthFactor;
+		float num4 = (1f - JCICKLIMBEF.EnemyHealth) * _enemyHealthFactor;
+		float num5 = (float)JCICKLIMBEF.AnimationFrames * _animationFramesFactor;
+		float num6 = (float)JCICKLIMBEF.MagicBullets * _magicBulletFactor;
+		float num7 = (float)JCICKLIMBEF.MissileBullets * _missileBulletFactor;
+		float num8 = JCICKLIMBEF.Hits * _hitFactor;
+		float num9 = (float)JCICKLIMBEF.ChildFrames * _childFramesFactor;
+		float num10 = JCICKLIMBEF.Distance * _distanceFactor;
+		float num11 = num + num2 + num3 + num4 + num5 + num6 + num7 + num8 + num9 + num10 + _shift;
+		foreach (global::Pair<string, TacticValue> item in _animationFactors)
 		{
 			float count = 0f;
 			float CKKFKEIELCP = 0f;
 			float JOOJIMPEPOJ = 0f;
-			JCICKLIMBEF.FAKEJAAEPJG.GetCountAndDamage(true, item.First, ref count, ref CKKFKEIELCP, ref JOOJIMPEPOJ);
-			float num12 = count * item.Second.FJNMMCGLOJH;
-			float num13 = CKKFKEIELCP * item.Second.KCPECJLPBAH;
-			float num14 = JOOJIMPEPOJ * item.Second.AIFFLEEOLHG;
+			JCICKLIMBEF.Statistics.GetCountAndDamage(true, item.First, ref count, ref CKKFKEIELCP, ref JOOJIMPEPOJ);
+			float num12 = count * item.Second._counterFactor;
+			float num13 = CKKFKEIELCP * item.Second._damageFactor;
+			float num14 = JOOJIMPEPOJ * item.Second._hitFactor;
 			num11 += num12 + num13 + num14;
 		}
-		num11 += GetAnimationSummands(JCICKLIMBEF.HDCPIAPMFNO, GKNOGDMPNHC);
-		num11 += GetAnimationSummands(JCICKLIMBEF.PBDLLNEOIDG, MHMDMMGJLEH);
-		if (MJKHAOMOOMK == NJDJLPHNAKG.Exponential)
+		num11 += GetAnimationSummands(JCICKLIMBEF.CurrentAnimation, _myAnimationFactors);
+		num11 += GetAnimationSummands(JCICKLIMBEF.EnemyCurrentAnimation, _enemyAnimationFactors);
+		if (_factorType == FactorType.Exponential)
 		{
 			return CalculateExponentialChance(num11);
 		}
-		if (MJKHAOMOOMK == NJDJLPHNAKG.Linear)
+		if (_factorType == FactorType.Linear)
 		{
 			return CalculateLinearChance(num11);
 		}
@@ -158,7 +158,7 @@ public class TacticValue
 		{
 			return _limit + (_base - _limit) * Mathf.Pow(2f, 0f - IGAPINAEDPP);
 		}
-		return LFCOMPLOFIM + (_base - LFCOMPLOFIM) * Mathf.Pow(2f, IGAPINAEDPP);
+		return _antiLimit + (_base - _antiLimit) * Mathf.Pow(2f, IGAPINAEDPP);
 	}
 
 	private float CalculateLinearChance(float IGAPINAEDPP)
@@ -168,22 +168,22 @@ public class TacticValue
 		{
 			return _base + (_limit - _base) * Mathf.Min(1f, IGAPINAEDPP);
 		}
-		return _base + (LFCOMPLOFIM - _base) * Mathf.Min(1f, 0f - IGAPINAEDPP);
+		return _base + (_antiLimit - _base) * Mathf.Min(1f, 0f - IGAPINAEDPP);
 	}
 
 	private void SetFactorType(string JNPHBPCMFEH)
 	{
 		if (JNPHBPCMFEH == "Linear")
 		{
-			MJKHAOMOOMK = NJDJLPHNAKG.Linear;
+			_factorType = FactorType.Linear;
 		}
 		else if (JNPHBPCMFEH == "Exponential")
 		{
-			MJKHAOMOOMK = NJDJLPHNAKG.Exponential;
+			_factorType = FactorType.Exponential;
 		}
 		else
 		{
-			MJKHAOMOOMK = NJDJLPHNAKG.Linear;
+			_factorType = FactorType.Linear;
 		}
 	}
 
@@ -202,22 +202,22 @@ public class TacticValue
 	private void CopyFrom(TacticValue JFMALLHPPMH)
 	{
 		_base = JFMALLHPPMH._base;
-		FJNMMCGLOJH = JFMALLHPPMH.FJNMMCGLOJH;
-		KCPECJLPBAH = JFMALLHPPMH.KCPECJLPBAH;
-		MEOEEBFJHAA = JFMALLHPPMH.MEOEEBFJHAA;
-		BFCLFALKDJE = JFMALLHPPMH.BFCLFALKDJE;
-		MPJNDEEMEAC = JFMALLHPPMH.MPJNDEEMEAC;
-		PBLKIFMDEHC = JFMALLHPPMH.PBLKIFMDEHC;
-		GIGOKAGAAHE = JFMALLHPPMH.GIGOKAGAAHE;
-		KAMCPBICLNJ = JFMALLHPPMH.KAMCPBICLNJ;
-		AIFFLEEOLHG = JFMALLHPPMH.AIFFLEEOLHG;
+		_counterFactor = JFMALLHPPMH._counterFactor;
+		_damageFactor = JFMALLHPPMH._damageFactor;
+		_healthFactor = JFMALLHPPMH._healthFactor;
+		_enemyHealthFactor = JFMALLHPPMH._enemyHealthFactor;
+		_animationFramesFactor = JFMALLHPPMH._animationFramesFactor;
+		_childFramesFactor = JFMALLHPPMH._childFramesFactor;
+		_magicBulletFactor = JFMALLHPPMH._magicBulletFactor;
+		_missileBulletFactor = JFMALLHPPMH._missileBulletFactor;
+		_hitFactor = JFMALLHPPMH._hitFactor;
 		_limit = JFMALLHPPMH._limit;
-		LFCOMPLOFIM = JFMALLHPPMH.LFCOMPLOFIM;
-		HAOPIJJPNBD = JFMALLHPPMH.HAOPIJJPNBD;
-		BMPNBKLELPH = JFMALLHPPMH.BMPNBKLELPH;
-		MJKHAOMOOMK = JFMALLHPPMH.MJKHAOMOOMK;
-		FLLAGMNBGLB = JFMALLHPPMH.FLLAGMNBGLB;
-		GKNOGDMPNHC = JFMALLHPPMH.GKNOGDMPNHC;
-		MHMDMMGJLEH = JFMALLHPPMH.MHMDMMGJLEH;
+		_antiLimit = JFMALLHPPMH._antiLimit;
+		_shift = JFMALLHPPMH._shift;
+		_animationFactors = JFMALLHPPMH._animationFactors;
+		_factorType = JFMALLHPPMH._factorType;
+		_distanceFactor = JFMALLHPPMH._distanceFactor;
+		_myAnimationFactors = JFMALLHPPMH._myAnimationFactors;
+		_enemyAnimationFactors = JFMALLHPPMH._enemyAnimationFactors;
 	}
 }

@@ -5,17 +5,17 @@ using System.Xml;
 public class PerkActionSetAttributes : PerkActionModificator
 {
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private Dictionary<string, FunctionExtension> LGLIMFLAKFK;
+	private Dictionary<string, FunctionExtension> _attributes;
 
-	public Dictionary<string, FunctionExtension> PGPKNHDMNBD
+	public Dictionary<string, FunctionExtension> AttributeValues
 	{
 		get
 		{
-			return NNBFJDJAAGI();
+			return GetAttributes();
 		}
 		protected set
 		{
-			PIOBIGEOKHN(value);
+			SetAttributes(value);
 		}
 	}
 
@@ -26,37 +26,37 @@ public class PerkActionSetAttributes : PerkActionModificator
 	public PerkActionSetAttributes(PerkActionSetAttributes NOLFMPDGCOC)
 		: base(NOLFMPDGCOC)
 	{
-		PIOBIGEOKHN(NOLFMPDGCOC.NNBFJDJAAGI());
+		SetAttributes(NOLFMPDGCOC.GetAttributes());
 	}
 
-	public Dictionary<string, FunctionExtension> NNBFJDJAAGI()
+	public Dictionary<string, FunctionExtension> GetAttributes()
 	{
-		return LGLIMFLAKFK;
+		return _attributes;
 	}
 
-	protected void PIOBIGEOKHN(Dictionary<string, FunctionExtension> value)
+	protected void SetAttributes(Dictionary<string, FunctionExtension> value)
 	{
-		LGLIMFLAKFK = value;
+		_attributes = value;
 	}
 
 	public override void Parse(XmlNode node)
 	{
 		base.Parse(node);
 		set_Type(ActionType.ACTION_SET_ATTRIBUTES);
-		PIOBIGEOKHN(new Dictionary<string, FunctionExtension>());
-		foreach (WarriorAttribute item in GameUtils.BGENALLCKII.IBLHIAHECLK)
+		SetAttributes(new Dictionary<string, FunctionExtension>());
+		foreach (WarriorAttribute item in GameUtils.WarriorAttributeList.AttributeList)
 		{
 			XmlAttribute xmlAttribute = node.Attributes[item.get_Name()];
 			if (xmlAttribute != null)
 			{
 				string key = item.get_Name();
-				string bLLCOEAOJGF = xmlAttribute.CIPOICEEIBK(string.Empty);
+				string bLLCOEAOJGF = xmlAttribute.GetStringOrDefault(string.Empty);
 				FunctionExtension oPIFBDJNMKD = new FunctionExtension();
 				oPIFBDJNMKD.Parse(bLLCOEAOJGF);
-				oPIFBDJNMKD.PBPBNENGLPA(JMDLAMHAJLN().HJFEFJIEINN);
-				oPIFBDJNMKD.DMPCFMACDJM(JMDLAMHAJLN().OKPFNCJFLDL);
+				oPIFBDJNMKD.SetFunctionCallback(GetPerk().EvaluateFunctionCallback);
+				oPIFBDJNMKD.SetVariableCallback(GetPerk().OnFunctionPreCallback);
 				oPIFBDJNMKD.set_Target(this);
-				NNBFJDJAAGI()[key] = oPIFBDJNMKD;
+				GetAttributes()[key] = oPIFBDJNMKD;
 			}
 		}
 	}

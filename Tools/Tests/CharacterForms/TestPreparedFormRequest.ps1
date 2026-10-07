@@ -10,8 +10,8 @@ using System;
 using System.Collections.Generic;
 class Vector3f{public float X;public Vector3f(float x){X=x;}public Vector3f(Vector3f other){X=other.X;}}
 class Parameters{public bool IsPlayer,IsWinner;public int RoundsWon;public float MaxLife=100,Health=100;public void SetCurrentLife(float value){Health=value;}}
-class Model{public Parameters Parameters=new Parameters();public List<Model> _Enemies=new List<Model>();public Model Owner;public Vector3f Position=new Vector3f(0);public int NFOOGKCGFAB=1;public object KDAHHIMLJGG=new object();public float KKMCHCNOHMB()=>Parameters.Health;public Vector3f PLBNCDCFPML()=>Position;public int KFCNPADAMHA()=>NFOOGKCGFAB;public void SetModelPosition(Vector3f value){Position=value;}public Model GetRootModel()=>Owner??this;public void CJNGMIMHFCC(Model enemy){_Enemies.Add(enemy);}}
-class Selector{public object Pending;public void PrepareFormAnimation(Model model){Pending=model.KDAHHIMLJGG;}}
+class Model{public Parameters Parameters=new Parameters();public List<Model> _Enemies=new List<Model>();public Model Owner;public Vector3f Position=new Vector3f(0);public int Sign=1;public object EventData=new object();public float GetLife()=>Parameters.Health;public Vector3f GetPosition()=>Position;public int GetFacingSign()=>Sign;public void SetModelPosition(Vector3f value){Position=value;}public Model GetRootModel()=>Owner??this;public void AddEnemy(Model enemy){_Enemies.Add(enemy);}}
+class Selector{public object Pending;public void PrepareFormAnimation(Model model){Pending=model.EventData;}}
 class Fight{
 METHOD
 internal class PreparedFormModel:IDisposable{public Model Model;public int Disposals;public void Dispose(){if(Model!=null){Disposals++;Model=null;}}}
@@ -27,11 +27,11 @@ static void Main(){
  var p=new PreparedFormModel{Model=next};int callbacks=0;Exception result=null;
  Check(f.QueuePreparedFighterForm(old,p,e=>{callbacks++;result=e;}),"accepted");
  Check(!f.Bound&&callbacks==0&&p.Model==next,"request is deferred");
- old.Parameters.Health=25;old.Parameters.RoundsWon=2;old.Position.X=73;old.NFOOGKCGFAB=-1;
+ old.Parameters.Health=25;old.Parameters.RoundsWon=2;old.Position.X=73;old.Sign=-1;
  f.Drain();
  Check(callbacks==1&&result==null&&f.Commits==1&&p.Disposals==0,"committed body survives request completion");
- Check(next.Parameters.Health==50&&next.Parameters.RoundsWon==2&&next.Position.X==73&&next.Position!=old.Position&&next.NFOOGKCGFAB==-1,"boundary health fraction, round wins, position and facing");
- Check(next._Enemies.Count==1&&next._Enemies[0]==enemy&&f._SelectAnimation.Pending==next.KDAHHIMLJGG,"root enemy deduplication and deferred animation entry");
+ Check(next.Parameters.Health==50&&next.Parameters.RoundsWon==2&&next.Position.X==73&&next.Position!=old.Position&&next.Sign==-1,"boundary health fraction, round wins, position and facing");
+ Check(next._Enemies.Count==1&&next._Enemies[0]==enemy&&f._SelectAnimation.Pending==next.EventData,"root enemy deduplication and deferred animation entry");
  f=new Fight{Reject=true};p=new PreparedFormModel{Model=new Model()};callbacks=0;
  Check(!f.QueuePreparedFighterForm(old,p,e=>callbacks++)&&p.Model!=null&&p.Disposals==0&&callbacks==0,"queue rejection leaves caller ownership");
  f=new Fight{FailCommit=true};p=new PreparedFormModel{Model=new Model()};result=null;

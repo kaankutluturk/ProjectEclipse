@@ -2,9 +2,9 @@ using System.Collections;
 
 public class SwitchResult
 {
-	public bool KMJFGGLMJEK;
+	public bool ThereIs;
 
-	public bool BCFJPFCGALJ;
+	public bool WithMinus;
 
 	public ArrayList PostStrings = new ArrayList();
 
@@ -12,6 +12,6 @@ public class SwitchResult
 
 	public SwitchResult()
 	{
-		KMJFGGLMJEK = false;
+		ThereIs = false;
 	}
 }

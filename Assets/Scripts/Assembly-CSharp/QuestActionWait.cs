@@ -3,7 +3,7 @@ using Nekki.SF2.Core;
 
 public class QuestActionWait : QuestAction
 {
-	private int DOODNMJOHJB;
+	private int frameCounter;
 
 	private int frames;
 
@@ -13,17 +13,17 @@ public class QuestActionWait : QuestAction
 		frames = EPKLCPOEELO.Attributes["Frames"].ParseInt();
 	}
 
-	public override void DEJMHFMLKIC(QuestParameters GFIHPBCEEOB)
+	public override void Execute(QuestParameters GFIHPBCEEOB)
 	{
-		GKFMJKAAJCA();
-		base.DEJMHFMLKIC(GFIHPBCEEOB);
+		ResetSequences();
+		base.Execute(GFIHPBCEEOB);
 		ApplicationController.add_OnUpdate(OnEveryFrame);
 	}
 
 	private void OnEveryFrame()
 	{
-		DOODNMJOHJB++;
-		if (DOODNMJOHJB >= frames)
+		frameCounter++;
+		if (frameCounter >= frames)
 		{
 			Stop();
 		}
@@ -32,12 +32,12 @@ public class QuestActionWait : QuestAction
 	private void Stop()
 	{
 		ApplicationController.remove_OnUpdate(OnEveryFrame);
-		OGIJONMKABB();
+		FinishAction();
 	}
 
-	public override void GKFMJKAAJCA()
+	public override void ResetSequences()
 	{
-		base.GKFMJKAAJCA();
-		DOODNMJOHJB = 0;
+		base.ResetSequences();
+		frameCounter = 0;
 	}
 }

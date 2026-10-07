@@ -5,21 +5,21 @@ using UnityEngine;
 
 public class AchievementsController : ITableViewDataSource, ITableViewDelegate
 {
-	private TableView FEFDHNFOJLF;
+	private TableView tableView;
 
-	private List<global::Pair<Achievement, int>> GJEPILABGDO = new List<global::Pair<Achievement, int>>();
+	private List<global::Pair<Achievement, int>> displayedAchievements = new List<global::Pair<Achievement, int>>();
 
 	public AchievementsController(TableView OIDFBEAABBA, GameObject CGLPIDAECLH)
 	{
-		FEFDHNFOJLF = OIDFBEAABBA;
-		LCKFANCIHJB();
+		tableView = OIDFBEAABBA;
+		RebuildAchievementList();
 		OIDFBEAABBA.set_CellPrefab(CGLPIDAECLH);
 		OIDFBEAABBA.Init(this, this);
 	}
 
 	public int NumberOfRowsInTableView(TableView OIDFBEAABBA)
 	{
-		return GJEPILABGDO.Count;
+		return displayedAchievements.Count;
 	}
 
 	public float SizeForRowInTableView(TableView OIDFBEAABBA, int IBAKGENOEPH)
@@ -29,10 +29,10 @@ public class AchievementsController : ITableViewDataSource, ITableViewDelegate
 
 	public TableViewCell CellForRowInTableView(TableView OIDFBEAABBA, int IBAKGENOEPH)
 	{
-		Achievement lLHEDBIEHAA = GJEPILABGDO[IBAKGENOEPH].First;
+		Achievement lLHEDBIEHAA = displayedAchievements[IBAKGENOEPH].First;
 		TableViewCell tableViewCell = OIDFBEAABBA.ReusableCellForRow(IBAKGENOEPH);
 		AchievementCell component = tableViewCell.GetComponent<AchievementCell>();
-		component.Init(lLHEDBIEHAA, GJEPILABGDO[IBAKGENOEPH].Second, IBAKGENOEPH);
+		component.Init(lLHEDBIEHAA, displayedAchievements[IBAKGENOEPH].Second, IBAKGENOEPH);
 		return tableViewCell;
 	}
 
@@ -42,35 +42,35 @@ public class AchievementsController : ITableViewDataSource, ITableViewDelegate
 
 	public void TableViewDidSelectCellForRow(TableView OIDFBEAABBA, int IBAKGENOEPH)
 	{
-		FEFDHNFOJLF.ScrollToCell(IBAKGENOEPH, 0.5f);
+		tableView.ScrollToCell(IBAKGENOEPH, 0.5f);
 	}
 
-	private void LCKFANCIHJB()
+	private void RebuildAchievementList()
 	{
-		GJEPILABGDO.Clear();
-		List<AchievCounter> mDNKEAFGAOB = GameUtils.HHLEKNNJGMJ.MDNKEAFGAOB;
-		List<RosterAchievCounter> list = new List<RosterAchievCounter>(ListSF.CCDKHLAMKKO().KJNPJKEHGLE().HOBHAAAEELG());
-		List<RosterAchievement> eOJAMHMPKAJ = ListSF.CCDKHLAMKKO().KJNPJKEHGLE().NOJKMMJJPHF();
+		displayedAchievements.Clear();
+		List<AchievCounter> mDNKEAFGAOB = GameUtils.AchievementDefinitions.Counters;
+		List<RosterAchievCounter> list = new List<RosterAchievCounter>(ListSF.GetRoster().GetAchievements().GetCounters());
+		List<RosterAchievement> eOJAMHMPKAJ = ListSF.GetRoster().GetAchievements().GetAchievements();
 		for (int i = 0; i < mDNKEAFGAOB.Count; i++)
 		{
 			string mENAJEAJJBE = mDNKEAFGAOB[i].Name;
 			int ePJGLECOIBG = 0;
-			List<Achievement> pGAGNLJABIE = new List<Achievement>(mDNKEAFGAOB[i].FOICCCGPCMJ);
+			List<Achievement> pGAGNLJABIE = new List<Achievement>(mDNKEAFGAOB[i].Achievements);
 			for (int j = 0; j < list.Count; j++)
 			{
 				RosterAchievCounter cKJBHGKBPPM = list[j];
 				if (mENAJEAJJBE == cKJBHGKBPPM.get_Name())
 				{
-					ePJGLECOIBG = cKJBHGKBPPM.MCIPEJBLIDC();
+					ePJGLECOIBG = cKJBHGKBPPM.GetCounter();
 					list.RemoveAt(j);
 					break;
 				}
 			}
-			DIKFALENELA(pGAGNLJABIE, eOJAMHMPKAJ, ePJGLECOIBG);
+			AddCounterAchievements(pGAGNLJABIE, eOJAMHMPKAJ, ePJGLECOIBG);
 		}
 	}
 
-	private void DIKFALENELA(List<Achievement> PGAGNLJABIE, List<RosterAchievement> EOJAMHMPKAJ, int EPJGLECOIBG)
+	private void AddCounterAchievements(List<Achievement> PGAGNLJABIE, List<RosterAchievement> EOJAMHMPKAJ, int EPJGLECOIBG)
 	{
 		for (int i = 0; i < EOJAMHMPKAJ.Count; i++)
 		{
@@ -78,9 +78,9 @@ public class AchievementsController : ITableViewDataSource, ITableViewDelegate
 			for (int j = 0; j < PGAGNLJABIE.Count; j++)
 			{
 				Achievement jNPIOKEKMII = PGAGNLJABIE[j];
-				if ((!jNPIOKEKMII.GDCBBAHKCIE || jNPIOKEKMII.HGMHEOGJDMM) && text == jNPIOKEKMII.Name)
+				if ((!jNPIOKEKMII.IsHidden || jNPIOKEKMII.IsUnlocked) && text == jNPIOKEKMII.Name)
 				{
-					GJEPILABGDO.Add(new global::Pair<Achievement, int>(jNPIOKEKMII, jNPIOKEKMII.EOGLBDCLMBM));
+					displayedAchievements.Add(new global::Pair<Achievement, int>(jNPIOKEKMII, jNPIOKEKMII.CounterValue));
 					PGAGNLJABIE.RemoveAt(j);
 					break;
 				}
@@ -88,10 +88,10 @@ public class AchievementsController : ITableViewDataSource, ITableViewDelegate
 		}
 		for (int k = 0; k < PGAGNLJABIE.Count; k++)
 		{
-			if (!PGAGNLJABIE[k].GDCBBAHKCIE || PGAGNLJABIE[k].HGMHEOGJDMM)
+			if (!PGAGNLJABIE[k].IsHidden || PGAGNLJABIE[k].IsUnlocked)
 			{
-				GJEPILABGDO.Add(new global::Pair<Achievement, int>(PGAGNLJABIE[k], EPJGLECOIBG));
-				if (EPJGLECOIBG < PGAGNLJABIE[k].EOGLBDCLMBM)
+				displayedAchievements.Add(new global::Pair<Achievement, int>(PGAGNLJABIE[k], EPJGLECOIBG));
+				if (EPJGLECOIBG < PGAGNLJABIE[k].CounterValue)
 				{
 					break;
 				}
@@ -99,11 +99,11 @@ public class AchievementsController : ITableViewDataSource, ITableViewDelegate
 		}
 	}
 
-	public bool IGGFLBOBGLN()
+	public bool HasNewAchievement()
 	{
-		for (int i = 0; i < GJEPILABGDO.Count; i++)
+		for (int i = 0; i < displayedAchievements.Count; i++)
 		{
-			if (GJEPILABGDO[i].First.DBHJGAGOLOB())
+			if (displayedAchievements[i].First.GetIsNew())
 			{
 				return true;
 			}
@@ -111,30 +111,30 @@ public class AchievementsController : ITableViewDataSource, ITableViewDelegate
 		return false;
 	}
 
-	public void ICDEBPNMLFB(float _Duration = 0f)
+	public void ScrollToFirstNewAchievement(float _Duration = 0f)
 	{
 		int num = -1;
-		for (int i = 0; i < GJEPILABGDO.Count; i++)
+		for (int i = 0; i < displayedAchievements.Count; i++)
 		{
-			if (GJEPILABGDO[i].First.DBHJGAGOLOB())
+			if (displayedAchievements[i].First.GetIsNew())
 			{
 				num = i;
 				break;
 			}
 		}
-		if (num >= 0 && num < GJEPILABGDO.Count)
+		if (num >= 0 && num < displayedAchievements.Count)
 		{
-			FEFDHNFOJLF.ScrollToCell(num, _Duration);
+			tableView.ScrollToCell(num, _Duration);
 		}
 	}
 
-	public void BDHALBHODPG(string OGPJPGMBIHJ)
+	public void ScrollToAchievement(string OGPJPGMBIHJ)
 	{
 		int num = -1;
 		int i = 0;
-		for (int count = GJEPILABGDO.Count; i < count; i++)
+		for (int count = displayedAchievements.Count; i < count; i++)
 		{
-			string mENAJEAJJBE = GJEPILABGDO[i].First.Name;
+			string mENAJEAJJBE = displayedAchievements[i].First.Name;
 			if (mENAJEAJJBE == OGPJPGMBIHJ)
 			{
 				num = i;
@@ -143,8 +143,8 @@ public class AchievementsController : ITableViewDataSource, ITableViewDelegate
 		}
 		if (num > -1)
 		{
-			FEFDHNFOJLF.ScrollToCell(num);
-			ProfileCell profileCell = (ProfileCell)FEFDHNFOJLF.get_visibleCells().GetCellAtIndex(num);
+			tableView.ScrollToCell(num);
+			ProfileCell profileCell = (ProfileCell)tableView.get_visibleCells().GetCellAtIndex(num);
 			profileCell.GetFirstIcon().Choose();
 		}
 	}

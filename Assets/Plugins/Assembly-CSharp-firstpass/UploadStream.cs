@@ -7,7 +7,7 @@ public sealed class UploadStream : Stream
 {
 	private MemoryStream ReadBuffer = new MemoryStream();
 
-	private MemoryStream LCDHLKCLFLB = new MemoryStream();
+	private MemoryStream WriteBuffer = new MemoryStream();
 
 	private bool noMoreData;
 
@@ -16,9 +16,9 @@ public sealed class UploadStream : Stream
 	private object locker = new object();
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private string HKGHEJDKCPI;
+	private string name;
 
-	public string MENAJEAJJBE
+	public string StreamName
 	{
 		get
 		{
@@ -30,11 +30,11 @@ public sealed class UploadStream : Stream
 		}
 	}
 
-	private bool ACIPIAGGOFA
+	private bool IsReadBufferEmpty
 	{
 		get
 		{
-			return AJIIONEPLIB();
+			return CheckReadBufferEmpty();
 		}
 	}
 
@@ -52,21 +52,21 @@ public sealed class UploadStream : Stream
 	public UploadStream()
 	{
 		ReadBuffer = new MemoryStream();
-		LCDHLKCLFLB = new MemoryStream();
+		WriteBuffer = new MemoryStream();
 		set_Name(string.Empty);
 	}
 
 	public string get_Name()
 	{
-		return HKGHEJDKCPI;
+		return name;
 	}
 
 	private void set_Name(string value)
 	{
-		HKGHEJDKCPI = value;
+		name = value;
 	}
 
-	private bool AJIIONEPLIB()
+	private bool CheckReadBufferEmpty()
 	{
 		lock (locker)
 		{
@@ -82,21 +82,21 @@ public sealed class UploadStream : Stream
 			{
 				return ReadBuffer.Read(buffer, IPCOBJBKNAO, count);
 			}
-			if (LCDHLKCLFLB.Length <= 0)
+			if (WriteBuffer.Length <= 0)
 			{
-				HTTPManager.MBBMPNDDPIH().KDAFBLAKBMI("UploadStream", string.Format("{0} - Read - End Of Stream", get_Name()));
+				HTTPManager.GetLogger().Information("UploadStream", string.Format("{0} - Read - End Of Stream", get_Name()));
 				return -1;
 			}
-			KLNFJCHIEFH();
+			SwitchBuffers();
 		}
-		if (AJIIONEPLIB())
+		if (CheckReadBufferEmpty())
 		{
 			ARE.WaitOne();
 			lock (locker)
 			{
-				if (AJIIONEPLIB() && LCDHLKCLFLB.Length > 0)
+				if (CheckReadBufferEmpty() && WriteBuffer.Length > 0)
 				{
-					KLNFJCHIEFH();
+					SwitchBuffers();
 				}
 			}
 		}
@@ -115,53 +115,53 @@ public sealed class UploadStream : Stream
 		}
 		lock (locker)
 		{
-			LCDHLKCLFLB.Write(buffer, IPCOBJBKNAO, count);
-			KLNFJCHIEFH();
+			WriteBuffer.Write(buffer, IPCOBJBKNAO, count);
+			SwitchBuffers();
 		}
 		ARE.Set();
 	}
 
 	public override void Flush()
 	{
-		GEJLNPIEDPF();
+		Finish();
 	}
 
 	protected override void Dispose(bool KLCPNDHEBGP)
 	{
 		if (KLCPNDHEBGP)
 		{
-			HTTPManager.MBBMPNDDPIH().KDAFBLAKBMI("UploadStream", string.Format("{0} - Dispose", get_Name()));
+			HTTPManager.GetLogger().Information("UploadStream", string.Format("{0} - Dispose", get_Name()));
 			ReadBuffer.Dispose();
 			ReadBuffer = null;
-			LCDHLKCLFLB.Dispose();
-			LCDHLKCLFLB = null;
+			WriteBuffer.Dispose();
+			WriteBuffer = null;
 			ARE.Close();
 			ARE = null;
 		}
 		base.Dispose(KLCPNDHEBGP);
 	}
 
-	public void GEJLNPIEDPF()
+	public void Finish()
 	{
 		if (noMoreData)
 		{
 			throw new ArgumentException("noMoreData already set!");
 		}
-		HTTPManager.MBBMPNDDPIH().KDAFBLAKBMI("UploadStream", string.Format("{0} - Finish", get_Name()));
+		HTTPManager.GetLogger().Information("UploadStream", string.Format("{0} - Finish", get_Name()));
 		noMoreData = true;
 		ARE.Set();
 	}
 
-	private bool KLNFJCHIEFH()
+	private bool SwitchBuffers()
 	{
 		lock (locker)
 		{
 			if (ReadBuffer.Position == ReadBuffer.Length)
 			{
-				LCDHLKCLFLB.Seek(0L, SeekOrigin.Begin);
+				WriteBuffer.Seek(0L, SeekOrigin.Begin);
 				ReadBuffer.SetLength(0L);
-				MemoryStream lCDHLKCLFLB = LCDHLKCLFLB;
-				LCDHLKCLFLB = ReadBuffer;
+				MemoryStream lCDHLKCLFLB = WriteBuffer;
+				WriteBuffer = ReadBuffer;
 				ReadBuffer = lCDHLKCLFLB;
 				return true;
 			}

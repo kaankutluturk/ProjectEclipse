@@ -4,7 +4,7 @@ $root=Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $PSScriptRoot))
 $fixture=Join-Path $root ('Temp/RewardNative-'+[Guid]::NewGuid().ToString('N'))
 New-Item -ItemType Directory -Path $fixture | Out-Null
 $aliases="using ObscuredLong = System.Int64;`nusing ObscuredUInt = System.UInt32;`nusing ObscuredFloat = System.Single;`n"
-foreach($name in @('Reward','RewardStruct','RewardPrize','RewardChoice','RewardLottery','Rewardable','LogMessage','MANJCIGJPMK')) {
+foreach($name in @('Reward','RewardStruct','RewardPrize','RewardChoice','RewardLottery','Rewardable','LogMessage','LotteryPrizeEntry')) {
  $source=Get-Content -LiteralPath (Join-Path $root ('Assets/Scripts/Assembly-CSharp/'+$name+'.cs')) -Raw -Encoding UTF8
  ($aliases+$source.Replace('using CodeStage.AntiCheat.ObscuredTypes;','')) | Set-Content -LiteralPath (Join-Path $fixture ($name+'.cs')) -Encoding UTF8
 }
@@ -17,9 +17,9 @@ $item=Get-Content -LiteralPath (Join-Path $root 'Assets/Scripts/Assembly-CSharp/
 $constructor=[regex]::Match($item,'(?ms)^\tpublic RewardItem\(.*?^\t\}')
 if(!$constructor.Success){throw 'Missing native item constructor'}
 $resultSource=Get-Content -LiteralPath (Join-Path $root 'Assets/Scripts/Assembly-CSharp/FightResult.cs') -Raw -Encoding UTF8
-$selectItem=[regex]::Match($resultSource,'(?ms)^\t\tpublic void KFJABAMAKOD\(RewardItem .*?^\t\t\}')
+$selectItem=[regex]::Match($resultSource,'(?ms)^\t\tpublic void AddReward\(RewardItem .*?^\t\t\}')
 if(!$selectItem.Success){throw 'Missing native result item selector'}
-$selectLottery=[regex]::Match($resultSource,'(?ms)^\t\tpublic void KFJABAMAKOD\(RewardLottery .*?^\t\t\}')
+$selectLottery=[regex]::Match($resultSource,'(?ms)^\t\tpublic void AddReward\(RewardLottery .*?^\t\t\}')
 if(!$selectLottery.Success){throw 'Missing native result lottery selector'}
 $runtime=Get-Content -Raw -LiteralPath (Join-Path $root 'Assets/Scripts/Eclipse/Modding/ModRuntime.cs')
 $buildLottery=[regex]::Match($runtime,'(?ms)^        internal static FightResult.ResultPrizeStruct BuildLotteryPrize\(.*?^        \}')

@@ -1,6 +1,6 @@
 public static class GraphicsController
 {
-	private static string IFOOEAMIMGM = string.Empty;
+	private static string cachedQualityCondition = string.Empty;
 
 	// best guess for name
 
@@ -14,66 +14,66 @@ public static class GraphicsController
 	{
 		UnityEngine.PlayerPrefs.SetInt("Eclipse.LargeControls", value ? 1 : 0);
 		UnityEngine.PlayerPrefs.Save();
-		Roster nKGLHEGIKKP = ListSF.CCDKHLAMKKO();
+		Roster nKGLHEGIKKP = ListSF.GetRoster();
 		if (nKGLHEGIKKP == null) return;
 		nKGLHEGIKKP.SessionSettings("ControllerScale", value.ToString());
-		ListSF.GetInstance().EJANJEEGOOE();
+		ListSF.GetInstance().RequestSave();
 	}
 
 	// best guess for name
 
 	public static bool LargeControlsEnabled()
 	{
-		return ELILPDACMDJ();
+		return ReadLargeControlsSetting();
 	}
 
-	public static string PMAODLMLDLK()
+	public static string GetEffectiveQualityCondition()
 	{
-		string text = DKALBDKBCFP();
+		string text = GetSavedQualityCondition();
 		if (text == string.Empty)
 		{
-			return SystemProperties.PMAODLMLDLK();
+			return SystemProperties.GetQualityConditionName();
 		}
-		QualityOption.HPNJCDGIHLI hPNJCDGIHLI = QualityOption.ONPFEBDGLFO(text);
-		QualityOption.HPNJCDGIHLI hPNJCDGIHLI2 = QualityOption.ONPFEBDGLFO(SystemProperties.PMAODLMLDLK());
+		QualityOption.QualityLevel hPNJCDGIHLI = QualityOption.ParseQualityLevel(text);
+		QualityOption.QualityLevel hPNJCDGIHLI2 = QualityOption.ParseQualityLevel(SystemProperties.GetQualityConditionName());
 		if (hPNJCDGIHLI <= hPNJCDGIHLI2)
 		{
 			return text;
 		}
-		return SystemProperties.PMAODLMLDLK();
+		return SystemProperties.GetQualityConditionName();
 	}
 
-	public static void FBIJKFHGOJK(string value)
+	public static void SetQualityCondition(string value)
 	{
-		IFOOEAMIMGM = value;
-		ListSF.CCDKHLAMKKO().SessionSettings("QualityCondition", IFOOEAMIMGM);
-		ListSF.GetInstance().EJANJEEGOOE(1);
+		cachedQualityCondition = value;
+		ListSF.GetRoster().SessionSettings("QualityCondition", cachedQualityCondition);
+		ListSF.GetInstance().RequestSave(1);
 	}
 
-	public static string DKALBDKBCFP()
+	public static string GetSavedQualityCondition()
 	{
-		if (IFOOEAMIMGM == string.Empty)
+		if (cachedQualityCondition == string.Empty)
 		{
-			IFOOEAMIMGM = HPEJGFMAKFP();
+			cachedQualityCondition = LoadQualityConditionSetting();
 		}
-		return IFOOEAMIMGM;
+		return cachedQualityCondition;
 	}
 
-	public static bool AFLFDJKLIEE()
+	public static bool CycleQualityCondition()
 	{
-		string text = PMAODLMLDLK();
+		string text = GetEffectiveQualityCondition();
 		string text2 = GetNextGraphicsQuality(text);
 		bool flag = text != text2;
 		if (flag)
 		{
-			FBIJKFHGOJK(text2);
+			SetQualityCondition(text2);
 		}
 		return flag;
 	}
 
 	public static string GetNextGraphicsQuality(string HEPNIDFNHBA)
 	{
-		string text = SystemProperties.PMAODLMLDLK();
+		string text = SystemProperties.GetQualityConditionName();
 		string text2 = QualityOption.GetNextQualityCondition(HEPNIDFNHBA, text);
 		if (QualityOption.CompareQualityCondition(text2, text))
 		{
@@ -82,92 +82,92 @@ public static class GraphicsController
 		return text2;
 	}
 
-	public static void FELIOKHNIKI()
+	public static void ToggleLocationResolution()
 	{
-		SystemProperties.LOHALAKNGFB bAINMLLIKOL = ((GHLDNALLEKN() == SystemProperties.LOHALAKNGFB.PATH_SMALL) ? SystemProperties.LOHALAKNGFB.PATH_BIG : SystemProperties.LOHALAKNGFB.PATH_SMALL);
-		KGGPNMGAJAH(bAINMLLIKOL);
+		SystemProperties.PathType bAINMLLIKOL = ((GetLocationResolution() == SystemProperties.PathType.PATH_SMALL) ? SystemProperties.PathType.PATH_BIG : SystemProperties.PathType.PATH_SMALL);
+		SetLocationResolution(bAINMLLIKOL);
 	}
 
-	public static void KGGPNMGAJAH(SystemProperties.LOHALAKNGFB value)
+	public static void SetLocationResolution(SystemProperties.PathType value)
 	{
-		string text = PNBGEDGDCDF(value);
+		string text = LocationResolutionToString(value);
 		if (text != string.Empty)
 		{
-			PBOMIGDFBLL(text);
+			SaveLocationResolution(text);
 		}
 	}
 
-	public static SystemProperties.LOHALAKNGFB GHLDNALLEKN()
+	public static SystemProperties.PathType GetLocationResolution()
 	{
-		string bAINMLLIKOL = AIGJNJNMODH();
-		return GAEGDDNCCHP(bAINMLLIKOL);
+		string bAINMLLIKOL = LoadLocationResolutionSetting();
+		return ParseLocationResolution(bAINMLLIKOL);
 	}
 
-	public static SystemProperties.LOHALAKNGFB GAEGDDNCCHP(string value)
+	public static SystemProperties.PathType ParseLocationResolution(string value)
 	{
-		SystemProperties.LOHALAKNGFB result = SystemProperties.LOHALAKNGFB.PATH_DEFAULT;
+		SystemProperties.PathType result = SystemProperties.PathType.PATH_DEFAULT;
 		if (value == "HIGH")
 		{
-			result = SystemProperties.LOHALAKNGFB.PATH_BIG;
+			result = SystemProperties.PathType.PATH_BIG;
 		}
 		else if (value == "LOW")
 		{
-			result = SystemProperties.LOHALAKNGFB.PATH_SMALL;
+			result = SystemProperties.PathType.PATH_SMALL;
 		}
 		return result;
 	}
 
-	public static string PNBGEDGDCDF(SystemProperties.LOHALAKNGFB value)
+	public static string LocationResolutionToString(SystemProperties.PathType value)
 	{
 		string empty = string.Empty;
 		switch (value)
 		{
-		case SystemProperties.LOHALAKNGFB.PATH_BIG:
+		case SystemProperties.PathType.PATH_BIG:
 			return "HIGH";
-		case SystemProperties.LOHALAKNGFB.PATH_SMALL:
+		case SystemProperties.PathType.PATH_SMALL:
 			return "LOW";
 		default:
 			return string.Empty;
 		}
 	}
 
-	private static bool ELILPDACMDJ()
+	private static bool ReadLargeControlsSetting()
 	{
 		if (UnityEngine.PlayerPrefs.HasKey("Eclipse.LargeControls"))
 			return UnityEngine.PlayerPrefs.GetInt("Eclipse.LargeControls") != 0;
-		bool result = !SystemProperties.FBGNIKBPCFB();
-		Roster nKGLHEGIKKP = ListSF.CCDKHLAMKKO();
-		if (nKGLHEGIKKP != null && nKGLHEGIKKP.FJGCOOAACLD("ControllerScale"))
+		bool result = !SystemProperties.IsTabletDevice();
+		Roster nKGLHEGIKKP = ListSF.GetRoster();
+		if (nKGLHEGIKKP != null && nKGLHEGIKKP.HasSessionSetting("ControllerScale"))
 		{
 			result = nKGLHEGIKKP.GetSettingsXML("ControllerScale") == "True" || nKGLHEGIKKP.GetSettingsXML("ControllerScale") == "1";
 		}
 		return result;
 	}
 
-	private static string HPEJGFMAKFP()
+	private static string LoadQualityConditionSetting()
 	{
-		Roster nKGLHEGIKKP = ListSF.CCDKHLAMKKO();
-		if (!nKGLHEGIKKP.FJGCOOAACLD("QualityCondition"))
+		Roster nKGLHEGIKKP = ListSF.GetRoster();
+		if (!nKGLHEGIKKP.HasSessionSetting("QualityCondition"))
 		{
-			FBIJKFHGOJK(SystemProperties.PMAODLMLDLK());
+			SetQualityCondition(SystemProperties.GetQualityConditionName());
 		}
 		return nKGLHEGIKKP.GetSettingsXML("QualityCondition");
 	}
 
-	private static void PBOMIGDFBLL(string value)
+	private static void SaveLocationResolution(string value)
 	{
-		Roster nKGLHEGIKKP = ListSF.CCDKHLAMKKO();
+		Roster nKGLHEGIKKP = ListSF.GetRoster();
 		nKGLHEGIKKP.SessionSettings("LocationResolution", value);
-		ListSF.GetInstance().EJANJEEGOOE();
+		ListSF.GetInstance().RequestSave();
 	}
 
-	private static string AIGJNJNMODH()
+	private static string LoadLocationResolutionSetting()
 	{
-		Roster nKGLHEGIKKP = ListSF.CCDKHLAMKKO();
-		if (!nKGLHEGIKKP.FJGCOOAACLD("LocationResolution"))
+		Roster nKGLHEGIKKP = ListSF.GetRoster();
+		if (!nKGLHEGIKKP.HasSessionSetting("LocationResolution"))
 		{
-			string bAINMLLIKOL = PNBGEDGDCDF(SystemProperties.JGBFPENNILG());
-			PBOMIGDFBLL(bAINMLLIKOL);
+			string bAINMLLIKOL = LocationResolutionToString(SystemProperties.GetLocationPathType());
+			SaveLocationResolution(bAINMLLIKOL);
 		}
 		return nKGLHEGIKKP.GetSettingsXML("LocationResolution");
 	}

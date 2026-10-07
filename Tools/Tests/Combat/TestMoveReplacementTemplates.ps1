@@ -52,7 +52,7 @@ static class MovesParser
         {
             var move = new InfoAnimation { Name = node.Attributes["Name"].Value, FileName = node.Attributes["File"].Value };
             foreach (XmlNode template in node.SelectNodes("Template"))
-                if (templates.TryGetValue(template.Attributes["Name"].Value, out var owner)) owner.MBJCDIDIBDJ(move);
+                if (templates.TryGetValue(template.Attributes["Name"].Value, out var owner)) owner.AddAnimation(move);
             if (!templates.ContainsKey(move.Name)) templates.Add(move.Name, new TemplateAnimation(move));
             moves.Add(move); added++;
         }
@@ -80,7 +80,7 @@ static class AnimationData
                 var node = new XmlDocument().CreateElement("Template"); node.SetAttribute("Name", template);
                 owner = new TemplateAnimation(node); _TemplatesByName.Add(template, owner);
             }
-            owner.MBJCDIDIBDJ(move);
+            owner.AddAnimation(move);
         }
         _TemplatesByName.Add(name, new TemplateAnimation(move));
         _Animations.Add(move); _AnimationsByName.Add(name, move);
@@ -93,7 +93,7 @@ static class Program
 {
     static int checks; static readonly List<string> failures = new List<string>();
     static void Check(bool condition, string message) { checks++; if (!condition) failures.Add(message); }
-    static List<InfoAnimation> Members(string template) => AnimationData.Templates[template].LDEBJOPLCKO();
+    static List<InfoAnimation> Members(string template) => AnimationData.Templates[template].GetAnimations();
     static XmlDocument Document(params (string name, string file, string[] templates)[] moves)
     {
         var document = new XmlDocument();
@@ -109,7 +109,7 @@ static class Program
         return document;
     }
     static Dictionary<string, string[]> Snapshot() => AnimationData.Templates.ToDictionary(
-        pair => pair.Key, pair => pair.Value.LDEBJOPLCKO().Select(move => move.Name + "@" + move.FileName).ToArray());
+        pair => pair.Key, pair => pair.Value.GetAnimations().Select(move => move.Name + "@" + move.FileName).ToArray());
     static bool Same(Dictionary<string, string[]> left, Dictionary<string, string[]> right) =>
         left.Count == right.Count && left.All(pair => right.TryGetValue(pair.Key, out var other) && pair.Value.SequenceEqual(other));
     static void Setup()
@@ -137,7 +137,7 @@ static class Program
         Check(Members("OnlyOriginal").Count == 0, "Template only the original declared still lists it.");
         Check(Members("OnlyReplacement").Count == 2 && ReferenceEquals(Members("OnlyReplacement")[1], replacement),
             "Template only the replacement declared does not list it.");
-        Check(AnimationData.Templates.Values.All(t => !t.LDEBJOPLCKO().Contains(original)), "Original remains in a live template.");
+        Check(AnimationData.Templates.Values.All(t => !t.GetAnimations().Contains(original)), "Original remains in a live template.");
         lifetime.Dispose();
         Check(ReferenceEquals(AnimationData.Get("Target"), original), "Dispose did not restore the original move.");
         Check(Same(baseline, Snapshot()) && Members("1key").Count == 3 && ReferenceEquals(Members("1key")[1], original) &&

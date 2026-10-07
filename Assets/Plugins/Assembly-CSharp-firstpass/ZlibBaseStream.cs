@@ -5,148 +5,148 @@ using System.Text;
 
 internal class ZlibBaseStream : Stream
 {
-	internal enum GKBLMACCNDB
+	internal enum StreamMode
 	{
 		Writer = 0,
 		Reader = 1,
 		Undefined = 2
 	}
 
-	protected internal ZlibCodec DGBPNHJILKM;
+	protected internal ZlibCodec _z;
 
-	protected internal GKBLMACCNDB EEGOCNIMEOI = GKBLMACCNDB.Undefined;
+	protected internal StreamMode _streamMode = StreamMode.Undefined;
 
-	protected internal AFJHGKAEJPG HOHDFAOLNFI;
+	protected internal FlushType _flushMode;
 
-	protected internal ZlibStreamFlavor MGHKJOOIJGI;
+	protected internal ZlibStreamFlavor _flavor;
 
-	protected internal KAOCBBMMFOG ANNHDHMNDFJ;
+	protected internal ZlibCompressionMode _compressionMode;
 
-	protected internal NKFKKGNBHDK _level;
+	protected internal ZlibCompressionLevel _level;
 
 	protected internal bool _leaveOpen;
 
-	protected internal byte[] PIKMAFBLGOF;
+	protected internal byte[] _workingBuffer;
 
-	protected internal int CBOPONBPHPE = 16384;
+	protected internal int _bufferSize = 16384;
 
-	protected internal byte[] ADDHDMAGBFB = new byte[1];
+	protected internal byte[] _buf1 = new byte[1];
 
 	protected internal Stream _stream;
 
-	protected internal DDGGLIIKFPL JKDDDFMLLMI;
+	protected internal CompressionStrategy Strategy;
 
-	private CRC32 GAICMJOFOJD;
+	private CRC32 _crc;
 
-	protected internal string PKGNEOJAJGD;
+	protected internal string _gzipFileName;
 
-	protected internal string OHOHAPPHLDI;
+	protected internal string _gzipComment;
 
 	protected internal DateTime _GzipMtime;
 
-	protected internal int LONHHBHGGHF;
+	protected internal int _gzipHeaderByteCount;
 
-	private bool LFIGEPGACDP;
+	private bool _noMoreInput;
 
-	internal int OJMLODFAGNP
+	internal int Crc32
 	{
 		get
 		{
-			return DNINGHEBKBB();
+			return GetCrc32();
 		}
 	}
 
-	protected internal bool JNGGOGDAKOE
+	protected internal bool WantCompress
 	{
 		get
 		{
-			return EHKLJHJOKPC();
+			return GetWantCompress();
 		}
 	}
 
-	private ZlibCodec LKPCKJOLJDO
+	private ZlibCodec Codec
 	{
 		get
 		{
-			return BMFJFPAFEIM();
+			return GetCodec();
 		}
 	}
 
-	private byte[] PDPDMGPNEBH
+	private byte[] WorkingBuffer
 	{
 		get
 		{
-			return HELANNNBHDN();
+			return GetWorkingBuffer();
 		}
 	}
 
-	public ZlibBaseStream(Stream ABJIEFMMIEK, KAOCBBMMFOG HCCDFEPLGBA, NKFKKGNBHDK GNLOCMLBNHF, ZlibStreamFlavor CENOEIJNIAG, bool LOLBAGJKKPH)
+	public ZlibBaseStream(Stream ABJIEFMMIEK, ZlibCompressionMode HCCDFEPLGBA, ZlibCompressionLevel GNLOCMLBNHF, ZlibStreamFlavor CENOEIJNIAG, bool LOLBAGJKKPH)
 	{
-		HOHDFAOLNFI = AFJHGKAEJPG.None;
+		_flushMode = FlushType.None;
 		_stream = ABJIEFMMIEK;
 		_leaveOpen = LOLBAGJKKPH;
-		ANNHDHMNDFJ = HCCDFEPLGBA;
-		MGHKJOOIJGI = CENOEIJNIAG;
+		_compressionMode = HCCDFEPLGBA;
+		_flavor = CENOEIJNIAG;
 		_level = GNLOCMLBNHF;
 		if (CENOEIJNIAG == ZlibStreamFlavor.GZIP)
 		{
-			GAICMJOFOJD = new CRC32();
+			_crc = new CRC32();
 		}
 	}
 
-	internal int DNINGHEBKBB()
+	internal int GetCrc32()
 	{
-		if (GAICMJOFOJD == null)
+		if (_crc == null)
 		{
 			return 0;
 		}
-		return GAICMJOFOJD.MMBAMEEDDFA();
+		return _crc.GetCrc32Result();
 	}
 
-	protected internal bool EHKLJHJOKPC()
+	protected internal bool GetWantCompress()
 	{
-		return ANNHDHMNDFJ == KAOCBBMMFOG.Compress;
+		return _compressionMode == ZlibCompressionMode.Compress;
 	}
 
-	private ZlibCodec BMFJFPAFEIM()
+	private ZlibCodec GetCodec()
 	{
-		if (DGBPNHJILKM == null)
+		if (_z == null)
 		{
-			bool flag = MGHKJOOIJGI == ZlibStreamFlavor.ZLIB;
-			DGBPNHJILKM = new ZlibCodec();
-			if (ANNHDHMNDFJ == KAOCBBMMFOG.Decompress)
+			bool flag = _flavor == ZlibStreamFlavor.ZLIB;
+			_z = new ZlibCodec();
+			if (_compressionMode == ZlibCompressionMode.Decompress)
 			{
-				DGBPNHJILKM.InitializeInflate(flag);
+				_z.InitializeInflate(flag);
 			}
 			else
 			{
-				DGBPNHJILKM.JKDDDFMLLMI = JKDDDFMLLMI;
-				DGBPNHJILKM.JCBLHDMMDAB(_level, flag);
+				_z.Strategy = Strategy;
+				_z.InitializeDeflate(_level, flag);
 			}
 		}
-		return DGBPNHJILKM;
+		return _z;
 	}
 
-	private byte[] HELANNNBHDN()
+	private byte[] GetWorkingBuffer()
 	{
-		if (PIKMAFBLGOF == null)
+		if (_workingBuffer == null)
 		{
-			PIKMAFBLGOF = new byte[CBOPONBPHPE];
+			_workingBuffer = new byte[_bufferSize];
 		}
-		return PIKMAFBLGOF;
+		return _workingBuffer;
 	}
 
 	public override void Write(byte[] buffer, int IPCOBJBKNAO, int count)
 	{
-		if (GAICMJOFOJD != null)
+		if (_crc != null)
 		{
-			GAICMJOFOJD.LOAACENMBJJ(buffer, IPCOBJBKNAO, count);
+			_crc.SlurpBlock(buffer, IPCOBJBKNAO, count);
 		}
-		if (EEGOCNIMEOI == GKBLMACCNDB.Undefined)
+		if (_streamMode == StreamMode.Undefined)
 		{
-			EEGOCNIMEOI = GKBLMACCNDB.Writer;
+			_streamMode = StreamMode.Writer;
 		}
-		else if (EEGOCNIMEOI != GKBLMACCNDB.Writer)
+		else if (_streamMode != StreamMode.Writer)
 		{
 			throw new ZlibException("Cannot Write after Reading.");
 		}
@@ -154,111 +154,111 @@ internal class ZlibBaseStream : Stream
 		{
 			return;
 		}
-		BMFJFPAFEIM().PEFOCMDODLD = buffer;
-		DGBPNHJILKM.LMIPBGGILEJ = IPCOBJBKNAO;
-		DGBPNHJILKM.IAPJEIDMGNP = count;
+		GetCodec().InputBuffer = buffer;
+		_z.NextIn = IPCOBJBKNAO;
+		_z.AvailableBytesIn = count;
 		bool flag = false;
 		do
 		{
-			DGBPNHJILKM.DKCGBABIAEN = HELANNNBHDN();
-			DGBPNHJILKM.EIBFDELHKNM = 0;
-			DGBPNHJILKM.NBNGINIIKNA = PIKMAFBLGOF.Length;
-			int num = ((!EHKLJHJOKPC()) ? DGBPNHJILKM.Inflate(HOHDFAOLNFI) : DGBPNHJILKM.GAMMFNJHCFO(HOHDFAOLNFI));
+			_z.OutputBuffer = GetWorkingBuffer();
+			_z.NextOut = 0;
+			_z.AvailableBytesOut = _workingBuffer.Length;
+			int num = ((!GetWantCompress()) ? _z.Inflate(_flushMode) : _z.Deflate(_flushMode));
 			if (num != 0 && num != 1)
 			{
-				throw new ZlibException(((!EHKLJHJOKPC()) ? "in" : "de") + "flating: " + DGBPNHJILKM.Message);
+				throw new ZlibException(((!GetWantCompress()) ? "in" : "de") + "flating: " + _z.Message);
 			}
-			_stream.Write(PIKMAFBLGOF, 0, PIKMAFBLGOF.Length - DGBPNHJILKM.NBNGINIIKNA);
-			flag = DGBPNHJILKM.IAPJEIDMGNP == 0 && DGBPNHJILKM.NBNGINIIKNA != 0;
-			if (MGHKJOOIJGI == ZlibStreamFlavor.GZIP && !EHKLJHJOKPC())
+			_stream.Write(_workingBuffer, 0, _workingBuffer.Length - _z.AvailableBytesOut);
+			flag = _z.AvailableBytesIn == 0 && _z.AvailableBytesOut != 0;
+			if (_flavor == ZlibStreamFlavor.GZIP && !GetWantCompress())
 			{
-				flag = DGBPNHJILKM.IAPJEIDMGNP == 8 && DGBPNHJILKM.NBNGINIIKNA != 0;
+				flag = _z.AvailableBytesIn == 8 && _z.AvailableBytesOut != 0;
 			}
 		}
 		while (!flag);
 	}
 
-	private void BFDAHEHCAGK()
+	private void Finish()
 	{
-		if (DGBPNHJILKM == null)
+		if (_z == null)
 		{
 			return;
 		}
-		if (EEGOCNIMEOI == GKBLMACCNDB.Writer)
+		if (_streamMode == StreamMode.Writer)
 		{
 			bool flag = false;
 			do
 			{
-				DGBPNHJILKM.DKCGBABIAEN = HELANNNBHDN();
-				DGBPNHJILKM.EIBFDELHKNM = 0;
-				DGBPNHJILKM.NBNGINIIKNA = PIKMAFBLGOF.Length;
-				int num = ((!EHKLJHJOKPC()) ? DGBPNHJILKM.Inflate(AFJHGKAEJPG.Finish) : DGBPNHJILKM.GAMMFNJHCFO(AFJHGKAEJPG.Finish));
+				_z.OutputBuffer = GetWorkingBuffer();
+				_z.NextOut = 0;
+				_z.AvailableBytesOut = _workingBuffer.Length;
+				int num = ((!GetWantCompress()) ? _z.Inflate(FlushType.Finish) : _z.Deflate(FlushType.Finish));
 				if (num != 1 && num != 0)
 				{
-					string text = ((!EHKLJHJOKPC()) ? "in" : "de") + "flating";
-					if (DGBPNHJILKM.Message == null)
+					string text = ((!GetWantCompress()) ? "in" : "de") + "flating";
+					if (_z.Message == null)
 					{
 						throw new ZlibException(string.Format("{0}: (rc = {1})", text, num));
 					}
-					throw new ZlibException(text + ": " + DGBPNHJILKM.Message);
+					throw new ZlibException(text + ": " + _z.Message);
 				}
-				if (PIKMAFBLGOF.Length - DGBPNHJILKM.NBNGINIIKNA > 0)
+				if (_workingBuffer.Length - _z.AvailableBytesOut > 0)
 				{
-					_stream.Write(PIKMAFBLGOF, 0, PIKMAFBLGOF.Length - DGBPNHJILKM.NBNGINIIKNA);
+					_stream.Write(_workingBuffer, 0, _workingBuffer.Length - _z.AvailableBytesOut);
 				}
-				flag = DGBPNHJILKM.IAPJEIDMGNP == 0 && DGBPNHJILKM.NBNGINIIKNA != 0;
-				if (MGHKJOOIJGI == ZlibStreamFlavor.GZIP && !EHKLJHJOKPC())
+				flag = _z.AvailableBytesIn == 0 && _z.AvailableBytesOut != 0;
+				if (_flavor == ZlibStreamFlavor.GZIP && !GetWantCompress())
 				{
-					flag = DGBPNHJILKM.IAPJEIDMGNP == 8 && DGBPNHJILKM.NBNGINIIKNA != 0;
+					flag = _z.AvailableBytesIn == 8 && _z.AvailableBytesOut != 0;
 				}
 			}
 			while (!flag);
 			Flush();
-			if (MGHKJOOIJGI == ZlibStreamFlavor.GZIP)
+			if (_flavor == ZlibStreamFlavor.GZIP)
 			{
-				if (!EHKLJHJOKPC())
+				if (!GetWantCompress())
 				{
 					throw new ZlibException("Writing with decompression is not supported.");
 				}
-				int value = GAICMJOFOJD.MMBAMEEDDFA();
+				int value = _crc.GetCrc32Result();
 				_stream.Write(BitConverter.GetBytes(value), 0, 4);
-				int value2 = (int)(GAICMJOFOJD.BFADCOPLBPM() & 0xFFFFFFFFu);
+				int value2 = (int)(_crc.GetTotalBytesRead() & 0xFFFFFFFFu);
 				_stream.Write(BitConverter.GetBytes(value2), 0, 4);
 			}
 		}
 		else
 		{
-			if (EEGOCNIMEOI != GKBLMACCNDB.Reader || MGHKJOOIJGI != ZlibStreamFlavor.GZIP)
+			if (_streamMode != StreamMode.Reader || _flavor != ZlibStreamFlavor.GZIP)
 			{
 				return;
 			}
-			if (EHKLJHJOKPC())
+			if (GetWantCompress())
 			{
 				throw new ZlibException("Reading with compression is not supported.");
 			}
-			if (DGBPNHJILKM.HCDKLJJLMOD == 0)
+			if (_z.TotalBytesOut == 0)
 			{
 				return;
 			}
 			byte[] array = new byte[8];
-			if (DGBPNHJILKM.IAPJEIDMGNP < 8)
+			if (_z.AvailableBytesIn < 8)
 			{
-				Array.Copy(DGBPNHJILKM.PEFOCMDODLD, DGBPNHJILKM.LMIPBGGILEJ, array, 0, DGBPNHJILKM.IAPJEIDMGNP);
-				int num2 = 8 - DGBPNHJILKM.IAPJEIDMGNP;
-				int num3 = _stream.Read(array, DGBPNHJILKM.IAPJEIDMGNP, num2);
+				Array.Copy(_z.InputBuffer, _z.NextIn, array, 0, _z.AvailableBytesIn);
+				int num2 = 8 - _z.AvailableBytesIn;
+				int num3 = _stream.Read(array, _z.AvailableBytesIn, num2);
 				if (num2 != num3)
 				{
-					throw new ZlibException(string.Format("Missing or incomplete GZIP trailer. Expected 8 bytes, got {0}.", DGBPNHJILKM.IAPJEIDMGNP + num3));
+					throw new ZlibException(string.Format("Missing or incomplete GZIP trailer. Expected 8 bytes, got {0}.", _z.AvailableBytesIn + num3));
 				}
 			}
 			else
 			{
-				Array.Copy(DGBPNHJILKM.PEFOCMDODLD, DGBPNHJILKM.LMIPBGGILEJ, array, 0, array.Length);
+				Array.Copy(_z.InputBuffer, _z.NextIn, array, 0, array.Length);
 			}
 			int num4 = BitConverter.ToInt32(array, 0);
-			int num5 = GAICMJOFOJD.MMBAMEEDDFA();
+			int num5 = _crc.GetCrc32Result();
 			int num6 = BitConverter.ToInt32(array, 4);
-			int num7 = (int)(DGBPNHJILKM.HCDKLJJLMOD & 0xFFFFFFFFu);
+			int num7 = (int)(_z.TotalBytesOut & 0xFFFFFFFFu);
 			if (num5 != num4)
 			{
 				throw new ZlibException(string.Format("Bad CRC32 in GZIP trailer. (actual({0:X8})!=expected({1:X8}))", num5, num4));
@@ -270,19 +270,19 @@ internal class ZlibBaseStream : Stream
 		}
 	}
 
-	private void PCLFFOBJJFO()
+	private void End()
 	{
-		if (BMFJFPAFEIM() != null)
+		if (GetCodec() != null)
 		{
-			if (EHKLJHJOKPC())
+			if (GetWantCompress())
 			{
-				DGBPNHJILKM.GPBPBEHKNEO();
+				_z.EndDeflate();
 			}
 			else
 			{
-				DGBPNHJILKM.LGGKOHICFEE();
+				_z.EndInflate();
 			}
-			DGBPNHJILKM = null;
+			_z = null;
 		}
 	}
 
@@ -294,11 +294,11 @@ internal class ZlibBaseStream : Stream
 		}
 		try
 		{
-			BFDAHEHCAGK();
+			Finish();
 		}
 		finally
 		{
-			PCLFFOBJJFO();
+			End();
 			if (!_leaveOpen)
 			{
 				_stream.Dispose();
@@ -334,32 +334,32 @@ internal class ZlibBaseStream : Stream
 		_stream.SetLength(value);
 	}
 
-	private string LLJFJHPPFHD()
+	private string ReadZeroTerminatedString()
 	{
 		List<byte> list = new List<byte>();
 		bool flag = false;
 		do
 		{
-			int num = _stream.Read(ADDHDMAGBFB, 0, 1);
+			int num = _stream.Read(_buf1, 0, 1);
 			if (num != 1)
 			{
 				throw new ZlibException("Unexpected EOF reading GZIP header.");
 			}
-			if (ADDHDMAGBFB[0] == 0)
+			if (_buf1[0] == 0)
 			{
 				flag = true;
 			}
 			else
 			{
-				list.Add(ADDHDMAGBFB[0]);
+				list.Add(_buf1[0]);
 			}
 		}
 		while (!flag);
 		byte[] array = list.ToArray();
-		return DMOMPOFCMJJ.iso8859dash1.GetString(array, 0, array.Length);
+		return GZipCompressionStream.iso8859dash1.GetString(array, 0, array.Length);
 	}
 
-	private int CJKBCCEICJL()
+	private int ReadAndValidateGzipHeader()
 	{
 		int num = 0;
 		byte[] array = new byte[10];
@@ -377,7 +377,7 @@ internal class ZlibBaseStream : Stream
 				throw new ZlibException("Bad GZIP header.");
 			}
 			int num3 = BitConverter.ToInt32(array, 4);
-			_GzipMtime = DMOMPOFCMJJ._unixEpoch.AddSeconds(num3);
+			_GzipMtime = GZipCompressionStream._unixEpoch.AddSeconds(num3);
 			num += num2;
 			if ((array[3] & 4) == 4)
 			{
@@ -394,15 +394,15 @@ internal class ZlibBaseStream : Stream
 			}
 			if ((array[3] & 8) == 8)
 			{
-				PKGNEOJAJGD = LLJFJHPPFHD();
+				_gzipFileName = ReadZeroTerminatedString();
 			}
 			if ((array[3] & 0x10) == 16)
 			{
-				OHOHAPPHLDI = LLJFJHPPFHD();
+				_gzipComment = ReadZeroTerminatedString();
 			}
 			if ((array[3] & 2) == 2)
 			{
-				Read(ADDHDMAGBFB, 0, 1);
+				Read(_buf1, 0, 1);
 			}
 			return num;
 		}
@@ -411,24 +411,24 @@ internal class ZlibBaseStream : Stream
 
 	public override int Read(byte[] buffer, int IPCOBJBKNAO, int count)
 	{
-		if (EEGOCNIMEOI == GKBLMACCNDB.Undefined)
+		if (_streamMode == StreamMode.Undefined)
 		{
 			if (!_stream.CanRead)
 			{
 				throw new ZlibException("The stream is not readable.");
 			}
-			EEGOCNIMEOI = GKBLMACCNDB.Reader;
-			BMFJFPAFEIM().IAPJEIDMGNP = 0;
-			if (MGHKJOOIJGI == ZlibStreamFlavor.GZIP)
+			_streamMode = StreamMode.Reader;
+			GetCodec().AvailableBytesIn = 0;
+			if (_flavor == ZlibStreamFlavor.GZIP)
 			{
-				LONHHBHGGHF = CJKBCCEICJL();
-				if (LONHHBHGGHF == 0)
+				_gzipHeaderByteCount = ReadAndValidateGzipHeader();
+				if (_gzipHeaderByteCount == 0)
 				{
 					return 0;
 				}
 			}
 		}
-		if (EEGOCNIMEOI != GKBLMACCNDB.Reader)
+		if (_streamMode != StreamMode.Reader)
 		{
 			throw new ZlibException("Cannot Read after Writing.");
 		}
@@ -436,7 +436,7 @@ internal class ZlibBaseStream : Stream
 		{
 			return 0;
 		}
-		if (LFIGEPGACDP && EHKLJHJOKPC())
+		if (_noMoreInput && GetWantCompress())
 		{
 			return 0;
 		}
@@ -457,50 +457,50 @@ internal class ZlibBaseStream : Stream
 			throw new ArgumentOutOfRangeException("count");
 		}
 		int num = 0;
-		DGBPNHJILKM.DKCGBABIAEN = buffer;
-		DGBPNHJILKM.EIBFDELHKNM = IPCOBJBKNAO;
-		DGBPNHJILKM.NBNGINIIKNA = count;
-		DGBPNHJILKM.PEFOCMDODLD = HELANNNBHDN();
+		_z.OutputBuffer = buffer;
+		_z.NextOut = IPCOBJBKNAO;
+		_z.AvailableBytesOut = count;
+		_z.InputBuffer = GetWorkingBuffer();
 		do
 		{
-			if (DGBPNHJILKM.IAPJEIDMGNP == 0 && !LFIGEPGACDP)
+			if (_z.AvailableBytesIn == 0 && !_noMoreInput)
 			{
-				DGBPNHJILKM.LMIPBGGILEJ = 0;
-				DGBPNHJILKM.IAPJEIDMGNP = _stream.Read(PIKMAFBLGOF, 0, PIKMAFBLGOF.Length);
-				if (DGBPNHJILKM.IAPJEIDMGNP == 0)
+				_z.NextIn = 0;
+				_z.AvailableBytesIn = _stream.Read(_workingBuffer, 0, _workingBuffer.Length);
+				if (_z.AvailableBytesIn == 0)
 				{
-					LFIGEPGACDP = true;
+					_noMoreInput = true;
 				}
 			}
-			num = ((!EHKLJHJOKPC()) ? DGBPNHJILKM.Inflate(HOHDFAOLNFI) : DGBPNHJILKM.GAMMFNJHCFO(HOHDFAOLNFI));
-			if (LFIGEPGACDP && num == -5)
+			num = ((!GetWantCompress()) ? _z.Inflate(_flushMode) : _z.Deflate(_flushMode));
+			if (_noMoreInput && num == -5)
 			{
 				return 0;
 			}
 			if (num != 0 && num != 1)
 			{
-				throw new ZlibException(string.Format("{0}flating:  rc={1}  msg={2}", (!EHKLJHJOKPC()) ? "in" : "de", num, DGBPNHJILKM.Message));
+				throw new ZlibException(string.Format("{0}flating:  rc={1}  msg={2}", (!GetWantCompress()) ? "in" : "de", num, _z.Message));
 			}
 		}
-		while (((!LFIGEPGACDP && num != 1) || DGBPNHJILKM.NBNGINIIKNA != count) && DGBPNHJILKM.NBNGINIIKNA > 0 && !LFIGEPGACDP && num == 0);
-		if (DGBPNHJILKM.NBNGINIIKNA > 0)
+		while (((!_noMoreInput && num != 1) || _z.AvailableBytesOut != count) && _z.AvailableBytesOut > 0 && !_noMoreInput && num == 0);
+		if (_z.AvailableBytesOut > 0)
 		{
-			if (num != 0 || DGBPNHJILKM.IAPJEIDMGNP == 0)
+			if (num != 0 || _z.AvailableBytesIn == 0)
 			{
 			}
-			if (LFIGEPGACDP && EHKLJHJOKPC())
+			if (_noMoreInput && GetWantCompress())
 			{
-				num = DGBPNHJILKM.GAMMFNJHCFO(AFJHGKAEJPG.Finish);
+				num = _z.Deflate(FlushType.Finish);
 				if (num != 0 && num != 1)
 				{
-					throw new ZlibException(string.Format("Deflating:  rc={0}  msg={1}", num, DGBPNHJILKM.Message));
+					throw new ZlibException(string.Format("Deflating:  rc={0}  msg={1}", num, _z.Message));
 				}
 			}
 		}
-		num = count - DGBPNHJILKM.NBNGINIIKNA;
-		if (GAICMJOFOJD != null)
+		num = count - _z.AvailableBytesOut;
+		if (_crc != null)
 		{
-			GAICMJOFOJD.LOAACENMBJJ(buffer, IPCOBJBKNAO, num);
+			_crc.SlurpBlock(buffer, IPCOBJBKNAO, num);
 		}
 		return num;
 	}

@@ -4,21 +4,21 @@ using System.Xml;
 public class NameRule : Rule
 {
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private string HKGHEJDKCPI;
+	private string ruleName;
 
 	public NameRule(XmlNode node)
-		: base(BCBLLMPAMLP.RuleName, node)
+		: base(RuleType.RuleName, node)
 	{
-		set_Name(node.Attributes["Name"].CIPOICEEIBK(string.Empty));
+		set_Name(node.Attributes["Name"].GetStringOrDefault(string.Empty));
 	}
 
 	public string get_Name()
 	{
-		return HKGHEJDKCPI;
+		return ruleName;
 	}
 
 	protected void set_Name(string value)
 	{
-		HKGHEJDKCPI = value;
+		ruleName = value;
 	}
 }

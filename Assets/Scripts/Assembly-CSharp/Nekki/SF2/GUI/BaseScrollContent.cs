@@ -122,7 +122,7 @@ namespace Nekki.SF2.GUI
 			}
 		}
 
-		private void GEEKMNDAEHK(BaseScrollItem item)
+		private void OnItemClicked(BaseScrollItem item)
 		{
 			onClickItem.Invoke(item);
 		}
@@ -169,7 +169,7 @@ namespace Nekki.SF2.GUI
 			_Items.Add(item);
 			item.onClick.AddListener(() =>
 			{
-				GEEKMNDAEHK(item);
+				OnItemClicked(item);
 			});
 			UpdateLayout();
 		}
@@ -193,7 +193,7 @@ namespace Nekki.SF2.GUI
 		{
 			if (HELFDCAIJNE == null)
 			{
-				LLLOJBFMONN.Error("BaseScrollContent.SetItems items is null");
+				GameLog.Error("BaseScrollContent.SetItems items is null");
 				return;
 			}
 			Clear();
@@ -209,7 +209,7 @@ namespace Nekki.SF2.GUI
 			{
 				_layout.spacing = Spacing;
 				LayoutRebuilder.ForceRebuildLayoutImmediate((RectTransform)_layout.gameObject.transform);
-				BMAPAEGMIFO();
+				UpdateSelectedItem();
 			}
 		}
 
@@ -217,7 +217,7 @@ namespace Nekki.SF2.GUI
 		{
 			if (base.gameObject == null)
 			{
-				LLLOJBFMONN.Error("BaseScrollContent.Clear gameObject is null");
+				GameLog.Error("BaseScrollContent.Clear gameObject is null");
 				return;
 			}
 			List<GameObject> list = new List<GameObject>();
@@ -254,10 +254,10 @@ namespace Nekki.SF2.GUI
 
 		public virtual void Update()
 		{
-			BMAPAEGMIFO();
+			UpdateSelectedItem();
 		}
 
-		private void BMAPAEGMIFO()
+		private void UpdateSelectedItem()
 		{
 			if (Center != null)
 			{

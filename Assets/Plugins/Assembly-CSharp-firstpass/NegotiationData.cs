@@ -5,87 +5,87 @@ using System.Diagnostics;
 public sealed class NegotiationData
 {
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private string KLKKKBPEPOI;
+	private string url;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private string JEKMJACHIBB;
+	private string webSocketServerUrl;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private string CFEFDADCKMF;
+	private string connectionToken;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private string FMLCDJCADML;
+	private string connectionId;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private TimeSpan? BAHGOFHKNKL;
+	private TimeSpan? keepAliveTimeout;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private TimeSpan HGPAAOFDBID;
+	private TimeSpan disconnectTimeout;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private TimeSpan MNFNJDDOLNN;
+	private TimeSpan connectionTimeout;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private bool CNKCCGOKOEB;
+	private bool tryWebSockets;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private string KPKEAFHNIOA;
+	private string protocolVersion;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private TimeSpan MFEPPIMHBKP;
+	private TimeSpan transportConnectTimeout;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private TimeSpan MFHDCBOGDKF;
+	private TimeSpan longPollDelay;
 
 	public Action<NegotiationData> OnReceived;
 
 	public Action<NegotiationData, string> OnError;
 
-	private HTTPRequest IFLGEGDHGBD;
+	private HTTPRequest negotiationRequest;
 
-	private IConnection PEBFDIFIMBO;
+	private IConnection connection;
 
-	public string OCIMIOMMGNE
+	public string WebSocketServerUrl
 	{
 		get
 		{
-			return IPPHLDGJADH();
+			return GetWebSocketServerUrl();
 		}
 		private set
 		{
-			GCFBKKBNLDI(value);
+			SetWebSocketServerUrl(value);
 		}
 	}
 
-	public string FFIPCFPNENI
+	public string ConnectionToken
 	{
 		get
 		{
-			return HKBCNJMMOOP();
+			return GetConnectionToken();
 		}
 		private set
 		{
-			AKFLLIIIJPF(value);
+			SetConnectionToken(value);
 		}
 	}
 
-	public string GBGLCJDKLID
+	public string ConnectionId
 	{
 		get
 		{
-			return FNJEMLMFGEG();
+			return GetConnectionId();
 		}
 		private set
 		{
-			JFHGEPMMEEM(value);
+			SetConnectionId(value);
 		}
 	}
 
-	public TimeSpan? NDDJEFFPBOC
+	public TimeSpan? KeepAliveInterval
 	{
 		get
 		{
-			return FCIMGPJDODG();
+			return GetKeepAliveTimeout();
 		}
 		private set
 		{
@@ -93,35 +93,35 @@ public sealed class NegotiationData
 		}
 	}
 
-	public TimeSpan PKAGMCHJCLB
+	public TimeSpan DisconnectTimeout
 	{
 		get
 		{
-			return BDMKAEDCGNL();
+			return GetDisconnectTimeout();
 		}
 		private set
 		{
-			OFLBEAPGAPI(value);
+			SetDisconnectTimeout(value);
 		}
 	}
 
-	public TimeSpan LHHIEGJPMCD
+	public TimeSpan ConnectionTimeout
 	{
 		get
 		{
-			return LFLAILLBGOF();
+			return GetConnectionTimeout();
 		}
 		private set
 		{
-			OICCAHABLBF(value);
+			SetConnectionTimeout(value);
 		}
 	}
 
-	public bool GGHFMABJDLP
+	public bool ShouldTryWebSockets
 	{
 		get
 		{
-			return AOKNIGBFMKG();
+			return GetTryWebSockets();
 		}
 		private set
 		{
@@ -129,194 +129,194 @@ public sealed class NegotiationData
 		}
 	}
 
-	public string BFJPAKFGFBH
+	public string ProtocolVersion
 	{
 		get
 		{
-			return HMLNCKGEHMN();
+			return GetProtocolVersion();
 		}
 		private set
 		{
-			BNEOABLKJDF(value);
+			SetProtocolVersion(value);
 		}
 	}
 
-	public TimeSpan MECOAAGEOPI
+	public TimeSpan TransportConnectTimeout
 	{
 		get
 		{
-			return BICBAKIOCMM();
+			return GetTransportConnectTimeout();
 		}
 		private set
 		{
-			MKEOKCINEBK(value);
+			SetTransportConnectTimeout(value);
 		}
 	}
 
-	public TimeSpan BLMAHPJOFKK
+	public TimeSpan LongPollDelay
 	{
 		get
 		{
-			return NCMIDNBFDID();
+			return GetLongPollDelay();
 		}
 		private set
 		{
-			IPMEBEILOEE(value);
+			SetLongPollDelay(value);
 		}
 	}
 
 	public NegotiationData(Connection MDGFGCDPGFI)
 	{
-		PEBFDIFIMBO = MDGFGCDPGFI;
+		connection = MDGFGCDPGFI;
 	}
 
-	public string KLMLKCKNNFD()
+	public string GetUrl()
 	{
-		return KLKKKBPEPOI;
+		return url;
 	}
 
 	private void set_Url(string value)
 	{
-		KLKKKBPEPOI = value;
+		url = value;
 	}
 
-	public string IPPHLDGJADH()
+	public string GetWebSocketServerUrl()
 	{
-		return JEKMJACHIBB;
+		return webSocketServerUrl;
 	}
 
-	private void GCFBKKBNLDI(string value)
+	private void SetWebSocketServerUrl(string value)
 	{
-		JEKMJACHIBB = value;
+		webSocketServerUrl = value;
 	}
 
-	public string HKBCNJMMOOP()
+	public string GetConnectionToken()
 	{
-		return CFEFDADCKMF;
+		return connectionToken;
 	}
 
-	private void AKFLLIIIJPF(string value)
+	private void SetConnectionToken(string value)
 	{
-		CFEFDADCKMF = value;
+		connectionToken = value;
 	}
 
-	public string FNJEMLMFGEG()
+	public string GetConnectionId()
 	{
-		return FMLCDJCADML;
+		return connectionId;
 	}
 
-	private void JFHGEPMMEEM(string value)
+	private void SetConnectionId(string value)
 	{
-		FMLCDJCADML = value;
+		connectionId = value;
 	}
 
-	public TimeSpan? FCIMGPJDODG()
+	public TimeSpan? GetKeepAliveTimeout()
 	{
-		return BAHGOFHKNKL;
+		return keepAliveTimeout;
 	}
 
 	private void set_KeepAliveTimeout(TimeSpan? value)
 	{
-		BAHGOFHKNKL = value;
+		keepAliveTimeout = value;
 	}
 
-	public TimeSpan BDMKAEDCGNL()
+	public TimeSpan GetDisconnectTimeout()
 	{
-		return HGPAAOFDBID;
+		return disconnectTimeout;
 	}
 
-	private void OFLBEAPGAPI(TimeSpan value)
+	private void SetDisconnectTimeout(TimeSpan value)
 	{
-		HGPAAOFDBID = value;
+		disconnectTimeout = value;
 	}
 
-	public TimeSpan LFLAILLBGOF()
+	public TimeSpan GetConnectionTimeout()
 	{
-		return MNFNJDDOLNN;
+		return connectionTimeout;
 	}
 
-	private void OICCAHABLBF(TimeSpan value)
+	private void SetConnectionTimeout(TimeSpan value)
 	{
-		MNFNJDDOLNN = value;
+		connectionTimeout = value;
 	}
 
-	public bool AOKNIGBFMKG()
+	public bool GetTryWebSockets()
 	{
-		return CNKCCGOKOEB;
+		return tryWebSockets;
 	}
 
 	private void set_TryWebSockets(bool value)
 	{
-		CNKCCGOKOEB = value;
+		tryWebSockets = value;
 	}
 
-	public string HMLNCKGEHMN()
+	public string GetProtocolVersion()
 	{
-		return KPKEAFHNIOA;
+		return protocolVersion;
 	}
 
-	private void BNEOABLKJDF(string value)
+	private void SetProtocolVersion(string value)
 	{
-		KPKEAFHNIOA = value;
+		protocolVersion = value;
 	}
 
-	public TimeSpan BICBAKIOCMM()
+	public TimeSpan GetTransportConnectTimeout()
 	{
-		return MFEPPIMHBKP;
+		return transportConnectTimeout;
 	}
 
-	private void MKEOKCINEBK(TimeSpan value)
+	private void SetTransportConnectTimeout(TimeSpan value)
 	{
-		MFEPPIMHBKP = value;
+		transportConnectTimeout = value;
 	}
 
-	public TimeSpan NCMIDNBFDID()
+	public TimeSpan GetLongPollDelay()
 	{
-		return MFHDCBOGDKF;
+		return longPollDelay;
 	}
 
-	private void IPMEBEILOEE(TimeSpan value)
+	private void SetLongPollDelay(TimeSpan value)
 	{
-		MFHDCBOGDKF = value;
+		longPollDelay = value;
 	}
 
 	public void Start()
 	{
-		IFLGEGDHGBD = new HTTPRequest(PEBFDIFIMBO.BuildUri(FHIEGKMHOCC.Negotiate), LAAFHDKKJFL.Get, true, true, LPMLIOMGAIO);
-		PEBFDIFIMBO.PrepareRequest(IFLGEGDHGBD, FHIEGKMHOCC.Negotiate);
-		IFLGEGDHGBD.Send();
-		HTTPManager.MBBMPNDDPIH().KDAFBLAKBMI("NegotiationData", "Negotiation request sent");
+		negotiationRequest = new HTTPRequest(connection.BuildUri(SignalRRequestType.Negotiate), HTTPMethods.Get, true, true, OnNegotiationRequestFinished);
+		connection.PrepareRequest(negotiationRequest, SignalRRequestType.Negotiate);
+		negotiationRequest.Send();
+		HTTPManager.GetLogger().Information("NegotiationData", "Negotiation request sent");
 	}
 
-	public void AKLEEMEHBIC()
+	public void Abort()
 	{
-		if (IFLGEGDHGBD != null)
+		if (negotiationRequest != null)
 		{
 			OnReceived = null;
 			OnError = null;
-			IFLGEGDHGBD.AKLEEMEHBIC();
+			negotiationRequest.Abort();
 		}
 	}
 
-	private void LPMLIOMGAIO(HTTPRequest CGOIOKHEGOE, HTTPResponse BEIGFGCBICO)
+	private void OnNegotiationRequestFinished(HTTPRequest CGOIOKHEGOE, HTTPResponse BEIGFGCBICO)
 	{
-		IFLGEGDHGBD = null;
-		switch (CGOIOKHEGOE.FLBBFDNHJAJ())
+		negotiationRequest = null;
+		switch (CGOIOKHEGOE.GetState())
 		{
-		case CFGBMHKCENK.Finished:
-			if (BEIGFGCBICO.AICKPAMONBH())
+		case HTTPRequestStates.Finished:
+			if (BEIGFGCBICO.GetIsSuccess())
 			{
-				HTTPManager.MBBMPNDDPIH().KDAFBLAKBMI("NegotiationData", "Negotiation data arrived: " + BEIGFGCBICO.DPBLPGKOEJB());
-				int num = BEIGFGCBICO.DPBLPGKOEJB().IndexOf("{");
+				HTTPManager.GetLogger().Information("NegotiationData", "Negotiation data arrived: " + BEIGFGCBICO.GetDataAsText());
+				int num = BEIGFGCBICO.GetDataAsText().IndexOf("{");
 				if (num < 0)
 				{
-					RaiseOnError("Invalid negotiation text: " + BEIGFGCBICO.DPBLPGKOEJB());
+					RaiseOnError("Invalid negotiation text: " + BEIGFGCBICO.GetDataAsText());
 					break;
 				}
-				NegotiationData jNNJJJOPCKL = Parse(BEIGFGCBICO.DPBLPGKOEJB().Substring(num));
+				NegotiationData jNNJJJOPCKL = Parse(BEIGFGCBICO.GetDataAsText().Substring(num));
 				if (jNNJJJOPCKL == null)
 				{
-					RaiseOnError("Parsing Negotiation data failed: " + BEIGFGCBICO.DPBLPGKOEJB());
+					RaiseOnError("Parsing Negotiation data failed: " + BEIGFGCBICO.GetDataAsText());
 				}
 				else if (OnReceived != null)
 				{
@@ -326,21 +326,21 @@ public sealed class NegotiationData
 			}
 			else
 			{
-				RaiseOnError(string.Format("Negotiation request finished Successfully, but the server sent an error. Status Code: {0}-{1} Message: {2} Uri: {3}", BEIGFGCBICO.KNMDPGBPNED(), BEIGFGCBICO.DCKPMHKDLEJ(), BEIGFGCBICO.DPBLPGKOEJB(), CGOIOKHEGOE.DKAECMGPGOE()));
+				RaiseOnError(string.Format("Negotiation request finished Successfully, but the server sent an error. Status Code: {0}-{1} Message: {2} Uri: {3}", BEIGFGCBICO.GetStatusCode(), BEIGFGCBICO.GetMessage(), BEIGFGCBICO.GetDataAsText(), CGOIOKHEGOE.GetCurrentUri()));
 			}
 			break;
-		case CFGBMHKCENK.Error:
-			RaiseOnError((CGOIOKHEGOE.IEFGFKFHNMD() == null) ? string.Empty : (CGOIOKHEGOE.IEFGFKFHNMD().Message + " " + CGOIOKHEGOE.IEFGFKFHNMD().StackTrace));
+		case HTTPRequestStates.Error:
+			RaiseOnError((CGOIOKHEGOE.GetException() == null) ? string.Empty : (CGOIOKHEGOE.GetException().Message + " " + CGOIOKHEGOE.GetException().StackTrace));
 			break;
 		default:
-			RaiseOnError(CGOIOKHEGOE.FLBBFDNHJAJ().ToString());
+			RaiseOnError(CGOIOKHEGOE.GetState().ToString());
 			break;
 		}
 	}
 
 	private void RaiseOnError(string KEPBNIIECPN)
 	{
-		HTTPManager.MBBMPNDDPIH().Error("NegotiationData", "Negotiation request failed with error: " + KEPBNIIECPN);
+		HTTPManager.GetLogger().Error("NegotiationData", "Negotiation request failed with error: " + KEPBNIIECPN);
 		if (OnError != null)
 		{
 			OnError(this, KEPBNIIECPN);
@@ -361,25 +361,25 @@ public sealed class NegotiationData
 			set_Url(GetString(dictionary, "Url"));
 			if (dictionary.ContainsKey("webSocketServerUrl"))
 			{
-				GCFBKKBNLDI(GetString(dictionary, "webSocketServerUrl"));
+				SetWebSocketServerUrl(GetString(dictionary, "webSocketServerUrl"));
 			}
-			AKFLLIIIJPF(Uri.EscapeDataString(GetString(dictionary, "ConnectionToken")));
-			JFHGEPMMEEM(GetString(dictionary, "ConnectionId"));
+			SetConnectionToken(Uri.EscapeDataString(GetString(dictionary, "ConnectionToken")));
+			SetConnectionId(GetString(dictionary, "ConnectionId"));
 			if (dictionary.ContainsKey("KeepAliveTimeout"))
 			{
 				set_KeepAliveTimeout(TimeSpan.FromSeconds(GetDouble(dictionary, "KeepAliveTimeout")));
 			}
-			OFLBEAPGAPI(TimeSpan.FromSeconds(GetDouble(dictionary, "DisconnectTimeout")));
-			OICCAHABLBF(TimeSpan.FromSeconds(GetDouble(dictionary, "ConnectionTimeout")));
+			SetDisconnectTimeout(TimeSpan.FromSeconds(GetDouble(dictionary, "DisconnectTimeout")));
+			SetConnectionTimeout(TimeSpan.FromSeconds(GetDouble(dictionary, "ConnectionTimeout")));
 			set_TryWebSockets((bool)Get(dictionary, "TryWebSockets"));
-			BNEOABLKJDF(GetString(dictionary, "ProtocolVersion"));
-			MKEOKCINEBK(TimeSpan.FromSeconds(GetDouble(dictionary, "TransportConnectTimeout")));
-			IPMEBEILOEE(TimeSpan.FromSeconds(GetDouble(dictionary, "LongPollDelay")));
+			SetProtocolVersion(GetString(dictionary, "ProtocolVersion"));
+			SetTransportConnectTimeout(TimeSpan.FromSeconds(GetDouble(dictionary, "TransportConnectTimeout")));
+			SetLongPollDelay(TimeSpan.FromSeconds(GetDouble(dictionary, "LongPollDelay")));
 			return this;
 		}
 		catch (Exception mPFFFAOGBJE)
 		{
-			HTTPManager.MBBMPNDDPIH().COHEDILAHFD("NegotiationData", "Parse", mPFFFAOGBJE);
+			HTTPManager.GetLogger().Exception("NegotiationData", "Parse", mPFFFAOGBJE);
 			return null;
 		}
 	}

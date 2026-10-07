@@ -9,11 +9,11 @@ internal struct ObjectMetadata
 
 	private IDictionary<string, PropertyMetadata> properties;
 
-	public Type FIFGGAOMEEB
+	public Type ItemType
 	{
 		get
 		{
-			return LPINKHOCABG();
+			return GetElementType();
 		}
 		set
 		{
@@ -21,11 +21,11 @@ internal struct ObjectMetadata
 		}
 	}
 
-	public bool KPLJCLFPMED
+	public bool IsDictionaryType
 	{
 		get
 		{
-			return PMPFFNMIKAN();
+			return GetIsDictionary();
 		}
 		set
 		{
@@ -33,19 +33,19 @@ internal struct ObjectMetadata
 		}
 	}
 
-	public IDictionary<string, PropertyMetadata> FPDMBBMEOAK
+	public IDictionary<string, PropertyMetadata> Properties
 	{
 		get
 		{
-			return FABLBHDIKCN();
+			return GetProperties();
 		}
 		set
 		{
-			IJAFNNMLFNF(value);
+			SetProperties(value);
 		}
 	}
 
-	public Type LPINKHOCABG()
+	public Type GetElementType()
 	{
 		if (element_type == null)
 		{
@@ -59,7 +59,7 @@ internal struct ObjectMetadata
 		element_type = value;
 	}
 
-	public bool PMPFFNMIKAN()
+	public bool GetIsDictionary()
 	{
 		return is_dictionary;
 	}
@@ -69,12 +69,12 @@ internal struct ObjectMetadata
 		is_dictionary = value;
 	}
 
-	public IDictionary<string, PropertyMetadata> FABLBHDIKCN()
+	public IDictionary<string, PropertyMetadata> GetProperties()
 	{
 		return properties;
 	}
 
-	public void IJAFNNMLFNF(IDictionary<string, PropertyMetadata> value)
+	public void SetProperties(IDictionary<string, PropertyMetadata> value)
 	{
 		properties = value;
 	}

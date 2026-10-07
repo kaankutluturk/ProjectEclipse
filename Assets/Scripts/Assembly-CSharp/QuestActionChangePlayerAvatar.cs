@@ -2,32 +2,32 @@ using System.Xml;
 
 public class QuestActionChangePlayerAvatar : QuestAction
 {
-	private string MBMAENOMLHF;
+	private string avatarExpression;
 
 	public override void Parse(XmlNode EPKLCPOEELO)
 	{
 		base.Parse(EPKLCPOEELO);
-		MBMAENOMLHF = EPKLCPOEELO.Attributes["Avatar"].CIPOICEEIBK(string.Empty);
+		avatarExpression = EPKLCPOEELO.Attributes["Avatar"].GetStringOrDefault(string.Empty);
 	}
 
-	public override void DEJMHFMLKIC(QuestParameters GFIHPBCEEOB)
+	public override void Execute(QuestParameters GFIHPBCEEOB)
 	{
-		base.DEJMHFMLKIC(GFIHPBCEEOB);
+		base.Execute(GFIHPBCEEOB);
 		string FHLFEBDNIFF = string.Empty;
 		GetValues(ref FHLFEBDNIFF);
-		if (GameUtils.CJKKIOIMGAC(FHLFEBDNIFF))
+		if (GameUtils.AvatarExists(FHLFEBDNIFF))
 		{
-			ListSF.CCDKHLAMKKO().BAOKBJGLKEF(FHLFEBDNIFF);
+			ListSF.GetRoster().SetAvatar(FHLFEBDNIFF);
 		}
-		OGIJONMKABB();
+		FinishAction();
 	}
 
 	private void GetValues(ref string FHLFEBDNIFF)
 	{
 		ConditionExtension.CompareResult lNIDLHOIHIM = new ConditionExtension.CompareResult();
 		QuestCondition kKDGLNECFHA = new QuestCondition();
-		kKDGLNECFHA.LIMHBJBEEIA(PAJDEKLLFNJ);
-		kKDGLNECFHA.MCPIOGALBMK(MBMAENOMLHF, lNIDLHOIHIM);
+		kKDGLNECFHA.SetParameters(Parameters);
+		kKDGLNECFHA.SetValue(avatarExpression, lNIDLHOIHIM);
 		FHLFEBDNIFF = lNIDLHOIHIM.ToString();
 	}
 }

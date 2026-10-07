@@ -500,19 +500,19 @@ namespace Eclipse.Modding
 
         internal static void Apply()
         {
-            if (LocalizationManager.MCLNNPPCFFL == null || Entries.Count == 0) return;
+            if (LocalizationManager.Languages == null || Entries.Count == 0) return;
             // Validate the complete overlay before adding anything. A collision must not
             // escape halfway through ParseModule and cause all game data to be parsed again.
             foreach (ExternalLocaleMetadata metadata in Entries)
-                foreach (LocalizationManager.Language language in LocalizationManager.MCLNNPPCFFL)
-                    if (!Applied.Contains(language)) ValidateNoCollision(metadata, language.name, language.EOMNCDDELLB);
+                foreach (LocalizationManager.Language language in LocalizationManager.Languages)
+                    if (!Applied.Contains(language)) ValidateNoCollision(metadata, language.name, language.Locale);
 
             var pending = new List<LocalizationManager.Language>();
             for (int i = 0; i < Entries.Count; i++)
             {
                 ExternalLocaleMetadata metadata = Entries[i];
                 if (Applied.Exists(language => language.name == metadata.Name &&
-                    LocalizationManager.MCLNNPPCFFL.Contains(language))) continue;
+                    LocalizationManager.Languages.Contains(language))) continue;
 
                 XmlDocument document = new XmlDocument();
                 XmlElement node = BaseLanguage == null ? document.CreateElement("Language") :
@@ -538,27 +538,27 @@ namespace Eclipse.Modding
                     Set(fonts, "CustomLineSpacingScale", metadata.CustomLineSpacingScale.ToString(System.Globalization.CultureInfo.InvariantCulture));
                     node.AppendChild(fonts);
                 }
-                var language = new LocalizationManager.Language(node, LocalizationManager.MCLNNPPCFFL.Count + pending.Count);
+                var language = new LocalizationManager.Language(node, LocalizationManager.Languages.Count + pending.Count);
                 // Loose locales supply mod strings through TOML, not a replacement base
                 // localization XML. Keep ordinary game text available through the base locale.
-                LocalizationManager.Language fallback = LocalizationManager.NLFKNPBICED(LocalizationManager.POIPGLLCCKC);
-                if (fallback != null) language.PMFEIPCHENB = fallback.PMFEIPCHENB;
+                LocalizationManager.Language fallback = LocalizationManager.FindLanguageByName(LocalizationManager.DefaultLanguageName);
+                if (fallback != null) language.FilePath = fallback.FilePath;
                 pending.Add(language);
             }
-            LocalizationManager.MCLNNPPCFFL.AddRange(pending);
+            LocalizationManager.Languages.AddRange(pending);
             Applied.AddRange(pending);
         }
 
         internal static void Clear()
         {
-            if (LocalizationManager.MCLNNPPCFFL != null)
+            if (LocalizationManager.Languages != null)
             {
-                bool selected = Applied.Contains(LocalizationManager.ILAJKOBCHFH);
+                bool selected = Applied.Contains(LocalizationManager.CurrentLanguage);
                 foreach (LocalizationManager.Language language in Applied)
-                    LocalizationManager.MCLNNPPCFFL.Remove(language);
-                for (int i = 0; i < LocalizationManager.MCLNNPPCFFL.Count; i++)
-                    LocalizationManager.MCLNNPPCFFL[i].index = i;
-                if (selected) LocalizationManager.ILAJKOBCHFH = LocalizationManager.NLFKNPBICED(LocalizationManager.POIPGLLCCKC);
+                    LocalizationManager.Languages.Remove(language);
+                for (int i = 0; i < LocalizationManager.Languages.Count; i++)
+                    LocalizationManager.Languages[i].index = i;
+                if (selected) LocalizationManager.CurrentLanguage = LocalizationManager.FindLanguageByName(LocalizationManager.DefaultLanguageName);
             }
             Applied.Clear();
             Entries.Clear();
@@ -802,8 +802,8 @@ namespace Eclipse.Modding
             // Animation startup already read this source. Reuse its pre-expansion
             // direct locks instead of loading/adapting/scanning moves.xml a second time.
             if (MovesParser.TryReadBaseMoveLockSources(wanted, out var sources)) return sources;
-            string path = SF2Paths.MCFPDHOLNGB() + "/moves.xml";
-            string text = path.StartsWith(SF2Paths.FFKEDOBDLOL) ? ResourceManager.KIHHJGJKMIC(path) : ResourceManager.GetText(path);
+            string path = SF2Paths.GetAnimationsPath() + "/moves.xml";
+            string text = path.StartsWith(SF2Paths.UserDataRoot) ? ResourceManager.GetFileOrDevText(path) : ResourceManager.GetText(path);
             var result = new Dictionary<string, XmlNode>(StringComparer.Ordinal);
             bool found = false;
             if (!string.IsNullOrEmpty(text))
@@ -871,7 +871,7 @@ namespace Eclipse.Modding
             XmlNode overlayTactics = overlayRoot["Tactics"];
             if (overlayTactics == null) return 0;
 
-            XmlDocument combined = XmlUtils.OpenXMLDocument(SF2Paths.KKIDGPBOBNI(), "tacticSettings.xml");
+            XmlDocument combined = XmlUtils.OpenXMLDocument(SF2Paths.GetGameDataPath(), "tacticSettings.xml");
             if (combined == null || combined["TacticsSettings"] == null || combined["TacticsSettings"]["Tactics"] == null)
                 throw new InvalidOperationException("Recovered tacticSettings.xml is unavailable.");
             XmlNode combinedTactics = combined["TacticsSettings"]["Tactics"];
@@ -880,7 +880,7 @@ namespace Eclipse.Modding
             foreach (XmlNode node in overlayTactics.ChildNodes)
             {
                 if (node.Name != "Tactic") continue;
-                string name = node.Attributes["Name"].CIPOICEEIBK(string.Empty);
+                string name = node.Attributes["Name"].GetStringOrDefault(string.Empty);
                 if (string.IsNullOrEmpty(name))
                     throw new InvalidOperationException("External tactic requires a Name.");
                 if (!pendingNames.Add(name))
@@ -916,7 +916,7 @@ namespace Eclipse.Modding
         private static XmlNode FindTactic(XmlNode tactics, string name)
         {
             foreach (XmlNode node in tactics.ChildNodes)
-                if (node.Name == "Tactic" && node.Attributes["Name"].CIPOICEEIBK(string.Empty) == name)
+                if (node.Name == "Tactic" && node.Attributes["Name"].GetStringOrDefault(string.Empty) == name)
                     return node;
             return null;
         }

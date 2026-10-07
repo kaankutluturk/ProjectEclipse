@@ -8,9 +8,9 @@ internal class BloodEffect
 
 	public int index;
 
-	public int BIPGHENGCFI;
+	public int LifetimeFrames;
 
-	private Vector3f KKIKIDNALOL = new Vector3f();
+	private Vector3f velocity = new Vector3f();
 
 	private int frames;
 
@@ -23,14 +23,14 @@ internal class BloodEffect
 		_Interpolation.Snap(Vector3.zero, Quaternion.identity);
 		frames = 0;
 		index = 0;
-		BIPGHENGCFI = 0;
+		LifetimeFrames = 0;
 		int min = -40;
 		int max = 40;
 		int min2 = -60;
 		int max2 = 20;
 		float num = 200f;
-		KKIKIDNALOL.SetX(JLHLMAFLMFO.GetX() / num + (float)UnityEngine.Random.Range(min, max) / 10f);
-		KKIKIDNALOL.SetY(JLHLMAFLMFO.GetY() / num + (float)UnityEngine.Random.Range(min2, max2) / 10f);
+		velocity.SetX(JLHLMAFLMFO.GetX() / num + (float)UnityEngine.Random.Range(min, max) / 10f);
+		velocity.SetY(JLHLMAFLMFO.GetY() / num + (float)UnityEngine.Random.Range(min2, max2) / 10f);
 	}
 
 	public void CreateSprite(string ONEIGMLOGDC, Color OHJKNABLCMF)
@@ -48,12 +48,12 @@ internal class BloodEffect
 	public void Render()
 	{
 		Vector3 localPosition = _Interpolation.CurrentPosition;
-		localPosition.x += KKIKIDNALOL.GetX();
-		localPosition.y += KKIKIDNALOL.GetY();
-		Vector3f kKIKIDNALOL = KKIKIDNALOL;
+		localPosition.x += velocity.GetX();
+		localPosition.y += velocity.GetY();
+		Vector3f kKIKIDNALOL = velocity;
 		kKIKIDNALOL.SetY(kKIKIDNALOL.GetY() + 0.2f);
-		int num = ((!(KKIKIDNALOL.GetX() < 0f)) ? 1 : (-1));
-		float z = Mathf.Atan((0f - KKIKIDNALOL.GetY()) / KKIKIDNALOL.GetX()) / (float)Math.PI * 180f - 90f * (float)num + 180f;
+		int num = ((!(velocity.GetX() < 0f)) ? 1 : (-1));
+		float z = Mathf.Atan((0f - velocity.GetY()) / velocity.GetX()) / (float)Math.PI * 180f - 90f * (float)num + 180f;
 		Quaternion worldRotation = Quaternion.Euler(0f, 0f, z);
 		Quaternion localRotation = (_UnityObject.transform.parent == null) ? worldRotation : Quaternion.Inverse(_UnityObject.transform.parent.rotation) * worldRotation;
 		_Interpolation.Push(localPosition, localRotation);
@@ -69,7 +69,7 @@ internal class BloodEffect
 		_UnityObject.transform.localScale = new Vector3(JDCCBCNFENK, JDCCBCNFENK, JDCCBCNFENK);
 	}
 
-	public void AGNODHKEJCJ()
+	public void Destroy()
 	{
 		UnityEngine.Object.Destroy(_UnityObject);
 	}

@@ -2,16 +2,16 @@ using Nekki.SF2.GUI.Shop;
 
 public class QuestActionUpgrades : QuestAction
 {
-	public override void DEJMHFMLKIC(QuestParameters GFIHPBCEEOB)
+	public override void Execute(QuestParameters GFIHPBCEEOB)
 	{
-		base.DEJMHFMLKIC(GFIHPBCEEOB);
-		Roster nKGLHEGIKKP = ListSF.CCDKHLAMKKO();
-		nKGLHEGIKKP.MJLDOEOMLEG(true);
+		base.Execute(GFIHPBCEEOB);
+		Roster nKGLHEGIKKP = ListSF.GetRoster();
+		nKGLHEGIKKP.SetShowUpgrades(true);
 		ShopScene instance = ShopScene.get_Instance();
 		if (instance != null)
 		{
 			instance.UpdateScene(null);
 		}
-		OGIJONMKABB();
+		FinishAction();
 	}
 }

@@ -5,21 +5,21 @@ using UnityEngine;
 
 public class CoroutineManager : MonoBehaviour
 {
-	private class LEPFPPAGHCO
+	private class CoroutineEntry
 	{
-		private static Dictionary<IEnumerator, LEPFPPAGHCO> _Coroutines = new Dictionary<IEnumerator, LEPFPPAGHCO>();
+		private static Dictionary<IEnumerator, CoroutineEntry> _Coroutines = new Dictionary<IEnumerator, CoroutineEntry>();
 
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		private IEnumerator LCHPADNHGAC;
+		private IEnumerator _routine;
 
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		private bool MDLALOPMKHF;
+		private bool _isRunning;
 
-		public IEnumerator BCLGCMNJMKD
+		public IEnumerator CoroutineEnumerator
 		{
 			get
 			{
-				return FFHBAIFLBMN();
+				return GetRoutine();
 			}
 			private set
 			{
@@ -27,11 +27,11 @@ public class CoroutineManager : MonoBehaviour
 			}
 		}
 
-		public bool OEDPHHDKECI
+		public bool IsEntryRunning
 		{
 			get
 			{
-				return NMACGEJHPDN();
+				return GetIsRunning();
 			}
 			private set
 			{
@@ -39,51 +39,51 @@ public class CoroutineManager : MonoBehaviour
 			}
 		}
 
-		public object BLOOLFFMKFI
+		public object CurrentItem
 		{
 			get
 			{
-				return AOJJOEHEPGM();
+				return GetCurrent();
 			}
 		}
 
-		public LEPFPPAGHCO(IEnumerator BBMAOMICECF)
+		public CoroutineEntry(IEnumerator BBMAOMICECF)
 		{
 			set_Routine(BBMAOMICECF);
 			set_IsRunning(true);
 			_Coroutines.Add(BBMAOMICECF, this);
 		}
 
-		public static LEPFPPAGHCO EMKADAPENNE(IEnumerator BBMAOMICECF)
+		public static CoroutineEntry Find(IEnumerator BBMAOMICECF)
 		{
-			LEPFPPAGHCO value = null;
+			CoroutineEntry value = null;
 			_Coroutines.TryGetValue(BBMAOMICECF, out value);
 			return value;
 		}
 
-		public IEnumerator FFHBAIFLBMN()
+		public IEnumerator GetRoutine()
 		{
-			return LCHPADNHGAC;
+			return _routine;
 		}
 
 		private void set_Routine(IEnumerator value)
 		{
-			LCHPADNHGAC = value;
+			_routine = value;
 		}
 
-		public bool NMACGEJHPDN()
+		public bool GetIsRunning()
 		{
-			return MDLALOPMKHF;
+			return _isRunning;
 		}
 
 		private void set_IsRunning(bool value)
 		{
-			MDLALOPMKHF = value;
+			_isRunning = value;
 		}
 
-		public bool PCCMLADDNDG()
+		public bool MoveNext()
 		{
-			if (FFHBAIFLBMN() != null && FFHBAIFLBMN().MoveNext())
+			if (GetRoutine() != null && GetRoutine().MoveNext())
 			{
 				return true;
 			}
@@ -93,23 +93,23 @@ public class CoroutineManager : MonoBehaviour
 
 		public void Stop()
 		{
-			if (NMACGEJHPDN())
+			if (GetIsRunning())
 			{
 				set_IsRunning(false);
-				_Coroutines.Remove(FFHBAIFLBMN());
+				_Coroutines.Remove(GetRoutine());
 			}
 		}
 
-		public object AOJJOEHEPGM()
+		public object GetCurrent()
 		{
-			return FFHBAIFLBMN().Current;
+			return GetRoutine().Current;
 		}
 	}
 
 	private static CoroutineManager _Current;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private bool PGAHCGBPNDB;
+	private bool _isPaused;
 
 	public static CoroutineManager BLOOLFFMKFI
 	{
@@ -119,7 +119,7 @@ public class CoroutineManager : MonoBehaviour
 		}
 	}
 
-	public bool FPJLHEMGNNB
+	public bool ManagerPaused
 	{
 		get
 		{
@@ -127,7 +127,7 @@ public class CoroutineManager : MonoBehaviour
 		}
 		private set
 		{
-			AHIEFDIHONK(value);
+			SetIsPaused(value);
 		}
 	}
 
@@ -143,23 +143,23 @@ public class CoroutineManager : MonoBehaviour
 
 	public bool get_IsPaused()
 	{
-		return PGAHCGBPNDB;
+		return _isPaused;
 	}
 
-	private void AHIEFDIHONK(bool value)
+	private void SetIsPaused(bool value)
 	{
-		PGAHCGBPNDB = value;
+		_isPaused = value;
 	}
 
 	public void StartRoutine(IEnumerator BBMAOMICECF)
 	{
-		LEPFPPAGHCO cCCLFIBGGDD = new LEPFPPAGHCO(BBMAOMICECF);
-		StartCoroutine(NAONPKJJKNH(cCCLFIBGGDD));
+		CoroutineEntry cCCLFIBGGDD = new CoroutineEntry(BBMAOMICECF);
+		StartCoroutine(RunRoutine(cCCLFIBGGDD));
 	}
 
 	public void StopRoutine(IEnumerator BBMAOMICECF)
 	{
-		LEPFPPAGHCO lEPFPPAGHCO = LEPFPPAGHCO.EMKADAPENNE(BBMAOMICECF);
+		CoroutineEntry lEPFPPAGHCO = CoroutineEntry.Find(BBMAOMICECF);
 		if (lEPFPPAGHCO != null)
 		{
 			lEPFPPAGHCO.Stop();
@@ -167,29 +167,29 @@ public class CoroutineManager : MonoBehaviour
 		StopCoroutine(BBMAOMICECF);
 	}
 
-	private IEnumerator NAONPKJJKNH(LEPFPPAGHCO CCCLFIBGGDD)
+	private IEnumerator RunRoutine(CoroutineEntry CCCLFIBGGDD)
 	{
 		yield return null;
-		while (CCCLFIBGGDD.NMACGEJHPDN())
+		while (CCCLFIBGGDD.GetIsRunning())
 		{
 			if (get_IsPaused())
 			{
 				yield return null;
 			}
-			else if (CCCLFIBGGDD.PCCMLADDNDG())
+			else if (CCCLFIBGGDD.MoveNext())
 			{
-				yield return CCCLFIBGGDD.AOJJOEHEPGM();
+				yield return CCCLFIBGGDD.GetCurrent();
 			}
 		}
 	}
 
 	private void Awake()
 	{
-		AHIEFDIHONK(false);
+		SetIsPaused(false);
 	}
 
 	private void OnApplicationPause(bool OIBJJLBCEHA)
 	{
-		AHIEFDIHONK(OIBJJLBCEHA);
+		SetIsPaused(OIBJJLBCEHA);
 	}
 }

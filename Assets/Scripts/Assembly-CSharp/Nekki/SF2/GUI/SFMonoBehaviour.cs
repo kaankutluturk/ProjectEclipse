@@ -5,31 +5,31 @@ namespace Nekki.SF2.GUI
 {
 	public class SFMonoBehaviour<T> : MonoBehaviour, global::IEventDispatcher<T>
 	{
-		private global::EventDispatcher<T> NBKJBIIPPNB = new global::EventDispatcher<T>();
+		private global::EventDispatcher<T> eventDispatcher = new global::EventDispatcher<T>();
 
 		public int AddEventListener(int name, Action<T> ODDEOFKLIAG)
 		{
-			return NBKJBIIPPNB.AddEventListener(name, ODDEOFKLIAG);
+			return eventDispatcher.AddEventListener(name, ODDEOFKLIAG);
 		}
 
 		public int CallEvent(int name, T EHCLMBADLKH)
 		{
-			return NBKJBIIPPNB.CallEvent(name, EHCLMBADLKH);
+			return eventDispatcher.CallEvent(name, EHCLMBADLKH);
 		}
 
 		public int RemoveAllEventListener()
 		{
-			return NBKJBIIPPNB.RemoveAllEventListener();
+			return eventDispatcher.RemoveAllEventListener();
 		}
 
 		public int RemoveEvent(int name)
 		{
-			return NBKJBIIPPNB.RemoveEvent(name);
+			return eventDispatcher.RemoveEvent(name);
 		}
 
 		public int RemoveEventListener(int name, Action<T> ODDEOFKLIAG)
 		{
-			return NBKJBIIPPNB.RemoveEventListener(name, ODDEOFKLIAG);
+			return eventDispatcher.RemoveEventListener(name, ODDEOFKLIAG);
 		}
 	}
 }

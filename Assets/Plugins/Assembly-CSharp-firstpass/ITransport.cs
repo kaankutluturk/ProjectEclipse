@@ -2,21 +2,21 @@ using System.Collections.Generic;
 
 public interface ITransport
 {
-	FGMEPPMFFKG AFINHOBCHMC { get; }
+	SocketIOTransportState CurrentState { get; }
 
-	SocketManager CPOHGNDIBJD { get; }
+	SocketManager TransportManager { get; }
 
-	bool KNCJBAHIAGI { get; }
+	bool HasPendingRequest { get; }
 
-	FGMEPPMFFKG FLBBFDNHJAJ();
+	SocketIOTransportState GetState();
 
-	SocketManager HLBNHJADOMP();
+	SocketManager GetManager();
 
-	bool LILBDKKEHCE();
+	bool GetIsRequestInProgress();
 
-	void LAJCMNNNIIM();
+	void OpenTransport();
 
-	void GNGIDEJLNCF();
+	void Poll();
 
 	void Send(Packet NPKADBPBKIG);
 

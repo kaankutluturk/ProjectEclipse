@@ -2,7 +2,7 @@ using System.Xml;
 
 public class Rewardable
 {
-	public enum GADCOGHCGDP
+	public enum RewardKind
 	{
 		REWARD_NOTHING = 0,
 		REWARD_ITEM = 1,
@@ -12,15 +12,15 @@ public class Rewardable
 		REWARD_LOTTERY = 5
 	}
 
-	public GADCOGHCGDP CLOGJMBMMPI;
+	public RewardKind Kind;
 
-	public bool IDGKPLBKDIB;
+	public bool IsDrop;
 
-	public bool GOOBKHECJIF;
+	public bool ShowReward;
 
 	public virtual void Parse(XmlNode node)
 	{
-		IDGKPLBKDIB = node.Attributes["Drop"].ParseBool();
-		GOOBKHECJIF = node.Attributes["ShowReward"].ParseBool();
+		IsDrop = node.Attributes["Drop"].ParseBool();
+		ShowReward = node.Attributes["ShowReward"].ParseBool();
 	}
 }

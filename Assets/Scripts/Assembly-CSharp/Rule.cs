@@ -5,7 +5,7 @@ using System.Xml;
 
 public class Rule : global::EventDispatcher<object>
 {
-	public enum BCBLLMPAMLP
+	public enum RuleType
 	{
 		RuleItem = 0,
 		RuleEquipItem = 1,
@@ -50,7 +50,7 @@ public class Rule : global::EventDispatcher<object>
 		RuleLightInTheDarkness = 42
 	}
 
-	public enum DIMPPDKCBLE
+	public enum RuleModeFilter
 	{
 		MODE_ECLIPSE = 0,
 		MODE_NORMAL = 1,
@@ -59,40 +59,40 @@ public class Rule : global::EventDispatcher<object>
 
 	public Rule ParentRule;
 
-	protected DeflatedString HEPAHAKDDGC = new DeflatedString();
+	protected DeflatedString xmlSource = new DeflatedString();
 
-	protected BCBLLMPAMLP _type;
+	protected RuleType _type;
 
-	public DIMPPDKCBLE PGOPBNMFAAG;
+	public RuleModeFilter ModeFilter;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private bool HNDCEAGNNMG;
+	private bool active;
 
-	protected bool DBOIEEKHBOD;
+	protected bool appliesToAllRounds;
 
 	public bool IsRandom;
 
-	protected List<int> APNNBCCKAJA = new List<int>();
+	protected List<int> unusedIntList = new List<int>();
 
 	protected List<int> _rounds = new List<int>();
 
-	public int KLJOBCIINOF;
+	public int MinLevel;
 
-	public int NMPCMFDGOKA;
+	public int MaxLevel;
 
-	public DeflatedString KPMOBOPDMDO
+	public DeflatedString XmlSource
 	{
 		get
 		{
-			return GIFDJEEGCJI();
+			return GetXmlSource();
 		}
 	}
 
-	public bool MMAIGKHJPMI
+	public bool IsActive
 	{
 		get
 		{
-			return HHHPGLLBPMF();
+			return GetActive();
 		}
 		private set
 		{
@@ -100,53 +100,53 @@ public class Rule : global::EventDispatcher<object>
 		}
 	}
 
-	public Rule(BCBLLMPAMLP LFLGCDNKNJI, XmlNode node)
+	public Rule(RuleType LFLGCDNKNJI, XmlNode node)
 	{
 		_type = LFLGCDNKNJI;
 		set_Active(true);
-		DBOIEEKHBOD = true;
+		appliesToAllRounds = true;
 		ParentRule = null;
 		IsRandom = false;
-		PGOPBNMFAAG = DIMPPDKCBLE.MODE_ALL;
-		KLJOBCIINOF = 0;
-		NMPCMFDGOKA = int.MaxValue;
-		HEPAHAKDDGC.Set(node);
-		MIJDEAIEEMM(node);
-		EALGLHDGAAH(node);
+		ModeFilter = RuleModeFilter.MODE_ALL;
+		MinLevel = 0;
+		MaxLevel = int.MaxValue;
+		xmlSource.Set(node);
+		ParseRounds(node);
+		ParseEclipseMode(node);
 	}
 
 	public Rule(Rule HNBFMAKFJAM)
 	{
 		_type = HNBFMAKFJAM._type;
-		set_Active(HNBFMAKFJAM.HHHPGLLBPMF());
-		DBOIEEKHBOD = HNBFMAKFJAM.DBOIEEKHBOD;
+		set_Active(HNBFMAKFJAM.GetActive());
+		appliesToAllRounds = HNBFMAKFJAM.appliesToAllRounds;
 		ParentRule = HNBFMAKFJAM.ParentRule;
 		IsRandom = HNBFMAKFJAM.IsRandom;
-		PGOPBNMFAAG = HNBFMAKFJAM.PGOPBNMFAAG;
-		KLJOBCIINOF = HNBFMAKFJAM.KLJOBCIINOF;
-		NMPCMFDGOKA = HNBFMAKFJAM.NMPCMFDGOKA;
+		ModeFilter = HNBFMAKFJAM.ModeFilter;
+		MinLevel = HNBFMAKFJAM.MinLevel;
+		MaxLevel = HNBFMAKFJAM.MaxLevel;
 		_rounds = HNBFMAKFJAM._rounds;
-		HEPAHAKDDGC = HNBFMAKFJAM.HEPAHAKDDGC;
+		xmlSource = HNBFMAKFJAM.xmlSource;
 	}
 
-	public DeflatedString GIFDJEEGCJI()
+	public DeflatedString GetXmlSource()
 	{
-		return HEPAHAKDDGC;
+		return xmlSource;
 	}
 
-	public BCBLLMPAMLP get_Type()
+	public RuleType get_Type()
 	{
 		return _type;
 	}
 
-	public bool HHHPGLLBPMF()
+	public bool GetActive()
 	{
-		return HNDCEAGNNMG;
+		return active;
 	}
 
 	private void set_Active(bool value)
 	{
-		HNDCEAGNNMG = value;
+		active = value;
 	}
 
 	public virtual void SetActive(bool value)
@@ -159,14 +159,14 @@ public class Rule : global::EventDispatcher<object>
 		return true;
 	}
 
-	public bool MIFEDJNJHNF()
+	public bool AppliesToAllRounds()
 	{
-		return DBOIEEKHBOD;
+		return appliesToAllRounds;
 	}
 
-	public bool HAKHBAOJBON(int round)
+	public bool AppliesToRound(int round)
 	{
-		if (!DBOIEEKHBOD)
+		if (!appliesToAllRounds)
 		{
 			foreach (int item in _rounds)
 			{
@@ -180,35 +180,35 @@ public class Rule : global::EventDispatcher<object>
 		return true;
 	}
 
-	public bool CHDEIEMINPF()
+	public bool IsPlayerLevelInRange()
 	{
-		return JKAHFDFNLPM();
+		return IsLevelInRange();
 	}
 
-	protected bool JKAHFDFNLPM(int MHNCENBCECJ)
+	protected bool IsLevelInRange(int MHNCENBCECJ)
 	{
-		return MHNCENBCECJ >= KLJOBCIINOF && MHNCENBCECJ <= NMPCMFDGOKA;
+		return MHNCENBCECJ >= MinLevel && MHNCENBCECJ <= MaxLevel;
 	}
 
-	protected bool JKAHFDFNLPM()
+	protected bool IsLevelInRange()
 	{
-		int mHNCENBCECJ = ListSF.CCDKHLAMKKO().PINDEKDNCNL();
-		return JKAHFDFNLPM(mHNCENBCECJ);
+		int mHNCENBCECJ = ListSF.GetRoster().GetLevel();
+		return IsLevelInRange(mHNCENBCECJ);
 	}
 
 	protected virtual void Parse(XmlNode node)
 	{
-		MIJDEAIEEMM(node);
-		EALGLHDGAAH(node);
+		ParseRounds(node);
+		ParseEclipseMode(node);
 	}
 
-	protected void MIJDEAIEEMM(XmlNode node)
+	protected void ParseRounds(XmlNode node)
 	{
 		XmlAttribute cJBEMNNNHDM = node.Attributes["Round"];
 		if (!cJBEMNNNHDM.Empty())
 		{
-			DBOIEEKHBOD = false;
-			string text = cJBEMNNNHDM.CIPOICEEIBK(string.Empty);
+			appliesToAllRounds = false;
+			string text = cJBEMNNNHDM.GetStringOrDefault(string.Empty);
 			string[] array = text.Split('|');
 			string[] array2 = array;
 			foreach (string value in array2)
@@ -219,21 +219,21 @@ public class Rule : global::EventDispatcher<object>
 		}
 	}
 
-	protected void EALGLHDGAAH(XmlNode node)
+	protected void ParseEclipseMode(XmlNode node)
 	{
 		bool flag = node.Attributes["Eclipse"].Empty();
 		bool flag2 = node.Attributes["Eclipse"].ParseBool();
 		if (flag)
 		{
-			PGOPBNMFAAG = DIMPPDKCBLE.MODE_ALL;
+			ModeFilter = RuleModeFilter.MODE_ALL;
 		}
 		else if (flag2)
 		{
-			PGOPBNMFAAG = DIMPPDKCBLE.MODE_ECLIPSE;
+			ModeFilter = RuleModeFilter.MODE_ECLIPSE;
 		}
 		else
 		{
-			PGOPBNMFAAG = DIMPPDKCBLE.MODE_NORMAL;
+			ModeFilter = RuleModeFilter.MODE_NORMAL;
 		}
 	}
 }

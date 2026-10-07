@@ -4,75 +4,75 @@ public class Achievement
 {
 	public int Priority;
 
-	public int EOGLBDCLMBM;
+	public int CounterValue;
 
-	public int ANCDKCFLHOL;
+	public int MoneyPrize;
 
-	public int LBJFKGAHBBG;
+	public int BonusPrize;
 
 	public string Name;
 
-	public string MGNNJPBCOGD;
+	public string Description;
 
-	public string MJBPMLCLMFN;
+	public string IconName;
 
-	public string EIEBHLJCOKE;
+	public string PlatformId;
 
-	public bool HGMHEOGJDMM;
+	public bool IsUnlocked;
 
-	public bool NMCBAKACIGK;
+	public bool RewardClaimed;
 
-	public bool GDCBBAHKCIE;
+	public bool IsHidden;
 
-	private bool ENNNIICHPBM;
+	private bool isNew;
 
 	public bool IsNew
 	{
 		get
 		{
-			return DBHJGAGOLOB();
+			return GetIsNew();
 		}
 		set
 		{
-			BEBDMOEIEJN(value);
+			SetIsNew(value);
 		}
 	}
 
 	public Achievement(XmlNode node)
 	{
-		EOGLBDCLMBM = node.Attributes["CounterValue"].ParseInt();
+		CounterValue = node.Attributes["CounterValue"].ParseInt();
 		Priority = node.Attributes["Priority"].ParseInt();
-		Name = node.Attributes["Name"].CIPOICEEIBK(string.Empty);
-		MGNNJPBCOGD = node.Attributes["Description"].CIPOICEEIBK(string.Empty);
-		MJBPMLCLMFN = node.Attributes["Icon"].CIPOICEEIBK(string.Empty);
-		ANCDKCFLHOL = node.Attributes["MoneyPrize"].ParseInt();
-		LBJFKGAHBBG = node.Attributes["BonusPrize"].ParseInt();
-		GDCBBAHKCIE = node.Attributes["Hidden"].ParseBool();
-		HGMHEOGJDMM = false;
-		NMCBAKACIGK = false;
-		ENNNIICHPBM = false;
-		if (SystemProperties.IPJFCBAGMJJ())
+		Name = node.Attributes["Name"].GetStringOrDefault(string.Empty);
+		Description = node.Attributes["Description"].GetStringOrDefault(string.Empty);
+		IconName = node.Attributes["Icon"].GetStringOrDefault(string.Empty);
+		MoneyPrize = node.Attributes["MoneyPrize"].ParseInt();
+		BonusPrize = node.Attributes["BonusPrize"].ParseInt();
+		IsHidden = node.Attributes["Hidden"].ParseBool();
+		IsUnlocked = false;
+		RewardClaimed = false;
+		isNew = false;
+		if (SystemProperties.IsAndroidPlatform())
 		{
-			EIEBHLJCOKE = node.Attributes["GooglePlayID"].CIPOICEEIBK(string.Empty);
+			PlatformId = node.Attributes["GooglePlayID"].GetStringOrDefault(string.Empty);
 		}
 		else
 		{
-			EIEBHLJCOKE = node.Attributes["GameCenterID"].CIPOICEEIBK(string.Empty);
+			PlatformId = node.Attributes["GameCenterID"].GetStringOrDefault(string.Empty);
 		}
 	}
 
-	public void BEBDMOEIEJN(bool value)
+	public void SetIsNew(bool value)
 	{
-		ENNNIICHPBM = value && (ANCDKCFLHOL > 0 || LBJFKGAHBBG > 0);
+		isNew = value && (MoneyPrize > 0 || BonusPrize > 0);
 	}
 
-	public bool DBHJGAGOLOB()
+	public bool GetIsNew()
 	{
-		return ENNNIICHPBM;
+		return isNew;
 	}
 
-	public string CIOKDNDHFBE()
+	public string GetIconName()
 	{
-		return MJBPMLCLMFN;
+		return IconName;
 	}
 }

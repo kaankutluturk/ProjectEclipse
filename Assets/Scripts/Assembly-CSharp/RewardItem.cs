@@ -44,22 +44,22 @@ public class RewardItem : Rewardable
 		}
 	}
 
-	protected string JNPPCEGFJLE;
+	protected string levelExpression;
 
-	public List<PerkStruct> LDLPCOFHFKE = new List<PerkStruct>();
+	public List<PerkStruct> enchantments = new List<PerkStruct>();
 
 	public RewardItem(XmlNode node)
 	{
 		Parse(node);
-		CLOGJMBMMPI = GADCOGHCGDP.REWARD_ITEM;
-		Name = node.Attributes["Name"].CIPOICEEIBK(string.Empty);
-		JNPPCEGFJLE = node.Attributes["Level"].CIPOICEEIBK(string.Empty);
+		Kind = RewardKind.REWARD_ITEM;
+		Name = node.Attributes["Name"].GetStringOrDefault(string.Empty);
+		levelExpression = node.Attributes["Level"].GetStringOrDefault(string.Empty);
 		UpgradeNumber = node.Attributes["UpgradeNumber"].ParseUint();
-		UpgradeLevelExpression = node.Attributes["UpgradeLevel"].CIPOICEEIBK(string.Empty);
-		EclipseRewardId = node.Attributes["EclipseReward"].CIPOICEEIBK(string.Empty);
+		UpgradeLevelExpression = node.Attributes["UpgradeLevel"].GetStringOrDefault(string.Empty);
+		EclipseRewardId = node.Attributes["EclipseReward"].GetStringOrDefault(string.Empty);
 		int grantIndex;
 		if (!string.IsNullOrEmpty(EclipseRewardId) &&
-			int.TryParse(node.Attributes["EclipseGrant"].CIPOICEEIBK(string.Empty), NumberStyles.None,
+			int.TryParse(node.Attributes["EclipseGrant"].GetStringOrDefault(string.Empty), NumberStyles.None,
 				CultureInfo.InvariantCulture, out grantIndex)) EclipseGrantIndex = grantIndex;
 		if (HasEclipseGrantConfiguration && node is XmlElement sourceElement)
 			_sourceNode = (XmlElement)sourceElement.CloneNode(true);
@@ -75,7 +75,7 @@ public class RewardItem : Rewardable
 		foreach (XmlNode childNode in xmlNode.ChildNodes)
 		{
 			PerkStruct item = new PerkStruct(childNode);
-			LDLPCOFHFKE.Add(item);
+			enchantments.Add(item);
 		}
 	}
 
@@ -117,9 +117,9 @@ public class RewardItem : Rewardable
 		return new RewardItem(item);
 	}
 
-	public int CMEFKONFDKN()
+	public int EvaluateLevel()
 	{
-		return EvaluateLevelExpression(JNPPCEGFJLE).ToInt();
+		return EvaluateLevelExpression(levelExpression).ToInt();
 	}
 
 	internal int EvaluateUpgradeLevel()
@@ -134,31 +134,31 @@ public class RewardItem : Rewardable
 	{
 		FunctionExtension oPIFBDJNMKD = new FunctionExtension();
 		oPIFBDJNMKD.Parse(expression);
-		oPIFBDJNMKD.PBPBNENGLPA(HJFEFJIEINN);
-		oPIFBDJNMKD.DMPCFMACDJM(OKPFNCJFLDL);
-		FunctionResult dEIHAOLOPLC = oPIFBDJNMKD.IBCPKBBAFNH();
-		return dEIHAOLOPLC.DCJLKCFKCOM;
+		oPIFBDJNMKD.SetFunctionCallback(OnFunctionCalled);
+		oPIFBDJNMKD.SetVariableCallback(OnFunctionCompleted);
+		FunctionResult dEIHAOLOPLC = oPIFBDJNMKD.Calculate();
+		return dEIHAOLOPLC.Value;
 	}
 
-	public void OKPFNCJFLDL(FunctionExtension.CallbackResult DCJLKCFKCOM)
+	public void OnFunctionCompleted(FunctionExtension.CallbackResult DCJLKCFKCOM)
 	{
 	}
 
-	public void HJFEFJIEINN(FunctionExtension.CallbackResult DCJLKCFKCOM)
+	public void OnFunctionCalled(FunctionExtension.CallbackResult DCJLKCFKCOM)
 	{
-		FunctionExtension.GLBAFLLMOOH gLBAFLLMOOH = DCJLKCFKCOM.data as FunctionExtension.GLBAFLLMOOH;
-		FunctionResult nAGGNMIFFGK = DCJLKCFKCOM.NAGGNMIFFGK;
-		if (gLBAFLLMOOH.FJLOLCPJACB.Equals("Player"))
+		FunctionExtension.FunctionCall gLBAFLLMOOH = DCJLKCFKCOM.data as FunctionExtension.FunctionCall;
+		FunctionResult nAGGNMIFFGK = DCJLKCFKCOM.result;
+		if (gLBAFLLMOOH.functionName.Equals("Player"))
 		{
-			BJAOOMLBIHK(gLBAFLLMOOH, nAGGNMIFFGK);
+			ResolvePlayerFunction(gLBAFLLMOOH, nAGGNMIFFGK);
 		}
 	}
 
-	private void BJAOOMLBIHK(FunctionExtension.GLBAFLLMOOH KJFKPMCPIBH, FunctionResult DCJLKCFKCOM)
+	private void ResolvePlayerFunction(FunctionExtension.FunctionCall KJFKPMCPIBH, FunctionResult DCJLKCFKCOM)
 	{
-		if (KJFKPMCPIBH.HBDLDIKHFEG.Equals("Level"))
+		if (KJFKPMCPIBH.propertyName.Equals("Level"))
 		{
-			DCJLKCFKCOM.DCJLKCFKCOM = ListSF.CCDKHLAMKKO().PINDEKDNCNL().ToString();
+			DCJLKCFKCOM.Value = ListSF.GetRoster().GetLevel().ToString();
 		}
 	}
 }

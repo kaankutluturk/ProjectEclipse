@@ -2,7 +2,7 @@ using System.Xml;
 
 public class QuestEvent
 {
-	public enum PMDPDMFLCIJ
+	public enum QuestEventType
 	{
 		QUEST_EVENT_NONE = 0,
 		QUEST_EVENT_FIGHT_ENTER = 1,
@@ -58,129 +58,129 @@ public class QuestEvent
         QUEST_EVENT_SHOW_RAID_LOOT = 51
 	}
 
-	public PMDPDMFLCIJ LFLGCDNKNJI;
+	public QuestEventType eventType;
 
 	public virtual void Parse(XmlNode node)
 	{
-		LFLGCDNKNJI = HDPFFPAGOPE(node.Name);
+		eventType = ParseEventType(node.Name);
 	}
 
-	public bool IsEvent(PMDPDMFLCIJ LJICOHPCPKO)
+	public bool IsEvent(QuestEventType LJICOHPCPKO)
 	{
-		return LJICOHPCPKO == LFLGCDNKNJI;
+		return LJICOHPCPKO == eventType;
 	}
 
-	public static PMDPDMFLCIJ HDPFFPAGOPE(string LFLGCDNKNJI)
+	public static QuestEventType ParseEventType(string LFLGCDNKNJI)
 	{
 		switch (LFLGCDNKNJI)
 		{
-        case "RaidMapEnter": return PMDPDMFLCIJ.QUEST_EVENT_RAID_MAP_ENTER;
-        case "RaidFloorChanged": return PMDPDMFLCIJ.QUEST_EVENT_RAID_FLOOR_CHANGED;
-        case "ShowRaidLoot": return PMDPDMFLCIJ.QUEST_EVENT_SHOW_RAID_LOOT;
+        case "RaidMapEnter": return QuestEventType.QUEST_EVENT_RAID_MAP_ENTER;
+        case "RaidFloorChanged": return QuestEventType.QUEST_EVENT_RAID_FLOOR_CHANGED;
+        case "ShowRaidLoot": return QuestEventType.QUEST_EVENT_SHOW_RAID_LOOT;
 
 		case "FightEnter":
-			return PMDPDMFLCIJ.QUEST_EVENT_FIGHT_ENTER;
+			return QuestEventType.QUEST_EVENT_FIGHT_ENTER;
 		case "FightEnd":
-			return PMDPDMFLCIJ.QUEST_EVENT_FIGHT_END;
+			return QuestEventType.QUEST_EVENT_FIGHT_END;
 		case "RaidFightEnter":
-			return PMDPDMFLCIJ.QUEST_EVENT_RAID_FIGHT_ENTER;
+			return QuestEventType.QUEST_EVENT_RAID_FIGHT_ENTER;
 		case "RaidFightEnd":
-			return PMDPDMFLCIJ.QUEST_EVENT_RAID_FIGHT_END;
+			return QuestEventType.QUEST_EVENT_RAID_FIGHT_END;
 		case "LevelUp":
-			return PMDPDMFLCIJ.QUEST_EVENT_LEVEL_UP;
+			return QuestEventType.QUEST_EVENT_LEVEL_UP;
 		case "GotItem":
-			return PMDPDMFLCIJ.QUEST_EVENT_GOT_ITEM;
+			return QuestEventType.QUEST_EVENT_GOT_ITEM;
 		case "Dialog":
-			return PMDPDMFLCIJ.QUEST_EVENT_DIALOG;
+			return QuestEventType.QUEST_EVENT_DIALOG;
 		case "SessionStart":
-			return PMDPDMFLCIJ.QUEST_EVENT_SESSION;
+			return QuestEventType.QUEST_EVENT_SESSION;
 		case "Activate":
-			return PMDPDMFLCIJ.QUEST_EVENT_ACTIVATE;
+			return QuestEventType.QUEST_EVENT_ACTIVATE;
 		case "Purchase":
-			return PMDPDMFLCIJ.QUEST_EVENT_PURCHASE;
+			return QuestEventType.QUEST_EVENT_PURCHASE;
 		case "PrePurchase":
-			return PMDPDMFLCIJ.QUEST_EVENT_PREPURCHASE;
+			return QuestEventType.QUEST_EVENT_PREPURCHASE;
 		case "LoginFacebook":
-			return PMDPDMFLCIJ.QUEST_EVENT_LOGIN_FB;
+			return QuestEventType.QUEST_EVENT_LOGIN_FB;
 		case "Delivery":
-			return PMDPDMFLCIJ.QUEST_EVENT_DELIVERY;
+			return QuestEventType.QUEST_EVENT_DELIVERY;
 		case "EnergyChanged":
-			return PMDPDMFLCIJ.QUEST_EVENT_ENERGY;
+			return QuestEventType.QUEST_EVENT_ENERGY;
 		case "ServerCurrencyMessage":
-			return PMDPDMFLCIJ.QUEST_EVENT_SERVER_CURRENCY;
+			return QuestEventType.QUEST_EVENT_SERVER_CURRENCY;
 		case "SettingsLangSwitch":
-			return PMDPDMFLCIJ.QUEST_EVENT_LANGUAGE_SWITCH;
+			return QuestEventType.QUEST_EVENT_LANGUAGE_SWITCH;
 		case "FreeSectionButton":
-			return PMDPDMFLCIJ.QUEST_EVENT_FREE_SECTION_BUTTON;
+			return QuestEventType.QUEST_EVENT_FREE_SECTION_BUTTON;
 		case "ApplicationStart":
-			return PMDPDMFLCIJ.QUEST_EVENT_START_APPLICATION;
+			return QuestEventType.QUEST_EVENT_START_APPLICATION;
 		case "ChangeTab":
-			return PMDPDMFLCIJ.QUEST_EVENT_CHANGE_TAB;
+			return QuestEventType.QUEST_EVENT_CHANGE_TAB;
 		case "PurchaseUnsuccessful":
-			return PMDPDMFLCIJ.QUEST_EVENT_PURCHASE_UNSUCCESSFUL;
+			return QuestEventType.QUEST_EVENT_PURCHASE_UNSUCCESSFUL;
 		case "StarterPackPress":
-			return PMDPDMFLCIJ.QUEST_EVENT_STARTER_PACK_PRESS;
+			return QuestEventType.QUEST_EVENT_STARTER_PACK_PRESS;
 		case "EnergyBarPress":
-			return PMDPDMFLCIJ.QUEST_EVENT_ENERGY_BAR_PRESS;
+			return QuestEventType.QUEST_EVENT_ENERGY_BAR_PRESS;
 		case "VideoButtonPress":
-			return PMDPDMFLCIJ.QUEST_EVENT_VIDEO_BUTTON_PRESS;
+			return QuestEventType.QUEST_EVENT_VIDEO_BUTTON_PRESS;
 		case "TimerEnd":
-			return PMDPDMFLCIJ.QUEST_EVENT_TIMER_END;
+			return QuestEventType.QUEST_EVENT_TIMER_END;
 		case "MapButtonPress":
-			return PMDPDMFLCIJ.QUEST_EVENT_MAP_BUTTON_PRESS;
+			return QuestEventType.QUEST_EVENT_MAP_BUTTON_PRESS;
 		case "RaidMapButtonPress":
-			return PMDPDMFLCIJ.QUEST_EVENT_RAID_MAP_BUTTON_PRESS;
+			return QuestEventType.QUEST_EVENT_RAID_MAP_BUTTON_PRESS;
 		case "Enchantment":
-			return PMDPDMFLCIJ.QUEST_EVENT_ENCHANTMENT;
+			return QuestEventType.QUEST_EVENT_ENCHANTMENT;
 		case "EnchantmentUnsuccessful":
-			return PMDPDMFLCIJ.QUEST_EVENT_ENCHANTMENT_UNSUCCESSFUL;
+			return QuestEventType.QUEST_EVENT_ENCHANTMENT_UNSUCCESSFUL;
 		case "ActivatePerk":
-			return PMDPDMFLCIJ.QUEST_EVENT_ACTIVATE_PERK;
+			return QuestEventType.QUEST_EVENT_ACTIVATE_PERK;
 		case "DeactivatePerk":
-			return PMDPDMFLCIJ.QUEST_EVENT_DIACTIVATE_PERK;
+			return QuestEventType.QUEST_EVENT_DIACTIVATE_PERK;
 		case "BuySpinGems":
-			return PMDPDMFLCIJ.QUEST_EVENT_BUY_SPIN_GEMS;
+			return QuestEventType.QUEST_EVENT_BUY_SPIN_GEMS;
 		case "AscensionReset":
-			return PMDPDMFLCIJ.QUEST_EVENT_RESET_ASCENSION;
+			return QuestEventType.QUEST_EVENT_RESET_ASCENSION;
 		case "SetItemAcquired":
-			return PMDPDMFLCIJ.QUEST_EVENT_SET_ITEM_ACQUIRED;
+			return QuestEventType.QUEST_EVENT_SET_ITEM_ACQUIRED;
 		case "DuelUnlocked":
-			return PMDPDMFLCIJ.QUEST_EVENT_DUEL_UNLOCKED;
+			return QuestEventType.QUEST_EVENT_DUEL_UNLOCKED;
 		case "OpenRaids":
-			return PMDPDMFLCIJ.QUEST_EVENT_RAID_OPEN;
+			return QuestEventType.QUEST_EVENT_RAID_OPEN;
 		case "RaidEnter":
-			return PMDPDMFLCIJ.QUEST_EVENT_RAID_ENTER;
+			return QuestEventType.QUEST_EVENT_RAID_ENTER;
 		case "RaidEnd":
-			return PMDPDMFLCIJ.QUEST_EVENT_RAID_END;
+			return QuestEventType.QUEST_EVENT_RAID_END;
 		case "BossShieldDestroyed":
-			return PMDPDMFLCIJ.QUEST_EVENT_BOSS_SHIELD_DESTR;
+			return QuestEventType.QUEST_EVENT_BOSS_SHIELD_DESTR;
 		case "RaidLogin":
-			return PMDPDMFLCIJ.QUEST_EVENT_RAID_LOGIN;
+			return QuestEventType.QUEST_EVENT_RAID_LOGIN;
 		case "SeasonStartWithRestore":
-			return PMDPDMFLCIJ.QUEST_EVENT_SEAS_START_WITH_REST;
+			return QuestEventType.QUEST_EVENT_SEAS_START_WITH_REST;
 		case "SeasonStartWithoutRestore":
-			return PMDPDMFLCIJ.QUEST_EVENT_SEAS_START_WITHOUT_REST;
+			return QuestEventType.QUEST_EVENT_SEAS_START_WITHOUT_REST;
 		case "DailyWindowOpen":
-			return PMDPDMFLCIJ.QUEST_EVENT_DAILY_WINDOW_OPEN;
+			return QuestEventType.QUEST_EVENT_DAILY_WINDOW_OPEN;
 		case "LeaderBoardTap":
-			return PMDPDMFLCIJ.QUEST_EVENT_LEADERBOARD_TAP;
+			return QuestEventType.QUEST_EVENT_LEADERBOARD_TAP;
 		case "ShowRewardedVideo":
-			return PMDPDMFLCIJ.QUEST_EVENT_SHOW_REWARDED_VIDEO;
+			return QuestEventType.QUEST_EVENT_SHOW_REWARDED_VIDEO;
 		case "LoginEnd":
-			return PMDPDMFLCIJ.QUEST_EVENT_LOGIN_END;
+			return QuestEventType.QUEST_EVENT_LOGIN_END;
 		case "ShopEnter":
-			return PMDPDMFLCIJ.QUEST_EVENT_SHOP_ENTER;
+			return QuestEventType.QUEST_EVENT_SHOP_ENTER;
 		case "SceneLoaded":
-			return PMDPDMFLCIJ.QUEST_EVENT_SCENE_LOADED;
+			return QuestEventType.QUEST_EVENT_SCENE_LOADED;
 		case "ShopButtonPress":
-			return PMDPDMFLCIJ.QUEST_EVENT_SHOP_BUTTON_PRESS;
+			return QuestEventType.QUEST_EVENT_SHOP_BUTTON_PRESS;
 		default:
 			if (Eclipse.Content.QuestCompatibility.IsDeferredQuestEvent(LFLGCDNKNJI))
 			{
-				return PMDPDMFLCIJ.QUEST_EVENT_NONE;
+				return QuestEventType.QUEST_EVENT_NONE;
 			}
-			LLLOJBFMONN.Error(string.Format("{0} {1}", "Unknown event type: ", LFLGCDNKNJI));
-			return PMDPDMFLCIJ.QUEST_EVENT_NONE;
+			GameLog.Error(string.Format("{0} {1}", "Unknown event type: ", LFLGCDNKNJI));
+			return QuestEventType.QUEST_EVENT_NONE;
 		}
 	}
 }

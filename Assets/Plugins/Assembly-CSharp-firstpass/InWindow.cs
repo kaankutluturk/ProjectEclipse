@@ -6,40 +6,40 @@ public class InWindow
 
 	private Stream _stream;
 
-	private uint MOPCNHCGPNC;
+	private uint _posLimit;
 
 	private bool _streamEndWasReached;
 
-	private uint BABLHKEJPEL;
+	private uint _pointerToLastSafePosition;
 
-	public uint HGGJBAEEKJN;
+	public uint _bufferOffset;
 
-	public uint EILJMLGCJAH;
+	public uint _blockSize;
 
 	public uint _pos;
 
-	private uint DBHKMKMKFMJ;
+	private uint _keepSizeBefore;
 
-	private uint ECELIIKJLHM;
+	private uint _keepSizeAfter;
 
-	public uint OONMJHCFEHO;
+	public uint _streamPos;
 
-	public void DFKNDKFDELB()
+	public void MoveBlock()
 	{
-		uint num = HGGJBAEEKJN + _pos - DBHKMKMKFMJ;
+		uint num = _bufferOffset + _pos - _keepSizeBefore;
 		if (num != 0)
 		{
 			num--;
 		}
-		uint num2 = HGGJBAEEKJN + OONMJHCFEHO - num;
+		uint num2 = _bufferOffset + _streamPos - num;
 		for (uint num3 = 0u; num3 < num2; num3++)
 		{
 			_bufferBase[num3] = _bufferBase[num + num3];
 		}
-		HGGJBAEEKJN -= num;
+		_bufferOffset -= num;
 	}
 
-	public virtual void ONDIFDJPMDM()
+	public virtual void ReadBlock()
 	{
 		if (_streamEndWasReached)
 		{
@@ -47,48 +47,48 @@ public class InWindow
 		}
 		while (true)
 		{
-			int num = (int)(0 - HGGJBAEEKJN + EILJMLGCJAH - OONMJHCFEHO);
+			int num = (int)(0 - _bufferOffset + _blockSize - _streamPos);
 			if (num == 0)
 			{
 				return;
 			}
-			int num2 = _stream.Read(_bufferBase, (int)(HGGJBAEEKJN + OONMJHCFEHO), num);
+			int num2 = _stream.Read(_bufferBase, (int)(_bufferOffset + _streamPos), num);
 			if (num2 == 0)
 			{
 				break;
 			}
-			OONMJHCFEHO += (uint)num2;
-			if (OONMJHCFEHO >= _pos + ECELIIKJLHM)
+			_streamPos += (uint)num2;
+			if (_streamPos >= _pos + _keepSizeAfter)
 			{
-				MOPCNHCGPNC = OONMJHCFEHO - ECELIIKJLHM;
+				_posLimit = _streamPos - _keepSizeAfter;
 			}
 		}
-		MOPCNHCGPNC = OONMJHCFEHO;
-		uint num3 = HGGJBAEEKJN + MOPCNHCGPNC;
-		if (num3 > BABLHKEJPEL)
+		_posLimit = _streamPos;
+		uint num3 = _bufferOffset + _posLimit;
+		if (num3 > _pointerToLastSafePosition)
 		{
-			MOPCNHCGPNC = BABLHKEJPEL - HGGJBAEEKJN;
+			_posLimit = _pointerToLastSafePosition - _bufferOffset;
 		}
 		_streamEndWasReached = true;
 	}
 
-	private void PJNFHNFLNNO()
+	private void Free()
 	{
 		_bufferBase = null;
 	}
 
 	public void Create(uint CMNIBPLKJEA, uint ABFKEDIJFPN, uint IKHIOAIPBNL)
 	{
-		DBHKMKMKFMJ = CMNIBPLKJEA;
-		ECELIIKJLHM = ABFKEDIJFPN;
+		_keepSizeBefore = CMNIBPLKJEA;
+		_keepSizeAfter = ABFKEDIJFPN;
 		uint num = CMNIBPLKJEA + ABFKEDIJFPN + IKHIOAIPBNL;
-		if (_bufferBase == null || EILJMLGCJAH != num)
+		if (_bufferBase == null || _blockSize != num)
 		{
-			PJNFHNFLNNO();
-			EILJMLGCJAH = num;
-			_bufferBase = new byte[EILJMLGCJAH];
+			Free();
+			_blockSize = num;
+			_bufferBase = new byte[_blockSize];
 		}
-		BABLHKEJPEL = EILJMLGCJAH - ABFKEDIJFPN;
+		_pointerToLastSafePosition = _blockSize - ABFKEDIJFPN;
 	}
 
 	public void SetStream(Stream ABJIEFMMIEK)
@@ -96,47 +96,47 @@ public class InWindow
 		_stream = ABJIEFMMIEK;
 	}
 
-	public void IAIFCIAAHOE()
+	public void ReleaseStream()
 	{
 		_stream = null;
 	}
 
 	public void Init()
 	{
-		HGGJBAEEKJN = 0u;
+		_bufferOffset = 0u;
 		_pos = 0u;
-		OONMJHCFEHO = 0u;
+		_streamPos = 0u;
 		_streamEndWasReached = false;
-		ONDIFDJPMDM();
+		ReadBlock();
 	}
 
-	public void MHEJFMDCOHI()
+	public void MovePos()
 	{
 		_pos++;
-		if (_pos > MOPCNHCGPNC)
+		if (_pos > _posLimit)
 		{
-			uint num = HGGJBAEEKJN + _pos;
-			if (num > BABLHKEJPEL)
+			uint num = _bufferOffset + _pos;
+			if (num > _pointerToLastSafePosition)
 			{
-				DFKNDKFDELB();
+				MoveBlock();
 			}
-			ONDIFDJPMDM();
+			ReadBlock();
 		}
 	}
 
 	public byte GetIndexByte(int index)
 	{
-		return _bufferBase[HGGJBAEEKJN + _pos + index];
+		return _bufferBase[_bufferOffset + _pos + index];
 	}
 
 	public uint GetMatchLen(int index, uint OIOMNNFMDOO, uint LOHCIKNKDEI)
 	{
-		if (_streamEndWasReached && _pos + index + LOHCIKNKDEI > OONMJHCFEHO)
+		if (_streamEndWasReached && _pos + index + LOHCIKNKDEI > _streamPos)
 		{
-			LOHCIKNKDEI = OONMJHCFEHO - (uint)(int)(_pos + index);
+			LOHCIKNKDEI = _streamPos - (uint)(int)(_pos + index);
 		}
 		OIOMNNFMDOO++;
-		uint num = HGGJBAEEKJN + _pos + (uint)index;
+		uint num = _bufferOffset + _pos + (uint)index;
 		uint num2;
 		for (num2 = 0u; num2 < LOHCIKNKDEI && _bufferBase[num + num2] == _bufferBase[num + num2 - OIOMNNFMDOO]; num2++)
 		{
@@ -144,16 +144,16 @@ public class InWindow
 		return num2;
 	}
 
-	public uint HBJMPBCHFJB()
+	public uint GetNumAvailableBytes()
 	{
-		return OONMJHCFEHO - _pos;
+		return _streamPos - _pos;
 	}
 
 	public void ReduceOffsets(int BALBEBAOPMP)
 	{
-		HGGJBAEEKJN += (uint)BALBEBAOPMP;
-		MOPCNHCGPNC -= (uint)BALBEBAOPMP;
+		_bufferOffset += (uint)BALBEBAOPMP;
+		_posLimit -= (uint)BALBEBAOPMP;
 		_pos -= (uint)BALBEBAOPMP;
-		OONMJHCFEHO -= (uint)BALBEBAOPMP;
+		_streamPos -= (uint)BALBEBAOPMP;
 	}
 }

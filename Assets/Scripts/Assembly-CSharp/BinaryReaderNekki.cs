@@ -3,26 +3,26 @@ using System.Diagnostics;
 
 public class BinaryReaderNekki : IDisposable
 {
-	private const int LMKPPMCBDLH = 1;
+	private const int BoolSize = 1;
 
-	private const int GBECGLPOLIG = 2;
+	private const int Int16Size = 2;
 
-	private const int LPAHFIHOJCG = 4;
+	private const int Int32Size = 4;
 
-	private const int BPNHNODECLM = 8;
+	private const int Int64Size = 8;
 
 	public readonly int Size;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private int JCGAABDDAOK;
+	private int _position;
 
 	private byte[] _bytes;
 
-	public int JJCKADKCDIF
+	public int CursorPosition
 	{
 		get
 		{
-			return ECJPLFFAMJO();
+			return GetPosition();
 		}
 		private set
 		{
@@ -36,54 +36,54 @@ public class BinaryReaderNekki : IDisposable
 		Size = _bytes.Length;
 	}
 
-	public int ECJPLFFAMJO()
+	public int GetPosition()
 	{
-		return JCGAABDDAOK;
+		return _position;
 	}
 
 	private void set_Position(int value)
 	{
-		JCGAABDDAOK = value;
+		_position = value;
 	}
 
-	public virtual bool CLBFCEJOKJC()
+	public virtual bool ReadBoolean()
 	{
-		bool result = BitConverter.ToBoolean(_bytes, ECJPLFFAMJO());
+		bool result = BitConverter.ToBoolean(_bytes, GetPosition());
 		SetPosition(1);
 		return result;
 	}
 
 	public virtual byte ReadByte()
 	{
-		byte result = _bytes[ECJPLFFAMJO()];
+		byte result = _bytes[GetPosition()];
 		SetPosition(1);
 		return result;
 	}
 
-	public virtual short FOMNAMCAEPD()
+	public virtual short ReadInt16()
 	{
-		short result = BitConverter.ToInt16(_bytes, ECJPLFFAMJO());
+		short result = BitConverter.ToInt16(_bytes, GetPosition());
 		SetPosition(2);
 		return result;
 	}
 
-	public virtual int GDFKNFAHHKF()
+	public virtual int ReadInt32()
 	{
-		int result = BitConverter.ToInt32(_bytes, ECJPLFFAMJO());
+		int result = BitConverter.ToInt32(_bytes, GetPosition());
 		SetPosition(4);
 		return result;
 	}
 
-	public virtual long JPNNLGCAIGK()
+	public virtual long ReadInt64()
 	{
-		long result = BitConverter.ToInt64(_bytes, ECJPLFFAMJO());
+		long result = BitConverter.ToInt64(_bytes, GetPosition());
 		SetPosition(8);
 		return result;
 	}
 
-	public virtual float MMJAOEBFCLN()
+	public virtual float ReadSingle()
 	{
-		float result = BitConverter.ToSingle(_bytes, ECJPLFFAMJO());
+		float result = BitConverter.ToSingle(_bytes, GetPosition());
 		SetPosition(4);
 		return result;
 	}
@@ -92,14 +92,14 @@ public class BinaryReaderNekki : IDisposable
 	{
 		int num = count * 4;
 		float[] array = new float[count];
-		Buffer.BlockCopy(_bytes, ECJPLFFAMJO(), array, 0, num);
+		Buffer.BlockCopy(_bytes, GetPosition(), array, 0, num);
 		SetPosition(num);
 		return array;
 	}
 
 	private void SetPosition(int value)
 	{
-		set_Position(ECJPLFFAMJO() + value);
+		set_Position(GetPosition() + value);
 	}
 
 	public void Dispose()

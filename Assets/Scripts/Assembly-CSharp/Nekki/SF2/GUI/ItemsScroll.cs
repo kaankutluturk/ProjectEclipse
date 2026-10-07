@@ -35,11 +35,11 @@ namespace Nekki.SF2.GUI
 		[SerializeField]
 		public BaseScrollContent scrollContent;
 
-		private bool CGAPKDMAENM;
+		private bool isDragging;
 
 		private Tween _tween;
 
-		public float CNBIHHDLDGE
+		public float MinVelocityThreshold
 		{
 			get
 			{
@@ -51,7 +51,7 @@ namespace Nekki.SF2.GUI
 			}
 		}
 
-		public float IHIPAJABAKO
+		public float AutoscrollTime
 		{
 			get
 			{
@@ -63,7 +63,7 @@ namespace Nekki.SF2.GUI
 			}
 		}
 
-		public bool BOFPNLPDEPF
+		public bool IsScrollActive
 		{
 			get
 			{
@@ -117,20 +117,20 @@ namespace Nekki.SF2.GUI
 		private void MoveTo(Vector2 LCCLEFMKLPB, float _Duration)
 		{
 			KillTween();
-			_tween = DOTween.To(() => NAEMFBHBLJO(), (Vector2Wrapper HBLGAEMOHAL) =>
+			_tween = DOTween.To(() => GetContentPosition(), (Vector2Wrapper HBLGAEMOHAL) =>
 			{
 				SetContentPosition(HBLGAEMOHAL);
 			}, LCCLEFMKLPB, _Duration);
-			_tween.OnComplete(FLGCOBPCHMB);
+			_tween.OnComplete(OnTweenComplete);
 		}
 
-		private void FLGCOBPCHMB()
+		private void OnTweenComplete()
 		{
 			StopMovement();
 			onScrollEnd.Invoke();
 		}
 
-		private Vector2 NAEMFBHBLJO()
+		private Vector2 GetContentPosition()
 		{
 			if (scrollContent != null)
 			{
@@ -147,7 +147,7 @@ namespace Nekki.SF2.GUI
 			}
 		}
 
-		private Vector2 KMCOHAGCFBN(BaseScrollItem item)
+		private Vector2 GetCenteredContentPosition(BaseScrollItem item)
 		{
 			RectTransform rectTransform = (RectTransform)scrollContent.transform;
 			Transform parent = rectTransform.parent;
@@ -164,17 +164,17 @@ namespace Nekki.SF2.GUI
 		{
 			if (scrollContent != null)
 			{
-				scrollContent.onSelectItem.AddListener(KPMMGHLPOBL);
+				scrollContent.onSelectItem.AddListener(OnItemSelected);
 				scrollContent.Center = (RectTransform)base.transform;
-				scrollContent.onClickItem.AddListener(JPJDBLDGCCK);
+				scrollContent.onClickItem.AddListener(OnItemClicked);
 			}
 		}
 
-		protected void KPMMGHLPOBL(BaseScrollItem item)
+		protected void OnItemSelected(BaseScrollItem item)
 		{
 		}
 
-		protected void JPJDBLDGCCK(BaseScrollItem item)
+		protected void OnItemClicked(BaseScrollItem item)
 		{
 			ScrollToItem(item, 1f);
 		}
@@ -190,14 +190,14 @@ namespace Nekki.SF2.GUI
 		{
 			base.OnBeginDrag(BHOLFGOGPCP);
 			KillTween();
-			CGAPKDMAENM = true;
+			isDragging = true;
 			onDragBegin.Invoke();
 		}
 
 		public override void OnEndDrag(PointerEventData BHOLFGOGPCP)
 		{
 			base.OnEndDrag(BHOLFGOGPCP);
-			CGAPKDMAENM = false;
+			isDragging = false;
 			if (AutoscrollIsOn && Math.Abs(get_velocity().magnitude) != 0f)
 			{
 				float num = 0f;
@@ -219,9 +219,9 @@ namespace Nekki.SF2.GUI
 
 		public void ScrollToItem(BaseScrollItem item, float _Duration)
 		{
-			if (!CGAPKDMAENM)
+			if (!isDragging)
 			{
-				Vector2 vector = KMCOHAGCFBN(item);
+				Vector2 vector = GetCenteredContentPosition(item);
 				if (_Duration == 0f)
 				{
                     KillTween();
@@ -243,7 +243,7 @@ namespace Nekki.SF2.GUI
 			set_Scrolling(false);
 		}
 
-		private bool PBNHJPMBJDA()
+		private bool IsFastScroll()
 		{
 			return get_velocity().magnitude > get_MinScrollVelocity();
 		}

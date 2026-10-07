@@ -3,15 +3,15 @@ using System.Diagnostics;
 
 public sealed class PropertyDescriptor : IPropertyDescriptor
 {
-	private readonly IPropertyDescriptor PNBMNIMMEOF;
+	private readonly IPropertyDescriptor baseDescriptor;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private string HKGHEJDKCPI;
+	private string name;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private int PAOBFNKOJED;
+	private int order;
 
-	public string MENAJEAJJBE
+	public string PropertyName
 	{
 		get
 		{
@@ -23,11 +23,11 @@ public sealed class PropertyDescriptor : IPropertyDescriptor
 		}
 	}
 
-	public Type JDCDCGFHLPC
+	public Type OverrideType
 	{
 		get
 		{
-			return MAGHEGMMNOF();
+			return GetTypeOverride();
 		}
 		set
 		{
@@ -35,11 +35,11 @@ public sealed class PropertyDescriptor : IPropertyDescriptor
 		}
 	}
 
-	public int PECDGDLCAAA
+	public int SortOrder
 	{
 		get
 		{
-			return BHDEMLGCNOJ();
+			return GetOrder();
 		}
 		set
 		{
@@ -47,72 +47,72 @@ public sealed class PropertyDescriptor : IPropertyDescriptor
 		}
 	}
 
-	public bool KBHICFPAIFJ
+	public bool CanWrite
 	{
 		get
 		{
-			return HHHGHBBDMHC();
+			return GetCanWrite();
 		}
 	}
 
 	public PropertyDescriptor(IPropertyDescriptor PNBMNIMMEOF)
 	{
-		this.PNBMNIMMEOF = PNBMNIMMEOF;
+		this.baseDescriptor = PNBMNIMMEOF;
 		set_Name(PNBMNIMMEOF.get_Name());
 	}
 
 	public string get_Name()
 	{
-		return HKGHEJDKCPI;
+		return name;
 	}
 
 	public void set_Name(string value)
 	{
-		HKGHEJDKCPI = value;
+		name = value;
 	}
 
 	public Type get_Type()
 	{
-		return PNBMNIMMEOF.get_Type();
+		return baseDescriptor.get_Type();
 	}
 
-	public Type MAGHEGMMNOF()
+	public Type GetTypeOverride()
 	{
-		return PNBMNIMMEOF.MAGHEGMMNOF();
+		return baseDescriptor.GetTypeOverride();
 	}
 
 	public void set_TypeOverride(Type value)
 	{
-		PNBMNIMMEOF.set_TypeOverride(value);
+		baseDescriptor.set_TypeOverride(value);
 	}
 
-	public int BHDEMLGCNOJ()
+	public int GetOrder()
 	{
-		return PAOBFNKOJED;
+		return order;
 	}
 
 	public void set_Order(int value)
 	{
-		PAOBFNKOJED = value;
+		order = value;
 	}
 
-	public bool HHHGHBBDMHC()
+	public bool GetCanWrite()
 	{
-		return PNBMNIMMEOF.HHHGHBBDMHC();
+		return baseDescriptor.GetCanWrite();
 	}
 
 	public void Write(object target, object value)
 	{
-		PNBMNIMMEOF.Write(target, value);
+		baseDescriptor.Write(target, value);
 	}
 
-	public T PJLLHGDNCIF<T>() where T : Attribute
+	public T GetCustomAttribute<T>() where T : Attribute
 	{
-		return PNBMNIMMEOF.PJLLHGDNCIF<T>();
+		return baseDescriptor.GetCustomAttribute<T>();
 	}
 
 	public IObjectDescriptor Read(object target)
 	{
-		return PNBMNIMMEOF.Read(target);
+		return baseDescriptor.Read(target);
 	}
 }

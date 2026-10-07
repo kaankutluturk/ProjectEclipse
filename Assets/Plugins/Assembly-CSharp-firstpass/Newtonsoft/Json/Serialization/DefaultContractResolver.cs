@@ -272,7 +272,7 @@ namespace Newtonsoft.Json.Serialization
 			else
 			{
 				DataContractAttribute dataContractAttribute = JsonTypeReflector.GetDataContractAttribute(contract.UnderlyingType);
-				if (dataContractAttribute != null && dataContractAttribute.OGFPFFHAIBA())
+				if (dataContractAttribute != null && dataContractAttribute.GetIsReference())
 				{
 					contract.IsReference = true;
 				}
@@ -574,8 +574,8 @@ namespace Newtonsoft.Json.Serialization
 			}
 			else if (pMHLKHKKCOJ != null)
 			{
-				property.Required = (pMHLKHKKCOJ.OKKKGAKIJBA() ? Required.AllowNull : Required.Default);
-				property.Order = ((pMHLKHKKCOJ.BHDEMLGCNOJ() == -1) ? ((int?)null) : new int?(pMHLKHKKCOJ.BHDEMLGCNOJ()));
+				property.Required = (pMHLKHKKCOJ.GetIsRequired() ? Required.AllowNull : Required.Default);
+				property.Order = ((pMHLKHKKCOJ.GetOrder() == -1) ? ((int?)null) : new int?(pMHLKHKKCOJ.GetOrder()));
 			}
 			else
 			{

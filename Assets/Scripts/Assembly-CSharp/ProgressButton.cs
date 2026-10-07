@@ -10,7 +10,7 @@ public class ProgressButton : SFButton
 	[SerializeField]
 	private Image _picComplete;
 
-	private float ILDDBLFPPPG;
+	private float percentage;
 
 	public const float PercentageMin = 0f;
 
@@ -36,19 +36,19 @@ public class ProgressButton : SFButton
 
 	public float GetPercentage()
 	{
-		return ILDDBLFPPPG;
+		return percentage;
 	}
 
-	private void EHCCJJNBGAF(float EJHLCDFHNPA)
+	private void ApplyPercentage(float EJHLCDFHNPA)
 	{
-		ILDDBLFPPPG = Mathf.Clamp(EJHLCDFHNPA, 0f, 100f);
+		percentage = Mathf.Clamp(EJHLCDFHNPA, 0f, 100f);
 		if (_picComplete != null)
 		{
-			if (ILDDBLFPPPG == 0f)
+			if (percentage == 0f)
 			{
 				_picComplete.gameObject.SetActive(false);
 			}
-			if (ILDDBLFPPPG == 100f)
+			if (percentage == 100f)
 			{
 				_picComplete.gameObject.SetActive(true);
 			}
@@ -57,7 +57,7 @@ public class ProgressButton : SFButton
 		{
 			if (FillSmoothingRate <= 0f || _displayedFill < 0f)
 			{
-				_displayedFill = ILDDBLFPPPG / 100f;
+				_displayedFill = percentage / 100f;
 				_picCircleProgressBar.fillAmount = _displayedFill;
 			}
 		}
@@ -69,7 +69,7 @@ public class ProgressButton : SFButton
 		{
 			return;
 		}
-		float target = ILDDBLFPPPG / 100f;
+		float target = percentage / 100f;
 		if (_displayedFill == target)
 		{
 			return;
@@ -88,31 +88,31 @@ public class ProgressButton : SFButton
 		float num = BFJBKLCLIHP / 60f;
 		KillTween();
 		EJHLCDFHNPA = Mathf.Clamp(EJHLCDFHNPA, 0f, 100f);
-		if (ILDDBLFPPPG == EJHLCDFHNPA)
+		if (percentage == EJHLCDFHNPA)
 		{
 			return;
 		}
 		if (num == 0f)
 		{
-			EHCCJJNBGAF(EJHLCDFHNPA);
+			ApplyPercentage(EJHLCDFHNPA);
 			return;
 		}
-		_tween = DOTween.To(() => ILDDBLFPPPG, (float DHDMNHCIPEH) =>
+		_tween = DOTween.To(() => percentage, (float DHDMNHCIPEH) =>
 		{
-			EHCCJJNBGAF(DHDMNHCIPEH);
+			ApplyPercentage(DHDMNHCIPEH);
 		}, EJHLCDFHNPA, num);
 	}
 
 	public void AddPercentage(float FOIPKLDNGDL)
 	{
 		KillTween();
-		EHCCJJNBGAF(GetPercentage() + FOIPKLDNGDL);
+		ApplyPercentage(GetPercentage() + FOIPKLDNGDL);
 	}
 
 	public void ResetPercentage()
 	{
 		KillTween();
-		EHCCJJNBGAF(0f);
+		ApplyPercentage(0f);
 	}
 
 	private void KillTween()

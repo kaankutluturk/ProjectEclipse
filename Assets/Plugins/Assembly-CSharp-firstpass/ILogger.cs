@@ -2,49 +2,49 @@ using System;
 
 public interface ILogger
 {
-	BFNKPHDJNII Level { get; set; }
+	Loglevels Level { get; set; }
 
-	string LEGHIOADBJC { get; set; }
+	string FormatVerbose { get; set; }
 
-	string LNIJFMFOIDN { get; set; }
+	string FormatInfo { get; set; }
 
-	string LHGJKHCPGBM { get; set; }
+	string FormatWarn { get; set; }
 
-	string BJDEHEABJGA { get; set; }
+	string FormatErr { get; set; }
 
-	string FOGIBNCFGJJ { get; set; }
+	string FormatEx { get; set; }
 
-	BFNKPHDJNII PINDEKDNCNL();
+	Loglevels GetLevel();
 
-	void DLDMOHEGENM(BFNKPHDJNII value);
+	void SetLevel(Loglevels value);
 
-	string IOPJBEOJMLD();
+	string GetFormatVerbose();
 
-	void FDKNEECBIBB(string value);
+	void SetFormatVerbose(string value);
 
-	string AHDNMMFOFLB();
+	string GetFormatInfo();
 
-	void MIKLLLHHECB(string value);
+	void SetFormatInfo(string value);
 
-	string KBKEJHEPJEN();
+	string GetFormatWarn();
 
-	void LLDEKAOFIGL(string value);
+	void SetFormatWarn(string value);
 
-	string DJACEMPJGGF();
+	string GetFormatErr();
 
-	void IMHLPLJCJGK(string value);
+	void SetFormatErr(string value);
 
-	string ACMJHFAHMIM();
+	string GetFormatEx();
 
-	void HHNFNCJGEKP(string value);
+	void SetFormatEx(string value);
 
-	void JMHHKELODIO(string HMHPCGBCNGI, string POOAFNBCFHM);
+	void Verbose(string HMHPCGBCNGI, string POOAFNBCFHM);
 
-	void KDAFBLAKBMI(string HMHPCGBCNGI, string EMBBNNBFODN);
+	void Information(string HMHPCGBCNGI, string EMBBNNBFODN);
 
-	void GLCKHLCAPIN(string HMHPCGBCNGI, string EPMNBLHHAHF);
+	void Warning(string HMHPCGBCNGI, string EPMNBLHHAHF);
 
 	void Error(string HMHPCGBCNGI, string KEPBNIIECPN);
 
-	void COHEDILAHFD(string HMHPCGBCNGI, string CKEHOEGLMBM, Exception MPFFFAOGBJE);
+	void Exception(string HMHPCGBCNGI, string CKEHOEGLMBM, Exception MPFFFAOGBJE);
 }

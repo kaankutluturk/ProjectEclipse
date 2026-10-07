@@ -69,7 +69,7 @@ namespace YamlDotNet.Core
 		{
 			get
 			{
-				return cursor.BJKDANAAGHK();
+				return cursor.Mark();
 			}
 		}
 
@@ -80,24 +80,24 @@ namespace YamlDotNet.Core
 			SkipComments = CGNHIACFHMM;
 		}
 
-		public bool PCCMLADDNDG()
+		public bool MoveNext()
 		{
 			if (Current != null)
 			{
-				KPFPDDBILAE();
+				ConsumeCurrentToken();
 			}
-			return NCFHFMEKMFC();
+			return FetchNextToken();
 		}
 
-		internal bool NCFHFMEKMFC()
+		internal bool FetchNextToken()
 		{
 			if (!tokenAvailable && !streamEndProduced)
 			{
-				FKGHEPHAOAP();
+				EnsureTokenAvailable();
 			}
 			if (tokens.Count > 0)
 			{
-				Current = tokens.HBPLGGGBDAB();
+				Current = tokens.Dequeue();
 				tokenAvailable = false;
 				return true;
 			}
@@ -105,7 +105,7 @@ namespace YamlDotNet.Core
 			return false;
 		}
 
-		internal void KPFPDDBILAE()
+		internal void ConsumeCurrentToken()
 		{
 			tokensParsed++;
 			tokenAvailable = false;
@@ -113,26 +113,26 @@ namespace YamlDotNet.Core
 			Current = null;
 		}
 
-		private char HKACDMEFHIB()
+		private char ReadChar()
 		{
 			char result = analyzer.Peek(0);
 			Skip();
 			return result;
 		}
 
-		private char OGNODHFDLNF()
+		private char ReadLineBreakNormalized()
 		{
 			if (analyzer.Check("\r\n\u0085"))
 			{
-				BBLGADKMIPD();
+				SkipLineBreak();
 				return '\n';
 			}
 			char result = analyzer.Peek(0);
-			BBLGADKMIPD();
+			SkipLineBreak();
 			return result;
 		}
 
-		private void FKGHEPHAOAP()
+		private void EnsureTokenAvailable()
 		{
 			while (true)
 			{
@@ -143,7 +143,7 @@ namespace YamlDotNet.Core
 				}
 				else
 				{
-					EJKKMIGJHKC();
+					StaleSimpleKeys();
 					foreach (SimpleKey simpleKey in simpleKeys)
 					{
 						if (simpleKey.IsPossible && simpleKey.TokenNumber == tokensParsed)
@@ -157,17 +157,17 @@ namespace YamlDotNet.Core
 				{
 					break;
 				}
-				PBNCMCKIPLN();
+				FetchMoreTokens();
 			}
 			tokenAvailable = true;
 		}
 
-		private static bool BKAHPGIAGED(StringBuilder BMKNHNOGIHO, char ILENLCMAMBH)
+		private static bool StartsWithChar(StringBuilder BMKNHNOGIHO, char ILENLCMAMBH)
 		{
 			return BMKNHNOGIHO.Length > 0 && BMKNHNOGIHO[0] == ILENLCMAMBH;
 		}
 
-		private void EJKKMIGJHKC()
+		private void StaleSimpleKeys()
 		{
 			foreach (SimpleKey simpleKey in simpleKeys)
 			{
@@ -175,7 +175,7 @@ namespace YamlDotNet.Core
 				{
 					if (simpleKey.IsRequired)
 					{
-						Mark mark = cursor.BJKDANAAGHK();
+						Mark mark = cursor.Mark();
 						throw new SyntaxErrorException(mark, mark, "While scanning a simple key, could not find expected ':'.");
 					}
 					simpleKey.IsPossible = false;
@@ -183,131 +183,131 @@ namespace YamlDotNet.Core
 			}
 		}
 
-		private void PBNCMCKIPLN()
+		private void FetchMoreTokens()
 		{
 			if (!streamStartProduced)
 			{
-				JCHFJFAJLMP();
+				FetchStreamStart();
 				return;
 			}
-			KGOIEEBEKFA();
-			EJKKMIGJHKC();
+			ScanToNextToken();
+			StaleSimpleKeys();
 			UnrollIndent(cursor.LineOffset);
-			analyzer.Buffer.CGGPDODMKCF(4);
+			analyzer.Buffer.Cache(4);
 			if (analyzer.Buffer.EndOfInput)
 			{
-				FIPLOALOAMJ();
+				FetchStreamEnd();
 				return;
 			}
 			if (cursor.LineOffset == 0 && analyzer.Check('%'))
 			{
-				HMINGFLCBEB();
+				FetchDirective();
 				return;
 			}
-			if (cursor.LineOffset == 0 && analyzer.Check('-') && analyzer.Check('-', 1) && analyzer.Check('-', 2) && analyzer.MKOKPKHBDMD(3))
+			if (cursor.LineOffset == 0 && analyzer.Check('-') && analyzer.Check('-', 1) && analyzer.Check('-', 2) && analyzer.IsWhiteBreakOrZero(3))
 			{
-				BIIAPHMNDJK(true);
+				FetchDocumentIndicator(true);
 				return;
 			}
-			if (cursor.LineOffset == 0 && analyzer.Check('.') && analyzer.Check('.', 1) && analyzer.Check('.', 2) && analyzer.MKOKPKHBDMD(3))
+			if (cursor.LineOffset == 0 && analyzer.Check('.') && analyzer.Check('.', 1) && analyzer.Check('.', 2) && analyzer.IsWhiteBreakOrZero(3))
 			{
-				BIIAPHMNDJK(false);
+				FetchDocumentIndicator(false);
 				return;
 			}
 			if (analyzer.Check('['))
 			{
-				CCDGCBGHAEB(true);
+				FetchFlowCollectionStart(true);
 				return;
 			}
 			if (analyzer.Check('{'))
 			{
-				CCDGCBGHAEB(false);
+				FetchFlowCollectionStart(false);
 				return;
 			}
 			if (analyzer.Check(']'))
 			{
-				KNECKBMGPEC(true);
+				FetchFlowCollectionEnd(true);
 				return;
 			}
 			if (analyzer.Check('}'))
 			{
-				KNECKBMGPEC(false);
+				FetchFlowCollectionEnd(false);
 				return;
 			}
 			if (analyzer.Check(','))
 			{
-				JNIGJKOKPIH();
+				FetchFlowEntry();
 				return;
 			}
-			if (analyzer.Check('-') && analyzer.MKOKPKHBDMD(1))
+			if (analyzer.Check('-') && analyzer.IsWhiteBreakOrZero(1))
 			{
-				LMKPEPCKKMP();
+				FetchBlockEntry();
 				return;
 			}
-			if (analyzer.Check('?') && (flowLevel > 0 || analyzer.MKOKPKHBDMD(1)))
+			if (analyzer.Check('?') && (flowLevel > 0 || analyzer.IsWhiteBreakOrZero(1)))
 			{
-				MHOMBHMODGE();
+				FetchKey();
 				return;
 			}
-			if (analyzer.Check(':') && (flowLevel > 0 || analyzer.MKOKPKHBDMD(1)))
+			if (analyzer.Check(':') && (flowLevel > 0 || analyzer.IsWhiteBreakOrZero(1)))
 			{
-				HBGPDPAPEJB();
+				FetchValue();
 				return;
 			}
 			if (analyzer.Check('*'))
 			{
-				BKPNOKPHDCE(true);
+				FetchAnchor(true);
 				return;
 			}
 			if (analyzer.Check('&'))
 			{
-				BKPNOKPHDCE(false);
+				FetchAnchor(false);
 				return;
 			}
 			if (analyzer.Check('!'))
 			{
-				MHDNFCAILLG();
+				FetchTag();
 				return;
 			}
 			if (analyzer.Check('|') && flowLevel == 0)
 			{
-				FLCGFAGILPB(true);
+				FetchBlockScalar(true);
 				return;
 			}
 			if (analyzer.Check('>') && flowLevel == 0)
 			{
-				FLCGFAGILPB(false);
+				FetchBlockScalar(false);
 				return;
 			}
 			if (analyzer.Check('\''))
 			{
-				DJLOGNJKFNK(true);
+				FetchFlowScalar(true);
 				return;
 			}
 			if (analyzer.Check('"'))
 			{
-				DJLOGNJKFNK(false);
+				FetchFlowScalar(false);
 				return;
 			}
-			if ((!analyzer.MKOKPKHBDMD() && !analyzer.Check("-?:,[]{}#&*!|>'\"%@`")) || (analyzer.Check('-') && !analyzer.MIGPEDGKJEG(1)) || (flowLevel == 0 && analyzer.Check("?:") && !analyzer.MKOKPKHBDMD(1)))
+			if ((!analyzer.IsWhiteBreakOrZero() && !analyzer.Check("-?:,[]{}#&*!|>'\"%@`")) || (analyzer.Check('-') && !analyzer.IsWhite(1)) || (flowLevel == 0 && analyzer.Check("?:") && !analyzer.IsWhiteBreakOrZero(1)))
 			{
-				JDJODGJEDOF();
+				FetchPlainScalar();
 				return;
 			}
-			Mark iLENLCMAMBH = cursor.BJKDANAAGHK();
+			Mark iLENLCMAMBH = cursor.Mark();
 			Skip();
-			Mark pCLFFOBJJFO = cursor.BJKDANAAGHK();
+			Mark pCLFFOBJJFO = cursor.Mark();
 			throw new SyntaxErrorException(iLENLCMAMBH, pCLFFOBJJFO, "While scanning for the next token, find character that cannot start any token.");
 		}
 
-		private bool CJCNCHCJAOM()
+		private bool IsWhitespaceToSkip()
 		{
 			return analyzer.Check(' ') || ((flowLevel > 0 || !simpleKeyAllowed) && analyzer.Check('\t'));
 		}
 
-		private bool OPEFOACCBGC()
+		private bool IsDocumentIndicator()
 		{
-			if (cursor.LineOffset == 0 && analyzer.MKOKPKHBDMD(3))
+			if (cursor.LineOffset == 0 && analyzer.IsWhiteBreakOrZero(3))
 			{
 				bool flag = analyzer.Check('-') && analyzer.Check('-', 1) && analyzer.Check('-', 2);
 				bool flag2 = analyzer.Check('.') && analyzer.Check('.', 1) && analyzer.Check('.', 2);
@@ -322,37 +322,37 @@ namespace YamlDotNet.Core
 			analyzer.Buffer.Skip(1);
 		}
 
-		private void BBLGADKMIPD()
+		private void SkipLineBreak()
 		{
-			if (analyzer.DHPOAOIAGPE())
+			if (analyzer.IsCrLf())
 			{
-				cursor.AIGOMGCEJJD(2);
+				cursor.SkipLineByOffset(2);
 				analyzer.Buffer.Skip(2);
 			}
-			else if (analyzer.JCPPGIPDMBK())
+			else if (analyzer.IsBreak())
 			{
-				cursor.AIGOMGCEJJD(1);
+				cursor.SkipLineByOffset(1);
 				analyzer.Buffer.Skip(1);
 			}
-			else if (!analyzer.AJCHNKGPEJB())
+			else if (!analyzer.IsZero())
 			{
 				throw new InvalidOperationException("Not at a break.");
 			}
 		}
 
-		private void KGOIEEBEKFA()
+		private void ScanToNextToken()
 		{
 			while (true)
 			{
-				if (CJCNCHCJAOM())
+				if (IsWhitespaceToSkip())
 				{
 					Skip();
 					continue;
 				}
-				LHNPOFBJJMN();
-				if (analyzer.JCPPGIPDMBK())
+				SkipComment();
+				if (analyzer.IsBreak())
 				{
-					BBLGADKMIPD();
+					SkipLineBreak();
 					if (flowLevel == 0)
 					{
 						simpleKeyAllowed = true;
@@ -363,36 +363,36 @@ namespace YamlDotNet.Core
 			}
 		}
 
-		private void LHNPOFBJJMN()
+		private void SkipComment()
 		{
 			if (analyzer.Check('#'))
 			{
-				Mark mark = cursor.BJKDANAAGHK();
+				Mark mark = cursor.Mark();
 				Skip();
-				while (analyzer.NBLLOLGNFGM())
+				while (analyzer.IsSpace())
 				{
 					Skip();
 				}
 				StringBuilder stringBuilder = new StringBuilder();
-				while (!analyzer.PDOIBEFPDEB())
+				while (!analyzer.IsBreakOrZero())
 				{
-					stringBuilder.Append(HKACDMEFHIB());
+					stringBuilder.Append(ReadChar());
 				}
 				if (!SkipComments)
 				{
 					bool eKOKIGANOMO = previous != null && previous.End.Line == mark.Line && !(previous is StreamStart);
-					tokens.JFGNCJCOCJA(new Tokens.Comment(stringBuilder.ToString(), eKOKIGANOMO, mark, cursor.BJKDANAAGHK()));
+					tokens.Enqueue(new Tokens.Comment(stringBuilder.ToString(), eKOKIGANOMO, mark, cursor.Mark()));
 				}
 			}
 		}
 
-		private void JCHFJFAJLMP()
+		private void FetchStreamStart()
 		{
 			simpleKeys.Push(new SimpleKey());
 			simpleKeyAllowed = true;
 			streamStartProduced = true;
-			Mark mark = cursor.BJKDANAAGHK();
-			tokens.JFGNCJCOCJA(new Tokens.StreamStart(mark, mark));
+			Mark mark = cursor.Mark();
+			tokens.Enqueue(new Tokens.StreamStart(mark, mark));
 		}
 
 		private void UnrollIndent(int DLPJJBPDNDE)
@@ -401,107 +401,107 @@ namespace YamlDotNet.Core
 			{
 				while (indent > DLPJJBPDNDE)
 				{
-					Mark mark = cursor.BJKDANAAGHK();
-					tokens.JFGNCJCOCJA(new BlockEnd(mark, mark));
+					Mark mark = cursor.Mark();
+					tokens.Enqueue(new BlockEnd(mark, mark));
 					indent = indents.Pop();
 				}
 			}
 		}
 
-		private void FIPLOALOAMJ()
+		private void FetchStreamEnd()
 		{
-			cursor.JFJBGABDLJM();
+			cursor.ForceSkipLineAfterNonBreak();
 			UnrollIndent(-1);
-			OIDDFFJBIKK();
+			RemoveSimpleKey();
 			simpleKeyAllowed = false;
 			streamEndProduced = true;
-			Mark mark = cursor.BJKDANAAGHK();
-			tokens.JFGNCJCOCJA(new StreamEnd(mark, mark));
+			Mark mark = cursor.Mark();
+			tokens.Enqueue(new StreamEnd(mark, mark));
 		}
 
-		private void HMINGFLCBEB()
+		private void FetchDirective()
 		{
 			UnrollIndent(-1);
-			OIDDFFJBIKK();
+			RemoveSimpleKey();
 			simpleKeyAllowed = false;
-			Token mBIJKDIEFIF = GCBFEKEJMJM();
-			tokens.JFGNCJCOCJA(mBIJKDIEFIF);
+			Token mBIJKDIEFIF = ScanDirective();
+			tokens.Enqueue(mBIJKDIEFIF);
 		}
 
-		private Token GCBFEKEJMJM()
+		private Token ScanDirective()
 		{
-			Mark iLENLCMAMBH = cursor.BJKDANAAGHK();
+			Mark iLENLCMAMBH = cursor.Mark();
 			Skip();
 			Token result;
 			switch (ScanDirectiveName(iLENLCMAMBH))
 			{
 			case "YAML":
-				result = HNBHLKOPJGL(iLENLCMAMBH);
+				result = ScanVersionDirective(iLENLCMAMBH);
 				break;
 			case "TAG":
-				result = GKOGPOOEBGL(iLENLCMAMBH);
+				result = ScanTagDirective(iLENLCMAMBH);
 				break;
 			default:
-				throw new SyntaxErrorException(iLENLCMAMBH, cursor.BJKDANAAGHK(), "While scanning a directive, find uknown directive name.");
+				throw new SyntaxErrorException(iLENLCMAMBH, cursor.Mark(), "While scanning a directive, find uknown directive name.");
 			}
-			while (analyzer.MIGPEDGKJEG())
+			while (analyzer.IsWhite())
 			{
 				Skip();
 			}
-			LHNPOFBJJMN();
-			if (!analyzer.PDOIBEFPDEB())
+			SkipComment();
+			if (!analyzer.IsBreakOrZero())
 			{
-				throw new SyntaxErrorException(iLENLCMAMBH, cursor.BJKDANAAGHK(), "While scanning a directive, did not find expected comment or line break.");
+				throw new SyntaxErrorException(iLENLCMAMBH, cursor.Mark(), "While scanning a directive, did not find expected comment or line break.");
 			}
-			if (analyzer.JCPPGIPDMBK())
+			if (analyzer.IsBreak())
 			{
-				BBLGADKMIPD();
+				SkipLineBreak();
 			}
 			return result;
 		}
 
-		private void BIIAPHMNDJK(bool EFNNCDEPIFB)
+		private void FetchDocumentIndicator(bool EFNNCDEPIFB)
 		{
 			UnrollIndent(-1);
-			OIDDFFJBIKK();
+			RemoveSimpleKey();
 			simpleKeyAllowed = false;
-			Mark mark = cursor.BJKDANAAGHK();
+			Mark mark = cursor.Mark();
 			Skip();
 			Skip();
 			Skip();
-			Token mBIJKDIEFIF = ((!EFNNCDEPIFB) ? ((Token)new Tokens.DocumentEnd(mark, mark)) : ((Token)new Tokens.DocumentStart(mark, cursor.BJKDANAAGHK())));
-			tokens.JFGNCJCOCJA(mBIJKDIEFIF);
+			Token mBIJKDIEFIF = ((!EFNNCDEPIFB) ? ((Token)new Tokens.DocumentEnd(mark, mark)) : ((Token)new Tokens.DocumentStart(mark, cursor.Mark())));
+			tokens.Enqueue(mBIJKDIEFIF);
 		}
 
-		private void CCDGCBGHAEB(bool AHKFNJKIBCN)
+		private void FetchFlowCollectionStart(bool AHKFNJKIBCN)
 		{
-			GBHAEIBOPNO();
-			ECMNMOMCMGB();
+			SaveSimpleKey();
+			IncreaseFlowLevel();
 			simpleKeyAllowed = true;
-			Mark mark = cursor.BJKDANAAGHK();
+			Mark mark = cursor.Mark();
 			Skip();
 			Token mBIJKDIEFIF = ((!AHKFNJKIBCN) ? ((Token)new FlowMappingStart(mark, mark)) : ((Token)new FlowSequenceStart(mark, mark)));
-			tokens.JFGNCJCOCJA(mBIJKDIEFIF);
+			tokens.Enqueue(mBIJKDIEFIF);
 		}
 
-		private void ECMNMOMCMGB()
+		private void IncreaseFlowLevel()
 		{
 			simpleKeys.Push(new SimpleKey());
 			flowLevel++;
 		}
 
-		private void KNECKBMGPEC(bool AHKFNJKIBCN)
+		private void FetchFlowCollectionEnd(bool AHKFNJKIBCN)
 		{
-			OIDDFFJBIKK();
-			BMJNHPLKCEA();
+			RemoveSimpleKey();
+			DecreaseFlowLevel();
 			simpleKeyAllowed = false;
-			Mark mark = cursor.BJKDANAAGHK();
+			Mark mark = cursor.Mark();
 			Skip();
 			Token mBIJKDIEFIF = ((!AHKFNJKIBCN) ? ((Token)new FlowMappingEnd(mark, mark)) : ((Token)new FlowSequenceEnd(mark, mark)));
-			tokens.JFGNCJCOCJA(mBIJKDIEFIF);
+			tokens.Enqueue(mBIJKDIEFIF);
 		}
 
-		private void BMJNHPLKCEA()
+		private void DecreaseFlowLevel()
 		{
 			if (flowLevel > 0)
 			{
@@ -510,52 +510,52 @@ namespace YamlDotNet.Core
 			}
 		}
 
-		private void JNIGJKOKPIH()
+		private void FetchFlowEntry()
 		{
-			OIDDFFJBIKK();
+			RemoveSimpleKey();
 			simpleKeyAllowed = true;
-			Mark iLENLCMAMBH = cursor.BJKDANAAGHK();
+			Mark iLENLCMAMBH = cursor.Mark();
 			Skip();
-			tokens.JFGNCJCOCJA(new FlowEntry(iLENLCMAMBH, cursor.BJKDANAAGHK()));
+			tokens.Enqueue(new FlowEntry(iLENLCMAMBH, cursor.Mark()));
 		}
 
-		private void LMKPEPCKKMP()
+		private void FetchBlockEntry()
 		{
 			if (flowLevel == 0)
 			{
 				if (!simpleKeyAllowed)
 				{
-					Mark mark = cursor.BJKDANAAGHK();
+					Mark mark = cursor.Mark();
 					throw new SyntaxErrorException(mark, mark, "Block sequence entries are not allowed in this context.");
 				}
-				RollIndent(cursor.LineOffset, -1, true, cursor.BJKDANAAGHK());
+				RollIndent(cursor.LineOffset, -1, true, cursor.Mark());
 			}
-			OIDDFFJBIKK();
+			RemoveSimpleKey();
 			simpleKeyAllowed = true;
-			Mark iLENLCMAMBH = cursor.BJKDANAAGHK();
+			Mark iLENLCMAMBH = cursor.Mark();
 			Skip();
-			tokens.JFGNCJCOCJA(new BlockEntry(iLENLCMAMBH, cursor.BJKDANAAGHK()));
+			tokens.Enqueue(new BlockEntry(iLENLCMAMBH, cursor.Mark()));
 		}
 
-		private void MHOMBHMODGE()
+		private void FetchKey()
 		{
 			if (flowLevel == 0)
 			{
 				if (!simpleKeyAllowed)
 				{
-					Mark mark = cursor.BJKDANAAGHK();
+					Mark mark = cursor.Mark();
 					throw new SyntaxErrorException(mark, mark, "Mapping keys are not allowed in this context.");
 				}
-				RollIndent(cursor.LineOffset, -1, false, cursor.BJKDANAAGHK());
+				RollIndent(cursor.LineOffset, -1, false, cursor.Mark());
 			}
-			OIDDFFJBIKK();
+			RemoveSimpleKey();
 			simpleKeyAllowed = flowLevel == 0;
-			Mark iLENLCMAMBH = cursor.BJKDANAAGHK();
+			Mark iLENLCMAMBH = cursor.Mark();
 			Skip();
-			tokens.JFGNCJCOCJA(new Key(iLENLCMAMBH, cursor.BJKDANAAGHK()));
+			tokens.Enqueue(new Key(iLENLCMAMBH, cursor.Mark()));
 		}
 
-		private void HBGPDPAPEJB()
+		private void FetchValue()
 		{
 			SimpleKey simpleKey = simpleKeys.Peek();
 			if (simpleKey.IsPossible)
@@ -571,16 +571,16 @@ namespace YamlDotNet.Core
 				{
 					if (!simpleKeyAllowed)
 					{
-						Mark mark = cursor.BJKDANAAGHK();
+						Mark mark = cursor.Mark();
 						throw new SyntaxErrorException(mark, mark, "Mapping values are not allowed in this context.");
 					}
-					RollIndent(cursor.LineOffset, -1, false, cursor.BJKDANAAGHK());
+					RollIndent(cursor.LineOffset, -1, false, cursor.Mark());
 				}
 				simpleKeyAllowed = flowLevel == 0;
 			}
-			Mark iLENLCMAMBH = cursor.BJKDANAAGHK();
+			Mark iLENLCMAMBH = cursor.Mark();
 			Skip();
-			tokens.JFGNCJCOCJA(new Value(iLENLCMAMBH, cursor.BJKDANAAGHK()));
+			tokens.Enqueue(new Value(iLENLCMAMBH, cursor.Mark()));
 		}
 
 		private void RollIndent(int DLPJJBPDNDE, int number, bool ANLMKAJLJIJ, Mark MGMMDGFPBLP)
@@ -592,7 +592,7 @@ namespace YamlDotNet.Core
 				Token mBIJKDIEFIF = ((!ANLMKAJLJIJ) ? ((Token)new BlockMappingStart(MGMMDGFPBLP, MGMMDGFPBLP)) : ((Token)new BlockSequenceStart(MGMMDGFPBLP, MGMMDGFPBLP)));
 				if (number == -1)
 				{
-					tokens.JFGNCJCOCJA(mBIJKDIEFIF);
+					tokens.Enqueue(mBIJKDIEFIF);
 				}
 				else
 				{
@@ -601,43 +601,43 @@ namespace YamlDotNet.Core
 			}
 		}
 
-		private void BKPNOKPHDCE(bool LCPNKFDMFIA)
+		private void FetchAnchor(bool LCPNKFDMFIA)
 		{
-			GBHAEIBOPNO();
+			SaveSimpleKey();
 			simpleKeyAllowed = false;
-			tokens.JFGNCJCOCJA(ALHHDIPHHAJ(LCPNKFDMFIA));
+			tokens.Enqueue(ScanAnchor(LCPNKFDMFIA));
 		}
 
-		private Token ALHHDIPHHAJ(bool LCPNKFDMFIA)
+		private Token ScanAnchor(bool LCPNKFDMFIA)
 		{
-			Mark iLENLCMAMBH = cursor.BJKDANAAGHK();
+			Mark iLENLCMAMBH = cursor.Mark();
 			Skip();
 			StringBuilder stringBuilder = new StringBuilder();
-			while (analyzer.KJGBACCEGND())
+			while (analyzer.IsAlphaNumericDashOrUnderscore())
 			{
-				stringBuilder.Append(HKACDMEFHIB());
+				stringBuilder.Append(ReadChar());
 			}
-			if (stringBuilder.Length == 0 || (!analyzer.MKOKPKHBDMD() && !analyzer.Check("?:,]}%@`")))
+			if (stringBuilder.Length == 0 || (!analyzer.IsWhiteBreakOrZero() && !analyzer.Check("?:,]}%@`")))
 			{
-				throw new SyntaxErrorException(iLENLCMAMBH, cursor.BJKDANAAGHK(), "While scanning an anchor or alias, did not find expected alphabetic or numeric character.");
+				throw new SyntaxErrorException(iLENLCMAMBH, cursor.Mark(), "While scanning an anchor or alias, did not find expected alphabetic or numeric character.");
 			}
 			if (LCPNKFDMFIA)
 			{
-				return new Tokens.AnchorAlias(stringBuilder.ToString(), iLENLCMAMBH, cursor.BJKDANAAGHK());
+				return new Tokens.AnchorAlias(stringBuilder.ToString(), iLENLCMAMBH, cursor.Mark());
 			}
-			return new Anchor(stringBuilder.ToString(), iLENLCMAMBH, cursor.BJKDANAAGHK());
+			return new Anchor(stringBuilder.ToString(), iLENLCMAMBH, cursor.Mark());
 		}
 
-		private void MHDNFCAILLG()
+		private void FetchTag()
 		{
-			GBHAEIBOPNO();
+			SaveSimpleKey();
 			simpleKeyAllowed = false;
-			tokens.JFGNCJCOCJA(PAAPFNEIACF());
+			tokens.Enqueue(ScanTag());
 		}
 
-		private Token PAAPFNEIACF()
+		private Token ScanTag()
 		{
-			Mark iLENLCMAMBH = cursor.BJKDANAAGHK();
+			Mark iLENLCMAMBH = cursor.Mark();
 			string text;
 			string text2;
 			if (analyzer.Check('<', 1))
@@ -648,7 +648,7 @@ namespace YamlDotNet.Core
 				text2 = ScanTagUri(null, iLENLCMAMBH);
 				if (!analyzer.Check('>'))
 				{
-					throw new SyntaxErrorException(iLENLCMAMBH, cursor.BJKDANAAGHK(), "While scanning a tag, did not find the expected '>'.");
+					throw new SyntaxErrorException(iLENLCMAMBH, cursor.Mark(), "While scanning a tag, did not find the expected '>'.");
 				}
 				Skip();
 			}
@@ -671,21 +671,21 @@ namespace YamlDotNet.Core
 					}
 				}
 			}
-			if (!analyzer.MKOKPKHBDMD())
+			if (!analyzer.IsWhiteBreakOrZero())
 			{
-				throw new SyntaxErrorException(iLENLCMAMBH, cursor.BJKDANAAGHK(), "While scanning a tag, did not find expected whitespace or line break.");
+				throw new SyntaxErrorException(iLENLCMAMBH, cursor.Mark(), "While scanning a tag, did not find expected whitespace or line break.");
 			}
-			return new Tag(text, text2, iLENLCMAMBH, cursor.BJKDANAAGHK());
+			return new Tag(text, text2, iLENLCMAMBH, cursor.Mark());
 		}
 
-		private void FLCGFAGILPB(bool HLIHDHJFPJP)
+		private void FetchBlockScalar(bool HLIHDHJFPJP)
 		{
-			OIDDFFJBIKK();
+			RemoveSimpleKey();
 			simpleKeyAllowed = true;
-			tokens.JFGNCJCOCJA(BEJNDKGCICB(HLIHDHJFPJP));
+			tokens.Enqueue(ScanBlockScalar(HLIHDHJFPJP));
 		}
 
-		private Token BEJNDKGCICB(bool HLIHDHJFPJP)
+		private Token ScanBlockScalar(bool HLIHDHJFPJP)
 		{
 			StringBuilder stringBuilder = new StringBuilder();
 			StringBuilder stringBuilder2 = new StringBuilder();
@@ -694,29 +694,29 @@ namespace YamlDotNet.Core
 			int num2 = 0;
 			int nAPIKMHPLFP = 0;
 			bool flag = false;
-			Mark iLENLCMAMBH = cursor.BJKDANAAGHK();
+			Mark iLENLCMAMBH = cursor.Mark();
 			Skip();
 			if (analyzer.Check("+-"))
 			{
 				num = (analyzer.Check('+') ? 1 : (-1));
 				Skip();
-				if (analyzer.DDINBPOLPJP())
+				if (analyzer.IsDigit())
 				{
 					if (analyzer.Check('0'))
 					{
-						throw new SyntaxErrorException(iLENLCMAMBH, cursor.BJKDANAAGHK(), "While scanning a block scalar, find an intendation indicator equal to 0.");
+						throw new SyntaxErrorException(iLENLCMAMBH, cursor.Mark(), "While scanning a block scalar, find an intendation indicator equal to 0.");
 					}
-					num2 = analyzer.MDEJLGGFDCP();
+					num2 = analyzer.AsDigit();
 					Skip();
 				}
 			}
-			else if (analyzer.DDINBPOLPJP())
+			else if (analyzer.IsDigit())
 			{
 				if (analyzer.Check('0'))
 				{
-					throw new SyntaxErrorException(iLENLCMAMBH, cursor.BJKDANAAGHK(), "While scanning a block scalar, find an intendation indicator equal to 0.");
+					throw new SyntaxErrorException(iLENLCMAMBH, cursor.Mark(), "While scanning a block scalar, find an intendation indicator equal to 0.");
 				}
-				num2 = analyzer.MDEJLGGFDCP();
+				num2 = analyzer.AsDigit();
 				Skip();
 				if (analyzer.Check("+-"))
 				{
@@ -724,29 +724,29 @@ namespace YamlDotNet.Core
 					Skip();
 				}
 			}
-			while (analyzer.MIGPEDGKJEG())
+			while (analyzer.IsWhite())
 			{
 				Skip();
 			}
-			LHNPOFBJJMN();
-			if (!analyzer.PDOIBEFPDEB())
+			SkipComment();
+			if (!analyzer.IsBreakOrZero())
 			{
-				throw new SyntaxErrorException(iLENLCMAMBH, cursor.BJKDANAAGHK(), "While scanning a block scalar, did not find expected comment or line break.");
+				throw new SyntaxErrorException(iLENLCMAMBH, cursor.Mark(), "While scanning a block scalar, did not find expected comment or line break.");
 			}
-			if (analyzer.JCPPGIPDMBK())
+			if (analyzer.IsBreak())
 			{
-				BBLGADKMIPD();
+				SkipLineBreak();
 			}
-			Mark PCLFFOBJJFO = cursor.BJKDANAAGHK();
+			Mark PCLFFOBJJFO = cursor.Mark();
 			if (num2 != 0)
 			{
 				nAPIKMHPLFP = ((indent < 0) ? num2 : (indent + num2));
 			}
 			nAPIKMHPLFP = ScanBlockScalarBreaks(nAPIKMHPLFP, stringBuilder3, iLENLCMAMBH, ref PCLFFOBJJFO);
-			while (cursor.LineOffset == nAPIKMHPLFP && !analyzer.AJCHNKGPEJB())
+			while (cursor.LineOffset == nAPIKMHPLFP && !analyzer.IsZero())
 			{
-				bool flag2 = analyzer.MIGPEDGKJEG();
-				if (!HLIHDHJFPJP && BKAHPGIAGED(stringBuilder2, '\n') && !flag && !flag2)
+				bool flag2 = analyzer.IsWhite();
+				if (!HLIHDHJFPJP && StartsWithChar(stringBuilder2, '\n') && !flag && !flag2)
 				{
 					if (stringBuilder3.Length == 0)
 					{
@@ -761,12 +761,12 @@ namespace YamlDotNet.Core
 				}
 				stringBuilder.Append(stringBuilder3.ToString());
 				stringBuilder3.Length = 0;
-				flag = analyzer.MIGPEDGKJEG();
-				while (!analyzer.PDOIBEFPDEB())
+				flag = analyzer.IsWhite();
+				while (!analyzer.IsBreakOrZero())
 				{
-					stringBuilder.Append(HKACDMEFHIB());
+					stringBuilder.Append(ReadChar());
 				}
-				stringBuilder2.Append(OGNODHFDLNF());
+				stringBuilder2.Append(ReadLineBreakNormalized());
 				nAPIKMHPLFP = ScanBlockScalarBreaks(nAPIKMHPLFP, stringBuilder3, iLENLCMAMBH, ref PCLFFOBJJFO);
 			}
 			if (num != -1)
@@ -777,17 +777,17 @@ namespace YamlDotNet.Core
 			{
 				stringBuilder.Append(stringBuilder3);
 			}
-			IBEOFCPMMJJ kIGNIBIMLKK = ((!HLIHDHJFPJP) ? IBEOFCPMMJJ.Folded : IBEOFCPMMJJ.Literal);
+			ScalarStyle kIGNIBIMLKK = ((!HLIHDHJFPJP) ? ScalarStyle.Folded : ScalarStyle.Literal);
 			return new Tokens.Scalar(stringBuilder.ToString(), kIGNIBIMLKK, iLENLCMAMBH, PCLFFOBJJFO);
 		}
 
 		private int ScanBlockScalarBreaks(int NAPIKMHPLFP, StringBuilder IIAFKNDBKLN, Mark ILENLCMAMBH, ref Mark PCLFFOBJJFO)
 		{
 			int num = 0;
-			PCLFFOBJJFO = cursor.BJKDANAAGHK();
+			PCLFFOBJJFO = cursor.Mark();
 			while (true)
 			{
-				if ((NAPIKMHPLFP == 0 || cursor.LineOffset < NAPIKMHPLFP) && analyzer.NBLLOLGNFGM())
+				if ((NAPIKMHPLFP == 0 || cursor.LineOffset < NAPIKMHPLFP) && analyzer.IsSpace())
 				{
 					Skip();
 					continue;
@@ -796,16 +796,16 @@ namespace YamlDotNet.Core
 				{
 					num = cursor.LineOffset;
 				}
-				if ((NAPIKMHPLFP == 0 || cursor.LineOffset < NAPIKMHPLFP) && analyzer.BPBEHGMHHGP())
+				if ((NAPIKMHPLFP == 0 || cursor.LineOffset < NAPIKMHPLFP) && analyzer.IsTab())
 				{
-					throw new SyntaxErrorException(ILENLCMAMBH, cursor.BJKDANAAGHK(), "While scanning a block scalar, find a tab character where an intendation space is expected.");
+					throw new SyntaxErrorException(ILENLCMAMBH, cursor.Mark(), "While scanning a block scalar, find a tab character where an intendation space is expected.");
 				}
-				if (!analyzer.JCPPGIPDMBK())
+				if (!analyzer.IsBreak())
 				{
 					break;
 				}
-				IIAFKNDBKLN.Append(OGNODHFDLNF());
-				PCLFFOBJJFO = cursor.BJKDANAAGHK();
+				IIAFKNDBKLN.Append(ReadLineBreakNormalized());
+				PCLFFOBJJFO = cursor.Mark();
 			}
 			if (NAPIKMHPLFP == 0)
 			{
@@ -814,16 +814,16 @@ namespace YamlDotNet.Core
 			return NAPIKMHPLFP;
 		}
 
-		private void DJLOGNJKFNK(bool JNEECJAOIHK)
+		private void FetchFlowScalar(bool JNEECJAOIHK)
 		{
-			GBHAEIBOPNO();
+			SaveSimpleKey();
 			simpleKeyAllowed = false;
-			tokens.JFGNCJCOCJA(JJAKHACHPAF(JNEECJAOIHK));
+			tokens.Enqueue(ScanFlowScalar(JNEECJAOIHK));
 		}
 
-		private Token JJAKHACHPAF(bool JNEECJAOIHK)
+		private Token ScanFlowScalar(bool JNEECJAOIHK)
 		{
-			Mark iLENLCMAMBH = cursor.BJKDANAAGHK();
+			Mark iLENLCMAMBH = cursor.Mark();
 			Skip();
 			StringBuilder stringBuilder = new StringBuilder();
 			StringBuilder stringBuilder2 = new StringBuilder();
@@ -831,16 +831,16 @@ namespace YamlDotNet.Core
 			StringBuilder stringBuilder4 = new StringBuilder();
 			while (true)
 			{
-				if (OPEFOACCBGC())
+				if (IsDocumentIndicator())
 				{
-					throw new SyntaxErrorException(iLENLCMAMBH, cursor.BJKDANAAGHK(), "While scanning a quoted scalar, find unexpected document indicator.");
+					throw new SyntaxErrorException(iLENLCMAMBH, cursor.Mark(), "While scanning a quoted scalar, find unexpected document indicator.");
 				}
-				if (analyzer.AJCHNKGPEJB())
+				if (analyzer.IsZero())
 				{
-					throw new SyntaxErrorException(iLENLCMAMBH, cursor.BJKDANAAGHK(), "While scanning a quoted scalar, find unexpected end of stream.");
+					throw new SyntaxErrorException(iLENLCMAMBH, cursor.Mark(), "While scanning a quoted scalar, find unexpected end of stream.");
 				}
 				bool flag = false;
-				while (!analyzer.MKOKPKHBDMD())
+				while (!analyzer.IsWhiteBreakOrZero())
 				{
 					if (JNEECJAOIHK && analyzer.Check('\'') && analyzer.Check('\'', 1))
 					{
@@ -853,10 +853,10 @@ namespace YamlDotNet.Core
 					{
 						break;
 					}
-					if (!JNEECJAOIHK && analyzer.Check('\\') && analyzer.JCPPGIPDMBK(1))
+					if (!JNEECJAOIHK && analyzer.Check('\\') && analyzer.IsBreak(1))
 					{
 						Skip();
-						BBLGADKMIPD();
+						SkipLineBreak();
 						flag = true;
 						break;
 					}
@@ -883,7 +883,7 @@ namespace YamlDotNet.Core
 								stringBuilder.Append(value);
 								break;
 							}
-							throw new SyntaxErrorException(iLENLCMAMBH, cursor.BJKDANAAGHK(), "While parsing a quoted scalar, find unknown escape character.");
+							throw new SyntaxErrorException(iLENLCMAMBH, cursor.Mark(), "While parsing a quoted scalar, find unknown escape character.");
 						}
 						}
 						Skip();
@@ -895,15 +895,15 @@ namespace YamlDotNet.Core
 						uint num2 = 0u;
 						for (int i = 0; i < num; i++)
 						{
-							if (!analyzer.EMFKOPNCOFA(i))
+							if (!analyzer.IsHex(i))
 							{
-								throw new SyntaxErrorException(iLENLCMAMBH, cursor.BJKDANAAGHK(), "While parsing a quoted scalar, did not find expected hexdecimal number.");
+								throw new SyntaxErrorException(iLENLCMAMBH, cursor.Mark(), "While parsing a quoted scalar, did not find expected hexdecimal number.");
 							}
-							num2 = (uint)((num2 << 4) + analyzer.IGACACHGIGK(i));
+							num2 = (uint)((num2 << 4) + analyzer.AsHex(i));
 						}
 						if ((num2 >= 55296 && num2 <= 57343) || num2 > 1114111)
 						{
-							throw new SyntaxErrorException(iLENLCMAMBH, cursor.BJKDANAAGHK(), "While parsing a quoted scalar, find invalid Unicode character escape code.");
+							throw new SyntaxErrorException(iLENLCMAMBH, cursor.Mark(), "While parsing a quoted scalar, find invalid Unicode character escape code.");
 						}
 						stringBuilder.Append((char)num2);
 						for (int j = 0; j < num; j++)
@@ -913,20 +913,20 @@ namespace YamlDotNet.Core
 					}
 					else
 					{
-						stringBuilder.Append(HKACDMEFHIB());
+						stringBuilder.Append(ReadChar());
 					}
 				}
 				if (analyzer.Check((!JNEECJAOIHK) ? '"' : '\''))
 				{
 					break;
 				}
-				while (analyzer.MIGPEDGKJEG() || analyzer.JCPPGIPDMBK())
+				while (analyzer.IsWhite() || analyzer.IsBreak())
 				{
-					if (analyzer.MIGPEDGKJEG())
+					if (analyzer.IsWhite())
 					{
 						if (!flag)
 						{
-							stringBuilder2.Append(HKACDMEFHIB());
+							stringBuilder2.Append(ReadChar());
 						}
 						else
 						{
@@ -936,17 +936,17 @@ namespace YamlDotNet.Core
 					else if (!flag)
 					{
 						stringBuilder2.Length = 0;
-						stringBuilder3.Append(OGNODHFDLNF());
+						stringBuilder3.Append(ReadLineBreakNormalized());
 						flag = true;
 					}
 					else
 					{
-						stringBuilder4.Append(OGNODHFDLNF());
+						stringBuilder4.Append(ReadLineBreakNormalized());
 					}
 				}
 				if (flag)
 				{
-					if (BKAHPGIAGED(stringBuilder3, '\n'))
+					if (StartsWithChar(stringBuilder3, '\n'))
 					{
 						if (stringBuilder4.Length == 0)
 						{
@@ -972,17 +972,17 @@ namespace YamlDotNet.Core
 				}
 			}
 			Skip();
-			return new Tokens.Scalar(stringBuilder.ToString(), (!JNEECJAOIHK) ? IBEOFCPMMJJ.DoubleQuoted : IBEOFCPMMJJ.SingleQuoted);
+			return new Tokens.Scalar(stringBuilder.ToString(), (!JNEECJAOIHK) ? ScalarStyle.DoubleQuoted : ScalarStyle.SingleQuoted);
 		}
 
-		private void JDJODGJEDOF()
+		private void FetchPlainScalar()
 		{
-			GBHAEIBOPNO();
+			SaveSimpleKey();
 			simpleKeyAllowed = false;
-			tokens.JFGNCJCOCJA(GIEBOAFKIGE());
+			tokens.Enqueue(ScanPlainScalar());
 		}
 
-		private Token GIEBOAFKIGE()
+		private Token ScanPlainScalar()
 		{
 			StringBuilder stringBuilder = new StringBuilder();
 			StringBuilder stringBuilder2 = new StringBuilder();
@@ -990,17 +990,17 @@ namespace YamlDotNet.Core
 			StringBuilder stringBuilder4 = new StringBuilder();
 			bool flag = false;
 			int num = indent + 1;
-			Mark mark = cursor.BJKDANAAGHK();
+			Mark mark = cursor.Mark();
 			Mark pCLFFOBJJFO = mark;
-			while (!OPEFOACCBGC() && !analyzer.Check('#'))
+			while (!IsDocumentIndicator() && !analyzer.Check('#'))
 			{
-				while (!analyzer.MKOKPKHBDMD())
+				while (!analyzer.IsWhiteBreakOrZero())
 				{
-					if (flowLevel > 0 && analyzer.Check(':') && !analyzer.MKOKPKHBDMD(1))
+					if (flowLevel > 0 && analyzer.Check(':') && !analyzer.IsWhiteBreakOrZero(1))
 					{
-						throw new SyntaxErrorException(mark, cursor.BJKDANAAGHK(), "While scanning a plain scalar, find unexpected ':'.");
+						throw new SyntaxErrorException(mark, cursor.Mark(), "While scanning a plain scalar, find unexpected ':'.");
 					}
-					if ((analyzer.Check(':') && analyzer.MKOKPKHBDMD(1)) || (flowLevel > 0 && analyzer.Check(",:?[]{}")))
+					if ((analyzer.Check(':') && analyzer.IsWhiteBreakOrZero(1)) || (flowLevel > 0 && analyzer.Check(",:?[]{}")))
 					{
 						break;
 					}
@@ -1008,7 +1008,7 @@ namespace YamlDotNet.Core
 					{
 						if (flag)
 						{
-							if (BKAHPGIAGED(stringBuilder3, '\n'))
+							if (StartsWithChar(stringBuilder3, '\n'))
 							{
 								if (stringBuilder4.Length == 0)
 								{
@@ -1034,24 +1034,24 @@ namespace YamlDotNet.Core
 							stringBuilder2.Length = 0;
 						}
 					}
-					stringBuilder.Append(HKACDMEFHIB());
-					pCLFFOBJJFO = cursor.BJKDANAAGHK();
+					stringBuilder.Append(ReadChar());
+					pCLFFOBJJFO = cursor.Mark();
 				}
-				if (!analyzer.MIGPEDGKJEG() && !analyzer.JCPPGIPDMBK())
+				if (!analyzer.IsWhite() && !analyzer.IsBreak())
 				{
 					break;
 				}
-				while (analyzer.MIGPEDGKJEG() || analyzer.JCPPGIPDMBK())
+				while (analyzer.IsWhite() || analyzer.IsBreak())
 				{
-					if (analyzer.MIGPEDGKJEG())
+					if (analyzer.IsWhite())
 					{
-						if (flag && cursor.LineOffset < num && analyzer.BPBEHGMHHGP())
+						if (flag && cursor.LineOffset < num && analyzer.IsTab())
 						{
-							throw new SyntaxErrorException(mark, cursor.BJKDANAAGHK(), "While scanning a plain scalar, find a tab character that violate intendation.");
+							throw new SyntaxErrorException(mark, cursor.Mark(), "While scanning a plain scalar, find a tab character that violate intendation.");
 						}
 						if (!flag)
 						{
-							stringBuilder2.Append(HKACDMEFHIB());
+							stringBuilder2.Append(ReadChar());
 						}
 						else
 						{
@@ -1061,12 +1061,12 @@ namespace YamlDotNet.Core
 					else if (!flag)
 					{
 						stringBuilder2.Length = 0;
-						stringBuilder3.Append(OGNODHFDLNF());
+						stringBuilder3.Append(ReadLineBreakNormalized());
 						flag = true;
 					}
 					else
 					{
-						stringBuilder4.Append(OGNODHFDLNF());
+						stringBuilder4.Append(ReadLineBreakNormalized());
 					}
 				}
 				if (flowLevel == 0 && cursor.LineOffset < num)
@@ -1078,10 +1078,10 @@ namespace YamlDotNet.Core
 			{
 				simpleKeyAllowed = true;
 			}
-			return new Tokens.Scalar(stringBuilder.ToString(), IBEOFCPMMJJ.Plain, mark, pCLFFOBJJFO);
+			return new Tokens.Scalar(stringBuilder.ToString(), ScalarStyle.Plain, mark, pCLFFOBJJFO);
 		}
 
-		private void OIDDFFJBIKK()
+		private void RemoveSimpleKey()
 		{
 			SimpleKey simpleKey = simpleKeys.Peek();
 			if (simpleKey.IsPossible && simpleKey.IsRequired)
@@ -1094,55 +1094,55 @@ namespace YamlDotNet.Core
 		private string ScanDirectiveName(Mark ILENLCMAMBH)
 		{
 			StringBuilder stringBuilder = new StringBuilder();
-			while (analyzer.KJGBACCEGND())
+			while (analyzer.IsAlphaNumericDashOrUnderscore())
 			{
-				stringBuilder.Append(HKACDMEFHIB());
+				stringBuilder.Append(ReadChar());
 			}
 			if (stringBuilder.Length == 0)
 			{
-				throw new SyntaxErrorException(ILENLCMAMBH, cursor.BJKDANAAGHK(), "While scanning a directive, could not find expected directive name.");
+				throw new SyntaxErrorException(ILENLCMAMBH, cursor.Mark(), "While scanning a directive, could not find expected directive name.");
 			}
-			if (!analyzer.MKOKPKHBDMD())
+			if (!analyzer.IsWhiteBreakOrZero())
 			{
-				throw new SyntaxErrorException(ILENLCMAMBH, cursor.BJKDANAAGHK(), "While scanning a directive, find unexpected non-alphabetical character.");
+				throw new SyntaxErrorException(ILENLCMAMBH, cursor.Mark(), "While scanning a directive, find unexpected non-alphabetical character.");
 			}
 			return stringBuilder.ToString();
 		}
 
-		private void ANNKALGJLJH()
+		private void SkipWhitespace()
 		{
-			while (analyzer.MIGPEDGKJEG())
+			while (analyzer.IsWhite())
 			{
 				Skip();
 			}
 		}
 
-		private Token HNBHLKOPJGL(Mark ILENLCMAMBH)
+		private Token ScanVersionDirective(Mark ILENLCMAMBH)
 		{
-			ANNKALGJLJH();
+			SkipWhitespace();
 			int iBGMIGIFNJM = ScanVersionDirectiveNumber(ILENLCMAMBH);
 			if (!analyzer.Check('.'))
 			{
-				throw new SyntaxErrorException(ILENLCMAMBH, cursor.BJKDANAAGHK(), "While scanning a %YAML directive, did not find expected digit or '.' character.");
+				throw new SyntaxErrorException(ILENLCMAMBH, cursor.Mark(), "While scanning a %YAML directive, did not find expected digit or '.' character.");
 			}
 			Skip();
 			int lDKAECLLDNG = ScanVersionDirectiveNumber(ILENLCMAMBH);
 			return new VersionDirective(new Version(iBGMIGIFNJM, lDKAECLLDNG), ILENLCMAMBH, ILENLCMAMBH);
 		}
 
-		private Token GKOGPOOEBGL(Mark ILENLCMAMBH)
+		private Token ScanTagDirective(Mark ILENLCMAMBH)
 		{
-			ANNKALGJLJH();
+			SkipWhitespace();
 			string fODGADCGDBH = ScanTagHandle(true, ILENLCMAMBH);
-			if (!analyzer.MIGPEDGKJEG())
+			if (!analyzer.IsWhite())
 			{
-				throw new SyntaxErrorException(ILENLCMAMBH, cursor.BJKDANAAGHK(), "While scanning a %TAG directive, did not find expected whitespace.");
+				throw new SyntaxErrorException(ILENLCMAMBH, cursor.Mark(), "While scanning a %TAG directive, did not find expected whitespace.");
 			}
-			ANNKALGJLJH();
+			SkipWhitespace();
 			string jMOHMLIGHHD = ScanTagUri(null, ILENLCMAMBH);
-			if (!analyzer.MKOKPKHBDMD())
+			if (!analyzer.IsWhiteBreakOrZero())
 			{
-				throw new SyntaxErrorException(ILENLCMAMBH, cursor.BJKDANAAGHK(), "While scanning a %TAG directive, did not find expected whitespace or line break.");
+				throw new SyntaxErrorException(ILENLCMAMBH, cursor.Mark(), "While scanning a %TAG directive, did not find expected whitespace or line break.");
 			}
 			return new TagDirective(fODGADCGDBH, jMOHMLIGHHD, ILENLCMAMBH, ILENLCMAMBH);
 		}
@@ -1154,7 +1154,7 @@ namespace YamlDotNet.Core
 			{
 				stringBuilder.Append(POLFAHOJJCN.Substring(1));
 			}
-			while (analyzer.KJGBACCEGND() || analyzer.Check(";/?:@&=+$,.!~*'()[]%"))
+			while (analyzer.IsAlphaNumericDashOrUnderscore() || analyzer.Check(";/?:@&=+$,.!~*'()[]%"))
 			{
 				if (analyzer.Check('%'))
 				{
@@ -1162,12 +1162,12 @@ namespace YamlDotNet.Core
 				}
 				else
 				{
-					stringBuilder.Append(HKACDMEFHIB());
+					stringBuilder.Append(ReadChar());
 				}
 			}
 			if (stringBuilder.Length == 0)
 			{
-				throw new SyntaxErrorException(ILENLCMAMBH, cursor.BJKDANAAGHK(), "While parsing a tag, did not find expected tag URI.");
+				throw new SyntaxErrorException(ILENLCMAMBH, cursor.Mark(), "While parsing a tag, did not find expected tag URI.");
 			}
 			return stringBuilder.ToString();
 		}
@@ -1178,22 +1178,22 @@ namespace YamlDotNet.Core
 			int num = 0;
 			do
 			{
-				if (!analyzer.Check('%') || !analyzer.EMFKOPNCOFA(1) || !analyzer.EMFKOPNCOFA(2))
+				if (!analyzer.Check('%') || !analyzer.IsHex(1) || !analyzer.IsHex(2))
 				{
-					throw new SyntaxErrorException(ILENLCMAMBH, cursor.BJKDANAAGHK(), "While parsing a tag, did not find URI escaped octet.");
+					throw new SyntaxErrorException(ILENLCMAMBH, cursor.Mark(), "While parsing a tag, did not find URI escaped octet.");
 				}
-				int num2 = (analyzer.IGACACHGIGK(1) << 4) + analyzer.IGACACHGIGK(2);
+				int num2 = (analyzer.AsHex(1) << 4) + analyzer.AsHex(2);
 				if (num == 0)
 				{
 					num = (((num2 & 0x80) == 0) ? 1 : (((num2 & 0xE0) == 192) ? 2 : (((num2 & 0xF0) == 224) ? 3 : (((num2 & 0xF8) == 240) ? 4 : 0))));
 					if (num == 0)
 					{
-						throw new SyntaxErrorException(ILENLCMAMBH, cursor.BJKDANAAGHK(), "While parsing a tag, find an incorrect leading UTF-8 octet.");
+						throw new SyntaxErrorException(ILENLCMAMBH, cursor.Mark(), "While parsing a tag, find an incorrect leading UTF-8 octet.");
 					}
 				}
 				else if ((num2 & 0xC0) != 128)
 				{
-					throw new SyntaxErrorException(ILENLCMAMBH, cursor.BJKDANAAGHK(), "While parsing a tag, find an incorrect trailing UTF-8 octet.");
+					throw new SyntaxErrorException(ILENLCMAMBH, cursor.Mark(), "While parsing a tag, find an incorrect trailing UTF-8 octet.");
 				}
 				list.Add((byte)num2);
 				Skip();
@@ -1204,7 +1204,7 @@ namespace YamlDotNet.Core
 			char[] chars = Encoding.UTF8.GetChars(list.ToArray());
 			if (chars.Length != 1)
 			{
-				throw new SyntaxErrorException(ILENLCMAMBH, cursor.BJKDANAAGHK(), "While parsing a tag, find an incorrect UTF-8 sequence.");
+				throw new SyntaxErrorException(ILENLCMAMBH, cursor.Mark(), "While parsing a tag, find an incorrect UTF-8 sequence.");
 			}
 			return chars[0];
 		}
@@ -1213,21 +1213,21 @@ namespace YamlDotNet.Core
 		{
 			if (!analyzer.Check('!'))
 			{
-				throw new SyntaxErrorException(ILENLCMAMBH, cursor.BJKDANAAGHK(), "While scanning a tag, did not find expected '!'.");
+				throw new SyntaxErrorException(ILENLCMAMBH, cursor.Mark(), "While scanning a tag, did not find expected '!'.");
 			}
 			StringBuilder stringBuilder = new StringBuilder();
-			stringBuilder.Append(HKACDMEFHIB());
-			while (analyzer.KJGBACCEGND())
+			stringBuilder.Append(ReadChar());
+			while (analyzer.IsAlphaNumericDashOrUnderscore())
 			{
-				stringBuilder.Append(HKACDMEFHIB());
+				stringBuilder.Append(ReadChar());
 			}
 			if (analyzer.Check('!'))
 			{
-				stringBuilder.Append(HKACDMEFHIB());
+				stringBuilder.Append(ReadChar());
 			}
 			else if (NDFFLMEDCFH && (stringBuilder.Length != 1 || stringBuilder[0] != '!'))
 			{
-				throw new SyntaxErrorException(ILENLCMAMBH, cursor.BJKDANAAGHK(), "While parsing a tag directive, did not find expected '!'.");
+				throw new SyntaxErrorException(ILENLCMAMBH, cursor.Mark(), "While parsing a tag directive, did not find expected '!'.");
 			}
 			return stringBuilder.ToString();
 		}
@@ -1236,29 +1236,29 @@ namespace YamlDotNet.Core
 		{
 			int num = 0;
 			int num2 = 0;
-			while (analyzer.DDINBPOLPJP())
+			while (analyzer.IsDigit())
 			{
 				if (++num2 > 9)
 				{
-					throw new SyntaxErrorException(ILENLCMAMBH, cursor.BJKDANAAGHK(), "While scanning a %YAML directive, find extremely long version number.");
+					throw new SyntaxErrorException(ILENLCMAMBH, cursor.Mark(), "While scanning a %YAML directive, find extremely long version number.");
 				}
-				num = num * 10 + analyzer.MDEJLGGFDCP();
+				num = num * 10 + analyzer.AsDigit();
 				Skip();
 			}
 			if (num2 == 0)
 			{
-				throw new SyntaxErrorException(ILENLCMAMBH, cursor.BJKDANAAGHK(), "While scanning a %YAML directive, did not find expected version number.");
+				throw new SyntaxErrorException(ILENLCMAMBH, cursor.Mark(), "While scanning a %YAML directive, did not find expected version number.");
 			}
 			return num;
 		}
 
-		private void GBHAEIBOPNO()
+		private void SaveSimpleKey()
 		{
 			bool mMIJJJMNNND = flowLevel == 0 && indent == cursor.LineOffset;
 			if (simpleKeyAllowed)
 			{
 				SimpleKey t = new SimpleKey(true, mMIJJJMNNND, tokensParsed + tokens.Count, cursor);
-				OIDDFFJBIKK();
+				RemoveSimpleKey();
 				simpleKeys.Pop();
 				simpleKeys.Push(t);
 			}

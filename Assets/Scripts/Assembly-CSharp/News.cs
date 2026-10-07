@@ -2,47 +2,47 @@ using System.Collections.Generic;
 
 public class News
 {
-	private List<NewsItem> HOGDMAJCMJP = new List<NewsItem>();
+	private List<NewsItem> _items = new List<NewsItem>();
 
-	public List<NewsItem> PMEBINFGHLH
+	public List<NewsItem> Items
 	{
 		get
 		{
-			return MEFNHIALOED();
+			return GetItems();
 		}
 	}
 
-	public List<NewsItem> MEFNHIALOED()
+	public List<NewsItem> GetItems()
 	{
-		return HOGDMAJCMJP;
+		return _items;
 	}
 
 	public void Reset()
 	{
-		HOGDMAJCMJP.Clear();
+		_items.Clear();
 	}
 
-	public void EJDDCELLCBK(string name, string BEPKJNKCKPH, string MDDOAGNHAHE, int OKNNNLIPODI, bool HNJDHGDLLPD, long NKKKMPPEMKE, List<NewsButton> HJNAHNICGMH, string PEMOECLNECD = "", bool EIKKPDKMMHK = false, string KINPMPFPFHD = "", string EJENJNPEDOH = "")
+	public void AddOrReplaceItem(string name, string BEPKJNKCKPH, string MDDOAGNHAHE, int OKNNNLIPODI, bool HNJDHGDLLPD, long NKKKMPPEMKE, List<NewsButton> HJNAHNICGMH, string PEMOECLNECD = "", bool EIKKPDKMMHK = false, string KINPMPFPFHD = "", string EJENJNPEDOH = "")
 	{
-		NewsItem pONDDFBMFOO = HOGDMAJCMJP.Find((NewsItem DHDMNHCIPEH) => DHDMNHCIPEH.Id == OKNNNLIPODI);
+		NewsItem pONDDFBMFOO = _items.Find((NewsItem DHDMNHCIPEH) => DHDMNHCIPEH.Id == OKNNNLIPODI);
 		if (pONDDFBMFOO != null)
 		{
-			HOGDMAJCMJP.Remove(pONDDFBMFOO);
+			_items.Remove(pONDDFBMFOO);
 		}
 		pONDDFBMFOO = new NewsItem();
 		pONDDFBMFOO.Title = PEMOECLNECD;
 		pONDDFBMFOO.Name = name;
 		pONDDFBMFOO.Url = BEPKJNKCKPH;
-		pONDDFBMFOO.MDDOAGNHAHE = MDDOAGNHAHE;
+		pONDDFBMFOO.ImageUrl = MDDOAGNHAHE;
 		pONDDFBMFOO.Id = OKNNNLIPODI;
-		pONDDFBMFOO.DCHJDPCEODD = HNJDHGDLLPD;
+		pONDDFBMFOO.IsActive = HNJDHGDLLPD;
 		pONDDFBMFOO.EndDate = NKKKMPPEMKE;
-		pONDDFBMFOO.CIKJHDEGHGD = false;
-		pONDDFBMFOO.GAHGCJNGDMH = false;
-		pONDDFBMFOO.EGBHELMJJKO = EIKKPDKMMHK;
-		pONDDFBMFOO.COIGFENOMJD = KINPMPFPFHD;
-		pONDDFBMFOO.DHKDOHFKOOJ = HJNAHNICGMH;
-		pONDDFBMFOO.KJHMHHBJEDH = EJENJNPEDOH;
-		MEFNHIALOED().Add(pONDDFBMFOO);
+		pONDDFBMFOO.WasShown = false;
+		pONDDFBMFOO.IsImageReady = false;
+		pONDDFBMFOO.GoShop = EIKKPDKMMHK;
+		pONDDFBMFOO.RedirectShop = KINPMPFPFHD;
+		pONDDFBMFOO.Buttons = HJNAHNICGMH;
+		pONDDFBMFOO.SpenderTypeId = EJENJNPEDOH;
+		GetItems().Add(pONDDFBMFOO);
 	}
 }

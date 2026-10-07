@@ -12,18 +12,18 @@ public class Evaluation
 		return Parse(BLLNKKNDNII, PNKJPOHEOJB, "Attribute");
 	}
 
-	public static float BEFJGPEAJCF(XmlNode BLLNKKNDNII, RatingEvaluation PNKJPOHEOJB)
+	public static float ParseAverageQuantity(XmlNode BLLNKKNDNII, RatingEvaluation PNKJPOHEOJB)
 	{
-		PNKJPOHEOJB.BEAGNAOOHBP = XmlUtils.ParseFloat(BLLNKKNDNII.Attributes["AverageQuantity"]);
-		return PNKJPOHEOJB.BEAGNAOOHBP;
+		PNKJPOHEOJB.averageQuantity = XmlUtils.ParseFloat(BLLNKKNDNII.Attributes["AverageQuantity"]);
+		return PNKJPOHEOJB.averageQuantity;
 	}
 
-	public static float MNFPBOPIHDE(XmlNode BLLNKKNDNII, RatingEvaluation PNKJPOHEOJB)
+	public static float ParseAverageDamageAndRecharge(XmlNode BLLNKKNDNII, RatingEvaluation PNKJPOHEOJB)
 	{
-		PNKJPOHEOJB.CDCIEOFCKNO = XmlUtils.ParseFloat(BLLNKKNDNII.Attributes["AverageBaseDamage"]);
-		PNKJPOHEOJB.GCOFCDFHMGL = XmlUtils.ParseFloat(BLLNKKNDNII.Attributes["RechargeRate"]);
-		PNKJPOHEOJB.OFHGAJDLIDB = XmlUtils.ParseFloat(BLLNKKNDNII.Attributes["MagicRechargeRate"]);
-		return PNKJPOHEOJB.CDCIEOFCKNO;
+		PNKJPOHEOJB.averageBaseDamage = XmlUtils.ParseFloat(BLLNKKNDNII.Attributes["AverageBaseDamage"]);
+		PNKJPOHEOJB.rechargeRate = XmlUtils.ParseFloat(BLLNKKNDNII.Attributes["RechargeRate"]);
+		PNKJPOHEOJB.magicRechargeRate = XmlUtils.ParseFloat(BLLNKKNDNII.Attributes["MagicRechargeRate"]);
+		return PNKJPOHEOJB.averageBaseDamage;
 	}
 
 	private void Parse(XmlNode MEEAKLDGLDF)

@@ -3,76 +3,76 @@ using System.Diagnostics;
 public class LedgerSettings
 {
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private string KLKKKBPEPOI;
+	private string url;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private int OCOBNPGODHJ;
+	private int timeout;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private int LAOBKCPOMLG;
+	private int maxRetry;
 
-	public int BEOBDJHNHIO
+	public int Timeout
 	{
 		get
 		{
-			return FJKGKLJGIJI();
+			return GetTimeout();
 		}
 		private set
 		{
-			DKLGPGDJPGO(value);
+			SetTimeout(value);
 		}
 	}
 
-	public int MCAJFNFANBG
+	public int MaxRetry
 	{
 		get
 		{
-			return MHDAMOAPFPC();
+			return GetMaxRetry();
 		}
 		private set
 		{
-			EGAPEDBFOGK(value);
+			SetMaxRetry(value);
 		}
 	}
 
 	public LedgerSettings(string BEPKJNKCKPH, int DGDKHFPEHOG, int BDNJNFPONEF)
 	{
 		set_Url(BEPKJNKCKPH);
-		DKLGPGDJPGO(DGDKHFPEHOG);
-		EGAPEDBFOGK(BDNJNFPONEF);
-		if (!KLMLKCKNNFD().EndsWith("/"))
+		SetTimeout(DGDKHFPEHOG);
+		SetMaxRetry(BDNJNFPONEF);
+		if (!GetUrl().EndsWith("/"))
 		{
-			set_Url(KLMLKCKNNFD() + "/");
+			set_Url(GetUrl() + "/");
 		}
 	}
 
-	public string KLMLKCKNNFD()
+	public string GetUrl()
 	{
-		return KLKKKBPEPOI;
+		return url;
 	}
 
 	private void set_Url(string value)
 	{
-		KLKKKBPEPOI = value;
+		url = value;
 	}
 
-	public int FJKGKLJGIJI()
+	public int GetTimeout()
 	{
-		return OCOBNPGODHJ;
+		return timeout;
 	}
 
-	private void DKLGPGDJPGO(int value)
+	private void SetTimeout(int value)
 	{
-		OCOBNPGODHJ = value;
+		timeout = value;
 	}
 
-	public int MHDAMOAPFPC()
+	public int GetMaxRetry()
 	{
-		return LAOBKCPOMLG;
+		return maxRetry;
 	}
 
-	private void EGAPEDBFOGK(int value)
+	private void SetMaxRetry(int value)
 	{
-		LAOBKCPOMLG = value;
+		maxRetry = value;
 	}
 }

@@ -4,34 +4,34 @@ using System.Diagnostics;
 
 namespace Nekki.SF2.Core.Network
 {
-	public class ServerProvider : ServerProviderBase, JNEBPDNJFJG
+	public class ServerProvider : ServerProviderBase, IPurchaseVerifier
 	{
 		private static ServerProvider _Instance;
 
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		private static string OFLIMNFAFHN;
+		private static string putUrl;
 
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		private static string BBNDHEMGHHK;
+		private static string getUrl;
 
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		private static string KPBKNDNFHEM;
+		private static string configUrl;
 
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		private static string DGMBMOLNBHL;
+		private static string timeServerUrl;
 
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		private static string GGBOJPFJBJH;
+		private static string userId;
 
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		private static string BDMEDOELLNO;
+		private static string dumpPutUrl;
 
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		private static string LCKGFBDBCOF;
+		private static string dumpGetUrl;
 
-		private static int PIINNMAEFIJ;
+		private static int loginInterval;
 
-		public string GKPACGEBJFP
+		public string PutServerUrl
 		{
 			get
 			{
@@ -39,7 +39,7 @@ namespace Nekki.SF2.Core.Network
 			}
 		}
 
-		public new static ServerProvider BPCBBHAKFDM
+		public new static ServerProvider SharedInstance
 		{
 			get
 			{
@@ -47,7 +47,7 @@ namespace Nekki.SF2.Core.Network
 			}
 		}
 
-		public static string LBGNJDOKHEH
+		public static string PutEndpoint
 		{
 			get
 			{
@@ -59,7 +59,7 @@ namespace Nekki.SF2.Core.Network
 			}
 		}
 
-		public static string CMGMOIJANNL
+		public static string GetEndpoint
 		{
 			get
 			{
@@ -71,7 +71,7 @@ namespace Nekki.SF2.Core.Network
 			}
 		}
 
-		public static string GJBPJGLDPIJ
+		public static string ConfigEndpoint
 		{
 			get
 			{
@@ -83,7 +83,7 @@ namespace Nekki.SF2.Core.Network
 			}
 		}
 
-		public static string EEEKJKIKLMD
+		public static string TimeServerEndpoint
 		{
 			get
 			{
@@ -95,7 +95,7 @@ namespace Nekki.SF2.Core.Network
 			}
 		}
 
-		public static string IIHIMJFONIL
+		public static string DumpPutEndpoint
 		{
 			get
 			{
@@ -107,7 +107,7 @@ namespace Nekki.SF2.Core.Network
 			}
 		}
 
-		public static string AHNMIPKNAKO
+		public static string DumpGetEndpoint
 		{
 			get
 			{
@@ -119,7 +119,7 @@ namespace Nekki.SF2.Core.Network
 			}
 		}
 
-		public static int LBHOGGEBNKD
+		public static int LoginIntervalSetting
 		{
 			get
 			{
@@ -131,7 +131,7 @@ namespace Nekki.SF2.Core.Network
 			}
 		}
 
-		protected override string NFKOPHMCLFF()
+		protected override string GetServerUrl()
 		{
 			return get_GetURL();
 		}
@@ -153,87 +153,87 @@ namespace Nekki.SF2.Core.Network
 
 		public static string get_PutURL()
 		{
-			return OFLIMNFAFHN;
+			return putUrl;
 		}
 
 		public static void set_PutURL(string value)
 		{
-			OFLIMNFAFHN = value;
+			putUrl = value;
 		}
 
 		public static string get_GetURL()
 		{
-			return BBNDHEMGHHK;
+			return getUrl;
 		}
 
 		public static void set_GetURL(string value)
 		{
-			BBNDHEMGHHK = value;
+			getUrl = value;
 		}
 
 		public static string get_ConfigURL()
 		{
-			return KPBKNDNFHEM;
+			return configUrl;
 		}
 
 		public static void set_ConfigURL(string value)
 		{
-			KPBKNDNFHEM = value;
+			configUrl = value;
 		}
 
 		public static string get_TimeServerURL()
 		{
-			return DGMBMOLNBHL;
+			return timeServerUrl;
 		}
 
 		public static void set_TimeServerURL(string value)
 		{
-			DGMBMOLNBHL = value;
+			timeServerUrl = value;
 		}
 
 		public static string get_UserID()
 		{
-			return GGBOJPFJBJH;
+			return userId;
 		}
 
 		public static void set_UserID(string value)
 		{
-			GGBOJPFJBJH = value;
+			userId = value;
 		}
 
 		public static string get_DumpPutURL()
 		{
-			return BDMEDOELLNO;
+			return dumpPutUrl;
 		}
 
 		public static void set_DumpPutURL(string value)
 		{
-			BDMEDOELLNO = value;
+			dumpPutUrl = value;
 		}
 
 		public static string get_DumpGetURL()
 		{
-			return LCKGFBDBCOF;
+			return dumpGetUrl;
 		}
 
 		public static void set_DumpGetURL(string value)
 		{
-			LCKGFBDBCOF = value;
+			dumpGetUrl = value;
 		}
 
 		public static int get_LoginInterval()
 		{
-			return PIINNMAEFIJ;
+			return loginInterval;
 		}
 
 		public static void set_LoginInterval(int value)
 		{
-			PIINNMAEFIJ = value;
+			loginInterval = value;
 		}
 
 		public static void Reset()
 		{
-			PIINNMAEFIJ = 0;
+			loginInterval = 0;
 		}
 
 		protected override void Init()
@@ -246,12 +246,12 @@ namespace Nekki.SF2.Core.Network
 			yield break;
 		}
 
-		public void VerifyPurchaseAction(JLDHCFFAIPK PAENLDALDGB, string DBKFOHCPLDB, Action<bool, string, object> p_delegate)
+		public void VerifyPurchaseAction(PaymentInfo PAENLDALDGB, string DBKFOHCPLDB, Action<bool, string, object> p_delegate)
 		{
 			StartCoroutine(FailRequest(p_delegate, PAENLDALDGB));
 		}
 
-		public void ConfirmVerificationAction(JLDHCFFAIPK PAENLDALDGB, string DBKFOHCPLDB, Action<bool, string, object> p_delegate)
+		public void ConfirmVerificationAction(PaymentInfo PAENLDALDGB, string DBKFOHCPLDB, Action<bool, string, object> p_delegate)
 		{
 			StartCoroutine(FailRequest(p_delegate, PAENLDALDGB));
 		}

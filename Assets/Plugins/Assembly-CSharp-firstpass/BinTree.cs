@@ -3,58 +3,58 @@ using System.IO;
 
 public class BinTree : InWindow, IInWindowStream, IMatchFinder
 {
-	private uint COJKJDCNPKK;
+	private uint _cyclicBufferPos;
 
-	private uint KHADNAIFHBC;
+	private uint _cyclicBufferSize;
 
-	private uint CLPBKMCAKNP;
+	private uint _matchMaxLen;
 
-	private uint[] MMBJNCGMDHC;
+	private uint[] _son;
 
-	private uint[] PIBKPHKCHGC;
+	private uint[] _hash;
 
-	private uint PNKNDHJACDC = 255u;
+	private uint _cutValue = 255u;
 
-	private uint EMOLEFJIIAA;
+	private uint _hashMask;
 
-	private uint OMMLGEAAMHD;
+	private uint _hashSizeSum;
 
 	private bool HASH_ARRAY = true;
 
-	private const uint AMIPEBFMAGJ = 1024u;
+	private const uint kHash2Size = 1024u;
 
-	private const uint OMAGGPMCIDK = 65536u;
+	private const uint kHash3Size = 65536u;
 
-	private const uint FGDFBHMBGJI = 65536u;
+	private const uint kBT2HashSize = 65536u;
 
-	private const uint ILACMFGNEGJ = 1u;
+	private const uint kStartMaxLen = 1u;
 
-	private const uint FDKODIBJKEM = 1024u;
+	private const uint kHash3Offset = 1024u;
 
-	private const uint ADPNCIIEHIN = 0u;
+	private const uint kEmptyHashValue = 0u;
 
-	private const uint KFLBBGNLNDH = 2147483647u;
+	private const uint kMaxValForNormalize = 2147483647u;
 
-	private uint ODGKKDLJDOE;
+	private uint kNumHashDirectBytes;
 
-	private uint HFJCODDCHPN = 4u;
+	private uint kMinMatchCheck = 4u;
 
-	private uint LOMAJDKHOPJ = 66560u;
+	private uint kFixHashSize = 66560u;
 
 	public void SetType(int EOKCENIBPJD)
 	{
 		HASH_ARRAY = EOKCENIBPJD > 2;
 		if (HASH_ARRAY)
 		{
-			ODGKKDLJDOE = 0u;
-			HFJCODDCHPN = 4u;
-			LOMAJDKHOPJ = 66560u;
+			kNumHashDirectBytes = 0u;
+			kMinMatchCheck = 4u;
+			kFixHashSize = 66560u;
 		}
 		else
 		{
-			ODGKKDLJDOE = 2u;
-			HFJCODDCHPN = 3u;
-			LOMAJDKHOPJ = 0u;
+			kNumHashDirectBytes = 2u;
+			kMinMatchCheck = 3u;
+			kFixHashSize = 0u;
 		}
 	}
 
@@ -63,32 +63,32 @@ public class BinTree : InWindow, IInWindowStream, IMatchFinder
 		base.SetStream(ABJIEFMMIEK);
 	}
 
-	public new void IAIFCIAAHOE()
+	public new void ReleaseStream()
 	{
-		base.IAIFCIAAHOE();
+		base.ReleaseStream();
 	}
 
 	public new void Init()
 	{
 		base.Init();
-		for (uint num = 0u; num < OMMLGEAAMHD; num++)
+		for (uint num = 0u; num < _hashSizeSum; num++)
 		{
-			PIBKPHKCHGC[num] = 0u;
+			_hash[num] = 0u;
 		}
-		COJKJDCNPKK = 0u;
+		_cyclicBufferPos = 0u;
 		ReduceOffsets(-1);
 	}
 
-	public new void MHEJFMDCOHI()
+	public new void MovePos()
 	{
-		if (++COJKJDCNPKK >= KHADNAIFHBC)
+		if (++_cyclicBufferPos >= _cyclicBufferSize)
 		{
-			COJKJDCNPKK = 0u;
+			_cyclicBufferPos = 0u;
 		}
-		base.MHEJFMDCOHI();
+		base.MovePos();
 		if (_pos == int.MaxValue)
 		{
-			NBDMEIKNJBG();
+			Normalize();
 		}
 	}
 
@@ -102,9 +102,9 @@ public class BinTree : InWindow, IInWindowStream, IMatchFinder
 		return base.GetMatchLen(index, OIOMNNFMDOO, LOHCIKNKDEI);
 	}
 
-	public new uint HBJMPBCHFJB()
+	public new uint GetNumAvailableBytes()
 	{
-		return base.HBJMPBCHFJB();
+		return base.GetNumAvailableBytes();
 	}
 
 	public void Create(uint PGNMIJNBAAJ, uint JHKHNGLLCLK, uint CCKFKNACIIN, uint CDINDGLFPKA)
@@ -113,14 +113,14 @@ public class BinTree : InWindow, IInWindowStream, IMatchFinder
 		{
 			throw new Exception();
 		}
-		PNKNDHJACDC = 16 + (CCKFKNACIIN >> 1);
+		_cutValue = 16 + (CCKFKNACIIN >> 1);
 		uint iKHIOAIPBNL = (PGNMIJNBAAJ + JHKHNGLLCLK + CCKFKNACIIN + CDINDGLFPKA) / 2 + 256;
 		Create(PGNMIJNBAAJ + JHKHNGLLCLK, CCKFKNACIIN + CDINDGLFPKA, iKHIOAIPBNL);
-		CLPBKMCAKNP = CCKFKNACIIN;
+		_matchMaxLen = CCKFKNACIIN;
 		uint num = PGNMIJNBAAJ + 1;
-		if (KHADNAIFHBC != num)
+		if (_cyclicBufferSize != num)
 		{
-			MMBJNCGMDHC = new uint[(KHADNAIFHBC = num) * 2];
+			_son = new uint[(_cyclicBufferSize = num) * 2];
 		}
 		uint num2 = 65536u;
 		if (HASH_ARRAY)
@@ -136,35 +136,35 @@ public class BinTree : InWindow, IInWindowStream, IMatchFinder
 			{
 				num2 >>= 1;
 			}
-			EMOLEFJIIAA = num2;
+			_hashMask = num2;
 			num2++;
-			num2 += LOMAJDKHOPJ;
+			num2 += kFixHashSize;
 		}
-		if (num2 != OMMLGEAAMHD)
+		if (num2 != _hashSizeSum)
 		{
-			PIBKPHKCHGC = new uint[OMMLGEAAMHD = num2];
+			_hash = new uint[_hashSizeSum = num2];
 		}
 	}
 
 	public uint GetMatches(uint[] PIPLHPNGIPF)
 	{
 		uint num;
-		if (_pos + CLPBKMCAKNP <= OONMJHCFEHO)
+		if (_pos + _matchMaxLen <= _streamPos)
 		{
-			num = CLPBKMCAKNP;
+			num = _matchMaxLen;
 		}
 		else
 		{
-			num = OONMJHCFEHO - _pos;
-			if (num < HFJCODDCHPN)
+			num = _streamPos - _pos;
+			if (num < kMinMatchCheck)
 			{
-				MHEJFMDCOHI();
+				MovePos();
 				return 0u;
 			}
 		}
 		uint num2 = 0u;
-		uint num3 = ((_pos > KHADNAIFHBC) ? (_pos - KHADNAIFHBC) : 0u);
-		uint num4 = HGGJBAEEKJN + _pos;
+		uint num3 = ((_pos > _cyclicBufferSize) ? (_pos - _cyclicBufferSize) : 0u);
+		uint num4 = _bufferOffset + _pos;
 		uint num5 = 1u;
 		uint num6 = 0u;
 		uint num7 = 0u;
@@ -175,25 +175,25 @@ public class BinTree : InWindow, IInWindowStream, IMatchFinder
 			num6 = num8 & 0x3FF;
 			num8 ^= (uint)(_bufferBase[num4 + 2] << 8);
 			num7 = num8 & 0xFFFF;
-			num9 = (num8 ^ (CRC.Table[_bufferBase[num4 + 3]] << 5)) & EMOLEFJIIAA;
+			num9 = (num8 ^ (CRC.Table[_bufferBase[num4 + 3]] << 5)) & _hashMask;
 		}
 		else
 		{
 			num9 = (uint)(_bufferBase[num4] ^ (_bufferBase[num4 + 1] << 8));
 		}
-		uint num10 = PIBKPHKCHGC[LOMAJDKHOPJ + num9];
+		uint num10 = _hash[kFixHashSize + num9];
 		if (HASH_ARRAY)
 		{
-			uint num11 = PIBKPHKCHGC[num6];
-			uint num12 = PIBKPHKCHGC[1024 + num7];
-			PIBKPHKCHGC[num6] = _pos;
-			PIBKPHKCHGC[1024 + num7] = _pos;
-			if (num11 > num3 && _bufferBase[HGGJBAEEKJN + num11] == _bufferBase[num4])
+			uint num11 = _hash[num6];
+			uint num12 = _hash[1024 + num7];
+			_hash[num6] = _pos;
+			_hash[1024 + num7] = _pos;
+			if (num11 > num3 && _bufferBase[_bufferOffset + num11] == _bufferBase[num4])
 			{
 				num5 = (PIPLHPNGIPF[num2++] = 2u);
 				PIPLHPNGIPF[num2++] = _pos - num11 - 1;
 			}
-			if (num12 > num3 && _bufferBase[HGGJBAEEKJN + num12] == _bufferBase[num4])
+			if (num12 > num3 && _bufferBase[_bufferOffset + num12] == _bufferBase[num4])
 			{
 				if (num12 == num11)
 				{
@@ -209,27 +209,27 @@ public class BinTree : InWindow, IInWindowStream, IMatchFinder
 				num5 = 1u;
 			}
 		}
-		PIBKPHKCHGC[LOMAJDKHOPJ + num9] = _pos;
-		uint num13 = (COJKJDCNPKK << 1) + 1;
-		uint num14 = COJKJDCNPKK << 1;
+		_hash[kFixHashSize + num9] = _pos;
+		uint num13 = (_cyclicBufferPos << 1) + 1;
+		uint num14 = _cyclicBufferPos << 1;
 		uint val2;
-		uint val = (val2 = ODGKKDLJDOE);
-		if (ODGKKDLJDOE != 0 && num10 > num3 && _bufferBase[HGGJBAEEKJN + num10 + ODGKKDLJDOE] != _bufferBase[num4 + ODGKKDLJDOE])
+		uint val = (val2 = kNumHashDirectBytes);
+		if (kNumHashDirectBytes != 0 && num10 > num3 && _bufferBase[_bufferOffset + num10 + kNumHashDirectBytes] != _bufferBase[num4 + kNumHashDirectBytes])
 		{
-			num5 = (PIPLHPNGIPF[num2++] = ODGKKDLJDOE);
+			num5 = (PIPLHPNGIPF[num2++] = kNumHashDirectBytes);
 			PIPLHPNGIPF[num2++] = _pos - num10 - 1;
 		}
-		uint pNKNDHJACDC = PNKNDHJACDC;
+		uint pNKNDHJACDC = _cutValue;
 		while (true)
 		{
 			if (num10 <= num3 || pNKNDHJACDC-- == 0)
 			{
-				MMBJNCGMDHC[num13] = (MMBJNCGMDHC[num14] = 0u);
+				_son[num13] = (_son[num14] = 0u);
 				break;
 			}
 			uint num15 = _pos - num10;
-			uint num16 = ((num15 > COJKJDCNPKK) ? (COJKJDCNPKK - num15 + KHADNAIFHBC) : (COJKJDCNPKK - num15)) << 1;
-			uint num17 = HGGJBAEEKJN + num10;
+			uint num16 = ((num15 > _cyclicBufferPos) ? (_cyclicBufferPos - num15 + _cyclicBufferSize) : (_cyclicBufferPos - num15)) << 1;
+			uint num17 = _bufferOffset + num10;
 			uint num18 = Math.Min(val, val2);
 			if (_bufferBase[num17 + num18] == _bufferBase[num4 + num18])
 			{
@@ -242,28 +242,28 @@ public class BinTree : InWindow, IInWindowStream, IMatchFinder
 					PIPLHPNGIPF[num2++] = num15 - 1;
 					if (num18 == num)
 					{
-						MMBJNCGMDHC[num14] = MMBJNCGMDHC[num16];
-						MMBJNCGMDHC[num13] = MMBJNCGMDHC[num16 + 1];
+						_son[num14] = _son[num16];
+						_son[num13] = _son[num16 + 1];
 						break;
 					}
 				}
 			}
 			if (_bufferBase[num17 + num18] < _bufferBase[num4 + num18])
 			{
-				MMBJNCGMDHC[num14] = num10;
+				_son[num14] = num10;
 				num14 = num16 + 1;
-				num10 = MMBJNCGMDHC[num14];
+				num10 = _son[num14];
 				val2 = num18;
 			}
 			else
 			{
-				MMBJNCGMDHC[num13] = num10;
+				_son[num13] = num10;
 				num13 = num16;
-				num10 = MMBJNCGMDHC[num13];
+				num10 = _son[num13];
 				val = num18;
 			}
 		}
-		MHEJFMDCOHI();
+		MovePos();
 		return num2;
 	}
 
@@ -272,53 +272,53 @@ public class BinTree : InWindow, IInWindowStream, IMatchFinder
 		do
 		{
 			uint num;
-			if (_pos + CLPBKMCAKNP <= OONMJHCFEHO)
+			if (_pos + _matchMaxLen <= _streamPos)
 			{
-				num = CLPBKMCAKNP;
+				num = _matchMaxLen;
 			}
 			else
 			{
-				num = OONMJHCFEHO - _pos;
-				if (num < HFJCODDCHPN)
+				num = _streamPos - _pos;
+				if (num < kMinMatchCheck)
 				{
-					MHEJFMDCOHI();
+					MovePos();
 					continue;
 				}
 			}
-			uint num2 = ((_pos > KHADNAIFHBC) ? (_pos - KHADNAIFHBC) : 0u);
-			uint num3 = HGGJBAEEKJN + _pos;
+			uint num2 = ((_pos > _cyclicBufferSize) ? (_pos - _cyclicBufferSize) : 0u);
+			uint num3 = _bufferOffset + _pos;
 			uint num7;
 			if (HASH_ARRAY)
 			{
 				uint num4 = CRC.Table[_bufferBase[num3]] ^ _bufferBase[num3 + 1];
 				uint num5 = num4 & 0x3FF;
-				PIBKPHKCHGC[num5] = _pos;
+				_hash[num5] = _pos;
 				num4 ^= (uint)(_bufferBase[num3 + 2] << 8);
 				uint num6 = num4 & 0xFFFF;
-				PIBKPHKCHGC[1024 + num6] = _pos;
-				num7 = (num4 ^ (CRC.Table[_bufferBase[num3 + 3]] << 5)) & EMOLEFJIIAA;
+				_hash[1024 + num6] = _pos;
+				num7 = (num4 ^ (CRC.Table[_bufferBase[num3 + 3]] << 5)) & _hashMask;
 			}
 			else
 			{
 				num7 = (uint)(_bufferBase[num3] ^ (_bufferBase[num3 + 1] << 8));
 			}
-			uint num8 = PIBKPHKCHGC[LOMAJDKHOPJ + num7];
-			PIBKPHKCHGC[LOMAJDKHOPJ + num7] = _pos;
-			uint num9 = (COJKJDCNPKK << 1) + 1;
-			uint num10 = COJKJDCNPKK << 1;
+			uint num8 = _hash[kFixHashSize + num7];
+			_hash[kFixHashSize + num7] = _pos;
+			uint num9 = (_cyclicBufferPos << 1) + 1;
+			uint num10 = _cyclicBufferPos << 1;
 			uint val2;
-			uint val = (val2 = ODGKKDLJDOE);
-			uint pNKNDHJACDC = PNKNDHJACDC;
+			uint val = (val2 = kNumHashDirectBytes);
+			uint pNKNDHJACDC = _cutValue;
 			while (true)
 			{
 				if (num8 <= num2 || pNKNDHJACDC-- == 0)
 				{
-					MMBJNCGMDHC[num9] = (MMBJNCGMDHC[num10] = 0u);
+					_son[num9] = (_son[num10] = 0u);
 					break;
 				}
 				uint num11 = _pos - num8;
-				uint num12 = ((num11 > COJKJDCNPKK) ? (COJKJDCNPKK - num11 + KHADNAIFHBC) : (COJKJDCNPKK - num11)) << 1;
-				uint num13 = HGGJBAEEKJN + num8;
+				uint num12 = ((num11 > _cyclicBufferPos) ? (_cyclicBufferPos - num11 + _cyclicBufferSize) : (_cyclicBufferPos - num11)) << 1;
+				uint num13 = _bufferOffset + num8;
 				uint num14 = Math.Min(val, val2);
 				if (_bufferBase[num13 + num14] == _bufferBase[num3 + num14])
 				{
@@ -327,27 +327,27 @@ public class BinTree : InWindow, IInWindowStream, IMatchFinder
 					}
 					if (num14 == num)
 					{
-						MMBJNCGMDHC[num10] = MMBJNCGMDHC[num12];
-						MMBJNCGMDHC[num9] = MMBJNCGMDHC[num12 + 1];
+						_son[num10] = _son[num12];
+						_son[num9] = _son[num12 + 1];
 						break;
 					}
 				}
 				if (_bufferBase[num13 + num14] < _bufferBase[num3 + num14])
 				{
-					MMBJNCGMDHC[num10] = num8;
+					_son[num10] = num8;
 					num10 = num12 + 1;
-					num8 = MMBJNCGMDHC[num10];
+					num8 = _son[num10];
 					val2 = num14;
 				}
 				else
 				{
-					MMBJNCGMDHC[num9] = num8;
+					_son[num9] = num8;
 					num9 = num12;
-					num8 = MMBJNCGMDHC[num9];
+					num8 = _son[num9];
 					val = num14;
 				}
 			}
-			MHEJFMDCOHI();
+			MovePos();
 		}
 		while (--OMEDGJMNGKE != 0);
 	}
@@ -362,16 +362,16 @@ public class BinTree : InWindow, IInWindowStream, IMatchFinder
 		}
 	}
 
-	private void NBDMEIKNJBG()
+	private void Normalize()
 	{
-		uint bALBEBAOPMP = _pos - KHADNAIFHBC;
-		NormalizeLinks(MMBJNCGMDHC, KHADNAIFHBC * 2, bALBEBAOPMP);
-		NormalizeLinks(PIBKPHKCHGC, OMMLGEAAMHD, bALBEBAOPMP);
+		uint bALBEBAOPMP = _pos - _cyclicBufferSize;
+		NormalizeLinks(_son, _cyclicBufferSize * 2, bALBEBAOPMP);
+		NormalizeLinks(_hash, _hashSizeSum, bALBEBAOPMP);
 		ReduceOffsets((int)bALBEBAOPMP);
 	}
 
-	public void BFILFJNGNNP(uint PADNFMPEFDM)
+	public void SetCutValue(uint PADNFMPEFDM)
 	{
-		PNKNDHJACDC = PADNFMPEFDM;
+		_cutValue = PADNFMPEFDM;
 	}
 }

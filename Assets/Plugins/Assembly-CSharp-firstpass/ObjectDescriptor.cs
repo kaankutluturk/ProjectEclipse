@@ -4,23 +4,23 @@ using System.Diagnostics;
 public sealed class ObjectDescriptor : IObjectDescriptor
 {
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private object IELPCLONGKP;
+	private object wrappedValue;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private Type KAHHEBMBCFA;
+	private Type type;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private Type CGNJIMHPGJG;
+	private Type staticType;
 
-	public Type CJJOAABHDGM
+	public Type StaticType
 	{
 		get
 		{
-			return HEOINHLCBOO();
+			return GetStaticType();
 		}
 		private set
 		{
-			JGNIGIGJFEE(value);
+			SetStaticType(value);
 		}
 	}
 
@@ -36,44 +36,44 @@ public sealed class ObjectDescriptor : IObjectDescriptor
 		{
 			throw new ArgumentNullException("staticType");
 		}
-		JGNIGIGJFEE(FGDJAEMHFKC);
+		SetStaticType(FGDJAEMHFKC);
 	}
 
 	object IObjectDescriptor.Value
 	{
 		get
 		{
-			return OEAKCOHMIHH();
+			return GetValue();
 		}
 	}
 
-	public object OEAKCOHMIHH()
+	public object GetValue()
 	{
-		return IELPCLONGKP;
+		return wrappedValue;
 	}
 
 	private void set_Value(object value)
 	{
-		IELPCLONGKP = value;
+		wrappedValue = value;
 	}
 
 	public Type get_Type()
 	{
-		return KAHHEBMBCFA;
+		return type;
 	}
 
 	private void set_Type(Type value)
 	{
-		KAHHEBMBCFA = value;
+		type = value;
 	}
 
-	public Type HEOINHLCBOO()
+	public Type GetStaticType()
 	{
-		return CGNJIMHPGJG;
+		return staticType;
 	}
 
-	private void JGNIGIGJFEE(Type value)
+	private void SetStaticType(Type value)
 	{
-		CGNJIMHPGJG = value;
+		staticType = value;
 	}
 }

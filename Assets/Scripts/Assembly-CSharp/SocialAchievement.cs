@@ -4,12 +4,12 @@ public class SocialAchievement
 
 	public int value;
 
-	public int MFODOCNLNPH;
+	public int TargetValue;
 
 	public SocialAchievement(string _name, int _value, int FPPIMENCNJP)
 	{
 		name = _name;
 		value = _value;
-		MFODOCNLNPH = FPPIMENCNJP;
+		TargetValue = FPPIMENCNJP;
 	}
 }

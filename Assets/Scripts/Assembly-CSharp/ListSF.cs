@@ -13,7 +13,7 @@ using UnityEngine;
 
 public class ListSF
 {
-	public enum BKDHBIDPKLK
+	public enum CheckItemType
 	{
 		CHECK_ITEM_NONE = 0,
 		CHECK_ITEM_LEVEL = 1,
@@ -25,49 +25,49 @@ public class ListSF
 
 	public class CheckItems
 	{
-		public BKDHBIDPKLK Type;
+		public CheckItemType Type;
 
 		public long Value;
 	}
 
 	public class TemplateUser
 	{
-		public ModelParameters KEJDJHAGBMK;
+		public ModelParameters Parameters;
 
 		public XmlNode node;
 
-		public string IJBOAGICOON;
+		public string ParentTemplateName;
 
 		public string name;
 	}
 
 	private class GroupsUser
 	{
-		public List<ModelParameters> FJMBBMJMOKC = new List<ModelParameters>();
+		public List<ModelParameters> Models = new List<ModelParameters>();
 
 		public XmlNode node;
 
 		public string name;
 
-		public string IJBOAGICOON;
+		public string TemplateName;
 
 		public int Size
 		{
 			get
 			{
-				return OLINNGEMHMG();
+				return GetCount();
 			}
 		}
 
-		public ModelParameters PNNMLIGMMPG()
+		public ModelParameters GetRandomModel()
 		{
-			int index = NekkiMath.randomInt(FJMBBMJMOKC.Count);
-			return FJMBBMJMOKC[index];
+			int index = NekkiMath.randomInt(Models.Count);
+			return Models[index];
 		}
 
-		public ModelParameters PNNMLIGMMPG(List<int> AOKENODDIEN)
+		public ModelParameters GetRandomModel(List<int> AOKENODDIEN)
 		{
-			int num = NekkiMath.randomInt(FJMBBMJMOKC.Count);
+			int num = NekkiMath.randomInt(Models.Count);
 			bool flag;
 			do
 			{
@@ -76,69 +76,69 @@ public class ListSF
 				{
 					if (item == num)
 					{
-						num = NekkiMath.randomInt(FJMBBMJMOKC.Count);
+						num = NekkiMath.randomInt(Models.Count);
 						flag = true;
 					}
 				}
 			}
 			while (flag);
 			AOKENODDIEN.Add(num);
-			return FJMBBMJMOKC[num];
+			return Models[num];
 		}
 
-		public int OLINNGEMHMG()
+		public int GetCount()
 		{
-			return FJMBBMJMOKC.Count;
+			return Models.Count;
 		}
 	}
 
 	private static ListSF _instance = null;
 
-	private static Roster ANEHEDFAPCH = null;
+	private static Roster _roster = null;
 
 	private static Items _items = new Items();
 
 	private QuestsManager _QuestsManager = QuestsManager.get_Instance();
 
-	public const string ILAAAOHLICG = "Coins";
+	public const string CurrencyCoinsKey = "Coins";
 
-	public const string DMOAJEIAHDO = "Ruby";
+	public const string CurrencyRubyKey = "Ruby";
 
-	public const string JIKLMGFDPNO = "Connection";
+	public const string ConnectionErrorKey = "Connection";
 
-	public const string BKIGCDBEJPF = "Verification";
+	public const string VerificationErrorKey = "Verification";
 
-	public const string HNIAJBFIJFA = "ServerNoResponse";
+	public const string ServerNoResponseErrorKey = "ServerNoResponse";
 
-	public const string HIPNPNJFNEM = "Materials";
+	public const string MaterialsErrorKey = "Materials";
 
-	public const string OHOBMDAOGHE = "TryAgain";
+	public const string TryAgainKey = "TryAgain";
 
-	public static bool LMJMPAOGKJF;
+	public static bool UnusedStaticFlag;
 
-	private IEnumerator KFFLKFPPKHO;
+	private IEnumerator authTimeoutRoutine;
 
-	public QuestParameters HAOHNNFLOGK = new QuestParameters();
+	public QuestParameters LotteryQuestParameters = new QuestParameters();
 
-	public AdvertConfig NAMLKEMHPHJ = new AdvertConfig();
+	public AdvertConfig AdvertSettings = new AdvertConfig();
 
-	public bool JGFGMICMBKL;
+	public bool IsContentLoaded;
 
-	private List<ModelParameters> FCBEJGEKOLA = new List<ModelParameters>();
+	private List<ModelParameters> mergedGroupModels = new List<ModelParameters>();
 
-	private List<KeyValuePair<string, BattleType>> GEDIPKEENJC = new List<KeyValuePair<string, BattleType>>();
+	private List<KeyValuePair<string, BattleType>> battleTypeNames = new List<KeyValuePair<string, BattleType>>();
 
-	private static bool PMJLDBCABPO;
+	private static bool isServerAuthPending;
 
-	private static bool KODPBMFMOLB;
+	private static bool isServerAuthFailed;
 
-	private static bool PFPEPKJBJGC;
+	private static bool isLoginStarted;
 
-	private static bool FMDDGHBNGHG;
+	private static bool isAuthorizeStarted;
 
-	private static bool IHNFKALCJGJ;
+	private static bool areZonesLoaded;
 
-		private XmlDocument IEDEFCBFJAD;
+		private XmlDocument userDocument;
 
     // Lifetime ownership of the loaded document, retained even after returning
     // to the title so a delayed callback cannot persist a discarded local profile.
@@ -146,69 +146,69 @@ public class ListSF
 
 	private XmlNode _CurrentUserNode;
 
-	private XmlDocument IEGJHNHFJFA;
+	private XmlDocument stagesDocument;
 
-	private XmlDocument ONBBADOAPIB;
+	private XmlDocument warriorsDocument;
 
-	private static long HJOHKOEICAP;
+	private static long currentTime;
 
-	private long AIJKJHMICNH;
+	private long unusedTimestamp;
 
-	private List<TemplateUser> HBOHFLOJMAA = new List<TemplateUser>();
+	private List<TemplateUser> templates = new List<TemplateUser>();
 
-	private List<GroupsUser> FAPGPFLOFEE = new List<GroupsUser>();
+	private List<GroupsUser> warriorGroups = new List<GroupsUser>();
 
-	private List<Zone> CMEABHLEKNH = new List<Zone>();
+	private List<Zone> zones = new List<Zone>();
 
-	private List<Zone> KHLBNALFOGN = new List<Zone>();
+	private List<Zone> secondaryZones = new List<Zone>();
 
-	private List<Zone> CNMGADBPPJK = new List<Zone>();
+	private List<Zone> tertiaryZones = new List<Zone>();
 
 	private List<Battle> _battles = new List<Battle>();
 
-	private List<FightList> JNPMCNMEOLE = new List<FightList>();
+	private List<FightList> fights = new List<FightList>();
 
-	private static List<BattleReplayable> DMNAHDJIBOP = new List<BattleReplayable>();
+	private static List<BattleReplayable> replayableBattles = new List<BattleReplayable>();
 
-	public static bool GKAOOOICJAI = false;
+	public static bool IsSoundEnabled = false;
 
-	private bool GJEJCLBAPMP;
+	private bool isSaveRequested;
 
-	private static bool OEAPBNJBCKP;
+	private static bool unusedFlag;
 
-	public static string BCNELIKKKLH
+	public static string UsersFilePath
 	{
 		get
 		{
-			return PFMBKJMEDEF();
+			return GetUsersFilePath();
 		}
 	}
 
-	public static string LIHHHPFNEPC
+	public static string UsersBackupFilePath
 	{
 		get
 		{
-			return IDIFECNLMKO();
+			return GetUsersBackupFilePath();
 		}
 	}
 
-	public static string HNPPDODPFFH
+	public static string LocalSettingsFilePath
 	{
 		get
 		{
-			return OPBLKCABALC();
+			return GetLocalSettingsFilePath();
 		}
 	}
 
-	public static string DPNDJHNALGN
+	public static string PacksFilePath
 	{
 		get
 		{
-			return GPKBMLALFIM();
+			return GetPacksFilePath();
 		}
 	}
 
-	public static ListSF BPCBBHAKFDM
+	public static ListSF Instance
 	{
 		get
 		{
@@ -216,15 +216,15 @@ public class ListSF
 		}
 	}
 
-	public static Roster MHINEBPCMLE
+	public static Roster CurrentRoster
 	{
 		get
 		{
-			return CCDKHLAMKKO();
+			return GetRoster();
 		}
 	}
 
-	public static Items OJIAKDDCGLB
+	public static Items ItemCatalog
 	{
 		get
 		{
@@ -232,62 +232,62 @@ public class ListSF
 		}
 	}
 
-	public static ModelParameters IECEIBNKFIK
+	public static ModelParameters PlayerParameters
 	{
 		get
 		{
-			return GAMMAIGEIOB();
+			return GetPlayerParameters();
 		}
 	}
 
-	public static long EFGOAPHFFNH
+	public static long ServerTime
 	{
 		get
 		{
-			return BLBNJKJKMBM();
+			return GetServerTime();
 		}
 	}
 
-	public static Zone PHLHELKODOG
+	public static Zone CurrentZone
 	{
 		get
 		{
-			return MGABNFOMDGB();
+			return GetCurrentZone();
 		}
 	}
 
-	private int LNPFCFBMHEM
+	private int CurrentUserId
 	{
 		get
 		{
-			return HFPJDOEEDCA();
+			return GetCurrentUserId();
 		}
 	}
 
-	public List<Battle> LGIIBNJFADA
+	public List<Battle> Battles
 	{
 		get
 		{
-			return MMCHMBIKIEP();
+			return GetBattles();
 		}
 	}
 
-	public static string PFMBKJMEDEF()
+	public static string GetUsersFilePath()
 	{
-		return string.Format("{0}/{1}", SF2Paths.GetUserDataDirectory(), Constants.OJMIJINKBPJ);
+		return string.Format("{0}/{1}", SF2Paths.GetUserDataDirectory(), Constants.UsersFileName);
 	}
 
-	public static string IDIFECNLMKO()
+	public static string GetUsersBackupFilePath()
 	{
-		return string.Format("{0}/{1}", SF2Paths.GetUserDataDirectory(), Constants.GHKPPHAAMBL);
+		return string.Format("{0}/{1}", SF2Paths.GetUserDataDirectory(), Constants.UsersBackupFileName);
 	}
 
-	public static string OPBLKCABALC()
+	public static string GetLocalSettingsFilePath()
 	{
-		return string.Format("{0}/{1}", SF2Paths.GetUserDataDirectory(), Constants.BICBNMCJFLK);
+		return string.Format("{0}/{1}", SF2Paths.GetUserDataDirectory(), Constants.LocalSettingsPath);
 	}
 
-	public static string GPKBMLALFIM()
+	public static string GetPacksFilePath()
 	{
 		return string.Format("{0}/{1}", SF2Paths.GetUserDataDirectory(), "assets/packs.xml");
 	}
@@ -302,9 +302,9 @@ public class ListSF
 		return _instance;
 	}
 
-	public static Roster CCDKHLAMKKO()
+	public static Roster GetRoster()
 	{
-		return ANEHEDFAPCH;
+		return _roster;
 	}
 
 	// best guess for name
@@ -317,9 +317,9 @@ public class ListSF
 	{
 		Eclipse.Modding.ModRuntime.UnbindProfile();
 		if (_instance != null)
-			GlobalTimer.get_Instance().removeEventListener(0, _instance.ILFBDHDMHPD);
+			GlobalTimer.get_Instance().removeEventListener(0, _instance.OnTimerTick);
 		_instance = null;
-		ANEHEDFAPCH = null;
+		_roster = null;
 		_items = new Items();
 		QuestsManager.Reset();
 	}
@@ -345,11 +345,11 @@ public class ListSF
 
 	internal void LoadTitlePreview()
 	{
-		TimeStep("battle types", EAFEBFMIDLF);
-		TimeStep("conditions", () => GameUtils.OJNHPHEPFLI.AEPHNNABOEK());
-		TimeStep("items", NMMBHENGDJO);
+		TimeStep("battle types", InitBattleTypes);
+		TimeStep("conditions", () => GameUtils.ModeCounters.InitConditions());
+		TimeStep("items", LoadItems);
 		TimeStep("mod content", () => Eclipse.Modding.ModRuntime.StartGameContent());
-		TimeStep("profile", PBNNPBEDOOJ);
+		TimeStep("profile", LoadProfile);
 		// Prices must remain in their source denomination until a real profile loads.
 		_titleContentReady = true;
 	}
@@ -357,80 +357,80 @@ public class ListSF
 	internal void DetachTitleProfile()
 	{
 		Eclipse.Modding.ModRuntime.UnbindProfile();
-		if (ANEHEDFAPCH != null) ANEHEDFAPCH.RemoveEventListener(0, EJANJEEGOOE);
-		ANEHEDFAPCH = null;
+		if (_roster != null) _roster.RemoveEventListener(0, RequestSave);
+		_roster = null;
 		_CurrentUserNode = null;
-		IEDEFCBFJAD = null;
-		GJEJCLBAPMP = false;
+		userDocument = null;
+		isSaveRequested = false;
 	}
 
 	internal void ResumeTitlePreview()
 	{
 		if (!_titleContentReady) throw new InvalidOperationException("Title content is not available.");
 		_titleContentReady = false;
-		TimeStep("profile", PBNNPBEDOOJ);
+		TimeStep("profile", LoadProfile);
 		TimeStep("item denominations", () => ItemInfo.DenominateItems());
 		CompleteGameContentLoad();
 	}
 
-	public void IIKDNMBIHCM()
+	public void LoadGameContent()
 	{
-		TimeStep("battle types", EAFEBFMIDLF);
-		TimeStep("conditions", () => GameUtils.OJNHPHEPFLI.AEPHNNABOEK());
-		TimeStep("items", NMMBHENGDJO);
+		TimeStep("battle types", InitBattleTypes);
+		TimeStep("conditions", () => GameUtils.ModeCounters.InitConditions());
+		TimeStep("items", LoadItems);
 		TimeStep("mod content", () => Eclipse.Modding.ModRuntime.StartGameContent());
-		TimeStep("profile", PBNNPBEDOOJ);
+		TimeStep("profile", LoadProfile);
 		TimeStep("item denominations", () => ItemInfo.DenominateItems());
 		CompleteGameContentLoad();
 	}
 
 	private void CompleteGameContentLoad()
 	{
-		TimeStep("warriors", OFIPOGGCKIN);
-		TimeStep("zones", KIEEPEOPJGB);
+		TimeStep("warriors", LoadWarriors);
+		TimeStep("zones", LoadZones);
 		TimeStep("mod stages", () => Eclipse.Modding.ModRuntime.ApplyStageContent());
-		JGFGMICMBKL = true;
-		TimeStep("quests", () => PDCHBPKOBFI(string.Empty));
+		IsContentLoaded = true;
+		TimeStep("quests", () => LoadQuests(string.Empty));
 		TimeStep("mod quests", () => Eclipse.Modding.ModRuntime.ApplyQuestContent());
-		TimeStep("periodic battles", LDADJAGGGPA);
-		TimeStep("packs", () => PacksController.ELEBLBJKDBI().GDNFPIBDDBO());
-		IEGJHNHFJFA = null;
-		GlobalTimer.get_Instance().addEventListener(0, ILFBDHDMHPD);
+		TimeStep("periodic battles", InitPeriodicBattles);
+		TimeStep("packs", () => PacksController.GetInstance().LoadPacks());
+		stagesDocument = null;
+		GlobalTimer.get_Instance().addEventListener(0, OnTimerTick);
 	}
 
-	public void IAAELKAKHPN()
+	public void RestartServerAuthorization()
 	{
-		FMDDGHBNGHG = false;
-		CEPOJOPGFIG();
+		isAuthorizeStarted = false;
+		AuthorizeWithServer();
 	}
 
-	public void MHOCDMBMALI()
+	public void StartSocialLogin()
 	{
 		bool flag = true;
 		bool flag2 = true;
-		LLLOJBFMONN.INNGABABJPC("Login sequence: initSocial");
+		GameLog.Info("Login sequence: initSocial");
 		if (flag)
 		{
-			FMDDGHBNGHG = false;
-			if (ANEHEDFAPCH.DFNEGEEHLFJ())
+			isAuthorizeStarted = false;
+			if (_roster.GetTrySocialLogin())
 			{
-				if ((ANEHEDFAPCH.DHPNBBILDPB() && !SystemProperties.AFKGHBJPLOK()) || GameCenterController.CPOLMPAAHOL())
+				if ((_roster.GetGPlusAutoLogin() && !SystemProperties.IsMetroArmPlatform()) || GameCenterController.GetCanAutoSignIn())
 				{
 					Debug.Log("Login sequence: GameCenterController.SignIn");
-					KOGNPNFOPIE();
+					StartAuthTimeout();
 					GameCenterAbstract.OnAuthenticate = (Action<bool>)Delegate.Combine(GameCenterAbstract.OnAuthenticate, new Action<bool>(OnAuthenticate));
-					GameCenterController.EFKOIIKEHDO();
+					GameCenterController.SignIn();
 				}
 				else
 				{
 					Debug.Log("Login sequence: skip social");
-					CEPOJOPGFIG();
+					AuthorizeWithServer();
 				}
 			}
 			else
 			{
 				Debug.Log("Login sequence: skip social");
-				CEPOJOPGFIG();
+				AuthorizeWithServer();
 			}
 		}
 		if (!flag2)
@@ -438,19 +438,19 @@ public class ListSF
 		}
 	}
 
-	public static ItemInfo PGKBAEGCABK(string GLLLLNHKCOF, long HNPMAENBMCO = 0L)
+	public static ItemInfo FindAvailableItemByGroup(string GLLLLNHKCOF, long HNPMAENBMCO = 0L)
 	{
 		List<ItemInfo> list = new List<ItemInfo>();
-		List<ItemInfo> list2 = GetItems().HCDLKHKBEPF();
+		List<ItemInfo> list2 = GetItems().GetAllItems();
 		foreach (ItemInfo item in list2)
 		{
 		}
-		Roster nKGLHEGIKKP = CCDKHLAMKKO();
+		Roster nKGLHEGIKKP = GetRoster();
 		if (nKGLHEGIKKP != null)
 		{
 			foreach (ItemInfo item2 in list)
 			{
-				if (item2.MMHIKEIDDNB == string.Empty || nKGLHEGIKKP.FLFKOIPCEPI(item2.MMHIKEIDDNB))
+				if (item2.GroupId == string.Empty || nKGLHEGIKKP.HasShopLock(item2.GroupId))
 				{
 					return item2;
 				}
@@ -459,22 +459,22 @@ public class ListSF
 		return null;
 	}
 
-	public static void CDCHFKPDDFH(ItemInfo FAKOMBAIFPP)
+	public static void ApplyRealMoneyPurchase(ItemInfo FAKOMBAIFPP)
 	{
-		UserItem dKCHDHMLKHN = ((FAKOMBAIFPP == null) ? null : CMGOCLGHNLH(FAKOMBAIFPP.Name));
+		UserItem dKCHDHMLKHN = ((FAKOMBAIFPP == null) ? null : GetUserItem(FAKOMBAIFPP.Name));
 		if (FAKOMBAIFPP != null && dKCHDHMLKHN == null)
 		{
-			Roster aNEHEDFAPCH = ANEHEDFAPCH;
-			aNEHEDFAPCH.PBEJGHOIPKC(aNEHEDFAPCH.INPAOPFFKEJ() + FAKOMBAIFPP.EGAJMELKANL.ToFloat());
-			Roster aNEHEDFAPCH2 = ANEHEDFAPCH;
-			aNEHEDFAPCH2.IKIHAIKLLOK(aNEHEDFAPCH2.MNDJBCMLJHF() + 1);
-			if (FAKOMBAIFPP.MBLKNNAFCOB)
+			Roster aNEHEDFAPCH = _roster;
+			aNEHEDFAPCH.SetTotalPaymentSum(aNEHEDFAPCH.GetTotalPaymentSum() + FAKOMBAIFPP.PriceAmountText.ToFloat());
+			Roster aNEHEDFAPCH2 = _roster;
+			aNEHEDFAPCH2.SetPaymentCount(aNEHEDFAPCH2.GetPaymentCount() + 1);
+			if (FAKOMBAIFPP.IsPaid)
 			{
-				Roster aNEHEDFAPCH3 = ANEHEDFAPCH;
-				aNEHEDFAPCH3.HGDLPMDHHOJ((ObscuredLong)((ObscuredLong)(aNEHEDFAPCH3.KNHDCEBIMEE()) + (ObscuredLong)(FAKOMBAIFPP.HHIFKGOJFAC)));
+				Roster aNEHEDFAPCH3 = _roster;
+				aNEHEDFAPCH3.SetPaidMoney((ObscuredLong)((ObscuredLong)(aNEHEDFAPCH3.GetPaidMoney()) + (ObscuredLong)(FAKOMBAIFPP.ReceiveGold)));
 			}
-			ANEHEDFAPCH.OIOOMAKNIOB(ANEHEDFAPCH.BFBOEGMAMNF() + (ObscuredLong)(FAKOMBAIFPP.HHIFKGOJFAC));
-			ANEHEDFAPCH.LLNELLFMMBB(ANEHEDFAPCH.EHFJHFDACMP() + (ObscuredLong)(FAKOMBAIFPP.BBMLCBEFLGI), Roster.HPOIJPGPOCF.CHANGE_PAYMENT, true);
+			_roster.SetMoney(_roster.GetMoney() + (ObscuredLong)(FAKOMBAIFPP.ReceiveGold));
+			_roster.SetBonus(_roster.GetBonus() + (ObscuredLong)(FAKOMBAIFPP.ReceiveBonus), Roster.BalanceChangeType.CHANGE_PAYMENT, true);
 			if (MainMenu.get_Instance() != null)
 			{
 				MainMenu.get_Instance().UpdateMoney();
@@ -482,29 +482,29 @@ public class ListSF
 			switch (FAKOMBAIFPP.SubType)
 			{
 			case "StarterPack":
-				GEFDJDIINND(FAKOMBAIFPP, 1, 0L, false);
+				AddItem(FAKOMBAIFPP, 1, 0L, false);
 				break;
 			case "UnlimitedEnergy":
-				GEFDJDIINND(FAKOMBAIFPP, 1, 0L, false);
+				AddItem(FAKOMBAIFPP, 1, 0L, false);
 				break;
 			case "PerkReset":
-				GEFDJDIINND(FAKOMBAIFPP, 1, 0L, false);
-				ANEHEDFAPCH.JLBDOBLHHAF().LCDFOLAAEGM();
+				AddItem(FAKOMBAIFPP, 1, 0L, false);
+				_roster.GetPerks().ResetPerks();
 				break;
 			}
-			ANEHEDFAPCH.GGGEHAGCLGC(true);
+			_roster.RequestSave(true);
 		}
 	}
 
-	public static ItemInfo CKCMJAJAELO(string FDKNIPNGFNF)
+	public static ItemInfo FindItemByMarketId(string FDKNIPNGFNF)
 	{
-		List<ItemInfo> list = GetItems().CKCMJAJAELO(FDKNIPNGFNF);
-		if (list.Count > 0 && ANEHEDFAPCH != null)
+		List<ItemInfo> list = GetItems().GetItemsByMarketId(FDKNIPNGFNF);
+		if (list.Count > 0 && _roster != null)
 		{
 			int i = 0;
 			for (int count = list.Count; i < count; i++)
 			{
-				if (string.IsNullOrEmpty(list[i].MMHIKEIDDNB) || ANEHEDFAPCH.FLFKOIPCEPI(list[i].MMHIKEIDDNB))
+				if (string.IsNullOrEmpty(list[i].GroupId) || _roster.HasShopLock(list[i].GroupId))
 				{
 					return list[i];
 				}
@@ -513,10 +513,10 @@ public class ListSF
 		return null;
 	}
 
-	public List<ModelParameters> APOACOEFALC(ModelParameters KKNOCIPBIIK, int count)
+	public List<ModelParameters> CreateOpponentParameters(ModelParameters KKNOCIPBIIK, int count)
 	{
 		List<ModelParameters> list = new List<ModelParameters>();
-		if (!KKNOCIPBIIK.IJKINPHBHCF())
+		if (!KKNOCIPBIIK.GetIsGroup())
 		{
 			for (int i = 0; i < count; i++)
 			{
@@ -527,30 +527,30 @@ public class ListSF
 		{
 			int num = 0;
 			List<List<int>> list2 = new List<List<int>>();
-			list2.CPCAJIKOIEE(KKNOCIPBIIK.KFKKHACFDPH.Count);
+			list2.Resize(KKNOCIPBIIK.GroupModels.Count);
 			for (int j = 0; j < count; j++)
 			{
 				int num2 = 0;
 				ModelParameters kIKOGDEPGHB = null;
-				foreach (GroupModel item in KKNOCIPBIIK.KFKKHACFDPH)
+				foreach (GroupModel item in KKNOCIPBIIK.GroupModels)
 				{
-					GroupsUser oFIHDFNGDLA = HJDCNPMEHGJ(item.Name);
+					GroupsUser oFIHDFNGDLA = GetGroupByName(item.Name);
 					if (oFIHDFNGDLA != null)
 					{
 						ModelParameters kIKOGDEPGHB2 = null;
 						if (!item.IsRandom)
 						{
-							int index = j % oFIHDFNGDLA.OLINNGEMHMG();
-							kIKOGDEPGHB2 = oFIHDFNGDLA.FJMBBMJMOKC[index];
+							int index = j % oFIHDFNGDLA.GetCount();
+							kIKOGDEPGHB2 = oFIHDFNGDLA.Models[index];
 						}
-						else if (!item.PMHHMDAIOGL)
+						else if (!item.NoDoubles)
 						{
-							kIKOGDEPGHB2 = oFIHDFNGDLA.PNNMLIGMMPG();
+							kIKOGDEPGHB2 = oFIHDFNGDLA.GetRandomModel();
 						}
 						else
 						{
-							kIKOGDEPGHB2 = oFIHDFNGDLA.PNNMLIGMMPG(list2[num2]);
-							int count2 = oFIHDFNGDLA.FJMBBMJMOKC.Count;
+							kIKOGDEPGHB2 = oFIHDFNGDLA.GetRandomModel(list2[num2]);
+							int count2 = oFIHDFNGDLA.Models.Count;
 							if (num >= count2 - 1)
 							{
 								list2[num2].Clear();
@@ -569,8 +569,8 @@ public class ListSF
 							}
 							else
 							{
-								kIKOGDEPGHB = IAOBIMJFBMH(kIKOGDEPGHB2.Node, kIKOGDEPGHB);
-								OLHPLOMLKLE(kIKOGDEPGHB);
+								kIKOGDEPGHB = ParseWarriorParameters(kIKOGDEPGHB2.Node, kIKOGDEPGHB);
+								AddMergedGroupModel(kIKOGDEPGHB);
 							}
 						}
 					}
@@ -581,12 +581,12 @@ public class ListSF
 					ModelParameters kIKOGDEPGHB3 = null;
 					if (KKNOCIPBIIK.Node.Attributes["Template"] == null)
 					{
-						kIKOGDEPGHB3 = IAOBIMJFBMH(KKNOCIPBIIK.Node, kIKOGDEPGHB);
+						kIKOGDEPGHB3 = ParseWarriorParameters(KKNOCIPBIIK.Node, kIKOGDEPGHB);
 					}
 					else
 					{
 						kIKOGDEPGHB3 = ((kIKOGDEPGHB == null) ? new ModelParameters() : kIKOGDEPGHB.Clone());
-						PLEDFOHECDC(kIKOGDEPGHB3, KKNOCIPBIIK);
+						ApplyParameterOverrides(kIKOGDEPGHB3, KKNOCIPBIIK);
 					}
 					list.Add(kIKOGDEPGHB3);
 				}
@@ -599,28 +599,28 @@ public class ListSF
 		return list;
 	}
 
-	public static ModelParameters GAMMAIGEIOB()
+	public static ModelParameters GetPlayerParameters()
 	{
-		return CCDKHLAMKKO().get_Parameters();
+		return GetRoster().get_Parameters();
 	}
 
-	public static long IDMJOMOMDOJ()
+	public static long GetCurrentTime()
 	{
-		return HJOHKOEICAP;
+		return currentTime;
 	}
 
-	public static long BLBNJKJKMBM()
+	public static long GetServerTime()
 	{
 		return 0L;
 	}
 
-	public static CheckItems CLKECIFEMNB(ItemInfo item, ItemAction LFLGCDNKNJI, int count = 1)
+	public static CheckItems CheckItemPurchase(ItemInfo item, ItemAction LFLGCDNKNJI, int count = 1)
 	{
 		if (item == null || count <= 0) return new CheckItems { Value = -1L };
 		if (!HasPurchaseCapacity(item, LFLGCDNKNJI, count)) return new CheckItems { Value = -1L };
-		GetInstance().JLEMHLLLCLD();
+		GetInstance().VerifyRosterBalance();
 		CheckItems bJEBPDNMNAE = new CheckItems();
-		Roster nKGLHEGIKKP = CCDKHLAMKKO();
+		Roster nKGLHEGIKKP = GetRoster();
 		long num = 0L;
 		long num2 = 0L;
 		bool flag = true;
@@ -628,13 +628,13 @@ public class ListSF
 		{
 		case ItemAction.Item_Buy_Gold:
 		case ItemAction.Item_Upgrade_Gold:
-			num = nKGLHEGIKKP.BFBOEGMAMNF();
-			num2 = CalculatePurchaseTotal(item.OHBBLIMNIMJ(), count);
+			num = nKGLHEGIKKP.GetMoney();
+			num2 = CalculatePurchaseTotal(item.GetCoinPrice(), count);
 			break;
 		case ItemAction.Item_Buy_Ruby:
 		case ItemAction.Item_Upgrade_Ruby:
-			num = nKGLHEGIKKP.EHFJHFDACMP();
-			num2 = CalculatePurchaseTotal(item.MCNMMBCJADI(), count);
+			num = nKGLHEGIKKP.GetBonus();
+			num2 = CalculatePurchaseTotal(item.GetGemPrice(), count);
 			break;
 		case ItemAction.Item_Buy_Real:
 		case ItemAction.Item_Free:
@@ -644,53 +644,53 @@ public class ListSF
 		case ItemAction.Item_Order_Ruby:
 		case ItemAction.Item_Delivery_Ruby:
 		case ItemAction.Item_Recipe_Delivery_Ruby:
-			num = nKGLHEGIKKP.EHFJHFDACMP();
-			num2 = (ObscuredLong)(item.KLHOKKPALOK);
+			num = nKGLHEGIKKP.GetBonus();
+			num2 = (ObscuredLong)(item.DeliveryGemPrice);
 			break;
 		case ItemAction.Item_Consumable:
-			num = nKGLHEGIKKP.EHFJHFDACMP();
-			num2 = CalculatePurchaseTotal(item.MCNMMBCJADI(), count);
+			num = nKGLHEGIKKP.GetBonus();
+			num2 = CalculatePurchaseTotal(item.GetGemPrice(), count);
 			break;
 		case ItemAction.Item_Recipe:
 		{
 			RecipeItemInfo bNJOCBKNPMG = (RecipeItemInfo)item;
-			Recipe iNODIOJPNJH = bNJOCBKNPMG.OIMGNCLBPHD();
-			UserItem nDMCFNGEPOA = bNJOCBKNPMG.MFEAIEJFDAM();
-			flag = iNODIOJPNJH.IHHJGMBGHEB(nDMCFNGEPOA);
+			Recipe iNODIOJPNJH = bNJOCBKNPMG.GetRecipe();
+			UserItem nDMCFNGEPOA = bNJOCBKNPMG.GetUserItem();
+			flag = iNODIOJPNJH.IsAvailableWithMaterials(nDMCFNGEPOA);
 			break;
 		}
 		default:
-			LLLOJBFMONN.Error("ListSF::isBuyItem - unknown type: %i", LFLGCDNKNJI);
+			GameLog.Error("ListSF::isBuyItem - unknown type: %i", LFLGCDNKNJI);
 			break;
 		}
 		// Invalid/overflowing totals must not wrap into an affordable price or balance.
 		if (num < 0 || num2 < 0) return new CheckItems { Value = -1L };
 		long num3 = num - num2;
-		bJEBPDNMNAE.Type = BKDHBIDPKLK.CHECK_ITEM_NONE;
+		bJEBPDNMNAE.Type = CheckItemType.CHECK_ITEM_NONE;
 		bJEBPDNMNAE.Value = num3;
-		if ((LFLGCDNKNJI == ItemAction.Item_Buy_Real || LFLGCDNKNJI == ItemAction.Item_Free) && !SystemProperties.PKLFCFBEIIG())
+		if ((LFLGCDNKNJI == ItemAction.Item_Buy_Real || LFLGCDNKNJI == ItemAction.Item_Free) && !SystemProperties.CheckConnection())
 		{
-			bJEBPDNMNAE.Type = BKDHBIDPKLK.CHECK_ITEM_NO_NETWORK;
+			bJEBPDNMNAE.Type = CheckItemType.CHECK_ITEM_NO_NETWORK;
 			bJEBPDNMNAE.Value = -1L;
 		}
-		else if (item.ItemLevel > nKGLHEGIKKP.PINDEKDNCNL())
+		else if (item.ItemLevel > nKGLHEGIKKP.GetLevel())
 		{
-			bJEBPDNMNAE.Type = BKDHBIDPKLK.CHECK_ITEM_LEVEL;
+			bJEBPDNMNAE.Type = CheckItemType.CHECK_ITEM_LEVEL;
 			bJEBPDNMNAE.Value = -1L;
 		}
 		else if (num3 < 0)
 		{
-			bJEBPDNMNAE.Type = ((LFLGCDNKNJI != ItemAction.Item_Buy_Gold && LFLGCDNKNJI != ItemAction.Item_Upgrade_Gold) ? BKDHBIDPKLK.CHECK_ITEM_BONUS : BKDHBIDPKLK.CHECK_ITEM_MONEY);
+			bJEBPDNMNAE.Type = ((LFLGCDNKNJI != ItemAction.Item_Buy_Gold && LFLGCDNKNJI != ItemAction.Item_Upgrade_Gold) ? CheckItemType.CHECK_ITEM_BONUS : CheckItemType.CHECK_ITEM_MONEY);
 			bJEBPDNMNAE.Value = -1L;
 		}
 		else if (num2 < 0)
 		{
-			bJEBPDNMNAE.Type = BKDHBIDPKLK.CHECK_ITEM_NONE;
+			bJEBPDNMNAE.Type = CheckItemType.CHECK_ITEM_NONE;
 			bJEBPDNMNAE.Value = -1L;
 		}
 		else if (LFLGCDNKNJI == ItemAction.Item_Recipe && !flag)
 		{
-			bJEBPDNMNAE.Type = BKDHBIDPKLK.CHECK_ITEM_MATERIALS;
+			bJEBPDNMNAE.Type = CheckItemType.CHECK_ITEM_MATERIALS;
 			bJEBPDNMNAE.Value = -1L;
 		}
 		return bJEBPDNMNAE;
@@ -712,11 +712,11 @@ public class ListSF
 		// Upgrade/delivery routes do not acquire another copy of the base item.
 		if (item.ParentItem != null || (action != ItemAction.Item_Buy_Gold &&
 			action != ItemAction.Item_Buy_Ruby && action != ItemAction.Item_Consumable)) return true;
-		UserItem existing = CMGOCLGHNLH(item.Name);
-		return CanIncrementItemCount(existing == null ? 0 : existing.OFOPFCJNEBL(), count);
+		UserItem existing = GetUserItem(item.Name);
+		return CanIncrementItemCount(existing == null ? 0 : existing.GetCount(), count);
 	}
 
-	public static bool KCBCGDFKNME(ItemInfo item, ItemAction LFLGCDNKNJI, long FLCBMGGIDDA, int count = 1, Action<object> callback = null)
+	public static bool BuyItem(ItemInfo item, ItemAction LFLGCDNKNJI, long FLCBMGGIDDA, int count = 1, Action<object> callback = null)
 	{
 		if (item == null || count <= 0) return false;
 		if (!HasPurchaseCapacity(item, LFLGCDNKNJI, count)) return false;
@@ -730,7 +730,7 @@ public class ListSF
 	{
 		if (item != null)
 		{
-			Roster nKGLHEGIKKP = CCDKHLAMKKO();
+			Roster nKGLHEGIKKP = GetRoster();
 			long bMNFPNBAMAF = -1L;
 			if (item.Type == "RaidItemPack")
 			{
@@ -739,78 +739,78 @@ public class ListSF
 			{
 			case ItemAction.Item_Buy_Gold:
 			case ItemAction.Item_Upgrade_Gold:
-				MBBMOKFGABP(item);
-				nKGLHEGIKKP.OIOOMAKNIOB(FLCBMGGIDDA);
+				RecordCoinShortfall(item);
+				nKGLHEGIKKP.SetMoney(FLCBMGGIDDA);
 				// The offline runtime completes shop orders immediately; do not create
 				// delivery timestamps that depend on the retired server timer.
 				bMNFPNBAMAF = -1L;
 				break;
 			case ItemAction.Item_Buy_Ruby:
 			case ItemAction.Item_Upgrade_Ruby:
-				BLNHEMCHIGF(item, false);
-				nKGLHEGIKKP.LLNELLFMMBB(FLCBMGGIDDA, Roster.HPOIJPGPOCF.CHANGE_BUY_ITEM);
+				RecordGemShortfall(item, false);
+				nKGLHEGIKKP.SetBonus(FLCBMGGIDDA, Roster.BalanceChangeType.CHANGE_BUY_ITEM);
 				break;
 			case ItemAction.Item_Buy_Real:
-				return EMEMDEAEMCB(item);
+				return BuyRealMoneyItem(item);
 			case ItemAction.Item_Free:
-				return HJHCCBGILAJ(item);
+				return BuyFreeItem(item);
 			case ItemAction.Item_Consumable:
-				BLNHEMCHIGF(item, false);
-				BDNBHBOJLDN(item, FLCBMGGIDDA);
+				RecordGemShortfall(item, false);
+				OnConsumablePurchased(item, FLCBMGGIDDA);
 				break;
 			case ItemAction.Item_Delivery_Ruby:
 			case ItemAction.Item_Recipe_Delivery_Ruby:
-				BLNHEMCHIGF(item, true);
-				nKGLHEGIKKP.LLNELLFMMBB(FLCBMGGIDDA, Roster.HPOIJPGPOCF.CHANGE_BUY_DELIVERY);
+				RecordGemShortfall(item, true);
+				nKGLHEGIKKP.SetBonus(FLCBMGGIDDA, Roster.BalanceChangeType.CHANGE_BUY_DELIVERY);
 				bMNFPNBAMAF = 0L;
 				break;
 			default:
-				LLLOJBFMONN.Error("ListSF::buyItem - unknown type: %i", LFLGCDNKNJI);
+				GameLog.Error("ListSF::buyItem - unknown type: %i", LFLGCDNKNJI);
 				break;
 			}
 			if (LFLGCDNKNJI == ItemAction.Item_Recipe_Delivery_Ruby)
 			{
-				PIFPAMKOPFK((RecipeItemInfo)item, LFLGCDNKNJI, FLCBMGGIDDA, bMNFPNBAMAF);
+				CompleteRecipeDelivery((RecipeItemInfo)item, LFLGCDNKNJI, FLCBMGGIDDA, bMNFPNBAMAF);
 			}
 			else
 			{
-				IGLBLDKOMML(item, LFLGCDNKNJI, FLCBMGGIDDA, bMNFPNBAMAF, count);
+				CompleteItemPurchase(item, LFLGCDNKNJI, FLCBMGGIDDA, bMNFPNBAMAF, count);
 			}
-			GameUtils.OFOKPNFGDMD("Virtual Good Purchased");
-			MenuController.IAMGKKOINFC();
-			ABKBFADGNBM(LFLGCDNKNJI);
+			GameUtils.TrackEvent("Virtual Good Purchased");
+			MenuController.RefreshMoney();
+			PlayPurchaseSound(LFLGCDNKNJI);
 		}
 		return true;
 	}
 
-	public static bool IGLBLDKOMML(ItemInfo item, ItemAction LFLGCDNKNJI, long FLCBMGGIDDA, long BMNFPNBAMAF, int count = 1)
+	public static bool CompleteItemPurchase(ItemInfo item, ItemAction LFLGCDNKNJI, long FLCBMGGIDDA, long BMNFPNBAMAF, int count = 1)
 	{
-		Roster nKGLHEGIKKP = CCDKHLAMKKO();
-		UserItem dKCHDHMLKHN = nKGLHEGIKKP.KHCNHPCPFII().CMGOCLGHNLH(item.Name);
-		long bMNFPNBAMAF = ((dKCHDHMLKHN == null) ? (-1) : dKCHDHMLKHN.IJGAOHJNLAH());
-		bool flag = BMNFPNBAMAF <= 0 || item.EHKNIKHPGDN == 0;
-		UserItem dKCHDHMLKHN2 = GEFDJDIINND(item, count, BMNFPNBAMAF, flag);
-		bool jBCMFEPAKLK = dKCHDHMLKHN2.GKGIKMCMCPB() || flag;
+		Roster nKGLHEGIKKP = GetRoster();
+		UserItem dKCHDHMLKHN = nKGLHEGIKKP.GetInventory().FindItem(item.Name);
+		long bMNFPNBAMAF = ((dKCHDHMLKHN == null) ? (-1) : dKCHDHMLKHN.GetDeliveryTimestamp());
+		bool flag = BMNFPNBAMAF <= 0 || item.DeliveryTime == 0;
+		UserItem dKCHDHMLKHN2 = AddItem(item, count, BMNFPNBAMAF, flag);
+		bool jBCMFEPAKLK = dKCHDHMLKHN2.GetIsOwned() || flag;
 		if (item.Type == "RealMoneyItem" || item.Type == "Consumable")
 		{
 			jBCMFEPAKLK = false;
 		}
-		AFGHCIDFAHB(dKCHDHMLKHN2, jBCMFEPAKLK);
-		GameUtils.LFKOMCMPKKC(item, LFLGCDNKNJI, count, bMNFPNBAMAF);
-		QuestParameters hHKLFIIBIFF = GetInstance().BNMLDPNCMLB();
-		FightIDS jLGLBLDPAAF = hHKLFIIBIFF.JLGLBLDPAAF;
-		hHKLFIIBIFF.JLGLBLDPAAF = FightIDS.Empty();
-		hHKLFIIBIFF.HEIADONEACH = string.Empty;
-		hHKLFIIBIFF.DLKPBAJDHBO = dKCHDHMLKHN2.BHKHOJPANHE();
-		if (GetInstance().FFBAJNGHGGD(QuestEvent.PMDPDMFLCIJ.QUEST_EVENT_PURCHASE))
+		UseItem(dKCHDHMLKHN2, jBCMFEPAKLK);
+		GameUtils.TrackItemAction(item, LFLGCDNKNJI, count, bMNFPNBAMAF);
+		QuestParameters hHKLFIIBIFF = GetInstance().GetQuestParameters();
+		FightIDS jLGLBLDPAAF = hHKLFIIBIFF.fightIds;
+		hHKLFIIBIFF.fightIds = FightIDS.Empty();
+		hHKLFIIBIFF.fightResult = string.Empty;
+		hHKLFIIBIFF.purchasedItem = dKCHDHMLKHN2.GetInfo();
+		if (GetInstance().RaiseQuestEvent(QuestEvent.QuestEventType.QUEST_EVENT_PURCHASE))
 		{
-			GetInstance().MHHNIPBJNAD();
+			GetInstance().RunQuestActions();
 		}
-		hHKLFIIBIFF.JLGLBLDPAAF = jLGLBLDPAAF;
+		hHKLFIIBIFF.fightIds = jLGLBLDPAAF;
 		return true;
 	}
 
-	public static bool PIFPAMKOPFK(RecipeItemInfo AJBJAPPEAFH, ItemAction LFLGCDNKNJI, long FLCBMGGIDDA, long BMNFPNBAMAF, int count = 1)
+	public static bool CompleteRecipeDelivery(RecipeItemInfo AJBJAPPEAFH, ItemAction LFLGCDNKNJI, long FLCBMGGIDDA, long BMNFPNBAMAF, int count = 1)
 	{
 		if (AJBJAPPEAFH == null || LFLGCDNKNJI != ItemAction.Item_Recipe_Delivery_Ruby) return false;
 		return ApplyRecipeToItem(AJBJAPPEAFH);
@@ -820,38 +820,38 @@ public class ListSF
 	{
 		if (userItem == null || recipe == null) return false;
 		RecipeItemInfo recipeItem;
-		return ForgeManager.ELEBLBJKDBI().StartEnchant(userItem, recipe, out recipeItem);
+		return ForgeManager.GetInstance().StartEnchant(userItem, recipe, out recipeItem);
 	}
 
 	public static bool ApplyRecipeToItem(RecipeItemInfo recipeItem)
 	{
-		Roster roster = CCDKHLAMKKO();
-		return roster != null && roster.KHCNHPCPFII().FinishDeliveryRecipe(recipeItem);
+		Roster roster = GetRoster();
+		return roster != null && roster.GetInventory().FinishDeliveryRecipe(recipeItem);
 	}
 
-	public static bool AFGHCIDFAHB(UserItem NDMCFNGEPOA, bool JBCMFEPAKLK, bool CMDMHFKJBHB = true)
+	public static bool UseItem(UserItem NDMCFNGEPOA, bool JBCMFEPAKLK, bool CMDMHFKJBHB = true)
 	{
 		if (NDMCFNGEPOA == null)
 		{
 			return false;
 		}
-		NDMCFNGEPOA.CDFODJBJIPI(CCDKHLAMKKO().PINDEKDNCNL());
-		bool aNNCECNAEPN = NDMCFNGEPOA.BHKHOJPANHE().ANNCECNAEPN;
+		NDMCFNGEPOA.RefreshUpgradeState(GetRoster().GetLevel());
+		bool aNNCECNAEPN = NDMCFNGEPOA.GetInfo().SpendAfterUse;
 		if (aNNCECNAEPN)
 		{
-			EFPHIJGNGKP(NDMCFNGEPOA, NDMCFNGEPOA.OFOPFCJNEBL());
+			SpendItem(NDMCFNGEPOA, NDMCFNGEPOA.GetCount());
 		}
 		JBCMFEPAKLK = JBCMFEPAKLK && !aNNCECNAEPN;
-		LLLOJBFMONN.Write("   UseItem: " + ((!JBCMFEPAKLK) ? "Unequiped " : "Equiped ") + NDMCFNGEPOA.get_Name());
-		NDMCFNGEPOA.JBLKCIBKMKB(JBCMFEPAKLK);
+		GameLog.Write("   UseItem: " + ((!JBCMFEPAKLK) ? "Unequiped " : "Equiped ") + NDMCFNGEPOA.get_Name());
+		NDMCFNGEPOA.SetIsEquipped(JBCMFEPAKLK);
 		if (CMDMHFKJBHB)
 		{
-			return CCDKHLAMKKO().BMADIJMPENJ(NDMCFNGEPOA, JBCMFEPAKLK);
+			return GetRoster().EquipItem(NDMCFNGEPOA, JBCMFEPAKLK);
 		}
 		return true;
 	}
 
-	public static void CNMDDKCANCJ(ItemInfo item)
+	public static void EquipFallbackItem(ItemInfo item)
 	{
 		if (item == null)
 		{
@@ -863,264 +863,264 @@ public class ListSF
 		{
 		case "Weapon":
 		{
-			UserItem nDMCFNGEPOA2 = CMGOCLGHNLH("Fists");
-			AFGHCIDFAHB(nDMCFNGEPOA2, true);
+			UserItem nDMCFNGEPOA2 = GetUserItem("Fists");
+			UseItem(nDMCFNGEPOA2, true);
 			break;
 		}
 		case "Armor":
 		{
-			UserItem nDMCFNGEPOA6 = CMGOCLGHNLH("Body");
-			AFGHCIDFAHB(nDMCFNGEPOA6, true);
+			UserItem nDMCFNGEPOA6 = GetUserItem("Body");
+			UseItem(nDMCFNGEPOA6, true);
 			break;
 		}
 		case "Helm":
 		{
-			UserItem nDMCFNGEPOA5 = CMGOCLGHNLH("Head");
-			AFGHCIDFAHB(nDMCFNGEPOA5, true);
+			UserItem nDMCFNGEPOA5 = GetUserItem("Head");
+			UseItem(nDMCFNGEPOA5, true);
 			break;
 		}
 		case "Ranged":
 		{
-			UserItem nDMCFNGEPOA4 = CMGOCLGHNLH("NoRanged");
-			AFGHCIDFAHB(nDMCFNGEPOA4, true);
+			UserItem nDMCFNGEPOA4 = GetUserItem("NoRanged");
+			UseItem(nDMCFNGEPOA4, true);
 			break;
 		}
 		case "Magic":
 		{
-			UserItem nDMCFNGEPOA3 = CMGOCLGHNLH("NoMagic");
-			AFGHCIDFAHB(nDMCFNGEPOA3, true);
+			UserItem nDMCFNGEPOA3 = GetUserItem("NoMagic");
+			UseItem(nDMCFNGEPOA3, true);
 			break;
 		}
 		case "RaidConsumable":
 			if (mDPPNGIEJGD == "RaidCharge")
 			{
-				UserItem nDMCFNGEPOA = CMGOCLGHNLH("NoRaidCharge");
-				AFGHCIDFAHB(nDMCFNGEPOA, true);
+				UserItem nDMCFNGEPOA = GetUserItem("NoRaidCharge");
+				UseItem(nDMCFNGEPOA, true);
 			}
 			break;
 		}
 	}
 
-	public static bool EFPHIJGNGKP(UserItem item, int count = 1)
+	public static bool SpendItem(UserItem item, int count = 1)
 	{
-		if (count > item.OFOPFCJNEBL())
+		if (count > item.GetCount())
 		{
-			count = item.OFOPFCJNEBL();
+			count = item.GetCount();
 		}
-		ItemInfo.MEFIBHIDOLA mEFIBHIDOLA = ItemInfo.MEFIBHIDOLA.SPEND_TYPE_NONE;
-		if (item.BHKHOJPANHE().Type == "Energy")
+		ItemInfo.SpendType mEFIBHIDOLA = ItemInfo.SpendType.SPEND_TYPE_NONE;
+		if (item.GetInfo().Type == "Energy")
 		{
-			mEFIBHIDOLA = ItemInfo.MEFIBHIDOLA.SPEND_TYPE_ENERGY;
+			mEFIBHIDOLA = ItemInfo.SpendType.SPEND_TYPE_ENERGY;
 		}
-		if (mEFIBHIDOLA == ItemInfo.MEFIBHIDOLA.SPEND_TYPE_ENERGY)
+		if (mEFIBHIDOLA == ItemInfo.SpendType.SPEND_TYPE_ENERGY)
 		{
-			ANEHEDFAPCH.OMJDCEEEJMB();
-			item.CHILOKHFALD(item.OFOPFCJNEBL() - count);
+			_roster.RefillPower();
+			item.SetCount(item.GetCount() - count);
 			return true;
 		}
-		LLLOJBFMONN.Write("Error - no such SpendItemType");
+		GameLog.Write("Error - no such SpendItemType");
 		return false;
 	}
 
-	public static void JALMHIICOPB(ItemInfo PJDAGCBPLJE)
+	public static void ClearEquippedSlot(ItemInfo PJDAGCBPLJE)
 	{
-		CCDKHLAMKKO().JALMHIICOPB(PJDAGCBPLJE);
+		GetRoster().UnequipItem(PJDAGCBPLJE);
 	}
 
-	public static void FAAAGBACKAE(ItemInfo item)
+	public static void UnequipOtherItemsOfType(ItemInfo item)
 	{
-		List<UserItem> list = CCDKHLAMKKO().KHCNHPCPFII().HOPBBLJLHOB(item.Type, string.Empty, false);
+		List<UserItem> list = GetRoster().GetInventory().FindItemsByType(item.Type, string.Empty, false);
 		foreach (UserItem userItem in list)
 		{
-			if (userItem.EFMFGEPDAOP() && userItem.get_Name() != userItem.OFMCNLBFIDF.Name)
+			if (userItem.GetIsEquipped() && userItem.get_Name() != userItem.Info.Name)
 			{
-				AFGHCIDFAHB(userItem, false);
+				UseItem(userItem, false);
 			}
 		}
 	}
 
-	public static bool IMLFOOIBLJA(ItemInfo item, int count = 1)
+	public static bool GiveItemUnequipped(ItemInfo item, int count = 1)
 	{
 		if (item == null)
 		{
 			return false;
 		}
-		UserItem mBIJKDIEFIF = GEFDJDIINND(item, count, 0L, false);
-		return CCDKHLAMKKO().BMADIJMPENJ(mBIJKDIEFIF, false);
+		UserItem mBIJKDIEFIF = AddItem(item, count, 0L, false);
+		return GetRoster().EquipItem(mBIJKDIEFIF, false);
 	}
 
-	public static bool GEOPLDMBCBD(ItemInfo item)
+	public static bool FinishItemDelivery(ItemInfo item)
 	{
 		if (item == null)
 		{
 			return false;
 		}
-		UserItem dKCHDHMLKHN = CMGOCLGHNLH(item.Name);
+		UserItem dKCHDHMLKHN = GetUserItem(item.Name);
 		dKCHDHMLKHN.set_DeliveryTime(0L);
-		dKCHDHMLKHN.BAMLNLIDEBG(-1);
-		item.BEBDMOEIEJN(true);
-		return dKCHDHMLKHN != null && ANEHEDFAPCH.BMADIJMPENJ(dKCHDHMLKHN, false);
+		dKCHDHMLKHN.SetDeliveryUpgradeLevel(-1);
+		item.SetIsNew(true);
+		return dKCHDHMLKHN != null && _roster.EquipItem(dKCHDHMLKHN, false);
 	}
 
-	public static UserItem GEFDJDIINND(ItemInfo item, int count = 1, long CNIOCCCBDBJ = 0L, bool JBCMFEPAKLK = true, bool KGOIDDCKBKI = true)
+	public static UserItem AddItem(ItemInfo item, int count = 1, long CNIOCCCBDBJ = 0L, bool JBCMFEPAKLK = true, bool KGOIDDCKBKI = true)
 	{
 		int acquisitionProfile = Eclipse.Modding.ModRuntime.StoryEvents.ProfileGeneration;
-		Roster nKGLHEGIKKP = CCDKHLAMKKO();
+		Roster nKGLHEGIKKP = GetRoster();
 		if (item.SubType == "UnlimitedEnergy")
 		{
-			nKGLHEGIKKP.ADKHNLAMDJP = true;
-			MenuController.ADPMENDMMKJ();
+			nKGLHEGIKKP.HasUnlimitedEnergy = true;
+			MenuController.RefreshEnergyView();
 		}
-		UserItem dKCHDHMLKHN = CMGOCLGHNLH(item.Name);
-		int previousCount = dKCHDHMLKHN == null ? 0 : dKCHDHMLKHN.OFOPFCJNEBL();
+		UserItem dKCHDHMLKHN = GetUserItem(item.Name);
+		int previousCount = dKCHDHMLKHN == null ? 0 : dKCHDHMLKHN.GetCount();
 		int acquiredCount = previousCount;
-		int oMHDLKNHNMJ = nKGLHEGIKKP.PINDEKDNCNL();
+		int oMHDLKNHNMJ = nKGLHEGIKKP.GetLevel();
 		if (dKCHDHMLKHN == null)
 		{
-			XmlNode fMBDAPOMFGN = nKGLHEGIKKP.BABKABBEFEL();
+			XmlNode fMBDAPOMFGN = nKGLHEGIKKP.GetItemsNode();
 			int bLJGEOEHIGP = ((CNIOCCCBDBJ <= 0) ? count : 0);
 			UserItem dKCHDHMLKHN2 = new UserItem(fMBDAPOMFGN, item.Name, JBCMFEPAKLK, bLJGEOEHIGP, -1, CNIOCCCBDBJ);
-			dKCHDHMLKHN2.KIGHKCOCJFJ(item);
-			dKCHDHMLKHN = nKGLHEGIKKP.KHCNHPCPFII().GEFDJDIINND(dKCHDHMLKHN2);
-			acquiredCount = dKCHDHMLKHN.OFOPFCJNEBL();
-			dKCHDHMLKHN.CDFODJBJIPI(oMHDLKNHNMJ);
-			dKCHDHMLKHN.IJCEKDCPBAG(false);
+			dKCHDHMLKHN2.SetInfo(item);
+			dKCHDHMLKHN = nKGLHEGIKKP.GetInventory().AddItem(dKCHDHMLKHN2);
+			acquiredCount = dKCHDHMLKHN.GetCount();
+			dKCHDHMLKHN.RefreshUpgradeState(oMHDLKNHNMJ);
+			dKCHDHMLKHN.SetIsUpgrade(false);
 			if (KGOIDDCKBKI)
 			{
-				dKCHDHMLKHN.PJEEGECBHMH();
+				dKCHDHMLKHN.ApplyDefaultEnchantments();
 			}
 		}
-		else if (dKCHDHMLKHN.OFOPFCJNEBL() != 0 || CNIOCCCBDBJ <= 0)
+		else if (dKCHDHMLKHN.GetCount() != 0 || CNIOCCCBDBJ <= 0)
 		{
-			if (dKCHDHMLKHN.OFOPFCJNEBL() != 0)
+			if (dKCHDHMLKHN.GetCount() != 0)
 			{
-				dKCHDHMLKHN.IJCEKDCPBAG(true);
+				dKCHDHMLKHN.SetIsUpgrade(true);
 			}
 			if (item.ParentItem == null)
 			{
-				dKCHDHMLKHN.CHILOKHFALD(dKCHDHMLKHN.OFOPFCJNEBL() + count);
-				acquiredCount = dKCHDHMLKHN.OFOPFCJNEBL();
+				dKCHDHMLKHN.SetCount(dKCHDHMLKHN.GetCount() + count);
+				acquiredCount = dKCHDHMLKHN.GetCount();
 			}
 			if (CNIOCCCBDBJ <= 0)
 			{
-				dKCHDHMLKHN.FMMDLMGHPIB(item.UpgradeLevel);
-				dKCHDHMLKHN.CDFODJBJIPI(oMHDLKNHNMJ);
+				dKCHDHMLKHN.SetUpgradeLevel(item.UpgradeLevel);
+				dKCHDHMLKHN.RefreshUpgradeState(oMHDLKNHNMJ);
 			}
 			dKCHDHMLKHN.set_DeliveryTime(CNIOCCCBDBJ);
-			dKCHDHMLKHN.BAMLNLIDEBG(item.UpgradeLevel);
+			dKCHDHMLKHN.SetDeliveryUpgradeLevel(item.UpgradeLevel);
 		}
 		else
 		{
-			dKCHDHMLKHN.CDFODJBJIPI(oMHDLKNHNMJ);
+			dKCHDHMLKHN.RefreshUpgradeState(oMHDLKNHNMJ);
 			dKCHDHMLKHN.set_DeliveryTime(CNIOCCCBDBJ);
-			dKCHDHMLKHN.BAMLNLIDEBG(-1);
-			dKCHDHMLKHN.IJCEKDCPBAG(false);
+			dKCHDHMLKHN.SetDeliveryUpgradeLevel(-1);
+			dKCHDHMLKHN.SetIsUpgrade(false);
 		}
 		if (JBCMFEPAKLK)
 		{
-			AFGHCIDFAHB(dKCHDHMLKHN, true);
+			UseItem(dKCHDHMLKHN, true);
 		}
 		Eclipse.Modding.ModRuntime.PublishItemAcquired(nKGLHEGIKKP, item, previousCount, acquiredCount, acquisitionProfile);
 		return dKCHDHMLKHN;
 	}
 
-	public static void ADIFNIKODHH(UserItem NDMCFNGEPOA, int count = 1)
+	public static void RemoveItem(UserItem NDMCFNGEPOA, int count = 1)
 	{
 		if (NDMCFNGEPOA == null)
 		{
 			return;
 		}
-		int num = NDMCFNGEPOA.OFOPFCJNEBL();
+		int num = NDMCFNGEPOA.GetCount();
 		if (num < count)
 		{
 			count = num;
 		}
-		NDMCFNGEPOA.CHILOKHFALD(NDMCFNGEPOA.OFOPFCJNEBL() - count);
-		if (NDMCFNGEPOA.OFOPFCJNEBL() == 0 && CCDKHLAMKKO().FEDNFNOMBNG(NDMCFNGEPOA.BHKHOJPANHE()))
+		NDMCFNGEPOA.SetCount(NDMCFNGEPOA.GetCount() - count);
+		if (NDMCFNGEPOA.GetCount() == 0 && GetRoster().IsItemEquipped(NDMCFNGEPOA.GetInfo()))
 		{
-			if (NDMCFNGEPOA.BHKHOJPANHE() != null)
+			if (NDMCFNGEPOA.GetInfo() != null)
 			{
-				NDMCFNGEPOA.BHKHOJPANHE().LEKDAILCFEG();
+				NDMCFNGEPOA.GetInfo().RestoreShopVisibility();
 			}
-			AFGHCIDFAHB(NDMCFNGEPOA, false);
-			CNMDDKCANCJ(NDMCFNGEPOA.BHKHOJPANHE());
+			UseItem(NDMCFNGEPOA, false);
+			EquipFallbackItem(NDMCFNGEPOA.GetInfo());
 		}
 	}
 
 	public static bool IncreaseExp(uint value)
 	{
-		return CCDKHLAMKKO().IDGMHHAJDMO(value);
+		return GetRoster().AddExperience(value);
 	}
 
-	public static bool GCPJADIMNKI(long CDCBEDDONKK)
+	public static bool AddCoins(long CDCBEDDONKK)
 	{
-		long num = CCDKHLAMKKO().BFBOEGMAMNF() + CDCBEDDONKK;
+		long num = GetRoster().GetMoney() + CDCBEDDONKK;
 		if (num < 0)
 		{
 			return false;
 		}
-		CCDKHLAMKKO().OIOOMAKNIOB(num);
+		GetRoster().SetMoney(num);
 		return true;
 	}
 
-	public static bool PNINBKEIBHO(long OKEFHDDPMEC)
+	public static bool SetCoins(long OKEFHDDPMEC)
 	{
 		if (OKEFHDDPMEC < 0)
 		{
 			return false;
 		}
-		CCDKHLAMKKO().OIOOMAKNIOB(OKEFHDDPMEC);
+		GetRoster().SetMoney(OKEFHDDPMEC);
 		return true;
 	}
 
-	public static bool FPIJEOMBFJN(long CDCBEDDONKK, Roster.HPOIJPGPOCF LFLGCDNKNJI, bool JEEOLJIFIOF = false)
+	public static bool AddGems(long CDCBEDDONKK, Roster.BalanceChangeType LFLGCDNKNJI, bool JEEOLJIFIOF = false)
 	{
-		long num = CCDKHLAMKKO().EHFJHFDACMP() + CDCBEDDONKK;
+		long num = GetRoster().GetBonus() + CDCBEDDONKK;
 		if (num < 0)
 		{
 			return false;
 		}
-		CCDKHLAMKKO().LLNELLFMMBB(num, LFLGCDNKNJI, JEEOLJIFIOF);
+		GetRoster().SetBonus(num, LFLGCDNKNJI, JEEOLJIFIOF);
 		return true;
 	}
 
-	public static bool BMHBGNDHPIJ(long value, Roster.HPOIJPGPOCF LFLGCDNKNJI, bool JEEOLJIFIOF = false)
+	public static bool SetGems(long value, Roster.BalanceChangeType LFLGCDNKNJI, bool JEEOLJIFIOF = false)
 	{
 		if (value < 0)
 		{
 			return false;
 		}
-		CCDKHLAMKKO().LLNELLFMMBB(value, LFLGCDNKNJI, JEEOLJIFIOF);
+		GetRoster().SetBonus(value, LFLGCDNKNJI, JEEOLJIFIOF);
 		return true;
 	}
 
 	public static bool ChangeEnergy(int value)
 	{
-		return CCDKHLAMKKO().ChangePower(value);
+		return GetRoster().ChangePower(value);
 	}
 
-	public static Zone MGABNFOMDGB()
+	public static Zone GetCurrentZone()
 	{
-		List<Zone> cMEABHLEKNH = GetInstance().CMEABHLEKNH;
+		List<Zone> cMEABHLEKNH = GetInstance().zones;
 		foreach (Zone item in cMEABHLEKNH)
 		{
-			if (item.AMBLIADMEOC())
+			if (item.GetIsStart())
 			{
 				return item;
 			}
 		}
-		List<Zone> kHLBNALFOGN = GetInstance().KHLBNALFOGN;
+		List<Zone> kHLBNALFOGN = GetInstance().secondaryZones;
 		foreach (Zone item2 in kHLBNALFOGN)
 		{
-			if (item2.AMBLIADMEOC())
+			if (item2.GetIsStart())
 			{
 				return item2;
 			}
 		}
-		List<Zone> cNMGADBPPJK = GetInstance().CNMGADBPPJK;
+		List<Zone> cNMGADBPPJK = GetInstance().tertiaryZones;
 		foreach (Zone item3 in cNMGADBPPJK)
 		{
-			if (item3.AMBLIADMEOC())
+			if (item3.GetIsStart())
 			{
 				return item3;
 			}
@@ -1128,9 +1128,9 @@ public class ListSF
 		return null;
 	}
 
-	public static Zone CFEDCFACBLE(string name)
+	public static Zone GetZoneByName(string name)
 	{
-		List<Zone> cMEABHLEKNH = GetInstance().CMEABHLEKNH;
+		List<Zone> cMEABHLEKNH = GetInstance().zones;
 		foreach (Zone item in cMEABHLEKNH)
 		{
 			if (item.get_Name() == name)
@@ -1138,7 +1138,7 @@ public class ListSF
 				return item;
 			}
 		}
-		List<Zone> kHLBNALFOGN = GetInstance().KHLBNALFOGN;
+		List<Zone> kHLBNALFOGN = GetInstance().secondaryZones;
 		foreach (Zone item2 in kHLBNALFOGN)
 		{
 			if (item2.get_Name() == name)
@@ -1146,7 +1146,7 @@ public class ListSF
 				return item2;
 			}
 		}
-		List<Zone> cNMGADBPPJK = GetInstance().CNMGADBPPJK;
+		List<Zone> cNMGADBPPJK = GetInstance().tertiaryZones;
 		foreach (Zone item3 in cNMGADBPPJK)
 		{
 			if (item3.get_Name() == name)
@@ -1157,15 +1157,15 @@ public class ListSF
 		return null;
 	}
 
-	public static List<Zone> FHAIJEAPFEA()
+	public static List<Zone> GetZones()
 	{
-		return GetInstance().CMEABHLEKNH;
+		return GetInstance().zones;
 	}
 
-	public static List<FightList> JEBHJOKNENP(Battle DPOOIONCEOA)
+	public static List<FightList> GetFightsForBattle(Battle DPOOIONCEOA)
 	{
 		List<FightList> list = new List<FightList>();
-		foreach (FightList item in GetInstance().JNPMCNMEOLE)
+		foreach (FightList item in GetInstance().fights)
 		{
 			if (item.Battle == DPOOIONCEOA)
 			{
@@ -1175,13 +1175,13 @@ public class ListSF
 		return list;
 	}
 
-	public static FightList CHMCKGCDGCM(FightIDS DIAIIPCBMFL)
+	public static FightList GetFightById(FightIDS DIAIIPCBMFL)
 	{
 		if (DIAIIPCBMFL == null)
 		{
 			return null;
 		}
-		List<FightList> jNPMCNMEOLE = GetInstance().JNPMCNMEOLE;
+		List<FightList> jNPMCNMEOLE = GetInstance().fights;
 		foreach (FightList item in jNPMCNMEOLE)
 		{
 			if (item.FightId.Equals(DIAIIPCBMFL))
@@ -1189,76 +1189,76 @@ public class ListSF
 				return item;
 			}
 		}
-		Battle cGJCGEBPCAF = MKHAAGMJOPG(DIAIIPCBMFL);
-		return (cGJCGEBPCAF == null) ? null : cGJCGEBPCAF.OEJCNHOEFIJ(DIAIIPCBMFL.EJPNIFANKDG());
+		Battle cGJCGEBPCAF = GetBattleById(DIAIIPCBMFL);
+		return (cGJCGEBPCAF == null) ? null : cGJCGEBPCAF.GetFightByName(DIAIIPCBMFL.GetFight());
 	}
 
-	public FightList AOEPHEPGLAK(string name)
+	public FightList GetFightByIdString(string name)
 	{
 		FightIDS mOCEDDJOAEB = new FightIDS(name);
 		mOCEDDJOAEB.SetFightIDSByString(name);
-		return CHMCKGCDGCM(mOCEDDJOAEB);
+		return GetFightById(mOCEDDJOAEB);
 	}
 
-	public static Battle MKHAAGMJOPG(FightIDS DIAIIPCBMFL)
+	public static Battle GetBattleById(FightIDS DIAIIPCBMFL)
 	{
 		if (DIAIIPCBMFL == null)
 		{
 			return null;
 		}
-		Zone pKCPOJKLMOK = CFEDCFACBLE(DIAIIPCBMFL.PELHCAEAOFE());
+		Zone pKCPOJKLMOK = GetZoneByName(DIAIIPCBMFL.GetZone());
 		if (pKCPOJKLMOK != null)
 		{
-			return pKCPOJKLMOK.MJINKOFNIAE(DIAIIPCBMFL.CPHDPCAECJN());
+			return pKCPOJKLMOK.FindBattle(DIAIIPCBMFL.GetBattle());
 		}
 		return null;
 	}
 
-	public static UserItem CMGOCLGHNLH(string name)
+	public static UserItem GetUserItem(string name)
 	{
-		return CCDKHLAMKKO().KHCNHPCPFII().CMGOCLGHNLH(name);
+		return GetRoster().GetInventory().FindItem(name);
 	}
 
-	public static RosterFight IKHJKHMIPEP(FightList KGKDKENMAOA, bool FFIBGBMOMPD)
+	public static RosterFight LoadRosterFight(FightList KGKDKENMAOA, bool FFIBGBMOMPD)
 	{
 		RosterFight pIGKOIFBOME = null;
-		pIGKOIFBOME = ((!FFIBGBMOMPD) ? CCDKHLAMKKO().NALCLBDLBKN(KGKDKENMAOA.FightId) : CCDKHLAMKKO().JJHCGOIKBCP(KGKDKENMAOA.FightId));
+		pIGKOIFBOME = ((!FFIBGBMOMPD) ? GetRoster().RecordFightLoss(KGKDKENMAOA.FightId) : GetRoster().RecordFightWin(KGKDKENMAOA.FightId));
 		if (pIGKOIFBOME != null)
 		{
-			pIGKOIFBOME.DLDMOHEGENM(CCDKHLAMKKO().PINDEKDNCNL());
+			pIGKOIFBOME.SetLevel(GetRoster().GetLevel());
 			KGKDKENMAOA.SetRosterFight(pIGKOIFBOME);
 		}
-		CGJCKGAFPED();
+		RefreshConditionStatuses();
 		return pIGKOIFBOME;
 	}
 
-	public static bool OPKPFKJPHNN(ConditionFight IOFGGOCEIAM)
+	public static bool IsConditionComplete(ConditionFight IOFGGOCEIAM)
 	{
 		ConditionType kKJHFNGGFCG = IOFGGOCEIAM.Type;
 		if (kKJHFNGGFCG == ConditionType.ConditionFightCount)
 		{
-			if (!NJDLOHEFIHO(IOFGGOCEIAM))
+			if (!IsFightCountConditionMet(IOFGGOCEIAM))
 			{
 				return false;
 			}
 		}
 		else
 		{
-			LLLOJBFMONN.Error("ListSF::isConditionComplete - No handler for this type: " + IOFGGOCEIAM.Type);
+			GameLog.Error("ListSF::isConditionComplete - No handler for this type: " + IOFGGOCEIAM.Type);
 		}
 		return true;
 	}
 
-	public static bool NJDLOHEFIHO(ConditionFight IOFGGOCEIAM)
+	public static bool IsFightCountConditionMet(ConditionFight IOFGGOCEIAM)
 	{
 		int iICJGJJGIMC = IOFGGOCEIAM.Count;
 		ConditionCompare iFNPGAFFDNC = IOFGGOCEIAM.Compare;
 		int num = 0;
 		bool result = true;
-		ConditionSubType dCJPHFALIND = IOFGGOCEIAM.DCJPHFALIND;
+		ConditionSubType dCJPHFALIND = IOFGGOCEIAM.SubType;
 		if (dCJPHFALIND == ConditionSubType.ConditionSubTypeFight)
 		{
-			RosterFight pIGKOIFBOME = CCDKHLAMKKO().FindSavedFightRecord(IOFGGOCEIAM.CCILLAHEENI());
+			RosterFight pIGKOIFBOME = GetRoster().FindSavedFightRecord(IOFGGOCEIAM.GetFightIds());
 			if (pIGKOIFBOME != null)
 			{
 				num = pIGKOIFBOME.GetWinCount();
@@ -1266,7 +1266,7 @@ public class ListSF
 		}
 		else
 		{
-			LLLOJBFMONN.Error("ListSF::isConditionFightCount - No handler for this object type: " + IOFGGOCEIAM.DCJPHFALIND);
+			GameLog.Error("ListSF::isConditionFightCount - No handler for this object type: " + IOFGGOCEIAM.SubType);
 		}
 		switch (iFNPGAFFDNC)
 		{
@@ -1286,18 +1286,18 @@ public class ListSF
 			result = num == iICJGJJGIMC;
 			break;
 		default:
-			LLLOJBFMONN.Error("ListSF::isConditionFightCount - No handler for this compare type: " + iFNPGAFFDNC);
+			GameLog.Error("ListSF::isConditionFightCount - No handler for this compare type: " + iFNPGAFFDNC);
 			break;
 		}
 		return result;
 	}
 
-	public static bool MHGGANGEOIA(List<ConditionFight> conditions)
+	public static bool AreConditionsComplete(List<ConditionFight> conditions)
 	{
 		int i = 0;
 		for (int count = conditions.Count; i < count; i++)
 		{
-			if (!OPKPFKJPHNN(conditions[i]))
+			if (!IsConditionComplete(conditions[i]))
 			{
 				return false;
 			}
@@ -1305,19 +1305,19 @@ public class ListSF
 		return true;
 	}
 
-	public static void BKDAMDOMLGK()
+	public static void UpdateAllFightStatuses()
 	{
-		List<FightList> jNPMCNMEOLE = GetInstance().JNPMCNMEOLE;
+		List<FightList> jNPMCNMEOLE = GetInstance().fights;
 		foreach (FightList item in jNPMCNMEOLE)
 		{
-			DINPFDGMEAB(item);
+			UpdateFightStatus(item);
 		}
 	}
 
-	public static void DINPFDGMEAB(FightList fight)
+	public static void UpdateFightStatus(FightList fight)
 	{
-		int eJGGHHEOGPG = fight.EJGGHHEOGPG;
-		RosterFight pIGKOIFBOME = fight.FLKFFDLLBKA();
+		int eJGGHHEOGPG = fight.ReplayCount;
+		RosterFight pIGKOIFBOME = fight.GetRosterFight();
 		BattleType pJMEMGHKKBM = fight.get_Type();
 		if (eJGGHHEOGPG > 0 && pIGKOIFBOME != null)
 		{
@@ -1326,7 +1326,7 @@ public class ListSF
 				if (pJMEMGHKKBM == BattleType.FightReplayable || pJMEMGHKKBM == BattleType.FightBossesReplayable || pJMEMGHKKBM == BattleType.FightFinalReplayable)
 				{
 					BattleReplayable bKKPCBGAEHC = (BattleReplayable)fight.Battle;
-					bKKPCBGAEHC.MJJFFAOLCCK(fight);
+					bKKPCBGAEHC.RefreshFightStatus(fight);
 				}
 				else
 				{
@@ -1337,11 +1337,11 @@ public class ListSF
 			if (pJMEMGHKKBM == BattleType.FightAscension)
 			{
 				BattleAscension bGFLODNGLPK = (BattleAscension)fight.Battle;
-				bGFLODNGLPK.MJJFFAOLCCK(fight);
+				bGFLODNGLPK.RefreshFightStatus(fight);
 				return;
 			}
 		}
-		if (MHGGANGEOIA(fight.KJILOMLMMEN()))
+		if (AreConditionsComplete(fight.GetConditions()))
 		{
 			fight.Status = ConditionStatus.StatusOpen;
 		}
@@ -1351,36 +1351,36 @@ public class ListSF
 		}
 	}
 
-	public static void BOFGHBJABMK()
+	public static void UpdateAllZoneStatuses()
 	{
-		List<Zone> cMEABHLEKNH = GetInstance().CMEABHLEKNH;
+		List<Zone> cMEABHLEKNH = GetInstance().zones;
 		foreach (Zone item in cMEABHLEKNH)
 		{
-			item.CGJCKGAFPED();
+			item.UpdateStatus();
 		}
-		List<Zone> kHLBNALFOGN = GetInstance().KHLBNALFOGN;
+		List<Zone> kHLBNALFOGN = GetInstance().secondaryZones;
 		foreach (Zone item2 in kHLBNALFOGN)
 		{
-			item2.CGJCKGAFPED();
+			item2.UpdateStatus();
 		}
-		List<Zone> cNMGADBPPJK = GetInstance().CNMGADBPPJK;
+		List<Zone> cNMGADBPPJK = GetInstance().tertiaryZones;
 		foreach (Zone item3 in cNMGADBPPJK)
 		{
-			item3.CGJCKGAFPED();
+			item3.UpdateStatus();
 		}
 	}
 
-	public static void CGJCKGAFPED()
+	public static void RefreshConditionStatuses()
 	{
-		BKDAMDOMLGK();
-		BOFGHBJABMK();
+		UpdateAllFightStatuses();
+		UpdateAllZoneStatuses();
 	}
 
-	public void EJANJEEGOOE(object data = null)
+	public void RequestSave(object data = null)
 	{
 		if (data == null || (int)data == 0)
 		{
-			GJEJCLBAPMP = true;
+			isSaveRequested = true;
 		}
 		else
 		{
@@ -1393,102 +1393,102 @@ public class ListSF
             if (_localVersusProfile || Eclipse.Multiplayer.LocalVersusSession.IsActive) return;
 			if (Eclipse.Modding.ModRuntime.DeferProfileSave())
 		{
-			GJEJCLBAPMP = true;
+			isSaveRequested = true;
 			return;
 		}
-		if (GJEJCLBAPMP || BOFABDEJGFL)
+		if (isSaveRequested || BOFABDEJGFL)
 		{
-			CCDKHLAMKKO().KGFJPLKOABI();
-			CCDKHLAMKKO().PMIIHIFGIIN();
+			GetRoster().SaveCounterItems();
+			GetRoster().SavePaymentOrders();
 			StringBuilder stringBuilder = new StringBuilder();
 			stringBuilder.Append(SF2Paths.GetUserDataDirectory());
 			stringBuilder.Append("/");
-			stringBuilder.Append(Constants.OJMIJINKBPJ);
-			XmlUtils.ONLDJNLKKAL(IEDEFCBFJAD, stringBuilder.ToString());
-			stringBuilder.Replace(Constants.OJMIJINKBPJ, Constants.GHKPPHAAMBL);
-			XmlUtils.ONLDJNLKKAL(IEDEFCBFJAD, stringBuilder.ToString());
-			GJEJCLBAPMP = false;
+			stringBuilder.Append(Constants.UsersFileName);
+			XmlUtils.SaveDocumentWithHash(userDocument, stringBuilder.ToString());
+			stringBuilder.Replace(Constants.UsersFileName, Constants.UsersBackupFileName);
+			XmlUtils.SaveDocumentWithHash(userDocument, stringBuilder.ToString());
+			isSaveRequested = false;
 		}
 	}
 
-	public static void CELGPFFHLIM()
+	public static void DeleteUserDataAndQuit()
 	{
-		Eclipse.Modding.ModProfileWriteJournal.Discard(PFMBKJMEDEF());
-		Eclipse.Modding.ModProfileWriteJournal.Discard(IDIFECNLMKO());
-		if (File.Exists(PFMBKJMEDEF()))
+		Eclipse.Modding.ModProfileWriteJournal.Discard(GetUsersFilePath());
+		Eclipse.Modding.ModProfileWriteJournal.Discard(GetUsersBackupFilePath());
+		if (File.Exists(GetUsersFilePath()))
 		{
-			File.Delete(PFMBKJMEDEF());
-			UserDataValidator.KAFMCNCGOJH(PFMBKJMEDEF());
+			File.Delete(GetUsersFilePath());
+			UserDataValidator.DeleteHashFile(GetUsersFilePath());
 		}
-		if (File.Exists(IDIFECNLMKO()))
+		if (File.Exists(GetUsersBackupFilePath()))
 		{
-			File.Delete(IDIFECNLMKO());
-			UserDataValidator.KAFMCNCGOJH(IDIFECNLMKO());
+			File.Delete(GetUsersBackupFilePath());
+			UserDataValidator.DeleteHashFile(GetUsersBackupFilePath());
 		}
-		if (File.Exists(OPBLKCABALC()))
+		if (File.Exists(GetLocalSettingsFilePath()))
 		{
-			File.Delete(OPBLKCABALC());
-			UserDataValidator.KAFMCNCGOJH(OPBLKCABALC());
+			File.Delete(GetLocalSettingsFilePath());
+			UserDataValidator.DeleteHashFile(GetLocalSettingsFilePath());
 		}
-		PacksController.ELEBLBJKDBI().AKMIAJPGHDC();
+		PacksController.GetInstance().DeletePacksFile();
 		ApplicationController.Quit();
 	}
 
-	public static string FDJICKDCIBI()
+	public static string ReadUsersFile()
 	{
-		return (!File.Exists(PFMBKJMEDEF())) ? string.Empty : File.ReadAllText(PFMBKJMEDEF());
+		return (!File.Exists(GetUsersFilePath())) ? string.Empty : File.ReadAllText(GetUsersFilePath());
 	}
 
 	public static void SetRosterFileContent(string GHDPPHAAPCA)
 	{
-		Eclipse.Modding.ModProfileWriteJournal.Discard(PFMBKJMEDEF());
-		Eclipse.Modding.ModProfileWriteJournal.Discard(IDIFECNLMKO());
-		if (File.Exists(PFMBKJMEDEF()))
+		Eclipse.Modding.ModProfileWriteJournal.Discard(GetUsersFilePath());
+		Eclipse.Modding.ModProfileWriteJournal.Discard(GetUsersBackupFilePath());
+		if (File.Exists(GetUsersFilePath()))
 		{
-			File.Delete(PFMBKJMEDEF());
-			UserDataValidator.KAFMCNCGOJH(PFMBKJMEDEF());
+			File.Delete(GetUsersFilePath());
+			UserDataValidator.DeleteHashFile(GetUsersFilePath());
 		}
-		if (File.Exists(IDIFECNLMKO()))
+		if (File.Exists(GetUsersBackupFilePath()))
 		{
-			File.Delete(IDIFECNLMKO());
-			UserDataValidator.KAFMCNCGOJH(IDIFECNLMKO());
+			File.Delete(GetUsersBackupFilePath());
+			UserDataValidator.DeleteHashFile(GetUsersBackupFilePath());
 		}
-		if (File.Exists(OPBLKCABALC()))
+		if (File.Exists(GetLocalSettingsFilePath()))
 		{
-			File.Delete(OPBLKCABALC());
-			UserDataValidator.KAFMCNCGOJH(OPBLKCABALC());
+			File.Delete(GetLocalSettingsFilePath());
+			UserDataValidator.DeleteHashFile(GetLocalSettingsFilePath());
 		}
-		if (File.Exists(GPKBMLALFIM()))
+		if (File.Exists(GetPacksFilePath()))
 		{
-			File.Delete(GPKBMLALFIM());
-			UserDataValidator.KAFMCNCGOJH(GPKBMLALFIM());
+			File.Delete(GetPacksFilePath());
+			UserDataValidator.DeleteHashFile(GetPacksFilePath());
 		}
-		XmlDocument xmlDocument = XmlUtils.DGOAOLEEMDG(GHDPPHAAPCA);
+		XmlDocument xmlDocument = XmlUtils.LoadFromString(GHDPPHAAPCA);
 		if (xmlDocument == null)
 		{
-			LLLOJBFMONN.Write("Trying to set incorrect user - " + PFMBKJMEDEF());
+			GameLog.Write("Trying to set incorrect user - " + GetUsersFilePath());
 			ApplicationController.Quit();
 		}
 		else
 		{
-			XmlUtils.ONLDJNLKKAL(xmlDocument, PFMBKJMEDEF());
-			LLLOJBFMONN.Write("User successfully replaced in - " + PFMBKJMEDEF());
+			XmlUtils.SaveDocumentWithHash(xmlDocument, GetUsersFilePath());
+			GameLog.Write("User successfully replaced in - " + GetUsersFilePath());
 			ApplicationController.Quit();
 		}
 	}
 
-	public bool FFBAJNGHGGD(QuestEvent.PMDPDMFLCIJ LFLGCDNKNJI)
+	public bool RaiseQuestEvent(QuestEvent.QuestEventType LFLGCDNKNJI)
 	{
 		int storyProfile = Eclipse.Modding.ModRuntime.StoryEvents.ProfileGeneration;
-		var notification = Eclipse.Modding.ModRuntime.CaptureStoryEvent(LFLGCDNKNJI, BNMLDPNCMLB());
+		var notification = Eclipse.Modding.ModRuntime.CaptureStoryEvent(LFLGCDNKNJI, GetQuestParameters());
 		bool handled = _QuestsManager.ActionQuest(LFLGCDNKNJI);
 		Eclipse.Modding.ModRuntime.PublishStoryEvent(notification, storyProfile);
 		return handled;
 	}
 
-	public void MHHNIPBJNAD()
+	public void RunQuestActions()
 	{
-		if (!HIAMHMEGBEI())
+		if (!AreQuestActionsBlocked())
 		{
 			_QuestsManager.RunActionsAll();
 		}
@@ -1498,30 +1498,30 @@ public class ListSF
 	internal bool QueueLotteryFightEnd(QuestParameters context, bool raid)
 	{
 		_QuestsManager.QuestParameters = context;
-		return FFBAJNGHGGD(raid ? QuestEvent.PMDPDMFLCIJ.QUEST_EVENT_RAID_FIGHT_END : QuestEvent.PMDPDMFLCIJ.QUEST_EVENT_FIGHT_END);
+		return RaiseQuestEvent(raid ? QuestEvent.QuestEventType.QUEST_EVENT_RAID_FIGHT_END : QuestEvent.QuestEventType.QUEST_EVENT_FIGHT_END);
 	}
 
-	public void FGAEEJBEGEJ(List<QuestStage> NKNMCOEBMNG)
+	public void AddActionQuests(List<QuestStage> NKNMCOEBMNG)
 	{
 		_QuestsManager.AddActionQuest(NKNMCOEBMNG);
 	}
 
-	public bool OMDLOOFIJDF()
+	public bool IsTutorialComplete()
 	{
-		Roster nKGLHEGIKKP = CCDKHLAMKKO();
+		Roster nKGLHEGIKKP = GetRoster();
 		if (nKGLHEGIKKP != null)
 		{
-			return nKGLHEGIKKP.BKBHIMEEDBG().JBPHIAEPHAH();
+			return nKGLHEGIKKP.GetTutorials().GetIsStoryTutorialActive();
 		}
-		XmlDocument xmlDocument = XmlUtils.OpenXMLDocument(SF2Paths.GetUserDataDirectory(), Constants.OJMIJINKBPJ);
-		int num = HFPJDOEEDCA();
+		XmlDocument xmlDocument = XmlUtils.OpenXMLDocument(SF2Paths.GetUserDataDirectory(), Constants.UsersFileName);
+		int num = GetCurrentUserId();
 		XmlNode xmlNode = xmlDocument["Users"];
 		foreach (XmlNode item in xmlNode)
 		{
 			if (num == item.Attributes["ID"].ParseInt())
 			{
 				XmlNode xmlNode3 = item;
-				string text = xmlNode3.Attributes["Tutorial"].CIPOICEEIBK(string.Empty);
+				string text = xmlNode3.Attributes["Tutorial"].GetStringOrDefault(string.Empty);
 				return text == "END";
 			}
 		}
@@ -1531,84 +1531,84 @@ public class ListSF
 	public void HandleAuthenticateResult(bool CELFBNLILMA)
 	{
 		Debug.Log("OnAuthenticate, isAuth = " + CELFBNLILMA);
-		NHHADCOPOJE();
+		StopAuthTimeout();
 		if (CELFBNLILMA)
 		{
-			DKBINLMJIJG();
+			OnAuthenticateSucceeded();
 		}
 		else
 		{
-			LHMCFCCBKPA();
+			OnAuthenticateFailed();
 		}
-		LDNNNJGKDDC();
+		FinishAuthenticate();
 	}
 
-	private void KOGNPNFOPIE()
+	private void StartAuthTimeout()
 	{
-		NHHADCOPOJE();
-		KFFLKFPPKHO = BMAPNFJFEHF();
-		CoroutineManager.get_Current().StartRoutine(KFFLKFPPKHO);
+		StopAuthTimeout();
+		authTimeoutRoutine = AuthTimeoutRoutine();
+		CoroutineManager.get_Current().StartRoutine(authTimeoutRoutine);
 	}
 
-	private void NHHADCOPOJE()
+	private void StopAuthTimeout()
 	{
-		if (KFFLKFPPKHO != null)
+		if (authTimeoutRoutine != null)
 		{
-			CoroutineManager.get_Current().StopRoutine(KFFLKFPPKHO);
+			CoroutineManager.get_Current().StopRoutine(authTimeoutRoutine);
 		}
-		KFFLKFPPKHO = null;
+		authTimeoutRoutine = null;
 	}
 
-	private IEnumerator BMAPNFJFEHF()
+	private IEnumerator AuthTimeoutRoutine()
 	{
 		float num = 1f;
 		Debug.LogFormat("Setup Authenticate Timeout: {0} sec", num);
 		yield return new WaitForSeconds(num);
 		Debug.Log("OnAuthenticateTimeout: time is up!");
-		LDNNNJGKDDC();
+		FinishAuthenticate();
 	}
 
-	private void LDNNNJGKDDC()
+	private void FinishAuthenticate()
 	{
 		Debug.Log("OnAuthenticateFinished");
 		GameCenterAbstract.OnAuthenticate = (Action<bool>)Delegate.Remove(GameCenterAbstract.OnAuthenticate, new Action<bool>(OnAuthenticate));
-		CEPOJOPGFIG();
+		AuthorizeWithServer();
 	}
 
-	public void CEPOJOPGFIG()
+	public void AuthorizeWithServer()
 	{
-		LLLOJBFMONN.INNGABABJPC("Login sequence: ListSF::serverAPIAuthorize");
-		if (!FMDDGHBNGHG)
+		GameLog.Info("Login sequence: ListSF::serverAPIAuthorize");
+		if (!isAuthorizeStarted)
 		{
-			FMDDGHBNGHG = true;
-			KODPBMFMOLB = false;
-			PMJLDBCABPO = true;
-			PFPEPKJBJGC = true;
-			JIJFBPGDBKF();
+			isAuthorizeStarted = true;
+			isServerAuthFailed = false;
+			isServerAuthPending = true;
+			isLoginStarted = true;
+			RequestServerSync();
 		}
 	}
 
-	public void DKBINLMJIJG()
+	public void OnAuthenticateSucceeded()
 	{
-		GameUtils.DKBINLMJIJG();
+		GameUtils.SendRepostedAchievements();
 	}
 
-	public void LHMCFCCBKPA()
+	public void OnAuthenticateFailed()
 	{
-		CCDKHLAMKKO().INNHOAPGCHI();
+		GetRoster().IncrementGPlusFailedLogins();
 	}
 
-	public bool HIAMHMEGBEI()
+	public bool AreQuestActionsBlocked()
 	{
 		return false;
 	}
 
-	public QuestParameters BNMLDPNCMLB()
+	public QuestParameters GetQuestParameters()
 	{
 		return _QuestsManager.QuestParameters;
 	}
 
-	public QuestStage PBGCEEBDBGG(string name)
+	public QuestStage GetQuestByName(string name)
 	{
 		return _QuestsManager.GetQuestByName(name);
 	}
@@ -1643,9 +1643,9 @@ public class ListSF
 		return _QuestsManager.AddQuestToStek(DOKAIKMLLDK, OBJGGIPDKDF);
 	}
 
-	public BattleType HIDKFHHJBDH(string name)
+	public BattleType GetBattleTypeByName(string name)
 	{
-		foreach (KeyValuePair<string, BattleType> item in GEDIPKEENJC)
+		foreach (KeyValuePair<string, BattleType> item in battleTypeNames)
 		{
 			if (item.Key == name)
 			{
@@ -1655,9 +1655,9 @@ public class ListSF
 		return BattleType.FightNone;
 	}
 
-	public string ADHNLNFEOKN(BattleType LFLGCDNKNJI)
+	public string GetBattleTypeName(BattleType LFLGCDNKNJI)
 	{
-		foreach (KeyValuePair<string, BattleType> item in GEDIPKEENJC)
+		foreach (KeyValuePair<string, BattleType> item in battleTypeNames)
 		{
 			if (item.Value == LFLGCDNKNJI)
 			{
@@ -1667,24 +1667,24 @@ public class ListSF
 		return "DUMMY";
 	}
 
-	public void EMJLEBDAALP()
+	public void OnPacksChanged()
 	{
 	}
 
-	public void DLAJNCEILEH(string value)
+	public void SetDataVersion(string value)
 	{
-		XmlNode xmlNode = IEDEFCBFJAD["Root"]["Versions"];
+		XmlNode xmlNode = userDocument["Root"]["Versions"];
 		if (xmlNode != null)
 		{
 			xmlNode["DataVersion"].Attributes["Value"].Value = value;
 		}
-		EJANJEEGOOE();
+		RequestSave();
 	}
 
-	public void DLAJNCEILEH(VersionContainer version)
+	public void SetDataVersion(VersionContainer version)
 	{
 		string bAINMLLIKOL = version.ToString(true);
-		DLAJNCEILEH(bAINMLLIKOL);
+		SetDataVersion(bAINMLLIKOL);
 	}
 
 	public void ClearQuestsStack(List<string> NIKHAICFGNM = null)
@@ -1692,41 +1692,41 @@ public class ListSF
 		_QuestsManager.ClearStack(NIKHAICFGNM);
 	}
 
-	public void EAFEBFMIDLF()
+	public void InitBattleTypes()
 	{
-		GEDIPKEENJC.Add(new KeyValuePair<string, BattleType>("DUMMY", BattleType.FightNone));
-		GEDIPKEENJC.Add(new KeyValuePair<string, BattleType>("TUTORIAL", BattleType.FightTutorial));
-		GEDIPKEENJC.Add(new KeyValuePair<string, BattleType>("CHALLENGE", BattleType.FightChallenge));
-		GEDIPKEENJC.Add(new KeyValuePair<string, BattleType>("ASCENSION", BattleType.FightAscension));
-		GEDIPKEENJC.Add(new KeyValuePair<string, BattleType>("BOSSES", BattleType.FightBosses));
-		GEDIPKEENJC.Add(new KeyValuePair<string, BattleType>("TOURNAMENT", BattleType.FightTournament));
-		GEDIPKEENJC.Add(new KeyValuePair<string, BattleType>("STORY", BattleType.FightStory));
-		GEDIPKEENJC.Add(new KeyValuePair<string, BattleType>("SURVIVAL", BattleType.FightSurvival));
-		GEDIPKEENJC.Add(new KeyValuePair<string, BattleType>("TACTICS", BattleType.FightFriendly));
-		GEDIPKEENJC.Add(new KeyValuePair<string, BattleType>("AUTO", BattleType.FightAuto));
-		GEDIPKEENJC.Add(new KeyValuePair<string, BattleType>("AI", BattleType.FightAi));
-		GEDIPKEENJC.Add(new KeyValuePair<string, BattleType>("HIDDEN", BattleType.FightUnregister));
-		GEDIPKEENJC.Add(new KeyValuePair<string, BattleType>("FAKE", BattleType.FightFake));
-		GEDIPKEENJC.Add(new KeyValuePair<string, BattleType>("PVP", BattleType.FightPVP));
-		GEDIPKEENJC.Add(new KeyValuePair<string, BattleType>("PERIODIC", BattleType.FightPeriodic));
-		GEDIPKEENJC.Add(new KeyValuePair<string, BattleType>("FINAL_BATTLE", BattleType.FightFinal));
-		GEDIPKEENJC.Add(new KeyValuePair<string, BattleType>("FINAL_BATTLE_REPLAYABLE", BattleType.FightFinalReplayable));
-		GEDIPKEENJC.Add(new KeyValuePair<string, BattleType>("BOSSES_INTERMISSION", BattleType.FightBossesIntermission));
-		GEDIPKEENJC.Add(new KeyValuePair<string, BattleType>("REPLAYABLE", BattleType.FightReplayable));
-		GEDIPKEENJC.Add(new KeyValuePair<string, BattleType>("BOSSES_REPLAYABLE", BattleType.FightBossesReplayable));
-		GEDIPKEENJC.Add(new KeyValuePair<string, BattleType>("FINAL_BATTLE_TITAN", BattleType.FightFinalTitan));
-		GEDIPKEENJC.Add(new KeyValuePair<string, BattleType>("RAID", BattleType.FightRaid));
+		battleTypeNames.Add(new KeyValuePair<string, BattleType>("DUMMY", BattleType.FightNone));
+		battleTypeNames.Add(new KeyValuePair<string, BattleType>("TUTORIAL", BattleType.FightTutorial));
+		battleTypeNames.Add(new KeyValuePair<string, BattleType>("CHALLENGE", BattleType.FightChallenge));
+		battleTypeNames.Add(new KeyValuePair<string, BattleType>("ASCENSION", BattleType.FightAscension));
+		battleTypeNames.Add(new KeyValuePair<string, BattleType>("BOSSES", BattleType.FightBosses));
+		battleTypeNames.Add(new KeyValuePair<string, BattleType>("TOURNAMENT", BattleType.FightTournament));
+		battleTypeNames.Add(new KeyValuePair<string, BattleType>("STORY", BattleType.FightStory));
+		battleTypeNames.Add(new KeyValuePair<string, BattleType>("SURVIVAL", BattleType.FightSurvival));
+		battleTypeNames.Add(new KeyValuePair<string, BattleType>("TACTICS", BattleType.FightFriendly));
+		battleTypeNames.Add(new KeyValuePair<string, BattleType>("AUTO", BattleType.FightAuto));
+		battleTypeNames.Add(new KeyValuePair<string, BattleType>("AI", BattleType.FightAi));
+		battleTypeNames.Add(new KeyValuePair<string, BattleType>("HIDDEN", BattleType.FightUnregister));
+		battleTypeNames.Add(new KeyValuePair<string, BattleType>("FAKE", BattleType.FightFake));
+		battleTypeNames.Add(new KeyValuePair<string, BattleType>("PVP", BattleType.FightPVP));
+		battleTypeNames.Add(new KeyValuePair<string, BattleType>("PERIODIC", BattleType.FightPeriodic));
+		battleTypeNames.Add(new KeyValuePair<string, BattleType>("FINAL_BATTLE", BattleType.FightFinal));
+		battleTypeNames.Add(new KeyValuePair<string, BattleType>("FINAL_BATTLE_REPLAYABLE", BattleType.FightFinalReplayable));
+		battleTypeNames.Add(new KeyValuePair<string, BattleType>("BOSSES_INTERMISSION", BattleType.FightBossesIntermission));
+		battleTypeNames.Add(new KeyValuePair<string, BattleType>("REPLAYABLE", BattleType.FightReplayable));
+		battleTypeNames.Add(new KeyValuePair<string, BattleType>("BOSSES_REPLAYABLE", BattleType.FightBossesReplayable));
+		battleTypeNames.Add(new KeyValuePair<string, BattleType>("FINAL_BATTLE_TITAN", BattleType.FightFinalTitan));
+		battleTypeNames.Add(new KeyValuePair<string, BattleType>("RAID", BattleType.FightRaid));
 	}
 
-	public void PDCHBPKOBFI(string EIDDAFDJJCJ = "")
+	public void LoadQuests(string EIDDAFDJJCJ = "")
 	{
 		string text = ((!(EIDDAFDJJCJ == string.Empty)) ? EIDDAFDJJCJ : "quests.xml");
-		Roster nKGLHEGIKKP = CCDKHLAMKKO();
-		if (nKGLHEGIKKP.JHHBKBENNNA(text))
+		Roster nKGLHEGIKKP = GetRoster();
+		if (nKGLHEGIKKP.HasLoadedQuestFile(text))
 		{
 			return;
 		}
-		XmlDocument xmlDocument = XmlUtils.OpenXMLDocument(SF2Paths.KKIDGPBOBNI(), text, XmlUtils.EBLFEPIOMOL.Normal, true, XmlCryptoUtils.NNLGALNDJCL());
+		XmlDocument xmlDocument = XmlUtils.OpenXMLDocument(SF2Paths.GetGameDataPath(), text, XmlUtils.XmlSourceMode.Normal, true, XmlCryptoUtils.GetIsEncryptionEnabled());
 		if (xmlDocument == null)
 		{
 			return;
@@ -1737,7 +1737,7 @@ public class ListSF
 		{
 			_QuestsManager.AddQuest(new QuestStage(childNode, text));
 		}
-		nKGLHEGIKKP.DDBBADOGHHB(text);
+		nKGLHEGIKKP.AddLoadedQuestFile(text);
 	}
 
 	public QuestStage AddExternalQuest(XmlNode node, string ownerFile)
@@ -1759,14 +1759,14 @@ public class ListSF
 		if (quest != null) _QuestsManager.RemoveExternalQuest(quest);
 	}
 
-	public void KBCBLOMDKCA(FightList KGKDKENMAOA)
+	public void OnFightSelected(FightList KGKDKENMAOA)
 	{
 		if (Module.GetInstance().GetCurrentScreenType() != ScreenType.ModuleMap)
 		{
 		}
 	}
 
-	public bool NKLCAPEMDIO(string EJENJNPEDOH)
+	public bool IsAdvertGroupAllowed(string EJENJNPEDOH)
 	{
 		if (EJENJNPEDOH == string.Empty)
 		{
@@ -1774,7 +1774,7 @@ public class ListSF
 		}
 		string[] collection = EJENJNPEDOH.Split(',');
 		List<string> list = new List<string>(collection);
-		int kEKGEBCKLJI = NAMLKEMHPHJ.KEKGEBCKLJI;
+		int kEKGEBCKLJI = AdvertSettings.GroupId;
 		foreach (string item in list)
 		{
 			if (kEKGEBCKLJI == item.ToInt())
@@ -1785,160 +1785,160 @@ public class ListSF
 		return false;
 	}
 
-	public void PLNBHLPHDJG(int PPGFCLBFLEK)
+	public void UpdateFightsLevel(int PPGFCLBFLEK)
 	{
-		foreach (FightList item in JNPMCNMEOLE)
+		foreach (FightList item in fights)
 		{
 			item.UpdateLevel(PPGFCLBFLEK);
 		}
 	}
 
-	public void MAOPKFNKHOI()
+	public void CreateMissingAchievements()
 	{
-		List<Achievement> list = GameUtils.HHLEKNNJGMJ.NMHMFCKBMKN();
+		List<Achievement> list = GameUtils.AchievementDefinitions.GetEarnedAchievements();
 		for (int i = 0; i < list.Count; i++)
 		{
 			Achievement jNPIOKEKMII = list[i];
-			if (ANEHEDFAPCH.KJNPJKEHGLE().JABBCCJLOOC(jNPIOKEKMII.Name) == null)
+			if (_roster.GetAchievements().FindAchievement(jNPIOKEKMII.Name) == null)
 			{
-				ANEHEDFAPCH.KJNPJKEHGLE().POKNGJJAHAL(jNPIOKEKMII, false, false);
-				ANEHEDFAPCH.KJNPJKEHGLE().CreateRepostAchievement(jNPIOKEKMII.Name);
+				_roster.GetAchievements().UnlockAchievement(jNPIOKEKMII, false, false);
+				_roster.GetAchievements().CreateRepostAchievement(jNPIOKEKMII.Name);
 			}
 		}
 	}
 
-	public void LCFENEAGDDG(string NEPOLDCKNJL)
+	public void ShowDataCorruptedDialog(string NEPOLDCKNJL)
 	{
-		LLLOJBFMONN.Error("{0}", NEPOLDCKNJL);
+		GameLog.Error("{0}", NEPOLDCKNJL);
 		string title = "ERROR 576";
 		string message = "Your game data may be corrupted. Please restart the application.\r\nContact support if this does not help: http://support.nekki.com\r\nDon`t uninstall the game to avoid savegame loss.";
 		string cancel = "Reload";
-		if (LocalizationManager.FJLMLAGEJDL)
+		if (LocalizationManager.IsLoaded)
 		{
 			title = LocalizationManager.GetString("HackTitle");
 			message = LocalizationManager.GetString("HackMessage");
 			cancel = LocalizationManager.GetString("HackButton");
 		}
-		DialogsOpener.OpenLocalAlertDialog(title, message, cancel, HAKPODKIJDJ);
+		DialogsOpener.OpenLocalAlertDialog(title, message, cancel, QuitApplication);
 	}
 
-	private void HAKPODKIJDJ()
+	private void QuitApplication()
 	{
 		Application.Quit();
 	}
 
-	public void BBDOJLNOHLO(object data)
+	public void UpdateEnergyRefillTimer(object data)
 	{
 		if (data == null)
 		{
-			LLLOJBFMONN.Error("ListSF::energyRefillTimer ERROR - data is NULL");
+			GameLog.Error("ListSF::energyRefillTimer ERROR - data is NULL");
 			return;
 		}
 		TextTimer.TimerDataStruct eHMOCHBPAGE = (TextTimer.TimerDataStruct)data;
-		eHMOCHBPAGE.ABIELBGOLCA(CCDKHLAMKKO().NHFHDFIJEJG());
-		if (0 >= eHMOCHBPAGE.CCCIFDLEMPI())
+		eHMOCHBPAGE.SetTime(GetRoster().GetEnergyRefillTimer());
+		if (0 >= eHMOCHBPAGE.GetTime())
 		{
-			eHMOCHBPAGE.ABIELBGOLCA(0L);
+			eHMOCHBPAGE.SetTime(0L);
 		}
 	}
 
-	public void JNKBLMLEJGE(object data)
+	public void UpdateDuelAccessibilityTimer(object data)
 	{
 		if (data == null)
 		{
-			LLLOJBFMONN.Error("ListSF::duelAccessibilityTimer ERROR - data is NULL");
+			GameLog.Error("ListSF::duelAccessibilityTimer ERROR - data is NULL");
 			return;
 		}
 		TextTimer.TimerDataStruct eHMOCHBPAGE = (TextTimer.TimerDataStruct)data;
-		if (BattlePeriodic.CCCIFDLEMPI() > 0)
+		if (BattlePeriodic.GetTime() > 0)
 		{
-			eHMOCHBPAGE.ABIELBGOLCA(BattlePeriodic.IDGBNPFIDGC() - BattlePeriodic.CCCIFDLEMPI());
+			eHMOCHBPAGE.SetTime(BattlePeriodic.GetRepeatTime() - BattlePeriodic.GetTime());
 		}
 		else
 		{
-			eHMOCHBPAGE.ABIELBGOLCA(0L);
+			eHMOCHBPAGE.SetTime(0L);
 		}
-		if (0 >= eHMOCHBPAGE.CCCIFDLEMPI())
+		if (0 >= eHMOCHBPAGE.GetTime())
 		{
-			eHMOCHBPAGE.ABIELBGOLCA(0L);
+			eHMOCHBPAGE.SetTime(0L);
 		}
 	}
 
-	public void ENMEBKHLCHF(object data)
+	public void UpdateDeliveryTimer(object data)
 	{
 		if (data == null)
 		{
-			LLLOJBFMONN.Error("ListSF::deliveryTimer ERROR - data is NULL");
+			GameLog.Error("ListSF::deliveryTimer ERROR - data is NULL");
 			return;
 		}
 		TextTimer.TimerDataStruct eHMOCHBPAGE = (TextTimer.TimerDataStruct)data;
 		if (eHMOCHBPAGE.Data != null)
 		{
 			UserItem dKCHDHMLKHN = (UserItem)eHMOCHBPAGE.Data;
-			eHMOCHBPAGE.ABIELBGOLCA(GameUtils.GetLeftTime(dKCHDHMLKHN.IJGAOHJNLAH()));
-			if (0 > eHMOCHBPAGE.CCCIFDLEMPI())
+			eHMOCHBPAGE.SetTime(GameUtils.GetLeftTime(dKCHDHMLKHN.GetDeliveryTimestamp()));
+			if (0 > eHMOCHBPAGE.GetTime())
 			{
-				eHMOCHBPAGE.ABIELBGOLCA(0L);
+				eHMOCHBPAGE.SetTime(0L);
 			}
 		}
 		else
 		{
-			eHMOCHBPAGE.ABIELBGOLCA(0L);
+			eHMOCHBPAGE.SetTime(0L);
 		}
 	}
 
-	public void OKNJMHBIIGJ(object data)
+	public void UpdateStartPackTimer(object data)
 	{
 		if (data == null)
 		{
-			LLLOJBFMONN.Error("ListSF::startPackTimer ERROR - data is NULL");
+			GameLog.Error("ListSF::startPackTimer ERROR - data is NULL");
 			return;
 		}
 		TextTimer.TimerDataStruct eHMOCHBPAGE = (TextTimer.TimerDataStruct)data;
-		eHMOCHBPAGE.ABIELBGOLCA(CCDKHLAMKKO().AACMNAJJKME() - IDMJOMOMDOJ());
-		if (0 > eHMOCHBPAGE.CCCIFDLEMPI())
+		eHMOCHBPAGE.SetTime(GetRoster().GetStarterPackTimerEndTime() - GetCurrentTime());
+		if (0 > eHMOCHBPAGE.GetTime())
 		{
-			eHMOCHBPAGE.ABIELBGOLCA(0L);
+			eHMOCHBPAGE.SetTime(0L);
 		}
 	}
 
-	public void IAKAPNOBAMJ(object data)
+	public void UpdateCustomRosterTimer(object data)
 	{
 		if (data == null)
 		{
-			LLLOJBFMONN.Error("ListSF::customRosterTimer ERROR - data is NULL");
+			GameLog.Error("ListSF::customRosterTimer ERROR - data is NULL");
 			return;
 		}
 		TextTimer.TimerDataStruct eHMOCHBPAGE = (TextTimer.TimerDataStruct)data;
 		if (eHMOCHBPAGE.Data != null)
 		{
 			string gOHIIMFFFJI = (string)eHMOCHBPAGE.Data;
-			RosterTimerContainer kCMICMHCEBB = CCDKHLAMKKO().AEMFLPNDDKL();
-			RosterTimer fPNMILOHPMB = kCMICMHCEBB.PPCMACMLHCA(gOHIIMFFFJI);
+			RosterTimerContainer kCMICMHCEBB = GetRoster().GetTimerContainer();
+			RosterTimer fPNMILOHPMB = kCMICMHCEBB.FindTimer(gOHIIMFFFJI);
 			if (fPNMILOHPMB != null)
 			{
-				eHMOCHBPAGE.ABIELBGOLCA(GameUtils.GetLeftTime(fPNMILOHPMB.CMIABOOJOEN()));
-				if (eHMOCHBPAGE.CCCIFDLEMPI() < 0)
+				eHMOCHBPAGE.SetTime(GameUtils.GetLeftTime(fPNMILOHPMB.GetEndTimeSeconds()));
+				if (eHMOCHBPAGE.GetTime() < 0)
 				{
-					eHMOCHBPAGE.ABIELBGOLCA(0L);
+					eHMOCHBPAGE.SetTime(0L);
 				}
 			}
 			else
 			{
-				eHMOCHBPAGE.ABIELBGOLCA(0L);
+				eHMOCHBPAGE.SetTime(0L);
 			}
 		}
 		else
 		{
-			eHMOCHBPAGE.ABIELBGOLCA(0L);
+			eHMOCHBPAGE.SetTime(0L);
 		}
 	}
 
-	public static List<PerkInfoItem> EIMKEJNJMEJ(ItemInfo PJDAGCBPLJE, bool EKBOGDKIHIH = true)
+	public static List<PerkInfoItem> GetItemEnchantments(ItemInfo PJDAGCBPLJE, bool EKBOGDKIHIH = true)
 	{
 		if (EKBOGDKIHIH)
 		{
-			UserItem dKCHDHMLKHN = CCDKHLAMKKO().KHCNHPCPFII().CMGOCLGHNLH(PJDAGCBPLJE.Name);
+			UserItem dKCHDHMLKHN = GetRoster().GetInventory().FindItem(PJDAGCBPLJE.Name);
 			if (dKCHDHMLKHN != null)
 			{
 				return dKCHDHMLKHN.GetEnchantments();
@@ -1947,16 +1947,16 @@ public class ListSF
 		return PJDAGCBPLJE.DefaultEnchantmentPreviews;
 	}
 
-	public void JLCGOODFKAK(ItemInfo item)
+	public void OnItemGiven(ItemInfo item)
 	{
 	}
 
-	public void OLHPLOMLKLE(ModelParameters JCICKLIMBEF)
+	public void AddMergedGroupModel(ModelParameters JCICKLIMBEF)
 	{
-		FCBEJGEKOLA.Add(JCICKLIMBEF);
+		mergedGroupModels.Add(JCICKLIMBEF);
 	}
 
-	public void OOLIADKLGLJ(ItemInfo item)
+	public void EquipDefaultItem(ItemInfo item)
 	{
 		string text = string.Empty;
 		if (item.Type == "Armor")
@@ -1985,158 +1985,158 @@ public class ListSF
 		}
 		else
 		{
-			JALMHIICOPB(item);
+			ClearEquippedSlot(item);
 		}
 		if (text != string.Empty)
 		{
-			UserItem dKCHDHMLKHN = CMGOCLGHNLH(text);
+			UserItem dKCHDHMLKHN = GetUserItem(text);
 			if (dKCHDHMLKHN != null)
 			{
-				AFGHCIDFAHB(dKCHDHMLKHN, true);
+				UseItem(dKCHDHMLKHN, true);
 			}
 		}
 	}
 
-	public bool IMDGMNFHFCN(FightResult HEIADONEACH)
+	public bool ApplyFightRewards(FightResult HEIADONEACH)
 	{
-		return IMDGMNFHFCN(HEIADONEACH.PMIHPJFAJIO);
+		return ApplyFightRewards(HEIADONEACH.Prize);
 	}
 
-	public bool IMDGMNFHFCN(FightResult.ResultPrizeStruct PMIHPJFAJIO)
+	public bool ApplyFightRewards(FightResult.ResultPrizeStruct PMIHPJFAJIO)
 	{
-		long gBGNFPNCGED = PMIHPJFAJIO.GBGNFPNCGED;
-		long pNDAIFALIKF = PMIHPJFAJIO.PNDAIFALIKF;
+		long gBGNFPNCGED = PMIHPJFAJIO.Money;
+		long pNDAIFALIKF = PMIHPJFAJIO.Bonus;
 		bool result = IncreaseExp(PMIHPJFAJIO.exp);
 		if (gBGNFPNCGED > 0)
 		{
-			GCPJADIMNKI(gBGNFPNCGED);
+			AddCoins(gBGNFPNCGED);
 		}
 		if (pNDAIFALIKF > 0)
 		{
-			FPIJEOMBFJN(pNDAIFALIKF, Roster.HPOIJPGPOCF.CHANGE_FIGHT_REWARD);
+			AddGems(pNDAIFALIKF, Roster.BalanceChangeType.CHANGE_FIGHT_REWARD);
 		}
-		List<CurrencyStruct> list = PMIHPJFAJIO.JGJLJMHKJBM();
+		List<CurrencyStruct> list = PMIHPJFAJIO.GetCurrencies();
 		if (list.Count > 0)
 		{
 			foreach (CurrencyStruct item in list)
 			{
-				if (CCDKHLAMKKO().ENBKLLMAALP() || item.BKDEAGGPNAO.NBIHGGLGMCN == GameCurrency.DEFOMBPHMBP.CURRENCY_GROUP_NONE)
+				if (GetRoster().GetShowForge() || item.Currency.Group == GameCurrency.CurrencyGroup.CURRENCY_GROUP_NONE)
 				{
-					ANEHEDFAPCH.AddCurrencyCount(item.BKDEAGGPNAO, (ObscuredInt)(item.Count));
+					_roster.AddCurrencyCount(item.Currency, (ObscuredInt)(item.Count));
 				}
 			}
 		}
-		List<ResistanceStruct> list2 = PMIHPJFAJIO.IHLPFEPHBPG();
+		List<ResistanceStruct> list2 = PMIHPJFAJIO.GetResistances();
 		if (list2.Count > 0)
 		{
 			foreach (ResistanceStruct item2 in list2)
 			{
 			}
 		}
-		List<FightResult.LJFFIBFBGID> hELFDCAIJNE = PMIHPJFAJIO.HELFDCAIJNE;
+		List<FightResult.ItemGrant> hELFDCAIJNE = PMIHPJFAJIO.Items;
 		if (hELFDCAIJNE.Count > 0)
 		{
-			foreach (FightResult.LJFFIBFBGID item3 in hELFDCAIJNE)
+			foreach (FightResult.ItemGrant item3 in hELFDCAIJNE)
 			{
-				ItemInfo dLKPBAJDHBO = item3.DLKPBAJDHBO;
-				RewardItem nAIEGGHELIH = item3.NAIEGGHELIH;
+				ItemInfo dLKPBAJDHBO = item3.Item;
+				RewardItem nAIEGGHELIH = item3.RewardSource;
 				if (dLKPBAJDHBO.ParentItem != null)
 				{
-					GEFDJDIINND(dLKPBAJDHBO.ParentItem, 1, 0L, false, false);
+					AddItem(dLKPBAJDHBO.ParentItem, 1, 0L, false, false);
 				}
-				UserItem dKCHDHMLKHN = GEFDJDIINND(dLKPBAJDHBO, 1, 0L, false, false);
+				UserItem dKCHDHMLKHN = AddItem(dLKPBAJDHBO, 1, 0L, false, false);
 				int mHGODOLNDLE = dLKPBAJDHBO.ItemLevel;
-				int mHNCENBCECJ = ANEHEDFAPCH.PINDEKDNCNL();
-				dKCHDHMLKHN.GDBFNNLHPOB(nAIEGGHELIH.LDLPCOFHFKE, mHGODOLNDLE, mHNCENBCECJ);
+				int mHNCENBCECJ = _roster.GetLevel();
+				dKCHDHMLKHN.ApplyEnchantments(nAIEGGHELIH.enchantments, mHGODOLNDLE, mHNCENBCECJ);
 			}
 		}
-		EJANJEEGOOE();
+		RequestSave();
 		return result;
 	}
 
-	public ModelParameters IAOBIMJFBMH(XmlNode node, ModelParameters NENHLHHFDCN, bool CHOLFBIPDIM = true)
+	public ModelParameters ParseWarriorParameters(XmlNode node, ModelParameters NENHLHHFDCN, bool CHOLFBIPDIM = true)
 	{
 		ModelParameters kIKOGDEPGHB = ((NENHLHHFDCN == null) ? new ModelParameters() : NENHLHHFDCN.Clone());
 		if (node.Attributes["Voice"] != null)
 		{
-			kIKOGDEPGHB.Voice = node.Attributes["Voice"].CIPOICEEIBK(string.Empty);
+			kIKOGDEPGHB.Voice = node.Attributes["Voice"].GetStringOrDefault(string.Empty);
 		}
 		if (node.Attributes["Number"] != null)
 		{
-			kIKOGDEPGHB.PEBKEBIBAFA = node.Attributes["Number"].ParseInt();
+			kIKOGDEPGHB.OpponentCount = node.Attributes["Number"].ParseInt();
 		}
 		if (node.Attributes["NoDoubles"] != null)
 		{
-			kIKOGDEPGHB.PMHHMDAIOGL = node.Attributes["NoDoubles"].ParseInt() > 0;
+			kIKOGDEPGHB.NoDoubles = node.Attributes["NoDoubles"].ParseInt() > 0;
 		}
-		kIKOGDEPGHB.EHFNCDPPIAF = node.Attributes["Random"].ParseInt();
-		kIKOGDEPGHB.MEECPNMPFPG = node.Attributes["AutoTuneFactor"].ParseFloat();
-		kIKOGDEPGHB.DLDMOHEGENM((ObscuredInt)(node.Attributes["Level"].ParseInt((ObscuredInt)(kIKOGDEPGHB.PINDEKDNCNL()))));
-		kIKOGDEPGHB.AKLPHMOAIGK = node.Attributes["Dan"].ParseInt(kIKOGDEPGHB.AKLPHMOAIGK);
-		kIKOGDEPGHB.KFMJMBANIGF = node.Attributes["Damage"].ParseFloat(kIKOGDEPGHB.KFMJMBANIGF);
-		kIKOGDEPGHB.EHBHNGOGCKO = node.Attributes["Difficulty"].ParseFloat(kIKOGDEPGHB.EHBHNGOGCKO);
-		kIKOGDEPGHB.KMNLACDHAFE = node.Attributes["BeginnerCheat"] != null && node.Attributes["BeginnerCheat"].ParseInt() > 0;
-		kIKOGDEPGHB.FPIMGHKNHMO = node.Attributes["WarriorPower"].ParseInt();
+		kIKOGDEPGHB.RandomValue = node.Attributes["Random"].ParseInt();
+		kIKOGDEPGHB.AutoTuneFactor = node.Attributes["AutoTuneFactor"].ParseFloat();
+		kIKOGDEPGHB.SetLevel((ObscuredInt)(node.Attributes["Level"].ParseInt((ObscuredInt)(kIKOGDEPGHB.GetLevel()))));
+		kIKOGDEPGHB.Dan = node.Attributes["Dan"].ParseInt(kIKOGDEPGHB.Dan);
+		kIKOGDEPGHB.Damage = node.Attributes["Damage"].ParseFloat(kIKOGDEPGHB.Damage);
+		kIKOGDEPGHB.Difficulty = node.Attributes["Difficulty"].ParseFloat(kIKOGDEPGHB.Difficulty);
+		kIKOGDEPGHB.BeginnerCheat = node.Attributes["BeginnerCheat"] != null && node.Attributes["BeginnerCheat"].ParseInt() > 0;
+		kIKOGDEPGHB.WarriorPower = node.Attributes["WarriorPower"].ParseInt();
 		if (node.Attributes["ShieldTotal"] != null)
 		{
 			kIKOGDEPGHB.ShieldTotal = Mathf.Max(0, node.Attributes["ShieldTotal"].ParseInt());
 			kIKOGDEPGHB.HasShieldTotalOverride = true;
 		}
-		kIKOGDEPGHB.ALCFNGIKCCB = node.Attributes["RatingCorrection"].ParseInt();
-		kIKOGDEPGHB.HGHDBNPIFEJ = node.Attributes["Unknown"].ParseBool();
-		List<WarriorAttribute> iBLHIAHECLK = GameUtils.BGENALLCKII.IBLHIAHECLK;
+		kIKOGDEPGHB.RatingCorrection = node.Attributes["RatingCorrection"].ParseInt();
+		kIKOGDEPGHB.UnknownFlag = node.Attributes["Unknown"].ParseBool();
+		List<WarriorAttribute> iBLHIAHECLK = GameUtils.WarriorAttributeList.AttributeList;
 		foreach (WarriorAttribute item in iBLHIAHECLK)
 		{
 			bool flag = node.Attributes[item.get_Name()] == null;
 			if (flag && CHOLFBIPDIM)
 			{
 				int OEMALIFPGPO = 0;
-				kIKOGDEPGHB.MAGFMAFCHLP.Get(item.get_Name(), ref OEMALIFPGPO);
-				OEMALIFPGPO = ((!GameUtils.HILEAHAAFIC(item.get_Name())) ? OEMALIFPGPO : (OEMALIFPGPO + kIKOGDEPGHB.FPIMGHKNHMO));
-				kIKOGDEPGHB.MAGFMAFCHLP.Set(item.get_Name(), OEMALIFPGPO);
+				kIKOGDEPGHB.BaseAttributes.Get(item.get_Name(), ref OEMALIFPGPO);
+				OEMALIFPGPO = ((!GameUtils.IsAlignTargetAttribute(item.get_Name())) ? OEMALIFPGPO : (OEMALIFPGPO + kIKOGDEPGHB.WarriorPower));
+				kIKOGDEPGHB.BaseAttributes.Set(item.get_Name(), OEMALIFPGPO);
 			}
 			else if (!flag)
 			{
 				int num = node.Attributes[item.get_Name()].ParseInt();
-				num = ((!GameUtils.HILEAHAAFIC(item.get_Name())) ? num : (num + kIKOGDEPGHB.FPIMGHKNHMO));
-				kIKOGDEPGHB.MAGFMAFCHLP.Set(item.get_Name(), num);
+				num = ((!GameUtils.IsAlignTargetAttribute(item.get_Name())) ? num : (num + kIKOGDEPGHB.WarriorPower));
+				kIKOGDEPGHB.BaseAttributes.Set(item.get_Name(), num);
 			}
 		}
 		if (node.Attributes["FirstName"] != null)
 		{
-			kIKOGDEPGHB.BMFLPBLAFLK = node.Attributes["FirstName"].CIPOICEEIBK(string.Empty);
+			kIKOGDEPGHB.FirstName = node.Attributes["FirstName"].GetStringOrDefault(string.Empty);
 		}
 		if (node.Attributes["LastName"] != null)
 		{
-			kIKOGDEPGHB.FMOKLKFCCKF = node.Attributes["LastName"].CIPOICEEIBK(string.Empty);
+			kIKOGDEPGHB.LastName = node.Attributes["LastName"].GetStringOrDefault(string.Empty);
 		}
 		if (node.Attributes["Avatar"] != null)
 		{
-			kIKOGDEPGHB.HNKFHGOOKEG = node.Attributes["Avatar"].CIPOICEEIBK(string.Empty);
+			kIKOGDEPGHB.Avatar = node.Attributes["Avatar"].GetStringOrDefault(string.Empty);
 		}
 		if (node.Attributes["PlayerRating"] != null)
 		{
-			kIKOGDEPGHB.FOPCCNDPFOE(node.Attributes["PlayerRating"].ParseFloat());
+			kIKOGDEPGHB.SetPlayerRating(node.Attributes["PlayerRating"].ParseFloat());
 		}
 		if (node.Attributes["EnemyRating"] != null)
 		{
-			kIKOGDEPGHB.KCLCLMNOIDJ(node.Attributes["EnemyRating"].ParseFloat());
+			kIKOGDEPGHB.SetEnemyRating(node.Attributes["EnemyRating"].ParseFloat());
 		}
 		if (node.Attributes["PlayerRatingMagic"] != null)
 		{
-			kIKOGDEPGHB.LEIPGKLCKOP(node.Attributes["PlayerRatingMagic"].ParseFloat());
+			kIKOGDEPGHB.SetPlayerRatingMagic(node.Attributes["PlayerRatingMagic"].ParseFloat());
 		}
 		if (node.Attributes["EnemyRatingMagic"] != null)
 		{
-			kIKOGDEPGHB.NHPLLBNKOAF(node.Attributes["EnemyRatingMagic"].ParseFloat());
+			kIKOGDEPGHB.SetEnemyRatingMagic(node.Attributes["EnemyRatingMagic"].ParseFloat());
 		}
 		if (node.Attributes["PlayerRatingRanged"] != null)
 		{
-			kIKOGDEPGHB.JPOCPFLJKDC(node.Attributes["PlayerRatingRanged"].ParseFloat());
+			kIKOGDEPGHB.SetPlayerRatingRanged(node.Attributes["PlayerRatingRanged"].ParseFloat());
 		}
 		if (node.Attributes["EnemyRatingRanged"] != null)
 		{
-			kIKOGDEPGHB.AJLEAGJFKPD(node.Attributes["EnemyRatingRanged"].ParseFloat());
+			kIKOGDEPGHB.SetEnemyRatingRanged(node.Attributes["EnemyRatingRanged"].ParseFloat());
 		}
 		XmlNode xmlNode = node["AttributesAlign"];
 		if (xmlNode != null)
@@ -2149,15 +2149,15 @@ public class ListSF
 				hLHDMKCPIJP.Priority = childNode.Attributes["Priority"].ParseInt();
 				if (childNode.Attributes["Eclipse"] == null)
 				{
-					hLHDMKCPIJP.KONCHIPGFGO = ModelParameters.IHFKGJLIPGH.DFBoth;
+					hLHDMKCPIJP.DifficultyFilter = ModelParameters.DifficultyFilter.DFBoth;
 				}
 				else if (childNode.Attributes["Eclipse"].ParseInt() == 0)
 				{
-					hLHDMKCPIJP.KONCHIPGFGO = ModelParameters.IHFKGJLIPGH.DFNormal;
+					hLHDMKCPIJP.DifficultyFilter = ModelParameters.DifficultyFilter.DFNormal;
 				}
 				else
 				{
-					hLHDMKCPIJP.KONCHIPGFGO = ModelParameters.IHFKGJLIPGH.DFHard;
+					hLHDMKCPIJP.DifficultyFilter = ModelParameters.DifficultyFilter.DFHard;
 				}
 				kIKOGDEPGHB.AttributeAlignments.Add(hLHDMKCPIJP);
 			}
@@ -2168,49 +2168,49 @@ public class ListSF
 			foreach (XmlNode item2 in xmlNode3)
 			{
 				GroupModel fIHMEHKAOCP = new GroupModel();
-				fIHMEHKAOCP.Name = item2.Attributes["Name"].CIPOICEEIBK(string.Empty);
+				fIHMEHKAOCP.Name = item2.Attributes["Name"].GetStringOrDefault(string.Empty);
 				fIHMEHKAOCP.IsRandom = item2.Attributes["Random"].ParseBool();
-				fIHMEHKAOCP.PMHHMDAIOGL = item2.Attributes["NoDoubles"].ParseBool();
-				kIKOGDEPGHB.KFKKHACFDPH.Add(fIHMEHKAOCP);
+				fIHMEHKAOCP.NoDoubles = item2.Attributes["NoDoubles"].ParseBool();
+				kIKOGDEPGHB.GroupModels.Add(fIHMEHKAOCP);
 			}
 		}
 		if (!CHOLFBIPDIM)
 		{
 			if (node.Attributes["Skeleton"] != null)
 			{
-				kIKOGDEPGHB.Skeleton = GetItems().GetItemByName(node.Attributes["Skeleton"].CIPOICEEIBK(string.Empty));
+				kIKOGDEPGHB.Skeleton = GetItems().GetItemByName(node.Attributes["Skeleton"].GetStringOrDefault(string.Empty));
 			}
 			if (node.Attributes["Armor"] != null)
 			{
-				kIKOGDEPGHB.Armor = GetItems().GetItemByName(node.Attributes["Armor"].CIPOICEEIBK(string.Empty));
+				kIKOGDEPGHB.Armor = GetItems().GetItemByName(node.Attributes["Armor"].GetStringOrDefault(string.Empty));
 			}
 			if (node.Attributes["Helm"] != null)
 			{
-				kIKOGDEPGHB.Helm = GetItems().GetItemByName(node.Attributes["Helm"].CIPOICEEIBK(string.Empty));
+				kIKOGDEPGHB.Helm = GetItems().GetItemByName(node.Attributes["Helm"].GetStringOrDefault(string.Empty));
 			}
 			if (node.Attributes["Weapon"] != null)
 			{
-				kIKOGDEPGHB.Weapon = GetItems().GetItemByName(node.Attributes["Weapon"].CIPOICEEIBK(string.Empty));
+				kIKOGDEPGHB.Weapon = GetItems().GetItemByName(node.Attributes["Weapon"].GetStringOrDefault(string.Empty));
 			}
 			if (node.Attributes["Ranged"] != null)
 			{
-				kIKOGDEPGHB.Ranged = GetItems().GetItemByName(node.Attributes["Ranged"].CIPOICEEIBK(string.Empty));
+				kIKOGDEPGHB.Ranged = GetItems().GetItemByName(node.Attributes["Ranged"].GetStringOrDefault(string.Empty));
 			}
 			if (node.Attributes["Magic"] != null)
 			{
-				kIKOGDEPGHB.Magic = GetItems().GetItemByName(node.Attributes["Magic"].CIPOICEEIBK(string.Empty));
+				kIKOGDEPGHB.Magic = GetItems().GetItemByName(node.Attributes["Magic"].GetStringOrDefault(string.Empty));
 			}
 			if (node.Attributes["RaidCharge"] != null)
 			{
-				KAOPLEPILDH kAOPLEPILDH = kIKOGDEPGHB as KAOPLEPILDH;
+				RaidModelParameters kAOPLEPILDH = kIKOGDEPGHB as RaidModelParameters;
 				if (kAOPLEPILDH != null)
 				{
-					kAOPLEPILDH.LMIBBJIKLNO = GetItems().GetItemByName(node.Attributes["RaidCharge"].CIPOICEEIBK(string.Empty));
+					kAOPLEPILDH.RaidChargeItem = GetItems().GetItemByName(node.Attributes["RaidCharge"].GetStringOrDefault(string.Empty));
 				}
 			}
 			if (node.Attributes["Seal"] != null)
 			{
-				kIKOGDEPGHB.KKJJONOBHKI = GetItems().GetItemByName(node.Attributes["Seal"].CIPOICEEIBK(string.Empty));
+				kIKOGDEPGHB.Seal = GetItems().GetItemByName(node.Attributes["Seal"].GetStringOrDefault(string.Empty));
 			}
 		}
 		else
@@ -2218,40 +2218,40 @@ public class ListSF
 			XmlNode xmlNode5 = node["Items"];
 			if (xmlNode5 != null)
 			{
-				kIKOGDEPGHB.HEKILHEHMMH.Clear();
+				kIKOGDEPGHB.DecorateItems.Clear();
 				foreach (XmlNode item3 in xmlNode5)
 				{
 					ItemInfo dJKEECEOCJB = null;
 					if (item3.Attributes["Name"] != null)
 					{
-						dJKEECEOCJB = GetItems().GetItemByName(item3.Attributes["Name"].CIPOICEEIBK(string.Empty));
+						dJKEECEOCJB = GetItems().GetItemByName(item3.Attributes["Name"].GetStringOrDefault(string.Empty));
 					}
 					else if (item3.Attributes["Type"] != null)
 					{
-						dJKEECEOCJB = kIKOGDEPGHB.KDABEFBJMOD(item3.Attributes["Type"].CIPOICEEIBK(string.Empty));
+						dJKEECEOCJB = kIKOGDEPGHB.GetItemByType(item3.Attributes["Type"].GetStringOrDefault(string.Empty));
 					}
 					if (dJKEECEOCJB != null)
 					{
 						if (dJKEECEOCJB.Type.Equals("Decorate"))
 						{
-							kIKOGDEPGHB.HEKILHEHMMH.Add(dJKEECEOCJB);
+							kIKOGDEPGHB.DecorateItems.Add(dJKEECEOCJB);
 							continue;
 						}
 						ItemInfo dJKEECEOCJB2 = dJKEECEOCJB.Clone();
 						XmlNode hKPPBKPJOEO = item3["Enchantments"];
 						dJKEECEOCJB2.DefaultEnchantments.Clear();
-						dJKEECEOCJB2.JCJKLMICDIC(hKPPBKPJOEO);
-						kIKOGDEPGHB.OLLNIKFPMKE(dJKEECEOCJB2.Type, dJKEECEOCJB2);
-						if (!JGFGMICMBKL)
+						dJKEECEOCJB2.SetParsedPerks(hKPPBKPJOEO);
+						kIKOGDEPGHB.SetItemByType(dJKEECEOCJB2.Type, dJKEECEOCJB2);
+						if (!IsContentLoaded)
 						{
-							kIKOGDEPGHB.PFNDNOMGFBC(dJKEECEOCJB2);
+							kIKOGDEPGHB.AddConditionItem(dJKEECEOCJB2);
 						}
 					}
-					else if (!string.IsNullOrEmpty(kIKOGDEPGHB.HHKODEICDNP))
+					else if (!string.IsNullOrEmpty(kIKOGDEPGHB.GroupName))
 					{
-						string text = item3.Attributes["Name"].CIPOICEEIBK(string.Empty);
-						string text2 = item3.Attributes["Type"].CIPOICEEIBK(string.Empty);
-						LLLOJBFMONN.Error("No item Wariror {0} ---- {1}", text, text2);
+						string text = item3.Attributes["Name"].GetStringOrDefault(string.Empty);
+						string text2 = item3.Attributes["Type"].GetStringOrDefault(string.Empty);
+						GameLog.Error("No item Wariror {0} ---- {1}", text, text2);
 					}
 				}
 			}
@@ -2260,21 +2260,21 @@ public class ListSF
 			{
 				foreach (XmlNode item4 in xmlNode7)
 				{
-					string gOHIIMFFFJI = item4.Attributes["Name"].CIPOICEEIBK(string.Empty);
-					PerkInfoItem aCONCDFDNJH = GameUtils.FDEJIIDIPBI.ABAGJKMKCBA(gOHIIMFFFJI);
+					string gOHIIMFFFJI = item4.Attributes["Name"].GetStringOrDefault(string.Empty);
+					PerkInfoItem aCONCDFDNJH = GameUtils.PerkItemList.FindBasePerk(gOHIIMFFFJI);
 					if (aCONCDFDNJH != null && !kIKOGDEPGHB.WarriorPerks.Contains(aCONCDFDNJH))
 					{
 						if (item4["Set"] != null || item4["RatingEvaluation"] != null)
 						{
 							aCONCDFDNJH = aCONCDFDNJH.Clone(item4["Set"], item4["RatingEvaluation"]);
-							kIKOGDEPGHB.LHLEIAKJANI(aCONCDFDNJH);
+							kIKOGDEPGHB.AddWarriorPerk(aCONCDFDNJH);
 						}
 						kIKOGDEPGHB.WarriorPerks.AddIfNotExist(aCONCDFDNJH);
 					}
 				}
 			}
 		}
-		Tactic hBFMBOHLKPJ = AiData.GetTacticByName(node.Attributes["Tactic"].CIPOICEEIBK(string.Empty));
+		Tactic hBFMBOHLKPJ = AiData.GetTacticByName(node.Attributes["Tactic"].GetStringOrDefault(string.Empty));
         if (node.Attributes["EclipseBodyModel"] != null) kIKOGDEPGHB.EclipseBodyModel = node.Attributes["EclipseBodyModel"].Value;
         if (node.Attributes["EclipseCharacterId"] != null) kIKOGDEPGHB.EclipseCharacterId = node.Attributes["EclipseCharacterId"].Value;
         if (node["EclipseSkinModels"] != null)
@@ -2283,46 +2283,46 @@ public class ListSF
             foreach (XmlNode skin in node["EclipseSkinModels"].ChildNodes) models.Add(skin.Attributes["Asset"].Value);
             kIKOGDEPGHB.EclipseSkinModels = models.ToArray();
         }
-		kIKOGDEPGHB.HBFMBOHLKPJ = hBFMBOHLKPJ;
+		kIKOGDEPGHB.FightTactic = hBFMBOHLKPJ;
 		kIKOGDEPGHB.AiControlled = node.Attributes["NotAI"] == null;
-		kIKOGDEPGHB.HKJFJHBHMND = node.Attributes["NotAnimation"] == null;
+		kIKOGDEPGHB.AnimationEnabled = node.Attributes["NotAnimation"] == null;
 		kIKOGDEPGHB.UserControlled = node.Attributes["Controlled"] != null;
 		kIKOGDEPGHB.IsPlayer = false;
 		kIKOGDEPGHB.IsWinner = false;
-		kIKOGDEPGHB.BHHLEBHLBLH = false;
-		kIKOGDEPGHB.PCALDKCJGCK = false;
+		kIKOGDEPGHB.RoundEnded = false;
+		kIKOGDEPGHB.IsDead = false;
 		kIKOGDEPGHB.RoundsWon = 0;
 		kIKOGDEPGHB.MaxLife = 0f;
-		if (!kIKOGDEPGHB.KKFBCOKMNDF)
+		if (!kIKOGDEPGHB.HasSourceNode)
 		{
 			kIKOGDEPGHB.Node = node;
-			kIKOGDEPGHB.KKFBCOKMNDF = true;
+			kIKOGDEPGHB.HasSourceNode = true;
 		}
 		return kIKOGDEPGHB;
 	}
 
-	public static void KNCECPAINLI(BattleReplayable BBAGBFDMNJE)
+	public static void RegisterReplayableBattle(BattleReplayable BBAGBFDMNJE)
 	{
-		DMNAHDJIBOP.AddIfNotExist(BBAGBFDMNJE);
+		replayableBattles.AddIfNotExist(BBAGBFDMNJE);
 	}
 
-	public void FOKCPLOMLOK(FightList fight, XmlNode node, BattleType LFLGCDNKNJI, string LPJNEDFCBOI, string PINIIFIOECE, Battle DPOOIONCEOA)
+	public void ParseFight(FightList fight, XmlNode node, BattleType LFLGCDNKNJI, string LPJNEDFCBOI, string PINIIFIOECE, Battle DPOOIONCEOA)
 	{
-		fight.Name = node.Attributes["Name"].CIPOICEEIBK(string.Empty);
+		fight.Name = node.Attributes["Name"].GetStringOrDefault(string.Empty);
 		fight.set_Type(LFLGCDNKNJI);
-		fight.EJGGHHEOGPG = node.Attributes["Replays"].ParseInt();
+		fight.ReplayCount = node.Attributes["Replays"].ParseInt();
 		fight.RepeatTime = node.Attributes["ReplayInterval"].ParseInt();
 		fight.set_PowerRequired(node.Attributes["Power"].ParseInt(1));
 		fight.RoundsToWin = node.Attributes["Rounds"].ParseInt(2);
 		fight.RoundTime = (ObscuredInt)(node.Attributes["RoundTime"].ParseInt(60));
-		fight.Location = node.Attributes["Location"].CIPOICEEIBK(LPJNEDFCBOI);
-		fight.Music = node.Attributes["Music"].CIPOICEEIBK(PINIIFIOECE);
-		fight.FANGNMDAINE = node.Attributes["EvaluatedRating"].ParseFloat(-1f);
+		fight.Location = node.Attributes["Location"].GetStringOrDefault(LPJNEDFCBOI);
+		fight.Music = node.Attributes["Music"].GetStringOrDefault(PINIIFIOECE);
+		fight.EvaluatedRating = node.Attributes["EvaluatedRating"].ParseFloat(-1f);
 		fight.HealthRecovery = node.Attributes["HealthRecovery"].ParseFloat(1f);
-		fight.MOPEDKMDLFA = node.Attributes["PrizeBase"].ParseFloat(-1f);
-		fight.set_Description(node.Attributes["Description"].CIPOICEEIBK(string.Empty));
-		fight.CNNCIENODGE = node.Attributes["Locked"].ParseBool();
-		fight.JKCHHOMGGBN = node.Attributes["RewardImage"].CIPOICEEIBK(string.Empty);
+		fight.PrizeBase = node.Attributes["PrizeBase"].ParseFloat(-1f);
+		fight.set_Description(node.Attributes["Description"].GetStringOrDefault(string.Empty));
+		fight.IsLocked = node.Attributes["Locked"].ParseBool();
+		fight.RewardImage = node.Attributes["RewardImage"].GetStringOrDefault(string.Empty);
 		fight.TrackFightProgress = LFLGCDNKNJI != BattleType.FightNone;
 		ushort aNHLAHFDDCE = 0;
 		ushort lPMDOHPIEOP = 0;
@@ -2332,7 +2332,7 @@ public class ListSF
 		}
 		else if (DPOOIONCEOA != null)
 		{
-			aNHLAHFDDCE = DPOOIONCEOA.GIOJPNNLKKK();
+			aNHLAHFDDCE = DPOOIONCEOA.GetRewardDigits();
 		}
 		if (!node.Attributes["PrizeBaseDigits"].Empty())
 		{
@@ -2340,10 +2340,10 @@ public class ListSF
 		}
 		else if (DPOOIONCEOA != null)
 		{
-			lPMDOHPIEOP = DPOOIONCEOA.MCEGLDIFDBI();
+			lPMDOHPIEOP = DPOOIONCEOA.GetPrizeBaseDigits();
 		}
-		fight.ANHLAHFDDCE = aNHLAHFDDCE;
-		fight.LPMDOHPIEOP = lPMDOHPIEOP;
+		fight.RewardDigits = aNHLAHFDDCE;
+		fight.PrizeBaseDigits = lPMDOHPIEOP;
 		ModelParameters kIKOGDEPGHB = null;
 		XmlNode xmlNode = node["Warriors"];
 		if (xmlNode != null)
@@ -2352,66 +2352,66 @@ public class ListSF
 			{
 				if (!childNode.Attributes["Template"].Empty())
 				{
-					TemplateUser aHIIGFBIGAA = CNFBCBDPKCI(childNode.Attributes["Template"].CIPOICEEIBK());
-					kIKOGDEPGHB = ((aHIIGFBIGAA == null) ? IAOBIMJFBMH(childNode, null) : IAOBIMJFBMH(childNode, aHIIGFBIGAA.KEJDJHAGBMK));
+					TemplateUser aHIIGFBIGAA = GetTemplateByName(childNode.Attributes["Template"].GetStringOrDefault());
+					kIKOGDEPGHB = ((aHIIGFBIGAA == null) ? ParseWarriorParameters(childNode, null) : ParseWarriorParameters(childNode, aHIIGFBIGAA.Parameters));
 				}
 				else
 				{
-					kIKOGDEPGHB = IAOBIMJFBMH(childNode, null);
+					kIKOGDEPGHB = ParseWarriorParameters(childNode, null);
 				}
-				kIKOGDEPGHB.HHKODEICDNP = childNode.Attributes["Group"].CIPOICEEIBK();
-				kIKOGDEPGHB.EHFNCDPPIAF = childNode.Attributes["Random"].ParseInt();
+				kIKOGDEPGHB.GroupName = childNode.Attributes["Group"].GetStringOrDefault();
+				kIKOGDEPGHB.RandomValue = childNode.Attributes["Random"].ParseInt();
 				kIKOGDEPGHB.Node = childNode;
 				fight.AddOpponent(kIKOGDEPGHB);
 			}
 		}
 		XmlNode hKPPBKPJOEO = node["Rules"];
 		XmlNode hKPPBKPJOEO2 = node["Rewards"];
-		EEPPJEMHBCK(fight, hKPPBKPJOEO);
+		ParseFightRules(fight, hKPPBKPJOEO);
 		// FightIDS is assigned after this parser returns; use the already registered
 		// battle metadata to identify offline raids while building their rewards.
 		if (LFLGCDNKNJI != BattleType.FightRaid ||
 			(DPOOIONCEOA != null && Eclipse.Modding.ModPolicies.TryRaidBattle(DPOOIONCEOA.get_Name(), out _)))
 		{
-			HCJDHMGAMIE(fight, hKPPBKPJOEO2);
+			ParseFightRewards(fight, hKPPBKPJOEO2);
 		}
 	}
 
-	public void AJKBFMLOCOF(FightList KGKDKENMAOA)
+	public void AddFight(FightList KGKDKENMAOA)
 	{
-		JNPMCNMEOLE.AddIfNotExist(KGKDKENMAOA);
-		if (IHNFKALCJGJ)
+		fights.AddIfNotExist(KGKDKENMAOA);
+		if (areZonesLoaded)
 		{
-			NEIBAJKEJDE(KGKDKENMAOA);
-			DINPFDGMEAB(KGKDKENMAOA);
+			LinkFightToRoster(KGKDKENMAOA);
+			UpdateFightStatus(KGKDKENMAOA);
 		}
 	}
 
-	public void KINHMMGJEMP(FightList KGKDKENMAOA)
+	public void RemoveFight(FightList KGKDKENMAOA)
 	{
-		JNPMCNMEOLE.Remove(KGKDKENMAOA);
+		fights.Remove(KGKDKENMAOA);
 	}
 
-	public static void MBBMOKFGABP(ItemInfo item)
+	public static void RecordCoinShortfall(ItemInfo item)
 	{
-		long num = item.OHBBLIMNIMJ();
-		Roster nKGLHEGIKKP = CCDKHLAMKKO();
-		long num2 = nKGLHEGIKKP.BFBOEGMAMNF() - (ObscuredLong)(nKGLHEGIKKP.KNHDCEBIMEE());
-		long num3 = (item.NNLMNNAEDIE = Math.Max(0L, num - num2));
-		nKGLHEGIKKP.HGDLPMDHHOJ((ObscuredLong)((ObscuredLong)(nKGLHEGIKKP.KNHDCEBIMEE()) - num3));
+		long num = item.GetCoinPrice();
+		Roster nKGLHEGIKKP = GetRoster();
+		long num2 = nKGLHEGIKKP.GetMoney() - (ObscuredLong)(nKGLHEGIKKP.GetPaidMoney());
+		long num3 = (item.MissingCoins = Math.Max(0L, num - num2));
+		nKGLHEGIKKP.SetPaidMoney((ObscuredLong)((ObscuredLong)(nKGLHEGIKKP.GetPaidMoney()) - num3));
 	}
 
-	public static void BLNHEMCHIGF(ItemInfo item, bool CNIOCCCBDBJ)
+	public static void RecordGemShortfall(ItemInfo item, bool CNIOCCCBDBJ)
 	{
 		long num = 0L;
-		num = (CNIOCCCBDBJ ? (long)(ObscuredLong)(item.KLHOKKPALOK) : item.MCNMMBCJADI());
-		long pEGDPDINDDO = Math.Max(0L, num - CCDKHLAMKKO().PEJFMMHOOGN());
-		item.PEGDPDINDDO = pEGDPDINDDO;
+		num = (CNIOCCCBDBJ ? (long)(ObscuredLong)(item.DeliveryGemPrice) : item.GetGemPrice());
+		long pEGDPDINDDO = Math.Max(0L, num - GetRoster().GetUnpaidBonus());
+		item.MissingGems = pEGDPDINDDO;
 	}
 
-	public TemplateUser CNFBCBDPKCI(string name)
+	public TemplateUser GetTemplateByName(string name)
 	{
-		foreach (TemplateUser item in HBOHFLOJMAA)
+		foreach (TemplateUser item in templates)
 		{
 			if (item.name == name)
 			{
@@ -2421,15 +2421,15 @@ public class ListSF
 		return null;
 	}
 
-	public void PLEDFOHECDC(ModelParameters OEMALIFPGPO, ModelParameters BBNKIBKPBLO)
+	public void ApplyParameterOverrides(ModelParameters OEMALIFPGPO, ModelParameters BBNKIBKPBLO)
 	{
-		if (BBNKIBKPBLO.IBBALIJOJMC != SceneTypes.SceneNone)
+		if (BBNKIBKPBLO.SceneType != SceneTypes.SceneNone)
 		{
-			OEMALIFPGPO.IBBALIJOJMC = BBNKIBKPBLO.IBBALIJOJMC;
+			OEMALIFPGPO.SceneType = BBNKIBKPBLO.SceneType;
 		}
-		if (BBNKIBKPBLO.MEECPNMPFPG != 0f)
+		if (BBNKIBKPBLO.AutoTuneFactor != 0f)
 		{
-			OEMALIFPGPO.MEECPNMPFPG = BBNKIBKPBLO.MEECPNMPFPG;
+			OEMALIFPGPO.AutoTuneFactor = BBNKIBKPBLO.AutoTuneFactor;
 		}
 		if (BBNKIBKPBLO.Voice.Length != 0)
 		{
@@ -2459,52 +2459,52 @@ public class ListSF
 		{
 			OEMALIFPGPO.Magic = BBNKIBKPBLO.Magic;
 		}
-		if (BBNKIBKPBLO.KKJJONOBHKI != null)
+		if (BBNKIBKPBLO.Seal != null)
 		{
-			OEMALIFPGPO.KKJJONOBHKI = BBNKIBKPBLO.KKJJONOBHKI;
+			OEMALIFPGPO.Seal = BBNKIBKPBLO.Seal;
 		}
-		KAOPLEPILDH kAOPLEPILDH = OEMALIFPGPO as KAOPLEPILDH;
-		KAOPLEPILDH kAOPLEPILDH2 = BBNKIBKPBLO as KAOPLEPILDH;
-		if (kAOPLEPILDH != null && kAOPLEPILDH2 != null && kAOPLEPILDH2.LMIBBJIKLNO != null)
+		RaidModelParameters kAOPLEPILDH = OEMALIFPGPO as RaidModelParameters;
+		RaidModelParameters kAOPLEPILDH2 = BBNKIBKPBLO as RaidModelParameters;
+		if (kAOPLEPILDH != null && kAOPLEPILDH2 != null && kAOPLEPILDH2.RaidChargeItem != null)
 		{
-			kAOPLEPILDH.LMIBBJIKLNO = kAOPLEPILDH2.LMIBBJIKLNO;
+			kAOPLEPILDH.RaidChargeItem = kAOPLEPILDH2.RaidChargeItem;
 		}
 		if (BBNKIBKPBLO.EndRoundType != EndRoundType.EndRoundTypeNone)
 		{
 			OEMALIFPGPO.EndRoundType = BBNKIBKPBLO.EndRoundType;
 		}
-		if (BBNKIBKPBLO.FPIMGHKNHMO != 0)
+		if (BBNKIBKPBLO.WarriorPower != 0)
 		{
-			OEMALIFPGPO.FPIMGHKNHMO = BBNKIBKPBLO.FPIMGHKNHMO;
+			OEMALIFPGPO.WarriorPower = BBNKIBKPBLO.WarriorPower;
 		}
 		if (BBNKIBKPBLO.HasShieldTotalOverride)
 		{
 			OEMALIFPGPO.ShieldTotal = BBNKIBKPBLO.ShieldTotal;
 			OEMALIFPGPO.HasShieldTotalOverride = true;
 		}
-		if (BBNKIBKPBLO.ALCFNGIKCCB != 0)
+		if (BBNKIBKPBLO.RatingCorrection != 0)
 		{
-			OEMALIFPGPO.ALCFNGIKCCB = BBNKIBKPBLO.ALCFNGIKCCB;
+			OEMALIFPGPO.RatingCorrection = BBNKIBKPBLO.RatingCorrection;
 		}
-		if (BBNKIBKPBLO.KFMJMBANIGF != 0f)
+		if (BBNKIBKPBLO.Damage != 0f)
 		{
-			OEMALIFPGPO.KFMJMBANIGF = BBNKIBKPBLO.KFMJMBANIGF;
+			OEMALIFPGPO.Damage = BBNKIBKPBLO.Damage;
 		}
-		if (BBNKIBKPBLO.EHBHNGOGCKO != 0f)
+		if (BBNKIBKPBLO.Difficulty != 0f)
 		{
-			OEMALIFPGPO.EHBHNGOGCKO = BBNKIBKPBLO.EHBHNGOGCKO;
+			OEMALIFPGPO.Difficulty = BBNKIBKPBLO.Difficulty;
 		}
-		if (!string.IsNullOrEmpty(BBNKIBKPBLO.BMFLPBLAFLK))
+		if (!string.IsNullOrEmpty(BBNKIBKPBLO.FirstName))
 		{
-			OEMALIFPGPO.BMFLPBLAFLK = BBNKIBKPBLO.BMFLPBLAFLK;
+			OEMALIFPGPO.FirstName = BBNKIBKPBLO.FirstName;
 		}
-		if (!string.IsNullOrEmpty(BBNKIBKPBLO.FMOKLKFCCKF))
+		if (!string.IsNullOrEmpty(BBNKIBKPBLO.LastName))
 		{
-			OEMALIFPGPO.FMOKLKFCCKF = BBNKIBKPBLO.FMOKLKFCCKF;
+			OEMALIFPGPO.LastName = BBNKIBKPBLO.LastName;
 		}
-		if (!string.IsNullOrEmpty(BBNKIBKPBLO.HNKFHGOOKEG))
+		if (!string.IsNullOrEmpty(BBNKIBKPBLO.Avatar))
 		{
-			OEMALIFPGPO.HNKFHGOOKEG = BBNKIBKPBLO.HNKFHGOOKEG;
+			OEMALIFPGPO.Avatar = BBNKIBKPBLO.Avatar;
 		}
 		if (BBNKIBKPBLO.Perks.Count != 0)
 		{
@@ -2527,33 +2527,33 @@ public class ListSF
 				OEMALIFPGPO.LearnedPerks.AddIfNotExist(item3);
 			}
 		}
-		if (BBNKIBKPBLO.PMHIIOJPDLO() != -1f)
+		if (BBNKIBKPBLO.GetPlayerRating() != -1f)
 		{
-			OEMALIFPGPO.FOPCCNDPFOE(BBNKIBKPBLO.PMHIIOJPDLO());
+			OEMALIFPGPO.SetPlayerRating(BBNKIBKPBLO.GetPlayerRating());
 		}
-		if (BBNKIBKPBLO.CEKIBEJELBM() != -1f)
+		if (BBNKIBKPBLO.GetEnemyRating() != -1f)
 		{
-			OEMALIFPGPO.KCLCLMNOIDJ(BBNKIBKPBLO.CEKIBEJELBM());
+			OEMALIFPGPO.SetEnemyRating(BBNKIBKPBLO.GetEnemyRating());
 		}
-		if (BBNKIBKPBLO.FLLKBDGJIKO() != -1f)
+		if (BBNKIBKPBLO.GetPlayerRatingMagic() != -1f)
 		{
-			OEMALIFPGPO.LEIPGKLCKOP(BBNKIBKPBLO.FLLKBDGJIKO());
+			OEMALIFPGPO.SetPlayerRatingMagic(BBNKIBKPBLO.GetPlayerRatingMagic());
 		}
-		if (BBNKIBKPBLO.GGIOPHOMCCL() != -1f)
+		if (BBNKIBKPBLO.GetEnemyRatingMagic() != -1f)
 		{
-			OEMALIFPGPO.NHPLLBNKOAF(BBNKIBKPBLO.GGIOPHOMCCL());
+			OEMALIFPGPO.SetEnemyRatingMagic(BBNKIBKPBLO.GetEnemyRatingMagic());
 		}
-		if (BBNKIBKPBLO.GBKEKEDPBIB() != -1f)
+		if (BBNKIBKPBLO.GetPlayerRatingRanged() != -1f)
 		{
-			OEMALIFPGPO.JPOCPFLJKDC(BBNKIBKPBLO.GBKEKEDPBIB());
+			OEMALIFPGPO.SetPlayerRatingRanged(BBNKIBKPBLO.GetPlayerRatingRanged());
 		}
-		if (BBNKIBKPBLO.GCEDCHHBJGM() != -1f)
+		if (BBNKIBKPBLO.GetEnemyRatingRanged() != -1f)
 		{
-			OEMALIFPGPO.AJLEAGJFKPD(BBNKIBKPBLO.GCEDCHHBJGM());
+			OEMALIFPGPO.SetEnemyRatingRanged(BBNKIBKPBLO.GetEnemyRatingRanged());
 		}
-		if (BBNKIBKPBLO.HBFMBOHLKPJ != null)
+		if (BBNKIBKPBLO.FightTactic != null)
 		{
-			OEMALIFPGPO.HBFMBOHLKPJ = BBNKIBKPBLO.HBFMBOHLKPJ;
+			OEMALIFPGPO.FightTactic = BBNKIBKPBLO.FightTactic;
 		}
 		if (BBNKIBKPBLO.AttributeAlignments.Count != 0)
 		{
@@ -2562,63 +2562,63 @@ public class ListSF
 				OEMALIFPGPO.AttributeAlignments.Add(new AttributesAlign(item4));
 			}
 		}
-		List<WarriorAttribute> iBLHIAHECLK = GameUtils.BGENALLCKII.IBLHIAHECLK;
+		List<WarriorAttribute> iBLHIAHECLK = GameUtils.WarriorAttributeList.AttributeList;
 		foreach (WarriorAttribute item5 in iBLHIAHECLK)
 		{
 			string kGBGENDIMBC = item5.get_Name();
 			int OEMALIFPGPO2 = 0;
-			if (BBNKIBKPBLO.IBLHIAHECLK.Get(kGBGENDIMBC, ref OEMALIFPGPO2))
+			if (BBNKIBKPBLO.FinalAttributes.Get(kGBGENDIMBC, ref OEMALIFPGPO2))
 			{
-				OEMALIFPGPO.IBLHIAHECLK.Set(kGBGENDIMBC, OEMALIFPGPO2);
+				OEMALIFPGPO.FinalAttributes.Set(kGBGENDIMBC, OEMALIFPGPO2);
 			}
 		}
 	}
 
-	private void ILFBDHDMHPD(object data)
+	private void OnTimerTick(object data)
 	{
 		long getTime = GlobalTimer.get_GetTime();
-		HJOHKOEICAP = getTime;
-		FCAACLKFFLH(HJOHKOEICAP);
-		ALJEKDDKPJJ(HJOHKOEICAP);
-		if (GameUtils.OBJEKOBDMOE)
+		currentTime = getTime;
+		SetZonesTime(currentTime);
+		UpdateRosterTime(currentTime);
+		if (GameUtils.IsLoginComplete)
 		{
 			bool flag = Module.GetInstance().GetCurrentScreenType() != ScreenType.ModulePreloader;
 			bool flag2 = Module.GetInstance().GetCurrentScreenType() != ScreenType.ModuleFight;
 			bool flag3 = Fight.GetCurrentFight() != null && Fight.GetCurrentFight().get_isFightNone();
 			if (flag && (flag2 || flag3))
 			{
-				GHDNJMDEALP(HJOHKOEICAP);
+				DeliverReadyRecipes(currentTime);
 			}
-			RosterTimerContainer kCMICMHCEBB = ANEHEDFAPCH.AEMFLPNDDKL();
-			kCMICMHCEBB.CheckTimers(HJOHKOEICAP);
+			RosterTimerContainer kCMICMHCEBB = _roster.GetTimerContainer();
+			kCMICMHCEBB.CheckTimers(currentTime);
 		}
 		OnAuthenticate();
 	}
 
-	private void NMMBHENGDJO()
+	private void LoadItems()
 	{
-		_items.NMMBHENGDJO(SF2Paths.KKIDGPBOBNI());
+		_items.LoadItems(SF2Paths.GetGameDataPath());
 	}
 
-		private void PBNNPBEDOOJ()
+		private void LoadProfile()
 		{
             _localVersusProfile = Eclipse.Multiplayer.LocalVersusSession.IsActive;
 			Eclipse.Modding.ModRuntime.UnbindProfile();
-		IEDEFCBFJAD = XmlUtils.AIFIAKNJMHG(SF2Paths.GetUserDataDirectory(), Constants.OJMIJINKBPJ);
-		if (IEDEFCBFJAD == null)
+		userDocument = XmlUtils.LoadDocumentWithHashCheck(SF2Paths.GetUserDataDirectory(), Constants.UsersFileName);
+		if (userDocument == null)
 		{
-			ANEHEDFAPCH = new Roster(null, null);
+			_roster = new Roster(null, null);
 			return;
 		}
             // Roster normalization and mod-state migrations may update this
             // document during boot. Local play owns a disposable copy.
-            if (_localVersusProfile) IEDEFCBFJAD = (XmlDocument)IEDEFCBFJAD.CloneNode(true);
-			int num = HFPJDOEEDCA();
-		XmlNode xmlNode = IEDEFCBFJAD["Root"]["Warriors"];
+            if (_localVersusProfile) userDocument = (XmlDocument)userDocument.CloneNode(true);
+			int num = GetCurrentUserId();
+		XmlNode xmlNode = userDocument["Root"]["Warriors"];
 		bool flag = false;
 		foreach (XmlNode childNode in xmlNode.ChildNodes)
 		{
-			string text = childNode.Attributes["IsFake"].CIPOICEEIBK(string.Empty);
+			string text = childNode.Attributes["IsFake"].GetStringOrDefault(string.Empty);
 			if (text == "True")
 			{
 				flag = true;
@@ -2626,61 +2626,61 @@ public class ListSF
 			else if (num == childNode.Attributes["ID"].ParseInt())
 			{
 				_CurrentUserNode = childNode;
-				ANEHEDFAPCH = NHAMDLEDOHM(_CurrentUserNode);
-				ANEHEDFAPCH.KHCNHPCPFII().HOMCPNCGPDB(GetItems().HCDLKHKBEPF());
-				Eclipse.Modding.ModRuntime.RecordSaveContext(_CurrentUserNode, ANEHEDFAPCH);
+				_roster = CreateRoster(_CurrentUserNode);
+				_roster.GetInventory().ApplyItemInfos(GetItems().GetAllItems());
+				Eclipse.Modding.ModRuntime.RecordSaveContext(_CurrentUserNode, _roster);
 				break;
 			}
 		}
-		ANEHEDFAPCH.get_Parameters().NOBKKLBJFIL();
-		XmlNode hKPPBKPJOEO = IEDEFCBFJAD["Root"]["Billing"];
-		if (Eclipse.Saves.CampaignSaveSession.PreviewDirectory == null) JMDJEEFELCD(hKPPBKPJOEO);
+		_roster.get_Parameters().CalculateAttributes();
+		XmlNode hKPPBKPJOEO = userDocument["Root"]["Billing"];
+		if (Eclipse.Saves.CampaignSaveSession.PreviewDirectory == null) ApplyBillingPrices(hKPPBKPJOEO);
 	}
 
-	private int HFPJDOEEDCA()
+	private int GetCurrentUserId()
 	{
-		return IEDEFCBFJAD["Root"]["CurrentUser"].Attributes["ID"].ParseInt();
+		return userDocument["Root"]["CurrentUser"].Attributes["ID"].ParseInt();
 	}
 
-	private void JMDJEEFELCD(XmlNode node)
+	private void ApplyBillingPrices(XmlNode node)
 	{
 		if (node == null)
 		{
 			return;
 		}
-		List<ItemInfo> list = GetItems().ONFMAJEAACM("RealMoneyItem");
+		List<ItemInfo> list = GetItems().GetItemsByType("RealMoneyItem");
 		foreach (XmlNode childNode in node.ChildNodes)
 		{
-			string name = childNode.Attributes["Name"].CIPOICEEIBK();
+			string name = childNode.Attributes["Name"].GetStringOrDefault();
 			if (!string.IsNullOrEmpty(name))
 			{
 				ItemInfo dJKEECEOCJB = list.Find((ItemInfo DHDMNHCIPEH) => DHDMNHCIPEH.Name.Equals(name));
 				if (dJKEECEOCJB != null)
 				{
-					dJKEECEOCJB.FPEIFLEBEAA = childNode.Attributes["RealPrice"].CIPOICEEIBK(dJKEECEOCJB.FPEIFLEBEAA);
-					dJKEECEOCJB.EGAJMELKANL = childNode.Attributes["RealPriceConst"].CIPOICEEIBK(dJKEECEOCJB.EGAJMELKANL);
-					dJKEECEOCJB.MIIJIMJDHFP = childNode.Attributes["RealPriceCurrency"].CIPOICEEIBK(dJKEECEOCJB.MIIJIMJDHFP);
+					dJKEECEOCJB.LocalizedPriceString = childNode.Attributes["RealPrice"].GetStringOrDefault(dJKEECEOCJB.LocalizedPriceString);
+					dJKEECEOCJB.PriceAmountText = childNode.Attributes["RealPriceConst"].GetStringOrDefault(dJKEECEOCJB.PriceAmountText);
+					dJKEECEOCJB.CurrencyCode = childNode.Attributes["RealPriceCurrency"].GetStringOrDefault(dJKEECEOCJB.CurrencyCode);
 				}
 			}
 		}
 	}
 
-	private void OFIPOGGCKIN()
+	private void LoadWarriors()
 	{
-		if (IEGJHNHFJFA == null)
+		if (stagesDocument == null)
 		{
-			IEGJHNHFJFA = XmlUtils.OpenXMLDocument(SF2Paths.KKIDGPBOBNI(), "stages.xml", XmlUtils.EBLFEPIOMOL.Normal, true, XmlCryptoUtils.NNLGALNDJCL());
+			stagesDocument = XmlUtils.OpenXMLDocument(SF2Paths.GetGameDataPath(), "stages.xml", XmlUtils.XmlSourceMode.Normal, true, XmlCryptoUtils.GetIsEncryptionEnabled());
 		}
-		ONBBADOAPIB = new XmlDocument();
-		ONBBADOAPIB.LCOLFMJJDJE(IEGJHNHFJFA["Stages"]["Warriors"]);
-		XmlNode xmlNode = ONBBADOAPIB["Warriors"]["Templates"];
+		warriorsDocument = new XmlDocument();
+		warriorsDocument.AppendImportedClone(stagesDocument["Stages"]["Warriors"]);
+		XmlNode xmlNode = warriorsDocument["Warriors"]["Templates"];
 		foreach (XmlNode childNode in xmlNode.ChildNodes)
 		{
-			KJMKFNHFCGM(childNode);
+			ParseTemplate(childNode);
 		}
-		EANLGFEDADB();
-		xmlNode = ONBBADOAPIB["Warriors"]["WarriorGroups"];
-		LNCPHCBFNJO(xmlNode);
+		ResolveTemplateInheritance();
+		xmlNode = warriorsDocument["Warriors"]["WarriorGroups"];
+		ParseWarriorGroups(xmlNode);
 	}
 
 	// Eclipse modding seam: register a mod-owned warrior template after the base
@@ -2692,62 +2692,62 @@ public class ListSF
 		{
 			throw new ArgumentException("An external warrior template requires a Template node.");
 		}
-		string name = node.Attributes["Name"].CIPOICEEIBK(string.Empty);
-		if (name == string.Empty || CNFBCBDPKCI(name) != null)
+		string name = node.Attributes["Name"].GetStringOrDefault(string.Empty);
+		if (name == string.Empty || GetTemplateByName(name) != null)
 		{
 			throw new InvalidOperationException("Warrior template '" + name + "' is already registered.");
 		}
-		XmlNode owned = ONBBADOAPIB.ImportNode(node, true);
-		TemplateUser template = KJMKFNHFCGM(owned);
-		if (template.IJBOAGICOON != string.Empty)
+		XmlNode owned = warriorsDocument.ImportNode(node, true);
+		TemplateUser template = ParseTemplate(owned);
+		if (template.ParentTemplateName != string.Empty)
 		{
-			TemplateUser parent = CNFBCBDPKCI(template.IJBOAGICOON);
+			TemplateUser parent = GetTemplateByName(template.ParentTemplateName);
 			if (parent == null)
 			{
-				HBOHFLOJMAA.Remove(template);
-				throw new InvalidOperationException("Warrior template '" + name + "' has no registered parent '" + template.IJBOAGICOON + "'.");
+				templates.Remove(template);
+				throw new InvalidOperationException("Warrior template '" + name + "' has no registered parent '" + template.ParentTemplateName + "'.");
 			}
-			XmlNode merged = ONBBADOAPIB.ImportNode(parent.KEJDJHAGBMK.Node ?? parent.node, true);
+			XmlNode merged = warriorsDocument.ImportNode(parent.Parameters.Node ?? parent.node, true);
 			merged = MergeUserXML(merged, owned);
 			// Parent parameters already contain inherited alignments and groups.
 			// Parse only this template's overlay; parsing the merged node appends
 			// inherited rows again (Default's seven became fourteen for DE bosses).
-			template.KEJDJHAGBMK = IAOBIMJFBMH(owned, parent.KEJDJHAGBMK);
-			template.KEJDJHAGBMK.Node = merged;
+			template.Parameters = ParseWarriorParameters(owned, parent.Parameters);
+			template.Parameters.Node = merged;
 		}
 	}
 
 	public void RemoveExternalTemplate(string name)
 	{
-		TemplateUser template = CNFBCBDPKCI(name);
+		TemplateUser template = GetTemplateByName(name);
 		if (template != null)
 		{
-			HBOHFLOJMAA.Remove(template);
+			templates.Remove(template);
 		}
 	}
 
-	private TemplateUser KJMKFNHFCGM(XmlNode node)
+	private TemplateUser ParseTemplate(XmlNode node)
 	{
 		TemplateUser aHIIGFBIGAA = new TemplateUser();
 		aHIIGFBIGAA.node = node;
-		aHIIGFBIGAA.IJBOAGICOON = node.Attributes["Template"].CIPOICEEIBK(string.Empty);
-		aHIIGFBIGAA.name = node.Attributes["Name"].CIPOICEEIBK(string.Empty);
-		aHIIGFBIGAA.KEJDJHAGBMK = IAOBIMJFBMH(node, null);
-		foreach (TemplateUser item in HBOHFLOJMAA)
+		aHIIGFBIGAA.ParentTemplateName = node.Attributes["Template"].GetStringOrDefault(string.Empty);
+		aHIIGFBIGAA.name = node.Attributes["Name"].GetStringOrDefault(string.Empty);
+		aHIIGFBIGAA.Parameters = ParseWarriorParameters(node, null);
+		foreach (TemplateUser item in templates)
 		{
 			if (item.name == aHIIGFBIGAA.name)
 			{
-				HBOHFLOJMAA.Remove(item);
+				templates.Remove(item);
 				break;
 			}
 		}
-		HBOHFLOJMAA.Add(aHIIGFBIGAA);
+		templates.Add(aHIIGFBIGAA);
 		return aHIIGFBIGAA;
 	}
 
-	private GroupsUser HJDCNPMEHGJ(string name)
+	private GroupsUser GetGroupByName(string name)
 	{
-		foreach (GroupsUser item in FAPGPFLOFEE)
+		foreach (GroupsUser item in warriorGroups)
 		{
 			if (item.name == name)
 			{
@@ -2757,30 +2757,30 @@ public class ListSF
 		return null;
 	}
 
-	private void EANLGFEDADB()
+	private void ResolveTemplateInheritance()
 	{
-		EANLGFEDADB(HBOHFLOJMAA);
+		ResolveTemplateInheritance(templates);
 	}
 
-	private void EANLGFEDADB(List<TemplateUser> PHEDCOGJGLE)
+	private void ResolveTemplateInheritance(List<TemplateUser> PHEDCOGJGLE)
 	{
-		foreach (TemplateUser item in HBOHFLOJMAA)
+		foreach (TemplateUser item in templates)
 		{
-			if (item.IJBOAGICOON == null || item.IJBOAGICOON.Equals(string.Empty))
+			if (item.ParentTemplateName == null || item.ParentTemplateName.Equals(string.Empty))
 			{
 				continue;
 			}
-			TemplateUser aHIIGFBIGAA = CNFBCBDPKCI(item.IJBOAGICOON);
-			XmlNode xmlNode = ONBBADOAPIB["Warriors"]["Templates_tmp"];
+			TemplateUser aHIIGFBIGAA = GetTemplateByName(item.ParentTemplateName);
+			XmlNode xmlNode = warriorsDocument["Warriors"]["Templates_tmp"];
 			if (xmlNode == null)
 			{
-				xmlNode = ONBBADOAPIB["Warriors"].ACBPMPMPKJJ("Templates_tmp");
+				xmlNode = warriorsDocument["Warriors"].AppendElement("Templates_tmp");
 			}
 			bool flag = false;
 			XmlNode xmlNode2 = null;
 			foreach (XmlNode childNode in xmlNode.ChildNodes)
 			{
-				if (childNode.Attributes["Name"].CIPOICEEIBK(string.Empty) == item.name)
+				if (childNode.Attributes["Name"].GetStringOrDefault(string.Empty) == item.name)
 				{
 					flag = true;
 					xmlNode2 = childNode;
@@ -2789,40 +2789,40 @@ public class ListSF
 			}
 			if (!flag)
 			{
-				xmlNode2 = xmlNode.LCOLFMJJDJE(aHIIGFBIGAA.KEJDJHAGBMK.Node);
+				xmlNode2 = xmlNode.AppendImportedClone(aHIIGFBIGAA.Parameters.Node);
 				xmlNode2 = MergeUserXML(xmlNode2, item.node);
 			}
-			item.KEJDJHAGBMK = IAOBIMJFBMH(xmlNode2, aHIIGFBIGAA.KEJDJHAGBMK);
-			item.KEJDJHAGBMK.Node = xmlNode2;
+			item.Parameters = ParseWarriorParameters(xmlNode2, aHIIGFBIGAA.Parameters);
+			item.Parameters.Node = xmlNode2;
 		}
 	}
 
-	private void LNCPHCBFNJO(XmlNode node)
+	private void ParseWarriorGroups(XmlNode node)
 	{
 		foreach (XmlNode childNode in node.ChildNodes)
 		{
 			GroupsUser oFIHDFNGDLA = new GroupsUser();
 			oFIHDFNGDLA.node = childNode;
-			oFIHDFNGDLA.name = childNode.Attributes["Name"].CIPOICEEIBK(string.Empty);
-			oFIHDFNGDLA.IJBOAGICOON = childNode.Attributes["Template"].CIPOICEEIBK(string.Empty);
-			PNMNKCNOHIF(childNode, oFIHDFNGDLA.FJMBBMJMOKC);
-			FAPGPFLOFEE.Add(oFIHDFNGDLA);
+			oFIHDFNGDLA.name = childNode.Attributes["Name"].GetStringOrDefault(string.Empty);
+			oFIHDFNGDLA.TemplateName = childNode.Attributes["Template"].GetStringOrDefault(string.Empty);
+			ParseGroupWarriors(childNode, oFIHDFNGDLA.Models);
+			warriorGroups.Add(oFIHDFNGDLA);
 		}
 	}
 
-	private void PNMNKCNOHIF(XmlNode node, List<ModelParameters> target)
+	private void ParseGroupWarriors(XmlNode node, List<ModelParameters> target)
 	{
 		int num = 0;
 		foreach (XmlNode childNode in node.ChildNodes)
 		{
-			string text = childNode.Attributes["Template"].CIPOICEEIBK(string.Empty);
-			TemplateUser aHIIGFBIGAA = ((!(text == string.Empty)) ? CNFBCBDPKCI(text) : null);
-			ModelParameters kIKOGDEPGHB = ((aHIIGFBIGAA == null) ? IAOBIMJFBMH(childNode, null) : CNMFNFDIOOK(aHIIGFBIGAA.KEJDJHAGBMK, childNode));
+			string text = childNode.Attributes["Template"].GetStringOrDefault(string.Empty);
+			TemplateUser aHIIGFBIGAA = ((!(text == string.Empty)) ? GetTemplateByName(text) : null);
+			ModelParameters kIKOGDEPGHB = ((aHIIGFBIGAA == null) ? ParseWarriorParameters(childNode, null) : CreateParametersFromTemplate(aHIIGFBIGAA.Parameters, childNode));
 			if (kIKOGDEPGHB != null)
 			{
-				kIKOGDEPGHB.HHKODEICDNP = childNode.Attributes["Group"].CIPOICEEIBK(string.Empty);
-				kIKOGDEPGHB.EHFNCDPPIAF = childNode.Attributes["Random"].ParseInt();
-				kIKOGDEPGHB.FLGGADFNNDK = num;
+				kIKOGDEPGHB.GroupName = childNode.Attributes["Group"].GetStringOrDefault(string.Empty);
+				kIKOGDEPGHB.RandomValue = childNode.Attributes["Random"].ParseInt();
+				kIKOGDEPGHB.OpponentIndex = num;
 				target.Add(kIKOGDEPGHB);
 			}
 			num++;
@@ -2839,25 +2839,25 @@ public class ListSF
         document.AppendChild(owned);
         string templateName = owned.Attributes["Template"]?.Value ?? string.Empty;
         ModelParameters parameters;
-        if (templateName.Length == 0) parameters = IAOBIMJFBMH(owned, null);
+        if (templateName.Length == 0) parameters = ParseWarriorParameters(owned, null);
         else
         {
-            var template = CNFBCBDPKCI(templateName);
-            if (template == null || template.KEJDJHAGBMK == null)
+            var template = GetTemplateByName(templateName);
+            if (template == null || template.Parameters == null)
                 throw new InvalidOperationException("Form template is unavailable: " + templateName);
-            parameters = CNMFNFDIOOK(template.KEJDJHAGBMK, owned);
+            parameters = CreateParametersFromTemplate(template.Parameters, owned);
         }
         if (parameters == null) throw new InvalidOperationException("Form parameters could not be constructed.");
         parameters.IsPlayer = player;
-        parameters.IBBALIJOJMC = SceneTypes.SceneFight;
+        parameters.SceneType = SceneTypes.SceneFight;
         return parameters;
     }
 
-	private ModelParameters CNMFNFDIOOK(ModelParameters KPAICOOKACB, XmlNode node)
+	private ModelParameters CreateParametersFromTemplate(ModelParameters KPAICOOKACB, XmlNode node)
 	{
 		if (KPAICOOKACB != null)
 		{
-			ModelParameters kIKOGDEPGHB = IAOBIMJFBMH(node, KPAICOOKACB);
+			ModelParameters kIKOGDEPGHB = ParseWarriorParameters(node, KPAICOOKACB);
 			// Clone() shares the template's Node; merge into a copy so resolving a
 			// warrior never rewrites its template (later template resolution, such
 			// as mod templates layered on Default, reads that node).
@@ -2867,18 +2867,18 @@ public class ListSF
 		return null;
 	}
 
-	private Roster NHAMDLEDOHM(XmlNode node)
+	private Roster CreateRoster(XmlNode node)
 	{
 		XmlNode equipmentView = Eclipse.Modding.ModSaveData.CreateEquipmentView(node,
 			name => GetItems().GetItemByName(name) != null, GameUtils.GetDefaultItem);
-		ModelParameters parameters = IAOBIMJFBMH(equipmentView, null, false);
+		ModelParameters parameters = ParseWarriorParameters(equipmentView, null, false);
 		parameters.Node = node;
 		Roster nKGLHEGIKKP = new Roster(node, parameters);
-		nKGLHEGIKKP.AddEventListener(0, EJANJEEGOOE);
+		nKGLHEGIKKP.AddEventListener(0, RequestSave);
 		return nKGLHEGIKKP;
 	}
 
-	public List<Battle> MMCHMBIKIEP()
+	public List<Battle> GetBattles()
 	{
 		return _battles;
 	}
@@ -2896,34 +2896,34 @@ public class ListSF
 		{
 			throw new System.ArgumentException("External zone Name must not be empty.", "node");
 		}
-		if (CFEDCFACBLE(name) != null)
+		if (GetZoneByName(name) != null)
 		{
 			throw new System.InvalidOperationException("Zone already exists: '" + name + "'.");
 		}
-		Zone zone = PGGMIJMOJHA(node, false);
-		CMEABHLEKNH.Add(zone);
+		Zone zone = ParseZone(node, false);
+		zones.Add(zone);
 		return zone;
 	}
 
 	public bool RemoveExternalZone(string name)
 	{
 		if (string.IsNullOrEmpty(name)) return false;
-		Zone zone = CMEABHLEKNH.Find((Zone value) => value.get_Name() == name);
+		Zone zone = zones.Find((Zone value) => value.get_Name() == name);
 		if (zone == null) return false;
-		foreach (Battle battle in zone.LGIIBNJFADA)
+		foreach (Battle battle in zone.Battles)
 		{
-			List<FightList> fights = JEBHJOKNENP(battle);
-			for (int i = 0; i < fights.Count; i++) KINHMMGJEMP(fights[i]);
+			List<FightList> fights = GetFightsForBattle(battle);
+			for (int i = 0; i < fights.Count; i++) RemoveFight(fights[i]);
 			_battles.Remove(battle);
 		}
-		CMEABHLEKNH.Remove(zone);
+		zones.Remove(zone);
 		return true;
 	}
 
 	public Battle FindBattleForModding(string zoneName, string battleName)
 	{
-		Zone zone = CFEDCFACBLE(zoneName);
-		return zone == null ? null : zone.LGIIBNJFADA.Find((Battle value) => value.get_Name() == battleName);
+		Zone zone = GetZoneByName(zoneName);
+		return zone == null ? null : zone.Battles.Find((Battle value) => value.get_Name() == battleName);
 	}
 
 	public Battle AddExternalBattle(string zoneName, XmlNode node)
@@ -2931,102 +2931,102 @@ public class ListSF
 		if (string.IsNullOrEmpty(zoneName)) throw new System.ArgumentException("Target zone must not be empty.", "zoneName");
 		if (node == null || node.Name != "Battle")
 			throw new System.ArgumentException("External stage content must provide one Battle node.", "node");
-		Zone zone = CFEDCFACBLE(zoneName);
+		Zone zone = GetZoneByName(zoneName);
 		if (zone == null) throw new System.InvalidOperationException("Zone does not exist: '" + zoneName + "'.");
 		string battleName = node.Attributes?["Name"]?.Value ?? string.Empty;
 		if (string.IsNullOrEmpty(battleName)) throw new System.ArgumentException("External battle Name must not be empty.", "node");
-		if (zone.LGIIBNJFADA.Exists((Battle value) => value.get_Name() == battleName))
+		if (zone.Battles.Exists((Battle value) => value.get_Name() == battleName))
 			throw new System.InvalidOperationException("Battle already exists in zone '" + zoneName + "': '" + battleName + "'.");
-		Battle battle = MMDBBEFAHJH(node, zone, false);
-		ELCJGIEJHNE(battle);
-		battle.BDAELBFECAJ();
+		Battle battle = ParseBattle(node, zone, false);
+		LinkBattleToRoster(battle);
+		battle.OnBattleCreated();
 		FightIDS ids = new FightIDS(string.Copy(zone.get_Name()), string.Copy(battle.get_Name()), string.Empty);
-		bool available = CCDKHLAMKKO().HAMPNCKAJKD(ids);
+		bool available = GetRoster().HasBattle(ids);
 		if (battle.get_Type() == BattleType.FightRaid) available = true;
 		battle.IsMapVisible = available;
-		zone.LGIIBNJFADA.Add(battle);
+		zone.Battles.Add(battle);
 		return battle;
 	}
 
 	public bool RemoveExternalBattle(string zoneName, string battleName)
 	{
 		if (string.IsNullOrEmpty(zoneName) || string.IsNullOrEmpty(battleName)) return false;
-		Zone zone = CFEDCFACBLE(zoneName);
+		Zone zone = GetZoneByName(zoneName);
 		if (zone == null) return false;
-		Battle battle = zone.LGIIBNJFADA.Find((Battle value) => value.get_Name() == battleName);
+		Battle battle = zone.Battles.Find((Battle value) => value.get_Name() == battleName);
 		if (battle == null) return false;
-		List<FightList> fights = JEBHJOKNENP(battle);
-		for (int i = 0; i < fights.Count; i++) KINHMMGJEMP(fights[i]);
-		zone.LGIIBNJFADA.Remove(battle);
+		List<FightList> fights = GetFightsForBattle(battle);
+		for (int i = 0; i < fights.Count; i++) RemoveFight(fights[i]);
+		zone.Battles.Remove(battle);
 		_battles.Remove(battle);
 		return true;
 	}
 
-	private void KIEEPEOPJGB()
+	private void LoadZones()
 	{
-		IEGJHNHFJFA = XmlUtils.OpenXMLDocument(SF2Paths.KKIDGPBOBNI(), "stages.xml", XmlUtils.EBLFEPIOMOL.Normal, true, XmlCryptoUtils.NNLGALNDJCL());
-		XmlNode xmlNode = IEGJHNHFJFA["Stages"]["Zones"];
+		stagesDocument = XmlUtils.OpenXMLDocument(SF2Paths.GetGameDataPath(), "stages.xml", XmlUtils.XmlSourceMode.Normal, true, XmlCryptoUtils.GetIsEncryptionEnabled());
+		XmlNode xmlNode = stagesDocument["Stages"]["Zones"];
 		foreach (XmlNode childNode in xmlNode.ChildNodes)
 		{
 			bool cBFACOIOIAK = false;
-			CMEABHLEKNH.Add(PGGMIJMOJHA(childNode, cBFACOIOIAK));
+			zones.Add(ParseZone(childNode, cBFACOIOIAK));
 		}
-		foreach (FightList item in JNPMCNMEOLE)
+		foreach (FightList item in fights)
 		{
 			Battle cNAOMDMIGLJ = item.Battle;
-			Zone pKCPOJKLMOK = cNAOMDMIGLJ.LKDFFCADHNO();
+			Zone pKCPOJKLMOK = cNAOMDMIGLJ.GetZone();
 			item.FightId.SetFightIDSByZBF(string.Copy(pKCPOJKLMOK.get_Name()), string.Copy(cNAOMDMIGLJ.get_Name()), string.Copy(item.Name));
-			RosterFight pIGKOIFBOME = ANEHEDFAPCH.FindSavedFightRecord(item.FightId);
+			RosterFight pIGKOIFBOME = _roster.FindSavedFightRecord(item.FightId);
 			if (pIGKOIFBOME != null)
 			{
 				item.SetRosterFight(pIGKOIFBOME);
 				item.ResetRandomRules();
 			}
 		}
-		IHNFKALCJGJ = true;
+		areZonesLoaded = true;
 	}
 
-	private Zone PGGMIJMOJHA(XmlNode node, bool CBFACOIOIAK = false)
+	private Zone ParseZone(XmlNode node, bool CBFACOIOIAK = false)
 	{
-		string gOHIIMFFFJI = node.Attributes["Name"].CIPOICEEIBK(string.Empty);
-		string pMFEIPCHENB = node.Attributes["FileName"].CIPOICEEIBK(string.Empty);
+		string gOHIIMFFFJI = node.Attributes["Name"].GetStringOrDefault(string.Empty);
+		string pMFEIPCHENB = node.Attributes["FileName"].GetStringOrDefault(string.Empty);
 		bool pENNHKHFEOM = 0 < node.Attributes["Start"].ParseInt();
 		ConditionStatus fFFCCEEDMKI = ConditionStatus.StatusOpen;
 		uint cDCJKJNGPOE = node.Attributes["RewardDigits"].ParseUint();
 		uint mCDAHGPLLDO = node.Attributes["PrizeBaseDigits"].ParseUint();
 		Zone pKCPOJKLMOK = new Zone(gOHIIMFFFJI, pMFEIPCHENB, pENNHKHFEOM, fFFCCEEDMKI, 0, cDCJKJNGPOE, mCDAHGPLLDO);
-		Roster nKGLHEGIKKP = CCDKHLAMKKO();
+		Roster nKGLHEGIKKP = GetRoster();
 		foreach (XmlNode childNode in node.ChildNodes)
 		{
-			Battle cGJCGEBPCAF = MMDBBEFAHJH(childNode, pKCPOJKLMOK, CBFACOIOIAK);
-			ELCJGIEJHNE(cGJCGEBPCAF);
-			cGJCGEBPCAF.BDAELBFECAJ();
+			Battle cGJCGEBPCAF = ParseBattle(childNode, pKCPOJKLMOK, CBFACOIOIAK);
+			LinkBattleToRoster(cGJCGEBPCAF);
+			cGJCGEBPCAF.OnBattleCreated();
 			FightIDS dIAIIPCBMFL = new FightIDS(string.Copy(pKCPOJKLMOK.get_Name()), string.Copy(cGJCGEBPCAF.get_Name()), string.Empty);
-			bool dCHJDPCEODD = nKGLHEGIKKP.HAMPNCKAJKD(dIAIIPCBMFL);
+			bool dCHJDPCEODD = nKGLHEGIKKP.HasBattle(dIAIIPCBMFL);
 			if (cGJCGEBPCAF.get_Type() == BattleType.FightRaid)
 			{
 				dCHJDPCEODD = true;
 			}
 			cGJCGEBPCAF.IsMapVisible = dCHJDPCEODD;
-			pKCPOJKLMOK.LGIIBNJFADA.Add(cGJCGEBPCAF);
+			pKCPOJKLMOK.Battles.Add(cGJCGEBPCAF);
 		}
 		return pKCPOJKLMOK;
 	}
 
-	private Battle MMDBBEFAHJH(XmlNode node, Zone HLJKOKMKMLM = null, bool CBFACOIOIAK = false)
+	private Battle ParseBattle(XmlNode node, Zone HLJKOKMKMLM = null, bool CBFACOIOIAK = false)
 	{
 		Vector2 mGMMDGFPBLP = new Vector2(node.Attributes["X"].ParseInt(), node.Attributes["Y"].ParseInt());
-		string gOHIIMFFFJI = node.Attributes["Name"].CIPOICEEIBK(string.Empty);
-		string lOKLDPLAPOL = node.Attributes["Alias"].CIPOICEEIBK(string.Empty);
-		string pEMOECLNECD = node.Attributes["Title"].CIPOICEEIBK(string.Empty);
-		string aDONPNOBBDE = ((!node.Attributes["Icon"].Empty()) ? node.Attributes["Icon"].CIPOICEEIBK(string.Empty) : "training");
-		string lHCFHAIDNDP = node.Attributes["Preview"].CIPOICEEIBK(string.Empty);
-		string eMDJGBHIAIA = node.Attributes["Description"].CIPOICEEIBK(string.Empty);
-		string lPJNEDFCBOI = node.Attributes["Location"].CIPOICEEIBK(GameUtils.NIPABEEAMHJ);
-		string pINIIFIOECE = node.Attributes["Music"].CIPOICEEIBK();
-		string text = node.Attributes["Type"].CIPOICEEIBK();
-		string oAPKHNPPGHP = node.Attributes["RewardImage"].CIPOICEEIBK();
-		string iHBMPGKIBAN = node.Attributes["ShowResistance"].CIPOICEEIBK();
+		string gOHIIMFFFJI = node.Attributes["Name"].GetStringOrDefault(string.Empty);
+		string lOKLDPLAPOL = node.Attributes["Alias"].GetStringOrDefault(string.Empty);
+		string pEMOECLNECD = node.Attributes["Title"].GetStringOrDefault(string.Empty);
+		string aDONPNOBBDE = ((!node.Attributes["Icon"].Empty()) ? node.Attributes["Icon"].GetStringOrDefault(string.Empty) : "training");
+		string lHCFHAIDNDP = node.Attributes["Preview"].GetStringOrDefault(string.Empty);
+		string eMDJGBHIAIA = node.Attributes["Description"].GetStringOrDefault(string.Empty);
+		string lPJNEDFCBOI = node.Attributes["Location"].GetStringOrDefault(GameUtils.DefaultLocation);
+		string pINIIFIOECE = node.Attributes["Music"].GetStringOrDefault();
+		string text = node.Attributes["Type"].GetStringOrDefault();
+		string oAPKHNPPGHP = node.Attributes["RewardImage"].GetStringOrDefault();
+		string iHBMPGKIBAN = node.Attributes["ShowResistance"].GetStringOrDefault();
 		ushort cDCJKJNGPOE = 0;
 		ushort mCDAHGPLLDO = 0;
 		if (!node.Attributes["RewardDigits"].Empty())
@@ -3035,7 +3035,7 @@ public class ListSF
 		}
 		else if (HLJKOKMKMLM != null)
 		{
-			cDCJKJNGPOE = (ushort)HLJKOKMKMLM.GIOJPNNLKKK();
+			cDCJKJNGPOE = (ushort)HLJKOKMKMLM.GetRewardDigits();
 		}
 		if (!node.Attributes["PrizeBaseDigits"].Empty())
 		{
@@ -3043,10 +3043,10 @@ public class ListSF
 		}
 		else if (HLJKOKMKMLM != null)
 		{
-			mCDAHGPLLDO = (ushort)HLJKOKMKMLM.MCEGLDIFDBI();
+			mCDAHGPLLDO = (ushort)HLJKOKMKMLM.GetPrizeBaseDigits();
 		}
 		Battle cGJCGEBPCAF;
-		switch (HIDKFHHJBDH(text))
+		switch (GetBattleTypeByName(text))
 		{
 		case BattleType.FightPeriodic:
 			cGJCGEBPCAF = new BattlePeriodic(text, mGMMDGFPBLP, gOHIIMFFFJI, aDONPNOBBDE, lHCFHAIDNDP, eMDJGBHIAIA, cDCJKJNGPOE, mCDAHGPLLDO, lOKLDPLAPOL, pEMOECLNECD, lPJNEDFCBOI, pINIIFIOECE, oAPKHNPPGHP, iHBMPGKIBAN);
@@ -3078,39 +3078,39 @@ public class ListSF
 			cGJCGEBPCAF = new Battle(text, mGMMDGFPBLP, gOHIIMFFFJI, aDONPNOBBDE, lHCFHAIDNDP, eMDJGBHIAIA, cDCJKJNGPOE, mCDAHGPLLDO, lOKLDPLAPOL, pEMOECLNECD, lPJNEDFCBOI, pINIIFIOECE, oAPKHNPPGHP, iHBMPGKIBAN);
 			break;
 		}
-		cGJCGEBPCAF.EENNGGIMMMI(HLJKOKMKMLM);
-		cGJCGEBPCAF.JNIIGKNBCCL(node);
+		cGJCGEBPCAF.SetZone(HLJKOKMKMLM);
+		cGJCGEBPCAF.SetSourceDefinition(node);
 		_battles.Add(cGJCGEBPCAF);
 		if (CBFACOIOIAK)
 		{
-			EGMDBNNBJFM(cGJCGEBPCAF);
+			ParseBattleFights(cGJCGEBPCAF);
 		}
 		return cGJCGEBPCAF;
 	}
 
-	private void EGMDBNNBJFM(Battle DPOOIONCEOA)
+	private void ParseBattleFights(Battle DPOOIONCEOA)
 	{
-		XmlNode xmlNode = DPOOIONCEOA.MMLPEMNIFBD().IOJIGDNFCFL();
-		string lPJNEDFCBOI = DPOOIONCEOA.CBABFGDMLIH();
-		string pINIIFIOECE = DPOOIONCEOA.MOADJJNKFKB();
+		XmlNode xmlNode = DPOOIONCEOA.GetSourceDefinition().GetNode();
+		string lPJNEDFCBOI = DPOOIONCEOA.GetLocation();
+		string pINIIFIOECE = DPOOIONCEOA.GetMusic();
 		int num = 0;
 		XmlNodeList xmlNodeList = xmlNode.SelectNodes("Fight");
 		foreach (XmlNode item in xmlNodeList)
 		{
 			FightList jDIPBIHBGPF = new FightList();
-			FOKCPLOMLOK(jDIPBIHBGPF, item, DPOOIONCEOA.get_Type(), lPJNEDFCBOI, pINIIFIOECE, DPOOIONCEOA);
-			DPOOIONCEOA.AJKBFMLOCOF(jDIPBIHBGPF, num);
+			ParseFight(jDIPBIHBGPF, item, DPOOIONCEOA.get_Type(), lPJNEDFCBOI, pINIIFIOECE, DPOOIONCEOA);
+			DPOOIONCEOA.AddFight(jDIPBIHBGPF, num);
 			num++;
 		}
-		DPOOIONCEOA.LEGLFDDINKO = 1;
+		DPOOIONCEOA.LoadedFightCount = 1;
 	}
 
-	private void NEIBAJKEJDE(FightList KGKDKENMAOA)
+	private void LinkFightToRoster(FightList KGKDKENMAOA)
 	{
 		Battle cNAOMDMIGLJ = KGKDKENMAOA.Battle;
-		Zone pKCPOJKLMOK = cNAOMDMIGLJ.LKDFFCADHNO();
+		Zone pKCPOJKLMOK = cNAOMDMIGLJ.GetZone();
 		KGKDKENMAOA.FightId.SetFightIDSByZBF(string.Copy(pKCPOJKLMOK.get_Name()), string.Copy(cNAOMDMIGLJ.get_Name()), string.Copy(KGKDKENMAOA.Name));
-		RosterFight pIGKOIFBOME = ANEHEDFAPCH.FindSavedFightRecord(KGKDKENMAOA.FightId);
+		RosterFight pIGKOIFBOME = _roster.FindSavedFightRecord(KGKDKENMAOA.FightId);
 		if (pIGKOIFBOME != null)
 		{
 			KGKDKENMAOA.SetRosterFight(pIGKOIFBOME);
@@ -3118,14 +3118,14 @@ public class ListSF
 		}
 	}
 
-	private void EEPPJEMHBCK(FightList fight, XmlNode node)
+	private void ParseFightRules(FightList fight, XmlNode node)
 	{
 		if (node == null)
 		{
 			return;
 		}
 		List<Rule> list = new List<Rule>();
-		RuleParser.EEPPJEMHBCK(node, list);
+		RuleParser.ParseRules(node, list);
 		foreach (Rule item in list)
 		{
 			if (item != null)
@@ -3135,82 +3135,82 @@ public class ListSF
 		}
 	}
 
-	private void HCJDHMGAMIE(FightList fight, XmlNode node)
+	private void ParseFightRewards(FightList fight, XmlNode node)
 	{
 		foreach (XmlNode childNode in node.ChildNodes)
 		{
-			RewardStruct lGDIIADDFLH = new RewardStruct(childNode, fight.ANHLAHFDDCE, fight.LPMDOHPIEOP);
-			fight.OJJLHLPLFKC(lGDIIADDFLH);
+			RewardStruct lGDIIADDFLH = new RewardStruct(childNode, fight.RewardDigits, fight.PrizeBaseDigits);
+			fight.AddReward(lGDIIADDFLH);
 		}
-		fight.UpdateLevel(CCDKHLAMKKO().PINDEKDNCNL());
+		fight.UpdateLevel(GetRoster().GetLevel());
 	}
 
-	private void ELCJGIEJHNE(Battle DPOOIONCEOA)
+	private void LinkBattleToRoster(Battle DPOOIONCEOA)
 	{
 		if (DPOOIONCEOA == null)
 		{
-			LLLOJBFMONN.Error("ListSF::setRosterBattle - battle is NULL");
+			GameLog.Error("ListSF::setRosterBattle - battle is NULL");
 			return;
 		}
-		List<RosterBattle> list = ANEHEDFAPCH.GetSavedBattles();
+		List<RosterBattle> list = _roster.GetSavedBattles();
 		foreach (RosterBattle item in list)
 		{
 			FightIDS mOCEDDJOAEB = new FightIDS(item.GetBattleId());
-			Zone pKCPOJKLMOK = DPOOIONCEOA.LKDFFCADHNO();
-			if (mOCEDDJOAEB.PELHCAEAOFE() == pKCPOJKLMOK.get_Name() && mOCEDDJOAEB.CPHDPCAECJN() == DPOOIONCEOA.get_Name())
+			Zone pKCPOJKLMOK = DPOOIONCEOA.GetZone();
+			if (mOCEDDJOAEB.GetZone() == pKCPOJKLMOK.get_Name() && mOCEDDJOAEB.GetBattle() == DPOOIONCEOA.get_Name())
 			{
-				DPOOIONCEOA.FOMHAGJJCLJ(item);
-				item.EDHMHFONDAI = DPOOIONCEOA;
+				DPOOIONCEOA.SetRosterBattle(item);
+				item.LinkedBattle = DPOOIONCEOA;
 				break;
 			}
 		}
 	}
 
-	private void FCAACLKFFLH(long DGGEIIBGENC)
+	private void SetZonesTime(long DGGEIIBGENC)
 	{
 		int i = 0;
-		for (int count = CMEABHLEKNH.Count; i < count; i++)
+		for (int count = zones.Count; i < count; i++)
 		{
-			CMEABHLEKNH[i].SetTime(DGGEIIBGENC);
+			zones[i].SetTime(DGGEIIBGENC);
 		}
 		int j = 0;
-		for (int count2 = KHLBNALFOGN.Count; j < count2; j++)
+		for (int count2 = secondaryZones.Count; j < count2; j++)
 		{
-			KHLBNALFOGN[j].SetTime(DGGEIIBGENC);
+			secondaryZones[j].SetTime(DGGEIIBGENC);
 		}
 		int k = 0;
-		for (int count3 = CNMGADBPPJK.Count; k < count3; k++)
+		for (int count3 = tertiaryZones.Count; k < count3; k++)
 		{
-			CNMGADBPPJK[k].SetTime(DGGEIIBGENC);
+			tertiaryZones[k].SetTime(DGGEIIBGENC);
 		}
 	}
 
-	private void ALJEKDDKPJJ(long time)
+	private void UpdateRosterTime(long time)
 	{
-		if (ANEHEDFAPCH != null)
+		if (_roster != null)
 		{
-			ANEHEDFAPCH.ALJEKDDKPJJ(time);
+			_roster.UpdatePowerRegeneration(time);
 		}
-		MenuController.CFGIJDFFLLA();
+		MenuController.RefreshEnergyBar();
 	}
 
-	private void JIJFBPGDBKF(object data = null)
+	private void RequestServerSync(object data = null)
 	{
-		long num = BLBNJKJKMBM();
-		long aIJKJHMICNH = GetInstance().AIJKJHMICNH;
-		NetworkController.ELEBLBJKDBI().IFFDOFMDABC();
+		long num = GetServerTime();
+		long aIJKJHMICNH = GetInstance().unusedTimestamp;
+		NetworkController.GetInstance().CompleteLogin();
 	}
 
-	private void JLEMHLLLCLD()
+	private void VerifyRosterBalance()
 	{
-		if (!GameSettings.HCAJHNKLLGB())
+		if (!GameSettings.IsUserDataValidationEnabled())
 		{
 			return;
 		}
-		float num = ANEHEDFAPCH.BFBOEGMAMNF();
-		float num2 = ANEHEDFAPCH.EHFJHFDACMP();
-		int num3 = HFPJDOEEDCA();
-		XmlNode xmlNode = IEDEFCBFJAD["Users"];
+		float num = _roster.GetMoney();
+		float num2 = _roster.GetBonus();
+		int num3 = GetCurrentUserId();
+		XmlNode xmlNode = userDocument["Users"];
 		Roster nKGLHEGIKKP = null;
 		if (xmlNode != null)
 		{
@@ -3218,19 +3218,19 @@ public class ListSF
 			{
 				if (num3 == childNode.Attributes["ID"].ParseInt())
 				{
-					nKGLHEGIKKP = NHAMDLEDOHM(childNode);
+					nKGLHEGIKKP = CreateRoster(childNode);
 					break;
 				}
 			}
 		}
-		if (nKGLHEGIKKP != null && (float)nKGLHEGIKKP.BFBOEGMAMNF() == num && (float)nKGLHEGIKKP.EHFJHFDACMP() == num2)
+		if (nKGLHEGIKKP != null && (float)nKGLHEGIKKP.GetMoney() == num && (float)nKGLHEGIKKP.GetBonus() == num2)
 		{
 		}
 	}
 
-	private void GHDNJMDEALP(long time)
+	private void DeliverReadyRecipes(long time)
 	{
-		List<RecipeItemInfo> list = ANEHEDFAPCH.KHCNHPCPFII().PHKEAPFEOLP();
+		List<RecipeItemInfo> list = _roster.GetInventory().GetRecipeDeliveries();
 		foreach (RecipeItemInfo item in list)
 		{
 			if (item != null && item.IsReadyForDelivery(time))
@@ -3240,9 +3240,9 @@ public class ListSF
 		}
 	}
 
-	private void LDADJAGGGPA()
+	private void InitPeriodicBattles()
 	{
-		BattlePeriodic.EEDCDDDNLIH(1, CCDKHLAMKKO().CPGGBLDAHBG());
+		BattlePeriodic.InitBattles(1, GetRoster().GetPeriodicPlayTime());
 	}
 
 	private XmlNode MergeUserXML(XmlNode FAIPFEKENIM, XmlNode node)
@@ -3253,7 +3253,7 @@ public class ListSF
 			string value = attribute.Value;
 			if (FAIPFEKENIM.Attributes[name] == null)
 			{
-				FAIPFEKENIM.LLIKNHNLGJJ(name).Value = value;
+				FAIPFEKENIM.AppendAttribute(name).Value = value;
 				continue;
 			}
 			string value2 = FAIPFEKENIM.Attributes[name].Value;
@@ -3268,7 +3268,7 @@ public class ListSF
 			{
 				FAIPFEKENIM.RemoveChild(FAIPFEKENIM["Items"]);
 			}
-			FAIPFEKENIM.LCOLFMJJDJE(node["Items"]);
+			FAIPFEKENIM.AppendImportedClone(node["Items"]);
 		}
 		if (node["Perks"] != null)
 		{
@@ -3276,7 +3276,7 @@ public class ListSF
 			{
 				FAIPFEKENIM.RemoveChild(FAIPFEKENIM["Perks"]);
 			}
-			FAIPFEKENIM.LCOLFMJJDJE(node["Perks"]);
+			FAIPFEKENIM.AppendImportedClone(node["Perks"]);
 		}
 		if (node["AttributesAlign"] != null)
 		{
@@ -3284,27 +3284,27 @@ public class ListSF
 			{
 				FAIPFEKENIM.RemoveChild(FAIPFEKENIM["AttributesAlign"]);
 			}
-			FAIPFEKENIM.LCOLFMJJDJE(node["AttributesAlign"]);
+			FAIPFEKENIM.AppendImportedClone(node["AttributesAlign"]);
 		}
 		return FAIPFEKENIM;
 	}
 
-	private static bool BDNBHBOJLDN(ItemInfo item, long BCBAOELLEPB)
+	private static bool OnConsumablePurchased(ItemInfo item, long BCBAOELLEPB)
 	{
 		return true;
 	}
 
-	private static bool EMEMDEAEMCB(ItemInfo item)
+	private static bool BuyRealMoneyItem(ItemInfo item)
 	{
 		return true;
 	}
 
-	private static bool HJHCCBGILAJ(ItemInfo item)
+	private static bool BuyFreeItem(ItemInfo item)
 	{
 		return true;
 	}
 
-	private static void ABKBFADGNBM(ItemAction LFLGCDNKNJI)
+	private static void PlayPurchaseSound(ItemAction LFLGCDNKNJI)
 	{
 		switch (LFLGCDNKNJI)
 		{
@@ -3312,21 +3312,21 @@ public class ListSF
 		case ItemAction.Item_Buy_Ruby:
 		case ItemAction.Item_Buy_Real:
 		case ItemAction.Item_Consumable:
-			Sound.IFKCCDAIADF("snd_buy");
+			Sound.PlaySound("snd_buy");
 			break;
 		case ItemAction.Item_Upgrade_Gold:
 		case ItemAction.Item_Upgrade_Ruby:
 		case ItemAction.Item_Delivery_Ruby:
-			Sound.IFKCCDAIADF("snd_upgrade");
+			Sound.PlaySound("snd_upgrade");
 			break;
 		}
 	}
 
-	public static List<PerkInfoItem> KJBMBFHCEIM(ItemInfo PJDAGCBPLJE, bool EKBOGDKIHIH)
+	public static List<PerkInfoItem> GetItemEnchantmentsForSide(ItemInfo PJDAGCBPLJE, bool EKBOGDKIHIH)
 	{
 		if (EKBOGDKIHIH)
 		{
-			UserItem dKCHDHMLKHN = CMGOCLGHNLH(PJDAGCBPLJE.Name);
+			UserItem dKCHDHMLKHN = GetUserItem(PJDAGCBPLJE.Name);
 			if (dKCHDHMLKHN != null)
 			{
 				return dKCHDHMLKHN.GetEnchantments();
@@ -3337,7 +3337,7 @@ public class ListSF
 
 	public void RandomizeObscuredVars()
 	{
-		JNPMCNMEOLE.ForEach((FightList DHDMNHCIPEH) =>
+		fights.ForEach((FightList DHDMNHCIPEH) =>
 		{
 			DHDMNHCIPEH.RandomizeObscuredVars();
 		});

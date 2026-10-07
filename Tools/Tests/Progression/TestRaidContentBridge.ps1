@@ -25,13 +25,13 @@ $boss = [ModelParameters]::new()
 $boss.ShieldTotal = [int]$node.GetAttribute('ShieldTotal')
 $boss.MaxLife = 1
 $boss.SetCurrentLife(1)
-$boss.GEACPINOAAN(-1.25)
-if ($boss.RemainingHealthBars -ne 9 -or [Math]::Abs($boss.CurrentHealthBarFraction - 0.75) -gt 0.0002 -or $boss.OJMIFOAHKBK()) { throw 'Cross-bar damage/count failed.' }
-$boss.GEACPINOAAN(-8.75)
-if ($boss.RemainingHealthBars -ne 0 -or !$boss.OJMIFOAHKBK()) { throw 'Exhausted boss did not die.' }
+$boss.ChangeLife(-1.25)
+if ($boss.RemainingHealthBars -ne 9 -or [Math]::Abs($boss.CurrentHealthBarFraction - 0.75) -gt 0.0002 -or $boss.GetLifeDepleted()) { throw 'Cross-bar damage/count failed.' }
+$boss.ChangeLife(-8.75)
+if ($boss.RemainingHealthBars -ne 0 -or !$boss.GetLifeDepleted()) { throw 'Exhausted boss did not die.' }
 $node = $adapter.GetType().GetMethod('BuildRewardNode', $flags).Invoke($adapter, @($document, $reward))
 if ($node.GetAttribute('Bonus') -ne '25') { throw 'Gem reward adapter failed.' }
 $prize = [RewardPrize]::new()
 $prize.Parse($node, 0, 0)
-if ([long]$prize.PNDAIFALIKF -ne 25) { throw 'Recovered reward parser lost gems.' }
+if ([long]$prize.bonus -ne 25) { throw 'Recovered reward parser lost gems.' }
 Write-Host 'PASS: production warrior/reward adapters, ten-bar pool carry/death, and recovered 25-gem reward parsing.'

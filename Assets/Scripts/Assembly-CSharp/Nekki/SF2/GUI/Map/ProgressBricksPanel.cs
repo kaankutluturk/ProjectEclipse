@@ -15,9 +15,9 @@ namespace Nekki.SF2.GUI.Map
 
 		public const int MAX_BIG_ICON_FIGHTS = 5;
 
-		private const ushort BPOBIJJOOIH = 6;
+		private const ushort BRICKS_PER_ROW_NORMAL = 6;
 
-		private const ushort ONOMMNNNJNL = 8;
+		private const ushort BRICKS_PER_ROW_MANY = 8;
 
 		[SerializeField]
 		private LabelAlias _lblTour;
@@ -77,18 +77,18 @@ namespace Nekki.SF2.GUI.Map
 				{
 					int index = i * num4 + j;
 					bool flag2 = modeProgress ? index < completed : list[index].Status == ConditionStatus.StatusComplete;
-					bool cNNCIENODGE = modeProgress ? index > completed : list[index].CNNCIENODGE;
+					bool cNNCIENODGE = modeProgress ? index > completed : list[index].IsLocked;
 					GameObject gameObject = Object.Instantiate(IndicatorFightPrefab);
 					IndicatorFight component2 = gameObject.GetComponent<IndicatorFight>();
 					component2.gameObject.transform.SetParent(base.gameObject.transform, false);
 					_indicators.Add(component2);
 					if (cNNCIENODGE)
 					{
-						component2.set_CurrentState(IndicatorFight.ILPCJIPBONE.IsLocked);
+						component2.set_CurrentState(IndicatorFight.IndicatorState.IsLocked);
 					}
 					else
 					{
-						component2.set_CurrentState((!flag2) ? IndicatorFight.ILPCJIPBONE.IsOff : IndicatorFight.ILPCJIPBONE.IsOn);
+						component2.set_CurrentState((!flag2) ? IndicatorFight.IndicatorState.IsOff : IndicatorFight.IndicatorState.IsOn);
 					}
 					component2.set_Scale(num2);
 					component2.transform.localPosition = new Vector3(num11, num8, component2.transform.localPosition.z);
@@ -122,7 +122,7 @@ namespace Nekki.SF2.GUI.Map
 				}
 				else
 				{
-					_lblTour.set_text(LocalizationManager.GetString(DPOOIONCEOA.IGPOHDHPIIL()) + " " + LocalizationManager.GetString("challengeBoss"));
+					_lblTour.set_text(LocalizationManager.GetString(DPOOIONCEOA.GetTitle()) + " " + LocalizationManager.GetString("challengeBoss"));
 				}
 				break;
 			}

@@ -96,7 +96,7 @@ namespace Eclipse.Multiplayer
                 var tactic = AiData.GetTacticByName(aiTactic);
                 if (tactic != null)
                 {
-                    parameters.HBFMBOHLKPJ = tactic;
+                    parameters.FightTactic = tactic;
                     parameters.AiControlled = true;
                     parameters.UserControlled = false;
                 }

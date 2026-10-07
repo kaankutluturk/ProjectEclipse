@@ -3,22 +3,22 @@ using System.Diagnostics;
 public sealed class ScalarEventInfo : ObjectEventInfo
 {
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private string CJOOJLBMOLC;
+	private string renderedValue;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private IBEOFCPMMJJ HANBNCBGJOI;
+	private ScalarStyle style;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private bool OFKGOAPCMLA;
+	private bool isPlainImplicit;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private bool OGIMJJCLJHE;
+	private bool isQuotedImplicit;
 
-	public string PGKAPALEPKH
+	public string RenderedText
 	{
 		get
 		{
-			return ICEKHEBNDIN();
+			return GetRenderedValue();
 		}
 		set
 		{
@@ -26,39 +26,39 @@ public sealed class ScalarEventInfo : ObjectEventInfo
 		}
 	}
 
-	public IBEOFCPMMJJ HCJPMGKAAMN
+	public ScalarStyle Style
 	{
 		get
 		{
-			return HALCJLMJDII();
+			return GetStyle();
 		}
 		set
 		{
-			KHFMMPCKMKE(value);
+			SetStyle(value);
 		}
 	}
 
-	public bool GGEHMNEDANI
+	public bool IsPlainImplicit
 	{
 		get
 		{
-			return BIDLJMEAFMI();
+			return GetIsPlainImplicit();
 		}
 		set
 		{
-			LBGFNDOAEED(value);
+			SetIsPlainImplicit(value);
 		}
 	}
 
-	public bool HFFBJBBEEKA
+	public bool IsQuotedImplicit
 	{
 		get
 		{
-			return NIENIKOPKOG();
+			return GetIsQuotedImplicit();
 		}
 		set
 		{
-			FKJHDMDNOCN(value);
+			SetIsQuotedImplicit(value);
 		}
 	}
 
@@ -67,43 +67,43 @@ public sealed class ScalarEventInfo : ObjectEventInfo
 	{
 	}
 
-	public string ICEKHEBNDIN()
+	public string GetRenderedValue()
 	{
-		return CJOOJLBMOLC;
+		return renderedValue;
 	}
 
 	public void set_RenderedValue(string value)
 	{
-		CJOOJLBMOLC = value;
+		renderedValue = value;
 	}
 
-	public IBEOFCPMMJJ HALCJLMJDII()
+	public ScalarStyle GetStyle()
 	{
-		return HANBNCBGJOI;
+		return style;
 	}
 
-	public void KHFMMPCKMKE(IBEOFCPMMJJ value)
+	public void SetStyle(ScalarStyle value)
 	{
-		HANBNCBGJOI = value;
+		style = value;
 	}
 
-	public bool BIDLJMEAFMI()
+	public bool GetIsPlainImplicit()
 	{
-		return OFKGOAPCMLA;
+		return isPlainImplicit;
 	}
 
-	public void LBGFNDOAEED(bool value)
+	public void SetIsPlainImplicit(bool value)
 	{
-		OFKGOAPCMLA = value;
+		isPlainImplicit = value;
 	}
 
-	public bool NIENIKOPKOG()
+	public bool GetIsQuotedImplicit()
 	{
-		return OGIMJJCLJHE;
+		return isQuotedImplicit;
 	}
 
-	public void FKJHDMDNOCN(bool value)
+	public void SetIsQuotedImplicit(bool value)
 	{
-		OGIMJJCLJHE = value;
+		isQuotedImplicit = value;
 	}
 }

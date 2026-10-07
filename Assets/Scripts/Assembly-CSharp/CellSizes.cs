@@ -2,35 +2,35 @@ using UnityEngine.SocialPlatforms;
 
 public class CellSizes
 {
-	private float[] AAJFMHAGDGM;
+	private float[] _rowSizes;
 
-	private float[] NHCFADBGNON;
+	private float[] _cumulativeSizes;
 
 	public int CumulativeIndex = -1;
 
 	private float _spacing;
 
-	public int KKPMCDPFCMP
+	public int RowCount
 	{
 		get
 		{
-			return HGHCEDEOMHA();
+			return GetRowCount();
 		}
 	}
 
-	public int BHCJCNKLNFC
+	public int CumulativeCount
 	{
 		get
 		{
-			return BPDFPOEOLIN();
+			return GetCumulativeCount();
 		}
 	}
 
-	public float EPDFGFIACAF
+	public float CellSpacing
 	{
 		get
 		{
-			return FEHBEIFACMG();
+			return GetSpacing();
 		}
 		set
 		{
@@ -38,17 +38,17 @@ public class CellSizes
 		}
 	}
 
-	public int HGHCEDEOMHA()
+	public int GetRowCount()
 	{
-		return AAJFMHAGDGM.Length;
+		return _rowSizes.Length;
 	}
 
-	public int BPDFPOEOLIN()
+	public int GetCumulativeCount()
 	{
-		return NHCFADBGNON.Length;
+		return _cumulativeSizes.Length;
 	}
 
-	public float FEHBEIFACMG()
+	public float GetSpacing()
 	{
 		return _spacing;
 	}
@@ -61,25 +61,25 @@ public class CellSizes
 	public void SetRowsCount(int count)
 	{
 		CumulativeIndex = -1;
-		AAJFMHAGDGM = new float[count];
-		NHCFADBGNON = new float[count];
+		_rowSizes = new float[count];
+		_cumulativeSizes = new float[count];
 	}
 
-	public void KJPFDBAIKAH(float PEEOEOMEBFG, int IBAKGENOEPH)
+	public void SetRowSize(float PEEOEOMEBFG, int IBAKGENOEPH)
 	{
-		if (!(PEEOEOMEBFG <= 0f) && IBAKGENOEPH < HGHCEDEOMHA())
+		if (!(PEEOEOMEBFG <= 0f) && IBAKGENOEPH < GetRowCount())
 		{
-			AAJFMHAGDGM[IBAKGENOEPH] = PEEOEOMEBFG;
+			_rowSizes[IBAKGENOEPH] = PEEOEOMEBFG;
 		}
 	}
 
-	public float IEMKAEEOMIH(int IBAKGENOEPH)
+	public float GetRowSize(int IBAKGENOEPH)
 	{
 		if (IBAKGENOEPH < 0)
 		{
 			return 0f;
 		}
-		return AAJFMHAGDGM[IBAKGENOEPH];
+		return _rowSizes[IBAKGENOEPH];
 	}
 
 	public float SumWithRange(Range JMPCNIOBPAI)
@@ -88,10 +88,10 @@ public class CellSizes
 		{
 			return 0f;
 		}
-		return PCKBCFLHKLO(JMPCNIOBPAI.from + JMPCNIOBPAI.count - 1) - PCKBCFLHKLO(JMPCNIOBPAI.from - 1);
+		return GetCumulativeSize(JMPCNIOBPAI.from + JMPCNIOBPAI.count - 1) - GetCumulativeSize(JMPCNIOBPAI.from - 1);
 	}
 
-	public float PCKBCFLHKLO(int IBAKGENOEPH)
+	public float GetCumulativeSize(int IBAKGENOEPH)
 	{
 		if (IBAKGENOEPH < 0)
 		{
@@ -100,13 +100,13 @@ public class CellSizes
 		while (CumulativeIndex < IBAKGENOEPH)
 		{
 			CumulativeIndex++;
-			NHCFADBGNON[CumulativeIndex] = AAJFMHAGDGM[CumulativeIndex];
+			_cumulativeSizes[CumulativeIndex] = _rowSizes[CumulativeIndex];
 			if (CumulativeIndex > 0)
 			{
-				NHCFADBGNON[CumulativeIndex] += _spacing;
-				NHCFADBGNON[CumulativeIndex] += NHCFADBGNON[CumulativeIndex - 1];
+				_cumulativeSizes[CumulativeIndex] += _spacing;
+				_cumulativeSizes[CumulativeIndex] += _cumulativeSizes[CumulativeIndex - 1];
 			}
 		}
-		return NHCFADBGNON[IBAKGENOEPH];
+		return _cumulativeSizes[IBAKGENOEPH];
 	}
 }

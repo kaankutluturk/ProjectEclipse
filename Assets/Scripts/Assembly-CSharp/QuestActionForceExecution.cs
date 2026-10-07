@@ -7,13 +7,13 @@ public class QuestActionForceExecution : QuestAction
 	public override void Parse(XmlNode EPKLCPOEELO)
 	{
 		base.Parse(EPKLCPOEELO);
-		Name = EPKLCPOEELO.Attributes["Name"].CIPOICEEIBK(string.Empty);
+		Name = EPKLCPOEELO.Attributes["Name"].GetStringOrDefault(string.Empty);
 	}
 
-	public override void DEJMHFMLKIC(QuestParameters GFIHPBCEEOB)
+	public override void Execute(QuestParameters GFIHPBCEEOB)
 	{
-		base.DEJMHFMLKIC(GFIHPBCEEOB);
+		base.Execute(GFIHPBCEEOB);
 		ListSF.GetInstance().AddQuestToStek(Name, true);
-		OGIJONMKABB();
+		FinishAction();
 	}
 }

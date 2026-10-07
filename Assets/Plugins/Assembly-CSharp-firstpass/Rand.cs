@@ -8,13 +8,13 @@ public static class Rand
 
 	private static List<short> _source;
 
-	private static List<short> FMOOJNFJFNB;
+	private static List<short> _used;
 
-	public static short FHNPGKOLJFF
+	public static short CurrentSeed
 	{
 		get
 		{
-			return CLCJNCMBDNB();
+			return GetSeed();
 		}
 		set
 		{
@@ -22,22 +22,22 @@ public static class Rand
 		}
 	}
 
-	private static short OFNCIJGCBNO
+	private static short NextValue
 	{
 		get
 		{
-			return CHOMDFOKMPA();
+			return TakeNext();
 		}
 	}
 
 	static Rand()
 	{
 		_source = new List<short>();
-		FMOOJNFJFNB = new List<short>();
+		_used = new List<short>();
 		Reset(0);
 	}
 
-	public static short CLCJNCMBDNB()
+	public static short GetSeed()
 	{
 		return _seed;
 	}
@@ -61,7 +61,7 @@ public static class Rand
 	private static void Reset(int OKGKLCLEDFN)
 	{
 		_seed = (short)(OKGKLCLEDFN % 32767);
-		FMOOJNFJFNB.Clear();
+		_used.Clear();
 		_source.Clear();
 		for (short num = 0; num < short.MaxValue; num++)
 		{
@@ -71,26 +71,26 @@ public static class Rand
 		{
 			return Random.Range(-1, 1);
 		});
-		FMOOJNFJFNB.AddRange(_source.GetRange(0, _seed));
+		_used.AddRange(_source.GetRange(0, _seed));
 		_source.RemoveRange(0, _seed);
 	}
 
-	private static void ALIKAKJLCAN()
+	private static void SwapPools()
 	{
-		FMOOJNFJFNB = Interlocked.Exchange(ref _source, FMOOJNFJFNB);
-		AdvLog.Log("after dirty: " + FMOOJNFJFNB.Count + " source: " + _source.Count);
+		_used = Interlocked.Exchange(ref _source, _used);
+		AdvLog.Log("after dirty: " + _used.Count + " source: " + _source.Count);
 	}
 
-	private static short CHOMDFOKMPA()
+	private static short TakeNext()
 	{
 		if (_source.Count == 0)
 		{
-			ALIKAKJLCAN();
+			SwapPools();
 		}
 		int index = Random.Range(0, _source.Count);
 		short num = _source[index];
 		_source.RemoveAt(index);
-		FMOOJNFJFNB.Add(num);
+		_used.Add(num);
 		return num;
 	}
 
@@ -101,6 +101,6 @@ public static class Rand
 			IPMPAMAHLJG = Interlocked.Exchange(ref IOFHCAAOELD, IPMPAMAHLJG);
 		}
 		int num = IPMPAMAHLJG - IOFHCAAOELD;
-		return (num != 0) ? (IOFHCAAOELD + CHOMDFOKMPA() % num) : 0;
+		return (num != 0) ? (IOFHCAAOELD + TakeNext() % num) : 0;
 	}
 }

@@ -7,29 +7,29 @@ namespace Nekki.Utils
 	{
 		public const int TICK = 0;
 
-		private static GlobalTimer EDAPJLKMFPC;
+		private static GlobalTimer _instance;
 
-		private static TimeSpan DGLAAIIIOLE;
+		private static TimeSpan _serverTimeOffset;
 
-		private static float MPAGBGEENIJ;
+		private static float _syncUnscaledTime;
 
-		private static DateTime JMIPAPNMNIP;
+		private static DateTime _serverTime;
 
-		private static bool AAMLMIEHEIO;
+		private static bool _isSynchronized;
 
-		private static Action NOIAHFNMDFC;
+		private static Action _onSyncSuccess;
 
-		private static Action GEKNEIFHPAI;
+		private static Action _onSyncError;
 
-		private static bool IGNLAKOKBPN;
+		private static bool _isRequestInProgress;
 
-		private static bool MFCFEFAMOLE;
+		private static bool _isLastRequestSuccessful;
 
-		private static bool ECBPAOEJPBI;
+		private static bool _skipServerSync;
 
-		private float DGAKCPDHKJM;
+		private float _lastTickTime;
 
-		public static GlobalTimer BPCBBHAKFDM
+		public static GlobalTimer SharedInstance
 		{
 			get
 			{
@@ -37,7 +37,7 @@ namespace Nekki.Utils
 			}
 		}
 
-		public static DateTime HLBLKMPNKOO
+		public static DateTime LocalNow
 		{
 			get
 			{
@@ -45,7 +45,7 @@ namespace Nekki.Utils
 			}
 		}
 
-		public static DateTime LAHJJHEOKAF
+		public static DateTime ServerNow
 		{
 			get
 			{
@@ -53,7 +53,7 @@ namespace Nekki.Utils
 			}
 		}
 
-		public static long NNOHILNKJEN
+		public static long ServerTimestamp
 		{
 			get
 			{
@@ -61,7 +61,7 @@ namespace Nekki.Utils
 			}
 		}
 
-		public static long LIGDBHAGCDG
+		public static long LocalUtcTimestamp
 		{
 			get
 			{
@@ -69,7 +69,7 @@ namespace Nekki.Utils
 			}
 		}
 
-		public static bool NGIJGICHDEG
+		public static bool Synchronized
 		{
 			get
 			{
@@ -77,7 +77,7 @@ namespace Nekki.Utils
 			}
 		}
 
-		public static bool KNCJBAHIAGI
+		public static bool IsRequestPending
 		{
 			get
 			{
@@ -85,7 +85,7 @@ namespace Nekki.Utils
 			}
 		}
 
-		public static bool GHACJDFEAGE
+		public static bool LastRequestSucceeded
 		{
 			get
 			{
@@ -95,11 +95,11 @@ namespace Nekki.Utils
 
 		public static GlobalTimer get_Instance()
 		{
-			if (!EDAPJLKMFPC)
+			if (!_instance)
 			{
 				Init();
 			}
-			return EDAPJLKMFPC;
+			return _instance;
 		}
 
 		public static DateTime get_LocalizedNow()
@@ -109,7 +109,7 @@ namespace Nekki.Utils
 
 		public static DateTime get_Now()
 		{
-			return JMIPAPNMNIP.AddSeconds(Time.unscaledTime - MPAGBGEENIJ);
+			return _serverTime.AddSeconds(Time.unscaledTime - _syncUnscaledTime);
 		}
 
 		public static long get_GetTime()
@@ -124,17 +124,17 @@ namespace Nekki.Utils
 
 		public static bool get_IsSynchronized()
 		{
-			return AAMLMIEHEIO;
+			return _isSynchronized;
 		}
 
 		public static bool get_IsRequestInProgress()
 		{
-			return IGNLAKOKBPN;
+			return _isRequestInProgress;
 		}
 
 		public static bool get_IsLastRequestSuccessful()
 		{
-			return MFCFEFAMOLE;
+			return _isLastRequestSuccessful;
 		}
 
 		public static long ConvertToUnixTimestamp(DateTime CIODNJIEKKK)
@@ -145,16 +145,16 @@ namespace Nekki.Utils
 
 		public static void Init(bool GCPIOLHKMAI = false)
 		{
-			if (!EDAPJLKMFPC)
+			if (!_instance)
 			{
-				EDAPJLKMFPC = new GameObject("_timer").AddComponent<GlobalTimer>();
-				UnityEngine.Object.DontDestroyOnLoad(EDAPJLKMFPC.get_gameObject());
+				_instance = new GameObject("_timer").AddComponent<GlobalTimer>();
+				UnityEngine.Object.DontDestroyOnLoad(_instance.get_gameObject());
 			}
-			DGLAAIIIOLE = default(TimeSpan);
-			AAMLMIEHEIO = false;
-			MFCFEFAMOLE = false;
-			ECBPAOEJPBI = GCPIOLHKMAI;
-			if (!ECBPAOEJPBI)
+			_serverTimeOffset = default(TimeSpan);
+			_isSynchronized = false;
+			_isLastRequestSuccessful = false;
+			_skipServerSync = GCPIOLHKMAI;
+			if (!_skipServerSync)
 			{
 				ServerTimeSync();
 			}
@@ -163,10 +163,10 @@ namespace Nekki.Utils
 		public static void ServerTimeSync(Action AFMCMJDBDIN = null, Action onError = null)
 		{
 			// Local clock only; keep timer callbacks and elapsed-time gameplay working.
-			IGNLAKOKBPN = true;
-			NOIAHFNMDFC = AFMCMJDBDIN;
-			GEKNEIFHPAI = onError;
-			ANFPDNJJKGB(ConvertToUnixTimestamp(DateTime.UtcNow));
+			_isRequestInProgress = true;
+			_onSyncSuccess = AFMCMJDBDIN;
+			_onSyncError = onError;
+			OnServerTimeReceived(ConvertToUnixTimestamp(DateTime.UtcNow));
 		}
 
 		public static void ServerTimeExtended(long CFGPDFHPGJP)
@@ -174,51 +174,51 @@ namespace Nekki.Utils
 			DateTime jMIPAPNMNIP = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
 			TimeSpan timeSpan = TimeSpan.FromMilliseconds(CFGPDFHPGJP);
 			jMIPAPNMNIP += timeSpan;
-			JMIPAPNMNIP = jMIPAPNMNIP;
-			MPAGBGEENIJ = Time.unscaledTime;
-			DGLAAIIIOLE = JMIPAPNMNIP - DateTime.Now;
-			AAMLMIEHEIO = true;
-			IGNLAKOKBPN = false;
-			MFCFEFAMOLE = true;
-			if (NOIAHFNMDFC != null)
+			_serverTime = jMIPAPNMNIP;
+			_syncUnscaledTime = Time.unscaledTime;
+			_serverTimeOffset = _serverTime - DateTime.Now;
+			_isSynchronized = true;
+			_isRequestInProgress = false;
+			_isLastRequestSuccessful = true;
+			if (_onSyncSuccess != null)
 			{
-				NOIAHFNMDFC();
-				NOIAHFNMDFC = null;
-				GEKNEIFHPAI = null;
+				_onSyncSuccess();
+				_onSyncSuccess = null;
+				_onSyncError = null;
 			}
 		}
 
-		private static void ANFPDNJJKGB(long time)
+		private static void OnServerTimeReceived(long time)
 		{
-			JMIPAPNMNIP = UnixTimeStampToDateTime(time);
-			MPAGBGEENIJ = Time.unscaledTime;
-			DGLAAIIIOLE = JMIPAPNMNIP - DateTime.Now;
-			AAMLMIEHEIO = true;
-			IGNLAKOKBPN = false;
-			MFCFEFAMOLE = true;
-			if (NOIAHFNMDFC != null)
+			_serverTime = UnixTimeStampToDateTime(time);
+			_syncUnscaledTime = Time.unscaledTime;
+			_serverTimeOffset = _serverTime - DateTime.Now;
+			_isSynchronized = true;
+			_isRequestInProgress = false;
+			_isLastRequestSuccessful = true;
+			if (_onSyncSuccess != null)
 			{
-				NOIAHFNMDFC();
-				NOIAHFNMDFC = null;
-				GEKNEIFHPAI = null;
+				_onSyncSuccess();
+				_onSyncSuccess = null;
+				_onSyncError = null;
 			}
 		}
 
-		private static void JAIJHNAIKJE(object LIOGIBJBHAH)
+		private static void OnServerTimeError(object LIOGIBJBHAH)
 		{
-			JMIPAPNMNIP = DateTime.Now;
-			MPAGBGEENIJ = Time.unscaledTime;
-			DGLAAIIIOLE = JMIPAPNMNIP - DateTime.Now;
-			AAMLMIEHEIO = false;
-			IGNLAKOKBPN = false;
-			MFCFEFAMOLE = false;
-			if (GEKNEIFHPAI != null)
+			_serverTime = DateTime.Now;
+			_syncUnscaledTime = Time.unscaledTime;
+			_serverTimeOffset = _serverTime - DateTime.Now;
+			_isSynchronized = false;
+			_isRequestInProgress = false;
+			_isLastRequestSuccessful = false;
+			if (_onSyncError != null)
 			{
-				GEKNEIFHPAI();
-				NOIAHFNMDFC = null;
-				GEKNEIFHPAI = null;
+				_onSyncError();
+				_onSyncSuccess = null;
+				_onSyncError = null;
 			}
-			AdvLog.CCOFFJPPAKC(LIOGIBJBHAH);
+			AdvLog.LogError(LIOGIBJBHAH);
 		}
 
 		public static DateTime UnixTimeStampToDateTime(double NNBJNDAFEDH)
@@ -233,9 +233,9 @@ namespace Nekki.Utils
 
 		private void Update()
 		{
-			if (DGAKCPDHKJM + 1f < Time.unscaledTime)
+			if (_lastTickTime + 1f < Time.unscaledTime)
 			{
-				DGAKCPDHKJM = Time.unscaledTime;
+				_lastTickTime = Time.unscaledTime;
 				// Invoke on the live component. During scene/application teardown the
 				// static singleton is cleared before Unity delivers the final Update.
 				callEvent(0, get_Now());
@@ -244,7 +244,7 @@ namespace Nekki.Utils
 
 		private void OnApplicationPause(bool OHCAIDHJHKC)
 		{
-			if (!OHCAIDHJHKC && !ECBPAOEJPBI)
+			if (!OHCAIDHJHKC && !_skipServerSync)
 			{
 				ServerTimeSync();
 			}
@@ -252,7 +252,7 @@ namespace Nekki.Utils
 
 		private new void OnDestroy()
 		{
-			EDAPJLKMFPC = null;
+			_instance = null;
 			StopAllCoroutines();
 			base.OnDestroy();
 		}

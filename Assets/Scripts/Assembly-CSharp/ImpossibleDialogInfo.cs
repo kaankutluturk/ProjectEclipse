@@ -5,14 +5,14 @@ public class ImpossibleDialogInfo
 {
 	public Action<object> Dlg;
 
-	public ImpossibleDialog.MAKDAMIONLL AMKJNPOCODK;
+	public ImpossibleDialog.ImpossibleDialogType Reason;
 
 	public object Content;
 
-	public ImpossibleDialogInfo(ImpossibleDialog.MAKDAMIONLL CBFFIFKAHHN, Action<object> _dlg = null, object GCGGIJDKKKO = null)
+	public ImpossibleDialogInfo(ImpossibleDialog.ImpossibleDialogType CBFFIFKAHHN, Action<object> _dlg = null, object GCGGIJDKKKO = null)
 	{
 		Dlg = _dlg;
-		AMKJNPOCODK = CBFFIFKAHHN;
+		Reason = CBFFIFKAHHN;
 		Content = GCGGIJDKKKO;
 	}
 }

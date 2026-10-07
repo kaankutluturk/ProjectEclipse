@@ -1,12 +1,12 @@
 public class WeaponModel : Model
 {
-	private bool HLAOOPKDLGA;
+	private bool hasPlayedAnimation;
 
-	public override bool FDELMAHAAJD
+	public override bool IsWeaponModel
 	{
 		get
 		{
-			return KIAFPPHPEEK();
+			return IsWeapon();
 		}
 	}
 
@@ -15,23 +15,23 @@ public class WeaponModel : Model
 	{
 	}
 
-	public override bool KIAFPPHPEEK()
+	public override bool IsWeapon()
 	{
 		return true;
 	}
 
 	public override bool PlayAnimation(InfoAnimation CMGIPKIPIPA, int AOJJBKLCHJO = 0, bool HHJGACBCGBP = false, int BADKABIKMBD = -1)
 	{
-		bool flag = !HLAOOPKDLGA;
-		if (!HLAOOPKDLGA)
+		bool flag = !hasPlayedAnimation;
+		if (!hasPlayedAnimation)
 		{
-			NJDJHGDMCIJ().KNCKHDNGKFO(this);
-			HLAOOPKDLGA = true;
+			GetParentModel().NotifyRangedAttack(this);
+			hasPlayedAnimation = true;
 		}
 		bool result = base.PlayAnimation(CMGIPKIPIPA, AOJJBKLCHJO, HHJGACBCGBP, BADKABIKMBD);
 		if (flag)
 		{
-			OCPMJKIEPIG().Render();
+			GetAnimationModule().Render();
 		}
 		return result;
 	}

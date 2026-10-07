@@ -8,11 +8,11 @@ public class RosterAchievCounter
 
 	private int _counter;
 
-	public int EOGLBDCLMBM
+	public int CurrentValue
 	{
 		get
 		{
-			return MCIPEJBLIDC();
+			return GetCounter();
 		}
 		set
 		{
@@ -23,7 +23,7 @@ public class RosterAchievCounter
 	public RosterAchievCounter(XmlNode node)
 	{
 		_node = node;
-		_name = node.Attributes["Name"].CIPOICEEIBK(string.Empty);
+		_name = node.Attributes["Name"].GetStringOrDefault(string.Empty);
 		_counter = node.Attributes["CurrentValue"].ParseInt();
 	}
 
@@ -37,12 +37,12 @@ public class RosterAchievCounter
 		_name = value;
 		if (_node.Attributes["Name"] == null)
 		{
-			_node.LLIKNHNLGJJ("Name");
+			_node.AppendAttribute("Name");
 		}
 		_node.Attributes["Name"].Value = _name;
 	}
 
-	public int MCIPEJBLIDC()
+	public int GetCounter()
 	{
 		return _counter;
 	}
@@ -52,7 +52,7 @@ public class RosterAchievCounter
 		_counter = value;
 		if (_node.Attributes["CurrentValue"] == null)
 		{
-			_node.LLIKNHNLGJJ("CurrentValue");
+			_node.AppendAttribute("CurrentValue");
 		}
 		_node.Attributes["CurrentValue"].Value = _counter.ToString();
 	}

@@ -2,35 +2,35 @@ using System.Xml;
 
 public class ActionHitEffect : ActionAnimation
 {
-	private string PLJGDHKIAOE;
+	private string _FileName;
 
-	public string IMMIEKDLGDO
+	public string FileName
 	{
 		get
 		{
-			return PCLGDBGPEKM();
+			return GetFileName();
 		}
 	}
 
 	public ActionHitEffect(XmlNode node)
-		: base(FADAJCEEKIO.HIT_EFFECT)
+		: base(ActionType.HIT_EFFECT)
 	{
 		Parse(node);
 	}
 
-	public string PCLGDBGPEKM()
+	public string GetFileName()
 	{
-		return PLJGDHKIAOE;
+		return _FileName;
 	}
 
 	public override void Visit(Model ACENLMONNPA)
 	{
-		ACENLMONNPA.OPPIKLBKMPN(this);
+		ACENLMONNPA.StartAction(this);
 	}
 
 	protected override void Parse(XmlNode node)
 	{
 		base.Parse(node);
-		PLJGDHKIAOE = node.Attributes["FileName"].CIPOICEEIBK(string.Empty);
+		_FileName = node.Attributes["FileName"].GetStringOrDefault(string.Empty);
 	}
 }

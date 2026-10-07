@@ -4,7 +4,7 @@ public interface IParsingEventVisitor
 
 	void Visit(StreamStart FOPOKALJIIJ);
 
-	void Visit(HNKFEGCMBJB FOPOKALJIIJ);
+	void Visit(StreamEndEvent FOPOKALJIIJ);
 
 	void Visit(DocumentStart FOPOKALJIIJ);
 
@@ -12,13 +12,13 @@ public interface IParsingEventVisitor
 
 	void Visit(Scalar FOPOKALJIIJ);
 
-	void Visit(JODGINIKFJF FOPOKALJIIJ);
+	void Visit(SequenceStart FOPOKALJIIJ);
 
-	void Visit(AKMKLAINLOL FOPOKALJIIJ);
+	void Visit(SequenceEnd FOPOKALJIIJ);
 
 	void Visit(MappingStart FOPOKALJIIJ);
 
-	void Visit(BLFPJCPALDH FOPOKALJIIJ);
+	void Visit(MappingEnd FOPOKALJIIJ);
 
 	void Visit(Comment FOPOKALJIIJ);
 }

@@ -24,7 +24,7 @@ namespace Eclipse.Modding
     }
     public static class ModModeRuntime { public static bool OfflineRaid; public static bool IsRaid(FightList fight)=>OfflineRaid; }
 }
-public static class StageType { public enum FDBBPEGEGMK { STAGE_FIGHT, STAGE_END_STANCE } }
+public static class StageType { public enum Stage { STAGE_FIGHT, STAGE_END_STANCE } }
 public sealed class FightList { public BattleType Type=BattleType.FightTournament; public BattleType get_Type()=>Type; }
 public sealed class RoundData { public int round=1; public bool processing=true; }
 public sealed class Vector3f { public float X,Y,Z; public float GetX()=>X; public float GetY()=>Y; public float GetZ()=>Z; public Vector3f(float x,float y,float z){X=x;Y=y;Z=z;} }
@@ -60,22 +60,22 @@ public partial class Fight
     public void MakeActorUnavailable(Model body)=>_eclipseActors[body].Available=false;
     public void RetireActor(Model body){MakeActorUnavailable(body);CancelEclipseActorProjectiles(body);_eclipseActors.Remove(body);}
     public static Fight Current;
-    public readonly List<Model> LNDLFINJHDB=new List<Model>(),HCPGFOCGDAA=new List<Model>(),JLEFIKJODGG=new List<Model>();
+    public readonly List<Model> ActiveModels=new List<Model>(),pendingModels=new List<Model>(),modelsToRemove=new List<Model>();
     private int fightTimeInFrame=>Clock;
-    private void RequestModelRemoval(object value){if(!JLEFIKJODGG.Contains((Model)value))JLEFIKJODGG.Add((Model)value);}
-    public void ProjectileStep(){ApplyEclipseProjectileSpawns();InitializeEclipseProjectileBirths();ApplyEclipseProjectiles();foreach(var child in JLEFIKJODGG){LNDLFINJHDB.Remove(child);HCPGFOCGDAA.Remove(child);ForgetEclipseProjectile(child);}JLEFIKJODGG.Clear();}
+    private void RequestModelRemoval(object value){if(!modelsToRemove.Contains((Model)value))modelsToRemove.Add((Model)value);}
+    public void ProjectileStep(){ApplyEclipseProjectileSpawns();InitializeEclipseProjectileBirths();ApplyEclipseProjectiles();foreach(var child in modelsToRemove){ActiveModels.Remove(child);pendingModels.Remove(child);ForgetEclipseProjectile(child);}modelsToRemove.Clear();}
     public void Age(){Clock++;UpdateEclipseProjectiles();}
     public void CancelProjectiles()=>CancelEclipseProjectiles();
     public ModAttackSource Attack(Model actor, Model.StrikeResult strike)=>CaptureEclipseAttackSource(actor,strike);
     public bool Query(Model body,ModId owner,out IReadOnlyList<IModProjectile> values,out string error)=>TryGetEclipseProjectiles(body,owner,out values,out error);
-    public Model Spawn(Model body,string owner,int life=180){if(!CanSpawnEclipseProjectile(body,owner,life))return null;var child=new Model{Parent=body};RegisterEclipseProjectile(body,child,owner,life);HCPGFOCGDAA.Add(child);return child;}
+    public Model Spawn(Model body,string owner,int life=180){if(!CanSpawnEclipseProjectile(body,owner,life))return null;var child=new Model{Parent=body};RegisterEclipseProjectile(body,child,owner,life);pendingModels.Add(child);return child;}
     public Model Player=new Model(),Enemy=new Model();
     public readonly RoundData round=new RoundData();
     public FightList FightDefinition=new FightList();
     public bool IsLocalVersus,IsTitleSparring,_modelTransitionsClosed,_eclipseFightEndDispatched,Paused;
     public bool isEndRound,isGameOver,isStopFight;
     public int _eclipseEndedRound=-1,Clock=1;
-    public StageType.FDBBPEGEGMK stageType=StageType.FDBBPEGEGMK.STAGE_FIGHT;
+    public StageType.Stage stageType=StageType.Stage.STAGE_FIGHT;
     public Fight(){ModRuntime.FailSpawn=ModRuntime.FailBirth=ModRuntime.FailAfterCreate=false;Current=this;ModRuntime.Scripts=new ModScriptSession();ModModeRuntime.OfflineRaid=false;}
     public static Fight GetCurrentFight()=>Current;
     public Model GetPlayerModel()=>Player;

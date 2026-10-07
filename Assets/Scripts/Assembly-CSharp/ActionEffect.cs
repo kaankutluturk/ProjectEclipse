@@ -5,9 +5,9 @@ public class ActionEffect : ActionAnimation
 {
 	private string _Name;
 
-	private string KHHJNHKEHPM;
+	private string _Sequence;
 
-	private float BPGEHHFLEOM;
+	private float _Scale;
 
 	private float _ScaleX;
 
@@ -17,19 +17,19 @@ public class ActionEffect : ActionAnimation
 
 	private int _Priority;
 
-	private float ECDOPLHOFOC;
+	private float _TimeScale;
 
-	private bool INFAGPDFGNL;
+	private bool _Looped;
 
-	private bool EDNLDFKKLGL;
+	private bool _OnBackground;
 
-	private DistancePoint LEPIOCGGDIC = new DistancePoint();
+	private DistancePoint _Position = new DistancePoint();
 
-	private bool EMPMLDKGEEG;
+	private bool _IsFollowObject;
 
 	private int _StopFollowFrame;
 
-	private DistanceVector GOPEDNFNPJF = new DistanceVector();
+	private DistanceVector _Vector = new DistanceVector();
 
 	public EffectAttachment Attachment { get; private set; }
 
@@ -37,55 +37,55 @@ public class ActionEffect : ActionAnimation
 	{
 		get
 		{
-			return EPDMGFELIMC();
+			return GetSequence();
 		}
 	}
 
-	public float FOAHMAOBFEA
+	public float Scale
 	{
 		get
 		{
-			return JKEBPLCOOID();
+			return GetScale();
 		}
 	}
 
-	public float PJLNOLDINHA
+	public float TimeScale
 	{
 		get
 		{
-			return EHJCPFIELAN();
+			return GetTimeScale();
 		}
 	}
 
-	public bool LBGCFNKKJJL
+	public bool IsLooped
 	{
 		get
 		{
-			return NCEKKNIMHAG();
+			return GetIsLooped();
 		}
 	}
 
-	public bool FGBGEHKFACJ
+	public bool IsOnBackground
 	{
 		get
 		{
-			return JNAALMFCPCN();
+			return GetIsOnBackground();
 		}
 	}
 
-	public DistancePoint JJCKADKCDIF
+	public DistancePoint Position
 	{
 		get
 		{
-			return ECJPLFFAMJO();
+			return GetPosition();
 		}
 	}
 
-	public bool FFPAFCIMFNB
+	public bool FollowObject
 	{
 		get
 		{
-			return DIGCODDLDAD();
+			return GetIsFollowObject();
 		}
 		set
 		{
@@ -93,16 +93,16 @@ public class ActionEffect : ActionAnimation
 		}
 	}
 
-	public DistanceVector PILEOJJHOOB
+	public DistanceVector DistanceInfo
 	{
 		get
 		{
-			return MABFDDNEOGO();
+			return GetVector();
 		}
 	}
 
 	public ActionEffect(XmlNode node)
-		: base(FADAJCEEKIO.EFFECT)
+		: base(ActionType.EFFECT)
 	{
 		Parse(node);
 	}
@@ -112,14 +112,14 @@ public class ActionEffect : ActionAnimation
 		return _Name;
 	}
 
-	public string EPDMGFELIMC()
+	public string GetSequence()
 	{
-		return KHHJNHKEHPM;
+		return _Sequence;
 	}
 
-	public float JKEBPLCOOID()
+	public float GetScale()
 	{
-		return BPGEHHFLEOM;
+		return _Scale;
 	}
 
 	public float GetScaleX()
@@ -142,76 +142,76 @@ public class ActionEffect : ActionAnimation
 		return _Priority;
 	}
 
-	public float EHJCPFIELAN()
+	public float GetTimeScale()
 	{
-		return ECDOPLHOFOC;
+		return _TimeScale;
 	}
 
-	public bool NCEKKNIMHAG()
+	public bool GetIsLooped()
 	{
-		return INFAGPDFGNL;
+		return _Looped;
 	}
 
-	public bool JNAALMFCPCN()
+	public bool GetIsOnBackground()
 	{
-		return EDNLDFKKLGL;
+		return _OnBackground;
 	}
 
-	public DistancePoint ECJPLFFAMJO()
+	public DistancePoint GetPosition()
 	{
-		return LEPIOCGGDIC;
+		return _Position;
 	}
 
-	public bool DIGCODDLDAD()
+	public bool GetIsFollowObject()
 	{
-		return EMPMLDKGEEG;
+		return _IsFollowObject;
 	}
 
 	public void set_IsFollowObject(bool value)
 	{
-		EMPMLDKGEEG = value;
+		_IsFollowObject = value;
 	}
 
-	public DistanceVector MABFDDNEOGO()
+	public DistanceVector GetVector()
 	{
-		return GOPEDNFNPJF;
+		return _Vector;
 	}
 
 	public override void Visit(Model ACENLMONNPA)
 	{
-		ACENLMONNPA.OPPIKLBKMPN(this);
+		ACENLMONNPA.StartAction(this);
 	}
 
-	public void KJHPCLOFDJB(ModelObject OECPEDPMKCD, bool EKBOGDKIHIH, ModelNode AECCPADGGPG, bool PHADJMAONJG, ModelObject MJCGOJBGFIE = null)
+	public void UpdateNodes(ModelObject OECPEDPMKCD, bool EKBOGDKIHIH, ModelNode AECCPADGGPG, bool PHADJMAONJG, ModelObject MJCGOJBGFIE = null)
 	{
-		LEPIOCGGDIC.UpdateNode(OECPEDPMKCD, EKBOGDKIHIH, AECCPADGGPG, PHADJMAONJG, MJCGOJBGFIE);
-		GOPEDNFNPJF.KJHPCLOFDJB(OECPEDPMKCD, EKBOGDKIHIH, AECCPADGGPG, PHADJMAONJG, MJCGOJBGFIE);
+		_Position.UpdateNode(OECPEDPMKCD, EKBOGDKIHIH, AECCPADGGPG, PHADJMAONJG, MJCGOJBGFIE);
+		_Vector.UpdateNodes(OECPEDPMKCD, EKBOGDKIHIH, AECCPADGGPG, PHADJMAONJG, MJCGOJBGFIE);
 	}
 
-	public void MGCNPBCBMHB()
+	public void ResetNodes()
 	{
-		LEPIOCGGDIC.GPGKANDFLNB();
-		GOPEDNFNPJF.JKDMJGNOKCA();
+		_Position.ClearChildPoints();
+		_Vector.ClearChildPoints();
 	}
 
 	protected override void Parse(XmlNode node)
 	{
 		base.Parse(node);
-		_Name = node.Attributes["Name"].CIPOICEEIBK(string.Empty);
-		KHHJNHKEHPM = node.Attributes["Sequence"].CIPOICEEIBK(string.Empty);
-		BPGEHHFLEOM = node.Attributes["Scale"].ParseFloat(1f);
-		_ScaleX = node.Attributes["ScaleX"].ParseFloat(BPGEHHFLEOM);
-		_ScaleY = node.Attributes["ScaleY"].ParseFloat(BPGEHHFLEOM);
+		_Name = node.Attributes["Name"].GetStringOrDefault(string.Empty);
+		_Sequence = node.Attributes["Sequence"].GetStringOrDefault(string.Empty);
+		_Scale = node.Attributes["Scale"].ParseFloat(1f);
+		_ScaleX = node.Attributes["ScaleX"].ParseFloat(_Scale);
+		_ScaleY = node.Attributes["ScaleY"].ParseFloat(_Scale);
 		_StartRotation = node.Attributes["StartRotation"].ParseFloat();
-		ECDOPLHOFOC = node.Attributes["TimeScale"].ParseFloat(1f);
-		INFAGPDFGNL = node.Attributes["Looped"].ParseBool();
-		EDNLDFKKLGL = node.Attributes["OnBackground"].ParseBool();
-		_Priority = node.Attributes["Priority"].ParseInt(EDNLDFKKLGL ? -10 : 0);
+		_TimeScale = node.Attributes["TimeScale"].ParseFloat(1f);
+		_Looped = node.Attributes["Looped"].ParseBool();
+		_OnBackground = node.Attributes["OnBackground"].ParseBool();
+		_Priority = node.Attributes["Priority"].ParseInt(_OnBackground ? -10 : 0);
 		XmlNode xmlNode = node["Position"];
 		if (xmlNode != null)
 		{
-			LEPIOCGGDIC.Create(xmlNode);
-			EMPMLDKGEEG = xmlNode.Attributes["Follow"].ParseBool();
+			_Position.Create(xmlNode);
+			_IsFollowObject = xmlNode.Attributes["Follow"].ParseBool();
 			_StopFollowFrame = xmlNode.Attributes["StopFollowframe"].ParseInt(-1);
 		}
 		else
@@ -223,13 +223,13 @@ public class ActionEffect : ActionAnimation
 		XmlNode xmlNode2 = node["Vector"];
 		if (xmlNode2 != null)
 		{
-			GOPEDNFNPJF.Parse(xmlNode2);
+			_Vector.Parse(xmlNode2);
 		}
 		XmlNode attachment = node["Attach"];
 		if (attachment != null)
 		{
 			Attachment = new EffectAttachment(attachment);
-			EMPMLDKGEEG = true;
+			_IsFollowObject = true;
 		}
 	}
 }

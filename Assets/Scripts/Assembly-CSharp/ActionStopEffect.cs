@@ -5,7 +5,7 @@ public class ActionStopEffect : ActionAnimation
 	private string _Name;
 
 	public ActionStopEffect(XmlNode node)
-		: base(FADAJCEEKIO.STOP_EFFECT)
+		: base(ActionType.STOP_EFFECT)
 	{
 		Parse(node);
 	}
@@ -17,12 +17,12 @@ public class ActionStopEffect : ActionAnimation
 
 	public override void Visit(Model ACENLMONNPA)
 	{
-		ACENLMONNPA.OPPIKLBKMPN(this);
+		ACENLMONNPA.StartAction(this);
 	}
 
 	protected override void Parse(XmlNode node)
 	{
 		base.Parse(node);
-		_Name = node.Attributes["Name"].CIPOICEEIBK(string.Empty);
+		_Name = node.Attributes["Name"].GetStringOrDefault(string.Empty);
 	}
 }

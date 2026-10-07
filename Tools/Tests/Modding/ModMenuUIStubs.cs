@@ -17,10 +17,10 @@ namespace Nekki.SF2.GUI.Menu
     public class MainMenu : MonoBehaviour { public MenuScroll Scroll; }
     public class MenuScroll : MonoBehaviour
     {
-        public enum ANJKEGGALAG { ScrollOpen, ScrollClose }
-        public ANJKEGGALAG CurScrollState;
+        public enum ScrollState { ScrollOpen, ScrollClose }
+        public ScrollState CurScrollState;
     }
 }
 public static class SF2MotionBlur { public static void EnsureOnMainCamera() { } }
 
-public static class Sound { public static void FAJONFGJBPD() { } public static void GKMINHHAMAK() { } }
+public static class Sound { public static void FAJONFGJBPD() { } public static void StopAllSounds() { } }

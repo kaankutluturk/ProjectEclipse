@@ -4,17 +4,17 @@ using System.Linq;
 
 public sealed class ReadableAndWritablePropertiesTypeInspector : TypeInspectorSkeleton
 {
-	private readonly ITypeInspector DIGADLIMNPD;
+	private readonly ITypeInspector innerTypeDescriptor;
 
 	public ReadableAndWritablePropertiesTypeInspector(ITypeInspector CECGLIIIJJH)
 	{
-		DIGADLIMNPD = CECGLIIIJJH;
+		innerTypeDescriptor = CECGLIIIJJH;
 	}
 
-	public override IEnumerable<IPropertyDescriptor> GHIBHNJKIHN(Type LFLGCDNKNJI, object EGJHGBCEPHO)
+	public override IEnumerable<IPropertyDescriptor> GetProperties(Type LFLGCDNKNJI, object EGJHGBCEPHO)
 	{
-		return from PIIEECCHMAC in DIGADLIMNPD.GHIBHNJKIHN(LFLGCDNKNJI, EGJHGBCEPHO)
-			where PIIEECCHMAC.HHHGHBBDMHC()
+		return from PIIEECCHMAC in innerTypeDescriptor.GetProperties(LFLGCDNKNJI, EGJHGBCEPHO)
+			where PIIEECCHMAC.GetCanWrite()
 			select PIIEECCHMAC;
 	}
 }

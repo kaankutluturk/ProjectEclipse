@@ -5,7 +5,7 @@ public sealed class EnumMemberAttribute : Attribute
 {
 	private string value;
 
-	public string OEAKCOHMIHH()
+	public string GetValue()
 	{
 		return value;
 	}

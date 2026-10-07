@@ -7,19 +7,19 @@ namespace Nekki.SF2.GUI.Shop
 {
 	public class PerksPanel : MonoBehaviour
 	{
-		public class KLDEKKBHMNL : UnityEvent<PerkInfoItem, Vector2, Vector2, GameObject>
+		public class PerkClickEvent : UnityEvent<PerkInfoItem, Vector2, Vector2, GameObject>
 		{
 		}
 
-		public KLDEKKBHMNL onPerksClick = new KLDEKKBHMNL();
+		public PerkClickEvent onPerksClick = new PerkClickEvent();
 
-		protected string LMABGLLMHKH = "Enchantments.";
+		protected string iconAtlasPrefix = "Enchantments.";
 
-		protected Vector2 PDMOLDKOACF = new Vector2(0f, -25f);
+		protected Vector2 hintOffset = new Vector2(0f, -25f);
 
-		private RectTransform IOAEAJAEOFK;
+		private RectTransform _rectTransform;
 
-		public RectTransform DIBDBBCPEGN
+		public RectTransform PanelRect
 		{
 			get
 			{
@@ -29,11 +29,11 @@ namespace Nekki.SF2.GUI.Shop
 
 		public RectTransform get_RectTransform()
 		{
-			if (IOAEAJAEOFK == null)
+			if (_rectTransform == null)
 			{
-				IOAEAJAEOFK = base.transform as RectTransform;
+				_rectTransform = base.transform as RectTransform;
 			}
-			return IOAEAJAEOFK;
+			return _rectTransform;
 		}
 
 		public virtual void Clear()
@@ -59,7 +59,7 @@ namespace Nekki.SF2.GUI.Shop
 
 		public void CreatePerkItem(PerkInfoItem CBINHDDCIEA)
 		{
-			if (CBINHDDCIEA != null && CBINHDDCIEA.NHKMCLPOMFK != null && !CBINHDDCIEA.NHKMCLPOMFK.Equals(string.Empty))
+			if (CBINHDDCIEA != null && CBINHDDCIEA.ImageName != null && !CBINHDDCIEA.ImageName.Equals(string.Empty))
 			{
 				GameObject AOMLCBHAJJH = new GameObject(CBINHDDCIEA.Name);
 				ResolutionImage resolutionImage = AOMLCBHAJJH.AddComponent<ResolutionImage>();
@@ -69,10 +69,10 @@ namespace Nekki.SF2.GUI.Shop
 				touchHandler.get_OnTouch().AddListener(() =>
 				{
 					Vector3 position = AOMLCBHAJJH.transform.position;
-					onPerksClick.Invoke(CBINHDDCIEA, position, PDMOLDKOACF, AOMLCBHAJJH);
+					onPerksClick.Invoke(CBINHDDCIEA, position, hintOffset, AOMLCBHAJJH);
 				});
-					string icon = CBINHDDCIEA.NHKMCLPOMFK;
-					resolutionImage.set_SpriteName((icon.IndexOf(':') > 0) ? icon : (LMABGLLMHKH + icon));
+					string icon = CBINHDDCIEA.ImageName;
+					resolutionImage.set_SpriteName((icon.IndexOf(':') > 0) ? icon : (iconAtlasPrefix + icon));
 				layoutElement.minHeight = resolutionImage.rectTransform.rect.height;
 				layoutElement.minWidth = resolutionImage.rectTransform.rect.width;
 				AOMLCBHAJJH.transform.SetParent(base.gameObject.transform, false);

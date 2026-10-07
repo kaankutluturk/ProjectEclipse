@@ -11,27 +11,27 @@ $stagePatterns = @(
     '(?ms)^    internal System.Action ReplaceFormRegistration\(.*?^    \}',
     '(?ms)^    internal PerkModelStruct PrepareModelRegistration\(.*?^    \}',
     '(?ms)^    internal void RequireFormReferencesTransferred\(.*?^    \}',
-    '(?ms)^\tpublic static void HKMMGCLNJCN\(.*?^\t\}',
-    '(?ms)^\tpublic static void AEMBNMFGDBN\(.*?^\t\}',
-    '(?ms)^\tpublic static void EHFKNCOOCAA\(.*?^\t\}',
+    '(?ms)^\tpublic static void RegisterNamespaceAction\(.*?^\t\}',
+    '(?ms)^\tpublic static void UnregisterNamespaceAction\(.*?^\t\}',
+    '(?ms)^\tpublic static void ClearNamespaceActions\(.*?^\t\}',
     '(?ms)^\tpublic static bool CheckModNameInNamespace\(.*?^\t\}',
-    '(?ms)^\tpublic static ActionPerk AFAGHKFHHIF\(.*?^\t\}',
-    '(?ms)^\tpublic static List<ActionPerk> DOAECFNPKIO\(.*?^\t\}',
-    '(?ms)^\tpublic void CLBPEANCNOA\(.*?^\t\}'
+    '(?ms)^\tpublic static ActionPerk FindNamespaceAction\(.*?^\t\}',
+    '(?ms)^\tpublic static List<ActionPerk> GetNamespaceActions\(.*?^\t\}',
+    '(?ms)^\tpublic void AddExpiredAction\(.*?^\t\}'
 )
 $infoPatterns = @(
-    '(?ms)^\tpublic List<PerksStage.ActionPerk> MNLNLKOJPHO\(.*?^\t\}',
-    '(?ms)^\tpublic List<PerksStage.ActionPerk> HIPOGANEPMI\(.*?^\t\}',
-    '(?ms)^\tpublic List<string> BFKDLIMHGFA\(.*?^\t\}',
-    '(?ms)^\tpublic List<string> BKIMFEIMHCF\(.*?^\t\}',
+    '(?ms)^\tpublic List<PerksStage.ActionPerk> GetPendingActions\(.*?^\t\}',
+    '(?ms)^\tpublic List<PerksStage.ActionPerk> GetActiveActions\(.*?^\t\}',
+    '(?ms)^\tpublic List<string> GetActiveActionNames\(.*?^\t\}',
+    '(?ms)^\tpublic List<string> GetExpiredModNames\(.*?^\t\}',
     '(?ms)^\tpublic void Run\(.*?^\t\}',
-    '(?ms)^\tpublic void MHHNIPBJNAD\(.*?^\t\}',
+    '(?ms)^\tpublic void ExecuteActions\(.*?^\t\}',
     '(?ms)^\tpublic void Render\(.*?^\t\}',
-    '(?ms)^\tprivate void CAIPNAAJICO\(.*?^\t\}',
+    '(?ms)^\tprivate void ApplyHealthChangeTick\(.*?^\t\}',
     '(?ms)^\tpublic void ClearActions\(.*?^\t\}',
-    '(?ms)^\tprivate void ACKKGAAPLDG\(.*?^\t\}',
-    '(?ms)^\tprivate void BBEMBELMEGP\(.*?^\t\}',
-    '(?ms)^\tprivate void KKODDGMCDBC\(.*?^\t\}'
+    '(?ms)^\tprivate void ExpireAction\(.*?^\t\}',
+    '(?ms)^\tprivate void RemoveActiveAction\(.*?^\t\}',
+    '(?ms)^\tprivate void ApplyVariable\(.*?^\t\}'
 )
 function Extract-Methods([string]$source, [string[]]$patterns) {
     $methods = foreach ($pattern in $patterns) {

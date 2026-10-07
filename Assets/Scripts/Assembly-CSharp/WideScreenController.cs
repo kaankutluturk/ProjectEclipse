@@ -31,7 +31,7 @@ public class WideScreenController : MonoBehaviour
         if (capped)
         {
             transform.SetAsLastSibling();
-            BEDKFGIICFL(contentWidth);
+            PositionBorders(contentWidth);
         }
         for (int i = 0; i < parent.childCount; i++)
         {
@@ -49,7 +49,7 @@ public class WideScreenController : MonoBehaviour
         }
     }
 
-	private void BEDKFGIICFL(float DJFFDCFCNJM)
+	private void PositionBorders(float DJFFDCFCNJM)
 	{
 		float num = DJFFDCFCNJM / 2f;
 		Vector3 localPosition = _LeftBorder.transform.localPosition;

@@ -2,24 +2,24 @@ using System.Xml;
 
 public class QuestActionDeliver : QuestAction
 {
-	private string DLKPBAJDHBO;
+	private string itemExpression;
 
-	private string KEHBCHJDCND;
+	private string enchantmentExpression;
 
 	public override void Parse(XmlNode EPKLCPOEELO)
 	{
 		base.Parse(EPKLCPOEELO);
-		DLKPBAJDHBO = EPKLCPOEELO.Attributes["Item"].CIPOICEEIBK(string.Empty);
-		KEHBCHJDCND = EPKLCPOEELO.Attributes["Enchantment"].CIPOICEEIBK(string.Empty);
+		itemExpression = EPKLCPOEELO.Attributes["Item"].GetStringOrDefault(string.Empty);
+		enchantmentExpression = EPKLCPOEELO.Attributes["Enchantment"].GetStringOrDefault(string.Empty);
 	}
 
-	public override void DEJMHFMLKIC(QuestParameters GFIHPBCEEOB)
+	public override void Execute(QuestParameters GFIHPBCEEOB)
 	{
-		base.DEJMHFMLKIC(GFIHPBCEEOB);
+		base.Execute(GFIHPBCEEOB);
 		ConditionExtension.CompareResult lNIDLHOIHIM = new ConditionExtension.CompareResult();
 		QuestCondition kKDGLNECFHA = new QuestCondition();
-		kKDGLNECFHA.LIMHBJBEEIA(GFIHPBCEEOB);
-		kKDGLNECFHA.MCPIOGALBMK(DLKPBAJDHBO, lNIDLHOIHIM);
+		kKDGLNECFHA.SetParameters(GFIHPBCEEOB);
+		kKDGLNECFHA.SetValue(itemExpression, lNIDLHOIHIM);
 		string text = lNIDLHOIHIM.ToString();
 		if (!text.Equals("0"))
 		{
@@ -28,10 +28,10 @@ public class QuestActionDeliver : QuestAction
 		else
 		{
 			string empty = string.Empty;
-			kKDGLNECFHA.MCPIOGALBMK(KEHBCHJDCND, lNIDLHOIHIM);
+			kKDGLNECFHA.SetValue(enchantmentExpression, lNIDLHOIHIM);
 			empty = lNIDLHOIHIM.ToString();
-			GameUtils.PKMIJDBNNFK(empty);
+			GameUtils.TrackDelivery(empty);
 		}
-		OGIJONMKABB();
+		FinishAction();
 	}
 }

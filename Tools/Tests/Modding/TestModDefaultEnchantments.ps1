@@ -16,7 +16,7 @@ function Apply([string]$text) {
     return @{ Success=$success; Lifetime=$arguments[1]; Xml=$xml }
 }
 [xml]$base = '<Perk Name="fixture.default" PerkType="Single"/>'
-[void][GameUtils]::FDEJIIDIPBI.AddExternalBasePerk($base.DocumentElement)
+[void][GameUtils]::PerkItemList.AddExternalBasePerk($base.DocumentElement)
 $item = [ItemInfo]::new($null)
 $originalPreview = $item.DefaultEnchantmentPreviews
 $originalGrants = $item.DefaultEnchantments
@@ -48,14 +48,14 @@ Check ([object]::ReferenceEquals($originalGrants,$item.DefaultEnchantments)) 'Re
 $parameterized = Apply '<Enchantments><Perk Name="fixture.default"><Set Aspect="123"/></Perk></Enchantments>'
 Check $parameterized.Success 'Parameterized loadout rejected.'
 Check (($item.DefaultEnchantments[0].Pairs | Where-Object Key -eq 'Aspect').Value -eq '123') 'Acquisition parameters lost.'
-Check (![object]::ReferenceEquals($item.DefaultEnchantmentPreviews[0],[GameUtils]::FDEJIIDIPBI.ABAGJKMKCBA('fixture.default'))) 'Parameterized preview shares mutable core perk.'
+Check (![object]::ReferenceEquals($item.DefaultEnchantmentPreviews[0],[GameUtils]::PerkItemList.FindBasePerk('fixture.default'))) 'Parameterized preview shares mutable core perk.'
 $parameterized.Xml.DocumentElement.FirstChild.Set.SetAttribute('Aspect','999')
 Check (($item.DefaultEnchantments[0].Pairs | Where-Object Key -eq 'Aspect').Value -eq '123') 'Source parameter mutation leaked.'
 $parameterized.Lifetime.Dispose()
 $rows = [Collections.Generic.List[string]]::new()
 for ($index=0; $index -lt 65; $index++) {
     [xml]$definition = "<Perk Name='fixture.limit$index' PerkType='Single'/>"
-    [void][GameUtils]::FDEJIIDIPBI.AddExternalBasePerk($definition.DocumentElement)
+    [void][GameUtils]::PerkItemList.AddExternalBasePerk($definition.DocumentElement)
     $rows.Add("<Perk Name='fixture.limit$index'/>")
 }
 $bounded = Apply ('<Enchantments>' + ($rows.GetRange(0,64) -join '') + '</Enchantments>')
@@ -105,11 +105,11 @@ $emptyMods = [Eclipse.Modding.ModDescriptor[]]@()
 Check ([Eclipse.Modding.ModSaveData]::ComputeContentSetFingerprint($emptyMods,$content) -ne [Eclipse.Modding.ModSaveData]::ComputeContentSetFingerprint($emptyMods,$changed)) 'Default aspect missing from compatibility fingerprint.'
 $items = [Items]::new()
 $item.Name = 'fixture_weapon'
-$items.HCDLKHKBEPF().Add($item)
+$items.GetAllItems().Add($item)
 $adapter = [Eclipse.Modding.LegacyContentAdapter]::new($content)
 $adapter.ApplyItems($items)
 $forge = [ForgeManager]::new()
-$adapter.ApplyPerksAndEnchantments([GameUtils]::FDEJIIDIPBI,$forge)
+$adapter.ApplyPerksAndEnchantments([GameUtils]::PerkItemList,$forge)
 Check ($item.DefaultEnchantments.Count -eq 1 -and ($item.DefaultEnchantments[0].Pairs | Where-Object Key -eq 'Aspect').Value -eq '123') 'Committed loadout did not reach native defaults.'
 $remove = [Eclipse.Modding.LegacyContentAdapter].GetMethod('RemovePerksAndEnchantments',$flags)
 $null = $remove.Invoke($adapter,@())
@@ -117,10 +117,10 @@ Check ([object]::ReferenceEquals($originalGrants,$item.DefaultEnchantments)) 'Ad
 $broken = [Eclipse.Modding.LegacyContentAdapter]::new((Catalog $true))
 $broken.ApplyItems($items)
 $failure = $null
-try { $broken.ApplyPerksAndEnchantments([GameUtils]::FDEJIIDIPBI,$forge) } catch { $failure = $_ }
+try { $broken.ApplyPerksAndEnchantments([GameUtils]::PerkItemList,$forge) } catch { $failure = $_ }
 Check ($null -ne $failure -and $failure.ToString().Contains('fixture_absent')) 'Missing second item not rejected.'
 Check ([object]::ReferenceEquals($originalGrants,$item.DefaultEnchantments)) 'Later missing item did not restore earlier override.'
-$adapter.ApplyPerksAndEnchantments([GameUtils]::FDEJIIDIPBI,$forge)
+$adapter.ApplyPerksAndEnchantments([GameUtils]::PerkItemList,$forge)
 Check ($item.DefaultEnchantments.Count -eq 1) 'Failed adapter poisoned later application.'
 $null = $remove.Invoke($adapter,@())
 Write-Output "PASS: $script:checks compiled default-enchantment registration/projection/rollback checks; no grant or rendering claim."

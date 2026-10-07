@@ -2,36 +2,36 @@ using System.Collections.Generic;
 
 public class Bezier
 {
-	private Vector3f MNMDLCKNLDJ = new Vector3f();
+	private Vector3f _firstMidPoint = new Vector3f();
 
-	private Vector3f GAHMKEODMPJ = new Vector3f();
+	private Vector3f _secondMidPoint = new Vector3f();
 
-	private float OKEMEKMBMPF;
+	private float _stepFactor;
 
-	private float PBLPKOLLBCL;
+	private float _secondDifference;
 
-	private float NJPFIIODEHP;
+	private float _differenceStep;
 
 	private int _count;
 
 	public Bezier(int count)
 	{
-		OKEMEKMBMPF = 1f / (float)count;
-		PBLPKOLLBCL = (0f - OKEMEKMBMPF) / (float)count;
-		NJPFIIODEHP = 0f - PBLPKOLLBCL - PBLPKOLLBCL;
+		_stepFactor = 1f / (float)count;
+		_secondDifference = (0f - _stepFactor) / (float)count;
+		_differenceStep = 0f - _secondDifference - _secondDifference;
 		_count = count;
-		OKEMEKMBMPF += OKEMEKMBMPF;
+		_stepFactor += _stepFactor;
 	}
 
-	private void JJJAPLECBOD(Vector3f HAEJICBDOKC, Vector3f MILMANCOCLK, Vector3f DMECFLFKOPA, int count, List<Vector3f> OEMALIFPGPO)
+	private void ComputeCurvePoints(Vector3f HAEJICBDOKC, Vector3f MILMANCOCLK, Vector3f DMECFLFKOPA, int count, List<Vector3f> OEMALIFPGPO)
 	{
-		float num = PBLPKOLLBCL;
+		float num = _secondDifference;
 		if (OEMALIFPGPO.Count != count)
 		{
-			OEMALIFPGPO.CPCAJIKOIEE(count);
+			OEMALIFPGPO.Resize(count);
 			for (int i = 0; i < count; i++)
 			{
-				if (Vector2f.LFPMCJPCJBD(OEMALIFPGPO[i], null))
+				if (Vector2f.op_Equality(OEMALIFPGPO[i], null))
 				{
 					OEMALIFPGPO[i] = new Vector3f();
 				}
@@ -42,9 +42,9 @@ public class Bezier
 		float num4 = 0f;
 		foreach (Vector3f item in OEMALIFPGPO)
 		{
-			num += NJPFIIODEHP;
-			num2 -= OKEMEKMBMPF - num;
-			num3 += OKEMEKMBMPF - num - num;
+			num += _differenceStep;
+			num2 -= _stepFactor - num;
+			num3 += _stepFactor - num - num;
 			num4 += num;
 			item.SetX(num2 * HAEJICBDOKC.GetX() + num3 * MILMANCOCLK.GetX() + num4 * DMECFLFKOPA.GetX());
 			item.SetY(num2 * HAEJICBDOKC.GetY() + num3 * MILMANCOCLK.GetY() + num4 * DMECFLFKOPA.GetY());
@@ -52,10 +52,10 @@ public class Bezier
 		}
 	}
 
-	public void CFCFNHONDML(Vector3f MLGFPMDKOHD, Vector3f DMMNCDKPCCI, Vector3f PIBOFKAMIDL, List<Vector3f> OEMALIFPGPO)
+	public void BuildCurve(Vector3f MLGFPMDKOHD, Vector3f DMMNCDKPCCI, Vector3f PIBOFKAMIDL, List<Vector3f> OEMALIFPGPO)
 	{
-		MNMDLCKNLDJ.SetMiddlePoint3D(MLGFPMDKOHD, DMMNCDKPCCI);
-		GAHMKEODMPJ.SetMiddlePoint3D(DMMNCDKPCCI, PIBOFKAMIDL);
-		JJJAPLECBOD(MNMDLCKNLDJ, DMMNCDKPCCI, GAHMKEODMPJ, _count, OEMALIFPGPO);
+		_firstMidPoint.SetMiddlePoint3D(MLGFPMDKOHD, DMMNCDKPCCI);
+		_secondMidPoint.SetMiddlePoint3D(DMMNCDKPCCI, PIBOFKAMIDL);
+		ComputeCurvePoints(_firstMidPoint, DMMNCDKPCCI, _secondMidPoint, _count, OEMALIFPGPO);
 	}
 }

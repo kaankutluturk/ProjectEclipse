@@ -2,18 +2,18 @@ using System.Xml;
 
 public static class GameLoader
 {
-	private const int KPPOOEGPPJA = 10;
+	private const int MaxPlayableSounds = 10;
 
-	public static void EIBJELAJHCH()
+	public static void LoadSettings()
 	{
-		GameSettings.IFBKAJPILOI();
-		GameSettings.IIGOJINCIIF();
-		GameSettings.AMOMFPOENBF();
+		GameSettings.InitUserDataValidation();
+		GameSettings.CheckVersions();
+		GameSettings.InitVersion();
 	}
 
-	public static void BFGENGJPCCN()
+	public static void PreloadArmorSound()
 	{
-		Sound.IFKCCDAIADF("snd_armor", 0f);
+		Sound.PlaySound("snd_armor", 0f);
 	}
 
 	public static void SetSound(uint BELCFJOLEMF)
@@ -25,29 +25,29 @@ public static class GameLoader
 	{
 		Sound.Init();
 		SetSound(10u);
-		BFGENGJPCCN();
+		PreloadArmorSound();
 	}
 
-	public static void BJLLJHDFMOO()
+	public static void LoadAnimations()
 	{
-		AnimationData.Load(SF2Paths.MCFPDHOLNGB(), SystemProperties.DBBOCENKMGD());
+		AnimationData.Load(SF2Paths.GetAnimationsPath(), SystemProperties.IsDebug());
 	}
 
-	public static void POLKDKOOACO()
+	public static void LoadAi()
 	{
 		AiData.Load();
 	}
 
 	public static void SetVersion(string APFECPFKMMH)
 	{
-		XmlDocument xmlDocument = XmlUtils.AIFIAKNJMHG(SF2Paths.GetUserDataDirectory(), Constants.OJMIJINKBPJ);
+		XmlDocument xmlDocument = XmlUtils.LoadDocumentWithHashCheck(SF2Paths.GetUserDataDirectory(), Constants.UsersFileName);
 		if (xmlDocument != null)
 		{
 			xmlDocument["Root"]["Versions"]["Version"].SetAttribute("Value", APFECPFKMMH);
-			string kPFELJFPGHJ = string.Format("{0}/{1}", SF2Paths.GetUserDataDirectory(), Constants.OJMIJINKBPJ);
-			string kPFELJFPGHJ2 = string.Format("{0}/{1}", SF2Paths.GetUserDataDirectory(), Constants.GHKPPHAAMBL);
-			XmlUtils.ONLDJNLKKAL(xmlDocument, kPFELJFPGHJ);
-			XmlUtils.ONLDJNLKKAL(xmlDocument, kPFELJFPGHJ2);
+			string kPFELJFPGHJ = string.Format("{0}/{1}", SF2Paths.GetUserDataDirectory(), Constants.UsersFileName);
+			string kPFELJFPGHJ2 = string.Format("{0}/{1}", SF2Paths.GetUserDataDirectory(), Constants.UsersBackupFileName);
+			XmlUtils.SaveDocumentWithHash(xmlDocument, kPFELJFPGHJ);
+			XmlUtils.SaveDocumentWithHash(xmlDocument, kPFELJFPGHJ2);
 		}
 	}
 }

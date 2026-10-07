@@ -68,7 +68,7 @@ namespace Eclipse.Modding
             if (_content.LocaleMetadata.Count != 0)
             {
                 // Validate before stages, quests, and save-bound state are initialized.
-                XmlDocument localization = XmlUtils.OpenXMLDocument(SF2Paths.KKIDGPBOBNI(), "localization.xml");
+                XmlDocument localization = XmlUtils.OpenXMLDocument(SF2Paths.GetGameDataPath(), "localization.xml");
                 ExternalLocaleRuntime.ValidateBaseLanguages(localization?["Localization"]?["Languages"]);
             }
         }

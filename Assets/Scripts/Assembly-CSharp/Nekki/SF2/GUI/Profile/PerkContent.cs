@@ -5,23 +5,23 @@ namespace Nekki.SF2.GUI.Profile
 {
 	public class PerkContent : Content
 	{
-		public enum NIFHEMGLNKI
+		public enum PerkContentLayer
 		{
 			zText = 0,
 			zIcon = 1
 		}
 
-		private const int BFGKMIDOEFC = 88;
+		private const int HEADER_FONT_SIZE = 88;
 
-		private const int CKJIDMCICGK = 70;
+		private const int TEXT_FONT_SIZE = 70;
 
-		private const int KLHCBMNAGGC = 104;
+		private const int IMPROVE_LABEL_FONT_SIZE = 104;
 
-		private const float OAKHGJGOGHE = -294f;
+		private const float IMPROVE_BUTTON_Y = -294f;
 
-		private const float POHALNJGPLL = -294f;
+		private const float IMPROVE_LABEL_Y = -294f;
 
-		private const int BIOPJCPBOCK = 110;
+		private const int KEY_ICON_SPACING = 110;
 
 		[SerializeField]
 		private GameObject _keys;
@@ -35,49 +35,49 @@ namespace Nekki.SF2.GUI.Profile
 		[SerializeField]
 		private LabelAlias _lblImprove;
 
-		private Action<object> FNOECGMEKGL;
+		private Action<object> improveCallback;
 
-		private InfoAnimation BJONHDGCNFE;
+		private InfoAnimation infoAnimation;
 
 		private string _text;
 
-		private string ADDKGJGCBMB;
+		private string improveButtonAlias;
 
-		private string CBCBPBGPCCA;
+		private string improveLabelAlias;
 
-		private ProfilePerk.KMHBPKKCNPP MAFFNGPOMJD;
+		private ProfilePerk.ProfilePerkState perkState;
 
-		private bool OBGMJMBNMME;
+		private bool hasUpBorder;
 
-		private float ECCMHGEEFLE;
+		private float upBorder;
 
-		private float GEFOLNHPJMI;
+		private float textWidth;
 
 		private void Start()
 		{
-			_btnImprove.onClick.AddListener(KNDBFAFPBPK);
+			_btnImprove.onClick.AddListener(OnImproveClicked);
 		}
 
-		public void Init(string HCPNFPMHFCM, ProfilePerk.KMHBPKKCNPP state, Action<object> ODDEOFKLIAG = null, InfoAnimation HCBDNEOKGNK = null, float JMLAKAKDBBL = -1f)
+		public void Init(string HCPNFPMHFCM, ProfilePerk.ProfilePerkState state, Action<object> ODDEOFKLIAG = null, InfoAnimation HCBDNEOKGNK = null, float JMLAKAKDBBL = -1f)
 		{
 			_text = HCPNFPMHFCM;
-			FNOECGMEKGL = ODDEOFKLIAG;
-			MAFFNGPOMJD = state;
-			GEFOLNHPJMI = JMLAKAKDBBL;
-			BJONHDGCNFE = HCBDNEOKGNK;
-			ADDKGJGCBMB = "profile_BtnImprove";
-			CBCBPBGPCCA = "profile_LblImprove";
+			improveCallback = ODDEOFKLIAG;
+			perkState = state;
+			textWidth = JMLAKAKDBBL;
+			infoAnimation = HCBDNEOKGNK;
+			improveButtonAlias = "profile_BtnImprove";
+			improveLabelAlias = "profile_LblImprove";
 			HeaderFontSize = 88;
-			PHKIJLEICHE();
-			DECAGHCLJJI();
-			AJNMAKEIDMH();
-			CPHNDCNNHOH();
+			InitImproveButton();
+			InitKeyIcons();
+			InitLabels();
+			LayoutLabels();
 		}
 
 		public override void SetUpBorder(float BGEEALIPKCC)
 		{
-			ECCMHGEEFLE = BGEEALIPKCC;
-			OBGMJMBNMME = true;
+			upBorder = BGEEALIPKCC;
+			hasUpBorder = true;
 		}
 
 		public LabelButton GetBtnImprove()
@@ -85,19 +85,19 @@ namespace Nekki.SF2.GUI.Profile
 			return _btnImprove;
 		}
 
-		private void AJNMAKEIDMH()
+		private void InitLabels()
 		{
-			_textLabel.color = Constants.PJJIMHMJPAL;
-			_textLabel.rectTransform.sizeDelta = new Vector2(GEFOLNHPJMI, _textLabel.rectTransform.rect.height);
+			_textLabel.color = Constants.DialogTextColor;
+			_textLabel.rectTransform.sizeDelta = new Vector2(textWidth, _textLabel.rectTransform.rect.height);
 			_textLabel.set_LabelFontSize(70);
 			_textLabel.set_Alias(_text);
-			_lblImprove.color = Constants.PJJIMHMJPAL;
+			_lblImprove.color = Constants.DialogTextColor;
 			_lblImprove.rectTransform.sizeDelta = new Vector2(GetComponent<RectTransform>().rect.width - 120f, _lblImprove.rectTransform.rect.height);
 			_lblImprove.set_LabelFontSize(104);
-			_lblImprove.set_Alias(CBCBPBGPCCA);
-			_lblImprove.transform.OKHPLHPBPKJ(0f);
-			_lblImprove.transform.BGNJGIACJBG(-294f);
-			if (MAFFNGPOMJD == ProfilePerk.KMHBPKKCNPP.PERK_SELECTED)
+			_lblImprove.set_Alias(improveLabelAlias);
+			_lblImprove.transform.SetLocalX(0f);
+			_lblImprove.transform.SetLocalY(-294f);
+			if (perkState == ProfilePerk.ProfilePerkState.PERK_SELECTED)
 			{
 				_lblImprove.gameObject.SetActive(true);
 			}
@@ -107,22 +107,22 @@ namespace Nekki.SF2.GUI.Profile
 			}
 		}
 
-		private void CPHNDCNNHOH()
+		private void LayoutLabels()
 		{
 			_textLabel.rectTransform.sizeDelta = new Vector2(GetComponent<RectTransform>().rect.width - 120f, _textLabel.rectTransform.rect.height);
 			_lblImprove.rectTransform.sizeDelta = new Vector2(GetComponent<RectTransform>().rect.width - 120f, _lblImprove.rectTransform.rect.height);
 			float bAINMLLIKOL = 0f;
-			if (OBGMJMBNMME)
+			if (hasUpBorder)
 			{
-				float eCCMHGEEFLE = ECCMHGEEFLE;
+				float eCCMHGEEFLE = upBorder;
 				float num = _btnImprove.transform.localPosition.y + _btnImprove.GetComponent<RectTransform>().rect.height / 2f;
 				bAINMLLIKOL = eCCMHGEEFLE - (eCCMHGEEFLE - num) / 2f;
 			}
-			_lblImprove.transform.OKHPLHPBPKJ(0f);
-			_lblImprove.transform.BGNJGIACJBG(-294f);
+			_lblImprove.transform.SetLocalX(0f);
+			_lblImprove.transform.SetLocalY(-294f);
 			if (_keys.gameObject.activeSelf)
 			{
-				_keys.transform.BGNJGIACJBG(bAINMLLIKOL);
+				_keys.transform.SetLocalY(bAINMLLIKOL);
 				_textLabel.gameObject.SetActive(false);
 			}
 			else
@@ -131,63 +131,63 @@ namespace Nekki.SF2.GUI.Profile
 			}
 		}
 
-		private void PHKIJLEICHE()
+		private void InitImproveButton()
 		{
 			_btnImprove.gameObject.SetActive(true);
-			_btnImprove.SetAlias(ADDKGJGCBMB);
-			if (MAFFNGPOMJD == ProfilePerk.KMHBPKKCNPP.PERK_LOCK || MAFFNGPOMJD == ProfilePerk.KMHBPKKCNPP.PERK_SELECTED || MAFFNGPOMJD == ProfilePerk.KMHBPKKCNPP.PERK_UNAVAILABLE)
+			_btnImprove.SetAlias(improveButtonAlias);
+			if (perkState == ProfilePerk.ProfilePerkState.PERK_LOCK || perkState == ProfilePerk.ProfilePerkState.PERK_SELECTED || perkState == ProfilePerk.ProfilePerkState.PERK_UNAVAILABLE)
 			{
 				_btnImprove.gameObject.SetActive(false);
 			}
-			_btnImprove.transform.OKHPLHPBPKJ(0f);
-			_btnImprove.transform.BGNJGIACJBG(-294f);
+			_btnImprove.transform.SetLocalX(0f);
+			_btnImprove.transform.SetLocalY(-294f);
 		}
 
-		private void DECAGHCLJJI()
+		private void InitKeyIcons()
 		{
 			foreach (Transform item in _keys.transform)
 			{
 				UnityEngine.Object.Destroy(item.gameObject);
 				_keys.gameObject.SetActive(false);
 			}
-			if (BJONHDGCNFE == null)
+			if (infoAnimation == null)
 			{
 				return;
 			}
 			_keys.gameObject.SetActive(true);
 			float num = 0f;
-			KeyData fONEJOKEIEN = BJONHDGCNFE.ILBCHANCOBP().RequiredKeys;
-			for (int i = 0; i < fONEJOKEIEN.CEPODJDDLBF.Count; i++)
+			KeyData fONEJOKEIEN = infoAnimation.GetFirstKeysCondition().RequiredKeys;
+			for (int i = 0; i < fONEJOKEIEN.AdditionalKeys.Count; i++)
 			{
-				ResolutionImage keyIcon = GetKeyIcon(fONEJOKEIEN.CEPODJDDLBF[i]);
+				ResolutionImage keyIcon = GetKeyIcon(fONEJOKEIEN.AdditionalKeys[i]);
 				if (keyIcon != null)
 				{
 					keyIcon.transform.SetParent(_keys.transform, false);
-					keyIcon.transform.OKHPLHPBPKJ(num);
+					keyIcon.transform.SetLocalX(num);
 					num += 110f;
 				}
 			}
-			if (fONEJOKEIEN.CEPODJDDLBF.Count > 0)
+			if (fONEJOKEIEN.AdditionalKeys.Count > 0)
 			{
 				GameObject gameObject = new GameObject("KeyIcon");
 				ResolutionImage resolutionImage = gameObject.AddComponent<ResolutionImage>();
 				resolutionImage.set_SpriteName("ComboButtons.icon_plus");
 				resolutionImage.SetNativeSize();
 				resolutionImage.transform.SetParent(_keys.transform, false);
-				resolutionImage.transform.OKHPLHPBPKJ(num);
+				resolutionImage.transform.SetLocalX(num);
 				num += 110f;
 			}
-			for (int j = 0; j < fONEJOKEIEN.IGEEOAGOMEM.Count; j++)
+			for (int j = 0; j < fONEJOKEIEN.StarterKeys.Count; j++)
 			{
-				ResolutionImage keyIcon2 = GetKeyIcon(fONEJOKEIEN.IGEEOAGOMEM[j]);
+				ResolutionImage keyIcon2 = GetKeyIcon(fONEJOKEIEN.StarterKeys[j]);
 				if (keyIcon2 != null)
 				{
 					keyIcon2.transform.SetParent(_keys.transform, false);
-					keyIcon2.transform.OKHPLHPBPKJ(num);
+					keyIcon2.transform.SetLocalX(num);
 					num += 110f;
 				}
 			}
-			_keys.transform.OKHPLHPBPKJ((0f - (num - 110f)) / 2f);
+			_keys.transform.SetLocalX((0f - (num - 110f)) / 2f);
 		}
 
 		public static ResolutionImage GetKeyIcon(int PONDIGKAALH)
@@ -235,7 +235,7 @@ namespace Nekki.SF2.GUI.Profile
 				num = 225f;
 				break;
 			default:
-				LLLOJBFMONN.Error("PerkContent::getKeyIcon - unknown type: %i", (FightCID)PONDIGKAALH);
+				GameLog.Error("PerkContent::getKeyIcon - unknown type: %i", (FightCID)PONDIGKAALH);
 				break;
 			}
 			GameObject gameObject = new GameObject("KeyIcon");
@@ -250,11 +250,11 @@ namespace Nekki.SF2.GUI.Profile
 			return resolutionImage;
 		}
 
-		private void KNDBFAFPBPK()
+		private void OnImproveClicked()
 		{
-			if (FNOECGMEKGL != null)
+			if (improveCallback != null)
 			{
-				FNOECGMEKGL(null);
+				improveCallback(null);
 			}
 		}
 	}

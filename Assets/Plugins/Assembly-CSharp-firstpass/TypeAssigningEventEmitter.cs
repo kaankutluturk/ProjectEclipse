@@ -3,24 +3,24 @@ using System.Globalization;
 
 public sealed class TypeAssigningEventEmitter : ChainedEventEmitter
 {
-	private readonly bool LMNFCJPEKHL;
+	private readonly bool requireTagWhenStaticAndActualTypesAreDifferent;
 
 	public TypeAssigningEventEmitter(IEventEmitter JDJEJDIJLLE, bool KAHOIHHBHGG)
 		: base(JDJEJDIJLLE)
 	{
-		LMNFCJPEKHL = KAHOIHHBHGG;
+		requireTagWhenStaticAndActualTypesAreDifferent = KAHOIHHBHGG;
 	}
 
 	public override void Emit(ScalarEventInfo FNHCFCAALAE)
 	{
-		FNHCFCAALAE.LBGFNDOAEED(true);
-		FNHCFCAALAE.KHFMMPCKMKE(IBEOFCPMMJJ.Plain);
-		TypeCode typeCode = ((FNHCFCAALAE.EHKMMGBHNDB().OEAKCOHMIHH() != null) ? FNHCFCAALAE.EHKMMGBHNDB().get_Type().GetTypeCode() : TypeCode.Empty);
+		FNHCFCAALAE.SetIsPlainImplicit(true);
+		FNHCFCAALAE.SetStyle(ScalarStyle.Plain);
+		TypeCode typeCode = ((FNHCFCAALAE.GetSource().GetValue() != null) ? FNHCFCAALAE.GetSource().get_Type().GetTypeCode() : TypeCode.Empty);
 		switch (typeCode)
 		{
 		case TypeCode.Boolean:
 			FNHCFCAALAE.set_Tag("tag:yaml.org,2002:bool");
-			FNHCFCAALAE.set_RenderedValue(YamlFormatter.NMBPLFHGICK(FNHCFCAALAE.EHKMMGBHNDB().OEAKCOHMIHH()));
+			FNHCFCAALAE.set_RenderedValue(YamlFormatter.FormatBool(FNHCFCAALAE.GetSource().GetValue()));
 			break;
 		case TypeCode.SByte:
 		case TypeCode.Byte:
@@ -31,32 +31,32 @@ public sealed class TypeAssigningEventEmitter : ChainedEventEmitter
 		case TypeCode.Int64:
 		case TypeCode.UInt64:
 			FNHCFCAALAE.set_Tag("tag:yaml.org,2002:int");
-			FNHCFCAALAE.set_RenderedValue(YamlFormatter.DGIAFODNLNN(FNHCFCAALAE.EHKMMGBHNDB().OEAKCOHMIHH()));
+			FNHCFCAALAE.set_RenderedValue(YamlFormatter.FormatNumber(FNHCFCAALAE.GetSource().GetValue()));
 			break;
 		case TypeCode.Single:
 		case TypeCode.Double:
 		case TypeCode.Decimal:
 			FNHCFCAALAE.set_Tag("tag:yaml.org,2002:float");
-			FNHCFCAALAE.set_RenderedValue(YamlFormatter.DGIAFODNLNN(FNHCFCAALAE.EHKMMGBHNDB().OEAKCOHMIHH()));
+			FNHCFCAALAE.set_RenderedValue(YamlFormatter.FormatNumber(FNHCFCAALAE.GetSource().GetValue()));
 			break;
 		case TypeCode.Char:
 		case TypeCode.String:
 			FNHCFCAALAE.set_Tag("tag:yaml.org,2002:str");
-			FNHCFCAALAE.set_RenderedValue(FNHCFCAALAE.EHKMMGBHNDB().OEAKCOHMIHH().ToString());
-			FNHCFCAALAE.KHFMMPCKMKE(IBEOFCPMMJJ.Any);
+			FNHCFCAALAE.set_RenderedValue(FNHCFCAALAE.GetSource().GetValue().ToString());
+			FNHCFCAALAE.SetStyle(ScalarStyle.Any);
 			break;
 		case TypeCode.DateTime:
 			FNHCFCAALAE.set_Tag("tag:yaml.org,2002:timestamp");
-			FNHCFCAALAE.set_RenderedValue(YamlFormatter.AHNEOKMPCPD(FNHCFCAALAE.EHKMMGBHNDB().OEAKCOHMIHH()));
+			FNHCFCAALAE.set_RenderedValue(YamlFormatter.FormatDateTime(FNHCFCAALAE.GetSource().GetValue()));
 			break;
 		case TypeCode.Empty:
 			FNHCFCAALAE.set_Tag("tag:yaml.org,2002:null");
 			FNHCFCAALAE.set_RenderedValue(string.Empty);
 			break;
 		default:
-			if (FNHCFCAALAE.EHKMMGBHNDB().get_Type() == typeof(TimeSpan))
+			if (FNHCFCAALAE.GetSource().get_Type() == typeof(TimeSpan))
 			{
-				FNHCFCAALAE.set_RenderedValue(YamlFormatter.ALEIMPLLAHI(FNHCFCAALAE.EHKMMGBHNDB().OEAKCOHMIHH()));
+				FNHCFCAALAE.set_RenderedValue(YamlFormatter.FormatTimeSpan(FNHCFCAALAE.GetSource().GetValue()));
 				break;
 			}
 			throw new NotSupportedException(string.Format(CultureInfo.InvariantCulture, "TypeCode.{0} is not supported.", typeCode));
@@ -64,23 +64,23 @@ public sealed class TypeAssigningEventEmitter : ChainedEventEmitter
 		base.Emit(FNHCFCAALAE);
 	}
 
-	public override void Emit(LPADMPIAIPF FNHCFCAALAE)
+	public override void Emit(MappingStartEventInfo FNHCFCAALAE)
 	{
-		FJKGHHMPMHH(FNHCFCAALAE);
+		AssignTypeIfDifferent(FNHCFCAALAE);
 		base.Emit(FNHCFCAALAE);
 	}
 
-	public override void Emit(PBGMOJFHMGI FNHCFCAALAE)
+	public override void Emit(SequenceStartEventInfo FNHCFCAALAE)
 	{
-		FJKGHHMPMHH(FNHCFCAALAE);
+		AssignTypeIfDifferent(FNHCFCAALAE);
 		base.Emit(FNHCFCAALAE);
 	}
 
-	private void FJKGHHMPMHH(ObjectEventInfo FNHCFCAALAE)
+	private void AssignTypeIfDifferent(ObjectEventInfo FNHCFCAALAE)
 	{
-		if (LMNFCJPEKHL && FNHCFCAALAE.EHKMMGBHNDB().OEAKCOHMIHH() != null && FNHCFCAALAE.EHKMMGBHNDB().get_Type() != FNHCFCAALAE.EHKMMGBHNDB().HEOINHLCBOO())
+		if (requireTagWhenStaticAndActualTypesAreDifferent && FNHCFCAALAE.GetSource().GetValue() != null && FNHCFCAALAE.GetSource().get_Type() != FNHCFCAALAE.GetSource().GetStaticType())
 		{
-			FNHCFCAALAE.set_Tag("!" + FNHCFCAALAE.EHKMMGBHNDB().get_Type().AssemblyQualifiedName);
+			FNHCFCAALAE.set_Tag("!" + FNHCFCAALAE.GetSource().get_Type().AssemblyQualifiedName);
 		}
 	}
 }

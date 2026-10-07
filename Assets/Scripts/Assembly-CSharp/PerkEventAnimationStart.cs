@@ -5,7 +5,7 @@ using System.Xml;
 public class PerkEventAnimationStart : PerkEvent
 {
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private string HKGHEJDKCPI;
+	private string _name;
 
 	public PerkEventAnimationStart()
 	{
@@ -19,18 +19,18 @@ public class PerkEventAnimationStart : PerkEvent
 
 	public string get_Name()
 	{
-		return HKGHEJDKCPI;
+		return _name;
 	}
 
 	protected void set_Name(string value)
 	{
-		HKGHEJDKCPI = value;
+		_name = value;
 	}
 
 	public override void Parse(XmlNode node)
 	{
 		base.Parse(node);
-		set_Name(node.Attributes["Name"].CIPOICEEIBK(string.Empty));
+		set_Name(node.Attributes["Name"].GetStringOrDefault(string.Empty));
 	}
 
 	public override bool IsEqual(EventStruct EJMEALJNNIL)
@@ -41,7 +41,7 @@ public class PerkEventAnimationStart : PerkEvent
 		}
 		Dictionary<string, object> dictionary = (Dictionary<string, object>)EJMEALJNNIL.Info;
 		InfoAnimation pJAHIOELGGD = ((!dictionary.ContainsKey("Animation")) ? null : ((InfoAnimation)dictionary["Animation"]));
-		if (get_Name() != string.Empty && (pJAHIOELGGD == null || !pJAHIOELGGD.CNPFHBMGDFP(get_Name())))
+		if (get_Name() != string.Empty && (pJAHIOELGGD == null || !pJAHIOELGGD.HasName(get_Name())))
 		{
 			return false;
 		}

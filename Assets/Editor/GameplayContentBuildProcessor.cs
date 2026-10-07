@@ -66,9 +66,9 @@ public sealed class GameplayContentBuildProcessor : IPreprocessBuildWithReport
         int callbacks = 0;
         var request = new HTTPRequest(new Uri("https://example.invalid/offline-check"),
             (completed, response) => { callbacks++; });
-        HTTPManager.EMPGOCGHMBI(request);
-        if (request.FLBBFDNHJAJ() != CFGBMHKCENK.Error ||
-            !(request.IEFGFKFHNMD() is NotSupportedException) || callbacks != 1)
+        HTTPManager.SendRequest(request);
+        if (request.GetState() != HTTPRequestStates.Error ||
+            !(request.GetException() is NotSupportedException) || callbacks != 1)
             throw new InvalidOperationException("Offline HTTP failure/completion contract failed.");
         TextAsset content = Resources.Load<TextAsset>(GameplayContentArchive.ResourcePath);
         if (content == null || content.bytes.Length == 0)

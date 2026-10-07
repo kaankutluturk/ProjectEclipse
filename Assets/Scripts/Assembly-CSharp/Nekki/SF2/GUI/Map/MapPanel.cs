@@ -7,19 +7,19 @@ namespace Nekki.SF2.GUI.Map
 {
 	public class MapPanel : SFMonoBehaviour<object>
 	{
-		public enum HLEIAGFDMKK
+		public enum MapPanelLayer
 		{
 			ZShadow = 0,
 			ZMap = 1
 		}
 
-		public enum OAHPENLBMKD
+		public enum MapPanelEvent
 		{
 			onClickBattle = 0,
 			onSelectZone = 1
 		}
 
-		private Scroll LJOBLDELNGD;
+		private Scroll zoneScroll;
 
 		[SerializeField]
 		private GameObject _baseScrollContentPrefab;
@@ -31,18 +31,18 @@ namespace Nekki.SF2.GUI.Map
 
 		public void Init()
 		{
-			LJOBLDELNGD = GetComponent<Scroll>();
+			zoneScroll = GetComponent<Scroll>();
 			if (_baseScrollContentPrefab != null)
 			{
 				GameObject gameObject = Object.Instantiate(_baseScrollContentPrefab);
 				_baseScrollContent = gameObject.GetComponent<BaseScrollContent>();
 			}
-			IDCFACEODIF();
+			InitScroll();
 		}
 
 		private void OnDestroy()
 		{
-			LJOBLDELNGD.ClearItems();
+			zoneScroll.ClearItems();
 			_baseScrollContent.onClickItem = null;
 			_baseScrollContent.onSelectItem = null;
 		}
@@ -79,18 +79,18 @@ namespace Nekki.SF2.GUI.Map
 
 		public void AddStoryZones()
 		{
-			List<Zone> hFPCBJLOJEM = ListSF.FHAIJEAPFEA().FindAll(
+			List<Zone> hFPCBJLOJEM = ListSF.GetZones().FindAll(
 				zone => !UnderworldZonePolicy.IsRaidZone(zone));
-			GHCJGLHOFHO(hFPCBJLOJEM);
+			AddZones(hFPCBJLOJEM);
 		}
 
 		public void AddRaidZones()
 		{
             // Only registered offline raid zones have a supported entry path.
-            List<Zone> raidZones = ListSF.FHAIJEAPFEA().FindAll(
+            List<Zone> raidZones = ListSF.GetZones().FindAll(
                 zone => zone != null && Eclipse.Modding.ModPolicies.IsRaidZone(zone.get_Name()));
             UnderworldZonePolicy.MarkLocallyPlayable(raidZones);
-			GHCJGLHOFHO(raidZones);
+			AddZones(raidZones);
 		}
 
 		public void SetRaidPowerMode(bool enabled)
@@ -139,9 +139,9 @@ namespace Nekki.SF2.GUI.Map
 				if ((bool)item.GetButtonByBattle(DPOOIONCEOA))
 				{
 					item.SetLastBattle(DPOOIONCEOA);
-					if (LJOBLDELNGD.GetCurrentItem() != item)
+					if (zoneScroll.GetCurrentItem() != item)
 					{
-						LJOBLDELNGD.ScrollToItem(item, _Duration);
+						zoneScroll.ScrollToItem(item, _Duration);
 					}
 					// Instant focus must publish selection before MapScene reads it.
 					// The regular Update will handle animated scrolling as before.
@@ -154,7 +154,7 @@ namespace Nekki.SF2.GUI.Map
 		public List<ZoneScrollItem> GetZones()
 		{
 			List<ZoneScrollItem> list = new List<ZoneScrollItem>();
-			foreach (BaseScrollItem item2 in LJOBLDELNGD.GetItems())
+			foreach (BaseScrollItem item2 in zoneScroll.GetItems())
 			{
 				ZoneScrollItem item = item2 as ZoneScrollItem;
 				list.Add(item);
@@ -174,22 +174,22 @@ namespace Nekki.SF2.GUI.Map
 
 		public int GetCurrentItemIndex()
 		{
-			return LJOBLDELNGD.GetCurrentItemIndex();
+			return zoneScroll.GetCurrentItemIndex();
 		}
 
 		public ZoneScrollItem GetCurrentZone()
 		{
-			return LJOBLDELNGD.GetCurrentItem() as ZoneScrollItem;
+			return zoneScroll.GetCurrentItem() as ZoneScrollItem;
 		}
 
 		public void ScrollToZone(int index, float _Duration)
 		{
-			LJOBLDELNGD.ScrollToItem(index, _Duration);
+			zoneScroll.ScrollToItem(index, _Duration);
 		}
 
 		public virtual void SetTouchEnabled(bool value)
 		{
-			LJOBLDELNGD.enabled = value;
+			zoneScroll.enabled = value;
 			List<ZoneScrollItem> zones = GetZones();
 			foreach (ZoneScrollItem item in zones)
 			{
@@ -204,51 +204,51 @@ namespace Nekki.SF2.GUI.Map
 			_baseScrollContent.Clear();
 		}
 
-		private void IDCFACEODIF()
+		private void InitScroll()
 		{
-			if (!(LJOBLDELNGD == null) && !(_baseScrollContent == null))
+			if (!(zoneScroll == null) && !(_baseScrollContent == null))
 			{
-				LJOBLDELNGD.Init(_baseScrollContent);
-				_baseScrollContent.onSelectItem.AddListener(GBFNCCGLEGL);
-				LJOBLDELNGD.get_ItemsScroll().set_MinScrollVelocity(500f);
-				LJOBLDELNGD.get_ItemsScroll().set_AutoscrollDuration(0.25f);
-				LJOBLDELNGD.get_BaseScrollContent().Spacing = 0f;
-				LJOBLDELNGD.ScrollToBegin();
+				zoneScroll.Init(_baseScrollContent);
+				_baseScrollContent.onSelectItem.AddListener(ForwardZoneSelect);
+				zoneScroll.get_ItemsScroll().set_MinScrollVelocity(500f);
+				zoneScroll.get_ItemsScroll().set_AutoscrollDuration(0.25f);
+				zoneScroll.get_BaseScrollContent().Spacing = 0f;
+				zoneScroll.ScrollToBegin();
 			}
 		}
 
-		private void DMPHCAKENKH(object data)
+		private void ForwardBattleClick(object data)
 		{
 			CallEvent(0, data);
 		}
 
-		private void GBFNCCGLEGL(object data)
+		private void ForwardZoneSelect(object data)
 		{
 			CallEvent(1, data);
 		}
 
-		private void GHCJGLHOFHO(List<Zone> HFPCBJLOJEM)
+		private void AddZones(List<Zone> HFPCBJLOJEM)
 		{
 			foreach (Zone item in HFPCBJLOJEM)
 			{
-				FMIEDAKDMOH(item);
+				AddZone(item);
 			}
 		}
 
-		private void FMIEDAKDMOH(Zone HLJKOKMKMLM)
+		private void AddZone(Zone HLJKOKMKMLM)
 		{
-			if (LJOBLDELNGD == null || _scrollItemPrefab == null)
+			if (zoneScroll == null || _scrollItemPrefab == null)
 			{
-				LLLOJBFMONN.Error("MapPanel.AddZone some field is null");
+				GameLog.Error("MapPanel.AddZone some field is null");
 			}
 			else
 			{
-				if (HLJKOKMKMLM.AMBLIADMEOC())
+				if (HLJKOKMKMLM.GetIsStart())
 				{
 					return;
 				}
 				bool flag = true;
-				List<Battle> lGIIBNJFADA = HLJKOKMKMLM.LGIIBNJFADA;
+				List<Battle> lGIIBNJFADA = HLJKOKMKMLM.Battles;
 				for (int i = 0; i < lGIIBNJFADA.Count; i++)
 				{
 					Battle cGJCGEBPCAF = lGIIBNJFADA[i];
@@ -262,15 +262,15 @@ namespace Nekki.SF2.GUI.Map
 					if (component != null)
 					{
 						component.Init(HLJKOKMKMLM);
-						component.AddEventListener(0, DMPHCAKENKH);
+						component.AddEventListener(0, ForwardBattleClick);
 						component.SelectFirstBattle();
-						LJOBLDELNGD.AddItem(component);
+						zoneScroll.AddItem(component);
 					}
 					else
 					{
-						LLLOJBFMONN.Error("ShopScrollContent.SetItems scrollItem is null");
+						GameLog.Error("ShopScrollContent.SetItems scrollItem is null");
 					}
-					LJOBLDELNGD.ScrollToBegin();
+					zoneScroll.ScrollToBegin();
 				}
 			}
 		}

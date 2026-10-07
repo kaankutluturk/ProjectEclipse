@@ -1,20 +1,20 @@
 public class ParseModule : LoadingModule
 {
-	public override void JLPMOKPFECK()
+	public override void ProcessStep()
 	{
-		if (!CHIHBINEGFL)
+		if (!isFinished)
 		{
 			GameUtils.InitVariables();
 			bool reusedTitleContent = Eclipse.UI.TitleScreen.TryResumeGameDataPreview();
 			if (!reusedTitleContent)
 			{
-				GameSettings.OCIPKAONMOP();
-				GameLoader.BJLLJHDFMOO();
-				GameLoader.POLKDKOOACO();
-				ListSF.GetInstance().IIKDNMBIHCM();
+				GameSettings.LoadAllSettings();
+				GameLoader.LoadAnimations();
+				GameLoader.LoadAi();
+				ListSF.GetInstance().LoadGameContent();
 			}
-			PerkTree.GBPBIPFIOJH().LJHPGKAOIAE();
-			GameSettings.LNNLDPLDABI();
+			PerkTree.GetInstance().RebuildProfile();
+			GameSettings.ApplyQualityOptions();
 			if (!reusedTitleContent)
 			{
 				GameLoader.SetSound();
@@ -22,9 +22,9 @@ public class ParseModule : LoadingModule
 			}
 			Eclipse.Modding.ModRuntime.ApplyLocaleMetadata();
 			Eclipse.Modding.ModRuntime.ApplyLegacyLocalization();
-			ListSF.CCDKHLAMKKO().AFAKCAMAACM();
-			GameUtils.OEKOKKCILAG();
-			CHIHBINEGFL = true;
+			ListSF.GetRoster().ApplyLanguage();
+			GameUtils.ScheduleStartupNotifications();
+			isFinished = true;
 		}
 	}
 }

@@ -4,37 +4,37 @@ using UnityEngine;
 
 public class RandomTactic
 {
-	public class EILEKOMGNOP
+	public class TacticDelay
 	{
-		public string FGICHADOEHF;
+		public string animationName;
 
-		public int DPGMCKCDMBC;
+		public int minDelay;
 
-		public int EBDBPJNBHGI;
+		public int maxDelay;
 	}
 
 	public List<string> Intervals = new List<string>();
 
-	public List<EILEKOMGNOP> IPCDOLMOJIF = new List<EILEKOMGNOP>();
+	public List<TacticDelay> delays = new List<TacticDelay>();
 
 	public float BeginnerCheat;
 
 	public void Parse(XmlNode node)
 	{
-		IPCDOLMOJIF.Clear();
+		delays.Clear();
 		XmlNode xmlNode = node["Intervals"];
 		foreach (XmlNode childNode in xmlNode.ChildNodes)
 		{
-			Intervals.Add(childNode.Attributes["Name"].CIPOICEEIBK(string.Empty));
+			Intervals.Add(childNode.Attributes["Name"].GetStringOrDefault(string.Empty));
 		}
 		XmlNode xmlNode3 = node["Delays"];
 		foreach (XmlNode childNode2 in xmlNode3.ChildNodes)
 		{
-			EILEKOMGNOP eILEKOMGNOP = new EILEKOMGNOP();
-			eILEKOMGNOP.FGICHADOEHF = childNode2.Attributes["Animation"].CIPOICEEIBK(string.Empty);
-			eILEKOMGNOP.DPGMCKCDMBC = childNode2.Attributes["Min"].ParseInt();
-			eILEKOMGNOP.EBDBPJNBHGI = childNode2.Attributes["Max"].ParseInt();
-			IPCDOLMOJIF.Add(eILEKOMGNOP);
+			TacticDelay eILEKOMGNOP = new TacticDelay();
+			eILEKOMGNOP.animationName = childNode2.Attributes["Animation"].GetStringOrDefault(string.Empty);
+			eILEKOMGNOP.minDelay = childNode2.Attributes["Min"].ParseInt();
+			eILEKOMGNOP.maxDelay = childNode2.Attributes["Max"].ParseInt();
+			delays.Add(eILEKOMGNOP);
 		}
 		XmlNode xmlNode5 = node["BeginnerCheat"];
 		BeginnerCheat = xmlNode5.Attributes["Treshold"].ParseFloat();
@@ -47,13 +47,13 @@ public class RandomTactic
 
 	public int GetDelayByName(List<string> NIKHAICFGNM)
 	{
-		foreach (EILEKOMGNOP item in IPCDOLMOJIF)
+		foreach (TacticDelay item in delays)
 		{
 			foreach (string item2 in NIKHAICFGNM)
 			{
-				if (item.FGICHADOEHF == item2)
+				if (item.animationName == item2)
 				{
-					return Eclipse.Multiplayer.VersusDeterminism.Range(item.DPGMCKCDMBC, item.EBDBPJNBHGI) + 1;
+					return Eclipse.Multiplayer.VersusDeterminism.Range(item.minDelay, item.maxDelay) + 1;
 				}
 			}
 		}

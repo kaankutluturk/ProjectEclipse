@@ -76,7 +76,7 @@ namespace Eclipse.Multiplayer
             {
                 EnsureWorld();
                 var parameters = LocalVersusMatch.PrepareFighter(loadout, true, string.Empty);
-                _container.ShowParameters(parameters, StageType.FDBBPEGEGMK.STAGE_SHOP_START, "Profile", _tint);
+                _container.ShowParameters(parameters, StageType.Stage.STAGE_SHOP_START, "Profile", _tint);
                 _shown = loadout;
                 _renderers.Clear();
                 _nextRendererScan = 0f;

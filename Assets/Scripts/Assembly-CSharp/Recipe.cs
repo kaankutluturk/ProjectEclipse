@@ -306,7 +306,7 @@ public class Recipe
 
 	public bool IsRecipeAvailableForItem(UserItem userItem)
 	{
-		if (userItem == null || userItem.OFOPFCJNEBL() <= 0 || userItem.PHDBCIHJKON() != null) return false;
+		if (userItem == null || userItem.GetCount() <= 0 || userItem.GetRecipeDelivery() != null) return false;
 		ItemInfo info = CurrentInfo(userItem);
 		return info != null && IsRecipeAvailableForItemType(info.Type) && GetPriceByItem(userItem) != null &&
 			IsRecipeWillEnchantItem(userItem, info.ItemLevel);
@@ -326,7 +326,7 @@ public class Recipe
 	}
 
 	// Recovered callers use this method as the "Available" and materials gate.
-	public bool IHHJGMBGHEB(UserItem userItem)
+	public bool IsAvailableWithMaterials(UserItem userItem)
 	{
 		return IsRecipeAvailableForItem(userItem) && CheckMaterialsForItem(userItem);
 	}
@@ -335,12 +335,12 @@ public class Recipe
 	{
 		if (_isFree) return true;
 		RecipePrice price = GetPriceByItem(userItem);
-		Roster roster = ListSF.CCDKHLAMKKO();
+		Roster roster = ListSF.GetRoster();
 		if (price == null || roster == null) return false;
 		foreach (CurrencyStruct material in price.Materials)
 		{
-			if (material?.BKDEAGGPNAO == null) return false;
-			if (roster.GetCurrencyCount(material.BKDEAGGPNAO) < material.Count) return false;
+			if (material?.Currency == null) return false;
+			if (roster.GetCurrencyCount(material.Currency) < material.Count) return false;
 		}
 		return true;
 	}
@@ -358,7 +358,7 @@ public class Recipe
 				{
 					if (enchantment != null && IsNativeCandidateExcluded(info?.Type, enchantment.get_Name())) continue;
 					if (enchantment == null || !IsPerkReadyToEnchant(enchantment)) continue;
-					if (checkRequired && IsEnchantmentAlreadyExists(enchantment, userItem.JAJNJAIJOPA)) continue;
+					if (checkRequired && IsEnchantmentAlreadyExists(enchantment, userItem.Enchantments)) continue;
 					result.Add(CopyCandidateForItem(enchantment, info?.Type));
 				}
 			}
@@ -372,7 +372,7 @@ public class Recipe
 					if (!candidate.Contains(itemLevel)) continue;
 					PerkStruct enchantment = candidate.Perk;
 				if (enchantment == null || !IsPerkReadyToEnchant(enchantment)) continue;
-				if (checkRequired && IsEnchantmentAlreadyExists(enchantment, userItem.JAJNJAIJOPA)) continue;
+				if (checkRequired && IsEnchantmentAlreadyExists(enchantment, userItem.Enchantments)) continue;
 				result.Add(CopyCandidateForItem(enchantment, info.Type));
 			}
 		}
@@ -383,8 +383,8 @@ public class Recipe
 	{
 		foreach (PerkStruct perk in GetPossibleEnchantments(userItem, itemLevel, false))
 		{
-			PerkInfoItem info = GameUtils.FDEJIIDIPBI.ABAGJKMKCBA(perk.get_Name());
-			if (info != null && info.LELHEEDNMBP == PerkInfoItem.DNPGIEGCGKH.COMBO) return true;
+			PerkInfoItem info = GameUtils.PerkItemList.FindBasePerk(perk.get_Name());
+			if (info != null && info.Kind == PerkInfoItem.PerkKind.COMBO) return true;
 		}
 		return false;
 	}
@@ -423,8 +423,8 @@ public class Recipe
 
 	private static bool IsPerkReadyToEnchant(PerkStruct enchantment)
 	{
-		return enchantment != null && GameUtils.FDEJIIDIPBI != null &&
-			GameUtils.FDEJIIDIPBI.ABAGJKMKCBA(enchantment.get_Name()) != null;
+		return enchantment != null && GameUtils.PerkItemList != null &&
+			GameUtils.PerkItemList.FindBasePerk(enchantment.get_Name()) != null;
 	}
 
 	private static bool IsEnchantmentAlreadyExists(PerkStruct enchantment, List<PerkInfoItem> enchantments)
@@ -439,8 +439,8 @@ public class Recipe
 	private static ItemInfo CurrentInfo(UserItem userItem)
 	{
 		if (userItem == null) return null;
-		ItemInfo info = userItem.DBLCMCEGJGI(false);
-		return info ?? userItem.BHKHOJPANHE();
+		ItemInfo info = userItem.GetDisplayInfo(false);
+		return info ?? userItem.GetInfo();
 	}
 
 	internal static string Attr(XmlNode node, string name, string fallback = "")
@@ -528,7 +528,7 @@ public sealed class RecipePrices
 	public RecipePrice GetPriceByLevel(UserItem userItem)
 	{
 		if (userItem == null) return null;
-		ItemInfo info = userItem.DBLCMCEGJGI(false) ?? userItem.BHKHOJPANHE();
+		ItemInfo info = userItem.GetDisplayInfo(false) ?? userItem.GetInfo();
 		return info == null ? null : GetPriceByLevel(info.ItemLevel);
 	}
 
@@ -606,7 +606,7 @@ public sealed class VariationConditionItem : VariationCondition
 	}
 	public override bool Check(UserItem userItem, int itemLevel)
 	{
-		ItemInfo info = userItem == null ? null : (userItem.DBLCMCEGJGI(false) ?? userItem.BHKHOJPANHE());
+		ItemInfo info = userItem == null ? null : (userItem.GetDisplayInfo(false) ?? userItem.GetInfo());
 		return info != null && string.Equals(info.Type, _itemType, StringComparison.Ordinal);
 	}
 }

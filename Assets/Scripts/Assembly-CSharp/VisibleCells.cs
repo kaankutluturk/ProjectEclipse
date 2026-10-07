@@ -8,13 +8,13 @@ public class VisibleCells
 	public Range IndexesRange;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private Dictionary<int, TableViewCell> JMEPBPMMOKE;
+	private Dictionary<int, TableViewCell> cells;
 
-	public Dictionary<int, TableViewCell> MMINMBOKMEO
+	public Dictionary<int, TableViewCell> Cells
 	{
 		get
 		{
-			return BFNFADJMAPC();
+			return GetCells();
 		}
 		private set
 		{
@@ -26,7 +26,7 @@ public class VisibleCells
 	{
 		get
 		{
-			return OFOPFCJNEBL();
+			return GetCount();
 		}
 	}
 
@@ -36,35 +36,35 @@ public class VisibleCells
 		set_cells(new Dictionary<int, TableViewCell>());
 	}
 
-	public Dictionary<int, TableViewCell> BFNFADJMAPC()
+	public Dictionary<int, TableViewCell> GetCells()
 	{
-		return JMEPBPMMOKE;
+		return cells;
 	}
 
 	private void set_cells(Dictionary<int, TableViewCell> value)
 	{
-		JMEPBPMMOKE = value;
+		cells = value;
 	}
 
-	public int OFOPFCJNEBL()
+	public int GetCount()
 	{
-		return BFNFADJMAPC().Count;
+		return GetCells().Count;
 	}
 
 	public TableViewCell GetCellAtIndex(int index)
 	{
 		TableViewCell value = null;
-		BFNFADJMAPC().TryGetValue(index, out value);
+		GetCells().TryGetValue(index, out value);
 		return value;
 	}
 
-	public void KLKJONFEGHM(int index, TableViewCell HJCPCBLCJJN)
+	public void SetCellAtIndex(int index, TableViewCell HJCPCBLCJJN)
 	{
-		BFNFADJMAPC()[index] = HJCPCBLCJJN;
+		GetCells()[index] = HJCPCBLCJJN;
 	}
 
 	public void RemoveCellAtIndex(int index)
 	{
-		BFNFADJMAPC().Remove(index);
+		GetCells().Remove(index);
 	}
 }

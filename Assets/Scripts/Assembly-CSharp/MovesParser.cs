@@ -4,7 +4,7 @@ using UnityEngine;
 
 public static class MovesParser
 {
-	private const string PNMKCPIEPCO = "/moves.xml";
+	private const string MovesFileName = "/moves.xml";
 
 	private static Dictionary<string, XmlNode> _TemplateTemp;
 
@@ -28,7 +28,7 @@ public static class MovesParser
 		XmlNode aFHNINCKJEE = xmlDocument["Movesxml"]["Templates"];
 		XmlNode iLCCDINCICK = xmlDocument["Movesxml"]["Moves"];
 		XmlNode hKPPBKPJOEO = xmlDocument["Movesxml"]["Triggers"];
-		AKGCKOGKJBD(aFHNINCKJEE, CBNKICJENCB);
+		ParseTemplates(aFHNINCKJEE, CBNKICJENCB);
 		_BaseTemplateNodes.Clear();
 		foreach (KeyValuePair<string, XmlNode> pair in _TemplateTemp)
 			_BaseTemplateNodes.Add(pair.Key, pair.Value.CloneNode(true));
@@ -39,8 +39,8 @@ public static class MovesParser
 			_LegacyTemplateTemp.Add(template.Attributes["Name"].Value, template);
 			_BaseLegacyTemplateNodes[template.Attributes["Name"].Value] = template.CloneNode(true);
 		}
-		MNCBOOGMKGB(iLCCDINCICK, CBNKICJENCB, DPPDBCBFHIL, IAGDAAPCDNI);
-		KOKCNPLBFAG(hKPPBKPJOEO, CMHFKBKKKOK);
+		ParseMoves(iLCCDINCICK, CBNKICJENCB, DPPDBCBFHIL, IAGDAAPCDNI);
+		ParseTriggers(hKPPBKPJOEO, CMHFKBKKKOK);
 		_TemplateTemp.Clear();
 		_TemplateTemp = null;
 		_LegacyTemplateTemp.Clear();
@@ -100,7 +100,7 @@ public static class MovesParser
 				foreach (XmlNode node in templateNodes.ChildNodes)
 				{
 					if (node.Name != "Template") continue;
-					string name = node.Attributes["Name"].CIPOICEEIBK(string.Empty);
+					string name = node.Attributes["Name"].GetStringOrDefault(string.Empty);
 					if (string.IsNullOrEmpty(name) || templates.ContainsKey(name) || _TemplateTemp.ContainsKey(name) || !pendingTemplates.Add(name))
 						throw new System.InvalidOperationException("External move template collides with existing template '" + name + "'.");
 				}
@@ -110,7 +110,7 @@ public static class MovesParser
 			foreach (XmlNode node in moveNodes.ChildNodes)
 			{
 				if (node.NodeType != XmlNodeType.Element) continue;
-				string name = node.Attributes["Name"].CIPOICEEIBK(string.Empty);
+				string name = node.Attributes["Name"].GetStringOrDefault(string.Empty);
 				if (string.IsNullOrEmpty(name) || !pendingMoves.Add(name))
 					throw new System.InvalidOperationException("External moves document contains invalid or duplicate move '" + name + "'.");
 				for (int i = 0; i < moves.Count; i++)
@@ -124,7 +124,7 @@ public static class MovesParser
 				foreach (XmlNode node in triggerNodes.ChildNodes)
 				{
 					if (node.NodeType != XmlNodeType.Element) continue;
-					string name = node.Attributes["Name"].CIPOICEEIBK(string.Empty);
+					string name = node.Attributes["Name"].GetStringOrDefault(string.Empty);
 					if (string.IsNullOrEmpty(name) || !pendingTriggers.Add(name))
 						throw new System.InvalidOperationException("External moves document contains invalid or duplicate trigger '" + name + "'.");
 					for (int i = 0; i < triggers.Count; i++)
@@ -138,7 +138,7 @@ public static class MovesParser
 				foreach (XmlNode node in templateNodes.ChildNodes)
 				{
 					if (node.Name != "Template") continue;
-					string name = node.Attributes["Name"].CIPOICEEIBK(string.Empty);
+					string name = node.Attributes["Name"].GetStringOrDefault(string.Empty);
 					TemplateAnimation template = new TemplateAnimation(node);
 					templates.Add(name, template);
 					_TemplateTemp.Add(name, node);
@@ -147,8 +147,8 @@ public static class MovesParser
 			}
 
 			int before = moves.Count;
-			MNCBOOGMKGB(moveNodes, templates, moves, tricks);
-			if (triggerNodes != null) KOKCNPLBFAG(triggerNodes, triggers);
+			ParseMoves(moveNodes, templates, moves, tricks);
+			if (triggerNodes != null) ParseTriggers(triggerNodes, triggers);
 			return moves.Count - before;
 		}
 		finally
@@ -199,7 +199,7 @@ public static class MovesParser
 				}
 				else
 				{
-					LLLOJBFMONN.Write("Move template don't find: " + array[i]);
+					GameLog.Write("Move template don't find: " + array[i]);
 				}
 			}
 		}
@@ -213,12 +213,12 @@ public static class MovesParser
 			XmlAttribute xmlAttribute2 = FFFLNOBCBGL.Attributes[name];
 			if (xmlAttribute2 == null)
 			{
-				FFFLNOBCBGL.LCOLFMJJDJE(attribute);
+				FFFLNOBCBGL.CopyAttribute(attribute);
 			}
 		}
 	}
 
-	private static List<InfoAnimation> MNCBOOGMKGB(XmlNode nodes, Dictionary<string, TemplateAnimation> JIGEFEPNCIN, List<InfoAnimation> OEMALIFPGPO, List<Trick> IAGDAAPCDNI)
+	private static List<InfoAnimation> ParseMoves(XmlNode nodes, Dictionary<string, TemplateAnimation> JIGEFEPNCIN, List<InfoAnimation> OEMALIFPGPO, List<Trick> IAGDAAPCDNI)
 	{
 		List<global::Pair<InfoAnimation, string>> list = new List<global::Pair<InfoAnimation, string>>();
 		list.Capacity = 100;
@@ -232,38 +232,38 @@ public static class MovesParser
 				? _LegacyTemplateTemp : _TemplateTemp;
 			SetMoveTemplate(childNode, childNode, list2, templates);
 			InfoAnimation pJAHIOELGGD = new InfoAnimation();
-			pJAHIOELGGD.Name = childNode.Attributes["Name"].CIPOICEEIBK(string.Empty);
+			pJAHIOELGGD.Name = childNode.Attributes["Name"].GetStringOrDefault(string.Empty);
 			pJAHIOELGGD.Id = childNode.Attributes["ID"].ParseInt();
-			pJAHIOELGGD.FileName = childNode.Attributes["FileName"].CIPOICEEIBK(string.Empty);
-			pJAHIOELGGD.MNHGBPOIHKG = childNode.Attributes["MidFrames"].ParseInt();
+			pJAHIOELGGD.FileName = childNode.Attributes["FileName"].GetStringOrDefault(string.Empty);
+			pJAHIOELGGD.MidFrames = childNode.Attributes["MidFrames"].ParseInt();
 			pJAHIOELGGD.FirstFrame = childNode.Attributes["FirstFrame"].ParseInt();
 			pJAHIOELGGD.AnimationEndFrame = childNode.Attributes["EndFrame"].ParseInt();
 			pJAHIOELGGD.Priority = childNode.Attributes["Priority"].ParseInt();
-			pJAHIOELGGD.PFELBJBNEEK(childNode.Attributes["NoMagicRecharge"].ParseBool());
-			pJAHIOELGGD.Type = InfoAnimation.MGHNBEPCKIF.AnimationNone;
-			pJAHIOELGGD.OFADIIPBEKI = InfoAnimation.EOJCAKOHCHA.TutorialNone;
-			pJAHIOELGGD.HFBOLCPHMBB = childNode.Attributes["NoWallRepulsion"].ParseBool();
-			pJAHIOELGGD.DCLGDANCGHC = childNode.Attributes["StyleFactor"].ParseFloat(1f);
-			pJAHIOELGGD.FBKGDALBNDJ = childNode.Attributes["Physics"].ParseBool();
-			pJAHIOELGGD.HECHJGBMHIC = childNode.Attributes["EndsStage"].ParseBool();
-			pJAHIOELGGD.LLELLFKJKGE(childNode.Attributes["Looped"].ParseBool());
-			pJAHIOELGGD.JEADCBJMEGC = childNode.Attributes["NoInterpolationFrames"].ParseBool();
-			pJAHIOELGGD.ALFPDPEEJFO = childNode.Attributes["AlignOnParentWallCollision"].ParseBool();
-			pJAHIOELGGD.ABEGFBOKPOI();
+			pJAHIOELGGD.SetNoMagicRecharge(childNode.Attributes["NoMagicRecharge"].ParseBool());
+			pJAHIOELGGD.Type = InfoAnimation.AnimationKind.AnimationNone;
+			pJAHIOELGGD.TutorialType = InfoAnimation.TutorialKind.TutorialNone;
+			pJAHIOELGGD.NoWallRepulsion = childNode.Attributes["NoWallRepulsion"].ParseBool();
+			pJAHIOELGGD.StyleFactor = childNode.Attributes["StyleFactor"].ParseFloat(1f);
+			pJAHIOELGGD.HasPhysics = childNode.Attributes["Physics"].ParseBool();
+			pJAHIOELGGD.EndsStage = childNode.Attributes["EndsStage"].ParseBool();
+			pJAHIOELGGD.SetIsLooped(childNode.Attributes["Looped"].ParseBool());
+			pJAHIOELGGD.NoInterpolationFrames = childNode.Attributes["NoInterpolationFrames"].ParseBool();
+			pJAHIOELGGD.AlignOnParentWallCollision = childNode.Attributes["AlignOnParentWallCollision"].ParseBool();
+			pJAHIOELGGD.LoadAnimationClip();
 			pJAHIOELGGD.AddTemplateName(pJAHIOELGGD.Name);
 			XmlAttribute xmlAttribute = childNode.Attributes["MirrorNode"];
 			if (xmlAttribute != null)
 			{
-				pJAHIOELGGD.ECCLELFHNHE().HHACPELEPAK(xmlAttribute.CIPOICEEIBK(string.Empty));
+				pJAHIOELGGD.GetMirrorNode().SetNodeName(xmlAttribute.GetStringOrDefault(string.Empty));
 			}
 			xmlAttribute = childNode.Attributes["CameraCOMAlignStage"];
 			if (xmlAttribute != null)
 			{
-				StageType.FDBBPEGEGMK bAINMLLIKOL = StageType.GetStageByName(xmlAttribute.CIPOICEEIBK(string.Empty));
-				pJAHIOELGGD.POOOFPBAJDM(bAINMLLIKOL);
+				StageType.Stage bAINMLLIKOL = StageType.GetStageByName(xmlAttribute.GetStringOrDefault(string.Empty));
+				pJAHIOELGGD.SetCameraStage(bAINMLLIKOL);
 			}
-			pJAHIOELGGD.IBMFCIFKGOO(childNode.Attributes["TacticWeapon"].CIPOICEEIBK(string.Empty));
-			string text = childNode.Attributes["TacticEquivalent"].CIPOICEEIBK(string.Empty);
+			pJAHIOELGGD.SetTacticWeapons(childNode.Attributes["TacticWeapon"].GetStringOrDefault(string.Empty));
+			string text = childNode.Attributes["TacticEquivalent"].GetStringOrDefault(string.Empty);
 			if (!string.IsNullOrEmpty(text))
 			{
 				list.Add(new global::Pair<InfoAnimation, string>(pJAHIOELGGD, text));
@@ -272,14 +272,14 @@ public static class MovesParser
 			xmlAttribute = childNode.Attributes["Type"];
 			if (xmlAttribute != null)
 			{
-				string text2 = xmlAttribute.CIPOICEEIBK(string.Empty);
+				string text2 = xmlAttribute.GetStringOrDefault(string.Empty);
 				if (text2 == "MOVE")
 				{
-					pJAHIOELGGD.Type = InfoAnimation.MGHNBEPCKIF.AnimationMove;
+					pJAHIOELGGD.Type = InfoAnimation.AnimationKind.AnimationMove;
 				}
 				else if (text2 == "ATTACK")
 				{
-					pJAHIOELGGD.Type = InfoAnimation.MGHNBEPCKIF.AnimationAttack;
+					pJAHIOELGGD.Type = InfoAnimation.AnimationKind.AnimationAttack;
 				}
 			}
 			xmlAttribute = childNode.Attributes["Delay"];
@@ -287,10 +287,10 @@ public static class MovesParser
 			{
 				pJAHIOELGGD.AddDelay(xmlAttribute.ParseInt());
 			}
-			NEONAMKOFPN(list2, pJAHIOELGGD, JIGEFEPNCIN);
-			OOCDLNMDLKE(childNode, list2, pJAHIOELGGD);
-			JGLOLDJFFKC(pJAHIOELGGD, childNode, list2);
-			GHMBNFDNMCH(pJAHIOELGGD, childNode["Rotation"]);
+			ApplyTemplates(list2, pJAHIOELGGD, JIGEFEPNCIN);
+			ParseMoveInside(childNode, list2, pJAHIOELGGD);
+			ParseVelocity(pJAHIOELGGD, childNode, list2);
+			ParseRotation(pJAHIOELGGD, childNode["Rotation"]);
 			pJAHIOELGGD.Init();
 			OEMALIFPGPO.Add(pJAHIOELGGD);
 			XmlNode xmlNode2 = childNode["Profile"];
@@ -319,24 +319,24 @@ public static class MovesParser
 				lLHEDBIEHAA.set_TacticEquivalent(pJAHIOELGGD2);
 				continue;
 			}
-			LLLOJBFMONN.Error("{0} tactic equivalent {1} not found", lLHEDBIEHAA.Name, nFNBFHCDEGG);
+			GameLog.Error("{0} tactic equivalent {1} not found", lLHEDBIEHAA.Name, nFNBFHCDEGG);
 		}
 		return OEMALIFPGPO;
 	}
 
-	private static void KOKCNPLBFAG(XmlNode node, List<Trigger> OEMALIFPGPO)
+	private static void ParseTriggers(XmlNode node, List<Trigger> OEMALIFPGPO)
 	{
 		foreach (XmlNode childNode in node.ChildNodes)
 		{
 			Trigger cPFMGFAFAFB = new Trigger();
-			cPFMGFAFAFB.Name = childNode.Attributes["Name"].CIPOICEEIBK(string.Empty);
-			FDHENMIHJBC(childNode, cPFMGFAFAFB);
+			cPFMGFAFAFB.Name = childNode.Attributes["Name"].GetStringOrDefault(string.Empty);
+			ParseTriggerInside(childNode, cPFMGFAFAFB);
 			cPFMGFAFAFB.Init();
 			OEMALIFPGPO.Add(cPFMGFAFAFB);
 		}
 	}
 
-	private static void AKGCKOGKJBD(XmlNode AFHNINCKJEE, Dictionary<string, TemplateAnimation> JIGEFEPNCIN)
+	private static void ParseTemplates(XmlNode AFHNINCKJEE, Dictionary<string, TemplateAnimation> JIGEFEPNCIN)
 	{
 		JIGEFEPNCIN.Clear();
 		_TemplateTemp = new Dictionary<string, XmlNode>();
@@ -355,7 +355,7 @@ public static class MovesParser
 		}
 	}
 
-	private static void NEONAMKOFPN(List<XmlNode> MMLFAGGGINF, InfoAnimation INOIBNOMNEO, Dictionary<string, TemplateAnimation> JIGEFEPNCIN)
+	private static void ApplyTemplates(List<XmlNode> MMLFAGGGINF, InfoAnimation INOIBNOMNEO, Dictionary<string, TemplateAnimation> JIGEFEPNCIN)
 	{
 		string text = null;
 		for (int i = 0; i < MMLFAGGGINF.Count; i++)
@@ -363,7 +363,7 @@ public static class MovesParser
 			text = MMLFAGGGINF[i].Attributes["Name"].Value;
 			if (JIGEFEPNCIN.ContainsKey(text))
 			{
-				JIGEFEPNCIN[text].MBJCDIDIBDJ(INOIBNOMNEO);
+				JIGEFEPNCIN[text].AddAnimation(INOIBNOMNEO);
 			}
 		}
 		if (!JIGEFEPNCIN.ContainsKey(INOIBNOMNEO.Name))
@@ -373,7 +373,7 @@ public static class MovesParser
 		}
 	}
 
-	private static bool PPDEKBCNBDM(string name, List<TemplateAnimation> OEMALIFPGPO)
+	private static bool ContainsTemplate(string name, List<TemplateAnimation> OEMALIFPGPO)
 	{
 		foreach (TemplateAnimation item in OEMALIFPGPO)
 		{
@@ -385,7 +385,7 @@ public static class MovesParser
 		return false;
 	}
 
-	private static TemplateAnimation CNFBCBDPKCI(string name, List<TemplateAnimation> JIGEFEPNCIN)
+	private static TemplateAnimation FindTemplate(string name, List<TemplateAnimation> JIGEFEPNCIN)
 	{
 		int i = 0;
 		for (int count = JIGEFEPNCIN.Count; i < count; i++)
@@ -398,55 +398,55 @@ public static class MovesParser
 		return null;
 	}
 
-	private static void OOCDLNMDLKE(XmlNode node, List<XmlNode> MMLFAGGGINF, InfoAnimation DBOLBEOCEME)
+	private static void ParseMoveInside(XmlNode node, List<XmlNode> MMLFAGGGINF, InfoAnimation DBOLBEOCEME)
 	{
 		InfoAnimation.MoveInside cNPOIHDPBPB = new InfoAnimation.MoveInside();
-		cNPOIHDPBPB.AJCMBMJGJEG = JBNILFIHMMK(node, MMLFAGGGINF);
-		cNPOIHDPBPB.JIFAHHGNPFH = EPCNPJEALBH("Conditions", node, MMLFAGGGINF);
-		cNPOIHDPBPB.Locks = EPCNPJEALBH("Locks", node, MMLFAGGGINF);
-		cNPOIHDPBPB.Intervals = MAFNIEICKGN(node, MMLFAGGGINF);
-		cNPOIHDPBPB.DJBAIAKOIHM = EFJHONIPBOC(node, MMLFAGGGINF);
-		cNPOIHDPBPB.NIDNJFOGBFO = OJJDCDGJAHO(node, MMLFAGGGINF);
+		cNPOIHDPBPB.Events = ParseEvents(node, MMLFAGGGINF);
+		cNPOIHDPBPB.Conditions = ParseConditions("Conditions", node, MMLFAGGGINF);
+		cNPOIHDPBPB.Locks = ParseConditions("Locks", node, MMLFAGGGINF);
+		cNPOIHDPBPB.Intervals = ParseIntervals(node, MMLFAGGGINF);
+		cNPOIHDPBPB.Actions = ParseActions(node, MMLFAGGGINF);
+		cNPOIHDPBPB.TacticsConditions = ParseTacticConditions(node, MMLFAGGGINF);
 		XmlNode xmlNode = node["Transitions"];
 		if (xmlNode != null)
 		{
-			cNPOIHDPBPB.ELFBPNOBDKC = KFPHEGLHEMM(xmlNode);
+			cNPOIHDPBPB.Transitions = ParseTransitions(xmlNode);
 		}
 		xmlNode = node["Shop"];
 		if (xmlNode != null)
 		{
-			cNPOIHDPBPB.DFLNENOIMPO = ABAFCBFPAON(xmlNode);
+			cNPOIHDPBPB.ShopData = ParseShop(xmlNode);
 		}
-		NAAEEHHHOFG(cNPOIHDPBPB, node, MMLFAGGGINF);
-		FPOCAAILLAM(cNPOIHDPBPB, node, MMLFAGGGINF);
-		DBOLBEOCEME.NHAEHLFMPNK(cNPOIHDPBPB);
+		ParseAlign(cNPOIHDPBPB, node, MMLFAGGGINF);
+		ParseSetDirection(cNPOIHDPBPB, node, MMLFAGGGINF);
+		DBOLBEOCEME.MergeMoveData(cNPOIHDPBPB);
 	}
 
-	private static void FDHENMIHJBC(XmlNode node, Trigger CPBHKJFPFJB)
+	private static void ParseTriggerInside(XmlNode node, Trigger CPBHKJFPFJB)
 	{
 		Trigger.TriggerInside pCFAHEOAJLB = new Trigger.TriggerInside();
-		pCFAHEOAJLB.AJCMBMJGJEG = JBNILFIHMMK(node);
-		pCFAHEOAJLB.JIFAHHGNPFH = EPCNPJEALBH("Conditions", node);
-		pCFAHEOAJLB.HIFPHBNGIPO = EPCNPJEALBH("Locks", node);
-		pCFAHEOAJLB.DJBAIAKOIHM = EFJHONIPBOC(node);
-		CPBHKJFPFJB.NHAEHLFMPNK(pCFAHEOAJLB);
+		pCFAHEOAJLB.Events = ParseEvents(node);
+		pCFAHEOAJLB.Conditions = ParseConditions("Conditions", node);
+		pCFAHEOAJLB.ExtraConditions = ParseConditions("Locks", node);
+		pCFAHEOAJLB.Actions = ParseActions(node);
+		CPBHKJFPFJB.MergeDefinition(pCFAHEOAJLB);
 	}
 
-	private static List<EventAnimation> JBNILFIHMMK(XmlNode nodes, List<XmlNode> MMLFAGGGINF = null)
+	private static List<EventAnimation> ParseEvents(XmlNode nodes, List<XmlNode> MMLFAGGGINF = null)
 	{
 		List<EventAnimation> list = new List<EventAnimation>();
-		JBNILFIHMMK(nodes["Events"], list);
+		ParseEvents(nodes["Events"], list);
 		if (MMLFAGGGINF != null)
 		{
 			for (int i = 0; i < MMLFAGGGINF.Count; i++)
 			{
-				JBNILFIHMMK(MMLFAGGGINF[i]["Events"], list);
+				ParseEvents(MMLFAGGGINF[i]["Events"], list);
 			}
 		}
 		return list;
 	}
 
-	private static void JBNILFIHMMK(XmlNode MEEAKLDGLDF, List<EventAnimation> FFFLNOBCBGL)
+	private static void ParseEvents(XmlNode MEEAKLDGLDF, List<EventAnimation> FFFLNOBCBGL)
 	{
 		if (MEEAKLDGLDF == null)
 		{
@@ -465,21 +465,21 @@ public static class MovesParser
 		}
 	}
 
-	private static List<ConditionAnimation> EPCNPJEALBH(string IMGCANJHPND, XmlNode nodes, List<XmlNode> MMLFAGGGINF = null)
+	private static List<ConditionAnimation> ParseConditions(string IMGCANJHPND, XmlNode nodes, List<XmlNode> MMLFAGGGINF = null)
 	{
 		List<ConditionAnimation> list = new List<ConditionAnimation>();
-		EPCNPJEALBH(nodes[IMGCANJHPND], list);
+		ParseConditions(nodes[IMGCANJHPND], list);
 		if (MMLFAGGGINF != null)
 		{
 			for (int i = 0; i < MMLFAGGGINF.Count; i++)
 			{
-				EPCNPJEALBH(MMLFAGGGINF[i][IMGCANJHPND], list);
+				ParseConditions(MMLFAGGGINF[i][IMGCANJHPND], list);
 			}
 		}
 		return list;
 	}
 
-	private static void EPCNPJEALBH(XmlNode MEEAKLDGLDF, List<ConditionAnimation> FFFLNOBCBGL)
+	private static void ParseConditions(XmlNode MEEAKLDGLDF, List<ConditionAnimation> FFFLNOBCBGL)
 	{
 		if (MEEAKLDGLDF == null)
 		{
@@ -497,41 +497,41 @@ public static class MovesParser
 		}
 	}
 
-	private static List<ConditionAnimation> OJJDCDGJAHO(XmlNode node, List<XmlNode> MMLFAGGGINF)
+	private static List<ConditionAnimation> ParseTacticConditions(XmlNode node, List<XmlNode> MMLFAGGGINF)
 	{
 		List<ConditionAnimation> list = new List<ConditionAnimation>();
 		XmlNode xmlNode = node["Tactics"];
 		if (xmlNode != null)
 		{
-			EPCNPJEALBH(xmlNode["Conditions"], list);
+			ParseConditions(xmlNode["Conditions"], list);
 		}
 		for (int i = 0; i < MMLFAGGGINF.Count; i++)
 		{
 			xmlNode = node["Tactics"];
 			if (xmlNode != null)
 			{
-				EPCNPJEALBH(xmlNode["Conditions"], list);
+				ParseConditions(xmlNode["Conditions"], list);
 			}
 		}
 		return list;
 	}
 
-	private static InfoAnimation.MoveInside.ShopAnimation ABAFCBFPAON(XmlNode nodes)
+	private static InfoAnimation.MoveInside.ShopAnimation ParseShop(XmlNode nodes)
 	{
 		InfoAnimation.MoveInside.ShopAnimation oNLLFHPLBFL = new InfoAnimation.MoveInside.ShopAnimation();
-		oNLLFHPLBFL.FGMBMNFANHF = nodes["RunOnStart"] != null;
-		oNLLFHPLBFL.AnimationName = nodes["NextAnimation"].Attributes["Name"].CIPOICEEIBK(string.Empty);
+		oNLLFHPLBFL.RunOnStart = nodes["RunOnStart"] != null;
+		oNLLFHPLBFL.AnimationName = nodes["NextAnimation"].Attributes["Name"].GetStringOrDefault(string.Empty);
 		oNLLFHPLBFL.IsExists = true;
 		return oNLLFHPLBFL;
 	}
 
-	private static List<TransitionAnimation> KFPHEGLHEMM(XmlNode nodes)
+	private static List<TransitionAnimation> ParseTransitions(XmlNode nodes)
 	{
 		List<TransitionAnimation> list = new List<TransitionAnimation>(nodes.ChildNodes.Count);
 		foreach (XmlNode childNode in nodes.ChildNodes)
 		{
 			TransitionAnimation nIHOEJAKIJK = new TransitionAnimation();
-			nIHOEJAKIJK.AJKANHBOADL(EPCNPJEALBH("Conditions", childNode));
+			nIHOEJAKIJK.SetConditions(ParseConditions("Conditions", childNode));
 			if (childNode.Attributes["FirstFrame"] != null)
 			{
 				nIHOEJAKIJK.IsFrameShift = false;
@@ -547,21 +547,21 @@ public static class MovesParser
 		return list;
 	}
 
-	private static List<IntervalAnimation> MAFNIEICKGN(XmlNode nodes, List<XmlNode> MMLFAGGGINF = null)
+	private static List<IntervalAnimation> ParseIntervals(XmlNode nodes, List<XmlNode> MMLFAGGGINF = null)
 	{
 		List<IntervalAnimation> list = new List<IntervalAnimation>();
-		MAFNIEICKGN(nodes["Intervals"], list);
+		ParseIntervals(nodes["Intervals"], list);
 		if (MMLFAGGGINF != null)
 		{
 			for (int i = 0; i < MMLFAGGGINF.Count; i++)
 			{
-				MAFNIEICKGN(MMLFAGGGINF[i]["Intervals"], list);
+				ParseIntervals(MMLFAGGGINF[i]["Intervals"], list);
 			}
 		}
 		return list;
 	}
 
-	private static void MAFNIEICKGN(XmlNode MEEAKLDGLDF, List<IntervalAnimation> FFFLNOBCBGL)
+	private static void ParseIntervals(XmlNode MEEAKLDGLDF, List<IntervalAnimation> FFFLNOBCBGL)
 	{
 		if (MEEAKLDGLDF == null)
 		{
@@ -570,29 +570,29 @@ public static class MovesParser
 		FFFLNOBCBGL.Capacity = FFFLNOBCBGL.Count + MEEAKLDGLDF.ChildNodes.Count;
 		foreach (XmlNode childNode in MEEAKLDGLDF.ChildNodes)
 		{
-			string lFLGCDNKNJI = childNode.Attributes["Type"].CIPOICEEIBK(string.Empty);
-			IntervalAnimation.NGAJJDIEDGF nGAJJDIEDGF = IntervalAnimation.LAJMDAFFPJE(lFLGCDNKNJI);
-			IntervalAnimation mNOIEOBBCMI = ((nGAJJDIEDGF != IntervalAnimation.NGAJJDIEDGF.INTERVAL_ATTACK) ? new IntervalAnimation(nGAJJDIEDGF) : new IntervalAttack());
+			string lFLGCDNKNJI = childNode.Attributes["Type"].GetStringOrDefault(string.Empty);
+			IntervalAnimation.IntervalType nGAJJDIEDGF = IntervalAnimation.ParseIntervalType(lFLGCDNKNJI);
+			IntervalAnimation mNOIEOBBCMI = ((nGAJJDIEDGF != IntervalAnimation.IntervalType.INTERVAL_ATTACK) ? new IntervalAnimation(nGAJJDIEDGF) : new IntervalAttack());
 			mNOIEOBBCMI.Parse(childNode);
 			FFFLNOBCBGL.Add(mNOIEOBBCMI);
 		}
 	}
 
-	private static List<ActionAnimation> EFJHONIPBOC(XmlNode nodes, List<XmlNode> MMLFAGGGINF = null)
+	private static List<ActionAnimation> ParseActions(XmlNode nodes, List<XmlNode> MMLFAGGGINF = null)
 	{
 		List<ActionAnimation> list = new List<ActionAnimation>();
-		EFJHONIPBOC(nodes["Actions"], list);
+		ParseActions(nodes["Actions"], list);
 		if (MMLFAGGGINF != null)
 		{
 			for (int i = 0; i < MMLFAGGGINF.Count; i++)
 			{
-				EFJHONIPBOC(MMLFAGGGINF[i]["Actions"], list);
+				ParseActions(MMLFAGGGINF[i]["Actions"], list);
 			}
 		}
 		return list;
 	}
 
-	private static void EFJHONIPBOC(XmlNode MEEAKLDGLDF, List<ActionAnimation> FFFLNOBCBGL)
+	private static void ParseActions(XmlNode MEEAKLDGLDF, List<ActionAnimation> FFFLNOBCBGL)
 	{
 		if (MEEAKLDGLDF == null)
 		{
@@ -609,14 +609,14 @@ public static class MovesParser
 		}
 	}
 
-	private static void NAAEEHHHOFG(InfoAnimation.MoveInside ODACDCDONJE, XmlNode node, List<XmlNode> MMLFAGGGINF)
+	private static void ParseAlign(InfoAnimation.MoveInside ODACDCDONJE, XmlNode node, List<XmlNode> MMLFAGGGINF)
 	{
-		ODACDCDONJE.ILOEBFFAEAN.IsExists = false;
+		ODACDCDONJE.AlignData.IsExists = false;
 		XmlNode xmlNode = node["Align"];
 		if (xmlNode != null)
 		{
-			ODACDCDONJE.ILOEBFFAEAN = PLMHJKGIHLB(xmlNode);
-			ODACDCDONJE.ILOEBFFAEAN.IsExists = true;
+			ODACDCDONJE.AlignData = ParseAlignPivot(xmlNode);
+			ODACDCDONJE.AlignData.IsExists = true;
 			return;
 		}
 		for (int i = 0; i < MMLFAGGGINF.Count; i++)
@@ -624,35 +624,35 @@ public static class MovesParser
 			xmlNode = MMLFAGGGINF[i]["Align"];
 			if (xmlNode != null)
 			{
-				ODACDCDONJE.ILOEBFFAEAN = PLMHJKGIHLB(xmlNode);
-				ODACDCDONJE.ILOEBFFAEAN.IsExists = true;
+				ODACDCDONJE.AlignData = ParseAlignPivot(xmlNode);
+				ODACDCDONJE.AlignData.IsExists = true;
 				break;
 			}
 		}
 	}
 
-	private static InfoAnimation.MovePivot PLMHJKGIHLB(XmlNode node)
+	private static InfoAnimation.MovePivot ParseAlignPivot(XmlNode node)
 	{
 		InfoAnimation.MovePivot jKHNOAFIHKP = new InfoAnimation.MovePivot();
 		XmlNode xmlNode = node["Pivot"];
 		XmlNode xmlNode2 = node["Position"];
-		string text = xmlNode.Attributes["Object"].CIPOICEEIBK(string.Empty);
-		string text2 = xmlNode2.Attributes["Object"].CIPOICEEIBK(string.Empty);
+		string text = xmlNode.Attributes["Object"].GetStringOrDefault(string.Empty);
+		string text2 = xmlNode2.Attributes["Object"].GetStringOrDefault(string.Empty);
 		XmlAttribute cJBEMNNNHDM = xmlNode.Attributes["Player"];
-		string lFLGCDNKNJI = cJBEMNNNHDM.CIPOICEEIBK("Me");
+		string lFLGCDNKNJI = cJBEMNNNHDM.GetStringOrDefault("Me");
 		XmlAttribute cJBEMNNNHDM2 = xmlNode2.Attributes["Player"];
-		string lFLGCDNKNJI2 = cJBEMNNNHDM2.CIPOICEEIBK("Me");
+		string lFLGCDNKNJI2 = cJBEMNNNHDM2.GetStringOrDefault("Me");
 		XmlAttribute xmlAttribute = node.Attributes["Axis"];
-		jKHNOAFIHKP.HNDMMOGMOAN = (jKHNOAFIHKP.IMCDDINEFKC = (jKHNOAFIHKP.GHKGPDMMHHK = false));
+		jKHNOAFIHKP.AlignX = (jKHNOAFIHKP.AlignY = (jKHNOAFIHKP.AlignZ = false));
 		if (xmlAttribute == null)
 		{
-			jKHNOAFIHKP.HNDMMOGMOAN = true;
-			jKHNOAFIHKP.IMCDDINEFKC = true;
-			jKHNOAFIHKP.GHKGPDMMHHK = true;
+			jKHNOAFIHKP.AlignX = true;
+			jKHNOAFIHKP.AlignY = true;
+			jKHNOAFIHKP.AlignZ = true;
 		}
 		else
 		{
-			string text3 = xmlAttribute.CIPOICEEIBK(string.Empty);
+			string text3 = xmlAttribute.GetStringOrDefault(string.Empty);
 			string[] array = text3.Split('|');
 			string[] array2 = array;
 			foreach (string text4 in array2)
@@ -660,70 +660,70 @@ public static class MovesParser
 				switch (text4)
 				{
 				case "X":
-					jKHNOAFIHKP.HNDMMOGMOAN = true;
+					jKHNOAFIHKP.AlignX = true;
 					continue;
 				case "Y":
-					jKHNOAFIHKP.IMCDDINEFKC = true;
+					jKHNOAFIHKP.AlignY = true;
 					continue;
 				case "Z":
-					jKHNOAFIHKP.GHKGPDMMHHK = true;
+					jKHNOAFIHKP.AlignZ = true;
 					continue;
 				}
-				LLLOJBFMONN.Error("ERROR: alignParse - wrong axis \"{0}\" in \"{1}\"", text4, text3);
+				GameLog.Error("ERROR: alignParse - wrong axis \"{0}\" in \"{1}\"", text4, text3);
 			}
 		}
 		XmlAttribute xmlAttribute2 = node.Attributes["ShiftModelNode"];
 		if (xmlAttribute2 != null)
 		{
-			jKHNOAFIHKP.BONDKHGGCDD = xmlAttribute2.CIPOICEEIBK(string.Empty);
+			jKHNOAFIHKP.ShiftModelNode = xmlAttribute2.GetStringOrDefault(string.Empty);
 		}
-		jKHNOAFIHKP.BAFGOANMBMI = ModelType.EHFNOBFLAHI(lFLGCDNKNJI);
-		jKHNOAFIHKP.EDBLMNIEKBD = ModelType.EHFNOBFLAHI(lFLGCDNKNJI2);
-		jKHNOAFIHKP.BLODCIGDJFK = xmlNode.Attributes["Part"].CIPOICEEIBK(string.Empty);
-		jKHNOAFIHKP.PMILDGBBLMF = xmlNode2.Attributes["Part"].CIPOICEEIBK(string.Empty);
-		jKHNOAFIHKP.LDNPHPGEOPJ.SetX(xmlNode2.Attributes["ShiftX"].ParseFloat());
-		jKHNOAFIHKP.LDNPHPGEOPJ.SetY(xmlNode2.Attributes["ShiftY"].ParseFloat());
+		jKHNOAFIHKP.PivotModelType = ModelType.ParseTargetType(lFLGCDNKNJI);
+		jKHNOAFIHKP.PositionModelType = ModelType.ParseTargetType(lFLGCDNKNJI2);
+		jKHNOAFIHKP.PivotPart = xmlNode.Attributes["Part"].GetStringOrDefault(string.Empty);
+		jKHNOAFIHKP.PositionPart = xmlNode2.Attributes["Part"].GetStringOrDefault(string.Empty);
+		jKHNOAFIHKP.PositionShift.SetX(xmlNode2.Attributes["ShiftX"].ParseFloat());
+		jKHNOAFIHKP.PositionShift.SetY(xmlNode2.Attributes["ShiftY"].ParseFloat());
 		switch (text)
 		{
 		case "Nodes":
-			jKHNOAFIHKP.CKBGFODEBAJ = InfoAnimation.DOLCEABGNGA.ObjectNodes;
+			jKHNOAFIHKP.PivotObjectType = InfoAnimation.AlignObjectType.ObjectNodes;
 			break;
 		case "Animation":
-			jKHNOAFIHKP.CKBGFODEBAJ = InfoAnimation.DOLCEABGNGA.ObjectAnimation;
+			jKHNOAFIHKP.PivotObjectType = InfoAnimation.AlignObjectType.ObjectAnimation;
 			break;
 		case "Wall":
-			jKHNOAFIHKP.CKBGFODEBAJ = InfoAnimation.DOLCEABGNGA.ObjectWall;
+			jKHNOAFIHKP.PivotObjectType = InfoAnimation.AlignObjectType.ObjectWall;
 			break;
 		case "Pivot":
-			jKHNOAFIHKP.CKBGFODEBAJ = InfoAnimation.DOLCEABGNGA.ObjectPivot;
+			jKHNOAFIHKP.PivotObjectType = InfoAnimation.AlignObjectType.ObjectPivot;
 			break;
 		}
 		switch (text2)
 		{
 		case "Nodes":
-			jKHNOAFIHKP.HHPAGAOGGLP = InfoAnimation.DOLCEABGNGA.ObjectNodes;
+			jKHNOAFIHKP.PositionObjectType = InfoAnimation.AlignObjectType.ObjectNodes;
 			break;
 		case "Animation":
-			jKHNOAFIHKP.HHPAGAOGGLP = InfoAnimation.DOLCEABGNGA.ObjectAnimation;
+			jKHNOAFIHKP.PositionObjectType = InfoAnimation.AlignObjectType.ObjectAnimation;
 			break;
 		case "Wall":
-			jKHNOAFIHKP.HHPAGAOGGLP = InfoAnimation.DOLCEABGNGA.ObjectWall;
+			jKHNOAFIHKP.PositionObjectType = InfoAnimation.AlignObjectType.ObjectWall;
 			break;
 		case "Pivot":
-			jKHNOAFIHKP.HHPAGAOGGLP = InfoAnimation.DOLCEABGNGA.ObjectPivot;
+			jKHNOAFIHKP.PositionObjectType = InfoAnimation.AlignObjectType.ObjectPivot;
 			break;
 		}
 		return jKHNOAFIHKP;
 	}
 
-	private static void FPOCAAILLAM(InfoAnimation.MoveInside ODACDCDONJE, XmlNode node, List<XmlNode> MMLFAGGGINF)
+	private static void ParseSetDirection(InfoAnimation.MoveInside ODACDCDONJE, XmlNode node, List<XmlNode> MMLFAGGGINF)
 	{
-		ODACDCDONJE.IHJEKBAEIKK.IsExists = false;
+		ODACDCDONJE.SetDirectionData.IsExists = false;
 		XmlNode xmlNode = node["SetDirection"];
 		if (xmlNode != null)
 		{
-			ODACDCDONJE.IHJEKBAEIKK = JOLJIHDPADK(xmlNode);
-			ODACDCDONJE.IHJEKBAEIKK.IsExists = true;
+			ODACDCDONJE.SetDirectionData = ParseDirection(xmlNode);
+			ODACDCDONJE.SetDirectionData.IsExists = true;
 			return;
 		}
 		for (int i = 0; i < MMLFAGGGINF.Count; i++)
@@ -731,26 +731,26 @@ public static class MovesParser
 			xmlNode = MMLFAGGGINF[i]["SetDirection"];
 			if (xmlNode != null)
 			{
-				ODACDCDONJE.IHJEKBAEIKK = JOLJIHDPADK(xmlNode);
-				ODACDCDONJE.IHJEKBAEIKK.IsExists = true;
+				ODACDCDONJE.SetDirectionData = ParseDirection(xmlNode);
+				ODACDCDONJE.SetDirectionData.IsExists = true;
 				break;
 			}
 		}
 	}
 
-	public static InfoAnimation.MoveInside.Direction JOLJIHDPADK(XmlNode node)
+	public static InfoAnimation.MoveInside.Direction ParseDirection(XmlNode node)
 	{
 		InfoAnimation.MoveInside.Direction nMLHMNAEJDH = new InfoAnimation.MoveInside.Direction();
 		XmlNode hKPPBKPJOEO = node["From"];
-		nMLHMNAEJDH.CLCFLPDNBNL.Create(hKPPBKPJOEO);
+		nMLHMNAEJDH.FromPoint.Create(hKPPBKPJOEO);
 		hKPPBKPJOEO = node["To"];
-		nMLHMNAEJDH.KAEAKHIEIHH.Create(hKPPBKPJOEO);
+		nMLHMNAEJDH.ToPoint.Create(hKPPBKPJOEO);
 		hKPPBKPJOEO = node["Impulse"];
-		nMLHMNAEJDH.IIIDIKABLOJ = InfoAnimation.MoveInside.Direction.BBAGKNMNONO(hKPPBKPJOEO);
+		nMLHMNAEJDH.ImpulseMode = InfoAnimation.MoveInside.Direction.ParseImpulseMode(hKPPBKPJOEO);
 		return nMLHMNAEJDH;
 	}
 
-	public static void CHILAIJNEHG()
+	public static void ClearCaches()
 	{
 		_baseMoveLockSources = null;
 		MovesMaps.Clear();
@@ -758,7 +758,7 @@ public static class MovesParser
 		_BaseLegacyTemplateNodes.Clear();
 	}
 
-	private static void JGLOLDJFFKC(InfoAnimation DBOLBEOCEME, XmlNode MEEAKLDGLDF, List<XmlNode> MMLFAGGGINF)
+	private static void ParseVelocity(InfoAnimation DBOLBEOCEME, XmlNode MEEAKLDGLDF, List<XmlNode> MMLFAGGGINF)
 	{
 		XmlNode xmlNode = MEEAKLDGLDF["Velocity"];
 		if (xmlNode == null)
@@ -782,13 +782,13 @@ public static class MovesParser
 			bEHOPOPCJGB2.x = xmlNode.Attributes["Ax"].ParseFloat();
 			bEHOPOPCJGB2.y = xmlNode.Attributes["Ay"].ParseFloat();
 			bEHOPOPCJGB2.z = xmlNode.Attributes["Az"].ParseFloat();
-			DBOLBEOCEME.NFMLONEIJEJ(xmlNode.Attributes["SaveVelocity"].ParseBool());
+			DBOLBEOCEME.SetSaveVelocity(xmlNode.Attributes["SaveVelocity"].ParseBool());
 		}
-		DBOLBEOCEME.DIGCECPPHOH(Vector3f.op_Implicit(bEHOPOPCJGB));
-		DBOLBEOCEME.PICBLJDLDDN(Vector3f.op_Implicit(bEHOPOPCJGB2));
+		DBOLBEOCEME.SetVelocity(Vector3f.op_Implicit(bEHOPOPCJGB));
+		DBOLBEOCEME.SetAcceleration(Vector3f.op_Implicit(bEHOPOPCJGB2));
 	}
 
-	private static void GHMBNFDNMCH(InfoAnimation DBOLBEOCEME, XmlNode node)
+	private static void ParseRotation(InfoAnimation DBOLBEOCEME, XmlNode node)
 	{
 		float bAINMLLIKOL = 0f;
 		if (node != null)
@@ -798,7 +798,7 @@ public static class MovesParser
 			if (xmlNode != null)
 			{
 				DistancePoint bAINMLLIKOL2 = new DistancePoint(xmlNode);
-				DBOLBEOCEME.HGJPLKKCKHM(bAINMLLIKOL2);
+				DBOLBEOCEME.SetRotationPosition(bAINMLLIKOL2);
 			}
 		}
 		DBOLBEOCEME.set_RotationAngle(bAINMLLIKOL);

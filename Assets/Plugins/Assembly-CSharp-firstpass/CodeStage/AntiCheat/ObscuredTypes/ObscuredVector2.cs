@@ -37,16 +37,16 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 			get
 			{
 				float num = InternalDecryptField(hiddenValue.x);
-				if (ObscuredCheatingDetector.NMACGEJHPDN() && !fakeValue.Equals(initialFakeValue) && Math.Abs(num - fakeValue.x) > ObscuredCheatingDetector.get_Instance().vector2Epsilon)
+				if (ObscuredCheatingDetector.GetIsRunning() && !fakeValue.Equals(initialFakeValue) && Math.Abs(num - fakeValue.x) > ObscuredCheatingDetector.get_Instance().vector2Epsilon)
 				{
-					ObscuredCheatingDetector.get_Instance().MCDANNDOEIK();
+					ObscuredCheatingDetector.get_Instance().OnCheatingDetected();
 				}
 				return num;
 			}
 			set
 			{
 				hiddenValue.x = InternalEncryptField(value);
-				if (ObscuredCheatingDetector.NMACGEJHPDN())
+				if (ObscuredCheatingDetector.GetIsRunning())
 				{
 					fakeValue.x = value;
 				}
@@ -58,16 +58,16 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 			get
 			{
 				float num = InternalDecryptField(hiddenValue.y);
-				if (ObscuredCheatingDetector.NMACGEJHPDN() && !fakeValue.Equals(initialFakeValue) && Math.Abs(num - fakeValue.y) > ObscuredCheatingDetector.get_Instance().vector2Epsilon)
+				if (ObscuredCheatingDetector.GetIsRunning() && !fakeValue.Equals(initialFakeValue) && Math.Abs(num - fakeValue.y) > ObscuredCheatingDetector.get_Instance().vector2Epsilon)
 				{
-					ObscuredCheatingDetector.get_Instance().MCDANNDOEIK();
+					ObscuredCheatingDetector.get_Instance().OnCheatingDetected();
 				}
 				return num;
 			}
 			set
 			{
 				hiddenValue.y = InternalEncryptField(value);
-				if (ObscuredCheatingDetector.NMACGEJHPDN())
+				if (ObscuredCheatingDetector.GetIsRunning())
 				{
 					fakeValue.y = value;
 				}
@@ -151,25 +151,25 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 			return result;
 		}
 
-		public void PKOKLDGAPEI()
+		public void ApplyNewCryptoKey()
 		{
 			if (currentCryptoKey != cryptoKey)
 			{
-				hiddenValue = Encrypt(GEKBGBJOMIA(), cryptoKey);
+				hiddenValue = Encrypt(InternalDecrypt(), cryptoKey);
 				currentCryptoKey = cryptoKey;
 			}
 		}
 
-		public void GMCADPGOCHM()
+		public void RandomizeCryptoKey()
 		{
-			Vector2 bAINMLLIKOL = GEKBGBJOMIA();
+			Vector2 bAINMLLIKOL = InternalDecrypt();
 			currentCryptoKey = UnityEngine.Random.Range(int.MinValue, int.MaxValue);
 			hiddenValue = Encrypt(bAINMLLIKOL, currentCryptoKey);
 		}
 
-		public RawEncryptedVector2 ECEBFGCJIDA()
+		public RawEncryptedVector2 GetEncrypted()
 		{
-			PKOKLDGAPEI();
+			ApplyNewCryptoKey();
 			return hiddenValue;
 		}
 
@@ -177,13 +177,13 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 		{
 			inited = true;
 			hiddenValue = ANGFOBEKKKD;
-			if (ObscuredCheatingDetector.NMACGEJHPDN())
+			if (ObscuredCheatingDetector.GetIsRunning())
 			{
-				fakeValue = GEKBGBJOMIA();
+				fakeValue = InternalDecrypt();
 			}
 		}
 
-		private Vector2 GEKBGBJOMIA()
+		private Vector2 InternalDecrypt()
 		{
 			if (!inited)
 			{
@@ -195,9 +195,9 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 			Vector2 vector = default(Vector2);
 			vector.x = ObscuredFloat.Decrypt(hiddenValue.x, currentCryptoKey);
 			vector.y = ObscuredFloat.Decrypt(hiddenValue.y, currentCryptoKey);
-			if (ObscuredCheatingDetector.NMACGEJHPDN() && !fakeValue.Equals(initialFakeValue) && !CompareVectorsWithTolerance(vector, fakeValue))
+			if (ObscuredCheatingDetector.GetIsRunning() && !fakeValue.Equals(initialFakeValue) && !CompareVectorsWithTolerance(vector, fakeValue))
 			{
-				ObscuredCheatingDetector.get_Instance().MCDANNDOEIK();
+				ObscuredCheatingDetector.get_Instance().OnCheatingDetected();
 			}
 			return vector;
 		}
@@ -226,7 +226,7 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 		public static implicit operator ObscuredVector2(Vector2 value)
 		{
 			ObscuredVector2 result = new ObscuredVector2(Encrypt(value));
-			if (ObscuredCheatingDetector.NMACGEJHPDN())
+			if (ObscuredCheatingDetector.GetIsRunning())
 			{
 				result.fakeValue = value;
 			}
@@ -235,28 +235,28 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 
 		public static implicit operator Vector2(ObscuredVector2 value)
 		{
-			return value.GEKBGBJOMIA();
+			return value.InternalDecrypt();
 		}
 
 		public static implicit operator Vector3(ObscuredVector2 value)
 		{
-			Vector2 vector = value.GEKBGBJOMIA();
+			Vector2 vector = value.InternalDecrypt();
 			return new Vector3(vector.x, vector.y, 0f);
 		}
 
 		public override int GetHashCode()
 		{
-			return GEKBGBJOMIA().GetHashCode();
+			return InternalDecrypt().GetHashCode();
 		}
 
 		public override string ToString()
 		{
-			return GEKBGBJOMIA().ToString();
+			return InternalDecrypt().ToString();
 		}
 
 		public string ToString(string LBOHOKIBHOH)
 		{
-			return GEKBGBJOMIA().ToString(LBOHOKIBHOH);
+			return InternalDecrypt().ToString(LBOHOKIBHOH);
 		}
 	}
 }

@@ -43,11 +43,11 @@ namespace Nekki.SF2.GUI.Fight
 		[SerializeField]
 		private HorizontalLayoutGroup layoutGroup;
 
-		private float GLAMMHFCJPN;
+		private float animationTime;
 
 		private List<DisplayModel> enemiesModels = new List<DisplayModel>();
 
-		public float ADMLKNCMFLG
+		public float AnimationDuration
 		{
 			get
 			{
@@ -57,24 +57,24 @@ namespace Nekki.SF2.GUI.Fight
 
 		public float get_AnimationTime()
 		{
-			return GLAMMHFCJPN;
+			return animationTime;
 		}
 
 		public void Init(List<ModelParameters> IDAAONBIBJM, int index, bool PPIJJHJCGGB)
 		{
 			if (displayModelPrefab == null)
 			{
-				LLLOJBFMONN.Error("EnemiesScreen.Init displayModelPrefab is null");
+				GameLog.Error("EnemiesScreen.Init displayModelPrefab is null");
 				return;
 			}
 			if (enemiesPanel == null)
 			{
-				LLLOJBFMONN.Error("EnemiesScreen.Init enemiesPanel is null");
+				GameLog.Error("EnemiesScreen.Init enemiesPanel is null");
 				return;
 			}
 			if (layoutGroup == null)
 			{
-				LLLOJBFMONN.Error("EnemiesScreen.Init layoutGroup is null");
+				GameLog.Error("EnemiesScreen.Init layoutGroup is null");
 				return;
 			}
 			Vector2 sizeDelta = new Vector2(0f, 0f);
@@ -83,7 +83,7 @@ namespace Nekki.SF2.GUI.Fight
 			{
 				DisplayModel component = Object.Instantiate(displayModelPrefab).GetComponent<DisplayModel>();
 				component.transform.SetParent(enemiesPanel, false);
-				component.SetAvatar(item.HNKFHGOOKEG);
+				component.SetAvatar(item.Avatar);
 				if (index > num)
 				{
 					component.Completed();
@@ -135,7 +135,7 @@ namespace Nekki.SF2.GUI.Fight
 				num2++;
 			}
 			s.AppendInterval(timeEnemyPauseFinish);
-			GLAMMHFCJPN = timeEnemyPauseStart + timeEnemyMove + timeEnemyPause + timeEnemyShade + timeEnemyPauseFinish;
+			animationTime = timeEnemyPauseStart + timeEnemyMove + timeEnemyPause + timeEnemyShade + timeEnemyPauseFinish;
 		}
 	}
 }

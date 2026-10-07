@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class MapButtonController : global::EventDispatcher<MapButtonInfo>
 {
-	public enum HNOEGLCDHJF
+	public enum MapButtonEvent
 	{
 		MAP_BUTTON_INFO_ADD = 0,
 		MAP_BUTTON_INFO_REMOVE = 1
@@ -14,25 +14,25 @@ public class MapButtonController : global::EventDispatcher<MapButtonInfo>
 
 	private XmlNode _node;
 
-	private List<MapButtonInfo> ECMMPBEMCPE = new List<MapButtonInfo>();
+	private List<MapButtonInfo> buttons = new List<MapButtonInfo>();
 
-	public static MapButtonController BPCBBHAKFDM
+	public static MapButtonController Instance
 	{
 		get
 		{
-			return ELEBLBJKDBI();
+			return GetInstance();
 		}
 	}
 
-	public List<MapButtonInfo> KIHLMIHLGHC
+	public List<MapButtonInfo> StoryButtons
 	{
 		get
 		{
-			return MEPCBPIJLGB();
+			return GetStoryButtons();
 		}
 	}
 
-	public static MapButtonController ELEBLBJKDBI()
+	public static MapButtonController GetInstance()
 	{
 		if (_instance == null)
 		{
@@ -41,72 +41,72 @@ public class MapButtonController : global::EventDispatcher<MapButtonInfo>
 		return _instance;
 	}
 
-	public List<MapButtonInfo> MEPCBPIJLGB()
+	public List<MapButtonInfo> GetStoryButtons()
 	{
-		return ECMMPBEMCPE.FindAll(OHGCDIHFJIJ);
+		return buttons.FindAll(IsStoryButton);
 	}
 
-	public bool OHGCDIHFJIJ(MapButtonInfo KLNKEPMAGKF)
+	public bool IsStoryButton(MapButtonInfo KLNKEPMAGKF)
 	{
-		MapButtonInfo.HNEJAKIGDBA hNEJAKIGDBA = KLNKEPMAGKF.EDMILHNJFAA();
-		return hNEJAKIGDBA == MapButtonInfo.HNEJAKIGDBA.Story || hNEJAKIGDBA == MapButtonInfo.HNEJAKIGDBA.Both;
+		MapButtonInfo.MapButtonShowType hNEJAKIGDBA = KLNKEPMAGKF.GetShowType();
+		return hNEJAKIGDBA == MapButtonInfo.MapButtonShowType.Story || hNEJAKIGDBA == MapButtonInfo.MapButtonShowType.Both;
 	}
 
-	public void GKIOOABOBFL(MapButtonInfo DJDNMAOEFBD)
+	public void AddButton(MapButtonInfo DJDNMAOEFBD)
 	{
 		if (DJDNMAOEFBD != null)
 		{
-			MapButtonInfo eBMMANKELOA = ECMMPBEMCPE.Find((MapButtonInfo DHDMNHCIPEH) => DHDMNHCIPEH.Name.Equals(DJDNMAOEFBD.Name));
+			MapButtonInfo eBMMANKELOA = buttons.Find((MapButtonInfo DHDMNHCIPEH) => DHDMNHCIPEH.Name.Equals(DJDNMAOEFBD.Name));
 			if (eBMMANKELOA != null)
 			{
 				if (SamePresentation(eBMMANKELOA, DJDNMAOEFBD)) return;
 				// A quest can move a button across mod versions; replace the saved
 				// presentation and refresh any map that is already open.
-				KFEBGKAALIA(eBMMANKELOA.Name);
-				ECMMPBEMCPE.Remove(eBMMANKELOA);
+				RemoveButtonFromXml(eBMMANKELOA.Name);
+				buttons.Remove(eBMMANKELOA);
 				CallEvent(1, eBMMANKELOA);
 			}
-			IPLIFIPBFAD(DJDNMAOEFBD);
-			ECMMPBEMCPE.Add(DJDNMAOEFBD);
+			SaveButtonToXml(DJDNMAOEFBD);
+			buttons.Add(DJDNMAOEFBD);
 			CallEvent(0, DJDNMAOEFBD);
 		}
 	}
 
 	private static bool SamePresentation(MapButtonInfo current, MapButtonInfo next)
 	{
-		return current.NHKMCLPOMFK == next.NHKMCLPOMFK &&
-			current.Timer == next.Timer && current.HFBFPBGLBOM == next.HFBFPBGLBOM &&
-			(current.KMEDBHDDDJA == next.KMEDBHDDDJA ||
-				current.KMEDBHDDDJA == "Image" && string.IsNullOrEmpty(next.KMEDBHDDDJA)) &&
-			current.BIJFFONMDBC == next.BIJFFONMDBC &&
+		return current.ImageName == next.ImageName &&
+			current.Timer == next.Timer && current.AtlasName == next.AtlasName &&
+			(current.TypeName == next.TypeName ||
+				current.TypeName == "Image" && string.IsNullOrEmpty(next.TypeName)) &&
+			current.Position == next.Position &&
 			current.AnchorMinX == next.AnchorMinX && current.AnchorMaxX == next.AnchorMaxX &&
-			current.NEOIMNAHLAN == next.NEOIMNAHLAN &&
-			current.BOEJEFCDIAD == next.BOEJEFCDIAD && current.Pause == next.Pause &&
-			current.MLKPBAALMBC == next.MLKPBAALMBC;
+			current.AutoPosition == next.AutoPosition &&
+			current.Speed == next.Speed && current.Pause == next.Pause &&
+			current.ShowTypeName == next.ShowTypeName;
 	}
 
-	public void DMCBGLJHBPA(MapButtonInfo DJDNMAOEFBD)
+	public void RemoveButton(MapButtonInfo DJDNMAOEFBD)
 	{
 		if (DJDNMAOEFBD != null)
 		{
-			DMCBGLJHBPA(DJDNMAOEFBD.Name);
+			RemoveButton(DJDNMAOEFBD.Name);
 		}
 	}
 
-	public void DMCBGLJHBPA(string name)
+	public void RemoveButton(string name)
 	{
-		MapButtonInfo eBMMANKELOA = ECMMPBEMCPE.Find((MapButtonInfo DHDMNHCIPEH) => DHDMNHCIPEH.Name.Equals(name));
+		MapButtonInfo eBMMANKELOA = buttons.Find((MapButtonInfo DHDMNHCIPEH) => DHDMNHCIPEH.Name.Equals(name));
 		if (eBMMANKELOA != null)
 		{
-			KFEBGKAALIA(name);
-			ECMMPBEMCPE.Remove(eBMMANKELOA);
+			RemoveButtonFromXml(name);
+			buttons.Remove(eBMMANKELOA);
 			CallEvent(1, eBMMANKELOA);
 		}
 	}
 
 	public void Parse(XmlNode node)
 	{
-		JNIIGKNBCCL(node);
+		EnsureButtonsNode(node);
 		Clear();
 		foreach (XmlNode childNode in _node.ChildNodes)
 		{
@@ -114,87 +114,87 @@ public class MapButtonController : global::EventDispatcher<MapButtonInfo>
 			bool nEOIMNAHLAN = childNode.Attributes["X"].Empty() || childNode.Attributes["Y"].Empty();
 			float x = childNode.Attributes["X"].ParseFloat();
 			float y = childNode.Attributes["Y"].ParseFloat();
-			eBMMANKELOA.Name = childNode.Attributes["Name"].CIPOICEEIBK();
-			eBMMANKELOA.NHKMCLPOMFK = childNode.Attributes["Image"].CIPOICEEIBK();
-			eBMMANKELOA.Timer = childNode.Attributes["Timer"].CIPOICEEIBK();
-			eBMMANKELOA.KMEDBHDDDJA = childNode.Attributes["Type"].CIPOICEEIBK("Image");
-			eBMMANKELOA.HFBFPBGLBOM = childNode.Attributes["Atlas"].CIPOICEEIBK();
-			eBMMANKELOA.BOEJEFCDIAD = childNode.Attributes["Speed"].ParseFloat();
+			eBMMANKELOA.Name = childNode.Attributes["Name"].GetStringOrDefault();
+			eBMMANKELOA.ImageName = childNode.Attributes["Image"].GetStringOrDefault();
+			eBMMANKELOA.Timer = childNode.Attributes["Timer"].GetStringOrDefault();
+			eBMMANKELOA.TypeName = childNode.Attributes["Type"].GetStringOrDefault("Image");
+			eBMMANKELOA.AtlasName = childNode.Attributes["Atlas"].GetStringOrDefault();
+			eBMMANKELOA.Speed = childNode.Attributes["Speed"].ParseFloat();
 			eBMMANKELOA.Pause = childNode.Attributes["Pause"].ParseFloat();
-			eBMMANKELOA.BIJFFONMDBC = new Vector2(x, y);
+			eBMMANKELOA.Position = new Vector2(x, y);
 			float defaultAnchorX = (eBMMANKELOA.Name == "EclipseModeOn" || eBMMANKELOA.Name == "EclipseModeOff") ? 1f : 0.5f;
 			eBMMANKELOA.AnchorMinX = childNode.Attributes["AnchorMinX"].ParseFloat(defaultAnchorX);
 			eBMMANKELOA.AnchorMaxX = childNode.Attributes["AnchorMaxX"].ParseFloat(eBMMANKELOA.AnchorMinX);
-			eBMMANKELOA.NEOIMNAHLAN = nEOIMNAHLAN;
-			eBMMANKELOA.MLKPBAALMBC = childNode.Attributes["ShowType"].CIPOICEEIBK("Story");
-			ECMMPBEMCPE.Add(eBMMANKELOA);
+			eBMMANKELOA.AutoPosition = nEOIMNAHLAN;
+			eBMMANKELOA.ShowTypeName = childNode.Attributes["ShowType"].GetStringOrDefault("Story");
+			buttons.Add(eBMMANKELOA);
 		}
 	}
 
 	private void Clear()
 	{
-		ECMMPBEMCPE.Clear();
+		buttons.Clear();
 	}
 
-	private void JNIIGKNBCCL(XmlNode node)
+	private void EnsureButtonsNode(XmlNode node)
 	{
 		if (node != null)
 		{
 			_node = node["MapButtons"];
 			if (_node == null)
 			{
-				node.ACBPMPMPKJJ("MapButtons");
+				node.AppendElement("MapButtons");
 				_node = node["MapButtons"];
-				ListSF.GetInstance().EJANJEEGOOE();
+				ListSF.GetInstance().RequestSave();
 			}
 		}
 	}
 
-	private void IPLIFIPBFAD(MapButtonInfo DJDNMAOEFBD)
+	private void SaveButtonToXml(MapButtonInfo DJDNMAOEFBD)
 	{
-		XmlNode mEEAKLDGLDF = _node.ACBPMPMPKJJ("Button");
-		mEEAKLDGLDF.LLIKNHNLGJJ("Name").Value = DJDNMAOEFBD.Name;
-		mEEAKLDGLDF.LLIKNHNLGJJ("Image").Value = DJDNMAOEFBD.NHKMCLPOMFK;
-		mEEAKLDGLDF.LLIKNHNLGJJ("Type").Value = DJDNMAOEFBD.KMEDBHDDDJA;
-		if (DJDNMAOEFBD.BOEJEFCDIAD > 0f)
+		XmlNode mEEAKLDGLDF = _node.AppendElement("Button");
+		mEEAKLDGLDF.AppendAttribute("Name").Value = DJDNMAOEFBD.Name;
+		mEEAKLDGLDF.AppendAttribute("Image").Value = DJDNMAOEFBD.ImageName;
+		mEEAKLDGLDF.AppendAttribute("Type").Value = DJDNMAOEFBD.TypeName;
+		if (DJDNMAOEFBD.Speed > 0f)
 		{
-			mEEAKLDGLDF.LLIKNHNLGJJ("Speed").Value = DJDNMAOEFBD.BOEJEFCDIAD.ToString();
+			mEEAKLDGLDF.AppendAttribute("Speed").Value = DJDNMAOEFBD.Speed.ToString();
 		}
 		if (DJDNMAOEFBD.Pause > 0f)
 		{
-			mEEAKLDGLDF.LLIKNHNLGJJ("Pause").Value = DJDNMAOEFBD.Pause.ToString();
+			mEEAKLDGLDF.AppendAttribute("Pause").Value = DJDNMAOEFBD.Pause.ToString();
 		}
-		if (!DJDNMAOEFBD.NEOIMNAHLAN)
+		if (!DJDNMAOEFBD.AutoPosition)
 		{
-			mEEAKLDGLDF.LLIKNHNLGJJ("X").Value = DJDNMAOEFBD.BIJFFONMDBC.x.ToString();
-			mEEAKLDGLDF.LLIKNHNLGJJ("Y").Value = DJDNMAOEFBD.BIJFFONMDBC.y.ToString();
-			mEEAKLDGLDF.LLIKNHNLGJJ("AnchorMinX").Value = DJDNMAOEFBD.AnchorMinX.ToString();
-			mEEAKLDGLDF.LLIKNHNLGJJ("AnchorMaxX").Value = DJDNMAOEFBD.AnchorMaxX.ToString();
+			mEEAKLDGLDF.AppendAttribute("X").Value = DJDNMAOEFBD.Position.x.ToString();
+			mEEAKLDGLDF.AppendAttribute("Y").Value = DJDNMAOEFBD.Position.y.ToString();
+			mEEAKLDGLDF.AppendAttribute("AnchorMinX").Value = DJDNMAOEFBD.AnchorMinX.ToString();
+			mEEAKLDGLDF.AppendAttribute("AnchorMaxX").Value = DJDNMAOEFBD.AnchorMaxX.ToString();
 		}
-		if (!string.IsNullOrEmpty(DJDNMAOEFBD.HFBFPBGLBOM))
+		if (!string.IsNullOrEmpty(DJDNMAOEFBD.AtlasName))
 		{
-			mEEAKLDGLDF.LLIKNHNLGJJ("Atlas").Value = DJDNMAOEFBD.HFBFPBGLBOM;
+			mEEAKLDGLDF.AppendAttribute("Atlas").Value = DJDNMAOEFBD.AtlasName;
 		}
 		if (!string.IsNullOrEmpty(DJDNMAOEFBD.Timer))
 		{
-			mEEAKLDGLDF.LLIKNHNLGJJ("Timer").Value = DJDNMAOEFBD.Timer;
+			mEEAKLDGLDF.AppendAttribute("Timer").Value = DJDNMAOEFBD.Timer;
 		}
-		mEEAKLDGLDF.LLIKNHNLGJJ("ShowType").Value = DJDNMAOEFBD.MLKPBAALMBC;
-		ListSF.GetInstance().EJANJEEGOOE();
+		mEEAKLDGLDF.AppendAttribute("ShowType").Value = DJDNMAOEFBD.ShowTypeName;
+		ListSF.GetInstance().RequestSave();
 	}
 
-	private void KFEBGKAALIA(MapButtonInfo DJDNMAOEFBD)
+	private void RemoveButtonFromXml(MapButtonInfo DJDNMAOEFBD)
 	{
-		KFEBGKAALIA(DJDNMAOEFBD.Name);
+		RemoveButtonFromXml(DJDNMAOEFBD.Name);
 	}
 
-	private void KFEBGKAALIA(string name)
+	private void RemoveButtonFromXml(string name)
 	{
-		XmlNode xmlNode = _node.LJGLMGNAFHJ("Button", "Name", name);
+		XmlNode xmlNode = _node.FindChildWithAttribute("Button", "Name", name);
 		if (xmlNode != null)
 		{
 			_node.RemoveChild(xmlNode);
-			ListSF.GetInstance().EJANJEEGOOE();
+			ListSF.GetInstance().RequestSave();
 		}
 	}
 }

@@ -17,14 +17,14 @@ Check ($attack.GetReactionName(0) -ceq 'fixture.moves:moves/victim') 'Owned reac
 Check ($victim.Events.Hit.GetAttribute('Name') -ceq $attack.GetReactionName(0)) 'Owned hit selector no longer matches attack reaction.'
 $reference=$archive.SelectSingleNode('//Move[@Name="MindThrowHitNormal"]/SetDirection')
 Check ((Shape $victim.SetDirection) -ceq (Shape $reference)) 'Archived reverse-impulse direction differs.'
-$parser=[MovesParser].GetMethod('JOLJIHDPADK',[Reflection.BindingFlags]'Static,Public')
+$parser=[MovesParser].GetMethod('ParseDirection',[Reflection.BindingFlags]'Static,Public')
 foreach($reverse in @($true,$false)) {
  $projected=Project (Load-Lua $reactionLua.Replace('reverse=true',('reverse='+$reverse.ToString().ToLowerInvariant())))
  $direction=$parser.Invoke($null,@($projected.SelectSingleNode('//Move[@Name="fixture.moves:moves/victim"]/SetDirection')))
  foreach($impulse in @(-1,0,1)) {
-  $state=[ModelConditions]::new();$state.BOECCPNHAII=$impulse
+  $state=[ModelConditions]::new();$state.ImpulseX=$impulse
   $expected=if(($impulse * $(if($reverse){-1}else{1})) -ge 0){1}else{-1}
-  Check ($direction.IMLFCBLAJGA($state) -eq $expected) 'Native impulse-facing sign/default differs.'
+  Check ($direction.GetDirectionSign($state) -eq $expected) 'Native impulse-facing sign/default differs.'
  }
 }
 $fp=Fingerprint $catalog

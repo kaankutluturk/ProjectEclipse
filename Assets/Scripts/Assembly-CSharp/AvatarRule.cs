@@ -4,21 +4,21 @@ using System.Xml;
 public class AvatarRule : Rule
 {
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private string HKGHEJDKCPI;
+	private string name;
 
 	public AvatarRule(XmlNode node)
-		: base(BCBLLMPAMLP.RuleAvatar, node)
+		: base(RuleType.RuleAvatar, node)
 	{
-		set_Name(node.Attributes["Name"].CIPOICEEIBK(string.Empty));
+		set_Name(node.Attributes["Name"].GetStringOrDefault(string.Empty));
 	}
 
 	public string get_Name()
 	{
-		return HKGHEJDKCPI;
+		return name;
 	}
 
 	protected void set_Name(string value)
 	{
-		HKGHEJDKCPI = value;
+		name = value;
 	}
 }

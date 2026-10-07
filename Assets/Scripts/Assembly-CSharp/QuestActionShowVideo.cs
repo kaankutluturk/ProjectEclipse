@@ -4,49 +4,49 @@ using UnityEngine;
 
 public class QuestActionShowVideo : QuestAction
 {
-	private GameObject FECENALPJDH;
+	private GameObject videoScreenObject;
 
-	private VideoPlayerController NOOBPIDLFNH;
+	private VideoPlayerController videoPlayer;
 
-	private string PIANEEJIGBH;
+	private string videoName;
 
 	public override void Parse(XmlNode EPKLCPOEELO)
 	{
 		base.Parse(EPKLCPOEELO);
-		PIANEEJIGBH = EPKLCPOEELO.Attributes["Name"].CIPOICEEIBK(string.Empty);
+		videoName = EPKLCPOEELO.Attributes["Name"].GetStringOrDefault(string.Empty);
 	}
 
-	public override void DEJMHFMLKIC(QuestParameters GFIHPBCEEOB)
+	public override void Execute(QuestParameters GFIHPBCEEOB)
 	{
-		base.DEJMHFMLKIC(GFIHPBCEEOB);
+		base.Execute(GFIHPBCEEOB);
 		// The mobile intro is over 100 seconds long and the original player only
 		// accepted touch input.  In the Editor that presents as an unskippable
 		// black loader screen, so continue the first-launch quest immediately.
-		if (Application.isEditor && string.Equals(PIANEEJIGBH, "intro.mp4", System.StringComparison.OrdinalIgnoreCase))
+		if (Application.isEditor && string.Equals(videoName, "intro.mp4", System.StringComparison.OrdinalIgnoreCase))
 		{
 			Debug.Log("[Video] Skipping mobile intro during Editor play.");
-			OGIJONMKABB();
+			FinishAction();
 			return;
 		}
-		FECENALPJDH = (GameObject)Object.Instantiate(Resources.Load("Prefabs/VideoScreen"));
-		NOOBPIDLFNH = FECENALPJDH.GetComponent<VideoPlayerController>();
-		NOOBPIDLFNH.Init();
-		NOOBPIDLFNH.add_ShowCompleted(IKBCACMMLHE);
-		string text = string.Format("{0}/{1}", SF2Paths.MEKBAHBKMNB(), PIANEEJIGBH);
+		videoScreenObject = (GameObject)Object.Instantiate(Resources.Load("Prefabs/VideoScreen"));
+		videoPlayer = videoScreenObject.GetComponent<VideoPlayerController>();
+		videoPlayer.Init();
+		videoPlayer.add_ShowCompleted(OnVideoShowCompleted);
+		string text = string.Format("{0}/{1}", SF2Paths.GetBundlesPath(), videoName);
 		if (File.Exists(text))
 		{
-			NOOBPIDLFNH.Play(text);
+			videoPlayer.Play(text);
 		}
 		else
 		{
-			NOOBPIDLFNH.Play(ResourceManager.DEKCGMCMGKK(PIANEEJIGBH));
+			videoPlayer.Play(ResourceManager.GetVideoClip(videoName));
 		}
 	}
 
-	private void IKBCACMMLHE()
+	private void OnVideoShowCompleted()
 	{
-		NOOBPIDLFNH.remove_ShowCompleted(IKBCACMMLHE);
-		Object.Destroy(FECENALPJDH, 1f);
-		OGIJONMKABB();
+		videoPlayer.remove_ShowCompleted(OnVideoShowCompleted);
+		Object.Destroy(videoScreenObject, 1f);
+		FinishAction();
 	}
 }

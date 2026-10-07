@@ -7,7 +7,7 @@ public class ConditionName : ConditionAnimation
 	public ConditionName(XmlNode node)
 		: base(ConditionType.NAME)
 	{
-		_Name = node.Attributes["Value"].CIPOICEEIBK(string.Empty);
+		_Name = node.Attributes["Value"].GetStringOrDefault(string.Empty);
 	}
 
 	public override bool IsEqual(ModelConditions conditions)

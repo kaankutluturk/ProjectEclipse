@@ -3,32 +3,32 @@ using System.Diagnostics;
 public abstract class EventInfo
 {
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private IObjectDescriptor MNOENKFJDDN;
+	private IObjectDescriptor source;
 
-	public IObjectDescriptor ACEGLCCNKLF
+	public IObjectDescriptor SourceDescriptor
 	{
 		get
 		{
-			return EHKMMGBHNDB();
+			return GetSource();
 		}
 		private set
 		{
-			AJMDDENIPFE(value);
+			SetSource(value);
 		}
 	}
 
 	protected EventInfo(IObjectDescriptor BBNKIBKPBLO)
 	{
-		AJMDDENIPFE(BBNKIBKPBLO);
+		SetSource(BBNKIBKPBLO);
 	}
 
-	public IObjectDescriptor EHKMMGBHNDB()
+	public IObjectDescriptor GetSource()
 	{
-		return MNOENKFJDDN;
+		return source;
 	}
 
-	private void AJMDDENIPFE(IObjectDescriptor value)
+	private void SetSource(IObjectDescriptor value)
 	{
-		MNOENKFJDDN = value;
+		source = value;
 	}
 }

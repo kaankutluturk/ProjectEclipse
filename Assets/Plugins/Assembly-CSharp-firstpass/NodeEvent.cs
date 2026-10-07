@@ -6,27 +6,27 @@ public abstract class NodeEvent : ParsingEvent
 {
 	internal static readonly Regex anchorValidator = new Regex("^[0-9a-zA-Z_\\-]+$", RegexOptions.None);
 
-	private readonly string KOLNNNLOCFE;
+	private readonly string anchor;
 
-	private readonly string EDLADAAKMDF;
+	private readonly string tag;
 
-	public string BJKKJNDLDJN
+	public string Anchor
 	{
 		get
 		{
-			return HCPOJDFJFMM();
+			return GetAnchor();
 		}
 	}
 
-	public string DDFDDHGJFBO
+	public string Tag
 	{
 		get
 		{
-			return LOIGCKFONHJ();
+			return GetTag();
 		}
 	}
 
-	public abstract bool MKCFJALADOA { get; }
+	public abstract bool IsCanonical { get; }
 
 	protected NodeEvent(string KOLNNNLOCFE, string EDLADAAKMDF, Mark ILENLCMAMBH, Mark PCLFFOBJJFO)
 		: base(ILENLCMAMBH, PCLFFOBJJFO)
@@ -46,8 +46,8 @@ public abstract class NodeEvent : ParsingEvent
 		{
 			throw new ArgumentException("Tag value must not be empty.", "tag");
 		}
-		this.KOLNNNLOCFE = KOLNNNLOCFE;
-		this.EDLADAAKMDF = EDLADAAKMDF;
+		this.anchor = KOLNNNLOCFE;
+		this.tag = EDLADAAKMDF;
 	}
 
 	protected NodeEvent(string KOLNNNLOCFE, string EDLADAAKMDF)
@@ -55,15 +55,15 @@ public abstract class NodeEvent : ParsingEvent
 	{
 	}
 
-	public string HCPOJDFJFMM()
+	public string GetAnchor()
 	{
-		return KOLNNNLOCFE;
+		return anchor;
 	}
 
-	public string LOIGCKFONHJ()
+	public string GetTag()
 	{
-		return EDLADAAKMDF;
+		return tag;
 	}
 
-	public abstract bool DOHAHEHOCLN();
+	public abstract bool GetIsCanonical();
 }

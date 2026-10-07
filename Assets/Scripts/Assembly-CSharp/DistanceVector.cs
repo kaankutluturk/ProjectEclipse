@@ -5,11 +5,11 @@ public class DistanceVector
 {
 	private bool _Exists;
 
-	private DistancePointFollow DLKOKBMKAJE = new DistancePointFollow();
+	private DistancePointFollow fromPoint = new DistancePointFollow();
 
-	private DistancePointFollow KPBKMOCDIBF = new DistancePointFollow();
+	private DistancePointFollow toPoint = new DistancePointFollow();
 
-	private Vector2f BMKAHMEJOJI;
+	private Vector2f cachedDistance;
 
 	public DistanceVector()
 	{
@@ -23,35 +23,35 @@ public class DistanceVector
 
 	public void Parse(XmlNode node)
 	{
-		DLKOKBMKAJE.Create(node["From"]);
-		KPBKMOCDIBF.Create(node["To"]);
+		fromPoint.Create(node["From"]);
+		toPoint.Create(node["To"]);
 		_Exists = true;
 	}
 
-	public Vector2f HLBBNCBJHGB(ModelConditions conditions)
+	public Vector2f GetVector(ModelConditions conditions)
 	{
 		if (_Exists)
 		{
-			Vector3 vector = DLKOKBMKAJE.EMGKDOAMBOH(conditions);
-			Vector3 vector2 = KPBKMOCDIBF.EMGKDOAMBOH(conditions);
-			BMKAHMEJOJI = new Vector2f(vector2.x - vector.x, vector2.y - vector.y);
+			Vector3 vector = fromPoint.GetPosition(conditions);
+			Vector3 vector2 = toPoint.GetPosition(conditions);
+			cachedDistance = new Vector2f(vector2.x - vector.x, vector2.y - vector.y);
 		}
 		else
 		{
-			BMKAHMEJOJI = new Vector2f();
+			cachedDistance = new Vector2f();
 		}
-		return BMKAHMEJOJI;
+		return cachedDistance;
 	}
 
-	public void KJHPCLOFDJB(ModelObject OECPEDPMKCD, bool EKBOGDKIHIH, ModelNode AECCPADGGPG, bool PHADJMAONJG, ModelObject MJCGOJBGFIE = null)
+	public void UpdateNodes(ModelObject OECPEDPMKCD, bool EKBOGDKIHIH, ModelNode AECCPADGGPG, bool PHADJMAONJG, ModelObject MJCGOJBGFIE = null)
 	{
-		DLKOKBMKAJE.UpdateNode(OECPEDPMKCD, EKBOGDKIHIH, AECCPADGGPG, PHADJMAONJG, MJCGOJBGFIE);
-		KPBKMOCDIBF.UpdateNode(OECPEDPMKCD, EKBOGDKIHIH, AECCPADGGPG, PHADJMAONJG, MJCGOJBGFIE);
+		fromPoint.UpdateNode(OECPEDPMKCD, EKBOGDKIHIH, AECCPADGGPG, PHADJMAONJG, MJCGOJBGFIE);
+		toPoint.UpdateNode(OECPEDPMKCD, EKBOGDKIHIH, AECCPADGGPG, PHADJMAONJG, MJCGOJBGFIE);
 	}
 
-	public void JKDMJGNOKCA()
+	public void ClearChildPoints()
 	{
-		DLKOKBMKAJE.GPGKANDFLNB();
-		KPBKMOCDIBF.GPGKANDFLNB();
+		fromPoint.ClearChildPoints();
+		toPoint.ClearChildPoints();
 	}
 }

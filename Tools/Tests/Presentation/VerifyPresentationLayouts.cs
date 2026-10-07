@@ -1,7 +1,7 @@
 // Run with unity command eval_file --file Tools/Tests/Presentation/VerifyPresentationLayouts.cs.
 // Requires a loaded campaign. Creates only a temporary result UI; never presses OK
 // or applies an enchantment, so it grants no rewards and spends no materials.
-if (!Application.isPlaying || ListSF.CCDKHLAMKKO() == null) throw new Exception("Load a campaign first.");
+if (!Application.isPlaying || ListSF.GetRoster() == null) throw new Exception("Load a campaign first.");
 var checks=new System.Collections.Generic.List<string>();
 Action<bool,string> check=(ok,name)=>{if(!ok)throw new Exception(name);checks.Add(name);};
 var root=new GameObject("Presentation verification",typeof(RectTransform),typeof(Canvas),typeof(UnityEngine.UI.CanvasScaler));
@@ -11,9 +11,9 @@ try {
  var scaler=root.GetComponent<UnityEngine.UI.CanvasScaler>();
  scaler.uiScaleMode=UnityEngine.UI.CanvasScaler.ScaleMode.ScaleWithScreenSize;scaler.referenceResolution=new Vector2(2730,1536);scaler.matchWidthOrHeight=1;
  var screen=UnityEngine.Object.Instantiate(Resources.Load<GameObject>("prefabs/fight/display/screens/EndFightScreen"),root.transform,false).GetComponent<Nekki.SF2.GUI.Fight.EndFightScreen>();
- var result=new FightResult {MHNEKAEGNBO=GameOverTypes.GAME_OVER_WIN,AIOMDIAFHGB=new ComboStatistic(),NJNKGLJNNDH=100};
- result.AIOMDIAFHGB.ECOOCLMNFJM.PDJPOBHLIHA=12345;
- result.AIOMDIAFHGB.ECOOCLMNFJM.POPNFGNAOJD=12345;
+ var result=new FightResult {GameOverType=GameOverTypes.GAME_OVER_WIN,PlayerStatistics=new ComboStatistic(),ExpReward=100};
+ result.PlayerStatistics.Prize.BaseGold=12345;
+ result.PlayerStatistics.Prize.TotalGold=12345;
  screen.Init(result);
  screen.OnAnimationFinishButton();
  Canvas.ForceUpdateCanvases();
@@ -50,7 +50,7 @@ try {
  if(shop!=null) {
   var backdrop=shop.GetComponent<Eclipse.Rendering.ShopDojoBackdrop>();
   check(backdrop!=null,"Shop owns native dojo scenery");
-  check(Eclipse.Rendering.LocationAtmosphere.CurrentLocationName==Eclipse.Modding.ModRuntime.ResolveDojoLocation(GameUtils.NIPABEEAMHJ),"Shop matches selected dojo");
+  check(Eclipse.Rendering.LocationAtmosphere.CurrentLocationName==Eclipse.Modding.ModRuntime.ResolveDojoLocation(GameUtils.DefaultLocation),"Shop matches selected dojo");
   check(UnityEngine.Camera.main.GetComponent<EclipseScreenEffects>()!=null,"Shop camera supports mod screen effects");
   var forge=(Eclipse.Forge.ShopForgeController)typeof(Nekki.SF2.GUI.Shop.ShopScene).GetField("_forgeController",hidden).GetValue(shop);
   if(forge.IsOpen) {

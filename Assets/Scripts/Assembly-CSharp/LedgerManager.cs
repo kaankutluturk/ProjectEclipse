@@ -15,9 +15,9 @@ public class LedgerManager
 		// load remote ledger settings, and local fights must not depend on them.
 	}
 
-	private void ACPAMDHCFFE(bool DCJLKCFKCOM, string data, object IEHMCKBJCAK)
+	private void OnLedgerReceived(bool DCJLKCFKCOM, string data, object IEHMCKBJCAK)
 	{
-		Roster nKGLHEGIKKP = ListSF.CCDKHLAMKKO();
+		Roster nKGLHEGIKKP = ListSF.GetRoster();
 		if (nKGLHEGIKKP == null)
 		{
 			Debug.LogError("Roster not created error");
@@ -29,7 +29,7 @@ public class LedgerManager
 				return;
 			}
 			JSONNode jSONNode = JSON.Parse(data);
-			unconfirmedIds = SystemProperties.LFICEOIFOMI().ToList();
+			unconfirmedIds = SystemProperties.GetUnconfirmedLedgerIDs().ToList();
 			for (int i = 0; i < jSONNode.Count; i++)
 			{
 				JSONNode jSONNode2 = jSONNode[i];
@@ -37,31 +37,31 @@ public class LedgerManager
 				if (!unconfirmedIds.Contains(asInt))
 				{
 					unconfirmedIds.Add(asInt);
-					string lFLGCDNKNJI = jSONNode2["cur"].CIPOICEEIBK();
-					string fDGOFODPGPH = jSONNode2["ini"].CIPOICEEIBK();
+					string lFLGCDNKNJI = jSONNode2["cur"].GetString();
+					string fDGOFODPGPH = jSONNode2["ini"].GetString();
 					GiveReward(lFLGCDNKNJI, jSONNode2["cnt"], fDGOFODPGPH);
 				}
 			}
-			FMONIHMEGBF();
+			OnRewardsGiven();
 			SystemProperties.set_UnconfirmedLedgerIDs(unconfirmedIds.ToArray());
-			LIIBANIDLLI();
+			ConfirmRewards();
 		}
 	}
 
 	private void GiveReward(string LFLGCDNKNJI, JSONNode NICNMHCJIBJ, string FDGOFODPGPH)
 	{
-		Roster nKGLHEGIKKP = ListSF.CCDKHLAMKKO();
+		Roster nKGLHEGIKKP = ListSF.GetRoster();
 		if (FDGOFODPGPH == "admin")
 		{
 			switch (LFLGCDNKNJI)
 			{
 			case "GEMS":
-				EBAIKGHPPOG(NICNMHCJIBJ.ParseInt());
-				DialogsOpener.PEDJMOMBJJI("dlgAlertTitle", string.Concat("dlgGotGift{img::MiscSprites.ruby}{", NICNMHCJIBJ, "}"), "dlgStoryBtnTake", string.Empty, null, LabelButton.FBMGEHJPPIK.BUTTON_WHITE, LabelButton.FBMGEHJPPIK.BUTTON_DARK, false, false, string.Empty);
+				AddGems(NICNMHCJIBJ.ParseInt());
+				DialogsOpener.OpenSimpleDialog("dlgAlertTitle", string.Concat("dlgGotGift{img::MiscSprites.ruby}{", NICNMHCJIBJ, "}"), "dlgStoryBtnTake", string.Empty, null, LabelButton.ButtonColor.BUTTON_WHITE, LabelButton.ButtonColor.BUTTON_DARK, false, false, string.Empty);
 				break;
 			case "COINS":
-				GPEHMMKAOAL(NICNMHCJIBJ.ParseInt());
-				DialogsOpener.PEDJMOMBJJI("dlgAlertTitle", string.Concat("dlgGotGift{img::MiscSprites.gold}{", NICNMHCJIBJ, "}"), "dlgStoryBtnTake", string.Empty, null, LabelButton.FBMGEHJPPIK.BUTTON_WHITE, LabelButton.FBMGEHJPPIK.BUTTON_DARK, false, false, string.Empty);
+				AddCoins(NICNMHCJIBJ.ParseInt());
+				DialogsOpener.OpenSimpleDialog("dlgAlertTitle", string.Concat("dlgGotGift{img::MiscSprites.gold}{", NICNMHCJIBJ, "}"), "dlgStoryBtnTake", string.Empty, null, LabelButton.ButtonColor.BUTTON_WHITE, LabelButton.ButtonColor.BUTTON_DARK, false, false, string.Empty);
 				break;
 			default:
 				Debug.LogError("LedgerManagerSF::giveReward Unknown currency type");
@@ -79,31 +79,31 @@ public class LedgerManager
 				Debug.LogError("LedgerManager.GiveReward() Unknown currency type");
 			}
 		}
-		MenuController.IAMGKKOINFC();
+		MenuController.RefreshMoney();
 	}
 
-	private static void GPEHMMKAOAL(int NICNMHCJIBJ)
+	private static void AddCoins(int NICNMHCJIBJ)
 	{
-		Roster nKGLHEGIKKP = ListSF.CCDKHLAMKKO();
-		nKGLHEGIKKP.OIOOMAKNIOB(Math.Max(0L, nKGLHEGIKKP.BFBOEGMAMNF() + NICNMHCJIBJ));
+		Roster nKGLHEGIKKP = ListSF.GetRoster();
+		nKGLHEGIKKP.SetMoney(Math.Max(0L, nKGLHEGIKKP.GetMoney() + NICNMHCJIBJ));
 	}
 
-	private static void EBAIKGHPPOG(int NICNMHCJIBJ)
+	private static void AddGems(int NICNMHCJIBJ)
 	{
-		Roster nKGLHEGIKKP = ListSF.CCDKHLAMKKO();
-		nKGLHEGIKKP.LLNELLFMMBB(Math.Max(0L, nKGLHEGIKKP.EHFJHFDACMP() + NICNMHCJIBJ), Roster.HPOIJPGPOCF.CHANGE_LEDGER);
+		Roster nKGLHEGIKKP = ListSF.GetRoster();
+		nKGLHEGIKKP.SetBonus(Math.Max(0L, nKGLHEGIKKP.GetBonus() + NICNMHCJIBJ), Roster.BalanceChangeType.CHANGE_LEDGER);
 	}
 
-	private void FMONIHMEGBF()
+	private void OnRewardsGiven()
 	{
 	}
 
-	private void LIIBANIDLLI()
+	private void ConfirmRewards()
 	{
 		// No remote reward confirmation in offline builds.
 	}
 
-	private void KDLADLABMGE(bool DCJLKCFKCOM, string data, object IEHMCKBJCAK)
+	private void OnConfirmResponse(bool DCJLKCFKCOM, string data, object IEHMCKBJCAK)
 	{
 		if (DCJLKCFKCOM)
 		{

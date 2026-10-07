@@ -2,135 +2,135 @@ using System.Xml;
 
 public class MarketSettings
 {
-	private bool MFEKNCELHAP;
+	private bool isChinaMarket;
 
-	private bool POGHNJGEFEA;
+	private bool isJapanMarket;
 
-	private bool FNAMFKPJPGC;
+	private bool isKoreaMarket;
 
-	private bool MBPOBBKJGEP;
+	private bool isAmazonMarket;
 
-	private bool GEOCMAAICHH;
+	private bool isAmazonMobileMarket;
 
-	private bool GGLDMLFGFKB;
+	private bool isSteamMarket;
 
-	private bool ELACJCBLALD;
+	private bool isAndroidTvMarket;
 
-	private bool OHINGABDMDH;
+	private bool isWinStoreMarket;
 
-	public bool KBBBCKFOGBM
+	public bool IsChinaMarket
 	{
 		get
 		{
-			return BKGIFIPIHAL();
+			return GetIsChinaMarket();
 		}
 	}
 
-	public bool OIMBIEPEEAK
+	public bool IsJapanMarket
 	{
 		get
 		{
-			return GIGEOMONCON();
+			return GetIsJapanMarket();
 		}
 	}
 
-	public bool HPBDACCIMKG
+	public bool IsKoreaMarket
 	{
 		get
 		{
-			return DMJJDFCAKFG();
+			return GetIsKoreaMarket();
 		}
 	}
 
-	public bool LJKLEBDLAFI
+	public bool IsAmazonMarket
 	{
 		get
 		{
-			return NPNOMBEEPJD();
+			return GetIsAmazonMarket();
 		}
 	}
 
-	public bool ANMKPNMPKJA
+	public bool IsAmazonMobileMarket
 	{
 		get
 		{
-			return OPCBKOOFMAK();
+			return GetIsAmazonMobileMarket();
 		}
 	}
 
-	public bool FKCDDHMHFLG
+	public bool IsSteamMarket
 	{
 		get
 		{
-			return DBJOHGNPDDO();
+			return GetIsSteamMarket();
 		}
 	}
 
-	public bool PEFMKEAGJGK
+	public bool IsAndroidTvMarket
 	{
 		get
 		{
-			return COPJOJAMBKA();
+			return GetIsAndroidTvMarket();
 		}
 	}
 
-	public bool EDMLAOFBHHC
+	public bool IsWinStoreMarket
 	{
 		get
 		{
-			return OKALPNOADLJ();
+			return GetIsWinStoreMarket();
 		}
 	}
 
 	public void Parse(XmlNode node)
 	{
-		MFEKNCELHAP = node["China"].PNJPEDPDMCP().ParseBool();
-		POGHNJGEFEA = node["Japan"].PNJPEDPDMCP().ParseBool();
-		FNAMFKPJPGC = node["Korea"].PNJPEDPDMCP().ParseBool();
-		MBPOBBKJGEP = node["Amazon"].PNJPEDPDMCP().ParseBool();
-		GEOCMAAICHH = node["AmazonMobile"].PNJPEDPDMCP().ParseBool();
-		GGLDMLFGFKB = node["Steam"].PNJPEDPDMCP().ParseBool();
-		ELACJCBLALD = node["AndroidTV"].PNJPEDPDMCP().ParseBool();
-		OHINGABDMDH = node["WinStore"].PNJPEDPDMCP().ParseBool();
+		isChinaMarket = node["China"].FirstAttribute().ParseBool();
+		isJapanMarket = node["Japan"].FirstAttribute().ParseBool();
+		isKoreaMarket = node["Korea"].FirstAttribute().ParseBool();
+		isAmazonMarket = node["Amazon"].FirstAttribute().ParseBool();
+		isAmazonMobileMarket = node["AmazonMobile"].FirstAttribute().ParseBool();
+		isSteamMarket = node["Steam"].FirstAttribute().ParseBool();
+		isAndroidTvMarket = node["AndroidTV"].FirstAttribute().ParseBool();
+		isWinStoreMarket = node["WinStore"].FirstAttribute().ParseBool();
 	}
 
-	public bool BKGIFIPIHAL()
+	public bool GetIsChinaMarket()
 	{
-		return MFEKNCELHAP;
+		return isChinaMarket;
 	}
 
-	public bool GIGEOMONCON()
+	public bool GetIsJapanMarket()
 	{
-		return POGHNJGEFEA;
+		return isJapanMarket;
 	}
 
-	public bool DMJJDFCAKFG()
+	public bool GetIsKoreaMarket()
 	{
-		return FNAMFKPJPGC;
+		return isKoreaMarket;
 	}
 
-	public bool NPNOMBEEPJD()
+	public bool GetIsAmazonMarket()
 	{
-		return MBPOBBKJGEP;
+		return isAmazonMarket;
 	}
 
-	public bool OPCBKOOFMAK()
+	public bool GetIsAmazonMobileMarket()
 	{
-		return GEOCMAAICHH;
+		return isAmazonMobileMarket;
 	}
 
-	public bool DBJOHGNPDDO()
+	public bool GetIsSteamMarket()
 	{
-		return GGLDMLFGFKB;
+		return isSteamMarket;
 	}
 
-	public bool COPJOJAMBKA()
+	public bool GetIsAndroidTvMarket()
 	{
-		return ELACJCBLALD;
+		return isAndroidTvMarket;
 	}
 
-	public bool OKALPNOADLJ()
+	public bool GetIsWinStoreMarket()
 	{
-		return OHINGABDMDH;
+		return isWinStoreMarket;
 	}
 }

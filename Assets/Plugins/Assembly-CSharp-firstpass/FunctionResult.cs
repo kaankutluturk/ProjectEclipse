@@ -2,18 +2,18 @@ using System.Collections.Generic;
 
 public class FunctionResult
 {
-	public string DCJLKCFKCOM;
+	public string Value;
 
 	public int ToInt()
 	{
 		float result;
-		if (!float.TryParse(DCJLKCFKCOM, out result))
+		if (!float.TryParse(Value, out result))
 		{
-			Dictionary<string, RpnParser.PHNLIHEJEPK> pPEABEJMCPI = new Dictionary<string, RpnParser.PHNLIHEJEPK>();
+			Dictionary<string, RpnParser.VariableDelegate> pPEABEJMCPI = new Dictionary<string, RpnParser.VariableDelegate>();
 			Dictionary<string, RpnParser.ParameterDelegate> gIOGAJGIGMO = new Dictionary<string, RpnParser.ParameterDelegate>();
 			RpnParser.init(pPEABEJMCPI, gIOGAJGIGMO);
-			RpnParser.Formula lANLKOHCGEJ = new RpnParser.Formula(DCJLKCFKCOM);
-			object obj = lANLKOHCGEJ.ODHJHHMEEOI();
+			RpnParser.Formula lANLKOHCGEJ = new RpnParser.Formula(Value);
+			object obj = lANLKOHCGEJ.Calculate();
 			if (!float.TryParse(obj.ToString(), out result))
 			{
 				result = 0f;
@@ -25,13 +25,13 @@ public class FunctionResult
 	public float ToFloat()
 	{
 		float result;
-		if (!float.TryParse(DCJLKCFKCOM, out result))
+		if (!float.TryParse(Value, out result))
 		{
-			Dictionary<string, RpnParser.PHNLIHEJEPK> pPEABEJMCPI = new Dictionary<string, RpnParser.PHNLIHEJEPK>();
+			Dictionary<string, RpnParser.VariableDelegate> pPEABEJMCPI = new Dictionary<string, RpnParser.VariableDelegate>();
 			Dictionary<string, RpnParser.ParameterDelegate> gIOGAJGIGMO = new Dictionary<string, RpnParser.ParameterDelegate>();
 			RpnParser.init(pPEABEJMCPI, gIOGAJGIGMO);
-			RpnParser.Formula lANLKOHCGEJ = new RpnParser.Formula(DCJLKCFKCOM);
-			object obj = lANLKOHCGEJ.ODHJHHMEEOI();
+			RpnParser.Formula lANLKOHCGEJ = new RpnParser.Formula(Value);
+			object obj = lANLKOHCGEJ.Calculate();
 			if (!float.TryParse(obj.ToString(), out result))
 			{
 				return 0f;

@@ -1,6 +1,6 @@
 internal sealed class InflateManager
 {
-	private enum EMMGLMMPKDO
+	private enum InflateManagerMode
 	{
 		METHOD = 0,
 		FLAG = 1,
@@ -18,35 +18,35 @@ internal sealed class InflateManager
 		BAD = 13
 	}
 
-	private const int LEDINGHODAJ = 32;
+	private const int PRESET_DICT = 32;
 
-	private const int GLGHJDNCDON = 8;
+	private const int Z_DEFLATED = 8;
 
-	private EMMGLMMPKDO NMMPBADCFHK;
+	private InflateManagerMode mode;
 
-	internal ZlibCodec CJMKCEHHMCH;
+	internal ZlibCodec _codec;
 
-	internal int FJLOLCPJACB;
+	internal int method;
 
-	internal uint MNAKBCPLIMJ;
+	internal uint computedCheck;
 
-	internal uint IFIAIEJEEOK;
+	internal uint expectedCheck;
 
-	internal int OMHIFDHPIMD;
+	internal int marker;
 
 	private bool _handleRfc1950HeaderBytes = true;
 
-	internal int BEJLEKCJHFM;
+	internal int wbits;
 
-	internal InflateBlocks CGKHDGJKOMG;
+	internal InflateBlocks blocks;
 
 	private static readonly byte[] mark = new byte[4] { 0, 0, 255, 255 };
 
-	internal bool NGMPHIPIFLC
+	internal bool HandleRfc1950Header
 	{
 		get
 		{
-			return CJPMKPAIMCF();
+			return GetHandleRfc1950HeaderBytes();
 		}
 		set
 		{
@@ -63,7 +63,7 @@ internal sealed class InflateManager
 		_handleRfc1950HeaderBytes = FOCCBLONFOF;
 	}
 
-	internal bool CJPMKPAIMCF()
+	internal bool GetHandleRfc1950HeaderBytes()
 	{
 		return _handleRfc1950HeaderBytes;
 	}
@@ -75,42 +75,42 @@ internal sealed class InflateManager
 
 	internal int Reset()
 	{
-		CJMKCEHHMCH.ALJBBHPGGPA = (CJMKCEHHMCH.HCDKLJJLMOD = 0L);
-		CJMKCEHHMCH.Message = null;
-		NMMPBADCFHK = ((!CJPMKPAIMCF()) ? EMMGLMMPKDO.BLOCKS : EMMGLMMPKDO.METHOD);
-		CGKHDGJKOMG.Reset();
+		_codec.TotalBytesIn = (_codec.TotalBytesOut = 0L);
+		_codec.Message = null;
+		mode = ((!GetHandleRfc1950HeaderBytes()) ? InflateManagerMode.BLOCKS : InflateManagerMode.METHOD);
+		blocks.Reset();
 		return 0;
 	}
 
-	internal int PLHPGFGAGKJ()
+	internal int End()
 	{
-		if (CGKHDGJKOMG != null)
+		if (blocks != null)
 		{
-			CGKHDGJKOMG.PJNFHNFLNNO();
+			blocks.Free();
 		}
-		CGKHDGJKOMG = null;
+		blocks = null;
 		return 0;
 	}
 
-	internal int EHAJODIAFEG(ZlibCodec HNJFOALABOA, int OKPHBCHECPI)
+	internal int Initialize(ZlibCodec HNJFOALABOA, int OKPHBCHECPI)
 	{
-		CJMKCEHHMCH = HNJFOALABOA;
-		CJMKCEHHMCH.Message = null;
-		CGKHDGJKOMG = null;
+		_codec = HNJFOALABOA;
+		_codec.Message = null;
+		blocks = null;
 		if (OKPHBCHECPI < 8 || OKPHBCHECPI > 15)
 		{
-			PLHPGFGAGKJ();
+			End();
 			throw new ZlibException("Bad window size.");
 		}
-		BEJLEKCJHFM = OKPHBCHECPI;
-		CGKHDGJKOMG = new InflateBlocks(HNJFOALABOA, (!CJPMKPAIMCF()) ? null : this, 1 << OKPHBCHECPI);
+		wbits = OKPHBCHECPI;
+		blocks = new InflateBlocks(HNJFOALABOA, (!GetHandleRfc1950HeaderBytes()) ? null : this, 1 << OKPHBCHECPI);
 		Reset();
 		return 0;
 	}
 
-	internal int Inflate(AFJHGKAEJPG NGBJDNFAPKC)
+	internal int Inflate(FlushType NGBJDNFAPKC)
 	{
-		if (CJMKCEHHMCH.PEFOCMDODLD == null)
+		if (_codec.InputBuffer == null)
 		{
 			throw new ZlibException("InputBuffer is null. ");
 		}
@@ -118,112 +118,112 @@ internal sealed class InflateManager
 		int num2 = -5;
 		while (true)
 		{
-			switch (NMMPBADCFHK)
+			switch (mode)
 			{
-			case EMMGLMMPKDO.METHOD:
-				if (CJMKCEHHMCH.IAPJEIDMGNP == 0)
+			case InflateManagerMode.METHOD:
+				if (_codec.AvailableBytesIn == 0)
 				{
 					return num2;
 				}
 				num2 = num;
-				CJMKCEHHMCH.IAPJEIDMGNP--;
-				CJMKCEHHMCH.ALJBBHPGGPA++;
-				if (((FJLOLCPJACB = CJMKCEHHMCH.PEFOCMDODLD[CJMKCEHHMCH.LMIPBGGILEJ++]) & 0xF) != 8)
+				_codec.AvailableBytesIn--;
+				_codec.TotalBytesIn++;
+				if (((method = _codec.InputBuffer[_codec.NextIn++]) & 0xF) != 8)
 				{
-					NMMPBADCFHK = EMMGLMMPKDO.BAD;
-					CJMKCEHHMCH.Message = string.Format("unknown compression method (0x{0:X2})", FJLOLCPJACB);
-					OMHIFDHPIMD = 5;
+					mode = InflateManagerMode.BAD;
+					_codec.Message = string.Format("unknown compression method (0x{0:X2})", method);
+					marker = 5;
 				}
-				else if ((FJLOLCPJACB >> 4) + 8 > BEJLEKCJHFM)
+				else if ((method >> 4) + 8 > wbits)
 				{
-					NMMPBADCFHK = EMMGLMMPKDO.BAD;
-					CJMKCEHHMCH.Message = string.Format("invalid window size ({0})", (FJLOLCPJACB >> 4) + 8);
-					OMHIFDHPIMD = 5;
+					mode = InflateManagerMode.BAD;
+					_codec.Message = string.Format("invalid window size ({0})", (method >> 4) + 8);
+					marker = 5;
 				}
 				else
 				{
-					NMMPBADCFHK = EMMGLMMPKDO.FLAG;
+					mode = InflateManagerMode.FLAG;
 				}
 				break;
-			case EMMGLMMPKDO.FLAG:
+			case InflateManagerMode.FLAG:
 			{
-				if (CJMKCEHHMCH.IAPJEIDMGNP == 0)
+				if (_codec.AvailableBytesIn == 0)
 				{
 					return num2;
 				}
 				num2 = num;
-				CJMKCEHHMCH.IAPJEIDMGNP--;
-				CJMKCEHHMCH.ALJBBHPGGPA++;
-				int num3 = CJMKCEHHMCH.PEFOCMDODLD[CJMKCEHHMCH.LMIPBGGILEJ++] & 0xFF;
-				if (((FJLOLCPJACB << 8) + num3) % 31 != 0)
+				_codec.AvailableBytesIn--;
+				_codec.TotalBytesIn++;
+				int num3 = _codec.InputBuffer[_codec.NextIn++] & 0xFF;
+				if (((method << 8) + num3) % 31 != 0)
 				{
-					NMMPBADCFHK = EMMGLMMPKDO.BAD;
-					CJMKCEHHMCH.Message = "incorrect header check";
-					OMHIFDHPIMD = 5;
+					mode = InflateManagerMode.BAD;
+					_codec.Message = "incorrect header check";
+					marker = 5;
 				}
 				else
 				{
-					NMMPBADCFHK = (((num3 & 0x20) != 0) ? EMMGLMMPKDO.DICT4 : EMMGLMMPKDO.BLOCKS);
+					mode = (((num3 & 0x20) != 0) ? InflateManagerMode.DICT4 : InflateManagerMode.BLOCKS);
 				}
 				break;
 			}
-			case EMMGLMMPKDO.DICT4:
-				if (CJMKCEHHMCH.IAPJEIDMGNP == 0)
+			case InflateManagerMode.DICT4:
+				if (_codec.AvailableBytesIn == 0)
 				{
 					return num2;
 				}
 				num2 = num;
-				CJMKCEHHMCH.IAPJEIDMGNP--;
-				CJMKCEHHMCH.ALJBBHPGGPA++;
-				IFIAIEJEEOK = (uint)((CJMKCEHHMCH.PEFOCMDODLD[CJMKCEHHMCH.LMIPBGGILEJ++] << 24) & 0xFF000000u);
-				NMMPBADCFHK = EMMGLMMPKDO.DICT3;
+				_codec.AvailableBytesIn--;
+				_codec.TotalBytesIn++;
+				expectedCheck = (uint)((_codec.InputBuffer[_codec.NextIn++] << 24) & 0xFF000000u);
+				mode = InflateManagerMode.DICT3;
 				break;
-			case EMMGLMMPKDO.DICT3:
-				if (CJMKCEHHMCH.IAPJEIDMGNP == 0)
+			case InflateManagerMode.DICT3:
+				if (_codec.AvailableBytesIn == 0)
 				{
 					return num2;
 				}
 				num2 = num;
-				CJMKCEHHMCH.IAPJEIDMGNP--;
-				CJMKCEHHMCH.ALJBBHPGGPA++;
-				IFIAIEJEEOK += (uint)((CJMKCEHHMCH.PEFOCMDODLD[CJMKCEHHMCH.LMIPBGGILEJ++] << 16) & 0xFF0000);
-				NMMPBADCFHK = EMMGLMMPKDO.DICT2;
+				_codec.AvailableBytesIn--;
+				_codec.TotalBytesIn++;
+				expectedCheck += (uint)((_codec.InputBuffer[_codec.NextIn++] << 16) & 0xFF0000);
+				mode = InflateManagerMode.DICT2;
 				break;
-			case EMMGLMMPKDO.DICT2:
-				if (CJMKCEHHMCH.IAPJEIDMGNP == 0)
+			case InflateManagerMode.DICT2:
+				if (_codec.AvailableBytesIn == 0)
 				{
 					return num2;
 				}
 				num2 = num;
-				CJMKCEHHMCH.IAPJEIDMGNP--;
-				CJMKCEHHMCH.ALJBBHPGGPA++;
-				IFIAIEJEEOK += (uint)((CJMKCEHHMCH.PEFOCMDODLD[CJMKCEHHMCH.LMIPBGGILEJ++] << 8) & 0xFF00);
-				NMMPBADCFHK = EMMGLMMPKDO.DICT1;
+				_codec.AvailableBytesIn--;
+				_codec.TotalBytesIn++;
+				expectedCheck += (uint)((_codec.InputBuffer[_codec.NextIn++] << 8) & 0xFF00);
+				mode = InflateManagerMode.DICT1;
 				break;
-			case EMMGLMMPKDO.DICT1:
-				if (CJMKCEHHMCH.IAPJEIDMGNP == 0)
+			case InflateManagerMode.DICT1:
+				if (_codec.AvailableBytesIn == 0)
 				{
 					return num2;
 				}
 				num2 = num;
-				CJMKCEHHMCH.IAPJEIDMGNP--;
-				CJMKCEHHMCH.ALJBBHPGGPA++;
-				IFIAIEJEEOK += (uint)(CJMKCEHHMCH.PEFOCMDODLD[CJMKCEHHMCH.LMIPBGGILEJ++] & 0xFF);
-				CJMKCEHHMCH._Adler32 = IFIAIEJEEOK;
-				NMMPBADCFHK = EMMGLMMPKDO.DICT0;
+				_codec.AvailableBytesIn--;
+				_codec.TotalBytesIn++;
+				expectedCheck += (uint)(_codec.InputBuffer[_codec.NextIn++] & 0xFF);
+				_codec._Adler32 = expectedCheck;
+				mode = InflateManagerMode.DICT0;
 				return 2;
-			case EMMGLMMPKDO.DICT0:
-				NMMPBADCFHK = EMMGLMMPKDO.BAD;
-				CJMKCEHHMCH.Message = "need dictionary";
-				OMHIFDHPIMD = 0;
+			case InflateManagerMode.DICT0:
+				mode = InflateManagerMode.BAD;
+				_codec.Message = "need dictionary";
+				marker = 0;
 				return -2;
-			case EMMGLMMPKDO.BLOCKS:
-				num2 = CGKHDGJKOMG.HDEHLIKBKJG(num2);
+			case InflateManagerMode.BLOCKS:
+				num2 = blocks.Process(num2);
 				switch (num2)
 				{
 				case -3:
-					NMMPBADCFHK = EMMGLMMPKDO.BAD;
-					OMHIFDHPIMD = 0;
+					mode = InflateManagerMode.BAD;
+					marker = 0;
 					goto end_IL_0028;
 				case 0:
 					num2 = num;
@@ -234,69 +234,69 @@ internal sealed class InflateManager
 					return num2;
 				}
 				num2 = num;
-				MNAKBCPLIMJ = CGKHDGJKOMG.Reset();
-				if (!CJPMKPAIMCF())
+				computedCheck = blocks.Reset();
+				if (!GetHandleRfc1950HeaderBytes())
 				{
-					NMMPBADCFHK = EMMGLMMPKDO.DONE;
+					mode = InflateManagerMode.DONE;
 					return 1;
 				}
-				NMMPBADCFHK = EMMGLMMPKDO.CHECK4;
+				mode = InflateManagerMode.CHECK4;
 				break;
-			case EMMGLMMPKDO.CHECK4:
-				if (CJMKCEHHMCH.IAPJEIDMGNP == 0)
+			case InflateManagerMode.CHECK4:
+				if (_codec.AvailableBytesIn == 0)
 				{
 					return num2;
 				}
 				num2 = num;
-				CJMKCEHHMCH.IAPJEIDMGNP--;
-				CJMKCEHHMCH.ALJBBHPGGPA++;
-				IFIAIEJEEOK = (uint)((CJMKCEHHMCH.PEFOCMDODLD[CJMKCEHHMCH.LMIPBGGILEJ++] << 24) & 0xFF000000u);
-				NMMPBADCFHK = EMMGLMMPKDO.CHECK3;
+				_codec.AvailableBytesIn--;
+				_codec.TotalBytesIn++;
+				expectedCheck = (uint)((_codec.InputBuffer[_codec.NextIn++] << 24) & 0xFF000000u);
+				mode = InflateManagerMode.CHECK3;
 				break;
-			case EMMGLMMPKDO.CHECK3:
-				if (CJMKCEHHMCH.IAPJEIDMGNP == 0)
+			case InflateManagerMode.CHECK3:
+				if (_codec.AvailableBytesIn == 0)
 				{
 					return num2;
 				}
 				num2 = num;
-				CJMKCEHHMCH.IAPJEIDMGNP--;
-				CJMKCEHHMCH.ALJBBHPGGPA++;
-				IFIAIEJEEOK += (uint)((CJMKCEHHMCH.PEFOCMDODLD[CJMKCEHHMCH.LMIPBGGILEJ++] << 16) & 0xFF0000);
-				NMMPBADCFHK = EMMGLMMPKDO.CHECK2;
+				_codec.AvailableBytesIn--;
+				_codec.TotalBytesIn++;
+				expectedCheck += (uint)((_codec.InputBuffer[_codec.NextIn++] << 16) & 0xFF0000);
+				mode = InflateManagerMode.CHECK2;
 				break;
-			case EMMGLMMPKDO.CHECK2:
-				if (CJMKCEHHMCH.IAPJEIDMGNP == 0)
+			case InflateManagerMode.CHECK2:
+				if (_codec.AvailableBytesIn == 0)
 				{
 					return num2;
 				}
 				num2 = num;
-				CJMKCEHHMCH.IAPJEIDMGNP--;
-				CJMKCEHHMCH.ALJBBHPGGPA++;
-				IFIAIEJEEOK += (uint)((CJMKCEHHMCH.PEFOCMDODLD[CJMKCEHHMCH.LMIPBGGILEJ++] << 8) & 0xFF00);
-				NMMPBADCFHK = EMMGLMMPKDO.CHECK1;
+				_codec.AvailableBytesIn--;
+				_codec.TotalBytesIn++;
+				expectedCheck += (uint)((_codec.InputBuffer[_codec.NextIn++] << 8) & 0xFF00);
+				mode = InflateManagerMode.CHECK1;
 				break;
-			case EMMGLMMPKDO.CHECK1:
-				if (CJMKCEHHMCH.IAPJEIDMGNP == 0)
+			case InflateManagerMode.CHECK1:
+				if (_codec.AvailableBytesIn == 0)
 				{
 					return num2;
 				}
 				num2 = num;
-				CJMKCEHHMCH.IAPJEIDMGNP--;
-				CJMKCEHHMCH.ALJBBHPGGPA++;
-				IFIAIEJEEOK += (uint)(CJMKCEHHMCH.PEFOCMDODLD[CJMKCEHHMCH.LMIPBGGILEJ++] & 0xFF);
-				if (MNAKBCPLIMJ != IFIAIEJEEOK)
+				_codec.AvailableBytesIn--;
+				_codec.TotalBytesIn++;
+				expectedCheck += (uint)(_codec.InputBuffer[_codec.NextIn++] & 0xFF);
+				if (computedCheck != expectedCheck)
 				{
-					NMMPBADCFHK = EMMGLMMPKDO.BAD;
-					CJMKCEHHMCH.Message = "incorrect data check";
-					OMHIFDHPIMD = 5;
+					mode = InflateManagerMode.BAD;
+					_codec.Message = "incorrect data check";
+					marker = 5;
 					break;
 				}
-				NMMPBADCFHK = EMMGLMMPKDO.DONE;
+				mode = InflateManagerMode.DONE;
 				return 1;
-			case EMMGLMMPKDO.DONE:
+			case InflateManagerMode.DONE:
 				return 1;
-			case EMMGLMMPKDO.BAD:
-				throw new ZlibException(string.Format("Bad state ({0})", CJMKCEHHMCH.Message));
+			case InflateManagerMode.BAD:
+				throw new ZlibException(string.Format("Bad state ({0})", _codec.Message));
 			default:
 				{
 					throw new ZlibException("Stream error.");
@@ -311,64 +311,64 @@ internal sealed class InflateManager
 	{
 		int iLENLCMAMBH = 0;
 		int num = dictionary.Length;
-		if (NMMPBADCFHK != EMMGLMMPKDO.DICT0)
+		if (mode != InflateManagerMode.DICT0)
 		{
 			throw new ZlibException("Stream error.");
 		}
-		if (Adler.IAJPFDALGJM(1u, dictionary, 0, dictionary.Length) != CJMKCEHHMCH._Adler32)
+		if (Adler.Adler32(1u, dictionary, 0, dictionary.Length) != _codec._Adler32)
 		{
 			return -3;
 		}
-		CJMKCEHHMCH._Adler32 = Adler.IAJPFDALGJM(0u, null, 0, 0);
-		if (num >= 1 << BEJLEKCJHFM)
+		_codec._Adler32 = Adler.Adler32(0u, null, 0, 0);
+		if (num >= 1 << wbits)
 		{
-			num = (1 << BEJLEKCJHFM) - 1;
+			num = (1 << wbits) - 1;
 			iLENLCMAMBH = dictionary.Length - num;
 		}
-		CGKHDGJKOMG.SetDictionary(dictionary, iLENLCMAMBH, num);
-		NMMPBADCFHK = EMMGLMMPKDO.BLOCKS;
+		blocks.SetDictionary(dictionary, iLENLCMAMBH, num);
+		mode = InflateManagerMode.BLOCKS;
 		return 0;
 	}
 
-	internal int JGCOKJJDLBC()
+	internal int Sync()
 	{
-		if (NMMPBADCFHK != EMMGLMMPKDO.BAD)
+		if (mode != InflateManagerMode.BAD)
 		{
-			NMMPBADCFHK = EMMGLMMPKDO.BAD;
-			OMHIFDHPIMD = 0;
+			mode = InflateManagerMode.BAD;
+			marker = 0;
 		}
 		int num;
-		if ((num = CJMKCEHHMCH.IAPJEIDMGNP) == 0)
+		if ((num = _codec.AvailableBytesIn) == 0)
 		{
 			return -5;
 		}
-		int num2 = CJMKCEHHMCH.LMIPBGGILEJ;
-		int num3 = OMHIFDHPIMD;
+		int num2 = _codec.NextIn;
+		int num3 = marker;
 		while (num != 0 && num3 < 4)
 		{
-			num3 = ((CJMKCEHHMCH.PEFOCMDODLD[num2] != mark[num3]) ? ((CJMKCEHHMCH.PEFOCMDODLD[num2] == 0) ? (4 - num3) : 0) : (num3 + 1));
+			num3 = ((_codec.InputBuffer[num2] != mark[num3]) ? ((_codec.InputBuffer[num2] == 0) ? (4 - num3) : 0) : (num3 + 1));
 			num2++;
 			num--;
 		}
-		CJMKCEHHMCH.ALJBBHPGGPA += num2 - CJMKCEHHMCH.LMIPBGGILEJ;
-		CJMKCEHHMCH.LMIPBGGILEJ = num2;
-		CJMKCEHHMCH.IAPJEIDMGNP = num;
-		OMHIFDHPIMD = num3;
+		_codec.TotalBytesIn += num2 - _codec.NextIn;
+		_codec.NextIn = num2;
+		_codec.AvailableBytesIn = num;
+		marker = num3;
 		if (num3 != 4)
 		{
 			return -3;
 		}
-		long aLJBBHPGGPA = CJMKCEHHMCH.ALJBBHPGGPA;
-		long hCDKLJJLMOD = CJMKCEHHMCH.HCDKLJJLMOD;
+		long aLJBBHPGGPA = _codec.TotalBytesIn;
+		long hCDKLJJLMOD = _codec.TotalBytesOut;
 		Reset();
-		CJMKCEHHMCH.ALJBBHPGGPA = aLJBBHPGGPA;
-		CJMKCEHHMCH.HCDKLJJLMOD = hCDKLJJLMOD;
-		NMMPBADCFHK = EMMGLMMPKDO.BLOCKS;
+		_codec.TotalBytesIn = aLJBBHPGGPA;
+		_codec.TotalBytesOut = hCDKLJJLMOD;
+		mode = InflateManagerMode.BLOCKS;
 		return 0;
 	}
 
-	internal int NGLFANAHOJJ(ZlibCodec LKPCKJOLJDO)
+	internal int SyncPoint(ZlibCodec LKPCKJOLJDO)
 	{
-		return CGKHDGJKOMG.NGLFANAHOJJ();
+		return blocks.SyncPoint();
 	}
 }

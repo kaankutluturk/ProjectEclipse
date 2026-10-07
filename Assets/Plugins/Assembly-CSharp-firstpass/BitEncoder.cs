@@ -1,14 +1,14 @@
 internal struct BitEncoder
 {
-	public const int GMKPCANHECM = 11;
+	public const int kNumBitModelTotalBits = 11;
 
 	public const uint kBitModelTotal = 2048u;
 
-	private const int PEDEJBJFKOF = 5;
+	private const int kNumMoveBits = 5;
 
-	private const int MAGKCKLGMDD = 2;
+	private const int kNumMoveReducingBits = 2;
 
-	public const int CNMMKAGLEHI = 6;
+	public const int kNumBitPriceShiftBits = 6;
 
 	private uint Prob;
 
@@ -45,7 +45,7 @@ internal struct BitEncoder
 		}
 	}
 
-	public void Encode(ABCAONADOMK GLOJHMAIFOK, uint symbol)
+	public void Encode(RangeEncoder GLOJHMAIFOK, uint symbol)
 	{
 		uint num = (GLOJHMAIFOK.Range >> 11) * Prob;
 		if (symbol == 0)
@@ -62,7 +62,7 @@ internal struct BitEncoder
 		if (GLOJHMAIFOK.Range < 16777216)
 		{
 			GLOJHMAIFOK.Range <<= 8;
-			GLOJHMAIFOK.GDJHIBPJMBN();
+			GLOJHMAIFOK.ShiftLow();
 		}
 	}
 
@@ -71,12 +71,12 @@ internal struct BitEncoder
 		return ProbPrices[(((Prob - symbol) ^ (int)(0 - symbol)) & 0x7FF) >> 2];
 	}
 
-	public uint ONPEFCGICJL()
+	public uint GetPrice0()
 	{
 		return ProbPrices[Prob >> 2];
 	}
 
-	public uint AJMPGCNGLHF()
+	public uint GetPrice1()
 	{
 		return ProbPrices[2048 - Prob >> 2];
 	}

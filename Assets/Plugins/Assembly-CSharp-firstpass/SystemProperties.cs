@@ -7,7 +7,7 @@ using UnityEngine.Profiling;
 
 public class SystemProperties
 {
-	public enum LOHALAKNGFB
+	public enum PathType
 	{
 		PATH_SMALL = 0,
 		PATH_BIG = 1,
@@ -15,295 +15,295 @@ public class SystemProperties
 		PATH_NONE = 2
 	}
 
-	private static Vector2 EMGIKFNGDMA = new Vector2(1024f, 768f);
+	private static Vector2 smallResolution = new Vector2(1024f, 768f);
 
-	private static Vector2 PALJEJEKBMB = new Vector2(2048f, 1536f);
+	private static Vector2 bigResolution = new Vector2(2048f, 1536f);
 
-	private static Vector2 JNMPKENKPJK = new Vector2(1365f, 768f);
+	private static Vector2 wideResolution = new Vector2(1365f, 768f);
 
-	private static DeviceInfo BIFPNNLNKHA = new DeviceInfo();
+	private static DeviceInfo deviceInfo = new DeviceInfo();
 
 	private static int _numOfDisplayModes = 0;
 
-	private static List<QualityCondition> AGOHLNDLAEA = new List<QualityCondition>();
+	private static List<QualityCondition> qualityConditions = new List<QualityCondition>();
 
-	public static Vector2 CALAEHKMGLE = default(Vector2);
+	public static Vector2 PictureResolution = default(Vector2);
 
-	public static float ALOKJEILMLK = 1f;
+	public static float ScaleX = 1f;
 
-	public static float NHIDNIPGCPC = 1f;
+	public static float ScaleY = 1f;
 
-	public static float PBIEBOJBFMD = 0f;
+	public static float VirtualWidth = 0f;
 
-	public static float GOBOMOJIDOO = 0f;
+	public static float VirtualHeight = 0f;
 
-	private static bool? NMHFJLJCNDH;
+	private static bool? isPaidCached;
 
-	private static string KHFNFFOFKLF
+	private static string IdentifierSuffix
 	{
 		get
 		{
-			return DOKBFGCJAGH();
+			return GetIdentifierSuffix();
 		}
 	}
 
-	public static bool CPLBCOBPCCJ
+	public static bool IsDebugMode
 	{
 		get
 		{
-			return DBBOCENKMGD();
+			return IsDebug();
 		}
 	}
 
-	public static bool FIEAMGMOEGL
+	public static bool Enabled
 	{
 		get
 		{
-			return FHHPHDIBEFM();
+			return IsEnabled();
 		}
 	}
 
-	public static bool IIGNAAPBDFE
+	public static bool Available
 	{
 		get
 		{
-			return NDEPIDFFOBF();
+			return IsAvailable();
 		}
 	}
 
-	public static int ILLOKFLDDON
+	public static int NumOfDisplayModes
 	{
 		get
 		{
-			return NPDPKLMFBHH();
+			return GetNumOfDisplayModes();
 		}
 	}
 
-	public static int LCAJCJFBJDM
+	public static int ScreenWidth
 	{
 		get
 		{
-			return MCGOBLKFGHO();
+			return GetScreenWidth();
 		}
 	}
 
-	public static int CLBGKICNMIH
+	public static int ScreenHeight
 	{
 		get
 		{
-			return OACFGEDMCOD();
+			return GetScreenHeight();
 		}
 	}
 
-	public static bool ODDGLIEHGFK
+	public static bool IsEditor
 	{
 		get
 		{
-			return LHGPKEFEHDH();
+			return IsEditorPlatform();
 		}
 	}
 
-	public static bool PPHNHLODNIN
+	public static bool IsWindowsEditor
 	{
 		get
 		{
-			return PPFPHAKMNLC();
+			return IsWindowsEditorPlatform();
 		}
 	}
 
-	public static bool MHDCIGHDIME
+	public static bool IsIos
 	{
 		get
 		{
-			return MEBGOGMJFLM();
+			return IsIosPlatform();
 		}
 	}
 
-	public static bool DAAKJIIDJBG
+	public static bool IsAndroid
 	{
 		get
 		{
-			return IPJFCBAGMJJ();
+			return IsAndroidPlatform();
 		}
 	}
 
-	public static bool HDEKJHLMKPC
+	public static bool IsWindows
 	{
 		get
 		{
-			return CEJMCBKCPOH();
+			return IsWindowsPlatform();
 		}
 	}
 
-	public static bool LANIPINOLAH
+	public static bool IsMac
 	{
 		get
 		{
-			return AOJIOMDCEKN();
+			return IsMacPlatform();
 		}
 	}
 
-	public static bool DDEOPDADDHK
+	public static bool IsMetroArm
 	{
 		get
 		{
-			return AFKGHBJPLOK();
+			return IsMetroArmPlatform();
 		}
 	}
 
-	public static bool HFPHMLJKIIH
+	public static bool IsWindowsStore
 	{
 		get
 		{
-			return NFFOJCHNPJD();
+			return IsWindowsStorePlatform();
 		}
 	}
 
-	public static bool FANDPECGOFF
+	public static bool IsWp8
 	{
 		get
 		{
-			return DDIDANINPJE();
+			return IsWp8Platform();
 		}
 	}
 
-	public static bool OEPPKLJBEIP
+	public static bool IsTizen
 	{
 		get
 		{
-			return GEBFGBAJMIE();
+			return IsTizenPlatform();
 		}
 	}
 
-	public static bool DCHNPKKJFPG
+	public static bool IsMobile
 	{
 		get
 		{
-			return GAAMHGCDANB();
+			return IsMobilePlatform();
 		}
 	}
 
-	public static bool OKNGOOIIOAB
+	public static bool HasConnection
 	{
 		get
 		{
-			return PKLFCFBEIIG();
+			return CheckConnection();
 		}
 	}
 
-	public static bool OMHPPHBPFDO
+	public static bool IsOnline
 	{
 		get
 		{
-			return DCKPKCIFOAG();
+			return CheckOnline();
 		}
 	}
 
-	public static bool JGLKJECFHED
+	public static bool IsTablet
 	{
 		get
 		{
-			return FBGNIKBPCFB();
+			return IsTabletDevice();
 		}
 	}
 
-	public static bool IPNLEGJFHEB
+	public static bool IsNarrowAspect
 	{
 		get
 		{
-			return MHOKHLIDJNJ();
+			return IsNarrowAspectRatio();
 		}
 	}
 
-	public static string HIBGNCGMLKI
+	public static string PlatformName
 	{
 		get
 		{
-			return IAAKNCJMAAK();
+			return GetPlatformName();
 		}
 	}
 
-	public static string DOBDPPAJEMM
+	public static string PlatformDeviceType
 	{
 		get
 		{
-			return ICMOGAMDEMM();
+			return GetPlatformDeviceType();
 		}
 	}
 
-	public static string BCFGMMPPNPL
+	public static string DeviceId
 	{
 		get
 		{
-			return GLLJKPBHELE();
+			return GetDeviceId();
 		}
 	}
 
-	public static string BHPFHBHJCFD
+	public static string PlatformDeviceId
 	{
 		get
 		{
-			return IJOILMDCIMI();
+			return GetPlatformDeviceId();
 		}
 	}
 
-	public static string ECGBLGBPFMK
+	public static string UserIdentifier
 	{
 		get
 		{
-			return DBKBHEMJLLC();
+			return GetUserIdentifier();
 		}
 		set
 		{
-			ICMBPCDMDIP(value);
+			SetUserIdentifier(value);
 		}
 	}
 
-	public static string DFIPKAIDIDE
+	public static string DeviceUniqueIdentifier
 	{
 		get
 		{
-			return IIILDACELJP();
+			return GetDeviceUniqueId();
 		}
 	}
 
-	public static string PPCFIFIMOEG
+	public static string OsVersion
 	{
 		get
 		{
-			return CFEDCPDNICD();
+			return GetOsVersion();
 		}
 	}
 
-	public static long NHHNLGMHJBA
+	public static long UtcOffsetSeconds
 	{
 		get
 		{
-			return JOFIGLFDPDE();
+			return GetUtcOffsetSeconds();
 		}
 	}
 
-	public static bool NCJMBJBIGCK
+	public static bool IsPaidVersion
 	{
 		get
 		{
-			return AFAAJMFLBIC();
+			return IsPaidApp();
 		}
 	}
 
-	public static string OONBPJPAHEO
+	public static string InstallGuid
 	{
 		get
 		{
-			return OKLHMDPCGJL();
+			return GetInstallGuid();
 		}
 	}
 
-	public static int[] AHMCBLFHKDD
+	public static int[] UnconfirmedLedgers
 	{
 		get
 		{
-			return LFICEOIFOMI();
+			return GetUnconfirmedLedgerIDs();
 		}
 		set
 		{
@@ -311,19 +311,19 @@ public class SystemProperties
 		}
 	}
 
-	public static string OLHCEJKIIOB
+	public static string DeviceModel
 	{
 		get
 		{
-			return OBKPEDOHCOO();
+			return GetDeviceModel();
 		}
 	}
 
-	public static VersionContainer OGMKHOHOGPD
+	public static VersionContainer DataVersion
 	{
 		get
 		{
-			return DFJEJKJECBI();
+			return GetDataVersion();
 		}
 	}
 
@@ -331,11 +331,11 @@ public class SystemProperties
 	{
 		get
 		{
-			return KCJMMIEBLHL();
+			return GetVersion();
 		}
 	}
 
-	private static string DOKBFGCJAGH()
+	private static string GetIdentifierSuffix()
 	{
 		return "-UP";
 	}
@@ -344,79 +344,79 @@ public class SystemProperties
 	{
 		if (!string.IsNullOrEmpty(OONGHHGHHFG))
 		{
-			return OONGHHGHHFG + DOKBFGCJAGH();
+			return OONGHHGHHFG + GetIdentifierSuffix();
 		}
 		return OONGHHGHHFG;
 	}
 
-	public static bool DBBOCENKMGD()
+	public static bool IsDebug()
 	{
 		return false;
 	}
 
-	public static bool FHHPHDIBEFM()
+	public static bool IsEnabled()
 	{
 		return true;
 	}
 
-	public static bool NDEPIDFFOBF()
+	public static bool IsAvailable()
 	{
 		return true;
 	}
 
-	public static bool FDENJPADIDJ()
+	public static bool IsTestMode()
 	{
 		return false;
 	}
 
-	public static int NPDPKLMFBHH()
+	public static int GetNumOfDisplayModes()
 	{
 		return _numOfDisplayModes;
 	}
 
-	public static void CMEKDMFKDEO(int NMMPBADCFHK)
+	public static void ApplyResolution(int NMMPBADCFHK)
 	{
-		Vector2 eMGIKFNGDMA = EMGIKFNGDMA;
-		ALOKJEILMLK = (float)BIFPNNLNKHA.LBKMKDKDFJF / eMGIKFNGDMA.x;
-		NHIDNIPGCPC = (float)BIFPNNLNKHA.LLFOGEMDMJD / JNMPKENKPJK.y;
-		PBIEBOJBFMD = (float)BIFPNNLNKHA.LBKMKDKDFJF / NHIDNIPGCPC;
-		GOBOMOJIDOO = (float)BIFPNNLNKHA.LLFOGEMDMJD / NHIDNIPGCPC;
+		Vector2 eMGIKFNGDMA = smallResolution;
+		ScaleX = (float)deviceInfo.DisplayWidth / eMGIKFNGDMA.x;
+		ScaleY = (float)deviceInfo.DisplayHeight / wideResolution.y;
+		VirtualWidth = (float)deviceInfo.DisplayWidth / ScaleY;
+		VirtualHeight = (float)deviceInfo.DisplayHeight / ScaleY;
 	}
 
-	public static int MCGOBLKFGHO()
+	public static int GetScreenWidth()
 	{
 		return Screen.width;
 	}
 
-	public static int OACFGEDMCOD()
+	public static int GetScreenHeight()
 	{
 		return Screen.height;
 	}
 
-	public static void HBCGFAKAJOA()
+	public static void InitDeviceInfo()
 	{
-		BIFPNNLNKHA.Id = SystemInfo.deviceModel;
-		LLLOJBFMONN.Write(BIFPNNLNKHA.Id);
-		BIFPNNLNKHA.ODDGLIEHGFK = Application.platform == RuntimePlatform.WindowsEditor || Application.platform == RuntimePlatform.OSXEditor;
-		BIFPNNLNKHA.PPHNHLODNIN = Application.platform == RuntimePlatform.WindowsEditor;
-		BIFPNNLNKHA.DHPGNIFEOPI = JBBJGPNELBK();
-		BIFPNNLNKHA.MDPBKNDOGKJ = SystemInfo.operatingSystem;
-		BIFPNNLNKHA.OAPHJAPMKJG = PreciseLocale.BGMAJFGKCEB();
-		BIFPNNLNKHA.MOMPODBNJNE = SystemInfo.processorCount;
-		BIFPNNLNKHA.AOJLHDILEBJ = (int)((float)SystemInfo.systemMemorySize / 1024f);
-		BIFPNNLNKHA.LGEEAANABHH = (int)((float)(SystemInfo.systemMemorySize - Profiler.GetTotalAllocatedMemoryLong()) / 1024f);
-		BIFPNNLNKHA.DFIPKAIDIDE = SystemInfo.deviceUniqueIdentifier;
-		BIFPNNLNKHA.FFNCAFDPLPL = SFSocial.GBPBIPFIOJH().HBPJFLOFIJO();
-		if (AFKGHBJPLOK())
+		deviceInfo.Id = SystemInfo.deviceModel;
+		GameLog.Write(deviceInfo.Id);
+		deviceInfo.IsEditor = Application.platform == RuntimePlatform.WindowsEditor || Application.platform == RuntimePlatform.OSXEditor;
+		deviceInfo.IsWindowsEditor = Application.platform == RuntimePlatform.WindowsEditor;
+		deviceInfo.Os = GetOperatingSystemName();
+		deviceInfo.OsName = SystemInfo.operatingSystem;
+		deviceInfo.Locale = PreciseLocale.GetLanguageID();
+		deviceInfo.CpuCount = SystemInfo.processorCount;
+		deviceInfo.TotalRam = (int)((float)SystemInfo.systemMemorySize / 1024f);
+		deviceInfo.FreeRam = (int)((float)(SystemInfo.systemMemorySize - Profiler.GetTotalAllocatedMemoryLong()) / 1024f);
+		deviceInfo.UniqueId = SystemInfo.deviceUniqueIdentifier;
+		deviceInfo.SocialPlayerId = SFSocial.GetInstance().GetPlayerId();
+		if (IsMetroArmPlatform())
 		{
-			int length = BIFPNNLNKHA.Id.IndexOf('_');
-			BIFPNNLNKHA.Id = BIFPNNLNKHA.Id.Substring(0, length);
+			int length = deviceInfo.Id.IndexOf('_');
+			deviceInfo.Id = deviceInfo.Id.Substring(0, length);
 		}
 	}
 
-	private static string JBBJGPNELBK()
+	private static string GetOperatingSystemName()
 	{
-		if (IPJFCBAGMJJ())
+		if (IsAndroidPlatform())
 		{
 			string operatingSystem = SystemInfo.operatingSystem;
 			int num = operatingSystem.IndexOf("(");
@@ -429,159 +429,159 @@ public class SystemProperties
 		return SystemInfo.operatingSystem;
 	}
 
-	public static void GOCLBADJDGK(XmlDocument JFJPKEONJIJ)
+	public static void LoadDevicesConfig(XmlDocument JFJPKEONJIJ)
 	{
-		ICNACCADGEJ(JFJPKEONJIJ);
-		LOHALAKNGFB lOHALAKNGFB = DMCFAGPGNIE();
-		if (lOHALAKNGFB == LOHALAKNGFB.PATH_DEFAULT)
+		ParseDevicesXml(JFJPKEONJIJ);
+		PathType lOHALAKNGFB = GetResolutionPathType();
+		if (lOHALAKNGFB == PathType.PATH_DEFAULT)
 		{
-			lOHALAKNGFB = (FKPHLDIBPLO() ? LOHALAKNGFB.PATH_BIG : LOHALAKNGFB.PATH_SMALL);
+			lOHALAKNGFB = (IsHighResolution() ? PathType.PATH_BIG : PathType.PATH_SMALL);
 		}
-		OBNFPIPOHMH(lOHALAKNGFB);
-		LOHALAKNGFB lOHALAKNGFB2 = JGBFPENNILG();
-		if (lOHALAKNGFB2 == LOHALAKNGFB.PATH_DEFAULT)
+		SetPicturePaths(lOHALAKNGFB);
+		PathType lOHALAKNGFB2 = GetLocationPathType();
+		if (lOHALAKNGFB2 == PathType.PATH_DEFAULT)
 		{
-			lOHALAKNGFB2 = (FKPHLDIBPLO() ? LOHALAKNGFB.PATH_BIG : LOHALAKNGFB.PATH_SMALL);
+			lOHALAKNGFB2 = (IsHighResolution() ? PathType.PATH_BIG : PathType.PATH_SMALL);
 		}
-		SetInverseLocationScale((lOHALAKNGFB2 != LOHALAKNGFB.PATH_SMALL) ? 1 : 2);
-		Vector2 eMGIKFNGDMA = EMGIKFNGDMA;
-		ALOKJEILMLK = (float)MCGOBLKFGHO() / eMGIKFNGDMA.x;
-		NHIDNIPGCPC = (float)OACFGEDMCOD() / JNMPKENKPJK.y;
-		PBIEBOJBFMD = (float)MCGOBLKFGHO() / NHIDNIPGCPC;
-		GOBOMOJIDOO = (float)OACFGEDMCOD() / NHIDNIPGCPC;
+		SetInverseLocationScale((lOHALAKNGFB2 != PathType.PATH_SMALL) ? 1 : 2);
+		Vector2 eMGIKFNGDMA = smallResolution;
+		ScaleX = (float)GetScreenWidth() / eMGIKFNGDMA.x;
+		ScaleY = (float)GetScreenHeight() / wideResolution.y;
+		VirtualWidth = (float)GetScreenWidth() / ScaleY;
+		VirtualHeight = (float)GetScreenHeight() / ScaleY;
 	}
 
-	public static bool LHGPKEFEHDH()
+	public static bool IsEditorPlatform()
 	{
-		return BIFPNNLNKHA.ODDGLIEHGFK;
+		return deviceInfo.IsEditor;
 	}
 
-	public static bool PPFPHAKMNLC()
+	public static bool IsWindowsEditorPlatform()
 	{
-		return BIFPNNLNKHA.PPHNHLODNIN;
+		return deviceInfo.IsWindowsEditor;
 	}
 
-	public static bool MEBGOGMJFLM()
+	public static bool IsIosPlatform()
 	{
 		return Application.platform == RuntimePlatform.IPhonePlayer;
 	}
 
-	public static bool IPJFCBAGMJJ()
+	public static bool IsAndroidPlatform()
 	{
 		return Application.platform == RuntimePlatform.Android;
 	}
 
-	public static bool CEJMCBKCPOH()
+	public static bool IsWindowsPlatform()
 	{
 		return Application.platform == RuntimePlatform.WindowsPlayer;
 	}
 
-	public static bool AOJIOMDCEKN()
+	public static bool IsMacPlatform()
 	{
 		return Application.platform == RuntimePlatform.OSXPlayer;
 	}
 
-	public static bool AFKGHBJPLOK()
+	public static bool IsMetroArmPlatform()
 	{
 		return Application.platform == RuntimePlatform.MetroPlayerARM;
 	}
 
-	public static bool NFFOJCHNPJD()
+	public static bool IsWindowsStorePlatform()
 	{
 		return Application.platform == RuntimePlatform.MetroPlayerX86 || Application.platform == RuntimePlatform.MetroPlayerX64;
 	}
 
-	public static bool DDIDANINPJE()
+	public static bool IsWp8Platform()
 	{
 		return Application.platform == RuntimePlatform.WP8Player;
 	}
 
-	public static bool GEBFGBAJMIE()
+	public static bool IsTizenPlatform()
 	{
 		return Application.platform == RuntimePlatform.TizenPlayer;
 	}
 
-	public static bool GAAMHGCDANB()
+	public static bool IsMobilePlatform()
 	{
 		return Application.isMobilePlatform;
 	}
 
-	public static bool PKLFCFBEIIG()
+	public static bool CheckConnection()
 	{
 		return true;
 	}
 
-	public static bool DCKPKCIFOAG()
+	public static bool CheckOnline()
 	{
-		return PKLFCFBEIIG();
+		return CheckConnection();
 	}
 
-	public static bool FBGNIKBPCFB()
+	public static bool IsTabletDevice()
 	{
-		return BIFPNNLNKHA.JGLKJECFHED;
+		return deviceInfo.IsTablet;
 	}
 
-	public static bool MHOKHLIDJNJ()
+	public static bool IsNarrowAspectRatio()
 	{
 		return (float)Screen.width / (float)Screen.height < 1.66f;
 	}
 
-	public static bool FKPHLDIBPLO()
+	public static bool IsHighResolution()
 	{
-		return (float)BIFPNNLNKHA.LLFOGEMDMJD > EMGIKFNGDMA.y;
+		return (float)deviceInfo.DisplayHeight > smallResolution.y;
 	}
 
-	public static LOHALAKNGFB DMCFAGPGNIE()
+	public static PathType GetResolutionPathType()
 	{
-		return BIFPNNLNKHA.ACHKMBJANGN;
+		return deviceInfo.GuiResolution;
 	}
 
-	public static LOHALAKNGFB JGBFPENNILG()
+	public static PathType GetLocationPathType()
 	{
-		return BIFPNNLNKHA.BLIOAMODNOH;
+		return deviceInfo.LocationResolution;
 	}
 
-	public static void NHIDOHIJMBG(int value)
+	public static void SetTargetFrameRate(int value)
 	{
 	}
 
-	public static string IAAKNCJMAAK()
+	public static string GetPlatformName()
 	{
-		if (NFFOJCHNPJD())
+		if (IsWindowsStorePlatform())
 		{
 			return "winstore";
 		}
-		if (AFKGHBJPLOK() || DDIDANINPJE())
+		if (IsMetroArmPlatform() || IsWp8Platform())
 		{
 			return "win";
 		}
-		if (IPJFCBAGMJJ())
+		if (IsAndroidPlatform())
 		{
 			return "and";
 		}
-		if (MEBGOGMJFLM())
+		if (IsIosPlatform())
 		{
 			return "ios";
 		}
-		if (LHGPKEFEHDH())
+		if (IsEditorPlatform())
 		{
 			return "tst";
 		}
-		if (AOJIOMDCEKN())
+		if (IsMacPlatform())
 		{
 			return "mac";
 		}
 		return "unk";
 	}
 
-	public static string ICMOGAMDEMM()
+	public static string GetPlatformDeviceType()
 	{
-		return string.Format("{0}{1}", IAAKNCJMAAK(), (!FBGNIKBPCFB()) ? "_phone" : "_pad");
+		return string.Format("{0}{1}", GetPlatformName(), (!IsTabletDevice()) ? "_phone" : "_pad");
 	}
 
-	public static string GLLJKPBHELE()
+	public static string GetDeviceId()
 	{
-		string text = BPGAOEMIFNN.OBGMKPLOMJL();
+		string text = DeviceIdBridge.GetNativeDeviceId();
 		if (string.IsNullOrEmpty(text))
 		{
 			text = SystemInfo.deviceUniqueIdentifier;
@@ -589,50 +589,50 @@ public class SystemProperties
 		return text;
 	}
 
-	public static string IJOILMDCIMI()
+	public static string GetPlatformDeviceId()
 	{
-		return string.Format("{0}_{1}", IAAKNCJMAAK(), GLLJKPBHELE());
+		return string.Format("{0}_{1}", GetPlatformName(), GetDeviceId());
 	}
 
-	public static DeviceInfo NICPICAMAOH()
+	public static DeviceInfo GetDeviceInfo()
 	{
-		return BIFPNNLNKHA;
+		return deviceInfo;
 	}
 
-	public static string DCPMKCGDHPJ(LOHALAKNGFB EBIGIKHLFNL)
+	public static string PathTypeToString(PathType EBIGIKHLFNL)
 	{
 		switch (EBIGIKHLFNL)
 		{
-		case LOHALAKNGFB.PATH_DEFAULT:
-			return (!FKPHLDIBPLO()) ? "LOW" : "HIGH";
-		case LOHALAKNGFB.PATH_BIG:
+		case PathType.PATH_DEFAULT:
+			return (!IsHighResolution()) ? "LOW" : "HIGH";
+		case PathType.PATH_BIG:
 			return "HIGH";
-		case LOHALAKNGFB.PATH_SMALL:
+		case PathType.PATH_SMALL:
 			return "LOW";
 		default:
 			return "DEFAULT";
 		}
 	}
 
-	public static LOHALAKNGFB PLKALGPCALI(string name)
+	public static PathType ParsePathType(string name)
 	{
 		switch (name)
 		{
 		case "DEFAULT":
-			return LOHALAKNGFB.PATH_DEFAULT;
+			return PathType.PATH_DEFAULT;
 		case "LOW":
-			return LOHALAKNGFB.PATH_SMALL;
+			return PathType.PATH_SMALL;
 		case "HIGH":
-			return LOHALAKNGFB.PATH_BIG;
+			return PathType.PATH_BIG;
 		default:
-			LLLOJBFMONN.Error("ERROR: SystemProperties::getPathType - %s", name);
-			return LOHALAKNGFB.PATH_DEFAULT;
+			GameLog.Error("ERROR: SystemProperties::getPathType - %s", name);
+			return PathType.PATH_DEFAULT;
 		}
 	}
 
-	public static string DBKBHEMJLLC()
+	public static string GetUserIdentifier()
 	{
-		string text = BIFPNNLNKHA.CJPJNFFJNGN;
+		string text = deviceInfo.CustomUniqueId;
 		if (text == null)
 		{
 			text = SystemInfo.deviceUniqueIdentifier;
@@ -640,56 +640,56 @@ public class SystemProperties
 		return MakeIdentifier(text);
 	}
 
-	public static void ICMBPCDMDIP(string value)
+	public static void SetUserIdentifier(string value)
 	{
-		BIFPNNLNKHA.CJPJNFFJNGN = value;
+		deviceInfo.CustomUniqueId = value;
 	}
 
-	public static void BFBMCAALLHF(VersionContainer version, VersionContainer JJCDPPFGPDO)
+	public static void SetVersions(VersionContainer version, VersionContainer JJCDPPFGPDO)
 	{
-		BIFPNNLNKHA.Version = version;
-		BIFPNNLNKHA.OGMKHOHOGPD = JJCDPPFGPDO;
+		deviceInfo.Version = version;
+		deviceInfo.DataVersion = JJCDPPFGPDO;
 	}
 
-	public static string HBPJFLOFIJO()
+	public static string RefreshSocialUserId()
 	{
-		BIFPNNLNKHA.FFNCAFDPLPL = SFSocial.GBPBIPFIOJH().HBPJFLOFIJO();
-		return BIFPNNLNKHA.FFNCAFDPLPL;
+		deviceInfo.SocialPlayerId = SFSocial.GetInstance().GetPlayerId();
+		return deviceInfo.SocialPlayerId;
 	}
 
-	public static string IIILDACELJP()
+	public static string GetDeviceUniqueId()
 	{
 		return SystemInfo.deviceUniqueIdentifier;
 	}
 
-	public static string CFEDCPDNICD()
+	public static string GetOsVersion()
 	{
-		return BIFPNNLNKHA.DHPGNIFEOPI;
+		return deviceInfo.Os;
 	}
 
-	public static long JOFIGLFDPDE()
+	public static long GetUtcOffsetSeconds()
 	{
 		return (long)TimeZone.CurrentTimeZone.GetUtcOffset(DateTime.Now).TotalSeconds;
 	}
 
 	public static void Clear()
 	{
-		AGOHLNDLAEA.Clear();
+		qualityConditions.Clear();
 	}
 
-	public static string PMAODLMLDLK()
+	public static string GetQualityConditionName()
 	{
-		if (!BIFPNNLNKHA.QualityCondition.BKOIKMEEHDK())
+		if (!deviceInfo.QualityCondition.IsNullOrEmpty())
 		{
-			return BIFPNNLNKHA.QualityCondition;
+			return deviceInfo.QualityCondition;
 		}
-		if (NFFOJCHNPJD())
+		if (IsWindowsStorePlatform())
 		{
-			return AGOHLNDLAEA[0].get_Name();
+			return qualityConditions[0].get_Name();
 		}
-		foreach (QualityCondition item in AGOHLNDLAEA)
+		foreach (QualityCondition item in qualityConditions)
 		{
-			if (item.CEHMBJOALEM())
+			if (item.IsSatisfied())
 			{
 				return item.get_Name();
 			}
@@ -699,16 +699,16 @@ public class SystemProperties
 
 	public static void SetInverseLocationScale(float value)
 	{
-		BIFPNNLNKHA.InverseLocationScale = value;
+		deviceInfo.InverseLocationScale = value;
 	}
 
-	private static void ICNACCADGEJ(XmlDocument EELFNMOHGJL)
+	private static void ParseDevicesXml(XmlDocument EELFNMOHGJL)
 	{
 		Clear();
-		HJKFCAIBCPP();
-		BIFPNNLNKHA.JGLKJECFHED = FKPHLDIBPLO();
-		BIFPNNLNKHA.ACHKMBJANGN = PLKALGPCALI("DEFAULT");
-		BIFPNNLNKHA.BLIOAMODNOH = PLKALGPCALI("DEFAULT");
+		DetectScreenResolution();
+		deviceInfo.IsTablet = IsHighResolution();
+		deviceInfo.GuiResolution = ParsePathType("DEFAULT");
+		deviceInfo.LocationResolution = ParsePathType("DEFAULT");
 		XmlElement xmlElement = EELFNMOHGJL["Root"];
 		if (xmlElement == null)
 		{
@@ -721,7 +721,7 @@ public class SystemProperties
 			float f2 = (float)Screen.height / Screen.dpi;
 			float num = Mathf.Sqrt(Mathf.Pow(f, 2f) + Mathf.Pow(f2, 2f));
 			float num2 = float.Parse(xmlNode["TabletDiagonal"].Attributes["Value"].Value, System.Globalization.CultureInfo.InvariantCulture);
-			BIFPNNLNKHA.JGLKJECFHED = num >= num2;
+			deviceInfo.IsTablet = num >= num2;
 		}
 		XmlElement xmlElement2 = xmlElement["Devices"];
 		if (xmlElement2 != null)
@@ -737,82 +737,82 @@ public class SystemProperties
 				{
 					if (xmlElement2.ChildNodes[i].Attributes["Tablet"] != null)
 					{
-						kGDCPJPEKKE.BFDKILHELJA = xmlElement2.ChildNodes[i].Attributes["Tablet"].Value;
+						kGDCPJPEKKE.Tablet = xmlElement2.ChildNodes[i].Attributes["Tablet"].Value;
 					}
 					if (xmlElement2.ChildNodes[i].Attributes["Resolution"] != null)
 					{
-						kGDCPJPEKKE.MIKMPEHBLBN = xmlElement2.ChildNodes[i].Attributes["Resolution"].Value;
+						kGDCPJPEKKE.Resolution = xmlElement2.ChildNodes[i].Attributes["Resolution"].Value;
 					}
 					if (xmlElement2.ChildNodes[i].Attributes["LocationResolution"] != null)
 					{
-						kGDCPJPEKKE.FNAJOKNINLA = xmlElement2.ChildNodes[i].Attributes["LocationResolution"].Value;
+						kGDCPJPEKKE.LocationResolution = xmlElement2.ChildNodes[i].Attributes["LocationResolution"].Value;
 					}
 					if (xmlElement2.ChildNodes[i].Attributes["QualityCondition"] != null)
 					{
-						kGDCPJPEKKE.HEPNIDFNHBA = xmlElement2.ChildNodes[i].Attributes["QualityCondition"].Value;
+						kGDCPJPEKKE.QualityCondition = xmlElement2.ChildNodes[i].Attributes["QualityCondition"].Value;
 					}
 				}
-				if (BIFPNNLNKHA.Id == xmlElement2.ChildNodes[i].Attributes["Name"].Value)
+				if (deviceInfo.Id == xmlElement2.ChildNodes[i].Attributes["Name"].Value)
 				{
-					BIFPNNLNKHA.JGLKJECFHED = xmlElement2.ChildNodes[i].Attributes["Tablet"] != null && int.Parse(xmlElement2.ChildNodes[i].Attributes["Tablet"].Value) > 0;
+					deviceInfo.IsTablet = xmlElement2.ChildNodes[i].Attributes["Tablet"] != null && int.Parse(xmlElement2.ChildNodes[i].Attributes["Tablet"].Value) > 0;
 					string gOHIIMFFFJI = ((xmlElement2.Attributes["Resolution"] == null) ? "DEFAULT" : xmlNode.Attributes["Resolution"].Value);
-					BIFPNNLNKHA.ACHKMBJANGN = PLKALGPCALI(gOHIIMFFFJI);
+					deviceInfo.GuiResolution = ParsePathType(gOHIIMFFFJI);
 					string gOHIIMFFFJI2 = ((xmlElement2.Attributes["LocationResolution"] == null) ? "DEFAULT" : xmlNode.Attributes["LocationResolution"].Value);
-					BIFPNNLNKHA.BLIOAMODNOH = PLKALGPCALI(gOHIIMFFFJI2);
-					BIFPNNLNKHA.QualityCondition = ((xmlElement2.Attributes["QualityCondition"] == null) ? string.Empty : xmlNode.Attributes["QualityCondition"].Value);
+					deviceInfo.LocationResolution = ParsePathType(gOHIIMFFFJI2);
+					deviceInfo.QualityCondition = ((xmlElement2.Attributes["QualityCondition"] == null) ? string.Empty : xmlNode.Attributes["QualityCondition"].Value);
 				}
 			}
-			if (!kGDCPJPEKKE.KLNLNKBIDGD())
+			if (!kGDCPJPEKKE.IsEmpty())
 			{
-				if (!string.IsNullOrEmpty(kGDCPJPEKKE.BFDKILHELJA))
+				if (!string.IsNullOrEmpty(kGDCPJPEKKE.Tablet))
 				{
-					BIFPNNLNKHA.JGLKJECFHED = int.Parse(kGDCPJPEKKE.BFDKILHELJA) > 0;
+					deviceInfo.IsTablet = int.Parse(kGDCPJPEKKE.Tablet) > 0;
 				}
-				if (kGDCPJPEKKE.MIKMPEHBLBN != string.Empty)
+				if (kGDCPJPEKKE.Resolution != string.Empty)
 				{
-					BIFPNNLNKHA.ACHKMBJANGN = PLKALGPCALI(kGDCPJPEKKE.MIKMPEHBLBN);
+					deviceInfo.GuiResolution = ParsePathType(kGDCPJPEKKE.Resolution);
 				}
-				if (kGDCPJPEKKE.FNAJOKNINLA != string.Empty)
+				if (kGDCPJPEKKE.LocationResolution != string.Empty)
 				{
-					BIFPNNLNKHA.BLIOAMODNOH = PLKALGPCALI(kGDCPJPEKKE.FNAJOKNINLA);
+					deviceInfo.LocationResolution = ParsePathType(kGDCPJPEKKE.LocationResolution);
 				}
-				if (kGDCPJPEKKE.HEPNIDFNHBA != string.Empty)
+				if (kGDCPJPEKKE.QualityCondition != string.Empty)
 				{
-					BIFPNNLNKHA.QualityCondition = kGDCPJPEKKE.HEPNIDFNHBA;
+					deviceInfo.QualityCondition = kGDCPJPEKKE.QualityCondition;
 				}
 			}
 		}
 		ParseQualityConditions(xmlElement["QualityConditions"]);
 	}
 
-	private static void OBNFPIPOHMH(LOHALAKNGFB LFLGCDNKNJI)
+	private static void SetPicturePaths(PathType LFLGCDNKNJI)
 	{
 		switch (LFLGCDNKNJI)
 		{
-		case LOHALAKNGFB.PATH_SMALL:
-			CALAEHKMGLE = EMGIKFNGDMA;
+		case PathType.PATH_SMALL:
+			PictureResolution = smallResolution;
 			return;
-		case LOHALAKNGFB.PATH_BIG:
-			CALAEHKMGLE = PALJEJEKBMB;
+		case PathType.PATH_BIG:
+			PictureResolution = bigResolution;
 			return;
 		}
-		LLLOJBFMONN.Error("ERROR: SystemProperties::setPicturePaths - %i", LFLGCDNKNJI);
-		CALAEHKMGLE = EMGIKFNGDMA;
+		GameLog.Error("ERROR: SystemProperties::setPicturePaths - %i", LFLGCDNKNJI);
+		PictureResolution = smallResolution;
 	}
 
-	private static void HJKFCAIBCPP()
+	private static void DetectScreenResolution()
 	{
 		int width = Screen.currentResolution.width;
 		int height = Screen.currentResolution.height;
 		if (height < width)
 		{
-			BIFPNNLNKHA.LBKMKDKDFJF = width;
-			BIFPNNLNKHA.LLFOGEMDMJD = height;
+			deviceInfo.DisplayWidth = width;
+			deviceInfo.DisplayHeight = height;
 		}
 		else
 		{
-			BIFPNNLNKHA.LBKMKDKDFJF = height;
-			BIFPNNLNKHA.LLFOGEMDMJD = width;
+			deviceInfo.DisplayWidth = height;
+			deviceInfo.DisplayHeight = width;
 		}
 	}
 
@@ -821,26 +821,26 @@ public class SystemProperties
 		foreach (XmlNode childNode in node.ChildNodes)
 		{
 			QualityCondition item = new QualityCondition(childNode);
-			AGOHLNDLAEA.Add(item);
+			qualityConditions.Add(item);
 		}
 	}
 
-	public static bool AFAAJMFLBIC()
+	public static bool IsPaidApp()
 	{
-		if (!NMHFJLJCNDH.HasValue)
+		if (!isPaidCached.HasValue)
 		{
-			NMHFJLJCNDH = Application.identifier == "com.nekki.shadowfight2.paid" || Application.identifier == "com.nekki.shadowfight.paid";
+			isPaidCached = Application.identifier == "com.nekki.shadowfight2.paid" || Application.identifier == "com.nekki.shadowfight.paid";
 		}
-		return NMHFJLJCNDH.Value;
+		return isPaidCached.Value;
 	}
 
-	public static string OKLHMDPCGJL()
+	public static string GetInstallGuid()
 	{
-		if (MEBGOGMJFLM())
+		if (IsIosPlatform())
 		{
-			return GLLJKPBHELE();
+			return GetDeviceId();
 		}
-		if (IPJFCBAGMJJ())
+		if (IsAndroidPlatform())
 		{
 			if (!PlayerPrefs.HasKey("AndroidGUID"))
 			{
@@ -848,7 +848,7 @@ public class SystemProperties
 			}
 			return PlayerPrefs.GetString("AndroidGUID");
 		}
-		if (LHGPKEFEHDH() || CEJMCBKCPOH() || AOJIOMDCEKN())
+		if (IsEditorPlatform() || IsWindowsPlatform() || IsMacPlatform())
 		{
 			if (!PlayerPrefs.HasKey("EmulatorGUID"))
 			{
@@ -859,7 +859,7 @@ public class SystemProperties
 		return null;
 	}
 
-	public static int[] LFICEOIFOMI()
+	public static int[] GetUnconfirmedLedgerIDs()
 	{
 		string text = PlayerPrefs.GetString("UnconfirmedLedgerIDs", null);
 		List<int> list = new List<int>();
@@ -883,18 +883,18 @@ public class SystemProperties
 		PlayerPrefs.SetString("UnconfirmedLedgerIDs", string.Join(",", value.Select((int OKNNNLIPODI) => OKNNNLIPODI.ToString()).ToArray()));
 	}
 
-	public static string OBKPEDOHCOO()
+	public static string GetDeviceModel()
 	{
 		return SystemInfo.deviceModel;
 	}
 
-	public static VersionContainer DFJEJKJECBI()
+	public static VersionContainer GetDataVersion()
 	{
-		return BIFPNNLNKHA.OGMKHOHOGPD;
+		return deviceInfo.DataVersion;
 	}
 
-	public static VersionContainer KCJMMIEBLHL()
+	public static VersionContainer GetVersion()
 	{
-		return BIFPNNLNKHA.Version;
+		return deviceInfo.Version;
 	}
 }

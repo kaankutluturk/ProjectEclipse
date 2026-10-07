@@ -3,7 +3,7 @@ using System.Text;
 
 public class CustomBinaryWriter : BinaryWriter
 {
-	private Encoding KIAEBFEDGHA = Encoding.UTF8;
+	private Encoding encoding = Encoding.UTF8;
 
 	public CustomBinaryWriter()
 		: base(new MemoryStream())
@@ -13,10 +13,10 @@ public class CustomBinaryWriter : BinaryWriter
 	public override void Write(string value)
 	{
 		value = value.Replace("\n", string.Empty);
-		Write(KIAEBFEDGHA.GetBytes(value + "\n"));
+		Write(encoding.GetBytes(value + "\n"));
 	}
 
-	public byte[] IBOIAEAAEGD()
+	public byte[] ToArray()
 	{
 		byte[] array = new byte[16384];
 		using (MemoryStream memoryStream = new MemoryStream())

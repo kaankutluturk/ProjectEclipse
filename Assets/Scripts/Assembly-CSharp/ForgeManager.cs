@@ -57,9 +57,9 @@ public class ForgeManager : global::EventDispatcher<object>
 		}
 	}
 
-	public static ForgeManager BPCBBHAKFDM => ELEBLBJKDBI();
+	public static ForgeManager Instance => GetInstance();
 
-	public static ForgeManager ELEBLBJKDBI()
+	public static ForgeManager GetInstance()
 	{
 		if (_instance == null) _instance = new ForgeManager();
 		return _instance;
@@ -96,11 +96,11 @@ public class ForgeManager : global::EventDispatcher<object>
 		Debug.Log("[Forge] Loaded " + _recipes.Count + " recipes and " + _aspects.Count + " aspect ranges from " + path);
 	}
 
-	public RecipePrice FIGKJLNILIN(string itemName, string recipeName)
+	public RecipePrice GetPriceByItemName(string itemName, string recipeName)
 	{
 		Recipe recipe = GetRecipeByName(recipeName);
-		Roster roster = ListSF.CCDKHLAMKKO();
-		UserItem userItem = roster?.KHCNHPCPFII()?.CMGOCLGHNLH(itemName);
+		Roster roster = ListSF.GetRoster();
+		UserItem userItem = roster?.GetInventory()?.FindItem(itemName);
 		return recipe?.GetPriceByItem(userItem);
 	}
 
@@ -220,7 +220,7 @@ public class ForgeManager : global::EventDispatcher<object>
 		string itemName = name.Substring(0, separator);
 		string recipeName = name.Substring(separator + 1);
 		Recipe recipe = GetRecipeByName(recipeName);
-		UserItem userItem = ListSF.CCDKHLAMKKO()?.KHCNHPCPFII()?.CMGOCLGHNLH(itemName);
+		UserItem userItem = ListSF.GetRoster()?.GetInventory()?.FindItem(itemName);
 		RecipePrice price = recipe?.GetPriceByItem(userItem);
 		return recipe == null || userItem == null || price == null ? null : new RecipeItemInfo(recipe, userItem, price);
 	}
@@ -244,7 +244,7 @@ public class ForgeManager : global::EventDispatcher<object>
 
 	public bool EnchantItem(RecipeItemInfo recipeItem)
 	{
-		return recipeItem != null && EnchantItem(recipeItem.MFEAIEJFDAM(), recipeItem.OIMGNCLBPHD(),
+		return recipeItem != null && EnchantItem(recipeItem.GetUserItem(), recipeItem.GetRecipe(),
 			recipeItem.ItemLevel, recipeItem.PlayerLevel);
 	}
 
@@ -261,7 +261,7 @@ public class ForgeManager : global::EventDispatcher<object>
 		{
 			// This recovered method owns the original replacement rule and serializes
 			// the resulting <Enchantments> subtree into the existing UserItem node.
-			userItem.GDBFNNLHPOB(enchantments, itemLevel, playerLevel);
+			userItem.ApplyEnchantments(enchantments, itemLevel, playerLevel);
 		}
 		finally
 		{
@@ -281,7 +281,7 @@ public class ForgeManager : global::EventDispatcher<object>
 		if (price == null) return false;
 		recipeItem = new RecipeItemInfo(recipe, userItem, price);
 
-		Roster roster = ListSF.CCDKHLAMKKO();
+		Roster roster = ListSF.GetRoster();
 		bool free = recipe.IsFree;
 		if (!free && !DeductMaterials(roster, price))
 		{
@@ -298,7 +298,7 @@ public class ForgeManager : global::EventDispatcher<object>
 				success = userItem.SetRecipeDelivery(recipeItem);
 			if (!success) throw new InvalidOperationException("Unable to start forge recipe '" + recipe.Name + "'.");
 			if (free) recipe.IsFree = false;
-			roster?.GGGEHAGCLGC(true);
+			roster?.RequestSave(true);
 			return true;
 		}
 		catch (Exception exception)
@@ -312,14 +312,14 @@ public class ForgeManager : global::EventDispatcher<object>
 
 	public bool FinishEnchant(RecipeItemInfo recipeItem)
 	{
-		if (recipeItem == null || recipeItem.MFEAIEJFDAM() == null) return false;
+		if (recipeItem == null || recipeItem.GetUserItem() == null) return false;
         if (recipeItem.IsStillInOrder && !Eclipse.Modding.ModPolicies.SkipEnabled("forge")) return false;
-		UserItem userItem = recipeItem.MFEAIEJFDAM();
+		UserItem userItem = recipeItem.GetUserItem();
 		bool success = EnchantItem(recipeItem);
 		if (success)
 		{
 			userItem.ClearRecipeDelivery();
-			ListSF.CCDKHLAMKKO()?.GGGEHAGCLGC(true);
+			ListSF.GetRoster()?.RequestSave(true);
 		}
 		return success;
 	}
@@ -329,11 +329,11 @@ public class ForgeManager : global::EventDispatcher<object>
 		if (roster == null || price == null) return false;
 		foreach (CurrencyStruct material in price.Materials)
 		{
-			if (material?.BKDEAGGPNAO == null || roster.GetCurrencyCount(material.BKDEAGGPNAO) < material.Count)
+			if (material?.Currency == null || roster.GetCurrencyCount(material.Currency) < material.Count)
 				return false;
 		}
 		foreach (CurrencyStruct material in price.Materials)
-			roster.AddCurrencyCount(material.BKDEAGGPNAO, -(int)material.Count);
+			roster.AddCurrencyCount(material.Currency, -(int)material.Count);
 		return true;
 	}
 
@@ -341,21 +341,21 @@ public class ForgeManager : global::EventDispatcher<object>
 	{
 		if (roster == null || price == null) return;
 		foreach (CurrencyStruct material in price.Materials)
-			if (material?.BKDEAGGPNAO != null) roster.AddCurrencyCount(material.BKDEAGGPNAO, (int)material.Count);
+			if (material?.Currency != null) roster.AddCurrencyCount(material.Currency, (int)material.Count);
 	}
 
 	private static void NotifyItemEnchanted(UserItem userItem, Recipe recipe)
 	{
 		Action<UserItem> callback = _onItemEnchanted;
 		if (callback != null) callback(userItem);
-		ListSF list = ListSF.BPCBBHAKFDM;
+		ListSF list = ListSF.Instance;
 		if (list == null) return;
-		QuestParameters parameters = list.BNMLDPNCMLB();
-		parameters.DPLEGFCHOCE.OHCGEEEKEJH = userItem.get_Name();
-		parameters.DPLEGFCHOCE.FHELNNCGCGC = recipe.Name;
-		parameters.DPLEGFCHOCE.BMNFPNBAMAF = 0L;
-		parameters.DPLEGFCHOCE.MECEADEKGJB = string.Empty;
-		if (list.FFBAJNGHGGD(QuestEvent.PMDPDMFLCIJ.QUEST_EVENT_ENCHANTMENT)) list.MHHNIPBJNAD();
+		QuestParameters parameters = list.GetQuestParameters();
+		parameters.enchantment.itemName = userItem.get_Name();
+		parameters.enchantment.recipeName = recipe.Name;
+		parameters.enchantment.endTimestamp = 0L;
+		parameters.enchantment.costType = string.Empty;
+		if (list.RaiseQuestEvent(QuestEvent.QuestEventType.QUEST_EVENT_ENCHANTMENT)) list.RunQuestActions();
 	}
 
 	private void EnsureParsed()

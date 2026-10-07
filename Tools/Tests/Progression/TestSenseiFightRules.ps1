@@ -80,8 +80,8 @@ foreach($definition in $catalog.FightRules) {
     $node=$buildRule.Invoke($adapter,@([Xml.XmlDocument]::new(),$definition))
     $native=[NoButtonRule]::new($node)
     $wanted=switch($definition.Id.LocalId){'mode_normal'{'MODE_NORMAL'} 'mode_eclipse'{'MODE_ECLIPSE'} 'mode_all'{'MODE_ALL'}}
-    Check ($native.PGOPBNMFAAG.ToString() -ceq $wanted) ('Native mode parsing differs: '+$node.OuterXml)
-    Check (!$native.HAKHBAOJBON(1) -and $native.HAKHBAOJBON(2) -and !$native.HAKHBAOJBON(3)) 'Native round restriction changed.'
+    Check ($native.ModeFilter.ToString() -ceq $wanted) ('Native mode parsing differs: '+$node.OuterXml)
+    Check (!$native.AppliesToRound(1) -and $native.AppliesToRound(2) -and !$native.AppliesToRound(3)) 'Native round restriction changed.'
 }
 foreach($fight in $catalog.Fights){
     $node=$build.Invoke($adapter,@([Xml.XmlDocument]::new(),$fight))

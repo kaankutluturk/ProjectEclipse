@@ -2,33 +2,33 @@ using System.Collections;
 
 public interface IJsonWrapper : IDictionary, IList, IEnumerable, ICollection, IOrderedDictionary
 {
-	bool MENGHLDLPDP { get; }
+	bool IsArray { get; }
 
-	bool BKKEJEHCHAK { get; }
+	bool IsBoolean { get; }
 
-	bool LPEHBKJIAJB { get; }
+	bool IsDouble { get; }
 
-	bool MKGEMBAAPBL { get; }
+	bool IsInt { get; }
 
-	bool LNLKOGMCNNF { get; }
+	bool IsLong { get; }
 
-	bool PDKNNMDCPDJ { get; }
+	bool IsObject { get; }
 
-	bool JDALJCCIBIN { get; }
+	bool IsString { get; }
 
-	bool NKLOBJNAFOL();
+	bool GetIsArray();
 
-	bool DBAOMEBNMPH();
+	bool GetIsBoolean();
 
-	bool OEIGDMENBKN();
+	bool GetIsDouble();
 
-	bool BGDHACEDILB();
+	bool GetIsInt();
 
-	bool BPKJMLDOLPH();
+	bool GetIsLong();
 
-	bool HKCKGNMIKBM();
+	bool GetIsObject();
 
-	bool FMFILGDCAKM();
+	bool GetIsString();
 
 	bool GetBoolean();
 
@@ -36,7 +36,7 @@ public interface IJsonWrapper : IDictionary, IList, IEnumerable, ICollection, IO
 
 	int GetInt();
 
-	GGIECEPGFNH NCGOKKHFKJF();
+	JsonType GetJsonType();
 
 	long GetLong();
 
@@ -48,7 +48,7 @@ public interface IJsonWrapper : IDictionary, IList, IEnumerable, ICollection, IO
 
 	void SetInt(int PKHDLOGJKAD);
 
-	void FJKDNANFIHA(GGIECEPGFNH LFLGCDNKNJI);
+	void SetJsonType(JsonType LFLGCDNKNJI);
 
 	void SetLong(long PKHDLOGJKAD);
 

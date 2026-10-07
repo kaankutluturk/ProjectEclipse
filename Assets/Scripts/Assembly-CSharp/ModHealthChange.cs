@@ -4,13 +4,13 @@ using System.Xml;
 public class ModHealthChange : PerkActionModificator
 {
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private float CKNAHAEAPAJ;
+	private float perFrameValue;
 
-	public float NGKLOKPGGMF
+	public float HealthPerFrame
 	{
 		get
 		{
-			return JMPIBKKAHJP();
+			return GetPerFrameValue();
 		}
 		protected set
 		{
@@ -25,17 +25,17 @@ public class ModHealthChange : PerkActionModificator
 	public ModHealthChange(ModHealthChange NOLFMPDGCOC)
 		: base(NOLFMPDGCOC)
 	{
-		set_PerFrameValue(NOLFMPDGCOC.JMPIBKKAHJP());
+		set_PerFrameValue(NOLFMPDGCOC.GetPerFrameValue());
 	}
 
-	public float JMPIBKKAHJP()
+	public float GetPerFrameValue()
 	{
-		return CKNAHAEAPAJ;
+		return perFrameValue;
 	}
 
 	protected void set_PerFrameValue(float value)
 	{
-		CKNAHAEAPAJ = value;
+		perFrameValue = value;
 	}
 
 	public override void Parse(XmlNode node)

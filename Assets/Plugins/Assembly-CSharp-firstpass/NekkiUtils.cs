@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class NekkiUtils
 {
-	public enum FHOMOMIOLAK
+	public enum DeviceKind
 	{
 		NONE = 0,
 		UNKNOWN = 1,
@@ -13,7 +13,7 @@ public class NekkiUtils
 		DESKTOP = 5
 	}
 
-	private static FHOMOMIOLAK GLDLEHNOHIM;
+	private static DeviceKind _deviceKind;
 
 	public static Vector2 GetVector2FromString(string IGGFGLLIGCG, char DPOEFEMLAKD)
 	{
@@ -36,7 +36,7 @@ public class NekkiUtils
 		return new Vector4(float.Parse(array[0]), float.Parse(array[1]), float.Parse(array[2]), float.Parse(array[3]));
 	}
 
-	public static Matrix4x4 NPOAOFGPJLD(string IGGFGLLIGCG, char DPOEFEMLAKD)
+	public static Matrix4x4 GetMatrixFromStringColumnMajor(string IGGFGLLIGCG, char DPOEFEMLAKD)
 	{
 		IGGFGLLIGCG = IGGFGLLIGCG.Trim();
 		string[] array = IGGFGLLIGCG.Split(DPOEFEMLAKD);
@@ -53,7 +53,7 @@ public class NekkiUtils
 		return result;
 	}
 
-	public static Matrix4x4 GHNDKDEDOGH(string IGGFGLLIGCG, char DPOEFEMLAKD)
+	public static Matrix4x4 GetMatrixFromStringRowMajor(string IGGFGLLIGCG, char DPOEFEMLAKD)
 	{
 		IGGFGLLIGCG = IGGFGLLIGCG.Trim();
 		string[] array = IGGFGLLIGCG.Split(DPOEFEMLAKD);
@@ -70,7 +70,7 @@ public class NekkiUtils
 		return result;
 	}
 
-	public static string LKFECIDBIEA(string IGGFGLLIGCG, char DPOEFEMLAKD, int PLBNNDIKAJO, int count, out int JIEODOJKGLD)
+	public static string ReadSeparatedTokens(string IGGFGLLIGCG, char DPOEFEMLAKD, int PLBNNDIKAJO, int count, out int JIEODOJKGLD)
 	{
 		IGGFGLLIGCG = IGGFGLLIGCG.Trim();
 		int num = 0;
@@ -125,20 +125,20 @@ public class NekkiUtils
 		return ((int)(color.r * 255f) << 16) + ((int)(color.g * 255f) << 8) + (int)(color.b * 255f);
 	}
 
-	public static void KKCLIIOIKAD()
+	public static void DetectDeviceKind()
 	{
 		if (SystemInfo.deviceType != DeviceType.Handheld)
 		{
 			switch (SystemInfo.deviceType)
 			{
 			case DeviceType.Unknown:
-				GLDLEHNOHIM = FHOMOMIOLAK.UNKNOWN;
+				_deviceKind = DeviceKind.UNKNOWN;
 				break;
 			case DeviceType.Console:
-				GLDLEHNOHIM = FHOMOMIOLAK.CONSOLE;
+				_deviceKind = DeviceKind.CONSOLE;
 				break;
 			case DeviceType.Desktop:
-				GLDLEHNOHIM = FHOMOMIOLAK.DESKTOP;
+				_deviceKind = DeviceKind.DESKTOP;
 				break;
 			}
 			return;
@@ -146,7 +146,7 @@ public class NekkiUtils
 		float num = ((Screen.width <= Screen.height) ? ((float)Screen.height) : ((float)Screen.width));
 		if (num < 800f)
 		{
-			GLDLEHNOHIM = FHOMOMIOLAK.PHONE;
+			_deviceKind = DeviceKind.PHONE;
 		}
 		if (Application.platform == RuntimePlatform.Android || Application.platform == RuntimePlatform.IPhonePlayer)
 		{
@@ -155,37 +155,37 @@ public class NekkiUtils
 			float num2 = Mathf.Sqrt(Mathf.Pow(f, 2f) + Mathf.Pow(f2, 2f));
 			if (num2 >= 6.5f)
 			{
-				GLDLEHNOHIM = FHOMOMIOLAK.TABLET;
+				_deviceKind = DeviceKind.TABLET;
 			}
 		}
-		GLDLEHNOHIM = FHOMOMIOLAK.PHONE;
+		_deviceKind = DeviceKind.PHONE;
 	}
 
-	public static FHOMOMIOLAK BBGLNMLEOLG()
+	public static DeviceKind GetDeviceKind()
 	{
-		if (GLDLEHNOHIM == FHOMOMIOLAK.NONE)
+		if (_deviceKind == DeviceKind.NONE)
 		{
-			KKCLIIOIKAD();
+			DetectDeviceKind();
 		}
-		return GLDLEHNOHIM;
+		return _deviceKind;
 	}
 
-	public static bool JGLKJECFHED()
+	public static bool IsTablet()
 	{
-		return BBGLNMLEOLG() == FHOMOMIOLAK.TABLET;
+		return GetDeviceKind() == DeviceKind.TABLET;
 	}
 
-	public static bool ONGKCNAICGI()
+	public static bool IsPhone()
 	{
-		return BBGLNMLEOLG() == FHOMOMIOLAK.PHONE;
+		return GetDeviceKind() == DeviceKind.PHONE;
 	}
 
-	public static bool JDIKHMODKKF()
+	public static bool IsEditorNotPlaying()
 	{
 		return Application.isEditor && !Application.isPlaying;
 	}
 
-	public static string NBFOIPELHOI()
+	public static string GetPlatformName()
 	{
 		switch (Application.platform)
 		{

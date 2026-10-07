@@ -7,7 +7,7 @@ using System.Threading;
 [DefaultMember("Item")]
 public sealed class SocketManager : IHeartbeat, IManager
 {
-	public enum IFLBJIKPLOL
+	public enum SocketManagerState
 	{
 		Initial = 0,
 		Closed = 1,
@@ -16,57 +16,57 @@ public sealed class SocketManager : IHeartbeat, IManager
 		Reconnecting = 4
 	}
 
-	public static OOINGNLNJGM MLILENMLJAH = new LBMMAKIBFHD();
+	public static ISocketJsonEncoder DefaultEncoder = new SocketIODefaultJsonEncoder();
 
 	public const int MinProtocolVersion = 4;
 
-	private IFLBJIKPLOL state;
+	private SocketManagerState state;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private SocketOptions GLJHJKNBNDD;
+	private SocketOptions options;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private Uri NHCOGAAPOAB;
+	private Uri uri;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private HandshakeData GCKLPLNOHCH;
+	private HandshakeData handshake;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private ITransport DCDGJNEKNKE;
+	private ITransport transport;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private ulong GDDMABPJDPP;
+	private ulong requestCounter;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private int CPDNJPDONOL;
+	private int reconnectAttempts;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private OOINGNLNJGM NBCJNBIGHCJ;
+	private ISocketJsonEncoder encoder;
 
-	private int MFMMDNPNOCE;
+	private int nextAckId;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private IFLBJIKPLOL KKPFPDLOEFJ;
+	private SocketManagerState previousState;
 
-	private Dictionary<string, Socket> OABAACFMPFH = new Dictionary<string, Socket>();
+	private Dictionary<string, Socket> namespaces = new Dictionary<string, Socket>();
 
-	private List<Socket> FADLKIHOHLN = new List<Socket>();
+	private List<Socket> sockets = new List<Socket>();
 
-	private List<Packet> LCAAGNNLNKO;
+	private List<Packet> offlinePackets;
 
-	private DateTime GHAGBCLOOFC = DateTime.MinValue;
+	private DateTime lastHeartbeat = DateTime.MinValue;
 
-	private DateTime ECDDELFMACL = DateTime.MinValue;
+	private DateTime lastPongReceived = DateTime.MinValue;
 
-	private DateTime GDEMFJODPBO;
+	private DateTime reconnectAt;
 
-	private DateTime BAHEGCMFMJI;
+	private DateTime connectionStarted;
 
-	public IFLBJIKPLOL AFINHOBCHMC
+	public SocketManagerState CurrentState
 	{
 		get
 		{
-			return FLBBFDNHJAJ();
+			return GetState();
 		}
 		private set
 		{
@@ -74,23 +74,23 @@ public sealed class SocketManager : IHeartbeat, IManager
 		}
 	}
 
-	public SocketOptions IFGNHLCDDCO
+	public SocketOptions Options
 	{
 		get
 		{
-			return HLHJJJGJEEL();
+			return GetOptions();
 		}
 		private set
 		{
-			KAFLNEBPLIA(value);
+			SetOptions(value);
 		}
 	}
 
-	public Uri GJIGOCNEPME
+	public Uri ServerUri
 	{
 		get
 		{
-			return OJBDMGBGJMA();
+			return GetUri();
 		}
 		private set
 		{
@@ -98,35 +98,35 @@ public sealed class SocketManager : IHeartbeat, IManager
 		}
 	}
 
-	public HandshakeData CDOOLJJGOAA
+	public HandshakeData HandshakeInfo
 	{
 		get
 		{
-			return EIOHJJFBIAL();
+			return GetHandshake();
 		}
 		private set
 		{
-			NLCGDODNKEF(value);
+			SetHandshake(value);
 		}
 	}
 
-	public ITransport HEFNODJLIBE
+	public ITransport ActiveTransport
 	{
 		get
 		{
-			return LODFOKFEAPC();
+			return GetTransport();
 		}
 		private set
 		{
-			AOJLKJODKMC(value);
+			SetTransport(value);
 		}
 	}
 
-	public ulong PHFIIKGKDCF
+	public ulong RequestCount
 	{
 		get
 		{
-			return EKBGNBPGFNG();
+			return GetRequestCounter();
 		}
 		internal set
 		{
@@ -134,11 +134,11 @@ public sealed class SocketManager : IHeartbeat, IManager
 		}
 	}
 
-	public Socket KNPLDJGCAKJ
+	public Socket RootSocket
 	{
 		get
 		{
-			return PDJFKOBODHH();
+			return GetRootSocket();
 		}
 	}
 
@@ -148,11 +148,11 @@ public sealed class SocketManager : IHeartbeat, IManager
 		return get_Item(JBALIKEKHGL);
 	}
 
-	public int LFJJLGFIOKE
+	public int ReconnectAttemptCount
 	{
 		get
 		{
-			return IKFMEIGJFCA();
+			return GetReconnectAttempts();
 		}
 		private set
 		{
@@ -160,43 +160,43 @@ public sealed class SocketManager : IHeartbeat, IManager
 		}
 	}
 
-	public OOINGNLNJGM GHLNIIFAKCF
+	public ISocketJsonEncoder Encoder
 	{
 		get
 		{
-			return KCMCCGKJGLE();
+			return GetEncoder();
 		}
 		set
 		{
-			MLMBDFBLPAC(value);
+			SetEncoder(value);
 		}
 	}
 
-	internal uint KBEDPONBFDK
+	internal uint Timestamp
 	{
 		get
 		{
-			return GPEEDKOHFIG();
+			return GetTimestamp();
 		}
 	}
 
-	internal int LEELHFGHGFL
+	internal int NextAckId
 	{
 		get
 		{
-			return ICKFNGAOMFI();
+			return GetNextAckId();
 		}
 	}
 
-	internal IFLBJIKPLOL OKNBCJILDGP
+	internal SocketManagerState PreviousState
 	{
 		get
 		{
-			return GBDAFIEGGPA();
+			return GetPreviousState();
 		}
 		private set
 		{
-			MDMJNFNIHGE(value);
+			SetPreviousState(value);
 		}
 	}
 
@@ -208,140 +208,140 @@ public sealed class SocketManager : IHeartbeat, IManager
 	public SocketManager(Uri KJHNCLAJMLO, SocketOptions LHONCAIFCAF)
 	{
 		set_Uri(KJHNCLAJMLO);
-		KAFLNEBPLIA(LHONCAIFCAF);
-		set_State(IFLBJIKPLOL.Initial);
-		MDMJNFNIHGE(IFLBJIKPLOL.Initial);
-		MLMBDFBLPAC(MLILENMLJAH);
+		SetOptions(LHONCAIFCAF);
+		set_State(SocketManagerState.Initial);
+		SetPreviousState(SocketManagerState.Initial);
+		SetEncoder(DefaultEncoder);
 	}
 
-	public IFLBJIKPLOL FLBBFDNHJAJ()
+	public SocketManagerState GetState()
 	{
 		return state;
 	}
 
-	private void set_State(IFLBJIKPLOL value)
+	private void set_State(SocketManagerState value)
 	{
-		MDMJNFNIHGE(state);
+		SetPreviousState(state);
 		state = value;
 	}
 
-	public SocketOptions HLHJJJGJEEL()
+	public SocketOptions GetOptions()
 	{
-		return GLJHJKNBNDD;
+		return options;
 	}
 
-	private void KAFLNEBPLIA(SocketOptions value)
+	private void SetOptions(SocketOptions value)
 	{
-		GLJHJKNBNDD = value;
+		options = value;
 	}
 
-	public Uri OJBDMGBGJMA()
+	public Uri GetUri()
 	{
-		return NHCOGAAPOAB;
+		return uri;
 	}
 
 	private void set_Uri(Uri value)
 	{
-		NHCOGAAPOAB = value;
+		uri = value;
 	}
 
-	public HandshakeData EIOHJJFBIAL()
+	public HandshakeData GetHandshake()
 	{
-		return GCKLPLNOHCH;
+		return handshake;
 	}
 
-	private void NLCGDODNKEF(HandshakeData value)
+	private void SetHandshake(HandshakeData value)
 	{
-		GCKLPLNOHCH = value;
+		handshake = value;
 	}
 
-	public ITransport LODFOKFEAPC()
+	public ITransport GetTransport()
 	{
-		return DCDGJNEKNKE;
+		return transport;
 	}
 
-	private void AOJLKJODKMC(ITransport value)
+	private void SetTransport(ITransport value)
 	{
-		DCDGJNEKNKE = value;
+		transport = value;
 	}
 
-	public ulong EKBGNBPGFNG()
+	public ulong GetRequestCounter()
 	{
-		return GDDMABPJDPP;
+		return requestCounter;
 	}
 
 	internal void set_RequestCounter(ulong value)
 	{
-		GDDMABPJDPP = value;
+		requestCounter = value;
 	}
 
-	public Socket PDJFKOBODHH()
+	public Socket GetRootSocket()
 	{
-		return ELGJFOCAJPE();
+		return GetSocket();
 	}
 
 	public Socket get_Item(string JBALIKEKHGL)
 	{
-		return ELGJFOCAJPE(JBALIKEKHGL);
+		return GetSocket(JBALIKEKHGL);
 	}
 
-	public int IKFMEIGJFCA()
+	public int GetReconnectAttempts()
 	{
-		return CPDNJPDONOL;
+		return reconnectAttempts;
 	}
 
 	private void set_ReconnectAttempts(int value)
 	{
-		CPDNJPDONOL = value;
+		reconnectAttempts = value;
 	}
 
-	public OOINGNLNJGM KCMCCGKJGLE()
+	public ISocketJsonEncoder GetEncoder()
 	{
-		return NBCJNBIGHCJ;
+		return encoder;
 	}
 
-	public void MLMBDFBLPAC(OOINGNLNJGM value)
+	public void SetEncoder(ISocketJsonEncoder value)
 	{
-		NBCJNBIGHCJ = value;
+		encoder = value;
 	}
 
-	internal uint GPEEDKOHFIG()
+	internal uint GetTimestamp()
 	{
 		return (uint)DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1)).TotalMilliseconds;
 	}
 
-	internal int ICKFNGAOMFI()
+	internal int GetNextAckId()
 	{
-		return Interlocked.Increment(ref MFMMDNPNOCE);
+		return Interlocked.Increment(ref nextAckId);
 	}
 
-	internal IFLBJIKPLOL GBDAFIEGGPA()
+	internal SocketManagerState GetPreviousState()
 	{
-		return KKPFPDLOEFJ;
+		return previousState;
 	}
 
-	private void MDMJNFNIHGE(IFLBJIKPLOL value)
+	private void SetPreviousState(SocketManagerState value)
 	{
-		KKPFPDLOEFJ = value;
+		previousState = value;
 	}
 
-	public Socket ELGJFOCAJPE()
+	public Socket GetSocket()
 	{
-		return ELGJFOCAJPE("/");
+		return GetSocket("/");
 	}
 
-	public Socket ELGJFOCAJPE(string JBALIKEKHGL)
+	public Socket GetSocket(string JBALIKEKHGL)
 	{
 		if (string.IsNullOrEmpty(JBALIKEKHGL))
 		{
 			throw new ArgumentNullException("Namespace parameter is null or empty!");
 		}
 		Socket value = null;
-		if (!OABAACFMPFH.TryGetValue(JBALIKEKHGL, out value))
+		if (!namespaces.TryGetValue(JBALIKEKHGL, out value))
 		{
 			value = new Socket(JBALIKEKHGL, this);
-			OABAACFMPFH.Add(JBALIKEKHGL, value);
-			FADLKIHOHLN.Add(value);
+			namespaces.Add(JBALIKEKHGL, value);
+			sockets.Add(value);
 			((ISocket)value).Open();
 		}
 		return value;
@@ -349,32 +349,32 @@ public sealed class SocketManager : IHeartbeat, IManager
 
 	void IManager.Remove(Socket JLEACANCMJF)
 	{
-		OABAACFMPFH.Remove(JLEACANCMJF.IONIEDIPEGB());
-		FADLKIHOHLN.Remove(JLEACANCMJF);
+		namespaces.Remove(JLEACANCMJF.GetNamespace());
+		sockets.Remove(JLEACANCMJF);
 	}
 
 	public void Open()
 	{
-		if (FLBBFDNHJAJ() == IFLBJIKPLOL.Initial || FLBBFDNHJAJ() == IFLBJIKPLOL.Closed || FLBBFDNHJAJ() == IFLBJIKPLOL.Reconnecting)
+		if (GetState() == SocketManagerState.Initial || GetState() == SocketManagerState.Closed || GetState() == SocketManagerState.Reconnecting)
 		{
-			HTTPManager.MBBMPNDDPIH().KDAFBLAKBMI("SocketManager", "Opening");
-			GDEMFJODPBO = DateTime.MinValue;
-			NLCGDODNKEF(new HandshakeData(this));
-			EIOHJJFBIAL().OnReceived = (HandshakeData LLAAFNOMDHA) =>
+			HTTPManager.GetLogger().Information("SocketManager", "Opening");
+			reconnectAt = DateTime.MinValue;
+			SetHandshake(new HandshakeData(this));
+			GetHandshake().OnReceived = (HandshakeData LLAAFNOMDHA) =>
 			{
-				JDJOMBGCABG();
+				OnHandshakeCallback();
 			};
-			EIOHJJFBIAL().OnError = (HandshakeData LLAAFNOMDHA, string KEPBNIIECPN) =>
+			GetHandshake().OnError = (HandshakeData LLAAFNOMDHA, string KEPBNIIECPN) =>
 			{
-				((IManager)this).EmitError(CCCOMMIFIMB.Internal, KEPBNIIECPN);
+				((IManager)this).EmitError(SocketIOErrors.Internal, KEPBNIIECPN);
 				((IManager)this).TryToReconnect();
 			};
-			EIOHJJFBIAL().Start();
+			GetHandshake().Start();
 			((IManager)this).EmitEvent("connecting", new object[0]);
-			set_State(IFLBJIKPLOL.Opening);
-			BAHEGCMFMJI = DateTime.UtcNow;
-			HTTPManager.MAMNLAJACOD().ELAHFBCGAGL(this);
-			ELGJFOCAJPE("/");
+			set_State(SocketManagerState.Opening);
+			connectionStarted = DateTime.UtcNow;
+			HTTPManager.GetHeartbeats().Subscribe(this);
+			GetSocket("/");
 		}
 	}
 
@@ -385,121 +385,121 @@ public sealed class SocketManager : IHeartbeat, IManager
 
 	void IManager.Close(bool IEPJILJMNDN)
 	{
-		if (FLBBFDNHJAJ() == IFLBJIKPLOL.Closed)
+		if (GetState() == SocketManagerState.Closed)
 		{
 			return;
 		}
-		HTTPManager.MBBMPNDDPIH().KDAFBLAKBMI("SocketManager", "Closing");
-		HTTPManager.MAMNLAJACOD().HKMBDKKHPCB(this);
+		HTTPManager.GetLogger().Information("SocketManager", "Closing");
+		HTTPManager.GetHeartbeats().Unsubscribe(this);
 		if (IEPJILJMNDN)
 		{
-			while (FADLKIHOHLN.Count > 0)
+			while (sockets.Count > 0)
 			{
-				((ISocket)FADLKIHOHLN[FADLKIHOHLN.Count - 1]).Disconnect(IEPJILJMNDN);
+				((ISocket)sockets[sockets.Count - 1]).Disconnect(IEPJILJMNDN);
 			}
 		}
 		else
 		{
-			for (int i = 0; i < FADLKIHOHLN.Count; i++)
+			for (int i = 0; i < sockets.Count; i++)
 			{
-				((ISocket)FADLKIHOHLN[i]).Disconnect(IEPJILJMNDN);
+				((ISocket)sockets[i]).Disconnect(IEPJILJMNDN);
 			}
 		}
-		set_State(IFLBJIKPLOL.Closed);
-		GHAGBCLOOFC = DateTime.MinValue;
-		if (LCAAGNNLNKO != null)
+		set_State(SocketManagerState.Closed);
+		lastHeartbeat = DateTime.MinValue;
+		if (offlinePackets != null)
 		{
-			LCAAGNNLNKO.Clear();
+			offlinePackets.Clear();
 		}
 		if (IEPJILJMNDN)
 		{
-			OABAACFMPFH.Clear();
+			namespaces.Clear();
 		}
-		if (EIOHJJFBIAL() != null)
+		if (GetHandshake() != null)
 		{
-			EIOHJJFBIAL().AKLEEMEHBIC();
+			GetHandshake().Abort();
 		}
-		NLCGDODNKEF(null);
-		if (LODFOKFEAPC() != null)
+		SetHandshake(null);
+		if (GetTransport() != null)
 		{
-			LODFOKFEAPC().Close();
+			GetTransport().Close();
 		}
-		AOJLKJODKMC(null);
+		SetTransport(null);
 	}
 
 	void IManager.TryToReconnect()
 	{
-		if (FLBBFDNHJAJ() == IFLBJIKPLOL.Reconnecting || FLBBFDNHJAJ() == IFLBJIKPLOL.Closed)
+		if (GetState() == SocketManagerState.Reconnecting || GetState() == SocketManagerState.Closed)
 		{
 			return;
 		}
-		if (!HLHJJJGJEEL().AMHAEEBHDFE())
+		if (!GetOptions().GetReconnection())
 		{
 			Close();
 			return;
 		}
 		int num;
-		set_ReconnectAttempts(num = IKFMEIGJFCA() + 1);
-		if (num >= HLHJJJGJEEL().GIBLAAJPHLP())
+		set_ReconnectAttempts(num = GetReconnectAttempts() + 1);
+		if (num >= GetOptions().GetReconnectionAttempts())
 		{
 			((IManager)this).EmitEvent("reconnect_failed", new object[0]);
 			Close();
 			return;
 		}
 		Random random = new Random();
-		int num2 = (int)HLHJJJGJEEL().CHAGLLGOKKE().TotalMilliseconds * IKFMEIGJFCA();
-		GDEMFJODPBO = DateTime.UtcNow + TimeSpan.FromMilliseconds(Math.Min(random.Next((int)((float)num2 - (float)num2 * HLHJJJGJEEL().JNJBBOELNIG()), (int)((float)num2 + (float)num2 * HLHJJJGJEEL().JNJBBOELNIG())), (int)HLHJJJGJEEL().ODAHMCJKEIL().TotalMilliseconds));
+		int num2 = (int)GetOptions().GetReconnectionDelay().TotalMilliseconds * GetReconnectAttempts();
+		reconnectAt = DateTime.UtcNow + TimeSpan.FromMilliseconds(Math.Min(random.Next((int)((float)num2 - (float)num2 * GetOptions().GetRandomizationFactor()), (int)((float)num2 + (float)num2 * GetOptions().GetRandomizationFactor())), (int)GetOptions().GetReconnectionDelayMax().TotalMilliseconds));
 		((IManager)this).Close(false);
-		set_State(IFLBJIKPLOL.Reconnecting);
-		for (int i = 0; i < FADLKIHOHLN.Count; i++)
+		set_State(SocketManagerState.Reconnecting);
+		for (int i = 0; i < sockets.Count; i++)
 		{
-			((ISocket)FADLKIHOHLN[i]).Open();
+			((ISocket)sockets[i]).Open();
 		}
-		HTTPManager.MAMNLAJACOD().ELAHFBCGAGL(this);
-		HTTPManager.MBBMPNDDPIH().KDAFBLAKBMI("SocketManager", "Reconnecting");
+		HTTPManager.GetHeartbeats().Subscribe(this);
+		HTTPManager.GetLogger().Information("SocketManager", "Reconnecting");
 	}
 
-	private void JDJOMBGCABG()
+	private void OnHandshakeCallback()
 	{
-		if (EIOHJJFBIAL().BLCLIKIBIPE().Contains("websocket"))
+		if (GetHandshake().GetUpgrades().Contains("websocket"))
 		{
-			AOJLKJODKMC(new KMLMEACFJGA(this));
+			SetTransport(new SocketIoWebSocketTransport(this));
 		}
 		else
 		{
-			AOJLKJODKMC(new HLNFFAMCLEH(this));
+			SetTransport(new SocketIOPollingTransport(this));
 		}
-		LODFOKFEAPC().LAJCMNNNIIM();
+		GetTransport().OpenTransport();
 	}
 
 	bool IManager.OnTransportConnected(ITransport DLAOOGHJGBI)
 	{
-		if (FLBBFDNHJAJ() != IFLBJIKPLOL.Opening)
+		if (GetState() != SocketManagerState.Opening)
 		{
 			return false;
 		}
-		if (GBDAFIEGGPA() == IFLBJIKPLOL.Reconnecting)
+		if (GetPreviousState() == SocketManagerState.Reconnecting)
 		{
 			((IManager)this).EmitEvent("reconnect", new object[0]);
 		}
-		set_State(IFLBJIKPLOL.Open);
-		ECDDELFMACL = DateTime.UtcNow;
+		set_State(SocketManagerState.Open);
+		lastPongReceived = DateTime.UtcNow;
 		set_ReconnectAttempts(0);
-		GNNBAGPHJKA();
-		HTTPManager.MBBMPNDDPIH().KDAFBLAKBMI("SocketManager", "Open");
+		SendOfflinePackets();
+		HTTPManager.GetLogger().Information("SocketManager", "Open");
 		return true;
 	}
 
 	void IManager.OnTransportError(ITransport DLAOOGHJGBI, string KEPBNIIECPN)
 	{
-		((IManager)this).EmitError(CCCOMMIFIMB.Internal, KEPBNIIECPN);
-		if (DLAOOGHJGBI.FLBBFDNHJAJ() == FGMEPPMFFKG.Connecting || DLAOOGHJGBI.FLBBFDNHJAJ() == FGMEPPMFFKG.Opening)
+		((IManager)this).EmitError(SocketIOErrors.Internal, KEPBNIIECPN);
+		if (DLAOOGHJGBI.GetState() == SocketIOTransportState.Connecting || DLAOOGHJGBI.GetState() == SocketIOTransportState.Opening)
 		{
-			if (DLAOOGHJGBI is KMLMEACFJGA)
+			if (DLAOOGHJGBI is SocketIoWebSocketTransport)
 			{
 				DLAOOGHJGBI.Close();
-				AOJLKJODKMC(new HLNFFAMCLEH(this));
-				LODFOKFEAPC().LAJCMNNNIIM();
+				SetTransport(new SocketIOPollingTransport(this));
+				GetTransport().OpenTransport();
 			}
 			else
 			{
@@ -513,28 +513,28 @@ public sealed class SocketManager : IHeartbeat, IManager
 		}
 	}
 
-	private ITransport DHHBFHPFGFJ()
+	private ITransport SelectTransport()
 	{
-		if (FLBBFDNHJAJ() != IFLBJIKPLOL.Open)
+		if (GetState() != SocketManagerState.Open)
 		{
 			return null;
 		}
-		return (!LODFOKFEAPC().LILBDKKEHCE()) ? LODFOKFEAPC() : null;
+		return (!GetTransport().GetIsRequestInProgress()) ? GetTransport() : null;
 	}
 
-	private void GNNBAGPHJKA()
+	private void SendOfflinePackets()
 	{
-		ITransport bNPCOHLEHNM = DHHBFHPFGFJ();
-		if (LCAAGNNLNKO != null && LCAAGNNLNKO.Count > 0 && bNPCOHLEHNM != null)
+		ITransport bNPCOHLEHNM = SelectTransport();
+		if (offlinePackets != null && offlinePackets.Count > 0 && bNPCOHLEHNM != null)
 		{
-			bNPCOHLEHNM.Send(LCAAGNNLNKO);
-			LCAAGNNLNKO.Clear();
+			bNPCOHLEHNM.Send(offlinePackets);
+			offlinePackets.Clear();
 		}
 	}
 
 	void IManager.SendPacket(Packet NPKADBPBKIG)
 	{
-		ITransport bNPCOHLEHNM = DHHBFHPFGFJ();
+		ITransport bNPCOHLEHNM = SelectTransport();
 		if (bNPCOHLEHNM != null)
 		{
 			try
@@ -544,67 +544,67 @@ public sealed class SocketManager : IHeartbeat, IManager
 			}
 			catch (Exception ex)
 			{
-				((IManager)this).EmitError(CCCOMMIFIMB.Internal, ex.Message + " " + ex.StackTrace);
+				((IManager)this).EmitError(SocketIOErrors.Internal, ex.Message + " " + ex.StackTrace);
 				return;
 			}
 		}
-		if (LCAAGNNLNKO == null)
+		if (offlinePackets == null)
 		{
-			LCAAGNNLNKO = new List<Packet>();
+			offlinePackets = new List<Packet>();
 		}
-		LCAAGNNLNKO.Add(NPKADBPBKIG.Clone());
+		offlinePackets.Add(NPKADBPBKIG.Clone());
 	}
 
 	void IManager.OnPacket(Packet NPKADBPBKIG)
 	{
-		if (FLBBFDNHJAJ() != IFLBJIKPLOL.Closed)
+		if (GetState() != SocketManagerState.Closed)
 		{
-			switch (NPKADBPBKIG.FFJBNPEOAHI())
+			switch (NPKADBPBKIG.GetTransportEvent())
 			{
-			case HJDLGPHLPNF.Ping:
-				((IManager)this).SendPacket(new Packet(HJDLGPHLPNF.Pong, ECDAJBEFCAH.Unknown, "/", string.Empty));
+			case TransportEventTypes.Ping:
+				((IManager)this).SendPacket(new Packet(TransportEventTypes.Pong, SocketIOEventType.Unknown, "/", string.Empty));
 				break;
-			case HJDLGPHLPNF.Pong:
-				ECDDELFMACL = DateTime.UtcNow;
+			case TransportEventTypes.Pong:
+				lastPongReceived = DateTime.UtcNow;
 				break;
 			}
 			Socket value = null;
-			if (OABAACFMPFH.TryGetValue(NPKADBPBKIG.IONIEDIPEGB(), out value))
+			if (namespaces.TryGetValue(NPKADBPBKIG.GetNamespace(), out value))
 			{
 				((ISocket)value).OnPacket(NPKADBPBKIG);
 			}
 			else
 			{
-				HTTPManager.MBBMPNDDPIH().GLCKHLCAPIN("SocketManager", "Namespace \"" + NPKADBPBKIG.IONIEDIPEGB() + "\" not found!");
+				HTTPManager.GetLogger().Warning("SocketManager", "Namespace \"" + NPKADBPBKIG.GetNamespace() + "\" not found!");
 			}
 		}
 	}
 
 	public void EmitAll(string DOPHKKGNAEF, params object[] LKIOKGCNKHE)
 	{
-		for (int i = 0; i < FADLKIHOHLN.Count; i++)
+		for (int i = 0; i < sockets.Count; i++)
 		{
-			FADLKIHOHLN[i].Emit(DOPHKKGNAEF, LKIOKGCNKHE);
+			sockets[i].Emit(DOPHKKGNAEF, LKIOKGCNKHE);
 		}
 	}
 
 	void IManager.EmitEvent(string DOPHKKGNAEF, params object[] LKIOKGCNKHE)
 	{
 		Socket value = null;
-		if (OABAACFMPFH.TryGetValue("/", out value))
+		if (namespaces.TryGetValue("/", out value))
 		{
 			((ISocket)value).EmitEvent(DOPHKKGNAEF, LKIOKGCNKHE);
 		}
 	}
 
-	void IManager.EmitEvent(ECDAJBEFCAH LFLGCDNKNJI, params object[] LKIOKGCNKHE)
+	void IManager.EmitEvent(SocketIOEventType LFLGCDNKNJI, params object[] LKIOKGCNKHE)
 	{
-		((IManager)this).EmitEvent(EventNames.ICAIODPBKBO(LFLGCDNKNJI), LKIOKGCNKHE);
+		((IManager)this).EmitEvent(EventNames.GetNameFor(LFLGCDNKNJI), LKIOKGCNKHE);
 	}
 
-	void IManager.EmitError(CCCOMMIFIMB GNKCGOGKAEK, string CKEHOEGLMBM)
+	void IManager.EmitError(SocketIOErrors GNKCGOGKAEK, string CKEHOEGLMBM)
 	{
-		((IManager)this).EmitEvent(ECDAJBEFCAH.Error, new object[1]
+		((IManager)this).EmitEvent(SocketIOEventType.Error, new object[1]
 		{
 			new Error(GNKCGOGKAEK, CKEHOEGLMBM)
 		});
@@ -612,56 +612,56 @@ public sealed class SocketManager : IHeartbeat, IManager
 
 	void IManager.EmitAll(string DOPHKKGNAEF, params object[] LKIOKGCNKHE)
 	{
-		for (int i = 0; i < FADLKIHOHLN.Count; i++)
+		for (int i = 0; i < sockets.Count; i++)
 		{
-			((ISocket)FADLKIHOHLN[i]).EmitEvent(DOPHKKGNAEF, LKIOKGCNKHE);
+			((ISocket)sockets[i]).EmitEvent(DOPHKKGNAEF, LKIOKGCNKHE);
 		}
 	}
 
 	void IHeartbeat.OnHeartbeatUpdate(TimeSpan OJOKANCMPLG)
 	{
-		switch (FLBBFDNHJAJ())
+		switch (GetState())
 		{
-		case IFLBJIKPLOL.Opening:
-			if (DateTime.UtcNow - BAHEGCMFMJI >= HLHJJJGJEEL().FJKGKLJGIJI())
+		case SocketManagerState.Opening:
+			if (DateTime.UtcNow - connectionStarted >= GetOptions().GetTimeout())
 			{
 				((IManager)this).EmitEvent("connect_error", new object[0]);
 				((IManager)this).EmitEvent("connect_timeout", new object[0]);
 				((IManager)this).TryToReconnect();
 			}
 			break;
-		case IFLBJIKPLOL.Reconnecting:
-			if (GDEMFJODPBO != DateTime.MinValue && DateTime.UtcNow >= GDEMFJODPBO)
+		case SocketManagerState.Reconnecting:
+			if (reconnectAt != DateTime.MinValue && DateTime.UtcNow >= reconnectAt)
 			{
 				((IManager)this).EmitEvent("reconnect_attempt", new object[0]);
 				((IManager)this).EmitEvent("reconnecting", new object[0]);
 				Open();
 			}
 			break;
-		case IFLBJIKPLOL.Open:
+		case SocketManagerState.Open:
 		{
 			ITransport bNPCOHLEHNM = null;
-			if (LODFOKFEAPC() != null && LODFOKFEAPC().FLBBFDNHJAJ() == FGMEPPMFFKG.Open)
+			if (GetTransport() != null && GetTransport().GetState() == SocketIOTransportState.Open)
 			{
-				bNPCOHLEHNM = LODFOKFEAPC();
+				bNPCOHLEHNM = GetTransport();
 			}
-			if (bNPCOHLEHNM == null || bNPCOHLEHNM.FLBBFDNHJAJ() != FGMEPPMFFKG.Open)
+			if (bNPCOHLEHNM == null || bNPCOHLEHNM.GetState() != SocketIOTransportState.Open)
 			{
 				break;
 			}
-			bNPCOHLEHNM.GNGIDEJLNCF();
-			GNNBAGPHJKA();
-			if (GHAGBCLOOFC == DateTime.MinValue)
+			bNPCOHLEHNM.Poll();
+			SendOfflinePackets();
+			if (lastHeartbeat == DateTime.MinValue)
 			{
-				GHAGBCLOOFC = DateTime.UtcNow;
+				lastHeartbeat = DateTime.UtcNow;
 				break;
 			}
-			if (DateTime.UtcNow - GHAGBCLOOFC > EIOHJJFBIAL().CMFJFNKMJIP())
+			if (DateTime.UtcNow - lastHeartbeat > GetHandshake().GetPingInterval())
 			{
-				((IManager)this).SendPacket(new Packet(HJDLGPHLPNF.Ping, ECDAJBEFCAH.Unknown, "/", string.Empty));
-				GHAGBCLOOFC = DateTime.UtcNow;
+				((IManager)this).SendPacket(new Packet(TransportEventTypes.Ping, SocketIOEventType.Unknown, "/", string.Empty));
+				lastHeartbeat = DateTime.UtcNow;
 			}
-			if (DateTime.UtcNow - ECDDELFMACL > EIOHJJFBIAL().EPFLHIKEBFO())
+			if (DateTime.UtcNow - lastPongReceived > GetHandshake().GetPingTimeout())
 			{
 				((IManager)this).TryToReconnect();
 			}

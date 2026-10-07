@@ -20,11 +20,11 @@ namespace Nekki.SF2.GUI
 		[SerializeField]
 		private VerticalLayoutGroup backgroudLayout;
 
-		private bool JKJOAIKAMOH;
+		private bool isFlipped;
 
-		private RectTransform IOAEAJAEOFK;
+		private RectTransform cachedRectTransform;
 
-		public RectTransform DIBDBBCPEGN
+		public RectTransform BoxRect
 		{
 			get
 			{
@@ -34,11 +34,11 @@ namespace Nekki.SF2.GUI
 
 		public RectTransform get_RectTransform()
 		{
-			if (IOAEAJAEOFK == null)
+			if (cachedRectTransform == null)
 			{
-				IOAEAJAEOFK = GetComponent<RectTransform>();
+				cachedRectTransform = GetComponent<RectTransform>();
 			}
-			return IOAEAJAEOFK;
+			return cachedRectTransform;
 		}
 
 		public void Init()
@@ -93,9 +93,9 @@ namespace Nekki.SF2.GUI
 
 		public void Flip()
 		{
-			if (!JKJOAIKAMOH)
+			if (!isFlipped)
 			{
-				JKJOAIKAMOH = true;
+				isFlipped = true;
 				Vector3 eulerAngles = new Vector3(0f, 0f, 180f);
 				Vector3 eulerAngles2 = new Vector3(180f, 180f, 0f);
 				base.transform.Rotate(eulerAngles);
@@ -118,9 +118,9 @@ namespace Nekki.SF2.GUI
 
 		public void ResetFlip()
 		{
-			if (JKJOAIKAMOH)
+			if (isFlipped)
 			{
-				JKJOAIKAMOH = false;
+				isFlipped = false;
 				Vector3 eulerAngles = new Vector3(0f, 0f, -180f);
 				Vector3 eulerAngles2 = new Vector3(-180f, -180f, 0f);
 				base.transform.Rotate(eulerAngles);

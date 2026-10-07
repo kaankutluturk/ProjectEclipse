@@ -3,13 +3,13 @@ using System.Xml;
 
 public class Defense
 {
-	public string AOAPDHDACPJ;
+	public string DefenseName;
 
 	public float Weight;
 
-	public string GMODDPGBGHM;
+	public string CancellingItem;
 
-	public List<Evaluation> IBLHIAHECLK = new List<Evaluation>();
+	public List<Evaluation> Evaluations = new List<Evaluation>();
 
 	public static int Parse(XmlNode BLLNKKNDNII, List<Defense> PNKJPOHEOJB)
 	{
@@ -28,9 +28,9 @@ public class Defense
 
 	public void Parse(XmlNode MEEAKLDGLDF)
 	{
-		AOAPDHDACPJ = XmlUtils.ParseString(MEEAKLDGLDF.Attributes["Name"]);
+		DefenseName = XmlUtils.ParseString(MEEAKLDGLDF.Attributes["Name"]);
 		Weight = XmlUtils.ParseFloat(MEEAKLDGLDF.Attributes["Weight"]);
-		GMODDPGBGHM = XmlUtils.ParseString(MEEAKLDGLDF.Attributes["CancellingItem"]);
-		Evaluation.ParseAttributes(MEEAKLDGLDF, IBLHIAHECLK);
+		CancellingItem = XmlUtils.ParseString(MEEAKLDGLDF.Attributes["CancellingItem"]);
+		Evaluation.ParseAttributes(MEEAKLDGLDF, Evaluations);
 	}
 }

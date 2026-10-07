@@ -1,6 +1,6 @@
 internal static class Crc32Helper
 {
-	private static readonly uint[] JNGDLGFKIFI = new uint[256]
+	private static readonly uint[] crcTable = new uint[256]
 	{
 		0u, 1996959894u, 3993919788u, 2567524794u, 124634137u, 1886057615u, 3915621685u, 2657392035u, 249268274u, 2044508324u,
 		3772115230u, 2547177864u, 162941995u, 2125561021u, 3887607047u, 2428444049u, 498536548u, 1789927666u, 4089016648u, 2227061214u,
@@ -30,12 +30,12 @@ internal static class Crc32Helper
 		1567103746u, 711928724u, 3020668471u, 3272380065u, 1510334235u, 755167117u
 	};
 
-	public static uint JDBNFCAIBHC(uint CJGBICDHGGL, byte[] buffer, int IPCOBJBKNAO, int BDBOAEGELMC)
+	public static uint UpdateCrc32(uint CJGBICDHGGL, byte[] buffer, int IPCOBJBKNAO, int BDBOAEGELMC)
 	{
 		CJGBICDHGGL ^= 0xFFFFFFFFu;
 		while (--BDBOAEGELMC >= 0)
 		{
-			CJGBICDHGGL = JNGDLGFKIFI[(CJGBICDHGGL ^ buffer[IPCOBJBKNAO++]) & 0xFF] ^ (CJGBICDHGGL >> 8);
+			CJGBICDHGGL = crcTable[(CJGBICDHGGL ^ buffer[IPCOBJBKNAO++]) & 0xFF] ^ (CJGBICDHGGL >> 8);
 		}
 		CJGBICDHGGL ^= 0xFFFFFFFFu;
 		return CJGBICDHGGL;

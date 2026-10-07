@@ -10,7 +10,7 @@ namespace Nekki.SF2.GUI
 		[SerializeField]
 		private LayoutElement layoutElement;
 
-		public LayoutElement CMFIABIFDDD
+		public LayoutElement LayoutElementComponent
 		{
 			get
 			{

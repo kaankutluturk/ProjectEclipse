@@ -7,24 +7,24 @@ namespace Nekki.SF2.Core.Fights.Controller
 {
 	public class GameController : SFMonoBehaviour<object>
 	{
-		public enum HDPJABCJEIC
+		public enum ControllerType
 		{
 			TYPE_NONE = 0,
 			TYPE_STICK = 1,
 			TYPE_KEYBOARD = 2
 		}
 
-		public enum ELNFGDNMPDP
+		public enum ControlEventType
 		{
 			OnControlPressed = 0,
 			OnControlReleased = 1
 		}
 
-		public struct NKHHIKLLJAC
+		public struct ControllerData
 		{
 			private object data;
 
-			private HDPJABCJEIC LFLGCDNKNJI;
+			private ControllerType controllerType;
 		}
 
 		private static GameController _Current;
@@ -35,22 +35,22 @@ namespace Nekki.SF2.Core.Fights.Controller
 		[SerializeField]
 		private GameObject _leftContainer;
 
-		private FightCID AGEAHBBKHMB;
+		private FightCID keyboardDirection;
 
 		[SerializeField]
 		private ActionButtons _actionButtons;
 
-		private FHHECMPNKHC NBMONJPAMHI = new FHHECMPNKHC();
+		private KeyboardInputPoller keyboardInput = new KeyboardInputPoller();
 
-		private List<int> CCMBIEPECGN;
+		private List<int> unusedIntList;
 
-		private int LBNAOBIJIHF;
+		private int unusedCounter;
 
-		private bool GOEHALKBLGK = true;
+		private bool punchEnabled = true;
 
-		private bool GCMMMFABBFC = true;
+		private bool kickEnabled = true;
 
-		private bool DGEIJHIPFIG = true;
+		private bool stickEnabled = true;
 
 		private bool _deviceInputEnabled; // best guess for name
 
@@ -93,11 +93,11 @@ namespace Nekki.SF2.Core.Fights.Controller
         {
             bool blocked = _controlRestrictions.IsBlocked(control);
             if (_ruleControls.SetBlocked(control, blocked))
-                EmitAvailableControl(1, new CBBEIGACPPD { Index = 0, KMOPCKPBHIA = control });
+                EmitAvailableControl(1, new FightControlEventData { Index = 0, Control = control });
             _actionButtons.SetRuleBlocked(control, blocked);
         }
 
-		public static GameController BLOOLFFMKFI
+		public static GameController CurrentController
 		{
 			get
 			{
@@ -154,13 +154,13 @@ namespace Nekki.SF2.Core.Fights.Controller
             Eclipse.UI.ControlLayout.Apply((RectTransform)transform);
             SyncModUiCapture();
             if (_localVersusInputEnabled) RefreshVersusInputVisual();
-				if (!_localVersusInputEnabled) NBMONJPAMHI.Render();
+				if (!_localVersusInputEnabled) keyboardInput.Render();
 				if (_deviceInputEnabled)
 			{
 				// Versus devices are sampled per simulation tick by Eclipse.Multiplayer.VersusTickDriver.
 				if (!_localVersusInputEnabled)
 				{
-					GetGamepadInput().Poll(!AssemblyController.JONCCPLEIBE().DBJOHGNPDDO());
+					GetGamepadInput().Poll(!AssemblyController.GetMarket().GetIsSteamMarket());
 				}
 			}
 		}
@@ -179,28 +179,28 @@ namespace Nekki.SF2.Core.Fights.Controller
 				_hasFocus = Application.isFocused;
 				// Local input owns complete keyboard snapshots, including key releases.
 				// The campaign's legacy keyboard/debug dispatcher remains separate.
-				NBMONJPAMHI.DCHJDPCEODD = _deviceInputEnabled && !enabled;
+				keyboardInput.IsEnabled = _deviceInputEnabled && !enabled;
 		}
 
 		public void Init(bool DFDCOMCCEEP = true, bool GJHOPBBMHDA = true, bool BIMHGOMADEJ = true)
 		{
 			_actionButtons.Init();
-			GOEHALKBLGK = DFDCOMCCEEP;
-			GCMMMFABBFC = GJHOPBBMHDA;
-			DGEIJHIPFIG = BIMHGOMADEJ;
+			punchEnabled = DFDCOMCCEEP;
+			kickEnabled = GJHOPBBMHDA;
+			stickEnabled = BIMHGOMADEJ;
 			InitController();
 		}
 
 		public void InitController()
 		{
-			if (!AssemblyController.JONCCPLEIBE().DBJOHGNPDDO())
+			if (!AssemblyController.GetMarket().GetIsSteamMarket())
 			{
-				NELFBBBKDEC(GOEHALKBLGK, GCMMMFABBFC);
-				PDKHGNCLOIP();
+				AddActionButtonListeners(punchEnabled, kickEnabled);
+				AddJoystickListeners();
 			}
-			CACNKNEFOCF();
-			HMGCHHIOPEP();
-			LBNAOBIJIHF = 0;
+			InitKeyboardInput();
+			ResetGamepadInput();
+			unusedCounter = 0;
 		}
 
 		public Stick GetJoystick()
@@ -235,15 +235,15 @@ namespace Nekki.SF2.Core.Fights.Controller
 			_actionButtons.gameObject.SetActive(HHFKEDNEOIL);
 			if (!HHFKEDNEOIL)
 			{
-				if (!DGEIJHIPFIG)
+				if (!stickEnabled)
 				{
 					_joystick.gameObject.SetActive(false);
 				}
-				if (!GOEHALKBLGK)
+				if (!punchEnabled)
 				{
 					_actionButtons.GetButtonPunch().gameObject.SetActive(false);
 				}
-				if (!GCMMMFABBFC)
+				if (!kickEnabled)
 				{
 					_actionButtons.GetButtonKick().gameObject.SetActive(false);
 				}
@@ -253,69 +253,69 @@ namespace Nekki.SF2.Core.Fights.Controller
 		public void SetPunchEnabled(bool value)
 		{
 			_actionButtons.SetPunchEnabled(value);
-			GOEHALKBLGK = value;
+			punchEnabled = value;
 		}
 
 		public void SetKickEnabled(bool value)
 		{
 			_actionButtons.SetKickEnabled(value);
-			GCMMMFABBFC = value;
+			kickEnabled = value;
 		}
 
 		public void SetStickEnabled(bool value)
 		{
 			_joystick.gameObject.SetActive(value);
-			DGEIJHIPFIG = value;
+			stickEnabled = value;
 		}
 
 		public bool GetPunchEnabled()
 		{
-			return GOEHALKBLGK;
+			return punchEnabled;
 		}
 
 		public bool GetKickEnabled()
 		{
-			return GCMMMFABBFC;
+			return kickEnabled;
 		}
 
 		public bool GetStickEnabled()
 		{
-			return DGEIJHIPFIG;
+			return stickEnabled;
 		}
 
 		public void ResetController()
 		{
-			NBMONJPAMHI.Clear();
-			NBMONJPAMHI.RemoveEventListener(0, ANEHCIIOHOK);
-			NBMONJPAMHI.RemoveEventListener(1, EEJDBDNNABN);
-			_joystick.RemoveEventListener(0, KJJNFLFLNHB);
-			_joystick.RemoveEventListener(1, KJJNFLFLNHB);
-			_joystick.RemoveEventListener(2, CICPKENEGNI);
-			_actionButtons.RemoveEventListener(1, KJJNFLFLNHB);
-			_actionButtons.RemoveEventListener(2, CICPKENEGNI);
+			keyboardInput.Clear();
+			keyboardInput.RemoveEventListener(0, HandleKeyPressed);
+			keyboardInput.RemoveEventListener(1, HandleKeyReleased);
+			_joystick.RemoveEventListener(0, HandleControlPressed);
+			_joystick.RemoveEventListener(1, HandleControlPressed);
+			_joystick.RemoveEventListener(2, HandleControlReleased);
+			_actionButtons.RemoveEventListener(1, HandleControlPressed);
+			_actionButtons.RemoveEventListener(2, HandleControlReleased);
 			StopController();
 		}
 
 		public void AddKeysModels()
 		{
-			NBMONJPAMHI.NGHDGMNEPJB(Eclipse.Input.FightKeyBindings.Get(KeyCode.O), FightCID.Punch);
-			NBMONJPAMHI.NGHDGMNEPJB(Eclipse.Input.FightKeyBindings.Get(KeyCode.P), FightCID.Kick);
-			NBMONJPAMHI.NGHDGMNEPJB(Eclipse.Input.FightKeyBindings.Get(KeyCode.K), FightCID.MissileButton);
-			NBMONJPAMHI.NGHDGMNEPJB(Eclipse.Input.FightKeyBindings.Get(KeyCode.L), FightCID.MagicButton);
-			NBMONJPAMHI.NGHDGMNEPJB(Eclipse.Input.FightKeyBindings.Get(KeyCode.J), FightCID.RaidChargeButton);
+			keyboardInput.AddKey(Eclipse.Input.FightKeyBindings.Get(KeyCode.O), FightCID.Punch);
+			keyboardInput.AddKey(Eclipse.Input.FightKeyBindings.Get(KeyCode.P), FightCID.Kick);
+			keyboardInput.AddKey(Eclipse.Input.FightKeyBindings.Get(KeyCode.K), FightCID.MissileButton);
+			keyboardInput.AddKey(Eclipse.Input.FightKeyBindings.Get(KeyCode.L), FightCID.MagicButton);
+			keyboardInput.AddKey(Eclipse.Input.FightKeyBindings.Get(KeyCode.J), FightCID.RaidChargeButton);
 		}
 
 		public bool IsQuadrantEnabled(FightCID KGBGENDIMBC)
 		{
-			if (!GOEHALKBLGK && KGBGENDIMBC == FightCID.Punch)
+			if (!punchEnabled && KGBGENDIMBC == FightCID.Punch)
 			{
 				return false;
 			}
-			if (!GCMMMFABBFC && KGBGENDIMBC == FightCID.Kick)
+			if (!kickEnabled && KGBGENDIMBC == FightCID.Kick)
 			{
 				return false;
 			}
-			if (!DGEIJHIPFIG && FCCPDEBPMCH(KGBGENDIMBC))
+			if (!stickEnabled && IsDirectionQuadrantNonZero(KGBGENDIMBC))
 			{
 				return false;
 			}
@@ -324,12 +324,12 @@ namespace Nekki.SF2.Core.Fights.Controller
 
 		public void StartController()
 		{
-			BFMNHIPMDMG(true);
+			SetDeviceInputEnabled(true);
 		}
 
 		public void StopController()
 		{
-			BFMNHIPMDMG(false);
+			SetDeviceInputEnabled(false);
 		}
 
 		public void ClearButtonsAppearance()
@@ -337,7 +337,7 @@ namespace Nekki.SF2.Core.Fights.Controller
             ClearScriptControlBlocks();
             foreach (var control in RestrictedActions)
                 SetButtonRuleEnabled(control, true);
-			if (AssemblyController.PGFJMOGKEID())
+			if (AssemblyController.GetShowController())
 			{
 				SetKickEnabled(true);
 				SetPunchEnabled(true);
@@ -349,83 +349,83 @@ namespace Nekki.SF2.Core.Fights.Controller
 			return DFOLKDCLLLN >= FightCID.QuadrantZero && DFOLKDCLLLN <= FightCID.QuadrantUpBack;
 		}
 
-		private void PDKHGNCLOIP()
+		private void AddJoystickListeners()
 		{
-			_joystick.RemoveEventListener(0, KJJNFLFLNHB);
-			_joystick.AddEventListener(0, KJJNFLFLNHB);
-			_joystick.RemoveEventListener(1, KJJNFLFLNHB);
-			_joystick.AddEventListener(1, KJJNFLFLNHB);
-			_joystick.RemoveEventListener(2, CICPKENEGNI);
-			_joystick.AddEventListener(2, CICPKENEGNI);
+			_joystick.RemoveEventListener(0, HandleControlPressed);
+			_joystick.AddEventListener(0, HandleControlPressed);
+			_joystick.RemoveEventListener(1, HandleControlPressed);
+			_joystick.AddEventListener(1, HandleControlPressed);
+			_joystick.RemoveEventListener(2, HandleControlReleased);
+			_joystick.AddEventListener(2, HandleControlReleased);
 		}
 
-		private void NELFBBBKDEC(bool DFDCOMCCEEP = true, bool GJHOPBBMHDA = true)
+		private void AddActionButtonListeners(bool DFDCOMCCEEP = true, bool GJHOPBBMHDA = true)
 		{
-			_actionButtons.RemoveEventListener(1, KJJNFLFLNHB);
-			_actionButtons.AddEventListener(1, KJJNFLFLNHB);
-			_actionButtons.RemoveEventListener(2, CICPKENEGNI);
-			_actionButtons.AddEventListener(2, CICPKENEGNI);
+			_actionButtons.RemoveEventListener(1, HandleControlPressed);
+			_actionButtons.AddEventListener(1, HandleControlPressed);
+			_actionButtons.RemoveEventListener(2, HandleControlReleased);
+			_actionButtons.AddEventListener(2, HandleControlReleased);
 			_actionButtons.SetPunchEnabled(DFDCOMCCEEP);
 			_actionButtons.SetKickEnabled(GJHOPBBMHDA);
 		}
 
-		private void CACNKNEFOCF()
+		private void InitKeyboardInput()
 		{
-			NBMONJPAMHI.Init();
-			NBMONJPAMHI.RemoveEventListener(0, ANEHCIIOHOK);
-			NBMONJPAMHI.RemoveEventListener(1, EEJDBDNNABN);
-			NBMONJPAMHI.AddEventListener(0, ANEHCIIOHOK);
-			NBMONJPAMHI.AddEventListener(1, EEJDBDNNABN);
-			NBMONJPAMHI.NGHDGMNEPJB(KeyCode.Keypad0, FightCID.QuadrantZero);
+			keyboardInput.Init();
+			keyboardInput.RemoveEventListener(0, HandleKeyPressed);
+			keyboardInput.RemoveEventListener(1, HandleKeyReleased);
+			keyboardInput.AddEventListener(0, HandleKeyPressed);
+			keyboardInput.AddEventListener(1, HandleKeyReleased);
+			keyboardInput.AddKey(KeyCode.Keypad0, FightCID.QuadrantZero);
 			AddKeysModels();
-			NBMONJPAMHI.NGHDGMNEPJB(KeyCode.RightArrow, FightCID.NextFrameButton);
-			NBMONJPAMHI.NGHDGMNEPJB(KeyCode.Keypad1, FightCID.WinRoundButton);
-			NBMONJPAMHI.NGHDGMNEPJB(KeyCode.Keypad2, FightCID.WinFightButton);
-			NBMONJPAMHI.NGHDGMNEPJB(KeyCode.Keypad3, FightCID.ResetRoundButton);
-			NBMONJPAMHI.NGHDGMNEPJB(KeyCode.Keypad4, FightCID.ResetFightButton);
-			NBMONJPAMHI.NGHDGMNEPJB(KeyCode.Keypad5, FightCID.LossRoundButton);
-			NBMONJPAMHI.NGHDGMNEPJB(KeyCode.Keypad6, FightCID.LossFightButton);
-			NBMONJPAMHI.NGHDGMNEPJB(KeyCode.Keypad7, FightCID.RechargeMagic);
-			NBMONJPAMHI.NGHDGMNEPJB(KeyCode.Keypad8, FightCID.IncreaseComboHit);
-			NBMONJPAMHI.NGHDGMNEPJB(KeyCode.Keypad9, FightCID.IncreaseStyle);
-			NBMONJPAMHI.NGHDGMNEPJB(KeyCode.Keypad0, FightCID.SetPlayerAllHitsCritical);
-			NBMONJPAMHI.NGHDGMNEPJB(KeyCode.Alpha1, FightCID.WinRoundButton);
-			NBMONJPAMHI.NGHDGMNEPJB(KeyCode.Alpha2, FightCID.WinFightButton);
-			NBMONJPAMHI.NGHDGMNEPJB(KeyCode.Alpha3, FightCID.ResetRoundButton);
-			NBMONJPAMHI.NGHDGMNEPJB(KeyCode.Alpha4, FightCID.ResetFightButton);
-			NBMONJPAMHI.NGHDGMNEPJB(KeyCode.Alpha5, FightCID.LossRoundButton);
-			NBMONJPAMHI.NGHDGMNEPJB(KeyCode.Alpha6, FightCID.LossFightButton);
-			NBMONJPAMHI.NGHDGMNEPJB(KeyCode.Alpha7, FightCID.RechargeMagic);
-			NBMONJPAMHI.NGHDGMNEPJB(KeyCode.Alpha8, FightCID.IncreaseComboHit);
-			NBMONJPAMHI.NGHDGMNEPJB(KeyCode.Alpha9, FightCID.IncreaseStyle);
-			NBMONJPAMHI.NGHDGMNEPJB(KeyCode.Alpha0, FightCID.SetPlayerAllHitsCritical);
-			NBMONJPAMHI.NGHDGMNEPJB(KeyCode.F1, FightCID.SlowModeKey);
-			NBMONJPAMHI.NGHDGMNEPJB(KeyCode.F3, FightCID.ShowEdgesButton);
-			NBMONJPAMHI.NGHDGMNEPJB(KeyCode.F4, FightCID.PauseButton);
-			NBMONJPAMHI.NGHDGMNEPJB(KeyCode.F5, FightCID.ShowDebugPerksButton);
-			NBMONJPAMHI.NGHDGMNEPJB(KeyCode.F6, FightCID.SetPlayerImmortality);
-			NBMONJPAMHI.NGHDGMNEPJB(KeyCode.F7, FightCID.SetBotImmortality);
-			NBMONJPAMHI.NGHDGMNEPJB(KeyCode.F10, FightCID.FullscreenMode);
-			NBMONJPAMHI.NGHDGMNEPJB(KeyCode.F11, FightCID.EnableMinScale);
-			NBMONJPAMHI.NGHDGMNEPJB(KeyCode.F12, FightCID.TestTactic);
-			NBMONJPAMHI.NGHDGMNEPJB(KeyCode.M, FightCID.SoundMuteButton);
-			NBMONJPAMHI.NGHDGMNEPJB(KeyCode.B, FightCID.StartBenchmarkKey);
-			NBMONJPAMHI.NGHDGMNEPJB(KeyCode.U, FightCID.StartSuper);
+			keyboardInput.AddKey(KeyCode.RightArrow, FightCID.NextFrameButton);
+			keyboardInput.AddKey(KeyCode.Keypad1, FightCID.WinRoundButton);
+			keyboardInput.AddKey(KeyCode.Keypad2, FightCID.WinFightButton);
+			keyboardInput.AddKey(KeyCode.Keypad3, FightCID.ResetRoundButton);
+			keyboardInput.AddKey(KeyCode.Keypad4, FightCID.ResetFightButton);
+			keyboardInput.AddKey(KeyCode.Keypad5, FightCID.LossRoundButton);
+			keyboardInput.AddKey(KeyCode.Keypad6, FightCID.LossFightButton);
+			keyboardInput.AddKey(KeyCode.Keypad7, FightCID.RechargeMagic);
+			keyboardInput.AddKey(KeyCode.Keypad8, FightCID.IncreaseComboHit);
+			keyboardInput.AddKey(KeyCode.Keypad9, FightCID.IncreaseStyle);
+			keyboardInput.AddKey(KeyCode.Keypad0, FightCID.SetPlayerAllHitsCritical);
+			keyboardInput.AddKey(KeyCode.Alpha1, FightCID.WinRoundButton);
+			keyboardInput.AddKey(KeyCode.Alpha2, FightCID.WinFightButton);
+			keyboardInput.AddKey(KeyCode.Alpha3, FightCID.ResetRoundButton);
+			keyboardInput.AddKey(KeyCode.Alpha4, FightCID.ResetFightButton);
+			keyboardInput.AddKey(KeyCode.Alpha5, FightCID.LossRoundButton);
+			keyboardInput.AddKey(KeyCode.Alpha6, FightCID.LossFightButton);
+			keyboardInput.AddKey(KeyCode.Alpha7, FightCID.RechargeMagic);
+			keyboardInput.AddKey(KeyCode.Alpha8, FightCID.IncreaseComboHit);
+			keyboardInput.AddKey(KeyCode.Alpha9, FightCID.IncreaseStyle);
+			keyboardInput.AddKey(KeyCode.Alpha0, FightCID.SetPlayerAllHitsCritical);
+			keyboardInput.AddKey(KeyCode.F1, FightCID.SlowModeKey);
+			keyboardInput.AddKey(KeyCode.F3, FightCID.ShowEdgesButton);
+			keyboardInput.AddKey(KeyCode.F4, FightCID.PauseButton);
+			keyboardInput.AddKey(KeyCode.F5, FightCID.ShowDebugPerksButton);
+			keyboardInput.AddKey(KeyCode.F6, FightCID.SetPlayerImmortality);
+			keyboardInput.AddKey(KeyCode.F7, FightCID.SetBotImmortality);
+			keyboardInput.AddKey(KeyCode.F10, FightCID.FullscreenMode);
+			keyboardInput.AddKey(KeyCode.F11, FightCID.EnableMinScale);
+			keyboardInput.AddKey(KeyCode.F12, FightCID.TestTactic);
+			keyboardInput.AddKey(KeyCode.M, FightCID.SoundMuteButton);
+			keyboardInput.AddKey(KeyCode.B, FightCID.StartBenchmarkKey);
+			keyboardInput.AddKey(KeyCode.U, FightCID.StartSuper);
 		}
 
-		private void HMGCHHIOPEP()
+		private void ResetGamepadInput()
 		{
 			GetGamepadInput().Reset();
 		}
 
-		private void BFMNHIPMDMG(bool value)
+		private void SetDeviceInputEnabled(bool value)
 		{
 			if (!value && _deviceInputEnabled)
 			{
 				GetGamepadInput().ReleaseAll();
 			}
 			_deviceInputEnabled = value;
-				NBMONJPAMHI.DCHJDPCEODD = value && !_localVersusInputEnabled;
+				keyboardInput.IsEnabled = value && !_localVersusInputEnabled;
 			if (!value)
 			{
 				ReleaseLocalVersusInputs();
@@ -443,7 +443,7 @@ namespace Nekki.SF2.Core.Fights.Controller
 			{
 				if (_localVersusPlayerTwoInput == null)
 					_localVersusPlayerTwoInput = new FightGamepadInput(control => true,
-						(eventType, control) => EmitControl(eventType, new CBBEIGACPPD { Index = 1, KMOPCKPBHIA = control }),
+						(eventType, control) => EmitControl(eventType, new FightControlEventData { Index = 1, Control = control }),
 						_localVersusKeyboardPlayerOne ? GamePad.Player.One : GamePad.Player.Two);
 				return _localVersusPlayerTwoInput;
 			}
@@ -493,7 +493,7 @@ namespace Nekki.SF2.Core.Fights.Controller
 
 		private void SendGamepadControlEvent(int eventType, FightCID control)
         {
-            EmitControl(eventType, new CBBEIGACPPD { Index = 0, KMOPCKPBHIA = control });
+            EmitControl(eventType, new FightControlEventData { Index = 0, Control = control });
         }
 
         private void SyncModUiCapture()
@@ -505,98 +505,98 @@ namespace Nekki.SF2.Core.Fights.Controller
                     _actionButtons.SetInputPressedVisual(control.Item1, false);
                     _joystick.SetInputDirectionVisual(control.Item1, false);
                 }
-                CallEvent(1, new CBBEIGACPPD { Index = control.Item2, KMOPCKPBHIA = control.Item1 });
+                CallEvent(1, new FightControlEventData { Index = control.Item2, Control = control.Item1 });
             }
         }
 
-        private void EmitControl(int eventType, CBBEIGACPPD data)
+        private void EmitControl(int eventType, FightControlEventData data)
         {
-            if (data.Index == 0 && !(eventType == 0 ? _ruleControls.Press(data.KMOPCKPBHIA) : _ruleControls.Release(data.KMOPCKPBHIA))) return;
+            if (data.Index == 0 && !(eventType == 0 ? _ruleControls.Press(data.Control) : _ruleControls.Release(data.Control))) return;
             EmitAvailableControl(eventType, data);
         }
 
-        private void EmitAvailableControl(int eventType, CBBEIGACPPD data)
+        private void EmitAvailableControl(int eventType, FightControlEventData data)
         {
             SyncModUiCapture();
-            var key = (data.KMOPCKPBHIA, data.Index);
+            var key = (data.Control, data.Index);
             if (eventType == 0 ? _modUiControls.Press(key) : _modUiControls.Release(key))
             {
                 if (data.Index == 0)
                 {
-                    _actionButtons.SetInputPressedVisual(data.KMOPCKPBHIA, eventType == 0);
-                    _joystick.SetInputDirectionVisual(data.KMOPCKPBHIA, eventType == 0);
+                    _actionButtons.SetInputPressedVisual(data.Control, eventType == 0);
+                    _joystick.SetInputDirectionVisual(data.Control, eventType == 0);
                 }
                 CallEvent(eventType, data);
             }
         }
 
-		private void KJJNFLFLNHB(object data)
+		private void HandleControlPressed(object data)
 		{
-			CBBEIGACPPD cBBEIGACPPD = (CBBEIGACPPD)data;
+			FightControlEventData cBBEIGACPPD = (FightControlEventData)data;
 			// Touch presses reach a versus fight through the tick driver, not as events.
-			if (_localVersusInputEnabled) _versusTouch = Eclipse.Multiplayer.VersusInputSampler.ApplyControl(_versusTouch, 0, cBBEIGACPPD.KMOPCKPBHIA);
-			if (cBBEIGACPPD.KMOPCKPBHIA != FightCID.QuadrantZero && IsQuadrantEnabled(cBBEIGACPPD.KMOPCKPBHIA))
+			if (_localVersusInputEnabled) _versusTouch = Eclipse.Multiplayer.VersusInputSampler.ApplyControl(_versusTouch, 0, cBBEIGACPPD.Control);
+			if (cBBEIGACPPD.Control != FightCID.QuadrantZero && IsQuadrantEnabled(cBBEIGACPPD.Control))
 			{
 				EmitControl(0, cBBEIGACPPD);
 			}
 		}
 
-		private void CICPKENEGNI(object data)
+		private void HandleControlReleased(object data)
 		{
-			CBBEIGACPPD cBBEIGACPPD = (CBBEIGACPPD)data;
-			if (_localVersusInputEnabled) _versusTouch = Eclipse.Multiplayer.VersusInputSampler.ApplyControl(_versusTouch, 1, cBBEIGACPPD.KMOPCKPBHIA);
-			if (IsQuadrantEnabled(cBBEIGACPPD.KMOPCKPBHIA))
+			FightControlEventData cBBEIGACPPD = (FightControlEventData)data;
+			if (_localVersusInputEnabled) _versusTouch = Eclipse.Multiplayer.VersusInputSampler.ApplyControl(_versusTouch, 1, cBBEIGACPPD.Control);
+			if (IsQuadrantEnabled(cBBEIGACPPD.Control))
 			{
 				EmitControl(1, cBBEIGACPPD);
 			}
 		}
 
-		private void ANEHCIIOHOK(object data)
+		private void HandleKeyPressed(object data)
 		{
-			CBBEIGACPPD cBBEIGACPPD = (CBBEIGACPPD)data;
-			if (!AssemblyController.JONCCPLEIBE().OKALPNOADLJ() || !IsDirectionQuadrant(cBBEIGACPPD.KMOPCKPBHIA))
+			FightControlEventData cBBEIGACPPD = (FightControlEventData)data;
+			if (!AssemblyController.GetMarket().GetIsWinStoreMarket() || !IsDirectionQuadrant(cBBEIGACPPD.Control))
 			{
-				if (cBBEIGACPPD.KMOPCKPBHIA != FightCID.QuadrantZero && IsQuadrantEnabled(cBBEIGACPPD.KMOPCKPBHIA))
+				if (cBBEIGACPPD.Control != FightCID.QuadrantZero && IsQuadrantEnabled(cBBEIGACPPD.Control))
 				{
 					EmitControl(0, cBBEIGACPPD);
 				}
 			}
 			else
 			{
-				CGMOFEOMPCB(cBBEIGACPPD);
+				UpdateKeyboardDirection(cBBEIGACPPD);
 			}
 		}
 
-		private void EEJDBDNNABN(object data)
+		private void HandleKeyReleased(object data)
 		{
-			CBBEIGACPPD cBBEIGACPPD = (CBBEIGACPPD)data;
-			if (!AssemblyController.JONCCPLEIBE().OKALPNOADLJ() || !IsDirectionQuadrant(cBBEIGACPPD.KMOPCKPBHIA))
+			FightControlEventData cBBEIGACPPD = (FightControlEventData)data;
+			if (!AssemblyController.GetMarket().GetIsWinStoreMarket() || !IsDirectionQuadrant(cBBEIGACPPD.Control))
 			{
-				if (IsQuadrantEnabled(cBBEIGACPPD.KMOPCKPBHIA))
+				if (IsQuadrantEnabled(cBBEIGACPPD.Control))
 				{
 					EmitControl(1, cBBEIGACPPD);
 				}
 			}
 			else
 			{
-				CGMOFEOMPCB(cBBEIGACPPD);
+				UpdateKeyboardDirection(cBBEIGACPPD);
 			}
 		}
 
-		private bool FCCPDEBPMCH(FightCID KGBGENDIMBC)
+		private bool IsDirectionQuadrantNonZero(FightCID KGBGENDIMBC)
 		{
 			return KGBGENDIMBC > FightCID.QuadrantZero && KGBGENDIMBC <= FightCID.QuadrantUpBack;
 		}
 
-		private void CGMOFEOMPCB(CBBEIGACPPD DFIBLGKFAHN)
+		private void UpdateKeyboardDirection(FightControlEventData DFIBLGKFAHN)
 		{
 			List<FightCID> list = new List<FightCID>();
 			int i = 0;
-			for (int count = NBMONJPAMHI.BFEBNHGFIHB.Count; i < count; i++)
+			for (int count = keyboardInput.keyBindingsByPlayer.Count; i < count; i++)
 			{
-				foreach (CBBEIGACPPD.GIPHMILLKGA item in NBMONJPAMHI.BFEBNHGFIHB[i])
+				foreach (FightControlEventData.KeyboardBinding item in keyboardInput.keyBindingsByPlayer[i])
 				{
-					if (Eclipse.Input.EclipseInput.GetKeyDown(item.EDEEELJMHLG) || Eclipse.Input.EclipseInput.GetKey(item.EDEEELJMHLG))
+					if (Eclipse.Input.EclipseInput.GetKeyDown(item.Key) || Eclipse.Input.EclipseInput.GetKey(item.Key))
 					{
 						if (!item.isActive)
 						{
@@ -607,7 +607,7 @@ namespace Nekki.SF2.Core.Fights.Controller
 					else if (item.isActive)
 					{
 						item.isActive = false;
-						DFIBLGKFAHN.KMOPCKPBHIA = item.Index;
+						DFIBLGKFAHN.Control = item.Index;
 						EmitControl(1, DFIBLGKFAHN);
 					}
 				}
@@ -669,17 +669,17 @@ namespace Nekki.SF2.Core.Fights.Controller
 					break;
 				}
 			}
-			if (AGEAHBBKHMB != eCHINOPKGGI)
+			if (keyboardDirection != eCHINOPKGGI)
 			{
-				if (AGEAHBBKHMB != FightCID.QuadrantZero)
+				if (keyboardDirection != FightCID.QuadrantZero)
 				{
-					DFIBLGKFAHN.KMOPCKPBHIA = AGEAHBBKHMB;
+					DFIBLGKFAHN.Control = keyboardDirection;
 					EmitControl(1, DFIBLGKFAHN);
 				}
-				AGEAHBBKHMB = eCHINOPKGGI;
+				keyboardDirection = eCHINOPKGGI;
 				if (eCHINOPKGGI != FightCID.QuadrantZero)
 				{
-					DFIBLGKFAHN.KMOPCKPBHIA = eCHINOPKGGI;
+					DFIBLGKFAHN.Control = eCHINOPKGGI;
 					EmitControl(0, DFIBLGKFAHN);
 				}
 			}

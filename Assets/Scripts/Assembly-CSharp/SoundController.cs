@@ -2,18 +2,18 @@ public class SoundController
 {
     private static void SaveMusicSettings()
     {
-        UnityEngine.PlayerPrefs.SetFloat("Eclipse.MusicVolume", Sound.EAIGFAPKILL());
-        UnityEngine.PlayerPrefs.SetInt("Eclipse.MusicMuted", Sound.ELHMADOKHHE() ? 1 : 0);
+        UnityEngine.PlayerPrefs.SetFloat("Eclipse.MusicVolume", Sound.GetMusicVolume());
+        UnityEngine.PlayerPrefs.SetInt("Eclipse.MusicMuted", Sound.GetMusicMuted() ? 1 : 0);
         UnityEngine.PlayerPrefs.Save();
-        ListSF.CCDKHLAMKKO()?.APDCCIEJLMD();
+        ListSF.GetRoster()?.SaveMusicSettings();
     }
 
     private static void SaveSoundSettings()
     {
-        UnityEngine.PlayerPrefs.SetFloat("Eclipse.SoundVolume", Sound.NBHPABEBLOP());
-        UnityEngine.PlayerPrefs.SetInt("Eclipse.SoundMuted", Sound.AAFLCDKJEPL() ? 1 : 0);
+        UnityEngine.PlayerPrefs.SetFloat("Eclipse.SoundVolume", Sound.GetSoundVolume());
+        UnityEngine.PlayerPrefs.SetInt("Eclipse.SoundMuted", Sound.GetSoundMuted() ? 1 : 0);
         UnityEngine.PlayerPrefs.Save();
-        ListSF.CCDKHLAMKKO()?.ABODKHDPHMI();
+        ListSF.GetRoster()?.SaveSoundSettings();
     }
 
     internal static void ApplySavedVolumes()
@@ -21,14 +21,14 @@ public class SoundController
         // Title-screen settings exist before a roster and take precedence once it loads.
         if (UnityEngine.PlayerPrefs.HasKey("Eclipse.MusicVolume"))
         {
-            Sound.OAFCOFNOIJK(UnityEngine.PlayerPrefs.GetFloat("Eclipse.MusicVolume"));
-            Sound.FMLHEDIPGAF(UnityEngine.PlayerPrefs.GetInt("Eclipse.MusicMuted") != 0);
-            ListSF.GKAOOOICJAI = Sound.ELHMADOKHHE();
+            Sound.SetMusicVolume(UnityEngine.PlayerPrefs.GetFloat("Eclipse.MusicVolume"));
+            Sound.SetMusicMuted(UnityEngine.PlayerPrefs.GetInt("Eclipse.MusicMuted") != 0);
+            ListSF.IsSoundEnabled = Sound.GetMusicMuted();
         }
         if (UnityEngine.PlayerPrefs.HasKey("Eclipse.SoundVolume"))
         {
-            Sound.JOFLPDCONNC(UnityEngine.PlayerPrefs.GetFloat("Eclipse.SoundVolume"));
-            Sound.FLOFHMBDHNM(UnityEngine.PlayerPrefs.GetInt("Eclipse.SoundMuted") != 0);
+            Sound.SetSoundVolume(UnityEngine.PlayerPrefs.GetFloat("Eclipse.SoundVolume"));
+            Sound.SetSoundMuted(UnityEngine.PlayerPrefs.GetInt("Eclipse.SoundMuted") != 0);
         }
     }
 
@@ -36,7 +36,7 @@ public class SoundController
 
 	public static bool IsBackgroundMusicIntro;
 
-	public static float IHHCOMFHFEI
+	public static float MusicVolume
 	{
 		get
 		{
@@ -48,7 +48,7 @@ public class SoundController
 		}
 	}
 
-	public static float PBBIGECFMBM
+	public static float SoundVolume
 	{
 		get
 		{
@@ -60,31 +60,31 @@ public class SoundController
 		}
 	}
 
-	public static bool DBLLOGFKAGN
+	public static bool IsMusicMuted
 	{
 		get
 		{
-			return ELHMADOKHHE();
+			return GetMusicMuted();
 		}
 		set
 		{
-			FMLHEDIPGAF(value);
+			SetMusicMuted(value);
 		}
 	}
 
-	public static bool BMDKHPCCFGB
+	public static bool IsSoundMuted
 	{
 		get
 		{
-			return AAFLCDKJEPL();
+			return GetSoundMuted();
 		}
 		set
 		{
-			FLOFHMBDHNM(value);
+			SetSoundMuted(value);
 		}
 	}
 
-	public static void KHPHDKFDCLL(string name = "menu", bool KKHJAJFEPPA = true)
+	public static void StartBackgroundMusic(string name = "menu", bool KKHJAJFEPPA = true)
 	{
 		if (!IsBackgroundMusicIntro)
 		{
@@ -93,7 +93,7 @@ public class SoundController
 		}
 	}
 
-	public static void NDBJCCIBAIO()
+	public static void StopBackgroundMusic()
 	{
 		IsBackgroundMusicIntro = false;
 		Sound.StopMusic();
@@ -103,23 +103,23 @@ public class SoundController
 
 	public static float GetMusicVolume()
 	{
-		return (!Sound.ELHMADOKHHE()) ? Sound.EAIGFAPKILL() : 0f;
+		return (!Sound.GetMusicMuted()) ? Sound.GetMusicVolume() : 0f;
 	}
 
 	// best guess for name
 
 	public static void SetMusicVolume(float value)
 	{
-		Sound.OAFCOFNOIJK(value);
+		Sound.SetMusicVolume(value);
 		bool flag = value <= 0f;
-		bool flag2 = Sound.ELHMADOKHHE();
+		bool flag2 = Sound.GetMusicMuted();
 		if (flag && !flag2)
 		{
-			FMLHEDIPGAF(true);
+			SetMusicMuted(true);
 		}
 		else if (!flag && flag2)
 		{
-			FMLHEDIPGAF(false);
+			SetMusicMuted(false);
 		}
 		else
 		{
@@ -131,23 +131,23 @@ public class SoundController
 
 	public static float GetSoundVolume()
 	{
-		return (!Sound.AAFLCDKJEPL()) ? Sound.NBHPABEBLOP() : 0f;
+		return (!Sound.GetSoundMuted()) ? Sound.GetSoundVolume() : 0f;
 	}
 
 	// best guess for name
 
 	public static void SetSoundVolume(float value)
 	{
-		Sound.JOFLPDCONNC(value);
+		Sound.SetSoundVolume(value);
 		bool flag = value <= 0f;
-		bool flag2 = Sound.AAFLCDKJEPL();
+		bool flag2 = Sound.GetSoundMuted();
 		if (flag && !flag2)
 		{
-			FLOFHMBDHNM(true);
+			SetSoundMuted(true);
 		}
 		else if (!flag && flag2)
 		{
-			FLOFHMBDHNM(false);
+			SetSoundMuted(false);
 		}
 		else
 		{
@@ -155,39 +155,39 @@ public class SoundController
 		}
 	}
 
-	public static bool ELHMADOKHHE()
+	public static bool GetMusicMuted()
 	{
-		return Sound.ELHMADOKHHE();
+		return Sound.GetMusicMuted();
 	}
 
-	public static void FMLHEDIPGAF(bool value)
+	public static void SetMusicMuted(bool value)
 	{
-		if (value != Sound.ELHMADOKHHE())
+		if (value != Sound.GetMusicMuted())
 		{
-			if (!value && Sound.EAIGFAPKILL() == 0f)
+			if (!value && Sound.GetMusicVolume() == 0f)
 			{
-				Sound.OAFCOFNOIJK(1f);
+				Sound.SetMusicVolume(1f);
 			}
-			Sound.FMLHEDIPGAF(value);
-			ListSF.GKAOOOICJAI = value;
+			Sound.SetMusicMuted(value);
+			ListSF.IsSoundEnabled = value;
 			SaveMusicSettings();
 		}
 	}
 
-	public static bool AAFLCDKJEPL()
+	public static bool GetSoundMuted()
 	{
-		return Sound.AAFLCDKJEPL();
+		return Sound.GetSoundMuted();
 	}
 
-	public static void FLOFHMBDHNM(bool value)
+	public static void SetSoundMuted(bool value)
 	{
-		if (value != Sound.AAFLCDKJEPL())
+		if (value != Sound.GetSoundMuted())
 		{
-			if (!value && Sound.NBHPABEBLOP() == 0f)
+			if (!value && Sound.GetSoundVolume() == 0f)
 			{
-				Sound.JOFLPDCONNC(1f);
+				Sound.SetSoundVolume(1f);
 			}
-			Sound.FLOFHMBDHNM(value);
+			Sound.SetSoundMuted(value);
 			SaveSoundSettings();
 		}
 	}

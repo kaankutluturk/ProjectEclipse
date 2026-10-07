@@ -60,7 +60,7 @@ public static class DevRaidHealthBarValidator
                 life.Init(parameters);
                 life.SetRaidStyle(true);
 				var counter = UnderworldRaidShieldBar.Attach(rect, parameters, font);
-                parameters.GEACPINOAAN(-damages[row]);
+                parameters.ChangeLife(-damages[row]);
                 life.Render(); // Includes cross-bar reset, not only direct fill assignment.
                 life.SetValBarValue(parameters.CurrentHealthBarFraction);
                 life.SetHitBarValue(Mathf.Min(1, parameters.CurrentHealthBarFraction + (row == 1 ? 0.035f : 0)));
@@ -146,7 +146,7 @@ public static class DevRaidHealthBarValidator
             // implementation immediately set the display to 75%; the new one
             // must visibly drain the first segment, fill its replacement, then
             // animate the 25% carry-over damage.
-            parameters.GEACPINOAAN(-1.25f);
+            parameters.ChangeLife(-1.25f);
             float expectedFraction = parameters.CurrentHealthBarFraction;
             life.Render();
             float firstFrameFill = GetLifeLayer(life, "_healthBar").fillAmount;

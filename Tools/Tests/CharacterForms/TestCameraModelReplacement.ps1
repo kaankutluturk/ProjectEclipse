@@ -14,35 +14,35 @@ struct Color{}
 class Transform{public Transform Parent;public bool Fail;public void SetParent(Transform p,bool world){if(Fail)throw new InvalidOperationException("parent");Parent=p;}}
 class GameObject{public Transform transform=new Transform();}
 class ModelNode{}
-class ModelObject{public Model Owner;public bool Missing;public ModelNode Focus=new ModelNode(),Other=new ModelNode();public Model get_Model()=>Owner;public ModelNode EGHIDHMENEF(string s)=>Missing?null:s=="focus"?Focus:Other;}
-class Model{public int Index;public GameObject Object=new GameObject();public ModelObject Body;public Model(){Body=new ModelObject{Owner=this};}public ModelObject CLDMEJKGLBA()=>Body;public GameObject MJNPBMOAFML()=>Object;public void set_color(Color c){}}
-class Settings{public string MNDFNOCCOKI="focus",MEIHGLKHLFC="other";}
-static class GameUtils{public static Settings LEPANPKBBKI()=>new Settings();}
+class ModelObject{public Model Owner;public bool Missing;public ModelNode Focus=new ModelNode(),Other=new ModelNode();public Model get_Model()=>Owner;public ModelNode GetNodeByName(string s)=>Missing?null:s=="focus"?Focus:Other;}
+class Model{public int Index;public GameObject Object=new GameObject();public ModelObject Body;public Model(){Body=new ModelObject{Owner=this};}public ModelObject GetBodyObject()=>Body;public GameObject GetGameObject()=>Object;public void set_color(Color c){}}
+class Settings{public string BindingNode="focus",CameraNode="other";}
+static class GameUtils{public static Settings GetCameraSettings()=>new Settings();}
 class Location{public Color modelsColor;}
 class ViewerModel{
- public List<ModelObject> INNLAFHKJNI=new List<ModelObject>();public ModelObject PHJPLPPEPJN,JMHBCFGBHIP;public GameObject _UnityObject=new GameObject();
+ public List<ModelObject> models=new List<ModelObject>();public ModelObject firstFighter,secondFighter;public GameObject _UnityObject=new GameObject();
  VIEWER
 }
-class Render{public ViewerModel Viewer=new ViewerModel();public HashSet<Model> Attached=new HashSet<Model>();public void CDDKOOMODHG(Model m){Attached.Add(m);}public void NAKJKHLEAEB(Model m){Attached.Remove(m);}public ViewerModel FPNKBJPKKGB()=>Viewer;}
+class Render{public ViewerModel Viewer=new ViewerModel();public HashSet<Model> Attached=new HashSet<Model>();public void AttachModelEffects(Model m){Attached.Add(m);}public void DetachModelEffects(Model m){Attached.Remove(m);}public ViewerModel GetViewerModel()=>Viewer;}
 class Camera{
- List<Model> _models=new List<Model>();Render BMBGCIEFJGB=new Render();Location _location=new Location();ModelNode CIJJBMDDAFL,BGFPBMFKFGJ;
+ List<Model> _models=new List<Model>();Render _render=new Render();Location _location=new Location();ModelNode _focusNode,_secondaryFocusNode;
  CAMERA
  static void Check(bool x,string why){if(!x)throw new Exception(why);}
  public static void Main(){
   var c=new Camera();var left=new Model{Index=7};var right=new Model{Index=9};var next=new Model();
-  var v=c.BMBGCIEFJGB.Viewer;c._models.AddRange(new[]{left,right});v.INNLAFHKJNI.AddRange(new[]{left.Body,right.Body});v.PHJPLPPEPJN=left.Body;v.JMHBCFGBHIP=right.Body;c.BMBGCIEFJGB.Attached.UnionWith(new[]{left,right});
+  var v=c._render.Viewer;c._models.AddRange(new[]{left,right});v.models.AddRange(new[]{left.Body,right.Body});v.firstFighter=left.Body;v.secondFighter=right.Body;c._render.Attached.UnionWith(new[]{left,right});
   Check(c.ReplaceModel(left,next,true),"player replacement");
-  Check(c._models[0]==next&&c._models[1]==right&&v.INNLAFHKJNI[0]==next.Body&&v.INNLAFHKJNI[1]==right.Body,"stable slots");
-  Check(v.PHJPLPPEPJN==next.Body&&v.JMHBCFGBHIP==right.Body,"primary pointers");
+  Check(c._models[0]==next&&c._models[1]==right&&v.models[0]==next.Body&&v.models[1]==right.Body,"stable slots");
+  Check(v.firstFighter==next.Body&&v.secondFighter==right.Body,"primary pointers");
   Check(next.Index==7&&right.Index==9&&next.Object.transform.Parent==v._UnityObject.transform,"index/parenting");
-  Check(c.CIJJBMDDAFL==next.Body.Focus&&c.BGFPBMFKFGJ==next.Body.Other,"focus transfer");
-  Check(c.BMBGCIEFJGB.Attached.SetEquals(new[]{next,right}),"listener transfer");
+  Check(c._focusNode==next.Body.Focus&&c._secondaryFocusNode==next.Body.Other,"focus transfer");
+  Check(c._render.Attached.SetEquals(new[]{next,right}),"listener transfer");
   Check(!c.ReplaceModel(left,new Model(),true)&&!c.ReplaceModel(next,right,true),"stale/duplicate rejection");
-  var bad=new Model();bad.Body.Missing=true;Check(!c.ReplaceModel(next,bad,true)&&!c.BMBGCIEFJGB.Attached.Contains(bad),"missing focus leaves current model");
-  bad=new Model();v.INNLAFHKJNI[0]=left.Body;Check(!c.ReplaceModel(next,bad,true),"viewer mismatch");Check(!c.BMBGCIEFJGB.Attached.Contains(bad)&&c._models[0]==next,"mismatch rollback");v.INNLAFHKJNI[0]=next.Body;
+  var bad=new Model();bad.Body.Missing=true;Check(!c.ReplaceModel(next,bad,true)&&!c._render.Attached.Contains(bad),"missing focus leaves current model");
+  bad=new Model();v.models[0]=left.Body;Check(!c.ReplaceModel(next,bad,true),"viewer mismatch");Check(!c._render.Attached.Contains(bad)&&c._models[0]==next,"mismatch rollback");v.models[0]=next.Body;
   bad=new Model();bad.Object.transform.Fail=true;bool threw=false;try{c.ReplaceModel(next,bad,true);}catch(InvalidOperationException){threw=true;}
-  Check(threw&&!c.BMBGCIEFJGB.Attached.Contains(bad)&&v.INNLAFHKJNI[0]==next.Body,"parenting failure preserves slot/listeners");
-  var final=new Model();Check(c.ReplaceModel(right,final,false),"opponent replacement");Check(v.JMHBCFGBHIP==final.Body&&v.PHJPLPPEPJN==next.Body&&c.CIJJBMDDAFL==next.Body.Focus,"opponent retains player focus");
+  Check(threw&&!c._render.Attached.Contains(bad)&&v.models[0]==next.Body,"parenting failure preserves slot/listeners");
+  var final=new Model();Check(c.ReplaceModel(right,final,false),"opponent replacement");Check(v.secondFighter==final.Body&&v.firstFighter==next.Body&&c._focusNode==next.Body.Focus,"opponent retains player focus");
   Console.WriteLine("PASS: production Camera/Viewer replacement; stable slots, primary references, focus, listener transfer, stale/duplicate/missing-focus rejection and parenting/mismatch failure. Unity and renderer services controlled.");
  }
 }

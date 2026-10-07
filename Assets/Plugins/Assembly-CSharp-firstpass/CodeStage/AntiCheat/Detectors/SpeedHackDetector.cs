@@ -9,13 +9,13 @@ namespace CodeStage.AntiCheat.Detectors
 	[AddComponentMenu("Code Stage/Anti-Cheat Toolkit/Speed Hack Detector")]
 	public class SpeedHackDetector : ActDetectorBase
 	{
-		internal const string JCAOMBMKNDE = "Speed Hack Detector";
+		internal const string ComponentName = "Speed Hack Detector";
 
-		internal const string MGAMICFMIJK = "[ACTk] Speed Hack Detector: ";
+		internal const string LogPrefix = "[ACTk] Speed Hack Detector: ";
 
 		private const long TICKS_PER_SECOND = 10000000L;
 
-		private const int ILOKOOHJKFN = 5000000;
+		private const int Threshold = 5000000;
 
 		private static int instancesInScene;
 
@@ -28,22 +28,22 @@ namespace CodeStage.AntiCheat.Detectors
 		[Tooltip("Amount of sequential successful checks before clearing internal false positives counter.\nSet 0 to disable Cool Down feature.")]
 		public int coolDown = 30;
 
-		private byte ALDILCFNLBM;
+		private byte currentFalsePositives;
 
-		private int CDMJCHICMAP;
+		private int currentCooldownShots;
 
-		private long BIJLGFLDLAJ;
+		private long ticksOnStart;
 
-		private long EGENECDHMIC;
+		private long vulnerableTicksOnStart;
 
-		private long CNFAGHGOMGO;
+		private long prevTicks;
 
-		private long KJFLOICFFEN;
+		private long prevIntervalTicks;
 
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		private static SpeedHackDetector OGKMDFDNIEN;
+		private static SpeedHackDetector instance;
 
-		public static SpeedHackDetector BPCBBHAKFDM
+		public static SpeedHackDetector CurrentInstance
 		{
 			get
 			{
@@ -55,11 +55,11 @@ namespace CodeStage.AntiCheat.Detectors
 			}
 		}
 
-		private static SpeedHackDetector MCEPJKHJPIJ
+		private static SpeedHackDetector GetOrCreateInstance
 		{
 			get
 			{
-				return NNMHGMJELIL();
+				return GetOrCreate();
 			}
 		}
 
@@ -71,7 +71,7 @@ namespace CodeStage.AntiCheat.Detectors
 		{
 			if (get_Instance() != null)
 			{
-				get_Instance().FCJDKBEGPEF(null, get_Instance().interval, get_Instance().maxFalsePositives, get_Instance().coolDown);
+				get_Instance().StartDetectionInternal(null, get_Instance().interval, get_Instance().maxFalsePositives, get_Instance().coolDown);
 			}
 			else
 			{
@@ -81,29 +81,29 @@ namespace CodeStage.AntiCheat.Detectors
 
 		public static void StartDetection(UnityAction callback)
 		{
-			StartDetection(callback, NNMHGMJELIL().interval);
+			StartDetection(callback, GetOrCreate().interval);
 		}
 
 		public static void StartDetection(UnityAction callback, float CHCGJBLDPML)
 		{
-			StartDetection(callback, CHCGJBLDPML, NNMHGMJELIL().maxFalsePositives);
+			StartDetection(callback, CHCGJBLDPML, GetOrCreate().maxFalsePositives);
 		}
 
 		public static void StartDetection(UnityAction callback, float CHCGJBLDPML, byte JKBEIPOFGCI)
 		{
-			StartDetection(callback, CHCGJBLDPML, JKBEIPOFGCI, NNMHGMJELIL().coolDown);
+			StartDetection(callback, CHCGJBLDPML, JKBEIPOFGCI, GetOrCreate().coolDown);
 		}
 
 		public static void StartDetection(UnityAction callback, float CHCGJBLDPML, byte JKBEIPOFGCI, int CCCBHICMMJP)
 		{
-			NNMHGMJELIL().FCJDKBEGPEF(callback, CHCGJBLDPML, JKBEIPOFGCI, CCCBHICMMJP);
+			GetOrCreate().StartDetectionInternal(callback, CHCGJBLDPML, JKBEIPOFGCI, CCCBHICMMJP);
 		}
 
 		public static void StopDetection()
 		{
 			if (get_Instance() != null)
 			{
-				get_Instance().DJEBEEIELBB();
+				get_Instance().StopDetectionInternal();
 			}
 		}
 
@@ -111,21 +111,21 @@ namespace CodeStage.AntiCheat.Detectors
 		{
 			if (get_Instance() != null)
 			{
-				get_Instance().HIEIKJFAIJE();
+				get_Instance().DisposeInternal();
 			}
 		}
 
 		public static SpeedHackDetector get_Instance()
 		{
-			return OGKMDFDNIEN;
+			return instance;
 		}
 
 		private static void set_Instance(SpeedHackDetector value)
 		{
-			OGKMDFDNIEN = value;
+			instance = value;
 		}
 
-		private static SpeedHackDetector NNMHGMJELIL()
+		private static SpeedHackDetector GetOrCreate()
 		{
 			if (get_Instance() != null)
 			{
@@ -146,7 +146,7 @@ namespace CodeStage.AntiCheat.Detectors
 			{
 				set_Instance(this);
 			}
-			SceneManager.sceneLoaded += FOFIOMHDCOM;
+			SceneManager.sceneLoaded += OnSceneLoaded;
 		}
 
 		protected override void OnDestroy()
@@ -155,23 +155,23 @@ namespace CodeStage.AntiCheat.Detectors
 			instancesInScene--;
 		}
 
-		private void FOFIOMHDCOM(Scene MHOCFOODLLL, LoadSceneMode NMMPBADCFHK)
+		private void OnSceneLoaded(Scene MHOCFOODLLL, LoadSceneMode NMMPBADCFHK)
 		{
-			KJCKJOKLPLL();
+			OnLevelLoadedCallback();
 		}
 
-		private void KJCKJOKLPLL()
+		private void OnLevelLoadedCallback()
 		{
 			if (instancesInScene < 2)
 			{
 				if (!keepAlive)
 				{
-					HIEIKJFAIJE();
+					DisposeInternal();
 				}
 			}
 			else if (!keepAlive && get_Instance() != this)
 			{
-				HIEIKJFAIJE();
+				DisposeInternal();
 			}
 		}
 
@@ -179,57 +179,57 @@ namespace CodeStage.AntiCheat.Detectors
 		{
 			if (!KCANPMPILKI)
 			{
-				FPOIECJBFGG();
+				ResetStartTicks();
 			}
 		}
 
 		private void Update()
 		{
-			if (!EKDNCONELMD)
+			if (!isRunning)
 			{
 				return;
 			}
 			long ticks = DateTime.UtcNow.Ticks;
-			long num = ticks - CNFAGHGOMGO;
+			long num = ticks - prevTicks;
 			if (num < 0 || num > 10000000)
 			{
-				FPOIECJBFGG();
+				ResetStartTicks();
 				return;
 			}
-			CNFAGHGOMGO = ticks;
+			prevTicks = ticks;
 			long num2 = (long)(interval * 10000000f);
-			if (ticks - KJFLOICFFEN < num2)
+			if (ticks - prevIntervalTicks < num2)
 			{
 				return;
 			}
 			long num3 = (long)Environment.TickCount * 10000L;
-			if (Mathf.Abs(num3 - EGENECDHMIC - (ticks - BIJLGFLDLAJ)) > 5000000f)
+			if (Mathf.Abs(num3 - vulnerableTicksOnStart - (ticks - ticksOnStart)) > 5000000f)
 			{
-				ALDILCFNLBM++;
-				if (ALDILCFNLBM > maxFalsePositives)
+				currentFalsePositives++;
+				if (currentFalsePositives > maxFalsePositives)
 				{
-					MCDANNDOEIK();
+					OnCheatingDetected();
 				}
 				else
 				{
-					CDMJCHICMAP = 0;
-					FPOIECJBFGG();
+					currentCooldownShots = 0;
+					ResetStartTicks();
 				}
 			}
-			else if (ALDILCFNLBM > 0 && coolDown > 0)
+			else if (currentFalsePositives > 0 && coolDown > 0)
 			{
-				CDMJCHICMAP++;
-				if (CDMJCHICMAP >= coolDown)
+				currentCooldownShots++;
+				if (currentCooldownShots >= coolDown)
 				{
-					ALDILCFNLBM = 0;
+					currentFalsePositives = 0;
 				}
 			}
-			KJFLOICFFEN = ticks;
+			prevIntervalTicks = ticks;
 		}
 
-		private void FCJDKBEGPEF(UnityAction callback, float DHMGICLCNNA, byte BKMJNLEIGGG, int KBLLGDNEAMO)
+		private void StartDetectionInternal(UnityAction callback, float DHMGICLCNNA, byte BKMJNLEIGGG, int KBLLGDNEAMO)
 		{
-			if (EKDNCONELMD)
+			if (isRunning)
 			{
 				UnityEngine.Debug.LogWarning("[ACTk] Speed Hack Detector: already running!", this);
 				return;
@@ -253,56 +253,56 @@ namespace CodeStage.AntiCheat.Detectors
 			interval = DHMGICLCNNA;
 			maxFalsePositives = BKMJNLEIGGG;
 			coolDown = KBLLGDNEAMO;
-			FPOIECJBFGG();
-			ALDILCFNLBM = 0;
-			CDMJCHICMAP = 0;
-			AKFEAJDLIKF = true;
-			EKDNCONELMD = true;
+			ResetStartTicks();
+			currentFalsePositives = 0;
+			currentCooldownShots = 0;
+			started = true;
+			isRunning = true;
 		}
 
-		protected override void LICPBNOFNOB()
+		protected override void StartDetectionAutomatically()
 		{
-			FCJDKBEGPEF(null, interval, maxFalsePositives, coolDown);
+			StartDetectionInternal(null, interval, maxFalsePositives, coolDown);
 		}
 
-		protected override void HEGJDFPFMII()
+		protected override void PauseDetector()
 		{
-			EKDNCONELMD = false;
+			isRunning = false;
 		}
 
-		protected override void KLJNEJIEMCN()
+		protected override void ResumeDetector()
 		{
 			if (detectionAction != null || detectionEventHasListener)
 			{
-				EKDNCONELMD = true;
+				isRunning = true;
 			}
 		}
 
-		protected override void DJEBEEIELBB()
+		protected override void StopDetectionInternal()
 		{
-			if (AKFEAJDLIKF)
+			if (started)
 			{
 				detectionAction = null;
-				AKFEAJDLIKF = false;
-				EKDNCONELMD = false;
+				started = false;
+				isRunning = false;
 			}
 		}
 
-		protected override void HIEIKJFAIJE()
+		protected override void DisposeInternal()
 		{
-			base.HIEIKJFAIJE();
+			base.DisposeInternal();
 			if (get_Instance() == this)
 			{
 				set_Instance(null);
 			}
 		}
 
-		private void FPOIECJBFGG()
+		private void ResetStartTicks()
 		{
-			BIJLGFLDLAJ = DateTime.UtcNow.Ticks;
-			EGENECDHMIC = (long)Environment.TickCount * 10000L;
-			CNFAGHGOMGO = BIJLGFLDLAJ;
-			KJFLOICFFEN = BIJLGFLDLAJ;
+			ticksOnStart = DateTime.UtcNow.Ticks;
+			vulnerableTicksOnStart = (long)Environment.TickCount * 10000L;
+			prevTicks = ticksOnStart;
+			prevIntervalTicks = ticksOnStart;
 		}
 	}
 }

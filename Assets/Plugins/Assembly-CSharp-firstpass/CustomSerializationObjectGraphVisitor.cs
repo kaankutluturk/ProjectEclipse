@@ -3,29 +3,29 @@ using System.Linq;
 
 public sealed class CustomSerializationObjectGraphVisitor : ChainedObjectGraphVisitor
 {
-	private readonly NEKGJNOFOFN NPIDIMCLNEM;
+	private readonly IEmitter emitter;
 
-	private readonly IEnumerable<IYamlTypeConverter> DKICAFJEABL;
+	private readonly IEnumerable<IYamlTypeConverter> typeConverters;
 
-	public CustomSerializationObjectGraphVisitor(NEKGJNOFOFN NPIDIMCLNEM, IObjectGraphVisitor GDMFLLGPLNO, IEnumerable<IYamlTypeConverter> DKICAFJEABL)
+	public CustomSerializationObjectGraphVisitor(IEmitter NPIDIMCLNEM, IObjectGraphVisitor GDMFLLGPLNO, IEnumerable<IYamlTypeConverter> DKICAFJEABL)
 		: base(GDMFLLGPLNO)
 	{
-		this.NPIDIMCLNEM = NPIDIMCLNEM;
-		this.DKICAFJEABL = ((DKICAFJEABL == null) ? Enumerable.Empty<IYamlTypeConverter>() : DKICAFJEABL.ToList());
+		this.emitter = NPIDIMCLNEM;
+		this.typeConverters = ((DKICAFJEABL == null) ? Enumerable.Empty<IYamlTypeConverter>() : DKICAFJEABL.ToList());
 	}
 
 	public override bool Enter(IObjectDescriptor value)
 	{
-		IYamlTypeConverter bLNPLLKJFLC = DKICAFJEABL.FirstOrDefault((IYamlTypeConverter GNAONAPDDLD) => GNAONAPDDLD.EFIEKANJAEC(value.get_Type()));
+		IYamlTypeConverter bLNPLLKJFLC = typeConverters.FirstOrDefault((IYamlTypeConverter GNAONAPDDLD) => GNAONAPDDLD.Accepts(value.get_Type()));
 		if (bLNPLLKJFLC != null)
 		{
-			bLNPLLKJFLC.WriteYaml(NPIDIMCLNEM, value.OEAKCOHMIHH(), value.get_Type());
+			bLNPLLKJFLC.WriteYaml(emitter, value.GetValue(), value.get_Type());
 			return false;
 		}
 		IYamlSerializable mFKFJGLKJDL = value as IYamlSerializable;
 		if (mFKFJGLKJDL != null)
 		{
-			mFKFJGLKJDL.WriteYaml(NPIDIMCLNEM);
+			mFKFJGLKJDL.WriteYaml(emitter);
 			return false;
 		}
 		return base.Enter(value);

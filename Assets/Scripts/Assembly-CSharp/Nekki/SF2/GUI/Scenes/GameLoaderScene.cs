@@ -13,20 +13,20 @@ namespace Nekki.SF2.GUI.Scenes
 		[SerializeField]
 		private GameObject logo;
 
-		private LoadingModule FCFFELHCEEA = new LoadingModule();
+		private LoadingModule loadingModule = new LoadingModule();
 
-		private bool CDCHAOBEMKH;
+		private bool startPending;
 
-		private bool HOCNNFGOMHL;
+		private bool stopPending;
 
-		private bool EOKFGFADIIH;
+		private bool clearPending;
 
 		[SerializeField]
 		private LockScreen _lockScreenPrefab;
 
-		private static bool PIHEPFHMJHJ;
+		private static bool isSessionLoaded;
 
-		public override ScreenType PNAJHDBDDLP
+		public override ScreenType SceneType
 		{
 			get
 			{
@@ -34,7 +34,7 @@ namespace Nekki.SF2.GUI.Scenes
 			}
 		}
 
-		public VideoClip ENNDIAJLJOH
+		public VideoClip IntroVideoClip
 		{
 			get
 			{
@@ -42,7 +42,7 @@ namespace Nekki.SF2.GUI.Scenes
 			}
 		}
 
-		public GameObject DODLJPFPIOB
+		public GameObject LogoObject
 		{
 			get
 			{
@@ -69,13 +69,13 @@ namespace Nekki.SF2.GUI.Scenes
 		{
 			base.Init(data);
 			Application.runInBackground = true;
-			CDCHAOBEMKH = true;
-			HOCNNFGOMHL = PIHEPFHMJHJ;
-            if (HOCNNFGOMHL) { Stop(); HOCNNFGOMHL = false; }
+			startPending = true;
+			stopPending = isSessionLoaded;
+            if (stopPending) { Stop(); stopPending = false; }
             Eclipse.UI.GameSessionRestart.ArrivedAtTitle();
             Eclipse.Multiplayer.LocalVersusSession.ArrivedAtTitle();
-			EOKFGFADIIH = false;
-			PIHEPFHMJHJ = true;
+			clearPending = false;
+			isSessionLoaded = true;
 			get_Logo().SetActive(false);
 			Eclipse.UI.TitleScreen.ShowAtStartup();
 			if (_lockScreenPrefab != null && LockScreen.get_Instance() == null)
@@ -87,79 +87,79 @@ namespace Nekki.SF2.GUI.Scenes
 		private void Update()
 		{
 			if (Eclipse.UI.TitleScreen.IsOpen) return;
-			if (EOKFGFADIIH)
+			if (clearPending)
 			{
 				Clear();
 			}
-			if (HOCNNFGOMHL)
+			if (stopPending)
 			{
 				Stop();
-				HOCNNFGOMHL = false;
+				stopPending = false;
 			}
-			if (CDCHAOBEMKH)
+			if (startPending)
 			{
 				Start();
-				CDCHAOBEMKH = false;
+				startPending = false;
 			}
-			if (!FCFFELHCEEA.JPDPHACFBFB())
+			if (!loadingModule.IsLoadingActive())
 			{
-				FCFFELHCEEA.Start();
+				loadingModule.Start();
 			}
-			if (!FCFFELHCEEA.GCHANFIHDGH())
+			if (!loadingModule.IsFinished())
 			{
-				if (!GameUtils.LJOJHDOIFLN)
+				if (!GameUtils.HackDetected)
 				{
 					try
 					{
-						FCFFELHCEEA.JLPMOKPFECK();
+						loadingModule.ProcessStep();
 					}
 					catch (HackDetectedException ex)
 					{
-						GameUtils.LJOJHDOIFLN = true;
-						ListSF.GetInstance().LCFENEAGDDG(ex.Message);
+						GameUtils.HackDetected = true;
+						ListSF.GetInstance().ShowDataCorruptedDialog(ex.Message);
 					}
 				}
 			}
-			else if (FCFFELHCEEA.GCHANFIHDGH() && !FCFFELHCEEA.OOPMAAHJMCE())
+			else if (loadingModule.IsFinished() && !loadingModule.IsEmpty())
 			{
-				EOKFGFADIIH = true;
+				clearPending = true;
 			}
 		}
 
 		public void Restart()
 		{
-			HOCNNFGOMHL = true;
-			CDCHAOBEMKH = true;
+			stopPending = true;
+			startPending = true;
 			SoundController.IsBackgroundMusicIntro = false;
 			Sound.StopMusic();
-			Sound.GKMINHHAMAK();
+			Sound.StopAllSounds();
 		}
 
 		public void Start()
 		{
 			Clear();
-			FCFFELHCEEA.Stop();
-			FCFFELHCEEA.AddModule(new PreInitializationModule());
+			loadingModule.Stop();
+			loadingModule.AddModule(new PreInitializationModule());
 			// Offline players need neither store licensing nor account/phone permissions.
-			FCFFELHCEEA.AddModule(new AntichitingModule());
-			FCFFELHCEEA.AddModule(new AttachFileModule());
-			FCFFELHCEEA.AddModule(new InitializationModule());
+			loadingModule.AddModule(new AntichitingModule());
+			loadingModule.AddModule(new AttachFileModule());
+			loadingModule.AddModule(new InitializationModule());
 			if (!Eclipse.Multiplayer.LocalVersusSession.IsActive)
-				FCFFELHCEEA.AddModule(new IntroModule(this));
-			FCFFELHCEEA.AddModule(new ParseModule());
-			FCFFELHCEEA.AddModule(new LoginModule());
+				loadingModule.AddModule(new IntroModule(this));
+			loadingModule.AddModule(new ParseModule());
+			loadingModule.AddModule(new LoginModule());
 		}
 
 		public static void Stop()
 		{
             Eclipse.Modding.ModRuntime.Shutdown();
-			PIHEPFHMJHJ = false;
-			GameUtils.OBJEKOBDMOE = false;
-			GameUtils.GCDIGFODNFO = true;
+			isSessionLoaded = false;
+			GameUtils.IsLoginComplete = false;
+			GameUtils.ShowNews = true;
 			Module.Reset();
 			ListSF.Reset();
 			ServerProvider.Reset();
-			AnimationData.BCILLFEBJHK();
+			AnimationData.ClearAnimations();
 			AiData.ClearAll();
 		}
 
@@ -167,17 +167,17 @@ namespace Nekki.SF2.GUI.Scenes
 		// Stop() resets a session, without changing this scene's own restart bookkeeping.
 		public static void DiscardTitlePreview()
 		{
-			bool loaded = PIHEPFHMJHJ, online = GameUtils.OBJEKOBDMOE, first = GameUtils.GCDIGFODNFO;
+			bool loaded = isSessionLoaded, online = GameUtils.IsLoginComplete, first = GameUtils.ShowNews;
 			Stop();
-			PIHEPFHMJHJ = loaded;
-			GameUtils.OBJEKOBDMOE = online;
-			GameUtils.GCDIGFODNFO = first;
+			isSessionLoaded = loaded;
+			GameUtils.IsLoginComplete = online;
+			GameUtils.ShowNews = first;
 		}
 
 		private void Clear()
 		{
-			FCFFELHCEEA.ClearModules(true);
-			EOKFGFADIIH = false;
+			loadingModule.ClearModules(true);
+			clearPending = false;
 		}
 	}
 }

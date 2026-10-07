@@ -18,15 +18,15 @@ public class QuestActionMenuBtnFlashing : QuestAction
 	public override void Parse(XmlNode EPKLCPOEELO)
 	{
 		base.Parse(EPKLCPOEELO);
-		_btnName = EPKLCPOEELO.Attributes["BtnName"].CIPOICEEIBK(string.Empty);
+		_btnName = EPKLCPOEELO.Attributes["BtnName"].GetStringOrDefault(string.Empty);
 	}
 
-	public override void DEJMHFMLKIC(QuestParameters GFIHPBCEEOB)
+	public override void Execute(QuestParameters GFIHPBCEEOB)
 	{
 		// Keep the quest parameters alive until the scroll finishes opening.  The
 		// destination is usually a roster variable (for example _NextScene), and
 		// resolving it later without base initialization turns it into numeric 0.
-		base.DEJMHFMLKIC(GFIHPBCEEOB);
+		base.Execute(GFIHPBCEEOB);
 		resolvedScreenName = ResolveScreenName(GFIHPBCEEOB);
 		MainMenu.get_Instance().CloseMenu();
 		TutorialCanvas.get_Instance().set_BlockOn(true);
@@ -38,31 +38,31 @@ public class QuestActionMenuBtnFlashing : QuestAction
 		if (tutorialComponent != null)
 		{
 			tutorialComponent.IsActive = true;
-			skipBtn.onClick.AddListener(JPMFAFMCCLP);
+			skipBtn.onClick.AddListener(OnSkipClicked);
 		}
 		ArrowCanvas.get_Instance().ShowArrow(new Vector3(scrollBtn.transform.position.x, scrollBtn.transform.position.y - 50f, 0f));
-		MainMenu.get_Instance().Scroll.AddEventListener(3, MGCEBAICAJG);
-		MainMenu.get_Instance().Scroll.AddEventListener(0, JDMLJBADBBI);
+		MainMenu.get_Instance().Scroll.AddEventListener(3, OnScrollArrowDismissed);
+		MainMenu.get_Instance().Scroll.AddEventListener(0, OnMenuScrollOpened);
 	}
 
-	private void JPMFAFMCCLP()
+	private void OnSkipClicked()
 	{
 		Button skipBtn = MainMenu.get_Instance().GetSkipBtn();
-		skipBtn.onClick.RemoveListener(JPMFAFMCCLP);
-		MGCEBAICAJG(0);
-		JDMLJBADBBI(0);
-		OAJKIJGCLMJ();
+		skipBtn.onClick.RemoveListener(OnSkipClicked);
+		OnScrollArrowDismissed(0);
+		OnMenuScrollOpened(0);
+		ReleaseTutorialLock();
 	}
 
-	private void MGCEBAICAJG(object data)
+	private void OnScrollArrowDismissed(object data)
 	{
-		MainMenu.get_Instance().Scroll.RemoveEventListener(3, MGCEBAICAJG);
+		MainMenu.get_Instance().Scroll.RemoveEventListener(3, OnScrollArrowDismissed);
 		ArrowCanvas.get_Instance().HideArrow();
 	}
 
-	private void JDMLJBADBBI(object data)
+	private void OnMenuScrollOpened(object data)
 	{
-		MainMenu.get_Instance().Scroll.RemoveEventListener(0, JDMLJBADBBI);
+		MainMenu.get_Instance().Scroll.RemoveEventListener(0, OnMenuScrollOpened);
 		NotificationsGame.CloseNotifications();
 		Button scrollBtn = MainMenu.get_Instance().GetScrollBtn();
 		TutorialComponent component = scrollBtn.gameObject.GetComponent<TutorialComponent>();
@@ -75,27 +75,27 @@ public class QuestActionMenuBtnFlashing : QuestAction
 		case "Map":
 		case "Shop":
 		case "Profile":
-			cCGJDFLIKFN = Module.DFDEMKONNKK(screenName);
+			cCGJDFLIKFN = Module.ParseScreenType(screenName);
 			break;
 		default:
 			Debug.LogWarning("[Tutorial] MenuBtnFlashing could not resolve target '" + _btnName + "' (value '" + screenName + "'); releasing tutorial lock.");
-			OAJKIJGCLMJ();
+			ReleaseTutorialLock();
 			return;
 		}
 		targetButton = MainMenu.get_Instance().GetButtonFromScreen(cCGJDFLIKFN);
 		if (targetButton == null)
 		{
 			Debug.LogWarning("[Tutorial] Menu button is unavailable for " + screenName + "; releasing tutorial lock.");
-			OAJKIJGCLMJ();
+			ReleaseTutorialLock();
 			return;
 		}
 		targetButton.set_IsFlashing(true);
-		targetButton.onClick.AddListener(OAJKIJGCLMJ);
+		targetButton.onClick.AddListener(ReleaseTutorialLock);
 		TutorialComponent component2 = targetButton.gameObject.GetComponent<TutorialComponent>();
 		if (component2 == null)
 		{
 			Debug.LogWarning("[Tutorial] Menu button for " + screenName + " has no TutorialComponent; releasing tutorial lock.");
-			OAJKIJGCLMJ();
+			ReleaseTutorialLock();
 			return;
 		}
 		component2.IsActive = true;
@@ -105,8 +105,8 @@ public class QuestActionMenuBtnFlashing : QuestAction
 	{
 		ConditionExtension.CompareResult result = new ConditionExtension.CompareResult();
 		QuestCondition condition = new QuestCondition();
-		condition.LIMHBJBEEIA(parameters);
-		condition.MCPIOGALBMK(_btnName, result);
+		condition.SetParameters(parameters);
+		condition.SetValue(_btnName, result);
 		string screenName = result.ToString();
 		if (IsMenuScreen(screenName))
 		{
@@ -117,12 +117,12 @@ public class QuestActionMenuBtnFlashing : QuestAction
 		// silently turn a string destination into zero again.
 		if (_btnName == "_NextScene")
 		{
-			RosterQuest.NOKCOAHJIPB variable = ListSF.CCDKHLAMKKO().PFMIBOCGGPC(_btnName);
+			RosterQuest.QuestVariable variable = ListSF.GetRoster().FindQuestVariable(_btnName);
 			if (variable != null && IsMenuScreen(variable.Value))
 			{
 				return variable.Value;
 			}
-			string tutorialStep = ListSF.CCDKHLAMKKO().BKBHIMEEDBG().JILGHNPIHME();
+			string tutorialStep = ListSF.GetRoster().GetTutorials().GetStoryStep();
 			switch (tutorialStep)
 			{
 			case "STEP_BUY_ITEM":
@@ -144,11 +144,11 @@ public class QuestActionMenuBtnFlashing : QuestAction
 		return screenName == "Dojo" || screenName == "Map" || screenName == "Shop" || screenName == "Profile";
 	}
 
-	private void OAJKIJGCLMJ()
+	private void ReleaseTutorialLock()
 	{
 		if (targetButton != null)
 		{
-			targetButton.onClick.RemoveListener(OAJKIJGCLMJ);
+			targetButton.onClick.RemoveListener(ReleaseTutorialLock);
 			targetButton.set_IsFlashing(false);
 			TutorialComponent component = targetButton.gameObject.GetComponent<TutorialComponent>();
 			if (component != null)
@@ -158,6 +158,6 @@ public class QuestActionMenuBtnFlashing : QuestAction
 			targetButton = null;
 		}
 		TutorialCanvas.get_Instance().set_BlockOn(false);
-		OGIJONMKABB();
+		FinishAction();
 	}
 }

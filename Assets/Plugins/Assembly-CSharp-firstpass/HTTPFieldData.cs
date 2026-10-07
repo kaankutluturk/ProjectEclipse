@@ -4,24 +4,24 @@ using System.Text;
 public class HTTPFieldData
 {
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private string HKGHEJDKCPI;
+	private string name;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private string NICJKIEBEOP;
+	private string fileName;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private string GGCOFGAKFJF;
+	private string mimeType;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private Encoding KCEDIFIGHJD;
+	private Encoding encoding;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private string MDBPCPHCLLC;
+	private string text;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private byte[] NNNFENBIMPM;
+	private byte[] binary;
 
-	public string MENAJEAJJBE
+	public string FieldName
 	{
 		get
 		{
@@ -37,31 +37,31 @@ public class HTTPFieldData
 	{
 		get
 		{
-			return EPDMGFELIMC();
+			return GetFileName();
 		}
 		set
 		{
-			IMMLGNKJPKA(value);
+			SetFileName(value);
 		}
 	}
 
-	public string GLJIAOAHJNE
+	public string MimeType
 	{
 		get
 		{
-			return DIHKMAKOHGN();
+			return GetMimeType();
 		}
 		set
 		{
-			KLHEONGIINC(value);
+			SetMimeType(value);
 		}
 	}
 
-	public Encoding LNGLPHJJIMC
+	public Encoding TextEncoding
 	{
 		get
 		{
-			return PGBGEOMJDJK();
+			return GetEncoding();
 		}
 		set
 		{
@@ -69,23 +69,23 @@ public class HTTPFieldData
 		}
 	}
 
-	public string GGDJIPKMKFC
+	public string Text
 	{
 		get
 		{
-			return ILMJJEMPKCN();
+			return GetText();
 		}
 		set
 		{
-			MHMDIMIEPLL(value);
+			SetText(value);
 		}
 	}
 
-	public byte[] CIABLGOJJAN
+	public byte[] BinaryData
 	{
 		get
 		{
-			return CLBEEBOFBMA();
+			return GetBinary();
 		}
 		set
 		{
@@ -93,85 +93,85 @@ public class HTTPFieldData
 		}
 	}
 
-	public byte[] LBAMJPCNCNK
+	public byte[] Payload
 	{
 		get
 		{
-			return NLHGDFGNIHB();
+			return GetPayload();
 		}
 	}
 
 	public string get_Name()
 	{
-		return HKGHEJDKCPI;
+		return name;
 	}
 
 	public void set_Name(string value)
 	{
-		HKGHEJDKCPI = value;
+		name = value;
 	}
 
-	public string EPDMGFELIMC()
+	public string GetFileName()
 	{
-		return NICJKIEBEOP;
+		return fileName;
 	}
 
-	public void IMMLGNKJPKA(string value)
+	public void SetFileName(string value)
 	{
-		NICJKIEBEOP = value;
+		fileName = value;
 	}
 
-	public string DIHKMAKOHGN()
+	public string GetMimeType()
 	{
-		return GGCOFGAKFJF;
+		return mimeType;
 	}
 
-	public void KLHEONGIINC(string value)
+	public void SetMimeType(string value)
 	{
-		GGCOFGAKFJF = value;
+		mimeType = value;
 	}
 
-	public Encoding PGBGEOMJDJK()
+	public Encoding GetEncoding()
 	{
-		return KCEDIFIGHJD;
+		return encoding;
 	}
 
 	public void set_Encoding(Encoding value)
 	{
-		KCEDIFIGHJD = value;
+		encoding = value;
 	}
 
-	public string ILMJJEMPKCN()
+	public string GetText()
 	{
-		return MDBPCPHCLLC;
+		return text;
 	}
 
-	public void MHMDIMIEPLL(string value)
+	public void SetText(string value)
 	{
-		MDBPCPHCLLC = value;
+		text = value;
 	}
 
-	public byte[] CLBEEBOFBMA()
+	public byte[] GetBinary()
 	{
-		return NNNFENBIMPM;
+		return binary;
 	}
 
 	public void set_Binary(byte[] value)
 	{
-		NNNFENBIMPM = value;
+		binary = value;
 	}
 
-	public byte[] NLHGDFGNIHB()
+	public byte[] GetPayload()
 	{
-		if (CLBEEBOFBMA() != null)
+		if (GetBinary() != null)
 		{
-			return CLBEEBOFBMA();
+			return GetBinary();
 		}
-		if (PGBGEOMJDJK() == null)
+		if (GetEncoding() == null)
 		{
 			set_Encoding(Encoding.UTF8);
 		}
-		byte[] bytes = PGBGEOMJDJK().GetBytes(ILMJJEMPKCN());
+		byte[] bytes = GetEncoding().GetBytes(GetText());
 		set_Binary(bytes);
 		return bytes;
 	}

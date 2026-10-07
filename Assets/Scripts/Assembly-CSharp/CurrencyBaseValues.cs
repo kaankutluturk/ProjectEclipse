@@ -7,27 +7,27 @@ public class CurrencyBaseValues
 	{
 		public string currencyName;
 
-		private List<CharProgLevel> JINJHDABECD;
+		private List<CharProgLevel> levels;
 
 		public CurrencyBaseValue(XmlNode EBLIGDMALEA)
 		{
-			currencyName = EBLIGDMALEA.Attributes["Name"].CIPOICEEIBK(string.Empty);
-			JINJHDABECD = new List<CharProgLevel>();
+			currencyName = EBLIGDMALEA.Attributes["Name"].GetStringOrDefault(string.Empty);
+			levels = new List<CharProgLevel>();
 			foreach (XmlNode childNode in EBLIGDMALEA.ChildNodes)
 			{
 				if (childNode.Name == "Level")
 				{
 					CharProgLevel item = new CharProgLevel(childNode);
-					JINJHDABECD.Add(item);
+					levels.Add(item);
 				}
 			}
 		}
 
 		public float GetBaseValue(int OMHDLKNHNMJ)
 		{
-			foreach (CharProgLevel item in JINJHDABECD)
+			foreach (CharProgLevel item in levels)
 			{
-				if (OMHDLKNHNMJ >= item.LHNCHOAEGEA && OMHDLKNHNMJ <= item.KAEPJHHLLPK)
+				if (OMHDLKNHNMJ >= item.Min && OMHDLKNHNMJ <= item.Max)
 				{
 					return item.value;
 				}
@@ -36,28 +36,28 @@ public class CurrencyBaseValues
 		}
 	}
 
-	public List<CurrencyBaseValue> PPJIHOCADPA = new List<CurrencyBaseValue>();
+	public List<CurrencyBaseValue> CurrencyValues = new List<CurrencyBaseValue>();
 
 	public void Parse(XmlNode node)
 	{
-		PPJIHOCADPA.Clear();
+		CurrencyValues.Clear();
 		foreach (XmlNode childNode in node.ChildNodes)
 		{
 			if (childNode.Name == "Currency")
 			{
 				CurrencyBaseValue item = new CurrencyBaseValue(childNode);
-				PPJIHOCADPA.Add(item);
+				CurrencyValues.Add(item);
 			}
 		}
 	}
 
 	public float GetBaseValue(string currencyName)
 	{
-		foreach (CurrencyBaseValue item in PPJIHOCADPA)
+		foreach (CurrencyBaseValue item in CurrencyValues)
 		{
 			if (item.currencyName == currencyName)
 			{
-				int oMHDLKNHNMJ = ListSF.CCDKHLAMKKO().PINDEKDNCNL();
+				int oMHDLKNHNMJ = ListSF.GetRoster().GetLevel();
 				return item.GetBaseValue(oMHDLKNHNMJ);
 			}
 		}

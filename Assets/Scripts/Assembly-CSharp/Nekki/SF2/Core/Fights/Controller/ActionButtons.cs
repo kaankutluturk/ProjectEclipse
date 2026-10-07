@@ -7,7 +7,7 @@ namespace Nekki.SF2.Core.Fights.Controller
 {
 	public class ActionButtons : SFMonoBehaviour<object>
 	{
-		public enum GMOKFCLLDDI
+		public enum ButtonEventType
 		{
 			OnButtonClick = 0,
 			OnButtonPress = 1,
@@ -103,7 +103,7 @@ namespace Nekki.SF2.Core.Fights.Controller
 			_btnRaidCharge.AddEventListener(2, ButtonClick);
 			_btnRaidCharge.AddEventListener(0, ButtonPress);
 			_btnRaidCharge.AddEventListener(1, ButtonRelease);
-			if (!AssemblyController.PGFJMOGKEID())
+			if (!AssemblyController.GetShowController())
 			{
 				_btnMissile.transform.position = _btnKick.transform.position;
 				_btnMagic.transform.position = _btnPunch.transform.position;
@@ -248,30 +248,30 @@ namespace Nekki.SF2.Core.Fights.Controller
 		public void ButtonClick(object data)
 		{
 			FightCID kJPGKHJNOMC = (FightCID)data;
-			FCKDDEIIPEN(GMOKFCLLDDI.OnButtonClick, kJPGKHJNOMC);
+			DispatchButtonEvent(ButtonEventType.OnButtonClick, kJPGKHJNOMC);
 		}
 
 		public void ButtonPress(object data)
 		{
 			FightCID kJPGKHJNOMC = (FightCID)data;
-			FCKDDEIIPEN(GMOKFCLLDDI.OnButtonPress, kJPGKHJNOMC);
+			DispatchButtonEvent(ButtonEventType.OnButtonPress, kJPGKHJNOMC);
 		}
 
 		public void ButtonRelease(object data)
 		{
 			FightCID kJPGKHJNOMC = (FightCID)data;
-			FCKDDEIIPEN(GMOKFCLLDDI.OnButtonRelease, kJPGKHJNOMC);
+			DispatchButtonEvent(ButtonEventType.OnButtonRelease, kJPGKHJNOMC);
 		}
 
-		private void FCKDDEIIPEN(GMOKFCLLDDI DOPHKKGNAEF, FightCID KJPGKHJNOMC)
+		private void DispatchButtonEvent(ButtonEventType DOPHKKGNAEF, FightCID KJPGKHJNOMC)
 		{
-			CBBEIGACPPD cBBEIGACPPD = new CBBEIGACPPD();
+			FightControlEventData cBBEIGACPPD = new FightControlEventData();
 			cBBEIGACPPD.Index = 0;
-			cBBEIGACPPD.KMOPCKPBHIA = KJPGKHJNOMC;
+			cBBEIGACPPD.Control = KJPGKHJNOMC;
 			CallEvent((int)DOPHKKGNAEF, cBBEIGACPPD);
 		}
 
-		private float MCCCGGDKNPO(int count)
+		private float GetSegmentAngle(int count)
 		{
 			float num = 0.125f;
 			float num2 = num * 360f / (float)count;

@@ -6,13 +6,13 @@ using UnityEngine.UI;
 
 public class QuestActionStoryTutorialBuyItem : QuestAction
 {
-	public override void DEJMHFMLKIC(QuestParameters GFIHPBCEEOB)
+	public override void Execute(QuestParameters GFIHPBCEEOB)
 	{
-		string cDNCPBKAHKJ = GameUtils.AKPBNLKFONO.CDNCPBKAHKJ;
-		UserItem dKCHDHMLKHN = ListSF.CCDKHLAMKKO().KHCNHPCPFII().CMGOCLGHNLH(cDNCPBKAHKJ);
+		string cDNCPBKAHKJ = GameUtils.TutorialSettings.TutorialWeapon;
+		UserItem dKCHDHMLKHN = ListSF.GetRoster().GetInventory().FindItem(cDNCPBKAHKJ);
 		if (dKCHDHMLKHN != null)
 		{
-			OGIJONMKABB();
+			FinishAction();
 		}
 		TutorialCanvas.get_Instance().set_BlockOn(true);
 		ShopScene current = Scene<ShopScene>.get_Current();
@@ -29,14 +29,14 @@ public class QuestActionStoryTutorialBuyItem : QuestAction
 		if (tutorialComponent != null)
 		{
 			tutorialComponent.IsActive = true;
-			skipBtn.onClick.AddListener(JPMFAFMCCLP);
+			skipBtn.onClick.AddListener(OnSkipClicked);
 		}
 	}
 
-	private void JPMFAFMCCLP()
+	private void OnSkipClicked()
 	{
 		Button skipBtn = MainMenu.get_Instance().GetSkipBtn();
-		skipBtn.onClick.AddListener(JPMFAFMCCLP);
+		skipBtn.onClick.AddListener(OnSkipClicked);
 		OnButtonClick();
 	}
 
@@ -49,16 +49,16 @@ public class QuestActionStoryTutorialBuyItem : QuestAction
 		goldButton.onClick.RemoveListener(OnButtonClick);
 		TutorialComponent component = goldButton.gameObject.GetComponent<TutorialComponent>();
 		component.IsActive = false;
-		string cDNCPBKAHKJ = GameUtils.AKPBNLKFONO.CDNCPBKAHKJ;
+		string cDNCPBKAHKJ = GameUtils.TutorialSettings.TutorialWeapon;
 		ItemInfo dJKEECEOCJB = ListSF.GetItems().GetItemByName(cDNCPBKAHKJ);
 		if (dJKEECEOCJB != null)
 		{
-			if (ItemBuyHelper.IHHKNBPKGHD(dJKEECEOCJB))
+			if (ItemBuyHelper.BuyItemWithCoins(dJKEECEOCJB))
 			{
-				ListSF.CCDKHLAMKKO().KHCNHPCPFII().EEDJEDBMIMI(dJKEECEOCJB, true);
+				ListSF.GetRoster().GetInventory().EquipItem(dJKEECEOCJB, true);
 			}
 			instance.GetInfoPanel().UpdateContent();
 		}
-		OGIJONMKABB();
+		FinishAction();
 	}
 }

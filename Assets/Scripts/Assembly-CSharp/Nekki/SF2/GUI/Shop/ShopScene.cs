@@ -89,74 +89,74 @@ namespace Nekki.SF2.GUI.Shop
 		[SerializeField]
 		private SpriteRenderer _backgroundRight;
 
-		private PaymentUI ODCDHJGNPEM;
+		private PaymentUI _paymentUi;
 
-		private List<ItemInfo> DOHLAAPAOOO = new List<ItemInfo>();
+		private List<ItemInfo> _weaponItems = new List<ItemInfo>();
 
-		private List<ItemInfo> KBMOJAPFLAO = new List<ItemInfo>();
+		private List<ItemInfo> _armorItems = new List<ItemInfo>();
 
-		private List<ItemInfo> GIECPODANIL = new List<ItemInfo>();
+		private List<ItemInfo> _helmetItems = new List<ItemInfo>();
 
-		private List<ItemInfo> IMHIHAMOFJD = new List<ItemInfo>();
+		private List<ItemInfo> _rangedItems = new List<ItemInfo>();
 
-		private List<ItemInfo> JFBDPCMEKMN = new List<ItemInfo>();
+		private List<ItemInfo> _magicItems = new List<ItemInfo>();
 
-		private List<ItemInfo> EBHGBBEGOAM = new List<ItemInfo>();
+		private List<ItemInfo> _paymentItems = new List<ItemInfo>();
 
-		private List<ItemInfo> AEABDIBDJAH = new List<ItemInfo>();
+		private List<ItemInfo> _freeItems = new List<ItemInfo>();
 
-		private InfoPanelContent AIEKLCMEKMI;
+		private InfoPanelContent _infoPanelContent;
 
-		private ParametersPanelContent JMJOHONKDDO;
+		private ParametersPanelContent _parametersPanelContent;
 
-		private PropertiesPanelContent KDFADLAANLM;
+		private PropertiesPanelContent _propertiesPanelContent;
 
 		private CheatsPanel _CheatsPanel;
 
-		private DelayedStrike PDDJMHMJACO;
+		private DelayedStrike _delayedStrike;
 
-		private string MHDHDBOENCD = "ShopPieces.Left_flag";
+		private string _leftFlagImage = "ShopPieces.Left_flag";
 
-		private string HIOEPHBLPCE = "ShopPieces.Right_flag";
+		private string _rightFlagImage = "ShopPieces.Right_flag";
 
-		private string GHHDJJEMHAN = "ShopPieces.Left_flag_properties";
+		private string _leftFlagPropertiesImage = "ShopPieces.Left_flag_properties";
 
-		private string NGNPGDAKHJJ = "ShopPieces.Right_flag_properties";
+		private string _rightFlagPropertiesImage = "ShopPieces.Right_flag_properties";
 
-		private string PIDAKCDGJFH = "ShopPieces.Left_flag_properties_none";
+		private string _leftFlagPropertiesNoneImage = "ShopPieces.Left_flag_properties_none";
 
-		private string AGPCJDDILHK = "ShopPieces.Right_flag_properties_none";
+		private string _rightFlagPropertiesNoneImage = "ShopPieces.Right_flag_properties_none";
 
-		private float ODHAHECBPHI = 1f;
+		private float _unusedFullAlpha = 1f;
 
-		private float CIBPLGLKGOI = 0.5f;
+		private float _unusedHalfAlpha = 0.5f;
 
-		private int MCMMNANBKME = 120;
+		private int _unusedSize120 = 120;
 
-		private float CLBCHPGCGCB = 1f;
+		private float _shownOpacity = 1f;
 
-		private float APNGDHAICIE;
+		private float _hiddenOpacity;
 
-		private float BHJIDLIBKDD = 0.7f;
+		private float _fadeDuration = 0.7f;
 
-		private int BONAMONOIIC;
+		private int _newItemsCount;
 
-		private ShopSection NNGHNIJCKLD = ShopSection.Unknown;
+		private ShopSection _currentSection = ShopSection.Unknown;
 
-		private static Dictionary<ShopSection, ItemInfo> CLFLAOAADGN = new Dictionary<ShopSection, ItemInfo>();
+		private static Dictionary<ShopSection, ItemInfo> _lastFocusedItems = new Dictionary<ShopSection, ItemInfo>();
 
-		private List<ItemInfo> PDHEEIPFFME = new List<ItemInfo>();
+		private List<ItemInfo> _currentItems = new List<ItemInfo>();
 
-		private bool MIAFGIJBKHN = true;
+		private bool _iconPanelActive = true;
 
-		private Vector2 GCMNMDIBAOE = new Vector2(0f, 0f);
+		private Vector2 _cellBaseSize = new Vector2(0f, 0f);
 
-		private ShopTableViewCell NNACFMKLHIB;
+		private ShopTableViewCell _selectedCell;
 
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		private static ShopScene OGKMDFDNIEN;
+		private static ShopScene _instance;
 
-		public PaymentUI GKPMFKIEPPB
+		public PaymentUI PaymentPanel
 		{
 			get
 			{
@@ -164,7 +164,7 @@ namespace Nekki.SF2.GUI.Shop
 			}
 		}
 
-		public override ScreenType PNAJHDBDDLP
+		public override ScreenType SceneType
 		{
 			get
 			{
@@ -172,7 +172,7 @@ namespace Nekki.SF2.GUI.Shop
 			}
 		}
 
-		public static ShopScene BPCBBHAKFDM
+		public static ShopScene SceneInstance
 		{
 			get
 			{
@@ -186,7 +186,7 @@ namespace Nekki.SF2.GUI.Shop
 
 		public PaymentUI get_PaymentUI()
 		{
-			return ODCDHJGNPEM;
+			return _paymentUi;
 		}
 
 		public override ScreenType get_SceneId()
@@ -196,25 +196,25 @@ namespace Nekki.SF2.GUI.Shop
 
 		public static ShopScene get_Instance()
 		{
-			return OGKMDFDNIEN;
+			return _instance;
 		}
 
 		public static void set_Instance(ShopScene value)
 		{
-			OGKMDFDNIEN = value;
+			_instance = value;
 		}
 
 		protected override void Init(object data)
 		{
 			base.Init(data);
-			PDDJMHMJACO = data as DelayedStrike;
+			_delayedStrike = data as DelayedStrike;
 			set_Instance(this);
 			Eclipse.Rendering.ShopDojoBackdrop.Attach(gameObject, _backgroundLeft, _backgroundRight);
-			ODCDHJGNPEM = IMDHIBMOAIG<PaymentUI>();
-			ODCDHJGNPEM.get_OnProductsUpdateEvent().AddListener(LCHCKOKGFHK);
-			if (ListSF.CCDKHLAMKKO() != null && ListSF.CCDKHLAMKKO().KHCNHPCPFII() != null)
+			_paymentUi = GetModule<PaymentUI>();
+			_paymentUi.get_OnProductsUpdateEvent().AddListener(OnProductsUpdated);
+			if (ListSF.GetRoster() != null && ListSF.GetRoster().GetInventory() != null)
 			{
-				ListSF.CCDKHLAMKKO().KHCNHPCPFII().LHNOOJJNDPK.AddListener(FGHDBGDNHAH);
+				ListSF.GetRoster().GetInventory().ItemsDelivered.AddListener(OnUserItemsChanged);
 			}
 			if (_mainMenu != null)
 			{
@@ -226,165 +226,165 @@ namespace Nekki.SF2.GUI.Shop
 			}
 			if (_tryItemButton != null)
 			{
-				_tryItemButton.onClick.AddListener(GLLPHHALCDA);
+				_tryItemButton.onClick.AddListener(OnTryButtonClicked);
 			}
 			if (_infoPanelContentPrefab != null)
 			{
 				GameObject gameObject = Object.Instantiate(_infoPanelContentPrefab);
-				AIEKLCMEKMI = gameObject.GetComponent<InfoPanelContent>();
-				AIEKLCMEKMI.Init();
-				AIEKLCMEKMI.updateEvent.AddListener(OEHKNFIDCMI);
+				_infoPanelContent = gameObject.GetComponent<InfoPanelContent>();
+				_infoPanelContent.Init();
+				_infoPanelContent.updateEvent.AddListener(OnItemInfoUpdated);
 			}
 			if (_ParametersPanelContentPrefab != null)
 			{
 				GameObject gameObject2 = Object.Instantiate(_ParametersPanelContentPrefab);
-				JMJOHONKDDO = gameObject2.GetComponent<ParametersPanelContent>();
-				JMJOHONKDDO.Init();
+				_parametersPanelContent = gameObject2.GetComponent<ParametersPanelContent>();
+				_parametersPanelContent.Init();
 			}
 			if (_propertiesPanelContentPrefab != null)
 			{
 				GameObject gameObject3 = Object.Instantiate(_propertiesPanelContentPrefab);
-				KDFADLAANLM = gameObject3.GetComponent<PropertiesPanelContent>();
-				KDFADLAANLM.Init();
-				if (KDFADLAANLM.get_PropertiesPanel() != null && _hintPanel != null)
+				_propertiesPanelContent = gameObject3.GetComponent<PropertiesPanelContent>();
+				_propertiesPanelContent.Init();
+				if (_propertiesPanelContent.get_PropertiesPanel() != null && _hintPanel != null)
 				{
-					KDFADLAANLM.get_PropertiesPanel().onPerksClick.AddListener(_hintPanel.ShowPerkHint);
+					_propertiesPanelContent.get_PropertiesPanel().onPerksClick.AddListener(_hintPanel.ShowPerkHint);
 				}
 			}
 			if (_itemInfo != null)
 			{
 				bool jOJGKNGGAHB = false;
-				_itemInfo.Init(AIEKLCMEKMI, jOJGKNGGAHB);
+				_itemInfo.Init(_infoPanelContent, jOJGKNGGAHB);
 			}
 			if (_itemParam != null)
 			{
 				bool jOJGKNGGAHB2 = true;
 				bool nKGDKKNNJOF = false;
 				float mDPGKEDBHNO = -40f;
-				_itemParam.Init(JMJOHONKDDO, jOJGKNGGAHB2, mDPGKEDBHNO, nKGDKKNNJOF, HIOEPHBLPCE, MHDHDBOENCD);
+				_itemParam.Init(_parametersPanelContent, jOJGKNGGAHB2, mDPGKEDBHNO, nKGDKKNNJOF, _rightFlagImage, _leftFlagImage);
 			}
 			if (_itemProperties != null)
 			{
 				bool jOJGKNGGAHB3 = true;
 				bool nKGDKKNNJOF2 = false;
 				float mDPGKEDBHNO2 = 40f;
-				_itemProperties.Init(KDFADLAANLM, jOJGKNGGAHB3, mDPGKEDBHNO2, nKGDKKNNJOF2, AGPCJDDILHK, PIDAKCDGJFH);
+				_itemProperties.Init(_propertiesPanelContent, jOJGKNGGAHB3, mDPGKEDBHNO2, nKGDKKNNJOF2, _rightFlagPropertiesNoneImage, _leftFlagPropertiesNoneImage);
 			}
 			if (_buttonPanel != null)
 			{
 				_buttonPanel.Init();
-				if (ListSF.GetItems().KEFJPEOEPBN().Count == 0)
+				if (ListSF.GetItems().GetFreeItems().Count == 0)
 				{
 					_buttonPanel.HideButton(6);
 				}
 			}
-			IDKPGMCBIFM();
+			LoadSectionItems();
 			_shopTableView.set_CellPrefab(_cellPrefab);
 			_shopTableView.Init(this, this);
-			_shopTableView.onSelectCell.AddListener(KPFEGEHJMOH);
+			_shopTableView.onSelectCell.AddListener(OnCellSelected);
 			_shopTableView.set_MinScrollVelocity(100f);
 			_shopTableView.get_Scroll().onDragBegin.AddListener(_hintPanel.HideHintAndStopCorutine);
 			if (_tryItemButton != null)
 			{
 				Transform forgeParent = _shopUIGroup != null ? _shopUIGroup.transform : transform;
-				_forgeController = new Eclipse.Forge.ShopForgeController(this, _mainMenu, _tryItemButton, forgeParent, KDFADLAANLM, _shopTableView != null ? _shopTableView.transform.parent as RectTransform : null, _itemParam != null ? _itemParam.transform as RectTransform : null, _itemProperties != null ? _itemProperties.transform as RectTransform : null, _hintPanel);
+				_forgeController = new Eclipse.Forge.ShopForgeController(this, _mainMenu, _tryItemButton, forgeParent, _propertiesPanelContent, _shopTableView != null ? _shopTableView.transform.parent as RectTransform : null, _itemParam != null ? _itemParam.transform as RectTransform : null, _itemProperties != null ? _itemProperties.transform as RectTransform : null, _hintPanel);
 			}
 			if (_modelContainer != null)
 			{
 				_modelContainer.Init();
 			}
-			if (SystemProperties.DBBOCENKMGD() && _cheatsPanelPrefab != null)
+			if (SystemProperties.IsDebug() && _cheatsPanelPrefab != null)
 			{
 				_CheatsPanel = Object.Instantiate(_cheatsPanelPrefab).GetComponent<CheatsPanel>();
 				Transform parent = ((!(_shopUIGroup != null)) ? base.transform : _shopUIGroup.transform);
 				_CheatsPanel.transform.SetParent(parent, false);
-				_CheatsPanel.OnShowCheats.AddListener(LAHBGMGMHPO);
-				_CheatsPanel.OnAddLevel.AddListener(NKIALIBEBBF);
+				_CheatsPanel.OnShowCheats.AddListener(OnShowCheats);
+				_CheatsPanel.OnAddLevel.AddListener(OnCheatLevelAdded);
 				_CheatsPanel.HideCheats();
 			}
 			SetFocusOnStart();
-			UpdateModel(ListSF.CCDKHLAMKKO().get_Parameters().Weapon);
+			UpdateModel(ListSF.GetRoster().get_Parameters().Weapon);
 			ShowUI();
 		}
 
-		protected override void PJNFHNFLNNO()
+		protected override void OnSceneClosed()
 		{
 			_forgeController?.Shutdown();
 			_forgeController = null;
 			RememberFocus();
 			UpdateNewItemsCounters();
-			ODCDHJGNPEM.get_OnProductsUpdateEvent().RemoveListener(LCHCKOKGFHK);
+			_paymentUi.get_OnProductsUpdateEvent().RemoveListener(OnProductsUpdated);
 			set_Instance(null);
-			if (ListSF.CCDKHLAMKKO() != null && ListSF.CCDKHLAMKKO().KHCNHPCPFII() != null)
+			if (ListSF.GetRoster() != null && ListSF.GetRoster().GetInventory() != null)
 			{
-				ListSF.CCDKHLAMKKO().KHCNHPCPFII().LHNOOJJNDPK.RemoveListener(FGHDBGDNHAH);
+				ListSF.GetRoster().GetInventory().ItemsDelivered.RemoveListener(OnUserItemsChanged);
 			}
-			base.PJNFHNFLNNO();
+			base.OnSceneClosed();
 		}
 
-		protected void KPFEGEHJMOH(TableViewCell HJCPCBLCJJN)
+		protected void OnCellSelected(TableViewCell HJCPCBLCJJN)
 		{
 			ShopTableViewCell shopTableViewCell = HJCPCBLCJJN as ShopTableViewCell;
 			if (!(shopTableViewCell == null))
 			{
-				if (NNACFMKLHIB != null)
+				if (_selectedCell != null)
 				{
 				}
-				NNACFMKLHIB = shopTableViewCell;
-				NOCJCNJACAD(shopTableViewCell);
-				KNOHDLJCHHL(shopTableViewCell);
-				if (AIEKLCMEKMI != null)
+				_selectedCell = shopTableViewCell;
+				UpdatePropertiesPanel(shopTableViewCell);
+				UpdateParametersForCell(shopTableViewCell);
+				if (_infoPanelContent != null)
 				{
-					AIEKLCMEKMI.SetItemInfo(shopTableViewCell.get_ItemInfo());
+					_infoPanelContent.SetItemInfo(shopTableViewCell.get_ItemInfo());
 				}
 				if (_tryItemButton != null)
 				{
-					FMJNALPHGGF(shopTableViewCell.get_ItemInfo());
+					UpdateTryButton(shopTableViewCell.get_ItemInfo());
 				}
 				_forgeController?.OnItemSelected(shopTableViewCell.get_ItemInfo());
 			}
 		}
 
-		private void LCHCKOKGFHK()
+		private void OnProductsUpdated()
 		{
-			if (NNACFMKLHIB != null && AIEKLCMEKMI != null)
+			if (_selectedCell != null && _infoPanelContent != null)
 			{
-				AIEKLCMEKMI.SetItemInfo(NNACFMKLHIB.get_ItemInfo());
+				_infoPanelContent.SetItemInfo(_selectedCell.get_ItemInfo());
 			}
 		}
 
-		private void NOCJCNJACAD(ShopTableViewCell LIBKHDGLJFF)
+		private void UpdatePropertiesPanel(ShopTableViewCell LIBKHDGLJFF)
 		{
-			if (!(LIBKHDGLJFF == null) && !(_itemProperties == null) && !(KDFADLAANLM == null))
+			if (!(LIBKHDGLJFF == null) && !(_itemProperties == null) && !(_propertiesPanelContent == null))
 			{
 				ItemInfo itemInfo = LIBKHDGLJFF.get_ItemInfo();
 				if (itemInfo != null && itemInfo.DefaultEnchantmentPreviews.Count > 0)
 				{
-					_itemProperties.set_OpenImage(NGNPGDAKHJJ);
-					_itemProperties.set_CloseImage(GHHDJJEMHAN);
+					_itemProperties.set_OpenImage(_rightFlagPropertiesImage);
+					_itemProperties.set_CloseImage(_leftFlagPropertiesImage);
 				}
 				else
 				{
-					_itemProperties.set_OpenImage(AGPCJDDILHK);
-					_itemProperties.set_CloseImage(PIDAKCDGJFH);
+					_itemProperties.set_OpenImage(_rightFlagPropertiesNoneImage);
+					_itemProperties.set_CloseImage(_leftFlagPropertiesNoneImage);
 				}
-				KDFADLAANLM.SetItemInfo(itemInfo);
+				_propertiesPanelContent.SetItemInfo(itemInfo);
 			}
 		}
 
-		private void KNOHDLJCHHL(ShopTableViewCell LIBKHDGLJFF)
+		private void UpdateParametersForCell(ShopTableViewCell LIBKHDGLJFF)
 		{
-			if (LIBKHDGLJFF != null && LIBKHDGLJFF.get_ItemInfo() != null && JMJOHONKDDO != null)
+			if (LIBKHDGLJFF != null && LIBKHDGLJFF.get_ItemInfo() != null && _parametersPanelContent != null)
 			{
-				JMJOHONKDDO.UpdateParameters(LIBKHDGLJFF.get_ItemInfo());
+				_parametersPanelContent.UpdateParameters(LIBKHDGLJFF.get_ItemInfo());
 			}
 		}
 
-		private void KNOHDLJCHHL()
+		private void UpdateParametersAnimated()
 		{
-			if (JMJOHONKDDO != null && NNACFMKLHIB != null && NNACFMKLHIB.get_ItemInfo() != null)
+			if (_parametersPanelContent != null && _selectedCell != null && _selectedCell.get_ItemInfo() != null)
 			{
-				JMJOHONKDDO.UpdateParametersWithDuration(NNACFMKLHIB.get_ItemInfo());
+				_parametersPanelContent.UpdateParametersWithDuration(_selectedCell.get_ItemInfo());
 			}
 		}
 
@@ -396,7 +396,7 @@ namespace Nekki.SF2.GUI.Shop
 			}
 		}
 
-		private void LAHBGMGMHPO()
+		private void OnShowCheats()
 		{
 			if (_buttonPanel != null)
 			{
@@ -411,24 +411,24 @@ namespace Nekki.SF2.GUI.Shop
 
 		public void RefreshItems()
 		{
-			PHKKGEMDCNG();
+			ReloadItems();
 			UpdateNewItemsCounters();
 		}
 
-		private void NKIALIBEBBF()
+		private void OnCheatLevelAdded()
 		{
-			PHKKGEMDCNG();
+			ReloadItems();
 			UpdateNewItemsCounters();
 		}
 
 		public void SetFocusOnStart()
 		{
-			if (PDDJMHMJACO != null)
+			if (_delayedStrike != null)
 			{
-				GoToSlider(PDDJMHMJACO.SliderType);
-				if (PDDJMHMJACO.DLKPBAJDHBO != null)
+				GoToSlider(_delayedStrike.SliderType);
+				if (_delayedStrike.Item != null)
 				{
-					ScrollToItem(PDDJMHMJACO.DLKPBAJDHBO);
+					ScrollToItem(_delayedStrike.Item);
 				}
 			}
 			else
@@ -439,9 +439,9 @@ namespace Nekki.SF2.GUI.Shop
 
 		public void RememberFocus()
 		{
-			if (NNACFMKLHIB != null && NNACFMKLHIB.get_ItemInfo() != null)
+			if (_selectedCell != null && _selectedCell.get_ItemInfo() != null)
 			{
-				CLFLAOAADGN[NNGHNIJCKLD] = NNACFMKLHIB.get_ItemInfo();
+				_lastFocusedItems[_currentSection] = _selectedCell.get_ItemInfo();
 			}
 		}
 
@@ -456,9 +456,9 @@ namespace Nekki.SF2.GUI.Shop
 		public bool FocusOnNewItem()
 		{
 			ItemInfo AOCHMFMOACB = null;
-			PDHEEIPFFME.ForEach((ItemInfo DHDMNHCIPEH) =>
+			_currentItems.ForEach((ItemInfo DHDMNHCIPEH) =>
 			{
-				if (DHDMNHCIPEH.DBHJGAGOLOB() && (AOCHMFMOACB == null || (ObscuredLong)(AOCHMFMOACB.GemPrice) < (ObscuredLong)(DHDMNHCIPEH.GemPrice) || ((ObscuredLong)(AOCHMFMOACB.GemPrice) == (ObscuredLong)(DHDMNHCIPEH.GemPrice) && (ObscuredLong)(AOCHMFMOACB.CoinPrice) < (ObscuredLong)(DHDMNHCIPEH.CoinPrice))))
+				if (DHDMNHCIPEH.GetIsNew() && (AOCHMFMOACB == null || (ObscuredLong)(AOCHMFMOACB.GemPrice) < (ObscuredLong)(DHDMNHCIPEH.GemPrice) || ((ObscuredLong)(AOCHMFMOACB.GemPrice) == (ObscuredLong)(DHDMNHCIPEH.GemPrice) && (ObscuredLong)(AOCHMFMOACB.CoinPrice) < (ObscuredLong)(DHDMNHCIPEH.CoinPrice))))
 				{
 					AOCHMFMOACB = DHDMNHCIPEH;
 				}
@@ -474,10 +474,10 @@ namespace Nekki.SF2.GUI.Shop
 		public bool FocusOnLastFocus()
 		{
 			ItemInfo dJKEECEOCJB = null;
-			if (CLFLAOAADGN.ContainsKey(NNGHNIJCKLD))
+			if (_lastFocusedItems.ContainsKey(_currentSection))
 			{
-				ItemInfo DIPNFHJPJGA = CLFLAOAADGN[NNGHNIJCKLD];
-				dJKEECEOCJB = PDHEEIPFFME.Find((ItemInfo DHDMNHCIPEH) => DHDMNHCIPEH.Name.Equals(DIPNFHJPJGA.Name));
+				ItemInfo DIPNFHJPJGA = _lastFocusedItems[_currentSection];
+				dJKEECEOCJB = _currentItems.Find((ItemInfo DHDMNHCIPEH) => DHDMNHCIPEH.Name.Equals(DIPNFHJPJGA.Name));
 			}
 			if (dJKEECEOCJB != null)
 			{
@@ -489,15 +489,15 @@ namespace Nekki.SF2.GUI.Shop
 
 		public bool FocusOnEquipedItem()
 		{
-			List<UserItem> list = ListSF.CCDKHLAMKKO().KHCNHPCPFII().DJBOFEEKJMP()
-				.FindAll((UserItem DHDMNHCIPEH) => DHDMNHCIPEH.EFMFGEPDAOP());
+			List<UserItem> list = ListSF.GetRoster().GetInventory().GetItems()
+				.FindAll((UserItem DHDMNHCIPEH) => DHDMNHCIPEH.GetIsEquipped());
 			ItemInfo dJKEECEOCJB = null;
-			foreach (ItemInfo item in PDHEEIPFFME)
+			foreach (ItemInfo item in _currentItems)
 			{
-				UserItem dKCHDHMLKHN = list.Find((UserItem DHDMNHCIPEH) => DHDMNHCIPEH.BHKHOJPANHE() != null && DHDMNHCIPEH.BHKHOJPANHE().Name.Equals(item.Name));
+				UserItem dKCHDHMLKHN = list.Find((UserItem DHDMNHCIPEH) => DHDMNHCIPEH.GetInfo() != null && DHDMNHCIPEH.GetInfo().Name.Equals(item.Name));
 				if (dKCHDHMLKHN != null)
 				{
-					dJKEECEOCJB = dKCHDHMLKHN.BHKHOJPANHE();
+					dJKEECEOCJB = dKCHDHMLKHN.GetInfo();
 					break;
 				}
 			}
@@ -511,10 +511,10 @@ namespace Nekki.SF2.GUI.Shop
 
 		public void ScrollToItem(ItemInfo item)
 		{
-			ItemInfo dJKEECEOCJB = PDHEEIPFFME.Find((ItemInfo DHDMNHCIPEH) => DHDMNHCIPEH.Name.Equals(item.Name));
+			ItemInfo dJKEECEOCJB = _currentItems.Find((ItemInfo DHDMNHCIPEH) => DHDMNHCIPEH.Name.Equals(item.Name));
 			if (dJKEECEOCJB != null && _shopTableView != null)
 			{
-				int iBAKGENOEPH = PDHEEIPFFME.IndexOf(dJKEECEOCJB);
+				int iBAKGENOEPH = _currentItems.IndexOf(dJKEECEOCJB);
 				_shopTableView.ScrollToCell(iBAKGENOEPH);
 			}
 		}
@@ -522,10 +522,10 @@ namespace Nekki.SF2.GUI.Shop
 		public void ScrollToItemByName(SliderType MNHKGIHKBPO, string FDJFBMNPPLM)
 		{
 			GoToSlider(MNHKGIHKBPO);
-			ItemInfo dJKEECEOCJB = PDHEEIPFFME.Find((ItemInfo FAKOMBAIFPP) => FAKOMBAIFPP.Name == FDJFBMNPPLM);
+			ItemInfo dJKEECEOCJB = _currentItems.Find((ItemInfo FAKOMBAIFPP) => FAKOMBAIFPP.Name == FDJFBMNPPLM);
 			if (dJKEECEOCJB != null && _shopTableView != null)
 			{
-				int iBAKGENOEPH = PDHEEIPFFME.IndexOf(dJKEECEOCJB);
+				int iBAKGENOEPH = _currentItems.IndexOf(dJKEECEOCJB);
 				_shopTableView.ScrollToCell(iBAKGENOEPH);
 			}
 		}
@@ -533,10 +533,10 @@ namespace Nekki.SF2.GUI.Shop
 		public void ScrollToItemByName(ShopSection KGDHCBNKLMF, string OHCGEEEKEJH)
 		{
 			SetShopSection(KGDHCBNKLMF);
-			ItemInfo dJKEECEOCJB = PDHEEIPFFME.Find((ItemInfo DHDMNHCIPEH) => DHDMNHCIPEH.Name.Equals(OHCGEEEKEJH));
+			ItemInfo dJKEECEOCJB = _currentItems.Find((ItemInfo DHDMNHCIPEH) => DHDMNHCIPEH.Name.Equals(OHCGEEEKEJH));
 			if (dJKEECEOCJB != null && _shopTableView != null)
 			{
-				int iBAKGENOEPH = PDHEEIPFFME.IndexOf(dJKEECEOCJB);
+				int iBAKGENOEPH = _currentItems.IndexOf(dJKEECEOCJB);
 				_shopTableView.ScrollToCell(iBAKGENOEPH);
 			}
 		}
@@ -572,23 +572,23 @@ namespace Nekki.SF2.GUI.Shop
 			}
 		}
 
-		private void IDKPGMCBIFM()
+		private void LoadSectionItems()
 		{
-			DFADPMMIAAL(ListSF.GetItems().MJKFCBMNNGJ(), DOHLAAPAOOO);
-			DFADPMMIAAL(ListSF.GetItems().MCGKNJPLIIH(), KBMOJAPFLAO);
-			DFADPMMIAAL(ListSF.GetItems().EKKIBLDGNHH(), GIECPODANIL);
-			DFADPMMIAAL(ListSF.GetItems().LKGPBHADANE(), IMHIHAMOFJD);
-			DFADPMMIAAL(ListSF.GetItems().OGFOBKIEGKA(), JFBDPCMEKMN);
-			DFADPMMIAAL(ListSF.GetItems().KCIHHGCHEKM(), EBHGBBEGOAM);
-			DFADPMMIAAL(ListSF.GetItems().BFFNOIPELKC(), EBHGBBEGOAM);
-			DFADPMMIAAL(ListSF.GetItems().KEFJPEOEPBN(), AEABDIBDJAH);
+			AddAvailableItems(ListSF.GetItems().GetWeapons(), _weaponItems);
+			AddAvailableItems(ListSF.GetItems().GetArmors(), _armorItems);
+			AddAvailableItems(ListSF.GetItems().GetHelms(), _helmetItems);
+			AddAvailableItems(ListSF.GetItems().GetRangedWeapons(), _rangedItems);
+			AddAvailableItems(ListSF.GetItems().GetMagicItems(), _magicItems);
+			AddAvailableItems(ListSF.GetItems().GetRealMoneyItems(), _paymentItems);
+			AddAvailableItems(ListSF.GetItems().GetConsumables(), _paymentItems);
+			AddAvailableItems(ListSF.GetItems().GetFreeItems(), _freeItems);
 		}
 
-		private void DFADPMMIAAL(List<ItemInfo> CAIHJJFKFLP, List<ItemInfo> PPFNLLCMHGM)
+		private void AddAvailableItems(List<ItemInfo> CAIHJJFKFLP, List<ItemInfo> PPFNLLCMHGM)
 		{
 			foreach (ItemInfo item in CAIHJJFKFLP)
 			{
-				if (ShopAvailabilityPolicy.IsAvailable(item, ListSF.CCDKHLAMKKO()))
+				if (ShopAvailabilityPolicy.IsAvailable(item, ListSF.GetRoster()))
 				{
 					PPFNLLCMHGM.Add(item);
 				}
@@ -597,12 +597,12 @@ namespace Nekki.SF2.GUI.Shop
 
 		public void SetShopSection(ShopSection KGDHCBNKLMF)
 		{
-			if (NNGHNIJCKLD == KGDHCBNKLMF)
+			if (_currentSection == KGDHCBNKLMF)
 			{
 				return;
 			}
 			RememberFocus();
-			NNGHNIJCKLD = KGDHCBNKLMF;
+			_currentSection = KGDHCBNKLMF;
 			ShowSidePanels(true);
 			UpdateNewItemsCounters();
 			if (_buttonPanel != null)
@@ -621,19 +621,19 @@ namespace Nekki.SF2.GUI.Shop
 			switch (KGDHCBNKLMF)
 			{
 			case ShopSection.Weapon:
-				CDPHCFAKPLO(DOHLAAPAOOO, 0f, _weaponImageSize);
+				SetSectionItems(_weaponItems, 0f, _weaponImageSize);
 				DisableButton(ShopSection.Weapon);
 				break;
 			case ShopSection.Armor:
-				CDPHCFAKPLO(KBMOJAPFLAO, 110f, _armorImageSize);
+				SetSectionItems(_armorItems, 110f, _armorImageSize);
 				DisableButton(ShopSection.Armor);
 				break;
 			case ShopSection.Helmet:
-				CDPHCFAKPLO(GIECPODANIL, 110f, _helmetImageSize);
+				SetSectionItems(_helmetItems, 110f, _helmetImageSize);
 				DisableButton(ShopSection.Helmet);
 				break;
 			case ShopSection.Ranged:
-				CDPHCFAKPLO(IMHIHAMOFJD, 0f, _rangedImageSize);
+				SetSectionItems(_rangedItems, 0f, _rangedImageSize);
 				DisableButton(ShopSection.Ranged);
 				if (_noItemsMessage != null)
 				{
@@ -641,7 +641,7 @@ namespace Nekki.SF2.GUI.Shop
 				}
 				break;
 			case ShopSection.Magic:
-				CDPHCFAKPLO(JFBDPCMEKMN, 120f, _magicImageSize);
+				SetSectionItems(_magicItems, 120f, _magicImageSize);
 				DisableButton(ShopSection.Magic);
 				if (_noItemsMessage != null)
 				{
@@ -649,34 +649,34 @@ namespace Nekki.SF2.GUI.Shop
 				}
 				break;
 			case ShopSection.Payment:
-				CDPHCFAKPLO(EBHGBBEGOAM, 20f, _paymentImageSize, false);
+				SetSectionItems(_paymentItems, 20f, _paymentImageSize, false);
 				DisableButton(ShopSection.Payment);
 				break;
 			case ShopSection.Free:
-				CDPHCFAKPLO(AEABDIBDJAH, 20f, _freeImageSize, false);
+				SetSectionItems(_freeItems, 20f, _freeImageSize, false);
 				DisableButton(ShopSection.Free);
 				break;
 			}
-			if (_modelContainer != null && _modelContainer.get__StageType() == StageType.FDBBPEGEGMK.STAGE_SHOP_TRY_ON)
+			if (_modelContainer != null && _modelContainer.get__StageType() == StageType.Stage.STAGE_SHOP_TRY_ON)
 			{
-				AKCNEACJIOG(null);
+				OnTryOnFinished(null);
 			}
 			SetFocus();
 		}
 
 		public void UpdateNewItemsCounters()
 		{
-			if (PDHEEIPFFME != null)
+			if (_currentItems != null)
 			{
-				PDHEEIPFFME.ForEach((ItemInfo DHDMNHCIPEH) =>
+				_currentItems.ForEach((ItemInfo DHDMNHCIPEH) =>
 				{
-					DHDMNHCIPEH.BEBDMOEIEJN(false);
+					DHDMNHCIPEH.SetIsNew(false);
 				});
 			}
-			int num = ListSF.GetItems().EFEJPENECKN();
-			if (BONAMONOIIC != num)
+			int num = ListSF.GetItems().GetNewItemsCount();
+			if (_newItemsCount != num)
 			{
-				BONAMONOIIC = num;
+				_newItemsCount = num;
 				if (_buttonPanel != null)
 				{
 					_buttonPanel.UpdateNewItemsCounter();
@@ -685,77 +685,77 @@ namespace Nekki.SF2.GUI.Shop
 				{
 					_mainMenu.UpdateNewItems();
 				}
-				ListSF.GetInstance().EJANJEEGOOE();
+				ListSF.GetInstance().RequestSave();
 			}
 		}
 
-		private void CDPHCFAKPLO(List<ItemInfo> HELFDCAIJNE, float CPLBEMJADEL, Vector2 PEEOEOMEBFG, bool PMKIFLOFHJG = true)
+		private void SetSectionItems(List<ItemInfo> HELFDCAIJNE, float CPLBEMJADEL, Vector2 PEEOEOMEBFG, bool PMKIFLOFHJG = true)
 		{
 			if (HELFDCAIJNE == null || _shopTableView == null)
 			{
-				LLLOJBFMONN.Error("ShopScene.SetItems some field is null");
+				GameLog.Error("ShopScene.SetItems some field is null");
 				return;
 			}
-			OPGJGJGNLMO(HELFDCAIJNE);
-			PDHEEIPFFME = HELFDCAIJNE;
-			MIAFGIJBKHN = PMKIFLOFHJG;
-			GCMNMDIBAOE = PEEOEOMEBFG;
+			SortItems(HELFDCAIJNE);
+			_currentItems = HELFDCAIJNE;
+			_iconPanelActive = PMKIFLOFHJG;
+			_cellBaseSize = PEEOEOMEBFG;
 			_shopTableView.set_Spacing(CPLBEMJADEL);
 			_shopTableView.ReloadData();
 			_shopTableView.ScrollToCell(0);
 			if (_noItemsMessage != null)
 			{
-				bool active = PDHEEIPFFME.Count == 0;
+				bool active = _currentItems.Count == 0;
 				_noItemsMessage.gameObject.SetActive(active);
 			}
-			if (_tryItemButton != null && PDHEEIPFFME.Count == 0)
+			if (_tryItemButton != null && _currentItems.Count == 0)
 			{
 				_tryItemButton.gameObject.SetActive(false);
 			}
-			ShowSidePanels(PDHEEIPFFME.Count > 0);
+			ShowSidePanels(_currentItems.Count > 0);
 		}
 
-		private void OPGJGJGNLMO(List<ItemInfo> HELFDCAIJNE)
+		private void SortItems(List<ItemInfo> HELFDCAIJNE)
 		{
 			HELFDCAIJNE.Sort((ItemInfo FGBJPFPGHKC, ItemInfo ACJEJOKKGNI) =>
 			{
-				UserItem dKCHDHMLKHN = ListSF.CCDKHLAMKKO().KHCNHPCPFII().CMGOCLGHNLH(FGBJPFPGHKC);
-				UserItem dKCHDHMLKHN2 = ListSF.CCDKHLAMKKO().KHCNHPCPFII().CMGOCLGHNLH(ACJEJOKKGNI);
-				int num = ((dKCHDHMLKHN == null) ? FGBJPFPGHKC.UpgradeLevel : dKCHDHMLKHN.DHNNCAEEMLL());
-				int num2 = ((dKCHDHMLKHN2 == null) ? ACJEJOKKGNI.UpgradeLevel : dKCHDHMLKHN2.DHNNCAEEMLL());
+				UserItem dKCHDHMLKHN = ListSF.GetRoster().GetInventory().FindItem(FGBJPFPGHKC);
+				UserItem dKCHDHMLKHN2 = ListSF.GetRoster().GetInventory().FindItem(ACJEJOKKGNI);
+				int num = ((dKCHDHMLKHN == null) ? FGBJPFPGHKC.UpgradeLevel : dKCHDHMLKHN.GetUpgradeLevel());
+				int num2 = ((dKCHDHMLKHN2 == null) ? ACJEJOKKGNI.UpgradeLevel : dKCHDHMLKHN2.GetUpgradeLevel());
 				int num3 = HELFDCAIJNE.IndexOf(FGBJPFPGHKC);
 				int value = HELFDCAIJNE.IndexOf(ACJEJOKKGNI);
 				return (num == num2) ? num3.CompareTo(value) : num.CompareTo(num2);
 			});
 		}
 
-		private void PHKKGEMDCNG()
+		private void ReloadItems()
 		{
-			ShopTableViewCell nNACFMKLHIB = NNACFMKLHIB;
-			OPGJGJGNLMO(PDHEEIPFFME);
+			ShopTableViewCell nNACFMKLHIB = _selectedCell;
+			SortItems(_currentItems);
 			_shopTableView.ReloadData();
-			if (_shopTableView != null && nNACFMKLHIB != null && nNACFMKLHIB != NNACFMKLHIB)
+			if (_shopTableView != null && nNACFMKLHIB != null && nNACFMKLHIB != _selectedCell)
 			{
 				_shopTableView.ScrollToCell(nNACFMKLHIB.get_RowNumber());
 			}
 		}
 
-		private void GHKDKGJJPFA(ShopScrollItem item)
+		private void OnScrollItemClicked(ShopScrollItem item)
 		{
 			if (item == _shopTableView.get_SelectedCell())
 			{
-				GLLPHHALCDA();
+				OnTryButtonClicked();
 			}
 		}
 
-		private void OEHKNFIDCMI()
+		private void OnItemInfoUpdated()
 		{
-			HCONMLFJGII();
-			PHKKGEMDCNG();
-			KNOHDLJCHHL();
-			if (NNACFMKLHIB != null && NNACFMKLHIB.get_ItemInfo() != null)
+			UpdateModelIfItemChanged();
+			ReloadItems();
+			UpdateParametersAnimated();
+			if (_selectedCell != null && _selectedCell.get_ItemInfo() != null)
 			{
-				FMJNALPHGGF(NNACFMKLHIB.get_ItemInfo());
+				UpdateTryButton(_selectedCell.get_ItemInfo());
 			}
 			if (_mainMenu != null)
 			{
@@ -763,17 +763,17 @@ namespace Nekki.SF2.GUI.Shop
 			}
 		}
 
-		private bool ICILAGHAPOO()
+		private bool IsSelectedItemTryable()
 		{
-			ItemInfo itemInfo = NNACFMKLHIB.get_ItemInfo();
+			ItemInfo itemInfo = _selectedCell.get_ItemInfo();
 			return itemInfo.Type.Equals("Weapon") || itemInfo.Type.Equals("Armor") || itemInfo.Type.Equals("Helm") || itemInfo.Type.Equals("Ranged") || itemInfo.Type.Equals("Magic");
 		}
 
-		private void FMJNALPHGGF(ItemInfo item)
+		private void UpdateTryButton(ItemInfo item)
 		{
 			if (!(_tryItemButton == null) && item != null)
 			{
-				if (ICILAGHAPOO())
+				if (IsSelectedItemTryable())
 				{
 					_tryItemButton.gameObject.SetActive(true);
 				}
@@ -783,7 +783,7 @@ namespace Nekki.SF2.GUI.Shop
 				}
 				bool PNKJLPDJOJF = false;
 				bool CBDBANOPFDM = false;
-				InputDeviceExtension.AOGLFIHGKCN(ref PNKJLPDJOJF, ref CBDBANOPFDM, item);
+				InputDeviceExtension.GetOwnedAndEquippedState(ref PNKJLPDJOJF, ref CBDBANOPFDM, item);
 				if (CBDBANOPFDM)
 				{
 					_tryItemButton.SetAlias("btnShopUnequip");
@@ -799,32 +799,32 @@ namespace Nekki.SF2.GUI.Shop
 			}
 		}
 
-		private void GLLPHHALCDA()
+		private void OnTryButtonClicked()
 		{
-			if (!ICILAGHAPOO() || NNACFMKLHIB.get_ItemInfo() == null)
+			if (!IsSelectedItemTryable() || _selectedCell.get_ItemInfo() == null)
 			{
 				return;
 			}
-			ItemInfo itemInfo = NNACFMKLHIB.get_ItemInfo();
+			ItemInfo itemInfo = _selectedCell.get_ItemInfo();
 			bool PNKJLPDJOJF = false;
 			bool CBDBANOPFDM = false;
-			InputDeviceExtension.AOGLFIHGKCN(ref PNKJLPDJOJF, ref CBDBANOPFDM, itemInfo);
+			InputDeviceExtension.GetOwnedAndEquippedState(ref PNKJLPDJOJF, ref CBDBANOPFDM, itemInfo);
 			if (PNKJLPDJOJF && CBDBANOPFDM)
 			{
-				ListSF.CCDKHLAMKKO().KHCNHPCPFII().JALMHIICOPB(itemInfo, true);
-				PHKKGEMDCNG();
-				HCONMLFJGII();
-				KNOHDLJCHHL();
-				FMJNALPHGGF(itemInfo);
+				ListSF.GetRoster().GetInventory().ResetToDefaultItem(itemInfo, true);
+				ReloadItems();
+				UpdateModelIfItemChanged();
+				UpdateParametersAnimated();
+				UpdateTryButton(itemInfo);
 				return;
 			}
 			if (PNKJLPDJOJF && !CBDBANOPFDM)
 			{
-				ListSF.CCDKHLAMKKO().KHCNHPCPFII().EEDJEDBMIMI(itemInfo, true);
-				PHKKGEMDCNG();
-				HCONMLFJGII(itemInfo);
-				KNOHDLJCHHL();
-				FMJNALPHGGF(itemInfo);
+				ListSF.GetRoster().GetInventory().EquipItem(itemInfo, true);
+				ReloadItems();
+				UpdateModelIfItemChanged(itemInfo);
+				UpdateParametersAnimated();
+				UpdateTryButton(itemInfo);
 				return;
 			}
 			ShopTableViewCell shopTableViewCell = _shopTableView.get_SelectedCell() as ShopTableViewCell;
@@ -832,43 +832,43 @@ namespace Nekki.SF2.GUI.Shop
 			{
 				if (_modelContainer != null)
 				{
-					_modelContainer.AddEventListener(1, AKCNEACJIOG);
+					_modelContainer.AddEventListener(1, OnTryOnFinished);
 				}
-				UpdateModel(shopTableViewCell.get_ItemInfo(), StageType.FDBBPEGEGMK.STAGE_SHOP_TRY_ON);
+				UpdateModel(shopTableViewCell.get_ItemInfo(), StageType.Stage.STAGE_SHOP_TRY_ON);
 				HideUI();
 			}
 		}
 
-		private void AKCNEACJIOG(object data)
+		private void OnTryOnFinished(object data)
 		{
 			if (_modelContainer != null)
 			{
-				_modelContainer.RemoveEventListener(1, AKCNEACJIOG);
+				_modelContainer.RemoveEventListener(1, OnTryOnFinished);
 			}
 			ShowUI();
-			StartCoroutine(EKGBMDLFHGA());
+			StartCoroutine(RestoreModelNextFrame());
 		}
 
-		private IEnumerator EKGBMDLFHGA()
+		private IEnumerator RestoreModelNextFrame()
 		{
 			yield return new WaitForEndOfFrame();
-			UpdateModel(null, StageType.FDBBPEGEGMK.STAGE_PEACEFUL_RESTORE);
+			UpdateModel(null, StageType.Stage.STAGE_PEACEFUL_RESTORE);
 		}
 
-		private void FGHDBGDNHAH(List<UserItem> GOGGLLFHAMB)
+		private void OnUserItemsChanged(List<UserItem> GOGGLLFHAMB)
 		{
-			if (AIEKLCMEKMI != null && NNACFMKLHIB != null)
+			if (_infoPanelContent != null && _selectedCell != null)
 			{
-				AIEKLCMEKMI.SetItemInfo(NNACFMKLHIB.get_ItemInfo());
+				_infoPanelContent.SetItemInfo(_selectedCell.get_ItemInfo());
 			}
-			PHKKGEMDCNG();
+			ReloadItems();
 		}
 
 		public override void UpdateScene(object data)
 		{
-			if (AIEKLCMEKMI != null)
+			if (_infoPanelContent != null)
 			{
-				AIEKLCMEKMI.UpdateContent();
+				_infoPanelContent.UpdateContent();
 			}
 			_forgeController?.Tick();
 		}
@@ -885,42 +885,42 @@ namespace Nekki.SF2.GUI.Shop
 
 		public void RestoreForgeClosedState()
 		{
-			bool hasSelection = NNACFMKLHIB != null && NNACFMKLHIB.get_ItemInfo() != null;
+			bool hasSelection = _selectedCell != null && _selectedCell.get_ItemInfo() != null;
 			ShowSidePanels(hasSelection);
 			if (_tryItemButton != null)
 			{
-				if (hasSelection) FMJNALPHGGF(NNACFMKLHIB.get_ItemInfo());
+				if (hasSelection) UpdateTryButton(_selectedCell.get_ItemInfo());
 				else _tryItemButton.gameObject.SetActive(false);
 			}
 		}
 
 		public void RefreshAfterForgeMutation()
 		{
-			ItemInfo selectedInfo = NNACFMKLHIB != null ? NNACFMKLHIB.get_ItemInfo() : null;
-			PHKKGEMDCNG();
+			ItemInfo selectedInfo = _selectedCell != null ? _selectedCell.get_ItemInfo() : null;
+			ReloadItems();
 			if (selectedInfo == null) return;
 
-			if (AIEKLCMEKMI != null) AIEKLCMEKMI.SetItemInfo(selectedInfo);
-			if (JMJOHONKDDO != null) JMJOHONKDDO.UpdateParameters(selectedInfo);
-			if (KDFADLAANLM != null) KDFADLAANLM.SetItemInfo(selectedInfo);
+			if (_infoPanelContent != null) _infoPanelContent.SetItemInfo(selectedInfo);
+			if (_parametersPanelContent != null) _parametersPanelContent.UpdateParameters(selectedInfo);
+			if (_propertiesPanelContent != null) _propertiesPanelContent.SetItemInfo(selectedInfo);
 			if (_itemProperties != null)
 			{
-				bool hasEnchantments = ListSF.EIMKEJNJMEJ(selectedInfo).Count > 0;
-				_itemProperties.set_OpenImage(hasEnchantments ? NGNPGDAKHJJ : AGPCJDDILHK);
-				_itemProperties.set_CloseImage(hasEnchantments ? GHHDJJEMHAN : PIDAKCDGJFH);
+				bool hasEnchantments = ListSF.GetItemEnchantments(selectedInfo).Count > 0;
+				_itemProperties.set_OpenImage(hasEnchantments ? _rightFlagPropertiesImage : _rightFlagPropertiesNoneImage);
+				_itemProperties.set_CloseImage(hasEnchantments ? _leftFlagPropertiesImage : _leftFlagPropertiesNoneImage);
 			}
-			if (_tryItemButton != null) FMJNALPHGGF(selectedInfo);
+			if (_tryItemButton != null) UpdateTryButton(selectedInfo);
 		}
 
-		private void HCONMLFJGII(ItemInfo DDCFPIDHLGJ = null)
+		private void UpdateModelIfItemChanged(ItemInfo DDCFPIDHLGJ = null)
 		{
-			if (_modelContainer != null && _modelContainer.IsItemDiffer(ListSF.CCDKHLAMKKO().get_Parameters()))
+			if (_modelContainer != null && _modelContainer.IsItemDiffer(ListSF.GetRoster().get_Parameters()))
 			{
 				UpdateModel(DDCFPIDHLGJ);
 			}
 		}
 
-		private void UpdateModel(ItemInfo DDCFPIDHLGJ, StageType.FDBBPEGEGMK LGPIFNMFPAN = StageType.FDBBPEGEGMK.STAGE_SHOP_START)
+		private void UpdateModel(ItemInfo DDCFPIDHLGJ, StageType.Stage LGPIFNMFPAN = StageType.Stage.STAGE_SHOP_START)
 		{
 			if (_modelContainer != null)
 			{
@@ -928,7 +928,7 @@ namespace Nekki.SF2.GUI.Shop
 				if (dJKEECEOCJB == null)
 				{
 					ShopTableViewCell shopTableViewCell = _shopTableView.get_SelectedCell() as ShopTableViewCell;
-					dJKEECEOCJB = ((!(shopTableViewCell != null)) ? ListSF.CCDKHLAMKKO().get_Parameters().Armor : shopTableViewCell.get_ItemInfo());
+					dJKEECEOCJB = ((!(shopTableViewCell != null)) ? ListSF.GetRoster().get_Parameters().Armor : shopTableViewCell.get_ItemInfo());
 				}
 				if (dJKEECEOCJB != null)
 				{
@@ -939,18 +939,18 @@ namespace Nekki.SF2.GUI.Shop
 
 		public void ShowUI()
 		{
-			_backgroundLeft.color = Constants.GFBLKELEBEH;
-			_backgroundRight.color = Constants.GFBLKELEBEH;
-			SetOpacity(CLBCHPGCGCB);
+			_backgroundLeft.color = Constants.DimmedBackgroundColor;
+			_backgroundRight.color = Constants.DimmedBackgroundColor;
+			SetOpacity(_shownOpacity);
 			if (_shopUIGroup != null)
 			{
 				_shopUIGroup.blocksRaycasts = true;
 			}
 		}
 
-		private bool DKCEAEKPJHC()
+		private bool ShouldDimBackground()
 		{
-			ShopSection nNGHNIJCKLD = NNGHNIJCKLD;
+			ShopSection nNGHNIJCKLD = _currentSection;
 			if (nNGHNIJCKLD == ShopSection.Armor || nNGHNIJCKLD == ShopSection.Helmet)
 			{
 				return false;
@@ -960,11 +960,11 @@ namespace Nekki.SF2.GUI.Shop
 
 		public void HideUI()
 		{
-			if (DKCEAEKPJHC())
+			if (ShouldDimBackground())
 			{
-				_backgroundLeft.color = Constants.EKJMAIDGKME;
-				_backgroundRight.color = Constants.EKJMAIDGKME;
-				SetOpacity(APNGDHAICIE);
+				_backgroundLeft.color = Constants.NormalBackgroundColor;
+				_backgroundRight.color = Constants.NormalBackgroundColor;
+				SetOpacity(_hiddenOpacity);
 				if (_shopUIGroup != null)
 				{
 					_shopUIGroup.blocksRaycasts = false;
@@ -976,13 +976,13 @@ namespace Nekki.SF2.GUI.Shop
 		{
 			if (_shopUIGroup != null)
 			{
-				_shopUIGroup.DOFade(KGJALFLDIBG, BHJIDLIBKDD);
+				_shopUIGroup.DOFade(KGJALFLDIBG, _fadeDuration);
 			}
 		}
 
 		public void ShowSidePanels(bool value)
 		{
-			bool active = NNGHNIJCKLD != ShopSection.Payment && NNGHNIJCKLD != ShopSection.Free && value;
+			bool active = _currentSection != ShopSection.Payment && _currentSection != ShopSection.Free && value;
 			if (_itemInfo != null)
 			{
 				_itemInfo.gameObject.SetActive(value);
@@ -999,17 +999,17 @@ namespace Nekki.SF2.GUI.Shop
 
 		public InfoPanelContent GetInfoPanel()
 		{
-			return AIEKLCMEKMI;
+			return _infoPanelContent;
 		}
 
 		public int NumberOfRowsInTableView(TableView OIDFBEAABBA)
 		{
-			return PDHEEIPFFME.Count;
+			return _currentItems.Count;
 		}
 
 		public float SizeForRowInTableView(TableView OIDFBEAABBA, int IBAKGENOEPH)
 		{
-			switch (NNGHNIJCKLD)
+			switch (_currentSection)
 			{
 			case ShopSection.Weapon:
 				return 422f;
@@ -1034,9 +1034,9 @@ namespace Nekki.SF2.GUI.Shop
 		{
 			TableViewCell tableViewCell = OIDFBEAABBA.ReusableCellForRow(IBAKGENOEPH);
 			ShopTableViewCell component = tableViewCell.GetComponent<ShopTableViewCell>();
-			component.set_BaseSize(GCMNMDIBAOE);
-			component.set_IconPanelActive(MIAFGIJBKHN);
-			component.SetItemInfo(PDHEEIPFFME[IBAKGENOEPH]);
+			component.set_BaseSize(_cellBaseSize);
+			component.set_IconPanelActive(_iconPanelActive);
+			component.SetItemInfo(_currentItems[IBAKGENOEPH]);
 			component.set_Index(IBAKGENOEPH);
 			if (component.get_PerksPanel() != null && _hintPanel != null)
 			{

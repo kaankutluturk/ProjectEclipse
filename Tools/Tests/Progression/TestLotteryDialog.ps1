@@ -13,9 +13,9 @@ static class LocalizationManager {public static string GetStringOrDefault(string
 namespace Eclipse.UI.Modding {static class ModUiGameBridge {public static ModUiSurface Last;public static void Attach(ModUiSurface s){Last=s;s.SetInputAllowed(true);}}}
 namespace UnityEngine {static class Random {public static float value=1;}static class Debug {public static void LogException(Exception e){}}}
 enum ScreenType {ModuleMap,ModuleFight}
-class QuestAction {public int Index;public object NOFNJFOCIMK()=>this;}
+class QuestAction {public int Index;public object GetStage()=>this;}
 class Module {
- public enum FKHIMIAOCJL {OnOpenScene=1,OnCloseScene=3}
+ public enum ModuleEvent {OnOpenScene=1,OnCloseScene=3}
  public static Module Instance=new Module();public static Module GetInstance()=>Instance;
  public ScreenType Screen;public ScreenType GetCurrentScreenType()=>Screen;
  System.Collections.Generic.Dictionary<int,Action<object>> handlers=new System.Collections.Generic.Dictionary<int,Action<object>>();

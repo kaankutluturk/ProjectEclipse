@@ -6,24 +6,24 @@ public class CurrencyCostRule : Rule
 
 	private int _currencyValue;
 
-	public string FAEGJAEEMGH
+	public string CurrencyName
 	{
 		get
 		{
-			return JFDCHNBPPNH();
+			return GetCurrencyName();
 		}
 	}
 
-	public int CPODJDDPJHB
+	public int CurrencyValue
 	{
 		get
 		{
-			return LHNHLANLHMN();
+			return GetCurrencyValue();
 		}
 	}
 
 	public CurrencyCostRule(XmlNode node)
-		: base(BCBLLMPAMLP.RuleCurrencyCost, node)
+		: base(RuleType.RuleCurrencyCost, node)
 	{
 		Parse(node);
 	}
@@ -35,19 +35,19 @@ public class CurrencyCostRule : Rule
 		_currencyValue = 999888777;
 	}
 
-	public string JFDCHNBPPNH()
+	public string GetCurrencyName()
 	{
 		return _currencyName;
 	}
 
-	public int LHNHLANLHMN()
+	public int GetCurrencyValue()
 	{
 		return 999888777;
 	}
 
 	protected override void Parse(XmlNode node)
 	{
-		_currencyName = node.Attributes["Name"].CIPOICEEIBK(string.Empty);
+		_currencyName = node.Attributes["Name"].GetStringOrDefault(string.Empty);
 		_currencyValue = node.Attributes["Value"].ParseInt();
 		if (_currencyValue < 0)
 		{

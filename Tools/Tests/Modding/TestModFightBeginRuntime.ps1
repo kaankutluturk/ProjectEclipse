@@ -14,7 +14,7 @@ if (!$dispatch) { throw 'Could not extract DispatchEclipseCombatEvent from Fight
 $damageBefore = $fightSource.IndexOf('float eclipseHealthBefore =')
 $damageApply = $fightSource.IndexOf('UpdateLife(EGHPHELLOGO.KJDFJPBIGJC', $damageBefore)
 $damageDispatch = $fightSource.IndexOf('DispatchEclipseCombatEvent(ModEffectEvent.DamageReceived', $damageApply)
-$damageBookkeeping = $fightSource.IndexOf('KDMDOBOKAIB(EGHPHELLOGO.KJDFJPBIGJC', $damageDispatch)
+$damageBookkeeping = $fightSource.IndexOf('ApplyLifeSteal(EGHPHELLOGO.KJDFJPBIGJC', $damageDispatch)
 if ($damageBefore -lt 0 -or $damageApply -le $damageBefore -or $damageDispatch -le $damageApply -or $damageBookkeeping -le $damageDispatch) {
     throw 'Damage callback is not ordered after health application and before hit bookkeeping.'
 }
@@ -184,7 +184,7 @@ public sealed class UserItems
 {
     private readonly Dictionary<string, UserItem> _items = new Dictionary<string, UserItem>(StringComparer.Ordinal);
     public void Add(ItemInfo item, UserItem userItem) { _items[item.Name] = userItem; }
-    public UserItem CMGOCLGHNLH(ItemInfo item)
+    public UserItem FindItem(ItemInfo item)
     {
         if (item == null) return null;
         UserItem value;
@@ -197,8 +197,8 @@ public sealed class RosterStub
     public bool IsEclipseMode() => false;
     public UserItems UserItems = new UserItems();
     public UserPerks UserPerks = new UserPerks();
-    public UserItems KHCNHPCPFII() { return UserItems; }
-    public UserPerks JLBDOBLHHAF() { return UserPerks; }
+    public UserItems GetInventory() { return UserItems; }
+    public UserPerks GetPerks() { return UserPerks; }
 }
 
 public sealed class RosterPerk
@@ -211,7 +211,7 @@ public sealed class UserPerks
 {
     private readonly Dictionary<string, RosterPerk> _perks = new Dictionary<string, RosterPerk>(StringComparer.Ordinal);
     public void Add(string name, RosterPerk perk) { _perks[name] = perk; }
-    public RosterPerk LKIEAGLHNON(string name)
+    public RosterPerk FindPerk(string name)
     {
         RosterPerk value;
         return _perks.TryGetValue(name, out value) ? value : null;
@@ -221,7 +221,7 @@ public sealed class UserPerks
 public static class ListSF
 {
     public static readonly RosterStub Roster = new RosterStub();
-    public static RosterStub CCDKHLAMKKO() { return Roster; }
+    public static RosterStub GetRoster() { return Roster; }
 }
 
 public sealed class ModelParameters
@@ -230,7 +230,7 @@ public sealed class ModelParameters
     public readonly List<PerkInfoItem> Perks = new List<PerkInfoItem>();
     public readonly List<PerkInfoItem> LearnedPerks = new List<PerkInfoItem>();
     public readonly List<ItemInfo> Items = new List<ItemInfo>();
-    public List<ItemInfo> PJNJIJIODHE() { return Items; }
+    public List<ItemInfo> GetEquippedItems() { return Items; }
 }
 
 public sealed class Model { }
@@ -261,12 +261,12 @@ public sealed class FightHarness
     private bool _eclipseCombatDispatching;
     private void DrainEclipseAnimationEvents() {}
     private readonly RoundStub round = new RoundStub();
-    private readonly ModelParameters NMNCKBPFCCP;
+    private readonly ModelParameters playerParameters;
     private readonly Model _playerModel = new Model();
 
     public FightHarness(ModelParameters player, int roundNumber)
     {
-        NMNCKBPFCCP = player;
+        playerParameters = player;
         round.round = roundNumber;
     }
 

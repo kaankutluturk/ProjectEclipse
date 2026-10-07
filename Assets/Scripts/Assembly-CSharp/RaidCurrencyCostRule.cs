@@ -2,29 +2,29 @@ using System.Xml;
 
 public class RaidCurrencyCostRule : CurrencyCostRule
 {
-	protected string GAFGMNPOEGE;
+	protected string packName;
 
 	public RaidCurrencyCostRule(XmlNode node)
 		: base(node)
 	{
-		_type = BCBLLMPAMLP.RuleRaidCurrencyCost;
+		_type = RuleType.RuleRaidCurrencyCost;
 		Parse(node);
 	}
 
 	public RaidCurrencyCostRule(RaidCurrencyCostRule HNBFMAKFJAM)
 		: base(HNBFMAKFJAM)
 	{
-		GAFGMNPOEGE = HNBFMAKFJAM.FGBHHCAGHFJ();
+		packName = HNBFMAKFJAM.GetPackName();
 	}
 
-	public string FGBHHCAGHFJ()
+	public string GetPackName()
 	{
-		return GAFGMNPOEGE;
+		return packName;
 	}
 
 	protected override void Parse(XmlNode node)
 	{
 		base.Parse(node);
-		GAFGMNPOEGE = node.Attributes["PackName"].CIPOICEEIBK(string.Empty);
+		packName = node.Attributes["PackName"].GetStringOrDefault(string.Empty);
 	}
 }

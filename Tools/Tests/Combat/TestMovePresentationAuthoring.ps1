@@ -17,9 +17,9 @@ foreach($move in @($slash,$preview)) {
         if($entry.HasAttribute('Frame')) {
             $frame=[int]$entry.GetAttribute('Frame')
             Check ($native.NeedStart($frame) -and !$native.NeedStart($frame-1) -and !$native.NeedStart($frame+1)) 'Scheduled frame was not preserved.'
-            Check (!$native.NeedStart([EventAnimation+EECEJKADLCK]::EVENT_STRIKE)) 'Frame action also starts on strike.'
+            Check (!$native.NeedStart([EventAnimation+EventAnimationType]::EVENT_STRIKE)) 'Frame action also starts on strike.'
         } else {
-            $eventType=if($entry.GetAttribute('Event') -eq 'Strike'){[EventAnimation+EECEJKADLCK]::EVENT_STRIKE}else{[EventAnimation+EECEJKADLCK]::EVENT_ANIMATION_END}
+            $eventType=if($entry.GetAttribute('Event') -eq 'Strike'){[EventAnimation+EventAnimationType]::EVENT_STRIKE}else{[EventAnimation+EventAnimationType]::EVENT_ANIMATION_END}
             Check ($native.NeedStart($eventType) -and !$native.NeedStart(0)) 'Scheduled event was not preserved.'
         }
         if($entry.Name -eq 'RandomSound') {
@@ -68,7 +68,7 @@ Check ($resultNode.Conditions.RoundResult.GetAttribute('Name') -ceq 'Victory' -a
     ([ConditionsParser]::Create($resultNode.Conditions.RoundResult) -is [ConditionRoundResult])) 'Typed round result did not reach the native condition parser.'
 $background=[ActionsParser]::Create($resultNode.Actions.Effect)
 Check ($resultNode.Actions.Effect.GetAttribute('OnBackground') -ceq '1' -and
-    $background -is [ActionEffect] -and $background.JNAALMFCPCN()) 'Background effect did not reach the native renderer contract.'
+    $background -is [ActionEffect] -and $background.GetIsOnBackground()) 'Background effect did not reach the native renderer contract.'
 Check ($resultNode.Actions.StopSound.GetAttribute('Name') -ceq 'snd_blade_fury' -and
     ([ActionsParser]::Create($resultNode.Actions.StopSound) -is [ActionStopSound])) 'Typed sound stop did not reach the native parser.'
 Check ((Fingerprint $resultCatalog) -cne (Fingerprint (Load-Lua $resultLua.Replace('snd_blade_fury','snd_other')))) 'Sound stop is absent from the fingerprint.'
@@ -120,7 +120,7 @@ foreach($mutation in @('tactic_distance={distance="X",from={pivot="Me"},to={pivo
  Check ($null -ne $failure) ('Invalid compound AI tactic accepted: '+$mutation)
 }
 $nativeProfile=[Trick]::new($slash.Profile,[InfoAnimation]::new())
-Check ($nativeProfile.Rank -eq 4 -and $nativeProfile.NHKMCLPOMFK -ceq 'Trick7.super_slash') 'Profile rank/icon changed in native parser.'
+Check ($nativeProfile.Rank -eq 4 -and $nativeProfile.Icon -ceq 'Trick7.super_slash') 'Profile rank/icon changed in native parser.'
 $fingerprint=Fingerprint $catalog
 Check ($fingerprint -ceq (Fingerprint (Load-Lua $presentationLua))) 'Presentation fingerprint changed on reload.'
 foreach($mutation in @('data.profile.rank=5','data.profile.core_icon="Other.icon"','data.tactic_distance.min=201','data.tactic_distance.max=801','data.tactic_distance.distance="Y"','data.tactic_distance.to.node="OtherNode"','data.timeline[9]=data.timeline[8];data.timeline[8]=nil','data.timeline.hit=data.timeline.strike;data.timeline.strike=nil','data.timeline.strike.sound[1]="snd_other"','data.preview.no_wall_repulsion=false','data.preview.no_interpolation_frames=false')) {

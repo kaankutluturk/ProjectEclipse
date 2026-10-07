@@ -14,13 +14,13 @@ namespace Nekki.SF2.GUI.Dialogs
 
 		public const int SCROLL_WIDTH = 1680;
 
-		private const int DENNBEEAPKP = 600;
+		private const int TopStripeY = 600;
 
-		private const int HBHNDONLGGA = -640;
+		private const int BottomStripeY = -640;
 
-		protected string ONLLNCIAOFC = string.Empty;
+		protected string imagePath = string.Empty;
 
-		protected string KNPONKPJHFJ = string.Empty;
+		protected string externalUrl = string.Empty;
 
 		[SerializeField]
 		protected ResolutionImage _picture;
@@ -28,9 +28,9 @@ namespace Nekki.SF2.GUI.Dialogs
 		[SerializeField]
 		protected ResolutionImage _loadingPicture;
 
-		private bool BKFINGKIGBE;
+		private bool isLoading;
 
-		protected List<NewsItem> FDAFJMFLKEP = new List<NewsItem>();
+		protected List<NewsItem> newsItems = new List<NewsItem>();
 
 		public bool GoShopAfterClose;
 
@@ -38,53 +38,53 @@ namespace Nekki.SF2.GUI.Dialogs
 
 		public bool BuyItemAfterClose;
 
-		protected NewsButtonMaker JODALANHFPD = new NewsButtonMaker();
+		protected NewsButtonMaker buttonMaker = new NewsButtonMaker();
 
 		public override void Init(object data)
 		{
 			NewsDialogInfo oFOJGCFHJKD = (NewsDialogInfo)data;
 			if (oFOJGCFHJKD != null)
 			{
-				FDAFJMFLKEP = oFOJGCFHJKD.FNHPCBEDKFO;
+				newsItems = oFOJGCFHJKD.Items;
 			}
 			IsQuestDialog = true;
-			_picture.GetComponent<SFButton>().AddEventListener(0, EINIDMAILNM);
+			_picture.GetComponent<SFButton>().AddEventListener(0, OnPictureClicked);
 		}
 
 		protected override void Start()
 		{
-			FLOHKIBCOKG();
-			SetupHeader(ODLPOMFLOCP);
-			MAGOIKICKAH(GBECKKCHAFI);
-			HLJBLAPMDCB();
-			if (AssemblyController.KMEOEAGGPBI())
+			LayoutStripes();
+			SetupHeader(titleAlias);
+			SetupFooter(footerType);
+			SetupContent();
+			if (AssemblyController.GetGamepadEnabled())
 			{
-				BHLHODFNHHO();
+				ApplyPlatformLayout();
 			}
 		}
 
-		protected override void HLJBLAPMDCB()
+		protected override void SetupContent()
 		{
-			_picture.gameObject.SetActive(FDAFJMFLKEP.Count > 0);
-			if (FDAFJMFLKEP.Count > 0)
+			_picture.gameObject.SetActive(newsItems.Count > 0);
+			if (newsItems.Count > 0)
 			{
-				NewsItem pONDDFBMFOO = FDAFJMFLKEP[0];
+				NewsItem pONDDFBMFOO = newsItems[0];
 				SetupHeader(pONDDFBMFOO.Title);
-				ONLLNCIAOFC = pONDDFBMFOO.NHKMCLPOMFK;
-				KNPONKPJHFJ = pONDDFBMFOO.Url;
-				if (pONDDFBMFOO.EGBHELMJJKO)
+				imagePath = pONDDFBMFOO.LocalImagePath;
+				externalUrl = pONDDFBMFOO.Url;
+				if (pONDDFBMFOO.GoShop)
 				{
 					GoShopAfterClose = true;
-					RedirectShopAfterClose = pONDDFBMFOO.COIGFENOMJD;
+					RedirectShopAfterClose = pONDDFBMFOO.RedirectShop;
 				}
 				Texture2D texture2D = null;
-				if (File.Exists(pONDDFBMFOO.NHKMCLPOMFK))
+				if (File.Exists(pONDDFBMFOO.LocalImagePath))
 				{
-					byte[] data = File.ReadAllBytes(pONDDFBMFOO.NHKMCLPOMFK);
+					byte[] data = File.ReadAllBytes(pONDDFBMFOO.LocalImagePath);
 					texture2D = new Texture2D(2, 2);
 					texture2D.LoadImage(data);
 				}
-				FDAFJMFLKEP.Remove(pONDDFBMFOO);
+				newsItems.Remove(pONDDFBMFOO);
 				if (texture2D != null)
 				{
 					_picture.sprite = Sprite.Create(texture2D, new Rect(0f, 0f, texture2D.width, texture2D.height), new Vector2(0.5f, 0.5f));
@@ -96,66 +96,66 @@ namespace Nekki.SF2.GUI.Dialogs
 			}
 		}
 
-		protected override void FLOHKIBCOKG()
+		protected override void LayoutStripes()
 		{
-			base.FLOHKIBCOKG();
-			_topStripe.transform.BGNJGIACJBG(600f);
-			_bottomStripe.transform.BGNJGIACJBG(-640f);
+			base.LayoutStripes();
+			_topStripe.transform.SetLocalY(600f);
+			_bottomStripe.transform.SetLocalY(-640f);
 		}
 
-		protected override void MAGOIKICKAH(KBDHPMOMJLL HJNAHNICGMH)
+		protected override void SetupFooter(FooterType HJNAHNICGMH)
 		{
-			base.MAGOIKICKAH(HJNAHNICGMH);
-			BOJNFFALDHH();
+			base.SetupFooter(HJNAHNICGMH);
+			SetupNewsButtons();
 		}
 
 		public override void OnClose(object data)
 		{
-			JODALANHFPD.EEFFNHNGDEH();
-			if (FDAFJMFLKEP.Count == 0)
+			buttonMaker.ClearButtons();
+			if (newsItems.Count == 0)
 			{
 				if ((!BuyItemAfterClose || !(RedirectShopAfterClose != string.Empty)) && GoShopAfterClose)
 				{
-					QuestParameters hHKLFIIBIFF = ListSF.GetInstance().BNMLDPNCMLB();
-					GameUtils.MKADBAEEMFA(GameUtils.NAMBCLFLNIN(hHKLFIIBIFF.OIKHBNOANPP), SliderType.SliderRuby);
+					QuestParameters hHKLFIIBIFF = ListSF.GetInstance().GetQuestParameters();
+					GameUtils.NotifyTabChanged(GameUtils.GetSliderTypeByName(hHKLFIIBIFF.currentTabName), SliderType.SliderRuby);
 					DelayedStrike dDFFCNPELBC = new DelayedStrike(SliderType.SliderRuby);
 					if (RedirectShopAfterClose != string.Empty)
 					{
-						dDFFCNPELBC.DLKPBAJDHBO = ListSF.PGKBAEGCABK(RedirectShopAfterClose, 0L);
+						dDFFCNPELBC.Item = ListSF.FindAvailableItemByGroup(RedirectShopAfterClose, 0L);
 					}
-					Module.DLOKJOHNDID(ScreenType.ModuleShop, dDFFCNPELBC);
+					Module.OpenScreen(ScreenType.ModuleShop, dDFFCNPELBC);
 				}
 				base.OnClose(data);
 			}
 			else
 			{
-				BOJNFFALDHH();
-				HLJBLAPMDCB();
+				SetupNewsButtons();
+				SetupContent();
 			}
 		}
 
 		protected virtual void EnableLoading(bool value)
 		{
 			_loadingPicture.gameObject.SetActive(value);
-			BKFINGKIGBE = value;
+			isLoading = value;
 		}
 
 		private void Update()
 		{
-			if (BKFINGKIGBE)
+			if (isLoading)
 			{
 				_loadingPicture.transform.Rotate(0f, 20f * Time.deltaTime, 0f);
 			}
 		}
 
-		protected virtual void BOJNFFALDHH()
+		protected virtual void SetupNewsButtons()
 		{
-			if (FDAFJMFLKEP.Count == 0)
+			if (newsItems.Count == 0)
 			{
 				return;
 			}
-			NewsItem pONDDFBMFOO = FDAFJMFLKEP[0];
-			List<NewsButton> dHKDOHFKOOJ = pONDDFBMFOO.DHKDOHFKOOJ;
+			NewsItem pONDDFBMFOO = newsItems[0];
+			List<NewsButton> dHKDOHFKOOJ = pONDDFBMFOO.Buttons;
 			int count = dHKDOHFKOOJ.Count;
 			_btnOK.gameObject.SetActive(true);
 			_btnOK.RemoveAllEventListener();
@@ -176,25 +176,25 @@ namespace Nekki.SF2.GUI.Dialogs
 			{
 				fNDOOJNDJDC = _btnOK.transform.localPosition.x;
 			}
-			JODALANHFPD.Init(fNDOOJNDJDC, gBCONNBABLL, num, base.gameObject, OnClose, this);
+			buttonMaker.Init(fNDOOJNDJDC, gBCONNBABLL, num, base.gameObject, OnClose, this);
 			foreach (NewsButton item in dHKDOHFKOOJ)
 			{
-				JODALANHFPD.IOCIJAODGKE(item);
+				buttonMaker.AddButton(item);
 			}
 		}
 
-		protected virtual void EINIDMAILNM(object data)
+		protected virtual void OnPictureClicked(object data)
 		{
-			if (KNPONKPJHFJ != string.Empty)
+			if (externalUrl != string.Empty)
 			{
-				OfflineServices.OpenExternalUrl(KNPONKPJHFJ);
+				OfflineServices.OpenExternalUrl(externalUrl);
 			}
 		}
 
 		protected override void SetupHeader(string HCPNFPMHFCM)
 		{
 			_header.set_text((!(HCPNFPMHFCM == string.Empty)) ? HCPNFPMHFCM : LocalizationManager.GetString("dlgNewsTitle"));
-			_header.transform.BGNJGIACJBG(-25f + _topStripe.transform.localPosition.y);
+			_header.transform.SetLocalY(-25f + _topStripe.transform.localPosition.y);
 		}
 	}
 }

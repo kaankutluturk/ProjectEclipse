@@ -4,16 +4,16 @@ using System.Xml;
 public class PerkActionSetModFrames : PerkAction
 {
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private string OPAFELFOFFB;
+	private string _modName;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private FunctionExtension DEDEBCBLNBJ;
+	private FunctionExtension _modFrames;
 
-	public string POLPHCDNLEL
+	public string FramesModName
 	{
 		get
 		{
-			return CMKKGFDBBJF();
+			return GetModName();
 		}
 		protected set
 		{
@@ -21,15 +21,15 @@ public class PerkActionSetModFrames : PerkAction
 		}
 	}
 
-	public FunctionExtension KIEAMMONFOJ
+	public FunctionExtension ModFramesFunction
 	{
 		get
 		{
-			return NFPODDJPNEL();
+			return GetModFrames();
 		}
 		protected set
 		{
-			CKIALPMBKGN(value);
+			SetModFrames(value);
 		}
 	}
 
@@ -40,44 +40,44 @@ public class PerkActionSetModFrames : PerkAction
 	public PerkActionSetModFrames(PerkActionSetModFrames NOLFMPDGCOC)
 		: base(NOLFMPDGCOC)
 	{
-		set_ModName(NOLFMPDGCOC.CMKKGFDBBJF());
-		CKIALPMBKGN(NOLFMPDGCOC.NFPODDJPNEL());
+		set_ModName(NOLFMPDGCOC.GetModName());
+		SetModFrames(NOLFMPDGCOC.GetModFrames());
 	}
 
-	public string CMKKGFDBBJF()
+	public string GetModName()
 	{
-		return OPAFELFOFFB;
+		return _modName;
 	}
 
 	protected void set_ModName(string value)
 	{
-		OPAFELFOFFB = value;
+		_modName = value;
 	}
 
-	public FunctionExtension NFPODDJPNEL()
+	public FunctionExtension GetModFrames()
 	{
-		return DEDEBCBLNBJ;
+		return _modFrames;
 	}
 
-	protected void CKIALPMBKGN(FunctionExtension value)
+	protected void SetModFrames(FunctionExtension value)
 	{
-		DEDEBCBLNBJ = value;
+		_modFrames = value;
 	}
 
 	public override void Parse(XmlNode node)
 	{
 		base.Parse(node);
 		set_Type(ActionType.ACTION_SET_MOD_FRAMES);
-		set_ModName(node.Attributes["Name"].CIPOICEEIBK(string.Empty));
-		CKIALPMBKGN(null);
-		string text = node.Attributes["Frames"].CIPOICEEIBK(string.Empty);
+		set_ModName(node.Attributes["Name"].GetStringOrDefault(string.Empty));
+		SetModFrames(null);
+		string text = node.Attributes["Frames"].GetStringOrDefault(string.Empty);
 		if (text != null && text != string.Empty)
 		{
-			CKIALPMBKGN(new FunctionExtension());
-			NFPODDJPNEL().Parse(text);
-			NFPODDJPNEL().PBPBNENGLPA(JMDLAMHAJLN().HJFEFJIEINN);
-			NFPODDJPNEL().DMPCFMACDJM(JMDLAMHAJLN().OKPFNCJFLDL);
-			NFPODDJPNEL().set_Target(this);
+			SetModFrames(new FunctionExtension());
+			GetModFrames().Parse(text);
+			GetModFrames().SetFunctionCallback(GetPerk().EvaluateFunctionCallback);
+			GetModFrames().SetVariableCallback(GetPerk().OnFunctionPreCallback);
+			GetModFrames().set_Target(this);
 		}
 	}
 }

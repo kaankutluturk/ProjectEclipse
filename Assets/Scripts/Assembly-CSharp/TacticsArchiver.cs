@@ -6,9 +6,9 @@ using System.Xml;
 
 public class TacticsArchiver
 {
-	public static void GOFALMFEDNF()
+	public static void BuildAllArchives()
 	{
-		XmlDocument xmlDocument = XmlUtils.OpenXMLDocument(SF2Paths.KKIDGPBOBNI(), "ComputerSettings.xml");
+		XmlDocument xmlDocument = XmlUtils.OpenXMLDocument(SF2Paths.GetGameDataPath(), "ComputerSettings.xml");
 		XmlNode xmlNode = xmlDocument["Settings"]["OutcomeTables"]["Items"]["Weapons"];
 		List<string> list = new List<string>();
 		list.Add(string.Empty);
@@ -16,21 +16,21 @@ public class TacticsArchiver
 		{
 			if (childNode.Name == "Weapon")
 			{
-				string item = childNode.Attributes["TacticWeapon"].CIPOICEEIBK(string.Empty);
+				string item = childNode.Attributes["TacticWeapon"].GetStringOrDefault(string.Empty);
 				list.Add(item);
 			}
 		}
 		foreach (string item2 in list)
 		{
-			GOFALMFEDNF(item2);
+			BuildArchive(item2);
 			foreach (string item3 in list)
 			{
-				GOFALMFEDNF(item2, item3);
+				BuildArchive(item2, item3);
 			}
 		}
 	}
 
-	private static void GOFALMFEDNF(string LGCMGHAFEDD)
+	private static void BuildArchive(string LGCMGHAFEDD)
 	{
 		byte[] LHJNAJKAFIK = new byte[0];
 		AddTable(LGCMGHAFEDD, ref LHJNAJKAFIK);
@@ -42,7 +42,7 @@ public class TacticsArchiver
 		}
 	}
 
-	private static void GOFALMFEDNF(string NDAJLDOMNLK, string AFKFIEAMFKG)
+	private static void BuildArchive(string NDAJLDOMNLK, string AFKFIEAMFKG)
 	{
 		if (IsWeaponOrder(NDAJLDOMNLK, AFKFIEAMFKG))
 		{
@@ -61,7 +61,7 @@ public class TacticsArchiver
 		}
 	}
 
-	private static void MFMGMPPALEG()
+	private static void LoadDefaultArchives()
 	{
 		List<string> list = new List<string>();
 		list.Add(string.Empty);
@@ -70,12 +70,12 @@ public class TacticsArchiver
 		{
 			foreach (string item2 in list)
 			{
-				MFMGMPPALEG(item, item2);
+				LoadArchive(item, item2);
 			}
 		}
 	}
 
-	public static void MFMGMPPALEG(string LGCMGHAFEDD)
+	public static void LoadArchive(string LGCMGHAFEDD)
 	{
 		string OEMALIFPGPO = string.Empty;
 		if (LGCMGHAFEDD == string.Empty)
@@ -86,16 +86,16 @@ public class TacticsArchiver
 		byte[] array = ResourceManager.GetBinary(OEMALIFPGPO);
 		if (array != null && array.Length > 0)
 		{
-			byte[] buffer = Compressor.EFJJNIMIBEO(array);
+			byte[] buffer = Compressor.Decompress(array);
 			using (MemoryStream input = new MemoryStream(buffer))
 			{
 				using (BinaryReader binaryReader = new BinaryReader(input))
 				{
 					while (binaryReader.BaseStream.Position != binaryReader.BaseStream.Length)
 					{
-						AiData.HDHPLDFCDOF hDHPLDFCDOF = (AiData.HDHPLDFCDOF)binaryReader.ReadUInt32();
-						string text = TacticalTableHolder.LNOMEMJCIAM(binaryReader);
-						if (hDHPLDFCDOF != AiData.HDHPLDFCDOF.shiftTable)
+						AiData.TableType hDHPLDFCDOF = (AiData.TableType)binaryReader.ReadUInt32();
+						string text = TacticalTableHolder.ReadNullTerminatedString(binaryReader);
+						if (hDHPLDFCDOF != AiData.TableType.shiftTable)
 						{
 							uint num = binaryReader.ReadUInt32();
 							if (0 < num)
@@ -108,7 +108,7 @@ public class TacticsArchiver
 						}
 						else
 						{
-							if (hDHPLDFCDOF != AiData.HDHPLDFCDOF.shiftTable)
+							if (hDHPLDFCDOF != AiData.TableType.shiftTable)
 							{
 								continue;
 							}
@@ -125,11 +125,11 @@ public class TacticsArchiver
 									uint num3 = binaryReader2.ReadUInt32();
 									for (int i = 0; i < num3; i++)
 									{
-										string gOHIIMFFFJI = TacticalTableHolder.LNOMEMJCIAM(binaryReader2);
-										InfoAnimation pJAHIOELGGD = AnimationData.BCIFKBJAFEC(gOHIIMFFFJI);
+										string gOHIIMFFFJI = TacticalTableHolder.ReadNullTerminatedString(binaryReader2);
+										InfoAnimation pJAHIOELGGD = AnimationData.GetAnimationByName(gOHIIMFFFJI);
 										if (pJAHIOELGGD != null)
 										{
-											pJAHIOELGGD.OBIBINIEJJE.LoadFromFile(pJAHIOELGGD, binaryReader2);
+											pJAHIOELGGD.ShiftTable.LoadFromFile(pJAHIOELGGD, binaryReader2);
 											continue;
 										}
 										ModelShiftTable pGDHGIJKPHN = new ModelShiftTable();
@@ -144,13 +144,13 @@ public class TacticsArchiver
 		}
 		else
 		{
-			LLLOJBFMONN.Write("file {0} not unzip", OEMALIFPGPO);
+			GameLog.Write("file {0} not unzip", OEMALIFPGPO);
 		}
 		// Several archives load together at a round boundary. Do not force a
 		// full-heap collection after each one; the runtime schedules collection.
 	}
 
-	public static void MFMGMPPALEG(string NDAJLDOMNLK, string AFKFIEAMFKG)
+	public static void LoadArchive(string NDAJLDOMNLK, string AFKFIEAMFKG)
 	{
 		if (!IsWeaponOrder(NDAJLDOMNLK, AFKFIEAMFKG))
 		{
@@ -161,22 +161,22 @@ public class TacticsArchiver
 		byte[] array = ResourceManager.GetBinary(OEMALIFPGPO);
 		if (array != null && array.Length > 0)
 		{
-			byte[] buffer = Compressor.EFJJNIMIBEO(array);
+			byte[] buffer = Compressor.Decompress(array);
 			using (MemoryStream input = new MemoryStream(buffer))
 			{
 				using (BinaryReader binaryReader = new BinaryReader(input))
 				{
 					while (binaryReader.BaseStream.Position != binaryReader.BaseStream.Length)
 					{
-						AiData.HDHPLDFCDOF hDHPLDFCDOF = (AiData.HDHPLDFCDOF)binaryReader.ReadUInt32();
+						AiData.TableType hDHPLDFCDOF = (AiData.TableType)binaryReader.ReadUInt32();
 						if (AiData.CheckIfTableExists(NDAJLDOMNLK, AFKFIEAMFKG, hDHPLDFCDOF))
 						{
-							LLLOJBFMONN.Write("Skipping - table {0}/{1} !", NDAJLDOMNLK, AFKFIEAMFKG);
+							GameLog.Write("Skipping - table {0}/{1} !", NDAJLDOMNLK, AFKFIEAMFKG);
 							return;
 						}
-						LLLOJBFMONN.Write("Reading - table {0}/{1} !", NDAJLDOMNLK, AFKFIEAMFKG);
-						string kEEMLGNLKPF = TacticalTableHolder.LNOMEMJCIAM(binaryReader);
-						string text = TacticalTableHolder.LNOMEMJCIAM(binaryReader);
+						GameLog.Write("Reading - table {0}/{1} !", NDAJLDOMNLK, AFKFIEAMFKG);
+						string kEEMLGNLKPF = TacticalTableHolder.ReadNullTerminatedString(binaryReader);
+						string text = TacticalTableHolder.ReadNullTerminatedString(binaryReader);
 						byte[] mLFPOCMGFMB = new byte[0];
 						uint num = binaryReader.ReadUInt32();
 						if (0 < num)
@@ -192,14 +192,14 @@ public class TacticsArchiver
 		}
 		else
 		{
-			LLLOJBFMONN.Write("file {0} not unzip", OEMALIFPGPO);
+			GameLog.Write("file {0} not unzip", OEMALIFPGPO);
 		}
 	}
 
 	private static void AddTable(string LGCMGHAFEDD, ref byte[] LHJNAJKAFIK)
 	{
-		string dCOPLCIFCFL = SF2Paths.KKIDGPBOBNI() + "/tactics/dodge/" + LGCMGHAFEDD + ".tbs";
-		string dCOPLCIFCFL2 = SF2Paths.KKIDGPBOBNI() + "/tactics/shiftTables/" + LGCMGHAFEDD + ".sts";
+		string dCOPLCIFCFL = SF2Paths.GetGameDataPath() + "/tactics/dodge/" + LGCMGHAFEDD + ".tbs";
+		string dCOPLCIFCFL2 = SF2Paths.GetGameDataPath() + "/tactics/shiftTables/" + LGCMGHAFEDD + ".sts";
 		byte[] array = ResourceManager.GetBinary(dCOPLCIFCFL);
 		if (array != null && array.Length > 0)
 		{
@@ -219,8 +219,8 @@ public class TacticsArchiver
 	private static void AddTable(string NDAJLDOMNLK, string AFKFIEAMFKG, ref byte[] LHJNAJKAFIK)
 	{
 		string text = NDAJLDOMNLK + "_" + AFKFIEAMFKG + ".tbs";
-		string dCOPLCIFCFL = SF2Paths.KKIDGPBOBNI() + "/tactics/movements/" + text;
-		string dCOPLCIFCFL2 = SF2Paths.KKIDGPBOBNI() + "/tactics/outcometablesforattack/" + text;
+		string dCOPLCIFCFL = SF2Paths.GetGameDataPath() + "/tactics/movements/" + text;
+		string dCOPLCIFCFL2 = SF2Paths.GetGameDataPath() + "/tactics/outcometablesforattack/" + text;
 		byte[] array = ResourceManager.GetBinary(dCOPLCIFCFL);
 		if (array != null && array.Length > 0)
 		{
@@ -246,13 +246,13 @@ public class TacticsArchiver
 
 	private static int GetFileName(string LGCMGHAFEDD, ref string OEMALIFPGPO)
 	{
-		OEMALIFPGPO = SF2Paths.KKIDGPBOBNI() + "/tactics_compressed/" + LGCMGHAFEDD.ToLower() + ".atf";
+		OEMALIFPGPO = SF2Paths.GetGameDataPath() + "/tactics_compressed/" + LGCMGHAFEDD.ToLower() + ".atf";
 		return OEMALIFPGPO.Length;
 	}
 
 	private static int GetFileName(string NDAJLDOMNLK, string AFKFIEAMFKG, ref string OEMALIFPGPO)
 	{
-		OEMALIFPGPO = SF2Paths.KKIDGPBOBNI() + "/tactics_compressed/" + NDAJLDOMNLK.ToLower() + "_" + AFKFIEAMFKG.ToLower() + ".atf";
+		OEMALIFPGPO = SF2Paths.GetGameDataPath() + "/tactics_compressed/" + NDAJLDOMNLK.ToLower() + "_" + AFKFIEAMFKG.ToLower() + ".atf";
 		return OEMALIFPGPO.Length;
 	}
 

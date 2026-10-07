@@ -81,7 +81,7 @@ public static class ValidateDE128UnderworldWinNative
                 return;
             }
             var scripts = ModRuntime.Scripts;
-            var roster = ListSF.CCDKHLAMKKO();
+            var roster = ListSF.GetRoster();
             var module = Module.GetInstance();
             if (scripts == null || roster == null || module == null) return;
             if (scripts.Diagnostics.Count != 0 || scripts.StateDiagnostics.Count != 0)
@@ -119,9 +119,9 @@ public static class ValidateDE128UnderworldWinNative
                 var target = DefinitionId.Parse(targetId);
                 if (ModProfileAccess.Fight(target).Wins != 0)
                     throw new Exception("Native win fixture profile has already won " + targetId);
-                var encounter = ListSF.CHMCKGCDGCM(new FightIDS(scripts.Content.RuntimeFightId(target)));
+                var encounter = ListSF.GetFightById(new FightIDS(scripts.Content.RuntimeFightId(target)));
                 if (encounter == null) throw new Exception("Underworld encounter missing: " + targetId);
-                gemsBefore = roster.EHFJHFDACMP();
+                gemsBefore = roster.GetBonus();
                 bool immediate = GameUtils.StartFight(encounter, false, null, true, false);
                 entryRequested = true;
                 bool preparing = (bool)typeof(ModModeRuntime).GetProperty("HasPendingPreparation", HiddenStatic).GetValue(null);
@@ -134,12 +134,12 @@ public static class ValidateDE128UnderworldWinNative
             var resultScreen = UnityEngine.Object.FindObjectOfType<EndFightScreen>();
             if (resultScreen != null && !resultSeen)
             {
-                var result = (FightResult)typeof(EndFightScreen).GetField("MPFLHOFEOGI", Hidden).GetValue(resultScreen);
+                var result = (FightResult)typeof(EndFightScreen).GetField("fightResult", Hidden).GetValue(resultScreen);
                 if (result == null || !result.IsWinner()) throw new Exception("Underworld victory did not reach a winning result screen.");
                 resultSeen = true;
-                Debug.Log(Prefix + "Native victory screen: coins=" + result.PMIHPJFAJIO.GBGNFPNCGED +
-                    " gems=" + result.PMIHPJFAJIO.PNDAIFALIKF + " experience=" + result.PMIHPJFAJIO.exp +
-                    " items=" + result.PMIHPJFAJIO.HELFDCAIJNE.Count);
+                Debug.Log(Prefix + "Native victory screen: coins=" + result.Prize.Money +
+                    " gems=" + result.Prize.Bonus + " experience=" + result.Prize.exp +
+                    " items=" + result.Prize.Items.Count);
             }
             if (resultSeen && !continued)
             {
@@ -151,7 +151,7 @@ public static class ValidateDE128UnderworldWinNative
             {
                 if (module.GetCurrentScreenType() != ScreenType.ModuleMap) return;
                 var scene = UnityEngine.Object.FindObjectOfType<MapScene>();
-                if (scene == null || scene.GetCurrentState() != MapScene.NMFLNANKNOJ.RaidMode) return;
+                if (scene == null || scene.GetCurrentState() != MapScene.MapMode.RaidMode) return;
                 if (ModProfileAccess.Fight(DefinitionId.Parse(targetId)).Wins != 1)
                     throw new Exception("Native Underworld victory was not saved as one win.");
                 if (EditorApplication.timeSinceStartup - lastPress >= 0.2 && PressResultStory())
@@ -168,7 +168,7 @@ public static class ValidateDE128UnderworldWinNative
                     throw new Exception("Underworld victory story remained pending after acknowledgement.");
                 if (resultCards == 0) throw new Exception("Underworld victory story did not appear natively.");
                 Debug.Log(Prefix + "PASS: native win, reward screen, saved fight win, " + resultCards +
-                    " result cards, Underworld map return; gems=" + gemsBefore + "->" + roster.EHFJHFDACMP() + ".");
+                    " result cards, Underworld map return; gems=" + gemsBefore + "->" + roster.GetBonus() + ".");
                 Finish(0);
                 return;
             }
@@ -218,14 +218,14 @@ public static class ValidateDE128UnderworldWinNative
     static void PressBlockingStory()
     {
         if (EditorApplication.timeSinceStartup - lastPress < 0.2) return;
-        var dialog = typeof(DialogsManager).GetField("OALIPPPOHCL", HiddenStatic).GetValue(null) as StoryDialog;
+        var dialog = typeof(DialogsManager).GetField("currentDialog", HiddenStatic).GetValue(null) as StoryDialog;
         if (dialog == null || !dialog.IsQuestDialog || dialog.get_ButtonOK() == null) return;
         lastPress = EditorApplication.timeSinceStartup;
         Press(dialog);
     }
 
     static void Press(StoryDialog dialog) =>
-        typeof(StoryDialog).GetMethod("GPEKKGLDKDF", Hidden).Invoke(dialog, new object[] { null });
+        typeof(StoryDialog).GetMethod("OnNextClicked", Hidden).Invoke(dialog, new object[] { null });
 
     static ModStoryEvents StoryBus => (ModStoryEvents)typeof(ModRuntime)
         .GetField("StoryEvents", HiddenStatic).GetValue(null);

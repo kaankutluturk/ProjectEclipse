@@ -3,33 +3,33 @@ using System.Collections.Generic;
 
 public sealed class GenericDictionaryNodeDeserializer : INodeDeserializer
 {
-	private readonly IObjectFactory IEBGHNHEOBB;
+	private readonly IObjectFactory objectFactory;
 
-	private static readonly GenericStaticMethod DLLJLGCNLMF = new GenericStaticMethod(() => LJAJEBCNABG<object, object>(null, null, null, null));
+	private static readonly GenericStaticMethod deserializeHelperMethod = new GenericStaticMethod(() => DeserializeHelper<object, object>(null, null, null, null));
 
 	public GenericDictionaryNodeDeserializer(IObjectFactory EJPHFDCKCCE)
 	{
-		IEBGHNHEOBB = EJPHFDCKCCE;
+		objectFactory = EJPHFDCKCCE;
 	}
 
 	bool INodeDeserializer.Deserialize(EventReader reader, Type MBLGNMBFHBI, Func<EventReader, Type, object> IJBAEAEDMCC, out object value)
 	{
-		Type type = ReflectionUtility.JIDNEGBGBGL(MBLGNMBFHBI, typeof(IDictionary<, >));
+		Type type = ReflectionUtility.GetImplementedGenericInterface(MBLGNMBFHBI, typeof(IDictionary<, >));
 		if (type == null)
 		{
 			value = false;
 			return false;
 		}
-		reader.DODGGCGJJLL<MappingStart>();
-		value = IEBGHNHEOBB.Create(MBLGNMBFHBI);
-		DLLJLGCNLMF.Invoke(type.GetGenericArguments(), reader, MBLGNMBFHBI, IJBAEAEDMCC, value);
-		reader.DODGGCGJJLL<BLFPJCPALDH>();
+		reader.Expect<MappingStart>();
+		value = objectFactory.Create(MBLGNMBFHBI);
+		deserializeHelperMethod.Invoke(type.GetGenericArguments(), reader, MBLGNMBFHBI, IJBAEAEDMCC, value);
+		reader.Expect<MappingEnd>();
 		return true;
 	}
 
-	private static void LJAJEBCNABG<TKey, TValue>(EventReader reader, Type MBLGNMBFHBI, Func<EventReader, Type, object> IJBAEAEDMCC, IDictionary<TKey, TValue> DCJLKCFKCOM)
+	private static void DeserializeHelper<TKey, TValue>(EventReader reader, Type MBLGNMBFHBI, Func<EventReader, Type, object> IJBAEAEDMCC, IDictionary<TKey, TValue> DCJLKCFKCOM)
 	{
-		while (!reader.GPHIFFOGOGN<BLFPJCPALDH>())
+		while (!reader.Accept<MappingEnd>())
 		{
 			object KGBGENDIMBC = IJBAEAEDMCC(reader, typeof(TKey));
 			IValuePromise aGAMFLELGLG = KGBGENDIMBC as IValuePromise;

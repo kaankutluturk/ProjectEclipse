@@ -6,7 +6,7 @@ namespace Nekki.SF2.GUI
 	public abstract class Scene<T> : ModuleHolder where T : Scene<T>
 	{
 		private static T EADAACFGGGM__BackingField;
-		public enum EEDLPLHMEEE
+		public enum SceneEvent
 		{
 			ON_HINT_CREATED = 200
 		}
@@ -19,20 +19,20 @@ namespace Nekki.SF2.GUI
 
 		public const int MODAL_LAYER_TOUCH_PRIORITY = -999999;
 
-		protected ScreenInfo LDHNLPEOMFC;
+		protected ScreenInfo screenInfo;
 
-		protected Sprite GKOFJFKBGOH;
+		protected Sprite visualSprite;
 
 		public static bool IsPause;
 
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		private static T EADAACFGGGM;
+		private static T current;
 
-		protected bool NDHHFHHBFEC;
+		protected bool isInitialized;
 
-		protected bool CPOMIKGDIEK;
+		protected bool isClosed;
 
-		public static T BLOOLFFMKFI
+		public static T CurrentScene
 		{
 			get
 			{
@@ -40,18 +40,18 @@ namespace Nekki.SF2.GUI
 			}
 			protected set
 			{
-				GAKMJOBBBAD(value);
+				SetCurrent(value);
 			}
 		}
 
-		public abstract ScreenType PNAJHDBDDLP { get; }
+		public abstract ScreenType SceneType { get; }
 
 		public static T get_Current()
 		{
 			return Scene<T>.EADAACFGGGM__BackingField;
 		}
 
-		protected static void GAKMJOBBBAD(T value)
+		protected static void SetCurrent(T value)
 		{
 			Scene<T>.EADAACFGGGM__BackingField = value;
 		}
@@ -60,19 +60,19 @@ namespace Nekki.SF2.GUI
 
 		protected virtual void Init(object data)
 		{
-			NDHHFHHBFEC = true;
-			GKOFJFKBGOH = null;
-			LDHNLPEOMFC = new ScreenInfo();
+			isInitialized = true;
+			visualSprite = null;
+			screenInfo = new ScreenInfo();
 			IsPause = false;
-			if (!AssemblyController.KMEOEAGGPBI())
+			if (!AssemblyController.GetGamepadEnabled())
 			{
 			}
 		}
 
-		protected virtual void PJNFHNFLNNO()
+		protected virtual void OnSceneClosed()
 		{
-			CPOMIKGDIEK = true;
-			if (!AssemblyController.KMEOEAGGPBI())
+			isClosed = true;
+			if (!AssemblyController.GetGamepadEnabled())
 			{
 			}
 		}
@@ -83,14 +83,14 @@ namespace Nekki.SF2.GUI
 			T val = this as T;
 			if (SceneManagerSF.Init(val.get_SceneId()))
 			{
-				GAKMJOBBBAD(this as T);
-				SceneManagerSF.DJKMOGJMHLO(get_SceneId());
-				GIHJGHJJJGK();
+				SetCurrent(this as T);
+				SceneManagerSF.SetCurrentScreen(get_SceneId());
+				CreateDebugCanvas();
 				base.Awake();
-				Init(Module.GetInstance().DMCJGOMOJEF.Data);
+				Init(Module.GetInstance().ScreenInfo.Data);
 				if (get_SceneId() != ScreenType.Loader)
 				{
-					Module.GetInstance().NFEBHLDPHHI(this);
+					Module.GetInstance().RegisterHolder(this);
 				}
 				if (_WideScreenController != null)
 				{
@@ -101,9 +101,9 @@ namespace Nekki.SF2.GUI
 			}
 		}
 
-		private void GIHJGHJJJGK()
+		private void CreateDebugCanvas()
 		{
-			if (_DebugCanvasPrefab != null && SystemProperties.DBBOCENKMGD())
+			if (_DebugCanvasPrefab != null && SystemProperties.IsDebug())
 			{
 				DebugUI debugUI = Object.Instantiate(_DebugCanvasPrefab);
 				debugUI.name = "[DebugCanvas]";
@@ -113,12 +113,12 @@ namespace Nekki.SF2.GUI
 		protected override void OnDestroy()
 		{
 			base.OnDestroy();
-			if (NDHHFHHBFEC && !CPOMIKGDIEK)
+			if (isInitialized && !isClosed)
 			{
-				PJNFHNFLNNO();
+				OnSceneClosed();
 			}
-			GAKMJOBBBAD((T)null);
-			Module.GetInstance().JOCFBBAAPBE(this);
+			SetCurrent((T)null);
+			Module.GetInstance().UnregisterHolder(this);
 		}
 
 		public virtual void UpdateScene(object data)

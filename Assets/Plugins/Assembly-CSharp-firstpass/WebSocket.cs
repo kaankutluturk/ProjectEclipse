@@ -4,17 +4,17 @@ using System.Diagnostics;
 public sealed class WebSocket
 {
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private HTTPRequest HMKDGNFLBMB;
+	private HTTPRequest internalRequest;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private bool HKJBEBPDOOK;
+	private bool startPingThread;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private int JICCALEELHL;
+	private int pingFrequency;
 
-	public BNIEFDKHAJN HKBKFMIBCED;
+	public OnWebSocketOpenDelegate OnOpen;
 
-	public KCEBOGOANEH OnMessage;
+	public OnWebSocketMessageDelegate OnMessage;
 
 	public OnWebSocketBinaryDelegate OnBinary;
 
@@ -22,39 +22,39 @@ public sealed class WebSocket
 
 	public OnWebSocketErrorDelegate OnError;
 
-	public JFCEKCIHELB NKNFDKGPPAJ;
+	public OnWebSocketErrorDescriptionDelegate OnErrorDesc;
 
-	public PDFHPHPODBK GJADNPIKFEL;
+	public OnWebSocketIncompleteFrameDelegate OnIncompleteFrame;
 
-	private bool PAMNPBEHNCF;
+	private bool requestSent;
 
-	private WebSocketResponse ILNFPNFEOCL;
+	private WebSocketResponse webSocket;
 
-	public HTTPRequest OOHLFJNPGGA
+	public HTTPRequest InternalRequest
 	{
 		get
 		{
-			return KGBEGJJPCKC();
+			return GetInternalRequest();
 		}
 		private set
 		{
-			HMPIGPEAMPM(value);
+			SetInternalRequest(value);
 		}
 	}
 
-	public bool PLCIGHLBOPP
+	public bool IsOpen
 	{
 		get
 		{
-			return DJKKJPNLOAE();
+			return GetIsOpen();
 		}
 	}
 
-	public bool HDEBMDAFLNC
+	public bool EnablePingThread
 	{
 		get
 		{
-			return ALNKFAEMIBD();
+			return GetStartPingThread();
 		}
 		set
 		{
@@ -62,11 +62,11 @@ public sealed class WebSocket
 		}
 	}
 
-	public int CINAOLMJCEJ
+	public int PingFrequencyMs
 	{
 		get
 		{
-			return IGDLFKDLPDK();
+			return GetPingFrequency();
 		}
 		set
 		{
@@ -86,236 +86,236 @@ public sealed class WebSocket
 		{
 			KJHNCLAJMLO = new Uri(KJHNCLAJMLO.Scheme + "://" + KJHNCLAJMLO.Host + ":" + ((!KJHNCLAJMLO.Scheme.Equals("wss", StringComparison.OrdinalIgnoreCase)) ? "80" : "443") + KJHNCLAJMLO.PathAndQuery);
 		}
-		HMPIGPEAMPM(new HTTPRequest(KJHNCLAJMLO, DLHNDCMFPCJ));
-		KGBEGJJPCKC().GFFABFBMJAO = FFCPMNOMFPA;
-		KGBEGJJPCKC().MMPFBNNMGED("Host", KJHNCLAJMLO.Host + ":" + KJHNCLAJMLO.Port);
-		KGBEGJJPCKC().MMPFBNNMGED("Upgrade", "websocket");
-		KGBEGJJPCKC().MMPFBNNMGED("Connection", "keep-alive, Upgrade");
-		KGBEGJJPCKC().MMPFBNNMGED("Sec-WebSocket-Key", GetSecKey(new object[4]
+		SetInternalRequest(new HTTPRequest(KJHNCLAJMLO, OnInternalRequestCallback));
+		GetInternalRequest().OnUpgraded = OnInternalRequestUpgraded;
+		GetInternalRequest().SetHeader("Host", KJHNCLAJMLO.Host + ":" + KJHNCLAJMLO.Port);
+		GetInternalRequest().SetHeader("Upgrade", "websocket");
+		GetInternalRequest().SetHeader("Connection", "keep-alive, Upgrade");
+		GetInternalRequest().SetHeader("Sec-WebSocket-Key", GetSecKey(new object[4]
 		{
 			this,
-			KGBEGJJPCKC(),
+			GetInternalRequest(),
 			KJHNCLAJMLO,
 			new object()
 		}));
 		if (!string.IsNullOrEmpty(IKOOJMAOFOD))
 		{
-			KGBEGJJPCKC().MMPFBNNMGED("Origin", IKOOJMAOFOD);
+			GetInternalRequest().SetHeader("Origin", IKOOJMAOFOD);
 		}
-		KGBEGJJPCKC().MMPFBNNMGED("Sec-WebSocket-Version", "13");
+		GetInternalRequest().SetHeader("Sec-WebSocket-Version", "13");
 		if (!string.IsNullOrEmpty(ENLHAIGCCBO))
 		{
-			KGBEGJJPCKC().MMPFBNNMGED("Sec-WebSocket-Protocol", ENLHAIGCCBO);
+			GetInternalRequest().SetHeader("Sec-WebSocket-Protocol", ENLHAIGCCBO);
 		}
-		KGBEGJJPCKC().MMPFBNNMGED("Cache-Control", "no-cache");
-		KGBEGJJPCKC().MMPFBNNMGED("Pragma", "no-cache");
-		KGBEGJJPCKC().JJCLPAGJEBJ(true);
-		if (HTTPManager.FHGBKFBCGCO() != null)
+		GetInternalRequest().SetHeader("Cache-Control", "no-cache");
+		GetInternalRequest().SetHeader("Pragma", "no-cache");
+		GetInternalRequest().SetDisableCache(true);
+		if (HTTPManager.GetProxy() != null)
 		{
-			KGBEGJJPCKC().PNGMAECJHID(new HTTPProxy(HTTPManager.FHGBKFBCGCO().DNIJHGFINDG(), HTTPManager.FHGBKFBCGCO().HPKPFEOBIOC(), false, false, HTTPManager.FHGBKFBCGCO().OHCGKBPPMEN()));
+			GetInternalRequest().SetProxy(new HTTPProxy(HTTPManager.GetProxy().GetAddress(), HTTPManager.GetProxy().GetCredentials(), false, false, HTTPManager.GetProxy().GetNonTransparentForHTTPS()));
 		}
 	}
 
-	public HTTPRequest KGBEGJJPCKC()
+	public HTTPRequest GetInternalRequest()
 	{
-		return HMKDGNFLBMB;
+		return internalRequest;
 	}
 
-	private void HMPIGPEAMPM(HTTPRequest value)
+	private void SetInternalRequest(HTTPRequest value)
 	{
-		HMKDGNFLBMB = value;
+		internalRequest = value;
 	}
 
-	public bool DJKKJPNLOAE()
+	public bool GetIsOpen()
 	{
-		return ILNFPNFEOCL != null && !ILNFPNFEOCL.HDDABMLNDPK();
+		return webSocket != null && !webSocket.GetIsClosed();
 	}
 
-	public bool ALNKFAEMIBD()
+	public bool GetStartPingThread()
 	{
-		return HKJBEBPDOOK;
+		return startPingThread;
 	}
 
 	public void set_StartPingThread(bool value)
 	{
-		HKJBEBPDOOK = value;
+		startPingThread = value;
 	}
 
-	public int IGDLFKDLPDK()
+	public int GetPingFrequency()
 	{
-		return JICCALEELHL;
+		return pingFrequency;
 	}
 
 	public void set_PingFrequency(int value)
 	{
-		JICCALEELHL = value;
+		pingFrequency = value;
 	}
 
-	private void DLHNDCMFPCJ(HTTPRequest CGOIOKHEGOE, HTTPResponse BEIGFGCBICO)
+	private void OnInternalRequestCallback(HTTPRequest CGOIOKHEGOE, HTTPResponse BEIGFGCBICO)
 	{
 		string empty = string.Empty;
-		switch (CGOIOKHEGOE.FLBBFDNHJAJ())
+		switch (CGOIOKHEGOE.GetState())
 		{
 		default:
 			return;
-		case CFGBMHKCENK.Finished:
-			if (BEIGFGCBICO.AICKPAMONBH() || BEIGFGCBICO.KNMDPGBPNED() == 101)
+		case HTTPRequestStates.Finished:
+			if (BEIGFGCBICO.GetIsSuccess() || BEIGFGCBICO.GetStatusCode() == 101)
 			{
-				HTTPManager.MBBMPNDDPIH().KDAFBLAKBMI("WebSocket", string.Format("Request finished. Status Code: {0} Message: {1}", BEIGFGCBICO.KNMDPGBPNED().ToString(), BEIGFGCBICO.DCKPMHKDLEJ()));
+				HTTPManager.GetLogger().Information("WebSocket", string.Format("Request finished. Status Code: {0} Message: {1}", BEIGFGCBICO.GetStatusCode().ToString(), BEIGFGCBICO.GetMessage()));
 				return;
 			}
-			empty = string.Format("Request Finished Successfully, but the server sent an error. Status Code: {0}-{1} Message: {2}", BEIGFGCBICO.KNMDPGBPNED(), BEIGFGCBICO.DCKPMHKDLEJ(), BEIGFGCBICO.DPBLPGKOEJB());
+			empty = string.Format("Request Finished Successfully, but the server sent an error. Status Code: {0}-{1} Message: {2}", BEIGFGCBICO.GetStatusCode(), BEIGFGCBICO.GetMessage(), BEIGFGCBICO.GetDataAsText());
 			break;
-		case CFGBMHKCENK.Error:
-			empty = "Request Finished with Error! " + ((CGOIOKHEGOE.IEFGFKFHNMD() == null) ? string.Empty : ("Exception: " + CGOIOKHEGOE.IEFGFKFHNMD().Message + CGOIOKHEGOE.IEFGFKFHNMD().StackTrace));
+		case HTTPRequestStates.Error:
+			empty = "Request Finished with Error! " + ((CGOIOKHEGOE.GetException() == null) ? string.Empty : ("Exception: " + CGOIOKHEGOE.GetException().Message + CGOIOKHEGOE.GetException().StackTrace));
 			break;
-		case CFGBMHKCENK.Aborted:
+		case HTTPRequestStates.Aborted:
 			empty = "Request Aborted!";
 			break;
-		case CFGBMHKCENK.ConnectionTimedOut:
+		case HTTPRequestStates.ConnectionTimedOut:
 			empty = "Connection Timed Out!";
 			break;
-		case CFGBMHKCENK.TimedOut:
+		case HTTPRequestStates.TimedOut:
 			empty = "Processing the request Timed Out!";
 			break;
 		}
 		if (OnError != null)
 		{
-			OnError(this, CGOIOKHEGOE.IEFGFKFHNMD());
+			OnError(this, CGOIOKHEGOE.GetException());
 		}
-		if (NKNFDKGPPAJ != null)
+		if (OnErrorDesc != null)
 		{
-			NKNFDKGPPAJ(this, empty);
+			OnErrorDesc(this, empty);
 		}
-		if (OnError == null && NKNFDKGPPAJ == null)
+		if (OnError == null && OnErrorDesc == null)
 		{
-			HTTPManager.MBBMPNDDPIH().Error("WebSocket", empty);
+			HTTPManager.GetLogger().Error("WebSocket", empty);
 		}
 	}
 
-	private void FFCPMNOMFPA(HTTPRequest CGOIOKHEGOE, HTTPResponse BEIGFGCBICO)
+	private void OnInternalRequestUpgraded(HTTPRequest CGOIOKHEGOE, HTTPResponse BEIGFGCBICO)
 	{
-		ILNFPNFEOCL = BEIGFGCBICO as WebSocketResponse;
-		if (ILNFPNFEOCL == null)
+		webSocket = BEIGFGCBICO as WebSocketResponse;
+		if (webSocket == null)
 		{
 			if (OnError != null)
 			{
-				OnError(this, CGOIOKHEGOE.IEFGFKFHNMD());
+				OnError(this, CGOIOKHEGOE.GetException());
 			}
-			if (NKNFDKGPPAJ != null)
+			if (OnErrorDesc != null)
 			{
 				string nEPOLDCKNJL = string.Empty;
-				if (CGOIOKHEGOE.IEFGFKFHNMD() != null)
+				if (CGOIOKHEGOE.GetException() != null)
 				{
-					nEPOLDCKNJL = CGOIOKHEGOE.IEFGFKFHNMD().Message + " " + CGOIOKHEGOE.IEFGFKFHNMD().StackTrace;
+					nEPOLDCKNJL = CGOIOKHEGOE.GetException().Message + " " + CGOIOKHEGOE.GetException().StackTrace;
 				}
-				NKNFDKGPPAJ(this, nEPOLDCKNJL);
+				OnErrorDesc(this, nEPOLDCKNJL);
 			}
 			return;
 		}
-		if (HKBKFMIBCED != null)
+		if (OnOpen != null)
 		{
 			try
 			{
-				HKBKFMIBCED(this);
+				OnOpen(this);
 			}
 			catch (Exception mPFFFAOGBJE)
 			{
-				HTTPManager.MBBMPNDDPIH().COHEDILAHFD("WebSocket", "OnOpen", mPFFFAOGBJE);
+				HTTPManager.GetLogger().Exception("WebSocket", "OnOpen", mPFFFAOGBJE);
 			}
 		}
-		ILNFPNFEOCL.OnText = (WebSocketResponse IIBIPJJLEGJ, string CKEHOEGLMBM) =>
+		webSocket.OnText = (WebSocketResponse IIBIPJJLEGJ, string CKEHOEGLMBM) =>
 		{
 			if (OnMessage != null)
 			{
 				OnMessage(this, CKEHOEGLMBM);
 			}
 		};
-		ILNFPNFEOCL.OnBinary = (WebSocketResponse IIBIPJJLEGJ, byte[] DOEJIOEKACH) =>
+		webSocket.OnBinary = (WebSocketResponse IIBIPJJLEGJ, byte[] DOEJIOEKACH) =>
 		{
 			if (OnBinary != null)
 			{
 				OnBinary(this, DOEJIOEKACH);
 			}
 		};
-		ILNFPNFEOCL.OnClosed = (WebSocketResponse IIBIPJJLEGJ, ushort KJPGKHJNOMC, string CKEHOEGLMBM) =>
+		webSocket.OnClosed = (WebSocketResponse IIBIPJJLEGJ, ushort KJPGKHJNOMC, string CKEHOEGLMBM) =>
 		{
 			if (OnClosed != null)
 			{
 				OnClosed(this, KJPGKHJNOMC, CKEHOEGLMBM);
 			}
 		};
-		if (GJADNPIKFEL != null)
+		if (OnIncompleteFrame != null)
 		{
-			ILNFPNFEOCL.GJADNPIKFEL = (WebSocketResponse IIBIPJJLEGJ, WebSocketFrameReader frame) =>
+			webSocket.OnIncompleteFrame = (WebSocketResponse IIBIPJJLEGJ, WebSocketFrameReader frame) =>
 			{
-				if (GJADNPIKFEL != null)
+				if (OnIncompleteFrame != null)
 				{
-					GJADNPIKFEL(this, frame);
+					OnIncompleteFrame(this, frame);
 				}
 			};
 		}
-		if (ALNKFAEMIBD())
+		if (GetStartPingThread())
 		{
-			ILNFPNFEOCL.StartPinging(Math.Min(IGDLFKDLPDK(), 100));
+			webSocket.StartPinging(Math.Min(GetPingFrequency(), 100));
 		}
-		ILNFPNFEOCL.PBAFKNHCJHD();
+		webSocket.StartReceive();
 	}
 
-	public void LAJCMNNNIIM()
+	public void OpenWebSocket()
 	{
-		if (!PAMNPBEHNCF && KGBEGJJPCKC() != null)
+		if (!requestSent && GetInternalRequest() != null)
 		{
-			KGBEGJJPCKC().Send();
-			PAMNPBEHNCF = true;
+			GetInternalRequest().Send();
+			requestSent = true;
 		}
 	}
 
 	public void Send(string LIOGIBJBHAH)
 	{
-		if (DJKKJPNLOAE())
+		if (GetIsOpen())
 		{
-			ILNFPNFEOCL.Send(LIOGIBJBHAH);
+			webSocket.Send(LIOGIBJBHAH);
 		}
 	}
 
 	public void Send(byte[] buffer)
 	{
-		if (DJKKJPNLOAE())
+		if (GetIsOpen())
 		{
-			ILNFPNFEOCL.Send(buffer);
+			webSocket.Send(buffer);
 		}
 	}
 
 	public void Send(byte[] buffer, ulong IPCOBJBKNAO, ulong count)
 	{
-		if (DJKKJPNLOAE())
+		if (GetIsOpen())
 		{
-			ILNFPNFEOCL.Send(buffer, IPCOBJBKNAO, count);
+			webSocket.Send(buffer, IPCOBJBKNAO, count);
 		}
 	}
 
 	public void Send(IWebSocketFrameWriter frame)
 	{
-		if (DJKKJPNLOAE())
+		if (GetIsOpen())
 		{
-			ILNFPNFEOCL.Send(frame);
+			webSocket.Send(frame);
 		}
 	}
 
 	public void Close()
 	{
-		if (DJKKJPNLOAE())
+		if (GetIsOpen())
 		{
-			ILNFPNFEOCL.Close();
+			webSocket.Close();
 		}
 	}
 
 	public void Close(ushort KJPGKHJNOMC, string LIOGIBJBHAH)
 	{
-		if (DJKKJPNLOAE())
+		if (GetIsOpen())
 		{
-			ILNFPNFEOCL.Close(KJPGKHJNOMC, LIOGIBJBHAH);
+			webSocket.Close(KJPGKHJNOMC, LIOGIBJBHAH);
 		}
 	}
 

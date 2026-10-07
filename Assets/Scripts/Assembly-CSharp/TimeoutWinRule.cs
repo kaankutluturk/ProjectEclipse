@@ -3,12 +3,12 @@ using System.Xml;
 public class TimeoutWinRule : InFightRule
 {
 	public TimeoutWinRule(XmlNode node, RuleAppliance EJPOJJKKICO)
-		: base(BCBLLMPAMLP.RuleTimeoutWin, EJPOJJKKICO, node)
+		: base(RuleType.RuleTimeoutWin, EJPOJJKKICO, node)
 	{
-		KOKHKAFELGL = false;
-		EBJIKKBLBEM(FightEvent.TimeoutEvent);
+		applianceLosesOnTrigger = false;
+		SubscribeEvent(FightEvent.TimeoutEvent);
 		Reset();
-		NDBMMPENJNJ = RuleAppliance.AppliancePlayer;
+		appliance = RuleAppliance.AppliancePlayer;
 	}
 
 	protected override bool CompareSingle(object data)
@@ -19,8 +19,8 @@ public class TimeoutWinRule : InFightRule
 	public override InFightRule Copy()
 	{
 		InFightRule aAJIFBJLJOA = null;
-		RuleAppliance eJPOJJKKICO = EDAKADCHOLE();
-		XmlNode hKPPBKPJOEO = GIFDJEEGCJI().IOJIGDNFCFL();
+		RuleAppliance eJPOJJKKICO = GetAppliance();
+		XmlNode hKPPBKPJOEO = GetXmlSource().GetNode();
 		aAJIFBJLJOA = new TimeoutWinRule(hKPPBKPJOEO, eJPOJJKKICO);
 		aAJIFBJLJOA.IsRandom = IsRandom;
 		return aAJIFBJLJOA;

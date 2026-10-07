@@ -41,7 +41,7 @@ namespace YamlDotNet.Core
 		{
 			get
 			{
-				return cursor.BJKDANAAGHK();
+				return cursor.Mark();
 			}
 		}
 

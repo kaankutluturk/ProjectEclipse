@@ -3,7 +3,7 @@ using System.Globalization;
 
 internal static class YamlFormatter
 {
-	private static readonly NumberFormatInfo MNNCBNBBPHN = new NumberFormatInfo
+	private static readonly NumberFormatInfo numberFormat = new NumberFormatInfo
 	{
 		CurrencyDecimalSeparator = ".",
 		CurrencyGroupSeparator = "_",
@@ -16,22 +16,22 @@ internal static class YamlFormatter
 		NumberDecimalDigits = 99
 	};
 
-	public static string DGIAFODNLNN(object number)
+	public static string FormatNumber(object number)
 	{
-		return Convert.ToString(number, MNNCBNBBPHN);
+		return Convert.ToString(number, numberFormat);
 	}
 
-	public static string NMBPLFHGICK(object CIGMFMBICLJ)
+	public static string FormatBool(object CIGMFMBICLJ)
 	{
 		return (!CIGMFMBICLJ.Equals(true)) ? "false" : "true";
 	}
 
-	public static string AHNEOKMPCPD(object KLHLNCMNKDD)
+	public static string FormatDateTime(object KLHLNCMNKDD)
 	{
 		return ((DateTime)KLHLNCMNKDD).ToString("o", CultureInfo.InvariantCulture);
 	}
 
-	public static string ALEIMPLLAHI(object NFBCAMOCHFG)
+	public static string FormatTimeSpan(object NFBCAMOCHFG)
 	{
 		return ((TimeSpan)NFBCAMOCHFG/*cast due to constrained. prefix*/).ToString();
 	}

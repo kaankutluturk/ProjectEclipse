@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 
 public class VersionContainer
 {
-	private enum LOICEAFFHDO
+	private enum CompareResult
 	{
 		Equally = 0,
 		More = 1,
@@ -14,51 +14,51 @@ public class VersionContainer
 
 	private readonly int[] _versionSource = new int[4];
 
-	public int JCKJHNFINJL
+	public int Major
 	{
 		get
 		{
-			return FAOHNABGKFH();
+			return GetMajor();
 		}
 		set
 		{
-			BINKMFGNMKA(value);
+			SetMajor(value);
 		}
 	}
 
-	public int OJEABAEBFIB
+	public int Minor
 	{
 		get
 		{
-			return ELEBDJHKBPL();
+			return GetMinor();
 		}
 		set
 		{
-			LBPFMNJKNNJ(value);
+			SetMinor(value);
 		}
 	}
 
-	public int CGACCLHNJNP
+	public int Build
 	{
 		get
 		{
-			return FMHLIFBPFBN();
+			return GetBuild();
 		}
 		set
 		{
-			KOLMOIIPCEC(value);
+			SetBuild(value);
 		}
 	}
 
-	public int OGMKHOHOGPD
+	public int Revision
 	{
 		get
 		{
-			return DFJEJKJECBI();
+			return GetRevision();
 		}
 		set
 		{
-			DPHPJFGOLMJ(value);
+			SetRevision(value);
 		}
 	}
 
@@ -77,42 +77,42 @@ public class VersionContainer
 		SetVersion(IGIOOCIDFIN, IBGMIGIFNJM, LDKAECLLDNG, JJCDPPFGPDO);
 	}
 
-	public int FAOHNABGKFH()
+	public int GetMajor()
 	{
 		return _versionSource[0];
 	}
 
-	public void BINKMFGNMKA(int value)
+	public void SetMajor(int value)
 	{
 		_versionSource[0] = value;
 	}
 
-	public int ELEBDJHKBPL()
+	public int GetMinor()
 	{
 		return _versionSource[1];
 	}
 
-	public void LBPFMNJKNNJ(int value)
+	public void SetMinor(int value)
 	{
 		_versionSource[1] = value;
 	}
 
-	public int FMHLIFBPFBN()
+	public int GetBuild()
 	{
 		return _versionSource[2];
 	}
 
-	public void KOLMOIIPCEC(int value)
+	public void SetBuild(int value)
 	{
 		_versionSource[2] = value;
 	}
 
-	public int DFJEJKJECBI()
+	public int GetRevision()
 	{
 		return _versionSource[3];
 	}
 
-	public void DPHPJFGOLMJ(int value)
+	public void SetRevision(int value)
 	{
 		_versionSource[3] = value;
 	}
@@ -142,15 +142,15 @@ public class VersionContainer
 
 	public void SetVersion(VersionContainer version)
 	{
-		SetVersion(version.FAOHNABGKFH(), version.ELEBDJHKBPL(), version.FMHLIFBPFBN(), version.DFJEJKJECBI());
+		SetVersion(version.GetMajor(), version.GetMinor(), version.GetBuild(), version.GetRevision());
 	}
 
 	public void SetVersion(int IGIOOCIDFIN, int IBGMIGIFNJM = -1, int LDKAECLLDNG = -1, int JJCDPPFGPDO = -1)
 	{
-		BINKMFGNMKA(IGIOOCIDFIN);
-		LBPFMNJKNNJ(IBGMIGIFNJM);
-		KOLMOIIPCEC(LDKAECLLDNG);
-		DPHPJFGOLMJ(JJCDPPFGPDO);
+		SetMajor(IGIOOCIDFIN);
+		SetMinor(IBGMIGIFNJM);
+		SetBuild(LDKAECLLDNG);
+		SetRevision(JJCDPPFGPDO);
 	}
 
 	public static VersionContainer CreateVersion(string version)
@@ -160,7 +160,7 @@ public class VersionContainer
 
 	public static VersionContainer CreateVersion(VersionContainer version)
 	{
-		return new VersionContainer(version.FAOHNABGKFH(), version.ELEBDJHKBPL(), version.FMHLIFBPFBN(), version.DFJEJKJECBI());
+		return new VersionContainer(version.GetMajor(), version.GetMinor(), version.GetBuild(), version.GetRevision());
 	}
 
 	public static VersionContainer CreateVersion(int IGIOOCIDFIN, int IBGMIGIFNJM = -1, int LDKAECLLDNG = -1, int JJCDPPFGPDO = -1)
@@ -169,94 +169,94 @@ public class VersionContainer
 	}
 
 	[SpecialName]
-	public static bool LFPMCJPCJBD(VersionContainer LHBNIMGFKIB, VersionContainer AAOIAEJJINO)
+	public static bool IsEqual(VersionContainer LHBNIMGFKIB, VersionContainer AAOIAEJJINO)
 	{
-		LOICEAFFHDO lOICEAFFHDO = Compare(LHBNIMGFKIB, AAOIAEJJINO);
-		return lOICEAFFHDO == LOICEAFFHDO.Equally;
+		CompareResult lOICEAFFHDO = Compare(LHBNIMGFKIB, AAOIAEJJINO);
+		return lOICEAFFHDO == CompareResult.Equally;
 	}
 
 	[SpecialName]
-	public static bool LFPMCJPCJBD(VersionContainer LHBNIMGFKIB, string AAOIAEJJINO)
+	public static bool IsEqual(VersionContainer LHBNIMGFKIB, string AAOIAEJJINO)
 	{
-		return LFPMCJPCJBD(LHBNIMGFKIB, CreateVersion(AAOIAEJJINO));
+		return IsEqual(LHBNIMGFKIB, CreateVersion(AAOIAEJJINO));
 	}
 
 	[SpecialName]
-	public static bool GLCJKGIOIEC(VersionContainer LHBNIMGFKIB, VersionContainer AAOIAEJJINO)
+	public static bool IsNotEqual(VersionContainer LHBNIMGFKIB, VersionContainer AAOIAEJJINO)
 	{
-		return !LFPMCJPCJBD(LHBNIMGFKIB, AAOIAEJJINO);
+		return !IsEqual(LHBNIMGFKIB, AAOIAEJJINO);
 	}
 
 	[SpecialName]
-	public static bool GLCJKGIOIEC(VersionContainer LHBNIMGFKIB, string AAOIAEJJINO)
+	public static bool IsNotEqual(VersionContainer LHBNIMGFKIB, string AAOIAEJJINO)
 	{
-		return GLCJKGIOIEC(LHBNIMGFKIB, CreateVersion(AAOIAEJJINO));
+		return IsNotEqual(LHBNIMGFKIB, CreateVersion(AAOIAEJJINO));
 	}
 
 	[SpecialName]
-	public static bool CGMHEDJDOEK(VersionContainer LHBNIMGFKIB, VersionContainer AAOIAEJJINO)
+	public static bool IsGreater(VersionContainer LHBNIMGFKIB, VersionContainer AAOIAEJJINO)
 	{
-		LOICEAFFHDO lOICEAFFHDO = Compare(LHBNIMGFKIB, AAOIAEJJINO);
-		return lOICEAFFHDO == LOICEAFFHDO.More && lOICEAFFHDO != LOICEAFFHDO.Equally;
+		CompareResult lOICEAFFHDO = Compare(LHBNIMGFKIB, AAOIAEJJINO);
+		return lOICEAFFHDO == CompareResult.More && lOICEAFFHDO != CompareResult.Equally;
 	}
 
 	[SpecialName]
-	public static bool CGMHEDJDOEK(VersionContainer LHBNIMGFKIB, string AAOIAEJJINO)
+	public static bool IsGreater(VersionContainer LHBNIMGFKIB, string AAOIAEJJINO)
 	{
-		return CGMHEDJDOEK(LHBNIMGFKIB, CreateVersion(AAOIAEJJINO));
+		return IsGreater(LHBNIMGFKIB, CreateVersion(AAOIAEJJINO));
 	}
 
 	[SpecialName]
-	public static bool GLLHGKILFFH(VersionContainer LHBNIMGFKIB, VersionContainer AAOIAEJJINO)
+	public static bool IsLess(VersionContainer LHBNIMGFKIB, VersionContainer AAOIAEJJINO)
 	{
-		LOICEAFFHDO lOICEAFFHDO = Compare(LHBNIMGFKIB, AAOIAEJJINO);
-		return lOICEAFFHDO == LOICEAFFHDO.Less && lOICEAFFHDO != LOICEAFFHDO.Equally;
+		CompareResult lOICEAFFHDO = Compare(LHBNIMGFKIB, AAOIAEJJINO);
+		return lOICEAFFHDO == CompareResult.Less && lOICEAFFHDO != CompareResult.Equally;
 	}
 
 	[SpecialName]
-	public static bool GLLHGKILFFH(VersionContainer LHBNIMGFKIB, string AAOIAEJJINO)
+	public static bool IsLess(VersionContainer LHBNIMGFKIB, string AAOIAEJJINO)
 	{
-		return GLLHGKILFFH(LHBNIMGFKIB, CreateVersion(AAOIAEJJINO));
+		return IsLess(LHBNIMGFKIB, CreateVersion(AAOIAEJJINO));
 	}
 
 	[SpecialName]
-	public static bool BCCGLNMPHCE(VersionContainer LHBNIMGFKIB, VersionContainer AAOIAEJJINO)
+	public static bool IsGreaterOrEqual(VersionContainer LHBNIMGFKIB, VersionContainer AAOIAEJJINO)
 	{
-		LOICEAFFHDO lOICEAFFHDO = Compare(LHBNIMGFKIB, AAOIAEJJINO);
-		return lOICEAFFHDO == LOICEAFFHDO.More || lOICEAFFHDO == LOICEAFFHDO.Equally;
+		CompareResult lOICEAFFHDO = Compare(LHBNIMGFKIB, AAOIAEJJINO);
+		return lOICEAFFHDO == CompareResult.More || lOICEAFFHDO == CompareResult.Equally;
 	}
 
 	[SpecialName]
-	public static bool BCCGLNMPHCE(VersionContainer LHBNIMGFKIB, string AAOIAEJJINO)
+	public static bool IsGreaterOrEqual(VersionContainer LHBNIMGFKIB, string AAOIAEJJINO)
 	{
-		return BCCGLNMPHCE(LHBNIMGFKIB, CreateVersion(AAOIAEJJINO));
+		return IsGreaterOrEqual(LHBNIMGFKIB, CreateVersion(AAOIAEJJINO));
 	}
 
 	[SpecialName]
-	public static bool CDOCLICKACF(VersionContainer LHBNIMGFKIB, VersionContainer AAOIAEJJINO)
+	public static bool IsLessOrEqual(VersionContainer LHBNIMGFKIB, VersionContainer AAOIAEJJINO)
 	{
-		LOICEAFFHDO lOICEAFFHDO = Compare(LHBNIMGFKIB, AAOIAEJJINO);
-		return lOICEAFFHDO == LOICEAFFHDO.Less || lOICEAFFHDO == LOICEAFFHDO.Equally;
+		CompareResult lOICEAFFHDO = Compare(LHBNIMGFKIB, AAOIAEJJINO);
+		return lOICEAFFHDO == CompareResult.Less || lOICEAFFHDO == CompareResult.Equally;
 	}
 
 	[SpecialName]
-	public static bool CDOCLICKACF(VersionContainer LHBNIMGFKIB, string AAOIAEJJINO)
+	public static bool IsLessOrEqual(VersionContainer LHBNIMGFKIB, string AAOIAEJJINO)
 	{
-		return CDOCLICKACF(LHBNIMGFKIB, CreateVersion(AAOIAEJJINO));
+		return IsLessOrEqual(LHBNIMGFKIB, CreateVersion(AAOIAEJJINO));
 	}
 
 	public string ToString(bool MJHLPGDFEHA)
 	{
 		if (MJHLPGDFEHA)
 		{
-			return string.Format("{0}.{1}.{2}.{3}", FAOHNABGKFH(), ELEBDJHKBPL(), FMHLIFBPFBN(), DFJEJKJECBI());
+			return string.Format("{0}.{1}.{2}.{3}", GetMajor(), GetMinor(), GetBuild(), GetRevision());
 		}
-		return string.Format("{0}.{1}.{2}", FAOHNABGKFH(), ELEBDJHKBPL(), FMHLIFBPFBN());
+		return string.Format("{0}.{1}.{2}", GetMajor(), GetMinor(), GetBuild());
 	}
 
 	public override bool Equals(object AOMLCBHAJJH)
 	{
-		return AOMLCBHAJJH is VersionContainer && LFPMCJPCJBD((VersionContainer)AOMLCBHAJJH, this);
+		return AOMLCBHAJJH is VersionContainer && IsEqual((VersionContainer)AOMLCBHAJJH, this);
 	}
 
 	public override int GetHashCode()
@@ -277,14 +277,14 @@ public class VersionContainer
 
 	public bool Empty(bool MJHLPGDFEHA = false)
 	{
-		if (FAOHNABGKFH() == 0 && ELEBDJHKBPL() == 0 && FMHLIFBPFBN() == 0 && (!MJHLPGDFEHA || DFJEJKJECBI() == 0))
+		if (GetMajor() == 0 && GetMinor() == 0 && GetBuild() == 0 && (!MJHLPGDFEHA || GetRevision() == 0))
 		{
 			return true;
 		}
 		return false;
 	}
 
-	private static LOICEAFFHDO Compare(VersionContainer LHBNIMGFKIB, VersionContainer AAOIAEJJINO, int IGIEDFIPIAN = 4)
+	private static CompareResult Compare(VersionContainer LHBNIMGFKIB, VersionContainer AAOIAEJJINO, int IGIEDFIPIAN = 4)
 	{
 		int[] mOCMENBOJJF = LHBNIMGFKIB._versionSource;
 		int[] mOCMENBOJJF2 = AAOIAEJJINO._versionSource;
@@ -292,10 +292,10 @@ public class VersionContainer
 		{
 			if (mOCMENBOJJF[i] != mOCMENBOJJF2[i])
 			{
-				return (mOCMENBOJJF[i] > mOCMENBOJJF2[i]) ? LOICEAFFHDO.More : LOICEAFFHDO.Less;
+				return (mOCMENBOJJF[i] > mOCMENBOJJF2[i]) ? CompareResult.More : CompareResult.Less;
 			}
 		}
-		return LOICEAFFHDO.Equally;
+		return CompareResult.Equally;
 	}
 
 	public bool ForCurrentVersion(string JJCDPPFGPDO)
@@ -305,11 +305,11 @@ public class VersionContainer
 
 	public bool ForCurrentVersion(VersionContainer JJCDPPFGPDO)
 	{
-		return Compare(this, JJCDPPFGPDO, 3) == LOICEAFFHDO.Equally;
+		return Compare(this, JJCDPPFGPDO, 3) == CompareResult.Equally;
 	}
 
-	public bool CMMIDNOLKPG(VersionContainer JJCDPPFGPDO)
+	public bool IsOlderThan(VersionContainer JJCDPPFGPDO)
 	{
-		return Compare(this, JJCDPPFGPDO, 3) == LOICEAFFHDO.Less;
+		return Compare(this, JJCDPPFGPDO, 3) == CompareResult.Less;
 	}
 }

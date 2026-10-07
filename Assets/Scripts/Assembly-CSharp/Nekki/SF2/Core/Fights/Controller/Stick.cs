@@ -9,7 +9,7 @@ namespace Nekki.SF2.Core.Fights.Controller
 {
 	public class Stick : SFMonoBehaviour<object>, IEventSystemHandler, IDragHandler, IPointerDownHandler, IPointerUpHandler
 	{
-		public enum GDMCBGPPGJM
+		public enum StickEventType
 		{
 			OnStickBegan = 0,
 			OnStickChange = 1,
@@ -31,49 +31,49 @@ namespace Nekki.SF2.Core.Fights.Controller
 		[SerializeField]
 		private Image _flashing;
 
-		private FightCID COFEJAHLFBF;
+		private FightCID currentDirection;
 
-		private float BNFDJKONDBP;
+		private float safeRadius;
 
-		private float ELNNNILDIFB;
+		private float safeRadiusSquared;
 
-		private float EJBALDKCFBB;
+		private float movementRadius;
 
-		private float HBHNJPMNMIM;
+		private float movementRadiusSquared;
 
-		private float OMMKBOAPGDP;
+		private float stopRadius;
 
-		private float FAFNDMLGDJI;
+		private float joystickRadius;
 
-		private float FKBJMDLAOMM;
+		private float joystickRadiusSquared;
 
-		private int HCMOIDIJNMD;
+		private int opacityCounter;
 
-		private int DMEAFBMAGDH = 10;
+		private int flashingSpeed = 10;
 
-		private bool CANIGBPEKFA;
+		private bool isFlashing;
 
-		private bool MGNLBNLCDAI;
+		private bool isRising;
 
-		private float PPGLPONABFM;
+		private float axisSectorDegrees;
 
-		private float JINLDLGFECA;
+		private float diagonalSectorDegrees;
 
-		private float BALIBHFOIFA;
+		private float axisSectorRadians;
 
-		private float GAGPDEDMDPI;
+		private float diagonalSectorRadians;
 
-		private float IKIAEPNIPEK;
+		private float halfAxisSectorCos;
 
-		private float MJGLHIPDJCP;
+		private float halfAxisSectorSin;
 
-		private float MILNPJLOFHG;
+		private float diagonalSectorTan;
 
-		private List<global::Pair<float, float>> LGNJNBJEAJE = new List<global::Pair<float, float>>();
+		private List<global::Pair<float, float>> quadrantAngles = new List<global::Pair<float, float>>();
 
-		private bool JMKEKMFHKBG;
+		private bool isRelativeTouch;
 
-		private Vector2 PPBJCHEEOFB = default(Vector2);
+		private Vector2 touchOrigin = default(Vector2);
 
 		private void Start()
 		{
@@ -83,178 +83,178 @@ namespace Nekki.SF2.Core.Fights.Controller
 		private void Update()
 		{
 			EaseVisualKnob();
-			if (!CANIGBPEKFA || !_flashing)
+			if (!isFlashing || !_flashing)
 			{
 				return;
 			}
-			_flashing.color = new Color(_flashing.color.r, _flashing.color.g, _flashing.color.b, (float)HCMOIDIJNMD / 255f);
-			if (MGNLBNLCDAI)
+			_flashing.color = new Color(_flashing.color.r, _flashing.color.g, _flashing.color.b, (float)opacityCounter / 255f);
+			if (isRising)
 			{
-				if (HCMOIDIJNMD < 250)
+				if (opacityCounter < 250)
 				{
-					HCMOIDIJNMD += DMEAFBMAGDH;
+					opacityCounter += flashingSpeed;
 					return;
 				}
-				MGNLBNLCDAI = false;
-				if (HCMOIDIJNMD > 250)
+				isRising = false;
+				if (opacityCounter > 250)
 				{
-					HCMOIDIJNMD = 250;
+					opacityCounter = 250;
 				}
 			}
-			else if (HCMOIDIJNMD > 0)
+			else if (opacityCounter > 0)
 			{
-				HCMOIDIJNMD -= DMEAFBMAGDH;
+				opacityCounter -= flashingSpeed;
 			}
 			else
 			{
-				MGNLBNLCDAI = true;
-				if (HCMOIDIJNMD < 0)
+				isRising = true;
+				if (opacityCounter < 0)
 				{
-					HCMOIDIJNMD = 0;
+					opacityCounter = 0;
 				}
 			}
 		}
 
 		public void Init()
 		{
-			PPGLPONABFM = AssemblyController.AMBFLNIFDHO();
-			PPGLPONABFM = 55f;
-			if (PPGLPONABFM < 0f)
+			axisSectorDegrees = AssemblyController.GetControllerPrimaryAngle();
+			axisSectorDegrees = 55f;
+			if (axisSectorDegrees < 0f)
 			{
-				PPGLPONABFM = 0f;
+				axisSectorDegrees = 0f;
 			}
-			if (PPGLPONABFM > 90f)
+			if (axisSectorDegrees > 90f)
 			{
-				PPGLPONABFM = 90f;
+				axisSectorDegrees = 90f;
 			}
-			JINLDLGFECA = 90f - PPGLPONABFM;
-			BALIBHFOIFA = PPGLPONABFM * (float)Math.PI / 180f;
-			GAGPDEDMDPI = JINLDLGFECA * (float)Math.PI / 180f;
-			IKIAEPNIPEK = Mathf.Cos(BALIBHFOIFA / 2f);
-			MJGLHIPDJCP = Mathf.Sin(BALIBHFOIFA / 2f);
-			MILNPJLOFHG = Mathf.Tan(GAGPDEDMDPI);
-			NFGCDODNFOH();
+			diagonalSectorDegrees = 90f - axisSectorDegrees;
+			axisSectorRadians = axisSectorDegrees * (float)Math.PI / 180f;
+			diagonalSectorRadians = diagonalSectorDegrees * (float)Math.PI / 180f;
+			halfAxisSectorCos = Mathf.Cos(axisSectorRadians / 2f);
+			halfAxisSectorSin = Mathf.Sin(axisSectorRadians / 2f);
+			diagonalSectorTan = Mathf.Tan(diagonalSectorRadians);
+			BuildQuadrantAngles();
 			SetJoystickRadius(_selectedTexture.rectTransform.rect.width / 2f);
-			SetStopRadius(FAFNDMLGDJI);
-			SetSafeRadius(FAFNDMLGDJI / 2f);
-			SetMovementRadius(FAFNDMLGDJI * AssemblyController.LJPECNLDCNO());
-			SetMovementRadius(FAFNDMLGDJI * 0.5f);
+			SetStopRadius(joystickRadius);
+			SetSafeRadius(joystickRadius / 2f);
+			SetMovementRadius(joystickRadius * AssemblyController.GetControllerGripRelativeRadius());
+			SetMovementRadius(joystickRadius * 0.5f);
 			_selectedTexture.gameObject.SetActive(false);
-			LHKEJOONODP(false);
+			SetPressedVisual(false);
 			if (_flashing != null)
 			{
 				_flashing.color = new Color(_flashing.color.r, _flashing.color.g, _flashing.color.b, 0f);
-				_flashing.gameObject.SetActive(CANIGBPEKFA);
+				_flashing.gameObject.SetActive(isFlashing);
 			}
 		}
 
 		public void SetSafeRadius(float value)
 		{
-			BNFDJKONDBP = value;
-			ELNNNILDIFB = BNFDJKONDBP * BNFDJKONDBP;
+			safeRadius = value;
+			safeRadiusSquared = safeRadius * safeRadius;
 		}
 
 		public float GetSafeRadius()
 		{
-			return BNFDJKONDBP;
+			return safeRadius;
 		}
 
 		public void SetMovementRadius(float value)
 		{
-			EJBALDKCFBB = value;
-			HBHNJPMNMIM = EJBALDKCFBB * EJBALDKCFBB;
+			movementRadius = value;
+			movementRadiusSquared = movementRadius * movementRadius;
 		}
 
 		public float GetMovementRadius()
 		{
-			return EJBALDKCFBB;
+			return movementRadius;
 		}
 
 		public void SetStopRadius(float value)
 		{
-			OMMKBOAPGDP = value;
+			stopRadius = value;
 		}
 
 		public float GetStopRadius()
 		{
-			return OMMKBOAPGDP;
+			return stopRadius;
 		}
 
 		public void SetJoystickRadius(float value)
 		{
-			FAFNDMLGDJI = value;
-			FKBJMDLAOMM = FAFNDMLGDJI * FAFNDMLGDJI;
+			joystickRadius = value;
+			joystickRadiusSquared = joystickRadius * joystickRadius;
 		}
 
 		public float GetJoystickRadius()
 		{
-			return FAFNDMLGDJI;
+			return joystickRadius;
 		}
 
 		public bool GetIsFlashing()
 		{
-			return CANIGBPEKFA;
+			return isFlashing;
 		}
 
 		public void SetIsFlashing(bool value)
 		{
-			if (CANIGBPEKFA != value)
+			if (isFlashing != value)
 			{
-				CANIGBPEKFA = value;
+				isFlashing = value;
 				if ((bool)_flashing)
 				{
 					_flashing.gameObject.SetActive(value);
 				}
-				HCMOIDIJNMD = 0;
-				MGNLBNLCDAI = true;
+				opacityCounter = 0;
+				isRising = true;
 			}
 		}
 
 		public bool GetIsRising()
 		{
-			return MGNLBNLCDAI;
+			return isRising;
 		}
 
 		public void SetIsRising(bool value)
 		{
-			MGNLBNLCDAI = value;
+			isRising = value;
 		}
 
 		public int GetOpacityCounter()
 		{
-			return HCMOIDIJNMD;
+			return opacityCounter;
 		}
 
 		public void SetOpacityCounter(int value)
 		{
-			HCMOIDIJNMD = value;
+			opacityCounter = value;
 		}
 
 		public int GetFlashingSpeed()
 		{
-			return DMEAFBMAGDH;
+			return flashingSpeed;
 		}
 
 		public void SetFlashingSpeed(int value)
 		{
-			DMEAFBMAGDH = value;
+			flashingSpeed = value;
 		}
 
 		public List<global::Pair<float, float>> GetQuadrantsAngles()
 		{
-			return LGNJNBJEAJE;
+			return quadrantAngles;
 		}
 
-		private float EDFBJIILGJB(Vector2 NAAPALOFBCI)
+		private float GetSquaredMagnitude(Vector2 NAAPALOFBCI)
 		{
 			return NAAPALOFBCI.x * NAAPALOFBCI.x + NAAPALOFBCI.y * NAAPALOFBCI.y;
 		}
 
 		public void TT()
 		{
-			if (COFEJAHLFBF != FightCID.QuadrantZero)
+			if (currentDirection != FightCID.QuadrantZero)
 			{
-				FCKDDEIIPEN(GDMCBGPPGJM.OnStickChange, COFEJAHLFBF);
+				DispatchStickEvent(StickEventType.OnStickChange, currentDirection);
 			}
 		}
 
@@ -274,9 +274,9 @@ namespace Nekki.SF2.Core.Fights.Controller
                 // Coming from rest, the knob leaves the centre rather than a stale touch position.
                 if (!visualKnobEasing && !_selectedController.gameObject.activeSelf)
                     _selectedController.transform.localPosition = Vector3.zero;
-                LHKEJOONODP(true);
+                SetPressedVisual(true);
                 float angle = (int)visualDirection * Mathf.PI / 4f - Mathf.PI / 4f;
-                visualKnobTarget = new Vector3(Mathf.Sin(angle), Mathf.Cos(angle), 0) * OMMKBOAPGDP;
+                visualKnobTarget = new Vector3(Mathf.Sin(angle), Mathf.Cos(angle), 0) * stopRadius;
             }
             else visualKnobTarget = Vector3.zero;
             visualKnobEasing = true;
@@ -301,7 +301,7 @@ namespace Nekki.SF2.Core.Fights.Controller
             if (visualDirection == FightCID.QuadrantZero)
             {
                 knob.localPosition = Vector3.zero;
-                LHKEJOONODP(false);
+                SetPressedVisual(false);
             }
         }
 
@@ -309,23 +309,23 @@ namespace Nekki.SF2.Core.Fights.Controller
 		{
 			Vector2 localPoint;
 			RectTransformUtility.ScreenPointToLocalPointInRectangle(GetComponent<RectTransform>(), BHOLFGOGPCP.position, BHOLFGOGPCP.pressEventCamera, out localPoint);
-			float num = EDFBJIILGJB(localPoint);
+			float num = GetSquaredMagnitude(localPoint);
 			float accept = 1f + 2f * Eclipse.UI.BattleTouchControls.TouchLeniency;
-			if (num <= FKBJMDLAOMM * accept * accept)
+			if (num <= joystickRadiusSquared * accept * accept)
 			{
 				touching = true;
 				visualDirection = FightCID.QuadrantZero;
-				if (num <= HBHNJPMNMIM)
+				if (num <= movementRadiusSquared)
 				{
-					JMKEKMFHKBG = true;
-					PPBJCHEEOFB = localPoint;
-					COFEJAHLFBF = FightCID.QuadrantZero;
-					KAEKFLCGIOG(default(Vector2));
+					isRelativeTouch = true;
+					touchOrigin = localPoint;
+					currentDirection = FightCID.QuadrantZero;
+					SetKnobPosition(default(Vector2));
 				}
 				else
 				{
-					COFEJAHLFBF = GLPAFFMMHKC(localPoint);
-					KAEKFLCGIOG(localPoint);
+					currentDirection = GetDirectionForPoint(localPoint);
+					SetKnobPosition(localPoint);
 				}
 				_normalTexture.gameObject.SetActive(false);
 				_selectedTexture.gameObject.SetActive(true);
@@ -333,8 +333,8 @@ namespace Nekki.SF2.Core.Fights.Controller
 				{
 					_flashing.gameObject.SetActive(false);
 				}
-				LHKEJOONODP(true);
-				FCKDDEIIPEN(GDMCBGPPGJM.OnStickBegan, COFEJAHLFBF);
+				SetPressedVisual(true);
+				DispatchStickEvent(StickEventType.OnStickBegan, currentDirection);
 			}
 		}
 
@@ -342,46 +342,46 @@ namespace Nekki.SF2.Core.Fights.Controller
 		{
 			Vector2 localPoint;
 			RectTransformUtility.ScreenPointToLocalPointInRectangle(GetComponent<RectTransform>(), BHOLFGOGPCP.position, BHOLFGOGPCP.pressEventCamera, out localPoint);
-			if (JMKEKMFHKBG)
+			if (isRelativeTouch)
 			{
-				localPoint.x -= PPBJCHEEOFB.x;
-				localPoint.y -= PPBJCHEEOFB.y;
+				localPoint.x -= touchOrigin.x;
+				localPoint.y -= touchOrigin.y;
 			}
-			KAEKFLCGIOG(localPoint);
-			FightCID eCHINOPKGGI = GLPAFFMMHKC(localPoint);
-			if (COFEJAHLFBF != eCHINOPKGGI)
+			SetKnobPosition(localPoint);
+			FightCID eCHINOPKGGI = GetDirectionForPoint(localPoint);
+			if (currentDirection != eCHINOPKGGI)
 			{
-				FCKDDEIIPEN(GDMCBGPPGJM.OnStickEnd, COFEJAHLFBF);
+				DispatchStickEvent(StickEventType.OnStickEnd, currentDirection);
 			}
-			COFEJAHLFBF = eCHINOPKGGI;
-			FCKDDEIIPEN(GDMCBGPPGJM.OnStickChange, COFEJAHLFBF);
+			currentDirection = eCHINOPKGGI;
+			DispatchStickEvent(StickEventType.OnStickChange, currentDirection);
 		}
 
 		public void OnPointerUp(PointerEventData BHOLFGOGPCP)
 		{
 			touching = false;
-			JMKEKMFHKBG = false;
-			LHKEJOONODP(false);
+			isRelativeTouch = false;
+			SetPressedVisual(false);
 			if ((bool)_flashing)
 			{
-				_flashing.gameObject.SetActive(CANIGBPEKFA);
+				_flashing.gameObject.SetActive(isFlashing);
 			}
-			FCKDDEIIPEN(GDMCBGPPGJM.OnStickEnd, COFEJAHLFBF);
-			COFEJAHLFBF = FightCID.QuadrantZero;
+			DispatchStickEvent(StickEventType.OnStickEnd, currentDirection);
+			currentDirection = FightCID.QuadrantZero;
 		}
 
-		private void KAEKFLCGIOG(Vector2 DGEJJGMMODA)
+		private void SetKnobPosition(Vector2 DGEJJGMMODA)
 		{
-			DGEJJGMMODA = Vector2.ClampMagnitude(DGEJJGMMODA, OMMKBOAPGDP);
+			DGEJJGMMODA = Vector2.ClampMagnitude(DGEJJGMMODA, stopRadius);
 			_selectedController.transform.localPosition = DGEJJGMMODA;
 		}
 
-		private FightCID GLPAFFMMHKC(Vector2 NAAPALOFBCI)
+		private FightCID GetDirectionForPoint(Vector2 NAAPALOFBCI)
 		{
 			FightCID eCHINOPKGGI = FightCID.QuadrantZero;
-			float num = NAAPALOFBCI.x * IKIAEPNIPEK + NAAPALOFBCI.y * MJGLHIPDJCP;
-			float num2 = NAAPALOFBCI.y * IKIAEPNIPEK - NAAPALOFBCI.x * MJGLHIPDJCP;
-			if (EDFBJIILGJB(NAAPALOFBCI) < ELNNNILDIFB)
+			float num = NAAPALOFBCI.x * halfAxisSectorCos + NAAPALOFBCI.y * halfAxisSectorSin;
+			float num2 = NAAPALOFBCI.y * halfAxisSectorCos - NAAPALOFBCI.x * halfAxisSectorSin;
+			if (GetSquaredMagnitude(NAAPALOFBCI) < safeRadiusSquared)
 			{
 				return FightCID.QuadrantZero;
 			}
@@ -414,9 +414,9 @@ namespace Nekki.SF2.Core.Fights.Controller
 				num4 = Mathf.Abs(num);
 			}
 			bool flag3 = false;
-			if (JINLDLGFECA != 90f)
+			if (diagonalSectorDegrees != 90f)
 			{
-				float num5 = num3 * MILNPJLOFHG;
+				float num5 = num3 * diagonalSectorTan;
 				if (num4 <= num5)
 				{
 					flag3 = true;
@@ -441,7 +441,7 @@ namespace Nekki.SF2.Core.Fights.Controller
 			}
 		}
 
-		private void LHKEJOONODP(bool NMFDJAMAOHN)
+		private void SetPressedVisual(bool NMFDJAMAOHN)
 		{
 			_normalController.gameObject.SetActive(!NMFDJAMAOHN);
 			_selectedController.gameObject.SetActive(NMFDJAMAOHN);
@@ -449,18 +449,18 @@ namespace Nekki.SF2.Core.Fights.Controller
 			_selectedTexture.gameObject.SetActive(NMFDJAMAOHN);
 		}
 
-		private void FCKDDEIIPEN(GDMCBGPPGJM DOPHKKGNAEF, FightCID KJPGKHJNOMC)
+		private void DispatchStickEvent(StickEventType DOPHKKGNAEF, FightCID KJPGKHJNOMC)
 		{
-			CBBEIGACPPD cBBEIGACPPD = new CBBEIGACPPD();
+			FightControlEventData cBBEIGACPPD = new FightControlEventData();
 			cBBEIGACPPD.Index = 0;
-			cBBEIGACPPD.KMOPCKPBHIA = KJPGKHJNOMC;
+			cBBEIGACPPD.Control = KJPGKHJNOMC;
 			CallEvent((int)DOPHKKGNAEF, cBBEIGACPPD);
 		}
 
-		private void NFGCDODNFOH()
+		private void BuildQuadrantAngles()
 		{
-			float num = BALIBHFOIFA / 2f + GAGPDEDMDPI + BALIBHFOIFA;
-			LGNJNBJEAJE.Clear();
+			float num = axisSectorRadians / 2f + diagonalSectorRadians + axisSectorRadians;
+			quadrantAngles.Clear();
 			for (int i = 0; i < 8; i++)
 			{
 				float num2;
@@ -470,12 +470,12 @@ namespace Nekki.SF2.Core.Fights.Controller
 				}
 				else
 				{
-					global::Pair<float, float> cCKLNOPEKHO = LGNJNBJEAJE[i - 1];
+					global::Pair<float, float> cCKLNOPEKHO = quadrantAngles[i - 1];
 					num2 = cCKLNOPEKHO.Second;
 				}
-				float pOFHDGJAFMP = ((i % 2 != 0) ? (num2 + BALIBHFOIFA) : (num2 + GAGPDEDMDPI));
+				float pOFHDGJAFMP = ((i % 2 != 0) ? (num2 + axisSectorRadians) : (num2 + diagonalSectorRadians));
 				global::Pair<float, float> item = new global::Pair<float, float>(num2, pOFHDGJAFMP);
-				LGNJNBJEAJE.Add(item);
+				quadrantAngles.Add(item);
 			}
 		}
 	}

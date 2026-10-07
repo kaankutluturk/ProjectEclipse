@@ -5,41 +5,41 @@ public class ViewerModel
 {
 	private GameObject _UnityObject;
 
-	private List<ModelObject> INNLAFHKJNI = new List<ModelObject>();
+	private List<ModelObject> models = new List<ModelObject>();
 
-	private ModelObject PHJPLPPEPJN;
+	private ModelObject firstFighter;
 
-	private ModelObject JMHBCFGBHIP;
+	private ModelObject secondFighter;
 
-	public GameObject ICDCIANNAAI
+	public GameObject RootObject
 	{
 		get
 		{
-			return MJNPBMOAFML();
+			return GetRootObject();
 		}
 	}
 
-	public ModelObject EEHFCJHOHNH
+	public ModelObject FirstFighter
 	{
 		get
 		{
-			return KBMBCHDBMML();
+			return GetFirstFighter();
 		}
 	}
 
-	public ModelObject IDIFJAHBLIG
+	public ModelObject SecondFighter
 	{
 		get
 		{
-			return BNGBCPKIHPD();
+			return GetSecondFighter();
 		}
 	}
 
-	public float DHOHNCJMOBB
+	public float FighterDistance
 	{
 		get
 		{
-			return LGGKNLPOCIH();
+			return GetFighterDistance();
 		}
 	}
 
@@ -48,26 +48,26 @@ public class ViewerModel
 		_UnityObject = new GameObject("ViewerModel");
 	}
 
-	public GameObject MJNPBMOAFML()
+	public GameObject GetRootObject()
 	{
 		return _UnityObject;
 	}
 
-	public ModelObject KBMBCHDBMML()
+	public ModelObject GetFirstFighter()
 	{
-		return PHJPLPPEPJN;
+		return firstFighter;
 	}
 
-	public ModelObject BNGBCPKIHPD()
+	public ModelObject GetSecondFighter()
 	{
-		return JMHBCFGBHIP;
+		return secondFighter;
 	}
 
 	public void Clear()
 	{
-		PHJPLPPEPJN = null;
-		JMHBCFGBHIP = null;
-		INNLAFHKJNI.Clear();
+		firstFighter = null;
+		secondFighter = null;
+		models.Clear();
 	}
 
 	public void Init(float GBNPHCHGKDO)
@@ -78,56 +78,56 @@ public class ViewerModel
 	{
 		if (IGGHECALMMP)
 		{
-			if (PHJPLPPEPJN == null)
+			if (firstFighter == null)
 			{
-				PHJPLPPEPJN = ACENLMONNPA;
+				firstFighter = ACENLMONNPA;
 			}
 			else
 			{
-				JMHBCFGBHIP = ACENLMONNPA;
+				secondFighter = ACENLMONNPA;
 			}
 		}
-		ACENLMONNPA.GetModel().MJNPBMOAFML().transform.SetParent(_UnityObject.transform, false);
+		ACENLMONNPA.GetModel().GetGameObject().transform.SetParent(_UnityObject.transform, false);
 		ACENLMONNPA.GetModel().set_color(color);
-		INNLAFHKJNI.Add(ACENLMONNPA);
+		models.Add(ACENLMONNPA);
 		return 0;
 	}
 
 	public void RemoveModel(int index)
 	{
-		ModelObject oIEODIEHJMH = INNLAFHKJNI[index];
-		if (oIEODIEHJMH == PHJPLPPEPJN)
+		ModelObject oIEODIEHJMH = models[index];
+		if (oIEODIEHJMH == firstFighter)
 		{
-			PHJPLPPEPJN = null;
+			firstFighter = null;
 		}
-		else if (oIEODIEHJMH == JMHBCFGBHIP)
+		else if (oIEODIEHJMH == secondFighter)
 		{
-			JMHBCFGBHIP = null;
+			secondFighter = null;
 		}
-		INNLAFHKJNI.RemoveAt(index);
+		models.RemoveAt(index);
 	}
 
     internal bool ReplaceModel(int index, ModelObject expected, ModelObject replacement, Color color)
     {
-        if (expected == null || replacement == null || index < 0 || index >= INNLAFHKJNI.Count ||
-            INNLAFHKJNI[index] != expected || INNLAFHKJNI.Contains(replacement)) return false;
+        if (expected == null || replacement == null || index < 0 || index >= models.Count ||
+            models[index] != expected || models.Contains(replacement)) return false;
         // Prepare render parenting before changing either primary fighter reference.
-        replacement.GetModel().MJNPBMOAFML().transform.SetParent(_UnityObject.transform, false);
+        replacement.GetModel().GetGameObject().transform.SetParent(_UnityObject.transform, false);
         replacement.GetModel().set_color(color);
-        INNLAFHKJNI[index] = replacement;
-        if (PHJPLPPEPJN == expected) PHJPLPPEPJN = replacement;
-        if (JMHBCFGBHIP == expected) JMHBCFGBHIP = replacement;
+        models[index] = replacement;
+        if (firstFighter == expected) firstFighter = replacement;
+        if (secondFighter == expected) secondFighter = replacement;
         return true;
     }
 
-	public void NGPIALAGGBI(ModelObject ACENLMONNPA, bool value)
+	public void SetModelActive(ModelObject ACENLMONNPA, bool value)
 	{
-		foreach (ModelObject item in INNLAFHKJNI)
+		foreach (ModelObject item in models)
 		{
 			if (item == ACENLMONNPA)
 			{
 				// Rollback remembers the previous state, so an undone vanish is shown again.
-				Eclipse.Multiplayer.Rollback.RollbackObjects.SetActive(item.GetModel().MJNPBMOAFML(), value);
+				Eclipse.Multiplayer.Rollback.RollbackObjects.SetActive(item.GetModel().GetGameObject(), value);
 				break;
 			}
 		}
@@ -136,17 +136,17 @@ public class ViewerModel
 	// Distance between the two fighters' interpolated pivots, for presentation.
 	public float InterpolatedFighterDistance()
 	{
-		Model first = PHJPLPPEPJN != null ? PHJPLPPEPJN.GetModel() : null;
-		Model second = JMHBCFGBHIP != null ? JMHBCFGBHIP.GetModel() : null;
-		if (first == null || second == null) return LGGKNLPOCIH();
-		return Vector2f.JOIHAKCICMP(first.InterpolatedPivot(), second.InterpolatedPivot());
+		Model first = firstFighter != null ? firstFighter.GetModel() : null;
+		Model second = secondFighter != null ? secondFighter.GetModel() : null;
+		if (first == null || second == null) return GetFighterDistance();
+		return Vector2f.Distance2D(first.InterpolatedPivot(), second.InterpolatedPivot());
 	}
 
-	public float LGGKNLPOCIH()
+	public float GetFighterDistance()
 	{
-		if (PHJPLPPEPJN != null && JMHBCFGBHIP != null)
+		if (firstFighter != null && secondFighter != null)
 		{
-			return Vector2f.JOIHAKCICMP(PHJPLPPEPJN.PLBNCDCFPML(), JMHBCFGBHIP.PLBNCDCFPML());
+			return Vector2f.Distance2D(firstFighter.GetCenterOfMassPosition(), secondFighter.GetCenterOfMassPosition());
 		}
 		return 0f;
 	}

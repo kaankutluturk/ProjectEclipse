@@ -4,13 +4,13 @@ namespace Nekki.SF2.GUI.Profile
 {
 	public class RightInfoSprite : SFMonoBehaviour<object>
 	{
-		private const int MCOMHPPHDAP = 83;
+		private const int NO_CONTENT_FONT_SIZE = 83;
 
-		private const int MAHAMJNNEKI = 104;
+		private const int DEFAULT_HEADER_FONT_SIZE = 104;
 
-		private const int NJMAJKNEBLG = 8;
+		private const int HEADER_X = 8;
 
-		private const float ANLKFGPDBIM = 150f;
+		private const float HEADER_TOP_OFFSET = 150f;
 
 		[SerializeField]
 		private LabelAlias _header;
@@ -27,26 +27,26 @@ namespace Nekki.SF2.GUI.Profile
 		[SerializeField]
 		private AchievementContent _achievContent;
 
-		private int HJBOBDMDHNC;
+		private int headerFontSize;
 
 		public void Init()
 		{
-			IJAAMJCPNBI();
+			InitLabels();
 		}
 
-		public void SetPerkInfo(KAHIFHMHDAF BPANICNCIAO)
+		public void SetPerkInfo(PerkContentData BPANICNCIAO)
 		{
 			_perkContent.gameObject.SetActive(true);
 			_trickContent.gameObject.SetActive(false);
 			_achievContent.gameObject.SetActive(false);
-			_perkContent.Init(BPANICNCIAO.EMDJGBHIAIA, BPANICNCIAO.state, BPANICNCIAO.ODDEOFKLIAG, BPANICNCIAO.HCBDNEOKGNK, BPANICNCIAO.JMLAKAKDBBL);
+			_perkContent.Init(BPANICNCIAO.description, BPANICNCIAO.state, BPANICNCIAO.Callback, BPANICNCIAO.Animation, BPANICNCIAO.LabelWidth);
 			if (_perkContent.HeaderFontSize > 0)
 			{
-				HJBOBDMDHNC = _perkContent.HeaderFontSize;
+				headerFontSize = _perkContent.HeaderFontSize;
 			}
 			else
 			{
-				HJBOBDMDHNC = 104;
+				headerFontSize = 104;
 			}
 			_noContentMessage.gameObject.SetActive(false);
 			SetLabel(BPANICNCIAO.name);
@@ -59,17 +59,17 @@ namespace Nekki.SF2.GUI.Profile
 			_perkContent.gameObject.SetActive(false);
 			_trickContent.gameObject.SetActive(true);
 			_achievContent.gameObject.SetActive(false);
-			_trickContent.Init(ACNOAOIBCBM.EMBBNNBFODN, ACNOAOIBCBM.CKKFKEIELCP, ACNOAOIBCBM.ODDEOFKLIAG, ACNOAOIBCBM.EMDJGBHIAIA);
+			_trickContent.Init(ACNOAOIBCBM.Animation, ACNOAOIBCBM.AttackDamages, ACNOAOIBCBM.OnClickCallback, ACNOAOIBCBM.Description);
 			if (_perkContent.HeaderFontSize > 0)
 			{
-				HJBOBDMDHNC = _perkContent.HeaderFontSize;
+				headerFontSize = _perkContent.HeaderFontSize;
 			}
 			else
 			{
-				HJBOBDMDHNC = 104;
+				headerFontSize = 104;
 			}
 			_noContentMessage.gameObject.SetActive(false);
-			SetLabel(ACNOAOIBCBM.HHAAFADDOJB);
+			SetLabel(ACNOAOIBCBM.Title);
 			float upBorder = _header.transform.localPosition.y - _header.rectTransform.rect.height / 2f;
 			_trickContent.SetUpBorder(upBorder);
 		}
@@ -79,17 +79,17 @@ namespace Nekki.SF2.GUI.Profile
 			_perkContent.gameObject.SetActive(false);
 			_trickContent.gameObject.SetActive(false);
 			_achievContent.gameObject.SetActive(true);
-			_achievContent.Init(BBOFGPLPEPB.MJBLCNPNOBC, BBOFGPLPEPB.GBGNFPNCGED, BBOFGPLPEPB.PNDAIFALIKF, BBOFGPLPEPB.ODDEOFKLIAG, BBOFGPLPEPB.DJGOCCEOAKD, BBOFGPLPEPB.NNEHNDILGDP);
+			_achievContent.Init(BBOFGPLPEPB.Description, BBOFGPLPEPB.MoneyPrize, BBOFGPLPEPB.BonusPrize, BBOFGPLPEPB.OnTakeReward, BBOFGPLPEPB.CanTakeReward, BBOFGPLPEPB.IsCompleted);
 			if (_achievContent.HeaderFontSize > 0)
 			{
-				HJBOBDMDHNC = _achievContent.HeaderFontSize;
+				headerFontSize = _achievContent.HeaderFontSize;
 			}
 			else
 			{
-				HJBOBDMDHNC = 104;
+				headerFontSize = 104;
 			}
 			_noContentMessage.gameObject.SetActive(false);
-			SetLabel(BBOFGPLPEPB.HHAAFADDOJB);
+			SetLabel(BBOFGPLPEPB.Title);
 			float upBorder = _header.transform.localPosition.y - _header.rectTransform.rect.height / 2f;
 			_trickContent.SetUpBorder(upBorder);
 		}
@@ -99,14 +99,14 @@ namespace Nekki.SF2.GUI.Profile
 			_perkContent.gameObject.SetActive(false);
 			_trickContent.gameObject.SetActive(false);
 			_achievContent.gameObject.SetActive(true);
-			_achievContent.Init(PJDAGCBPLJE.GGDJIPKMKFC);
+			_achievContent.Init(PJDAGCBPLJE.DescriptionAlias);
 			if (_achievContent.HeaderFontSize > 0)
 			{
-				HJBOBDMDHNC = _achievContent.HeaderFontSize;
+				headerFontSize = _achievContent.HeaderFontSize;
 			}
 			else
 			{
-				HJBOBDMDHNC = 104;
+				headerFontSize = 104;
 			}
 			_noContentMessage.gameObject.SetActive(false);
 			SetLabel(PJDAGCBPLJE.Name);
@@ -116,7 +116,7 @@ namespace Nekki.SF2.GUI.Profile
 
 		public void SetLabel(string HHAAFADDOJB)
 		{
-			_header.set_LabelFontSize(HJBOBDMDHNC);
+			_header.set_LabelFontSize(headerFontSize);
 			_header.set_Alias(HHAAFADDOJB);
 		}
 
@@ -157,20 +157,20 @@ namespace Nekki.SF2.GUI.Profile
 			return null;
 		}
 
-		private void IJAAMJCPNBI()
+		private void InitLabels()
 		{
 			_header.set_text(string.Empty);
-			_header.set_LabelFontSize(HJBOBDMDHNC);
-			_header.transform.OKHPLHPBPKJ(8f);
-			_header.transform.BGNJGIACJBG(GetComponent<RectTransform>().rect.height / 2f - 150f);
+			_header.set_LabelFontSize(headerFontSize);
+			_header.transform.SetLocalX(8f);
+			_header.transform.SetLocalY(GetComponent<RectTransform>().rect.height / 2f - 150f);
 			_header.rectTransform.sizeDelta = new Vector2(GetLabelWidth(), _header.rectTransform.rect.height);
-			_header.color = Constants.PJJIMHMJPAL;
+			_header.color = Constants.DialogTextColor;
 			_noContentMessage.set_text(string.Empty);
 			_noContentMessage.rectTransform.sizeDelta = new Vector2(GetLabelWidth(), _noContentMessage.rectTransform.rect.height);
 			_noContentMessage.set_LabelFontSize(83);
-			_noContentMessage.transform.OKHPLHPBPKJ(8f);
-			_noContentMessage.transform.BGNJGIACJBG(0f);
-			_noContentMessage.color = Constants.PJJIMHMJPAL;
+			_noContentMessage.transform.SetLocalX(8f);
+			_noContentMessage.transform.SetLocalY(0f);
+			_noContentMessage.color = Constants.DialogTextColor;
 		}
 	}
 }

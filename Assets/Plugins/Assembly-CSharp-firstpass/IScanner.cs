@@ -7,5 +7,5 @@ public interface IScanner
 
 	Token Current { get; }
 
-	bool PCCMLADDNDG();
+	bool MoveNext();
 }

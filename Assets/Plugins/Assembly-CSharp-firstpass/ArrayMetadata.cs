@@ -4,15 +4,15 @@ internal struct ArrayMetadata
 {
 	private Type element_type;
 
-	private bool IGDHCIAPEIP;
+	private bool isArray;
 
-	private bool NLDEAEEJNHE;
+	private bool isList;
 
-	public Type FIFGGAOMEEB
+	public Type ArrayElementType
 	{
 		get
 		{
-			return LPINKHOCABG();
+			return GetElementType();
 		}
 		set
 		{
@@ -20,31 +20,31 @@ internal struct ArrayMetadata
 		}
 	}
 
-	public bool MENGHLDLPDP
+	public bool IsArray
 	{
 		get
 		{
-			return NKLOBJNAFOL();
+			return GetIsArray();
 		}
 		set
 		{
-			GDKDBPFDCIJ(value);
+			SetIsArray(value);
 		}
 	}
 
-	public bool DLMLICFOLPO
+	public bool IsList
 	{
 		get
 		{
-			return FOIBIKPNLJD();
+			return GetIsList();
 		}
 		set
 		{
-			ICHOKOLOLKC(value);
+			SetIsList(value);
 		}
 	}
 
-	public Type LPINKHOCABG()
+	public Type GetElementType()
 	{
 		if (element_type == null)
 		{
@@ -58,23 +58,23 @@ internal struct ArrayMetadata
 		element_type = value;
 	}
 
-	public bool NKLOBJNAFOL()
+	public bool GetIsArray()
 	{
-		return IGDHCIAPEIP;
+		return isArray;
 	}
 
-	public void GDKDBPFDCIJ(bool value)
+	public void SetIsArray(bool value)
 	{
-		IGDHCIAPEIP = value;
+		isArray = value;
 	}
 
-	public bool FOIBIKPNLJD()
+	public bool GetIsList()
 	{
-		return NLDEAEEJNHE;
+		return isList;
 	}
 
-	public void ICHOKOLOLKC(bool value)
+	public void SetIsList(bool value)
 	{
-		NLDEAEEJNHE = value;
+		isList = value;
 	}
 }

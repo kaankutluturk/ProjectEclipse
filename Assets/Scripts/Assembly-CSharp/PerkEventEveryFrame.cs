@@ -6,13 +6,13 @@ using System.Xml;
 public class PerkEventEveryFrame : PerkEvent
 {
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private int PLFANBCJCLN;
+	private int _step;
 
-	public int COEJGMIFLGD
+	public int StepFrames
 	{
 		get
 		{
-			return ONPHCNLGPBE();
+			return GetStep();
 		}
 		protected set
 		{
@@ -27,17 +27,17 @@ public class PerkEventEveryFrame : PerkEvent
 	public PerkEventEveryFrame(PerkEventEveryFrame NOLFMPDGCOC)
 		: base(NOLFMPDGCOC)
 	{
-		set_Step(NOLFMPDGCOC.ONPHCNLGPBE());
+		set_Step(NOLFMPDGCOC.GetStep());
 	}
 
-	public int ONPHCNLGPBE()
+	public int GetStep()
 	{
-		return PLFANBCJCLN;
+		return _step;
 	}
 
 	protected void set_Step(int value)
 	{
-		PLFANBCJCLN = value;
+		_step = value;
 	}
 
 	public override void Parse(XmlNode node)
@@ -52,7 +52,7 @@ public class PerkEventEveryFrame : PerkEvent
 		{
 			return false;
 		}
-		if (ONPHCNLGPBE() != 0)
+		if (GetStep() != 0)
 		{
 			Dictionary<string, object> dictionary = (Dictionary<string, object>)EJMEALJNNIL.Info;
 			if (dictionary != null)
@@ -62,7 +62,7 @@ public class PerkEventEveryFrame : PerkEvent
 				{
 					num = Convert.ToInt64(dictionary["StepFrame"]);
 				}
-				return 0 == num % ONPHCNLGPBE();
+				return 0 == num % GetStep();
 			}
 		}
 		return true;

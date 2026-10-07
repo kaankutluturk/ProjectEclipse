@@ -10,64 +10,64 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 	public struct ObscuredDecimal : IEquatable<ObscuredDecimal>, IFormattable
 	{
 		[StructLayout(LayoutKind.Explicit)]
-		private struct FFMMPKOPPGG
+		private struct DecimalLongBytesUnion
 		{
 			[FieldOffset(0)]
 			public decimal d;
 
 			[FieldOffset(0)]
-			public long FGFLFAHLOEI;
+			public long l1;
 
 			[FieldOffset(8)]
-			public long KNGJOHMHNDF;
+			public long l2;
 
 			[FieldOffset(0)]
-			public byte NMAJNHKJJEM;
+			public byte b1;
 
 			[FieldOffset(1)]
-			public byte ONNJMGGPHEL;
+			public byte b2;
 
 			[FieldOffset(2)]
-			public byte NFOJBJJOOPO;
+			public byte b3;
 
 			[FieldOffset(3)]
-			public byte PLCIDFPMNPL;
+			public byte b4;
 
 			[FieldOffset(4)]
-			public byte PLIKJEOPJOB;
+			public byte b5;
 
 			[FieldOffset(5)]
-			public byte AGPBOFNNOKO;
+			public byte b6;
 
 			[FieldOffset(6)]
-			public byte LDPKGJADPMI;
+			public byte b7;
 
 			[FieldOffset(7)]
-			public byte PHHFMLPDCBO;
+			public byte b8;
 
 			[FieldOffset(8)]
-			public byte CGOBDKHAHIH;
+			public byte b9;
 
 			[FieldOffset(9)]
-			public byte KCHIHIPLDEG;
+			public byte b10;
 
 			[FieldOffset(10)]
-			public byte BNGHKEOHKCA;
+			public byte b11;
 
 			[FieldOffset(11)]
-			public byte IIJELFHMGHA;
+			public byte b12;
 
 			[FieldOffset(12)]
-			public byte BHDLOJBBIEK;
+			public byte b13;
 
 			[FieldOffset(13)]
-			public byte EMNECOBJKIE;
+			public byte b14;
 
 			[FieldOffset(14)]
-			public byte KFLLILNIJHL;
+			public byte b15;
 
 			[FieldOffset(15)]
-			public byte KCLIJDPNNGH;
+			public byte b16;
 		}
 
 		private static long cryptoKey = 209208L;
@@ -100,12 +100,12 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 
 		public static decimal Encrypt(decimal value, long KGBGENDIMBC)
 		{
-			FFMMPKOPPGG fFMMPKOPPGG = new FFMMPKOPPGG
+			DecimalLongBytesUnion fFMMPKOPPGG = new DecimalLongBytesUnion
 			{
 				d = value
 			};
-			fFMMPKOPPGG.FGFLFAHLOEI ^= KGBGENDIMBC;
-			fFMMPKOPPGG.KNGJOHMHNDF ^= KGBGENDIMBC;
+			fFMMPKOPPGG.l1 ^= KGBGENDIMBC;
+			fFMMPKOPPGG.l2 ^= KGBGENDIMBC;
 			return fFMMPKOPPGG.d;
 		}
 
@@ -121,16 +121,16 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 			{
 				num = cryptoKey;
 			}
-			FFMMPKOPPGG fFMMPKOPPGG = new FFMMPKOPPGG
+			DecimalLongBytesUnion fFMMPKOPPGG = new DecimalLongBytesUnion
 			{
 				d = value
 			};
-			fFMMPKOPPGG.FGFLFAHLOEI ^= num;
-			fFMMPKOPPGG.KNGJOHMHNDF ^= num;
+			fFMMPKOPPGG.l1 ^= num;
+			fFMMPKOPPGG.l2 ^= num;
 			return new byte[16]
 			{
-				fFMMPKOPPGG.NMAJNHKJJEM, fFMMPKOPPGG.ONNJMGGPHEL, fFMMPKOPPGG.NFOJBJJOOPO, fFMMPKOPPGG.PLCIDFPMNPL, fFMMPKOPPGG.PLIKJEOPJOB, fFMMPKOPPGG.AGPBOFNNOKO, fFMMPKOPPGG.LDPKGJADPMI, fFMMPKOPPGG.PHHFMLPDCBO, fFMMPKOPPGG.CGOBDKHAHIH, fFMMPKOPPGG.KCHIHIPLDEG,
-				fFMMPKOPPGG.BNGHKEOHKCA, fFMMPKOPPGG.IIJELFHMGHA, fFMMPKOPPGG.BHDLOJBBIEK, fFMMPKOPPGG.EMNECOBJKIE, fFMMPKOPPGG.KFLLILNIJHL, fFMMPKOPPGG.KCLIJDPNNGH
+				fFMMPKOPPGG.b1, fFMMPKOPPGG.b2, fFMMPKOPPGG.b3, fFMMPKOPPGG.b4, fFMMPKOPPGG.b5, fFMMPKOPPGG.b6, fFMMPKOPPGG.b7, fFMMPKOPPGG.b8, fFMMPKOPPGG.b9, fFMMPKOPPGG.b10,
+				fFMMPKOPPGG.b11, fFMMPKOPPGG.b12, fFMMPKOPPGG.b13, fFMMPKOPPGG.b14, fFMMPKOPPGG.b15, fFMMPKOPPGG.b16
 			};
 		}
 
@@ -141,52 +141,52 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 
 		public static decimal Decrypt(decimal value, long KGBGENDIMBC)
 		{
-			FFMMPKOPPGG fFMMPKOPPGG = new FFMMPKOPPGG
+			DecimalLongBytesUnion fFMMPKOPPGG = new DecimalLongBytesUnion
 			{
 				d = value
 			};
-			fFMMPKOPPGG.FGFLFAHLOEI ^= KGBGENDIMBC;
-			fFMMPKOPPGG.KNGJOHMHNDF ^= KGBGENDIMBC;
+			fFMMPKOPPGG.l1 ^= KGBGENDIMBC;
+			fFMMPKOPPGG.l2 ^= KGBGENDIMBC;
 			return fFMMPKOPPGG.d;
 		}
 
-		public void PKOKLDGAPEI()
+		public void ApplyNewCryptoKey()
 		{
 			if (currentCryptoKey != cryptoKey)
 			{
-				hiddenValue = InternalEncrypt(GEKBGBJOMIA(), cryptoKey);
+				hiddenValue = InternalEncrypt(InternalDecrypt(), cryptoKey);
 				currentCryptoKey = cryptoKey;
 			}
 		}
 
-		public void GMCADPGOCHM()
+		public void RandomizeCryptoKey()
 		{
-			decimal bAINMLLIKOL = GEKBGBJOMIA();
+			decimal bAINMLLIKOL = InternalDecrypt();
 			currentCryptoKey = UnityEngine.Random.Range(int.MinValue, int.MaxValue);
 			hiddenValue = InternalEncrypt(bAINMLLIKOL, currentCryptoKey);
 		}
 
-		public decimal ECEBFGCJIDA()
+		public decimal GetEncrypted()
 		{
-			PKOKLDGAPEI();
-			FFMMPKOPPGG fFMMPKOPPGG = new FFMMPKOPPGG
+			ApplyNewCryptoKey();
+			DecimalLongBytesUnion fFMMPKOPPGG = new DecimalLongBytesUnion
 			{
-				NMAJNHKJJEM = hiddenValue[0],
-				ONNJMGGPHEL = hiddenValue[1],
-				NFOJBJJOOPO = hiddenValue[2],
-				PLCIDFPMNPL = hiddenValue[3],
-				PLIKJEOPJOB = hiddenValue[4],
-				AGPBOFNNOKO = hiddenValue[5],
-				LDPKGJADPMI = hiddenValue[6],
-				PHHFMLPDCBO = hiddenValue[7],
-				CGOBDKHAHIH = hiddenValue[8],
-				KCHIHIPLDEG = hiddenValue[9],
-				BNGHKEOHKCA = hiddenValue[10],
-				IIJELFHMGHA = hiddenValue[11],
-				BHDLOJBBIEK = hiddenValue[12],
-				EMNECOBJKIE = hiddenValue[13],
-				KFLLILNIJHL = hiddenValue[14],
-				KCLIJDPNNGH = hiddenValue[15]
+				b1 = hiddenValue[0],
+				b2 = hiddenValue[1],
+				b3 = hiddenValue[2],
+				b4 = hiddenValue[3],
+				b5 = hiddenValue[4],
+				b6 = hiddenValue[5],
+				b7 = hiddenValue[6],
+				b8 = hiddenValue[7],
+				b9 = hiddenValue[8],
+				b10 = hiddenValue[9],
+				b11 = hiddenValue[10],
+				b12 = hiddenValue[11],
+				b13 = hiddenValue[12],
+				b14 = hiddenValue[13],
+				b15 = hiddenValue[14],
+				b16 = hiddenValue[15]
 			};
 			return fFMMPKOPPGG.d;
 		}
@@ -194,22 +194,22 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 		public void SetEncrypted(decimal ANGFOBEKKKD)
 		{
 			inited = true;
-			FFMMPKOPPGG fFMMPKOPPGG = new FFMMPKOPPGG
+			DecimalLongBytesUnion fFMMPKOPPGG = new DecimalLongBytesUnion
 			{
 				d = ANGFOBEKKKD
 			};
 			hiddenValue = new byte[16]
 			{
-				fFMMPKOPPGG.NMAJNHKJJEM, fFMMPKOPPGG.ONNJMGGPHEL, fFMMPKOPPGG.NFOJBJJOOPO, fFMMPKOPPGG.PLCIDFPMNPL, fFMMPKOPPGG.PLIKJEOPJOB, fFMMPKOPPGG.AGPBOFNNOKO, fFMMPKOPPGG.LDPKGJADPMI, fFMMPKOPPGG.PHHFMLPDCBO, fFMMPKOPPGG.CGOBDKHAHIH, fFMMPKOPPGG.KCHIHIPLDEG,
-				fFMMPKOPPGG.BNGHKEOHKCA, fFMMPKOPPGG.IIJELFHMGHA, fFMMPKOPPGG.BHDLOJBBIEK, fFMMPKOPPGG.EMNECOBJKIE, fFMMPKOPPGG.KFLLILNIJHL, fFMMPKOPPGG.KCLIJDPNNGH
+				fFMMPKOPPGG.b1, fFMMPKOPPGG.b2, fFMMPKOPPGG.b3, fFMMPKOPPGG.b4, fFMMPKOPPGG.b5, fFMMPKOPPGG.b6, fFMMPKOPPGG.b7, fFMMPKOPPGG.b8, fFMMPKOPPGG.b9, fFMMPKOPPGG.b10,
+				fFMMPKOPPGG.b11, fFMMPKOPPGG.b12, fFMMPKOPPGG.b13, fFMMPKOPPGG.b14, fFMMPKOPPGG.b15, fFMMPKOPPGG.b16
 			};
-			if (ObscuredCheatingDetector.NMACGEJHPDN())
+			if (ObscuredCheatingDetector.GetIsRunning())
 			{
-				fakeValue = GEKBGBJOMIA();
+				fakeValue = InternalDecrypt();
 			}
 		}
 
-		private decimal GEKBGBJOMIA()
+		private decimal InternalDecrypt()
 		{
 			if (!inited)
 			{
@@ -218,31 +218,31 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 				fakeValue = 0m;
 				inited = true;
 			}
-			FFMMPKOPPGG fFMMPKOPPGG = new FFMMPKOPPGG
+			DecimalLongBytesUnion fFMMPKOPPGG = new DecimalLongBytesUnion
 			{
-				NMAJNHKJJEM = hiddenValue[0],
-				ONNJMGGPHEL = hiddenValue[1],
-				NFOJBJJOOPO = hiddenValue[2],
-				PLCIDFPMNPL = hiddenValue[3],
-				PLIKJEOPJOB = hiddenValue[4],
-				AGPBOFNNOKO = hiddenValue[5],
-				LDPKGJADPMI = hiddenValue[6],
-				PHHFMLPDCBO = hiddenValue[7],
-				CGOBDKHAHIH = hiddenValue[8],
-				KCHIHIPLDEG = hiddenValue[9],
-				BNGHKEOHKCA = hiddenValue[10],
-				IIJELFHMGHA = hiddenValue[11],
-				BHDLOJBBIEK = hiddenValue[12],
-				EMNECOBJKIE = hiddenValue[13],
-				KFLLILNIJHL = hiddenValue[14],
-				KCLIJDPNNGH = hiddenValue[15]
+				b1 = hiddenValue[0],
+				b2 = hiddenValue[1],
+				b3 = hiddenValue[2],
+				b4 = hiddenValue[3],
+				b5 = hiddenValue[4],
+				b6 = hiddenValue[5],
+				b7 = hiddenValue[6],
+				b8 = hiddenValue[7],
+				b9 = hiddenValue[8],
+				b10 = hiddenValue[9],
+				b11 = hiddenValue[10],
+				b12 = hiddenValue[11],
+				b13 = hiddenValue[12],
+				b14 = hiddenValue[13],
+				b15 = hiddenValue[14],
+				b16 = hiddenValue[15]
 			};
-			fFMMPKOPPGG.FGFLFAHLOEI ^= currentCryptoKey;
-			fFMMPKOPPGG.KNGJOHMHNDF ^= currentCryptoKey;
+			fFMMPKOPPGG.l1 ^= currentCryptoKey;
+			fFMMPKOPPGG.l2 ^= currentCryptoKey;
 			decimal oFMGDFKHPDO = fFMMPKOPPGG.d;
-			if (ObscuredCheatingDetector.NMACGEJHPDN() && fakeValue != 0m && oFMGDFKHPDO != fakeValue)
+			if (ObscuredCheatingDetector.GetIsRunning() && fakeValue != 0m && oFMGDFKHPDO != fakeValue)
 			{
-				ObscuredCheatingDetector.get_Instance().MCDANNDOEIK();
+				ObscuredCheatingDetector.get_Instance().OnCheatingDetected();
 			}
 			return oFMGDFKHPDO;
 		}
@@ -250,7 +250,7 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 		public static implicit operator ObscuredDecimal(decimal value)
 		{
 			ObscuredDecimal result = new ObscuredDecimal(InternalEncrypt(value));
-			if (ObscuredCheatingDetector.NMACGEJHPDN())
+			if (ObscuredCheatingDetector.GetIsRunning())
 			{
 				result.fakeValue = value;
 			}
@@ -259,7 +259,7 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 
 		public static implicit operator decimal(ObscuredDecimal value)
 		{
-			return value.GEKBGBJOMIA();
+			return value.InternalDecrypt();
 		}
 
 		public static explicit operator ObscuredDecimal(ObscuredFloat f)
@@ -268,11 +268,11 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 		}
 
 		[SpecialName]
-		public static ObscuredDecimal ALEAHDHGCJL(ObscuredDecimal NILNDHEKNLJ)
+		public static ObscuredDecimal op_Increment(ObscuredDecimal NILNDHEKNLJ)
 		{
-			decimal bAINMLLIKOL = NILNDHEKNLJ.GEKBGBJOMIA() + 1m;
+			decimal bAINMLLIKOL = NILNDHEKNLJ.InternalDecrypt() + 1m;
 			NILNDHEKNLJ.hiddenValue = InternalEncrypt(bAINMLLIKOL, NILNDHEKNLJ.currentCryptoKey);
-			if (ObscuredCheatingDetector.NMACGEJHPDN())
+			if (ObscuredCheatingDetector.GetIsRunning())
 			{
 				NILNDHEKNLJ.fakeValue = bAINMLLIKOL;
 			}
@@ -280,11 +280,11 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 		}
 
 		[SpecialName]
-		public static ObscuredDecimal DDKOKLNFNPB(ObscuredDecimal NILNDHEKNLJ)
+		public static ObscuredDecimal op_Decrement(ObscuredDecimal NILNDHEKNLJ)
 		{
-			decimal bAINMLLIKOL = NILNDHEKNLJ.GEKBGBJOMIA() - 1m;
+			decimal bAINMLLIKOL = NILNDHEKNLJ.InternalDecrypt() - 1m;
 			NILNDHEKNLJ.hiddenValue = InternalEncrypt(bAINMLLIKOL, NILNDHEKNLJ.currentCryptoKey);
-			if (ObscuredCheatingDetector.NMACGEJHPDN())
+			if (ObscuredCheatingDetector.GetIsRunning())
 			{
 				NILNDHEKNLJ.fakeValue = bAINMLLIKOL;
 			}
@@ -293,22 +293,22 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 
 		public override string ToString()
 		{
-			return GEKBGBJOMIA().ToString();
+			return InternalDecrypt().ToString();
 		}
 
 		public string ToString(string LBOHOKIBHOH)
 		{
-			return GEKBGBJOMIA().ToString(LBOHOKIBHOH);
+			return InternalDecrypt().ToString(LBOHOKIBHOH);
 		}
 
 		public string ToString(IFormatProvider EEGMFLOPLLH)
 		{
-			return GEKBGBJOMIA().ToString(EEGMFLOPLLH);
+			return InternalDecrypt().ToString(EEGMFLOPLLH);
 		}
 
 		public string ToString(string LBOHOKIBHOH, IFormatProvider EEGMFLOPLLH)
 		{
-			return GEKBGBJOMIA().ToString(LBOHOKIBHOH, EEGMFLOPLLH);
+			return InternalDecrypt().ToString(LBOHOKIBHOH, EEGMFLOPLLH);
 		}
 
 		public override bool Equals(object AOMLCBHAJJH)
@@ -322,12 +322,12 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 
 		public bool Equals(ObscuredDecimal AOMLCBHAJJH)
 		{
-			return AOMLCBHAJJH.GEKBGBJOMIA().Equals(GEKBGBJOMIA());
+			return AOMLCBHAJJH.InternalDecrypt().Equals(InternalDecrypt());
 		}
 
 		public override int GetHashCode()
 		{
-			return GEKBGBJOMIA().GetHashCode();
+			return InternalDecrypt().GetHashCode();
 		}
 	}
 }

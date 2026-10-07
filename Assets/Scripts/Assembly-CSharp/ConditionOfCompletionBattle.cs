@@ -7,7 +7,7 @@ public class ConditionOfCompletionBattle : ConditionOfCompletion
 
 	public ConditionOfCompletionBattle(XmlNode node)
 	{
-		_name = node.Attributes["Name"].CIPOICEEIBK();
+		_name = node.Attributes["Name"].GetStringOrDefault();
 	}
 
 	public ConditionOfCompletionBattle(string name, int OGOLNFLBLBD)
@@ -17,23 +17,23 @@ public class ConditionOfCompletionBattle : ConditionOfCompletion
 
 	bool ConditionOfCompletion.IsComplete(FightIDS DIAIIPCBMFL)
 	{
-		if (LBCJMNPCJBN() || DIAIIPCBMFL.Equals(_name))
+		if (IsFightInRoster() || DIAIIPCBMFL.Equals(_name))
 		{
 			return true;
 		}
 		return false;
 	}
 
-	private bool LBCJMNPCJBN()
+	private bool IsFightInRoster()
 	{
-		List<RosterFight> list = ListSF.CCDKHLAMKKO().NIDBIFOJMAP();
+		List<RosterFight> list = ListSF.GetRoster().GetSavedFights();
 		bool result = false;
 		FightIDS mOCEDDJOAEB = new FightIDS();
 		mOCEDDJOAEB.SetFightIDSByString(_name);
 		for (int i = 0; i < list.Count; i++)
 		{
 			RosterFight pIGKOIFBOME = list[i];
-			if (mOCEDDJOAEB.Equals(pIGKOIFBOME.EKOIBAIIKHL()))
+			if (mOCEDDJOAEB.Equals(pIGKOIFBOME.GetFightIdString()))
 			{
 				result = true;
 			}

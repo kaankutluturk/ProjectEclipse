@@ -4,65 +4,65 @@ using System.Xml;
 public class PerkActionSetVariable : PerkAction
 {
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private FunctionExtension IELPCLONGKP;
+	private FunctionExtension _value;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private bool FOEIHFCIDNJ;
+	private bool _hasMinValue;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private FunctionExtension EBLMFFEMNCC;
+	private FunctionExtension _minValue;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private bool ECOOFPHOHMP;
+	private bool _hasMaxValue;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private FunctionExtension JMKHMGFMDJP;
+	private FunctionExtension _maxValue;
 
-	public bool LGCOMCPNMJM
+	public bool HasMinValue
 	{
 		get
 		{
-			return CPDLBMAKCEK();
+			return GetHasMinValue();
 		}
 		protected set
 		{
-			LPNGJDNOJNJ(value);
+			SetHasMinValue(value);
 		}
 	}
 
-	public FunctionExtension IMEGHKOIKLC
+	public FunctionExtension MinValue
 	{
 		get
 		{
-			return MCOHCDPJHAK();
+			return GetMinValue();
 		}
 		protected set
 		{
-			CMEPINAFLGH(value);
+			SetMinValue(value);
 		}
 	}
 
-	public bool ODEBGKLHLIF
+	public bool HasMaxValue
 	{
 		get
 		{
-			return OMLFBFOFJDD();
+			return GetHasMaxValue();
 		}
 		protected set
 		{
-			BICMECLDLIP(value);
+			SetHasMaxValue(value);
 		}
 	}
 
-	public FunctionExtension EFANAIIGEMO
+	public FunctionExtension MaxValue
 	{
 		get
 		{
-			return BHIGOIHJBDK();
+			return GetMaxValue();
 		}
 		protected set
 		{
-			ALDNPBOAANA(value);
+			SetMaxValue(value);
 		}
 	}
 
@@ -73,97 +73,97 @@ public class PerkActionSetVariable : PerkAction
 	public PerkActionSetVariable(PerkActionSetVariable NOLFMPDGCOC)
 		: base(NOLFMPDGCOC)
 	{
-		set_Value(NOLFMPDGCOC.OEAKCOHMIHH());
-		LPNGJDNOJNJ(NOLFMPDGCOC.CPDLBMAKCEK());
-		CMEPINAFLGH(NOLFMPDGCOC.MCOHCDPJHAK());
-		BICMECLDLIP(NOLFMPDGCOC.OMLFBFOFJDD());
-		ALDNPBOAANA(NOLFMPDGCOC.BHIGOIHJBDK());
+		set_Value(NOLFMPDGCOC.GetValue());
+		SetHasMinValue(NOLFMPDGCOC.GetHasMinValue());
+		SetMinValue(NOLFMPDGCOC.GetMinValue());
+		SetHasMaxValue(NOLFMPDGCOC.GetHasMaxValue());
+		SetMaxValue(NOLFMPDGCOC.GetMaxValue());
 	}
 
-	public FunctionExtension OEAKCOHMIHH()
+	public FunctionExtension GetValue()
 	{
-		return IELPCLONGKP;
+		return _value;
 	}
 
 	protected void set_Value(FunctionExtension value)
 	{
-		IELPCLONGKP = value;
+		_value = value;
 	}
 
-	public bool CPDLBMAKCEK()
+	public bool GetHasMinValue()
 	{
-		return FOEIHFCIDNJ;
+		return _hasMinValue;
 	}
 
-	protected void LPNGJDNOJNJ(bool value)
+	protected void SetHasMinValue(bool value)
 	{
-		FOEIHFCIDNJ = value;
+		_hasMinValue = value;
 	}
 
-	public FunctionExtension MCOHCDPJHAK()
+	public FunctionExtension GetMinValue()
 	{
-		return EBLMFFEMNCC;
+		return _minValue;
 	}
 
-	protected void CMEPINAFLGH(FunctionExtension value)
+	protected void SetMinValue(FunctionExtension value)
 	{
-		EBLMFFEMNCC = value;
+		_minValue = value;
 	}
 
-	public bool OMLFBFOFJDD()
+	public bool GetHasMaxValue()
 	{
-		return ECOOFPHOHMP;
+		return _hasMaxValue;
 	}
 
-	protected void BICMECLDLIP(bool value)
+	protected void SetHasMaxValue(bool value)
 	{
-		ECOOFPHOHMP = value;
+		_hasMaxValue = value;
 	}
 
-	public FunctionExtension BHIGOIHJBDK()
+	public FunctionExtension GetMaxValue()
 	{
-		return JMKHMGFMDJP;
+		return _maxValue;
 	}
 
-	protected void ALDNPBOAANA(FunctionExtension value)
+	protected void SetMaxValue(FunctionExtension value)
 	{
-		JMKHMGFMDJP = value;
+		_maxValue = value;
 	}
 
 	public override void Parse(XmlNode node)
 	{
 		base.Parse(node);
 		set_Type(ActionType.ACTION_SET_VARIABLE);
-		string text = node.Attributes["Value"].CIPOICEEIBK(string.Empty);
+		string text = node.Attributes["Value"].GetStringOrDefault(string.Empty);
 		if (text != null && text != string.Empty)
 		{
 			set_Value(new FunctionExtension());
-			OEAKCOHMIHH().Parse(text);
-			OEAKCOHMIHH().PBPBNENGLPA(JMDLAMHAJLN().HJFEFJIEINN);
-			OEAKCOHMIHH().DMPCFMACDJM(JMDLAMHAJLN().OKPFNCJFLDL);
-			OEAKCOHMIHH().set_Target(this);
+			GetValue().Parse(text);
+			GetValue().SetFunctionCallback(GetPerk().EvaluateFunctionCallback);
+			GetValue().SetVariableCallback(GetPerk().OnFunctionPreCallback);
+			GetValue().set_Target(this);
 		}
 		XmlAttribute xmlAttribute = node.Attributes["MinValue"];
-		LPNGJDNOJNJ(xmlAttribute != null);
-		string text2 = xmlAttribute.CIPOICEEIBK(string.Empty);
+		SetHasMinValue(xmlAttribute != null);
+		string text2 = xmlAttribute.GetStringOrDefault(string.Empty);
 		if (text2 != null && text2 != string.Empty)
 		{
-			CMEPINAFLGH(new FunctionExtension());
-			MCOHCDPJHAK().Parse(text2);
-			MCOHCDPJHAK().PBPBNENGLPA(JMDLAMHAJLN().HJFEFJIEINN);
-			MCOHCDPJHAK().DMPCFMACDJM(JMDLAMHAJLN().OKPFNCJFLDL);
-			MCOHCDPJHAK().set_Target(this);
+			SetMinValue(new FunctionExtension());
+			GetMinValue().Parse(text2);
+			GetMinValue().SetFunctionCallback(GetPerk().EvaluateFunctionCallback);
+			GetMinValue().SetVariableCallback(GetPerk().OnFunctionPreCallback);
+			GetMinValue().set_Target(this);
 		}
 		XmlAttribute xmlAttribute2 = node.Attributes["MaxValue"];
-		BICMECLDLIP(xmlAttribute2 != null);
-		string text3 = xmlAttribute2.CIPOICEEIBK(string.Empty);
+		SetHasMaxValue(xmlAttribute2 != null);
+		string text3 = xmlAttribute2.GetStringOrDefault(string.Empty);
 		if (text3 != null && text3 != string.Empty)
 		{
-			ALDNPBOAANA(new FunctionExtension());
-			BHIGOIHJBDK().Parse(text3);
-			BHIGOIHJBDK().PBPBNENGLPA(JMDLAMHAJLN().HJFEFJIEINN);
-			BHIGOIHJBDK().DMPCFMACDJM(JMDLAMHAJLN().OKPFNCJFLDL);
-			BHIGOIHJBDK().set_Target(this);
+			SetMaxValue(new FunctionExtension());
+			GetMaxValue().Parse(text3);
+			GetMaxValue().SetFunctionCallback(GetPerk().EvaluateFunctionCallback);
+			GetMaxValue().SetVariableCallback(GetPerk().OnFunctionPreCallback);
+			GetMaxValue().set_Target(this);
 		}
 	}
 }

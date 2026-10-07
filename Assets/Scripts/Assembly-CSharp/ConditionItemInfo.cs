@@ -2,13 +2,13 @@ using System.Xml;
 
 public class ConditionItemInfo : ConditionAnimation
 {
-	private string KCIIELDOBOM;
+	private string _itemType;
 
-	private string LOKOGOFENFO;
+	private string _subType;
 
 	private string _Name;
 
-	public string MDPPNGIEJGD
+	public string SubType
 	{
 		get
 		{
@@ -19,20 +19,20 @@ public class ConditionItemInfo : ConditionAnimation
 	public ConditionItemInfo(XmlNode node)
 		: base(ConditionType.ITEM)
 	{
-		KCIIELDOBOM = node.Attributes["Type"].CIPOICEEIBK(string.Empty);
-		LOKOGOFENFO = node.Attributes["SubType"].CIPOICEEIBK(string.Empty);
-		_Name = node.Attributes["Name"].CIPOICEEIBK(string.Empty);
+		_itemType = node.Attributes["Type"].GetStringOrDefault(string.Empty);
+		_subType = node.Attributes["SubType"].GetStringOrDefault(string.Empty);
+		_Name = node.Attributes["Name"].GetStringOrDefault(string.Empty);
 	}
 
 	public string get_Type()
 	{
-		return KCIIELDOBOM;
+		return _itemType;
 	}
 
 	// best guess for name
 	public string GetSubType()
 	{
-		return LOKOGOFENFO;
+		return _subType;
 	}
 
 	public string get_Name()
@@ -42,11 +42,11 @@ public class ConditionItemInfo : ConditionAnimation
 
 	public override bool IsEqual(ModelConditions conditions)
 	{
-		if (conditions == null || conditions.OJIAKDDCGLB == null)
+		if (conditions == null || conditions.Items == null)
 			return IsNot;
-		foreach (ItemInfo item in conditions.OJIAKDDCGLB)
+		foreach (ItemInfo item in conditions.Items)
 		{
-			if ((string.IsNullOrEmpty(KCIIELDOBOM) || KCIIELDOBOM == item.Type) && (string.IsNullOrEmpty(LOKOGOFENFO) || LOKOGOFENFO == item.SubType) && (string.IsNullOrEmpty(_Name) || _Name == item.Name))
+			if ((string.IsNullOrEmpty(_itemType) || _itemType == item.Type) && (string.IsNullOrEmpty(_subType) || _subType == item.SubType) && (string.IsNullOrEmpty(_Name) || _Name == item.Name))
 			{
 				return !IsNot;
 			}

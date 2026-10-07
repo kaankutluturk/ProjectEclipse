@@ -2,19 +2,19 @@ using System.Collections.Generic;
 
 public class PerkSetAttributes
 {
-	public Dictionary<string, string> IBLHIAHECLK;
+	public Dictionary<string, string> Values;
 
 	public PerkSetAttributes()
 	{
-		IBLHIAHECLK = new Dictionary<string, string>();
+		Values = new Dictionary<string, string>();
 	}
 
 	public PerkSetAttributes(PerkSetAttributes NOLFMPDGCOC)
 	{
-		IBLHIAHECLK = new Dictionary<string, string>();
-		foreach (KeyValuePair<string, string> item in NOLFMPDGCOC.IBLHIAHECLK)
+		Values = new Dictionary<string, string>();
+		foreach (KeyValuePair<string, string> item in NOLFMPDGCOC.Values)
 		{
-			IBLHIAHECLK.Add(item.Key, item.Value);
+			Values.Add(item.Key, item.Value);
 		}
 	}
 
@@ -24,22 +24,22 @@ public class PerkSetAttributes
 		{
 			return;
 		}
-		foreach (KeyValuePair<string, string> item in NOLFMPDGCOC.IBLHIAHECLK)
+		foreach (KeyValuePair<string, string> item in NOLFMPDGCOC.Values)
 		{
-			IBLHIAHECLK[item.Key] = item.Value;
+			Values[item.Key] = item.Value;
 		}
 	}
 
-	public void ENDOOADOLEO(string name, string value)
+	public void SetValue(string name, string value)
 	{
-		IBLHIAHECLK[name] = value;
+		Values[name] = value;
 	}
 
 	public string GetValue(string name)
 	{
-		if (IBLHIAHECLK.ContainsKey(name))
+		if (Values.ContainsKey(name))
 		{
-			return IBLHIAHECLK[name];
+			return Values[name];
 		}
 		return name;
 	}

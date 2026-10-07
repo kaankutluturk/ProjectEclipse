@@ -6,12 +6,12 @@ public sealed class DataContractAttribute : Attribute
 {
 	private string name;
 
-	private string ODFFCOCKANC;
+	private string ns;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private bool KDBJPBOODLM;
+	private bool isReference;
 
-	public string MENAJEAJJBE
+	public string ContractName
 	{
 		get
 		{
@@ -23,11 +23,11 @@ public sealed class DataContractAttribute : Attribute
 		}
 	}
 
-	public bool CEOOJHMGIPK
+	public bool UsesReferenceSemantics
 	{
 		get
 		{
-			return OGFPFFHAIBA();
+			return GetIsReference();
 		}
 		set
 		{
@@ -45,23 +45,23 @@ public sealed class DataContractAttribute : Attribute
 		name = value;
 	}
 
-	public string IONIEDIPEGB()
+	public string GetNamespace()
 	{
-		return ODFFCOCKANC;
+		return ns;
 	}
 
 	public void set_Namespace(string value)
 	{
-		ODFFCOCKANC = value;
+		ns = value;
 	}
 
-	public bool OGFPFFHAIBA()
+	public bool GetIsReference()
 	{
-		return KDBJPBOODLM;
+		return isReference;
 	}
 
 	public void set_IsReference(bool value)
 	{
-		KDBJPBOODLM = value;
+		isReference = value;
 	}
 }

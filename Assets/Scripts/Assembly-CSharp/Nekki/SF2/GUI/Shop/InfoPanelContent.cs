@@ -9,11 +9,11 @@ namespace Nekki.SF2.GUI.Shop
 {
 	public class InfoPanelContent : SidePanelContent
 	{
-		public class EHMHJDBJJPL : UnityEvent
+		public class ContentUpdatedEvent : UnityEvent
 		{
 		}
 
-		public EHMHJDBJJPL updateEvent = new EHMHJDBJJPL();
+		public ContentUpdatedEvent updateEvent = new ContentUpdatedEvent();
 
 		[SerializeField]
 		private LabelAlias _header;
@@ -33,35 +33,35 @@ namespace Nekki.SF2.GUI.Shop
 		[SerializeField]
 		private GameObject _buttonPrefab;
 
-		private IconLabelButton NDMPMIEKGAA;
+		private IconLabelButton buyGoldButton;
 
-		private IconLabelButton EPDPCAKGBBO;
+		private IconLabelButton buyRubyButton;
 
-		private IconLabelButton FNEMFKKBHLC;
+		private IconLabelButton upgradeGoldButton;
 
-		private IconLabelButton ABACDHNMNLJ;
+		private IconLabelButton upgradeRubyButton;
 
-		private IconLabelButton MAANHOHMEEO;
+		private IconLabelButton deliveryRubyButton;
 
-		private IconLabelButton MJOLEHNABAM;
+		private IconLabelButton consumableButton;
 
-		private IconLabelButton KFJFPNAFKLO;
+		private IconLabelButton realMoneyButton;
 
 		private List<IconLabelButton> _buttons = new List<IconLabelButton>();
 
-		private ItemInfo JMPPBCFDOLL;
+		private ItemInfo currentItem;
 
-		private ItemInfo HLOPCCHHGHB;
+		private ItemInfo pendingItem;
 
-		private UserItem NKBIOFJMONB;
+		private UserItem userItem;
 
-		private bool FNFHDIPECME;
+		private bool isOwned;
 
-		private bool PPEJCMNKIGP;
+		private bool isOrdered;
 
-		private bool KAPLEKBLLFO;
+		private bool isBeingMade;
 
-		private bool CJALINCMNCJ;
+		private bool isUpgradable;
 
 		public override void Init()
 		{
@@ -69,264 +69,264 @@ namespace Nekki.SF2.GUI.Shop
 			{
 				GameObject gameObject = UnityEngine.Object.Instantiate(_buttonPrefab);
 				gameObject.transform.SetParent(_buttonPanel.transform, false);
-				NDMPMIEKGAA = gameObject.GetComponent<IconLabelButton>();
-				_buttons.Add(NDMPMIEKGAA);
+				buyGoldButton = gameObject.GetComponent<IconLabelButton>();
+				_buttons.Add(buyGoldButton);
 				gameObject = UnityEngine.Object.Instantiate(_buttonPrefab);
 				gameObject.transform.SetParent(_buttonPanel.transform, false);
-				EPDPCAKGBBO = gameObject.GetComponent<IconLabelButton>();
-				_buttons.Add(EPDPCAKGBBO);
+				buyRubyButton = gameObject.GetComponent<IconLabelButton>();
+				_buttons.Add(buyRubyButton);
 				gameObject = UnityEngine.Object.Instantiate(_buttonPrefab);
 				gameObject.transform.SetParent(_buttonPanel.transform, false);
-				FNEMFKKBHLC = gameObject.GetComponent<IconLabelButton>();
-				_buttons.Add(FNEMFKKBHLC);
+				upgradeGoldButton = gameObject.GetComponent<IconLabelButton>();
+				_buttons.Add(upgradeGoldButton);
 				gameObject = UnityEngine.Object.Instantiate(_buttonPrefab);
 				gameObject.transform.SetParent(_buttonPanel.transform, false);
-				ABACDHNMNLJ = gameObject.GetComponent<IconLabelButton>();
-				_buttons.Add(ABACDHNMNLJ);
+				upgradeRubyButton = gameObject.GetComponent<IconLabelButton>();
+				_buttons.Add(upgradeRubyButton);
 				gameObject = UnityEngine.Object.Instantiate(_buttonPrefab);
 				gameObject.transform.SetParent(_buttonPanel.transform, false);
-				MAANHOHMEEO = gameObject.GetComponent<IconLabelButton>();
-				_buttons.Add(MAANHOHMEEO);
+				deliveryRubyButton = gameObject.GetComponent<IconLabelButton>();
+				_buttons.Add(deliveryRubyButton);
 				gameObject = UnityEngine.Object.Instantiate(_buttonPrefab);
 				gameObject.transform.SetParent(_buttonPanel.transform, false);
-				MJOLEHNABAM = gameObject.GetComponent<IconLabelButton>();
-				_buttons.Add(MJOLEHNABAM);
+				consumableButton = gameObject.GetComponent<IconLabelButton>();
+				_buttons.Add(consumableButton);
 				gameObject = UnityEngine.Object.Instantiate(_buttonPrefab);
 				gameObject.transform.SetParent(_buttonPanel.transform, false);
-				KFJFPNAFKLO = gameObject.GetComponent<IconLabelButton>();
-				_buttons.Add(KFJFPNAFKLO);
+				realMoneyButton = gameObject.GetComponent<IconLabelButton>();
+				_buttons.Add(realMoneyButton);
 			}
-			if (NDMPMIEKGAA != null)
+			if (buyGoldButton != null)
 			{
-				NDMPMIEKGAA.get_Icon().set_SpriteName(ListSF.CCDKHLAMKKO().OGJBDMNBMLJ());
-				NDMPMIEKGAA.SetColor(LabelButton.FBMGEHJPPIK.BUTTON_GREEN);
-				NDMPMIEKGAA.SetText("0");
-				NDMPMIEKGAA.ButtonId = 1;
-				NDMPMIEKGAA.AddEventListener(2, MDLLDINIIKM);
+				buyGoldButton.get_Icon().set_SpriteName(ListSF.GetRoster().GetCoinIcon());
+				buyGoldButton.SetColor(LabelButton.ButtonColor.BUTTON_GREEN);
+				buyGoldButton.SetText("0");
+				buyGoldButton.ButtonId = 1;
+				buyGoldButton.AddEventListener(2, OnItemActionClicked);
 			}
-			if (EPDPCAKGBBO != null)
+			if (buyRubyButton != null)
 			{
-				EPDPCAKGBBO.get_Icon().set_SpriteName("TopPanel.ruby");
-				EPDPCAKGBBO.SetColor(LabelButton.FBMGEHJPPIK.BUTTON_GREEN);
-				EPDPCAKGBBO.SetText("0");
-				EPDPCAKGBBO.ButtonId = 2;
-				EPDPCAKGBBO.AddEventListener(2, MDLLDINIIKM);
+				buyRubyButton.get_Icon().set_SpriteName("TopPanel.ruby");
+				buyRubyButton.SetColor(LabelButton.ButtonColor.BUTTON_GREEN);
+				buyRubyButton.SetText("0");
+				buyRubyButton.ButtonId = 2;
+				buyRubyButton.AddEventListener(2, OnItemActionClicked);
 			}
-			if (FNEMFKKBHLC != null)
+			if (upgradeGoldButton != null)
 			{
-				FNEMFKKBHLC.get_Icon().set_SpriteName(ListSF.CCDKHLAMKKO().OGJBDMNBMLJ());
-				FNEMFKKBHLC.SetColor(LabelButton.FBMGEHJPPIK.BUTTON_YELLOW);
-				FNEMFKKBHLC.SetText("0");
-				FNEMFKKBHLC.ButtonId = 7;
-				FNEMFKKBHLC.AddEventListener(2, MDLLDINIIKM);
+				upgradeGoldButton.get_Icon().set_SpriteName(ListSF.GetRoster().GetCoinIcon());
+				upgradeGoldButton.SetColor(LabelButton.ButtonColor.BUTTON_YELLOW);
+				upgradeGoldButton.SetText("0");
+				upgradeGoldButton.ButtonId = 7;
+				upgradeGoldButton.AddEventListener(2, OnItemActionClicked);
 			}
-			if (ABACDHNMNLJ != null)
+			if (upgradeRubyButton != null)
 			{
-				ABACDHNMNLJ.get_Icon().set_SpriteName("TopPanel.ruby");
-				ABACDHNMNLJ.SetColor(LabelButton.FBMGEHJPPIK.BUTTON_YELLOW);
-				ABACDHNMNLJ.SetText("0");
-				ABACDHNMNLJ.ButtonId = 8;
-				ABACDHNMNLJ.AddEventListener(2, MDLLDINIIKM);
+				upgradeRubyButton.get_Icon().set_SpriteName("TopPanel.ruby");
+				upgradeRubyButton.SetColor(LabelButton.ButtonColor.BUTTON_YELLOW);
+				upgradeRubyButton.SetText("0");
+				upgradeRubyButton.ButtonId = 8;
+				upgradeRubyButton.AddEventListener(2, OnItemActionClicked);
 			}
-			if (MAANHOHMEEO != null)
+			if (deliveryRubyButton != null)
 			{
-				MAANHOHMEEO.get_Icon().set_SpriteName("TopPanel.ruby");
-				MAANHOHMEEO.SetColor(LabelButton.FBMGEHJPPIK.BUTTON_GREEN);
-				MAANHOHMEEO.SetText("0");
-				MAANHOHMEEO.ButtonId = 10;
-				MAANHOHMEEO.AddEventListener(2, MDLLDINIIKM);
+				deliveryRubyButton.get_Icon().set_SpriteName("TopPanel.ruby");
+				deliveryRubyButton.SetColor(LabelButton.ButtonColor.BUTTON_GREEN);
+				deliveryRubyButton.SetText("0");
+				deliveryRubyButton.ButtonId = 10;
+				deliveryRubyButton.AddEventListener(2, OnItemActionClicked);
 			}
-			if (MJOLEHNABAM != null)
+			if (consumableButton != null)
 			{
-				MJOLEHNABAM.get_Icon().set_SpriteName("TopPanel.ruby");
-				MJOLEHNABAM.SetColor(LabelButton.FBMGEHJPPIK.BUTTON_GREEN);
-				MJOLEHNABAM.SetText("0");
-				MJOLEHNABAM.ButtonId = 17;
-				MJOLEHNABAM.AddEventListener(2, MDLLDINIIKM);
+				consumableButton.get_Icon().set_SpriteName("TopPanel.ruby");
+				consumableButton.SetColor(LabelButton.ButtonColor.BUTTON_GREEN);
+				consumableButton.SetText("0");
+				consumableButton.ButtonId = 17;
+				consumableButton.AddEventListener(2, OnItemActionClicked);
 			}
-			if (KFJFPNAFKLO != null)
+			if (realMoneyButton != null)
 			{
-				KFJFPNAFKLO.get_Icon().gameObject.SetActive(false);
-				KFJFPNAFKLO.SetColor(LabelButton.FBMGEHJPPIK.BUTTON_GREEN);
-				KFJFPNAFKLO.SetText("0.00 USD");
-				KFJFPNAFKLO.ButtonId = 3;
-				KFJFPNAFKLO.AddEventListener(2, MDLLDINIIKM);
+				realMoneyButton.get_Icon().gameObject.SetActive(false);
+				realMoneyButton.SetColor(LabelButton.ButtonColor.BUTTON_GREEN);
+				realMoneyButton.SetText("0.00 USD");
+				realMoneyButton.ButtonId = 3;
+				realMoneyButton.AddEventListener(2, OnItemActionClicked);
 			}
-			LNBNDFOMKCP();
+			HideAllButtons();
 		}
 
-		private void MDLLDINIIKM(object data)
+		private void OnItemActionClicked(object data)
 		{
-			if (!PNJCNLJNGEH())
+			if (!IsPurchaseBlockedByQuest())
 			{
 				ItemAction pCKPFBFHKJH = (ItemAction)data;
-				TradeDialog.LBGFOGHMBED iBODMPMJELJ = TradeDialog.LBGFOGHMBED.A_BUY;
+				TradeDialog.TradeAction iBODMPMJELJ = TradeDialog.TradeAction.A_BUY;
 				GameValueType bAINMLLIKOL = GameValueType.Gold;
 				long num = 0L;
 				long cNIOCCCBDBJ = 0L;
 				bool flag = false;
-				ListSF.BKDHBIDPKLK dDEDNPLHOJH = ListSF.BKDHBIDPKLK.CHECK_ITEM_NONE;
+				ListSF.CheckItemType dDEDNPLHOJH = ListSF.CheckItemType.CHECK_ITEM_NONE;
 				Action<object> oDDEOFKLIAG = null;
-				UserItem dKCHDHMLKHN = ListSF.CMGOCLGHNLH(JMPPBCFDOLL.Name);
+				UserItem dKCHDHMLKHN = ListSF.GetUserItem(currentItem.Name);
 				switch (pCKPFBFHKJH)
 				{
 				case ItemAction.Item_Buy_Gold:
-					iBODMPMJELJ = TradeDialog.LBGFOGHMBED.A_BUY;
+					iBODMPMJELJ = TradeDialog.TradeAction.A_BUY;
 					bAINMLLIKOL = GameValueType.Gold;
-					num = JMPPBCFDOLL.OHBBLIMNIMJ();
+					num = currentItem.GetCoinPrice();
 					cNIOCCCBDBJ = 0L;
-					oDDEOFKLIAG = LJLECGPEDFA;
-					flag = num > ListSF.CCDKHLAMKKO().BFBOEGMAMNF();
-					dDEDNPLHOJH = ListSF.BKDHBIDPKLK.CHECK_ITEM_MONEY;
+					oDDEOFKLIAG = OnBuyGoldConfirmed;
+					flag = num > ListSF.GetRoster().GetMoney();
+					dDEDNPLHOJH = ListSF.CheckItemType.CHECK_ITEM_MONEY;
 					break;
 				case ItemAction.Item_Buy_Ruby:
-					iBODMPMJELJ = TradeDialog.LBGFOGHMBED.A_BUY;
+					iBODMPMJELJ = TradeDialog.TradeAction.A_BUY;
 					bAINMLLIKOL = GameValueType.Gems;
-					num = JMPPBCFDOLL.MCNMMBCJADI();
+					num = currentItem.GetGemPrice();
 					cNIOCCCBDBJ = 0L;
-					oDDEOFKLIAG = AEOLDJPPIGM;
-					flag = num > ListSF.CCDKHLAMKKO().EHFJHFDACMP();
-					dDEDNPLHOJH = ListSF.BKDHBIDPKLK.CHECK_ITEM_BONUS;
+					oDDEOFKLIAG = OnBuyRubyConfirmed;
+					flag = num > ListSF.GetRoster().GetBonus();
+					dDEDNPLHOJH = ListSF.CheckItemType.CHECK_ITEM_BONUS;
 					break;
 				case ItemAction.Item_Upgrade_Gold:
-					iBODMPMJELJ = TradeDialog.LBGFOGHMBED.A_UPGRADE;
+					iBODMPMJELJ = TradeDialog.TradeAction.A_UPGRADE;
 					bAINMLLIKOL = GameValueType.Gold;
-					num = dKCHDHMLKHN.HADDPFNDPDG().OHBBLIMNIMJ();
+					num = dKCHDHMLKHN.GetNextUpgradeItem().GetCoinPrice();
 					cNIOCCCBDBJ = 0L;
-					oDDEOFKLIAG = EGLHCOAOPGL;
-					flag = num > ListSF.CCDKHLAMKKO().BFBOEGMAMNF();
-					dDEDNPLHOJH = ListSF.BKDHBIDPKLK.CHECK_ITEM_MONEY;
+					oDDEOFKLIAG = OnUpgradeGoldConfirmed;
+					flag = num > ListSF.GetRoster().GetMoney();
+					dDEDNPLHOJH = ListSF.CheckItemType.CHECK_ITEM_MONEY;
 					break;
 				case ItemAction.Item_Upgrade_Ruby:
-					iBODMPMJELJ = TradeDialog.LBGFOGHMBED.A_UPGRADE;
+					iBODMPMJELJ = TradeDialog.TradeAction.A_UPGRADE;
 					bAINMLLIKOL = GameValueType.Gems;
-					num = dKCHDHMLKHN.HADDPFNDPDG().MCNMMBCJADI();
+					num = dKCHDHMLKHN.GetNextUpgradeItem().GetGemPrice();
 					cNIOCCCBDBJ = 0L;
-					oDDEOFKLIAG = BLMDCAOBIJD;
-					flag = num > ListSF.CCDKHLAMKKO().EHFJHFDACMP();
-					dDEDNPLHOJH = ListSF.BKDHBIDPKLK.CHECK_ITEM_BONUS;
+					oDDEOFKLIAG = OnUpgradeRubyConfirmed;
+					flag = num > ListSF.GetRoster().GetBonus();
+					dDEDNPLHOJH = ListSF.CheckItemType.CHECK_ITEM_BONUS;
 					break;
 				case ItemAction.Item_Delivery_Ruby:
-					MHPLBNJCDOP();
+					BuyImmediateDelivery();
 					return;
 				case ItemAction.Item_Consumable:
-					iBODMPMJELJ = TradeDialog.LBGFOGHMBED.A_BUY;
+					iBODMPMJELJ = TradeDialog.TradeAction.A_BUY;
 					bAINMLLIKOL = GameValueType.Gems;
-					num = JMPPBCFDOLL.MCNMMBCJADI();
+					num = currentItem.GetGemPrice();
 					cNIOCCCBDBJ = 0L;
-					oDDEOFKLIAG = JFBJPMDFJKK;
-					flag = num > ListSF.CCDKHLAMKKO().EHFJHFDACMP();
-					dDEDNPLHOJH = ListSF.BKDHBIDPKLK.CHECK_ITEM_BONUS;
+					oDDEOFKLIAG = OnConsumableConfirmed;
+					flag = num > ListSF.GetRoster().GetBonus();
+					dDEDNPLHOJH = ListSF.CheckItemType.CHECK_ITEM_BONUS;
 					break;
 				case ItemAction.Item_Buy_Real:
-					ShopScene.get_Instance().get_PaymentUI().MakePurchase(JMPPBCFDOLL);
+					ShopScene.get_Instance().get_PaymentUI().MakePurchase(currentItem);
 					return;
 				}
-				HLOPCCHHGHB = JMPPBCFDOLL;
+				pendingItem = currentItem;
 				if (flag)
 				{
-					GameUtils.EEKHDNNBDCH(JMPPBCFDOLL, dDEDNPLHOJH);
+					GameUtils.NotifyPurchaseUnsuccessful(currentItem, dDEDNPLHOJH);
 				}
 				else
 				{
-					DialogsOpener.NGAMLDNIJID(iBODMPMJELJ, bAINMLLIKOL, num, oDDEOFKLIAG, cNIOCCCBDBJ);
+					DialogsOpener.OpenTradeDialog(iBODMPMJELJ, bAINMLLIKOL, num, oDDEOFKLIAG, cNIOCCCBDBJ);
 				}
 			}
 		}
 
-		private bool PNJCNLJNGEH()
+		private bool IsPurchaseBlockedByQuest()
 		{
 			bool result = false;
-			QuestParameters hHKLFIIBIFF = ListSF.GetInstance().BNMLDPNCMLB();
-			FightIDS jLGLBLDPAAF = hHKLFIIBIFF.JLGLBLDPAAF;
-			hHKLFIIBIFF.JLGLBLDPAAF = FightIDS.Empty();
-			hHKLFIIBIFF.HEIADONEACH = string.Empty;
-			hHKLFIIBIFF.AIEHNBBFNPF = string.Empty;
-			hHKLFIIBIFF.DLKPBAJDHBO = JMPPBCFDOLL;
-			if (ListSF.GetInstance().FFBAJNGHGGD(QuestEvent.PMDPDMFLCIJ.QUEST_EVENT_PREPURCHASE))
+			QuestParameters hHKLFIIBIFF = ListSF.GetInstance().GetQuestParameters();
+			FightIDS jLGLBLDPAAF = hHKLFIIBIFF.fightIds;
+			hHKLFIIBIFF.fightIds = FightIDS.Empty();
+			hHKLFIIBIFF.fightResult = string.Empty;
+			hHKLFIIBIFF.raidResult = string.Empty;
+			hHKLFIIBIFF.purchasedItem = currentItem;
+			if (ListSF.GetInstance().RaiseQuestEvent(QuestEvent.QuestEventType.QUEST_EVENT_PREPURCHASE))
 			{
-				ListSF.GetInstance().MHHNIPBJNAD();
+				ListSF.GetInstance().RunQuestActions();
 				result = true;
 			}
-			hHKLFIIBIFF.JLGLBLDPAAF = jLGLBLDPAAF;
+			hHKLFIIBIFF.fightIds = jLGLBLDPAAF;
 			return result;
 		}
 
-		private void LJLECGPEDFA(object data)
+		private void OnBuyGoldConfirmed(object data)
 		{
 			int num = ((data != null) ? ((int)data) : 0);
-			if (num > 0 && HLOPCCHHGHB != null)
+			if (num > 0 && pendingItem != null)
 			{
-				if (ItemBuyHelper.IHHKNBPKGHD(HLOPCCHHGHB))
+				if (ItemBuyHelper.BuyItemWithCoins(pendingItem))
 				{
-					ListSF.CCDKHLAMKKO().KHCNHPCPFII().EEDJEDBMIMI(HLOPCCHHGHB, true);
+					ListSF.GetRoster().GetInventory().EquipItem(pendingItem, true);
 				}
 				UpdateContent();
 			}
 		}
 
-		private void AEOLDJPPIGM(object data)
+		private void OnBuyRubyConfirmed(object data)
 		{
 			int num = ((data != null) ? ((int)data) : 0);
-			if (num > 0 && HLOPCCHHGHB != null)
+			if (num > 0 && pendingItem != null)
 			{
-				if (ItemBuyHelper.MGMAJHLAICA(HLOPCCHHGHB))
+				if (ItemBuyHelper.BuyItemWithGems(pendingItem))
 				{
-					ListSF.CCDKHLAMKKO().KHCNHPCPFII().EEDJEDBMIMI(HLOPCCHHGHB, true);
+					ListSF.GetRoster().GetInventory().EquipItem(pendingItem, true);
 				}
 				UpdateContent();
 			}
 		}
 
-		private void EGLHCOAOPGL(object data)
+		private void OnUpgradeGoldConfirmed(object data)
 		{
 			int num = ((data != null) ? ((int)data) : 0);
-			if (num > 0 && HLOPCCHHGHB != null)
+			if (num > 0 && pendingItem != null)
 			{
-				if (ItemBuyHelper.APICBINEPGJ(HLOPCCHHGHB))
+				if (ItemBuyHelper.UpgradeItemWithCoins(pendingItem))
 				{
-					ListSF.CCDKHLAMKKO().KHCNHPCPFII().EEDJEDBMIMI(HLOPCCHHGHB, true);
+					ListSF.GetRoster().GetInventory().EquipItem(pendingItem, true);
 				}
 				UpdateContent();
 			}
 		}
 
-		private void BLMDCAOBIJD(object data)
+		private void OnUpgradeRubyConfirmed(object data)
 		{
 			int num = ((data != null) ? ((int)data) : 0);
-			if (num > 0 && HLOPCCHHGHB != null)
+			if (num > 0 && pendingItem != null)
 			{
-				if (ItemBuyHelper.JAJLOABHIMA(HLOPCCHHGHB))
+				if (ItemBuyHelper.UpgradeItemWithGems(pendingItem))
 				{
-					ListSF.CCDKHLAMKKO().KHCNHPCPFII().EEDJEDBMIMI(HLOPCCHHGHB, true);
+					ListSF.GetRoster().GetInventory().EquipItem(pendingItem, true);
 				}
 				UpdateContent();
 			}
 		}
 
-		private void MHPLBNJCDOP()
+		private void BuyImmediateDelivery()
 		{
-			if (HLOPCCHHGHB != null)
+			if (pendingItem != null)
 			{
-				if (ItemBuyHelper.BuyImmediatelyDelivery(HLOPCCHHGHB))
+				if (ItemBuyHelper.BuyImmediatelyDelivery(pendingItem))
 				{
-					ListSF.CCDKHLAMKKO().KHCNHPCPFII().EEDJEDBMIMI(HLOPCCHHGHB, true);
+					ListSF.GetRoster().GetInventory().EquipItem(pendingItem, true);
 				}
 				UpdateContent();
 			}
 		}
 
-		private void JFBJPMDFJKK(object data)
+		private void OnConsumableConfirmed(object data)
 		{
 			int num = ((data != null) ? ((int)data) : 0);
-			if (num > 0 && HLOPCCHHGHB != null)
+			if (num > 0 && pendingItem != null)
 			{
-				bool flag = ItemBuyHelper.NIEAANPCGLC(HLOPCCHHGHB);
+				bool flag = ItemBuyHelper.BuyConsumableWithGems(pendingItem);
 				UpdateContent();
 			}
 		}
 
-		private void HPEKMDCMPBO()
+		private void DisableButtons()
 		{
 			float opacity = 0.7f;
 			foreach (IconLabelButton item in _buttons)
@@ -339,7 +339,7 @@ namespace Nekki.SF2.GUI.Shop
 			}
 		}
 
-		private void ACGIOEAPGPH()
+		private void EnableButtons()
 		{
 			float opacity = 1f;
 			foreach (IconLabelButton item in _buttons)
@@ -352,7 +352,7 @@ namespace Nekki.SF2.GUI.Shop
 			}
 		}
 
-		private void LNBNDFOMKCP()
+		private void HideAllButtons()
 		{
 			foreach (IconLabelButton item in _buttons)
 			{
@@ -383,9 +383,9 @@ namespace Nekki.SF2.GUI.Shop
 
 		public void ShowButton()
 		{
-			if (JMPPBCFDOLL != null)
+			if (currentItem != null)
 			{
-				switch (JMPPBCFDOLL.Type)
+				switch (currentItem.Type)
 				{
 				case "Consumable":
 					ShowConsumableButton();
@@ -403,64 +403,64 @@ namespace Nekki.SF2.GUI.Shop
 		public void ShowConsumableButton()
 		{
 			Color oHJKNABLCMF = Color.black;
-			if (ListSF.CCDKHLAMKKO().EHFJHFDACMP() < (ObscuredLong)(JMPPBCFDOLL.GemPrice))
+			if (ListSF.GetRoster().GetBonus() < (ObscuredLong)(currentItem.GemPrice))
 			{
-				oHJKNABLCMF = Constants.GJKMPOAJDCF;
+				oHJKNABLCMF = Constants.NegativeValueColor;
 			}
-			SetButton(MJOLEHNABAM, (ObscuredLong)(JMPPBCFDOLL.GemPrice), oHJKNABLCMF);
+			SetButton(consumableButton, (ObscuredLong)(currentItem.GemPrice), oHJKNABLCMF);
 		}
 
 		public void ShowPaymentButton()
 		{
-			SetButton(KFJFPNAFKLO, JMPPBCFDOLL.EGAJMELKANL + " " + JMPPBCFDOLL.MIIJIMJDHFP, Color.black);
+			SetButton(realMoneyButton, currentItem.PriceAmountText + " " + currentItem.CurrencyCode, Color.black);
 		}
 
 		public void ShowDefaultButton()
 		{
-			if (!FNFHDIPECME)
+			if (!isOwned)
 			{
 				Color oHJKNABLCMF = Color.black;
-				if (ListSF.CCDKHLAMKKO().BFBOEGMAMNF() < (ObscuredLong)(JMPPBCFDOLL.CoinPrice))
+				if (ListSF.GetRoster().GetMoney() < (ObscuredLong)(currentItem.CoinPrice))
 				{
-					oHJKNABLCMF = Constants.GJKMPOAJDCF;
+					oHJKNABLCMF = Constants.NegativeValueColor;
 				}
-				SetButton(NDMPMIEKGAA, (ObscuredLong)(JMPPBCFDOLL.CoinPrice), oHJKNABLCMF);
+				SetButton(buyGoldButton, (ObscuredLong)(currentItem.CoinPrice), oHJKNABLCMF);
 				Color oHJKNABLCMF2 = Color.black;
-				if (ListSF.CCDKHLAMKKO().EHFJHFDACMP() < (ObscuredLong)(JMPPBCFDOLL.GemPrice))
+				if (ListSF.GetRoster().GetBonus() < (ObscuredLong)(currentItem.GemPrice))
 				{
-					oHJKNABLCMF2 = Constants.GJKMPOAJDCF;
+					oHJKNABLCMF2 = Constants.NegativeValueColor;
 				}
-				SetButton(EPDPCAKGBBO, (ObscuredLong)(JMPPBCFDOLL.GemPrice), oHJKNABLCMF2);
+				SetButton(buyRubyButton, (ObscuredLong)(currentItem.GemPrice), oHJKNABLCMF2);
 			}
-			else if (KAPLEKBLLFO)
+			else if (isBeingMade)
 			{
-				ItemInfo dJKEECEOCJB = NKBIOFJMONB.HADDPFNDPDG();
+				ItemInfo dJKEECEOCJB = userItem.GetNextUpgradeItem();
 				if (dJKEECEOCJB == null)
 				{
-					dJKEECEOCJB = NKBIOFJMONB.AKKBIFEFDCI();
+					dJKEECEOCJB = userItem.GetCurrentUpgradeItem();
 				}
 				Color oHJKNABLCMF3 = Color.black;
-				if (ListSF.CCDKHLAMKKO().EHFJHFDACMP() < (ObscuredLong)(dJKEECEOCJB.KLHOKKPALOK))
+				if (ListSF.GetRoster().GetBonus() < (ObscuredLong)(dJKEECEOCJB.DeliveryGemPrice))
 				{
-					oHJKNABLCMF3 = Constants.GJKMPOAJDCF;
+					oHJKNABLCMF3 = Constants.NegativeValueColor;
 				}
-				SetButton(MAANHOHMEEO, (ObscuredLong)(dJKEECEOCJB.KLHOKKPALOK), oHJKNABLCMF3);
+				SetButton(deliveryRubyButton, (ObscuredLong)(dJKEECEOCJB.DeliveryGemPrice), oHJKNABLCMF3);
 			}
-			else if (CJALINCMNCJ && ListSF.CCDKHLAMKKO().HFINDOBJHNK())
+			else if (isUpgradable && ListSF.GetRoster().GetShowUpgrades())
 			{
-				ItemInfo dJKEECEOCJB2 = NKBIOFJMONB.HADDPFNDPDG();
+				ItemInfo dJKEECEOCJB2 = userItem.GetNextUpgradeItem();
 				Color oHJKNABLCMF4 = Color.black;
-				if (ListSF.CCDKHLAMKKO().BFBOEGMAMNF() < (ObscuredLong)(dJKEECEOCJB2.CoinPrice))
+				if (ListSF.GetRoster().GetMoney() < (ObscuredLong)(dJKEECEOCJB2.CoinPrice))
 				{
-					oHJKNABLCMF4 = Constants.GJKMPOAJDCF;
+					oHJKNABLCMF4 = Constants.NegativeValueColor;
 				}
-				SetButton(FNEMFKKBHLC, (ObscuredLong)(dJKEECEOCJB2.CoinPrice), oHJKNABLCMF4);
+				SetButton(upgradeGoldButton, (ObscuredLong)(dJKEECEOCJB2.CoinPrice), oHJKNABLCMF4);
 				Color oHJKNABLCMF5 = Color.black;
-				if (ListSF.CCDKHLAMKKO().EHFJHFDACMP() < (ObscuredLong)(dJKEECEOCJB2.GemPrice))
+				if (ListSF.GetRoster().GetBonus() < (ObscuredLong)(dJKEECEOCJB2.GemPrice))
 				{
-					oHJKNABLCMF5 = Constants.GJKMPOAJDCF;
+					oHJKNABLCMF5 = Constants.NegativeValueColor;
 				}
-				SetButton(ABACDHNMNLJ, (ObscuredLong)(dJKEECEOCJB2.GemPrice), oHJKNABLCMF5);
+				SetButton(upgradeRubyButton, (ObscuredLong)(dJKEECEOCJB2.GemPrice), oHJKNABLCMF5);
 			}
 		}
 
@@ -474,11 +474,11 @@ namespace Nekki.SF2.GUI.Shop
 			{
 				_descriptionDonate.gameObject.SetActive(false);
 			}
-			if (JMPPBCFDOLL.Type.Equals("Consumable"))
+			if (currentItem.Type.Equals("Consumable"))
 			{
 				SetConsumableDescription();
 			}
-			else if (JMPPBCFDOLL.Type.Equals("RealMoneyItem"))
+			else if (currentItem.Type.Equals("RealMoneyItem"))
 			{
 				SetRealMoneyItemDescription();
 			}
@@ -493,7 +493,7 @@ namespace Nekki.SF2.GUI.Shop
 			if (!(_descriptionDonate == null))
 			{
 				_descriptionDonate.gameObject.SetActive(true);
-				_descriptionDonate.SetAlias(JMPPBCFDOLL.GGDJIPKMKFC);
+				_descriptionDonate.SetAlias(currentItem.DescriptionAlias);
 			}
 		}
 
@@ -502,13 +502,13 @@ namespace Nekki.SF2.GUI.Shop
 			if (!(_descriptionDonate == null))
 			{
 				string text = string.Empty;
-				if ((ObscuredLong)(JMPPBCFDOLL.BBMLCBEFLGI) > 0)
+				if ((ObscuredLong)(currentItem.ReceiveBonus) > 0)
 				{
-					text = string.Format("<quad name={0} size=106 width=1 /> {1}", "TopPanel.ruby", JMPPBCFDOLL.BBMLCBEFLGI);
+					text = string.Format("<quad name={0} size=106 width=1 /> {1}", "TopPanel.ruby", currentItem.ReceiveBonus);
 				}
-				if ((ObscuredLong)(JMPPBCFDOLL.HHIFKGOJFAC) > 0)
+				if ((ObscuredLong)(currentItem.ReceiveGold) > 0)
 				{
-					text = string.Format("<quad name={0} size=106 width=1 /> {1}", ListSF.CCDKHLAMKKO().OGJBDMNBMLJ(), JMPPBCFDOLL.HHIFKGOJFAC);
+					text = string.Format("<quad name={0} size=106 width=1 /> {1}", ListSF.GetRoster().GetCoinIcon(), currentItem.ReceiveGold);
 				}
 				if (!string.IsNullOrEmpty(text))
 				{
@@ -525,24 +525,24 @@ namespace Nekki.SF2.GUI.Shop
 				return;
 			}
 			_description.gameObject.SetActive(true);
-			if (KAPLEKBLLFO)
+			if (isBeingMade)
 			{
 				_description.SetAlias("shopMaking");
 			}
-			else if (PPEJCMNKIGP)
+			else if (isOrdered)
 			{
 				_description.SetAlias("shopOrder");
 			}
-			else if (CJALINCMNCJ && ListSF.CCDKHLAMKKO().HFINDOBJHNK())
+			else if (isUpgradable && ListSF.GetRoster().GetShowUpgrades())
 			{
-				ItemInfo dJKEECEOCJB = ((NKBIOFJMONB == null) ? null : NKBIOFJMONB.HADDPFNDPDG());
+				ItemInfo dJKEECEOCJB = ((userItem == null) ? null : userItem.GetNextUpgradeItem());
 				if (dJKEECEOCJB != null)
 				{
-					int oMHDLKNHNMJ = ListSF.CCDKHLAMKKO().PINDEKDNCNL();
+					int oMHDLKNHNMJ = ListSF.GetRoster().GetLevel();
 					int oBJDGBBFJOO = dJKEECEOCJB.UpgradeLevel;
-					UpgradeIndexItem aACAFOBANOH = dJKEECEOCJB.MJNILIJLCMI(oMHDLKNHNMJ, oBJDGBBFJOO);
+					UpgradeIndexItem aACAFOBANOH = dJKEECEOCJB.GetUpgradeIndexItem(oMHDLKNHNMJ, oBJDGBBFJOO);
 					int num = ((aACAFOBANOH != null) ? aACAFOBANOH.Index : 0);
-					if (aACAFOBANOH.Type == UpgradeIndexItem.LIPHFAOKLCA.UPGRADE_INDEX_MILESTONE)
+					if (aACAFOBANOH.Type == UpgradeIndexItem.UpgradeIndexType.UPGRADE_INDEX_MILESTONE)
 					{
 						string alias = "shopUpgrade{img::MiscSprites.star}{" + num + "}";
 						_description.SetAlias(alias);
@@ -561,43 +561,43 @@ namespace Nekki.SF2.GUI.Shop
 
 		public void SetItemInfo(ItemInfo item)
 		{
-			NKBIOFJMONB = ListSF.CCDKHLAMKKO().KHCNHPCPFII().CMGOCLGHNLH(item);
-			FNFHDIPECME = NKBIOFJMONB != null;
-			JMPPBCFDOLL = ((!FNFHDIPECME) ? item : NKBIOFJMONB.AKKBIFEFDCI());
-			PPEJCMNKIGP = InputDeviceExtension.CBIECFPMNKC(item, NKBIOFJMONB);
-			KAPLEKBLLFO = InputDeviceExtension.GMCENJHBIDF(item, NKBIOFJMONB);
-			CJALINCMNCJ = InputDeviceExtension.ACOIHHPOBDH(item, NKBIOFJMONB);
+			userItem = ListSF.GetRoster().GetInventory().FindItem(item);
+			isOwned = userItem != null;
+			currentItem = ((!isOwned) ? item : userItem.GetCurrentUpgradeItem());
+			isOrdered = InputDeviceExtension.CanOrderDelivery(item, userItem);
+			isBeingMade = InputDeviceExtension.IsDeliveryInProgress(item, userItem);
+			isUpgradable = InputDeviceExtension.CanUpgradeItem(item, userItem);
 			_header.SetAlias(item.Name);
 			SetDescription();
-			LNBNDFOMKCP();
+			HideAllButtons();
 			ShowButton();
-			if (item.ItemLevel > ListSF.CCDKHLAMKKO().PINDEKDNCNL())
+			if (item.ItemLevel > ListSF.GetRoster().GetLevel())
 			{
-				HPEKMDCMPBO();
+				DisableButtons();
 			}
 			else
 			{
-				ACGIOEAPGPH();
+				EnableButtons();
 			}
 			if (_parametersPanel != null)
 			{
-				ItemInfo dJKEECEOCJB = ((NKBIOFJMONB == null) ? null : NKBIOFJMONB.HADDPFNDPDG());
-				bool oGMLCLNEAIJ = ListSF.CCDKHLAMKKO().HFINDOBJHNK() && FNFHDIPECME && dJKEECEOCJB != null;
-				_parametersPanel.SetParameters(JMPPBCFDOLL, dJKEECEOCJB, oGMLCLNEAIJ);
+				ItemInfo dJKEECEOCJB = ((userItem == null) ? null : userItem.GetNextUpgradeItem());
+				bool oGMLCLNEAIJ = ListSF.GetRoster().GetShowUpgrades() && isOwned && dJKEECEOCJB != null;
+				_parametersPanel.SetParameters(currentItem, dJKEECEOCJB, oGMLCLNEAIJ);
 			}
 		}
 
 		public void UpdateContent()
 		{
 			ShopScene.get_Instance().RememberFocus();
-			SetItemInfo(JMPPBCFDOLL);
+			SetItemInfo(currentItem);
 			updateEvent.Invoke();
 			ShopScene.get_Instance().FocusOnLastFocus();
 		}
 
 		public IconLabelButton GetGoldButton()
 		{
-			return NDMPMIEKGAA;
+			return buyGoldButton;
 		}
 	}
 }

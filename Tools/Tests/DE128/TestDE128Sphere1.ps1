@@ -80,7 +80,7 @@ foreach($key in $mapping.Keys) {
  }
  foreach($attack in $actual.SelectNodes('./Intervals/Interval[@Type="Attack"]')) {
   $parsed=Parse-Attack $attack
-  Check ($parsed.HPLOFLKCLHG() -and $parsed.NPHDDMAIGKN() -and !$parsed.PIKCMLIAFOI()) 'Sphere native attack options lost.'
+  Check ($parsed.GetNoCritical() -and $parsed.GetIgnoresBlock() -and !$parsed.GetHasEffect()) 'Sphere native attack options lost.'
  }
 }
 Check ($archive.SelectSingleNode('//Templates/Template[@Name="Sphere1"]').ChildNodes.Count -eq 0) 'Removed archive family template is no longer empty.'

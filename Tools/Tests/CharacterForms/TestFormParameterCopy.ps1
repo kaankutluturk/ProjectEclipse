@@ -3,17 +3,17 @@ $root=Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $PSScriptRoot))
 $parameterSource=Get-Content -Raw -LiteralPath (Join-Path $root 'Assets/Scripts/Assembly-CSharp/ModelParameters.cs')
 $animationSource=Get-Content -Raw -LiteralPath (Join-Path $root 'Assets/Scripts/Assembly-CSharp/AnimationData.cs')
 $rulesSource=Get-Content -Raw -LiteralPath (Join-Path $root 'Assets/Scripts/Assembly-CSharp/RulesInspector.cs')
-$fields=[regex]::Match($parameterSource,'(?ms)^\tpublic List<GroupModel> KFKKHACFDPH.*?^\tpublic int FPIMGHKNHMO;').Value
+$fields=[regex]::Match($parameterSource,'(?ms)^\tpublic List<GroupModel> GroupModels.*?^\tpublic int WarriorPower;').Value
 $fields += [regex]::Match($parameterSource,'(?ms)^\tpublic int ShieldTotal;.*?^\tpublic bool HasShieldTotalOverride;').Value
-$fields += [regex]::Match($parameterSource,'(?ms)^\tpublic int ALCFNGIKCCB;.*?^\tprivate bool LNHMCKNCGDP;').Value
+$fields += [regex]::Match($parameterSource,'(?ms)^\tpublic int RatingCorrection;.*?^\tprivate bool isImmortalityEnabled;').Value
 $copy=[regex]::Match($parameterSource,'(?ms)^\tpublic ModelParameters\(ModelParameters NBMGOEMJJAF\).*?^\t\}').Value
-$parameters=[regex]::Match($parameterSource,'(?ms)^\tpublic ObscuredInt PINDEKDNCNL\(.*?^\t\}').Value
-$parameters += [regex]::Match($parameterSource,'(?ms)^\tpublic void DLDMOHEGENM\(.*?^\t\}').Value
-$parameters += [regex]::Match($parameterSource,'(?ms)^\tpublic List<ItemInfo> PJNJIJIODHE\(.*?^\t\}').Value
-$parameters += [regex]::Match($parameterSource,'(?ms)^\tpublic List<PerkInfoItem> JBIOECDAAKP\(.*?^\t\}').Value
-$parameters += [regex]::Match($parameterSource,'(?ms)^\tpublic void JEJPEJFLDJC\(.*?^\t\}').Value
-$parameters += [regex]::Match($parameterSource,'(?ms)^\tprivate bool ILAFHEDMNNL\(.*?^\t\}').Value
-$animations=[regex]::Match($animationSource,'(?ms)^\tpublic static void AKJLPGMEFFD\(.*?^\t\}').Value
+$parameters=[regex]::Match($parameterSource,'(?ms)^\tpublic ObscuredInt GetLevel\(.*?^\t\}').Value
+$parameters += [regex]::Match($parameterSource,'(?ms)^\tpublic void SetLevel\(.*?^\t\}').Value
+$parameters += [regex]::Match($parameterSource,'(?ms)^\tpublic List<ItemInfo> GetEquippedItems\(.*?^\t\}').Value
+$parameters += [regex]::Match($parameterSource,'(?ms)^\tpublic List<PerkInfoItem> GetAllPerks\(.*?^\t\}').Value
+$parameters += [regex]::Match($parameterSource,'(?ms)^\tpublic void RemovePerksByNames\(.*?^\t\}').Value
+$parameters += [regex]::Match($parameterSource,'(?ms)^\tprivate bool IsPerkInNames\(.*?^\t\}').Value
+$animations=[regex]::Match($animationSource,'(?ms)^\tpublic static void CollectAvailableAnimations\(.*?^\t\}').Value
 $rules=[regex]::Match($rulesSource,'(?ms)^\tpublic void ApplyNoPerksRules\(.*?^\t\}').Value
 $rules += [regex]::Match($rulesSource,'(?ms)^\tpublic void ApplyNoAnimationRules\(.*?^\t\}').Value
 if(!$fields -or !$copy -or !$parameters -or !$animations -or !$rules){throw 'Form parameter copy/filter extraction failed.'}
@@ -50,11 +50,11 @@ class Attributes
 }
 class PerkInfoItem
 {
-    public enum DNPGIEGCGKH { SINGLE, COMBO }
+    public enum PerkKind { SINGLE, COMBO }
     public string Name;
-    public DNPGIEGCGKH LELHEEDNMBP;
+    public PerkKind Kind;
     public bool IsPerkByNames(string name) => name == Name;
-    public void HILDOOOKHGN(bool weapon) { }
+    public void SetIsWeaponPerk(bool weapon) { }
 }
 class ItemInfo
 {
@@ -63,22 +63,22 @@ class ItemInfo
     public readonly List<PerkInfoItem> InnatePerks = new List<PerkInfoItem>();
 }
 class UserItem { }
-class Inventory { public UserItem CMGOCLGHNLH(ItemInfo item) => throw new Exception("unexpected save lookup"); }
-class Roster { public Inventory KHCNHPCPFII() => throw new Exception("unexpected save lookup"); }
+class Inventory { public UserItem FindItem(ItemInfo item) => throw new Exception("unexpected save lookup"); }
+class Roster { public Inventory GetInventory() => throw new Exception("unexpected save lookup"); }
 class ListSF
 {
-    public static Roster CCDKHLAMKKO() => throw new Exception("unexpected save lookup");
-    public static List<PerkInfoItem> KJBMBFHCEIM(ItemInfo item, bool player) => throw new Exception("unexpected save lookup");
+    public static Roster GetRoster() => throw new Exception("unexpected save lookup");
+    public static List<PerkInfoItem> GetItemEnchantmentsForSide(ItemInfo item, bool player) => throw new Exception("unexpected save lookup");
 }
-class GameUtils { public static bool ILFJCODGINO(PerkInfoItem perk) => true; }
-class LLLOJBFMONN { public static void Error(string message) => throw new Exception(message); }
+class GameUtils { public static bool IsPerkCompatibleWithEquipment(PerkInfoItem perk) => true; }
+class GameLog { public static void Error(string message) => throw new Exception(message); }
 class ModelParameters
 {
     PARAMETER_FIELDS
     public ModelParameters()
     {
-        IBLHIAHECLK = new Attributes(); MAGFMAFCHLP = new Attributes();
-        JJCKADKCDIF = new Vector3f();
+        FinalAttributes = new Attributes(); BaseAttributes = new Attributes();
+        SpawnPosition = new Vector3f();
     }
     COPY_CONSTRUCTOR
     PARAMETER_METHODS
@@ -89,15 +89,15 @@ class InfoAnimation
 {
     public string Name;
     public ConditionTable MoveData = new ConditionTable();
-    public bool HPPGNJJCEGF(ModelConditions conditions, List<ConditionAnimation> required) => true;
+    public bool AreConditionsMet(ModelConditions conditions, List<ConditionAnimation> required) => true;
     public bool CheckAnimationName(List<string> names) => names.Contains(Name);
 }
 class ModelConditions
 {
-    public List<ItemInfo> OJIAKDDCGLB;
-    public bool FDELMAHAAJD;
-    public SceneTypes IBBALIJOJMC;
-    public List<PerkInfoItem> POBNMMADAJJ, CFPLPALGCMK;
+    public List<ItemInfo> Items;
+    public bool IsWeapon;
+    public SceneTypes SceneType;
+    public List<PerkInfoItem> SelfPerks, OtherPerks;
 }
 class AnimationData
 {
@@ -108,14 +108,14 @@ class AnimationData
 class NoPerksRule
 {
     public string Name;
-    public string DMEDLGGNAIK() => Name;
+    public string GetPerkName() => Name;
 }
 class NoAnimationRule
 {
     public string Name;
     public bool Active;
-    public bool HHHPGLLBPMF() => Active;
-    public string DPKNMJMPEDM() => Name;
+    public bool GetActive() => Active;
+    public string GetAnimationName() => Name;
 }
 class RulesInspector
 {
@@ -131,8 +131,8 @@ class ValidateFormParameterCopy
     static string[] Moves(ModelParameters parameters)
     {
         var selected = new List<InfoAnimation>();
-        AnimationData.AKJLPGMEFFD(selected, parameters.PJNJIJIODHE(), false,
-            parameters.DANNKMJOOOH, SceneTypes.SceneFight, parameters.JBIOECDAAKP());
+        AnimationData.CollectAvailableAnimations(selected, parameters.GetEquippedItems(), false,
+            parameters.ExcludedMoveNames, SceneTypes.SceneFight, parameters.GetAllPerks());
         return selected.Select(move => move.Name).ToArray();
     }
     static void Restrictions(bool player)
@@ -141,13 +141,13 @@ class ValidateFormParameterCopy
         var allowed = new PerkInfoItem { Name = "AllowedPerk" };
         var source = new ModelParameters {
             IsPlayer = player, UserControlled = player, AiControlled = !player,
-            IBBALIJOJMC = SceneTypes.SceneFight, MaxLife = 40,
+            SceneType = SceneTypes.SceneFight, MaxLife = 40,
             EclipseCharacterId = "sample:restricted-form",
             EclipseSkinModels = new[] { "sample:skin.xml" },
             Weapon = new ItemInfo { Type = "Weapon" } };
         source.Perks.Add(blocked);
         source.Weapon.InnatePerks.AddRange(new[] { blocked, allowed });
-        source.IBLHIAHECLK.Values.Add("WeaponDamage", 23);
+        source.FinalAttributes.Values.Add("WeaponDamage", 23);
         source.ModelDocuments.Add("sample:body.xml");
         var rules = new RulesInspector();
         rules._noAnimationRules.Add(new NoAnimationRule { Name = "RestrictedKick", Active = true });
@@ -155,24 +155,24 @@ class ValidateFormParameterCopy
         rules.ApplyNoAnimationRules(source);
         rules.ApplyNoPerksRules(source, new List<NoPerksRule> { new NoPerksRule { Name = "BlockedPerk" } });
         Check(Moves(source).SequenceEqual(new[] { "Stance" }), "native active animation restriction applies before copying");
-        Check(source.JBIOECDAAKP().SequenceEqual(new[] { allowed }), "native perk exclusion covers equipment after innate filtering");
+        Check(source.GetAllPerks().SequenceEqual(new[] { allowed }), "native perk exclusion covers equipment after innate filtering");
         var copy = new ModelParameters(source);
         Check(copy.IsPlayer == player && copy.UserControlled == player && copy.AiControlled == !player &&
             copy.MaxLife == 40 && copy.EclipseCharacterId == source.EclipseCharacterId,
             "copy preserves participant role, prepared health pool and destination character");
         Check(Moves(copy).SequenceEqual(Moves(source)), "copy must not re-enable RestrictedKick in the native animation filter");
-        Check(copy.JBIOECDAAKP().SequenceEqual(source.JBIOECDAAKP()), "copy must not re-enable equipment BlockedPerk in native perk aggregation");
-        Check(copy.DANNKMJOOOH != source.DANNKMJOOOH && copy.KOELCOMEJMI != source.KOELCOMEJMI,
+        Check(copy.GetAllPerks().SequenceEqual(source.GetAllPerks()), "copy must not re-enable equipment BlockedPerk in native perk aggregation");
+        Check(copy.ExcludedMoveNames != source.ExcludedMoveNames && copy.ExcludedPerkNames != source.ExcludedPerkNames,
             "copied restrictions must have independent collection ownership");
         var repeated = new ModelParameters(copy);
-        Check(Moves(repeated).SequenceEqual(Moves(source)) && repeated.JBIOECDAAKP().SequenceEqual(source.JBIOECDAAKP()),
+        Check(Moves(repeated).SequenceEqual(Moves(source)) && repeated.GetAllPerks().SequenceEqual(source.GetAllPerks()),
             "repeated copies preserve original restrictions through native consumers");
-        copy.DANNKMJOOOH.Clear(); copy.KOELCOMEJMI.Clear();
-        Check(Moves(source).SequenceEqual(new[] { "Stance" }) && source.JBIOECDAAKP().SequenceEqual(new[] { allowed }),
+        copy.ExcludedMoveNames.Clear(); copy.ExcludedPerkNames.Clear();
+        Check(Moves(source).SequenceEqual(new[] { "Stance" }) && source.GetAllPerks().SequenceEqual(new[] { allowed }),
             "clearing a detached copy cannot weaken original restrictions");
-        copy.IBLHIAHECLK.Values["WeaponDamage"] = 99;
+        copy.FinalAttributes.Values["WeaponDamage"] = 99;
         copy.ModelDocuments.Clear(); copy.EclipseSkinModels[0] = "changed";
-        Check(source.IBLHIAHECLK.Values["WeaponDamage"] == 23 && source.ModelDocuments.Count == 1 &&
+        Check(source.FinalAttributes.Values["WeaponDamage"] == 23 && source.ModelDocuments.Count == 1 &&
             source.EclipseSkinModels[0] == "sample:skin.xml", "existing attribute/model/skin copy isolation remains intact");
     }
     public static int Main()

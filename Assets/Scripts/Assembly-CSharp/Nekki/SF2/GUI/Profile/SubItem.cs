@@ -5,7 +5,7 @@ namespace Nekki.SF2.GUI.Profile
 {
 	public class SubItem : SFButton
 	{
-		public enum DNJPAMBANOM
+		public enum SubItemEvent
 		{
 			onChoose = 10
 		}
@@ -30,64 +30,64 @@ namespace Nekki.SF2.GUI.Profile
 
 		public ProfileCell ParentCell;
 
-		protected bool IIPJNGBMJJP;
+		protected bool isLocked;
 
 		protected bool _active;
 
-		protected bool OAHJFBHINFG;
+		protected bool isSelected;
 
 		public object Data;
 
-		protected int BIBDCOKMMKO;
+		protected int animationFrame;
 
-		protected int AGOKAGIEIJM;
+		protected int animationFrameCount;
 
-		protected bool BLNIFOCLLPD = true;
+		protected bool isFadingIn = true;
 
-		protected float BHKAAODJMJF = 1f;
+		protected float iconMaxOpacity = 1f;
 
-		protected float CDNOKAKOLMP = 1f;
+		protected float iconMinOpacity = 1f;
 
-		protected string _texturePath = SF2Paths.KLIDILIHOFF();
+		protected string _texturePath = SF2Paths.GetSkillsUiPath();
 
-		protected string GJPJJHACOJJ = string.Empty;
+		protected string spriteName = string.Empty;
 
-		private float HBEKOCIKIAJ;
+		private float selectedMaxOpacity;
 
-		private float MPHAGFFDINJ;
+		private float selectedMinOpacity;
 
-		private static bool GIIHHBFGAFM = true;
+		private static bool animationEnabled = true;
 
-		private bool APMOONFFHEC;
+		private bool isSelectFlashing;
 
-		private float MJBPKKGLGIH;
+		private float selectFlashMinOpacity;
 
-		private float DOOOGJGOJFB = 1f;
+		private float selectFlashMaxOpacity = 1f;
 
 		public void Init(int OKNNNLIPODI)
 		{
-			HBEKOCIKIAJ = ProfileGUI.OMILCNNEBIL.EBDBPJNBHGI / 255f;
-			MPHAGFFDINJ = ProfileGUI.OMILCNNEBIL.DPGMCKCDMBC / 255f;
-			AGOKAGIEIJM = ProfileGUI.AnimationSpeed;
+			selectedMaxOpacity = ProfileGUI.SelectOpacity.Max / 255f;
+			selectedMinOpacity = ProfileGUI.SelectOpacity.Min / 255f;
+			animationFrameCount = ProfileGUI.AnimationSpeed;
 			ButtonId = OKNNNLIPODI;
 			_backPicture.gameObject.SetActive(false);
 		}
 
 		public virtual void SetLock(bool AJPDLMOHKEN)
 		{
-			IIPJNGBMJJP = AJPDLMOHKEN;
-			GAGLGNPDCCL();
+			isLocked = AJPDLMOHKEN;
+			UpdateLockPicture();
 		}
 
 		public virtual bool GetLock()
 		{
-			return IIPJNGBMJJP;
+			return isLocked;
 		}
 
 		public virtual void SetActive(bool HNJDHGDLLPD)
 		{
 			_active = HNJDHGDLLPD;
-			JDCOEPMIBCI();
+			UpdateInactivePicture();
 		}
 
 		public virtual bool GetActive()
@@ -97,20 +97,20 @@ namespace Nekki.SF2.GUI.Profile
 
 		public virtual void SetSelected(bool CMEFIGAKNFG)
 		{
-			OAHJFBHINFG = CMEFIGAKNFG;
+			isSelected = CMEFIGAKNFG;
 			if ((bool)_selectedPicture)
 			{
-				_selectedPicture.gameObject.SetActive(OAHJFBHINFG);
+				_selectedPicture.gameObject.SetActive(isSelected);
 			}
-			if ((bool)_selectWhiteSquare && AssemblyController.KMEOEAGGPBI())
+			if ((bool)_selectWhiteSquare && AssemblyController.GetGamepadEnabled())
 			{
-				_selectWhiteSquare.gameObject.SetActive(OAHJFBHINFG);
+				_selectWhiteSquare.gameObject.SetActive(isSelected);
 			}
 		}
 
 		public virtual bool GetSelected()
 		{
-			return OAHJFBHINFG;
+			return isSelected;
 		}
 
 		public virtual void Choose()
@@ -125,7 +125,7 @@ namespace Nekki.SF2.GUI.Profile
 
 		public static void EnableAnimation(bool value)
 		{
-			GIIHHBFGAFM = value;
+			animationEnabled = value;
 		}
 
 		public void SetSelectFlashing(bool LHGLOOMODPK)
@@ -133,7 +133,7 @@ namespace Nekki.SF2.GUI.Profile
 			if (_selectWhiteSquare != null)
 			{
 			}
-			APMOONFFHEC = LHGLOOMODPK;
+			isSelectFlashing = LHGLOOMODPK;
 		}
 
 		public void SetSelectFlashingMinOpacity(float IEKAFNFKBNE)
@@ -141,14 +141,14 @@ namespace Nekki.SF2.GUI.Profile
 			if (_selectWhiteSquare != null)
 			{
 			}
-			MJBPKKGLGIH = IEKAFNFKBNE;
-			if (MJBPKKGLGIH < 0f)
+			selectFlashMinOpacity = IEKAFNFKBNE;
+			if (selectFlashMinOpacity < 0f)
 			{
-				MJBPKKGLGIH = 0f;
+				selectFlashMinOpacity = 0f;
 			}
-			if (MJBPKKGLGIH > 1f)
+			if (selectFlashMinOpacity > 1f)
 			{
-				MJBPKKGLGIH = 1f;
+				selectFlashMinOpacity = 1f;
 			}
 		}
 
@@ -157,41 +157,41 @@ namespace Nekki.SF2.GUI.Profile
 			if (_selectWhiteSquare != null)
 			{
 			}
-			DOOOGJGOJFB = BIPFOECJBNE;
-			if (DOOOGJGOJFB < 0f)
+			selectFlashMaxOpacity = BIPFOECJBNE;
+			if (selectFlashMaxOpacity < 0f)
 			{
-				DOOOGJGOJFB = 0f;
+				selectFlashMaxOpacity = 0f;
 			}
-			if (DOOOGJGOJFB > 1f)
+			if (selectFlashMaxOpacity > 1f)
 			{
-				DOOOGJGOJFB = 1f;
+				selectFlashMaxOpacity = 1f;
 			}
 		}
 
-		protected virtual void FGICHADOEHF()
+		protected virtual void UpdateSelectedFlash()
 		{
-			if (OAHJFBHINFG)
+			if (isSelected)
 			{
-				float num = HBEKOCIKIAJ - MPHAGFFDINJ;
-				if (num > 0f && AGOKAGIEIJM > 0)
+				float num = selectedMaxOpacity - selectedMinOpacity;
+				if (num > 0f && animationFrameCount > 0)
 				{
-					float num2 = num / (float)AGOKAGIEIJM * (float)BIBDCOKMMKO;
-					float kGJALFLDIBG = ((!BLNIFOCLLPD) ? (HBEKOCIKIAJ - num2) : (MPHAGFFDINJ + num2));
-					UIExtensions.HNIHBGAOAIH(_selectedPicture, kGJALFLDIBG);
+					float num2 = num / (float)animationFrameCount * (float)animationFrame;
+					float kGJALFLDIBG = ((!isFadingIn) ? (selectedMaxOpacity - num2) : (selectedMinOpacity + num2));
+					UIExtensions.SetAlpha(_selectedPicture, kGJALFLDIBG);
 				}
 			}
 		}
 
-		protected virtual void AJGODMIMDDP()
+		protected virtual void UpdateIconFlash()
 		{
-			float num = BHKAAODJMJF - CDNOKAKOLMP;
-			if (num > 0f && AGOKAGIEIJM > 0)
+			float num = iconMaxOpacity - iconMinOpacity;
+			if (num > 0f && animationFrameCount > 0)
 			{
-				float num2 = num / (float)AGOKAGIEIJM * (float)BIBDCOKMMKO;
-				float kGJALFLDIBG = ((!BLNIFOCLLPD) ? (BHKAAODJMJF - num2) : (CDNOKAKOLMP + num2));
+				float num2 = num / (float)animationFrameCount * (float)animationFrame;
+				float kGJALFLDIBG = ((!isFadingIn) ? (iconMaxOpacity - num2) : (iconMinOpacity + num2));
 				if (_icon != null)
 				{
-					UIExtensions.HNIHBGAOAIH(_icon, kGJALFLDIBG);
+					UIExtensions.SetAlpha(_icon, kGJALFLDIBG);
 				}
 			}
 		}
@@ -199,14 +199,14 @@ namespace Nekki.SF2.GUI.Profile
 		public virtual void UpdateIcon()
 		{
 			_icon.set_TexturePath(_texturePath);
-			_icon.set_SpriteName(GJPJJHACOJJ);
+			_icon.set_SpriteName(spriteName);
 			_selectedPicture.gameObject.SetActive(false);
 			_lockPicture.gameObject.SetActive(false);
 			_inactivePicture.gameObject.SetActive(false);
-			JDCOEPMIBCI();
+			UpdateInactivePicture();
 		}
 
-		protected virtual void JDCOEPMIBCI()
+		protected virtual void UpdateInactivePicture()
 		{
 			if (!_inactivePicture.IsDestroyed())
 			{
@@ -214,34 +214,34 @@ namespace Nekki.SF2.GUI.Profile
 			}
 		}
 
-		protected virtual void GAGLGNPDCCL()
+		protected virtual void UpdateLockPicture()
 		{
 			if (_lockPicture != null)
 			{
-				_lockPicture.gameObject.SetActive(IIPJNGBMJJP);
+				_lockPicture.gameObject.SetActive(isLocked);
 			}
 			if (_icon != null)
 			{
-				_icon.gameObject.SetActive(!IIPJNGBMJJP);
+				_icon.gameObject.SetActive(!isLocked);
 			}
 		}
 
-		protected virtual void FHCOMGJEKHE(NFOGOFFAPPP.HHGPKAJENGF LFLGCDNKNJI)
+		protected virtual void OnPressTypeChanged(ButtonStateExtensions.ButtonPressType LFLGCDNKNJI)
 		{
-			JDCOEPMIBCI();
+			UpdateInactivePicture();
 		}
 
 		private void Update()
 		{
-			if (GIIHHBFGAFM)
+			if (animationEnabled)
 			{
-				FGICHADOEHF();
+				UpdateSelectedFlash();
 			}
-			BIBDCOKMMKO++;
-			if (BIBDCOKMMKO > AGOKAGIEIJM)
+			animationFrame++;
+			if (animationFrame > animationFrameCount)
 			{
-				BIBDCOKMMKO = 0;
-				BLNIFOCLLPD = !BLNIFOCLLPD;
+				animationFrame = 0;
+				isFadingIn = !isFadingIn;
 			}
 		}
 
@@ -254,7 +254,7 @@ namespace Nekki.SF2.GUI.Profile
 			}
 		}
 
-		protected virtual void FOPPGHBAKHJ(bool LPPNCLBEAFA)
+		protected virtual void SetBackPictureVisible(bool LPPNCLBEAFA)
 		{
 			_backPicture.gameObject.SetActive(LPPNCLBEAFA);
 		}

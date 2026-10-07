@@ -69,18 +69,18 @@ internal static class RewardGrantNativeTests
             new RewardItem.ConfiguredGrantEnchantment("WEAKNESS", "1950", null, null, "0.41", "300",
                 new Dictionary<string, string> { { "Base", "-20000" } })
         });
-        Assert(source.LDLPCOFHFKE.Count == 1 && source.CMEFKONFDKN() == 0,
+        Assert(source.enchantments.Count == 1 && source.EvaluateLevel() == 0,
             "Configured clone mutated the shared source reward.");
-        Assert(clone.CMEFKONFDKN() == 52 && clone.UpgradeNumber == 2 && clone.IDGKPLBKDIB && clone.GOOBKHECJIF,
+        Assert(clone.EvaluateLevel() == 52 && clone.UpgradeNumber == 2 && clone.IsDrop && clone.ShowReward,
             "Configured clone lost level, upgrade, drop, or presentation state.");
         Assert(clone.HasEclipseGrantConfiguration && clone.EclipseGrantIndex == 0,
             "Configured clone lost its internal reward marker.");
-        Assert(clone.LDLPCOFHFKE.Count == 3 && clone.LDLPCOFHFKE[0].get_Name() == "FRENZY" &&
-            clone.LDLPCOFHFKE[0].Pairs.Single().Value == "3639.75",
+        Assert(clone.enchantments.Count == 3 && clone.enchantments[0].get_Name() == "FRENZY" &&
+            clone.enchantments[0].Pairs.Single().Value == "3639.75",
             "Configured clone did not retain the decimal aspect literal.");
-        Assert(clone.LDLPCOFHFKE[1].Pairs.Count == 0 && clone.LDLPCOFHFKE[1].EclipseKind == "Combo",
+        Assert(clone.enchantments[1].Pairs.Count == 0 && clone.enchantments[1].EclipseKind == "Combo",
             "Aspect-less external enchantment lost its kind or gained a synthetic aspect.");
-        Assert(clone.LDLPCOFHFKE[2].Pairs.ToDictionary(pair => pair.Key, pair => pair.Value)
+        Assert(clone.enchantments[2].Pairs.ToDictionary(pair => pair.Key, pair => pair.Value)
             .OrderBy(pair => pair.Key).SequenceEqual(new Dictionary<string, string> {
                 { "Aspect", "1950" }, { "Base", "-20000" }, { "Chance", "0.41" }, { "Frames", "300" }
             }.OrderBy(pair => pair.Key)), "Configured enchantment lost native chance, duration or perk parameters.");
@@ -114,25 +114,25 @@ internal static class RewardGrantNativeTests
         RewardItem source = ParseRewardItem("<Item Name='fixture:items/desolator' Drop='1' EclipseReward='fixture:rewards/titan' EclipseGrant='0'/>");
 
         Assert(ModRuntime.TryConfigureRewardGrant(source, 52, out var configured, out var error), "Bridge failed: " + error);
-        Assert(calls == 1 && seenLevel == 52 && configured.CMEFKONFDKN() == 52,
+        Assert(calls == 1 && seenLevel == 52 && configured.EvaluateLevel() == 52,
             "Bridge did not snapshot the pre-XP player level into a literal reward level.");
-        Assert(configured.LDLPCOFHFKE.Count == 2 && configured.LDLPCOFHFKE[0].get_Name() == "FRENZY" &&
-            configured.LDLPCOFHFKE[0].Pairs.ToDictionary(pair => pair.Key, pair => pair.Value)["Aspect"] == "3639.75" &&
-            configured.LDLPCOFHFKE[0].Pairs.ToDictionary(pair => pair.Key, pair => pair.Value)["ChanceFactor"] == "2.5" &&
-            configured.LDLPCOFHFKE[0].Pairs.ToDictionary(pair => pair.Key, pair => pair.Value)["Chance"] == "0.3" &&
-            configured.LDLPCOFHFKE[0].Pairs.ToDictionary(pair => pair.Key, pair => pair.Value)["Frames"] == "300" &&
-            configured.LDLPCOFHFKE[0].Pairs.ToDictionary(pair => pair.Key, pair => pair.Value)["DamageFactor"] == "15850" &&
-            configured.LDLPCOFHFKE[1].get_Name() == depPerk.ToString() && configured.LDLPCOFHFKE[1].EclipseKind == "Combo",
+        Assert(configured.enchantments.Count == 2 && configured.enchantments[0].get_Name() == "FRENZY" &&
+            configured.enchantments[0].Pairs.ToDictionary(pair => pair.Key, pair => pair.Value)["Aspect"] == "3639.75" &&
+            configured.enchantments[0].Pairs.ToDictionary(pair => pair.Key, pair => pair.Value)["ChanceFactor"] == "2.5" &&
+            configured.enchantments[0].Pairs.ToDictionary(pair => pair.Key, pair => pair.Value)["Chance"] == "0.3" &&
+            configured.enchantments[0].Pairs.ToDictionary(pair => pair.Key, pair => pair.Value)["Frames"] == "300" &&
+            configured.enchantments[0].Pairs.ToDictionary(pair => pair.Key, pair => pair.Value)["DamageFactor"] == "15850" &&
+            configured.enchantments[1].get_Name() == depPerk.ToString() && configured.enchantments[1].EclipseKind == "Combo",
             "Bridge did not convert validated perk identities/aspects into native payloads.");
-        Assert(source.CMEFKONFDKN() == 0 && source.LDLPCOFHFKE.Count == 0,
+        Assert(source.EvaluateLevel() == 0 && source.enchantments.Count == 0,
             "Bridge mutated the shared reward instance.");
 
-        Assert(ModRuntime.TryConfigureRewardGrant(source, 53, out var second, out error) && second.CMEFKONFDKN() == 53 && calls == 2,
+        Assert(ModRuntime.TryConfigureRewardGrant(source, 53, out var second, out error) && second.EvaluateLevel() == 53 && calls == 2,
             "Configured reward cached stale callback state across grants.");
 
         var overrideGrant = new RewardItemGrant(itemId, 0, _ => new RewardGrantConfiguration(37));
         catalog.ReplaceReward(new RewardDefinition(rewardId, new[] { overrideGrant }, Array.Empty<RewardChoiceDefinition>()));
-        Assert(ModRuntime.TryConfigureRewardGrant(source, 53, out var levelOverride, out error) && levelOverride.CMEFKONFDKN() == 37,
+        Assert(ModRuntime.TryConfigureRewardGrant(source, 53, out var levelOverride, out error) && levelOverride.EvaluateLevel() == 37,
             "Explicit configured reward level did not override the snapshot.");
 
         var missing = DefinitionId.Parse("fixture:perks/missing");
@@ -184,22 +184,22 @@ internal static class RewardGrantNativeTests
         ListSF.Reset(52, nativeItem);
         var result = new FightResult.ResultPrizeStruct();
         RewardItem source = ParseRewardItem("<Item Name='fixture:items/desolator' Drop='1' EclipseReward='fixture:rewards/titan' EclipseGrant='0'/>");
-        result.KFJABAMAKOD(source);
-        Assert(calls == 1 && result.HELFDCAIJNE.Count == 1 && result.HELFDCAIJNE[0].NAIEGGHELIH.CMEFKONFDKN() == 52,
+        result.AddReward(source);
+        Assert(calls == 1 && result.Items.Count == 1 && result.Items[0].RewardSource.EvaluateLevel() == 52,
             "FightResult did not configure the reward before native level lookup.");
-        Assert(result.HELFDCAIJNE[0].NAIEGGHELIH.LDLPCOFHFKE.Single().Pairs.Single().Value == "99.5",
+        Assert(result.Items[0].RewardSource.enchantments.Single().Pairs.Single().Value == "99.5",
             "FightResult prize lost configured enchantment payload.");
 
         ListSF.Current.Inventory.Owned["fixture:items/desolator"] = new UserItem();
         result = new FightResult.ResultPrizeStruct();
-        result.KFJABAMAKOD(source);
-        Assert(calls == 1 && result.HELFDCAIJNE.Count == 0, "Owned-item skip invoked configured callback or granted a duplicate.");
+        result.AddReward(source);
+        Assert(calls == 1 && result.Items.Count == 0, "Owned-item skip invoked configured callback or granted a duplicate.");
 
         ListSF.Current.Inventory.Owned.Clear();
         ListSF.CurrentItems.ByName.Clear();
         result = new FightResult.ResultPrizeStruct();
-        result.KFJABAMAKOD(source);
-        Assert(calls == 1 && result.HELFDCAIJNE.Count == 0, "Missing-item skip invoked configured callback.");
+        result.AddReward(source);
+        Assert(calls == 1 && result.Items.Count == 0, "Missing-item skip invoked configured callback.");
 
         ListSF.CurrentItems.ByName[nativeItem.Name] = nativeItem;
         catalog.ReplaceReward(new RewardDefinition(rewardId, new[]
@@ -208,8 +208,8 @@ internal static class RewardGrantNativeTests
         }, Array.Empty<RewardChoiceDefinition>()));
         UnityEngine.Debug.Warnings.Clear();
         result = new FightResult.ResultPrizeStruct();
-        result.KFJABAMAKOD(source);
-        Assert(result.HELFDCAIJNE.Count == 0 && UnityEngine.Debug.Warnings.Count == 1,
+        result.AddReward(source);
+        Assert(result.Items.Count == 0 && UnityEngine.Debug.Warnings.Count == 1,
             "Callback failure partially granted a prize or failed to warn.");
 
         catalog.ReplaceReward(new RewardDefinition(rewardId, new[]
@@ -219,8 +219,8 @@ internal static class RewardGrantNativeTests
         nativeItem.MissingUpdateLevel = 53;
         UnityEngine.Debug.Warnings.Clear();
         result = new FightResult.ResultPrizeStruct();
-        result.KFJABAMAKOD(source);
-        Assert(result.HELFDCAIJNE.Count == 0 && UnityEngine.Debug.Warnings.Count == 1 &&
+        result.AddReward(source);
+        Assert(result.Items.Count == 0 && UnityEngine.Debug.Warnings.Count == 1 &&
             UnityEngine.Debug.Warnings[0].Contains("exact level 53 is unavailable"),
             "Configured level silently downgraded to the native base item.");
     }
@@ -270,10 +270,10 @@ internal static class RewardGrantNativeTests
     private static void TestNativeEnchantmentSerialization()
     {
         ListSF.Reset(52, new ItemInfo("fixture:items/desolator", "Weapon", 52));
-        GameUtils.FDEJIIDIPBI.Register("FRENZY", PerkInfoItem.DNPGIEGCGKH.SINGLE);
+        GameUtils.PerkItemList.Register("FRENZY", PerkInfoItem.PerkKind.SINGLE);
         RewardItem reward = ParseRewardItem("<Item Name='fixture:items/desolator'><Enchantments><Perk Name='FRENZY'><Set Aspect='3639.75' Chance='0.3' Frames='300' DamageFactor='15850'/></Perk></Enchantments></Item>");
         var user = new UserItem();
-        user.GDBFNNLHPOB(reward.LDLPCOFHFKE, 52, 52);
+        user.ApplyEnchantments(reward.enchantments, 52, 52);
         XmlNode saved = user.Node.SelectSingleNode("Enchantments/Perk[@Name='FRENZY']/Set");
         Assert(saved != null && saved.Attributes["Aspect"].Value == "3639.75" &&
             saved.Attributes["Chance"].Value == "0.3" && saved.Attributes["Frames"].Value == "300" &&
@@ -297,63 +297,63 @@ internal static class RewardGrantNativeTests
 
 public static class XmlFixtureExtensions
 {
-    public static string CIPOICEEIBK(this XmlAttribute attribute, string fallback) => attribute == null ? fallback : attribute.Value;
+    public static string GetStringOrDefault(this XmlAttribute attribute, string fallback) => attribute == null ? fallback : attribute.Value;
     public static uint ParseUint(this XmlAttribute attribute) => attribute == null || string.IsNullOrEmpty(attribute.Value) ? 0u : uint.Parse(attribute.Value, CultureInfo.InvariantCulture);
     public static bool ParseBool(this XmlAttribute attribute) => attribute != null && (attribute.Value == "1" || bool.TryParse(attribute.Value, out var value) && value);
     public static int ToInt(this string value) => string.IsNullOrEmpty(value) ? 0 : (int)double.Parse(value, CultureInfo.InvariantCulture);
-    public static XmlNode ACBPMPMPKJJ(this XmlNode node, string name) { var child = node.OwnerDocument.CreateElement(name); node.AppendChild(child); return child; }
-    public static XmlNode KDPLHGGPJHN(this XmlNode node, string name) { var child = node.OwnerDocument.CreateElement(name); node.AppendChild(child); return child; }
-    public static XmlAttribute LLIKNHNLGJJ(this XmlNode node, string name) { var element = (XmlElement)node; var attr = element.GetAttributeNode(name) ?? element.OwnerDocument.CreateAttribute(name); if (attr.OwnerElement == null) element.Attributes.Append(attr); return attr; }
+    public static XmlNode AppendElement(this XmlNode node, string name) { var child = node.OwnerDocument.CreateElement(name); node.AppendChild(child); return child; }
+    public static XmlNode AppendNewNode(this XmlNode node, string name) { var child = node.OwnerDocument.CreateElement(name); node.AppendChild(child); return child; }
+    public static XmlAttribute AppendAttribute(this XmlNode node, string name) { var element = (XmlElement)node; var attr = element.GetAttributeNode(name) ?? element.OwnerDocument.CreateAttribute(name); if (attr.OwnerElement == null) element.Attributes.Append(attr); return attr; }
 }
 
 public class Rewardable
 {
-    public enum GADCOGHCGDP { REWARD_NOTHING, REWARD_ITEM }
-    public GADCOGHCGDP CLOGJMBMMPI;
-    public bool IDGKPLBKDIB;
-    public bool GOOBKHECJIF;
-    public virtual void Parse(XmlNode node) { IDGKPLBKDIB = node.Attributes["Drop"].ParseBool(); GOOBKHECJIF = node.Attributes["ShowReward"].ParseBool(); }
+    public enum RewardKind { REWARD_NOTHING, REWARD_ITEM }
+    public RewardKind Kind;
+    public bool IsDrop;
+    public bool ShowReward;
+    public virtual void Parse(XmlNode node) { IsDrop = node.Attributes["Drop"].ParseBool(); ShowReward = node.Attributes["ShowReward"].ParseBool(); }
 }
 
-public sealed class FunctionResult { public string DCJLKCFKCOM; }
+public sealed class FunctionResult { public string Value; }
 public sealed class FunctionExtension
 {
     private string _value;
-    public sealed class CallbackResult { public object data; public FunctionResult NAGGNMIFFGK = new FunctionResult(); }
-    public sealed class GLBAFLLMOOH { public string FJLOLCPJACB = ""; public string HBDLDIKHFEG = ""; }
+    public sealed class CallbackResult { public object data; public FunctionResult result = new FunctionResult(); }
+    public sealed class FunctionCall { public string functionName = ""; public string propertyName = ""; }
     public void Parse(string value) { _value = value; }
-    public void PBPBNENGLPA(Action<CallbackResult> callback) { }
-    public void DMPCFMACDJM(Action<CallbackResult> callback) { }
-    public FunctionResult IBCPKBBAFNH() => new FunctionResult { DCJLKCFKCOM = string.IsNullOrEmpty(_value) ? "0" : _value };
+    public void SetFunctionCallback(Action<CallbackResult> callback) { }
+    public void SetVariableCallback(Action<CallbackResult> callback) { }
+    public FunctionResult Calculate() => new FunctionResult { Value = string.IsNullOrEmpty(_value) ? "0" : _value };
 }
 
 public sealed class PerkInfoItem
 {
-    public enum DNPGIEGCGKH { SINGLE, COMBO }
+    public enum PerkKind { SINGLE, COMBO }
     public string Name;
-    public DNPGIEGCGKH LELHEEDNMBP;
-    public void HJFEFJIEINN(FunctionExtension.CallbackResult value) { }
-    public void OKPFNCJFLDL(FunctionExtension.CallbackResult value) { }
+    public PerkKind Kind;
+    public void EvaluateFunctionCallback(FunctionExtension.CallbackResult value) { }
+    public void OnFunctionPreCallback(FunctionExtension.CallbackResult value) { }
 }
 
 public sealed class PerkItems
 {
     private readonly Dictionary<string, PerkInfoItem> _items = new Dictionary<string, PerkInfoItem>(StringComparer.Ordinal);
-    public void Register(string name, PerkInfoItem.DNPGIEGCGKH kind) => _items[name] = new PerkInfoItem { Name = name, LELHEEDNMBP = kind };
-    public PerkInfoItem ABAGJKMKCBA(string name) => _items.TryGetValue(name, out var item) ? item : null;
+    public void Register(string name, PerkInfoItem.PerkKind kind) => _items[name] = new PerkInfoItem { Name = name, Kind = kind };
+    public PerkInfoItem FindBasePerk(string name) => _items.TryGetValue(name, out var item) ? item : null;
 }
 
-public static class GameUtils { public static readonly PerkItems FDEJIIDIPBI = new PerkItems(); }
+public static class GameUtils { public static readonly PerkItems PerkItemList = new PerkItems(); }
 
 public partial class UserItem
 {
-    internal bool JGPEOEDJMHH = true;
-    internal readonly List<PerkInfoItem> JCGBOOPPOLG = new List<PerkInfoItem>();
+    internal bool writesToNode = true;
+    internal readonly List<PerkInfoItem> enchantments = new List<PerkInfoItem>();
     internal readonly XmlElement _Node;
     public XmlElement Node => _Node;
     public UserItem() { var document = new XmlDocument { XmlResolver = null }; _Node = document.CreateElement("Item"); document.AppendChild(_Node); }
-    private void JNGJKFLJCML() { }
-    private void AMCMLDINIOM() { }
+    private void RemoveSingleEnchantments() { }
+    private void RemoveComboEnchantments() { }
 }
 
 public sealed class ItemInfo
@@ -365,10 +365,10 @@ public sealed class ItemInfo
     public int MissingUpdateLevel = -1;
     public ItemInfo(string name, string type, int level) { Name = name; Type = type; ItemLevel = level; }
     public ItemInfo GetUpdateItemByLevel(int level, bool ignored) => level == MissingUpdateLevel ? null : level == ItemLevel ? this : new ItemInfo(Name, Type, level);
-    public ItemInfo HIOBANJPMKF(int level) => new ItemInfo(Name, Type, level);
-    public List<UpgradeData> DNFDAGFAANJ(bool ignored, int level) => new List<UpgradeData>();
-    public ItemInfo MPADIPJLMLH(UpgradeData data) => this;
-    public static PerkInfoItem APPAODDDDKI(XmlNode node) => GameUtils.FDEJIIDIPBI.ABAGJKMKCBA(node.Attributes?["Name"]?.Value);
+    public ItemInfo GetUpgradeItemAtOrAboveUpgradeLevel(int level) => new ItemInfo(Name, Type, level);
+    public List<UpgradeData> GetUpgrades(bool ignored, int level) => new List<UpgradeData>();
+    public ItemInfo CreateUpgradedItem(UpgradeData data) => this;
+    public static PerkInfoItem ParsePerk(XmlNode node) => GameUtils.PerkItemList.FindBasePerk(node.Attributes?["Name"]?.Value);
 }
 public sealed class UpgradeData { }
 
@@ -380,33 +380,33 @@ public sealed class Items
 public sealed class UserItems
 {
     public readonly Dictionary<string, UserItem> Owned = new Dictionary<string, UserItem>(StringComparer.Ordinal);
-    public UserItem CMGOCLGHNLH(string name) => Owned.TryGetValue(name, out var item) ? item : null;
+    public UserItem FindItem(string name) => Owned.TryGetValue(name, out var item) ? item : null;
 }
 public sealed class Roster
 {
     public readonly UserItems Inventory = new UserItems();
     public int Level { get; set; }
-    public int MMIMAJCKFKL;
-    public bool CLODDOOGDBB;
-    public UserItems KHCNHPCPFII() => Inventory;
-    public int PINDEKDNCNL() => Level;
+    public int LevelOverride;
+    public bool UseLevelOverride;
+    public UserItems GetInventory() => Inventory;
+    public int GetLevel() => Level;
 }
 public static class ListSF
 {
     public static readonly Roster Current = new Roster();
     public static readonly Items CurrentItems = new Items();
-    public static Roster CCDKHLAMKKO() => Current;
+    public static Roster GetRoster() => Current;
     public static Items GetItems() => CurrentItems;
     public static void Reset(int level, ItemInfo item) { Current.Level = level; Current.Inventory.Owned.Clear(); CurrentItems.ByName.Clear(); if (item != null) CurrentItems.ByName[item.Name] = item; }
 }
 
 public partial class FightResult
 {
-    public sealed class LJFFIBFBGID
+    public sealed class ItemGrant
     {
-        public ItemInfo DLKPBAJDHBO;
-        public RewardItem NAIEGGHELIH;
-        public bool IDGKPLBKDIB;
+        public ItemInfo Item;
+        public RewardItem RewardSource;
+        public bool IsDrop;
     }
 }
 

@@ -44,8 +44,8 @@ namespace Eclipse.Multiplayer
         /// <summary>Replaces RulesInspector's clock-based reseed at fight and round starts.</summary>
         public static void ReseedRules(int round)
         {
-            if (Active) NekkiMath.KACCBCCEPGB((int)Mix((uint)_seed ^ 0xA5A5A5A5u, 0x40000000u + (uint)round));
-            else NekkiMath.KACCBCCEPGB();
+            if (Active) NekkiMath.SetSeed((int)Mix((uint)_seed ^ 0xA5A5A5A5u, 0x40000000u + (uint)round));
+            else NekkiMath.SetSeed();
         }
 
         /// <summary>Drop-in for UnityEngine.Random.Range(float, float) in gameplay code.</summary>
@@ -65,7 +65,7 @@ namespace Eclipse.Multiplayer
 
         private static void Reseed(uint salt)
         {
-            NekkiMath.KACCBCCEPGB((int)Mix((uint)_seed, salt));
+            NekkiMath.SetSeed((int)Mix((uint)_seed, salt));
             _state = Mix((uint)_seed ^ 0x9E3779B9u, salt) | 1u;
         }
 

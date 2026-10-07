@@ -11,47 +11,47 @@ namespace CodeStage.AntiCheat.Examples
 	[AddComponentMenu("")]
 	public class ActTesterGui : MonoBehaviour
 	{
-		private const string KHAMBPGILCG = "#FF4040";
+		private const string RedColor = "#FF4040";
 
-		private const string OLJKKKGHPBI = "#02C85F";
+		private const string GreenColor = "#02C85F";
 
-		private const string AGHDKHFHEPL = "name";
+		private const string PrefsString = "name";
 
-		private const string HMABOENBKHP = "money";
+		private const string PrefsInt = "money";
 
-		private const string MIAHDAJCHOM = "lifeBar";
+		private const string PrefsFloat = "lifeBar";
 
-		private const string CEKEKDEPJNG = "gameComplete";
+		private const string PrefsBool = "gameComplete";
 
-		private const string HJDHCAHHCDH = "demoUint";
+		private const string PrefsUint = "demoUint";
 
-		private const string IALKMKNGCAM = "demoLong";
+		private const string PrefsLong = "demoLong";
 
-		private const string MLOODEINEDD = "demoDouble";
+		private const string PrefsDouble = "demoDouble";
 
-		private const string PMDLJFEEAMA = "demoVector2";
+		private const string PrefsVector2 = "demoVector2";
 
-		private const string NGEKALCENHG = "demoVector3";
+		private const string PrefsVector3 = "demoVector3";
 
-		private const string PIBHBOAHCHG = "demoQuaternion";
+		private const string PrefsQuaternion = "demoQuaternion";
 
-		private const string KPANFHDDGFA = "demoRect";
+		private const string PrefsRect = "demoRect";
 
-		private const string DIDANHNOBGI = "demoColor";
+		private const string PrefsColor = "demoColor";
 
-		private const string AHBIMCEOIKN = "demoByteArray";
+		private const string PrefsByteArray = "demoByteArray";
 
-		private const string PLNHFGEKFCK = "http://j.mp/1gxg1tf";
+		private const string ApiUrlLockToDevice = "http://j.mp/1gxg1tf";
 
-		private const string AHJJPLILHNM = "http://j.mp/1iBK5pz";
+		private const string ApiUrlPreservePrefs = "http://j.mp/1iBK5pz";
 
-		private const string DCJCMMAMFFI = "http://j.mp/1FRAL5L";
+		private const string ApiUrlEmergencyMode = "http://j.mp/1FRAL5L";
 
-		private const string FNCHKBIIBEA = "http://j.mp/1LCdpDa";
+		private const string ApiUrlReadForeign = "http://j.mp/1LCdpDa";
 
-		private const string MEBEDDGJHNP = "http://j.mp/1KVrpxi";
+		private const string ApiUrlUnobscuredMode = "http://j.mp/1KVrpxi";
 
-		private const string GEPEPFPLCNL = "http://docs.unity3d.com/ScriptReference/PlayerPrefs.html";
+		private const string ApiUrlPlayerPrefs = "http://docs.unity3d.com/ScriptReference/PlayerPrefs.html";
 
 		[Header("Regular variables")]
 		public string regularString = "I'm regular string";
@@ -84,51 +84,51 @@ namespace CodeStage.AntiCheat.Examples
 
 		private readonly string[] tabs = new string[3] { "Variables protection", "Saves protection", "Cheating detectors" };
 
-		private int JEMIENMLNKL;
+		private int currentTab;
 
-		private string DGMEPCBKPEA;
+		private string allSimpleObscuredTypes;
 
-		private string JGENFAEFIGJ;
+		private string regularPrefs;
 
-		private string GMBAPAPCHCJ;
+		private string obscuredPrefs;
 
-		private int DNHIHOBELMC;
+		private int savesLock;
 
-		private bool LOLIHLHKEMG;
+		private bool savesAlterationDetected;
 
-		private bool HMJKPKPCDEH;
+		private bool foreignSavesDetected;
 
-		private bool OCEFNFANBGG;
+		private bool injectionDetected;
 
-		private bool FPJPGKBDMBF;
+		private bool speedHackDetected;
 
-		private bool ALLDLDNMKHD;
+		private bool obscuredTypeCheatDetected;
 
-		private bool MBPMDGDAFIB;
+		private bool wallHackCheatDetected;
 
 		private readonly StringBuilder logBuilder = new StringBuilder();
 
 		public void OnSpeedHackDetected()
 		{
-			FPJPGKBDMBF = true;
+			speedHackDetected = true;
 			Debug.Log("Speed hack Detected!");
 		}
 
 		public void OnInjectionDetected()
 		{
-			OCEFNFANBGG = true;
+			injectionDetected = true;
 			Debug.Log("Injection Detected!");
 		}
 
 		public void OnObscuredTypeCheatingDetected()
 		{
-			ALLDLDNMKHD = true;
+			obscuredTypeCheatDetected = true;
 			Debug.Log("Obscured Vars Cheating Detected!");
 		}
 
 		public void OnWallHackDetected()
 		{
-			MBPMDGDAFIB = true;
+			wallHackCheatDetected = true;
 			Debug.Log("Wall hack Detected!");
 		}
 
@@ -136,36 +136,36 @@ namespace CodeStage.AntiCheat.Examples
 		{
 			if (Application.isPlaying)
 			{
-				ObscuredPrefs.PPNGALKEMIO(prefsEncryptionKey);
+				ObscuredPrefs.SetCryptoKey(prefsEncryptionKey);
 			}
 		}
 
 		private void Awake()
 		{
-			ObscuredPrefs.PPNGALKEMIO(prefsEncryptionKey);
-			ObscuredPrefs.BOFHLEDGKGJ = ECHDGOJOJEB;
-			ObscuredPrefs.HHFALGBHMFH = MFICIHICJAL;
+			ObscuredPrefs.SetCryptoKey(prefsEncryptionKey);
+			ObscuredPrefs.OnAlterationDetected = OnSavesTampered;
+			ObscuredPrefs.OnPossibleForeignSavesDetected = OnForeignSavesDetected;
 		}
 
 		private void Start()
 		{
-			LELCPGOLMME();
-			EGMDGPNLLEH();
-			BEPHKDNOCLJ();
-			CLODPJMGPBI();
+			ObscuredStringExample();
+			ObscuredIntExample();
+			ObscuredFloatExample();
+			ObscuredVector3Example();
 			Invoke("RandomizeObscuredVars", UnityEngine.Random.Range(1f, 10f));
 		}
 
 		private void RandomizeObscuredVars()
 		{
-			obscuredInt.GMCADPGOCHM();
-			obscuredFloat.GMCADPGOCHM();
-			obscuredString.GMCADPGOCHM();
-			obscuredVector3.GMCADPGOCHM();
+			obscuredInt.RandomizeCryptoKey();
+			obscuredFloat.RandomizeCryptoKey();
+			obscuredString.RandomizeCryptoKey();
+			obscuredVector3.RandomizeCryptoKey();
 			Invoke("RandomizeObscuredVars", UnityEngine.Random.Range(1f, 10f));
 		}
 
-		private void LELCPGOLMME()
+		private void ObscuredStringExample()
 		{
 			logBuilder.Length = 0;
 			logBuilder.AppendLine("[ACTk] <b>[ ObscuredString test ]</b>");
@@ -173,11 +173,11 @@ namespace CodeStage.AntiCheat.Examples
 			string text = "the Goscurry is not a lie ;)";
 			logBuilder.AppendLine("Original string:\n" + text);
 			ObscuredString obscuredString = (ObscuredString)(text);
-			logBuilder.AppendLine("How your string is stored in memory when obscured:\n" + obscuredString.ECEBFGCJIDA());
+			logBuilder.AppendLine("How your string is stored in memory when obscured:\n" + obscuredString.GetEncrypted());
 			Debug.Log(logBuilder);
 		}
 
-		private void EGMDGPNLLEH()
+		private void ObscuredIntExample()
 		{
 			logBuilder.Length = 0;
 			logBuilder.AppendLine("[ACTk] <b>[ ObscuredInt test ]</b>");
@@ -185,21 +185,21 @@ namespace CodeStage.AntiCheat.Examples
 			int num = 5;
 			logBuilder.AppendLine("Original lives count: " + num);
 			ObscuredInt bAINMLLIKOL = (ObscuredInt)(num);
-			logBuilder.AppendLine("How your lives count is stored in memory when obscured: " + bAINMLLIKOL.ECEBFGCJIDA());
+			logBuilder.AppendLine("How your lives count is stored in memory when obscured: " + bAINMLLIKOL.GetEncrypted());
 			ObscuredInt.SetNewCryptoKey(666);
 			num = (int)(bAINMLLIKOL);
 			bAINMLLIKOL = (ObscuredInt)((int)(bAINMLLIKOL) - 2);
 			bAINMLLIKOL = (ObscuredInt)((int)(bAINMLLIKOL) + num + 10);
 			bAINMLLIKOL = (ObscuredInt)((int)(bAINMLLIKOL) / 2);
-			bAINMLLIKOL = ObscuredInt.ALEAHDHGCJL(bAINMLLIKOL);
+			bAINMLLIKOL = ObscuredInt.op_Increment(bAINMLLIKOL);
 			ObscuredInt.SetNewCryptoKey(999);
-			bAINMLLIKOL = ObscuredInt.ALEAHDHGCJL(bAINMLLIKOL);
-			bAINMLLIKOL = ObscuredInt.DDKOKLNFNPB(bAINMLLIKOL);
+			bAINMLLIKOL = ObscuredInt.op_Increment(bAINMLLIKOL);
+			bAINMLLIKOL = ObscuredInt.op_Decrement(bAINMLLIKOL);
 			logBuilder.AppendLine(string.Concat("Lives count after few usual operations: ", bAINMLLIKOL, " (", bAINMLLIKOL.ToString("X"), "h)"));
 			Debug.Log(logBuilder);
 		}
 
-		private void BEPHKDNOCLJ()
+		private void ObscuredFloatExample()
 		{
 			logBuilder.Length = 0;
 			logBuilder.AppendLine("[ACTk] <b>[ ObscuredFloat test ]</b>");
@@ -207,19 +207,19 @@ namespace CodeStage.AntiCheat.Examples
 			float num = 99.9f;
 			logBuilder.AppendLine("Original health bar: " + num);
 			ObscuredFloat bAINMLLIKOL = (ObscuredFloat)(num);
-			logBuilder.AppendLine("How your health bar is stored in memory when obscured: " + bAINMLLIKOL.ECEBFGCJIDA());
+			logBuilder.AppendLine("How your health bar is stored in memory when obscured: " + bAINMLLIKOL.GetEncrypted());
 			ObscuredFloat.SetNewCryptoKey(666);
 			bAINMLLIKOL = (ObscuredFloat)((float)(bAINMLLIKOL) + 6f);
 			bAINMLLIKOL = (ObscuredFloat)((float)(bAINMLLIKOL) - 1.5f);
-			bAINMLLIKOL = ObscuredFloat.ALEAHDHGCJL(bAINMLLIKOL);
-			bAINMLLIKOL = ObscuredFloat.DDKOKLNFNPB(bAINMLLIKOL);
-			bAINMLLIKOL = ObscuredFloat.DDKOKLNFNPB(bAINMLLIKOL);
+			bAINMLLIKOL = ObscuredFloat.op_Increment(bAINMLLIKOL);
+			bAINMLLIKOL = ObscuredFloat.op_Decrement(bAINMLLIKOL);
+			bAINMLLIKOL = ObscuredFloat.op_Decrement(bAINMLLIKOL);
 			bAINMLLIKOL = (ObscuredFloat)(num - (float)(bAINMLLIKOL) + 10.5f);
 			logBuilder.AppendLine("Health bar after few usual operations: " + bAINMLLIKOL);
 			Debug.Log(logBuilder);
 		}
 
-		private void CLODPJMGPBI()
+		private void ObscuredVector3Example()
 		{
 			logBuilder.Length = 0;
 			logBuilder.AppendLine("[ACTk] <b>[ ObscuredVector3 test ]</b>");
@@ -227,19 +227,19 @@ namespace CodeStage.AntiCheat.Examples
 			Vector3 vector = new Vector3(54.1f, 64.3f, 63.2f);
 			logBuilder.AppendLine("Original position: " + vector);
 			ObscuredVector3 rawObfuscatedVector = (ObscuredVector3)(vector);
-			ObscuredVector3.RawEncryptedVector3 rawEncryptedVector = rawObfuscatedVector.ECEBFGCJIDA();
+			ObscuredVector3.RawEncryptedVector3 rawEncryptedVector = rawObfuscatedVector.GetEncrypted();
 			logBuilder.AppendLine("How your position is stored in memory when obscured: (" + rawEncryptedVector.x + ", " + rawEncryptedVector.y + ", " + rawEncryptedVector.z + ")");
 			Debug.Log(logBuilder);
 		}
 
-		private void ECHDGOJOJEB()
+		private void OnSavesTampered()
 		{
-			LOLIHLHKEMG = true;
+			savesAlterationDetected = true;
 		}
 
-		private void MFICIHICJAL()
+		private void OnForeignSavesDetected()
 		{
-			HMJKPKPCDEH = true;
+			foreignSavesDetected = true;
 		}
 
 		private void OnGUI()
@@ -250,14 +250,14 @@ namespace CodeStage.AntiCheat.Examples
 			GUILayout.Label("<color=\"#0287C8\"><b>Anti-Cheat Toolkit Sandbox</b></color>", gUIStyle);
 			GUILayout.Label("Here you can overview common ACTk features and try to cheat something yourself.", gUIStyle);
 			GUILayout.Space(5f);
-			JEMIENMLNKL = GUILayout.Toolbar(JEMIENMLNKL, tabs);
-			if (JEMIENMLNKL == 0)
+			currentTab = GUILayout.Toolbar(currentTab, tabs);
+			if (currentTab == 0)
 			{
 				GUILayout.Label("ACTk offers own collection of the secure types to let you protect your variables from <b>ANY</b> memory hacking tools (Cheat Engine, ArtMoney, GameCIH, Game Guardian, etc.).");
 				GUILayout.Space(5f);
 				using (new HorizontalLayout())
 				{
-					GUILayout.Label("<b>Obscured types:</b>\n<color=\"#75C4EB\">" + MBNHEDGLCLO() + "</color>", GUILayout.MinWidth(130f));
+					GUILayout.Label("<b>Obscured types:</b>\n<color=\"#75C4EB\">" + GetAllSimpleObscuredTypes() + "</color>", GUILayout.MinWidth(130f));
 					GUILayout.Space(10f);
 					using (new VerticalLayout(GUI.skin.box))
 					{
@@ -355,7 +355,7 @@ namespace CodeStage.AntiCheat.Examples
 							GUILayout.Label("<b>ObscuredVector3:</b> " + obscuredVector3, GUILayout.Width(250f));
 							if (GUILayout.Button("Add random value"))
 							{
-								obscuredVector3 = ObscuredVector3.PHEFFKMOOCM(obscuredVector3, UnityEngine.Random.insideUnitSphere);
+								obscuredVector3 = ObscuredVector3.op_Addition(obscuredVector3, UnityEngine.Random.insideUnitSphere);
 							}
 							if (GUILayout.Button("Reset"))
 							{
@@ -365,13 +365,13 @@ namespace CodeStage.AntiCheat.Examples
 					}
 				}
 			}
-			else if (JEMIENMLNKL == 1)
+			else if (currentTab == 1)
 			{
 				GUILayout.Label("ACTk has secure layer for the PlayerPrefs: <color=\"#75C4EB\">ObscuredPrefs</color>. It protects data from view, detects any cheating attempts, optionally locks data to the current device and supports additional data types.");
 				GUILayout.Space(5f);
 				using (new HorizontalLayout())
 				{
-					GUILayout.Label("<b>Supported types:</b>\n" + PLJAKCEMHOA(), GUILayout.MinWidth(130f));
+					GUILayout.Label("<b>Supported types:</b>\n" + GetAllObscuredPrefsDataTypes(), GUILayout.MinWidth(130f));
 					using (new VerticalLayout(GUI.skin.box))
 					{
 						GUILayout.Label("Below you can try to cheat both regular PlayerPrefs and secure ObscuredPrefs:");
@@ -379,29 +379,29 @@ namespace CodeStage.AntiCheat.Examples
 						{
 							GUILayout.Label("<color=\"#FF4040\"><b>PlayerPrefs:</b></color>\neasy to cheat, only 3 supported types", gUIStyle);
 							GUILayout.Space(5f);
-							if (string.IsNullOrEmpty(JGENFAEFIGJ))
+							if (string.IsNullOrEmpty(regularPrefs))
 							{
-								KKPNIEOLNGP();
+								LoadRegularPrefs();
 							}
 							using (new HorizontalLayout())
 							{
-								GUILayout.Label(JGENFAEFIGJ, GUILayout.Width(270f));
+								GUILayout.Label(regularPrefs, GUILayout.Width(270f));
 								using (new VerticalLayout())
 								{
 									using (new HorizontalLayout())
 									{
 										if (GUILayout.Button("Save"))
 										{
-											COPMPOFEGJO();
+											SaveRegularPrefs();
 										}
 										if (GUILayout.Button("Load"))
 										{
-											KKPNIEOLNGP();
+											LoadRegularPrefs();
 										}
 									}
 									if (GUILayout.Button("Delete"))
 									{
-										FOPIDOGDNJB();
+										DeleteRegularPrefs();
 									}
 								}
 							}
@@ -411,66 +411,66 @@ namespace CodeStage.AntiCheat.Examples
 						{
 							GUILayout.Label("<color=\"#02C85F\"><b>ObscuredPrefs:</b></color>\nsecure, lot of additional types and extra options", gUIStyle);
 							GUILayout.Space(5f);
-							if (string.IsNullOrEmpty(GMBAPAPCHCJ))
+							if (string.IsNullOrEmpty(obscuredPrefs))
 							{
-								OOBHLEHEKIK();
+								LoadObscuredPrefs();
 							}
 							using (new HorizontalLayout())
 							{
-								GUILayout.Label(GMBAPAPCHCJ, GUILayout.Width(270f));
+								GUILayout.Label(obscuredPrefs, GUILayout.Width(270f));
 								using (new VerticalLayout())
 								{
 									using (new HorizontalLayout())
 									{
 										if (GUILayout.Button("Save"))
 										{
-											NFBNFAKEJFI();
+											SaveObscuredPrefs();
 										}
 										if (GUILayout.Button("Load"))
 										{
-											OOBHLEHEKIK();
+											LoadObscuredPrefs();
 										}
 									}
 									if (GUILayout.Button("Delete"))
 									{
-										OCDBIDGFMKJ();
+										DeleteObscuredPrefs();
 									}
 									using (new HorizontalLayout())
 									{
 										GUILayout.Label("LockToDevice level");
-										OOMDDMEDAOH("http://j.mp/1gxg1tf");
+										ShowHelpButton("http://j.mp/1gxg1tf");
 									}
-									DNHIHOBELMC = GUILayout.SelectionGrid(DNHIHOBELMC, new string[3]
+									savesLock = GUILayout.SelectionGrid(savesLock, new string[3]
 									{
-										ObscuredPrefs.EAONKJOAGJI.None.ToString(),
-										ObscuredPrefs.EAONKJOAGJI.Soft.ToString(),
-										ObscuredPrefs.EAONKJOAGJI.Strict.ToString()
+										ObscuredPrefs.DeviceLockLevel.None.ToString(),
+										ObscuredPrefs.DeviceLockLevel.Soft.ToString(),
+										ObscuredPrefs.DeviceLockLevel.Strict.ToString()
 									}, 3);
-									ObscuredPrefs.PJAJBMBNKJN = (ObscuredPrefs.EAONKJOAGJI)DNHIHOBELMC;
+									ObscuredPrefs.LockToDevice = (ObscuredPrefs.DeviceLockLevel)savesLock;
 									GUILayout.Space(5f);
 									using (new HorizontalLayout())
 									{
-										ObscuredPrefs.AOFOAEDPLCO = GUILayout.Toggle(ObscuredPrefs.AOFOAEDPLCO, "preservePlayerPrefs");
-										OOMDDMEDAOH("http://j.mp/1iBK5pz");
+										ObscuredPrefs.PreservePlayerPrefs = GUILayout.Toggle(ObscuredPrefs.PreservePlayerPrefs, "preservePlayerPrefs");
+										ShowHelpButton("http://j.mp/1iBK5pz");
 									}
 									using (new HorizontalLayout())
 									{
-										ObscuredPrefs.PIGNHFAAJDM = GUILayout.Toggle(ObscuredPrefs.PIGNHFAAJDM, "emergencyMode");
-										OOMDDMEDAOH("http://j.mp/1FRAL5L");
+										ObscuredPrefs.EmergencyMode = GUILayout.Toggle(ObscuredPrefs.EmergencyMode, "emergencyMode");
+										ShowHelpButton("http://j.mp/1FRAL5L");
 									}
 									using (new HorizontalLayout())
 									{
-										ObscuredPrefs.GOKCHJKPDCN = GUILayout.Toggle(ObscuredPrefs.GOKCHJKPDCN, "readForeignSaves");
-										OOMDDMEDAOH("http://j.mp/1LCdpDa");
+										ObscuredPrefs.ReadForeignSaves = GUILayout.Toggle(ObscuredPrefs.ReadForeignSaves, "readForeignSaves");
+										ShowHelpButton("http://j.mp/1LCdpDa");
 									}
 									GUILayout.Space(5f);
-									GUILayout.Label("<color=\"" + ((!LOLIHLHKEMG) ? "#02C85F" : "#FF4040") + "\">Saves modification detected: " + LOLIHLHKEMG + "</color>");
-									GUILayout.Label("<color=\"" + ((!HMJKPKPCDEH) ? "#02C85F" : "#FF4040") + "\">Foreign saves detected: " + HMJKPKPCDEH + "</color>");
+									GUILayout.Label("<color=\"" + ((!savesAlterationDetected) ? "#02C85F" : "#FF4040") + "\">Saves modification detected: " + savesAlterationDetected + "</color>");
+									GUILayout.Label("<color=\"" + ((!foreignSavesDetected) ? "#02C85F" : "#FF4040") + "\">Foreign saves detected: " + foreignSavesDetected + "</color>");
 								}
 							}
 						}
 						GUILayout.Space(5f);
-						OOMDDMEDAOH("http://docs.unity3d.com/ScriptReference/PlayerPrefs.html", "Visit docs to see where PlayerPrefs are stored", -1);
+						ShowHelpButton("http://docs.unity3d.com/ScriptReference/PlayerPrefs.html", "Visit docs to see where PlayerPrefs are stored", -1);
 					}
 				}
 			}
@@ -482,29 +482,29 @@ namespace CodeStage.AntiCheat.Examples
 				{
 					GUILayout.Label("<b>Speed Hack Detector</b>");
 					GUILayout.Label("Allows to detect Cheat Engine's speed hack (and maybe some other speed hack tools) usage.");
-					GUILayout.Label("<color=\"" + ((!FPJPGKBDMBF) ? "#02C85F" : "#FF4040") + "\">Detected: " + FPJPGKBDMBF.ToString().ToLower() + "</color>");
+					GUILayout.Label("<color=\"" + ((!speedHackDetected) ? "#02C85F" : "#FF4040") + "\">Detected: " + speedHackDetected.ToString().ToLower() + "</color>");
 					GUILayout.Space(10f);
 					GUILayout.Label("<b>Obscured Cheating Detector</b>");
 					GUILayout.Label("Detects cheating of any Obscured type (except ObscuredPrefs, it has own detection features) used in project.");
-					GUILayout.Label("<color=\"" + ((!ALLDLDNMKHD) ? "#02C85F" : "#FF4040") + "\">Detected: " + ALLDLDNMKHD.ToString().ToLower() + "</color>");
+					GUILayout.Label("<color=\"" + ((!obscuredTypeCheatDetected) ? "#02C85F" : "#FF4040") + "\">Detected: " + obscuredTypeCheatDetected.ToString().ToLower() + "</color>");
 					GUILayout.Space(10f);
 					GUILayout.Label("<b>WallHack Detector</b>");
 					GUILayout.Label("Detects common types of wall hack cheating: walking through the walls (Rigidbody and CharacterController modules), shooting through the walls (Raycast module), looking through the walls (Wireframe module).");
-					GUILayout.Label("<color=\"" + ((!MBPMDGDAFIB) ? "#02C85F" : "#FF4040") + "\">Detected: " + MBPMDGDAFIB.ToString().ToLower() + "</color>");
+					GUILayout.Label("<color=\"" + ((!wallHackCheatDetected) ? "#02C85F" : "#FF4040") + "\">Detected: " + wallHackCheatDetected.ToString().ToLower() + "</color>");
 					GUILayout.Space(10f);
 					GUILayout.Label("<b>Injection Detector</b>");
 					GUILayout.Label("Allows to detect foreign managed assemblies in your application.");
-					GUILayout.Label("<color=\"" + ((!OCEFNFANBGG) ? "#02C85F" : "#FF4040") + "\">Detected: " + OCEFNFANBGG.ToString().ToLower() + "</color>");
+					GUILayout.Label("<color=\"" + ((!injectionDetected) ? "#02C85F" : "#FF4040") + "\">Detected: " + injectionDetected.ToString().ToLower() + "</color>");
 				}
 			}
 			GUILayout.EndArea();
 		}
 
-		private string MBNHEDGLCLO()
+		private string GetAllSimpleObscuredTypes()
 		{
 			string result = "Can't get the list, sorry :(";
 			string PKLOIFLHINB = string.Empty;
-			if (string.IsNullOrEmpty(DGMEPCBKPEA))
+			if (string.IsNullOrEmpty(allSimpleObscuredTypes))
 			{
 				IEnumerable<Type> source = from GNAONAPDDLD in Assembly.GetExecutingAssembly().GetTypes()
 					where GNAONAPDDLD.IsPublic && GNAONAPDDLD.Namespace == "CodeStage.AntiCheat.ObscuredTypes" && GNAONAPDDLD.Name != "ObscuredPrefs"
@@ -523,30 +523,30 @@ namespace CodeStage.AntiCheat.Examples
 				if (!string.IsNullOrEmpty(PKLOIFLHINB))
 				{
 					result = PKLOIFLHINB;
-					DGMEPCBKPEA = PKLOIFLHINB;
+					allSimpleObscuredTypes = PKLOIFLHINB;
 				}
 			}
 			else
 			{
-				result = DGMEPCBKPEA;
+				result = allSimpleObscuredTypes;
 			}
 			return result;
 		}
 
-		private string PLJAKCEMHOA()
+		private string GetAllObscuredPrefsDataTypes()
 		{
 			return "int\nfloat\nstring\n<color=\"#75C4EB\">uint\ndouble\nlong\nbool\nbyte[]\nVector2\nVector3\nQuaternion\nColor\nRect</color>";
 		}
 
-		private void KKPNIEOLNGP()
+		private void LoadRegularPrefs()
 		{
-			JGENFAEFIGJ = "int: " + PlayerPrefs.GetInt("money", -1) + "\n";
-			string jGENFAEFIGJ = JGENFAEFIGJ;
-			JGENFAEFIGJ = jGENFAEFIGJ + "float: " + PlayerPrefs.GetFloat("lifeBar", -1f) + "\n";
-			JGENFAEFIGJ = JGENFAEFIGJ + "string: " + PlayerPrefs.GetString("name", "No saved PlayerPrefs!");
+			regularPrefs = "int: " + PlayerPrefs.GetInt("money", -1) + "\n";
+			string jGENFAEFIGJ = regularPrefs;
+			regularPrefs = jGENFAEFIGJ + "float: " + PlayerPrefs.GetFloat("lifeBar", -1f) + "\n";
+			regularPrefs = regularPrefs + "string: " + PlayerPrefs.GetString("name", "No saved PlayerPrefs!");
 		}
 
-		private void COPMPOFEGJO()
+		private void SaveRegularPrefs()
 		{
 			PlayerPrefs.SetInt("money", 456);
 			PlayerPrefs.SetFloat("lifeBar", 456.789f);
@@ -554,7 +554,7 @@ namespace CodeStage.AntiCheat.Examples
 			PlayerPrefs.Save();
 		}
 
-		private void FOPIDOGDNJB()
+		private void DeleteRegularPrefs()
 		{
 			PlayerPrefs.DeleteKey("money");
 			PlayerPrefs.DeleteKey("lifeBar");
@@ -562,36 +562,36 @@ namespace CodeStage.AntiCheat.Examples
 			PlayerPrefs.Save();
 		}
 
-		private void OOBHLEHEKIK()
+		private void LoadObscuredPrefs()
 		{
 			byte[] array = ObscuredPrefs.GetByteArray("demoByteArray", 0, 4);
-			GMBAPAPCHCJ = "int: " + ObscuredPrefs.GetInt("money", -1) + "\n";
-			string gMBAPAPCHCJ = GMBAPAPCHCJ;
-			GMBAPAPCHCJ = gMBAPAPCHCJ + "float: " + ObscuredPrefs.GetFloat("lifeBar", -1f) + "\n";
-			GMBAPAPCHCJ = GMBAPAPCHCJ + "string: " + ObscuredPrefs.GetString("name", "No saved ObscuredPrefs!") + "\n";
-			gMBAPAPCHCJ = GMBAPAPCHCJ;
-			GMBAPAPCHCJ = gMBAPAPCHCJ + "bool: " + ObscuredPrefs.GetBool("gameComplete", false) + "\n";
-			gMBAPAPCHCJ = GMBAPAPCHCJ;
-			GMBAPAPCHCJ = gMBAPAPCHCJ + "uint: " + ObscuredPrefs.GetUInt("demoUint", 0u) + "\n";
-			gMBAPAPCHCJ = GMBAPAPCHCJ;
-			GMBAPAPCHCJ = gMBAPAPCHCJ + "long: " + ObscuredPrefs.GetLong("demoLong", -1L) + "\n";
-			gMBAPAPCHCJ = GMBAPAPCHCJ;
-			GMBAPAPCHCJ = gMBAPAPCHCJ + "double: " + ObscuredPrefs.GetDouble("demoDouble", -1.0) + "\n";
-			gMBAPAPCHCJ = GMBAPAPCHCJ;
-			GMBAPAPCHCJ = string.Concat(gMBAPAPCHCJ, "Vector2: ", ObscuredPrefs.GetVector2("demoVector2", Vector2.zero), "\n");
-			gMBAPAPCHCJ = GMBAPAPCHCJ;
-			GMBAPAPCHCJ = string.Concat(gMBAPAPCHCJ, "Vector3: ", ObscuredPrefs.GetVector3("demoVector3", Vector3.zero), "\n");
-			gMBAPAPCHCJ = GMBAPAPCHCJ;
-			GMBAPAPCHCJ = string.Concat(gMBAPAPCHCJ, "Quaternion: ", ObscuredPrefs.GetQuaternion("demoQuaternion", Quaternion.identity), "\n");
-			gMBAPAPCHCJ = GMBAPAPCHCJ;
-			GMBAPAPCHCJ = string.Concat(gMBAPAPCHCJ, "Rect: ", ObscuredPrefs.GetRect("demoRect", new Rect(0f, 0f, 0f, 0f)), "\n");
-			gMBAPAPCHCJ = GMBAPAPCHCJ;
-			GMBAPAPCHCJ = string.Concat(gMBAPAPCHCJ, "Color: ", ObscuredPrefs.GetColor("demoColor", Color.black), "\n");
-			gMBAPAPCHCJ = GMBAPAPCHCJ;
-			GMBAPAPCHCJ = gMBAPAPCHCJ + "byte[]: {" + array[0] + "," + array[1] + "," + array[2] + "," + array[3] + "}";
+			obscuredPrefs = "int: " + ObscuredPrefs.GetInt("money", -1) + "\n";
+			string gMBAPAPCHCJ = obscuredPrefs;
+			obscuredPrefs = gMBAPAPCHCJ + "float: " + ObscuredPrefs.GetFloat("lifeBar", -1f) + "\n";
+			obscuredPrefs = obscuredPrefs + "string: " + ObscuredPrefs.GetString("name", "No saved ObscuredPrefs!") + "\n";
+			gMBAPAPCHCJ = obscuredPrefs;
+			obscuredPrefs = gMBAPAPCHCJ + "bool: " + ObscuredPrefs.GetBool("gameComplete", false) + "\n";
+			gMBAPAPCHCJ = obscuredPrefs;
+			obscuredPrefs = gMBAPAPCHCJ + "uint: " + ObscuredPrefs.GetUInt("demoUint", 0u) + "\n";
+			gMBAPAPCHCJ = obscuredPrefs;
+			obscuredPrefs = gMBAPAPCHCJ + "long: " + ObscuredPrefs.GetLong("demoLong", -1L) + "\n";
+			gMBAPAPCHCJ = obscuredPrefs;
+			obscuredPrefs = gMBAPAPCHCJ + "double: " + ObscuredPrefs.GetDouble("demoDouble", -1.0) + "\n";
+			gMBAPAPCHCJ = obscuredPrefs;
+			obscuredPrefs = string.Concat(gMBAPAPCHCJ, "Vector2: ", ObscuredPrefs.GetVector2("demoVector2", Vector2.zero), "\n");
+			gMBAPAPCHCJ = obscuredPrefs;
+			obscuredPrefs = string.Concat(gMBAPAPCHCJ, "Vector3: ", ObscuredPrefs.GetVector3("demoVector3", Vector3.zero), "\n");
+			gMBAPAPCHCJ = obscuredPrefs;
+			obscuredPrefs = string.Concat(gMBAPAPCHCJ, "Quaternion: ", ObscuredPrefs.GetQuaternion("demoQuaternion", Quaternion.identity), "\n");
+			gMBAPAPCHCJ = obscuredPrefs;
+			obscuredPrefs = string.Concat(gMBAPAPCHCJ, "Rect: ", ObscuredPrefs.GetRect("demoRect", new Rect(0f, 0f, 0f, 0f)), "\n");
+			gMBAPAPCHCJ = obscuredPrefs;
+			obscuredPrefs = string.Concat(gMBAPAPCHCJ, "Color: ", ObscuredPrefs.GetColor("demoColor", Color.black), "\n");
+			gMBAPAPCHCJ = obscuredPrefs;
+			obscuredPrefs = gMBAPAPCHCJ + "byte[]: {" + array[0] + "," + array[1] + "," + array[2] + "," + array[3] + "}";
 		}
 
-		private void NFBNFAKEJFI()
+		private void SaveObscuredPrefs()
 		{
 			ObscuredPrefs.SetInt("money", 123);
 			ObscuredPrefs.SetFloat("lifeBar", 123.456f);
@@ -609,35 +609,35 @@ namespace CodeStage.AntiCheat.Examples
 			ObscuredPrefs.Save();
 		}
 
-		private void OCDBIDGFMKJ()
+		private void DeleteObscuredPrefs()
 		{
-			ObscuredPrefs.LPJJAFDEKIB("money");
-			ObscuredPrefs.LPJJAFDEKIB("lifeBar");
-			ObscuredPrefs.LPJJAFDEKIB("name");
-			ObscuredPrefs.LPJJAFDEKIB("gameComplete");
-			ObscuredPrefs.LPJJAFDEKIB("demoUint");
-			ObscuredPrefs.LPJJAFDEKIB("demoLong");
-			ObscuredPrefs.LPJJAFDEKIB("demoDouble");
-			ObscuredPrefs.LPJJAFDEKIB("demoVector2");
-			ObscuredPrefs.LPJJAFDEKIB("demoVector3");
-			ObscuredPrefs.LPJJAFDEKIB("demoQuaternion");
-			ObscuredPrefs.LPJJAFDEKIB("demoRect");
-			ObscuredPrefs.LPJJAFDEKIB("demoColor");
-			ObscuredPrefs.LPJJAFDEKIB("demoByteArray");
+			ObscuredPrefs.DeleteKey("money");
+			ObscuredPrefs.DeleteKey("lifeBar");
+			ObscuredPrefs.DeleteKey("name");
+			ObscuredPrefs.DeleteKey("gameComplete");
+			ObscuredPrefs.DeleteKey("demoUint");
+			ObscuredPrefs.DeleteKey("demoLong");
+			ObscuredPrefs.DeleteKey("demoDouble");
+			ObscuredPrefs.DeleteKey("demoVector2");
+			ObscuredPrefs.DeleteKey("demoVector3");
+			ObscuredPrefs.DeleteKey("demoQuaternion");
+			ObscuredPrefs.DeleteKey("demoRect");
+			ObscuredPrefs.DeleteKey("demoColor");
+			ObscuredPrefs.DeleteKey("demoByteArray");
 			ObscuredPrefs.Save();
 		}
 
-		private void OOMDDMEDAOH(string BEPKJNKCKPH)
+		private void ShowHelpButton(string BEPKJNKCKPH)
 		{
-			OOMDDMEDAOH(BEPKJNKCKPH, 30);
+			ShowHelpButton(BEPKJNKCKPH, 30);
 		}
 
-		private void OOMDDMEDAOH(string BEPKJNKCKPH, int JMLAKAKDBBL)
+		private void ShowHelpButton(string BEPKJNKCKPH, int JMLAKAKDBBL)
 		{
-			OOMDDMEDAOH(BEPKJNKCKPH, "?", JMLAKAKDBBL);
+			ShowHelpButton(BEPKJNKCKPH, "?", JMLAKAKDBBL);
 		}
 
-		private void OOMDDMEDAOH(string BEPKJNKCKPH, string GCKANEECDHE, int JMLAKAKDBBL)
+		private void ShowHelpButton(string BEPKJNKCKPH, string GCKANEECDHE, int JMLAKAKDBBL)
 		{
 			GUILayoutOption[] array = new GUILayoutOption[1];
 			if (JMLAKAKDBBL != -1)
@@ -656,8 +656,8 @@ namespace CodeStage.AntiCheat.Examples
 
 		private void OnApplicationQuit()
 		{
-			FOPIDOGDNJB();
-			OCDBIDGFMKJ();
+			DeleteRegularPrefs();
+			DeleteObscuredPrefs();
 		}
 	}
 }

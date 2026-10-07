@@ -3,13 +3,13 @@ using System.Diagnostics;
 public class AliasEventInfo : EventInfo
 {
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private string NICBGBGLFML;
+	private string alias;
 
-	public string HBCNKNFPAIM
+	public string AliasName
 	{
 		get
 		{
-			return MIDPFGENBCF();
+			return GetAlias();
 		}
 		set
 		{
@@ -22,13 +22,13 @@ public class AliasEventInfo : EventInfo
 	{
 	}
 
-	public string MIDPFGENBCF()
+	public string GetAlias()
 	{
-		return NICBGBGLFML;
+		return alias;
 	}
 
 	public void set_Alias(string value)
 	{
-		NICBGBGLFML = value;
+		alias = value;
 	}
 }

@@ -6,25 +6,25 @@ public class Arrow : MonoBehaviour
 	[SerializeField]
 	private ResolutionImage _arrowImg;
 
-	private const float EJDJBNBIMCO = 24f;
+	private const float DefaultAmplitude = 24f;
 
-	private const float AGANNALIGCA = 0.8f;
+	private const float DefaultStep = 0.8f;
 
-	protected float PPHDNBOHHOP;
+	protected float _amplitude;
 
-	protected float IAAJJHIGNDK;
+	protected float _step;
 
-	protected int MNLLCAPJFPF;
+	protected int _maxSteps;
 
-	protected int PEEOHAPHGIK;
+	protected int _stepCount;
 
 	protected bool _animationUp;
 
 	public void Init(float AONLJLDPMEE = 24f)
 	{
-		PPHDNBOHHOP = AONLJLDPMEE;
-		IAAJJHIGNDK = 0.8f;
-		MNLLCAPJFPF = (int)(PPHDNBOHHOP / 0.8f);
+		_amplitude = AONLJLDPMEE;
+		_step = 0.8f;
+		_maxSteps = (int)(_amplitude / 0.8f);
 	}
 
 	private void Update()
@@ -33,21 +33,21 @@ public class Arrow : MonoBehaviour
 		{
 			return;
 		}
-		_arrowImg.transform.BGNJGIACJBG(_arrowImg.transform.localPosition.y - ((!_animationUp) ? (0f - IAAJJHIGNDK) : IAAJJHIGNDK));
+		_arrowImg.transform.SetLocalY(_arrowImg.transform.localPosition.y - ((!_animationUp) ? (0f - _step) : _step));
 		if (_animationUp)
 		{
-			if (PEEOHAPHGIK < MNLLCAPJFPF)
+			if (_stepCount < _maxSteps)
 			{
-				PEEOHAPHGIK++;
+				_stepCount++;
 			}
 			else
 			{
 				_animationUp = false;
 			}
 		}
-		else if (PEEOHAPHGIK > 0)
+		else if (_stepCount > 0)
 		{
-			PEEOHAPHGIK--;
+			_stepCount--;
 		}
 		else
 		{

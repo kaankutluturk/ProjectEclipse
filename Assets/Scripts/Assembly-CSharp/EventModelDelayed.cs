@@ -1,12 +1,12 @@
 public class EventModelDelayed
 {
-	public Model KJDFJPBIGJC;
+	public Model Owner;
 
-	public Model GAIBPAGPEGK;
+	public Model Target;
 
 	public object Data;
 
 	public bool IsRandom;
 
-	public EventAnimation.EECEJKADLCK Type;
+	public EventAnimation.EventAnimationType Type;
 }

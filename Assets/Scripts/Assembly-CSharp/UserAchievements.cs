@@ -3,75 +3,75 @@ using System.Xml;
 
 public class UserAchievements
 {
-	private XmlNode BEFBGGHPJFB;
+	private XmlNode countersNode;
 
-	private XmlNode KMKPBELDMDA;
+	private XmlNode achievementsNode;
 
-	private XmlNode FELLKEANCPA;
+	private XmlNode repostAchievementsNode;
 
-	private List<RosterAchievCounter> HFKGFPNAHAO = new List<RosterAchievCounter>();
+	private List<RosterAchievCounter> counters = new List<RosterAchievCounter>();
 
-	private List<RosterAchievement> EFAONOEAAIH = new List<RosterAchievement>();
+	private List<RosterAchievement> achievements = new List<RosterAchievement>();
 
-	private List<RepostAchievement> KFMFEODLCOK = new List<RepostAchievement>();
+	private List<RepostAchievement> repostAchievements = new List<RepostAchievement>();
 
-	public List<RosterAchievCounter> FHGNFKGFNEL
+	public List<RosterAchievCounter> Counters
 	{
 		get
 		{
-			return HOBHAAAEELG();
+			return GetCounters();
 		}
 	}
 
-	public List<RosterAchievement> FOICCCGPCMJ
+	public List<RosterAchievement> Achievements
 	{
 		get
 		{
-			return NOJKMMJJPHF();
+			return GetAchievements();
 		}
 	}
 
-	public List<RepostAchievement> DKBINLMJIJG
+	public List<RepostAchievement> RepostAchievements
 	{
 		get
 		{
-			return NEEDPAEIOLH();
+			return GetRepostAchievements();
 		}
 	}
 
-	public int GNKJNICHNOM
+	public int CompletedAchievementCount
 	{
 		get
 		{
-			return JKGGEMEBPCP();
+			return CountCompletedAchievements();
 		}
 	}
 
-	public List<RosterAchievCounter> HOBHAAAEELG()
+	public List<RosterAchievCounter> GetCounters()
 	{
-		return HFKGFPNAHAO;
+		return counters;
 	}
 
-	public List<RosterAchievement> NOJKMMJJPHF()
+	public List<RosterAchievement> GetAchievements()
 	{
-		return EFAONOEAAIH;
+		return achievements;
 	}
 
-	public List<RepostAchievement> NEEDPAEIOLH()
+	public List<RepostAchievement> GetRepostAchievements()
 	{
-		return KFMFEODLCOK;
+		return repostAchievements;
 	}
 
-	public int JKGGEMEBPCP()
+	public int CountCompletedAchievements()
 	{
 		int num = 0;
-		List<AchievCounter> mDNKEAFGAOB = GameUtils.HHLEKNNJGMJ.MDNKEAFGAOB;
+		List<AchievCounter> mDNKEAFGAOB = GameUtils.AchievementDefinitions.Counters;
 		for (int i = 0; i < mDNKEAFGAOB.Count; i++)
 		{
-			List<Achievement> fOICCCGPCMJ = mDNKEAFGAOB[i].FOICCCGPCMJ;
+			List<Achievement> fOICCCGPCMJ = mDNKEAFGAOB[i].Achievements;
 			for (int j = 0; j < fOICCCGPCMJ.Count; j++)
 			{
-				if (fOICCCGPCMJ[j].DBHJGAGOLOB())
+				if (fOICCCGPCMJ[j].GetIsNew())
 				{
 					num++;
 				}
@@ -82,63 +82,63 @@ public class UserAchievements
 
 	public void Parse(XmlNode node)
 	{
-		BEFBGGHPJFB = node["Counters"];
-		if (BEFBGGHPJFB == null)
+		countersNode = node["Counters"];
+		if (countersNode == null)
 		{
-			BEFBGGHPJFB = node.ACBPMPMPKJJ("Counters");
+			countersNode = node.AppendElement("Counters");
 		}
-		foreach (XmlNode childNode in BEFBGGHPJFB.ChildNodes)
+		foreach (XmlNode childNode in countersNode.ChildNodes)
 		{
-			HFKGFPNAHAO.Add(new RosterAchievCounter(childNode));
+			counters.Add(new RosterAchievCounter(childNode));
 		}
-		KMKPBELDMDA = node["Achievements"];
-		if (KMKPBELDMDA == null)
+		achievementsNode = node["Achievements"];
+		if (achievementsNode == null)
 		{
-			KMKPBELDMDA = node.ACBPMPMPKJJ("Achievements");
+			achievementsNode = node.AppendElement("Achievements");
 		}
-		foreach (XmlNode childNode2 in KMKPBELDMDA.ChildNodes)
+		foreach (XmlNode childNode2 in achievementsNode.ChildNodes)
 		{
-			HDDNEDBMAAA(new RosterAchievement(childNode2));
+			AddRosterAchievement(new RosterAchievement(childNode2));
 		}
-		FELLKEANCPA = node["RepostAchievements"];
-		if (FELLKEANCPA == null)
+		repostAchievementsNode = node["RepostAchievements"];
+		if (repostAchievementsNode == null)
 		{
-			FELLKEANCPA = node.ACBPMPMPKJJ("RepostAchievements");
+			repostAchievementsNode = node.AppendElement("RepostAchievements");
 		}
-		foreach (XmlNode childNode3 in FELLKEANCPA.ChildNodes)
+		foreach (XmlNode childNode3 in repostAchievementsNode.ChildNodes)
 		{
-			KFMFEODLCOK.Add(new RepostAchievement(childNode3));
+			repostAchievements.Add(new RepostAchievement(childNode3));
 		}
 	}
 
-	public RosterAchievCounter KJPLIHEMLJL(string name)
+	public RosterAchievCounter FindCounter(string name)
 	{
-		for (int i = 0; i < HFKGFPNAHAO.Count; i++)
+		for (int i = 0; i < counters.Count; i++)
 		{
-			if (HFKGFPNAHAO[i].get_Name() == name)
+			if (counters[i].get_Name() == name)
 			{
-				return HFKGFPNAHAO[i];
+				return counters[i];
 			}
 		}
 		return null;
 	}
 
-	public void BFCLLIKOJGD()
+	public void ApplyPendingCounters()
 	{
-		GameUtils.AchievementCounters oJNHPHEPFLI = GameUtils.OJNHPHEPFLI;
+		GameUtils.AchievementCounters oJNHPHEPFLI = GameUtils.ModeCounters;
 		bool flag = false;
 		List<string> list = new List<string>();
-		foreach (KeyValuePair<string, Counter> item in oJNHPHEPFLI.LLMLCLKNAAN)
+		foreach (KeyValuePair<string, Counter> item in oJNHPHEPFLI.AllCounters)
 		{
 			Counter value = item.Value;
 			if (value.CompleteValue > 0)
 			{
 				list.Add(value.Name);
 				int num = 0;
-				RosterAchievCounter cKJBHGKBPPM = KJPLIHEMLJL(value.Name);
+				RosterAchievCounter cKJBHGKBPPM = FindCounter(value.Name);
 				if (cKJBHGKBPPM != null)
 				{
-					num = cKJBHGKBPPM.MCIPEJBLIDC() + value.CompleteValue;
+					num = cKJBHGKBPPM.GetCounter() + value.CompleteValue;
 					if (value.Type == "WinBattle")
 					{
 						num = ((num > 1) ? 1 : num);
@@ -153,95 +153,95 @@ public class UserAchievements
 					flag = true;
 				}
 			}
-			value.CPMPOPHBFKJ();
+			value.ResetCompleteValue();
 		}
-		List<global::Pair<Achievement, int>> cIMGCGDDKCE = GameUtils.HHLEKNNJGMJ.DLACNJLPKBK(list);
-		GameUtils.NKGCBJAAJMA(cIMGCGDDKCE);
+		List<global::Pair<Achievement, int>> cIMGCGDDKCE = GameUtils.AchievementDefinitions.GetUnlockableAchievements(list);
+		GameUtils.UnlockAchievements(cIMGCGDDKCE);
 		if (flag)
 		{
-			ListSF.CCDKHLAMKKO().GGGEHAGCLGC();
+			ListSF.GetRoster().RequestSave();
 		}
 	}
 
-	public RosterAchievement JABBCCJLOOC(string name)
+	public RosterAchievement FindAchievement(string name)
 	{
-		for (int i = 0; i < EFAONOEAAIH.Count; i++)
+		for (int i = 0; i < achievements.Count; i++)
 		{
-			if (EFAONOEAAIH[i].get_Name() == name)
+			if (achievements[i].get_Name() == name)
 			{
-				return EFAONOEAAIH[i];
+				return achievements[i];
 			}
 		}
 		return null;
 	}
 
-	public void CAEKPHDIGDA(RosterAchievement PGAGNLJABIE, bool POHFOGPKMMK, bool NLCCJEHMAOF = true)
+	public void SetAchievementRewardClaimed(RosterAchievement PGAGNLJABIE, bool POHFOGPKMMK, bool NLCCJEHMAOF = true)
 	{
-		if (PGAGNLJABIE.BLHBOBGKMBN() != POHFOGPKMMK)
+		if (PGAGNLJABIE.GetReward() != POHFOGPKMMK)
 		{
 			PGAGNLJABIE.set_Reward(POHFOGPKMMK);
 			if (NLCCJEHMAOF)
 			{
-				ListSF.CCDKHLAMKKO().GGGEHAGCLGC();
+				ListSF.GetRoster().RequestSave();
 			}
 		}
 	}
 
-	public void POKNGJJAHAL(Achievement NCCHENOEPNF, bool POHFOGPKMMK = true, bool NLCCJEHMAOF = true)
+	public void UnlockAchievement(Achievement NCCHENOEPNF, bool POHFOGPKMMK = true, bool NLCCJEHMAOF = true)
 	{
 		if (NCCHENOEPNF == null)
 		{
 			return;
 		}
 		string mENAJEAJJBE = NCCHENOEPNF.Name;
-		for (int i = 0; i < EFAONOEAAIH.Count; i++)
+		for (int i = 0; i < achievements.Count; i++)
 		{
-			RosterAchievement pMGCOHHMIIC = EFAONOEAAIH[i];
+			RosterAchievement pMGCOHHMIIC = achievements[i];
 			if (mENAJEAJJBE == pMGCOHHMIIC.get_Name())
 			{
-				CAEKPHDIGDA(pMGCOHHMIIC, POHFOGPKMMK, NLCCJEHMAOF);
+				SetAchievementRewardClaimed(pMGCOHHMIIC, POHFOGPKMMK, NLCCJEHMAOF);
 				return;
 			}
 		}
 		string jLEKBBJBLOE = "Achievement";
-		XmlNode hKPPBKPJOEO = KMKPBELDMDA.ACBPMPMPKJJ(jLEKBBJBLOE);
+		XmlNode hKPPBKPJOEO = achievementsNode.AppendElement(jLEKBBJBLOE);
 		RosterAchievement pMGCOHHMIIC2 = new RosterAchievement(hKPPBKPJOEO);
 		pMGCOHHMIIC2.set_Name(mENAJEAJJBE);
 		pMGCOHHMIIC2.set_Reward(POHFOGPKMMK);
-		HDDNEDBMAAA(pMGCOHHMIIC2, NCCHENOEPNF);
+		AddRosterAchievement(pMGCOHHMIIC2, NCCHENOEPNF);
 		ArgsDict kEMMIFBFDPK = new ArgsDict();
 		kEMMIFBFDPK["name"] = mENAJEAJJBE;
-		StatisticsCollector.BPDGOKGHDHB(StatisticsEvent.JDNFFHILFAF.Achievement, kEMMIFBFDPK);
+		StatisticsCollector.LogEvent(StatisticsEvent.EventType.Achievement, kEMMIFBFDPK);
 		if (NLCCJEHMAOF)
 		{
-			ListSF.CCDKHLAMKKO().GGGEHAGCLGC();
+			ListSF.GetRoster().RequestSave();
 		}
 	}
 
 	public bool CreateRepostAchievement(string OGPJPGMBIHJ)
 	{
-		for (int i = 0; i < KFMFEODLCOK.Count; i++)
+		for (int i = 0; i < repostAchievements.Count; i++)
 		{
-			RepostAchievement aFOGJMECGBG = KFMFEODLCOK[i];
+			RepostAchievement aFOGJMECGBG = repostAchievements[i];
 			if (aFOGJMECGBG.get_Name() == OGPJPGMBIHJ)
 			{
 				return false;
 			}
 		}
-		KFMFEODLCOK.Add(new RepostAchievement(FELLKEANCPA, OGPJPGMBIHJ));
+		repostAchievements.Add(new RepostAchievement(repostAchievementsNode, OGPJPGMBIHJ));
 		return true;
 	}
 
-	public bool ANBCFNBEDMH(RepostAchievement NCCHENOEPNF)
+	public bool RemoveRepostAchievement(RepostAchievement NCCHENOEPNF)
 	{
 		int num = 0;
-		foreach (XmlNode childNode in FELLKEANCPA.ChildNodes)
+		foreach (XmlNode childNode in repostAchievementsNode.ChildNodes)
 		{
-			string text = childNode.Attributes["Name"].CIPOICEEIBK(string.Empty);
+			string text = childNode.Attributes["Name"].GetStringOrDefault(string.Empty);
 			if (text == NCCHENOEPNF.get_Name())
 			{
-				FELLKEANCPA.RemoveChild(childNode);
-				KFMFEODLCOK.RemoveAt(num);
+				repostAchievementsNode.RemoveChild(childNode);
+				repostAchievements.RemoveAt(num);
 				return true;
 			}
 			num++;
@@ -258,20 +258,20 @@ public class UserAchievements
 		}
 		if (flag)
 		{
-			ListSF.CCDKHLAMKKO().GGGEHAGCLGC();
+			ListSF.GetRoster().RequestSave();
 		}
 	}
 
-	public void PEBJNEJLONK(List<RepostAchievement> MGNCKHDDHLE)
+	public void RemoveRepostAchievements(List<RepostAchievement> MGNCKHDDHLE)
 	{
 		bool flag = false;
 		for (int i = 0; i < MGNCKHDDHLE.Count; i++)
 		{
-			flag = ANBCFNBEDMH(MGNCKHDDHLE[i]);
+			flag = RemoveRepostAchievement(MGNCKHDDHLE[i]);
 		}
 		if (flag)
 		{
-			ListSF.CCDKHLAMKKO().GGGEHAGCLGC();
+			ListSF.GetRoster().RequestSave();
 		}
 	}
 
@@ -279,36 +279,36 @@ public class UserAchievements
     {
         if (!Eclipse.Modding.DefinitionId.TryParse(name, out var id) || id.Namespace.Value == "core" || id.Category != "counters" || amount < 0 || maximum < 1)
             throw new System.ArgumentException("Invalid external counter increment.");
-        var existing = KJPLIHEMLJL(name);
-        int previous = existing?.MCIPEJBLIDC() ?? 0;
+        var existing = FindCounter(name);
+        int previous = existing?.GetCounter() ?? 0;
         int next = System.Math.Max(previous, (int)System.Math.Min(maximum, (long)previous + amount));
         if(existing == null) CreateRosterAchievCounter(name,next); else existing.set_Counter(next);
-        var definition = GameUtils.HHLEKNNJGMJ.KJPLIHEMLJL(name);
-        if(definition != null) foreach(var achievement in definition.FOICCCGPCMJ)
-            if(next >= achievement.EOGLBDCLMBM && JABBCCJLOOC(achievement.Name) == null)
-                POKNGJJAHAL(achievement, true, false);
-        ListSF.CCDKHLAMKKO().GGGEHAGCLGC();
+        var definition = GameUtils.AchievementDefinitions.GetCounterByName(name);
+        if(definition != null) foreach(var achievement in definition.Achievements)
+            if(next >= achievement.CounterValue && FindAchievement(achievement.Name) == null)
+                UnlockAchievement(achievement, true, false);
+        ListSF.GetRoster().RequestSave();
         return next;
     }
 
 	private void CreateRosterAchievCounter(string name, int value)
 	{
-		XmlNode hKPPBKPJOEO = BEFBGGHPJFB.ACBPMPMPKJJ("Counter");
+		XmlNode hKPPBKPJOEO = countersNode.AppendElement("Counter");
 		RosterAchievCounter cKJBHGKBPPM = new RosterAchievCounter(hKPPBKPJOEO);
 		cKJBHGKBPPM.set_Name(name);
 		cKJBHGKBPPM.set_Counter(value);
-		HFKGFPNAHAO.Add(cKJBHGKBPPM);
+		counters.Add(cKJBHGKBPPM);
 	}
 
-	private void HDDNEDBMAAA(RosterAchievement BCIJIDMGJLC, Achievement NCCHENOEPNF = null)
+	private void AddRosterAchievement(RosterAchievement BCIJIDMGJLC, Achievement NCCHENOEPNF = null)
 	{
-		Achievement jNPIOKEKMII = ((NCCHENOEPNF == null) ? GameUtils.HHLEKNNJGMJ.ABNAODNDHDM(BCIJIDMGJLC.get_Name()) : NCCHENOEPNF);
+		Achievement jNPIOKEKMII = ((NCCHENOEPNF == null) ? GameUtils.AchievementDefinitions.GetAchievementByName(BCIJIDMGJLC.get_Name()) : NCCHENOEPNF);
 		if (jNPIOKEKMII != null)
 		{
-			jNPIOKEKMII.HGMHEOGJDMM = true;
-			jNPIOKEKMII.NMCBAKACIGK = BCIJIDMGJLC.BLHBOBGKMBN();
-			jNPIOKEKMII.BEBDMOEIEJN(!BCIJIDMGJLC.BLHBOBGKMBN());
+			jNPIOKEKMII.IsUnlocked = true;
+			jNPIOKEKMII.RewardClaimed = BCIJIDMGJLC.GetReward();
+			jNPIOKEKMII.SetIsNew(!BCIJIDMGJLC.GetReward());
 		}
-		EFAONOEAAIH.Add(BCIJIDMGJLC);
+		achievements.Add(BCIJIDMGJLC);
 	}
 }

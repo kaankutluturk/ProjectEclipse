@@ -5,135 +5,135 @@ using System.Xml;
 public class PerkTrigger
 {
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private string HKGHEJDKCPI;
+	private string name;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private PerkInfoItem DHNEANFLBJI;
+	private PerkInfoItem perk;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private List<PerkEvent> PFFNNPMLBPD;
+	private List<PerkEvent> events;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private List<PerkCondition> LEFCMOOIOCA;
+	private List<PerkCondition> conditions;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private List<PerkAction> KEIGDAGJNLI;
+	private List<PerkAction> actions;
 
-	public PerkInfoItem JMDBPECCFDF
+	public PerkInfoItem PerkInfo
 	{
 		get
 		{
-			return JMDLAMHAJLN();
+			return GetPerk();
 		}
 		set
 		{
-			JMOIMIHPBOM(value);
+			SetPerk(value);
 		}
 	}
 
-	public List<PerkEvent> AJCMBMJGJEG
+	public List<PerkEvent> Events
 	{
 		get
 		{
-			return PHLLJJNCEIH();
+			return GetEvents();
 		}
 		protected set
 		{
-			FHNHLFIKICP(value);
+			SetEvents(value);
 		}
 	}
 
-	public List<PerkCondition> JIFAHHGNPFH
+	public List<PerkCondition> Conditions
 	{
 		get
 		{
-			return KJILOMLMMEN();
+			return GetConditions();
 		}
 		protected set
 		{
-			AJKANHBOADL(value);
+			SetConditions(value);
 		}
 	}
 
-	public List<PerkAction> DJBAIAKOIHM
+	public List<PerkAction> Actions
 	{
 		get
 		{
-			return HIPOGANEPMI();
+			return GetActions();
 		}
 		protected set
 		{
-			CLNPKBIMKJC(value);
+			SetActions(value);
 		}
 	}
 
 	public string get_Name()
 	{
-		return HKGHEJDKCPI;
+		return name;
 	}
 
 	protected void set_Name(string value)
 	{
-		HKGHEJDKCPI = value;
+		name = value;
 	}
 
-	public PerkInfoItem JMDLAMHAJLN()
+	public PerkInfoItem GetPerk()
 	{
-		return DHNEANFLBJI;
+		return perk;
 	}
 
-	public void JMOIMIHPBOM(PerkInfoItem value)
+	public void SetPerk(PerkInfoItem value)
 	{
-		DHNEANFLBJI = value;
+		perk = value;
 	}
 
-	public List<PerkEvent> PHLLJJNCEIH()
+	public List<PerkEvent> GetEvents()
 	{
-		return PFFNNPMLBPD;
+		return events;
 	}
 
-	protected void FHNHLFIKICP(List<PerkEvent> value)
+	protected void SetEvents(List<PerkEvent> value)
 	{
-		PFFNNPMLBPD = value;
+		events = value;
 	}
 
-	public List<PerkCondition> KJILOMLMMEN()
+	public List<PerkCondition> GetConditions()
 	{
-		return LEFCMOOIOCA;
+		return conditions;
 	}
 
-	protected void AJKANHBOADL(List<PerkCondition> value)
+	protected void SetConditions(List<PerkCondition> value)
 	{
-		LEFCMOOIOCA = value;
+		conditions = value;
 	}
 
-	public List<PerkAction> HIPOGANEPMI()
+	public List<PerkAction> GetActions()
 	{
-		return KEIGDAGJNLI;
+		return actions;
 	}
 
-	protected void CLNPKBIMKJC(List<PerkAction> value)
+	protected void SetActions(List<PerkAction> value)
 	{
-		KEIGDAGJNLI = value;
+		actions = value;
 	}
 
 	public void Parse(XmlNode node)
 	{
-		set_Name(node.Attributes["Name"].CIPOICEEIBK(string.Empty));
+		set_Name(node.Attributes["Name"].GetStringOrDefault(string.Empty));
 		XmlNode hKPPBKPJOEO = node["Events"];
 		XmlNode hKPPBKPJOEO2 = node["Conditions"];
 		XmlNode hKPPBKPJOEO3 = node["Actions"];
-		FHNHLFIKICP(PerkEvent.Create(hKPPBKPJOEO, JMDLAMHAJLN()));
-		AJKANHBOADL(PerkCondition.Create(hKPPBKPJOEO2, JMDLAMHAJLN()));
-		CLNPKBIMKJC(PerkAction.Create(hKPPBKPJOEO3, JMDLAMHAJLN(), this));
+		SetEvents(PerkEvent.Create(hKPPBKPJOEO, GetPerk()));
+		SetConditions(PerkCondition.Create(hKPPBKPJOEO2, GetPerk()));
+		SetActions(PerkAction.Create(hKPPBKPJOEO3, GetPerk(), this));
 	}
 
-	public bool MIMBCGNGGHO(PerkEvent.EventStruct EJMEALJNNIL)
+	public bool MatchesEvent(PerkEvent.EventStruct EJMEALJNNIL)
 	{
 		PerkEvent gBMAKFJNAPG = null;
-		for (int i = 0; i < PHLLJJNCEIH().Count; i++)
+		for (int i = 0; i < GetEvents().Count; i++)
 		{
-			gBMAKFJNAPG = PHLLJJNCEIH()[i];
+			gBMAKFJNAPG = GetEvents()[i];
 			bool flag = gBMAKFJNAPG.IsEqual(EJMEALJNNIL);
 			if ((!gBMAKFJNAPG.IsNot) ? flag : (!flag))
 			{
@@ -143,12 +143,12 @@ public class PerkTrigger
 		return false;
 	}
 
-	public bool IPFOGLIBLLB(Model ACENLMONNPA, List<string> NIKHAICFGNM)
+	public bool AreConditionsMet(Model ACENLMONNPA, List<string> NIKHAICFGNM)
 	{
 		PerkCondition iDJILNODHAD = null;
-		for (int i = 0; i < KJILOMLMMEN().Count; i++)
+		for (int i = 0; i < GetConditions().Count; i++)
 		{
-			iDJILNODHAD = KJILOMLMMEN()[i];
+			iDJILNODHAD = GetConditions()[i];
 			bool flag = iDJILNODHAD.IsEqual(ACENLMONNPA, NIKHAICFGNM);
 			if (!((!iDJILNODHAD.IsNot) ? flag : (!flag)))
 			{

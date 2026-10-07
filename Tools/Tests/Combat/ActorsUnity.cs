@@ -76,7 +76,7 @@ local nonfinite_rule=sf2.rules.behavior {id='nonfinite_probe',behavior=nonfinite
     static object Field(object target,string name)=>target.GetType().GetField(name,Hidden|BindingFlags.Public).GetValue(target);
     static object Invoke(object target,string name,params object[] args)=>target.GetType().GetMethod(name,Hidden|BindingFlags.Public).Invoke(target,args);
     static void Check(bool condition,string message){checks++;if(!condition)throw new Exception(message);}
-    static Model[] Models(Fight fight)=>fight.LNDLFINJHDB.Where(m=>m!=null&&!(m is WeaponModel)&&(m.get_Name()??"").StartsWith("example.actor-companions:actors/",StringComparison.Ordinal)).ToArray();
+    static Model[] Models(Fight fight)=>fight.ActiveModels.Where(m=>m!=null&&!(m is WeaponModel)&&(m.get_Name()??"").StartsWith("example.actor-companions:actors/",StringComparison.Ordinal)).ToArray();
     static IModActor Actor(Fight fight,Model model)=>(IModActor)((IDictionary)Field(fight,"_eclipseActors"))[model];
     static void Next(Fight fight){phase++;phaseFrame=fight.get_FightTimeInFrames();}
     static ModUiSurface Surface()
@@ -109,9 +109,9 @@ local nonfinite_rule=sf2.rules.behavior {id='nonfinite_probe',behavior=nonfinite
                 if((bool)Field(title,"splashing")||(string)Field(title,"currentPage")!="Home")return;
                 Invoke(title,"BeginCampaign");var directory=SF2Paths.GetUserDataDirectory();
                 Check(Eclipse.Saves.CampaignSaveSession.PreviewDirectory==null&&directory.StartsWith(Application.persistentDataPath,StringComparison.OrdinalIgnoreCase)&&Application.persistentDataPath.Contains("ActorsUnity-"),"Profile not isolated");
-                var profile=XmlUtils.OpenXMLDocument(SF2Paths.KKIDGPBOBNI(),"usersDefault.xml",XmlUtils.EBLFEPIOMOL.Normal,true,XmlCryptoUtils.NNLGALNDJCL());
+                var profile=XmlUtils.OpenXMLDocument(SF2Paths.GetGameDataPath(),"usersDefault.xml",XmlUtils.XmlSourceMode.Normal,true,XmlCryptoUtils.GetIsEncryptionEnabled());
                 ((System.Xml.XmlElement)profile.SelectSingleNode("/Root/Warriors/Warrior[@ID='1']")).SetAttribute("Tutorial","END");
-                Directory.CreateDirectory(directory);XmlUtils.ONLDJNLKKAL(profile,Path.Combine(directory,Constants.OJMIJINKBPJ).Replace('\\','/'));campaign=true;return;
+                Directory.CreateDirectory(directory);XmlUtils.SaveDocumentWithHash(profile,Path.Combine(directory,Constants.UsersFileName).Replace('\\','/'));campaign=true;return;
             }
             if(!entered)
             {
@@ -120,7 +120,7 @@ local nonfinite_rule=sf2.rules.behavior {id='nonfinite_probe',behavior=nonfinite
                 Check(!ModRuntime.Host.HasErrors,ModRuntime.Host.FormatReport());
                 Check(ModRuntime.Scripts.ActiveMods.Any(m=>m.Id.Value=="example.actor-companions"),"Actor example did not finish registration");
                 Check(ModRuntime.Host.EnabledMods.All(m=>m.Id.Value=="core"||m.Id.Value=="example.actor-companions"),"Unexpected user mods");
-                var encounter=ListSF.CHMCKGCDGCM(new FightIDS(ModRuntime.Scripts.Content.RuntimeFightId(DefinitionId.Parse("core:fights/zone_1/tournament/3"))));
+                var encounter=ListSF.GetFightById(new FightIDS(ModRuntime.Scripts.Content.RuntimeFightId(DefinitionId.Parse("core:fights/zone_1/tournament/3"))));
                 Check(encounter!=null,"Core encounter missing");entered=GameUtils.StartFight(encounter,false,null,true,false);return;
             }
             var fight=Fight.GetCurrentFight();if(fight==null||fight.get_FightTimeInFrames()<100)return;
@@ -131,8 +131,8 @@ local nonfinite_rule=sf2.rules.behavior {id='nonfinite_probe',behavior=nonfinite
             {
                 case 0:
                     surface=Surface();if(surface==null)return;
-                    var origin=player.PLBNCDCFPML();enemy.ShiftModelPosition(new Vector3f(origin.GetX()+700-enemy.PLBNCDCFPML().GetX(),0,0),true);
-                    playerHealth=player.KKMCHCNOHMB();enemyHealth=enemy.KKMCHCNOHMB();Click("summon");Next(fight);break;
+                    var origin=player.GetPosition();enemy.ShiftModelPosition(new Vector3f(origin.GetX()+700-enemy.GetPosition().GetX(),0,0),true);
+                    playerHealth=player.GetLife();enemyHealth=enemy.GetLife();Click("summon");Next(fight);break;
                 case 1:
                     actors=Models(fight);if(actors.Length!=2||!surface.Read("status").Text.StartsWith("Actors: 2",StringComparison.Ordinal))return;
                     Check(actors.All(m=>m.GetRootModel()==m&&m.Parameters.MaxLife==1&&m.Parameters.AiControlled&&!m.Parameters.UserControlled),"Actors lack independent health/AI root state");
@@ -146,7 +146,7 @@ local nonfinite_rule=sf2.rules.behavior {id='nonfinite_probe',behavior=nonfinite
                         Debug.Log("[ActorsUnity] Actor "+snapshot.Id+" team="+snapshot.Team+" target="+snapshot.Target+" x="+snapshot.Fighter.X+" max="+snapshot.Fighter.MaxHealth);
                     }
                     Check(player.GetCombatTarget()!=actors.Single(m=>m.Parameters.IsPlayer)&&enemy.GetCombatTarget()!=actors.Single(m=>!m.Parameters.IsPlayer),"Main fighter targets friendly actor");
-                    playerHealth=player.KKMCHCNOHMB();enemyHealth=enemy.KKMCHCNOHMB();
+                    playerHealth=player.GetLife();enemyHealth=enemy.GetLife();
                     Next(fight);break;
                 case 2:
                     if(actionStep==0)
@@ -154,12 +154,12 @@ local nonfinite_rule=sf2.rules.behavior {id='nonfinite_probe',behavior=nonfinite
                         if(frame-phaseFrame<15)return;
                         foreach(var actor in actors)
                         {
-                            var ai=Field(actor,"HJOGNGDMAKJ");
-                            Check(Field(ai,"CGPDPHJIDPA")!=null&&Field(ai,"COKFBIJAFLH")!=null,"Actor AI lacks own/target animation observations");
+                            var ai=Field(actor,"ai");
+                            Check(Field(ai,"botAnimation")!=null&&Field(ai,"enemyAnimation")!=null,"Actor AI lacks own/target animation observations");
                             Check(!actor._Enemies.Contains(actor.Parameters.IsPlayer?player:enemy),"Actor collision list contains friendly main fighter");
                             actor.Parameters.AiControlled=false;
                         }
-                        playerHealth=player.KKMCHCNOHMB();enemyHealth=enemy.KKMCHCNOHMB();
+                        playerHealth=player.GetLife();enemyHealth=enemy.GetLife();
                         Actor(fight,actors[0]).TrySnapshot(out var beforeMotion,out _);actorX=beforeMotion.Fighter.X;
                         motionCommand=false;Click("guide");actionStep=1;actionFrame=frame;return;
                     }
@@ -172,8 +172,8 @@ local nonfinite_rule=sf2.rules.behavior {id='nonfinite_probe',behavior=nonfinite
                     if(actionStep==2)
                     {
                         if(!healthCommand||frame-actionFrame<2)return;
-                        Check(actors[0].KKMCHCNOHMB()<1&&actors[0].KKMCHCNOHMB()>0,"Actual Lua health command did not apply");
-                        Check(Math.Abs(player.KKMCHCNOHMB()-playerHealth)<.00001&&Math.Abs(enemy.KKMCHCNOHMB()-enemyHealth)<.00001,"Actor health command mutated a main fighter");
+                        Check(actors[0].GetLife()<1&&actors[0].GetLife()>0,"Actual Lua health command did not apply");
+                        Check(Math.Abs(player.GetLife()-playerHealth)<.00001&&Math.Abs(enemy.GetLife()-enemyHealth)<.00001,"Actor health command mutated a main fighter");
                         applied=false;Click("strike");actionStep=3;actionFrame=frame;return;
                     }
                     if(actionStep==3)
@@ -206,7 +206,7 @@ local nonfinite_rule=sf2.rules.behavior {id='nonfinite_probe',behavior=nonfinite
                     Click("summon");Next(fight);break;
                 case 7:
                     actors=Models(fight);if(actors.Length!=2||!surface.Read("status").Text.StartsWith("Actors: 2",StringComparison.Ordinal))return;
-                    Invoke(fight,"OBNEDPKCNKJ");Next(fight);break;
+                    Invoke(fight,"Surrender");Next(fight);break;
                 case 8:
                     if(Models(fight).Length!=0)return;
                     Check(((IDictionary)Field(fight,"_eclipseActors")).Count==0&&surface.IsClosed,"Surrender retained actors or owned HUD");

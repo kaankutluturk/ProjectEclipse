@@ -1,9 +1,9 @@
 public class QuestActionRecount : QuestAction
 {
-	public override void DEJMHFMLKIC(QuestParameters GFIHPBCEEOB)
+	public override void Execute(QuestParameters GFIHPBCEEOB)
 	{
-		base.DEJMHFMLKIC(GFIHPBCEEOB);
-		GameUtils.HGJCGOPPNBI();
-		OGIJONMKABB();
+		base.Execute(GFIHPBCEEOB);
+		GameUtils.RecountAchievements();
+		FinishAction();
 	}
 }

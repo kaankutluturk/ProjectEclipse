@@ -6,7 +6,7 @@ public sealed class LargeFileDownloadSample : MonoBehaviour
 {
 	private const string URL = "http://ipv4.download.thinkbroadband.com/100MB.zip";
 
-	private HTTPRequest ONOCIELLAPL;
+	private HTTPRequest request;
 
 	private string status = string.Empty;
 
@@ -24,24 +24,24 @@ public sealed class LargeFileDownloadSample : MonoBehaviour
 
 	private void OnDestroy()
 	{
-		if (ONOCIELLAPL != null && ONOCIELLAPL.FLBBFDNHJAJ() < CFGBMHKCENK.Finished)
+		if (request != null && request.GetState() < HTTPRequestStates.Finished)
 		{
-			ONOCIELLAPL.OGLIKFCADME = null;
-			ONOCIELLAPL.AFGFGHKDJJI(null);
-			ONOCIELLAPL.AKLEEMEHBIC();
+			request.OnProgress = null;
+			request.SetCallback(null);
+			request.Abort();
 		}
 	}
 
 	private void OnGUI()
 	{
-		GUIHelper.ECMOBPFHNPN(GUIHelper.ClientArea, true, () =>
+		GUIHelper.DrawArea(GUIHelper.ClientArea, true, () =>
 		{
 			GUILayout.Label("Request status: " + status);
 			GUILayout.Space(5f);
 			GUILayout.Label(string.Format("Progress: {0:P2} of {1:N0}Mb", progress, PlayerPrefs.GetInt("DownloadLength") / 1048576));
 			GUILayout.HorizontalSlider(progress, 0f, 1f);
 			GUILayout.Space(50f);
-			if (ONOCIELLAPL == null)
+			if (request == null)
 			{
 				GUILayout.Label(string.Format("Desired Fragment Size: {0:N} KBytes", (float)fragmentSize / 1024f));
 				fragmentSize = (int)GUILayout.HorizontalSlider(fragmentSize, 4096f, 10485760f);
@@ -49,23 +49,23 @@ public sealed class LargeFileDownloadSample : MonoBehaviour
 				string text = ((!PlayerPrefs.HasKey("DownloadProgress")) ? "Start Download" : "Continue Download");
 				if (GUILayout.Button(text))
 				{
-					BMOGONHMAKN();
+					StartDownload();
 				}
 			}
-			else if (ONOCIELLAPL.FLBBFDNHJAJ() == CFGBMHKCENK.Processing && GUILayout.Button("Abort Download"))
+			else if (request.GetState() == HTTPRequestStates.Processing && GUILayout.Button("Abort Download"))
 			{
-				ONOCIELLAPL.AKLEEMEHBIC();
+				request.Abort();
 			}
 		});
 	}
 
-	private void BMOGONHMAKN()
+	private void StartDownload()
 	{
-		ONOCIELLAPL = new HTTPRequest(new Uri("http://ipv4.download.thinkbroadband.com/100MB.zip"), (HTTPRequest CGOIOKHEGOE, HTTPResponse BEIGFGCBICO) =>
+		request = new HTTPRequest(new Uri("http://ipv4.download.thinkbroadband.com/100MB.zip"), (HTTPRequest CGOIOKHEGOE, HTTPResponse BEIGFGCBICO) =>
 		{
-			switch (CGOIOKHEGOE.FLBBFDNHJAJ())
+			switch (CGOIOKHEGOE.GetState())
 			{
-			case CFGBMHKCENK.Processing:
+			case HTTPRequestStates.Processing:
 				if (!PlayerPrefs.HasKey("DownloadLength"))
 				{
 					string text = BEIGFGCBICO.GetFirstHeaderValue("content-length");
@@ -74,19 +74,19 @@ public sealed class LargeFileDownloadSample : MonoBehaviour
 						PlayerPrefs.SetInt("DownloadLength", int.Parse(text));
 					}
 				}
-				HNILLCOCGHA(BEIGFGCBICO.IOLFNBDPDDF());
+				ProcessFragments(BEIGFGCBICO.GetStreamedFragments());
 				status = "Processing";
 				break;
-			case CFGBMHKCENK.Finished:
-				if (BEIGFGCBICO.AICKPAMONBH())
+			case HTTPRequestStates.Finished:
+				if (BEIGFGCBICO.GetIsSuccess())
 				{
-					HNILLCOCGHA(BEIGFGCBICO.IOLFNBDPDDF());
-					if (BEIGFGCBICO.MJPPHHLMPEI())
+					ProcessFragments(BEIGFGCBICO.GetStreamedFragments());
+					if (BEIGFGCBICO.GetIsStreamingFinished())
 					{
 						status = "Streaming finished!";
 						PlayerPrefs.DeleteKey("DownloadProgress");
 						PlayerPrefs.Save();
-						ONOCIELLAPL = null;
+						request = null;
 					}
 					else
 					{
@@ -95,48 +95,48 @@ public sealed class LargeFileDownloadSample : MonoBehaviour
 				}
 				else
 				{
-					status = string.Format("Request finished Successfully, but the server sent an error. Status Code: {0}-{1} Message: {2}", BEIGFGCBICO.KNMDPGBPNED(), BEIGFGCBICO.DCKPMHKDLEJ(), BEIGFGCBICO.DPBLPGKOEJB());
-					AdvLog.LOPHFKMOPAA(status);
-					ONOCIELLAPL = null;
+					status = string.Format("Request finished Successfully, but the server sent an error. Status Code: {0}-{1} Message: {2}", BEIGFGCBICO.GetStatusCode(), BEIGFGCBICO.GetMessage(), BEIGFGCBICO.GetDataAsText());
+					AdvLog.LogWarning(status);
+					request = null;
 				}
 				break;
-			case CFGBMHKCENK.Error:
-				status = "Request Finished with Error! " + ((CGOIOKHEGOE.IEFGFKFHNMD() == null) ? "No Exception" : (CGOIOKHEGOE.IEFGFKFHNMD().Message + "\n" + CGOIOKHEGOE.IEFGFKFHNMD().StackTrace));
-				AdvLog.CCOFFJPPAKC(status);
-				ONOCIELLAPL = null;
+			case HTTPRequestStates.Error:
+				status = "Request Finished with Error! " + ((CGOIOKHEGOE.GetException() == null) ? "No Exception" : (CGOIOKHEGOE.GetException().Message + "\n" + CGOIOKHEGOE.GetException().StackTrace));
+				AdvLog.LogError(status);
+				request = null;
 				break;
-			case CFGBMHKCENK.Aborted:
+			case HTTPRequestStates.Aborted:
 				status = "Request Aborted!";
-				AdvLog.LOPHFKMOPAA(status);
-				ONOCIELLAPL = null;
+				AdvLog.LogWarning(status);
+				request = null;
 				break;
-			case CFGBMHKCENK.ConnectionTimedOut:
+			case HTTPRequestStates.ConnectionTimedOut:
 				status = "Connection Timed Out!";
-				AdvLog.CCOFFJPPAKC(status);
-				ONOCIELLAPL = null;
+				AdvLog.LogError(status);
+				request = null;
 				break;
-			case CFGBMHKCENK.TimedOut:
+			case HTTPRequestStates.TimedOut:
 				status = "Processing the request Timed Out!";
-				AdvLog.CCOFFJPPAKC(status);
-				ONOCIELLAPL = null;
+				AdvLog.LogError(status);
+				request = null;
 				break;
 			}
 		});
 		if (PlayerPrefs.HasKey("DownloadProgress"))
 		{
-			ONOCIELLAPL.SetRangeHeader(PlayerPrefs.GetInt("DownloadProgress"));
+			request.SetRangeHeader(PlayerPrefs.GetInt("DownloadProgress"));
 		}
 		else
 		{
 			PlayerPrefs.SetInt("DownloadProgress", 0);
 		}
-		ONOCIELLAPL.JJCLPAGJEBJ(true);
-		ONOCIELLAPL.DMHKNGKPHLJ(true);
-		ONOCIELLAPL.LPALILOEHPE(fragmentSize);
-		ONOCIELLAPL.Send();
+		request.SetDisableCache(true);
+		request.SetUseStreaming(true);
+		request.SetStreamFragmentSize(fragmentSize);
+		request.Send();
 	}
 
-	private void HNILLCOCGHA(List<byte[]> DAGGODDBKDD)
+	private void ProcessFragments(List<byte[]> DAGGODDBKDD)
 	{
 		if (DAGGODDBKDD != null && DAGGODDBKDD.Count > 0)
 		{

@@ -6,50 +6,50 @@ using System.Text;
 public sealed class SocketOptions
 {
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private bool MODPJMLMIAO;
+	private bool reconnection;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private int OKJFNLAHGJL;
+	private int reconnectionAttempts;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private TimeSpan HCEBEOKEPAB;
+	private TimeSpan reconnectionDelay;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private TimeSpan BCGIAIMMFLA;
+	private TimeSpan reconnectionDelayMax;
 
 	private float randomizationFactor;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private TimeSpan OCOBNPGODHJ;
+	private TimeSpan timeout;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private bool ACPBHKMPPKK;
+	private bool autoConnect;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private Dictionary<string, string> LGJADADCGHL;
+	private Dictionary<string, string> additionalQueryParams;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private bool IJJGBHCLDHH;
+	private bool queryParamsOnlyForHandshake;
 
 	private string BuiltQueryParams;
 
-	public bool LIAJIPFMBJA
+	public bool Reconnection
 	{
 		get
 		{
-			return AMHAEEBHDFE();
+			return GetReconnection();
 		}
 		set
 		{
-			MKNMNMLHOGA(value);
+			SetReconnection(value);
 		}
 	}
 
-	public int LBAHDILDNGE
+	public int MaxReconnectionAttempts
 	{
 		get
 		{
-			return GIBLAAJPHLP();
+			return GetReconnectionAttempts();
 		}
 		set
 		{
@@ -57,35 +57,35 @@ public sealed class SocketOptions
 		}
 	}
 
-	public TimeSpan EJHPNIHPKLH
+	public TimeSpan ReconnectionDelay
 	{
 		get
 		{
-			return CHAGLLGOKKE();
+			return GetReconnectionDelay();
 		}
 		set
 		{
-			PFIINOHHLPF(value);
+			SetReconnectionDelay(value);
 		}
 	}
 
-	public TimeSpan CAKPOBKOFJE
+	public TimeSpan ReconnectionDelayMax
 	{
 		get
 		{
-			return ODAHMCJKEIL();
+			return GetReconnectionDelayMax();
 		}
 		set
 		{
-			OBLKKCBCMEL(value);
+			SetReconnectionDelayMax(value);
 		}
 	}
 
-	public float IKKNDCBGMNC
+	public float Randomization
 	{
 		get
 		{
-			return JNJBBOELNIG();
+			return GetRandomizationFactor();
 		}
 		set
 		{
@@ -93,35 +93,35 @@ public sealed class SocketOptions
 		}
 	}
 
-	public TimeSpan BEOBDJHNHIO
+	public TimeSpan Timeout
 	{
 		get
 		{
-			return FJKGKLJGIJI();
+			return GetTimeout();
 		}
 		set
 		{
-			DKLGPGDJPGO(value);
+			SetTimeout(value);
 		}
 	}
 
-	public bool AIKNLBNELKF
+	public bool AutoConnect
 	{
 		get
 		{
-			return JLCKLGDFADC();
+			return GetAutoConnect();
 		}
 		set
 		{
-			AHGIJFEGONK(value);
+			SetAutoConnect(value);
 		}
 	}
 
-	public Dictionary<string, string> CNGINADLODB
+	public Dictionary<string, string> ConnectQueryParams
 	{
 		get
 		{
-			return MONGJAOIELO();
+			return GetAdditionalQueryParams();
 		}
 		set
 		{
@@ -129,11 +129,11 @@ public sealed class SocketOptions
 		}
 	}
 
-	public bool KOCIJKDENMF
+	public bool QueryParamsHandshakeOnly
 	{
 		get
 		{
-			return DKJAFHAOKDB();
+			return GetQueryParamsOnlyForHandshake();
 		}
 		set
 		{
@@ -143,57 +143,57 @@ public sealed class SocketOptions
 
 	public SocketOptions()
 	{
-		MKNMNMLHOGA(true);
+		SetReconnection(true);
 		set_ReconnectionAttempts(int.MaxValue);
-		PFIINOHHLPF(TimeSpan.FromMilliseconds(1000.0));
-		OBLKKCBCMEL(TimeSpan.FromMilliseconds(5000.0));
+		SetReconnectionDelay(TimeSpan.FromMilliseconds(1000.0));
+		SetReconnectionDelayMax(TimeSpan.FromMilliseconds(5000.0));
 		set_RandomizationFactor(0.5f);
-		DKLGPGDJPGO(TimeSpan.FromMilliseconds(20000.0));
-		AHGIJFEGONK(true);
+		SetTimeout(TimeSpan.FromMilliseconds(20000.0));
+		SetAutoConnect(true);
 		set_QueryParamsOnlyForHandshake(true);
 	}
 
-	public bool AMHAEEBHDFE()
+	public bool GetReconnection()
 	{
-		return MODPJMLMIAO;
+		return reconnection;
 	}
 
-	public void MKNMNMLHOGA(bool value)
+	public void SetReconnection(bool value)
 	{
-		MODPJMLMIAO = value;
+		reconnection = value;
 	}
 
-	public int GIBLAAJPHLP()
+	public int GetReconnectionAttempts()
 	{
-		return OKJFNLAHGJL;
+		return reconnectionAttempts;
 	}
 
 	public void set_ReconnectionAttempts(int value)
 	{
-		OKJFNLAHGJL = value;
+		reconnectionAttempts = value;
 	}
 
-	public TimeSpan CHAGLLGOKKE()
+	public TimeSpan GetReconnectionDelay()
 	{
-		return HCEBEOKEPAB;
+		return reconnectionDelay;
 	}
 
-	public void PFIINOHHLPF(TimeSpan value)
+	public void SetReconnectionDelay(TimeSpan value)
 	{
-		HCEBEOKEPAB = value;
+		reconnectionDelay = value;
 	}
 
-	public TimeSpan ODAHMCJKEIL()
+	public TimeSpan GetReconnectionDelayMax()
 	{
-		return BCGIAIMMFLA;
+		return reconnectionDelayMax;
 	}
 
-	public void OBLKKCBCMEL(TimeSpan value)
+	public void SetReconnectionDelayMax(TimeSpan value)
 	{
-		BCGIAIMMFLA = value;
+		reconnectionDelayMax = value;
 	}
 
-	public float JNJBBOELNIG()
+	public float GetRandomizationFactor()
 	{
 		return randomizationFactor;
 	}
@@ -203,49 +203,49 @@ public sealed class SocketOptions
 		randomizationFactor = Math.Min(1f, Math.Max(0f, value));
 	}
 
-	public TimeSpan FJKGKLJGIJI()
+	public TimeSpan GetTimeout()
 	{
-		return OCOBNPGODHJ;
+		return timeout;
 	}
 
-	public void DKLGPGDJPGO(TimeSpan value)
+	public void SetTimeout(TimeSpan value)
 	{
-		OCOBNPGODHJ = value;
+		timeout = value;
 	}
 
-	public bool JLCKLGDFADC()
+	public bool GetAutoConnect()
 	{
-		return ACPBHKMPPKK;
+		return autoConnect;
 	}
 
-	public void AHGIJFEGONK(bool value)
+	public void SetAutoConnect(bool value)
 	{
-		ACPBHKMPPKK = value;
+		autoConnect = value;
 	}
 
-	public Dictionary<string, string> MONGJAOIELO()
+	public Dictionary<string, string> GetAdditionalQueryParams()
 	{
-		return LGJADADCGHL;
+		return additionalQueryParams;
 	}
 
 	public void set_AdditionalQueryParams(Dictionary<string, string> value)
 	{
-		LGJADADCGHL = value;
+		additionalQueryParams = value;
 	}
 
-	public bool DKJAFHAOKDB()
+	public bool GetQueryParamsOnlyForHandshake()
 	{
-		return IJJGBHCLDHH;
+		return queryParamsOnlyForHandshake;
 	}
 
 	public void set_QueryParamsOnlyForHandshake(bool value)
 	{
-		IJJGBHCLDHH = value;
+		queryParamsOnlyForHandshake = value;
 	}
 
-	internal string LEKAOBKGMPF()
+	internal string BuildQueryParams()
 	{
-		if (MONGJAOIELO() == null || MONGJAOIELO().Count == 0)
+		if (GetAdditionalQueryParams() == null || GetAdditionalQueryParams().Count == 0)
 		{
 			return string.Empty;
 		}
@@ -253,8 +253,8 @@ public sealed class SocketOptions
 		{
 			return BuiltQueryParams;
 		}
-		StringBuilder stringBuilder = new StringBuilder(MONGJAOIELO().Count * 4);
-		foreach (KeyValuePair<string, string> item in MONGJAOIELO())
+		StringBuilder stringBuilder = new StringBuilder(GetAdditionalQueryParams().Count * 4);
+		foreach (KeyValuePair<string, string> item in GetAdditionalQueryParams())
 		{
 			stringBuilder.Append("&");
 			stringBuilder.Append(item.Key);

@@ -38,10 +38,10 @@ public static class ResourceManager
 		if (Eclipse.Content.LocalAnimationPreview.TryGetBinary(DCOPLCIFCFL, out previewAnimation))
 			return previewAnimation;
 #endif
-		if (SF2Paths.CGOHPKEBECD)
+		if (SF2Paths.UseBundledResources)
 		{
 			DCOPLCIFCFL = DCOPLCIFCFL.TrimStart('\\', '/');
-			DCOPLCIFCFL = NNBCLAEKMIO(DCOPLCIFCFL);
+			DCOPLCIFCFL = StripExtension(DCOPLCIFCFL);
 			TextAsset textAsset = ResourcesAndBundles.Load<TextAsset>(DCOPLCIFCFL);
 			return (!textAsset) ? null : textAsset.bytes;
 		}
@@ -54,7 +54,7 @@ public static class ResourceManager
 
 	public static AudioClip GetAudioClip(string DCOPLCIFCFL)
 	{
-		if (SF2Paths.CGOHPKEBECD)
+		if (SF2Paths.UseBundledResources)
 		{
 			DCOPLCIFCFL = DCOPLCIFCFL.TrimStart('\\', '/');
 			return ResourcesAndBundles.Load<AudioClip>(DCOPLCIFCFL);
@@ -70,9 +70,9 @@ public static class ResourceManager
 		return null;
 	}
 
-	public static VideoClip DEKCGMCMGKK(string DCOPLCIFCFL)
+	public static VideoClip GetVideoClip(string DCOPLCIFCFL)
 	{
-		DCOPLCIFCFL = SF2Paths.HAHDKJAPIJL() + "/" + Path.ChangeExtension(DCOPLCIFCFL, null);
+		DCOPLCIFCFL = SF2Paths.GetVideoPath() + "/" + Path.ChangeExtension(DCOPLCIFCFL, null);
 		DCOPLCIFCFL = DCOPLCIFCFL.TrimStart('\\', '/');
 		return ResourcesAndBundles.Load<VideoClip>(DCOPLCIFCFL);
 	}
@@ -663,11 +663,11 @@ public static class ResourceManager
 			return t0;
 		}
 
-		if (SF2Paths.CGOHPKEBECD && !GIEAPLJHHDK)
+		if (SF2Paths.UseBundledResources && !GIEAPLJHHDK)
 		{
-			return IJMMFCDCOAC(ONEIGMLOGDC);
+			return GetBundledOrModText(ONEIGMLOGDC);
 		}
-		return KIHHJGJKMIC(ONEIGMLOGDC);
+		return GetFileOrDevText(ONEIGMLOGDC);
 	}
 
 	// Loads the asset embedded in this Unity project without consulting the
@@ -680,12 +680,12 @@ public static class ResourceManager
 			return string.Empty;
 		}
 		ONEIGMLOGDC = ONEIGMLOGDC.TrimStart('\\', '/');
-		ONEIGMLOGDC = NNBCLAEKMIO(ONEIGMLOGDC);
+		ONEIGMLOGDC = StripExtension(ONEIGMLOGDC);
 		TextAsset textAsset = ResourcesAndBundles.Load<TextAsset>(ONEIGMLOGDC);
 		return (!textAsset) ? string.Empty : textAsset.text;
 	}
 
-	public static string IJMMFCDCOAC(string ONEIGMLOGDC)
+	public static string GetBundledOrModText(string ONEIGMLOGDC)
 	{
         string replacement = Eclipse.Modding.ModRuntime.LoadCoreModelReplacement(ONEIGMLOGDC);
         if (replacement != null) return replacement;
@@ -696,10 +696,10 @@ public static class ResourceManager
 			return t1;
 		}
 		ONEIGMLOGDC = ONEIGMLOGDC.TrimStart('\\', '/');
-		string text = SF2Paths.COGELDOPEJG(ONEIGMLOGDC);
+		string text = SF2Paths.ResolveWritablePath(ONEIGMLOGDC);
 		if (File.Exists(text))
 		{
-			return KIHHJGJKMIC(text);
+			return GetFileOrDevText(text);
 		}
 		string packagedModel = Eclipse.Content.PackagedArtCatalog.LoadModelText(ONEIGMLOGDC);
 		if (!string.IsNullOrEmpty(packagedModel))
@@ -711,12 +711,12 @@ public static class ResourceManager
 		{
 			return packagedLocationData;
 		}
-		ONEIGMLOGDC = NNBCLAEKMIO(ONEIGMLOGDC);
+		ONEIGMLOGDC = StripExtension(ONEIGMLOGDC);
 		TextAsset textAsset = ResourcesAndBundles.Load<TextAsset>(ONEIGMLOGDC);
 		return (!textAsset) ? string.Empty : textAsset.text;
 	}
 
-	public static string KIHHJGJKMIC(string ONEIGMLOGDC)
+	public static string GetFileOrDevText(string ONEIGMLOGDC)
 	{
         string replacement = Eclipse.Modding.ModRuntime.LoadCoreModelReplacement(ONEIGMLOGDC);
         if (replacement != null) return replacement;
@@ -726,9 +726,9 @@ public static class ResourceManager
 		{
 			return t2;
 		}
-		if (ONEIGMLOGDC.StartsWith(SF2Paths.KKIDGPBOBNI()))
+		if (ONEIGMLOGDC.StartsWith(SF2Paths.GetGameDataPath()))
 		{
-			string path = ONEIGMLOGDC.Replace(SF2Paths.KKIDGPBOBNI(), SF2Paths.GBOFOFGDMBN());
+			string path = ONEIGMLOGDC.Replace(SF2Paths.GetGameDataPath(), SF2Paths.GetWritableGameDataPath());
 			if (File.Exists(path))
 			{
 				return File.ReadAllText(path);
@@ -746,7 +746,7 @@ public static class ResourceManager
 		return null;
 	}
 
-	private static string NNBCLAEKMIO(string ONEIGMLOGDC)
+	private static string StripExtension(string ONEIGMLOGDC)
 	{
 		if (Path.HasExtension(ONEIGMLOGDC))
 		{

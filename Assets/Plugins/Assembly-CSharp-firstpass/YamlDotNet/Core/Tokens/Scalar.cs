@@ -7,7 +7,7 @@ namespace YamlDotNet.Core.Tokens
 	{
 		private readonly string value;
 
-		private readonly IBEOFCPMMJJ style;
+		private readonly ScalarStyle style;
 
 		public string Value
 		{
@@ -17,7 +17,7 @@ namespace YamlDotNet.Core.Tokens
 			}
 		}
 
-		public IBEOFCPMMJJ Style
+		public ScalarStyle Style
 		{
 			get
 			{
@@ -26,16 +26,16 @@ namespace YamlDotNet.Core.Tokens
 		}
 
 		public Scalar(string value)
-			: this(value, IBEOFCPMMJJ.Any)
+			: this(value, ScalarStyle.Any)
 		{
 		}
 
-		public Scalar(string value, IBEOFCPMMJJ KIGNIBIMLKK)
+		public Scalar(string value, ScalarStyle KIGNIBIMLKK)
 			: this(value, KIGNIBIMLKK, Mark.Empty, Mark.Empty)
 		{
 		}
 
-		public Scalar(string value, IBEOFCPMMJJ KIGNIBIMLKK, Mark ILENLCMAMBH, Mark PCLFFOBJJFO)
+		public Scalar(string value, ScalarStyle KIGNIBIMLKK, Mark ILENLCMAMBH, Mark PCLFFOBJJFO)
 			: base(ILENLCMAMBH, PCLFFOBJJFO)
 		{
 			value = value;

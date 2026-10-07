@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 public class SFButton : Button, global::IEventDispatcher<object>
 {
-	public enum HGNNIDPFKCN
+	public enum ButtonEvent
 	{
 		OnPress = 0,
 		OnRelease = 1,
@@ -16,24 +16,24 @@ public class SFButton : Button, global::IEventDispatcher<object>
 		OnTouchBegin = 5
 	}
 
-	private global::EventDispatcher<object> NBKJBIIPPNB = new global::EventDispatcher<object>();
+	private global::EventDispatcher<object> eventDispatcher = new global::EventDispatcher<object>();
 
 	[SerializeField]
 	public ResolutionImage FlashingImage;
 
-	private bool MGNLBNLCDAI;
+	private bool flashFadingIn;
 
-	private int HCMOIDIJNMD;
+	private int flashAlpha;
 
-	private int DMEAFBMAGDH = 10;
+	private int flashAlphaStep = 10;
 
-	private bool CANIGBPEKFA;
+	private bool isFlashing;
 
 	public bool IsOneShot;
 
 	public int ButtonId = -1;
 
-	public bool BLNHFKLOPBF
+	public bool Flashing
 	{
 		get
 		{
@@ -47,15 +47,15 @@ public class SFButton : Button, global::IEventDispatcher<object>
 
 	public bool get_IsFlashing()
 	{
-		return CANIGBPEKFA;
+		return isFlashing;
 	}
 
 	public void set_IsFlashing(bool value)
 	{
-		CANIGBPEKFA = value;
+		isFlashing = value;
 		if (FlashingImage != null)
 		{
-			FlashingImage.gameObject.SetActive(CANIGBPEKFA);
+			FlashingImage.gameObject.SetActive(isFlashing);
 		}
 	}
 
@@ -82,27 +82,27 @@ public class SFButton : Button, global::IEventDispatcher<object>
 
 	public int AddEventListener(int name, Action<object> ODDEOFKLIAG)
 	{
-		return NBKJBIIPPNB.AddEventListener(name, ODDEOFKLIAG);
+		return eventDispatcher.AddEventListener(name, ODDEOFKLIAG);
 	}
 
 	public int CallEvent(int name, object EHCLMBADLKH)
 	{
-		return (!base.interactable) ? 1 : NBKJBIIPPNB.CallEvent(name, EHCLMBADLKH);
+		return (!base.interactable) ? 1 : eventDispatcher.CallEvent(name, EHCLMBADLKH);
 	}
 
 	public int RemoveAllEventListener()
 	{
-		return NBKJBIIPPNB.RemoveAllEventListener();
+		return eventDispatcher.RemoveAllEventListener();
 	}
 
 	public int RemoveEvent(int name)
 	{
-		return NBKJBIIPPNB.RemoveEvent(name);
+		return eventDispatcher.RemoveEvent(name);
 	}
 
 	public int RemoveEventListener(int name, Action<object> ODDEOFKLIAG)
 	{
-		return NBKJBIIPPNB.RemoveEventListener(name, ODDEOFKLIAG);
+		return eventDispatcher.RemoveEventListener(name, ODDEOFKLIAG);
 	}
 
     private SelectionState _inputVisualState;
@@ -146,34 +146,34 @@ public class SFButton : Button, global::IEventDispatcher<object>
 
 	private void Update()
 	{
-		if (!CANIGBPEKFA || !(FlashingImage != null))
+		if (!isFlashing || !(FlashingImage != null))
 		{
 			return;
 		}
-		FlashingImage.color = new Color(FlashingImage.color.r, FlashingImage.color.g, FlashingImage.color.b, (float)HCMOIDIJNMD / 255f);
-		if (MGNLBNLCDAI)
+		FlashingImage.color = new Color(FlashingImage.color.r, FlashingImage.color.g, FlashingImage.color.b, (float)flashAlpha / 255f);
+		if (flashFadingIn)
 		{
-			if (HCMOIDIJNMD < 250)
+			if (flashAlpha < 250)
 			{
-				HCMOIDIJNMD += DMEAFBMAGDH;
+				flashAlpha += flashAlphaStep;
 				return;
 			}
-			MGNLBNLCDAI = false;
-			if (HCMOIDIJNMD > 250)
+			flashFadingIn = false;
+			if (flashAlpha > 250)
 			{
-				HCMOIDIJNMD = 250;
+				flashAlpha = 250;
 			}
 		}
-		else if (HCMOIDIJNMD > 0)
+		else if (flashAlpha > 0)
 		{
-			HCMOIDIJNMD -= DMEAFBMAGDH;
+			flashAlpha -= flashAlphaStep;
 		}
 		else
 		{
-			MGNLBNLCDAI = true;
-			if (HCMOIDIJNMD < 0)
+			flashFadingIn = true;
+			if (flashAlpha < 0)
 			{
-				HCMOIDIJNMD = 0;
+				flashAlpha = 0;
 			}
 		}
 	}

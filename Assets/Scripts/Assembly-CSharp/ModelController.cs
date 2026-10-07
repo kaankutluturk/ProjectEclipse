@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 public class ModelController : global::EventDispatcher<object>
 {
-	public enum FJBMMEFKCCD
+	public enum KeyEventType
 	{
 		onKeyPressed = 0,
 		onKeyReleased = 1
@@ -10,7 +10,7 @@ public class ModelController : global::EventDispatcher<object>
 
 	private class KeyInfo
 	{
-		public int EDEEELJMHLG;
+		public int KeyId;
 
 		public int Index;
 
@@ -19,51 +19,51 @@ public class ModelController : global::EventDispatcher<object>
 
 	private const float MCONTROLLER_COMBO_INTERVAL = 0.25f;
 
-	private const int JDLMJGIBBMI = 30;
+	private const int KeyClearInterval = 30;
 
-	private const int MHHLELDHCKA = 2;
+	private const int MaxPressedKeys = 2;
 
-	private const int GCGJJNMLPJM = 150;
+	private const int KeyCount = 150;
 
-	private List<KeyInfo> KNKFKGPKBPK = new List<KeyInfo>();
+	private List<KeyInfo> keys = new List<KeyInfo>();
 
-	private int LICAFNLFJHO;
+	private int keyClearCounter;
 
-	private KeyData AOFMFOHIKHF = new KeyData();
+	private KeyData currentKeyData = new KeyData();
 
-	private KeyData JKLJBOOOKOP = new KeyData();
+	private KeyData keyDataSnapshot = new KeyData();
 
-	private int MDAFKNLGJBJ;
+	private int pressAgeCounter;
 
-	public KeyData FONEJOKEIEN
+	public KeyData CurrentKeys
 	{
 		get
 		{
-			return ANALKHBJKIO();
+			return GetCurrentKeys();
 		}
 		set
 		{
-			IPGLLIAHDPE(value);
+			SetCurrentKeys(value);
 		}
 	}
 
 	public ModelController()
 	{
-		LICAFNLFJHO = 0;
-		MDAFKNLGJBJ = 0;
-		KNKFKGPKBPK.Capacity = 150;
+		keyClearCounter = 0;
+		pressAgeCounter = 0;
+		keys.Capacity = 150;
 		for (int i = 0; i < 150; i++)
 		{
 			KeyInfo hFBBKFECOBD = new KeyInfo();
-			hFBBKFECOBD.EDEEELJMHLG = (hFBBKFECOBD.Index = i + 1);
+			hFBBKFECOBD.KeyId = (hFBBKFECOBD.Index = i + 1);
 			hFBBKFECOBD.Press = false;
-			KNKFKGPKBPK.Add(hFBBKFECOBD);
+			keys.Add(hFBBKFECOBD);
 		}
 	}
 
-	public KeyData ANALKHBJKIO()
+	public KeyData GetCurrentKeys()
 	{
-		return AOFMFOHIKHF;
+		return currentKeyData;
 	}
 
     // Move held keys and combo timing without replaying input or exchanging
@@ -72,45 +72,45 @@ public class ModelController : global::EventDispatcher<object>
     {
         if (other == null || other == this)
             throw new System.ArgumentException("Form input requires distinct controllers.");
-        (KNKFKGPKBPK, other.KNKFKGPKBPK) = (other.KNKFKGPKBPK, KNKFKGPKBPK);
-        (LICAFNLFJHO, other.LICAFNLFJHO) = (other.LICAFNLFJHO, LICAFNLFJHO);
-        (AOFMFOHIKHF, other.AOFMFOHIKHF) = (other.AOFMFOHIKHF, AOFMFOHIKHF);
-        (JKLJBOOOKOP, other.JKLJBOOOKOP) = (other.JKLJBOOOKOP, JKLJBOOOKOP);
-        (MDAFKNLGJBJ, other.MDAFKNLGJBJ) = (other.MDAFKNLGJBJ, MDAFKNLGJBJ);
+        (keys, other.keys) = (other.keys, keys);
+        (keyClearCounter, other.keyClearCounter) = (other.keyClearCounter, keyClearCounter);
+        (currentKeyData, other.currentKeyData) = (other.currentKeyData, currentKeyData);
+        (keyDataSnapshot, other.keyDataSnapshot) = (other.keyDataSnapshot, keyDataSnapshot);
+        (pressAgeCounter, other.pressAgeCounter) = (other.pressAgeCounter, pressAgeCounter);
     }
 
-	public void IPGLLIAHDPE(KeyData value)
+	public void SetCurrentKeys(KeyData value)
 	{
-		AOFMFOHIKHF = value.Copy();
-		JKLJBOOOKOP = value.Copy();
+		currentKeyData = value.Copy();
+		keyDataSnapshot = value.Copy();
 	}
 
 	public void Render()
 	{
-		if (LICAFNLFJHO == 30)
+		if (keyClearCounter == 30)
 		{
-			AOFMFOHIKHF.Clear();
-			LICAFNLFJHO = 0;
+			currentKeyData.Clear();
+			keyClearCounter = 0;
 		}
-		if ((float)MDAFKNLGJBJ >= 15f)
+		if ((float)pressAgeCounter >= 15f)
 		{
-			AOFMFOHIKHF.IGEEOAGOMEM.Clear();
-			MDAFKNLGJBJ = 0;
+			currentKeyData.StarterKeys.Clear();
+			pressAgeCounter = 0;
 		}
 		SetAdditional();
-		MDAFKNLGJBJ++;
-		LICAFNLFJHO++;
+		pressAgeCounter++;
+		keyClearCounter++;
 	}
 
 	public void Reset()
 	{
-		JKLJBOOOKOP.Clear();
-		AOFMFOHIKHF.Clear();
-		AOFMFOHIKHF.IGEEOAGOMEM.Clear();
+		keyDataSnapshot.Clear();
+		currentKeyData.Clear();
+		currentKeyData.StarterKeys.Clear();
 		int i = 0;
-		for (int count = KNKFKGPKBPK.Count; i < count; i++)
+		for (int count = keys.Count; i < count; i++)
 		{
-			KNKFKGPKBPK[i].Press = false;
+			keys[i].Press = false;
 		}
 	}
 
@@ -120,15 +120,15 @@ public class ModelController : global::EventDispatcher<object>
 		if (hFBBKFECOBD != null && !hFBBKFECOBD.Press)
 		{
 			hFBBKFECOBD.Press = true;
-			MDAFKNLGJBJ = 0;
-			AOFMFOHIKHF.IGEEOAGOMEM.Add(hFBBKFECOBD.Index);
-			while (AOFMFOHIKHF.IGEEOAGOMEM.Count > 2)
+			pressAgeCounter = 0;
+			currentKeyData.StarterKeys.Add(hFBBKFECOBD.Index);
+			while (currentKeyData.StarterKeys.Count > 2)
 			{
-				AOFMFOHIKHF.IGEEOAGOMEM.RemoveAt(0);
+				currentKeyData.StarterKeys.RemoveAt(0);
 			}
-			AOFMFOHIKHF.Clear();
+			currentKeyData.Clear();
 			SetAdditional();
-			AOFMFOHIKHF.HGPMABCJGGN = GetPressType(AOFMFOHIKHF.IGEEOAGOMEM, AOFMFOHIKHF.CEPODJDDLBF);
+			currentKeyData.PressTypeMode = GetPressType(currentKeyData.StarterKeys, currentKeyData.AdditionalKeys);
 			CallKeyPressed();
 		}
 	}
@@ -141,13 +141,13 @@ public class ModelController : global::EventDispatcher<object>
 			return;
 		}
 		hFBBKFECOBD.Press = false;
-		if (!AOFMFOHIKHF.IGEEOAGOMEM.Contains(hFBBKFECOBD.Index))
+		if (!currentKeyData.StarterKeys.Contains(hFBBKFECOBD.Index))
 		{
-			int num = AOFMFOHIKHF.CEPODJDDLBF.IndexOf(hFBBKFECOBD.Index);
-			if (AOFMFOHIKHF.CEPODJDDLBF.Contains(hFBBKFECOBD.Index))
+			int num = currentKeyData.AdditionalKeys.IndexOf(hFBBKFECOBD.Index);
+			if (currentKeyData.AdditionalKeys.Contains(hFBBKFECOBD.Index))
 			{
-				AOFMFOHIKHF.HPEOJLAMIHC.Add(hFBBKFECOBD.Index);
-				AOFMFOHIKHF.CEPODJDDLBF.Remove(hFBBKFECOBD.Index);
+				currentKeyData.ReleaseKeys.Add(hFBBKFECOBD.Index);
+				currentKeyData.AdditionalKeys.Remove(hFBBKFECOBD.Index);
 				CallKeyReleased();
 			}
 		}
@@ -155,25 +155,25 @@ public class ModelController : global::EventDispatcher<object>
 
 	public KeyData GetKeyDataBySign(int AOJJBKLCHJO)
 	{
-		JKLJBOOOKOP.Set(AOFMFOHIKHF);
-		return JKLJBOOOKOP;
+		keyDataSnapshot.Set(currentKeyData);
+		return keyDataSnapshot;
 	}
 
 	public void CallKeyPressed()
 	{
-		CallEvent(0, AOFMFOHIKHF);
+		CallEvent(0, currentKeyData);
 	}
 
 	public void CallKeyReleased()
 	{
-		CallEvent(1, AOFMFOHIKHF);
+		CallEvent(1, currentKeyData);
 	}
 
 	private KeyInfo GetKey(int HDKKKCDKFEE)
 	{
-		foreach (KeyInfo item in KNKFKGPKBPK)
+		foreach (KeyInfo item in keys)
 		{
-			if (item.EDEEELJMHLG == HDKKKCDKFEE)
+			if (item.KeyId == HDKKKCDKFEE)
 			{
 				return item;
 			}
@@ -183,21 +183,21 @@ public class ModelController : global::EventDispatcher<object>
 
 	private void SetAdditional()
 	{
-		AOFMFOHIKHF.CEPODJDDLBF.Clear();
-		foreach (KeyInfo item in KNKFKGPKBPK)
+		currentKeyData.AdditionalKeys.Clear();
+		foreach (KeyInfo item in keys)
 		{
 			if (item.Press)
 			{
-				AOFMFOHIKHF.CEPODJDDLBF.Add(item.Index);
+				currentKeyData.AdditionalKeys.Add(item.Index);
 			}
 		}
 	}
 
-	private KeyData.MCIDLLKHKDE GetPressType(List<int> AKFEAJDLIKF, List<int> LFKEMJBCMFL)
+	private KeyData.PressType GetPressType(List<int> AKFEAJDLIKF, List<int> LFKEMJBCMFL)
 	{
 		if (AKFEAJDLIKF.Count == 1)
 		{
-			return KeyData.MCIDLLKHKDE.BOTH;
+			return KeyData.PressType.BOTH;
 		}
 		foreach (int item in AKFEAJDLIKF)
 		{
@@ -205,10 +205,10 @@ public class ModelController : global::EventDispatcher<object>
 			{
 				if (item == item2)
 				{
-					return KeyData.MCIDLLKHKDE.BOTH;
+					return KeyData.PressType.BOTH;
 				}
 			}
 		}
-		return KeyData.MCIDLLKHKDE.SEQUENCE;
+		return KeyData.PressType.SEQUENCE;
 	}
 }

@@ -3,14 +3,14 @@ using System.Collections.Generic;
 public class EventAnimationStart : EventAnimation
 {
 	public EventAnimationStart()
-		: base(EECEJKADLCK.EVENT_ANIMATION_START)
+		: base(EventAnimationType.EVENT_ANIMATION_START)
 	{
 	}
 
 	protected override bool Compare(EventAnimation FOPOKALJIIJ)
 	{
 		EventAnimationStart hPCJMBAJKLJ = FOPOKALJIIJ as EventAnimationStart;
-		bool flag = IsCompareNames(hPCJMBAJKLJ.JIFAHHGNPFH.NNPJJLPCOHD);
+		bool flag = IsCompareNames(hPCJMBAJKLJ.Conditions.SelfAnimationNames);
 		return (!IsNot) ? flag : (!flag);
 	}
 
@@ -19,7 +19,7 @@ public class EventAnimationStart : EventAnimation
 		int i = 0;
 		for (int count = NIKHAICFGNM.Count; i < count; i++)
 		{
-			if (NIKHAICFGNM[i] == LJICHLHMBFA)
+			if (NIKHAICFGNM[i] == AnimationName)
 			{
 				return true;
 			}

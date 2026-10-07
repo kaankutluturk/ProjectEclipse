@@ -2,29 +2,29 @@ using System.Xml;
 
 public class ChangeFightRule : Rule
 {
-	private int DKIGKNAHBFI;
+	private int _rounds;
 
-	private int CKOAOOINLHF;
+	private int _roundTime;
 
 	public ChangeFightRule(XmlNode node)
-		: base(BCBLLMPAMLP.RuleChangeFight, node)
+		: base(RuleType.RuleChangeFight, node)
 	{
 		Parse(node);
 	}
 
-	public int NNMOHPAAFGI()
+	public int GetRounds()
 	{
-		return DKIGKNAHBFI;
+		return _rounds;
 	}
 
-	public int IBHBDDFGEDN()
+	public int GetRoundTime()
 	{
-		return CKOAOOINLHF;
+		return _roundTime;
 	}
 
 	protected override void Parse(XmlNode node)
 	{
-		DKIGKNAHBFI = node.Attributes["Rounds"].ParseInt(-1);
-		CKOAOOINLHF = node.Attributes["RoundTime"].ParseInt(-1);
+		_rounds = node.Attributes["Rounds"].ParseInt(-1);
+		_roundTime = node.Attributes["RoundTime"].ParseInt(-1);
 	}
 }

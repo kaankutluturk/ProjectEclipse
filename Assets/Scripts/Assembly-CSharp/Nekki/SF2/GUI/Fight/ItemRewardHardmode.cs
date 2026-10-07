@@ -19,7 +19,7 @@ namespace Nekki.SF2.GUI.Fight
 		{
 			if (icon != null)
 			{
-				icon.set_TexturePath(SF2Paths.LFIIMPEAMFG());
+				icon.set_TexturePath(SF2Paths.GetItemsUiPath());
 				icon.set_SpriteName(item.FileName);
 			}
 		}

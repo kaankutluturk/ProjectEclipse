@@ -3,7 +3,7 @@ using System.Text;
 
 public abstract class ConditionExtension
 {
-	public enum KDEAPAPEEAO
+	public enum MathFunctionType
 	{
 		MATH_NONE = 0,
 		MATH_SUM = 1,
@@ -15,50 +15,50 @@ public abstract class ConditionExtension
 		MATH_RAND = 7
 	}
 
-	public enum FBKBGPPHALB
+	public enum StringFunctionType
 	{
 		STRING_NONE = 0,
 		STRING_CONCAT = 1,
 		STRING_SLICE = 2
 	}
 
-	public enum HAEOKBKNCHE
+	public enum QuestVariableType
 	{
 		QUEST_CONDITION_VARIABLE_NONE = 0,
 		QUEST_CONDITION_VARIABLE_STRING = 1,
 		QUEST_CONDITION_VARIABLE_NUMBER = 2
 	}
 
-	public class HLCPKKIIBFB
+	public class FunctionArgument
 	{
 		public string value = string.Empty;
 
-		public string DCJLKCFKCOM = string.Empty;
+		public string result = string.Empty;
 
 		public bool Empty()
 		{
-			return DCJLKCFKCOM.Equals(string.Empty);
+			return result.Equals(string.Empty);
 		}
 
 		public void Reset()
 		{
-			DCJLKCFKCOM = string.Empty;
+			result = string.Empty;
 		}
 	}
 
-	public class QuestFunctions : HLCPKKIIBFB
+	public class QuestFunctions : FunctionArgument
 	{
-		public string FJLOLCPJACB = string.Empty;
+		public string functionName = string.Empty;
 
-		public string GKPKHOMIMMN = string.Empty;
+		public string argumentsText = string.Empty;
 
-		public string HBDLDIKHFEG = string.Empty;
+		public string property = string.Empty;
 
-		public List<HLCPKKIIBFB> arguments = new List<HLCPKKIIBFB>();
+		public List<FunctionArgument> arguments = new List<FunctionArgument>();
 
-		public string OMHIDHHNPEF()
+		public string GetFirstArgument()
 		{
-			return (arguments.Count <= 0) ? string.Empty : arguments[0].DCJLKCFKCOM;
+			return (arguments.Count <= 0) ? string.Empty : arguments[0].result;
 		}
 	}
 
@@ -94,14 +94,14 @@ public abstract class ConditionExtension
 
 		public override string ToString()
 		{
-			if (INCOIAANDCO())
+			if (IsNumber())
 			{
 				return resultNumber.ToString();
 			}
 			return resultSTR;
 		}
 
-		public bool INCOIAANDCO()
+		public bool IsNumber()
 		{
 			return resultSTR.Equals(string.Empty);
 		}
@@ -117,7 +117,7 @@ public abstract class ConditionExtension
 	{
 	}
 
-	public void MCPIOGALBMK(string value, CompareResult BMDEBHIHIAJ)
+	public void SetValue(string value, CompareResult BMDEBHIHIAJ)
 	{
 		if (!value.Equals(string.Empty))
 		{
@@ -128,36 +128,36 @@ public abstract class ConditionExtension
 			}
 			else if (c.Equals('?'))
 			{
-				CDNAPPKEJHA(value, BMDEBHIHIAJ);
+				ExecuteFunction(value, BMDEBHIHIAJ);
 				if (!BMDEBHIHIAJ.resultSTR.Equals(string.Empty))
 				{
 					string iBBAMMHHBFE = BMDEBHIHIAJ.resultSTR;
 					BMDEBHIHIAJ.Clear();
-					MCPIOGALBMK(iBBAMMHHBFE, BMDEBHIHIAJ);
+					SetValue(iBBAMMHHBFE, BMDEBHIHIAJ);
 				}
 			}
 			else
 			{
-				JLDFNJEALLB(value, BMDEBHIHIAJ);
+				SetLiteralValue(value, BMDEBHIHIAJ);
 			}
 		}
 		else
 		{
-			LLLOJBFMONN.Write("ConditionExtension::setValue - empty string");
+			GameLog.Write("ConditionExtension::setValue - empty string");
 		}
 	}
 
-	protected QuestFunctions JNMHPJGGPMI(string value)
+	protected QuestFunctions ParseFunctions(string value)
 	{
 		if (!value.Equals(string.Empty))
 		{
-			return JMKKHEDOBDB(value);
+			return ParseFunctionInternal(value);
 		}
-		LLLOJBFMONN.Write("ConditionExtension.parseFunctions - empty string");
+		GameLog.Write("ConditionExtension.parseFunctions - empty string");
 		return null;
 	}
 
-	protected QuestFunctions JMKKHEDOBDB(string value)
+	protected QuestFunctions ParseFunctionInternal(string value)
 	{
 		if (value[0].Equals('?'))
 		{
@@ -171,21 +171,21 @@ public abstract class ConditionExtension
 			int num3 = value.LastIndexOf('.');
 			if (num <= 1 || num2 < num)
 			{
-				LLLOJBFMONN.Error("ConditionExtension::parseFunctions - malformed function: {0}", value);
+				GameLog.Error("ConditionExtension::parseFunctions - malformed function: {0}", value);
 				return null;
 			}
 			QuestFunctions bECNHJBBOKO = new QuestFunctions();
-			bECNHJBBOKO.GKPKHOMIMMN = value;
-			bECNHJBBOKO.FJLOLCPJACB = value.Substring(1, num - 1);
-			bECNHJBBOKO.GKPKHOMIMMN = value.Substring(num + 1, num2 - num - 1);
-			bECNHJBBOKO.HBDLDIKHFEG = ((num3 <= num2) ? string.Empty : value.Substring(num3 + 1, value.Length - num3 - 1));
-			FAKNFAMNNIL(bECNHJBBOKO);
+			bECNHJBBOKO.argumentsText = value;
+			bECNHJBBOKO.functionName = value.Substring(1, num - 1);
+			bECNHJBBOKO.argumentsText = value.Substring(num + 1, num2 - num - 1);
+			bECNHJBBOKO.property = ((num3 <= num2) ? string.Empty : value.Substring(num3 + 1, value.Length - num3 - 1));
+			ParseArguments(bECNHJBBOKO);
 			return bECNHJBBOKO;
 		}
 		return null;
 	}
 
-	protected void FAKNFAMNNIL(QuestFunctions KJFKPMCPIBH)
+	protected void ParseArguments(QuestFunctions KJFKPMCPIBH)
 	{
 		KJFKPMCPIBH.arguments.Clear();
 		bool flag = false;
@@ -193,7 +193,7 @@ public abstract class ConditionExtension
 		int num = 0;
 		StringBuilder stringBuilder = new StringBuilder();
 		StringBuilder stringBuilder2 = new StringBuilder();
-		string text = ClearGaps(KJFKPMCPIBH.GKPKHOMIMMN);
+		string text = ClearGaps(KJFKPMCPIBH.argumentsText);
 		int i = 0;
 		for (int length = text.Length; i < length; i++)
 		{
@@ -211,8 +211,8 @@ public abstract class ConditionExtension
 				}
 				else if (stringBuilder2.Length > 0)
 				{
-					HLCPKKIIBFB hLCPKKIIBFB = new HLCPKKIIBFB();
-					hLCPKKIIBFB.DCJLKCFKCOM = stringBuilder2.ToString();
+					FunctionArgument hLCPKKIIBFB = new FunctionArgument();
+					hLCPKKIIBFB.result = stringBuilder2.ToString();
 					KJFKPMCPIBH.arguments.Add(hLCPKKIIBFB);
 					stringBuilder2.Clear();
 				}
@@ -241,7 +241,7 @@ public abstract class ConditionExtension
 					{
 						flag = false;
 						stringBuilder.Append(c);
-						QuestFunctions item = JNMHPJGGPMI(stringBuilder.ToString());
+						QuestFunctions item = ParseFunctions(stringBuilder.ToString());
 						KJFKPMCPIBH.arguments.Add(item);
 						stringBuilder.Clear();
 					}
@@ -254,8 +254,8 @@ public abstract class ConditionExtension
 		}
 		if (stringBuilder2.Length > 0)
 		{
-			HLCPKKIIBFB hLCPKKIIBFB2 = new HLCPKKIIBFB();
-			hLCPKKIIBFB2.DCJLKCFKCOM = stringBuilder2.ToString();
+			FunctionArgument hLCPKKIIBFB2 = new FunctionArgument();
+			hLCPKKIIBFB2.result = stringBuilder2.ToString();
 			KJFKPMCPIBH.arguments.Add(hLCPKKIIBFB2);
 			stringBuilder2.Clear();
 		}
@@ -263,10 +263,10 @@ public abstract class ConditionExtension
 
 	protected void SessionSettings(string value, CompareResult BMDEBHIHIAJ)
 	{
-		IDHOFHMDIPL(value, BMDEBHIHIAJ);
+		ResolveSessionVariable(value, BMDEBHIHIAJ);
 	}
 
-	protected void JLDFNJEALLB(string value, CompareResult BMDEBHIHIAJ)
+	protected void SetLiteralValue(string value, CompareResult BMDEBHIHIAJ)
 	{
 		// An unset session/roster variable is a valid state while a quest waits
 		// for its first event.  Empty strings used to be classified as numbers
@@ -277,12 +277,12 @@ public abstract class ConditionExtension
 			BMDEBHIHIAJ.resultSTR = string.Empty;
 			return;
 		}
-		switch (FANCHMOGIEI(value))
+		switch (GetVariableType(value))
 		{
-		case HAEOKBKNCHE.QUEST_CONDITION_VARIABLE_STRING:
+		case QuestVariableType.QUEST_CONDITION_VARIABLE_STRING:
 			BMDEBHIHIAJ.resultSTR = value;
 			break;
-		case HAEOKBKNCHE.QUEST_CONDITION_VARIABLE_NUMBER:
+		case QuestVariableType.QUEST_CONDITION_VARIABLE_NUMBER:
 			double result;
 			if (double.TryParse(value, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out result) ||
 				double.TryParse(value, out result))
@@ -297,36 +297,36 @@ public abstract class ConditionExtension
 		}
 	}
 
-	protected HAEOKBKNCHE FANCHMOGIEI(string value)
+	protected QuestVariableType GetVariableType(string value)
 	{
 		if (string.IsNullOrEmpty(value))
 		{
-			return HAEOKBKNCHE.QUEST_CONDITION_VARIABLE_STRING;
+			return QuestVariableType.QUEST_CONDITION_VARIABLE_STRING;
 		}
 		foreach (int num in value)
 		{
 			if (num < 43 || num > 57)
 			{
-				return HAEOKBKNCHE.QUEST_CONDITION_VARIABLE_STRING;
+				return QuestVariableType.QUEST_CONDITION_VARIABLE_STRING;
 			}
 		}
-		return HAEOKBKNCHE.QUEST_CONDITION_VARIABLE_NUMBER;
+		return QuestVariableType.QUEST_CONDITION_VARIABLE_NUMBER;
 	}
 
-	protected void CDNAPPKEJHA(string value, CompareResult BMDEBHIHIAJ)
+	protected void ExecuteFunction(string value, CompareResult BMDEBHIHIAJ)
 	{
-		QuestFunctions kJFKPMCPIBH = JNMHPJGGPMI(value);
-		CDNAPPKEJHA(kJFKPMCPIBH, BMDEBHIHIAJ);
-		FELJIDPAKPI(kJFKPMCPIBH);
+		QuestFunctions kJFKPMCPIBH = ParseFunctions(value);
+		ExecuteFunction(kJFKPMCPIBH, BMDEBHIHIAJ);
+		ResetFunction(kJFKPMCPIBH);
 	}
 
-	protected void CDNAPPKEJHA(QuestFunctions KJFKPMCPIBH, CompareResult BMDEBHIHIAJ)
+	protected void ExecuteFunction(QuestFunctions KJFKPMCPIBH, CompareResult BMDEBHIHIAJ)
 	{
 		if (KJFKPMCPIBH == null)
 		{
 			return;
 		}
-		foreach (HLCPKKIIBFB item in KJFKPMCPIBH.arguments)
+		foreach (FunctionArgument item in KJFKPMCPIBH.arguments)
 		{
 			QuestFunctions bECNHJBBOKO = item as QuestFunctions;
 			if (bECNHJBBOKO != null)
@@ -334,52 +334,52 @@ public abstract class ConditionExtension
 				if (bECNHJBBOKO.Empty())
 				{
 					CompareResult lNIDLHOIHIM = new CompareResult();
-					CDNAPPKEJHA(bECNHJBBOKO, lNIDLHOIHIM);
-					bECNHJBBOKO.DCJLKCFKCOM = lNIDLHOIHIM.ToString();
+					ExecuteFunction(bECNHJBBOKO, lNIDLHOIHIM);
+					bECNHJBBOKO.result = lNIDLHOIHIM.ToString();
 				}
 			}
 			else
 			{
 				CompareResult lNIDLHOIHIM2 = new CompareResult();
-				MCPIOGALBMK(item.DCJLKCFKCOM, lNIDLHOIHIM2);
-				item.DCJLKCFKCOM = lNIDLHOIHIM2.ToString();
+				SetValue(item.result, lNIDLHOIHIM2);
+				item.result = lNIDLHOIHIM2.ToString();
 			}
 		}
-		AIFNPKLNPEE(KJFKPMCPIBH, BMDEBHIHIAJ);
+		FullFunction(KJFKPMCPIBH, BMDEBHIHIAJ);
 	}
 
-	protected abstract void AIFNPKLNPEE(QuestFunctions KJFKPMCPIBH, CompareResult BMDEBHIHIAJ);
+	protected abstract void FullFunction(QuestFunctions KJFKPMCPIBH, CompareResult BMDEBHIHIAJ);
 
-	protected abstract void IDHOFHMDIPL(string value, CompareResult BMDEBHIHIAJ);
+	protected abstract void ResolveSessionVariable(string value, CompareResult BMDEBHIHIAJ);
 
-	protected void FELJIDPAKPI(QuestFunctions KJFKPMCPIBH)
+	protected void ResetFunction(QuestFunctions KJFKPMCPIBH)
 	{
 		KJFKPMCPIBH.Reset();
-		foreach (HLCPKKIIBFB item in KJFKPMCPIBH.arguments)
+		foreach (FunctionArgument item in KJFKPMCPIBH.arguments)
 		{
 			QuestFunctions bECNHJBBOKO = item as QuestFunctions;
 			if (bECNHJBBOKO != null)
 			{
-				FELJIDPAKPI(bECNHJBBOKO);
+				ResetFunction(bECNHJBBOKO);
 			}
 		}
 	}
 
-	protected void MDENBJJAPMH(QuestFunctions KJFKPMCPIBH, CompareResult BMDEBHIHIAJ, KDEAPAPEEAO LFLGCDNKNJI)
+	protected void MathFunction(QuestFunctions KJFKPMCPIBH, CompareResult BMDEBHIHIAJ, MathFunctionType LFLGCDNKNJI)
 	{
 		switch (LFLGCDNKNJI)
 		{
-		case KDEAPAPEEAO.MATH_SUM:
-		case KDEAPAPEEAO.MATH_SUB:
-		case KDEAPAPEEAO.MATH_MULTI:
-		case KDEAPAPEEAO.MATH_DIVISION:
+		case MathFunctionType.MATH_SUM:
+		case MathFunctionType.MATH_SUB:
+		case MathFunctionType.MATH_MULTI:
+		case MathFunctionType.MATH_DIVISION:
 		{
 			int num5 = 0;
 			double num6 = 0.0;
-			foreach (HLCPKKIIBFB item in KJFKPMCPIBH.arguments)
+			foreach (FunctionArgument item in KJFKPMCPIBH.arguments)
 			{
 				double result = 0.0;
-				double.TryParse(item.DCJLKCFKCOM, out result);
+				double.TryParse(item.result, out result);
 				if (num5 == 0)
 				{
 					num6 = result;
@@ -388,24 +388,24 @@ public abstract class ConditionExtension
 				{
 					switch (LFLGCDNKNJI)
 					{
-					case KDEAPAPEEAO.MATH_SUM:
+					case MathFunctionType.MATH_SUM:
 						num6 += result;
 						break;
-					case KDEAPAPEEAO.MATH_SUB:
+					case MathFunctionType.MATH_SUB:
 						num6 -= result;
 						break;
-					case KDEAPAPEEAO.MATH_MULTI:
+					case MathFunctionType.MATH_MULTI:
 						num6 *= result;
 						break;
-					case KDEAPAPEEAO.MATH_DIVISION:
+					case MathFunctionType.MATH_DIVISION:
 						if (result == 0.0)
 						{
-							LLLOJBFMONN.Error("ConditionExtension::MathFunction - wrong arguments division 0");
+							GameLog.Error("ConditionExtension::MathFunction - wrong arguments division 0");
 						}
 						num6 /= result;
 						break;
 					default:
-						LLLOJBFMONN.Error(string.Format("{0},{1}", "ConditionExtension::mathFunction - unknown type: ", LFLGCDNKNJI));
+						GameLog.Error(string.Format("{0},{1}", "ConditionExtension::mathFunction - unknown type: ", LFLGCDNKNJI));
 						break;
 					}
 				}
@@ -414,69 +414,69 @@ public abstract class ConditionExtension
 			BMDEBHIHIAJ.resultNumber = num6;
 			break;
 		}
-		case KDEAPAPEEAO.MATH_DIVISION_INT:
+		case MathFunctionType.MATH_DIVISION_INT:
 			if (KJFKPMCPIBH.arguments.Count == 2)
 			{
-				int num3 = int.Parse(KJFKPMCPIBH.arguments[0].DCJLKCFKCOM);
-				int num4 = int.Parse(KJFKPMCPIBH.arguments[1].DCJLKCFKCOM);
+				int num3 = int.Parse(KJFKPMCPIBH.arguments[0].result);
+				int num4 = int.Parse(KJFKPMCPIBH.arguments[1].result);
 				BMDEBHIHIAJ.resultNumber = num3 / num4;
 			}
 			else
 			{
-				LLLOJBFMONN.Error(string.Format("{0},{1}", "ConditionExtension::MathFunction - wrong arguments count ", KJFKPMCPIBH.arguments.Count));
+				GameLog.Error(string.Format("{0},{1}", "ConditionExtension::MathFunction - wrong arguments count ", KJFKPMCPIBH.arguments.Count));
 			}
 			break;
-		case KDEAPAPEEAO.MATH_MOD:
+		case MathFunctionType.MATH_MOD:
 			if (KJFKPMCPIBH.arguments.Count == 2)
 			{
-				int num7 = int.Parse(KJFKPMCPIBH.arguments[0].DCJLKCFKCOM);
-				int num8 = int.Parse(KJFKPMCPIBH.arguments[1].DCJLKCFKCOM);
+				int num7 = int.Parse(KJFKPMCPIBH.arguments[0].result);
+				int num8 = int.Parse(KJFKPMCPIBH.arguments[1].result);
 				BMDEBHIHIAJ.resultNumber = num7 % num8;
 			}
 			else
 			{
-				LLLOJBFMONN.Error(string.Format("{0},{1}", "ConditionExtension::MathFunction - wrong arguments count ", KJFKPMCPIBH.arguments.Count));
+				GameLog.Error(string.Format("{0},{1}", "ConditionExtension::MathFunction - wrong arguments count ", KJFKPMCPIBH.arguments.Count));
 			}
 			break;
-		case KDEAPAPEEAO.MATH_RAND:
+		case MathFunctionType.MATH_RAND:
 			if (KJFKPMCPIBH.arguments.Count == 2)
 			{
-				float num = float.Parse(KJFKPMCPIBH.arguments[0].DCJLKCFKCOM);
-				float num2 = float.Parse(KJFKPMCPIBH.arguments[1].DCJLKCFKCOM);
+				float num = float.Parse(KJFKPMCPIBH.arguments[0].result);
+				float num2 = float.Parse(KJFKPMCPIBH.arguments[1].result);
 				BMDEBHIHIAJ.resultNumber = NekkiMath.randomInt((int)num, (int)num2 + 1);
 			}
 			else
 			{
-				LLLOJBFMONN.Error(string.Format("{0},{1}", "ConditionExtension::MathFunction - wrong arguments count ", KJFKPMCPIBH.arguments.Count));
+				GameLog.Error(string.Format("{0},{1}", "ConditionExtension::MathFunction - wrong arguments count ", KJFKPMCPIBH.arguments.Count));
 			}
 			break;
 		default:
-			LLLOJBFMONN.Error(string.Format("{0},{1}", "ConditionExtension::mathFunction - unknown type: ", LFLGCDNKNJI));
+			GameLog.Error(string.Format("{0},{1}", "ConditionExtension::mathFunction - unknown type: ", LFLGCDNKNJI));
 			break;
 		}
 	}
 
-	protected void MLPIEBOJBNM(QuestFunctions KJFKPMCPIBH, CompareResult BMDEBHIHIAJ, FBKBGPPHALB LFLGCDNKNJI)
+	protected void StringFunction(QuestFunctions KJFKPMCPIBH, CompareResult BMDEBHIHIAJ, StringFunctionType LFLGCDNKNJI)
 	{
 		int num = 0;
 		StringBuilder stringBuilder = new StringBuilder();
 		List<string> list = new List<string>();
-		foreach (HLCPKKIIBFB item in KJFKPMCPIBH.arguments)
+		foreach (FunctionArgument item in KJFKPMCPIBH.arguments)
 		{
-			string dCJLKCFKCOM = item.DCJLKCFKCOM;
+			string dCJLKCFKCOM = item.result;
 			list.Add(dCJLKCFKCOM);
 			if (num == 0)
 			{
 				stringBuilder.Clear();
 				stringBuilder.Append(dCJLKCFKCOM);
 			}
-			else if (LFLGCDNKNJI == FBKBGPPHALB.STRING_CONCAT)
+			else if (LFLGCDNKNJI == StringFunctionType.STRING_CONCAT)
 			{
 				stringBuilder.Append(dCJLKCFKCOM);
 			}
 			num++;
 		}
-		if (list.Count >= 3 && LFLGCDNKNJI == FBKBGPPHALB.STRING_SLICE)
+		if (list.Count >= 3 && LFLGCDNKNJI == StringFunctionType.STRING_SLICE)
 		{
 			string iGGFGLLIGCG = list[0];
 			int iOFHCAAOELD = int.Parse(list[1]);

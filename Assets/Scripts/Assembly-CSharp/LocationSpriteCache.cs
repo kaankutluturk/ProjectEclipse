@@ -7,11 +7,11 @@ public static class LocationSpriteCache
 
 	private static Dictionary<string, Sprite> _CachedSingleSprite = new Dictionary<string, Sprite>();
 
-	public static Sprite[] ENFOJMFEGJH(string ONNKJLOGHGH)
+	public static Sprite[] LoadAtlasSprites(string ONNKJLOGHGH)
 	{
 		if (!_CachedAtlases.ContainsKey(ONNKJLOGHGH))
 		{
-			Sprite[] array = ResourcesAndBundles.BNCMBJOICHI<Sprite>(ONNKJLOGHGH);
+			Sprite[] array = ResourcesAndBundles.LoadAllAssets<Sprite>(ONNKJLOGHGH);
 			if (array != null)
 			{
 				_CachedAtlases.Add(ONNKJLOGHGH, array);
@@ -21,7 +21,7 @@ public static class LocationSpriteCache
 		return _CachedAtlases[ONNKJLOGHGH];
 	}
 
-	private static Sprite OPHFAHOKBOK(string PPAJIHNNNDG, string CMMPHNJDOCF)
+	private static Sprite LoadSingleSprite(string PPAJIHNNNDG, string CMMPHNJDOCF)
 	{
 		string text = string.Format("{0}/{1}", PPAJIHNNNDG, CMMPHNJDOCF);
 		if (_CachedSingleSprite.ContainsKey(text))
@@ -37,20 +37,20 @@ public static class LocationSpriteCache
 		return sprite;
 	}
 
-	public static Sprite PPBEKKDIJKC(string PPAJIHNNNDG, string CMMPHNJDOCF, string BBPGNOBFECF)
+	public static Sprite GetSprite(string PPAJIHNNNDG, string CMMPHNJDOCF, string BBPGNOBFECF)
 	{
 		if (Eclipse.Modding.AssetId.TryParse(PPAJIHNNNDG, out _))
 		{
 			// Qualified core/mod location art is addressed per sprite. Legacy atlas sub-assets
 			// remain available for installed/core locations through the branch below.
-			return OPHFAHOKBOK(PPAJIHNNNDG, CMMPHNJDOCF);
+			return LoadSingleSprite(PPAJIHNNNDG, CMMPHNJDOCF);
 		}
         if (Eclipse.Modding.ModRuntime.TryResolveCoreReplacement(PPAJIHNNNDG + "/" + CMMPHNJDOCF, out var replacement))
             return Eclipse.Modding.ModRuntime.Host.TypedAssets.LoadSprite(replacement);
 		if (!string.IsNullOrEmpty(BBPGNOBFECF))
 		{
 			string oNNKJLOGHGH = string.Format("{0}/{1}", PPAJIHNNNDG, BBPGNOBFECF);
-			Sprite[] array = ENFOJMFEGJH(oNNKJLOGHGH);
+			Sprite[] array = LoadAtlasSprites(oNNKJLOGHGH);
 			Sprite[] array2 = array ?? new Sprite[0];
 			foreach (Sprite sprite in array2)
 			{
@@ -60,13 +60,13 @@ public static class LocationSpriteCache
 				}
 			}
 		}
-		return OPHFAHOKBOK(PPAJIHNNNDG, CMMPHNJDOCF);
+		return LoadSingleSprite(PPAJIHNNNDG, CMMPHNJDOCF);
 	}
 
 	public static void Clear()
 	{
 		_CachedAtlases.Clear();
 		_CachedSingleSprite.Clear();
-		CocosAnimationData.DECIILEPLDM();
+		CocosAnimationData.ClearCache();
 	}
 }

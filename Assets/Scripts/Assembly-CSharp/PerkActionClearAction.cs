@@ -4,13 +4,13 @@ using System.Xml;
 public class PerkActionClearAction : PerkAction
 {
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private string BODLHPJCLIG;
+	private string _actionName;
 
-	public string AOOJOKOHAHA
+	public string ClearedActionName
 	{
 		get
 		{
-			return DDBPICENEJE();
+			return GetNameAction();
 		}
 		protected set
 		{
@@ -25,23 +25,23 @@ public class PerkActionClearAction : PerkAction
 	public PerkActionClearAction(PerkActionClearAction NOLFMPDGCOC)
 		: base(NOLFMPDGCOC)
 	{
-		set_NameAction(NOLFMPDGCOC.DDBPICENEJE());
+		set_NameAction(NOLFMPDGCOC.GetNameAction());
 	}
 
-	public string DDBPICENEJE()
+	public string GetNameAction()
 	{
-		return BODLHPJCLIG;
+		return _actionName;
 	}
 
 	protected void set_NameAction(string value)
 	{
-		BODLHPJCLIG = value;
+		_actionName = value;
 	}
 
 	public override void Parse(XmlNode node)
 	{
 		base.Parse(node);
 		set_Type(ActionType.ACTION_CLEAR_ACTION);
-		set_NameAction(node.Attributes["Name"].CIPOICEEIBK(string.Empty));
+		set_NameAction(node.Attributes["Name"].GetStringOrDefault(string.Empty));
 	}
 }

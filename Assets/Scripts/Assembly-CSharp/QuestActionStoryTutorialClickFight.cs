@@ -4,7 +4,7 @@ using Nekki.SF2.GUI.Map;
 
 public class QuestActionStoryTutorialClickFight : QuestAction
 {
-	public override void DEJMHFMLKIC(QuestParameters GFIHPBCEEOB)
+	public override void Execute(QuestParameters GFIHPBCEEOB)
 	{
 		TutorialCanvas.get_Instance().set_BlockOn(true);
 		MapScene current = Scene<MapScene>.get_Current();
@@ -27,6 +27,6 @@ public class QuestActionStoryTutorialClickFight : QuestAction
 		btnFight.onClick.RemoveListener(OnButtonClick);
 		TutorialComponent component = btnFight.gameObject.GetComponent<TutorialComponent>();
 		component.IsActive = false;
-		OGIJONMKABB();
+		FinishAction();
 	}
 }

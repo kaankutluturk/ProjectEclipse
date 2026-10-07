@@ -7,13 +7,13 @@ public class Parser
 {
 	public ArrayList NonSwitchStrings = new ArrayList();
 
-	private SwitchResult[] JBGGDPDJLAP;
+	private SwitchResult[] _switches;
 
-	private const char OIAEBHEHHBJ = '-';
+	private const char kSwitchID1 = '-';
 
-	private const char DNJJLLFPPJL = '/';
+	private const char kSwitchID2 = '/';
 
-	private const char OPAENCOBOGP = '-';
+	private const char kSwitchMinus = '-';
 
 	private const string kStopSwitchParsing = "--";
 
@@ -25,10 +25,10 @@ public class Parser
 
 	public Parser(int DJLBIKHFOFA)
 	{
-		JBGGDPDJLAP = new SwitchResult[DJLBIKHFOFA];
+		_switches = new SwitchResult[DJLBIKHFOFA];
 		for (int i = 0; i < DJLBIKHFOFA; i++)
 		{
-			JBGGDPDJLAP[i] = new SwitchResult();
+			_switches[i] = new SwitchResult();
 		}
 	}
 
@@ -40,19 +40,19 @@ public class Parser
 			return false;
 		}
 		int num = 0;
-		if (!AIILOCLKCAH(BGPCMGJPELK[num]))
+		if (!IsItSwitchChar(BGPCMGJPELK[num]))
 		{
 			return false;
 		}
 		while (num < length)
 		{
-			if (AIILOCLKCAH(BGPCMGJPELK[num]))
+			if (IsItSwitchChar(BGPCMGJPELK[num]))
 			{
 				num++;
 			}
 			int num2 = 0;
 			int num3 = -1;
-			for (int i = 0; i < JBGGDPDJLAP.Length; i++)
+			for (int i = 0; i < _switches.Length; i++)
 			{
 				int length2 = OKHCFPOEPGG[i].IDString.Length;
 				if (length2 > num3 && num + length2 <= length && string.Compare(OKHCFPOEPGG[i].IDString, 0, BGPCMGJPELK, num, length2, true) == 0)
@@ -65,37 +65,37 @@ public class Parser
 			{
 				throw new Exception("maxLen == kNoLen");
 			}
-			SwitchResult oHAKJKDHPAO = JBGGDPDJLAP[num2];
+			SwitchResult oHAKJKDHPAO = _switches[num2];
 			SwitchForm pMBOOOLGPJI = OKHCFPOEPGG[num2];
-			if (!pMBOOOLGPJI.Multi && oHAKJKDHPAO.KMJFGGLMJEK)
+			if (!pMBOOOLGPJI.Multi && oHAKJKDHPAO.ThereIs)
 			{
 				throw new Exception("switch must be single");
 			}
-			oHAKJKDHPAO.KMJFGGLMJEK = true;
+			oHAKJKDHPAO.ThereIs = true;
 			num += num3;
 			int num4 = length - num;
-			EGGHFJMOPCE kKJHFNGGFCG = pMBOOOLGPJI.Type;
+			SwitchType kKJHFNGGFCG = pMBOOOLGPJI.Type;
 			switch (kKJHFNGGFCG)
 			{
-			case EGGHFJMOPCE.PostMinus:
+			case SwitchType.PostMinus:
 				if (num4 == 0)
 				{
-					oHAKJKDHPAO.BCFJPFCGALJ = false;
+					oHAKJKDHPAO.WithMinus = false;
 					break;
 				}
-				oHAKJKDHPAO.BCFJPFCGALJ = BGPCMGJPELK[num] == '-';
-				if (oHAKJKDHPAO.BCFJPFCGALJ)
+				oHAKJKDHPAO.WithMinus = BGPCMGJPELK[num] == '-';
+				if (oHAKJKDHPAO.WithMinus)
 				{
 					num++;
 				}
 				break;
-			case EGGHFJMOPCE.PostChar:
+			case SwitchType.PostChar:
 			{
-				if (num4 < pMBOOOLGPJI.DJIJIHHBHHP)
+				if (num4 < pMBOOOLGPJI.MinLen)
 				{
 					throw new Exception("switch is not full");
 				}
-				string hKJPFMBPOJO = pMBOOOLGPJI.HKJPFMBPOJO;
+				string hKJPFMBPOJO = pMBOOOLGPJI.PostCharSet;
 				if (num4 == 0)
 				{
 					oHAKJKDHPAO.PostCharIndex = -1;
@@ -111,15 +111,15 @@ public class Parser
 				num++;
 				break;
 			}
-			case EGGHFJMOPCE.LimitedPostString:
-			case EGGHFJMOPCE.UnLimitedPostString:
+			case SwitchType.LimitedPostString:
+			case SwitchType.UnLimitedPostString:
 			{
-				int dJIJIHHBHHP = pMBOOOLGPJI.DJIJIHHBHHP;
+				int dJIJIHHBHHP = pMBOOOLGPJI.MinLen;
 				if (num4 < dJIJIHHBHHP)
 				{
 					throw new Exception("switch is not full");
 				}
-				if (kKJHFNGGFCG == EGGHFJMOPCE.UnLimitedPostString)
+				if (kKJHFNGGFCG == SwitchType.UnLimitedPostString)
 				{
 					oHAKJKDHPAO.PostStrings.Add(BGPCMGJPELK.Substring(num));
 					return true;
@@ -127,10 +127,10 @@ public class Parser
 				string text = BGPCMGJPELK.Substring(num, dJIJIHHBHHP);
 				num += dJIJIHHBHHP;
 				int num5 = dJIJIHHBHHP;
-				while (num5 < pMBOOOLGPJI.BEIECNAFPJJ && num < length)
+				while (num5 < pMBOOOLGPJI.MaxLen && num < length)
 				{
 					char c = BGPCMGJPELK[num];
-					if (AIILOCLKCAH(c))
+					if (IsItSwitchChar(c))
 					{
 						break;
 					}
@@ -146,7 +146,7 @@ public class Parser
 		return true;
 	}
 
-	public void HFKNFJKJHCF(SwitchForm[] OKHCFPOEPGG, string[] LPJJGICENBE)
+	public void ParseStrings(SwitchForm[] OKHCFPOEPGG, string[] LPJJGICENBE)
 	{
 		int num = LPJJGICENBE.Length;
 		bool flag = false;
@@ -170,10 +170,10 @@ public class Parser
 
 	public SwitchResult get_Item(int index)
 	{
-		return JBGGDPDJLAP[index];
+		return _switches[index];
 	}
 
-	public static int ONFDGHPFPAG(CommandForm[] JHOPHFBKNAI, string FGNIBFLIOCO, out string KKKODGNDMKM)
+	public static int ParseCommand(CommandForm[] JHOPHFBKNAI, string FGNIBFLIOCO, out string KKKODGNDMKM)
 	{
 		for (int i = 0; i < JHOPHFBKNAI.Length; i++)
 		{
@@ -196,18 +196,18 @@ public class Parser
 		return -1;
 	}
 
-	private static bool DCGEDOOPMLP(int COKKBDEDJEO, ANEPNHNMPMJ[] FKGBLNPFCJC, string FGNIBFLIOCO, ArrayList PAHFPIAOPOG)
+	private static bool ParseSubCharsCommand(int COKKBDEDJEO, CommandSubCharsSet[] FKGBLNPFCJC, string FGNIBFLIOCO, ArrayList PAHFPIAOPOG)
 	{
 		PAHFPIAOPOG.Clear();
 		int num = 0;
 		for (int i = 0; i < COKKBDEDJEO; i++)
 		{
-			ANEPNHNMPMJ aNEPNHNMPMJ = FKGBLNPFCJC[i];
+			CommandSubCharsSet aNEPNHNMPMJ = FKGBLNPFCJC[i];
 			int num2 = -1;
-			int length = aNEPNHNMPMJ.HJGBHJBLMOJ.Length;
+			int length = aNEPNHNMPMJ.Chars.Length;
 			for (int j = 0; j < length; j++)
 			{
-				char value = aNEPNHNMPMJ.HJGBHJBLMOJ[j];
+				char value = aNEPNHNMPMJ.Chars[j];
 				int num3 = FGNIBFLIOCO.IndexOf(value);
 				if (num3 >= 0)
 				{
@@ -223,7 +223,7 @@ public class Parser
 					num++;
 				}
 			}
-			if (num2 == -1 && !aNEPNHNMPMJ.KOMGDMPFEED)
+			if (num2 == -1 && !aNEPNHNMPMJ.EmptyAllowed)
 			{
 				return false;
 			}
@@ -232,7 +232,7 @@ public class Parser
 		return num == FGNIBFLIOCO.Length;
 	}
 
-	private static bool AIILOCLKCAH(char ILHDJDNPFKH)
+	private static bool IsItSwitchChar(char ILHDJDNPFKH)
 	{
 		return ILHDJDNPFKH == '-' || ILHDJDNPFKH == '/';
 	}

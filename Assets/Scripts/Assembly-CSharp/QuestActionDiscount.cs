@@ -3,45 +3,45 @@ using System.Xml;
 
 public class QuestActionDiscount : QuestAction
 {
-	private string ABKKEDPPPCI = string.Empty;
+	private string itemExpression = string.Empty;
 
-	private string BJEMAJAOFKE = "0";
+	private string percentExpression = "0";
 
-	private string CAEBEDLOMBE = "0";
+	private string toggleExpression = "0";
 
-	private string AOIKBGKHJMC = string.Empty;
+	private string periodExpression = string.Empty;
 
-	private string PPNHCAMHNKJ = string.Empty;
+	private string newAmountExpression = string.Empty;
 
-	private string LPENEFLIBEF = string.Empty;
+	private string newPriceExpression = string.Empty;
 
-	private string JGPCLKNPCLG = string.Empty;
+	private string saleExpression = string.Empty;
 
 	public override void Parse(XmlNode EPKLCPOEELO)
 	{
 		base.Parse(EPKLCPOEELO);
-		ABKKEDPPPCI = EPKLCPOEELO.Attributes["Item"].CIPOICEEIBK(string.Empty);
-		BJEMAJAOFKE = EPKLCPOEELO.Attributes["Percent"].CIPOICEEIBK(string.Empty);
-		CAEBEDLOMBE = EPKLCPOEELO.Attributes["Toggle"].CIPOICEEIBK(string.Empty);
-		PPNHCAMHNKJ = EPKLCPOEELO.Attributes["NewAmount"].CIPOICEEIBK("0");
-		LPENEFLIBEF = EPKLCPOEELO.Attributes["NewPrice"].CIPOICEEIBK(string.Empty);
-		AOIKBGKHJMC = EPKLCPOEELO.Attributes["Period"].CIPOICEEIBK("0");
-		JGPCLKNPCLG = EPKLCPOEELO.Attributes["Sale"].CIPOICEEIBK(string.Empty);
+		itemExpression = EPKLCPOEELO.Attributes["Item"].GetStringOrDefault(string.Empty);
+		percentExpression = EPKLCPOEELO.Attributes["Percent"].GetStringOrDefault(string.Empty);
+		toggleExpression = EPKLCPOEELO.Attributes["Toggle"].GetStringOrDefault(string.Empty);
+		newAmountExpression = EPKLCPOEELO.Attributes["NewAmount"].GetStringOrDefault("0");
+		newPriceExpression = EPKLCPOEELO.Attributes["NewPrice"].GetStringOrDefault(string.Empty);
+		periodExpression = EPKLCPOEELO.Attributes["Period"].GetStringOrDefault("0");
+		saleExpression = EPKLCPOEELO.Attributes["Sale"].GetStringOrDefault(string.Empty);
 	}
 
-	public override void DEJMHFMLKIC(QuestParameters GFIHPBCEEOB)
+	public override void Execute(QuestParameters GFIHPBCEEOB)
 	{
-		base.DEJMHFMLKIC(GFIHPBCEEOB);
-		OGIJONMKABB();
+		base.Execute(GFIHPBCEEOB);
+		FinishAction();
 	}
 
-	private void PMMCIFDFCLJ(QuestParameters GFIHPBCEEOB, ItemInfo item, ref int upgradeLevel, ref float IFKAJHEOAEG, ref bool LPPNCLBEAFA, ref long AJKMNFGEHIJ, ref long GKIHFPFHKCI, ref string DDHOJFFGBKM, ref bool GEPBMEMMLEA)
+	private void EvaluateParameters(QuestParameters GFIHPBCEEOB, ItemInfo item, ref int upgradeLevel, ref float IFKAJHEOAEG, ref bool LPPNCLBEAFA, ref long AJKMNFGEHIJ, ref long GKIHFPFHKCI, ref string DDHOJFFGBKM, ref bool GEPBMEMMLEA)
 	{
 		string empty = string.Empty;
 		ConditionExtension.CompareResult lNIDLHOIHIM = new ConditionExtension.CompareResult();
 		QuestCondition kKDGLNECFHA = new QuestCondition();
-		kKDGLNECFHA.LIMHBJBEEIA(GFIHPBCEEOB);
-		kKDGLNECFHA.MCPIOGALBMK(ABKKEDPPPCI, lNIDLHOIHIM);
+		kKDGLNECFHA.SetParameters(GFIHPBCEEOB);
+		kKDGLNECFHA.SetValue(itemExpression, lNIDLHOIHIM);
 		empty = lNIDLHOIHIM.ToString();
 		string text = string.Empty;
 		string text2 = string.Empty;
@@ -57,7 +57,7 @@ public class QuestActionDiscount : QuestAction
 		}
 		if (text2 != string.Empty)
 		{
-			kKDGLNECFHA.MCPIOGALBMK(text2, lNIDLHOIHIM);
+			kKDGLNECFHA.SetValue(text2, lNIDLHOIHIM);
 			upgradeLevel = (int)lNIDLHOIHIM.resultNumber;
 		}
 		else
@@ -65,20 +65,20 @@ public class QuestActionDiscount : QuestAction
 			upgradeLevel = -1;
 		}
 		lNIDLHOIHIM.Clear();
-		kKDGLNECFHA.MCPIOGALBMK(BJEMAJAOFKE, lNIDLHOIHIM);
+		kKDGLNECFHA.SetValue(percentExpression, lNIDLHOIHIM);
 		IFKAJHEOAEG = (float)lNIDLHOIHIM.resultNumber;
 		lNIDLHOIHIM.Clear();
-		kKDGLNECFHA.MCPIOGALBMK(CAEBEDLOMBE, lNIDLHOIHIM);
+		kKDGLNECFHA.SetValue(toggleExpression, lNIDLHOIHIM);
 		LPPNCLBEAFA = lNIDLHOIHIM.resultNumber > 0.0;
 		lNIDLHOIHIM.Clear();
-		kKDGLNECFHA.MCPIOGALBMK(PPNHCAMHNKJ, lNIDLHOIHIM);
+		kKDGLNECFHA.SetValue(newAmountExpression, lNIDLHOIHIM);
 		AJKMNFGEHIJ = (long)lNIDLHOIHIM.resultNumber;
 		lNIDLHOIHIM.Clear();
-		kKDGLNECFHA.MCPIOGALBMK(AOIKBGKHJMC, lNIDLHOIHIM);
+		kKDGLNECFHA.SetValue(periodExpression, lNIDLHOIHIM);
 		GKIHFPFHKCI = (long)lNIDLHOIHIM.resultNumber;
 		lNIDLHOIHIM.Clear();
-		kKDGLNECFHA.MCPIOGALBMK(LPENEFLIBEF, lNIDLHOIHIM);
-		if (LPENEFLIBEF != string.Empty && lNIDLHOIHIM.INCOIAANDCO())
+		kKDGLNECFHA.SetValue(newPriceExpression, lNIDLHOIHIM);
+		if (newPriceExpression != string.Empty && lNIDLHOIHIM.IsNumber())
 		{
 			DDHOJFFGBKM = lNIDLHOIHIM.resultNumber.ToString();
 		}
@@ -87,12 +87,12 @@ public class QuestActionDiscount : QuestAction
 			DDHOJFFGBKM = lNIDLHOIHIM.resultSTR;
 		}
 		lNIDLHOIHIM.Clear();
-		kKDGLNECFHA.MCPIOGALBMK(JGPCLKNPCLG, lNIDLHOIHIM);
+		kKDGLNECFHA.SetValue(saleExpression, lNIDLHOIHIM);
 		GEPBMEMMLEA = lNIDLHOIHIM.resultNumber > 0.0;
 		item = ListSF.GetItems().GetItemByName(text);
 		if (item == null)
 		{
-			LLLOJBFMONN.Error("QuestActionDiscount - cant find item \"%s\" from name \"%s\"", text, ABKKEDPPPCI);
+			GameLog.Error("QuestActionDiscount - cant find item \"%s\" from name \"%s\"", text, itemExpression);
 		}
 	}
 }

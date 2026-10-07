@@ -14,7 +14,7 @@ class Program {
  public class Roster {public bool Eclipse=true;public bool IsEclipseMode()=>Eclipse;}
  public class FightList {public string FightId="zone|boss|1";}
  public class Item {public string Name="katana",Type="Weapon",SubType="Katana";public System.Xml.XmlNode NodeXML;}
- public class ModelParameters {public bool IsPlayer;public List<Item> Items=new List<Item>();public List<Item> PJNJIJIODHE()=>Items;}
+ public class ModelParameters {public bool IsPlayer;public List<Item> Items=new List<Item>();public List<Item> GetEquippedItems()=>Items;}
  public class Definition {public DefinitionId Id=DefinitionId.Parse("core:fights/zone/boss/1");}
  public class Catalog {
   public List<Definition> Fights=new List<Definition>{new Definition()};

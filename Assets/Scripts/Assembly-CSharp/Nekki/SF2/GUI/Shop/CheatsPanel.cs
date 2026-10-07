@@ -26,7 +26,7 @@ namespace Nekki.SF2.GUI.Shop
 
 		public void ShowCheats()
 		{
-			if (SystemProperties.DBBOCENKMGD())
+			if (SystemProperties.IsDebug())
 			{
 				if (cheatsButtons != null)
 				{
@@ -47,9 +47,9 @@ namespace Nekki.SF2.GUI.Shop
 
 		public void AddMoney()
 		{
-			if (SystemProperties.DBBOCENKMGD())
+			if (SystemProperties.IsDebug())
 			{
-				ListSF.GCPJADIMNKI(addMoneyCount);
+				ListSF.AddCoins(addMoneyCount);
 				if (MainMenu.get_Instance() != null)
 				{
 					MainMenu.get_Instance().UpdateMoney();
@@ -59,9 +59,9 @@ namespace Nekki.SF2.GUI.Shop
 
 		public void AddBonus()
 		{
-			if (SystemProperties.DBBOCENKMGD())
+			if (SystemProperties.IsDebug())
 			{
-				ListSF.FPIJEOMBFJN(addBonusCount, Roster.HPOIJPGPOCF.CHANGE_CHEAT);
+				ListSF.AddGems(addBonusCount, Roster.BalanceChangeType.CHANGE_CHEAT);
 				if (MainMenu.get_Instance() != null)
 				{
 					MainMenu.get_Instance().UpdateMoney();
@@ -71,10 +71,10 @@ namespace Nekki.SF2.GUI.Shop
 
 		public void AddLevel()
 		{
-			if (SystemProperties.DBBOCENKMGD())
+			if (SystemProperties.IsDebug())
 			{
-				uint bAINMLLIKOL = ListSF.CCDKHLAMKKO().HEOHJNFGEDH();
-				ListSF.CCDKHLAMKKO().DBPBGBNHAIP(bAINMLLIKOL);
+				uint bAINMLLIKOL = ListSF.GetRoster().GetExperienceToNextLevel();
+				ListSF.GetRoster().SetExperience(bAINMLLIKOL);
 				if (MainMenu.get_Instance() != null)
 				{
 					MainMenu.get_Instance().UpdateLevel();
@@ -89,21 +89,21 @@ namespace Nekki.SF2.GUI.Shop
 
 		public void OpenItems()
 		{
-			ListSF.CCDKHLAMKKO().AddShopLock("ZONE_2", true);
-			ListSF.CCDKHLAMKKO().AddShopLock("ZONE_3", true);
-			ListSF.CCDKHLAMKKO().AddShopLock("ZONE_4", true);
-			ListSF.CCDKHLAMKKO().AddShopLock("ZONE_5", true);
-			ListSF.CCDKHLAMKKO().AddShopLock("ZONE_6", true);
-			ListSF.CCDKHLAMKKO().AddShopLock("ZONE_IM", true);
-			ListSF.CCDKHLAMKKO().AddShopLock("ZONE_7_1", true);
-			ListSF.CCDKHLAMKKO().AddShopLock("ZONE_7_2", true);
-			ListSF.CCDKHLAMKKO().AddShopLock("ZONE_7_3", true);
+			ListSF.GetRoster().AddShopLock("ZONE_2", true);
+			ListSF.GetRoster().AddShopLock("ZONE_3", true);
+			ListSF.GetRoster().AddShopLock("ZONE_4", true);
+			ListSF.GetRoster().AddShopLock("ZONE_5", true);
+			ListSF.GetRoster().AddShopLock("ZONE_6", true);
+			ListSF.GetRoster().AddShopLock("ZONE_IM", true);
+			ListSF.GetRoster().AddShopLock("ZONE_7_1", true);
+			ListSF.GetRoster().AddShopLock("ZONE_7_2", true);
+			ListSF.GetRoster().AddShopLock("ZONE_7_3", true);
 		}
 
 		public void ResetProgress()
 		{
-			GameCenterController.MMGHEKOEHDB();
-			ListSF.CELGPFFHLIM();
+			GameCenterController.ResetAchievements();
+			ListSF.DeleteUserDataAndQuit();
 		}
 	}
 }

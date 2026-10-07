@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class RenderContainer
 {
-	public enum OLBEPOHIHGA
+	public enum RenderContainerZLayer
 	{
 		Z_EFFECTS_CONTAINER_BACKGROUND = 0,
 		Z_VIEWER_MODEL = 1,
@@ -11,150 +11,150 @@ public class RenderContainer
 
 	private GameObject _UnityObject;
 
-	private ViewerModel MELCPENMECL;
+	private ViewerModel viewerModel;
 
-	private EffectsContainer NKGMEJFMGAP;
+	private EffectsContainer backgroundEffects;
 
-	private EffectsContainer FBBJHFBEALC;
+	private EffectsContainer foregroundEffects;
 
-	public GameObject ICDCIANNAAI
+	public GameObject RootObject
 	{
 		get
 		{
-			return MJNPBMOAFML();
+			return GetRootObject();
 		}
 	}
 
-	public ViewerModel KCBHCAMOEAK
+	public ViewerModel ModelViewer
 	{
 		get
 		{
-			return FPNKBJPKKGB();
+			return GetViewerModel();
 		}
 	}
 
-	public EffectsContainer HKADBEAJECH
+	public EffectsContainer BackgroundEffects
 	{
 		get
 		{
-			return GOCPBKNDKMC();
+			return GetBackgroundEffects();
 		}
 	}
 
-	public EffectsContainer HMLOLLBNBIL
+	public EffectsContainer ForegroundEffects
 	{
 		get
 		{
-			return GDBMKMFFOCF();
+			return GetForegroundEffects();
 		}
 	}
 
 	public RenderContainer()
 	{
 		_UnityObject = new GameObject("RenderContainer");
-		MELCPENMECL = new ViewerModel();
+		viewerModel = new ViewerModel();
 	}
 
-	public GameObject MJNPBMOAFML()
+	public GameObject GetRootObject()
 	{
 		return _UnityObject;
 	}
 
-	public ViewerModel FPNKBJPKKGB()
+	public ViewerModel GetViewerModel()
 	{
-		return MELCPENMECL;
+		return viewerModel;
 	}
 
-	public EffectsContainer GOCPBKNDKMC()
+	public EffectsContainer GetBackgroundEffects()
 	{
-		return NKGMEJFMGAP;
+		return backgroundEffects;
 	}
 
-	public EffectsContainer GDBMKMFFOCF()
+	public EffectsContainer GetForegroundEffects()
 	{
-		return FBBJHFBEALC;
+		return foregroundEffects;
 	}
 
-	private void JCDIJHDFHFN(object data)
+	private void OnEffectStarted(object data)
 	{
 		ActionEffect jFJGGMEJDPG = (ActionEffect)data;
-		if (jFJGGMEJDPG.JNAALMFCPCN())
+		if (jFJGGMEJDPG.GetIsOnBackground())
 		{
-			NKGMEJFMGAP.NAOIDALEENG(jFJGGMEJDPG);
+			backgroundEffects.StartEffect(jFJGGMEJDPG);
 		}
 		else
 		{
-			FBBJHFBEALC.NAOIDALEENG(jFJGGMEJDPG);
+			foregroundEffects.StartEffect(jFJGGMEJDPG);
 		}
 	}
 
-	private void DGMPPBLAGFN(object data)
+	private void OnEffectStopped(object data)
 	{
 		ActionStopEffect iBODMPMJELJ = (ActionStopEffect)data;
-		NKGMEJFMGAP.HNCAGBNDBMA(iBODMPMJELJ);
-		FBBJHFBEALC.HNCAGBNDBMA(iBODMPMJELJ);
+		backgroundEffects.StopEffect(iBODMPMJELJ);
+		foregroundEffects.StopEffect(iBODMPMJELJ);
 	}
 
-	private void FMIILPBJGAC(object data)
+	private void OnEffectFollowStopped(object data)
 	{
 		ActionStopFollowEffect iBODMPMJELJ = (ActionStopFollowEffect)data;
-		NKGMEJFMGAP.PCOEBNDLHKP(iBODMPMJELJ);
-		FBBJHFBEALC.PCOEBNDLHKP(iBODMPMJELJ);
+		backgroundEffects.StopFollowEffect(iBODMPMJELJ);
+		foregroundEffects.StopFollowEffect(iBODMPMJELJ);
 	}
 
 	public void Init(Location LPJNEDFCBOI)
 	{
-		FJHEAKJJFIC(LPJNEDFCBOI.GBNPHCHGKDO);
-		KCPOPBDIBMM(LPJNEDFCBOI.GBNPHCHGKDO);
-		_UnityObject.transform.localPosition = new Vector3((0f - LPJNEDFCBOI.JMLAKAKDBBL) / 2f, (0f - LPJNEDFCBOI.FEIHFIPFNKF) / 2f + LPJNEDFCBOI.GBNPHCHGKDO, 0f);
-		_UnityObject.transform.SetParent(LPJNEDFCBOI.gameLayer.MJNPBMOAFML().transform, false);
+		CreateViewerModel(LPJNEDFCBOI.floorHeight);
+		CreateEffectContainers(LPJNEDFCBOI.floorHeight);
+		_UnityObject.transform.localPosition = new Vector3((0f - LPJNEDFCBOI.width) / 2f, (0f - LPJNEDFCBOI.height) / 2f + LPJNEDFCBOI.floorHeight, 0f);
+		_UnityObject.transform.SetParent(LPJNEDFCBOI.gameLayer.GetLayerObject().transform, false);
 		Vector3 localScale = _UnityObject.transform.localScale;
 		_UnityObject.transform.localScale = new Vector3(localScale.x, localScale.y * -1f, localScale.z);
 	}
 
-	public void FJHEAKJJFIC(float GBNPHCHGKDO)
+	public void CreateViewerModel(float GBNPHCHGKDO)
 	{
-		MELCPENMECL.Init(GBNPHCHGKDO);
-		MELCPENMECL.MJNPBMOAFML().transform.SetParent(_UnityObject.transform, false);
-		MELCPENMECL.MJNPBMOAFML().transform.localPosition = new Vector3(0f, 0f, 0f);
+		viewerModel.Init(GBNPHCHGKDO);
+		viewerModel.GetRootObject().transform.SetParent(_UnityObject.transform, false);
+		viewerModel.GetRootObject().transform.localPosition = new Vector3(0f, 0f, 0f);
 	}
 
-	public void KCPOPBDIBMM(float GBNPHCHGKDO)
+	public void CreateEffectContainers(float GBNPHCHGKDO)
 	{
-		NKGMEJFMGAP = new EffectsContainer();
-		NKGMEJFMGAP.init(GBNPHCHGKDO);
-		NKGMEJFMGAP.MJNPBMOAFML().transform.SetParent(_UnityObject.transform, false);
-		NKGMEJFMGAP.MJNPBMOAFML().transform.localPosition = new Vector3(0f, 0f, 0.01f);
-		FBBJHFBEALC = new EffectsContainer();
-		FBBJHFBEALC.init(GBNPHCHGKDO);
-		FBBJHFBEALC.MJNPBMOAFML().transform.SetParent(_UnityObject.transform, false);
-		FBBJHFBEALC.MJNPBMOAFML().transform.localPosition = new Vector3(0f, 0f, -0.01f);
+		backgroundEffects = new EffectsContainer();
+		backgroundEffects.init(GBNPHCHGKDO);
+		backgroundEffects.GetUnityObject().transform.SetParent(_UnityObject.transform, false);
+		backgroundEffects.GetUnityObject().transform.localPosition = new Vector3(0f, 0f, 0.01f);
+		foregroundEffects = new EffectsContainer();
+		foregroundEffects.init(GBNPHCHGKDO);
+		foregroundEffects.GetUnityObject().transform.SetParent(_UnityObject.transform, false);
+		foregroundEffects.GetUnityObject().transform.localPosition = new Vector3(0f, 0f, -0.01f);
 	}
 
 	public void Clear()
 	{
-		MELCPENMECL.Clear();
-		NKGMEJFMGAP.CEPKAHEAADL();
-		FBBJHFBEALC.CEPKAHEAADL();
+		viewerModel.Clear();
+		backgroundEffects.ClearModels();
+		foregroundEffects.ClearModels();
 	}
 
-	public void CDDKOOMODHG(Model ACENLMONNPA)
+	public void AttachModelEffects(Model ACENLMONNPA)
 	{
-		ACENLMONNPA.AddEventListener(7, JCDIJHDFHFN);
-		ACENLMONNPA.AddEventListener(8, DGMPPBLAGFN);
-		ACENLMONNPA.AddEventListener(9, FMIILPBJGAC);
+		ACENLMONNPA.AddEventListener(7, OnEffectStarted);
+		ACENLMONNPA.AddEventListener(8, OnEffectStopped);
+		ACENLMONNPA.AddEventListener(9, OnEffectFollowStopped);
 	}
 
-	public void NAKJKHLEAEB(Model ACENLMONNPA)
+	public void DetachModelEffects(Model ACENLMONNPA)
 	{
-		ACENLMONNPA.RemoveEventListener(7, JCDIJHDFHFN);
-		ACENLMONNPA.RemoveEventListener(8, DGMPPBLAGFN);
-		ACENLMONNPA.RemoveEventListener(9, FMIILPBJGAC);
+		ACENLMONNPA.RemoveEventListener(7, OnEffectStarted);
+		ACENLMONNPA.RemoveEventListener(8, OnEffectStopped);
+		ACENLMONNPA.RemoveEventListener(9, OnEffectFollowStopped);
 	}
 
-	public void JPPGJBHLAGC()
+	public void UpdateEffects()
 	{
-		NKGMEJFMGAP.PMAFCJNKFLF();
-		FBBJHFBEALC.PMAFCJNKFLF();
+		backgroundEffects.RemoveAllEffects();
+		foregroundEffects.RemoveAllEffects();
 	}
 }

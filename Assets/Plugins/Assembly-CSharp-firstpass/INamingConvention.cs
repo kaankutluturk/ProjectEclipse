@@ -1,4 +1,4 @@
 public interface INamingConvention
 {
-	string CBNOIMMJDGO(string value);
+	string Apply(string value);
 }

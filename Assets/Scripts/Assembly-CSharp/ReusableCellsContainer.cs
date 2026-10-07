@@ -3,28 +3,28 @@ using Nekki.SF2.GUI;
 
 public class ReusableCellsContainer
 {
-	public LinkedList<TableViewCell> IGKHHJKCPIJ;
+	public LinkedList<TableViewCell> cells;
 
 	public void Init()
 	{
-		IGKHHJKCPIJ = new LinkedList<TableViewCell>();
+		cells = new LinkedList<TableViewCell>();
 	}
 
-	public void FCGLFBFIPON(TableViewCell HJCPCBLCJJN)
+	public void RecycleCell(TableViewCell HJCPCBLCJJN)
 	{
-		IGKHHJKCPIJ.AddLast(HJCPCBLCJJN);
+		cells.AddLast(HJCPCBLCJJN);
 		HJCPCBLCJJN.gameObject.SetActive(false);
 	}
 
-	public TableViewCell CBLMJDCPLCD()
+	public TableViewCell TakeCell()
 	{
-		if (IGKHHJKCPIJ.Count == 0)
+		if (cells.Count == 0)
 		{
 			return null;
 		}
-		TableViewCell value = IGKHHJKCPIJ.First.Value;
+		TableViewCell value = cells.First.Value;
 		value.gameObject.SetActive(true);
-		IGKHHJKCPIJ.RemoveFirst();
+		cells.RemoveFirst();
 		return value;
 	}
 }

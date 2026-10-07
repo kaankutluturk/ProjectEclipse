@@ -3,7 +3,7 @@ using System.Xml;
 public class InvertJoystickRule : InFightRule
 {
 	public InvertJoystickRule(XmlNode node)
-		: base(BCBLLMPAMLP.RuleInvertJoystick, RuleAppliance.AppliancePlayer, node)
+		: base(RuleType.RuleInvertJoystick, RuleAppliance.AppliancePlayer, node)
 	{
 		Parse(node);
 	}
@@ -11,7 +11,7 @@ public class InvertJoystickRule : InFightRule
 	public override InFightRule Copy()
 	{
 		InFightRule aAJIFBJLJOA = null;
-		XmlNode hKPPBKPJOEO = GIFDJEEGCJI().IOJIGDNFCFL();
+		XmlNode hKPPBKPJOEO = GetXmlSource().GetNode();
 		aAJIFBJLJOA = new InvertJoystickRule(hKPPBKPJOEO);
 		aAJIFBJLJOA.IsRandom = IsRandom;
 		return aAJIFBJLJOA;

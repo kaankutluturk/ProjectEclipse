@@ -6,25 +6,25 @@ public class VerificationSettings
 
 	public string Url;
 
-	public int BEOBDJHNHIO;
+	public int Timeout;
 
-	public int MCAJFNFANBG;
+	public int MaxRetry;
 
-	public int KJJCIKKDNFJ;
+	public int Frequency;
 
 	public VerificationSettings(string KNPONKPJHFJ, int _timeout, int JAPFPFANIMO, int LIANOKFMGMB)
 	{
 		Url = KNPONKPJHFJ;
-		BEOBDJHNHIO = _timeout;
-		MCAJFNFANBG = JAPFPFANIMO;
-		KJJCIKKDNFJ = LIANOKFMGMB;
+		Timeout = _timeout;
+		MaxRetry = JAPFPFANIMO;
+		Frequency = LIANOKFMGMB;
 	}
 
 	public VerificationSettings()
 	{
 		Url = "https://95.213.140.21/verifyReceipt";
-		BEOBDJHNHIO = 5000;
-		MCAJFNFANBG = 2;
-		KJJCIKKDNFJ = -1;
+		Timeout = 5000;
+		MaxRetry = 2;
+		Frequency = -1;
 	}
 }

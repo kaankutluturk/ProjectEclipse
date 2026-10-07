@@ -4,17 +4,17 @@ using UnityEngine.Video;
 
 public class IntroModule : LoadingModule
 {
-	private VideoClip NDPCKCLAFAK;
+	private VideoClip introClip;
 
-	private GameObject FECENALPJDH;
+	private GameObject videoScreenObject;
 
-	private VideoPlayerController NOOBPIDLFNH;
+	private VideoPlayerController videoPlayer;
 
 	private GameObject _logo;
 
 	public IntroModule(GameLoaderScene FCDFLMFEJGI)
 	{
-		NDPCKCLAFAK = FCDFLMFEJGI.get_IntroClip();
+		introClip = FCDFLMFEJGI.get_IntroClip();
 		_logo = FCDFLMFEJGI.get_Logo();
 	}
 
@@ -24,47 +24,47 @@ public class IntroModule : LoadingModule
 	public override void Start()
 	{
 		base.Start();
-		if (Disabled || !AssemblyController.CPJFGBLMHFH())
+		if (Disabled || !AssemblyController.GetShowIntro())
 		{
 			if (_logo != null)
 			{
 				_logo.SetActive(true);
 			}
-			CHIHBINEGFL = true;
+			isFinished = true;
 			return;
 		}
-		if (AssemblyController.CPJFGBLMHFH())
+		if (AssemblyController.GetShowIntro())
 		{
-			FECENALPJDH = (GameObject)Object.Instantiate(Resources.Load("Prefabs/VideoScreen"));
-			NOOBPIDLFNH = FECENALPJDH.GetComponent<VideoPlayerController>();
-			NOOBPIDLFNH.Init();
-			NOOBPIDLFNH.add_ShowCompleted(HLKOKIDAPGO);
-			NOOBPIDLFNH.Play(NDPCKCLAFAK);
+			videoScreenObject = (GameObject)Object.Instantiate(Resources.Load("Prefabs/VideoScreen"));
+			videoPlayer = videoScreenObject.GetComponent<VideoPlayerController>();
+			videoPlayer.Init();
+			videoPlayer.add_ShowCompleted(OnVideoFinished);
+			videoPlayer.Play(introClip);
 		}
 		else
 		{
 			_logo.SetActive(true);
-			CHIHBINEGFL = true;
+			isFinished = true;
 		}
 	}
 
-	public override void JLPMOKPFECK()
+	public override void ProcessStep()
 	{
-		if (!CHIHBINEGFL && Eclipse.Input.EclipseInput.anyKeyDown)
+		if (!isFinished && Eclipse.Input.EclipseInput.anyKeyDown)
 		{
-			HLKOKIDAPGO();
+			OnVideoFinished();
 		}
 	}
 
-	private void HLKOKIDAPGO()
+	private void OnVideoFinished()
 	{
-		NOOBPIDLFNH.remove_ShowCompleted(HLKOKIDAPGO);
-		Object.Destroy(NOOBPIDLFNH, 0.5f);
-		Object.Destroy(FECENALPJDH, 0.5f);
-		FECENALPJDH = null;
-		NDPCKCLAFAK = null;
-		NOOBPIDLFNH = null;
+		videoPlayer.remove_ShowCompleted(OnVideoFinished);
+		Object.Destroy(videoPlayer, 0.5f);
+		Object.Destroy(videoScreenObject, 0.5f);
+		videoScreenObject = null;
+		introClip = null;
+		videoPlayer = null;
 		_logo.SetActive(true);
-		CHIHBINEGFL = true;
+		isFinished = true;
 	}
 }

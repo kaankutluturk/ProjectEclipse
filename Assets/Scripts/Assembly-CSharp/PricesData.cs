@@ -1,111 +1,111 @@
 public class PricesData
 {
-	public long NICNMHCJIBJ;
+	public long Amount;
 
-	public long AJKMNFGEHIJ;
+	public long NewAmount;
 
-	public long ABAINMKLBAM;
+	public long AddAmount;
 
-	public long IIHKEOHAKDJ;
+	public long NewAddAmount;
 
-	public long OFPIHGHEJAH;
+	public long StartDate;
 
-	public long MCEDKIPLOMO;
+	public long EndDate;
 
-	public int JGMODPBJHAD;
+	public int Currency;
 
-	public int BKDNJPAOAEL;
+	public int AddPercent;
 
-	public string GNIJPFLLNIC;
+	public string ProductId;
 
-	public string GFMKCJPKMOK;
+	public string NewProductId;
 
-	public string LMNMPHGIFAF;
+	public string Price;
 
-	public string DDHOJFFGBKM;
+	public string NewPrice;
 
-	public string KBCEJHOADJK;
+	public string AddCurrency;
 
 	public string name;
 
-	public string AOJJBKLCHJO;
+	public string Sign;
 
-	public string AIFNAPNLOML;
+	public string SignCode;
 
-	public string ICBBNJMLDJH;
+	public string Label;
 
-	public string PHMJCFDJAMJ;
+	public string GroupId;
 
-	public string EOMNCDDELLB;
+	public string Locale;
 
-	public string GGDANLHOOKB;
+	public string MobileOperator;
 
-	public string EJENJNPEDOH;
+	public string SpenderTypeId;
 
-	public bool PBAMOKEPKBG;
+	public bool Focus;
 
-	public bool ALAFFFIOIFI = true;
+	public bool IsConsumable = true;
 
-	public long OABCCJAHOIO
+	public long CurrentAmount
 	{
 		get
 		{
-			return FDOOHEMKBFO();
+			return GetCurrentAmount();
 		}
 	}
 
-	public long MOKOCEJFKEI
+	public long CurrentAddAmount
 	{
 		get
 		{
-			return MNLCFCEBLGA();
+			return GetCurrentAddAmount();
 		}
 	}
 
-	public string MDAAJFBENON
+	public string CurrentPrice
 	{
 		get
 		{
-			return GFIMMDLCPMI();
+			return GetCurrentPrice();
 		}
 	}
 
-	public bool MIPIKJMOBGP
+	public bool IsDiscountActive
 	{
 		get
 		{
-			return DMNCMKACPFI();
+			return GetIsDiscountActive();
 		}
 	}
 
-	public long FDOOHEMKBFO()
+	public long GetCurrentAmount()
 	{
-		if (AJKMNFGEHIJ > 0 && DMNCMKACPFI())
+		if (NewAmount > 0 && GetIsDiscountActive())
 		{
-			return AJKMNFGEHIJ;
+			return NewAmount;
 		}
-		return NICNMHCJIBJ;
+		return Amount;
 	}
 
-	public long MNLCFCEBLGA()
+	public long GetCurrentAddAmount()
 	{
-		if (IIHKEOHAKDJ > 0 && DMNCMKACPFI())
+		if (NewAddAmount > 0 && GetIsDiscountActive())
 		{
-			return IIHKEOHAKDJ;
+			return NewAddAmount;
 		}
-		return ABAINMKLBAM;
+		return AddAmount;
 	}
 
-	public string GFIMMDLCPMI()
+	public string GetCurrentPrice()
 	{
-		if (!string.IsNullOrEmpty(DDHOJFFGBKM) && DMNCMKACPFI())
+		if (!string.IsNullOrEmpty(NewPrice) && GetIsDiscountActive())
 		{
-			return DDHOJFFGBKM;
+			return NewPrice;
 		}
-		return LMNMPHGIFAF;
+		return Price;
 	}
 
-	public bool DMNCMKACPFI()
+	public bool GetIsDiscountActive()
 	{
 		return false;
 	}

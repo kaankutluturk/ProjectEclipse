@@ -18,10 +18,10 @@ namespace Nekki.SF2.Core.Tutorials {
 public class QuestParameters {}
 public class QuestAction {
     public int Completions, Cancellations;
-    public virtual void DEJMHFMLKIC(QuestParameters p) {}
-    public virtual void GKFMJKAAJCA() {}
-    public void OGIJONMKABB() { Completions++; }
-    public void PJGEOIKPGFH() { Cancellations++; }
+    public virtual void Execute(QuestParameters p) {}
+    public virtual void ResetSequences() {}
+    public void FinishAction() { Completions++; }
+    public void CompleteQuestStage() { Cancellations++; }
 }
 public class TutorialComponent { public bool IsActive; }
 public class ClickEvent {
@@ -41,18 +41,18 @@ public class LabelButton {
 public enum SliderType { SliderTricks }
 public enum SceneTypes { SceneFight, SceneProfile }
 public class InfoAnimation { public string Name; }
-public class Trick { public string Name; public InfoAnimation KJHMOGGECBN; }
+public class Trick { public string Name; public InfoAnimation Animation; }
 public static class GameUtils {
     public static List<Trick> Tricks;
     public static SceneTypes RequestedScene;
     public static bool InputLocked;
     public static int Unlocks;
-    public static List<Trick> KLLGJKHALGH(SceneTypes scene = SceneTypes.SceneFight) { RequestedScene = scene; return Tricks; }
-    public static void FMICOICLCNL(bool visible) { InputLocked = true; }
-    public static void KKNGFGMJKHG() { InputLocked = false; Unlocks++; }
+    public static List<Trick> GetPlayerTricks(SceneTypes scene = SceneTypes.SceneFight) { RequestedScene = scene; return Tricks; }
+    public static void LockInput(bool visible) { InputLocked = true; }
+    public static void UnlockInput() { InputLocked = false; Unlocks++; }
 }
 public static class SubItem { public static bool Enabled = true; public static void EnableAnimation(bool value) { Enabled = value; } }
-public static class Constants { public const int GFBLKELEBEH = 0; }
+public static class Constants { public const int DimmedBackgroundColor = 0; }
 public class FakeObject { public void SetActive(bool value) {} }
 public class FakePanel { public FakeObject gameObject = new FakeObject(); }
 public class FakeGroup { public bool blocksRaycasts = true; public float alpha = 1; }
@@ -63,7 +63,7 @@ public class Model {
 }
 public static class AnimationData {
     public static bool Available = true;
-    public static InfoAnimation BCIFKBJAFEC(string name) { return Available ? new InfoAnimation { Name = name } : null; }
+    public static InfoAnimation GetAnimationByName(string name) { return Available ? new InfoAnimation { Name = name } : null; }
 }
 public class ModelContainer {
     private Model _playerModel = new Model();
@@ -77,21 +77,21 @@ public class ProfileScene {
     public LabelButton Button = new LabelButton();
     public string Selected;
     public ModelContainer ModelContainer = new ModelContainer();
-    private InfoAnimation MKGONDJABAH;
-    private bool IBADMKPHOOJ, EIDKMLIOKOD, _trickPreviewActive;
-    private bool OHDPMGDBCCF = true;
+    private InfoAnimation pendingPreviewAnimation;
+    private bool isPreviewAnimationPlaying, isFading, _trickPreviewActive;
+    private bool isFadingIn = true;
     private string _previewAnimationName;
-    private float BKACEHDPGKC = 1;
+    private float uiAlpha = 1;
     private FakePanel _leftPanel = new FakePanel();
     private FakeBackground _backgroundLeft = new FakeBackground(), _backgroundRight = new FakeBackground();
     private FakeGroup _profileUIGroup = new FakeGroup(), _bottomUIGroup = new FakeGroup();
-    private List<object> JHFCFBIPGPF = new List<object>();
+    private List<object> sectionButtons = new List<object>();
     public bool Clickable { get { return _profileUIGroup.blocksRaycasts && _bottomUIGroup.blocksRaycasts; } }
     public void ScrollToItemByName(SliderType type, string name) { Selected = name; }
     public LabelButton GetBtnStrikeShow() { return Button; }
-    public void Show() { MKGONDJABAH = new InfoAnimation { Name = "HighBlockProfile" }; CGFOHBFAJBL(); Button.onClick.Invoke(); }
-    public void Tick(int count = 40) { for (int i = 0; i < count; i++) HPHAOJDPNND(); }
-    public void EndAnimation(string name) { LDFKBJAHGII(new Model.EventModel { Data = new InfoAnimation { Name = name } }); }
+    public void Show() { pendingPreviewAnimation = new InfoAnimation { Name = "HighBlockProfile" }; BeginTrickPreview(); Button.onClick.Invoke(); }
+    public void Tick(int count = 40) { for (int i = 0; i < count; i++) UpdateFade(); }
+    public void EndAnimation(string name) { OnModelEvent(new Model.EventModel { Data = new InfoAnimation { Name = name } }); }
     public void Close() { ReleaseTrickPreviewInput(); if (ProfileClosing != null) ProfileClosing(null); }
     /* PROFILE_METHODS */
 }
@@ -106,8 +106,8 @@ public static class TutorialRegression {
         AnimationData.Available = true;
         TutorialCanvas.Instance = new TutorialCanvas();
         GameUtils.Tricks = new List<Trick> {
-            new Trick { Name = "WrongFirstMove", KJHMOGGECBN = new InfoAnimation { Name = "WrongFirstMove" } },
-            new Trick { Name = "HighBlockProfile", KJHMOGGECBN = new InfoAnimation { Name = "HighBlockProfile" } }
+            new Trick { Name = "WrongFirstMove", Animation = new InfoAnimation { Name = "WrongFirstMove" } },
+            new Trick { Name = "HighBlockProfile", Animation = new InfoAnimation { Name = "HighBlockProfile" } }
         };
         var profile = new ProfileScene();
         Scene<ProfileScene>.Current = profile;
@@ -116,7 +116,7 @@ public static class TutorialRegression {
     public static string Run() {
         var profile = Setup();
         var action = new QuestActionStoryTutorialShowBlock();
-        action.DEJMHFMLKIC(new QuestParameters());
+        action.Execute(new QuestParameters());
         Assert(GameUtils.RequestedScene == SceneTypes.SceneProfile && profile.Selected == "HighBlockProfile", "Must select the block preview, not the first fight move");
         Assert(TutorialCanvas.Instance.Blocked && profile.Button.Flashing && profile.Button.Component.IsActive, "Show must be the active tutorial control");
         profile.Show();
@@ -134,7 +134,7 @@ public static class TutorialRegression {
         Assert(action.Completions == 1 && action.Cancellations == 0 && GameUtils.Unlocks == 1, "Duplicate end/close must not complete or unlock twice");
 
         foreach (int ticks in new[] { -1, 0, 40 }) {
-            profile = Setup(); action = new QuestActionStoryTutorialShowBlock(); action.DEJMHFMLKIC(new QuestParameters());
+            profile = Setup(); action = new QuestActionStoryTutorialShowBlock(); action.Execute(new QuestParameters());
             if (ticks >= 0) { profile.Show(); profile.Tick(ticks); }
             profile.Close();
             Assert(!TutorialCanvas.Instance.Blocked && !GameUtils.InputLocked, "Leaving Profile must release both locks, including during fade");
@@ -142,14 +142,14 @@ public static class TutorialRegression {
             Assert(profile.Button.onClick.Count == 0 && !profile.Button.Component.IsActive, "Leaving must remove tutorial controls");
             profile.Close(); Assert(action.Cancellations == 1, "Close cleanup must be idempotent");
         }
-        profile = Setup(); action = new QuestActionStoryTutorialShowBlock(); action.DEJMHFMLKIC(new QuestParameters());
+        profile = Setup(); action = new QuestActionStoryTutorialShowBlock(); action.Execute(new QuestParameters());
         AnimationData.Available = false; profile.Show(); profile.Tick(100);
         Assert(!GameUtils.InputLocked && !TutorialCanvas.Instance.Blocked && profile.Clickable && action.Completions == 1, "Missing animation must restore UI without Escape");
 
-        profile = Setup(); action = new QuestActionStoryTutorialShowBlock(); action.DEJMHFMLKIC(new QuestParameters());
-        action.GKFMJKAAJCA();
+        profile = Setup(); action = new QuestActionStoryTutorialShowBlock(); action.Execute(new QuestParameters());
+        action.ResetSequences();
         Assert(!TutorialCanvas.Instance.Blocked && profile.Button.onClick.Count == 0, "Reset must release lock and callbacks");
-        action.DEJMHFMLKIC(new QuestParameters());
+        action.Execute(new QuestParameters());
         Assert(profile.Button.onClick.Count == 1, "Restart must not accumulate callbacks");
         profile.Show(); profile.Tick(); profile.EndAnimation("HighBlockProfile"); profile.Tick();
         Assert(action.Completions == 1, "Reset action must be reusable");
@@ -160,7 +160,7 @@ public static class TutorialRegression {
             if (missing == "animation") GameUtils.Tricks.Clear();
             if (missing == "button") profile.Button = null;
             if (missing == "component") profile.Button.Component = null;
-            action = new QuestActionStoryTutorialShowBlock(); action.DEJMHFMLKIC(new QuestParameters());
+            action = new QuestActionStoryTutorialShowBlock(); action.Execute(new QuestParameters());
             Assert(!TutorialCanvas.Instance.Blocked && action.Completions == 1, "Missing " + missing + " must not leave an input lock");
         }
         return "PASS: " + checks + " tutorial/preview regression assertions (headless UI fakes; native playtest still required).";

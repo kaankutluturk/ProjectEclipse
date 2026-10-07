@@ -3,7 +3,7 @@ using System.Linq;
 
 public class FigureTopology
 {
-	public static List<int> NGPPLGNODNB(int LGKJBIEDKBO)
+	public static List<int> CreateFanIndices(int LGKJBIEDKBO)
 	{
 		int[] array = new int[LGKJBIEDKBO * 3];
 		for (int i = 0; i < LGKJBIEDKBO; i++)
@@ -15,7 +15,7 @@ public class FigureTopology
 		return array.ToList();
 	}
 
-	public static List<int> OAPJCHAALCJ(int LGKJBIEDKBO)
+	public static List<int> CreateQuadIndices(int LGKJBIEDKBO)
 	{
 		int[] array = new int[LGKJBIEDKBO * 6];
 		for (int i = 0; i < LGKJBIEDKBO * 6; i += 6)
@@ -30,7 +30,7 @@ public class FigureTopology
 		return array.ToList();
 	}
 
-	public static List<int> AMJOJPPFIEB(int LGKJBIEDKBO)
+	public static List<int> CreateStripIndices(int LGKJBIEDKBO)
 	{
 		int[] array = new int[LGKJBIEDKBO * 3];
 		for (int i = 0; i < LGKJBIEDKBO; i++)

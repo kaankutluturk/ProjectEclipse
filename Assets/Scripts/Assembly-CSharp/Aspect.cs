@@ -5,7 +5,7 @@ public class Aspect
 {
 	private string _name = string.Empty;
 
-	private string DHLNMJCGJMO = string.Empty;
+	private string _attribute = string.Empty;
 
 	private float _base;
 
@@ -13,7 +13,7 @@ public class Aspect
 	{
 		get
 		{
-			return EJPCHOLGGJJ();
+			return GetAttribute();
 		}
 	}
 
@@ -22,15 +22,15 @@ public class Aspect
 		return _name;
 	}
 
-	public string EJPCHOLGGJJ()
+	public string GetAttribute()
 	{
-		return DHLNMJCGJMO;
+		return _attribute;
 	}
 
 	public void Parse(XmlNode node)
 	{
-		_name = node.Attributes["Name"].CIPOICEEIBK(string.Empty);
-		DHLNMJCGJMO = node.Attributes["Attribute"].CIPOICEEIBK(string.Empty);
+		_name = node.Attributes["Name"].GetStringOrDefault(string.Empty);
+		_attribute = node.Attributes["Attribute"].GetStringOrDefault(string.Empty);
 		_base = node.Attributes["Base"].ParseFloat();
 	}
 

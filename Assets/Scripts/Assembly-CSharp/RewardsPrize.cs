@@ -5,32 +5,32 @@ public class RewardsPrize
 {
 	private string NameAttr = "Value";
 
-	public float NJAIKCKFMNN;
+	public float PerfectFactor;
 
-	public float LOONMILKCFK;
+	public float FirstStrikeFactor;
 
-	public float GKAEJDCDMHC;
+	public float ComboCountFactor;
 
-	public float MLNBGDHDKLL;
+	public float HeadShotFactor;
 
-	public float PMPDAOIGCLP;
+	public float DefaultPrizeBaseFactor;
 
-	public float APCAKCCOMLO;
+	public float ShockFactor;
 
 	public List<float> Styles = new List<float>();
 
 	public void Parse(XmlNode node)
 	{
-		PMPDAOIGCLP = node["DefaultPrizeBaseFactor"].Attributes[NameAttr].ParseFloat();
-		NJAIKCKFMNN = node["Perfect"].Attributes[NameAttr].ParseFloat();
-		LOONMILKCFK = node["FirstStrike"].Attributes[NameAttr].ParseFloat();
-		GKAEJDCDMHC = node["ComboCount"].Attributes[NameAttr].ParseFloat();
-		MLNBGDHDKLL = node["HeadShot"].Attributes[NameAttr].ParseFloat();
-		APCAKCCOMLO = node["Shock"].Attributes[NameAttr].ParseFloat();
-		GKGMGLOHEGO(node);
+		DefaultPrizeBaseFactor = node["DefaultPrizeBaseFactor"].Attributes[NameAttr].ParseFloat();
+		PerfectFactor = node["Perfect"].Attributes[NameAttr].ParseFloat();
+		FirstStrikeFactor = node["FirstStrike"].Attributes[NameAttr].ParseFloat();
+		ComboCountFactor = node["ComboCount"].Attributes[NameAttr].ParseFloat();
+		HeadShotFactor = node["HeadShot"].Attributes[NameAttr].ParseFloat();
+		ShockFactor = node["Shock"].Attributes[NameAttr].ParseFloat();
+		ParseStyles(node);
 	}
 
-	private void GKGMGLOHEGO(XmlNode node)
+	private void ParseStyles(XmlNode node)
 	{
 		Styles.Clear();
 		XmlNode xmlNode = node["Styles"];

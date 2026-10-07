@@ -2,16 +2,16 @@ using System.Xml;
 
 public class DamageFactorRule : AnimationListRule
 {
-	public const float KJBDNLFDCJA = 1f;
+	public const float DefaultFactor = 1f;
 
-	public const float HLPMOPAJKKD = 1f;
+	public const float DefaultRepeatFactor = 1f;
 
-	private float IOGMPFJOCPE;
+	private float factor;
 
-	private float BEMFHMKCJOK;
+	private float repeatFactor;
 
 	public DamageFactorRule(XmlNode node, RuleAppliance EJPOJJKKICO)
-		: base(BCBLLMPAMLP.RuleDamageFactor, EJPOJJKKICO, node)
+		: base(RuleType.RuleDamageFactor, EJPOJJKKICO, node)
 	{
 		Parse(node);
 	}
@@ -19,27 +19,27 @@ public class DamageFactorRule : AnimationListRule
 	protected override bool CompareSingle(object data)
 	{
 		FightData hCPJJKMNMCE = (FightData)data;
-		return CheckAnimation(hCPJJKMNMCE.LKLHCEEMINM);
+		return CheckAnimation(hCPJJKMNMCE.CurrentAnimation);
 	}
 
 	public override void InitRule(object data)
 	{
-		foreach (InfoAnimation item in KABLHHCPDPD)
+		foreach (InfoAnimation item in animations)
 		{
 			foreach (IntervalAnimation item2 in item.MoveData.Intervals)
 			{
-				if (item2.Type == IntervalAnimation.NGAJJDIEDGF.INTERVAL_ATTACK)
+				if (item2.Type == IntervalAnimation.IntervalType.INTERVAL_ATTACK)
 				{
 					IntervalAttack hFIIPNLCIEE = (IntervalAttack)item2;
-					IntervalAttack.Factors bPLPKPIBEIF = hFIIPNLCIEE.GetFactors(NDBMMPENJNJ);
-					if (bPLPKPIBEIF.FNDCJJNDNJC || bPLPKPIBEIF.DJGAHEOIHGG)
+					IntervalAttack.Factors bPLPKPIBEIF = hFIIPNLCIEE.GetFactors(appliance);
+					if (bPLPKPIBEIF.IsFactorSet || bPLPKPIBEIF.IsMultiplierSet)
 					{
 						break;
 					}
-					bPLPKPIBEIF.FNDCJJNDNJC = true;
-					bPLPKPIBEIF.Factor = IOGMPFJOCPE;
-					bPLPKPIBEIF.DJGAHEOIHGG = true;
-					bPLPKPIBEIF.HJIIIBHAOMJ = BEMFHMKCJOK;
+					bPLPKPIBEIF.IsFactorSet = true;
+					bPLPKPIBEIF.Factor = factor;
+					bPLPKPIBEIF.IsMultiplierSet = true;
+					bPLPKPIBEIF.FactorMultiplier = repeatFactor;
 				}
 			}
 		}
@@ -52,20 +52,20 @@ public class DamageFactorRule : AnimationListRule
 
 	public override void Clear()
 	{
-		foreach (InfoAnimation item in KABLHHCPDPD)
+		foreach (InfoAnimation item in animations)
 		{
 			foreach (IntervalAnimation item2 in item.MoveData.Intervals)
 			{
-				if (item2.Type == IntervalAnimation.NGAJJDIEDGF.INTERVAL_ATTACK)
+				if (item2.Type == IntervalAnimation.IntervalType.INTERVAL_ATTACK)
 				{
 					IntervalAttack hFIIPNLCIEE = (IntervalAttack)item2;
-					IntervalAttack.Factors bPLPKPIBEIF = hFIIPNLCIEE.GetFactors(NDBMMPENJNJ);
-					if (bPLPKPIBEIF.FNDCJJNDNJC || bPLPKPIBEIF.DJGAHEOIHGG)
+					IntervalAttack.Factors bPLPKPIBEIF = hFIIPNLCIEE.GetFactors(appliance);
+					if (bPLPKPIBEIF.IsFactorSet || bPLPKPIBEIF.IsMultiplierSet)
 					{
-						bPLPKPIBEIF.FNDCJJNDNJC = false;
+						bPLPKPIBEIF.IsFactorSet = false;
 						bPLPKPIBEIF.Factor = 1f;
-						bPLPKPIBEIF.DJGAHEOIHGG = false;
-						bPLPKPIBEIF.HJIIIBHAOMJ = 1f;
+						bPLPKPIBEIF.IsMultiplierSet = false;
+						bPLPKPIBEIF.FactorMultiplier = 1f;
 					}
 				}
 			}
@@ -75,9 +75,9 @@ public class DamageFactorRule : AnimationListRule
 	protected override void Parse(XmlNode node)
 	{
 		base.Parse(node);
-		string gOHIIMFFFJI = node.Attributes["Animation"].CIPOICEEIBK(string.Empty);
-		AnimationData.NEBELEFIDMB(gOHIIMFFFJI, KABLHHCPDPD);
-		IOGMPFJOCPE = node.Attributes["Factor"].ParseFloat(1f);
-		BEMFHMKCJOK = node.Attributes["RepeatFactor"].ParseFloat(1f);
+		string gOHIIMFFFJI = node.Attributes["Animation"].GetStringOrDefault(string.Empty);
+		AnimationData.AddTemplateAnimations(gOHIIMFFFJI, animations);
+		factor = node.Attributes["Factor"].ParseFloat(1f);
+		repeatFactor = node.Attributes["RepeatFactor"].ParseFloat(1f);
 	}
 }

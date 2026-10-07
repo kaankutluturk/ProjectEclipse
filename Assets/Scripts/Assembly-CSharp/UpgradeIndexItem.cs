@@ -1,6 +1,6 @@
 public class UpgradeIndexItem
 {
-	public enum LIPHFAOKLCA
+	public enum UpgradeIndexType
 	{
 		UPGRADE_INDEX_NONE = 0,
 		UPGRADE_INDEX_MILESTONE = 1,
@@ -9,5 +9,5 @@ public class UpgradeIndexItem
 
 	public int Index;
 
-	public LIPHFAOKLCA Type = LIPHFAOKLCA.UPGRADE_INDEX_NORMAL;
+	public UpgradeIndexType Type = UpgradeIndexType.UPGRADE_INDEX_NORMAL;
 }

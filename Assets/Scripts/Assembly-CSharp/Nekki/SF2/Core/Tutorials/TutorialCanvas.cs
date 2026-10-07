@@ -12,7 +12,7 @@ namespace Nekki.SF2.Core.Tutorials
 
 		private bool _BlockOn;
 
-		public static TutorialCanvas BPCBBHAKFDM
+		public static TutorialCanvas SharedInstance
 		{
 			get
 			{
@@ -20,7 +20,7 @@ namespace Nekki.SF2.Core.Tutorials
 			}
 		}
 
-		public bool IOGKDIPPLMB
+		public bool BlockEnabled
 		{
 			get
 			{
@@ -54,11 +54,11 @@ namespace Nekki.SF2.Core.Tutorials
 			_BlockOn = value;
 			if (_BlockOn)
 			{
-				JKCGIMBHDPE();
+				ShowBackground();
 			}
 			else
 			{
-				DBFJLLNBOKE();
+				HideBackground();
 			}
 		}
 
@@ -72,12 +72,12 @@ namespace Nekki.SF2.Core.Tutorials
 			_instance = null;
 		}
 
-		private void JKCGIMBHDPE()
+		private void ShowBackground()
 		{
 			_Background.gameObject.SetActive(true);
 		}
 
-		private void DBFJLLNBOKE()
+		private void HideBackground()
 		{
 			_Background.gameObject.SetActive(false);
 		}

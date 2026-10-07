@@ -9,67 +9,67 @@ namespace Nekki.SF2.GUI.Dialogs
 {
 	public class SettingsAdvancedDialog : SettingsDialog
 	{
-		private const int KNNGJJLIFHK = -620;
+		private const int GraphicsButtonX = -620;
 
-		private const int FCNBBIKDIFH = -620;
+		private const int ControllerButtonX = -620;
 
-		private const int LMNCFKPNJPN = -620;
+		private const int LocationButtonX = -620;
 
-		private const int FPPFMHHIDJN = -620;
+		private const int SoundButtonX = -620;
 
-		private const int NOKIFJDNJGA = -620;
+		private const int MusicButtonX = -620;
 
-		private const int JIALLKOOGMF = 0;
+		private const int LegacyButtonYCenter = 0;
 
-		private const int EBHMMNCHFDP = 300;
+		private const int GraphicsButtonY = 300;
 
-		private const int DFDOFGAGIPE = 100;
+		private const int ControllerButtonY = 100;
 
-		private const int HKLGPCMPAGK = 100;
+		private const int LegacyButtonYUpper = 100;
 
-		private const int LKGBADCONLK = -100;
+		private const int LegacyButtonYMiddle = -100;
 
-		private const int EOFMGPCDJMI = -300;
+		private const int LegacyButtonYLower = -300;
 
-		private const int KHCBFOBKIDF = 650;
+		private const int TopStripeY = 650;
 
-		private const int KENGHLNFHBD = -680;
+		private const int BottomStripeY = -680;
 
-		private const int AFGCLAPADNK = 1077;
+		private const int TopStripeWidth = 1077;
 
-		private const int MMOPDOACJDJ = 1000;
+		private const int BottomStripeWidth = 1000;
 
-		private const int JOCDMOJCLKD = -100;
+		private const int UserIdLabelOffsetY = -100;
 
-		private const string AGHOMBNCFNG = "SettingsButtons.sound";
+		private const string SoundSpriteName = "SettingsButtons.sound";
 
-		private const string GFFCBAEJKGG = "SettingsButtons.sound_off";
+		private const string SoundOffSpriteName = "SettingsButtons.sound_off";
 
-		private const string IBLAMIJBCMI = "SettingsButtons.sound_selected";
+		private const string SoundSelectedSpriteName = "SettingsButtons.sound_selected";
 
-		private const string HOIOIFJDFJL = "SettingsButtons.sound_off_selected";
+		private const string SoundOffSelectedSpriteName = "SettingsButtons.sound_off_selected";
 
-		private const string DELBIFJECOK = "SettingsButtons.music";
+		private const string MusicSpriteName = "SettingsButtons.music";
 
-		private const string NMGMEJPLCFC = "SettingsButtons.music_off";
+		private const string MusicOffSpriteName = "SettingsButtons.music_off";
 
-		private const string KGKMLNJPDOO = "SettingsButtons.music_selected";
+		private const string MusicSelectedSpriteName = "SettingsButtons.music_selected";
 
-		private const string EOOAPLHPCEE = "SettingsButtons.music_off_selected";
+		private const string MusicOffSelectedSpriteName = "SettingsButtons.music_off_selected";
 
-		private const string BFELEFMPJEC = "SettingsButtons.graphics";
+		private const string GraphicsSpriteName = "SettingsButtons.graphics";
 
-		private const string AGKCMELNNGG = "SettingsButtons.graphics_selected";
+		private const string GraphicsSelectedSpriteName = "SettingsButtons.graphics_selected";
 
-		private const string CLNPNHKMPJA = "SettingsButtons.location";
+		private const string LocationSpriteName = "SettingsButtons.location";
 
-		private const string CHALFKPGEDG = "SettingsButtons.location_selected";
+		private const string LocationSelectedSpriteName = "SettingsButtons.location_selected";
 
-		private const string ECMLLFANLKJ = "SettingsButtons.controller";
+		private const string ControllerSpriteName = "SettingsButtons.controller";
 
-		private const string CHMDLBIBIMD = "SettingsButtons.controller_selected";
+		private const string ControllerSelectedSpriteName = "SettingsButtons.controller_selected";
 
-		protected string BNEHHACJNGB;
+		protected string initialQualityName;
 
 		[SerializeField]
 		private ResolutionButton btnGraphics;
@@ -105,40 +105,40 @@ namespace Nekki.SF2.GUI.Dialogs
 
 		public override void Init(object data)
 		{
-			BNEHHACJNGB = GraphicsController.PMAODLMLDLK();
+			initialQualityName = GraphicsController.GetEffectiveQualityCondition();
 			IsPausing = false;
-			Init("Settings_Advanced_Title", "Settings_Advanced", "Settings_Back", KBDHPMOMJLL.FOOTER_CANCEL);
+			Init("Settings_Advanced_Title", "Settings_Advanced", "Settings_Back", FooterType.FOOTER_CANCEL);
 		}
 
-		protected override void HLJBLAPMDCB()
+		protected override void SetupContent()
 		{
-			BBDGOPHHDBJ();
-			EBNPPFKKPLD();
+			SetupDefaultPlatformButtons();
+			SetupDefaultLabels();
 			GetDesktopRenderSettings().Setup();
-			AABKDFHHFOF();
-			GPLBHPLJNAE();
-			LMAAIDIDNEF();
-			ALBPEOFFDKK();
+			SetupVolumeSliders();
+			SetupUserIdLabel();
+			PositionContent();
+			ExpandButtonTouchZones();
 		}
 
-		protected override void FLOHKIBCOKG()
+		protected override void LayoutStripes()
 		{
-			base.FLOHKIBCOKG();
-			LOFKNKHJEDJ();
+			base.LayoutStripes();
+			PositionStripesDefault();
 		}
 
 		protected override void OnClickButton(object data)
 		{
-			AHDEAELNGBD buttonId = (AHDEAELNGBD)data;
+			SettingsButtonId buttonId = (SettingsButtonId)data;
 			if (GetDesktopRenderSettings().HandleClick(buttonId))
 			{
 				return;
 			}
 			switch (buttonId)
 			{
-			case AHDEAELNGBD.BTN_SOUND_ADV:
-				SoundController.FLOFHMBDHNM(!SoundController.AAFLCDKJEPL());
-				if (SoundController.AAFLCDKJEPL())
+			case SettingsButtonId.BTN_SOUND_ADV:
+				SoundController.SetSoundMuted(!SoundController.GetSoundMuted());
+				if (SoundController.GetSoundMuted())
 				{
 					soundTrackBar.value = 0f;
 				}
@@ -146,11 +146,11 @@ namespace Nekki.SF2.GUI.Dialogs
 				{
 					soundTrackBar.value = SoundController.GetSoundVolume();
 				}
-				AOFFEDGGNMN();
+				RefreshSoundButton();
 				break;
-			case AHDEAELNGBD.BTN_MUSIC_ADV:
-				SoundController.FMLHEDIPGAF(!SoundController.ELHMADOKHHE());
-				if (SoundController.ELHMADOKHHE())
+			case SettingsButtonId.BTN_MUSIC_ADV:
+				SoundController.SetMusicMuted(!SoundController.GetMusicMuted());
+				if (SoundController.GetMusicMuted())
 				{
 					musicTrackBar.value = 0f;
 				}
@@ -158,31 +158,31 @@ namespace Nekki.SF2.GUI.Dialogs
 				{
 					musicTrackBar.value = SoundController.GetMusicVolume();
 				}
-				IHPJIBKOPDL();
+				RefreshMusicButton();
 				break;
-			case AHDEAELNGBD.BTN_CONTROLLER:
+			case SettingsButtonId.BTN_CONTROLLER:
 				GraphicsController.ToggleControlSize();
-				AABJCHNIDJP();
-				DEMCCCLKNEM();
+				RefreshControllerLabel();
+				RefreshDojoControllerLayout();
 				break;
-			case AHDEAELNGBD.BTN_GRAPHICS:
-				if (GraphicsController.AFLFDJKLIEE())
+			case SettingsButtonId.BTN_GRAPHICS:
+				if (GraphicsController.CycleQualityCondition())
 				{
-					NPMFPLFMFMI();
+					RefreshGraphicsLabel();
 				}
 				break;
-			case AHDEAELNGBD.BTN_LOCATION_RESOLUTION:
-				GraphicsController.FELIOKHNIKI();
-				GDPCOKJGAJO();
+			case SettingsButtonId.BTN_LOCATION_RESOLUTION:
+				GraphicsController.ToggleLocationResolution();
+				RefreshLocationLabel();
 				break;
 			}
 		}
 
 		public override void OnClose(object data)
 		{
-			if (BNEHHACJNGB != GraphicsController.PMAODLMLDLK())
+			if (initialQualityName != GraphicsController.GetEffectiveQualityCondition())
 			{
-				DFLOLCIKPEM();
+				ShowRestartDialog();
 			}
 			else
 			{
@@ -190,125 +190,125 @@ namespace Nekki.SF2.GUI.Dialogs
 			}
 		}
 
-		private void BGPPLMPDNKF()
+		private void CloseWithCascade()
 		{
 			CallEvent(2, null);
-			base.OnClose((object)IPJEOLNMLEH.OnPopupCloseCascade);
+			base.OnClose((object)DialogCloseEvent.OnPopupCloseCascade);
 		}
 
 		private void Update()
 		{
 		}
 
-		protected override void BBDGOPHHDBJ()
+		protected override void SetupDefaultPlatformButtons()
 		{
-			OHDFPIADEIG(btnGraphics, "SettingsButtons.graphics", "SettingsButtons.graphics_selected", -620f, 300f, AHDEAELNGBD.BTN_GRAPHICS);
-			OHDFPIADEIG(btnController, "SettingsButtons.controller", "SettingsButtons.controller_selected", -620f, 100f, AHDEAELNGBD.BTN_CONTROLLER);
-			IHPJIBKOPDL();
-			AOFFEDGGNMN();
+			SetupButton(btnGraphics, "SettingsButtons.graphics", "SettingsButtons.graphics_selected", -620f, 300f, SettingsButtonId.BTN_GRAPHICS);
+			SetupButton(btnController, "SettingsButtons.controller", "SettingsButtons.controller_selected", -620f, 100f, SettingsButtonId.BTN_CONTROLLER);
+			RefreshMusicButton();
+			RefreshSoundButton();
 		}
 
-		protected override void EBNPPFKKPLD()
+		protected override void SetupDefaultLabels()
 		{
-			NPMFPLFMFMI();
-			GDPCOKJGAJO();
-			AABJCHNIDJP();
-			PGMBIJFAEHP(lblMusicAdv, "Settings_Music");
-			PGMBIJFAEHP(lblSoundAdv, "Settings_Sound");
+			RefreshGraphicsLabel();
+			RefreshLocationLabel();
+			RefreshControllerLabel();
+			SetupLabel(lblMusicAdv, "Settings_Music");
+			SetupLabel(lblSoundAdv, "Settings_Sound");
 		}
 
-		protected void AABKDFHHFOF()
+		protected void SetupVolumeSliders()
 		{
-			PGOGAGFHNFK(soundTrackBar, SoundController.GetSoundVolume(), new Vector2(50f, btnSoundAdv.transform.localPosition.y), OEBEMLDGNDB);
-			PGOGAGFHNFK(musicTrackBar, SoundController.GetMusicVolume(), new Vector2(50f, btnMusicAdv.transform.localPosition.y), IMJLOABEMOL);
+			SetupSlider(soundTrackBar, SoundController.GetSoundVolume(), new Vector2(50f, btnSoundAdv.transform.localPosition.y), OnSoundVolumeChanged);
+			SetupSlider(musicTrackBar, SoundController.GetMusicVolume(), new Vector2(50f, btnMusicAdv.transform.localPosition.y), OnMusicVolumeChanged);
 		}
 
-		protected override void LOFKNKHJEDJ()
+		protected override void PositionStripesDefault()
 		{
 			float num = 650f;
 			float num2 = ((!lblUserId.gameObject.activeSelf) ? 0f : 37f);
-			_topStripe.transform.BGNJGIACJBG(num + num2);
+			_topStripe.transform.SetLocalY(num + num2);
 			_topStripe.rectTransform.sizeDelta = new Vector2(1077f, _topStripe.rectTransform.rect.height);
 			num = -680f;
-			_bottomStripe.transform.BGNJGIACJBG(num - num2);
+			_bottomStripe.transform.SetLocalY(num - num2);
 			_bottomStripe.rectTransform.sizeDelta = new Vector2(1000f, _bottomStripe.rectTransform.rect.height);
 		}
 
-		protected override void GPLBHPLJNAE()
+		protected override void SetupUserIdLabel()
 		{
-			base.GPLBHPLJNAE();
+			base.SetupUserIdLabel();
 			float y = lblUserId.transform.localPosition.y;
 			y += -100f;
-			lblUserId.transform.BGNJGIACJBG(y);
+			lblUserId.transform.SetLocalY(y);
 			lblUserId.gameObject.SetActive(false);
 		}
 
-		protected override void LMAAIDIDNEF()
+		protected override void PositionContent()
 		{
 			float num = 0f;
 			num += ((!lblUserId.gameObject.activeSelf) ? 0f : 37f);
-			_content.transform.BGNJGIACJBG(num);
+			_content.transform.SetLocalY(num);
 		}
 
-		protected void OEBEMLDGNDB(float JIJAJFEJJHK)
+		protected void OnSoundVolumeChanged(float JIJAJFEJJHK)
 		{
-			bool flag = SoundController.AAFLCDKJEPL();
+			bool flag = SoundController.GetSoundMuted();
 			SoundController.SetSoundVolume(JIJAJFEJJHK);
-			if (flag != SoundController.AAFLCDKJEPL())
+			if (flag != SoundController.GetSoundMuted())
 			{
-				AOFFEDGGNMN();
+				RefreshSoundButton();
 			}
 		}
 
-		protected void IMJLOABEMOL(float JIJAJFEJJHK)
+		protected void OnMusicVolumeChanged(float JIJAJFEJJHK)
 		{
-			bool flag = SoundController.ELHMADOKHHE();
+			bool flag = SoundController.GetMusicMuted();
 			SoundController.SetMusicVolume(JIJAJFEJJHK);
-			if (flag != SoundController.ELHMADOKHHE())
+			if (flag != SoundController.GetMusicMuted())
 			{
-				IHPJIBKOPDL();
+				RefreshMusicButton();
 			}
 		}
 
-		protected void BOEJIOIJLJO(object data)
+		protected void OnRestartDialogClosed(object data)
 		{
-			if (data != null && ((IPJEOLNMLEH)Enum.Parse(typeof(IPJEOLNMLEH), Convert.ToString(data))/*cast due to constrained. prefix*/).Equals(IPJEOLNMLEH.OnPopupCloseOK))
+			if (data != null && ((DialogCloseEvent)Enum.Parse(typeof(DialogCloseEvent), Convert.ToString(data))/*cast due to constrained. prefix*/).Equals(DialogCloseEvent.OnPopupCloseOK))
 			{
-				BGPPLMPDNKF();
-				GameUtils.BKFMHANNIEF();
+				CloseWithCascade();
+				GameUtils.ResetScenes();
 			}
 		}
 
-			protected void AOFFEDGGNMN()
+			protected void RefreshSoundButton()
 			{
-				bool flag = SoundController.AAFLCDKJEPL();
-				OHDFPIADEIG(btnSoundAdv, (!flag) ? "SettingsButtons.sound" : "SettingsButtons.sound_off", (!flag) ? "SettingsButtons.sound_selected" : "SettingsButtons.sound_off_selected", -620f, -375f, AHDEAELNGBD.BTN_SOUND_ADV);
+				bool flag = SoundController.GetSoundMuted();
+				SetupButton(btnSoundAdv, (!flag) ? "SettingsButtons.sound" : "SettingsButtons.sound_off", (!flag) ? "SettingsButtons.sound_selected" : "SettingsButtons.sound_off_selected", -620f, -375f, SettingsButtonId.BTN_SOUND_ADV);
 			}
 
-			protected void IHPJIBKOPDL()
+			protected void RefreshMusicButton()
 			{
-				bool flag = SoundController.ELHMADOKHHE();
-				OHDFPIADEIG(btnMusicAdv, (!flag) ? "SettingsButtons.music" : "SettingsButtons.music_off", (!flag) ? "SettingsButtons.music_selected" : "SettingsButtons.music_off_selected", -620f, -235f, AHDEAELNGBD.BTN_MUSIC_ADV);
+				bool flag = SoundController.GetMusicMuted();
+				SetupButton(btnMusicAdv, (!flag) ? "SettingsButtons.music" : "SettingsButtons.music_off", (!flag) ? "SettingsButtons.music_selected" : "SettingsButtons.music_off_selected", -620f, -235f, SettingsButtonId.BTN_MUSIC_ADV);
 			}
 
-		protected void AABJCHNIDJP()
+		protected void RefreshControllerLabel()
 		{
-			PGMBIJFAEHP(lblController, string.Empty);
-			string text = LocalizationManager.GetString("Settings_Controller_Scale") + LocalizationManager.GetString(HHBPNDNGFAM());
+			SetupLabel(lblController, string.Empty);
+			string text = LocalizationManager.GetString("Settings_Controller_Scale") + LocalizationManager.GetString(GetControllerSizeAlias());
 			lblController.set_text(text);
 		}
 
-		protected void NPMFPLFMFMI()
+		protected void RefreshGraphicsLabel()
 		{
-			PGMBIJFAEHP(lblGraphics, string.Empty);
-			lblGraphics.set_text(LocalizationManager.GetString("Settings_Graphics_Quality") + LocalizationManager.GetString(BPBKNHEDMKI()));
+			SetupLabel(lblGraphics, string.Empty);
+			lblGraphics.set_text(LocalizationManager.GetString("Settings_Graphics_Quality") + LocalizationManager.GetString(GetGraphicsQualityAlias()));
 		}
 
-		protected void GDPCOKJGAJO()
+		protected void RefreshLocationLabel()
 		{
 		}
 
-		protected void ALBPEOFFDKK()
+		protected void ExpandButtonTouchZones()
 		{
 			float jMLAKAKDBBL = 1500f;
 			ChangeButtonTouchZone(btnGraphics, jMLAKAKDBBL);
@@ -324,62 +324,62 @@ namespace Nekki.SF2.GUI.Dialogs
 				_desktopRenderSettings = new DesktopRenderSettingsControls(
 					(_content == null) ? null : _content.transform,
 					btnGraphics, lblGraphics, btnController, btnMusicAdv, btnSoundAdv,
-					OHDFPIADEIG, IHPJIBKOPDL, AOFFEDGGNMN);
+					SetupButton, RefreshMusicButton, RefreshSoundButton);
 			}
 			return _desktopRenderSettings;
 		}
 
-		protected void DFLOLCIKPEM()
+		protected void ShowRestartDialog()
 		{
-			DialogsOpener.PEDJMOMBJJI("dlgAlertTitle", "dlgSettingsRestart", "dlgServiceRestart", "dlgServiceBtnLater", BOEJIOIJLJO, LabelButton.FBMGEHJPPIK.BUTTON_WHITE, LabelButton.FBMGEHJPPIK.BUTTON_DARK, false, false, string.Empty);
+			DialogsOpener.OpenSimpleDialog("dlgAlertTitle", "dlgSettingsRestart", "dlgServiceRestart", "dlgServiceBtnLater", OnRestartDialogClosed, LabelButton.ButtonColor.BUTTON_WHITE, LabelButton.ButtonColor.BUTTON_DARK, false, false, string.Empty);
 		}
 
-		protected string HHBPNDNGFAM()
+		protected string GetControllerSizeAlias()
 		{
 			return (!GraphicsController.LargeControlsEnabled()) ? "Settings_Controller_Small" : "Settings_Controller_Large";
 		}
 
-		protected string BPBKNHEDMKI()
+		protected string GetGraphicsQualityAlias()
 		{
-			string gOHIIMFFFJI = GraphicsController.PMAODLMLDLK();
-			QualityOption.HPNJCDGIHLI hPNJCDGIHLI = QualityOption.ONPFEBDGLFO(gOHIIMFFFJI);
+			string gOHIIMFFFJI = GraphicsController.GetEffectiveQualityCondition();
+			QualityOption.QualityLevel hPNJCDGIHLI = QualityOption.ParseQualityLevel(gOHIIMFFFJI);
 			string empty = string.Empty;
 			switch (hPNJCDGIHLI)
 			{
-			case QualityOption.HPNJCDGIHLI.QUALITY_LOW:
+			case QualityOption.QualityLevel.QUALITY_LOW:
 				return "Settings_Graphics_Low";
-			case QualityOption.HPNJCDGIHLI.QUALITY_MEDIUM:
+			case QualityOption.QualityLevel.QUALITY_MEDIUM:
 				return "Settings_Graphics_Medium";
-			case QualityOption.HPNJCDGIHLI.QUALITY_HIGH:
+			case QualityOption.QualityLevel.QUALITY_HIGH:
 				return "Settings_Graphics_High";
 			default:
 				return string.Empty;
 			}
 		}
 
-		protected string MOIIMMLICLB()
+		protected string GetResolutionPathAlias()
 		{
 			string empty = string.Empty;
-			switch (GraphicsController.GHLDNALLEKN())
+			switch (GraphicsController.GetLocationResolution())
 			{
-			case SystemProperties.LOHALAKNGFB.PATH_SMALL:
+			case SystemProperties.PathType.PATH_SMALL:
 				return "Settings_Graphics_Low";
-			case SystemProperties.LOHALAKNGFB.PATH_BIG:
+			case SystemProperties.PathType.PATH_BIG:
 				return "Settings_Graphics_High";
 			default:
 				return string.Empty;
 			}
 		}
 
-		protected void PGOGAGFHNFK(Slider KFKCPEALPDL, float value, Vector2 MGMMDGFPBLP, UnityAction<float> ODDEOFKLIAG)
+		protected void SetupSlider(Slider KFKCPEALPDL, float value, Vector2 MGMMDGFPBLP, UnityAction<float> ODDEOFKLIAG)
 		{
 			KFKCPEALPDL.gameObject.SetActive(true);
 			KFKCPEALPDL.onValueChanged.AddListener(ODDEOFKLIAG);
 			KFKCPEALPDL.minValue = 0f;
 			KFKCPEALPDL.maxValue = 1f;
 			KFKCPEALPDL.value = value;
-			KFKCPEALPDL.transform.OKHPLHPBPKJ(MGMMDGFPBLP.x);
-			KFKCPEALPDL.transform.BGNJGIACJBG(MGMMDGFPBLP.y);
+			KFKCPEALPDL.transform.SetLocalX(MGMMDGFPBLP.x);
+			KFKCPEALPDL.transform.SetLocalY(MGMMDGFPBLP.y);
 		}
 
 		protected void ChangeButtonTouchZone(Button GAMILDJHFDB, LabelAlias NCJDCOLEFHG)
@@ -390,7 +390,7 @@ namespace Nekki.SF2.GUI.Dialogs
 		{
 		}
 
-		protected void DEMCCCLKNEM()
+		protected void RefreshDojoControllerLayout()
 		{
 			DojoScene current = Scene<DojoScene>.get_Current();
 			if (current != null)

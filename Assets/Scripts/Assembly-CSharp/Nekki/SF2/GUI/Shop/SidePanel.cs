@@ -26,29 +26,29 @@ namespace Nekki.SF2.GUI.Shop
 		[SerializeField]
 		private CanvasGroup _canvasGroup;
 
-		private SidePanelContent GCGGIJDKKKO;
+		private SidePanelContent _content;
 
-		private const float JMNKFPNCFFG = 1f;
+		private const float DefaultAnimationDuration = 1f;
 
-		private bool EABBPDKDKJE = true;
+		private bool _isOpen = true;
 
-		private bool EOPFNNGEJOL = true;
+		private bool _shouldOpenOnRelease = true;
 
-		private bool MMEDJKEFDJC = true;
+		private bool _isMovable = true;
 
-		private string NKPHGKJGJFK;
+		private string _openImage;
 
-		private string IBFJLPCDHBH;
+		private string _closeImage;
 
-		private Vector2 EGKGKFBGFNN;
+		private Vector2 _normalizedPosition;
 
-		private Vector3 NCEDIDPKGPF = new Vector3(0f, 0f);
+		private Vector3 _closeButtonOffset = new Vector3(0f, 0f);
 
-		private Vector3 DCCOOOKAGIF = new Vector3(0f, 0f);
+		private Vector3 _openButtonOffset = new Vector3(0f, 0f);
 
 		private Tween _tween;
 
-		public string CMJPCPLOJCA
+		public string OpenImageName
 		{
 			get
 			{
@@ -60,7 +60,7 @@ namespace Nekki.SF2.GUI.Shop
 			}
 		}
 
-		public string KHCPHAPBIOF
+		public string CloseImageName
 		{
 			get
 			{
@@ -74,93 +74,93 @@ namespace Nekki.SF2.GUI.Shop
 
 		public string get_OpenImage()
 		{
-			return NKPHGKJGJFK;
+			return _openImage;
 		}
 
 		public void set_OpenImage(string value)
 		{
-			NKPHGKJGJFK = value;
-			NLCJBAIMKLM();
+			_openImage = value;
+			UpdateMoveButton();
 		}
 
 		public string get_CloseImage()
 		{
-			return IBFJLPCDHBH;
+			return _closeImage;
 		}
 
 		public void set_CloseImage(string value)
 		{
-			IBFJLPCDHBH = value;
-			NLCJBAIMKLM();
+			_closeImage = value;
+			UpdateMoveButton();
 		}
 
 		public void Init(SidePanelContent DMNBDBJNKME, bool JOJGKNGGAHB, float MDPGKEDBHNO = 0f, bool NKGDKKNNJOF = true, string NEFNMHJLBPC = null, string AENEHAMGPBC = null)
 		{
-			MMEDJKEFDJC = JOJGKNGGAHB;
-			NCEDIDPKGPF.y = MDPGKEDBHNO;
-			DCCOOOKAGIF.y = MDPGKEDBHNO;
-			EABBPDKDKJE = NKGDKKNNJOF;
-			NKPHGKJGJFK = NEFNMHJLBPC;
-			IBFJLPCDHBH = AENEHAMGPBC;
-			GCGGIJDKKKO = DMNBDBJNKME;
+			_isMovable = JOJGKNGGAHB;
+			_closeButtonOffset.y = MDPGKEDBHNO;
+			_openButtonOffset.y = MDPGKEDBHNO;
+			_isOpen = NKGDKKNNJOF;
+			_openImage = NEFNMHJLBPC;
+			_closeImage = AENEHAMGPBC;
+			_content = DMNBDBJNKME;
 			if (_scrollRect != null)
 			{
-				EGKGKFBGFNN = _scrollRect.normalizedPosition;
+				_normalizedPosition = _scrollRect.normalizedPosition;
 			}
 			if (_moveButton != null)
 			{
-				_moveButton.gameObject.SetActive(MMEDJKEFDJC);
+				_moveButton.gameObject.SetActive(_isMovable);
 			}
 			if (_scrollRect != null)
 			{
-				_scrollRect.horizontal = MMEDJKEFDJC;
+				_scrollRect.horizontal = _isMovable;
 			}
-			if (GCGGIJDKKKO != null && _contentParent != null)
+			if (_content != null && _contentParent != null)
 			{
-				GCGGIJDKKKO.transform.SetParent(_contentParent, false);
+				_content.transform.SetParent(_contentParent, false);
 			}
-			SetOpen(EABBPDKDKJE, 0f);
+			SetOpen(_isOpen, 0f);
 		}
 
 		public void OnClick()
 		{
-			if (!MMEDJKEFDJC) return;
-			SetOpen(!EABBPDKDKJE);
+			if (!_isMovable) return;
+			SetOpen(!_isOpen);
 		}
 
 		public void OnValueChanged(Vector2 LCCLEFMKLPB)
 		{
-			if (!MMEDJKEFDJC) return;
-			if (EGKGKFBGFNN.x > LCCLEFMKLPB.x || LCCLEFMKLPB.x == 0f)
+			if (!_isMovable) return;
+			if (_normalizedPosition.x > LCCLEFMKLPB.x || LCCLEFMKLPB.x == 0f)
 			{
-				EOPFNNGEJOL = true;
+				_shouldOpenOnRelease = true;
 			}
-			if (EGKGKFBGFNN.x < LCCLEFMKLPB.x || LCCLEFMKLPB.x == 1f)
+			if (_normalizedPosition.x < LCCLEFMKLPB.x || LCCLEFMKLPB.x == 1f)
 			{
-				EOPFNNGEJOL = false;
+				_shouldOpenOnRelease = false;
 			}
-			EGKGKFBGFNN = LCCLEFMKLPB;
+			_normalizedPosition = LCCLEFMKLPB;
 		}
 
 		public void OnScrollDragBegin(PointerEventData data)
 		{
-			if (!MMEDJKEFDJC) return;
+			if (!_isMovable) return;
 			KillTween();
 			base.gameObject.transform.SetSiblingIndex(1);
 		}
 
 		public void OnScrollDragEnd(PointerEventData data)
 		{
-			if (!MMEDJKEFDJC) return;
-			SetOpen(EOPFNNGEJOL);
+			if (!_isMovable) return;
+			SetOpen(_shouldOpenOnRelease);
 		}
 
 		private void SetPosition(Vector2 LCCLEFMKLPB)
 		{
-			EGKGKFBGFNN = LCCLEFMKLPB;
+			_normalizedPosition = LCCLEFMKLPB;
 			if (_scrollRect != null)
 			{
-				_scrollRect.normalizedPosition = EGKGKFBGFNN;
+				_scrollRect.normalizedPosition = _normalizedPosition;
 			}
 		}
 
@@ -173,19 +173,19 @@ namespace Nekki.SF2.GUI.Shop
 			}
 		}
 
-		private void MGDHEBAMBFN(Vector2 LCCLEFMKLPB, float _Duration)
+		private void TweenPosition(Vector2 LCCLEFMKLPB, float _Duration)
 		{
 			KillTween();
-			_tween = DOTween.To(() => EGKGKFBGFNN, (Vector2Wrapper HBLGAEMOHAL) =>
+			_tween = DOTween.To(() => _normalizedPosition, (Vector2Wrapper HBLGAEMOHAL) =>
 			{
 				SetPosition(HBLGAEMOHAL);
 			}, LCCLEFMKLPB, _Duration);
-			_tween.OnComplete(CMLDLHPOPFJ);
+			_tween.OnComplete(OnTweenComplete);
 		}
 
-		private void CMLDLHPOPFJ()
+		private void OnTweenComplete()
 		{
-			if (!EABBPDKDKJE)
+			if (!_isOpen)
 			{
 				base.gameObject.transform.SetSiblingIndex(0);
 				if (_canvasGroup != null)
@@ -199,7 +199,7 @@ namespace Nekki.SF2.GUI.Shop
 			}
 		}
 
-		private void MJNKCCHGOLD(string KHPKDMGDMAB)
+		private void SetButtonSprite(string KHPKDMGDMAB)
 		{
 			ResolutionImage resolutionImage = _moveButton.image as ResolutionImage;
 			if (resolutionImage != null)
@@ -208,20 +208,20 @@ namespace Nekki.SF2.GUI.Shop
 			}
 		}
 
-		private void NLCJBAIMKLM()
+		private void UpdateMoveButton()
 		{
 			if (_moveButton != null)
 			{
-				if (EABBPDKDKJE && NKPHGKJGJFK != null)
+				if (_isOpen && _openImage != null)
 				{
-					MJNKCCHGOLD(NKPHGKJGJFK);
-					_moveButton.transform.localPosition = _openBtnPos + DCCOOOKAGIF;
+					SetButtonSprite(_openImage);
+					_moveButton.transform.localPosition = _openBtnPos + _openButtonOffset;
 					_moveButton.transform.SetSiblingIndex(1);
 				}
-				else if (!EABBPDKDKJE && IBFJLPCDHBH != null)
+				else if (!_isOpen && _closeImage != null)
 				{
-					MJNKCCHGOLD(IBFJLPCDHBH);
-					_moveButton.transform.localPosition = _closeBtnPos + NCEDIDPKGPF;
+					SetButtonSprite(_closeImage);
+					_moveButton.transform.localPosition = _closeBtnPos + _closeButtonOffset;
 					_moveButton.transform.SetSiblingIndex(0);
 				}
 			}
@@ -229,17 +229,17 @@ namespace Nekki.SF2.GUI.Shop
 
 		public void SetOpen(bool FPCBALMEPEN, float _Duration = 1f)
 		{
-			EABBPDKDKJE = FPCBALMEPEN;
+			_isOpen = FPCBALMEPEN;
 			if (FPCBALMEPEN)
 			{
-				MGDHEBAMBFN(new Vector2(0f, 0f), _Duration);
+				TweenPosition(new Vector2(0f, 0f), _Duration);
 				base.gameObject.transform.SetSiblingIndex(1);
-				NLCJBAIMKLM();
+				UpdateMoveButton();
 			}
 			else if (!FPCBALMEPEN)
 			{
-				MGDHEBAMBFN(new Vector2(1f, 0f), _Duration);
-				NLCJBAIMKLM();
+				TweenPosition(new Vector2(1f, 0f), _Duration);
+				UpdateMoveButton();
 				if (_canvasGroup != null)
 				{
 					_canvasGroup.blocksRaycasts = false;

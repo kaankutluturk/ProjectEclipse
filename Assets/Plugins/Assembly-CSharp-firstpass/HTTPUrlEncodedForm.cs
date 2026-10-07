@@ -7,35 +7,35 @@ public sealed class HTTPUrlEncodedForm : HTTPFormBase
 
 	public override void PrepareRequest(HTTPRequest ONOCIELLAPL)
 	{
-		ONOCIELLAPL.MMPFBNNMGED("Content-Type", "application/x-www-form-urlencoded");
+		ONOCIELLAPL.SetHeader("Content-Type", "application/x-www-form-urlencoded");
 	}
 
-	public override byte[] GDENFGNLFKL()
+	public override byte[] GetData()
 	{
-		if (CachedData != null && !JODDPBJOEJN())
+		if (CachedData != null && !GetIsChanged())
 		{
 			return CachedData;
 		}
 		StringBuilder stringBuilder = new StringBuilder();
-		for (int i = 0; i < CKOJIABCEBP().Count; i++)
+		for (int i = 0; i < GetFields().Count; i++)
 		{
-			HTTPFieldData iIMHHCDGJOL = CKOJIABCEBP()[i];
+			HTTPFieldData iIMHHCDGJOL = GetFields()[i];
 			if (i > 0)
 			{
 				stringBuilder.Append("&");
 			}
 			stringBuilder.Append(Uri.EscapeDataString(iIMHHCDGJOL.get_Name()));
 			stringBuilder.Append("=");
-			if (!string.IsNullOrEmpty(iIMHHCDGJOL.ILMJJEMPKCN()) || iIMHHCDGJOL.CLBEEBOFBMA() == null)
+			if (!string.IsNullOrEmpty(iIMHHCDGJOL.GetText()) || iIMHHCDGJOL.GetBinary() == null)
 			{
-				stringBuilder.Append(Uri.EscapeDataString(iIMHHCDGJOL.ILMJJEMPKCN()));
+				stringBuilder.Append(Uri.EscapeDataString(iIMHHCDGJOL.GetText()));
 			}
 			else
 			{
-				stringBuilder.Append(Uri.EscapeDataString(Encoding.UTF8.GetString(iIMHHCDGJOL.CLBEEBOFBMA(), 0, iIMHHCDGJOL.CLBEEBOFBMA().Length)));
+				stringBuilder.Append(Uri.EscapeDataString(Encoding.UTF8.GetString(iIMHHCDGJOL.GetBinary(), 0, iIMHHCDGJOL.GetBinary().Length)));
 			}
 		}
-		AKIGPOBCEOC(false);
+		SetIsChanged(false);
 		return CachedData = Encoding.UTF8.GetBytes(stringBuilder.ToString());
 	}
 }

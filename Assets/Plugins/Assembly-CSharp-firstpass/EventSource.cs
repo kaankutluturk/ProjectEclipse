@@ -7,26 +7,26 @@ using System.Threading;
 public class EventSource : IHeartbeat
 {
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private Uri NHCOGAAPOAB;
+	private Uri uri;
 
-	private EDMIJLJOPPF MAFFNGPOMJD;
-
-	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private TimeSpan EJIPHPJCPHO;
+	private EventSourceState state;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private string NFONJOFLBCD;
+	private TimeSpan reconnectionTime;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private HTTPRequest HMKDGNFLBMB;
+	private string lastEventId;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	[CompilerGenerated]
-	private BHJHIPILHJB OnOpen;
+	private HTTPRequest internalRequest;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
 	[CompilerGenerated]
-	private IPIGAJKKJLN onMessageField;
+	private OnGeneralEventDelegate OnOpen;
+
+	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
+	[CompilerGenerated]
+	private OnEventSourceMessageDelegate onMessageField;
 
 	[CompilerGenerated]
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
@@ -38,23 +38,23 @@ public class EventSource : IHeartbeat
 
 	[CompilerGenerated]
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private BHJHIPILHJB onClosedField;
+	private OnGeneralEventDelegate onClosedField;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
 	[CompilerGenerated]
-	private GAHJEMHNLNB OnStateChanged;
+	private OnStateChangedDelegate OnStateChanged;
 
-	private Dictionary<string, JEEIPOLICHA> IANMNLLLEHH;
+	private Dictionary<string, OnEventDelegate> eventTable;
 
 	private byte RetryCount;
 
 	private DateTime RetryCalled;
 
-	public Uri GJIGOCNEPME
+	public Uri EventSourceUri
 	{
 		get
 		{
-			return OJBDMGBGJMA();
+			return GetUri();
 		}
 		private set
 		{
@@ -62,11 +62,11 @@ public class EventSource : IHeartbeat
 		}
 	}
 
-	public EDMIJLJOPPF AFINHOBCHMC
+	public EventSourceState ReadyState
 	{
 		get
 		{
-			return FLBBFDNHJAJ();
+			return GetState();
 		}
 		private set
 		{
@@ -74,11 +74,11 @@ public class EventSource : IHeartbeat
 		}
 	}
 
-	public TimeSpan AMHFGABBPEH
+	public TimeSpan ReconnectDelay
 	{
 		get
 		{
-			return NDLJCMFOAJG();
+			return GetReconnectionTime();
 		}
 		set
 		{
@@ -86,11 +86,11 @@ public class EventSource : IHeartbeat
 		}
 	}
 
-	public string OMJPABGFOHH
+	public string LastReceivedEventId
 	{
 		get
 		{
-			return HLDPNIFFCDG();
+			return GetLastEventId();
 		}
 		private set
 		{
@@ -98,39 +98,39 @@ public class EventSource : IHeartbeat
 		}
 	}
 
-	public HTTPRequest OOHLFJNPGGA
+	public HTTPRequest InternalRequest
 	{
 		get
 		{
-			return KGBEGJJPCKC();
+			return GetInternalRequest();
 		}
 		private set
 		{
-			HMPIGPEAMPM(value);
+			SetInternalRequest(value);
 		}
 	}
 
-	public event BHJHIPILHJB HKBKFMIBCED
+	public event OnGeneralEventDelegate Opened
 	{
 		add
 		{
-			LMOIENENDCP(value);
+			AddOnOpen(value);
 		}
 		remove
 		{
-			IIGDNCOBGDB(value);
+			RemoveOnOpen(value);
 		}
 	}
 
-	public event IPIGAJKKJLN OnMessage
+	public event OnEventSourceMessageDelegate OnMessage
 	{
 		add
 		{
-			LIMLEFJPHPP(value);
+			AddOnMessage(value);
 		}
 		remove
 		{
-			FEJIPPJIAHH(value);
+			RemoveOnMessage(value);
 		}
 	}
 
@@ -138,47 +138,47 @@ public class EventSource : IHeartbeat
 	{
 		add
 		{
-			BJDMHEHILEO(value);
+			AddOnError(value);
 		}
 		remove
 		{
-			LEIDAIFMPCE(value);
+			RemoveOnError(value);
 		}
 	}
 
-	public event OnRetryDelegate HNPIDLGCLDL
+	public event OnRetryDelegate RetryRequested
 	{
 		add
 		{
-			CKMLLHFIEJG(value);
+			AddOnRetry(value);
 		}
 		remove
 		{
-			HCNCCLGKAND(value);
+			RemoveOnRetry(value);
 		}
 	}
 
-	public event BHJHIPILHJB OnClosed
+	public event OnGeneralEventDelegate OnClosed
 	{
 		add
 		{
-			IDCIMGLDBJG(value);
+			AddOnClosed(value);
 		}
 		remove
 		{
-			OIBOHOKKFKE(value);
+			RemoveOnClosed(value);
 		}
 	}
 
-	public event GAHJEMHNLNB KPGNPBCPCJK
+	public event OnStateChangedDelegate StateChanged
 	{
 		add
 		{
-			FADMHEJNPJO(value);
+			AddOnStateChanged(value);
 		}
 		remove
 		{
-			NEFHCNPDIHG(value);
+			RemoveOnStateChanged(value);
 		}
 	}
 
@@ -186,126 +186,126 @@ public class EventSource : IHeartbeat
 	{
 		set_Uri(KJHNCLAJMLO);
 		set_ReconnectionTime(TimeSpan.FromMilliseconds(2000.0));
-		HMPIGPEAMPM(new HTTPRequest(OJBDMGBGJMA(), LAAFHDKKJFL.Get, false, true, GCGGFEIEJBN));
-		KGBEGJJPCKC().MMPFBNNMGED("Accept", "text/event-stream");
-		KGBEGJJPCKC().MMPFBNNMGED("Cache-Control", "no-cache");
-		KGBEGJJPCKC().MMPFBNNMGED("Accept-Encoding", "identity");
-		KGBEGJJPCKC().MBLIFPIOOON(OBBKIBFJEMI.ServerSentEvents);
-		KGBEGJJPCKC().GFFABFBMJAO = GFFABFBMJAO;
-		KGBEGJJPCKC().LADBBAMKLPJ(true);
+		SetInternalRequest(new HTTPRequest(GetUri(), HTTPMethods.Get, false, true, OnRequestFinished));
+		GetInternalRequest().SetHeader("Accept", "text/event-stream");
+		GetInternalRequest().SetHeader("Cache-Control", "no-cache");
+		GetInternalRequest().SetHeader("Accept-Encoding", "identity");
+		GetInternalRequest().SetProtocolHandler(SupportedProtocols.ServerSentEvents);
+		GetInternalRequest().OnUpgraded = OnUpgraded;
+		GetInternalRequest().SetDisableRetry(true);
 	}
 
-	public Uri OJBDMGBGJMA()
+	public Uri GetUri()
 	{
-		return NHCOGAAPOAB;
+		return uri;
 	}
 
 	private void set_Uri(Uri value)
 	{
-		NHCOGAAPOAB = value;
+		uri = value;
 	}
 
-	public EDMIJLJOPPF FLBBFDNHJAJ()
+	public EventSourceState GetState()
 	{
-		return MAFFNGPOMJD;
+		return state;
 	}
 
-	private void set_State(EDMIJLJOPPF value)
+	private void set_State(EventSourceState value)
 	{
-		EDMIJLJOPPF mAFFNGPOMJD = MAFFNGPOMJD;
-		MAFFNGPOMJD = value;
+		EventSourceState mAFFNGPOMJD = state;
+		state = value;
 		if (OnStateChanged != null)
 		{
 			try
 			{
-				OnStateChanged(this, mAFFNGPOMJD, MAFFNGPOMJD);
+				OnStateChanged(this, mAFFNGPOMJD, state);
 			}
 			catch (Exception mPFFFAOGBJE)
 			{
-				HTTPManager.MBBMPNDDPIH().COHEDILAHFD("EventSource", "OnStateChanged", mPFFFAOGBJE);
+				HTTPManager.GetLogger().Exception("EventSource", "OnStateChanged", mPFFFAOGBJE);
 			}
 		}
 	}
 
-	public TimeSpan NDLJCMFOAJG()
+	public TimeSpan GetReconnectionTime()
 	{
-		return EJIPHPJCPHO;
+		return reconnectionTime;
 	}
 
 	public void set_ReconnectionTime(TimeSpan value)
 	{
-		EJIPHPJCPHO = value;
+		reconnectionTime = value;
 	}
 
-	public string HLDPNIFFCDG()
+	public string GetLastEventId()
 	{
-		return NFONJOFLBCD;
+		return lastEventId;
 	}
 
 	private void set_LastEventId(string value)
 	{
-		NFONJOFLBCD = value;
+		lastEventId = value;
 	}
 
-	public HTTPRequest KGBEGJJPCKC()
+	public HTTPRequest GetInternalRequest()
 	{
-		return HMKDGNFLBMB;
+		return internalRequest;
 	}
 
-	private void HMPIGPEAMPM(HTTPRequest value)
+	private void SetInternalRequest(HTTPRequest value)
 	{
-		HMKDGNFLBMB = value;
+		internalRequest = value;
 	}
 
-	public void LMOIENENDCP(BHJHIPILHJB value)
+	public void AddOnOpen(OnGeneralEventDelegate value)
 	{
-		BHJHIPILHJB bHJHIPILHJB = OnOpen;
-		BHJHIPILHJB bHJHIPILHJB2;
+		OnGeneralEventDelegate bHJHIPILHJB = OnOpen;
+		OnGeneralEventDelegate bHJHIPILHJB2;
 		do
 		{
 			bHJHIPILHJB2 = bHJHIPILHJB;
-			bHJHIPILHJB = Interlocked.CompareExchange(ref OnOpen, (BHJHIPILHJB)Delegate.Combine(bHJHIPILHJB2, value), bHJHIPILHJB);
+			bHJHIPILHJB = Interlocked.CompareExchange(ref OnOpen, (OnGeneralEventDelegate)Delegate.Combine(bHJHIPILHJB2, value), bHJHIPILHJB);
 		}
 		while ((object)bHJHIPILHJB != bHJHIPILHJB2);
 	}
 
-	public void IIGDNCOBGDB(BHJHIPILHJB value)
+	public void RemoveOnOpen(OnGeneralEventDelegate value)
 	{
-		BHJHIPILHJB bHJHIPILHJB = OnOpen;
-		BHJHIPILHJB bHJHIPILHJB2;
+		OnGeneralEventDelegate bHJHIPILHJB = OnOpen;
+		OnGeneralEventDelegate bHJHIPILHJB2;
 		do
 		{
 			bHJHIPILHJB2 = bHJHIPILHJB;
-			bHJHIPILHJB = Interlocked.CompareExchange(ref OnOpen, (BHJHIPILHJB)Delegate.Remove(bHJHIPILHJB2, value), bHJHIPILHJB);
+			bHJHIPILHJB = Interlocked.CompareExchange(ref OnOpen, (OnGeneralEventDelegate)Delegate.Remove(bHJHIPILHJB2, value), bHJHIPILHJB);
 		}
 		while ((object)bHJHIPILHJB != bHJHIPILHJB2);
 	}
 
-	public void LIMLEFJPHPP(IPIGAJKKJLN value)
+	public void AddOnMessage(OnEventSourceMessageDelegate value)
 	{
-		IPIGAJKKJLN iPIGAJKKJLN = onMessageField;
-		IPIGAJKKJLN iPIGAJKKJLN2;
+		OnEventSourceMessageDelegate iPIGAJKKJLN = onMessageField;
+		OnEventSourceMessageDelegate iPIGAJKKJLN2;
 		do
 		{
 			iPIGAJKKJLN2 = iPIGAJKKJLN;
-			iPIGAJKKJLN = Interlocked.CompareExchange(ref onMessageField, (IPIGAJKKJLN)Delegate.Combine(iPIGAJKKJLN2, value), iPIGAJKKJLN);
+			iPIGAJKKJLN = Interlocked.CompareExchange(ref onMessageField, (OnEventSourceMessageDelegate)Delegate.Combine(iPIGAJKKJLN2, value), iPIGAJKKJLN);
 		}
 		while ((object)iPIGAJKKJLN != iPIGAJKKJLN2);
 	}
 
-	public void FEJIPPJIAHH(IPIGAJKKJLN value)
+	public void RemoveOnMessage(OnEventSourceMessageDelegate value)
 	{
-		IPIGAJKKJLN iPIGAJKKJLN = onMessageField;
-		IPIGAJKKJLN iPIGAJKKJLN2;
+		OnEventSourceMessageDelegate iPIGAJKKJLN = onMessageField;
+		OnEventSourceMessageDelegate iPIGAJKKJLN2;
 		do
 		{
 			iPIGAJKKJLN2 = iPIGAJKKJLN;
-			iPIGAJKKJLN = Interlocked.CompareExchange(ref onMessageField, (IPIGAJKKJLN)Delegate.Remove(iPIGAJKKJLN2, value), iPIGAJKKJLN);
+			iPIGAJKKJLN = Interlocked.CompareExchange(ref onMessageField, (OnEventSourceMessageDelegate)Delegate.Remove(iPIGAJKKJLN2, value), iPIGAJKKJLN);
 		}
 		while ((object)iPIGAJKKJLN != iPIGAJKKJLN2);
 	}
 
-	public void BJDMHEHILEO(OnErrorDelegate value)
+	public void AddOnError(OnErrorDelegate value)
 	{
 		OnErrorDelegate eGECAPOLBHF = onErrorField;
 		OnErrorDelegate eGECAPOLBHF2;
@@ -317,7 +317,7 @@ public class EventSource : IHeartbeat
 		while ((object)eGECAPOLBHF != eGECAPOLBHF2);
 	}
 
-	public void LEIDAIFMPCE(OnErrorDelegate value)
+	public void RemoveOnError(OnErrorDelegate value)
 	{
 		OnErrorDelegate eGECAPOLBHF = onErrorField;
 		OnErrorDelegate eGECAPOLBHF2;
@@ -329,7 +329,7 @@ public class EventSource : IHeartbeat
 		while ((object)eGECAPOLBHF != eGECAPOLBHF2);
 	}
 
-	public void CKMLLHFIEJG(OnRetryDelegate value)
+	public void AddOnRetry(OnRetryDelegate value)
 	{
 		OnRetryDelegate cPMLAEEAKNP = OnRetry;
 		OnRetryDelegate cPMLAEEAKNP2;
@@ -341,7 +341,7 @@ public class EventSource : IHeartbeat
 		while ((object)cPMLAEEAKNP != cPMLAEEAKNP2);
 	}
 
-	public void HCNCCLGKAND(OnRetryDelegate value)
+	public void RemoveOnRetry(OnRetryDelegate value)
 	{
 		OnRetryDelegate cPMLAEEAKNP = OnRetry;
 		OnRetryDelegate cPMLAEEAKNP2;
@@ -353,97 +353,97 @@ public class EventSource : IHeartbeat
 		while ((object)cPMLAEEAKNP != cPMLAEEAKNP2);
 	}
 
-	public void IDCIMGLDBJG(BHJHIPILHJB value)
+	public void AddOnClosed(OnGeneralEventDelegate value)
 	{
-		BHJHIPILHJB bHJHIPILHJB = onClosedField;
-		BHJHIPILHJB bHJHIPILHJB2;
+		OnGeneralEventDelegate bHJHIPILHJB = onClosedField;
+		OnGeneralEventDelegate bHJHIPILHJB2;
 		do
 		{
 			bHJHIPILHJB2 = bHJHIPILHJB;
-			bHJHIPILHJB = Interlocked.CompareExchange(ref onClosedField, (BHJHIPILHJB)Delegate.Combine(bHJHIPILHJB2, value), bHJHIPILHJB);
+			bHJHIPILHJB = Interlocked.CompareExchange(ref onClosedField, (OnGeneralEventDelegate)Delegate.Combine(bHJHIPILHJB2, value), bHJHIPILHJB);
 		}
 		while ((object)bHJHIPILHJB != bHJHIPILHJB2);
 	}
 
-	public void OIBOHOKKFKE(BHJHIPILHJB value)
+	public void RemoveOnClosed(OnGeneralEventDelegate value)
 	{
-		BHJHIPILHJB bHJHIPILHJB = onClosedField;
-		BHJHIPILHJB bHJHIPILHJB2;
+		OnGeneralEventDelegate bHJHIPILHJB = onClosedField;
+		OnGeneralEventDelegate bHJHIPILHJB2;
 		do
 		{
 			bHJHIPILHJB2 = bHJHIPILHJB;
-			bHJHIPILHJB = Interlocked.CompareExchange(ref onClosedField, (BHJHIPILHJB)Delegate.Remove(bHJHIPILHJB2, value), bHJHIPILHJB);
+			bHJHIPILHJB = Interlocked.CompareExchange(ref onClosedField, (OnGeneralEventDelegate)Delegate.Remove(bHJHIPILHJB2, value), bHJHIPILHJB);
 		}
 		while ((object)bHJHIPILHJB != bHJHIPILHJB2);
 	}
 
-	public void FADMHEJNPJO(GAHJEMHNLNB value)
+	public void AddOnStateChanged(OnStateChangedDelegate value)
 	{
-		GAHJEMHNLNB gAHJEMHNLNB = OnStateChanged;
-		GAHJEMHNLNB gAHJEMHNLNB2;
+		OnStateChangedDelegate gAHJEMHNLNB = OnStateChanged;
+		OnStateChangedDelegate gAHJEMHNLNB2;
 		do
 		{
 			gAHJEMHNLNB2 = gAHJEMHNLNB;
-			gAHJEMHNLNB = Interlocked.CompareExchange(ref OnStateChanged, (GAHJEMHNLNB)Delegate.Combine(gAHJEMHNLNB2, value), gAHJEMHNLNB);
+			gAHJEMHNLNB = Interlocked.CompareExchange(ref OnStateChanged, (OnStateChangedDelegate)Delegate.Combine(gAHJEMHNLNB2, value), gAHJEMHNLNB);
 		}
 		while ((object)gAHJEMHNLNB != gAHJEMHNLNB2);
 	}
 
-	public void NEFHCNPDIHG(GAHJEMHNLNB value)
+	public void RemoveOnStateChanged(OnStateChangedDelegate value)
 	{
-		GAHJEMHNLNB gAHJEMHNLNB = OnStateChanged;
-		GAHJEMHNLNB gAHJEMHNLNB2;
+		OnStateChangedDelegate gAHJEMHNLNB = OnStateChanged;
+		OnStateChangedDelegate gAHJEMHNLNB2;
 		do
 		{
 			gAHJEMHNLNB2 = gAHJEMHNLNB;
-			gAHJEMHNLNB = Interlocked.CompareExchange(ref OnStateChanged, (GAHJEMHNLNB)Delegate.Remove(gAHJEMHNLNB2, value), gAHJEMHNLNB);
+			gAHJEMHNLNB = Interlocked.CompareExchange(ref OnStateChanged, (OnStateChangedDelegate)Delegate.Remove(gAHJEMHNLNB2, value), gAHJEMHNLNB);
 		}
 		while ((object)gAHJEMHNLNB != gAHJEMHNLNB2);
 	}
 
-	public void LAJCMNNNIIM()
+	public void OpenEventSource()
 	{
-		if (FLBBFDNHJAJ() == EDMIJLJOPPF.Initial || FLBBFDNHJAJ() == EDMIJLJOPPF.Retrying || FLBBFDNHJAJ() == EDMIJLJOPPF.Closed)
+		if (GetState() == EventSourceState.Initial || GetState() == EventSourceState.Retrying || GetState() == EventSourceState.Closed)
 		{
-			set_State(EDMIJLJOPPF.Connecting);
-			if (!string.IsNullOrEmpty(HLDPNIFFCDG()))
+			set_State(EventSourceState.Connecting);
+			if (!string.IsNullOrEmpty(GetLastEventId()))
 			{
-				KGBEGJJPCKC().MMPFBNNMGED("Last-Event-ID", HLDPNIFFCDG());
+				GetInternalRequest().SetHeader("Last-Event-ID", GetLastEventId());
 			}
-			KGBEGJJPCKC().Send();
+			GetInternalRequest().Send();
 		}
 	}
 
 	public void Close()
 	{
-		if (FLBBFDNHJAJ() != EDMIJLJOPPF.Closing && FLBBFDNHJAJ() != EDMIJLJOPPF.Closed)
+		if (GetState() != EventSourceState.Closing && GetState() != EventSourceState.Closed)
 		{
-			set_State(EDMIJLJOPPF.Closing);
-			if (KGBEGJJPCKC() != null)
+			set_State(EventSourceState.Closing);
+			if (GetInternalRequest() != null)
 			{
-				KGBEGJJPCKC().AKLEEMEHBIC();
+				GetInternalRequest().Abort();
 			}
 			else
 			{
-				set_State(EDMIJLJOPPF.Closed);
+				set_State(EventSourceState.Closed);
 			}
 		}
 	}
 
-	public void JPJAFMLNALO(string DOPHKKGNAEF, JEEIPOLICHA IBODMPMJELJ)
+	public void On(string DOPHKKGNAEF, OnEventDelegate IBODMPMJELJ)
 	{
-		if (IANMNLLLEHH == null)
+		if (eventTable == null)
 		{
-			IANMNLLLEHH = new Dictionary<string, JEEIPOLICHA>();
+			eventTable = new Dictionary<string, OnEventDelegate>();
 		}
-		IANMNLLLEHH[DOPHKKGNAEF] = IBODMPMJELJ;
+		eventTable[DOPHKKGNAEF] = IBODMPMJELJ;
 	}
 
 	public void Off(string DOPHKKGNAEF)
 	{
 		if (DOPHKKGNAEF != null)
 		{
-			IANMNLLLEHH.Remove(DOPHKKGNAEF);
+			eventTable.Remove(DOPHKKGNAEF);
 		}
 	}
 
@@ -457,12 +457,12 @@ public class EventSource : IHeartbeat
 			}
 			catch (Exception mPFFFAOGBJE)
 			{
-				HTTPManager.MBBMPNDDPIH().COHEDILAHFD("EventSource", CKEHOEGLMBM + " - OnError", mPFFFAOGBJE);
+				HTTPManager.GetLogger().Exception("EventSource", CKEHOEGLMBM + " - OnError", mPFFFAOGBJE);
 			}
 		}
 	}
 
-	private bool DKDJHEHMILP()
+	private bool CallOnRetry()
 	{
 		if (OnRetry != null)
 		{
@@ -472,15 +472,15 @@ public class EventSource : IHeartbeat
 			}
 			catch (Exception mPFFFAOGBJE)
 			{
-				HTTPManager.MBBMPNDDPIH().COHEDILAHFD("EventSource", "CallOnRetry", mPFFFAOGBJE);
+				HTTPManager.GetLogger().Exception("EventSource", "CallOnRetry", mPFFFAOGBJE);
 			}
 		}
 		return true;
 	}
 
-	private void FAJMMHIMBOB(string CKEHOEGLMBM)
+	private void SetClosed(string CKEHOEGLMBM)
 	{
-		set_State(EDMIJLJOPPF.Closed);
+		set_State(EventSourceState.Closed);
 		if (onClosedField != null)
 		{
 			try
@@ -489,25 +489,25 @@ public class EventSource : IHeartbeat
 			}
 			catch (Exception mPFFFAOGBJE)
 			{
-				HTTPManager.MBBMPNDDPIH().COHEDILAHFD("EventSource", CKEHOEGLMBM + " - OnClosed", mPFFFAOGBJE);
+				HTTPManager.GetLogger().Exception("EventSource", CKEHOEGLMBM + " - OnClosed", mPFFFAOGBJE);
 			}
 		}
 	}
 
-	private void DOIGOILHAKM()
+	private void Retry()
 	{
-		if (RetryCount > 0 || !DKDJHEHMILP())
+		if (RetryCount > 0 || !CallOnRetry())
 		{
-			FAJMMHIMBOB("Retry");
+			SetClosed("Retry");
 			return;
 		}
 		RetryCount++;
 		RetryCalled = DateTime.UtcNow;
-		HTTPManager.MAMNLAJACOD().ELAHFBCGAGL(this);
-		set_State(EDMIJLJOPPF.Retrying);
+		HTTPManager.GetHeartbeats().Subscribe(this);
+		set_State(EventSourceState.Retrying);
 	}
 
-	private void GFFABFBMJAO(HTTPRequest BPMCLBNFEDK, HTTPResponse GIHDDAKBMHE)
+	private void OnUpgraded(HTTPRequest BPMCLBNFEDK, HTTPResponse GIHDDAKBMHE)
 	{
 		EventSourceResponse eNJKHKLBBLI = GIHDDAKBMHE as EventSourceResponse;
 		if (eNJKHKLBBLI == null)
@@ -523,59 +523,59 @@ public class EventSource : IHeartbeat
 			}
 			catch (Exception mPFFFAOGBJE)
 			{
-				HTTPManager.MBBMPNDDPIH().COHEDILAHFD("EventSource", "OnOpen", mPFFFAOGBJE);
+				HTTPManager.GetLogger().Exception("EventSource", "OnOpen", mPFFFAOGBJE);
 			}
 		}
-		eNJKHKLBBLI.OnMessage = (Action<EventSourceResponse, Message>)Delegate.Combine(eNJKHKLBBLI.OnMessage, new Action<EventSourceResponse, Message>(GKPFJAIFHMC));
-		eNJKHKLBBLI.PBAFKNHCJHD();
+		eNJKHKLBBLI.OnMessage = (Action<EventSourceResponse, Message>)Delegate.Combine(eNJKHKLBBLI.OnMessage, new Action<EventSourceResponse, Message>(OnMessageReceived));
+		eNJKHKLBBLI.StartReceive();
 		RetryCount = 0;
-		set_State(EDMIJLJOPPF.Open);
+		set_State(EventSourceState.Open);
 	}
 
-	private void GCGGFEIEJBN(HTTPRequest CGOIOKHEGOE, HTTPResponse BEIGFGCBICO)
+	private void OnRequestFinished(HTTPRequest CGOIOKHEGOE, HTTPResponse BEIGFGCBICO)
 	{
-		if (FLBBFDNHJAJ() == EDMIJLJOPPF.Closed)
+		if (GetState() == EventSourceState.Closed)
 		{
 			return;
 		}
-		if (FLBBFDNHJAJ() == EDMIJLJOPPF.Closing)
+		if (GetState() == EventSourceState.Closing)
 		{
-			FAJMMHIMBOB("OnRequestFinished");
+			SetClosed("OnRequestFinished");
 			return;
 		}
 		string text = string.Empty;
 		bool flag = true;
-		switch (CGOIOKHEGOE.FLBBFDNHJAJ())
+		switch (CGOIOKHEGOE.GetState())
 		{
-		case CFGBMHKCENK.Processing:
+		case HTTPRequestStates.Processing:
 			flag = !BEIGFGCBICO.HasHeader("content-length");
 			break;
-		case CFGBMHKCENK.Finished:
-			if (BEIGFGCBICO.KNMDPGBPNED() == 200 && !BEIGFGCBICO.HasHeaderWithValue("content-type", "text/event-stream"))
+		case HTTPRequestStates.Finished:
+			if (BEIGFGCBICO.GetStatusCode() == 200 && !BEIGFGCBICO.HasHeaderWithValue("content-type", "text/event-stream"))
 			{
 				text = "No Content-Type header with value 'text/event-stream' present.";
 				flag = false;
 			}
-			if (flag && BEIGFGCBICO.KNMDPGBPNED() != 500 && BEIGFGCBICO.KNMDPGBPNED() != 502 && BEIGFGCBICO.KNMDPGBPNED() != 503 && BEIGFGCBICO.KNMDPGBPNED() != 504)
+			if (flag && BEIGFGCBICO.GetStatusCode() != 500 && BEIGFGCBICO.GetStatusCode() != 502 && BEIGFGCBICO.GetStatusCode() != 503 && BEIGFGCBICO.GetStatusCode() != 504)
 			{
 				flag = false;
-				text = string.Format("Request Finished Successfully, but the server sent an error. Status Code: {0}-{1} Message: {2}", BEIGFGCBICO.KNMDPGBPNED(), BEIGFGCBICO.DCKPMHKDLEJ(), BEIGFGCBICO.DPBLPGKOEJB());
+				text = string.Format("Request Finished Successfully, but the server sent an error. Status Code: {0}-{1} Message: {2}", BEIGFGCBICO.GetStatusCode(), BEIGFGCBICO.GetMessage(), BEIGFGCBICO.GetDataAsText());
 			}
 			break;
-		case CFGBMHKCENK.Error:
-			text = "Request Finished with Error! " + ((CGOIOKHEGOE.IEFGFKFHNMD() == null) ? "No Exception" : (CGOIOKHEGOE.IEFGFKFHNMD().Message + "\n" + CGOIOKHEGOE.IEFGFKFHNMD().StackTrace));
+		case HTTPRequestStates.Error:
+			text = "Request Finished with Error! " + ((CGOIOKHEGOE.GetException() == null) ? "No Exception" : (CGOIOKHEGOE.GetException().Message + "\n" + CGOIOKHEGOE.GetException().StackTrace));
 			break;
-		case CFGBMHKCENK.Aborted:
-			text = "OnRequestFinished - Aborted without request. EventSource's State: " + FLBBFDNHJAJ();
+		case HTTPRequestStates.Aborted:
+			text = "OnRequestFinished - Aborted without request. EventSource's State: " + GetState();
 			break;
-		case CFGBMHKCENK.ConnectionTimedOut:
+		case HTTPRequestStates.ConnectionTimedOut:
 			text = "Connection Timed Out!";
 			break;
-		case CFGBMHKCENK.TimedOut:
+		case HTTPRequestStates.TimedOut:
 			text = "Processing the request Timed Out!";
 			break;
 		}
-		if (FLBBFDNHJAJ() < EDMIJLJOPPF.Closing)
+		if (GetState() < EventSourceState.Closing)
 		{
 			if (!string.IsNullOrEmpty(text))
 			{
@@ -583,34 +583,34 @@ public class EventSource : IHeartbeat
 			}
 			if (flag)
 			{
-				DOIGOILHAKM();
+				Retry();
 			}
 			else
 			{
-				FAJMMHIMBOB("OnRequestFinished");
+				SetClosed("OnRequestFinished");
 			}
 		}
 		else
 		{
-			FAJMMHIMBOB("OnRequestFinished");
+			SetClosed("OnRequestFinished");
 		}
 	}
 
-	private void GKPFJAIFHMC(EventSourceResponse BEIGFGCBICO, Message LIOGIBJBHAH)
+	private void OnMessageReceived(EventSourceResponse BEIGFGCBICO, Message LIOGIBJBHAH)
 	{
-		if (FLBBFDNHJAJ() >= EDMIJLJOPPF.Closing)
+		if (GetState() >= EventSourceState.Closing)
 		{
 			return;
 		}
-		if (LIOGIBJBHAH.IMMIJJCLPBO() != null)
+		if (LIOGIBJBHAH.GetMessageId() != null)
 		{
-			set_LastEventId(LIOGIBJBHAH.IMMIJJCLPBO());
+			set_LastEventId(LIOGIBJBHAH.GetMessageId());
 		}
-		if (LIOGIBJBHAH.GOOCPGAOBBH().TotalMilliseconds > 0.0)
+		if (LIOGIBJBHAH.GetRetry().TotalMilliseconds > 0.0)
 		{
-			set_ReconnectionTime(LIOGIBJBHAH.GOOCPGAOBBH());
+			set_ReconnectionTime(LIOGIBJBHAH.GetRetry());
 		}
-		if (string.IsNullOrEmpty(LIOGIBJBHAH.CHIGLEKCFFN()))
+		if (string.IsNullOrEmpty(LIOGIBJBHAH.GetData()))
 		{
 			return;
 		}
@@ -622,11 +622,11 @@ public class EventSource : IHeartbeat
 			}
 			catch (Exception mPFFFAOGBJE)
 			{
-				HTTPManager.MBBMPNDDPIH().COHEDILAHFD("EventSource", "OnMessageReceived - OnMessage", mPFFFAOGBJE);
+				HTTPManager.GetLogger().Exception("EventSource", "OnMessageReceived - OnMessage", mPFFFAOGBJE);
 			}
 		}
-		JEEIPOLICHA value;
-		if (string.IsNullOrEmpty(LIOGIBJBHAH.EMCEPDNKAPK()) || !IANMNLLLEHH.TryGetValue(LIOGIBJBHAH.EMCEPDNKAPK(), out value) || value == null)
+		OnEventDelegate value;
+		if (string.IsNullOrEmpty(LIOGIBJBHAH.GetEvent()) || !eventTable.TryGetValue(LIOGIBJBHAH.GetEvent(), out value) || value == null)
 		{
 			return;
 		}
@@ -636,24 +636,24 @@ public class EventSource : IHeartbeat
 		}
 		catch (Exception mPFFFAOGBJE2)
 		{
-			HTTPManager.MBBMPNDDPIH().COHEDILAHFD("EventSource", "OnMessageReceived - action", mPFFFAOGBJE2);
+			HTTPManager.GetLogger().Exception("EventSource", "OnMessageReceived - action", mPFFFAOGBJE2);
 		}
 	}
 
 	void IHeartbeat.OnHeartbeatUpdate(TimeSpan OJOKANCMPLG)
 	{
-		if (FLBBFDNHJAJ() != EDMIJLJOPPF.Retrying)
+		if (GetState() != EventSourceState.Retrying)
 		{
-			HTTPManager.MAMNLAJACOD().HKMBDKKHPCB(this);
+			HTTPManager.GetHeartbeats().Unsubscribe(this);
 		}
-		else if (DateTime.UtcNow - RetryCalled >= NDLJCMFOAJG())
+		else if (DateTime.UtcNow - RetryCalled >= GetReconnectionTime())
 		{
-			LAJCMNNNIIM();
-			if (FLBBFDNHJAJ() != EDMIJLJOPPF.Connecting)
+			OpenEventSource();
+			if (GetState() != EventSourceState.Connecting)
 			{
-				FAJMMHIMBOB("OnHeartbeatUpdate");
+				SetClosed("OnHeartbeatUpdate");
 			}
-			HTTPManager.MAMNLAJACOD().HKMBDKKHPCB(this);
+			HTTPManager.GetHeartbeats().Unsubscribe(this);
 		}
 	}
 }

@@ -67,7 +67,7 @@ public static class ValidateDE128UnderworldNative
                 return;
             }
             var scripts = ModRuntime.Scripts;
-            var roster = ListSF.CCDKHLAMKKO();
+            var roster = ListSF.GetRoster();
             var module = Module.GetInstance();
             if (scripts == null || roster == null || module == null) return;
             if (scripts.Diagnostics.Count != 0 || scripts.StateDiagnostics.Count != 0)
@@ -105,14 +105,14 @@ public static class ValidateDE128UnderworldNative
                     .Invoke(null, null) == null)
                 {
                     var flags = BindingFlags.Static | BindingFlags.NonPublic;
-                    var activeDialog = typeof(DialogsManager).GetField("OALIPPPOHCL", flags).GetValue(null) as BaseDialog;
+                    var activeDialog = typeof(DialogsManager).GetField("currentDialog", flags).GetValue(null) as BaseDialog;
                     if (activeDialog is StoryDialog story && story.IsQuestDialog &&
                         EditorApplication.timeSinceStartup - lastDialogPress > 0.2)
                     {
                         if (++campaignCards > 40 || story.get_ButtonOK() == null)
                             throw new Exception("Native campaign story did not present a usable confirmation button.");
                         lastDialogPress = EditorApplication.timeSinceStartup;
-                        var title = typeof(StoryDialog).GetField("AKNJEGGNNBJ", Hidden).GetValue(story);
+                        var title = typeof(StoryDialog).GetField("portraitSpriteName", Hidden).GetValue(story);
                         PressStoryButton(story);
                         Debug.Log(Prefix + "Acknowledged campaign quest card " + campaignCards + ": " + title);
                         return;
@@ -147,8 +147,8 @@ public static class ValidateDE128UnderworldNative
                     AuditUnderworldCatalog(scripts.Content);
                     catalogAudited = true;
                 }
-                var encounter = ListSF.CHMCKGCDGCM(new FightIDS(scripts.Content.RuntimeFightId(definition.Id)));
-                if (encounter == null || !UnderworldZonePolicy.IsRaidZone(encounter.Battle.OAEIILGHJMG))
+                var encounter = ListSF.GetFightById(new FightIDS(scripts.Content.RuntimeFightId(definition.Id)));
+                if (encounter == null || !UnderworldZonePolicy.IsRaidZone(encounter.Battle.ParentZone))
                     throw new Exception("The resolved Volcano encounter is not an Underworld fight.");
                 bool immediate = GameUtils.StartFight(encounter, false, null, true, false);
                 entryRequested = true;
@@ -167,7 +167,7 @@ public static class ValidateDE128UnderworldNative
                 if (module.GetCurrentScreenType() != ScreenType.ModuleMap) return;
                 var returnedMap = UnityEngine.Object.FindObjectOfType<MapScene>();
                 if (returnedMap == null) return;
-                if (returnedMap.GetCurrentState() != MapScene.NMFLNANKNOJ.RaidMode)
+                if (returnedMap.GetCurrentState() != MapScene.MapMode.RaidMode)
                     throw new Exception("Surrender returned to the story map instead of Underworld.");
                 Debug.Log(Prefix + "PASS: eight real raid map tiers, three native Volcano entry cards, resumed fight, " +
                     "60 live frames, rendered arena art and fighter rigs, 15 shield bars, nine alignment rows, " +
@@ -197,22 +197,22 @@ public static class ValidateDE128UnderworldNative
             }
             if (cards != 3 || StoryBus.FightEntries.HasPending)
                 throw new Exception("Volcano fight began before all three story cards completed.");
-            var enemy = (Model)typeof(Fight).GetField("CKNCPOABFBO", Hidden).GetValue(fight);
+            var enemy = (Model)typeof(Fight).GetField("_enemyModel", Hidden).GetValue(fight);
             var player = (Model)typeof(Fight).GetField("_playerModel", Hidden).GetValue(fight);
             if (enemy == null || player == null || fight.get_FightTimeInFrames() < 60) return;
             var live = fight.GetFightDefinition();
             if (live?.FightId?.ToString() != new FightIDS(scripts.Content.RuntimeFightId(
                     scripts.Content.Fights.First(value => value.Id.ToString() == FightId).Id)).ToString() ||
-                !UnderworldZonePolicy.IsRaidZone(live.Battle.OAEIILGHJMG) ||
+                !UnderworldZonePolicy.IsRaidZone(live.Battle.ParentZone) ||
                 live.Location != "vulcan_raid")
                 throw new Exception("Volcano fight identity, raid zone or arena changed: " + live?.Location);
             if (enemy.Parameters.ShieldTotal != 15 || enemy.Parameters.AttributeAlignments.Count != 9 ||
-                enemy.CLDMEJKGLBA() == null || player.CLDMEJKGLBA() == null)
+                enemy.GetBodyObject() == null || player.GetBodyObject() == null)
                 throw new Exception("Volcano native fighter/shield/alignment setup changed: bars=" +
                     enemy.Parameters.ShieldTotal + " alignments=" + enemy.Parameters.AttributeAlignments.Count);
             var location = (Location)typeof(Fight).GetField("_location", Hidden).GetValue(fight);
-            int renderedSprites = location?.layers?.Sum(layer => layer.ICDCIANNAAI == null ? 0 :
-                layer.ICDCIANNAAI.GetComponentsInChildren<SpriteRenderer>(true).Length) ?? 0;
+            int renderedSprites = location?.layers?.Sum(layer => layer.LayerObject == null ? 0 :
+                layer.LayerObject.GetComponentsInChildren<SpriteRenderer>(true).Length) ?? 0;
             if (location?.name != "vulcan_raid" || renderedSprites == 0)
                 throw new Exception("Volcano arena did not render its packaged sprites: " + location?.name +
                     " sprites=" + renderedSprites);
@@ -255,17 +255,17 @@ public static class ValidateDE128UnderworldNative
             int count;
             if (definition.IsCore)
             {
-                var core = ListSF.GetInstance().CNFBCBDPKCI(definition.LegacyName);
-                if (core?.KEJDJHAGBMK == null)
+                var core = ListSF.GetInstance().GetTemplateByName(definition.LegacyName);
+                if (core?.Parameters == null)
                     throw new Exception("Missing native core warrior template: " + definition.LegacyName);
-                count = core.KEJDJHAGBMK.AttributeAlignments.Count;
+                count = core.Parameters.AttributeAlignments.Count;
             }
             else
             {
                 var body = definition.Body;
                 count = (body.HasTemplate ? ExpectedRows(body.Template) : 0) + body.AttributeAlignments.Count;
-                var native = ListSF.GetInstance().CNFBCBDPKCI(definition.LegacyName);
-                int actual = native?.KEJDJHAGBMK?.AttributeAlignments.Count ?? -1;
+                var native = ListSF.GetInstance().GetTemplateByName(definition.LegacyName);
+                int actual = native?.Parameters?.AttributeAlignments.Count ?? -1;
                 if (actual != count)
                     throw new Exception("Native template alignment inheritance differs: " + definition.Id +
                         " expected=" + count + " actual=" + actual);
@@ -281,9 +281,9 @@ public static class ValidateDE128UnderworldNative
         int opponents = 0;
         foreach (var fight in fights)
         {
-            var native = ListSF.CHMCKGCDGCM(new FightIDS(content.RuntimeFightId(fight.Id)));
-            if (native == null || !UnderworldZonePolicy.IsRaidZone(native.Battle?.OAEIILGHJMG) ||
-                native.OFKJMHPMCCD().Count != fight.Warriors.Count)
+            var native = ListSF.GetFightById(new FightIDS(content.RuntimeFightId(fight.Id)));
+            if (native == null || !UnderworldZonePolicy.IsRaidZone(native.Battle?.ParentZone) ||
+                native.GetOpponents().Count != fight.Warriors.Count)
                 throw new Exception("Native Underworld fight or opponent roster differs: " + fight.Id);
             if (!string.IsNullOrEmpty(fight.Location) && native.Location != fight.Location)
                 throw new Exception("Native Underworld arena differs: " + fight.Id + " at " + native.Location);
@@ -293,7 +293,7 @@ public static class ValidateDE128UnderworldNative
                     throw new Exception("Missing Underworld opponent definition: " + fight.Warriors[i]);
                 int count = (warrior.HasTemplate ? ExpectedRows(warrior.Template) : 0) +
                     warrior.AttributeAlignments.Count;
-                var model = native.OFKJMHPMCCD()[i];
+                var model = native.GetOpponents()[i];
                 if (model == null || model.AttributeAlignments.Count != count ||
                     (warrior.HealthBars > 0 && model.ShieldTotal != warrior.HealthBars))
                     throw new Exception("Native Underworld opponent inheritance differs: " + warrior.Id +
@@ -308,7 +308,7 @@ public static class ValidateDE128UnderworldNative
 
     static void PressStoryButton(StoryDialog dialog)
     {
-        typeof(StoryDialog).GetMethod("GPEKKGLDKDF", Hidden).Invoke(dialog, new object[] { null });
+        typeof(StoryDialog).GetMethod("OnNextClicked", Hidden).Invoke(dialog, new object[] { null });
     }
 
     static void Finish(int code)

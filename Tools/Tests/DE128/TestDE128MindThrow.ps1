@@ -88,7 +88,7 @@ foreach($phase in @('start','middle')) {
  $attack=$doc.SelectSingleNode('//Move[@Name="de128:moves/mind_throw_'+$phase+'"]/Intervals/Interval[@Type="Attack"]')
  $parsed=Parse-Attack $attack
  Check ($parsed.GetReactionName(10) -ceq 'de128:moves/mind_throw_hit') 'Owned victim hit lost in native parser.'
- Check ($parsed.HPLOFLKCLHG() -and $parsed.NPHDDMAIGKN() -and !$parsed.PIKCMLIAFOI()) 'Native projectile options lost.'
+ Check ($parsed.GetNoCritical() -and $parsed.GetIgnoresBlock() -and !$parsed.GetHasEffect()) 'Native projectile options lost.'
 }
 $direct=$doc.SelectSingleNode('//Move[@Name="de128:moves/mind_throw_player2"]/Intervals/Interval[@Type="Attack"]')
 Check ($null -eq $direct.AttackingParts -and (Parse-Attack $direct).GetReactionName(48) -ceq 'NoReaction') 'Direct final hit changed.'

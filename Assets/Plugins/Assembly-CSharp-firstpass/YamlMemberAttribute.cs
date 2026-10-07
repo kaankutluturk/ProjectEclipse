@@ -5,19 +5,19 @@ using System.Diagnostics;
 public sealed class YamlMemberAttribute : Attribute
 {
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private Type AHFBNBCEGPG;
+	private Type serializeAs;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private int PAOBFNKOJED;
+	private int order;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private string NICBGBGLFML;
+	private string memberName;
 
-	public Type CNPNDGPFOLC
+	public Type SerializeAsType
 	{
 		get
 		{
-			return FDDGCEPMIJG();
+			return GetSerializeAs();
 		}
 		set
 		{
@@ -25,11 +25,11 @@ public sealed class YamlMemberAttribute : Attribute
 		}
 	}
 
-	public int PECDGDLCAAA
+	public int OrderIndex
 	{
 		get
 		{
-			return BHDEMLGCNOJ();
+			return GetOrder();
 		}
 		set
 		{
@@ -37,11 +37,11 @@ public sealed class YamlMemberAttribute : Attribute
 		}
 	}
 
-	public string HBCNKNFPAIM
+	public string MemberName
 	{
 		get
 		{
-			return MIDPFGENBCF();
+			return GetName();
 		}
 		set
 		{
@@ -58,33 +58,33 @@ public sealed class YamlMemberAttribute : Attribute
 		set_SerializeAs(JDBOFNJPMPH);
 	}
 
-	public Type FDDGCEPMIJG()
+	public Type GetSerializeAs()
 	{
-		return AHFBNBCEGPG;
+		return serializeAs;
 	}
 
 	public void set_SerializeAs(Type value)
 	{
-		AHFBNBCEGPG = value;
+		serializeAs = value;
 	}
 
-	public int BHDEMLGCNOJ()
+	public int GetOrder()
 	{
-		return PAOBFNKOJED;
+		return order;
 	}
 
 	public void set_Order(int value)
 	{
-		PAOBFNKOJED = value;
+		order = value;
 	}
 
-	public string MIDPFGENBCF()
+	public string GetName()
 	{
-		return NICBGBGLFML;
+		return memberName;
 	}
 
 	public void set_Alias(string value)
 	{
-		NICBGBGLFML = value;
+		memberName = value;
 	}
 }

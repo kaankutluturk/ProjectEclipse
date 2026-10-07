@@ -3,46 +3,46 @@ using System.Xml;
 
 public class RandomRule : Rule
 {
-	public enum EOAOMBKFMPF
+	public enum RefreshMode
 	{
 		REFRESH_NONE = 0,
 		REFRESH_EACH_FIGHT = 1,
 		REFRESH_EACH_ROUND = 2
 	}
 
-	public const string KAHFLCIMJBO = "EachFight";
+	public const string RefreshEachFightName = "EachFight";
 
-	public const string KAPJDNNLKHE = "EachRound";
+	public const string RefreshEachRoundName = "EachRound";
 
-	private Rule ALJIKCOCHCL;
+	private Rule selectedRule;
 
 	private List<Rule> _rules = new List<Rule>();
 
-	private List<Rule> FLPJJMJHBBK = new List<Rule>();
+	private List<Rule> availableRules = new List<Rule>();
 
-	private List<Rule> JNMJJPEBECE = new List<Rule>();
+	private List<Rule> usedRules = new List<Rule>();
 
 	private bool _noDoubles;
 
-	private EOAOMBKFMPF BJIBDCEMHCH;
+	private RefreshMode refreshMode;
 
 	public RandomRule(XmlNode node)
-		: base(BCBLLMPAMLP.RuleRandom, node)
+		: base(RuleType.RuleRandom, node)
 	{
-		ALJIKCOCHCL = null;
+		selectedRule = null;
 		_noDoubles = false;
-		BJIBDCEMHCH = EOAOMBKFMPF.REFRESH_NONE;
+		refreshMode = RefreshMode.REFRESH_NONE;
 		Parse(node);
-		JNMJJPEBECE = new List<Rule>();
+		usedRules = new List<Rule>();
 	}
 
-	public void OIOJKNKDFJM()
+	public void SelectRandomRule()
 	{
 		List<Rule> list = new List<Rule>();
-		int num = ListSF.CCDKHLAMKKO().PINDEKDNCNL();
-		foreach (Rule item in FLPJJMJHBBK)
+		int num = ListSF.GetRoster().GetLevel();
+		foreach (Rule item in availableRules)
 		{
-			if (item.CHDEIEMINPF())
+			if (item.IsPlayerLevelInRange())
 			{
 				list.Add(item);
 			}
@@ -51,41 +51,41 @@ public class RandomRule : Rule
 		if (count > 0)
 		{
 			int index = NekkiMath.randomInt(count);
-			ALJIKCOCHCL = list[index];
+			selectedRule = list[index];
 			if (_noDoubles)
 			{
-				FLPJJMJHBBK.RemoveAt(index);
-				JNMJJPEBECE.Add(ALJIKCOCHCL);
+				availableRules.RemoveAt(index);
+				usedRules.Add(selectedRule);
 			}
 		}
-		else if (JNMJJPEBECE.Count > 0)
+		else if (usedRules.Count > 0)
 		{
-			GDDNBFMCEJO();
-			OIOJKNKDFJM();
+			ResetAvailableRules();
+			SelectRandomRule();
 		}
 		else
 		{
-			LLLOJBFMONN.Error("RandomRule::resetRandom ERROR - RandomRule is empty");
+			GameLog.Error("RandomRule::resetRandom ERROR - RandomRule is empty");
 		}
 	}
 
-	public void GDDNBFMCEJO()
+	public void ResetAvailableRules()
 	{
-		FLPJJMJHBBK.Clear();
-		FLPJJMJHBBK.AddRange(_rules);
-		JNMJJPEBECE.Clear();
-		ALJIKCOCHCL = null;
+		availableRules.Clear();
+		availableRules.AddRange(_rules);
+		usedRules.Clear();
+		selectedRule = null;
 	}
 
-	public Rule GHLEKCGJAEP()
+	public Rule GetSelectedRule()
 	{
-		return ALJIKCOCHCL;
+		return selectedRule;
 	}
 
 	public override void SetActive(bool value)
 	{
 		base.SetActive(value);
-		foreach (Rule item in FLPJJMJHBBK)
+		foreach (Rule item in availableRules)
 		{
 			item.SetActive(value);
 		}
@@ -93,50 +93,50 @@ public class RandomRule : Rule
 
 	public bool CheckReset(int round)
 	{
-		switch (BJIBDCEMHCH)
+		switch (refreshMode)
 		{
-		case EOAOMBKFMPF.REFRESH_EACH_ROUND:
+		case RefreshMode.REFRESH_EACH_ROUND:
 			return true;
-		case EOAOMBKFMPF.REFRESH_EACH_FIGHT:
+		case RefreshMode.REFRESH_EACH_FIGHT:
 			return round == 1;
 		default:
-			LLLOJBFMONN.Error("RandomRule::checkReset ERROR - invalid Refresh value");
+			GameLog.Error("RandomRule::checkReset ERROR - invalid Refresh value");
 			return false;
 		}
 	}
 
-	public EOAOMBKFMPF EPMBMBMNJIA()
+	public RefreshMode GetRefreshMode()
 	{
-		return BJIBDCEMHCH;
+		return refreshMode;
 	}
 
-	public List<Rule> BONNMLEJBJH()
+	public List<Rule> GetRules()
 	{
 		return _rules;
 	}
 
 	protected new void Parse(XmlNode node)
 	{
-		RuleParser.EEPPJEMHBCK(node, _rules);
-		FLPJJMJHBBK.Clear();
-		FLPJJMJHBBK.AddRange(_rules);
+		RuleParser.ParseRules(node, _rules);
+		availableRules.Clear();
+		availableRules.AddRange(_rules);
 		foreach (Rule item in _rules)
 		{
 			item.IsRandom = true;
 		}
 		_noDoubles = node.Attributes["NoDoubles"].ParseBool();
-		string text = node.Attributes["Refresh"].CIPOICEEIBK(string.Empty);
+		string text = node.Attributes["Refresh"].GetStringOrDefault(string.Empty);
 		if (text == "EachRound")
 		{
-			BJIBDCEMHCH = EOAOMBKFMPF.REFRESH_EACH_ROUND;
+			refreshMode = RefreshMode.REFRESH_EACH_ROUND;
 		}
 		else if (text == "EachFight")
 		{
-			BJIBDCEMHCH = EOAOMBKFMPF.REFRESH_EACH_FIGHT;
+			refreshMode = RefreshMode.REFRESH_EACH_FIGHT;
 		}
 		else
 		{
-			BJIBDCEMHCH = EOAOMBKFMPF.REFRESH_EACH_FIGHT;
+			refreshMode = RefreshMode.REFRESH_EACH_FIGHT;
 		}
 	}
 }

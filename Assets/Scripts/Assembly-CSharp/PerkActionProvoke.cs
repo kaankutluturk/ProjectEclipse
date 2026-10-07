@@ -4,13 +4,13 @@ using System.Xml;
 public class PerkActionProvoke : PerkAction
 {
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private string OOJBEPKKFEC;
+	private string _provokeTrigger;
 
-	public string FEDHCBGNJIM
+	public string ProvokeTrigger
 	{
 		get
 		{
-			return FFLBCPJJKEJ();
+			return GetProvokeTrigger();
 		}
 		protected set
 		{
@@ -25,23 +25,23 @@ public class PerkActionProvoke : PerkAction
 	public PerkActionProvoke(PerkActionProvoke NOLFMPDGCOC)
 		: base(NOLFMPDGCOC)
 	{
-		set_Trigger(NOLFMPDGCOC.FFLBCPJJKEJ());
+		set_Trigger(NOLFMPDGCOC.GetProvokeTrigger());
 	}
 
-	public string FFLBCPJJKEJ()
+	public string GetProvokeTrigger()
 	{
-		return OOJBEPKKFEC;
+		return _provokeTrigger;
 	}
 
 	protected void set_Trigger(string value)
 	{
-		OOJBEPKKFEC = value;
+		_provokeTrigger = value;
 	}
 
 	public override void Parse(XmlNode node)
 	{
 		base.Parse(node);
 		set_Type(ActionType.ACTION_PROVOKE);
-		set_Trigger(node.Attributes["Trigger"].CIPOICEEIBK(string.Empty));
+		set_Trigger(node.Attributes["Trigger"].GetStringOrDefault(string.Empty));
 	}
 }

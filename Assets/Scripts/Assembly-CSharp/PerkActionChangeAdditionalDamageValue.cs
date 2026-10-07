@@ -4,13 +4,13 @@ using System.Xml;
 public class PerkActionChangeAdditionalDamageValue : PerkActionModificator
 {
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private float FEAEEMLEBKI;
+	private float _additionalDamageValue;
 
-	public float OMKEMNJKFEO
+	public float AdditionalDamageAmount
 	{
 		get
 		{
-			return JKEKBCJHANF();
+			return GetAdditionalDamageValue();
 		}
 		protected set
 		{
@@ -26,17 +26,17 @@ public class PerkActionChangeAdditionalDamageValue : PerkActionModificator
 	public PerkActionChangeAdditionalDamageValue(PerkActionChangeAdditionalDamageValue NOLFMPDGCOC)
 		: base(NOLFMPDGCOC)
 	{
-		set_AdditionalDamageValue(NOLFMPDGCOC.JKEKBCJHANF());
+		set_AdditionalDamageValue(NOLFMPDGCOC.GetAdditionalDamageValue());
 	}
 
-	public float JKEKBCJHANF()
+	public float GetAdditionalDamageValue()
 	{
-		return FEAEEMLEBKI;
+		return _additionalDamageValue;
 	}
 
 	protected void set_AdditionalDamageValue(float value)
 	{
-		FEAEEMLEBKI = value;
+		_additionalDamageValue = value;
 	}
 
 	public override void Parse(XmlNode node)

@@ -11,9 +11,9 @@ public class FightList
 
 	protected BattleType _type;
 
-	protected RosterFight ECHMHCODAFA;
+	protected RosterFight rosterFight;
 
-	protected int DNKLOKMPMPL;
+	protected int powerRequired;
 
 	protected string _description = string.Empty;
 
@@ -27,21 +27,21 @@ public class FightList
 
 	public int Index = -1;
 
-	public int EJGGHHEOGPG;
+	public int ReplayCount;
 
 	public long RepeatTime;
 
 	// best guess for name
 	public bool TrackFightProgress;
 
-	private bool JPNHGEBCPAF;
+	private bool isInFight;
 
-	private bool AMCPPIOLKGC;
+	private bool randomRulesResetPending;
 
 	// best guess for name
 	public ConditionStatus Status;
 
-	public bool CNNCIENODGE;
+	public bool IsLocked;
 
 	// best guess for name
 	public int RoundsToWin;
@@ -57,17 +57,17 @@ public class FightList
 	// best guess for name
 	public int RewardIndex;
 
-	public ObscuredLong LDHOBIADNEC;
+	public ObscuredLong PrizeMoney;
 
-	public ObscuredLong JBNAJPPNGFB;
+	public ObscuredLong PrizeBonus;
 
 	public ObscuredUInt PrizeExp;
 
-	public string PPCNJPCPGGP = string.Empty;
+	public string AltImage = string.Empty;
 
-	public float MOPEDKMDLFA;
+	public float PrizeBase;
 
-	public float FANGNMDAINE;
+	public float EvaluatedRating;
 
 	// best guess for name
 	public float HealthRecovery;
@@ -75,37 +75,37 @@ public class FightList
 	// best guess for name
 	public string Music = string.Empty;
 
-	private List<ModelParameters> KCIGNIAJLBM = new List<ModelParameters>();
+	private List<ModelParameters> opponents = new List<ModelParameters>();
 
 	private List<ConditionFight> _conditions = new List<ConditionFight>();
 
-	private List<RewardStruct> BIKCEGKOBME = new List<RewardStruct>();
+	private List<RewardStruct> rewards = new List<RewardStruct>();
 
 	private List<ItemRule> _itemRules = new List<ItemRule>();
 
 	private List<RandomRule> _randomRules = new List<RandomRule>();
 
-	private DescriptionRule DGIJOJONCFO;
+	private DescriptionRule descriptionRule;
 
 	private List<Rule> _rules = new List<Rule>();
 
-	private List<Rule> IACOELKGMAA = new List<Rule>();
+	private List<Rule> eclipseRules = new List<Rule>();
 
-	private List<Rule> BLJOKCLPFGN = new List<Rule>();
+	private List<Rule> temporaryRules = new List<Rule>();
 
-	private List<Rule> FKDOPPMODKH = new List<Rule>();
+	private List<Rule> allRules = new List<Rule>();
 
-	public ushort ANHLAHFDDCE;
+	public ushort RewardDigits;
 
-	public ushort LPMDOHPIEOP;
+	public ushort PrizeBaseDigits;
 
-	public string JKCHHOMGGBN = string.Empty;
+	public string RewardImage = string.Empty;
 
-	public RosterFight MIENCCOKHCP
+	public RosterFight RosterFightInfo
 	{
 		get
 		{
-			return FLKFFDLLBKA();
+			return GetRosterFight();
 		}
 		set
 		{
@@ -113,11 +113,11 @@ public class FightList
 		}
 	}
 
-	public int PPLPFDOODPA
+	public int RequiredPower
 	{
 		get
 		{
-			return BFMMAFJFABG();
+			return GetPowerRequired();
 		}
 		set
 		{
@@ -125,11 +125,11 @@ public class FightList
 		}
 	}
 
-	public string MGNNJPBCOGD
+	public string FightDescription
 	{
 		get
 		{
-			return GJOAJAIJHOE();
+			return GetDescription();
 		}
 		set
 		{
@@ -137,11 +137,11 @@ public class FightList
 		}
 	}
 
-	public bool LMLBLFINMMC
+	public bool InFight
 	{
 		get
 		{
-			return DBAEHGILOCO();
+			return GetIsInFight();
 		}
 		set
 		{
@@ -149,43 +149,43 @@ public class FightList
 		}
 	}
 
-	public List<ModelParameters> KGNAIGHPJMA
+	public List<ModelParameters> Opponents
 	{
 		get
 		{
-			return OFKJMHPMCCD();
+			return GetOpponents();
 		}
 	}
 
-	public List<ConditionFight> JIFAHHGNPFH
+	public List<ConditionFight> Conditions
 	{
 		get
 		{
-			return KJILOMLMMEN();
+			return GetConditions();
 		}
 	}
 
-	public List<RewardStruct> MNKBCDFHGJD
+	public List<RewardStruct> Rewards
 	{
 		get
 		{
-			return APKPCGDBMEP();
+			return GetRewards();
 		}
 	}
 
-	public List<ItemRule> GPFPHKNJNNF
+	public List<ItemRule> ItemRules
 	{
 		get
 		{
-			return EHGIKANKJNJ();
+			return GetItemRules();
 		}
 	}
 
-	public List<RandomRule> MKCOEBKJGOF
+	public List<RandomRule> RandomRules
 	{
 		get
 		{
-			return CENNLFIPNLH();
+			return GetRandomRules();
 		}
 	}
 
@@ -199,34 +199,34 @@ public class FightList
 		_type = value;
 	}
 
-	public RosterFight FLKFFDLLBKA()
+	public RosterFight GetRosterFight()
 	{
-		return ECHMHCODAFA;
+		return rosterFight;
 	}
 
 	// best guess for name
 	public void SetRosterFight(RosterFight value)
 	{
-		ECHMHCODAFA = value;
-		ECHMHCODAFA.GAHNGDBKFNO = this;
+		rosterFight = value;
+		rosterFight.LinkedFightList = this;
 	}
 
-	public int BFMMAFJFABG()
+	public int GetPowerRequired()
 	{
-		return DNKLOKMPMPL;
+		return powerRequired;
 	}
 
 	public void set_PowerRequired(int value)
 	{
-		DNKLOKMPMPL = value;
+		powerRequired = value;
 	}
 
-	public string GJOAJAIJHOE()
+	public string GetDescription()
 	{
 		// Map previews request descriptions before fight initialization populates
         // the selected rule. Resolve the active rule for the preview as well.
-        DescriptionRule description = DGIJOJONCFO ?? IOMIAAJBPAA();
-        return description == null ? _description : description.MIDPFGENBCF();
+        DescriptionRule description = descriptionRule ?? FindDescriptionRule();
+        return description == null ? _description : description.GetDescriptionAlias();
 	}
 
 	public void set_Description(string value)
@@ -234,60 +234,60 @@ public class FightList
 		_description = value;
 	}
 
-	public bool DBAEHGILOCO()
+	public bool GetIsInFight()
 	{
-		return JPNHGEBCPAF;
+		return isInFight;
 	}
 
 	public void set_IsInFight(bool value)
 	{
-		JPNHGEBCPAF = value;
+		isInFight = value;
 	}
 
-	public List<ModelParameters> OFKJMHPMCCD()
+	public List<ModelParameters> GetOpponents()
 	{
-		return KCIGNIAJLBM;
+		return opponents;
 	}
 
-	public List<ConditionFight> KJILOMLMMEN()
+	public List<ConditionFight> GetConditions()
 	{
 		return _conditions;
 	}
 
-	public List<RewardStruct> APKPCGDBMEP()
+	public List<RewardStruct> GetRewards()
 	{
-		return BIKCEGKOBME;
+		return rewards;
 	}
 
-	public List<ItemRule> EHGIKANKJNJ()
+	public List<ItemRule> GetItemRules()
 	{
 		return _itemRules;
 	}
 
-	public List<RandomRule> CENNLFIPNLH()
+	public List<RandomRule> GetRandomRules()
 	{
 		return _randomRules;
 	}
 
 	public void RandomizeObscuredVars()
 	{
-		RoundTime.GMCADPGOCHM();
-		LDHOBIADNEC.GMCADPGOCHM();
-		JBNAJPPNGFB.GMCADPGOCHM();
-		PrizeExp.GMCADPGOCHM();
-		APKPCGDBMEP().ForEach((RewardStruct DHDMNHCIPEH) =>
+		RoundTime.RandomizeCryptoKey();
+		PrizeMoney.RandomizeCryptoKey();
+		PrizeBonus.RandomizeCryptoKey();
+		PrizeExp.RandomizeCryptoKey();
+		GetRewards().ForEach((RewardStruct DHDMNHCIPEH) =>
 		{
 			DHDMNHCIPEH.RandomizeObscuredVars();
 		});
-		OFKJMHPMCCD().ForEach((ModelParameters DHDMNHCIPEH) =>
+		GetOpponents().ForEach((ModelParameters DHDMNHCIPEH) =>
 		{
 			DHDMNHCIPEH.RandomizeObscuredVars();
 		});
 	}
 
-	public long HHJHCLBCEEA()
+	public long GetTimeLeft()
 	{
-		long num = RepeatTime - ECHMHCODAFA.CCCIFDLEMPI();
+		long num = RepeatTime - rosterFight.GetElapsedSinceCompletion();
 		if (num < 0)
 		{
 			num = 0L;
@@ -299,10 +299,10 @@ public class FightList
 	{
 		foreach (ItemRule item in _itemRules)
 		{
-			if (item.CHDEIEMINPF() && !item.KIGLIADCMHK())
+			if (item.IsPlayerLevelInRange() && !item.GetIsEquipRule())
 			{
 				UserItem dKCHDHMLKHN = item.get_Item();
-				if (dKCHDHMLKHN.BHKHOJPANHE().Type == LMNNBBKHMEI)
+				if (dKCHDHMLKHN.GetInfo().Type == LMNNBBKHMEI)
 				{
 					return dKCHDHMLKHN.get_Name();
 				}
@@ -311,28 +311,28 @@ public class FightList
 		return string.Empty;
 	}
 
-	public int EENGGKCGLEB(string LMNNBBKHMEI)
+	public int GetRuleItemLevel(string LMNNBBKHMEI)
 	{
 		foreach (ItemRule item in _itemRules)
 		{
-			if (item.CHDEIEMINPF() && !item.KIGLIADCMHK())
+			if (item.IsPlayerLevelInRange() && !item.GetIsEquipRule())
 			{
 				UserItem dKCHDHMLKHN = item.get_Item();
-				if (dKCHDHMLKHN.BHKHOJPANHE().Type == LMNNBBKHMEI)
+				if (dKCHDHMLKHN.GetInfo().Type == LMNNBBKHMEI)
 				{
-					return dKCHDHMLKHN.DHNNCAEEMLL();
+					return dKCHDHMLKHN.GetUpgradeLevel();
 				}
 			}
 		}
 		return 0;
 	}
 
-	public bool PCEPDPMOPKC()
+	public bool HasCurrencyCost()
 	{
-		List<CurrencyCostRule> list = LBGNOMEFLBA();
+		List<CurrencyCostRule> list = GetCurrencyCostRules();
 		foreach (CurrencyCostRule item in list)
 		{
-			if (item.JFDCHNBPPNH() != string.Empty && item.LHNHLANLHMN() > 0)
+			if (item.GetCurrencyName() != string.Empty && item.GetCurrencyValue() > 0)
 			{
 				return true;
 			}
@@ -340,88 +340,88 @@ public class FightList
 		return false;
 	}
 
-	public int BCGHJHJBCME(string currencyName)
+	public int GetCurrencyCost(string currencyName)
 	{
 		int num = 0;
-		List<CurrencyCostRule> list = LBGNOMEFLBA();
+		List<CurrencyCostRule> list = GetCurrencyCostRules();
 		foreach (CurrencyCostRule item in list)
 		{
-			if (item.JFDCHNBPPNH() == currencyName)
+			if (item.GetCurrencyName() == currencyName)
 			{
-				num += item.LHNHLANLHMN();
+				num += item.GetCurrencyValue();
 			}
 		}
 		return num;
 	}
 
-	public void KMPACCIOOLE(ModelParameters IHEFAMAFBIA, bool FFBFPLODJME, int round = 0)
+	public void EquipRuleItems(ModelParameters IHEFAMAFBIA, bool FFBFPLODJME, int round = 0)
 	{
-		Roster nKGLHEGIKKP = ListSF.CCDKHLAMKKO();
-		List<ItemRule> list = EHGIKANKJNJ();
+		Roster nKGLHEGIKKP = ListSF.GetRoster();
+		List<ItemRule> list = GetItemRules();
 		foreach (ItemRule item in list)
 		{
-			if (round > 0 && !item.HAKHBAOJBON(round) && !item.CHDEIEMINPF())
+			if (round > 0 && !item.AppliesToRound(round) && !item.IsPlayerLevelInRange())
 			{
 				continue;
 			}
 			UserItem dKCHDHMLKHN = item.get_Item();
-			ItemInfo dJKEECEOCJB = dKCHDHMLKHN.BHKHOJPANHE();
+			ItemInfo dJKEECEOCJB = dKCHDHMLKHN.GetInfo();
 			string text = dKCHDHMLKHN.get_Name();
 			if (text == string.Empty)
 			{
-				LLLOJBFMONN.Error("name for item is empty");
+				GameLog.Error("name for item is empty");
 			}
-			UserItem dKCHDHMLKHN2 = ListSF.CCDKHLAMKKO().KHCNHPCPFII().CMGOCLGHNLH(text);
+			UserItem dKCHDHMLKHN2 = ListSF.GetRoster().GetInventory().FindItem(text);
 			dJKEECEOCJB = null;
 			if (dKCHDHMLKHN2 == null)
 			{
 				dJKEECEOCJB = ListSF.GetItems().GetItemByName(text);
 				if (dJKEECEOCJB == null)
 				{
-					LLLOJBFMONN.Error(" Model::equipRulesItems - item not found \"%s\"", text);
+					GameLog.Error(" Model::equipRulesItems - item not found \"%s\"", text);
 					continue;
 				}
 			}
 			else
 			{
-				dJKEECEOCJB = dKCHDHMLKHN2.BHKHOJPANHE();
+				dJKEECEOCJB = dKCHDHMLKHN2.GetInfo();
 			}
-			if ((dJKEECEOCJB == null || !nKGLHEGIKKP.KHCNHPCPFII().MHMFKLLIFEJ(dJKEECEOCJB)) && !item.KIGLIADCMHK())
+			if ((dJKEECEOCJB == null || !nKGLHEGIKKP.GetInventory().HasItem(dJKEECEOCJB)) && !item.GetIsEquipRule())
 			{
 				dJKEECEOCJB = null;
 			}
-			if (dJKEECEOCJB != null && (!FFBFPLODJME || !item.DCFMEDKNIDI()))
+			if (dJKEECEOCJB != null && (!FFBFPLODJME || !item.GetNoAttributeChange()))
 			{
 				ItemInfo dJKEECEOCJB2 = dJKEECEOCJB.Clone();
 				dJKEECEOCJB2.IgnoreInventoryEnchantments = true;
-				IHEFAMAFBIA.OLLNIKFPMKE(dJKEECEOCJB.Type, dJKEECEOCJB2);
+				IHEFAMAFBIA.SetItemByType(dJKEECEOCJB.Type, dJKEECEOCJB2);
 			}
 		}
 	}
 
-	public RewardStruct OOOBLJIHBEP(int index)
+	public RewardStruct GetRewardAt(int index)
 	{
-		if (APKPCGDBMEP().Count > index)
+		if (GetRewards().Count > index)
 		{
-			return APKPCGDBMEP()[index];
+			return GetRewards()[index];
 		}
-		LLLOJBFMONN.Write("FightList::getReward - wrong index: " + index + " from " + APKPCGDBMEP().Count + " (we need this error?)");
+		GameLog.Write("FightList::getReward - wrong index: " + index + " from " + GetRewards().Count + " (we need this error?)");
 		return null;
 	}
 
-	public bool ECEFCOJPBPG()
+	public bool IsReplayAvailable()
 	{
-		return ECHMHCODAFA == null || ECHMHCODAFA.GHCHJIBBBOK(RepeatTime);
+		return rosterFight == null || rosterFight.IsRepeatAvailable(RepeatTime);
 	}
 
-	public void OJJLHLPLFKC(RewardStruct LGDIIADDFLH)
+	public void AddReward(RewardStruct LGDIIADDFLH)
 	{
-		BIKCEGKOBME.Add(LGDIIADDFLH);
+		rewards.Add(LGDIIADDFLH);
 	}
 
-	public List<Rule> BONNMLEJBJH()
+	public List<Rule> GetRules()
 	{
-		return (!ListSF.CCDKHLAMKKO().IsEclipseMode()) ? _rules : IACOELKGMAA;
+		return (!ListSF.GetRoster().IsEclipseMode()) ? _rules : eclipseRules;
 	}
 
 	public bool MeetsPlayerItemRequirements(ModelParameters parameters)
@@ -430,14 +430,14 @@ public class FightList
 		{
 			return true;
 		}
-		foreach (Rule rule in BONNMLEJBJH())
+		foreach (Rule rule in GetRules())
 		{
 			ItemRule itemRule = rule as ItemRule;
-			if (itemRule == null || !itemRule.IsEntryRequirement() || !rule.CHDEIEMINPF())
+			if (itemRule == null || !itemRule.IsEntryRequirement() || !rule.IsPlayerLevelInRange())
 			{
 				continue;
 			}
-			RuleAppliance appliance = itemRule.EDAKADCHOLE();
+			RuleAppliance appliance = itemRule.GetAppliance();
 			if ((appliance == RuleAppliance.AppliancePlayer || appliance == RuleAppliance.ApplianceAll) &&
 				!itemRule.IsSatisfiedBy(parameters))
 			{
@@ -447,88 +447,88 @@ public class FightList
 		return true;
 	}
 
-	public void FGPICFIPAGG()
+	public void CopyRulesToEclipseRules()
 	{
-		IACOELKGMAA = _rules;
+		eclipseRules = _rules;
 	}
 
 	public void SetTime(long time)
 	{
-		RosterFight pIGKOIFBOME = FLKFFDLLBKA();
+		RosterFight pIGKOIFBOME = GetRosterFight();
 		if (pIGKOIFBOME != null)
 		{
 			if (_type == BattleType.FightPeriodic)
 			{
-				pIGKOIFBOME.CLCBNOCDIPF(time);
-				CNIIKMBPIDG();
+				pIGKOIFBOME.UpdateElapsedSinceRandomize(time);
+				TriggerDuelUnlockedQuests();
 			}
-			pIGKOIFBOME.ABIELBGOLCA(time);
+			pIGKOIFBOME.UpdateElapsedSinceCompletion(time);
 		}
 	}
 
-	public int PNHLGCBPFIG()
+	public int GetTotalOpponentRounds()
 	{
 		int num = 0;
-		foreach (ModelParameters item in KCIGNIAJLBM)
+		foreach (ModelParameters item in opponents)
 		{
-			num += item.PEBKEBIBAFA;
+			num += item.OpponentCount;
 		}
 		return num;
 	}
 
-	public float LGGEHKEJJHO(ModelParameters ACENLMONNPA, ModelParameters HFGPAELCNMF)
+	public float CalculateDifficulty(ModelParameters ACENLMONNPA, ModelParameters HFGPAELCNMF)
 	{
 		float num = 0f;
 		float num2 = 0f;
 		float num3 = 0f;
-		RatingEvaluationRule hIFCIAHLLAE = NJCFKELLCCB();
+		RatingEvaluationRule hIFCIAHLLAE = GetRatingEvaluationRule();
 		if (hIFCIAHLLAE != null)
 		{
-			num = hIFCIAHLLAE.JLDBFIKOALE();
-			num2 = hIFCIAHLLAE.IJCNLEOEFAG();
-			num3 = hIFCIAHLLAE.FIOPALJIOEC();
+			num = hIFCIAHLLAE.GetPlayerRating();
+			num2 = hIFCIAHLLAE.GetEnemyRating();
+			num3 = hIFCIAHLLAE.GetRatingCorrection();
 		}
 		EquippedItemsStruct hELFDCAIJNE = new EquippedItemsStruct();
 		EquippedItemsStruct hELFDCAIJNE2 = new EquippedItemsStruct();
-		ACENLMONNPA.ALBOCOGOBCN(hELFDCAIJNE);
-		HFGPAELCNMF.ALBOCOGOBCN(hELFDCAIJNE2);
-		DEIOEPHPBGO(ACENLMONNPA);
-		DEIOEPHPBGO(HFGPAELCNMF);
-		List<global::Pair<string, float>> list = NGEICMPHDBG();
-		List<global::Pair<string, float>> list2 = DNACAMPFMKN();
+		ACENLMONNPA.CopyEquippedItemsTo(hELFDCAIJNE);
+		HFGPAELCNMF.CopyEquippedItemsTo(hELFDCAIJNE2);
+		ApplyRuleItems(ACENLMONNPA);
+		ApplyRuleItems(HFGPAELCNMF);
+		List<global::Pair<string, float>> list = GetPlayerAttributeModifiers();
+		List<global::Pair<string, float>> list2 = GetOpponentAttributeModifiers();
 		if (num == 0f)
 		{
-			num = HFGPAELCNMF.PMHIIOJPDLO();
+			num = HFGPAELCNMF.GetPlayerRating();
 		}
 		if (num < 0f)
 		{
-			num = ACENLMONNPA.DJOIGHCCMJG(HFGPAELCNMF, list);
+			num = ACENLMONNPA.CalculateDamageRating(HFGPAELCNMF, list);
 		}
 		if (num2 == 0f)
 		{
-			num2 = HFGPAELCNMF.CEKIBEJELBM();
+			num2 = HFGPAELCNMF.GetEnemyRating();
 		}
 		if (num2 < 0f)
 		{
-			num2 = HFGPAELCNMF.DJOIGHCCMJG(ACENLMONNPA, list2);
+			num2 = HFGPAELCNMF.CalculateDamageRating(ACENLMONNPA, list2);
 		}
-		float num4 = GameUtils.MGPIOCMLCLF();
-		string kGBGENDIMBC = GameUtils.CJMOJMKCLMJ();
+		float num4 = GameUtils.GetDamageFactorBase();
+		string kGBGENDIMBC = GameUtils.GetDamageFactorAttribute();
 		int OEMALIFPGPO = 0;
 		int OEMALIFPGPO2 = 0;
 		ModelParameters kIKOGDEPGHB = HFGPAELCNMF.Clone();
 		ModelParameters kIKOGDEPGHB2 = ACENLMONNPA.Clone();
-		kIKOGDEPGHB.GPOIKJNPDIO(list2);
-		kIKOGDEPGHB2.GPOIKJNPDIO(list);
-		kIKOGDEPGHB.IBLHIAHECLK.Get(kGBGENDIMBC, ref OEMALIFPGPO);
-		kIKOGDEPGHB2.IBLHIAHECLK.Get(kGBGENDIMBC, ref OEMALIFPGPO2);
+		kIKOGDEPGHB.AddAttributeShifts(list2);
+		kIKOGDEPGHB2.AddAttributeShifts(list);
+		kIKOGDEPGHB.FinalAttributes.Get(kGBGENDIMBC, ref OEMALIFPGPO);
+		kIKOGDEPGHB2.FinalAttributes.Get(kGBGENDIMBC, ref OEMALIFPGPO2);
 		float num5 = 1f;
 		float num6 = 1f;
-		List<Rule> list3 = BONNMLEJBJH();
+		List<Rule> list3 = GetRules();
 		List<InFightRule> list4 = new List<InFightRule>();
 		foreach (Rule item in list3)
 		{
-			if (item.get_Type() == Rule.BCBLLMPAMLP.RuleResistance)
+			if (item.get_Type() == Rule.RuleType.RuleResistance)
 			{
 				InFightRule aAJIFBJLJOA = item as InFightRule;
 				if (aAJIFBJLJOA != null)
@@ -542,136 +542,136 @@ public class FightList
 			ResistanceRule hCOHJNFLKIF = item2 as ResistanceRule;
 			if (hCOHJNFLKIF != null)
 			{
-				string gOHIIMFFFJI = hCOHJNFLKIF.DJBFLJAIKLI();
-				int num7 = hCOHJNFLKIF.GLBEGDFMDBO();
-				int num8 = ListSF.CCDKHLAMKKO().IJCGBPDAAJF(gOHIIMFFFJI);
+				string gOHIIMFFFJI = hCOHJNFLKIF.GetResistanceName();
+				int num7 = hCOHJNFLKIF.GetResistanceValue();
+				int num8 = ListSF.GetRoster().GetResistanceCount(gOHIIMFFFJI);
 				if (num8 < num7)
 				{
-					float num9 = Mathf.Pow(2f, (float)(num7 - num8) / GameUtils.CHOGPMPEDIC());
-					float num10 = Mathf.Pow(2f, (float)(num8 - num7) / GameUtils.CHOGPMPEDIC());
+					float num9 = Mathf.Pow(2f, (float)(num7 - num8) / GameUtils.GetResistanceDoublingRange());
+					float num10 = Mathf.Pow(2f, (float)(num8 - num7) / GameUtils.GetResistanceDoublingRange());
 					num6 *= num9;
 					num5 *= num10;
 				}
 			}
 		}
 		float num11 = num2 / num * Mathf.Pow(2f, (float)(OEMALIFPGPO - OEMALIFPGPO2) * num4) * num6 / num5;
-		float num12 = (float)HFGPAELCNMF.ALCFNGIKCCB + num3;
-		num11 *= Mathf.Pow(2f, 2f * num12 / GameUtils.BGJPLNFFEOB);
-		ACENLMONNPA.ALGDEEKFPKK(hELFDCAIJNE);
-		HFGPAELCNMF.ALGDEEKFPKK(hELFDCAIJNE2);
+		float num12 = (float)HFGPAELCNMF.RatingCorrection + num3;
+		num11 *= Mathf.Pow(2f, 2f * num12 / GameUtils.DamageDoublingRange);
+		ACENLMONNPA.SetEquippedItemsFrom(hELFDCAIJNE);
+		HFGPAELCNMF.SetEquippedItemsFrom(hELFDCAIJNE2);
 		return num11;
 	}
 
-	public float MPNBGBIMEIP(ModelParameters ACENLMONNPA, List<ModelParameters> IDAAONBIBJM)
+	public float CalculateDifficultyVsLastOpponent(ModelParameters ACENLMONNPA, List<ModelParameters> IDAAONBIBJM)
 	{
 		float result = 0f;
 		int count = IDAAONBIBJM.Count;
 		if (0 < count)
 		{
 			ModelParameters hFGPAELCNMF = IDAAONBIBJM[count - 1];
-			result = LGGEHKEJJHO(ACENLMONNPA, hFGPAELCNMF);
+			result = CalculateDifficulty(ACENLMONNPA, hFGPAELCNMF);
 		}
 		else
 		{
-			LLLOJBFMONN.Error("enemy less than 1");
+			GameLog.Error("enemy less than 1");
 		}
 		return result;
 	}
 
-	public bool CBJOENICLAF()
+	public bool HasMultipleOpponentsAndRounds()
 	{
-		return OFKJMHPMCCD().Count > 1 && RoundsToWin > 1;
+		return GetOpponents().Count > 1 && RoundsToWin > 1;
 	}
 
 	public void PutRule(Rule HNBFMAKFJAM)
 	{
 		switch (HNBFMAKFJAM.get_Type())
 		{
-		case Rule.BCBLLMPAMLP.RuleItem:
-		case Rule.BCBLLMPAMLP.RuleEquipItem:
-		case Rule.BCBLLMPAMLP.RuleRandomAquiredItem:
+		case Rule.RuleType.RuleItem:
+		case Rule.RuleType.RuleEquipItem:
+		case Rule.RuleType.RuleRandomAquiredItem:
 			_itemRules.AddIfNotExist((ItemRule)HNBFMAKFJAM);
 			break;
-		case Rule.BCBLLMPAMLP.RuleRandom:
+		case Rule.RuleType.RuleRandom:
 			_randomRules.AddIfNotExist((RandomRule)HNBFMAKFJAM);
 			break;
-		case Rule.BCBLLMPAMLP.RuleComplex:
-			GEIHPJNNDGG((ComplexRule)HNBFMAKFJAM);
+		case Rule.RuleType.RuleComplex:
+			CollectNestedRandomRules((ComplexRule)HNBFMAKFJAM);
 			break;
 		default:
-			LLLOJBFMONN.Error("FightList::putRule ERROR - wrong rule type %i. Rule not added to fight.", HNBFMAKFJAM.get_Type());
+			GameLog.Error("FightList::putRule ERROR - wrong rule type %i. Rule not added to fight.", HNBFMAKFJAM.get_Type());
 			return;
-		case Rule.BCBLLMPAMLP.RuleNoButton:
-		case Rule.BCBLLMPAMLP.RuleNoAnimation:
-		case Rule.BCBLLMPAMLP.RuleRingout:
-		case Rule.BCBLLMPAMLP.RuleDarkness:
-		case Rule.BCBLLMPAMLP.RuleLightInTheDarkness:
-		case Rule.BCBLLMPAMLP.RuleHotGround:
-		case Rule.BCBLLMPAMLP.RuleLoseFall:
-		case Rule.BCBLLMPAMLP.RuleRegeneration:
-		case Rule.BCBLLMPAMLP.RuleAttributes:
-		case Rule.BCBLLMPAMLP.RuleDamageFactor:
-		case Rule.BCBLLMPAMLP.RuleRemoveInterval:
-		case Rule.BCBLLMPAMLP.RuleCrazy:
-		case Rule.BCBLLMPAMLP.RuleLifeSteal:
-		case Rule.BCBLLMPAMLP.RuleNoHealthBar:
-		case Rule.BCBLLMPAMLP.RuleCombo:
-		case Rule.BCBLLMPAMLP.RuleTimeoutWin:
-		case Rule.BCBLLMPAMLP.RulePoints:
-		case Rule.BCBLLMPAMLP.RuleRechargeMagicEachRound:
-		case Rule.BCBLLMPAMLP.RuleNoBulletsReplenishment:
-		case Rule.BCBLLMPAMLP.RuleDescription:
-		case Rule.BCBLLMPAMLP.RulePerk:
-		case Rule.BCBLLMPAMLP.RuleNoPerks:
-		case Rule.BCBLLMPAMLP.RuleWinStyle:
-		case Rule.BCBLLMPAMLP.RuleWinCombo:
-		case Rule.BCBLLMPAMLP.RuleWinShock:
-		case Rule.BCBLLMPAMLP.RuleChangeFight:
-		case Rule.BCBLLMPAMLP.RuleTactic:
-		case Rule.BCBLLMPAMLP.RuleInvertJoystick:
-		case Rule.BCBLLMPAMLP.RuleRandomArea:
-		case Rule.BCBLLMPAMLP.RuleRatingEvaluation:
-		case Rule.BCBLLMPAMLP.RuleInvulnerability:
-		case Rule.BCBLLMPAMLP.RuleCurrencyCost:
-		case Rule.BCBLLMPAMLP.RuleResistance:
-		case Rule.BCBLLMPAMLP.RuleRaidCurrencyCost:
-		case Rule.BCBLLMPAMLP.RuleAvatar:
-		case Rule.BCBLLMPAMLP.RuleName:
+		case Rule.RuleType.RuleNoButton:
+		case Rule.RuleType.RuleNoAnimation:
+		case Rule.RuleType.RuleRingout:
+		case Rule.RuleType.RuleDarkness:
+		case Rule.RuleType.RuleLightInTheDarkness:
+		case Rule.RuleType.RuleHotGround:
+		case Rule.RuleType.RuleLoseFall:
+		case Rule.RuleType.RuleRegeneration:
+		case Rule.RuleType.RuleAttributes:
+		case Rule.RuleType.RuleDamageFactor:
+		case Rule.RuleType.RuleRemoveInterval:
+		case Rule.RuleType.RuleCrazy:
+		case Rule.RuleType.RuleLifeSteal:
+		case Rule.RuleType.RuleNoHealthBar:
+		case Rule.RuleType.RuleCombo:
+		case Rule.RuleType.RuleTimeoutWin:
+		case Rule.RuleType.RulePoints:
+		case Rule.RuleType.RuleRechargeMagicEachRound:
+		case Rule.RuleType.RuleNoBulletsReplenishment:
+		case Rule.RuleType.RuleDescription:
+		case Rule.RuleType.RulePerk:
+		case Rule.RuleType.RuleNoPerks:
+		case Rule.RuleType.RuleWinStyle:
+		case Rule.RuleType.RuleWinCombo:
+		case Rule.RuleType.RuleWinShock:
+		case Rule.RuleType.RuleChangeFight:
+		case Rule.RuleType.RuleTactic:
+		case Rule.RuleType.RuleInvertJoystick:
+		case Rule.RuleType.RuleRandomArea:
+		case Rule.RuleType.RuleRatingEvaluation:
+		case Rule.RuleType.RuleInvulnerability:
+		case Rule.RuleType.RuleCurrencyCost:
+		case Rule.RuleType.RuleResistance:
+		case Rule.RuleType.RuleRaidCurrencyCost:
+		case Rule.RuleType.RuleAvatar:
+		case Rule.RuleType.RuleName:
 			break;
 		}
-		switch (HNBFMAKFJAM.PGOPBNMFAAG)
+		switch (HNBFMAKFJAM.ModeFilter)
 		{
-		case Rule.DIMPPDKCBLE.MODE_ECLIPSE:
-			IACOELKGMAA.AddIfNotExist(HNBFMAKFJAM);
+		case Rule.RuleModeFilter.MODE_ECLIPSE:
+			eclipseRules.AddIfNotExist(HNBFMAKFJAM);
 			break;
-		case Rule.DIMPPDKCBLE.MODE_NORMAL:
+		case Rule.RuleModeFilter.MODE_NORMAL:
 			_rules.AddIfNotExist(HNBFMAKFJAM);
 			break;
 		default:
-			IACOELKGMAA.AddIfNotExist(HNBFMAKFJAM);
+			eclipseRules.AddIfNotExist(HNBFMAKFJAM);
 			_rules.AddIfNotExist(HNBFMAKFJAM);
 			break;
 		}
-		FKDOPPMODKH.AddIfNotExist(HNBFMAKFJAM);
+		allRules.AddIfNotExist(HNBFMAKFJAM);
 	}
 
 	// best guess for name
 	public void AddOpponent(ModelParameters AIIALIFJJMB)
 	{
-		KCIGNIAJLBM.AddIfNotExist(AIIALIFJJMB);
+		opponents.AddIfNotExist(AIIALIFJJMB);
 	}
 
-	public void KNIBCMJBDBP(Rule HNBFMAKFJAM)
+	public void PutTemporaryRule(Rule HNBFMAKFJAM)
 	{
-		BLJOKCLPFGN.AddIfNotExist(HNBFMAKFJAM);
+		temporaryRules.AddIfNotExist(HNBFMAKFJAM);
 		PutRule(HNBFMAKFJAM);
 	}
 
-	public void CNIIKMBPIDG()
+	public void TriggerDuelUnlockedQuests()
 	{
-		if (ECHMHCODAFA.AANKNHJKJII(RepeatTime) && !ECEFCOJPBPG() && ListSF.GetInstance().FFBAJNGHGGD(QuestEvent.PMDPDMFLCIJ.QUEST_EVENT_DUEL_UNLOCKED))
+		if (rosterFight.RerandomizeIfElapsed(RepeatTime) && !IsReplayAvailable() && ListSF.GetInstance().RaiseQuestEvent(QuestEvent.QuestEventType.QUEST_EVENT_DUEL_UNLOCKED))
 		{
-			ListSF.GetInstance().MHHNIPBJNAD();
+			ListSF.GetInstance().RunQuestActions();
 		}
 	}
 
@@ -681,27 +681,27 @@ public class FightList
 		{
 			return;
 		}
-		if (JPNHGEBCPAF)
+		if (isInFight)
 		{
-			AMCPPIOLKGC = true;
+			randomRulesResetPending = true;
 			return;
 		}
-		NekkiMath.KACCBCCEPGB(ECHMHCODAFA.BKDOAOCGJLJ());
+		NekkiMath.SetSeed(rosterFight.GetRandomRuleSeed());
 		foreach (RandomRule item in _randomRules)
 		{
-			if (item.EPMBMBMNJIA() == RandomRule.EOAOMBKFMPF.REFRESH_EACH_FIGHT)
+			if (item.GetRefreshMode() == RandomRule.RefreshMode.REFRESH_EACH_FIGHT)
 			{
-				item.OIOJKNKDFJM();
+				item.SelectRandomRule();
 			}
 		}
-		NekkiMath.KACCBCCEPGB();
-		GJFPAFPEPLK();
-		AMCPPIOLKGC = false;
+		NekkiMath.SetSeed();
+		RefreshDescriptionRule();
+		randomRulesResetPending = false;
 	}
 
-	public void JENGHOJIOFK()
+	public void ApplyPendingRandomReset()
 	{
-		if (AMCPPIOLKGC)
+		if (randomRulesResetPending)
 		{
 			ResetRandomRules();
 		}
@@ -709,58 +709,58 @@ public class FightList
 
 	public void UpdateLevel(int PPGFCLBFLEK)
 	{
-		int count = BIKCEGKOBME.Count;
+		int count = rewards.Count;
 		if (count > 0)
 		{
-			RewardStruct fDFKLPHBAHJ = BIKCEGKOBME[count - 1];
-			RewardPrize cMHHEHILIIH = fDFKLPHBAHJ.KOBOIFJNPMO(PPGFCLBFLEK);
+			RewardStruct fDFKLPHBAHJ = rewards[count - 1];
+			RewardPrize cMHHEHILIIH = fDFKLPHBAHJ.GetPrizeForLevel(PPGFCLBFLEK);
 			PrizeExp = cMHHEHILIIH.exp;
-			LDHOBIADNEC = cMHHEHILIIH.GBGNFPNCGED;
-			JBNAJPPNGFB = cMHHEHILIIH.PNDAIFALIKF;
+			PrizeMoney = cMHHEHILIIH.money;
+			PrizeBonus = cMHHEHILIIH.bonus;
 		}
 		else
 		{
 			PrizeExp = (ObscuredUInt)(0u);
-			LDHOBIADNEC = (ObscuredLong)(0L);
-			JBNAJPPNGFB = (ObscuredLong)(0L);
+			PrizeMoney = (ObscuredLong)(0L);
+			PrizeBonus = (ObscuredLong)(0L);
 		}
 	}
 
-	public void IJCMEOONKND()
+	public void RemoveTemporaryRules()
 	{
-		foreach (Rule item in BLJOKCLPFGN)
+		foreach (Rule item in temporaryRules)
 		{
-			FKDOPPMODKH.Remove(item);
+			allRules.Remove(item);
 			switch (item.get_Type())
 			{
-			case Rule.BCBLLMPAMLP.RuleItem:
-			case Rule.BCBLLMPAMLP.RuleEquipItem:
-			case Rule.BCBLLMPAMLP.RuleRandomAquiredItem:
+			case Rule.RuleType.RuleItem:
+			case Rule.RuleType.RuleEquipItem:
+			case Rule.RuleType.RuleRandomAquiredItem:
 				_itemRules.Remove((ItemRule)item);
 				break;
-			case Rule.BCBLLMPAMLP.RuleRandom:
+			case Rule.RuleType.RuleRandom:
 				_randomRules.Remove((RandomRule)item);
 				break;
 			}
 			_rules.Remove(item);
-			IACOELKGMAA.Remove(item);
+			eclipseRules.Remove(item);
 		}
-		BLJOKCLPFGN.Clear();
+		temporaryRules.Clear();
 	}
 
-	public void GJFPAFPEPLK()
+	public void RefreshDescriptionRule()
 	{
-		DGIJOJONCFO = IOMIAAJBPAA();
-		AEHLMKODMBJ();
+		descriptionRule = FindDescriptionRule();
+		NotifyRulesChanged();
 	}
 
-	public virtual List<CurrencyCostRule> LBGNOMEFLBA()
+	public virtual List<CurrencyCostRule> GetCurrencyCostRules()
 	{
 		List<CurrencyCostRule> list = new List<CurrencyCostRule>();
-		List<Rule> list2 = BONNMLEJBJH();
+		List<Rule> list2 = GetRules();
 		foreach (Rule item2 in list2)
 		{
-			if (item2.get_Type() == Rule.BCBLLMPAMLP.RuleCurrencyCost)
+			if (item2.get_Type() == Rule.RuleType.RuleCurrencyCost)
 			{
 				CurrencyCostRule item = (CurrencyCostRule)item2;
 				list.Add(item);
@@ -769,26 +769,26 @@ public class FightList
 		return list;
 	}
 
-	private DescriptionRule IOMIAAJBPAA(Rule HNBFMAKFJAM)
+	private DescriptionRule FindDescriptionRule(Rule HNBFMAKFJAM)
 	{
 		switch (HNBFMAKFJAM.get_Type())
 		{
-		case Rule.BCBLLMPAMLP.RuleDescription:
+		case Rule.RuleType.RuleDescription:
 			return (DescriptionRule)HNBFMAKFJAM;
-		case Rule.BCBLLMPAMLP.RuleRandom:
+		case Rule.RuleType.RuleRandom:
 		{
 			// A map preview can run before the fight rolls its random rule; nothing is picked yet.
-			Rule selected = ((RandomRule)HNBFMAKFJAM).GHLEKCGJAEP();
-			return selected == null ? null : IOMIAAJBPAA(selected);
+			Rule selected = ((RandomRule)HNBFMAKFJAM).GetSelectedRule();
+			return selected == null ? null : FindDescriptionRule(selected);
 		}
-		case Rule.BCBLLMPAMLP.RuleComplex:
+		case Rule.RuleType.RuleComplex:
 		{
 			DescriptionRule result = null;
-			List<Rule> list = ((ComplexRule)HNBFMAKFJAM).BONNMLEJBJH();
+			List<Rule> list = ((ComplexRule)HNBFMAKFJAM).GetRules();
 			{
 				foreach (Rule item in list)
 				{
-					DescriptionRule gNBDNDOBLDO = IOMIAAJBPAA(item);
+					DescriptionRule gNBDNDOBLDO = FindDescriptionRule(item);
 					if (gNBDNDOBLDO != null)
 					{
 						result = gNBDNDOBLDO;
@@ -802,15 +802,15 @@ public class FightList
 		}
 	}
 
-	private DescriptionRule IOMIAAJBPAA()
+	private DescriptionRule FindDescriptionRule()
 	{
 		DescriptionRule result = null;
-		List<Rule> list = BONNMLEJBJH();
+		List<Rule> list = GetRules();
 		foreach (Rule item in list)
 		{
-			if (item.CHDEIEMINPF())
+			if (item.IsPlayerLevelInRange())
 			{
-				DescriptionRule gNBDNDOBLDO = IOMIAAJBPAA(item);
+				DescriptionRule gNBDNDOBLDO = FindDescriptionRule(item);
 				if (gNBDNDOBLDO != null)
 				{
 					result = gNBDNDOBLDO;
@@ -820,32 +820,32 @@ public class FightList
 		return result;
 	}
 
-	private void GEIHPJNNDGG(ComplexRule FPMPFCGEBKE)
+	private void CollectNestedRandomRules(ComplexRule FPMPFCGEBKE)
 	{
-		foreach (Rule item in FPMPFCGEBKE.BONNMLEJBJH())
+		foreach (Rule item in FPMPFCGEBKE.GetRules())
 		{
-			if (item.get_Type() == Rule.BCBLLMPAMLP.RuleRandom)
+			if (item.get_Type() == Rule.RuleType.RuleRandom)
 			{
 				_randomRules.AddIfNotExist((RandomRule)item);
 			}
-			if (item.get_Type() == Rule.BCBLLMPAMLP.RuleComplex)
+			if (item.get_Type() == Rule.RuleType.RuleComplex)
 			{
-				GEIHPJNNDGG((ComplexRule)item);
+				CollectNestedRandomRules((ComplexRule)item);
 			}
 		}
 	}
 
-	private void AEHLMKODMBJ()
+	private void NotifyRulesChanged()
 	{
-		ListSF.GetInstance().KBCBLOMDKCA(this);
+		ListSF.GetInstance().OnFightSelected(this);
 	}
 
-	private RatingEvaluationRule NJCFKELLCCB()
+	private RatingEvaluationRule GetRatingEvaluationRule()
 	{
-		List<Rule> list = BONNMLEJBJH();
+		List<Rule> list = GetRules();
 		foreach (Rule item in list)
 		{
-			if (item.get_Type() == Rule.BCBLLMPAMLP.RuleRatingEvaluation)
+			if (item.get_Type() == Rule.RuleType.RuleRatingEvaluation)
 			{
 				return (RatingEvaluationRule)item;
 			}
@@ -853,31 +853,31 @@ public class FightList
 		return null;
 	}
 
-	private List<global::Pair<string, float>> NGEICMPHDBG()
+	private List<global::Pair<string, float>> GetPlayerAttributeModifiers()
 	{
-		return EHFAACGDJEP(RuleAppliance.AppliancePlayer);
+		return GetAttributeModifiers(RuleAppliance.AppliancePlayer);
 	}
 
-	private List<global::Pair<string, float>> DNACAMPFMKN()
+	private List<global::Pair<string, float>> GetOpponentAttributeModifiers()
 	{
-		return EHFAACGDJEP(RuleAppliance.ApplianceOpponent);
+		return GetAttributeModifiers(RuleAppliance.ApplianceOpponent);
 	}
 
-	private List<global::Pair<string, float>> EHFAACGDJEP(RuleAppliance IGFNCCEHFEK)
+	private List<global::Pair<string, float>> GetAttributeModifiers(RuleAppliance IGFNCCEHFEK)
 	{
 		List<global::Pair<string, float>> list = new List<global::Pair<string, float>>();
-		List<Rule> list2 = BONNMLEJBJH();
+		List<Rule> list2 = GetRules();
 		foreach (Rule item in list2)
 		{
-			if (item.get_Type() != Rule.BCBLLMPAMLP.RuleAttributes)
+			if (item.get_Type() != Rule.RuleType.RuleAttributes)
 			{
 				continue;
 			}
 			AttributesRule bGIGBBHDIDB = (AttributesRule)item;
-			Dictionary<string, float> dictionary = bGIGBBHDIDB.MAKMDLMJNPO();
+			Dictionary<string, float> dictionary = bGIGBBHDIDB.GetAttributeValues();
 			foreach (KeyValuePair<string, float> item2 in dictionary)
 			{
-				if (bGIGBBHDIDB.EDAKADCHOLE() == IGFNCCEHFEK || bGIGBBHDIDB.EDAKADCHOLE() == RuleAppliance.ApplianceAll)
+				if (bGIGBBHDIDB.GetAppliance() == IGFNCCEHFEK || bGIGBBHDIDB.GetAppliance() == RuleAppliance.ApplianceAll)
 				{
 					if (!item2.Key.Contains("Defense"))
 					{
@@ -893,27 +893,27 @@ public class FightList
 		return list;
 	}
 
-	private void DEIOEPHPBGO(ModelParameters IHEFAMAFBIA)
+	private void ApplyRuleItems(ModelParameters IHEFAMAFBIA)
 	{
 		RuleAppliance iGFNCCEHFEK = (IHEFAMAFBIA.IsPlayer ? RuleAppliance.AppliancePlayer : RuleAppliance.ApplianceOpponent);
-		List<ItemRule> list = NEFPHIJEMLM(iGFNCCEHFEK);
+		List<ItemRule> list = GetItemRulesFor(iGFNCCEHFEK);
 		foreach (RandomRule item in _randomRules)
 		{
-			Rule gKAJMMNJBGA = item.GHLEKCGJAEP();
+			Rule gKAJMMNJBGA = item.GetSelectedRule();
 			if (gKAJMMNJBGA != null)
 			{
-				OGMJKBDKLMP(gKAJMMNJBGA, list);
+				CollectItemRules(gKAJMMNJBGA, list);
 			}
 		}
-		IHEFAMAFBIA.KMPACCIOOLE(list, false);
+		IHEFAMAFBIA.SetItemsFromRules(list, false);
 	}
 
-	private List<ItemRule> NEFPHIJEMLM(RuleAppliance IGFNCCEHFEK)
+	private List<ItemRule> GetItemRulesFor(RuleAppliance IGFNCCEHFEK)
 	{
 		List<ItemRule> list = new List<ItemRule>();
 		foreach (ItemRule item in _itemRules)
 		{
-			if (item.EDAKADCHOLE() == IGFNCCEHFEK || item.EDAKADCHOLE() == RuleAppliance.ApplianceAll)
+			if (item.GetAppliance() == IGFNCCEHFEK || item.GetAppliance() == RuleAppliance.ApplianceAll)
 			{
 				list.Add(item);
 			}
@@ -921,30 +921,30 @@ public class FightList
 		return list;
 	}
 
-	private void OGMJKBDKLMP(Rule HNBFMAKFJAM, List<ItemRule> OEMALIFPGPO)
+	private void CollectItemRules(Rule HNBFMAKFJAM, List<ItemRule> OEMALIFPGPO)
 	{
 		switch (HNBFMAKFJAM.get_Type())
 		{
-		case Rule.BCBLLMPAMLP.RuleRandom:
+		case Rule.RuleType.RuleRandom:
 		{
 			RandomRule lEAKKGFJBLL = (RandomRule)HNBFMAKFJAM;
-			OGMJKBDKLMP(lEAKKGFJBLL.GHLEKCGJAEP(), OEMALIFPGPO);
+			CollectItemRules(lEAKKGFJBLL.GetSelectedRule(), OEMALIFPGPO);
 			break;
 		}
-		case Rule.BCBLLMPAMLP.RuleComplex:
+		case Rule.RuleType.RuleComplex:
 		{
 			ComplexRule cDFLHDCCMMN = (ComplexRule)HNBFMAKFJAM;
 			{
-				foreach (Rule item in cDFLHDCCMMN.BONNMLEJBJH())
+				foreach (Rule item in cDFLHDCCMMN.GetRules())
 				{
-					OGMJKBDKLMP(item, OEMALIFPGPO);
+					CollectItemRules(item, OEMALIFPGPO);
 				}
 				break;
 			}
 		}
-		case Rule.BCBLLMPAMLP.RuleItem:
-		case Rule.BCBLLMPAMLP.RuleEquipItem:
-		case Rule.BCBLLMPAMLP.RuleRandomAquiredItem:
+		case Rule.RuleType.RuleItem:
+		case Rule.RuleType.RuleEquipItem:
+		case Rule.RuleType.RuleRandomAquiredItem:
 			OEMALIFPGPO.Add((ItemRule)HNBFMAKFJAM);
 			break;
 		}

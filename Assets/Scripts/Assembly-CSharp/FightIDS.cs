@@ -1,34 +1,34 @@
 public class FightIDS
 {
-	private string NHIIEPAGPPA;
+	private string zone;
 
-	private string NAMJEBLOKNM;
+	private string battle;
 
-	private string JEAHLOHOAAF;
+	private string fightIdRaw;
 
-	private string PJOMDOEMFFB;
+	private string fullId;
 
-	public string GEIAEIKDLMP
+	public string Zone
 	{
 		get
 		{
-			return PELHCAEAOFE();
+			return GetZone();
 		}
 	}
 
-	public string AMHIKINPPFN
+	public string Battle
 	{
 		get
 		{
-			return CPHDPCAECJN();
+			return GetBattle();
 		}
 	}
 
-	public string FECNKMAHIOO
+	public string FightIdentifier
 	{
 		get
 		{
-			return EJPNIFANKDG();
+			return GetFight();
 		}
 	}
 
@@ -52,29 +52,29 @@ public class FightIDS
 		SetFightIDSByZBF(HLJKOKMKMLM, DPOOIONCEOA, fight);
 	}
 
-	public string PELHCAEAOFE()
+	public string GetZone()
 	{
-		return NHIIEPAGPPA;
+		return zone;
 	}
 
-	public string CPHDPCAECJN()
+	public string GetBattle()
 	{
-		return NAMJEBLOKNM;
+		return battle;
 	}
 
-	public string EJPNIFANKDG()
+	public string GetFight()
 	{
-		return JEAHLOHOAAF;
+		return fightIdRaw;
 	}
 
 	public override string ToString()
 	{
-		return PJOMDOEMFFB;
+		return fullId;
 	}
 
-	public string OOBHBGJIBGP()
+	public string GetZoneBattle()
 	{
-		return NHIIEPAGPPA + '|' + NAMJEBLOKNM;
+		return zone + '|' + battle;
 	}
 
 	public void SetFightIDSByString(string value)
@@ -83,19 +83,19 @@ public class FightIDS
 		{
 			string[] array = value.Split('|');
 			int num = array.Length;
-			NHIIEPAGPPA = ((num <= 0) ? string.Empty : array[0]);
-			NAMJEBLOKNM = ((num <= 1) ? string.Empty : array[1]);
-			JEAHLOHOAAF = ((num <= 2) ? string.Empty : array[2]);
-			KNEGDCJNEED();
+			zone = ((num <= 0) ? string.Empty : array[0]);
+			battle = ((num <= 1) ? string.Empty : array[1]);
+			fightIdRaw = ((num <= 2) ? string.Empty : array[2]);
+			UpdateFullId();
 		}
 	}
 
 	public void SetFightIDSByZBF(string HLJKOKMKMLM, string DPOOIONCEOA, string fight)
 	{
-		NHIIEPAGPPA = ((HLJKOKMKMLM == null) ? string.Empty : HLJKOKMKMLM);
-		NAMJEBLOKNM = ((DPOOIONCEOA == null) ? string.Empty : DPOOIONCEOA);
-		JEAHLOHOAAF = ((fight == null) ? string.Empty : fight);
-		KNEGDCJNEED();
+		zone = ((HLJKOKMKMLM == null) ? string.Empty : HLJKOKMKMLM);
+		battle = ((DPOOIONCEOA == null) ? string.Empty : DPOOIONCEOA);
+		fightIdRaw = ((fight == null) ? string.Empty : fight);
+		UpdateFullId();
 	}
 
 	public bool Equals(string DIAIIPCBMFL)
@@ -110,34 +110,34 @@ public class FightIDS
 
 	public bool Equals(string HLJKOKMKMLM, string DPOOIONCEOA, string fight)
 	{
-		return HLJKOKMKMLM.Equals(NHIIEPAGPPA) && DPOOIONCEOA.Equals(NAMJEBLOKNM) && fight.Equals(JEAHLOHOAAF);
+		return HLJKOKMKMLM.Equals(zone) && DPOOIONCEOA.Equals(battle) && fight.Equals(fightIdRaw);
 	}
 
-	public bool OLAJNGPILGL(string DIAIIPCBMFL)
+	public bool EqualsZoneBattle(string DIAIIPCBMFL)
 	{
 		string[] array = DIAIIPCBMFL.Split('|');
 		int num = array.Length;
 		string hLJKOKMKMLM = ((num <= 0) ? string.Empty : array[0]);
 		string dPOOIONCEOA = ((num <= 1) ? string.Empty : array[1]);
-		return OLAJNGPILGL(hLJKOKMKMLM, dPOOIONCEOA);
+		return EqualsZoneBattle(hLJKOKMKMLM, dPOOIONCEOA);
 	}
 
-	public bool OLAJNGPILGL(string HLJKOKMKMLM, string DPOOIONCEOA)
+	public bool EqualsZoneBattle(string HLJKOKMKMLM, string DPOOIONCEOA)
 	{
-		return HLJKOKMKMLM.Equals(NHIIEPAGPPA) && DPOOIONCEOA.Equals(NAMJEBLOKNM);
+		return HLJKOKMKMLM.Equals(zone) && DPOOIONCEOA.Equals(battle);
 	}
 
 	public void Clear()
 	{
-		NHIIEPAGPPA = string.Empty;
-		NAMJEBLOKNM = string.Empty;
-		JEAHLOHOAAF = string.Empty;
-		PJOMDOEMFFB = string.Empty;
+		zone = string.Empty;
+		battle = string.Empty;
+		fightIdRaw = string.Empty;
+		fullId = string.Empty;
 	}
 
-	public bool OOPMAAHJMCE()
+	public bool IsEmpty()
 	{
-		return NHIIEPAGPPA.Equals(string.Empty) && NAMJEBLOKNM.Equals(string.Empty);
+		return zone.Equals(string.Empty) && battle.Equals(string.Empty);
 	}
 
 	public static FightIDS Empty()
@@ -147,8 +147,8 @@ public class FightIDS
 		return mOCEDDJOAEB;
 	}
 
-	private void KNEGDCJNEED()
+	private void UpdateFullId()
 	{
-		PJOMDOEMFFB = NHIIEPAGPPA + "|" + NAMJEBLOKNM + "|" + JEAHLOHOAAF;
+		fullId = zone + "|" + battle + "|" + fightIdRaw;
 	}
 }

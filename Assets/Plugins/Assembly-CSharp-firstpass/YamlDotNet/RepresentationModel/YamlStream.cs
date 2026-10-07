@@ -43,29 +43,29 @@ namespace YamlDotNet.RepresentationModel
 		public void Load(TextReader NILNDHEKNLJ)
 		{
 			documents.Clear();
-			APMHDDIADMF bPGMNGAJMKK = new APMHDDIADMF(NILNDHEKNLJ);
+			YamlEventParser bPGMNGAJMKK = new YamlEventParser(NILNDHEKNLJ);
 			EventReader dCDJJJDPACI = new EventReader(bPGMNGAJMKK);
-			dCDJJJDPACI.DODGGCGJJLL<StreamStart>();
-			while (!dCDJJJDPACI.GPHIFFOGOGN<HNKFEGCMBJB>())
+			dCDJJJDPACI.Expect<StreamStart>();
+			while (!dCDJJJDPACI.Accept<StreamEndEvent>())
 			{
 				YamlDocument item = new YamlDocument(dCDJJJDPACI);
 				documents.Add(item);
 			}
-			dCDJJJDPACI.DODGGCGJJLL<HNKFEGCMBJB>();
+			dCDJJJDPACI.Expect<StreamEndEvent>();
 		}
 
 		public void Save(TextWriter output, bool EENMGCCBIHF = true)
 		{
-			NEKGJNOFOFN nEKGJNOFOFN = new Emitter(output);
+			IEmitter nEKGJNOFOFN = new Emitter(output);
 			nEKGJNOFOFN.Emit(new StreamStart());
 			foreach (YamlDocument document in documents)
 			{
 				document.Save(nEKGJNOFOFN, EENMGCCBIHF);
 			}
-			nEKGJNOFOFN.Emit(new HNKFEGCMBJB());
+			nEKGJNOFOFN.Emit(new StreamEndEvent());
 		}
 
-		public void GPHIFFOGOGN(IYamlVisitor NKECMANOOEM)
+		public void Accept(IYamlVisitor NKECMANOOEM)
 		{
 			NKECMANOOEM.Visit(this);
 		}

@@ -5,9 +5,9 @@ using System.Text;
 
 public class Crypto
 {
-	private static byte[] FPEMKGPELNH = Encoding.ASCII.GetBytes("o6806642kbM7c5");
+	private static byte[] salt = Encoding.ASCII.GetBytes("o6806642kbM7c5");
 
-	public static string APAIFKLIICN(string NOGCALGLPCH, string MGOACNLKMPB)
+	public static string EncryptStringAES(string NOGCALGLPCH, string MGOACNLKMPB)
 	{
 		if (string.IsNullOrEmpty(NOGCALGLPCH))
 		{
@@ -21,7 +21,7 @@ public class Crypto
 		RijndaelManaged rijndaelManaged = null;
 		try
 		{
-			Rfc2898DeriveBytes rfc2898DeriveBytes = new Rfc2898DeriveBytes(MGOACNLKMPB, FPEMKGPELNH);
+			Rfc2898DeriveBytes rfc2898DeriveBytes = new Rfc2898DeriveBytes(MGOACNLKMPB, salt);
 			rijndaelManaged = new RijndaelManaged();
 			rijndaelManaged.Key = rfc2898DeriveBytes.GetBytes(rijndaelManaged.KeySize / 8);
 			ICryptoTransform transform = rijndaelManaged.CreateEncryptor(rijndaelManaged.Key, rijndaelManaged.IV);
@@ -48,7 +48,7 @@ public class Crypto
 		}
 	}
 
-	public static string BLFFIJJHOPA(string PKJCKPENLIN, string MGOACNLKMPB)
+	public static string DecryptStringAES(string PKJCKPENLIN, string MGOACNLKMPB)
 	{
 		if (string.IsNullOrEmpty(PKJCKPENLIN))
 		{
@@ -62,13 +62,13 @@ public class Crypto
 		string text = null;
 		try
 		{
-			Rfc2898DeriveBytes rfc2898DeriveBytes = new Rfc2898DeriveBytes(MGOACNLKMPB, FPEMKGPELNH);
+			Rfc2898DeriveBytes rfc2898DeriveBytes = new Rfc2898DeriveBytes(MGOACNLKMPB, salt);
 			byte[] buffer = Convert.FromBase64String(PKJCKPENLIN);
 			using (MemoryStream memoryStream = new MemoryStream(buffer))
 			{
 				rijndaelManaged = new RijndaelManaged();
 				rijndaelManaged.Key = rfc2898DeriveBytes.GetBytes(rijndaelManaged.KeySize / 8);
-				rijndaelManaged.IV = EOKDGDGEBJA(memoryStream);
+				rijndaelManaged.IV = ReadByteArray(memoryStream);
 				ICryptoTransform transform = rijndaelManaged.CreateDecryptor(rijndaelManaged.Key, rijndaelManaged.IV);
 				using (CryptoStream stream = new CryptoStream(memoryStream, transform, CryptoStreamMode.Read))
 				{
@@ -88,7 +88,7 @@ public class Crypto
 		}
 	}
 
-	private static byte[] EOKDGDGEBJA(Stream JDCCBCNFENK)
+	private static byte[] ReadByteArray(Stream JDCCBCNFENK)
 	{
 		byte[] array = new byte[4];
 		if (JDCCBCNFENK.Read(array, 0, array.Length) != array.Length)

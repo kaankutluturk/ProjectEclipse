@@ -24,7 +24,7 @@ $read = Extract-Block $runtime 'private static Dictionary<string, XmlNode> ReadR
 $parserSource = Get-Content -Raw (Join-Path $root 'Assets/Scripts/Assembly-CSharp/MovesParser.cs')
 $capture = Extract-Block $parserSource 'private static Dictionary<string, XmlNode> CaptureBaseMoveLockSources'
 $cachedRead = Extract-Block $parserSource 'internal static bool TryReadBaseMoveLockSources'
-$clear = Extract-Block $parserSource 'public static void CHILAIJNEHG'
+$clear = Extract-Block $parserSource 'public static void ClearCaches'
 if ($parserSource.IndexOf('CaptureBaseMoveLockSources(xmlDocument') -gt $parserSource.IndexOf('LocalAnimationPreview.Apply(xmlDocument)') -or
     $parserSource -notmatch '(?s)_LegacyTemplateTemp = null;\s*_baseMoveLockSources = moveLockSources;') {
     throw 'Base move lock snapshot is not captured before expansion and published after parsing.'

@@ -5,17 +5,17 @@ using Range = UnityEngine.SocialPlatforms.Range;
 
 public interface ITableView
 {
-	ITableViewDataSource JFDKGBHEEOF { get; set; }
+	ITableViewDataSource TableDataSource { get; set; }
 
 	ITableViewDelegate Delegate { get; set; }
 
-	GameObject AKMFLOHDJJG { get; set; }
+	GameObject RowCellPrefab { get; set; }
 
-	Range NKGGFPOGKJC { get; }
+	Range VisibleRowRange { get; }
 
-	float ELNOAHEFGBL { get; }
+	float TotalContentSize { get; }
 
-	float JJCKADKCDIF { get; }
+	float ScrollPosition { get; }
 
 	ITableViewDataSource get_DataSource();
 

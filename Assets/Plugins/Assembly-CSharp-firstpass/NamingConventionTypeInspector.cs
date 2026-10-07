@@ -4,9 +4,9 @@ using System.Linq;
 
 public sealed class NamingConventionTypeInspector : TypeInspectorSkeleton
 {
-	private readonly ITypeInspector CECGLIIIJJH;
+	private readonly ITypeInspector innerTypeDescriptor;
 
-	private readonly INamingConvention LELOAKPLJEH;
+	private readonly INamingConvention namingConvention;
 
 	public NamingConventionTypeInspector(ITypeInspector CECGLIIIJJH, INamingConvention LELOAKPLJEH)
 	{
@@ -14,20 +14,20 @@ public sealed class NamingConventionTypeInspector : TypeInspectorSkeleton
 		{
 			throw new ArgumentNullException("innerTypeDescriptor");
 		}
-		this.CECGLIIIJJH = CECGLIIIJJH;
+		this.innerTypeDescriptor = CECGLIIIJJH;
 		if (LELOAKPLJEH == null)
 		{
 			throw new ArgumentNullException("namingConvention");
 		}
-		this.LELOAKPLJEH = LELOAKPLJEH;
+		this.namingConvention = LELOAKPLJEH;
 	}
 
-	public override IEnumerable<IPropertyDescriptor> GHIBHNJKIHN(Type LFLGCDNKNJI, object EGJHGBCEPHO)
+	public override IEnumerable<IPropertyDescriptor> GetProperties(Type LFLGCDNKNJI, object EGJHGBCEPHO)
 	{
-		return CECGLIIIJJH.GHIBHNJKIHN(LFLGCDNKNJI, EGJHGBCEPHO).Select((Func<IPropertyDescriptor, IPropertyDescriptor>)((IPropertyDescriptor PIIEECCHMAC) =>
+		return innerTypeDescriptor.GetProperties(LFLGCDNKNJI, EGJHGBCEPHO).Select((Func<IPropertyDescriptor, IPropertyDescriptor>)((IPropertyDescriptor PIIEECCHMAC) =>
 		{
 			PropertyDescriptor fLAHDIEMBAL = new PropertyDescriptor(PIIEECCHMAC);
-			fLAHDIEMBAL.set_Name(LELOAKPLJEH.CBNOIMMJDGO(PIIEECCHMAC.get_Name()));
+			fLAHDIEMBAL.set_Name(namingConvention.Apply(PIIEECCHMAC.get_Name()));
 			return fLAHDIEMBAL;
 		}));
 	}

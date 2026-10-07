@@ -4,16 +4,16 @@ using System.Diagnostics;
 public sealed class HTTPCacheMaintananceParams
 {
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private TimeSpan DKEPNBDPBND;
+	private TimeSpan deleteOlder;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private ulong DJJOJLCMACI;
+	private ulong maxCacheSize;
 
-	public TimeSpan BEIDGPIMGBB
+	public TimeSpan DeleteOlderThan
 	{
 		get
 		{
-			return DKAPKJDOAEJ();
+			return GetDeleteOlder();
 		}
 		private set
 		{
@@ -21,11 +21,11 @@ public sealed class HTTPCacheMaintananceParams
 		}
 	}
 
-	public ulong AJFGLJKCBLM
+	public ulong MaxCacheSizeLimit
 	{
 		get
 		{
-			return GAJGIIJPPBF();
+			return GetMaxCacheSize();
 		}
 		private set
 		{
@@ -39,23 +39,23 @@ public sealed class HTTPCacheMaintananceParams
 		set_MaxCacheSize(EBFOBGKCGJP);
 	}
 
-	public TimeSpan DKAPKJDOAEJ()
+	public TimeSpan GetDeleteOlder()
 	{
-		return DKEPNBDPBND;
+		return deleteOlder;
 	}
 
 	private void set_DeleteOlder(TimeSpan value)
 	{
-		DKEPNBDPBND = value;
+		deleteOlder = value;
 	}
 
-	public ulong GAJGIIJPPBF()
+	public ulong GetMaxCacheSize()
 	{
-		return DJJOJLCMACI;
+		return maxCacheSize;
 	}
 
 	private void set_MaxCacheSize(ulong value)
 	{
-		DJJOJLCMACI = value;
+		maxCacheSize = value;
 	}
 }

@@ -64,35 +64,35 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 			return new string(array);
 		}
 
-		public void PKOKLDGAPEI()
+		public void ApplyNewCryptoKey()
 		{
 			if (currentCryptoKey != cryptoKey)
 			{
-				hiddenValue = InternalEncrypt(GEKBGBJOMIA());
+				hiddenValue = InternalEncrypt(InternalDecrypt());
 				currentCryptoKey = cryptoKey;
 			}
 		}
 
-		public void GMCADPGOCHM()
+		public void RandomizeCryptoKey()
 		{
-			string bAINMLLIKOL = GEKBGBJOMIA();
+			string bAINMLLIKOL = InternalDecrypt();
 			currentCryptoKey = UnityEngine.Random.Range(int.MinValue, int.MaxValue).ToString();
 			hiddenValue = InternalEncrypt(bAINMLLIKOL, currentCryptoKey);
 		}
 
-		public string ECEBFGCJIDA()
+		public string GetEncrypted()
 		{
-			PKOKLDGAPEI();
+			ApplyNewCryptoKey();
 			return GetString(hiddenValue);
 		}
 
 		public void SetEncrypted(string ANGFOBEKKKD)
 		{
 			inited = true;
-			hiddenValue = KKGIHLIJLKM(ANGFOBEKKKD);
-			if (ObscuredCheatingDetector.NMACGEJHPDN())
+			hiddenValue = GetBytes(ANGFOBEKKKD);
+			if (ObscuredCheatingDetector.GetIsRunning())
 			{
-				fakeValue = GEKBGBJOMIA();
+				fakeValue = InternalDecrypt();
 			}
 		}
 
@@ -103,10 +103,10 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 
 		private static byte[] InternalEncrypt(string value, string KGBGENDIMBC)
 		{
-			return KKGIHLIJLKM(EncryptDecrypt(value, KGBGENDIMBC));
+			return GetBytes(EncryptDecrypt(value, KGBGENDIMBC));
 		}
 
-		private string GEKBGBJOMIA()
+		private string InternalDecrypt()
 		{
 			if (!inited)
 			{
@@ -121,9 +121,9 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 				text = cryptoKey;
 			}
 			string text2 = EncryptDecrypt(GetString(hiddenValue), text);
-			if (ObscuredCheatingDetector.NMACGEJHPDN() && !string.IsNullOrEmpty(fakeValue) && text2 != fakeValue)
+			if (ObscuredCheatingDetector.GetIsRunning() && !string.IsNullOrEmpty(fakeValue) && text2 != fakeValue)
 			{
-				ObscuredCheatingDetector.get_Instance().MCDANNDOEIK();
+				ObscuredCheatingDetector.get_Instance().OnCheatingDetected();
 			}
 			return text2;
 		}
@@ -135,7 +135,7 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 				return null;
 			}
 			ObscuredString obscuredString = new ObscuredString(InternalEncrypt(value));
-			if (ObscuredCheatingDetector.NMACGEJHPDN())
+			if (ObscuredCheatingDetector.GetIsRunning())
 			{
 				obscuredString.fakeValue = value;
 			}
@@ -144,20 +144,20 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 
 		public static implicit operator string(ObscuredString value)
 		{
-			if (LFPMCJPCJBD(value, null))
+			if (op_Equality(value, null))
 			{
 				return null;
 			}
-			return value.GEKBGBJOMIA();
+			return value.InternalDecrypt();
 		}
 
 		public override string ToString()
 		{
-			return GEKBGBJOMIA();
+			return InternalDecrypt();
 		}
 
 		[SpecialName]
-		public static bool LFPMCJPCJBD(ObscuredString LHBNIMGFKIB, ObscuredString AAOIAEJJINO)
+		public static bool op_Equality(ObscuredString LHBNIMGFKIB, ObscuredString AAOIAEJJINO)
 		{
 			if (object.ReferenceEquals(LHBNIMGFKIB, AAOIAEJJINO))
 			{
@@ -171,13 +171,13 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 			{
 				return ArraysEquals(LHBNIMGFKIB.hiddenValue, AAOIAEJJINO.hiddenValue);
 			}
-			return string.Equals(LHBNIMGFKIB.GEKBGBJOMIA(), AAOIAEJJINO.GEKBGBJOMIA());
+			return string.Equals(LHBNIMGFKIB.InternalDecrypt(), AAOIAEJJINO.InternalDecrypt());
 		}
 
 		[SpecialName]
-		public static bool GLCJKGIOIEC(ObscuredString LHBNIMGFKIB, ObscuredString AAOIAEJJINO)
+		public static bool op_Inequality(ObscuredString LHBNIMGFKIB, ObscuredString AAOIAEJJINO)
 		{
-			return !LFPMCJPCJBD(LHBNIMGFKIB, AAOIAEJJINO);
+			return !op_Equality(LHBNIMGFKIB, AAOIAEJJINO);
 		}
 
 		public override bool Equals(object AOMLCBHAJJH)
@@ -191,7 +191,7 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 
 		public bool Equals(ObscuredString value)
 		{
-			if (LFPMCJPCJBD(value, null))
+			if (op_Equality(value, null))
 			{
 				return false;
 			}
@@ -199,24 +199,24 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 			{
 				return ArraysEquals(hiddenValue, value.hiddenValue);
 			}
-			return string.Equals(GEKBGBJOMIA(), value.GEKBGBJOMIA());
+			return string.Equals(InternalDecrypt(), value.InternalDecrypt());
 		}
 
 		public bool Equals(ObscuredString value, StringComparison HLEHPPPKBMD)
 		{
-			if (LFPMCJPCJBD(value, null))
+			if (op_Equality(value, null))
 			{
 				return false;
 			}
-			return string.Equals(GEKBGBJOMIA(), value.GEKBGBJOMIA(), HLEHPPPKBMD);
+			return string.Equals(InternalDecrypt(), value.InternalDecrypt(), HLEHPPPKBMD);
 		}
 
 		public override int GetHashCode()
 		{
-			return GEKBGBJOMIA().GetHashCode();
+			return InternalDecrypt().GetHashCode();
 		}
 
-		private static byte[] KKGIHLIJLKM(string IGGFGLLIGCG)
+		private static byte[] GetBytes(string IGGFGLLIGCG)
 		{
 			byte[] array = new byte[IGGFGLLIGCG.Length * 2];
 			Buffer.BlockCopy(IGGFGLLIGCG.ToCharArray(), 0, array, 0, array.Length);

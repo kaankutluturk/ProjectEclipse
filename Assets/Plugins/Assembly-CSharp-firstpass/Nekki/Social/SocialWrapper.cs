@@ -10,29 +10,29 @@ namespace Nekki.Social
 		private string _currentUserID;
 
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		private static UserInfo IMGFNMPBGAK;
+		private static UserInfo _currentUser;
 
-		private static SocialWrapper EDAPJLKMFPC;
+		private static SocialWrapper _instance;
 
-		private static Action<DFIPCKIEILP> PDAPAKFEFJA;
+		private static Action<SocialNetworkType> _onNetworkDetected;
 
 		private bool _initDone;
 
-		private Callbacks OHFANOBDGMN;
+		private Callbacks _callbacks;
 
-		internal static UserInfo LFIBBPIPPFJ
+		internal static UserInfo CurrentUser
 		{
 			get
 			{
-				return NLEKLPFPLPC();
+				return GetCurrentUser();
 			}
 			private set
 			{
-				IMJMHDPIBDI(value);
+				SetCurrentUser(value);
 			}
 		}
 
-		public bool JLJPBPKCCBE
+		public bool IsInitialized
 		{
 			get
 			{
@@ -40,17 +40,17 @@ namespace Nekki.Social
 			}
 		}
 
-		internal static UserInfo NLEKLPFPLPC()
+		internal static UserInfo GetCurrentUser()
 		{
-			return IMGFNMPBGAK;
+			return _currentUser;
 		}
 
-		private static void IMJMHDPIBDI(UserInfo value)
+		private static void SetCurrentUser(UserInfo value)
 		{
-			IMGFNMPBGAK = value;
+			_currentUser = value;
 		}
 
-		internal static SocialWrapper Init(Callbacks EODBKOHACMO, Action<DFIPCKIEILP> GOLAPDHMKGC)
+		internal static SocialWrapper Init(Callbacks EODBKOHACMO, Action<SocialNetworkType> GOLAPDHMKGC)
 		{
 			GameObject gameObject = GameObject.Find("_social");
 			if (!gameObject)
@@ -63,10 +63,10 @@ namespace Nekki.Social
 			{
 				UnityEngine.Object.Destroy(component);
 			}
-			EDAPJLKMFPC = gameObject.AddComponent<SocialWrapper>();
-			EDAPJLKMFPC.OHFANOBDGMN = EODBKOHACMO;
-			PDAPAKFEFJA = GOLAPDHMKGC;
-			return EDAPJLKMFPC;
+			_instance = gameObject.AddComponent<SocialWrapper>();
+			_instance._callbacks = EODBKOHACMO;
+			_onNetworkDetected = GOLAPDHMKGC;
+			return _instance;
 		}
 
 		public bool get_Initialized()
@@ -77,36 +77,36 @@ namespace Nekki.Social
 		protected virtual void Start()
 		{
 			UnityEngine.Debug.Log("SocialWrapper Start");
-			PDOFECBDMHO();
+			RequestSocialNetworkInfo();
 		}
 
-		private void PDOFECBDMHO()
+		private void RequestSocialNetworkInfo()
 		{
 			Application.ExternalCall("RequestSocialNetworkInfo");
 		}
 
-		internal void LHCIEKHPNGB(string EMBBNNBFODN)
+		internal void OnSocialNetworkInfo(string EMBBNNBFODN)
 		{
 			if (!_initDone && EMBBNNBFODN.Contains("|"))
 			{
 				_initDone = true;
 				string[] array = EMBBNNBFODN.Split('|');
-				PIHBADCBECE(array[0], array[1]);
+				OnNetworkInitialized(array[0], array[1]);
 			}
 		}
 
-		protected virtual void PIHBADCBECE(string IDMBNOHJOAH, string AOKMNKOIMHI)
+		protected virtual void OnNetworkInitialized(string IDMBNOHJOAH, string AOKMNKOIMHI)
 		{
 			_currentUserID = AOKMNKOIMHI;
 			if (IDMBNOHJOAH != null && IDMBNOHJOAH == "VK")
 			{
-				OHFANOBDGMN.AJHHICIMCDF(DFIPCKIEILP.VKontakte, AOKMNKOIMHI);
-				PDAPAKFEFJA(DFIPCKIEILP.VKontakte);
+				_callbacks.OnInitialized(SocialNetworkType.VKontakte, AOKMNKOIMHI);
+				_onNetworkDetected(SocialNetworkType.VKontakte);
 			}
 			else
 			{
-				OHFANOBDGMN.AJHHICIMCDF(DFIPCKIEILP.None, AOKMNKOIMHI);
-				PDAPAKFEFJA(DFIPCKIEILP.None);
+				_callbacks.OnInitialized(SocialNetworkType.None, AOKMNKOIMHI);
+				_onNetworkDetected(SocialNetworkType.None);
 			}
 		}
 
@@ -124,32 +124,32 @@ namespace Nekki.Social
 			Application.ExternalCall("RequestUsersInfo", stringBuilder.ToString());
 		}
 
-		internal void KHMOHOCHHNK(string BBNKIBKPBLO)
+		internal void OnUserInfo(string BBNKIBKPBLO)
 		{
 			UserInfo jPKEEFNNAAP = new UserInfo(BBNKIBKPBLO);
-			if (jPKEEFNNAAP.NDLJPNCIJIP() == _currentUserID)
+			if (jPKEEFNNAAP.GetUserId() == _currentUserID)
 			{
-				IMJMHDPIBDI(jPKEEFNNAAP);
+				SetCurrentUser(jPKEEFNNAAP);
 			}
-			OHFANOBDGMN.FAHEIIBEFGE(jPKEEFNNAAP);
+			_callbacks.OnUserInfo(jPKEEFNNAAP);
 		}
 
-		internal void KCBMPAILEIN()
+		internal void RequestFriends()
 		{
 			Application.ExternalCall("RequestFriends");
 		}
 
-		internal void JFLDJPKOFAP(string BBNKIBKPBLO)
+		internal void OnFriends(string BBNKIBKPBLO)
 		{
-			OHFANOBDGMN.MIMEMJDABNC(UserInfo.GetInfos(BBNKIBKPBLO));
+			_callbacks.OnFriendsInfo(UserInfo.GetInfos(BBNKIBKPBLO));
 		}
 
-		internal void EIPHCAEGONE(string BBNKIBKPBLO)
+		internal void OnAppFriends(string BBNKIBKPBLO)
 		{
-			OHFANOBDGMN.JKJFMHDBJCC(UserInfo.GetInfos(BBNKIBKPBLO));
+			_callbacks.OnAppFriendsInfo(UserInfo.GetInfos(BBNKIBKPBLO));
 		}
 
-		internal void NKCLMBADENN()
+		internal void Invite()
 		{
 			Application.ExternalCall("Invite");
 		}
@@ -159,29 +159,29 @@ namespace Nekki.Social
 			Application.ExternalCall("RequestBookmark", (!DPJFKNNHONA) ? "false" : "true");
 		}
 
-		internal void AGIOLFLGFML(string state)
+		internal void OnBookmarkState(string state)
 		{
-			OHFANOBDGMN.LNCNJPOAMLL(state.Equals("true"));
+			_callbacks.OnBookmarkState(state.Equals("true"));
 		}
 
-		internal void CNKJLMJAFNL()
+		internal void RequestCheckGroupMembership()
 		{
 			Application.ExternalCall("RequestCheckGroupMembership");
 		}
 
-		internal void CKIOFOJHKMJ(string state)
+		internal void OnGroupMembership(string state)
 		{
-			OHFANOBDGMN.EEBEIFHLHLM(state.Equals("true"));
+			_callbacks.OnGroupMembership(state.Equals("true"));
 		}
 
-		internal void MGFOEBCEKNB(string FFHABDMFMMC, string LIOGIBJBHAH, string DMNBDBJNKME)
+		internal void RequestWallPost(string FFHABDMFMMC, string LIOGIBJBHAH, string DMNBDBJNKME)
 		{
 			Application.ExternalCall("RequestWallPost", FFHABDMFMMC, LIOGIBJBHAH, DMNBDBJNKME);
 		}
 
-		internal void ICCDKFEMJJC(string ADFFKCBJDMP)
+		internal void OnWallPost(string ADFFKCBJDMP)
 		{
-			OHFANOBDGMN.BACNFJLHGNG(ADFFKCBJDMP);
+			_callbacks.OnWallPostResult(ADFFKCBJDMP);
 		}
 
 		internal void Buy(string BGFOJFBFJIA)
@@ -189,22 +189,22 @@ namespace Nekki.Social
 			Application.ExternalCall("Buy", BGFOJFBFJIA);
 		}
 
-		internal void HINBPONHLHD(string DACBPIHLFFD)
+		internal void OnBuy(string DACBPIHLFFD)
 		{
-			OHFANOBDGMN.BDKEHMPGDDH(DACBPIHLFFD);
+			_callbacks.OnBuyResult(DACBPIHLFFD);
 		}
 
-		internal void IFCHDCBOJHH()
+		internal void OnExternalFocusGained()
 		{
-			OHFANOBDGMN.OBJFKDMJLJD(true);
+			_callbacks.OnOrderCompleted(true);
 		}
 
-		internal void KLGKGPICDPJ()
+		internal void OnExternalFocusLost()
 		{
-			OHFANOBDGMN.OBJFKDMJLJD(false);
+			_callbacks.OnOrderCompleted(false);
 		}
 
-		internal void GNAEAMAEPBK(string BDKHPMOHIMN)
+		internal void OnResolutionChanged(string BDKHPMOHIMN)
 		{
 			string[] array = BDKHPMOHIMN.Split('|');
 			int num = int.Parse(array[0]);
@@ -220,8 +220,8 @@ namespace Nekki.Social
 
 		public static void Delete()
 		{
-			IMJMHDPIBDI(null);
-			EDAPJLKMFPC = null;
+			SetCurrentUser(null);
+			_instance = null;
 		}
 	}
 }

@@ -7,85 +7,85 @@ public static class ItemBuyHelper
 	private static bool SettleImmediatePurchase(ItemInfo item, bool gems, System.Func<bool> apply)
 	{
 		if (item == null) return false;
-		Roster roster = ListSF.CCDKHLAMKKO();
+		Roster roster = ListSF.GetRoster();
 		if (roster == null) return false;
 		long price = gems ? (long)item.GemPrice : (long)item.CoinPrice;
-		long balance = gems ? roster.EHFJHFDACMP() : roster.BFBOEGMAMNF();
+		long balance = gems ? roster.GetBonus() : roster.GetMoney();
 		if (price < 0 || balance < price) return false;
-		UserItem existing = roster.KHCNHPCPFII().CMGOCLGHNLH(item);
-		if (!ListSF.CanIncrementItemCount(existing == null ? 0 : existing.OFOPFCJNEBL(), 1)) return false;
+		UserItem existing = roster.GetInventory().FindItem(item);
+		if (!ListSF.CanIncrementItemCount(existing == null ? 0 : existing.GetCount(), 1)) return false;
 		return Eclipse.Modding.ModRuntime.SettleItemPurchase(item, 1, apply);
 	}
 
-	private static bool KCBCGDFKNME(ItemInfo item)
+	private static bool AddPurchasedItem(ItemInfo item)
 	{
-		UserItem dKCHDHMLKHN = ListSF.CCDKHLAMKKO().KHCNHPCPFII().CMGOCLGHNLH(item);
-		if (!ListSF.CanIncrementItemCount(dKCHDHMLKHN == null ? 0 : dKCHDHMLKHN.OFOPFCJNEBL(), 1)) return false;
+		UserItem dKCHDHMLKHN = ListSF.GetRoster().GetInventory().FindItem(item);
+		if (!ListSF.CanIncrementItemCount(dKCHDHMLKHN == null ? 0 : dKCHDHMLKHN.GetCount(), 1)) return false;
 		if (dKCHDHMLKHN == null)
 		{
-			XmlNode fMBDAPOMFGN = ListSF.CCDKHLAMKKO().BABKABBEFEL();
+			XmlNode fMBDAPOMFGN = ListSF.GetRoster().GetItemsNode();
 			UserItem dKCHDHMLKHN2 = new UserItem(fMBDAPOMFGN, item.Name, false, 1, -1, -1L);
-			dKCHDHMLKHN2.KIGHKCOCJFJ(item);
-			dKCHDHMLKHN2.IJCEKDCPBAG(false);
-			dKCHDHMLKHN2.PJEEGECBHMH();
-			ListSF.CCDKHLAMKKO().KHCNHPCPFII().GEFDJDIINND(dKCHDHMLKHN2);
-			dKCHDHMLKHN2.CDFODJBJIPI(ListSF.CCDKHLAMKKO().PINDEKDNCNL());
-			Sound.IFKCCDAIADF("snd_buy");
+			dKCHDHMLKHN2.SetInfo(item);
+			dKCHDHMLKHN2.SetIsUpgrade(false);
+			dKCHDHMLKHN2.ApplyDefaultEnchantments();
+			ListSF.GetRoster().GetInventory().AddItem(dKCHDHMLKHN2);
+			dKCHDHMLKHN2.RefreshUpgradeState(ListSF.GetRoster().GetLevel());
+			Sound.PlaySound("snd_buy");
 			return true;
 		}
-		dKCHDHMLKHN.CHILOKHFALD(dKCHDHMLKHN.OFOPFCJNEBL() + 1);
+		dKCHDHMLKHN.SetCount(dKCHDHMLKHN.GetCount() + 1);
 		return true;
 	}
 
-	private static bool OBHEMCJGMHE(ItemInfo item)
+	private static bool AddItemWithDelivery(ItemInfo item)
 	{
-		UserItem dKCHDHMLKHN = ListSF.CCDKHLAMKKO().KHCNHPCPFII().CMGOCLGHNLH(item);
+		UserItem dKCHDHMLKHN = ListSF.GetRoster().GetInventory().FindItem(item);
 		if (dKCHDHMLKHN == null)
 		{
-			long aFHNFJLOGIC = GlobalTimer.get_LocalTimeUTC() + item.EHKNIKHPGDN;
-			XmlNode fMBDAPOMFGN = ListSF.CCDKHLAMKKO().BABKABBEFEL();
+			long aFHNFJLOGIC = GlobalTimer.get_LocalTimeUTC() + item.DeliveryTime;
+			XmlNode fMBDAPOMFGN = ListSF.GetRoster().GetItemsNode();
 			UserItem dKCHDHMLKHN2 = new UserItem(fMBDAPOMFGN, item.Name, false, 0, -1, aFHNFJLOGIC);
-			dKCHDHMLKHN2.KIGHKCOCJFJ(item);
-			dKCHDHMLKHN2.IJCEKDCPBAG(false);
-			dKCHDHMLKHN2.PJEEGECBHMH();
-			ListSF.CCDKHLAMKKO().KHCNHPCPFII().GEFDJDIINND(dKCHDHMLKHN2);
-			dKCHDHMLKHN2.CDFODJBJIPI(ListSF.CCDKHLAMKKO().PINDEKDNCNL());
-			Sound.IFKCCDAIADF("snd_upgrade");
+			dKCHDHMLKHN2.SetInfo(item);
+			dKCHDHMLKHN2.SetIsUpgrade(false);
+			dKCHDHMLKHN2.ApplyDefaultEnchantments();
+			ListSF.GetRoster().GetInventory().AddItem(dKCHDHMLKHN2);
+			dKCHDHMLKHN2.RefreshUpgradeState(ListSF.GetRoster().GetLevel());
+			Sound.PlaySound("snd_upgrade");
 			return true;
 		}
 		return false;
 	}
 
-	private static bool LBCJLCDMJLI(ItemInfo item, UserItem NDMCFNGEPOA)
+	private static bool ApplyUpgrade(ItemInfo item, UserItem NDMCFNGEPOA)
 	{
 		if (NDMCFNGEPOA != null)
 		{
-			NDMCFNGEPOA.IJCEKDCPBAG(true);
-			NDMCFNGEPOA.FMMDLMGHPIB(item.UpgradeLevel);
-			NDMCFNGEPOA.CDFODJBJIPI(ListSF.CCDKHLAMKKO().PINDEKDNCNL());
-			Sound.IFKCCDAIADF("snd_upgrade");
+			NDMCFNGEPOA.SetIsUpgrade(true);
+			NDMCFNGEPOA.SetUpgradeLevel(item.UpgradeLevel);
+			NDMCFNGEPOA.RefreshUpgradeState(ListSF.GetRoster().GetLevel());
+			Sound.PlaySound("snd_upgrade");
 			return true;
 		}
 		return false;
 	}
 
-	private static bool JHLILCFNLAE(ItemInfo item, UserItem NDMCFNGEPOA)
+	private static bool ApplyUpgradeWithDelivery(ItemInfo item, UserItem NDMCFNGEPOA)
 	{
 		if (NDMCFNGEPOA != null)
 		{
-			long bAINMLLIKOL = GlobalTimer.get_LocalTimeUTC() + item.EHKNIKHPGDN;
+			long bAINMLLIKOL = GlobalTimer.get_LocalTimeUTC() + item.DeliveryTime;
 			NDMCFNGEPOA.set_DeliveryTime(bAINMLLIKOL);
-			NDMCFNGEPOA.BAMLNLIDEBG(item.UpgradeLevel);
-			NDMCFNGEPOA.IJCEKDCPBAG(true);
-			NDMCFNGEPOA.PJEEGECBHMH();
-			ListSF.CCDKHLAMKKO().KHCNHPCPFII().GEFDJDIINND(NDMCFNGEPOA, true);
-			Sound.IFKCCDAIADF("snd_upgrade");
+			NDMCFNGEPOA.SetDeliveryUpgradeLevel(item.UpgradeLevel);
+			NDMCFNGEPOA.SetIsUpgrade(true);
+			NDMCFNGEPOA.ApplyDefaultEnchantments();
+			ListSF.GetRoster().GetInventory().AddItem(NDMCFNGEPOA, true);
+			Sound.PlaySound("snd_upgrade");
 			return true;
 		}
 		return false;
 	}
 
-	public static bool IHHKNBPKGHD(ItemInfo item)
+	public static bool BuyItemWithCoins(ItemInfo item)
 	{
 		return SettleImmediatePurchase(item, false, () => ApplyImmediateCoinPurchase(item));
 	}
@@ -96,26 +96,26 @@ public static class ItemBuyHelper
 		{
 			return false;
 		}
-		if (ListSF.CCDKHLAMKKO().BFBOEGMAMNF() >= (ObscuredLong)(item.CoinPrice))
+		if (ListSF.GetRoster().GetMoney() >= (ObscuredLong)(item.CoinPrice))
 		{
-			long bAINMLLIKOL = ListSF.CCDKHLAMKKO().BFBOEGMAMNF() - (ObscuredLong)(item.CoinPrice);
+			long bAINMLLIKOL = ListSF.GetRoster().GetMoney() - (ObscuredLong)(item.CoinPrice);
 			bool flag = false;
 			// Desktop/offline builds have no reliable server-backed delivery clock.
 			// Complete coin purchases immediately so an order cannot strand the item.
-			flag = KCBCGDFKNME(item);
+			flag = AddPurchasedItem(item);
 			if (flag)
 			{
-				ListSF.CCDKHLAMKKO().OIOOMAKNIOB(bAINMLLIKOL);
-				ListSF.CCDKHLAMKKO().GGGEHAGCLGC(true);
-				LMBHFAHHDKI(item, StatisticsCollector.CNCDMFJLMFH.Money, false);
-				CBADCGAEPGA(item);
+				ListSF.GetRoster().SetMoney(bAINMLLIKOL);
+				ListSF.GetRoster().RequestSave(true);
+				ReportPurchaseStatistics(item, StatisticsCollector.CurrencyType.Money, false);
+				NotifyPurchaseQuestEvent(item);
 			}
 			return flag;
 		}
 		return false;
 	}
 
-	public static bool MGMAJHLAICA(ItemInfo item)
+	public static bool BuyItemWithGems(ItemInfo item)
 	{
 		return SettleImmediatePurchase(item, true, () => ApplyImmediateGemPurchase(item));
 	}
@@ -126,83 +126,83 @@ public static class ItemBuyHelper
 		{
 			return false;
 		}
-		if (ListSF.CCDKHLAMKKO().EHFJHFDACMP() >= (ObscuredLong)(item.GemPrice))
+		if (ListSF.GetRoster().GetBonus() >= (ObscuredLong)(item.GemPrice))
 		{
-			long bAINMLLIKOL = ListSF.CCDKHLAMKKO().EHFJHFDACMP() - (ObscuredLong)(item.GemPrice);
-			bool flag = KCBCGDFKNME(item);
+			long bAINMLLIKOL = ListSF.GetRoster().GetBonus() - (ObscuredLong)(item.GemPrice);
+			bool flag = AddPurchasedItem(item);
 			if (flag)
 			{
-				ListSF.CCDKHLAMKKO().LLNELLFMMBB(bAINMLLIKOL, Roster.HPOIJPGPOCF.CHANGE_BUY_ITEM);
-				ListSF.CCDKHLAMKKO().GGGEHAGCLGC(true);
-				LMBHFAHHDKI(item, StatisticsCollector.CNCDMFJLMFH.Bonus, false);
-				CBADCGAEPGA(item);
+				ListSF.GetRoster().SetBonus(bAINMLLIKOL, Roster.BalanceChangeType.CHANGE_BUY_ITEM);
+				ListSF.GetRoster().RequestSave(true);
+				ReportPurchaseStatistics(item, StatisticsCollector.CurrencyType.Bonus, false);
+				NotifyPurchaseQuestEvent(item);
 			}
 			return flag;
 		}
 		return false;
 	}
 
-	public static bool APICBINEPGJ(ItemInfo item)
+	public static bool UpgradeItemWithCoins(ItemInfo item)
 	{
 		if (item == null)
 		{
 			return false;
 		}
-		UserItem dKCHDHMLKHN = ListSF.CCDKHLAMKKO().KHCNHPCPFII().CMGOCLGHNLH(item);
+		UserItem dKCHDHMLKHN = ListSF.GetRoster().GetInventory().FindItem(item);
 		if (dKCHDHMLKHN == null)
 		{
 			return false;
 		}
-		ItemInfo dJKEECEOCJB = dKCHDHMLKHN.HADDPFNDPDG();
+		ItemInfo dJKEECEOCJB = dKCHDHMLKHN.GetNextUpgradeItem();
 		if (dJKEECEOCJB == null)
 		{
 			return false;
 		}
-		if (ListSF.CCDKHLAMKKO().BFBOEGMAMNF() >= (ObscuredLong)(dJKEECEOCJB.CoinPrice))
+		if (ListSF.GetRoster().GetMoney() >= (ObscuredLong)(dJKEECEOCJB.CoinPrice))
 		{
-			long bAINMLLIKOL = ListSF.CCDKHLAMKKO().BFBOEGMAMNF() - (ObscuredLong)(dJKEECEOCJB.CoinPrice);
+			long bAINMLLIKOL = ListSF.GetRoster().GetMoney() - (ObscuredLong)(dJKEECEOCJB.CoinPrice);
 			bool flag = false;
 			// Shop upgrades are immediate in the offline runtime. This also avoids
 			// entering the legacy delivery branch without reporting success.
-			flag = LBCJLCDMJLI(dJKEECEOCJB, dKCHDHMLKHN);
+			flag = ApplyUpgrade(dJKEECEOCJB, dKCHDHMLKHN);
 			if (flag)
 			{
-				ListSF.CCDKHLAMKKO().OIOOMAKNIOB(bAINMLLIKOL);
-				ListSF.CCDKHLAMKKO().GGGEHAGCLGC(true);
-				LMBHFAHHDKI(dJKEECEOCJB, StatisticsCollector.CNCDMFJLMFH.Money, false);
-				CBADCGAEPGA(dJKEECEOCJB);
+				ListSF.GetRoster().SetMoney(bAINMLLIKOL);
+				ListSF.GetRoster().RequestSave(true);
+				ReportPurchaseStatistics(dJKEECEOCJB, StatisticsCollector.CurrencyType.Money, false);
+				NotifyPurchaseQuestEvent(dJKEECEOCJB);
 			}
 			return flag;
 		}
 		return false;
 	}
 
-	public static bool JAJLOABHIMA(ItemInfo item)
+	public static bool UpgradeItemWithGems(ItemInfo item)
 	{
 		if (item == null)
 		{
 			return false;
 		}
-		UserItem dKCHDHMLKHN = ListSF.CCDKHLAMKKO().KHCNHPCPFII().CMGOCLGHNLH(item);
+		UserItem dKCHDHMLKHN = ListSF.GetRoster().GetInventory().FindItem(item);
 		if (dKCHDHMLKHN == null)
 		{
 			return false;
 		}
-		ItemInfo dJKEECEOCJB = dKCHDHMLKHN.HADDPFNDPDG();
+		ItemInfo dJKEECEOCJB = dKCHDHMLKHN.GetNextUpgradeItem();
 		if (dJKEECEOCJB == null)
 		{
 			return false;
 		}
-		if (ListSF.CCDKHLAMKKO().EHFJHFDACMP() >= (ObscuredLong)(dJKEECEOCJB.GemPrice))
+		if (ListSF.GetRoster().GetBonus() >= (ObscuredLong)(dJKEECEOCJB.GemPrice))
 		{
-			long bAINMLLIKOL = ListSF.CCDKHLAMKKO().EHFJHFDACMP() - (ObscuredLong)(dJKEECEOCJB.GemPrice);
-			bool flag = LBCJLCDMJLI(dJKEECEOCJB, dKCHDHMLKHN);
+			long bAINMLLIKOL = ListSF.GetRoster().GetBonus() - (ObscuredLong)(dJKEECEOCJB.GemPrice);
+			bool flag = ApplyUpgrade(dJKEECEOCJB, dKCHDHMLKHN);
 			if (flag)
 			{
-				ListSF.CCDKHLAMKKO().LLNELLFMMBB(bAINMLLIKOL, Roster.HPOIJPGPOCF.CHANGE_BUY_ITEM);
-				ListSF.CCDKHLAMKKO().GGGEHAGCLGC(true);
-				LMBHFAHHDKI(dJKEECEOCJB, StatisticsCollector.CNCDMFJLMFH.Bonus, false);
-				CBADCGAEPGA(dJKEECEOCJB);
+				ListSF.GetRoster().SetBonus(bAINMLLIKOL, Roster.BalanceChangeType.CHANGE_BUY_ITEM);
+				ListSF.GetRoster().RequestSave(true);
+				ReportPurchaseStatistics(dJKEECEOCJB, StatisticsCollector.CurrencyType.Bonus, false);
+				NotifyPurchaseQuestEvent(dJKEECEOCJB);
 			}
 			return flag;
 		}
@@ -221,33 +221,33 @@ public static class ItemBuyHelper
 		{
 			return false;
 		}
-		UserItem dKCHDHMLKHN = ListSF.CCDKHLAMKKO().KHCNHPCPFII().CMGOCLGHNLH(item);
+		UserItem dKCHDHMLKHN = ListSF.GetRoster().GetInventory().FindItem(item);
 		if (dKCHDHMLKHN == null)
 		{
 			return false;
 		}
-		ItemInfo dJKEECEOCJB = dKCHDHMLKHN.HADDPFNDPDG();
+		ItemInfo dJKEECEOCJB = dKCHDHMLKHN.GetNextUpgradeItem();
 		if (dJKEECEOCJB == null)
 		{
 			return false;
 		}
-		bool flag = ListSF.CCDKHLAMKKO().EHFJHFDACMP() >= (ObscuredLong)(dJKEECEOCJB.KLHOKKPALOK);
-		bool flag2 = dKCHDHMLKHN.IJGAOHJNLAH() > GlobalTimer.get_LocalTimeUTC();
+		bool flag = ListSF.GetRoster().GetBonus() >= (ObscuredLong)(dJKEECEOCJB.DeliveryGemPrice);
+		bool flag2 = dKCHDHMLKHN.GetDeliveryTimestamp() > GlobalTimer.get_LocalTimeUTC();
 		if (flag && flag2)
 		{
-			long bAINMLLIKOL = ListSF.CCDKHLAMKKO().EHFJHFDACMP() - (ObscuredLong)(dJKEECEOCJB.KLHOKKPALOK);
-			ListSF.CCDKHLAMKKO().KHCNHPCPFII().GBLHFNGPIOF(dKCHDHMLKHN);
-			ListSF.CCDKHLAMKKO().LLNELLFMMBB(bAINMLLIKOL, Roster.HPOIJPGPOCF.CHANGE_BUY_DELIVERY);
-			ListSF.CCDKHLAMKKO().GGGEHAGCLGC(true);
-			LMBHFAHHDKI(dJKEECEOCJB, StatisticsCollector.CNCDMFJLMFH.Bonus, true);
-			CBADCGAEPGA(dJKEECEOCJB);
-			Sound.IFKCCDAIADF("snd_upgrade");
+			long bAINMLLIKOL = ListSF.GetRoster().GetBonus() - (ObscuredLong)(dJKEECEOCJB.DeliveryGemPrice);
+			ListSF.GetRoster().GetInventory().CompleteDelivery(dKCHDHMLKHN);
+			ListSF.GetRoster().SetBonus(bAINMLLIKOL, Roster.BalanceChangeType.CHANGE_BUY_DELIVERY);
+			ListSF.GetRoster().RequestSave(true);
+			ReportPurchaseStatistics(dJKEECEOCJB, StatisticsCollector.CurrencyType.Bonus, true);
+			NotifyPurchaseQuestEvent(dJKEECEOCJB);
+			Sound.PlaySound("snd_upgrade");
 			return true;
 		}
 		return false;
 	}
 
-	public static bool NIEAANPCGLC(ItemInfo item)
+	public static bool BuyConsumableWithGems(ItemInfo item)
 	{
 		return SettleImmediatePurchase(item, true, () => ApplyImmediateConsumablePurchase(item));
 	}
@@ -258,52 +258,52 @@ public static class ItemBuyHelper
 		{
 			return false;
 		}
-		if (ListSF.CCDKHLAMKKO().EHFJHFDACMP() >= (ObscuredLong)(item.GemPrice))
+		if (ListSF.GetRoster().GetBonus() >= (ObscuredLong)(item.GemPrice))
 		{
-			long bAINMLLIKOL = ListSF.CCDKHLAMKKO().EHFJHFDACMP() - (ObscuredLong)(item.GemPrice);
-			bool flag = KCBCGDFKNME(item);
+			long bAINMLLIKOL = ListSF.GetRoster().GetBonus() - (ObscuredLong)(item.GemPrice);
+			bool flag = AddPurchasedItem(item);
 			if (flag)
 			{
 				switch (item.SubType)
 				{
 				case "PerkReset":
-					ListSF.CCDKHLAMKKO().JLBDOBLHHAF().LCDFOLAAEGM();
+					ListSF.GetRoster().GetPerks().ResetPerks();
 					break;
 				case "Currency":
-					ListSF.CCDKHLAMKKO().AddCurrencyCount(item.FAEGJAEEMGH, (ObscuredInt)(item.CPODJDDPJHB));
+					ListSF.GetRoster().AddCurrencyCount(item.CurrencyName, (ObscuredInt)(item.CurrencyValue));
 					break;
 				}
-				ListSF.CCDKHLAMKKO().LLNELLFMMBB(bAINMLLIKOL, Roster.HPOIJPGPOCF.CHANGE_BUY_ITEM);
-				ListSF.CCDKHLAMKKO().GGGEHAGCLGC(true);
-				LMBHFAHHDKI(item, StatisticsCollector.CNCDMFJLMFH.Bonus, false);
-				CBADCGAEPGA(item);
+				ListSF.GetRoster().SetBonus(bAINMLLIKOL, Roster.BalanceChangeType.CHANGE_BUY_ITEM);
+				ListSF.GetRoster().RequestSave(true);
+				ReportPurchaseStatistics(item, StatisticsCollector.CurrencyType.Bonus, false);
+				NotifyPurchaseQuestEvent(item);
 			}
 			return flag;
 		}
 		return false;
 	}
 
-	private static void LMBHFAHHDKI(ItemInfo item, StatisticsCollector.CNCDMFJLMFH LFLGCDNKNJI, bool MNGGLFFHDJG)
+	private static void ReportPurchaseStatistics(ItemInfo item, StatisticsCollector.CurrencyType LFLGCDNKNJI, bool MNGGLFFHDJG)
 	{
 		ArgsDict kEMMIFBFDPK = new ArgsDict();
 		kEMMIFBFDPK["item"] = item;
 		kEMMIFBFDPK["type"] = LFLGCDNKNJI;
 		kEMMIFBFDPK["immediatelyDelivery"] = MNGGLFFHDJG;
-		StatisticsCollector.BPDGOKGHDHB(StatisticsEvent.JDNFFHILFAF.Purchase, kEMMIFBFDPK);
+		StatisticsCollector.LogEvent(StatisticsEvent.EventType.Purchase, kEMMIFBFDPK);
 	}
 
-	private static void CBADCGAEPGA(ItemInfo item)
+	private static void NotifyPurchaseQuestEvent(ItemInfo item)
 	{
-		QuestParameters hHKLFIIBIFF = ListSF.GetInstance().BNMLDPNCMLB();
-		FightIDS jLGLBLDPAAF = hHKLFIIBIFF.JLGLBLDPAAF;
-		hHKLFIIBIFF.JLGLBLDPAAF = FightIDS.Empty();
-		hHKLFIIBIFF.HEIADONEACH = string.Empty;
-		hHKLFIIBIFF.AIEHNBBFNPF = string.Empty;
-		hHKLFIIBIFF.DLKPBAJDHBO = item;
-		if (ListSF.GetInstance().FFBAJNGHGGD(QuestEvent.PMDPDMFLCIJ.QUEST_EVENT_PURCHASE))
+		QuestParameters hHKLFIIBIFF = ListSF.GetInstance().GetQuestParameters();
+		FightIDS jLGLBLDPAAF = hHKLFIIBIFF.fightIds;
+		hHKLFIIBIFF.fightIds = FightIDS.Empty();
+		hHKLFIIBIFF.fightResult = string.Empty;
+		hHKLFIIBIFF.raidResult = string.Empty;
+		hHKLFIIBIFF.purchasedItem = item;
+		if (ListSF.GetInstance().RaiseQuestEvent(QuestEvent.QuestEventType.QUEST_EVENT_PURCHASE))
 		{
-			ListSF.GetInstance().MHHNIPBJNAD();
+			ListSF.GetInstance().RunQuestActions();
 		}
-		hHKLFIIBIFF.JLGLBLDPAAF = jLGLBLDPAAF;
+		hHKLFIIBIFF.fightIds = jLGLBLDPAAF;
 	}
 }

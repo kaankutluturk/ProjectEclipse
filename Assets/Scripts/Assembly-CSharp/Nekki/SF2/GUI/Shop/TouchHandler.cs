@@ -6,9 +6,9 @@ namespace Nekki.SF2.GUI.Shop
 {
 	public class TouchHandler : Selectable
 	{
-		private UnityEvent FPANPKJAHCA = new UnityEvent();
+		private UnityEvent _onTouch = new UnityEvent();
 
-		public UnityEvent PFPJJNKLCKK
+		public UnityEvent OnTouchEvent
 		{
 			get
 			{
@@ -18,13 +18,13 @@ namespace Nekki.SF2.GUI.Shop
 
 		public UnityEvent get_OnTouch()
 		{
-			return FPANPKJAHCA;
+			return _onTouch;
 		}
 
 		public override void OnPointerDown(PointerEventData BHOLFGOGPCP)
 		{
 			base.OnPointerDown(BHOLFGOGPCP);
-			FPANPKJAHCA.Invoke();
+			_onTouch.Invoke();
 		}
 
 		private new void OnDestroy()

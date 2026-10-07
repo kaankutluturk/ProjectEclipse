@@ -4,52 +4,52 @@ using System.Diagnostics;
 internal sealed class EventTable
 {
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private Socket DLOJBJBNIOK;
+	private Socket socket;
 
 	private Dictionary<string, List<EventDescriptor>> Table = new Dictionary<string, List<EventDescriptor>>();
 
-	private Socket KNPLDJGCAKJ
+	private Socket OwnerSocket
 	{
 		get
 		{
-			return PDJFKOBODHH();
+			return GetOwnerSocket();
 		}
 		set
 		{
-			AHOICPCKAHI(value);
+			SetOwnerSocket(value);
 		}
 	}
 
 	public EventTable(Socket JLEACANCMJF)
 	{
-		AHOICPCKAHI(JLEACANCMJF);
+		SetOwnerSocket(JLEACANCMJF);
 	}
 
-	private Socket PDJFKOBODHH()
+	private Socket GetOwnerSocket()
 	{
-		return DLOJBJBNIOK;
+		return socket;
 	}
 
-	private void AHOICPCKAHI(Socket value)
+	private void SetOwnerSocket(Socket value)
 	{
-		DLOJBJBNIOK = value;
+		socket = value;
 	}
 
-	public void DNKHCGPPBAE(string DOPHKKGNAEF, BLIMHGJLDLD callback, bool ONOLLCMDGBO, bool EJDLINOJJIF)
+	public void Register(string DOPHKKGNAEF, SocketIOCallback callback, bool ONOLLCMDGBO, bool EJDLINOJJIF)
 	{
 		List<EventDescriptor> value;
 		if (!Table.TryGetValue(DOPHKKGNAEF, out value))
 		{
 			Table.Add(DOPHKKGNAEF, value = new List<EventDescriptor>(1));
 		}
-		EventDescriptor lBIMLJMCENN = value.Find((EventDescriptor d) => d.BECMKPPKAJB() == ONOLLCMDGBO && d.CAACHPIAHIJ() == EJDLINOJJIF);
+		EventDescriptor lBIMLJMCENN = value.Find((EventDescriptor d) => d.GetOnlyOnce() == ONOLLCMDGBO && d.GetAutoDecodePayload() == EJDLINOJJIF);
 		if (lBIMLJMCENN == null)
 		{
 			value.Add(new EventDescriptor(ONOLLCMDGBO, EJDLINOJJIF, callback));
 		}
 		else
 		{
-			lBIMLJMCENN.PGBFAFNDGAA().Add(callback);
+			lBIMLJMCENN.GetCallbacks().Add(callback);
 		}
 	}
 
@@ -58,52 +58,52 @@ internal sealed class EventTable
 		Table.Remove(DOPHKKGNAEF);
 	}
 
-	public void Unregister(string DOPHKKGNAEF, BLIMHGJLDLD callback)
+	public void Unregister(string DOPHKKGNAEF, SocketIOCallback callback)
 	{
 		List<EventDescriptor> value;
 		if (Table.TryGetValue(DOPHKKGNAEF, out value))
 		{
 			for (int i = 0; i < value.Count; i++)
 			{
-				value[i].PGBFAFNDGAA().Remove(callback);
+				value[i].GetCallbacks().Remove(callback);
 			}
 		}
 	}
 
 	public void Call(string DOPHKKGNAEF, Packet NPKADBPBKIG, params object[] LKIOKGCNKHE)
 	{
-		if (HTTPManager.MBBMPNDDPIH().PINDEKDNCNL() <= BFNKPHDJNII.All)
+		if (HTTPManager.GetLogger().GetLevel() <= Loglevels.All)
 		{
-			HTTPManager.MBBMPNDDPIH().JMHHKELODIO("EventTable", "Call - " + DOPHKKGNAEF);
+			HTTPManager.GetLogger().Verbose("EventTable", "Call - " + DOPHKKGNAEF);
 		}
 		List<EventDescriptor> value;
 		if (Table.TryGetValue(DOPHKKGNAEF, out value))
 		{
 			for (int i = 0; i < value.Count; i++)
 			{
-				value[i].Call(PDJFKOBODHH(), NPKADBPBKIG, LKIOKGCNKHE);
+				value[i].Call(GetOwnerSocket(), NPKADBPBKIG, LKIOKGCNKHE);
 			}
 		}
 	}
 
 	public void Call(Packet NPKADBPBKIG)
 	{
-		string text = NPKADBPBKIG.EFJKNHMALOL();
-		string text2 = ((NPKADBPBKIG.CMEHGNCCCIN() == ECDAJBEFCAH.Unknown) ? EventNames.ICAIODPBKBO(NPKADBPBKIG.FFJBNPEOAHI()) : EventNames.ICAIODPBKBO(NPKADBPBKIG.CMEHGNCCCIN()));
+		string text = NPKADBPBKIG.DecodeEventName();
+		string text2 = ((NPKADBPBKIG.GetSocketIOEvent() == SocketIOEventType.Unknown) ? EventNames.GetNameFor(NPKADBPBKIG.GetTransportEvent()) : EventNames.GetNameFor(NPKADBPBKIG.GetSocketIOEvent()));
 		object[] lKIOKGCNKHE = null;
-		if (JFEKPKEOGCL(text) || JFEKPKEOGCL(text2))
+		if (HasSubscriber(text) || HasSubscriber(text2))
 		{
-			if (NPKADBPBKIG.FFJBNPEOAHI() == HJDLGPHLPNF.Message && (NPKADBPBKIG.CMEHGNCCCIN() == ECDAJBEFCAH.Event || NPKADBPBKIG.CMEHGNCCCIN() == ECDAJBEFCAH.BinaryEvent) && GICEOMDFBCK(text))
+			if (NPKADBPBKIG.GetTransportEvent() == TransportEventTypes.Message && (NPKADBPBKIG.GetSocketIOEvent() == SocketIOEventType.Event || NPKADBPBKIG.GetSocketIOEvent() == SocketIOEventType.BinaryEvent) && IsAutoDecode(text))
 			{
-				lKIOKGCNKHE = NPKADBPBKIG.Decode(PDJFKOBODHH().HLBNHJADOMP().KCMCCGKJGLE());
+				lKIOKGCNKHE = NPKADBPBKIG.Decode(GetOwnerSocket().GetManager().GetEncoder());
 			}
 			if (!string.IsNullOrEmpty(text))
 			{
 				Call(text, NPKADBPBKIG, lKIOKGCNKHE);
 			}
-			if (!NPKADBPBKIG.KJFDJLNHKJI() && GICEOMDFBCK(text2))
+			if (!NPKADBPBKIG.GetIsDecoded() && IsAutoDecode(text2))
 			{
-				lKIOKGCNKHE = NPKADBPBKIG.Decode(PDJFKOBODHH().HLBNHJADOMP().KCMCCGKJGLE());
+				lKIOKGCNKHE = NPKADBPBKIG.Decode(GetOwnerSocket().GetManager().GetEncoder());
 			}
 			if (!string.IsNullOrEmpty(text2))
 			{
@@ -117,14 +117,14 @@ internal sealed class EventTable
 		Table.Clear();
 	}
 
-	private bool GICEOMDFBCK(string DOPHKKGNAEF)
+	private bool IsAutoDecode(string DOPHKKGNAEF)
 	{
 		List<EventDescriptor> value;
 		if (Table.TryGetValue(DOPHKKGNAEF, out value))
 		{
 			for (int i = 0; i < value.Count; i++)
 			{
-				if (value[i].CAACHPIAHIJ() && value[i].PGBFAFNDGAA().Count > 0)
+				if (value[i].GetAutoDecodePayload() && value[i].GetCallbacks().Count > 0)
 				{
 					return true;
 				}
@@ -133,7 +133,7 @@ internal sealed class EventTable
 		return false;
 	}
 
-	private bool JFEKPKEOGCL(string DOPHKKGNAEF)
+	private bool HasSubscriber(string DOPHKKGNAEF)
 	{
 		return Table.ContainsKey(DOPHKKGNAEF);
 	}

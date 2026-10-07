@@ -5,32 +5,32 @@ namespace Nekki.Audio
 {
 	public class AudioUnit : MonoBehaviour
 	{
-		private PlayCommand PIEKHPPPIKO;
+		private PlayCommand _command;
 
 		private AudioSource _source;
 
 		private Chanel _parent;
 
-		private bool DIFDDHGKKDL;
+		private bool _fadingOut;
 
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		private bool PMEFBNOLGEI;
+		private bool _isPaused;
 
-		private bool IKELBJJFKJG;
+		private bool _wasPlaying;
 
-		internal bool DJNNDGIICGA
+		internal bool IsAudioPaused
 		{
 			get
 			{
-				return JOHIGCLLECD();
+				return GetIsPaused();
 			}
 			private set
 			{
-				CCIPGJMJJCA(value);
+				SetIsPaused(value);
 			}
 		}
 
-		public bool JNCMBHENOIM
+		public bool Muted
 		{
 			get
 			{
@@ -42,22 +42,22 @@ namespace Nekki.Audio
 			}
 		}
 
-		internal bool EDEFCODFPGK
+		internal bool IsFree
 		{
 			get
 			{
-				return CNMPNLDPPEL();
+				return GetIsFree();
 			}
 		}
 
-		internal bool JOHIGCLLECD()
+		internal bool GetIsPaused()
 		{
-			return PMEFBNOLGEI;
+			return _isPaused;
 		}
 
-		private void CCIPGJMJJCA(bool value)
+		private void SetIsPaused(bool value)
 		{
-			PMEFBNOLGEI = value;
+			_isPaused = value;
 		}
 
 		public bool get_IsMute()
@@ -72,42 +72,42 @@ namespace Nekki.Audio
 
 		internal void Init(Chanel PBJGAIDJFAG, PlayCommand NJOJDALGNKG, AudioClip PIKHEAGHOKB)
 		{
-			PIEKHPPPIKO = NJOJDALGNKG;
+			_command = NJOJDALGNKG;
 			if (!_source)
 			{
 				_source = base.gameObject.AddComponent<AudioSource>();
 				_source.spatialBlend = 0f;
 			}
 			_source.clip = PIKHEAGHOKB;
-			_source.loop = NJOJDALGNKG.ADCBILEEEEO();
-			_source.volume = PBJGAIDJFAG.LFDFKPHKEGJ() * NJOJDALGNKG.AFKMLMCCJLI();
+			_source.loop = NJOJDALGNKG.GetLoop();
+			_source.volume = PBJGAIDJFAG.GetMasterVolume() * NJOJDALGNKG.GetVolume();
 			_parent = PBJGAIDJFAG;
-			CCIPGJMJJCA(false);
-			IKELBJJFKJG = false;
+			SetIsPaused(false);
+			_wasPlaying = false;
 			_source.Play();
 		}
 
 		public void Pause()
 		{
-			if (!(_source == null) && !JOHIGCLLECD())
+			if (!(_source == null) && !GetIsPaused())
 			{
-				CCIPGJMJJCA(true);
-				IKELBJJFKJG = _source.isPlaying;
+				SetIsPaused(true);
+				_wasPlaying = _source.isPlaying;
 				_source.Pause();
 			}
 		}
 
 		public void UnPause()
 		{
-			if (!(_source == null) && JOHIGCLLECD())
+			if (!(_source == null) && GetIsPaused())
 			{
-				if (IKELBJJFKJG)
+				if (_wasPlaying)
 				{
 					_source.Play();
 				}
-				_source.volume = _parent.LFDFKPHKEGJ() * PIEKHPPPIKO.AFKMLMCCJLI();
-				CCIPGJMJJCA(false);
-				IKELBJJFKJG = false;
+				_source.volume = _parent.GetMasterVolume() * _command.GetVolume();
+				SetIsPaused(false);
+				_wasPlaying = false;
 			}
 		}
 
@@ -118,31 +118,31 @@ namespace Nekki.Audio
 				if (!BJIOMMPCLEA)
 				{
 					_source.Stop();
-					CCIPGJMJJCA(false);
-					IKELBJJFKJG = false;
+					SetIsPaused(false);
+					_wasPlaying = false;
 				}
 				else
 				{
-					DIFDDHGKKDL = true;
+					_fadingOut = true;
 				}
 			}
 		}
 
-		internal bool CNMPNLDPPEL()
+		internal bool GetIsFree()
 		{
-			return !_source || ((bool)_source && !_source.isPlaying && !JOHIGCLLECD());
+			return !_source || ((bool)_source && !_source.isPlaying && !GetIsPaused());
 		}
 
 		internal void Update()
 		{
-			if (JOHIGCLLECD() || CNMPNLDPPEL())
+			if (GetIsPaused() || GetIsFree())
 			{
 				return;
 			}
 			// Scene teardown can destroy the owning channel before this component's
 			// final Update.  The decompiled code kept dereferencing the stale owner
 			// every frame, producing thousands of errors and severe Editor lag.
-			if (_parent == null || PIEKHPPPIKO == null)
+			if (_parent == null || _command == null)
 			{
 				if (_source != null)
 				{
@@ -151,13 +151,13 @@ namespace Nekki.Audio
 				enabled = false;
 				return;
 			}
-			if (DIFDDHGKKDL)
+			if (_fadingOut)
 			{
 				float num = _source.volume * 0.9f;
 				if ((double)num < 0.05)
 				{
 					Stop();
-					DIFDDHGKKDL = false;
+					_fadingOut = false;
 				}
 				else
 				{
@@ -166,11 +166,11 @@ namespace Nekki.Audio
 			}
 			else
 			{
-				_source.volume = _parent.LFDFKPHKEGJ() * PIEKHPPPIKO.AFKMLMCCJLI();
+				_source.volume = _parent.GetMasterVolume() * _command.GetVolume();
 			}
 		}
 
-		internal void PJNFHNFLNNO()
+		internal void ReturnToChanel()
 		{
 			if (_parent != null)
 			{

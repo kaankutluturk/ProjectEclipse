@@ -3,48 +3,48 @@ using System.Xml;
 
 public class EventIntervalStart : EventAnimation
 {
-	private IntervalAnimation.NGAJJDIEDGF PLJCBEKDIMA;
+	private IntervalAnimation.IntervalType intervalType;
 
 	public EventIntervalStart()
-		: base(EECEJKADLCK.EVENT_INTERVAL_START)
+		: base(EventAnimationType.EVENT_INTERVAL_START)
 	{
-		PLJCBEKDIMA = IntervalAnimation.NGAJJDIEDGF.INTERVAL_NONE;
+		intervalType = IntervalAnimation.IntervalType.INTERVAL_NONE;
 	}
 
 	protected override bool Compare(EventAnimation FOPOKALJIIJ)
 	{
 		EventIntervalStart nBFEDMCCKPJ = FOPOKALJIIJ as EventIntervalStart;
-		List<IntervalAnimation> cAANBJEPGAA = nBFEDMCCKPJ.JIFAHHGNPFH.Intervals;
-		bool flag = KDPJLEOGABP(cAANBJEPGAA);
+		List<IntervalAnimation> cAANBJEPGAA = nBFEDMCCKPJ.Conditions.Intervals;
+		bool flag = HasMatchingInterval(cAANBJEPGAA);
 		return (!IsNot) ? flag : (!flag);
 	}
 
 	protected override void Parse(XmlNode MEEAKLDGLDF)
 	{
-		switch (MEEAKLDGLDF.Attributes["Type"].CIPOICEEIBK(string.Empty))
+		switch (MEEAKLDGLDF.Attributes["Type"].GetStringOrDefault(string.Empty))
 		{
 		case "Attack":
-			PLJCBEKDIMA = IntervalAnimation.NGAJJDIEDGF.INTERVAL_ATTACK;
+			intervalType = IntervalAnimation.IntervalType.INTERVAL_ATTACK;
 			break;
 		case "Block":
-			PLJCBEKDIMA = IntervalAnimation.NGAJJDIEDGF.INTERVAL_BLOCK;
+			intervalType = IntervalAnimation.IntervalType.INTERVAL_BLOCK;
 			break;
 		case "Invulnerable":
-			PLJCBEKDIMA = IntervalAnimation.NGAJJDIEDGF.INTERVAL_INVULNERABLE;
+			intervalType = IntervalAnimation.IntervalType.INTERVAL_INVULNERABLE;
 			break;
 		default:
-			PLJCBEKDIMA = IntervalAnimation.NGAJJDIEDGF.INTERVAL_NONE;
+			intervalType = IntervalAnimation.IntervalType.INTERVAL_NONE;
 			break;
 		}
 	}
 
-	private bool KDPJLEOGABP(List<IntervalAnimation> NFLDEGMEJAK)
+	private bool HasMatchingInterval(List<IntervalAnimation> NFLDEGMEJAK)
 	{
 		int i = 0;
 		for (int count = NFLDEGMEJAK.Count; i < count; i++)
 		{
 			IntervalAnimation mNOIEOBBCMI = NFLDEGMEJAK[i];
-			if ((PLJCBEKDIMA == IntervalAnimation.NGAJJDIEDGF.INTERVAL_NONE || PLJCBEKDIMA == mNOIEOBBCMI.Type) && (LJICHLHMBFA == string.Empty || LJICHLHMBFA == mNOIEOBBCMI.Name))
+			if ((intervalType == IntervalAnimation.IntervalType.INTERVAL_NONE || intervalType == mNOIEOBBCMI.Type) && (AnimationName == string.Empty || AnimationName == mNOIEOBBCMI.Name))
 			{
 				return true;
 			}

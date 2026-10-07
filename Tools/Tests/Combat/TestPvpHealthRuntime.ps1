@@ -16,8 +16,8 @@ for ($i=0; $i -lt 100; $i++) {
     $overkill = $false
     $resolved = $model.ResolveStrikeDamage($damage, [ref]$overkill)
     Check (!$overkill) 'Blocked hit passed native overkill margin'
-    $model.GEACPINOAAN(-$resolved)
-    Check (!$model.OJMIFOAHKBK()) 'Native health setter killed a blocking fighter'
+    $model.ChangeLife(-$resolved)
+    Check (!$model.GetLifeDepleted()) 'Native health setter killed a blocking fighter'
     $model.RecoverableLife = [Eclipse.Multiplayer.Balance.PvpRecoverableHealth]::PoolAfterDamage($model.RecoverableLife, $model.RemainingHealthInDamageUnits, 1, $before-$model.RemainingHealthInDamageUnits, $true, $rules)
 }
 Near $model.RemainingHealthInDamageUnits .0001 'Native blocking floor'
@@ -43,13 +43,13 @@ $beforeHash = [Eclipse.Multiplayer.VersusStateHash]::Hash([ref]$state)
 $fighter.RecoverableLife = .2
 $state.Left = $fighter
 Check ([Eclipse.Multiplayer.VersusStateHash]::Hash([ref]$state) -ne $beforeHash) 'Grey health missing from simulation hash'
-$model.BCLGFKDDNKH()
+$model.RestoreFullLife()
 Near $model.RecoverableLife 0 'Round reset clears grey pool'
 $model.SetCurrentLife(.5)
 $model.RecoverableLife = .5
 $model.SetCurrentLife(.8)
 Near $model.RecoverableLife .2 'External healing clamps grey pool'
-$model.GEACPINOAAN(-1)
-Check ($model.OJMIFOAHKBK()) 'Direct hit remains lethal'
+$model.ChangeLife(-1)
+Check ($model.GetLifeDepleted()) 'Direct hit remains lethal'
 Near $model.RecoverableLife 0 'Death clears grey pool'
 Write-Output "PASS: $checks compiled native-health and rollback checks (no Unity editor or game playtest)."

@@ -6,99 +6,99 @@ public class Items
 {
 	private string _fileName = "/list.xml";
 
-	private List<ItemInfo> GMCMEPIKDOI = new List<ItemInfo>();
+	private List<ItemInfo> weapons = new List<ItemInfo>();
 
-	private List<ItemInfo> HOOPHODHKPB = new List<ItemInfo>();
+	private List<ItemInfo> armors = new List<ItemInfo>();
 
-	private List<ItemInfo> CKONDOACLHG = new List<ItemInfo>();
+	private List<ItemInfo> helms = new List<ItemInfo>();
 
-	private List<ItemInfo> FJPBGMBAEFP = new List<ItemInfo>();
+	private List<ItemInfo> rangedWeapons = new List<ItemInfo>();
 
-	private List<ItemInfo> CAANAADPJBF = new List<ItemInfo>();
+	private List<ItemInfo> magicItems = new List<ItemInfo>();
 
-	private List<ItemInfo> OMMJCLFJLIF = new List<ItemInfo>();
+	private List<ItemInfo> seals = new List<ItemInfo>();
 
-	private List<ItemInfo> OHPGLEFNBID = new List<ItemInfo>();
+	private List<ItemInfo> realMoneyItems = new List<ItemInfo>();
 
-	private List<ItemInfo> POAPGJKKPMK = new List<ItemInfo>();
+	private List<ItemInfo> consumables = new List<ItemInfo>();
 
-	private List<ItemInfo> EDHACKOGGAA = new List<ItemInfo>();
+	private List<ItemInfo> freeItems = new List<ItemInfo>();
 
-	private List<ItemInfo> DEEGAJNPJCI = new List<ItemInfo>();
+	private List<ItemInfo> allItems = new List<ItemInfo>();
 
-	private List<UpgradeDataContainer> EJDLNCGFACO = new List<UpgradeDataContainer>();
+	private List<UpgradeDataContainer> upgradeContainers = new List<UpgradeDataContainer>();
 
-	private ItemSets MPOPIPMCPOJ = new ItemSets();
+	private ItemSets itemSets = new ItemSets();
 
-	public List<ItemInfo> JIIFFJAJNNN
+	public List<ItemInfo> Weapons
 	{
 		get
 		{
-			return MJKFCBMNNGJ();
+			return GetWeapons();
 		}
 	}
 
-	public List<ItemInfo> KGGEFNMBLDK
+	public List<ItemInfo> Armors
 	{
 		get
 		{
-			return MCGKNJPLIIH();
+			return GetArmors();
 		}
 	}
 
-	public List<ItemInfo> NDJOHPHKJAD
+	public List<ItemInfo> Helms
 	{
 		get
 		{
-			return EKKIBLDGNHH();
+			return GetHelms();
 		}
 	}
 
-	public List<ItemInfo> JLKLNBDHJDD
+	public List<ItemInfo> RangedWeapons
 	{
 		get
 		{
-			return LKGPBHADANE();
+			return GetRangedWeapons();
 		}
 	}
 
-	public List<ItemInfo> MBANHMHBAJJ
+	public List<ItemInfo> MagicItems
 	{
 		get
 		{
-			return OGFOBKIEGKA();
+			return GetMagicItems();
 		}
 	}
 
-	public List<ItemInfo> PICCOILOGOB
+	public List<ItemInfo> Seals
 	{
 		get
 		{
-			return DBGMLKGEJDD();
+			return GetSeals();
 		}
 	}
 
-	public List<ItemInfo> EOHJMKFDBEI
+	public List<ItemInfo> RealMoneyItems
 	{
 		get
 		{
-			return KCIHHGCHEKM();
+			return GetRealMoneyItems();
 		}
 	}
 
-	public List<ItemInfo> GLHNHHCHLHL
+	public List<ItemInfo> Consumables
 	{
 		get
 		{
-			return BFFNOIPELKC();
+			return GetConsumables();
 		}
 	}
 
-	public List<ItemInfo> PJNFHNFLNNO
+	public List<ItemInfo> FreeItems
 	{
 		get
 		{
-			return KEFJPEOEPBN();
+			return GetFreeItems();
 		}
 	}
 
@@ -107,108 +107,108 @@ public class Items
 	{
 		get
 		{
-			return HCDLKHKBEPF();
+			return GetAllItems();
 		}
 	}
 
-	public List<UpgradeDataContainer> CEKOFEFDMLJ
+	public List<UpgradeDataContainer> UpgradeContainers
 	{
 		get
 		{
-			return CKCGBCNMOOP();
+			return GetUpgradeContainers();
 		}
 	}
 
-	public ItemSets KJPHFJLDMPC
+	public ItemSets Sets
 	{
 		get
 		{
-			return DGKMILIPLLF();
+			return GetItemSets();
 		}
 	}
 
-	private List<ItemInfo> HLMEPLOEPEL
+	private List<ItemInfo> ProductItems
 	{
 		get
 		{
-			return HKHHDDKGMIA();
+			return GetProductItems();
 		}
 	}
 
-	public int LIEGFJCKPLA
+	public int NewItemsCount
 	{
 		get
 		{
-			return EFEJPENECKN();
+			return GetNewItemsCount();
 		}
 	}
 
-	public List<ItemInfo> MJKFCBMNNGJ()
+	public List<ItemInfo> GetWeapons()
 	{
-		return GMCMEPIKDOI;
+		return weapons;
 	}
 
-	public List<ItemInfo> MCGKNJPLIIH()
+	public List<ItemInfo> GetArmors()
 	{
-		return HOOPHODHKPB;
+		return armors;
 	}
 
-	public List<ItemInfo> EKKIBLDGNHH()
+	public List<ItemInfo> GetHelms()
 	{
-		return CKONDOACLHG;
+		return helms;
 	}
 
-	public List<ItemInfo> LKGPBHADANE()
+	public List<ItemInfo> GetRangedWeapons()
 	{
-		return FJPBGMBAEFP;
+		return rangedWeapons;
 	}
 
-	public List<ItemInfo> OGFOBKIEGKA()
+	public List<ItemInfo> GetMagicItems()
 	{
-		return CAANAADPJBF;
+		return magicItems;
 	}
 
-	public List<ItemInfo> DBGMLKGEJDD()
+	public List<ItemInfo> GetSeals()
 	{
-		return OMMJCLFJLIF;
+		return seals;
 	}
 
-	public List<ItemInfo> KCIHHGCHEKM()
+	public List<ItemInfo> GetRealMoneyItems()
 	{
-		return OHPGLEFNBID;
+		return realMoneyItems;
 	}
 
-	public List<ItemInfo> BFFNOIPELKC()
+	public List<ItemInfo> GetConsumables()
 	{
-		return POAPGJKKPMK;
+		return consumables;
 	}
 
-	public List<ItemInfo> KEFJPEOEPBN()
+	public List<ItemInfo> GetFreeItems()
 	{
-		return EDHACKOGGAA;
+		return freeItems;
 	}
 
-	public List<ItemInfo> HCDLKHKBEPF()
+	public List<ItemInfo> GetAllItems()
 	{
-		return DEEGAJNPJCI;
+		return allItems;
 	}
 
-	public List<UpgradeDataContainer> CKCGBCNMOOP()
+	public List<UpgradeDataContainer> GetUpgradeContainers()
 	{
-		return EJDLNCGFACO;
+		return upgradeContainers;
 	}
 
-	public ItemSets DGKMILIPLLF()
+	public ItemSets GetItemSets()
 	{
-		return MPOPIPMCPOJ;
+		return itemSets;
 	}
 
-	private List<ItemInfo> HKHHDDKGMIA()
+	private List<ItemInfo> GetProductItems()
 	{
 		List<ItemInfo> list = new List<ItemInfo>();
-		foreach (ItemInfo item in DEEGAJNPJCI)
+		foreach (ItemInfo item in allItems)
 		{
-			if (item.Type == "RealMoneyItem" && !string.IsNullOrEmpty(item.JLDEALIEEJI()))
+			if (item.Type == "RealMoneyItem" && !string.IsNullOrEmpty(item.GetMarketId()))
 			{
 				list.Add(item);
 			}
@@ -216,12 +216,12 @@ public class Items
 		return list;
 	}
 
-	public int EFEJPENECKN()
+	public int GetNewItemsCount()
 	{
 		int count = 0;
-		DEEGAJNPJCI.ForEach((ItemInfo DHDMNHCIPEH) =>
+		allItems.ForEach((ItemInfo DHDMNHCIPEH) =>
 		{
-			if (!DHDMNHCIPEH.Type.Equals("Seal") && DHDMNHCIPEH.DBHJGAGOLOB())
+			if (!DHDMNHCIPEH.Type.Equals("Seal") && DHDMNHCIPEH.GetIsNew())
 			{
 				count++;
 			}
@@ -231,13 +231,13 @@ public class Items
 
 	public int GetCountNewItemsByType(string LFLGCDNKNJI)
 	{
-		return DEEGAJNPJCI.FindAll((ItemInfo DHDMNHCIPEH) => DHDMNHCIPEH.Type.Equals(LFLGCDNKNJI) && DHDMNHCIPEH.DBHJGAGOLOB()).Count;
+		return allItems.FindAll((ItemInfo DHDMNHCIPEH) => DHDMNHCIPEH.Type.Equals(LFLGCDNKNJI) && DHDMNHCIPEH.GetIsNew()).Count;
 	}
 
 	// best guess for name
 	public ItemInfo GetItemByName(string name)
 	{
-		ItemInfo item = DEEGAJNPJCI.Find((ItemInfo DHDMNHCIPEH) => DHDMNHCIPEH.Name.Equals(name));
+		ItemInfo item = allItems.Find((ItemInfo DHDMNHCIPEH) => DHDMNHCIPEH.Name.Equals(name));
 		if (item != null) return item;
 		Eclipse.Modding.DefinitionId id;
 		Eclipse.Modding.ItemDefinition definition;
@@ -247,71 +247,71 @@ public class Items
 		{
 			if (definition.IsCore && definition.LegacyName != null)
 			{
-				ItemInfo legacy = DEEGAJNPJCI.Find(value => value.Name == definition.LegacyName && value.NodeXML != null &&
+				ItemInfo legacy = allItems.Find(value => value.Name == definition.LegacyName && value.NodeXML != null &&
 					definition.LegacyItemXml != null && value.NodeXML.OuterXml == definition.LegacyItemXml);
-				return legacy ?? DEEGAJNPJCI.Find(value => value.Name == definition.LegacyName);
+				return legacy ?? allItems.Find(value => value.Name == definition.LegacyName);
 			}
-			return DEEGAJNPJCI.Find(value => value.Name == definition.Id.ToString());
+			return allItems.Find(value => value.Name == definition.Id.ToString());
 		}
 		return null;
 	}
 
-	public List<ItemInfo> ONFMAJEAACM(string LFLGCDNKNJI)
+	public List<ItemInfo> GetItemsByType(string LFLGCDNKNJI)
 	{
 		switch (LFLGCDNKNJI)
 		{
 		case "Weapon":
-			return MJKFCBMNNGJ();
+			return GetWeapons();
 		case "Armor":
-			return MCGKNJPLIIH();
+			return GetArmors();
 		case "Helm":
-			return EKKIBLDGNHH();
+			return GetHelms();
 		case "Ranged":
-			return LKGPBHADANE();
+			return GetRangedWeapons();
 		case "Magic":
-			return OGFOBKIEGKA();
+			return GetMagicItems();
 		case "RealMoneyItem":
-			return KCIHHGCHEKM();
+			return GetRealMoneyItems();
 		case "Consumable":
-			return BFFNOIPELKC();
+			return GetConsumables();
 		case "Free":
-			return KEFJPEOEPBN();
+			return GetFreeItems();
 		case "Seal":
-			return DBGMLKGEJDD();
+			return GetSeals();
 		default:
 			return null;
 		}
 	}
 
-	public List<ItemInfo> CKCMJAJAELO(string FDKNIPNGFNF)
+	public List<ItemInfo> GetItemsByMarketId(string FDKNIPNGFNF)
 	{
 		List<ItemInfo> list = new List<ItemInfo>();
 		int i = 0;
-		for (int count = DEEGAJNPJCI.Count; i < count; i++)
+		for (int count = allItems.Count; i < count; i++)
 		{
-			if (DEEGAJNPJCI[i].JLDEALIEEJI() == FDKNIPNGFNF)
+			if (allItems[i].GetMarketId() == FDKNIPNGFNF)
 			{
-				list.Add(DEEGAJNPJCI[i]);
+				list.Add(allItems[i]);
 			}
 		}
 		return list;
 	}
 
-	private ItemInfo HOBNJMONDKB(XmlNode node, int JDEHLOMDDOH)
+	private ItemInfo ParseItem(XmlNode node, int JDEHLOMDDOH)
 	{
 		ItemInfo dJKEECEOCJB = new ItemInfo(node);
 		dJKEECEOCJB.NodeXML = node.CloneNode(true);
 		XmlNode xmlNode = node["Upgrades"];
 		if (xmlNode != null)
 		{
-			string lFLGCDNKNJI = xmlNode.Attributes["Template"].CIPOICEEIBK(string.Empty);
+			string lFLGCDNKNJI = xmlNode.Attributes["Template"].GetStringOrDefault(string.Empty);
 			foreach (XmlNode item in xmlNode)
 			{
 				UpgradeData iFOFMGAKHEP = new UpgradeData(item, lFLGCDNKNJI);
-				dJKEECEOCJB.HNMFDILOBMJ(iFOFMGAKHEP);
+				dJKEECEOCJB.AddLocalUpgrade(iFOFMGAKHEP);
 			}
 		}
-		dJKEECEOCJB.GEEGNGNLPGO();
+		dJKEECEOCJB.SortLocalUpgrades();
 		dJKEECEOCJB.Index = JDEHLOMDDOH;
 		return dJKEECEOCJB;
 	}
@@ -336,15 +336,15 @@ public class Items
 			throw new System.InvalidOperationException("Item already exists: " + name);
 		}
 
-		ItemInfo item = HOBNJMONDKB(node, HCDLKHKBEPF().Count);
-		List<ItemInfo> category = ONFMAJEAACM(item.Type);
+		ItemInfo item = ParseItem(node, GetAllItems().Count);
+		List<ItemInfo> category = GetItemsByType(item.Type);
 		if (category == null || (item.Type != "Weapon" && item.Type != "Armor" && item.Type != "Helm" &&
 			item.Type != "Ranged" && item.Type != "Magic" && item.Type != "Consumable" &&
 			item.Type != "Free" && item.Type != "Seal"))
 		{
 			throw new System.InvalidOperationException("Unsupported external item type '" + item.Type + "': " + name);
 		}
-		HCDLKHKBEPF().Add(item);
+		GetAllItems().Add(item);
 		category.Add(item);
 		return item;
 	}
@@ -360,10 +360,10 @@ public class Items
 		{
 			return false;
 		}
-		List<ItemInfo> category = ONFMAJEAACM(item.Type);
+		List<ItemInfo> category = GetItemsByType(item.Type);
 		if (category == null) return false;
 		category.Remove(item);
-		HCDLKHKBEPF().Remove(item);
+		GetAllItems().Remove(item);
 		return true;
 	}
 
@@ -385,20 +385,20 @@ public class Items
 		foreach (XmlNode childNode in node.ChildNodes)
 		{
 			UpgradeDataContainer aKHJNNDCKMK = new UpgradeDataContainer();
-			aKHJNNDCKMK.Type = childNode.Attributes["Name"].CIPOICEEIBK(string.Empty);
+			aKHJNNDCKMK.Type = childNode.Attributes["Name"].GetStringOrDefault(string.Empty);
 			foreach (XmlNode childNode2 in childNode.ChildNodes)
 			{
 				UpgradeData item = new UpgradeData(childNode2, aKHJNNDCKMK.Type);
-				aKHJNNDCKMK.KPAPEBOAKIE.Add(item);
+				aKHJNNDCKMK.Upgrades.Add(item);
 			}
-			EJDLNCGFACO.Add(aKHJNNDCKMK);
+			upgradeContainers.Add(aKHJNNDCKMK);
 		}
 	}
 
 	// best guess for name
 	public UpgradeDataContainer GetUpgradeDataContainerByName(string LFLGCDNKNJI)
 	{
-		foreach (UpgradeDataContainer item in EJDLNCGFACO)
+		foreach (UpgradeDataContainer item in upgradeContainers)
 		{
 			if (item.Type.Equals(LFLGCDNKNJI))
 			{
@@ -408,13 +408,13 @@ public class Items
 		return null;
 	}
 
-	public void NMMBHENGDJO(string path)
+	public void LoadItems(string path)
 	{
 		XmlDocument xmlDocument = null;
-		xmlDocument = XmlUtils.OpenXMLDocument(path + _fileName, string.Empty, XmlUtils.EBLFEPIOMOL.Normal, true, XmlCryptoUtils.NNLGALNDJCL());
+		xmlDocument = XmlUtils.OpenXMLDocument(path + _fileName, string.Empty, XmlUtils.XmlSourceMode.Normal, true, XmlCryptoUtils.GetIsEncryptionEnabled());
 		if (xmlDocument == null)
 		{
-			LLLOJBFMONN.Error("Items.ParseItems xmlDocument == null");
+			GameLog.Error("Items.ParseItems xmlDocument == null");
 			return;
 		}
 		XmlNode hKPPBKPJOEO = xmlDocument["List"]["UpgradeList"];
@@ -423,51 +423,51 @@ public class Items
 		int num = 0;
 		foreach (XmlNode childNode in xmlNode.ChildNodes)
 		{
-			ItemInfo dJKEECEOCJB = HOBNJMONDKB(childNode, num);
-			HCDLKHKBEPF().Add(dJKEECEOCJB);
+			ItemInfo dJKEECEOCJB = ParseItem(childNode, num);
+			GetAllItems().Add(dJKEECEOCJB);
 			num++;
 			switch (dJKEECEOCJB.Type)
 			{
 			case "Weapon":
-				MJKFCBMNNGJ().Add(dJKEECEOCJB);
+				GetWeapons().Add(dJKEECEOCJB);
 				break;
 			case "Armor":
-				MCGKNJPLIIH().Add(dJKEECEOCJB);
+				GetArmors().Add(dJKEECEOCJB);
 				break;
 			case "Helm":
-				EKKIBLDGNHH().Add(dJKEECEOCJB);
+				GetHelms().Add(dJKEECEOCJB);
 				break;
 			case "Ranged":
-				LKGPBHADANE().Add(dJKEECEOCJB);
+				GetRangedWeapons().Add(dJKEECEOCJB);
 				break;
 			case "Magic":
-				OGFOBKIEGKA().Add(dJKEECEOCJB);
+				GetMagicItems().Add(dJKEECEOCJB);
 				break;
 			case "RealMoneyItem":
-				KCIHHGCHEKM().Add(dJKEECEOCJB);
+				GetRealMoneyItems().Add(dJKEECEOCJB);
 				break;
 			case "Consumable":
-				BFFNOIPELKC().Add(dJKEECEOCJB);
+				GetConsumables().Add(dJKEECEOCJB);
 				break;
 			case "Free":
-				KEFJPEOEPBN().Add(dJKEECEOCJB);
+				GetFreeItems().Add(dJKEECEOCJB);
 				break;
 			case "Seal":
-				DBGMLKGEJDD().Add(dJKEECEOCJB);
+				GetSeals().Add(dJKEECEOCJB);
 				break;
 			}
 		}
 		XmlNode hKPPBKPJOEO3 = xmlDocument["List"]["ItemSets"];
-		DGKMILIPLLF().Parse(hKPPBKPJOEO3);
+		GetItemSets().Parse(hKPPBKPJOEO3);
 	}
 
-	public void HGAKAILEHJO()
+	public void ClearNewItemFlags()
 	{
-		foreach (ItemInfo item in DEEGAJNPJCI)
+		foreach (ItemInfo item in allItems)
 		{
-			if (item.DBHJGAGOLOB())
+			if (item.GetIsNew())
 			{
-				item.BEBDMOEIEJN(false);
+				item.SetIsNew(false);
 			}
 		}
 	}
@@ -479,71 +479,71 @@ public class Items
 
 	public void SetNewAddItem(ItemInfo item, bool value, int OMHDLKNHNMJ)
 	{
-		bool flag = item.MMHIKEIDDNB == string.Empty || ListSF.CCDKHLAMKKO().FLFKOIPCEPI(item.MMHIKEIDDNB);
+		bool flag = item.GroupId == string.Empty || ListSF.GetRoster().HasShopLock(item.GroupId);
 		bool flag2 = OMHDLKNHNMJ == item.ItemLevel;
-		if (!item.GOKHJMOEGIJ() && flag && flag2)
+		if (!item.IsHidden() && flag && flag2)
 		{
-			item.BEBDMOEIEJN(value);
+			item.SetIsNew(value);
 		}
 	}
 
-	public void MJICEAIDCGP(string EADBPKMABML)
+	public void ClearNewFlagsForGroup(string EADBPKMABML)
 	{
-		List<ItemInfo> list = HCDLKHKBEPF();
+		List<ItemInfo> list = GetAllItems();
 		foreach (ItemInfo item in list)
 		{
-			if (item.DCHJDPCEODD && item.DBHJGAGOLOB() && item.MMHIKEIDDNB == EADBPKMABML)
+			if (item.IsShopVisible && item.GetIsNew() && item.GroupId == EADBPKMABML)
 			{
-				item.BEBDMOEIEJN(false);
+				item.SetIsNew(false);
 			}
 		}
 	}
 
-	public ProductDefinition[] FOEGEPKLGJN()
+	public ProductDefinition[] GetProductDefinitions()
 	{
 		List<ProductDefinition> list = new List<ProductDefinition>();
 		HashSet<string> hashSet = new HashSet<string>();
-		foreach (ItemInfo item in DEEGAJNPJCI)
+		foreach (ItemInfo item in allItems)
 		{
-			if (item.Type == "RealMoneyItem" && !string.IsNullOrEmpty(item.JLDEALIEEJI()) && !hashSet.Contains(item.JLDEALIEEJI()))
+			if (item.Type == "RealMoneyItem" && !string.IsNullOrEmpty(item.GetMarketId()) && !hashSet.Contains(item.GetMarketId()))
 			{
-				hashSet.Add(item.JLDEALIEEJI());
-				list.Add(new ProductDefinition(item.JLDEALIEEJI(), (!item.DFFFFIHOOKL()) ? ProductType.NonConsumable : ProductType.Consumable));
+				hashSet.Add(item.GetMarketId());
+				list.Add(new ProductDefinition(item.GetMarketId(), (!item.GetIsConsumable()) ? ProductType.NonConsumable : ProductType.Consumable));
 			}
 		}
 		return list.ToArray();
 	}
 
-	public void HAHLCEBCPLJ(Product[] OCMDJBDPLJK)
+	public void ApplyStoreProducts(Product[] OCMDJBDPLJK)
 	{
 		if (OCMDJBDPLJK != null && OCMDJBDPLJK.Length != 0)
 		{
-			List<ItemInfo> gBBJICINGDF = HKHHDDKGMIA();
+			List<ItemInfo> gBBJICINGDF = GetProductItems();
 			foreach (Product pANEMFIIOGB in OCMDJBDPLJK)
 			{
-				KGNJPJKFEEB(pANEMFIIOGB, gBBJICINGDF);
+				ApplyStoreProduct(pANEMFIIOGB, gBBJICINGDF);
 			}
 		}
 	}
 
-	private void KGNJPJKFEEB(Product PANEMFIIOGB, List<ItemInfo> GBBJICINGDF)
+	private void ApplyStoreProduct(Product PANEMFIIOGB, List<ItemInfo> GBBJICINGDF)
 	{
 		foreach (ItemInfo item in GBBJICINGDF)
 		{
-			if (item.JLDEALIEEJI() == PANEMFIIOGB.definition.id)
+			if (item.GetMarketId() == PANEMFIIOGB.definition.id)
 			{
-				item.IEIKLANLOPL(PANEMFIIOGB.metadata);
+				item.ApplyProductMetadata(PANEMFIIOGB.metadata);
 			}
 		}
 	}
 
 	public void RandomizeObscuredVars()
 	{
-		HCDLKHKBEPF().ForEach((ItemInfo DHDMNHCIPEH) =>
+		GetAllItems().ForEach((ItemInfo DHDMNHCIPEH) =>
 		{
 			DHDMNHCIPEH.RandomizeObscuredVars();
 		});
-		CKCGBCNMOOP().ForEach((UpgradeDataContainer DHDMNHCIPEH) =>
+		GetUpgradeContainers().ForEach((UpgradeDataContainer DHDMNHCIPEH) =>
 		{
 			DHDMNHCIPEH.RandomizeObscuredVars();
 		});

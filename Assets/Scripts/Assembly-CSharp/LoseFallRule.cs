@@ -2,13 +2,13 @@ using System.Xml;
 
 public class LoseFallRule : AnimationListRule
 {
-	public const float PGJLFIONACP = -100000f;
+	public const float DefaultMax = -100000f;
 
-	public const float PLIKDGOFDAB = 100000f;
+	public const float DefaultMin = 100000f;
 
-	private float GNBJFBPFAMM;
+	private float offsetX;
 
-	private float MOLFLBBKAOE;
+	private float offsetY;
 
 	private string _nodeName;
 
@@ -16,61 +16,61 @@ public class LoseFallRule : AnimationListRule
 
     internal override System.Action PrepareModelRebind(Model expected, Model replacement)
     {
-        if (_node == null || expected == null || expected.CLDMEJKGLBA().EGHIDHMENEF(_nodeName) != _node) return null;
-        ModelNode target = replacement?.CLDMEJKGLBA()?.EGHIDHMENEF(_nodeName);
+        if (_node == null || expected == null || expected.GetBodyObject().GetNodeByName(_nodeName) != _node) return null;
+        ModelNode target = replacement?.GetBodyObject()?.GetNodeByName(_nodeName);
         if (target == null) throw new System.InvalidOperationException("Form is missing LoseFallRule node: " + _nodeName);
         return () => _node = target;
     }
 
-	private float NCOIMBKECMD;
+	private float minX;
 
-	private float IBLJKECKGKP;
+	private float maxX;
 
-	private float KEFGNKPIHKH;
+	private float maxY;
 
-	private float AHHGHKHMLDN;
+	private float minY;
 
 	private bool _isCheckRender;
 
 	public LoseFallRule(XmlNode node, RuleAppliance EJPOJJKKICO)
-		: base(BCBLLMPAMLP.RuleLoseFall, EJPOJJKKICO, node)
+		: base(RuleType.RuleLoseFall, EJPOJJKKICO, node)
 	{
 		_isCheckRender = false;
-		IBLJKECKGKP = -100000f;
-		NCOIMBKECMD = 100000f;
-		KEFGNKPIHKH = -100000f;
-		AHHGHKHMLDN = 100000f;
-		GNBJFBPFAMM = 0f;
-		MOLFLBBKAOE = 0f;
+		maxX = -100000f;
+		minX = 100000f;
+		maxY = -100000f;
+		minY = 100000f;
+		offsetX = 0f;
+		offsetY = 0f;
 		_node = null;
 		Parse(node);
-		EBJIKKBLBEM(FightEvent.AnimationStartEvent);
-		EBJIKKBLBEM(FightEvent.RenderEvent);
+		SubscribeEvent(FightEvent.AnimationStartEvent);
+		SubscribeEvent(FightEvent.RenderEvent);
 		if (CheckAnimation("Physical"))
 		{
-			EBJIKKBLBEM(FightEvent.PhysicsStartEvent);
+			SubscribeEvent(FightEvent.PhysicsStartEvent);
 		}
 	}
 
-	public float EJHLFJBJHAN()
+	public float GetMinX()
 	{
-		return NCOIMBKECMD;
+		return minX;
 	}
 
-	public float JFBOKNFDFDO()
+	public float GetMaxX()
 	{
-		return IBLJKECKGKP;
+		return maxX;
 	}
 
-	public bool GFIIDPIFMFJ()
+	public bool CheckOutOfBounds()
 	{
 		if (_node == null || !_isCheckRender)
 		{
 			return false;
 		}
 		Vector3f eMAFACPEPDK = _node.GetStart();
-		eMAFACPEPDK = new Vector3f(eMAFACPEPDK.GetX() + GNBJFBPFAMM, 0f - eMAFACPEPDK.GetY() + MOLFLBBKAOE, eMAFACPEPDK.GetZ());
-		bool flag = eMAFACPEPDK.GetX() > IBLJKECKGKP || eMAFACPEPDK.GetX() < NCOIMBKECMD || eMAFACPEPDK.GetY() > KEFGNKPIHKH || eMAFACPEPDK.GetY() < AHHGHKHMLDN;
+		eMAFACPEPDK = new Vector3f(eMAFACPEPDK.GetX() + offsetX, 0f - eMAFACPEPDK.GetY() + offsetY, eMAFACPEPDK.GetZ());
+		bool flag = eMAFACPEPDK.GetX() > maxX || eMAFACPEPDK.GetX() < minX || eMAFACPEPDK.GetY() > maxY || eMAFACPEPDK.GetY() < minY;
 		if (flag)
 		{
 			SetActive(false);
@@ -82,29 +82,29 @@ public class LoseFallRule : AnimationListRule
 	{
 		Reset();
 		RuleInitData oIFPCFEGFOB = (RuleInitData)data;
-		if (oIFPCFEGFOB.LPJNEDFCBOI != null)
+		if (oIFPCFEGFOB.FightLocation != null)
 		{
-			GNBJFBPFAMM = (0f - oIFPCFEGFOB.LPJNEDFCBOI.JMLAKAKDBBL) / 2f;
-			MOLFLBBKAOE = 0f - oIFPCFEGFOB.LPJNEDFCBOI.JMBOGPILDNM;
+			offsetX = (0f - oIFPCFEGFOB.FightLocation.width) / 2f;
+			offsetY = 0f - oIFPCFEGFOB.FightLocation.positionY;
 		}
-		switch (NDBMMPENJNJ)
+		switch (appliance)
 		{
 		case RuleAppliance.AppliancePlayer:
-			if (oIFPCFEGFOB.DLPKDAIDCBF != null)
+			if (oIFPCFEGFOB.PlayerModel != null)
 			{
-				_node = oIFPCFEGFOB.DLPKDAIDCBF.CLDMEJKGLBA().EGHIDHMENEF(_nodeName);
+				_node = oIFPCFEGFOB.PlayerModel.GetBodyObject().GetNodeByName(_nodeName);
 			}
 			break;
 		case RuleAppliance.ApplianceOpponent:
-			if (oIFPCFEGFOB.OGBHDKKOIGH != null)
+			if (oIFPCFEGFOB.OpponentModel != null)
 			{
-				_node = oIFPCFEGFOB.OGBHDKKOIGH.CLDMEJKGLBA().EGHIDHMENEF(_nodeName);
+				_node = oIFPCFEGFOB.OpponentModel.GetBodyObject().GetNodeByName(_nodeName);
 			}
 			break;
 		}
 		if (_node == null)
 		{
-			LLLOJBFMONN.Error("LoseFallRule::initRule error - no ModelNode found with name %s", _nodeName);
+			GameLog.Error("LoseFallRule::initRule error - no ModelNode found with name %s", _nodeName);
 		}
 	}
 
@@ -121,16 +121,16 @@ public class LoseFallRule : AnimationListRule
 	protected override bool CompareSingle(object data)
 	{
 		FightData hCPJJKMNMCE = (FightData)data;
-		switch (hCPJJKMNMCE.KOJNCHKPLLN)
+		switch (hCPJJKMNMCE.FightEventType)
 		{
 		case FightEvent.PhysicsStartEvent:
 			_isCheckRender = true;
-			return GFIIDPIFMFJ();
+			return CheckOutOfBounds();
 		case FightEvent.AnimationStartEvent:
-			_isCheckRender = CheckAnimation(hCPJJKMNMCE.LKLHCEEMINM);
-			return GFIIDPIFMFJ();
+			_isCheckRender = CheckAnimation(hCPJJKMNMCE.CurrentAnimation);
+			return CheckOutOfBounds();
 		case FightEvent.RenderEvent:
-			return GFIIDPIFMFJ();
+			return CheckOutOfBounds();
 		default:
 			return false;
 		}
@@ -139,17 +139,17 @@ public class LoseFallRule : AnimationListRule
 	protected override void Parse(XmlNode node)
 	{
 		base.Parse(node);
-		_nodeName = node.Attributes["Node"].CIPOICEEIBK(string.Empty);
-		string text = node.Attributes["Axis"].CIPOICEEIBK(string.Empty);
+		_nodeName = node.Attributes["Node"].GetStringOrDefault(string.Empty);
+		string text = node.Attributes["Axis"].GetStringOrDefault(string.Empty);
 		if (text == "X")
 		{
-			IBLJKECKGKP = node.Attributes["Max"].ParseFloat(-100000f);
-			NCOIMBKECMD = node.Attributes["Min"].ParseFloat(100000f);
+			maxX = node.Attributes["Max"].ParseFloat(-100000f);
+			minX = node.Attributes["Min"].ParseFloat(100000f);
 		}
 		if (text == "Y")
 		{
-			KEFGNKPIHKH = node.Attributes["Max"].ParseFloat(-100000f);
-			AHHGHKHMLDN = node.Attributes["Min"].ParseFloat(100000f);
+			maxY = node.Attributes["Max"].ParseFloat(-100000f);
+			minY = node.Attributes["Min"].ParseFloat(100000f);
 		}
 	}
 }

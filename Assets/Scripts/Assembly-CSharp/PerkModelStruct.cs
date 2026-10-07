@@ -4,61 +4,61 @@ using System.Diagnostics;
 public class PerkModelStruct
 {
     // best guess for name
-    internal List<InfoPerk> ActivePerkEffects => HIPOGANEPMI();
+    internal List<InfoPerk> ActivePerkEffects => GetInfoPerks();
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private Model JNPEKAFCGNO;
+	private Model ownerModel;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private List<InfoPerk> KEIGDAGJNLI;
+	private List<InfoPerk> infoPerks;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private List<PerkData> KCLEGANKJGI;
+	private List<PerkData> perkDataList;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private List<PerkTrigger> CCCKBOLNBGG;
+	private List<PerkTrigger> generalTriggers;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private List<PerkTrigger> KOMHGNCENIB;
+	private List<PerkTrigger> comboTriggers;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private List<PerkTrigger> JPOOGEKMFEB;
+	private List<PerkTrigger> everyFrameTriggers;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private List<PerkTrigger> EOGNNGMLGCF;
+	private List<PerkTrigger> hitPreCritTriggers;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private List<PerkTrigger> NKPFGNDOPHG;
+	private List<PerkTrigger> hitPostCritTriggers;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private List<PerkTrigger> OEPNMAGJFBP;
+	private List<PerkTrigger> postHitTriggers;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private List<PerkTrigger> ADMMLNIAKEH;
+	private List<PerkTrigger> magicChargedTriggers;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private List<PerkTrigger> MAGGDAHGCBH;
+	private List<PerkTrigger> roundStageStartTriggers;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private List<PerkTrigger> KCLIBBLDIAI;
+	private List<PerkTrigger> animationStartTriggers;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private List<PerkTrigger> DIHGFAFMLLC;
+	private List<PerkTrigger> animationEndTriggers;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private List<PerkTrigger> FEPONKMDIAJ;
+	private List<PerkTrigger> styleTriggers;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private List<PerkTrigger> BACKGEMJOAK;
+	private List<PerkTrigger> modExpiresTriggers;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private List<PerkTrigger> JLEHKAFKCAP;
+	private List<PerkTrigger> areaEnterTriggers;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private List<PerkTrigger> EGAOBOCFEDA;
+	private List<PerkTrigger> areaExitTriggers;
 
 	private List<PerkTrigger> FMIGRATIONINTERVALEND;
 
-	public Model KJDFJPBIGJC
+	public Model OwnerModel
 	{
 		get
 		{
@@ -70,383 +70,383 @@ public class PerkModelStruct
 		}
 	}
 
-	public List<InfoPerk> DJBAIAKOIHM
+	public List<InfoPerk> InfoPerks
 	{
 		get
 		{
-			return HIPOGANEPMI();
+			return GetInfoPerks();
 		}
 		protected set
 		{
-			CLNPKBIMKJC(value);
+			SetInfoPerks(value);
 		}
 	}
 
-	public List<PerkData> NHBIJEEKALC
+	public List<PerkData> PerkDataList
 	{
 		get
 		{
-			return ANPCFJGEJPO();
+			return GetPerkDataList();
 		}
 		protected set
 		{
-			IAFGAAHDHAK(value);
+			SetPerkDataList(value);
 		}
 	}
 
-	public List<PerkTrigger> CDDDOEKCBLA
+	public List<PerkTrigger> GeneralTriggers
 	{
 		get
 		{
-			return IBKFJFMCFAL();
+			return GetGeneralTriggers();
 		}
 		protected set
 		{
-			HEDFKHEMAIJ(value);
+			SetGeneralTriggers(value);
 		}
 	}
 
-	public List<PerkTrigger> OIBBJNIGFCH
+	public List<PerkTrigger> ComboTriggers
 	{
 		get
 		{
-			return GBMCKIKMDNH();
+			return GetComboTriggers();
 		}
 		protected set
 		{
-			DBOODAINMLC(value);
+			SetComboTriggers(value);
 		}
 	}
 
-	public List<PerkTrigger> JDGIMJPEGON
+	public List<PerkTrigger> EveryFrameTriggers
 	{
 		get
 		{
-			return DEAADEMBDGN();
+			return GetEveryFrameTriggers();
 		}
 		protected set
 		{
-			AHGFJDHPDPM(value);
+			SetEveryFrameTriggers(value);
 		}
 	}
 
-	public List<PerkTrigger> PBPLCNLDFOC
+	public List<PerkTrigger> HitPreCritTriggers
 	{
 		get
 		{
-			return GMCIFKOLPDH();
+			return GetHitPreCritTriggers();
 		}
 		protected set
 		{
-			FMOKGIODCLE(value);
+			SetHitPreCritTriggers(value);
 		}
 	}
 
-	public List<PerkTrigger> PEMHDNFHIGI
+	public List<PerkTrigger> HitPostCritTriggers
 	{
 		get
 		{
-			return MPMNMFBBDJF();
+			return GetHitPostCritTriggers();
 		}
 		protected set
 		{
-			CBPDJOEBAOM(value);
+			SetHitPostCritTriggers(value);
 		}
 	}
 
-	public List<PerkTrigger> CKCKPGMJECC
+	public List<PerkTrigger> PostHitTriggers
 	{
 		get
 		{
-			return CPIGPEHCCAJ();
+			return GetPostHitTriggers();
 		}
 		protected set
 		{
-			CDLBFKGIHFH(value);
+			SetPostHitTriggers(value);
 		}
 	}
 
-	public List<PerkTrigger> HAKAKDGJCFC
+	public List<PerkTrigger> MagicChargedTriggers
 	{
 		get
 		{
-			return KBNLBEPMEHH();
+			return GetMagicChargedTriggers();
 		}
 		protected set
 		{
-			AOBPNOOICNO(value);
+			SetMagicChargedTriggers(value);
 		}
 	}
 
-	public List<PerkTrigger> ELCMKNDIDJF
+	public List<PerkTrigger> RoundStageStartTriggers
 	{
 		get
 		{
-			return GHMGNHPKPGF();
+			return GetRoundStageStartTriggers();
 		}
 		protected set
 		{
-			DPPHDNMFANC(value);
+			SetRoundStageStartTriggers(value);
 		}
 	}
 
-	public List<PerkTrigger> KHMAPLHHBDI
+	public List<PerkTrigger> AnimationStartTriggers
 	{
 		get
 		{
-			return NJOFBEBLCCB();
+			return GetAnimationStartTriggers();
 		}
 		protected set
 		{
-			FHNDNFHPEFM(value);
+			SetAnimationStartTriggers(value);
 		}
 	}
 
-	public List<PerkTrigger> LNHBEDPOGBI
+	public List<PerkTrigger> AnimationEndTriggers
 	{
 		get
 		{
-			return DOAAGFIINIE();
+			return GetAnimationEndTriggers();
 		}
 		protected set
 		{
-			MANPOILPLCM(value);
+			SetAnimationEndTriggers(value);
 		}
 	}
 
-	public List<PerkTrigger> DPEEHMDPBIM
+	public List<PerkTrigger> StyleTriggers
 	{
 		get
 		{
-			return CDLEEPDEFJP();
+			return GetStyleTriggers();
 		}
 		protected set
 		{
-			BFBILEEFCLI(value);
+			SetStyleTriggers(value);
 		}
 	}
 
-	public List<PerkTrigger> KMAAHHEBKMG
+	public List<PerkTrigger> ModExpiresTriggers
 	{
 		get
 		{
-			return CFFBHLIPDDF();
+			return GetModExpiresTriggers();
 		}
 		protected set
 		{
-			KGFOPJAKHIB(value);
+			SetModExpiresTriggers(value);
 		}
 	}
 
-	public List<PerkTrigger> LDIDLMHFCNF
+	public List<PerkTrigger> AreaEnterTriggers
 	{
 		get
 		{
-			return HHMPEODCJBI();
+			return GetAreaEnterTriggers();
 		}
 		protected set
 		{
-			HDLALEDDFJB(value);
+			SetAreaEnterTriggers(value);
 		}
 	}
 
-	public List<PerkTrigger> JLBKCFOBDEP
+	public List<PerkTrigger> AreaExitTriggers
 	{
 		get
 		{
-			return EIJABICDDFO();
+			return GetAreaExitTriggers();
 		}
 		protected set
 		{
-			NOGCEBPENBJ(value);
+			SetAreaExitTriggers(value);
 		}
 	}
 
 	public PerkModelStruct()
 	{
 		set_Model(null);
-		CLNPKBIMKJC(new List<InfoPerk>());
-		IAFGAAHDHAK(new List<PerkData>());
-		HEDFKHEMAIJ(new List<PerkTrigger>());
-		DBOODAINMLC(new List<PerkTrigger>());
-		AHGFJDHPDPM(new List<PerkTrigger>());
-		FMOKGIODCLE(new List<PerkTrigger>());
-		CBPDJOEBAOM(new List<PerkTrigger>());
-		CDLBFKGIHFH(new List<PerkTrigger>());
-		AOBPNOOICNO(new List<PerkTrigger>());
-		DPPHDNMFANC(new List<PerkTrigger>());
-		FHNDNFHPEFM(new List<PerkTrigger>());
-		MANPOILPLCM(new List<PerkTrigger>());
-		BFBILEEFCLI(new List<PerkTrigger>());
-		KGFOPJAKHIB(new List<PerkTrigger>());
-		HDLALEDDFJB(new List<PerkTrigger>());
-		NOGCEBPENBJ(new List<PerkTrigger>());
+		SetInfoPerks(new List<InfoPerk>());
+		SetPerkDataList(new List<PerkData>());
+		SetGeneralTriggers(new List<PerkTrigger>());
+		SetComboTriggers(new List<PerkTrigger>());
+		SetEveryFrameTriggers(new List<PerkTrigger>());
+		SetHitPreCritTriggers(new List<PerkTrigger>());
+		SetHitPostCritTriggers(new List<PerkTrigger>());
+		SetPostHitTriggers(new List<PerkTrigger>());
+		SetMagicChargedTriggers(new List<PerkTrigger>());
+		SetRoundStageStartTriggers(new List<PerkTrigger>());
+		SetAnimationStartTriggers(new List<PerkTrigger>());
+		SetAnimationEndTriggers(new List<PerkTrigger>());
+		SetStyleTriggers(new List<PerkTrigger>());
+		SetModExpiresTriggers(new List<PerkTrigger>());
+		SetAreaEnterTriggers(new List<PerkTrigger>());
+		SetAreaExitTriggers(new List<PerkTrigger>());
 		FMIGRATIONINTERVALEND = new List<PerkTrigger>();
 	}
 
 	public Model get_Model()
 	{
-		return JNPEKAFCGNO;
+		return ownerModel;
 	}
 
 	public void set_Model(Model value)
 	{
-		JNPEKAFCGNO = value;
+		ownerModel = value;
 	}
 
-	public List<InfoPerk> HIPOGANEPMI()
+	public List<InfoPerk> GetInfoPerks()
 	{
-		return KEIGDAGJNLI;
+		return infoPerks;
 	}
 
-	protected void CLNPKBIMKJC(List<InfoPerk> value)
+	protected void SetInfoPerks(List<InfoPerk> value)
 	{
-		KEIGDAGJNLI = value;
+		infoPerks = value;
 	}
 
-	public List<PerkData> ANPCFJGEJPO()
+	public List<PerkData> GetPerkDataList()
 	{
-		return KCLEGANKJGI;
+		return perkDataList;
 	}
 
-	protected void IAFGAAHDHAK(List<PerkData> value)
+	protected void SetPerkDataList(List<PerkData> value)
 	{
-		KCLEGANKJGI = value;
+		perkDataList = value;
 	}
 
-	public List<PerkTrigger> IBKFJFMCFAL()
+	public List<PerkTrigger> GetGeneralTriggers()
 	{
-		return CCCKBOLNBGG;
+		return generalTriggers;
 	}
 
-	protected void HEDFKHEMAIJ(List<PerkTrigger> value)
+	protected void SetGeneralTriggers(List<PerkTrigger> value)
 	{
-		CCCKBOLNBGG = value;
+		generalTriggers = value;
 	}
 
-	public List<PerkTrigger> GBMCKIKMDNH()
+	public List<PerkTrigger> GetComboTriggers()
 	{
-		return KOMHGNCENIB;
+		return comboTriggers;
 	}
 
-	protected void DBOODAINMLC(List<PerkTrigger> value)
+	protected void SetComboTriggers(List<PerkTrigger> value)
 	{
-		KOMHGNCENIB = value;
+		comboTriggers = value;
 	}
 
-	public List<PerkTrigger> DEAADEMBDGN()
+	public List<PerkTrigger> GetEveryFrameTriggers()
 	{
-		return JPOOGEKMFEB;
+		return everyFrameTriggers;
 	}
 
-	protected void AHGFJDHPDPM(List<PerkTrigger> value)
+	protected void SetEveryFrameTriggers(List<PerkTrigger> value)
 	{
-		JPOOGEKMFEB = value;
+		everyFrameTriggers = value;
 	}
 
-	public List<PerkTrigger> GMCIFKOLPDH()
+	public List<PerkTrigger> GetHitPreCritTriggers()
 	{
-		return EOGNNGMLGCF;
+		return hitPreCritTriggers;
 	}
 
-	protected void FMOKGIODCLE(List<PerkTrigger> value)
+	protected void SetHitPreCritTriggers(List<PerkTrigger> value)
 	{
-		EOGNNGMLGCF = value;
+		hitPreCritTriggers = value;
 	}
 
-	public List<PerkTrigger> MPMNMFBBDJF()
+	public List<PerkTrigger> GetHitPostCritTriggers()
 	{
-		return NKPFGNDOPHG;
+		return hitPostCritTriggers;
 	}
 
-	protected void CBPDJOEBAOM(List<PerkTrigger> value)
+	protected void SetHitPostCritTriggers(List<PerkTrigger> value)
 	{
-		NKPFGNDOPHG = value;
+		hitPostCritTriggers = value;
 	}
 
-	public List<PerkTrigger> CPIGPEHCCAJ()
+	public List<PerkTrigger> GetPostHitTriggers()
 	{
-		return OEPNMAGJFBP;
+		return postHitTriggers;
 	}
 
-	protected void CDLBFKGIHFH(List<PerkTrigger> value)
+	protected void SetPostHitTriggers(List<PerkTrigger> value)
 	{
-		OEPNMAGJFBP = value;
+		postHitTriggers = value;
 	}
 
-	public List<PerkTrigger> KBNLBEPMEHH()
+	public List<PerkTrigger> GetMagicChargedTriggers()
 	{
-		return ADMMLNIAKEH;
+		return magicChargedTriggers;
 	}
 
-	protected void AOBPNOOICNO(List<PerkTrigger> value)
+	protected void SetMagicChargedTriggers(List<PerkTrigger> value)
 	{
-		ADMMLNIAKEH = value;
+		magicChargedTriggers = value;
 	}
 
-	public List<PerkTrigger> GHMGNHPKPGF()
+	public List<PerkTrigger> GetRoundStageStartTriggers()
 	{
-		return MAGGDAHGCBH;
+		return roundStageStartTriggers;
 	}
 
-	protected void DPPHDNMFANC(List<PerkTrigger> value)
+	protected void SetRoundStageStartTriggers(List<PerkTrigger> value)
 	{
-		MAGGDAHGCBH = value;
+		roundStageStartTriggers = value;
 	}
 
-	public List<PerkTrigger> NJOFBEBLCCB()
+	public List<PerkTrigger> GetAnimationStartTriggers()
 	{
-		return KCLIBBLDIAI;
+		return animationStartTriggers;
 	}
 
-	protected void FHNDNFHPEFM(List<PerkTrigger> value)
+	protected void SetAnimationStartTriggers(List<PerkTrigger> value)
 	{
-		KCLIBBLDIAI = value;
+		animationStartTriggers = value;
 	}
 
-	public List<PerkTrigger> DOAAGFIINIE()
+	public List<PerkTrigger> GetAnimationEndTriggers()
 	{
-		return DIHGFAFMLLC;
+		return animationEndTriggers;
 	}
 
-	protected void MANPOILPLCM(List<PerkTrigger> value)
+	protected void SetAnimationEndTriggers(List<PerkTrigger> value)
 	{
-		DIHGFAFMLLC = value;
+		animationEndTriggers = value;
 	}
 
-	public List<PerkTrigger> CDLEEPDEFJP()
+	public List<PerkTrigger> GetStyleTriggers()
 	{
-		return FEPONKMDIAJ;
+		return styleTriggers;
 	}
 
-	protected void BFBILEEFCLI(List<PerkTrigger> value)
+	protected void SetStyleTriggers(List<PerkTrigger> value)
 	{
-		FEPONKMDIAJ = value;
+		styleTriggers = value;
 	}
 
-	public List<PerkTrigger> CFFBHLIPDDF()
+	public List<PerkTrigger> GetModExpiresTriggers()
 	{
-		return BACKGEMJOAK;
+		return modExpiresTriggers;
 	}
 
-	protected void KGFOPJAKHIB(List<PerkTrigger> value)
+	protected void SetModExpiresTriggers(List<PerkTrigger> value)
 	{
-		BACKGEMJOAK = value;
+		modExpiresTriggers = value;
 	}
 
-	public List<PerkTrigger> HHMPEODCJBI()
+	public List<PerkTrigger> GetAreaEnterTriggers()
 	{
-		return JLEHKAFKCAP;
+		return areaEnterTriggers;
 	}
 
-	protected void HDLALEDDFJB(List<PerkTrigger> value)
+	protected void SetAreaEnterTriggers(List<PerkTrigger> value)
 	{
-		JLEHKAFKCAP = value;
+		areaEnterTriggers = value;
 	}
 
-	public List<PerkTrigger> EIJABICDDFO()
+	public List<PerkTrigger> GetAreaExitTriggers()
 	{
-		return EGAOBOCFEDA;
+		return areaExitTriggers;
 	}
 
 	public List<PerkTrigger> GetIntervalEndTriggers()
@@ -454,32 +454,32 @@ public class PerkModelStruct
 		return FMIGRATIONINTERVALEND;
 	}
 
-	protected void NOGCEBPENBJ(List<PerkTrigger> value)
+	protected void SetAreaExitTriggers(List<PerkTrigger> value)
 	{
-		EGAOBOCFEDA = value;
+		areaExitTriggers = value;
 	}
 
-	public void JPHLFDHOLKB(PerkInfoItem AEFFHJGMNFI)
+	public void RemovePerk(PerkInfoItem AEFFHJGMNFI)
 	{
-		foreach (PerkData item in ANPCFJGEJPO())
+		foreach (PerkData item in GetPerkDataList())
 		{
-			if (item.MBDDKGIOOGD == AEFFHJGMNFI)
+			if (item.PerkInfo == AEFFHJGMNFI)
 			{
-				ANPCFJGEJPO().Remove(item);
+				GetPerkDataList().Remove(item);
 				break;
 			}
 		}
-		foreach (PerkTrigger item2 in AEFFHJGMNFI.NOJEIGNOPII())
+		foreach (PerkTrigger item2 in AEFFHJGMNFI.GetTriggers())
 		{
-			MBFFKDMFFGO(item2);
+			RemoveTriggerFromEvents(item2);
 		}
 	}
 
-	public PerkData DCGNMCFLDFD(PerkInfoItem AEFFHJGMNFI)
+	public PerkData FindPerkData(PerkInfoItem AEFFHJGMNFI)
 	{
-		foreach (PerkData item in ANPCFJGEJPO())
+		foreach (PerkData item in GetPerkDataList())
 		{
-			if (item.MBDDKGIOOGD == AEFFHJGMNFI)
+			if (item.PerkInfo == AEFFHJGMNFI)
 			{
 				return item;
 			}
@@ -487,57 +487,57 @@ public class PerkModelStruct
 		return null;
 	}
 
-	public List<PerkTrigger> ILLIKOPBPIK(PerkEvent.KNKIIEPDCPN LFLGCDNKNJI)
+	public List<PerkTrigger> GetTriggersForEvent(PerkEvent.PerkEventType LFLGCDNKNJI)
 	{
 		switch (LFLGCDNKNJI)
 		{
-		case PerkEvent.KNKIIEPDCPN.EVENT_COMBO:
-			return GBMCKIKMDNH();
-		case PerkEvent.KNKIIEPDCPN.EVENT_EVERY_FRAME:
-			return DEAADEMBDGN();
-		case PerkEvent.KNKIIEPDCPN.EVENT_HIT_PRECRIT:
-			return GMCIFKOLPDH();
-		case PerkEvent.KNKIIEPDCPN.EVENT_HIT_POSTCRIT:
-			return MPMNMFBBDJF();
-		case PerkEvent.KNKIIEPDCPN.EVENT_POST_HIT:
-			return CPIGPEHCCAJ();
-		case PerkEvent.KNKIIEPDCPN.EVENT_MAGIC_CHARGED:
-			return KBNLBEPMEHH();
-		case PerkEvent.KNKIIEPDCPN.EVENT_ROUND_STAGE_START:
-			return GHMGNHPKPGF();
-		case PerkEvent.KNKIIEPDCPN.EVENT_STYLE:
-			return CDLEEPDEFJP();
-		case PerkEvent.KNKIIEPDCPN.EVENT_ANIMATION_START:
-			return NJOFBEBLCCB();
-		case PerkEvent.KNKIIEPDCPN.EVENT_ANIMATION_END:
-			return DOAAGFIINIE();
-		case PerkEvent.KNKIIEPDCPN.EVENT_MOD_EXPIRES:
-			return CFFBHLIPDDF();
-		case PerkEvent.KNKIIEPDCPN.EVENT_AREA_ENTER:
-			return HHMPEODCJBI();
-		case PerkEvent.KNKIIEPDCPN.EVENT_AREA_EXIT:
-			return EIJABICDDFO();
-		case PerkEvent.KNKIIEPDCPN.EVENT_INTERVAL_END:
+		case PerkEvent.PerkEventType.EVENT_COMBO:
+			return GetComboTriggers();
+		case PerkEvent.PerkEventType.EVENT_EVERY_FRAME:
+			return GetEveryFrameTriggers();
+		case PerkEvent.PerkEventType.EVENT_HIT_PRECRIT:
+			return GetHitPreCritTriggers();
+		case PerkEvent.PerkEventType.EVENT_HIT_POSTCRIT:
+			return GetHitPostCritTriggers();
+		case PerkEvent.PerkEventType.EVENT_POST_HIT:
+			return GetPostHitTriggers();
+		case PerkEvent.PerkEventType.EVENT_MAGIC_CHARGED:
+			return GetMagicChargedTriggers();
+		case PerkEvent.PerkEventType.EVENT_ROUND_STAGE_START:
+			return GetRoundStageStartTriggers();
+		case PerkEvent.PerkEventType.EVENT_STYLE:
+			return GetStyleTriggers();
+		case PerkEvent.PerkEventType.EVENT_ANIMATION_START:
+			return GetAnimationStartTriggers();
+		case PerkEvent.PerkEventType.EVENT_ANIMATION_END:
+			return GetAnimationEndTriggers();
+		case PerkEvent.PerkEventType.EVENT_MOD_EXPIRES:
+			return GetModExpiresTriggers();
+		case PerkEvent.PerkEventType.EVENT_AREA_ENTER:
+			return GetAreaEnterTriggers();
+		case PerkEvent.PerkEventType.EVENT_AREA_EXIT:
+			return GetAreaExitTriggers();
+		case PerkEvent.PerkEventType.EVENT_INTERVAL_END:
 			return GetIntervalEndTriggers();
 		default:
 			return null;
 		}
 	}
 
-	public void MBFFKDMFFGO(PerkTrigger CPBHKJFPFJB)
+	public void RemoveTriggerFromEvents(PerkTrigger CPBHKJFPFJB)
 	{
-		foreach (PerkEvent item in CPBHKJFPFJB.PHLLJJNCEIH())
+		foreach (PerkEvent item in CPBHKJFPFJB.GetEvents())
 		{
-			List<PerkTrigger> list = ILLIKOPBPIK(item.get_Type());
+			List<PerkTrigger> list = GetTriggersForEvent(item.get_Type());
 			list.Remove(CPBHKJFPFJB);
 		}
 	}
 
-	public void ANHEJBMHGIL(PerkInfoItem AEFFHJGMNFI, bool value)
+	public void SetPerkEnabled(PerkInfoItem AEFFHJGMNFI, bool value)
 	{
-		foreach (PerkData item in ANPCFJGEJPO())
+		foreach (PerkData item in GetPerkDataList())
 		{
-			if (item.MBDDKGIOOGD == AEFFHJGMNFI)
+			if (item.PerkInfo == AEFFHJGMNFI)
 			{
 				item.Enabled = value;
 				break;

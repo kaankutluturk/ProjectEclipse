@@ -17,17 +17,17 @@ public class BattleReplayable : Battle
 	public void Parse(XmlNode node)
 	{
 		XmlNode hKPPBKPJOEO = node["Rules"];
-		EEPPJEMHBCK(hKPPBKPJOEO);
+		ParseRules(hKPPBKPJOEO);
 	}
 
-	public int HLBOMMKJAAO()
+	public int GetCompletedCycles()
 	{
-		return (MEOMPEEPCJJ != null) ? MEOMPEEPCJJ.ODCFKCJJDKN() : 0;
+		return (_rosterBattle != null) ? _rosterBattle.GetReplayCount() : 0;
 	}
 
 	public bool TryStartNextReplay()
 	{
-		if (MEOMPEEPCJJ == null || MEOMPEEPCJJ.IsLocked())
+		if (_rosterBattle == null || _rosterBattle.IsLocked())
 		{
 			return false;
 		}
@@ -42,30 +42,30 @@ public class BattleReplayable : Battle
 		int completedCycles = int.MaxValue;
 		foreach (FightList fight in fights)
 		{
-			RosterFight rosterFight = fight.FLKFFDLLBKA();
-			if (rosterFight == null || fight.EJGGHHEOGPG <= 0)
+			RosterFight rosterFight = fight.GetRosterFight();
+			if (rosterFight == null || fight.ReplayCount <= 0)
 			{
 				return false;
 			}
-			completedCycles = System.Math.Min(completedCycles, rosterFight.GetWinCount() / fight.EJGGHHEOGPG);
+			completedCycles = System.Math.Min(completedCycles, rosterFight.GetWinCount() / fight.ReplayCount);
 		}
-		if (completedCycles <= HLBOMMKJAAO())
+		if (completedCycles <= GetCompletedCycles())
 		{
 			return false;
 		}
-		MEOMPEEPCJJ.FHCHCHPPMEI(completedCycles);
+		_rosterBattle.SetReplayCount(completedCycles);
 		foreach (FightList fight in fights)
 		{
-			ListSF.DINPFDGMEAB(fight);
+			ListSF.UpdateFightStatus(fight);
 		}
 		return true;
 	}
 
-	public virtual void MJJFFAOLCCK(FightList KGKDKENMAOA)
+	public virtual void RefreshFightStatus(FightList KGKDKENMAOA)
 	{
-		int num = HLBOMMKJAAO();
-		RosterFight pIGKOIFBOME = KGKDKENMAOA.FLKFFDLLBKA();
-		int eJGGHHEOGPG = KGKDKENMAOA.EJGGHHEOGPG;
+		int num = GetCompletedCycles();
+		RosterFight pIGKOIFBOME = KGKDKENMAOA.GetRosterFight();
+		int eJGGHHEOGPG = KGKDKENMAOA.ReplayCount;
 		if (pIGKOIFBOME != null)
 		{
 			if (pIGKOIFBOME.GetWinCount() >= eJGGHHEOGPG * (num + 1))
@@ -79,8 +79,8 @@ public class BattleReplayable : Battle
 		}
 	}
 
-	protected void EEPPJEMHBCK(XmlNode node)
+	protected void ParseRules(XmlNode node)
 	{
-		RuleParser.EEPPJEMHBCK(node, _rules);
+		RuleParser.ParseRules(node, _rules);
 	}
 }

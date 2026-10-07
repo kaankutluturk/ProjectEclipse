@@ -2,15 +2,15 @@ using YamlDotNet.Core;
 
 public abstract class ParsingEvent
 {
-	private readonly Mark ILENLCMAMBH;
+	private readonly Mark start;
 
-	private readonly Mark PCLFFOBJJFO;
+	private readonly Mark end;
 
-	public virtual int OHJMGKADENE
+	public virtual int NestingIncrease
 	{
 		get
 		{
-			return DPIMLJJFMCO();
+			return GetNestingIncrease();
 		}
 	}
 
@@ -18,40 +18,40 @@ public abstract class ParsingEvent
 	{
 		get
 		{
-			return OGPHJPFHBJL();
+			return GetStart();
 		}
 	}
 
-	public Mark PLHPGFGAGKJ
+	public Mark End
 	{
 		get
 		{
-			return GDJHIJHFPHA();
+			return GetEnd();
 		}
 	}
 
 	internal ParsingEvent(Mark ILENLCMAMBH, Mark PCLFFOBJJFO)
 	{
-		this.ILENLCMAMBH = ILENLCMAMBH;
-		this.PCLFFOBJJFO = PCLFFOBJJFO;
+		this.start = ILENLCMAMBH;
+		this.end = PCLFFOBJJFO;
 	}
 
-	public virtual int DPIMLJJFMCO()
+	public virtual int GetNestingIncrease()
 	{
 		return 0;
 	}
 
-	internal abstract BHBPOHDAGPH get_Type();
+	internal abstract ParsingEventType get_Type();
 
-	public Mark OGPHJPFHBJL()
+	public Mark GetStart()
 	{
-		return ILENLCMAMBH;
+		return start;
 	}
 
-	public Mark GDJHIJHFPHA()
+	public Mark GetEnd()
 	{
-		return PCLFFOBJJFO;
+		return end;
 	}
 
-	public abstract void GPHIFFOGOGN(IParsingEventVisitor NKECMANOOEM);
+	public abstract void Accept(IParsingEventVisitor NKECMANOOEM);
 }

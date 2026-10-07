@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 public abstract class PostSendTransportBase : TransportBase
 {
-	protected List<HTTPRequest> BLKGCEOGHGB = new List<HTTPRequest>();
+	protected List<HTTPRequest> sendRequestQueue = new List<HTTPRequest>();
 
 	public PostSendTransportBase(string name, Connection EPDOEDFFPFD)
 		: base(name, EPDOEDFFPFD)
@@ -11,55 +11,55 @@ public abstract class PostSendTransportBase : TransportBase
 
 	protected override void SendImpl(string EMDHMHOKGFP)
 	{
-		HTTPRequest iPLGNIDJDCF = new HTTPRequest(BAFGHLCPPHM().BuildUri(FHIEGKMHOCC.Send, this), LAAFHDKKJFL.Post, true, true, HPKOMAEBJGP);
-		iPLGNIDJDCF.OJCFIIONEKJ(AIEMPPBDGNH.UrlEncoded);
+		HTTPRequest iPLGNIDJDCF = new HTTPRequest(GetConnection().BuildUri(SignalRRequestType.Send, this), HTTPMethods.Post, true, true, OnSendRequestFinished);
+		iPLGNIDJDCF.SetFormUsage(HTTPFormUsage.UrlEncoded);
 		iPLGNIDJDCF.AddField("data", EMDHMHOKGFP);
-		BAFGHLCPPHM().PrepareRequest(iPLGNIDJDCF, FHIEGKMHOCC.Send);
-		iPLGNIDJDCF.INEEHPCAICE(-1);
+		GetConnection().PrepareRequest(iPLGNIDJDCF, SignalRRequestType.Send);
+		iPLGNIDJDCF.SetPriority(-1);
 		iPLGNIDJDCF.Send();
-		BLKGCEOGHGB.Add(iPLGNIDJDCF);
+		sendRequestQueue.Add(iPLGNIDJDCF);
 	}
 
-	private void HPKOMAEBJGP(HTTPRequest CGOIOKHEGOE, HTTPResponse BEIGFGCBICO)
+	private void OnSendRequestFinished(HTTPRequest CGOIOKHEGOE, HTTPResponse BEIGFGCBICO)
 	{
-		BLKGCEOGHGB.Remove(CGOIOKHEGOE);
+		sendRequestQueue.Remove(CGOIOKHEGOE);
 		string text = string.Empty;
-		switch (CGOIOKHEGOE.FLBBFDNHJAJ())
+		switch (CGOIOKHEGOE.GetState())
 		{
-		case CFGBMHKCENK.Finished:
-			if (BEIGFGCBICO.AICKPAMONBH())
+		case HTTPRequestStates.Finished:
+			if (BEIGFGCBICO.GetIsSuccess())
 			{
-				HTTPManager.MBBMPNDDPIH().KDAFBLAKBMI("Transport - " + get_Name(), "Send - Request Finished Successfully! " + BEIGFGCBICO.DPBLPGKOEJB());
-				if (!string.IsNullOrEmpty(BEIGFGCBICO.DPBLPGKOEJB()))
+				HTTPManager.GetLogger().Information("Transport - " + get_Name(), "Send - Request Finished Successfully! " + BEIGFGCBICO.GetDataAsText());
+				if (!string.IsNullOrEmpty(BEIGFGCBICO.GetDataAsText()))
 				{
-					IServerMessage bNGPAAAKBOP = TransportBase.Parse(BAFGHLCPPHM().IBNMFHGHIBI(), BEIGFGCBICO.DPBLPGKOEJB());
+					IServerMessage bNGPAAAKBOP = TransportBase.Parse(GetConnection().GetJsonEncoder(), BEIGFGCBICO.GetDataAsText());
 					if (bNGPAAAKBOP != null)
 					{
-						BAFGHLCPPHM().OnMessage(bNGPAAAKBOP);
+						GetConnection().OnMessage(bNGPAAAKBOP);
 					}
 				}
 			}
 			else
 			{
-				text = string.Format("Send - Request Finished Successfully, but the server sent an error. Status Code: {0}-{1} Message: {2}", BEIGFGCBICO.KNMDPGBPNED(), BEIGFGCBICO.DCKPMHKDLEJ(), BEIGFGCBICO.DPBLPGKOEJB());
+				text = string.Format("Send - Request Finished Successfully, but the server sent an error. Status Code: {0}-{1} Message: {2}", BEIGFGCBICO.GetStatusCode(), BEIGFGCBICO.GetMessage(), BEIGFGCBICO.GetDataAsText());
 			}
 			break;
-		case CFGBMHKCENK.Error:
-			text = "Send - Request Finished with Error! " + ((CGOIOKHEGOE.IEFGFKFHNMD() == null) ? "No Exception" : (CGOIOKHEGOE.IEFGFKFHNMD().Message + "\n" + CGOIOKHEGOE.IEFGFKFHNMD().StackTrace));
+		case HTTPRequestStates.Error:
+			text = "Send - Request Finished with Error! " + ((CGOIOKHEGOE.GetException() == null) ? "No Exception" : (CGOIOKHEGOE.GetException().Message + "\n" + CGOIOKHEGOE.GetException().StackTrace));
 			break;
-		case CFGBMHKCENK.Aborted:
+		case HTTPRequestStates.Aborted:
 			text = "Send - Request Aborted!";
 			break;
-		case CFGBMHKCENK.ConnectionTimedOut:
+		case HTTPRequestStates.ConnectionTimedOut:
 			text = "Send - Connection Timed Out!";
 			break;
-		case CFGBMHKCENK.TimedOut:
+		case HTTPRequestStates.TimedOut:
 			text = "Send - Processing the request Timed Out!";
 			break;
 		}
 		if (!string.IsNullOrEmpty(text))
 		{
-			BAFGHLCPPHM().Error(text);
+			GetConnection().Error(text);
 		}
 	}
 }

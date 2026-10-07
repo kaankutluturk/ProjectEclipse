@@ -7,81 +7,81 @@ public class EffectsContainer
 
 	private List<Model> _models = new List<Model>();
 
-	private EffectsRunning IGLOMLIOOBM;
+	private EffectsRunning effectsRunning;
 
-	public GameObject ICDCIANNAAI
+	public GameObject UnityObject
 	{
 		get
 		{
-			return MJNPBMOAFML();
+			return GetUnityObject();
 		}
 	}
 
-	public EffectsRunning EOPFGIDLHKP
+	public EffectsRunning RunningEffects
 	{
 		get
 		{
-			return NFCBNLKLPBK();
+			return GetEffectsRunning();
 		}
 	}
 
 	public EffectsContainer()
 	{
-		IGLOMLIOOBM = null;
+		effectsRunning = null;
 		_UnityObject = new GameObject("EffectsContainer");
 	}
 
-	public GameObject MJNPBMOAFML()
+	public GameObject GetUnityObject()
 	{
 		return _UnityObject;
 	}
 
-	public EffectsRunning NFCBNLKLPBK()
+	public EffectsRunning GetEffectsRunning()
 	{
-		return IGLOMLIOOBM;
+		return effectsRunning;
 	}
 
 	public void init(float GBNPHCHGKDO)
 	{
-		GOPCPIFMEKO();
+		EnsureRunning();
 	}
 
-	public void GOPCPIFMEKO()
+	public void EnsureRunning()
 	{
-		if (IGLOMLIOOBM == null)
+		if (effectsRunning == null)
 		{
-			IGLOMLIOOBM = new EffectsRunning();
-			IGLOMLIOOBM.MJNPBMOAFML().transform.SetParent(_UnityObject.transform, false);
+			effectsRunning = new EffectsRunning();
+			effectsRunning.GetUnityObject().transform.SetParent(_UnityObject.transform, false);
 		}
 	}
 
-	public void CEPKAHEAADL()
+	public void ClearModels()
 	{
 		_models.Clear();
 	}
 
-	public void DHOMHKADCFG()
+	public void UpdateEffects()
 	{
-		IGLOMLIOOBM.DHOMHKADCFG();
+		effectsRunning.UpdateEffects();
 	}
 
-	public void NAOIDALEENG(ActionEffect IBODMPMJELJ)
+	public void StartEffect(ActionEffect IBODMPMJELJ)
 	{
-		IGLOMLIOOBM.BGDJDFABJFD(IBODMPMJELJ, IBODMPMJELJ.get_Model());
+		effectsRunning.StartEffect(IBODMPMJELJ, IBODMPMJELJ.get_Model());
 	}
 
-	public void HNCAGBNDBMA(ActionStopEffect IBODMPMJELJ)
+	public void StopEffect(ActionStopEffect IBODMPMJELJ)
 	{
-		IGLOMLIOOBM.CNBFDLLLJOF(IBODMPMJELJ, IBODMPMJELJ.get_Model());
+		effectsRunning.StopEffect(IBODMPMJELJ, IBODMPMJELJ.get_Model());
 	}
 
-	public void PCOEBNDLHKP(ActionStopFollowEffect IBODMPMJELJ)
+	public void StopFollowEffect(ActionStopFollowEffect IBODMPMJELJ)
 	{
-		IGLOMLIOOBM.stopFollowEffect(IBODMPMJELJ, IBODMPMJELJ.get_Model());
+		effectsRunning.stopFollowEffect(IBODMPMJELJ, IBODMPMJELJ.get_Model());
 	}
 
-	public void PMAFCJNKFLF()
+	public void RemoveAllEffects()
 	{
-		IGLOMLIOOBM.PMAFCJNKFLF();
+		effectsRunning.RemoveAllEffects();
 	}
 }

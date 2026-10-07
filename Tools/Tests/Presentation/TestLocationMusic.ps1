@@ -10,11 +10,11 @@ using System;
 using System.Xml;
 using System.Collections.Generic;
 public static class NativeMusicExtensions {
- public static string CIPOICEEIBK(this XmlAttribute value){return value==null?"":value.Value;}
+ public static string GetStringOrDefault(this XmlAttribute value){return value==null?"":value.Value;}
 }
 public static class NativeMusicFixture {
  public sealed class Entry {public string MusicAsset;}
- public static List<string> Select(bool hasExternalLocation,string single,string list,string PINIIFIOECE){
+ public static List<string> Select(bool hasExternalLocation,string single,string list,string encounterMusic){
   var musics=new List<string>{"stale"};var externalLocation=new Entry{MusicAsset=single};
   var xmlDocument=new XmlDocument();xmlDocument.LoadXml("<Root/>");if(list!=null)xmlDocument.DocumentElement.SetAttribute("Music",list);
   /* BLOCK */

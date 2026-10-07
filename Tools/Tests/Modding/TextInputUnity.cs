@@ -46,16 +46,16 @@ public static class TextInputUnity
                 typeof(Eclipse.UI.TitleScreen).GetMethod("BeginCampaign",Hidden).Invoke(title,null);
                 var directory=SF2Paths.GetUserDataDirectory();
                 Check(Eclipse.Saves.CampaignSaveSession.PreviewDirectory==null&&directory.StartsWith(Application.persistentDataPath,StringComparison.OrdinalIgnoreCase)&&Application.persistentDataPath.Contains("TextInputUnity-"),"Profile not isolated");
-                var profile=XmlUtils.OpenXMLDocument(SF2Paths.KKIDGPBOBNI(),"usersDefault.xml",XmlUtils.EBLFEPIOMOL.Normal,true,XmlCryptoUtils.NNLGALNDJCL());
+                var profile=XmlUtils.OpenXMLDocument(SF2Paths.GetGameDataPath(),"usersDefault.xml",XmlUtils.XmlSourceMode.Normal,true,XmlCryptoUtils.GetIsEncryptionEnabled());
                 ((System.Xml.XmlElement)profile.SelectSingleNode("/Root/Warriors/Warrior[@ID='1']")).SetAttribute("Tutorial","END");
-                Directory.CreateDirectory(directory);XmlUtils.ONLDJNLKKAL(profile,Path.Combine(directory,Constants.OJMIJINKBPJ).Replace('\\','/'));
+                Directory.CreateDirectory(directory);XmlUtils.SaveDocumentWithHash(profile,Path.Combine(directory,Constants.UsersFileName).Replace('\\','/'));
                 campaign=true;return;
             }
             if(!entered){
                 if(ModRuntime.Scripts==null||Module.GetInstance()==null||Eclipse.UI.TitleScreen.IsOpen||UnityEngine.Object.FindFirstObjectByType<Eclipse.UI.EclipseLoadingOverlay>()!=null)return;
                 var screen=Module.GetInstance().GetCurrentScreenType();if(screen!=ScreenType.ModuleDojo&&screen!=ScreenType.ModuleMap)return;
                 Check(!ModRuntime.Host.HasErrors,ModRuntime.Host.FormatReport());Check(ModRuntime.Host.EnabledMods.Any(m=>m.Id.Value=="example.text-input-lab"),"Text Input Lab not enabled");Check(!ModRuntime.Scripts.HasErrors,"Startup mod errors");
-                var encounter=ListSF.CHMCKGCDGCM(new FightIDS(ModRuntime.Scripts.Content.RuntimeFightId(DefinitionId.Parse("core:fights/zone_1/tournament/3"))));
+                var encounter=ListSF.GetFightById(new FightIDS(ModRuntime.Scripts.Content.RuntimeFightId(DefinitionId.Parse("core:fights/zone_1/tournament/3"))));
                 Check(encounter!=null,"Core encounter missing");entered=GameUtils.StartFight(encounter,false,null,true,false);return;
             }
             var fight=Fight.GetCurrentFight();if(fight==null||fight.get_FightTimeInFrames()<10)return;
@@ -128,7 +128,7 @@ public static class TextInputUnity
                 Eclipse.UI.Modding.ModUiGameBridge.Route(0,false,true);
                 Check(form.IsClosed&&!surface.IsClosed,"Second Back dismisses modal only");
                 surface.Close();Check(surface.IsClosed&&!coordinator.IsEditingText,"Owner close removes field input authority");
-                typeof(Fight).GetMethod("HCNDAFDHACI",Hidden).Invoke(fight,new object[]{GameOverTypes.GAME_OVER_SURRENDER});Next();break;
+                typeof(Fight).GetMethod("AbortFight",Hidden).Invoke(fight,new object[]{GameOverTypes.GAME_OVER_SURRENDER});Next();break;
             case 9:
                 if(elapsed<.2)return;
                 Check(ModRuntime.Scripts.CallbackDiagnostics.RecentFailures.Count==0,"Text Input Lab callback errors");

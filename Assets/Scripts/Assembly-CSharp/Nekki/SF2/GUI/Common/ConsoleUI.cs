@@ -38,9 +38,9 @@ namespace Nekki.SF2.GUI.Common
 
 		private int _LastCommandIndex = -1;
 
-		private RectTransform DEFEGINEEKB;
+		private RectTransform rectTransform;
 
-		public static ConsoleUI BLOOLFFMKFI
+		public static ConsoleUI ActiveConsole
 		{
 			get
 			{
@@ -48,7 +48,7 @@ namespace Nekki.SF2.GUI.Common
 			}
 		}
 
-		public bool NJKPPJDCHPE
+		public bool IsWindowOpen
 		{
 			get
 			{
@@ -56,7 +56,7 @@ namespace Nekki.SF2.GUI.Common
 			}
 		}
 
-		public static event Action<bool> GKMLAKACCFO
+		public static event Action<bool> ConsoleActiveChanged
 		{
 			add
 			{
@@ -108,12 +108,12 @@ namespace Nekki.SF2.GUI.Common
 			_Current = this;
 			_Text.text = _OutputList.ToString();
 			_Window.gameObject.SetActive(false);
-			DEFEGINEEKB = GetComponent<RectTransform>();
+			rectTransform = GetComponent<RectTransform>();
 		}
 
-		protected override void PJNFHNFLNNO()
+		protected override void OnModuleShutdown()
 		{
-			base.PJNFHNFLNNO();
+			base.OnModuleShutdown();
 			_Current = null;
 		}
 
@@ -172,7 +172,7 @@ namespace Nekki.SF2.GUI.Common
 					_CommandList.Add(text);
 				}
 				AddText(string.Format("<b>{0}</b>", text));
-				LLLOJBFMONN.Write(text2);
+				GameLog.Write(text2);
 				string[] array = text2.Split('\n');
 				foreach (string nGEPNAJJHCD in array)
 				{
@@ -190,17 +190,17 @@ namespace Nekki.SF2.GUI.Common
 
 		public void OnToggleConsoleButton()
 		{
-			Vector3 localPosition = DEFEGINEEKB.localPosition;
+			Vector3 localPosition = rectTransform.localPosition;
 			if (!get_IsWindowActive())
 			{
 				Activate(true);
-				DEFEGINEEKB.localPosition = localPosition - new Vector3(0f, _Window.rect.height, 0f);
+				rectTransform.localPosition = localPosition - new Vector3(0f, _Window.rect.height, 0f);
 				_Input.ActivateInputField();
 			}
 			else
 			{
 				Activate(false);
-				DEFEGINEEKB.localPosition = localPosition + new Vector3(0f, _Window.rect.height, 0f);
+				rectTransform.localPosition = localPosition + new Vector3(0f, _Window.rect.height, 0f);
 				_Input.DeactivateInputField();
 			}
 		}
@@ -208,7 +208,7 @@ namespace Nekki.SF2.GUI.Common
 		protected void Activate(bool DMOGLMLJCDP)
 		{
 			_Window.gameObject.SetActive(DMOGLMLJCDP);
-			if (NDHHFHHBFEC && OnConsoleActive != null)
+			if (initialized && OnConsoleActive != null)
 			{
 				OnConsoleActive(DMOGLMLJCDP);
 			}

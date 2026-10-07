@@ -7,7 +7,7 @@ public class ConditionPerk : ConditionAnimation
 	public ConditionPerk(XmlNode node)
 		: base(ConditionType.PERK)
 	{
-		_Name = node.Attributes["Name"].CIPOICEEIBK(string.Empty);
+		_Name = node.Attributes["Name"].GetStringOrDefault(string.Empty);
 	}
 
 	public string get_Name()
@@ -20,9 +20,9 @@ public class ConditionPerk : ConditionAnimation
 		bool flag = false;
 		bool flag2 = false;
 		bool flag3 = false;
-		if (conditions.POBNMMADAJJ != null)
+		if (conditions.SelfPerks != null)
 		{
-			foreach (PerkInfoItem item in conditions.POBNMMADAJJ)
+			foreach (PerkInfoItem item in conditions.SelfPerks)
 			{
 				if (item != null && _Name == item.Name)
 				{
@@ -31,9 +31,9 @@ public class ConditionPerk : ConditionAnimation
 				}
 			}
 		}
-		if (conditions.CFPLPALGCMK != null)
+		if (conditions.OtherPerks != null)
 		{
-			foreach (PerkInfoItem item2 in conditions.CFPLPALGCMK)
+			foreach (PerkInfoItem item2 in conditions.OtherPerks)
 			{
 				if (item2 != null && _Name == item2.Name)
 				{
@@ -42,15 +42,15 @@ public class ConditionPerk : ConditionAnimation
 				}
 			}
 		}
-		switch (OOFFOILONLO)
+		switch (_targetModelType)
 		{
-		case ModelType.KEIDBIOIFGA.MODEL_THIS:
+		case ModelType.ModelTargetType.MODEL_THIS:
 			flag = flag2;
 			break;
-		case ModelType.KEIDBIOIFGA.MODEL_OTHER:
+		case ModelType.ModelTargetType.MODEL_OTHER:
 			flag = flag3;
 			break;
-		case ModelType.KEIDBIOIFGA.MODEL_BOTH:
+		case ModelType.ModelTargetType.MODEL_BOTH:
 			flag = flag2 && flag3;
 			break;
 		default:

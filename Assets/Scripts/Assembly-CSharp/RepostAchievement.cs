@@ -9,12 +9,12 @@ public class RepostAchievement
 	public RepostAchievement(XmlNode node)
 	{
 		_node = node;
-		_name = node.Attributes["Name"].CIPOICEEIBK();
+		_name = node.Attributes["Name"].GetStringOrDefault();
 	}
 
 	public RepostAchievement(XmlNode FMBDAPOMFGN, string name)
 	{
-		_node = FMBDAPOMFGN.ACBPMPMPKJJ("RepostAchievement");
+		_node = FMBDAPOMFGN.AppendElement("RepostAchievement");
 		set_Name(name);
 	}
 
@@ -28,7 +28,7 @@ public class RepostAchievement
 		_name = value;
 		if (_node.Attributes["Name"] == null)
 		{
-			_node.LLIKNHNLGJJ("Name");
+			_node.AppendAttribute("Name");
 		}
 		_node.Attributes["Name"].Value = _name;
 	}

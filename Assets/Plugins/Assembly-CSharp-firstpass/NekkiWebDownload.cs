@@ -3,48 +3,48 @@ using UnityEngine.Networking;
 
 public class NekkiWebDownload : NekkiWebRequest
 {
-	private readonly string NHNPNIOBFPG;
+	private readonly string _targetPath;
 
-	private readonly string CDIGBKFPBKE;
+	private readonly string _tempPath;
 
 	public NekkiWebDownload(string path, float DGDKHFPEHOG = 5f)
 		: base(DGDKHFPEHOG)
 	{
-		NHNPNIOBFPG = path;
-		CDIGBKFPBKE = Path.GetDirectoryName(path) + "/" + Path.GetFileNameWithoutExtension(path) + "_download.nekki";
-		HCEPBIAOJKG.BKLIKICKDPH(NHNPNIOBFPG);
-		HCEPBIAOJKG.BKLIKICKDPH(CDIGBKFPBKE);
+		_targetPath = path;
+		_tempPath = Path.GetDirectoryName(path) + "/" + Path.GetFileNameWithoutExtension(path) + "_download.nekki";
+		FileUtils.DeleteFile(_targetPath);
+		FileUtils.DeleteFile(_tempPath);
 	}
 
 	public void Send(UnityWebRequest DLILAFJFLAI)
 	{
-		if (HCEPBIAOJKG.GFBMBNAIJEJ(CDIGBKFPBKE))
+		if (FileUtils.FileExists(_tempPath))
 		{
-			FileInfo fileInfo = new FileInfo(CDIGBKFPBKE);
+			FileInfo fileInfo = new FileInfo(_tempPath);
 			DLILAFJFLAI.SetRequestHeader("range-start", fileInfo.Length.ToString());
 		}
 		Send(DLILAFJFLAI);
 	}
 
-	protected override void JBEBPLHMDPF()
+	protected override void SendSuccess()
 	{
-		if (NekkiUtils.JDIKHMODKKF())
+		if (NekkiUtils.IsEditorNotPlaying())
 		{
-			HCEPBIAOJKG.OOMKKNBMFDG(NHNPNIOBFPG, KJBFBPBCAOH());
-			HCEPBIAOJKG.BKLIKICKDPH(CDIGBKFPBKE);
+			FileUtils.WriteAllBytes(_targetPath, GetBytes());
+			FileUtils.DeleteFile(_tempPath);
 		}
-		base.JBEBPLHMDPF();
+		base.SendSuccess();
 	}
 
 	protected override void SendError(bool BALCNGAKGKN = false)
 	{
-		HCEPBIAOJKG.BKLIKICKDPH(NHNPNIOBFPG);
-		HCEPBIAOJKG.BKLIKICKDPH(CDIGBKFPBKE);
+		FileUtils.DeleteFile(_targetPath);
+		FileUtils.DeleteFile(_tempPath);
 		base.SendError();
 	}
 
-	protected override NekkiWebHandler GBMIBHMCDHC(NekkiUri KJHNCLAJMLO)
+	protected override NekkiWebHandler CreateHandler(NekkiUri KJHNCLAJMLO)
 	{
-		return new NekkiWebHandlerDownload(KJHNCLAJMLO, NHNPNIOBFPG, CDIGBKFPBKE);
+		return new NekkiWebHandlerDownload(KJHNCLAJMLO, _targetPath, _tempPath);
 	}
 }

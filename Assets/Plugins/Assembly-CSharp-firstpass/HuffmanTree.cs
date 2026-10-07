@@ -2,50 +2,50 @@ using Unity.IO.Compression;
 
 internal class HuffmanTree
 {
-	internal const int ODNHPDMFBCN = 288;
+	internal const int MaxLiteralTreeElements = 288;
 
-	internal const int LMHLPPPFFAM = 32;
+	internal const int MaxDistTreeElements = 32;
 
-	internal const int JNAMHNNNOFD = 256;
+	internal const int EndOfBlockCode = 256;
 
-	internal const int IPJMAIGFOFF = 19;
+	internal const int NumberOfCodeLengthTreeElements = 19;
 
-	private int BDCGEABNBNP;
+	private int tableBits;
 
-	private short[] BFGHBIMJHAK;
+	private short[] table;
 
-	private short[] MKICABFAHFA;
+	private short[] left;
 
-	private short[] JMLKHIPBCLI;
+	private short[] right;
 
 	private byte[] codeLengthArray;
 
-	private int NOHHGLPGCGE;
+	private int tableMask;
 
-	private static HuffmanTree BBGLCFHEAFJ;
+	private static HuffmanTree staticLiteralLengthTree;
 
-	private static HuffmanTree IHGOLENKGBO;
+	private static HuffmanTree staticDistanceTree;
 
-	public static HuffmanTree CDHAJEBPIGP
+	public static HuffmanTree StaticLiteralLengthTree
 	{
 		get
 		{
-			return CMJKCGMHABI();
+			return GetStaticLiteralLengthTree();
 		}
 	}
 
-	public static HuffmanTree KCGLLGFCHEO
+	public static HuffmanTree StaticDistanceTree
 	{
 		get
 		{
-			return CECHGKLBAAN();
+			return GetStaticDistanceTree();
 		}
 	}
 
 	static HuffmanTree()
 	{
-		BBGLCFHEAFJ = new HuffmanTree(EONIMMMPOLE());
-		IHGOLENKGBO = new HuffmanTree(CPOEOOCGFFJ());
+		staticLiteralLengthTree = new HuffmanTree(GetStaticLiteralTreeLength());
+		staticDistanceTree = new HuffmanTree(GetStaticDistanceTreeLength());
 	}
 
 	public HuffmanTree(byte[] BOKCDKCDIOA)
@@ -53,27 +53,27 @@ internal class HuffmanTree
 		codeLengthArray = BOKCDKCDIOA;
 		if (codeLengthArray.Length == 288)
 		{
-			BDCGEABNBNP = 9;
+			tableBits = 9;
 		}
 		else
 		{
-			BDCGEABNBNP = 7;
+			tableBits = 7;
 		}
-		NOHHGLPGCGE = (1 << BDCGEABNBNP) - 1;
-		JDFKMJMOEOF();
+		tableMask = (1 << tableBits) - 1;
+		CreateTable();
 	}
 
-	public static HuffmanTree CMJKCGMHABI()
+	public static HuffmanTree GetStaticLiteralLengthTree()
 	{
-		return BBGLCFHEAFJ;
+		return staticLiteralLengthTree;
 	}
 
-	public static HuffmanTree CECHGKLBAAN()
+	public static HuffmanTree GetStaticDistanceTree()
 	{
-		return IHGOLENKGBO;
+		return staticDistanceTree;
 	}
 
-	private static byte[] EONIMMMPOLE()
+	private static byte[] GetStaticLiteralTreeLength()
 	{
 		byte[] array = new byte[288];
 		for (int i = 0; i <= 143; i++)
@@ -95,7 +95,7 @@ internal class HuffmanTree
 		return array;
 	}
 
-	private static byte[] CPOEOOCGFFJ()
+	private static byte[] GetStaticDistanceTreeLength()
 	{
 		byte[] array = new byte[32];
 		for (int i = 0; i < 32; i++)
@@ -105,7 +105,7 @@ internal class HuffmanTree
 		return array;
 	}
 
-	private uint[] FLDOBAHJHKK()
+	private uint[] CalculateHuffmanCode()
 	{
 		uint[] array = new uint[17];
 		byte[] bIODNNBNOFC = codeLengthArray;
@@ -126,19 +126,19 @@ internal class HuffmanTree
 			int num3 = codeLengthArray[k];
 			if (num3 > 0)
 			{
-				array3[k] = FastEncoderStatics.MEFBBOOOOII(array2[num3], num3);
+				array3[k] = FastEncoderStatics.BitReverse(array2[num3], num3);
 				array2[num3]++;
 			}
 		}
 		return array3;
 	}
 
-	private void JDFKMJMOEOF()
+	private void CreateTable()
 	{
-		uint[] array = FLDOBAHJHKK();
-		BFGHBIMJHAK = new short[1 << BDCGEABNBNP];
-		MKICABFAHFA = new short[2 * codeLengthArray.Length];
-		JMLKHIPBCLI = new short[2 * codeLengthArray.Length];
+		uint[] array = CalculateHuffmanCode();
+		table = new short[1 << tableBits];
+		left = new short[2 * codeLengthArray.Length];
+		right = new short[2 * codeLengthArray.Length];
 		short num = (short)codeLengthArray.Length;
 		for (int i = 0; i < codeLengthArray.Length; i++)
 		{
@@ -148,25 +148,25 @@ internal class HuffmanTree
 				continue;
 			}
 			int num3 = (int)array[i];
-			if (num2 <= BDCGEABNBNP)
+			if (num2 <= tableBits)
 			{
 				int num4 = 1 << num2;
 				if (num3 >= num4)
 				{
 					throw new InvalidDataException(SR.GetString("Invalid Huffman data"));
 				}
-				int num5 = 1 << BDCGEABNBNP - num2;
+				int num5 = 1 << tableBits - num2;
 				for (int j = 0; j < num5; j++)
 				{
-					BFGHBIMJHAK[num3] = (short)i;
+					table[num3] = (short)i;
 					num3 += num4;
 				}
 				continue;
 			}
-			int num6 = num2 - BDCGEABNBNP;
-			int num7 = 1 << BDCGEABNBNP;
-			int num8 = num3 & ((1 << BDCGEABNBNP) - 1);
-			short[] array2 = BFGHBIMJHAK;
+			int num6 = num2 - tableBits;
+			int num7 = 1 << tableBits;
+			int num8 = num3 & ((1 << tableBits) - 1);
+			short[] array2 = table;
 			do
 			{
 				short num9 = array2[num8];
@@ -180,7 +180,7 @@ internal class HuffmanTree
 				{
 					throw new InvalidDataException(SR.GetString("Invalid Huffman data"));
 				}
-				array2 = (((num3 & num7) != 0) ? JMLKHIPBCLI : MKICABFAHFA);
+				array2 = (((num3 & num7) != 0) ? right : left);
 				num8 = -num9;
 				num7 <<= 1;
 				num6--;
@@ -190,21 +190,21 @@ internal class HuffmanTree
 		}
 	}
 
-	public int NBKGIKBOJGM(InputBuffer NILNDHEKNLJ)
+	public int GetNextSymbol(InputBuffer NILNDHEKNLJ)
 	{
-		uint num = NILNDHEKNLJ.DDGBLEAPMLA();
-		if (NILNDHEKNLJ.PEKEJGLMKPH() == 0)
+		uint num = NILNDHEKNLJ.TryLoad16Bits();
+		if (NILNDHEKNLJ.GetAvailableBits() == 0)
 		{
 			return -1;
 		}
-		int num2 = BFGHBIMJHAK[num & NOHHGLPGCGE];
+		int num2 = table[num & tableMask];
 		if (num2 < 0)
 		{
-			uint num3 = (uint)(1 << BDCGEABNBNP);
+			uint num3 = (uint)(1 << tableBits);
 			do
 			{
 				num2 = -num2;
-				num2 = (((num & num3) != 0) ? JMLKHIPBCLI[num2] : MKICABFAHFA[num2]);
+				num2 = (((num & num3) != 0) ? right[num2] : left[num2]);
 				num3 <<= 1;
 			}
 			while (num2 < 0);
@@ -214,7 +214,7 @@ internal class HuffmanTree
 		{
 			throw new InvalidDataException(SR.GetString("Invalid Huffman data"));
 		}
-		if (num4 > NILNDHEKNLJ.PEKEJGLMKPH())
+		if (num4 > NILNDHEKNLJ.GetAvailableBits())
 		{
 			return -1;
 		}

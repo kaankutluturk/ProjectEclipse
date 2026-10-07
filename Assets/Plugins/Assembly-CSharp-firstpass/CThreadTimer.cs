@@ -3,53 +3,53 @@ using System.Timers;
 
 public class CThreadTimer
 {
-	public delegate void LMCCGEMFINC();
+	public delegate void TimerElapsedCallback();
 
-	private LMCCGEMFINC AMOEOOKHEEB;
+	private TimerElapsedCallback elapsedCallback;
 
 	private Timer _myTimer;
 
 	private bool _completed;
 
-	public bool HDDGEKLLDJF
+	public bool IsCompleted
 	{
 		get
 		{
-			return FPFGBHOKEKO();
+			return GetCompleted();
 		}
 	}
 
-	public CThreadTimer(LMCCGEMFINC callback, float CPEBIEHDNIO, bool LGFKGJFHHCH)
+	public CThreadTimer(TimerElapsedCallback callback, float CPEBIEHDNIO, bool LGFKGJFHHCH)
 	{
-		AMOEOOKHEEB = (LMCCGEMFINC)Delegate.Combine(AMOEOOKHEEB, callback);
+		elapsedCallback = (TimerElapsedCallback)Delegate.Combine(elapsedCallback, callback);
 		_myTimer = new Timer();
-		_myTimer.Elapsed += ONKHFODDMNL;
+		_myTimer.Elapsed += OnTimerElapsed;
 		_myTimer.Interval = CPEBIEHDNIO;
 		if (LGFKGJFHHCH)
 		{
-			this.LGFKGJFHHCH();
+			this.StartTimer();
 		}
 	}
 
-	public bool FPFGBHOKEKO()
+	public bool GetCompleted()
 	{
 		return _completed;
 	}
 
-	public void LGFKGJFHHCH()
+	public void StartTimer()
 	{
 		_completed = false;
 		_myTimer.Start();
 	}
 
-	public void LGFKGJFHHCH(float CPEBIEHDNIO)
+	public void StartTimer(float CPEBIEHDNIO)
 	{
 		_completed = false;
 		_myTimer.Interval = CPEBIEHDNIO;
 		_myTimer.Start();
 	}
 
-	public bool GFOEBDACOLN()
+	public bool Pause()
 	{
 		if (!_completed)
 		{
@@ -58,7 +58,7 @@ public class CThreadTimer
 		return !_completed;
 	}
 
-	public bool DIGLJEJBDPH()
+	public bool Resume()
 	{
 		if (!_completed)
 		{
@@ -67,10 +67,10 @@ public class CThreadTimer
 		return !_completed;
 	}
 
-	private void ONKHFODDMNL(object BBNKIBKPBLO, ElapsedEventArgs FOPOKALJIIJ)
+	private void OnTimerElapsed(object BBNKIBKPBLO, ElapsedEventArgs FOPOKALJIIJ)
 	{
 		_completed = false;
-		AMOEOOKHEEB();
+		elapsedCallback();
 		_myTimer.Dispose();
 	}
 }

@@ -6,7 +6,7 @@ using UnityEngine;
 
 public static class MD5Utils
 {
-	public static string PIFDHBHOMJL(string DCOPLCIFCFL, string JBAPBBGCOGG = null)
+	public static string MD5HashFile(string DCOPLCIFCFL, string JBAPBBGCOGG = null)
 	{
 		try
 		{
@@ -20,7 +20,7 @@ public static class MD5Utils
 		return string.Empty;
 	}
 
-	public static string INPENHNJBGJ(string DMKMNOINKFC, string JBAPBBGCOGG = null)
+	public static string MD5HashString(string DMKMNOINKFC, string JBAPBBGCOGG = null)
 	{
 		using (MD5 mD = MD5.Create())
 		{
@@ -52,12 +52,12 @@ public static class MD5Utils
 
 	public static bool CheckFileHash(string DCOPLCIFCFL, string IMMGBGKAMPK, string JBAPBBGCOGG = null)
 	{
-		return PIFDHBHOMJL(DCOPLCIFCFL, JBAPBBGCOGG) == IMMGBGKAMPK;
+		return MD5HashFile(DCOPLCIFCFL, JBAPBBGCOGG) == IMMGBGKAMPK;
 	}
 
-	public static bool HGHDINBJBAD(string DMKMNOINKFC, string IMMGBGKAMPK, string JBAPBBGCOGG = null)
+	public static bool CheckStringHash(string DMKMNOINKFC, string IMMGBGKAMPK, string JBAPBBGCOGG = null)
 	{
-		return INPENHNJBGJ(DMKMNOINKFC, JBAPBBGCOGG) == IMMGBGKAMPK;
+		return MD5HashString(DMKMNOINKFC, JBAPBBGCOGG) == IMMGBGKAMPK;
 	}
 
 	public static bool CheckBytesHash(byte[] OIOHECBCFJA, string IMMGBGKAMPK, string JBAPBBGCOGG = null)

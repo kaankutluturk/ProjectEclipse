@@ -6,78 +6,78 @@ using UnityEngine;
 
 public abstract class GameInit
 {
-	public delegate void KNHFNPECPED();
+	public delegate void InitializeDoneHandler();
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
 	[CompilerGenerated]
-	private static KNHFNPECPED InitializeDone;
+	private static InitializeDoneHandler InitializeDone;
 
-	public static event KNHFNPECPED GACEDPMJOIC
+	public static event InitializeDoneHandler OnInitializeDone
 	{
 		add
 		{
-			BEFDGPNJIDH(value);
+			AddInitializeDone(value);
 		}
 		remove
 		{
-			NBAODLKAKKE(value);
+			RemoveInitializeDone(value);
 		}
 	}
 
-	public static void BEFDGPNJIDH(KNHFNPECPED value)
+	public static void AddInitializeDone(InitializeDoneHandler value)
 	{
-		KNHFNPECPED kNHFNPECPED = InitializeDone;
-		KNHFNPECPED kNHFNPECPED2;
+		InitializeDoneHandler kNHFNPECPED = InitializeDone;
+		InitializeDoneHandler kNHFNPECPED2;
 		do
 		{
 			kNHFNPECPED2 = kNHFNPECPED;
-			kNHFNPECPED = Interlocked.CompareExchange(ref InitializeDone, (KNHFNPECPED)Delegate.Combine(kNHFNPECPED2, value), kNHFNPECPED);
+			kNHFNPECPED = Interlocked.CompareExchange(ref InitializeDone, (InitializeDoneHandler)Delegate.Combine(kNHFNPECPED2, value), kNHFNPECPED);
 		}
 		while ((object)kNHFNPECPED != kNHFNPECPED2);
 	}
 
-	public static void NBAODLKAKKE(KNHFNPECPED value)
+	public static void RemoveInitializeDone(InitializeDoneHandler value)
 	{
-		KNHFNPECPED kNHFNPECPED = InitializeDone;
-		KNHFNPECPED kNHFNPECPED2;
+		InitializeDoneHandler kNHFNPECPED = InitializeDone;
+		InitializeDoneHandler kNHFNPECPED2;
 		do
 		{
 			kNHFNPECPED2 = kNHFNPECPED;
-			kNHFNPECPED = Interlocked.CompareExchange(ref InitializeDone, (KNHFNPECPED)Delegate.Remove(kNHFNPECPED2, value), kNHFNPECPED);
+			kNHFNPECPED = Interlocked.CompareExchange(ref InitializeDone, (InitializeDoneHandler)Delegate.Remove(kNHFNPECPED2, value), kNHFNPECPED);
 		}
 		while ((object)kNHFNPECPED != kNHFNPECPED2);
 	}
 
-	private static void COLMDNAPFKJ()
+	private static void RaiseInitializeDone()
 	{
-		KNHFNPECPED initializeDone = InitializeDone;
+		InitializeDoneHandler initializeDone = InitializeDone;
 		if (initializeDone != null)
 		{
 			initializeDone();
 		}
 	}
 
-	protected void IMMENGDGOOC()
+	protected void NotifyInitializeDone()
 	{
-		COLMDNAPFKJ();
+		RaiseInitializeDone();
 	}
 
-	public virtual void ELAHFBCGAGL(params Action[] AFENHJFICNN)
+	public virtual void AddInitCallbacks(params Action[] AFENHJFICNN)
 	{
 		foreach (Action action in AFENHJFICNN)
 		{
 			Action IBODMPMJELJ = action;
-			BEFDGPNJIDH(() =>
+			AddInitializeDone(() =>
 			{
 				IBODMPMJELJ();
 			});
 		}
 	}
 
-	public virtual void EHAJODIAFEG()
+	public virtual void FinishInit()
 	{
 		SF2DisplayFrameRate.Apply();
-		IMMENGDGOOC();
+		NotifyInitializeDone();
 	}
 
 	public abstract void Init(params Action[] AFENHJFICNN);

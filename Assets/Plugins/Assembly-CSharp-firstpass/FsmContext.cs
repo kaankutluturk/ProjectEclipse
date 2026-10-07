@@ -2,9 +2,9 @@ internal class FsmContext
 {
 	public bool Return;
 
-	public int BKINLEDMLDJ;
+	public int NextState;
 
-	public Lexer PLHFFNOPLMM;
+	public Lexer L;
 
-	public int BFIEGKKGJDD;
+	public int StateStack;
 }

@@ -5,19 +5,19 @@ public class DocumentEnd : ParsingEvent
 {
 	private readonly bool isImplicit;
 
-	public override int OHJMGKADENE
+	public override int NestingIncrease
 	{
 		get
 		{
-			return DPIMLJJFMCO();
+			return GetNestingIncrease();
 		}
 	}
 
-	public bool KIOLMKCLEEB
+	public bool IsImplicit
 	{
 		get
 		{
-			return BBBGHODAEIN();
+			return GetIsImplicit();
 		}
 	}
 
@@ -32,17 +32,17 @@ public class DocumentEnd : ParsingEvent
 	{
 	}
 
-	public override int DPIMLJJFMCO()
+	public override int GetNestingIncrease()
 	{
 		return -1;
 	}
 
-	internal override BHBPOHDAGPH get_Type()
+	internal override ParsingEventType get_Type()
 	{
-		return BHBPOHDAGPH.DocumentEnd;
+		return ParsingEventType.DocumentEnd;
 	}
 
-	public bool BBBGHODAEIN()
+	public bool GetIsImplicit()
 	{
 		return isImplicit;
 	}
@@ -52,7 +52,7 @@ public class DocumentEnd : ParsingEvent
 		return string.Format(CultureInfo.InvariantCulture, "Document end [isImplicit = {0}]", isImplicit);
 	}
 
-	public override void GPHIFFOGOGN(IParsingEventVisitor NKECMANOOEM)
+	public override void Accept(IParsingEventVisitor NKECMANOOEM)
 	{
 		NKECMANOOEM.Visit(this);
 	}

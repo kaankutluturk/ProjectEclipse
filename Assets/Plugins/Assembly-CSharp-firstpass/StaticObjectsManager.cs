@@ -11,21 +11,21 @@ public class StaticObjectsManager : MonoBehaviour
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
 	private static Action OnApplicationQuitEvent;
 
-	private static StaticObjectsManager EDAPJLKMFPC;
+	private static StaticObjectsManager instance;
 
 	private Transform _transform;
 
 	private HashSet<GameObject> _staticObjects;
 
-	protected static StaticObjectsManager BPCBBHAKFDM
+	protected static StaticObjectsManager Instance
 	{
 		get
 		{
-			return ELEBLBJKDBI();
+			return GetInstance();
 		}
 	}
 
-	public static event Action NCPKFJJOLKC
+	public static event Action ApplicationQuitting
 	{
 		add
 		{
@@ -61,26 +61,26 @@ public class StaticObjectsManager : MonoBehaviour
 		while ((object)action != action2);
 	}
 
-	protected static StaticObjectsManager ELEBLBJKDBI()
+	protected static StaticObjectsManager GetInstance()
 	{
-		if (EDAPJLKMFPC == null)
+		if (instance == null)
 		{
 			GameObject gameObject = new GameObject("STATIC_OBJECTS");
 			UnityEngine.Object.DontDestroyOnLoad(gameObject);
-			EDAPJLKMFPC = gameObject.AddComponent<StaticObjectsManager>();
-			EDAPJLKMFPC._transform = gameObject.transform;
-			EDAPJLKMFPC._staticObjects = new HashSet<GameObject>();
+			instance = gameObject.AddComponent<StaticObjectsManager>();
+			instance._transform = gameObject.transform;
+			instance._staticObjects = new HashSet<GameObject>();
 		}
-		return EDAPJLKMFPC;
+		return instance;
 	}
 
 	public static void AddObject(GameObject ODMLDMOAOLN, bool DLIBCKLEOFM = true)
 	{
-		if (!ELEBLBJKDBI()._staticObjects.Contains(ODMLDMOAOLN))
+		if (!GetInstance()._staticObjects.Contains(ODMLDMOAOLN))
 		{
 			if (DLIBCKLEOFM)
 			{
-				ODMLDMOAOLN.transform.parent = ELEBLBJKDBI()._transform;
+				ODMLDMOAOLN.transform.parent = GetInstance()._transform;
 			}
 			else
 			{
@@ -90,37 +90,37 @@ public class StaticObjectsManager : MonoBehaviour
 			{
 				ODMLDMOAOLN.name = "_" + ODMLDMOAOLN.name;
 			}
-			ELEBLBJKDBI()._staticObjects.Add(ODMLDMOAOLN);
+			GetInstance()._staticObjects.Add(ODMLDMOAOLN);
 		}
 	}
 
 	public static void RemoveObject(GameObject ODMLDMOAOLN)
 	{
-		if (ELEBLBJKDBI()._staticObjects.Contains(ODMLDMOAOLN))
+		if (GetInstance()._staticObjects.Contains(ODMLDMOAOLN))
 		{
-			ELEBLBJKDBI()._staticObjects.Remove(ODMLDMOAOLN);
+			GetInstance()._staticObjects.Remove(ODMLDMOAOLN);
 			UnityEngine.Object.Destroy(ODMLDMOAOLN);
 		}
 	}
 
 	public static void Clear()
 	{
-		foreach (GameObject item in ELEBLBJKDBI()._staticObjects)
+		foreach (GameObject item in GetInstance()._staticObjects)
 		{
 			if ((bool)item)
 			{
 				UnityEngine.Object.Destroy(item);
 			}
 		}
-		if ((bool)ELEBLBJKDBI())
+		if ((bool)GetInstance())
 		{
-			UnityEngine.Object.Destroy(ELEBLBJKDBI().gameObject);
+			UnityEngine.Object.Destroy(GetInstance().gameObject);
 		}
-		EDAPJLKMFPC = null;
+		instance = null;
 	}
 
 	private void OnApplicationQuit()
 	{
-		OnApplicationQuitEvent.FEEGJDJIFEF();
+		OnApplicationQuitEvent.SafeInvoke();
 	}
 }

@@ -232,8 +232,8 @@ public partial class Fight
     {
         error = null;
         if (!_eclipseProjectiles.TryGetValue(entry.Model, out var registered) || !ReferenceEquals(registered, entry) ||
-            entry.Removing || JLEFIKJODGG.Contains(entry.Model) ||
-            (!LNDLFINJHDB.Contains(entry.Model) && !HCPGFOCGDAA.Contains(entry.Model)) ||
+            entry.Removing || modelsToRemove.Contains(entry.Model) ||
+            (!ActiveModels.Contains(entry.Model) && !pendingModels.Contains(entry.Model)) ||
             !ReferenceEquals(entry.Session, ModRuntime.Scripts) || !ProjectileOwnerActive(entry.Session, entry.Owner) ||
             entry.Round != round.round || !CanUseEclipseProjectileRoot(entry.Root) ||
             entry.Model.GetRootModel() != entry.Root || entry.Birth == null && fightTimeInFrame - entry.Born >= entry.Lifetime ||
@@ -274,7 +274,7 @@ public partial class Fight
         if (entry.Birth != null) FinishEclipseProjectileSpawn(entry.Birth, null, "Projectile retired before native initialization.");
         entry.Birth = null;
         _eclipseProjectiles.Remove(entry.Model);
-        if (LNDLFINJHDB.Contains(entry.Model) || HCPGFOCGDAA.Contains(entry.Model)) RequestModelRemoval(entry.Model);
+        if (ActiveModels.Contains(entry.Model) || pendingModels.Contains(entry.Model)) RequestModelRemoval(entry.Model);
     }
     private void ForgetEclipseProjectile(Model model)
     {

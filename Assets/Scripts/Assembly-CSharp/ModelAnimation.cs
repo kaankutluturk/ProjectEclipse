@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class ModelAnimation : global::EventDispatcher<object>
 {
-	public enum CEEJIMAJDMN
+	public enum AnimationEventType
 	{
 		ON_START_ANIMATION_EVENT = 0,
 		ON_STOP_ANIMATION_EVENT = 1,
@@ -12,147 +12,147 @@ public class ModelAnimation : global::EventDispatcher<object>
 		ON_ACTION_START = 4
 	}
 
-	private ModelAnimation CDMBBKPCMPP;
+	private ModelAnimation parentAnimation;
 
-	private ModelAnimation LOOMFPAEADA;
+	private ModelAnimation otherAnimation;
 
-	private HashSet<IntervalAnimation.NGAJJDIEDGF> PAICIELHBHA;
+	private HashSet<IntervalAnimation.IntervalType> intervalTypeFilter;
 
-	private bool MDLBEBOGOGK;
+	private bool isPlaying;
 
-	private bool MHEIFCGAOHP;
+	private bool pendingFinalUpdate;
 
-	private bool ONHMMDAOGIM;
+	private bool frameChangedPending;
 
-	private bool KJODFLDMCFP;
+	private bool bufferReachedKeyFrame;
 
-	private int JMKAHNADIOI;
+	private int sign;
 
-	private int LBHPMJDHAEM;
+	private int currentNodeId;
 
-	private ModelNode KFGEBGBEJBC;
+	private ModelNode currentNode;
 
-	private int GKGEBAKLIDH;
+	private int startFrame;
 
-	private int EJJNHDCIEAD;
+	private int endFrame;
 
-	private int HHDIJIMGOKM;
+	private int unusedInt;
 
-	private int IDKMDLCEHBK;
+	private int frameCounter;
 
-	private int OLFJCLJKHIF;
+	private int frameCursor;
 
-	private int CNFABIDNBOH;
+	private int bufferState;
 
-	private int BCGHHIIPCBJ;
+	private int frameInMove;
 
-	private int FGFGGGKDJLN;
+	private int lastProcessedFrame;
 
-	private bool IPGAAGOANDE;
+	private bool isMirrored;
 
-	private bool INFAGPDFGNL;
+	private bool isLooping;
 
-	private bool AEKEELJMLDC;
+	private bool useInterruptFrames;
 
-	private bool KGIEFJNJFOH;
+	private bool hasParentModel;
 
-	private float BDHBFDMBMFM;
+	private float pivotTargetX;
 
-	private float DCJLLPNFIMF;
+	private float startPositionX;
 
-	private float PMIELLEMGJK;
+	private float firstStartPositionX;
 
-	private int GEPFNKEMDEE;
+	private int renderTickCount;
 
-	private bool NLANLJEDHKJ;
+	private bool firstPositionCaptured;
 
-	private float NBLBKLANDNC;
+	private float shiftWallDelta;
 
-	private Vector3f JCLKMEAJOLO = new Vector3f();
+	private Vector3f shift = new Vector3f();
 
-	private Vector3f BFDLFAHGKHP = new Vector3f();
+	private Vector3f accumulatedOffset = new Vector3f();
 
-	private Vector3f AGAFKHLPLCA = new Vector3f();
+	private Vector3f velocity = new Vector3f();
 
-	private Vector3f DBCBOPONOBE = new Vector3f();
+	private Vector3f acceleration = new Vector3f();
 
-	private float GLOJGJIBABF;
+	private float subFrameScale;
 
-	private int MIDMNJKJOFO;
+	private int startFrameOffset;
 
-	private int NINBIDKEHKD;
+	private int frontAlignMargin;
 
-	private int ALKLIKKIDCM;
+	private int backAlignMargin;
 
 	private ModelObject _Model;
 
-	private float DNOJAJNAFAF;
+	private float leftWallX;
 
-	private float DPEOGNBGKML;
+	private float rightWallX;
 
 	private KeyFrames _Frames = new KeyFrames();
 
-	private List<List<Vector3f>> AHOBIIMFNEP = new List<List<Vector3f>>();
+	private List<List<Vector3f>> bufferedFrames = new List<List<Vector3f>>();
 
-	private int PLLOJCCNDOH;
+	private int bufferIndex;
 
-	private int ECNLDOICIND;
+	private int interpolationSteps;
 
-	private List<IntervalAnimation> KKNKJMCFIJK = new List<IntervalAnimation>();
+	private List<IntervalAnimation> activeIntervals = new List<IntervalAnimation>();
 
-	private List<IntervalAnimation> OACCPPMJMML = new List<IntervalAnimation>();
+	private List<IntervalAnimation> endedIntervals = new List<IntervalAnimation>();
 
-	private InfoAnimation BAOONIGFBMB;
+	private InfoAnimation currentInfo;
 
-	private InfoAnimation FJDKCIHGLLM;
+	private InfoAnimation firstInfo;
 
-	private List<ModelEdge> ECNLLKIJIGP = new List<ModelEdge>();
+	private List<ModelEdge> attackingEdges = new List<ModelEdge>();
 
-	public ModelNode LNGDODBCMEB;
+	public ModelNode Heel1Node;
 
-	public ModelNode NMGJKMEDDCB;
+	public ModelNode Heel2Node;
 
-	public ModelNode HDILJAAKKDL;
+	public ModelNode UnusedNode;
 
-	public InfoAnimation GJGDKFAAGOD;
+	public InfoAnimation RequiredInfo;
 
-	public ModelAnimation KNFBNMGCKFO
+	public ModelAnimation ParentAnimation
 	{
 		get
 		{
-			return ODHOECEPOFK();
+			return GetParentAnimation();
 		}
 		set
 		{
-			CBKLDPIBGHD(value);
+			SetParentAnimation(value);
 		}
 	}
 
-	public ModelAnimation PBDLLNEOIDG
+	public ModelAnimation OtherAnimation
 	{
 		get
 		{
-			return OJKLPPNCONP();
+			return GetOtherAnimation();
 		}
 		set
 		{
-			NFEGCGJIICB(value);
+			SetOtherAnimation(value);
 		}
 	}
 
-	public bool EKEPPACCCPI
+	public bool IsPlaying
 	{
 		get
 		{
-			return NMEEPBDJHMG();
+			return GetIsPlaying();
 		}
 	}
 
-	public int GFHOIKMBNHF
+	public int FacingSign
 	{
 		get
 		{
-			return KFCNPADAMHA();
+			return GetSign();
 		}
 		set
 		{
@@ -160,43 +160,43 @@ public class ModelAnimation : global::EventDispatcher<object>
 		}
 	}
 
-	public int CLIPMJNJDKI
+	public int CurrentNodeId
 	{
 		get
 		{
-			return BOIDEOFKBMK();
+			return GetCurrentNodeId();
 		}
 	}
 
-	public ModelNode BKODDBIOLLD
+	public ModelNode CurrentNode
 	{
 		get
 		{
-			return PKKDMELGFBE();
+			return GetCurrentNode();
 		}
 	}
 
-	public int HALDIEBDJLG
+	public int StartFrame
 	{
 		get
 		{
-			return LOIJGOPOGMO();
+			return GetStartFrame();
 		}
 	}
 
-	public int LHHAGECFIOL
+	public int EndFrame
 	{
 		get
 		{
-			return BNALDMNOMHH();
+			return GetEndFrame();
 		}
 	}
 
-	public bool KFFBBLOCLEL
+	public bool IsMirrored
 	{
 		get
 		{
-			return ANHGOGDEFCO();
+			return GetIsMirrored();
 		}
 	}
 
@@ -204,31 +204,31 @@ public class ModelAnimation : global::EventDispatcher<object>
 	{
 		get
 		{
-			return FHGNPPBLIIL();
+			return GetStartPosition();
 		}
 	}
 
-	public float DGGMKIEPDCE
+	public float FirstStartPositionX
 	{
 		get
 		{
-			return LPNPNBJGKJM();
+			return GetFirstStartPositionX();
 		}
 	}
 
-	public int BANAFKEMLJC
+	public int RenderTickCount
 	{
 		get
 		{
-			return JFGEHNHLDJM();
+			return GetRenderTickCount();
 		}
 	}
 
-	public float ICCPGFDJFMN
+	public float WallShiftDelta
 	{
 		get
 		{
-			return LIBBBOCOCNP();
+			return GetShiftWallDelta();
 		}
 		set
 		{
@@ -240,39 +240,39 @@ public class ModelAnimation : global::EventDispatcher<object>
 	{
 		get
 		{
-			return HOPJDHOEKEN();
+			return GetShift();
 		}
 		set
 		{
-			JCNEDHMGLKE(value);
+			SetShift(value);
 		}
 	}
 
-	public int IFEMCGMHADD
+	public int StartFrameOffset
 	{
 		get
 		{
-			return KOCKCMNHPMC();
+			return GetStartFrameOffset();
 		}
 	}
 
-	public int OGCIGFBOBMD
+	public int FrontAlignMargin
 	{
 		get
 		{
-			return IHKKEEOCOOF();
+			return GetFrontAlignMargin();
 		}
 	}
 
-	public int FICBMNCMJIG
+	public int BackAlignMargin
 	{
 		get
 		{
-			return INAOPLIFJEJ();
+			return GetBackAlignMargin();
 		}
 	}
 
-	public ModelObject KJDFJPBIGJC
+	public ModelObject OwnerModel
 	{
 		get
 		{
@@ -280,91 +280,91 @@ public class ModelAnimation : global::EventDispatcher<object>
 		}
 	}
 
-	public float BOGHNBAKCEL
+	public float LeftWallX
 	{
 		get
 		{
-			return KJFIBMMOEPI();
+			return GetLeftWallX();
 		}
 	}
 
-	public float PCIBKEOCFAO
+	public float RightWallX
 	{
 		get
 		{
-			return PHHHEGOBAPB();
+			return GetRightWallX();
 		}
 	}
 
-	public List<IntervalAnimation> GDAGDHGLKPB
+	public List<IntervalAnimation> ActiveIntervals
 	{
 		get
 		{
-			return PCKKMNHDDMP();
+			return GetActiveIntervals();
 		}
 	}
 
-	public InfoAnimation FGICHADOEHF
+	public InfoAnimation CurrentInfo
 	{
 		get
 		{
-			return NNMAFFCCMHC();
+			return GetCurrentInfo();
 		}
 		set
 		{
-			DBDJHIHLCFD(value);
+			SetCurrentInfo(value);
 		}
 	}
 
-	public InfoAnimation OGOCAHDGAKO
+	public InfoAnimation FirstInfo
 	{
 		get
 		{
-			return JJBEAOPDGCO();
+			return GetFirstInfo();
 		}
 	}
 
-	public List<ModelEdge> JNCNOKPDMCM
+	public List<ModelEdge> AttackingEdges
 	{
 		get
 		{
-			return CPNOFKIMMCK();
+			return GetAttackingEdges();
 		}
 	}
 
-	public int BJDFMKOCNBN
+	public int CurrentFrame
 	{
 		get
 		{
-			return LPFPGDJALED();
+			return GetCurrentFrame();
 		}
 	}
 
-	public int NFIMGNEINNI
+	public int PhysicsFrame
 	{
 		get
 		{
-			return NEBJGKODIKP();
+			return GetPhysicsFrame();
 		}
 	}
 
-	public int BBGDBGIPBJP
+	public int ReactionFrame
 	{
 		get
 		{
-			return NODAINEDAKJ();
+			return GetReactionFrame();
 		}
 	}
 
-	public int CAIOJLHLNAE
+	public int PlayedFrame
 	{
 		get
 		{
-			return MEOKDFJHEKC();
+			return GetPlayedFrame();
 		}
 	}
 
-	public int HFOEPOPBGBB
+	public int FrameInMove
 	{
 		get
 		{
@@ -372,183 +372,183 @@ public class ModelAnimation : global::EventDispatcher<object>
 		}
 	}
 
-	public int MCMNPBAIMFN
+	public int FrameStep
 	{
 		get
 		{
-			return PIDJIKLOKJC();
+			return GetFrameStep();
 		}
 	}
 
-	public ModelNode AFLPHBDFMGA
+	public ModelNode PlayingNode
 	{
 		get
 		{
-			return CJELIBMCCMA();
+			return GetPlayingNode();
 		}
 	}
 
 	public ModelAnimation(ModelObject ACENLMONNPA)
 	{
-		LNGDODBCMEB = null;
-		NMGJKMEDDCB = null;
-		LOOMFPAEADA = null;
-		CDMBBKPCMPP = null;
-		CNFABIDNBOH = -3;
+		Heel1Node = null;
+		Heel2Node = null;
+		otherAnimation = null;
+		parentAnimation = null;
+		bufferState = -3;
 		_Model = ACENLMONNPA;
-		MDLBEBOGOGK = false;
-		JMKAHNADIOI = 1;
-		LBHPMJDHAEM = 0;
-		KFGEBGBEJBC = null;
-		GKGEBAKLIDH = 0;
-		IDKMDLCEHBK = 0;
-		OLFJCLJKHIF = 0;
-		FGFGGGKDJLN = int.MaxValue;
-		DCJLLPNFIMF = 0f;
-		BAOONIGFBMB = null;
-		FJDKCIHGLLM = null;
-		IPGAAGOANDE = false;
-		NINBIDKEHKD = 0;
-		ALKLIKKIDCM = 0;
-		MHEIFCGAOHP = false;
-		GJGDKFAAGOD = null;
-		PAICIELHBHA = null;
-		MIDMNJKJOFO = 0;
-		INFAGPDFGNL = false;
-		KGIEFJNJFOH = ACENLMONNPA.GetModel().NJDJHGDMCIJ() != null;
-		GLOJGJIBABF = 1f;
-		NBLBKLANDNC = 0f;
-		ONHMMDAOGIM = false;
-		KJODFLDMCFP = false;
-		PMIELLEMGJK = 0f;
-		GEPFNKEMDEE = 0;
-		NLANLJEDHKJ = false;
+		isPlaying = false;
+		sign = 1;
+		currentNodeId = 0;
+		currentNode = null;
+		startFrame = 0;
+		frameCounter = 0;
+		frameCursor = 0;
+		lastProcessedFrame = int.MaxValue;
+		startPositionX = 0f;
+		currentInfo = null;
+		firstInfo = null;
+		isMirrored = false;
+		frontAlignMargin = 0;
+		backAlignMargin = 0;
+		pendingFinalUpdate = false;
+		RequiredInfo = null;
+		intervalTypeFilter = null;
+		startFrameOffset = 0;
+		isLooping = false;
+		hasParentModel = ACENLMONNPA.GetModel().GetParentModel() != null;
+		subFrameScale = 1f;
+		shiftWallDelta = 0f;
+		frameChangedPending = false;
+		bufferReachedKeyFrame = false;
+		firstStartPositionX = 0f;
+		renderTickCount = 0;
+		firstPositionCaptured = false;
 		Stop();
 	}
 
-	public ModelAnimation ODHOECEPOFK()
+	public ModelAnimation GetParentAnimation()
 	{
-		return CDMBBKPCMPP;
+		return parentAnimation;
 	}
 
-	public void CBKLDPIBGHD(ModelAnimation value)
+	public void SetParentAnimation(ModelAnimation value)
 	{
-		CDMBBKPCMPP = value;
+		parentAnimation = value;
 	}
 
-	public ModelAnimation OJKLPPNCONP()
+	public ModelAnimation GetOtherAnimation()
 	{
-		return LOOMFPAEADA;
+		return otherAnimation;
 	}
 
-	public void NFEGCGJIICB(ModelAnimation value)
+	public void SetOtherAnimation(ModelAnimation value)
 	{
-		LOOMFPAEADA = value;
+		otherAnimation = value;
 	}
 
-	public bool NMEEPBDJHMG()
+	public bool GetIsPlaying()
 	{
-		return MDLBEBOGOGK;
+		return isPlaying;
 	}
 
-	public int KFCNPADAMHA()
+	public int GetSign()
 	{
-		return JMKAHNADIOI;
+		return sign;
 	}
 
 	public void set_Sign(int value)
 	{
 		if (value < 0)
 		{
-			JMKAHNADIOI = -1;
+			sign = -1;
 			return;
 		}
 		if (value > 0)
 		{
-			JMKAHNADIOI = 1;
+			sign = 1;
 			return;
 		}
-		JMKAHNADIOI = 1;
+		sign = 1;
 		Debug.LogError("set sign value != -1 or 1");
 	}
 
-	public int BOIDEOFKBMK()
+	public int GetCurrentNodeId()
 	{
-		return LBHPMJDHAEM;
+		return currentNodeId;
 	}
 
-	public ModelNode PKKDMELGFBE()
+	public ModelNode GetCurrentNode()
 	{
-		return KFGEBGBEJBC;
+		return currentNode;
 	}
 
-	public int LOIJGOPOGMO()
+	public int GetStartFrame()
 	{
-		return GKGEBAKLIDH;
+		return startFrame;
 	}
 
-	public int BNALDMNOMHH()
+	public int GetEndFrame()
 	{
-		return EJJNHDCIEAD;
+		return endFrame;
 	}
 
-	public bool ANHGOGDEFCO()
+	public bool GetIsMirrored()
 	{
-		return IPGAAGOANDE;
+		return isMirrored;
 	}
 
-	public float FHGNPPBLIIL()
+	public float GetStartPosition()
 	{
-		if (MDLBEBOGOGK)
+		if (isPlaying)
 		{
-			return DCJLLPNFIMF;
+			return startPositionX;
 		}
 		return 0f;
 	}
 
-	public float LPNPNBJGKJM()
+	public float GetFirstStartPositionX()
 	{
-		return PMIELLEMGJK;
+		return firstStartPositionX;
 	}
 
-	public int JFGEHNHLDJM()
+	public int GetRenderTickCount()
 	{
-		return GEPFNKEMDEE;
+		return renderTickCount;
 	}
 
-	public float LIBBBOCOCNP()
+	public float GetShiftWallDelta()
 	{
-		return NBLBKLANDNC;
+		return shiftWallDelta;
 	}
 
 	public void set_ShiftWallDelta(float value)
 	{
-		NBLBKLANDNC = value;
+		shiftWallDelta = value;
 	}
 
-	public Vector3f HOPJDHOEKEN()
+	public Vector3f GetShift()
 	{
-		return JCLKMEAJOLO;
+		return shift;
 	}
 
-	public void JCNEDHMGLKE(Vector3f value)
+	public void SetShift(Vector3f value)
 	{
-		JCLKMEAJOLO.Set(value);
+		shift.Set(value);
 	}
 
-	public int KOCKCMNHPMC()
+	public int GetStartFrameOffset()
 	{
-		return MIDMNJKJOFO;
+		return startFrameOffset;
 	}
 
-	public int IHKKEEOCOOF()
+	public int GetFrontAlignMargin()
 	{
-		return NINBIDKEHKD;
+		return frontAlignMargin;
 	}
 
-	public int INAOPLIFJEJ()
+	public int GetBackAlignMargin()
 	{
-		return ALKLIKKIDCM;
+		return backAlignMargin;
 	}
 
 	public ModelObject get_Model()
@@ -556,95 +556,95 @@ public class ModelAnimation : global::EventDispatcher<object>
 		return _Model;
 	}
 
-	public float KJFIBMMOEPI()
+	public float GetLeftWallX()
 	{
-		return DNOJAJNAFAF;
+		return leftWallX;
 	}
 
-	public float PHHHEGOBAPB()
+	public float GetRightWallX()
 	{
-		return DPEOGNBGKML;
+		return rightWallX;
 	}
 
-	public List<IntervalAnimation> PCKKMNHDDMP()
+	public List<IntervalAnimation> GetActiveIntervals()
 	{
-		return KKNKJMCFIJK;
+		return activeIntervals;
 	}
 
-	public InfoAnimation NNMAFFCCMHC()
+	public InfoAnimation GetCurrentInfo()
 	{
-		return BAOONIGFBMB;
+		return currentInfo;
 	}
 
-	public void DBDJHIHLCFD(InfoAnimation value)
+	public void SetCurrentInfo(InfoAnimation value)
 	{
-		BAOONIGFBMB = value;
+		currentInfo = value;
 	}
 
-	public InfoAnimation JJBEAOPDGCO()
+	public InfoAnimation GetFirstInfo()
 	{
-		return FJDKCIHGLLM;
+		return firstInfo;
 	}
 
-	public List<ModelEdge> CPNOFKIMMCK()
+	public List<ModelEdge> GetAttackingEdges()
 	{
-		return ECNLLKIJIGP;
+		return attackingEdges;
 	}
 
 	public void Render()
 	{
-		GEPFNKEMDEE++;
-		if (MDLBEBOGOGK)
+		renderTickCount++;
+		if (isPlaying)
 		{
-			if (CNFABIDNBOH != -3)
+			if (bufferState != -3)
 			{
-				CNFABIDNBOH++;
+				bufferState++;
 			}
-			else if (IDKMDLCEHBK == 0)
+			else if (frameCounter == 0)
 			{
-				BCGHHIIPCBJ = 0;
+				frameInMove = 0;
 			}
 			ShiftWall();
-			int num = _Frames.FNEPPBAKIDP();
+			int num = _Frames.GetRemainingFrameCount();
 			if (isBuffer())
 			{
 				DrawFrame();
-				BCGHHIIPCBJ++;
+				frameInMove++;
 				CheckActionsOnFrame();
-				if (KGIEFJNJFOH && !isBuffer() && OLFJCLJKHIF + 2 >= num)
+				if (hasParentModel && !isBuffer() && frameCursor + 2 >= num)
 				{
-					if (INFAGPDFGNL)
+					if (isLooping)
 					{
-						SetBufferFrame(OLFJCLJKHIF, GKGEBAKLIDH + 1);
-						OLFJCLJKHIF = GKGEBAKLIDH;
+						SetBufferFrame(frameCursor, startFrame + 1);
+						frameCursor = startFrame;
 					}
 					else
 					{
 						StopAnimation();
-						LDFKBJAHGII(BAOONIGFBMB);
+						OnStopAnimation(currentInfo);
 						DeleteAnimation();
 					}
 				}
 			}
-			else if (!KGIEFJNJFOH && OLFJCLJKHIF + 2 >= num)
+			else if (!hasParentModel && frameCursor + 2 >= num)
 			{
-				if (INFAGPDFGNL)
+				if (isLooping)
 				{
-					SetBufferFrame(OLFJCLJKHIF, GKGEBAKLIDH + 1);
-					OLFJCLJKHIF = GKGEBAKLIDH + 1;
+					SetBufferFrame(frameCursor, startFrame + 1);
+					frameCursor = startFrame + 1;
 					DrawFrame();
-					BCGHHIIPCBJ++;
+					frameInMove++;
 				}
 				else
 				{
 					StopAnimation();
-					LDFKBJAHGII(BAOONIGFBMB);
+					OnStopAnimation(currentInfo);
 					DeleteAnimation();
 				}
 			}
 			else
 			{
-				if (OLFJCLJKHIF + 2 < num && !isBuffer())
+				if (frameCursor + 2 < num && !isBuffer())
 				{
 					SetBufferFrame();
 				}
@@ -652,114 +652,114 @@ public class ModelAnimation : global::EventDispatcher<object>
 				{
 					DrawFrame();
 				}
-				BCGHHIIPCBJ++;
-				IDKMDLCEHBK++;
-				OLFJCLJKHIF++;
+				frameInMove++;
+				frameCounter++;
+				frameCursor++;
 				NewFrame();
 			}
 		}
-		else if (MHEIFCGAOHP && BAOONIGFBMB != null)
+		else if (pendingFinalUpdate && currentInfo != null)
 		{
-			OLFJCLJKHIF += 3;
+			frameCursor += 3;
 			NewFrame();
-			MHEIFCGAOHP = false;
+			pendingFinalUpdate = false;
 		}
 	}
 
 	public void RenderPhysics()
 	{
-		IDKMDLCEHBK++;
-		OLFJCLJKHIF++;
+		frameCounter++;
+		frameCursor++;
 		NewFrame();
 	}
 
 	public void StopAnimation()
 	{
-		MDLBEBOGOGK = false;
+		isPlaying = false;
 		Stop();
 	}
 
 	public void DeleteAnimation()
 	{
-		MDLBEBOGOGK = false;
-		MHEIFCGAOHP = true;
+		isPlaying = false;
+		pendingFinalUpdate = true;
 	}
 
-	public int LPFPGDJALED()
+	public int GetCurrentFrame()
 	{
-		if (!BAOONIGFBMB.FBKGDALBNDJ)
+		if (!currentInfo.HasPhysics)
 		{
-			return ((OLFJCLJKHIF > 2) ? (OLFJCLJKHIF - 2) : 0) + GKGEBAKLIDH;
+			return ((frameCursor > 2) ? (frameCursor - 2) : 0) + startFrame;
 		}
-		return OLFJCLJKHIF;
+		return frameCursor;
 	}
 
-	public int NEBJGKODIKP()
+	public int GetPhysicsFrame()
 	{
-		return (!MDLBEBOGOGK) ? IDKMDLCEHBK : (((IDKMDLCEHBK > 2) ? (IDKMDLCEHBK - 2) : 0) + GKGEBAKLIDH);
+		return (!isPlaying) ? frameCounter : (((frameCounter > 2) ? (frameCounter - 2) : 0) + startFrame);
 	}
 
-	public int NODAINEDAKJ()
+	public int GetReactionFrame()
 	{
-		return (IDKMDLCEHBK != 0) ? (IDKMDLCEHBK + GKGEBAKLIDH - 2) : (-3);
+		return (frameCounter != 0) ? (frameCounter + startFrame - 2) : (-3);
 	}
 
-	public int MEOKDFJHEKC()
+	public int GetPlayedFrame()
 	{
-		return (IDKMDLCEHBK != 0) ? (IDKMDLCEHBK + GKGEBAKLIDH - 2) : (-3);
+		return (frameCounter != 0) ? (frameCounter + startFrame - 2) : (-3);
 	}
 
 	// best guess for name
 	public int GetFrameInMove()
 	{
-		if (MDLBEBOGOGK)
+		if (isPlaying)
 		{
-			return BCGHHIIPCBJ;
+			return frameInMove;
 		}
 		return 0;
 	}
 
 	public void Reset()
 	{
-		MDLBEBOGOGK = false;
-		JMKAHNADIOI = 1;
-		LBHPMJDHAEM = 0;
-		KFGEBGBEJBC = null;
-		GKGEBAKLIDH = 0;
-		IDKMDLCEHBK = 0;
-		OLFJCLJKHIF = 0;
-		MHEIFCGAOHP = false;
-		FGFGGGKDJLN = int.MaxValue;
+		isPlaying = false;
+		sign = 1;
+		currentNodeId = 0;
+		currentNode = null;
+		startFrame = 0;
+		frameCounter = 0;
+		frameCursor = 0;
+		pendingFinalUpdate = false;
+		lastProcessedFrame = int.MaxValue;
 		Stop();
 	}
 
-	public int PIDJIKLOKJC()
+	public int GetFrameStep()
 	{
-		return BAOONIGFBMB.MNHGBPOIHKG;
+		return currentInfo.MidFrames;
 	}
 
-	public ModelNode AAPLMJGHIGI(int OKNNNLIPODI)
+	public ModelNode GetNodeById(int OKNNNLIPODI)
 	{
-		return _Model.NAMKCLGOPDD()[OKNNNLIPODI];
+		return _Model.GetAllNodes()[OKNNNLIPODI];
 	}
 
-	public ModelNode CJELIBMCCMA()
+	public ModelNode GetPlayingNode()
 	{
-		if (MDLBEBOGOGK)
+		if (isPlaying)
 		{
-			return KFGEBGBEJBC;
+			return currentNode;
 		}
 		return null;
 	}
 
-	public ModelNode EGHIDHMENEF(string name, int AOJJBKLCHJO)
+	public ModelNode GetNodeByNameForSign(string name, int AOJJBKLCHJO)
 	{
 		if (!string.IsNullOrEmpty(name))
 		{
-			ModelNode lCDGOCIAIDK = _Model.EGHIDHMENEF(name);
+			ModelNode lCDGOCIAIDK = _Model.GetNodeByName(name);
 			if (lCDGOCIAIDK != null)
 			{
-				ModelNode lCDGOCIAIDK2 = lCDGOCIAIDK.PKOPJAHFNJG();
+				ModelNode lCDGOCIAIDK2 = lCDGOCIAIDK.GetPairNode();
 				if (lCDGOCIAIDK2 == null)
 				{
 					return lCDGOCIAIDK;
@@ -802,7 +802,7 @@ public class ModelAnimation : global::EventDispatcher<object>
 					}
 					break;
 				default:
-					LLLOJBFMONN.Error("strange sign {0}", AOJJBKLCHJO);
+					GameLog.Error("strange sign {0}", AOJJBKLCHJO);
 					return lCDGOCIAIDK;
 				}
 			}
@@ -812,10 +812,10 @@ public class ModelAnimation : global::EventDispatcher<object>
 
 	public void SetAligns(float JDJNFNGEDDP, float CCDPMGGMDLP, int CDNFFEFGLKN, int JNKHDFNCOGK)
 	{
-		NINBIDKEHKD = CDNFFEFGLKN;
-		ALKLIKKIDCM = JNKHDFNCOGK;
-		DNOJAJNAFAF = JDJNFNGEDDP;
-		DPEOGNBGKML = CCDPMGGMDLP;
+		frontAlignMargin = CDNFFEFGLKN;
+		backAlignMargin = JNKHDFNCOGK;
+		leftWallX = JDJNFNGEDDP;
+		rightWallX = CCDPMGGMDLP;
 	}
 
 	public void ShiftSequence(float HLBMDDOPKKL, float ELAKEOGEDPN = 0f, float PIIFLHIBODE = 0f)
@@ -825,17 +825,17 @@ public class ModelAnimation : global::EventDispatcher<object>
 
 	public void MirrorSequence()
 	{
-		if (JMKAHNADIOI == -1)
+		if (sign == -1)
 		{
-			_Frames.NKHEGNLGJIG();
+			_Frames.MirrorHorizontally();
 		}
 	}
 
 	public void ShiftBuffer(Vector3f OPNPKNEOALJ)
 	{
-		for (int i = 0; i < AHOBIIMFNEP.Count; i++)
+		for (int i = 0; i < bufferedFrames.Count; i++)
 		{
-			List<Vector3f> list = AHOBIIMFNEP[i];
+			List<Vector3f> list = bufferedFrames[i];
 			for (int j = 0; j < list.Count; j++)
 			{
 				list[j].Add(OPNPKNEOALJ);
@@ -847,11 +847,11 @@ public class ModelAnimation : global::EventDispatcher<object>
 	{
 		if (DBOLBEOCEME != null)
 		{
-			if (GJGDKFAAGOD != null && GJGDKFAAGOD != DBOLBEOCEME && GJGDKFAAGOD != DBOLBEOCEME.IMFGMAAEMIC())
+			if (RequiredInfo != null && RequiredInfo != DBOLBEOCEME && RequiredInfo != DBOLBEOCEME.GetTacticEquivalent())
 			{
-				LLLOJBFMONN.Error("Animation error need: '{0}' (Priority {1}); Animation played: '{2}' (Priority {3})", GJGDKFAAGOD.Name, GJGDKFAAGOD.Priority, DBOLBEOCEME.Name, DBOLBEOCEME.Priority);
+				GameLog.Error("Animation error need: '{0}' (Priority {1}); Animation played: '{2}' (Priority {3})", RequiredInfo.Name, RequiredInfo.Priority, DBOLBEOCEME.Name, DBOLBEOCEME.Priority);
 			}
-			if (KGIEFJNJFOH)
+			if (hasParentModel)
 			{
 				ClearIntervals();
 				ClearAttackingEdges();
@@ -859,7 +859,7 @@ public class ModelAnimation : global::EventDispatcher<object>
 			int num = DBOLBEOCEME.FirstFrame;
 			if (HHJGACBCGBP)
 			{
-				int num2 = LPFPGDJALED();
+				int num2 = GetCurrentFrame();
 				num = num2 + 1 + BADKABIKMBD;
 			}
 			else if (-1 < BADKABIKMBD)
@@ -868,55 +868,55 @@ public class ModelAnimation : global::EventDispatcher<object>
 			}
 			Stop();
 			set_Sign(AOJJBKLCHJO);
-			BAOONIGFBMB = DBOLBEOCEME;
-			GKGEBAKLIDH = num;
-			EJJNHDCIEAD = BAOONIGFBMB.AnimationEndFrame;
-			INFAGPDFGNL = BAOONIGFBMB.NCEKKNIMHAG();
-			if (GKGEBAKLIDH > EJJNHDCIEAD - 1)
+			currentInfo = DBOLBEOCEME;
+			startFrame = num;
+			endFrame = currentInfo.AnimationEndFrame;
+			isLooping = currentInfo.GetIsLooped();
+			if (startFrame > endFrame - 1)
 			{
-				GKGEBAKLIDH = EJJNHDCIEAD - 1;
+				startFrame = endFrame - 1;
 			}
-			if (BAOONIGFBMB.DIHJOPGKGFO().Length == 0)
+			if (currentInfo.GetAnimationFrames().Length == 0)
 			{
-				LLLOJBFMONN.Error("ModelAnimation::playInfo - empty animation \"{0}\"", BAOONIGFBMB.Name);
-				MDLBEBOGOGK = false;
+				GameLog.Error("ModelAnimation::playInfo - empty animation \"{0}\"", currentInfo.Name);
+				isPlaying = false;
 				return false;
 			}
-			AEKEELJMLDC = NAJJLNDPNJC;
+			useInterruptFrames = NAJJLNDPNJC;
 			if (NAJJLNDPNJC)
 			{
-				SetInterruptFrames(BAOONIGFBMB.DFKIHADCFKG());
+				SetInterruptFrames(currentInfo.GetNodesCount());
 			}
 			// A frame-shifted continuation starts from the previous move's frame, which can pass
 			// this animation's end. Load keyframes from the clamped start, not the raw value.
-			BAOONIGFBMB.HAILLLEPCHP(_Frames, GKGEBAKLIDH, !AEKEELJMLDC);
+			currentInfo.FillKeyFrames(_Frames, startFrame, !useInterruptFrames);
 			PhysicsNodes();
 			SetCurrentNode();
 			MirrorNodes();
 			ShiftPoints();
-			int gNDPBMIJEMH = DBOLBEOCEME.DFKIHADCFKG();
-			AHOBIIMFNEP.CPCAJIKOIEE(gNDPBMIJEMH);
-			MDLBEBOGOGK = true;
-			IDKMDLCEHBK = 0;
-			OLFJCLJKHIF = 0;
-			FGFGGGKDJLN = int.MaxValue;
-			BCGHHIIPCBJ = 0;
-			PLLOJCCNDOH = int.MaxValue;
-			CNFABIDNBOH = -3;
-			MHEIFCGAOHP = false;
-			BFDLFAHGKHP.Reset();
-			if (!BAOONIGFBMB.HOPDDLNABCG())
+			int gNDPBMIJEMH = DBOLBEOCEME.GetNodesCount();
+			bufferedFrames.Resize(gNDPBMIJEMH);
+			isPlaying = true;
+			frameCounter = 0;
+			frameCursor = 0;
+			lastProcessedFrame = int.MaxValue;
+			frameInMove = 0;
+			bufferIndex = int.MaxValue;
+			bufferState = -3;
+			pendingFinalUpdate = false;
+			accumulatedOffset.Reset();
+			if (!currentInfo.GetSaveVelocity())
 			{
-				AGAFKHLPLCA.Set(BAOONIGFBMB.LBJFGCFGMDI());
-				Vector3f aGAFKHLPLCA = AGAFKHLPLCA;
-				aGAFKHLPLCA.SetX(aGAFKHLPLCA.GetX() * (float)KFCNPADAMHA());
+				velocity.Set(currentInfo.GetVelocity());
+				Vector3f aGAFKHLPLCA = velocity;
+				aGAFKHLPLCA.SetX(aGAFKHLPLCA.GetX() * (float)GetSign());
 			}
-			DBCBOPONOBE.Set(BAOONIGFBMB.NCENGIOMKOF());
-			Vector3f dBCBOPONOBE = DBCBOPONOBE;
-			dBCBOPONOBE.SetX(dBCBOPONOBE.GetX() * (float)KFCNPADAMHA());
+			acceleration.Set(currentInfo.GetAcceleration());
+			Vector3f dBCBOPONOBE = acceleration;
+			dBCBOPONOBE.SetX(dBCBOPONOBE.GetX() * (float)GetSign());
 			SetDistanceAlign();
-			PAMICDLAMHC(BAOONIGFBMB);
-			GJGDKFAAGOD = null;
+			OnStartAnimation(currentInfo);
+			RequiredInfo = null;
 			return true;
 		}
 		return false;
@@ -925,21 +925,21 @@ public class ModelAnimation : global::EventDispatcher<object>
 	public void SetIntervals()
 	{
 		ClearAttackingEdges();
-		int num = LPFPGDJALED();
-		BAOONIGFBMB.GetIntervals(num, KKNKJMCFIJK, OACCPPMJMML, PAICIELHBHA);
-		foreach (IntervalAnimation item in KKNKJMCFIJK)
+		int num = GetCurrentFrame();
+		currentInfo.GetIntervals(num, activeIntervals, endedIntervals, intervalTypeFilter);
+		foreach (IntervalAnimation item in activeIntervals)
 		{
-			if (item.Type == IntervalAnimation.NGAJJDIEDGF.INTERVAL_ATTACK)
+			if (item.Type == IntervalAnimation.IntervalType.INTERVAL_ATTACK)
 			{
 				SetAttackingEdges(item);
 			}
-			int num2 = ((GKGEBAKLIDH > item.Start) ? GKGEBAKLIDH : item.Start);
+			int num2 = ((startFrame > item.Start) ? startFrame : item.Start);
 			if (num2 == num)
 			{
 				OnStartIntervals(item);
 			}
 		}
-		foreach (IntervalAnimation item2 in OACCPPMJMML)
+		foreach (IntervalAnimation item2 in endedIntervals)
 		{
 			OnEndIntervals(item2);
 		}
@@ -947,7 +947,7 @@ public class ModelAnimation : global::EventDispatcher<object>
 
 	public void ClearIntervals()
 	{
-		foreach (IntervalAnimation item in KKNKJMCFIJK)
+		foreach (IntervalAnimation item in activeIntervals)
 		{
 			OnEndIntervals(item);
 		}
@@ -955,7 +955,7 @@ public class ModelAnimation : global::EventDispatcher<object>
 
 	public void ResetIntervals()
 	{
-		KKNKJMCFIJK.Clear();
+		activeIntervals.Clear();
 	}
 
 	public void OnStartIntervals(IntervalAnimation CHCGJBLDPML)
@@ -968,14 +968,14 @@ public class ModelAnimation : global::EventDispatcher<object>
 		CallEvent(3, CHCGJBLDPML);
 	}
 
-	public void PAMICDLAMHC(InfoAnimation DBOLBEOCEME)
+	public void OnStartAnimation(InfoAnimation DBOLBEOCEME)
 	{
 		CallEvent(0, DBOLBEOCEME);
 	}
 
-	public void LDFKBJAHGII(InfoAnimation DBOLBEOCEME)
+	public void OnStopAnimation(InfoAnimation DBOLBEOCEME)
 	{
-		if (!KGIEFJNJFOH)
+		if (!hasParentModel)
 		{
 			ClearIntervals();
 			ClearAttackingEdges();
@@ -986,11 +986,11 @@ public class ModelAnimation : global::EventDispatcher<object>
 	public void SetAttackingEdges(IntervalAnimation CHCGJBLDPML)
 	{
 		IntervalAttack hFIIPNLCIEE = CHCGJBLDPML as IntervalAttack;
-		List<string> list = hFIIPNLCIEE.IKPJJAEIOCG();
+		List<string> list = hFIIPNLCIEE.GetAttackingParts();
 		foreach (string item in list)
 		{
 			string text = item;
-			if (ANHGOGDEFCO())
+			if (GetIsMirrored())
 			{
 				char c = text[item.Length - 2];
 				char c2 = text[item.Length - 1];
@@ -1007,61 +1007,61 @@ public class ModelAnimation : global::EventDispatcher<object>
 					}
 				}
 			}
-			ModelEdge nAKBKCDKEHF = _Model.CLBHEMEAAEN(text);
+			ModelEdge nAKBKCDKEHF = _Model.GetEdgeByName(text);
 			if (nAKBKCDKEHF != null)
 			{
-				ECNLLKIJIGP.Add(nAKBKCDKEHF);
+				attackingEdges.Add(nAKBKCDKEHF);
 			}
 		}
 	}
 
 	public void ClearAttackingEdges()
 	{
-		ECNLLKIJIGP.Clear();
+		attackingEdges.Clear();
 	}
 
-	public IntervalAnimation HDJBHPOGKNJ(IntervalAnimation.NGAJJDIEDGF LFLGCDNKNJI)
+	public IntervalAnimation FindInterval(IntervalAnimation.IntervalType LFLGCDNKNJI)
 	{
-		for (int i = 0; i < KKNKJMCFIJK.Count; i++)
+		for (int i = 0; i < activeIntervals.Count; i++)
 		{
-			if (LFLGCDNKNJI == KKNKJMCFIJK[i].Type)
+			if (LFLGCDNKNJI == activeIntervals[i].Type)
 			{
-				return KKNKJMCFIJK[i];
+				return activeIntervals[i];
 			}
 		}
 		return null;
 	}
 
-	public IntervalAnimation HDJBHPOGKNJ(string JDPPEBHEJPI)
+	public IntervalAnimation FindInterval(string JDPPEBHEJPI)
 	{
-		for (int i = 0; i < KKNKJMCFIJK.Count; i++)
+		for (int i = 0; i < activeIntervals.Count; i++)
 		{
-			if (KKNKJMCFIJK[i].Name == JDPPEBHEJPI)
+			if (activeIntervals[i].Name == JDPPEBHEJPI)
 			{
-				return KKNKJMCFIJK[i];
+				return activeIntervals[i];
 			}
 		}
 		return null;
 	}
 
-	public void RemoveInterval(IntervalAnimation.NGAJJDIEDGF LFLGCDNKNJI)
+	public void RemoveInterval(IntervalAnimation.IntervalType LFLGCDNKNJI)
 	{
-		for (int num = KKNKJMCFIJK.Count - 1; num >= 0; num--)
+		for (int num = activeIntervals.Count - 1; num >= 0; num--)
 		{
-			if (LFLGCDNKNJI == KKNKJMCFIJK[num].Type)
+			if (LFLGCDNKNJI == activeIntervals[num].Type)
 			{
-				KKNKJMCFIJK.RemoveAt(num);
+				activeIntervals.RemoveAt(num);
 			}
 		}
 	}
 
 	public void RemoveInterval(string name)
 	{
-		for (int num = KKNKJMCFIJK.Count - 1; num >= 0; num--)
+		for (int num = activeIntervals.Count - 1; num >= 0; num--)
 		{
-			if (name == KKNKJMCFIJK[num].Name)
+			if (name == activeIntervals[num].Name)
 			{
-				KKNKJMCFIJK.RemoveAt(num);
+				activeIntervals.RemoveAt(num);
 			}
 		}
 	}
@@ -1078,7 +1078,7 @@ public class ModelAnimation : global::EventDispatcher<object>
 	{
 		for (int i = 0; i < NFLDEGMEJAK.Count; i++)
 		{
-			if (HDJBHPOGKNJ(NFLDEGMEJAK[i]) != null)
+			if (FindInterval(NFLDEGMEJAK[i]) != null)
 			{
 				return true;
 			}
@@ -1088,31 +1088,31 @@ public class ModelAnimation : global::EventDispatcher<object>
 
 	public void Init()
 	{
-		LNGDODBCMEB = _Model.EGHIDHMENEF("NHeel_1");
-		NMGJKMEDDCB = _Model.EGHIDHMENEF("NHeel_2");
+		Heel1Node = _Model.GetNodeByName("NHeel_1");
+		Heel2Node = _Model.GetNodeByName("NHeel_2");
 	}
 
-	public void PONNDMHBGJK(IntervalAnimation.NGAJJDIEDGF LFLGCDNKNJI)
+	public void AddIntervalTypeFilter(IntervalAnimation.IntervalType LFLGCDNKNJI)
 	{
-		if (PAICIELHBHA == null)
+		if (intervalTypeFilter == null)
 		{
-			PAICIELHBHA = new HashSet<IntervalAnimation.NGAJJDIEDGF>();
+			intervalTypeFilter = new HashSet<IntervalAnimation.IntervalType>();
 		}
-		PAICIELHBHA.Add(LFLGCDNKNJI);
+		intervalTypeFilter.Add(LFLGCDNKNJI);
 	}
 
-	public void FDDONCMEAHA()
+	public void ClearIntervalTypeFilter()
 	{
-		PAICIELHBHA = null;
+		intervalTypeFilter = null;
 	}
 
-	public void PJDPCLCOGFP(EventAnimation.EECEJKADLCK LFLGCDNKNJI)
+	public void TriggerActionsForEvent(EventAnimation.EventAnimationType LFLGCDNKNJI)
 	{
-		if (BAOONIGFBMB == null)
+		if (currentInfo == null)
 		{
 			return;
 		}
-		List<ActionAnimation> dJBAIAKOIHM = BAOONIGFBMB.MoveData.DJBAIAKOIHM;
+		List<ActionAnimation> dJBAIAKOIHM = currentInfo.MoveData.Actions;
 		if (dJBAIAKOIHM.Count <= 0)
 		{
 			return;
@@ -1133,7 +1133,7 @@ public class ModelAnimation : global::EventDispatcher<object>
 
 	public void MoveByVelocity(Vector3f BLPIMOCGMKJ)
 	{
-		List<ModelNode> list = _Model.NAMKCLGOPDD();
+		List<ModelNode> list = _Model.GetAllNodes();
 		foreach (ModelNode item in list)
 		{
 			item.SetEnd();
@@ -1143,13 +1143,13 @@ public class ModelAnimation : global::EventDispatcher<object>
 
 	public static bool CalcIsMirror(ModelObject IPKAHIMPMEG, string PCAMJGFDBID, int AOJJBKLCHJO, Vector3[] MCPABOHDBLO, bool AAGPPKAOHGI = true)
 	{
-		ModelNode lCDGOCIAIDK = IPKAHIMPMEG.EGHIDHMENEF(PCAMJGFDBID);
-		ModelNode lCDGOCIAIDK2 = ((lCDGOCIAIDK == null) ? null : lCDGOCIAIDK.PKOPJAHFNJG());
+		ModelNode lCDGOCIAIDK = IPKAHIMPMEG.GetNodeByName(PCAMJGFDBID);
+		ModelNode lCDGOCIAIDK2 = ((lCDGOCIAIDK == null) ? null : lCDGOCIAIDK.GetPairNode());
 		if (lCDGOCIAIDK != null && lCDGOCIAIDK2 != null)
 		{
 			return CalcIsMirror(lCDGOCIAIDK, lCDGOCIAIDK2, AOJJBKLCHJO, MCPABOHDBLO, AAGPPKAOHGI);
 		}
-		LLLOJBFMONN.Error("ModelAnimation::mirrorNodes - nodes not found: \"{0}\"", PCAMJGFDBID);
+		GameLog.Error("ModelAnimation::mirrorNodes - nodes not found: \"{0}\"", PCAMJGFDBID);
 		return false;
 	}
 
@@ -1170,13 +1170,13 @@ public class ModelAnimation : global::EventDispatcher<object>
 
 	public static bool CalcIsMirror(ModelObject IPKAHIMPMEG, string PCAMJGFDBID, int AOJJBKLCHJO, List<Vector3f> MCPABOHDBLO, bool AAGPPKAOHGI = true)
 	{
-		ModelNode lCDGOCIAIDK = IPKAHIMPMEG.EGHIDHMENEF(PCAMJGFDBID);
-		ModelNode lCDGOCIAIDK2 = ((lCDGOCIAIDK == null) ? null : lCDGOCIAIDK.PKOPJAHFNJG());
+		ModelNode lCDGOCIAIDK = IPKAHIMPMEG.GetNodeByName(PCAMJGFDBID);
+		ModelNode lCDGOCIAIDK2 = ((lCDGOCIAIDK == null) ? null : lCDGOCIAIDK.GetPairNode());
 		if (lCDGOCIAIDK != null && lCDGOCIAIDK2 != null)
 		{
 			return CalcIsMirror(lCDGOCIAIDK, lCDGOCIAIDK2, AOJJBKLCHJO, MCPABOHDBLO, AAGPPKAOHGI);
 		}
-		LLLOJBFMONN.Error("ModelAnimation::mirrorNodes - nodes not found: \"{0}\"", PCAMJGFDBID);
+		GameLog.Error("ModelAnimation::mirrorNodes - nodes not found: \"{0}\"", PCAMJGFDBID);
 		return false;
 	}
 
@@ -1197,94 +1197,94 @@ public class ModelAnimation : global::EventDispatcher<object>
 
 	private void SetDistanceAlign()
 	{
-		ModelNode lCDGOCIAIDK = CJELIBMCCMA();
-		float bDHBFDMBMFM = BDHBFDMBMFM;
-		int gOBJCKFGIPA = BAOONIGFBMB.FirstFrame;
-		int num = LOIJGOPOGMO();
-		MIDMNJKJOFO = (num - gOBJCKFGIPA) * (BAOONIGFBMB.MNHGBPOIHKG + 1);
+		ModelNode lCDGOCIAIDK = GetPlayingNode();
+		float bDHBFDMBMFM = pivotTargetX;
+		int gOBJCKFGIPA = currentInfo.FirstFrame;
+		int num = GetStartFrame();
+		startFrameOffset = (num - gOBJCKFGIPA) * (currentInfo.MidFrames + 1);
 		float num2 = 0f;
-		if (0 < MIDMNJKJOFO && BAOONIGFBMB.MoveData.ILOEBFFAEAN.CKBGFODEBAJ == InfoAnimation.DOLCEABGNGA.ObjectNodes)
+		if (0 < startFrameOffset && currentInfo.MoveData.AlignData.PivotObjectType == InfoAnimation.AlignObjectType.ObjectNodes)
 		{
 			int num3;
-			if (ANHGOGDEFCO())
+			if (GetIsMirrored())
 			{
-				ModelNode lCDGOCIAIDK2 = lCDGOCIAIDK.PKOPJAHFNJG();
-				num3 = ((lCDGOCIAIDK2 == null) ? BOIDEOFKBMK() : lCDGOCIAIDK2.GetID());
+				ModelNode lCDGOCIAIDK2 = lCDGOCIAIDK.GetPairNode();
+				num3 = ((lCDGOCIAIDK2 == null) ? GetCurrentNodeId() : lCDGOCIAIDK2.GetID());
 			}
 			else
 			{
-				num3 = BOIDEOFKBMK();
+				num3 = GetCurrentNodeId();
 			}
-			num2 = BAOONIGFBMB.DIHJOPGKGFO()[num][num3].x - BAOONIGFBMB.DIHJOPGKGFO()[gOBJCKFGIPA][num3].x;
+			num2 = currentInfo.GetAnimationFrames()[num][num3].x - currentInfo.GetAnimationFrames()[gOBJCKFGIPA][num3].x;
 		}
-		bDHBFDMBMFM = (DCJLLPNFIMF = bDHBFDMBMFM + num2 * (float)KFCNPADAMHA());
-		if (!NLANLJEDHKJ)
+		bDHBFDMBMFM = (startPositionX = bDHBFDMBMFM + num2 * (float)GetSign());
+		if (!firstPositionCaptured)
 		{
-			PMIELLEMGJK = bDHBFDMBMFM;
-			FJDKCIHGLLM = BAOONIGFBMB;
-			GEPFNKEMDEE = -4;
-			NLANLJEDHKJ = true;
+			firstStartPositionX = bDHBFDMBMFM;
+			firstInfo = currentInfo;
+			renderTickCount = -4;
+			firstPositionCaptured = true;
 		}
 	}
 
 	private void Stop()
 	{
 		_Frames.Reset();
-		PLLOJCCNDOH = int.MaxValue;
+		bufferIndex = int.MaxValue;
 	}
 
 	private void DrawFrame()
 	{
-		List<ModelNode> list = _Model.NAMKCLGOPDD();
-		PGBLJDCEIOM();
+		List<ModelNode> list = _Model.GetAllNodes();
+		ApplyVelocity();
 		Vector3f eMAFACPEPDK = new Vector3f();
-		for (int i = 0; i < AHOBIIMFNEP.Count; i++)
+		for (int i = 0; i < bufferedFrames.Count; i++)
 		{
 			ModelNode Node = list[i];
 			if (!_Model.IsShock() || (_Model.IsShock() && !Node.IsShock()))
 			{
 				Node.SetEnd();
-				eMAFACPEPDK.Set(AHOBIIMFNEP[i][PLLOJCCNDOH]);
-				eMAFACPEPDK.Add(BFDLFAHGKHP);
+				eMAFACPEPDK.Set(bufferedFrames[i][bufferIndex]);
+				eMAFACPEPDK.Add(accumulatedOffset);
 				Node.SetStart(eMAFACPEPDK);
-				Node.OHMNDOKBGGA(true);
+				Node.SetSkipMacroUpdate(true);
 			}
 		}
-		if (BAOONIGFBMB.NBOLIGLFFEL() != 0f)
+		if (currentInfo.GetRotationAngle() != 0f)
 		{
-			CKNIEFMEDDA();
+			ApplyDrawTransform();
 		}
-		int count = AHOBIIMFNEP[0].Count;
-		if (PLLOJCCNDOH == count - 1)
+		int count = bufferedFrames[0].Count;
+		if (bufferIndex == count - 1)
 		{
-			PLLOJCCNDOH++;
+			bufferIndex++;
 		}
 		else
 		{
-			PLLOJCCNDOH += ((ECNLDOICIND <= 1) ? 1 : (ECNLDOICIND / GameUtils.GGBABPJBGJB()));
-			if (PLLOJCCNDOH > count - 1)
+			bufferIndex += ((interpolationSteps <= 1) ? 1 : (interpolationSteps / GameUtils.GetSlowMode()));
+			if (bufferIndex > count - 1)
 			{
-				PLLOJCCNDOH = count - 1;
+				bufferIndex = count - 1;
 			}
 		}
-		if (PLLOJCCNDOH >= ECNLDOICIND)
+		if (bufferIndex >= interpolationSteps)
 		{
-			KJODFLDMCFP = true;
+			bufferReachedKeyFrame = true;
 		}
 		else
 		{
-			KJODFLDMCFP = false;
+			bufferReachedKeyFrame = false;
 		}
-		KGOGFKAPIOC();
+		ApplyAcceleration();
 	}
 
 	private void SetInterruptFrames(int JEJGJGLMKDM)
 	{
 		_Frames.InterruptFramesSeted(JEJGJGLMKDM);
-		int num = (BAOONIGFBMB.MNHGBPOIHKG + 1) / 2;
-		KeyFrames.Frame cJMFONMNFBI = _Frames.KLNOLPIADNN(0);
-		KeyFrames.Frame cJMFONMNFBI2 = _Frames.KLNOLPIADNN(1);
-		List<ModelNode> list = _Model.NAMKCLGOPDD();
+		int num = (currentInfo.MidFrames + 1) / 2;
+		KeyFrames.Frame cJMFONMNFBI = _Frames.GetFrame(0);
+		KeyFrames.Frame cJMFONMNFBI2 = _Frames.GetFrame(1);
+		List<ModelNode> list = _Model.GetAllNodes();
 		for (int i = 0; i < cJMFONMNFBI.Size; i++)
 		{
 			Vector3f eMAFACPEPDK = list[i].GetStart();
@@ -1301,72 +1301,72 @@ public class ModelAnimation : global::EventDispatcher<object>
 
 	private void ShiftPoints()
 	{
-		InfoAnimation.MovePivot iLOEBFFAEAN = BAOONIGFBMB.MoveData.ILOEBFFAEAN;
-		ModelAnimation oJIEPADIEDE = DMDKINMOAKM(iLOEBFFAEAN.BAFGOANMBMI);
-		ModelAnimation oJIEPADIEDE2 = DMDKINMOAKM(iLOEBFFAEAN.EDBLMNIEKBD);
+		InfoAnimation.MovePivot iLOEBFFAEAN = currentInfo.MoveData.AlignData;
+		ModelAnimation oJIEPADIEDE = GetAnimationByModelType(iLOEBFFAEAN.PivotModelType);
+		ModelAnimation oJIEPADIEDE2 = GetAnimationByModelType(iLOEBFFAEAN.PositionModelType);
 		Vector3f eMAFACPEPDK = new Vector3f();
 		Vector3f eMAFACPEPDK2 = new Vector3f();
 		if (oJIEPADIEDE2 == null)
 		{
 			oJIEPADIEDE2 = this;
 		}
-		switch (iLOEBFFAEAN.CKBGFODEBAJ)
+		switch (iLOEBFFAEAN.PivotObjectType)
 		{
-		case InfoAnimation.DOLCEABGNGA.ObjectPivot:
-			eMAFACPEPDK.Set(_Frames.KLNOLPIADNN(2).Data[LBHPMJDHAEM]);
+		case InfoAnimation.AlignObjectType.ObjectPivot:
+			eMAFACPEPDK.Set(_Frames.GetFrame(2).Data[currentNodeId]);
 			break;
-		case InfoAnimation.DOLCEABGNGA.ObjectNodes:
+		case InfoAnimation.AlignObjectType.ObjectNodes:
 		{
-			int num = ((!oJIEPADIEDE.ANHGOGDEFCO() || iLOEBFFAEAN.BAHKGNNELBL <= -1) ? iLOEBFFAEAN.CLIPMJNJDKI : iLOEBFFAEAN.BAHKGNNELBL);
-			num = ((num >= 0 && num < _Frames.KLNOLPIADNN(2).Size) ? num : 0);
-			eMAFACPEPDK.Set(_Frames.KLNOLPIADNN(2).Data[num]);
+			int num = ((!oJIEPADIEDE.GetIsMirrored() || iLOEBFFAEAN.PivotPairNodeId <= -1) ? iLOEBFFAEAN.PivotNodeId : iLOEBFFAEAN.PivotPairNodeId);
+			num = ((num >= 0 && num < _Frames.GetFrame(2).Size) ? num : 0);
+			eMAFACPEPDK.Set(_Frames.GetFrame(2).Data[num]);
 			break;
 		}
-		case InfoAnimation.DOLCEABGNGA.ObjectAnimation:
+		case InfoAnimation.AlignObjectType.ObjectAnimation:
 			eMAFACPEPDK.Reset();
 			break;
-		case InfoAnimation.DOLCEABGNGA.ObjectWall:
+		case InfoAnimation.AlignObjectType.ObjectWall:
 			eMAFACPEPDK.Reset();
-			eMAFACPEPDK.SetX((KFCNPADAMHA() == 1 != (iLOEBFFAEAN.BLODCIGDJFK == "Back")) ? (0f - DPEOGNBGKML) : (0f - DNOJAJNAFAF));
+			eMAFACPEPDK.SetX((GetSign() == 1 != (iLOEBFFAEAN.PivotPart == "Back")) ? (0f - rightWallX) : (0f - leftWallX));
 			break;
 		}
-		switch (iLOEBFFAEAN.HHPAGAOGGLP)
+		switch (iLOEBFFAEAN.PositionObjectType)
 		{
-		case InfoAnimation.DOLCEABGNGA.ObjectPivot:
-			if (oJIEPADIEDE2.PKKDMELGFBE() != null)
+		case InfoAnimation.AlignObjectType.ObjectPivot:
+			if (oJIEPADIEDE2.GetCurrentNode() != null)
 			{
-				eMAFACPEPDK2.Set(oJIEPADIEDE2.PKKDMELGFBE().GetStart());
+				eMAFACPEPDK2.Set(oJIEPADIEDE2.GetCurrentNode().GetStart());
 			}
 			break;
-		case InfoAnimation.DOLCEABGNGA.ObjectNodes:
+		case InfoAnimation.AlignObjectType.ObjectNodes:
 		{
-			int oKNNNLIPODI = ((!oJIEPADIEDE2.ANHGOGDEFCO() || iLOEBFFAEAN.KFMGKDOLKGN <= -1) ? iLOEBFFAEAN.JPKDOHPGEBA : iLOEBFFAEAN.KFMGKDOLKGN);
-			eMAFACPEPDK2.Set(oJIEPADIEDE2.AAPLMJGHIGI(oKNNNLIPODI).GetStart());
+			int oKNNNLIPODI = ((!oJIEPADIEDE2.GetIsMirrored() || iLOEBFFAEAN.PositionPairNodeId <= -1) ? iLOEBFFAEAN.PositionNodeId : iLOEBFFAEAN.PositionPairNodeId);
+			eMAFACPEPDK2.Set(oJIEPADIEDE2.GetNodeById(oKNNNLIPODI).GetStart());
 			break;
 		}
-		case InfoAnimation.DOLCEABGNGA.ObjectAnimation:
-			eMAFACPEPDK2.Set(oJIEPADIEDE2.HOPJDHOEKEN());
+		case InfoAnimation.AlignObjectType.ObjectAnimation:
+			eMAFACPEPDK2.Set(oJIEPADIEDE2.GetShift());
 			break;
-		case InfoAnimation.DOLCEABGNGA.ObjectWall:
+		case InfoAnimation.AlignObjectType.ObjectWall:
 			eMAFACPEPDK2.Reset();
-			eMAFACPEPDK2.SetX((KFCNPADAMHA() == 1 != (iLOEBFFAEAN.PMILDGBBLMF == "Back")) ? DPEOGNBGKML : DNOJAJNAFAF);
+			eMAFACPEPDK2.SetX((GetSign() == 1 != (iLOEBFFAEAN.PositionPart == "Back")) ? rightWallX : leftWallX);
 			break;
 		}
-		eMAFACPEPDK2.SetX(eMAFACPEPDK2.GetX() + (float)KFCNPADAMHA() * iLOEBFFAEAN.LDNPHPGEOPJ.GetX());
-		eMAFACPEPDK2.SetY(eMAFACPEPDK2.GetY() + iLOEBFFAEAN.LDNPHPGEOPJ.GetY());
-		BDHBFDMBMFM = eMAFACPEPDK2.GetX();
-		JCLKMEAJOLO.Set(Vector3f.MJOKEBGPHKB(eMAFACPEPDK2, eMAFACPEPDK));
-		ShiftSequence((!iLOEBFFAEAN.HNDMMOGMOAN) ? 0f : JCLKMEAJOLO.GetX(), (!iLOEBFFAEAN.IMCDDINEFKC) ? 0f : JCLKMEAJOLO.GetY(), (!iLOEBFFAEAN.GHKGPDMMHHK) ? 0f : JCLKMEAJOLO.GetZ());
-		if (string.IsNullOrEmpty(iLOEBFFAEAN.BONDKHGGCDD))
+		eMAFACPEPDK2.SetX(eMAFACPEPDK2.GetX() + (float)GetSign() * iLOEBFFAEAN.PositionShift.GetX());
+		eMAFACPEPDK2.SetY(eMAFACPEPDK2.GetY() + iLOEBFFAEAN.PositionShift.GetY());
+		pivotTargetX = eMAFACPEPDK2.GetX();
+		shift.Set(Vector3f.op_Subtraction(eMAFACPEPDK2, eMAFACPEPDK));
+		ShiftSequence((!iLOEBFFAEAN.AlignX) ? 0f : shift.GetX(), (!iLOEBFFAEAN.AlignY) ? 0f : shift.GetY(), (!iLOEBFFAEAN.AlignZ) ? 0f : shift.GetZ());
+		if (string.IsNullOrEmpty(iLOEBFFAEAN.ShiftModelNode))
 		{
 			return;
 		}
-		ModelNode lCDGOCIAIDK = _Model.EGHIDHMENEF(iLOEBFFAEAN.BONDKHGGCDD);
+		ModelNode lCDGOCIAIDK = _Model.GetNodeByName(iLOEBFFAEAN.ShiftModelNode);
 		int index = lCDGOCIAIDK.GetID();
-		eMAFACPEPDK = _Frames.KLNOLPIADNN(2).Data[index];
-		Vector3f bEHOPOPCJGB = new Vector3f(Vector3f.MJOKEBGPHKB(eMAFACPEPDK, lCDGOCIAIDK.GetStart()));
-		Vector3f bEHOPOPCJGB2 = new Vector3f(Vector3f.MJOKEBGPHKB(eMAFACPEPDK, lCDGOCIAIDK.GetEnd()));
-		List<ModelNode> list = _Model.NAMKCLGOPDD();
+		eMAFACPEPDK = _Frames.GetFrame(2).Data[index];
+		Vector3f bEHOPOPCJGB = new Vector3f(Vector3f.op_Subtraction(eMAFACPEPDK, lCDGOCIAIDK.GetStart()));
+		Vector3f bEHOPOPCJGB2 = new Vector3f(Vector3f.op_Subtraction(eMAFACPEPDK, lCDGOCIAIDK.GetEnd()));
+		List<ModelNode> list = _Model.GetAllNodes();
 		int count = list.Count;
 		foreach (ModelNode item in list)
 		{
@@ -1375,22 +1375,22 @@ public class ModelAnimation : global::EventDispatcher<object>
 		}
 	}
 
-	private float IHPGHCDAHKF(List<Vector3f> frame)
+	private float GetNodeOffsetX(List<Vector3f> frame)
 	{
-		return KFGEBGBEJBC.GetStart().GetX() - frame[LBHPMJDHAEM].GetX();
+		return currentNode.GetStart().GetX() - frame[currentNodeId].GetX();
 	}
 
-	private float EDJHNDGAFMJ(List<Vector3f> frame)
+	private float GetNodeOffsetY(List<Vector3f> frame)
 	{
-		return KFGEBGBEJBC.GetStart().GetY() - frame[LBHPMJDHAEM].GetY();
+		return currentNode.GetStart().GetY() - frame[currentNodeId].GetY();
 	}
 
-	private Vector3f ONFBGCBIFJL(List<Vector3f> frame)
+	private Vector3f GetNodeOffset(List<Vector3f> frame)
 	{
-		return Vector3f.MJOKEBGPHKB(KFGEBGBEJBC.GetStart(), frame[LBHPMJDHAEM]);
+		return Vector3f.op_Subtraction(currentNode.GetStart(), frame[currentNodeId]);
 	}
 
-	private Vector3f ONFBGCBIFJL()
+	private Vector3f GetNodeOffset()
 	{
 		return Vector3f.op_Implicit(default(Vector3));
 	}
@@ -1398,71 +1398,71 @@ public class ModelAnimation : global::EventDispatcher<object>
 	private void MirrorNodes()
 	{
 		MirrorSequence();
-		InfoAnimation.MirrorNode cIEEMJJCABC = BAOONIGFBMB.ECCLELFHNHE();
-		if (cIEEMJJCABC.DAIAOBAEDCB())
+		InfoAnimation.MirrorNode cIEEMJJCABC = currentInfo.GetMirrorNode();
+		if (cIEEMJJCABC.GetIsEmpty())
 		{
 			return;
 		}
-		IPGAAGOANDE = CalcIsMirror(_Model, cIEEMJJCABC.FJANLLCDPCP(), KFCNPADAMHA(), _Frames.KLNOLPIADNN(2).Data);
-		if (IPGAAGOANDE)
+		isMirrored = CalcIsMirror(_Model, cIEEMJJCABC.GetNodeName(), GetSign(), _Frames.GetFrame(2).Data);
+		if (isMirrored)
 		{
-			int num = _Model.GetNodeIDByPairName(LBHPMJDHAEM);
+			int num = _Model.GetNodeIDByPairName(currentNodeId);
 			if (num > -1)
 			{
-				LBHPMJDHAEM = num;
-				KFGEBGBEJBC = _Model.NAMKCLGOPDD()[LBHPMJDHAEM];
+				currentNodeId = num;
+				currentNode = _Model.GetAllNodes()[currentNodeId];
 			}
-			BAOONIGFBMB.FNGJFDNAPPH(_Model.DJNNIKHGGFO(), _Frames, 2);
+			currentInfo.SwapNodePairs(_Model.GetPairNodeIds(), _Frames, 2);
 		}
 	}
 
 	private bool isBuffer()
 	{
-		return 0 < AHOBIIMFNEP.Count && PLLOJCCNDOH < AHOBIIMFNEP[0].Count;
+		return 0 < bufferedFrames.Count && bufferIndex < bufferedFrames[0].Count;
 	}
 
 	private void SetBufferFrame(int PADOCECKBPE = -1, int AGOKCKGOKLI = -1)
 	{
 		if (PADOCECKBPE == -1 || AGOKCKGOKLI == -1)
 		{
-			PADOCECKBPE = OLFJCLJKHIF;
-			AGOKCKGOKLI = OLFJCLJKHIF + 1;
+			PADOCECKBPE = frameCursor;
+			AGOKCKGOKLI = frameCursor + 1;
 		}
-		CNFABIDNBOH = 1;
-		ECNLDOICIND = GameUtils.GGBABPJBGJB();
-		GLOJGJIBABF = 1f / (float)ECNLDOICIND;
-		int bLJGEOEHIGP = (PIDJIKLOKJC() + 1) * ECNLDOICIND;
-		List<Vector3f> aLAKNMCKLFI = _Frames.KLNOLPIADNN(PADOCECKBPE).Data;
-		List<Vector3f> aLAKNMCKLFI2 = _Frames.KLNOLPIADNN(AGOKCKGOKLI).Data;
-		List<Vector3f> aLAKNMCKLFI3 = _Frames.KLNOLPIADNN(AGOKCKGOKLI + 1).Data;
+		bufferState = 1;
+		interpolationSteps = GameUtils.GetSlowMode();
+		subFrameScale = 1f / (float)interpolationSteps;
+		int bLJGEOEHIGP = (GetFrameStep() + 1) * interpolationSteps;
+		List<Vector3f> aLAKNMCKLFI = _Frames.GetFrame(PADOCECKBPE).Data;
+		List<Vector3f> aLAKNMCKLFI2 = _Frames.GetFrame(AGOKCKGOKLI).Data;
+		List<Vector3f> aLAKNMCKLFI3 = _Frames.GetFrame(AGOKCKGOKLI + 1).Data;
 		Bezier kHKJJAKJPAJ = new Bezier(bLJGEOEHIGP);
-		for (int i = 0; i < AHOBIIMFNEP.Count; i++)
+		for (int i = 0; i < bufferedFrames.Count; i++)
 		{
-			kHKJJAKJPAJ.CFCFNHONDML(aLAKNMCKLFI[i], aLAKNMCKLFI2[i], aLAKNMCKLFI3[i], AHOBIIMFNEP[i]);
+			kHKJJAKJPAJ.BuildCurve(aLAKNMCKLFI[i], aLAKNMCKLFI2[i], aLAKNMCKLFI3[i], bufferedFrames[i]);
 		}
-		PLLOJCCNDOH = 0;
+		bufferIndex = 0;
 	}
 
 	private void ShiftWall()
 	{
 		bool flag = false;
 		float num = 0f;
-		if (CDMBBKPCMPP != null && BAOONIGFBMB.ALFPDPEEJFO)
+		if (parentAnimation != null && currentInfo.AlignOnParentWallCollision)
 		{
-			num = CDMBBKPCMPP.LIBBBOCOCNP();
+			num = parentAnimation.GetShiftWallDelta();
 			flag = true;
 		}
-		int num2 = OLFJCLJKHIF + 2;
-		if (num2 > _Frames.OLINNGEMHMG() - 1)
+		int num2 = frameCursor + 2;
+		if (num2 > _Frames.GetSize() - 1)
 		{
 			set_ShiftWallDelta(0f);
 			return;
 		}
-		int num3 = ((JMKAHNADIOI != -1) ? ALKLIKKIDCM : NINBIDKEHKD);
-		int num4 = ((JMKAHNADIOI != 1) ? ALKLIKKIDCM : NINBIDKEHKD);
-		int index = ((_Model.CJELIBMCCMA() == null) ? _Model.NAMKCLGOPDD()[0].GetID() : _Model.CJELIBMCCMA().GetID());
-		float num5 = _Frames.KLNOLPIADNN(num2).Data[index].GetX();
-		if (BAOONIGFBMB.HFBOLCPHMBB && !flag)
+		int num3 = ((sign != -1) ? backAlignMargin : frontAlignMargin);
+		int num4 = ((sign != 1) ? backAlignMargin : frontAlignMargin);
+		int index = ((_Model.GetPivotNode() == null) ? _Model.GetAllNodes()[0].GetID() : _Model.GetPivotNode().GetID());
+		float num5 = _Frames.GetFrame(num2).Data[index].GetX();
+		if (currentInfo.NoWallRepulsion && !flag)
 		{
 			return;
 		}
@@ -1472,17 +1472,17 @@ public class ModelAnimation : global::EventDispatcher<object>
 		}
 		else
 		{
-			num5 = ((num5 < DNOJAJNAFAF + (float)num3) ? (num5 - (DNOJAJNAFAF + (float)num3)) : ((!(num5 > DPEOGNBGKML - (float)num4)) ? 0f : (num5 - (DPEOGNBGKML - (float)num4))));
+			num5 = ((num5 < leftWallX + (float)num3) ? (num5 - (leftWallX + (float)num3)) : ((!(num5 > rightWallX - (float)num4)) ? 0f : (num5 - (rightWallX - (float)num4))));
 			set_ShiftWallDelta(num5);
 			if (num5 == 0f)
 			{
 				return;
 			}
 		}
-		int num6 = ((_Frames.OLINNGEMHMG() >= num2 + 2) ? (num2 + 2) : _Frames.OLINNGEMHMG());
+		int num6 = ((_Frames.GetSize() >= num2 + 2) ? (num2 + 2) : _Frames.GetSize());
 		for (int i = num2; i < num6; i++)
 		{
-			KeyFrames.Frame cJMFONMNFBI = _Frames.KLNOLPIADNN(i);
+			KeyFrames.Frame cJMFONMNFBI = _Frames.GetFrame(i);
 			for (int j = 0; j < cJMFONMNFBI.Size; j++)
 			{
 				Vector3f eMAFACPEPDK = cJMFONMNFBI.Data[j];
@@ -1493,14 +1493,14 @@ public class ModelAnimation : global::EventDispatcher<object>
 
 	private void NewFrame()
 	{
-		if (BAOONIGFBMB != null)
+		if (currentInfo != null)
 		{
-			int num = LPFPGDJALED();
-			if (num != FGFGGGKDJLN)
+			int num = GetCurrentFrame();
+			if (num != lastProcessedFrame)
 			{
-				FGFGGGKDJLN = num;
+				lastProcessedFrame = num;
 				SetIntervals();
-				ONHMMDAOGIM = true;
+				frameChangedPending = true;
 			}
 		}
 		CheckActionsOnFrame();
@@ -1508,14 +1508,14 @@ public class ModelAnimation : global::EventDispatcher<object>
 
 	private void SetCurrentNode()
 	{
-		if (BAOONIGFBMB.MoveData.ILOEBFFAEAN.CLIPMJNJDKI > -1)
+		if (currentInfo.MoveData.AlignData.PivotNodeId > -1)
 		{
-			LBHPMJDHAEM = BAOONIGFBMB.MoveData.ILOEBFFAEAN.CLIPMJNJDKI;
-			KFGEBGBEJBC = _Model.NAMKCLGOPDD()[LBHPMJDHAEM];
+			currentNodeId = currentInfo.MoveData.AlignData.PivotNodeId;
+			currentNode = _Model.GetAllNodes()[currentNodeId];
 		}
 		else
 		{
-			KFGEBGBEJBC = null;
+			currentNode = null;
 			// A move with no alignment pivot is valid; do not log every playback,
 			// including rollback re-simulation, on the combat hot path.
 		}
@@ -1523,49 +1523,49 @@ public class ModelAnimation : global::EventDispatcher<object>
 
 	private void PhysicsNodes()
 	{
-		_Model.FLPIFFOGDBF();
-		List<ModelNode> list = _Model.NAMKCLGOPDD();
-		int num = BAOONIGFBMB.DFKIHADCFKG();
+		_Model.RestoreDefaultPhysics();
+		List<ModelNode> list = _Model.GetAllNodes();
+		int num = currentInfo.GetNodesCount();
 		if (list.Count < num)
 		{
-			LLLOJBFMONN.Error("In {0} animation {1} nodes, but in model only {2}", BAOONIGFBMB.Name, num, list.Count);
+			GameLog.Error("In {0} animation {1} nodes, but in model only {2}", currentInfo.Name, num, list.Count);
 		}
 		for (int i = 0; i < num; i++)
 		{
-			list[i].KCDIAMOLAKB();
+			list[i].DisablePhysics();
 		}
 	}
 
-	private ModelAnimation DMDKINMOAKM(ModelType.KEIDBIOIFGA HJMMACIELFG)
+	private ModelAnimation GetAnimationByModelType(ModelType.ModelTargetType HJMMACIELFG)
 	{
 		switch (HJMMACIELFG)
 		{
-		case ModelType.KEIDBIOIFGA.MODEL_NULL:
-		case ModelType.KEIDBIOIFGA.MODEL_THIS:
+		case ModelType.ModelTargetType.MODEL_NULL:
+		case ModelType.ModelTargetType.MODEL_THIS:
 			return this;
-		case ModelType.KEIDBIOIFGA.MODEL_PARENT:
-			return CDMBBKPCMPP;
-		case ModelType.KEIDBIOIFGA.MODEL_OTHER:
-			return LOOMFPAEADA;
+		case ModelType.ModelTargetType.MODEL_PARENT:
+			return parentAnimation;
+		case ModelType.ModelTargetType.MODEL_OTHER:
+			return otherAnimation;
 		default:
-			LLLOJBFMONN.Error("ModelAnimation::getPlayerAnimation - unknown type: {0}", HJMMACIELFG);
+			GameLog.Error("ModelAnimation::getPlayerAnimation - unknown type: {0}", HJMMACIELFG);
 			return null;
 		}
 	}
 
 	private void CheckActionsOnFrame()
 	{
-		if (!ONHMMDAOGIM || !KJODFLDMCFP)
+		if (!frameChangedPending || !bufferReachedKeyFrame)
 		{
 			return;
 		}
-		ONHMMDAOGIM = false;
-		List<ActionAnimation> dJBAIAKOIHM = BAOONIGFBMB.MoveData.DJBAIAKOIHM;
+		frameChangedPending = false;
+		List<ActionAnimation> dJBAIAKOIHM = currentInfo.MoveData.Actions;
 		if (dJBAIAKOIHM.Count <= 0)
 		{
 			return;
 		}
-		int dBEDGEMEFNB = LPFPGDJALED();
+		int dBEDGEMEFNB = GetCurrentFrame();
 		List<ActionAnimation> list = new List<ActionAnimation>();
 		foreach (ActionAnimation item in dJBAIAKOIHM)
 		{
@@ -1580,41 +1580,41 @@ public class ModelAnimation : global::EventDispatcher<object>
 		}
 	}
 
-	private void PGBLJDCEIOM()
+	private void ApplyVelocity()
 	{
-		PGBLJDCEIOM(AGAFKHLPLCA);
+		ApplyVelocity(velocity);
 	}
 
-	private void PGBLJDCEIOM(Vector3f BLPIMOCGMKJ)
+	private void ApplyVelocity(Vector3f BLPIMOCGMKJ)
 	{
 		Vector3f eMAFACPEPDK = new Vector3f(BLPIMOCGMKJ);
-		if (GLOJGJIBABF != 1f)
+		if (subFrameScale != 1f)
 		{
-			eMAFACPEPDK.Multiply(GLOJGJIBABF);
+			eMAFACPEPDK.Multiply(subFrameScale);
 		}
-		BFDLFAHGKHP.Add(eMAFACPEPDK);
+		accumulatedOffset.Add(eMAFACPEPDK);
 	}
 
-	private void KGOGFKAPIOC()
+	private void ApplyAcceleration()
 	{
-		KGOGFKAPIOC(DBCBOPONOBE);
+		ApplyAcceleration(acceleration);
 	}
 
-	private void KGOGFKAPIOC(Vector3f IALBIAFLGFI)
+	private void ApplyAcceleration(Vector3f IALBIAFLGFI)
 	{
 		Vector3f eMAFACPEPDK = new Vector3f(IALBIAFLGFI);
-		if (GLOJGJIBABF != 1f)
+		if (subFrameScale != 1f)
 		{
-			eMAFACPEPDK.Multiply(GLOJGJIBABF);
+			eMAFACPEPDK.Multiply(subFrameScale);
 		}
-		AGAFKHLPLCA.Add(eMAFACPEPDK);
+		velocity.Add(eMAFACPEPDK);
 	}
 
-	private void OBOOKFFKMIB()
+	private void NoOpHook()
 	{
 	}
 
-	private void CKNIEFMEDDA()
+	private void ApplyDrawTransform()
 	{
 	}
 }

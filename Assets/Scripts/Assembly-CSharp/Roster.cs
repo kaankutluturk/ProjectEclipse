@@ -4,9 +4,9 @@ using System.Xml;
 using CodeStage.AntiCheat.ObscuredTypes;
 using UnityEngine;
 
-public class Roster : MELBIBHDPCE
+public class Roster : SavedXmlProfile
 {
-	public enum LHIKHHPIHPL
+	public enum BalanceType
 	{
 		BALANCE_NONE = 0,
 		BALANCE_BONUS = 1,
@@ -15,7 +15,7 @@ public class Roster : MELBIBHDPCE
 		BALANCE_MONEY_PAID = 4
 	}
 
-	public enum HPOIJPGPOCF
+	public enum BalanceChangeType
 	{
 		CHANGE_INIT = 0,
 		CHANGE_PAYMENT = 1,
@@ -33,7 +33,7 @@ public class Roster : MELBIBHDPCE
 		CHANGE_LEDGER = 13
 	}
 
-	public enum LDIJCCNBNNM
+	public enum DeliveryKind
 	{
 		DELIVERY_ITEM = 0,
 		DELIVERY_RECIPE = 1,
@@ -42,67 +42,67 @@ public class Roster : MELBIBHDPCE
 		ECLIPSE_MODE_TOGGLE = 4
 	}
 
-	private string DNBFEGDILIA = SF2Paths.KKIDGPBOBNI() + "/music/";
+	private string musicPath = SF2Paths.GetGameDataPath() + "/music/";
 
-	private string PDGHOOLJNMI = SF2Paths.KKIDGPBOBNI() + "/sounds/";
+	private string soundsPath = SF2Paths.GetGameDataPath() + "/sounds/";
 
-	public const int FFOOOBCMMNF = 1;
+	public const int DefaultLevel = 1;
 
-	public const int KOFIHALIJJL = 900;
+	public const int DumpIntervalSeconds = 900;
 
-	private XmlNode FPCJCIIBLND;
+	private XmlNode itemsNode;
 
-	private UserItems JEMDPOAHOAP = new UserItems();
+	private UserItems userItems = new UserItems();
 
-	private UserAchievements EHLHFJLCKKE = new UserAchievements();
+	private UserAchievements userAchievements = new UserAchievements();
 
-	private UserTutorials HKINOMCMDDL = new UserTutorials();
+	private UserTutorials userTutorials = new UserTutorials();
 
-	private UserPerks ABBGMNHDECI;
+	private UserPerks userPerks;
 
-	private XmlNode JADHFPKIHDF;
+	private XmlNode fightsNode;
 
-	private XmlNode GJDMCIILLBJ;
+	private XmlNode shopNode;
 
-	private XmlNode IOFKIODDAMJ;
+	private XmlNode battlesNode;
 
-	private XmlNode ADEJBJHOEDF;
+	private XmlNode questsNode;
 
-	private XmlNode OLEKIOJIFEK;
+	private XmlNode variablesNode;
 
-	private XmlNode AMCNNLHPCGI;
+	private XmlNode openTricksNode;
 
-	private XmlNode HALBNLAFAMM;
+	private XmlNode timersNode;
 
-	private XmlNode ALMPFGCDAOP;
+	private XmlNode currenciesNode;
 
-	private XmlNode KHKMHPDKDIJ;
+	private XmlNode paymentsNode;
 
-	private List<string> EOJCMGDPHLL = new List<string>();
+	private List<string> loadedQuestFiles = new List<string>();
 
-	private List<RosterBattle> HLHEFIKFBHH = new List<RosterBattle>();
+	private List<RosterBattle> battles = new List<RosterBattle>();
 
-	private List<RosterFight> JNPMCNMEOLE = new List<RosterFight>();
+	private List<RosterFight> fights = new List<RosterFight>();
 
-	private List<RosterQuest> CNFCPCJPGLM = new List<RosterQuest>();
+	private List<RosterQuest> quests = new List<RosterQuest>();
 
-	private List<string> COJMHNDCACJ = new List<string>();
+	private List<string> openTricks = new List<string>();
 
-	private List<string> BMKAMGGIELK = new List<string>();
+	private List<string> shopLocks = new List<string>();
 
-	private List<CurrencyStruct> DNPGEMMDPNN = new List<CurrencyStruct>();
+	private List<CurrencyStruct> currencies = new List<CurrencyStruct>();
 
-	private List<ResistanceStruct> OEJCIFGACNG = new List<ResistanceStruct>();
+	private List<ResistanceStruct> resistances = new List<ResistanceStruct>();
 
-	private static FMGDPLEEKEM EHAAMEPDOGJ;
+	private static PaymentOrdersManager paymentOrders;
 
-	private ObscuredLong MJBFFBPLAGC;
+	private ObscuredLong money;
 
-	private ObscuredLong BDONIKLHFLJ;
+	private ObscuredLong bonus;
 
-	private ObscuredLong BIOMOEDPLIP = (ObscuredLong)(0L);
+	private ObscuredLong paidMoney = (ObscuredLong)(0L);
 
-	private ObscuredLong IAFKGOFKDKE = (ObscuredLong)(0L);
+	private ObscuredLong paidBonus = (ObscuredLong)(0L);
 
 	private uint _indexSlider;
 
@@ -110,125 +110,125 @@ public class Roster : MELBIBHDPCE
 
 	private ObscuredInt _power;
 
-	public int OGLHGFJKMCO;
+	public int PowerMax;
 
-	public int DIJOCFEFHAK;
+	public int PowerRegenSeconds;
 
-	private long CHJNGJLCICH;
+	private long powerSyncTime;
 
-	private long HBPJBBJFHME = -1L;
+	private long energyRefillTimer = -1L;
 
 	// Energy is disabled for every profile, including existing depleted saves.
 	// Keep the legacy member writable for recovered item/quest callers.
-	public bool ADKHNLAMDJP
+	public bool HasUnlimitedEnergy
 	{
 		get { return true; }
 		set { }
 	}
 
-	private long GKLJJHLFACI;
+	private long lastDumpTime;
 
-	private long GKIONOFPEGB;
+	private long periodicPlayTime;
 
-	private long BHOEHPFBIJE;
+	private long lastDailyTimeOffset;
 
-	private long JOLENHJGDLH;
+	private long lastEnergyTimeOffset;
 
-	private bool AJGEKAADGEJ;
+	private bool showUpgrades;
 
-	private bool NPEENBBIFFB;
+	private bool showForge;
 
-	private int CHDMBKEHHLH;
+	private int discipleMode;
 
-	private int CFNNEGHPCMN;
+	private int denominationDigits;
 
-	private FightIDS GDFIGNHHKDC;
+	private FightIDS fightIds;
 
 	private Color _MapMaskColor = Color.white;
 
-	public bool CLODDOOGDBB;
+	public bool UseLevelOverride;
 
-	public int MMIMAJCKFKL;
+	public int LevelOverride;
 
-	protected ModelParameters HEGIABHIPHA;
+	protected ModelParameters modelParameters;
 
-	protected string BGMCCMHOMJL = string.Empty;
+	protected string language = string.Empty;
 
-	protected string NBBNANIILBL = string.Empty;
+	protected string coinIcon = string.Empty;
 
-	protected XmlAttribute HPAHCBILEOE;
+	protected XmlAttribute mapFocusAttribute;
 
-	protected FightIDS FHJHPGDPNBH = new FightIDS();
+	protected FightIDS mapFocus = new FightIDS();
 
-	protected XmlAttribute AALOLMPMCDH;
+	protected XmlAttribute raidMapFocusAttribute;
 
-	protected FightIDS LINHCAGANFC = new FightIDS();
+	protected FightIDS raidMapFocus = new FightIDS();
 
-	private bool OKLFFBPGIAN;
+	private bool facebookLiked;
 
-	private long DLKPHLOAFGM;
+	private long starterPackTimerEndTime;
 
-	private RosterTimerContainer GNOMNIKGAPE;
+	private RosterTimerContainer timerContainer;
 
-	private bool JHJLHNHCPMP;
+	private bool eclipseMode;
 
-	public Dictionary<string, RosterQuest.NOKCOAHJIPB> INLEOAPIEDJ = new Dictionary<string, RosterQuest.NOKCOAHJIPB>();
+	public Dictionary<string, RosterQuest.QuestVariable> QuestVariables = new Dictionary<string, RosterQuest.QuestVariable>();
 
-	private bool NDIEOONABLA;
+	private bool trySocialLogin;
 
-	private bool CFIMMOBMEIP;
+	private bool askedForDumps;
 
-	private bool GNCENEKPINA;
+	private bool gplusAutoLogin;
 
 	private List<ObscuredUInt> _levelThresholds = new List<ObscuredUInt>();
 
-	private int GAKAEGHGNGD;
+	private int gplusFailedLogins;
 
-	private string OFKGMKADHBD = string.Empty;
+	private string currentZone = string.Empty;
 
-	private bool MCPCBHPLOPP;
+	private bool raidRemindRandomRule;
 
-	public XmlNode AIPFJFDHDBF
+	public XmlNode ItemsNode
 	{
 		get
 		{
-			return BABKABBEFEL();
+			return GetItemsNode();
 		}
 	}
 
-	public UserItems FCBGGMFCDDA
+	public UserItems Inventory
 	{
 		get
 		{
-			return KHCNHPCPFII();
+			return GetInventory();
 		}
 	}
 
-	public UserAchievements IMGACJKJAPA
+	public UserAchievements Achievements
 	{
 		get
 		{
-			return KJNPJKEHGLE();
+			return GetAchievements();
 		}
 	}
 
-	public UserTutorials KEGPEFPCKOG
+	public UserTutorials Tutorials
 	{
 		get
 		{
-			return BKBHIMEEDBG();
+			return GetTutorials();
 		}
 	}
 
-	public UserPerks MCFHMBCELDC
+	public UserPerks Perks
 	{
 		get
 		{
-			return JLBDOBLHHAF();
+			return GetPerks();
 		}
 	}
 
-	public List<RosterBattle> IDDAHHFELEM
+	public List<RosterBattle> SavedBattles
 	{
 		get
 		{
@@ -236,83 +236,83 @@ public class Roster : MELBIBHDPCE
 		}
 	}
 
-	public List<RosterFight> BKBFHLADPIM
+	public List<RosterFight> SavedFights
 	{
 		get
 		{
-			return NIDBIFOJMAP();
+			return GetSavedFights();
 		}
 	}
 
-	public List<RosterQuest> OEDLGIEPACN
+	public List<RosterQuest> Quests
 	{
 		get
 		{
-			return JNHBGEDJBLJ();
+			return GetQuests();
 		}
 	}
 
-	public List<string> KBMFMBLNFLE
+	public List<string> OpenTricks
 	{
 		get
 		{
-			return AMAELLHKNDJ();
+			return GetOpenTricks();
 		}
 	}
 
-	public static FMGDPLEEKEM MIJLPJONGNM
+	public static PaymentOrdersManager PaymentOrders
 	{
 		get
 		{
-			return PKACFPCOHJH();
+			return GetPaymentOrders();
 		}
 	}
 
-	public long JDPAGMPKLHB
+	public long Money
 	{
 		get
 		{
-			return BFBOEGMAMNF();
+			return GetMoney();
 		}
 	}
 
-	public long OHHLCBPGOIM
+	public long Bonus
 	{
 		get
 		{
-			return EHFJHFDACMP();
+			return GetBonus();
 		}
 	}
 
-	public ObscuredLong IHCGIHFKIGF
+	public ObscuredLong PaidMoney
 	{
 		get
 		{
-			return KNHDCEBIMEE();
+			return GetPaidMoney();
 		}
 		set
 		{
-			HGDLPMDHHOJ(value);
+			SetPaidMoney(value);
 		}
 	}
 
-	public ObscuredLong LJIJBLBPODG
+	public ObscuredLong PaidBonus
 	{
 		get
 		{
-			return FJGHKGPAPPN();
+			return GetPaidBonus();
 		}
 		set
 		{
-			DBJLKIJNBHJ(value);
+			SetPaidBonus(value);
 		}
 	}
 
-	public uint KFHNMIDOKAM
+	public uint SliderIndex
 	{
 		get
 		{
-			return BBLDLAIBOLP();
+			return GetSliderIndex();
 		}
 		set
 		{
@@ -320,159 +320,159 @@ public class Roster : MELBIBHDPCE
 		}
 	}
 
-	public uint KGJJCGMHBKD
+	public uint ExperienceToNextLevel
 	{
 		get
 		{
-			return HEOHJNFGEDH();
+			return GetExperienceToNextLevel();
 		}
 	}
 
-	public uint NIPCKCLLBLJ
+	public uint Experience
 	{
 		get
 		{
-			return EOKLELGLHJJ();
+			return GetExperience();
 		}
 	}
 
-	public int MFGLDPKEDJB
+	public int MaxPower
 	{
 		get
 		{
-			return NHKMGNPADKI();
+			return GetMaxPower();
 		}
 	}
 
-	public long HNJMOKDHCHG
+	public long PowerSyncTime
 	{
 		get
 		{
-			return FNDAKFILBOE();
+			return GetPowerSyncTime();
 		}
 		set
 		{
-			PABEFKBJNEF(value);
+			SetPowerSyncTime(value);
 		}
 	}
 
-	public long FDBNBGAGGBF
+	public long EnergyRefillTimer
 	{
 		get
 		{
-			return NHFHDFIJEJG();
+			return GetEnergyRefillTimer();
 		}
 	}
 
-	public long KENOPHJGJDL
+	public long LastDumpTime
 	{
 		get
 		{
-			return NBDICCLKEAC();
+			return GetLastDumpTime();
 		}
 		set
 		{
-			BNGLIONOOAG(value);
+			SetLastDumpTime(value);
 		}
 	}
 
-	public long FELJIMDLIDI
+	public long PeriodicPlayTime
 	{
 		get
 		{
-			return CPGGBLDAHBG();
+			return GetPeriodicPlayTime();
 		}
 		set
 		{
-			DEPJCHIFFKA(value);
+			SetPeriodicPlayTime(value);
 		}
 	}
 
-	public long OCKFAOHHOGO
+	public long LastDailyTimeOffset
 	{
 		get
 		{
-			return ECGBNDKJIPD();
+			return GetLastDailyTimeOffset();
 		}
 		set
 		{
-			DFBDNDMOLFH(value);
+			SetLastDailyTimeOffset(value);
 		}
 	}
 
-	public long KMGBCEEDEBC
+	public long LastEnergyTimeOffset
 	{
 		get
 		{
-			return AHAAGOHCGHN();
+			return GetLastEnergyTimeOffset();
 		}
 		set
 		{
-			ODPOOEPKJBP(value);
+			SetLastEnergyTimeOffset(value);
 		}
 	}
 
-	public bool KAJIIOIPDCA
+	public bool ShowUpgrades
 	{
 		get
 		{
-			return HFINDOBJHNK();
+			return GetShowUpgrades();
 		}
 		set
 		{
-			MJLDOEOMLEG(value);
+			SetShowUpgrades(value);
 		}
 	}
 
-	public bool IIEHAMOGEHM
+	public bool ShowForge
 	{
 		get
 		{
-			return ENBKLLMAALP();
+			return GetShowForge();
 		}
 		set
 		{
-			PLBEEGGFKDH(value);
+			SetShowForge(value);
 		}
 	}
 
-	public int AIHIDCEKGMH
+	public int DiscipleMode
 	{
 		get
 		{
-			return BGBFBIDOECK();
+			return GetDiscipleMode();
 		}
 	}
 
-	public int FKDIBAHAJGG
+	public int DenominationDigits
 	{
 		get
 		{
-			return NPGECMDDNFO();
+			return GetDenominationDigits();
 		}
 		set
 		{
-			KGEHCFADNLI(value);
+			SetDenominationDigits(value);
 		}
 	}
 
-	public FightIDS CBMEHICIGFB
+	public FightIDS FightIds
 	{
 		get
 		{
-			return HEBDMAIEAPM();
+			return GetFightIds();
 		}
 		set
 		{
-			MICFFKODJME(value);
+			SetFightIds(value);
 		}
 	}
 
-	public Color LHNBHJHEPNG
+	public Color MapMaskTint
 	{
 		get
 		{
-			return EPEDEDLCAJF();
+			return GetMapMaskColor();
 		}
 		set
 		{
@@ -480,7 +480,7 @@ public class Roster : MELBIBHDPCE
 		}
 	}
 
-	public ModelParameters KMMJCHDKBDO
+	public ModelParameters PlayerParameters
 	{
 		get
 		{
@@ -488,87 +488,87 @@ public class Roster : MELBIBHDPCE
 		}
 	}
 
-	public string OAPHJAPMKJG
+	public string Language
 	{
 		get
 		{
-			return GKLECBABFCP();
+			return GetLanguage();
 		}
 		set
 		{
-			COKACMKOIGD(value);
+			SetLanguage(value);
 		}
 	}
 
-	public string HNHKICMKDEA
+	public string CoinIcon
 	{
 		get
 		{
-			return OGJBDMNBMLJ();
+			return GetCoinIcon();
 		}
 		set
 		{
-			HEIPPEGBOCK(value);
+			SetCoinIcon(value);
 		}
 	}
 
-	public FightIDS IDEEJDJLFLH
+	public FightIDS MapFocus
 	{
 		get
 		{
-			return KNJNHKDCINB();
+			return GetMapFocus();
 		}
 		set
 		{
-			KPDHMBIDAHA(value);
+			SetMapFocusIds(value);
 		}
 	}
 
-	public FightIDS PEOPBHOAJLF
+	public FightIDS RaidMapFocus
 	{
 		get
 		{
-			return MGICKOOCNAJ();
+			return GetRaidMapFocus();
 		}
 		set
 		{
-			AEGEEMMBLDF(value);
+			SetRaidMapFocusIds(value);
 		}
 	}
 
-	public bool IJOONMBEKDM
+	public bool FacebookLiked
 	{
 		get
 		{
-			return MLOHMAGMIAI();
+			return GetFacebookLiked();
 		}
 		set
 		{
-			EKHEBJIOMFH(value);
+			SetFacebookLiked(value);
 		}
 	}
 
-	public long ELGFEIJCNEJ
+	public long StarterPackTimerEndTime
 	{
 		get
 		{
-			return AACMNAJJKME();
+			return GetStarterPackTimerEndTime();
 		}
 		set
 		{
-			EPGEKHNCEJF(value);
+			SetStarterPackTimerEndTime(value);
 		}
 	}
 
-	public RosterTimerContainer GCEIELIEGJH
+	public RosterTimerContainer Timers
 	{
 		get
 		{
-			return AEMFLPNDDKL();
+			return GetTimerContainer();
 		}
 	}
 
-	public bool OGNHPKLGPDB
+	public bool EclipseMode
 	{
 		get
 		{
@@ -580,95 +580,95 @@ public class Roster : MELBIBHDPCE
 	{
 		get
 		{
-			return PINDEKDNCNL();
+			return GetLevel();
 		}
 		set
 		{
-			DLDMOHEGENM(value);
+			SetLevel(value);
 		}
 	}
 
-	public int JLPPKJPFJEO
+	public int NewTricksCount
 	{
 		get
 		{
-			return NPKBPGMNDFJ();
+			return CountNewTricks();
 		}
 	}
 
-	public int DJCNNIDIHCE
+	public int SealCount
 	{
 		get
 		{
-			return CNFOLIEFJCE();
+			return CountOwnedSeals();
 		}
 	}
 
-	public bool CCJIANKFBGK
+	public bool TrySocialLogin
 	{
 		get
 		{
-			return DFNEGEEHLFJ();
+			return GetTrySocialLogin();
 		}
 		set
 		{
-			OEAOPFDLMJJ(value);
+			SetTrySocialLogin(value);
 		}
 	}
 
-	public bool FJLFILEFNNK
+	public bool AskedForDumps
 	{
 		get
 		{
-			return FDPIBNJJDAK();
+			return GetAskedForDumps();
 		}
 		set
 		{
-			AJCCEFKDKIO(value);
+			SetAskedForDumps(value);
 		}
 	}
 
-	public bool LJEGNLNKJNF
+	public bool GPlusAutoLogin
 	{
 		get
 		{
-			return DHPNBBILDPB();
+			return GetGPlusAutoLogin();
 		}
 		set
 		{
-			BCMKHEKOMDB(value);
+			SetGPlusAutoLogin(value);
 		}
 	}
 
-	public string JCABJECCOCB
+	public string MarketCode
 	{
 		get
 		{
-			return ODMONBDLMIP();
+			return GetMarketCode();
 		}
 	}
 
-	public string JHJDOOIJCBK
+	public string CurrentZone
 	{
 		get
 		{
-			return NFKHNICBOIB();
+			return GetCurrentZone();
 		}
 		set
 		{
-			AOIBKCOBABL(value);
+			SetCurrentZone(value);
 		}
 	}
 
-	public bool JBKGCKKLHGO
+	public bool RaidRemindRandomRule
 	{
 		get
 		{
-			return LDHANGLFDPJ();
+			return GetRaidRemindRandomRule();
 		}
 		set
 		{
-			MOBIJGMLNLI(value);
+			SetRaidRemindRandomRule(value);
 		}
 	}
 
@@ -684,116 +684,116 @@ public class Roster : MELBIBHDPCE
 		{
 			UnityEngine.Debug.Log("[DevXml] restored the Eclipse Mode map button from completed progression");
 		}
-		MMIMAJCKFKL = 0;
-		CLODDOOGDBB = false;
-		HCMLOIDALKC(node.Attributes["ServerUserID"].CIPOICEEIBK(string.Empty));
-		AJCCEFKDKIO(node.Attributes["AskedForDumps"].ParseBool());
-		HEGIABHIPHA = JCICKLIMBEF;
+		LevelOverride = 0;
+		UseLevelOverride = false;
+		SetServerUserId(node.Attributes["ServerUserID"].GetStringOrDefault(string.Empty));
+		SetAskedForDumps(node.Attributes["AskedForDumps"].ParseBool());
+		modelParameters = JCICKLIMBEF;
 		if (JCICKLIMBEF != null) JCICKLIMBEF.EclipseRosterPlayer = true;
-		PLELELJIKEL();
+		LoadLevelThresholds();
 		_indexSlider = node.Attributes["IndexSlider"].ParseUint();
-		NBBNANIILBL = node.Attributes["CoinIcon"].CIPOICEEIBK("MiscSprites.gold");
-		if (NBBNANIILBL.Contains(".png"))
+		coinIcon = node.Attributes["CoinIcon"].GetStringOrDefault("MiscSprites.gold");
+		if (coinIcon.Contains(".png"))
 		{
-			HEIPPEGBOCK(NBBNANIILBL.Replace(".png", string.Empty));
+			SetCoinIcon(coinIcon.Replace(".png", string.Empty));
 		}
-		if (!NBBNANIILBL.Contains("MiscSprites"))
+		if (!coinIcon.Contains("MiscSprites"))
 		{
-			HEIPPEGBOCK(string.Format("{0}.{1}", "MiscSprites", NBBNANIILBL));
+			SetCoinIcon(string.Format("{0}.{1}", "MiscSprites", coinIcon));
 		}
-		OIOOMAKNIOB(node.Attributes["Money"].ParseLong(0L));
-		LLNELLFMMBB(node.Attributes["Bonus"].ParseLong(0L), HPOIJPGPOCF.CHANGE_INIT);
-		IAFKGOFKDKE = (ObscuredLong)(node.Attributes["PaidBonus"].ParseLong(0L));
-		BIOMOEDPLIP = (ObscuredLong)(node.Attributes["PaidMoney"].ParseLong(0L));
-		CFNNEGHPCMN = node.Attributes["DenominationDigits"].ParseInt();
-		FHCPEIGMGMK();
-		DLDMOHEGENM(node.Attributes["Level"].ParseInt());
+		SetMoney(node.Attributes["Money"].ParseLong(0L));
+		SetBonus(node.Attributes["Bonus"].ParseLong(0L), BalanceChangeType.CHANGE_INIT);
+		paidBonus = (ObscuredLong)(node.Attributes["PaidBonus"].ParseLong(0L));
+		paidMoney = (ObscuredLong)(node.Attributes["PaidMoney"].ParseLong(0L));
+		denominationDigits = node.Attributes["DenominationDigits"].ParseInt();
+		RescaleCurrencyDenomination();
+		SetLevel(node.Attributes["Level"].ParseInt());
 		_experience = (ObscuredUInt)(node.Attributes["Experience"].ParseUint());
-		OGLHGFJKMCO = GameUtils.NAMEDMHAFKA();
-		DIJOCFEFHAK = GameUtils.DIJOCFEFHAK;
-		_power = (ObscuredInt)OGLHGFJKMCO;
-		CHJNGJLCICH = -1L;
-		BHOEHPFBIJE = node.Attributes["LastDailyTimeOffset"].ParseInt();
-		JOLENHJGDLH = node.Attributes["LastEnergyTimeOffset"].ParseInt();
-		GKLJJHLFACI = node.Attributes["LastDumpTime"].ParseInt();
-		IGBNKIKIDII(node.Attributes["FightIDS"].CIPOICEEIBK(string.Empty));
-		HPAHCBILEOE = node.Attributes["MapFocus"];
-		SetMapFocus(node.Attributes["MapFocus"].CIPOICEEIBK(string.Empty));
-		AALOLMPMCDH = node.Attributes["RaidMapFocus"];
-		SetRaidMapFocus(node.Attributes["RaidMapFocus"].CIPOICEEIBK(string.Empty));
-		COKACMKOIGD(node.Attributes["Language"].CIPOICEEIBK(string.Empty));
-		AJGEKAADGEJ = node.Attributes["ShowUpgrades"].ParseBool();
-		NPEENBBIFFB = node.Attributes["ShowForge"].ParseBool();
-		NDIEOONABLA = node.Attributes["TrySocialLogin"].ParseBool(true);
-		GKIONOFPEGB = node.Attributes["PeriodicPlayTime"].ParseLong(0L);
-		OFKGMKADHBD = node.Attributes["CurrentZone"].CIPOICEEIBK(string.Empty);
-		HKINOMCMDDL.Parse(node);
-		JHJLHNHCPMP = node.Attributes["EclipseMode"].CIPOICEEIBK("Off") == "On";
+		PowerMax = GameUtils.GetMaxPower();
+		PowerRegenSeconds = GameUtils.PowerMaxTime;
+		_power = (ObscuredInt)PowerMax;
+		powerSyncTime = -1L;
+		lastDailyTimeOffset = node.Attributes["LastDailyTimeOffset"].ParseInt();
+		lastEnergyTimeOffset = node.Attributes["LastEnergyTimeOffset"].ParseInt();
+		lastDumpTime = node.Attributes["LastDumpTime"].ParseInt();
+		SetFightIdsFromString(node.Attributes["FightIDS"].GetStringOrDefault(string.Empty));
+		mapFocusAttribute = node.Attributes["MapFocus"];
+		SetMapFocus(node.Attributes["MapFocus"].GetStringOrDefault(string.Empty));
+		raidMapFocusAttribute = node.Attributes["RaidMapFocus"];
+		SetRaidMapFocus(node.Attributes["RaidMapFocus"].GetStringOrDefault(string.Empty));
+		SetLanguage(node.Attributes["Language"].GetStringOrDefault(string.Empty));
+		showUpgrades = node.Attributes["ShowUpgrades"].ParseBool();
+		showForge = node.Attributes["ShowForge"].ParseBool();
+		trySocialLogin = node.Attributes["TrySocialLogin"].ParseBool(true);
+		periodicPlayTime = node.Attributes["PeriodicPlayTime"].ParseLong(0L);
+		currentZone = node.Attributes["CurrentZone"].GetStringOrDefault(string.Empty);
+		userTutorials.Parse(node);
+		eclipseMode = node.Attributes["EclipseMode"].GetStringOrDefault("Off") == "On";
 		// The mask is otherwise only set by the eclipse.xml toggle quests, so a
 		// profile restored in Eclipse mode showed the daytime map until toggled.
 		// Match the colors those quests apply for each mode.
-		_MapMaskColor = JHJLHNHCPMP ? ColorUtils.DAAIIECAAFO("#83624BFF") : Color.white;
-		FPCJCIIBLND = node["Items"];
-		JEMDPOAHOAP.Parse(FPCJCIIBLND);
-		IOFKIODDAMJ = node["Battles"];
-		foreach (XmlNode childNode in IOFKIODDAMJ.ChildNodes)
+		_MapMaskColor = eclipseMode ? ColorUtils.ParseHexColor("#83624BFF") : Color.white;
+		itemsNode = node["Items"];
+		userItems.Parse(itemsNode);
+		battlesNode = node["Battles"];
+		foreach (XmlNode childNode in battlesNode.ChildNodes)
 		{
 			AddBattle(new RosterBattle(childNode));
 		}
-		JADHFPKIHDF = node["Fights"];
-		if (JADHFPKIHDF != null)
+		fightsNode = node["Fights"];
+		if (fightsNode != null)
 		{
-			foreach (XmlNode childNode2 in JADHFPKIHDF.ChildNodes)
+			foreach (XmlNode childNode2 in fightsNode.ChildNodes)
 			{
-				AJKBFMLOCOF(new RosterFight(childNode2));
+				AddFight(new RosterFight(childNode2));
 			}
 		}
-		GJDMCIILLBJ = node["Shop"];
-		if (GJDMCIILLBJ != null)
+		shopNode = node["Shop"];
+		if (shopNode != null)
 		{
-			foreach (XmlNode childNode3 in GJDMCIILLBJ.ChildNodes)
+			foreach (XmlNode childNode3 in shopNode.ChildNodes)
 			{
-				AddShopLock(childNode3.Attributes["Name"].CIPOICEEIBK(string.Empty));
+				AddShopLock(childNode3.Attributes["Name"].GetStringOrDefault(string.Empty));
 			}
 		}
-		ABBGMNHDECI = new UserPerks(HEGIABHIPHA);
-		ABBGMNHDECI.Parse(node);
+		userPerks = new UserPerks(modelParameters);
+		userPerks.Parse(node);
 		if (node["Quests"] != null)
 		{
-			ADEJBJHOEDF = node["Quests"]["Quests"];
-			if (ADEJBJHOEDF != null)
+			questsNode = node["Quests"]["Quests"];
+			if (questsNode != null)
 			{
-				foreach (XmlNode childNode4 in ADEJBJHOEDF.ChildNodes)
+				foreach (XmlNode childNode4 in questsNode.ChildNodes)
 				{
-					FDJJIIBHAOG(childNode4);
+					AddQuestFromNode(childNode4);
 				}
 			}
-			INLEOAPIEDJ = new Dictionary<string, RosterQuest.NOKCOAHJIPB>();
-			OLEKIOJIFEK = node["Quests"]["Variables"];
-			if (OLEKIOJIFEK != null)
+			QuestVariables = new Dictionary<string, RosterQuest.QuestVariable>();
+			variablesNode = node["Quests"]["Variables"];
+			if (variablesNode != null)
 			{
-				foreach (XmlNode childNode5 in OLEKIOJIFEK.ChildNodes)
+				foreach (XmlNode childNode5 in variablesNode.ChildNodes)
 				{
-					OCDOPMPENHP(childNode5);
+					ParseQuestVariable(childNode5);
 				}
 			}
 		}
-		EHLHFJLCKKE.Parse(node);
-		AMCNNLHPCGI = node["OpenTricks"];
-		if (AMCNNLHPCGI != null)
+		userAchievements.Parse(node);
+		openTricksNode = node["OpenTricks"];
+		if (openTricksNode != null)
 		{
-			foreach (XmlNode childNode6 in AMCNNLHPCGI.ChildNodes)
+			foreach (XmlNode childNode6 in openTricksNode.ChildNodes)
 			{
-				ENFKEIHBICK(childNode6.Attributes["Name"].CIPOICEEIBK(string.Empty), false);
+				AddOpenTrick(childNode6.Attributes["Name"].GetStringOrDefault(string.Empty), false);
 			}
 		}
-		HALBNLAFAMM = node["Timers"];
-		if (HALBNLAFAMM == null)
+		timersNode = node["Timers"];
+		if (timersNode == null)
 		{
-			HALBNLAFAMM = node.ACBPMPMPKJJ("Timers");
+			timersNode = node.AppendElement("Timers");
 		}
-		GNOMNIKGAPE = new RosterTimerContainer(HALBNLAFAMM);
-		OJNFOCEKFNC(node);
+		timerContainer = new RosterTimerContainer(timersNode);
+		LoadSoundSettings(node);
 		// The decompiled roster never restored the dojo opponent toggle from
 		// SessionSettings.  A click wrote Disciple correctly, but reloading the
 		// dojo immediately reset the backing field to zero and made the selector
@@ -803,110 +803,110 @@ public class Roster : MELBIBHDPCE
 		{
 			disciple = 0;
 		}
-		CHDMBKEHHLH = (disciple != 0) ? 1 : 0;
-		EJLOBJIFEAL();
-		MapButtonController.ELEBLBJKDBI().Parse(node);
-		ALMPFGCDAOP = node["Currencies"];
-		if (ALMPFGCDAOP == null)
+		discipleMode = (disciple != 0) ? 1 : 0;
+		LoadCounterItems();
+		MapButtonController.GetInstance().Parse(node);
+		currenciesNode = node["Currencies"];
+		if (currenciesNode == null)
 		{
-			ALMPFGCDAOP = node.ACBPMPMPKJJ("Currencies");
+			currenciesNode = node.AppendElement("Currencies");
 		}
-		BCLGMKICMJM(ALMPFGCDAOP);
-		KHKMHPDKDIJ = node["Payments"];
-		if (KHKMHPDKDIJ == null)
+		ParseCurrencies(currenciesNode);
+		paymentsNode = node["Payments"];
+		if (paymentsNode == null)
 		{
-			KHKMHPDKDIJ = node.ACBPMPMPKJJ("Payments");
+			paymentsNode = node.AppendElement("Payments");
 		}
-		if (EHAAMEPDOGJ == null)
+		if (paymentOrders == null)
 		{
-			EHAAMEPDOGJ = new FMGDPLEEKEM();
+			paymentOrders = new PaymentOrdersManager();
 		}
-		if (!EHAAMEPDOGJ.JAMADKCIMMB(node.Attributes["PaymentOrders"]))
+		if (!paymentOrders.LoadLegacyPaymentOrders(node.Attributes["PaymentOrders"]))
 		{
-			EHAAMEPDOGJ.BPEPGALPBAE(KHKMHPDKDIJ);
+			paymentOrders.LoadFromXml(paymentsNode);
 		}
 	}
 
-	public XmlNode BABKABBEFEL()
+	public XmlNode GetItemsNode()
 	{
-		return FPCJCIIBLND;
+		return itemsNode;
 	}
 
-	public UserItems KHCNHPCPFII()
+	public UserItems GetInventory()
 	{
-		return JEMDPOAHOAP;
+		return userItems;
 	}
 
-	public UserAchievements KJNPJKEHGLE()
+	public UserAchievements GetAchievements()
 	{
-		return EHLHFJLCKKE;
+		return userAchievements;
 	}
 
-	public UserTutorials BKBHIMEEDBG()
+	public UserTutorials GetTutorials()
 	{
-		return HKINOMCMDDL;
+		return userTutorials;
 	}
 
-	public UserPerks JLBDOBLHHAF()
+	public UserPerks GetPerks()
 	{
-		return ABBGMNHDECI;
+		return userPerks;
 	}
 
 	// best guess for name
 	public List<RosterBattle> GetSavedBattles()
 	{
-		return HLHEFIKFBHH;
+		return battles;
 	}
 
-	public List<RosterFight> NIDBIFOJMAP()
+	public List<RosterFight> GetSavedFights()
 	{
-		return JNPMCNMEOLE;
+		return fights;
 	}
 
-	public List<RosterQuest> JNHBGEDJBLJ()
+	public List<RosterQuest> GetQuests()
 	{
-		return CNFCPCJPGLM;
+		return quests;
 	}
 
-	public List<string> AMAELLHKNDJ()
+	public List<string> GetOpenTricks()
 	{
-		return COJMHNDCACJ;
+		return openTricks;
 	}
 
-	public static FMGDPLEEKEM PKACFPCOHJH()
+	public static PaymentOrdersManager GetPaymentOrders()
 	{
-		return EHAAMEPDOGJ;
+		return paymentOrders;
 	}
 
-	public long BFBOEGMAMNF()
+	public long GetMoney()
 	{
-		return (ObscuredLong)(MJBFFBPLAGC);
+		return (ObscuredLong)(money);
 	}
 
-	public void OIOOMAKNIOB(long value)
+	public void SetMoney(long value)
 	{
-		long num = (long)Math.Pow(10.0, CFNNEGHPCMN);
+		long num = (long)Math.Pow(10.0, denominationDigits);
 		if (num <= 0)
 		{
 			num = 1L;
 		}
-		long num2 = (ObscuredLong)(MJBFFBPLAGC);
-		MJBFFBPLAGC = (ObscuredLong)(value);
-		EMDLLIGKONG("Money", (ObscuredLong)(MJBFFBPLAGC) * num);
+		long num2 = (ObscuredLong)(money);
+		money = (ObscuredLong)(value);
+		SetNodeAttribute("Money", (ObscuredLong)(money) * num);
 	}
 
-	public long EHFJHFDACMP()
+	public long GetBonus()
 	{
-		return (ObscuredLong)(BDONIKLHFLJ);
+		return (ObscuredLong)(bonus);
 	}
 
-	public void LLNELLFMMBB(long value, HPOIJPGPOCF LFLGCDNKNJI, bool JEEOLJIFIOF = false)
+	public void SetBonus(long value, BalanceChangeType LFLGCDNKNJI, bool JEEOLJIFIOF = false)
 	{
-		long num = (ObscuredLong)(BDONIKLHFLJ);
-		BDONIKLHFLJ = (ObscuredLong)(value);
-		EMDLLIGKONG("Bonus", (ObscuredLong)(BDONIKLHFLJ));
+		long num = (ObscuredLong)(bonus);
+		bonus = (ObscuredLong)(value);
+		SetNodeAttribute("Bonus", (ObscuredLong)(bonus));
 		long num2 = Math.Abs(num - value);
-		if (LFLGCDNKNJI == HPOIJPGPOCF.CHANGE_INIT)
+		if (LFLGCDNKNJI == BalanceChangeType.CHANGE_INIT)
 		{
 			return;
 		}
@@ -914,51 +914,51 @@ public class Roster : MELBIBHDPCE
 		{
 			if (JEEOLJIFIOF)
 			{
-				DBJLKIJNBHJ((ObscuredLong)((ObscuredLong)(IAFKGOFKDKE) + num2));
+				SetPaidBonus((ObscuredLong)((ObscuredLong)(paidBonus) + num2));
 			}
 			ArgsDict kEMMIFBFDPK = new ArgsDict();
 			kEMMIFBFDPK["changed"] = num2;
-			kEMMIFBFDPK["type"] = HEODNLPIJHL(LFLGCDNKNJI);
+			kEMMIFBFDPK["type"] = GetBalanceChangeName(LFLGCDNKNJI);
 			kEMMIFBFDPK["isPaid"] = JEEOLJIFIOF;
-			StatisticsCollector.BPDGOKGHDHB(StatisticsEvent.JDNFFHILFAF.Gems_Changed, kEMMIFBFDPK);
+			StatisticsCollector.LogEvent(StatisticsEvent.EventType.Gems_Changed, kEMMIFBFDPK);
 		}
 		else if (value < num)
 		{
-			long num3 = num - (ObscuredLong)(IAFKGOFKDKE);
+			long num3 = num - (ObscuredLong)(paidBonus);
 			long num4 = Math.Max(0L, num2 - num3);
-			DBJLKIJNBHJ((ObscuredLong)((ObscuredLong)(IAFKGOFKDKE) - num4));
+			SetPaidBonus((ObscuredLong)((ObscuredLong)(paidBonus) - num4));
 		}
 	}
 
-	public ObscuredLong KNHDCEBIMEE()
+	public ObscuredLong GetPaidMoney()
 	{
-		return BIOMOEDPLIP;
+		return paidMoney;
 	}
 
-	public void HGDLPMDHHOJ(ObscuredLong value)
+	public void SetPaidMoney(ObscuredLong value)
 	{
-		long num = (long)Math.Pow(10.0, CFNNEGHPCMN);
+		long num = (long)Math.Pow(10.0, denominationDigits);
 		if (num <= 0)
 		{
 			num = 1L;
 		}
-		long num2 = (ObscuredLong)(BIOMOEDPLIP);
-		BIOMOEDPLIP = value;
-		EMDLLIGKONG("PaidMoney", (ObscuredLong)(value) * num);
+		long num2 = (ObscuredLong)(paidMoney);
+		paidMoney = value;
+		SetNodeAttribute("PaidMoney", (ObscuredLong)(value) * num);
 	}
 
-	public ObscuredLong FJGHKGPAPPN()
+	public ObscuredLong GetPaidBonus()
 	{
-		return IAFKGOFKDKE;
+		return paidBonus;
 	}
 
-	public void DBJLKIJNBHJ(ObscuredLong value)
+	public void SetPaidBonus(ObscuredLong value)
 	{
-		IAFKGOFKDKE = value;
-		EMDLLIGKONG("PaidBonus", (ObscuredLong)(value));
+		paidBonus = value;
+		SetNodeAttribute("PaidBonus", (ObscuredLong)(value));
 	}
 
-	public uint BBLDLAIBOLP()
+	public uint GetSliderIndex()
 	{
 		return _indexSlider;
 	}
@@ -966,14 +966,14 @@ public class Roster : MELBIBHDPCE
 	public void set_IndexSlider(uint value)
 	{
 		_indexSlider = value;
-		EMDLLIGKONG("IndexSlider", value);
+		SetNodeAttribute("IndexSlider", value);
 	}
 
-	public uint HEOHJNFGEDH()
+	public uint GetExperienceToNextLevel()
 	{
-		if (HEGIABHIPHA != null)
+		if (modelParameters != null)
 		{
-			int num = (ObscuredInt)(HEGIABHIPHA.PINDEKDNCNL()) - 1;
+			int num = (ObscuredInt)(modelParameters.GetLevel()) - 1;
 			if (num < _levelThresholds.Count)
 			{
 				return (ObscuredUInt)(_levelThresholds[num]);
@@ -982,206 +982,206 @@ public class Roster : MELBIBHDPCE
 		return 2147483647u;
 	}
 
-	public uint EOKLELGLHJJ()
+	public uint GetExperience()
 	{
 		return (ObscuredUInt)(_experience);
 	}
 
-	public bool DBPBGBNHAIP(uint value)
+	public bool SetExperience(uint value)
 	{
-		if (HEGIABHIPHA == null)
+		if (modelParameters == null)
 		{
 			return false;
 		}
 		int storyProfile = Eclipse.Modding.ModRuntime.StoryEvents.ProfileGeneration;
-		int previousLevel = PINDEKDNCNL();
+		int previousLevel = GetLevel();
 		bool flag = false;
-		uint num = HEOHJNFGEDH();
+		uint num = GetExperienceToNextLevel();
 		_experience = (ObscuredUInt)(value);
 		uint num2 = (ObscuredUInt)(_experience);
 		if (num <= num2)
 		{
 			flag = true;
-			int num3 = (ObscuredInt)(HEGIABHIPHA.PINDEKDNCNL());
+			int num3 = (ObscuredInt)(modelParameters.GetLevel());
 			while (num <= num2)
 			{
 				num2 -= num;
 				num3++;
-				HEGIABHIPHA.DLDMOHEGENM((ObscuredInt)(num3));
-				num = HEOHJNFGEDH();
-				if (num2 > GameUtils.JNOGEPFLLDM)
+				modelParameters.SetLevel((ObscuredInt)(num3));
+				num = GetExperienceToNextLevel();
+				if (num2 > GameUtils.MaximumExperience)
 				{
-					num2 = GameUtils.JNOGEPFLLDM;
+					num2 = GameUtils.MaximumExperience;
 				}
 			}
 			if (num3 > _levelThresholds.Count)
 			{
 				num3 = _levelThresholds.Count;
-				num2 = HEOHJNFGEDH();
+				num2 = GetExperienceToNextLevel();
 				flag = false;
 			}
 			_experience = (ObscuredUInt)(num2);
-			HEGIABHIPHA.DLDMOHEGENM((ObscuredInt)(num3));
-			EMDLLIGKONG("Level", (ObscuredInt)(HEGIABHIPHA.PINDEKDNCNL()));
+			modelParameters.SetLevel((ObscuredInt)(num3));
+			SetNodeAttribute("Level", (ObscuredInt)(modelParameters.GetLevel()));
 		}
-		if ((ObscuredInt)(HEGIABHIPHA.PINDEKDNCNL()) == _levelThresholds.Count && (ObscuredInt)(HEGIABHIPHA.PINDEKDNCNL()) > 1)
+		if ((ObscuredInt)(modelParameters.GetLevel()) == _levelThresholds.Count && (ObscuredInt)(modelParameters.GetLevel()) > 1)
 		{
-			num2 = (ObscuredUInt)(_levelThresholds[(ObscuredInt)(HEGIABHIPHA.PINDEKDNCNL()) - 2]);
+			num2 = (ObscuredUInt)(_levelThresholds[(ObscuredInt)(modelParameters.GetLevel()) - 2]);
 			_experience = (ObscuredUInt)(num2);
 		}
 		if (flag)
 		{
-			KHCNHPCPFII().NHJAHNDOLAE();
-			KHCNHPCPFII().UpdateLockItems(PINDEKDNCNL());
-			GameUtils.PIHNKCIDDJB();
-			ListSF.GetInstance().PLNBHLPHDJG(PINDEKDNCNL());
-			StatisticsCollector.BPDGOKGHDHB(StatisticsEvent.JDNFFHILFAF.Level_Up);
-			GameUtils.OFOKPNFGDMD("Level Up");
+			GetInventory().RefreshUpgradeStates();
+			GetInventory().UpdateLockItems(GetLevel());
+			GameUtils.UpdateShopNewItemsCounters();
+			ListSF.GetInstance().UpdateFightsLevel(GetLevel());
+			StatisticsCollector.LogEvent(StatisticsEvent.EventType.Level_Up);
+			GameUtils.TrackEvent("Level Up");
 		}
-		EMDLLIGKONG("Experience", (ObscuredUInt)(_experience));
+		SetNodeAttribute("Experience", (ObscuredUInt)(_experience));
 		Eclipse.Modding.ModRuntime.PublishLevelUp(this, previousLevel, storyProfile);
 		return flag;
 	}
 
-	public bool IDGMHHAJDMO(uint value)
+	public bool AddExperience(uint value)
 	{
-		return DBPBGBNHAIP((ObscuredUInt)(_experience) + value);
+		return SetExperience((ObscuredUInt)(_experience) + value);
 	}
 
-	public void BBHFFLJGDDL()
+	public void RefreshLevelFromExperience()
 	{
-		bool flag = DBPBGBNHAIP((ObscuredUInt)(_experience));
-		QuestParameters hHKLFIIBIFF = ListSF.GetInstance().BNMLDPNCMLB();
-		hHKLFIIBIFF.BJIDALJIKNC = (flag ? 1 : 0);
+		bool flag = SetExperience((ObscuredUInt)(_experience));
+		QuestParameters hHKLFIIBIFF = ListSF.GetInstance().GetQuestParameters();
+		hHKLFIIBIFF.levelUp = (flag ? 1 : 0);
 	}
 
-	public int NHKMGNPADKI()
+	public int GetMaxPower()
 	{
-		return OGLHGFJKMCO;
+		return PowerMax;
 	}
 
-	public long FNDAKFILBOE()
+	public long GetPowerSyncTime()
 	{
-		return CHJNGJLCICH;
+		return powerSyncTime;
 	}
 
-	public void PABEFKBJNEF(long value)
+	public void SetPowerSyncTime(long value)
 	{
-		CHJNGJLCICH = value;
-		EMDLLIGKONG("PowerSyncTime", value);
+		powerSyncTime = value;
+		SetNodeAttribute("PowerSyncTime", value);
 	}
 
-	public long NHFHDFIJEJG()
+	public long GetEnergyRefillTimer()
 	{
 		return -1L;
 	}
 
-	public long NBDICCLKEAC()
+	public long GetLastDumpTime()
 	{
-		return GKLJJHLFACI;
+		return lastDumpTime;
 	}
 
-	public void BNGLIONOOAG(long value)
+	public void SetLastDumpTime(long value)
 	{
-		GKLJJHLFACI = value;
-		EMDLLIGKONG("LastDumpTime", GKLJJHLFACI);
+		lastDumpTime = value;
+		SetNodeAttribute("LastDumpTime", lastDumpTime);
 	}
 
-	public long CPGGBLDAHBG()
+	public long GetPeriodicPlayTime()
 	{
-		return GKIONOFPEGB;
+		return periodicPlayTime;
 	}
 
-	public void DEPJCHIFFKA(long value)
+	public void SetPeriodicPlayTime(long value)
 	{
-		GKIONOFPEGB = value;
-		EMDLLIGKONG("PeriodicPlayTime", GKIONOFPEGB);
+		periodicPlayTime = value;
+		SetNodeAttribute("PeriodicPlayTime", periodicPlayTime);
 	}
 
-	public long ECGBNDKJIPD()
+	public long GetLastDailyTimeOffset()
 	{
-		return BHOEHPFBIJE;
+		return lastDailyTimeOffset;
 	}
 
-	public void DFBDNDMOLFH(long value)
+	public void SetLastDailyTimeOffset(long value)
 	{
-		BHOEHPFBIJE = value;
-		EMDLLIGKONG("LastDailyTimeOffset", BHOEHPFBIJE);
+		lastDailyTimeOffset = value;
+		SetNodeAttribute("LastDailyTimeOffset", lastDailyTimeOffset);
 	}
 
-	public long AHAAGOHCGHN()
+	public long GetLastEnergyTimeOffset()
 	{
-		return JOLENHJGDLH;
+		return lastEnergyTimeOffset;
 	}
 
-	public void ODPOOEPKJBP(long value)
+	public void SetLastEnergyTimeOffset(long value)
 	{
-		JOLENHJGDLH = value;
-		EMDLLIGKONG("LastEnergyTimeOffset", JOLENHJGDLH);
+		lastEnergyTimeOffset = value;
+		SetNodeAttribute("LastEnergyTimeOffset", lastEnergyTimeOffset);
 	}
 
-	public bool HFINDOBJHNK()
+	public bool GetShowUpgrades()
 	{
-		return AJGEKAADGEJ;
+		return showUpgrades;
 	}
 
-	public void MJLDOEOMLEG(bool value)
+	public void SetShowUpgrades(bool value)
 	{
-		AJGEKAADGEJ = value;
-		EMDLLIGKONG("ShowUpgrades", AJGEKAADGEJ);
+		showUpgrades = value;
+		SetNodeAttribute("ShowUpgrades", showUpgrades);
 	}
 
-	public bool ENBKLLMAALP()
+	public bool GetShowForge()
 	{
-		return NPEENBBIFFB;
+		return showForge;
 	}
 
-	public void PLBEEGGFKDH(bool value)
+	public void SetShowForge(bool value)
 	{
-		NPEENBBIFFB = value;
-		EMDLLIGKONG("ShowForge", NPEENBBIFFB);
+		showForge = value;
+		SetNodeAttribute("ShowForge", showForge);
 	}
 
-	public int BGBFBIDOECK()
+	public int GetDiscipleMode()
 	{
-		return CHDMBKEHHLH;
+		return discipleMode;
 	}
 
-	public int NPGECMDDNFO()
+	public int GetDenominationDigits()
 	{
-		return CFNNEGHPCMN;
+		return denominationDigits;
 	}
 
-	public void KGEHCFADNLI(int value)
+	public void SetDenominationDigits(int value)
 	{
-		CFNNEGHPCMN = value;
-		EMDLLIGKONG("DenominationDigits", CFNNEGHPCMN);
+		denominationDigits = value;
+		SetNodeAttribute("DenominationDigits", denominationDigits);
 	}
 
-	public FightIDS HEBDMAIEAPM()
+	public FightIDS GetFightIds()
 	{
-		return GDFIGNHHKDC;
+		return fightIds;
 	}
 
-	public void MICFFKODJME(FightIDS value)
+	public void SetFightIds(FightIDS value)
 	{
-		GDFIGNHHKDC = value;
-		EMDLLIGKONG("FightIDS", GDFIGNHHKDC.ToString());
+		fightIds = value;
+		SetNodeAttribute("FightIDS", fightIds.ToString());
 	}
 
-	public void IGBNKIKIDII(string JFIIJBAOOIK)
+	public void SetFightIdsFromString(string JFIIJBAOOIK)
 	{
-		if (GDFIGNHHKDC != null)
+		if (fightIds != null)
 		{
-			GDFIGNHHKDC.SetFightIDSByString(JFIIJBAOOIK);
+			fightIds.SetFightIDSByString(JFIIJBAOOIK);
 		}
 		else
 		{
-			GDFIGNHHKDC = new FightIDS(JFIIJBAOOIK);
+			fightIds = new FightIDS(JFIIJBAOOIK);
 		}
 	}
 
-	public Color EPEDEDLCAJF()
+	public Color GetMapMaskColor()
 	{
 		return _MapMaskColor;
 	}
@@ -1193,37 +1193,37 @@ public class Roster : MELBIBHDPCE
 
 	public ModelParameters get_Parameters()
 	{
-		return HEGIABHIPHA;
+		return modelParameters;
 	}
 
-	public string GKLECBABFCP()
+	public string GetLanguage()
 	{
-		return BGMCCMHOMJL;
+		return language;
 	}
 
-	public void COKACMKOIGD(string value)
+	public void SetLanguage(string value)
 	{
-		BGMCCMHOMJL = value;
-		EMDLLIGKONG("Language", BGMCCMHOMJL);
+		language = value;
+		SetNodeAttribute("Language", language);
 	}
 
-	public string OGJBDMNBMLJ()
+	public string GetCoinIcon()
 	{
-		return NBBNANIILBL;
+		return coinIcon;
 	}
 
-	public void HEIPPEGBOCK(string value)
+	public void SetCoinIcon(string value)
 	{
-		NBBNANIILBL = value;
-		EMDLLIGKONG("CoinIcon", NBBNANIILBL);
+		coinIcon = value;
+		SetNodeAttribute("CoinIcon", coinIcon);
 	}
 
-	public FightIDS KNJNHKDCINB()
+	public FightIDS GetMapFocus()
 	{
-		return FHJHPGDPNBH;
+		return mapFocus;
 	}
 
-	public void KPDHMBIDAHA(FightIDS value)
+	public void SetMapFocusIds(FightIDS value)
 	{
 		SetMapFocus(value.ToString());
 	}
@@ -1231,34 +1231,34 @@ public class Roster : MELBIBHDPCE
 	// best guess for name
 	public void SetMapFocus(string JFIIJBAOOIK)
 	{
-		if (!FHJHPGDPNBH.OLAJNGPILGL(JFIIJBAOOIK))
+		if (!mapFocus.EqualsZoneBattle(JFIIJBAOOIK))
 		{
-			FHJHPGDPNBH.SetFightIDSByString(JFIIJBAOOIK);
-			if (HPAHCBILEOE != null)
+			mapFocus.SetFightIDSByString(JFIIJBAOOIK);
+			if (mapFocusAttribute != null)
 			{
-				HPAHCBILEOE.Value = FHJHPGDPNBH.OOBHBGJIBGP();
+				mapFocusAttribute.Value = mapFocus.GetZoneBattle();
 			}
 			else
 			{
-				EMDLLIGKONG("MapFocus", FHJHPGDPNBH.OOBHBGJIBGP());
+				SetNodeAttribute("MapFocus", mapFocus.GetZoneBattle());
 			}
 		}
 	}
 
-	public FightIDS MGICKOOCNAJ()
+	public FightIDS GetRaidMapFocus()
 	{
-		if (LINHCAGANFC == null)
+		if (raidMapFocus == null)
 		{
-			LINHCAGANFC = new FightIDS("ZONE_RAID|BOSS_1");
+			raidMapFocus = new FightIDS("ZONE_RAID|BOSS_1");
 		}
-		else if (LINHCAGANFC.OOPMAAHJMCE())
+		else if (raidMapFocus.IsEmpty())
 		{
-			LINHCAGANFC.SetFightIDSByString("ZONE_RAID|BOSS_1");
+			raidMapFocus.SetFightIDSByString("ZONE_RAID|BOSS_1");
 		}
-		return LINHCAGANFC;
+		return raidMapFocus;
 	}
 
-	public void AEGEEMMBLDF(FightIDS value)
+	public void SetRaidMapFocusIds(FightIDS value)
 	{
 		SetRaidMapFocus(value.ToString());
 	}
@@ -1266,84 +1266,84 @@ public class Roster : MELBIBHDPCE
 	// best guess for name
 	public void SetRaidMapFocus(string JFIIJBAOOIK)
 	{
-		if (!LINHCAGANFC.OLAJNGPILGL(JFIIJBAOOIK))
+		if (!raidMapFocus.EqualsZoneBattle(JFIIJBAOOIK))
 		{
-			LINHCAGANFC.SetFightIDSByString(JFIIJBAOOIK);
-			if (LINHCAGANFC.OOPMAAHJMCE())
+			raidMapFocus.SetFightIDSByString(JFIIJBAOOIK);
+			if (raidMapFocus.IsEmpty())
 			{
-				LINHCAGANFC.SetFightIDSByString("ZONE_RAID|BOSS_1");
+				raidMapFocus.SetFightIDSByString("ZONE_RAID|BOSS_1");
 			}
-			if (AALOLMPMCDH != null)
+			if (raidMapFocusAttribute != null)
 			{
-				AALOLMPMCDH.Value = LINHCAGANFC.OOBHBGJIBGP();
+				raidMapFocusAttribute.Value = raidMapFocus.GetZoneBattle();
 			}
 			else
 			{
-				EMDLLIGKONG("RaidMapFocus", LINHCAGANFC.OOBHBGJIBGP());
+				SetNodeAttribute("RaidMapFocus", raidMapFocus.GetZoneBattle());
 			}
 		}
 	}
 
-	public bool MLOHMAGMIAI()
+	public bool GetFacebookLiked()
 	{
-		return OKLFFBPGIAN;
+		return facebookLiked;
 	}
 
-	public void EKHEBJIOMFH(bool value)
+	public void SetFacebookLiked(bool value)
 	{
-		OKLFFBPGIAN = value;
-		EMDLLIGKONG("FacebookLiked", OKLFFBPGIAN);
+		facebookLiked = value;
+		SetNodeAttribute("FacebookLiked", facebookLiked);
 	}
 
-	public long AACMNAJJKME()
+	public long GetStarterPackTimerEndTime()
 	{
-		return DLKPHLOAFGM;
+		return starterPackTimerEndTime;
 	}
 
-	public void EPGEKHNCEJF(long value)
+	public void SetStarterPackTimerEndTime(long value)
 	{
-		DLKPHLOAFGM = value;
-		EMDLLIGKONG("StarterPackTimerEndTime", DLKPHLOAFGM);
+		starterPackTimerEndTime = value;
+		SetNodeAttribute("StarterPackTimerEndTime", starterPackTimerEndTime);
 	}
 
-	public RosterTimerContainer AEMFLPNDDKL()
+	public RosterTimerContainer GetTimerContainer()
 	{
-		return GNOMNIKGAPE;
+		return timerContainer;
 	}
 
 	// best guess for name
 	public bool IsEclipseMode()
 	{
-		return JHJLHNHCPMP;
+		return eclipseMode;
 	}
 
 	public void SetEclipseMode(bool value)
 	{
-		JHJLHNHCPMP = value;
-		EMDLLIGKONG("EclipseMode", value ? "On" : "Off");
+		eclipseMode = value;
+		SetNodeAttribute("EclipseMode", value ? "On" : "Off");
 	}
 
-	public int PINDEKDNCNL()
+	public int GetLevel()
 	{
-		if (!CLODDOOGDBB)
+		if (!UseLevelOverride)
 		{
-			return (HEGIABHIPHA != null) ? (int)(HEGIABHIPHA.PINDEKDNCNL()) : 0;
+			return (modelParameters != null) ? (int)(modelParameters.GetLevel()) : 0;
 		}
-		return MMIMAJCKFKL;
+		return LevelOverride;
 	}
 
-	public void DLDMOHEGENM(int value)
+	public void SetLevel(int value)
 	{
-		if (HEGIABHIPHA != null)
+		if (modelParameters != null)
 		{
-			HEGIABHIPHA.DLDMOHEGENM((ObscuredInt)(value));
-			EMDLLIGKONG("Level", (ObscuredInt)(HEGIABHIPHA.PINDEKDNCNL()));
+			modelParameters.SetLevel((ObscuredInt)(value));
+			SetNodeAttribute("Level", (ObscuredInt)(modelParameters.GetLevel()));
 		}
 	}
 
 	public int GetCurrencyCount(GameCurrency MDDNHLBDJBN)
 	{
-		CurrencyStruct lAPFHLGNAAF = MEOLAFECPHI(MDDNHLBDJBN);
+		CurrencyStruct lAPFHLGNAAF = FindCurrency(MDDNHLBDJBN);
 		if (lAPFHLGNAAF != null)
 		{
 			return (ObscuredInt)(lAPFHLGNAAF.Count);
@@ -1351,17 +1351,17 @@ public class Roster : MELBIBHDPCE
 		return 0;
 	}
 
-	public void MHGIEFLBBGM()
+	public void ToggleDiscipleMode()
 	{
-		int num = ((CHDMBKEHHLH == 0) ? 1 : 0);
+		int num = ((discipleMode == 0) ? 1 : 0);
 		SessionSettings("Disciple", num);
-		CHDMBKEHHLH = num;
+		discipleMode = num;
 	}
 
-	public int NPKBPGMNDFJ()
+	public int CountNewTricks()
 	{
 		int num = 0;
-		List<Trick> list = GameUtils.KLLGJKHALGH();
+		List<Trick> list = GameUtils.GetPlayerTricks();
 		for (int i = 0; i < list.Count; i++)
 		{
 			if (list[i].IsNew)
@@ -1372,18 +1372,18 @@ public class Roster : MELBIBHDPCE
 		return num;
 	}
 
-	public int CNFOLIEFJCE()
+	public int CountOwnedSeals()
 	{
 		int num = 0;
-		Roster nKGLHEGIKKP = ListSF.CCDKHLAMKKO();
+		Roster nKGLHEGIKKP = ListSF.GetRoster();
 		if (nKGLHEGIKKP == null)
 		{
 			return 0;
 		}
-		List<UserItem> list = nKGLHEGIKKP.KHCNHPCPFII().HOPBBLJLHOB("Seal", string.Empty);
+		List<UserItem> list = nKGLHEGIKKP.GetInventory().FindItemsByType("Seal", string.Empty);
 		foreach (UserItem item in list)
 		{
-			if (item.OFOPFCJNEBL() > 0 && item.BHKHOJPANHE().DBHJGAGOLOB())
+			if (item.GetCount() > 0 && item.GetInfo().GetIsNew())
 			{
 				num++;
 			}
@@ -1391,14 +1391,14 @@ public class Roster : MELBIBHDPCE
 		return num;
 	}
 
-	public bool FLFKOIPCEPI(string name)
+	public bool HasShopLock(string name)
 	{
-		return JNOGGCIPGCI(name) >= 0;
+		return FindShopLockIndex(name) >= 0;
 	}
 
-	public bool HAMPNCKAJKD(FightIDS DIAIIPCBMFL)
+	public bool HasBattle(FightIDS DIAIIPCBMFL)
 	{
-		foreach (RosterBattle item in HLHEFIKFBHH)
+		foreach (RosterBattle item in battles)
 		{
 			if (item.GetBattleId().Equals(DIAIIPCBMFL.ToString()))
 			{
@@ -1414,12 +1414,12 @@ public class Roster : MELBIBHDPCE
 		{
 			return string.Empty;
 		}
-		return _node["SessionSettings"][name].Attributes["Value"].CIPOICEEIBK(string.Empty);
+		return _node["SessionSettings"][name].Attributes["Value"].GetStringOrDefault(string.Empty);
 	}
 
-	public RosterQuest OOMJEHAKOBA(string name)
+	public RosterQuest FindQuest(string name)
 	{
-		foreach (RosterQuest item in CNFCPCJPGLM)
+		foreach (RosterQuest item in quests)
 		{
 			if (name == item.Name)
 			{
@@ -1429,7 +1429,7 @@ public class Roster : MELBIBHDPCE
 		return null;
 	}
 
-	public bool FJGCOOAACLD(string name)
+	public bool HasSessionSetting(string name)
 	{
 		XmlNode xmlNode = _node["SessionSettings"];
 		if (xmlNode == null)
@@ -1444,73 +1444,73 @@ public class Roster : MELBIBHDPCE
 		return true;
 	}
 
-	public bool FNLMHKJGCMC(string name)
+	public bool DoesAbGroupExist(string name)
 	{
 		return false;
 	}
 
-	public void APDCCIEJLMD()
+	public void SaveMusicSettings()
 	{
-		XmlNode sounds = ((_node["Sounds"] != null) ? _node["Sounds"] : _node.ACBPMPMPKJJ("Sounds"));
-		XmlNode music = ((sounds["Music"] != null) ? sounds["Music"] : sounds.ACBPMPMPKJJ("Music"));
-		music.LLIKNHNLGJJ("Value").Value = Sound.EAIGFAPKILL().ToString(System.Globalization.CultureInfo.InvariantCulture);
-		music.LLIKNHNLGJJ("Mute").Value = ((!Sound.ELHMADOKHHE()) ? "0" : "1");
-		GGGEHAGCLGC();
+		XmlNode sounds = ((_node["Sounds"] != null) ? _node["Sounds"] : _node.AppendElement("Sounds"));
+		XmlNode music = ((sounds["Music"] != null) ? sounds["Music"] : sounds.AppendElement("Music"));
+		music.AppendAttribute("Value").Value = Sound.GetMusicVolume().ToString(System.Globalization.CultureInfo.InvariantCulture);
+		music.AppendAttribute("Mute").Value = ((!Sound.GetMusicMuted()) ? "0" : "1");
+		RequestSave();
 	}
 
-	public void ABODKHDPHMI()
+	public void SaveSoundSettings()
 	{
-		XmlNode sounds = ((_node["Sounds"] != null) ? _node["Sounds"] : _node.ACBPMPMPKJJ("Sounds"));
-		XmlNode sound = ((sounds["Sound"] != null) ? sounds["Sound"] : sounds.ACBPMPMPKJJ("Sound"));
-		sound.LLIKNHNLGJJ("Value").Value = Sound.NBHPABEBLOP().ToString(System.Globalization.CultureInfo.InvariantCulture);
-		sound.LLIKNHNLGJJ("Mute").Value = ((!Sound.AAFLCDKJEPL()) ? "0" : "1");
-		GGGEHAGCLGC();
+		XmlNode sounds = ((_node["Sounds"] != null) ? _node["Sounds"] : _node.AppendElement("Sounds"));
+		XmlNode sound = ((sounds["Sound"] != null) ? sounds["Sound"] : sounds.AppendElement("Sound"));
+		sound.AppendAttribute("Value").Value = Sound.GetSoundVolume().ToString(System.Globalization.CultureInfo.InvariantCulture);
+		sound.AppendAttribute("Mute").Value = ((!Sound.GetSoundMuted()) ? "0" : "1");
+		RequestSave();
 	}
 
-	public static string HEODNLPIJHL(HPOIJPGPOCF LFLGCDNKNJI)
+	public static string GetBalanceChangeName(BalanceChangeType LFLGCDNKNJI)
 	{
 		switch (LFLGCDNKNJI)
 		{
-		case HPOIJPGPOCF.CHANGE_INIT:
+		case BalanceChangeType.CHANGE_INIT:
 			return "init";
-		case HPOIJPGPOCF.CHANGE_PAYMENT:
+		case BalanceChangeType.CHANGE_PAYMENT:
 			return "payment";
-		case HPOIJPGPOCF.CHANGE_ACHIEVEMENT:
+		case BalanceChangeType.CHANGE_ACHIEVEMENT:
 			return "achievement";
-		case HPOIJPGPOCF.CHANGE_FIGHT_REWARD:
+		case BalanceChangeType.CHANGE_FIGHT_REWARD:
 			return "fight_reward";
-		case HPOIJPGPOCF.CHANGE_VIDEO_VIEW:
+		case BalanceChangeType.CHANGE_VIDEO_VIEW:
 			return "video_view";
-		case HPOIJPGPOCF.CHANGE_FACEBOOK:
+		case BalanceChangeType.CHANGE_FACEBOOK:
 			return "facebook";
-		case HPOIJPGPOCF.CHANGE_QUEST:
+		case BalanceChangeType.CHANGE_QUEST:
 			return "quest";
-		case HPOIJPGPOCF.CHANGE_CHEAT:
+		case BalanceChangeType.CHANGE_CHEAT:
 			return "cheat";
-		case HPOIJPGPOCF.CHANGE_SERVER_GIVE:
+		case BalanceChangeType.CHANGE_SERVER_GIVE:
 			return "server";
-		case HPOIJPGPOCF.CHANGE_OFFER:
+		case BalanceChangeType.CHANGE_OFFER:
 			return "offer";
-		case HPOIJPGPOCF.CHANGE_BUY_ITEM:
+		case BalanceChangeType.CHANGE_BUY_ITEM:
 			return "buy_item";
-		case HPOIJPGPOCF.CHANGE_BUY_DELIVERY:
+		case BalanceChangeType.CHANGE_BUY_DELIVERY:
 			return "buy_delivery";
-		case HPOIJPGPOCF.CHANGE_RAIDS_REWARD:
+		case BalanceChangeType.CHANGE_RAIDS_REWARD:
 			return "raids_reward";
-		case HPOIJPGPOCF.CHANGE_LEDGER:
+		case BalanceChangeType.CHANGE_LEDGER:
 			return "ledger";
 		default:
-			LLLOJBFMONN.Error("unknown BalanceChangeType");
+			GameLog.Error("unknown BalanceChangeType");
 			return "unknown";
 		}
 	}
 
-	public List<RosterFight> FHDLNKAAAOK(int GNLOCMLBNHF)
+	public List<RosterFight> FindFightsByLevel(int GNLOCMLBNHF)
 	{
 		List<RosterFight> list = new List<RosterFight>();
-		foreach (RosterFight item in JNPMCNMEOLE)
+		foreach (RosterFight item in fights)
 		{
-			if (item.PINDEKDNCNL() == GNLOCMLBNHF)
+			if (item.GetLevel() == GNLOCMLBNHF)
 			{
 				list.Add(item);
 			}
@@ -1521,9 +1521,9 @@ public class Roster : MELBIBHDPCE
 	// best guess for name
 	public RosterFight FindSavedFightRecord(FightIDS JFIIJBAOOIK)
 	{
-		foreach (RosterFight item in JNPMCNMEOLE)
+		foreach (RosterFight item in fights)
 		{
-			if (JFIIJBAOOIK.Equals(item.EKOIBAIIKHL()))
+			if (JFIIJBAOOIK.Equals(item.GetFightIdString()))
 			{
 				return item;
 			}
@@ -1531,83 +1531,83 @@ public class Roster : MELBIBHDPCE
 		return null;
 	}
 
-	public RosterFight JJHCGOIKBCP(FightIDS DIAIIPCBMFL)
+	public RosterFight RecordFightWin(FightIDS DIAIIPCBMFL)
 	{
 		RosterFight pIGKOIFBOME = FindSavedFightRecord(DIAIIPCBMFL);
-		pIGKOIFBOME.GICDABHEMML();
+		pIGKOIFBOME.RecordWin();
 		if (IsEclipseMode())
 		{
-			pIGKOIFBOME.LOEBHEODPAH();
+			pIGKOIFBOME.IncrementEclipseWinCount();
 		}
 		return pIGKOIFBOME;
 	}
 
-	public RosterFight NALCLBDLBKN(FightIDS DIAIIPCBMFL)
+	public RosterFight RecordFightLoss(FightIDS DIAIIPCBMFL)
 	{
 		RosterFight pIGKOIFBOME = FindSavedFightRecord(DIAIIPCBMFL);
 		if (pIGKOIFBOME != null)
 		{
-			pIGKOIFBOME.ICAKCDMOMDF();
+			pIGKOIFBOME.RecordLoss();
 			if (IsEclipseMode())
 			{
-				pIGKOIFBOME.HBIAOHGMLDK();
+				pIGKOIFBOME.IncrementEclipseLossCount();
 			}
 			return pIGKOIFBOME;
 		}
 		return null;
 	}
 
-	public RosterFight OBAFPDGJHNN(FightIDS DIAIIPCBMFL)
+	public RosterFight CreateFight(FightIDS DIAIIPCBMFL)
 	{
 		string text = "Fights";
 		string jLEKBBJBLOE = "Fight";
-		XmlNode mEEAKLDGLDF = ((_node[text] == null) ? _node.ACBPMPMPKJJ(text) : _node[text]);
-		XmlNode hKPPBKPJOEO = mEEAKLDGLDF.ACBPMPMPKJJ(jLEKBBJBLOE);
+		XmlNode mEEAKLDGLDF = ((_node[text] == null) ? _node.AppendElement(text) : _node[text]);
+		XmlNode hKPPBKPJOEO = mEEAKLDGLDF.AppendElement(jLEKBBJBLOE);
 		RosterFight pIGKOIFBOME = new RosterFight(hKPPBKPJOEO);
 		pIGKOIFBOME.set_FightIDS(DIAIIPCBMFL.ToString());
-		JNPMCNMEOLE.Add(pIGKOIFBOME);
+		fights.Add(pIGKOIFBOME);
 		return pIGKOIFBOME;
 	}
 
-	public RosterBattle MKGLPNLDDKF(FightIDS DIAIIPCBMFL)
+	public RosterBattle CreateBattle(FightIDS DIAIIPCBMFL)
 	{
 		string text = "Battles";
 		string jLEKBBJBLOE = "Battle";
-		XmlNode mEEAKLDGLDF = (_node[text].IsEmpty ? _node.ACBPMPMPKJJ(text) : _node[text]);
-		string fOOKNBHPOOA = DIAIIPCBMFL.PELHCAEAOFE() + "|" + DIAIIPCBMFL.CPHDPCAECJN() + "|";
-		XmlNode xmlNode = mEEAKLDGLDF.LJGLMGNAFHJ("Battle", "Name", fOOKNBHPOOA);
+		XmlNode mEEAKLDGLDF = (_node[text].IsEmpty ? _node.AppendElement(text) : _node[text]);
+		string fOOKNBHPOOA = DIAIIPCBMFL.GetZone() + "|" + DIAIIPCBMFL.GetBattle() + "|";
+		XmlNode xmlNode = mEEAKLDGLDF.FindChildWithAttribute("Battle", "Name", fOOKNBHPOOA);
 		if (xmlNode == null)
 		{
-			xmlNode = mEEAKLDGLDF.ACBPMPMPKJJ(jLEKBBJBLOE);
+			xmlNode = mEEAKLDGLDF.AppendElement(jLEKBBJBLOE);
 		}
 		RosterBattle dDNLCGOPAGC = new RosterBattle(xmlNode);
-		dDNLCGOPAGC.GEGKFFGACDI(DIAIIPCBMFL);
-		HLHEFIKFBHH.Add(dDNLCGOPAGC);
+		dDNLCGOPAGC.SetBattleId(DIAIIPCBMFL);
+		battles.Add(dDNLCGOPAGC);
 		return dDNLCGOPAGC;
 	}
 
-	public void MEJJNKMPMFE(FightIDS DIAIIPCBMFL)
+	public void EnsureBattleNode(FightIDS DIAIIPCBMFL)
 	{
 		string text = "Battles";
 		string jLEKBBJBLOE = "Battle";
-		XmlNode mEEAKLDGLDF = (_node[text].IsEmpty ? _node.ACBPMPMPKJJ(text) : _node[text]);
-		string text2 = DIAIIPCBMFL.PELHCAEAOFE() + "|" + DIAIIPCBMFL.CPHDPCAECJN() + "|";
-		XmlNode xmlNode = mEEAKLDGLDF.LJGLMGNAFHJ("Battle", "Name", text2);
+		XmlNode mEEAKLDGLDF = (_node[text].IsEmpty ? _node.AppendElement(text) : _node[text]);
+		string text2 = DIAIIPCBMFL.GetZone() + "|" + DIAIIPCBMFL.GetBattle() + "|";
+		XmlNode xmlNode = mEEAKLDGLDF.FindChildWithAttribute("Battle", "Name", text2);
 		if (xmlNode == null)
 		{
-			XmlNode mEEAKLDGLDF2 = mEEAKLDGLDF.ACBPMPMPKJJ(jLEKBBJBLOE);
-			mEEAKLDGLDF2.LLIKNHNLGJJ("Name").Value = text2;
+			XmlNode mEEAKLDGLDF2 = mEEAKLDGLDF.AppendElement(jLEKBBJBLOE);
+			mEEAKLDGLDF2.AppendAttribute("Name").Value = text2;
 		}
 	}
 
-	public RosterFight AJKBFMLOCOF(RosterFight value, bool EFCPLDABOIF = false)
+	public RosterFight AddFight(RosterFight value, bool EFCPLDABOIF = false)
 	{
 		if (EFCPLDABOIF)
 		{
 			bool flag = false;
-			foreach (RosterFight item in JNPMCNMEOLE)
+			foreach (RosterFight item in fights)
 			{
-				if (item.EKOIBAIIKHL() == value.EKOIBAIIKHL())
+				if (item.GetFightIdString() == value.GetFightIdString())
 				{
 					flag = true;
 					break;
@@ -1615,12 +1615,12 @@ public class Roster : MELBIBHDPCE
 			}
 			if (!flag)
 			{
-				JNPMCNMEOLE.Add(value);
+				fights.Add(value);
 			}
 		}
 		else
 		{
-			JNPMCNMEOLE.Add(value);
+			fights.Add(value);
 		}
 		return value;
 	}
@@ -1630,108 +1630,108 @@ public class Roster : MELBIBHDPCE
 	{
 		if (DIAIIPCBMFL == null)
 		{
-			LLLOJBFMONN.Error("Roster::addBattle ERROR - ids is NULL");
+			GameLog.Error("Roster::addBattle ERROR - ids is NULL");
 			return;
 		}
 		if (!PEJELKNFEKJ)
 		{
-			HEHJKDPAPLA(DIAIIPCBMFL);
+			RemoveBattle(DIAIIPCBMFL);
 			return;
 		}
-		MEJJNKMPMFE(DIAIIPCBMFL);
+		EnsureBattleNode(DIAIIPCBMFL);
 		ListSF.GetInstance().OnAuthenticate();
 		if (EFCPLDABOIF)
 		{
-			foreach (RosterBattle item in HLHEFIKFBHH)
+			foreach (RosterBattle item in battles)
 			{
 				if (item.GetBattleId().Equals(DIAIIPCBMFL))
 				{
-					item.GEGKFFGACDI(DIAIIPCBMFL);
+					item.SetBattleId(DIAIIPCBMFL);
 					item.SetLocked(NIBIMBDBPMI);
-					item.HCEOCBOFIGC(MDEHPLPLNNF);
-					item.FHCHCHPPMEI(OAHPBDFKJOK);
+					item.SetHidden(MDEHPLPLNNF);
+					item.SetReplayCount(OAHPBDFKJOK);
 					return;
 				}
 			}
 		}
-		RosterBattle dDNLCGOPAGC = MKGLPNLDDKF(DIAIIPCBMFL);
+		RosterBattle dDNLCGOPAGC = CreateBattle(DIAIIPCBMFL);
 		dDNLCGOPAGC.SetLocked(NIBIMBDBPMI);
-		dDNLCGOPAGC.HCEOCBOFIGC(MDEHPLPLNNF);
-		dDNLCGOPAGC.FHCHCHPPMEI(OAHPBDFKJOK);
-		Battle cGJCGEBPCAF = ListSF.MKHAAGMJOPG(DIAIIPCBMFL);
+		dDNLCGOPAGC.SetHidden(MDEHPLPLNNF);
+		dDNLCGOPAGC.SetReplayCount(OAHPBDFKJOK);
+		Battle cGJCGEBPCAF = ListSF.GetBattleById(DIAIIPCBMFL);
 		if (cGJCGEBPCAF != null)
 		{
-			dDNLCGOPAGC.EDHMHFONDAI = cGJCGEBPCAF;
-			cGJCGEBPCAF.FOMHAGJJCLJ(dDNLCGOPAGC);
-			cGJCGEBPCAF.BDAELBFECAJ();
+			dDNLCGOPAGC.LinkedBattle = cGJCGEBPCAF;
+			cGJCGEBPCAF.SetRosterBattle(dDNLCGOPAGC);
+			cGJCGEBPCAF.OnBattleCreated();
 		}
 	}
 
 	// best guess for name
 	public void AddBattle(RosterBattle ELBLEPOEKIL)
 	{
-		foreach (RosterBattle item in HLHEFIKFBHH)
+		foreach (RosterBattle item in battles)
 		{
 			if (item.GetBattleId().Equals(ELBLEPOEKIL.GetBattleId()))
 			{
-				LLLOJBFMONN.Error("Battle already exists: " + item.GetBattleId().CPHDPCAECJN());
+				GameLog.Error("Battle already exists: " + item.GetBattleId().GetBattle());
 				return;
 			}
 		}
-		HLHEFIKFBHH.Add(ELBLEPOEKIL);
+		battles.Add(ELBLEPOEKIL);
 	}
 
 	// best guess for name
 	public void AddBattle(Battle DPOOIONCEOA, bool EFCPLDABOIF = false, bool PEJELKNFEKJ = true, bool NIBIMBDBPMI = false, bool MDEHPLPLNNF = false, int OAHPBDFKJOK = 0)
 	{
-		FightIDS dIAIIPCBMFL = new FightIDS(DPOOIONCEOA.LKDFFCADHNO().get_Name(), DPOOIONCEOA.get_Name(), string.Empty);
+		FightIDS dIAIIPCBMFL = new FightIDS(DPOOIONCEOA.GetZone().get_Name(), DPOOIONCEOA.get_Name(), string.Empty);
 		AddBattle(dIAIIPCBMFL, EFCPLDABOIF, PEJELKNFEKJ, NIBIMBDBPMI, MDEHPLPLNNF, OAHPBDFKJOK);
 	}
 
-	public void HEHJKDPAPLA(RosterBattle ELBLEPOEKIL)
+	public void RemoveBattle(RosterBattle ELBLEPOEKIL)
 	{
 		string text = ELBLEPOEKIL.GetBattleId().ToString();
 		XmlNode xmlNode = _node["Battles"];
 		foreach (XmlNode childNode in xmlNode.ChildNodes)
 		{
-			string text2 = childNode.Attributes["Name"].CIPOICEEIBK(string.Empty);
+			string text2 = childNode.Attributes["Name"].GetStringOrDefault(string.Empty);
 			if (text2 == text)
 			{
 				xmlNode.RemoveChild(childNode);
 				break;
 			}
 		}
-		ListSF.GetInstance().EJANJEEGOOE();
-		foreach (RosterBattle item in HLHEFIKFBHH)
+		ListSF.GetInstance().RequestSave();
+		foreach (RosterBattle item in battles)
 		{
 			if (ELBLEPOEKIL == item)
 			{
-				HLHEFIKFBHH.Remove(item);
+				battles.Remove(item);
 				break;
 			}
 		}
-		Battle eDHMHFONDAI = ELBLEPOEKIL.EDHMHFONDAI;
-		eDHMHFONDAI.JNPDHAFMKID();
+		Battle eDHMHFONDAI = ELBLEPOEKIL.LinkedBattle;
+		eDHMHFONDAI.ClearRosterBattle();
 	}
 
-	public void HEHJKDPAPLA(FightIDS DIAIIPCBMFL)
+	public void RemoveBattle(FightIDS DIAIIPCBMFL)
 	{
-		foreach (RosterBattle item in HLHEFIKFBHH)
+		foreach (RosterBattle item in battles)
 		{
 			if (item.GetBattleId().Equals(DIAIIPCBMFL))
 			{
-				HEHJKDPAPLA(item);
+				RemoveBattle(item);
 				break;
 			}
 		}
 	}
 
-	public List<RosterBattle> CIOHLDJJNAO(string PPBIPCKMFKB)
+	public List<RosterBattle> GetBattlesInZone(string PPBIPCKMFKB)
 	{
 		List<RosterBattle> list = new List<RosterBattle>();
-		foreach (RosterBattle item in HLHEFIKFBHH)
+		foreach (RosterBattle item in battles)
 		{
-			if (item.GetBattleId().PELHCAEAOFE() == PPBIPCKMFKB)
+			if (item.GetBattleId().GetZone() == PPBIPCKMFKB)
 			{
 				list.Add(item);
 			}
@@ -1739,42 +1739,42 @@ public class Roster : MELBIBHDPCE
 		return list;
 	}
 
-	public RosterQuest FLMIDLIKKOG(string GACKIHNGHLE, string PMFEIPCHENB)
+	public RosterQuest AddQuest(string GACKIHNGHLE, string PMFEIPCHENB)
 	{
-		XmlNode xmlNode = ((_node["Quests"] == null) ? _node.ACBPMPMPKJJ("Quests") : _node["Quests"]);
-		XmlNode mEEAKLDGLDF = ((xmlNode["Quests"] == null) ? xmlNode.ACBPMPMPKJJ("Quests") : xmlNode["Quests"]);
-		XmlNode xmlNode2 = mEEAKLDGLDF.ACBPMPMPKJJ("Quest");
-		xmlNode2.LLIKNHNLGJJ("Name").Value = GACKIHNGHLE;
-		string value = DirectoryController.BAANOCLBLKM(PMFEIPCHENB);
-		xmlNode2.LLIKNHNLGJJ("FileName").Value = value;
-		return FDJJIIBHAOG(xmlNode2);
+		XmlNode xmlNode = ((_node["Quests"] == null) ? _node.AppendElement("Quests") : _node["Quests"]);
+		XmlNode mEEAKLDGLDF = ((xmlNode["Quests"] == null) ? xmlNode.AppendElement("Quests") : xmlNode["Quests"]);
+		XmlNode xmlNode2 = mEEAKLDGLDF.AppendElement("Quest");
+		xmlNode2.AppendAttribute("Name").Value = GACKIHNGHLE;
+		string value = DirectoryController.StripProtocol(PMFEIPCHENB);
+		xmlNode2.AppendAttribute("FileName").Value = value;
+		return AddQuestFromNode(xmlNode2);
 	}
 
-	public RosterQuest FDJJIIBHAOG(XmlNode FNMHECBANNJ)
+	public RosterQuest AddQuestFromNode(XmlNode FNMHECBANNJ)
 	{
 		RosterQuest dKBDLDGOFDN = new RosterQuest(FNMHECBANNJ);
-		CNFCPCJPGLM.Add(dKBDLDGOFDN);
+		quests.Add(dKBDLDGOFDN);
 		return dKBDLDGOFDN;
 	}
 
-	public void OCDOPMPENHP(XmlNode node)
+	public void ParseQuestVariable(XmlNode node)
 	{
-		string text = "_" + node.Attributes["Name"].CIPOICEEIBK(string.Empty);
-		RosterQuest.NOKCOAHJIPB nOKCOAHJIPB = PFMIBOCGGPC(text);
+		string text = "_" + node.Attributes["Name"].GetStringOrDefault(string.Empty);
+		RosterQuest.QuestVariable nOKCOAHJIPB = FindQuestVariable(text);
 		if (nOKCOAHJIPB != null)
 		{
-			nOKCOAHJIPB.MCPIOGALBMK(node.Attributes["Value"].CIPOICEEIBK(string.Empty));
+			nOKCOAHJIPB.SetValue(node.Attributes["Value"].GetStringOrDefault(string.Empty));
 			return;
 		}
-		nOKCOAHJIPB = new RosterQuest.NOKCOAHJIPB(node);
-		INLEOAPIEDJ[text] = nOKCOAHJIPB;
+		nOKCOAHJIPB = new RosterQuest.QuestVariable(node);
+		QuestVariables[text] = nOKCOAHJIPB;
 	}
 
-	public RosterQuest.NOKCOAHJIPB PFMIBOCGGPC(string name)
+	public RosterQuest.QuestVariable FindQuestVariable(string name)
 	{
-		if (INLEOAPIEDJ.ContainsKey(name))
+		if (QuestVariables.ContainsKey(name))
 		{
-			return INLEOAPIEDJ[name];
+			return QuestVariables[name];
 		}
 		return null;
 	}
@@ -1782,20 +1782,20 @@ public class Roster : MELBIBHDPCE
 	public void SetQuestVariable(string name, string value)
 	{
 		string gOHIIMFFFJI = "_" + name;
-		RosterQuest.NOKCOAHJIPB nOKCOAHJIPB = PFMIBOCGGPC(gOHIIMFFFJI);
+		RosterQuest.QuestVariable nOKCOAHJIPB = FindQuestVariable(gOHIIMFFFJI);
 		if (nOKCOAHJIPB != null)
 		{
-			nOKCOAHJIPB.MCPIOGALBMK(value);
+			nOKCOAHJIPB.SetValue(value);
 			return;
 		}
-		XmlNode xmlNode = ((_node["Quests"] == null) ? _node.ACBPMPMPKJJ("Quests") : _node["Quests"]);
-		XmlNode mEEAKLDGLDF = ((xmlNode["Variables"] == null) ? xmlNode.ACBPMPMPKJJ("Variables") : xmlNode["Variables"]);
-		XmlNode xmlNode2 = mEEAKLDGLDF.ACBPMPMPKJJ("Variable");
-		xmlNode2.LLIKNHNLGJJ("Name").Value = name;
-		xmlNode2.LLIKNHNLGJJ("Value").Value = value;
-		nOKCOAHJIPB = new RosterQuest.NOKCOAHJIPB(xmlNode2);
+		XmlNode xmlNode = ((_node["Quests"] == null) ? _node.AppendElement("Quests") : _node["Quests"]);
+		XmlNode mEEAKLDGLDF = ((xmlNode["Variables"] == null) ? xmlNode.AppendElement("Variables") : xmlNode["Variables"]);
+		XmlNode xmlNode2 = mEEAKLDGLDF.AppendElement("Variable");
+		xmlNode2.AppendAttribute("Name").Value = name;
+		xmlNode2.AppendAttribute("Value").Value = value;
+		nOKCOAHJIPB = new RosterQuest.QuestVariable(xmlNode2);
 		gOHIIMFFFJI = "_" + nOKCOAHJIPB.Name;
-		INLEOAPIEDJ[gOHIIMFFFJI] = nOKCOAHJIPB;
+		QuestVariables[gOHIIMFFFJI] = nOKCOAHJIPB;
 	}
 
 	public void SessionSettings(string name, string value)
@@ -1803,17 +1803,17 @@ public class Roster : MELBIBHDPCE
 		XmlNode xmlNode = _node["SessionSettings"];
 		if (xmlNode == null)
 		{
-			xmlNode = _node.ACBPMPMPKJJ("SessionSettings");
+			xmlNode = _node.AppendElement("SessionSettings");
 		}
 		XmlNode xmlNode2 = xmlNode[name];
 		if (xmlNode2 == null)
 		{
-			xmlNode2 = xmlNode.ACBPMPMPKJJ(name);
+			xmlNode2 = xmlNode.AppendElement(name);
 		}
 		XmlAttribute xmlAttribute = xmlNode2.Attributes["Value"];
 		if (xmlAttribute == null)
 		{
-			xmlAttribute = xmlNode2.LLIKNHNLGJJ("Value");
+			xmlAttribute = xmlNode2.AppendAttribute("Value");
 		}
 		xmlAttribute.Value = value;
 	}
@@ -1823,26 +1823,26 @@ public class Roster : MELBIBHDPCE
 		SessionSettings(name, value.ToString());
 	}
 
-	public bool FEDNFNOMBNG(ItemInfo item)
+	public bool IsItemEquipped(ItemInfo item)
 	{
-		UserItem dKCHDHMLKHN = KHCNHPCPFII().CMGOCLGHNLH(item);
-		return dKCHDHMLKHN != null && dKCHDHMLKHN.EFMFGEPDAOP();
+		UserItem dKCHDHMLKHN = GetInventory().FindItem(item);
+		return dKCHDHMLKHN != null && dKCHDHMLKHN.GetIsEquipped();
 	}
 
-	public long PEJFMMHOOGN()
+	public long GetUnpaidBonus()
 	{
-		return EHFJHFDACMP() - (ObscuredLong)(FJGHKGPAPPN());
+		return GetBonus() - (ObscuredLong)(GetPaidBonus());
 	}
 
-	public bool DFNEGEEHLFJ()
+	public bool GetTrySocialLogin()
 	{
-		return NDIEOONABLA;
+		return trySocialLogin;
 	}
 
-	public void OEAOPFDLMJJ(bool value)
+	public void SetTrySocialLogin(bool value)
 	{
-		NDIEOONABLA = value;
-		EMDLLIGKONG("TrySocialLogin", NDIEOONABLA);
+		trySocialLogin = value;
+		SetNodeAttribute("TrySocialLogin", trySocialLogin);
 	}
 
 	public bool ChangePower(int value)
@@ -1851,77 +1851,77 @@ public class Roster : MELBIBHDPCE
 		return true;
 	}
 
-	public void DKAAELKJJOP(int value)
+	public void SetPower(int value)
 	{
 		// Legacy SetEnergy quest actions must not reintroduce depletion.
-		_power = (ObscuredInt)OGLHGFJKMCO;
+		_power = (ObscuredInt)PowerMax;
 	}
 
-	public void ALJEKDDKPJJ(long LBIGLJLMIDG)
+	public void UpdatePowerRegeneration(long LBIGLJLMIDG)
 	{
 		// No regeneration clock or save writes are needed without energy.
 	}
 
-	public bool BMADIJMPENJ(UserItem item, bool JBCMFEPAKLK = true)
+	public bool EquipItem(UserItem item, bool JBCMFEPAKLK = true)
 	{
 		if (!JBCMFEPAKLK)
 		{
-			GGGEHAGCLGC();
+			RequestSave();
 			return true;
 		}
-		if (HEGIABHIPHA != null)
+		if (modelParameters != null)
 		{
-			ItemInfo dJKEECEOCJB = item.BHKHOJPANHE();
-			if (dJKEECEOCJB.ILDOPPMOOOF(item.DHNNCAEEMLL()) != null)
+			ItemInfo dJKEECEOCJB = item.GetInfo();
+			if (dJKEECEOCJB.GetUpgradeItemByUpgradeLevel(item.GetUpgradeLevel()) != null)
 			{
-				dJKEECEOCJB = dJKEECEOCJB.ILDOPPMOOOF(item.DHNNCAEEMLL());
+				dJKEECEOCJB = dJKEECEOCJB.GetUpgradeItemByUpgradeLevel(item.GetUpgradeLevel());
 			}
-			HEGIABHIPHA.OLLNIKFPMKE(dJKEECEOCJB.Type, dJKEECEOCJB);
-			EMDLLIGKONG(dJKEECEOCJB.Type, (!JBCMFEPAKLK) ? string.Empty : dJKEECEOCJB.Name);
-			HEGIABHIPHA.PPFDLIBLNDG();
+			modelParameters.SetItemByType(dJKEECEOCJB.Type, dJKEECEOCJB);
+			SetNodeAttribute(dJKEECEOCJB.Type, (!JBCMFEPAKLK) ? string.Empty : dJKEECEOCJB.Name);
+			modelParameters.BuildModelDocuments();
 			return true;
 		}
 		return false;
 	}
 
-	public void JALMHIICOPB(ItemInfo PJDAGCBPLJE)
+	public void UnequipItem(ItemInfo PJDAGCBPLJE)
 	{
-		if (HEGIABHIPHA != null)
+		if (modelParameters != null)
 		{
-			HEGIABHIPHA.OLLNIKFPMKE(PJDAGCBPLJE.Type, null);
-			EMDLLIGKONG(PJDAGCBPLJE.Type, string.Empty);
-			HEGIABHIPHA.PPFDLIBLNDG();
+			modelParameters.SetItemByType(PJDAGCBPLJE.Type, null);
+			SetNodeAttribute(PJDAGCBPLJE.Type, string.Empty);
+			modelParameters.BuildModelDocuments();
 		}
 	}
 
-	public void OMJDCEEEJMB()
+	public void RefillPower()
 	{
-		DKAAELKJJOP(OGLHGFJKMCO);
+		SetPower(PowerMax);
 	}
 
-	public bool PBOFBNFALNN()
+	public bool StartPendingQuests()
 	{
 		RosterQuest dKBDLDGOFDN = null;
 		int num = 0;
 		List<QuestStage> list = new List<QuestStage>();
-		foreach (RosterQuest item in CNFCPCJPGLM)
+		foreach (RosterQuest item in quests)
 		{
 			if (ListSF.GetInstance().IsEclipseQuestSuppressed(item.Name, item.FileName)) continue;
 			if (item.get_Parameters() == null)
 			{
 				continue;
 			}
-			if (!JHHBKBENNNA(item.FileName))
+			if (!HasLoadedQuestFile(item.FileName))
 			{
-				ListSF.GetInstance().PDCHBPKOBFI(item.FileName);
+				ListSF.GetInstance().LoadQuests(item.FileName);
 			}
 			QuestStage mLLKDGBEGJI = ListSF.GetInstance().FindEclipseSavedQuest(item.Name, item.FileName);
 			if (ListSF.GetInstance().IsEclipseQuestSuppressed(item.Name, item.FileName)) continue;
 			if (mLLKDGBEGJI != null)
 			{
-				if (mLLKDGBEGJI.IDGAAJAFCHC())
+				if (mLLKDGBEGJI.IsUnresumable())
 				{
-					mLLKDGBEGJI.AGJGEBBLFGA();
+					mLLKDGBEGJI.MarkComplete();
 					continue;
 				}
 				if (num == 0)
@@ -1932,7 +1932,7 @@ public class Roster : MELBIBHDPCE
 				{
 					if (item2 == mLLKDGBEGJI)
 					{
-						LLLOJBFMONN.Error("same name of quest %s", item.Name);
+						GameLog.Error("same name of quest %s", item.Name);
 					}
 				}
 				list.Add(mLLKDGBEGJI);
@@ -1940,24 +1940,24 @@ public class Roster : MELBIBHDPCE
 			}
 			else
 			{
-				item.LCIHKPPGNPF();
-				item.PLNNKKBPDJK = true;
+				item.ClearParameters();
+				item.IsParametersCleared = true;
 			}
 		}
 		if (list.Count > 0)
 		{
-			ListSF.GetInstance().FGAEEJBEGEJ(list);
+			ListSF.GetInstance().AddActionQuests(list);
 			if (dKBDLDGOFDN != null)
 			{
-				ScreenType iPKNDMINFMJ = (ScreenType)dKBDLDGOFDN.ELBKKOPHLHK();
+				ScreenType iPKNDMINFMJ = (ScreenType)dKBDLDGOFDN.GetCheckpointScreenType();
 				ScreenType iPKNDMINFMJ2 = Module.GetInstance().GetCurrentScreenType();
 				if (iPKNDMINFMJ == ScreenType.ModuleFight && iPKNDMINFMJ != iPKNDMINFMJ2)
 				{
-					Module.DLOKJOHNDID(ScreenType.ModuleDojo);
+					Module.OpenScreen(ScreenType.ModuleDojo);
 				}
 				else if (iPKNDMINFMJ != (ScreenType)(-1) && iPKNDMINFMJ != iPKNDMINFMJ2)
 				{
-					Module.DLOKJOHNDID(iPKNDMINFMJ, 0);
+					Module.OpenScreen(iPKNDMINFMJ, 0);
 				}
 				return true;
 			}
@@ -1965,60 +1965,60 @@ public class Roster : MELBIBHDPCE
 		return false;
 	}
 
-	public bool FDPIBNJJDAK()
+	public bool GetAskedForDumps()
 	{
-		return CFIMMOBMEIP;
+		return askedForDumps;
 	}
 
-	public void AJCCEFKDKIO(bool value)
+	public void SetAskedForDumps(bool value)
 	{
-		CFIMMOBMEIP = value;
-		EMDLLIGKONG("AskedForDumps", CFIMMOBMEIP);
+		askedForDumps = value;
+		SetNodeAttribute("AskedForDumps", askedForDumps);
 	}
 
-	public void BIHELGAGPGO()
+	public void UpdateLastDumpTime()
 	{
-		long num = ListSF.IDMJOMOMDOJ();
-		if (num - NBDICCLKEAC() >= 900)
+		long num = ListSF.GetCurrentTime();
+		if (num - GetLastDumpTime() >= 900)
 		{
-			BNGLIONOOAG(num);
+			SetLastDumpTime(num);
 		}
 	}
 
-	public void PNHPFNGCFGO()
+	public void SaveBillingItems()
 	{
 		if (_node == null)
 		{
 			return;
 		}
-		List<ItemInfo> list = ListSF.GetItems().ONFMAJEAACM("RealMoneyItem");
+		List<ItemInfo> list = ListSF.GetItems().GetItemsByType("RealMoneyItem");
 		XmlNode xmlNode = _node["Billing"];
 		if (xmlNode == null)
 		{
-			xmlNode = _node.KDPLHGGPJHN("Billing");
+			xmlNode = _node.AppendNewNode("Billing");
 		}
 		foreach (ItemInfo item in list)
 		{
-			XmlNode xmlNode2 = xmlNode.LJGLMGNAFHJ("Item", "Name", item.Name);
+			XmlNode xmlNode2 = xmlNode.FindChildWithAttribute("Item", "Name", item.Name);
 			if (xmlNode2 == null)
 			{
-				xmlNode2 = xmlNode.KDPLHGGPJHN("Item");
+				xmlNode2 = xmlNode.AppendNewNode("Item");
 			}
-			XmlAttribute xmlAttribute = xmlNode2.LLIKNHNLGJJ("Name");
+			XmlAttribute xmlAttribute = xmlNode2.AppendAttribute("Name");
 			xmlAttribute.Value = item.Name;
-			xmlAttribute = xmlNode2.LLIKNHNLGJJ("RealPrice");
-			xmlAttribute.Value = item.FPEIFLEBEAA;
-			xmlAttribute = xmlNode2.LLIKNHNLGJJ("RealPriceConst");
-			xmlAttribute.Value = item.EGAJMELKANL;
-			xmlAttribute = xmlNode2.LLIKNHNLGJJ("RealPriceCurrency");
-			xmlAttribute.Value = item.MIIJIMJDHFP;
+			xmlAttribute = xmlNode2.AppendAttribute("RealPrice");
+			xmlAttribute.Value = item.LocalizedPriceString;
+			xmlAttribute = xmlNode2.AppendAttribute("RealPriceConst");
+			xmlAttribute.Value = item.PriceAmountText;
+			xmlAttribute = xmlNode2.AppendAttribute("RealPriceCurrency");
+			xmlAttribute.Value = item.CurrencyCode;
 		}
-		ListSF.GetInstance().EJANJEEGOOE();
+		ListSF.GetInstance().RequestSave();
 	}
 
 	public bool AddShopLock(string name, bool FLOAHAOBNAP = false)
 	{
-		if (!FLFKOIPCEPI(name))
+		if (!HasShopLock(name))
 		{
 			if (FLOAHAOBNAP)
 			{
@@ -2027,42 +2027,42 @@ public class Roster : MELBIBHDPCE
 				XmlNode xmlNode = _node[text];
 				if (xmlNode == null)
 				{
-					xmlNode = _node.KDPLHGGPJHN(text);
+					xmlNode = _node.AppendNewNode(text);
 				}
-				XmlNode mEEAKLDGLDF = xmlNode.KDPLHGGPJHN(iMGCANJHPND);
-				mEEAKLDGLDF.LLIKNHNLGJJ("Name").Value = name;
+				XmlNode mEEAKLDGLDF = xmlNode.AppendNewNode(iMGCANJHPND);
+				mEEAKLDGLDF.AppendAttribute("Name").Value = name;
 			}
-			BMKAMGGIELK.Add(name);
+			shopLocks.Add(name);
 			return true;
 		}
 		return false;
 	}
 
-	public bool OAHDKIDMOCG(string name)
+	public bool RemoveShopLock(string name)
 	{
-		int num = JNOGGCIPGCI(name);
+		int num = FindShopLockIndex(name);
 		if (num >= 0)
 		{
 			XmlNode xmlNode = _node["Shop"];
-			XmlNode xmlNode2 = xmlNode.LJGLMGNAFHJ("Lock", "Name", name);
+			XmlNode xmlNode2 = xmlNode.FindChildWithAttribute("Lock", "Name", name);
 			if (xmlNode2 != null)
 			{
 				xmlNode.RemoveChild(xmlNode2);
 			}
-			BMKAMGGIELK.RemoveAt(num);
+			shopLocks.RemoveAt(num);
 			return true;
 		}
 		return false;
 	}
 
-	public int JNOGGCIPGCI(string name)
+	public int FindShopLockIndex(string name)
 	{
 		if (name == null)
 		{
 			return -1;
 		}
 		int num = 0;
-		foreach (string item in BMKAMGGIELK)
+		foreach (string item in shopLocks)
 		{
 			if (item.Equals(name))
 			{
@@ -2073,14 +2073,14 @@ public class Roster : MELBIBHDPCE
 		return -1;
 	}
 
-	public void ENFKEIHBICK(string name, bool NLCCJEHMAOF = true)
+	public void AddOpenTrick(string name, bool NLCCJEHMAOF = true)
 	{
-		if (COJMHNDCACJ.Contains(name))
+		if (openTricks.Contains(name))
 		{
 			return;
 		}
-		COJMHNDCACJ.Add(name);
-		List<Trick> list = AnimationData.BFNFDDLNHPA();
+		openTricks.Add(name);
+		List<Trick> list = AnimationData.GetTricks();
 		for (int i = 0; i < list.Count; i++)
 		{
 			Trick iHNIKIHKFHC = list[i];
@@ -2094,14 +2094,14 @@ public class Roster : MELBIBHDPCE
 		{
 			string text = "OpenTricks";
 			string jLEKBBJBLOE = "Trick";
-			XmlNode mEEAKLDGLDF = ((_node[text] == null) ? _node.ACBPMPMPKJJ(text) : _node[text]);
-			XmlNode mEEAKLDGLDF2 = mEEAKLDGLDF.ACBPMPMPKJJ(jLEKBBJBLOE);
-			mEEAKLDGLDF2.LLIKNHNLGJJ("Name").Value = name;
-			GGGEHAGCLGC();
+			XmlNode mEEAKLDGLDF = ((_node[text] == null) ? _node.AppendElement(text) : _node[text]);
+			XmlNode mEEAKLDGLDF2 = mEEAKLDGLDF.AppendElement(jLEKBBJBLOE);
+			mEEAKLDGLDF2.AppendAttribute("Name").Value = name;
+			RequestSave();
 		}
 	}
 
-	public void DECNJIOFODA(string name, bool NLCCJEHMAOF = true)
+	public void RemoveOpenTrick(string name, bool NLCCJEHMAOF = true)
 	{
 		string nameKey = "OpenTricks";
 		if (_node[nameKey] == null)
@@ -2111,23 +2111,23 @@ public class Roster : MELBIBHDPCE
 		XmlNode xmlNode = _node[nameKey];
 		foreach (XmlNode childNode in xmlNode.ChildNodes)
 		{
-			if (childNode.Attributes["Name"].CIPOICEEIBK(string.Empty) == nameKey)
+			if (childNode.Attributes["Name"].GetStringOrDefault(string.Empty) == nameKey)
 			{
 				xmlNode.RemoveChild(childNode);
 				break;
 			}
 		}
-		if (COJMHNDCACJ.Contains(name))
+		if (openTricks.Contains(name))
 		{
-			COJMHNDCACJ.Remove(name);
+			openTricks.Remove(name);
 		}
 		if (NLCCJEHMAOF)
 		{
-			GGGEHAGCLGC();
+			RequestSave();
 		}
 	}
 
-	private void EJLOBJIFEAL()
+	private void LoadCounterItems()
 	{
 		XmlNode xmlNode = _node["CounterItems"];
 		if (xmlNode == null)
@@ -2141,21 +2141,21 @@ public class Roster : MELBIBHDPCE
 		}
 		foreach (XmlNode childNode in xmlNode2.ChildNodes)
 		{
-			ItemInfo dJKEECEOCJB = ListSF.GetItems().GetItemByName(childNode.Attributes["Name"].CIPOICEEIBK());
-			if (dJKEECEOCJB != null && dJKEECEOCJB.GKODCKNAAHB == 0)
+			ItemInfo dJKEECEOCJB = ListSF.GetItems().GetItemByName(childNode.Attributes["Name"].GetStringOrDefault());
+			if (dJKEECEOCJB != null && dJKEECEOCJB.SilentReceive == 0)
 			{
-				dJKEECEOCJB.BEBDMOEIEJN(true);
+				dJKEECEOCJB.SetIsNew(true);
 			}
 		}
 	}
 
-	public void KGFJPLKOABI()
+	public void SaveCounterItems()
 	{
 		List<string> PIDDFMECFAO = new List<string>();
-		List<ItemInfo> list = ListSF.GetItems().HCDLKHKBEPF();
+		List<ItemInfo> list = ListSF.GetItems().GetAllItems();
 		list.ForEach((ItemInfo DHDMNHCIPEH) =>
 		{
-			if (DHDMNHCIPEH.DBHJGAGOLOB())
+			if (DHDMNHCIPEH.GetIsNew())
 			{
 				PIDDFMECFAO.Add(DHDMNHCIPEH.Name);
 			}
@@ -2171,30 +2171,30 @@ public class Roster : MELBIBHDPCE
 		{
 			return;
 		}
-		xmlNode = _node.ACBPMPMPKJJ(text);
-		XmlNode mEEAKLDGLDF = xmlNode.ACBPMPMPKJJ("Items");
+		xmlNode = _node.AppendElement(text);
+		XmlNode mEEAKLDGLDF = xmlNode.AppendElement("Items");
 		foreach (string item in PIDDFMECFAO)
 		{
-			mEEAKLDGLDF.ACBPMPMPKJJ("Item").LLIKNHNLGJJ("Name").Value = item;
+			mEEAKLDGLDF.AppendElement("Item").AppendAttribute("Name").Value = item;
 		}
 	}
 
-	public void PMIIHIFGIIN()
+	public void SavePaymentOrders()
 	{
-		EHAAMEPDOGJ.INECBIPEJNL(KHKMHPDKDIJ);
+		paymentOrders.SaveToXml(paymentsNode);
 	}
 
-	public void DDBBADOGHHB(string EIDDAFDJJCJ)
+	public void AddLoadedQuestFile(string EIDDAFDJJCJ)
 	{
-		if (!JHHBKBENNNA(EIDDAFDJJCJ))
+		if (!HasLoadedQuestFile(EIDDAFDJJCJ))
 		{
-			EOJCMGDPHLL.Add(EIDDAFDJJCJ);
+			loadedQuestFiles.Add(EIDDAFDJJCJ);
 		}
 	}
 
-	public bool JHHBKBENNNA(string EIDDAFDJJCJ)
+	public bool HasLoadedQuestFile(string EIDDAFDJJCJ)
 	{
-		foreach (string item in EOJCMGDPHLL)
+		foreach (string item in loadedQuestFiles)
 		{
 			if (item == EIDDAFDJJCJ)
 			{
@@ -2204,104 +2204,104 @@ public class Roster : MELBIBHDPCE
 		return false;
 	}
 
-	public bool DHPNBBILDPB()
+	public bool GetGPlusAutoLogin()
 	{
-		return GNCENEKPINA && GAKAEGHGNGD < 1;
+		return gplusAutoLogin && gplusFailedLogins < 1;
 	}
 
-	public void BCMKHEKOMDB(bool value)
+	public void SetGPlusAutoLogin(bool value)
 	{
-		GNCENEKPINA = value;
-		EMDLLIGKONG("GPlusAutoLogin", GNCENEKPINA);
+		gplusAutoLogin = value;
+		SetNodeAttribute("GPlusAutoLogin", gplusAutoLogin);
 	}
 
-	public void INNHOAPGCHI()
+	public void IncrementGPlusFailedLogins()
 	{
-		GAKAEGHGNGD++;
-		KLCCBHMJKFI(GAKAEGHGNGD);
+		gplusFailedLogins++;
+		SetGPlusFailedLogins(gplusFailedLogins);
 	}
 
-	public void MFJLCDAEFFD()
+	public void ResetGPlusFailedLogins()
 	{
-		GAKAEGHGNGD = 0;
-		KLCCBHMJKFI(GAKAEGHGNGD);
+		gplusFailedLogins = 0;
+		SetGPlusFailedLogins(gplusFailedLogins);
 	}
 
-	public void AOBEHOILNOG(string name, bool FLOAHAOBNAP)
+	public void SetAbGroupToggle(string name, bool FLOAHAOBNAP)
 	{
 	}
 
-	public void FHCPEIGMGMK(int NPFOBKBJAOB = 0)
+	public void RescaleCurrencyDenomination(int NPFOBKBJAOB = 0)
 	{
-		double num = Math.Pow(10.0, CFNNEGHPCMN - NPFOBKBJAOB);
+		double num = Math.Pow(10.0, denominationDigits - NPFOBKBJAOB);
 		long num2 = 0L;
-		double num3 = (double)(ObscuredLong)(MJBFFBPLAGC) / num;
+		double num3 = (double)(ObscuredLong)(money) / num;
 		if (num > 1.0)
 		{
-			num2 = (ObscuredLong)(MJBFFBPLAGC) % (long)num;
+			num2 = (ObscuredLong)(money) % (long)num;
 			if (0 < num2)
 			{
 				num3++;
 			}
 		}
-		MJBFFBPLAGC = (ObscuredLong)((long)num3);
+		money = (ObscuredLong)((long)num3);
 		num2 = 0L;
-		double num4 = (double)(ObscuredLong)(BIOMOEDPLIP) / num;
+		double num4 = (double)(ObscuredLong)(paidMoney) / num;
 		if (num > 1.0)
 		{
-			num2 = (ObscuredLong)(BIOMOEDPLIP) % (long)num;
+			num2 = (ObscuredLong)(paidMoney) % (long)num;
 		}
 		if (0 < num2)
 		{
 			num4++;
 		}
-		BIOMOEDPLIP = (ObscuredLong)((long)num4);
+		paidMoney = (ObscuredLong)((long)num4);
 	}
 
-	public void GADHOGMDMIG(string name, int value)
+	public void SetCurrencyCount(string name, int value)
 	{
-		GameCurrency cJJOFMHLFFM = GameUtils.AJDKHINLIDI.ICFINJLNCPM(name);
+		GameCurrency cJJOFMHLFFM = GameUtils.GameCurrencies.GetCurrencyByName(name);
 		if (cJJOFMHLFFM == null)
 		{
 			cJJOFMHLFFM = new GameCurrency(name, name);
-			GameUtils.AJDKHINLIDI.FCDLIEFIIGG(cJJOFMHLFFM);
+			GameUtils.GameCurrencies.AddCurrency(cJJOFMHLFFM);
 		}
-		GADHOGMDMIG(cJJOFMHLFFM, value);
+		SetCurrencyCount(cJJOFMHLFFM, value);
 	}
 
-	public void GADHOGMDMIG(GameCurrency MDDNHLBDJBN, int value)
+	public void SetCurrencyCount(GameCurrency MDDNHLBDJBN, int value)
 	{
 		if (value < 0)
 		{
 			value = 0;
 		}
-		CurrencyStruct lAPFHLGNAAF = MEOLAFECPHI(MDDNHLBDJBN);
+		CurrencyStruct lAPFHLGNAAF = FindCurrency(MDDNHLBDJBN);
 		if (lAPFHLGNAAF == null)
 		{
 			CurrencyStruct item = new CurrencyStruct(MDDNHLBDJBN, value);
-			DNPGEMMDPNN.Add(item);
-			lAPFHLGNAAF = DNPGEMMDPNN[DNPGEMMDPNN.Count - 1];
+			currencies.Add(item);
+			lAPFHLGNAAF = currencies[currencies.Count - 1];
 		}
 		lAPFHLGNAAF.Count = (ObscuredInt)(value);
-		string mENAJEAJJBE = lAPFHLGNAAF.BKDEAGGPNAO.Name;
-		if (ALMPFGCDAOP == null)
+		string mENAJEAJJBE = lAPFHLGNAAF.Currency.Name;
+		if (currenciesNode == null)
 		{
-			ALMPFGCDAOP = _node.ACBPMPMPKJJ("Currencies");
+			currenciesNode = _node.AppendElement("Currencies");
 		}
-		if (ALMPFGCDAOP.Attributes[mENAJEAJJBE] == null)
+		if (currenciesNode.Attributes[mENAJEAJJBE] == null)
 		{
-			ALMPFGCDAOP.LLIKNHNLGJJ(mENAJEAJJBE);
+			currenciesNode.AppendAttribute(mENAJEAJJBE);
 		}
-		ALMPFGCDAOP.Attributes[mENAJEAJJBE].Value = value.ToString();
-		GGGEHAGCLGC();
+		currenciesNode.Attributes[mENAJEAJJBE].Value = value.ToString();
+		RequestSave();
 		CallEvent(2, lAPFHLGNAAF);
 	}
 
-	public CurrencyStruct MEOLAFECPHI(string name)
+	public CurrencyStruct FindCurrency(string name)
 	{
-		foreach (CurrencyStruct item in DNPGEMMDPNN)
+		foreach (CurrencyStruct item in currencies)
 		{
-			if (item.BKDEAGGPNAO.Name == name)
+			if (item.Currency.Name == name)
 			{
 				return item;
 			}
@@ -2309,11 +2309,11 @@ public class Roster : MELBIBHDPCE
 		return null;
 	}
 
-	public CurrencyStruct MEOLAFECPHI(GameCurrency MDDNHLBDJBN)
+	public CurrencyStruct FindCurrency(GameCurrency MDDNHLBDJBN)
 	{
-		foreach (CurrencyStruct item in DNPGEMMDPNN)
+		foreach (CurrencyStruct item in currencies)
 		{
-			if (item.BKDEAGGPNAO == MDDNHLBDJBN)
+			if (item.Currency == MDDNHLBDJBN)
 			{
 				return item;
 			}
@@ -2323,11 +2323,11 @@ public class Roster : MELBIBHDPCE
 
 	public void AddCurrencyCount(string name, int value)
 	{
-		GameCurrency cJJOFMHLFFM = GameUtils.AJDKHINLIDI.ICFINJLNCPM(name);
+		GameCurrency cJJOFMHLFFM = GameUtils.GameCurrencies.GetCurrencyByName(name);
 		if (cJJOFMHLFFM == null)
 		{
 			cJJOFMHLFFM = new GameCurrency(name, name);
-			GameUtils.AJDKHINLIDI.FCDLIEFIIGG(cJJOFMHLFFM);
+			GameUtils.GameCurrencies.AddCurrency(cJJOFMHLFFM);
 		}
 		if (cJJOFMHLFFM != null)
 		{
@@ -2337,23 +2337,23 @@ public class Roster : MELBIBHDPCE
 
 	public void AddCurrencyCount(GameCurrency MDDNHLBDJBN, int value)
 	{
-		CurrencyStruct lAPFHLGNAAF = MEOLAFECPHI(MDDNHLBDJBN);
+		CurrencyStruct lAPFHLGNAAF = FindCurrency(MDDNHLBDJBN);
 		int num = 0;
 		if (lAPFHLGNAAF != null)
 		{
 			num = (ObscuredInt)(lAPFHLGNAAF.Count);
 		}
-		GADHOGMDMIG(MDDNHLBDJBN, num + value);
+		SetCurrencyCount(MDDNHLBDJBN, num + value);
 	}
 
 	public bool GetIsCurrencyExist(string name)
 	{
-		return MEOLAFECPHI(name) != null;
+		return FindCurrency(name) != null;
 	}
 
 	public int GetCurrencyCount(string name)
 	{
-		CurrencyStruct lAPFHLGNAAF = MEOLAFECPHI(name);
+		CurrencyStruct lAPFHLGNAAF = FindCurrency(name);
 		if (lAPFHLGNAAF != null)
 		{
 			return (ObscuredInt)(lAPFHLGNAAF.Count);
@@ -2361,9 +2361,9 @@ public class Roster : MELBIBHDPCE
 		return 0;
 	}
 
-	public int IJCGBPDAAJF(string name)
+	public int GetResistanceCount(string name)
 	{
-		ResistanceStruct lONBLHKCFDH = PMMBCHOFBNL(name);
+		ResistanceStruct lONBLHKCFDH = FindResistance(name);
 		if (lONBLHKCFDH != null)
 		{
 			return (ObscuredInt)(lONBLHKCFDH.Count);
@@ -2371,67 +2371,67 @@ public class Roster : MELBIBHDPCE
 		return 0;
 	}
 
-	public string ODMONBDLMIP()
+	public string GetMarketCode()
 	{
-		MarketSettings cAGGDFBMJKG = AssemblyController.JONCCPLEIBE();
-		if (cAGGDFBMJKG.NPNOMBEEPJD() || cAGGDFBMJKG.OPCBKOOFMAK())
+		MarketSettings cAGGDFBMJKG = AssemblyController.GetMarket();
+		if (cAGGDFBMJKG.GetIsAmazonMarket() || cAGGDFBMJKG.GetIsAmazonMobileMarket())
 		{
 			return "ama";
 		}
-		if (cAGGDFBMJKG.BKGIFIPIHAL())
+		if (cAGGDFBMJKG.GetIsChinaMarket())
 		{
 			return "chn";
 		}
-		if (cAGGDFBMJKG.DMJJDFCAKFG())
+		if (cAGGDFBMJKG.GetIsKoreaMarket())
 		{
 			return "kak";
 		}
-		return SystemProperties.IAAKNCJMAAK();
+		return SystemProperties.GetPlatformName();
 	}
 
-	public void BAOKBJGLKEF(string FHLFEBDNIFF)
+	public void SetAvatar(string FHLFEBDNIFF)
 	{
 		if (get_Parameters() != null)
 		{
-			get_Parameters().HNKFHGOOKEG = FHLFEBDNIFF;
+			get_Parameters().Avatar = FHLFEBDNIFF;
 		}
-		EMDLLIGKONG("Avatar", FHLFEBDNIFF);
+		SetNodeAttribute("Avatar", FHLFEBDNIFF);
 	}
 
-	public void AFAKCAMAACM()
+	public void ApplyLanguage()
 	{
 		LocalizationManager.Language pPNFBAFOOAH = null;
-		if (BGMCCMHOMJL == string.Empty)
+		if (language == string.Empty)
 		{
-			string eOMNCDDELLB = SystemProperties.NICPICAMAOH().OHCHKFMFDKM();
-			pPNFBAFOOAH = LocalizationManager.HHKANICOAAG(eOMNCDDELLB);
+			string eOMNCDDELLB = SystemProperties.GetDeviceInfo().GetLanguage();
+			pPNFBAFOOAH = LocalizationManager.FindLanguageByLocale(eOMNCDDELLB);
 			if (pPNFBAFOOAH == null)
 			{
-				string pOIPGLLCCKC = LocalizationManager.POIPGLLCCKC;
-				pPNFBAFOOAH = LocalizationManager.NLFKNPBICED(pOIPGLLCCKC);
+				string pOIPGLLCCKC = LocalizationManager.DefaultLanguageName;
+				pPNFBAFOOAH = LocalizationManager.FindLanguageByName(pOIPGLLCCKC);
 			}
 		}
 		else
 		{
-			pPNFBAFOOAH = LocalizationManager.NLFKNPBICED(BGMCCMHOMJL);
+			pPNFBAFOOAH = LocalizationManager.FindLanguageByName(language);
 		}
 		if (pPNFBAFOOAH == null)
 		{
-			LLLOJBFMONN.Error("Roster parse - null language");
+			GameLog.Error("Roster parse - null language");
 			return;
 		}
-		if (!LocalizationManager.GGBKNBFCBEJ(pPNFBAFOOAH))
+		if (!LocalizationManager.HasAllFonts(pPNFBAFOOAH))
 		{
-			string pOIPGLLCCKC2 = LocalizationManager.POIPGLLCCKC;
-			pPNFBAFOOAH = LocalizationManager.NLFKNPBICED(pOIPGLLCCKC2);
+			string pOIPGLLCCKC2 = LocalizationManager.DefaultLanguageName;
+			pPNFBAFOOAH = LocalizationManager.FindLanguageByName(pOIPGLLCCKC2);
 		}
-		COKACMKOIGD(pPNFBAFOOAH.name);
-		LocalizationManager.BJPNKAGDKFL(pPNFBAFOOAH);
+		SetLanguage(pPNFBAFOOAH.name);
+		LocalizationManager.ChangeLanguage(pPNFBAFOOAH);
 	}
 
-	private void PLELELJIKEL()
+	private void LoadLevelThresholds()
 	{
-		List<global::Pair<int, uint>> pEDIMBMABIG = GameUtils.HHONBOCJBLB.PEDIMBMABIG;
+		List<global::Pair<int, uint>> pEDIMBMABIG = GameUtils.LevelThresholdTable.Thresholds;
 		foreach (global::Pair<int, uint> item2 in pEDIMBMABIG)
 		{
 			ObscuredUInt item = (ObscuredUInt)(item2.Second);
@@ -2439,51 +2439,51 @@ public class Roster : MELBIBHDPCE
 		}
 	}
 
-	public string NFKHNICBOIB()
+	public string GetCurrentZone()
 	{
-		if (OFKGMKADHBD == string.Empty)
+		if (currentZone == string.Empty)
 		{
-			AOIBKCOBABL(EKCEFDBKPAC());
+			SetCurrentZone(ComputeCurrentZone());
 		}
-		return OFKGMKADHBD;
+		return currentZone;
 	}
 
-	public void AOIBKCOBABL(string value)
+	public void SetCurrentZone(string value)
 	{
-		OFKGMKADHBD = value;
-		EMDLLIGKONG("CurrentZone", OFKGMKADHBD);
+		currentZone = value;
+		SetNodeAttribute("CurrentZone", currentZone);
 	}
 
 	public void RandomizeObscuredVars()
 	{
-		MJBFFBPLAGC.GMCADPGOCHM();
-		BIOMOEDPLIP.GMCADPGOCHM();
-		BDONIKLHFLJ.GMCADPGOCHM();
-		IAFKGOFKDKE.GMCADPGOCHM();
-		_experience.GMCADPGOCHM();
-		_power.GMCADPGOCHM();
+		money.RandomizeCryptoKey();
+		paidMoney.RandomizeCryptoKey();
+		bonus.RandomizeCryptoKey();
+		paidBonus.RandomizeCryptoKey();
+		_experience.RandomizeCryptoKey();
+		_power.RandomizeCryptoKey();
 		_levelThresholds.ForEach((ObscuredUInt DHDMNHCIPEH) =>
 		{
-			DHDMNHCIPEH.GMCADPGOCHM();
+			DHDMNHCIPEH.RandomizeCryptoKey();
 		});
 	}
 
-	public string EKCEFDBKPAC()
+	public string ComputeCurrentZone()
 	{
 		int num = 0;
-		foreach (RosterBattle item in HLHEFIKFBHH)
+		foreach (RosterBattle item in battles)
 		{
 			if (item.IsLocked())
 			{
 				continue;
 			}
 			bool flag = false;
-			foreach (RosterFight item2 in JNPMCNMEOLE)
+			foreach (RosterFight item2 in fights)
 			{
-				if (item2.GIDNOKCJLPL() == item.GetBattleId().CPHDPCAECJN())
+				if (item2.GetBattleName() == item.GetBattleId().GetBattle())
 				{
 					flag = true;
-					int num2 = item.EDHMHFONDAI.LKDFFCADHNO().KDJNDHLHAFH();
+					int num2 = item.LinkedBattle.GetZone().GetIndex();
 					if (num2 > num)
 					{
 						num = num2;
@@ -2493,10 +2493,10 @@ public class Roster : MELBIBHDPCE
 				{
 					continue;
 				}
-				int num3 = item.EDHMHFONDAI.KCIKELGFHOA();
+				int num3 = item.LinkedBattle.GetFightCount();
 				if (num3 > 0)
 				{
-					int num4 = item.EDHMHFONDAI.LKDFFCADHNO().KDJNDHLHAFH();
+					int num4 = item.LinkedBattle.GetZone().GetIndex();
 					if (num4 > num)
 					{
 						num = num4;
@@ -2504,51 +2504,51 @@ public class Roster : MELBIBHDPCE
 				}
 			}
 		}
-		if (num < ListSF.FHAIJEAPFEA().Count)
+		if (num < ListSF.GetZones().Count)
 		{
-			Zone pKCPOJKLMOK = ListSF.FHAIJEAPFEA()[num];
+			Zone pKCPOJKLMOK = ListSF.GetZones()[num];
 			return pKCPOJKLMOK.get_Name();
 		}
 		return "ZONE_1";
 	}
 
-	private void KLCCBHMJKFI(int count)
+	private void SetGPlusFailedLogins(int count)
 	{
-		GAKAEGHGNGD = count;
-		EMDLLIGKONG("GPlusFiledLogins", GAKAEGHGNGD);
+		gplusFailedLogins = count;
+		SetNodeAttribute("GPlusFiledLogins", gplusFailedLogins);
 	}
 
-	private void OJNFOCEKFNC(XmlNode node)
+	private void LoadSoundSettings(XmlNode node)
 	{
-		Sound.NMKBJANLIEO(PDGHOOLJNMI, DNBFEGDILIA);
+		Sound.SetPaths(soundsPath, musicPath);
 		XmlNode xmlNode = node["Sounds"];
 		if (xmlNode != null)
 		{
 			XmlNode xmlNode2 = xmlNode["Sound"];
 			if (xmlNode2 != null)
 			{
-				Sound.JOFLPDCONNC(xmlNode2.Attributes["Value"].ParseFloat(1f));
-				Sound.FLOFHMBDHNM(xmlNode2.Attributes["Mute"].ParseBool());
+				Sound.SetSoundVolume(xmlNode2.Attributes["Value"].ParseFloat(1f));
+				Sound.SetSoundMuted(xmlNode2.Attributes["Mute"].ParseBool());
 			}
 			else
 			{
 				Debug.LogWarning("[UserData] Warrior Sound settings missing; using default sound volume.");
-				Sound.JOFLPDCONNC(1f);
-				Sound.FLOFHMBDHNM(false);
+				Sound.SetSoundVolume(1f);
+				Sound.SetSoundMuted(false);
 			}
 			xmlNode2 = xmlNode["Music"];
 			if (xmlNode2 != null)
 			{
-				Sound.OAFCOFNOIJK(xmlNode2.Attributes["Value"].ParseFloat(1f));
-				Sound.FMLHEDIPGAF(xmlNode2.Attributes["Mute"].ParseBool());
+				Sound.SetMusicVolume(xmlNode2.Attributes["Value"].ParseFloat(1f));
+				Sound.SetMusicMuted(xmlNode2.Attributes["Mute"].ParseBool());
 			}
 			else
 			{
 				Debug.LogWarning("[UserData] Warrior Music settings missing; using default music volume.");
-				Sound.OAFCOFNOIJK(1f);
-				Sound.FMLHEDIPGAF(false);
+				Sound.SetMusicVolume(1f);
+				Sound.SetMusicMuted(false);
 			}
-			ListSF.GKAOOOICJAI = Sound.ELHMADOKHHE();
+			ListSF.IsSoundEnabled = Sound.GetMusicMuted();
 		}
 		else
 		{
@@ -2556,34 +2556,34 @@ public class Roster : MELBIBHDPCE
 			// these settings.  The values below are the runtime defaults, so this is
 			// recoverable and must not abort a Windows Editor playtest.
 			Debug.LogWarning("[UserData] Warrior Sounds section missing; using default volumes.");
-			Sound.JOFLPDCONNC(1f);
-			Sound.FLOFHMBDHNM(false);
-			Sound.OAFCOFNOIJK(1f);
-			Sound.FMLHEDIPGAF(false);
+			Sound.SetSoundVolume(1f);
+			Sound.SetSoundMuted(false);
+			Sound.SetMusicVolume(1f);
+			Sound.SetMusicMuted(false);
 		}
 		SoundController.ApplySavedVolumes();
 	}
 
-	private void BCLGMKICMJM(XmlNode HBKKCEFLPPE)
+	private void ParseCurrencies(XmlNode HBKKCEFLPPE)
 	{
-		List<GameCurrency> list = GameUtils.AJDKHINLIDI.IIAPDCECFCN();
+		List<GameCurrency> list = GameUtils.GameCurrencies.GetCurrencies();
 		foreach (GameCurrency item2 in list)
 		{
 			XmlAttribute cJBEMNNNHDM = HBKKCEFLPPE.Attributes[item2.Name];
 			if (cJBEMNNNHDM.Empty())
 			{
-				HBKKCEFLPPE.LLIKNHNLGJJ(item2.Name).Value = "0";
+				HBKKCEFLPPE.AppendAttribute(item2.Name).Value = "0";
 			}
 			CurrencyStruct item = new CurrencyStruct(item2, cJBEMNNNHDM.ParseInt());
-			DNPGEMMDPNN.Add(item);
+			currencies.Add(item);
 		}
 	}
 
-	private ResistanceStruct PMMBCHOFBNL(string name)
+	private ResistanceStruct FindResistance(string name)
 	{
-		foreach (ResistanceStruct item in OEJCIFGACNG)
+		foreach (ResistanceStruct item in resistances)
 		{
-			if (item.PIFOHOOFJDE.Name == name)
+			if (item.resistance.Name == name)
 			{
 				return item;
 			}
@@ -2591,14 +2591,14 @@ public class Roster : MELBIBHDPCE
 		return null;
 	}
 
-	public bool LDHANGLFDPJ()
+	public bool GetRaidRemindRandomRule()
 	{
-		return MCPCBHPLOPP;
+		return raidRemindRandomRule;
 	}
 
-	public void MOBIJGMLNLI(bool value)
+	public void SetRaidRemindRandomRule(bool value)
 	{
-		MCPCBHPLOPP = value;
-		EMDLLIGKONG("RaidRemindRandomRule", MCPCBHPLOPP);
+		raidRemindRandomRule = value;
+		SetNodeAttribute("RaidRemindRandomRule", raidRemindRandomRule);
 	}
 }

@@ -5,36 +5,36 @@ using UnityEngine;
 
 public static class Sound
 {
-	private static int FINECDOIGAH = 0;
+	private static int MusicChannel = 0;
 
-	private static int OBCGCEHIFBH = 1;
+	private static int FirstSoundChannel = 1;
 
-	private static int AEAIOKEFHGG = 10;
+	private static int LastSoundChannel = 10;
 
-	private static string NEBOIGHENOB = "sounds/";
+	private static string soundsPath = "sounds/";
 
-	private static string BLMBLOKPMEC = "music/";
+	private static string musicPath = "music/";
 
-	private static string LBHNIGEOLPG = ".wav";
+	private static string soundExtension = ".wav";
 
-	private static string EJGKHALAMAG = ".ogg";
+	private static string musicExtension = ".ogg";
 
-	private static float JLGDLCJBGAC = 1f;
+	private static float soundVolume = 1f;
 
-	private static float IOJKBCBFHKJ = 1f;
+	private static float musicVolume = 1f;
 
-	private static bool CFMLCAOIFIM = false;
+	private static bool isMuted = false;
 
-	private static bool KDIFBILDPCK = false;
+	private static bool isSoundMuted = false;
 
-	private static bool MLELLNBHONP = false;
+	private static bool isMusicMuted = false;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private static bool DBHAKEPIFCD;
+	private static bool isMusicPaused;
 
-	private static List<KeyValuePair<string, uint>> BEKCBIJGMPE = new List<KeyValuePair<string, uint>>();
+	private static List<KeyValuePair<string, uint>> playingSounds = new List<KeyValuePair<string, uint>>();
 
-	private static List<KeyValuePair<string, uint>> HLLDPAAADKK = new List<KeyValuePair<string, uint>>();
+	private static List<KeyValuePair<string, uint>> loopingSounds = new List<KeyValuePair<string, uint>>();
 
 	private static readonly HashSet<string> MissingAudioWarnings = new HashSet<string>();
 
@@ -94,314 +94,314 @@ public static class Sound
 	public static uint MaxPlayableSounds = 10u;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private static string HLMKAFLMMNL;
+	private static string currentMusicName;
 
-	public static string CHLDAFKHCBL
+	public static string SoundsPath
 	{
 		get
 		{
-			return AJLAODNPHFB();
+			return GetSoundsPath();
 		}
 		private set
 		{
-			IDLDLAEOBBE(value);
+			SetSoundsPath(value);
 		}
 	}
 
-	public static string NEJNHNCNOOE
+	public static string MusicPath
 	{
 		get
 		{
-			return MEPDBBPHNMD();
+			return GetMusicPath();
 		}
 		private set
 		{
-			JJIFAIOCFFM(value);
+			SetMusicPath(value);
 		}
 	}
 
-	public static string AGGFPFFFBNH
+	public static string SoundExtension
 	{
 		get
 		{
-			return GMGNDGCHFFG();
+			return GetSoundExtension();
 		}
 		private set
 		{
-			KPKNIEIMACC(value);
+			SetSoundExtension(value);
 		}
 	}
 
-	public static string EDEIODDLONI
+	public static string MusicExtension
 	{
 		get
 		{
-			return OFDOCPONLGM();
+			return GetMusicExtension();
 		}
 		private set
 		{
-			BBBCFOKHGCA(value);
+			SetMusicExtension(value);
 		}
 	}
 
-	public static float ECCOGGCFLPF
+	public static float SoundVolume
 	{
 		get
 		{
-			return NBHPABEBLOP();
+			return GetSoundVolume();
 		}
 		set
 		{
-			JOFLPDCONNC(value);
+			SetSoundVolume(value);
 		}
 	}
 
-	public static float JBNOHFLLGPL
+	public static float MusicVolume
 	{
 		get
 		{
-			return EAIGFAPKILL();
+			return GetMusicVolume();
 		}
 		set
 		{
-			OAFCOFNOIJK(value);
+			SetMusicVolume(value);
 		}
 	}
 
-	public static bool JNCMBHENOIM
+	public static bool IsMuted
 	{
 		get
 		{
-			return BLCCOPHEKGL();
+			return GetMuted();
 		}
 		set
 		{
-			AGPDEMFFICJ(value);
+			SetMuted(value);
 		}
 	}
 
-	public static bool BMDKHPCCFGB
+	public static bool IsSoundMuted
 	{
 		get
 		{
-			return AAFLCDKJEPL();
+			return GetSoundMuted();
 		}
 		set
 		{
-			FLOFHMBDHNM(value);
+			SetSoundMuted(value);
 		}
 	}
 
-	public static bool DBLLOGFKAGN
+	public static bool IsMusicMuted
 	{
 		get
 		{
-			return ELHMADOKHHE();
+			return GetMusicMuted();
 		}
 		set
 		{
-			FMLHEDIPGAF(value);
+			SetMusicMuted(value);
 		}
 	}
 
-	public static bool ADKBINPKGLO
+	public static bool IsMusicPlaying
 	{
 		get
 		{
-			return AGCEHOJAJBK();
+			return GetMusicPlaying();
 		}
 	}
 
-	public static bool IALIMAPIFHP
+	public static bool IsMusicPaused
 	{
 		get
 		{
-			return ABIACJPDIKP();
+			return GetMusicPaused();
 		}
 		private set
 		{
-			BOLPPMPALJJ(value);
+			SetMusicPaused(value);
 		}
 	}
 
-	public static string DLFOPJKPMNC
+	public static string CurrentMusicName
 	{
 		get
 		{
-			return PJDJEAPBNLF();
+			return GetCurrentMusicName();
 		}
 		private set
 		{
-			MDAIMFGPCEG(value);
+			SetCurrentMusicName(value);
 		}
 	}
 
-	public static string AJLAODNPHFB()
+	public static string GetSoundsPath()
 	{
-		return NEBOIGHENOB;
+		return soundsPath;
 	}
 
-	private static void IDLDLAEOBBE(string value)
+	private static void SetSoundsPath(string value)
 	{
-		NEBOIGHENOB = value;
-		if (NEBOIGHENOB[NEBOIGHENOB.Length - 1] != '/')
+		soundsPath = value;
+		if (soundsPath[soundsPath.Length - 1] != '/')
 		{
-			NEBOIGHENOB += "/";
+			soundsPath += "/";
 		}
 	}
 
-	public static string MEPDBBPHNMD()
+	public static string GetMusicPath()
 	{
-		return BLMBLOKPMEC;
+		return musicPath;
 	}
 
-	private static void JJIFAIOCFFM(string value)
+	private static void SetMusicPath(string value)
 	{
-		BLMBLOKPMEC = value;
-		if (BLMBLOKPMEC[BLMBLOKPMEC.Length - 1] != '/')
+		musicPath = value;
+		if (musicPath[musicPath.Length - 1] != '/')
 		{
-			BLMBLOKPMEC += "/";
+			musicPath += "/";
 		}
 	}
 
-	public static string GMGNDGCHFFG()
+	public static string GetSoundExtension()
 	{
-		return LBHNIGEOLPG;
+		return soundExtension;
 	}
 
-	private static void KPKNIEIMACC(string value)
+	private static void SetSoundExtension(string value)
 	{
-		LBHNIGEOLPG = value;
-		if (LBHNIGEOLPG[0] != '.')
+		soundExtension = value;
+		if (soundExtension[0] != '.')
 		{
-			LBHNIGEOLPG.Insert(0, ".");
+			soundExtension.Insert(0, ".");
 		}
 	}
 
-	public static string OFDOCPONLGM()
+	public static string GetMusicExtension()
 	{
-		return EJGKHALAMAG;
+		return musicExtension;
 	}
 
-	private static void BBBCFOKHGCA(string value)
+	private static void SetMusicExtension(string value)
 	{
-		EJGKHALAMAG = value;
-		if (EJGKHALAMAG[0] != '.')
+		musicExtension = value;
+		if (musicExtension[0] != '.')
 		{
-			EJGKHALAMAG.Insert(0, ".");
+			musicExtension.Insert(0, ".");
 		}
 	}
 
-	public static float NBHPABEBLOP()
+	public static float GetSoundVolume()
 	{
-		return JLGDLCJBGAC;
+		return soundVolume;
 	}
 
-	public static void JOFLPDCONNC(float value)
+	public static void SetSoundVolume(float value)
 	{
-		JLGDLCJBGAC = Mathf.Clamp(value, 0f, 1f);
-		FAEHODPALBB(JLGDLCJBGAC);
+		soundVolume = Mathf.Clamp(value, 0f, 1f);
+		ApplySoundVolumeToChannels(soundVolume);
 	}
 
-	public static float EAIGFAPKILL()
+	public static float GetMusicVolume()
 	{
-		return IOJKBCBFHKJ;
+		return musicVolume;
 	}
 
-	public static void OAFCOFNOIJK(float value)
+	public static void SetMusicVolume(float value)
 	{
-		IOJKBCBFHKJ = Mathf.Clamp(value, 0f, 1f);
-		SetVolumeToChannel(FINECDOIGAH, value, MLELLNBHONP);
+		musicVolume = Mathf.Clamp(value, 0f, 1f);
+		SetVolumeToChannel(MusicChannel, value, isMusicMuted);
 	}
 
-	public static bool BLCCOPHEKGL()
+	public static bool GetMuted()
 	{
-		return CFMLCAOIFIM;
+		return isMuted;
 	}
 
-	public static void AGPDEMFFICJ(bool value)
+	public static void SetMuted(bool value)
 	{
-		CFMLCAOIFIM = value;
-		FLOFHMBDHNM(value);
-		FMLHEDIPGAF(value);
+		isMuted = value;
+		SetSoundMuted(value);
+		SetMusicMuted(value);
 	}
 
-	public static bool AAFLCDKJEPL()
+	public static bool GetSoundMuted()
 	{
-		return KDIFBILDPCK;
+		return isSoundMuted;
 	}
 
-	public static void FLOFHMBDHNM(bool value)
+	public static void SetSoundMuted(bool value)
 	{
-		if (value != KDIFBILDPCK)
+		if (value != isSoundMuted)
 		{
-			KDIFBILDPCK = value;
-			PPBDLGFBOKL(value);
+			isSoundMuted = value;
+			ApplySoundMuteToChannels(value);
 		}
 	}
 
-	public static bool ELHMADOKHHE()
+	public static bool GetMusicMuted()
 	{
-		return MLELLNBHONP;
+		return isMusicMuted;
 	}
 
-	public static void FMLHEDIPGAF(bool value)
+	public static void SetMusicMuted(bool value)
 	{
-		if (value != MLELLNBHONP)
+		if (value != isMusicMuted)
 		{
-			MLELLNBHONP = value;
-			SetMuteToChannel(FINECDOIGAH, MLELLNBHONP);
+			isMusicMuted = value;
+			SetMuteToChannel(MusicChannel, isMusicMuted);
 		}
 	}
 
-	public static bool AGCEHOJAJBK()
+	public static bool GetMusicPlaying()
 	{
-		return AudioManager.IsPlaying(FINECDOIGAH);
+		return AudioManager.IsPlaying(MusicChannel);
 	}
 
-	public static bool ABIACJPDIKP()
+	public static bool GetMusicPaused()
 	{
-		return DBHAKEPIFCD;
+		return isMusicPaused;
 	}
 
-	private static void BOLPPMPALJJ(bool value)
+	private static void SetMusicPaused(bool value)
 	{
-		DBHAKEPIFCD = value;
+		isMusicPaused = value;
 	}
 
-	public static string PJDJEAPBNLF()
+	public static string GetCurrentMusicName()
 	{
-		return HLMKAFLMMNL;
+		return currentMusicName;
 	}
 
-	private static void MDAIMFGPCEG(string value)
+	private static void SetCurrentMusicName(string value)
 	{
-		HLMKAFLMMNL = value;
+		currentMusicName = value;
 	}
 
-	public static void NMKBJANLIEO(string EGPPPNJHNMF, string ADLELPHJADH)
+	public static void SetPaths(string EGPPPNJHNMF, string ADLELPHJADH)
 	{
-		IDLDLAEOBBE(EGPPPNJHNMF);
-		JJIFAIOCFFM(ADLELPHJADH);
+		SetSoundsPath(EGPPPNJHNMF);
+		SetMusicPath(ADLELPHJADH);
 	}
 
-	public static void HCFBIFOFGLC(string IBFNOCDNNDB, string NHAKIADKLPG)
+	public static void SetExtensions(string IBFNOCDNNDB, string NHAKIADKLPG)
 	{
-		KPKNIEIMACC(IBFNOCDNNDB);
-		BBBCFOKHGCA(NHAKIADKLPG);
+		SetSoundExtension(IBFNOCDNNDB);
+		SetMusicExtension(NHAKIADKLPG);
 	}
 
 	public static void SetVolume(float MJDCMAEEIPJ, float FEFBNAOBBBE)
 	{
-		JOFLPDCONNC(MJDCMAEEIPJ);
-		OAFCOFNOIJK(FEFBNAOBBBE);
+		SetSoundVolume(MJDCMAEEIPJ);
+		SetMusicVolume(FEFBNAOBBBE);
 	}
 
-	private static void FAEHODPALBB(float MJDCMAEEIPJ)
+	private static void ApplySoundVolumeToChannels(float MJDCMAEEIPJ)
 	{
-		for (int i = OBCGCEHIFBH; i <= AEAIOKEFHGG; i++)
+		for (int i = FirstSoundChannel; i <= LastSoundChannel; i++)
 		{
-			SetVolumeToChannel(i, MJDCMAEEIPJ, KDIFBILDPCK);
+			SetVolumeToChannel(i, MJDCMAEEIPJ, isSoundMuted);
 		}
 	}
 
@@ -411,9 +411,9 @@ public static class Sound
 		SetMuteToChannel(LMGPAGINHGD, NGHNGOJHJDE);
 	}
 
-	private static void PPBDLGFBOKL(bool JFIDKIMPPDH)
+	private static void ApplySoundMuteToChannels(bool JFIDKIMPPDH)
 	{
-		for (int i = OBCGCEHIFBH; i <= AEAIOKEFHGG; i++)
+		for (int i = FirstSoundChannel; i <= LastSoundChannel; i++)
 		{
 			SetMuteToChannel(i, JFIDKIMPPDH);
 		}
@@ -431,12 +431,12 @@ public static class Sound
 		}
 	}
 
-	public static int IFKCCDAIADF(string DPBKBKDCIOI, bool KKHJAJFEPPA = false, float JIJAJFEJJHK = 1f)
+	public static int PlaySound(string DPBKBKDCIOI, bool KKHJAJFEPPA = false, float JIJAJFEJJHK = 1f)
 	{
 		if (Eclipse.Multiplayer.SpectatorInputSource.SuppressAudio && !KKHJAJFEPPA) return -1;
 		if (KKHJAJFEPPA)
 		{
-			var loop = BKDELGBHEDP(DPBKBKDCIOI);
+			var loop = FindLoopingSound(DPBKBKDCIOI);
 			if (loop.Key != string.Empty && AudioManager.IsPlaying((int)loop.Value)) return (int)loop.Value;
 		}
 		if (Fight.GetCurrentFight()?.IsTitleSparring == true)
@@ -452,17 +452,17 @@ public static class Sound
 		bool flag = AudioManager.CheckAudioLoaded(DPBKBKDCIOI);
 		if (!flag)
 		{
-			flag = IOIEJHLMBLI(DPBKBKDCIOI, JIJAJFEJJHK);
+			flag = LoadSound(DPBKBKDCIOI, JIJAJFEJJHK);
 		}
 		int num = -1;
 		if (flag)
 		{
-			num = AONDDFIDNJE();
-			MDGPOBCKJMJ(num, DPBKBKDCIOI, KKHJAJFEPPA, KDIFBILDPCK);
-			KCLJDFLJMDO(DPBKBKDCIOI, (uint)num);
+			num = GetFreeChannel();
+			PlayOnChannel(num, DPBKBKDCIOI, KKHJAJFEPPA, isSoundMuted);
+			TrackPlayingSound(DPBKBKDCIOI, (uint)num);
 			if (KKHJAJFEPPA)
 			{
-				EOIPDBEELIJ(DPBKBKDCIOI, (uint)num);
+				TrackLoopingSound(DPBKBKDCIOI, (uint)num);
 				Eclipse.Multiplayer.Rollback.RollbackObjects.LoopStarted(DPBKBKDCIOI);
 			}
 		}
@@ -481,19 +481,19 @@ public static class Sound
 		return num;
 	}
 
-	public static int IFKCCDAIADF(string DPBKBKDCIOI, float JIJAJFEJJHK)
+	public static int PlaySound(string DPBKBKDCIOI, float JIJAJFEJJHK)
 	{
-		return IFKCCDAIADF(DPBKBKDCIOI, false, JIJAJFEJJHK);
+		return PlaySound(DPBKBKDCIOI, false, JIJAJFEJJHK);
 	}
 
-	public static void GKMINHHAMAK()
+	public static void StopAllSounds()
 	{
-		for (int i = OBCGCEHIFBH; i <= AEAIOKEFHGG; i++)
+		for (int i = FirstSoundChannel; i <= LastSoundChannel; i++)
 		{
 			AudioManager.Stop(i);
 		}
-		HLLDPAAADKK.Clear();
-		BEKCBIJGMPE.Clear();
+		loopingSounds.Clear();
+		playingSounds.Clear();
 	}
 
 	// best guess for name
@@ -504,24 +504,24 @@ public static class Sound
 			Eclipse.UI.EclipseUiAudio.StopTitleFightSounds();
 			return;
 		}
-		foreach (KeyValuePair<string, uint> item in HLLDPAAADKK)
+		foreach (KeyValuePair<string, uint> item in loopingSounds)
 		{
 			StopSound((int)item.Value);
 		}
-		HLLDPAAADKK.Clear();
+		loopingSounds.Clear();
 	}
 
-	public static void PMOECBEJGBL()
+	public static void PauseAllSounds()
 	{
-		for (int i = OBCGCEHIFBH; i <= AEAIOKEFHGG; i++)
+		for (int i = FirstSoundChannel; i <= LastSoundChannel; i++)
 		{
 			AudioManager.Pause(true, i);
 		}
 	}
 
-	public static void BPPCHJFPEHB()
+	public static void ResumeAllSounds()
 	{
-		for (int i = OBCGCEHIFBH; i <= AEAIOKEFHGG; i++)
+		for (int i = FirstSoundChannel; i <= LastSoundChannel; i++)
 		{
 			AudioManager.Pause(false, i);
 		}
@@ -539,14 +539,14 @@ public static class Sound
 			Eclipse.UI.EclipseUiAudio.StopTitleFightSound(path);
 			return;
 		}
-		KeyValuePair<string, uint> keyValuePair = BKDELGBHEDP(path);
+		KeyValuePair<string, uint> keyValuePair = FindLoopingSound(path);
 		if (keyValuePair.Key != string.Empty)
 		{
-			HOEPOMDNEML(path);
+			UntrackLoopingSound(path);
 			StopSound((int)keyValuePair.Value);
 			return;
 		}
-		foreach (KeyValuePair<string, uint> item in BEKCBIJGMPE)
+		foreach (KeyValuePair<string, uint> item in playingSounds)
 		{
 			if (keyValuePair.Key == path)
 			{
@@ -570,8 +570,8 @@ public static class Sound
 		if (Eclipse.Modding.ModAssetBinding.TryLoadAudio(LOJOJHIFCBL, out audioClip))
 		{
 			AudioManager.AddAudio(audioClip, LOJOJHIFCBL, 1f);
-			MDGPOBCKJMJ(FINECDOIGAH, LOJOJHIFCBL, KKHJAJFEPPA, MLELLNBHONP);
-			MDAIMFGPCEG(LOJOJHIFCBL);
+			PlayOnChannel(MusicChannel, LOJOJHIFCBL, KKHJAJFEPPA, isMusicMuted);
+			SetCurrentMusicName(LOJOJHIFCBL);
 			return;
 		}
 		if (Eclipse.Modding.ModAssetBinding.IsQualified(LOJOJHIFCBL))
@@ -582,10 +582,10 @@ public static class Sound
 			}
 			return;
 		}
-		string bLMBLOKPMEC = BLMBLOKPMEC;
+		string bLMBLOKPMEC = musicPath;
 		string text = LOJOJHIFCBL;
 		bool flag = text.EndsWith(".ogg", System.StringComparison.OrdinalIgnoreCase);
-		bLMBLOKPMEC = ((!flag && !SF2Paths.CGOHPKEBECD) ? (bLMBLOKPMEC + LOJOJHIFCBL + EJGKHALAMAG) : (bLMBLOKPMEC + LOJOJHIFCBL));
+		bLMBLOKPMEC = ((!flag && !SF2Paths.UseBundledResources) ? (bLMBLOKPMEC + LOJOJHIFCBL + musicExtension) : (bLMBLOKPMEC + LOJOJHIFCBL));
 		audioClip = ResourceManager.GetAudioClip(bLMBLOKPMEC);
 		if (audioClip == null)
 		{
@@ -610,8 +610,8 @@ public static class Sound
 			}
 		}
 		AudioManager.AddAudio(audioClip, LOJOJHIFCBL, 1f);
-		MDGPOBCKJMJ(FINECDOIGAH, LOJOJHIFCBL, KKHJAJFEPPA, MLELLNBHONP);
-		MDAIMFGPCEG(LOJOJHIFCBL);
+		PlayOnChannel(MusicChannel, LOJOJHIFCBL, KKHJAJFEPPA, isMusicMuted);
+		SetCurrentMusicName(LOJOJHIFCBL);
 	}
 
 	private static string ResolveRecoveredMusicName(string requested)
@@ -632,10 +632,10 @@ public static class Sound
 
 	private static string BuildMusicPath(string musicName)
 	{
-		return BLMBLOKPMEC + musicName + ((!SF2Paths.CGOHPKEBECD) ? EJGKHALAMAG : string.Empty);
+		return musicPath + musicName + ((!SF2Paths.UseBundledResources) ? musicExtension : string.Empty);
 	}
 
-	public static void MDGPOBCKJMJ(int ADNDLGKIJJK, string DPBKBKDCIOI, bool KKHJAJFEPPA, bool KPCIIDFJCOB)
+	public static void PlayOnChannel(int ADNDLGKIJJK, string DPBKBKDCIOI, bool KKHJAJFEPPA, bool KPCIIDFJCOB)
 	{
 		AudioManager.Play(ADNDLGKIJJK, DPBKBKDCIOI, KKHJAJFEPPA, true);
 		SetMuteToChannel(ADNDLGKIJJK, KPCIIDFJCOB);
@@ -645,29 +645,29 @@ public static class Sound
 	public static void StopMusic()
 	{
 		// Paused sources also need stopping when a fight is left.
-		AudioManager.Stop(FINECDOIGAH);
-		if (PJDJEAPBNLF() != null)
+		AudioManager.Stop(MusicChannel);
+		if (GetCurrentMusicName() != null)
 		{
-			AudioManager.UnloadAudio(PJDJEAPBNLF());
-			MDAIMFGPCEG(null);
+			AudioManager.UnloadAudio(GetCurrentMusicName());
+			SetCurrentMusicName(null);
 		}
 	}
 
-	public static void CKIHDLJBGAE()
+	public static void PauseMusic()
 	{
-		if (AudioManager.IsPlaying(FINECDOIGAH))
+		if (AudioManager.IsPlaying(MusicChannel))
 		{
-			AudioManager.Pause(true, FINECDOIGAH);
-			BOLPPMPALJJ(true);
+			AudioManager.Pause(true, MusicChannel);
+			SetMusicPaused(true);
 		}
 	}
 
-	public static void MPAHNMFMHHK()
+	public static void ResumeMusic()
 	{
-		if (AudioManager.IsPlaying(FINECDOIGAH))
+		if (AudioManager.IsPlaying(MusicChannel))
 		{
-			AudioManager.Pause(false, FINECDOIGAH);
-			BOLPPMPALJJ(false);
+			AudioManager.Pause(false, MusicChannel);
+			SetMusicPaused(false);
 		}
 	}
 
@@ -675,11 +675,11 @@ public static class Sound
 	{
 		foreach (string item in NAECCPFPEHC)
 		{
-			IOIEJHLMBLI(item, NBHPABEBLOP());
+			LoadSound(item, GetSoundVolume());
 		}
 	}
 
-	public static bool IOIEJHLMBLI(string DPBKBKDCIOI, float JIJAJFEJJHK = 1f)
+	public static bool LoadSound(string DPBKBKDCIOI, float JIJAJFEJJHK = 1f)
 	{
 		AudioClip audioClip = LoadSoundClip(DPBKBKDCIOI);
 		if (audioClip != null) AudioManager.AddAudio(audioClip, DPBKBKDCIOI, JIJAJFEJJHK);
@@ -697,47 +697,47 @@ public static class Sound
 		{
 			return null;
 		}
-		string text = AJLAODNPHFB();
+		string text = GetSoundsPath();
 		text += DPBKBKDCIOI;
-		if (!SF2Paths.CGOHPKEBECD)
+		if (!SF2Paths.UseBundledResources)
 		{
-			text += GMGNDGCHFFG();
+			text += GetSoundExtension();
 		}
 		return ResourceManager.GetAudioClip(text);
 	}
 
-	private static void KCLJDFLJMDO(string path, uint OKNNNLIPODI)
+	private static void TrackPlayingSound(string path, uint OKNNNLIPODI)
 	{
 		KeyValuePair<string, uint> item = new KeyValuePair<string, uint>(path, OKNNNLIPODI);
-		if (BEKCBIJGMPE.Count == MaxPlayableSounds)
+		if (playingSounds.Count == MaxPlayableSounds)
 		{
-			BEKCBIJGMPE.Remove(BEKCBIJGMPE[0]);
+			playingSounds.Remove(playingSounds[0]);
 		}
-		BEKCBIJGMPE.Add(item);
+		playingSounds.Add(item);
 	}
 
-	private static void EOIPDBEELIJ(string path, uint OKNNNLIPODI)
+	private static void TrackLoopingSound(string path, uint OKNNNLIPODI)
 	{
 		KeyValuePair<string, uint> item = new KeyValuePair<string, uint>(path, OKNNNLIPODI);
-		HLLDPAAADKK.Add(item);
+		loopingSounds.Add(item);
 	}
 
-	private static void HOEPOMDNEML(string path)
+	private static void UntrackLoopingSound(string path)
 	{
-		foreach (KeyValuePair<string, uint> item in HLLDPAAADKK)
+		foreach (KeyValuePair<string, uint> item in loopingSounds)
 		{
 			if (item.Key == path)
 			{
-				HLLDPAAADKK.Remove(item);
+				loopingSounds.Remove(item);
 				break;
 			}
 		}
 	}
 
-	private static KeyValuePair<string, uint> BKDELGBHEDP(string path)
+	private static KeyValuePair<string, uint> FindLoopingSound(string path)
 	{
 		KeyValuePair<string, uint> result = new KeyValuePair<string, uint>(string.Empty, 0u);
-		foreach (KeyValuePair<string, uint> item in HLLDPAAADKK)
+		foreach (KeyValuePair<string, uint> item in loopingSounds)
 		{
 			if (item.Key == path)
 			{
@@ -750,23 +750,23 @@ public static class Sound
 
 	public static void Init()
 	{
-		int[] array = new int[AEAIOKEFHGG - OBCGCEHIFBH + 1];
-		for (int i = OBCGCEHIFBH; i <= AEAIOKEFHGG; i++)
+		int[] array = new int[LastSoundChannel - FirstSoundChannel + 1];
+		for (int i = FirstSoundChannel; i <= LastSoundChannel; i++)
 		{
-			array[i - OBCGCEHIFBH] = i;
+			array[i - FirstSoundChannel] = i;
 		}
-		AudioManager.Init(null, FINECDOIGAH, array);
+		AudioManager.Init(null, MusicChannel, array);
 	}
 
-	public static int AONDDFIDNJE()
+	public static int GetFreeChannel()
 	{
-		for (int i = OBCGCEHIFBH; i <= AEAIOKEFHGG; i++)
+		for (int i = FirstSoundChannel; i <= LastSoundChannel; i++)
 		{
 			if (!AudioManager.IsPlaying(i))
 			{
 				return i;
 			}
 		}
-		return AEAIOKEFHGG;
+		return LastSoundChannel;
 	}
 }

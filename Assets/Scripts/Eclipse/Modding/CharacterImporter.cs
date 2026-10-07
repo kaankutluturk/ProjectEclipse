@@ -152,7 +152,7 @@ namespace Eclipse.Modding
         /// <summary>Writes the game's canonical combat skeleton for the importer. Main thread only.</summary>
         internal static void WriteCanonicalRig(string path)
         {
-            var document = ModelLoader.FHGHPCACAKJ.JBJDPDOEGFO(SF2Paths.BNHLPKEDMOM(), "mdl_skeleton.xml");
+            var document = ModelLoader.DocumentCache.GetDocument(SF2Paths.GetModelsPath(), "mdl_skeleton.xml");
             if (document == null || document["Scene"] == null)
                 throw new InvalidDataException("The game's combat skeleton (mdl_skeleton) could not be read.");
             using (var writer = new StreamWriter(path, false, new UTF8Encoding(false)))
@@ -205,7 +205,7 @@ namespace Eclipse.Modding
             foreach (var (file, frame) in PreviewClips)
             {
                 // The game's own clips feed the preview; a missing one only drops that cell.
-                byte[] data = ResourceManager.GetBinary(SF2Paths.CBKLONCNPCP() + "/" + file);
+                byte[] data = ResourceManager.GetBinary(SF2Paths.GetBinaryAnimationsPath() + "/" + file);
                 if (data == null || data.Length == 0) continue;
                 string path = Path.Combine(work, file);
                 File.WriteAllBytes(path, data);

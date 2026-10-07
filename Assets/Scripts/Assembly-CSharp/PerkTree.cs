@@ -3,7 +3,7 @@ using System.Xml;
 
 public class PerkTree
 {
-	public enum AAAIBJGLPAI
+	public enum PerkItemType
 	{
 		TYPE_NONE = 0,
 		TYPE_PERK = 1,
@@ -12,30 +12,30 @@ public class PerkTree
 
 	public class PerkItem
 	{
-		public AAAIBJGLPAI Type;
+		public PerkItemType Type;
 
 		public string Name;
 
 		public int Level;
 
-		public PerkItem(AAAIBJGLPAI _type, string _name, int _level)
+		public PerkItem(PerkItemType _type, string _name, int _level)
 		{
 			Type = _type;
 			Name = _name;
 			Level = _level;
 		}
 
-		public bool KHNMKGFDPHD()
+		public bool IsAvailable()
 		{
 			bool flag = false;
-			RosterPerk hOGDBKBFFDJ = ListSF.CCDKHLAMKKO().JLBDOBLHHAF().LKIEAGLHNON(Name);
+			RosterPerk hOGDBKBFFDJ = ListSF.GetRoster().GetPerks().FindPerk(Name);
 			bool flag2 = hOGDBKBFFDJ != null;
 			switch (Type)
 			{
-			case AAAIBJGLPAI.TYPE_PERK:
-				return !flag2 || hOGDBKBFFDJ.PINDEKDNCNL() >= Level;
-			case AAAIBJGLPAI.TYPE_UPGRADE:
-				return flag2 && hOGDBKBFFDJ.PINDEKDNCNL() <= Level;
+			case PerkItemType.TYPE_PERK:
+				return !flag2 || hOGDBKBFFDJ.GetLevel() >= Level;
+			case PerkItemType.TYPE_UPGRADE:
+				return flag2 && hOGDBKBFFDJ.GetLevel() <= Level;
 			default:
 				return false;
 			}
@@ -44,7 +44,7 @@ public class PerkTree
 
 	public class PerkBranch
 	{
-		public List<PerkItem> OJIAKDDCGLB = new List<PerkItem>();
+		public List<PerkItem> Items = new List<PerkItem>();
 
 		public int Level;
 
@@ -53,13 +53,13 @@ public class PerkTree
 			Level = _level;
 		}
 
-		public List<PerkItem> HNGFNDIKHEC(int CCBEHBMOPMC = 2)
+		public List<PerkItem> GetAvailableItems(int CCBEHBMOPMC = 2)
 		{
 			List<PerkItem> list = new List<PerkItem>();
-			for (int i = 0; i < OJIAKDDCGLB.Count; i++)
+			for (int i = 0; i < Items.Count; i++)
 			{
-				PerkItem pJOFNPMOJJA = OJIAKDDCGLB[i];
-				if (pJOFNPMOJJA.KHNMKGFDPHD())
+				PerkItem pJOFNPMOJJA = Items[i];
+				if (pJOFNPMOJJA.IsAvailable())
 				{
 					list.Add(pJOFNPMOJJA);
 				}
@@ -74,15 +74,15 @@ public class PerkTree
 
 	private static PerkTree _instance;
 
-	private List<PerkBranch> COPMNJGPPIH = new List<PerkBranch>();
+	private List<PerkBranch> branches = new List<PerkBranch>();
 
-	private List<ProfilePerkContainer> HBDGGFOPFFB = new List<ProfilePerkContainer>();
+	private List<ProfilePerkContainer> levelContainers = new List<ProfilePerkContainer>();
 
-	private List<ProfilePerk> DPPMNFCIIGP = new List<ProfilePerk>();
+	private List<ProfilePerk> profilePerks = new List<ProfilePerk>();
 
-	private List<PerkInfoItem> PPHJHENDCLL = new List<PerkInfoItem>();
+	private List<PerkInfoItem> availablePerkInfos = new List<PerkInfoItem>();
 
-	public static PerkTree GBPBIPFIOJH()
+	public static PerkTree GetInstance()
 	{
 		if (_instance == null)
 		{
@@ -98,53 +98,53 @@ public class PerkTree
 
 	public void Clear()
 	{
-		COPMNJGPPIH.Clear();
-		FAGKACLCCPE();
+		branches.Clear();
+		ClearProfileState();
 	}
 
-	public void FAGKACLCCPE()
+	public void ClearProfileState()
 	{
-		HBDGGFOPFFB.Clear();
-		DPPMNFCIIGP.Clear();
-		PPHJHENDCLL.Clear();
+		levelContainers.Clear();
+		profilePerks.Clear();
+		availablePerkInfos.Clear();
 	}
 
-	public void LJHPGKAOIAE()
+	public void RebuildProfile()
 	{
-		FAGKACLCCPE();
+		ClearProfileState();
 		// Profile initialization removes learned perks from this working list. Keep
 		// the content catalog intact when replacing the title's preview profile.
-		PPHJHENDCLL = new List<PerkInfoItem>(GameUtils.FDEJIIDIPBI.GFPFNILGJML());
-		List<PerkBranch> list = GBPBIPFIOJH().LGGMDGDHJJP();
+		availablePerkInfos = new List<PerkInfoItem>(GameUtils.PerkItemList.GetProgressionPerks());
+		List<PerkBranch> list = GetInstance().GetBranches();
 		for (int i = 0; i < list.Count; i++)
 		{
 			PerkBranch gOOLLBPEFJM = list[i];
-			int bLJGEOEHIGP = ((gOOLLBPEFJM.OJIAKDDCGLB.Count == 1) ? 1 : 2);
-			AHPDPEDGJLM(gOOLLBPEFJM.Level, bLJGEOEHIGP);
+			int bLJGEOEHIGP = ((gOOLLBPEFJM.Items.Count == 1) ? 1 : 2);
+			AddEmptyContainer(gOOLLBPEFJM.Level, bLJGEOEHIGP);
 		}
 		if (list.Count != 0)
 		{
-			AEOKBBBAANA(list[0]);
+			RefreshBranch(list[0]);
 		}
-		DCBCNJJCAMP();
-		List<PerkHistory.Perk> jOGBKOJCINM = ListSF.CCDKHLAMKKO().JLBDOBLHHAF().GIAEMMLABDL.JOGBKOJCINM;
+		UnlockFirstLevelPerks();
+		List<PerkHistory.Perk> jOGBKOJCINM = ListSF.GetRoster().GetPerks().History.Perks;
 		for (int j = 0; j < jOGBKOJCINM.Count; j++)
 		{
-			AEOKBBBAANA(jOGBKOJCINM[j]);
+			ApplyLearnedPerk(jOGBKOJCINM[j]);
 		}
 	}
 
-	public void AEOKBBBAANA(PerkHistory.Perk AEFFHJGMNFI)
+	public void ApplyLearnedPerk(PerkHistory.Perk AEFFHJGMNFI)
 	{
 		if (AEFFHJGMNFI != null)
 		{
 			RemovePerkInfoItemIfExist(AEFFHJGMNFI.Name);
-			PerkBranch gOOLLBPEFJM = FMNLBLFHJFB(AEFFHJGMNFI.Level);
+			PerkBranch gOOLLBPEFJM = FindNextBranchAfterLevel(AEFFHJGMNFI.Level);
 			if (gOOLLBPEFJM != null)
 			{
-				AEOKBBBAANA(gOOLLBPEFJM);
+				RefreshBranch(gOOLLBPEFJM);
 			}
-			KCOMDIKHFCH(AEFFHJGMNFI);
+			UpdateStatesForLearnedPerk(AEFFHJGMNFI);
 		}
 	}
 
@@ -153,18 +153,18 @@ public class PerkTree
 		Clear();
 		foreach (XmlNode childNode in node.ChildNodes)
 		{
-			FBCMCLEBAKC(childNode);
+			ParseBranch(childNode);
 		}
-		COPMNJGPPIH.Sort((PerkBranch LHBNIMGFKIB, PerkBranch AAOIAEJJINO) => LHBNIMGFKIB.Level.CompareTo(AAOIAEJJINO.Level));
+		branches.Sort((PerkBranch LHBNIMGFKIB, PerkBranch AAOIAEJJINO) => LHBNIMGFKIB.Level.CompareTo(AAOIAEJJINO.Level));
 	}
 
-	public int KBIOIHPNLIM()
+	public int GetUnlockedBranchCount()
 	{
 		int num = 0;
-		int num2 = ListSF.CCDKHLAMKKO().PINDEKDNCNL();
-		for (int i = 0; i < COPMNJGPPIH.Count; i++)
+		int num2 = ListSF.GetRoster().GetLevel();
+		for (int i = 0; i < branches.Count; i++)
 		{
-			PerkBranch gOOLLBPEFJM = COPMNJGPPIH[i];
+			PerkBranch gOOLLBPEFJM = branches[i];
 			if (gOOLLBPEFJM.Level > num2)
 			{
 				break;
@@ -174,54 +174,54 @@ public class PerkTree
 		return num;
 	}
 
-	public List<PerkBranch> LGGMDGDHJJP()
+	public List<PerkBranch> GetBranches()
 	{
-		return COPMNJGPPIH;
+		return branches;
 	}
 
 	public PerkBranch ReplaceExternalBranch(int level, IReadOnlyList<PerkItem> items)
 	{
 		if (items == null || items.Count == 0)
 			throw new System.ArgumentException("External perk-tree branch requires at least one item.", "items");
-		PerkBranch previous = FMNLBLFHJFB(level);
+		PerkBranch previous = FindNextBranchAfterLevel(level);
 		PerkBranch replacement = new PerkBranch(level);
 		for (int i = 0; i < items.Count; i++)
 		{
 			PerkItem item = items[i];
-			if (item == null || item.Type == AAAIBJGLPAI.TYPE_NONE || string.IsNullOrEmpty(item.Name))
+			if (item == null || item.Type == PerkItemType.TYPE_NONE || string.IsNullOrEmpty(item.Name))
 				throw new System.ArgumentException("External perk-tree branch contains an invalid item.", "items");
-			replacement.OJIAKDDCGLB.Add(new PerkItem(item.Type, item.Name, level));
+			replacement.Items.Add(new PerkItem(item.Type, item.Name, level));
 		}
-		if (previous != null) COPMNJGPPIH.Remove(previous);
-		COPMNJGPPIH.Add(replacement);
-		COPMNJGPPIH.Sort((left, right) => left.Level.CompareTo(right.Level));
+		if (previous != null) branches.Remove(previous);
+		branches.Add(replacement);
+		branches.Sort((left, right) => left.Level.CompareTo(right.Level));
 		return previous;
 	}
 
 	public void RestoreExternalBranch(int level, PerkBranch branch)
 	{
-		PerkBranch current = FMNLBLFHJFB(level);
-		if (current != null) COPMNJGPPIH.Remove(current);
-		if (branch != null) COPMNJGPPIH.Add(branch);
-		COPMNJGPPIH.Sort((left, right) => left.Level.CompareTo(right.Level));
+		PerkBranch current = FindNextBranchAfterLevel(level);
+		if (current != null) branches.Remove(current);
+		if (branch != null) branches.Add(branch);
+		branches.Sort((left, right) => left.Level.CompareTo(right.Level));
 	}
 
-	public List<ProfilePerk> JGCHDCOOGII()
+	public List<ProfilePerk> GetProfilePerks()
 	{
-		return DPPMNFCIIGP;
+		return profilePerks;
 	}
 
-	public List<ProfilePerk> HBODBIBFIKM(int GNLOCMLBNHF)
+	public List<ProfilePerk> GetProfilePerksAtLevel(int GNLOCMLBNHF)
 	{
 		List<ProfilePerk> list = new List<ProfilePerk>();
-		for (int i = 0; i < DPPMNFCIIGP.Count; i++)
+		for (int i = 0; i < profilePerks.Count; i++)
 		{
-			ProfilePerk pLKCIINIFMJ = DPPMNFCIIGP[i];
-			if (pLKCIINIFMJ.PINDEKDNCNL() == GNLOCMLBNHF)
+			ProfilePerk pLKCIINIFMJ = profilePerks[i];
+			if (pLKCIINIFMJ.GetLevel() == GNLOCMLBNHF)
 			{
 				list.Add(pLKCIINIFMJ);
 			}
-			else if (pLKCIINIFMJ.PINDEKDNCNL() > GNLOCMLBNHF)
+			else if (pLKCIINIFMJ.GetLevel() > GNLOCMLBNHF)
 			{
 				break;
 			}
@@ -229,12 +229,12 @@ public class PerkTree
 		return list;
 	}
 
-	public ProfilePerk LAAJJBEEDKL(string name)
+	public ProfilePerk FindProfilePerk(string name)
 	{
-		for (int i = 0; i < DPPMNFCIIGP.Count; i++)
+		for (int i = 0; i < profilePerks.Count; i++)
 		{
-			ProfilePerk pLKCIINIFMJ = DPPMNFCIIGP[i];
-			if (pLKCIINIFMJ.KAMBOKLFBEE() == name)
+			ProfilePerk pLKCIINIFMJ = profilePerks[i];
+			if (pLKCIINIFMJ.GetPerkName() == name)
 			{
 				return pLKCIINIFMJ;
 			}
@@ -242,16 +242,16 @@ public class PerkTree
 		return null;
 	}
 
-	public List<ProfilePerkContainer> KGKJCLDFIHA()
+	public List<ProfilePerkContainer> GetLevelContainers()
 	{
-		return HBDGGFOPFFB;
+		return levelContainers;
 	}
 
-	public ProfilePerkContainer HKCIFHMLKKM(int GNLOCMLBNHF)
+	public ProfilePerkContainer GetContainerAtLevel(int GNLOCMLBNHF)
 	{
-		for (int i = 0; i < HBDGGFOPFFB.Count; i++)
+		for (int i = 0; i < levelContainers.Count; i++)
 		{
-			ProfilePerkContainer fHPJJGPJLHD = HBDGGFOPFFB[i];
+			ProfilePerkContainer fHPJJGPJLHD = levelContainers[i];
 			if (fHPJJGPJLHD.Level == GNLOCMLBNHF)
 			{
 				return fHPJJGPJLHD;
@@ -260,11 +260,11 @@ public class PerkTree
 		return null;
 	}
 
-	public ProfilePerkContainer HPKLHAAFPHK(int GNLOCMLBNHF)
+	public ProfilePerkContainer GetNextContainerAfterLevel(int GNLOCMLBNHF)
 	{
-		for (int i = 0; i < HBDGGFOPFFB.Count; i++)
+		for (int i = 0; i < levelContainers.Count; i++)
 		{
-			ProfilePerkContainer fHPJJGPJLHD = HBDGGFOPFFB[i];
+			ProfilePerkContainer fHPJJGPJLHD = levelContainers[i];
 			if (fHPJJGPJLHD.Level > GNLOCMLBNHF)
 			{
 				return fHPJJGPJLHD;
@@ -273,11 +273,11 @@ public class PerkTree
 		return null;
 	}
 
-	public PerkBranch FMNLBLFHJFB(int GNLOCMLBNHF)
+	public PerkBranch FindNextBranchAfterLevel(int GNLOCMLBNHF)
 	{
-		for (int i = 0; i < COPMNJGPPIH.Count; i++)
+		for (int i = 0; i < branches.Count; i++)
 		{
-			PerkBranch gOOLLBPEFJM = COPMNJGPPIH[i];
+			PerkBranch gOOLLBPEFJM = branches[i];
 			if (gOOLLBPEFJM.Level > GNLOCMLBNHF)
 			{
 				return gOOLLBPEFJM;
@@ -286,114 +286,114 @@ public class PerkTree
 		return null;
 	}
 
-	private void FBCMCLEBAKC(XmlNode node)
+	private void ParseBranch(XmlNode node)
 	{
 		int iBMNBEGDMBJ = node.Attributes["Value"].ParseInt();
 		PerkBranch gOOLLBPEFJM = new PerkBranch(iBMNBEGDMBJ);
 		foreach (XmlNode childNode in node.ChildNodes)
 		{
-			AAAIBJGLPAI aMKFIJMKLIB = MLFLOGKMLJI(childNode.Name);
-			string pHJCCJNOCGJ = childNode.Attributes["Name"].CIPOICEEIBK(string.Empty);
+			PerkItemType aMKFIJMKLIB = ParseItemType(childNode.Name);
+			string pHJCCJNOCGJ = childNode.Attributes["Name"].GetStringOrDefault(string.Empty);
 			PerkItem item = new PerkItem(aMKFIJMKLIB, pHJCCJNOCGJ, iBMNBEGDMBJ);
-			gOOLLBPEFJM.OJIAKDDCGLB.Add(item);
+			gOOLLBPEFJM.Items.Add(item);
 		}
-		COPMNJGPPIH.Add(gOOLLBPEFJM);
+		branches.Add(gOOLLBPEFJM);
 	}
 
 	private void RemoveProfilePerksWithLevel(int GNLOCMLBNHF)
 	{
 		int num = 0;
-		while (num != DPPMNFCIIGP.Count)
+		while (num != profilePerks.Count)
 		{
-			if (DPPMNFCIIGP[num].PINDEKDNCNL() == GNLOCMLBNHF)
+			if (profilePerks[num].GetLevel() == GNLOCMLBNHF)
 			{
-				DPPMNFCIIGP.RemoveAt(num);
+				profilePerks.RemoveAt(num);
 			}
 			else
 			{
 				num++;
 			}
 		}
-		ProfilePerkContainer fHPJJGPJLHD = HKCIFHMLKKM(GNLOCMLBNHF);
+		ProfilePerkContainer fHPJJGPJLHD = GetContainerAtLevel(GNLOCMLBNHF);
 		if (fHPJJGPJLHD != null)
 		{
-			List<ProfilePerk> jOGBKOJCINM = fHPJJGPJLHD.JOGBKOJCINM;
+			List<ProfilePerk> jOGBKOJCINM = fHPJJGPJLHD.Perks;
 			jOGBKOJCINM.Clear();
 		}
 	}
 
-	private void EKJFPAJMIIF(PerkBranch JBEIKKDKINI)
+	private void PopulateBranchPerks(PerkBranch JBEIKKDKINI)
 	{
-		List<PerkItem> list = JBEIKKDKINI.HNGFNDIKHEC();
-		ProfilePerkContainer fHPJJGPJLHD = HKCIFHMLKKM(JBEIKKDKINI.Level);
+		List<PerkItem> list = JBEIKKDKINI.GetAvailableItems();
+		ProfilePerkContainer fHPJJGPJLHD = GetContainerAtLevel(JBEIKKDKINI.Level);
 		for (int i = 0; i < list.Count; i++)
 		{
 			PerkItem pJOFNPMOJJA = list[i];
-			PerkInfoItem aCONCDFDNJH = CIHOCOBECNP(pJOFNPMOJJA.Name);
+			PerkInfoItem aCONCDFDNJH = FindPerkInfo(pJOFNPMOJJA.Name);
 			if (aCONCDFDNJH != null)
 			{
-				ProfilePerk item = new ProfilePerk(aCONCDFDNJH, pJOFNPMOJJA.Level, ProfilePerk.KMHBPKKCNPP.PERK_LOCK, HCHAAHKHCFN(pJOFNPMOJJA.Type));
-				DPPMNFCIIGP.Add(item);
+				ProfilePerk item = new ProfilePerk(aCONCDFDNJH, pJOFNPMOJJA.Level, ProfilePerk.ProfilePerkState.PERK_LOCK, ToProfilePerkType(pJOFNPMOJJA.Type));
+				profilePerks.Add(item);
 				if (fHPJJGPJLHD != null)
 				{
-					fHPJJGPJLHD.JOGBKOJCINM.Add(item);
+					fHPJJGPJLHD.Perks.Add(item);
 				}
 			}
 		}
 	}
 
-	private void AHPDPEDGJLM(int GNLOCMLBNHF, int count = 2)
+	private void AddEmptyContainer(int GNLOCMLBNHF, int count = 2)
 	{
 		ProfilePerkContainer fHPJJGPJLHD = new ProfilePerkContainer(GNLOCMLBNHF);
-		HBDGGFOPFFB.Add(fHPJJGPJLHD);
+		levelContainers.Add(fHPJJGPJLHD);
 		for (int i = 0; i < count; i++)
 		{
-			ProfilePerk item = new ProfilePerk(null, GNLOCMLBNHF, ProfilePerk.KMHBPKKCNPP.PERK_LOCK);
-			DPPMNFCIIGP.Add(item);
-			fHPJJGPJLHD.JOGBKOJCINM.Add(item);
+			ProfilePerk item = new ProfilePerk(null, GNLOCMLBNHF, ProfilePerk.ProfilePerkState.PERK_LOCK);
+			profilePerks.Add(item);
+			fHPJJGPJLHD.Perks.Add(item);
 		}
 	}
 
-	private void AEOKBBBAANA(PerkBranch JBEIKKDKINI)
+	private void RefreshBranch(PerkBranch JBEIKKDKINI)
 	{
 		RemoveProfilePerksWithLevel(JBEIKKDKINI.Level);
-		EKJFPAJMIIF(JBEIKKDKINI);
-		DPPMNFCIIGP.Sort((ProfilePerk LHBNIMGFKIB, ProfilePerk AAOIAEJJINO) => LHBNIMGFKIB.PINDEKDNCNL().CompareTo(AAOIAEJJINO.PINDEKDNCNL()));
+		PopulateBranchPerks(JBEIKKDKINI);
+		profilePerks.Sort((ProfilePerk LHBNIMGFKIB, ProfilePerk AAOIAEJJINO) => LHBNIMGFKIB.GetLevel().CompareTo(AAOIAEJJINO.GetLevel()));
 	}
 
-	private void KCOMDIKHFCH(PerkHistory.Perk AEFFHJGMNFI)
+	private void UpdateStatesForLearnedPerk(PerkHistory.Perk AEFFHJGMNFI)
 	{
-		List<ProfilePerk> list = HBODBIBFIKM(AEFFHJGMNFI.Level);
+		List<ProfilePerk> list = GetProfilePerksAtLevel(AEFFHJGMNFI.Level);
 		for (int i = 0; i < list.Count; i++)
 		{
 			ProfilePerk pLKCIINIFMJ = list[i];
-			ProfilePerk.KMHBPKKCNPP bAINMLLIKOL = ((!(pLKCIINIFMJ.KAMBOKLFBEE() == AEFFHJGMNFI.Name)) ? ProfilePerk.KMHBPKKCNPP.PERK_UNAVAILABLE : ProfilePerk.KMHBPKKCNPP.PERK_SELECTED);
+			ProfilePerk.ProfilePerkState bAINMLLIKOL = ((!(pLKCIINIFMJ.GetPerkName() == AEFFHJGMNFI.Name)) ? ProfilePerk.ProfilePerkState.PERK_UNAVAILABLE : ProfilePerk.ProfilePerkState.PERK_SELECTED);
 			pLKCIINIFMJ.set_State(bAINMLLIKOL);
 		}
-		List<ProfilePerk> list2 = ENFMEDEFINB(AEFFHJGMNFI.Level);
+		List<ProfilePerk> list2 = GetNextLevelProfilePerks(AEFFHJGMNFI.Level);
 		for (int j = 0; j < list2.Count; j++)
 		{
-			list2[j].set_State(ProfilePerk.KMHBPKKCNPP.PERK_AVAILABLE);
+			list2[j].set_State(ProfilePerk.ProfilePerkState.PERK_AVAILABLE);
 		}
 	}
 
-	private void DCBCNJJCAMP()
+	private void UnlockFirstLevelPerks()
 	{
-		if (DPPMNFCIIGP.Count > 0)
+		if (profilePerks.Count > 0)
 		{
-			int num = DPPMNFCIIGP[0].PINDEKDNCNL();
-			int count = DPPMNFCIIGP.Count;
-			for (int i = 0; i < count && num == DPPMNFCIIGP[i].PINDEKDNCNL(); i++)
+			int num = profilePerks[0].GetLevel();
+			int count = profilePerks.Count;
+			for (int i = 0; i < count && num == profilePerks[i].GetLevel(); i++)
 			{
-				DPPMNFCIIGP[i].set_State(ProfilePerk.KMHBPKKCNPP.PERK_AVAILABLE);
+				profilePerks[i].set_State(ProfilePerk.ProfilePerkState.PERK_AVAILABLE);
 			}
 		}
 	}
 
-	private PerkInfoItem CIHOCOBECNP(string name)
+	private PerkInfoItem FindPerkInfo(string name)
 	{
 		PerkInfoItem aCONCDFDNJH = null;
-		foreach (PerkInfoItem item in PPHJHENDCLL)
+		foreach (PerkInfoItem item in availablePerkInfos)
 		{
 			if (item.Name == name)
 			{
@@ -403,58 +403,58 @@ public class PerkTree
 		}
 		if (aCONCDFDNJH == null)
 		{
-			aCONCDFDNJH = GameUtils.FDEJIIDIPBI.ABAGJKMKCBA(name);
+			aCONCDFDNJH = GameUtils.PerkItemList.FindBasePerk(name);
 		}
 		return aCONCDFDNJH;
 	}
 
 	private void RemovePerkInfoItemIfExist(string name)
 	{
-		for (int i = 0; i < PPHJHENDCLL.Count; i++)
+		for (int i = 0; i < availablePerkInfos.Count; i++)
 		{
-			if (PPHJHENDCLL[i].Name == name)
+			if (availablePerkInfos[i].Name == name)
 			{
-				PPHJHENDCLL.RemoveAt(i);
+				availablePerkInfos.RemoveAt(i);
 				break;
 			}
 		}
 	}
 
-	private AAAIBJGLPAI MLFLOGKMLJI(string CNKBLODAFDO)
+	private PerkItemType ParseItemType(string CNKBLODAFDO)
 	{
-		AAAIBJGLPAI result = AAAIBJGLPAI.TYPE_NONE;
+		PerkItemType result = PerkItemType.TYPE_NONE;
 		if (CNKBLODAFDO == "Perk")
 		{
-			result = AAAIBJGLPAI.TYPE_PERK;
+			result = PerkItemType.TYPE_PERK;
 		}
 		else if (CNKBLODAFDO == "Upgrade")
 		{
-			result = AAAIBJGLPAI.TYPE_UPGRADE;
+			result = PerkItemType.TYPE_UPGRADE;
 		}
 		return result;
 	}
 
-	private ProfilePerk.JHDKDOPHGOO HCHAAHKHCFN(AAAIBJGLPAI LFLGCDNKNJI)
+	private ProfilePerk.ProfilePerkType ToProfilePerkType(PerkItemType LFLGCDNKNJI)
 	{
 		switch (LFLGCDNKNJI)
 		{
-		case AAAIBJGLPAI.TYPE_PERK:
-			return ProfilePerk.JHDKDOPHGOO.TYPE_PERK;
-		case AAAIBJGLPAI.TYPE_UPGRADE:
-			return ProfilePerk.JHDKDOPHGOO.TYPE_UPGRADE;
+		case PerkItemType.TYPE_PERK:
+			return ProfilePerk.ProfilePerkType.TYPE_PERK;
+		case PerkItemType.TYPE_UPGRADE:
+			return ProfilePerk.ProfilePerkType.TYPE_UPGRADE;
 		default:
-			return ProfilePerk.JHDKDOPHGOO.TYPE_NONE;
+			return ProfilePerk.ProfilePerkType.TYPE_NONE;
 		}
 	}
 
-	private List<ProfilePerk> ENFMEDEFINB(int GNLOCMLBNHF)
+	private List<ProfilePerk> GetNextLevelProfilePerks(int GNLOCMLBNHF)
 	{
 		List<ProfilePerk> list = new List<ProfilePerk>();
 		int num = GNLOCMLBNHF;
-		for (int i = 0; i < DPPMNFCIIGP.Count; i++)
+		for (int i = 0; i < profilePerks.Count; i++)
 		{
-			ProfilePerk pLKCIINIFMJ = DPPMNFCIIGP[i];
-			int num2 = pLKCIINIFMJ.PINDEKDNCNL();
+			ProfilePerk pLKCIINIFMJ = profilePerks[i];
+			int num2 = pLKCIINIFMJ.GetLevel();
 			if (num2 > num && num > GNLOCMLBNHF)
 			{
 				break;

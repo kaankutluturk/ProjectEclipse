@@ -22,11 +22,11 @@ namespace Eclipse.UI
             try
             {
                 // Preserve the old content context until the native save has completed.
-                ListSF.CCDKHLAMKKO()?.GGGEHAGCLGC();
+                ListSF.GetRoster()?.RequestSave();
                 savePreferences?.Invoke();
                 PlayerPrefs.Save();
                 Sound.StopMusic(); // Persistent music channel survives scene loads.
-                Sound.GKMINHHAMAK(); // Stop remaining campaign sound channels.
+                Sound.StopAllSounds(); // Stop remaining campaign sound channels.
                 IsRestarting = true;
                 Time.timeScale = 1f;
                 AudioListener.pause = false;

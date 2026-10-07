@@ -47,8 +47,8 @@ Check ((Shape $node.Actions.ShakeScreen) -ceq (Shape $expectedShake)) 'Archived 
 $actualShake=[ActionShakeScreen]::new($node.Actions.ShakeScreen)
 $nativeShake=[ActionShakeScreen]::new($expectedShake)
 Check ($actualShake.NeedStart(48) -and !$actualShake.NeedStart(47)) 'Native shake timing changed.'
-foreach($field in $actualShake.CBNIELBJDAO().GetType().GetFields()) {
- Check ($field.GetValue($actualShake.CBNIELBJDAO()) -eq $field.GetValue($nativeShake.CBNIELBJDAO())) ('Shake native payload mismatch: '+$field.Name)
+foreach($field in $actualShake.GetEffect().GetType().GetFields()) {
+ Check ($field.GetValue($actualShake.GetEffect()) -eq $field.GetValue($nativeShake.GetEffect())) ('Shake native payload mismatch: '+$field.Name)
 }
 $fp=Fingerprint $catalog
 foreach($mutation in @('sound.voice="Female"','sound.core_sound="snd_f_pl_attack6"','shake.pause_time=1','shake.effect_time=31',

@@ -2,7 +2,7 @@ public class RandomGenerator
 {
 	private const uint M = 2147483647u;
 
-	private uint CALKMDJCFDK;
+	private uint _state;
 
 	private uint _seed;
 
@@ -11,13 +11,13 @@ public class RandomGenerator
 		setSeed(OKGKLCLEDFN);
 	}
 
-	public uint DADGADIAJHI()
+	public uint NextRandom()
 	{
-		CALKMDJCFDK = randLCG(CALKMDJCFDK);
-		return CALKMDJCFDK;
+		_state = randLCG(_state);
+		return _state;
 	}
 
-	public uint EBKAFDGPLOE()
+	public uint GetSeed()
 	{
 		return _seed;
 	}
@@ -25,7 +25,7 @@ public class RandomGenerator
 	public void setSeed(uint OKGKLCLEDFN)
 	{
 		_seed = OKGKLCLEDFN;
-		CALKMDJCFDK = OKGKLCLEDFN;
+		_state = OKGKLCLEDFN;
 	}
 
 	public uint randLCG(uint DGNDGHPMPJD)
@@ -34,7 +34,7 @@ public class RandomGenerator
 		return DGNDGHPMPJD;
 	}
 
-	public static uint HHJPLLHOGCH()
+	public static uint GetMaxValue()
 	{
 		return 2147483648u;
 	}

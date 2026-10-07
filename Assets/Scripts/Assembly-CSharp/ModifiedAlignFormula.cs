@@ -7,47 +7,47 @@ public class ModifiedAlignFormula
 	{
 		public string Name;
 
-		public float OPHGJJGKIHE;
+		public float DamageMultiplier;
 
-		public float BPPJAMCGICA;
+		public float NetDamage;
 
-		public float GFHOHECBODM;
+		public float MinAttributeDifference;
 
-		public string KLAIAPBONFM;
+		public string ApplyTo;
 
 		public DamageAttribute(XmlNode node)
 		{
 			Name = XmlUtils.ParseString(node.Attributes["Name"]);
-			OPHGJJGKIHE = XmlUtils.ParseFloat(node.Attributes["DamageMultiplier"], 2f);
-			BPPJAMCGICA = XmlUtils.ParseFloat(node.Attributes["NetDamage"], 0.1f);
-			GFHOHECBODM = XmlUtils.ParseFloat(node.Attributes["MinAttributeDifference"]);
-			KLAIAPBONFM = XmlUtils.ParseString(node.Attributes["ApplyTo"], "Player");
-			if (KLAIAPBONFM != "Player" && KLAIAPBONFM != "Enemy")
+			DamageMultiplier = XmlUtils.ParseFloat(node.Attributes["DamageMultiplier"], 2f);
+			NetDamage = XmlUtils.ParseFloat(node.Attributes["NetDamage"], 0.1f);
+			MinAttributeDifference = XmlUtils.ParseFloat(node.Attributes["MinAttributeDifference"]);
+			ApplyTo = XmlUtils.ParseString(node.Attributes["ApplyTo"], "Player");
+			if (ApplyTo != "Player" && ApplyTo != "Enemy")
 			{
-				KLAIAPBONFM = "Player";
+				ApplyTo = "Player";
 			}
 		}
 	}
 
-	private List<DamageAttribute> AJNCNCFDLKL = new List<DamageAttribute>();
+	private List<DamageAttribute> damageAttributes = new List<DamageAttribute>();
 
 	public void Parse(XmlNode node)
 	{
-		AJNCNCFDLKL.Clear();
+		damageAttributes.Clear();
 		foreach (XmlNode childNode in node.ChildNodes)
 		{
 			DamageAttribute item = new DamageAttribute(childNode);
-			AJNCNCFDLKL.Add(item);
+			damageAttributes.Add(item);
 		}
 	}
 
-	public DamageAttribute NOADKFMGODA(string name)
+	public DamageAttribute FindDamageAttribute(string name)
 	{
-		for (int i = 0; i < AJNCNCFDLKL.Count; i++)
+		for (int i = 0; i < damageAttributes.Count; i++)
 		{
-			if (AJNCNCFDLKL[i].Name == name)
+			if (damageAttributes[i].Name == name)
 			{
-				return AJNCNCFDLKL[i];
+				return damageAttributes[i];
 			}
 		}
 		return null;

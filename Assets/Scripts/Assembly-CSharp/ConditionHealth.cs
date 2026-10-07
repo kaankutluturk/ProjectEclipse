@@ -2,21 +2,21 @@ using System.Xml;
 
 public class ConditionHealth : ConditionAnimation
 {
-	public float HIKKOHGMFDO;
+	public float Min;
 
-	public float IJEKNNPOBJD;
+	public float Max;
 
 	public ConditionHealth(XmlNode node)
 		: base(ConditionType.HEALTH)
 	{
-		HIKKOHGMFDO = node.Attributes["Min"].ParseFloat();
-		IJEKNNPOBJD = node.Attributes["Max"].ParseFloat();
+		Min = node.Attributes["Min"].ParseFloat();
+		Max = node.Attributes["Max"].ParseFloat();
 	}
 
 	public override bool IsEqual(ModelConditions conditions)
 	{
-		float num = conditions.BFLPOMAHPJD / conditions.KGCJIBCACBH;
-		bool flag = HIKKOHGMFDO <= num && num <= IJEKNNPOBJD;
+		float num = conditions.CurrentHealth / conditions.MaxHealth;
+		bool flag = Min <= num && num <= Max;
 		return (!IsNot) ? flag : (!flag);
 	}
 }

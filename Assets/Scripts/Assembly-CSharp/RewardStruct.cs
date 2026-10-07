@@ -2,65 +2,65 @@ using System.Xml;
 
 public class RewardStruct
 {
-	public Reward BBCCBPIIELF;
+	public Reward CommonReward;
 
-	public Reward FMOGFMIGLNP;
+	public Reward NormalModeReward;
 
-	public Reward LJLIFMOIAJJ;
+	public Reward EclipseModeReward;
 
 	public RewardStruct(XmlNode node, ushort CDCJKJNGPOE, ushort MCDAHGPLLDO)
 	{
-		BBCCBPIIELF = new Reward(node, CDCJKJNGPOE, MCDAHGPLLDO);
+		CommonReward = new Reward(node, CDCJKJNGPOE, MCDAHGPLLDO);
 		XmlNode xmlNode = node["NormalModeReward"];
 		if (xmlNode != null)
 		{
-			FMOGFMIGLNP = new Reward(xmlNode, CDCJKJNGPOE, MCDAHGPLLDO);
+			NormalModeReward = new Reward(xmlNode, CDCJKJNGPOE, MCDAHGPLLDO);
 		}
 		else
 		{
-			FMOGFMIGLNP = null;
+			NormalModeReward = null;
 		}
 		XmlNode xmlNode2 = node["EclipseModeReward"];
 		if (xmlNode2 != null)
 		{
-			LJLIFMOIAJJ = new Reward(xmlNode2, CDCJKJNGPOE, MCDAHGPLLDO);
+			EclipseModeReward = new Reward(xmlNode2, CDCJKJNGPOE, MCDAHGPLLDO);
 		}
 		else
 		{
-			LJLIFMOIAJJ = null;
+			EclipseModeReward = null;
 		}
 	}
 
 	public void RandomizeObscuredVars()
 	{
-		if (BBCCBPIIELF != null)
+		if (CommonReward != null)
 		{
-			BBCCBPIIELF.RandomizeObscuredVars();
+			CommonReward.RandomizeObscuredVars();
 		}
-		if (FMOGFMIGLNP != null)
+		if (NormalModeReward != null)
 		{
-			FMOGFMIGLNP.RandomizeObscuredVars();
+			NormalModeReward.RandomizeObscuredVars();
 		}
-		if (LJLIFMOIAJJ != null)
+		if (EclipseModeReward != null)
 		{
-			LJLIFMOIAJJ.RandomizeObscuredVars();
+			EclipseModeReward.RandomizeObscuredVars();
 		}
 	}
 
-	public RewardPrize KOBOIFJNPMO(int GNLOCMLBNHF)
+	public RewardPrize GetPrizeForLevel(int GNLOCMLBNHF)
 	{
 		RewardPrize cMHHEHILIIH = new RewardPrize();
-		if (BBCCBPIIELF != null)
+		if (CommonReward != null)
 		{
-			cMHHEHILIIH = BBCCBPIIELF.KOBOIFJNPMO(GNLOCMLBNHF);
+			cMHHEHILIIH = CommonReward.GetPrizeForLevel(GNLOCMLBNHF);
 			cMHHEHILIIH.IsCloned = true;
 		}
-		Reward lOELDGJGPIF = ((!ListSF.CCDKHLAMKKO().IsEclipseMode()) ? FMOGFMIGLNP : LJLIFMOIAJJ);
+		Reward lOELDGJGPIF = ((!ListSF.GetRoster().IsEclipseMode()) ? NormalModeReward : EclipseModeReward);
 		if (lOELDGJGPIF != null)
 		{
-			RewardPrize cMHHEHILIIH2 = lOELDGJGPIF.KOBOIFJNPMO(GNLOCMLBNHF);
+			RewardPrize cMHHEHILIIH2 = lOELDGJGPIF.GetPrizeForLevel(GNLOCMLBNHF);
 			cMHHEHILIIH2.IsCloned = true;
-			cMHHEHILIIH.HNJGHOKCDJF(cMHHEHILIIH2);
+			cMHHEHILIIH.Merge(cMHHEHILIIH2);
 		}
 		return cMHHEHILIIH;
 	}

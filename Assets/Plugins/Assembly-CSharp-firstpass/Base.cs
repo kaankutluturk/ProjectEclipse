@@ -1,6 +1,6 @@
 internal abstract class Base
 {
-	public struct IPAFOKKOCPF
+	public struct CoderState
 	{
 		public uint Index;
 
@@ -9,7 +9,7 @@ internal abstract class Base
 			Index = 0u;
 		}
 
-		public void BPGEKNIINGF()
+		public void UpdateChar()
 		{
 			if (Index < 4)
 			{
@@ -25,82 +25,82 @@ internal abstract class Base
 			}
 		}
 
-		public void HCMNGMEPJGM()
+		public void UpdateMatch()
 		{
 			Index = ((Index >= 7) ? 10u : 7u);
 		}
 
-		public void EJIFGEACABJ()
+		public void UpdateRep()
 		{
 			Index = ((Index >= 7) ? 11u : 8u);
 		}
 
-		public void GGAGNGPBMIH()
+		public void UpdateShortRep()
 		{
 			Index = ((Index >= 7) ? 11u : 9u);
 		}
 
-		public bool ALIFLOIMDFO()
+		public bool IsCharState()
 		{
 			return Index < 7;
 		}
 	}
 
-	public const uint CDCAFAMGCBN = 4u;
+	public const uint kNumRepDistances = 4u;
 
-	public const uint BPENCDLJNCD = 12u;
+	public const uint kNumStates = 12u;
 
-	public const int CIKHDDBDLMP = 6;
+	public const int kNumPosSlotBits = 6;
 
-	public const int GKKNDCELNBJ = 0;
+	public const int kDicLogSizeMin = 0;
 
-	public const int JIONKDFHIOC = 2;
+	public const int kNumLenToPosStatesBits = 2;
 
-	public const uint CKDPNGHGNEA = 4u;
+	public const uint kNumLenToPosStates = 4u;
 
-	public const uint KGEGLENNGCM = 2u;
+	public const uint kMatchMinLen = 2u;
 
-	public const int HGGBFNGMBDK = 4;
+	public const int kNumAlignBits = 4;
 
-	public const uint KJIJCFDLPBB = 16u;
+	public const uint kAlignTableSize = 16u;
 
-	public const uint MHCDPMNPOBE = 15u;
+	public const uint kAlignMask = 15u;
 
-	public const uint COGPELDEPMI = 4u;
+	public const uint kStartPosModelIndex = 4u;
 
-	public const uint EBPFLNBHDOH = 14u;
+	public const uint kEndPosModelIndex = 14u;
 
-	public const uint KOFBJPBNDND = 10u;
+	public const uint kNumPosModels = 10u;
 
-	public const uint PHCOLPNHCCK = 128u;
+	public const uint kNumFullDistances = 128u;
 
-	public const uint ONMFLHPOFHB = 4u;
+	public const uint kNumLitPosStatesBitsEncodingMax = 4u;
 
-	public const uint CPLBBEBJAKM = 8u;
+	public const uint kNumLitContextBitsMax = 8u;
 
-	public const int LEBHAANFIBC = 4;
+	public const int kNumPosStatesBitsMax = 4;
 
-	public const uint IBCLKNKALNN = 16u;
+	public const uint kNumPosStatesMax = 16u;
 
-	public const int KCGMMFAEPFL = 4;
+	public const int kNumPosStatesBitsEncodingMax = 4;
 
-	public const uint LKPHMOIDNKG = 16u;
+	public const uint kNumPosStatesEncodingMax = 16u;
 
-	public const int NGFIHBJFLKK = 3;
+	public const int kNumLowLenBits = 3;
 
-	public const int HMOBHENCJNI = 3;
+	public const int kNumMidLenBits = 3;
 
-	public const int AHMCOEKNGAJ = 8;
+	public const int kNumHighLenBits = 8;
 
-	public const uint JKBHPPALKEF = 8u;
+	public const uint kNumLowLenSymbols = 8u;
 
-	public const uint HNLHLJKAFCP = 8u;
+	public const uint kNumMidLenSymbols = 8u;
 
-	public const uint BJDIJCNFDCH = 272u;
+	public const uint kNumLenSymbols = 272u;
 
-	public const uint NMJCOHJKBME = 273u;
+	public const uint kMatchMaxLen = 273u;
 
-	public static uint BBAEOHBBCHI(uint JCAJDBOMGOM)
+	public static uint GetLenToPosState(uint JCAJDBOMGOM)
 	{
 		JCAJDBOMGOM -= 2;
 		if (JCAJDBOMGOM < 4)

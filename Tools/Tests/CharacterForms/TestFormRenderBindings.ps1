@@ -22,14 +22,14 @@ class Fight{
  Dictionary<Model,OwnedActor> _eclipseActors=new Dictionary<Model,OwnedActor>();
  bool RejectPresentation;
 
- Model _playerModel=new Model(),CKNCPOABFBO=new Model();Binding _Camera=new Binding(),_SelectAnimation=new Binding();Rules _rulesInspector=new Rules();
- List<Model> LNDLFINJHDB=new List<Model>();
- Perks EPBDEDGLHJE=new Perks();
+ Model _playerModel=new Model(),_enemyModel=new Model();Binding _Camera=new Binding(),_SelectAnimation=new Binding();Rules _rulesInspector=new Rules();
+ List<Model> ActiveModels=new List<Model>();
+ Perks perksStage=new Perks();
  Action BindFormPresentation(Model expected,Model replacement,bool player,bool actor=false){if(RejectPresentation)throw new InvalidOperationException("presentation");return()=>{};} Action BindFormParticipant(Model expected,Model replacement){_playerModel=replacement;return()=>_playerModel=expected;}
  bool IsEclipseActorModel(Model model)=>model!=null&&_eclipseActors.ContainsKey(model);
- bool IsEclipseFormParticipant(Model model)=>model==_playerModel||model==CKNCPOABFBO||IsEclipseActorModel(model);
+ bool IsEclipseFormParticipant(Model model)=>model==_playerModel||model==_enemyModel||IsEclipseActorModel(model);
  Action BindEclipseActorFormParticipant(Model old,Model next){var actor=_eclipseActors[old];_eclipseActors.Remove(old);_eclipseActors.Add(next,actor);actor.Model=next;return()=>{_eclipseActors.Remove(next);_eclipseActors.Add(old,actor);actor.Model=old;};}
- public Fight(){_Camera.Current=_Camera.Original=_SelectAnimation.Current=_SelectAnimation.Original=_rulesInspector.Current=_playerModel;LNDLFINJHDB.AddRange(new[]{_playerModel,CKNCPOABFBO});CKNCPOABFBO._Enemies.Add(_playerModel);}
+ public Fight(){_Camera.Current=_Camera.Original=_SelectAnimation.Current=_SelectAnimation.Original=_rulesInspector.Current=_playerModel;ActiveModels.AddRange(new[]{_playerModel,_enemyModel});_enemyModel._Enemies.Add(_playerModel);}
  STAGE
  static void Check(bool x,string why){if(!x)throw new Exception(why);}
  public static void Main(){
@@ -37,12 +37,12 @@ class Fight{
   var stage=new FormRenderBindings(f,f._playerModel,next);
   Check(f._Camera.Current==next&&f._SelectAnimation.Current==next&&f._rulesInspector.Current==next,"all registrations staged");
   Check(f._playerModel==next,"participant identity follows staged registrations");
-  Check(f.EPBDEDGLHJE.Current==next,"queued perks staged");
-  Check(f.EPBDEDGLHJE.AttributeTarget==next&&f.EPBDEDGLHJE.Registration==next,"attribute effects and registration staged");
+  Check(f.perksStage.Current==next,"queued perks staged");
+  Check(f.perksStage.AttributeTarget==next&&f.perksStage.Registration==next,"attribute effects and registration staged");
   stage.Dispose();stage.Dispose();Check(f._Camera.Current==f._playerModel&&f._SelectAnimation.Current==f._playerModel&&f._rulesInspector.Current==f._playerModel,"rollback and idempotent dispose");
   Check(f._SelectAnimation.EventRestores==1,"events restored once after reversing selector registration");
-  Check(f.EPBDEDGLHJE.Current==f._playerModel,"queued perks restored");
-  Check(f.EPBDEDGLHJE.AttributeTarget==f._playerModel&&f.EPBDEDGLHJE.Registration==f._playerModel,"attribute effects and registration restored");
+  Check(f.perksStage.Current==f._playerModel,"queued perks restored");
+  Check(f.perksStage.AttributeTarget==f._playerModel&&f.perksStage.Registration==f._playerModel,"attribute effects and registration restored");
   f._rulesInspector.Reject=true;bool failed=false;try{new FormRenderBindings(f,f._playerModel,next);}catch(InvalidOperationException){failed=true;}
   Check(failed&&f._Camera.Current==f._playerModel,"rule validation precedes mutation");f._rulesInspector.Reject=false;
   f._SelectAnimation.Reject=true;failed=false;try{new FormRenderBindings(f,f._playerModel,next);}catch(InvalidOperationException){failed=true;}
@@ -56,21 +56,21 @@ class Fight{
   f=new Fight();f._Camera.RejectRestore=true;f._SelectAnimation.Reject=true;failed=false;
   try{new FormRenderBindings(f,f._playerModel,next);}catch(AggregateException e){failed=e.InnerExceptions.Count==2;}
   Check(failed,"original plus rollback failures reported");
-  f=new Fight();var weapon=new Model{Owner=f.CKNCPOABFBO};weapon._Enemies.Add(f._playerModel);f.CKNCPOABFBO.Weapons.Add(weapon);f.LNDLFINJHDB.Add(weapon);
-  var retiredWeapon=new Model{Owner=f._playerModel};retiredWeapon._Enemies.Add(f._playerModel);f._playerModel.Weapons.Add(retiredWeapon);f.LNDLFINJHDB.Add(retiredWeapon);
+  f=new Fight();var weapon=new Model{Owner=f._enemyModel};weapon._Enemies.Add(f._playerModel);f._enemyModel.Weapons.Add(weapon);f.ActiveModels.Add(weapon);
+  var retiredWeapon=new Model{Owner=f._playerModel};retiredWeapon._Enemies.Add(f._playerModel);f._playerModel.Weapons.Add(retiredWeapon);f.ActiveModels.Add(retiredWeapon);
   stage=new FormRenderBindings(f,f._playerModel,next);
-  Check(f.CKNCPOABFBO._Enemies[0]==next&&weapon._Enemies[0]==next&&weapon.Exchanges==1,"surviving fighter and weapon targeting exchanged once");
+  Check(f._enemyModel._Enemies[0]==next&&weapon._Enemies[0]==next&&weapon.Exchanges==1,"surviving fighter and weapon targeting exchanged once");
   Check(retiredWeapon.Exchanges==0,"retired weapon targeting is not mutated");
-  stage.Dispose();Check(f.CKNCPOABFBO._Enemies[0]==f._playerModel&&weapon._Enemies[0]==f._playerModel,"targeting restored with registrations");
+  stage.Dispose();Check(f._enemyModel._Enemies[0]==f._playerModel&&weapon._Enemies[0]==f._playerModel,"targeting restored with registrations");
   weapon.RejectEnemy=true;failed=false;try{new FormRenderBindings(f,f._playerModel,next);}catch(InvalidOperationException){failed=true;}
-  Check(failed&&f.CKNCPOABFBO._Enemies[0]==f._playerModel&&f._Camera.Current==f._playerModel,"later observer rejection restores earlier observers and camera");weapon.RejectEnemy=false;
+  Check(failed&&f._enemyModel._Enemies[0]==f._playerModel&&f._Camera.Current==f._playerModel,"later observer rejection restores earlier observers and camera");weapon.RejectEnemy=false;
   f._SelectAnimation.Reject=true;failed=false;try{new FormRenderBindings(f,f._playerModel,next);}catch(InvalidOperationException){failed=true;}
-  Check(failed&&weapon._Enemies[0]==f._playerModel&&f.CKNCPOABFBO._Enemies[0]==f._playerModel,"selector rejection restores all enemy targets");f._SelectAnimation.Reject=false;
+  Check(failed&&weapon._Enemies[0]==f._playerModel&&f._enemyModel._Enemies[0]==f._playerModel,"selector rejection restores all enemy targets");f._SelectAnimation.Reject=false;
   stage=new FormRenderBindings(f,f._playerModel,next);stage.Commit();stage.Dispose();Check(weapon._Enemies[0]==next,"commit retains enemy targeting");
-  f=new Fight();stage=new FormRenderBindings(f,f._playerModel,next);f.CKNCPOABFBO.RejectEnemyRestore=true;failed=false;try{stage.Dispose();}catch(AggregateException){failed=true;}
+  f=new Fight();stage=new FormRenderBindings(f,f._playerModel,next);f._enemyModel.RejectEnemyRestore=true;failed=false;try{stage.Dispose();}catch(AggregateException){failed=true;}
   Check(failed&&f._Camera.Current==f._playerModel&&f._SelectAnimation.Current==f._playerModel,"target rollback failure still attempts other registrations");
   // Use the production owner helper and coordinator, including a late rejection.
-  f=new Fight();var old=f._playerModel;var other=f.CKNCPOABFBO;
+  f=new Fight();var old=f._playerModel;var other=f._enemyModel;
   var birth=new PendingActor{Root=old};var queued=new PendingActor{Root=old};var foreign=new PendingActor{Root=other};
   var live=new OwnedActor{Model=new Model(),Root=old,TargetRequest=other,Birth=birth};
   var hostile=new OwnedActor{Model=new Model(),Root=other,TargetRequest=old};
@@ -91,13 +91,13 @@ class Fight{
   Check(hostile.Root==opponentNext&&live.TargetRequest==opponentNext&&foreign.Root==opponentNext,"opponent ownership/explicit target/pending birth transfer");
   restore();Check(hostile.Root==other&&live.TargetRequest==other&&foreign.Root==other,"opponent reference rollback");
   f=new Fight();var main=f._playerModel;var actorBody=new Model();var actorRecord=new OwnedActor{Model=actorBody,Root=main};
-  f._eclipseActors.Add(actorBody,actorRecord);f.LNDLFINJHDB.Add(actorBody);
+  f._eclipseActors.Add(actorBody,actorRecord);f.ActiveModels.Add(actorBody);
   f._Camera.Current=f._Camera.Original=f._SelectAnimation.Current=f._SelectAnimation.Original=actorBody;
-  f._rulesInspector.Reject=true;f.CKNCPOABFBO._Enemies.Add(actorBody);
+  f._rulesInspector.Reject=true;f._enemyModel._Enemies.Add(actorBody);
   stage=new FormRenderBindings(f,actorBody,next);
   Check(f._playerModel==main&&f._rulesInspector.Current==main&&actorRecord.Model==next,"actor form skips canonical identity/rule inspector");
-  Check(f.CKNCPOABFBO._Enemies.Contains(next),"actor form rebinds native observers");
-  stage.Dispose();Check(actorRecord.Model==actorBody&&f.CKNCPOABFBO._Enemies.Contains(actorBody),"actor coordinator restores identity and observers");
+  Check(f._enemyModel._Enemies.Contains(next),"actor form rebinds native observers");
+  stage.Dispose();Check(actorRecord.Model==actorBody&&f._enemyModel._Enemies.Contains(actorBody),"actor coordinator restores identity and observers");
   f.RejectPresentation=true;failed=false;try{new FormRenderBindings(f,actorBody,next);}catch(InvalidOperationException){failed=true;}
   Check(failed&&actorRecord.Model==actorBody&&f._Camera.Current==actorBody&&f._rulesInspector.Current==main,"late actor form rejection restores all actor registrations");
   Console.WriteLine("PASS: production form registration orchestration; preparation, staged exchange, commit, rollback, partial rejection and rollback-failure reporting. Actor ownership/explicit targets/queued births preserved through commit and late rollback; camera/selector/rule services controlled.");

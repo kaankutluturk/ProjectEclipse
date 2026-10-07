@@ -18,7 +18,7 @@ namespace Nekki.Yaml
 			return value.ToString();
 		}
 
-		public string PLGAAMADMEE()
+		public string GetTypeNode()
 		{
 			return typeNode;
 		}
@@ -28,7 +28,7 @@ namespace Nekki.Yaml
 			return key;
 		}
 
-		public static Node AGFNPDIMEDI(string OEHJKBNMJPH, YamlNode DOBDLPLFMAC)
+		public static Node CreateNode(string OEHJKBNMJPH, YamlNode DOBDLPLFMAC)
 		{
 			Type type = DOBDLPLFMAC.GetType();
 			if (type == typeof(YamlScalarNode))

@@ -2,11 +2,11 @@ using YamlDotNet.Core;
 
 public class StreamStart : ParsingEvent
 {
-	public override int OHJMGKADENE
+	public override int NestingIncrease
 	{
 		get
 		{
-			return DPIMLJJFMCO();
+			return GetNestingIncrease();
 		}
 	}
 
@@ -20,14 +20,14 @@ public class StreamStart : ParsingEvent
 	{
 	}
 
-	public override int DPIMLJJFMCO()
+	public override int GetNestingIncrease()
 	{
 		return 1;
 	}
 
-	internal override BHBPOHDAGPH get_Type()
+	internal override ParsingEventType get_Type()
 	{
-		return BHBPOHDAGPH.StreamStart;
+		return ParsingEventType.StreamStart;
 	}
 
 	public override string ToString()
@@ -35,7 +35,7 @@ public class StreamStart : ParsingEvent
 		return "Stream start";
 	}
 
-	public override void GPHIFFOGOGN(IParsingEventVisitor NKECMANOOEM)
+	public override void Accept(IParsingEventVisitor NKECMANOOEM)
 	{
 		NKECMANOOEM.Visit(this);
 	}

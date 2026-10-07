@@ -1,10 +1,10 @@
 public class QuestActionRestartApplication : QuestAction
 {
-	public override void DEJMHFMLKIC(QuestParameters GFIHPBCEEOB)
+	public override void Execute(QuestParameters GFIHPBCEEOB)
 	{
-		base.DEJMHFMLKIC(GFIHPBCEEOB);
+		base.Execute(GFIHPBCEEOB);
 		ListSF.GetInstance().OnAuthenticate(true);
-		OGIJONMKABB();
-		GameUtils.BKFMHANNIEF();
+		FinishAction();
+		GameUtils.ResetScenes();
 	}
 }

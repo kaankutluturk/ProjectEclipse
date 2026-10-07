@@ -2,35 +2,35 @@ using System;
 
 public sealed class ObjectNodeDeserializer : INodeDeserializer
 {
-	private readonly IObjectFactory IEBGHNHEOBB;
+	private readonly IObjectFactory _objectFactory;
 
-	private readonly ITypeInspector APLJDMHILEN;
+	private readonly ITypeInspector _typeDescriptor;
 
 	private readonly bool _ignoreUnmatched;
 
 	public ObjectNodeDeserializer(IObjectFactory EJPHFDCKCCE, ITypeInspector GIJPGEHPILC, bool GNFDAJLHBCN)
 	{
-		IEBGHNHEOBB = EJPHFDCKCCE;
-		APLJDMHILEN = GIJPGEHPILC;
+		_objectFactory = EJPHFDCKCCE;
+		_typeDescriptor = GIJPGEHPILC;
 		_ignoreUnmatched = GNFDAJLHBCN;
 	}
 
 	bool INodeDeserializer.Deserialize(EventReader reader, Type MBLGNMBFHBI, Func<EventReader, Type, object> IJBAEAEDMCC, out object value)
 	{
-		MappingStart oGMPNFCPPDH = reader.GNNPKHDPGLN<MappingStart>();
+		MappingStart oGMPNFCPPDH = reader.Allow<MappingStart>();
 		if (oGMPNFCPPDH == null)
 		{
 			value = null;
 			return false;
 		}
-		value = IEBGHNHEOBB.Create(MBLGNMBFHBI);
-		while (!reader.GPHIFFOGOGN<BLFPJCPALDH>())
+		value = _objectFactory.Create(MBLGNMBFHBI);
+		while (!reader.Accept<MappingEnd>())
 		{
-			Scalar lEACOCDHICF = reader.DODGGCGJJLL<Scalar>();
-			IPropertyDescriptor JLCGLCLEGBD = APLJDMHILEN.DBLHKMEGOEK(MBLGNMBFHBI, null, lEACOCDHICF.OEAKCOHMIHH(), _ignoreUnmatched);
+			Scalar lEACOCDHICF = reader.Expect<Scalar>();
+			IPropertyDescriptor JLCGLCLEGBD = _typeDescriptor.GetProperty(MBLGNMBFHBI, null, lEACOCDHICF.GetValue(), _ignoreUnmatched);
 			if (JLCGLCLEGBD == null)
 			{
-				reader.FHCPPKNIOKB();
+				reader.SkipThisAndNestedEvents();
 				continue;
 			}
 			object obj = IJBAEAEDMCC(reader, JLCGLCLEGBD.get_Type());
@@ -48,7 +48,7 @@ public sealed class ObjectNodeDeserializer : INodeDeserializer
 				JLCGLCLEGBD.Write(valueRef, bAINMLLIKOL2);
 			});
 		}
-		reader.DODGGCGJJLL<BLFPJCPALDH>();
+		reader.Expect<MappingEnd>();
 		return true;
 	}
 }

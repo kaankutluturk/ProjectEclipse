@@ -2,16 +2,16 @@ using System.Xml;
 
 public class AntichitingModule : LoadingModule
 {
-	public override void JLPMOKPFECK()
+	public override void ProcessStep()
 	{
-		if (!CHIHBINEGFL)
+		if (!isFinished)
 		{
-			GameSettings.AIKBOKDPNOA();
-			SystemProperties.HBCGFAKAJOA();
-			XmlDocument jFJPKEONJIJ = XmlUtils.OpenXMLDocument(SF2Paths.KKIDGPBOBNI(), "devices.xml");
-			SystemProperties.GOCLBADJDGK(jFJPKEONJIJ);
+			GameSettings.LoadAssemblySettings();
+			SystemProperties.InitDeviceInfo();
+			XmlDocument jFJPKEONJIJ = XmlUtils.OpenXMLDocument(SF2Paths.GetGameDataPath(), "devices.xml");
+			SystemProperties.LoadDevicesConfig(jFJPKEONJIJ);
 			GameCenterController.Init();
-			CHIHBINEGFL = true;
+			isFinished = true;
 		}
 	}
 }

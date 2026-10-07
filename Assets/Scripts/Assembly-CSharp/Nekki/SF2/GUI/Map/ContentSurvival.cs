@@ -38,7 +38,7 @@ namespace Nekki.SF2.GUI.Map
 			{
 				return;
 			}
-			List<RewardStruct> list2 = list[0].APKPCGDBMEP();
+			List<RewardStruct> list2 = list[0].GetRewards();
 			long num = 0L;
 			long num2 = 0L;
 			long num3 = 0L;
@@ -46,16 +46,16 @@ namespace Nekki.SF2.GUI.Map
 			int count = list2.Count;
 			if (count < 2)
 			{
-				LLLOJBFMONN.Error("Survival has no rewards");
+				GameLog.Error("Survival has no rewards");
 				return;
 			}
-			int gNLOCMLBNHF = ListSF.CCDKHLAMKKO().PINDEKDNCNL();
-			RewardPrize cMHHEHILIIH = list2[1].KOBOIFJNPMO(gNLOCMLBNHF);
-			RewardPrize cMHHEHILIIH2 = list2[list2.Count - 1].KOBOIFJNPMO(gNLOCMLBNHF);
-			num = (ObscuredLong)(cMHHEHILIIH.PNDAIFALIKF);
-			num2 = (ObscuredLong)(cMHHEHILIIH2.PNDAIFALIKF);
-			num3 = (ObscuredLong)(cMHHEHILIIH.GBGNFPNCGED);
-			num4 = (ObscuredLong)(cMHHEHILIIH2.GBGNFPNCGED);
+			int gNLOCMLBNHF = ListSF.GetRoster().GetLevel();
+			RewardPrize cMHHEHILIIH = list2[1].GetPrizeForLevel(gNLOCMLBNHF);
+			RewardPrize cMHHEHILIIH2 = list2[list2.Count - 1].GetPrizeForLevel(gNLOCMLBNHF);
+			num = (ObscuredLong)(cMHHEHILIIH.bonus);
+			num2 = (ObscuredLong)(cMHHEHILIIH2.bonus);
+			num3 = (ObscuredLong)(cMHHEHILIIH.money);
+			num4 = (ObscuredLong)(cMHHEHILIIH2.money);
 			num3 = GameUtils.GetDenominatedValue(num3);
 			num4 = GameUtils.GetDenominatedValue(num4);
 			int cFMPJLLNCFF = 68;
@@ -67,7 +67,7 @@ namespace Nekki.SF2.GUI.Map
 			_survivalPrizeMax.Init(num4, num2, cMHHEHILIIH2, 0f, 100f, cFMPJLLNCFF);
 			if (DPOOIONCEOA.get_Type() == BattleType.FightBossesIntermission)
 			{
-				_lblDescription.SetAlias(DPOOIONCEOA.GJOAJAIJHOE());
+				_lblDescription.SetAlias(DPOOIONCEOA.GetDescription());
 			}
 		}
 	}

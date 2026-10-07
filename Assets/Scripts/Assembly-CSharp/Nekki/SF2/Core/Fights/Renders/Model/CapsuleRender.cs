@@ -10,9 +10,9 @@ namespace Nekki.SF2.Core.Fights.Renders.Model
 
 		protected Capsule _Base;
 
-		private static Material CBDOCDONEJE;
+		private static Material coloredSpriteMaterial;
 
-		private static Material OAKNHBMPNLH;
+		private static Material defaultSpriteMaterial;
 
 		private LineRenderer _LineRender;
 
@@ -29,7 +29,7 @@ namespace Nekki.SF2.Core.Fights.Renders.Model
 		private LineRenderer _RimLine;
 		private Eclipse.Rendering.FighterVolume _Volume;
 
-		public float NFOMECHPEOP
+		public float StrokeWidth
 		{
 			get
 			{
@@ -41,19 +41,19 @@ namespace Nekki.SF2.Core.Fights.Renders.Model
 			}
 		}
 
-		private static Material BHOOIDPODBM
+		private static Material ColoredSpriteMaterial
 		{
 			get
 			{
-				return IJPDLBNIKEJ();
+				return GetColoredSpriteMaterial();
 			}
 		}
 
-		private static Material FAOIEHIIFMP
+		private static Material DefaultSpriteMaterial
 		{
 			get
 			{
-				return MJIHAKPIPMH();
+				return GetDefaultSpriteMaterial();
 			}
 		}
 
@@ -117,27 +117,27 @@ namespace Nekki.SF2.Core.Fights.Renders.Model
 			_LineRender.endColor = tint ?? _OriginalEndColor;
 		}
 
-		private static Material IJPDLBNIKEJ()
+		private static Material GetColoredSpriteMaterial()
 		{
-			if (CBDOCDONEJE == null)
+			if (coloredSpriteMaterial == null)
 			{
-				CBDOCDONEJE = new Material(Shader.Find("Sprites/Colored"));
+				coloredSpriteMaterial = new Material(Shader.Find("Sprites/Colored"));
 			}
-			return CBDOCDONEJE;
+			return coloredSpriteMaterial;
 		}
 
-		private static Material MJIHAKPIPMH()
+		private static Material GetDefaultSpriteMaterial()
 		{
-			if (OAKNHBMPNLH == null)
+			if (defaultSpriteMaterial == null)
 			{
-				OAKNHBMPNLH = new Material(Shader.Find("Sprites/Default"));
+				defaultSpriteMaterial = new Material(Shader.Find("Sprites/Default"));
 			}
-			return OAKNHBMPNLH;
+			return defaultSpriteMaterial;
 		}
 
 		private void Start()
 		{
-			_Stroke = _Base.IHEKOJKHPGP();
+			_Stroke = _Base.GetThickness();
 			_LineRender = base.gameObject.AddComponent<LineRenderer>();
 			_LineRender.numCapVertices = 9;
 			LineRenderer nLHJNOCKKGE = _LineRender;
@@ -145,7 +145,7 @@ namespace Nekki.SF2.Core.Fights.Renders.Model
 			_LineRender.endWidth = pJMDIHLGNHB;
 			nLHJNOCKKGE.startWidth = pJMDIHLGNHB;
 			_LineRender.useWorldSpace = false;
-			_LineRender.sharedMaterial = MJIHAKPIPMH();
+			_LineRender.sharedMaterial = GetDefaultSpriteMaterial();
 			_LineRender.shadowCastingMode = ShadowCastingMode.Off;
 			_LineRender.receiveShadows = false;
 			_LineRender.alignment = LineAlignment.TransformZ;
@@ -162,10 +162,10 @@ namespace Nekki.SF2.Core.Fights.Renders.Model
 
 		public void Render()
 		{
-			if (_Base != null && !Vector2f.LFPMCJPCJBD(_Base.NDCACMDFLJN(), null) && !Vector2f.LFPMCJPCJBD(_Base.MINOGAHDDHA(), null) && !(_LineRender == null))
+			if (_Base != null && !Vector2f.op_Equality(_Base.GetStart(), null) && !Vector2f.op_Equality(_Base.GetEnd(), null) && !(_LineRender == null))
 			{
-				Vector3f eMAFACPEPDK = _Base.NDCACMDFLJN();
-				Vector3f eMAFACPEPDK2 = _Base.MINOGAHDDHA();
+				Vector3f eMAFACPEPDK = _Base.GetStart();
+				Vector3f eMAFACPEPDK2 = _Base.GetEnd();
 				Vector3 rawStart = new Vector3(eMAFACPEPDK.GetX(), eMAFACPEPDK.GetY(), eMAFACPEPDK.GetZ());
 				Vector3 rawEnd = new Vector3(eMAFACPEPDK2.GetX(), eMAFACPEPDK2.GetY(), eMAFACPEPDK2.GetZ());
 				Vector3 start;
@@ -174,13 +174,13 @@ namespace Nekki.SF2.Core.Fights.Renders.Model
 				ApplyTint();
 				float num = end.x - start.x;
 				float num2 = end.y - start.y;
-				float x = start.x + num * _Base.JAEOCMCOEFE();
-				float y = start.y + num2 * _Base.JAEOCMCOEFE();
-				float x2 = start.x + num * (1f - _Base.PLFEEBJMGAK());
-				float y2 = start.y + num2 * (1f - _Base.PLFEEBJMGAK());
-				if (_Stroke != _Base.IHEKOJKHPGP())
+				float x = start.x + num * _Base.GetMargin1();
+				float y = start.y + num2 * _Base.GetMargin1();
+				float x2 = start.x + num * (1f - _Base.GetMargin2());
+				float y2 = start.y + num2 * (1f - _Base.GetMargin2());
+				if (_Stroke != _Base.GetThickness())
 				{
-					_Stroke = _Base.IHEKOJKHPGP();
+					_Stroke = _Base.GetThickness();
 					LineRenderer nLHJNOCKKGE = _LineRender;
 					float pJMDIHLGNHB = _Stroke;
 					_LineRender.endWidth = pJMDIHLGNHB;
@@ -195,8 +195,8 @@ namespace Nekki.SF2.Core.Fights.Renders.Model
 				solid = solid && (bodyOutline || _Volume != null);
 				if (_Volume != null) _Volume.gameObject.SetActive(solid && !bodyOutline);
 				_LineRender.enabled = !solid;
-				if (solid && !bodyOutline) _Volume.Capsule(Vector3.LerpUnclamped(start, end, _Base.JAEOCMCOEFE()),
-					Vector3.LerpUnclamped(start, end, 1f - _Base.PLFEEBJMGAK()), _Stroke, _LineRender.startColor);
+				if (solid && !bodyOutline) _Volume.Capsule(Vector3.LerpUnclamped(start, end, _Base.GetMargin1()),
+					Vector3.LerpUnclamped(start, end, 1f - _Base.GetMargin2()), _Stroke, _LineRender.startColor);
 				UpdateRim(new Vector3(x, y, 0f), new Vector3(x2, y2, 0f));
 			}
 		}

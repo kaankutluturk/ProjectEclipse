@@ -8,6 +8,6 @@ public class PerkActionModificator : PerkAction
 	public PerkActionModificator(PerkActionModificator NOLFMPDGCOC)
 		: base(NOLFMPDGCOC)
 	{
-		set_Modificator(NOLFMPDGCOC.NKAEEFNNBEN());
+		set_Modificator(NOLFMPDGCOC.GetModificator());
 	}
 }

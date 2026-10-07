@@ -1,8 +1,8 @@
 public interface IProtocol
 {
-	bool BILHEJLBKMF { get; }
+	bool IsConnectionClosed { get; }
 
-	bool HDDABMLNDPK();
+	bool GetIsClosed();
 
 	void HandleEvents();
 }

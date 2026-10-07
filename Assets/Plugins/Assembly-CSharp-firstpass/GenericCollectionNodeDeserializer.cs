@@ -4,35 +4,35 @@ using YamlDotNet.Core;
 
 public sealed class GenericCollectionNodeDeserializer : INodeDeserializer
 {
-	private readonly IObjectFactory IEBGHNHEOBB;
+	private readonly IObjectFactory objectFactory;
 
-	private static readonly GenericStaticMethod ICACCOKCLGO = new GenericStaticMethod(() => LJAJEBCNABG<object>(null, null, null, null));
+	private static readonly GenericStaticMethod deserializeHelperMethod = new GenericStaticMethod(() => DeserializeHelper<object>(null, null, null, null));
 
 	public GenericCollectionNodeDeserializer(IObjectFactory EJPHFDCKCCE)
 	{
-		IEBGHNHEOBB = EJPHFDCKCCE;
+		objectFactory = EJPHFDCKCCE;
 	}
 
 	bool INodeDeserializer.Deserialize(EventReader reader, Type MBLGNMBFHBI, Func<EventReader, Type, object> IJBAEAEDMCC, out object value)
 	{
-		Type type = ReflectionUtility.JIDNEGBGBGL(MBLGNMBFHBI, typeof(ICollection<>));
+		Type type = ReflectionUtility.GetImplementedGenericInterface(MBLGNMBFHBI, typeof(ICollection<>));
 		if (type == null)
 		{
 			value = false;
 			return false;
 		}
-		value = IEBGHNHEOBB.Create(MBLGNMBFHBI);
-		ICACCOKCLGO.Invoke(type.GetGenericArguments(), reader, MBLGNMBFHBI, IJBAEAEDMCC, value);
+		value = objectFactory.Create(MBLGNMBFHBI);
+		deserializeHelperMethod.Invoke(type.GetGenericArguments(), reader, MBLGNMBFHBI, IJBAEAEDMCC, value);
 		return true;
 	}
 
-	internal static void LJAJEBCNABG<TItem>(EventReader reader, Type MBLGNMBFHBI, Func<EventReader, Type, object> IJBAEAEDMCC, ICollection<TItem> DCJLKCFKCOM)
+	internal static void DeserializeHelper<TItem>(EventReader reader, Type MBLGNMBFHBI, Func<EventReader, Type, object> IJBAEAEDMCC, ICollection<TItem> DCJLKCFKCOM)
 	{
 		IList<TItem> GBAAEMCBDAM = DCJLKCFKCOM as IList<TItem>;
-		reader.DODGGCGJJLL<JODGINIKFJF>();
-		while (!reader.GPHIFFOGOGN<AKMKLAINLOL>())
+		reader.Expect<SequenceStart>();
+		while (!reader.Accept<SequenceEnd>())
 		{
-			ParsingEvent jMKLCDAKEOG = reader.OAPMECPBPKJ().AOJJOEHEPGM();
+			ParsingEvent jMKLCDAKEOG = reader.GetParser().GetCurrent();
 			object obj = IJBAEAEDMCC(reader, typeof(TItem));
 			IValuePromise aGAMFLELGLG = obj as IValuePromise;
 			if (aGAMFLELGLG == null)
@@ -50,8 +50,8 @@ public sealed class GenericCollectionNodeDeserializer : INodeDeserializer
 				});
 				continue;
 			}
-			throw new ForwardAnchorNotSupportedException(jMKLCDAKEOG.OGPHJPFHBJL(), jMKLCDAKEOG.GDJHIJHFPHA(), "Forward alias references are not allowed because this type does not implement IList<>");
+			throw new ForwardAnchorNotSupportedException(jMKLCDAKEOG.GetStart(), jMKLCDAKEOG.GetEnd(), "Forward alias references are not allowed because this type does not implement IList<>");
 		}
-		reader.DODGGCGJJLL<AKMKLAINLOL>();
+		reader.Expect<SequenceEnd>();
 	}
 }

@@ -63,25 +63,25 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 			return value ^ KGBGENDIMBC;
 		}
 
-		public void PKOKLDGAPEI()
+		public void ApplyNewCryptoKey()
 		{
 			if (currentCryptoKey != cryptoKey)
 			{
-				hiddenValue = Encrypt(GEKBGBJOMIA(), cryptoKey);
+				hiddenValue = Encrypt(InternalDecrypt(), cryptoKey);
 				currentCryptoKey = cryptoKey;
 			}
 		}
 
-		public void GMCADPGOCHM()
+		public void RandomizeCryptoKey()
 		{
-			long bAINMLLIKOL = GEKBGBJOMIA();
+			long bAINMLLIKOL = InternalDecrypt();
 			currentCryptoKey = UnityEngine.Random.Range(int.MinValue, int.MaxValue);
 			hiddenValue = Encrypt(bAINMLLIKOL, currentCryptoKey);
 		}
 
-		public long ECEBFGCJIDA()
+		public long GetEncrypted()
 		{
-			PKOKLDGAPEI();
+			ApplyNewCryptoKey();
 			return hiddenValue;
 		}
 
@@ -89,13 +89,13 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 		{
 			inited = true;
 			hiddenValue = ANGFOBEKKKD;
-			if (ObscuredCheatingDetector.NMACGEJHPDN())
+			if (ObscuredCheatingDetector.GetIsRunning())
 			{
-				fakeValue = GEKBGBJOMIA();
+				fakeValue = InternalDecrypt();
 			}
 		}
 
-		private long GEKBGBJOMIA()
+		private long InternalDecrypt()
 		{
 			if (!inited)
 			{
@@ -105,9 +105,9 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 				inited = true;
 			}
 			long num = Decrypt(hiddenValue, currentCryptoKey);
-			if (ObscuredCheatingDetector.NMACGEJHPDN() && fakeValue != 0 && num != fakeValue)
+			if (ObscuredCheatingDetector.GetIsRunning() && fakeValue != 0 && num != fakeValue)
 			{
-				ObscuredCheatingDetector.get_Instance().MCDANNDOEIK();
+				ObscuredCheatingDetector.get_Instance().OnCheatingDetected();
 			}
 			return num;
 		}
@@ -115,7 +115,7 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 		public static implicit operator ObscuredLong(long value)
 		{
 			ObscuredLong result = new ObscuredLong(Encrypt(value));
-			if (ObscuredCheatingDetector.NMACGEJHPDN())
+			if (ObscuredCheatingDetector.GetIsRunning())
 			{
 				result.fakeValue = value;
 			}
@@ -124,15 +124,15 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 
 		public static implicit operator long(ObscuredLong value)
 		{
-			return value.GEKBGBJOMIA();
+			return value.InternalDecrypt();
 		}
 
 		[SpecialName]
-		public static ObscuredLong ALEAHDHGCJL(ObscuredLong NILNDHEKNLJ)
+		public static ObscuredLong op_Increment(ObscuredLong NILNDHEKNLJ)
 		{
-			long bAINMLLIKOL = NILNDHEKNLJ.GEKBGBJOMIA() + 1;
+			long bAINMLLIKOL = NILNDHEKNLJ.InternalDecrypt() + 1;
 			NILNDHEKNLJ.hiddenValue = Encrypt(bAINMLLIKOL, NILNDHEKNLJ.currentCryptoKey);
-			if (ObscuredCheatingDetector.NMACGEJHPDN())
+			if (ObscuredCheatingDetector.GetIsRunning())
 			{
 				NILNDHEKNLJ.fakeValue = bAINMLLIKOL;
 			}
@@ -140,11 +140,11 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 		}
 
 		[SpecialName]
-		public static ObscuredLong DDKOKLNFNPB(ObscuredLong NILNDHEKNLJ)
+		public static ObscuredLong op_Decrement(ObscuredLong NILNDHEKNLJ)
 		{
-			long bAINMLLIKOL = NILNDHEKNLJ.GEKBGBJOMIA() - 1;
+			long bAINMLLIKOL = NILNDHEKNLJ.InternalDecrypt() - 1;
 			NILNDHEKNLJ.hiddenValue = Encrypt(bAINMLLIKOL, NILNDHEKNLJ.currentCryptoKey);
-			if (ObscuredCheatingDetector.NMACGEJHPDN())
+			if (ObscuredCheatingDetector.GetIsRunning())
 			{
 				NILNDHEKNLJ.fakeValue = bAINMLLIKOL;
 			}
@@ -171,27 +171,27 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 
 		public override int GetHashCode()
 		{
-			return GEKBGBJOMIA().GetHashCode();
+			return InternalDecrypt().GetHashCode();
 		}
 
 		public override string ToString()
 		{
-			return GEKBGBJOMIA().ToString();
+			return InternalDecrypt().ToString();
 		}
 
 		public string ToString(string LBOHOKIBHOH)
 		{
-			return GEKBGBJOMIA().ToString(LBOHOKIBHOH);
+			return InternalDecrypt().ToString(LBOHOKIBHOH);
 		}
 
 		public string ToString(IFormatProvider EEGMFLOPLLH)
 		{
-			return GEKBGBJOMIA().ToString(EEGMFLOPLLH);
+			return InternalDecrypt().ToString(EEGMFLOPLLH);
 		}
 
 		public string ToString(string LBOHOKIBHOH, IFormatProvider EEGMFLOPLLH)
 		{
-			return GEKBGBJOMIA().ToString(LBOHOKIBHOH, EEGMFLOPLLH);
+			return InternalDecrypt().ToString(LBOHOKIBHOH, EEGMFLOPLLH);
 		}
 	}
 }

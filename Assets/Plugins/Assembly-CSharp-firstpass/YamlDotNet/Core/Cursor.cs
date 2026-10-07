@@ -23,7 +23,7 @@ namespace YamlDotNet.Core
 			LineOffset = LIMLDKKPJIA.LineOffset;
 		}
 
-		public Mark BJKDANAAGHK()
+		public Mark Mark()
 		{
 			return new Mark(Index, Line, LineOffset + 1);
 		}
@@ -34,14 +34,14 @@ namespace YamlDotNet.Core
 			LineOffset++;
 		}
 
-		public void AIGOMGCEJJD(int IPCOBJBKNAO)
+		public void SkipLineByOffset(int IPCOBJBKNAO)
 		{
 			Index += IPCOBJBKNAO;
 			Line++;
 			LineOffset = 0;
 		}
 
-		public void JFJBGABDLJM()
+		public void ForceSkipLineAfterNonBreak()
 		{
 			if (LineOffset != 0)
 			{

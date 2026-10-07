@@ -11,17 +11,17 @@ public class QuestActionSetEnergy : QuestAction
 		_value = EPKLCPOEELO.Attributes["Value"].ParseInt();
 		if (_value < 0)
 		{
-			LLLOJBFMONN.Error("QuestActionSetEnergy::parse - wrong value: %i, setting to 0", _value);
+			GameLog.Error("QuestActionSetEnergy::parse - wrong value: %i, setting to 0", _value);
 			_value = 0;
 		}
 	}
 
-	public override void DEJMHFMLKIC(QuestParameters GFIHPBCEEOB)
+	public override void Execute(QuestParameters GFIHPBCEEOB)
 	{
-		base.DEJMHFMLKIC(GFIHPBCEEOB);
-		Roster nKGLHEGIKKP = ListSF.CCDKHLAMKKO();
-		int oGLHGFJKMCO = nKGLHEGIKKP.OGLHGFJKMCO;
-		nKGLHEGIKKP.DKAAELKJJOP(Math.Min(_value, oGLHGFJKMCO));
-		OGIJONMKABB();
+		base.Execute(GFIHPBCEEOB);
+		Roster nKGLHEGIKKP = ListSF.GetRoster();
+		int oGLHGFJKMCO = nKGLHEGIKKP.PowerMax;
+		nKGLHEGIKKP.SetPower(Math.Min(_value, oGLHGFJKMCO));
+		FinishAction();
 	}
 }

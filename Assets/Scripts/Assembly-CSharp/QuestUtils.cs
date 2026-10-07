@@ -1,32 +1,32 @@
 public static class QuestUtils
 {
-	private static GFKEHPOBLFJ OCPOJKKFCHH = new GFKEHPOBLFJ();
+	private static DifficultyFilterOverride difficultyOptions = new DifficultyFilterOverride();
 
-	private static NoAnimationMove MJMKFGBAFLE = new NoAnimationMove();
+	private static NoAnimationMove noAnimationMoves = new NoAnimationMove();
 
-	public static GFKEHPOBLFJ HHMGBELFNMF
+	public static DifficultyFilterOverride DifficultyOptions
 	{
 		get
 		{
-			return DPLFDKODKIC();
+			return GetDifficultyOptions();
 		}
 	}
 
-	public static NoAnimationMove CHMOLLHJJLG
+	public static NoAnimationMove NoAnimationMoves
 	{
 		get
 		{
-			return BKBHIHMEMEH();
+			return GetNoAnimationMoves();
 		}
 	}
 
-	public static GFKEHPOBLFJ DPLFDKODKIC()
+	public static DifficultyFilterOverride GetDifficultyOptions()
 	{
-		return OCPOJKKFCHH;
+		return difficultyOptions;
 	}
 
-	public static NoAnimationMove BKBHIHMEMEH()
+	public static NoAnimationMove GetNoAnimationMoves()
 	{
-		return MJMKFGBAFLE;
+		return noAnimationMoves;
 	}
 }

@@ -2,38 +2,38 @@ using System.Collections.Generic;
 
 public class PricesDataContainer
 {
-	private List<PricesData> NHDOHBCNLGB = new List<PricesData>();
+	private List<PricesData> prices = new List<PricesData>();
 
-	public List<PricesData> IHHMHNHOLCB
+	public List<PricesData> Prices
 	{
 		get
 		{
-			return GMCBGMPEHLF();
+			return GetPrices();
 		}
 	}
 
-	public List<PricesData> GMCBGMPEHLF()
+	public List<PricesData> GetPrices()
 	{
-		return NHDOHBCNLGB;
+		return prices;
 	}
 
-	public PricesData CCFOOCDFGMF(string JKKKGIOHNMH)
+	public PricesData FindByProductId(string JKKKGIOHNMH)
 	{
-		return NHDOHBCNLGB.Find((PricesData DHDMNHCIPEH) => DHDMNHCIPEH.GNIJPFLLNIC == JKKKGIOHNMH || DHDMNHCIPEH.GFMKCJPKMOK == JKKKGIOHNMH);
+		return prices.Find((PricesData DHDMNHCIPEH) => DHDMNHCIPEH.ProductId == JKKKGIOHNMH || DHDMNHCIPEH.NewProductId == JKKKGIOHNMH);
 	}
 
-	public PricesData LIKBNIAJHKA(string BMCEHAPAJCA)
+	public PricesData FindByName(string BMCEHAPAJCA)
 	{
-		return NHDOHBCNLGB.Find((PricesData DHDMNHCIPEH) => DHDMNHCIPEH.name == BMCEHAPAJCA);
+		return prices.Find((PricesData DHDMNHCIPEH) => DHDMNHCIPEH.name == BMCEHAPAJCA);
 	}
 
-	public bool LIKBNIAJHKA(string BMCEHAPAJCA, out float HCHKFOJEEBK)
+	public bool TryGetPriceValue(string BMCEHAPAJCA, out float HCHKFOJEEBK)
 	{
 		HCHKFOJEEBK = 0f;
-		PricesData bEOLBLGJCKA = LIKBNIAJHKA(BMCEHAPAJCA);
+		PricesData bEOLBLGJCKA = FindByName(BMCEHAPAJCA);
 		if (bEOLBLGJCKA != null)
 		{
-			return float.TryParse(bEOLBLGJCKA.GFIMMDLCPMI(), out HCHKFOJEEBK);
+			return float.TryParse(bEOLBLGJCKA.GetCurrentPrice(), out HCHKFOJEEBK);
 		}
 		return false;
 	}

@@ -10,11 +10,11 @@ public class ConditionList : ConditionAnimation
 		OR = 1
 	}
 
-	private OperatorType DGHJEHMPAOP;
+	private OperatorType _operator;
 
-	private List<ConditionAnimation> KEJBANPKCFA = new List<ConditionAnimation>();
+	private List<ConditionAnimation> _conditions = new List<ConditionAnimation>();
 
-	public List<ConditionAnimation> JIFAHHGNPFH
+	public List<ConditionAnimation> Conditions
 	{
 		get
 		{
@@ -26,47 +26,47 @@ public class ConditionList : ConditionAnimation
 		: base(ConditionType.LIST)
 	{
 		string text = XmlUtils.ParseString(node.Attributes["Type"]);
-		DGHJEHMPAOP = ((text == "Or") ? OperatorType.OR : OperatorType.AND);
-		KEJBANPKCFA = conditions;
+		_operator = ((text == "Or") ? OperatorType.OR : OperatorType.AND);
+		_conditions = conditions;
 	}
 
 	public OperatorType get_Type()
 	{
-		return DGHJEHMPAOP;
+		return _operator;
 	}
 
 	// best guess for name
 	public List<ConditionAnimation> GetConditions()
 	{
-		return KEJBANPKCFA;
+		return _conditions;
 	}
 
 	public override bool IsEqual(ModelConditions conditions)
 	{
-		bool flag = OIBMEHKCPKB(conditions);
+		bool flag = EvaluateConditions(conditions);
 		return (!IsNot) ? flag : (!flag);
 	}
 
-	public bool DJEJMGCMPPH(ModelConditions conditions, Model ACENLMONNPA = null, EventAnimation DOANBADPBGH = null)
+	public bool EvaluateWithModel(ModelConditions conditions, Model ACENLMONNPA = null, EventAnimation DOANBADPBGH = null)
 	{
-		bool flag = OIBMEHKCPKB(conditions, ACENLMONNPA, DOANBADPBGH);
+		bool flag = EvaluateConditions(conditions, ACENLMONNPA, DOANBADPBGH);
 		return (!IsNot) ? flag : (!flag);
 	}
 
-	private bool OIBMEHKCPKB(ModelConditions conditions, Model ACENLMONNPA = null, EventAnimation DOANBADPBGH = null)
+	private bool EvaluateConditions(ModelConditions conditions, Model ACENLMONNPA = null, EventAnimation DOANBADPBGH = null)
 	{
-		foreach (ConditionAnimation item in KEJBANPKCFA)
+		foreach (ConditionAnimation item in _conditions)
 		{
 			bool flag = false;
 			if (item.Type == ConditionType.EVENT && ACENLMONNPA != null)
 			{
-				ModelType.KEIDBIOIFGA lFLGCDNKNJI = item.FHBAPKNECOM();
-				Model fGCODGKLHED = item.DKDAKGDMHAL(ACENLMONNPA, lFLGCDNKNJI);
-				ModelConditions dGJJDPIAEAO = fGCODGKLHED.EBABHGHPLFK();
+				ModelType.ModelTargetType lFLGCDNKNJI = item.GetTargetModelType();
+				Model fGCODGKLHED = item.ResolveTargetModel(ACENLMONNPA, lFLGCDNKNJI);
+				ModelConditions dGJJDPIAEAO = fGCODGKLHED.GetConditions();
 				if (DOANBADPBGH != null)
 				{
-					dGJJDPIAEAO.HFCIDBJJINB = DOANBADPBGH;
-					DOANBADPBGH.JIFAHHGNPFH = dGJJDPIAEAO;
+					dGJJDPIAEAO.CurrentEvent = DOANBADPBGH;
+					DOANBADPBGH.Conditions = dGJJDPIAEAO;
 				}
 				flag = item.IsEqual(dGJJDPIAEAO);
 			}
@@ -74,15 +74,15 @@ public class ConditionList : ConditionAnimation
 			{
 				flag = item.IsEqual(conditions);
 			}
-			if (flag && DGHJEHMPAOP == OperatorType.OR)
+			if (flag && _operator == OperatorType.OR)
 			{
 				return true;
 			}
-			if (!flag && DGHJEHMPAOP == OperatorType.AND)
+			if (!flag && _operator == OperatorType.AND)
 			{
 				return false;
 			}
 		}
-		return OperatorType.AND == DGHJEHMPAOP;
+		return OperatorType.AND == _operator;
 	}
 }

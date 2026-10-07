@@ -41,23 +41,23 @@ namespace Eclipse.Multiplayer
         private static FighterSnapshot CaptureModel(Model model)
         {
             if (model == null) return default;
-            var position = model.PLBNCDCFPML();
+            var position = model.GetPosition();
             var result = new FighterSnapshot
             {
                 Present = true,
                 X = position != null ? position.GetX() : float.NaN,
                 Y = position != null ? position.GetY() : float.NaN,
-                Facing = model.KFCNPADAMHA(),
-                Life = model.KKMCHCNOHMB(),
+                Facing = model.GetFacingSign(),
+                Life = model.GetLife(),
                 RecoverableLife = model.Parameters != null ? model.Parameters.RecoverableLife : 0f,
                 RoundsWon = model.Parameters != null ? model.Parameters.RoundsWon : -1,
                 Animation = model.GetCurrentAnimation()?.Name,
             };
             // Only counters that are safe without an active animation (fighters have none during the intro).
-            var animation = model.OCPMJKIEPIG();
+            var animation = model.GetAnimationModule();
             if (animation != null)
             {
-                result.Frame = animation.NEBJGKODIKP();
+                result.Frame = animation.GetPhysicsFrame();
                 result.Interval = animation.GetFrameInMove();
             }
             return result;

@@ -6,17 +6,17 @@ namespace Nekki.SF2.GUI.Fight
 {
 	public class ComboItem : MonoBehaviour
 	{
-		private const string IBGLKACJEHD = "FightUI.Critical";
+		private const string CriticalSprite = "FightUI.Critical";
 
-		private const string JCFGHNHJOFP = "FightUI.First_Strike";
+		private const string FirstStrikeSprite = "FightUI.First_Strike";
 
-		private const string HMLOHEKPAGC = "FightUI.Head_Hit";
+		private const string HeadHitSprite = "FightUI.Head_Hit";
 
-		private const string AIGAAPIEIPH = "FightUI.Combo";
+		private const string ComboSprite = "FightUI.Combo";
 
-		private const string NHCNONBPNJH = "FightUI.hot_ground";
+		private const string HotGroundSprite = "FightUI.hot_ground";
 
-		private const string MDIGBDBAKEM = "FightUI.shock";
+		private const string ShockSprite = "FightUI.shock";
 
 		[SerializeField]
 		private Color _labelColorHotground = new Color32(254, 253, 131, byte.MaxValue);
@@ -37,12 +37,12 @@ namespace Nekki.SF2.GUI.Fight
 		private HorizontalLayoutGroup _layout;
 
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		private ComboTypes MMEKOHBGPGG;
+		private ComboTypes comboType;
 
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		private ScreenModel.JEDPGMIGGKK NMBECJLDELB;
+		private ScreenModel.ScreenSide modelSide;
 
-		public ComboTypes GLFJFNICMIF
+		public ComboTypes ItemType
 		{
 			get
 			{
@@ -50,11 +50,11 @@ namespace Nekki.SF2.GUI.Fight
 			}
 			private set
 			{
-				EIEKDJFOKAO(value);
+				SetComboType(value);
 			}
 		}
 
-		public ScreenModel.JEDPGMIGGKK DPLAGLNBMOM
+		public ScreenModel.ScreenSide ModelSide
 		{
 			get
 			{
@@ -62,28 +62,28 @@ namespace Nekki.SF2.GUI.Fight
 			}
 			private set
 			{
-				JLBHBOKEAFD(value);
+				SetModelSide(value);
 			}
 		}
 
 		public ComboTypes get_ComboType()
 		{
-			return MMEKOHBGPGG;
+			return comboType;
 		}
 
-		private void EIEKDJFOKAO(ComboTypes value)
+		private void SetComboType(ComboTypes value)
 		{
-			MMEKOHBGPGG = value;
+			comboType = value;
 		}
 
-		public ScreenModel.JEDPGMIGGKK get_ModelType()
+		public ScreenModel.ScreenSide get_ModelType()
 		{
-			return NMBECJLDELB;
+			return modelSide;
 		}
 
-		private void JLBHBOKEAFD(ScreenModel.JEDPGMIGGKK value)
+		private void SetModelSide(ScreenModel.ScreenSide value)
 		{
-			NMBECJLDELB = value;
+			modelSide = value;
 		}
 
 		public RectTransform get_rectTransform()
@@ -91,13 +91,13 @@ namespace Nekki.SF2.GUI.Fight
 			return base.transform as RectTransform;
 		}
 
-		public void Init(ComboTypes LFLGCDNKNJI, ScreenModel.JEDPGMIGGKK NPEAOKLDJHA)
+		public void Init(ComboTypes LFLGCDNKNJI, ScreenModel.ScreenSide NPEAOKLDJHA)
 		{
-			JLBHBOKEAFD(NPEAOKLDJHA);
-			EIEKDJFOKAO(LFLGCDNKNJI);
+			SetModelSide(NPEAOKLDJHA);
+			SetComboType(LFLGCDNKNJI);
 			if (_image != null)
 			{
-				_image.set_SpriteName(APNCKGLEIEE(LFLGCDNKNJI));
+				_image.set_SpriteName(GetSpriteName(LFLGCDNKNJI));
 				_image.SetNativeSize();
 				LayoutElement component = _image.GetComponent<LayoutElement>();
 				component.minWidth = _image.rectTransform.rect.width;
@@ -114,7 +114,7 @@ namespace Nekki.SF2.GUI.Fight
 					_label.color = _labelColorHotground;
 					_label.set_LabelFontSize(_labelFontSizeHotground);
 				}
-				if (NPEAOKLDJHA == ScreenModel.JEDPGMIGGKK.TYPE_LEFT)
+				if (NPEAOKLDJHA == ScreenModel.ScreenSide.TYPE_LEFT)
 				{
 					_label.transform.SetAsLastSibling();
 				}
@@ -126,7 +126,7 @@ namespace Nekki.SF2.GUI.Fight
 			UpdateSize();
 		}
 
-		private string APNCKGLEIEE(ComboTypes LFLGCDNKNJI)
+		private string GetSpriteName(ComboTypes LFLGCDNKNJI)
 		{
 			switch (LFLGCDNKNJI)
 			{

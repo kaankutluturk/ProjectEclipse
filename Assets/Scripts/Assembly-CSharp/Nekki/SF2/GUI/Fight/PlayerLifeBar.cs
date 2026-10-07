@@ -15,21 +15,21 @@ namespace Nekki.SF2.GUI.Fight
 		[SerializeField]
 		private ResolutionImageSkew _hitBar;
 
-		private ModelParameters HEGIABHIPHA;
+		private ModelParameters fighterModel;
 
-		private float CNNFPAMBLCN;
+		private float targetHealthValue;
 
-		private float PHNAGDGNKCN;
+		private float targetHitValue;
 
-		private float GDJBAIIDKDE;
+		private float currentHealthValue;
 
-		private float GJBDOHGGIAA;
+		private float currentHitValue;
 
-		private int HMPIKELHBMG;
+		private int healthBarFramesLeft;
 
-		private int CDJAOLBGLJK;
+		private int hitBarFramesLeft;
 
-		private float FBFNFLBPACL;
+		private float hitBarDelay;
 
 		private bool _lockLifeUpdate;
 
@@ -44,7 +44,7 @@ namespace Nekki.SF2.GUI.Fight
 			_raidStyle.Apply(_healthBar, _background, raidBoss);
 		}
 
-		public bool IILLNODMAMI
+		public bool IsLifeUpdateLocked
 		{
 			get
 			{
@@ -78,30 +78,30 @@ namespace Nekki.SF2.GUI.Fight
 				Eclipse.Rendering.Interpolation.TickPresentationSmoother.Clock.Fight);
 			Eclipse.Rendering.Interpolation.TickPresentationSmoother.AttachFill(_hitBar,
 				Eclipse.Rendering.Interpolation.TickPresentationSmoother.Clock.Fight);
-			HEGIABHIPHA = JCICKLIMBEF;
+			fighterModel = JCICKLIMBEF;
 			Eclipse.Multiplayer.PvpRecoverableBar.Attach(_healthBar, JCICKLIMBEF);
-			JEBDBEIMPLK();
+			ResetState();
 		}
 
-		private void JEBDBEIMPLK()
+		private void ResetState()
 		{
-			FBFNFLBPACL = 0f;
+			hitBarDelay = 0f;
 			_lockLifeUpdate = false;
-			GDJBAIIDKDE = 0f;
-			HMPIKELHBMG = 0;
-			GJBDOHGGIAA = 0f;
-			CDJAOLBGLJK = 0;
-			CNNFPAMBLCN = 0f;
-			PHNAGDGNKCN = 0f;
+			currentHealthValue = 0f;
+			healthBarFramesLeft = 0;
+			currentHitValue = 0f;
+			hitBarFramesLeft = 0;
+			targetHealthValue = 0f;
+			targetHitValue = 0f;
 			ResetLife();
 		}
 
 		public void ResetLife()
 		{
-			_raidTransition.Reset(HEGIABHIPHA.RemainingHealthBars);
-			FBFNFLBPACL = 0f;
-			SetValBarValue(KIPMKKDPEKH());
-			SetHitBarValue(KIPMKKDPEKH());
+			_raidTransition.Reset(fighterModel.RemainingHealthBars);
+			hitBarDelay = 0f;
+			SetValBarValue(GetHealthFraction());
+			SetHitBarValue(GetHealthFraction());
 		}
 
 		public virtual void Render()
@@ -110,75 +110,75 @@ namespace Nekki.SF2.GUI.Fight
 			{
 				UpdateLife();
 			}
-			IBJGPLNHBHM();
-			OFGDKCEBAPN();
-			float num = 1f / (float)GameUtils.GGBABPJBGJB();
-			if (FBFNFLBPACL > 0f)
+			AnimateHealthBar();
+			AnimateHitBar();
+			float num = 1f / (float)GameUtils.GetSlowMode();
+			if (hitBarDelay > 0f)
 			{
-				FBFNFLBPACL -= num;
-				if (FBFNFLBPACL <= 0f)
+				hitBarDelay -= num;
+				if (hitBarDelay <= 0f)
 				{
-					SetHitBarValue(CNNFPAMBLCN, 30);
+					SetHitBarValue(targetHealthValue, 30);
 				}
 			}
 		}
 
-		private void IBJGPLNHBHM()
+		private void AnimateHealthBar()
 		{
-			if (GDJBAIIDKDE != CNNFPAMBLCN)
+			if (currentHealthValue != targetHealthValue)
 			{
 				float num = 0f;
-				if (HMPIKELHBMG < 1)
+				if (healthBarFramesLeft < 1)
 				{
-					num = CNNFPAMBLCN;
+					num = targetHealthValue;
 				}
 				else
 				{
-					float num2 = GDJBAIIDKDE - CNNFPAMBLCN;
-					float num3 = num2 / (float)HMPIKELHBMG;
-					num = GDJBAIIDKDE - num3;
+					float num2 = currentHealthValue - targetHealthValue;
+					float num3 = num2 / (float)healthBarFramesLeft;
+					num = currentHealthValue - num3;
 				}
-				JEEHFMNKFFH(num);
-				HMPIKELHBMG--;
+				ApplyHealthBarValue(num);
+				healthBarFramesLeft--;
 			}
 		}
 
-		private void OFGDKCEBAPN()
+		private void AnimateHitBar()
 		{
-			if (GJBDOHGGIAA != PHNAGDGNKCN)
+			if (currentHitValue != targetHitValue)
 			{
 				float num = 0f;
-				if (CDJAOLBGLJK < 1)
+				if (hitBarFramesLeft < 1)
 				{
-					num = PHNAGDGNKCN;
+					num = targetHitValue;
 				}
 				else
 				{
-					float num2 = GJBDOHGGIAA - PHNAGDGNKCN;
-					float num3 = num2 / (float)CDJAOLBGLJK;
-					num = GJBDOHGGIAA - num3;
+					float num2 = currentHitValue - targetHitValue;
+					float num3 = num2 / (float)hitBarFramesLeft;
+					num = currentHitValue - num3;
 				}
-				EKAFFANKJFB(num);
-				CDJAOLBGLJK--;
+				ApplyHitBarValue(num);
+				hitBarFramesLeft--;
 			}
 		}
 
 		private void UpdateLife()
 		{
-			float num = KIPMKKDPEKH();
+			float num = GetHealthFraction();
 			UnderworldRaidLifeBarUpdate raidUpdate = _raidTransition.Update(
 				num,
-				HEGIABHIPHA.RemainingHealthBars,
-				HEGIABHIPHA.HealthBarCount,
-				GDJBAIIDKDE,
-				GJBDOHGGIAA,
-				CNNFPAMBLCN);
+				fighterModel.RemainingHealthBars,
+				fighterModel.HealthBarCount,
+				currentHealthValue,
+				currentHitValue,
+				targetHealthValue);
 			if (raidUpdate.Handled)
 			{
 				ApplyRaidLifeBarUpdate(raidUpdate);
 				return;
 			}
-			float num2 = num - CNNFPAMBLCN;
+			float num2 = num - targetHealthValue;
 			if (num2 != 0f)
 			{
 				if (num2 > 0f)
@@ -188,7 +188,7 @@ namespace Nekki.SF2.GUI.Fight
 				}
 				else
 				{
-					FBFNFLBPACL = ((Mathf.Abs(num2) < 0.01f) ? 1 : 60);
+					hitBarDelay = ((Mathf.Abs(num2) < 0.01f) ? 1 : 60);
 					SetValBarValue(num, 10);
 				}
 			}
@@ -203,7 +203,7 @@ namespace Nekki.SF2.GUI.Fight
 			}
 			if (update.SetHitDelay)
 			{
-				FBFNFLBPACL = update.HitDelay;
+				hitBarDelay = update.HitDelay;
 			}
 			if (update.SetHealthBar)
 			{
@@ -217,48 +217,48 @@ namespace Nekki.SF2.GUI.Fight
 
 		public void SetValBarValue(float value, int frames = 0)
 		{
-			CNNFPAMBLCN = value;
-			HMPIKELHBMG = frames;
-			if (HMPIKELHBMG == 0)
+			targetHealthValue = value;
+			healthBarFramesLeft = frames;
+			if (healthBarFramesLeft == 0)
 			{
-				JEEHFMNKFFH(CNNFPAMBLCN);
+				ApplyHealthBarValue(targetHealthValue);
 			}
 		}
 
 		public void SetHitBarValue(float value, int frames = 0)
 		{
-			PHNAGDGNKCN = value;
-			CDJAOLBGLJK = frames;
-			if (CDJAOLBGLJK == 0)
+			targetHitValue = value;
+			hitBarFramesLeft = frames;
+			if (hitBarFramesLeft == 0)
 			{
-				EKAFFANKJFB(PHNAGDGNKCN);
+				ApplyHitBarValue(targetHitValue);
 			}
 		}
 
-		private void JEEHFMNKFFH(float value)
+		private void ApplyHealthBarValue(float value)
 		{
 			if (_healthBar != null && _healthBar.fillAmount != value)
 			{
 				_healthBar.fillAmount = value;
 			}
-			GDJBAIIDKDE = value;
+			currentHealthValue = value;
 		}
 
-		private void EKAFFANKJFB(float value)
+		private void ApplyHitBarValue(float value)
 		{
 			if (_hitBar != null && _hitBar.fillAmount != value)
 			{
 				_hitBar.fillAmount = value;
 			}
-			GJBDOHGGIAA = value;
+			currentHitValue = value;
 		}
 
-		private float KIPMKKDPEKH()
+		private float GetHealthFraction()
 		{
-			float num = HEGIABHIPHA == null ? 0f : HEGIABHIPHA.CurrentHealthBarFraction;
-			if (num > 0f && num < FightGUI.JIBDDCOHPCC())
+			float num = fighterModel == null ? 0f : fighterModel.CurrentHealthBarFraction;
+			if (num > 0f && num < FightGUI.GetLifeBarMin())
 			{
-				num = FightGUI.JIBDDCOHPCC();
+				num = FightGUI.GetLifeBarMin();
 			}
 			return num;
 		}

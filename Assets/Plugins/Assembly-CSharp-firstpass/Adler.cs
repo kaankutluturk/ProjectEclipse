@@ -4,7 +4,7 @@ public sealed class Adler
 
 	private static readonly int NMAX = 5552;
 
-	public static uint IAJPFDALGJM(uint HMGBNHKFPAG, byte[] HLDLIFPJMOA, int index, int JCAJDBOMGOM)
+	public static uint Adler32(uint HMGBNHKFPAG, byte[] HLDLIFPJMOA, int index, int JCAJDBOMGOM)
 	{
 		if (HLDLIFPJMOA == null)
 		{

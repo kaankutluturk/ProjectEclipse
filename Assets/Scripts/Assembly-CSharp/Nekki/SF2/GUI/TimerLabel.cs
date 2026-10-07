@@ -30,28 +30,28 @@ namespace Nekki.SF2.GUI
 
 		public string Delimiter = ":";
 
-		private string JHJEPPMLLLK;
+		private string _delimiterAlias;
 
 		public string DaysString = "d ";
 
-		private string IPGNJBLGGDL;
+		private string _daysStringAlias;
 
 		public string HoursString;
 
-		private string HNNFMKCCFND;
+		private string _hoursStringAlias;
 
 		public string MinutesString;
 
-		private string KBEBEBHFGAJ;
+		private string _minutesStringAlias;
 
 		public string SecondsString;
 
-		private string NCPCLAFFPBE;
+		private string _secondsStringAlias;
 
 		[SerializeField]
 		private long _currentTime;
 
-		public string MKFBIJMBDGD
+		public string DelimiterAliasKey
 		{
 			get
 			{
@@ -63,7 +63,7 @@ namespace Nekki.SF2.GUI
 			}
 		}
 
-		public string DFFANDFIDEK
+		public string DaysAliasKey
 		{
 			get
 			{
@@ -75,7 +75,7 @@ namespace Nekki.SF2.GUI
 			}
 		}
 
-		public string KNCBNKIIGCJ
+		public string HoursAliasKey
 		{
 			get
 			{
@@ -87,7 +87,7 @@ namespace Nekki.SF2.GUI
 			}
 		}
 
-		public string BPEEILFMBNK
+		public string MinutesAliasKey
 		{
 			get
 			{
@@ -99,7 +99,7 @@ namespace Nekki.SF2.GUI
 			}
 		}
 
-		public string GNMLNGLCNAI
+		public string SecondsAliasKey
 		{
 			get
 			{
@@ -111,7 +111,7 @@ namespace Nekki.SF2.GUI
 			}
 		}
 
-		public long INOFJEFCNEE
+		public long RemainingTime
 		{
 			get
 			{
@@ -125,57 +125,57 @@ namespace Nekki.SF2.GUI
 
 		public string get_DelimiterAlias()
 		{
-			return JHJEPPMLLLK;
+			return _delimiterAlias;
 		}
 
 		public void set_DelimiterAlias(string value)
 		{
-			JHJEPPMLLLK = value;
-			Delimiter = LocalizationManager.GetString(JHJEPPMLLLK);
+			_delimiterAlias = value;
+			Delimiter = LocalizationManager.GetString(_delimiterAlias);
 		}
 
 		public string get_DaysStringAlias()
 		{
-			return IPGNJBLGGDL;
+			return _daysStringAlias;
 		}
 
 		public void set_DaysStringAlias(string value)
 		{
-			IPGNJBLGGDL = value;
-			DaysString = LocalizationManager.GetString(IPGNJBLGGDL);
+			_daysStringAlias = value;
+			DaysString = LocalizationManager.GetString(_daysStringAlias);
 		}
 
 		public string get_HoursStringAlias()
 		{
-			return HNNFMKCCFND;
+			return _hoursStringAlias;
 		}
 
 		public void set_HoursStringAlias(string value)
 		{
-			HNNFMKCCFND = value;
-			HoursString = LocalizationManager.GetString(HNNFMKCCFND);
+			_hoursStringAlias = value;
+			HoursString = LocalizationManager.GetString(_hoursStringAlias);
 		}
 
 		public string get_MinutesStringAlias()
 		{
-			return KBEBEBHFGAJ;
+			return _minutesStringAlias;
 		}
 
 		public void set_MinutesStringAlias(string value)
 		{
-			KBEBEBHFGAJ = value;
-			MinutesString = LocalizationManager.GetString(KBEBEBHFGAJ);
+			_minutesStringAlias = value;
+			MinutesString = LocalizationManager.GetString(_minutesStringAlias);
 		}
 
 		public string get_SecondsStringAlias()
 		{
-			return NCPCLAFFPBE;
+			return _secondsStringAlias;
 		}
 
 		public void set_SecondsStringAlias(string value)
 		{
-			NCPCLAFFPBE = value;
-			SecondsString = LocalizationManager.GetString(NCPCLAFFPBE);
+			_secondsStringAlias = value;
+			SecondsString = LocalizationManager.GetString(_secondsStringAlias);
 		}
 
 		public long get_CurrentTime()
@@ -188,7 +188,7 @@ namespace Nekki.SF2.GUI
 			if (_currentTime != value)
 			{
 				_currentTime = value;
-				DDLIPEKBHED();
+				UpdateText();
 			}
 		}
 
@@ -196,37 +196,37 @@ namespace Nekki.SF2.GUI
 		{
 			base.Awake();
 			GlobalTimer.get_Instance().addEventListener(0, OnTimerTick);
-			LocalizationManager.LKFNMDCLMCD(OCLBJLPOKLB);
+			LocalizationManager.AddLanguageChangedHandler(OnLanguageChanged);
 		}
 
 		protected override void OnDestroy()
 		{
 			base.OnDestroy();
 			GlobalTimer.get_Instance().removeEventListener(0, OnTimerTick);
-			LocalizationManager.FFIJPHDLPCF(OCLBJLPOKLB);
+			LocalizationManager.RemoveLanguageChangedHandler(OnLanguageChanged);
 		}
 
-		private void OCLBJLPOKLB()
+		private void OnLanguageChanged()
 		{
-			if (!string.IsNullOrEmpty(IPGNJBLGGDL))
+			if (!string.IsNullOrEmpty(_daysStringAlias))
 			{
-				set_DaysStringAlias(IPGNJBLGGDL);
+				set_DaysStringAlias(_daysStringAlias);
 			}
-			if (!string.IsNullOrEmpty(HNNFMKCCFND))
+			if (!string.IsNullOrEmpty(_hoursStringAlias))
 			{
-				set_HoursStringAlias(HNNFMKCCFND);
+				set_HoursStringAlias(_hoursStringAlias);
 			}
-			if (!string.IsNullOrEmpty(KBEBEBHFGAJ))
+			if (!string.IsNullOrEmpty(_minutesStringAlias))
 			{
-				set_MinutesStringAlias(KBEBEBHFGAJ);
+				set_MinutesStringAlias(_minutesStringAlias);
 			}
-			if (!string.IsNullOrEmpty(NCPCLAFFPBE))
+			if (!string.IsNullOrEmpty(_secondsStringAlias))
 			{
-				set_SecondsStringAlias(NCPCLAFFPBE);
+				set_SecondsStringAlias(_secondsStringAlias);
 			}
-			if (!string.IsNullOrEmpty(JHJEPPMLLLK))
+			if (!string.IsNullOrEmpty(_delimiterAlias))
 			{
-				set_DelimiterAlias(JHJEPPMLLLK);
+				set_DelimiterAlias(_delimiterAlias);
 			}
 		}
 
@@ -235,11 +235,11 @@ namespace Nekki.SF2.GUI
 			if (0 < _currentTime)
 			{
 				_currentTime--;
-				DDLIPEKBHED();
+				UpdateText();
 			}
 		}
 
-		private void DDLIPEKBHED()
+		private void UpdateText()
 		{
 			set_text(GetTimeString(_currentTime, IsSeconds, IsMinutes, IsHours, IsDays, Delimiter, DaysString, UseDaysDelimiter, IsSecondsZero, IsMinutesZero, IsHoursZero, IsDaysZero, HoursString, MinutesString, SecondsString, SegmentsDate));
 		}

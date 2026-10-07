@@ -5,86 +5,86 @@ using SF2.Offline;
 
 public class ItemInfo
 {
-	public enum MEFIBHIDOLA
+	public enum SpendType
 	{
 		SPEND_TYPE_NONE = 0,
 		SPEND_TYPE_ENERGY = 1
 	}
 
-	public enum HAIJKHDIFBC
+	public enum DiscountSource
 	{
 		DISCOUNT_NONE = 0,
 		DISCOUNT_QUEST = 1,
 		DISCOUNT_CONFIG = 2
 	}
 
-	public const string HMNIGMPCKFE = "NoneItem";
+	public const string TypeNoneItem = "NoneItem";
 
-	public const string PKFHJMIEKFG = "Skeleton";
+	public const string TypeSkeleton = "Skeleton";
 
-	public const string NKCPIOAGNAE = "Weapon";
+	public const string TypeWeapon = "Weapon";
 
-	public const string PNMMEPBMMOC = "Armor";
+	public const string TypeArmor = "Armor";
 
-	public const string OGPJODJEGLM = "Helm";
+	public const string TypeHelm = "Helm";
 
-	public const string BIJMKPGBHMO = "Ranged";
+	public const string TypeRanged = "Ranged";
 
-	public const string NFLIMNFMJJI = "Magic";
+	public const string TypeMagic = "Magic";
 
-	public const string BDFIIAGIKHM = "RealMoneyItem";
+	public const string TypeRealMoneyItem = "RealMoneyItem";
 
-	public const string HNLBLBNJMPN = "Energy";
+	public const string TypeEnergy = "Energy";
 
-	public const string HEBJDAMBIME = "Dummy";
+	public const string TypeDummy = "Dummy";
 
-	public const string LEAFPMKEIMF = "Decorate";
+	public const string TypeDecorate = "Decorate";
 
-	public const string FFFKBNMHDOP = "Cheat";
+	public const string TypeCheat = "Cheat";
 
-	public const string DPKFGDKOCMA = "Seal";
+	public const string TypeSeal = "Seal";
 
-	public const string AOHPCDBCLBI = "Free";
+	public const string TypeFree = "Free";
 
-	public const string DONHFCBOKKC = "Profile";
+	public const string TypeProfile = "Profile";
 
-	public const string DGAMEBKKNPP = "Recipe";
+	public const string TypeRecipe = "Recipe";
 
-	public const string HDNONAPIKGK = "Consumable";
+	public const string TypeConsumable = "Consumable";
 
-	public const string KHOKCIKCNKA = "RaidConsumable";
+	public const string TypeRaidConsumable = "RaidConsumable";
 
-	public const string OGKHEJBOPAH = "RaidItemPack";
+	public const string TypeRaidItemPack = "RaidItemPack";
 
-	public const string CKLEEDONENO = "Gold";
+	public const string TypeGold = "Gold";
 
-	public const string DNBMMGPOBPC = "Bonus";
+	public const string TypeBonus = "Bonus";
 
-	public const string GEPKNMNBICG = "UnlimitedEnergy";
+	public const string TypeUnlimitedEnergy = "UnlimitedEnergy";
 
-	public const string LDJPGMNAKFA = "StarterPack";
+	public const string TypeStarterPack = "StarterPack";
 
-	public const string AMBOPJLFKJG = "TapJoy";
+	public const string TypeTapJoy = "TapJoy";
 
-	public const string JMOCLCKLIBA = "SponsorPay";
+	public const string TypeSponsorPay = "SponsorPay";
 
-	public const string LMNJLACPFJP = "Metaps";
+	public const string TypeMetaps = "Metaps";
 
-	public const string PMIDDMDFEBM = "Video";
+	public const string TypeVideo = "Video";
 
-	public const string MDJNCBFJCJG = "Facebook_Like";
+	public const string TypeFacebookLike = "Facebook_Like";
 
-	public const string AMPCCNCIIFN = "PerkReset";
+	public const string TypePerkReset = "PerkReset";
 
-	public const string DLIHMBADCEO = "Currency";
+	public const string TypeCurrency = "Currency";
 
-	public const string JOGIHBIANNF = "RaidCurrency";
+	public const string TypeRaidCurrency = "RaidCurrency";
 
-	public const string ICICDOHDFCB = "RaidCharge";
+	public const string TypeRaidCharge = "RaidCharge";
 
-	public const string HHGPLLMEONG = "RaidPotion";
+	public const string TypeRaidPotion = "RaidPotion";
 
-	public const string EEFPBKDFKAK = "RaidHorn";
+	public const string TypeRaidHorn = "RaidHorn";
 
 	public string Name = string.Empty;
 
@@ -312,64 +312,64 @@ public class ItemInfo
 		return true;
 	}
 
-	public string IDFNCLPIIMA = string.Empty;
+	public string LegacyAlias = string.Empty;
 
-	public string HBCNKNFPAIM = string.Empty;
+	public string LegacyDescription = string.Empty;
 
-	public string DBJJONLCHND = string.Empty;
+	public string LegacyTitle = string.Empty;
 
-	public string MMHIKEIDDNB = string.Empty;
+	public string GroupId = string.Empty;
 
-	private string IIKKHJIIFEE = string.Empty;
+	private string marketId = string.Empty;
 
-	private bool JFOKBAKDBDA;
+	private bool isConsumable;
 
-	public string FPEIFLEBEAA = string.Empty;
+	public string LocalizedPriceString = string.Empty;
 
-	public string EGAJMELKANL = string.Empty;
+	public string PriceAmountText = string.Empty;
 
-	public string MIIJIMJDHFP = string.Empty;
+	public string CurrencyCode = string.Empty;
 
 	// best guess for name
 	public string LegacyPaidItem = string.Empty;
 
-	public string GGDJIPKMKFC = string.Empty;
+	public string DescriptionAlias = string.Empty;
 
-	public string CGGDGCCNKJA = string.Empty;
+	public string ButtonTextAlias = string.Empty;
 
-	public string CMDJPAKOHMK = string.Empty;
+	public string IconName = string.Empty;
 
 	// best guess for name
 	public string UpgradeTemplateName = string.Empty;
 
-	public bool ANNCECNAEPN;
+	public bool SpendAfterUse;
 
 	// best guess for name
 	public bool HasAuthoredLevel;
 
-	private bool PPGBMODEAGD;
+	private bool isEnabledByDefault;
 
 	public int Index;
 
-	public int NLMDNOBHHKP;
+	public int ItemId;
 
 	// best guess for name
 	public int ItemLevel;
 
-	public int GDCBBAHKCIE;
+	public int HiddenFlag;
 
-	public bool DCHJDPCEODD;
+	public bool IsShopVisible;
 
-	private bool FOMPCNKEPJF;
+	private bool defaultShopVisible;
 
-	public int ICDIEHCJBGA;
+	public int Milestone;
 
-	public int GKODCKNAAHB;
+	public int SilentReceive;
 
 	// best guess for name
 	public int UpgradeLevel;
 
-	public long EHKNIKHPGDN;
+	public long DeliveryTime;
 
 	// best guess for name
 	public ObscuredLong CoinPrice = (ObscuredLong)(0L);
@@ -377,15 +377,15 @@ public class ItemInfo
 	// best guess for name
 	public ObscuredLong GemPrice = (ObscuredLong)(0L);
 
-	public ObscuredLong KLHOKKPALOK = (ObscuredLong)(0L);
+	public ObscuredLong DeliveryGemPrice = (ObscuredLong)(0L);
 
-	public ObscuredLong NDCOLFHCNLD = (ObscuredLong)(0L);
+	public ObscuredLong DeliveryCoinPrice = (ObscuredLong)(0L);
 
-	public bool MBLKNNAFCOB;
+	public bool IsPaid;
 
-	public ObscuredLong HHIFKGOJFAC = (ObscuredLong)(0L);
+	public ObscuredLong ReceiveGold = (ObscuredLong)(0L);
 
-	public ObscuredLong BBMLCBEFLGI = (ObscuredLong)(0L);
+	public ObscuredLong ReceiveBonus = (ObscuredLong)(0L);
 
 	public ItemInfo ParentItem;
 
@@ -394,7 +394,7 @@ public class ItemInfo
 	// best guess for name
 	public bool IgnoreInventoryEnchantments;
 
-	private bool DHDDDJFLDBD;
+	private bool hasDeliveryDescription;
 
 	// best guess for name
 	public Attributes ItemAttributes = new Attributes();
@@ -431,7 +431,7 @@ public class ItemInfo
 			if (child.NodeType != XmlNodeType.Element || child.Name != "Perk" || resolved.Count >= 64) return false;
 			string name = child.Attributes?["Name"]?.Value;
 			if (string.IsNullOrEmpty(name) || !names.Add(name)) return false;
-			PerkInfoItem definition = GameUtils.FDEJIIDIPBI.ABAGJKMKCBA(name);
+			PerkInfoItem definition = GameUtils.PerkItemList.FindBasePerk(name);
 			if (definition == null) return false;
 			// Combat marks equipment perks as weapon/non-weapon. Never share that mutable marker with the registry or another item.
 			resolved.Add(definition.Clone(child["Set"], child["RatingEvaluation"]));
@@ -490,7 +490,7 @@ public class ItemInfo
 			if (child.NodeType != XmlNodeType.Element || child.Name != "Perk" || grants.Count >= 64) return false;
 			string name = child.Attributes?["Name"]?.Value;
 			if (string.IsNullOrEmpty(name) || !names.Add(name)) return false;
-			PerkInfoItem preview = APPAODDDDKI(child);
+			PerkInfoItem preview = ParsePerk(child);
 			if (preview == null) return false;
 			previews.Add(preview);
 			grants.Add(new PerkStruct(child));
@@ -503,31 +503,31 @@ public class ItemInfo
 		return true;
 	}
 
-	private bool DJNOJLDEHDD;
+	private bool isNew;
 
-	public string FAEGJAEEMGH = string.Empty;
+	public string CurrencyName = string.Empty;
 
-	public ObscuredInt CPODJDDPJHB = (ObscuredInt)(0);
+	public ObscuredInt CurrencyValue = (ObscuredInt)(0);
 
-	private int FMOJBFNFLNM;
+	private int addPercent;
 
-	private int OJMODONDEHE;
+	private int priceDigits;
 
-	private bool DGOMAGNAMMD;
+	private bool unusedFlag;
 
-	public ObscuredInt FOLLHACLPNB = (ObscuredInt)(0);
+	public ObscuredInt LotteryPrice = (ObscuredInt)(0);
 
-	public bool ACOIHHPOBDH;
+	public bool IsUpgradePurchase;
 
-	public long NNLMNNAEDIE;
+	public long MissingCoins;
 
-	public long PEGDPDINDDO;
+	public long MissingGems;
 
-	public string FCCNPMNNGAN
+	public string MarketId
 	{
 		get
 		{
-			return JLDEALIEEJI();
+			return GetMarketId();
 		}
 		set
 		{
@@ -535,11 +535,11 @@ public class ItemInfo
 		}
 	}
 
-	public bool LBPBADPNHLJ
+	public bool IsConsumable
 	{
 		get
 		{
-			return DFFFFIHOOKL();
+			return GetIsConsumable();
 		}
 	}
 
@@ -547,11 +547,11 @@ public class ItemInfo
 	{
 		get
 		{
-			return DBHJGAGOLOB();
+			return GetIsNew();
 		}
 		set
 		{
-			BEBDMOEIEJN(value);
+			SetIsNew(value);
 		}
 	}
 
@@ -560,7 +560,7 @@ public class ItemInfo
 		if (node != null)
 		{
 			Init();
-			JKJLFOAOLFI(node);
+			ParseNode(node);
 		}
 	}
 
@@ -577,43 +577,43 @@ public class ItemInfo
 		Type = item.Type;
 		SubType = item.SubType;
 		TacticSubtype = item.TacticSubtype;
-		IDFNCLPIIMA = item.IDFNCLPIIMA;
-		HBCNKNFPAIM = item.HBCNKNFPAIM;
-		DBJJONLCHND = item.DBJJONLCHND;
-		MMHIKEIDDNB = item.MMHIKEIDDNB;
-		IIKKHJIIFEE = item.IIKKHJIIFEE;
-		JFOKBAKDBDA = item.JFOKBAKDBDA;
-		FPEIFLEBEAA = item.FPEIFLEBEAA;
-		EGAJMELKANL = item.EGAJMELKANL;
-		MIIJIMJDHFP = item.MIIJIMJDHFP;
+		LegacyAlias = item.LegacyAlias;
+		LegacyDescription = item.LegacyDescription;
+		LegacyTitle = item.LegacyTitle;
+		GroupId = item.GroupId;
+		marketId = item.marketId;
+		isConsumable = item.isConsumable;
+		LocalizedPriceString = item.LocalizedPriceString;
+		PriceAmountText = item.PriceAmountText;
+		CurrencyCode = item.CurrencyCode;
 		LegacyPaidItem = item.LegacyPaidItem;
-		GGDJIPKMKFC = item.GGDJIPKMKFC;
-		CGGDGCCNKJA = item.CGGDGCCNKJA;
-		CMDJPAKOHMK = item.CMDJPAKOHMK;
-		ANNCECNAEPN = item.ANNCECNAEPN;
+		DescriptionAlias = item.DescriptionAlias;
+		ButtonTextAlias = item.ButtonTextAlias;
+		IconName = item.IconName;
+		SpendAfterUse = item.SpendAfterUse;
 		HasAuthoredLevel = item.HasAuthoredLevel;
 		UpgradeTemplateName = item.UpgradeTemplateName;
-		PPGBMODEAGD = item.PPGBMODEAGD;
+		isEnabledByDefault = item.isEnabledByDefault;
 		Index = item.Index;
-		NLMDNOBHHKP = item.NLMDNOBHHKP;
+		ItemId = item.ItemId;
 		ItemLevel = item.ItemLevel;
-		GDCBBAHKCIE = item.GDCBBAHKCIE;
-		DCHJDPCEODD = item.DCHJDPCEODD;
-		FOMPCNKEPJF = item.FOMPCNKEPJF;
-		ICDIEHCJBGA = item.ICDIEHCJBGA;
-		GKODCKNAAHB = item.GKODCKNAAHB;
+		HiddenFlag = item.HiddenFlag;
+		IsShopVisible = item.IsShopVisible;
+		defaultShopVisible = item.defaultShopVisible;
+		Milestone = item.Milestone;
+		SilentReceive = item.SilentReceive;
 		UpgradeLevel = item.UpgradeLevel;
-		EHKNIKHPGDN = item.EHKNIKHPGDN;
+		DeliveryTime = item.DeliveryTime;
 		CoinPrice = item.CoinPrice;
 		GemPrice = item.GemPrice;
-		KLHOKKPALOK = item.KLHOKKPALOK;
-		NDCOLFHCNLD = item.NDCOLFHCNLD;
-		MBLKNNAFCOB = item.MBLKNNAFCOB;
-		HHIFKGOJFAC = item.HHIFKGOJFAC;
-		BBMLCBEFLGI = item.BBMLCBEFLGI;
+		DeliveryGemPrice = item.DeliveryGemPrice;
+		DeliveryCoinPrice = item.DeliveryCoinPrice;
+		IsPaid = item.IsPaid;
+		ReceiveGold = item.ReceiveGold;
+		ReceiveBonus = item.ReceiveBonus;
 		ParentItem = item.ParentItem;
 		IgnoreInventoryEnchantments = item.IgnoreInventoryEnchantments;
-		DJNOJLDEHDD = item.DJNOJLDEHDD;
+		isNew = item.isNew;
 		ItemAttributes = new Attributes(item.ItemAttributes);
 		InnatePerks = new List<PerkInfoItem>(item.InnatePerks);
 		LocalUpgrades = new List<UpgradeData>(item.LocalUpgrades);
@@ -622,44 +622,44 @@ public class ItemInfo
 		DefaultEnchantments = new List<PerkStruct>(item.DefaultEnchantments);
 	}
 
-	public string JLDEALIEEJI()
+	public string GetMarketId()
 	{
-		return IIKKHJIIFEE;
+		return marketId;
 	}
 
 	public void set_MarketID(string value)
 	{
-		IIKKHJIIFEE = value;
+		marketId = value;
 	}
 
-	public bool DFFFFIHOOKL()
+	public bool GetIsConsumable()
 	{
-		return JFOKBAKDBDA;
+		return isConsumable;
 	}
 
-	public bool DBHJGAGOLOB()
+	public bool GetIsNew()
 	{
-		return DJNOJLDEHDD;
+		return isNew;
 	}
 
-	public void BEBDMOEIEJN(bool value)
+	public void SetIsNew(bool value)
 	{
-		if (!value || GKODCKNAAHB == 0)
+		if (!value || SilentReceive == 0)
 		{
-			DJNOJLDEHDD = value;
+			isNew = value;
 		}
 	}
 
 	public void RandomizeObscuredVars()
 	{
-		CPODJDDPJHB.GMCADPGOCHM();
-		FOLLHACLPNB.GMCADPGOCHM();
-		CoinPrice.GMCADPGOCHM();
-		GemPrice.GMCADPGOCHM();
-		KLHOKKPALOK.GMCADPGOCHM();
-		NDCOLFHCNLD.GMCADPGOCHM();
-		HHIFKGOJFAC.GMCADPGOCHM();
-		BBMLCBEFLGI.GMCADPGOCHM();
+		CurrencyValue.RandomizeCryptoKey();
+		LotteryPrice.RandomizeCryptoKey();
+		CoinPrice.RandomizeCryptoKey();
+		GemPrice.RandomizeCryptoKey();
+		DeliveryGemPrice.RandomizeCryptoKey();
+		DeliveryCoinPrice.RandomizeCryptoKey();
+		ReceiveGold.RandomizeCryptoKey();
+		ReceiveBonus.RandomizeCryptoKey();
 		LocalUpgrades.ForEach((UpgradeData DHDMNHCIPEH) =>
 		{
 			DHDMNHCIPEH.RandomizeObscuredVars();
@@ -668,60 +668,60 @@ public class ItemInfo
 
 	private long GetPrice()
 	{
-		return (ObscuredLong)((!PLBFFNCCCGO()) ? CoinPrice : GemPrice);
+		return (ObscuredLong)((!HasGemPrice()) ? CoinPrice : GemPrice);
 	}
 
-	private long HIPLKBCODAH()
+	private long GetEffectivePrice()
 	{
-		return (!PLBFFNCCCGO()) ? OHBBLIMNIMJ() : MCNMMBCJADI();
+		return (!HasGemPrice()) ? GetCoinPrice() : GetGemPrice();
 	}
 
-	private long MKEHOGFBMMA()
+	private long GetScaledCoinPrice()
 	{
-		return (ObscuredLong)(CoinPrice) * (long)GameUtils.FPBFDNBDDIE;
+		return (ObscuredLong)(CoinPrice) * (long)GameUtils.SellPriceFactor;
 	}
 
-	public long OHBBLIMNIMJ()
+	public long GetCoinPrice()
 	{
 		return (ObscuredLong)(CoinPrice);
 	}
 
-	public long MCNMMBCJADI()
+	public long GetGemPrice()
 	{
 		return (ObscuredLong)(GemPrice);
 	}
 
-	private int DNDHIHJPIEA()
+	private int GetLotteryPrice()
 	{
-		return (int)((float)(ObscuredInt)(FOLLHACLPNB) * GECGFACDOBA());
+		return (int)((float)(ObscuredInt)(LotteryPrice) * GetLotteryPriceMultiplier());
 	}
 
-	public bool PLBFFNCCCGO()
+	public bool HasGemPrice()
 	{
 		return 0 < (ObscuredLong)(GemPrice);
 	}
 
-	public bool INCBGIDFIDN()
+	public bool HasCoinPrice()
 	{
 		return 0 < (ObscuredLong)(CoinPrice);
 	}
 
-	public bool CAIEBJHILON()
+	public bool HasLotteryPrice()
 	{
-		return 0 < (ObscuredInt)(FOLLHACLPNB);
+		return 0 < (ObscuredInt)(LotteryPrice);
 	}
 
-	public void LEKDAILCFEG()
+	public void RestoreShopVisibility()
 	{
-		DCHJDPCEODD = FOMPCNKEPJF;
+		IsShopVisible = defaultShopVisible;
 	}
 
-	public bool GOKHJMOEGIJ()
+	public bool IsHidden()
 	{
-		return GDCBBAHKCIE > 0;
+		return HiddenFlag > 0;
 	}
 
-	public bool INEOECGAGGD()
+	public bool IsUpgradeVariant()
 	{
 		return (ParentItem != null) ? true : false;
 	}
@@ -737,48 +737,48 @@ public class ItemInfo
 	{
 		if (!node.Attributes["Type"].Empty())
 		{
-			Type = node.Attributes["Type"].CIPOICEEIBK(string.Empty);
+			Type = node.Attributes["Type"].GetStringOrDefault(string.Empty);
 		}
 		if (!node.Attributes["SubType"].Empty())
 		{
-			SubType = node.Attributes["SubType"].CIPOICEEIBK(string.Empty);
+			SubType = node.Attributes["SubType"].GetStringOrDefault(string.Empty);
 		}
 		if (!node.Attributes["TacticSubtype"].Empty())
 		{
-			TacticSubtype = node.Attributes["TacticSubtype"].CIPOICEEIBK(string.Empty);
+			TacticSubtype = node.Attributes["TacticSubtype"].GetStringOrDefault(string.Empty);
 		}
 	}
 
-	private void JKJLFOAOLFI(XmlNode node)
+	private void ParseNode(XmlNode node)
 	{
 		if (!node.Attributes["Name"].Empty())
 		{
-			Name = node.Attributes["Name"].CIPOICEEIBK(string.Empty);
+			Name = node.Attributes["Name"].GetStringOrDefault(string.Empty);
 		}
 		if (!node.Attributes["PackLabel"].Empty())
 		{
-			MMHIKEIDDNB = node.Attributes["PackLabel"].CIPOICEEIBK(string.Empty);
+			GroupId = node.Attributes["PackLabel"].GetStringOrDefault(string.Empty);
 		}
 		if (!node.Attributes["GroupID"].Empty())
 		{
-			MMHIKEIDDNB = node.Attributes["GroupID"].CIPOICEEIBK(string.Empty);
+			GroupId = node.Attributes["GroupID"].GetStringOrDefault(string.Empty);
 		}
 		if (!node.Attributes["Image"].Empty())
 		{
-			FileName = node.Attributes["Image"].CIPOICEEIBK(string.Empty);
+			FileName = node.Attributes["Image"].GetStringOrDefault(string.Empty);
 		}
 		if (!node.Attributes["Model"].Empty())
 		{
-			ModelFileName = node.Attributes["Model"].CIPOICEEIBK(string.Empty);
+			ModelFileName = node.Attributes["Model"].GetStringOrDefault(string.Empty);
 		}
 		ReadCombatClassification(node);
 		if (!node.Attributes["Text"].Empty())
 		{
-			GGDJIPKMKFC = node.Attributes["Text"].CIPOICEEIBK(string.Empty);
+			DescriptionAlias = node.Attributes["Text"].GetStringOrDefault(string.Empty);
 		}
 		if (!node.Attributes["TextButton"].Empty())
 		{
-			CGGDGCCNKJA = node.Attributes["TextButton"].CIPOICEEIBK(string.Empty);
+			ButtonTextAlias = node.Attributes["TextButton"].GetStringOrDefault(string.Empty);
 		}
 		if (!node.Attributes["Price"].Empty())
 		{
@@ -786,7 +786,7 @@ public class ItemInfo
 		}
 		if (!node.Attributes["PriceDigits"].Empty())
 		{
-			OJMODONDEHE = node.Attributes["PriceDigits"].ParseInt();
+			priceDigits = node.Attributes["PriceDigits"].ParseInt();
 		}
 		if (!node.Attributes["BonusPrice"].Empty())
 		{
@@ -794,73 +794,73 @@ public class ItemInfo
 		}
 		if (!node.Attributes["LotteryPrice"].Empty())
 		{
-			FOLLHACLPNB = (ObscuredInt)(node.Attributes["LotteryPrice"].ParseInt());
+			LotteryPrice = (ObscuredInt)(node.Attributes["LotteryPrice"].ParseInt());
 		}
 		if (!node.Attributes["SilentRecieve"].Empty())
 		{
-			GKODCKNAAHB = node.Attributes["SilentRecieve"].ParseInt();
+			SilentReceive = node.Attributes["SilentRecieve"].ParseInt();
 		}
-		if (string.IsNullOrEmpty(IIKKHJIIFEE) && (SystemProperties.LHGPKEFEHDH() || SystemProperties.MEBGOGMJFLM()) && !node.Attributes["IphoneID"].Empty())
+		if (string.IsNullOrEmpty(marketId) && (SystemProperties.IsEditorPlatform() || SystemProperties.IsIosPlatform()) && !node.Attributes["IphoneID"].Empty())
 		{
-			IIKKHJIIFEE = node.Attributes["IphoneID"].CIPOICEEIBK(string.Empty);
+			marketId = node.Attributes["IphoneID"].GetStringOrDefault(string.Empty);
 		}
-		if (string.IsNullOrEmpty(IIKKHJIIFEE) && !AssemblyController.JONCCPLEIBE().BKGIFIPIHAL() && SystemProperties.IPJFCBAGMJJ() && !node.Attributes["AndroidID"].Empty())
+		if (string.IsNullOrEmpty(marketId) && !AssemblyController.GetMarket().GetIsChinaMarket() && SystemProperties.IsAndroidPlatform() && !node.Attributes["AndroidID"].Empty())
 		{
-			IIKKHJIIFEE = node.Attributes["AndroidID"].CIPOICEEIBK(string.Empty);
+			marketId = node.Attributes["AndroidID"].GetStringOrDefault(string.Empty);
 		}
-		if (string.IsNullOrEmpty(IIKKHJIIFEE) && AssemblyController.JONCCPLEIBE().BKGIFIPIHAL() && SystemProperties.IPJFCBAGMJJ() && !node.Attributes["ChineseID"].Empty())
+		if (string.IsNullOrEmpty(marketId) && AssemblyController.GetMarket().GetIsChinaMarket() && SystemProperties.IsAndroidPlatform() && !node.Attributes["ChineseID"].Empty())
 		{
-			IIKKHJIIFEE = node.Attributes["ChineseID"].CIPOICEEIBK(string.Empty);
+			marketId = node.Attributes["ChineseID"].GetStringOrDefault(string.Empty);
 		}
-		if (string.IsNullOrEmpty(IIKKHJIIFEE) && SystemProperties.AFKGHBJPLOK() && !node.Attributes["WinPhoneID"].Empty())
+		if (string.IsNullOrEmpty(marketId) && SystemProperties.IsMetroArmPlatform() && !node.Attributes["WinPhoneID"].Empty())
 		{
-			IIKKHJIIFEE = node.Attributes["WinPhoneID"].CIPOICEEIBK(string.Empty);
+			marketId = node.Attributes["WinPhoneID"].GetStringOrDefault(string.Empty);
 		}
 		if (!node.Attributes["ConsumableProduct"].Empty())
 		{
-			JFOKBAKDBDA = node.Attributes["ConsumableProduct"].ParseBool();
+			isConsumable = node.Attributes["ConsumableProduct"].ParseBool();
 		}
-		if (!AssemblyController.JONCCPLEIBE().BKGIFIPIHAL() && !node.Attributes["RealPrice"].Empty())
+		if (!AssemblyController.GetMarket().GetIsChinaMarket() && !node.Attributes["RealPrice"].Empty())
 		{
-			FPEIFLEBEAA = node.Attributes["RealPrice"].CIPOICEEIBK(string.Empty);
-			EGAJMELKANL = FPEIFLEBEAA.Substring(1);
-			MIIJIMJDHFP = "USD";
+			LocalizedPriceString = node.Attributes["RealPrice"].GetStringOrDefault(string.Empty);
+			PriceAmountText = LocalizedPriceString.Substring(1);
+			CurrencyCode = "USD";
 		}
-		if (AssemblyController.JONCCPLEIBE().BKGIFIPIHAL() && !node.Attributes["RealPriceChina"].Empty())
+		if (AssemblyController.GetMarket().GetIsChinaMarket() && !node.Attributes["RealPriceChina"].Empty())
 		{
-			FPEIFLEBEAA = node.Attributes["RealPriceChina"].CIPOICEEIBK(string.Empty);
-			EGAJMELKANL = FPEIFLEBEAA.Substring(2);
-			MIIJIMJDHFP = "CNY";
+			LocalizedPriceString = node.Attributes["RealPriceChina"].GetStringOrDefault(string.Empty);
+			PriceAmountText = LocalizedPriceString.Substring(2);
+			CurrencyCode = "CNY";
 		}
 		if (!node.Attributes["isPaid"].Empty())
 		{
-			MBLKNNAFCOB = node.Attributes["isPaid"].ParseBool();
+			IsPaid = node.Attributes["isPaid"].ParseBool();
 		}
 		if (!node.Attributes["RecieveGold"].Empty())
 		{
-			HHIFKGOJFAC = (ObscuredLong)(node.Attributes["RecieveGold"].ParseLong(0L));
+			ReceiveGold = (ObscuredLong)(node.Attributes["RecieveGold"].ParseLong(0L));
 		}
 		if (!node.Attributes["RecieveBonus"].Empty())
 		{
-			BBMLCBEFLGI = (ObscuredLong)(node.Attributes["RecieveBonus"].ParseLong(0L));
+			ReceiveBonus = (ObscuredLong)(node.Attributes["RecieveBonus"].ParseLong(0L));
 		}
 		if (!node.Attributes["CurrencyName"].Empty())
 		{
-			FAEGJAEEMGH = node.Attributes["CurrencyName"].CIPOICEEIBK(string.Empty);
+			CurrencyName = node.Attributes["CurrencyName"].GetStringOrDefault(string.Empty);
 		}
 		if (!node.Attributes["CurrencyValue"].Empty())
 		{
-			CPODJDDPJHB = (ObscuredInt)(node.Attributes["CurrencyValue"].ParseInt());
+			CurrencyValue = (ObscuredInt)(node.Attributes["CurrencyValue"].ParseInt());
 		}
 		if (!node.Attributes["ShopHide"].Empty())
 		{
 			bool flag = node.Attributes["ShopHide"].ParseBool();
-			DCHJDPCEODD = !flag;
-			FOMPCNKEPJF = DCHJDPCEODD;
+			IsShopVisible = !flag;
+			defaultShopVisible = IsShopVisible;
 		}
 		if (!node.Attributes["Hidden"].Empty())
 		{
-			GDCBBAHKCIE = node.Attributes["Hidden"].ParseInt();
+			HiddenFlag = node.Attributes["Hidden"].ParseInt();
 		}
 		HasAuthoredLevel = !node.Attributes["Level"].Empty();
 		if (!node.Attributes["Level"].Empty())
@@ -873,48 +873,48 @@ public class ItemInfo
 		}
 		if (!node.Attributes["SpendAfterUse"].Empty())
 		{
-			ANNCECNAEPN = node.Attributes["SpendAfterUse"].ParseBool();
+			SpendAfterUse = node.Attributes["SpendAfterUse"].ParseBool();
 		}
 		if (!node.Attributes["DeliveryTime"].Empty())
 		{
-			EHKNIKHPGDN = node.Attributes["DeliveryTime"].ParseLong(0L);
+			DeliveryTime = node.Attributes["DeliveryTime"].ParseLong(0L);
 		}
 		if (!node.Attributes["DeliveryDescription"].Empty())
 		{
-			DHDDDJFLDBD = node.Attributes["DeliveryDescription"].ParseBool();
+			hasDeliveryDescription = node.Attributes["DeliveryDescription"].ParseBool();
 		}
 		if (!node.Attributes["BonusDeliveryPrice"].Empty())
 		{
-			KLHOKKPALOK = (ObscuredLong)(node.Attributes["BonusDeliveryPrice"].ParseLong(0L));
+			DeliveryGemPrice = (ObscuredLong)(node.Attributes["BonusDeliveryPrice"].ParseLong(0L));
 		}
 		if (!node.Attributes["Milestone"].Empty())
 		{
-			ICDIEHCJBGA = node.Attributes["Milestone"].ParseInt();
+			Milestone = node.Attributes["Milestone"].ParseInt();
 		}
 		XmlNode xmlNode = node["Perks"];
 		if (xmlNode != null)
 		{
-			DELGGDKPMKP(xmlNode);
+			ParseInnatePerks(xmlNode);
 		}
 		XmlNode xmlNode2 = node["Enchantments"];
 		if (xmlNode2 != null)
 		{
-			CKIBPGDJHNO(xmlNode2);
-			BMAOLOLLBEI(xmlNode2);
+			ParseEnchantmentPreviews(xmlNode2);
+			ParseDefaultEnchantments(xmlNode2);
 		}
 		if (!node.Attributes["AddPercent"].Empty())
 		{
-			FMOJBFNFLNM = node.Attributes["AddPercent"].ParseInt();
+			addPercent = node.Attributes["AddPercent"].ParseInt();
 		}
 		if (!node.Attributes["Icon"].Empty())
 		{
-			CMDJPAKOHMK = node.Attributes["Icon"].CIPOICEEIBK(string.Empty);
+			IconName = node.Attributes["Icon"].GetStringOrDefault(string.Empty);
 		}
 		if (!node.Attributes["PaidItem"].Empty())
 		{
-			LegacyPaidItem = node.Attributes["PaidItem"].CIPOICEEIBK(string.Empty);
+			LegacyPaidItem = node.Attributes["PaidItem"].GetStringOrDefault(string.Empty);
 		}
-		List<WarriorAttribute> iBLHIAHECLK = GameUtils.BGENALLCKII.IBLHIAHECLK;
+		List<WarriorAttribute> iBLHIAHECLK = GameUtils.WarriorAttributeList.AttributeList;
 		foreach (WarriorAttribute item in iBLHIAHECLK)
 		{
 			XmlAttribute cJBEMNNNHDM = node.Attributes[item.get_Name()];
@@ -926,11 +926,11 @@ public class ItemInfo
 		XmlNode xmlNode3 = node["Upgrades"];
 		if (xmlNode3 != null)
 		{
-			UpgradeTemplateName = xmlNode3.Attributes["Template"].CIPOICEEIBK(string.Empty);
+			UpgradeTemplateName = xmlNode3.Attributes["Template"].GetStringOrDefault(string.Empty);
 		}
 	}
 
-	private float GECGFACDOBA()
+	private float GetLotteryPriceMultiplier()
 	{
 		return 1f;
 	}
@@ -951,12 +951,12 @@ public class ItemInfo
 		}
 	}
 
-	public void DELGGDKPMKP(XmlNode node)
+	public void ParseInnatePerks(XmlNode node)
 	{
 		InnatePerks.Clear();
 		foreach (XmlNode childNode in node.ChildNodes)
 		{
-			PerkInfoItem aCONCDFDNJH = APPAODDDDKI(childNode);
+			PerkInfoItem aCONCDFDNJH = ParsePerk(childNode);
 			if (aCONCDFDNJH != null)
 			{
 				InnatePerks.Add(aCONCDFDNJH);
@@ -964,19 +964,19 @@ public class ItemInfo
 		}
 	}
 
-	public static PerkInfoItem APPAODDDDKI(XmlNode node)
+	public static PerkInfoItem ParsePerk(XmlNode node)
 	{
-		string gOHIIMFFFJI = node.Attributes["Name"].CIPOICEEIBK(string.Empty);
-		PerkInfoItem aCONCDFDNJH = GameUtils.FDEJIIDIPBI.ABAGJKMKCBA(gOHIIMFFFJI);
+		string gOHIIMFFFJI = node.Attributes["Name"].GetStringOrDefault(string.Empty);
+		PerkInfoItem aCONCDFDNJH = GameUtils.PerkItemList.FindBasePerk(gOHIIMFFFJI);
 		if (aCONCDFDNJH != null)
 		{
 			if (node["Set"] != null || node["RatingEvaluation"] != null)
 			{
 				aCONCDFDNJH = aCONCDFDNJH.Clone(node["Set"], node["RatingEvaluation"]);
-				string text = node.Attributes["Description"].CIPOICEEIBK(string.Empty);
+				string text = node.Attributes["Description"].GetStringOrDefault(string.Empty);
 				if (text != null && !text.Equals(string.Empty))
 				{
-					aCONCDFDNJH.MGNNJPBCOGD = text;
+					aCONCDFDNJH.DescriptionKey = text;
 				}
 			}
 			return aCONCDFDNJH;
@@ -984,12 +984,12 @@ public class ItemInfo
 		return null;
 	}
 
-	public void CKIBPGDJHNO(XmlNode node)
+	public void ParseEnchantmentPreviews(XmlNode node)
 	{
 		DefaultEnchantmentPreviews.Clear();
 		foreach (XmlNode childNode in node.ChildNodes)
 		{
-			PerkInfoItem aCONCDFDNJH = APPAODDDDKI(childNode);
+			PerkInfoItem aCONCDFDNJH = ParsePerk(childNode);
 			if (aCONCDFDNJH != null)
 			{
 				DefaultEnchantmentPreviews.Add(aCONCDFDNJH);
@@ -997,16 +997,16 @@ public class ItemInfo
 		}
 	}
 
-	public void JCJKLMICDIC(XmlNode node)
+	public void SetParsedPerks(XmlNode node)
 	{
-		APPEHIAIAAM();
+		RemoveParsedPerks();
 		if (node == null)
 		{
 			return;
 		}
 		foreach (XmlNode childNode in node.ChildNodes)
 		{
-			PerkInfoItem aCONCDFDNJH = APPAODDDDKI(childNode);
+			PerkInfoItem aCONCDFDNJH = ParsePerk(childNode);
 			if (aCONCDFDNJH != null)
 			{
 				ParsedPerks.Add(aCONCDFDNJH);
@@ -1015,9 +1015,9 @@ public class ItemInfo
 		}
 	}
 
-	public void BMAOLOLLBEI(XmlNode node)
+	public void ParseDefaultEnchantments(XmlNode node)
 	{
-		GAHFEAAHDCL();
+		ClearDefaultEnchantments();
 		foreach (XmlNode childNode in node.ChildNodes)
 		{
 			PerkStruct item = new PerkStruct(childNode);
@@ -1025,50 +1025,50 @@ public class ItemInfo
 		}
 	}
 
-	public void GAHFEAAHDCL()
+	public void ClearDefaultEnchantments()
 	{
 		DefaultEnchantments.Clear();
 	}
 
-	private void FHILKOAPBKG(int NPFOBKBJAOB)
+	private void DenominateReservedPrices(int NPFOBKBJAOB)
 	{
 	}
 
-	private void BJBEKBECHAI(int NPFOBKBJAOB)
+	private void DenominateReservedValues(int NPFOBKBJAOB)
 	{
 	}
 
-	public void HNMFDILOBMJ(UpgradeData IFOFMGAKHEP)
+	public void AddLocalUpgrade(UpgradeData IFOFMGAKHEP)
 	{
-		UpgradeData item = DBPHNGLCHHO(IFOFMGAKHEP);
+		UpgradeData item = CompleteUpgradeData(IFOFMGAKHEP);
 		LocalUpgrades.Add(item);
 	}
 
-	public int FMHIKMNJHDL()
+	public int GetMaxLocalUpgradeLevel()
 	{
 		int LPINKLMDEEF = int.MinValue;
 		LocalUpgrades.ForEach((UpgradeData DHDMNHCIPEH) =>
 		{
-			if (DHDMNHCIPEH.OGLHOJNMEBD.AKKLOMFOLNO > LPINKLMDEEF)
+			if (DHDMNHCIPEH.Values.UpgradeLevel > LPINKLMDEEF)
 			{
-				LPINKLMDEEF = DHDMNHCIPEH.OGLHOJNMEBD.AKKLOMFOLNO;
+				LPINKLMDEEF = DHDMNHCIPEH.Values.UpgradeLevel;
 			}
 		});
 		return LPINKLMDEEF;
 	}
 
-	public List<UpgradeData> DNFDAGFAANJ(bool NNDOJGMBEDC = false, int JELPMBDMLAB = int.MaxValue)
+	public List<UpgradeData> GetUpgrades(bool NNDOJGMBEDC = false, int JELPMBDMLAB = int.MaxValue)
 	{
 		List<UpgradeData> list = new List<UpgradeData>();
 		List<UpgradeData> list2 = new List<UpgradeData>();
-		int num = FMHIKMNJHDL();
+		int num = GetMaxLocalUpgradeLevel();
 		list2.AddRange(LocalUpgrades);
 		UpgradeDataContainer aKHJNNDCKMK = ListSF.GetItems().GetUpgradeDataContainerByName(UpgradeTemplateName);
 		if (aKHJNNDCKMK != null)
 		{
-			foreach (UpgradeData item in aKHJNNDCKMK.KPAPEBOAKIE)
+			foreach (UpgradeData item in aKHJNNDCKMK.Upgrades)
 			{
-				if (item.OGLHOJNMEBD.AKKLOMFOLNO > num)
+				if (item.Values.UpgradeLevel > num)
 				{
 					list2.Add(item);
 				}
@@ -1077,7 +1077,7 @@ public class ItemInfo
 		list2.Sort();
 		foreach (UpgradeData item2 in list2)
 		{
-			if ((!NNDOJGMBEDC || item2.OGLHOJNMEBD.AKKLOMFOLNO > UpgradeLevel) && item2.OGLHOJNMEBD.Level <= JELPMBDMLAB)
+			if ((!NNDOJGMBEDC || item2.Values.UpgradeLevel > UpgradeLevel) && item2.Values.Level <= JELPMBDMLAB)
 			{
 				list.Add(item2);
 			}
@@ -1085,68 +1085,68 @@ public class ItemInfo
 		return list;
 	}
 
-	public void HPCGCMMGAAP(UpgradeData LILLEENHNCG)
+	public void ApplyUpgrade(UpgradeData LILLEENHNCG)
 	{
-		List<WarriorAttribute> iBLHIAHECLK = GameUtils.BGENALLCKII.IBLHIAHECLK;
+		List<WarriorAttribute> iBLHIAHECLK = GameUtils.WarriorAttributeList.AttributeList;
 		foreach (WarriorAttribute item in iBLHIAHECLK)
 		{
 			int OEMALIFPGPO = 0;
-			if (LILLEENHNCG.OGLHOJNMEBD.IBLHIAHECLK.Get(item.get_Name(), ref OEMALIFPGPO))
+			if (LILLEENHNCG.Values.Attributes.Get(item.get_Name(), ref OEMALIFPGPO))
 			{
 				ItemAttributes.Set(item.get_Name(), OEMALIFPGPO);
 			}
 		}
-		if (LILLEENHNCG.EBHOFBFKNMB.KLHOKKPALOK)
+		if (LILLEENHNCG.HasValues.HasBonusDeliveryPrice)
 		{
-			KLHOKKPALOK = LILLEENHNCG.OGLHOJNMEBD.KLHOKKPALOK;
+			DeliveryGemPrice = LILLEENHNCG.Values.BonusDeliveryPrice;
 		}
-		if (LILLEENHNCG.EBHOFBFKNMB.FMHECGHHKGB)
+		if (LILLEENHNCG.HasValues.HasBonusPrice)
 		{
-			GemPrice = LILLEENHNCG.OGLHOJNMEBD.FMHECGHHKGB;
+			GemPrice = LILLEENHNCG.Values.BonusPrice;
 		}
-		if (LILLEENHNCG.EBHOFBFKNMB.EHKNIKHPGDN)
+		if (LILLEENHNCG.HasValues.HasDeliveryTime)
 		{
-			EHKNIKHPGDN = LILLEENHNCG.OGLHOJNMEBD.EHKNIKHPGDN;
+			DeliveryTime = LILLEENHNCG.Values.DeliveryTime;
 		}
-		if (LILLEENHNCG.EBHOFBFKNMB.Level)
+		if (LILLEENHNCG.HasValues.Level)
 		{
-			ItemLevel = LILLEENHNCG.OGLHOJNMEBD.Level;
+			ItemLevel = LILLEENHNCG.Values.Level;
 		}
-		if (LILLEENHNCG.EBHOFBFKNMB.ICDIEHCJBGA)
+		if (LILLEENHNCG.HasValues.HasMilestone)
 		{
-			ICDIEHCJBGA = LILLEENHNCG.OGLHOJNMEBD.ICDIEHCJBGA;
+			Milestone = LILLEENHNCG.Values.Milestone;
 		}
-		if (LILLEENHNCG.EBHOFBFKNMB.MDAAJFBENON)
+		if (LILLEENHNCG.HasValues.HasPrice)
 		{
-			CoinPrice = LILLEENHNCG.OGLHOJNMEBD.MDAAJFBENON;
+			CoinPrice = LILLEENHNCG.Values.Price;
 		}
-		if (LILLEENHNCG.EBHOFBFKNMB.AKKLOMFOLNO)
+		if (LILLEENHNCG.HasValues.HasUpgradeLevel)
 		{
-			UpgradeLevel = LILLEENHNCG.OGLHOJNMEBD.AKKLOMFOLNO;
+			UpgradeLevel = LILLEENHNCG.Values.UpgradeLevel;
 		}
 	}
 
-	public ItemInfo ILDOPPMOOOF(int GNLOCMLBNHF)
+	public ItemInfo GetUpgradeItemByUpgradeLevel(int GNLOCMLBNHF)
 	{
-		List<UpgradeData> list = DNFDAGFAANJ();
+		List<UpgradeData> list = GetUpgrades();
 		foreach (UpgradeData item in list)
 		{
-			if (item.OGLHOJNMEBD.AKKLOMFOLNO == GNLOCMLBNHF)
+			if (item.Values.UpgradeLevel == GNLOCMLBNHF)
 			{
-				return MPADIPJLMLH(item);
+				return CreateUpgradedItem(item);
 			}
 		}
 		return null;
 	}
 
-	public ItemInfo HIOBANJPMKF(int GNLOCMLBNHF)
+	public ItemInfo GetUpgradeItemAtOrAboveUpgradeLevel(int GNLOCMLBNHF)
 	{
-		List<UpgradeData> list = DNFDAGFAANJ();
+		List<UpgradeData> list = GetUpgrades();
 		foreach (UpgradeData item in list)
 		{
-			if (item.OGLHOJNMEBD.AKKLOMFOLNO >= GNLOCMLBNHF)
+			if (item.Values.UpgradeLevel >= GNLOCMLBNHF)
 			{
-				return MPADIPJLMLH(item);
+				return CreateUpgradedItem(item);
 			}
 		}
 		return null;
@@ -1158,10 +1158,10 @@ public class ItemInfo
 		UpgradeData fKFLGOCPFEB2 = null;
 		UpgradeData fKFLGOCPFEB3 = null;
 		bool flag = false;
-		List<UpgradeData> list = DNFDAGFAANJ();
+		List<UpgradeData> list = GetUpgrades();
 		foreach (UpgradeData item in list)
 		{
-			int gCAPLEJMMPM = item.OGLHOJNMEBD.Level;
+			int gCAPLEJMMPM = item.Values.Level;
 			if (!flag && gCAPLEJMMPM == JHLGOAFNPNM)
 			{
 				fKFLGOCPFEB = item;
@@ -1179,31 +1179,31 @@ public class ItemInfo
 			return null;
 		}
 		UpgradeData lILLEENHNCG = ((!GHNLHKBJOIH) ? fKFLGOCPFEB : fKFLGOCPFEB2);
-		return MPADIPJLMLH(lILLEENHNCG);
+		return CreateUpgradedItem(lILLEENHNCG);
 	}
 
-	public ItemInfo GJAMPOFICNK(int index)
+	public ItemInfo GetUpgradeItemByIndex(int index)
 	{
-		List<UpgradeData> list = DNFDAGFAANJ();
+		List<UpgradeData> list = GetUpgrades();
 		if (0 <= index && index < list.Count)
 		{
-			return MPADIPJLMLH(list[index]);
+			return CreateUpgradedItem(list[index]);
 		}
-		LLLOJBFMONN.Error("ItemInfo.getUpdateItemByIndex wrong index: {0}", index);
+		GameLog.Error("ItemInfo.getUpdateItemByIndex wrong index: {0}", index);
 		return null;
 	}
 
-	public UpgradeIndexItem MJNILIJLCMI(int OMHDLKNHNMJ, int upgradeLevel)
+	public UpgradeIndexItem GetUpgradeIndexItem(int OMHDLKNHNMJ, int upgradeLevel)
 	{
 		UpgradeIndexItem aACAFOBANOH = new UpgradeIndexItem();
 		int num = 0;
 		if (ParentItem != null)
 		{
-			List<UpgradeData> list = ParentItem.DNFDAGFAANJ();
+			List<UpgradeData> list = ParentItem.GetUpgrades();
 			foreach (UpgradeData item in list)
 			{
-				UpgradeData.AGKOBJMBAEC oGLHOJNMEBD = item.OGLHOJNMEBD;
-				if (oGLHOJNMEBD.Level == ItemLevel && oGLHOJNMEBD.AKKLOMFOLNO < UpgradeLevel && oGLHOJNMEBD.AKKLOMFOLNO > ParentItem.UpgradeLevel)
+				UpgradeData.UpgradeValues oGLHOJNMEBD = item.Values;
+				if (oGLHOJNMEBD.Level == ItemLevel && oGLHOJNMEBD.UpgradeLevel < UpgradeLevel && oGLHOJNMEBD.UpgradeLevel > ParentItem.UpgradeLevel)
 				{
 					num++;
 				}
@@ -1215,7 +1215,7 @@ public class ItemInfo
 		}
 		if (num == 0)
 		{
-			aACAFOBANOH.Type = UpgradeIndexItem.LIPHFAOKLCA.UPGRADE_INDEX_MILESTONE;
+			aACAFOBANOH.Type = UpgradeIndexItem.UpgradeIndexType.UPGRADE_INDEX_MILESTONE;
 			aACAFOBANOH.Index = ItemLevel;
 		}
 		else
@@ -1225,29 +1225,29 @@ public class ItemInfo
 		return aACAFOBANOH;
 	}
 
-	public void NHJAHNDOLAE(int OMHDLKNHNMJ, int upgradeLevel, ref ItemInfo HDMHCCKLLGK, ref ItemInfo JLNLOCNBGEK)
+	public void FindNextUpgradeItems(int OMHDLKNHNMJ, int upgradeLevel, ref ItemInfo HDMHCCKLLGK, ref ItemInfo JLNLOCNBGEK)
 	{
-		List<UpgradeData> list = DNFDAGFAANJ();
+		List<UpgradeData> list = GetUpgrades();
 		List<UpgradeData> list2 = new List<UpgradeData>();
 		UpgradeData fKFLGOCPFEB = null;
 		UpgradeData fKFLGOCPFEB2 = null;
 		UpgradeData fKFLGOCPFEB3 = null;
-		float num = GameUtils.HPEBEOMLHKF.GetValue(Type);
+		float num = GameUtils.OutdateLevelTable.GetValue(Type);
 		int num2 = upgradeLevel / 100;
 		foreach (UpgradeData item in list)
 		{
-			int aKKLOMFOLNO = item.OGLHOJNMEBD.AKKLOMFOLNO;
+			int aKKLOMFOLNO = item.Values.UpgradeLevel;
 			if (aKKLOMFOLNO == upgradeLevel)
 			{
 				fKFLGOCPFEB = item;
 			}
-			if (item.OGLHOJNMEBD.Level <= OMHDLKNHNMJ && aKKLOMFOLNO > upgradeLevel)
+			if (item.Values.Level <= OMHDLKNHNMJ && aKKLOMFOLNO > upgradeLevel)
 			{
-				if (item.OGLHOJNMEBD.ICDIEHCJBGA > 0 && (float)item.OGLHOJNMEBD.Level >= (float)num2 + num && (fKFLGOCPFEB2 == null || fKFLGOCPFEB2.OGLHOJNMEBD.AKKLOMFOLNO < aKKLOMFOLNO))
+				if (item.Values.Milestone > 0 && (float)item.Values.Level >= (float)num2 + num && (fKFLGOCPFEB2 == null || fKFLGOCPFEB2.Values.UpgradeLevel < aKKLOMFOLNO))
 				{
 					fKFLGOCPFEB2 = item;
 				}
-				if (item.OGLHOJNMEBD.ICDIEHCJBGA <= 0 && (fKFLGOCPFEB3 == null || fKFLGOCPFEB3.OGLHOJNMEBD.AKKLOMFOLNO > aKKLOMFOLNO))
+				if (item.Values.Milestone <= 0 && (fKFLGOCPFEB3 == null || fKFLGOCPFEB3.Values.UpgradeLevel > aKKLOMFOLNO))
 				{
 					fKFLGOCPFEB3 = item;
 				}
@@ -1255,7 +1255,7 @@ public class ItemInfo
 		}
 		if (fKFLGOCPFEB != null)
 		{
-			HDMHCCKLLGK = MPADIPJLMLH(fKFLGOCPFEB);
+			HDMHCCKLLGK = CreateUpgradedItem(fKFLGOCPFEB);
 		}
 		else
 		{
@@ -1263,11 +1263,11 @@ public class ItemInfo
 		}
 		if (fKFLGOCPFEB2 != null)
 		{
-			JLNLOCNBGEK = MPADIPJLMLH(fKFLGOCPFEB2);
+			JLNLOCNBGEK = CreateUpgradedItem(fKFLGOCPFEB2);
 		}
 		else if (fKFLGOCPFEB3 != null)
 		{
-			JLNLOCNBGEK = MPADIPJLMLH(fKFLGOCPFEB3);
+			JLNLOCNBGEK = CreateUpgradedItem(fKFLGOCPFEB3);
 		}
 		else
 		{
@@ -1277,33 +1277,33 @@ public class ItemInfo
 
 	public static void DenominateItems(int NPFOBKBJAOB = 0)
 	{
-		List<ItemInfo> list = ListSF.GetItems().HCDLKHKBEPF();
+		List<ItemInfo> list = ListSF.GetItems().GetAllItems();
 		foreach (ItemInfo item in list)
 		{
 			item.CoinPrice = (ObscuredLong)(GameUtils.GetDenominatedValue((ObscuredLong)(item.CoinPrice), NPFOBKBJAOB));
-			item.FHILKOAPBKG(NPFOBKBJAOB);
-			item.BJBEKBECHAI(NPFOBKBJAOB);
+			item.DenominateReservedPrices(NPFOBKBJAOB);
+			item.DenominateReservedValues(NPFOBKBJAOB);
 			List<UpgradeData> kEFPALGDBOC = item.LocalUpgrades;
 			foreach (UpgradeData item2 in kEFPALGDBOC)
 			{
-				item2.OGLHOJNMEBD.MDAAJFBENON = (ObscuredLong)(GameUtils.GetDenominatedValue((ObscuredLong)(item2.OGLHOJNMEBD.MDAAJFBENON), NPFOBKBJAOB));
+				item2.Values.Price = (ObscuredLong)(GameUtils.GetDenominatedValue((ObscuredLong)(item2.Values.Price), NPFOBKBJAOB));
 			}
 			if (item.Type.Equals("RealMoneyItem"))
 			{
-				item.HHIFKGOJFAC = (ObscuredLong)(GameUtils.GetDenominatedValue((ObscuredLong)(item.HHIFKGOJFAC), NPFOBKBJAOB));
+				item.ReceiveGold = (ObscuredLong)(GameUtils.GetDenominatedValue((ObscuredLong)(item.ReceiveGold), NPFOBKBJAOB));
 			}
 		}
-		foreach (UpgradeDataContainer item3 in ListSF.GetItems().CKCGBCNMOOP())
+		foreach (UpgradeDataContainer item3 in ListSF.GetItems().GetUpgradeContainers())
 		{
-			foreach (UpgradeData item4 in item3.KPAPEBOAKIE)
+			foreach (UpgradeData item4 in item3.Upgrades)
 			{
-				item4.OGLHOJNMEBD.MDAAJFBENON = (ObscuredLong)(GameUtils.GetDenominatedValue((ObscuredLong)(item4.OGLHOJNMEBD.MDAAJFBENON), NPFOBKBJAOB));
+				item4.Values.Price = (ObscuredLong)(GameUtils.GetDenominatedValue((ObscuredLong)(item4.Values.Price), NPFOBKBJAOB));
 			}
 		}
-		ListSF.CCDKHLAMKKO().KHCNHPCPFII().NHJAHNDOLAE();
+		ListSF.GetRoster().GetInventory().RefreshUpgradeStates();
 	}
 
-	public ItemInfo MPADIPJLMLH(UpgradeData LILLEENHNCG)
+	public ItemInfo CreateUpgradedItem(UpgradeData LILLEENHNCG)
 	{
 		if (LILLEENHNCG == null)
 		{
@@ -1311,20 +1311,20 @@ public class ItemInfo
 		}
 		ItemInfo dJKEECEOCJB = Clone();
 		dJKEECEOCJB.ParentItem = this;
-		dJKEECEOCJB.HPCGCMMGAAP(LILLEENHNCG);
+		dJKEECEOCJB.ApplyUpgrade(LILLEENHNCG);
 		return dJKEECEOCJB;
 	}
 
-	private void APPEHIAIAAM()
+	private void RemoveParsedPerks()
 	{
 		ParsedPerks.ForEach((PerkInfoItem DHDMNHCIPEH) =>
 		{
-			MLOOKBFCOHM(DHDMNHCIPEH);
+			RemoveInnatePerk(DHDMNHCIPEH);
 		});
 		ParsedPerks.Clear();
 	}
 
-	private void MLOOKBFCOHM(PerkInfoItem DPLEGFCHOCE)
+	private void RemoveInnatePerk(PerkInfoItem DPLEGFCHOCE)
 	{
 		InnatePerks.Remove(DPLEGFCHOCE);
 	}
@@ -1333,88 +1333,88 @@ public class ItemInfo
 	{
 		CoinPrice = (ObscuredLong)(0L);
 		GemPrice = (ObscuredLong)(0L);
-		FOLLHACLPNB = (ObscuredInt)(0);
-		HHIFKGOJFAC = (ObscuredLong)(0L);
-		BBMLCBEFLGI = (ObscuredLong)(0L);
-		FAEGJAEEMGH = string.Empty;
-		CPODJDDPJHB = (ObscuredInt)(0);
-		DCHJDPCEODD = true;
-		GDCBBAHKCIE = 0;
+		LotteryPrice = (ObscuredInt)(0);
+		ReceiveGold = (ObscuredLong)(0L);
+		ReceiveBonus = (ObscuredLong)(0L);
+		CurrencyName = string.Empty;
+		CurrencyValue = (ObscuredInt)(0);
+		IsShopVisible = true;
+		HiddenFlag = 0;
 		ItemLevel = 0;
 		UpgradeLevel = 0;
-		ACOIHHPOBDH = false;
-		ANNCECNAEPN = false;
-		NNLMNNAEDIE = 0L;
-		PEGDPDINDDO = 0L;
-		MBLKNNAFCOB = false;
-		EHKNIKHPGDN = 0L;
-		DHDDDJFLDBD = false;
-		KLHOKKPALOK = (ObscuredLong)(0L);
-		NDCOLFHCNLD = (ObscuredLong)(0L);
-		ICDIEHCJBGA = 0;
-		GKODCKNAAHB = 0;
+		IsUpgradePurchase = false;
+		SpendAfterUse = false;
+		MissingCoins = 0L;
+		MissingGems = 0L;
+		IsPaid = false;
+		DeliveryTime = 0L;
+		hasDeliveryDescription = false;
+		DeliveryGemPrice = (ObscuredLong)(0L);
+		DeliveryCoinPrice = (ObscuredLong)(0L);
+		Milestone = 0;
+		SilentReceive = 0;
 		ParentItem = null;
-		FMOJBFNFLNM = 0;
-		OJMODONDEHE = 0;
-		DGOMAGNAMMD = false;
-		CMDJPAKOHMK = string.Empty;
+		addPercent = 0;
+		priceDigits = 0;
+		unusedFlag = false;
+		IconName = string.Empty;
 		IgnoreInventoryEnchantments = false;
 		LegacyPaidItem = "None";
-		PPGBMODEAGD = true;
+		isEnabledByDefault = true;
 	}
 
-	private UpgradeData DBPHNGLCHHO(UpgradeData IFOFMGAKHEP)
+	private UpgradeData CompleteUpgradeData(UpgradeData IFOFMGAKHEP)
 	{
 		UpgradeData fKFLGOCPFEB = new UpgradeData(IFOFMGAKHEP);
-		List<WarriorAttribute> iBLHIAHECLK = GameUtils.BGENALLCKII.IBLHIAHECLK;
+		List<WarriorAttribute> iBLHIAHECLK = GameUtils.WarriorAttributeList.AttributeList;
 		foreach (WarriorAttribute item in iBLHIAHECLK)
 		{
 			int OEMALIFPGPO = 0;
-			if (ItemAttributes.Get(item.get_Name(), ref OEMALIFPGPO) && !fKFLGOCPFEB.OGLHOJNMEBD.IBLHIAHECLK.Get(item.get_Name(), ref OEMALIFPGPO))
+			if (ItemAttributes.Get(item.get_Name(), ref OEMALIFPGPO) && !fKFLGOCPFEB.Values.Attributes.Get(item.get_Name(), ref OEMALIFPGPO))
 			{
 				ItemAttributes.Get(item.get_Name(), ref OEMALIFPGPO);
-				fKFLGOCPFEB.OGLHOJNMEBD.IBLHIAHECLK.Set(item.get_Name(), OEMALIFPGPO);
+				fKFLGOCPFEB.Values.Attributes.Set(item.get_Name(), OEMALIFPGPO);
 			}
 		}
-		if (!fKFLGOCPFEB.EBHOFBFKNMB.KLHOKKPALOK)
+		if (!fKFLGOCPFEB.HasValues.HasBonusDeliveryPrice)
 		{
-			fKFLGOCPFEB.OGLHOJNMEBD.KLHOKKPALOK = KLHOKKPALOK;
+			fKFLGOCPFEB.Values.BonusDeliveryPrice = DeliveryGemPrice;
 		}
-		if (!fKFLGOCPFEB.EBHOFBFKNMB.FMHECGHHKGB)
+		if (!fKFLGOCPFEB.HasValues.HasBonusPrice)
 		{
-			fKFLGOCPFEB.OGLHOJNMEBD.FMHECGHHKGB = GemPrice;
+			fKFLGOCPFEB.Values.BonusPrice = GemPrice;
 		}
-		if (!fKFLGOCPFEB.EBHOFBFKNMB.EHKNIKHPGDN)
+		if (!fKFLGOCPFEB.HasValues.HasDeliveryTime)
 		{
-			fKFLGOCPFEB.OGLHOJNMEBD.EHKNIKHPGDN = EHKNIKHPGDN;
+			fKFLGOCPFEB.Values.DeliveryTime = DeliveryTime;
 		}
-		if (!fKFLGOCPFEB.EBHOFBFKNMB.Level)
+		if (!fKFLGOCPFEB.HasValues.Level)
 		{
-			fKFLGOCPFEB.OGLHOJNMEBD.Level = ItemLevel;
+			fKFLGOCPFEB.Values.Level = ItemLevel;
 		}
-		if (!fKFLGOCPFEB.EBHOFBFKNMB.ICDIEHCJBGA)
+		if (!fKFLGOCPFEB.HasValues.HasMilestone)
 		{
-			fKFLGOCPFEB.OGLHOJNMEBD.ICDIEHCJBGA = ICDIEHCJBGA;
+			fKFLGOCPFEB.Values.Milestone = Milestone;
 		}
-		if (!fKFLGOCPFEB.EBHOFBFKNMB.MDAAJFBENON)
+		if (!fKFLGOCPFEB.HasValues.HasPrice)
 		{
-			fKFLGOCPFEB.OGLHOJNMEBD.MDAAJFBENON = CoinPrice;
+			fKFLGOCPFEB.Values.Price = CoinPrice;
 		}
-		if (!fKFLGOCPFEB.EBHOFBFKNMB.AKKLOMFOLNO)
+		if (!fKFLGOCPFEB.HasValues.HasUpgradeLevel)
 		{
-			fKFLGOCPFEB.OGLHOJNMEBD.AKKLOMFOLNO = UpgradeLevel;
+			fKFLGOCPFEB.Values.UpgradeLevel = UpgradeLevel;
 		}
 		return fKFLGOCPFEB;
 	}
 
-	public void IEIKLANLOPL(ProductMetadata CFDFJHGLMNH)
+	public void ApplyProductMetadata(ProductMetadata CFDFJHGLMNH)
 	{
-		FPEIFLEBEAA = CFDFJHGLMNH.localizedPriceString;
-		EGAJMELKANL = CFDFJHGLMNH.localizedPrice.ToString();
-		MIIJIMJDHFP = CFDFJHGLMNH.isoCurrencyCode;
+		LocalizedPriceString = CFDFJHGLMNH.localizedPriceString;
+		PriceAmountText = CFDFJHGLMNH.localizedPrice.ToString();
+		CurrencyCode = CFDFJHGLMNH.isoCurrencyCode;
 	}
 
-	public void GEEGNGNLPGO()
+	public void SortLocalUpgrades()
 	{
 		LocalUpgrades.Sort();
 		int index = 0;

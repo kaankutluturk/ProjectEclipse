@@ -97,12 +97,12 @@ public class RulesInspector : global::EventDispatcher<object>
 	{
 		_fight = fight;
 		RulesActive = false;
-		if (KGKDKENMAOA.FLKFFDLLBKA() != null && KGKDKENMAOA.FLKFFDLLBKA().HasRandomSeeds)
+		if (KGKDKENMAOA.GetRosterFight() != null && KGKDKENMAOA.GetRosterFight().HasRandomSeeds)
 		{
-			SetRandomRuleSeed(KGKDKENMAOA.FLKFFDLLBKA().BKDOAOCGJLJ());
+			SetRandomRuleSeed(KGKDKENMAOA.GetRosterFight().GetRandomRuleSeed());
 			SetHasRandomSeed(true);
 		}
-		List<Rule> list = KGKDKENMAOA.BONNMLEJBJH();
+		List<Rule> list = KGKDKENMAOA.GetRules();
 		foreach (Rule item in list)
 		{
 			PutRule(item);
@@ -154,12 +154,12 @@ public class RulesInspector : global::EventDispatcher<object>
 			list = _resistanceRules;
 			break;
 		default:
-			LLLOJBFMONN.Error("Error - RulesInspector::checkEvent - unknown event %i", KOJNCHKPLLN);
+			GameLog.Error("Error - RulesInspector::checkEvent - unknown event %i", KOJNCHKPLLN);
 			return;
 		}
 		foreach (InFightRule item in list)
 		{
-			if (item.HHHPGLLBPMF() && (item.EDAKADCHOLE() == EJPOJJKKICO || item.EDAKADCHOLE() == RuleAppliance.ApplianceAll || EJPOJJKKICO == RuleAppliance.ApplianceAll) && item.Compare(data))
+			if (item.GetActive() && (item.GetAppliance() == EJPOJJKKICO || item.GetAppliance() == RuleAppliance.ApplianceAll || EJPOJJKKICO == RuleAppliance.ApplianceAll) && item.Compare(data))
 			{
 				RulePassed(item);
 			}
@@ -180,61 +180,61 @@ public class RulesInspector : global::EventDispatcher<object>
 		bool spotlightPrepared = false;
 		foreach (InFightRule item in _inFightRules)
 		{
-			if (!item.HHHPGLLBPMF())
+			if (!item.GetActive())
 			{
 				continue;
 			}
 			switch (item.get_Type())
 			{
-			case Rule.BCBLLMPAMLP.RuleRingout:
+			case Rule.RuleType.RuleRingout:
 				if (!flag)
 				{
 					RingOutRule iKKBOBLOPDI = (RingOutRule)item;
-					_fight.CreateRingout(iKKBOBLOPDI.EJHLFJBJHAN(), iKKBOBLOPDI.JFBOKNFDFDO(), iKKBOBLOPDI.IOCBNKAFHKL(), iKKBOBLOPDI.OCJHHNFNHMK());
+					_fight.CreateRingout(iKKBOBLOPDI.GetMinX(), iKKBOBLOPDI.GetMaxX(), iKKBOBLOPDI.GetSequenceSpeed(), iKKBOBLOPDI.GetSequenceName());
 					flag = true;
 				}
 				break;
-			case Rule.BCBLLMPAMLP.RuleHotGround:
+			case Rule.RuleType.RuleHotGround:
 				if (!flag5)
 				{
 					HotGroundRule gCNCEGFIOKG = (HotGroundRule)item;
-					if (gCNCEGFIOKG.BFOJOGLCIBB())
+					if (gCNCEGFIOKG.HasSequence())
 					{
-						_fight.CreateHotGround(gCNCEGFIOKG.OCJHHNFNHMK(), gCNCEGFIOKG.APDIONCLEDH());
+						_fight.CreateHotGround(gCNCEGFIOKG.GetSequenceName(), gCNCEGFIOKG.GetSequenceWidth());
 					}
 					flag5 = true;
 				}
 				break;
-			case Rule.BCBLLMPAMLP.RuleNoHealthBar:
-				_fight.JKPOGNMHDNK(item.EDAKADCHOLE(), false);
+			case Rule.RuleType.RuleNoHealthBar:
+				_fight.SetHealthBarVisible(item.GetAppliance(), false);
 				break;
-			case Rule.BCBLLMPAMLP.RuleDarkness:
+			case Rule.RuleType.RuleDarkness:
 				if (!flag2)
 				{
-					_fight.HKOMIIDELBC();
+					_fight.CreateDarkness();
 					flag2 = true;
 				}
 				break;
-			case Rule.BCBLLMPAMLP.RuleLightInTheDarkness:
+			case Rule.RuleType.RuleLightInTheDarkness:
 				if (!spotlightPrepared)
 				{
 					_fight.CreateLightInTheDarkness();
 					spotlightPrepared = true;
 				}
 				break;
-			case Rule.BCBLLMPAMLP.RulePoints:
+			case Rule.RuleType.RulePoints:
 				if (!flag3)
 				{
-					PointsTableType nOPJGLHKJPG = ((PointsRule)item).GCKBDFJKPDC();
-					int lOMKKEAMMIG = ((PointsRule)item).OEDHHGKAMID();
-					_fight.ANAOBOCPCON(0f, -220f, nOPJGLHKJPG, lOMKKEAMMIG);
+					PointsTableType nOPJGLHKJPG = ((PointsRule)item).GetTableType();
+					int lOMKKEAMMIG = ((PointsRule)item).GetMaxPoints();
+					_fight.CreatePointsTable(0f, -220f, nOPJGLHKJPG, lOMKKEAMMIG);
 					flag3 = true;
 				}
 				break;
-			case Rule.BCBLLMPAMLP.RuleRandomArea:
+			case Rule.RuleType.RuleRandomArea:
 				if (!flag4)
 				{
-					_fight.CreatePerkActivationArea(((RandomAreaRule)item).HFDJFADIAEP(), ((RandomAreaRule)item).BPMABAFDFJK(), ((RandomAreaRule)item).AJIAFONPDKE());
+					_fight.CreatePerkActivationArea(((RandomAreaRule)item).GetWidth(), ((RandomAreaRule)item).GetImagePath(), ((RandomAreaRule)item).GetIconPath());
 				}
 				break;
 			}
@@ -245,19 +245,19 @@ public class RulesInspector : global::EventDispatcher<object>
 	{
 		foreach (InFightRule item in _inFightRules)
 		{
-			if (item.HHHPGLLBPMF())
+			if (item.GetActive())
 			{
 				item.InitRule(data);
 				switch (item.get_Type())
 				{
-				case Rule.BCBLLMPAMLP.RuleRechargeMagicEachRound:
-					_fight.IFFANEPCAJB(item.EDAKADCHOLE());
+				case Rule.RuleType.RuleRechargeMagicEachRound:
+					_fight.RechargeMagic(item.GetAppliance());
 					break;
-				case Rule.BCBLLMPAMLP.RuleTactic:
-					_fight.SetBotTactic(((TacticRule)item).ICIKNGANCGK());
+				case Rule.RuleType.RuleTactic:
+					_fight.SetBotTactic(((TacticRule)item).GetTacticName());
 					break;
-				case Rule.BCBLLMPAMLP.RuleInvertJoystick:
-					_fight.OHEIDPMLNDE(true);
+				case Rule.RuleType.RuleInvertJoystick:
+					_fight.SetControlsInverted(true);
 					break;
 				}
 			}
@@ -280,15 +280,15 @@ public class RulesInspector : global::EventDispatcher<object>
 	{
 		foreach (InFightRule item in _inFightRules)
 		{
-			if (item.HHHPGLLBPMF())
+			if (item.GetActive())
 			{
 				item.Stop();
-				Rule.BCBLLMPAMLP bCBLLMPAMLP = item.get_Type();
-				if (bCBLLMPAMLP == Rule.BCBLLMPAMLP.RuleDarkness)
+				Rule.RuleType bCBLLMPAMLP = item.get_Type();
+				if (bCBLLMPAMLP == Rule.RuleType.RuleDarkness)
 				{
-					_fight.DBIHABKLFHP(0f);
+					_fight.SetDarknessAlpha(0f);
 				}
-				else if (bCBLLMPAMLP == Rule.BCBLLMPAMLP.RuleLightInTheDarkness)
+				else if (bCBLLMPAMLP == Rule.RuleType.RuleLightInTheDarkness)
 				{
 					_fight.RemoveLightInTheDarkness();
 				}
@@ -301,27 +301,27 @@ public class RulesInspector : global::EventDispatcher<object>
 		bool flag = false;
 		foreach (InFightRule item in _inFightRules)
 		{
-			flag = item.HAKHBAOJBON(CurrentRound) && item.CHDEIEMINPF();
+			flag = item.AppliesToRound(CurrentRound) && item.IsPlayerLevelInRange();
 			item.SetActive(flag);
 		}
 		foreach (NoButtonRule item2 in _noButtonRules)
 		{
-			flag = item2.HAKHBAOJBON(CurrentRound) && item2.CHDEIEMINPF();
+			flag = item2.AppliesToRound(CurrentRound) && item2.IsPlayerLevelInRange();
 			item2.SetActive(flag);
 		}
 		foreach (NoAnimationRule item3 in _noAnimationRules)
 		{
-			flag = item3.HAKHBAOJBON(CurrentRound) && item3.CHDEIEMINPF();
+			flag = item3.AppliesToRound(CurrentRound) && item3.IsPlayerLevelInRange();
 			item3.SetActive(flag);
 		}
 		foreach (ItemRule item4 in _itemRules)
 		{
-			flag = item4.HAKHBAOJBON(CurrentRound) && item4.CHDEIEMINPF();
+			flag = item4.AppliesToRound(CurrentRound) && item4.IsPlayerLevelInRange();
 			item4.SetActive(flag);
 		}
 		foreach (RandomRule item5 in _randomRules)
 		{
-			flag = item5.HAKHBAOJBON(CurrentRound) && item5.CHDEIEMINPF();
+			flag = item5.AppliesToRound(CurrentRound) && item5.IsPlayerLevelInRange();
 			item5.SetActive(flag);
 		}
 	}
@@ -330,29 +330,29 @@ public class RulesInspector : global::EventDispatcher<object>
 	{
 		if (IHEFAMAFBIA == null)
 		{
-			LLLOJBFMONN.Error("RulesInspector::applyNoPerksRules ERROR - modelParameters is NULL");
+			GameLog.Error("RulesInspector::applyNoPerksRules ERROR - modelParameters is NULL");
 		}
-		IHEFAMAFBIA.KOELCOMEJMI.Clear();
+		IHEFAMAFBIA.ExcludedPerkNames.Clear();
 		foreach (NoPerksRule item2 in GOMIMEDNKHH)
 		{
-			string item = item2.DMEDLGGNAIK();
-			IHEFAMAFBIA.KOELCOMEJMI.Add(item);
+			string item = item2.GetPerkName();
+			IHEFAMAFBIA.ExcludedPerkNames.Add(item);
 		}
-		IHEFAMAFBIA.JEJPEJFLDJC(IHEFAMAFBIA.Perks, IHEFAMAFBIA.KOELCOMEJMI);
+		IHEFAMAFBIA.RemovePerksByNames(IHEFAMAFBIA.Perks, IHEFAMAFBIA.ExcludedPerkNames);
 	}
 
 	public void ApplyNoAnimationRules(ModelParameters IHEFAMAFBIA)
 	{
 		if (IHEFAMAFBIA == null)
 		{
-			LLLOJBFMONN.Error("RulesInspector::applyNoAnimationRules ERROR - modelParameters is NULL");
+			GameLog.Error("RulesInspector::applyNoAnimationRules ERROR - modelParameters is NULL");
 		}
-		IHEFAMAFBIA.DANNKMJOOOH.Clear();
+		IHEFAMAFBIA.ExcludedMoveNames.Clear();
 		foreach (NoAnimationRule item in _noAnimationRules)
 		{
-			if (item.HHHPGLLBPMF())
+			if (item.GetActive())
 			{
-				IHEFAMAFBIA.DANNKMJOOOH.Add(item.DPKNMJMPEDM());
+				IHEFAMAFBIA.ExcludedMoveNames.Add(item.GetAnimationName());
 			}
 		}
 	}
@@ -361,15 +361,15 @@ public class RulesInspector : global::EventDispatcher<object>
 	{
 		if (IHEFAMAFBIA == null)
 		{
-			LLLOJBFMONN.Error("RulesInspector::ApplyAvatarAndNameRules ERROR - modelParameters is NULL");
+			GameLog.Error("RulesInspector::ApplyAvatarAndNameRules ERROR - modelParameters is NULL");
 		}
 		foreach (AvatarRule item in _avatarRules)
 		{
-			IHEFAMAFBIA.HNKFHGOOKEG = item.get_Name();
+			IHEFAMAFBIA.Avatar = item.get_Name();
 		}
 		foreach (NameRule item2 in _nameRules)
 		{
-			IHEFAMAFBIA.BMFLPBLAFLK = item2.get_Name();
+			IHEFAMAFBIA.FirstName = item2.get_Name();
 		}
 	}
 
@@ -377,12 +377,12 @@ public class RulesInspector : global::EventDispatcher<object>
 	{
 		if (LPGANKOAPJL == null)
 		{
-			LLLOJBFMONN.Error("RulesInspector::checkButtonRules ERROR - gameController is NULL");
+			GameLog.Error("RulesInspector::checkButtonRules ERROR - gameController is NULL");
 			return;
 		}
 		foreach (NoButtonRule item in _noButtonRules)
 		{
-			if (item.HHHPGLLBPMF())
+			if (item.GetActive())
 			{
 				ApplyButtonRule(item, LPGANKOAPJL);
 			}
@@ -391,21 +391,21 @@ public class RulesInspector : global::EventDispatcher<object>
 
 	public void ApplyButtonRule(NoButtonRule HNBFMAKFJAM, GameController LPGANKOAPJL)
 	{
-		switch (HNBFMAKFJAM.KBINIBAGEFM())
+		switch (HNBFMAKFJAM.GetButtonType())
 		{
-		case NoButtonRule.AHIDMNNEAEC.ButtonTypePunch:
+		case NoButtonRule.NoButtonType.ButtonTypePunch:
 			LPGANKOAPJL.SetButtonRuleEnabled(FightCID.Punch, false);
 			break;
-		case NoButtonRule.AHIDMNNEAEC.ButtonTypeKick:
+		case NoButtonRule.NoButtonType.ButtonTypeKick:
 			LPGANKOAPJL.SetButtonRuleEnabled(FightCID.Kick, false);
 			break;
-        case NoButtonRule.AHIDMNNEAEC.ButtonTypeRanged:
+        case NoButtonRule.NoButtonType.ButtonTypeRanged:
             LPGANKOAPJL.SetButtonRuleEnabled(FightCID.MissileButton, false);
             break;
-        case NoButtonRule.AHIDMNNEAEC.ButtonTypeMagic:
+        case NoButtonRule.NoButtonType.ButtonTypeMagic:
             LPGANKOAPJL.SetButtonRuleEnabled(FightCID.MagicButton, false);
             break;
-        case NoButtonRule.AHIDMNNEAEC.ButtonTypeRaidCharge:
+        case NoButtonRule.NoButtonType.ButtonTypeRaidCharge:
             LPGANKOAPJL.SetButtonRuleEnabled(FightCID.RaidChargeButton, false);
 			break;
 		}
@@ -420,7 +420,7 @@ public class RulesInspector : global::EventDispatcher<object>
 		ChangeFightRule iJCOGNNJLFA = null;
 		foreach (ChangeFightRule item in _changeFightRules)
 		{
-			if (item.HHHPGLLBPMF())
+			if (item.GetActive())
 			{
 				iJCOGNNJLFA = item;
 			}
@@ -433,12 +433,12 @@ public class RulesInspector : global::EventDispatcher<object>
 
 	public void ApplyChangeFightRule(ChangeFightRule HNBFMAKFJAM, FightList KGKDKENMAOA)
 	{
-		int num = HNBFMAKFJAM.NNMOHPAAFGI();
+		int num = HNBFMAKFJAM.GetRounds();
 		if (num > 0)
 		{
 			KGKDKENMAOA.RoundsToWin = num;
 		}
-		int num2 = HNBFMAKFJAM.IBHBDDFGEDN();
+		int num2 = HNBFMAKFJAM.GetRoundTime();
 		if (num2 > 0)
 		{
 			KGKDKENMAOA.RoundTime = (ObscuredInt)(num2);
@@ -452,16 +452,16 @@ public class RulesInspector : global::EventDispatcher<object>
 		{
 			if (_hasRandomSeed)
 			{
-				NekkiMath.KACCBCCEPGB(_randomRuleSeed);
+				NekkiMath.SetSeed(_randomRuleSeed);
 			}
 			else
 			{
 				Eclipse.Multiplayer.VersusDeterminism.ReseedRules(CurrentRound);
 			}
-			ResetRandomRules(RandomRule.EOAOMBKFMPF.REFRESH_EACH_FIGHT);
+			ResetRandomRules(RandomRule.RefreshMode.REFRESH_EACH_FIGHT);
 		}
 		Eclipse.Multiplayer.VersusDeterminism.ReseedRules(CurrentRound);
-		ResetRandomRules(RandomRule.EOAOMBKFMPF.REFRESH_EACH_ROUND);
+		ResetRandomRules(RandomRule.RefreshMode.REFRESH_EACH_ROUND);
 		PutRandomRules();
 	}
 
@@ -478,10 +478,10 @@ public class RulesInspector : global::EventDispatcher<object>
 	{
 		foreach (ItemRule item in JIILGONALOA)
 		{
-			if (item != null && item.get_Type() == Rule.BCBLLMPAMLP.RuleRandomAquiredItem)
+			if (item != null && item.get_Type() == Rule.RuleType.RuleRandomAquiredItem)
 			{
 				RandomAquiredItemRule kJNNJGGKBCO = (RandomAquiredItemRule)item;
-				kJNNJGGKBCO.PINICFPAOAK();
+				kJNNJGGKBCO.RefreshItems();
 			}
 		}
 	}
@@ -526,56 +526,56 @@ public class RulesInspector : global::EventDispatcher<object>
 		bool flag = false;
 		switch (HNBFMAKFJAM.get_Type())
 		{
-		case Rule.BCBLLMPAMLP.RuleRegeneration:
+		case Rule.RuleType.RuleRegeneration:
 		{
-			float num2 = ((RegenerationRule)HNBFMAKFJAM).BIGCPKBIJNA();
-			num2 /= (float)GameUtils.GGBABPJBGJB();
-			if (_fight.UpdateLife(HNBFMAKFJAM.EDAKADCHOLE(), num2))
+			float num2 = ((RegenerationRule)HNBFMAKFJAM).GetRate();
+			num2 /= (float)GameUtils.GetSlowMode();
+			if (_fight.UpdateLife(HNBFMAKFJAM.GetAppliance(), num2))
 			{
-				_fight.HAANFNBPMBE(HNBFMAKFJAM);
+				_fight.SetEndFightRule(HNBFMAKFJAM);
 			}
 			break;
 		}
-		case Rule.BCBLLMPAMLP.RuleLifeSteal:
+		case Rule.RuleType.RuleLifeSteal:
 		{
-			float num = ((LifeStealRule)HNBFMAKFJAM).FGJOBADADEB();
-			num /= (float)GameUtils.GGBABPJBGJB();
-			if (_fight.UpdateLife(HNBFMAKFJAM.EDAKADCHOLE(), num))
+			float num = ((LifeStealRule)HNBFMAKFJAM).GetLastLifeStolen();
+			num /= (float)GameUtils.GetSlowMode();
+			if (_fight.UpdateLife(HNBFMAKFJAM.GetAppliance(), num))
 			{
-				_fight.HAANFNBPMBE(HNBFMAKFJAM);
+				_fight.SetEndFightRule(HNBFMAKFJAM);
 			}
 			break;
 		}
-		case Rule.BCBLLMPAMLP.RuleRingout:
-		case Rule.BCBLLMPAMLP.RuleHotGround:
-			if (HNBFMAKFJAM.OBDNDAEPPNN())
+		case Rule.RuleType.RuleRingout:
+		case Rule.RuleType.RuleHotGround:
+			if (HNBFMAKFJAM.IsDeathRule())
 			{
-				_fight.ALNNLCAKCAF(HNBFMAKFJAM.EDAKADCHOLE());
+				_fight.SetLifeToZero(HNBFMAKFJAM.GetAppliance());
 			}
-			_fight.HAANFNBPMBE(HNBFMAKFJAM);
+			_fight.SetEndFightRule(HNBFMAKFJAM);
 			break;
-		case Rule.BCBLLMPAMLP.RuleLoseFall:
-		case Rule.BCBLLMPAMLP.RuleTimeoutWin:
-		case Rule.BCBLLMPAMLP.RuleWinStyle:
-		case Rule.BCBLLMPAMLP.RuleWinCombo:
-		case Rule.BCBLLMPAMLP.RuleWinShock:
-			_fight.HAANFNBPMBE(HNBFMAKFJAM);
+		case Rule.RuleType.RuleLoseFall:
+		case Rule.RuleType.RuleTimeoutWin:
+		case Rule.RuleType.RuleWinStyle:
+		case Rule.RuleType.RuleWinCombo:
+		case Rule.RuleType.RuleWinShock:
+			_fight.SetEndFightRule(HNBFMAKFJAM);
 			break;
-		case Rule.BCBLLMPAMLP.RulePoints:
-			_fight.UpdatePointsTable(((PointsRule)HNBFMAKFJAM).BDHKJEFJNFJ(), ((PointsRule)HNBFMAKFJAM).MHCBPGMIEEH());
-			if (((PointsRule)HNBFMAKFJAM).FEIKKONCLFE())
+		case Rule.RuleType.RulePoints:
+			_fight.UpdatePointsTable(((PointsRule)HNBFMAKFJAM).GetPlayerPoints(), ((PointsRule)HNBFMAKFJAM).GetOpponentPoints());
+			if (((PointsRule)HNBFMAKFJAM).GetIsFinished())
 			{
-				_fight.HAANFNBPMBE(HNBFMAKFJAM);
+				_fight.SetEndFightRule(HNBFMAKFJAM);
 			}
 			break;
-		case Rule.BCBLLMPAMLP.RuleCrazy:
-		case Rule.BCBLLMPAMLP.RuleCombo:
+		case Rule.RuleType.RuleCrazy:
+		case Rule.RuleType.RuleCombo:
 			flag = true;
 			break;
 		}
 		if (flag)
 		{
-			CheckDamageRules(HNBFMAKFJAM.EDAKADCHOLE());
+			CheckDamageRules(HNBFMAKFJAM.GetAppliance());
 		}
 	}
 
@@ -583,33 +583,33 @@ public class RulesInspector : global::EventDispatcher<object>
 	{
 		foreach (InFightRule item in _renderRules)
 		{
-			if (!item.HHHPGLLBPMF())
+			if (!item.GetActive())
 			{
 				continue;
 			}
 			switch (item.get_Type())
 			{
-			case Rule.BCBLLMPAMLP.RuleHotGround:
-				if (((HotGroundRule)item).HADLDHHEOKM)
+			case Rule.RuleType.RuleHotGround:
+				if (((HotGroundRule)item).timerChanged)
 				{
 					if (_fight.preFight != null)
 					{
-						_fight.preFight.ViewerUpdateHotGroundTimer(((HotGroundRule)item).NNOHILNKJEN(), item.EDAKADCHOLE());
+						_fight.preFight.ViewerUpdateHotGroundTimer(((HotGroundRule)item).GetRemainingSeconds(), item.GetAppliance());
 					}
-					((HotGroundRule)item).HADLDHHEOKM = false;
+					((HotGroundRule)item).timerChanged = false;
 				}
 				break;
-			case Rule.BCBLLMPAMLP.RuleDarkness:
-				_fight.DBIHABKLFHP(((DarknessRule)item).CFNAMMODOAA());
+			case Rule.RuleType.RuleDarkness:
+				_fight.SetDarknessAlpha(((DarknessRule)item).GetAlpha());
 				break;
-			case Rule.BCBLLMPAMLP.RuleLightInTheDarkness:
+			case Rule.RuleType.RuleLightInTheDarkness:
 				var spotlight = (Eclipse.Combat.LightInTheDarknessRule)item;
-				_fight.UpdateLightInTheDarkness(spotlight.EDAKADCHOLE(), spotlight.LightRadius, spotlight.LightShape);
+				_fight.UpdateLightInTheDarkness(spotlight.GetAppliance(), spotlight.LightRadius, spotlight.LightShape);
 				break;
-			case Rule.BCBLLMPAMLP.RuleRandomArea:
+			case Rule.RuleType.RuleRandomArea:
 			{
 				RandomAreaRule dFAONBFDMKA = (RandomAreaRule)item;
-				_fight.UpdatePerkActivationArea(dFAONBFDMKA.BOCHPMJBLGA(), dFAONBFDMKA.CFNAMMODOAA(), dFAONBFDMKA.JFFONEBNBMP());
+				_fight.UpdatePerkActivationArea(dFAONBFDMKA.GetPositionX(), dFAONBFDMKA.GetAlpha(), dFAONBFDMKA.IsAreaVisible());
 				break;
 			}
 			}
@@ -627,19 +627,19 @@ public class RulesInspector : global::EventDispatcher<object>
 		bool flag = true;
 		foreach (InFightRule item in _damageRules)
 		{
-			if (item.HHHPGLLBPMF() && item.EDAKADCHOLE() == EJPOJJKKICO)
+			if (item.GetActive() && item.GetAppliance() == EJPOJJKKICO)
 			{
-				flag = flag && !((DamageRule)item).BKEAKKCDMMN();
+				flag = flag && !((DamageRule)item).IsNoDamage();
 			}
 		}
 		RuleAppliance eJPOJJKKICO = ((EJPOJJKKICO != RuleAppliance.AppliancePlayer) ? RuleAppliance.AppliancePlayer : RuleAppliance.ApplianceOpponent);
-		_fight.AMLOPBMHPHC(eJPOJJKKICO).MABELGMBHEA(!flag);
+		_fight.GetModelByAppliance(eJPOJJKKICO).SetDamageImmune(!flag);
 	}
 
 	protected void CheckResistanceRules()
 	{
-		Model fGCODGKLHED = _fight.AMLOPBMHPHC(RuleAppliance.AppliancePlayer);
-		Model fGCODGKLHED2 = _fight.AMLOPBMHPHC(RuleAppliance.ApplianceOpponent);
+		Model fGCODGKLHED = _fight.GetModelByAppliance(RuleAppliance.AppliancePlayer);
+		Model fGCODGKLHED2 = _fight.GetModelByAppliance(RuleAppliance.ApplianceOpponent);
 		float num = 1f;
 		float num2 = 1f;
 		foreach (InFightRule item in _resistanceRules)
@@ -647,20 +647,20 @@ public class RulesInspector : global::EventDispatcher<object>
 			ResistanceRule hCOHJNFLKIF = item as ResistanceRule;
 			if (hCOHJNFLKIF != null)
 			{
-				string gOHIIMFFFJI = hCOHJNFLKIF.DJBFLJAIKLI();
-				int num3 = hCOHJNFLKIF.GLBEGDFMDBO();
-				int num4 = ListSF.CCDKHLAMKKO().IJCGBPDAAJF(gOHIIMFFFJI);
+				string gOHIIMFFFJI = hCOHJNFLKIF.GetResistanceName();
+				int num3 = hCOHJNFLKIF.GetResistanceValue();
+				int num4 = ListSF.GetRoster().GetResistanceCount(gOHIIMFFFJI);
 				if (num4 < num3)
 				{
-					float num5 = Mathf.Pow(2f, (float)(num3 - num4) / GameUtils.CHOGPMPEDIC());
-					float num6 = Mathf.Pow(2f, (float)(num4 - num3) / GameUtils.CHOGPMPEDIC());
+					float num5 = Mathf.Pow(2f, (float)(num3 - num4) / GameUtils.GetResistanceDoublingRange());
+					float num6 = Mathf.Pow(2f, (float)(num4 - num3) / GameUtils.GetResistanceDoublingRange());
 					num *= num6;
 					num2 *= num5;
 				}
 			}
 		}
-		fGCODGKLHED.OLGNPKCPKOJ(num);
-		fGCODGKLHED2.OLGNPKCPKOJ(num2);
+		fGCODGKLHED.SetDamageMultiplier(num);
+		fGCODGKLHED2.SetDamageMultiplier(num2);
 	}
 
 	protected void SetItemRules(List<ItemRule> GEEJLFGCKNJ)
@@ -700,47 +700,47 @@ public class RulesInspector : global::EventDispatcher<object>
 
 	protected void SetInFightRule(InFightRule HNBFMAKFJAM)
 	{
-		if (HNBFMAKFJAM.PMBJPCMHJOA(FightEvent.RenderEvent))
+		if (HNBFMAKFJAM.IsSubscribedTo(FightEvent.RenderEvent))
 		{
 			_renderRules.Add(HNBFMAKFJAM);
 		}
-		if (HNBFMAKFJAM.PMBJPCMHJOA(FightEvent.CollisionEvent))
+		if (HNBFMAKFJAM.IsSubscribedTo(FightEvent.CollisionEvent))
 		{
 			_collisionRules.Add(HNBFMAKFJAM);
 		}
-		if (HNBFMAKFJAM.PMBJPCMHJOA(FightEvent.HitEvent))
+		if (HNBFMAKFJAM.IsSubscribedTo(FightEvent.HitEvent))
 		{
 			_hitRules.Add(HNBFMAKFJAM);
 		}
-		if (HNBFMAKFJAM.PMBJPCMHJOA(FightEvent.AnimationStartEvent))
+		if (HNBFMAKFJAM.IsSubscribedTo(FightEvent.AnimationStartEvent))
 		{
 			_animationRules.Add(HNBFMAKFJAM);
 		}
-		if (HNBFMAKFJAM.PMBJPCMHJOA(FightEvent.PhysicsStartEvent))
+		if (HNBFMAKFJAM.IsSubscribedTo(FightEvent.PhysicsStartEvent))
 		{
 			_physicsRules.Add(HNBFMAKFJAM);
 		}
-		if (HNBFMAKFJAM.PMBJPCMHJOA(FightEvent.CrazyEvent))
+		if (HNBFMAKFJAM.IsSubscribedTo(FightEvent.CrazyEvent))
 		{
 			_crazyRules.Add(HNBFMAKFJAM);
 		}
-		if (HNBFMAKFJAM.PMBJPCMHJOA(FightEvent.StrikeEvent))
+		if (HNBFMAKFJAM.IsSubscribedTo(FightEvent.StrikeEvent))
 		{
 			_strikeRules.Add(HNBFMAKFJAM);
 		}
-		if (HNBFMAKFJAM.PMBJPCMHJOA(FightEvent.TimeoutEvent))
+		if (HNBFMAKFJAM.IsSubscribedTo(FightEvent.TimeoutEvent))
 		{
 			_timeoutRules.Add(HNBFMAKFJAM);
 		}
-		if (HNBFMAKFJAM.PMBJPCMHJOA(FightEvent.DamageCheckEvent))
+		if (HNBFMAKFJAM.IsSubscribedTo(FightEvent.DamageCheckEvent))
 		{
 			_damageRules.Add(HNBFMAKFJAM);
 		}
-		if (HNBFMAKFJAM.PMBJPCMHJOA(FightEvent.ComboEvent))
+		if (HNBFMAKFJAM.IsSubscribedTo(FightEvent.ComboEvent))
 		{
 			_comboRules.Add(HNBFMAKFJAM);
 		}
-		if (HNBFMAKFJAM.PMBJPCMHJOA(FightEvent.ResistanceCheckEvent))
+		if (HNBFMAKFJAM.IsSubscribedTo(FightEvent.ResistanceCheckEvent))
 		{
 			_resistanceRules.Add(HNBFMAKFJAM);
 		}
@@ -750,47 +750,47 @@ public class RulesInspector : global::EventDispatcher<object>
 
 	protected void DeactivateInFightRule(InFightRule HNBFMAKFJAM)
 	{
-		if (HNBFMAKFJAM.PMBJPCMHJOA(FightEvent.RenderEvent))
+		if (HNBFMAKFJAM.IsSubscribedTo(FightEvent.RenderEvent))
 		{
 			_renderRules.Remove(HNBFMAKFJAM);
 		}
-		if (HNBFMAKFJAM.PMBJPCMHJOA(FightEvent.CollisionEvent))
+		if (HNBFMAKFJAM.IsSubscribedTo(FightEvent.CollisionEvent))
 		{
 			_collisionRules.Remove(HNBFMAKFJAM);
 		}
-		if (HNBFMAKFJAM.PMBJPCMHJOA(FightEvent.HitEvent))
+		if (HNBFMAKFJAM.IsSubscribedTo(FightEvent.HitEvent))
 		{
 			_hitRules.Remove(HNBFMAKFJAM);
 		}
-		if (HNBFMAKFJAM.PMBJPCMHJOA(FightEvent.AnimationStartEvent))
+		if (HNBFMAKFJAM.IsSubscribedTo(FightEvent.AnimationStartEvent))
 		{
 			_animationRules.Remove(HNBFMAKFJAM);
 		}
-		if (HNBFMAKFJAM.PMBJPCMHJOA(FightEvent.PhysicsStartEvent))
+		if (HNBFMAKFJAM.IsSubscribedTo(FightEvent.PhysicsStartEvent))
 		{
 			_physicsRules.Remove(HNBFMAKFJAM);
 		}
-		if (HNBFMAKFJAM.PMBJPCMHJOA(FightEvent.CrazyEvent))
+		if (HNBFMAKFJAM.IsSubscribedTo(FightEvent.CrazyEvent))
 		{
 			_crazyRules.Remove(HNBFMAKFJAM);
 		}
-		if (HNBFMAKFJAM.PMBJPCMHJOA(FightEvent.StrikeEvent))
+		if (HNBFMAKFJAM.IsSubscribedTo(FightEvent.StrikeEvent))
 		{
 			_strikeRules.Remove(HNBFMAKFJAM);
 		}
-		if (HNBFMAKFJAM.PMBJPCMHJOA(FightEvent.TimeoutEvent))
+		if (HNBFMAKFJAM.IsSubscribedTo(FightEvent.TimeoutEvent))
 		{
 			_timeoutRules.Remove(HNBFMAKFJAM);
 		}
-		if (HNBFMAKFJAM.PMBJPCMHJOA(FightEvent.DamageCheckEvent))
+		if (HNBFMAKFJAM.IsSubscribedTo(FightEvent.DamageCheckEvent))
 		{
 			_damageRules.Remove(HNBFMAKFJAM);
 		}
-		if (HNBFMAKFJAM.PMBJPCMHJOA(FightEvent.ComboEvent))
+		if (HNBFMAKFJAM.IsSubscribedTo(FightEvent.ComboEvent))
 		{
 			_comboRules.Remove(HNBFMAKFJAM);
 		}
-		if (HNBFMAKFJAM.PMBJPCMHJOA(FightEvent.ResistanceCheckEvent))
+		if (HNBFMAKFJAM.IsSubscribedTo(FightEvent.ResistanceCheckEvent))
 		{
 			_resistanceRules.Remove(HNBFMAKFJAM);
 		}
@@ -805,54 +805,54 @@ public class RulesInspector : global::EventDispatcher<object>
 	{
 		switch (HNBFMAKFJAM.get_Type())
 		{
-		case Rule.BCBLLMPAMLP.RuleComplex:
+		case Rule.RuleType.RuleComplex:
 			RemoveComplexRule((ComplexRule)HNBFMAKFJAM);
 			return;
-		case Rule.BCBLLMPAMLP.RuleItem:
-		case Rule.BCBLLMPAMLP.RuleEquipItem:
-		case Rule.BCBLLMPAMLP.RuleRandomAquiredItem:
+		case Rule.RuleType.RuleItem:
+		case Rule.RuleType.RuleEquipItem:
+		case Rule.RuleType.RuleRandomAquiredItem:
 			_itemRules.Remove((ItemRule)HNBFMAKFJAM);
 			_playerItemRules.Remove((ItemRule)HNBFMAKFJAM);
 			_enemyItemRules.Remove((ItemRule)HNBFMAKFJAM);
 			break;
-		case Rule.BCBLLMPAMLP.RuleNoButton:
+		case Rule.RuleType.RuleNoButton:
 			_noButtonRules.Remove((NoButtonRule)HNBFMAKFJAM);
 			break;
-		case Rule.BCBLLMPAMLP.RuleNoAnimation:
+		case Rule.RuleType.RuleNoAnimation:
 			_noAnimationRules.Remove((NoAnimationRule)HNBFMAKFJAM);
 			break;
-		case Rule.BCBLLMPAMLP.RuleChangeFight:
+		case Rule.RuleType.RuleChangeFight:
 			_changeFightRules.Remove((ChangeFightRule)HNBFMAKFJAM);
 			break;
-		case Rule.BCBLLMPAMLP.RuleRingout:
-		case Rule.BCBLLMPAMLP.RuleHotGround:
-		case Rule.BCBLLMPAMLP.RuleLoseFall:
-		case Rule.BCBLLMPAMLP.RuleRegeneration:
-		case Rule.BCBLLMPAMLP.RuleAttributes:
-		case Rule.BCBLLMPAMLP.RuleDamageFactor:
-		case Rule.BCBLLMPAMLP.RuleRemoveInterval:
-		case Rule.BCBLLMPAMLP.RuleCrazy:
-		case Rule.BCBLLMPAMLP.RuleLifeSteal:
-		case Rule.BCBLLMPAMLP.RuleNoHealthBar:
-		case Rule.BCBLLMPAMLP.RuleCombo:
-		case Rule.BCBLLMPAMLP.RuleTimeoutWin:
-		case Rule.BCBLLMPAMLP.RuleRechargeMagicEachRound:
-		case Rule.BCBLLMPAMLP.RuleNoBulletsReplenishment:
-		case Rule.BCBLLMPAMLP.RuleInvulnerability:
-		case Rule.BCBLLMPAMLP.RuleResistance:
+		case Rule.RuleType.RuleRingout:
+		case Rule.RuleType.RuleHotGround:
+		case Rule.RuleType.RuleLoseFall:
+		case Rule.RuleType.RuleRegeneration:
+		case Rule.RuleType.RuleAttributes:
+		case Rule.RuleType.RuleDamageFactor:
+		case Rule.RuleType.RuleRemoveInterval:
+		case Rule.RuleType.RuleCrazy:
+		case Rule.RuleType.RuleLifeSteal:
+		case Rule.RuleType.RuleNoHealthBar:
+		case Rule.RuleType.RuleCombo:
+		case Rule.RuleType.RuleTimeoutWin:
+		case Rule.RuleType.RuleRechargeMagicEachRound:
+		case Rule.RuleType.RuleNoBulletsReplenishment:
+		case Rule.RuleType.RuleInvulnerability:
+		case Rule.RuleType.RuleResistance:
 			RemoveInFightRule((InFightRule)HNBFMAKFJAM);
 			break;
-		case Rule.BCBLLMPAMLP.RuleDarkness:
-		case Rule.BCBLLMPAMLP.RuleLightInTheDarkness:
-		case Rule.BCBLLMPAMLP.RulePoints:
-		case Rule.BCBLLMPAMLP.RuleInvertJoystick:
-		case Rule.BCBLLMPAMLP.RuleRandomArea:
+		case Rule.RuleType.RuleDarkness:
+		case Rule.RuleType.RuleLightInTheDarkness:
+		case Rule.RuleType.RulePoints:
+		case Rule.RuleType.RuleInvertJoystick:
+		case Rule.RuleType.RuleRandomArea:
 			RemoveInFightRule((InFightRule)HNBFMAKFJAM, true);
 			break;
-		case Rule.BCBLLMPAMLP.RuleAvatar:
+		case Rule.RuleType.RuleAvatar:
 			_avatarRules.Remove((AvatarRule)HNBFMAKFJAM);
 			break;
-		case Rule.BCBLLMPAMLP.RuleName:
+		case Rule.RuleType.RuleName:
 			_nameRules.Remove((NameRule)HNBFMAKFJAM);
 			break;
 		}
@@ -861,7 +861,7 @@ public class RulesInspector : global::EventDispatcher<object>
 
 	protected void RemoveComplexRule(ComplexRule FPMPFCGEBKE)
 	{
-		List<Rule> list = FPMPFCGEBKE.BONNMLEJBJH();
+		List<Rule> list = FPMPFCGEBKE.GetRules();
 		foreach (Rule item in list)
 		{
 			RemoveRule(item);
@@ -871,23 +871,23 @@ public class RulesInspector : global::EventDispatcher<object>
 
 	protected void PutPerkFromRule(PerkRule HNBFMAKFJAM)
 	{
-		switch (HNBFMAKFJAM.EDAKADCHOLE())
+		switch (HNBFMAKFJAM.GetAppliance())
 		{
 		case RuleAppliance.AppliancePlayer:
-			_playerPerks.Add(HNBFMAKFJAM.GNIICEKAJKC());
+			_playerPerks.Add(HNBFMAKFJAM.GetPerk());
 			break;
 		case RuleAppliance.ApplianceOpponent:
-			_enemyPerks.Add(HNBFMAKFJAM.GNIICEKAJKC());
+			_enemyPerks.Add(HNBFMAKFJAM.GetPerk());
 			break;
 		default:
-			LLLOJBFMONN.Error("RulesInspector::putPerkFromRule ERROR - wrong rule appliance %i", HNBFMAKFJAM.EDAKADCHOLE());
+			GameLog.Error("RulesInspector::putPerkFromRule ERROR - wrong rule appliance %i", HNBFMAKFJAM.GetAppliance());
 			break;
 		}
 	}
 
 	protected void PutNoPerkFromRule(NoPerksRule HNBFMAKFJAM)
 	{
-		switch (HNBFMAKFJAM.EDAKADCHOLE())
+		switch (HNBFMAKFJAM.GetAppliance())
 		{
 		case RuleAppliance.AppliancePlayer:
 			_playerNoPerksRules.Add(HNBFMAKFJAM);
@@ -900,7 +900,7 @@ public class RulesInspector : global::EventDispatcher<object>
 			_enemyNoPerksRules.Add(HNBFMAKFJAM);
 			break;
 		default:
-			LLLOJBFMONN.Error("RulesInspector::putPerkFromRule ERROR - wrong rule appliance %i", HNBFMAKFJAM.EDAKADCHOLE());
+			GameLog.Error("RulesInspector::putPerkFromRule ERROR - wrong rule appliance %i", HNBFMAKFJAM.GetAppliance());
 			break;
 		}
 	}
@@ -911,13 +911,13 @@ public class RulesInspector : global::EventDispatcher<object>
 		_enemyPerks.Clear();
 		foreach (Rule item in _rules)
 		{
-			if (item.HHHPGLLBPMF())
+			if (item.GetActive())
 			{
-				if (item.get_Type() == Rule.BCBLLMPAMLP.RulePerk)
+				if (item.get_Type() == Rule.RuleType.RulePerk)
 				{
 					PutPerkFromRule((PerkRule)item);
 				}
-				else if (item.get_Type() == Rule.BCBLLMPAMLP.RuleNoPerks)
+				else if (item.get_Type() == Rule.RuleType.RuleNoPerks)
 				{
 					PutNoPerkFromRule((NoPerksRule)item);
 				}
@@ -933,13 +933,13 @@ public class RulesInspector : global::EventDispatcher<object>
 		});
 	}
 
-	protected void ResetRandomRules(RandomRule.EOAOMBKFMPF LFLGCDNKNJI)
+	protected void ResetRandomRules(RandomRule.RefreshMode LFLGCDNKNJI)
 	{
 		foreach (RandomRule item in _randomRules)
 		{
-			if (item.HHHPGLLBPMF() && item.EPMBMBMNJIA() == LFLGCDNKNJI)
+			if (item.GetActive() && item.GetRefreshMode() == LFLGCDNKNJI)
 			{
-				item.OIOJKNKDFJM();
+				item.SelectRandomRule();
 			}
 		}
 	}
@@ -948,9 +948,9 @@ public class RulesInspector : global::EventDispatcher<object>
 	{
 		foreach (RandomRule item in _randomRules)
 		{
-			if (item.HHHPGLLBPMF())
+			if (item.GetActive())
 			{
-				PutRule(item.GHLEKCGJAEP());
+				PutRule(item.GetSelectedRule());
 			}
 		}
 	}
@@ -959,77 +959,77 @@ public class RulesInspector : global::EventDispatcher<object>
 	{
 		switch (HNBFMAKFJAM.get_Type())
 		{
-		case Rule.BCBLLMPAMLP.RuleRandom:
+		case Rule.RuleType.RuleRandom:
 			_randomRules.Add((RandomRule)HNBFMAKFJAM);
 			break;
-		case Rule.BCBLLMPAMLP.RuleComplex:
+		case Rule.RuleType.RuleComplex:
 			PutComplexRule((ComplexRule)HNBFMAKFJAM);
 			return;
-		case Rule.BCBLLMPAMLP.RuleItem:
-		case Rule.BCBLLMPAMLP.RuleEquipItem:
-		case Rule.BCBLLMPAMLP.RuleRandomAquiredItem:
+		case Rule.RuleType.RuleItem:
+		case Rule.RuleType.RuleEquipItem:
+		case Rule.RuleType.RuleRandomAquiredItem:
 			PutItemRule((ItemRule)HNBFMAKFJAM);
 			break;
-		case Rule.BCBLLMPAMLP.RuleNoButton:
+		case Rule.RuleType.RuleNoButton:
 			_noButtonRules.Add((NoButtonRule)HNBFMAKFJAM);
 			break;
-		case Rule.BCBLLMPAMLP.RuleNoAnimation:
+		case Rule.RuleType.RuleNoAnimation:
 			_noAnimationRules.Add((NoAnimationRule)HNBFMAKFJAM);
 			break;
-		case Rule.BCBLLMPAMLP.RuleChangeFight:
+		case Rule.RuleType.RuleChangeFight:
 			_changeFightRules.Add((ChangeFightRule)HNBFMAKFJAM);
 			break;
-		case Rule.BCBLLMPAMLP.RuleRingout:
-		case Rule.BCBLLMPAMLP.RuleHotGround:
-		case Rule.BCBLLMPAMLP.RuleLoseFall:
-		case Rule.BCBLLMPAMLP.RuleRegeneration:
-		case Rule.BCBLLMPAMLP.RuleAttributes:
-		case Rule.BCBLLMPAMLP.RuleDamageFactor:
-		case Rule.BCBLLMPAMLP.RuleRemoveInterval:
-		case Rule.BCBLLMPAMLP.RuleCrazy:
-		case Rule.BCBLLMPAMLP.RuleLifeSteal:
-		case Rule.BCBLLMPAMLP.RuleNoHealthBar:
-		case Rule.BCBLLMPAMLP.RuleCombo:
-		case Rule.BCBLLMPAMLP.RuleTimeoutWin:
-		case Rule.BCBLLMPAMLP.RuleRechargeMagicEachRound:
-		case Rule.BCBLLMPAMLP.RuleNoBulletsReplenishment:
-		case Rule.BCBLLMPAMLP.RulePerk:
-		case Rule.BCBLLMPAMLP.RuleNoPerks:
-		case Rule.BCBLLMPAMLP.RuleWinStyle:
-		case Rule.BCBLLMPAMLP.RuleWinCombo:
-		case Rule.BCBLLMPAMLP.RuleWinShock:
-		case Rule.BCBLLMPAMLP.RuleTactic:
-		case Rule.BCBLLMPAMLP.RuleInvulnerability:
-		case Rule.BCBLLMPAMLP.RuleResistance:
+		case Rule.RuleType.RuleRingout:
+		case Rule.RuleType.RuleHotGround:
+		case Rule.RuleType.RuleLoseFall:
+		case Rule.RuleType.RuleRegeneration:
+		case Rule.RuleType.RuleAttributes:
+		case Rule.RuleType.RuleDamageFactor:
+		case Rule.RuleType.RuleRemoveInterval:
+		case Rule.RuleType.RuleCrazy:
+		case Rule.RuleType.RuleLifeSteal:
+		case Rule.RuleType.RuleNoHealthBar:
+		case Rule.RuleType.RuleCombo:
+		case Rule.RuleType.RuleTimeoutWin:
+		case Rule.RuleType.RuleRechargeMagicEachRound:
+		case Rule.RuleType.RuleNoBulletsReplenishment:
+		case Rule.RuleType.RulePerk:
+		case Rule.RuleType.RuleNoPerks:
+		case Rule.RuleType.RuleWinStyle:
+		case Rule.RuleType.RuleWinCombo:
+		case Rule.RuleType.RuleWinShock:
+		case Rule.RuleType.RuleTactic:
+		case Rule.RuleType.RuleInvulnerability:
+		case Rule.RuleType.RuleResistance:
 			PutInFightRule((InFightRule)HNBFMAKFJAM);
 			return;
-		case Rule.BCBLLMPAMLP.RuleDarkness:
-		case Rule.BCBLLMPAMLP.RuleLightInTheDarkness:
-		case Rule.BCBLLMPAMLP.RulePoints:
+		case Rule.RuleType.RuleDarkness:
+		case Rule.RuleType.RuleLightInTheDarkness:
+		case Rule.RuleType.RulePoints:
 			PutInFightRule((InFightRule)HNBFMAKFJAM, true);
 			return;
-		case Rule.BCBLLMPAMLP.RuleDescription:
-		case Rule.BCBLLMPAMLP.RuleRatingEvaluation:
-		case Rule.BCBLLMPAMLP.RuleCurrencyCost:
-		case Rule.BCBLLMPAMLP.RuleRaidCurrencyCost:
+		case Rule.RuleType.RuleDescription:
+		case Rule.RuleType.RuleRatingEvaluation:
+		case Rule.RuleType.RuleCurrencyCost:
+		case Rule.RuleType.RuleRaidCurrencyCost:
 			return;
-		case Rule.BCBLLMPAMLP.RuleInvertJoystick:
+		case Rule.RuleType.RuleInvertJoystick:
 			PutInFightRule((InFightRule)HNBFMAKFJAM, true);
 			break;
-		case Rule.BCBLLMPAMLP.RuleRandomArea:
+		case Rule.RuleType.RuleRandomArea:
 			PutInFightRule((InFightRule)HNBFMAKFJAM, true);
 			break;
-		case Rule.BCBLLMPAMLP.RuleAvatar:
+		case Rule.RuleType.RuleAvatar:
 			_avatarRules.Add((AvatarRule)HNBFMAKFJAM);
 			break;
-		case Rule.BCBLLMPAMLP.RuleName:
+		case Rule.RuleType.RuleName:
 			_nameRules.Add((NameRule)HNBFMAKFJAM);
 			break;
 		default:
-			LLLOJBFMONN.Error("RulesInspector::putRule ERROR - wrong rule type %i", HNBFMAKFJAM.get_Type());
+			GameLog.Error("RulesInspector::putRule ERROR - wrong rule type %i", HNBFMAKFJAM.get_Type());
 			break;
 		}
-		if (HNBFMAKFJAM.get_Type() != Rule.BCBLLMPAMLP.RuleRandom)
+		if (HNBFMAKFJAM.get_Type() != Rule.RuleType.RuleRandom)
 		{
 			_rules.AddIfNotExist(HNBFMAKFJAM);
 		}
@@ -1037,7 +1037,7 @@ public class RulesInspector : global::EventDispatcher<object>
 
 	protected void PutComplexRule(ComplexRule HNBFMAKFJAM)
 	{
-		List<Rule> list = HNBFMAKFJAM.BONNMLEJBJH();
+		List<Rule> list = HNBFMAKFJAM.GetRules();
 		foreach (Rule item in list)
 		{
 			PutRule(item);
@@ -1047,7 +1047,7 @@ public class RulesInspector : global::EventDispatcher<object>
 
 	protected void PutItemRule(ItemRule BICJICMJNMC)
 	{
-		switch (BICJICMJNMC.EDAKADCHOLE())
+		switch (BICJICMJNMC.GetAppliance())
 		{
 		case RuleAppliance.AppliancePlayer:
 			_playerItemRules.Add(BICJICMJNMC);
@@ -1065,12 +1065,12 @@ public class RulesInspector : global::EventDispatcher<object>
 
 	protected void PutInFightRule(InFightRule MGEAFPEKMMC, bool CNKAMHAILKG = false)
 	{
-		if (!CNKAMHAILKG && MGEAFPEKMMC.EDAKADCHOLE() == RuleAppliance.ApplianceAll)
+		if (!CNKAMHAILKG && MGEAFPEKMMC.GetAppliance() == RuleAppliance.ApplianceAll)
 		{
 			InFightRule aAJIFBJLJOA = MGEAFPEKMMC.Copy();
 			InFightRule aAJIFBJLJOA2 = MGEAFPEKMMC.Copy();
-			aAJIFBJLJOA.MOEAPHGDNAB(RuleAppliance.AppliancePlayer);
-			aAJIFBJLJOA2.MOEAPHGDNAB(RuleAppliance.ApplianceOpponent);
+			aAJIFBJLJOA.SetAppliance(RuleAppliance.AppliancePlayer);
+			aAJIFBJLJOA2.SetAppliance(RuleAppliance.ApplianceOpponent);
 			aAJIFBJLJOA.ParentRule = MGEAFPEKMMC;
 			aAJIFBJLJOA2.ParentRule = MGEAFPEKMMC;
 			SetInFightRule(aAJIFBJLJOA);
@@ -1084,7 +1084,7 @@ public class RulesInspector : global::EventDispatcher<object>
 
 	protected void RemoveInFightRule(InFightRule HNBFMAKFJAM, bool CNKAMHAILKG = false)
 	{
-		if (!CNKAMHAILKG && HNBFMAKFJAM.EDAKADCHOLE() == RuleAppliance.ApplianceAll)
+		if (!CNKAMHAILKG && HNBFMAKFJAM.GetAppliance() == RuleAppliance.ApplianceAll)
 		{
 			int num = 0;
 			while (num < _inFightRules.Count)

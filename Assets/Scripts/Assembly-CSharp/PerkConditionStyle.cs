@@ -5,28 +5,28 @@ public class PerkConditionStyle : PerkConditionMatchMinMax
 {
 	public PerkConditionStyle()
 	{
-		set_Type(NHDGLPNNNLH.CONDITION_STYLE);
+		set_Type(PerkConditionType.CONDITION_STYLE);
 	}
 
 	public override void Parse(XmlNode node)
 	{
 		base.Parse(node);
-		int num = CJAGHBEHFIL(node.Attributes["Min"].CIPOICEEIBK(string.Empty));
-		int num2 = CJAGHBEHFIL(node.Attributes["Max"].CIPOICEEIBK(string.Empty));
-		FMKBHHJDHDM.IBCPKBBAFNH();
+		int num = ParseStyleIndex(node.Attributes["Min"].GetStringOrDefault(string.Empty));
+		int num2 = ParseStyleIndex(node.Attributes["Max"].GetStringOrDefault(string.Empty));
+		minMax.EvaluateFunctions();
 		if (num != -1)
 		{
-			FMKBHHJDHDM.KPPNJLNHGME(num);
-			FMKBHHJDHDM.DGGMKIGCGLI(false);
+			minMax.SetMinValue(num);
+			minMax.SetMinUnbounded(false);
 		}
 		if (num2 != -1)
 		{
-			FMKBHHJDHDM.BIPMDHGOMBG(num2);
-			FMKBHHJDHDM.ENIOHPINGMP(false);
+			minMax.SetMaxValue(num2);
+			minMax.SetMaxUnbounded(false);
 		}
 	}
 
-	private int CJAGHBEHFIL(string name)
+	private int ParseStyleIndex(string name)
 	{
 		switch (name)
 		{
@@ -49,17 +49,17 @@ public class PerkConditionStyle : PerkConditionMatchMinMax
 
 	public override bool IsEqual(Model GIAMLEDNFJD, List<string> NIKHAICFGNM)
 	{
-		Model fGCODGKLHED = EPCPGEPPHLO(GIAMLEDNFJD);
+		Model fGCODGKLHED = ResolveTargetModel(GIAMLEDNFJD);
 		if (fGCODGKLHED == null)
 		{
 			return false;
 		}
-		int pACHBHGEIGN = fGCODGKLHED.PACHBHGEIGN;
-		if (!FMKBHHJDHDM.KEMLMMPIPGJ() && (int)FMKBHHJDHDM.PPCEOKCAEBD() > pACHBHGEIGN)
+		int pACHBHGEIGN = fGCODGKLHED.StyleRank;
+		if (!minMax.GetMinUnbounded() && (int)minMax.GetMinValue() > pACHBHGEIGN)
 		{
 			return false;
 		}
-		if (!FMKBHHJDHDM.HFGENILMBKK() && (int)FMKBHHJDHDM.EFDLCJBJNPE() < pACHBHGEIGN)
+		if (!minMax.GetMaxUnbounded() && (int)minMax.GetMaxValue() < pACHBHGEIGN)
 		{
 			return false;
 		}

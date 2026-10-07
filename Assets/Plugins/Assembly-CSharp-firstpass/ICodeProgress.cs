@@ -1,4 +1,4 @@
 public interface ICodeProgress
 {
-	void LPOMOAKHBBA(long NCKELGLBGJN, long JNILCBKONPG);
+	void SetProgress(long NCKELGLBGJN, long JNILCBKONPG);
 }

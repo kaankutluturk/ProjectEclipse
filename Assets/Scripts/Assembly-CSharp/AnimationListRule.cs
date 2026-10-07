@@ -3,9 +3,9 @@ using System.Xml;
 
 public class AnimationListRule : InFightRule
 {
-	protected List<InfoAnimation> KABLHHCPDPD = new List<InfoAnimation>();
+	protected List<InfoAnimation> animations = new List<InfoAnimation>();
 
-	public AnimationListRule(BCBLLMPAMLP LFLGCDNKNJI, RuleAppliance EJPOJJKKICO, XmlNode node)
+	public AnimationListRule(RuleType LFLGCDNKNJI, RuleAppliance EJPOJJKKICO, XmlNode node)
 		: base(LFLGCDNKNJI, EJPOJJKKICO, node)
 	{
 		FillAnimations(node);
@@ -22,9 +22,9 @@ public class AnimationListRule : InFightRule
 
 	public bool CheckAnimation(string name)
 	{
-		foreach (InfoAnimation item in KABLHHCPDPD)
+		foreach (InfoAnimation item in animations)
 		{
-			if (item.Name == name || item.LPPIKDGABOL(name))
+			if (item.Name == name || item.HasTemplateName(name))
 			{
 				return true;
 			}
@@ -38,8 +38,8 @@ public class AnimationListRule : InFightRule
 		{
 			if (childNode.Name == "Animation")
 			{
-				string gOHIIMFFFJI = childNode.Attributes["Name"].CIPOICEEIBK(string.Empty);
-				AnimationData.NEBELEFIDMB(gOHIIMFFFJI, KABLHHCPDPD);
+				string gOHIIMFFFJI = childNode.Attributes["Name"].GetStringOrDefault(string.Empty);
+				AnimationData.AddTemplateAnimations(gOHIIMFFFJI, animations);
 			}
 		}
 	}
@@ -47,8 +47,8 @@ public class AnimationListRule : InFightRule
 	public override InFightRule Copy()
 	{
 		AnimationListRule kCGODLBLCDJ = null;
-		RuleAppliance eJPOJJKKICO = EDAKADCHOLE();
-		XmlNode hKPPBKPJOEO = GIFDJEEGCJI().IOJIGDNFCFL();
+		RuleAppliance eJPOJJKKICO = GetAppliance();
+		XmlNode hKPPBKPJOEO = GetXmlSource().GetNode();
 		kCGODLBLCDJ = new AnimationListRule(_type, eJPOJJKKICO, hKPPBKPJOEO);
 		kCGODLBLCDJ.IsRandom = IsRandom;
 		return kCGODLBLCDJ;

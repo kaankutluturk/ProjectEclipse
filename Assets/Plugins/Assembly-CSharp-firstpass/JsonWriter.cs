@@ -8,31 +8,31 @@ public class JsonWriter
 {
 	private static NumberFormatInfo number_format;
 
-	private WriterContext PDCAHMPCPOC;
+	private WriterContext context;
 
-	private Stack<WriterContext> GANNNLHPFOF;
+	private Stack<WriterContext> ctx_stack;
 
-	private bool ENMNNCAJAKH;
+	private bool has_reached_end;
 
 	private char[] hex_seq;
 
-	private int FCOACAMEHOE;
+	private int indentation;
 
-	private int OBDDDDDNAPB;
+	private int indent_value;
 
 	private StringBuilder inst_string_builder;
 
-	private bool PPEHFKKNOFP;
+	private bool pretty_print;
 
-	private bool AKMKIMANJNB;
+	private bool validate;
 
 	private TextWriter writer;
 
-	public int GPFDMIKIDPD
+	public int IndentSize
 	{
 		get
 		{
-			return FPECAKINHEH();
+			return GetIndentValue();
 		}
 		set
 		{
@@ -40,35 +40,35 @@ public class JsonWriter
 		}
 	}
 
-	public bool MIDDOAJFLGK
+	public bool PrettyPrint
 	{
 		get
 		{
-			return FJMNHDEIMOP();
+			return GetPrettyPrint();
 		}
 		set
 		{
-			PMMFMGBAOEC(value);
+			SetPrettyPrint(value);
 		}
 	}
 
-	public TextWriter JPKHJFKIBPE
+	public TextWriter TextWriter
 	{
 		get
 		{
-			return ONBOFGNMJEN();
+			return GetTextWriter();
 		}
 	}
 
-	public bool FGCBJJKKILH
+	public bool Validate
 	{
 		get
 		{
-			return EPCAKOLMCMC();
+			return GetValidate();
 		}
 		set
 		{
-			BHMCFLJJJNM(value);
+			SetValidate(value);
 		}
 	}
 
@@ -99,84 +99,84 @@ public class JsonWriter
 		Init();
 	}
 
-	public int FPECAKINHEH()
+	public int GetIndentValue()
 	{
-		return OBDDDDDNAPB;
+		return indent_value;
 	}
 
 	public void set_IndentValue(int value)
 	{
-		FCOACAMEHOE = FCOACAMEHOE / OBDDDDDNAPB * value;
-		OBDDDDDNAPB = value;
+		indentation = indentation / indent_value * value;
+		indent_value = value;
 	}
 
-	public bool FJMNHDEIMOP()
+	public bool GetPrettyPrint()
 	{
-		return PPEHFKKNOFP;
+		return pretty_print;
 	}
 
-	public void PMMFMGBAOEC(bool value)
+	public void SetPrettyPrint(bool value)
 	{
-		PPEHFKKNOFP = value;
+		pretty_print = value;
 	}
 
-	public TextWriter ONBOFGNMJEN()
+	public TextWriter GetTextWriter()
 	{
 		return writer;
 	}
 
-	public bool EPCAKOLMCMC()
+	public bool GetValidate()
 	{
-		return AKMKIMANJNB;
+		return validate;
 	}
 
-	public void BHMCFLJJJNM(bool value)
+	public void SetValidate(bool value)
 	{
-		AKMKIMANJNB = value;
+		validate = value;
 	}
 
-	private void KBPDDHBBNLA(KINIMNHPNLB AJEPDBPHNCM)
+	private void DoValidation(JsonWriterCondition AJEPDBPHNCM)
 	{
-		if (!PDCAHMPCPOC.DPMHKEGECAM)
+		if (!context.ExpectingValue)
 		{
-			PDCAHMPCPOC.Count++;
+			context.Count++;
 		}
-		if (!AKMKIMANJNB)
+		if (!validate)
 		{
 			return;
 		}
-		if (ENMNNCAJAKH)
+		if (has_reached_end)
 		{
 			throw new JsonException("A complete JSON symbol has already been written");
 		}
 		switch (AJEPDBPHNCM)
 		{
-		case KINIMNHPNLB.InArray:
-			if (!PDCAHMPCPOC.HOILJAFJHLM)
+		case JsonWriterCondition.InArray:
+			if (!context.InArray)
 			{
 				throw new JsonException("Can't close an array here");
 			}
 			break;
-		case KINIMNHPNLB.InObject:
-			if (!PDCAHMPCPOC.MHABHHKLDFO || PDCAHMPCPOC.DPMHKEGECAM)
+		case JsonWriterCondition.InObject:
+			if (!context.InObject || context.ExpectingValue)
 			{
 				throw new JsonException("Can't close an object here");
 			}
 			break;
-		case KINIMNHPNLB.NotAProperty:
-			if (PDCAHMPCPOC.MHABHHKLDFO && !PDCAHMPCPOC.DPMHKEGECAM)
+		case JsonWriterCondition.NotAProperty:
+			if (context.InObject && !context.ExpectingValue)
 			{
 				throw new JsonException("Expected a property");
 			}
 			break;
-		case KINIMNHPNLB.Property:
-			if (!PDCAHMPCPOC.MHABHHKLDFO || PDCAHMPCPOC.DPMHKEGECAM)
+		case JsonWriterCondition.Property:
+			if (!context.InObject || context.ExpectingValue)
 			{
 				throw new JsonException("Can't add a property here");
 			}
 			break;
-		case KINIMNHPNLB.Value:
-			if (!PDCAHMPCPOC.HOILJAFJHLM && (!PDCAHMPCPOC.MHABHHKLDFO || !PDCAHMPCPOC.DPMHKEGECAM))
+		case JsonWriterCondition.Value:
+			if (!context.InArray && (!context.InObject || !context.ExpectingValue))
 			{
 				throw new JsonException("Can't add a value here");
 			}
@@ -186,18 +186,18 @@ public class JsonWriter
 
 	private void Init()
 	{
-		ENMNNCAJAKH = false;
+		has_reached_end = false;
 		hex_seq = new char[4];
-		FCOACAMEHOE = 0;
-		OBDDDDDNAPB = 4;
-		PPEHFKKNOFP = false;
-		AKMKIMANJNB = true;
-		GANNNLHPFOF = new Stack<WriterContext>();
-		PDCAHMPCPOC = new WriterContext();
-		GANNNLHPFOF.Push(PDCAHMPCPOC);
+		indentation = 0;
+		indent_value = 4;
+		pretty_print = false;
+		validate = true;
+		ctx_stack = new Stack<WriterContext>();
+		context = new WriterContext();
+		ctx_stack.Push(context);
 	}
 
-	private static void MCCNEABGNGB(int HDKKKCDKFEE, char[] IJGJLEJKMBJ)
+	private static void IntToHex(int HDKKKCDKFEE, char[] IJGJLEJKMBJ)
 	{
 		for (int i = 0; i < 4; i++)
 		{
@@ -214,19 +214,19 @@ public class JsonWriter
 		}
 	}
 
-	private void GOCGFMNIBAD()
+	private void Indent()
 	{
-		if (PPEHFKKNOFP)
+		if (pretty_print)
 		{
-			FCOACAMEHOE += OBDDDDDNAPB;
+			indentation += indent_value;
 		}
 	}
 
-	private void CACLDGNEIFA(string IGGFGLLIGCG)
+	private void Put(string IGGFGLLIGCG)
 	{
-		if (PPEHFKKNOFP && !PDCAHMPCPOC.DPMHKEGECAM)
+		if (pretty_print && !context.ExpectingValue)
 		{
-			for (int i = 0; i < FCOACAMEHOE; i++)
+			for (int i = 0; i < indentation; i++)
 			{
 				writer.Write(' ');
 			}
@@ -234,26 +234,26 @@ public class JsonWriter
 		writer.Write(IGGFGLLIGCG);
 	}
 
-	private void KLHPKPODIHH()
+	private void PutNewline()
 	{
-		KLHPKPODIHH(true);
+		PutNewline(true);
 	}
 
-	private void KLHPKPODIHH(bool GOLEKPDOAAP)
+	private void PutNewline(bool GOLEKPDOAAP)
 	{
-		if (GOLEKPDOAAP && !PDCAHMPCPOC.DPMHKEGECAM && PDCAHMPCPOC.Count > 1)
+		if (GOLEKPDOAAP && !context.ExpectingValue && context.Count > 1)
 		{
 			writer.Write(',');
 		}
-		if (PPEHFKKNOFP && !PDCAHMPCPOC.DPMHKEGECAM)
+		if (pretty_print && !context.ExpectingValue)
 		{
 			writer.Write('\n');
 		}
 	}
 
-	private void DIKLAKCMINM(string IGGFGLLIGCG)
+	private void PutString(string IGGFGLLIGCG)
 	{
-		CACLDGNEIFA(string.Empty);
+		Put(string.Empty);
 		writer.Write('"');
 		int length = IGGFGLLIGCG.Length;
 		for (int i = 0; i < length; i++)
@@ -286,18 +286,18 @@ public class JsonWriter
 				writer.Write(IGGFGLLIGCG[i]);
 				continue;
 			}
-			MCCNEABGNGB(IGGFGLLIGCG[i], hex_seq);
+			IntToHex(IGGFGLLIGCG[i], hex_seq);
 			writer.Write("\\u");
 			writer.Write(hex_seq);
 		}
 		writer.Write('"');
 	}
 
-	private void GBKGILPLBFE()
+	private void Unindent()
 	{
-		if (PPEHFKKNOFP)
+		if (pretty_print)
 		{
-			FCOACAMEHOE -= OBDDDDDNAPB;
+			indentation -= indent_value;
 		}
 	}
 
@@ -312,10 +312,10 @@ public class JsonWriter
 
 	public void Reset()
 	{
-		ENMNNCAJAKH = false;
-		GANNNLHPFOF.Clear();
-		PDCAHMPCPOC = new WriterContext();
-		GANNNLHPFOF.Push(PDCAHMPCPOC);
+		has_reached_end = false;
+		ctx_stack.Clear();
+		context = new WriterContext();
+		ctx_stack.Push(context);
 		if (inst_string_builder != null)
 		{
 			inst_string_builder.Remove(0, inst_string_builder.Length);
@@ -324,142 +324,142 @@ public class JsonWriter
 
 	public void Write(bool CIGMFMBICLJ)
 	{
-		KBPDDHBBNLA(KINIMNHPNLB.Value);
-		KLHPKPODIHH();
-		CACLDGNEIFA((!CIGMFMBICLJ) ? "false" : "true");
-		PDCAHMPCPOC.DPMHKEGECAM = false;
+		DoValidation(JsonWriterCondition.Value);
+		PutNewline();
+		Put((!CIGMFMBICLJ) ? "false" : "true");
+		context.ExpectingValue = false;
 	}
 
 	public void Write(decimal number)
 	{
-		KBPDDHBBNLA(KINIMNHPNLB.Value);
-		KLHPKPODIHH();
-		CACLDGNEIFA(Convert.ToString(number, number_format));
-		PDCAHMPCPOC.DPMHKEGECAM = false;
+		DoValidation(JsonWriterCondition.Value);
+		PutNewline();
+		Put(Convert.ToString(number, number_format));
+		context.ExpectingValue = false;
 	}
 
 	public void Write(double number)
 	{
-		KBPDDHBBNLA(KINIMNHPNLB.Value);
-		KLHPKPODIHH();
+		DoValidation(JsonWriterCondition.Value);
+		PutNewline();
 		string text = Convert.ToString(number, number_format);
-		CACLDGNEIFA(text);
+		Put(text);
 		if (text.IndexOf('.') == -1 && text.IndexOf('E') == -1)
 		{
 			writer.Write(".0");
 		}
-		PDCAHMPCPOC.DPMHKEGECAM = false;
+		context.ExpectingValue = false;
 	}
 
 	public void Write(int number)
 	{
-		KBPDDHBBNLA(KINIMNHPNLB.Value);
-		KLHPKPODIHH();
-		CACLDGNEIFA(Convert.ToString(number, number_format));
-		PDCAHMPCPOC.DPMHKEGECAM = false;
+		DoValidation(JsonWriterCondition.Value);
+		PutNewline();
+		Put(Convert.ToString(number, number_format));
+		context.ExpectingValue = false;
 	}
 
 	public void Write(long number)
 	{
-		KBPDDHBBNLA(KINIMNHPNLB.Value);
-		KLHPKPODIHH();
-		CACLDGNEIFA(Convert.ToString(number, number_format));
-		PDCAHMPCPOC.DPMHKEGECAM = false;
+		DoValidation(JsonWriterCondition.Value);
+		PutNewline();
+		Put(Convert.ToString(number, number_format));
+		context.ExpectingValue = false;
 	}
 
 	public void Write(string IGGFGLLIGCG)
 	{
-		KBPDDHBBNLA(KINIMNHPNLB.Value);
-		KLHPKPODIHH();
+		DoValidation(JsonWriterCondition.Value);
+		PutNewline();
 		if (IGGFGLLIGCG == null)
 		{
-			CACLDGNEIFA("null");
+			Put("null");
 		}
 		else
 		{
-			DIKLAKCMINM(IGGFGLLIGCG);
+			PutString(IGGFGLLIGCG);
 		}
-		PDCAHMPCPOC.DPMHKEGECAM = false;
+		context.ExpectingValue = false;
 	}
 
 	public void Write(ulong number)
 	{
-		KBPDDHBBNLA(KINIMNHPNLB.Value);
-		KLHPKPODIHH();
-		CACLDGNEIFA(Convert.ToString(number, number_format));
-		PDCAHMPCPOC.DPMHKEGECAM = false;
+		DoValidation(JsonWriterCondition.Value);
+		PutNewline();
+		Put(Convert.ToString(number, number_format));
+		context.ExpectingValue = false;
 	}
 
-	public void FMIALOIGMFH()
+	public void WriteArrayEnd()
 	{
-		KBPDDHBBNLA(KINIMNHPNLB.InArray);
-		KLHPKPODIHH(false);
-		GANNNLHPFOF.Pop();
-		if (GANNNLHPFOF.Count == 1)
+		DoValidation(JsonWriterCondition.InArray);
+		PutNewline(false);
+		ctx_stack.Pop();
+		if (ctx_stack.Count == 1)
 		{
-			ENMNNCAJAKH = true;
+			has_reached_end = true;
 		}
 		else
 		{
-			PDCAHMPCPOC = GANNNLHPFOF.Peek();
-			PDCAHMPCPOC.DPMHKEGECAM = false;
+			context = ctx_stack.Peek();
+			context.ExpectingValue = false;
 		}
-		GBKGILPLBFE();
-		CACLDGNEIFA("]");
+		Unindent();
+		Put("]");
 	}
 
-	public void AGGBIHCJOKF()
+	public void WriteArrayStart()
 	{
-		KBPDDHBBNLA(KINIMNHPNLB.NotAProperty);
-		KLHPKPODIHH();
-		CACLDGNEIFA("[");
-		PDCAHMPCPOC = new WriterContext();
-		PDCAHMPCPOC.HOILJAFJHLM = true;
-		GANNNLHPFOF.Push(PDCAHMPCPOC);
-		GOCGFMNIBAD();
+		DoValidation(JsonWriterCondition.NotAProperty);
+		PutNewline();
+		Put("[");
+		context = new WriterContext();
+		context.InArray = true;
+		ctx_stack.Push(context);
+		Indent();
 	}
 
-	public void KDAIDMBDFHB()
+	public void WriteObjectEnd()
 	{
-		KBPDDHBBNLA(KINIMNHPNLB.InObject);
-		KLHPKPODIHH(false);
-		GANNNLHPFOF.Pop();
-		if (GANNNLHPFOF.Count == 1)
+		DoValidation(JsonWriterCondition.InObject);
+		PutNewline(false);
+		ctx_stack.Pop();
+		if (ctx_stack.Count == 1)
 		{
-			ENMNNCAJAKH = true;
+			has_reached_end = true;
 		}
 		else
 		{
-			PDCAHMPCPOC = GANNNLHPFOF.Peek();
-			PDCAHMPCPOC.DPMHKEGECAM = false;
+			context = ctx_stack.Peek();
+			context.ExpectingValue = false;
 		}
-		GBKGILPLBFE();
-		CACLDGNEIFA("}");
+		Unindent();
+		Put("}");
 	}
 
-	public void ACCDHGHBCHM()
+	public void WriteObjectStart()
 	{
-		KBPDDHBBNLA(KINIMNHPNLB.NotAProperty);
-		KLHPKPODIHH();
-		CACLDGNEIFA("{");
-		PDCAHMPCPOC = new WriterContext();
-		PDCAHMPCPOC.MHABHHKLDFO = true;
-		GANNNLHPFOF.Push(PDCAHMPCPOC);
-		GOCGFMNIBAD();
+		DoValidation(JsonWriterCondition.NotAProperty);
+		PutNewline();
+		Put("{");
+		context = new WriterContext();
+		context.InObject = true;
+		ctx_stack.Push(context);
+		Indent();
 	}
 
-	public void MPKEMEAPPJL(string MHJMMIJKOGH)
+	public void WritePropertyName(string MHJMMIJKOGH)
 	{
-		KBPDDHBBNLA(KINIMNHPNLB.Property);
-		KLHPKPODIHH();
-		DIKLAKCMINM(MHJMMIJKOGH);
-		if (PPEHFKKNOFP)
+		DoValidation(JsonWriterCondition.Property);
+		PutNewline();
+		PutString(MHJMMIJKOGH);
+		if (pretty_print)
 		{
-			if (MHJMMIJKOGH.Length > PDCAHMPCPOC.GAMMEFMGEFP)
+			if (MHJMMIJKOGH.Length > context.Padding)
 			{
-				PDCAHMPCPOC.GAMMEFMGEFP = MHJMMIJKOGH.Length;
+				context.Padding = MHJMMIJKOGH.Length;
 			}
-			for (int num = PDCAHMPCPOC.GAMMEFMGEFP - MHJMMIJKOGH.Length; num >= 0; num--)
+			for (int num = context.Padding - MHJMMIJKOGH.Length; num >= 0; num--)
 			{
 				writer.Write(' ');
 			}
@@ -469,6 +469,6 @@ public class JsonWriter
 		{
 			writer.Write(':');
 		}
-		PDCAHMPCPOC.DPMHKEGECAM = true;
+		context.ExpectingValue = true;
 	}
 }

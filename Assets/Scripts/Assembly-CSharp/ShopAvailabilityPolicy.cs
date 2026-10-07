@@ -5,8 +5,8 @@ public static class ShopAvailabilityPolicy
     public static bool IsAvailable(ItemInfo item, Roster roster)
     {
         if (item == null || roster == null) return false;
-        bool groupLocked = !string.IsNullOrEmpty(item.MMHIKEIDDNB) && !roster.FLFKOIPCEPI(item.MMHIKEIDDNB);
-        bool available = item.DCHJDPCEODD && !item.GOKHJMOEGIJ() && !groupLocked;
+        bool groupLocked = !string.IsNullOrEmpty(item.GroupId) && !roster.HasShopLock(item.GroupId);
+        bool available = item.IsShopVisible && !item.IsHidden() && !groupLocked;
 
         ModScriptSession scripts = ModRuntime.Scripts;
         if (scripts == null) return available;
@@ -19,6 +19,6 @@ public static class ShopAvailabilityPolicy
         if (policy.Visibility == ModItemVisibility.ForceHidden) return false;
         if (policy.Visibility == ModItemVisibility.ForceVisible) available = true;
         if (!available) return false;
-        return string.IsNullOrEmpty(policy.RequiredGroup) || roster.FLFKOIPCEPI(policy.RequiredGroup);
+        return string.IsNullOrEmpty(policy.RequiredGroup) || roster.HasShopLock(policy.RequiredGroup);
     }
 }

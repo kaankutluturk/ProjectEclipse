@@ -7,20 +7,20 @@ public class QuestActionEclipseMode : QuestAction
 	public override void Parse(XmlNode node)
 	{
 		base.Parse(node);
-		string value = node.Attributes["Toggle"].CIPOICEEIBK("Off");
+		string value = node.Attributes["Toggle"].GetStringOrDefault("Off");
 		_enabled = value.Equals("On", System.StringComparison.OrdinalIgnoreCase) ||
 			value.Equals("True", System.StringComparison.OrdinalIgnoreCase) || value == "1";
 	}
 
-	public override void DEJMHFMLKIC(QuestParameters GFIHPBCEEOB)
+	public override void Execute(QuestParameters GFIHPBCEEOB)
 	{
-		base.DEJMHFMLKIC(GFIHPBCEEOB);
-		Roster roster = ListSF.CCDKHLAMKKO();
+		base.Execute(GFIHPBCEEOB);
+		Roster roster = ListSF.GetRoster();
 		if (roster != null)
 		{
 			roster.SetEclipseMode(_enabled);
-			ListSF.GetInstance().EJANJEEGOOE();
+			ListSF.GetInstance().RequestSave();
 		}
-		OGIJONMKABB();
+		FinishAction();
 	}
 }

@@ -6,60 +6,60 @@ public class LoadingModule
 
 	private int _currentModuleIndex;
 
-	protected bool CHIHBINEGFL;
+	protected bool isFinished;
 
-	private bool EBOAEEHCMDN;
+	private bool isRunning;
 
 	public LoadingModule()
 	{
-		CHIHBINEGFL = false;
-		EBOAEEHCMDN = false;
+		isFinished = false;
+		isRunning = false;
 		_currentModuleIndex = 0;
 	}
 
 	public virtual void Start()
 	{
-		CHIHBINEGFL = false;
-		EBOAEEHCMDN = true;
+		isFinished = false;
+		isRunning = true;
 		_currentModuleIndex = 0;
 	}
 
 	public virtual void Stop()
 	{
-		EBOAEEHCMDN = false;
+		isRunning = false;
 	}
 
-	public virtual bool GCHANFIHDGH()
+	public virtual bool IsFinished()
 	{
-		return CHIHBINEGFL;
+		return isFinished;
 	}
 
-	public virtual bool JPDPHACFBFB()
+	public virtual bool IsLoadingActive()
 	{
-		return EBOAEEHCMDN;
+		return isRunning;
 	}
 
-	public virtual bool OOPMAAHJMCE()
+	public virtual bool IsEmpty()
 	{
 		return _modules.Count == 0;
 	}
 
-	public virtual void JLPMOKPFECK()
+	public virtual void ProcessStep()
 	{
-		if (!JPDPHACFBFB())
+		if (!IsLoadingActive())
 		{
 			return;
 		}
 		if (_currentModuleIndex < _modules.Count)
 		{
 			LoadingModule pHNHABBBKKL = _modules[_currentModuleIndex];
-			if (!pHNHABBBKKL.JPDPHACFBFB())
+			if (!pHNHABBBKKL.IsLoadingActive())
 			{
 				pHNHABBBKKL.Start();
 			}
-			if (!pHNHABBBKKL.GCHANFIHDGH())
+			if (!pHNHABBBKKL.IsFinished())
 			{
-				pHNHABBBKKL.JLPMOKPFECK();
+				pHNHABBBKKL.ProcessStep();
 			}
 			else
 			{
@@ -68,7 +68,7 @@ public class LoadingModule
 		}
 		else
 		{
-			CHIHBINEGFL = true;
+			isFinished = true;
 		}
 	}
 

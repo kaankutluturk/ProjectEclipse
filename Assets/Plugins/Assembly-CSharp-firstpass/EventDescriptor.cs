@@ -5,116 +5,116 @@ using System.Diagnostics;
 internal sealed class EventDescriptor
 {
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private List<BLIMHGJLDLD> OAKKGBDGKCM;
+	private List<SocketIOCallback> callbacks;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private bool FOJBGCENLHM;
+	private bool onlyOnce;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private bool BABMNMGKNMB;
+	private bool autoDecodePayload;
 
-	private BLIMHGJLDLD[] OKOBFIFILCH;
+	private SocketIOCallback[] callbackArray;
 
-	public List<BLIMHGJLDLD> JOKFMPDBGNL
+	public List<SocketIOCallback> Callbacks
 	{
 		get
 		{
-			return PGBFAFNDGAA();
+			return GetCallbacks();
 		}
 		private set
 		{
-			NCODIDAGBAE(value);
+			SetCallbacks(value);
 		}
 	}
 
-	public bool DFCOFEGKOMP
+	public bool OnlyOnce
 	{
 		get
 		{
-			return BECMKPPKAJB();
+			return GetOnlyOnce();
 		}
 		private set
 		{
-			LBOEBPFPHMJ(value);
+			SetOnlyOnce(value);
 		}
 	}
 
-	public bool KCIILHEGDAG
+	public bool AutoDecodePayload
 	{
 		get
 		{
-			return CAACHPIAHIJ();
+			return GetAutoDecodePayload();
 		}
 		private set
 		{
-			FEDKJGINJID(value);
+			SetAutoDecodePayload(value);
 		}
 	}
 
-	public EventDescriptor(bool ONOLLCMDGBO, bool EJDLINOJJIF, BLIMHGJLDLD callback)
+	public EventDescriptor(bool ONOLLCMDGBO, bool EJDLINOJJIF, SocketIOCallback callback)
 	{
-		LBOEBPFPHMJ(ONOLLCMDGBO);
-		FEDKJGINJID(EJDLINOJJIF);
-		NCODIDAGBAE(new List<BLIMHGJLDLD>(1));
+		SetOnlyOnce(ONOLLCMDGBO);
+		SetAutoDecodePayload(EJDLINOJJIF);
+		SetCallbacks(new List<SocketIOCallback>(1));
 		if (callback != null)
 		{
-			PGBFAFNDGAA().Add(callback);
+			GetCallbacks().Add(callback);
 		}
 	}
 
-	public List<BLIMHGJLDLD> PGBFAFNDGAA()
+	public List<SocketIOCallback> GetCallbacks()
 	{
-		return OAKKGBDGKCM;
+		return callbacks;
 	}
 
-	private void NCODIDAGBAE(List<BLIMHGJLDLD> value)
+	private void SetCallbacks(List<SocketIOCallback> value)
 	{
-		OAKKGBDGKCM = value;
+		callbacks = value;
 	}
 
-	public bool BECMKPPKAJB()
+	public bool GetOnlyOnce()
 	{
-		return FOJBGCENLHM;
+		return onlyOnce;
 	}
 
-	private void LBOEBPFPHMJ(bool value)
+	private void SetOnlyOnce(bool value)
 	{
-		FOJBGCENLHM = value;
+		onlyOnce = value;
 	}
 
-	public bool CAACHPIAHIJ()
+	public bool GetAutoDecodePayload()
 	{
-		return BABMNMGKNMB;
+		return autoDecodePayload;
 	}
 
-	private void FEDKJGINJID(bool value)
+	private void SetAutoDecodePayload(bool value)
 	{
-		BABMNMGKNMB = value;
+		autoDecodePayload = value;
 	}
 
 	public void Call(Socket JLEACANCMJF, Packet NPKADBPBKIG, params object[] LKIOKGCNKHE)
 	{
-		if (OKOBFIFILCH == null || OKOBFIFILCH.Length < PGBFAFNDGAA().Count)
+		if (callbackArray == null || callbackArray.Length < GetCallbacks().Count)
 		{
-			Array.Resize(ref OKOBFIFILCH, PGBFAFNDGAA().Count);
+			Array.Resize(ref callbackArray, GetCallbacks().Count);
 		}
-		PGBFAFNDGAA().CopyTo(OKOBFIFILCH);
-		for (int i = 0; i < OKOBFIFILCH.Length; i++)
+		GetCallbacks().CopyTo(callbackArray);
+		for (int i = 0; i < callbackArray.Length; i++)
 		{
 			try
 			{
-				OKOBFIFILCH[i](JLEACANCMJF, NPKADBPBKIG, LKIOKGCNKHE);
+				callbackArray[i](JLEACANCMJF, NPKADBPBKIG, LKIOKGCNKHE);
 			}
 			catch (Exception ex)
 			{
-				((ISocket)JLEACANCMJF).EmitError(CCCOMMIFIMB.User, ex.Message + " " + ex.StackTrace);
-				HTTPManager.MBBMPNDDPIH().COHEDILAHFD("EventDescriptor", "Call", ex);
+				((ISocket)JLEACANCMJF).EmitError(SocketIOErrors.User, ex.Message + " " + ex.StackTrace);
+				HTTPManager.GetLogger().Exception("EventDescriptor", "Call", ex);
 			}
-			if (BECMKPPKAJB())
+			if (GetOnlyOnce())
 			{
-				PGBFAFNDGAA().Remove(OKOBFIFILCH[i]);
+				GetCallbacks().Remove(callbackArray[i]);
 			}
-			OKOBFIFILCH[i] = null;
+			callbackArray[i] = null;
 		}
 	}
 }

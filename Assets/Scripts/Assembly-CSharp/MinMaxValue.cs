@@ -2,19 +2,19 @@ using System.Xml;
 
 public class MinMaxValue
 {
-	public float DPGMCKCDMBC;
+	public float Min;
 
-	public float EBDBPJNBHGI;
+	public float Max;
 
 	public MinMaxValue(float NOFALOKFBEM = 0f, float MFODOCNLNPH = 0f)
 	{
-		DPGMCKCDMBC = NOFALOKFBEM;
-		EBDBPJNBHGI = MFODOCNLNPH;
+		Min = NOFALOKFBEM;
+		Max = MFODOCNLNPH;
 	}
 
 	public void Parse(XmlNode node, float PCEKHCGCHFH = 0f, float JCKIAGACDMA = 0f)
 	{
-		DPGMCKCDMBC = node.Attributes["Min"].ParseFloat(PCEKHCGCHFH);
-		EBDBPJNBHGI = node.Attributes["Max"].ParseFloat(JCKIAGACDMA);
+		Min = node.Attributes["Min"].ParseFloat(PCEKHCGCHFH);
+		Max = node.Attributes["Max"].ParseFloat(JCKIAGACDMA);
 	}
 }

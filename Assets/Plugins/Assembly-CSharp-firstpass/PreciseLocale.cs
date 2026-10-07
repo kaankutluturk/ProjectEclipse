@@ -5,7 +5,7 @@ using UnityEngine;
 
 public static class PreciseLocale
 {
-	private static readonly Dictionary<SystemLanguage, string> NAHDBCDHJHO = new Dictionary<SystemLanguage, string>
+	private static readonly Dictionary<SystemLanguage, string> languageCodes = new Dictionary<SystemLanguage, string>
 	{
 		{
 			SystemLanguage.Afrikaans,
@@ -173,20 +173,20 @@ public static class PreciseLocale
 		}
 	};
 
-	public static string FBPILFMCNGJ()
+	public static string GetRegion()
 	{
 		RegionInfo region = GetLocalRegion();
 		return region == null ? string.Empty : region.TwoLetterISORegionName;
 	}
 
-	public static string BGMAJFGKCEB()
+	public static string GetLanguageID()
 	{
-		string language = PBPAPAFAMJB();
-		string region = FBPILFMCNGJ();
+		string language = GetLanguage();
+		string region = GetRegion();
 		return string.IsNullOrEmpty(region) ? language : language + "_" + region;
 	}
 
-	public static string PBPAPAFAMJB()
+	public static string GetLanguage()
 	{
 		// Unity already reads the device language. No third-party Java plugin is
 		// needed, and unsupported device languages must not block game startup.
@@ -194,13 +194,13 @@ public static class PreciseLocale
 		return language == "?" ? "en" : language;
 	}
 
-	public static string OHHPBPBCFPL()
+	public static string GetCurrencyCode()
 	{
 		RegionInfo region = GetLocalRegion();
 		return region == null ? string.Empty : region.ISOCurrencySymbol;
 	}
 
-	public static string HIMMFECDKCI()
+	public static string GetCurrencySymbol()
 	{
 		RegionInfo region = GetLocalRegion();
 		return region == null ? string.Empty : region.CurrencySymbol;
@@ -212,7 +212,7 @@ public static class PreciseLocale
 		// Use a region only when that culture agrees with Unity's device language;
 		// otherwise retain the language-only locale instead of inventing a region.
 		CultureInfo culture = CultureInfo.CurrentCulture;
-		string language = PBPAPAFAMJB();
+		string language = GetLanguage();
 		string cultureLanguage = culture.TwoLetterISOLanguageName;
 		bool matches = cultureLanguage == language || (language == "no" && (cultureLanguage == "nb" || cultureLanguage == "nn"));
 		if (!matches || culture.IsNeutralCulture || string.IsNullOrEmpty(culture.Name)) return null;
@@ -230,17 +230,17 @@ public static class PreciseLocale
 	{
 		if (HBGOBBALPBP == SystemLanguage.ChineseSimplified || HBGOBBALPBP == SystemLanguage.ChineseTraditional) return "zh";
 		string value;
-		if (NAHDBCDHJHO.TryGetValue(HBGOBBALPBP, out value))
+		if (languageCodes.TryGetValue(HBGOBBALPBP, out value))
 		{
 			return value;
 		}
-		return NAHDBCDHJHO[SystemLanguage.Unknown];
+		return languageCodes[SystemLanguage.Unknown];
 	}
 
 	public static SystemLanguage FromLanguageCode(this string HBGOBBALPBP)
 	{
 		SystemLanguage result = SystemLanguage.Unknown;
-		foreach (KeyValuePair<SystemLanguage, string> item in NAHDBCDHJHO)
+		foreach (KeyValuePair<SystemLanguage, string> item in languageCodes)
 		{
 			if (HBGOBBALPBP == item.Value)
 			{

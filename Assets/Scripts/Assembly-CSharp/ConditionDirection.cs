@@ -2,55 +2,55 @@ using System.Xml;
 
 public class ConditionDirection : ConditionAnimation
 {
-	public InfoAnimation.MoveInside.Direction HFOEHJIMGPI;
+	public InfoAnimation.MoveInside.Direction _direction;
 
 	public ConditionDirection(XmlNode node)
 		: base(ConditionType.DIRECTION)
 	{
-		HFOEHJIMGPI = MovesParser.JOLJIHDPADK(node);
+		_direction = MovesParser.ParseDirection(node);
 	}
 
 	public override bool IsEqual(ModelConditions conditions)
 	{
-		int num = HFOEHJIMGPI.IMLFCBLAJGA(conditions);
+		int num = _direction.GetDirectionSign(conditions);
 		int num2 = 1;
-		switch (OOFFOILONLO)
+		switch (_targetModelType)
 		{
-		case ModelType.KEIDBIOIFGA.MODEL_THIS:
-			num2 = conditions.GFHOIKMBNHF;
+		case ModelType.ModelTargetType.MODEL_THIS:
+			num2 = conditions.SelfSign;
 			break;
-		case ModelType.KEIDBIOIFGA.MODEL_OTHER:
-			num2 = conditions.OLNDCCIPJAE;
+		case ModelType.ModelTargetType.MODEL_OTHER:
+			num2 = conditions.OtherSign;
 			break;
-		case ModelType.KEIDBIOIFGA.MODEL_PARENT:
-			num2 = conditions.CDPEPJDJIPK;
+		case ModelType.ModelTargetType.MODEL_PARENT:
+			num2 = conditions.ParentSign;
 			break;
 		default:
-			LLLOJBFMONN.Error("ConditionDirection::isEqual ERROR - unsupported model type: {0}", OOFFOILONLO);
+			GameLog.Error("ConditionDirection::isEqual ERROR - unsupported model type: {0}", _targetModelType);
 			break;
 		}
 		bool flag = num == num2;
 		return (!IsNot) ? flag : (!flag);
 	}
 
-	public void KJHPCLOFDJB(ModelObject OECPEDPMKCD, bool EKBOGDKIHIH, ModelNode AECCPADGGPG, bool PHADJMAONJG, ModelObject MJCGOJBGFIE = null)
+	public void UpdateNodes(ModelObject OECPEDPMKCD, bool EKBOGDKIHIH, ModelNode AECCPADGGPG, bool PHADJMAONJG, ModelObject MJCGOJBGFIE = null)
 	{
-		HFOEHJIMGPI.CLCFLPDNBNL.UpdateNode(OECPEDPMKCD, EKBOGDKIHIH, AECCPADGGPG, PHADJMAONJG, MJCGOJBGFIE);
-		HFOEHJIMGPI.KAEAKHIEIHH.UpdateNode(OECPEDPMKCD, EKBOGDKIHIH, AECCPADGGPG, PHADJMAONJG, MJCGOJBGFIE);
+		_direction.FromPoint.UpdateNode(OECPEDPMKCD, EKBOGDKIHIH, AECCPADGGPG, PHADJMAONJG, MJCGOJBGFIE);
+		_direction.ToPoint.UpdateNode(OECPEDPMKCD, EKBOGDKIHIH, AECCPADGGPG, PHADJMAONJG, MJCGOJBGFIE);
 	}
 
-	public void ABNCNNHMLII()
+	public void ResetNodes()
 	{
-		HFOEHJIMGPI.CLCFLPDNBNL.GPGKANDFLNB();
-		HFOEHJIMGPI.KAEAKHIEIHH.GPGKANDFLNB();
+		_direction.FromPoint.ClearChildPoints();
+		_direction.ToPoint.ClearChildPoints();
 	}
 
-	public override Model DKDAKGDMHAL(Model BPBMKGHEEBI, ModelType.KEIDBIOIFGA LFLGCDNKNJI)
+	public override Model ResolveTargetModel(Model BPBMKGHEEBI, ModelType.ModelTargetType LFLGCDNKNJI)
 	{
 		return BPBMKGHEEBI;
 	}
 
-	public override void MJFKNEHGNMB(ModelType.KEIDBIOIFGA LFLGCDNKNJI)
+	public override void ApplyTargetModelType(ModelType.ModelTargetType LFLGCDNKNJI)
 	{
 	}
 }

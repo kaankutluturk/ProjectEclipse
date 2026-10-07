@@ -5,37 +5,37 @@ namespace Nekki.SF2.GUI.Profile
 {
 	public class ProfileSliderItem : BaseScrollItem
 	{
-		public enum LLJHOHPLLME
+		public enum IconAlignment
 		{
 			NONE_ALIGNMENT = 0,
 			LEFT_ALIGNMENT = 1
 		}
 
-		private List<SubItem> BNIBNKHLLIC = new List<SubItem>();
+		private List<SubItem> icons = new List<SubItem>();
 
-		private float NDKEJKELOHF = 95f;
+		private float iconSpacing = 95f;
 
 		[SerializeField]
 		private PerkTreeLines _perkLines;
 
 		public void Init(float PEIAPNNLFFL = 95f)
 		{
-			NDKEJKELOHF = PEIAPNNLFFL;
+			iconSpacing = PEIAPNNLFFL;
 			_perkLines.gameObject.SetActive(false);
 		}
 
-		public void AddIcons(SubItem ADONPNOBBDE, LLJHOHPLLME LJFADBBKKPH = LLJHOHPLLME.NONE_ALIGNMENT)
+		public void AddIcons(SubItem ADONPNOBBDE, IconAlignment LJFADBBKKPH = IconAlignment.NONE_ALIGNMENT)
 		{
 			if (ADONPNOBBDE != null)
 			{
-				GAIHDBGNEFA(ADONPNOBBDE);
+				AddIcon(ADONPNOBBDE);
 				switch (LJFADBBKKPH)
 				{
-				case LLJHOHPLLME.NONE_ALIGNMENT:
-					OELPCLPNGGF();
+				case IconAlignment.NONE_ALIGNMENT:
+					LayoutIcons();
 					break;
-				case LLJHOHPLLME.LEFT_ALIGNMENT:
-					ADONPNOBBDE.transform.OKHPLHPBPKJ(60f - GetComponent<RectTransform>().rect.width / 2f);
+				case IconAlignment.LEFT_ALIGNMENT:
+					ADONPNOBBDE.transform.SetLocalX(60f - GetComponent<RectTransform>().rect.width / 2f);
 					break;
 				}
 			}
@@ -46,22 +46,22 @@ namespace Nekki.SF2.GUI.Profile
 			int count = BAOPCLKCLAF.Count;
 			for (int i = 0; i < count; i++)
 			{
-				GAIHDBGNEFA(BAOPCLKCLAF[i]);
+				AddIcon(BAOPCLKCLAF[i]);
 			}
-			OELPCLPNGGF();
+			LayoutIcons();
 		}
 
 		public List<SubItem> GetIcons()
 		{
-			return BNIBNKHLLIC;
+			return icons;
 		}
 
 		public bool IsUnlokedItem()
 		{
 			bool result = false;
-			for (int i = 0; i < BNIBNKHLLIC.Count; i++)
+			for (int i = 0; i < icons.Count; i++)
 			{
-				if (!BNIBNKHLLIC[i].GetLock())
+				if (!icons[i].GetLock())
 				{
 					result = true;
 					break;
@@ -72,7 +72,7 @@ namespace Nekki.SF2.GUI.Profile
 
 		public virtual void UpdateState()
 		{
-			foreach (SubItem item in BNIBNKHLLIC)
+			foreach (SubItem item in icons)
 			{
 				item.UpdateState();
 			}
@@ -80,33 +80,33 @@ namespace Nekki.SF2.GUI.Profile
 
 		public void Clear()
 		{
-			foreach (SubItem item in BNIBNKHLLIC)
+			foreach (SubItem item in icons)
 			{
 				item.ParentCell = null;
 				Object.Destroy(item.gameObject);
 			}
-			BNIBNKHLLIC.Clear();
+			icons.Clear();
 		}
 
-		private void GAIHDBGNEFA(SubItem ADONPNOBBDE)
+		private void AddIcon(SubItem ADONPNOBBDE)
 		{
-			ADONPNOBBDE.transform.BGNJGIACJBG(0f);
-			BNIBNKHLLIC.Add(ADONPNOBBDE);
+			ADONPNOBBDE.transform.SetLocalY(0f);
+			icons.Add(ADONPNOBBDE);
 		}
 
-		private void OELPCLPNGGF()
+		private void LayoutIcons()
 		{
-			int count = BNIBNKHLLIC.Count;
+			int count = icons.Count;
 			switch (count)
 			{
 			case 0:
 				break;
 			case 2:
 			{
-				SubItem subItem = BNIBNKHLLIC[0];
-				float num2 = subItem.GetComponent<RectTransform>().rect.width / 2f + NDKEJKELOHF;
-				subItem.transform.OKHPLHPBPKJ(0f - num2);
-				BNIBNKHLLIC[1].transform.OKHPLHPBPKJ(num2);
+				SubItem subItem = icons[0];
+				float num2 = subItem.GetComponent<RectTransform>().rect.width / 2f + iconSpacing;
+				subItem.transform.SetLocalX(0f - num2);
+				icons[1].transform.SetLocalX(num2);
 				break;
 			}
 			default:
@@ -114,7 +114,7 @@ namespace Nekki.SF2.GUI.Profile
 				float num = (0f - GetComponent<RectTransform>().rect.width) / 2f + GetComponent<RectTransform>().rect.width / 2f / (float)count;
 				for (int i = 0; i < count; i++)
 				{
-					BNIBNKHLLIC[i].transform.OKHPLHPBPKJ(num + GetComponent<RectTransform>().rect.width / (float)count * (float)i);
+					icons[i].transform.SetLocalX(num + GetComponent<RectTransform>().rect.width / (float)count * (float)i);
 				}
 				break;
 			}

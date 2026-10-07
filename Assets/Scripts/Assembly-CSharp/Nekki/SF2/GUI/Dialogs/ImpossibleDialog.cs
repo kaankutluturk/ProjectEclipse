@@ -4,7 +4,7 @@ namespace Nekki.SF2.GUI.Dialogs
 {
 	public class ImpossibleDialog : BaseDialog
 	{
-		public enum MAKDAMIONLL
+		public enum ImpossibleDialogType
 		{
 			A_NOT_ENOUGH_GOLD = 0,
 			A_NOT_ENOUGH_RUBY = 1,
@@ -16,13 +16,13 @@ namespace Nekki.SF2.GUI.Dialogs
 			A_SELL_ERROR = 7
 		}
 
-		private const int MACACIPAONI = 135;
+		private const int HeaderFontSize = 135;
 
-		private const int INECLDHJIML = 70;
+		private const int MessageOffsetY = 70;
 
-		private const int MCOMHPPHDAP = 122;
+		private const int MessageFontSize = 122;
 
-		private MAKDAMIONLL CBFFIFKAHHN = MAKDAMIONLL.A_SELL_ERROR;
+		private ImpossibleDialogType dialogType = ImpossibleDialogType.A_SELL_ERROR;
 
 		private string _titleString = string.Empty;
 
@@ -34,85 +34,85 @@ namespace Nekki.SF2.GUI.Dialogs
 		public override void Init(object data)
 		{
 			ImpossibleDialogInfo fHBGDNBFPLG = (ImpossibleDialogInfo)data;
-			CBFFIFKAHHN = fHBGDNBFPLG.AMKJNPOCODK;
+			dialogType = fHBGDNBFPLG.Reason;
 			_contentData = fHBGDNBFPLG.Content;
 			if (fHBGDNBFPLG.Dlg != null)
 			{
 				AddEventListener(0, fHBGDNBFPLG.Dlg);
 			}
-			switch (CBFFIFKAHHN)
+			switch (dialogType)
 			{
-			case MAKDAMIONLL.A_NOT_ENOUGH_GOLD:
-				IPECDAGDHHH();
+			case ImpossibleDialogType.A_NOT_ENOUGH_GOLD:
+				SetupNotEnoughGold();
 				break;
-			case MAKDAMIONLL.A_NOT_ENOUGH_RUBY:
-				DGKLBMJPDDN();
+			case ImpossibleDialogType.A_NOT_ENOUGH_RUBY:
+				SetupNotEnoughRuby();
 				break;
-			case MAKDAMIONLL.A_NOT_ENOUGH_ENERGY:
-				ILOFFPLEJLO();
+			case ImpossibleDialogType.A_NOT_ENOUGH_ENERGY:
+				SetupNotEnoughEnergy();
 				break;
 			default:
-				LLOHNIADENP(CBFFIFKAHHN);
+				SetupErrorDialog(dialogType);
 				break;
 			}
-			base.Init(_titleString, "dlgBuyButton", "Cancel", GBECKKCHAFI);
+			base.Init(_titleString, "dlgBuyButton", "Cancel", footerType);
 		}
 
-		protected virtual void IPECDAGDHHH()
+		protected virtual void SetupNotEnoughGold()
 		{
 			_titleString = "dlgNotEnoughGoldTitle";
-			NEDJJMIHKPK(MAKDAMIONLL.A_NOT_ENOUGH_GOLD);
+			SetupBuyDialog(ImpossibleDialogType.A_NOT_ENOUGH_GOLD);
 		}
 
-		protected virtual void DGKLBMJPDDN()
+		protected virtual void SetupNotEnoughRuby()
 		{
 			_titleString = "dlgNotEnoughRubyTitle";
-			NEDJJMIHKPK(MAKDAMIONLL.A_NOT_ENOUGH_RUBY);
+			SetupBuyDialog(ImpossibleDialogType.A_NOT_ENOUGH_RUBY);
 		}
 
-		protected virtual void NEDJJMIHKPK(MAKDAMIONLL IBODMPMJELJ)
+		protected virtual void SetupBuyDialog(ImpossibleDialogType IBODMPMJELJ)
 		{
-			BGJJDGOBPKA = "shopBuy";
-			GBECKKCHAFI = KBDHPMOMJLL.FOOTER_BOTH;
+			defaultOkButtonAlias = "shopBuy";
+			footerType = FooterType.FOOTER_BOTH;
 			string empty = string.Empty;
 			switch (IBODMPMJELJ)
 			{
 			default:
 				return;
-			case MAKDAMIONLL.A_NOT_ENOUGH_GOLD:
+			case ImpossibleDialogType.A_NOT_ENOUGH_GOLD:
 				empty = "dlgNotEnoughGoldMessage";
 				break;
-			case MAKDAMIONLL.A_NOT_ENOUGH_RUBY:
+			case ImpossibleDialogType.A_NOT_ENOUGH_RUBY:
 				empty = "dlgNotEnoughRubyMessage";
 				break;
-			case MAKDAMIONLL.A_NOT_ENOUGH_ENERGY:
+			case ImpossibleDialogType.A_NOT_ENOUGH_ENERGY:
 				empty = "dlgNotEnoughEnergyMessage";
 				break;
 			}
-			GHMKEENGCMI(empty);
+			SetupMessageAlias(empty);
 		}
 
-		protected virtual void LLOHNIADENP(MAKDAMIONLL IBODMPMJELJ)
+		protected virtual void SetupErrorDialog(ImpossibleDialogType IBODMPMJELJ)
 		{
-			BGJJDGOBPKA = "ok";
-			GBECKKCHAFI = KBDHPMOMJLL.FOOTER_OK;
+			defaultOkButtonAlias = "ok";
+			footerType = FooterType.FOOTER_OK;
 			_titleString = "dlgErrorTitle";
 		}
 
-		protected virtual void ILOFFPLEJLO()
+		protected virtual void SetupNotEnoughEnergy()
 		{
 			if (_contentData != null)
 			{
 				_titleString = "dlgNotEnoughEnergyTitle";
-				BGJJDGOBPKA = "dlgNotEnoughEnergyButton";
-				GBECKKCHAFI = KBDHPMOMJLL.FOOTER_BOTH;
+				defaultOkButtonAlias = "dlgNotEnoughEnergyButton";
+				footerType = FooterType.FOOTER_BOTH;
 				string empty = string.Empty;
 				string empty2 = string.Empty;
 				int num = 0;
 				NotEnoughEnergyDialogInfo oJJHNNJPMCI = (NotEnoughEnergyDialogInfo)_contentData;
-				empty = TimerLabel.GetTimeString(oJJHNNJPMCI.CLDABPBDDGB, true, true, true, false, ":", string.Empty, true, true, true, true, true, string.Empty, string.Empty, string.Empty);
+				empty = TimerLabel.GetTimeString(oJJHNNJPMCI.WaitSeconds, true, true, true, false, ":", string.Empty, true, true, true, true, true, string.Empty, string.Empty, string.Empty);
 				num = oJJHNNJPMCI.Value;
-				GameValueType hGIKOMLPBMJ = oJJHNNJPMCI.HGIKOMLPBMJ;
+				GameValueType hGIKOMLPBMJ = oJJHNNJPMCI.ValueType;
 				string empty3 = string.Empty;
 				switch (hGIKOMLPBMJ)
 				{
@@ -123,7 +123,7 @@ namespace Nekki.SF2.GUI.Dialogs
 					empty3 = "MiscSprites.energy";
 					break;
 				default:
-					empty3 = ListSF.CCDKHLAMKKO().OGJBDMNBMLJ();
+					empty3 = ListSF.GetRoster().GetCoinIcon();
 					break;
 				}
 				empty2 = num.ToString();
@@ -139,10 +139,10 @@ namespace Nekki.SF2.GUI.Dialogs
 				text += " ";
 				text += LocalizationManager.GetString("dlgNotEnoughEnergyMessage4");
 				_text.alignment = TextAnchor.MiddleCenter;
-				_text.transform.OKHPLHPBPKJ(0f);
-				_text.transform.BGNJGIACJBG(70f);
+				_text.transform.SetLocalX(0f);
+				_text.transform.SetLocalY(70f);
 				_text.set_LabelFontSize(122);
-				_text.color = Constants.PJJIMHMJPAL;
+				_text.color = Constants.DialogTextColor;
 				_text.set_text(text);
 			}
 		}
@@ -153,13 +153,13 @@ namespace Nekki.SF2.GUI.Dialogs
 			_header.set_LabelFontSize(135);
 		}
 
-		protected virtual void GHMKEENGCMI(string APFHJLHOCEN)
+		protected virtual void SetupMessageAlias(string APFHJLHOCEN)
 		{
 			_text.alignment = TextAnchor.MiddleCenter;
-			_text.transform.OKHPLHPBPKJ(0f);
-			_text.transform.BGNJGIACJBG(70f);
+			_text.transform.SetLocalX(0f);
+			_text.transform.SetLocalY(70f);
 			_text.set_LabelFontSize(122);
-			_text.color = Constants.PJJIMHMJPAL;
+			_text.color = Constants.DialogTextColor;
 			_text.set_Alias(APFHJLHOCEN);
 		}
 	}

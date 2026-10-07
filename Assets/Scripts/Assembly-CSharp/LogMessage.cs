@@ -1,8 +1,8 @@
 public struct LogMessage
 {
-	public RewardPrize DPIIJICBGGA;
+	public RewardPrize Prize;
 
-	public int BDJKDCMHEBI;
+	public int MinLevel;
 
-	public int CIKLDJLOFDJ;
+	public int MaxLevel;
 }

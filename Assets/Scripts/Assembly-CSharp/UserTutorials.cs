@@ -2,27 +2,27 @@ using System.Xml;
 
 public class UserTutorials
 {
-	private XmlAttribute KJDFLFIBLGP;
+	private XmlAttribute storyStepAttribute;
 
 	private string _storyTutorialStep = string.Empty;
 
-	private XmlAttribute JHNKGJPCNIN;
+	private XmlAttribute raidStepAttribute;
 
-	private RaidTutorialStepCode CEOBGDPEDOO = RaidTutorialStepCode.RaidTutNotStarted;
+	private RaidTutorialStepCode raidTutorialStep = RaidTutorialStepCode.RaidTutNotStarted;
 
-	private XmlAttribute FEDMOPFADNJ;
+	private XmlAttribute raidGemsTakenAttribute;
 
-	private bool JFNNHJHCOKL;
+	private bool raidGemsTaken;
 
-	private XmlAttribute EBNMHICBFJJ;
+	private XmlAttribute forgeMaterialsGivenAttribute;
 
-	private bool LABBDBLNEDJ;
+	private bool forgeMaterialsGiven;
 
-	public string HDIDABICNNI
+	public string StoryStep
 	{
 		get
 		{
-			return JILGHNPIHME();
+			return GetStoryStep();
 		}
 		set
 		{
@@ -30,51 +30,51 @@ public class UserTutorials
 		}
 	}
 
-	public bool OMDLOOFIJDF
+	public bool IsStoryTutorialActive
 	{
 		get
 		{
-			return JBPHIAEPHAH();
+			return GetIsStoryTutorialActive();
 		}
 	}
 
-	public RaidTutorialStepCode GLOLFNEKHBH
+	public RaidTutorialStepCode RaidStep
 	{
 		get
 		{
-			return NAGDMOLMLGH();
+			return GetRaidStep();
 		}
 		set
 		{
-			PECCKNJMNJP(value);
+			SetRaidStep(value);
 		}
 	}
 
-	public bool KGBJGLLNPPF
+	public bool RaidGemsTaken
 	{
 		get
 		{
-			return IJOGJBEIIJD();
+			return GetRaidGemsTaken();
 		}
 		set
 		{
-			KLJDICMKAAF(value);
+			SetRaidGemsTaken(value);
 		}
 	}
 
-	public bool MCILJIFPJHJ
+	public bool ForgeMaterialsGiven
 	{
 		get
 		{
-			return JAOBNPABAIF();
+			return GetForgeMaterialsGiven();
 		}
 		set
 		{
-			NNDIAFDINFC(value);
+			SetForgeMaterialsGiven(value);
 		}
 	}
 
-	public string JILGHNPIHME()
+	public string GetStoryStep()
 	{
 		return _storyTutorialStep;
 	}
@@ -84,85 +84,85 @@ public class UserTutorials
 		if (!(_storyTutorialStep == value))
 		{
 			_storyTutorialStep = value;
-			KJDFLFIBLGP.Value = _storyTutorialStep;
-			ListSF.CCDKHLAMKKO().GGGEHAGCLGC();
+			storyStepAttribute.Value = _storyTutorialStep;
+			ListSF.GetRoster().RequestSave();
 		}
 	}
 
-	public bool JBPHIAEPHAH()
+	public bool GetIsStoryTutorialActive()
 	{
 		return _storyTutorialStep != "END";
 	}
 
-	public RaidTutorialStepCode NAGDMOLMLGH()
+	public RaidTutorialStepCode GetRaidStep()
 	{
-		return CEOBGDPEDOO;
+		return raidTutorialStep;
 	}
 
-	public void PECCKNJMNJP(RaidTutorialStepCode value)
+	public void SetRaidStep(RaidTutorialStepCode value)
 	{
-		if (CEOBGDPEDOO <= value)
+		if (raidTutorialStep <= value)
 		{
-			CEOBGDPEDOO = value;
-			JHNKGJPCNIN.Value = GameUtils.HEJIFIHLLJF[CEOBGDPEDOO];
-			ListSF.CCDKHLAMKKO().GGGEHAGCLGC();
+			raidTutorialStep = value;
+			raidStepAttribute.Value = GameUtils.RaidTutorialStepNames[raidTutorialStep];
+			ListSF.GetRoster().RequestSave();
 		}
 	}
 
-	public bool IJOGJBEIIJD()
+	public bool GetRaidGemsTaken()
 	{
-		return JFNNHJHCOKL;
+		return raidGemsTaken;
 	}
 
-	public void KLJDICMKAAF(bool value)
+	public void SetRaidGemsTaken(bool value)
 	{
-		if (JFNNHJHCOKL != value)
+		if (raidGemsTaken != value)
 		{
-			JFNNHJHCOKL = value;
-			FEDMOPFADNJ.Value = ((!JFNNHJHCOKL) ? "0" : "1");
-			ListSF.CCDKHLAMKKO().GGGEHAGCLGC();
+			raidGemsTaken = value;
+			raidGemsTakenAttribute.Value = ((!raidGemsTaken) ? "0" : "1");
+			ListSF.GetRoster().RequestSave();
 		}
 	}
 
-	public bool JAOBNPABAIF()
+	public bool GetForgeMaterialsGiven()
 	{
-		return LABBDBLNEDJ;
+		return forgeMaterialsGiven;
 	}
 
-	public void NNDIAFDINFC(bool value)
+	public void SetForgeMaterialsGiven(bool value)
 	{
-		LABBDBLNEDJ = value;
-		EBNMHICBFJJ.Value = ((!LABBDBLNEDJ) ? "0" : "1");
-		ListSF.CCDKHLAMKKO().GGGEHAGCLGC();
+		forgeMaterialsGiven = value;
+		forgeMaterialsGivenAttribute.Value = ((!forgeMaterialsGiven) ? "0" : "1");
+		ListSF.GetRoster().RequestSave();
 	}
 
 	public void Parse(XmlNode node)
 	{
-		KJDFLFIBLGP = node.Attributes["Tutorial"];
-		if (KJDFLFIBLGP == null)
+		storyStepAttribute = node.Attributes["Tutorial"];
+		if (storyStepAttribute == null)
 		{
-			KJDFLFIBLGP = node.LLIKNHNLGJJ("Tutorial");
-			KJDFLFIBLGP.Value = GameUtils.AKPBNLKFONO.StepsNames[0];
+			storyStepAttribute = node.AppendAttribute("Tutorial");
+			storyStepAttribute.Value = GameUtils.TutorialSettings.StepsNames[0];
 		}
-		string text = KJDFLFIBLGP.CIPOICEEIBK();
-		_storyTutorialStep = ((!GameUtils.AKPBNLKFONO.IsStepName(text)) ? GameUtils.AKPBNLKFONO.StepsNames[0] : text);
-		JHNKGJPCNIN = node.Attributes["RaidTutorialStep"];
-		if (JHNKGJPCNIN == null)
+		string text = storyStepAttribute.GetStringOrDefault();
+		_storyTutorialStep = ((!GameUtils.TutorialSettings.IsStepName(text)) ? GameUtils.TutorialSettings.StepsNames[0] : text);
+		raidStepAttribute = node.Attributes["RaidTutorialStep"];
+		if (raidStepAttribute == null)
 		{
-			JHNKGJPCNIN = node.LLIKNHNLGJJ("RaidTutorialStep");
+			raidStepAttribute = node.AppendAttribute("RaidTutorialStep");
 		}
-		CEOBGDPEDOO = GameUtils.PHHOCKCCGMM(JHNKGJPCNIN.CIPOICEEIBK("NotStarted"));
-		FEDMOPFADNJ = node.Attributes["RaidTutorialGemsTaken"];
-		if (FEDMOPFADNJ == null)
+		raidTutorialStep = GameUtils.GetRaidTutorialStepByName(raidStepAttribute.GetStringOrDefault("NotStarted"));
+		raidGemsTakenAttribute = node.Attributes["RaidTutorialGemsTaken"];
+		if (raidGemsTakenAttribute == null)
 		{
-			FEDMOPFADNJ = node.LLIKNHNLGJJ("RaidTutorialGemsTaken");
+			raidGemsTakenAttribute = node.AppendAttribute("RaidTutorialGemsTaken");
 		}
-		JFNNHJHCOKL = FEDMOPFADNJ.ParseBool();
-		EBNMHICBFJJ = node.Attributes["ForgeTutorialMaterialsGiven"];
-		if (EBNMHICBFJJ == null)
+		raidGemsTaken = raidGemsTakenAttribute.ParseBool();
+		forgeMaterialsGivenAttribute = node.Attributes["ForgeTutorialMaterialsGiven"];
+		if (forgeMaterialsGivenAttribute == null)
 		{
-			EBNMHICBFJJ = node.LLIKNHNLGJJ("ForgeTutorialMaterialsGiven");
+			forgeMaterialsGivenAttribute = node.AppendAttribute("ForgeTutorialMaterialsGiven");
 		}
-		LABBDBLNEDJ = EBNMHICBFJJ.ParseBool();
+		forgeMaterialsGiven = forgeMaterialsGivenAttribute.ParseBool();
 	}
 }

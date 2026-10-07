@@ -83,8 +83,8 @@ public static class ValidateTitleSparringNative
                     ModVisuals.PlayEffectSound = (sound, volume) => effectSounds++;
                     ModVisuals.ResetTriggers();
                 }
-                profile = ListSF.CCDKHLAMKKO().get_Parameters().Node.OuterXml;
-                leftWall = GameUtils.CKOPPGCIHPL(); rightWall = GameUtils.FBOGLADLJML();
+                profile = ListSF.GetRoster().get_Parameters().Node.OuterXml;
+                leftWall = GameUtils.GetLeftWall(); rightWall = GameUtils.GetRightWall();
                 stageType = typeof(TitleScreen).GetNestedType("StageView", Hidden);
                 stage = stageType.GetMethod("Open", Hidden).Invoke(null, new object[] { Scenes[sceneIndex] });
                 Check(stage != null, "Stage failed to open.");
@@ -106,7 +106,7 @@ public static class ValidateTitleSparringNative
                 }
                 Check(firstLeft.Parameters.AiControlled && firstRight.Parameters.AiControlled && !firstLeft.Parameters.UserControlled && !firstRight.Parameters.UserControlled, "Both fighters must be CPUs.");
                 Eclipse.Rendering.FighterParticles.Hit(null, new Vector3f(), true, false, true);
-                var particles = firstLeft.MJNPBMOAFML().GetComponent<Eclipse.Rendering.FighterParticles>();
+                var particles = firstLeft.GetGameObject().GetComponent<Eclipse.Rendering.FighterParticles>();
                 foreach (var trigger in new[] { ModFxTrigger.Land, ModFxTrigger.Knockdown, ModFxTrigger.Slide, ModFxTrigger.Wall })
                     Call(particles, "Fire", trigger, Vector3.zero);
                 firstLeft.AddEventListener(0, LeftInterval); firstRight.AddEventListener(0, RightInterval);
@@ -126,9 +126,9 @@ public static class ValidateTitleSparringNative
                         Check(leftAttacks > 0 && rightAttacks > 0, "CPUs failed to trade native attacks.");
                         firstFight.UpdateLife(firstRight, -firstRight.Parameters.MaxLife * 2f);
                         firstFight.SetLife(firstLeft, 0f);
-                        Check(firstLeft.Parameters.HABJPOFCIHA() == 1f && firstRight.Parameters.HABJPOFCIHA() == 1f,
+                        Check(firstLeft.Parameters.GetLifeRatio() == 1f && firstRight.Parameters.GetLifeRatio() == 1f,
                             "Title fighters lost health under lethal damage/direct life assignment.");
-                        Check(!firstLeft.Parameters.PCALDKCJGCK && !firstRight.Parameters.PCALDKCJGCK, "Immortal title fighter entered knockout state.");
+                        Check(!firstLeft.Parameters.IsDead && !firstRight.Parameters.IsDead, "Immortal title fighter entered knockout state.");
                         forcedKnockout = true;
                     }
                     if (ticks >= 2600) { FinishChecks(); return; }
@@ -157,11 +157,11 @@ public static class ValidateTitleSparringNative
         Check(((float[])typeof(ModVisuals).GetField("_triggerTimes", Hidden).GetValue(null)).All(time => time < 0), "Title hit or movement triggered a global screen effect.");
         Check(ModVisuals.CurrentTimeScale() == 1f && ModVisuals.CurrentMuffle() == 0f, "Title sparring slowed/muffled the menu.");
         Check(ReferenceEquals(items, ListSF.GetItems()) && ReferenceEquals(scripts, ModRuntime.Scripts), "Sparring reloaded content.");
-        Check(profile == ListSF.CCDKHLAMKKO().get_Parameters().Node.OuterXml, "Sparring changed preview progress.");
+        Check(profile == ListSF.GetRoster().get_Parameters().Node.OuterXml, "Sparring changed preview progress.");
         Check(typeof(ModRuntime).GetField("_profileRoster", Hidden).GetValue(null) == null, "Sparring bound a mod save profile.");
         Call(stage, "RemoveFighters");
         Check(Fight.GetCurrentFight() == null, "Title fight survived disposal.");
-        Check(GameUtils.CKOPPGCIHPL() == leftWall && GameUtils.FBOGLADLJML() == rightWall, "Title combat bounds leaked.");
+        Check(GameUtils.GetLeftWall() == leftWall && GameUtils.GetRightWall() == rightWall, "Title combat bounds leaked.");
         Call(stage, "Dispose"); stage = null;
         Debug.Log("[TitleSparringNative] Scene passed: " + Scenes[sceneIndex] + "; ticks=" + ticks + ", attacks=" + leftAttacks + "/" + rightAttacks);
         if (++sceneIndex < Scenes.Length)
@@ -188,31 +188,31 @@ public static class ValidateTitleSparringNative
         var old = RenderTexture.active;
         var location = (Location)stageType.GetField("location", Hidden).GetValue(stage);
         var render = (global::Render)stageType.GetField("render", Hidden).GetValue(stage);
-        var container = render.PFELMKLNBMC.MJNPBMOAFML().transform;
+        var container = render.Container.GetRootObject().transform;
         Check(container.parent.localScale == Vector3.one, "Gameplay camera scaled the title game layer.");
-        Check(GameUtils.CKOPPGCIHPL() == location.MFAPMDDJBBL && GameUtils.FBOGLADLJML() == location.JMLAKAKDBBL - location.MFAPMDDJBBL, "Title uses artificial walls instead of the native stage walls.");
+        Check(GameUtils.GetLeftWall() == location.wallWidth && GameUtils.GetRightWall() == location.width - location.wallWidth, "Title uses artificial walls instead of the native stage walls.");
         foreach (var model in new[] { firstLeft, firstRight })
         {
-            var point = model.PLBNCDCFPML();
+            var point = model.GetPosition();
             var projected = camera.WorldToViewportPoint(container.TransformPoint(new Vector3(point.GetX(), point.GetY(), 0)));
             Check(projected.x >= .05f && projected.x <= .95f, "CPU is outside title view: " + projected);
-            Check(model.MJNPBMOAFML().GetComponentsInChildren<MeshRenderer>().Length > 0, "CPU has no native rendered mesh.");
+            Check(model.GetGameObject().GetComponentsInChildren<MeshRenderer>().Length > 0, "CPU has no native rendered mesh.");
         }
         WritePicture(Scenes[sceneIndex]);
         foreach (var side in new[] { "left", "right" })
         {
-            float center = side == "left" ? location.MFAPMDDJBBL : location.JMLAKAKDBBL - location.MFAPMDDJBBL;
+            float center = side == "left" ? location.wallWidth : location.width - location.wallWidth;
             render.UpdateMenuBackdrop(camera, false, center);
             bool behind = true;
             float height = camera.orthographicSize * 2f;
-            float scale = Mathf.Max(height / location.FEIHFIPFNKF, height * camera.aspect / location.JMLAKAKDBBL);
+            float scale = Mathf.Max(height / location.height, height * camera.aspect / location.width);
             float halfVisible = height * camera.aspect / scale * .5f;
-            float offset = location.JMLAKAKDBBL * .5f - Mathf.Clamp(center, halfVisible, location.JMLAKAKDBBL - halfVisible);
+            float offset = location.width * .5f - Mathf.Clamp(center, halfVisible, location.width - halfVisible);
             foreach (var layer in location.layers)
             {
                 if (layer == location.gameLayer) behind = false;
                 float factor = behind ? ModVisuals.BackgroundLayerFactor(layer.Factor) : layer.Factor;
-                Check(Mathf.Abs(layer.MJNPBMOAFML().transform.localPosition.x - offset * factor) < .01f, "Title ignored the stage layer's parallax factor.");
+                Check(Mathf.Abs(layer.GetLayerObject().transform.localPosition.x - offset * factor) < .01f, "Title ignored the stage layer's parallax factor.");
             }
             WritePicture(Scenes[sceneIndex] + "-" + side);
         }
@@ -264,17 +264,17 @@ public static class ValidateTitleSparringNative
             foreach (float alpha in new[] { 0f, .5f, 1f })
             {
                 frameField.SetValue(null, Time.frameCount); alphaField.SetValue(null, alpha);
-                float left = Mathf.Lerp(firstLeft.CLDMEJKGLBA().HOFFDCFEBGA().GetEnd().GetX(), firstLeft.PLBNCDCFPML().GetX(), alpha);
-                float right = Mathf.Lerp(firstRight.CLDMEJKGLBA().HOFFDCFEBGA().GetEnd().GetX(), firstRight.PLBNCDCFPML().GetX(), alpha);
+                float left = Mathf.Lerp(firstLeft.GetBodyObject().GetCenterOfMassNode().GetEnd().GetX(), firstLeft.GetPosition().GetX(), alpha);
+                float right = Mathf.Lerp(firstRight.GetBodyObject().GetCenterOfMassNode().GetEnd().GetX(), firstRight.GetPosition().GetX(), alpha);
                 float center = (left + right) * .5f;
                 Check(Mathf.Abs((float)Call(firstFight, "GetTitleSparringCenterX", alpha) - center) < .001f, "Title camera center does not interpolate fighter pivots.");
                 Call(stage, "Tick", 1280, 720);
                 float height = camera.orthographicSize * 2f;
-                float scale = Mathf.Max(height / location.FEIHFIPFNKF, height * camera.aspect / location.JMLAKAKDBBL);
+                float scale = Mathf.Max(height / location.height, height * camera.aspect / location.width);
                 float halfVisible = height * camera.aspect / scale * .5f;
-                float expected = (location.JMLAKAKDBBL * .5f - Mathf.Clamp(center, halfVisible, location.JMLAKAKDBBL - halfVisible)) * location.gameLayer.Factor;
-                Check(Mathf.Abs(location.gameLayer.MJNPBMOAFML().transform.localPosition.x - expected) < .01f, "Rendered title camera ignores interpolation alpha.");
-                Check(render.MJNPBMOAFML().transform.position.x == camera.transform.position.x, "Title panned the entire stage instead of its layers.");
+                float expected = (location.width * .5f - Mathf.Clamp(center, halfVisible, location.width - halfVisible)) * location.gameLayer.Factor;
+                Check(Mathf.Abs(location.gameLayer.GetLayerObject().transform.localPosition.x - expected) < .01f, "Rendered title camera ignores interpolation alpha.");
+                Check(render.GetRootObject().transform.position.x == camera.transform.position.x, "Title panned the entire stage instead of its layers.");
             }
             SF2DisplayFrameRate.SetInterpolationEnabled(false);
             frameField.SetValue(null, Time.frameCount); alphaField.SetValue(null, 0f);
@@ -293,9 +293,9 @@ public static class ValidateTitleSparringNative
     static CurrentEffect[] MagicEffects()
     {
         var render = (global::Render)stageType.GetField("render", Hidden).GetValue(stage);
-        var background = render.GOCPBKNDKMC().NFCBNLKLPBK();
-        var front = render.GDBMKMFFOCF().NFCBNLKLPBK();
-        var field = typeof(EffectsRunning).GetField("IGLOMLIOOBM", Hidden);
+        var background = render.GetBackgroundEffects().GetEffectsRunning();
+        var front = render.GetForegroundEffects().GetEffectsRunning();
+        var field = typeof(EffectsRunning).GetField("runningEffects", Hidden);
         return ((System.Collections.Generic.List<CurrentEffect>)field.GetValue(background))
             .Concat((System.Collections.Generic.List<CurrentEffect>)field.GetValue(front)).ToArray();
     }
@@ -312,18 +312,18 @@ public static class ValidateTitleSparringNative
                 document.LoadXml("<Effect Name='" + spec.Item1 + "' Sequence='mgc_magic_mass_bomb_start' TimeScale='1' OnBackground='" + (spec.Item2 ? "1" : "0") + "' Looped='" + (spec.Item3 ? "1" : "0") + "'/>");
                 new ActionEffect(document.DocumentElement).Visit(firstLeft);
             }
-            var effects = MagicEffects().Where(effect => effect.LLOLBKJMKNC.get_Name().StartsWith("TitleMagic")).ToArray();
+            var effects = MagicEffects().Where(effect => effect.Effect.get_Name().StartsWith("TitleMagic")).ToArray();
             Check(effects.Length == 3, "Native effects did not reach both title effect containers.");
-            Check(effects.All(effect => effect.BHHCMELOEJF.get_TotalFrames() > 2 && effect.BHHCMELOEJF.GetComponentInChildren<SpriteRenderer>().sprite != null), "Native magic art is missing.");
-            var frames = effects.Select(effect => effect.BHHCMELOEJF.GetComponentInChildren<SpriteRenderer>().sprite).ToArray();
+            Check(effects.All(effect => effect.Animation.get_TotalFrames() > 2 && effect.Animation.GetComponentInChildren<SpriteRenderer>().sprite != null), "Native magic art is missing.");
+            var frames = effects.Select(effect => effect.Animation.GetComponentInChildren<SpriteRenderer>().sprite).ToArray();
             for (int i = 0; i < 3; i++) Call(stage, "Advance");
             for (int i = 0; i < effects.Length; i++)
-                Check(effects[i].BHHCMELOEJF.GetComponentInChildren<SpriteRenderer>().sprite != frames[i], "Title magic stayed on its first frame.");
-            int duration = effects.Max(effect => effect.BHHCMELOEJF.get_TotalFrames()) + 4;
+                Check(effects[i].Animation.GetComponentInChildren<SpriteRenderer>().sprite != frames[i], "Title magic stayed on its first frame.");
+            int duration = effects.Max(effect => effect.Animation.get_TotalFrames()) + 4;
             for (int i = 0; i < duration; i++) Call(stage, "Advance");
-            Check(!MagicEffects().Any(effect => effect.LLOLBKJMKNC.get_Name() == "TitleMagicFront" || effect.LLOLBKJMKNC.get_Name() == "TitleMagicBack"), "Finished title magic was not removed.");
-            Check(MagicEffects().Any(effect => effect.LLOLBKJMKNC.get_Name() == "TitleMagicLoop"), "Looping title magic ended early.");
-            Call(stage, "ShowFighters", leftLoadoutForTest(), rightLoadoutForTest(), firstLeft.Parameters.JJCKADKCDIF.GetX(), firstRight.Parameters.JJCKADKCDIF.GetX());
+            Check(!MagicEffects().Any(effect => effect.Effect.get_Name() == "TitleMagicFront" || effect.Effect.get_Name() == "TitleMagicBack"), "Finished title magic was not removed.");
+            Check(MagicEffects().Any(effect => effect.Effect.get_Name() == "TitleMagicLoop"), "Looping title magic ended early.");
+            Call(stage, "ShowFighters", leftLoadoutForTest(), rightLoadoutForTest(), firstLeft.Parameters.SpawnPosition.GetX(), firstRight.Parameters.SpawnPosition.GetX());
             Check(MagicEffects().Length == 0, "Old magic effects survived a title rematch.");
             firstFight = Fight.GetCurrentFight(); firstLeft = firstFight.GetPlayerModel(); firstRight = firstFight.GetEnemyModel();
             firstLeft.AddEventListener(0, LeftInterval); firstRight.AddEventListener(0, RightInterval);
@@ -424,14 +424,14 @@ public static class ValidateTitleSparringNative
             Check(((CanvasGroup)Get("homePresentation")).alpha == 1f, "Returning Home preserved a hidden menu.");
             firstFight.UpdateLife(firstRight, -firstRight.Parameters.MaxLife * 2f);
             firstFight.SetLife(firstLeft, 0f);
-            Check(firstLeft.Parameters.HABJPOFCIHA() == 1f && firstRight.Parameters.HABJPOFCIHA() == 1f
-                && !firstLeft.Parameters.PCALDKCJGCK && !firstRight.Parameters.PCALDKCJGCK,
+            Check(firstLeft.Parameters.GetLifeRatio() == 1f && firstRight.Parameters.GetLifeRatio() == 1f
+                && !firstLeft.Parameters.IsDead && !firstRight.Parameters.IsDead,
                 "Title immortality failed for lethal damage or direct health assignment.");
             firstLeft.AddEventListener(0, LeftInterval); firstRight.AddEventListener(0, RightInterval);
             for (int i = 0; i < 2700; i++) Call(stage, "Advance");
             Check(Fight.GetCurrentFight() == firstFight && leftAttacks > 0 && rightAttacks > 0,
                 "Title fight stopped attacking or restarted at its old timeout.");
-            Check(firstLeft.Parameters.HABJPOFCIHA() == 1f && firstRight.Parameters.HABJPOFCIHA() == 1f,
+            Check(firstLeft.Parameters.GetLifeRatio() == 1f && firstRight.Parameters.GetLifeRatio() == 1f,
                 "Native combat reduced infinite-health title fighters' life.");
         }
         finally

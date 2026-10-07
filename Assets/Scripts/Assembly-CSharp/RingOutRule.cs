@@ -2,104 +2,104 @@ using System.Xml;
 
 public class RingOutRule : InFightRule
 {
-	public const float PGJLFIONACP = 100000f;
+	public const float DefaultMax = 100000f;
 
-	public const float PLIKDGOFDAB = -100000f;
+	public const float DefaultMin = -100000f;
 
-	public const float MNCFCHNOCGI = 3f;
+	public const float DefaultSequenceSpeed = 3f;
 
 	public const string DEFAULT_SEQUENTION_NAME = "ringout";
 
-	private float GNBJFBPFAMM;
+	private float originOffsetX;
 
-	private float MOLFLBBKAOE;
+	private float originOffsetY;
 
 	private string _nodeName;
 
-	private string IEGGNJMGIMN;
+	private string sequenceName;
 
 	private ModelNode _node;
 
     internal override System.Action PrepareModelRebind(Model expected, Model replacement)
     {
-        if (_node == null || expected == null || expected.CLDMEJKGLBA().EGHIDHMENEF(_nodeName) != _node) return null;
-        ModelNode target = replacement?.CLDMEJKGLBA()?.EGHIDHMENEF(_nodeName);
+        if (_node == null || expected == null || expected.GetBodyObject().GetNodeByName(_nodeName) != _node) return null;
+        ModelNode target = replacement?.GetBodyObject()?.GetNodeByName(_nodeName);
         if (target == null) throw new System.InvalidOperationException("Form is missing RingOutRule node: " + _nodeName);
         return () => _node = target;
     }
 
-	private float NCOIMBKECMD;
+	private float minX;
 
-	private float IBLJKECKGKP;
+	private float maxX;
 
-	private float KEFGNKPIHKH;
+	private float maxY;
 
-	private float AHHGHKHMLDN;
+	private float minY;
 
-	private float AAHGGDAHNLP;
+	private float sequenceSpeed;
 
 	public RingOutRule(XmlNode node, RuleAppliance EJPOJJKKICO)
-		: base(BCBLLMPAMLP.RuleRingout, EJPOJJKKICO, node)
+		: base(RuleType.RuleRingout, EJPOJJKKICO, node)
 	{
 		_nodeName = string.Empty;
-		KEFGNKPIHKH = 100000f;
-		AHHGHKHMLDN = -100000f;
-		NCOIMBKECMD = -100000f;
-		IBLJKECKGKP = 100000f;
+		maxY = 100000f;
+		minY = -100000f;
+		minX = -100000f;
+		maxX = 100000f;
 		_node = null;
-		GNBJFBPFAMM = 0f;
-		AAHGGDAHNLP = 3f;
-		EBJIKKBLBEM(FightEvent.RenderEvent);
+		originOffsetX = 0f;
+		sequenceSpeed = 3f;
+		SubscribeEvent(FightEvent.RenderEvent);
 		Parse(node);
 	}
 
-	public float EJHLFJBJHAN()
+	public float GetMinX()
 	{
-		return NCOIMBKECMD;
+		return minX;
 	}
 
-	public float JFBOKNFDFDO()
+	public float GetMaxX()
 	{
-		return IBLJKECKGKP;
+		return maxX;
 	}
 
-	public float IOCBNKAFHKL()
+	public float GetSequenceSpeed()
 	{
-		return AAHGGDAHNLP;
+		return sequenceSpeed;
 	}
 
 	public override void InitRule(object data)
 	{
 		RuleInitData oIFPCFEGFOB = (RuleInitData)data;
-		if (oIFPCFEGFOB.LPJNEDFCBOI != null)
+		if (oIFPCFEGFOB.FightLocation != null)
 		{
-			GNBJFBPFAMM = (0f - oIFPCFEGFOB.LPJNEDFCBOI.JMLAKAKDBBL) / 2f;
-			MOLFLBBKAOE = 0f - oIFPCFEGFOB.LPJNEDFCBOI.GBNPHCHGKDO;
+			originOffsetX = (0f - oIFPCFEGFOB.FightLocation.width) / 2f;
+			originOffsetY = 0f - oIFPCFEGFOB.FightLocation.floorHeight;
 		}
-		switch (NDBMMPENJNJ)
+		switch (appliance)
 		{
 		case RuleAppliance.AppliancePlayer:
-			if (oIFPCFEGFOB.DLPKDAIDCBF != null)
+			if (oIFPCFEGFOB.PlayerModel != null)
 			{
-				_node = oIFPCFEGFOB.DLPKDAIDCBF.CLDMEJKGLBA().EGHIDHMENEF(_nodeName);
+				_node = oIFPCFEGFOB.PlayerModel.GetBodyObject().GetNodeByName(_nodeName);
 			}
 			break;
 		case RuleAppliance.ApplianceOpponent:
-			if (oIFPCFEGFOB.OGBHDKKOIGH != null)
+			if (oIFPCFEGFOB.OpponentModel != null)
 			{
-				_node = oIFPCFEGFOB.OGBHDKKOIGH.CLDMEJKGLBA().EGHIDHMENEF(_nodeName);
+				_node = oIFPCFEGFOB.OpponentModel.GetBodyObject().GetNodeByName(_nodeName);
 			}
 			break;
 		}
 		if (_node == null)
 		{
-			LLLOJBFMONN.Error("RingoutRule::initRule error - no ModelNode found with name %s", _nodeName);
+			GameLog.Error("RingoutRule::initRule error - no ModelNode found with name %s", _nodeName);
 		}
 	}
 
-	public string OCJHHNFNHMK()
+	public string GetSequenceName()
 	{
-		return IEGGNJMGIMN;
+		return sequenceName;
 	}
 
 	protected override bool CompareSingle(object data)
@@ -109,8 +109,8 @@ public class RingOutRule : InFightRule
 			return false;
 		}
 		Vector3f eMAFACPEPDK = _node.GetStart();
-		eMAFACPEPDK = new Vector3f(eMAFACPEPDK.GetX() + GNBJFBPFAMM, 0f - eMAFACPEPDK.GetY() + MOLFLBBKAOE, eMAFACPEPDK.GetZ());
-		bool flag = eMAFACPEPDK.GetX() > IBLJKECKGKP || eMAFACPEPDK.GetX() < NCOIMBKECMD || eMAFACPEPDK.GetY() > KEFGNKPIHKH || eMAFACPEPDK.GetY() < AHHGHKHMLDN;
+		eMAFACPEPDK = new Vector3f(eMAFACPEPDK.GetX() + originOffsetX, 0f - eMAFACPEPDK.GetY() + originOffsetY, eMAFACPEPDK.GetZ());
+		bool flag = eMAFACPEPDK.GetX() > maxX || eMAFACPEPDK.GetX() < minX || eMAFACPEPDK.GetY() > maxY || eMAFACPEPDK.GetY() < minY;
 		if (flag)
 		{
 			SetActive(false);
@@ -121,27 +121,27 @@ public class RingOutRule : InFightRule
 	protected override void Parse(XmlNode node)
 	{
 		base.Parse(node);
-		_nodeName = node.Attributes["Node"].CIPOICEEIBK(string.Empty);
-		string text = node.Attributes["Axis"].CIPOICEEIBK(string.Empty);
+		_nodeName = node.Attributes["Node"].GetStringOrDefault(string.Empty);
+		string text = node.Attributes["Axis"].GetStringOrDefault(string.Empty);
 		if (text == "X")
 		{
-			IBLJKECKGKP = node.Attributes["Max"].ParseFloat(100000f);
-			NCOIMBKECMD = node.Attributes["Min"].ParseFloat(-100000f);
+			maxX = node.Attributes["Max"].ParseFloat(100000f);
+			minX = node.Attributes["Min"].ParseFloat(-100000f);
 		}
 		if (text == "Y")
 		{
-			KEFGNKPIHKH = node.Attributes["Max"].ParseFloat(100000f);
-			AHHGHKHMLDN = node.Attributes["Min"].ParseFloat(-100000f);
+			maxY = node.Attributes["Max"].ParseFloat(100000f);
+			minY = node.Attributes["Min"].ParseFloat(-100000f);
 		}
-		AAHGGDAHNLP = node.Attributes["SequentionSpeed"].ParseFloat(3f);
-		IEGGNJMGIMN = node.Attributes["Sequence"].CIPOICEEIBK("ringout");
+		sequenceSpeed = node.Attributes["SequentionSpeed"].ParseFloat(3f);
+		sequenceName = node.Attributes["Sequence"].GetStringOrDefault("ringout");
 	}
 
 	public override InFightRule Copy()
 	{
 		InFightRule aAJIFBJLJOA = null;
-		RuleAppliance eJPOJJKKICO = EDAKADCHOLE();
-		XmlNode hKPPBKPJOEO = GIFDJEEGCJI().IOJIGDNFCFL();
+		RuleAppliance eJPOJJKKICO = GetAppliance();
+		XmlNode hKPPBKPJOEO = GetXmlSource().GetNode();
 		aAJIFBJLJOA = new RingOutRule(hKPPBKPJOEO, eJPOJJKKICO);
 		aAJIFBJLJOA.IsRandom = IsRandom;
 		return aAJIFBJLJOA;

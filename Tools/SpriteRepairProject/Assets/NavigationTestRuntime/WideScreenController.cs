@@ -27,7 +27,7 @@ public class WideScreenController : MonoBehaviour
 		(base.transform as RectTransform).SetSiblingIndex(1000);
 		RectTransform rectTransform = (RectTransform)base.gameObject.transform.parent;
 		float num5 = 1536f / num2 * num;
-		BEDKFGIICFL(num5);
+		PositionBorders(num5);
 		float pPOFNJGPHGP = (float)(int)((rectTransform.sizeDelta.x - num5) / 2f) + 1f;
 		List<RectTransform> list = new List<RectTransform>();
 		for (int i = 0; i < rectTransform.childCount; i++)
@@ -55,7 +55,7 @@ public class WideScreenController : MonoBehaviour
 		PIDLNECOJBG.offsetMin = offsetMin;
 	}
 
-	private void BEDKFGIICFL(float DJFFDCFCNJM)
+	private void PositionBorders(float DJFFDCFCNJM)
 	{
 		float num = (int)(DJFFDCFCNJM / 2f) - 1;
 		Vector3 localPosition = _LeftBorder.transform.localPosition;

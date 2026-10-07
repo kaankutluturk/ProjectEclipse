@@ -7,15 +7,15 @@ public class QuestActionUnlockBattle : QuestAction
 {
 	private bool _toggle;
 
-	private bool LNKJGCAAJHN;
+	private bool isLocked;
 
-	private bool LIHHPCMHCCE;
+	private bool isInstant;
 
-	private bool INMFGOMPJEO;
+	private bool isHidden;
 
 	private string _name = string.Empty;
 
-	private string GFAMDGCPINA = string.Empty;
+	private string replayCountExpression = string.Empty;
 
 	private string _hidden = string.Empty;
 
@@ -24,25 +24,25 @@ public class QuestActionUnlockBattle : QuestAction
 		base.Parse(EPKLCPOEELO);
 		string name = EPKLCPOEELO.Name;
 		_toggle = name == "ShowBattle";
-		LNKJGCAAJHN = EPKLCPOEELO.Attributes["Locked"].ParseBool();
-		_name = EPKLCPOEELO.Attributes["Name"].CIPOICEEIBK(string.Empty);
-		LIHHPCMHCCE = EPKLCPOEELO.Attributes["Instant"].ParseBool();
-		_hidden = EPKLCPOEELO.Attributes["Hidden"].CIPOICEEIBK(string.Empty);
-		GFAMDGCPINA = EPKLCPOEELO.Attributes["ReplayCount"].CIPOICEEIBK(string.Empty);
+		isLocked = EPKLCPOEELO.Attributes["Locked"].ParseBool();
+		_name = EPKLCPOEELO.Attributes["Name"].GetStringOrDefault(string.Empty);
+		isInstant = EPKLCPOEELO.Attributes["Instant"].ParseBool();
+		_hidden = EPKLCPOEELO.Attributes["Hidden"].GetStringOrDefault(string.Empty);
+		replayCountExpression = EPKLCPOEELO.Attributes["ReplayCount"].GetStringOrDefault(string.Empty);
 	}
 
-	public override void DEJMHFMLKIC(QuestParameters JCICKLIMBEF)
+	public override void Execute(QuestParameters JCICKLIMBEF)
 	{
-		base.DEJMHFMLKIC(JCICKLIMBEF);
+		base.Execute(JCICKLIMBEF);
 		ConditionExtension.CompareResult lNIDLHOIHIM = new ConditionExtension.CompareResult();
 		QuestCondition kKDGLNECFHA = new QuestCondition();
-		kKDGLNECFHA.LIMHBJBEEIA(JCICKLIMBEF);
-		kKDGLNECFHA.MCPIOGALBMK(_name, lNIDLHOIHIM);
+		kKDGLNECFHA.SetParameters(JCICKLIMBEF);
+		kKDGLNECFHA.SetValue(_name, lNIDLHOIHIM);
 		int oAHPBDFKJOK = 0;
-		if (!string.IsNullOrEmpty(GFAMDGCPINA))
+		if (!string.IsNullOrEmpty(replayCountExpression))
 		{
 			ConditionExtension.CompareResult lNIDLHOIHIM2 = new ConditionExtension.CompareResult();
-			kKDGLNECFHA.MCPIOGALBMK(GFAMDGCPINA, lNIDLHOIHIM2);
+			kKDGLNECFHA.SetValue(replayCountExpression, lNIDLHOIHIM2);
 			oAHPBDFKJOK = (int)lNIDLHOIHIM2.resultNumber;
 		}
 		if (!string.IsNullOrEmpty(_hidden))
@@ -52,30 +52,30 @@ public class QuestActionUnlockBattle : QuestAction
 			// false and exposed Eclipse battles while the mode was disabled.
 			if (_hidden.Trim() == "1 - _$InEclipseMode")
 			{
-				Roster roster = ListSF.CCDKHLAMKKO();
-				INMFGOMPJEO = roster == null || !roster.IsEclipseMode();
+				Roster roster = ListSF.GetRoster();
+				isHidden = roster == null || !roster.IsEclipseMode();
 			}
 			else
 			{
 				ConditionExtension.CompareResult lNIDLHOIHIM3 = new ConditionExtension.CompareResult();
-				kKDGLNECFHA.MCPIOGALBMK(_hidden, lNIDLHOIHIM3);
-				INMFGOMPJEO = lNIDLHOIHIM3.resultNumber > 0.0;
+				kKDGLNECFHA.SetValue(_hidden, lNIDLHOIHIM3);
+				isHidden = lNIDLHOIHIM3.resultNumber > 0.0;
 			}
 		}
 		FightIDS mOCEDDJOAEB = new FightIDS();
 		mOCEDDJOAEB.SetFightIDSByString(lNIDLHOIHIM.resultSTR);
-		Roster nKGLHEGIKKP = ListSF.CCDKHLAMKKO();
-		nKGLHEGIKKP.AddBattle(mOCEDDJOAEB, true, _toggle, LNKJGCAAJHN, INMFGOMPJEO, oAHPBDFKJOK);
-		ListSF.GetInstance().EJANJEEGOOE();
-		ListSF.CGJCKGAFPED();
-		Zone pKCPOJKLMOK = ListSF.CFEDCFACBLE(mOCEDDJOAEB.PELHCAEAOFE());
-		bool flag = JLIJLEGKEJA(pKCPOJKLMOK);
-		Battle cGJCGEBPCAF = ((pKCPOJKLMOK == null) ? null : pKCPOJKLMOK.MJINKOFNIAE(mOCEDDJOAEB.CPHDPCAECJN()));
+		Roster nKGLHEGIKKP = ListSF.GetRoster();
+		nKGLHEGIKKP.AddBattle(mOCEDDJOAEB, true, _toggle, isLocked, isHidden, oAHPBDFKJOK);
+		ListSF.GetInstance().RequestSave();
+		ListSF.RefreshConditionStatuses();
+		Zone pKCPOJKLMOK = ListSF.GetZoneByName(mOCEDDJOAEB.GetZone());
+		bool flag = HasVisibleBattle(pKCPOJKLMOK);
+		Battle cGJCGEBPCAF = ((pKCPOJKLMOK == null) ? null : pKCPOJKLMOK.FindBattle(mOCEDDJOAEB.GetBattle()));
 		if (cGJCGEBPCAF != null)
 		{
 			cGJCGEBPCAF.IsMapVisible = _toggle;
 		}
-		bool flag2 = JLIJLEGKEJA(pKCPOJKLMOK);
+		bool flag2 = HasVisibleBattle(pKCPOJKLMOK);
 		MapScene current = Scene<MapScene>.get_Current();
 		if (current != null)
 		{
@@ -83,18 +83,18 @@ public class QuestActionUnlockBattle : QuestAction
 			{
 				current.ReloadZones();
 			}
-			current.ActiveBattleByFightIDS(mOCEDDJOAEB, _toggle, false, LIHHPCMHCCE);
+			current.ActiveBattleByFightIDS(mOCEDDJOAEB, _toggle, false, isInstant);
 		}
-		OGIJONMKABB();
+		FinishAction();
 	}
 
-	private bool JLIJLEGKEJA(Zone HLJKOKMKMLM)
+	private bool HasVisibleBattle(Zone HLJKOKMKMLM)
 	{
 		if (HLJKOKMKMLM == null)
 		{
 			return false;
 		}
-		List<Battle> lGIIBNJFADA = HLJKOKMKMLM.LGIIBNJFADA;
+		List<Battle> lGIIBNJFADA = HLJKOKMKMLM.Battles;
 		for (int i = 0; i < lGIIBNJFADA.Count; i++)
 		{
 			if (lGIIBNJFADA[i].IsMapVisible)

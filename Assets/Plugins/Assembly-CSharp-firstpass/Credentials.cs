@@ -3,77 +3,77 @@ using System.Diagnostics;
 public sealed class Credentials
 {
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private BMBGFBGIAPL KAHHEBMBCFA;
+	private AuthenticationTypes type;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private string MHIOHGELAGB;
+	private string userName;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private string FDPDIGOJOOG;
+	private string password;
 
-	public string OEDGKJNJCEA
+	public string UserName
 	{
 		get
 		{
-			return BFFCEKDPNAM();
+			return GetUserName();
 		}
 		private set
 		{
-			IHIOOLDEDBN(value);
+			SetUserName(value);
 		}
 	}
 
-	public string LCIENEOINCL
+	public string Password
 	{
 		get
 		{
-			return LDEFEGOBBGO();
+			return GetPassword();
 		}
 		private set
 		{
-			EOMDIHIOGDO(value);
+			SetPassword(value);
 		}
 	}
 
 	public Credentials(string IFCOOFDKDGL, string AODNGDGJCMD)
-		: this(BMBGFBGIAPL.Unknown, IFCOOFDKDGL, AODNGDGJCMD)
+		: this(AuthenticationTypes.Unknown, IFCOOFDKDGL, AODNGDGJCMD)
 	{
 	}
 
-	public Credentials(BMBGFBGIAPL LFLGCDNKNJI, string IFCOOFDKDGL, string AODNGDGJCMD)
+	public Credentials(AuthenticationTypes LFLGCDNKNJI, string IFCOOFDKDGL, string AODNGDGJCMD)
 	{
 		set_Type(LFLGCDNKNJI);
-		IHIOOLDEDBN(IFCOOFDKDGL);
-		EOMDIHIOGDO(AODNGDGJCMD);
+		SetUserName(IFCOOFDKDGL);
+		SetPassword(AODNGDGJCMD);
 	}
 
-	public BMBGFBGIAPL get_Type()
+	public AuthenticationTypes get_Type()
 	{
-		return KAHHEBMBCFA;
+		return type;
 	}
 
-	private void set_Type(BMBGFBGIAPL value)
+	private void set_Type(AuthenticationTypes value)
 	{
-		KAHHEBMBCFA = value;
+		type = value;
 	}
 
-	public string BFFCEKDPNAM()
+	public string GetUserName()
 	{
-		return MHIOHGELAGB;
+		return userName;
 	}
 
-	private void IHIOOLDEDBN(string value)
+	private void SetUserName(string value)
 	{
-		MHIOHGELAGB = value;
+		userName = value;
 	}
 
-	public string LDEFEGOBBGO()
+	public string GetPassword()
 	{
-		return FDPDIGOJOOG;
+		return password;
 	}
 
-	private void EOMDIHIOGDO(string value)
+	private void SetPassword(string value)
 	{
-		FDPDIGOJOOG = value;
+		password = value;
 	}
 }

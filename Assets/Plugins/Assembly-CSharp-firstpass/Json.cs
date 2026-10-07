@@ -6,31 +6,31 @@ using System.Text;
 
 public class Json
 {
-	private const int CGPBDIPPGAM = 0;
+	private const int TOKEN_NONE = 0;
 
-	private const int PCJCEOFFCCP = 1;
+	private const int TOKEN_CURLY_OPEN = 1;
 
-	private const int OPJLGINFAMB = 2;
+	private const int TOKEN_CURLY_CLOSE = 2;
 
-	private const int PBEKCMMCPPD = 3;
+	private const int TOKEN_SQUARED_OPEN = 3;
 
-	private const int MJIFIAINJGI = 4;
+	private const int TOKEN_SQUARED_CLOSE = 4;
 
-	private const int OAEAEEMMBHF = 5;
+	private const int TOKEN_COLON = 5;
 
-	private const int OPKIMEIIBEN = 6;
+	private const int TOKEN_COMMA = 6;
 
-	private const int HGHKDLLNDLJ = 7;
+	private const int TOKEN_STRING = 7;
 
-	private const int MDOJALGHBGN = 8;
+	private const int TOKEN_NUMBER = 8;
 
-	private const int EIHBGKAOGAK = 9;
+	private const int TOKEN_TRUE = 9;
 
-	private const int JMKAIOGMEHO = 10;
+	private const int TOKEN_FALSE = 10;
 
-	private const int GCKKHHGCOFO = 11;
+	private const int TOKEN_NULL = 11;
 
-	private const int HNPKHPLBEGG = 2000;
+	private const int BUILDER_CAPACITY = 2000;
 
 	public static object Decode(string EMDHMHOKGFP)
 	{
@@ -63,7 +63,7 @@ public class Json
 		bool flag = false;
 		while (!flag)
 		{
-			switch (IHEOHKNJHIG(EMDHMHOKGFP, index))
+			switch (LookAhead(EMDHMHOKGFP, index))
 			{
 			case 0:
 				IBFAPIMOMBA = false;
@@ -105,7 +105,7 @@ public class Json
 		bool flag = false;
 		while (!flag)
 		{
-			switch (IHEOHKNJHIG(EMDHMHOKGFP, index))
+			switch (LookAhead(EMDHMHOKGFP, index))
 			{
 			case 0:
 				IBFAPIMOMBA = false;
@@ -134,7 +134,7 @@ public class Json
 
 	protected static object ParseValue(char[] EMDHMHOKGFP, ref int index, ref bool IBFAPIMOMBA)
 	{
-		switch (IHEOHKNJHIG(EMDHMHOKGFP, index))
+		switch (LookAhead(EMDHMHOKGFP, index))
 		{
 		case 7:
 			return ParseString(EMDHMHOKGFP, ref index, ref IBFAPIMOMBA);
@@ -241,7 +241,7 @@ public class Json
 	protected static double ParseNumber(char[] EMDHMHOKGFP, ref int index, ref bool IBFAPIMOMBA)
 	{
 		EatWhitespace(EMDHMHOKGFP, ref index);
-		int num = JHFHJJGFENL(EMDHMHOKGFP, index);
+		int num = GetLastIndexOfNumber(EMDHMHOKGFP, index);
 		int length = num - index + 1;
 		double result;
 		IBFAPIMOMBA = double.TryParse(new string(EMDHMHOKGFP, index, length), NumberStyles.Any, CultureInfo.InvariantCulture, out result);
@@ -249,7 +249,7 @@ public class Json
 		return result;
 	}
 
-	protected static int JHFHJJGFENL(char[] EMDHMHOKGFP, int index)
+	protected static int GetLastIndexOfNumber(char[] EMDHMHOKGFP, int index)
 	{
 		int i;
 		for (i = index; i < EMDHMHOKGFP.Length && "0123456789+-.eE".IndexOf(EMDHMHOKGFP[i]) != -1; i++)
@@ -266,7 +266,7 @@ public class Json
 		}
 	}
 
-	protected static int IHEOHKNJHIG(char[] EMDHMHOKGFP, int index)
+	protected static int LookAhead(char[] EMDHMHOKGFP, int index)
 	{
 		int IHPMGHJPLBP2 = index;
 		return NextToken(EMDHMHOKGFP, ref IHPMGHJPLBP2);

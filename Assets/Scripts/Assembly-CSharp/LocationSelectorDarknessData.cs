@@ -4,19 +4,19 @@ public class LocationSelectorDarknessData
 {
 	public Color color;
 
-	public int GFDMINCFBID;
+	public int darkeningEndFrame;
 
-	public int NDBJNFHDGOA;
+	public int darkEndFrame;
 
-	public int NJBHKDBOEAI;
+	public int lightingEndFrame;
 
-	public int KCANPMPILKI;
+	public int lightEndFrame;
 
 	public LocationSelectorDarknessData(int JJDLOICPIHC = 0, int PFKGAICNOJB = 0, int OGOGNLDJEDP = 0, int JDDJEAGMNMP = 0)
 	{
-		GFDMINCFBID = JJDLOICPIHC;
-		NDBJNFHDGOA = PFKGAICNOJB;
-		NJBHKDBOEAI = OGOGNLDJEDP;
-		KCANPMPILKI = JDDJEAGMNMP;
+		darkeningEndFrame = JJDLOICPIHC;
+		darkEndFrame = PFKGAICNOJB;
+		lightingEndFrame = OGOGNLDJEDP;
+		lightEndFrame = JDDJEAGMNMP;
 	}
 }

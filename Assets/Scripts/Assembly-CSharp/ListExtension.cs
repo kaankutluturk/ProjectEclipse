@@ -25,7 +25,7 @@ public static class ListExtension
 		return OMKIGJOLJJE.Count - count;
 	}
 
-	public static bool ANNPHPHLNEH<T>(this List<T> EGJHGBCEPHO, List<T> BPLIHEIIBFP) where T : IComparable
+	public static bool ContainsAllItems<T>(this List<T> EGJHGBCEPHO, List<T> BPLIHEIIBFP) where T : IComparable
 	{
 		int count = BPLIHEIIBFP.Count;
 		int count2 = EGJHGBCEPHO.Count;
@@ -58,7 +58,7 @@ public static class ListExtension
 		return false;
 	}
 
-	public static T CJBCAIOBHMP<T>(this List<T> OMKIGJOLJJE) where T : class
+	public static T GetRandomElement<T>(this List<T> OMKIGJOLJJE) where T : class
 	{
 		int count = OMKIGJOLJJE.Count;
 		if (count == 0)
@@ -68,7 +68,7 @@ public static class ListExtension
 		return OMKIGJOLJJE[UnityEngine.Random.Range(0, count)];
 	}
 
-	public static void CPCAJIKOIEE<T>(this List<T> OMKIGJOLJJE, int GNDPBMIJEMH) where T : new()
+	public static void Resize<T>(this List<T> OMKIGJOLJJE, int GNDPBMIJEMH) where T : new()
 	{
 		int count = OMKIGJOLJJE.Count;
 		if (count == GNDPBMIJEMH)
@@ -91,7 +91,7 @@ public static class ListExtension
 		}
 	}
 
-	public static List<T> KJCJIHJOLFC<T>(this List<T> OMKIGJOLJJE)
+	public static List<T> GetDistinct<T>(this List<T> OMKIGJOLJJE)
 	{
 		List<T> list = new List<T>();
 		foreach (T item in OMKIGJOLJJE)

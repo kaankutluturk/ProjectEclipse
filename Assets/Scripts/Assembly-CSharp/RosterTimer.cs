@@ -4,19 +4,19 @@ using System.Xml;
 public class RosterTimer
 {
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private string HKGHEJDKCPI;
+	private string name;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private long MFBDGFAPFNI;
+	private long endTimeSeconds;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private XmlNode POFLFMGCMJA;
+	private XmlNode node;
 
-	public long LICABBHACHO
+	public long EndTime
 	{
 		get
 		{
-			return CMIABOOJOEN();
+			return GetEndTimeSeconds();
 		}
 		set
 		{
@@ -28,56 +28,56 @@ public class RosterTimer
 	{
 		set_Name(name);
 		set_EndTimeSeconds(MCEDKIPLOMO);
-		Roster nKGLHEGIKKP = ListSF.CCDKHLAMKKO();
-		RosterTimerContainer kCMICMHCEBB = nKGLHEGIKKP.AEMFLPNDDKL();
-		XmlNode mEEAKLDGLDF = kCMICMHCEBB.LIGMHKEOJBB();
-		set_Node(mEEAKLDGLDF.ACBPMPMPKJJ("Timer"));
-		LIGMHKEOJBB().LLIKNHNLGJJ("Name").Value = get_Name();
-		LIGMHKEOJBB().LLIKNHNLGJJ("EndTime").Value = ((ulong)CMIABOOJOEN()/*cast due to constrained. prefix*/).ToString();
+		Roster nKGLHEGIKKP = ListSF.GetRoster();
+		RosterTimerContainer kCMICMHCEBB = nKGLHEGIKKP.GetTimerContainer();
+		XmlNode mEEAKLDGLDF = kCMICMHCEBB.GetNode();
+		set_Node(mEEAKLDGLDF.AppendElement("Timer"));
+		GetNode().AppendAttribute("Name").Value = get_Name();
+		GetNode().AppendAttribute("EndTime").Value = ((ulong)GetEndTimeSeconds()/*cast due to constrained. prefix*/).ToString();
 	}
 
 	public RosterTimer(XmlNode node)
 	{
 		set_Node(node);
-		if (LIGMHKEOJBB().Attributes["Name"].Empty())
+		if (GetNode().Attributes["Name"].Empty())
 		{
-			LIGMHKEOJBB().LLIKNHNLGJJ("Name").Value = string.Empty;
+			GetNode().AppendAttribute("Name").Value = string.Empty;
 		}
-		if (LIGMHKEOJBB().Attributes["EndTime"].Empty())
+		if (GetNode().Attributes["EndTime"].Empty())
 		{
-			LIGMHKEOJBB().LLIKNHNLGJJ("EndTime").Value = "0";
+			GetNode().AppendAttribute("EndTime").Value = "0";
 		}
-		set_Name(LIGMHKEOJBB().Attributes["Name"].CIPOICEEIBK(string.Empty));
-		set_EndTimeSeconds(LIGMHKEOJBB().Attributes["EndTime"].ParseLong(0L));
+		set_Name(GetNode().Attributes["Name"].GetStringOrDefault(string.Empty));
+		set_EndTimeSeconds(GetNode().Attributes["EndTime"].ParseLong(0L));
 	}
 
 	public string get_Name()
 	{
-		return HKGHEJDKCPI;
+		return name;
 	}
 
 	private void set_Name(string value)
 	{
-		HKGHEJDKCPI = value;
+		name = value;
 	}
 
-	public long CMIABOOJOEN()
+	public long GetEndTimeSeconds()
 	{
-		return MFBDGFAPFNI;
+		return endTimeSeconds;
 	}
 
 	public void set_EndTimeSeconds(long value)
 	{
-		MFBDGFAPFNI = value;
+		endTimeSeconds = value;
 	}
 
-	public XmlNode LIGMHKEOJBB()
+	public XmlNode GetNode()
 	{
-		return POFLFMGCMJA;
+		return node;
 	}
 
 	private void set_Node(XmlNode value)
 	{
-		POFLFMGCMJA = value;
+		node = value;
 	}
 }

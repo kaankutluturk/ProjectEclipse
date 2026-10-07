@@ -86,7 +86,7 @@ public static class ValidateLocalVersusNative
                     // Resolve the same paths as the loader before it parses the
                     // profile. Initializing these paths only creates directories.
                     SF2Paths.Init();
-                    saveStamps = new[] { new SaveStamp(ListSF.PFMBKJMEDEF()), new SaveStamp(ListSF.IDIFECNLMKO()) };
+                    saveStamps = new[] { new SaveStamp(ListSF.GetUsersFilePath()), new SaveStamp(ListSF.GetUsersBackupFilePath()) };
                     multiplayer.onClick.Invoke();
                     step = 1;
                     break;
@@ -96,7 +96,7 @@ public static class ValidateLocalVersusNative
                     Check(Fight.GetCurrentFight() == null, "Local boot did not enter a campaign fight");
                     CheckSaves("Local startup");
                     localProfileOwner = ListSF.GetInstance();
-                    localProfileOwner.EJANJEEGOOE();
+                    localProfileOwner.RequestSave();
                     localProfileOwner.OnAuthenticate(true);
                     CheckSaves("Forced save during local play");
                     baseline = ProfileXml();
@@ -120,8 +120,8 @@ public static class ValidateLocalVersusNative
                         "Exactly one fight EventSystem");
                     Check(ProfileXml() == baseline, "Constructing native local fighters preserves campaign XML");
                     ExerciseRouting(fight);
-                    firstX = fight.GetPlayerModel().PLBNCDCFPML().GetX();
-                    secondX = fight.GetEnemyModel().PLBNCDCFPML().GetX();
+                    firstX = fight.GetPlayerModel().GetPosition().GetX();
+                    secondX = fight.GetEnemyModel().GetPosition().GetX();
                     SendControl(0, FightCID.QuadrantForward, true);
                     SendControl(1, FightCID.QuadrantBack, true);
                     movementFrame = fight.get_FightTimeInFrames();
@@ -131,8 +131,8 @@ public static class ValidateLocalVersusNative
                     if (!Ready(fight) || fight.get_FightTimeInFrames() < movementFrame + 60) return;
                     SendControl(0, FightCID.QuadrantForward, false);
                     SendControl(1, FightCID.QuadrantBack, false);
-                    Check(fight.GetPlayerModel().PLBNCDCFPML().GetX() > firstX &&
-                        fight.GetEnemyModel().PLBNCDCFPML().GetX() < secondX,
+                    Check(fight.GetPlayerModel().GetPosition().GetX() > firstX &&
+                        fight.GetEnemyModel().GetPosition().GetX() < secondX,
                         "Both native fighters move toward each other from their own controls");
                     Capture("hud");
                     step = 12;
@@ -193,7 +193,7 @@ public static class ValidateLocalVersusNative
                     if (!Ready(fight) || fight.get_RoundNumber() <= round) return;
                     Check(!LocalVersusSession.HasResult && fight.GetPlayerModel().Parameters.RoundsWon == 0 &&
                         fight.GetEnemyModel().Parameters.RoundsWon == 0, "Equal timeout replays with neither player awarded a round");
-                    fight.GetEnemyModel().GFNCMLFKBGP(fight.GetEnemyModel().Parameters.MaxLife * .5f);
+                    fight.GetEnemyModel().SetLife(fight.GetEnemyModel().Parameters.MaxLife * .5f);
                     SetTimerExpired(fight);
                     step = 8;
                     break;
@@ -216,7 +216,7 @@ public static class ValidateLocalVersusNative
                     Check(fight.GetPlayerModel().Parameters.RoundsWon == 0 &&
                         fight.GetEnemyModel().Parameters.RoundsWon == 0 && !LocalVersusSession.HasResult,
                         "Double knockout replays without awarding a round");
-                    fight.GetPlayerModel().GFNCMLFKBGP(fight.GetPlayerModel().Parameters.MaxLife * .5f);
+                    fight.GetPlayerModel().SetLife(fight.GetPlayerModel().Parameters.MaxLife * .5f);
                     SetTimerExpired(fight);
                     step = 16;
                     break;
@@ -273,7 +273,7 @@ public static class ValidateLocalVersusNative
         typeof(Module).GetMethod("OpenLocalVersus", Hidden).Invoke(Module.GetInstance(), new object[] { match });
     }
 
-    static bool Ready(Fight fight) => fight != null && fight.IsLocalVersus && fight.CONGPMFCIJM() &&
+    static bool Ready(Fight fight) => fight != null && fight.IsLocalVersus && fight.GetIsFightStage() &&
         !fight.IsPaused() && fight.get_FightTimeInFrames() > 10;
 
     static void CheckFighters(Fight fight)
@@ -291,17 +291,17 @@ public static class ValidateLocalVersusNative
     static void ExerciseRouting(Fight fight)
     {
         var controller = GameController.get_Current();
-        var one = fight.GetPlayerModel().DEGJJOMLJGM();
-        var two = fight.GetEnemyModel().DEGJJOMLJGM();
+        var one = fight.GetPlayerModel().GetController();
+        var two = fight.GetEnemyModel().GetController();
         one.Reset(); two.Reset();
-        controller.CallEvent(0, new CBBEIGACPPD { Index = 1, KMOPCKPBHIA = FightCID.QuadrantDown });
-        Check(two.FONEJOKEIEN.IGEEOAGOMEM.Contains((int)FightCID.QuadrantDown) && one.FONEJOKEIEN.IGEEOAGOMEM.Count == 0,
+        controller.CallEvent(0, new FightControlEventData { Index = 1, Control = FightCID.QuadrantDown });
+        Check(two.CurrentKeys.StarterKeys.Contains((int)FightCID.QuadrantDown) && one.CurrentKeys.StarterKeys.Count == 0,
             "Player two control reaches only player two's native combo buffer");
-        controller.CallEvent(1, new CBBEIGACPPD { Index = 1, KMOPCKPBHIA = FightCID.QuadrantDown });
-        controller.CallEvent(0, new CBBEIGACPPD { Index = 0, KMOPCKPBHIA = FightCID.Punch });
-        Check(one.FONEJOKEIEN.IGEEOAGOMEM.Contains((int)FightCID.Punch) &&
-            !two.FONEJOKEIEN.IGEEOAGOMEM.Contains((int)FightCID.Punch), "Player one control remains independent");
-        controller.CallEvent(1, new CBBEIGACPPD { Index = 0, KMOPCKPBHIA = FightCID.Punch });
+        controller.CallEvent(1, new FightControlEventData { Index = 1, Control = FightCID.QuadrantDown });
+        controller.CallEvent(0, new FightControlEventData { Index = 0, Control = FightCID.Punch });
+        Check(one.CurrentKeys.StarterKeys.Contains((int)FightCID.Punch) &&
+            !two.CurrentKeys.StarterKeys.Contains((int)FightCID.Punch), "Player one control remains independent");
+        controller.CallEvent(1, new FightControlEventData { Index = 0, Control = FightCID.Punch });
         one.Reset(); two.Reset();
     }
 
@@ -309,7 +309,7 @@ public static class ValidateLocalVersusNative
         .Invoke(fight, new object[] { playerOne, false });
 
     static void SendControl(int player, FightCID control, bool pressed) =>
-        GameController.get_Current().CallEvent(pressed ? 0 : 1, new CBBEIGACPPD { Index = player, KMOPCKPBHIA = control });
+        GameController.get_Current().CallEvent(pressed ? 0 : 1, new FightControlEventData { Index = player, Control = control });
 
     static void Capture(string name)
     {
@@ -320,15 +320,15 @@ public static class ValidateLocalVersusNative
     static void SetTimerExpired(Fight fight)
     {
         var viewer = fight.preFight.get_ViewerFight();
-        var field = typeof(Nekki.SF2.GUI.Fight.ViewerFight).GetField("ENKHHGEMJCK", Hidden);
+        var field = typeof(Nekki.SF2.GUI.Fight.ViewerFight).GetField("timeCountFrames", Hidden);
         if (field == null) throw new InvalidOperationException("The native frame-count timer field is missing.");
         field.SetValue(viewer, (CodeStage.AntiCheat.ObscuredTypes.ObscuredInt)0);
-        typeof(Nekki.SF2.GUI.Fight.ViewerFight).GetField("NFEMKPCLDDB", Hidden)
+        typeof(Nekki.SF2.GUI.Fight.ViewerFight).GetField("timeSeconds", Hidden)
             .SetValue(viewer, (CodeStage.AntiCheat.ObscuredTypes.ObscuredInt)0);
     }
 
-    static string ProfileXml() => ((XmlNode)typeof(MELBIBHDPCE).GetField("_node", Hidden)
-        .GetValue(ListSF.CCDKHLAMKKO())).OuterXml;
+    static string ProfileXml() => ((XmlNode)typeof(SavedXmlProfile).GetField("_node", Hidden)
+        .GetValue(ListSF.GetRoster())).OuterXml;
 
     sealed class SaveStamp
     {

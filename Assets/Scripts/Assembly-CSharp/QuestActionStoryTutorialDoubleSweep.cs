@@ -9,12 +9,12 @@ public class QuestActionStoryTutorialDoubleSweep : QuestAction
 
 	private bool _LastAnimationIsDoubleSweep;
 
-	public override void DEJMHFMLKIC(QuestParameters GFIHPBCEEOB)
+	public override void Execute(QuestParameters GFIHPBCEEOB)
 	{
-		base.DEJMHFMLKIC(GFIHPBCEEOB);
+		base.Execute(GFIHPBCEEOB);
 		MainMenu.get_Instance().SetEnabled(false);
 		Fight gDBOMJODDEA = Fight.GetCurrentFight();
-		Model fGCODGKLHED = gDBOMJODDEA.LNDLFINJHDB[0];
+		Model fGCODGKLHED = gDBOMJODDEA.ActiveModels[0];
 		fGCODGKLHED.AddEventListener(2, OnAnimationStart);
 		Stick joystick = gDBOMJODDEA.Controller.GetJoystick();
 		joystick.SetIsFlashing(true);
@@ -22,7 +22,7 @@ public class QuestActionStoryTutorialDoubleSweep : QuestAction
 		buttonKick.AddFlashImage("FightButtons.Kick_Highlight");
 		buttonKick.FlashingImage.rectTransform.localScale = new Vector3(1.33f, 1.33f);
 		buttonKick.set_IsFlashing(true);
-		_WaitTimeCoroutine = IGIJPMDLDEL();
+		_WaitTimeCoroutine = WaitForTimeout();
 		CoroutineManager.get_Current().StartRoutine(_WaitTimeCoroutine);
 	}
 
@@ -31,7 +31,7 @@ public class QuestActionStoryTutorialDoubleSweep : QuestAction
 		if (_LastAnimationIsDoubleSweep)
 		{
 			_LastAnimationIsDoubleSweep = false;
-			LLJIIEDNJPF();
+			CompleteStep();
 		}
 		Model.EventModel oJDOHGBGPFK = (Model.EventModel)data;
 		InfoAnimation pJAHIOELGGD = (InfoAnimation)oJDOHGBGPFK.Data;
@@ -41,13 +41,13 @@ public class QuestActionStoryTutorialDoubleSweep : QuestAction
 		}
 	}
 
-	private IEnumerator IGIJPMDLDEL()
+	private IEnumerator WaitForTimeout()
 	{
-		yield return new WaitForSeconds(GameUtils.AKPBNLKFONO.DefaultTutorialStepTimeout);
-		LLJIIEDNJPF();
+		yield return new WaitForSeconds(GameUtils.TutorialSettings.DefaultTutorialStepTimeout);
+		CompleteStep();
 	}
 
-	private void LLJIIEDNJPF()
+	private void CompleteStep()
 	{
 		if (_WaitTimeCoroutine != null)
 		{
@@ -55,12 +55,12 @@ public class QuestActionStoryTutorialDoubleSweep : QuestAction
 		}
 		MainMenu.get_Instance().SetEnabled(true);
 		Fight gDBOMJODDEA = Fight.GetCurrentFight();
-		Model fGCODGKLHED = gDBOMJODDEA.LNDLFINJHDB[0];
+		Model fGCODGKLHED = gDBOMJODDEA.ActiveModels[0];
 		fGCODGKLHED.RemoveEventListener(2, OnAnimationStart);
 		Stick joystick = gDBOMJODDEA.Controller.GetJoystick();
 		joystick.SetIsFlashing(false);
 		SFButton buttonKick = gDBOMJODDEA.Controller.GetButtonKick();
 		buttonKick.set_IsFlashing(false);
-		OGIJONMKABB();
+		FinishAction();
 	}
 }

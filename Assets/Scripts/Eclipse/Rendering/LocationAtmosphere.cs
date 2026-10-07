@@ -96,8 +96,8 @@ namespace Eclipse.Rendering
 			_fxObjects.Clear();
 			_flickers.Clear();
 			if (_location.gameLayer == null) return;
-			float width = Mathf.Max(_location.JMLAKAKDBBL, 1f);
-			float height = Mathf.Max(_location.FEIHFIPFNKF, 1f);
+			float width = Mathf.Max(_location.width, 1f);
+			float height = Mathf.Max(_location.height, 1f);
 			foreach (ModFxDefinition definition in ModVisuals.EnumerateActiveFx(ModFxKind.Particles))
 			{
 				if (definition.Placement == ModFxPlacement.Node || definition.Placement == ModFxPlacement.Hit ||
@@ -128,18 +128,18 @@ namespace Eclipse.Rendering
 		private void Place(ModFxDefinition definition, out Transform parent, out float z)
 		{
 			parent = null; z = 0f;
-			if (definition.Placement == ModFxPlacement.Behind) { parent = _location.gameLayer.MJNPBMOAFML().transform; z = 1f; return; }
-			if (definition.Placement == ModFxPlacement.Front) { parent = _location.gameLayer.MJNPBMOAFML().transform; z = -2.5f; return; }
+			if (definition.Placement == ModFxPlacement.Behind) { parent = _location.gameLayer.GetLayerObject().transform; z = 1f; return; }
+			if (definition.Placement == ModFxPlacement.Front) { parent = _location.gameLayer.GetLayerObject().transform; z = -2.5f; return; }
 			float target = 1f - definition.Number("depth");
 			float best = float.MaxValue;
 			foreach (LocationSelector layer in _location.layers)
 			{
-				if (layer.BBELALLBKHH()) break;
-				float distance = Mathf.Abs(layer.JLBBJEELMGG() - target);
-				if (distance < best) { best = distance; parent = layer.MJNPBMOAFML().transform; }
+				if (layer.GetIsGameLayer()) break;
+				float distance = Mathf.Abs(layer.GetFactor() - target);
+				if (distance < best) { best = distance; parent = layer.GetLayerObject().transform; }
 			}
 			z = -2.8f;
-			if (parent == null) { parent = _location.gameLayer.MJNPBMOAFML().transform; z = 1f; }
+			if (parent == null) { parent = _location.gameLayer.GetLayerObject().transform; z = 1f; }
 		}
 
 		private GameObject CreateOverlay(Transform parent, float z, ModFxDefinition definition)
@@ -159,14 +159,14 @@ namespace Eclipse.Rendering
 			if ((w <= 0f || h <= 0f) && sprite == null && definition.Shape != ModFxShape.Rect)
 			{
 				// A beam or glow without a size: a quarter of the stage wide, full height for beams.
-				float stageW = Mathf.Max(_location.JMLAKAKDBBL, 1f), stageH = Mathf.Max(_location.FEIHFIPFNKF, 1f);
+				float stageW = Mathf.Max(_location.width, 1f), stageH = Mathf.Max(_location.height, 1f);
 				w = w > 0f ? w : stageW * 0.25f;
 				h = h > 0f ? h : (definition.Shape == ModFxShape.Shaft ? stageH * 1.2f : w);
 			}
 			if (w <= 0f || h <= 0f)
 			{
 				// No size: cover the whole view (a sprite keeps its aspect and fills the width).
-				float cover = Mathf.Max(_location.JMLAKAKDBBL, _location.FEIHFIPFNKF) * 3f;
+				float cover = Mathf.Max(_location.width, _location.height) * 3f;
 				if (sprite == null) overlay.transform.localScale = new Vector3(40000f, -40000f, 1f);
 				else overlay.transform.localScale = new Vector3(cover / Mathf.Max(size.x, 1e-3f), -cover / Mathf.Max(size.x, 1e-3f), 1f);
 			}
@@ -194,7 +194,7 @@ namespace Eclipse.Rendering
 			var background = new List<LocationSelector>();
 			foreach (LocationSelector layer in _location.layers)
 			{
-				if (layer.BBELALLBKHH()) break;
+				if (layer.GetIsGameLayer()) break;
 				background.Add(layer);
 			}
 			if (background.Count == 0 || !_sceneColor.HasValue) return;
@@ -206,13 +206,13 @@ namespace Eclipse.Rendering
 			float nearer = 0f;
 			for (int i = background.Count - 1; i >= 0; i--)
 			{
-				float h = strength * (1f - Mathf.Clamp01(background[i].JLBBJEELMGG()));
+				float h = strength * (1f - Mathf.Clamp01(background[i].GetFactor()));
 				float alpha = h <= nearer ? 0f : 1f - (1f - h) / Mathf.Max(1f - nearer, 1e-3f);
 				nearer = Mathf.Max(nearer, h);
 				if (alpha <= 0.005f) continue;
 				var overlay = new GameObject("Depth haze").AddComponent<SpriteRenderer>();
 				overlay.sprite = _whiteSprite;
-				overlay.transform.SetParent(background[i].MJNPBMOAFML().transform, false);
+				overlay.transform.SetParent(background[i].GetLayerObject().transform, false);
 				overlay.transform.localPosition = new Vector3(0f, 0f, OverlayDepth);
 				overlay.transform.localScale = new Vector3(40000f, 40000f, 1f);
 				Color color = _sceneColor.Value; color.a = alpha;
@@ -236,7 +236,7 @@ namespace Eclipse.Rendering
 		{
 			Color fallback = new Color(0.6f, 0.65f, 0.75f, 1f);
 			if (_location.layers.Count == 0) return fallback;
-			var renderers = _location.layers[0].MJNPBMOAFML().GetComponentsInChildren<SpriteRenderer>(true);
+			var renderers = _location.layers[0].GetLayerObject().GetComponentsInChildren<SpriteRenderer>(true);
 			if (renderers.Length == 0) return fallback;
 			RenderTexture rt = RenderTexture.GetTemporary(8, 8, 0, RenderTextureFormat.ARGB32);
 			var readback = new Texture2D(8, 8, TextureFormat.RGBA32, false);
@@ -293,11 +293,11 @@ namespace Eclipse.Rendering
 			ModParticleStyle preset = ChooseStyle(_location.name, settings);
 			float density = settings.Number("density");
 			if (preset == ModParticleStyle.None || density <= 0f) return;
-			float width = Mathf.Max(_location.JMLAKAKDBBL, 1f);
-			float height = Mathf.Max(_location.FEIHFIPFNKF, 1f);
+			float width = Mathf.Max(_location.width, 1f);
+			float height = Mathf.Max(_location.height, 1f);
 
 			_particles = new GameObject("Ambient particles (" + preset + ")");
-			_particles.transform.SetParent(_location.gameLayer.MJNPBMOAFML().transform, false);
+			_particles.transform.SetParent(_location.gameLayer.GetLayerObject().transform, false);
 			// Behind the game layer's fighters and floor, in front of the next background layer.
 			_particles.transform.localPosition = new Vector3(0f, 0f, 1f);
 			// The render root is mirrored vertically; flip back so +y is up.

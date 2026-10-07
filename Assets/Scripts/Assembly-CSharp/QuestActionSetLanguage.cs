@@ -2,27 +2,27 @@ using System.Xml;
 
 public class QuestActionSetLanguage : QuestAction
 {
-	private string BGMCCMHOMJL;
+	private string languageExpression;
 
 	public override void Parse(XmlNode EPKLCPOEELO)
 	{
 		base.Parse(EPKLCPOEELO);
-		BGMCCMHOMJL = EPKLCPOEELO.Attributes["Name"].CIPOICEEIBK(string.Empty);
+		languageExpression = EPKLCPOEELO.Attributes["Name"].GetStringOrDefault(string.Empty);
 	}
 
-	public override void DEJMHFMLKIC(QuestParameters GFIHPBCEEOB)
+	public override void Execute(QuestParameters GFIHPBCEEOB)
 	{
-		base.DEJMHFMLKIC(GFIHPBCEEOB);
+		base.Execute(GFIHPBCEEOB);
 		ConditionExtension.CompareResult lNIDLHOIHIM = new ConditionExtension.CompareResult();
 		QuestCondition kKDGLNECFHA = new QuestCondition();
-		kKDGLNECFHA.LIMHBJBEEIA(GFIHPBCEEOB);
-		kKDGLNECFHA.MCPIOGALBMK(BGMCCMHOMJL, lNIDLHOIHIM);
+		kKDGLNECFHA.SetParameters(GFIHPBCEEOB);
+		kKDGLNECFHA.SetValue(languageExpression, lNIDLHOIHIM);
 		string kEEACJILEEK = lNIDLHOIHIM.ToString();
-		LocalizationManager.Language pPNFBAFOOAH = LocalizationManager.NLFKNPBICED(kEEACJILEEK);
+		LocalizationManager.Language pPNFBAFOOAH = LocalizationManager.FindLanguageByName(kEEACJILEEK);
 		if (pPNFBAFOOAH != null)
 		{
-			LocalizationManager.BJPNKAGDKFL(pPNFBAFOOAH);
+			LocalizationManager.ChangeLanguage(pPNFBAFOOAH);
 		}
-		OGIJONMKABB();
+		FinishAction();
 	}
 }

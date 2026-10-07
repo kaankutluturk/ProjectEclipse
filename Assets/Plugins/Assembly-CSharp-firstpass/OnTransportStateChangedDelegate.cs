@@ -1,0 +1,1 @@
+public delegate void OnTransportStateChangedDelegate(TransportBase CHMELBKHOPP, TransportStates JOBAGBFMMFP, TransportStates MPJEMGJIBBD);

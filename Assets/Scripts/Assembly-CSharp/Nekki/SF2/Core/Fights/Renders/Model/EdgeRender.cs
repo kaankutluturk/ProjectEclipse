@@ -5,7 +5,7 @@ namespace Nekki.SF2.Core.Fights.Renders.Model
 {
 	public class EdgeRender : MonoBehaviour
 	{
-		private ModelEdge JJNIIAEBGIA;
+		private ModelEdge edge;
 
 		private LineRenderer _Line;
 
@@ -13,7 +13,7 @@ namespace Nekki.SF2.Core.Fights.Renders.Model
 
 		private bool _PresentationResolved;
 
-		public ModelEdge EDPCJALFPLE
+		public ModelEdge TargetEdge
 		{
 			set
 			{
@@ -23,10 +23,10 @@ namespace Nekki.SF2.Core.Fights.Renders.Model
 
 		public void set_Edge(ModelEdge value)
 		{
-			JJNIIAEBGIA = value;
+			edge = value;
 			if (_Line == null)
 			{
-				FBJIIKIODKL();
+				CreateLineRenderer();
 			}
 		}
 
@@ -36,7 +36,7 @@ namespace Nekki.SF2.Core.Fights.Renders.Model
 			_Line.endColor = value;
 		}
 
-		private void FBJIIKIODKL()
+		private void CreateLineRenderer()
 		{
 			_Line = base.gameObject.AddComponent<LineRenderer>();
 			_Line.material = new Material(Shader.Find("Sprites/Default"));
@@ -55,9 +55,9 @@ namespace Nekki.SF2.Core.Fights.Renders.Model
 			float x;
 			float y;
 			float z;
-			FightInterpolation.SamplePosition(JJNIIAEBGIA.GetStartNode(), alpha, out x, out y, out z);
+			FightInterpolation.SamplePosition(edge.GetStartNode(), alpha, out x, out y, out z);
 			_Line.SetPosition(0, new Vector3(x, y, -1f));
-			FightInterpolation.SamplePosition(JJNIIAEBGIA.GetEndNode(), alpha, out x, out y, out z);
+			FightInterpolation.SamplePosition(edge.GetEndNode(), alpha, out x, out y, out z);
 			_Line.SetPosition(1, new Vector3(x, y, -1f));
 		}
 	}

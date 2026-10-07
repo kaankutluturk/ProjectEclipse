@@ -1,18 +1,18 @@
 internal class Match
 {
-	private CDKCDPDMGDK state;
+	private MatchState state;
 
-	private int LCCLEFMKLPB;
+	private int position;
 
-	private int JCAJDBOMGOM;
+	private int length;
 
 	private byte symbol;
 
-	internal CDKCDPDMGDK AFINHOBCHMC
+	internal MatchState MatchState
 	{
 		get
 		{
-			return FLBBFDNHJAJ();
+			return GetState();
 		}
 		set
 		{
@@ -20,11 +20,11 @@ internal class Match
 		}
 	}
 
-	internal int JJCKADKCDIF
+	internal int MatchPosition
 	{
 		get
 		{
-			return ECJPLFFAMJO();
+			return GetPosition();
 		}
 		set
 		{
@@ -32,11 +32,11 @@ internal class Match
 		}
 	}
 
-	internal int IHGONCCOKMK
+	internal int MatchLength
 	{
 		get
 		{
-			return KLIOMCPELLF();
+			return GetLength();
 		}
 		set
 		{
@@ -44,11 +44,11 @@ internal class Match
 		}
 	}
 
-	internal byte NOAMPFKMDOO
+	internal byte LiteralSymbol
 	{
 		get
 		{
-			return BCHAFDDNJHG();
+			return GetSymbol();
 		}
 		set
 		{
@@ -56,37 +56,37 @@ internal class Match
 		}
 	}
 
-	internal CDKCDPDMGDK FLBBFDNHJAJ()
+	internal MatchState GetState()
 	{
 		return state;
 	}
 
-	internal void set_State(CDKCDPDMGDK value)
+	internal void set_State(MatchState value)
 	{
 		state = value;
 	}
 
-	internal int ECJPLFFAMJO()
+	internal int GetPosition()
 	{
-		return LCCLEFMKLPB;
+		return position;
 	}
 
 	internal void set_Position(int value)
 	{
-		LCCLEFMKLPB = value;
+		position = value;
 	}
 
-	internal int KLIOMCPELLF()
+	internal int GetLength()
 	{
-		return JCAJDBOMGOM;
+		return length;
 	}
 
 	internal void set_Length(int value)
 	{
-		JCAJDBOMGOM = value;
+		length = value;
 	}
 
-	internal byte BCHAFDDNJHG()
+	internal byte GetSymbol()
 	{
 		return symbol;
 	}

@@ -4,7 +4,7 @@ namespace Nekki.SF2.GUI.Map
 {
 	public class IndicatorFight : SFMonoBehaviour<object>
 	{
-		public enum ILPCJIPBONE
+		public enum IndicatorState
 		{
 			IsOn = 0,
 			IsOff = 1,
@@ -19,11 +19,11 @@ namespace Nekki.SF2.GUI.Map
 
 		public const string FILE_INDICATOR_LOCKED = "MiscSprites.indicatorLocked";
 
-		private ILPCJIPBONE LDOJANLOFHI = ILPCJIPBONE.IsOff;
+		private IndicatorState currentState = IndicatorState.IsOff;
 
 		private float _scale = 1f;
 
-		public ILPCJIPBONE GCDHNODCJAA
+		public IndicatorState GCDHNODCJAA
 		{
 			get
 			{
@@ -35,7 +35,7 @@ namespace Nekki.SF2.GUI.Map
 			}
 		}
 
-		public float FOAHMAOBFEA
+		public float IndicatorScale
 		{
 			get
 			{
@@ -47,25 +47,25 @@ namespace Nekki.SF2.GUI.Map
 			}
 		}
 
-		public ILPCJIPBONE get_CurrentState()
+		public IndicatorState get_CurrentState()
 		{
-			return LDOJANLOFHI;
+			return currentState;
 		}
 
-		public void set_CurrentState(ILPCJIPBONE value)
+		public void set_CurrentState(IndicatorState value)
 		{
-			LDOJANLOFHI = value;
+			currentState = value;
 			ResolutionImage component = GetComponent<ResolutionImage>();
 			component.set_TexturePath("MiscSprites");
-			switch (LDOJANLOFHI)
+			switch (currentState)
 			{
-			case ILPCJIPBONE.IsOn:
+			case IndicatorState.IsOn:
 				component.set_SpriteName("MiscSprites.indicatorOn");
 				break;
-			case ILPCJIPBONE.IsOff:
+			case IndicatorState.IsOff:
 				component.set_SpriteName("MiscSprites.indicatorOff");
 				break;
-			case ILPCJIPBONE.IsLocked:
+			case IndicatorState.IsLocked:
 				component.set_SpriteName("MiscSprites.indicatorLocked");
 				break;
 			}

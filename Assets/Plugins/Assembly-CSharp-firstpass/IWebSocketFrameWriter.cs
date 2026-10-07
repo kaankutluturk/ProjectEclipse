@@ -1,6 +1,6 @@
 public interface IWebSocketFrameWriter
 {
-	BECKAHJIEGE get_Type();
+	WebSocketFrameTypes get_Type();
 
 	byte[] Get();
 }

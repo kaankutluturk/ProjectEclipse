@@ -6,29 +6,29 @@ namespace Eclipse.UI { public static class MenuSceneFade {
  public static bool Deferred; public static Action Pending;
  public static bool Begin(ScreenType from,ScreenType to,Action load) { if(!Deferred)return false;Pending=load;return true; }
 }}
-public class QuestParameters {public string GAEPENBCCPB,BPPAPLLPBIJ="Map",GMDFCHJBJGO;public object OIKHBNOANPP;}
-public class ListSF {public static readonly ListSF Value=new ListSF();public QuestParameters Parameters=new QuestParameters();public static ListSF GetInstance()=>Value;public QuestParameters BNMLDPNCMLB()=>Parameters;}
+public class QuestParameters {public string sceneFrom,currentSceneName="Map",sceneTo;public object currentTabName;}
+public class ListSF {public static readonly ListSF Value=new ListSF();public QuestParameters Parameters=new QuestParameters();public static ListSF GetInstance()=>Value;public QuestParameters GetQuestParameters()=>Parameters;}
 public static class GameUtils {
  public static bool SceneGate,TabGate,Throw;public static int Gates;
- public static SliderType NAMBCLFLNIN(object value)=>SliderType.None;
- public static bool OIGPBEKELCP(ScreenType value){Gates++;if(Throw)throw new Exception("native failure");return SceneGate;}
- public static bool MKADBAEEMFA(SliderType a,SliderType b){Gates++;return TabGate;}
+ public static SliderType GetSliderTypeByName(object value)=>SliderType.None;
+ public static bool NotifyShopOpened(ScreenType value){Gates++;if(Throw)throw new Exception("native failure");return SceneGate;}
+ public static bool NotifyTabChanged(SliderType a,SliderType b){Gates++;return TabGate;}
 }
-public static class MenuController {public static void BGFJOFOLGDH(bool value){}public static void BEMOBLOBCHN(){} }
+public static class MenuController {public static void SetNormalViewMode(bool value){}public static void RefreshRubySale(){} }
 public class Module {
- public class ScreenInfo {public ScreenType ScreenType=ScreenType.ModuleMap,HKJFKDEEIDJ;public object Data;public Action<object> Dlg;}
- public static Module Value=new Module();public ScreenInfo DMCJGOMOJEF=new ScreenInfo();public object Holder=new object();
+ public class ScreenInfo {public ScreenType ScreenType=ScreenType.ModuleMap,PreviousScreenType;public object Data;public Action<object> Dlg;}
+ public static Module Value=new Module();public ScreenInfo ScreenInfo=new ScreenInfo();public object Holder=new object();
  public int Transitions;public Action OnTransition;
  public static Module GetInstance()=>Value;
- public object BOHBCFMJPCA()=>Holder;
- public ScreenType GetCurrentScreenType()=>DMCJGOMOJEF.ScreenType;
- public static string INIOOEKJIDI(ScreenType type)=>type.ToString();
- public static SliderType PDLBAGNMFIN(ScreenType type,object data)=>SliderType.None;
- public void OAAFAINKKMI(){Transitions++;OnTransition?.Invoke();}
+ public object GetCurrentHolder()=>Holder;
+ public ScreenType GetCurrentScreenType()=>ScreenInfo.ScreenType;
+ public static string GetScreenName(ScreenType type)=>type.ToString();
+ public static SliderType GetSliderTypeForScreen(ScreenType type,object data)=>SliderType.None;
+ public void LoadCurrentScreen(){Transitions++;OnTransition?.Invoke();}
  public void CallEvent(int id,object data){}
  /* NATIVE */
 }
-public static class SceneManagerSF {public static ScreenType Current=ScreenType.ModuleMap;public static ScreenType EKFBDMBCDMB()=>Current;}
+public static class SceneManagerSF {public static ScreenType Current=ScreenType.ModuleMap;public static ScreenType GetCurrentScreen()=>Current;}
 namespace UnityEngine.SceneManagement {public struct Scene {public int buildIndex;}public static class SceneManager {public static int Index=4;public static Scene GetActiveScene()=>new Scene{buildIndex=Index};}}
 namespace Nekki.SF2.GUI {public class LockScreen {public class Object {public bool activeInHierarchy;}public Object gameObject=new Object();public static LockScreen Value;public static LockScreen get_Instance()=>Value;}}
 namespace Eclipse.UI.Modding {public static class ModUiGameBridge {public static bool NativeInputBlocked;}}
@@ -56,17 +56,17 @@ static class Program {
   Reject(()=>Eclipse.UI.Modding.ModUiGameBridge.NativeInputBlocked=true,"native input block");
   Reject(()=>Nekki.SF2.GUI.LockScreen.Value=new Nekki.SF2.GUI.LockScreen{gameObject=new Nekki.SF2.GUI.LockScreen.Object{activeInHierarchy=true}},"native lock screen");
   Reject(()=>Module.Value.Holder=null,"scene not initialized");
-  Reject(()=>Module.Value.DMCJGOMOJEF.ScreenType=ScreenType.ModuleShop,"transition already requested");
+  Reject(()=>Module.Value.ScreenInfo.ScreenType=ScreenType.ModuleShop,"transition already requested");
   Reject(()=>UnityEngine.SceneManagement.SceneManager.Index=1,"active loader scene");
   foreach(var screen in new[]{ScreenType.ModuleFight,ScreenType.Loader,ScreenType.ModulePreloader,ScreenType.ModuleCreditsScreen,ScreenType.ModuleNone})
-   Reject(()=>{SceneManagerSF.Current=screen;Module.Value.DMCJGOMOJEF.ScreenType=screen;UnityEngine.SceneManagement.SceneManager.Index=(int)screen;},"unsupported source "+screen);
+   Reject(()=>{SceneManagerSF.Current=screen;Module.Value.ScreenInfo.ScreenType=screen;UnityEngine.SceneManagement.SceneManager.Index=(int)screen;},"unsupported source "+screen);
   foreach(var destination in new[]{"map","shop","profile","dojo"}){
    Reset();bool same=destination=="map";
    Check(ModRuntime.TryNavigateScene(destination),"valid destination "+destination);
    Check(Module.Value.Transitions==(same?0:1)&&GameUtils.Gates==(same?0:2),"preserved native transition and both gates "+destination);
   }
   foreach(var source in new[]{ScreenType.ModuleShop,ScreenType.ModuleProfile,ScreenType.ModuleDojo}){
-   Reset();SceneManagerSF.Current=source;Module.Value.DMCJGOMOJEF.ScreenType=source;UnityEngine.SceneManagement.SceneManager.Index=(int)source;
+   Reset();SceneManagerSF.Current=source;Module.Value.ScreenInfo.ScreenType=source;UnityEngine.SceneManagement.SceneManager.Index=(int)source;
    Check(ModRuntime.TryNavigateScene("map")&&Module.Value.Transitions==1,"valid source "+source);
   }
   Reset();GameUtils.SceneGate=true;

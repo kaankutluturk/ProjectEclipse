@@ -4,29 +4,29 @@ internal sealed class InfTree
 {
 	private const int MANY = 1440;
 
-	private const int PCOACPDIDLE = 0;
+	private const int Z_OK = 0;
 
-	private const int MMLCEDDFCML = 1;
+	private const int Z_STREAM_END = 1;
 
-	private const int GJCGJLNINCO = 2;
+	private const int Z_NEED_DICT = 2;
 
-	private const int ONHOKLDPLDE = -1;
+	private const int Z_ERRNO = -1;
 
-	private const int PNHCFLGBENF = -2;
+	private const int Z_STREAM_ERROR = -2;
 
-	private const int HKEFBFJDGAA = -3;
+	private const int Z_DATA_ERROR = -3;
 
-	private const int PKJMAJBDKKM = -4;
+	private const int Z_MEM_ERROR = -4;
 
-	private const int HMIPOPCKGHN = -5;
+	private const int Z_BUF_ERROR = -5;
 
-	private const int IANPNPFINHF = -6;
+	private const int Z_VERSION_ERROR = -6;
 
-	internal const int KEMABIFGJAN = 9;
+	internal const int fixed_bl = 9;
 
-	internal const int CNJKIFLBGFE = 5;
+	internal const int fixed_bd = 5;
 
-	internal static readonly int[] DHKOPCEMKJJ = new int[1536]
+	internal static readonly int[] fixed_tl = new int[1536]
 	{
 		96, 7, 256, 0, 8, 80, 0, 8, 16, 84,
 		8, 115, 82, 7, 31, 0, 8, 112, 0, 8,
@@ -184,7 +184,7 @@ internal sealed class InfTree
 		0, 8, 79, 0, 9, 255
 	};
 
-	internal static readonly int[] LPMHKHGDLPN = new int[96]
+	internal static readonly int[] fixed_td = new int[96]
 	{
 		80, 5, 1, 87, 5, 257, 83, 5, 17, 91,
 		5, 4097, 81, 5, 5, 89, 5, 1025, 85, 5,
@@ -198,7 +198,7 @@ internal sealed class InfTree
 		86, 5, 193, 192, 5, 24577
 	};
 
-	internal static readonly int[] OLMGFJGMPME = new int[31]
+	internal static readonly int[] cplens = new int[31]
 	{
 		3, 4, 5, 6, 7, 8, 9, 10, 11, 13,
 		15, 17, 19, 23, 27, 31, 35, 43, 51, 59,
@@ -206,7 +206,7 @@ internal sealed class InfTree
 		0
 	};
 
-	internal static readonly int[] CGKBEKFKGAL = new int[31]
+	internal static readonly int[] cplext = new int[31]
 	{
 		0, 0, 0, 0, 0, 0, 0, 0, 1, 1,
 		1, 1, 2, 2, 2, 2, 3, 3, 3, 3,
@@ -214,46 +214,46 @@ internal sealed class InfTree
 		112
 	};
 
-	internal static readonly int[] NHIEONALKPD = new int[30]
+	internal static readonly int[] cpdist = new int[30]
 	{
 		1, 2, 3, 4, 5, 7, 9, 13, 17, 25,
 		33, 49, 65, 97, 129, 193, 257, 385, 513, 769,
 		1025, 1537, 2049, 3073, 4097, 6145, 8193, 12289, 16385, 24577
 	};
 
-	internal static readonly int[] INCBEEMOMPK = new int[30]
+	internal static readonly int[] cpdext = new int[30]
 	{
 		0, 0, 0, 0, 1, 1, 2, 2, 3, 3,
 		4, 4, 5, 5, 6, 6, 7, 7, 8, 8,
 		9, 9, 10, 10, 11, 11, 12, 12, 13, 13
 	};
 
-	internal const int ACIDDPNGKKM = 15;
+	internal const int BMAX = 15;
 
-	internal int[] MNBNAEAJGCA;
+	internal int[] hn;
 
-	internal int[] AFIEJABPAKA;
+	internal int[] v;
 
-	internal int[] ILHDJDNPFKH;
+	internal int[] BitLengthCounts;
 
-	internal int[] BOPODEAIEBJ;
+	internal int[] TableEntryScratch;
 
-	internal int[] HMAAMFNACEI;
+	internal int[] u;
 
-	internal int[] DHDMNHCIPEH;
+	internal int[] x;
 
-	private int AIPNIKIPIMB(int[] AAOIAEJJINO, int ENHNNLJLKCI, int HDKKKCDKFEE, int JDCCBCNFENK, int[] d, int[] FOPOKALJIIJ, int[] GNAONAPDDLD, int[] OFBGCEPCNOL, int[] JNNBEHPCCOB, int[] MNBNAEAJGCA, int[] AFIEJABPAKA)
+	private int huft_build(int[] AAOIAEJJINO, int ENHNNLJLKCI, int HDKKKCDKFEE, int JDCCBCNFENK, int[] d, int[] FOPOKALJIIJ, int[] GNAONAPDDLD, int[] OFBGCEPCNOL, int[] JNNBEHPCCOB, int[] MNBNAEAJGCA, int[] AFIEJABPAKA)
 	{
 		int num = 0;
 		int num2 = HDKKKCDKFEE;
 		do
 		{
-			ILHDJDNPFKH[AAOIAEJJINO[ENHNNLJLKCI + num]]++;
+			BitLengthCounts[AAOIAEJJINO[ENHNNLJLKCI + num]]++;
 			num++;
 			num2--;
 		}
 		while (num2 != 0);
-		if (ILHDJDNPFKH[0] == HDKKKCDKFEE)
+		if (BitLengthCounts[0] == HDKKKCDKFEE)
 		{
 			GNAONAPDDLD[0] = -1;
 			OFBGCEPCNOL[0] = 0;
@@ -261,7 +261,7 @@ internal sealed class InfTree
 		}
 		int num3 = OFBGCEPCNOL[0];
 		int i;
-		for (i = 1; i <= 15 && ILHDJDNPFKH[i] == 0; i++)
+		for (i = 1; i <= 15 && BitLengthCounts[i] == 0; i++)
 		{
 		}
 		int j = i;
@@ -270,7 +270,7 @@ internal sealed class InfTree
 			num3 = i;
 		}
 		num2 = 15;
-		while (num2 != 0 && ILHDJDNPFKH[num2] == 0)
+		while (num2 != 0 && BitLengthCounts[num2] == 0)
 		{
 			num2--;
 		}
@@ -283,24 +283,24 @@ internal sealed class InfTree
 		int num5 = 1 << i;
 		while (i < num2)
 		{
-			if ((num5 -= ILHDJDNPFKH[i]) < 0)
+			if ((num5 -= BitLengthCounts[i]) < 0)
 			{
 				return -3;
 			}
 			i++;
 			num5 <<= 1;
 		}
-		if ((num5 -= ILHDJDNPFKH[num2]) < 0)
+		if ((num5 -= BitLengthCounts[num2]) < 0)
 		{
 			return -3;
 		}
-		ILHDJDNPFKH[num2] += num5;
-		i = (DHDMNHCIPEH[1] = 0);
+		BitLengthCounts[num2] += num5;
+		i = (x[1] = 0);
 		num = 1;
 		int num6 = 2;
 		while (--num2 != 0)
 		{
-			i = (DHDMNHCIPEH[num6] = i + ILHDJDNPFKH[num]);
+			i = (x[num6] = i + BitLengthCounts[num]);
 			num6++;
 			num++;
 		}
@@ -310,22 +310,22 @@ internal sealed class InfTree
 		{
 			if ((i = AAOIAEJJINO[ENHNNLJLKCI + num]) != 0)
 			{
-				AFIEJABPAKA[DHDMNHCIPEH[i]++] = num2;
+				AFIEJABPAKA[x[i]++] = num2;
 			}
 			num++;
 		}
 		while (++num2 < HDKKKCDKFEE);
-		HDKKKCDKFEE = DHDMNHCIPEH[num4];
-		num2 = (DHDMNHCIPEH[0] = 0);
+		HDKKKCDKFEE = x[num4];
+		num2 = (x[0] = 0);
 		num = 0;
 		int num7 = -1;
 		int num8 = -num3;
-		HMAAMFNACEI[0] = 0;
+		u[0] = 0;
 		int num9 = 0;
 		int num10 = 0;
 		for (; j <= num4; j++)
 		{
-			int num11 = ILHDJDNPFKH[j];
+			int num11 = BitLengthCounts[j];
 			while (num11-- != 0)
 			{
 				int num12;
@@ -341,9 +341,9 @@ internal sealed class InfTree
 						num6 = j;
 						if (i < num10)
 						{
-							while (++i < num10 && (num12 <<= 1) > ILHDJDNPFKH[++num6])
+							while (++i < num10 && (num12 <<= 1) > BitLengthCounts[++num6])
 							{
-								num12 -= ILHDJDNPFKH[num6];
+								num12 -= BitLengthCounts[num6];
 							}
 						}
 					}
@@ -352,51 +352,51 @@ internal sealed class InfTree
 					{
 						return -3;
 					}
-					num9 = (HMAAMFNACEI[num7] = MNBNAEAJGCA[0]);
+					num9 = (u[num7] = MNBNAEAJGCA[0]);
 					MNBNAEAJGCA[0] += num10;
 					if (num7 != 0)
 					{
-						DHDMNHCIPEH[num7] = num2;
-						BOPODEAIEBJ[0] = (sbyte)i;
-						BOPODEAIEBJ[1] = (sbyte)num3;
-						i = SharedUtils.AMEAMGBOINH(num2, num8 - num3);
-						BOPODEAIEBJ[2] = num9 - HMAAMFNACEI[num7 - 1] - i;
-						Array.Copy(BOPODEAIEBJ, 0, JNNBEHPCCOB, (HMAAMFNACEI[num7 - 1] + i) * 3, 3);
+						x[num7] = num2;
+						TableEntryScratch[0] = (sbyte)i;
+						TableEntryScratch[1] = (sbyte)num3;
+						i = SharedUtils.URShift(num2, num8 - num3);
+						TableEntryScratch[2] = num9 - u[num7 - 1] - i;
+						Array.Copy(TableEntryScratch, 0, JNNBEHPCCOB, (u[num7 - 1] + i) * 3, 3);
 					}
 					else
 					{
 						GNAONAPDDLD[0] = num9;
 					}
 				}
-				BOPODEAIEBJ[1] = (sbyte)(j - num8);
+				TableEntryScratch[1] = (sbyte)(j - num8);
 				if (num >= HDKKKCDKFEE)
 				{
-					BOPODEAIEBJ[0] = 192;
+					TableEntryScratch[0] = 192;
 				}
 				else if (AFIEJABPAKA[num] < JDCCBCNFENK)
 				{
-					BOPODEAIEBJ[0] = (sbyte)((AFIEJABPAKA[num] >= 256) ? 96 : 0);
-					BOPODEAIEBJ[2] = AFIEJABPAKA[num++];
+					TableEntryScratch[0] = (sbyte)((AFIEJABPAKA[num] >= 256) ? 96 : 0);
+					TableEntryScratch[2] = AFIEJABPAKA[num++];
 				}
 				else
 				{
-					BOPODEAIEBJ[0] = (sbyte)(FOPOKALJIIJ[AFIEJABPAKA[num] - JDCCBCNFENK] + 16 + 64);
-					BOPODEAIEBJ[2] = d[AFIEJABPAKA[num++] - JDCCBCNFENK];
+					TableEntryScratch[0] = (sbyte)(FOPOKALJIIJ[AFIEJABPAKA[num] - JDCCBCNFENK] + 16 + 64);
+					TableEntryScratch[2] = d[AFIEJABPAKA[num++] - JDCCBCNFENK];
 				}
 				num12 = 1 << j - num8;
-				for (i = SharedUtils.AMEAMGBOINH(num2, num8); i < num10; i += num12)
+				for (i = SharedUtils.URShift(num2, num8); i < num10; i += num12)
 				{
-					Array.Copy(BOPODEAIEBJ, 0, JNNBEHPCCOB, (num9 + i) * 3, 3);
+					Array.Copy(TableEntryScratch, 0, JNNBEHPCCOB, (num9 + i) * 3, 3);
 				}
 				i = 1 << j - 1;
 				while ((num2 & i) != 0)
 				{
 					num2 ^= i;
-					i = SharedUtils.AMEAMGBOINH(i, 1);
+					i = SharedUtils.URShift(i, 1);
 				}
 				num2 ^= i;
 				int num13 = (1 << num8) - 1;
-				while ((num2 & num13) != DHDMNHCIPEH[num7])
+				while ((num2 & num13) != x[num7])
 				{
 					num7--;
 					num8 -= num3;
@@ -407,11 +407,11 @@ internal sealed class InfTree
 		return (num5 != 0 && num4 != 1) ? (-5) : 0;
 	}
 
-	internal int NLOHPGJGJJN(int[] ILHDJDNPFKH, int[] KKFMKNCBLDC, int[] ILPHPGNPGAE, int[] JNNBEHPCCOB, ZlibCodec LKPCKJOLJDO)
+	internal int inflate_trees_bits(int[] ILHDJDNPFKH, int[] KKFMKNCBLDC, int[] ILPHPGNPGAE, int[] JNNBEHPCCOB, ZlibCodec LKPCKJOLJDO)
 	{
-		FIKBOENFICO(19);
-		MNBNAEAJGCA[0] = 0;
-		int num = AIPNIKIPIMB(ILHDJDNPFKH, 0, 19, 19, null, null, ILPHPGNPGAE, KKFMKNCBLDC, JNNBEHPCCOB, MNBNAEAJGCA, AFIEJABPAKA);
+		initWorkArea(19);
+		hn[0] = 0;
+		int num = huft_build(ILHDJDNPFKH, 0, 19, 19, null, null, ILPHPGNPGAE, KKFMKNCBLDC, JNNBEHPCCOB, hn, v);
 		if (num == -3)
 		{
 			LKPCKJOLJDO.Message = "oversubscribed dynamic bit lengths tree";
@@ -424,11 +424,11 @@ internal sealed class InfTree
 		return num;
 	}
 
-	internal int ENIFNPJMGIB(int BIFPNHEPFNI, int FIOKFKIJFNF, int[] ILHDJDNPFKH, int[] GGEJHHHGPKN, int[] NBHIKILKMED, int[] AEFHBJIMPHM, int[] GICLKGGKJAG, int[] JNNBEHPCCOB, ZlibCodec LKPCKJOLJDO)
+	internal int inflate_trees_dynamic(int BIFPNHEPFNI, int FIOKFKIJFNF, int[] ILHDJDNPFKH, int[] GGEJHHHGPKN, int[] NBHIKILKMED, int[] AEFHBJIMPHM, int[] GICLKGGKJAG, int[] JNNBEHPCCOB, ZlibCodec LKPCKJOLJDO)
 	{
-		FIKBOENFICO(288);
-		MNBNAEAJGCA[0] = 0;
-		int num = AIPNIKIPIMB(ILHDJDNPFKH, 0, BIFPNHEPFNI, 257, OLMGFJGMPME, CGKBEKFKGAL, AEFHBJIMPHM, GGEJHHHGPKN, JNNBEHPCCOB, MNBNAEAJGCA, AFIEJABPAKA);
+		initWorkArea(288);
+		hn[0] = 0;
+		int num = huft_build(ILHDJDNPFKH, 0, BIFPNHEPFNI, 257, cplens, cplext, AEFHBJIMPHM, GGEJHHHGPKN, JNNBEHPCCOB, hn, v);
 		if (num != 0 || GGEJHHHGPKN[0] == 0)
 		{
 			switch (num)
@@ -445,8 +445,8 @@ internal sealed class InfTree
 			}
 			return num;
 		}
-		FIKBOENFICO(288);
-		num = AIPNIKIPIMB(ILHDJDNPFKH, BIFPNHEPFNI, FIOKFKIJFNF, 0, NHIEONALKPD, INCBEEMOMPK, GICLKGGKJAG, NBHIKILKMED, JNNBEHPCCOB, MNBNAEAJGCA, AFIEJABPAKA);
+		initWorkArea(288);
+		num = huft_build(ILHDJDNPFKH, BIFPNHEPFNI, FIOKFKIJFNF, 0, cpdist, cpdext, GICLKGGKJAG, NBHIKILKMED, JNNBEHPCCOB, hn, v);
 		if (num != 0 || (NBHIKILKMED[0] == 0 && BIFPNHEPFNI > 257))
 		{
 			switch (num)
@@ -470,37 +470,37 @@ internal sealed class InfTree
 		return 0;
 	}
 
-	internal static int KFBEFCDGIDA(int[] GGEJHHHGPKN, int[] NBHIKILKMED, int[][] AEFHBJIMPHM, int[][] GICLKGGKJAG, ZlibCodec LKPCKJOLJDO)
+	internal static int inflate_trees_fixed(int[] GGEJHHHGPKN, int[] NBHIKILKMED, int[][] AEFHBJIMPHM, int[][] GICLKGGKJAG, ZlibCodec LKPCKJOLJDO)
 	{
 		GGEJHHHGPKN[0] = 9;
 		NBHIKILKMED[0] = 5;
-		AEFHBJIMPHM[0] = DHKOPCEMKJJ;
-		GICLKGGKJAG[0] = LPMHKHGDLPN;
+		AEFHBJIMPHM[0] = fixed_tl;
+		GICLKGGKJAG[0] = fixed_td;
 		return 0;
 	}
 
-	private void FIKBOENFICO(int IJFMGIJHHGE)
+	private void initWorkArea(int IJFMGIJHHGE)
 	{
-		if (MNBNAEAJGCA == null)
+		if (hn == null)
 		{
-			MNBNAEAJGCA = new int[1];
-			AFIEJABPAKA = new int[IJFMGIJHHGE];
-			ILHDJDNPFKH = new int[16];
-			BOPODEAIEBJ = new int[3];
-			HMAAMFNACEI = new int[15];
-			DHDMNHCIPEH = new int[16];
+			hn = new int[1];
+			v = new int[IJFMGIJHHGE];
+			BitLengthCounts = new int[16];
+			TableEntryScratch = new int[3];
+			u = new int[15];
+			x = new int[16];
 			return;
 		}
-		if (AFIEJABPAKA.Length < IJFMGIJHHGE)
+		if (v.Length < IJFMGIJHHGE)
 		{
-			AFIEJABPAKA = new int[IJFMGIJHHGE];
+			v = new int[IJFMGIJHHGE];
 		}
-		Array.Clear(AFIEJABPAKA, 0, IJFMGIJHHGE);
-		Array.Clear(ILHDJDNPFKH, 0, 16);
-		BOPODEAIEBJ[0] = 0;
-		BOPODEAIEBJ[1] = 0;
-		BOPODEAIEBJ[2] = 0;
-		Array.Clear(HMAAMFNACEI, 0, 15);
-		Array.Clear(DHDMNHCIPEH, 0, 16);
+		Array.Clear(v, 0, IJFMGIJHHGE);
+		Array.Clear(BitLengthCounts, 0, 16);
+		TableEntryScratch[0] = 0;
+		TableEntryScratch[1] = 0;
+		TableEntryScratch[2] = 0;
+		Array.Clear(u, 0, 15);
+		Array.Clear(x, 0, 16);
 	}
 }

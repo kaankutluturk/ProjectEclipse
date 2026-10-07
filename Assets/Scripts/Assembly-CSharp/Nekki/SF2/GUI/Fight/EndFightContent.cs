@@ -38,25 +38,25 @@ namespace Nekki.SF2.GUI.Fight
 		[SerializeField]
 		private Transform _buttonPanel;
 
-		private VerticalLayoutGroup KCAMOOCBMBE;
+		private VerticalLayoutGroup ownLayout;
 
-		private VerticalLayoutGroup JJPGPNCNFII;
+		private VerticalLayoutGroup parentLayout;
 
-		private FightResult MPFLHOFEOGI;
+		private FightResult fightResult;
 
 		private ItemRewardHardmode _itemReward;
 
-		private List<Line> GOJABLKPFJM = new List<Line>();
+		private List<Line> lines = new List<Line>();
 
 		private List<ItemInfo> _items = new List<ItemInfo>();
 
 		private int _currentLine;
 
-		private const float ICLIJILAGMB = 300f;
+		private const float RewardSpacing = 300f;
 
-		private float LGEDDHALPDI;
+		private float savedParentSpacing;
 
-		private float AAGLGCPCECE;
+		private float savedOwnSpacing;
 
 		public UnityEvent AnimationEndEvent = new UnityEvent();
 
@@ -69,37 +69,37 @@ namespace Nekki.SF2.GUI.Fight
 			if (_buttonOk != null)
 				((RectTransform)_buttonOk.transform).anchoredPosition = Vector2.zero;
 			_animationFinishButton = OBMBALDIBEB;
-			MPFLHOFEOGI = HEIADONEACH;
+			fightResult = HEIADONEACH;
 			_currentLine = 0;
-			_items = MPFLHOFEOGI.PMIHPJFAJIO.PJNJIJIODHE(true);
+			_items = fightResult.Prize.GetItems(true);
 			bool flag = _items.Count > 0;
-			JJPGPNCNFII = KPAICOOKACB;
-			KCAMOOCBMBE = GetComponent<VerticalLayoutGroup>();
+			parentLayout = KPAICOOKACB;
+			ownLayout = GetComponent<VerticalLayoutGroup>();
 			if (!flag)
 			{
-				HIODPBFDLIM();
+				ShowResultLines();
 			}
 			else
 			{
-				JHGJAJAIONL();
+				ShowItemReward();
 			}
 		}
 
-		private void JHGJAJAIONL()
+		private void ShowItemReward()
 		{
 			if (_animationFinishButton != null)
 			{
 				_animationFinishButton.gameObject.SetActive(false);
 			}
-			if ((bool)JJPGPNCNFII)
+			if ((bool)parentLayout)
 			{
-				LGEDDHALPDI = JJPGPNCNFII.spacing;
-				JJPGPNCNFII.spacing = 300f;
+				savedParentSpacing = parentLayout.spacing;
+				parentLayout.spacing = 300f;
 			}
-			if ((bool)KCAMOOCBMBE)
+			if ((bool)ownLayout)
 			{
-				AAGLGCPCECE = KCAMOOCBMBE.spacing;
-				KCAMOOCBMBE.spacing = 300f;
+				savedOwnSpacing = ownLayout.spacing;
+				ownLayout.spacing = 300f;
 			}
 			if (_items.Count != 0)
 			{
@@ -110,7 +110,7 @@ namespace Nekki.SF2.GUI.Fight
 			}
 			if (_buttonOk != null)
 			{
-				_buttonOk.onClick.AddListener(ILBGMNNMIEN);
+				_buttonOk.onClick.AddListener(OnRewardOkClicked);
 				_buttonOk.gameObject.SetActive(true);
 			}
 			if (_buttonPanel != null)
@@ -119,7 +119,7 @@ namespace Nekki.SF2.GUI.Fight
 			}
 		}
 
-		private void HIODPBFDLIM()
+		private void ShowResultLines()
 		{
 			if (_animationFinishButton != null)
 			{
@@ -127,16 +127,16 @@ namespace Nekki.SF2.GUI.Fight
 			}
 			if (_textAndMoneyLinePrefab != null)
 			{
-				GOJABLKPFJM.Add(CreateLine(goldPrizeAlias, MPFLHOFEOGI.AIOMDIAFHGB.ECOOCLMNFJM.PDJPOBHLIHA, MPFLHOFEOGI.AIOMDIAFHGB.ECOOCLMNFJM.JNCDLOAEMCG, string.Empty));
-				GOJABLKPFJM.Add(CreateLine(goldPerfectAlias, MPFLHOFEOGI.AIOMDIAFHGB.ECOOCLMNFJM.MKNGIDKGOLE, 0L, MPFLHOFEOGI.AIOMDIAFHGB.JDKFHFOJKPI.ToString()));
-				GOJABLKPFJM.Add(CreateLine(goldFirstStrikeAlias, MPFLHOFEOGI.AIOMDIAFHGB.ECOOCLMNFJM.LOONMILKCFK, 0L, MPFLHOFEOGI.AIOMDIAFHGB.MOLDOOIJELI.ToString()));
-				GOJABLKPFJM.Add(CreateLine(goldComboAlias, MPFLHOFEOGI.AIOMDIAFHGB.ECOOCLMNFJM.GKAEJDCDMHC, 0L, MPFLHOFEOGI.AIOMDIAFHGB.KKJHBKBMPGN.ToString()));
-				GOJABLKPFJM.Add(CreateLine(goldShockAlias, MPFLHOFEOGI.AIOMDIAFHGB.ECOOCLMNFJM.APCAKCCOMLO, 0L, MPFLHOFEOGI.AIOMDIAFHGB.OGMOILIMCOM.ToString()));
-				GOJABLKPFJM.Add(CreateLine(MPFLHOFEOGI.AIOMDIAFHGB.StatisticCrazyStyleToString, MPFLHOFEOGI.AIOMDIAFHGB.ECOOCLMNFJM.AIJNPAIMPHG, 0L, string.Empty));
+				lines.Add(CreateLine(goldPrizeAlias, fightResult.PlayerStatistics.Prize.BaseGold, fightResult.PlayerStatistics.Prize.Experience, string.Empty));
+				lines.Add(CreateLine(goldPerfectAlias, fightResult.PlayerStatistics.Prize.PerfectGold, 0L, fightResult.PlayerStatistics.PerfectCount.ToString()));
+				lines.Add(CreateLine(goldFirstStrikeAlias, fightResult.PlayerStatistics.Prize.FirstStrikeGold, 0L, fightResult.PlayerStatistics.FirstStrikeCount.ToString()));
+				lines.Add(CreateLine(goldComboAlias, fightResult.PlayerStatistics.Prize.ComboGold, 0L, fightResult.PlayerStatistics.MaxCombo.ToString()));
+				lines.Add(CreateLine(goldShockAlias, fightResult.PlayerStatistics.Prize.ShockGold, 0L, fightResult.PlayerStatistics.ShockCount.ToString()));
+				lines.Add(CreateLine(fightResult.PlayerStatistics.StatisticCrazyStyleToString, fightResult.PlayerStatistics.Prize.StyleGold, 0L, string.Empty));
 			}
 			if (_expAndMoneyLinePrefab != null)
 			{
-				GOJABLKPFJM.Add(CreateLine((long)MPFLHOFEOGI.NJNKGLJNNDH, MPFLHOFEOGI.AIOMDIAFHGB.ECOOCLMNFJM.POPNFGNAOJD));
+				lines.Add(CreateLine((long)fightResult.ExpReward, fightResult.PlayerStatistics.Prize.TotalGold));
 			}
 			if (_buttonOk != null)
 			{
@@ -150,55 +150,55 @@ namespace Nekki.SF2.GUI.Fight
 			{
 				_buttonPanel.SetAsLastSibling();
 			}
-			BKOEBBIFCDE();
+			StartNextLine();
 		}
 
-		private void ILBGMNNMIEN()
+		private void OnRewardOkClicked()
 		{
 			if (_buttonOk != null)
 			{
-				_buttonOk.onClick.RemoveListener(ILBGMNNMIEN);
+				_buttonOk.onClick.RemoveListener(OnRewardOkClicked);
 			}
-			if ((bool)JJPGPNCNFII)
+			if ((bool)parentLayout)
 			{
-				JJPGPNCNFII.spacing = LGEDDHALPDI;
+				parentLayout.spacing = savedParentSpacing;
 			}
-			if ((bool)KCAMOOCBMBE)
+			if ((bool)ownLayout)
 			{
-				KCAMOOCBMBE.spacing = AAGLGCPCECE;
+				ownLayout.spacing = savedOwnSpacing;
 			}
 			Object.DestroyObject(_itemReward.gameObject);
-			HIODPBFDLIM();
+			ShowResultLines();
 		}
 
-		private void BKOEBBIFCDE()
+		private void StartNextLine()
 		{
-			if (_currentLine < GOJABLKPFJM.Count)
+			if (_currentLine < lines.Count)
 			{
-				Line fCMOHBLGJFP = GOJABLKPFJM[_currentLine];
-				fCMOHBLGJFP.AddListener(JACPGFBNLDI);
+				Line fCMOHBLGJFP = lines[_currentLine];
+				fCMOHBLGJFP.AddListener(OnLineFinished);
 				fCMOHBLGJFP.AddListener(fCMOHBLGJFP.StartAnimation);
 				fCMOHBLGJFP.StartAnimation();
 				return;
 			}
-			Line fCMOHBLGJFP2 = ((GOJABLKPFJM.Count <= 0) ? null : GOJABLKPFJM[GOJABLKPFJM.Count - 1]);
+			Line fCMOHBLGJFP2 = ((lines.Count <= 0) ? null : lines[lines.Count - 1]);
 			if (fCMOHBLGJFP2 != null)
 			{
-				fCMOHBLGJFP2.AddListener(OCHPJGEBHAE);
+				fCMOHBLGJFP2.AddListener(OnAllLinesFinished);
 			}
-			foreach (Line item in GOJABLKPFJM)
+			foreach (Line item in lines)
 			{
-				item.RemoveListener(JACPGFBNLDI);
+				item.RemoveListener(OnLineFinished);
 				item.RemoveListener(item.StartAnimation);
 			}
 		}
 
-		private void JACPGFBNLDI()
+		private void OnLineFinished()
 		{
-			StartCoroutine(LFPPJMCFOND());
+			StartCoroutine(AdvanceLineCoroutine());
 		}
 
-		private void OCHPJGEBHAE()
+		private void OnAllLinesFinished()
 		{
 			AnimationEndEvent.Invoke();
 			if (_buttonOk != null)
@@ -207,11 +207,11 @@ namespace Nekki.SF2.GUI.Fight
 			}
 		}
 
-		private IEnumerator LFPPJMCFOND()
+		private IEnumerator AdvanceLineCoroutine()
 		{
 			yield return new WaitForEndOfFrame();
 			_currentLine++;
-			BKOEBBIFCDE();
+			StartNextLine();
 		}
 
 		public Line CreateLine(string HCPNFPMHFCM, long GBGNFPNCGED, long PAGGOKFIEOP = 0L, string BBLOBPOCGNM = "")
@@ -234,11 +234,11 @@ namespace Nekki.SF2.GUI.Fight
 
 		public void FinishAnimation()
 		{
-			foreach (Line item in GOJABLKPFJM)
+			foreach (Line item in lines)
 			{
 				item.FinishAnimation();
 			}
-			OCHPJGEBHAE();
+			OnAllLinesFinished();
 		}
 	}
 }

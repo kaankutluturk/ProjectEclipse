@@ -103,15 +103,19 @@ wait for or belong behind the modding/content API. See `Docs/DE_SCOPE_AUDIT.md`.
 - Deobfuscation mappings must be supported by recorded structural or behavioral
   evidence. Use the conservative scripts and their dry-run/idempotency checks;
   do not guess names from proximity or replace identifier substrings.
-- For obfuscated identifiers used by newly authored Eclipse code, make a
-  best-effort descriptive naming guess from the declaration, implementation and
-  callers. Limit this cleanup to symbols our new code actually uses, including
-  necessary updates to their existing callers. Mark each inferred declaration
-  with the exact comment `// best guess for name`. Reuse an existing descriptive
-  name when available. Check the owning type, name collisions, reflection and
-  serialized references before renaming; a shared obfuscated token does not
-  imply a shared meaning. Keep these guesses separate from confirmed recovery
-  mappings in `Deobfuscation/`.
+- Most formerly obfuscated symbols now carry descriptive names inferred from
+  the code. These are behavioral guesses, not recovered original names; each one
+  is recorded with its evidence in `Deobfuscation/inferred_symbols.tsv`. Improve a
+  name freely when the logic supports a better one.
+- To rename a remaining obfuscated identifier, use
+  `Tools/Recovery/SymbolRenamer` (see `Deobfuscation/README.md`). It renames by
+  resolved symbol, never by text, and rejects any rename that changes what an
+  identifier binds to or adds a compile error. Add a ledger row to
+  `inferred_symbols.tsv` instead of an inline comment. Existing
+  `// best guess for name` comments may stay. A shared obfuscated token does not
+  imply a shared meaning. Check reflection strings, JSON/serialized member names
+  and the regression scripts under `Tools/` that reference recovered names. Keep
+  these guesses separate from the confirmed recovery mappings in `Deobfuscation/`.
 
 ## Build and verification
 

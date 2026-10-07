@@ -16,22 +16,22 @@ foreach ($name in @('usersDefault.xml', 'usersDefaultWarrior.xml')) {
 # Bypass unrelated profile construction. Zero backing fields model a depleted
 # old save without its entitlement; no profile XML is available for timer writes.
 $roster = [Runtime.Serialization.FormatterServices]::GetUninitializedObject([Roster])
-$roster.OGLHGFJKMCO = 5
-$roster.DIJOCFEFHAK = 0
-$roster.ADKHNLAMDJP = $false
-Assert-Energy $roster.ADKHNLAMDJP 'Legacy writes can disable unlimited energy'
+$roster.PowerMax = 5
+$roster.PowerRegenSeconds = 0
+$roster.HasUnlimitedEnergy = $false
+Assert-Energy $roster.HasUnlimitedEnergy 'Legacy writes can disable unlimited energy'
 foreach ($value in @([int]::MinValue, -100, -1, 0, 1, 100, [int]::MaxValue)) {
     Assert-Energy ($roster.ChangePower($value)) 'Energy cost rejected'
-    $roster.DKAAELKJJOP($value)
-    Assert-Energy ($roster.NHKMGNPADKI() -eq 5) 'Energy changed from full'
+    $roster.SetPower($value)
+    Assert-Energy ($roster.GetMaxPower() -eq 5) 'Energy changed from full'
 }
 foreach ($time in @([long]::MinValue, -1L, 0L, 1720000000L, [long]::MaxValue)) {
-    $roster.ALJEKDDKPJJ($time)
-    Assert-Energy ($roster.NHFHDFIJEJG() -eq -1) 'Energy regeneration timer is active'
-    Assert-Energy ($roster.NHKMGNPADKI() -eq 5) 'Clock changed energy'
+    $roster.UpdatePowerRegeneration($time)
+    Assert-Energy ($roster.GetEnergyRefillTimer() -eq -1) 'Energy regeneration timer is active'
+    Assert-Energy ($roster.GetMaxPower() -eq 5) 'Clock changed energy'
 }
 $notifications = [Runtime.Serialization.FormatterServices]::GetUninitializedObject([LocalNotificationManager])
-$notifications.DODOMBCHMDN(0L)
-$notifications.HOHFHDMEDLI(0L)
+$notifications.ScheduleEnergy(0L)
+$notifications.ScheduleEnergyFull(0L)
 $checks += 2 # No Unity scheduler, localization, or live state is available.
 Write-Output "PASS: $checks disabled-energy assertions (fresh templates, depleted roster, extreme costs/timestamps, no refill notifications)."

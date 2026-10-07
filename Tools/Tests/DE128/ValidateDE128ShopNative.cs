@@ -60,7 +60,7 @@ public static class ValidateDE128ShopNative
                 return;
             }
             var scripts = ModRuntime.Scripts;
-            var roster = ListSF.CCDKHLAMKKO();
+            var roster = ListSF.GetRoster();
             if (scripts == null || roster == null || Module.GetInstance() == null) return;
             var screen = Module.GetInstance().GetCurrentScreenType();
             if (scripts.Diagnostics.Count != 0)
@@ -129,7 +129,7 @@ public static class ValidateDE128ShopNative
 
     static void CheckForge()
     {
-        var manager = ForgeManager.ELEBLBJKDBI();
+        var manager = ForgeManager.GetInstance();
         if (manager.Recipes.Count != 5) throw new Exception("Expected three core and two DE128 forge recipes.");
         var simple = manager.GetRecipeByName("Simple");
         var complex = manager.GetRecipeByName("Complex");
@@ -180,39 +180,39 @@ public static class ValidateDE128ShopNative
 
     static void Buy(Roster roster)
     {
-        roster.OIOOMAKNIOB(10000000);
-        roster.LLNELLFMMBB(1000, Roster.HPOIJPGPOCF.CHANGE_INIT);
+        roster.SetMoney(10000000);
+        roster.SetBonus(1000, Roster.BalanceChangeType.CHANGE_INIT);
         var scythe = Item("WEAPON_HW15_SCYTHE");
         var armor = Item("ARMOR_ANNIVERSARY_10TH");
         var helm = Item("HELM_STARTER_PACK");
         if ((long)scythe.CoinPrice != 2550000 || (long)scythe.GemPrice != 97 ||
             (long)armor.GemPrice != 79 || (long)helm.GemPrice != 24 || helm.LocalUpgrades.Count != 0)
             throw new Exception("Representative archived prices or starter-helm upgrade profile changed.");
-        if (!ItemBuyHelper.IHHKNBPKGHD(scythe) || roster.BFBOEGMAMNF() != 7450000 || roster.EHFJHFDACMP() != 1000)
+        if (!ItemBuyHelper.BuyItemWithCoins(scythe) || roster.GetMoney() != 7450000 || roster.GetBonus() != 1000)
             throw new Exception("Native dual-currency coin purchase failed.");
-        if (!ItemBuyHelper.MGMAJHLAICA(armor) || roster.BFBOEGMAMNF() != 7450000 || roster.EHFJHFDACMP() != 921)
+        if (!ItemBuyHelper.BuyItemWithGems(armor) || roster.GetMoney() != 7450000 || roster.GetBonus() != 921)
             throw new Exception("Native gem purchase failed.");
-        if (!ItemBuyHelper.MGMAJHLAICA(helm) || roster.EHFJHFDACMP() != 897)
+        if (!ItemBuyHelper.BuyItemWithGems(helm) || roster.GetBonus() != 897)
             throw new Exception("Native starter helm purchase failed.");
         foreach (var item in new[] { scythe, armor, helm })
         {
-            var owned = roster.KHCNHPCPFII().CMGOCLGHNLH(item);
-            if (owned == null || owned.OFOPFCJNEBL() != 1 || owned.IJGAOHJNLAH() > 0 ||
+            var owned = roster.GetInventory().FindItem(item);
+            if (owned == null || owned.GetCount() != 1 || owned.GetDeliveryTimestamp() > 0 ||
                 owned.GetEnchantments().Count != item.DefaultEnchantments.Count)
                 throw new Exception("Immediate native inventory/enchantment mismatch: " + item.Name);
         }
-        roster.GGGEHAGCLGC(true);
+        roster.RequestSave(true);
     }
 
     static void Reload(Roster roster)
     {
-        if (roster.BFBOEGMAMNF() != 7450000 || roster.EHFJHFDACMP() != 897)
+        if (roster.GetMoney() != 7450000 || roster.GetBonus() != 897)
             throw new Exception("Native saved balances were not reloaded.");
         foreach (string name in new[] { "WEAPON_HW15_SCYTHE", "ARMOR_ANNIVERSARY_10TH", "HELM_STARTER_PACK" })
         {
             var item = Item(name);
-            var owned = roster.KHCNHPCPFII().CMGOCLGHNLH(item);
-            if (owned == null || owned.OFOPFCJNEBL() != 1 || owned.IJGAOHJNLAH() > 0 ||
+            var owned = roster.GetInventory().FindItem(item);
+            if (owned == null || owned.GetCount() != 1 || owned.GetDeliveryTimestamp() > 0 ||
                 owned.GetEnchantments().Count != item.DefaultEnchantments.Count)
                 throw new Exception("Purchased item did not survive native save/reload: " + name);
         }
@@ -225,62 +225,62 @@ public static class ValidateDE128ShopNative
         var scythe = Item("WEAPON_HW15_SCYTHE");
         var helm = Item("HELM_STARTER_PACK");
         Debug.Log(Prefix + "Warlock before purchase: model=" + warlock.ModelFileName +
-            " gemPrice=" + (long)warlock.GemPrice + " gems=" + roster.EHFJHFDACMP() +
-            " owned=" + (roster.KHCNHPCPFII().CMGOCLGHNLH(warlock)?.OFOPFCJNEBL() ?? 0));
-        var existingWarlock = roster.KHCNHPCPFII().CMGOCLGHNLH(warlock);
+            " gemPrice=" + (long)warlock.GemPrice + " gems=" + roster.GetBonus() +
+            " owned=" + (roster.GetInventory().FindItem(warlock)?.GetCount() ?? 0));
+        var existingWarlock = roster.GetInventory().FindItem(warlock);
         if (warlock.ModelFileName != "core:gamedata/models/mdl_armor_super_cloak_no_spikes" ||
-            (existingWarlock == null && !ItemBuyHelper.MGMAJHLAICA(warlock)) ||
-            roster.EHFJHFDACMP() != 853 ||
-            roster.KHCNHPCPFII().CMGOCLGHNLH(warlock)?.OFOPFCJNEBL() != 1)
+            (existingWarlock == null && !ItemBuyHelper.BuyItemWithGems(warlock)) ||
+            roster.GetBonus() != 853 ||
+            roster.GetInventory().FindItem(warlock)?.GetCount() != 1)
             throw new Exception("Changed-model armor did not purchase through the native gem path.");
-        var inventory = roster.KHCNHPCPFII();
-        inventory.EEDJEDBMIMI(scythe, true);
-        inventory.EEDJEDBMIMI(warlock, true);
-        if (!inventory.CMGOCLGHNLH(scythe).EFMFGEPDAOP() ||
-            !inventory.CMGOCLGHNLH(warlock).EFMFGEPDAOP() ||
-            !roster.get_Parameters().DGMDEDKLGMB().Any(item => item.Name == scythe.Name) ||
-            !roster.get_Parameters().DGMDEDKLGMB().Any(item => item.Name == warlock.Name))
+        var inventory = roster.GetInventory();
+        inventory.EquipItem(scythe, true);
+        inventory.EquipItem(warlock, true);
+        if (!inventory.FindItem(scythe).GetIsEquipped() ||
+            !inventory.FindItem(warlock).GetIsEquipped() ||
+            !roster.get_Parameters().GetEquippedItemsByType().Any(item => item.Name == scythe.Name) ||
+            !roster.get_Parameters().GetEquippedItemsByType().Any(item => item.Name == warlock.Name))
             throw new Exception("Native equip did not project archived weapon and changed-model armor.");
 
-        var ownedHelm = inventory.CMGOCLGHNLH(helm);
+        var ownedHelm = inventory.FindItem(helm);
         // Native upgrades target the current player level. A level-50 test
         // profile would select the level-50 milestone (18 trillion coins), so
         // exercise the first available level-7 upgrade then restore level 50.
         roster.Level = 7;
-        ownedHelm.CDFODJBJIPI(roster.Level);
-        var upgrade = ownedHelm.HADDPFNDPDG();
-        if (upgrade == null || upgrade.UpgradeLevel <= ownedHelm.DHNNCAEEMLL() ||
+        ownedHelm.RefreshUpgradeState(roster.Level);
+        var upgrade = ownedHelm.GetNextUpgradeItem();
+        if (upgrade == null || upgrade.UpgradeLevel <= ownedHelm.GetUpgradeLevel() ||
             (long)upgrade.CoinPrice <= 0)
             throw new Exception("Starter helm has no valid next shared-template upgrade.");
-        roster.OIOOMAKNIOB(100000000);
+        roster.SetMoney(100000000);
         long price = (long)upgrade.CoinPrice;
         int level = upgrade.UpgradeLevel;
-        if (!ItemBuyHelper.APICBINEPGJ(helm) || roster.BFBOEGMAMNF() != 100000000 - price ||
-            ownedHelm.DHNNCAEEMLL() != level || ownedHelm.IJGAOHJNLAH() > 0)
+        if (!ItemBuyHelper.UpgradeItemWithCoins(helm) || roster.GetMoney() != 100000000 - price ||
+            ownedHelm.GetUpgradeLevel() != level || ownedHelm.GetDeliveryTimestamp() > 0)
             throw new Exception("Native starter-helm coin upgrade did not settle immediately.");
         roster.Level = 50;
-        ownedHelm.CDFODJBJIPI(roster.Level);
-        roster.GGGEHAGCLGC(true);
+        ownedHelm.RefreshUpgradeState(roster.Level);
+        roster.RequestSave(true);
         // Ordinary upgrades mark the profile dirty; the game's next save tick
         // writes it. Force that native save before terminating this short run.
         ListSF.GetInstance().OnAuthenticate(true);
         string root = Directory.GetParent(Application.dataPath).FullName;
         File.WriteAllText(Path.Combine(root, "de128-shop-expected.txt"),
-            roster.BFBOEGMAMNF() + "\n" + level + "\n");
+            roster.GetMoney() + "\n" + level + "\n");
     }
 
     static void Inspect(Roster roster)
     {
         var warlock = Item("ARMOR_C4_Z1_WARLOCK");
-        var helm = roster.KHCNHPCPFII().CMGOCLGHNLH(Item("HELM_STARTER_PACK"));
-        if (helm != null) helm.CDFODJBJIPI(roster.Level);
-        var nextHelm = helm?.HADDPFNDPDG();
-        Debug.Log(Prefix + "INSPECT: level=" + roster.Level + " coins=" + roster.BFBOEGMAMNF() +
-            " gems=" + roster.EHFJHFDACMP() + " warlockModel=" + warlock.ModelFileName +
+        var helm = roster.GetInventory().FindItem(Item("HELM_STARTER_PACK"));
+        if (helm != null) helm.RefreshUpgradeState(roster.Level);
+        var nextHelm = helm?.GetNextUpgradeItem();
+        Debug.Log(Prefix + "INSPECT: level=" + roster.Level + " coins=" + roster.GetMoney() +
+            " gems=" + roster.GetBonus() + " warlockModel=" + warlock.ModelFileName +
             " warlockGemPrice=" + (long)warlock.GemPrice +
-            " warlockOwned=" + (roster.KHCNHPCPFII().CMGOCLGHNLH(warlock)?.OFOPFCJNEBL() ?? 0) +
-            " helmUpgrade=" + (helm?.DHNNCAEEMLL() ?? -1) +
-            " helmDelivery=" + (helm?.IJGAOHJNLAH() ?? -1) +
+            " warlockOwned=" + (roster.GetInventory().FindItem(warlock)?.GetCount() ?? 0) +
+            " helmUpgrade=" + (helm?.GetUpgradeLevel() ?? -1) +
+            " helmDelivery=" + (helm?.GetDeliveryTimestamp() ?? -1) +
             " nextUpgrade=" + (nextHelm?.UpgradeLevel ?? -1) +
             " nextCoinPrice=" + (nextHelm == null ? -1 : (long)nextHelm.CoinPrice));
     }
@@ -289,22 +289,22 @@ public static class ValidateDE128ShopNative
     {
         string root = Directory.GetParent(Application.dataPath).FullName;
         string[] expected = File.ReadAllLines(Path.Combine(root, "de128-shop-expected.txt"));
-        if (roster.Level != 50 || roster.BFBOEGMAMNF() != long.Parse(expected[0]) ||
-            roster.EHFJHFDACMP() != 853)
+        if (roster.Level != 50 || roster.GetMoney() != long.Parse(expected[0]) ||
+            roster.GetBonus() != 853)
             throw new Exception("Native saved level/currency after equip and upgrade did not reload: level=" +
-                roster.Level + " coins=" + roster.BFBOEGMAMNF() + " gems=" + roster.EHFJHFDACMP() +
+                roster.Level + " coins=" + roster.GetMoney() + " gems=" + roster.GetBonus() +
                 " expectedCoins=" + expected[0]);
-        var inventory = roster.KHCNHPCPFII();
+        var inventory = roster.GetInventory();
         foreach (string name in new[] { "WEAPON_HW15_SCYTHE", "ARMOR_C4_Z1_WARLOCK" })
         {
             var item = Item(name);
-            var owned = inventory.CMGOCLGHNLH(item);
-            if (owned == null || owned.OFOPFCJNEBL() != 1 || !owned.EFMFGEPDAOP() ||
-                !roster.get_Parameters().DGMDEDKLGMB().Any(equipped => equipped.Name == name))
+            var owned = inventory.FindItem(item);
+            if (owned == null || owned.GetCount() != 1 || !owned.GetIsEquipped() ||
+                !roster.get_Parameters().GetEquippedItemsByType().Any(equipped => equipped.Name == name))
                 throw new Exception("Equipped archived item did not survive native reload: " + name);
         }
-        var helm = inventory.CMGOCLGHNLH(Item("HELM_STARTER_PACK"));
-        if (helm == null || helm.DHNNCAEEMLL() != int.Parse(expected[1]) || helm.IJGAOHJNLAH() > 0)
+        var helm = inventory.FindItem(Item("HELM_STARTER_PACK"));
+        if (helm == null || helm.GetUpgradeLevel() != int.Parse(expected[1]) || helm.GetDeliveryTimestamp() > 0)
             throw new Exception("Starter helm upgrade did not survive native reload.");
     }
 
@@ -315,7 +315,7 @@ public static class ValidateDE128ShopNative
             if (screen != ScreenType.ModuleDojo && screen != ScreenType.ModuleMap) return;
             if (roster.Level != 50) throw new Exception("Shop preview requires the saved high-level test profile.");
             roster.AddShopLock("ACT_4");
-            Module.DLOKJOHNDID(ScreenType.ModuleShop, null, null, false);
+            Module.OpenScreen(ScreenType.ModuleShop, null, null, false);
             shopRequested = true;
             return;
         }
@@ -323,13 +323,13 @@ public static class ValidateDE128ShopNative
         var scene = UnityEngine.Object.FindObjectOfType<Nekki.SF2.GUI.Shop.ShopScene>();
         if (scene == null) return;
         var armor = (System.Collections.Generic.List<ItemInfo>)typeof(Nekki.SF2.GUI.Shop.ShopScene)
-            .GetField("KBMOJAPFLAO", Hidden).GetValue(scene);
+            .GetField("_armorItems", Hidden).GetValue(scene);
         if (armor.Count == 0) return;
         var warlock = Item("ARMOR_C4_Z1_WARLOCK");
         if (!ShopAvailabilityPolicy.IsAvailable(warlock, roster) || !armor.Contains(warlock))
             throw new Exception("The live shop did not list the visible changed-model armor.");
         var weapons = (System.Collections.Generic.List<ItemInfo>)typeof(Nekki.SF2.GUI.Shop.ShopScene)
-            .GetField("DOHLAAPAOOO", Hidden).GetValue(scene);
+            .GetField("_weaponItems", Hidden).GetValue(scene);
         var wakizashi = Item("WEAPON_WAKIDZASHI");
         if (!ShopAvailabilityPolicy.IsAvailable(wakizashi, roster) || !weapons.Contains(wakizashi))
             throw new Exception("The live shop did not list the changed-icon weapon after its act gate.");
@@ -350,7 +350,7 @@ public static class ValidateDE128ShopNative
             int targetRow = previewStage == 1 ? armor.IndexOf(warlock) : weapons.IndexOf(wakizashi);
             table.ScrollToCell(targetRow);
             if (EditorApplication.timeSinceStartup - shopSelectedAt < 8) return;
-            bool scrolling = (bool)typeof(TableView).GetField("BKJCHFPNIIB", Hidden).GetValue(table);
+            bool scrolling = (bool)typeof(TableView).GetField("_isDragging", Hidden).GetValue(table);
             throw new Exception("The live shop did not select " + expected.Name + ": " +
                 selected?.get_ItemInfo()?.Name + "; targetRow=" + targetRow +
                 "; rows=" + table.NumberOfRows() + "; scrolling=" + scrolling +

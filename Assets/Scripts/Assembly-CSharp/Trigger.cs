@@ -4,17 +4,17 @@ public class Trigger
 {
 	public class TriggerInside
 	{
-		public List<EventAnimation> AJCMBMJGJEG = new List<EventAnimation>();
+		public List<EventAnimation> Events = new List<EventAnimation>();
 
-		public List<ConditionAnimation> JIFAHHGNPFH = new List<ConditionAnimation>();
+		public List<ConditionAnimation> Conditions = new List<ConditionAnimation>();
 
-		public List<ConditionAnimation> HIFPHBNGIPO = new List<ConditionAnimation>();
+		public List<ConditionAnimation> ExtraConditions = new List<ConditionAnimation>();
 
-		public List<ActionAnimation> DJBAIAKOIHM = new List<ActionAnimation>();
+		public List<ActionAnimation> Actions = new List<ActionAnimation>();
 
-		public EventAnimation OIGBIFNICBI(EventAnimation.EECEJKADLCK LFLGCDNKNJI)
+		public EventAnimation FindEvent(EventAnimation.EventAnimationType LFLGCDNKNJI)
 		{
-			foreach (EventAnimation item in AJCMBMJGJEG)
+			foreach (EventAnimation item in Events)
 			{
 				if (item.Type == LFLGCDNKNJI)
 				{
@@ -27,37 +27,37 @@ public class Trigger
 
 	private List<string> _TemplateNames = new List<string>();
 
-	public TriggerInside IDEMFOLJIFE;
+	public TriggerInside Definition;
 
 	public string Name;
 
-	public virtual List<string> LANPOMAOOIM
+	public virtual List<string> TemplateNames
 	{
 		get
 		{
-			return FOLOOGCLPNE();
+			return GetTemplateNames();
 		}
 	}
 
-	public virtual ConditionKeys OHOPGOOAEOJ
+	public virtual ConditionKeys KeyConditions
 	{
 		get
 		{
-			return ILBCHANCOBP();
+			return GetKeyConditions();
 		}
 	}
 
-	public virtual List<ConditionKeys> ODCILHKPLAF
+	public virtual List<ConditionKeys> AllKeyConditions
 	{
 		get
 		{
-			return MOPMGFIIFGA();
+			return GetAllKeyConditions();
 		}
 	}
 
 	public Trigger()
 	{
-		IDEMFOLJIFE = new TriggerInside();
+		Definition = new TriggerInside();
 	}
 
 	public virtual void Init()
@@ -68,9 +68,9 @@ public class Trigger
 	{
 	}
 
-	public virtual bool JBALJDEOGNK(EventAnimation p_event)
+	public virtual bool ContainsEvent(EventAnimation p_event)
 	{
-		foreach (EventAnimation item in IDEMFOLJIFE.AJCMBMJGJEG)
+		foreach (EventAnimation item in Definition.Events)
 		{
 			if (item.IsEqual(p_event))
 			{
@@ -80,13 +80,13 @@ public class Trigger
 		return false;
 	}
 
-	public virtual bool HPPGNJJCEGF(ModelConditions conditions, List<ConditionAnimation> JPGMNIFICDM = null, EventAnimation DOANBADPBGH = null)
+	public virtual bool CheckConditions(ModelConditions conditions, List<ConditionAnimation> JPGMNIFICDM = null, EventAnimation DOANBADPBGH = null)
 	{
-		List<ConditionAnimation> list = ((JPGMNIFICDM == null) ? IDEMFOLJIFE.JIFAHHGNPFH : JPGMNIFICDM);
+		List<ConditionAnimation> list = ((JPGMNIFICDM == null) ? Definition.Conditions : JPGMNIFICDM);
 		if (DOANBADPBGH != null)
 		{
-			conditions.HFCIDBJJINB = DOANBADPBGH;
-			DOANBADPBGH.JIFAHHGNPFH = conditions;
+			conditions.CurrentEvent = DOANBADPBGH;
+			DOANBADPBGH.Conditions = conditions;
 		}
 		foreach (ConditionAnimation item in list)
 		{
@@ -98,65 +98,65 @@ public class Trigger
 		return true;
 	}
 
-	public virtual bool HPPGNJJCEGF(Model ACENLMONNPA, List<ConditionAnimation> JPGMNIFICDM = null, EventAnimation DOANBADPBGH = null)
+	public virtual bool CheckConditions(Model ACENLMONNPA, List<ConditionAnimation> JPGMNIFICDM = null, EventAnimation DOANBADPBGH = null)
 	{
-		List<ConditionAnimation> list = ((JPGMNIFICDM == null) ? IDEMFOLJIFE.JIFAHHGNPFH : JPGMNIFICDM);
+		List<ConditionAnimation> list = ((JPGMNIFICDM == null) ? Definition.Conditions : JPGMNIFICDM);
 		foreach (ConditionAnimation item in list)
 		{
-			ModelType.KEIDBIOIFGA kEIDBIOIFGA = item.FHBAPKNECOM();
-			Model fGCODGKLHED = item.DKDAKGDMHAL(ACENLMONNPA, kEIDBIOIFGA);
+			ModelType.ModelTargetType kEIDBIOIFGA = item.GetTargetModelType();
+			Model fGCODGKLHED = item.ResolveTargetModel(ACENLMONNPA, kEIDBIOIFGA);
 			if (fGCODGKLHED == null)
 			{
 				return false;
 			}
-			ModelConditions dGJJDPIAEAO = fGCODGKLHED.EBABHGHPLFK();
+			ModelConditions dGJJDPIAEAO = fGCODGKLHED.GetConditions();
 			if (DOANBADPBGH != null)
 			{
-				dGJJDPIAEAO.HFCIDBJJINB = DOANBADPBGH;
-				DOANBADPBGH.JIFAHHGNPFH = dGJJDPIAEAO;
+				dGJJDPIAEAO.CurrentEvent = DOANBADPBGH;
+				DOANBADPBGH.Conditions = dGJJDPIAEAO;
 			}
-			item.MJFKNEHGNMB(ModelType.KEIDBIOIFGA.MODEL_THIS);
+			item.ApplyTargetModelType(ModelType.ModelTargetType.MODEL_THIS);
 			bool flag = false;
 			if (item.Type == ConditionAnimation.ConditionType.LIST)
 			{
 				ConditionList eLFKOGJJNMN = item as ConditionList;
 				if (eLFKOGJJNMN != null)
 				{
-					flag = eLFKOGJJNMN.DJEJMGCMPPH(ACENLMONNPA.EBABHGHPLFK(), ACENLMONNPA, DOANBADPBGH);
+					flag = eLFKOGJJNMN.EvaluateWithModel(ACENLMONNPA.GetConditions(), ACENLMONNPA, DOANBADPBGH);
 				}
 			}
 			else
 			{
-				flag = item.IsEqual(fGCODGKLHED.EBABHGHPLFK());
+				flag = item.IsEqual(fGCODGKLHED.GetConditions());
 			}
 			if (!flag)
 			{
-				item.GNPMNEDOFPB(kEIDBIOIFGA);
+				item.SetTargetModelType(kEIDBIOIFGA);
 				return false;
 			}
-			item.GNPMNEDOFPB(kEIDBIOIFGA);
+			item.SetTargetModelType(kEIDBIOIFGA);
 		}
 		return true;
 	}
 
-	public virtual List<string> FOLOOGCLPNE()
+	public virtual List<string> GetTemplateNames()
 	{
 		return _TemplateNames;
 	}
 
-	public virtual ConditionKeys ILBCHANCOBP()
+	public virtual ConditionKeys GetKeyConditions()
 	{
-		return DHBACBKLADO(IDEMFOLJIFE.JIFAHHGNPFH);
+		return FindFirstKeyConditions(Definition.Conditions);
 	}
 
-	public virtual List<ConditionKeys> MOPMGFIIFGA()
+	public virtual List<ConditionKeys> GetAllKeyConditions()
 	{
 		List<ConditionKeys> list = new List<ConditionKeys>();
-		CIEHMPCOKGK(IDEMFOLJIFE.JIFAHHGNPFH, list);
+		CollectKeyConditions(Definition.Conditions, list);
 		return list;
 	}
 
-	public static ConditionKeys JEELAPHJLOE(ConditionAnimation IOFGGOCEIAM)
+	public static ConditionKeys AsConditionKeys(ConditionAnimation IOFGGOCEIAM)
 	{
 		if (IOFGGOCEIAM.Type == ConditionAnimation.ConditionType.KEYS)
 		{
@@ -168,55 +168,55 @@ public class Trigger
 	public virtual void PreloadEffects(List<string> MNDEJPFJODO = null)
 	{
 		string text = "Textures/Effects/Magic/";
-		foreach (ActionAnimation item in IDEMFOLJIFE.DJBAIAKOIHM)
+		foreach (ActionAnimation item in Definition.Actions)
 		{
-			if (item.get_Type() == ActionAnimation.FADAJCEEKIO.EFFECT)
+			if (item.get_Type() == ActionAnimation.ActionType.EFFECT)
 			{
 				ActionEffect jFJGGMEJDPG = (ActionEffect)item;
-				string oNNKJLOGHGH = text + jFJGGMEJDPG.EPDMGFELIMC();
-				LocationSpriteCache.ENFOJMFEGJH(oNNKJLOGHGH);
+				string oNNKJLOGHGH = text + jFJGGMEJDPG.GetSequence();
+				LocationSpriteCache.LoadAtlasSprites(oNNKJLOGHGH);
 			}
 		}
 	}
 
 	public virtual void PreloadSounds()
 	{
-		foreach (ActionAnimation item in IDEMFOLJIFE.DJBAIAKOIHM)
+		foreach (ActionAnimation item in Definition.Actions)
 		{
-			if (item.get_Type() == ActionAnimation.FADAJCEEKIO.SOUND)
+			if (item.get_Type() == ActionAnimation.ActionType.SOUND)
 			{
 				ActionSound nMLKJLJHCIA = (ActionSound)item;
-				Sound.IOIEJHLMBLI(nMLKJLJHCIA.get_Name());
+				Sound.LoadSound(nMLKJLJHCIA.get_Name());
 			}
 		}
 	}
 
-	public virtual void NHAEHLFMPNK(TriggerInside KECIIKEIJBH)
+	public virtual void MergeDefinition(TriggerInside KECIIKEIJBH)
 	{
-		if (IDEMFOLJIFE != null)
+		if (Definition != null)
 		{
-			ACGIFMKPBGC(KECIIKEIJBH.AJCMBMJGJEG);
-			EGGLLLLFMCO(KECIIKEIJBH.JIFAHHGNPFH);
-			FGAEEJBEGEJ(KECIIKEIJBH.DJBAIAKOIHM);
-			OFMGLKAGCGO(KECIIKEIJBH.HIFPHBNGIPO);
+			AddEvents(KECIIKEIJBH.Events);
+			AddConditions(KECIIKEIJBH.Conditions);
+			AddActions(KECIIKEIJBH.Actions);
+			AddExtraConditions(KECIIKEIJBH.ExtraConditions);
 		}
 	}
 
-	public virtual void BPHNHFJCFCD(ModelObject OECPEDPMKCD, bool EKBOGDKIHIH, bool PHADJMAONJG, ModelObject MJCGOJBGFIE)
+	public virtual void UpdateForObject(ModelObject OECPEDPMKCD, bool EKBOGDKIHIH, bool PHADJMAONJG, ModelObject MJCGOJBGFIE)
 	{
 		ModelNode aECCPADGGPG = null;
-		UpdateConditions(IDEMFOLJIFE.JIFAHHGNPFH, OECPEDPMKCD, EKBOGDKIHIH, PHADJMAONJG, MJCGOJBGFIE, aECCPADGGPG);
-		foreach (ActionAnimation item in IDEMFOLJIFE.DJBAIAKOIHM)
+		UpdateConditions(Definition.Conditions, OECPEDPMKCD, EKBOGDKIHIH, PHADJMAONJG, MJCGOJBGFIE, aECCPADGGPG);
+		foreach (ActionAnimation item in Definition.Actions)
 		{
-			if (item.get_Type() == ActionAnimation.FADAJCEEKIO.EFFECT)
+			if (item.get_Type() == ActionAnimation.ActionType.EFFECT)
 			{
 				ActionEffect jFJGGMEJDPG = (ActionEffect)item;
-				jFJGGMEJDPG.KJHPCLOFDJB(OECPEDPMKCD, EKBOGDKIHIH, null, PHADJMAONJG, MJCGOJBGFIE);
+				jFJGGMEJDPG.UpdateNodes(OECPEDPMKCD, EKBOGDKIHIH, null, PHADJMAONJG, MJCGOJBGFIE);
 			}
 		}
 	}
 
-	public void CJAPHCKAOIE(List<ConditionAnimation> AIDMEPEKEOL)
+	public void ResetConditions(List<ConditionAnimation> AIDMEPEKEOL)
 	{
 		foreach (ConditionAnimation item in AIDMEPEKEOL)
 		{
@@ -225,11 +225,11 @@ public class Trigger
 				ConditionDistance jNPIBKBDJAN = item as ConditionDistance;
 				if (jNPIBKBDJAN != null)
 				{
-					jNPIBKBDJAN.ABNCNNHMLII();
+					jNPIBKBDJAN.ResetNodes();
 				}
 				else
 				{
-					LLLOJBFMONN.Error("conditionDistance is null");
+					GameLog.Error("conditionDistance is null");
 				}
 			}
 			else if (item.Type == ConditionAnimation.ConditionType.DIRECTION)
@@ -237,11 +237,11 @@ public class Trigger
 				ConditionDirection cFCGJLJBOKI = item as ConditionDirection;
 				if (cFCGJLJBOKI != null)
 				{
-					cFCGJLJBOKI.ABNCNNHMLII();
+					cFCGJLJBOKI.ResetNodes();
 				}
 				else
 				{
-					LLLOJBFMONN.Error("conditionDistance is null");
+					GameLog.Error("conditionDistance is null");
 				}
 			}
 			else if (item.Type == ConditionAnimation.ConditionType.LIST)
@@ -250,35 +250,35 @@ public class Trigger
 				if (eLFKOGJJNMN != null)
 				{
 					List<ConditionAnimation> aIDMEPEKEOL = eLFKOGJJNMN.GetConditions();
-					CJAPHCKAOIE(aIDMEPEKEOL);
+					ResetConditions(aIDMEPEKEOL);
 				}
 				else
 				{
-					LLLOJBFMONN.Error("conditions is null");
+					GameLog.Error("conditions is null");
 				}
 			}
 		}
 	}
 
-	public virtual void ABNCNNHMLII()
+	public virtual void ResetState()
 	{
-		CJAPHCKAOIE(IDEMFOLJIFE.JIFAHHGNPFH);
-		foreach (ActionAnimation item in IDEMFOLJIFE.DJBAIAKOIHM)
+		ResetConditions(Definition.Conditions);
+		foreach (ActionAnimation item in Definition.Actions)
 		{
-			if (item.get_Type() == ActionAnimation.FADAJCEEKIO.EFFECT)
+			if (item.get_Type() == ActionAnimation.ActionType.EFFECT)
 			{
 				ActionEffect jFJGGMEJDPG = (ActionEffect)item;
-				jFJGGMEJDPG.MGCNPBCBMHB();
+				jFJGGMEJDPG.ResetNodes();
 			}
 		}
 	}
 
-	public virtual bool CNPFHBMGDFP(string name)
+	public virtual bool MatchesName(string name)
 	{
-		return Name == name || LPPIKDGABOL(name);
+		return Name == name || HasTemplateName(name);
 	}
 
-	public virtual bool LPPIKDGABOL(string IJBOAGICOON)
+	public virtual bool HasTemplateName(string IJBOAGICOON)
 	{
 		foreach (string item in _TemplateNames)
 		{
@@ -290,7 +290,7 @@ public class Trigger
 		return false;
 	}
 
-	protected static ConditionKeys DHBACBKLADO(List<ConditionAnimation> conditions)
+	protected static ConditionKeys FindFirstKeyConditions(List<ConditionAnimation> conditions)
 	{
 		foreach (ConditionAnimation item in conditions)
 		{
@@ -300,7 +300,7 @@ public class Trigger
 				if (eLFKOGJJNMN != null)
 				{
 					List<ConditionAnimation> kDOGKKGDOBK = eLFKOGJJNMN.GetConditions();
-					ConditionKeys bHDEBDIHDFM = DHBACBKLADO(kDOGKKGDOBK);
+					ConditionKeys bHDEBDIHDFM = FindFirstKeyConditions(kDOGKKGDOBK);
 					if (bHDEBDIHDFM != null)
 					{
 						return bHDEBDIHDFM;
@@ -308,12 +308,12 @@ public class Trigger
 				}
 				else
 				{
-					LLLOJBFMONN.Error("conditionList is null");
+					GameLog.Error("conditionList is null");
 				}
 			}
 			else
 			{
-				ConditionKeys bHDEBDIHDFM2 = InfoAnimation.JEELAPHJLOE(item);
+				ConditionKeys bHDEBDIHDFM2 = InfoAnimation.AsKeysCondition(item);
 				if (bHDEBDIHDFM2 != null)
 				{
 					return bHDEBDIHDFM2;
@@ -323,7 +323,7 @@ public class Trigger
 		return null;
 	}
 
-	protected static void CIEHMPCOKGK(List<ConditionAnimation> conditions, List<ConditionKeys> GKHEPKGMEFI)
+	protected static void CollectKeyConditions(List<ConditionAnimation> conditions, List<ConditionKeys> GKHEPKGMEFI)
 	{
 		foreach (ConditionAnimation item in conditions)
 		{
@@ -333,16 +333,16 @@ public class Trigger
 				if (eLFKOGJJNMN != null)
 				{
 					List<ConditionAnimation> kDOGKKGDOBK = eLFKOGJJNMN.GetConditions();
-					CIEHMPCOKGK(kDOGKKGDOBK, GKHEPKGMEFI);
+					CollectKeyConditions(kDOGKKGDOBK, GKHEPKGMEFI);
 				}
 				else
 				{
-					LLLOJBFMONN.Error("conditionList is null");
+					GameLog.Error("conditionList is null");
 				}
 			}
 			else
 			{
-				ConditionKeys bHDEBDIHDFM = InfoAnimation.JEELAPHJLOE(item);
+				ConditionKeys bHDEBDIHDFM = InfoAnimation.AsKeysCondition(item);
 				if (bHDEBDIHDFM != null)
 				{
 					GKHEPKGMEFI.Add(bHDEBDIHDFM);
@@ -364,11 +364,11 @@ public class Trigger
 				ConditionDistance jNPIBKBDJAN = ((item == null) ? null : (item as ConditionDistance));
 				if (jNPIBKBDJAN != null)
 				{
-					jNPIBKBDJAN.KJHPCLOFDJB(OECPEDPMKCD, EKBOGDKIHIH, AECCPADGGPG, PHADJMAONJG, MJCGOJBGFIE);
+					jNPIBKBDJAN.UpdateNodes(OECPEDPMKCD, EKBOGDKIHIH, AECCPADGGPG, PHADJMAONJG, MJCGOJBGFIE);
 				}
 				else
 				{
-					LLLOJBFMONN.Error("subcondition is null");
+					GameLog.Error("subcondition is null");
 				}
 			}
 			if (item.Type == ConditionAnimation.ConditionType.DIRECTION)
@@ -376,11 +376,11 @@ public class Trigger
 				ConditionDirection cFCGJLJBOKI = item as ConditionDirection;
 				if (cFCGJLJBOKI != null)
 				{
-					cFCGJLJBOKI.KJHPCLOFDJB(OECPEDPMKCD, EKBOGDKIHIH, AECCPADGGPG, PHADJMAONJG, MJCGOJBGFIE);
+					cFCGJLJBOKI.UpdateNodes(OECPEDPMKCD, EKBOGDKIHIH, AECCPADGGPG, PHADJMAONJG, MJCGOJBGFIE);
 				}
 				else
 				{
-					LLLOJBFMONN.Error("subcondition is null");
+					GameLog.Error("subcondition is null");
 				}
 			}
 			else if (item.Type == ConditionAnimation.ConditionType.LIST)
@@ -393,29 +393,29 @@ public class Trigger
 				}
 				else
 				{
-					LLLOJBFMONN.Error("subconditions is null");
+					GameLog.Error("subconditions is null");
 				}
 			}
 		}
 	}
 
-	protected virtual void ACGIFMKPBGC(List<EventAnimation> value)
+	protected virtual void AddEvents(List<EventAnimation> value)
 	{
-		IDEMFOLJIFE.AJCMBMJGJEG.AddRange(value);
+		Definition.Events.AddRange(value);
 	}
 
-	protected virtual void EGGLLLLFMCO(List<ConditionAnimation> value)
+	protected virtual void AddConditions(List<ConditionAnimation> value)
 	{
-		IDEMFOLJIFE.JIFAHHGNPFH.AddRange(value);
+		Definition.Conditions.AddRange(value);
 	}
 
-	protected virtual void OFMGLKAGCGO(List<ConditionAnimation> value)
+	protected virtual void AddExtraConditions(List<ConditionAnimation> value)
 	{
-		IDEMFOLJIFE.HIFPHBNGIPO.AddRange(value);
+		Definition.ExtraConditions.AddRange(value);
 	}
 
-	protected virtual void FGAEEJBEGEJ(List<ActionAnimation> value)
+	protected virtual void AddActions(List<ActionAnimation> value)
 	{
-		IDEMFOLJIFE.DJBAIAKOIHM.AddRange(value);
+		Definition.Actions.AddRange(value);
 	}
 }

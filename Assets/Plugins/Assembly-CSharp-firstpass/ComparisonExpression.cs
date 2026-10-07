@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class ComparisonExpression
 {
-	public enum HBHFGHDGOBI
+	public enum ComparisonType
 	{
 		COMPARISON_NONE = 0,
 		COMPARISON_EQUAL = 1,
@@ -17,58 +17,58 @@ public class ComparisonExpression
 
 	protected bool _isTrue;
 
-	protected HBHFGHDGOBI MDLIBPIHOMD;
+	protected ComparisonType _comparisonType;
 
-	protected float MAFCNMOAIDA;
+	protected float _actualValue;
 
-	protected float DIKPCBMONEH;
+	protected float _thanValue;
 
 	public ComparisonExpression(XmlNode node)
 	{
-		MDLIBPIHOMD = GGNIBBDFBED(node.Name);
+		_comparisonType = ParseComparisonType(node.Name);
 		_isTrue = node.Attributes["Not"] == null || (!(node.Attributes["Not"].Value == "True") && !(node.Attributes["Not"].Value == "1"));
 	}
 
 	public bool Compare()
 	{
 		bool flag = true;
-		switch (MDLIBPIHOMD)
+		switch (_comparisonType)
 		{
-		case HBHFGHDGOBI.COMPARISON_EQUAL:
-			flag = Mathf.Abs(MAFCNMOAIDA - DIKPCBMONEH) < 1E-05f;
+		case ComparisonType.COMPARISON_EQUAL:
+			flag = Mathf.Abs(_actualValue - _thanValue) < 1E-05f;
 			break;
-		case HBHFGHDGOBI.COMPARISON_GREATER:
-			flag = MAFCNMOAIDA - DIKPCBMONEH > 1E-05f;
+		case ComparisonType.COMPARISON_GREATER:
+			flag = _actualValue - _thanValue > 1E-05f;
 			break;
-		case HBHFGHDGOBI.COMPARISON_GREATER_EQUAL:
-			flag = MAFCNMOAIDA - DIKPCBMONEH > -1E-05f;
+		case ComparisonType.COMPARISON_GREATER_EQUAL:
+			flag = _actualValue - _thanValue > -1E-05f;
 			break;
-		case HBHFGHDGOBI.COMPARISON_LESS:
-			flag = MAFCNMOAIDA - DIKPCBMONEH < -1E-05f;
+		case ComparisonType.COMPARISON_LESS:
+			flag = _actualValue - _thanValue < -1E-05f;
 			break;
-		case HBHFGHDGOBI.COMPARISON_LESS_EQUAL:
-			flag = MAFCNMOAIDA - DIKPCBMONEH < 1E-05f;
+		case ComparisonType.COMPARISON_LESS_EQUAL:
+			flag = _actualValue - _thanValue < 1E-05f;
 			break;
 		}
 		return (!_isTrue) ? (!flag) : flag;
 	}
 
-	public static HBHFGHDGOBI GGNIBBDFBED(string name)
+	public static ComparisonType ParseComparisonType(string name)
 	{
 		switch (name)
 		{
 		case "Equal":
-			return HBHFGHDGOBI.COMPARISON_EQUAL;
+			return ComparisonType.COMPARISON_EQUAL;
 		case "Greater":
-			return HBHFGHDGOBI.COMPARISON_GREATER;
+			return ComparisonType.COMPARISON_GREATER;
 		case "GreaterEqual":
-			return HBHFGHDGOBI.COMPARISON_GREATER_EQUAL;
+			return ComparisonType.COMPARISON_GREATER_EQUAL;
 		case "Less":
-			return HBHFGHDGOBI.COMPARISON_LESS;
+			return ComparisonType.COMPARISON_LESS;
 		case "LessEqual":
-			return HBHFGHDGOBI.COMPARISON_LESS_EQUAL;
+			return ComparisonType.COMPARISON_LESS_EQUAL;
 		default:
-			return HBHFGHDGOBI.COMPARISON_NONE;
+			return ComparisonType.COMPARISON_NONE;
 		}
 	}
 }

@@ -74,12 +74,12 @@ public static class ValidateFormNative
             if (!entered)
             {
                 var scripts = ModRuntime.Scripts;
-                if (scripts == null || ListSF.CCDKHLAMKKO() == null || Module.GetInstance() == null) return;
+                if (scripts == null || ListSF.GetRoster() == null || Module.GetInstance() == null) return;
                 var screen = Module.GetInstance().GetCurrentScreenType();
                 if (screen != ScreenType.ModuleDojo && screen != ScreenType.ModuleMap) return;
                 var definition = scripts.Content.Fights.FirstOrDefault(f => f.Id.ToString() == "example.shifting-guardian:fights/guardian");
                 if (definition == null) throw new Exception("Shifting Guardian did not register.");
-                var encounter = ListSF.CHMCKGCDGCM(new FightIDS(scripts.Content.RuntimeFightId(definition.Id)));
+                var encounter = ListSF.GetFightById(new FightIDS(scripts.Content.RuntimeFightId(definition.Id)));
                 if (encounter == null) throw new Exception("Native encounter projection is missing.");
                 entered = GameUtils.StartFight(encounter, false, null, true, false);
                 Debug.Log("[FormNative] StartFight=" + entered);
@@ -87,7 +87,7 @@ public static class ValidateFormNative
             }
             var fight = Fight.GetCurrentFight();
             if (fight == null) return;
-            var enemy = (Model)typeof(Fight).GetField("CKNCPOABFBO", Hidden).GetValue(fight);
+            var enemy = (Model)typeof(Fight).GetField("_enemyModel", Hidden).GetValue(fight);
             var player = (Model)typeof(Fight).GetField("_playerModel", Hidden).GetValue(fight);
             if (enemy == null || player == null || fight.get_FightTimeInFrames() < 1) return;
             int frame = fight.get_FightTimeInFrames();
@@ -105,10 +105,10 @@ public static class ValidateFormNative
                 originalPlayer = enemy.Parameters.IsPlayer;
                 originalControlled = enemy.Parameters.UserControlled;
                 originalAi = enemy.Parameters.AiControlled;
-                enemy.EBABHGHPLFK().PerkVariables[Counter] = 17;
-                enemy.EBABHGHPLFK().PerkStringVariables[Phase] = "shifting";
-                enemy.GFNCMLFKBGP(enemy.Parameters.MaxLife * .75f);
-                originalRatio = enemy.KKMCHCNOHMB() / enemy.Parameters.MaxLife;
+                enemy.GetConditions().PerkVariables[Counter] = 17;
+                enemy.GetConditions().PerkStringVariables[Phase] = "shifting";
+                enemy.SetLife(enemy.Parameters.MaxLife * .75f);
+                originalRatio = enemy.GetLife() / enemy.Parameters.MaxLife;
                 Debug.Log("[FormNative] Initial body ready; health ratio=" + originalRatio);
             }
             if (enemy != original && switchedAt < 0)
@@ -123,7 +123,7 @@ public static class ValidateFormNative
                     enemy.Parameters.AiControlled != originalAi)
                     throw new Exception("Form replacement changed participant input/AI eligibility.");
                 CheckVariables(enemy);
-                float ratio = enemy.KKMCHCNOHMB() / enemy.Parameters.MaxLife;
+                float ratio = enemy.GetLife() / enemy.Parameters.MaxLife;
                 if (Math.Abs(ratio - originalRatio) > .001f) throw new Exception("Health ratio changed across form swap: " + ratio);
                 switchedAt = fight.get_FightTimeInFrames();
                 Debug.Log("[FormNative] Native body replaced at frame " + switchedAt + "; weapon=" +
@@ -131,14 +131,14 @@ public static class ValidateFormNative
             }
             if (switchedAt >= 0 && fight.get_FightTimeInFrames() >= switchedAt + 120)
             {
-                if (enemy.CLDMEJKGLBA() == null)
+                if (enemy.GetBodyObject() == null)
                     throw new Exception("Replacement lost its native model object.");
-                var animation = enemy.OCPMJKIEPIG();
+                var animation = enemy.GetAnimationModule();
                 if (animation == null)
                     throw new Exception("Replacement lost its animation controller.");
-                if (animation.NNMAFFCCMHC() == null)
+                if (animation.GetCurrentInfo() == null)
                     throw new Exception("Replacement has no selected animation at frame " + frame + ".");
-                var surface = enemy.MJNPBMOAFML();
+                var surface = enemy.GetGameObject();
                 if (surface == null)
                     throw new Exception("Replacement lost its Unity object.");
                 if (!surface.activeSelf || !surface.activeInHierarchy)
@@ -179,12 +179,12 @@ public static class ValidateFormNative
 
     static string WeaponName(Model model)
     {
-        return model.Parameters.DGMDEDKLGMB().FirstOrDefault(item => item != null && item.Type == "Weapon")?.Name;
+        return model.Parameters.GetEquippedItemsByType().FirstOrDefault(item => item != null && item.Type == "Weapon")?.Name;
     }
 
     static void CheckVariables(Model model)
     {
-        var conditions = model.EBABHGHPLFK();
+        var conditions = model.GetConditions();
         if (conditions == null || !conditions.PerkVariables.TryGetValue(Counter, out float count) || count != 17 ||
             !conditions.PerkStringVariables.TryGetValue(Phase, out string phase) || phase != "shifting")
             throw new Exception("Numeric/text perk variables were lost across native body retirement.");

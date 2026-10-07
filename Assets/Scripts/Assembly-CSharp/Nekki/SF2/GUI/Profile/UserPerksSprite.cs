@@ -6,12 +6,12 @@ namespace Nekki.SF2.GUI.Profile
 {
 	public class UserPerksSprite : SFMonoBehaviour<object>
 	{
-		private ProfileSliderItem NOELBEFDFFE;
+		private ProfileSliderItem currentSliderItem;
 
 		[SerializeField]
 		private LabelAlias _label;
 
-		private List<ProfilePerk> NDEOKNAOAKM = new List<ProfilePerk>();
+		private List<ProfilePerk> perks = new List<ProfilePerk>();
 
 		[SerializeField]
 		protected Scroll _slider;
@@ -29,10 +29,10 @@ namespace Nekki.SF2.GUI.Profile
 		{
 			_label.set_text(string.Empty);
 			_label.set_LabelFontSize(83);
-			_label.color = Constants.PJJIMHMJPAL;
+			_label.color = Constants.DialogTextColor;
 			_label.alignment = TextAnchor.MiddleCenter;
-			IEFFLCBGJJM();
-			BDAJMIAPDOF();
+			InitSlider();
+			LoadUserPerks();
 			_label.rectTransform.sizeDelta = new Vector2(GetComponent<RectTransform>().rect.width - 120f, _label.rectTransform.rect.height);
 			_label.set_Alias("ProfileNoPerks");
 		}
@@ -43,25 +43,25 @@ namespace Nekki.SF2.GUI.Profile
 			{
 				return;
 			}
-			ProfilePerk pLKCIINIFMJ = ABAGJKMKCBA(ELHEKFLAIKM.Name);
+			ProfilePerk pLKCIINIFMJ = FindPerkByName(ELHEKFLAIKM.Name);
 			if (pLKCIINIFMJ != null)
 			{
-				pLKCIINIFMJ.NOLDHAFMOLF(ELHEKFLAIKM);
-				pLKCIINIFMJ.set_Description(ELHEKFLAIKM.MGNNJPBCOGD);
+				pLKCIINIFMJ.SetPerkInfo(ELHEKFLAIKM);
+				pLKCIINIFMJ.set_Description(ELHEKFLAIKM.DescriptionKey);
 				return;
 			}
-			ProfilePerk pLKCIINIFMJ2 = new ProfilePerk(ELHEKFLAIKM, 0, ProfilePerk.KMHBPKKCNPP.PERK_SELECTED, ProfilePerk.JHDKDOPHGOO.TYPE_PERK_SELETED);
-			NDEOKNAOAKM.Add(pLKCIINIFMJ2);
-			if (!(pLKCIINIFMJ2.CEENDGFFEFM() != string.Empty))
+			ProfilePerk pLKCIINIFMJ2 = new ProfilePerk(ELHEKFLAIKM, 0, ProfilePerk.ProfilePerkState.PERK_SELECTED, ProfilePerk.ProfilePerkType.TYPE_PERK_SELETED);
+			perks.Add(pLKCIINIFMJ2);
+			if (!(pLKCIINIFMJ2.GetMoveName() != string.Empty))
 			{
-				if (KMNLKGHEMIM())
+				if (NeedsNewSliderItem())
 				{
 					GameObject gameObject = Object.Instantiate(_profileSliderItemPrefab);
-					NOELBEFDFFE = gameObject.GetComponent<ProfileSliderItem>();
-					NOELBEFDFFE.Init(15f);
-					_slider.AddItem(NOELBEFDFFE);
+					currentSliderItem = gameObject.GetComponent<ProfileSliderItem>();
+					currentSliderItem.Init(15f);
+					_slider.AddItem(currentSliderItem);
 				}
-				GameObject gameObject2 = Object.Instantiate(_perkItemPrefab, NOELBEFDFFE.transform, false);
+				GameObject gameObject2 = Object.Instantiate(_perkItemPrefab, currentSliderItem.transform, false);
 				PerkSubItem component = gameObject2.GetComponent<PerkSubItem>();
 				component.Init(pLKCIINIFMJ2, 0);
 				ProfileScene current = Scene<ProfileScene>.get_Current();
@@ -69,8 +69,8 @@ namespace Nekki.SF2.GUI.Profile
 				{
 					current.AddSubItem(component);
 				}
-				NOELBEFDFFE.AddIcons(component);
-				LBPMCDKOFOE();
+				currentSliderItem.AddIcons(component);
+				ScrollToLastItems();
 				if (_label != null)
 				{
 					_label.gameObject.SetActive(false);
@@ -81,29 +81,29 @@ namespace Nekki.SF2.GUI.Profile
 		public void Clear()
 		{
 			_slider.ClearItems();
-			NDEOKNAOAKM.ForEach((ProfilePerk PIIEECCHMAC) =>
+			perks.ForEach((ProfilePerk PIIEECCHMAC) =>
 			{
 				PIIEECCHMAC.RemoveAllEventListener();
 			});
-			NDEOKNAOAKM.Clear();
+			perks.Clear();
 		}
 
-		private void IEFFLCBGJJM()
+		private void InitSlider()
 		{
 			_slider.Init(_sliderContent);
 			_slider.get_ItemsScroll().AutoscrollIsOn = false;
 		}
 
-		private void BDAJMIAPDOF()
+		private void LoadUserPerks()
 		{
-			List<RosterPerk> list = ListSF.CCDKHLAMKKO().JLBDOBLHHAF().KEHFPLBNDHI();
+			List<RosterPerk> list = ListSF.GetRoster().GetPerks().GetPerks();
 			for (int i = 0; i < list.Count; i++)
 			{
-				AddItem(list[i].DFOELJAEEGG());
+				AddItem(list[i].GetPerkInfo());
 			}
 		}
 
-		private void LBPMCDKOFOE()
+		private void ScrollToLastItems()
 		{
 			if (!(_slider == null))
 			{
@@ -115,25 +115,25 @@ namespace Nekki.SF2.GUI.Profile
 			}
 		}
 
-		private bool KMNLKGHEMIM()
+		private bool NeedsNewSliderItem()
 		{
-			if (NOELBEFDFFE == null)
+			if (currentSliderItem == null)
 			{
 				return true;
 			}
-			if (NOELBEFDFFE.GetIcons().Count >= 2)
+			if (currentSliderItem.GetIcons().Count >= 2)
 			{
 				return true;
 			}
 			return false;
 		}
 
-		private ProfilePerk ABAGJKMKCBA(string name)
+		private ProfilePerk FindPerkByName(string name)
 		{
 			ProfilePerk result = null;
-			foreach (ProfilePerk item in NDEOKNAOAKM)
+			foreach (ProfilePerk item in perks)
 			{
-				if (item.KAMBOKLFBEE() == name)
+				if (item.GetPerkName() == name)
 				{
 					result = item;
 					break;

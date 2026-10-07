@@ -2,64 +2,64 @@ using System.Xml;
 
 public class RatingEvaluationRule : Rule
 {
-	protected float LIIBMLCBOEL;
+	protected float playerRating;
 
-	protected float GGKOKNNPJFC;
+	protected float enemyRating;
 
-	protected float ICGKDBJLMMD;
+	protected float playerRatingMagic;
 
-	protected float OFEHMDKHFPC;
+	protected float enemyRatingMagic;
 
-	protected float BIEBOJEAKMO;
+	protected float playerRatingRanged;
 
-	protected float CKJHMIPEPAN;
+	protected float enemyRatingRanged;
 
-	protected float INMBDMJFLLJ;
+	protected float ratingCorrection;
 
 	public RatingEvaluationRule(XmlNode node)
-		: base(BCBLLMPAMLP.RuleRatingEvaluation, node)
+		: base(RuleType.RuleRatingEvaluation, node)
 	{
-		LIIBMLCBOEL = node.Attributes["PlayerRating"].ParseFloat();
-		GGKOKNNPJFC = node.Attributes["EnemyRating"].ParseFloat();
-		ICGKDBJLMMD = node.Attributes["PlayerRatingMagic"].ParseFloat();
-		OFEHMDKHFPC = node.Attributes["EnemyRatingMagic"].ParseFloat();
-		BIEBOJEAKMO = node.Attributes["PlayerRatingRanged"].ParseFloat();
-		CKJHMIPEPAN = node.Attributes["EnemyRatingRanged"].ParseFloat();
-		INMBDMJFLLJ = node.Attributes["RatingCorrection"].ParseFloat();
+		playerRating = node.Attributes["PlayerRating"].ParseFloat();
+		enemyRating = node.Attributes["EnemyRating"].ParseFloat();
+		playerRatingMagic = node.Attributes["PlayerRatingMagic"].ParseFloat();
+		enemyRatingMagic = node.Attributes["EnemyRatingMagic"].ParseFloat();
+		playerRatingRanged = node.Attributes["PlayerRatingRanged"].ParseFloat();
+		enemyRatingRanged = node.Attributes["EnemyRatingRanged"].ParseFloat();
+		ratingCorrection = node.Attributes["RatingCorrection"].ParseFloat();
 	}
 
-	public float JLDBFIKOALE()
+	public float GetPlayerRating()
 	{
-		return LIIBMLCBOEL;
+		return playerRating;
 	}
 
-	public float IJCNLEOEFAG()
+	public float GetEnemyRating()
 	{
-		return GGKOKNNPJFC;
+		return enemyRating;
 	}
 
-	public float KFGKCOKGBFB()
+	public float GetPlayerRatingMagic()
 	{
-		return ICGKDBJLMMD;
+		return playerRatingMagic;
 	}
 
-	public float EJCAKIHPNDG()
+	public float GetEnemyRatingMagic()
 	{
-		return OFEHMDKHFPC;
+		return enemyRatingMagic;
 	}
 
-	public float EJJFJELMIMP()
+	public float GetPlayerRatingRanged()
 	{
-		return BIEBOJEAKMO;
+		return playerRatingRanged;
 	}
 
-	public float OOCNGFFGFPD()
+	public float GetEnemyRatingRanged()
 	{
-		return CKJHMIPEPAN;
+		return enemyRatingRanged;
 	}
 
-	public float FIOPALJIOEC()
+	public float GetRatingCorrection()
 	{
-		return INMBDMJFLLJ;
+		return ratingCorrection;
 	}
 }

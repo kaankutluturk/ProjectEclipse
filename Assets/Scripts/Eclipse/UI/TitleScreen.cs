@@ -269,7 +269,7 @@ namespace Eclipse.UI
             if (optionsOnly) return;
             // Returning to the title can leave the game's own menu or fight music loaded; stop it
             // (this also lets the map start its menu theme afresh after the title closes).
-            try { SoundController.NDBJCCIBAIO(); }
+            try { SoundController.StopBackgroundMusic(); }
             catch (Exception error) { Debug.LogWarning("[Title] Could not stop game music: " + error.Message); }
             // The track follows the scene; on a cold launch it rises slowly under the splash.
             ChooseScene();

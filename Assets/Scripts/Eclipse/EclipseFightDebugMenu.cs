@@ -274,25 +274,25 @@ namespace Eclipse.Diagnostics
 			_visibleHitboxes.Clear();
 			_visibleHurtboxes.Clear();
 
-			for (int i = 0; i < fight.LNDLFINJHDB.Count; i++)
+			for (int i = 0; i < fight.ActiveModels.Count; i++)
 			{
-				Model model = fight.LNDLFINJHDB[i];
+				Model model = fight.ActiveModels[i];
 				if (!IsFighterModel(model))
 				{
 					continue;
 				}
 
-				ModelObject modelObject = model.KFDGGLKBKEP;
-				List<ModelEdge> hurtboxes = modelObject.OOFMOAHJEJF;
+				ModelObject modelObject = model.Body;
+				List<ModelEdge> hurtboxes = modelObject.CollisionEdges;
 				for (int edgeIndex = 0; edgeIndex < hurtboxes.Count; edgeIndex++)
 				{
 					ModelEdge edge = hurtboxes[edgeIndex];
 					_visibleHurtboxes.Add(edge);
-					UpdateLine(_hurtboxLines, edge, model.ICDCIANNAAI.transform, HurtboxColor, -1.4f);
+					UpdateLine(_hurtboxLines, edge, model.UnityObject.transform, HurtboxColor, -1.4f);
 				}
 
-				ModelAnimation animation = model.DAPLCAPAPDI;
-				List<ModelEdge> hitboxes = animation == null ? null : animation.CPNOFKIMMCK();
+				ModelAnimation animation = model.AnimationModule;
+				List<ModelEdge> hitboxes = animation == null ? null : animation.GetAttackingEdges();
 				if (hitboxes == null)
 				{
 					continue;
@@ -301,7 +301,7 @@ namespace Eclipse.Diagnostics
 				{
 					ModelEdge edge = hitboxes[edgeIndex];
 					_visibleHitboxes.Add(edge);
-					UpdateLine(_hitboxLines, edge, model.ICDCIANNAAI.transform, HitboxColor, -1.6f);
+					UpdateLine(_hitboxLines, edge, model.UnityObject.transform, HitboxColor, -1.6f);
 				}
 			}
 
@@ -334,11 +334,11 @@ namespace Eclipse.Diagnostics
 				line.transform.SetParent(parent, false);
 			}
 
-			Vector3f start = edge.CCMHKFHDFNM;
-			Vector3f end = edge.MBLICPBLEFC;
+			Vector3f start = edge.CollisionStart;
+			Vector3f end = edge.CollisionEnd;
 			line.SetPosition(0, new Vector3(start.GetX(), start.GetY(), depth));
 			line.SetPosition(1, new Vector3(end.GetX(), end.GetY(), depth));
-			float width = Mathf.Max(0.04f, edge.AGODBAOHPJC * 2f);
+			float width = Mathf.Max(0.04f, edge.CollisionRadius * 2f);
 			line.startWidth = width;
 			line.endWidth = width;
 			line.startColor = color;
@@ -354,17 +354,17 @@ namespace Eclipse.Diagnostics
 				return;
 			}
 
-			for (int i = 0; i < fight.LNDLFINJHDB.Count; i++)
+			for (int i = 0; i < fight.ActiveModels.Count; i++)
 			{
-				Model model = fight.LNDLFINJHDB[i];
+				Model model = fight.ActiveModels[i];
 				if (!IsFighterModel(model))
 				{
 					continue;
 				}
 
-				Vector3f center = model.BPPINEHFOBB;
+				Vector3f center = model.Position;
 				Vector3 localCenter = new Vector3(center.GetX(), center.GetY(), center.GetZ());
-				Vector3 screen = camera.WorldToScreenPoint(model.ICDCIANNAAI.transform.TransformPoint(localCenter));
+				Vector3 screen = camera.WorldToScreenPoint(model.UnityObject.transform.TransformPoint(localCenter));
 				if (screen.z < 0f)
 				{
 					continue;
@@ -387,13 +387,13 @@ namespace Eclipse.Diagnostics
 		private static Fight GetActiveFight()
 		{
 			Fight fight = Fight.GetCurrentFight();
-			return fight != null && fight.LNDLFINJHDB != null && fight.LNDLFINJHDB.Count > 0 ? fight : null;
+			return fight != null && fight.ActiveModels != null && fight.ActiveModels.Count > 0 ? fight : null;
 		}
 
 		private static bool IsFighterModel(Model model)
 		{
-			return model != null && model.Parameters != null && model.ICDCIANNAAI != null &&
-				model.KFDGGLKBKEP != null && model.HIPJNBEFGHN();
+			return model != null && model.Parameters != null && model.UnityObject != null &&
+				model.Body != null && model.HasEnemies();
 		}
 
 		private Material GetLineMaterial()

@@ -9,47 +9,47 @@ namespace AssemblyCleanupFixture.Session
         public static readonly List<string> Events = new List<string>();
         public static bool RunQuests;
     }
-    public class GiveLogin { public void PGAJKMOPDIJ() { Trace.Events.Add("rewards"); } }
+    public class GiveLogin { public void SendGiveLogin() { Trace.Events.Add("rewards"); } }
     public class LedgerManager { }
-    public static class LLLOJBFMONN { public static void INNGABABJPC(string message) { } }
+    public static class GameLog { public static void Info(string message) { } }
     public struct FightIDS { public static FightIDS Empty() { return new FightIDS(); } }
-    public static class QuestEvent { public enum PMDPDMFLCIJ { QUEST_EVENT_LOGIN_END, QUEST_EVENT_SESSION } }
+    public static class QuestEvent { public enum QuestEventType { QUEST_EVENT_LOGIN_END, QUEST_EVENT_SESSION } }
     public class QuestParameters
     {
         public object ActiveQuest;
-        public FightIDS JLGLBLDPAAF;
-        public string HEIADONEACH = "active";
-        public object LBGOMJFFEPP() { return ActiveQuest; }
+        public FightIDS fightIds;
+        public string fightResult = "active";
+        public object GetFightList() { return ActiveQuest; }
     }
     public class ListSF
     {
         private static readonly ListSF instance = new ListSF();
         public readonly QuestParameters Quest = new QuestParameters();
         public static ListSF GetInstance() { return instance; }
-        public static ListSF CCDKHLAMKKO() { return instance; }
-        public void MAOPKFNKHOI() { Trace.Events.Add("first-session"); }
-        public void BIHELGAGPGO() { Trace.Events.Add("local-update"); }
-        public QuestParameters BNMLDPNCMLB() { return Quest; }
-        public bool FFBAJNGHGGD(QuestEvent.PMDPDMFLCIJ evt) { Trace.Events.Add(evt.ToString()); return Trace.RunQuests; }
-        public void MHHNIPBJNAD() { Trace.Events.Add("quest-run"); }
+        public static ListSF GetRoster() { return instance; }
+        public void CreateMissingAchievements() { Trace.Events.Add("first-session"); }
+        public void UpdateLastDumpTime() { Trace.Events.Add("local-update"); }
+        public QuestParameters GetQuestParameters() { return Quest; }
+        public bool RaiseQuestEvent(QuestEvent.QuestEventType evt) { Trace.Events.Add(evt.ToString()); return Trace.RunQuests; }
+        public void RunQuestActions() { Trace.Events.Add("quest-run"); }
     }
 }
 
 namespace AssemblyCleanupFixture.Backend
 {
-    public interface JNEBPDNJFJG
+    public interface IPurchaseVerifier
     {
-        void VerifyPurchaseAction(JLDHCFFAIPK product, string platform, Action<bool, string, object> callback);
-        void ConfirmVerificationAction(JLDHCFFAIPK product, string platform, Action<bool, string, object> callback);
+        void VerifyPurchaseAction(PaymentInfo product, string platform, Action<bool, string, object> callback);
+        void ConfirmVerificationAction(PaymentInfo product, string platform, Action<bool, string, object> callback);
     }
-    public class JLDHCFFAIPK { }
+    public class PaymentInfo { }
     public class ServerProviderBase
     {
-        public static ServerProviderBase BPCBBHAKFDM;
+        public static ServerProviderBase CurrentInstance;
         public static ServerProviderBase get_Instance() { return null; }
         public static T Init<T>() where T : new() { return new T(); }
         protected virtual void Init() { }
-        protected virtual string NFKOPHMCLFF() { return null; }
+        protected virtual string GetServerUrl() { return null; }
         protected virtual IEnumerator TimeSyncRoutine(Action<long> done, Action<string> error) { yield break; }
         public IEnumerator Pending;
         public void StartCoroutine(IEnumerator routine) { Pending = routine; }
@@ -70,9 +70,9 @@ namespace AssemblyCleanupFixture
         }
         public static string Run()
         {
-            var session = Session.NetworkController.ELEBLBJKDBI();
-            Check(ReferenceEquals(session, Session.NetworkController.BPCBBHAKFDM), "Session singleton changed");
-            Check(session.LBDHOLEICEG != null && session.KDILDKDNIID != null, "Local reward/ledger helpers missing");
+            var session = Session.NetworkController.GetInstance();
+            Check(ReferenceEquals(session, Session.NetworkController.Instance), "Session singleton changed");
+            Check(session.GiveLoginService != null && session.Ledger != null, "Local reward/ledger helpers missing");
             int completions = 0;
             session.OnLoginComplete += state => {
                 Check(state == null, "Login fabricated remote data");
@@ -84,18 +84,18 @@ namespace AssemblyCleanupFixture
                 Session.Trace.RunQuests = i >= 2;
                 var quest = Session.ListSF.GetInstance().Quest;
                 quest.ActiveQuest = active ? new object() : null;
-                quest.HEIADONEACH = "active";
+                quest.fightResult = "active";
                 Session.Trace.Events.Clear();
-                session.IFFDOFMDABC();
+                session.CompleteLogin();
                 string run = Session.Trace.RunQuests ? ",quest-run" : "";
                 string expected = (i == 0 ? "first-session," : "") +
                     "local-update,rewards,QUEST_EVENT_LOGIN_END" + run + ",complete,QUEST_EVENT_SESSION" + run;
                 Check(string.Join(",", Session.Trace.Events) == expected, "Local session ordering changed");
-                Check(quest.HEIADONEACH == (active ? "active" : ""), "Active quest state was cleared incorrectly");
+                Check(quest.fightResult == (active ? "active" : ""), "Active quest state was cleared incorrectly");
             }
             Check(completions == 4, "Login completion count changed");
             var server = Backend.ServerProvider.get_Instance();
-            var product = new Backend.JLDHCFFAIPK();
+            var product = new Backend.PaymentInfo();
             object expectedState = null;
             int responses = 0;
             Action<bool, string, object> callback = (success, error, state) => {

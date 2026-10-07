@@ -34,7 +34,7 @@ public static class Program
         var doc = new XmlDocument();
         doc.LoadXml("<Choice><Item Weight='2'/><Money Weight='1'/></Choice>");
         var choice = new RewardChoice(doc.DocumentElement);
-        Rewardable selected = choice.OOOBLJIHBEP();
+        Rewardable selected = choice.ChooseRandomReward();
         if (selected == null || selected.Kind != "Item") throw new Exception("RewardChoice did not parse/select its first weighted child.");
         Console.WriteLine("RewardChoice runtime: PASS (backing list initialized; weighted child parse/select works).");
         return 0;

@@ -32,7 +32,7 @@ foreach($axis in @('X','Y')) {
   foreach($value in @(-251,-250,-249)) {
    [xml]$fixtureNode='<Distance Axis="'+$axis+'" Max="-250" Not="'+([int]$negated)+'"><From Object="Floor"/><To Object="Floor" Shift'+$axis+'="'+$value+'"/></Distance>'
    $native=Parse-Condition $fixtureNode.DocumentElement
-   $state=[ModelConditions]::new();$state.PCAOCHAIBJC=1
+   $state=[ModelConditions]::new();$state.AnimationSign=1
    Check ($native.IsEqual($state) -eq (($value -le -250) -xor $negated)) 'Native signed distance bound/negation mismatch.'
   }
  }

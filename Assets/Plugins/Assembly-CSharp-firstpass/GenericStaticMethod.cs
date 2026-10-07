@@ -4,19 +4,19 @@ using System.Reflection;
 
 public sealed class GenericStaticMethod
 {
-	private readonly MethodInfo DLMNFPDKIEI;
+	private readonly MethodInfo methodToCall;
 
 	public GenericStaticMethod(Expression<Action> BOPGDKGIGHM)
 	{
 		MethodCallExpression methodCallExpression = (MethodCallExpression)BOPGDKGIGHM.Body;
-		DLMNFPDKIEI = methodCallExpression.Method.GetGenericMethodDefinition();
+		methodToCall = methodCallExpression.Method.GetGenericMethodDefinition();
 	}
 
 	public object Invoke(Type[] GIAFINCFDLC, params object[] arguments)
 	{
 		try
 		{
-			return DLMNFPDKIEI.MakeGenericMethod(GIAFINCFDLC).Invoke(null, arguments);
+			return methodToCall.MakeGenericMethod(GIAFINCFDLC).Invoke(null, arguments);
 		}
 		catch (TargetInvocationException mPFFFAOGBJE)
 		{

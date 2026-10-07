@@ -6,7 +6,7 @@ namespace Nekki.SF2.GUI
 {
 	public class TableViewScroll : SFScrollRect
 	{
-		private TableViewOrientation NDIOMHCLPEP;
+		private TableViewOrientation _orientation;
 
 		[SerializeField]
 		public UnityEvent onDragBegin = new UnityEvent();
@@ -14,7 +14,7 @@ namespace Nekki.SF2.GUI
 		[SerializeField]
 		public UnityEvent onDragEnd = new UnityEvent();
 
-		public float AFAJHIFFOGP
+		public float ContentSizeDelta
 		{
 			get
 			{
@@ -28,7 +28,7 @@ namespace Nekki.SF2.GUI
 
 		public float get_Size()
 		{
-			if (NDIOMHCLPEP == TableViewOrientation.Horizontal)
+			if (_orientation == TableViewOrientation.Horizontal)
 			{
 				return get_content().rect.width;
 			}
@@ -37,7 +37,7 @@ namespace Nekki.SF2.GUI
 
 		public float get_SizeDelta()
 		{
-			if (NDIOMHCLPEP == TableViewOrientation.Horizontal)
+			if (_orientation == TableViewOrientation.Horizontal)
 			{
 				return get_content().sizeDelta.x;
 			}
@@ -46,7 +46,7 @@ namespace Nekki.SF2.GUI
 
 		public void set_SizeDelta(float value)
 		{
-			if (NDIOMHCLPEP == TableViewOrientation.Horizontal)
+			if (_orientation == TableViewOrientation.Horizontal)
 			{
 				get_content().sizeDelta = new Vector2(value, get_content().sizeDelta.y);
 			}
@@ -58,13 +58,13 @@ namespace Nekki.SF2.GUI
 
 		public void Init()
 		{
-			OKPMNKIOOOE();
+			CreateContent();
 		}
 
 		public void SetOrientation(TableViewOrientation LJHFAPHFGIC)
 		{
-			NDIOMHCLPEP = LJHFAPHFGIC;
-			if (NDIOMHCLPEP == TableViewOrientation.Horizontal)
+			_orientation = LJHFAPHFGIC;
+			if (_orientation == TableViewOrientation.Horizontal)
 			{
 				get_content().anchorMin = new Vector2(0f, 0f);
 				get_content().anchorMax = new Vector2(0f, 1f);
@@ -76,13 +76,13 @@ namespace Nekki.SF2.GUI
 				get_content().anchorMax = new Vector2(1f, 1f);
 				get_content().pivot = new Vector2(0.5f, 1f);
 			}
-			set_horizontal(NDIOMHCLPEP == TableViewOrientation.Horizontal);
+			set_horizontal(_orientation == TableViewOrientation.Horizontal);
 			set_vertical(!get_horizontal());
 		}
 
 		public void SetNormalizedPosition(float HOLFOPDJLFL)
 		{
-			if (NDIOMHCLPEP == TableViewOrientation.Horizontal)
+			if (_orientation == TableViewOrientation.Horizontal)
 			{
 				set_horizontalNormalizedPosition(HOLFOPDJLFL);
 			}
@@ -92,7 +92,7 @@ namespace Nekki.SF2.GUI
 			}
 		}
 
-		private void OKPMNKIOOOE()
+		private void CreateContent()
 		{
 			set_content(new GameObject("Table View Content", typeof(RectTransform), typeof(CanvasRenderer)).GetComponent<RectTransform>());
 			get_content().SetParent(base.gameObject.GetComponent<RectTransform>(), false);

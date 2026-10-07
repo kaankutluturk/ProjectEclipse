@@ -4,45 +4,45 @@ using System.Linq;
 
 public sealed class YamlAttributesTypeInspector : TypeInspectorSkeleton
 {
-	private readonly ITypeInspector CECGLIIIJJH;
+	private readonly ITypeInspector innerTypeDescriptor;
 
 	public YamlAttributesTypeInspector(ITypeInspector CECGLIIIJJH)
 	{
-		this.CECGLIIIJJH = CECGLIIIJJH;
+		this.innerTypeDescriptor = CECGLIIIJJH;
 	}
 
-	public override IEnumerable<IPropertyDescriptor> GHIBHNJKIHN(Type LFLGCDNKNJI, object EGJHGBCEPHO)
+	public override IEnumerable<IPropertyDescriptor> GetProperties(Type LFLGCDNKNJI, object EGJHGBCEPHO)
 	{
-		return from PIIEECCHMAC in (from PIIEECCHMAC in CECGLIIIJJH.GHIBHNJKIHN(LFLGCDNKNJI, EGJHGBCEPHO)
-				where PIIEECCHMAC.PJLLHGDNCIF<MOEOPMHGKCI>() == null
+		return from PIIEECCHMAC in (from PIIEECCHMAC in innerTypeDescriptor.GetProperties(LFLGCDNKNJI, EGJHGBCEPHO)
+				where PIIEECCHMAC.GetCustomAttribute<YamlIgnoreAttribute>() == null
 				select PIIEECCHMAC).Select((Func<IPropertyDescriptor, IPropertyDescriptor>)((IPropertyDescriptor PIIEECCHMAC) =>
 			{
 				PropertyDescriptor fLAHDIEMBAL = new PropertyDescriptor(PIIEECCHMAC);
-				YamlAliasAttribute gAANEGEKJGH = PIIEECCHMAC.PJLLHGDNCIF<YamlAliasAttribute>();
+				YamlAliasAttribute gAANEGEKJGH = PIIEECCHMAC.GetCustomAttribute<YamlAliasAttribute>();
 				if (gAANEGEKJGH != null)
 				{
-					fLAHDIEMBAL.set_Name(gAANEGEKJGH.MIDPFGENBCF());
+					fLAHDIEMBAL.set_Name(gAANEGEKJGH.GetAlias());
 				}
-				YamlMemberAttribute kGBEBCLPIIO = PIIEECCHMAC.PJLLHGDNCIF<YamlMemberAttribute>();
+				YamlMemberAttribute kGBEBCLPIIO = PIIEECCHMAC.GetCustomAttribute<YamlMemberAttribute>();
 				if (kGBEBCLPIIO != null)
 				{
-					if (kGBEBCLPIIO.FDDGCEPMIJG() != null)
+					if (kGBEBCLPIIO.GetSerializeAs() != null)
 					{
-						fLAHDIEMBAL.set_TypeOverride(kGBEBCLPIIO.FDDGCEPMIJG());
+						fLAHDIEMBAL.set_TypeOverride(kGBEBCLPIIO.GetSerializeAs());
 					}
-					fLAHDIEMBAL.set_Order(kGBEBCLPIIO.BHDEMLGCNOJ());
-					if (kGBEBCLPIIO.MIDPFGENBCF() != null)
+					fLAHDIEMBAL.set_Order(kGBEBCLPIIO.GetOrder());
+					if (kGBEBCLPIIO.GetName() != null)
 					{
 						if (gAANEGEKJGH != null)
 						{
 							throw new InvalidOperationException("Mixing YamlAlias(...) with YamlMember(Alias = ...) is an error. The YamlAlias attribute is obsolete and should be removed.");
 						}
-						fLAHDIEMBAL.set_Name(kGBEBCLPIIO.MIDPFGENBCF());
+						fLAHDIEMBAL.set_Name(kGBEBCLPIIO.GetName());
 					}
 				}
 				return fLAHDIEMBAL;
 			}))
-			orderby PIIEECCHMAC.BHDEMLGCNOJ()
+			orderby PIIEECCHMAC.GetOrder()
 			select PIIEECCHMAC;
 	}
 }

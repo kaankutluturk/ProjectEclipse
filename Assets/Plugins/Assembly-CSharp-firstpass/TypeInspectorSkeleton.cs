@@ -6,11 +6,11 @@ using System.Runtime.Serialization;
 
 public abstract class TypeInspectorSkeleton : ITypeInspector
 {
-	public abstract IEnumerable<IPropertyDescriptor> GHIBHNJKIHN(Type LFLGCDNKNJI, object EGJHGBCEPHO);
+	public abstract IEnumerable<IPropertyDescriptor> GetProperties(Type LFLGCDNKNJI, object EGJHGBCEPHO);
 
-	public IPropertyDescriptor DBLHKMEGOEK(Type LFLGCDNKNJI, object EGJHGBCEPHO, string name, bool GNFDAJLHBCN)
+	public IPropertyDescriptor GetProperty(Type LFLGCDNKNJI, object EGJHGBCEPHO, string name, bool GNFDAJLHBCN)
 	{
-		IEnumerable<IPropertyDescriptor> enumerable = from PIIEECCHMAC in GHIBHNJKIHN(LFLGCDNKNJI, EGJHGBCEPHO)
+		IEnumerable<IPropertyDescriptor> enumerable = from PIIEECCHMAC in GetProperties(LFLGCDNKNJI, EGJHGBCEPHO)
 			where PIIEECCHMAC.get_Name() == name
 			select PIIEECCHMAC;
 		using (IEnumerator<IPropertyDescriptor> enumerator = enumerable.GetEnumerator())

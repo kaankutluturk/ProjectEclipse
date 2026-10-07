@@ -10,70 +10,70 @@ function Read-Method($source, $name) {
 $ai = Get-Content -Raw (Join-Path $root 'Assets/Scripts/Assembly-CSharp/ModelAi.cs')
 $quest = Get-Content -Raw (Join-Path $root 'Assets/Scripts/Assembly-CSharp/QuestCondition.cs')
 $localization = Get-Content -Raw (Join-Path $root 'Assets/Scripts/Assembly-CSharp/LocalizationManager.cs')
-$formatMethods = (Read-Method $localization 'CAKFDPGBLLG') + (Read-Method $localization 'GetWordEndSymbol')
+$formatMethods = (Read-Method $localization 'ResolveEmbeddedKeys') + (Read-Method $localization 'GetWordEndSymbol')
 $location = Get-Content -Raw (Join-Path $root 'Assets/Scripts/Assembly-CSharp/Location.cs')
-$locationPath = Read-Method $location 'LKDJCCIJFMD'
+$locationPath = Read-Method $location 'ResolveLayerTexturePath'
 $labelSource = Get-Content -Raw (Join-Path $root 'Assets/Scripts/Assembly-CSharp/Nekki/SF2/GUI/LabelAlias.cs')
 $labelSetter = [regex]::Match($labelSource, '(?ms)^\t\tpublic void SetAlias\(.*?^\t\t\}').Value
 if (!$labelSetter) { throw 'Cannot extract LabelAlias.SetAlias.' }
 $aiMethods = (Read-Method $ai 'IsPlayableAnimations') + (Read-Method $ai 'IsTacticPlayableAnimations')
-$questMethods = (Read-Method $quest 'KGCPIDICOJB') + (Read-Method $quest 'NumberCompare') +
-    (Read-Method $quest 'StringCompare') + (Read-Method $quest 'OJHJEMKMDCP') + (Read-Method $quest 'LPBPJBCIGCO')
-$enum = [regex]::Match($quest, '(?ms)^\tpublic enum NFFNINLIPJJ.*?^\t\}').Value
+$questMethods = (Read-Method $quest 'CompareResults') + (Read-Method $quest 'NumberCompare') +
+    (Read-Method $quest 'StringCompare') + (Read-Method $quest 'EvaluateDataVersionFunction') + (Read-Method $quest 'EvaluateVersionControllerFunction')
+$enum = [regex]::Match($quest, '(?ms)^\tpublic enum ComparisonType.*?^\t\}').Value
 $code = @'
 using System;
 using System.Collections.Generic;
 using System.Xml;
 using Eclipse.Content;
 public static class SystemProperties {
-    public static bool DBBOCENKMGD() => false;
-    public static VersionContainer DFJEJKJECBI() => new VersionContainer("2.41.9");
-    public static VersionContainer KCJMMIEBLHL() => new VersionContainer("2.41.9");
+    public static bool IsDebug() => false;
+    public static VersionContainer GetDataVersion() => new VersionContainer("2.41.9");
+    public static VersionContainer GetVersion() => new VersionContainer("2.41.9");
 }
 namespace UnityEngine { public static class Time { public static int frameCount; } public static class Debug { public static void LogWarning(object message) {} } }
-public static class LLLOJBFMONN { public static void Error(string message) { throw new Exception(message); } }
+public static class GameLog { public static void Error(string message) { throw new Exception(message); } }
 public sealed class QuestParameters {}
-public class QuestAction { public string EFJMDEMAGIM; public virtual void DEJMHFMLKIC(QuestParameters p) {} public void OGIJONMKABB() {} }
+public class QuestAction { public string ActionName; public virtual void Execute(QuestParameters p) {} public void FinishAction() {} }
 public sealed class QuestActionOpenUrl : QuestAction {}
 public sealed class QuestActionSwitchToRaidsMap : QuestAction {}
 namespace Eclipse.Modding { public sealed class OfflineRaidQuestAction : QuestAction { public OfflineRaidQuestAction(string operation) { throw new NotSupportedException("Offline raid actions are outside this fixture."); } } }
-public static class GameCenterController { public static bool OBDJPKOJADA() => false; }
+public static class GameCenterController { public static bool GetIsAuthenticated() => false; }
 public sealed class ConditionKeys {}
 public sealed class LocationPathFixture {
     /* LOCATION */
-    public string Resolve(string path) => LKDJCCIJFMD(path);
+    public string Resolve(string path) => ResolveLayerTexturePath(path);
 }
 public static class FormatFixture {
     /* FORMAT */
-    public static string Format(string value) => CAKFDPGBLLG(value);
+    public static string Format(string value) => ResolveEmbeddedKeys(value);
     static string GetString(string key) => key == "long" ? "a much longer translation" : key == "short" ? "x" : "%%ERROR%%";
 }
 public sealed class LabelFixture {
     string _Alias = ""; public string Text = "";
     void set_text(string value) { Text = value; }
-    void OCLBJLPOKLB() { if (_Alias != "") Text = _Alias; }
+    void RefreshLocalizedText() { if (_Alias != "") Text = _Alias; }
     /* LABEL */
 }
-public sealed class EventAnimation { public enum EECEJKADLCK { EVENT_KEY_PRESSED } }
-public sealed class ModelConditions { public bool IDCHHGHAENM; public int PDKPGKPBBIL, PCAOCHAIBJC, FOIHIKCEBJF; }
-public sealed class ModelAnimation { public int KFCNPADAMHA() => 1; }
+public sealed class EventAnimation { public enum EventAnimationType { EVENT_KEY_PRESSED } }
+public sealed class ModelConditions { public bool IsKeyCheckEnabled; public int CandidateMoveNames, AnimationSign, PivotPairSelector; }
+public sealed class ModelAnimation { public int GetSign() => 1; }
 public sealed class Model {
     public List<InfoAnimation> Moves = new List<InfoAnimation>();
     public List<InfoAnimation> GetAvailableAnimations() => Moves;
-    public ModelConditions EBABHGHPLFK() => new ModelConditions();
+    public ModelConditions GetConditions() => new ModelConditions();
 }
 public sealed class InfoAnimation {
-    public sealed class Inside { public Inside ILOEBFFAEAN => this; public int OLBDPMKCJIF; public object NIDNJFOGBFO; }
+    public sealed class Inside { public Inside AlignData => this; public int PivotSideKind; public object TacticsConditions; }
     public sealed class CapabilityTable { public List<InfoAnimation> HigherPriorityMoves = new List<InfoAnimation>(); }
     public ConditionKeys Keys;
     public bool Allowed = true;
     public Inside MoveData = new Inside();
     public CapabilityTable PriorityConflicts = new CapabilityTable();
-    public ConditionKeys ILBCHANCOBP() => Keys;
-    public int FOLOOGCLPNE() => 0;
-    public int CEDEDCLGJDE(ModelConditions c, int direction) => 0;
-    public EventAnimation OIGBIFNICBI(EventAnimation.EECEJKADLCK e) => null;
-    public bool HPPGNJJCEGF(object model, object conditions, EventAnimation e) => Allowed;
+    public ConditionKeys GetFirstKeysCondition() => Keys;
+    public int GetTemplateNames() => 0;
+    public int GetDirection(ModelConditions c, int direction) => 0;
+    public EventAnimation FindMoveEventByType(EventAnimation.EventAnimationType e) => null;
+    public bool AreConditionsMet(object model, object conditions, EventAnimation e) => Allowed;
 }
 public sealed class AiFixture {
     public Model _Model = new Model();
@@ -86,18 +86,18 @@ public sealed class AiFixture {
 public sealed class QuestFixture {
     /* ENUM */
     public bool _compareVersions;
-    public NFFNINLIPJJ LFLGCDNKNJI;
-    public sealed class QuestFunctions { public string HBDLDIKHFEG; }
+    public ComparisonType comparison;
+    public sealed class QuestFunctions { public string property; }
     public sealed class CompareResult {
         public string resultSTR = ""; public double resultNumber;
-        public bool INCOIAANDCO() => resultSTR == "";
-        public override string ToString() => INCOIAANDCO() ? resultNumber.ToString() : resultSTR;
+        public bool IsNumber() => resultSTR == "";
+        public override string ToString() => IsNumber() ? resultNumber.ToString() : resultSTR;
     }
     /* QUEST */
-    public bool Compare(string left, string right) => KGCPIDICOJB(new CompareResult { resultSTR = left }, new CompareResult { resultSTR = right });
+    public bool Compare(string left, string right) => CompareResults(new CompareResult { resultSTR = left }, new CompareResult { resultSTR = right });
     public string Version(bool data) {
-        var result = new CompareResult(); var function = new QuestFunctions { HBDLDIKHFEG = "Version" };
-        if (data) OJHJEMKMDCP(function, result); else LPBPJBCIGCO(function, result);
+        var result = new CompareResult(); var function = new QuestFunctions { property = "Version" };
+        if (data) EvaluateDataVersionFunction(function, result); else EvaluateVersionControllerFunction(function, result);
         return result.resultSTR;
     }
 }
@@ -124,7 +124,7 @@ public static class Program {
         Check(ai.Normal(keyed), "Event-only override suppressed ordinary keyed movement.");
         keyed.Allowed = false;
         Check(!ai.Normal(keyed) && !ai.Tactical(keyed), "Existing animation eligibility was bypassed.");
-        var quest = new QuestFixture { _compareVersions = true, LFLGCDNKNJI = QuestFixture.NFFNINLIPJJ.QUEST_CONDITION_GREATER_EQUAL };
+        var quest = new QuestFixture { _compareVersions = true, comparison = QuestFixture.ComparisonType.QUEST_CONDITION_GREATER_EQUAL };
         Check(quest.Version(true) == "2.41.9" && quest.Version(false) == "2.41.9", "Full version property failed.");
         Check(quest.Compare("2.41.9", "2.0.0") && quest.Compare("2.10.0", "2.9.0") &&
             !quest.Compare("1.6.0", "2.0.0") && quest.Compare("2.0.0", "2.0.0"), "Version comparison is not numeric component order.");

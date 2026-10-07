@@ -2,14 +2,14 @@ using System.Xml;
 
 public class CopyItemInfo : ItemInfo
 {
-	public string BLIKNEDFOFG;
+	public string CopyParentType;
 
-	public string PCOBPICANEP;
+	public string CopyParentSubtype;
 
 	public CopyItemInfo(XmlNode node, string FFBGOLDLBHD = "", string IGOAPEILEFP = "")
 		: base(node)
 	{
-		BLIKNEDFOFG = FFBGOLDLBHD;
-		PCOBPICANEP = IGOAPEILEFP;
+		CopyParentType = FFBGOLDLBHD;
+		CopyParentSubtype = IGOAPEILEFP;
 	}
 }

@@ -2,7 +2,7 @@ using System;
 
 public sealed class LambdaObjectFactory : IObjectFactory
 {
-	private readonly Func<Type, object> BPIELBMAJHK;
+	private readonly Func<Type, object> factory;
 
 	public LambdaObjectFactory(Func<Type, object> DJFCIPIMOBC)
 	{
@@ -10,11 +10,11 @@ public sealed class LambdaObjectFactory : IObjectFactory
 		{
 			throw new ArgumentNullException("factory");
 		}
-		BPIELBMAJHK = DJFCIPIMOBC;
+		factory = DJFCIPIMOBC;
 	}
 
 	public object Create(Type LFLGCDNKNJI)
 	{
-		return BPIELBMAJHK(LFLGCDNKNJI);
+		return factory(LFLGCDNKNJI);
 	}
 }

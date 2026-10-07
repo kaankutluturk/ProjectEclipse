@@ -19,17 +19,17 @@ namespace YamlDotNet.RepresentationModel
 			base.Anchor = KOLNNNLOCFE;
 		}
 
-		internal override void GPBMMFCHANP(DocumentLoadingState state)
+		internal override void ResolveAliases(DocumentLoadingState state)
 		{
 			throw new NotSupportedException("Resolving an alias on an alias node does not make sense");
 		}
 
-		internal override void Emit(NEKGJNOFOFN NPIDIMCLNEM, EmitterState state)
+		internal override void Emit(IEmitter NPIDIMCLNEM, EmitterState state)
 		{
 			throw new NotSupportedException("A YamlAliasNode is an implementation detail and should never be saved.");
 		}
 
-		public override void GPHIFFOGOGN(IYamlVisitor NKECMANOOEM)
+		public override void Accept(IYamlVisitor NKECMANOOEM)
 		{
 			throw new NotSupportedException("A YamlAliasNode is an implementation detail and should never be visited.");
 		}

@@ -4,7 +4,7 @@ using System.Xml;
 
 public class PerkEvent : PerkObject
 {
-	public enum KNKIIEPDCPN
+	public enum PerkEventType
 	{
 		EVENT_NONE = 0,
 		EVENT_ROUND_STAGE_START = 1,
@@ -25,19 +25,19 @@ public class PerkEvent : PerkObject
 
 	public class EventStruct
 	{
-		public KNKIIEPDCPN Type;
+		public PerkEventType Type;
 
 		public object Info;
 
-		public Model BMIGEFANCCC;
+		public Model PerkOwnerModel;
 
-		public Model BIKLKJMNGKP;
+		public Model EventModel;
 
 		public string Namespace = string.Empty;
 	}
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private KNKIIEPDCPN KAHHEBMBCFA;
+	private PerkEventType _type;
 
 	public PerkEvent()
 	{
@@ -49,14 +49,14 @@ public class PerkEvent : PerkObject
 		set_Type(NOLFMPDGCOC.get_Type());
 	}
 
-	public KNKIIEPDCPN get_Type()
+	public PerkEventType get_Type()
 	{
-		return KAHHEBMBCFA;
+		return _type;
 	}
 
-	protected void set_Type(KNKIIEPDCPN value)
+	protected void set_Type(PerkEventType value)
 	{
-		KAHHEBMBCFA = value;
+		_type = value;
 	}
 
 	public static List<PerkEvent> Create(XmlNode node, PerkInfoItem AEFFHJGMNFI)
@@ -110,9 +110,9 @@ public class PerkEvent : PerkObject
 					gBMAKFJNAPG = new PerkEvent();
 					break;
 				}
-				gBMAKFJNAPG.JMOIMIHPBOM(AEFFHJGMNFI);
+				gBMAKFJNAPG.SetPerk(AEFFHJGMNFI);
 				gBMAKFJNAPG.Parse(childNode);
-				if (gBMAKFJNAPG.get_Type() != KNKIIEPDCPN.EVENT_NONE)
+				if (gBMAKFJNAPG.get_Type() != PerkEventType.EVENT_NONE)
 				{
 					list.Add(gBMAKFJNAPG);
 				}
@@ -128,59 +128,59 @@ public class PerkEvent : PerkObject
 		{
 			switch (BBLOGNPCPKI.get_Type())
 			{
-			case KNKIIEPDCPN.EVENT_ROUND_STAGE_START:
+			case PerkEventType.EVENT_ROUND_STAGE_START:
 				gBMAKFJNAPG = new PerkEventRoundStage((PerkEventRoundStage)BBLOGNPCPKI);
 				break;
-			case KNKIIEPDCPN.EVENT_HIT_PRECRIT:
+			case PerkEventType.EVENT_HIT_PRECRIT:
 				gBMAKFJNAPG = new PerkEventPostHit((PerkEventPostHit)BBLOGNPCPKI);
 				break;
-			case KNKIIEPDCPN.EVENT_HIT_POSTCRIT:
+			case PerkEventType.EVENT_HIT_POSTCRIT:
 				gBMAKFJNAPG = new PerkEventPostHit((PerkEventPostHit)BBLOGNPCPKI);
 				break;
-			case KNKIIEPDCPN.EVENT_POST_HIT:
+			case PerkEventType.EVENT_POST_HIT:
 				gBMAKFJNAPG = new PerkEventPostHit((PerkEventPostHit)BBLOGNPCPKI);
 				break;
-			case KNKIIEPDCPN.EVENT_ANIMATION_START:
+			case PerkEventType.EVENT_ANIMATION_START:
 				gBMAKFJNAPG = new PerkEventAnimationStart((PerkEventAnimationStart)BBLOGNPCPKI);
 				break;
-			case KNKIIEPDCPN.EVENT_ANIMATION_END:
+			case PerkEventType.EVENT_ANIMATION_END:
 				gBMAKFJNAPG = new PerkEventAnimationStart((PerkEventAnimationStart)BBLOGNPCPKI);
 				break;
-			case KNKIIEPDCPN.EVENT_MOD_EXPIRES:
+			case PerkEventType.EVENT_MOD_EXPIRES:
 				gBMAKFJNAPG = new PerkEventModExpires((PerkEventModExpires)BBLOGNPCPKI);
 				break;
-			case KNKIIEPDCPN.EVENT_EVERY_FRAME:
+			case PerkEventType.EVENT_EVERY_FRAME:
 				gBMAKFJNAPG = new PerkEventEveryFrame((PerkEventEveryFrame)BBLOGNPCPKI);
 				break;
-			case KNKIIEPDCPN.EVENT_AREA_ENTER:
+			case PerkEventType.EVENT_AREA_ENTER:
 				gBMAKFJNAPG = new PerkEventAreaEnter((PerkEventAreaEnter)BBLOGNPCPKI);
 				break;
-			case KNKIIEPDCPN.EVENT_AREA_EXIT:
+			case PerkEventType.EVENT_AREA_EXIT:
 				gBMAKFJNAPG = new PerkEventAreaEnter((PerkEventAreaEnter)BBLOGNPCPKI);
 				break;
-			case KNKIIEPDCPN.EVENT_MAGIC_CHARGED:
+			case PerkEventType.EVENT_MAGIC_CHARGED:
 				gBMAKFJNAPG = new PerkEventAreaEnter((PerkEventAreaEnter)BBLOGNPCPKI);
 				break;
-			case KNKIIEPDCPN.EVENT_INTERVAL_END:
+			case PerkEventType.EVENT_INTERVAL_END:
 				gBMAKFJNAPG = new PerkEventIntervalEnd((PerkEventIntervalEnd)BBLOGNPCPKI);
 				break;
 			default:
 				gBMAKFJNAPG = new PerkEvent(BBLOGNPCPKI);
-				LLLOJBFMONN.Error("PerkEvent.Clone PerkEvent type is EventType.EVENT_NONE");
+				GameLog.Error("PerkEvent.Clone PerkEvent type is EventType.EVENT_NONE");
 				break;
 			}
-			gBMAKFJNAPG.JMOIMIHPBOM(AEFFHJGMNFI);
+			gBMAKFJNAPG.SetPerk(AEFFHJGMNFI);
 		}
 		return gBMAKFJNAPG;
 	}
 
 	public virtual bool IsEqual(EventStruct EJMEALJNNIL)
 	{
-		if (IHJJBIDMEMB == PlayerType.PLAYER_ME && EJMEALJNNIL.BMIGEFANCCC != EJMEALJNNIL.BIKLKJMNGKP)
+		if (TargetPlayer == PlayerType.PLAYER_ME && EJMEALJNNIL.PerkOwnerModel != EJMEALJNNIL.EventModel)
 		{
 			return false;
 		}
-		if (IHJJBIDMEMB == PlayerType.PLAYER_ENEMY && EJMEALJNNIL.BMIGEFANCCC == EJMEALJNNIL.BIKLKJMNGKP)
+		if (TargetPlayer == PlayerType.PLAYER_ENEMY && EJMEALJNNIL.PerkOwnerModel == EJMEALJNNIL.EventModel)
 		{
 			return false;
 		}
@@ -193,49 +193,49 @@ public class PerkEvent : PerkObject
 		switch (node.Name)
 		{
 		case "RoundStageStart":
-			set_Type(KNKIIEPDCPN.EVENT_ROUND_STAGE_START);
+			set_Type(PerkEventType.EVENT_ROUND_STAGE_START);
 			break;
 		case "EveryFrame":
-			set_Type(KNKIIEPDCPN.EVENT_EVERY_FRAME);
+			set_Type(PerkEventType.EVENT_EVERY_FRAME);
 			break;
 		case "Style":
-			set_Type(KNKIIEPDCPN.EVENT_STYLE);
+			set_Type(PerkEventType.EVENT_STYLE);
 			break;
 		case "Combo":
-			set_Type(KNKIIEPDCPN.EVENT_COMBO);
+			set_Type(PerkEventType.EVENT_COMBO);
 			break;
 		case "HitPreCrit":
-			set_Type(KNKIIEPDCPN.EVENT_HIT_PRECRIT);
+			set_Type(PerkEventType.EVENT_HIT_PRECRIT);
 			break;
 		case "HitPostCrit":
-			set_Type(KNKIIEPDCPN.EVENT_HIT_POSTCRIT);
+			set_Type(PerkEventType.EVENT_HIT_POSTCRIT);
 			break;
 		case "PostHit":
-			set_Type(KNKIIEPDCPN.EVENT_POST_HIT);
+			set_Type(PerkEventType.EVENT_POST_HIT);
 			break;
 		case "MagicCharged":
-			set_Type(KNKIIEPDCPN.EVENT_MAGIC_CHARGED);
+			set_Type(PerkEventType.EVENT_MAGIC_CHARGED);
 			break;
 		case "AnimationStart":
-			set_Type(KNKIIEPDCPN.EVENT_ANIMATION_START);
+			set_Type(PerkEventType.EVENT_ANIMATION_START);
 			break;
 		case "AnimationEnd":
-			set_Type(KNKIIEPDCPN.EVENT_ANIMATION_END);
+			set_Type(PerkEventType.EVENT_ANIMATION_END);
 			break;
 		case "ModExpires":
-			set_Type(KNKIIEPDCPN.EVENT_MOD_EXPIRES);
+			set_Type(PerkEventType.EVENT_MOD_EXPIRES);
 			break;
 		case "AreaEnter":
-			set_Type(KNKIIEPDCPN.EVENT_AREA_ENTER);
+			set_Type(PerkEventType.EVENT_AREA_ENTER);
 			break;
 		case "AreaExit":
-			set_Type(KNKIIEPDCPN.EVENT_AREA_EXIT);
+			set_Type(PerkEventType.EVENT_AREA_EXIT);
 			break;
 		case "IntervalEnd":
-			set_Type(KNKIIEPDCPN.EVENT_INTERVAL_END);
+			set_Type(PerkEventType.EVENT_INTERVAL_END);
 			break;
 		default:
-			set_Type(KNKIIEPDCPN.EVENT_NONE);
+			set_Type(PerkEventType.EVENT_NONE);
 			break;
 		}
 	}
@@ -247,7 +247,7 @@ public class PerkEvent : PerkObject
 public class PerkEventIntervalEnd : PerkEvent
 {
 	private string _name = string.Empty;
-	private IntervalAnimation.NGAJJDIEDGF _intervalType = IntervalAnimation.NGAJJDIEDGF.INTERVAL_NONE;
+	private IntervalAnimation.IntervalType _intervalType = IntervalAnimation.IntervalType.INTERVAL_NONE;
 
 	public PerkEventIntervalEnd()
 	{
@@ -262,8 +262,8 @@ public class PerkEventIntervalEnd : PerkEvent
 	public override void Parse(XmlNode node)
 	{
 		base.Parse(node);
-		_name = node.Attributes["Name"].CIPOICEEIBK(string.Empty);
-		_intervalType = IntervalAnimation.LAJMDAFFPJE(node.Attributes["Type"].CIPOICEEIBK(string.Empty));
+		_name = node.Attributes["Name"].GetStringOrDefault(string.Empty);
+		_intervalType = IntervalAnimation.ParseIntervalType(node.Attributes["Type"].GetStringOrDefault(string.Empty));
 	}
 
 	public override bool IsEqual(EventStruct eventInfo)
@@ -275,6 +275,6 @@ public class PerkEventIntervalEnd : PerkEvent
 		if (interval == null)
 			return false;
 		return (_name == string.Empty || interval.Name == _name) &&
-			(_intervalType == IntervalAnimation.NGAJJDIEDGF.INTERVAL_NONE || interval.Type == _intervalType);
+			(_intervalType == IntervalAnimation.IntervalType.INTERVAL_NONE || interval.Type == _intervalType);
 	}
 }

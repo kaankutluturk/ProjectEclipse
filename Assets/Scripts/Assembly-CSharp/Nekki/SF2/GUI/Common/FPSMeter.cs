@@ -7,7 +7,7 @@ namespace Nekki.SF2.GUI.Common
 	public class FPSMeter : UIModule
 	{
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		private static float AFCLFLDJMML;
+		private static float fps;
 
 		[SerializeField]
 		private float _UpdateInterval = 0.2f;
@@ -15,13 +15,13 @@ namespace Nekki.SF2.GUI.Common
 		[SerializeField]
 		private Text _Label;
 
-		private float FLDEMCMMMCI;
+		private float timeUntilUpdate;
 
 		private int _LastFramesCount;
 
-		private float IBALEADCBMA;
+		private float lastSampleTime;
 
-		public static float OPOJHHMNNGH
+		public static float CurrentFps
 		{
 			get
 			{
@@ -29,18 +29,18 @@ namespace Nekki.SF2.GUI.Common
 			}
 			private set
 			{
-				PFOLPDOJNKI(value);
+				SetFps(value);
 			}
 		}
 
 		public static float get_FPS()
 		{
-			return AFCLFLDJMML;
+			return fps;
 		}
 
-		private static void PFOLPDOJNKI(float value)
+		private static void SetFps(float value)
 		{
-			AFCLFLDJMML = value;
+			fps = value;
 		}
 
 		protected override void Init()
@@ -49,33 +49,33 @@ namespace Nekki.SF2.GUI.Common
 			SetTime();
 		}
 
-		protected override void PJNFHNFLNNO()
+		protected override void OnModuleShutdown()
 		{
-			base.PJNFHNFLNNO();
+			base.OnModuleShutdown();
 		}
 
 		private void Update()
 		{
-			FLDEMCMMMCI -= Time.deltaTime;
-			if (FLDEMCMMMCI <= 1E-06f)
+			timeUntilUpdate -= Time.deltaTime;
+			if (timeUntilUpdate <= 1E-06f)
 			{
-				HMOOAHEBKAM();
+				UpdateFpsLabel();
 			}
 		}
 
 		private void SetTime()
 		{
-			FLDEMCMMMCI = _UpdateInterval;
+			timeUntilUpdate = _UpdateInterval;
 			_LastFramesCount = Time.frameCount;
-			IBALEADCBMA = Time.realtimeSinceStartup;
+			lastSampleTime = Time.realtimeSinceStartup;
 		}
 
-		private void HMOOAHEBKAM()
+		private void UpdateFpsLabel()
 		{
 			int num = Time.frameCount - _LastFramesCount;
-			float num2 = Time.realtimeSinceStartup - IBALEADCBMA;
+			float num2 = Time.realtimeSinceStartup - lastSampleTime;
 			SetTime();
-			PFOLPDOJNKI((float)num / num2);
+			SetFps((float)num / num2);
 			_Label.text = string.Format("FPS: {0:F1}", get_FPS());
 		}
 	}

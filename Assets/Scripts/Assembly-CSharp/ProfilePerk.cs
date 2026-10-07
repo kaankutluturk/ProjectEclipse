@@ -1,6 +1,6 @@
 public class ProfilePerk : global::EventDispatcher<object>
 {
-	public enum OLBACIJLKBI
+	public enum ProfilePerkEvent
 	{
 		PerkStateUpdate = 0,
 		PerkDesroyed = 1,
@@ -8,7 +8,7 @@ public class ProfilePerk : global::EventDispatcher<object>
 		PerkInfoChanged = 3
 	}
 
-	public enum KMHBPKKCNPP
+	public enum ProfilePerkState
 	{
 		PERK_AVAILABLE = 0,
 		PERK_UNAVAILABLE = 1,
@@ -16,7 +16,7 @@ public class ProfilePerk : global::EventDispatcher<object>
 		PERK_LOCK = 3
 	}
 
-	public enum JHDKDOPHGOO
+	public enum ProfilePerkType
 	{
 		TYPE_NONE = 0,
 		TYPE_PERK = 1,
@@ -24,23 +24,23 @@ public class ProfilePerk : global::EventDispatcher<object>
 		TYPE_PERK_SELETED = 3
 	}
 
-	protected KMHBPKKCNPP MAFFNGPOMJD;
+	protected ProfilePerkState perkState;
 
 	protected int _level;
 
-	protected PerkInfoItem ILJJPHHDIJI;
+	protected PerkInfoItem perkInfo;
 
 	public bool IsNew;
 
-	protected JHDKDOPHGOO _type;
+	protected ProfilePerkType _type;
 
 	protected string _description;
 
-	public KMHBPKKCNPP AFINHOBCHMC
+	public ProfilePerkState PerkState
 	{
 		get
 		{
-			return FLBBFDNHJAJ();
+			return GetState();
 		}
 		set
 		{
@@ -52,27 +52,27 @@ public class ProfilePerk : global::EventDispatcher<object>
 	{
 		get
 		{
-			return PINDEKDNCNL();
+			return GetLevel();
 		}
 	}
 
-	public PerkInfoItem MBDDKGIOOGD
+	public PerkInfoItem PerkInfo
 	{
 		get
 		{
-			return DFOELJAEEGG();
+			return GetPerkInfo();
 		}
 		set
 		{
-			NOLDHAFMOLF(value);
+			SetPerkInfo(value);
 		}
 	}
 
-	public string MGNNJPBCOGD
+	public string DescriptionKey
 	{
 		get
 		{
-			return GJOAJAIJHOE();
+			return GetDescription();
 		}
 		set
 		{
@@ -80,49 +80,49 @@ public class ProfilePerk : global::EventDispatcher<object>
 		}
 	}
 
-	public ProfilePerk(PerkInfoItem AEFFHJGMNFI, int GNLOCMLBNHF, KMHBPKKCNPP state = KMHBPKKCNPP.PERK_AVAILABLE, JHDKDOPHGOO LFLGCDNKNJI = JHDKDOPHGOO.TYPE_NONE)
+	public ProfilePerk(PerkInfoItem AEFFHJGMNFI, int GNLOCMLBNHF, ProfilePerkState state = ProfilePerkState.PERK_AVAILABLE, ProfilePerkType LFLGCDNKNJI = ProfilePerkType.TYPE_NONE)
 	{
-		MAFFNGPOMJD = state;
+		perkState = state;
 		_level = GNLOCMLBNHF;
-		ILJJPHHDIJI = AEFFHJGMNFI;
+		perkInfo = AEFFHJGMNFI;
 		IsNew = false;
 		_type = LFLGCDNKNJI;
-		_description = ((ILJJPHHDIJI == null) ? string.Empty : ILJJPHHDIJI.MGNNJPBCOGD);
+		_description = ((perkInfo == null) ? string.Empty : perkInfo.DescriptionKey);
 	}
 
-	public KMHBPKKCNPP FLBBFDNHJAJ()
+	public ProfilePerkState GetState()
 	{
-		return MAFFNGPOMJD;
+		return perkState;
 	}
 
-	public void set_State(KMHBPKKCNPP value)
+	public void set_State(ProfilePerkState value)
 	{
-		MAFFNGPOMJD = value;
-		CallEvent(0, MAFFNGPOMJD);
+		perkState = value;
+		CallEvent(0, perkState);
 	}
 
-	public int PINDEKDNCNL()
+	public int GetLevel()
 	{
 		return _level;
 	}
 
-	public PerkInfoItem DFOELJAEEGG()
+	public PerkInfoItem GetPerkInfo()
 	{
-		return ILJJPHHDIJI;
+		return perkInfo;
 	}
 
-	public void NOLDHAFMOLF(PerkInfoItem value)
+	public void SetPerkInfo(PerkInfoItem value)
 	{
-		ILJJPHHDIJI = value;
+		perkInfo = value;
 		CallEvent(2, 0);
 	}
 
-	public JHDKDOPHGOO get_Type()
+	public ProfilePerkType get_Type()
 	{
 		return _type;
 	}
 
-	public string GJOAJAIJHOE()
+	public string GetDescription()
 	{
 		return _description;
 	}
@@ -133,7 +133,7 @@ public class ProfilePerk : global::EventDispatcher<object>
 		CallEvent(3, 0);
 	}
 
-	private void ANIDBLANMIC()
+	private void NotifyDestroyed()
 	{
 		CallEvent(1, null);
 	}
@@ -143,23 +143,23 @@ public class ProfilePerk : global::EventDispatcher<object>
 		return OMHDLKNHNMJ < _level;
 	}
 
-	public int LMGGMMFEODJ()
+	public int GetUpgradeLevel()
 	{
-		return (ILJJPHHDIJI != null) ? ILJJPHHDIJI.AKKLOMFOLNO : 0;
+		return (perkInfo != null) ? perkInfo.UpgradeLevel : 0;
 	}
 
-	public string CEENDGFFEFM()
+	public string GetMoveName()
 	{
-		return (ILJJPHHDIJI == null) ? string.Empty : ILJJPHHDIJI.JNBECGKCNBB;
+		return (perkInfo == null) ? string.Empty : perkInfo.MoveName;
 	}
 
-	public string KAMBOKLFBEE()
+	public string GetPerkName()
 	{
-		return (ILJJPHHDIJI == null) ? string.Empty : ILJJPHHDIJI.Name;
+		return (perkInfo == null) ? string.Empty : perkInfo.Name;
 	}
 
-	public string OPIOIHAPMDG()
+	public string GetImageName()
 	{
-		return (ILJJPHHDIJI == null) ? string.Empty : ILJJPHHDIJI.NHKMCLPOMFK;
+		return (perkInfo == null) ? string.Empty : perkInfo.ImageName;
 	}
 }

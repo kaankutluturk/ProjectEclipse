@@ -8,39 +8,39 @@ public sealed class Cookie : IComparable<Cookie>, IEquatable<Cookie>
 	private const int Version = 1;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private string HKGHEJDKCPI;
+	private string _name;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private string IELPCLONGKP;
+	private string _value;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private DateTime DLHGOFDMCHO;
+	private DateTime _date;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private DateTime KLMBGHCOBPE;
+	private DateTime _lastAccess;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private DateTime DCBEPAGIKAK;
+	private DateTime _expires;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private long DLAMLEBFCJO;
+	private long _maxAge;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private bool FJNJIMKBHCJ;
+	private bool _isSession;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private string EEMFKBEMNAJ;
+	private string _domain;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private string AHAGEGAEDBD;
+	private string _path;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private bool FDLIOFMNGPG;
+	private bool _isSecure;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private bool IDGFJNJEJEL;
+	private bool _isHttpOnly;
 
-	public string MENAJEAJJBE
+	public string CookieName
 	{
 		get
 		{
@@ -52,47 +52,47 @@ public sealed class Cookie : IComparable<Cookie>, IEquatable<Cookie>
 		}
 	}
 
-	public DateTime IPJJMANFBBF
+	public DateTime Date
 	{
 		get
 		{
-			return DJPNPAGCDKB();
+			return GetDate();
 		}
 		internal set
 		{
-			MPHLCKEMAIL(value);
+			SetDate(value);
 		}
 	}
 
-	public DateTime BINEABBDPDH
+	public DateTime LastAccess
 	{
 		get
 		{
-			return PPHKANGFLHJ();
+			return GetLastAccess();
 		}
 		set
 		{
-			ABGLCGLPNKO(value);
+			SetLastAccess(value);
 		}
 	}
 
-	public DateTime FCFCGJHCJJL
+	public DateTime Expires
 	{
 		get
 		{
-			return EPCHAKMLDFN();
+			return GetExpires();
 		}
 		private set
 		{
-			PGAOJGPAMND(value);
+			SetExpires(value);
 		}
 	}
 
-	public long JHJOIHEHOEP
+	public long MaxAgeSeconds
 	{
 		get
 		{
-			return FCBEBMKLFIO();
+			return GetMaxAge();
 		}
 		private set
 		{
@@ -100,63 +100,63 @@ public sealed class Cookie : IComparable<Cookie>, IEquatable<Cookie>
 		}
 	}
 
-	public bool OPMIELPALOE
+	public bool IsSession
 	{
 		get
 		{
-			return HPBAMOOJLLF();
+			return GetIsSession();
 		}
 		private set
 		{
-			IOAIJLIJEGM(value);
+			SetIsSession(value);
 		}
 	}
 
-	public string COMLIHJDDPG
+	public string Domain
 	{
 		get
 		{
-			return PILMIFGDMCK();
+			return GetDomain();
 		}
 		private set
 		{
-			GCICCAKGEGO(value);
+			SetDomain(value);
 		}
 	}
 
-	public string NGMCEBMMKHP
+	public string Path
 	{
 		get
 		{
-			return DEIEDODNANN();
+			return GetPath();
 		}
 		private set
 		{
-			GEAMFLMNFBI(value);
+			SetPath(value);
 		}
 	}
 
-	public bool EINFHMBOLBE
+	public bool IsSecure
 	{
 		get
 		{
-			return KFPJIIHEAFJ();
+			return GetIsSecure();
 		}
 		private set
 		{
-			CNFIAGCLCLM(value);
+			SetIsSecure(value);
 		}
 	}
 
-	public bool ABIAINBOAKM
+	public bool IsHttpOnly
 	{
 		get
 		{
-			return BJGFJBHHAFA();
+			return GetIsHttpOnly();
 		}
 		private set
 		{
-			KFBLGDFAHFH(value);
+			SetIsHttpOnly(value);
 		}
 	}
 
@@ -175,139 +175,139 @@ public sealed class Cookie : IComparable<Cookie>, IEquatable<Cookie>
 	{
 		set_Name(name);
 		set_Value(value);
-		GEAMFLMNFBI(path);
-		GCICCAKGEGO(OKDDNOHODMN);
+		SetPath(path);
+		SetDomain(OKDDNOHODMN);
 	}
 
 	internal Cookie()
 	{
-		IOAIJLIJEGM(true);
+		SetIsSession(true);
 		set_MaxAge(-1L);
-		ABGLCGLPNKO(DateTime.UtcNow);
+		SetLastAccess(DateTime.UtcNow);
 	}
 
 	public string get_Name()
 	{
-		return HKGHEJDKCPI;
+		return _name;
 	}
 
 	private void set_Name(string value)
 	{
-		HKGHEJDKCPI = value;
+		_name = value;
 	}
 
-	public string OEAKCOHMIHH()
+	public string GetValue()
 	{
-		return IELPCLONGKP;
+		return _value;
 	}
 
 	private void set_Value(string value)
 	{
-		IELPCLONGKP = value;
+		_value = value;
 	}
 
-	public DateTime DJPNPAGCDKB()
+	public DateTime GetDate()
 	{
-		return DLHGOFDMCHO;
+		return _date;
 	}
 
-	internal void MPHLCKEMAIL(DateTime value)
+	internal void SetDate(DateTime value)
 	{
-		DLHGOFDMCHO = value;
+		_date = value;
 	}
 
-	public DateTime PPHKANGFLHJ()
+	public DateTime GetLastAccess()
 	{
-		return KLMBGHCOBPE;
+		return _lastAccess;
 	}
 
-	public void ABGLCGLPNKO(DateTime value)
+	public void SetLastAccess(DateTime value)
 	{
-		KLMBGHCOBPE = value;
+		_lastAccess = value;
 	}
 
-	public DateTime EPCHAKMLDFN()
+	public DateTime GetExpires()
 	{
-		return DCBEPAGIKAK;
+		return _expires;
 	}
 
-	private void PGAOJGPAMND(DateTime value)
+	private void SetExpires(DateTime value)
 	{
-		DCBEPAGIKAK = value;
+		_expires = value;
 	}
 
-	public long FCBEBMKLFIO()
+	public long GetMaxAge()
 	{
-		return DLAMLEBFCJO;
+		return _maxAge;
 	}
 
 	private void set_MaxAge(long value)
 	{
-		DLAMLEBFCJO = value;
+		_maxAge = value;
 	}
 
-	public bool HPBAMOOJLLF()
+	public bool GetIsSession()
 	{
-		return FJNJIMKBHCJ;
+		return _isSession;
 	}
 
-	private void IOAIJLIJEGM(bool value)
+	private void SetIsSession(bool value)
 	{
-		FJNJIMKBHCJ = value;
+		_isSession = value;
 	}
 
-	public string PILMIFGDMCK()
+	public string GetDomain()
 	{
-		return EEMFKBEMNAJ;
+		return _domain;
 	}
 
-	private void GCICCAKGEGO(string value)
+	private void SetDomain(string value)
 	{
-		EEMFKBEMNAJ = value;
+		_domain = value;
 	}
 
-	public string DEIEDODNANN()
+	public string GetPath()
 	{
-		return AHAGEGAEDBD;
+		return _path;
 	}
 
-	private void GEAMFLMNFBI(string value)
+	private void SetPath(string value)
 	{
-		AHAGEGAEDBD = value;
+		_path = value;
 	}
 
-	public bool KFPJIIHEAFJ()
+	public bool GetIsSecure()
 	{
-		return FDLIOFMNGPG;
+		return _isSecure;
 	}
 
-	private void CNFIAGCLCLM(bool value)
+	private void SetIsSecure(bool value)
 	{
-		FDLIOFMNGPG = value;
+		_isSecure = value;
 	}
 
-	public bool BJGFJBHHAFA()
+	public bool GetIsHttpOnly()
 	{
-		return IDGFJNJEJEL;
+		return _isHttpOnly;
 	}
 
-	private void KFBLGDFAHFH(bool value)
+	private void SetIsHttpOnly(bool value)
 	{
-		IDGFJNJEJEL = value;
+		_isHttpOnly = value;
 	}
 
-	public bool IDGHLAOFMEO()
+	public bool WillExpireInTheFuture()
 	{
-		if (HPBAMOOJLLF())
+		if (GetIsSession())
 		{
 			return true;
 		}
-		return (FCBEBMKLFIO() == -1) ? (EPCHAKMLDFN() > DateTime.UtcNow) : (Math.Max(0L, (long)(DateTime.UtcNow - DJPNPAGCDKB()).TotalSeconds) < FCBEBMKLFIO());
+		return (GetMaxAge() == -1) ? (GetExpires() > DateTime.UtcNow) : (Math.Max(0L, (long)(DateTime.UtcNow - GetDate()).TotalSeconds) < GetMaxAge());
 	}
 
-	public uint ADGKKEKOJBD()
+	public uint GuessSize()
 	{
-		return (uint)(((get_Name() != null) ? (get_Name().Length * 2) : 0) + ((OEAKCOHMIHH() != null) ? (OEAKCOHMIHH().Length * 2) : 0) + ((PILMIFGDMCK() != null) ? (PILMIFGDMCK().Length * 2) : 0) + ((DEIEDODNANN() != null) ? (DEIEDODNANN().Length * 2) : 0) + 32 + 3);
+		return (uint)(((get_Name() != null) ? (get_Name().Length * 2) : 0) + ((GetValue() != null) ? (GetValue().Length * 2) : 0) + ((GetDomain() != null) ? (GetDomain().Length * 2) : 0) + ((GetPath() != null) ? (GetPath().Length * 2) : 0) + 32 + 3);
 	}
 
 	public static Cookie Parse(string HHAAFADDOJB, Uri BABJLNLFPPI)
@@ -315,69 +315,69 @@ public sealed class Cookie : IComparable<Cookie>, IEquatable<Cookie>
 		Cookie eKAOIOLAGFH = new Cookie();
 		try
 		{
-			List<KeyValuePair> list = HBAPIKCODAD(HHAAFADDOJB);
+			List<KeyValuePair> list = ParseCookieValue(HHAAFADDOJB);
 			foreach (KeyValuePair item in list)
 			{
-				switch (item.AENLBNDAEKB().ToLowerInvariant())
+				switch (item.GetKey().ToLowerInvariant())
 				{
 				case "path":
 				{
 					object bAINMLLIKOL;
-					if (string.IsNullOrEmpty(item.OEAKCOHMIHH()) || !item.OEAKCOHMIHH().StartsWith("/"))
+					if (string.IsNullOrEmpty(item.GetValue()) || !item.GetValue().StartsWith("/"))
 					{
 						bAINMLLIKOL = "/";
 					}
 					else
 					{
-						string text = item.OEAKCOHMIHH();
-						eKAOIOLAGFH.GEAMFLMNFBI(text);
+						string text = item.GetValue();
+						eKAOIOLAGFH.SetPath(text);
 						bAINMLLIKOL = text;
 					}
-					eKAOIOLAGFH.GEAMFLMNFBI((string)bAINMLLIKOL);
+					eKAOIOLAGFH.SetPath((string)bAINMLLIKOL);
 					break;
 				}
 				case "domain":
-					if (string.IsNullOrEmpty(item.OEAKCOHMIHH()))
+					if (string.IsNullOrEmpty(item.GetValue()))
 					{
 						return null;
 					}
-					eKAOIOLAGFH.GCICCAKGEGO((!item.OEAKCOHMIHH().StartsWith(".")) ? item.OEAKCOHMIHH() : item.OEAKCOHMIHH().Substring(1));
+					eKAOIOLAGFH.SetDomain((!item.GetValue().StartsWith(".")) ? item.GetValue() : item.GetValue().Substring(1));
 					break;
 				case "expires":
-					eKAOIOLAGFH.PGAOJGPAMND(item.OEAKCOHMIHH().ToDateTime(DateTime.FromBinary(0L)));
-					eKAOIOLAGFH.IOAIJLIJEGM(false);
+					eKAOIOLAGFH.SetExpires(item.GetValue().ToDateTime(DateTime.FromBinary(0L)));
+					eKAOIOLAGFH.SetIsSession(false);
 					break;
 				case "max-age":
-					eKAOIOLAGFH.set_MaxAge(item.OEAKCOHMIHH().ToInt64(-1L));
-					eKAOIOLAGFH.IOAIJLIJEGM(false);
+					eKAOIOLAGFH.set_MaxAge(item.GetValue().ToInt64(-1L));
+					eKAOIOLAGFH.SetIsSession(false);
 					break;
 				case "secure":
-					eKAOIOLAGFH.CNFIAGCLCLM(true);
+					eKAOIOLAGFH.SetIsSecure(true);
 					break;
 				case "httponly":
-					eKAOIOLAGFH.KFBLGDFAHFH(true);
+					eKAOIOLAGFH.SetIsHttpOnly(true);
 					break;
 				default:
-					eKAOIOLAGFH.set_Name(item.AENLBNDAEKB());
-					eKAOIOLAGFH.set_Value(item.OEAKCOHMIHH());
+					eKAOIOLAGFH.set_Name(item.GetKey());
+					eKAOIOLAGFH.set_Value(item.GetValue());
 					break;
 				}
 			}
-			if (HTTPManager.IMFEILECHFL())
+			if (HTTPManager.GetEnablePrivateBrowsing())
 			{
-				eKAOIOLAGFH.IOAIJLIJEGM(true);
+				eKAOIOLAGFH.SetIsSession(true);
 			}
-			if (string.IsNullOrEmpty(eKAOIOLAGFH.PILMIFGDMCK()))
+			if (string.IsNullOrEmpty(eKAOIOLAGFH.GetDomain()))
 			{
-				eKAOIOLAGFH.GCICCAKGEGO(BABJLNLFPPI.Host);
+				eKAOIOLAGFH.SetDomain(BABJLNLFPPI.Host);
 			}
-			if (string.IsNullOrEmpty(eKAOIOLAGFH.DEIEDODNANN()))
+			if (string.IsNullOrEmpty(eKAOIOLAGFH.GetPath()))
 			{
-				eKAOIOLAGFH.GEAMFLMNFBI(BABJLNLFPPI.AbsolutePath);
+				eKAOIOLAGFH.SetPath(BABJLNLFPPI.AbsolutePath);
 			}
 			DateTime utcNow = DateTime.UtcNow;
-			eKAOIOLAGFH.ABGLCGLPNKO(utcNow);
-			eKAOIOLAGFH.MPHLCKEMAIL(utcNow);
+			eKAOIOLAGFH.SetLastAccess(utcNow);
+			eKAOIOLAGFH.SetDate(utcNow);
 		}
 		catch
 		{
@@ -389,16 +389,16 @@ public sealed class Cookie : IComparable<Cookie>, IEquatable<Cookie>
 	{
 		ABJIEFMMIEK.Write(1);
 		ABJIEFMMIEK.Write(get_Name() ?? string.Empty);
-		ABJIEFMMIEK.Write(OEAKCOHMIHH() ?? string.Empty);
-		ABJIEFMMIEK.Write(DJPNPAGCDKB().ToBinary());
-		ABJIEFMMIEK.Write(PPHKANGFLHJ().ToBinary());
-		ABJIEFMMIEK.Write(EPCHAKMLDFN().ToBinary());
-		ABJIEFMMIEK.Write(FCBEBMKLFIO());
-		ABJIEFMMIEK.Write(HPBAMOOJLLF());
-		ABJIEFMMIEK.Write(PILMIFGDMCK() ?? string.Empty);
-		ABJIEFMMIEK.Write(DEIEDODNANN() ?? string.Empty);
-		ABJIEFMMIEK.Write(KFPJIIHEAFJ());
-		ABJIEFMMIEK.Write(BJGFJBHHAFA());
+		ABJIEFMMIEK.Write(GetValue() ?? string.Empty);
+		ABJIEFMMIEK.Write(GetDate().ToBinary());
+		ABJIEFMMIEK.Write(GetLastAccess().ToBinary());
+		ABJIEFMMIEK.Write(GetExpires().ToBinary());
+		ABJIEFMMIEK.Write(GetMaxAge());
+		ABJIEFMMIEK.Write(GetIsSession());
+		ABJIEFMMIEK.Write(GetDomain() ?? string.Empty);
+		ABJIEFMMIEK.Write(GetPath() ?? string.Empty);
+		ABJIEFMMIEK.Write(GetIsSecure());
+		ABJIEFMMIEK.Write(GetIsHttpOnly());
 	}
 
 	internal void LoadFrom(BinaryReader ABJIEFMMIEK)
@@ -406,20 +406,20 @@ public sealed class Cookie : IComparable<Cookie>, IEquatable<Cookie>
 		ABJIEFMMIEK.ReadInt32();
 		set_Name(ABJIEFMMIEK.ReadString());
 		set_Value(ABJIEFMMIEK.ReadString());
-		MPHLCKEMAIL(DateTime.FromBinary(ABJIEFMMIEK.ReadInt64()));
-		ABGLCGLPNKO(DateTime.FromBinary(ABJIEFMMIEK.ReadInt64()));
-		PGAOJGPAMND(DateTime.FromBinary(ABJIEFMMIEK.ReadInt64()));
+		SetDate(DateTime.FromBinary(ABJIEFMMIEK.ReadInt64()));
+		SetLastAccess(DateTime.FromBinary(ABJIEFMMIEK.ReadInt64()));
+		SetExpires(DateTime.FromBinary(ABJIEFMMIEK.ReadInt64()));
 		set_MaxAge(ABJIEFMMIEK.ReadInt64());
-		IOAIJLIJEGM(ABJIEFMMIEK.ReadBoolean());
-		GCICCAKGEGO(ABJIEFMMIEK.ReadString());
-		GEAMFLMNFBI(ABJIEFMMIEK.ReadString());
-		CNFIAGCLCLM(ABJIEFMMIEK.ReadBoolean());
-		KFBLGDFAHFH(ABJIEFMMIEK.ReadBoolean());
+		SetIsSession(ABJIEFMMIEK.ReadBoolean());
+		SetDomain(ABJIEFMMIEK.ReadString());
+		SetPath(ABJIEFMMIEK.ReadString());
+		SetIsSecure(ABJIEFMMIEK.ReadBoolean());
+		SetIsHttpOnly(ABJIEFMMIEK.ReadBoolean());
 	}
 
 	public override string ToString()
 	{
-		return get_Name() + "=" + OEAKCOHMIHH();
+		return get_Name() + "=" + GetValue();
 	}
 
 	public override bool Equals(object AOMLCBHAJJH)
@@ -441,7 +441,7 @@ public sealed class Cookie : IComparable<Cookie>, IEquatable<Cookie>
 		{
 			return true;
 		}
-		return get_Name().Equals(FJKPPODBPJF.get_Name(), StringComparison.Ordinal) && ((PILMIFGDMCK() == null && FJKPPODBPJF.PILMIFGDMCK() == null) || PILMIFGDMCK().Equals(FJKPPODBPJF.PILMIFGDMCK(), StringComparison.Ordinal)) && ((DEIEDODNANN() == null && FJKPPODBPJF.DEIEDODNANN() == null) || DEIEDODNANN().Equals(FJKPPODBPJF.DEIEDODNANN(), StringComparison.Ordinal));
+		return get_Name().Equals(FJKPPODBPJF.get_Name(), StringComparison.Ordinal) && ((GetDomain() == null && FJKPPODBPJF.GetDomain() == null) || GetDomain().Equals(FJKPPODBPJF.GetDomain(), StringComparison.Ordinal)) && ((GetPath() == null && FJKPPODBPJF.GetPath() == null) || GetPath().Equals(FJKPPODBPJF.GetPath(), StringComparison.Ordinal));
 	}
 
 	public override int GetHashCode()
@@ -459,7 +459,7 @@ public sealed class Cookie : IComparable<Cookie>, IEquatable<Cookie>
 		return IGGFGLLIGCG.Read(ref LCCLEFMKLPB, ';');
 	}
 
-	private static List<KeyValuePair> HBAPIKCODAD(string IGGFGLLIGCG)
+	private static List<KeyValuePair> ParseCookieValue(string IGGFGLLIGCG)
 	{
 		List<KeyValuePair> list = new List<KeyValuePair>();
 		if (IGGFGLLIGCG == null)
@@ -482,6 +482,6 @@ public sealed class Cookie : IComparable<Cookie>, IEquatable<Cookie>
 
 	public int CompareTo(Cookie NOLFMPDGCOC)
 	{
-		return PPHKANGFLHJ().CompareTo(NOLFMPDGCOC.PPHKANGFLHJ());
+		return GetLastAccess().CompareTo(NOLFMPDGCOC.GetLastAccess());
 	}
 }

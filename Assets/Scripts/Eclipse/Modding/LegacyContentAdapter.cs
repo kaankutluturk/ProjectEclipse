@@ -84,7 +84,7 @@ namespace Eclipse.Modding
                 foreach (ItemSetDefinition definition in _content.ItemSets)
                 {
                     if (definition.IsCore) continue;
-                    ItemSet itemSet = _items.DGKMILIPLLF().AddExternalSet(BuildItemSetNode(definition));
+                    ItemSet itemSet = _items.GetItemSets().AddExternalSet(BuildItemSetNode(definition));
                     _itemSetNames.Add(itemSet.Name);
                 }
                 ModRuntime.LoadTimings.Mark("sets");
@@ -108,9 +108,9 @@ namespace Eclipse.Modding
             ThrowIfDisposed();
             RemoveLocalization();
 
-            string language = LocalizationManager.ILAJKOBCHFH == null
-                ? LocalizationManager.POIPGLLCCKC
-                : LocalizationManager.ILAJKOBCHFH.name;
+            string language = LocalizationManager.CurrentLanguage == null
+                ? LocalizationManager.DefaultLanguageName
+                : LocalizationManager.CurrentLanguage.name;
             foreach (LocalizationDefinition localization in _content.Localizations)
             {
                 string value = localization.GetOrEnglish(language);
@@ -183,7 +183,7 @@ namespace Eclipse.Modding
 
             if (!_languageSubscribed)
             {
-                LocalizationManager.OCLBJLPOKLB += OnLanguageChanged;
+                LocalizationManager.LanguageChanged += OnLanguageChanged;
                 _languageSubscribed = true;
             }
         }
@@ -273,10 +273,10 @@ namespace Eclipse.Modding
                         if (!_content.TryGetPerk(entry.Perk, out perk))
                             throw new InvalidOperationException("Progression branch lost perk '" + entry.Perk + "'.");
                         items.Add(new PerkTree.PerkItem(entry.Action == ModProgressionPerkAction.Upgrade
-                            ? PerkTree.AAAIBJGLPAI.TYPE_UPGRADE : PerkTree.AAAIBJGLPAI.TYPE_PERK,
+                            ? PerkTree.PerkItemType.TYPE_UPGRADE : PerkTree.PerkItemType.TYPE_PERK,
                             RuntimePerkName(perk), overlay.Level));
                     }
-                    PerkTree tree = PerkTree.GBPBIPFIOJH();
+                    PerkTree tree = PerkTree.GetInstance();
                     PerkTree.PerkBranch previous = tree.ReplaceExternalBranch(overlay.Level, items);
                     _progressionBindings.Add(new ProgressionBranchBinding(overlay.Level, previous));
                 }
@@ -374,7 +374,7 @@ namespace Eclipse.Modding
             if (_disposed) return;
             if (_languageSubscribed)
             {
-                LocalizationManager.OCLBJLPOKLB -= OnLanguageChanged;
+                LocalizationManager.LanguageChanged -= OnLanguageChanged;
                 _languageSubscribed = false;
             }
             RemoveLocalization();
@@ -1288,7 +1288,7 @@ namespace Eclipse.Modding
             if (_items != null)
             {
                 for (int i = _itemSetNames.Count - 1; i >= 0; i--)
-                    _items.DGKMILIPLLF().RemoveExternalSet(_itemSetNames[i]);
+                    _items.GetItemSets().RemoveExternalSet(_itemSetNames[i]);
                 for (int i = _itemNames.Count - 1; i >= 0; i--)
                     _items.RemoveExternalItem(_itemNames[i]);
             }
@@ -1301,14 +1301,14 @@ namespace Eclipse.Modding
         {
             if (definition.IsCore)
             {
-                PerkInfoItem core = _perks.ABAGJKMKCBA(definition.LegacyName);
+                PerkInfoItem core = _perks.FindBasePerk(definition.LegacyName);
                 if (core == null)
                     throw new InvalidOperationException("Core perk template is unavailable at runtime: " + definition.Id);
                 return core;
             }
 
             string runtimeName = RuntimePerkName(definition);
-            PerkInfoItem existing = _perks.ABAGJKMKCBA(runtimeName);
+            PerkInfoItem existing = _perks.FindBasePerk(runtimeName);
             if (existing != null)
             {
                 if (_perkNames.Contains(runtimeName)) return existing;
@@ -1326,7 +1326,7 @@ namespace Eclipse.Modding
         private PerkInfoItem EnsureScriptedEnchantmentApplied(EnchantmentDefinition definition)
         {
             string runtimeName = definition.Id.ToString();
-            PerkInfoItem existing = _perks.ABAGJKMKCBA(runtimeName);
+            PerkInfoItem existing = _perks.FindBasePerk(runtimeName);
             if (existing != null)
             {
                 if (_perkNames.Contains(runtimeName)) return existing;
@@ -1346,7 +1346,7 @@ namespace Eclipse.Modding
             XmlElement node = document.CreateElement("Perk");
             document.AppendChild(node);
             node.SetAttribute("Name", id.ToString());
-            node.SetAttribute("ID", _perks.CJJEPHDFOCJ().Count.ToString(CultureInfo.InvariantCulture));
+            node.SetAttribute("ID", _perks.GetBasePerks().Count.ToString(CultureInfo.InvariantCulture));
             node.SetAttribute("Alias", displayName.ToString());
             node.SetAttribute("Description", description.ToString());
             if (hasIcon) node.SetAttribute("Image", icon.ToString());
@@ -1574,7 +1574,7 @@ namespace Eclipse.Modding
             for (int i = _progressionBindings.Count - 1; i >= 0; i--)
             {
                 ProgressionBranchBinding binding = _progressionBindings[i];
-                PerkTree.GBPBIPFIOJH().RestoreExternalBranch(binding.Level, binding.Previous);
+                PerkTree.GetInstance().RestoreExternalBranch(binding.Level, binding.Previous);
             }
             _progressionBindings.Clear();
             if (_forge != null)
@@ -1868,13 +1868,13 @@ namespace Eclipse.Modding
                 throw new InvalidOperationException("Vanilla upgrade template is unavailable: " + template);
 
             int upgradeLevel = checked(level * 100);
-            for (int i = 0; i < upgrades.KPAPEBOAKIE.Count; i++)
+            for (int i = 0; i < upgrades.Upgrades.Count; i++)
             {
-                UpgradeData upgrade = upgrades.KPAPEBOAKIE[i];
-                if (upgrade.OGLHOJNMEBD.Level != level || upgrade.OGLHOJNMEBD.AKKLOMFOLNO != upgradeLevel)
+                UpgradeData upgrade = upgrades.Upgrades[i];
+                if (upgrade.Values.Level != level || upgrade.Values.UpgradeLevel != upgradeLevel)
                     continue;
                 int value = 0;
-                if (!upgrade.OGLHOJNMEBD.IBLHIAHECLK.Get(attribute, ref value, false))
+                if (!upgrade.Values.Attributes.Get(attribute, ref value, false))
                     throw new InvalidOperationException("Vanilla progression milestone " + template + " level " +
                         level + " does not define " + attribute + ".");
                 return value;

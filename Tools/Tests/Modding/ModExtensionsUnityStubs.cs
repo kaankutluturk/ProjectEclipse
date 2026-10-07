@@ -28,12 +28,12 @@ namespace Nekki.SF2.GUI
     public static class ResolutionImage { public static Sprite GetSprite(string path,string name)=>null; }
     public sealed class SFScrollRect : ScrollRect
     {
-        public enum MDMLKCMBBPA { Elastic }
+        public enum ScrollMovementType { Elastic }
         public void set_viewport(RectTransform value)=>viewport=value;
         public void set_content(RectTransform value)=>content=value;
         public void set_horizontal(bool value)=>horizontal=value;
         public void set_vertical(bool value)=>vertical=value;
-        public void set_movementType(MDMLKCMBBPA value)=>movementType=MovementType.Elastic;
+        public void set_movementType(ScrollMovementType value)=>movementType=MovementType.Elastic;
         public void set_elasticity(float value)=>elasticity=value;
         public void set_inertia(bool value)=>inertia=value;
         public void set_decelerationRate(float value)=>decelerationRate=value;

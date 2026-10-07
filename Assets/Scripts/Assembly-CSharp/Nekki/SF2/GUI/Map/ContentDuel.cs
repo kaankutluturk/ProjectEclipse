@@ -17,39 +17,39 @@ namespace Nekki.SF2.GUI.Map
 		[SerializeField]
 		protected Button _btnPeriodicReset;
 
-		private Battle FODLHLABAMI;
+		private Battle battle;
 
 		public void Init(Battle DPOOIONCEOA, FightList KOMGFJOCEDN)
 		{
-			FODLHLABAMI = DPOOIONCEOA;
-			_lblDescription.SetAlias(KOMGFJOCEDN.GJOAJAIJHOE());
-			bool mMDLKOPCFLK = (DPOOIONCEOA.get_Type() != BattleType.FightBosses && DPOOIONCEOA.get_Type() != BattleType.FightBossesReplayable && DPOOIONCEOA.get_Type() != BattleType.FightFinalTitan) || !KJHIOOFNKEG(KOMGFJOCEDN);
+			battle = DPOOIONCEOA;
+			_lblDescription.SetAlias(KOMGFJOCEDN.GetDescription());
+			bool mMDLKOPCFLK = (DPOOIONCEOA.get_Type() != BattleType.FightBosses && DPOOIONCEOA.get_Type() != BattleType.FightBossesReplayable && DPOOIONCEOA.get_Type() != BattleType.FightFinalTitan) || !HasRewardItem(KOMGFJOCEDN);
 			_prizePanel.Init(-1, mMDLKOPCFLK, KOMGFJOCEDN);
-			_difficultyPanel.gameObject.SetActive(DPOOIONCEOA.KCIKELGFHOA() != 0);
-			_difficultyPanel.Init(GameUtils.JEILJMPPEGL(KOMGFJOCEDN));
+			_difficultyPanel.gameObject.SetActive(DPOOIONCEOA.GetFightCount() != 0);
+			_difficultyPanel.Init(GameUtils.CalculateFightDifficulty(KOMGFJOCEDN));
 			_btnPeriodicReset.gameObject.SetActive(false);
-			if (DPOOIONCEOA.get_Type() == BattleType.FightPeriodic && SystemProperties.DBBOCENKMGD())
+			if (DPOOIONCEOA.get_Type() == BattleType.FightPeriodic && SystemProperties.IsDebug())
 			{
 				_btnPeriodicReset.gameObject.SetActive(true);
-				_btnPeriodicReset.onClick.AddListener(PDFOEKDFNHI);
+				_btnPeriodicReset.onClick.AddListener(OnPeriodicResetClicked);
 			}
 		}
 
-		private bool KJHIOOFNKEG(FightList KOMGFJOCEDN)
+		private bool HasRewardItem(FightList KOMGFJOCEDN)
 		{
 			if (KOMGFJOCEDN == null)
 			{
 				return false;
 			}
-			RewardStruct fDFKLPHBAHJ = KOMGFJOCEDN.APKPCGDBMEP()[KOMGFJOCEDN.APKPCGDBMEP().Count - 1];
-			int gNLOCMLBNHF = ListSF.CCDKHLAMKKO().PINDEKDNCNL();
-			RewardPrize cMHHEHILIIH = fDFKLPHBAHJ.KOBOIFJNPMO(gNLOCMLBNHF);
-			if (cMHHEHILIIH.HELFDCAIJNE.Count == 0)
+			RewardStruct fDFKLPHBAHJ = KOMGFJOCEDN.GetRewards()[KOMGFJOCEDN.GetRewards().Count - 1];
+			int gNLOCMLBNHF = ListSF.GetRoster().GetLevel();
+			RewardPrize cMHHEHILIIH = fDFKLPHBAHJ.GetPrizeForLevel(gNLOCMLBNHF);
+			if (cMHHEHILIIH.items.Count == 0)
 			{
 				return false;
 			}
-			RewardItem cACJANFAJEC = cMHHEHILIIH.HELFDCAIJNE[0];
-			if (!cACJANFAJEC.GOOBKHECJIF)
+			RewardItem cACJANFAJEC = cMHHEHILIIH.items[0];
+			if (!cACJANFAJEC.ShowReward)
 			{
 				return false;
 			}
@@ -57,15 +57,15 @@ namespace Nekki.SF2.GUI.Map
 			return dJKEECEOCJB != null;
 		}
 
-		private void PDFOEKDFNHI()
+		private void OnPeriodicResetClicked()
 		{
-			if (FODLHLABAMI != null)
+			if (battle != null)
 			{
-				if (FODLHLABAMI.get_Type() == BattleType.FightPeriodic)
+				if (battle.get_Type() == BattleType.FightPeriodic)
 				{
 					BattlePeriodic.Reset(false);
 				}
-				CallEvent(0, FODLHLABAMI);
+				CallEvent(0, battle);
 			}
 		}
 	}

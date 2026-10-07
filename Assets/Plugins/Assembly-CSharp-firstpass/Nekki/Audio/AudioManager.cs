@@ -8,13 +8,13 @@ namespace Nekki.Audio
 {
 	public class AudioManager : MonoBehaviour
 	{
-		private const int BMFLCMGODMO = 0;
+		private const int DefaultMusicChannel = 0;
 
-		private const int FJIPIONMGBM = 1;
+		private const int DefaultSoundChannel = 1;
 
-		private static AudioManager EDAPJLKMFPC;
+		private static AudioManager _instance;
 
-		private static readonly Dictionary<int, Chanel> NCAHAPGPHDM = new Dictionary<int, Chanel>();
+		private static readonly Dictionary<int, Chanel> _chanels = new Dictionary<int, Chanel>();
 
 		private static List<int> _musicChanels = new List<int>();
 
@@ -22,21 +22,21 @@ namespace Nekki.Audio
 
 		private static Dictionary<string, float> _volumesByClips = new Dictionary<string, float>();
 
-		private static AudioSettings HPOJCCHMKOP;
+		private static AudioSettings _settings;
 
 		public static void Init(string ALHKHJOJECK, int[] DOBMHKNFHCA, int[] HLGLHKIOPDE)
 		{
-			if ((bool)EDAPJLKMFPC)
+			if ((bool)_instance)
 			{
-				AdvLog.LOPHFKMOPAA("AudioManager already exists!");
+				AdvLog.LogWarning("AudioManager already exists!");
 				return;
 			}
 			_musicChanels = new List<int>(DOBMHKNFHCA);
-			EDAPJLKMFPC = new GameObject("_audioManager").AddComponent<AudioManager>();
-			UnityEngine.Object.DontDestroyOnLoad(EDAPJLKMFPC.gameObject);
+			_instance = new GameObject("_audioManager").AddComponent<AudioManager>();
+			UnityEngine.Object.DontDestroyOnLoad(_instance.gameObject);
 			Load(ALHKHJOJECK);
-			OverallUnitPool.Init(EDAPJLKMFPC);
-			HPOJCCHMKOP = new AudioSettings();
+			OverallUnitPool.Init(_instance);
+			_settings = new AudioSettings();
 		}
 
 		public static void Init(string ALHKHJOJECK, int CEDJBBELDLH, int[] HLGLHKIOPDE)
@@ -66,12 +66,12 @@ namespace Nekki.Audio
 				List<string> list = new List<string>(Directory.GetFiles(ALHKHJOJECK, "*.xml"));
 				for (int j = 0; j < list.Count; j++)
 				{
-					IPLDPCAAEGK(list[j], ALHKHJOJECK);
+					LoadSoundsXml(list[j], ALHKHJOJECK);
 				}
 			}
 		}
 
-		private static void IPLDPCAAEGK(string HIOFDADIEME, string ALHKHJOJECK)
+		private static void LoadSoundsXml(string HIOFDADIEME, string ALHKHJOJECK)
 		{
 			if (!File.Exists(HIOFDADIEME))
 			{
@@ -84,7 +84,7 @@ namespace Nekki.Audio
 			}
 			catch (Exception ex)
 			{
-				AdvLog.LOPHFKMOPAA("wrong xml: " + ex.Message);
+				AdvLog.LogWarning("wrong xml: " + ex.Message);
 				return;
 			}
 			XmlElement xmlElement = xmlDocument["Sounds"];
@@ -104,7 +104,7 @@ namespace Nekki.Audio
 				if (!string.IsNullOrEmpty(text))
 				{
 					string aKGGCMGELKH = ALHKHJOJECK + "/" + text;
-					KDJAABFBHEL(value, aKGGCMGELKH);
+					LoadClip(value, aKGGCMGELKH);
 					if (_volumesByClips.ContainsKey(value))
 					{
 						_volumesByClips[value] = value2;
@@ -117,7 +117,7 @@ namespace Nekki.Audio
 			}
 		}
 
-		private static void KDJAABFBHEL(string LGLFOBEIPKB, string AKGGCMGELKH)
+		private static void LoadClip(string LGLFOBEIPKB, string AKGGCMGELKH)
 		{
 			if (!File.Exists(AKGGCMGELKH))
 			{
@@ -148,7 +148,7 @@ namespace Nekki.Audio
 			{
 				return wWW.GetAudioClip();
 			}
-			AdvLog.CCOFFJPPAKC(wWW.error);
+			AdvLog.LogError(wWW.error);
 			return null;
 		}
 
@@ -188,68 +188,68 @@ namespace Nekki.Audio
 		{
 			if (_clips.ContainsKey(LGLFOBEIPKB))
 			{
-				if (!NCAHAPGPHDM.ContainsKey(ADNDLGKIJJK))
+				if (!_chanels.ContainsKey(ADNDLGKIJJK))
 				{
-					NCAHAPGPHDM.Add(ADNDLGKIJJK, new Chanel(ADNDLGKIJJK, OIAEAINHKBJ(ADNDLGKIJJK), _clips));
+					_chanels.Add(ADNDLGKIJJK, new Chanel(ADNDLGKIJJK, IsMusicChanel(ADNDLGKIJJK), _clips));
 				}
 				PlayCommand iPHFFPCPLDP = new PlayCommand(ADNDLGKIJJK, LGLFOBEIPKB, KKHJAJFEPPA, ENNOPELJKPB, JIJAJFEJJHK * _volumesByClips[LGLFOBEIPKB]);
-				iPHFFPCPLDP.JJOFEEGNEDM(HPOJCCHMKOP);
-				NCAHAPGPHDM[ADNDLGKIJJK].EACCANOGCFL(iPHFFPCPLDP);
+				iPHFFPCPLDP.SetAudioSettings(_settings);
+				_chanels[ADNDLGKIJJK].Play(iPHFFPCPLDP);
 			}
 		}
 
 		public static void Play(PlayCommand LEKEGLMDAHA)
 		{
-			if (!EDAPJLKMFPC)
+			if (!_instance)
 			{
-				AdvLog.LOPHFKMOPAA("you must init AudioManager first!");
+				AdvLog.LogWarning("you must init AudioManager first!");
 				return;
 			}
-			LEKEGLMDAHA.JJOFEEGNEDM(HPOJCCHMKOP);
-			if (NCAHAPGPHDM.ContainsKey(LEKEGLMDAHA.OKFNIMIANKK()))
+			LEKEGLMDAHA.SetAudioSettings(_settings);
+			if (_chanels.ContainsKey(LEKEGLMDAHA.GetChanelID()))
 			{
-				NCAHAPGPHDM.Add(LEKEGLMDAHA.OKFNIMIANKK(), new Chanel(LEKEGLMDAHA.OKFNIMIANKK(), OIAEAINHKBJ(LEKEGLMDAHA.OKFNIMIANKK()), _clips));
+				_chanels.Add(LEKEGLMDAHA.GetChanelID(), new Chanel(LEKEGLMDAHA.GetChanelID(), IsMusicChanel(LEKEGLMDAHA.GetChanelID()), _clips));
 			}
-			NCAHAPGPHDM[LEKEGLMDAHA.OKFNIMIANKK()].EACCANOGCFL(LEKEGLMDAHA);
+			_chanels[LEKEGLMDAHA.GetChanelID()].Play(LEKEGLMDAHA);
 		}
 
 		public static void Mute(int ADNDLGKIJJK)
 		{
-			if (!NCAHAPGPHDM.ContainsKey(ADNDLGKIJJK))
+			if (!_chanels.ContainsKey(ADNDLGKIJJK))
 			{
-				NCAHAPGPHDM.Add(ADNDLGKIJJK, new Chanel(ADNDLGKIJJK, OIAEAINHKBJ(ADNDLGKIJJK), _clips));
+				_chanels.Add(ADNDLGKIJJK, new Chanel(ADNDLGKIJJK, IsMusicChanel(ADNDLGKIJJK), _clips));
 			}
-			NCAHAPGPHDM[ADNDLGKIJJK].LKLAFKJFNIP();
+			_chanels[ADNDLGKIJJK].Mute();
 		}
 
 		public static void UnMute(int ADNDLGKIJJK)
 		{
-			if (!NCAHAPGPHDM.ContainsKey(ADNDLGKIJJK))
+			if (!_chanels.ContainsKey(ADNDLGKIJJK))
 			{
-				NCAHAPGPHDM.Add(ADNDLGKIJJK, new Chanel(ADNDLGKIJJK, OIAEAINHKBJ(ADNDLGKIJJK), _clips));
+				_chanels.Add(ADNDLGKIJJK, new Chanel(ADNDLGKIJJK, IsMusicChanel(ADNDLGKIJJK), _clips));
 			}
-			NCAHAPGPHDM[ADNDLGKIJJK].PNNNNJBKONA();
+			_chanels[ADNDLGKIJJK].Unmute();
 		}
 
 		private static void Pause(bool KCANPMPILKI, int ADNDLGKIJJK, string DPBKBKDCIOI)
 		{
-			if (NCAHAPGPHDM.ContainsKey(ADNDLGKIJJK))
+			if (_chanels.ContainsKey(ADNDLGKIJJK))
 			{
-				NCAHAPGPHDM[ADNDLGKIJJK].Pause(KCANPMPILKI, DPBKBKDCIOI);
+				_chanels[ADNDLGKIJJK].Pause(KCANPMPILKI, DPBKBKDCIOI);
 			}
 		}
 
 		public static void Pause(bool KCANPMPILKI, int ADNDLGKIJJK)
 		{
-			if (NCAHAPGPHDM.ContainsKey(ADNDLGKIJJK))
+			if (_chanels.ContainsKey(ADNDLGKIJJK))
 			{
-				NCAHAPGPHDM[ADNDLGKIJJK].Pause(KCANPMPILKI);
+				_chanels[ADNDLGKIJJK].Pause(KCANPMPILKI);
 			}
 		}
 
 		private static void Pause(bool KCANPMPILKI)
 		{
-			foreach (Chanel value in NCAHAPGPHDM.Values)
+			foreach (Chanel value in _chanels.Values)
 			{
 				value.Pause(KCANPMPILKI);
 			}
@@ -257,48 +257,48 @@ namespace Nekki.Audio
 
 		public static void Stop(int AHCPPDFEDNJ, bool BJIOMMPCLEA = false)
 		{
-			if (NCAHAPGPHDM.ContainsKey(AHCPPDFEDNJ))
+			if (_chanels.ContainsKey(AHCPPDFEDNJ))
 			{
-				NCAHAPGPHDM[AHCPPDFEDNJ].IEHPNJOOPCG(BJIOMMPCLEA);
+				_chanels[AHCPPDFEDNJ].StopAll(BJIOMMPCLEA);
 			}
 		}
 
 		public static void SetVolume(float JIJAJFEJJHK, int AHCPPDFEDNJ)
 		{
-			if (!NCAHAPGPHDM.ContainsKey(AHCPPDFEDNJ))
+			if (!_chanels.ContainsKey(AHCPPDFEDNJ))
 			{
-				NCAHAPGPHDM.Add(AHCPPDFEDNJ, new Chanel(AHCPPDFEDNJ, OIAEAINHKBJ(AHCPPDFEDNJ), _clips));
+				_chanels.Add(AHCPPDFEDNJ, new Chanel(AHCPPDFEDNJ, IsMusicChanel(AHCPPDFEDNJ), _clips));
 			}
-			NCAHAPGPHDM[AHCPPDFEDNJ].set_MasterVolume(JIJAJFEJJHK);
+			_chanels[AHCPPDFEDNJ].set_MasterVolume(JIJAJFEJJHK);
 		}
 
 		public static float GetVolume(int AHCPPDFEDNJ)
 		{
-			if (NCAHAPGPHDM.ContainsKey(AHCPPDFEDNJ))
+			if (_chanels.ContainsKey(AHCPPDFEDNJ))
 			{
-				return NCAHAPGPHDM[AHCPPDFEDNJ].LFDFKPHKEGJ();
+				return _chanels[AHCPPDFEDNJ].GetMasterVolume();
 			}
 			return 1f;
 		}
 
 		internal void Start()
 		{
-			if ((bool)EDAPJLKMFPC && EDAPJLKMFPC != this)
+			if ((bool)_instance && _instance != this)
 			{
 				UnityEngine.Object.Destroy(base.gameObject);
 			}
 		}
 
-		private static bool OIAEAINHKBJ(int LIAILCGJBDK)
+		private static bool IsMusicChanel(int LIAILCGJBDK)
 		{
 			return _musicChanels.Contains(LIAILCGJBDK);
 		}
 
 		public static bool IsPlaying(int AHCPPDFEDNJ)
 		{
-			if (NCAHAPGPHDM.ContainsKey(AHCPPDFEDNJ))
+			if (_chanels.ContainsKey(AHCPPDFEDNJ))
 			{
-				return NCAHAPGPHDM[AHCPPDFEDNJ].EGCDMGAFFEE();
+				return _chanels[AHCPPDFEDNJ].GetIsPlaying();
 			}
 			return false;
 		}

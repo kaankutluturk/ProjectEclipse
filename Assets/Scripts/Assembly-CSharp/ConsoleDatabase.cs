@@ -9,28 +9,28 @@ public static class ConsoleDatabase
 	private class CommandData
 	{
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		private CommandFunction GNLOEEPMBAE;
+		private CommandFunction _handler;
 
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		private bool BNOGJDKNPNK;
+		private bool _lowercaseArguments;
 
-		public CommandFunction LFGMKDBLKIM
+		public CommandFunction Handler
 		{
 			get
 			{
-				return GELBGNNLCPL();
+				return GetHandler();
 			}
 			private set
 			{
-				BOMEKPKGNGF(value);
+				SetHandler(value);
 			}
 		}
 
-		public bool DCEDOJMGMFD
+		public bool LowercaseArguments
 		{
 			get
 			{
-				return NKMNCHFLCOB();
+				return GetIgnoreCase();
 			}
 			private set
 			{
@@ -40,28 +40,28 @@ public static class ConsoleDatabase
 
 		public CommandData(CommandFunction MHAEIBNCMPL, bool DLEJFILIEGL)
 		{
-			BOMEKPKGNGF(MHAEIBNCMPL);
+			SetHandler(MHAEIBNCMPL);
 			set_IgnoreCase(DLEJFILIEGL);
 		}
 
-		public CommandFunction GELBGNNLCPL()
+		public CommandFunction GetHandler()
 		{
-			return GNLOEEPMBAE;
+			return _handler;
 		}
 
-		private void BOMEKPKGNGF(CommandFunction value)
+		private void SetHandler(CommandFunction value)
 		{
-			GNLOEEPMBAE = value;
+			_handler = value;
 		}
 
-		public bool NKMNCHFLCOB()
+		public bool GetIgnoreCase()
 		{
-			return BNOGJDKNPNK;
+			return _lowercaseArguments;
 		}
 
 		private void set_IgnoreCase(bool value)
 		{
-			BNOGJDKNPNK = value;
+			_lowercaseArguments = value;
 		}
 	}
 
@@ -69,12 +69,12 @@ public static class ConsoleDatabase
 
 	private static readonly char[] _ArgsSeparators = new char[1] { ' ' };
 
-	private static readonly Dictionary<string, CommandData> CBJMDPIEOBC = new Dictionary<string, CommandData>();
+	private static readonly Dictionary<string, CommandData> _commands = new Dictionary<string, CommandData>();
 
 	public static bool HasCommand(string name)
 	{
 		name = name.ToLower();
-		return CBJMDPIEOBC.ContainsKey(name) && CBJMDPIEOBC[name] != null;
+		return _commands.ContainsKey(name) && _commands[name] != null;
 	}
 
 	public static string ExecuteCommand(string LEKEGLMDAHA)
@@ -88,25 +88,25 @@ public static class ConsoleDatabase
 			LEKEGLMDAHA = LEKEGLMDAHA.Trim(' ');
 			if (HasCommand(text))
 			{
-				CommandData kHGKFJFOEBE = CBJMDPIEOBC[text];
-				if (kHGKFJFOEBE.NKMNCHFLCOB())
+				CommandData kHGKFJFOEBE = _commands[text];
+				if (kHGKFJFOEBE.GetIgnoreCase())
 				{
 					LEKEGLMDAHA = LEKEGLMDAHA.ToLower();
 				}
 				string[] lKIOKGCNKHE = LEKEGLMDAHA.Split(_ArgsSeparators, StringSplitOptions.RemoveEmptyEntries);
-				return kHGKFJFOEBE.GELBGNNLCPL()(lKIOKGCNKHE);
+				return kHGKFJFOEBE.GetHandler()(lKIOKGCNKHE);
 			}
 		}
 		return "Unknown command!";
 	}
 
-	public static void IMEAIJNKBOP(string name, CommandFunction LEPDMLGJCKI, bool DLEJFILIEGL = true)
+	public static void RegisterCommand(string name, CommandFunction LEPDMLGJCKI, bool DLEJFILIEGL = true)
 	{
-		CBJMDPIEOBC[name.ToLower()] = new CommandData(LEPDMLGJCKI, DLEJFILIEGL);
+		_commands[name.ToLower()] = new CommandData(LEPDMLGJCKI, DLEJFILIEGL);
 	}
 
 	public static void UnregisterCommand(string name)
 	{
-		CBJMDPIEOBC.Remove(name.ToLower());
+		_commands.Remove(name.ToLower());
 	}
 }

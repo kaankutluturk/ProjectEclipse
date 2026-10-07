@@ -6,43 +6,43 @@ namespace Nekki.SF2.GUI.Dialogs
 {
 	public class StoryDialog : BaseDialog
 	{
-		private const float JJDELNLKLMI = 120f;
+		private const float ButtonYOffset = 120f;
 
 		private const string PRICE_TEXT_BACKGROUND = "ShopPieces.stripe";
 
-		private const int KKPDDHGAECI = 100;
+		private const int DefaultSizeOffset = 100;
 
-		private const int EGKAICLFKGD = 900;
+		private const int TextWidthWithPortrait = 900;
 
-		private const int BLOJHNNDAHN = -120;
+		private const int ButtonOffsetBelow = -120;
 
-		private const int DPJCJMNHJPA = 120;
+		private const int ButtonsBottomOffset = 120;
 
-		private const int HJJMGMKOMJP = 740;
+		private const int ButtonRightEdgeX = 740;
 
-		private const int LLLAOBBPFHK = 60;
+		private const int ButtonSpacing = 60;
 
-		private const int EHMDBBMBFMJ = 40;
+		private const int PortraitTextGap = 40;
 
-		protected const int EAGOJOBFHBC = 103;
+		protected const int LabelFontSize = 103;
 
-		protected const int LKJMEIKLGPL = 1680;
+		protected const int FullTextWidth = 1680;
 
-		private const int PHOFEFIMAEM = 40;
+		private const int TimerLabelGap = 40;
 
-		private const int BJEMKGGJEAP = 1234;
+		private const int TimerLabelTagBase = 1234;
 
-		private const int NFCHOPIJOHF = 20;
+		private const int ContentOffsetY = 20;
 
-		protected float CJDGAIICNGM = GameUtils.FCMBGDFIBPK();
+		protected float referenceHeight = GameUtils.GetDialogContentWidth();
 
-		protected const float OICADIFPCOC = 0.9f;
+		protected const float PortraitSizeRatio = 0.9f;
 
-		protected const float FAPMANOMJDN = 0.8f;
+		protected const float ContentHeightRatio = 0.8f;
 
-		private const int JPHAHHBOHCA = -500;
+		private const int PortraitX = -500;
 
-		private const int BKNNIPNGDKL = 110;
+		private const int MinLineSplitIndex = 110;
 
 		public const float FOOTER_TEXT_OFFSET_Y = 60f;
 
@@ -50,7 +50,7 @@ namespace Nekki.SF2.GUI.Dialogs
 
 		public const float FOOTER_TEXT_DOWN_OFFSET_Y = 30f;
 
-		protected TextTimer OIHKOMFCFME;
+		protected TextTimer timer;
 
 		[SerializeField]
 		protected LabelAlias _text;
@@ -67,46 +67,46 @@ namespace Nekki.SF2.GUI.Dialogs
 		[SerializeField]
 		protected GameObject _textsSprite;
 
-		protected float HAPLFCEGEFI = 100f;
+		protected float defaultSize = 100f;
 
-		protected int HPBNHCPCOEB;
+		protected int currentPageIndex;
 
-		protected int LOKIJLFALJP;
+		protected int unusedIndex;
 
-		protected bool FCGALLIMMAF = true;
+		protected bool showCancelButton = true;
 
-		protected List<StoryDialogContent> IHMEPGICLGF = new List<StoryDialogContent>();
+		protected List<StoryDialogContent> contents = new List<StoryDialogContent>();
 
-		protected string AKNJEGGNNBJ = string.Empty;
+		protected string portraitSpriteName = string.Empty;
 
-		protected bool ANIJAKJOHED = true;
+		protected bool showPortrait = true;
 
-		protected UserItem NKBIOFJMONB;
+		protected UserItem timerUserItem;
 
-		protected RecipeItemInfo DMDLCMBKEHA;
+		protected RecipeItemInfo timerRecipe;
 
-		protected string APBAOFGMAAA = string.Empty;
+		protected string messageText = string.Empty;
 
-		protected string MALELNACHFP = string.Empty;
+		protected string storyOkButtonAlias = string.Empty;
 
-		protected LabelButton.FBMGEHJPPIK OKJBFFAIJPL;
+		protected LabelButton.ButtonColor cancelButtonColor;
 
-		protected LabelButton.FBMGEHJPPIK JCAOLHHIFEC;
+		protected LabelButton.ButtonColor okButtonColor;
 
-		protected int HCMDPDLJLOO = int.MaxValue;
+		protected int timerContentId = int.MaxValue;
 
-		protected bool PAPNPKAGDNB;
+		protected bool isTimerActive;
 
 		protected long _leftTime;
 
-		protected List<StoryDialogContent> LGEKNIKOFMD = new List<StoryDialogContent>();
+		protected List<StoryDialogContent> priceLineContents = new List<StoryDialogContent>();
 
 		[SerializeField]
 		protected GameObject _footerTextsSprite;
 
-		protected bool JODDCOBBHMN;
+		protected bool messageRefreshPending;
 
-		protected bool GIGHCCNJNGA;
+		protected bool showAllContents;
 
 		public override void Init(object data)
 		{
@@ -115,58 +115,58 @@ namespace Nekki.SF2.GUI.Dialogs
 			{
 				StoryDialogInfo gPJMLFBLDEF = (StoryDialogInfo)data;
 				dIKEFIIPNBE = gPJMLFBLDEF.Title;
-				AKNJEGGNNBJ = gPJMLFBLDEF.GBMEDJJOFBF;
-				ANIJAKJOHED = gPJMLFBLDEF.IPOAINACEOB;
-				IHMEPGICLGF = gPJMLFBLDEF.CHJHCGODKJM;
-				FCGALLIMMAF = gPJMLFBLDEF.MHPGECECDGO;
-				MALELNACHFP = gPJMLFBLDEF.KCMBJJDAGHP;
-				JCAOLHHIFEC = gPJMLFBLDEF.LEALGLNFFDI;
-				EBCJGLPLHAD = gPJMLFBLDEF.PDBEAEIJCBO;
-				OKJBFFAIJPL = gPJMLFBLDEF.DFAGEOKEMIE;
-				GIGHCCNJNGA = gPJMLFBLDEF.MOOMLCGKFBA;
+				portraitSpriteName = gPJMLFBLDEF.PortraitName;
+				showPortrait = gPJMLFBLDEF.ShowPortrait;
+				contents = gPJMLFBLDEF.Contents;
+				showCancelButton = gPJMLFBLDEF.ShowCancelButton;
+				storyOkButtonAlias = gPJMLFBLDEF.OkButtonText;
+				okButtonColor = gPJMLFBLDEF.OkButtonColor;
+				cancelButtonAlias = gPJMLFBLDEF.CancelButtonText;
+				cancelButtonColor = gPJMLFBLDEF.CancelButtonColor;
+				showAllContents = gPJMLFBLDEF.UseEdgeButtons;
 				if (gPJMLFBLDEF.Dlg != null)
 				{
 					AddEventListener(0, gPJMLFBLDEF.Dlg);
 				}
 			}
-			GlobalTimer.get_Instance().addEventListener(0, ILFBDHDMHPD);
-			base.Init(dIKEFIIPNBE, MALELNACHFP, EBCJGLPLHAD);
+			GlobalTimer.get_Instance().addEventListener(0, OnTimerTick);
+			base.Init(dIKEFIIPNBE, storyOkButtonAlias, cancelButtonAlias);
 		}
 
 		private new void Start()
 		{
 			base.Start();
-			KJHPCLOFDJB();
+			RelayoutDialog();
 		}
 
 		private void OnDestroy()
 		{
-			GlobalTimer.get_Instance().removeEventListener(0, ILFBDHDMHPD);
+			GlobalTimer.get_Instance().removeEventListener(0, OnTimerTick);
 		}
 
 		public override void Close(object data)
 		{
-			IPJEOLNMLEH iPJEOLNMLEH = IPJEOLNMLEH.OnPopupClose;
+			DialogCloseEvent iPJEOLNMLEH = DialogCloseEvent.OnPopupClose;
 			OnClose(iPJEOLNMLEH);
 		}
 
-		protected override void HLJBLAPMDCB()
+		protected override void SetupContent()
 		{
-			HPGFNENGBFI(AKNJEGGNNBJ);
-			if (GIGHCCNJNGA)
+			SetupPortrait(portraitSpriteName);
+			if (showAllContents)
 			{
-				GDMKEKGBDGG();
+				BuildAllContents();
 			}
 			else
 			{
-				AJNMAKEIDMH();
+				ShowFirstContent();
 			}
-			_content.transform.BGNJGIACJBG(20f);
-			Vector2 sizeDelta = new Vector2(_content.GetComponent<RectTransform>().rect.width, CJDGAIICNGM * 0.9f * 0.8f);
+			_content.transform.SetLocalY(20f);
+			Vector2 sizeDelta = new Vector2(_content.GetComponent<RectTransform>().rect.width, referenceHeight * 0.9f * 0.8f);
 			_content.GetComponent<RectTransform>().sizeDelta = sizeDelta;
 		}
 
-		protected override void CGKGDKAGFLI()
+		protected override void FitContentSize()
 		{
 			float num = 0f;
 			if (_text.get_text() != string.Empty)
@@ -177,7 +177,7 @@ namespace Nekki.SF2.GUI.Dialogs
 			{
 				num += _textsSprite.GetComponent<RectTransform>().rect.height;
 			}
-			float b = CJDGAIICNGM * 0.9f * 0.8f;
+			float b = referenceHeight * 0.9f * 0.8f;
 			float num2 = Mathf.Max(num, b);
 			if (_footerTextsSprite.gameObject.activeSelf)
 			{
@@ -187,105 +187,105 @@ namespace Nekki.SF2.GUI.Dialogs
 			_content.GetComponent<RectTransform>().sizeDelta = sizeDelta;
 		}
 
-		protected override void MAGOIKICKAH(KBDHPMOMJLL HJNAHNICGMH)
+		protected override void SetupFooter(FooterType HJNAHNICGMH)
 		{
-			if (HPBNHCPCOEB + 1 < IHMEPGICLGF.Count)
+			if (currentPageIndex + 1 < contents.Count)
 			{
-				SetButton(IHMEPGICLGF[HPBNHCPCOEB].AJELOOEBCPO);
+				SetButton(contents[currentPageIndex].ButtonText);
 			}
-			if (HPBNHCPCOEB + 1 == IHMEPGICLGF.Count)
+			if (currentPageIndex + 1 == contents.Count)
 			{
-				BGJJDGOBPKA = ((!(MALELNACHFP == string.Empty)) ? MALELNACHFP : IHMEPGICLGF[HPBNHCPCOEB].AJELOOEBCPO);
-				FALMBFKEGIE();
+				defaultOkButtonAlias = ((!(storyOkButtonAlias == string.Empty)) ? storyOkButtonAlias : contents[currentPageIndex].ButtonText);
+				ShowLastPageButtons();
 			}
-			else if (IHMEPGICLGF.Count == 0)
+			else if (contents.Count == 0)
 			{
-				BGJJDGOBPKA = ((!(MALELNACHFP == string.Empty)) ? MALELNACHFP : BGJJDGOBPKA);
-				FALMBFKEGIE();
+				defaultOkButtonAlias = ((!(storyOkButtonAlias == string.Empty)) ? storyOkButtonAlias : defaultOkButtonAlias);
+				ShowLastPageButtons();
 			}
 		}
 
-		protected virtual void FALMBFKEGIE()
+		protected virtual void ShowLastPageButtons()
 		{
-			KBDHPMOMJLL kBDHPMOMJLL = KBDHPMOMJLL.FOOTER_NONE;
-			kBDHPMOMJLL = ((!FCGALLIMMAF) ? KBDHPMOMJLL.FOOTER_OK : KBDHPMOMJLL.FOOTER_BOTH);
-			base.MAGOIKICKAH(kBDHPMOMJLL);
+			FooterType kBDHPMOMJLL = FooterType.FOOTER_NONE;
+			kBDHPMOMJLL = ((!showCancelButton) ? FooterType.FOOTER_OK : FooterType.FOOTER_BOTH);
+			base.SetupFooter(kBDHPMOMJLL);
 			_btnOK.RemoveEventListener(2, OnClose);
-			_btnOK.RemoveEventListener(2, GPEKKGLDKDF);
-			_btnOK.AddEventListener(2, GPEKKGLDKDF);
-			_btnCancel.gameObject.SetActive(FCGALLIMMAF);
-			if (FCGALLIMMAF)
+			_btnOK.RemoveEventListener(2, OnNextClicked);
+			_btnOK.AddEventListener(2, OnNextClicked);
+			_btnCancel.gameObject.SetActive(showCancelButton);
+			if (showCancelButton)
 			{
 				_btnCancel.RemoveEventListener(2, OnClose);
-				_btnCancel.AddEventListener(2, MDCHOBEPGCO);
+				_btnCancel.AddEventListener(2, OnCancelClicked);
 			}
-			CHFENJOILAB();
-			BHLHODFNHHO();
+			PositionButtons();
+			ApplyPlatformLayout();
 		}
 
-		protected virtual void HPGFNENGBFI(string LBBHPDDLLOK)
+		protected virtual void SetupPortrait(string LBBHPDDLLOK)
 		{
 			string[] array = LBBHPDDLLOK.Split('|');
 			string[] array2 = LBBHPDDLLOK.Split('/');
 			string[] array3 = array2[array2.Length - 1].Split('.');
-			_portrait.set_TexturePath(SF2Paths.BHCPOOOJAAK());
+			_portrait.set_TexturePath(SF2Paths.GetUsersUiPath());
 			// Eclipse mod dialogs pass qualified sprite IDs (owner:path); the legacy
 			// basename/extension trimming would drop their namespace.
 			_portrait.set_SpriteName(array[0].IndexOf(':') > 0 ? array[0] : array3[0]);
 			int num = ((array.Length <= 1) ? 1 : (-1));
-			_portrait.transform.BGNJGIACJBG(0f);
-			_portrait.transform.OKHPLHPBPKJ(-500f);
+			_portrait.transform.SetLocalY(0f);
+			_portrait.transform.SetLocalX(-500f);
 			_portrait.SetNativeSize();
 			_portrait.transform.localScale = new Vector2(1.8f * (float)num, 1.8f);
-			_portrait.gameObject.SetActive(ANIJAKJOHED);
+			_portrait.gameObject.SetActive(showPortrait);
 		}
 
-		protected virtual void CHFENJOILAB()
+		protected virtual void PositionButtons()
 		{
 			float y = _bottomStripe.transform.localPosition.y;
 			float bAINMLLIKOL = y + 120f;
 			if (_btnOK != null && _btnOK.gameObject.activeSelf)
 			{
 				float bAINMLLIKOL2 = 740f - _btnOK.GetComponent<RectTransform>().rect.width / 2f;
-				_btnOK.transform.OKHPLHPBPKJ(bAINMLLIKOL2);
-				_btnOK.transform.BGNJGIACJBG(bAINMLLIKOL);
+				_btnOK.transform.SetLocalX(bAINMLLIKOL2);
+				_btnOK.transform.SetLocalY(bAINMLLIKOL);
 			}
 			if (_btnCancel != null && _btnCancel.gameObject.activeSelf)
 			{
 				float num = 0f;
-				TransformExtensions.OKHPLHPBPKJ(value: (!_btnOK.gameObject.activeSelf) ? ((1680f - _btnCancel.GetComponent<RectTransform>().rect.width) / 2f - 740f) : (_btnOK.transform.localPosition.x - 60f - (_btnOK.GetComponent<RectTransform>().rect.width + _btnCancel.GetComponent<RectTransform>().rect.width) / 2f), KGOIHPPNFGC: _btnCancel.transform);
-				_btnCancel.transform.BGNJGIACJBG(bAINMLLIKOL);
+				TransformExtensions.SetLocalX(value: (!_btnOK.gameObject.activeSelf) ? ((1680f - _btnCancel.GetComponent<RectTransform>().rect.width) / 2f - 740f) : (_btnOK.transform.localPosition.x - 60f - (_btnOK.GetComponent<RectTransform>().rect.width + _btnCancel.GetComponent<RectTransform>().rect.width) / 2f), KGOIHPPNFGC: _btnCancel.transform);
+				_btnCancel.transform.SetLocalY(bAINMLLIKOL);
 			}
 		}
 
-		protected virtual void NBGHLFJPOGM(string LIOGIBJBHAH)
+		protected virtual void SetMessageKey(string LIOGIBJBHAH)
 		{
-			JODDCOBBHMN = true;
-			APBAOFGMAAA = LocalizationManager.GetString(LIOGIBJBHAH);
+			messageRefreshPending = true;
+			messageText = LocalizationManager.GetString(LIOGIBJBHAH);
 			_timeLabel.gameObject.SetActive(false);
 		}
 
-		protected virtual void NBGHLFJPOGM(StoryDialogContent DMNBDBJNKME)
+		protected virtual void ShowContent(StoryDialogContent DMNBDBJNKME)
 		{
-			KAFHPCAIFNI(DMNBDBJNKME);
-			NBGHLFJPOGM(DMNBDBJNKME.GGDJIPKMKFC);
+			SetupTextLabel(DMNBDBJNKME);
+			SetMessageKey(DMNBDBJNKME.Text);
 			if (_timerLabel != null)
 			{
 				_timerLabel.gameObject.SetActive(false);
 			}
 			int num = -1;
-			if (DMNBDBJNKME.MALKNOOGNBA != null)
+			if (DMNBDBJNKME.ItemTimer != null)
 			{
-				num = ELALCENFCPJ.IndexOf(DMNBDBJNKME.MALKNOOGNBA);
+				num = textTimers.IndexOf(DMNBDBJNKME.ItemTimer);
 				if (num == -1)
 				{
-					ELALCENFCPJ.Add(DMNBDBJNKME.MALKNOOGNBA);
-					_timerLabel = HOPECLFOPLH(DMNBDBJNKME);
-					DMNBDBJNKME.MALKNOOGNBA.set_Label(_timerLabel);
-					DMNBDBJNKME.MALKNOOGNBA.JLPMOKPFECK();
-					num = ELALCENFCPJ.Count - 1;
+					textTimers.Add(DMNBDBJNKME.ItemTimer);
+					_timerLabel = CreateTimerLabel(DMNBDBJNKME);
+					DMNBDBJNKME.ItemTimer.set_Label(_timerLabel);
+					DMNBDBJNKME.ItemTimer.Refresh();
+					num = textTimers.Count - 1;
 				}
-				_timerLabel = DMNBDBJNKME.MALKNOOGNBA.EDAKEMEHFIC();
+				_timerLabel = DMNBDBJNKME.ItemTimer.GetLabel();
 			}
 			else
 			{
@@ -303,92 +303,92 @@ namespace Nekki.SF2.GUI.Dialogs
 			if ((bool)_timerLabel && !flag)
 			{
 				_timerLabel.set_LabelFontSize(103);
-				_timerLabel.color = DMNBDBJNKME.MALKNOOGNBA.Color;
+				_timerLabel.color = DMNBDBJNKME.ItemTimer.Color;
 				_timerLabel.tag = (1234 + num).ToString();
 				_timerLabel.transform.SetParent(_content.transform, false);
 			}
 			if (DMNBDBJNKME.CheckTimer)
 			{
-				NHAGNALDKCP(DMNBDBJNKME);
+				StartTimer(DMNBDBJNKME);
 			}
 		}
 
-		protected virtual void NHAGNALDKCP(StoryDialogContent DMNBDBJNKME)
+		protected virtual void StartTimer(StoryDialogContent DMNBDBJNKME)
 		{
-			PAPNPKAGDNB = true;
+			isTimerActive = true;
 			_leftTime = DMNBDBJNKME.Timer;
-			HCMDPDLJLOO = DMNBDBJNKME.Id;
-			NKBIOFJMONB = DMNBDBJNKME.FGBNJDPGOFN;
-			DMDLCMBKEHA = DMNBDBJNKME.KMNGHHBCEGD;
+			timerContentId = DMNBDBJNKME.Id;
+			timerUserItem = DMNBDBJNKME.OwnedItem;
+			timerRecipe = DMNBDBJNKME.Recipe;
 			if (_leftTime <= 0)
 			{
-				OnClose(HCMDPDLJLOO);
+				OnClose(timerContentId);
 			}
-			JJAMIENHFPJ();
+			UpdateTimerLabel();
 		}
 
 		protected virtual void SetButton(string HCPNFPMHFCM)
 		{
-			BGJJDGOBPKA = HCPNFPMHFCM;
-			PHKIJLEICHE(_btnOK, KBDHPMOMJLL.FOOTER_OK);
+			defaultOkButtonAlias = HCPNFPMHFCM;
+			SetupButton(_btnOK, FooterType.FOOTER_OK);
 			_btnOK.RemoveEventListener(2, OnClose);
-			_btnOK.RemoveEventListener(2, GPEKKGLDKDF);
-			_btnOK.AddEventListener(2, GPEKKGLDKDF);
+			_btnOK.RemoveEventListener(2, OnNextClicked);
+			_btnOK.AddEventListener(2, OnNextClicked);
 		}
 
-		protected virtual void ILFBDHDMHPD(object data)
+		protected virtual void OnTimerTick(object data)
 		{
-			if (ELALCENFCPJ.Count > 0)
+			if (textTimers.Count > 0)
 			{
-				FFALBJIJIIP(0);
-				FOCAHKBJKEK();
+				RefreshTextTimers(0);
+				CloseIfTimerExpired();
 			}
-			if (PAPNPKAGDNB)
+			if (isTimerActive)
 			{
 				if (_leftTime <= 0)
 				{
-					OnClose(HCMDPDLJLOO);
+					OnClose(timerContentId);
 				}
-				FLKJAKKMBIP();
-				JJAMIENHFPJ();
+				UpdateLeftTime();
+				UpdateTimerLabel();
 			}
 		}
 
-		private void FLKJAKKMBIP()
+		private void UpdateLeftTime()
 		{
-			if (NKBIOFJMONB == null)
+			if (timerUserItem == null)
 			{
-				if (DMDLCMBKEHA == null)
+				if (timerRecipe == null)
 				{
 					_leftTime--;
 				}
 				else
 				{
-					_leftTime = GameUtils.GetLeftTime(DMDLCMBKEHA.HGDELDFDFNH());
+					_leftTime = GameUtils.GetLeftTime(timerRecipe.GetDeliveryEndTime());
 				}
 			}
 			else
 			{
-				_leftTime = GameUtils.GetLeftTime(NKBIOFJMONB.IJGAOHJNLAH());
+				_leftTime = GameUtils.GetLeftTime(timerUserItem.GetDeliveryTimestamp());
 			}
 		}
 
-		protected virtual void AJNMAKEIDMH()
+		protected virtual void ShowFirstContent()
 		{
 			_timeLabel.set_Alias(string.Empty);
 			_timeLabel.set_text(string.Empty);
-			_timeLabel.color = Constants.KLLKHFKHCGK;
+			_timeLabel.color = Constants.DialogHeaderColor;
 			_timeLabel.set_LabelFontSize(103);
 			_timeLabel.gameObject.SetActive(false);
 			_timeLabel.transform.SetParent(_content.transform, false);
-			int count = IHMEPGICLGF.Count;
+			int count = contents.Count;
 			if (count > 0)
 			{
-				NBGHLFJPOGM(IHMEPGICLGF[0]);
+				ShowContent(contents[0]);
 			}
 		}
 
-		protected virtual void KAFHPCAIFNI(StoryDialogContent DMNBDBJNKME)
+		protected virtual void SetupTextLabel(StoryDialogContent DMNBDBJNKME)
 		{
 			_text.gameObject.SetActive(true);
 			_text.set_Alias(string.Empty);
@@ -396,77 +396,77 @@ namespace Nekki.SF2.GUI.Dialogs
 			_text.set_LabelFontSize(103);
 			_text.color = DMNBDBJNKME.FontColor;
 			_text.alignment = TextAnchor.MiddleLeft;
-			_text.transform.BGNJGIACJBG(0f);
-			float x = ((!ANIJAKJOHED) ? 1680 : 900);
+			_text.transform.SetLocalY(0f);
+			float x = ((!showPortrait) ? 1680 : 900);
 			_text.rectTransform.sizeDelta = new Vector2(x, _text.rectTransform.rect.height);
 		}
 
-		protected virtual void GPEKKGLDKDF(object data)
+		protected virtual void OnNextClicked(object data)
 		{
-			HPBNHCPCOEB++;
-			if (HPBNHCPCOEB == IHMEPGICLGF.Count - 1)
+			currentPageIndex++;
+			if (currentPageIndex == contents.Count - 1)
 			{
-				NBGHLFJPOGM(IHMEPGICLGF[HPBNHCPCOEB]);
-				BGJJDGOBPKA = ((!(MALELNACHFP == string.Empty)) ? MALELNACHFP : IHMEPGICLGF[HPBNHCPCOEB].AJELOOEBCPO);
-				FALMBFKEGIE();
+				ShowContent(contents[currentPageIndex]);
+				defaultOkButtonAlias = ((!(storyOkButtonAlias == string.Empty)) ? storyOkButtonAlias : contents[currentPageIndex].ButtonText);
+				ShowLastPageButtons();
 			}
-			else if (HPBNHCPCOEB >= IHMEPGICLGF.Count)
+			else if (currentPageIndex >= contents.Count)
 			{
 				OnClose(data);
 			}
 			else
 			{
-				NBGHLFJPOGM(IHMEPGICLGF[HPBNHCPCOEB]);
-				SetButton(IHMEPGICLGF[HPBNHCPCOEB].AJELOOEBCPO);
-				CHFENJOILAB();
-				BHLHODFNHHO();
+				ShowContent(contents[currentPageIndex]);
+				SetButton(contents[currentPageIndex].ButtonText);
+				PositionButtons();
+				ApplyPlatformLayout();
 			}
 		}
 
-		protected void MDCHOBEPGCO(object data)
+		protected void OnCancelClicked(object data)
 		{
 			base.OnClose(data);
 		}
 
 		private void Update()
 		{
-			if (JODDCOBBHMN)
+			if (messageRefreshPending)
 			{
-				JODDCOBBHMN = false;
-				KCDJNNNDJCE();
+				messageRefreshPending = false;
+				ApplyMessageText();
 			}
 		}
 
-		protected virtual void KCDJNNNDJCE()
+		protected virtual void ApplyMessageText()
 		{
-			string text = APBAOFGMAAA;
+			string text = messageText;
 			if (_timerLabel != null)
 			{
 				text += _timerLabel.get_text();
 			}
 			_text.set_text(text);
-			_text.transform.BGNJGIACJBG(0f);
-			if (ANIJAKJOHED)
+			_text.transform.SetLocalY(0f);
+			if (showPortrait)
 			{
-				_text.transform.OKHPLHPBPKJ(_portrait.transform.localPosition.x + 40f + CJDGAIICNGM * 0.9f / 2f + _text.rectTransform.rect.width / 2f);
+				_text.transform.SetLocalX(_portrait.transform.localPosition.x + 40f + referenceHeight * 0.9f / 2f + _text.rectTransform.rect.width / 2f);
 			}
 			else
 			{
-				_text.transform.OKHPLHPBPKJ(0f);
+				_text.transform.SetLocalX(0f);
 			}
 			if (_timerLabel != null)
 			{
 				_timerLabel.gameObject.SetActive(true);
 			}
-			JJAMIENHFPJ();
-			CGKGDKAGFLI();
-			KJHPCLOFDJB();
-			CHFENJOILAB();
+			UpdateTimerLabel();
+			FitContentSize();
+			RelayoutDialog();
+			PositionButtons();
 		}
 
-		protected virtual void JJAMIENHFPJ()
+		protected virtual void UpdateTimerLabel()
 		{
-			if (!(_timeLabel == null) && PAPNPKAGDNB)
+			if (!(_timeLabel == null) && isTimerActive)
 			{
 				bool aNLFBBLJMJH = true;
 				string timeString = TimerLabel.GetTimeString(_leftTime, true, true, true, aNLFBBLJMJH, ":", string.Empty, true, true, true, true, true, string.Empty, string.Empty, string.Empty);
@@ -474,24 +474,24 @@ namespace Nekki.SF2.GUI.Dialogs
 				_timeLabel.gameObject.SetActive(true);
 				if (!_text)
 				{
-					_timeLabel.transform.OKHPLHPBPKJ(_portrait.transform.localPosition.x + 40f + CJDGAIICNGM * 0.9f / 2f + _timeLabel.preferredWidth / 2f);
+					_timeLabel.transform.SetLocalX(_portrait.transform.localPosition.x + 40f + referenceHeight * 0.9f / 2f + _timeLabel.preferredWidth / 2f);
 				}
 				else if (!(_text.preferredWidth + _timeLabel.preferredWidth < 900f))
 				{
-					_text.transform.BGNJGIACJBG(40f);
-					_timeLabel.transform.OKHPLHPBPKJ(_portrait.transform.localPosition.x + 40f + CJDGAIICNGM * 0.9f / 2f + _timeLabel.preferredWidth / 2f);
-					_timeLabel.transform.BGNJGIACJBG(_text.transform.localPosition.y - _text.preferredHeight / 2f - 40f);
+					_text.transform.SetLocalY(40f);
+					_timeLabel.transform.SetLocalX(_portrait.transform.localPosition.x + 40f + referenceHeight * 0.9f / 2f + _timeLabel.preferredWidth / 2f);
+					_timeLabel.transform.SetLocalY(_text.transform.localPosition.y - _text.preferredHeight / 2f - 40f);
 				}
 			}
 		}
 
-		protected virtual void MFEGIBHOLDI()
+		protected virtual void BuildPriceLines()
 		{
 			_footerTextsSprite.gameObject.SetActive(true);
 			float num = 0f;
 			float num2 = 0f;
 			int num3 = 0;
-			foreach (StoryDialogContent item in LGEKNIKOFMD)
+			foreach (StoryDialogContent item in priceLineContents)
 			{
 				GameObject gameObject = new GameObject("LabelAlias");
 				LabelAlias labelAlias = gameObject.AddComponent<LabelAlias>();
@@ -503,16 +503,16 @@ namespace Nekki.SF2.GUI.Dialogs
 				labelAlias.alignByGeometry = true;
 				labelAlias.verticalOverflow = VerticalWrapMode.Overflow;
 				labelAlias.rectTransform.sizeDelta = new Vector2(1680f, 10f);
-				labelAlias.set_text(LocalizationManager.GetString(item.GGDJIPKMKFC));
-				string text = LocalizationManager.GetString(item.GGDJIPKMKFC);
-				bool flag = null != item.MALKNOOGNBA;
+				labelAlias.set_text(LocalizationManager.GetString(item.Text));
+				string text = LocalizationManager.GetString(item.Text);
+				bool flag = null != item.ItemTimer;
 				TimerLabel timerLabel = null;
 				if (flag)
 				{
-					ELALCENFCPJ.Add(item.MALKNOOGNBA);
-					timerLabel = HOPECLFOPLH(item);
-					item.MALKNOOGNBA.set_Label(timerLabel);
-					item.MALKNOOGNBA.JLPMOKPFECK();
+					textTimers.Add(item.ItemTimer);
+					timerLabel = CreateTimerLabel(item);
+					item.ItemTimer.set_Label(timerLabel);
+					item.ItemTimer.Refresh();
 					timerLabel.transform.SetParent(_footerTextsSprite.transform, false);
 					text = text + "<visible=0>" + timerLabel.get_text() + "</>";
 				}
@@ -523,8 +523,8 @@ namespace Nekki.SF2.GUI.Dialogs
 				}
 				num -= labelAlias.preferredHeight / 2f;
 				labelAlias.transform.SetParent(_footerTextsSprite.transform, false);
-				labelAlias.transform.BGNJGIACJBG(num);
-				labelAlias.transform.OKHPLHPBPKJ(0f);
+				labelAlias.transform.SetLocalY(num);
+				labelAlias.transform.SetLocalX(0f);
 				num -= labelAlias.preferredHeight / 2f + 32.5f;
 				if (flag)
 				{
@@ -535,8 +535,8 @@ namespace Nekki.SF2.GUI.Dialogs
 				resolutionImage.set_SpriteName("ShopPieces.stripe");
 				resolutionImage.transform.SetParent(_footerTextsSprite.transform, false);
 				resolutionImage.SetNativeSize();
-				resolutionImage.transform.OKHPLHPBPKJ(labelAlias.transform.localPosition.x);
-				resolutionImage.transform.BGNJGIACJBG(labelAlias.transform.localPosition.y);
+				resolutionImage.transform.SetLocalX(labelAlias.transform.localPosition.x);
+				resolutionImage.transform.SetLocalY(labelAlias.transform.localPosition.y);
 				float width = resolutionImage.rectTransform.rect.width;
 				float width2 = labelAlias.rectTransform.rect.width;
 				if (width < width2 + 240f)
@@ -548,28 +548,28 @@ namespace Nekki.SF2.GUI.Dialogs
 				num3++;
 			}
 			_footerTextsSprite.GetComponent<RectTransform>().sizeDelta = new Vector2(1680f, num2);
-			float a = _portrait.transform.localPosition.y - CJDGAIICNGM * 0.9f * 0.8f / 2f;
+			float a = _portrait.transform.localPosition.y - referenceHeight * 0.9f * 0.8f / 2f;
 			float b = _textsSprite.transform.localPosition.y - _textsSprite.GetComponent<RectTransform>().rect.height;
 			float num4 = Mathf.Min(a, b);
-			_footerTextsSprite.transform.BGNJGIACJBG(num4 - 60f);
+			_footerTextsSprite.transform.SetLocalY(num4 - 60f);
 		}
 
-		protected override void PHKIJLEICHE(LabelButton GAMILDJHFDB, KBDHPMOMJLL MOPOCBKIKBI)
+		protected override void SetupButton(LabelButton GAMILDJHFDB, FooterType MOPOCBKIKBI)
 		{
 			GAMILDJHFDB.gameObject.SetActive(true);
 			string alias = string.Empty;
 			int buttonId = 0;
-			LabelButton.FBMGEHJPPIK color = LabelButton.FBMGEHJPPIK.BUTTON_WHITE;
+			LabelButton.ButtonColor color = LabelButton.ButtonColor.BUTTON_WHITE;
 			switch (MOPOCBKIKBI)
 			{
-			case KBDHPMOMJLL.FOOTER_CANCEL:
-				alias = EBCJGLPLHAD;
-				color = OKJBFFAIJPL;
+			case FooterType.FOOTER_CANCEL:
+				alias = cancelButtonAlias;
+				color = cancelButtonColor;
 				buttonId = 0;
 				break;
-			case KBDHPMOMJLL.FOOTER_OK:
-				alias = BGJJDGOBPKA;
-				color = JCAOLHHIFEC;
+			case FooterType.FOOTER_OK:
+				alias = defaultOkButtonAlias;
+				color = okButtonColor;
 				buttonId = 1;
 				break;
 			}
@@ -580,21 +580,21 @@ namespace Nekki.SF2.GUI.Dialogs
 			GAMILDJHFDB.AddEventListener(2, OnClose);
 		}
 
-		protected virtual void GDMKEKGBDGG()
+		protected virtual void BuildAllContents()
 		{
 			float num = 0f;
 			_textsSprite.gameObject.SetActive(true);
-			float x = ((!ANIJAKJOHED) ? 1680 : 900);
+			float x = ((!showPortrait) ? 1680 : 900);
 			float num2 = 0f;
 			int i = 0;
-			for (int count = IHMEPGICLGF.Count; i < count; i++)
+			for (int count = contents.Count; i < count; i++)
 			{
-				StoryDialogContent nJEPNCJLPPF = IHMEPGICLGF[i];
+				StoryDialogContent nJEPNCJLPPF = contents[i];
 				if (!nJEPNCJLPPF.CheckTimer)
 				{
-					switch (nJEPNCJLPPF.NGEPEDCCMAI)
+					switch (nJEPNCJLPPF.Type)
 					{
-					case StoryDialogContent.MFHMNFAPAOH.CONTENT_TYPE_REGULAR:
+					case StoryDialogContent.ContentType.CONTENT_TYPE_REGULAR:
 					{
 						GameObject gameObject = new GameObject("LabelAlias");
 						LabelAlias labelAlias = gameObject.AddComponent<LabelAlias>();
@@ -606,23 +606,23 @@ namespace Nekki.SF2.GUI.Dialogs
 						labelAlias.alignByGeometry = true;
 						labelAlias.verticalOverflow = VerticalWrapMode.Overflow;
 						labelAlias.rectTransform.sizeDelta = new Vector2(x, 10f);
-						string text = LocalizationManager.GetString(nJEPNCJLPPF.GGDJIPKMKFC);
-						bool flag = null != nJEPNCJLPPF.MALKNOOGNBA;
+						string text = LocalizationManager.GetString(nJEPNCJLPPF.Text);
+						bool flag = null != nJEPNCJLPPF.ItemTimer;
 						TimerLabel timerLabel = null;
 						if (flag)
 						{
-							ELALCENFCPJ.Add(nJEPNCJLPPF.MALKNOOGNBA);
-							timerLabel = HOPECLFOPLH(nJEPNCJLPPF);
-							nJEPNCJLPPF.MALKNOOGNBA.set_Label(timerLabel);
-							nJEPNCJLPPF.MALKNOOGNBA.JLPMOKPFECK();
+							textTimers.Add(nJEPNCJLPPF.ItemTimer);
+							timerLabel = CreateTimerLabel(nJEPNCJLPPF);
+							nJEPNCJLPPF.ItemTimer.set_Label(timerLabel);
+							nJEPNCJLPPF.ItemTimer.Refresh();
 							timerLabel.transform.SetParent(_textsSprite.transform, false);
 							text += "<visible=0>00:00:00</>";
 						}
 						labelAlias.set_text(text);
 						labelAlias.transform.SetParent(_textsSprite.transform, false);
 						num -= labelAlias.preferredHeight / 2f;
-						labelAlias.transform.BGNJGIACJBG(num);
-						labelAlias.transform.OKHPLHPBPKJ(_portrait.transform.localPosition.x + 40f + CJDGAIICNGM * 0.9f / 2f + labelAlias.rectTransform.rect.width / 2f);
+						labelAlias.transform.SetLocalY(num);
+						labelAlias.transform.SetLocalX(_portrait.transform.localPosition.x + 40f + referenceHeight * 0.9f / 2f + labelAlias.rectTransform.rect.width / 2f);
 						num -= labelAlias.preferredHeight / 2f + 32.5f;
 						num2 += labelAlias.preferredHeight + 32.5f;
 						if (flag)
@@ -631,8 +631,8 @@ namespace Nekki.SF2.GUI.Dialogs
 						}
 						break;
 					}
-					case StoryDialogContent.MFHMNFAPAOH.CONTENT_TYPE_PRICELINE:
-						LGEKNIKOFMD.Add(nJEPNCJLPPF);
+					case StoryDialogContent.ContentType.CONTENT_TYPE_PRICELINE:
+						priceLineContents.Add(nJEPNCJLPPF);
 						break;
 					}
 				}
@@ -640,43 +640,43 @@ namespace Nekki.SF2.GUI.Dialogs
 				{
 					_timeLabel.set_Alias(string.Empty);
 					_timeLabel.set_text(string.Empty);
-					_timeLabel.color = Constants.KLLKHFKHCGK;
+					_timeLabel.color = Constants.DialogHeaderColor;
 					_timeLabel.set_LabelFontSize(103);
 					_timeLabel.gameObject.SetActive(false);
 					_timeLabel.transform.SetParent(_textsSprite.transform, false);
-					NHAGNALDKCP(nJEPNCJLPPF);
+					StartTimer(nJEPNCJLPPF);
 					num -= _timeLabel.preferredHeight / 4f;
-					_timeLabel.transform.BGNJGIACJBG(num);
+					_timeLabel.transform.SetLocalY(num);
 					num -= _timeLabel.preferredHeight / 4f + 32.5f;
 					num2 += _timeLabel.preferredHeight;
 				}
 			}
-			IHMEPGICLGF.Clear();
+			contents.Clear();
 			_textsSprite.GetComponent<RectTransform>().sizeDelta = new Vector2(x, num2);
-			_textsSprite.transform.BGNJGIACJBG(-20f - num / 2f);
-			if (LGEKNIKOFMD.Count > 0)
+			_textsSprite.transform.SetLocalY(-20f - num / 2f);
+			if (priceLineContents.Count > 0)
 			{
-				MFEGIBHOLDI();
+				BuildPriceLines();
 			}
 		}
 
-		protected virtual TimerLabel HOPECLFOPLH(StoryDialogContent DMNBDBJNKME)
+		protected virtual TimerLabel CreateTimerLabel(StoryDialogContent DMNBDBJNKME)
 		{
 			GameObject gameObject = new GameObject("TimerLabel");
 			TimerLabel timerLabel = gameObject.AddComponent<TimerLabel>();
-			timerLabel.IsSeconds = DMNBDBJNKME.MALKNOOGNBA.CBCBKMHGLEF;
-			timerLabel.IsMinutes = DMNBDBJNKME.MALKNOOGNBA.PMNNBLHOCPH;
-			timerLabel.IsHours = DMNBDBJNKME.MALKNOOGNBA.KFMCBOHHFNH;
-			timerLabel.IsDays = DMNBDBJNKME.MALKNOOGNBA.DAPJNFEGFJL;
-			timerLabel.Delimiter = DMNBDBJNKME.MALKNOOGNBA.HNECCLNDKJL;
-			timerLabel.DaysString = DMNBDBJNKME.MALKNOOGNBA.DEJKIIKMGAO;
-			timerLabel.UseDaysDelimiter = DMNBDBJNKME.MALKNOOGNBA.NPODIGENMMO;
-			timerLabel.IsSecondsZero = DMNBDBJNKME.MALKNOOGNBA.LHOKGJNFELC;
-			timerLabel.IsMinutesZero = DMNBDBJNKME.MALKNOOGNBA.CLFKEPDADAM;
-			timerLabel.IsHoursZero = DMNBDBJNKME.MALKNOOGNBA.HAFGMOFEJGI;
-			timerLabel.IsDaysZero = DMNBDBJNKME.MALKNOOGNBA.DNLOOJOACNE;
+			timerLabel.IsSeconds = DMNBDBJNKME.ItemTimer.IsSeconds;
+			timerLabel.IsMinutes = DMNBDBJNKME.ItemTimer.IsMinutes;
+			timerLabel.IsHours = DMNBDBJNKME.ItemTimer.IsHours;
+			timerLabel.IsDays = DMNBDBJNKME.ItemTimer.IsDays;
+			timerLabel.Delimiter = DMNBDBJNKME.ItemTimer.Delimiter;
+			timerLabel.DaysString = DMNBDBJNKME.ItemTimer.DaysString;
+			timerLabel.UseDaysDelimiter = DMNBDBJNKME.ItemTimer.UseDaysDelimiter;
+			timerLabel.IsSecondsZero = DMNBDBJNKME.ItemTimer.IsSecondsZero;
+			timerLabel.IsMinutesZero = DMNBDBJNKME.ItemTimer.IsMinutesZero;
+			timerLabel.IsHoursZero = DMNBDBJNKME.ItemTimer.IsHoursZero;
+			timerLabel.IsDaysZero = DMNBDBJNKME.ItemTimer.IsDaysZero;
 			timerLabel.set_LabelFontSize(103);
-			timerLabel.color = DMNBDBJNKME.MALKNOOGNBA.Color;
+			timerLabel.color = DMNBDBJNKME.ItemTimer.Color;
 			return timerLabel;
 		}
 
@@ -705,9 +705,9 @@ namespace Nekki.SF2.GUI.Dialogs
 			return list;
 		}
 
-		protected virtual void FOCAHKBJKEK()
+		protected virtual void CloseIfTimerExpired()
 		{
-			foreach (TextTimer item in ELALCENFCPJ)
+			foreach (TextTimer item in textTimers)
 			{
 				if (item.Time <= 0)
 				{

@@ -10,8 +10,8 @@ public sealed class WebSocketContinuationFrame : WebSocketBinaryFrame
 	{
 	}
 
-	public override BECKAHJIEGE get_Type()
+	public override WebSocketFrameTypes get_Type()
 	{
-		return BECKAHJIEGE.Continuation;
+		return WebSocketFrameTypes.Continuation;
 	}
 }

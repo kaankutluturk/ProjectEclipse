@@ -6,15 +6,15 @@ public class Location
 {
 	public const int ZDelta = -3;
 
-	private const string JEFPPEDOMLA = "params.xml";
+	private const string ParamsFileName = "params.xml";
 
-	private static string PGCOAFKLLCG;
+	private static string sharedLocationName;
 
-	private static string ACIJLMFFGIA;
+	private static string legacyLocationPath;
 
-	private static string JGAGHHGDKNN;
+	private static string legacyLocationMusic;
 
-	private string MFILBEJPGHO;
+	private string artworkFolderName;
 
 	private bool _preferCustomLayout;
 
@@ -31,29 +31,29 @@ public class Location
 
 	public string name;
 
-	private string PINIIFIOECE;
+	private string encounterMusic;
 
 	public List<string> musics = new List<string>();
 
 	public int gridSize;
 
-	public float GBNPHCHGKDO;
+	public float floorHeight;
 
-	public float JMBOGPILDNM;
+	public float positionY;
 
-	public float MFAPMDDJBBL;
+	public float wallWidth;
 
-	public float JMLAKAKDBBL;
+	public float width;
 
-	public float FEIHFIPFNKF;
+	public float height;
 
-	public float IIMDMHKPJJN;
+	public float minWidth;
 
-	public float DJKCICJKHNN;
+	public float minWidthRatio;
 
-	public Vector3f JJNMOJLLDEC = new Vector3f();
+	public Vector3f playerStartPosition = new Vector3f();
 
-	public Vector3f CLGGLBHOMCE = new Vector3f();
+	public Vector3f enemyStartPosition = new Vector3f();
 
 	public Color modelsColor;
 
@@ -61,63 +61,63 @@ public class Location
 
 	public LocationSelector gameLayer;
 
-	public static string BDEIJGPCBMO
+	public static string SharedLocationName
 	{
 		get
 		{
-			return KCCLMHNNMNH();
+			return GetSharedLocationName();
 		}
 	}
 
-	public Vector3f BJBKBJMALJC
+	public Vector3f ModelsCenter
 	{
 		get
 		{
-			return GOEOFEIOAPC();
+			return GetModelsCenter();
 		}
 	}
 
-	public Vector2f LHFLKPKAOLM
+	public Vector2f HalfSize
 	{
 		get
 		{
-			return HIHNLFGMHAG();
+			return GetHalfSize();
 		}
 	}
 
-	public string NPPIFKKLNCN
+	public string RandomMusic
 	{
 		get
 		{
-			return MOADJJNKFKB();
+			return GetRandomMusic();
 		}
 	}
 
-	private string PNBLGOPFAOD
+	private string ParamsPath
 	{
 		get
 		{
-			return BBNOJALBLKC();
+			return GetParamsPath();
 		}
 	}
 
-	private string GPNPNHFACPO
+	private string TexturesPath
 	{
 		get
 		{
-			return MKNEGEKDDKH();
+			return GetTexturesPath();
 		}
 	}
 
 	public Location()
 	{
-		name = GameUtils.NIPABEEAMHJ;
+		name = GameUtils.DefaultLocation;
 		gridSize = 0;
-		GBNPHCHGKDO = 0f;
-		JMBOGPILDNM = 0f;
-		MFAPMDDJBBL = 0f;
-		JMLAKAKDBBL = 0f;
-		FEIHFIPFNKF = 0f;
+		floorHeight = 0f;
+		positionY = 0f;
+		wallWidth = 0f;
+		width = 0f;
+		height = 0f;
 		gameLayer = null;
 		layers = null;
 	}
@@ -136,7 +136,7 @@ public class Location
 
 	private static string ResolveDojo(string encounterLocation)
 	{
-		string fallback = !string.IsNullOrWhiteSpace(GameUtils.NIPABEEAMHJ) ? GameUtils.NIPABEEAMHJ : encounterLocation;
+		string fallback = !string.IsNullOrWhiteSpace(GameUtils.DefaultLocation) ? GameUtils.DefaultLocation : encounterLocation;
 		return Eclipse.Modding.ModRuntime.ResolveDojoLocation(fallback);
 	}
 
@@ -159,48 +159,48 @@ public class Location
 	public Location(string JLEKBBJBLOE, string FGCHEGMCGPD, bool preferCustomLayout = false)
 	{
 		_preferCustomLayout = preferCustomLayout;
-		LLLOJBFMONN.Write("Location:" + JLEKBBJBLOE);
+		GameLog.Write("Location:" + JLEKBBJBLOE);
 		name = JLEKBBJBLOE;
 		gridSize = 0;
-		GBNPHCHGKDO = 0f;
-		JMBOGPILDNM = 0f;
-		MFAPMDDJBBL = 0f;
-		JMLAKAKDBBL = 0f;
-		FEIHFIPFNKF = 0f;
-		PINIIFIOECE = FGCHEGMCGPD;
+		floorHeight = 0f;
+		positionY = 0f;
+		wallWidth = 0f;
+		width = 0f;
+		height = 0f;
+		encounterMusic = FGCHEGMCGPD;
 		gameLayer = null;
 		layers = null;
 	}
 
 	public void init()
 	{
-		MFILBEJPGHO = name;
+		artworkFolderName = name;
 		Eclipse.Modding.ExternalLocationRuntime.Entry externalLocation;
 		bool hasExternalLocation = Eclipse.Modding.ExternalLocationRuntime.TryGet(name, out externalLocation);
 		string value;
-		if (!hasExternalLocation && !_preferCustomLayout && MissingArtworkFallbacks.TryGetValue(MFILBEJPGHO, out value))
+		if (!hasExternalLocation && !_preferCustomLayout && MissingArtworkFallbacks.TryGetValue(artworkFolderName, out value))
 		{
-			Debug.Log("[Location] Using installed artwork '" + value + "' for newer location '" + MFILBEJPGHO + "'.");
-			MFILBEJPGHO = value;
+			Debug.Log("[Location] Using installed artwork '" + value + "' for newer location '" + artworkFolderName + "'.");
+			artworkFolderName = value;
 		}
 		// Recovered raid artwork belongs to the new combined-layer layouts.
 		// The embedded legacy params split those layers into obsolete tiles.
 		XmlDocument xmlDocument = hasExternalLocation ? OpenExternalLocationDocument(externalLocation.Params) :
-			(_preferCustomLayout ? XmlUtils.OpenXMLDocument(BBNOJALBLKC(), string.Empty) : OpenInstalledLocationDocument());
+			(_preferCustomLayout ? XmlUtils.OpenXMLDocument(GetParamsPath(), string.Empty) : OpenInstalledLocationDocument());
 		if (xmlDocument == null)
 		{
 			xmlDocument = hasExternalLocation ? null :
-				(_preferCustomLayout ? OpenInstalledLocationDocument() : XmlUtils.OpenXMLDocument(BBNOJALBLKC(), string.Empty));
+				(_preferCustomLayout ? OpenInstalledLocationDocument() : XmlUtils.OpenXMLDocument(GetParamsPath(), string.Empty));
 		}
 		if (xmlDocument == null || xmlDocument["Root"] == null)
 		{
 			Debug.LogWarning("[Location] Missing or invalid location '" + name + "'; using dojo fallback.");
 			hasExternalLocation = false;
-			MFILBEJPGHO = "dojo";
+			artworkFolderName = "dojo";
 			xmlDocument = OpenInstalledLocationDocument();
 			if (xmlDocument == null)
 			{
-				xmlDocument = XmlUtils.OpenXMLDocument(BBNOJALBLKC(), string.Empty);
+				xmlDocument = XmlUtils.OpenXMLDocument(GetParamsPath(), string.Empty);
 			}
 		}
 		if (xmlDocument == null || xmlDocument["Root"] == null)
@@ -218,9 +218,9 @@ public class Location
 			// Mod location choices have the same priority as its single-track setting.
 			musics.AddRange(xmlDocument["Root"].GetAttribute("Music").Split('|'));
 		}
-		else if (PINIIFIOECE != string.Empty)
+		else if (encounterMusic != string.Empty)
 		{
-			musics.Add(PINIIFIOECE);
+			musics.Add(encounterMusic);
 		}
 		else
 		{
@@ -231,14 +231,14 @@ public class Location
 		}
 		XmlAttribute cJBEMNNNHDM = xmlDocument["Root"].Attributes["FrictionForce"];
 		PhysicsController.SetFrictionForce(cJBEMNNNHDM.ParseFloat(PhysicsController.GetFriction()));
-		MFAPMDDJBBL = xmlDocument["Root"].Attributes["Wall"].ParseFloat();
-		GBNPHCHGKDO = xmlDocument["Root"].Attributes["Floor"].ParseFloat();
-		JMBOGPILDNM = xmlDocument["Root"].Attributes["PositionY"].ParseFloat();
-		modelsColor = ColorUtils.DAAIIECAAFO(xmlDocument["Root"].Attributes["Color"].CIPOICEEIBK());
-		JMLAKAKDBBL = xmlDocument["Root"].Attributes["Width"].ParseFloat();
-		FEIHFIPFNKF = xmlDocument["Root"].Attributes["Height"].ParseFloat();
-		IIMDMHKPJJN = xmlDocument["Root"].Attributes["MinWidth"].ParseFloat(JMLAKAKDBBL);
-		DJKCICJKHNN = IIMDMHKPJJN / JMLAKAKDBBL;
+		wallWidth = xmlDocument["Root"].Attributes["Wall"].ParseFloat();
+		floorHeight = xmlDocument["Root"].Attributes["Floor"].ParseFloat();
+		positionY = xmlDocument["Root"].Attributes["PositionY"].ParseFloat();
+		modelsColor = ColorUtils.ParseHexColor(xmlDocument["Root"].Attributes["Color"].GetStringOrDefault());
+		width = xmlDocument["Root"].Attributes["Width"].ParseFloat();
+		height = xmlDocument["Root"].Attributes["Height"].ParseFloat();
+		minWidth = xmlDocument["Root"].Attributes["MinWidth"].ParseFloat(width);
+		minWidthRatio = minWidth / width;
 		gridSize = xmlDocument["Root"].Attributes["GridSize"].ParseInt();
 		layers = new List<LocationSelector>();
 		XmlNode xmlNode = xmlDocument["Root"];
@@ -264,7 +264,7 @@ public class Location
 
 	private XmlDocument OpenInstalledLocationDocument()
 	{
-		string text = ResourceManager.GetBundledText(BBNOJALBLKC());
+		string text = ResourceManager.GetBundledText(GetParamsPath());
 		if (string.IsNullOrEmpty(text))
 		{
 			return null;
@@ -277,48 +277,48 @@ public class Location
 		}
 		catch (XmlException exception)
 		{
-			Debug.LogWarning("[Location] Invalid bundled params for '" + MFILBEJPGHO + "': " + exception.Message);
+			Debug.LogWarning("[Location] Invalid bundled params for '" + artworkFolderName + "': " + exception.Message);
 			return null;
 		}
 	}
 
-	public static string KCCLMHNNMNH()
+	public static string GetSharedLocationName()
 	{
-		return PGCOAFKLLCG;
+		return sharedLocationName;
 	}
 
-	public Vector3f GOEOFEIOAPC()
+	public Vector3f GetModelsCenter()
 	{
-		Vector3f eMAFACPEPDK = Vector3f.PHEFFKMOOCM(JJNMOJLLDEC, CLGGLBHOMCE);
+		Vector3f eMAFACPEPDK = Vector3f.op_Addition(playerStartPosition, enemyStartPosition);
 		eMAFACPEPDK.Multiply(0.5f);
 		return eMAFACPEPDK;
 	}
 
-	public Vector2f HIHNLFGMHAG()
+	public Vector2f GetHalfSize()
 	{
-		return new Vector2f(JMLAKAKDBBL / 2f, FEIHFIPFNKF / 2f);
+		return new Vector2f(width / 2f, height / 2f);
 	}
 
-	public string MOADJJNKFKB()
+	public string GetRandomMusic()
 	{
-		return NekkiMath.FGFBKJLIADI(musics);
+		return NekkiMath.RandomElement(musics);
 	}
 
 	public void Clear()
 	{
 	}
 
-	private string BBNOJALBLKC()
+	private string GetParamsPath()
 	{
-		return string.Format("{0}/{1}/{2}", SF2Paths.OCAKEHJCNCC(), MFILBEJPGHO, "params.xml");
+		return string.Format("{0}/{1}/{2}", SF2Paths.GetLocationsPath(), artworkFolderName, "params.xml");
 	}
 
-	private string MKNEGEKDDKH()
+	private string GetTexturesPath()
 	{
-		return string.Format("Textures/Locations/{0}", MFILBEJPGHO);
+		return string.Format("Textures/Locations/{0}", artworkFolderName);
 	}
 
-	private string LKDJCCIJFMD(string FAAALPKKJID)
+	private string ResolveLayerTexturePath(string FAAALPKKJID)
 	{
 		if (Eclipse.Modding.AssetId.TryParse(FAAALPKKJID, out _))
 		{
@@ -333,22 +333,22 @@ public class Location
 		int num2 = node.Attributes["Scaling"].ParseInt();
 		LocationSelector hEOCIOGMDKG = new LocationSelector(DFIDNHKKNMB);
 		string text = null;
-		text = ((node.Attributes["Path"] == null) ? MKNEGEKDDKH() : LKDJCCIJFMD(node.Attributes["Path"].CIPOICEEIBK()));
-		hEOCIOGMDKG.NLJHHPCLMBI(num2 > 0);
+		text = ((node.Attributes["Path"] == null) ? GetTexturesPath() : ResolveLayerTexturePath(node.Attributes["Path"].GetStringOrDefault()));
+		hEOCIOGMDKG.SetScalingEnabled(num2 > 0);
 		hEOCIOGMDKG.set_Type(node.Attributes["Type"].ParseInt());
-		hEOCIOGMDKG.FPFLDAMPALH(node.Attributes["Factor"].ParseFloat());
-		hEOCIOGMDKG.LHPOLNGGAFA(node.Attributes["Atlas"].CIPOICEEIBK());
-		if (!string.IsNullOrEmpty(hEOCIOGMDKG.EMNJEHHOBKG()))
+		hEOCIOGMDKG.SetFactor(node.Attributes["Factor"].ParseFloat());
+		hEOCIOGMDKG.SetAtlasName(node.Attributes["Atlas"].GetStringOrDefault());
+		if (!string.IsNullOrEmpty(hEOCIOGMDKG.GetAtlasName()))
 		{
-			hEOCIOGMDKG.NJPBFGMGCFC(CocosAnimationData.Create(string.Format("{0}/{1}_xml.xml", text, hEOCIOGMDKG.EMNJEHHOBKG()), true));
+			hEOCIOGMDKG.SetCocosAnimationData(CocosAnimationData.Create(string.Format("{0}/{1}_xml.xml", text, hEOCIOGMDKG.GetAtlasName()), true));
 		}
 		foreach (XmlNode childNode in node.ChildNodes)
 		{
 			switch (childNode.Name)
 			{
 			case "ModelsViewer":
-				JJNMOJLLDEC.Set(childNode.Attributes["PlayerPositionX"].ParseFloat(), childNode.Attributes["PlayerPositionY"].ParseFloat());
-				CLGGLBHOMCE.Set(childNode.Attributes["EnemyPositionX"].ParseFloat(), childNode.Attributes["EnemyPositionY"].ParseFloat());
+				playerStartPosition.Set(childNode.Attributes["PlayerPositionX"].ParseFloat(), childNode.Attributes["PlayerPositionY"].ParseFloat());
+				enemyStartPosition.Set(childNode.Attributes["EnemyPositionX"].ParseFloat(), childNode.Attributes["EnemyPositionY"].ParseFloat());
 				gridSize = num;
 				break;
 			case "ParticleEffect":
@@ -367,7 +367,7 @@ public class Location
 			}
 		}
 		layers.Add(hEOCIOGMDKG);
-		if (hEOCIOGMDKG.BBELALLBKHH())
+		if (hEOCIOGMDKG.GetIsGameLayer())
 		{
 			gameLayer = hEOCIOGMDKG;
 		}
@@ -375,11 +375,11 @@ public class Location
 
 	private void ParseImage(XmlNode node, string PPAJIHNNNDG, LocationSelector IDHKNBECKKO, int EELGIMCJLAI)
 	{
-		string ODMCNMJPHFJ = node.Attributes["ClassName"].CIPOICEEIBK();
-		Sprite sprite = LocationSpriteCache.PPBEKKDIJKC(PPAJIHNNNDG, ODMCNMJPHFJ, IDHKNBECKKO.EMNJEHHOBKG());
+		string ODMCNMJPHFJ = node.Attributes["ClassName"].GetStringOrDefault();
+		Sprite sprite = LocationSpriteCache.GetSprite(PPAJIHNNNDG, ODMCNMJPHFJ, IDHKNBECKKO.GetAtlasName());
 		if (sprite == null)
 		{
-			LLLOJBFMONN.Write("Pic: {0}", ODMCNMJPHFJ);
+			GameLog.Write("Pic: {0}", ODMCNMJPHFJ);
 			return;
 		}
 		GameObject gameObject = new GameObject(ODMCNMJPHFJ);
@@ -388,7 +388,7 @@ public class Location
 		spriteRenderer.flipX = node.Attributes["FlipX"].ParseInt() != 0;
 		spriteRenderer.flipY = node.Attributes["FlipY"].ParseInt() != 0;
 		SpriteMaskInteraction maskInteraction;
-		if (System.Enum.TryParse(node.Attributes["MaskInteraction"].CIPOICEEIBK(), out maskInteraction))
+		if (System.Enum.TryParse(node.Attributes["MaskInteraction"].GetStringOrDefault(), out maskInteraction))
 			spriteRenderer.maskInteraction = maskInteraction;
 		if (node.Name == "SpriteMask")
 		{
@@ -397,7 +397,7 @@ public class Location
 		}
 		if (node.Attributes["Color"] != null)
 		{
-			spriteRenderer.color = ColorUtils.DAAIIECAAFO(node.Attributes["Color"].Value);
+			spriteRenderer.color = ColorUtils.ParseHexColor(node.Attributes["Color"].Value);
 		}
 		float num = node.Attributes["X"].ParseFloat();
 		float num2 = 0f - node.Attributes["Y"].ParseFloat();
@@ -408,16 +408,16 @@ public class Location
 		float x = sprite.rect.size.x;
 		float y = sprite.rect.size.y;
 		bool flag = false;
-		if (IDHKNBECKKO.ALLFLLFJIGC() != null)
+		if (IDHKNBECKKO.GetCocosAnimationData() != null)
 		{
-			CocosAnimationData.SpriteFrameCocos pBAHNJDFMBO = IDHKNBECKKO.ALLFLLFJIGC().BFJEFNHKPJI().Find((CocosAnimationData.SpriteFrameCocos DHDMNHCIPEH) => DHDMNHCIPEH.get_Name() == ODMCNMJPHFJ);
+			CocosAnimationData.SpriteFrameCocos pBAHNJDFMBO = IDHKNBECKKO.GetCocosAnimationData().GetFrames().Find((CocosAnimationData.SpriteFrameCocos DHDMNHCIPEH) => DHDMNHCIPEH.get_Name() == ODMCNMJPHFJ);
 			if (pBAHNJDFMBO != null)
 			{
-				flag = pBAHNJDFMBO.KGFGOFBMCCG();
-				num3 = pBAHNJDFMBO.LMJCBAFGAFL().x;
-				num4 = pBAHNJDFMBO.LMJCBAFGAFL().y;
-				x = pBAHNJDFMBO.PFIECJPOFFB().x;
-				y = pBAHNJDFMBO.PFIECJPOFFB().y;
+				flag = pBAHNJDFMBO.GetRotated();
+				num3 = pBAHNJDFMBO.GetOffset().x;
+				num4 = pBAHNJDFMBO.GetOffset().y;
+				x = pBAHNJDFMBO.GetSourceSize().x;
+				y = pBAHNJDFMBO.GetSourceSize().y;
 			}
 		}
 		Vector3 vector = default(Vector3);
@@ -449,7 +449,7 @@ public class Location
         }
         gameObject.transform.localScale = vector;
 		gameObject.transform.localPosition = new Vector3(num + num3 * vector.x, num2 + num4 * vector.y, 0f);
-		IDHKNBECKKO.GDEDCJGMFDK(gameObject, EELGIMCJLAI);
+		IDHKNBECKKO.AddImage(gameObject, EELGIMCJLAI);
 	}
 
 	private void ParseSimpleEffect(XmlNode node, string OKNJDIMPKCB, LocationSelector IDHKNBECKKO, int EELGIMCJLAI)
@@ -457,7 +457,7 @@ public class Location
 		bool flag = false;
 		string text = OKNJDIMPKCB;
 		ChangingSprite fEMGGEAGICG = null;
-		string text2 = node.Attributes["PictureLocation"].CIPOICEEIBK();
+		string text2 = node.Attributes["PictureLocation"].GetStringOrDefault();
 		if (text2 == "global")
 		{
 			text = string.Empty;
@@ -465,39 +465,39 @@ public class Location
 		}
 		if (node.Attributes["Path"] != null)
 		{
-			text = "Textures/" + node.Attributes["Path"].CIPOICEEIBK();
+			text = "Textures/" + node.Attributes["Path"].GetStringOrDefault();
 		}
-		string text3 = node.Attributes["Type"].CIPOICEEIBK();
+		string text3 = node.Attributes["Type"].GetStringOrDefault();
 		if (text3 == "Picture")
 		{
-			string ODMCNMJPHFJ = node.Attributes["ClassName"].CIPOICEEIBK();
-			CocosAnimationData animationData = IDHKNBECKKO.ALLFLLFJIGC();
-			CocosAnimationData.SpriteFrameCocos pIDBGGLFBCO = animationData == null ? null : animationData.BFJEFNHKPJI().Find((CocosAnimationData.SpriteFrameCocos DHDMNHCIPEH) => DHDMNHCIPEH.get_Name() == ODMCNMJPHFJ);
-			if (LocationSpriteCache.PPBEKKDIJKC(text, ODMCNMJPHFJ, IDHKNBECKKO.EMNJEHHOBKG()) == null)
+			string ODMCNMJPHFJ = node.Attributes["ClassName"].GetStringOrDefault();
+			CocosAnimationData animationData = IDHKNBECKKO.GetCocosAnimationData();
+			CocosAnimationData.SpriteFrameCocos pIDBGGLFBCO = animationData == null ? null : animationData.GetFrames().Find((CocosAnimationData.SpriteFrameCocos DHDMNHCIPEH) => DHDMNHCIPEH.get_Name() == ODMCNMJPHFJ);
+			if (LocationSpriteCache.GetSprite(text, ODMCNMJPHFJ, IDHKNBECKKO.GetAtlasName()) == null)
 			{
 				Debug.LogWarning("[Location] Missing picture effect '" + ODMCNMJPHFJ + "' in " + name);
 				return;
 			}
-			fEMGGEAGICG = new ChangingSprite(ChangingSprite.MHDKGPHKHIE.PictureBased);
-			fEMGGEAGICG.LDEAPJCKFMP(text, ODMCNMJPHFJ, IDHKNBECKKO.EMNJEHHOBKG(), pIDBGGLFBCO, node.Attributes["Width"].ParseFloat(), node.Attributes["Height"].ParseFloat());
-			SpriteRenderer renderer = fEMGGEAGICG.NJKCDEJGJLF.GetComponent<SpriteRenderer>();
+			fEMGGEAGICG = new ChangingSprite(ChangingSprite.SpriteEffectType.PictureBased);
+			fEMGGEAGICG.InitPicture(text, ODMCNMJPHFJ, IDHKNBECKKO.GetAtlasName(), pIDBGGLFBCO, node.Attributes["Width"].ParseFloat(), node.Attributes["Height"].ParseFloat());
+			SpriteRenderer renderer = fEMGGEAGICG.SpriteObject.GetComponent<SpriteRenderer>();
 			renderer.flipX = node.Attributes["FlipX"].ParseInt() != 0;
 			renderer.flipY = node.Attributes["FlipY"].ParseInt() != 0;
 		}
 		if (text3 == "Sequention")
 		{
-			if (GameUtils.GBCMHICHIOI)
+			if (GameUtils.SequencesDisabled)
 			{
 				return;
 			}
-			fEMGGEAGICG = new ChangingSprite(ChangingSprite.MHDKGPHKHIE.AtlasBased);
-			if (!fEMGGEAGICG.OMHFEGBJDHP(node.Attributes["ClassName"].CIPOICEEIBK(), text.TrimEnd('/') + "/Atlases/", node.Attributes["Speed"].ParseFloat(), node.Attributes["Offset"].ParseFloat(), node.Attributes["Width"].ParseFloat(), node.Attributes["Height"].ParseFloat()))
+			fEMGGEAGICG = new ChangingSprite(ChangingSprite.SpriteEffectType.AtlasBased);
+			if (!fEMGGEAGICG.InitAtlasAnimation(node.Attributes["ClassName"].GetStringOrDefault(), text.TrimEnd('/') + "/Atlases/", node.Attributes["Speed"].ParseFloat(), node.Attributes["Offset"].ParseFloat(), node.Attributes["Width"].ParseFloat(), node.Attributes["Height"].ParseFloat()))
 			{
 				fEMGGEAGICG = null;
 				return;
 			}
 			flag = true;
-			fEMGGEAGICG.OGBLGCKOCLL(node.Attributes["Pause"].ParseFloat());
+			fEMGGEAGICG.SetPause(node.Attributes["Pause"].ParseFloat());
 		}
 		if (fEMGGEAGICG == null)
 		{
@@ -510,58 +510,58 @@ public class Location
 			string name = childNode.Name;
 			if (name == "OscillationX")
 			{
-				fEMGGEAGICG.PBDEFHJGBML(childNode.Attributes["Offset"].ParseFloat());
+				fEMGGEAGICG.SetOscillationXOffset(childNode.Attributes["Offset"].ParseFloat());
 				foreach (XmlNode childNode2 in childNode.ChildNodes)
 				{
-					fEMGGEAGICG.NOHGIBJKJNC(childNode2.Attributes["Period"].ParseFloat(), childNode2.Attributes["Value"].ParseFloat(), childNode2.Attributes["Ease"].ParseFloat());
+					fEMGGEAGICG.AddOscillationXKeyframe(childNode2.Attributes["Period"].ParseFloat(), childNode2.Attributes["Value"].ParseFloat(), childNode2.Attributes["Ease"].ParseFloat());
 				}
 			}
 			if (name == "OscillationY")
 			{
-				fEMGGEAGICG.INPLHCAAJKP(childNode.Attributes["Offset"].ParseFloat());
+				fEMGGEAGICG.SetOscillationYOffset(childNode.Attributes["Offset"].ParseFloat());
 				foreach (XmlNode childNode3 in childNode.ChildNodes)
 				{
-					fEMGGEAGICG.HMLBMLMDLOP(childNode3.Attributes["Period"].ParseFloat(), childNode3.Attributes["Value"].ParseFloat(), childNode3.Attributes["Ease"].ParseFloat());
+					fEMGGEAGICG.AddOscillationYKeyframe(childNode3.Attributes["Period"].ParseFloat(), childNode3.Attributes["Value"].ParseFloat(), childNode3.Attributes["Ease"].ParseFloat());
 				}
 			}
 			if (name == "Transparency")
 			{
-				fEMGGEAGICG.CNECHMNCAHM(childNode.Attributes["Offset"].ParseFloat());
+				fEMGGEAGICG.SetTransparencyOffset(childNode.Attributes["Offset"].ParseFloat());
 				foreach (XmlNode childNode4 in childNode.ChildNodes)
 				{
-					fEMGGEAGICG.KGJGDKNJPJH(childNode4.Attributes["Period"].ParseFloat(), childNode4.Attributes["Value"].ParseFloat(), childNode4.Attributes["Ease"].ParseFloat());
+					fEMGGEAGICG.AddTransparencyKeyframe(childNode4.Attributes["Period"].ParseFloat(), childNode4.Attributes["Value"].ParseFloat(), childNode4.Attributes["Ease"].ParseFloat());
 				}
 			}
 			if (name == "Rotation")
 			{
-				fEMGGEAGICG.MBGHNIKNNPJ(childNode.Attributes["Offset"].ParseFloat());
+				fEMGGEAGICG.SetRotationOffset(childNode.Attributes["Offset"].ParseFloat());
 				foreach (XmlNode childNode5 in childNode.ChildNodes)
 				{
-					fEMGGEAGICG.KEOBIGPEGEO(childNode5.Attributes["Period"].ParseFloat(), childNode5.Attributes["Value"].ParseFloat(), childNode5.Attributes["Ease"].ParseFloat());
+					fEMGGEAGICG.AddRotationKeyframe(childNode5.Attributes["Period"].ParseFloat(), childNode5.Attributes["Value"].ParseFloat(), childNode5.Attributes["Ease"].ParseFloat());
 				}
 			}
 			if (name == "Speed")
 			{
-				fEMGGEAGICG.JNLCGHHDBBE(childNode.Attributes["X"].ParseFloat(), childNode.Attributes["Y"].ParseFloat());
+				fEMGGEAGICG.SetSpeed(childNode.Attributes["X"].ParseFloat(), childNode.Attributes["Y"].ParseFloat());
 			}
 			if (name == "ReappearX")
 			{
-				fEMGGEAGICG.FDMODLLENAE(childNode.Attributes["Min"].ParseFloat(), childNode.Attributes["Max"].ParseFloat());
+				fEMGGEAGICG.SetReappearX(childNode.Attributes["Min"].ParseFloat(), childNode.Attributes["Max"].ParseFloat());
 			}
 			if (name == "ReappearY")
 			{
-				fEMGGEAGICG.FNPELDEJFGN(childNode.Attributes["Min"].ParseFloat(), childNode.Attributes["Max"].ParseFloat());
+				fEMGGEAGICG.SetReappearY(childNode.Attributes["Min"].ParseFloat(), childNode.Attributes["Max"].ParseFloat());
 			}
 		}
-		IDHKNBECKKO.IFAMCLKHNMA(fEMGGEAGICG, EELGIMCJLAI);
+		IDHKNBECKKO.AddSimpleEffect(fEMGGEAGICG, EELGIMCJLAI);
 	}
 
 	private void ParseParticleEffect(XmlNode node, LocationSelector IDHKNBECKKO, int EELGIMCJLAI, int LFLGCDNKNJI)
 	{
-		if (!GameUtils.LEEIGNICAMN)
+		if (!GameUtils.ParticlesDisabled)
 		{
-			string jIPAAPBPNJM = "Textures/Location_effects/Particles/" + node.Attributes["ClassName"].CIPOICEEIBK();
-			ChangingSprite fEMGGEAGICG = new ChangingSprite(ChangingSprite.MHDKGPHKHIE.ParticleBased);
+			string jIPAAPBPNJM = "Textures/Location_effects/Particles/" + node.Attributes["ClassName"].GetStringOrDefault();
+			ChangingSprite fEMGGEAGICG = new ChangingSprite(ChangingSprite.SpriteEffectType.ParticleBased);
 			float fNDOOJNDJDC = node.Attributes["X"].ParseFloat();
 			float num = node.Attributes["Y"].ParseFloat();
 			int num2 = node.Attributes["MiddleColor"].ParseInt();
@@ -569,18 +569,18 @@ public class Location
 			switch (LFLGCDNKNJI)
 			{
 			case 0:
-				flag = fEMGGEAGICG.AFPMFHFIBBO(jIPAAPBPNJM, fNDOOJNDJDC, 0f - num);
+				flag = fEMGGEAGICG.InitParticles(jIPAAPBPNJM, fNDOOJNDJDC, 0f - num);
 				break;
 			case 1:
-				flag = fEMGGEAGICG.AFPMFHFIBBO(jIPAAPBPNJM, fNDOOJNDJDC, 0f - num);
+				flag = fEMGGEAGICG.InitParticles(jIPAAPBPNJM, fNDOOJNDJDC, 0f - num);
 				break;
 			default:
-				LLLOJBFMONN.Write("unknown type in parseParticleEffect");
+				GameLog.Write("unknown type in parseParticleEffect");
 				break;
 			}
 			if (flag)
 			{
-				IDHKNBECKKO.MHCEMJOAPCA(fEMGGEAGICG, EELGIMCJLAI);
+				IDHKNBECKKO.AddParticleEffect(fEMGGEAGICG, EELGIMCJLAI);
 			}
 		}
 	}

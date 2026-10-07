@@ -72,10 +72,10 @@ foreach ($assembly in @([GameplayContentArchive].Assembly, [OfflineServices].Ass
 }
 
 # These bridges previously emitted unresolved iOS symbols in Android IL2CPP.
-Assert-True ($null -eq [BPGAOEMIFNN]::OBGMKPLOMJL()) 'Legacy native device-ID bridge is still active'
-[LLJPGGEJCPK]::JOIGJOFNIKI($true, $true, $true, $true, $true, $true)
-[LLJPGGEJCPK]::HLEIFBABHLB()
-foreach ($type in @([BPGAOEMIFNN], [LLJPGGEJCPK])) {
+Assert-True ($null -eq [DeviceIdBridge]::GetNativeDeviceId()) 'Legacy native device-ID bridge is still active'
+[LicenseChecker]::CheckLicense($true, $true, $true, $true, $true, $true)
+[LicenseChecker]::CloseSession()
+foreach ($type in @([DeviceIdBridge], [LicenseChecker])) {
     $imports = @($type.GetMethods([Reflection.BindingFlags]'Public,NonPublic,Static') | Where-Object {
         $_.GetCustomAttributes([Runtime.InteropServices.DllImportAttribute], $false).Count -gt 0
     })
@@ -99,7 +99,7 @@ public static class OfflineLocaleTest {
         try {
             System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo(cultureName);
             OfflineLocaleUnity.Application.systemLanguage = (OfflineLocaleUnity.SystemLanguage)System.Enum.Parse(typeof(OfflineLocaleUnity.SystemLanguage), language);
-            return new[] { OfflineLocaleFixture.BGMAJFGKCEB(), OfflineLocaleFixture.PBPAPAFAMJB(), OfflineLocaleFixture.FBPILFMCNGJ(), OfflineLocaleFixture.OHHPBPBCFPL(), OfflineLocaleFixture.HIMMFECDKCI() };
+            return new[] { OfflineLocaleFixture.GetLanguageID(), OfflineLocaleFixture.GetLanguage(), OfflineLocaleFixture.GetRegion(), OfflineLocaleFixture.GetCurrencyCode(), OfflineLocaleFixture.GetCurrencySymbol() };
         } finally { System.Threading.Thread.CurrentThread.CurrentCulture = previous; }
     }
 }
@@ -138,7 +138,7 @@ using System;
 public static class OfflineAlertFixture {
     public static Action<object> Selection;
     public static bool LiteralText;
-    public static void PEDJMOMBJJI(string title, string message, string ok, string cancel, Action<object> selected, bool literalText = false) { Selection = selected; LiteralText = literalText; }
+    public static void OpenSimpleDialog(string title, string message, string ok, string cancel, Action<object> selected, bool literalText = false) { Selection = selected; LiteralText = literalText; }
 /* METHODS */
 }
 '@
@@ -166,12 +166,12 @@ $checks++
 # Compile the settings helpers against UI fakes: desktop prefabs omit credits
 # and support. This checks managed control flow, not Unity rendering/import.
 $settingsSource = Get-Content -Raw (Join-Path $projectPath 'Assets/Scripts/Assembly-CSharp/Nekki/SF2/GUI/Dialogs/SettingsDialog.cs')
-$settingsMethods = foreach ($name in @('OHDFPIADEIG', 'PGMBIJFAEHP', 'BOPCBJJIHNK')) {
+$settingsMethods = foreach ($name in @('SetupButton', 'SetupLabel', 'SetMainButtonsHidden')) {
     $method = [regex]::Match($settingsSource, '(?ms)^\t\tprotected void ' + $name + '\([^\r\n]*\)\r?\n\t\t\{.*?^\t\t\}')
     Assert-True $method.Success ('Settings helper not found: ' + $name)
     $method.Value.Replace('protected void', 'public void')
 }
-$settingsEnum = [regex]::Match($settingsSource, '(?m)^\t\tpublic enum AHDEAELNGBD\s*\{[^{}]*\}')
+$settingsEnum = [regex]::Match($settingsSource, '(?m)^\t\tpublic enum SettingsButtonId\s*\{[^{}]*\}')
 Assert-True $settingsEnum.Success 'Settings button IDs not found'
 $settingsFixture = @'
 using System;
@@ -197,13 +197,13 @@ public class OfflineSettingsFixture {
         public void set_Alias(string value) { Alias = value; }
         public void set_LabelFontSize(int value) { FontSize = value; }
     }
-    public static class Constants { public const int PJJIMHMJPAL = 1; }
-    public static class SystemProperties { public static bool DDIDANINPJE() { return true; } }
+    public static class Constants { public const int DialogTextColor = 1; }
+    public static class SystemProperties { public static bool IsWp8Platform() { return true; } }
     public ResolutionButton btnMusic = new ResolutionButton(), btnSound = new ResolutionButton(),
         btnLanguage = new ResolutionButton(), btnGameCenter = new ResolutionButton(), btnCredits, btnSupport;
     public LabelAlias lblGameCenter = new LabelAlias(), lblItunes = new LabelAlias();
     public bool SelectedSprites;
-    private bool PEPADDIALAO() { return SelectedSprites; }
+    private bool UsesSelectedSprites() { return SelectedSprites; }
     private void OnClickButton(object data) { }
 /* ENUM */
 /* METHODS */
@@ -212,26 +212,26 @@ public class OfflineSettingsFixture {
 Add-Type -TypeDefinition $settingsFixture.Replace('/* ENUM */', $settingsEnum.Value).Replace('/* METHODS */', ($settingsMethods -join "`n"))
 $settings = New-Object OfflineSettingsFixture
 foreach ($buttonId in @('BTN_CREDITS', 'BTN_SUPPORT')) {
-    $id = [OfflineSettingsFixture+AHDEAELNGBD][Enum]::Parse([OfflineSettingsFixture+AHDEAELNGBD], $buttonId)
-    $settings.OHDFPIADEIG($null, 'normal', 'pressed', 0, 0, $id)
+    $id = [OfflineSettingsFixture+SettingsButtonId][Enum]::Parse([OfflineSettingsFixture+SettingsButtonId], $buttonId)
+    $settings.SetupButton($null, 'normal', 'pressed', 0, 0, $id)
     $checks++
 }
-$settings.PGMBIJFAEHP($null, 'Settings_Credits')
-$settings.PGMBIJFAEHP($null, 'Settings_Support')
+$settings.SetupLabel($null, 'Settings_Credits')
+$settings.SetupLabel($null, 'Settings_Support')
 $checks += 2
 foreach ($selected in @($false, $true)) {
     $settings.SelectedSprites = $selected
-    $settings.OHDFPIADEIG($settings.btnMusic, 'normal', 'pressed', -670, 200, [OfflineSettingsFixture+AHDEAELNGBD]::BTN_MUSIC)
+    $settings.SetupButton($settings.btnMusic, 'normal', 'pressed', -670, 200, [OfflineSettingsFixture+SettingsButtonId]::BTN_MUSIC)
     $expectedPressed = if ($selected) { 'pressed' } else { 'normal' }
     Assert-True ($settings.btnMusic.Normal -ceq 'normal' -and $settings.btnMusic.Pressed -ceq $expectedPressed) 'Settings music sprites changed'
     Assert-True ($settings.btnMusic.gameObject.activeSelf -and $settings.btnMusic.Listeners -eq 1 -and $settings.btnMusic.ButtonId -eq 0) 'Settings music activation/events changed'
     Assert-True ($settings.btnMusic.transform.localPosition.x -eq -670 -and $settings.btnMusic.transform.localPosition.y -eq 200) 'Settings music position changed'
 }
 $settingsLabel = New-Object OfflineSettingsFixture+LabelAlias
-$settings.PGMBIJFAEHP($settingsLabel, 'Settings_Music')
+$settings.SetupLabel($settingsLabel, 'Settings_Music')
 Assert-True ($settingsLabel.gameObject.activeSelf -and $settingsLabel.Alias -ceq 'Settings_Music' -and $settingsLabel.FontSize -eq 101) 'Existing settings label no longer initializes'
 foreach ($hide in @($true, $false)) {
-    $settings.BOPCBJJIHNK($hide)
+    $settings.SetMainButtonsHidden($hide)
     Assert-True ($settings.btnMusic.gameObject.activeSelf -eq !$hide -and $settings.btnSound.gameObject.activeSelf -eq !$hide -and $settings.btnLanguage.gameObject.activeSelf -eq !$hide) 'Settings visibility fails without credits/support'
 }
 
@@ -261,8 +261,8 @@ $save = Join-Path $testRoot 'users.xml'
 [xml]$document = '<Root><Warriors /></Root>'
 [IO.File]::WriteAllText($save, $document.OuterXml)
 foreach ($initialize in @($false, $true)) {
-    if ($initialize) { [GameSettings]::IFBKAJPILOI() }
-    Assert-True (![GameSettings]::HCAJHNKLLGB()) 'Save validation enabled'
+    if ($initialize) { [GameSettings]::InitUserDataValidation() }
+    Assert-True (![GameSettings]::IsUserDataValidationEnabled()) 'Save validation enabled'
     Assert-True ([UserDataValidator]::CheckFileHash($document, $save)) 'Hashless local save rejected'
     [UserDataValidator]::UpdateFileHash($document, $save)
     [UserDataValidator]::UpdateFileHash($save)
@@ -270,21 +270,21 @@ foreach ($initialize in @($false, $true)) {
 }
 [IO.File]::WriteAllText(($save + '.hash'), 'stale-invalid-hash')
 Assert-True ([UserDataValidator]::CheckFileHash($document, $save)) 'Stale save hash rejected'
-[UserDataValidator]::KAFMCNCGOJH($save)
-[UserDataValidator]::NLIJEIGOALP($save, (Join-Path $testRoot 'copy.xml'))
+[UserDataValidator]::DeleteHashFile($save)
+[UserDataValidator]::CopyHashFile($save, (Join-Path $testRoot 'copy.xml'))
 Assert-True ([IO.File]::ReadAllText(($save + '.hash')) -ceq 'stale-invalid-hash') 'Existing hash sidecar was modified'
 Assert-True (!(Test-Path -LiteralPath (Join-Path $testRoot 'copy.xml.hash'))) 'Hash sidecar was copied'
 
-$store = [ICFMIHIKGOD]::OFFDIMCJOIC()
-Assert-True (!$store.LCFBJGONPBH()) 'Store must report unavailable'
-Assert-True ($store.NABJBCEKEHK().Length -eq 0) 'Offline store exposes products'
+$store = [PaymentManager]::GetStore()
+Assert-True (!$store.CanMakePayments()) 'Store must report unavailable'
+Assert-True ($store.GetProducts().Length -eq 0) 'Offline store exposes products'
 $script:purchaseFailed = 0
 $script:purchaseFinished = 0
 $script:purchaseGranted = 0
-$store.ENCIAJBEOEA = [Action[string,SF2.Offline.PurchaseFailureReason]]{ param($id, $reason) if ($id -ceq 'test' -and $reason -eq [SF2.Offline.PurchaseFailureReason]::PurchasingUnavailable) { $script:purchaseFailed++ } }
-$store.JOFLHEEPJIB = [Action[string,string]]{ param($id,$receipt) $script:purchaseFinished++ }
-$store.JEAJAJMDPNL = [Action[string]]{ param($id) $script:purchaseGranted++ }
-$store.BDAAKHOLPOF('test')
+$store.OnPurchaseFailed = [Action[string,SF2.Offline.PurchaseFailureReason]]{ param($id, $reason) if ($id -ceq 'test' -and $reason -eq [SF2.Offline.PurchaseFailureReason]::PurchasingUnavailable) { $script:purchaseFailed++ } }
+$store.OnPurchaseFinished = [Action[string,string]]{ param($id,$receipt) $script:purchaseFinished++ }
+$store.OnPurchaseSucceeded = [Action[string]]{ param($id) $script:purchaseGranted++ }
+$store.PurchaseProduct('test')
 Assert-True ($script:purchaseFailed -eq 1 -and $script:purchaseFinished -eq 1 -and $script:purchaseGranted -eq 0) 'Offline purchase callbacks are incorrect'
 
 foreach ($url in @('https://example.com', 'http://127.0.0.1/service', '//server/share', 'file://server/share/file.xml', 'jar:https://example.com/app.apk')) {
@@ -296,7 +296,7 @@ foreach ($url in @('file:///C:/game/data.xml', 'file:///data/user/0/game/files/d
 Assert-True ([Nekki.SF2.Core.Network.ServerProvider]::OFFLINE) 'Backend is not permanently offline'
 
 # Reproduces the PC dojo startup crash: no remote ledger config is loaded.
-Assert-True ($null -eq [GeneralConfig]::ELEBLBJKDBI().IMOKGIDCANG()) 'Ledger regression fixture unexpectedly has server settings'
+Assert-True ($null -eq [GeneralConfig]::GetInstance().GetLedgerSettings()) 'Ledger regression fixture unexpectedly has server settings'
 (New-Object LedgerManager).Check() # Must return without server config, Unity, or a roster.
 $checks++
 

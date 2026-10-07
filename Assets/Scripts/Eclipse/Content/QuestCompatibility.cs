@@ -473,10 +473,10 @@ namespace Eclipse.Content
 				return true;
 
 			case "IsDebug":
-				numberValue = global::SystemProperties.DBBOCENKMGD() ? 1.0 : 0.0;
+				numberValue = global::SystemProperties.IsDebug() ? 1.0 : 0.0;
 				return true;
 			case "IsSocialAuthorized":
-				numberValue = global::GameCenterController.OBDJPKOJADA() ? 1.0 : 0.0;
+				numberValue = global::GameCenterController.GetIsAuthenticated() ? 1.0 : 0.0;
 				return true;
 			case "FramesCount":
 				numberValue = UnityEngine.Time.frameCount;
@@ -545,11 +545,11 @@ namespace Eclipse.Content
 
 	public sealed class DeferredQuestAction : global::QuestAction
 	{
-		public override void DEJMHFMLKIC(global::QuestParameters parameters)
+		public override void Execute(global::QuestParameters parameters)
 		{
-			base.DEJMHFMLKIC(parameters);
-			QuestCompatibility.LogDeferredAction(EFJMDEMAGIM);
-			OGIJONMKABB();
+			base.Execute(parameters);
+			QuestCompatibility.LogDeferredAction(ActionName);
+			FinishAction();
 		}
 	}
 }

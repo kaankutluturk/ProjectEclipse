@@ -9,13 +9,13 @@ public class MagicSettings
 
 		private float _Base;
 
-		private string HMKPNFBMHMP;
+		private string _AttributeName;
 
 		public float Base
 		{
 			get
 			{
-				return FINOFPCBLDK();
+				return GetBase();
 			}
 		}
 
@@ -23,7 +23,7 @@ public class MagicSettings
 		{
 			get
 			{
-				return EJPCHOLGGJJ();
+				return GetAttribute();
 			}
 		}
 
@@ -32,33 +32,33 @@ public class MagicSettings
 			return _Name;
 		}
 
-		public float FINOFPCBLDK()
+		public float GetBase()
 		{
 			return _Base;
 		}
 
-		public string EJPCHOLGGJJ()
+		public string GetAttribute()
 		{
-			return HMKPNFBMHMP;
+			return _AttributeName;
 		}
 
 		public void Parse(XmlNode node)
 		{
 			_Name = node.Name;
 			_Base = XmlUtils.ParseFloat(node.Attributes["Base"]);
-			HMKPNFBMHMP = XmlUtils.ParseString(node.Attributes["Attribute"]);
+			_AttributeName = XmlUtils.ParseString(node.Attributes["Attribute"]);
 		}
 	}
 
-	private List<MagicCharge> APLFDBEPGBK = new List<MagicCharge>();
+	private List<MagicCharge> charges = new List<MagicCharge>();
 
-	private MagicCharge EDIFEKEHLJF(string name)
+	private MagicCharge FindCharge(string name)
 	{
-		for (int i = 0; i < APLFDBEPGBK.Count; i++)
+		for (int i = 0; i < charges.Count; i++)
 		{
-			if (APLFDBEPGBK[i].get_Name() == name)
+			if (charges[i].get_Name() == name)
 			{
-				return APLFDBEPGBK[i];
+				return charges[i];
 			}
 		}
 		return null;
@@ -66,77 +66,77 @@ public class MagicSettings
 
 	public void Parse(XmlNode node)
 	{
-		APLFDBEPGBK.Clear();
+		charges.Clear();
 		foreach (XmlNode childNode in node.ChildNodes)
 		{
 			MagicCharge eHONFFPDKOI = new MagicCharge();
-			APLFDBEPGBK.Add(eHONFFPDKOI);
+			charges.Add(eHONFFPDKOI);
 			eHONFFPDKOI.Parse(childNode);
 		}
 	}
 
-	private float ACGMAJCAKIK(string JLEKBBJBLOE, ModelParameters IHEFAMAFBIA = null)
+	private float GetChargeValue(string JLEKBBJBLOE, ModelParameters IHEFAMAFBIA = null)
 	{
-		MagicCharge eHONFFPDKOI = EDIFEKEHLJF(JLEKBBJBLOE);
+		MagicCharge eHONFFPDKOI = FindCharge(JLEKBBJBLOE);
 		if (eHONFFPDKOI == null)
 		{
-			LLLOJBFMONN.Error(JLEKBBJBLOE + " for Magic not found");
+			GameLog.Error(JLEKBBJBLOE + " for Magic not found");
 			return 0f;
 		}
 		if (IHEFAMAFBIA == null)
 		{
-			return eHONFFPDKOI.FINOFPCBLDK();
+			return eHONFFPDKOI.GetBase();
 		}
 		int OEMALIFPGPO = 0;
-		if (IHEFAMAFBIA.IBLHIAHECLK.Get(eHONFFPDKOI.EJPCHOLGGJJ(), ref OEMALIFPGPO))
+		if (IHEFAMAFBIA.FinalAttributes.Get(eHONFFPDKOI.GetAttribute(), ref OEMALIFPGPO))
 		{
-			return eHONFFPDKOI.FINOFPCBLDK() * (float)OEMALIFPGPO;
+			return eHONFFPDKOI.GetBase() * (float)OEMALIFPGPO;
 		}
-		return eHONFFPDKOI.FINOFPCBLDK();
+		return eHONFFPDKOI.GetBase();
 	}
 
-	public float HCJBIAGKIGI(Model ACENLMONNPA)
+	public float GetInitialCharge(Model ACENLMONNPA)
 	{
-		return HCJBIAGKIGI(ACENLMONNPA.Parameters);
+		return GetInitialCharge(ACENLMONNPA.Parameters);
 	}
 
-	public float MPIOONCNFOK(Model ACENLMONNPA)
+	public float GetPainRecharge(Model ACENLMONNPA)
 	{
-		return MPIOONCNFOK(ACENLMONNPA.Parameters);
+		return GetPainRecharge(ACENLMONNPA.Parameters);
 	}
 
-	public float LLKJJLOMNID(Model ACENLMONNPA)
+	public float GetDamageRecharge(Model ACENLMONNPA)
 	{
-		return LLKJJLOMNID(ACENLMONNPA.Parameters);
+		return GetDamageRecharge(ACENLMONNPA.Parameters);
 	}
 
-	public float HCJBIAGKIGI(ModelParameters IHEFAMAFBIA)
+	public float GetInitialCharge(ModelParameters IHEFAMAFBIA)
 	{
-		return ACGMAJCAKIK("InitialCharge", IHEFAMAFBIA);
+		return GetChargeValue("InitialCharge", IHEFAMAFBIA);
 	}
 
-	public float NKOILNKJOAA()
+	public float GetInitialCharge()
 	{
-		return ACGMAJCAKIK("InitialCharge");
+		return GetChargeValue("InitialCharge");
 	}
 
-	public float MPIOONCNFOK(ModelParameters IHEFAMAFBIA)
+	public float GetPainRecharge(ModelParameters IHEFAMAFBIA)
 	{
-		return ACGMAJCAKIK("PainRecharge", IHEFAMAFBIA);
+		return GetChargeValue("PainRecharge", IHEFAMAFBIA);
 	}
 
-	public float JGHFCAPPDED()
+	public float GetPainRecharge()
 	{
-		return ACGMAJCAKIK("PainRecharge");
+		return GetChargeValue("PainRecharge");
 	}
 
-	public float LLKJJLOMNID(ModelParameters IHEFAMAFBIA)
+	public float GetDamageRecharge(ModelParameters IHEFAMAFBIA)
 	{
-		return ACGMAJCAKIK("DamageRecharge", IHEFAMAFBIA);
+		return GetChargeValue("DamageRecharge", IHEFAMAFBIA);
 	}
 
-	public float HOOBFKANPEK()
+	public float GetDamageRecharge()
 	{
-		return ACGMAJCAKIK("DamageRecharge");
+		return GetChargeValue("DamageRecharge");
 	}
 }

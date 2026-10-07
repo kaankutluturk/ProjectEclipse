@@ -1,21 +1,21 @@
 public class EventLog : BaseEventLog
 {
-	private static EventLog EDAPJLKMFPC;
+	private static EventLog instance;
 
-	public static EventLog BPCBBHAKFDM
+	public static EventLog Instance
 	{
 		get
 		{
-			return ELEBLBJKDBI();
+			return GetInstance();
 		}
 	}
 
-	public static EventLog ELEBLBJKDBI()
+	public static EventLog GetInstance()
 	{
-		if (EDAPJLKMFPC == null)
+		if (instance == null)
 		{
-			EDAPJLKMFPC = new EventLog();
+			instance = new EventLog();
 		}
-		return EDAPJLKMFPC;
+		return instance;
 	}
 }

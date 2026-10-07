@@ -45,25 +45,25 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 			return (sbyte)(value ^ KGBGENDIMBC);
 		}
 
-		public void PKOKLDGAPEI()
+		public void ApplyNewCryptoKey()
 		{
 			if (currentCryptoKey != cryptoKey)
 			{
-				hiddenValue = EncryptDecrypt(GEKBGBJOMIA(), cryptoKey);
+				hiddenValue = EncryptDecrypt(InternalDecrypt(), cryptoKey);
 				currentCryptoKey = cryptoKey;
 			}
 		}
 
-		public void GMCADPGOCHM()
+		public void RandomizeCryptoKey()
 		{
-			sbyte bAINMLLIKOL = GEKBGBJOMIA();
+			sbyte bAINMLLIKOL = InternalDecrypt();
 			currentCryptoKey = (sbyte)UnityEngine.Random.Range(-128, 127);
 			hiddenValue = EncryptDecrypt(bAINMLLIKOL, currentCryptoKey);
 		}
 
-		public sbyte ECEBFGCJIDA()
+		public sbyte GetEncrypted()
 		{
-			PKOKLDGAPEI();
+			ApplyNewCryptoKey();
 			return hiddenValue;
 		}
 
@@ -71,13 +71,13 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 		{
 			inited = true;
 			hiddenValue = ANGFOBEKKKD;
-			if (ObscuredCheatingDetector.NMACGEJHPDN())
+			if (ObscuredCheatingDetector.GetIsRunning())
 			{
-				fakeValue = GEKBGBJOMIA();
+				fakeValue = InternalDecrypt();
 			}
 		}
 
-		private sbyte GEKBGBJOMIA()
+		private sbyte InternalDecrypt()
 		{
 			if (!inited)
 			{
@@ -87,9 +87,9 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 				inited = true;
 			}
 			sbyte b = EncryptDecrypt(hiddenValue, currentCryptoKey);
-			if (ObscuredCheatingDetector.NMACGEJHPDN() && fakeValue != 0 && b != fakeValue)
+			if (ObscuredCheatingDetector.GetIsRunning() && fakeValue != 0 && b != fakeValue)
 			{
-				ObscuredCheatingDetector.get_Instance().MCDANNDOEIK();
+				ObscuredCheatingDetector.get_Instance().OnCheatingDetected();
 			}
 			return b;
 		}
@@ -97,7 +97,7 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 		public static implicit operator ObscuredSByte(sbyte value)
 		{
 			ObscuredSByte result = new ObscuredSByte(EncryptDecrypt(value));
-			if (ObscuredCheatingDetector.NMACGEJHPDN())
+			if (ObscuredCheatingDetector.GetIsRunning())
 			{
 				result.fakeValue = value;
 			}
@@ -106,15 +106,15 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 
 		public static implicit operator sbyte(ObscuredSByte value)
 		{
-			return value.GEKBGBJOMIA();
+			return value.InternalDecrypt();
 		}
 
 		[SpecialName]
-		public static ObscuredSByte ALEAHDHGCJL(ObscuredSByte NILNDHEKNLJ)
+		public static ObscuredSByte op_Increment(ObscuredSByte NILNDHEKNLJ)
 		{
-			sbyte bAINMLLIKOL = (sbyte)(NILNDHEKNLJ.GEKBGBJOMIA() + 1);
+			sbyte bAINMLLIKOL = (sbyte)(NILNDHEKNLJ.InternalDecrypt() + 1);
 			NILNDHEKNLJ.hiddenValue = EncryptDecrypt(bAINMLLIKOL, NILNDHEKNLJ.currentCryptoKey);
-			if (ObscuredCheatingDetector.NMACGEJHPDN())
+			if (ObscuredCheatingDetector.GetIsRunning())
 			{
 				NILNDHEKNLJ.fakeValue = bAINMLLIKOL;
 			}
@@ -122,11 +122,11 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 		}
 
 		[SpecialName]
-		public static ObscuredSByte DDKOKLNFNPB(ObscuredSByte NILNDHEKNLJ)
+		public static ObscuredSByte op_Decrement(ObscuredSByte NILNDHEKNLJ)
 		{
-			sbyte bAINMLLIKOL = (sbyte)(NILNDHEKNLJ.GEKBGBJOMIA() - 1);
+			sbyte bAINMLLIKOL = (sbyte)(NILNDHEKNLJ.InternalDecrypt() - 1);
 			NILNDHEKNLJ.hiddenValue = EncryptDecrypt(bAINMLLIKOL, NILNDHEKNLJ.currentCryptoKey);
-			if (ObscuredCheatingDetector.NMACGEJHPDN())
+			if (ObscuredCheatingDetector.GetIsRunning())
 			{
 				NILNDHEKNLJ.fakeValue = bAINMLLIKOL;
 			}
@@ -153,27 +153,27 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 
 		public override string ToString()
 		{
-			return GEKBGBJOMIA().ToString();
+			return InternalDecrypt().ToString();
 		}
 
 		public string ToString(string LBOHOKIBHOH)
 		{
-			return GEKBGBJOMIA().ToString(LBOHOKIBHOH);
+			return InternalDecrypt().ToString(LBOHOKIBHOH);
 		}
 
 		public override int GetHashCode()
 		{
-			return GEKBGBJOMIA().GetHashCode();
+			return InternalDecrypt().GetHashCode();
 		}
 
 		public string ToString(IFormatProvider EEGMFLOPLLH)
 		{
-			return GEKBGBJOMIA().ToString(EEGMFLOPLLH);
+			return InternalDecrypt().ToString(EEGMFLOPLLH);
 		}
 
 		public string ToString(string LBOHOKIBHOH, IFormatProvider EEGMFLOPLLH)
 		{
-			return GEKBGBJOMIA().ToString(LBOHOKIBHOH, EEGMFLOPLLH);
+			return InternalDecrypt().ToString(LBOHOKIBHOH, EEGMFLOPLLH);
 		}
 	}
 }

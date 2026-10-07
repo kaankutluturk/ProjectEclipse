@@ -7,33 +7,33 @@ public class ItemSet
 
 	public string Title;
 
-	public string GGDJIPKMKFC;
+	public string Text;
 
-	public string LHOJGHFGLFD;
+	public string Brief;
 
-	public List<ItemSetItem> OJIAKDDCGLB;
+	public List<ItemSetItem> Items;
 
 	// Eclipse: the combo enchantment this set grants (list.xml DefaultComboPerk).
 	public string DefaultComboPerk;
 
 	public ItemSet(XmlNode node)
 	{
-		Name = node.Attributes["Name"].CIPOICEEIBK(string.Empty);
-		Title = node.Attributes["Title"].CIPOICEEIBK(string.Empty);
-		GGDJIPKMKFC = node.Attributes["Text"].CIPOICEEIBK(string.Empty);
-		LHOJGHFGLFD = node.Attributes["Brief"].CIPOICEEIBK(string.Empty);
-		DefaultComboPerk = node.Attributes["DefaultComboPerk"].CIPOICEEIBK(string.Empty);
-		OJIAKDDCGLB = new List<ItemSetItem>();
+		Name = node.Attributes["Name"].GetStringOrDefault(string.Empty);
+		Title = node.Attributes["Title"].GetStringOrDefault(string.Empty);
+		Text = node.Attributes["Text"].GetStringOrDefault(string.Empty);
+		Brief = node.Attributes["Brief"].GetStringOrDefault(string.Empty);
+		DefaultComboPerk = node.Attributes["DefaultComboPerk"].GetStringOrDefault(string.Empty);
+		Items = new List<ItemSetItem>();
 		foreach (XmlNode childNode in node.ChildNodes)
 		{
 			ItemSetItem item = new ItemSetItem(childNode);
-			OJIAKDDCGLB.Add(item);
+			Items.Add(item);
 		}
 	}
 
-	public ItemSetItem HJNFOPNFFIJ(string OHCGEEEKEJH)
+	public ItemSetItem GetItemByName(string OHCGEEEKEJH)
 	{
-		foreach (ItemSetItem item in OJIAKDDCGLB)
+		foreach (ItemSetItem item in Items)
 		{
 			if (item.Name.Equals(OHCGEEEKEJH))
 			{
@@ -43,16 +43,16 @@ public class ItemSet
 		return null;
 	}
 
-	public bool BAOEOHJOIDK()
+	public bool IsComplete()
 	{
-		foreach (ItemSetItem item in OJIAKDDCGLB)
+		foreach (ItemSetItem item in Items)
 		{
-			ItemInfo oFMCNLBFIDF = item.OFMCNLBFIDF;
+			ItemInfo oFMCNLBFIDF = item.Item;
 			if (oFMCNLBFIDF == null)
 			{
 				return false;
 			}
-			UserItem dKCHDHMLKHN = ListSF.CCDKHLAMKKO().KHCNHPCPFII().CMGOCLGHNLH(oFMCNLBFIDF);
+			UserItem dKCHDHMLKHN = ListSF.GetRoster().GetInventory().FindItem(oFMCNLBFIDF);
 			if (dKCHDHMLKHN == null)
 			{
 				return false;

@@ -17,22 +17,22 @@ namespace UnityEngine.SceneManagement {public static class SceneManager {public 
 public static class SceneManagerSF {
  public static bool Allowed=true;
  public static bool Init(ScreenType type)=>Allowed;
- public static void DJKMOGJMHLO(ScreenType type){Trace.Steps.Add("current");}
+ public static void SetCurrentScreen(ScreenType type){Trace.Steps.Add("current");}
 }
 public class Module {
  public class Info {public object Data;}
- public Info DMCJGOMOJEF=new Info();public ScreenType Requested=ScreenType.ModuleMap;
+ public Info ScreenInfo=new Info();public ScreenType Requested=ScreenType.ModuleMap;
  public static Module Value=new Module();public static Module GetInstance()=>Value;
  public ScreenType GetCurrentScreenType()=>Requested;
- public void NFEBHLDPHHI(object scene){Trace.Steps.Add("module");}
+ public void RegisterHolder(object scene){Trace.Steps.Add("module");}
 }
 public class OwnerBase:UnityEngine.Component {protected virtual void Awake(){Trace.Steps.Add("base");}}
 public class SceneFixture<T>:OwnerBase where T:SceneFixture<T> {
  public class Layout {public void Run(){Trace.Steps.Add("layout");}}
  public Layout _WideScreenController=new Layout();public ScreenType Screen=ScreenType.ModuleMap;public bool Fail;
  public ScreenType get_SceneId()=>Screen;
- public void GAKMJOBBBAD(T value){}
- public void GIHJGHJJJGK(){Trace.Steps.Add("debug");}
+ public void SetCurrent(T value){}
+ public void CreateDebugCanvas(){Trace.Steps.Add("debug");}
  public void Init(object data){Trace.Steps.Add("init");if(Fail)throw new InvalidOperationException("init");}
  public void Run()=>Awake();
  /* AWAKE */

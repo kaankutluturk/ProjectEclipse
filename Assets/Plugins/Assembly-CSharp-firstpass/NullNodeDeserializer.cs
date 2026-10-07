@@ -6,26 +6,26 @@ public sealed class NullNodeDeserializer : INodeDeserializer
 	{
 		value = null;
 		NodeEvent dGMPGIHHKCN = reader.Peek<NodeEvent>();
-		bool flag = dGMPGIHHKCN != null && FMNBNDEEDKK(dGMPGIHHKCN);
+		bool flag = dGMPGIHHKCN != null && NodeIsNull(dGMPGIHHKCN);
 		if (flag)
 		{
-			reader.FHCPPKNIOKB();
+			reader.SkipThisAndNestedEvents();
 		}
 		return flag;
 	}
 
-	private bool FMNBNDEEDKK(NodeEvent ABOEBNGCALL)
+	private bool NodeIsNull(NodeEvent ABOEBNGCALL)
 	{
-		if (ABOEBNGCALL.LOIGCKFONHJ() == "tag:yaml.org,2002:null")
+		if (ABOEBNGCALL.GetTag() == "tag:yaml.org,2002:null")
 		{
 			return true;
 		}
 		Scalar lEACOCDHICF = ABOEBNGCALL as Scalar;
-		if (lEACOCDHICF == null || lEACOCDHICF.HALCJLMJDII() != IBEOFCPMMJJ.Plain)
+		if (lEACOCDHICF == null || lEACOCDHICF.GetStyle() != ScalarStyle.Plain)
 		{
 			return false;
 		}
-		string text = lEACOCDHICF.OEAKCOHMIHH();
+		string text = lEACOCDHICF.GetValue();
 		if (text == string.Empty)
 		{
 			goto IL_0086;

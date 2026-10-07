@@ -5,13 +5,13 @@ internal class DemoHubSample : MonoBehaviour
 {
 	private readonly Uri URI = new Uri("http://besthttpsignalr.azurewebsites.net/signalr");
 
-	private Connection FJGOJHMELAH;
+	private Connection signalRConnection;
 
-	private DemoHub LHDMOALIFHL;
+	private DemoHub demoHub;
 
-	private TypedDemoHub BHEJFCJCNJO;
+	private TypedDemoHub typedDemoHub;
 
-	private Hub NEEINNIJJBL;
+	private Hub vbDemoHub;
 
 	private string vbReadStateResult = string.Empty;
 
@@ -19,61 +19,61 @@ internal class DemoHubSample : MonoBehaviour
 
 	private void Start()
 	{
-		LHDMOALIFHL = new DemoHub();
-		BHEJFCJCNJO = new TypedDemoHub();
-		NEEINNIJJBL = new Hub("vbdemo");
-		FJGOJHMELAH = new Connection(URI, LHDMOALIFHL, BHEJFCJCNJO, NEEINNIJJBL);
-		FJGOJHMELAH.LPEPILDNMNE(new PEELJCOAGOH());
-		FJGOJHMELAH.FJBEHFPIAHI((Connection MDGFGCDPGFI) =>
+		demoHub = new DemoHub();
+		typedDemoHub = new TypedDemoHub();
+		vbDemoHub = new Hub("vbdemo");
+		signalRConnection = new Connection(URI, demoHub, typedDemoHub, vbDemoHub);
+		signalRConnection.SetJsonEncoder(new LitJsonEncoder());
+		signalRConnection.AddConnectedHandler((Connection MDGFGCDPGFI) =>
 		{
 			var anon = new
 			{
-				MENAJEAJJBE = "Foo",
-				IDGJLEBFHOK = 20,
-				IJMOLOMMEBG = new
+				HubDisplayName = "Foo",
+				PersonAge = 20,
+				Address = new
 				{
-					IKGHGDEDKPC = "One Microsoft Way",
-					DDIDIMMDPDN = "98052"
+					Street = "One Microsoft Way",
+					Zip = "98052"
 				}
 			};
-			LHDMOALIFHL.ReportProgress("Long running job!");
-			LHDMOALIFHL.MDGBAIHKMPE();
-			LHDMOALIFHL.GetValue();
-			LHDMOALIFHL.GEEDKDFKMOI();
-			LHDMOALIFHL.MBDPOHEEJGO();
-			LHDMOALIFHL.FBDHPAIGJBG();
-			LHDMOALIFHL.LACEDJJCILL();
-			LHDMOALIFHL.ILAAHBOFIIM(anon);
-			LHDMOALIFHL.SimpleArray(new int[3] { 5, 5, 6 });
-			LHDMOALIFHL.MJLIGOHOKLH(anon);
-			LHDMOALIFHL.ComplexArray(new object[3] { anon, anon, anon });
-			LHDMOALIFHL.Overload();
-			LHDMOALIFHL.FLBBFDNHJAJ()["name"] = "Testing state!";
-			LHDMOALIFHL.LLBPNJCDCBB();
-			LHDMOALIFHL.IHIBHBFIMCJ();
-			LHDMOALIFHL.PJKALCNNLBD();
-			BHEJFCJCNJO.OBHMNCMCEIO("Typed echo callback");
-			NEEINNIJJBL.Call("readStateValue", (Hub CGFIJCNNCKP, ClientMessage CKEHOEGLMBM, ResultMessage DCJLKCFKCOM) =>
+			demoHub.ReportProgress("Long running job!");
+			demoHub.AddToGroups();
+			demoHub.GetValue();
+			demoHub.TaskWithException();
+			demoHub.GenericTaskWithException();
+			demoHub.SynchronousException();
+			demoHub.DynamicTask();
+			demoHub.PassingDynamicComplex(anon);
+			demoHub.SimpleArray(new int[3] { 5, 5, 6 });
+			demoHub.ComplexType(anon);
+			demoHub.ComplexArray(new object[3] { anon, anon, anon });
+			demoHub.Overload();
+			demoHub.GetState()["name"] = "Testing state!";
+			demoHub.ReadStateValue();
+			demoHub.PlainTask();
+			demoHub.GenericTaskWithContinueWith();
+			typedDemoHub.Echo("Typed echo callback");
+			vbDemoHub.Call("readStateValue", (Hub CGFIJCNNCKP, ClientMessage CKEHOEGLMBM, ResultMessage DCJLKCFKCOM) =>
 			{
-				vbReadStateResult = string.Format("Read some state from VB.NET! => {0}", (DCJLKCFKCOM.LBAIENGDLDJ() != null) ? DCJLKCFKCOM.LBAIENGDLDJ().ToString() : "undefined");
+				vbReadStateResult = string.Format("Read some state from VB.NET! => {0}", (DCJLKCFKCOM.GetReturnValue() != null) ? DCJLKCFKCOM.GetReturnValue().ToString() : "undefined");
 			});
 		});
-		FJGOJHMELAH.LAJCMNNNIIM();
+		signalRConnection.OpenConnection();
 	}
 
 	private void OnDestroy()
 	{
-		FJGOJHMELAH.Close();
+		signalRConnection.Close();
 	}
 
 	private void OnGUI()
 	{
-		GUIHelper.ECMOBPFHNPN(GUIHelper.ClientArea, true, () =>
+		GUIHelper.DrawArea(GUIHelper.ClientArea, true, () =>
 		{
 			scrollPos = GUILayout.BeginScrollView(scrollPos, false, false);
 			GUILayout.BeginVertical();
-			LHDMOALIFHL.MCAIPGEPMDE();
-			BHEJFCJCNJO.MCAIPGEPMDE();
+			demoHub.Draw();
+			typedDemoHub.Draw();
 			GUILayout.Label("Read State Value");
 			GUILayout.BeginHorizontal();
 			GUILayout.Space(20f);

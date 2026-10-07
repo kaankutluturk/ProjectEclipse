@@ -8,7 +8,7 @@ public partial class PerksStage
     internal InfoPerk GetScriptFlagContainer(Model model, object owner, string behavior, bool create)
     {
         if (model == null || owner == null) throw new ArgumentException("Flag owner is unavailable.");
-        var registration = MPJMCCGKEOD.Find(value => value.get_Model() == model);
+        var registration = modelRegistrations.Find(value => value.get_Model() == model);
         if (registration == null) throw new InvalidOperationException("Fighter has no active perk registration.");
         var containers = registration.ActivePerkEffects;
         int owned = 0;
@@ -22,7 +22,7 @@ public partial class PerksStage
         if (owned >= 64) throw new InvalidOperationException("Fighter flag-owner limit reached (64).");
         var result = new InfoPerk {
             ScriptFlagOwner = owner,
-            DCMHONAFOGI = new PerkData(new PerkInfoItem { Name = behavior })
+            Data = new PerkData(new PerkInfoItem { Name = behavior })
         };
         containers.Add(result);
         return result;
@@ -35,28 +35,28 @@ public partial class InfoPerk
 
     internal bool HasScriptFlag(string name)
     {
-        return BFKDLIMHGFA().Contains(name);
+        return GetActiveActionNames().Contains(name);
     }
 
     internal void SetScriptFlag(Model model, string name)
     {
         if (ScriptFlagOwner == null) throw new InvalidOperationException("Not a script flag container.");
         if (HasScriptFlag(name)) return;
-        if (BFKDLIMHGFA().Count >= 64) throw new InvalidOperationException("Flag limit reached (64 per owner).");
+        if (GetActiveActionNames().Count >= 64) throw new InvalidOperationException("Flag limit reached (64 per owner).");
         var action = new PerksStage.ActionPerk {
-            KJDFJPBIGJC = model, BIKLKJMNGKP = model,
-            AMKJNPOCODK = new PerkActionFlag(name, DCMHONAFOGI.MBDDKGIOOGD)
+            TargetModel = model, SourceModel = model,
+            Action = new PerkActionFlag(name, Data.PerkInfo)
         };
         // The native path copies modifiers into active actions/name lists and
         // handles removal/expiry through ClearActions. No synthetic event DSL.
-        MHHNIPBJNAD(new List<PerksStage.ActionPerk> { action });
+        ExecuteActions(new List<PerksStage.ActionPerk> { action });
     }
 
     internal void ClearScriptFlag(string name)
     {
         if (ScriptFlagOwner == null) throw new InvalidOperationException("Not a script flag container.");
-        foreach (var action in HIPOGANEPMI())
-            if (action.AMKJNPOCODK.get_Name() == name) action.PLNNKKBPDJK = true;
+        foreach (var action in GetActiveActions())
+            if (action.Action.get_Name() == name) action.IsExpired = true;
         ClearActions();
     }
 }
@@ -68,8 +68,8 @@ public partial class PerkActionFlag
         set_Name(name);
         set_Type(ActionType.ACTION_FLAG);
         set_Namespace(string.Empty);
-        JMOIMIHPBOM(owner);
-        CONNEMFGHMM(new PerkTrigger { JMDBPECCFDF = owner });
-        IHMGKCPKCDD("ModFlag");
+        SetPerk(owner);
+        SetTrigger(new PerkTrigger { PerkInfo = owner });
+        SetElementName("ModFlag");
     }
 }

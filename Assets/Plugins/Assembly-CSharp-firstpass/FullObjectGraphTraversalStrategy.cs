@@ -3,17 +3,17 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 
-public class FullObjectGraphTraversalStrategy : BIGFDIOHKIG
+public class FullObjectGraphTraversalStrategy : IObjectGraphTraversalStrategy
 {
-	protected readonly Serializer MGFPEIHBMLD;
+	protected readonly Serializer serializer;
 
 	private readonly int maxRecursion;
 
-	private readonly ITypeInspector GIJPGEHPILC;
+	private readonly ITypeInspector typeDescriptor;
 
-	private readonly ITypeResolver CBMKGNIHPFO;
+	private readonly ITypeResolver typeResolver;
 
-	private static readonly global::GenericInstanceMethod<FullObjectGraphTraversalStrategy> KONOFKFLIDP = new global::GenericInstanceMethod<FullObjectGraphTraversalStrategy>((FullObjectGraphTraversalStrategy s) => s.NMPBHMBDKCD<int, int>(null, null, 0));
+	private static readonly global::GenericInstanceMethod<FullObjectGraphTraversalStrategy> traverseGenericDictionaryHelper = new global::GenericInstanceMethod<FullObjectGraphTraversalStrategy>((FullObjectGraphTraversalStrategy s) => s.TraverseGenericDictionaryHelper<int, int>(null, null, 0));
 
 	public FullObjectGraphTraversalStrategy(Serializer MGFPEIHBMLD, ITypeInspector GIJPGEHPILC, ITypeResolver CBMKGNIHPFO, int maxRecursion)
 	{
@@ -21,21 +21,21 @@ public class FullObjectGraphTraversalStrategy : BIGFDIOHKIG
 		{
 			throw new ArgumentOutOfRangeException("maxRecursion", maxRecursion, "maxRecursion must be greater than 1");
 		}
-		this.MGFPEIHBMLD = MGFPEIHBMLD;
+		this.serializer = MGFPEIHBMLD;
 		if (GIJPGEHPILC == null)
 		{
 			throw new ArgumentNullException("typeDescriptor");
 		}
-		this.GIJPGEHPILC = GIJPGEHPILC;
+		this.typeDescriptor = GIJPGEHPILC;
 		if (CBMKGNIHPFO == null)
 		{
 			throw new ArgumentNullException("typeResolver");
 		}
-		this.CBMKGNIHPFO = CBMKGNIHPFO;
+		this.typeResolver = CBMKGNIHPFO;
 		this.maxRecursion = maxRecursion;
 	}
 
-	void BIGFDIOHKIG.Traverse(IObjectDescriptor OFDNAFPEAGP, IObjectGraphVisitor NKECMANOOEM)
+	void IObjectGraphTraversalStrategy.Traverse(IObjectDescriptor OFDNAFPEAGP, IObjectGraphVisitor NKECMANOOEM)
 	{
 		Traverse(OFDNAFPEAGP, NKECMANOOEM, 0);
 	}
@@ -76,7 +76,7 @@ public class FullObjectGraphTraversalStrategy : BIGFDIOHKIG
 		case TypeCode.Empty:
 			throw new NotSupportedException(string.Format(CultureInfo.InvariantCulture, "TypeCode.{0} is not supported.", typeCode));
 		}
-		if (value.OEAKCOHMIHH() == null || value.get_Type() == typeof(TimeSpan))
+		if (value.GetValue() == null || value.get_Type() == typeof(TimeSpan))
 		{
 			NKECMANOOEM.VisitScalar(value);
 			return;
@@ -84,43 +84,43 @@ public class FullObjectGraphTraversalStrategy : BIGFDIOHKIG
 		Type underlyingType = Nullable.GetUnderlyingType(value.get_Type());
 		if (underlyingType != null)
 		{
-			Traverse(new ObjectDescriptor(value.OEAKCOHMIHH(), underlyingType, value.get_Type()), NKECMANOOEM, KDONPJHEEBI);
+			Traverse(new ObjectDescriptor(value.GetValue(), underlyingType, value.get_Type()), NKECMANOOEM, KDONPJHEEBI);
 		}
 		else
 		{
-			CDDKEFCFMGC(value, NKECMANOOEM, KDONPJHEEBI);
+			TraverseObject(value, NKECMANOOEM, KDONPJHEEBI);
 		}
 	}
 
-	protected virtual void CDDKEFCFMGC(IObjectDescriptor value, IObjectGraphVisitor NKECMANOOEM, int KDONPJHEEBI)
+	protected virtual void TraverseObject(IObjectDescriptor value, IObjectGraphVisitor NKECMANOOEM, int KDONPJHEEBI)
 	{
 		if (typeof(IDictionary).IsAssignableFrom(value.get_Type()))
 		{
-			HFFPLAENAOO(value, NKECMANOOEM, KDONPJHEEBI);
+			TraverseDictionary(value, NKECMANOOEM, KDONPJHEEBI);
 			return;
 		}
-		Type type = ReflectionUtility.JIDNEGBGBGL(value.get_Type(), typeof(IDictionary<, >));
+		Type type = ReflectionUtility.GetImplementedGenericInterface(value.get_Type(), typeof(IDictionary<, >));
 		if (type != null)
 		{
-			IGAOOMJINDO(value, type, NKECMANOOEM, KDONPJHEEBI);
+			TraverseGenericDictionary(value, type, NKECMANOOEM, KDONPJHEEBI);
 		}
 		else if (typeof(IEnumerable).IsAssignableFrom(value.get_Type()))
 		{
-			OLPCLENDEPG(value, NKECMANOOEM, KDONPJHEEBI);
+			TraverseList(value, NKECMANOOEM, KDONPJHEEBI);
 		}
 		else
 		{
-			FGAICKPNBIH(value, NKECMANOOEM, KDONPJHEEBI);
+			TraverseProperties(value, NKECMANOOEM, KDONPJHEEBI);
 		}
 	}
 
-	protected virtual void HFFPLAENAOO(IObjectDescriptor dictionary, IObjectGraphVisitor NKECMANOOEM, int KDONPJHEEBI)
+	protected virtual void TraverseDictionary(IObjectDescriptor dictionary, IObjectGraphVisitor NKECMANOOEM, int KDONPJHEEBI)
 	{
 		NKECMANOOEM.VisitMappingStart(dictionary, typeof(object), typeof(object));
-		foreach (DictionaryEntry item in (IDictionary)dictionary.OEAKCOHMIHH())
+		foreach (DictionaryEntry item in (IDictionary)dictionary.GetValue())
 		{
-			IObjectDescriptor mKEOBENKHGI = BMEHIHLGKGP(item.Key, typeof(object));
-			IObjectDescriptor bAINMLLIKOL = BMEHIHLGKGP(item.Value, typeof(object));
+			IObjectDescriptor mKEOBENKHGI = GetObjectDescriptor(item.Key, typeof(object));
+			IObjectDescriptor bAINMLLIKOL = GetObjectDescriptor(item.Value, typeof(object));
 			if (NKECMANOOEM.EnterMapping(mKEOBENKHGI, bAINMLLIKOL))
 			{
 				Traverse(mKEOBENKHGI, NKECMANOOEM, KDONPJHEEBI);
@@ -130,20 +130,20 @@ public class FullObjectGraphTraversalStrategy : BIGFDIOHKIG
 		NKECMANOOEM.VisitMappingEnd(dictionary);
 	}
 
-	private void IGAOOMJINDO(IObjectDescriptor dictionary, Type DDOHIJFGGGO, IObjectGraphVisitor NKECMANOOEM, int KDONPJHEEBI)
+	private void TraverseGenericDictionary(IObjectDescriptor dictionary, Type DDOHIJFGGGO, IObjectGraphVisitor NKECMANOOEM, int KDONPJHEEBI)
 	{
 		Type[] genericArguments = DDOHIJFGGGO.GetGenericArguments();
 		NKECMANOOEM.VisitMappingStart(dictionary, genericArguments[0], genericArguments[1]);
-		KONOFKFLIDP.Invoke(genericArguments, this, dictionary.OEAKCOHMIHH(), NKECMANOOEM, KDONPJHEEBI);
+		traverseGenericDictionaryHelper.Invoke(genericArguments, this, dictionary.GetValue(), NKECMANOOEM, KDONPJHEEBI);
 		NKECMANOOEM.VisitMappingEnd(dictionary);
 	}
 
-	private void NMPBHMBDKCD<TKey, TValue>(IDictionary<TKey, TValue> dictionary, IObjectGraphVisitor NKECMANOOEM, int KDONPJHEEBI)
+	private void TraverseGenericDictionaryHelper<TKey, TValue>(IDictionary<TKey, TValue> dictionary, IObjectGraphVisitor NKECMANOOEM, int KDONPJHEEBI)
 	{
 		foreach (KeyValuePair<TKey, TValue> item in dictionary)
 		{
-			IObjectDescriptor mKEOBENKHGI = BMEHIHLGKGP(item.Key, typeof(TKey));
-			IObjectDescriptor bAINMLLIKOL = BMEHIHLGKGP(item.Value, typeof(TValue));
+			IObjectDescriptor mKEOBENKHGI = GetObjectDescriptor(item.Key, typeof(TKey));
+			IObjectDescriptor bAINMLLIKOL = GetObjectDescriptor(item.Value, typeof(TValue));
 			if (NKECMANOOEM.EnterMapping(mKEOBENKHGI, bAINMLLIKOL))
 			{
 				Traverse(mKEOBENKHGI, NKECMANOOEM, KDONPJHEEBI);
@@ -152,24 +152,24 @@ public class FullObjectGraphTraversalStrategy : BIGFDIOHKIG
 		}
 	}
 
-	private void OLPCLENDEPG(IObjectDescriptor value, IObjectGraphVisitor NKECMANOOEM, int KDONPJHEEBI)
+	private void TraverseList(IObjectDescriptor value, IObjectGraphVisitor NKECMANOOEM, int KDONPJHEEBI)
 	{
-		Type type = ReflectionUtility.JIDNEGBGBGL(value.get_Type(), typeof(IEnumerable<>));
+		Type type = ReflectionUtility.GetImplementedGenericInterface(value.get_Type(), typeof(IEnumerable<>));
 		Type type2 = ((type == null) ? typeof(object) : type.GetGenericArguments()[0]);
 		NKECMANOOEM.VisitSequenceStart(value, type2);
-		foreach (object item in (IEnumerable)value.OEAKCOHMIHH())
+		foreach (object item in (IEnumerable)value.GetValue())
 		{
-			Traverse(BMEHIHLGKGP(item, type2), NKECMANOOEM, KDONPJHEEBI);
+			Traverse(GetObjectDescriptor(item, type2), NKECMANOOEM, KDONPJHEEBI);
 		}
 		NKECMANOOEM.VisitSequenceEnd(value);
 	}
 
-	protected virtual void FGAICKPNBIH(IObjectDescriptor value, IObjectGraphVisitor NKECMANOOEM, int KDONPJHEEBI)
+	protected virtual void TraverseProperties(IObjectDescriptor value, IObjectGraphVisitor NKECMANOOEM, int KDONPJHEEBI)
 	{
 		NKECMANOOEM.VisitMappingStart(value, typeof(string), typeof(object));
-		foreach (IPropertyDescriptor item in GIJPGEHPILC.GHIBHNJKIHN(value.get_Type(), value.OEAKCOHMIHH()))
+		foreach (IPropertyDescriptor item in typeDescriptor.GetProperties(value.get_Type(), value.GetValue()))
 		{
-			IObjectDescriptor bAINMLLIKOL = item.Read(value.OEAKCOHMIHH());
+			IObjectDescriptor bAINMLLIKOL = item.Read(value.GetValue());
 			if (NKECMANOOEM.EnterMapping(item, bAINMLLIKOL))
 			{
 				Traverse(new ObjectDescriptor(item.get_Name(), typeof(string), typeof(string)), NKECMANOOEM, KDONPJHEEBI);
@@ -179,8 +179,8 @@ public class FullObjectGraphTraversalStrategy : BIGFDIOHKIG
 		NKECMANOOEM.VisitMappingEnd(value);
 	}
 
-	private IObjectDescriptor BMEHIHLGKGP(object value, Type FGDJAEMHFKC)
+	private IObjectDescriptor GetObjectDescriptor(object value, Type FGDJAEMHFKC)
 	{
-		return new ObjectDescriptor(value, CBMKGNIHPFO.Resolve(FGDJAEMHFKC, value), FGDJAEMHFKC);
+		return new ObjectDescriptor(value, typeResolver.Resolve(FGDJAEMHFKC, value), FGDJAEMHFKC);
 	}
 }

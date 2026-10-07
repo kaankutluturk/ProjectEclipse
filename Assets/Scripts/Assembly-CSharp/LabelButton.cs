@@ -4,7 +4,7 @@ using UnityEngine;
 [RequireComponent(typeof(ResolutionImage))]
 public class LabelButton : ResolutionButton
 {
-	public enum FBMGEHJPPIK
+	public enum ButtonColor
 	{
 		BUTTON_DARK = 0,
 		BUTTON_WHITE = 1,
@@ -26,13 +26,13 @@ public class LabelButton : ResolutionButton
 
 	public const string FILE_BUTTON_BEIGE = "CommonButtons.btnBeige";
 
-	private string[] PKDNEPABDDL = new string[6] { "CommonButtons.BtnDark", "CommonButtons.BtnWhite", "CommonButtons.BtnGreen", "CommonButtons.btnSilver", "CommonButtons.BtnYellow", "CommonButtons.btnBeige" };
+	private string[] buttonSpriteNames = new string[6] { "CommonButtons.BtnDark", "CommonButtons.BtnWhite", "CommonButtons.BtnGreen", "CommonButtons.btnSilver", "CommonButtons.BtnYellow", "CommonButtons.btnBeige" };
 
 	public LabelAlias Label;
 
-	private float MGPPBIADMJM;
+	private float opacity;
 
-	public Rect IEKFEFEFMML
+	public Rect ButtonRect
 	{
 		get
 		{
@@ -82,35 +82,35 @@ public class LabelButton : ResolutionButton
 		return string.Empty;
 	}
 
-	public void SetColor(FBMGEHJPPIK AKCKEADANBC)
+	public void SetColor(ButtonColor AKCKEADANBC)
 	{
 		ResolutionImage resolutionImage = base.targetGraphic as ResolutionImage;
 		if (resolutionImage != null)
 		{
 			resolutionImage.set_TexturePath("UI/Atlases/");
-			resolutionImage.set_SpriteName(PKDNEPABDDL[(int)AKCKEADANBC]);
+			resolutionImage.set_SpriteName(buttonSpriteNames[(int)AKCKEADANBC]);
 		}
 	}
 
-	public FBMGEHJPPIK GetColor()
+	public ButtonColor GetColor()
 	{
 		ResolutionImage resolutionImage = base.targetGraphic as ResolutionImage;
 		if (resolutionImage != null)
 		{
-			for (int i = 0; i < PKDNEPABDDL.Length; i++)
+			for (int i = 0; i < buttonSpriteNames.Length; i++)
 			{
-				if (resolutionImage.get_SpriteName() == PKDNEPABDDL[i])
+				if (resolutionImage.get_SpriteName() == buttonSpriteNames[i])
 				{
-					return (FBMGEHJPPIK)i;
+					return (ButtonColor)i;
 				}
 			}
 		}
-		return FBMGEHJPPIK.BUTTON_WHITE;
+		return ButtonColor.BUTTON_WHITE;
 	}
 
 	public virtual void SetOpacity(float KGJALFLDIBG)
 	{
-		MGPPBIADMJM = KGJALFLDIBG;
+		opacity = KGJALFLDIBG;
 		ResolutionImage resolutionImage = base.targetGraphic as ResolutionImage;
 		Color color = resolutionImage.color;
 		color.a = KGJALFLDIBG;
@@ -125,23 +125,23 @@ public class LabelButton : ResolutionButton
 
 	public virtual float GetOpacity()
 	{
-		return MGPPBIADMJM;
+		return opacity;
 	}
 
-	public static FBMGEHJPPIK GetBtnColor(string EDAGDDKMBKC)
+	public static ButtonColor GetBtnColor(string EDAGDDKMBKC)
 	{
-		FBMGEHJPPIK result = FBMGEHJPPIK.BUTTON_WHITE;
+		ButtonColor result = ButtonColor.BUTTON_WHITE;
 		switch (EDAGDDKMBKC)
 		{
 		case "Red":
-			result = FBMGEHJPPIK.BUTTON_DARK;
+			result = ButtonColor.BUTTON_DARK;
 			break;
 		case "Green":
-			result = FBMGEHJPPIK.BUTTON_GREEN;
+			result = ButtonColor.BUTTON_GREEN;
 			break;
 		case "White":
 		case "Beige":
-			result = FBMGEHJPPIK.BUTTON_WHITE;
+			result = ButtonColor.BUTTON_WHITE;
 			break;
 		}
 		return result;

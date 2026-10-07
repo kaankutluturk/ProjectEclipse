@@ -4,32 +4,32 @@ using System.Xml;
 public class PerkActionDisableInterval : PerkAction
 {
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private string KHKLMPFJEJJ;
+	private string _intervalName;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private string HIDMKDOBNDF;
+	private string _intervalType;
 
-	public string CCFKABDNCLA
+	public string IntervalName
 	{
 		get
 		{
-			return BIIIIDOCMEK();
+			return GetIntervalName();
 		}
 		protected set
 		{
-			NINADDOJPAA(value);
+			SetIntervalName(value);
 		}
 	}
 
-	public string MOLEHILDAGP
+	public string IntervalType
 	{
 		get
 		{
-			return KFDPPOKFMPI();
+			return GetIntervalType();
 		}
 		protected set
 		{
-			HPPDPOEEPEP(value);
+			SetIntervalType(value);
 		}
 	}
 
@@ -40,35 +40,35 @@ public class PerkActionDisableInterval : PerkAction
 	public PerkActionDisableInterval(PerkActionDisableInterval NOLFMPDGCOC)
 		: base(NOLFMPDGCOC)
 	{
-		NINADDOJPAA(NOLFMPDGCOC.BIIIIDOCMEK());
-		HPPDPOEEPEP(NOLFMPDGCOC.KFDPPOKFMPI());
+		SetIntervalName(NOLFMPDGCOC.GetIntervalName());
+		SetIntervalType(NOLFMPDGCOC.GetIntervalType());
 	}
 
-	public string BIIIIDOCMEK()
+	public string GetIntervalName()
 	{
-		return KHKLMPFJEJJ;
+		return _intervalName;
 	}
 
-	protected void NINADDOJPAA(string value)
+	protected void SetIntervalName(string value)
 	{
-		KHKLMPFJEJJ = value;
+		_intervalName = value;
 	}
 
-	public string KFDPPOKFMPI()
+	public string GetIntervalType()
 	{
-		return HIDMKDOBNDF;
+		return _intervalType;
 	}
 
-	protected void HPPDPOEEPEP(string value)
+	protected void SetIntervalType(string value)
 	{
-		HIDMKDOBNDF = value;
+		_intervalType = value;
 	}
 
 	public override void Parse(XmlNode node)
 	{
 		base.Parse(node);
 		set_Type(ActionType.ACTION_DISABLE_INTERVAL);
-		NINADDOJPAA(node.Attributes["IntervalName"].CIPOICEEIBK(string.Empty));
-		HPPDPOEEPEP(node.Attributes["IntervalType"].CIPOICEEIBK(string.Empty));
+		SetIntervalName(node.Attributes["IntervalName"].GetStringOrDefault(string.Empty));
+		SetIntervalType(node.Attributes["IntervalType"].GetStringOrDefault(string.Empty));
 	}
 }

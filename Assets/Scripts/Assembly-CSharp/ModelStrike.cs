@@ -22,8 +22,8 @@ public class ModelStrike
 		{
 			Vector3f startVector = Start.GetStart();
 			Vector3f endVector = End.GetStart();
-			float num = Edge.LDKFFINHBOH();
-			float num2 = Vector2f.JOIHAKCICMP(Start.GetStart(), Point);
+			float num = Edge.GetLength2D();
+			float num2 = Vector2f.Distance2D(Start.GetStart(), Point);
 			float num3 = ((!(num < num2)) ? (num2 / num) : 1f);
 			if (!Start.IsFixedAndIsNotNode())
 			{
@@ -46,7 +46,7 @@ public class ModelStrike
 
 	private void Decrease()
 	{
-		List<ModelNode> list = _ModelObject.NAMKCLGOPDD();
+		List<ModelNode> list = _ModelObject.GetAllNodes();
 		foreach (ModelNode item in list)
 		{
 			Vector3f end = item.GetEnd();

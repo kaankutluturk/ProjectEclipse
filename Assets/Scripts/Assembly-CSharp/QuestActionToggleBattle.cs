@@ -11,7 +11,7 @@ public class QuestActionToggleBattle : QuestAction
 	public override void Parse(XmlNode EPKLCPOEELO)
 	{
 		base.Parse(EPKLCPOEELO);
-		string text = EPKLCPOEELO.Attributes["Toggle"].CIPOICEEIBK(string.Empty);
+		string text = EPKLCPOEELO.Attributes["Toggle"].GetStringOrDefault(string.Empty);
 		if (text.Equals("on"))
 		{
 			_toggle = true;
@@ -20,30 +20,30 @@ public class QuestActionToggleBattle : QuestAction
 		{
 			_toggle = false;
 		}
-		_name = EPKLCPOEELO.Attributes["Name"].CIPOICEEIBK(string.Empty);
+		_name = EPKLCPOEELO.Attributes["Name"].GetStringOrDefault(string.Empty);
 	}
 
-	public override void DEJMHFMLKIC(QuestParameters GFIHPBCEEOB)
+	public override void Execute(QuestParameters GFIHPBCEEOB)
 	{
-		base.DEJMHFMLKIC(GFIHPBCEEOB);
+		base.Execute(GFIHPBCEEOB);
 		ConditionExtension.CompareResult lNIDLHOIHIM = new ConditionExtension.CompareResult();
 		QuestCondition kKDGLNECFHA = new QuestCondition();
-		kKDGLNECFHA.LIMHBJBEEIA(GFIHPBCEEOB);
-		kKDGLNECFHA.MCPIOGALBMK(_name, lNIDLHOIHIM);
+		kKDGLNECFHA.SetParameters(GFIHPBCEEOB);
+		kKDGLNECFHA.SetValue(_name, lNIDLHOIHIM);
 		FightIDS mOCEDDJOAEB = new FightIDS();
 		mOCEDDJOAEB.SetFightIDSByString(lNIDLHOIHIM.resultSTR);
-		Battle cGJCGEBPCAF = ListSF.MKHAAGMJOPG(mOCEDDJOAEB);
-		RosterBattle dDNLCGOPAGC = ((cGJCGEBPCAF == null) ? null : cGJCGEBPCAF.NNPNEABKHPP());
+		Battle cGJCGEBPCAF = ListSF.GetBattleById(mOCEDDJOAEB);
+		RosterBattle dDNLCGOPAGC = ((cGJCGEBPCAF == null) ? null : cGJCGEBPCAF.GetRosterBattle());
 		if (dDNLCGOPAGC != null)
 		{
-			dDNLCGOPAGC.HCEOCBOFIGC(!_toggle);
+			dDNLCGOPAGC.SetHidden(!_toggle);
 		}
 		MapScene current = Scene<MapScene>.get_Current();
 		if (current != null && cGJCGEBPCAF != null)
 		{
 			current.UpdateBattleButtonHidden(cGJCGEBPCAF);
 		}
-		ListSF.GetInstance().EJANJEEGOOE();
-		OGIJONMKABB();
+		ListSF.GetInstance().RequestSave();
+		FinishAction();
 	}
 }

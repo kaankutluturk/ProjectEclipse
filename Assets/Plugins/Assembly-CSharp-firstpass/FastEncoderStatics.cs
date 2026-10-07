@@ -1,44 +1,44 @@
 internal static class FastEncoderStatics
 {
-	internal static readonly byte[] KOEECIBJHJO;
+	internal static readonly byte[] FastEncoderTreeStructureData;
 
-	internal static readonly byte[] GLKEPNMLNEC;
+	internal static readonly byte[] BFinalFastEncoderTreeStructureData;
 
-	internal static readonly uint[] HEOFMEEEIKP;
+	internal static readonly uint[] FastEncoderLiteralCodeInfo;
 
-	internal static readonly uint[] CIBAPLNOJJL;
+	internal static readonly uint[] FastEncoderDistanceCodeInfo;
 
-	internal static readonly uint[] EFKOOBOPIDF;
+	internal static readonly uint[] BitMask;
 
-	internal static readonly byte[] ECCFNFEKKCC;
+	internal static readonly byte[] ExtraLengthBits;
 
-	internal static readonly byte[] BHDPMJMOHMI;
+	internal static readonly byte[] ExtraDistanceBits;
 
-	internal const int ODOJPEAMJNG = 256;
+	internal const int NumChars = 256;
 
-	internal const int KKKFCCAPPLB = 29;
+	internal const int NumLengthBaseCodes = 29;
 
-	internal const int MMMPKHMFNGB = 30;
+	internal const int NumDistBaseCodes = 30;
 
-	internal const uint CNEJFGHPNAH = 34u;
+	internal const uint FastEncoderPostTreeBitBuf = 34u;
 
-	internal const int FCJMNDAALPH = 9;
+	internal const int FastEncoderPostTreeBitCount = 9;
 
-	internal const uint MKHAOJEGMCN = 0u;
+	internal const uint NoCompressionHeader = 0u;
 
-	internal const int LICJJOBMDFL = 3;
+	internal const int NoCompressionHeaderBitCount = 3;
 
-	internal const uint LOBOKGANDIC = 1u;
+	internal const uint BFinalNoCompressionHeader = 1u;
 
-	internal const int CHMMHJFLJBH = 3;
+	internal const int BFinalNoCompressionHeaderBitCount = 3;
 
-	internal const int FLCPPKKJCAF = 16;
+	internal const int MaxCodeLen = 16;
 
-	private static byte[] DEAMPBJFOPB;
+	private static byte[] distLookup;
 
 	static FastEncoderStatics()
 	{
-		KOEECIBJHJO = new byte[98]
+		FastEncoderTreeStructureData = new byte[98]
 		{
 			236, 189, 7, 96, 28, 73, 150, 37, 38, 47,
 			109, 202, 123, 127, 74, 245, 74, 215, 224, 116,
@@ -51,7 +51,7 @@ internal static class FastEncoderStatics
 			1, 108, 246, 206, 74, 218, 201, 158, 33, 128,
 			170, 200, 31, 63, 126, 124, 31, 63
 		};
-		GLKEPNMLNEC = new byte[98]
+		BFinalFastEncoderTreeStructureData = new byte[98]
 		{
 			237, 189, 7, 96, 28, 73, 150, 37, 38, 47,
 			109, 202, 123, 127, 74, 245, 74, 215, 224, 116,
@@ -64,7 +64,7 @@ internal static class FastEncoderStatics
 			1, 108, 246, 206, 74, 218, 201, 158, 33, 128,
 			170, 200, 31, 63, 126, 124, 31, 63
 		};
-		HEOFMEEEIKP = new uint[513]
+		FastEncoderLiteralCodeInfo = new uint[513]
 		{
 			55278u, 317422u, 186350u, 448494u, 120814u, 382958u, 251886u, 514030u, 14318u, 51180u,
 			294u, 276462u, 145390u, 407534u, 79854u, 341998u, 210926u, 473070u, 47086u, 309230u,
@@ -119,57 +119,57 @@ internal static class FastEncoderStatics
 			2615281u, 2746353u, 2877425u, 3008497u, 3139569u, 3270641u, 3401713u, 3532785u, 3663857u, 3794929u,
 			3926001u, 4057073u, 18411u
 		};
-		CIBAPLNOJJL = new uint[32]
+		FastEncoderDistanceCodeInfo = new uint[32]
 		{
 			3846u, 130826u, 261899u, 524043u, 65305u, 16152u, 48936u, 32552u, 7991u, 24375u,
 			3397u, 12102u, 84u, 7509u, 2148u, 869u, 1140u, 4981u, 3204u, 644u,
 			2708u, 1684u, 3748u, 420u, 2484u, 2997u, 1476u, 7109u, 2005u, 6101u,
 			0u, 256u
 		};
-		EFKOOBOPIDF = new uint[16]
+		BitMask = new uint[16]
 		{
 			0u, 1u, 3u, 7u, 15u, 31u, 63u, 127u, 255u, 511u,
 			1023u, 2047u, 4095u, 8191u, 16383u, 32767u
 		};
-		ECCFNFEKKCC = new byte[29]
+		ExtraLengthBits = new byte[29]
 		{
 			0, 0, 0, 0, 0, 0, 0, 0, 1, 1,
 			1, 1, 2, 2, 2, 2, 3, 3, 3, 3,
 			4, 4, 4, 4, 5, 5, 5, 5, 0
 		};
-		BHDPMJMOHMI = new byte[32]
+		ExtraDistanceBits = new byte[32]
 		{
 			0, 0, 0, 0, 1, 1, 2, 2, 3, 3,
 			4, 4, 5, 5, 6, 6, 7, 7, 8, 8,
 			9, 9, 10, 10, 11, 11, 12, 12, 13, 13,
 			0, 0
 		};
-		DEAMPBJFOPB = new byte[512];
+		distLookup = new byte[512];
 		int num = 0;
 		int i;
 		for (i = 0; i < 16; i++)
 		{
-			for (int j = 0; j < 1 << (int)BHDPMJMOHMI[i]; j++)
+			for (int j = 0; j < 1 << (int)ExtraDistanceBits[i]; j++)
 			{
-				DEAMPBJFOPB[num++] = (byte)i;
+				distLookup[num++] = (byte)i;
 			}
 		}
 		num >>= 7;
 		for (; i < 30; i++)
 		{
-			for (int k = 0; k < 1 << BHDPMJMOHMI[i] - 7; k++)
+			for (int k = 0; k < 1 << ExtraDistanceBits[i] - 7; k++)
 			{
-				DEAMPBJFOPB[256 + num++] = (byte)i;
+				distLookup[256 + num++] = (byte)i;
 			}
 		}
 	}
 
-	internal static int MFIEBGCGIDF(int LCCLEFMKLPB)
+	internal static int GetSlot(int LCCLEFMKLPB)
 	{
-		return DEAMPBJFOPB[(LCCLEFMKLPB >= 256) ? (256 + (LCCLEFMKLPB >> 7)) : LCCLEFMKLPB];
+		return distLookup[(LCCLEFMKLPB >= 256) ? (256 + (LCCLEFMKLPB >> 7)) : LCCLEFMKLPB];
 	}
 
-	public static uint MEFBBOOOOII(uint KJPGKHJNOMC, int BDBOAEGELMC)
+	public static uint BitReverse(uint KJPGKHJNOMC, int BDBOAEGELMC)
 	{
 		uint num = 0u;
 		do

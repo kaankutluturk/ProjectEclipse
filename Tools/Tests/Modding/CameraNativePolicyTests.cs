@@ -15,7 +15,7 @@ class Transform { public Position localPosition; }
 struct Position { public float x,y,z; }
 class LocationSelector
 {
-    public Body Body=new Body(); public Body MJNPBMOAFML()=>Body;
+    public Body Body=new Body(); public Body GetLayerObject()=>Body;
     public void SetPositionY(float value){var p=Body.transform.localPosition;p.y=(float)Math.Round(value,2,MidpointRounding.AwayFromZero);Body.transform.localPosition=p;}
 }
 partial class Fight

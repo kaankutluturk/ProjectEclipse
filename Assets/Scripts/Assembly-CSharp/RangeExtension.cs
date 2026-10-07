@@ -4,7 +4,7 @@ using Range = UnityEngine.SocialPlatforms.Range;
 
 public static class RangeExtension
 {
-	public static int GEMHMCFOIMJ(this Range JMPCNIOBPAI)
+	public static int GetLastIndex(this Range JMPCNIOBPAI)
 	{
 		if (JMPCNIOBPAI.count == 0)
 		{

@@ -3,33 +3,33 @@ using System.Xml;
 
 public class EventModExpires : EventAnimation
 {
-	private string GKJIAILGHMK;
+	private string modName;
 
-	public string POLPHCDNLEL
+	public string ModName
 	{
 		get
 		{
-			return CMKKGFDBBJF();
+			return GetModName();
 		}
 	}
 
 	public EventModExpires()
-		: base(EECEJKADLCK.EVENT_MOD_EXPIRES)
+		: base(EventAnimationType.EVENT_MOD_EXPIRES)
 	{
 	}
 
-	public string CMKKGFDBBJF()
+	public string GetModName()
 	{
-		return GKJIAILGHMK;
+		return modName;
 	}
 
 	protected override bool Compare(EventAnimation FOPOKALJIIJ)
 	{
 		bool flag = false;
-		List<PerksStage.ActionPerk> fPFKABHOEHP = FOPOKALJIIJ.JIFAHHGNPFH.FPFKABHOEHP;
+		List<PerksStage.ActionPerk> fPFKABHOEHP = FOPOKALJIIJ.Conditions.SelfExpiredPerks;
 		for (int i = 0; i < fPFKABHOEHP.Count; i++)
 		{
-			if (fPFKABHOEHP[i].DDBPICENEJE() == GKJIAILGHMK)
+			if (fPFKABHOEHP[i].GetModName() == modName)
 			{
 				flag = true;
 			}
@@ -39,6 +39,6 @@ public class EventModExpires : EventAnimation
 
 	protected override void Parse(XmlNode MEEAKLDGLDF)
 	{
-		GKJIAILGHMK = MEEAKLDGLDF.Attributes["Name"].CIPOICEEIBK(string.Empty);
+		modName = MEEAKLDGLDF.Attributes["Name"].GetStringOrDefault(string.Empty);
 	}
 }

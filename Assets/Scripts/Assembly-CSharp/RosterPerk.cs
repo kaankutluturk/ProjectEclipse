@@ -6,12 +6,12 @@ public class RosterPerk
 {
 	private int _level;
 
-	private int FEAJIHEBIGL;
+	private int upgradeLevel;
 
 	private string _name = string.Empty;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private PerkInfoItem AAJEBIINPNL;
+	private PerkInfoItem perkInfo;
 
 	private XmlNode _node;
 
@@ -24,35 +24,35 @@ public class RosterPerk
 	{
 		get
 		{
-			return PINDEKDNCNL();
+			return GetLevel();
 		}
 		set
 		{
-			DLDMOHEGENM(value);
+			SetLevel(value);
 		}
 	}
 
-	public int AKKLOMFOLNO
+	public int UpgradeLevel
 	{
 		get
 		{
-			return DHNNCAEEMLL();
+			return GetUpgradeLevel();
 		}
 		set
 		{
-			FMMDLMGHPIB(value);
+			SetUpgradeLevel(value);
 		}
 	}
 
-	public PerkInfoItem MBDDKGIOOGD
+	public PerkInfoItem PerkInfo
 	{
 		get
 		{
-			return DFOELJAEEGG();
+			return GetPerkInfo();
 		}
 		set
 		{
-			NOLDHAFMOLF(value);
+			SetPerkInfo(value);
 		}
 	}
 
@@ -62,49 +62,49 @@ public class RosterPerk
 		XmlAttribute xmlAttribute = _node.Attributes["Level"];
 		if (xmlAttribute == null || string.IsNullOrEmpty(xmlAttribute.Value))
 		{
-			xmlAttribute = _node.LLIKNHNLGJJ("Level");
+			xmlAttribute = _node.AppendAttribute("Level");
 			xmlAttribute.Value = "0";
 		}
 		XmlAttribute xmlAttribute2 = _node.Attributes["Name"];
 		if (xmlAttribute2 == null || string.IsNullOrEmpty(xmlAttribute2.Value))
 		{
-			xmlAttribute2 = _node.LLIKNHNLGJJ("Name");
+			xmlAttribute2 = _node.AppendAttribute("Name");
 		}
 		_level = xmlAttribute.ParseInt();
-		_name = xmlAttribute2.CIPOICEEIBK(string.Empty);
-		FEAJIHEBIGL = _node.Attributes["UpgradeLevel"].ParseInt();
+		_name = xmlAttribute2.GetStringOrDefault(string.Empty);
+		upgradeLevel = _node.Attributes["UpgradeLevel"].ParseInt();
 	}
 
-	public int PINDEKDNCNL()
+	public int GetLevel()
 	{
 		return _level;
 	}
 
-	public void DLDMOHEGENM(int value)
+	public void SetLevel(int value)
 	{
 		_level = value;
 		XmlAttribute xmlAttribute = _node.Attributes["Level"];
 		if (xmlAttribute == null)
 		{
-			xmlAttribute = _node.LLIKNHNLGJJ("Level");
+			xmlAttribute = _node.AppendAttribute("Level");
 		}
 		xmlAttribute.Value = _level.ToString();
 	}
 
-	public int DHNNCAEEMLL()
+	public int GetUpgradeLevel()
 	{
-		return FEAJIHEBIGL;
+		return upgradeLevel;
 	}
 
-	public void FMMDLMGHPIB(int value)
+	public void SetUpgradeLevel(int value)
 	{
-		FEAJIHEBIGL = value;
+		upgradeLevel = value;
 		XmlAttribute xmlAttribute = _node.Attributes["UpgradeLevel"];
 		if (xmlAttribute == null)
 		{
-			xmlAttribute = _node.LLIKNHNLGJJ("UpgradeLevel");
+			xmlAttribute = _node.AppendAttribute("UpgradeLevel");
 		}
-		xmlAttribute.Value = FEAJIHEBIGL.ToString();
+		xmlAttribute.Value = upgradeLevel.ToString();
 	}
 
 	public string get_Name()
@@ -118,19 +118,19 @@ public class RosterPerk
 		XmlAttribute xmlAttribute = _node.Attributes["Name"];
 		if (xmlAttribute == null)
 		{
-			xmlAttribute = _node.LLIKNHNLGJJ("Name");
+			xmlAttribute = _node.AppendAttribute("Name");
 		}
 		xmlAttribute.Value = _name;
 	}
 
-	public PerkInfoItem DFOELJAEEGG()
+	public PerkInfoItem GetPerkInfo()
 	{
-		return AAJEBIINPNL;
+		return perkInfo;
 	}
 
-	public void NOLDHAFMOLF(PerkInfoItem value)
+	public void SetPerkInfo(PerkInfoItem value)
 	{
-		AAJEBIINPNL = value;
+		perkInfo = value;
 	}
 
 	public void AppendNodeChild(Dictionary<string, string> MPEHGKBJPEN)
@@ -144,10 +144,10 @@ public class RosterPerk
 		{
 			return;
 		}
-		XmlNode mEEAKLDGLDF = _node.ACBPMPMPKJJ("Set");
+		XmlNode mEEAKLDGLDF = _node.AppendElement("Set");
 		foreach (KeyValuePair<string, string> item in MPEHGKBJPEN)
 		{
-			mEEAKLDGLDF.LLIKNHNLGJJ(item.Key).Value = item.Value;
+			mEEAKLDGLDF.AppendAttribute(item.Key).Value = item.Value;
 		}
 	}
 }

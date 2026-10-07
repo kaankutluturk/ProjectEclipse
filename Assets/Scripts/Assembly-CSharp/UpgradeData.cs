@@ -5,156 +5,156 @@ using CodeStage.AntiCheat.ObscuredTypes;
 
 public class UpgradeData : IComparable<UpgradeData>
 {
-	public struct ONOBKNJPKIP
+	public struct UpgradeFieldFlags
 	{
-		public bool EHKNIKHPGDN;
+		public bool HasDeliveryTime;
 
-		public bool KLHOKKPALOK;
+		public bool HasBonusDeliveryPrice;
 
-		public bool KFIAHDNGHMI;
+		public bool HasType;
 
-		public bool MDAAJFBENON;
+		public bool HasPrice;
 
-		public bool FMHECGHHKGB;
+		public bool HasBonusPrice;
 
 		public bool Level;
 
-		public bool AKKLOMFOLNO;
+		public bool HasUpgradeLevel;
 
-		public bool ICDIEHCJBGA;
+		public bool HasMilestone;
 	}
 
-	public struct AGKOBJMBAEC
+	public struct UpgradeValues
 	{
-		public Attributes IBLHIAHECLK;
+		public Attributes Attributes;
 
-		public ObscuredLong KLHOKKPALOK;
+		public ObscuredLong BonusDeliveryPrice;
 
-		public ObscuredLong FMHECGHHKGB;
+		public ObscuredLong BonusPrice;
 
-		public ObscuredLong MDAAJFBENON;
+		public ObscuredLong Price;
 
-		public string KFIAHDNGHMI;
+		public string ItemType;
 
-		public long EHKNIKHPGDN;
+		public long DeliveryTime;
 
 		public int Level;
 
-		public int AKKLOMFOLNO;
+		public int UpgradeLevel;
 
-		public int ICDIEHCJBGA;
+		public int Milestone;
 	}
 
-	public AGKOBJMBAEC OGLHOJNMEBD;
+	public UpgradeValues Values;
 
-	public ONOBKNJPKIP EBHOFBFKNMB;
+	public UpgradeFieldFlags HasValues;
 
 	public int UpgradeIndex;
 
 	public UpgradeData(XmlNode node, string LFLGCDNKNJI)
 	{
-		EBHOFBFKNMB.KLHOKKPALOK = false;
-		EBHOFBFKNMB.FMHECGHHKGB = false;
-		EBHOFBFKNMB.EHKNIKHPGDN = false;
-		EBHOFBFKNMB.Level = false;
-		EBHOFBFKNMB.ICDIEHCJBGA = false;
-		EBHOFBFKNMB.MDAAJFBENON = false;
-		EBHOFBFKNMB.AKKLOMFOLNO = false;
-		EBHOFBFKNMB.KFIAHDNGHMI = false;
-		OGLHOJNMEBD.KLHOKKPALOK = (ObscuredLong)(0L);
-		OGLHOJNMEBD.FMHECGHHKGB = (ObscuredLong)(0L);
-		OGLHOJNMEBD.MDAAJFBENON = (ObscuredLong)(0L);
-		OGLHOJNMEBD.EHKNIKHPGDN = 0L;
-		OGLHOJNMEBD.Level = 0;
-		OGLHOJNMEBD.ICDIEHCJBGA = 0;
-		OGLHOJNMEBD.AKKLOMFOLNO = 0;
-		OGLHOJNMEBD.KFIAHDNGHMI = LFLGCDNKNJI;
-		OGLHOJNMEBD.IBLHIAHECLK = new Attributes();
-		List<WarriorAttribute> iBLHIAHECLK = GameUtils.BGENALLCKII.IBLHIAHECLK;
+		HasValues.HasBonusDeliveryPrice = false;
+		HasValues.HasBonusPrice = false;
+		HasValues.HasDeliveryTime = false;
+		HasValues.Level = false;
+		HasValues.HasMilestone = false;
+		HasValues.HasPrice = false;
+		HasValues.HasUpgradeLevel = false;
+		HasValues.HasType = false;
+		Values.BonusDeliveryPrice = (ObscuredLong)(0L);
+		Values.BonusPrice = (ObscuredLong)(0L);
+		Values.Price = (ObscuredLong)(0L);
+		Values.DeliveryTime = 0L;
+		Values.Level = 0;
+		Values.Milestone = 0;
+		Values.UpgradeLevel = 0;
+		Values.ItemType = LFLGCDNKNJI;
+		Values.Attributes = new Attributes();
+		List<WarriorAttribute> iBLHIAHECLK = GameUtils.WarriorAttributeList.AttributeList;
 		foreach (WarriorAttribute item in iBLHIAHECLK)
 		{
 			XmlAttribute xmlAttribute = node.Attributes[item.get_Name()];
 			if (xmlAttribute != null)
 			{
-				OGLHOJNMEBD.IBLHIAHECLK.Set(item.get_Name(), xmlAttribute.ParseInt());
+				Values.Attributes.Set(item.get_Name(), xmlAttribute.ParseInt());
 			}
 		}
 		XmlAttribute xmlAttribute2 = node.Attributes["DeliveryTime"];
 		if (xmlAttribute2 != null)
 		{
-			EBHOFBFKNMB.EHKNIKHPGDN = true;
-			OGLHOJNMEBD.EHKNIKHPGDN = xmlAttribute2.ParseLong(0L);
+			HasValues.HasDeliveryTime = true;
+			Values.DeliveryTime = xmlAttribute2.ParseLong(0L);
 		}
 		XmlAttribute xmlAttribute3 = node.Attributes["BonusDeliveryPrice"];
 		if (xmlAttribute3 != null)
 		{
-			EBHOFBFKNMB.KLHOKKPALOK = true;
-			OGLHOJNMEBD.KLHOKKPALOK = (ObscuredLong)(xmlAttribute3.ParseLong(0L));
+			HasValues.HasBonusDeliveryPrice = true;
+			Values.BonusDeliveryPrice = (ObscuredLong)(xmlAttribute3.ParseLong(0L));
 		}
-		EBHOFBFKNMB.KFIAHDNGHMI = true;
-		OGLHOJNMEBD.KFIAHDNGHMI = LFLGCDNKNJI;
+		HasValues.HasType = true;
+		Values.ItemType = LFLGCDNKNJI;
 		XmlAttribute xmlAttribute4 = node.Attributes["Price"];
 		if (xmlAttribute4 != null)
 		{
-			EBHOFBFKNMB.MDAAJFBENON = true;
-			OGLHOJNMEBD.MDAAJFBENON = (ObscuredLong)(xmlAttribute4.ParseLong(0L));
+			HasValues.HasPrice = true;
+			Values.Price = (ObscuredLong)(xmlAttribute4.ParseLong(0L));
 		}
 		XmlAttribute xmlAttribute5 = node.Attributes["BonusPrice"];
 		if (xmlAttribute5 != null)
 		{
-			EBHOFBFKNMB.FMHECGHHKGB = true;
-			OGLHOJNMEBD.FMHECGHHKGB = (ObscuredLong)(xmlAttribute5.ParseLong(0L));
+			HasValues.HasBonusPrice = true;
+			Values.BonusPrice = (ObscuredLong)(xmlAttribute5.ParseLong(0L));
 		}
 		XmlAttribute xmlAttribute6 = node.Attributes["Level"];
 		if (xmlAttribute6 != null)
 		{
-			EBHOFBFKNMB.Level = true;
-			OGLHOJNMEBD.Level = xmlAttribute6.ParseInt();
+			HasValues.Level = true;
+			Values.Level = xmlAttribute6.ParseInt();
 		}
 		XmlAttribute xmlAttribute7 = node.Attributes["UpgradeLevel"];
 		if (xmlAttribute7 != null)
 		{
-			EBHOFBFKNMB.AKKLOMFOLNO = true;
-			OGLHOJNMEBD.AKKLOMFOLNO = xmlAttribute7.ParseInt();
+			HasValues.HasUpgradeLevel = true;
+			Values.UpgradeLevel = xmlAttribute7.ParseInt();
 		}
 		XmlAttribute xmlAttribute8 = node.Attributes["Milestone"];
 		if (xmlAttribute8 != null)
 		{
-			EBHOFBFKNMB.ICDIEHCJBGA = true;
-			OGLHOJNMEBD.ICDIEHCJBGA = xmlAttribute8.ParseInt();
+			HasValues.HasMilestone = true;
+			Values.Milestone = xmlAttribute8.ParseInt();
 		}
 	}
 
 	public UpgradeData(UpgradeData NOLFMPDGCOC)
 	{
-		EBHOFBFKNMB.KLHOKKPALOK = NOLFMPDGCOC.EBHOFBFKNMB.KLHOKKPALOK;
-		EBHOFBFKNMB.FMHECGHHKGB = NOLFMPDGCOC.EBHOFBFKNMB.FMHECGHHKGB;
-		EBHOFBFKNMB.EHKNIKHPGDN = NOLFMPDGCOC.EBHOFBFKNMB.EHKNIKHPGDN;
-		EBHOFBFKNMB.Level = NOLFMPDGCOC.EBHOFBFKNMB.Level;
-		EBHOFBFKNMB.ICDIEHCJBGA = NOLFMPDGCOC.EBHOFBFKNMB.ICDIEHCJBGA;
-		EBHOFBFKNMB.MDAAJFBENON = NOLFMPDGCOC.EBHOFBFKNMB.MDAAJFBENON;
-		EBHOFBFKNMB.AKKLOMFOLNO = NOLFMPDGCOC.EBHOFBFKNMB.AKKLOMFOLNO;
-		EBHOFBFKNMB.KFIAHDNGHMI = NOLFMPDGCOC.EBHOFBFKNMB.KFIAHDNGHMI;
-		OGLHOJNMEBD.IBLHIAHECLK = NOLFMPDGCOC.OGLHOJNMEBD.IBLHIAHECLK;
-		OGLHOJNMEBD.KLHOKKPALOK = NOLFMPDGCOC.OGLHOJNMEBD.KLHOKKPALOK;
-		OGLHOJNMEBD.FMHECGHHKGB = NOLFMPDGCOC.OGLHOJNMEBD.FMHECGHHKGB;
-		OGLHOJNMEBD.EHKNIKHPGDN = NOLFMPDGCOC.OGLHOJNMEBD.EHKNIKHPGDN;
-		OGLHOJNMEBD.Level = NOLFMPDGCOC.OGLHOJNMEBD.Level;
-		OGLHOJNMEBD.ICDIEHCJBGA = NOLFMPDGCOC.OGLHOJNMEBD.ICDIEHCJBGA;
-		OGLHOJNMEBD.MDAAJFBENON = NOLFMPDGCOC.OGLHOJNMEBD.MDAAJFBENON;
-		OGLHOJNMEBD.AKKLOMFOLNO = NOLFMPDGCOC.OGLHOJNMEBD.AKKLOMFOLNO;
-		OGLHOJNMEBD.KFIAHDNGHMI = NOLFMPDGCOC.OGLHOJNMEBD.KFIAHDNGHMI;
+		HasValues.HasBonusDeliveryPrice = NOLFMPDGCOC.HasValues.HasBonusDeliveryPrice;
+		HasValues.HasBonusPrice = NOLFMPDGCOC.HasValues.HasBonusPrice;
+		HasValues.HasDeliveryTime = NOLFMPDGCOC.HasValues.HasDeliveryTime;
+		HasValues.Level = NOLFMPDGCOC.HasValues.Level;
+		HasValues.HasMilestone = NOLFMPDGCOC.HasValues.HasMilestone;
+		HasValues.HasPrice = NOLFMPDGCOC.HasValues.HasPrice;
+		HasValues.HasUpgradeLevel = NOLFMPDGCOC.HasValues.HasUpgradeLevel;
+		HasValues.HasType = NOLFMPDGCOC.HasValues.HasType;
+		Values.Attributes = NOLFMPDGCOC.Values.Attributes;
+		Values.BonusDeliveryPrice = NOLFMPDGCOC.Values.BonusDeliveryPrice;
+		Values.BonusPrice = NOLFMPDGCOC.Values.BonusPrice;
+		Values.DeliveryTime = NOLFMPDGCOC.Values.DeliveryTime;
+		Values.Level = NOLFMPDGCOC.Values.Level;
+		Values.Milestone = NOLFMPDGCOC.Values.Milestone;
+		Values.Price = NOLFMPDGCOC.Values.Price;
+		Values.UpgradeLevel = NOLFMPDGCOC.Values.UpgradeLevel;
+		Values.ItemType = NOLFMPDGCOC.Values.ItemType;
 	}
 
 	public int CompareTo(UpgradeData NOLFMPDGCOC)
 	{
-		return (OGLHOJNMEBD.AKKLOMFOLNO >= NOLFMPDGCOC.OGLHOJNMEBD.AKKLOMFOLNO) ? 1 : (-1);
+		return (Values.UpgradeLevel >= NOLFMPDGCOC.Values.UpgradeLevel) ? 1 : (-1);
 	}
 
 	public void RandomizeObscuredVars()
 	{
-		OGLHOJNMEBD.KLHOKKPALOK.GMCADPGOCHM();
-		OGLHOJNMEBD.FMHECGHHKGB.GMCADPGOCHM();
-		OGLHOJNMEBD.MDAAJFBENON.GMCADPGOCHM();
+		Values.BonusDeliveryPrice.RandomizeCryptoKey();
+		Values.BonusPrice.RandomizeCryptoKey();
+		Values.Price.RandomizeCryptoKey();
 	}
 }

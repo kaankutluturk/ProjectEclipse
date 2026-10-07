@@ -6,21 +6,21 @@ namespace Nekki.SF2.GUI.Dialogs
 {
 	public class SimpleDialog : BaseDialog
 	{
-		private const int KHCBFOBKIDF = 100;
+		private const int ContentOffsetY = 100;
 
-		private const int IBNKNFCOHMM = -20;
+		private const int ButtonsOffsetY = -20;
 
-		private const float IGANLEMDENC = 1680f;
+		private const float MaxFooterWidth = 1680f;
 
-		private const float MONACNLJJPI = 1100f;
+		private const float MinFooterWidth = 1100f;
 
-		private const float LODNLNEGOFL = 60f;
+		private const float FooterButtonPadding = 60f;
 
-		private const float LMIOPOFAEMM = -20f;
+		private const float HeaderOffsetY = -20f;
 
-		private const float IGDGCHMFJIF = 100f;
+		private const float DefaultFooterWidth = 100f;
 
-		private const int EAGOJOBFHBC = 103;
+		private const int CheckBoxLabelFontSize = 103;
 
 		[SerializeField]
 		private LabelAlias _label;
@@ -35,56 +35,56 @@ namespace Nekki.SF2.GUI.Dialogs
 
 		private bool _useLiteralText;
 
-		private string KKHONCCHNMG = string.Empty;
+		private string messageText = string.Empty;
 
-		private bool LOOHNJPAAHD;
+		private bool hasCheckBox;
 
-		private bool CJJBDGPDOFF;
+		private bool checkBoxInitialValue;
 
-		private string IAHHOEJJJHP = string.Empty;
+		private string checkBoxText = string.Empty;
 
-		private float OCMLLEDKLFL = 100f;
+		private float footerWidth = 100f;
 
-		protected LabelButton.FBMGEHJPPIK CHEHEHHMDNF = LabelButton.FBMGEHJPPIK.BUTTON_WHITE;
+		protected LabelButton.ButtonColor okButtonColor = LabelButton.ButtonColor.BUTTON_WHITE;
 
-		protected LabelButton.FBMGEHJPPIK AHJODMEKEGG;
+		protected LabelButton.ButtonColor cancelButtonColor;
 
 		public override void Init(object data)
 		{
 			_useLiteralText = false;
 			string dIKEFIIPNBE = string.Empty;
-			KBDHPMOMJLL hJNAHNICGMH = KBDHPMOMJLL.FOOTER_NONE;
+			FooterType hJNAHNICGMH = FooterType.FOOTER_NONE;
 			if (data != null)
 			{
 				SimpleDialogInfo jJMIOMABAKK = (SimpleDialogInfo)data;
 				_useLiteralText = jJMIOMABAKK.UseLiteralText;
-				BGJJDGOBPKA = jJMIOMABAKK.BKANENCBCOA;
-				EBCJGLPLHAD = jJMIOMABAKK.FFPLNDENING;
-				CHEHEHHMDNF = jJMIOMABAKK.HBMMFJGFCPH;
-				AHJODMEKEGG = jJMIOMABAKK.NLLFNHKKKBE;
+				defaultOkButtonAlias = jJMIOMABAKK.OkButtonText;
+				cancelButtonAlias = jJMIOMABAKK.CancelButtonText;
+				okButtonColor = jJMIOMABAKK.OkButtonStyle;
+				cancelButtonColor = jJMIOMABAKK.CancelButtonStyle;
 				_dlg = jJMIOMABAKK.Dlg;
-				KKHONCCHNMG = jJMIOMABAKK.GGDJIPKMKFC;
-				LOOHNJPAAHD = jJMIOMABAKK.KIGGOAIKFCB;
-				CJJBDGPDOFF = jJMIOMABAKK.HLFPOONJFNM;
-				IAHHOEJJJHP = jJMIOMABAKK.CJKCAIJLFPN;
+				messageText = jJMIOMABAKK.Message;
+				hasCheckBox = jJMIOMABAKK.ShowCheckBox;
+				checkBoxInitialValue = jJMIOMABAKK.CheckBoxChecked;
+				checkBoxText = jJMIOMABAKK.CheckBoxText;
 				dIKEFIIPNBE = jJMIOMABAKK.Title;
-				hJNAHNICGMH = jJMIOMABAKK.DHKDOHFKOOJ;
+				hJNAHNICGMH = jJMIOMABAKK.FooterType;
 			}
-			base.Init(dIKEFIIPNBE, BGJJDGOBPKA, EBCJGLPLHAD, hJNAHNICGMH);
+			base.Init(dIKEFIIPNBE, defaultOkButtonAlias, cancelButtonAlias, hJNAHNICGMH);
 		}
 
 		protected override void Start()
 		{
 			base.Start();
-			_label.set_Alias(_useLiteralText ? string.Empty : KKHONCCHNMG);
-			if (_useLiteralText) _label.set_text(KKHONCCHNMG);
-			_checkBox.gameObject.SetActive(LOOHNJPAAHD);
-			_checkBoxLabel.gameObject.SetActive(LOOHNJPAAHD);
-			if (LOOHNJPAAHD)
+			_label.set_Alias(_useLiteralText ? string.Empty : messageText);
+			if (_useLiteralText) _label.set_text(messageText);
+			_checkBox.gameObject.SetActive(hasCheckBox);
+			_checkBoxLabel.gameObject.SetActive(hasCheckBox);
+			if (hasCheckBox)
 			{
-				CreateCheckBox(CJJBDGPDOFF, IAHHOEJJJHP);
+				CreateCheckBox(checkBoxInitialValue, checkBoxText);
 			}
-			CGICCNNDLPC();
+			RefreshLayout();
 		}
 
 		protected override void SetupHeader(string title)
@@ -93,7 +93,7 @@ namespace Nekki.SF2.GUI.Dialogs
 			if (_useLiteralText) _header.set_text(title);
 		}
 
-		protected virtual void JNFDOIOKDJH(bool value)
+		protected virtual void OnCheckBoxChanged(bool value)
 		{
 			if (_dlg != null)
 			{
@@ -102,52 +102,52 @@ namespace Nekki.SF2.GUI.Dialogs
 			}
 		}
 
-		private void LHLIIGLPOOP()
+		private void LayoutContent()
 		{
-			float jMLAKAKDBBL = Math.Min(Math.Max(INNODIOFCPO(), 1100f), 1680f);
-			NJHHGCMGCGH(jMLAKAKDBBL);
-			JOGBCHAOLOG();
+			float jMLAKAKDBBL = Math.Min(Math.Max(CalculateRequiredFooterWidth(), 1100f), 1680f);
+			SetFooterWidth(jMLAKAKDBBL);
+			PositionFooterButtons();
 			_content.GetComponent<RectTransform>().sizeDelta = new Vector2(_content.GetComponent<RectTransform>().rect.width, _label.preferredHeight);
 		}
 
-		private void NJHHGCMGCGH(float JMLAKAKDBBL)
+		private void SetFooterWidth(float JMLAKAKDBBL)
 		{
-			OCMLLEDKLFL = JMLAKAKDBBL;
+			footerWidth = JMLAKAKDBBL;
 		}
 
-		private void JOGBCHAOLOG()
+		private void PositionFooterButtons()
 		{
-			if (GBECKKCHAFI == KBDHPMOMJLL.FOOTER_BOTH)
+			if (footerType == FooterType.FOOTER_BOTH)
 			{
 				float width = _btnOK.GetComponent<RectTransform>().rect.width;
 				float width2 = _btnCancel.GetComponent<RectTransform>().rect.width;
-				float num = (OCMLLEDKLFL - width - width2) / 3f;
-				float num2 = (0f - OCMLLEDKLFL) / 2f + num + width2 / 2f;
-				_btnCancel.transform.OKHPLHPBPKJ(num2);
+				float num = (footerWidth - width - width2) / 3f;
+				float num2 = (0f - footerWidth) / 2f + num + width2 / 2f;
+				_btnCancel.transform.SetLocalX(num2);
 				num2 += width2 / 2f + num + width / 2f;
-				_btnOK.transform.OKHPLHPBPKJ(num2);
+				_btnOK.transform.SetLocalX(num2);
 			}
-			else if (GBECKKCHAFI == KBDHPMOMJLL.FOOTER_OK)
+			else if (footerType == FooterType.FOOTER_OK)
 			{
-				_btnOK.transform.OKHPLHPBPKJ(0f);
+				_btnOK.transform.SetLocalX(0f);
 			}
-			else if (GBECKKCHAFI == KBDHPMOMJLL.FOOTER_CANCEL)
+			else if (footerType == FooterType.FOOTER_CANCEL)
 			{
-				_btnCancel.transform.OKHPLHPBPKJ(0f);
+				_btnCancel.transform.SetLocalX(0f);
 			}
 		}
 
-		private float INNODIOFCPO()
+		private float CalculateRequiredFooterWidth()
 		{
 			int num = 1;
 			float num2 = 0f;
-			if (GBECKKCHAFI == KBDHPMOMJLL.FOOTER_BOTH || GBECKKCHAFI == KBDHPMOMJLL.FOOTER_OK)
+			if (footerType == FooterType.FOOTER_BOTH || footerType == FooterType.FOOTER_OK)
 			{
 				num2 = _btnOK.GetComponent<RectTransform>().rect.width;
 				num++;
 			}
 			float num3 = 0f;
-			if (GBECKKCHAFI == KBDHPMOMJLL.FOOTER_BOTH || GBECKKCHAFI == KBDHPMOMJLL.FOOTER_CANCEL)
+			if (footerType == FooterType.FOOTER_BOTH || footerType == FooterType.FOOTER_CANCEL)
 			{
 				num3 = _btnCancel.GetComponent<RectTransform>().rect.width;
 				num++;
@@ -155,68 +155,68 @@ namespace Nekki.SF2.GUI.Dialogs
 			return num2 + num3 + 60f * (float)num;
 		}
 
-		private void CGICCNNDLPC()
+		private void RefreshLayout()
 		{
-			LHLIIGLPOOP();
-			JHADDLNINDI();
+			LayoutContent();
+			PositionStripesAndButtons();
 		}
 
 		private void CreateCheckBox(bool EPHHGNKDPEG, string DOEEIGAHKEN)
 		{
 			float num = _checkBox.GetComponent<RectTransform>().rect.height / 4f;
 			float bAINMLLIKOL = (0f - _label.preferredHeight) / 2f - 2f * num;
-			_checkBox.transform.BGNJGIACJBG(bAINMLLIKOL);
-			_label.transform.BGNJGIACJBG(_label.transform.localPosition.y + num);
+			_checkBox.transform.SetLocalY(bAINMLLIKOL);
+			_label.transform.SetLocalY(_label.transform.localPosition.y + num);
 			_checkBox.isOn = EPHHGNKDPEG;
-			_checkBox.onValueChanged.RemoveListener(JNFDOIOKDJH);
-			_checkBox.onValueChanged.AddListener(JNFDOIOKDJH);
+			_checkBox.onValueChanged.RemoveListener(OnCheckBoxChanged);
+			_checkBox.onValueChanged.AddListener(OnCheckBoxChanged);
 			_checkBoxLabel.set_LabelFontSize(103);
-			_checkBoxLabel.color = Constants.PJJIMHMJPAL;
+			_checkBoxLabel.color = Constants.DialogTextColor;
 			_checkBoxLabel.set_Alias(DOEEIGAHKEN);
-			_checkBoxLabel.transform.BGNJGIACJBG(bAINMLLIKOL);
+			_checkBoxLabel.transform.SetLocalY(bAINMLLIKOL);
 			float num2 = _checkBox.GetComponent<RectTransform>().rect.width + _checkBoxLabel.preferredWidth;
 			num2 = _checkBoxLabel.preferredWidth;
-			_checkBox.transform.OKHPLHPBPKJ((0f - num2) / 2f);
-			_checkBoxLabel.transform.OKHPLHPBPKJ(_checkBox.GetComponent<RectTransform>().rect.width / 2f);
+			_checkBox.transform.SetLocalX((0f - num2) / 2f);
+			_checkBoxLabel.transform.SetLocalX(_checkBox.GetComponent<RectTransform>().rect.width / 2f);
 		}
 
-		protected virtual void JHADDLNINDI()
+		protected virtual void PositionStripesAndButtons()
 		{
 			float num = _content.GetComponent<RectTransform>().rect.height / 2f + 160f;
 			if (_topStripe != null && _bottomStripe != null)
 			{
-				_topStripe.transform.BGNJGIACJBG(80f + num);
-				_bottomStripe.transform.BGNJGIACJBG(-120f - num);
+				_topStripe.transform.SetLocalY(80f + num);
+				_bottomStripe.transform.SetLocalY(-120f - num);
 			}
 			if (_header != null)
 			{
-				_header.transform.BGNJGIACJBG(num + -20f);
+				_header.transform.SetLocalY(num + -20f);
 			}
 			if (_btnOK != null)
 			{
-				_btnOK.transform.BGNJGIACJBG(0f - num + -20f);
+				_btnOK.transform.SetLocalY(0f - num + -20f);
 			}
 			if (_btnCancel != null)
 			{
-				_btnCancel.transform.BGNJGIACJBG(0f - num + -20f);
+				_btnCancel.transform.SetLocalY(0f - num + -20f);
 			}
 		}
 
-		protected override void PHKIJLEICHE(LabelButton GAMILDJHFDB, KBDHPMOMJLL MOPOCBKIKBI)
+		protected override void SetupButton(LabelButton GAMILDJHFDB, FooterType MOPOCBKIKBI)
 		{
 			string alias = string.Empty;
 			int buttonId = 0;
-			LabelButton.FBMGEHJPPIK color = LabelButton.FBMGEHJPPIK.BUTTON_WHITE;
+			LabelButton.ButtonColor color = LabelButton.ButtonColor.BUTTON_WHITE;
 			switch (MOPOCBKIKBI)
 			{
-			case KBDHPMOMJLL.FOOTER_CANCEL:
-				alias = EBCJGLPLHAD;
-				color = AHJODMEKEGG;
+			case FooterType.FOOTER_CANCEL:
+				alias = cancelButtonAlias;
+				color = cancelButtonColor;
 				buttonId = 0;
 				break;
-			case KBDHPMOMJLL.FOOTER_OK:
-				alias = BGJJDGOBPKA;
-				color = CHEHEHHMDNF;
+			case FooterType.FOOTER_OK:
+				alias = defaultOkButtonAlias;
+				color = okButtonColor;
 				buttonId = 1;
 				break;
 			}

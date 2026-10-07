@@ -4,35 +4,35 @@ using CodeStage.AntiCheat.ObscuredTypes;
 
 public class Reward
 {
-	private RewardPrize GMNOFEBABLM = new RewardPrize();
+	private RewardPrize basePrize = new RewardPrize();
 
-	private List<LogMessage> PCAMNBMIHIN = new List<LogMessage>();
+	private List<LogMessage> levelPrizes = new List<LogMessage>();
 
 	public Reward(XmlNode node, ushort CDCJKJNGPOE = 0, ushort MCDAHGPLLDO = 0)
 	{
-		GMNOFEBABLM.Parse(node, CDCJKJNGPOE, MCDAHGPLLDO);
+		basePrize.Parse(node, CDCJKJNGPOE, MCDAHGPLLDO);
 		foreach (XmlNode item2 in node.SelectNodes("Level"))
 		{
 			LogMessage item = default(LogMessage);
-			item.DPIIJICBGGA = new RewardPrize();
-			item.DPIIJICBGGA.Parse(item2, CDCJKJNGPOE, MCDAHGPLLDO);
-			item.BDJKDCMHEBI = item2.Attributes["Min"].ParseInt(int.MinValue);
-			item.CIKLDJLOFDJ = item2.Attributes["Max"].ParseInt(int.MaxValue);
-			item.DPIIJICBGGA.IsCloned = true;
-			PCAMNBMIHIN.Add(item);
+			item.Prize = new RewardPrize();
+			item.Prize.Parse(item2, CDCJKJNGPOE, MCDAHGPLLDO);
+			item.MinLevel = item2.Attributes["Min"].ParseInt(int.MinValue);
+			item.MaxLevel = item2.Attributes["Max"].ParseInt(int.MaxValue);
+			item.Prize.IsCloned = true;
+			levelPrizes.Add(item);
 		}
 	}
 
-	public RewardPrize KOBOIFJNPMO(int GNLOCMLBNHF)
+	public RewardPrize GetPrizeForLevel(int GNLOCMLBNHF)
 	{
 		RewardPrize cMHHEHILIIH = new RewardPrize();
 		cMHHEHILIIH.IsCloned = true;
-		cMHHEHILIIH.HNJGHOKCDJF(GMNOFEBABLM);
-		foreach (LogMessage item in PCAMNBMIHIN)
+		cMHHEHILIIH.Merge(basePrize);
+		foreach (LogMessage item in levelPrizes)
 		{
-			if (item.BDJKDCMHEBI <= GNLOCMLBNHF && GNLOCMLBNHF <= item.CIKLDJLOFDJ)
+			if (item.MinLevel <= GNLOCMLBNHF && GNLOCMLBNHF <= item.MaxLevel)
 			{
-				cMHHEHILIIH.HNJGHOKCDJF(item.DPIIJICBGGA);
+				cMHHEHILIIH.Merge(item.Prize);
 			}
 		}
 		return cMHHEHILIIH;
@@ -40,21 +40,21 @@ public class Reward
 
 	public void ApplyDenomination(int NPFOBKBJAOB)
 	{
-		GMNOFEBABLM.GBGNFPNCGED = (ObscuredLong)(GameUtils.GetDenominatedValue((ObscuredLong)(GMNOFEBABLM.GBGNFPNCGED), NPFOBKBJAOB));
-		foreach (LogMessage item in PCAMNBMIHIN)
+		basePrize.money = (ObscuredLong)(GameUtils.GetDenominatedValue((ObscuredLong)(basePrize.money), NPFOBKBJAOB));
+		foreach (LogMessage item in levelPrizes)
 		{
-			item.DPIIJICBGGA.GBGNFPNCGED = (ObscuredLong)(GameUtils.GetDenominatedValue((ObscuredLong)(item.DPIIJICBGGA.GBGNFPNCGED), NPFOBKBJAOB));
+			item.Prize.money = (ObscuredLong)(GameUtils.GetDenominatedValue((ObscuredLong)(item.Prize.money), NPFOBKBJAOB));
 		}
 	}
 
 	public void RandomizeObscuredVars()
 	{
-		GMNOFEBABLM.RandomizeObscuredVars();
-		PCAMNBMIHIN.ForEach((LogMessage DHDMNHCIPEH) =>
+		basePrize.RandomizeObscuredVars();
+		levelPrizes.ForEach((LogMessage DHDMNHCIPEH) =>
 		{
-			if (DHDMNHCIPEH.DPIIJICBGGA != null)
+			if (DHDMNHCIPEH.Prize != null)
 			{
-				DHDMNHCIPEH.DPIIJICBGGA.RandomizeObscuredVars();
+				DHDMNHCIPEH.Prize.RandomizeObscuredVars();
 			}
 		});
 	}

@@ -113,8 +113,8 @@ internal static class DevUnderworldValidator
 			foreach (XmlNode value in doc.SelectNodes("//key[.='sourceSize']/following-sibling::string[1]"))
 			{
 				var frame = new CocosAnimationData.SpriteFrameCocos();
-				frame.AAHNBCAFBMG(value.InnerText);
-				if (frame.PFIECJPOFFB().x <= 0 || frame.PFIECJPOFFB().y <= 0)
+				frame.SetSourceSize(value.InnerText);
+				if (frame.GetSourceSize().x <= 0 || frame.GetSourceSize().y <= 0)
 					errors.Add(resource + ": nonpositive source size");
 			}
 		}

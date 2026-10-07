@@ -18,7 +18,7 @@ public class CreditsScreenElement : SFMonoBehaviour<object>
 		lblNames.UpdateLabelFontSize();
 		int fontSize = lblRole.fontSize;
 		int fontSize2 = lblNames.fontSize;
-		lblNames.transform.BGNJGIACJBG(lblRole.transform.localPosition.y - (float)(fontSize - fontSize2));
+		lblNames.transform.SetLocalY(lblRole.transform.localPosition.y - (float)(fontSize - fontSize2));
 		GetComponent<LayoutElement>().minHeight = (float)Mathf.Abs(fontSize - fontSize2) + lblNames.preferredHeight;
 	}
 }

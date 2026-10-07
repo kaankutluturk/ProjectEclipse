@@ -7,27 +7,27 @@ namespace Nekki.SF2.GUI.Map
 {
 	public class InfoBattle : SFMonoBehaviour<object>
 	{
-		private enum HKMFFHDLDBG
+		private enum InfoLayer
 		{
 			zIcon = 0,
 			zContainer = 1,
 			zContent = 2
 		}
 
-		private enum JLEIGFAOBJL
+		private enum ContainerPart
 		{
 			zContainerSprite = 0,
 			zSlider = 1,
 			zComplete = 2
 		}
 
-		private enum DGDGGMBNEIN
+		private enum IndicatorsPart
 		{
 			zIndicators = 0,
 			zLabel = 1
 		}
 
-		private enum DGDCMJDCIIK
+		private enum DebugFightAction
 		{
 			SkipFight = 0,
 			RemoveFight = 1,
@@ -60,7 +60,7 @@ namespace Nekki.SF2.GUI.Map
 
 		public const float INTERMISSION_DESCRIPTION_OFFSET_Y = 16f;
 
-		private FightIDS DICGPFLPAIH = new FightIDS();
+		private FightIDS currentFightIds = new FightIDS();
 
 		[SerializeField]
 		private LabelAlias _lblBattleName;
@@ -83,7 +83,7 @@ namespace Nekki.SF2.GUI.Map
 		[SerializeField]
 		private Button _btnPeriodicReset;
 
-		private int KODLOCOEFON;
+		private int survivalSliderIndex;
 
 		[SerializeField]
 		private ProgressBar _immunityBar;
@@ -91,13 +91,13 @@ namespace Nekki.SF2.GUI.Map
 		[SerializeField]
 		private Text _immunityLabel;
 
-		private float CAMIKINNJLC;
+		private float immunityValue;
 
-		private float EMAIKDJGMGL;
+		private float immunityMaxValue;
 
-		private int ALHECCDENMO;
+		private int unusedFrameCounter;
 
-		private ContentBase MHPKMPKPBPG;
+		private ContentBase currentContent;
 
 		[SerializeField]
 		private ContentClosed _contentClosed;
@@ -126,12 +126,12 @@ namespace Nekki.SF2.GUI.Map
 		public void Init()
 		{
 			_contentDuel.AddEventListener(0, OnCallUpdate);
-			IDJDCJNEMDH();
-			KGHCKIFPONO();
-			DIBHHDHBKJA();
-			KOAAKKGJOKO();
+			InitFightButton();
+			InitSkipFightButton();
+			InitRemoveFightButton();
+			InitPeriodicResetButton();
 			ClearInfo();
-			Module.GetInstance().AddEventListener(4, EFPMIKBJMLD);
+			Module.GetInstance().AddEventListener(4, OnModuleEvent);
 		}
 
 		~InfoBattle()
@@ -147,73 +147,73 @@ namespace Nekki.SF2.GUI.Map
 		{
 			ClearInfo();
 			FightList jDIPBIHBGPF = null;
-			DICGPFLPAIH.SetFightIDSByString(string.Empty);
+			currentFightIds.SetFightIDSByString(string.Empty);
 			if (DPOOIONCEOA == null)
 			{
 				return;
 			}
-			RosterBattle dDNLCGOPAGC = DPOOIONCEOA.NNPNEABKHPP();
-			jDIPBIHBGPF = GameUtils.GKBHKJNGNPO(DPOOIONCEOA);
+			RosterBattle dDNLCGOPAGC = DPOOIONCEOA.GetRosterBattle();
+			jDIPBIHBGPF = GameUtils.GetOpenFight(DPOOIONCEOA);
 			if (jDIPBIHBGPF != null)
 			{
-				DICGPFLPAIH = new FightIDS(jDIPBIHBGPF.FightId);
+				currentFightIds = new FightIDS(jDIPBIHBGPF.FightId);
 			}
 			else
 			{
-				DICGPFLPAIH.SetFightIDSByZBF(string.Copy((DPOOIONCEOA.LKDFFCADHNO() == null) ? string.Empty : DPOOIONCEOA.LKDFFCADHNO().get_Name()), string.Copy(DPOOIONCEOA.get_Name()), string.Empty);
+				currentFightIds.SetFightIDSByZBF(string.Copy((DPOOIONCEOA.GetZone() == null) ? string.Empty : DPOOIONCEOA.GetZone().get_Name()), string.Copy(DPOOIONCEOA.get_Name()), string.Empty);
 			}
-			if (jDIPBIHBGPF != null && jDIPBIHBGPF.PPCNJPCPGGP != string.Empty)
+			if (jDIPBIHBGPF != null && jDIPBIHBGPF.AltImage != string.Empty)
 			{
 				string kHPKDMGDMAB = string.Empty;
-				if (jDIPBIHBGPF != null && jDIPBIHBGPF.PPCNJPCPGGP != string.Empty)
+				if (jDIPBIHBGPF != null && jDIPBIHBGPF.AltImage != string.Empty)
 				{
-					kHPKDMGDMAB = jDIPBIHBGPF.PPCNJPCPGGP;
+					kHPKDMGDMAB = jDIPBIHBGPF.AltImage;
 				}
-				UpdateAltImage(SF2Paths.BHCPOOOJAAK(), kHPKDMGDMAB);
+				UpdateAltImage(SF2Paths.GetUsersUiPath(), kHPKDMGDMAB);
 			}
-			_lblBattleName.SetAlias(DPOOIONCEOA.IGPOHDHPIIL());
-			UpdateIcon(DPOOIONCEOA.FGPAPMGHBDE());
+			_lblBattleName.SetAlias(DPOOIONCEOA.GetTitle());
+			UpdateIcon(DPOOIONCEOA.GetPreviewIcon());
             if (Eclipse.Modding.ModModeRuntime.TryCurrent(DPOOIONCEOA, out var modeFight))
             {
                 string reason = modeFight == null ? "This mode is complete or currently unavailable." : Eclipse.Modding.ModModeRuntime.EntryStatus(modeFight);
                 if (reason != "")
                 {
-                    _contentClosed.InitText(reason); MHPKMPKPBPG = _contentClosed; MHPKMPKPBPG.gameObject.SetActive(true);
+                    _contentClosed.InitText(reason); currentContent = _contentClosed; currentContent.gameObject.SetActive(true);
                 }
                 else
                 {
-                    string title = LocalizationManager.GetString(DPOOIONCEOA.IGPOHDHPIIL());
+                    string title = LocalizationManager.GetString(DPOOIONCEOA.GetTitle());
                     if (modeFight.get_Type() == BattleType.FightRaid)
                     {
                         _lblBattleName.set_text(title);
                         _contentBossesFinal.Init(DPOOIONCEOA, modeFight);
-                        MHPKMPKPBPG = _contentBossesFinal;
+                        currentContent = _contentBossesFinal;
                     }
                     else
                     {
                         _lblBattleName.set_text(title + Eclipse.Modding.ModModeRuntime.ProgressLabel(modeFight));
                         _contentTourChall.Init(DPOOIONCEOA, modeFight);
-                        MHPKMPKPBPG = _contentTourChall;
+                        currentContent = _contentTourChall;
                     }
-                    MHPKMPKPBPG.gameObject.SetActive(true); OHNNACAAOKH(DPOOIONCEOA, modeFight);
+                    currentContent.gameObject.SetActive(true); UpdateFightButton(DPOOIONCEOA, modeFight);
                 }
                 return;
             }
 			if (DPOOIONCEOA.get_Type() == BattleType.FightRaid)
 			{
 				_contentClosed.InitText("This raid is not available offline.");
-				MHPKMPKPBPG = _contentClosed;
-				MHPKMPKPBPG.gameObject.SetActive(true);
+				currentContent = _contentClosed;
+				currentContent.gameObject.SetActive(true);
 				_btnFight.gameObject.SetActive(false);
 				return;
 			}
-			if (jDIPBIHBGPF != null && GameUtils.HHKHINLNCJB && GameUtils.NFBKHONMMDL != jDIPBIHBGPF.Location + jDIPBIHBGPF.Battle.get_Name() + jDIPBIHBGPF.Name)
+			if (jDIPBIHBGPF != null && GameUtils.AutoWinPending && GameUtils.AutoWinFightKey != jDIPBIHBGPF.Location + jDIPBIHBGPF.Battle.get_Name() + jDIPBIHBGPF.Name)
 			{
-				GameUtils.HHKHINLNCJB = false;
+				GameUtils.AutoWinPending = false;
 			}
 			if (_btnRemoveFight != null)
 			{
-				if (DPOOIONCEOA.CHLIJGLJAOA() && SystemProperties.DBBOCENKMGD())
+				if (DPOOIONCEOA.HasCompletedFight() && SystemProperties.IsDebug())
 				{
 					_btnRemoveFight.gameObject.SetActive(true);
 				}
@@ -224,36 +224,36 @@ namespace Nekki.SF2.GUI.Map
 			}
 			if ((dDNLCGOPAGC != null && dDNLCGOPAGC.IsLocked()) || DPOOIONCEOA.get_Type() == BattleType.FightFake)
 			{
-				_contentClosed.Init(DPOOIONCEOA.GJOAJAIJHOE());
-				MHPKMPKPBPG = _contentClosed;
-				MHPKMPKPBPG.gameObject.SetActive(true);
+				_contentClosed.Init(DPOOIONCEOA.GetDescription());
+				currentContent = _contentClosed;
+				currentContent.gameObject.SetActive(true);
 			}
-			else if (jDIPBIHBGPF != null && jDIPBIHBGPF.CNNCIENODGE)
+			else if (jDIPBIHBGPF != null && jDIPBIHBGPF.IsLocked)
 			{
-				_contentClosed.Init(jDIPBIHBGPF.GJOAJAIJHOE());
-				MHPKMPKPBPG = _contentClosed;
-				MHPKMPKPBPG.gameObject.SetActive(true);
+				_contentClosed.Init(jDIPBIHBGPF.GetDescription());
+				currentContent = _contentClosed;
+				currentContent.gameObject.SetActive(true);
 			}
-			else if ((jDIPBIHBGPF != null && !jDIPBIHBGPF.ECEFCOJPBPG()) || DPOOIONCEOA.MNHLGELMOEJ() == ConditionStatus.StatusComplete || DPOOIONCEOA.MNHLGELMOEJ() == ConditionStatus.StatusIncomplete)
+			else if ((jDIPBIHBGPF != null && !jDIPBIHBGPF.IsReplayAvailable()) || DPOOIONCEOA.GetStatus() == ConditionStatus.StatusComplete || DPOOIONCEOA.GetStatus() == ConditionStatus.StatusIncomplete)
 			{
-				_contentCompleteOrLocked.Init(DPOOIONCEOA, DICGPFLPAIH);
-				MHPKMPKPBPG = _contentCompleteOrLocked;
-				MHPKMPKPBPG.gameObject.SetActive(true);
+				_contentCompleteOrLocked.Init(DPOOIONCEOA, currentFightIds);
+				currentContent = _contentCompleteOrLocked;
+				currentContent.gameObject.SetActive(true);
 			}
 			else
 			{
-				MMPGJGCCHHI(DPOOIONCEOA, jDIPBIHBGPF);
+				InitContentForBattle(DPOOIONCEOA, jDIPBIHBGPF);
 			}
 		}
 
 		public void ClearInfo()
 		{
-			if (MHPKMPKPBPG != null)
+			if (currentContent != null)
 			{
-				MHPKMPKPBPG.gameObject.SetActive(false);
-				MHPKMPKPBPG = null;
+				currentContent.gameObject.SetActive(false);
+				currentContent = null;
 			}
-			DICGPFLPAIH.SetFightIDSByString(string.Empty);
+			currentFightIds.SetFightIDSByString(string.Empty);
 			_lblBattleName.set_text(string.Empty);
 			_btnFight.gameObject.SetActive(false);
 			if (_btnRemoveFight != null)
@@ -284,12 +284,12 @@ namespace Nekki.SF2.GUI.Map
 			{
 				return GetCurrentFight().Battle;
 			}
-			return ListSF.MKHAAGMJOPG(DICGPFLPAIH);
+			return ListSF.GetBattleById(currentFightIds);
 		}
 
 		public FightList GetCurrentFight()
 		{
-			return ListSF.CHMCKGCDGCM(DICGPFLPAIH);
+			return ListSF.GetFightById(currentFightIds);
 		}
 
 		public LabelButton GetBtnFight()
@@ -304,7 +304,7 @@ namespace Nekki.SF2.GUI.Map
 
 		public void StartCurrentFight()
 		{
-			FightList jDIPBIHBGPF = ListSF.CHMCKGCDGCM(DICGPFLPAIH);
+			FightList jDIPBIHBGPF = ListSF.GetFightById(currentFightIds);
 			if (jDIPBIHBGPF != null)
 			{
 				StartFight(jDIPBIHBGPF);
@@ -326,45 +326,45 @@ namespace Nekki.SF2.GUI.Map
 			return 0f;
 		}
 
-		private void IDJDCJNEMDH()
+		private void InitFightButton()
 		{
 			_btnFight.SetAlias("startFight");
-			_btnFight.onClick.AddListener(FONNLNNBFHM);
+			_btnFight.onClick.AddListener(OnFightButtonClicked);
 			_btnFight.gameObject.SetActive(false);
 		}
 
-		private void KGHCKIFPONO()
+		private void InitSkipFightButton()
 		{
-			_btnSkipFight.gameObject.SetActive(SystemProperties.DBBOCENKMGD());
-			if (SystemProperties.DBBOCENKMGD())
+			_btnSkipFight.gameObject.SetActive(SystemProperties.IsDebug());
+			if (SystemProperties.IsDebug())
 			{
 				_btnSkipFight.onClick.AddListener(() =>
 				{
-					GPAPKBPIPJP(DGDCMJDCIIK.SkipFight);
+					OnDebugAction(DebugFightAction.SkipFight);
 				});
 			}
 		}
 
-		private void KOAAKKGJOKO()
+		private void InitPeriodicResetButton()
 		{
-			_btnPeriodicReset.gameObject.SetActive(SystemProperties.DBBOCENKMGD());
-			if (SystemProperties.DBBOCENKMGD())
+			_btnPeriodicReset.gameObject.SetActive(SystemProperties.IsDebug());
+			if (SystemProperties.IsDebug())
 			{
 				_btnPeriodicReset.onClick.AddListener(() =>
 				{
-					GPAPKBPIPJP(DGDCMJDCIIK.PeriodicReset);
+					OnDebugAction(DebugFightAction.PeriodicReset);
 				});
 			}
 		}
 
-		private void DIBHHDHBKJA()
+		private void InitRemoveFightButton()
 		{
-			_btnRemoveFight.gameObject.SetActive(SystemProperties.DBBOCENKMGD());
-			if (SystemProperties.DBBOCENKMGD())
+			_btnRemoveFight.gameObject.SetActive(SystemProperties.IsDebug());
+			if (SystemProperties.IsDebug())
 			{
 				_btnRemoveFight.onClick.AddListener(() =>
 				{
-					GPAPKBPIPJP(DGDCMJDCIIK.RemoveFight);
+					OnDebugAction(DebugFightAction.RemoveFight);
 				});
 			}
 		}
@@ -383,36 +383,36 @@ namespace Nekki.SF2.GUI.Map
 			}
 		}
 
-		private void OHNNACAAOKH(Battle DPOOIONCEOA, FightList KOMGFJOCEDN)
+		private void UpdateFightButton(Battle DPOOIONCEOA, FightList KOMGFJOCEDN)
 		{
 			_btnFight.gameObject.SetActive(true);
 			_btnFight.interactable = KOMGFJOCEDN == null ||
-				KOMGFJOCEDN.MeetsPlayerItemRequirements(ListSF.CCDKHLAMKKO().get_Parameters());
+				KOMGFJOCEDN.MeetsPlayerItemRequirements(ListSF.GetRoster().get_Parameters());
 			string alias = string.Empty;
 			if (KOMGFJOCEDN != null && KOMGFJOCEDN.get_Type() == BattleType.FightRaid)
 			{
 				BattleRaid pAHLFJIMKCL = DPOOIONCEOA as BattleRaid;
 				if (pAHLFJIMKCL != null)
 				{
-					List<CurrencyCostRule> list = KOMGFJOCEDN.LBGNOMEFLBA();
+					List<CurrencyCostRule> list = KOMGFJOCEDN.GetCurrencyCostRules();
 					if (list.Count == 0)
 					{
 						alias = "enterRaid";
 					}
 					else
 					{
-						string text = list[0].JFDCHNBPPNH();
-						int num = list[0].LHNHLANLHMN();
+						string text = list[0].GetCurrencyName();
+						int num = list[0].GetCurrencyValue();
 					}
 				}
 			}
-			else if (KOMGFJOCEDN != null && KOMGFJOCEDN.PCEPDPMOPKC())
+			else if (KOMGFJOCEDN != null && KOMGFJOCEDN.HasCurrencyCost())
 			{
-				List<CurrencyCostRule> list2 = KOMGFJOCEDN.LBGNOMEFLBA();
-				string gOHIIMFFFJI = list2[0].JFDCHNBPPNH();
-				int num2 = list2[0].LHNHLANLHMN();
-				GameCurrency cJJOFMHLFFM = GameUtils.AJDKHINLIDI.ICFINJLNCPM(gOHIIMFFFJI);
-				string mJBPMLCLMFN = cJJOFMHLFFM.MJBPMLCLMFN;
+				List<CurrencyCostRule> list2 = KOMGFJOCEDN.GetCurrencyCostRules();
+				string gOHIIMFFFJI = list2[0].GetCurrencyName();
+				int num2 = list2[0].GetCurrencyValue();
+				GameCurrency cJJOFMHLFFM = GameUtils.GameCurrencies.GetCurrencyByName(gOHIIMFFFJI);
+				string mJBPMLCLMFN = cJJOFMHLFFM.Icon;
 				alias = "startFight |<" + mJBPMLCLMFN + "><offsetX=10>" + num2 + "</>";
 			}
 			else
@@ -422,10 +422,10 @@ namespace Nekki.SF2.GUI.Map
 			_btnFight.SetAlias(alias);
 		}
 
-		private void FONNLNNBFHM()
+		private void OnFightButtonClicked()
 		{
-			GameUtils.HHKHINLNCJB = false;
-			FightList jDIPBIHBGPF = ListSF.CHMCKGCDGCM(DICGPFLPAIH);
+			GameUtils.AutoWinPending = false;
+			FightList jDIPBIHBGPF = ListSF.GetFightById(currentFightIds);
 			if (jDIPBIHBGPF == null)
 			{
 				return;
@@ -436,32 +436,32 @@ namespace Nekki.SF2.GUI.Map
             }
             else if (jDIPBIHBGPF.get_Type() == BattleType.FightPeriodic)
 			{
-				if (!SystemProperties.DCKPKCIFOAG())
+				if (!SystemProperties.CheckOnline())
 				{
-					DialogsOpener.DNFMECAEDLJ();
+					DialogsOpener.OpenDuelLockedDialog();
 				}
 				else
 				{
-					GlobalTimer.ServerTimeSync(BDHAOMGEKBA, BDHAOMGEKBA);
+					GlobalTimer.ServerTimeSync(OnServerTimeSynced, OnServerTimeSynced);
 				}
 			}
 			else if (jDIPBIHBGPF.get_Type() == BattleType.FightRaid)
 			{
 				Battle cNAOMDMIGLJ = jDIPBIHBGPF.Battle;
 				BattleRaid pAHLFJIMKCL = (BattleRaid)cNAOMDMIGLJ;
-				if (pAHLFJIMKCL.DJCDFEAMPDA(jDIPBIHBGPF))
+				if (pAHLFJIMKCL.CanAffordFightCost(jDIPBIHBGPF))
 				{
-					bool flag = ListSF.CCDKHLAMKKO().LDHANGLFDPJ();
-					if (jDIPBIHBGPF.CENNLFIPNLH().Count != 0 && flag)
+					bool flag = ListSF.GetRoster().GetRaidRemindRandomRule();
+					if (jDIPBIHBGPF.GetRandomRules().Count != 0 && flag)
 					{
 					}
 				}
 				else
 				{
-					List<CurrencyCostRule> list = jDIPBIHBGPF.LBGNOMEFLBA();
+					List<CurrencyCostRule> list = jDIPBIHBGPF.GetCurrencyCostRules();
 					if (list.Count != 0)
 					{
-						JEKLMNFLDGK(list[0] as RaidCurrencyCostRule);
+						ShowRaidNotEnoughKeys(list[0] as RaidCurrencyCostRule);
 					}
 				}
 			}
@@ -471,7 +471,7 @@ namespace Nekki.SF2.GUI.Map
 			}
 		}
 
-		private void MMPGJGCCHHI(Battle DPOOIONCEOA, FightList KOMGFJOCEDN)
+		private void InitContentForBattle(Battle DPOOIONCEOA, FightList KOMGFJOCEDN)
 		{
 			switch (DPOOIONCEOA.get_Type())
 			{
@@ -480,72 +480,72 @@ namespace Nekki.SF2.GUI.Map
 			case BattleType.FightStory:
 			case BattleType.FightReplayable:
 				_contentTourChall.Init(DPOOIONCEOA, KOMGFJOCEDN);
-				MHPKMPKPBPG = _contentTourChall;
-				MHPKMPKPBPG.gameObject.SetActive(true);
+				currentContent = _contentTourChall;
+				currentContent.gameObject.SetActive(true);
 				break;
 			case BattleType.FightBosses:
 			case BattleType.FightBossesReplayable:
 			case BattleType.FightFinalTitan:
 			{
-				int num = DPOOIONCEOA.KCIKELGFHOA();
+				int num = DPOOIONCEOA.GetFightCount();
 				if (KOMGFJOCEDN.Index != num - 1)
 				{
 					_contentBosses.Init(DPOOIONCEOA, KOMGFJOCEDN);
-					MHPKMPKPBPG = _contentBosses;
+					currentContent = _contentBosses;
 				}
 				else
 				{
 					_contentBossesFinal.Init(DPOOIONCEOA, KOMGFJOCEDN);
-					MHPKMPKPBPG = _contentBossesFinal;
+					currentContent = _contentBossesFinal;
 				}
-				MHPKMPKPBPG.gameObject.SetActive(true);
+				currentContent.gameObject.SetActive(true);
 				break;
 			}
 			case BattleType.FightFinal:
 			case BattleType.FightFinalReplayable:
 				_contentBossesFinal.Init(DPOOIONCEOA, KOMGFJOCEDN);
-				MHPKMPKPBPG = _contentBossesFinal;
-				MHPKMPKPBPG.gameObject.SetActive(true);
+				currentContent = _contentBossesFinal;
+				currentContent.gameObject.SetActive(true);
 				break;
 			case BattleType.FightPeriodic:
 				_contentDuel.Init(DPOOIONCEOA, KOMGFJOCEDN);
-				MHPKMPKPBPG = _contentDuel;
-				MHPKMPKPBPG.gameObject.SetActive(true);
+				currentContent = _contentDuel;
+				currentContent.gameObject.SetActive(true);
 				break;
 			case BattleType.FightSurvival:
 				_contentSurvival.Init(DPOOIONCEOA);
-				MHPKMPKPBPG = _contentSurvival;
-				MHPKMPKPBPG.gameObject.SetActive(true);
+				currentContent = _contentSurvival;
+				currentContent.gameObject.SetActive(true);
 				break;
 			case BattleType.FightBossesIntermission:
 				_contentBossIntermission.Init(DPOOIONCEOA);
-				MHPKMPKPBPG = _contentBossIntermission;
-				MHPKMPKPBPG.gameObject.SetActive(true);
+				currentContent = _contentBossIntermission;
+				currentContent.gameObject.SetActive(true);
 				break;
 			default:
-				LLLOJBFMONN.Write("ERROR: openStatus() - unknown fight type: " + DPOOIONCEOA.get_Type());
+				GameLog.Write("ERROR: openStatus() - unknown fight type: " + DPOOIONCEOA.get_Type());
 				break;
 			}
-			OHNNACAAOKH(DPOOIONCEOA, KOMGFJOCEDN);
+			UpdateFightButton(DPOOIONCEOA, KOMGFJOCEDN);
 		}
 
 		private void StartFight(FightList KGKDKENMAOA)
 		{
 			if (KGKDKENMAOA == null ||
-				!KGKDKENMAOA.MeetsPlayerItemRequirements(ListSF.CCDKHLAMKKO().get_Parameters()))
+				!KGKDKENMAOA.MeetsPlayerItemRequirements(ListSF.GetRoster().get_Parameters()))
 			{
 				return;
 			}
 			Battle cNAOMDMIGLJ = KGKDKENMAOA.Battle;
 			if (cNAOMDMIGLJ.get_Type() == BattleType.FightSurvival)
 			{
-				ListSF.CCDKHLAMKKO().set_IndexSlider((uint)KODLOCOEFON);
+				ListSF.GetRoster().set_IndexSlider((uint)survivalSliderIndex);
 			}
 			Battle dPOOIONCEOA = ((cNAOMDMIGLJ.get_Type() != BattleType.FightBosses && cNAOMDMIGLJ.get_Type() != BattleType.FightBossesReplayable && cNAOMDMIGLJ.get_Type() != BattleType.FightFinalTitan) ? null : cNAOMDMIGLJ);
 			GameUtils.StartFight(KGKDKENMAOA, false, dPOOIONCEOA);
 		}
 
-		private void PDFOEKDFNHI()
+		private void ResetPeriodicBattle()
 		{
 			Battle currentBattle = GetCurrentBattle();
 			if (currentBattle != null)
@@ -558,7 +558,7 @@ namespace Nekki.SF2.GUI.Map
 			}
 		}
 
-		private void GPAPKBPIPJP(DGDCMJDCIIK PNBIFIIMEDL)
+		private void OnDebugAction(DebugFightAction PNBIFIIMEDL)
 		{
 			Battle currentBattle = GetCurrentBattle();
 			if (currentBattle == null)
@@ -567,32 +567,32 @@ namespace Nekki.SF2.GUI.Map
 			}
 			switch (PNBIFIIMEDL)
 			{
-			case DGDCMJDCIIK.PeriodicReset:
-				PDFOEKDFNHI();
+			case DebugFightAction.PeriodicReset:
+				ResetPeriodicBattle();
 				return;
-			case DGDCMJDCIIK.RemoveFight:
-				DFMGJEIJLCJ();
-				currentBattle.BKGJCODJHKF();
-				ListSF.CGJCKGAFPED();
+			case DebugFightAction.RemoveFight:
+				RemoveLinkedQuestBattle();
+				currentBattle.ResetLastFightProgress();
+				ListSF.RefreshConditionStatuses();
 				UpdateBattleInfo(currentBattle);
 				return;
 			}
-			GameUtils.HHKHINLNCJB = true;
+			GameUtils.AutoWinPending = true;
 			FightList currentFight = GetCurrentFight();
-			GameUtils.NFBKHONMMDL = ((currentFight != null) ? (currentFight.Location + currentFight.Battle.get_Name() + currentFight.Name) : string.Empty);
+			GameUtils.AutoWinFightKey = ((currentFight != null) ? (currentFight.Location + currentFight.Battle.get_Name() + currentFight.Name) : string.Empty);
 			if (currentFight == null)
 			{
 				return;
 			}
 			if (currentFight.get_Type() == BattleType.FightPeriodic)
 			{
-				if (!SystemProperties.DCKPKCIFOAG())
+				if (!SystemProperties.CheckOnline())
 				{
-					DialogsOpener.DNFMECAEDLJ();
+					DialogsOpener.OpenDuelLockedDialog();
 				}
 				else
 				{
-					GlobalTimer.ServerTimeSync(BDHAOMGEKBA, BDHAOMGEKBA);
+					GlobalTimer.ServerTimeSync(OnServerTimeSynced, OnServerTimeSynced);
 				}
 				return;
 			}
@@ -600,7 +600,7 @@ namespace Nekki.SF2.GUI.Map
 			StartFight(currentFight);
 			if (jDIPBIHBGPF != null)
 			{
-				int num = jDIPBIHBGPF.APKPCGDBMEP().Count - 2;
+				int num = jDIPBIHBGPF.GetRewards().Count - 2;
 				if (num < 0)
 				{
 					num = 0;
@@ -610,16 +610,16 @@ namespace Nekki.SF2.GUI.Map
 			UpdateBattleInfo(GetCurrentBattle());
 		}
 
-		private void BDHAOMGEKBA()
+		private void OnServerTimeSynced()
 		{
 			if (!GlobalTimer.get_IsSynchronized())
 			{
-				DialogsOpener.DNFMECAEDLJ();
+				DialogsOpener.OpenDuelLockedDialog();
 				UpdateBattleInfo(GetCurrentBattle());
 				return;
 			}
 			FightList currentFight = GetCurrentFight();
-			if (currentFight != null && !currentFight.ECEFCOJPBPG())
+			if (currentFight != null && !currentFight.IsReplayAvailable())
 			{
 				UpdateBattleInfo(GetCurrentBattle());
 			}
@@ -629,38 +629,38 @@ namespace Nekki.SF2.GUI.Map
 			}
 		}
 
-		private void EFPMIKBJMLD(object data)
+		private void OnModuleEvent(object data)
 		{
-			GameUtils.HHKHINLNCJB = false;
+			GameUtils.AutoWinPending = false;
 		}
 
-		private void DFMGJEIJLCJ()
+		private void RemoveLinkedQuestBattle()
 		{
 			FightList currentFight = GetCurrentFight();
 			if (currentFight != null && currentFight.FightId.ToString() == "ZONE_6|BOSS_SAMURAI|6")
 			{
 				FightIDS dIAIIPCBMFL = new FightIDS("ZONE_6", "QuestBattle", string.Empty);
-				Battle cGJCGEBPCAF = ListSF.MKHAAGMJOPG(dIAIIPCBMFL);
+				Battle cGJCGEBPCAF = ListSF.GetBattleById(dIAIIPCBMFL);
 				if (cGJCGEBPCAF != null)
 				{
-					cGJCGEBPCAF.BKGJCODJHKF();
+					cGJCGEBPCAF.ResetLastFightProgress();
 				}
 			}
 		}
 
-		private void JEKLMNFLDGK(RaidCurrencyCostRule HNBFMAKFJAM)
+		private void ShowRaidNotEnoughKeys(RaidCurrencyCostRule HNBFMAKFJAM)
 		{
 			if (HNBFMAKFJAM == null)
 			{
-				LLLOJBFMONN.Error("showRaidsNotEnoughKeys rule is NULL");
+				GameLog.Error("showRaidsNotEnoughKeys rule is NULL");
 			}
 			else
 			{
-				string text = HNBFMAKFJAM.JFDCHNBPPNH();
+				string text = HNBFMAKFJAM.GetCurrencyName();
 			}
 		}
 
-		private void GLGFKFICAOC(object data)
+		private void OnRaidUpdated(object data)
 		{
 			Battle currentBattle = GetCurrentBattle();
 			if (currentBattle != null && currentBattle.get_Type() == BattleType.FightRaid)

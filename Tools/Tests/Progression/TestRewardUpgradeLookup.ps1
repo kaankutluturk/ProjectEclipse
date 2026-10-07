@@ -3,7 +3,7 @@ $root=Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $PSScriptRoot))
 $fixture=Join-Path $root ('Temp/RewardUpgradeLookup-'+[Guid]::NewGuid().ToString('N'))
 New-Item -ItemType Directory -Path $fixture | Out-Null
 $source=Get-Content -Raw -LiteralPath (Join-Path $root 'Assets/Scripts/Assembly-CSharp/ItemInfo.cs')
-$methods=@('public int FMHIKMNJHDL','public List<UpgradeData> DNFDAGFAANJ','public ItemInfo HIOBANJPMKF') | ForEach-Object {
+$methods=@('public int GetMaxLocalUpgradeLevel','public List<UpgradeData> GetUpgrades','public ItemInfo GetUpgradeItemAtOrAboveUpgradeLevel') | ForEach-Object {
  $match=[regex]::Match($source,'(?ms)^\t'+[regex]::Escape($_)+'\(.*?^\t\}')
  if(!$match.Success){throw "Missing native method $_"};$match.Value
 }
@@ -13,11 +13,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
 class UpgradeData:IComparable<UpgradeData> {
- public struct Fields {public int AKKLOMFOLNO,Level;}
- public Fields OGLHOJNMEBD;
- public int CompareTo(UpgradeData other)=>OGLHOJNMEBD.AKKLOMFOLNO>=other.OGLHOJNMEBD.AKKLOMFOLNO?1:-1;
+ public struct Fields {public int UpgradeLevel,Level;}
+ public Fields Values;
+ public int CompareTo(UpgradeData other)=>Values.UpgradeLevel>=other.Values.UpgradeLevel?1:-1;
 }
-class UpgradeDataContainer {public List<UpgradeData> KPAPEBOAKIE=new List<UpgradeData>();}
+class UpgradeDataContainer {public List<UpgradeData> Upgrades=new List<UpgradeData>();}
 class ListSF {
  public static readonly ListSF Catalog=new ListSF();public static ListSF GetItems()=>Catalog;
  public Dictionary<string,UpgradeDataContainer> Templates=new Dictionary<string,UpgradeDataContainer>();
@@ -25,24 +25,24 @@ class ListSF {
 }
 class ItemInfo {
  public List<UpgradeData> LocalUpgrades=new List<UpgradeData>();public string UpgradeTemplateName;public int UpgradeLevel,Level;
- public ItemInfo MPADIPJLMLH(UpgradeData data)=>new ItemInfo{UpgradeLevel=data.OGLHOJNMEBD.AKKLOMFOLNO,Level=data.OGLHOJNMEBD.Level};
+ public ItemInfo CreateUpgradedItem(UpgradeData data)=>new ItemInfo{UpgradeLevel=data.Values.UpgradeLevel,Level=data.Values.Level};
  /* METHODS */
 }
 class Program {
  static int checks;static void Check(bool value,string message){checks++;if(!value)throw new Exception(message);}
- static UpgradeData Row(int level,int encoded)=>new UpgradeData{OGLHOJNMEBD=new UpgradeData.Fields{Level=level,AKKLOMFOLNO=encoded}};
+ static UpgradeData Row(int level,int encoded)=>new UpgradeData{Values=new UpgradeData.Fields{Level=level,UpgradeLevel=encoded}};
  static UpgradeData Parse(XElement e)=>Row((int?)e.Attribute("Level")??0,(int?)e.Attribute("UpgradeLevel")??0);
  static void Main(string[] args){
   var item=new ItemInfo{UpgradeTemplateName="test",UpgradeLevel=100};item.LocalUpgrades.Add(Row(1,100));
-  ListSF.Catalog.Templates["test"]=new UpgradeDataContainer{KPAPEBOAKIE=new List<UpgradeData>{Row(5,500),Row(1,90),Row(3,300)}};
-  Check(item.HIOBANJPMKF(100).UpgradeLevel==100,"Local exact upgrade lost");
-  Check(item.HIOBANJPMKF(200).UpgradeLevel==300,"Native next-entry semantics changed");
-  Check(item.HIOBANJPMKF(501)==null,"Above-table request silently clamped");
-  Check(item.DNFDAGFAANJ().Select(r=>r.OGLHOJNMEBD.AKKLOMFOLNO).SequenceEqual(new[]{100,300,500}),"Local/template merge or ordering changed");
-  Check(item.DNFDAGFAANJ(true,3).Single().OGLHOJNMEBD.AKKLOMFOLNO==300,"Ordinal filter changed");
+  ListSF.Catalog.Templates["test"]=new UpgradeDataContainer{Upgrades=new List<UpgradeData>{Row(5,500),Row(1,90),Row(3,300)}};
+  Check(item.GetUpgradeItemAtOrAboveUpgradeLevel(100).UpgradeLevel==100,"Local exact upgrade lost");
+  Check(item.GetUpgradeItemAtOrAboveUpgradeLevel(200).UpgradeLevel==300,"Native next-entry semantics changed");
+  Check(item.GetUpgradeItemAtOrAboveUpgradeLevel(501)==null,"Above-table request silently clamped");
+  Check(item.GetUpgrades().Select(r=>r.Values.UpgradeLevel).SequenceEqual(new[]{100,300,500}),"Local/template merge or ordering changed");
+  Check(item.GetUpgrades(true,3).Single().Values.UpgradeLevel==300,"Ordinal filter changed");
   var list=XDocument.Load(args[0]);
   foreach(var template in list.Descendants("Upgrades").Where(e=>e.Attribute("Name")!=null))
-   ListSF.Catalog.Templates[(string)template.Attribute("Name")]=new UpgradeDataContainer{KPAPEBOAKIE=template.Elements("Upgrade").Select(Parse).ToList()};
+   ListSF.Catalog.Templates[(string)template.Attribute("Name")]=new UpgradeDataContainer{Upgrades=template.Elements("Upgrade").Select(Parse).ToList()};
   var items=list.Root.Element("Items").Elements("Item").ToDictionary(e=>(string)e.Attribute("Name"));
   int rows=0,missing=0,exact=0,higher=0,unavailable=0,unsupported=0;
   var stages=XDocument.Load(args[1]);
@@ -53,7 +53,7 @@ class Program {
    var upgrades=definition.Element("Upgrades");var native=new ItemInfo{UpgradeTemplateName=(string)upgrades?.Attribute("Template")};
    if(upgrades!=null)native.LocalUpgrades.AddRange(upgrades.Elements("Upgrade").Select(Parse));
    for(int level=1;level<=52;level++){
-    var chosen=native.HIOBANJPMKF(level*100);
+    var chosen=native.GetUpgradeItemAtOrAboveUpgradeLevel(level*100);
     if(chosen==null)unavailable++;else if(chosen.UpgradeLevel==level*100)exact++;else higher++;
    }
   }

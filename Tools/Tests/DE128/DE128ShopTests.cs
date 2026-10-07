@@ -8,10 +8,10 @@ using Eclipse.Modding;
 // Catalog resolution, Lua registration and archive assertions use production data.
 public sealed class ItemInfo
 {
-    public string Name, MMHIKEIDDNB;
-    public bool DCHJDPCEODD, Hidden;
+    public string Name, GroupId;
+    public bool IsShopVisible, Hidden;
     public XmlNode NodeXML;
-    public bool GOKHJMOEGIJ() => Hidden;
+    public bool IsHidden() => Hidden;
     internal bool TryOverrideInitialProfile(int level, int upgradeLevel,
         System.Collections.Generic.IReadOnlyDictionary<string, int> stats, string upgradeTemplate,
         string legacyPaidItem, bool clearLocalUpgrades, out IDisposable lifetime)
@@ -25,7 +25,7 @@ public sealed class Roster
 {
     public int Level;
     public string Group;
-    public bool FLFKOIPCEPI(string group) => Group == group;
+    public bool HasShopLock(string group) => Group == group;
 }
 namespace Eclipse.Modding
 {
@@ -129,7 +129,7 @@ internal static class DE128ShopTests
                     "DE combat family differs without an active subtype patch: " + name);
             check(File.Exists(Path.Combine(repository, "Assets/Resources/ui/items", item.GetAttribute("Image") + ".png")) ||
                 icon != null, "Missing imported shop icon: " + name);
-            var native = new ItemInfo { Name = name, NodeXML = item, DCHJDPCEODD = false, MMHIKEIDDNB = "old_offer" };
+            var native = new ItemInfo { Name = name, NodeXML = item, IsShopVisible = false, GroupId = "old_offer" };
             ModRuntime.Scripts = new ModScriptSession { Content = catalog };
             profile.Group = policy.RequiredGroup;
             profile.Level = policy.MinimumLevel - 1;
@@ -173,7 +173,7 @@ internal static class DE128ShopTests
             var perk = (XmlElement)row.SelectSingleNode("Enchantments/Perk");
             check(enchantment.Perk == CoreContentImporter.PerkId(perk.GetAttribute("Name")) &&
                 enchantment.Aspect == int.Parse(((XmlElement)perk["Set"]).GetAttribute("Aspect")), "Restored weapon default enchantment drift.");
-            var native = new ItemInfo { Name = weapon.Id.ToString(), DCHJDPCEODD = true };
+            var native = new ItemInfo { Name = weapon.Id.ToString(), IsShopVisible = true };
             ModRuntime.Scripts = new ModScriptSession { Content = catalog };
             profile.Level = listing.Level; profile.Group = "";
             check(!ShopAvailabilityPolicy.IsAvailable(native, profile), "Restored weapon bypassed act gate.");
@@ -191,7 +191,7 @@ internal static class DE128ShopTests
         // Use one canonical weapon in a fresh catalog to test generic composition.
         CoreContentImporter.ImportWeapons(baseCatalog, new[] { xml.DocumentElement }, null);
         target = CoreContentImporter.WeaponId(xml.DocumentElement.GetAttribute("Name"));
-        var probe = new ItemInfo { Name = xml.DocumentElement.GetAttribute("Name"), NodeXML = xml.DocumentElement, DCHJDPCEODD = true };
+        var probe = new ItemInfo { Name = xml.DocumentElement.GetAttribute("Name"), NodeXML = xml.DocumentElement, IsShopVisible = true };
         check(!ShopAvailabilityPolicy.IsAvailable(null, profile) && !ShopAvailabilityPolicy.IsAvailable(probe, null), "Null guards changed.");
         string noPolicy = ModSaveData.ComputeContentSetFingerprint(new[] { mod }, baseCatalog);
         using (var tx = baseCatalog.BeginRegistration(mod))

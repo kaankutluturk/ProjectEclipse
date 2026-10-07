@@ -2,24 +2,24 @@ using System.Xml;
 
 public static class FightGUI
 {
-	private static float FFKBDBGCCEN;
+	private static float lifeBarMin;
 
-	public static float FCPEPJALAJF
+	public static float LifeBarMin
 	{
 		get
 		{
-			return JIBDDCOHPCC();
+			return GetLifeBarMin();
 		}
 	}
 
-	public static float JIBDDCOHPCC()
+	public static float GetLifeBarMin()
 	{
-		return FFKBDBGCCEN;
+		return lifeBarMin;
 	}
 
 	public static void Parse(XmlNode node)
 	{
 		PerkGUI.Parse(node["PerkIcons"]);
-		FFKBDBGCCEN = node["LifeBarMin"].PNJPEDPDMCP().ParseFloat();
+		lifeBarMin = node["LifeBarMin"].FirstAttribute().ParseFloat();
 	}
 }

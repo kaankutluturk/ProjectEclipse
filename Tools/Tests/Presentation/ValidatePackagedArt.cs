@@ -59,7 +59,7 @@ public static class ValidatePackagedArt
         AssetMetadata backgroundMetadata;
         Require(new CoreAssetProvider().TryDescribe(AssetId.Parse("core:Textures/Locations/battlefield/battlefield_bg1.back_1"), out backgroundMetadata)
             && backgroundMetadata.Kind == AssetKind.Sprite, "Arena background cannot resolve through the public asset API.");
-        Require(LocationSpriteCache.PPBEKKDIJKC("core:textures/locations/battlefield", "battlefield_bg1.back_1", "") == showcaseBackground,
+        Require(LocationSpriteCache.GetSprite("core:textures/locations/battlefield", "battlefield_bg1.back_1", "") == showcaseBackground,
             "Arena sprite failed through the recovered location cache.");
         TextAsset manifest = Resources.Load<TextAsset>(PackagedArtCatalog.CatalogResourcePath);
         Require(manifest != null, "Packaged catalog missing");
@@ -1015,13 +1015,13 @@ public static class ValidatePackagedArt
 
             ListSF.ResetModdingTestItems();
             ListSF.SeedModdingTestCoreItems();
-            GameUtils.FDEJIIDIPBI.SeedCore(Path.Combine(GameplayContentArchive.GetXmlRoot(), "perks.xml"));
+            GameUtils.PerkItemList.SeedCore(Path.Combine(GameplayContentArchive.GetXmlRoot(), "perks.xml"));
             ItemInfo vanillaKatana = ListSF.GetItems().GetItemByName("WEAPON_KATANA");
             ItemInfo vanillaBody = ListSF.GetItems().GetItemByName("Body");
             ItemInfo vanillaHead = ListSF.GetItems().GetItemByName("Head");
             ItemInfo vanillaNoRanged = ListSF.GetItems().GetItemByName("NoRanged");
             ItemInfo vanillaNoMagic = ListSF.GetItems().GetItemByName("NoMagic");
-            ItemInfo[] duplicateRanged = ListSF.GetItems().HCDLKHKBEPF().Where(x => x.Name == "GlaivebowArrow").ToArray();
+            ItemInfo[] duplicateRanged = ListSF.GetItems().GetAllItems().Where(x => x.Name == "GlaivebowArrow").ToArray();
             Require(vanillaKatana != null, "Vanilla weapon fixture was not seeded");
             Require(vanillaBody != null && vanillaHead != null && vanillaNoRanged != null && vanillaNoMagic != null &&
                 duplicateRanged.Length == 2, "Vanilla equipment fixture was not seeded completely");
@@ -1043,28 +1043,28 @@ public static class ValidatePackagedArt
                 "ModRuntime did not isolate the failing Lua mod during startup");
             const string externalPerkId = "example.enchantment:perks/eclipse_lifesteal";
             const string externalEnchantmentId = "example.enchantment:enchantments/eclipse_lifesteal_weapon";
-            PerkInfoItem runtimePerk = GameUtils.FDEJIIDIPBI.ABAGJKMKCBA(externalPerkId);
-            PerkInfoItem runtimeEnchantment = GameUtils.FDEJIIDIPBI.ABAGJKMKCBA(externalEnchantmentId);
+            PerkInfoItem runtimePerk = GameUtils.PerkItemList.FindBasePerk(externalPerkId);
+            PerkInfoItem runtimeEnchantment = GameUtils.PerkItemList.FindBasePerk(externalEnchantmentId);
             string externalPresentationTitle = string.Empty;
             string externalPresentationDescription = string.Empty;
-            Require(runtimePerk != null && runtimePerk.HAAKMBKCMCO.Attributes["Alias"]?.Value ==
+            Require(runtimePerk != null && runtimePerk.DefaultNode.Attributes["Alias"]?.Value ==
                     "example.enchantment:localization/perk.eclipse_lifesteal" &&
-                runtimePerk.HAAKMBKCMCO["Set"] == null && runtimeEnchantment != null &&
-                runtimeEnchantment.HAAKMBKCMCO.Attributes["Alias"]?.Value ==
+                runtimePerk.DefaultNode["Set"] == null && runtimeEnchantment != null &&
+                runtimeEnchantment.DefaultNode.Attributes["Alias"]?.Value ==
                     "example.enchantment:localization/enchantment.eclipse_lifesteal" &&
-                runtimeEnchantment.HAAKMBKCMCO.Attributes["Description"]?.Value ==
+                runtimeEnchantment.DefaultNode.Attributes["Description"]?.Value ==
                     "example.enchantment:localization/enchantment.eclipse_lifesteal.description" &&
                 ModRuntime.TryGetExternalEffectPresentation(externalEnchantmentId,
                     out externalPresentationTitle, out externalPresentationDescription) &&
                 externalPresentationTitle == "example.enchantment:localization/enchantment.eclipse_lifesteal" &&
                 externalPresentationDescription ==
                     "example.enchantment:localization/enchantment.eclipse_lifesteal.description" &&
-                ForgeManager.ELEBLBJKDBI().HasExternalEnchantmentCandidate("Medium", "Weapon", externalEnchantmentId) &&
-                ForgeManager.ELEBLBJKDBI().HasExternalEnchantmentMetadata("Medium", "Weapon", externalEnchantmentId,
+                ForgeManager.GetInstance().HasExternalEnchantmentCandidate("Medium", "Weapon", externalEnchantmentId) &&
+                ForgeManager.GetInstance().HasExternalEnchantmentMetadata("Medium", "Weapon", externalEnchantmentId,
                     externalEnchantmentId, "Single") &&
-                ForgeManager.ELEBLBJKDBI().HasExternalEnchantmentParameter("Medium", "Weapon", externalEnchantmentId,
+                ForgeManager.GetInstance().HasExternalEnchantmentParameter("Medium", "Weapon", externalEnchantmentId,
                     "chance", "0.65") &&
-                ForgeManager.ELEBLBJKDBI().HasExternalEnchantmentParameter("Medium", "Weapon", externalEnchantmentId,
+                ForgeManager.GetInstance().HasExternalEnchantmentParameter("Medium", "Weapon", externalEnchantmentId,
                     "stacks", "1"),
                 "Behavior-backed perk/enchantment was not adapted into the recovered runtime");
 
@@ -1097,7 +1097,7 @@ public static class ValidatePackagedArt
                     new Dictionary<string, string>(StringComparer.Ordinal) { { "phase", "perk_saved" } },
                     new TestFighterOperations(), out string savedPerkInvokeError) && string.IsNullOrEmpty(savedPerkInvokeError),
                 "Saved typed perk did not reach its bounded behavior handler: " + savedPerkInvokeError);
-            Require(ListSF.GetItems().HCDLKHKBEPF().Count == 745 &&
+            Require(ListSF.GetItems().GetAllItems().Count == 745 &&
                 ListSF.GetItems().GetItemByName("core:items/weapon/weapon_katana") == vanillaKatana &&
                 vanillaKatana.Name == "WEAPON_KATANA", "Core registry import duplicated or renamed a legacy weapon");
             Require(ListSF.GetItems().GetItemByName("core:items/armor/body") == vanillaBody &&
@@ -1210,17 +1210,17 @@ public static class ValidatePackagedArt
             Require(legacyCoreByName != null && legacyCoreByName.texture != null,
                 "Implicit core routing lost PackagedArtCatalog legacy atlas-member compatibility");
             ModRuntime.Shutdown();
-            Require(ListSF.GetItems().HCDLKHKBEPF().Count == 740 &&
+            Require(ListSF.GetItems().GetAllItems().Count == 740 &&
                 ListSF.GetItems().GetItemByName("WEAPON_KATANA") == vanillaKatana,
                 "ModRuntime shutdown removed a vanilla weapon");
             Require(ListSF.GetItems().GetItemByName(legacyItemId) == null,
                 "ModRuntime shutdown did not remove the injected legacy weapon");
             Require(LocalizationManager.GetExternalStringForTest(legacyLocalizationId) == null,
                 "ModRuntime shutdown did not remove injected localization aliases");
-            Require(GameUtils.FDEJIIDIPBI.ABAGJKMKCBA(externalPerkId) == null &&
-                GameUtils.FDEJIIDIPBI.ABAGJKMKCBA(externalEnchantmentId) == null &&
-                !ForgeManager.ELEBLBJKDBI().HasExternalEnchantmentCandidate("Medium", "Weapon", externalEnchantmentId) &&
-                !ForgeManager.ELEBLBJKDBI().HasExternalEnchantmentCandidate("Medium", "Weapon", externalEnchantmentId),
+            Require(GameUtils.PerkItemList.FindBasePerk(externalPerkId) == null &&
+                GameUtils.PerkItemList.FindBasePerk(externalEnchantmentId) == null &&
+                !ForgeManager.GetInstance().HasExternalEnchantmentCandidate("Medium", "Weapon", externalEnchantmentId) &&
+                !ForgeManager.GetInstance().HasExternalEnchantmentCandidate("Medium", "Weapon", externalEnchantmentId),
                 "ModRuntime shutdown did not remove injected perk/enchantment runtime state");
         }
         finally

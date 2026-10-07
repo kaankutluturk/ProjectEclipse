@@ -11,7 +11,7 @@ public class UIPoligon : UIFigure
 	[SerializeField]
 	private bool _UseTriangleFan = true;
 
-	public List<Vector2> CMJMECFMIKP
+	public List<Vector2> PointList
 	{
 		get
 		{
@@ -33,7 +33,7 @@ public class UIPoligon : UIFigure
 			list.Add(AddVertex(_Points[i]));
 		}
 		DHJBOKKAOJK.Clear();
-		DHJBOKKAOJK.AddUIVertexStream(list, (!_UseTriangleFan) ? FigureTopology.AMJOJPPFIEB(list.Count - 2) : FigureTopology.NGPPLGNODNB(list.Count - 2));
+		DHJBOKKAOJK.AddUIVertexStream(list, (!_UseTriangleFan) ? FigureTopology.CreateStripIndices(list.Count - 2) : FigureTopology.CreateFanIndices(list.Count - 2));
 	}
 
 	private UIVertex AddVertex(Vector3 GIAEPIIIMDH)

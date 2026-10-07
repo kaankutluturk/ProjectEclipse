@@ -38,7 +38,7 @@ public static class ScriptedActorsUnity
     static object Field(object target,string name)=>target.GetType().GetField(name,Hidden|BindingFlags.Public).GetValue(target);
     static object Invoke(object target,string name,params object[] args)=>target.GetType().GetMethod(name,Hidden|BindingFlags.Public).Invoke(target,args);
     static void Check(bool condition,string message){checks++;if(!condition)throw new Exception(message);}
-    static Model[] Models(Fight fight)=>fight.LNDLFINJHDB.Where(m=>m!=null&&!(m is WeaponModel)&&(m.get_Name()??"").StartsWith("example.scripted-actors:actors/",StringComparison.Ordinal)).ToArray();
+    static Model[] Models(Fight fight)=>fight.ActiveModels.Where(m=>m!=null&&!(m is WeaponModel)&&(m.get_Name()??"").StartsWith("example.scripted-actors:actors/",StringComparison.Ordinal)).ToArray();
     static IModActor Actor(Fight fight,Model model)=>(IModActor)((IDictionary)Field(fight,"_eclipseActors"))[model];
     static void Next(Fight fight){phase++;phaseFrame=fight.get_FightTimeInFrames();}
     static ModUiSurface Surface()
@@ -88,7 +88,7 @@ public static class ScriptedActorsUnity
         Check(snapshot.Fighter.Actor!=null && snapshot.Fighter.Actor.Id==id && snapshot.Fighter.Actor.Owner=="example.scripted-actors","Actor provenance missing from native snapshot");
         model.AddEventListener(2,value=>
         {
-            if(!(value is Model.EventModel notification)||!(notification.Data is InfoAnimation move)||move.Type!=InfoAnimation.MGHNBEPCKIF.AnimationAttack)return;
+            if(!(value is Model.EventModel notification)||!(notification.Data is InfoAnimation move)||move.Type!=InfoAnimation.AnimationKind.AnimationAttack)return;
             if(!choices.TryGetValue(id,out var names)||!names.Contains(move.Name)){failure="Native actor attack was not selected by Lua: "+id+" "+move.Name;return;}
             starts[model]++;
             if(firstStarts.TryGetValue(model,out var first)&&starts[model]==first+1)nextStartHealth[model]=Life(Peer(model));
@@ -108,9 +108,9 @@ public static class ScriptedActorsUnity
                 if((bool)Field(title,"splashing")||(string)Field(title,"currentPage")!="Home")return;
                 Invoke(title,"BeginCampaign");var directory=SF2Paths.GetUserDataDirectory();
                 Check(Eclipse.Saves.CampaignSaveSession.PreviewDirectory==null&&directory.StartsWith(Application.persistentDataPath,StringComparison.OrdinalIgnoreCase)&&Application.persistentDataPath.Contains("ScriptedActorsUnity-"),"Profile not isolated");
-                var profile=XmlUtils.OpenXMLDocument(SF2Paths.KKIDGPBOBNI(),"usersDefault.xml",XmlUtils.EBLFEPIOMOL.Normal,true,XmlCryptoUtils.NNLGALNDJCL());
+                var profile=XmlUtils.OpenXMLDocument(SF2Paths.GetGameDataPath(),"usersDefault.xml",XmlUtils.XmlSourceMode.Normal,true,XmlCryptoUtils.GetIsEncryptionEnabled());
                 ((System.Xml.XmlElement)profile.SelectSingleNode("/Root/Warriors/Warrior[@ID='1']")).SetAttribute("Tutorial","END");
-                Directory.CreateDirectory(directory);XmlUtils.ONLDJNLKKAL(profile,Path.Combine(directory,Constants.OJMIJINKBPJ).Replace('\\','/'));campaign=true;return;
+                Directory.CreateDirectory(directory);XmlUtils.SaveDocumentWithHash(profile,Path.Combine(directory,Constants.UsersFileName).Replace('\\','/'));campaign=true;return;
             }
             if(!entered)
             {
@@ -119,7 +119,7 @@ public static class ScriptedActorsUnity
                 Check(!ModRuntime.Host.HasErrors,ModRuntime.Host.FormatReport());
                 Check(ModRuntime.Scripts.ActiveMods.Any(m=>m.Id.Value=="example.scripted-actors"),"Actor example did not finish registration");
                 Check(ModRuntime.Host.EnabledMods.All(m=>m.Id.Value=="core"||m.Id.Value=="example.scripted-actors"),"Unexpected user mods");
-                var encounter=ListSF.CHMCKGCDGCM(new FightIDS(ModRuntime.Scripts.Content.RuntimeFightId(DefinitionId.Parse("core:fights/zone_1/tournament/3"))));
+                var encounter=ListSF.GetFightById(new FightIDS(ModRuntime.Scripts.Content.RuntimeFightId(DefinitionId.Parse("core:fights/zone_1/tournament/3"))));
                 Check(encounter!=null,"Core encounter missing");entered=GameUtils.StartFight(encounter,false,null,true,false);return;
             }
 
@@ -181,7 +181,7 @@ public static class ScriptedActorsUnity
                     Check(ids.All(id=>!originalIds.Contains(id)),"Replacement actors reused runtime identities");
                     Check(born.Count==4,"Replacement Lua controller memory was not fresh");
                     Check(ids.All(id=>hostEvents.Contains("host_spawn:"+id)),"Replacement behavior instances did not start with fresh state");
-                    Invoke(fight,"OBNEDPKCNKJ");Next(fight);break;
+                    Invoke(fight,"Surrender");Next(fight);break;
                 case 7:
                     if(Models(fight).Length!=0)return;
                     Check(((IDictionary)Field(fight,"_eclipseActors")).Count==0&&surface.IsClosed,"Surrender retained actors or HUD");

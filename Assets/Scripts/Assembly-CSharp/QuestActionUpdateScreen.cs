@@ -1,8 +1,8 @@
 public class QuestActionUpdateScreen : QuestAction
 {
-	public override void DEJMHFMLKIC(QuestParameters GFIHPBCEEOB)
+	public override void Execute(QuestParameters GFIHPBCEEOB)
 	{
-		base.DEJMHFMLKIC(GFIHPBCEEOB);
+		base.Execute(GFIHPBCEEOB);
 		Module module = Module.GetInstance();
 		ScreenType currentScreen = module.GetCurrentScreenType();
 		// UpdateScreen can be resumed from the save before the first real module
@@ -11,20 +11,20 @@ public class QuestActionUpdateScreen : QuestAction
 		if (currentScreen == ScreenType.ModuleNone)
 		{
 			UnityEngine.Debug.LogWarning("[Quest] Ignoring UpdateScreen before a screen is initialized.");
-			OGIJONMKABB();
+			FinishAction();
 			return;
 		}
-		module.AddEventListener(1, DOHEMBEEHBB);
-		if (!Module.DLOKJOHNDID(currentScreen))
+		module.AddEventListener(1, OnModuleChanged);
+		if (!Module.OpenScreen(currentScreen))
 		{
-			module.RemoveEventListener(1, DOHEMBEEHBB);
-			OGIJONMKABB();
+			module.RemoveEventListener(1, OnModuleChanged);
+			FinishAction();
 		}
 	}
 
-	private void DOHEMBEEHBB(object data)
+	private void OnModuleChanged(object data)
 	{
-		Module.GetInstance().RemoveEventListener(1, DOHEMBEEHBB);
-		OGIJONMKABB();
+		Module.GetInstance().RemoveEventListener(1, OnModuleChanged);
+		FinishAction();
 	}
 }

@@ -45,25 +45,25 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 			return (char)(value ^ KGBGENDIMBC);
 		}
 
-		public void PKOKLDGAPEI()
+		public void ApplyNewCryptoKey()
 		{
 			if (currentCryptoKey != cryptoKey)
 			{
-				hiddenValue = EncryptDecrypt(GEKBGBJOMIA(), cryptoKey);
+				hiddenValue = EncryptDecrypt(InternalDecrypt(), cryptoKey);
 				currentCryptoKey = cryptoKey;
 			}
 		}
 
-		public void GMCADPGOCHM()
+		public void RandomizeCryptoKey()
 		{
-			char bAINMLLIKOL = GEKBGBJOMIA();
+			char bAINMLLIKOL = InternalDecrypt();
 			currentCryptoKey = (char)UnityEngine.Random.Range(0, 65535);
 			hiddenValue = EncryptDecrypt(bAINMLLIKOL, currentCryptoKey);
 		}
 
-		public char ECEBFGCJIDA()
+		public char GetEncrypted()
 		{
-			PKOKLDGAPEI();
+			ApplyNewCryptoKey();
 			return hiddenValue;
 		}
 
@@ -71,13 +71,13 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 		{
 			inited = true;
 			hiddenValue = ANGFOBEKKKD;
-			if (ObscuredCheatingDetector.NMACGEJHPDN())
+			if (ObscuredCheatingDetector.GetIsRunning())
 			{
-				fakeValue = GEKBGBJOMIA();
+				fakeValue = InternalDecrypt();
 			}
 		}
 
-		private char GEKBGBJOMIA()
+		private char InternalDecrypt()
 		{
 			if (!inited)
 			{
@@ -87,9 +87,9 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 				inited = true;
 			}
 			char c = EncryptDecrypt(hiddenValue, currentCryptoKey);
-			if (ObscuredCheatingDetector.NMACGEJHPDN() && fakeValue != 0 && c != fakeValue)
+			if (ObscuredCheatingDetector.GetIsRunning() && fakeValue != 0 && c != fakeValue)
 			{
-				ObscuredCheatingDetector.get_Instance().MCDANNDOEIK();
+				ObscuredCheatingDetector.get_Instance().OnCheatingDetected();
 			}
 			return c;
 		}
@@ -97,7 +97,7 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 		public static implicit operator ObscuredChar(char value)
 		{
 			ObscuredChar result = new ObscuredChar(EncryptDecrypt(value));
-			if (ObscuredCheatingDetector.NMACGEJHPDN())
+			if (ObscuredCheatingDetector.GetIsRunning())
 			{
 				result.fakeValue = value;
 			}
@@ -106,15 +106,15 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 
 		public static implicit operator char(ObscuredChar value)
 		{
-			return value.GEKBGBJOMIA();
+			return value.InternalDecrypt();
 		}
 
 		[SpecialName]
-		public static ObscuredChar ALEAHDHGCJL(ObscuredChar NILNDHEKNLJ)
+		public static ObscuredChar op_Increment(ObscuredChar NILNDHEKNLJ)
 		{
-			char bAINMLLIKOL = (char)(NILNDHEKNLJ.GEKBGBJOMIA() + 1);
+			char bAINMLLIKOL = (char)(NILNDHEKNLJ.InternalDecrypt() + 1);
 			NILNDHEKNLJ.hiddenValue = EncryptDecrypt(bAINMLLIKOL, NILNDHEKNLJ.currentCryptoKey);
-			if (ObscuredCheatingDetector.NMACGEJHPDN())
+			if (ObscuredCheatingDetector.GetIsRunning())
 			{
 				NILNDHEKNLJ.fakeValue = bAINMLLIKOL;
 			}
@@ -122,11 +122,11 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 		}
 
 		[SpecialName]
-		public static ObscuredChar DDKOKLNFNPB(ObscuredChar NILNDHEKNLJ)
+		public static ObscuredChar op_Decrement(ObscuredChar NILNDHEKNLJ)
 		{
-			char bAINMLLIKOL = (char)(NILNDHEKNLJ.GEKBGBJOMIA() - 1);
+			char bAINMLLIKOL = (char)(NILNDHEKNLJ.InternalDecrypt() - 1);
 			NILNDHEKNLJ.hiddenValue = EncryptDecrypt(bAINMLLIKOL, NILNDHEKNLJ.currentCryptoKey);
-			if (ObscuredCheatingDetector.NMACGEJHPDN())
+			if (ObscuredCheatingDetector.GetIsRunning())
 			{
 				NILNDHEKNLJ.fakeValue = bAINMLLIKOL;
 			}
@@ -153,17 +153,17 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 
 		public override string ToString()
 		{
-			return GEKBGBJOMIA().ToString();
+			return InternalDecrypt().ToString();
 		}
 
 		public string ToString(IFormatProvider EEGMFLOPLLH)
 		{
-			return GEKBGBJOMIA().ToString(EEGMFLOPLLH);
+			return InternalDecrypt().ToString(EEGMFLOPLLH);
 		}
 
 		public override int GetHashCode()
 		{
-			return GEKBGBJOMIA().GetHashCode();
+			return InternalDecrypt().GetHashCode();
 		}
 	}
 }

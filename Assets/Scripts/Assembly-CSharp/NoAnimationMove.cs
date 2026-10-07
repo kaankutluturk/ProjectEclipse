@@ -2,53 +2,53 @@ using System.Xml;
 
 public class NoAnimationMove
 {
-	public class GFJKIMLDLLL
+	public class MoveInfoBase
 	{
 		public string Name;
 
-		public string MJBPMLCLMFN;
+		public string Alias;
 
-		public string NNMNMLHJNHE;
+		public string Description;
 	}
 
-	public class JNMKPGHOFIF : GFJKIMLDLLL
+	public class RaidMoveInfo : MoveInfoBase
 	{
-		public XmlDocument JAIAPBIOLHK;
+		public XmlDocument MoveDocument;
 
-		public XmlNode KFMEKMMLFMA;
+		public XmlNode MoveNode;
 
 		public string Type;
 
-		public float KFMJMBANIGF;
+		public float Duration;
 
-		public string KJDFJPBIGJC;
+		public string ScriptName;
 
-		public uint CJDIOEEBKAL;
+		public uint ChargeCost;
 	}
 
-	public class NEPIBDAFIEF
+	public class CritSettings
 	{
 		public float CritProbablity;
 
 		public int CritAdditional;
 	}
 
-	private NEPIBDAFIEF LDGHJAECCEG = new NEPIBDAFIEF();
+	private CritSettings _critSettings = new CritSettings();
 
-	public NEPIBDAFIEF KANIIJHIBDI
+	public CritSettings Crit
 	{
 		get
 		{
-			return JOPIIDEIJEF();
+			return GetCritSettings();
 		}
 	}
 
-	public NEPIBDAFIEF JOPIIDEIJEF()
+	public CritSettings GetCritSettings()
 	{
-		return LDGHJAECCEG;
+		return _critSettings;
 	}
 
-	public JNMKPGHOFIF HLINMMJEANJ(string DGJBDENCHBJ)
+	public RaidMoveInfo GetMoveByName(string DGJBDENCHBJ)
 	{
 		return null;
 	}

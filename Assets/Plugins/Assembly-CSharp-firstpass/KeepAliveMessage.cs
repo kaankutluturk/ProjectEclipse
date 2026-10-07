@@ -1,8 +1,8 @@
 public sealed class KeepAliveMessage : IServerMessage
 {
-	public LENCKBHFKLD get_Type()
+	public MessageTypes get_Type()
 	{
-		return LENCKBHFKLD.KeepAlive;
+		return MessageTypes.KeepAlive;
 	}
 
 	void IServerMessage.Parse(object data)

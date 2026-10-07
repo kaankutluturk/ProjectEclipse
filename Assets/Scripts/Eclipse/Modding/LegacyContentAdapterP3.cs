@@ -25,17 +25,17 @@ namespace Eclipse.Modding
                     achievement.SetAttribute("Hidden",definition.Hidden?"1":"0");
                 }
                 var native=new AchievCounter(node);
-                GameUtils.HHLEKNNJGMJ.MDNKEAFGAOB.Add(native); _externalCounters.Add(native);
+                GameUtils.AchievementDefinitions.Counters.Add(native); _externalCounters.Add(native);
             }
             ModProgressionAccess.Read=id=>{
                 RequireCounter(id);
-                var user=ListSF.CCDKHLAMKKO()?.KJNPJKEHGLE();
+                var user=ListSF.GetRoster()?.GetAchievements();
                 if(user==null) throw new ModContentException("Profile is unavailable.");
-                return user.KJPLIHEMLJL(id.ToString())?.MCIPEJBLIDC()??0;
+                return user.FindCounter(id.ToString())?.GetCounter()??0;
             };
             ModProgressionAccess.Advance=(id,amount)=>{
                 var definition=RequireCounter(id);
-                var user=ListSF.CCDKHLAMKKO()?.KJNPJKEHGLE();
+                var user=ListSF.GetRoster()?.GetAchievements();
                 if(user==null) throw new ModContentException("Profile is unavailable.");
                 return user.AdvanceExternalCounter(id.ToString(),amount,definition.Maximum);
             };
@@ -48,7 +48,7 @@ namespace Eclipse.Modding
         private void RemoveP3Content()
         {
             ModProgressionAccess.Clear();
-            foreach(var counter in _externalCounters) GameUtils.HHLEKNNJGMJ.MDNKEAFGAOB.Remove(counter);
+            foreach(var counter in _externalCounters) GameUtils.AchievementDefinitions.Counters.Remove(counter);
             _externalCounters.Clear();
         }
         private void ApplyP3Localization(string language)

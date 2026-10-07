@@ -1,7 +1,7 @@
 public class EventKeyPressed : EventAnimation
 {
 	public EventKeyPressed()
-		: base(EECEJKADLCK.EVENT_KEY_PRESSED)
+		: base(EventAnimationType.EVENT_KEY_PRESSED)
 	{
 	}
 

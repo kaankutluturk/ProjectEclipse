@@ -13,7 +13,7 @@ public sealed class EnumerableNodeDeserializer : INodeDeserializer
 		}
 		else
 		{
-			Type type2 = ReflectionUtility.JIDNEGBGBGL(MBLGNMBFHBI, typeof(IEnumerable<>));
+			Type type2 = ReflectionUtility.GetImplementedGenericInterface(MBLGNMBFHBI, typeof(IEnumerable<>));
 			if (type2 != MBLGNMBFHBI)
 			{
 				value = null;

@@ -9,53 +9,53 @@ using UnityEngine;
 
 public class HTTPResponse : IDisposable
 {
-	internal const byte DGDNNNCFKLL = 13;
+	internal const byte CR = 13;
 
-	internal const byte LIGDEEPMLPF = 10;
+	internal const byte LF = 10;
 
 	public const int MinBufferSize = 4096;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private int KJPNOCBOGBL;
+	private int versionMajor;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private int AJOOGBMJLHE;
+	private int versionMinor;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private int GFNNKFEAKOF;
+	private int statusCode;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private string AGEPKFMGHGA;
+	private string message;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private bool FMACGENCLBL;
+	private bool isStreamed;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private bool HPKEIBAGFIO;
+	private bool isStreamingFinished;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private bool PNDNAMEJEGK;
+	private bool isFromCache;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private Dictionary<string, List<string>> BOEIOCLGPDI;
+	private Dictionary<string, List<string>> headers;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private byte[] JFKBADLJJBM;
+	private byte[] data;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private bool BOEELGOJIJD;
+	private bool isUpgraded;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private List<Cookie> POHEINBEINN;
+	private List<Cookie> cookies;
 
-	protected string EPOPPOGJPMI;
+	protected string dataAsText;
 
 	protected Texture2D texture;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private bool CENCKNPEDFK;
+	private bool isClosedManually;
 
-	internal HTTPRequest KEEGKCNNPGM;
+	internal HTTPRequest BaseRequest;
 
 	protected Stream Stream;
 
@@ -63,99 +63,99 @@ public class HTTPResponse : IDisposable
 
 	protected object SyncRoot = new object();
 
-	protected byte[] GACBHEJGAHJ;
+	protected byte[] fragmentBuffer;
 
-	protected int CGLDCBJFPKA;
+	protected int fragmentBufferDataLength;
 
-	protected Stream LLBCFJNMEHJ;
+	protected Stream cacheStream;
 
-	protected int EHIGJOACCNJ;
+	protected int allFragmentSize;
 
-	public int IJONNHDDJLC
+	public int VersionMajor
 	{
 		get
 		{
-			return NPPCNJOCKIM();
+			return GetVersionMajor();
 		}
 		protected set
 		{
-			LPFNOIBIJFP(value);
+			SetVersionMajor(value);
 		}
 	}
 
-	public int GMJIPPKIADJ
+	public int VersionMinor
 	{
 		get
 		{
-			return FOOKHAFFFIF();
+			return GetVersionMinor();
 		}
 		protected set
 		{
-			EHGCOEFJAHF(value);
+			SetVersionMinor(value);
 		}
 	}
 
-	public int POPGAABILGI
+	public int StatusCode
 	{
 		get
 		{
-			return KNMDPGBPNED();
+			return GetStatusCode();
 		}
 		protected set
 		{
-			ADBHCKLPIFN(value);
+			SetStatusCode(value);
 		}
 	}
 
-	public bool BFIKOBDDHCD
+	public bool IsSuccess
 	{
 		get
 		{
-			return AICKPAMONBH();
+			return GetIsSuccess();
 		}
 	}
 
-	public bool COFIJEAHEOM
+	public bool IsStreamed
 	{
 		get
 		{
-			return HOKPOJABMPK();
+			return GetIsStreamed();
 		}
 		protected set
 		{
-			HGGMCLNCADA(value);
+			SetIsStreamed(value);
 		}
 	}
 
-	public bool KNPPNPBMKKH
+	public bool IsStreamingFinished
 	{
 		get
 		{
-			return MJPPHHLMPEI();
+			return GetIsStreamingFinished();
 		}
 		internal set
 		{
-			OBGGJPGINGC(value);
+			SetIsStreamingFinished(value);
 		}
 	}
 
-	public bool OAHNBGENIPC
+	public bool IsFromCache
 	{
 		get
 		{
-			return LOHDBJLLKEE();
+			return GetIsFromCache();
 		}
 		internal set
 		{
-			KBOCENDKCJO(value);
+			SetIsFromCache(value);
 		}
 	}
 
-	public Dictionary<string, List<string>> CPNAPDCFCDL
+	public Dictionary<string, List<string>> ResponseHeaders
 	{
 		get
 		{
-			return AJCCGKHBNML();
+			return GetHeaders();
 		}
 		protected set
 		{
@@ -163,198 +163,198 @@ public class HTTPResponse : IDisposable
 		}
 	}
 
-	public bool BDDFFCAGFPE
+	public bool IsUpgraded
 	{
 		get
 		{
-			return ODOHODEENIB();
+			return GetIsUpgraded();
 		}
 		protected set
 		{
-			GCDKHOCDONK(value);
+			SetIsUpgraded(value);
 		}
 	}
 
-	public List<Cookie> FPFLODAGEFD
+	public List<Cookie> Cookies
 	{
 		get
 		{
-			return HNDADBHDOID();
+			return GetCookies();
 		}
 		internal set
 		{
-			PPLAPHMALFL(value);
+			SetCookies(value);
 		}
 	}
 
-	public string IDFMFCBBNGA
+	public string DataAsText
 	{
 		get
 		{
-			return DPBLPGKOEJB();
+			return GetDataAsText();
 		}
 	}
 
-	public Texture2D OFKOFDLKGHG
+	public Texture2D DataAsTexture2D
 	{
 		get
 		{
-			return EKOAPMEHNAJ();
+			return GetDataAsTexture2D();
 		}
 	}
 
-	public bool PKKDGGLBMCA
+	public bool IsClosedManually
 	{
 		get
 		{
-			return MLPKGGIKCDF();
+			return GetIsClosedManually();
 		}
 		protected set
 		{
-			DFIAKBONHGB(value);
+			SetIsClosedManually(value);
 		}
 	}
 
 	internal HTTPResponse(HTTPRequest ONOCIELLAPL, Stream ABJIEFMMIEK, bool IBIIADCLKCH, bool PEAJIKCANHP)
 	{
-		KEEGKCNNPGM = ONOCIELLAPL;
+		BaseRequest = ONOCIELLAPL;
 		Stream = ABJIEFMMIEK;
-		HGGMCLNCADA(IBIIADCLKCH);
-		KBOCENDKCJO(PEAJIKCANHP);
-		DFIAKBONHGB(false);
+		SetIsStreamed(IBIIADCLKCH);
+		SetIsFromCache(PEAJIKCANHP);
+		SetIsClosedManually(false);
 	}
 
-	public int NPPCNJOCKIM()
+	public int GetVersionMajor()
 	{
-		return KJPNOCBOGBL;
+		return versionMajor;
 	}
 
-	protected void LPFNOIBIJFP(int value)
+	protected void SetVersionMajor(int value)
 	{
-		KJPNOCBOGBL = value;
+		versionMajor = value;
 	}
 
-	public int FOOKHAFFFIF()
+	public int GetVersionMinor()
 	{
-		return AJOOGBMJLHE;
+		return versionMinor;
 	}
 
-	protected void EHGCOEFJAHF(int value)
+	protected void SetVersionMinor(int value)
 	{
-		AJOOGBMJLHE = value;
+		versionMinor = value;
 	}
 
-	public int KNMDPGBPNED()
+	public int GetStatusCode()
 	{
-		return GFNNKFEAKOF;
+		return statusCode;
 	}
 
-	protected void ADBHCKLPIFN(int value)
+	protected void SetStatusCode(int value)
 	{
-		GFNNKFEAKOF = value;
+		statusCode = value;
 	}
 
-	public bool AICKPAMONBH()
+	public bool GetIsSuccess()
 	{
-		return (KNMDPGBPNED() >= 200 && KNMDPGBPNED() < 300) || KNMDPGBPNED() == 304;
+		return (GetStatusCode() >= 200 && GetStatusCode() < 300) || GetStatusCode() == 304;
 	}
 
-	public string DCKPMHKDLEJ()
+	public string GetMessage()
 	{
-		return AGEPKFMGHGA;
+		return message;
 	}
 
 	protected void set_Message(string value)
 	{
-		AGEPKFMGHGA = value;
+		message = value;
 	}
 
-	public bool HOKPOJABMPK()
+	public bool GetIsStreamed()
 	{
-		return FMACGENCLBL;
+		return isStreamed;
 	}
 
-	protected void HGGMCLNCADA(bool value)
+	protected void SetIsStreamed(bool value)
 	{
-		FMACGENCLBL = value;
+		isStreamed = value;
 	}
 
-	public bool MJPPHHLMPEI()
+	public bool GetIsStreamingFinished()
 	{
-		return HPKEIBAGFIO;
+		return isStreamingFinished;
 	}
 
-	internal void OBGGJPGINGC(bool value)
+	internal void SetIsStreamingFinished(bool value)
 	{
-		HPKEIBAGFIO = value;
+		isStreamingFinished = value;
 	}
 
-	public bool LOHDBJLLKEE()
+	public bool GetIsFromCache()
 	{
-		return PNDNAMEJEGK;
+		return isFromCache;
 	}
 
-	internal void KBOCENDKCJO(bool value)
+	internal void SetIsFromCache(bool value)
 	{
-		PNDNAMEJEGK = value;
+		isFromCache = value;
 	}
 
-	public Dictionary<string, List<string>> AJCCGKHBNML()
+	public Dictionary<string, List<string>> GetHeaders()
 	{
-		return BOEIOCLGPDI;
+		return headers;
 	}
 
 	protected void set_Headers(Dictionary<string, List<string>> value)
 	{
-		BOEIOCLGPDI = value;
+		headers = value;
 	}
 
-	public byte[] CHIGLEKCFFN()
+	public byte[] GetData()
 	{
-		return JFKBADLJJBM;
+		return data;
 	}
 
 	internal void set_Data(byte[] value)
 	{
-		JFKBADLJJBM = value;
+		data = value;
 	}
 
-	public bool ODOHODEENIB()
+	public bool GetIsUpgraded()
 	{
-		return BOEELGOJIJD;
+		return isUpgraded;
 	}
 
-	protected void GCDKHOCDONK(bool value)
+	protected void SetIsUpgraded(bool value)
 	{
-		BOEELGOJIJD = value;
+		isUpgraded = value;
 	}
 
-	public List<Cookie> HNDADBHDOID()
+	public List<Cookie> GetCookies()
 	{
-		return POHEINBEINN;
+		return cookies;
 	}
 
-	internal void PPLAPHMALFL(List<Cookie> value)
+	internal void SetCookies(List<Cookie> value)
 	{
-		POHEINBEINN = value;
+		cookies = value;
 	}
 
-	public string DPBLPGKOEJB()
+	public string GetDataAsText()
 	{
-		if (CHIGLEKCFFN() == null)
+		if (GetData() == null)
 		{
 			return string.Empty;
 		}
-		if (!string.IsNullOrEmpty(EPOPPOGJPMI))
+		if (!string.IsNullOrEmpty(dataAsText))
 		{
-			return EPOPPOGJPMI;
+			return dataAsText;
 		}
-		return EPOPPOGJPMI = Encoding.UTF8.GetString(CHIGLEKCFFN(), 0, CHIGLEKCFFN().Length);
+		return dataAsText = Encoding.UTF8.GetString(GetData(), 0, GetData().Length);
 	}
 
-	public Texture2D EKOAPMEHNAJ()
+	public Texture2D GetDataAsTexture2D()
 	{
-		if (CHIGLEKCFFN() == null)
+		if (GetData() == null)
 		{
 			return null;
 		}
@@ -363,18 +363,18 @@ public class HTTPResponse : IDisposable
 			return texture;
 		}
 		texture = new Texture2D(0, 0, TextureFormat.ARGB32, false);
-		texture.LoadImage(CHIGLEKCFFN());
+		texture.LoadImage(GetData());
 		return texture;
 	}
 
-	public bool MLPKGGIKCDF()
+	public bool GetIsClosedManually()
 	{
-		return CENCKNPEDFK;
+		return isClosedManually;
 	}
 
-	protected void DFIAKBONHGB(bool value)
+	protected void SetIsClosedManually(bool value)
 	{
-		CENCKNPEDFK = value;
+		isClosedManually = value;
 	}
 
 	internal virtual bool Receive(int JHFPNBPNHEH = -1, bool NDCKHEGBAGO = true)
@@ -382,26 +382,26 @@ public class HTTPResponse : IDisposable
 		string empty = string.Empty;
 		try
 		{
-			empty = JJFJFNEFOHK(Stream, 32);
+			empty = ReadTo(Stream, 32);
 		}
 		catch
 		{
-			if (!KEEGKCNNPGM.CKLEKLGMEAG())
+			if (!BaseRequest.GetDisableRetry())
 			{
 				return false;
 			}
 			throw;
 		}
-		if (!KEEGKCNNPGM.CKLEKLGMEAG() && string.IsNullOrEmpty(empty))
+		if (!BaseRequest.GetDisableRetry() && string.IsNullOrEmpty(empty))
 		{
 			return false;
 		}
 		string[] array = empty.Split('/', '.');
-		LPFNOIBIJFP(int.Parse(array[1]));
-		EHGCOEFJAHF(int.Parse(array[2]));
-		string text = FOBCHHBKJDG(Stream, 32, 10);
+		SetVersionMajor(int.Parse(array[1]));
+		SetVersionMinor(int.Parse(array[2]));
+		string text = NoTrimReadTo(Stream, 32, 10);
 		int result;
-		if (KEEGKCNNPGM.CKLEKLGMEAG())
+		if (BaseRequest.GetDisableRetry())
 		{
 			result = int.Parse(text);
 		}
@@ -409,17 +409,17 @@ public class HTTPResponse : IDisposable
 		{
 			return false;
 		}
-		ADBHCKLPIFN(result);
+		SetStatusCode(result);
 		if (text.Length > 0 && (byte)text[text.Length - 1] != 10 && (byte)text[text.Length - 1] != 13)
 		{
-			set_Message(JJFJFNEFOHK(Stream, 10));
+			set_Message(ReadTo(Stream, 10));
 		}
 		else
 		{
 			set_Message(string.Empty);
 		}
-		NEECNIHNFGI(Stream);
-		GCDKHOCDONK(KNMDPGBPNED() == 101 && (HasHeaderWithValue("connection", "upgrade") || HasHeader("upgrade")));
+		ReadHeaders(Stream);
+		SetIsUpgraded(GetStatusCode() == 101 && (HasHeaderWithValue("connection", "upgrade") || HasHeader("upgrade")));
 		if (!NDCKHEGBAGO)
 		{
 			return true;
@@ -431,11 +431,11 @@ public class HTTPResponse : IDisposable
 	{
 		if (JHFPNBPNHEH != -1)
 		{
-			KBOCENDKCJO(true);
+			SetIsFromCache(true);
 			ReadRaw(Stream, JHFPNBPNHEH);
 			return true;
 		}
-		if ((KNMDPGBPNED() >= 100 && KNMDPGBPNED() < 200) || KNMDPGBPNED() == 204 || KNMDPGBPNED() == 304 || KEEGKCNNPGM.JCHNIGKBBMI() == LAAFHDKKJFL.Head)
+		if ((GetStatusCode() >= 100 && GetStatusCode() < 200) || GetStatusCode() == 204 || GetStatusCode() == 304 || BaseRequest.GetMethodType() == HTTPMethods.Head)
 		{
 			return true;
 		}
@@ -453,52 +453,52 @@ public class HTTPResponse : IDisposable
 			}
 			else if (list2 != null)
 			{
-				HTTPRange jALPJGLIOFH = MFNPGKMKBMA();
-				ReadRaw(Stream, jALPJGLIOFH.CCJEDKMCDHP() - jALPJGLIOFH.AHALHOCNCJK() + 1);
+				HTTPRange jALPJGLIOFH = GetRange();
+				ReadRaw(Stream, jALPJGLIOFH.GetLastBytePos() - jALPJGLIOFH.GetFirstBytePos() + 1);
 			}
 			else
 			{
-				LLFGNKODCDG(Stream);
+				ReadUnknownSize(Stream);
 			}
 		}
 		return true;
 	}
 
-	protected void NEECNIHNFGI(Stream ABJIEFMMIEK)
+	protected void ReadHeaders(Stream ABJIEFMMIEK)
 	{
-		string text = JJFJFNEFOHK(ABJIEFMMIEK, 58, 10).Trim();
+		string text = ReadTo(ABJIEFMMIEK, 58, 10).Trim();
 		while (text != string.Empty)
 		{
-			string bAINMLLIKOL = JJFJFNEFOHK(ABJIEFMMIEK, 10);
+			string bAINMLLIKOL = ReadTo(ABJIEFMMIEK, 10);
 			AddHeader(text, bAINMLLIKOL);
-			text = JJFJFNEFOHK(ABJIEFMMIEK, 58, 10);
+			text = ReadTo(ABJIEFMMIEK, 58, 10);
 		}
 	}
 
 	protected void AddHeader(string name, string value)
 	{
 		name = name.ToLower();
-		if (AJCCGKHBNML() == null)
+		if (GetHeaders() == null)
 		{
 			set_Headers(new Dictionary<string, List<string>>());
 		}
 		List<string> list;
-		if (!AJCCGKHBNML().TryGetValue(name, out list))
+		if (!GetHeaders().TryGetValue(name, out list))
 		{
-			AJCCGKHBNML().Add(name, list = new List<string>(1));
+			GetHeaders().Add(name, list = new List<string>(1));
 		}
 		list.Add(value);
 	}
 
 	public List<string> GetHeaderValues(string name)
 	{
-		if (AJCCGKHBNML() == null)
+		if (GetHeaders() == null)
 		{
 			return null;
 		}
 		name = name.ToLower();
 		List<string> value;
-		if (!AJCCGKHBNML().TryGetValue(name, out value) || value.Count == 0)
+		if (!GetHeaders().TryGetValue(name, out value) || value.Count == 0)
 		{
 			return null;
 		}
@@ -507,13 +507,13 @@ public class HTTPResponse : IDisposable
 
 	public string GetFirstHeaderValue(string name)
 	{
-		if (AJCCGKHBNML() == null)
+		if (GetHeaders() == null)
 		{
 			return null;
 		}
 		name = name.ToLower();
 		List<string> value;
-		if (!AJCCGKHBNML().TryGetValue(name, out value) || value.Count == 0)
+		if (!GetHeaders().TryGetValue(name, out value) || value.Count == 0)
 		{
 			return null;
 		}
@@ -547,7 +547,7 @@ public class HTTPResponse : IDisposable
 		return true;
 	}
 
-	public HTTPRange MFNPGKMKBMA()
+	public HTTPRange GetRange()
 	{
 		List<string> list = GetHeaderValues("content-range");
 		if (list == null)
@@ -562,7 +562,7 @@ public class HTTPResponse : IDisposable
 		return new HTTPRange(int.Parse(array[1]), int.Parse(array[2]), (!(array[3] != "*")) ? (-1) : int.Parse(array[3]));
 	}
 
-	public static string JJFJFNEFOHK(Stream ABJIEFMMIEK, byte MOFIAGJPCNA)
+	public static string ReadTo(Stream ABJIEFMMIEK, byte MOFIAGJPCNA)
 	{
 		using (MemoryStream memoryStream = new MemoryStream())
 		{
@@ -572,11 +572,11 @@ public class HTTPResponse : IDisposable
 				memoryStream.WriteByte((byte)num);
 				num = ABJIEFMMIEK.ReadByte();
 			}
-			return memoryStream.ToArray().JBAOFMBHJND().Trim();
+			return memoryStream.ToArray().AsciiToString().Trim();
 		}
 	}
 
-	public static string JJFJFNEFOHK(Stream ABJIEFMMIEK, byte ECEBLBGKFPF, byte NELKINPNIGD)
+	public static string ReadTo(Stream ABJIEFMMIEK, byte ECEBLBGKFPF, byte NELKINPNIGD)
 	{
 		using (MemoryStream memoryStream = new MemoryStream())
 		{
@@ -586,11 +586,11 @@ public class HTTPResponse : IDisposable
 				memoryStream.WriteByte((byte)num);
 				num = ABJIEFMMIEK.ReadByte();
 			}
-			return memoryStream.ToArray().JBAOFMBHJND().Trim();
+			return memoryStream.ToArray().AsciiToString().Trim();
 		}
 	}
 
-	public static string FOBCHHBKJDG(Stream ABJIEFMMIEK, byte ECEBLBGKFPF, byte NELKINPNIGD)
+	public static string NoTrimReadTo(Stream ABJIEFMMIEK, byte ECEBLBGKFPF, byte NELKINPNIGD)
 	{
 		using (MemoryStream memoryStream = new MemoryStream())
 		{
@@ -600,13 +600,13 @@ public class HTTPResponse : IDisposable
 				memoryStream.WriteByte((byte)num);
 				num = ABJIEFMMIEK.ReadByte();
 			}
-			return memoryStream.ToArray().JBAOFMBHJND();
+			return memoryStream.ToArray().AsciiToString();
 		}
 	}
 
 	protected int ReadChunkLength(Stream ABJIEFMMIEK)
 	{
-		string text = JJFJFNEFOHK(ABJIEFMMIEK, 10);
+		string text = ReadTo(ABJIEFMMIEK, 10);
 		string[] array = text.Split(';');
 		string text2 = array[0];
 		int result;
@@ -619,14 +619,14 @@ public class HTTPResponse : IDisposable
 
 	protected void ReadChunked(Stream ABJIEFMMIEK)
 	{
-		FJKBNCMIHAD();
+		BeginReceiveStreamFragments();
 		using (MemoryStream memoryStream = new MemoryStream())
 		{
 			int num = ReadChunkLength(ABJIEFMMIEK);
 			byte[] array = new byte[num];
 			int num2 = 0;
-			KEEGKCNNPGM.HEEHALMDLPL(num);
-			KEEGKCNNPGM.HNPAEADANKK(AICKPAMONBH() || LOHDBJLLKEE());
+			BaseRequest.SetDownloadLength(num);
+			BaseRequest.SetDownloadProgressChanged(GetIsSuccess() || GetIsFromCache());
 			while (num != 0)
 			{
 				if (array.Length < num)
@@ -634,7 +634,7 @@ public class HTTPResponse : IDisposable
 					Array.Resize(ref array, num);
 				}
 				int num3 = 0;
-				CCKDHANEGHM();
+				WaitWhileHasFragments();
 				do
 				{
 					int num4 = ABJIEFMMIEK.Read(array, num3, num - num3);
@@ -645,28 +645,28 @@ public class HTTPResponse : IDisposable
 					num3 += num4;
 				}
 				while (num3 < num);
-				if (KEEGKCNNPGM.MDEPOKKKKCL())
+				if (BaseRequest.GetUseStreaming())
 				{
-					HGLEDODOADF(array, 0, num3);
+					FeedStreamFragment(array, 0, num3);
 				}
 				else
 				{
 					memoryStream.Write(array, 0, num3);
 				}
-				JJFJFNEFOHK(ABJIEFMMIEK, 10);
+				ReadTo(ABJIEFMMIEK, 10);
 				num2 += num3;
 				num = ReadChunkLength(ABJIEFMMIEK);
-				HTTPRequest kEEGKCNNPGM = KEEGKCNNPGM;
-				kEEGKCNNPGM.HEEHALMDLPL(kEEGKCNNPGM.ELADIMFGGEO() + num);
-				KEEGKCNNPGM.BHOHEPLCIOI(num2);
-				KEEGKCNNPGM.HNPAEADANKK(AICKPAMONBH() || LOHDBJLLKEE());
+				HTTPRequest kEEGKCNNPGM = BaseRequest;
+				kEEGKCNNPGM.SetDownloadLength(kEEGKCNNPGM.GetDownloadLength() + num);
+				BaseRequest.SetDownloaded(num2);
+				BaseRequest.SetDownloadProgressChanged(GetIsSuccess() || GetIsFromCache());
 			}
-			if (KEEGKCNNPGM.MDEPOKKKKCL())
+			if (BaseRequest.GetUseStreaming())
 			{
-				FBLEGPBMIFA();
+				FlushRemainingFragmentBuffer();
 			}
-			NEECNIHNFGI(ABJIEFMMIEK);
-			if (!KEEGKCNNPGM.MDEPOKKKKCL())
+			ReadHeaders(ABJIEFMMIEK);
+			if (!BaseRequest.GetUseStreaming())
 			{
 				set_Data(DecodeStream(memoryStream));
 			}
@@ -675,17 +675,17 @@ public class HTTPResponse : IDisposable
 
 	internal void ReadRaw(Stream ABJIEFMMIEK, int HDIIBKGCCNB)
 	{
-		FJKBNCMIHAD();
-		KEEGKCNNPGM.HEEHALMDLPL(HDIIBKGCCNB);
-		KEEGKCNNPGM.HNPAEADANKK(AICKPAMONBH() || LOHDBJLLKEE());
-		using (MemoryStream memoryStream = new MemoryStream((!KEEGKCNNPGM.MDEPOKKKKCL()) ? HDIIBKGCCNB : 0))
+		BeginReceiveStreamFragments();
+		BaseRequest.SetDownloadLength(HDIIBKGCCNB);
+		BaseRequest.SetDownloadProgressChanged(GetIsSuccess() || GetIsFromCache());
+		using (MemoryStream memoryStream = new MemoryStream((!BaseRequest.GetUseStreaming()) ? HDIIBKGCCNB : 0))
 		{
-			byte[] array = new byte[Math.Max(KEEGKCNNPGM.CKFPMFMHPGI(), 4096)];
+			byte[] array = new byte[Math.Max(BaseRequest.GetStreamFragmentSize(), 4096)];
 			int num = 0;
 			while (HDIIBKGCCNB > 0)
 			{
 				num = 0;
-				CCKDHANEGHM();
+				WaitWhileHasFragments();
 				do
 				{
 					int num2 = ABJIEFMMIEK.Read(array, num, Math.Min(HDIIBKGCCNB, array.Length - num));
@@ -695,37 +695,37 @@ public class HTTPResponse : IDisposable
 					}
 					num += num2;
 					HDIIBKGCCNB -= num2;
-					HTTPRequest kEEGKCNNPGM = KEEGKCNNPGM;
-					kEEGKCNNPGM.BHOHEPLCIOI(kEEGKCNNPGM.IBILKGBKKOI() + num2);
-					KEEGKCNNPGM.HNPAEADANKK(AICKPAMONBH() || LOHDBJLLKEE());
+					HTTPRequest kEEGKCNNPGM = BaseRequest;
+					kEEGKCNNPGM.SetDownloaded(kEEGKCNNPGM.GetDownloaded() + num2);
+					BaseRequest.SetDownloadProgressChanged(GetIsSuccess() || GetIsFromCache());
 				}
 				while (num < array.Length && HDIIBKGCCNB > 0);
-				if (KEEGKCNNPGM.MDEPOKKKKCL())
+				if (BaseRequest.GetUseStreaming())
 				{
-					HGLEDODOADF(array, 0, num);
+					FeedStreamFragment(array, 0, num);
 				}
 				else
 				{
 					memoryStream.Write(array, 0, num);
 				}
 			}
-			if (KEEGKCNNPGM.MDEPOKKKKCL())
+			if (BaseRequest.GetUseStreaming())
 			{
-				FBLEGPBMIFA();
+				FlushRemainingFragmentBuffer();
 			}
-			if (!KEEGKCNNPGM.MDEPOKKKKCL())
+			if (!BaseRequest.GetUseStreaming())
 			{
 				set_Data(DecodeStream(memoryStream));
 			}
 		}
 	}
 
-	protected void LLFGNKODCDG(Stream ABJIEFMMIEK)
+	protected void ReadUnknownSize(Stream ABJIEFMMIEK)
 	{
 		NetworkStream networkStream = ABJIEFMMIEK as NetworkStream;
 		using (MemoryStream memoryStream = new MemoryStream())
 		{
-			byte[] array = new byte[Math.Max(KEEGKCNNPGM.CKFPMFMHPGI(), 4096)];
+			byte[] array = new byte[Math.Max(BaseRequest.GetStreamFragmentSize(), 4096)];
 			int num = 0;
 			int num2 = 0;
 			do
@@ -757,15 +757,15 @@ public class HTTPResponse : IDisposable
 						num2 = ABJIEFMMIEK.Read(array, num, array.Length - num);
 					}
 					num += num2;
-					HTTPRequest kEEGKCNNPGM = KEEGKCNNPGM;
-					kEEGKCNNPGM.BHOHEPLCIOI(kEEGKCNNPGM.IBILKGBKKOI() + num2);
-					KEEGKCNNPGM.HEEHALMDLPL(KEEGKCNNPGM.IBILKGBKKOI());
-					KEEGKCNNPGM.HNPAEADANKK(AICKPAMONBH() || LOHDBJLLKEE());
+					HTTPRequest kEEGKCNNPGM = BaseRequest;
+					kEEGKCNNPGM.SetDownloaded(kEEGKCNNPGM.GetDownloaded() + num2);
+					BaseRequest.SetDownloadLength(BaseRequest.GetDownloaded());
+					BaseRequest.SetDownloadProgressChanged(GetIsSuccess() || GetIsFromCache());
 				}
 				while (num < array.Length && num2 > 0);
-				if (KEEGKCNNPGM.MDEPOKKKKCL())
+				if (BaseRequest.GetUseStreaming())
 				{
-					HGLEDODOADF(array, 0, num);
+					FeedStreamFragment(array, 0, num);
 				}
 				else
 				{
@@ -773,11 +773,11 @@ public class HTTPResponse : IDisposable
 				}
 			}
 			while (num2 > 0);
-			if (KEEGKCNNPGM.MDEPOKKKKCL())
+			if (BaseRequest.GetUseStreaming())
 			{
-				FBLEGPBMIFA();
+				FlushRemainingFragmentBuffer();
 			}
-			if (!KEEGKCNNPGM.MDEPOKKKKCL())
+			if (!BaseRequest.GetUseStreaming())
 			{
 				set_Data(DecodeStream(memoryStream));
 			}
@@ -787,7 +787,7 @@ public class HTTPResponse : IDisposable
 	protected byte[] DecodeStream(Stream JGFDPHDCFNL)
 	{
 		JGFDPHDCFNL.Seek(0L, SeekOrigin.Begin);
-		List<string> list = ((!LOHDBJLLKEE()) ? GetHeaderValues("content-encoding") : null);
+		List<string> list = ((!GetIsFromCache()) ? GetHeaderValues("content-encoding") : null);
 		Stream stream = null;
 		if (list == null)
 		{
@@ -798,10 +798,10 @@ public class HTTPResponse : IDisposable
 			switch (list[0])
 			{
 			case "gzip":
-				stream = new DMOMPOFCMJJ(JGFDPHDCFNL, KAOCBBMMFOG.Decompress);
+				stream = new GZipCompressionStream(JGFDPHDCFNL, ZlibCompressionMode.Decompress);
 				break;
 			case "deflate":
-				stream = new OPBDIMHHCMJ(JGFDPHDCFNL, KAOCBBMMFOG.Decompress);
+				stream = new ZlibDeflateStream(JGFDPHDCFNL, ZlibCompressionMode.Decompress);
 				break;
 			default:
 				stream = JGFDPHDCFNL;
@@ -820,55 +820,55 @@ public class HTTPResponse : IDisposable
 		}
 	}
 
-	protected void FJKBNCMIHAD()
+	protected void BeginReceiveStreamFragments()
 	{
-		if (!KEEGKCNNPGM.DCOLJJKGFGD() && KEEGKCNNPGM.MDEPOKKKKCL() && !LOHDBJLLKEE() && HTTPCacheService.HCCGCAKPOGB(KEEGKCNNPGM.DKAECMGPGOE(), KEEGKCNNPGM.JCHNIGKBBMI(), this))
+		if (!BaseRequest.GetDisableCache() && BaseRequest.GetUseStreaming() && !GetIsFromCache() && HTTPCacheService.IsCacheble(BaseRequest.GetCurrentUri(), BaseRequest.GetMethodType(), this))
 		{
-			LLBCFJNMEHJ = HTTPCacheService.KHGFDHOJOOG(KEEGKCNNPGM.DKAECMGPGOE(), this);
+			cacheStream = HTTPCacheService.PrepareStreamed(BaseRequest.GetCurrentUri(), this);
 		}
-		EHIGJOACCNJ = 0;
+		allFragmentSize = 0;
 	}
 
-	protected void HGLEDODOADF(byte[] buffer, int LCCLEFMKLPB, int BDBOAEGELMC)
+	protected void FeedStreamFragment(byte[] buffer, int LCCLEFMKLPB, int BDBOAEGELMC)
 	{
-		if (GACBHEJGAHJ == null)
+		if (fragmentBuffer == null)
 		{
-			GACBHEJGAHJ = new byte[KEEGKCNNPGM.CKFPMFMHPGI()];
-			CGLDCBJFPKA = 0;
+			fragmentBuffer = new byte[BaseRequest.GetStreamFragmentSize()];
+			fragmentBufferDataLength = 0;
 		}
-		if (CGLDCBJFPKA + BDBOAEGELMC <= KEEGKCNNPGM.CKFPMFMHPGI())
+		if (fragmentBufferDataLength + BDBOAEGELMC <= BaseRequest.GetStreamFragmentSize())
 		{
-			Array.Copy(buffer, LCCLEFMKLPB, GACBHEJGAHJ, CGLDCBJFPKA, BDBOAEGELMC);
-			CGLDCBJFPKA += BDBOAEGELMC;
-			if (CGLDCBJFPKA == KEEGKCNNPGM.CKFPMFMHPGI())
+			Array.Copy(buffer, LCCLEFMKLPB, fragmentBuffer, fragmentBufferDataLength, BDBOAEGELMC);
+			fragmentBufferDataLength += BDBOAEGELMC;
+			if (fragmentBufferDataLength == BaseRequest.GetStreamFragmentSize())
 			{
-				AddStreamedFragment(GACBHEJGAHJ);
-				GACBHEJGAHJ = null;
-				CGLDCBJFPKA = 0;
+				AddStreamedFragment(fragmentBuffer);
+				fragmentBuffer = null;
+				fragmentBufferDataLength = 0;
 			}
 		}
 		else
 		{
-			int num = KEEGKCNNPGM.CKFPMFMHPGI() - CGLDCBJFPKA;
-			HGLEDODOADF(buffer, LCCLEFMKLPB, num);
-			HGLEDODOADF(buffer, LCCLEFMKLPB + num, BDBOAEGELMC - num);
+			int num = BaseRequest.GetStreamFragmentSize() - fragmentBufferDataLength;
+			FeedStreamFragment(buffer, LCCLEFMKLPB, num);
+			FeedStreamFragment(buffer, LCCLEFMKLPB + num, BDBOAEGELMC - num);
 		}
 	}
 
-	protected void FBLEGPBMIFA()
+	protected void FlushRemainingFragmentBuffer()
 	{
-		if (GACBHEJGAHJ != null)
+		if (fragmentBuffer != null)
 		{
-			Array.Resize(ref GACBHEJGAHJ, CGLDCBJFPKA);
-			AddStreamedFragment(GACBHEJGAHJ);
-			GACBHEJGAHJ = null;
-			CGLDCBJFPKA = 0;
+			Array.Resize(ref fragmentBuffer, fragmentBufferDataLength);
+			AddStreamedFragment(fragmentBuffer);
+			fragmentBuffer = null;
+			fragmentBufferDataLength = 0;
 		}
-		if (LLBCFJNMEHJ != null)
+		if (cacheStream != null)
 		{
-			LLBCFJNMEHJ.Dispose();
-			LLBCFJNMEHJ = null;
-			HTTPCacheService.SetBodyLength(KEEGKCNNPGM.DKAECMGPGOE(), EHIGJOACCNJ);
+			cacheStream.Dispose();
+			cacheStream = null;
+			HTTPCacheService.SetBodyLength(BaseRequest.GetCurrentUri(), allFragmentSize);
 		}
 	}
 
@@ -881,19 +881,19 @@ public class HTTPResponse : IDisposable
 				streamedFragments = new List<byte[]>();
 			}
 			streamedFragments.Add(buffer);
-			if (LLBCFJNMEHJ != null)
+			if (cacheStream != null)
 			{
-				LLBCFJNMEHJ.Write(buffer, 0, buffer.Length);
-				EHIGJOACCNJ += buffer.Length;
+				cacheStream.Write(buffer, 0, buffer.Length);
+				allFragmentSize += buffer.Length;
 			}
 		}
 	}
 
-	protected void CCKDHANEGHM()
+	protected void WaitWhileHasFragments()
 	{
 	}
 
-	public List<byte[]> IOLFNBDPDDF()
+	public List<byte[]> GetStreamedFragments()
 	{
 		lock (SyncRoot)
 		{
@@ -907,7 +907,7 @@ public class HTTPResponse : IDisposable
 		}
 	}
 
-	internal bool PNOCCDHAAHI()
+	internal bool HasStreamedFragments()
 	{
 		lock (SyncRoot)
 		{
@@ -915,18 +915,18 @@ public class HTTPResponse : IDisposable
 		}
 	}
 
-	internal void NOEMFDALAGD()
+	internal void FinishStreaming()
 	{
-		OBGGJPGINGC(true);
+		SetIsStreamingFinished(true);
 		Dispose();
 	}
 
 	public void Dispose()
 	{
-		if (LLBCFJNMEHJ != null)
+		if (cacheStream != null)
 		{
-			LLBCFJNMEHJ.Dispose();
-			LLBCFJNMEHJ = null;
+			cacheStream.Dispose();
+			cacheStream = null;
 		}
 	}
 }

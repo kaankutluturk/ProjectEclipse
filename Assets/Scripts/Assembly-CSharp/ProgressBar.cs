@@ -11,11 +11,11 @@ public class ProgressBar : MonoBehaviour
 	[SerializeField]
 	public ResolutionImage Stripe;
 
-	private float JEECPIEHLLH;
+	private float minValue;
 
-	private float FPPIMENCNJP = 1f;
+	private float maxValue = 1f;
 
-	private float LOMDDBJKNNO = 1f;
+	private float currentValue = 1f;
 
 	private Tween _tween;
 
@@ -35,37 +35,37 @@ public class ProgressBar : MonoBehaviour
 
 	public void SetValueBorders(float LHNCHOAEGEA, float KAEPJHHLLPK)
 	{
-		JEECPIEHLLH = LHNCHOAEGEA;
-		FPPIMENCNJP = KAEPJHHLLPK;
-		IEHJMPBHAFJ();
+		minValue = LHNCHOAEGEA;
+		maxValue = KAEPJHHLLPK;
+		UpdateFill();
 	}
 
 	public virtual void SetValue(float OKEFHDDPMEC, float _Duration = 0f)
 	{
-		OKEFHDDPMEC = Mathf.Clamp(OKEFHDDPMEC, JEECPIEHLLH, FPPIMENCNJP);
-		if (LOMDDBJKNNO != OKEFHDDPMEC)
+		OKEFHDDPMEC = Mathf.Clamp(OKEFHDDPMEC, minValue, maxValue);
+		if (currentValue != OKEFHDDPMEC)
 		{
 			if (_tween != null)
 			{
 				_tween.Kill();
 				_tween = null;
 			}
-			_tween = DOTween.To(() => LOMDDBJKNNO, (float DHDMNHCIPEH) =>
+			_tween = DOTween.To(() => currentValue, (float DHDMNHCIPEH) =>
 			{
-				LOMDDBJKNNO = DHDMNHCIPEH;
-				IEHJMPBHAFJ();
+				currentValue = DHDMNHCIPEH;
+				UpdateFill();
 			}, OKEFHDDPMEC, _Duration);
-			IEHJMPBHAFJ();
+			UpdateFill();
 		}
 	}
 
 	public virtual float GetValue()
 	{
-		return LOMDDBJKNNO;
+		return currentValue;
 	}
 
-	private void IEHJMPBHAFJ()
+	private void UpdateFill()
 	{
-		Stripe.fillAmount = (LOMDDBJKNNO - JEECPIEHLLH) / (FPPIMENCNJP - JEECPIEHLLH);
+		Stripe.fillAmount = (currentValue - minValue) / (maxValue - minValue);
 	}
 }

@@ -6,29 +6,29 @@ using UnityEngine;
 
 public class AudioSettings
 {
-	public delegate void NKLBOBJEEDA(float JIJAJFEJJHK);
+	public delegate void VolumeChangedHandler(float JIJAJFEJJHK);
 
 	[CompilerGenerated]
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private NKLBOBJEEDA SoundsVolumeChanged;
+	private VolumeChangedHandler SoundsVolumeChanged;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
 	[CompilerGenerated]
-	private NKLBOBJEEDA MusicVolumeChanged;
+	private VolumeChangedHandler MusicVolumeChanged;
 
-	private float FFFFAMKMCLM;
+	private float masterVolume;
 
-	private float BNPMJIOBENC;
+	private float soundsVolume;
 
-	private float IOJKBCBFHKJ;
+	private float musicVolume;
 
 	private bool _muted;
 
-	public bool KHHDJOHAKFO
+	public bool IsMuted
 	{
 		get
 		{
-			return NJOFCALNKMF();
+			return GetMuted();
 		}
 		set
 		{
@@ -36,11 +36,11 @@ public class AudioSettings
 		}
 	}
 
-	public float MABNKFFKBKN
+	public float MasterVolumeLevel
 	{
 		get
 		{
-			return LFDFKPHKEGJ();
+			return GetMasterVolume();
 		}
 		set
 		{
@@ -48,111 +48,111 @@ public class AudioSettings
 		}
 	}
 
-	public float ECCOGGCFLPF
+	public float SoundsVolume
 	{
 		get
 		{
-			return NBHPABEBLOP();
+			return GetSoundsVolume();
 		}
 		set
 		{
-			JOFLPDCONNC(value);
+			SetSoundsVolume(value);
 		}
 	}
 
-	public float JBNOHFLLGPL
+	public float MusicVolume
 	{
 		get
 		{
-			return EAIGFAPKILL();
+			return GetMusicVolume();
 		}
 		set
 		{
-			OAFCOFNOIJK(value);
+			SetMusicVolume(value);
 		}
 	}
 
-	public event NKLBOBJEEDA KEAGHEHDMEH
+	public event VolumeChangedHandler OnSoundsVolumeChanged
 	{
 		add
 		{
-			PGIIMEJAHBH(value);
+			AddSoundsVolumeChanged(value);
 		}
 		remove
 		{
-			FMDGLOPCGEP(value);
+			RemoveSoundsVolumeChanged(value);
 		}
 	}
 
-	public event NKLBOBJEEDA CHMLIHIAEHM
+	public event VolumeChangedHandler OnMusicVolumeChanged
 	{
 		add
 		{
-			IKJIMIMPNJP(value);
+			AddMusicVolumeChanged(value);
 		}
 		remove
 		{
-			PPJOIHOPHFF(value);
+			RemoveMusicVolumeChanged(value);
 		}
 	}
 
 	internal AudioSettings()
 	{
-		FFFFAMKMCLM = PlayerPrefs.GetFloat("_masterVolume", 1f);
-		IOJKBCBFHKJ = PlayerPrefs.GetFloat("_musicVolume", 1f);
-		BNPMJIOBENC = PlayerPrefs.GetFloat("_soundsVolume", 1f);
+		masterVolume = PlayerPrefs.GetFloat("_masterVolume", 1f);
+		musicVolume = PlayerPrefs.GetFloat("_musicVolume", 1f);
+		soundsVolume = PlayerPrefs.GetFloat("_soundsVolume", 1f);
 		_muted = PlayerPrefs.GetInt("_muted", 0) == 1;
 	}
 
-	public void PGIIMEJAHBH(NKLBOBJEEDA value)
+	public void AddSoundsVolumeChanged(VolumeChangedHandler value)
 	{
-		NKLBOBJEEDA nKLBOBJEEDA = SoundsVolumeChanged;
-		NKLBOBJEEDA nKLBOBJEEDA2;
+		VolumeChangedHandler nKLBOBJEEDA = SoundsVolumeChanged;
+		VolumeChangedHandler nKLBOBJEEDA2;
 		do
 		{
 			nKLBOBJEEDA2 = nKLBOBJEEDA;
-			nKLBOBJEEDA = Interlocked.CompareExchange(ref SoundsVolumeChanged, (NKLBOBJEEDA)Delegate.Combine(nKLBOBJEEDA2, value), nKLBOBJEEDA);
+			nKLBOBJEEDA = Interlocked.CompareExchange(ref SoundsVolumeChanged, (VolumeChangedHandler)Delegate.Combine(nKLBOBJEEDA2, value), nKLBOBJEEDA);
 		}
 		while ((object)nKLBOBJEEDA != nKLBOBJEEDA2);
 	}
 
-	public void FMDGLOPCGEP(NKLBOBJEEDA value)
+	public void RemoveSoundsVolumeChanged(VolumeChangedHandler value)
 	{
-		NKLBOBJEEDA nKLBOBJEEDA = SoundsVolumeChanged;
-		NKLBOBJEEDA nKLBOBJEEDA2;
+		VolumeChangedHandler nKLBOBJEEDA = SoundsVolumeChanged;
+		VolumeChangedHandler nKLBOBJEEDA2;
 		do
 		{
 			nKLBOBJEEDA2 = nKLBOBJEEDA;
-			nKLBOBJEEDA = Interlocked.CompareExchange(ref SoundsVolumeChanged, (NKLBOBJEEDA)Delegate.Remove(nKLBOBJEEDA2, value), nKLBOBJEEDA);
+			nKLBOBJEEDA = Interlocked.CompareExchange(ref SoundsVolumeChanged, (VolumeChangedHandler)Delegate.Remove(nKLBOBJEEDA2, value), nKLBOBJEEDA);
 		}
 		while ((object)nKLBOBJEEDA != nKLBOBJEEDA2);
 	}
 
-	public void IKJIMIMPNJP(NKLBOBJEEDA value)
+	public void AddMusicVolumeChanged(VolumeChangedHandler value)
 	{
-		NKLBOBJEEDA nKLBOBJEEDA = MusicVolumeChanged;
-		NKLBOBJEEDA nKLBOBJEEDA2;
+		VolumeChangedHandler nKLBOBJEEDA = MusicVolumeChanged;
+		VolumeChangedHandler nKLBOBJEEDA2;
 		do
 		{
 			nKLBOBJEEDA2 = nKLBOBJEEDA;
-			nKLBOBJEEDA = Interlocked.CompareExchange(ref MusicVolumeChanged, (NKLBOBJEEDA)Delegate.Combine(nKLBOBJEEDA2, value), nKLBOBJEEDA);
+			nKLBOBJEEDA = Interlocked.CompareExchange(ref MusicVolumeChanged, (VolumeChangedHandler)Delegate.Combine(nKLBOBJEEDA2, value), nKLBOBJEEDA);
 		}
 		while ((object)nKLBOBJEEDA != nKLBOBJEEDA2);
 	}
 
-	public void PPJOIHOPHFF(NKLBOBJEEDA value)
+	public void RemoveMusicVolumeChanged(VolumeChangedHandler value)
 	{
-		NKLBOBJEEDA nKLBOBJEEDA = MusicVolumeChanged;
-		NKLBOBJEEDA nKLBOBJEEDA2;
+		VolumeChangedHandler nKLBOBJEEDA = MusicVolumeChanged;
+		VolumeChangedHandler nKLBOBJEEDA2;
 		do
 		{
 			nKLBOBJEEDA2 = nKLBOBJEEDA;
-			nKLBOBJEEDA = Interlocked.CompareExchange(ref MusicVolumeChanged, (NKLBOBJEEDA)Delegate.Remove(nKLBOBJEEDA2, value), nKLBOBJEEDA);
+			nKLBOBJEEDA = Interlocked.CompareExchange(ref MusicVolumeChanged, (VolumeChangedHandler)Delegate.Remove(nKLBOBJEEDA2, value), nKLBOBJEEDA);
 		}
 		while ((object)nKLBOBJEEDA != nKLBOBJEEDA2);
 	}
 
-	public bool NJOFCALNKMF()
+	public bool GetMuted()
 	{
 		return _muted;
 	}
@@ -162,66 +162,66 @@ public class AudioSettings
 		if (value != _muted)
 		{
 			_muted = value;
-			BKNHDEMCBFA(NBHPABEBLOP());
-			BIDFNHMGFKM(NBHPABEBLOP());
+			RaiseSoundsVolumeChanged(GetSoundsVolume());
+			RaiseMusicVolumeChanged(GetSoundsVolume());
 			PlayerPrefs.SetInt("_muted", _muted ? 1 : 0);
 			PlayerPrefs.Save();
 		}
 	}
 
-	public float LFDFKPHKEGJ()
+	public float GetMasterVolume()
 	{
-		return (!NJOFCALNKMF()) ? FFFFAMKMCLM : 0f;
+		return (!GetMuted()) ? masterVolume : 0f;
 	}
 
 	public void set_MasterVolume(float value)
 	{
 		value = Mathf.Clamp01(value);
-		if (!(Math.Abs(value - FFFFAMKMCLM) < 0.01f))
+		if (!(Math.Abs(value - masterVolume) < 0.01f))
 		{
-			FFFFAMKMCLM = value;
-			BKNHDEMCBFA(NBHPABEBLOP());
-			BIDFNHMGFKM(NBHPABEBLOP());
-			PlayerPrefs.SetFloat("_masterVolume", FFFFAMKMCLM);
+			masterVolume = value;
+			RaiseSoundsVolumeChanged(GetSoundsVolume());
+			RaiseMusicVolumeChanged(GetSoundsVolume());
+			PlayerPrefs.SetFloat("_masterVolume", masterVolume);
 			PlayerPrefs.Save();
 		}
 	}
 
-	public float NBHPABEBLOP()
+	public float GetSoundsVolume()
 	{
-		return BNPMJIOBENC * LFDFKPHKEGJ();
+		return soundsVolume * GetMasterVolume();
 	}
 
-	public void JOFLPDCONNC(float value)
+	public void SetSoundsVolume(float value)
 	{
 		value = Mathf.Clamp01(value);
-		if (!(Math.Abs(value - BNPMJIOBENC) < 0.01f))
+		if (!(Math.Abs(value - soundsVolume) < 0.01f))
 		{
-			BNPMJIOBENC = Mathf.Clamp01(value);
-			BKNHDEMCBFA(NBHPABEBLOP());
-			PlayerPrefs.SetFloat("_soundsVolume", BNPMJIOBENC);
+			soundsVolume = Mathf.Clamp01(value);
+			RaiseSoundsVolumeChanged(GetSoundsVolume());
+			PlayerPrefs.SetFloat("_soundsVolume", soundsVolume);
 			PlayerPrefs.Save();
 		}
 	}
 
-	public float EAIGFAPKILL()
+	public float GetMusicVolume()
 	{
-		return IOJKBCBFHKJ * LFDFKPHKEGJ();
+		return musicVolume * GetMasterVolume();
 	}
 
-	public void OAFCOFNOIJK(float value)
+	public void SetMusicVolume(float value)
 	{
 		value = Mathf.Clamp01(value);
-		if (!(Math.Abs(value - IOJKBCBFHKJ) < 0.01f))
+		if (!(Math.Abs(value - musicVolume) < 0.01f))
 		{
-			IOJKBCBFHKJ = Mathf.Clamp01(value);
-			BIDFNHMGFKM(NBHPABEBLOP());
-			PlayerPrefs.SetFloat("_musicVolume", IOJKBCBFHKJ);
+			musicVolume = Mathf.Clamp01(value);
+			RaiseMusicVolumeChanged(GetSoundsVolume());
+			PlayerPrefs.SetFloat("_musicVolume", musicVolume);
 			PlayerPrefs.Save();
 		}
 	}
 
-	protected virtual void BKNHDEMCBFA(float JIJAJFEJJHK)
+	protected virtual void RaiseSoundsVolumeChanged(float JIJAJFEJJHK)
 	{
 		if (SoundsVolumeChanged != null)
 		{
@@ -229,7 +229,7 @@ public class AudioSettings
 		}
 	}
 
-	protected virtual void BIDFNHMGFKM(float JIJAJFEJJHK)
+	protected virtual void RaiseMusicVolumeChanged(float JIJAJFEJJHK)
 	{
 		if (MusicVolumeChanged != null)
 		{

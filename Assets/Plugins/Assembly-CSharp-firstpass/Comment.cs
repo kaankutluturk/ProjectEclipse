@@ -4,16 +4,16 @@ using YamlDotNet.Core;
 public class Comment : ParsingEvent
 {
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private string IELPCLONGKP;
+	private string commentValue;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private bool DGLPEGPPNJJ;
+	private bool isInline;
 
-	public bool BAAFBDAEGOJ
+	public bool IsInlineComment
 	{
 		get
 		{
-			return IGLENNPMPDJ();
+			return GetIsInline();
 		}
 		private set
 		{
@@ -33,32 +33,32 @@ public class Comment : ParsingEvent
 		set_IsInline(EKOKIGANOMO);
 	}
 
-	public string OEAKCOHMIHH()
+	public string GetValue()
 	{
-		return IELPCLONGKP;
+		return commentValue;
 	}
 
 	private void set_Value(string value)
 	{
-		IELPCLONGKP = value;
+		commentValue = value;
 	}
 
-	public bool IGLENNPMPDJ()
+	public bool GetIsInline()
 	{
-		return DGLPEGPPNJJ;
+		return isInline;
 	}
 
 	private void set_IsInline(bool value)
 	{
-		DGLPEGPPNJJ = value;
+		isInline = value;
 	}
 
-	internal override BHBPOHDAGPH get_Type()
+	internal override ParsingEventType get_Type()
 	{
-		return BHBPOHDAGPH.Comment;
+		return ParsingEventType.Comment;
 	}
 
-	public override void GPHIFFOGOGN(IParsingEventVisitor NKECMANOOEM)
+	public override void Accept(IParsingEventVisitor NKECMANOOEM)
 	{
 		NKECMANOOEM.Visit(this);
 	}

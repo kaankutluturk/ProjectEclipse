@@ -11,7 +11,7 @@ namespace Eclipse.Modding
     public static class ModRuntime { public static ModScriptSession Scripts = new ModScriptSession(); }
     public static class ModModeRuntime { public static bool OfflineRaid; public static bool IsRaid(FightList fight)=>OfflineRaid; }
 }
-public static class StageType { public enum FDBBPEGEGMK { STAGE_FIGHT, STAGE_END_STANCE } }
+public static class StageType { public enum Stage { STAGE_FIGHT, STAGE_END_STANCE } }
 public sealed class FightList { public BattleType Type=BattleType.FightTournament; public BattleType get_Type()=>Type; }
 public sealed class RoundData { public int round=1; public bool processing=true; }
 public sealed class Vector3f { public float X,Y,Z; public Vector3f(float x,float y,float z){X=x;Y=y;Z=z;} }
@@ -38,7 +38,7 @@ public partial class Fight
     public bool IsLocalVersus,IsTitleSparring,_modelTransitionsClosed,_eclipseFightEndDispatched,Paused;
     public bool isEndRound,isGameOver,isStopFight;
     public int _eclipseEndedRound=-1,Clock=1;
-    public StageType.FDBBPEGEGMK stageType=StageType.FDBBPEGEGMK.STAGE_FIGHT;
+    public StageType.Stage stageType=StageType.Stage.STAGE_FIGHT;
     public Fight(){Current=this;ModRuntime.Scripts=new ModScriptSession();ModModeRuntime.OfflineRaid=false;}
     public static Fight GetCurrentFight()=>Current;
     public Model GetPlayerModel()=>Player;

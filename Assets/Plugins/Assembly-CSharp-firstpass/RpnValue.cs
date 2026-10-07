@@ -4,21 +4,21 @@ using System.Runtime.CompilerServices;
 
 public class RpnValue<T>
 {
-	private const string NIBHABIAIKI = "?CLC_";
+	private const string CalculatedPrefix = "?CLC_";
 
-	private const string OCPFCPGBHNO = "?";
+	private const string FunctionPrefix = "?";
 
 	private bool isConst;
 
 	private T value;
 
-	private RpnParser.Formula DPABILBDPFF;
+	private RpnParser.Formula formula;
 
 	public T Value
 	{
 		get
 		{
-			return OEAKCOHMIHH();
+			return GetValue();
 		}
 	}
 
@@ -30,19 +30,19 @@ public class RpnValue<T>
 
 	public RpnValue(string BOADBNLBJAN, bool AEKOOFJLNFP = false)
 	{
-		DPABILBDPFF = new RpnParser.Formula(BOADBNLBJAN);
+		formula = new RpnParser.Formula(BOADBNLBJAN);
 		if (BOADBNLBJAN.Contains("?CLC_") || !BOADBNLBJAN.Contains("?"))
 		{
-			value = ConvertTo(DPABILBDPFF.ODHJHHMEEOI().ToString());
+			value = ConvertTo(formula.Calculate().ToString());
 			isConst = true;
-			DPABILBDPFF = null;
+			formula = null;
 		}
 	}
 
 	[SpecialName]
 	public static T op_Implicit(global::RpnValue<T> NMICDDBHMDN)
 	{
-		return NMICDDBHMDN.OEAKCOHMIHH();
+		return NMICDDBHMDN.GetValue();
 	}
 
 	[SpecialName]
@@ -84,12 +84,12 @@ public class RpnValue<T>
 		return BHMCGLHBCBI.ToLower() == "true" || BHMCGLHBCBI == "1";
 	}
 
-	public T OEAKCOHMIHH()
+	public T GetValue()
 	{
 		if (isConst)
 		{
 			return value;
 		}
-		return ConvertTo(DPABILBDPFF.ODHJHHMEEOI().ToString());
+		return ConvertTo(formula.Calculate().ToString());
 	}
 }

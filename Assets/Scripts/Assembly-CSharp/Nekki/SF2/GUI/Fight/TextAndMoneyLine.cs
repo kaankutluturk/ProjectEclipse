@@ -25,31 +25,31 @@ namespace Nekki.SF2.GUI.Fight
 		[SerializeField]
 		private float moneyAddTime;
 
-		private Vector2 IINGLPEOPNN;
+		private Vector2 labelTargetPosition;
 
-		private long PHGCCAFJFLL;
+		private long targetMoney;
 
-		private long CDGOOJOAOPL;
+		private long displayedMoney;
 
-		private long EKHOFFABFOG;
+		private long targetRubies;
 
-		private long LJAEAKIDDOE;
+		private long displayedRubies;
 
 		private bool needShowLabel;
 
-		private DG.Tweening.Sequence BMJCFMAIDIE;
+		private DG.Tweening.Sequence labelSequence;
 
-		private DG.Tweening.Sequence HEFFELHEAME;
+		private DG.Tweening.Sequence countSequence;
 
 		private UnityEvent endEvent = new UnityEvent();
 
 		public void Init(string HCPNFPMHFCM, long GBGNFPNCGED, long PAGGOKFIEOP, string BBLOBPOCGNM = "")
 		{
 			needShowLabel = true;
-			PHGCCAFJFLL = GBGNFPNCGED;
-			CDGOOJOAOPL = 0L;
-			EKHOFFABFOG = PAGGOKFIEOP;
-			LJAEAKIDDOE = 0L;
+			targetMoney = GBGNFPNCGED;
+			displayedMoney = 0L;
+			targetRubies = PAGGOKFIEOP;
+			displayedRubies = 0L;
 			NumberFormatInfo numberFormatInfo = new NumberFormatInfo();
 			numberFormatInfo.NumberGroupSeparator = " ";
 			NumberFormatInfo numberFormatInfo2 = numberFormatInfo;
@@ -63,18 +63,18 @@ namespace Nekki.SF2.GUI.Fight
 				// The recovered label has a zero-width rect. Give the localized text
 				// a measurable box before its entrance tween captures the destination.
 				textLabel.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, Mathf.Max(1f, textLabel.preferredWidth));
-				IINGLPEOPNN = textLabel.transform.localPosition;
+				labelTargetPosition = textLabel.transform.localPosition;
 				textLabel.transform.localPosition = basePos;
 			}
 			if (moneyCount != null)
 			{
-				moneyCount.SetIcon(ListSF.CCDKHLAMKKO().OGJBDMNBMLJ());
-				moneyCount.SetText(CDGOOJOAOPL.ToString("N0", numberFormatInfo2));
+				moneyCount.SetIcon(ListSF.GetRoster().GetCoinIcon());
+				moneyCount.SetText(displayedMoney.ToString("N0", numberFormatInfo2));
 				moneyCount.gameObject.SetActive(false);
 			}
 			if (rubyCount != null)
 			{
-				rubyCount.SetText(LJAEAKIDDOE.ToString("N0", numberFormatInfo2));
+				rubyCount.SetText(displayedRubies.ToString("N0", numberFormatInfo2));
 				rubyCount.gameObject.SetActive(false);
 			}
 		}
@@ -83,64 +83,64 @@ namespace Nekki.SF2.GUI.Fight
 		{
 			if (needShowLabel)
 			{
-				NEOAHCLHNHE();
+				PlayLabelAnimation();
 				needShowLabel = false;
 			}
 			else
 			{
-				IAPEAPKIIHN();
+				PlayCountAnimation();
 			}
 		}
 
-		private void NEOAHCLHNHE()
+		private void PlayLabelAnimation()
 		{
-			BMJCFMAIDIE = DOTween.Sequence();
+			labelSequence = DOTween.Sequence();
 			if (textLabel != null)
 			{
-				BMJCFMAIDIE.Append(textLabel.transform.DOLocalMove(IINGLPEOPNN, textMoveTime));
+				labelSequence.Append(textLabel.transform.DOLocalMove(labelTargetPosition, textMoveTime));
 			}
-			BMJCFMAIDIE.AppendCallback(() =>
+			labelSequence.AppendCallback(() =>
 			{
-				if ((PHGCCAFJFLL > 0 || EKHOFFABFOG < 1) && moneyCount != null)
+				if ((targetMoney > 0 || targetRubies < 1) && moneyCount != null)
 				{
 					moneyCount.gameObject.SetActive(true);
 				}
-				if (EKHOFFABFOG > 0 && rubyCount != null)
+				if (targetRubies > 0 && rubyCount != null)
 				{
 					rubyCount.gameObject.SetActive(true);
 				}
 			});
-			BMJCFMAIDIE.AppendCallback(() =>
+			labelSequence.AppendCallback(() =>
 			{
 				endEvent.Invoke();
 			});
 		}
 
-		private void IAPEAPKIIHN()
+		private void PlayCountAnimation()
 		{
 			NumberFormatInfo f = new NumberFormatInfo
 			{
 				NumberGroupSeparator = " "
 			};
-			HEFFELHEAME = DOTween.Sequence();
+			countSequence = DOTween.Sequence();
 			if (moneyCount != null && rubyCount != null)
 			{
-				Tweener t = DOTween.To(() => CDGOOJOAOPL, (long DHDMNHCIPEH) =>
+				Tweener t = DOTween.To(() => displayedMoney, (long DHDMNHCIPEH) =>
 				{
-					CDGOOJOAOPL = DHDMNHCIPEH;
-					moneyCount.SetText(CDGOOJOAOPL.ToString("N0", f));
-				}, PHGCCAFJFLL, moneyAddTime);
-				HEFFELHEAME.Append(t);
-				if (EKHOFFABFOG > 0)
+					displayedMoney = DHDMNHCIPEH;
+					moneyCount.SetText(displayedMoney.ToString("N0", f));
+				}, targetMoney, moneyAddTime);
+				countSequence.Append(t);
+				if (targetRubies > 0)
 				{
-					Tweener t2 = DOTween.To(() => LJAEAKIDDOE, (long DHDMNHCIPEH) =>
+					Tweener t2 = DOTween.To(() => displayedRubies, (long DHDMNHCIPEH) =>
 					{
-						LJAEAKIDDOE = DHDMNHCIPEH;
-						rubyCount.SetText(LJAEAKIDDOE.ToString("N0", f));
-					}, EKHOFFABFOG, moneyAddTime);
-					HEFFELHEAME.Join(t2);
+						displayedRubies = DHDMNHCIPEH;
+						rubyCount.SetText(displayedRubies.ToString("N0", f));
+					}, targetRubies, moneyAddTime);
+					countSequence.Join(t2);
 				}
-				HEFFELHEAME.AppendCallback(() =>
+				countSequence.AppendCallback(() =>
 				{
 					endEvent.Invoke();
 				});
@@ -166,31 +166,31 @@ namespace Nekki.SF2.GUI.Fight
 			NumberFormatInfo numberFormatInfo = new NumberFormatInfo();
 			numberFormatInfo.NumberGroupSeparator = " ";
 			NumberFormatInfo numberFormatInfo2 = numberFormatInfo;
-			if (BMJCFMAIDIE != null)
+			if (labelSequence != null)
 			{
-				BMJCFMAIDIE.Kill();
-				BMJCFMAIDIE = null;
+				labelSequence.Kill();
+				labelSequence = null;
 			}
-			if (HEFFELHEAME != null)
+			if (countSequence != null)
 			{
-				HEFFELHEAME.Kill();
-				HEFFELHEAME = null;
+				countSequence.Kill();
+				countSequence = null;
 			}
 			if (textLabel != null)
 			{
-				textLabel.transform.localPosition = IINGLPEOPNN;
+				textLabel.transform.localPosition = labelTargetPosition;
 			}
-			if ((PHGCCAFJFLL > 0 || EKHOFFABFOG < 1) && moneyCount != null)
+			if ((targetMoney > 0 || targetRubies < 1) && moneyCount != null)
 			{
 				moneyCount.gameObject.SetActive(true);
-				CDGOOJOAOPL = PHGCCAFJFLL;
-				moneyCount.SetText(CDGOOJOAOPL.ToString("N0", numberFormatInfo2));
+				displayedMoney = targetMoney;
+				moneyCount.SetText(displayedMoney.ToString("N0", numberFormatInfo2));
 			}
-			if (EKHOFFABFOG > 0 && rubyCount != null)
+			if (targetRubies > 0 && rubyCount != null)
 			{
 				rubyCount.gameObject.SetActive(true);
-				LJAEAKIDDOE = EKHOFFABFOG;
-				rubyCount.SetText(LJAEAKIDDOE.ToString("N0", numberFormatInfo2));
+				displayedRubies = targetRubies;
+				rubyCount.SetText(displayedRubies.ToString("N0", numberFormatInfo2));
 			}
 		}
 	}

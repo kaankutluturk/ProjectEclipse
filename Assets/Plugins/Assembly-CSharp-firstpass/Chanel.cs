@@ -10,21 +10,21 @@ internal class Chanel
 	private Dictionary<string, AudioClip> _clips;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private bool GHKEHHMNBLO;
+	private bool isMusic;
 
-	public bool JNCMBHENOIM;
-
-	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private int CLPCIBMBDDP;
+	public bool IsMute;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private float FGBOBKBLFBP;
+	private int id;
 
-	public bool MKAGGEPMEHF
+	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
+	private float masterVolume;
+
+	public bool IsMusicChannel
 	{
 		get
 		{
-			return AGEEHOABFFF();
+			return GetIsMusic();
 		}
 		private set
 		{
@@ -32,19 +32,19 @@ internal class Chanel
 		}
 	}
 
-	public bool EELNODBOPAB
+	public bool IsSoundChannel
 	{
 		get
 		{
-			return MJAONMOCKNO();
+			return GetIsSound();
 		}
 	}
 
-	public int GJCOGFOJAEB
+	public int ChannelId
 	{
 		get
 		{
-			return ANAECCFDHMI();
+			return GetChannelId();
 		}
 		private set
 		{
@@ -52,19 +52,19 @@ internal class Chanel
 		}
 	}
 
-	public bool BDJPLHOKIPF
+	public bool IsPlaying
 	{
 		get
 		{
-			return EGCDMGAFFEE();
+			return GetIsPlaying();
 		}
 	}
 
-	public float MABNKFFKBKN
+	public float Volume
 	{
 		get
 		{
-			return LFDFKPHKEGJ();
+			return GetMasterVolume();
 		}
 		set
 		{
@@ -77,73 +77,73 @@ internal class Chanel
 		set_IsMusic(MHAFPAHIFKP);
 		set_ID(OKNNNLIPODI);
 		_clips = OCEMOHJPDLK;
-		JNCMBHENOIM = false;
+		IsMute = false;
 		set_MasterVolume(1f);
 	}
 
-	public bool AGEEHOABFFF()
+	public bool GetIsMusic()
 	{
-		return GHKEHHMNBLO;
+		return isMusic;
 	}
 
 	private void set_IsMusic(bool value)
 	{
-		GHKEHHMNBLO = value;
+		isMusic = value;
 	}
 
-	public bool MJAONMOCKNO()
+	public bool GetIsSound()
 	{
-		return !AGEEHOABFFF();
+		return !GetIsMusic();
 	}
 
-	public int ANAECCFDHMI()
+	public int GetChannelId()
 	{
-		return CLPCIBMBDDP;
+		return id;
 	}
 
 	private void set_ID(int value)
 	{
-		CLPCIBMBDDP = value;
+		id = value;
 	}
 
-	public bool EGCDMGAFFEE()
+	public bool GetIsPlaying()
 	{
 		return _active.Count != 0;
 	}
 
-	public float LFDFKPHKEGJ()
+	public float GetMasterVolume()
 	{
-		return FGBOBKBLFBP;
+		return masterVolume;
 	}
 
 	public void set_MasterVolume(float value)
 	{
-		FGBOBKBLFBP = value;
+		masterVolume = value;
 	}
 
-	internal void EACCANOGCFL(PlayCommand LEKEGLMDAHA)
+	internal void Play(PlayCommand LEKEGLMDAHA)
 	{
-		AudioClip audioClip = ((!_clips.ContainsKey(LEKEGLMDAHA.JIKANFGDMJN())) ? null : _clips[LEKEGLMDAHA.JIKANFGDMJN()]);
+		AudioClip audioClip = ((!_clips.ContainsKey(LEKEGLMDAHA.GetSound())) ? null : _clips[LEKEGLMDAHA.GetSound()]);
 		if (!audioClip)
 		{
 			return;
 		}
-		if (!LEKEGLMDAHA.FKGNNDDNJDN())
+		if (!LEKEGLMDAHA.GetOverlap())
 		{
-			IEHPNJOOPCG();
+			StopAll();
 		}
-		if (_active.ContainsKey(LEKEGLMDAHA.JIKANFGDMJN()))
+		if (_active.ContainsKey(LEKEGLMDAHA.GetSound()))
 		{
-			_active[LEKEGLMDAHA.JIKANFGDMJN()].Init(this, LEKEGLMDAHA, audioClip);
-			_active[LEKEGLMDAHA.JIKANFGDMJN()].set_IsMute(JNCMBHENOIM);
+			_active[LEKEGLMDAHA.GetSound()].Init(this, LEKEGLMDAHA, audioClip);
+			_active[LEKEGLMDAHA.GetSound()].set_IsMute(IsMute);
 			return;
 		}
-		AudioUnit audioUnit = OverallUnitPool.NGDGDCCFONE();
+		AudioUnit audioUnit = OverallUnitPool.GetFreeUnit();
 		if ((bool)audioUnit)
 		{
 			audioUnit.Init(this, LEKEGLMDAHA, audioClip);
-			audioUnit.set_IsMute(JNCMBHENOIM);
-			_active.Add(LEKEGLMDAHA.JIKANFGDMJN(), audioUnit);
+			audioUnit.set_IsMute(IsMute);
+			_active.Add(LEKEGLMDAHA.GetSound(), audioUnit);
 		}
 	}
 
@@ -189,7 +189,7 @@ internal class Chanel
 		}
 	}
 
-	public void IEHPNJOOPCG(bool BJIOMMPCLEA = false)
+	public void StopAll(bool BJIOMMPCLEA = false)
 	{
 		foreach (AudioUnit value in _active.Values)
 		{
@@ -198,18 +198,18 @@ internal class Chanel
 		_active.Clear();
 	}
 
-	public void LKLAFKJFNIP()
+	public void Mute()
 	{
-		JNCMBHENOIM = true;
+		IsMute = true;
 		foreach (AudioUnit value in _active.Values)
 		{
 			value.set_IsMute(true);
 		}
 	}
 
-	public void PNNNNJBKONA()
+	public void Unmute()
 	{
-		JNCMBHENOIM = false;
+		IsMute = false;
 		foreach (AudioUnit value in _active.Values)
 		{
 			value.set_IsMute(false);

@@ -16,7 +16,7 @@ if ($LASTEXITCODE -ne 0) { throw 'Campaign save checks failed.' }
 # The native loader must remain stopped until a title selection is complete;
 # a path lease is released only after the outgoing profile has been stopped.
 $loader = Get-Content -Raw (Join-Path $root 'Assets/Scripts/Assembly-CSharp/Nekki/SF2/GUI/Scenes/GameLoaderScene.cs')
-$stop = $loader.IndexOf('Stop(); HOCNNFGOMHL = false;')
+$stop = $loader.IndexOf('Stop(); stopPending = false;')
 $arrive = $loader.IndexOf('GameSessionRestart.ArrivedAtTitle()')
 if ($stop -lt 0 -or $arrive -lt 0 -or $stop -gt $arrive -or
     !$loader.Contains('if (Eclipse.UI.TitleScreen.IsOpen) return;')) { throw 'Title profile handoff guard changed.' }

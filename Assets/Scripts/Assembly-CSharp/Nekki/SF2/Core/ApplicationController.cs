@@ -27,7 +27,7 @@ namespace Nekki.SF2.Core
 
 		private static ApplicationController _Instance;
 
-		public bool FPJLHEMGNNB
+		public bool IsAppPaused
 		{
 			get
 			{
@@ -47,7 +47,7 @@ namespace Nekki.SF2.Core
 			}
 		}
 
-		public static event Action<bool> EIPNBNDFEFF
+		public static event Action<bool> PauseChanged
 		{
 			add
 			{
@@ -59,7 +59,7 @@ namespace Nekki.SF2.Core
 			}
 		}
 
-		public static event Action LCNANNAJNGG
+		public static event Action FrameUpdated
 		{
 			add
 			{
@@ -141,7 +141,7 @@ namespace Nekki.SF2.Core
 			{
 				GameObject gameObject = new GameObject("[ApplicationController]");
 				_Instance = gameObject.AddComponent<ApplicationController>();
-				ObscuredCheatingDetector.StartDetection(_Instance.GDCNEGNCLPG);
+				ObscuredCheatingDetector.StartDetection(_Instance.OnCheatingDetected);
 				UnityEngine.Object.DontDestroyOnLoad(gameObject);
 			}
 		}
@@ -172,9 +172,9 @@ namespace Nekki.SF2.Core
 
 		private void RandomizeObscuredVars()
 		{
-			if (ListSF.CCDKHLAMKKO() != null)
+			if (ListSF.GetRoster() != null)
 			{
-				ListSF.CCDKHLAMKKO().RandomizeObscuredVars();
+				ListSF.GetRoster().RandomizeObscuredVars();
 				ListSF.GetItems().RandomizeObscuredVars();
 				ListSF.GetInstance().RandomizeObscuredVars();
 				if (Scene<FightScene>.get_Current() != null)
@@ -184,7 +184,7 @@ namespace Nekki.SF2.Core
 			}
 		}
 
-		private void GDCNEGNCLPG()
+		private void OnCheatingDetected()
 		{
 			Quit();
 		}

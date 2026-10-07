@@ -69,56 +69,56 @@ namespace CodeStage.AntiCheat.Examples
 			logBuilder.AppendLine("[ACTk] <b>[ Performance tests ]</b>");
 			if (boolTest)
 			{
-				KMKCDDEPAPO();
+				TestBool();
 			}
 			if (byteTest)
 			{
-				DPDGEADKHMD();
+				TestByte();
 			}
 			if (shortTest)
 			{
-				OCPMOAGOILG();
+				TestShort();
 			}
 			if (ushortTest)
 			{
-				FNPKEJLIIIL();
+				TestUShort();
 			}
 			if (intTest)
 			{
-				CNDEIMMMBDC();
+				TestInt();
 			}
 			if (uintTest)
 			{
-				BNHNLPMPDLP();
+				TestUInt();
 			}
 			if (longTest)
 			{
-				HIAHCFHNPBM();
+				TestLong();
 			}
 			if (floatTest)
 			{
-				HFJNIOGAPGN();
+				TestFloat();
 			}
 			if (doubleTest)
 			{
-				JKPAANFGOPL();
+				TestDouble();
 			}
 			if (stringTest)
 			{
-				JLEAFAGGMMA();
+				TestString();
 			}
 			if (vector3Test)
 			{
-				PBPBBJIBLIL();
+				TestVector3();
 			}
 			if (prefsTest)
 			{
-				GCOFOKLHJMB();
+				TestObscuredPrefs();
 			}
 			UnityEngine.Debug.Log(logBuilder);
 		}
 
-		private void KMKCDDEPAPO()
+		private void TestBool()
 		{
 			logBuilder.AppendLine("ObscuredBool vs bool, " + boolIterations + " iterations for read and write");
 			ObscuredBool bAINMLLIKOL = (ObscuredBool)(true);
@@ -158,7 +158,7 @@ namespace CodeStage.AntiCheat.Examples
 			}
 		}
 
-		private void DPDGEADKHMD()
+		private void TestByte()
 		{
 			logBuilder.AppendLine("ObscuredByte vs byte, " + byteIterations + " iterations for read and write");
 			ObscuredByte bAINMLLIKOL = (ObscuredByte)(100);
@@ -198,7 +198,7 @@ namespace CodeStage.AntiCheat.Examples
 			}
 		}
 
-		private void OCPMOAGOILG()
+		private void TestShort()
 		{
 			logBuilder.AppendLine("ObscuredShort vs short, " + shortIterations + " iterations for read and write");
 			ObscuredShort bAINMLLIKOL = (ObscuredShort)(100);
@@ -238,7 +238,7 @@ namespace CodeStage.AntiCheat.Examples
 			}
 		}
 
-		private void FNPKEJLIIIL()
+		private void TestUShort()
 		{
 			logBuilder.AppendLine("ObscuredUShort vs ushort, " + ushortIterations + " iterations for read and write");
 			ObscuredUShort bAINMLLIKOL = (ObscuredUShort)(100);
@@ -278,7 +278,7 @@ namespace CodeStage.AntiCheat.Examples
 			}
 		}
 
-		private void JKPAANFGOPL()
+		private void TestDouble()
 		{
 			logBuilder.AppendLine("ObscuredDouble vs double, " + doubleIterations + " iterations for read and write");
 			ObscuredDouble bAINMLLIKOL = (ObscuredDouble)(100.0);
@@ -318,7 +318,7 @@ namespace CodeStage.AntiCheat.Examples
 			}
 		}
 
-		private void HFJNIOGAPGN()
+		private void TestFloat()
 		{
 			logBuilder.AppendLine("ObscuredFloat vs float, " + floatIterations + " iterations for read and write");
 			ObscuredFloat bAINMLLIKOL = (ObscuredFloat)(100f);
@@ -358,7 +358,7 @@ namespace CodeStage.AntiCheat.Examples
 			}
 		}
 
-		private void CNDEIMMMBDC()
+		private void TestInt()
 		{
 			logBuilder.AppendLine("ObscuredInt vs int, " + intIterations + " iterations for read and write");
 			ObscuredInt bAINMLLIKOL = (ObscuredInt)(100);
@@ -398,7 +398,7 @@ namespace CodeStage.AntiCheat.Examples
 			}
 		}
 
-		private void HIAHCFHNPBM()
+		private void TestLong()
 		{
 			logBuilder.AppendLine("ObscuredLong vs long, " + longIterations + " iterations for read and write");
 			ObscuredLong bAINMLLIKOL = (ObscuredLong)(100L);
@@ -438,7 +438,7 @@ namespace CodeStage.AntiCheat.Examples
 			}
 		}
 
-		private void JLEAFAGGMMA()
+		private void TestString()
 		{
 			logBuilder.AppendLine("ObscuredString vs string, " + stringIterations + " iterations for read and write");
 			ObscuredString obscuredString = (ObscuredString)("abcd");
@@ -470,7 +470,7 @@ namespace CodeStage.AntiCheat.Examples
 			if (text2 != string.Empty)
 			{
 			}
-			if (ObscuredString.GLCJKGIOIEC(obscuredString, (ObscuredString)(string.Empty)))
+			if (ObscuredString.op_Inequality(obscuredString, (ObscuredString)(string.Empty)))
 			{
 			}
 			if (!(text != string.Empty))
@@ -478,7 +478,7 @@ namespace CodeStage.AntiCheat.Examples
 			}
 		}
 
-		private void BNHNLPMPDLP()
+		private void TestUInt()
 		{
 			logBuilder.AppendLine("ObscuredUInt vs uint, " + uintIterations + " iterations for read and write");
 			ObscuredUInt bAINMLLIKOL = (ObscuredUInt)(100u);
@@ -518,7 +518,7 @@ namespace CodeStage.AntiCheat.Examples
 			}
 		}
 
-		private void PBPBBJIBLIL()
+		private void TestVector3()
 		{
 			logBuilder.AppendLine("ObscuredVector3 vs Vector3, " + vector3Iterations + " iterations for read and write");
 			ObscuredVector3 obscuredVector = (ObscuredVector3)(new Vector3(1f, 2f, 3f));
@@ -550,7 +550,7 @@ namespace CodeStage.AntiCheat.Examples
 			if (vector2 != Vector3.zero)
 			{
 			}
-			if (ObscuredVector3.GLCJKGIOIEC(obscuredVector, Vector3.zero))
+			if (ObscuredVector3.op_Inequality(obscuredVector, Vector3.zero))
 			{
 			}
 			if (!(vector != Vector3.zero))
@@ -558,7 +558,7 @@ namespace CodeStage.AntiCheat.Examples
 			}
 		}
 
-		private void GCOFOKLHJMB()
+		private void TestObscuredPrefs()
 		{
 			logBuilder.AppendLine("ObscuredPrefs vs PlayerPrefs, " + prefsIterations + " iterations for read and write");
 			Stopwatch stopwatch = Stopwatch.StartNew();
@@ -576,9 +576,9 @@ namespace CodeStage.AntiCheat.Examples
 			}
 			stopwatch.Stop();
 			logBuilder.AppendLine("ObscuredPrefs:").AppendLine(stopwatch.ElapsedMilliseconds + " ms");
-			ObscuredPrefs.LPJJAFDEKIB("__a");
-			ObscuredPrefs.LPJJAFDEKIB("__b");
-			ObscuredPrefs.LPJJAFDEKIB("__c");
+			ObscuredPrefs.DeleteKey("__a");
+			ObscuredPrefs.DeleteKey("__b");
+			ObscuredPrefs.DeleteKey("__c");
 			stopwatch.Reset();
 			stopwatch.Start();
 			for (int k = 0; k < prefsIterations; k++)

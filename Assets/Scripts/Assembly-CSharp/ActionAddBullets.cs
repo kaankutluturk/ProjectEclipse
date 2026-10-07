@@ -2,15 +2,15 @@ using System.Xml;
 
 public class ActionAddBullets : ActionAnimation
 {
-	private BulletType KCIIELDOBOM;
+	private BulletType bulletType;
 
 	private int _Value;
 
-	public BulletType HJEILDDNNCJ
+	public BulletType Kind
 	{
 		get
 		{
-			return AOLGKCANKLL();
+			return GetBulletType();
 		}
 	}
 
@@ -18,49 +18,49 @@ public class ActionAddBullets : ActionAnimation
 	{
 		get
 		{
-			return OEAKCOHMIHH();
+			return GetValue();
 		}
 	}
 
 	public ActionAddBullets(XmlNode node)
-		: base(FADAJCEEKIO.ADD_BULLETS)
+		: base(ActionType.ADD_BULLETS)
 	{
 		Parse(node);
 	}
 
-	public BulletType AOLGKCANKLL()
+	public BulletType GetBulletType()
 	{
-		return KCIIELDOBOM;
+		return bulletType;
 	}
 
-	public int OEAKCOHMIHH()
+	public int GetValue()
 	{
 		return _Value;
 	}
 
 	public override void Visit(Model ACENLMONNPA)
 	{
-		ACENLMONNPA.OPPIKLBKMPN(this);
+		ACENLMONNPA.StartAction(this);
 	}
 
 	protected override void Parse(XmlNode node)
 	{
 		base.Parse(node);
-		string text = node.Attributes["Type"].CIPOICEEIBK(string.Empty);
+		string text = node.Attributes["Type"].GetStringOrDefault(string.Empty);
 		if (text == "MagicBullet")
 		{
-			KCIIELDOBOM = BulletType.MAGIC_BULLET;
+			bulletType = BulletType.MAGIC_BULLET;
 		}
 		else if (text == "RaidChargeBullet")
 		{
-			KCIIELDOBOM = BulletType.RAID_CHARGE_BULLET;
+			bulletType = BulletType.RAID_CHARGE_BULLET;
 		}
 		else
 		{
-			LLLOJBFMONN.Error("ERROR: Unknown bulletType");
+			GameLog.Error("ERROR: Unknown bulletType");
 		}
 		_Value = node.Attributes["Value"].ParseInt();
-		if ((KCIIELDOBOM == BulletType.MAGIC_BULLET || KCIIELDOBOM == BulletType.RAID_CHARGE_BULLET) && GameUtils.GLHMHHIADMK)
+		if ((bulletType == BulletType.MAGIC_BULLET || bulletType == BulletType.RAID_CHARGE_BULLET) && GameUtils.AlwaysMagicMode)
 		{
 			_Value = 0;
 		}

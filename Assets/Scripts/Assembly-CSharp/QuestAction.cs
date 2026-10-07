@@ -9,21 +9,21 @@ using UnityEngine;
 
 public class QuestAction : global::EventDispatcher<object>
 {
-	public enum KHLLOOHAMLC
+	public enum InputLockMode
 	{
 		LOCK_NONE = 0,
 		LOCK_SILENT = 1,
 		LOCK_VISIBLE = 2
 	}
 
-	public enum GMNIJDEMPNF
+	public enum QuestActionEvent
 	{
 		OnRun = 0,
 		OnComplete = 1,
 		OnCreateRosterQuest = 2
 	}
 
-	public enum PODELEEIBMP
+	public enum QuestActionType
 	{
 		QUEST_ACTION_NONE = 0,
 		QUEST_ACTION_DIALOG = 1,
@@ -131,230 +131,230 @@ public class QuestAction : global::EventDispatcher<object>
 
 	public bool CheckPoint;
 
-	public string EFJMDEMAGIM;
+	public string ActionName;
 
-	public string ONGHPGEIJEN;
+	public string QuestName;
 
-	public string AEHNKDOJALB;
+	public string QuestFileName;
 
-	public int AMIMGEOENPL;
+	public int StageIndex;
 
-	public QuestParameters PAJDEKLLFNJ;
+	public QuestParameters Parameters;
 
-	private QuestStage DOKAIKMLLDK;
+	private QuestStage stage;
 
-	private string DPBKBKDCIOI;
+	private string soundName;
 
-	private KHLLOOHAMLC JKIPOGOLAAI;
+	private InputLockMode lockMode;
 
-	public static PODELEEIBMP HJCIPCKMANH(string LFLGCDNKNJI)
+	public static QuestActionType GetActionTypeByName(string LFLGCDNKNJI)
 	{
 		switch (LFLGCDNKNJI)
 		{
 		case "Dialog":
-			return PODELEEIBMP.QUEST_ACTION_DIALOG;
+			return QuestActionType.QUEST_ACTION_DIALOG;
 		case "DialogCheckTickets":
-			return PODELEEIBMP.QUEST_ACTION_DIALOG_CHECK_TICKETS;
+			return QuestActionType.QUEST_ACTION_DIALOG_CHECK_TICKETS;
 		case "DialogLottery":
-			return PODELEEIBMP.QUEST_ACTION_DIALOG_LOTTERY;
+			return QuestActionType.QUEST_ACTION_DIALOG_LOTTERY;
 		case "Fight":
-			return PODELEEIBMP.QUEST_ACTION_FIGHT;
+			return QuestActionType.QUEST_ACTION_FIGHT;
 		case "ActScreen":
-			return PODELEEIBMP.QUEST_ACTION_ACT;
+			return QuestActionType.QUEST_ACTION_ACT;
 		case "ShowBattle":
 		case "HideBattle":
-			return PODELEEIBMP.QUEST_ACTION_UNLOCK_BATTLE;
+			return QuestActionType.QUEST_ACTION_UNLOCK_BATTLE;
 		case "Checkpoint":
-			return PODELEEIBMP.QUEST_ACTION_CHECKPOINT;
+			return QuestActionType.QUEST_ACTION_CHECKPOINT;
 		case "SetVariable":
-			return PODELEEIBMP.QUEST_ACTION_VARIABLE;
+			return QuestActionType.QUEST_ACTION_VARIABLE;
 		case "OpenZone":
-			return PODELEEIBMP.QUEST_ACTION_GOTO_ZONE;
+			return QuestActionType.QUEST_ACTION_GOTO_ZONE;
 		case "Wait":
-			return PODELEEIBMP.QUEST_ACTION_WAIT;
+			return QuestActionType.QUEST_ACTION_WAIT;
 		case "Download":
-			return PODELEEIBMP.QUEST_ACTION_DOWNLOAD;
+			return QuestActionType.QUEST_ACTION_DOWNLOAD;
 		case "ShowUpgrades":
-			return PODELEEIBMP.QUEST_ACTION_UPGRADES;
+			return QuestActionType.QUEST_ACTION_UPGRADES;
 		case "ShowForge":
-			return PODELEEIBMP.QUEST_ACTION_FORGE;
+			return QuestActionType.QUEST_ACTION_FORGE;
 		case "OpenShop":
-			return PODELEEIBMP.QUEST_ACTION_SHOP;
+			return QuestActionType.QUEST_ACTION_SHOP;
 		case "ShowNews":
-			return PODELEEIBMP.QUEST_ACTION_NEWS;
+			return QuestActionType.QUEST_ACTION_NEWS;
 		case "ToggleItems":
-			return PODELEEIBMP.QUEST_ACTION_TOGGLE_ITEMS;
+			return QuestActionType.QUEST_ACTION_TOGGLE_ITEMS;
 		case "Activate":
-			return PODELEEIBMP.QUEST_ACTION_ACTIVATE;
+			return QuestActionType.QUEST_ACTION_ACTIVATE;
 		case "Discount":
-			return PODELEEIBMP.QUEST_ACTION_DISCOUNT;
+			return QuestActionType.QUEST_ACTION_DISCOUNT;
 		case "ChangeScene":
-			return PODELEEIBMP.QUEST_ACTION_CHANGE_SCENE;
+			return QuestActionType.QUEST_ACTION_CHANGE_SCENE;
 		case "GiveItem":
-			return PODELEEIBMP.QUEST_ACTION_GIVE_ITEM;
+			return QuestActionType.QUEST_ACTION_GIVE_ITEM;
 		case "ForceExecution":
-			return PODELEEIBMP.QUEST_ACTION_FORCE_EXECUTION;
+			return QuestActionType.QUEST_ACTION_FORCE_EXECUTION;
 		case "GiveCurrency":
-			return PODELEEIBMP.QUEST_ACTION_GIVE_CURRENCY;
+			return QuestActionType.QUEST_ACTION_GIVE_CURRENCY;
 		case "TakeCurrency":
-			return PODELEEIBMP.QUEST_ACTION_TAKE_CURRENCY;
+			return QuestActionType.QUEST_ACTION_TAKE_CURRENCY;
 		case "SetMapFocus":
-			return PODELEEIBMP.QUEST_ACTION_MAP_FOCUS;
+			return QuestActionType.QUEST_ACTION_MAP_FOCUS;
 		case "SetDataVersion":
-			return PODELEEIBMP.QUEST_ACTION_VERSION;
+			return QuestActionType.QUEST_ACTION_VERSION;
 		case "ClearQuestQueue":
-			return PODELEEIBMP.QUEST_ACTION_CLEAR_STACK;
+			return QuestActionType.QUEST_ACTION_CLEAR_STACK;
 		case "FacebookAPICall":
-			return PODELEEIBMP.QUEST_ACTION_FB;
+			return QuestActionType.QUEST_ACTION_FB;
 		case "SetFBIndicator":
-			return PODELEEIBMP.QUEST_ACTION_FB_INDICATOR;
+			return QuestActionType.QUEST_ACTION_FB_INDICATOR;
 		case "Deliver":
-			return PODELEEIBMP.QUEST_ACTION_DELIVER;
+			return QuestActionType.QUEST_ACTION_DELIVER;
 		case "AttachQuestFile":
-			return PODELEEIBMP.QUEST_ACTION_ATTACH_FILE;
+			return QuestActionType.QUEST_ACTION_ATTACH_FILE;
 		case "SetParameter":
-			return PODELEEIBMP.QUEST_ACTION_SET_PARAMETER;
+			return QuestActionType.QUEST_ACTION_SET_PARAMETER;
 		case "Foreach":
-			return PODELEEIBMP.QUEST_ACTION_FOREACH;
+			return QuestActionType.QUEST_ACTION_FOREACH;
 		case "Recount":
-			return PODELEEIBMP.QUEST_ACTION_RECOUNT;
+			return QuestActionType.QUEST_ACTION_RECOUNT;
 		case "ShowAd":
-			return PODELEEIBMP.QUEST_ACTION_SHOW_AD;
+			return QuestActionType.QUEST_ACTION_SHOW_AD;
 		case "SetEnergy":
-			return PODELEEIBMP.QUEST_ACTION_SET_ENERGY;
+			return QuestActionType.QUEST_ACTION_SET_ENERGY;
 		case "OpenUrl":
-			return PODELEEIBMP.QUEST_ACTION_OPEN_URL;
+			return QuestActionType.QUEST_ACTION_OPEN_URL;
 		case "ResetPerks":
-			return PODELEEIBMP.QUEST_ACTION_RESET_PERKS;
+			return QuestActionType.QUEST_ACTION_RESET_PERKS;
 		case "UpgradesCleanup":
-			return PODELEEIBMP.QUEST_ACTION_UPGRADES_CLEANUP;
+			return QuestActionType.QUEST_ACTION_UPGRADES_CLEANUP;
 		case "SetSessionSettings":
-			return PODELEEIBMP.QUEST_ACTION_SESSION_SETTINGS;
+			return QuestActionType.QUEST_ACTION_SESSION_SETTINGS;
 		case "ResetDuelTimer":
-			return PODELEEIBMP.QUEST_ACTION_RESET_DUEL_TIMER;
+			return QuestActionType.QUEST_ACTION_RESET_DUEL_TIMER;
 		case "SendStrangerStats":
-			return PODELEEIBMP.QUEST_ACTION_SEND_STRANGER_STATS;
+			return QuestActionType.QUEST_ACTION_SEND_STRANGER_STATS;
 		case "SendDiscountStats":
-			return PODELEEIBMP.QUEST_ACTION_SEND_DISCOUNT_STATS;
+			return QuestActionType.QUEST_ACTION_SEND_DISCOUNT_STATS;
 		case "SetCurrentZone":
-			return PODELEEIBMP.QUEST_ACTION_SET_CURRENT_ZONE;
+			return QuestActionType.QUEST_ACTION_SET_CURRENT_ZONE;
 		case "SetLanguage":
-			return PODELEEIBMP.QUEST_ACTION_SET_LANGUAGE;
+			return QuestActionType.QUEST_ACTION_SET_LANGUAGE;
 		case "BuyItem":
-			return PODELEEIBMP.QUEST_ACTION_BUY_ITEM;
+			return QuestActionType.QUEST_ACTION_BUY_ITEM;
 		case "ShowStarterPackTimer":
-			return PODELEEIBMP.QUEST_ACTION_SHOW_STARTER_PACK_TIMER;
+			return QuestActionType.QUEST_ACTION_SHOW_STARTER_PACK_TIMER;
 		case "HideStarterPackTimer":
-			return PODELEEIBMP.QUEST_ACTION_HIDE_STARTER_PACK_TIMER;
+			return QuestActionType.QUEST_ACTION_HIDE_STARTER_PACK_TIMER;
 		case "ChangeTab":
-			return PODELEEIBMP.QUEST_ACTION_CHANGE_TAB;
+			return QuestActionType.QUEST_ACTION_CHANGE_TAB;
 		case "ShowVideo":
-			return PODELEEIBMP.QUEST_ACTION_SHOW_VIDEO;
+			return QuestActionType.QUEST_ACTION_SHOW_VIDEO;
 		case "UpdateScene":
-			return PODELEEIBMP.QUEST_ACTION_UPDATE_SCREEN;
+			return QuestActionType.QUEST_ACTION_UPDATE_SCREEN;
 		case "Denomination":
-			return PODELEEIBMP.QUEST_ACTION_DENOMINATION;
+			return QuestActionType.QUEST_ACTION_DENOMINATION;
 		case "TapjoyActionCall":
-			return PODELEEIBMP.QUEST_ACTION_TAPJOY_CALL;
+			return QuestActionType.QUEST_ACTION_TAPJOY_CALL;
 		case "ActivateTimer":
-			return PODELEEIBMP.QUEST_ACTION_ACTIVATE_TIMER;
+			return QuestActionType.QUEST_ACTION_ACTIVATE_TIMER;
 		case "EndTimer":
-			return PODELEEIBMP.QUEST_ACTION_END_TIMER;
+			return QuestActionType.QUEST_ACTION_END_TIMER;
 		case "ShowMapButton":
-			return PODELEEIBMP.QUEST_ACTION_SHOW_MAP_BUTTON;
+			return QuestActionType.QUEST_ACTION_SHOW_MAP_BUTTON;
 		case "HideMapButton":
-			return PODELEEIBMP.QUEST_ACTION_HIDE_MAP_BUTTON;
+			return QuestActionType.QUEST_ACTION_HIDE_MAP_BUTTON;
 		case "ToggleEclipseMode":
-			return PODELEEIBMP.QUEST_ACTION_ECLIPSE_MODE;
+			return QuestActionType.QUEST_ACTION_ECLIPSE_MODE;
 		case "ShowEclipseModeTutorial":
-			return PODELEEIBMP.QUEST_ACTION_ECLIPSE_MODE_TUTORIAL;
+			return QuestActionType.QUEST_ACTION_ECLIPSE_MODE_TUTORIAL;
 		case "ShowEclipseModeSwitchBackTutorial":
-			return PODELEEIBMP.QUEST_ACTION_ECLIPSE_MODE_SWITCH_BACK_TUTORIAL;
+			return QuestActionType.QUEST_ACTION_ECLIPSE_MODE_SWITCH_BACK_TUTORIAL;
 		case "ShowEclipseModeReplayTutorial":
-			return PODELEEIBMP.QUEST_ACTION_ECLIPSE_MODE_REPLAY_TUTORIAL;
+			return QuestActionType.QUEST_ACTION_ECLIPSE_MODE_REPLAY_TUTORIAL;
 		case "ToggleGroup":
-			return PODELEEIBMP.QUEST_ACTION_TOGGLE_GROUP;
+			return QuestActionType.QUEST_ACTION_TOGGLE_GROUP;
 		case "RemovePack":
-			return PODELEEIBMP.QUEST_ACTION_REMOVE_PACK;
+			return QuestActionType.QUEST_ACTION_REMOVE_PACK;
 		case "ApplicationRestart":
-			return PODELEEIBMP.QUEST_ACTION_RESTART_APPLICATION;
+			return QuestActionType.QUEST_ACTION_RESTART_APPLICATION;
 		case "SetMapMask":
-			return PODELEEIBMP.QUEST_ACTION_SET_MAP_MASK;
+			return QuestActionType.QUEST_ACTION_SET_MAP_MASK;
 		case "ResumeQuests":
-			return PODELEEIBMP.QUEST_ACTION_RESUME_QUEST;
+			return QuestActionType.QUEST_ACTION_RESUME_QUEST;
 		case "ToggleBattle":
-			return PODELEEIBMP.QUEST_ACTION_TOGGLE_BATTLE;
+			return QuestActionType.QUEST_ACTION_TOGGLE_BATTLE;
 		case "ShowForgeTutorial":
-			return PODELEEIBMP.QUEST_ACTION_SHOW_FORGE_TUTORIAL;
+			return QuestActionType.QUEST_ACTION_SHOW_FORGE_TUTORIAL;
 		case "ResetCrashFlag":
-			return PODELEEIBMP.QUEST_ACTION_RESET_CRASH_FLAG;
+			return QuestActionType.QUEST_ACTION_RESET_CRASH_FLAG;
 		case "SetLowGraphics":
-			return PODELEEIBMP.QUEST_ACTION_SET_LOW_GRAPHICS;
+			return QuestActionType.QUEST_ACTION_SET_LOW_GRAPHICS;
 		case "ResetEnchantments":
-			return PODELEEIBMP.QUEST_ACTION_RESET_ENCHANTMENTS;
+			return QuestActionType.QUEST_ACTION_RESET_ENCHANTMENTS;
 		case "GivePerk":
-			return PODELEEIBMP.QUEST_ACTION_GIVE_PERK;
+			return QuestActionType.QUEST_ACTION_GIVE_PERK;
 		case "GiveFreeRecipe":
-			return PODELEEIBMP.QUEST_ACTION_GIVE_FREE_RECIPE;
+			return QuestActionType.QUEST_ACTION_GIVE_FREE_RECIPE;
 		case "OpenForge":
-			return PODELEEIBMP.QUEST_ACTION_OPEN_FORGE;
+			return QuestActionType.QUEST_ACTION_OPEN_FORGE;
 		case "ChangePlayerAvatar":
-			return PODELEEIBMP.QUEST_ACTION_CHANGE_PLAYER_AVATAR;
+			return QuestActionType.QUEST_ACTION_CHANGE_PLAYER_AVATAR;
 		case "ShowSetTutorial":
-			return PODELEEIBMP.QUEST_ACTION_SHOW_SET_TUTORIAL;
+			return QuestActionType.QUEST_ACTION_SHOW_SET_TUTORIAL;
 		case "ShowCredits":
-			return PODELEEIBMP.QUEST_ACTION_SHOW_CREDITS;
+			return QuestActionType.QUEST_ACTION_SHOW_CREDITS;
 		case "GiveAchievement":
-			return PODELEEIBMP.QUEST_ACTION_GIVE_ACHIEVEMENT;
+			return QuestActionType.QUEST_ACTION_GIVE_ACHIEVEMENT;
 		case "ShowRaidsGag":
-			return PODELEEIBMP.QUEST_ACTION_SHOW_RAID_TOGGLE_BTN;
+			return QuestActionType.QUEST_ACTION_SHOW_RAID_TOGGLE_BTN;
 		case "RaidsButtonTutorial":
-			return PODELEEIBMP.QUEST_ACTION_SHOW_RAID_TUTORIAL;
+			return QuestActionType.QUEST_ACTION_SHOW_RAID_TUTORIAL;
 		case "OpenLeagueDialog":
-			return PODELEEIBMP.QUEST_ACTION_OPEN_LEAGUE_DIALOG;
+			return QuestActionType.QUEST_ACTION_OPEN_LEAGUE_DIALOG;
 		case "ShowRaidFightTutorial":
-			return PODELEEIBMP.QUEST_ACTION_SHOW_RAID_FIGHT_TUTORIAL;
+			return QuestActionType.QUEST_ACTION_SHOW_RAID_FIGHT_TUTORIAL;
 		case "ShowLeagueWindow":
-			return PODELEEIBMP.QUEST_ACTION_SHOW_RAID_LEAGUES_TUTORIAL;
+			return QuestActionType.QUEST_ACTION_SHOW_RAID_LEAGUES_TUTORIAL;
 		case "SetStoryTutorialStep":
-			return PODELEEIBMP.QUEST_ACTION_SET_STORY_TUTORIAL_STEP;
+			return QuestActionType.QUEST_ACTION_SET_STORY_TUTORIAL_STEP;
 		case "SetRaidInfoTutorialStep":
-			return PODELEEIBMP.QUEST_ACTION_SET_RAID_INFO_TUTORIAL_STEP;
+			return QuestActionType.QUEST_ACTION_SET_RAID_INFO_TUTORIAL_STEP;
 		case "SwitchToRaids":
-			return PODELEEIBMP.QUEST_ACTION_SWITCH_TO_RAIDS;
+			return QuestActionType.QUEST_ACTION_SWITCH_TO_RAIDS;
 		case "Unzip":
-			return PODELEEIBMP.QUEST_ACTION_UNZIP;
+			return QuestActionType.QUEST_ACTION_UNZIP;
 		case "BuyPack":
-			return PODELEEIBMP.QUEST_ACTION_BUY_PACK;
+			return QuestActionType.QUEST_ACTION_BUY_PACK;
 		case "Timer":
-			return PODELEEIBMP.QUEST_ACTION_ACTIVATE_TIMER;
+			return QuestActionType.QUEST_ACTION_ACTIVATE_TIMER;
 		case "MenuBtnFlashing":
-			return PODELEEIBMP.QUEST_ACTION_MENU_BTN_FLASHING;
+			return QuestActionType.QUEST_ACTION_MENU_BTN_FLASHING;
 		case "StoryTutorialMove":
-			return PODELEEIBMP.QUEST_ACTION_STORY_TUTORIAL_MOVE;
+			return QuestActionType.QUEST_ACTION_STORY_TUTORIAL_MOVE;
 		case "StoryTutorialPunchbag":
-			return PODELEEIBMP.QUEST_ACTION_STORY_TUTORIAL_PUNCHBAG;
+			return QuestActionType.QUEST_ACTION_STORY_TUTORIAL_PUNCHBAG;
 		case "StoryTutorialBuyItem":
-			return PODELEEIBMP.QUEST_ACTION_STORY_TUTORIAL_BUY_ITEM;
+			return QuestActionType.QUEST_ACTION_STORY_TUTORIAL_BUY_ITEM;
 		case "StoryTutorialClickFight":
-			return PODELEEIBMP.QUEST_ACTION_STORY_TUTORIAL_CLICK_FIGHT;
+			return QuestActionType.QUEST_ACTION_STORY_TUTORIAL_CLICK_FIGHT;
 		case "StoryTutorialLearnPerk":
-			return PODELEEIBMP.QUEST_ACTION_STORY_TUTORIAL_LEARN_PERK;
+			return QuestActionType.QUEST_ACTION_STORY_TUTORIAL_LEARN_PERK;
 		case "StoryTutorialDoubleSweep":
-			return PODELEEIBMP.QUEST_ACTION_STORY_TUTORIAL_DOUBLE_SWEEP;
+			return QuestActionType.QUEST_ACTION_STORY_TUTORIAL_DOUBLE_SWEEP;
 		case "StoryTutorialShowBlock":
-			return PODELEEIBMP.QUEST_ACTION_STORY_TUTORIAL_SHOW_BLOCK;
+			return QuestActionType.QUEST_ACTION_STORY_TUTORIAL_SHOW_BLOCK;
 		case "If":
-			return PODELEEIBMP.QUEST_ACTION_IF;
+			return QuestActionType.QUEST_ACTION_IF;
 		case "Run":
-			return PODELEEIBMP.QUEST_ACTION_RUN;
+			return QuestActionType.QUEST_ACTION_RUN;
 		case "ChangeDojoLocation":
-			return PODELEEIBMP.QUEST_ACTION_CHANGE_DOJO_LOCATION;
+			return QuestActionType.QUEST_ACTION_CHANGE_DOJO_LOCATION;
 		case "UpdateEclipseBattles":
-			return PODELEEIBMP.QUEST_ACTION_UPDATE_ECLIPSE_BATTLES;
+			return QuestActionType.QUEST_ACTION_UPDATE_ECLIPSE_BATTLES;
 		default:
-			LLLOJBFMONN.Error(string.Format("{0} {1}", "Unknown quest type: ", LFLGCDNKNJI));
-			return PODELEEIBMP.QUEST_ACTION_NONE;
+			GameLog.Error(string.Format("{0} {1}", "Unknown quest type: ", LFLGCDNKNJI));
+			return QuestActionType.QUEST_ACTION_NONE;
 		}
 	}
 
@@ -365,267 +365,267 @@ public class QuestAction : global::EventDispatcher<object>
 		{
 			return compatibilityAction;
 		}
-		PODELEEIBMP lFLGCDNKNJI = HJCIPCKMANH(CNKBLODAFDO);
-		return CAHMAJAIHFI(lFLGCDNKNJI);
+		QuestActionType lFLGCDNKNJI = GetActionTypeByName(CNKBLODAFDO);
+		return CreateActionByType(lFLGCDNKNJI);
 	}
 
-	public static QuestAction CAHMAJAIHFI(PODELEEIBMP LFLGCDNKNJI)
+	public static QuestAction CreateActionByType(QuestActionType LFLGCDNKNJI)
 	{
 		switch (LFLGCDNKNJI)
 		{
-		case PODELEEIBMP.QUEST_ACTION_DIALOG:
+		case QuestActionType.QUEST_ACTION_DIALOG:
 			return new QuestActionDialog();
-		case PODELEEIBMP.QUEST_ACTION_DIALOG_CHECK_TICKETS:
+		case QuestActionType.QUEST_ACTION_DIALOG_CHECK_TICKETS:
 			return new QuestActionDialogCheckTickets();
-		case PODELEEIBMP.QUEST_ACTION_DIALOG_LOTTERY:
+		case QuestActionType.QUEST_ACTION_DIALOG_LOTTERY:
 			return new QuestActionDialogLottery();
-		case PODELEEIBMP.QUEST_ACTION_FIGHT:
+		case QuestActionType.QUEST_ACTION_FIGHT:
 			return new QuestActionFight();
-		case PODELEEIBMP.QUEST_ACTION_ACT:
+		case QuestActionType.QUEST_ACTION_ACT:
 			return new QuestActionAct();
-		case PODELEEIBMP.QUEST_ACTION_UNLOCK_BATTLE:
+		case QuestActionType.QUEST_ACTION_UNLOCK_BATTLE:
 			return new QuestActionUnlockBattle();
-		case PODELEEIBMP.QUEST_ACTION_CHECKPOINT:
+		case QuestActionType.QUEST_ACTION_CHECKPOINT:
 			return new QuestActionCheckPoint();
-		case PODELEEIBMP.QUEST_ACTION_VARIABLE:
+		case QuestActionType.QUEST_ACTION_VARIABLE:
 			return new QuestActionVariable();
-		case PODELEEIBMP.QUEST_ACTION_GOTO_ZONE:
+		case QuestActionType.QUEST_ACTION_GOTO_ZONE:
 			return new QuestActionGotoZone();
-		case PODELEEIBMP.QUEST_ACTION_WAIT:
+		case QuestActionType.QUEST_ACTION_WAIT:
 			return new QuestActionWait();
-		case PODELEEIBMP.QUEST_ACTION_DOWNLOAD:
+		case QuestActionType.QUEST_ACTION_DOWNLOAD:
 			return new QuestActionDownload();
-		case PODELEEIBMP.QUEST_ACTION_UPGRADES:
+		case QuestActionType.QUEST_ACTION_UPGRADES:
 			return new QuestActionUpgrades();
-		case PODELEEIBMP.QUEST_ACTION_FORGE:
+		case QuestActionType.QUEST_ACTION_FORGE:
 			return new QuestActionForge();
-		case PODELEEIBMP.QUEST_ACTION_SHOP:
+		case QuestActionType.QUEST_ACTION_SHOP:
 			return new QuestActionShop();
-		case PODELEEIBMP.QUEST_ACTION_NEWS:
+		case QuestActionType.QUEST_ACTION_NEWS:
 			return new QuestActionNews();
-		case PODELEEIBMP.QUEST_ACTION_TOGGLE_ITEMS:
+		case QuestActionType.QUEST_ACTION_TOGGLE_ITEMS:
 			return new QuestActionToggleItems();
-		case PODELEEIBMP.QUEST_ACTION_ACTIVATE:
+		case QuestActionType.QUEST_ACTION_ACTIVATE:
 			return new QuestActionActivate();
-		case PODELEEIBMP.QUEST_ACTION_DISCOUNT:
+		case QuestActionType.QUEST_ACTION_DISCOUNT:
 			return new QuestActionDiscount();
-		case PODELEEIBMP.QUEST_ACTION_CHANGE_SCENE:
+		case QuestActionType.QUEST_ACTION_CHANGE_SCENE:
 			return new QuestActionChangeScene();
-		case PODELEEIBMP.QUEST_ACTION_CHANGE_TAB:
+		case QuestActionType.QUEST_ACTION_CHANGE_TAB:
 			return new QuestActionChangeTab();
-		case PODELEEIBMP.QUEST_ACTION_GIVE_ITEM:
+		case QuestActionType.QUEST_ACTION_GIVE_ITEM:
 			return new QuestActionGiveItem();
-		case PODELEEIBMP.QUEST_ACTION_FORCE_EXECUTION:
+		case QuestActionType.QUEST_ACTION_FORCE_EXECUTION:
 			return new QuestActionForceExecution();
-		case PODELEEIBMP.QUEST_ACTION_GIVE_CURRENCY:
+		case QuestActionType.QUEST_ACTION_GIVE_CURRENCY:
 			return new QuestActionGiveCurrency();
-		case PODELEEIBMP.QUEST_ACTION_TAKE_CURRENCY:
+		case QuestActionType.QUEST_ACTION_TAKE_CURRENCY:
 			return new QuestActionTakeCurrency();
-		case PODELEEIBMP.QUEST_ACTION_MAP_FOCUS:
+		case QuestActionType.QUEST_ACTION_MAP_FOCUS:
 			return new QuestActionMapFocus();
-		case PODELEEIBMP.QUEST_ACTION_VERSION:
+		case QuestActionType.QUEST_ACTION_VERSION:
 			return new QuestActionCurrentVersion();
-		case PODELEEIBMP.QUEST_ACTION_CLEAR_STACK:
+		case QuestActionType.QUEST_ACTION_CLEAR_STACK:
 			return new QuestActionClearStack();
-		case PODELEEIBMP.QUEST_ACTION_FB:
+		case QuestActionType.QUEST_ACTION_FB:
 			return new QuestActionFacebookAPICall();
-		case PODELEEIBMP.QUEST_ACTION_FB_INDICATOR:
+		case QuestActionType.QUEST_ACTION_FB_INDICATOR:
 			return new QuestActionSetFBIndicator();
-		case PODELEEIBMP.QUEST_ACTION_DELIVER:
+		case QuestActionType.QUEST_ACTION_DELIVER:
 			return new QuestActionDeliver();
-		case PODELEEIBMP.QUEST_ACTION_ATTACH_FILE:
+		case QuestActionType.QUEST_ACTION_ATTACH_FILE:
 			return new QuestActionAttachFile();
-		case PODELEEIBMP.QUEST_ACTION_SET_PARAMETER:
+		case QuestActionType.QUEST_ACTION_SET_PARAMETER:
 			return new QuestActionSetParameter();
-		case PODELEEIBMP.QUEST_ACTION_FOREACH:
+		case QuestActionType.QUEST_ACTION_FOREACH:
 			return new QuestActionForeach();
-		case PODELEEIBMP.QUEST_ACTION_RECOUNT:
+		case QuestActionType.QUEST_ACTION_RECOUNT:
 			return new QuestActionRecount();
-		case PODELEEIBMP.QUEST_ACTION_SHOW_AD:
+		case QuestActionType.QUEST_ACTION_SHOW_AD:
 			return new QuestActionShowAd();
-		case PODELEEIBMP.QUEST_ACTION_SET_ENERGY:
+		case QuestActionType.QUEST_ACTION_SET_ENERGY:
 			return new QuestActionSetEnergy();
-		case PODELEEIBMP.QUEST_ACTION_OPEN_URL:
+		case QuestActionType.QUEST_ACTION_OPEN_URL:
 			return new QuestActionOpenUrl();
-		case PODELEEIBMP.QUEST_ACTION_RESET_PERKS:
+		case QuestActionType.QUEST_ACTION_RESET_PERKS:
 			return new QuestActionResetPerks();
-		case PODELEEIBMP.QUEST_ACTION_UPGRADES_CLEANUP:
+		case QuestActionType.QUEST_ACTION_UPGRADES_CLEANUP:
 			return new QuestActionUpgradesCleanup();
-		case PODELEEIBMP.QUEST_ACTION_SESSION_SETTINGS:
+		case QuestActionType.QUEST_ACTION_SESSION_SETTINGS:
 			return new QuestActionSessionSettings();
-		case PODELEEIBMP.QUEST_ACTION_RESET_DUEL_TIMER:
+		case QuestActionType.QUEST_ACTION_RESET_DUEL_TIMER:
 			return new QuestActionResetDuelTimer();
-		case PODELEEIBMP.QUEST_ACTION_SEND_STRANGER_STATS:
+		case QuestActionType.QUEST_ACTION_SEND_STRANGER_STATS:
 			return new QuestActionSendStrangerStats();
-		case PODELEEIBMP.QUEST_ACTION_SEND_DISCOUNT_STATS:
+		case QuestActionType.QUEST_ACTION_SEND_DISCOUNT_STATS:
 			return new QuestActionSendDiscountStats();
-		case PODELEEIBMP.QUEST_ACTION_SET_CURRENT_ZONE:
+		case QuestActionType.QUEST_ACTION_SET_CURRENT_ZONE:
 			return new QuestActionSetCurrentZone();
-		case PODELEEIBMP.QUEST_ACTION_SET_LANGUAGE:
+		case QuestActionType.QUEST_ACTION_SET_LANGUAGE:
 			return new QuestActionSetLanguage();
-		case PODELEEIBMP.QUEST_ACTION_BUY_ITEM:
+		case QuestActionType.QUEST_ACTION_BUY_ITEM:
 			return new QuestActionBuyItem();
-		case PODELEEIBMP.QUEST_ACTION_SHOW_STARTER_PACK_TIMER:
+		case QuestActionType.QUEST_ACTION_SHOW_STARTER_PACK_TIMER:
 			return new QuestActionShowStarterPackTimer();
-		case PODELEEIBMP.QUEST_ACTION_HIDE_STARTER_PACK_TIMER:
+		case QuestActionType.QUEST_ACTION_HIDE_STARTER_PACK_TIMER:
 			return new QuestActionHideStarterPackTimer();
-		case PODELEEIBMP.QUEST_ACTION_SHOW_VIDEO:
+		case QuestActionType.QUEST_ACTION_SHOW_VIDEO:
 			return new QuestActionShowVideo();
-		case PODELEEIBMP.QUEST_ACTION_UPDATE_SCREEN:
+		case QuestActionType.QUEST_ACTION_UPDATE_SCREEN:
 			return new QuestActionUpdateScreen();
-		case PODELEEIBMP.QUEST_ACTION_DENOMINATION:
+		case QuestActionType.QUEST_ACTION_DENOMINATION:
 			return new QuestActionDenomination();
-		case PODELEEIBMP.QUEST_ACTION_TAPJOY_CALL:
+		case QuestActionType.QUEST_ACTION_TAPJOY_CALL:
 			return new QuestActionTapjoyActionCall();
-		case PODELEEIBMP.QUEST_ACTION_ACTIVATE_TIMER:
+		case QuestActionType.QUEST_ACTION_ACTIVATE_TIMER:
 			return new QuestActionActivateTimer();
-		case PODELEEIBMP.QUEST_ACTION_END_TIMER:
+		case QuestActionType.QUEST_ACTION_END_TIMER:
 			return new QuestActionEndTimer();
-		case PODELEEIBMP.QUEST_ACTION_SHOW_MAP_BUTTON:
+		case QuestActionType.QUEST_ACTION_SHOW_MAP_BUTTON:
 			return new QuestActionShowMapButton();
-		case PODELEEIBMP.QUEST_ACTION_HIDE_MAP_BUTTON:
+		case QuestActionType.QUEST_ACTION_HIDE_MAP_BUTTON:
 			return new QuestActionHideMapButton();
-		case PODELEEIBMP.QUEST_ACTION_ECLIPSE_MODE:
+		case QuestActionType.QUEST_ACTION_ECLIPSE_MODE:
 			return new QuestActionEclipseMode();
-		case PODELEEIBMP.QUEST_ACTION_ECLIPSE_MODE_TUTORIAL:
+		case QuestActionType.QUEST_ACTION_ECLIPSE_MODE_TUTORIAL:
 			return new QuestActionEclipseModeTutorial();
-		case PODELEEIBMP.QUEST_ACTION_ECLIPSE_MODE_SWITCH_BACK_TUTORIAL:
+		case QuestActionType.QUEST_ACTION_ECLIPSE_MODE_SWITCH_BACK_TUTORIAL:
 			return new QuestActionEclipseModeSwitchBackTutorial();
-		case PODELEEIBMP.QUEST_ACTION_ECLIPSE_MODE_REPLAY_TUTORIAL:
+		case QuestActionType.QUEST_ACTION_ECLIPSE_MODE_REPLAY_TUTORIAL:
 			return new QuestActionEclipseModeReplayTutorial();
-		case PODELEEIBMP.QUEST_ACTION_TOGGLE_GROUP:
+		case QuestActionType.QUEST_ACTION_TOGGLE_GROUP:
 			return new QuestActionToggleGroup();
-		case PODELEEIBMP.QUEST_ACTION_REMOVE_PACK:
+		case QuestActionType.QUEST_ACTION_REMOVE_PACK:
 			return new QuestActionRemovePack();
-		case PODELEEIBMP.QUEST_ACTION_RESTART_APPLICATION:
+		case QuestActionType.QUEST_ACTION_RESTART_APPLICATION:
 			return new QuestActionRestartApplication();
-		case PODELEEIBMP.QUEST_ACTION_SET_MAP_MASK:
+		case QuestActionType.QUEST_ACTION_SET_MAP_MASK:
 			return new QuestActionMapMask();
-		case PODELEEIBMP.QUEST_ACTION_RESUME_QUEST:
+		case QuestActionType.QUEST_ACTION_RESUME_QUEST:
 			return new QuestActionResumeQuests();
-		case PODELEEIBMP.QUEST_ACTION_TOGGLE_BATTLE:
+		case QuestActionType.QUEST_ACTION_TOGGLE_BATTLE:
 			return new QuestActionToggleBattle();
-		case PODELEEIBMP.QUEST_ACTION_SHOW_FORGE_TUTORIAL:
+		case QuestActionType.QUEST_ACTION_SHOW_FORGE_TUTORIAL:
 			return new QuestActionShowForgeTutorial();
-		case PODELEEIBMP.QUEST_ACTION_RESET_CRASH_FLAG:
+		case QuestActionType.QUEST_ACTION_RESET_CRASH_FLAG:
 			return new QuestActionResetCrashFlag();
-		case PODELEEIBMP.QUEST_ACTION_SET_LOW_GRAPHICS:
+		case QuestActionType.QUEST_ACTION_SET_LOW_GRAPHICS:
 			return new QuestActionSetLowGraphics();
-		case PODELEEIBMP.QUEST_ACTION_RESET_ENCHANTMENTS:
+		case QuestActionType.QUEST_ACTION_RESET_ENCHANTMENTS:
 			return new QuestActionResetEnchantments();
-		case PODELEEIBMP.QUEST_ACTION_GIVE_PERK:
+		case QuestActionType.QUEST_ACTION_GIVE_PERK:
 			return new QuestActionGivePerk();
-		case PODELEEIBMP.QUEST_ACTION_GIVE_FREE_RECIPE:
+		case QuestActionType.QUEST_ACTION_GIVE_FREE_RECIPE:
 			return new QuestActionGiveFreeRecipe();
-		case PODELEEIBMP.QUEST_ACTION_OPEN_FORGE:
+		case QuestActionType.QUEST_ACTION_OPEN_FORGE:
 			return new QuestActionOpenForge();
-		case PODELEEIBMP.QUEST_ACTION_CHANGE_PLAYER_AVATAR:
+		case QuestActionType.QUEST_ACTION_CHANGE_PLAYER_AVATAR:
 			return new QuestActionChangePlayerAvatar();
-		case PODELEEIBMP.QUEST_ACTION_SHOW_SET_TUTORIAL:
+		case QuestActionType.QUEST_ACTION_SHOW_SET_TUTORIAL:
 			return new QuestActionShowSetTutorial();
-		case PODELEEIBMP.QUEST_ACTION_SHOW_CREDITS:
+		case QuestActionType.QUEST_ACTION_SHOW_CREDITS:
 			return new QuestActionShowCredits();
-		case PODELEEIBMP.QUEST_ACTION_GIVE_ACHIEVEMENT:
+		case QuestActionType.QUEST_ACTION_GIVE_ACHIEVEMENT:
 			return new QuestActionGiveAchievement();
-		case PODELEEIBMP.QUEST_ACTION_SHOW_RAID_TOGGLE_BTN:
+		case QuestActionType.QUEST_ACTION_SHOW_RAID_TOGGLE_BTN:
 			return new QuestActionShowRaidToggleBtn();
-		case PODELEEIBMP.QUEST_ACTION_SHOW_RAID_TUTORIAL:
+		case QuestActionType.QUEST_ACTION_SHOW_RAID_TUTORIAL:
 			return new QuestActionShowRaidTutorial();
-		case PODELEEIBMP.QUEST_ACTION_OPEN_LEAGUE_DIALOG:
+		case QuestActionType.QUEST_ACTION_OPEN_LEAGUE_DIALOG:
 			return new QuestActionOpenLeagueDialog();
-		case PODELEEIBMP.QUEST_ACTION_SHOW_RAID_FIGHT_TUTORIAL:
+		case QuestActionType.QUEST_ACTION_SHOW_RAID_FIGHT_TUTORIAL:
 			return new QuestActionShowRaidFightTutorial();
-		case PODELEEIBMP.QUEST_ACTION_SHOW_RAID_LEAGUES_TUTORIAL:
+		case QuestActionType.QUEST_ACTION_SHOW_RAID_LEAGUES_TUTORIAL:
 			return new QuestActionShowRaidLeaguesTutorial();
-		case PODELEEIBMP.QUEST_ACTION_SET_STORY_TUTORIAL_STEP:
+		case QuestActionType.QUEST_ACTION_SET_STORY_TUTORIAL_STEP:
 			return new QuestActionSetStoryTutorialStep();
-		case PODELEEIBMP.QUEST_ACTION_SET_RAID_INFO_TUTORIAL_STEP:
+		case QuestActionType.QUEST_ACTION_SET_RAID_INFO_TUTORIAL_STEP:
 			return new QuestActionSetRaidInfoTutorialStep();
-		case PODELEEIBMP.QUEST_ACTION_SWITCH_TO_RAIDS:
+		case QuestActionType.QUEST_ACTION_SWITCH_TO_RAIDS:
 			return new QuestActionSwitchToRaidsMap();
-		case PODELEEIBMP.QUEST_ACTION_UNZIP:
+		case QuestActionType.QUEST_ACTION_UNZIP:
 			return new QuestActionUnzip();
-		case PODELEEIBMP.QUEST_ACTION_BUY_PACK:
+		case QuestActionType.QUEST_ACTION_BUY_PACK:
 			return new QuestActionBuyPack();
-		case PODELEEIBMP.QUEST_ACTION_MENU_BTN_FLASHING:
+		case QuestActionType.QUEST_ACTION_MENU_BTN_FLASHING:
 			return new QuestActionMenuBtnFlashing();
-		case PODELEEIBMP.QUEST_ACTION_STORY_TUTORIAL_MOVE:
+		case QuestActionType.QUEST_ACTION_STORY_TUTORIAL_MOVE:
 			return new QuestActionStoryTutorialMove();
-		case PODELEEIBMP.QUEST_ACTION_STORY_TUTORIAL_PUNCHBAG:
+		case QuestActionType.QUEST_ACTION_STORY_TUTORIAL_PUNCHBAG:
 			return new QuestActionStoryTutorialPunchbag();
-		case PODELEEIBMP.QUEST_ACTION_STORY_TUTORIAL_BUY_ITEM:
+		case QuestActionType.QUEST_ACTION_STORY_TUTORIAL_BUY_ITEM:
 			return new QuestActionStoryTutorialBuyItem();
-		case PODELEEIBMP.QUEST_ACTION_STORY_TUTORIAL_CLICK_FIGHT:
+		case QuestActionType.QUEST_ACTION_STORY_TUTORIAL_CLICK_FIGHT:
 			return new QuestActionStoryTutorialClickFight();
-		case PODELEEIBMP.QUEST_ACTION_STORY_TUTORIAL_LEARN_PERK:
+		case QuestActionType.QUEST_ACTION_STORY_TUTORIAL_LEARN_PERK:
 			return new QuestActionStoryTutorialLearnPerk();
-		case PODELEEIBMP.QUEST_ACTION_STORY_TUTORIAL_DOUBLE_SWEEP:
+		case QuestActionType.QUEST_ACTION_STORY_TUTORIAL_DOUBLE_SWEEP:
 			return new QuestActionStoryTutorialDoubleSweep();
-		case PODELEEIBMP.QUEST_ACTION_STORY_TUTORIAL_SHOW_BLOCK:
+		case QuestActionType.QUEST_ACTION_STORY_TUTORIAL_SHOW_BLOCK:
 			return new QuestActionStoryTutorialShowBlock();
-		case PODELEEIBMP.QUEST_ACTION_IF:
+		case QuestActionType.QUEST_ACTION_IF:
 			return new QuestActionIf();
-		case PODELEEIBMP.QUEST_ACTION_RUN:
+		case QuestActionType.QUEST_ACTION_RUN:
 			return new QuestActionRun();
-		case PODELEEIBMP.QUEST_ACTION_CHANGE_DOJO_LOCATION:
+		case QuestActionType.QUEST_ACTION_CHANGE_DOJO_LOCATION:
 			return new QuestActionChangeDojoLocation();
-		case PODELEEIBMP.QUEST_ACTION_UPDATE_ECLIPSE_BATTLES:
+		case QuestActionType.QUEST_ACTION_UPDATE_ECLIPSE_BATTLES:
 			return new QuestActionUpdateEclipseBattles();
 		default:
-			LLLOJBFMONN.Error(string.Format("{0} {1}", "QuestAction.getClassActionByType - type: ", LFLGCDNKNJI));
+			GameLog.Error(string.Format("{0} {1}", "QuestAction.getClassActionByType - type: ", LFLGCDNKNJI));
 			return new QuestAction();
 		}
 	}
 
-	public void OGIJONMKABB()
+	public void FinishAction()
 	{
-		if (JKIPOGOLAAI != KHLLOOHAMLC.LOCK_NONE)
+		if (lockMode != InputLockMode.LOCK_NONE)
 		{
-			Module.GetInstance().DIDFMBMPEAF(false);
+			Module.GetInstance().SetQuestInputLock(false);
 		}
-		if (LogRules.ELEBLBJKDBI().PIAKPGMPGMN())
+		if (LogRules.GetInstance().GetLogQuestActions())
 		{
 			StringBuilder stringBuilder = new StringBuilder();
 			stringBuilder.Append("QuestAction ");
-			stringBuilder.Append(EFJMDEMAGIM);
+			stringBuilder.Append(ActionName);
 			stringBuilder.Append(" completed");
-			LLLOJBFMONN.INNGABABJPC(stringBuilder.ToString());
+			GameLog.Info(stringBuilder.ToString());
 		}
 		QuestsManager.get_Instance().CurrentActionName = string.Empty;
-		CallEvent(1, PAJDEKLLFNJ);
+		CallEvent(1, Parameters);
 	}
 
 	public virtual void Parse(XmlNode EPKLCPOEELO)
 	{
-		EFJMDEMAGIM = EPKLCPOEELO.Name;
-		JKIPOGOLAAI = LKMGEKCOFMF(XmlUtils.ParseString(EPKLCPOEELO.Attributes["Lock"], string.Empty));
-		DPBKBKDCIOI = XmlUtils.ParseString(EPKLCPOEELO.Attributes["Sound"], string.Empty);
+		ActionName = EPKLCPOEELO.Name;
+		lockMode = ParseLockMode(XmlUtils.ParseString(EPKLCPOEELO.Attributes["Lock"], string.Empty));
+		soundName = XmlUtils.ParseString(EPKLCPOEELO.Attributes["Sound"], string.Empty);
 	}
 
-	public virtual void DEJMHFMLKIC(QuestParameters GFIHPBCEEOB)
+	public virtual void Execute(QuestParameters GFIHPBCEEOB)
 	{
-		CallEvent(0, PAJDEKLLFNJ);
-		if (LogRules.ELEBLBJKDBI().PIAKPGMPGMN())
+		CallEvent(0, Parameters);
+		if (LogRules.GetInstance().GetLogQuestActions())
 		{
 			StringBuilder stringBuilder = new StringBuilder();
 			stringBuilder.Append("QuestAction ");
-			stringBuilder.Append(EFJMDEMAGIM);
+			stringBuilder.Append(ActionName);
 			stringBuilder.Append(" started");
-			LLLOJBFMONN.INNGABABJPC(stringBuilder.ToString());
+			GameLog.Info(stringBuilder.ToString());
 		}
-		QuestsManager.get_Instance().CurrentActionName = EFJMDEMAGIM;
-		if (JKIPOGOLAAI != KHLLOOHAMLC.LOCK_NONE)
+		QuestsManager.get_Instance().CurrentActionName = ActionName;
+		if (lockMode != InputLockMode.LOCK_NONE)
 		{
-			Module.GetInstance().DIDFMBMPEAF(true, JKIPOGOLAAI == KHLLOOHAMLC.LOCK_VISIBLE);
+			Module.GetInstance().SetQuestInputLock(true, lockMode == InputLockMode.LOCK_VISIBLE);
 		}
-		if (!DPBKBKDCIOI.Equals(string.Empty))
+		if (!soundName.Equals(string.Empty))
 		{
-			IFKCCDAIADF();
+			PlaySound();
 		}
-		PAJDEKLLFNJ = GFIHPBCEEOB;
+		Parameters = GFIHPBCEEOB;
 	}
 
-	public virtual void GKFMJKAAJCA()
+	public virtual void ResetSequences()
 	{
 	}
 
@@ -633,16 +633,16 @@ public class QuestAction : global::EventDispatcher<object>
 	{
 	}
 
-	public virtual void PJGEOIKPGFH()
+	public virtual void CompleteQuestStage()
 	{
-		QuestStage mLLKDGBEGJI = ListSF.GetInstance().PBGCEEBDBGG(ONGHPGEIJEN);
+		QuestStage mLLKDGBEGJI = ListSF.GetInstance().GetQuestByName(QuestName);
 		if (mLLKDGBEGJI != null)
 		{
-			mLLKDGBEGJI.MFGLIALECAM();
+			mLLKDGBEGJI.FinishQuest();
 		}
 	}
 
-	public virtual void NLJLHHNPCAO(XmlNode EPKLCPOEELO, QuestActionsSequence AFENHJFICNN, Action<object> ODDEOFKLIAG)
+	public virtual void ParseSequence(XmlNode EPKLCPOEELO, QuestActionsSequence AFENHJFICNN, Action<object> ODDEOFKLIAG)
 	{
 		if (EPKLCPOEELO != null)
 		{
@@ -650,59 +650,59 @@ public class QuestAction : global::EventDispatcher<object>
 			{
 				string name = childNode.Name;
 				QuestAction mBAAKHELFKL = GetClassActionByName(name);
-				mBAAKHELFKL.ONGHPGEIJEN = ONGHPGEIJEN;
+				mBAAKHELFKL.QuestName = QuestName;
 				mBAAKHELFKL.Parse(childNode);
-				AFENHJFICNN.NLJLHHNPCAO(mBAAKHELFKL);
+				AFENHJFICNN.AddAction(mBAAKHELFKL);
 			}
 		}
 		AFENHJFICNN.AddEventListener(1, ODDEOFKLIAG);
 	}
 
-	public virtual void APKBANHAEGN(XmlNode EPKLCPOEELO, QuestActionsSequence AFENHJFICNN, Action<object> ODDEOFKLIAG)
+	public virtual void ParseSequenceWithUnlock(XmlNode EPKLCPOEELO, QuestActionsSequence AFENHJFICNN, Action<object> ODDEOFKLIAG)
 	{
-		NLJLHHNPCAO(EPKLCPOEELO, AFENHJFICNN, ODDEOFKLIAG);
+		ParseSequence(EPKLCPOEELO, AFENHJFICNN, ODDEOFKLIAG);
 		AFENHJFICNN.AddEventListener(0, OnRunSuccessAndErrorAction);
 	}
 
 	public void OnRunSuccessAndErrorAction(object data)
 	{
-		if (JKIPOGOLAAI != KHLLOOHAMLC.LOCK_NONE)
+		if (lockMode != InputLockMode.LOCK_NONE)
 		{
-			Module.GetInstance().DIDFMBMPEAF(false);
+			Module.GetInstance().SetQuestInputLock(false);
 		}
 	}
 
-	public virtual void EPFCAILHDII(QuestStage DOKAIKMLLDK)
+	public virtual void SetStage(QuestStage DOKAIKMLLDK)
 	{
-		this.DOKAIKMLLDK = DOKAIKMLLDK;
+		this.stage = DOKAIKMLLDK;
 	}
 
-	public QuestStage NOFNJFOCIMK()
+	public QuestStage GetStage()
 	{
-		return DOKAIKMLLDK;
+		return stage;
 	}
 
-	public KHLLOOHAMLC LKMGEKCOFMF()
+	public InputLockMode GetLockMode()
 	{
-		return JKIPOGOLAAI;
+		return lockMode;
 	}
 
-	private void IFKCCDAIADF()
+	private void PlaySound()
 	{
-		Sound.IFKCCDAIADF(DPBKBKDCIOI);
+		Sound.PlaySound(soundName);
 	}
 
-	private KHLLOOHAMLC LKMGEKCOFMF(string value)
+	private InputLockMode ParseLockMode(string value)
 	{
 		if (value.Equals("Silent"))
 		{
-			return KHLLOOHAMLC.LOCK_SILENT;
+			return InputLockMode.LOCK_SILENT;
 		}
 		if (value.Equals("Visible"))
 		{
-			return KHLLOOHAMLC.LOCK_VISIBLE;
+			return InputLockMode.LOCK_VISIBLE;
 		}
-		return KHLLOOHAMLC.LOCK_NONE;
+		return InputLockMode.LOCK_NONE;
 	}
 }
 
@@ -719,8 +719,8 @@ public class QuestActionIf : QuestAction
 	{
 		base.Parse(node);
 		ParseConditions(node["Conditions"], _conditions);
-		NLJLHHNPCAO(node["Then"], _then, OnBranchComplete);
-		NLJLHHNPCAO(node["Else"], _else, OnBranchComplete);
+		ParseSequence(node["Then"], _then, OnBranchComplete);
+		ParseSequence(node["Else"], _else, OnBranchComplete);
 	}
 
 	private static void ParseConditions(XmlNode container, List<QuestCondition> output)
@@ -737,7 +737,7 @@ public class QuestActionIf : QuestAction
 			}
 			QuestCondition condition = new QuestCondition();
 			condition.Parse(node);
-			if (condition.LFLGCDNKNJI == QuestCondition.NFFNINLIPJJ.QUEST_CONDITION_OPERATOR)
+			if (condition.comparison == QuestCondition.ComparisonType.QUEST_CONDITION_OPERATOR)
 			{
 				ParseConditions(node, condition.conditions);
 			}
@@ -745,9 +745,9 @@ public class QuestActionIf : QuestAction
 		}
 	}
 
-	public override void DEJMHFMLKIC(QuestParameters parameters)
+	public override void Execute(QuestParameters parameters)
 	{
-		base.DEJMHFMLKIC(parameters);
+		base.Execute(parameters);
 		bool matches = true;
 		foreach (QuestCondition condition in _conditions)
 		{
@@ -758,25 +758,25 @@ public class QuestActionIf : QuestAction
 			}
 		}
 		_running = matches ? _then : _else;
-		_running.JJIHOMLLAOL = 0;
-		_running.FHPKJMMLIEG();
-		if (_running.AFENHJFICNN.Count == 0)
+		_running.currentIndex = 0;
+		_running.Reset();
+		if (_running.actions.Count == 0)
 		{
-			OGIJONMKABB();
+			FinishAction();
 			return;
 		}
-		_running.DEJMHFMLKIC(parameters);
+		_running.Run(parameters);
 	}
 
 	private void OnBranchComplete(object data)
 	{
-		OGIJONMKABB();
+		FinishAction();
 	}
 
-	public override void GKFMJKAAJCA()
+	public override void ResetSequences()
 	{
-		_then.FHPKJMMLIEG();
-		_else.FHPKJMMLIEG();
+		_then.Reset();
+		_else.Reset();
 		_running = null;
 	}
 }
@@ -789,26 +789,26 @@ public class QuestActionRun : QuestAction
 	public override void Parse(XmlNode node)
 	{
 		base.Parse(node);
-		_name = node.Attributes["Name"].CIPOICEEIBK(string.Empty);
+		_name = node.Attributes["Name"].GetStringOrDefault(string.Empty);
 	}
 
-	public override void DEJMHFMLKIC(QuestParameters parameters)
+	public override void Execute(QuestParameters parameters)
 	{
-		base.DEJMHFMLKIC(parameters);
+		base.Execute(parameters);
 		if (ListSF.GetInstance().IsEclipseQuestSuppressed(_name))
 		{
-			OGIJONMKABB();
+			FinishAction();
 			return;
 		}
-		_runningQuest = ListSF.GetInstance().PBGCEEBDBGG(_name);
+		_runningQuest = ListSF.GetInstance().GetQuestByName(_name);
 		if (_runningQuest == null)
 		{
 			Debug.LogWarning("[DevXml] Run action could not find quest: " + _name);
-			OGIJONMKABB();
+			FinishAction();
 			return;
 		}
 		_runningQuest.AddEventListener(1, OnQuestComplete);
-		_runningQuest.MHHNIPBJNAD(parameters, false);
+		_runningQuest.StartActions(parameters, false);
 	}
 
 	private void OnQuestComplete(object data)
@@ -818,7 +818,7 @@ public class QuestActionRun : QuestAction
 			_runningQuest.RemoveEventListener(1, OnQuestComplete);
 			_runningQuest = null;
 		}
-		OGIJONMKABB();
+		FinishAction();
 	}
 }
 
@@ -829,31 +829,31 @@ public class QuestActionChangeDojoLocation : QuestAction
 	public override void Parse(XmlNode node)
 	{
 		base.Parse(node);
-		_name = node.Attributes["Name"].CIPOICEEIBK("dojo");
+		_name = node.Attributes["Name"].GetStringOrDefault("dojo");
 	}
 
-	public override void DEJMHFMLKIC(QuestParameters parameters)
+	public override void Execute(QuestParameters parameters)
 	{
-		base.DEJMHFMLKIC(parameters);
+		base.Execute(parameters);
 		ConditionExtension.CompareResult result = new ConditionExtension.CompareResult();
 		QuestCondition condition = new QuestCondition();
-		condition.LIMHBJBEEIA(parameters);
-		condition.MCPIOGALBMK(_name, result);
-		GameUtils.NIPABEEAMHJ = result.ToString();
-		OGIJONMKABB();
+		condition.SetParameters(parameters);
+		condition.SetValue(_name, result);
+		GameUtils.DefaultLocation = result.ToString();
+		FinishAction();
 	}
 }
 
 public class QuestActionUpdateEclipseBattles : QuestAction
 {
-	public override void DEJMHFMLKIC(QuestParameters parameters)
+	public override void Execute(QuestParameters parameters)
 	{
-		base.DEJMHFMLKIC(parameters);
-		Roster roster = ListSF.CCDKHLAMKKO();
+		base.Execute(parameters);
+		Roster roster = ListSF.GetRoster();
 		ListSF listSF = ListSF.GetInstance();
 		if (roster == null || listSF == null)
 		{
-			OGIJONMKABB();
+			FinishAction();
 			return;
 		}
 		bool eclipseMode = roster.IsEclipseMode();
@@ -861,14 +861,14 @@ public class QuestActionUpdateEclipseBattles : QuestAction
 		Battle selectedBattle = GetSelectedBattle(current);
 		Battle selectedReplacement = null;
 		List<Battle> changedBattles = new List<Battle>();
-		foreach (Battle normalBattle in listSF.MMCHMBIKIEP())
+		foreach (Battle normalBattle in listSF.GetBattles())
 		{
 			string eclipseBattleName = GetEclipseBattleName(normalBattle);
 			if (string.IsNullOrEmpty(eclipseBattleName))
 			{
 				continue;
 			}
-			Zone zone = normalBattle.LKDFFCADHNO();
+			Zone zone = normalBattle.GetZone();
 			Battle eclipseBattle = FindBattle(zone, eclipseBattleName);
 			if (eclipseBattle == null)
 			{
@@ -877,7 +877,7 @@ public class QuestActionUpdateEclipseBattles : QuestAction
 			// A mode switch may only exchange an already unlocked pair. If an old
 			// save retained a hidden flag while the Eclipse counterpart was never
 			// introduced, restore the normal entry instead of leaving no button.
-			if (normalBattle.NNPNEABKHPP() == null)
+			if (normalBattle.GetRosterBattle() == null)
 			{
 				continue;
 			}
@@ -887,7 +887,7 @@ public class QuestActionUpdateEclipseBattles : QuestAction
 			{
 				continue;
 			}
-			if (normalBattle.NNPNEABKHPP().IsLocked())
+			if (normalBattle.GetRosterBattle().IsLocked())
 			{
 				// Revealed future story entries are still gated. Do not introduce
 				// an unlocked replay or expose one left behind by an older save.
@@ -896,7 +896,7 @@ public class QuestActionUpdateEclipseBattles : QuestAction
 				if (selectedBattle == eclipseBattle) selectedReplacement = normalBattle;
 				continue;
 			}
-			if (normalBattle.MNHLGELMOEJ() != ConditionStatus.StatusComplete)
+			if (normalBattle.GetStatus() != ConditionStatus.StatusComplete)
 			{
 				// An unfinished battle is fought as itself in Eclipse mode: its Eclipse="1"
 				// rules make it the harder version. The replay counterpart only takes over
@@ -907,7 +907,7 @@ public class QuestActionUpdateEclipseBattles : QuestAction
 				if (selectedBattle == eclipseBattle) selectedReplacement = normalBattle;
 				continue;
 			}
-			if (eclipseBattle.NNPNEABKHPP() == null)
+			if (eclipseBattle.GetRosterBattle() == null)
 			{
 				// The newer UpdateEclipseBattles action also introduces the replay
 				// counterpart for every battle that has already been unlocked.  The
@@ -915,7 +915,7 @@ public class QuestActionUpdateEclipseBattles : QuestAction
 				// playthrough never acquired any Eclipse tournament/challenge entries.
 				roster.AddBattle(eclipseBattle, true, true, false, !eclipseMode, 0);
 				eclipseBattle.IsMapVisible = true;
-				if (eclipseBattle.NNPNEABKHPP() == null)
+				if (eclipseBattle.GetRosterBattle() == null)
 				{
 					SetBattleHidden(normalBattle, false, changedBattles);
 					continue;
@@ -946,7 +946,7 @@ public class QuestActionUpdateEclipseBattles : QuestAction
 		}
 		if (changedBattles.Count != 0)
 		{
-			listSF.EJANJEEGOOE();
+			listSF.RequestSave();
 			if (current != null)
 			{
 				foreach (Battle battle in changedBattles)
@@ -966,12 +966,12 @@ public class QuestActionUpdateEclipseBattles : QuestAction
 				}
 			}
 		}
-		OGIJONMKABB();
+		FinishAction();
 	}
 
 	private static string GetEclipseBattleName(Battle battle)
 	{
-		XmlNode node = battle.MMLPEMNIFBD().IOJIGDNFCFL();
+		XmlNode node = battle.GetSourceDefinition().GetNode();
 		if (node == null || node.Attributes == null)
 		{
 			return string.Empty;
@@ -986,7 +986,7 @@ public class QuestActionUpdateEclipseBattles : QuestAction
 		{
 			return null;
 		}
-		foreach (Battle battle in zone.LGIIBNJFADA)
+		foreach (Battle battle in zone.Battles)
 		{
 			if (battle.get_Name() == name)
 			{
@@ -1012,9 +1012,9 @@ public class QuestActionUpdateEclipseBattles : QuestAction
 		{
 			return false;
 		}
-		foreach (Battle candidate in zone.LGIIBNJFADA)
+		foreach (Battle candidate in zone.Battles)
 		{
-			if (candidate == battle || candidate.NNPNEABKHPP() == null || !candidate.get_Name().EndsWith("_INTERMISSION", StringComparison.Ordinal))
+			if (candidate == battle || candidate.GetRosterBattle() == null || !candidate.get_Name().EndsWith("_INTERMISSION", StringComparison.Ordinal))
 			{
 				continue;
 			}
@@ -1028,12 +1028,12 @@ public class QuestActionUpdateEclipseBattles : QuestAction
 
 	private static void SetBattleHidden(Battle battle, bool hidden, List<Battle> changedBattles)
 	{
-		RosterBattle rosterBattle = battle.NNPNEABKHPP();
-		if (rosterBattle == null || rosterBattle.KAPIELMDIIK() == hidden)
+		RosterBattle rosterBattle = battle.GetRosterBattle();
+		if (rosterBattle == null || rosterBattle.IsHidden() == hidden)
 		{
 			return;
 		}
-		rosterBattle.HCEOCBOFIGC(hidden);
+		rosterBattle.SetHidden(hidden);
 		changedBattles.Add(battle);
 	}
 }

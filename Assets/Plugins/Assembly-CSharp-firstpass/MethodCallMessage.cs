@@ -5,26 +5,26 @@ using System.Diagnostics;
 public sealed class MethodCallMessage : IServerMessage
 {
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private string JFIMJNHKJHA;
+	private string hub;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private string FPNIGCIIIJK;
+	private string method;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private object[] BADMNBMBKIB;
+	private object[] arguments;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private IDictionary<string, object> MKHEFCIEOCA;
+	private IDictionary<string, object> state;
 
-	public string LHDEDFFGBHI
+	public string HubName
 	{
 		get
 		{
-			return GDANEAJOFMP();
+			return GetHub();
 		}
 		private set
 		{
-			FKEKBJKDNKN(value);
+			SetHub(value);
 		}
 	}
 
@@ -32,19 +32,19 @@ public sealed class MethodCallMessage : IServerMessage
 	{
 		get
 		{
-			return OIPIMPLLDCP();
+			return GetMethod();
 		}
 		private set
 		{
-			GOLMHEHNMDE(value);
+			SetMethod(value);
 		}
 	}
 
-	public object[] AIANPCBJCKN
+	public object[] MethodArguments
 	{
 		get
 		{
-			return FNKPHEHFKEI();
+			return GetArguments();
 		}
 		private set
 		{
@@ -52,11 +52,11 @@ public sealed class MethodCallMessage : IServerMessage
 		}
 	}
 
-	public IDictionary<string, object> AFINHOBCHMC
+	public IDictionary<string, object> HubState
 	{
 		get
 		{
-			return FLBBFDNHJAJ();
+			return GetState();
 		}
 		private set
 		{
@@ -64,56 +64,56 @@ public sealed class MethodCallMessage : IServerMessage
 		}
 	}
 
-	public LENCKBHFKLD get_Type()
+	public MessageTypes get_Type()
 	{
-		return LENCKBHFKLD.MethodCall;
+		return MessageTypes.MethodCall;
 	}
 
-	public string GDANEAJOFMP()
+	public string GetHub()
 	{
-		return JFIMJNHKJHA;
+		return hub;
 	}
 
-	private void FKEKBJKDNKN(string value)
+	private void SetHub(string value)
 	{
-		JFIMJNHKJHA = value;
+		hub = value;
 	}
 
-	public string OIPIMPLLDCP()
+	public string GetMethod()
 	{
-		return FPNIGCIIIJK;
+		return method;
 	}
 
-	private void GOLMHEHNMDE(string value)
+	private void SetMethod(string value)
 	{
-		FPNIGCIIIJK = value;
+		method = value;
 	}
 
-	public object[] FNKPHEHFKEI()
+	public object[] GetArguments()
 	{
-		return BADMNBMBKIB;
+		return arguments;
 	}
 
 	private void set_Arguments(object[] value)
 	{
-		BADMNBMBKIB = value;
+		arguments = value;
 	}
 
-	public IDictionary<string, object> FLBBFDNHJAJ()
+	public IDictionary<string, object> GetState()
 	{
-		return MKHEFCIEOCA;
+		return state;
 	}
 
 	private void set_State(IDictionary<string, object> value)
 	{
-		MKHEFCIEOCA = value;
+		state = value;
 	}
 
 	void IServerMessage.Parse(object data)
 	{
 		IDictionary<string, object> dictionary = data as IDictionary<string, object>;
-		FKEKBJKDNKN(dictionary["H"].ToString());
-		GOLMHEHNMDE(dictionary["M"].ToString());
+		SetHub(dictionary["H"].ToString());
+		SetMethod(dictionary["M"].ToString());
 		List<object> list = new List<object>();
 		foreach (object item in dictionary["A"] as IEnumerable)
 		{

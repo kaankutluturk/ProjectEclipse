@@ -11,112 +11,112 @@ public class KeyFrames
 		public int Size;
 	}
 
-	protected List<Frame> DCFPONJAING = new List<Frame>();
+	protected List<Frame> frames = new List<Frame>();
 
 	private bool _IsInterruptFramesSeted;
 
-	protected int BOAIMPGFINL;
+	protected int frameCount;
 
-	protected int BCFLAENGDHA;
+	protected int currentFrameIndex;
 
 	public int Size
 	{
 		get
 		{
-			return OLINNGEMHMG();
+			return GetSize();
 		}
 	}
 
-	public int DEHLAIGHHPD
+	public int CurrentFrameIndex
 	{
 		get
 		{
-			return HEBNLOODNFE();
+			return GetCurrentFrameIndex();
 		}
 	}
 
-	public int KHAODKDIOHH
+	public int RemainingFrameCount
 	{
 		get
 		{
-			return FNEPPBAKIDP();
+			return GetRemainingFrameCount();
 		}
 	}
 
-	public int OLINNGEMHMG()
+	public int GetSize()
 	{
-		return BOAIMPGFINL;
+		return frameCount;
 	}
 
-	public int HEBNLOODNFE()
+	public int GetCurrentFrameIndex()
 	{
-		return BCFLAENGDHA;
+		return currentFrameIndex;
 	}
 
-	public int FNEPPBAKIDP()
+	public int GetRemainingFrameCount()
 	{
-		return BOAIMPGFINL - BCFLAENGDHA;
+		return frameCount - currentFrameIndex;
 	}
 
-	public void NEOLKFNMAHJ()
+	public void AdvanceFrame()
 	{
-		BCFLAENGDHA++;
+		currentFrameIndex++;
 	}
 
 	public void InterruptFramesSeted(int FPDMCHPHFAJ)
 	{
-		BOAIMPGFINL = 2;
+		frameCount = 2;
 		_IsInterruptFramesSeted = true;
-		if (DCFPONJAING.Count < BOAIMPGFINL)
+		if (frames.Count < frameCount)
 		{
-			NLMAIINFADE(2, FPDMCHPHFAJ);
+			AllocateFrames(2, FPDMCHPHFAJ);
 		}
-		for (int i = 0; i < BOAIMPGFINL; i++)
+		for (int i = 0; i < frameCount; i++)
 		{
-			Frame cJMFONMNFBI = DCFPONJAING[i];
+			Frame cJMFONMNFBI = frames[i];
 			if (cJMFONMNFBI.Size != FPDMCHPHFAJ)
 			{
 				if (cJMFONMNFBI.Size < FPDMCHPHFAJ)
 				{
-					cJMFONMNFBI.Data.CPCAJIKOIEE(FPDMCHPHFAJ);
+					cJMFONMNFBI.Data.Resize(FPDMCHPHFAJ);
 				}
 				cJMFONMNFBI.Size = FPDMCHPHFAJ;
 			}
 		}
 	}
 
-	public Frame KLNOLPIADNN(int DCHCFFFFLLK)
+	public Frame GetFrame(int DCHCFFFFLLK)
 	{
-		if (BOAIMPGFINL <= DCHCFFFFLLK)
+		if (frameCount <= DCHCFFFFLLK)
 		{
 			return null;
 		}
-		return DCFPONJAING[DCHCFFFFLLK];
+		return frames[DCHCFFFFLLK];
 	}
 
-	public Frame JGEBADMHJCP(int OCDKOFPGCHH)
+	public Frame GetFrameRelativeToCurrent(int OCDKOFPGCHH)
 	{
-		return DCFPONJAING[BCFLAENGDHA + OCDKOFPGCHH];
+		return frames[currentFrameIndex + OCDKOFPGCHH];
 	}
 
 	public void Shift(float HLBMDDOPKKL, float ELAKEOGEDPN = 0f, float PIIFLHIBODE = 0f)
 	{
-		for (int i = (_IsInterruptFramesSeted ? 2 : 0); i < BOAIMPGFINL; i++)
+		for (int i = (_IsInterruptFramesSeted ? 2 : 0); i < frameCount; i++)
 		{
-			for (int j = 0; j < DCFPONJAING[i].Size; j++)
+			for (int j = 0; j < frames[i].Size; j++)
 			{
-				DCFPONJAING[i].Data[j].Add(HLBMDDOPKKL, ELAKEOGEDPN, PIIFLHIBODE);
+				frames[i].Data[j].Add(HLBMDDOPKKL, ELAKEOGEDPN, PIIFLHIBODE);
 			}
 		}
 	}
 
-	public void NKHEGNLGJIG()
+	public void MirrorHorizontally()
 	{
-		for (int i = (_IsInterruptFramesSeted ? 2 : 0); i < BOAIMPGFINL; i++)
+		for (int i = (_IsInterruptFramesSeted ? 2 : 0); i < frameCount; i++)
 		{
-			for (int j = 0; j < DCFPONJAING[i].Size; j++)
+			for (int j = 0; j < frames[i].Size; j++)
 			{
-				Vector3f eMAFACPEPDK = DCFPONJAING[i].Data[j];
+				Vector3f eMAFACPEPDK = frames[i].Data[j];
 				eMAFACPEPDK.SetX(eMAFACPEPDK.GetX() * -1f);
 			}
 		}
@@ -124,12 +124,12 @@ public class KeyFrames
 
 	public void Reset()
 	{
-		BOAIMPGFINL = 0;
-		BCFLAENGDHA = 0;
+		frameCount = 0;
+		currentFrameIndex = 0;
 		_IsInterruptFramesSeted = false;
 	}
 
-	public void HAILLLEPCHP(int AMNCLCPADOO, int IFIOLDFCLIE, bool HOHEFHKJIOG, Vector3[][] GHDPPHAAPCA)
+	public void SetFramesFromRange(int AMNCLCPADOO, int IFIOLDFCLIE, bool HOHEFHKJIOG, Vector3[][] GHDPPHAAPCA)
 	{
 		if (HOHEFHKJIOG)
 		{
@@ -145,17 +145,17 @@ public class KeyFrames
 
 	public void SetFrame(Vector3[] GHDPPHAAPCA)
 	{
-		BOAIMPGFINL++;
-		if (DCFPONJAING.Count < BOAIMPGFINL)
+		frameCount++;
+		if (frames.Count < frameCount)
 		{
-			NLMAIINFADE(1, GHDPPHAAPCA.Length);
+			AllocateFrames(1, GHDPPHAAPCA.Length);
 		}
-		Frame cJMFONMNFBI = DCFPONJAING[BOAIMPGFINL - 1];
+		Frame cJMFONMNFBI = frames[frameCount - 1];
 		if (cJMFONMNFBI.Size != GHDPPHAAPCA.Length)
 		{
 			if (cJMFONMNFBI.Size < GHDPPHAAPCA.Length)
 			{
-				cJMFONMNFBI.Data.CPCAJIKOIEE(GHDPPHAAPCA.Length);
+				cJMFONMNFBI.Data.Resize(GHDPPHAAPCA.Length);
 			}
 			cJMFONMNFBI.Size = GHDPPHAAPCA.Length;
 		}
@@ -165,13 +165,13 @@ public class KeyFrames
 		}
 	}
 
-	protected void NLMAIINFADE(int GNDPBMIJEMH, int DGHIGGGFNLP)
+	protected void AllocateFrames(int GNDPBMIJEMH, int DGHIGGGFNLP)
 	{
 		for (int i = 0; i < GNDPBMIJEMH; i++)
 		{
 			Frame cJMFONMNFBI = new Frame();
 			cJMFONMNFBI.Data = new List<Vector3f>(DGHIGGGFNLP);
-			DCFPONJAING.Add(cJMFONMNFBI);
+			frames.Add(cJMFONMNFBI);
 			for (int j = 0; j < DGHIGGGFNLP; j++)
 			{
 				cJMFONMNFBI.Data.Add(new Vector3f());

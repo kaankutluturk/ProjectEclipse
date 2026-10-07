@@ -7,22 +7,22 @@ public class WebSocketBinaryFrame : IWebSocketFrameWriter
 	private static readonly byte[] NoData = new byte[0];
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private bool OIGMDFDEPHD;
+	private bool isFinal;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private byte[] JFKBADLJJBM;
+	private byte[] data;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private ulong JEAHFBGJDII;
+	private ulong pos;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private ulong DCGIHLANEKJ;
+	private ulong length;
 
-	public bool EKPJBHAKGED
+	public bool FinalFragment
 	{
 		get
 		{
-			return MOOCLIBIPBI();
+			return GetIsFinal();
 		}
 		protected set
 		{
@@ -30,23 +30,23 @@ public class WebSocketBinaryFrame : IWebSocketFrameWriter
 		}
 	}
 
-	protected ulong KICOKBAGIPH
+	protected ulong Pos
 	{
 		get
 		{
-			return FLMOEFEIFCE();
+			return GetPos();
 		}
 		set
 		{
-			ONEFHFDLHBB(value);
+			SetPos(value);
 		}
 	}
 
-	protected ulong IHGONCCOKMK
+	protected ulong DataLength
 	{
 		get
 		{
-			return KLIOMCPELLF();
+			return GetLength();
 		}
 		set
 		{
@@ -67,74 +67,74 @@ public class WebSocketBinaryFrame : IWebSocketFrameWriter
 	public WebSocketBinaryFrame(byte[] data, ulong LCCLEFMKLPB, ulong BDBOAEGELMC, bool JDHJLBBIKLM)
 	{
 		set_Data(data);
-		ONEFHFDLHBB(LCCLEFMKLPB);
+		SetPos(LCCLEFMKLPB);
 		set_Length(BDBOAEGELMC);
 		set_IsFinal(JDHJLBBIKLM);
 	}
 
-	public virtual BECKAHJIEGE get_Type()
+	public virtual WebSocketFrameTypes get_Type()
 	{
-		return BECKAHJIEGE.Binary;
+		return WebSocketFrameTypes.Binary;
 	}
 
-	public bool MOOCLIBIPBI()
+	public bool GetIsFinal()
 	{
-		return OIGMDFDEPHD;
+		return isFinal;
 	}
 
 	protected void set_IsFinal(bool value)
 	{
-		OIGMDFDEPHD = value;
+		isFinal = value;
 	}
 
-	protected byte[] CHIGLEKCFFN()
+	protected byte[] GetData()
 	{
-		return JFKBADLJJBM;
+		return data;
 	}
 
 	protected void set_Data(byte[] value)
 	{
-		JFKBADLJJBM = value;
+		data = value;
 	}
 
-	protected ulong FLMOEFEIFCE()
+	protected ulong GetPos()
 	{
-		return JEAHFBGJDII;
+		return pos;
 	}
 
-	protected void ONEFHFDLHBB(ulong value)
+	protected void SetPos(ulong value)
 	{
-		JEAHFBGJDII = value;
+		pos = value;
 	}
 
-	protected ulong KLIOMCPELLF()
+	protected ulong GetLength()
 	{
-		return DCGIHLANEKJ;
+		return length;
 	}
 
 	protected void set_Length(ulong value)
 	{
-		DCGIHLANEKJ = value;
+		length = value;
 	}
 
 	public virtual byte[] Get()
 	{
-		if (CHIGLEKCFFN() == null)
+		if (GetData() == null)
 		{
 			set_Data(NoData);
 		}
-		using (MemoryStream memoryStream = new MemoryStream((int)KLIOMCPELLF() + 9))
+		using (MemoryStream memoryStream = new MemoryStream((int)GetLength() + 9))
 		{
-			byte b = (byte)(MOOCLIBIPBI() ? 128u : 0u);
+			byte b = (byte)(GetIsFinal() ? 128u : 0u);
 			memoryStream.WriteByte((byte)((uint)b | (uint)get_Type()));
-			if (KLIOMCPELLF() < 126)
+			if (GetLength() < 126)
 			{
-				memoryStream.WriteByte((byte)(0x80 | (byte)KLIOMCPELLF()));
+				memoryStream.WriteByte((byte)(0x80 | (byte)GetLength()));
 			}
-			else if (KLIOMCPELLF() < 65535)
+			else if (GetLength() < 65535)
 			{
 				memoryStream.WriteByte(254);
-				byte[] bytes = BitConverter.GetBytes((ushort)KLIOMCPELLF());
+				byte[] bytes = BitConverter.GetBytes((ushort)GetLength());
 				if (BitConverter.IsLittleEndian)
 				{
 					Array.Reverse(bytes, 0, bytes.Length);
@@ -144,7 +144,7 @@ public class WebSocketBinaryFrame : IWebSocketFrameWriter
 			else
 			{
 				memoryStream.WriteByte(byte.MaxValue);
-				byte[] bytes2 = BitConverter.GetBytes(KLIOMCPELLF());
+				byte[] bytes2 = BitConverter.GetBytes(GetLength());
 				if (BitConverter.IsLittleEndian)
 				{
 					Array.Reverse(bytes2, 0, bytes2.Length);
@@ -153,9 +153,9 @@ public class WebSocketBinaryFrame : IWebSocketFrameWriter
 			}
 			byte[] bytes3 = BitConverter.GetBytes(GetHashCode());
 			memoryStream.Write(bytes3, 0, bytes3.Length);
-			for (ulong num = FLMOEFEIFCE(); num < FLMOEFEIFCE() + KLIOMCPELLF(); num++)
+			for (ulong num = GetPos(); num < GetPos() + GetLength(); num++)
 			{
-				memoryStream.WriteByte((byte)(CHIGLEKCFFN()[num] ^ bytes3[(num - FLMOEFEIFCE()) % 4]));
+				memoryStream.WriteByte((byte)(GetData()[num] ^ bytes3[(num - GetPos()) % 4]));
 			}
 			return memoryStream.ToArray();
 		}

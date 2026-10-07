@@ -76,29 +76,29 @@ $nativeStubs = Join-Path $fixture 'NativeStubs.cs'
 @'
 using System; using System.Collections.Generic; using System.Xml;
 public class EventDispatcher<T> { }
-public sealed class DeflatedString { private XmlNode _node; public void Set(XmlNode node){_node=node.CloneNode(true);} public XmlNode IOJIGDNFCFL()=>_node.CloneNode(true); }
+public sealed class DeflatedString { private XmlNode _node; public void Set(XmlNode node){_node=node.CloneNode(true);} public XmlNode GetNode()=>_node.CloneNode(true); }
 public static class NativeXmlExt {
  public static bool Empty(this XmlAttribute a)=>a==null||string.IsNullOrEmpty(a.Value);
- public static string CIPOICEEIBK(this XmlAttribute a,string f)=>a==null?f:a.Value;
+ public static string GetStringOrDefault(this XmlAttribute a,string f)=>a==null?f:a.Value;
  public static float ParseFloat(this XmlAttribute a,float f=0)=>a==null?f:float.Parse(a.Value,System.Globalization.CultureInfo.InvariantCulture);
  public static bool ParseBool(this XmlAttribute a)=>a!=null&&(a.Value=="1"||string.Equals(a.Value,"true",StringComparison.OrdinalIgnoreCase)||string.Equals(a.Value,"Eclipse",StringComparison.OrdinalIgnoreCase));
 }
 public enum RuleAppliance { ApplianceNone, AppliancePlayer, ApplianceOpponent, ApplianceAll }
 public enum FightEvent { AnimationStartEvent, RenderEvent, HitEvent }
-public sealed class InfoAnimation { public string Name; public bool LPPIKDGABOL(string n)=>false; }
-public static class AnimationData { public static void NEBELEFIDMB(string n,List<InfoAnimation> l){l.Add(new InfoAnimation{Name=n});} }
+public sealed class InfoAnimation { public string Name; public bool HasTemplateName(string n)=>false; }
+public static class AnimationData { public static void AddTemplateAnimations(string n,List<InfoAnimation> l){l.Add(new InfoAnimation{Name=n});} }
 public sealed class ModelNode { public Vector3f GetStart()=>new Vector3f(); }
-public sealed class ModelNodes { public ModelNode EGHIDHMENEF(string n)=>new ModelNode(); }
-public class Model { public ModelNodes CLDMEJKGLBA()=>new ModelNodes(); public void PONNDMHBGJK(IntervalAnimation.NGAJJDIEDGF t){} }
+public sealed class ModelNodes { public ModelNode GetNodeByName(string n)=>new ModelNode(); }
+public class Model { public ModelNodes GetBodyObject()=>new ModelNodes(); public void SuppressInterval(IntervalAnimation.IntervalType t){} }
 public struct Vector3f { float x,y,z; public Vector3f(float x,float y,float z){this.x=x;this.y=y;this.z=z;} public float GetX()=>x; public float GetY()=>y; public float GetZ()=>z; }
-public sealed class NativeLocation { public float JMLAKAKDBBL; public float GBNPHCHGKDO; }
-public sealed class RuleInitData { public NativeLocation LPJNEDFCBOI; public Model DLPKDAIDCBF; public Model OGBHDKKOIGH; }
-public sealed class FightData { public FightEvent KOJNCHKPLLN; public bool CBLNOFELDOE; public InfoAnimation LKLHCEEMINM; }
-public sealed class PlayersFightData { public int SlowMode=1; public FightData MPLPEMOFHGI=new FightData(); public FightData EKBMBILHBMC=new FightData(); }
-public static class LLLOJBFMONN { public static void Error(string f,params object[] a){} }
-public static class IntervalAnimation { public enum NGAJJDIEDGF { INTERVAL_NONE,INTERVAL_ATTACK,INTERVAL_BLOCK,INTERVAL_INVULNERABLE,INTERVAL_SELF_UNINTERRUPT,INTERVAL_UNINTERRUPT,INTERVAL_UNSTABLE } }
-public sealed class NativeRoster { public int PINDEKDNCNL()=>52; }
-public static class ListSF { public static NativeRoster CCDKHLAMKKO()=>new NativeRoster(); }
+public sealed class NativeLocation { public float width; public float floorHeight; }
+public sealed class RuleInitData { public NativeLocation FightLocation; public Model PlayerModel; public Model OpponentModel; }
+public sealed class FightData { public FightEvent FightEventType; public bool IsUsingItem; public InfoAnimation CurrentAnimation; }
+public sealed class PlayersFightData { public int SlowMode=1; public FightData PlayerData=new FightData(); public FightData EnemyData=new FightData(); }
+public static class GameLog { public static void Error(string f,params object[] a){} }
+public static class IntervalAnimation { public enum IntervalType { INTERVAL_NONE,INTERVAL_ATTACK,INTERVAL_BLOCK,INTERVAL_INVULNERABLE,INTERVAL_SELF_UNINTERRUPT,INTERVAL_UNINTERRUPT,INTERVAL_UNSTABLE } }
+public sealed class NativeRoster { public int GetLevel()=>52; }
+public static class ListSF { public static NativeRoster GetRoster()=>new NativeRoster(); }
 '@ | Set-Content -Encoding UTF8 $nativeStubs
 
 $sources = @(

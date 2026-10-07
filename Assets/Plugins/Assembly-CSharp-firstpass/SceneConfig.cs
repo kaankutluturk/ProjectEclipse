@@ -122,27 +122,27 @@ public class SceneConfig : MonoBehaviour
 
 	public bool IsConfig;
 
-	private static SceneConfig EDAPJLKMFPC;
+	private static SceneConfig instance;
 
-	private float CDLEAEBCKDN;
+	private float leftBorderX;
 
-	private float BJCBBBHBOID;
+	private float rightBorderX;
 
-	private float ECICHHBFELI;
+	private float centerX;
 
-	private Vector3 OFELPAHFIOJ;
+	private Vector3 spawnPointEnemy;
 
-	private Vector3 IFALGIHJHLN;
+	private Vector3 spawnPointPlayer;
 
-	private float JHPCPBHPDNJ;
+	private float maxDistBetweenModels;
 
-	private float FNICPCKHHAC;
+	private float locationRightBorder;
 
-	private float BNJCCKOMHJH;
+	private float locationLeftBorder;
 
-	private float LEGKPOHHMEO;
+	private float camZOffset;
 
-	public static SceneConfig BPCBBHAKFDM
+	public static SceneConfig CurrentInstance
 	{
 		get
 		{
@@ -150,7 +150,7 @@ public class SceneConfig : MonoBehaviour
 		}
 	}
 
-	public static bool ELFPNFCHEIL
+	public static bool HasInstance
 	{
 		get
 		{
@@ -158,7 +158,7 @@ public class SceneConfig : MonoBehaviour
 		}
 	}
 
-	public static float LDNACACPMFG
+	public static float LeftBorder
 	{
 		get
 		{
@@ -170,7 +170,7 @@ public class SceneConfig : MonoBehaviour
 		}
 	}
 
-	public static float JHPCKJNHHDE
+	public static float RightBorder
 	{
 		get
 		{
@@ -182,7 +182,7 @@ public class SceneConfig : MonoBehaviour
 		}
 	}
 
-	public static float HLIGLIEFMGL
+	public static float Center
 	{
 		get
 		{
@@ -190,11 +190,11 @@ public class SceneConfig : MonoBehaviour
 		}
 		private set
 		{
-			HEPEBCNHAPD(value);
+			SetCenterX(value);
 		}
 	}
 
-	public static Vector3 BNGJNHJPHGG
+	public static Vector3 EnemySpawnPoint
 	{
 		get
 		{
@@ -202,11 +202,11 @@ public class SceneConfig : MonoBehaviour
 		}
 		private set
 		{
-			LENIOMGPDNB(value);
+			SetSpawnPointEnemy(value);
 		}
 	}
 
-	public static Vector3 DLEJLEOJGCE
+	public static Vector3 PlayerSpawnPoint
 	{
 		get
 		{
@@ -214,11 +214,11 @@ public class SceneConfig : MonoBehaviour
 		}
 		private set
 		{
-			PEIPFPAOCHB(value);
+			SetSpawnPointPlayer(value);
 		}
 	}
 
-	public static float CJCICEMEKJI
+	public static float FloorY
 	{
 		get
 		{
@@ -226,7 +226,7 @@ public class SceneConfig : MonoBehaviour
 		}
 	}
 
-	public static float PBDOAMOFMHI
+	public static float MaxModelDistance
 	{
 		get
 		{
@@ -234,11 +234,11 @@ public class SceneConfig : MonoBehaviour
 		}
 		private set
 		{
-			GLBMAFELMDI(value);
+			SetMaxDistBetweenModels(value);
 		}
 	}
 
-	public static float FPLFNIJIICP
+	public static float LocationRightEdge
 	{
 		get
 		{
@@ -246,11 +246,11 @@ public class SceneConfig : MonoBehaviour
 		}
 		private set
 		{
-			EBNMJIGMMOP(value);
+			SetLocationRightBorder(value);
 		}
 	}
 
-	public static float NBHMMCCAFFL
+	public static float LocationLeftEdge
 	{
 		get
 		{
@@ -258,11 +258,11 @@ public class SceneConfig : MonoBehaviour
 		}
 		private set
 		{
-			HPKGOFCOGGM(value);
+			SetLocationLeftBorder(value);
 		}
 	}
 
-	public static float MCHJFJGLGNC
+	public static float CameraZOffset
 	{
 		get
 		{
@@ -270,7 +270,7 @@ public class SceneConfig : MonoBehaviour
 		}
 		private set
 		{
-			IECJPIDEPCD(value);
+			SetCamZOffset(value);
 		}
 	}
 
@@ -372,125 +372,125 @@ public class SceneConfig : MonoBehaviour
 
 	public static SceneConfig get_Instance()
 	{
-		return EDAPJLKMFPC;
+		return instance;
 	}
 
 	public static bool get_IsPresent()
 	{
-		return EDAPJLKMFPC;
+		return instance;
 	}
 
 	public static float get_LeftBorderX()
 	{
-		return EDAPJLKMFPC.CDLEAEBCKDN;
+		return instance.leftBorderX;
 	}
 
 	public static void set_LeftBorderX(float value)
 	{
-		EDAPJLKMFPC.CDLEAEBCKDN = value;
+		instance.leftBorderX = value;
 	}
 
 	public static float get_RightBorderX()
 	{
-		return EDAPJLKMFPC.BJCBBBHBOID;
+		return instance.rightBorderX;
 	}
 
 	public static void set_RightBorderX(float value)
 	{
-		EDAPJLKMFPC.BJCBBBHBOID = value;
+		instance.rightBorderX = value;
 	}
 
 	public static float get_CenterX()
 	{
-		return EDAPJLKMFPC.ECICHHBFELI;
+		return instance.centerX;
 	}
 
-	private static void HEPEBCNHAPD(float value)
+	private static void SetCenterX(float value)
 	{
-		EDAPJLKMFPC.ECICHHBFELI = value;
+		instance.centerX = value;
 	}
 
 	public static Vector3 get_SpawnPointEnemy()
 	{
-		return EDAPJLKMFPC.OFELPAHFIOJ;
+		return instance.spawnPointEnemy;
 	}
 
-	private static void LENIOMGPDNB(Vector3 value)
+	private static void SetSpawnPointEnemy(Vector3 value)
 	{
-		EDAPJLKMFPC.OFELPAHFIOJ = value;
+		instance.spawnPointEnemy = value;
 	}
 
 	public static Vector3 get_SpawnPointPlayer()
 	{
-		return EDAPJLKMFPC.IFALGIHJHLN;
+		return instance.spawnPointPlayer;
 	}
 
-	private static void PEIPFPAOCHB(Vector3 value)
+	private static void SetSpawnPointPlayer(Vector3 value)
 	{
-		EDAPJLKMFPC.IFALGIHJHLN = value;
+		instance.spawnPointPlayer = value;
 	}
 
 	public static float get_PointFloor()
 	{
-		return EDAPJLKMFPC.IFALGIHJHLN.y;
+		return instance.spawnPointPlayer.y;
 	}
 
 	public static float get_MaxDistBetweenModels()
 	{
-		return EDAPJLKMFPC.JHPCPBHPDNJ;
+		return instance.maxDistBetweenModels;
 	}
 
-	private static void GLBMAFELMDI(float value)
+	private static void SetMaxDistBetweenModels(float value)
 	{
-		EDAPJLKMFPC.JHPCPBHPDNJ = value;
+		instance.maxDistBetweenModels = value;
 	}
 
 	public static float get_LocationRightBorder()
 	{
-		return EDAPJLKMFPC.FNICPCKHHAC;
+		return instance.locationRightBorder;
 	}
 
-	private static void EBNMJIGMMOP(float value)
+	private static void SetLocationRightBorder(float value)
 	{
-		EDAPJLKMFPC.FNICPCKHHAC = value;
+		instance.locationRightBorder = value;
 	}
 
 	public static float get_LocationLeftBorder()
 	{
-		return EDAPJLKMFPC.BNJCCKOMHJH;
+		return instance.locationLeftBorder;
 	}
 
-	private static void HPKGOFCOGGM(float value)
+	private static void SetLocationLeftBorder(float value)
 	{
-		EDAPJLKMFPC.BNJCCKOMHJH = value;
+		instance.locationLeftBorder = value;
 	}
 
 	public static float get_CamZOffset()
 	{
-		return EDAPJLKMFPC.LEGKPOHHMEO;
+		return instance.camZOffset;
 	}
 
-	private static void IECJPIDEPCD(float value)
+	private static void SetCamZOffset(float value)
 	{
-		EDAPJLKMFPC.LEGKPOHHMEO = value;
+		instance.camZOffset = value;
 	}
 
 	private void Awake()
 	{
-		EDAPJLKMFPC = this;
+		instance = this;
 		if (!IsConfig)
 		{
 			float x = base.transform.Find(GetString("LeftBorder")).position.x;
 			set_LeftBorderX(x);
-			HPKGOFCOGGM(x);
+			SetLocationLeftBorder(x);
 			x = base.transform.Find(GetString("RightBorder")).position.x;
 			set_RightBorderX(x);
-			EBNMJIGMMOP(x);
-			HEPEBCNHAPD((get_RightBorderX() + get_LeftBorderX()) / 2f);
-			LENIOMGPDNB(base.transform.Find(GetString("SpawnPointA")).position);
-			PEIPFPAOCHB(base.transform.Find(GetString("SpawnPointB")).position);
-			GLBMAFELMDI(GetFloat("MaxDistBetweenModels"));
-			IECJPIDEPCD(GetFloat("CamZOffset"));
+			SetLocationRightBorder(x);
+			SetCenterX((get_RightBorderX() + get_LeftBorderX()) / 2f);
+			SetSpawnPointEnemy(base.transform.Find(GetString("SpawnPointA")).position);
+			SetSpawnPointPlayer(base.transform.Find(GetString("SpawnPointB")).position);
+			SetMaxDistBetweenModels(GetFloat("MaxDistBetweenModels"));
+			SetCamZOffset(GetFloat("CamZOffset"));
 		}
 	}
 }

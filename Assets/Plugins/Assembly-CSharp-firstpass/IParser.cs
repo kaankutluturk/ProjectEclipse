@@ -1,8 +1,8 @@
 public interface IParser
 {
-	ParsingEvent BLOOLFFMKFI { get; }
+	ParsingEvent CurrentEvent { get; }
 
-	ParsingEvent AOJJOEHEPGM();
+	ParsingEvent GetCurrent();
 
-	bool PCCMLADDNDG();
+	bool MoveNext();
 }

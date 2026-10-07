@@ -110,7 +110,7 @@ public partial class Fight
 
     private bool IsEclipseActorModel(Model model) => model != null && _eclipseActors.ContainsKey(model);
     private bool IsEclipseFormParticipant(Model model) => model != null &&
-        (model == _playerModel || model == CKNCPOABFBO ||
+        (model == _playerModel || model == _enemyModel ||
          _eclipseActors.TryGetValue(model,out var actor) && actor.Birth == null && ActorValid(actor,false,out _));
 
     private bool TryQueueEclipseActorForm(Model expected,DefinitionId character,Action<Exception> complete,out string error)
@@ -140,9 +140,9 @@ public partial class Fight
     {
         if(expected==null||replacement==null||expected==replacement||
             !_eclipseActors.TryGetValue(expected,out var actor)||actor.Birth!=null||!ActorValid(actor,false,out _)||
-            _eclipseActors.ContainsKey(replacement)||LNDLFINJHDB.Contains(replacement))
+            _eclipseActors.ContainsKey(replacement)||ActiveModels.Contains(replacement))
             throw new InvalidOperationException("Actor form participant identity is stale.");
-        int index=LNDLFINJHDB.IndexOf(expected);
+        int index=ActiveModels.IndexOf(expected);
         if(index<0||replacement.Parameters.IsPlayer!=actor.PlayerTeam||replacement.Parameters.UserControlled||
             replacement.Parameters.AiControlled!=actor.Definition.AiControlled||replacement.Parameters.MaxLife!=actor.Definition.MaxHealth||
             _eclipseShields.ContainsKey(replacement)||_eclipseStatusIcons.Keys.Any(k=>k.Item1==replacement))
@@ -152,7 +152,7 @@ public partial class Fight
         var icons=_eclipseStatusIcons.Where(p=>p.Key.Item1==expected).ToArray();
         bool hasShield=_eclipseShields.TryGetValue(expected,out var shield);
         _eclipseActors.Remove(expected);_eclipseActors.Add(replacement,actor);actor.Model=replacement;
-        LNDLFINJHDB[index]=replacement;
+        ActiveModels[index]=replacement;
         if(hasShield){_eclipseShields.Remove(expected);_eclipseShields.Add(replacement,shield);}
         MoveFormBehaviorKeys(_eclipseOpponentInstances,opponentState,expected,replacement);
         MoveFormBehaviorKeys(_eclipseInnateInstances,innateState,expected,replacement);
@@ -165,7 +165,7 @@ public partial class Fight
             MoveFormBehaviorKeys(_eclipseInnateInstances,innateState,replacement,expected);
             MoveFormBehaviorKeys(_eclipseOpponentInstances,opponentState,replacement,expected);
             if(hasShield){_eclipseShields.Remove(replacement);_eclipseShields.Add(expected,shield);}
-            LNDLFINJHDB[index]=expected;actor.Model=expected;
+            ActiveModels[index]=expected;actor.Model=expected;
             _eclipseActors.Remove(replacement);_eclipseActors.Add(expected,actor);
         };
     }

@@ -1,8 +1,8 @@
 internal interface IFileFormatWriter
 {
-	byte[] BOLKKEBKHEE();
+	byte[] GetHeader();
 
 	void UpdateWithBytesRead(byte[] buffer, int IPCOBJBKNAO, int OGAPEFFEHIH);
 
-	byte[] AIJJKADBLMG();
+	byte[] GetFooter();
 }

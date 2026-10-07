@@ -46,16 +46,16 @@ public static class FighterPlaybackUnity
                 typeof(Eclipse.UI.TitleScreen).GetMethod("BeginCampaign",Hidden).Invoke(title,null);
                 var directory=SF2Paths.GetUserDataDirectory();
                 Check(Eclipse.Saves.CampaignSaveSession.PreviewDirectory==null&&directory.StartsWith(Application.persistentDataPath,StringComparison.OrdinalIgnoreCase)&&Application.persistentDataPath.Contains(Path.GetFileName(Path.GetDirectoryName(Application.dataPath))),"Profile not isolated");
-                var profile=XmlUtils.OpenXMLDocument(SF2Paths.KKIDGPBOBNI(),"usersDefault.xml",XmlUtils.EBLFEPIOMOL.Normal,true,XmlCryptoUtils.NNLGALNDJCL());
+                var profile=XmlUtils.OpenXMLDocument(SF2Paths.GetGameDataPath(),"usersDefault.xml",XmlUtils.XmlSourceMode.Normal,true,XmlCryptoUtils.GetIsEncryptionEnabled());
                 ((System.Xml.XmlElement)profile.SelectSingleNode("/Root/Warriors/Warrior[@ID='1']")).SetAttribute("Tutorial","END");
-                Directory.CreateDirectory(directory);XmlUtils.ONLDJNLKKAL(profile,Path.Combine(directory,Constants.OJMIJINKBPJ).Replace('\\','/'));
+                Directory.CreateDirectory(directory);XmlUtils.SaveDocumentWithHash(profile,Path.Combine(directory,Constants.UsersFileName).Replace('\\','/'));
                 campaign=true;return;
             }
             if(!entered){
                 if(ModRuntime.Scripts==null||Module.GetInstance()==null)return;
                 var screen=Module.GetInstance().GetCurrentScreenType();if(screen!=ScreenType.ModuleDojo&&screen!=ScreenType.ModuleMap)return;
                 Check(!ModRuntime.Scripts.HasErrors,"Startup mod errors");
-                var encounter=ListSF.CHMCKGCDGCM(new FightIDS(ModRuntime.Scripts.Content.RuntimeFightId(DefinitionId.Parse("core:fights/zone_1/tournament/3"))));
+                var encounter=ListSF.GetFightById(new FightIDS(ModRuntime.Scripts.Content.RuntimeFightId(DefinitionId.Parse("core:fights/zone_1/tournament/3"))));
                 Check(encounter!=null,"Core encounter missing");entered=GameUtils.StartFight(encounter,false,null,true,false);return;
             }
             var fight=Fight.GetCurrentFight();if(fight==null)return;
@@ -102,7 +102,7 @@ public static class FighterPlaybackUnity
             var ops=(IModFighterPlayback)Activator.CreateInstance(typeof(Fight).GetNestedType("EclipseFighterOperations",BindingFlags.NonPublic),Hidden|BindingFlags.Public,null,new object[]{fight,fight.GetPlayerModel(),null,null,null,null,false},null);
             bool? applied=null;Check(ops.TryPlayMove(DefinitionId.Parse(Move),(ok,error)=>applied=ok,out var failure),failure);
             fight.SetPaused(true);typeof(Fight).GetMethod("ApplyEclipseFighterPlayback",Hidden,null,Type.EmptyTypes,null).Invoke(fight,null);Check(applied==null,"Pause consumed playback");
-            fight.SetPaused(false);typeof(Fight).GetMethod("HCNDAFDHACI",Hidden).Invoke(fight,new object[]{GameOverTypes.GAME_OVER_SURRENDER});
+            fight.SetPaused(false);typeof(Fight).GetMethod("AbortFight",Hidden).Invoke(fight,new object[]{GameOverTypes.GAME_OVER_SURRENDER});
             Check(applied==false&&surface.IsClosed,"Surrender retained queued playback or HUD");
             Check(((IDictionary)Field(fight,"_eclipseFighterPlayback")).Count==0,"Surrender queue nonempty");
             File.WriteAllText(Path.Combine(Path.GetDirectoryName(Application.dataPath),"validation-result.txt"),"PASS: "+checks+" full-game native fighter playback checks; shipped authored punch, native button/deferred playback/start callback/contact damage/cooldown, pause retention and surrender cancellation. Idle controls/spacing and isolated post-tutorial profile controlled.");

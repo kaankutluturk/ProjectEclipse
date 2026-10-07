@@ -10,7 +10,7 @@ namespace Nekki.SF2.GUI.Shop
 
 		private BaseScrollContent _baseScrollContent;
 
-		public ItemsScroll LCHHABGJMND
+		public ItemsScroll ItemsScrollView
 		{
 			get
 			{
@@ -18,7 +18,7 @@ namespace Nekki.SF2.GUI.Shop
 			}
 		}
 
-		public BaseScrollContent FAIHAAIMHDD
+		public BaseScrollContent ScrollContent
 		{
 			get
 			{

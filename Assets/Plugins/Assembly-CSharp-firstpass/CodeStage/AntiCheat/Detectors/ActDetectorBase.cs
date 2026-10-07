@@ -6,11 +6,11 @@ namespace CodeStage.AntiCheat.Detectors
 	[AddComponentMenu("")]
 	public abstract class ActDetectorBase : MonoBehaviour
 	{
-		protected const string KCAEFCJMBPA = "Anti-Cheat Toolkit Detectors";
+		protected const string ContainerName = "Anti-Cheat Toolkit Detectors";
 
-		protected const string EEENHFBCDJE = "Code Stage/Anti-Cheat Toolkit/";
+		protected const string MenuPath = "Code Stage/Anti-Cheat Toolkit/";
 
-		protected const string LEOHBKLGNNH = "GameObject/Create Other/Code Stage/Anti-Cheat Toolkit/";
+		protected const string GameObjectMenuPath = "GameObject/Create Other/Code Stage/Anti-Cheat Toolkit/";
 
 		protected static GameObject detectorsContainer;
 
@@ -31,9 +31,9 @@ namespace CodeStage.AntiCheat.Detectors
 		[SerializeField]
 		protected bool detectionEventHasListener;
 
-		protected bool EKDNCONELMD;
+		protected bool isRunning;
 
-		protected bool AKFEAJDLIKF;
+		protected bool started;
 
 		private void Start()
 		{
@@ -41,36 +41,36 @@ namespace CodeStage.AntiCheat.Detectors
 			{
 				detectorsContainer = base.gameObject;
 			}
-			if (autoStart && !AKFEAJDLIKF)
+			if (autoStart && !started)
 			{
-				LICPBNOFNOB();
+				StartDetectionAutomatically();
 			}
 		}
 
 		private void OnEnable()
 		{
-			if (AKFEAJDLIKF && (detectionEventHasListener || detectionAction != null))
+			if (started && (detectionEventHasListener || detectionAction != null))
 			{
-				KLJNEJIEMCN();
+				ResumeDetector();
 			}
 		}
 
 		private void OnDisable()
 		{
-			if (AKFEAJDLIKF)
+			if (started)
 			{
-				HEGJDFPFMII();
+				PauseDetector();
 			}
 		}
 
 		private void OnApplicationQuit()
 		{
-			HIEIKJFAIJE();
+			DisposeInternal();
 		}
 
 		protected virtual void OnDestroy()
 		{
-			DJEBEEIELBB();
+			StopDetectionInternal();
 			if (base.transform.childCount == 0 && GetComponentsInChildren<Component>().Length <= 2)
 			{
 				Object.Destroy(base.gameObject);
@@ -93,12 +93,12 @@ namespace CodeStage.AntiCheat.Detectors
 			return true;
 		}
 
-		protected virtual void HIEIKJFAIJE()
+		protected virtual void DisposeInternal()
 		{
 			Object.Destroy(this);
 		}
 
-		internal virtual void MCDANNDOEIK()
+		internal virtual void OnCheatingDetected()
 		{
 			if (detectionAction != null)
 			{
@@ -110,20 +110,20 @@ namespace CodeStage.AntiCheat.Detectors
 			}
 			if (autoDispose)
 			{
-				HIEIKJFAIJE();
+				DisposeInternal();
 			}
 			else
 			{
-				DJEBEEIELBB();
+				StopDetectionInternal();
 			}
 		}
 
-		protected abstract void LICPBNOFNOB();
+		protected abstract void StartDetectionAutomatically();
 
-		protected abstract void DJEBEEIELBB();
+		protected abstract void StopDetectionInternal();
 
-		protected abstract void HEGJDFPFMII();
+		protected abstract void PauseDetector();
 
-		protected abstract void KLJNEJIEMCN();
+		protected abstract void ResumeDetector();
 	}
 }

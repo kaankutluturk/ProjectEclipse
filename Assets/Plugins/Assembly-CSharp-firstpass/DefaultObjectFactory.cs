@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 public sealed class DefaultObjectFactory : IObjectFactory
 {
-	private static readonly Dictionary<Type, Type> HLNILELMELH = new Dictionary<Type, Type>
+	private static readonly Dictionary<Type, Type> defaultInterfaceImplementations = new Dictionary<Type, Type>
 	{
 		{
 			typeof(IEnumerable<>),
@@ -26,7 +26,7 @@ public sealed class DefaultObjectFactory : IObjectFactory
 	public object Create(Type LFLGCDNKNJI)
 	{
 		Type value;
-		if (LFLGCDNKNJI.EDALBNGKHAD() && HLNILELMELH.TryGetValue(LFLGCDNKNJI.GetGenericTypeDefinition(), out value))
+		if (LFLGCDNKNJI.IsInterfaceCheck() && defaultInterfaceImplementations.TryGetValue(LFLGCDNKNJI.GetGenericTypeDefinition(), out value))
 		{
 			LFLGCDNKNJI = value.MakeGenericType(LFLGCDNKNJI.GetGenericArguments());
 		}

@@ -7,7 +7,7 @@ namespace Nekki.SF2.GUI.Shop
 {
 	public class ShopTableViewCell : TableViewCell, IComparable<ShopTableViewCell>
 	{
-		private string _texturePath = SF2Paths.LFIIMPEAMFG();
+		private string _texturePath = SF2Paths.GetItemsUiPath();
 
 		[SerializeField]
 		private ResolutionImage _lockIcon;
@@ -37,16 +37,16 @@ namespace Nekki.SF2.GUI.Shop
 		private LayoutElement _layoutElement;
 
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		private Vector2 LMFNOHNBCMC;
+		private Vector2 _baseSize;
 
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		private int LKDFKFHAOOC;
+		private int _index;
 
-		private ItemInfo JMPPBCFDOLL;
+		private ItemInfo _itemInfo;
 
 		private float _incraseHeight;
 
-		public PerksPanel FNKBLODMEKA
+		public PerksPanel PerksPanelRef
 		{
 			get
 			{
@@ -54,7 +54,7 @@ namespace Nekki.SF2.GUI.Shop
 			}
 		}
 
-		public LayoutElement CMFIABIFDDD
+		public LayoutElement LayoutElementRef
 		{
 			get
 			{
@@ -62,7 +62,7 @@ namespace Nekki.SF2.GUI.Shop
 			}
 		}
 
-		public Vector2 MLIBBLGEHJI
+		public Vector2 BaseSizeValue
 		{
 			get
 			{
@@ -74,7 +74,7 @@ namespace Nekki.SF2.GUI.Shop
 			}
 		}
 
-		public bool FNNPPCNDLNK
+		public bool IconPanelVisible
 		{
 			get
 			{
@@ -86,7 +86,7 @@ namespace Nekki.SF2.GUI.Shop
 			}
 		}
 
-		public Vector3 GEHBDCJNJMJ
+		public Vector3 CenterPoint
 		{
 			get
 			{
@@ -94,7 +94,7 @@ namespace Nekki.SF2.GUI.Shop
 			}
 		}
 
-		public ItemInfo OFMCNLBFIDF
+		public ItemInfo ItemInfoRef
 		{
 			get
 			{
@@ -102,7 +102,7 @@ namespace Nekki.SF2.GUI.Shop
 			}
 		}
 
-		public float PJOANAMPNNO
+		public float HeightIncrease
 		{
 			get
 			{
@@ -126,12 +126,12 @@ namespace Nekki.SF2.GUI.Shop
 
 		public Vector2 get_BaseSize()
 		{
-			return LMFNOHNBCMC;
+			return _baseSize;
 		}
 
 		public void set_BaseSize(Vector2 value)
 		{
-			LMFNOHNBCMC = value;
+			_baseSize = value;
 		}
 
 		public bool get_IconPanelActive()
@@ -144,18 +144,18 @@ namespace Nekki.SF2.GUI.Shop
 			if (_iconPanel != null)
 			{
 				_iconPanel.gameObject.SetActive(value);
-				GNBDBHEPKML();
+				UpdateLayoutSize();
 			}
 		}
 
 		public int get_Index()
 		{
-			return LKDFKFHAOOC;
+			return _index;
 		}
 
 		public void set_Index(int value)
 		{
-			LKDFKFHAOOC = value;
+			_index = value;
 		}
 
 		public Vector3 get_CenterPosition()
@@ -170,7 +170,7 @@ namespace Nekki.SF2.GUI.Shop
 
 		public ItemInfo get_ItemInfo()
 		{
-			return JMPPBCFDOLL;
+			return _itemInfo;
 		}
 
 		public float get_IncraseHeight()
@@ -181,32 +181,32 @@ namespace Nekki.SF2.GUI.Shop
 		public void set_IncraseHeight(float value)
 		{
 			_incraseHeight = value;
-			GNBDBHEPKML();
+			UpdateLayoutSize();
 		}
 
 		public void SetItemInfo(ItemInfo item)
 		{
 			if (item == null)
 			{
-				LLLOJBFMONN.Error("ShopTableViewCell.SetItemInfo item is null");
+				GameLog.Error("ShopTableViewCell.SetItemInfo item is null");
 				return;
 			}
 			base.gameObject.name = string.Format("ShopTableViewCell({0})", item.Name);
-			UserItem dKCHDHMLKHN = ListSF.CCDKHLAMKKO().KHCNHPCPFII().CMGOCLGHNLH(item);
-			JMPPBCFDOLL = ((dKCHDHMLKHN == null) ? item : dKCHDHMLKHN.AKKBIFEFDCI());
-			_lockIcon.gameObject.SetActive(item.ItemLevel > ListSF.CCDKHLAMKKO().PINDEKDNCNL());
+			UserItem dKCHDHMLKHN = ListSF.GetRoster().GetInventory().FindItem(item);
+			_itemInfo = ((dKCHDHMLKHN == null) ? item : dKCHDHMLKHN.GetCurrentUpgradeItem());
+			_lockIcon.gameObject.SetActive(item.ItemLevel > ListSF.GetRoster().GetLevel());
 			_jackdawIcon.gameObject.SetActive(dKCHDHMLKHN != null && item.Type != "Seal");
-			_equppiedIcon.gameObject.SetActive(dKCHDHMLKHN != null && dKCHDHMLKHN.EFMFGEPDAOP());
-			bool active = JMPPBCFDOLL.ItemLevel > 0;
-			Font font = LocalizationManager.MBPJIKFOEBJ();
+			_equppiedIcon.gameObject.SetActive(dKCHDHMLKHN != null && dKCHDHMLKHN.GetIsEquipped());
+			bool active = _itemInfo.ItemLevel > 0;
+			Font font = LocalizationManager.GetContentFont();
 			if (font != null)
 			{
 				_levelLabel.font = font;
 			}
-			_levelLabel.text = JMPPBCFDOLL.ItemLevel.ToString();
+			_levelLabel.text = _itemInfo.ItemLevel.ToString();
 			_levelLabel.gameObject.SetActive(active);
 			_levelIcon.gameObject.SetActive(active);
-			_image.set_TexturePath((!(item.Type == "Seal")) ? _texturePath : SF2Paths.BHCPOOOJAAK());
+			_image.set_TexturePath((!(item.Type == "Seal")) ? _texturePath : SF2Paths.GetUsersUiPath());
 			_image.set_SpriteName(item.FileName);
 			if (item.Type == "Seal")
 			{
@@ -216,16 +216,16 @@ namespace Nekki.SF2.GUI.Shop
 			{
 				_image.SetNativeSize();
 			}
-			_perksPanel.SetPerks(ListSF.EIMKEJNJMEJ(JMPPBCFDOLL));
-			GNBDBHEPKML();
-			GIMBAAJGDEN();
+			_perksPanel.SetPerks(ListSF.GetItemEnchantments(_itemInfo));
+			UpdateLayoutSize();
+			ApplyOpacity();
 		}
 
-		private void GIMBAAJGDEN()
+		private void ApplyOpacity()
 		{
 		}
 
-		private void GNBDBHEPKML()
+		private void UpdateLayoutSize()
 		{
 			RectTransform rectTransform = (RectTransform)base.transform;
 			Vector2 vector = get_BaseSize();
@@ -245,15 +245,15 @@ namespace Nekki.SF2.GUI.Shop
 
 		public void UpdateItem()
 		{
-			SetItemInfo(JMPPBCFDOLL);
+			SetItemInfo(_itemInfo);
 		}
 
 		public int CompareTo(ShopTableViewCell NOLFMPDGCOC)
 		{
-			int num = ((JMPPBCFDOLL != null) ? JMPPBCFDOLL.ItemLevel : 0);
-			int value = ((NOLFMPDGCOC.JMPPBCFDOLL != null) ? NOLFMPDGCOC.JMPPBCFDOLL.ItemLevel : 0);
-			int num2 = ((JMPPBCFDOLL != null) ? JMPPBCFDOLL.Index : 0);
-			int value2 = ((NOLFMPDGCOC.JMPPBCFDOLL == null) ? 1 : NOLFMPDGCOC.JMPPBCFDOLL.Index);
+			int num = ((_itemInfo != null) ? _itemInfo.ItemLevel : 0);
+			int value = ((NOLFMPDGCOC._itemInfo != null) ? NOLFMPDGCOC._itemInfo.ItemLevel : 0);
+			int num2 = ((_itemInfo != null) ? _itemInfo.Index : 0);
+			int value2 = ((NOLFMPDGCOC._itemInfo == null) ? 1 : NOLFMPDGCOC._itemInfo.Index);
 			int num3 = num.CompareTo(value);
 			if (num3 != 0)
 			{

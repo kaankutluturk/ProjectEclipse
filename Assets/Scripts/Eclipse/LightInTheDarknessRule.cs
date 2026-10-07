@@ -11,16 +11,16 @@ namespace Eclipse.Combat
         public float LightShape { get; private set; }
 
         public LightInTheDarknessRule(XmlNode node, RuleAppliance target)
-            : base(BCBLLMPAMLP.RuleLightInTheDarkness, target, node)
+            : base(RuleType.RuleLightInTheDarkness, target, node)
         {
             LightRadius = node.Attributes["LightRadius"].ParseFloat(0.2f);
             LightShape = node.Attributes["LightShape"].ParseFloat(1f);
-            EBJIKKBLBEM(FightEvent.RenderEvent);
+            SubscribeEvent(FightEvent.RenderEvent);
         }
 
         public override InFightRule Copy()
         {
-            return new LightInTheDarknessRule(GIFDJEEGCJI().IOJIGDNFCFL(), EDAKADCHOLE())
+            return new LightInTheDarknessRule(GetXmlSource().GetNode(), GetAppliance())
             {
                 IsRandom = IsRandom
             };

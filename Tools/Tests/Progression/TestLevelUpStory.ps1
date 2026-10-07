@@ -4,8 +4,8 @@ $fixture=Join-Path $root ('Temp/LevelUpStory-'+[Guid]::NewGuid().ToString('N'))
 New-Item -ItemType Directory -Path $fixture | Out-Null
 $roster=Get-Content -LiteralPath (Join-Path $root 'Assets/Scripts/Assembly-CSharp/Roster.cs') -Raw -Encoding UTF8
 $hostSource=Get-Content -LiteralPath (Join-Path $root 'Assets/Scripts/Eclipse/Modding/ModRuntime.cs') -Raw -Encoding UTF8
-$gain=[regex]::Match($roster,'(?ms)^\tpublic bool DBPBGBNHAIP\(.*?^\t\}')
-$threshold=[regex]::Match($roster,'(?ms)^\tpublic uint HEOHJNFGEDH\(.*?^\t\}')
+$gain=[regex]::Match($roster,'(?ms)^\tpublic bool SetExperience\(.*?^\t\}')
+$threshold=[regex]::Match($roster,'(?ms)^\tpublic uint GetExperienceToNextLevel\(.*?^\t\}')
 $publish=[regex]::Match($hostSource,'(?ms)^        internal static void PublishLevelUp\(.*?^        \}')
 if(!$gain.Success -or !$threshold.Success -or !$publish.Success){throw 'Production level methods not found.'}
 $code=Get-Content -LiteralPath (Join-Path $PSScriptRoot 'ValidateLevelUpStory.cs') -Raw -Encoding UTF8

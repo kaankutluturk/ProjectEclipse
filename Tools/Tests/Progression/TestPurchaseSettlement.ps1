@@ -20,7 +20,7 @@ static class Program {
  sealed class Scripts { public Catalog Content=new Catalog(); }
  static Scripts _scripts=new Scripts();
  static class StoryEvents { public static int ProfileGeneration; public static void RunDeferred(Action action)=>action(); }
- sealed class Roster { public void GGGEHAGCLGC(bool force){} }
+ sealed class Roster { public void RequestSave(bool force){} }
  sealed class ListSF {
   public static ListSF GetInstance()=>new ListSF();
   public void OnAuthenticate(bool force){if(DeferProfileSave())return; if(failSave)throw new Exception("disk failure"); saved=_lotteryProfileNode.OuterXml; writes++;}

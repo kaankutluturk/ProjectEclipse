@@ -2,20 +2,20 @@ using System.Xml;
 
 public class QuestActionEndTimer : QuestAction
 {
-	private string GAADCGKKMEN;
+	private string timerName;
 
 	public override void Parse(XmlNode EPKLCPOEELO)
 	{
 		base.Parse(EPKLCPOEELO);
-		GAADCGKKMEN = EPKLCPOEELO.Attributes["Name"].CIPOICEEIBK(string.Empty);
+		timerName = EPKLCPOEELO.Attributes["Name"].GetStringOrDefault(string.Empty);
 	}
 
-	public override void DEJMHFMLKIC(QuestParameters GFIHPBCEEOB)
+	public override void Execute(QuestParameters GFIHPBCEEOB)
 	{
-		base.DEJMHFMLKIC(GFIHPBCEEOB);
-		Roster nKGLHEGIKKP = ListSF.CCDKHLAMKKO();
-		RosterTimerContainer kCMICMHCEBB = nKGLHEGIKKP.AEMFLPNDDKL();
-		kCMICMHCEBB.IPKMLCMAINI(GAADCGKKMEN);
-		OGIJONMKABB();
+		base.Execute(GFIHPBCEEOB);
+		Roster nKGLHEGIKKP = ListSF.GetRoster();
+		RosterTimerContainer kCMICMHCEBB = nKGLHEGIKKP.GetTimerContainer();
+		kCMICMHCEBB.RemoveTimer(timerName);
+		FinishAction();
 	}
 }

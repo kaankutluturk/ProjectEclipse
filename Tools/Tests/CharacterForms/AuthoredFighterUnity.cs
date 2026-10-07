@@ -65,10 +65,10 @@ public static class AuthoredFighterUnity
     static object Invoke(object target,string name,params object[] args)=>target.GetType().GetMethod(name,Hidden|BindingFlags.Public).Invoke(target,args);
     static void Check(bool value,string message) { checks++; if(!value) throw new Exception(message); }
     static float Life(Model model)=>model.Parameters.RemainingHealthInDamageUnits;
-    static Model[] Actors(Fight fight)=>fight.LNDLFINJHDB.Where(m=>m!=null&&!(m is WeaponModel)&&(m.get_Name()??"").StartsWith(Owner+":actors/",StringComparison.Ordinal)).ToArray();
+    static Model[] Actors(Fight fight)=>fight.ActiveModels.Where(m=>m!=null&&!(m is WeaponModel)&&(m.get_Name()??"").StartsWith(Owner+":actors/",StringComparison.Ordinal)).ToArray();
     static IModActor Actor(Fight fight,Model model)=>(IModActor)((IDictionary)Field(fight,"_eclipseActors"))[model];
     static string Id(Fight fight,Model model) { Check(Actor(fight,model).TrySnapshot(out var snap,out var error),error); return snap.Id; }
-    static float[] Pose(Model model)=>model.GetModelObject().NAMKCLGOPDD().SelectMany(n=>new[]{n.GetEnd().GetX(),n.GetEnd().GetY(),n.GetEnd().GetZ()}).ToArray();
+    static float[] Pose(Model model)=>model.GetModelObject().GetAllNodes().SelectMany(n=>new[]{n.GetEnd().GetX(),n.GetEnd().GetY(),n.GetEnd().GetZ()}).ToArray();
     static float[] Sash(Model model)
     {
         var body=model.GetModelObject(); var root=body.FindNodeOrParent("NPivot").GetEnd();
@@ -111,9 +111,9 @@ public static class AuthoredFighterUnity
                 if((bool)Field(title,"splashing")||(string)Field(title,"currentPage")!="Home")return;
                 Invoke(title,"BeginCampaign"); var directory=SF2Paths.GetUserDataDirectory();
                 Check(directory.StartsWith(Application.persistentDataPath,StringComparison.OrdinalIgnoreCase)&&Application.persistentDataPath.Contains("AuthoredFighterUnity-"),"Profile not isolated");
-                var profile=XmlUtils.OpenXMLDocument(SF2Paths.KKIDGPBOBNI(),"usersDefault.xml",XmlUtils.EBLFEPIOMOL.Normal,true,XmlCryptoUtils.NNLGALNDJCL());
+                var profile=XmlUtils.OpenXMLDocument(SF2Paths.GetGameDataPath(),"usersDefault.xml",XmlUtils.XmlSourceMode.Normal,true,XmlCryptoUtils.GetIsEncryptionEnabled());
                 ((System.Xml.XmlElement)profile.SelectSingleNode("/Root/Warriors/Warrior[@ID='1']")).SetAttribute("Tutorial","END");
-                Directory.CreateDirectory(directory);XmlUtils.ONLDJNLKKAL(profile,Path.Combine(directory,Constants.OJMIJINKBPJ).Replace('\\','/'));campaign=true;return;
+                Directory.CreateDirectory(directory);XmlUtils.SaveDocumentWithHash(profile,Path.Combine(directory,Constants.UsersFileName).Replace('\\','/'));campaign=true;return;
             }
             if(!entered)
             {
@@ -147,7 +147,7 @@ public static class AuthoredFighterUnity
                     entered=true;return;
                 }
                 var encounterId=PlayerEntry?Owner+":fights/playable":"core:fights/zone_1/tournament/3";
-                var encounter=ListSF.CHMCKGCDGCM(new FightIDS(ModRuntime.Scripts.Content.RuntimeFightId(DefinitionId.Parse(encounterId))));
+                var encounter=ListSF.GetFightById(new FightIDS(ModRuntime.Scripts.Content.RuntimeFightId(DefinitionId.Parse(encounterId))));
                 Check(encounter!=null,"Core encounter missing");entered=GameUtils.StartFight(encounter,false,null,true,false);
                 if(PlayerEntry)entryRequested=Surface("choose_player")!=null;
                 return;
@@ -160,13 +160,13 @@ public static class AuthoredFighterUnity
             if(PlayerEntry&&!initialPlayerChecked)
             {
                 string expected=Owner+":warriors/"+(ComparisonEntry?"core_comparison":"sash_fighter");
-                Check(player.Parameters.EclipseCharacterId==expected&&(ComparisonEntry?string.IsNullOrEmpty(player.Parameters.EclipseBodyModel):player.Parameters.EclipseBodyModel==Owner+":models/body"),"Encounter did not start as its chosen player character: expected="+expected+" actual="+player.Parameters.EclipseCharacterId+" body="+player.Parameters.EclipseBodyModel+" fight="+fight.GetFightDefinition().FightId+" selected="+EntryPlayer(fight.GetFightDefinition())?.EclipseCharacterId+" canonical="+((ModelParameters)Field(fight,"NMNCKBPFCCP")).EclipseCharacterId+" screen="+Module.GetInstance().GetCurrentScreenType()+" plan="+Profile?.SelectSingleNode("EclipseModes/Mode/Encounter")?.OuterXml+" canceled="+entryCanceled+" choice="+choiceCaptureStarted);
+                Check(player.Parameters.EclipseCharacterId==expected&&(ComparisonEntry?string.IsNullOrEmpty(player.Parameters.EclipseBodyModel):player.Parameters.EclipseBodyModel==Owner+":models/body"),"Encounter did not start as its chosen player character: expected="+expected+" actual="+player.Parameters.EclipseCharacterId+" body="+player.Parameters.EclipseBodyModel+" fight="+fight.GetFightDefinition().FightId+" selected="+EntryPlayer(fight.GetFightDefinition())?.EclipseCharacterId+" canonical="+((ModelParameters)Field(fight,"playerParameters")).EclipseCharacterId+" screen="+Module.GetInstance().GetCurrentScreenType()+" plan="+Profile?.SelectSingleNode("EclipseModes/Mode/Encounter")?.OuterXml+" canceled="+entryCanceled+" choice="+choiceCaptureStarted);
                 Check(player.Parameters.IsPlayer&&player.Parameters.UserControlled&&!player.Parameters.AiControlled,"Declared player entered without native player/input ownership");
                 Check(formApplied==0,"Declared player depended on a live form request");
                 Check(ModRuntime.Scripts.Content.TryGetMode(DefinitionId.Parse(Owner+":modes/playable"),out var mode),"Playable mode missing after entry");
                 var plan=new ModModeProgress(Profile,mode).ReadPlan();
                 Check(plan?.PlayerCharacter?.ToString()==expected,"Chosen character not retained in saved plan");
-                var blueprint=ListSF.CHMCKGCDGCM(new FightIDS(ModRuntime.Scripts.Content.RuntimeFightId(mode.Fights[0])));
+                var blueprint=ListSF.GetFightById(new FightIDS(ModRuntime.Scripts.Content.RuntimeFightId(mode.Fights[0])));
                 Check(EntryPlayer(blueprint).EclipseCharacterId==Owner+":warriors/sash_fighter","Prepared character leaked into shared blueprint");
                 var alternate=ModModeRuntime.BuildEncounter(mode,0,new ModEncounterPlan(playerCharacter:DefinitionId.Parse(Owner+":warriors/"+(ComparisonEntry?"sash_fighter":"core_comparison"))));
                 Check(EntryPlayer(alternate).EclipseCharacterId!=expected&&player.Parameters.EclipseCharacterId==expected,"Separate generated instance did not isolate player selection");
@@ -183,7 +183,7 @@ public static class AuthoredFighterUnity
             {
                 case 0:
                     surface=Surface();if(surface==null)return;
-                    var origin=player.PLBNCDCFPML();var other=enemy.PLBNCDCFPML();enemy.ShiftModelPosition(new Vector3f(origin.GetX()+900-other.GetX(),0,0),true);
+                    var origin=player.GetPosition();var other=enemy.GetPosition();enemy.ShiftModelPosition(new Vector3f(origin.GetX()+900-other.GetX(),0,0),true);
                     playerLife=Life(player);enemyLife=Life(enemy);Click("summon");Next(fight);break;
                 case 1:
                     var pair=Actors(fight);if(pair.Length!=2)return;
@@ -196,12 +196,12 @@ public static class AuthoredFighterUnity
                         Check(model.Parameters.EclipseSkinModels.Single()==Owner+":models/sash","Authored skin binding absent");
                         Check((int)Field(model.GetModelObject(),"_NodesCount")==67,"Skin altered animation point count");
                         Check(Enumerable.Range(0,6).All(i=>model.GetModelObject().FindNodeOrParent("AuthoredSashV"+i)!=null),"Authored helper bindings missing");
-                        Debug.Log("[AuthoredFighterUnity] Native composed nodes="+model.GetModelObject().NAMKCLGOPDD().Count+" animation nodes="+Field(model.GetModelObject(),"_NodesCount"));
+                        Debug.Log("[AuthoredFighterUnity] Native composed nodes="+model.GetModelObject().GetAllNodes().Count+" animation nodes="+Field(model.GetModelObject(),"_NodesCount"));
                         Check(model.GetModelObject().Triangles.Count(t=>t.get_Name().StartsWith("AuthoredSash-",StringComparison.Ordinal))==4,"Connected authored triangles missing");
                         Check(!model.Parameters.AiControlled&&!model.Parameters.UserControlled,"Fixture did not use public manual actor controls");
                         Check(model.GetAvailableAnimations().Any(m=>m.Name==Move&&m.FileName.Contains("animations/strike")),"Owned native clip unavailable");
                     }
-                    Check(left.PLBNCDCFPML().GetX()<right.PLBNCDCFPML().GetX(),"Left/right setup crossed before authored playback: "+left.PLBNCDCFPML().GetX()+" / "+right.PLBNCDCFPML().GetX());
+                    Check(left.GetPosition().GetX()<right.GetPosition().GetX(),"Left/right setup crossed before authored playback: "+left.GetPosition().GetX()+" / "+right.GetPosition().GetX());
                     leftId=Id(fight,left);rightId=Id(fight,right);
                     sashRest=Sash(left);beforeHit=Life(right);Click("left");Check(left.GetCurrentAnimation()?.Name!=Move,"HUD invoked playback recursively");Next(fight);break;
                 case 2:
@@ -218,13 +218,13 @@ public static class AuthoredFighterUnity
                     Click("reform");Next(fight);break;
                 case 3:
                     if(frame-phaseFrame<30||surface.Read("status").Text.Contains("spacing"))return;
-                    Check(left.PLBNCDCFPML().GetX()<right.PLBNCDCFPML().GetX(),"Public reset did not form the mirrored contact setup");
+                    Check(left.GetPosition().GetX()<right.GetPosition().GetX(),"Public reset did not form the mirrored contact setup");
                     beforeHit=Life(left);Click("right");Next(fight);break;
                 case 4:
                     if(right.GetCurrentAnimation()?.Name==Move)
                     {
                         var animation=Field(right,"_Animation");
-                        mirroredRight |= (int)Field(animation,"JMKAHNADIOI")==-1&&(bool)Field(animation,"IPGAAGOANDE");
+                        mirroredRight |= (int)Field(animation,"sign")==-1&&(bool)Field(animation,"isMirrored");
                     }
                     if(frame-phaseFrame>240)throw new Exception("Mirrored authored strike made no contact: "+right.GetCurrentAnimation()?.Name+" health="+Life(left));
                     if(Life(left)>=beforeHit||right.GetCurrentAnimation()?.Name==Move)return;
@@ -311,7 +311,7 @@ public static class AuthoredFighterUnity
                         Check(left.Parameters.IsPlayer&&!left.Parameters.UserControlled&&!left.Parameters.AiControlled&&left.Parameters.MaxLife==10&&Life(left)<=actorLifeBefore+.001,"Actor form changed team/control/health or healed");
                         Check(left.GetCombatTarget()==right&&right.GetCombatTarget()==left&&Field(ownerRightActor,"TargetRequest")==left,"Actor form did not rebind explicit/native hostile targets");
                         Check(player.Parameters==actorMainPlayer&&enemy.Parameters==actorMainEnemy&&Math.Abs(Life(player)-actorPlayerLifeBefore)<.001&&Math.Abs(Life(enemy)-actorEnemyLifeBefore)<.001,"Actor form changed main parameters/health");
-                        Check(!fight.LNDLFINJHDB.Contains(retiredActor)&&!((IDictionary)Field(fight,"_eclipseActors")).Contains(retiredActor)&&ended.Count==0,"Actor form left retired root registered or emitted end");
+                        Check(!fight.ActiveModels.Contains(retiredActor)&&!((IDictionary)Field(fight,"_eclipseActors")).Contains(retiredActor)&&ended.Count==0,"Actor form left retired root registered or emitted end");
                         Check(Surface()==surface&&!surface.IsClosed&&ModRuntime.Scripts.CallbackDiagnostics.RecentFailures.Count==0,"Actor form damaged HUD or Lua callbacks");
                         if(!restored)
                         {
@@ -346,9 +346,9 @@ public static class AuthoredFighterUnity
                     Check(player.Parameters.EclipseCharacterId==Owner+":warriors/sash_fighter"&&player.Parameters.EclipseBodyModel==Owner+":models/body","Wrong authored player form");
                     Check(player.Parameters.IsPlayer&&player.Parameters.UserControlled&&!player.Parameters.AiControlled,"Player form lost input eligibility");
                     Check(Math.Abs(Life(player)/player.Parameters.MaxLife-formRatio)<.001&&frame>=formFrame,"Form changed health percentage or restarted clock");
-                    Check(fight.GetEnemyModel()==enemy&&enemy.GetCombatTarget()==player&&fight.LNDLFINJHDB.Contains(player)&&!fight.LNDLFINJHDB.Contains(originalPlayer),"Canonical participant/target ownership did not rebind");
+                    Check(fight.GetEnemyModel()==enemy&&enemy.GetCombatTarget()==player&&fight.ActiveModels.Contains(player)&&!fight.ActiveModels.Contains(originalPlayer),"Canonical participant/target ownership did not rebind");
                     Check(Surface()==surface&&!surface.IsClosed&&Actors(fight).Length==0,"Form reset or duplicated the rule HUD/actor lifecycle");
-                    Check(player.GetModelObject().NAMKCLGOPDD().Any(n=>n.GetName()=="AuthoredSashV5"),"Player form did not load authored skin");
+                    Check(player.GetModelObject().GetAllNodes().Any(n=>n.GetName()=="AuthoredSashV5"),"Player form did not load authored skin");
                     Invoke(player,"TrainingMoveToX",450f);Invoke(enemy,"TrainingMoveToX",550f);beforeHit=Life(enemy);
                     Invoke(fight.Controller,"SendGamepadControlEvent",0,FightCID.Punch);Next(fight);break;
                 case 10:
@@ -357,7 +357,7 @@ public static class AuthoredFighterUnity
                     // before the real input/move-selection pipeline consumes it.
                     if(frame-phaseFrame>=3)Invoke(fight.Controller,"SendGamepadControlEvent",1,FightCID.Punch);
                     inputStrike|=player.GetCurrentAnimation()?.Name==Move;
-                    if(frame-phaseFrame>240)throw new Exception("Native Punch did not make authored player contact: "+player.GetCurrentAnimation()?.Name+" starts="+playerStarts+" hits="+playerHits+" playerControl="+Field(player,"HCPHOJKFIDM")+" fightInput="+Field(fight,"IOPJDMCBIMM")+" controller="+fight.Controller.IsQuadrantEnabled(FightCID.Punch)+" stage="+Field(fight,"stageType")+" char="+player.Parameters.EclipseCharacterId);
+                    if(frame-phaseFrame>240)throw new Exception("Native Punch did not make authored player contact: "+player.GetCurrentAnimation()?.Name+" starts="+playerStarts+" hits="+playerHits+" playerControl="+Field(player,"inputEnabled")+" fightInput="+Field(fight,"isInputEnabled")+" controller="+fight.Controller.IsQuadrantEnabled(FightCID.Punch)+" stage="+Field(fight,"stageType")+" char="+player.Parameters.EclipseCharacterId);
                     if(!inputStrike||Life(enemy)>=beforeHit||player.GetCurrentAnimation()?.Name==Move)return;
                     CheckSource(enemy,player);Check(playerStarts>0&&playerHits>0,"Player input lacked ordinary animation/damage callbacks");
                     Invoke(enemy,"TrainingMoveToX",950f);enemy.PressAnyKey(FightCID.Punch);
@@ -368,7 +368,7 @@ public static class AuthoredFighterUnity
                     // Let the deliberate opponent Punch and the player's hit/block
                     // reaction finish before testing input on the comparison form.
                     if(frame-phaseFrame>240)throw new Exception("Opponent comparison action did not settle: "+enemy.GetCurrentAnimation()?.Name+" player="+player.GetCurrentAnimation()?.Name);
-                    if(frame-phaseFrame<60||enemy.NMEEPBDJHMG()&&enemy.GetCurrentAnimation()!=null&&(int)enemy.GetCurrentAnimation().Type==2)return;
+                    if(frame-phaseFrame<60||enemy.HasCurrentAnimation()&&enemy.GetCurrentAnimation()!=null&&(int)enemy.GetCurrentAnimation().Type==2)return;
                     if(!playerCaptured)Check(!enemyUsedAuthored,"Character-specific Punch leaked to the other fighter");
                     if(!playerCaptured){playerCaptured=true;captured=false;new GameObject("Authored player capture").AddComponent<AuthoredPlayerCapture>();return;}
                     if(!captured)return;
@@ -382,7 +382,7 @@ public static class AuthoredFighterUnity
                     inputReadyFrame=-1;
                     Check(player.Parameters.EclipseCharacterId==Owner+":warriors/core_comparison"&&string.IsNullOrEmpty(player.Parameters.EclipseBodyModel),"Comparison retained authored body identity");
                     Check(player.Parameters.IsPlayer&&player.Parameters.UserControlled&&Math.Abs(Life(player)/player.Parameters.MaxLife-formRatio)<.001&&frame>=formFrame,"Comparison form lost player state");
-                    Check(!player.GetModelObject().NAMKCLGOPDD().Any(n=>n.GetName()=="AuthoredSashV5"),"Comparison retained authored sash geometry");
+                    Check(!player.GetModelObject().GetAllNodes().Any(n=>n.GetName()=="AuthoredSashV5"),"Comparison retained authored sash geometry");
                     Invoke(player,"TrainingMoveToX",450f);Invoke(enemy,"TrainingMoveToX",550f);
                     Invoke(fight.Controller,"SendGamepadControlEvent",0,FightCID.Punch);Next(fight);break;
                 case 13:
@@ -397,7 +397,7 @@ public static class AuthoredFighterUnity
                     Check(!comparisonUsedAuthored,"Character-specific Punch leaked to core comparison form");
                     Check(corePunchSeen,"Comparison form lost ordinary Punch selection");
                     Check(Surface()==surface&&ModRuntime.Scripts.CallbackDiagnostics.RecentFailures.Count==0,"Player form callbacks/HUD failed");
-                    Invoke(fight,"OBNEDPKCNKJ");Check(surface.IsClosed,"Round teardown retained authored HUD");
+                    Invoke(fight,"Surrender");Check(surface.IsClosed,"Round teardown retained authored HUD");
                     File.WriteAllText(Path.Combine(Root,"authored-fighter-result.txt"),"PASS: "+checks+" full-game authored fighter checks; original 61x67 native clip/skin, both actor facings and repeated Lua contact, pause/dismissal, owner and actor form changes retaining companion handles/IDs/behavior/lifetimes/targets and continued bidirectional native contact, public player/comparison form swaps preserving health/input/timer/HUD/target identity, native controller Punch selects authored attack with contact/callbacks and stays character-specific. Controlled Campaign/standard rig/core equipment; not physical devices, arbitrary rigs, all exports/platforms.");
                     Debug.Log("[AuthoredFighterUnity] PASS: "+checks);Finish(0);break;
             }

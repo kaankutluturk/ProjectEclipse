@@ -4,82 +4,82 @@ internal class InputBuffer
 {
 	private byte[] buffer;
 
-	private int ILENLCMAMBH;
+	private int start;
 
-	private int PCLFFOBJJFO;
+	private int end;
 
 	private uint bitBuffer;
 
-	private int FJPIAFJLLBI;
+	private int bitsInBuffer;
 
-	public int GMAEJHLBDPL
+	public int AvailableBits
 	{
 		get
 		{
-			return PEKEJGLMKPH();
+			return GetAvailableBits();
 		}
 	}
 
-	public int EDCELODAANL
+	public int AvailableBytes
 	{
 		get
 		{
-			return EJAHIMFDFJI();
+			return GetAvailableBytes();
 		}
 	}
 
-	public int PEKEJGLMKPH()
+	public int GetAvailableBits()
 	{
-		return FJPIAFJLLBI;
+		return bitsInBuffer;
 	}
 
-	public int EJAHIMFDFJI()
+	public int GetAvailableBytes()
 	{
-		return PCLFFOBJJFO - ILENLCMAMBH + FJPIAFJLLBI / 8;
+		return end - start + bitsInBuffer / 8;
 	}
 
 	public bool EnsureBitsAvailable(int count)
 	{
-		if (FJPIAFJLLBI < count)
+		if (bitsInBuffer < count)
 		{
 			if (NeedsInput())
 			{
 				return false;
 			}
-			bitBuffer |= (uint)(buffer[ILENLCMAMBH++] << FJPIAFJLLBI);
-			FJPIAFJLLBI += 8;
-			if (FJPIAFJLLBI < count)
+			bitBuffer |= (uint)(buffer[start++] << bitsInBuffer);
+			bitsInBuffer += 8;
+			if (bitsInBuffer < count)
 			{
 				if (NeedsInput())
 				{
 					return false;
 				}
-				bitBuffer |= (uint)(buffer[ILENLCMAMBH++] << FJPIAFJLLBI);
-				FJPIAFJLLBI += 8;
+				bitBuffer |= (uint)(buffer[start++] << bitsInBuffer);
+				bitsInBuffer += 8;
 			}
 		}
 		return true;
 	}
 
-	public uint DDGBLEAPMLA()
+	public uint TryLoad16Bits()
 	{
-		if (FJPIAFJLLBI < 8)
+		if (bitsInBuffer < 8)
 		{
-			if (ILENLCMAMBH < PCLFFOBJJFO)
+			if (start < end)
 			{
-				bitBuffer |= (uint)(buffer[ILENLCMAMBH++] << FJPIAFJLLBI);
-				FJPIAFJLLBI += 8;
+				bitBuffer |= (uint)(buffer[start++] << bitsInBuffer);
+				bitsInBuffer += 8;
 			}
-			if (ILENLCMAMBH < PCLFFOBJJFO)
+			if (start < end)
 			{
-				bitBuffer |= (uint)(buffer[ILENLCMAMBH++] << FJPIAFJLLBI);
-				FJPIAFJLLBI += 8;
+				bitBuffer |= (uint)(buffer[start++] << bitsInBuffer);
+				bitsInBuffer += 8;
 			}
 		}
-		else if (FJPIAFJLLBI < 16 && ILENLCMAMBH < PCLFFOBJJFO)
+		else if (bitsInBuffer < 16 && start < end)
 		{
-			bitBuffer |= (uint)(buffer[ILENLCMAMBH++] << FJPIAFJLLBI);
-			FJPIAFJLLBI += 8;
+			bitBuffer |= (uint)(buffer[start++] << bitsInBuffer);
+			bitsInBuffer += 8;
 		}
 		return bitBuffer;
 	}
@@ -97,18 +97,18 @@ internal class InputBuffer
 		}
 		int result = (int)(bitBuffer & GetBitMask(count));
 		bitBuffer >>= count;
-		FJPIAFJLLBI -= count;
+		bitsInBuffer -= count;
 		return result;
 	}
 
 	public int CopyTo(byte[] output, int IPCOBJBKNAO, int BDBOAEGELMC)
 	{
 		int num = 0;
-		while (FJPIAFJLLBI > 0 && BDBOAEGELMC > 0)
+		while (bitsInBuffer > 0 && BDBOAEGELMC > 0)
 		{
 			output[IPCOBJBKNAO++] = (byte)bitBuffer;
 			bitBuffer >>= 8;
-			FJPIAFJLLBI -= 8;
+			bitsInBuffer -= 8;
 			BDBOAEGELMC--;
 			num++;
 		}
@@ -116,37 +116,37 @@ internal class InputBuffer
 		{
 			return num;
 		}
-		int num2 = PCLFFOBJJFO - ILENLCMAMBH;
+		int num2 = end - start;
 		if (BDBOAEGELMC > num2)
 		{
 			BDBOAEGELMC = num2;
 		}
-		Array.Copy(buffer, ILENLCMAMBH, output, IPCOBJBKNAO, BDBOAEGELMC);
-		ILENLCMAMBH += BDBOAEGELMC;
+		Array.Copy(buffer, start, output, IPCOBJBKNAO, BDBOAEGELMC);
+		start += BDBOAEGELMC;
 		return num + BDBOAEGELMC;
 	}
 
 	public bool NeedsInput()
 	{
-		return ILENLCMAMBH == PCLFFOBJJFO;
+		return start == end;
 	}
 
 	public void SetInput(byte[] buffer, int IPCOBJBKNAO, int BDBOAEGELMC)
 	{
 		this.buffer = buffer;
-		ILENLCMAMBH = IPCOBJBKNAO;
-		PCLFFOBJJFO = IPCOBJBKNAO + BDBOAEGELMC;
+		start = IPCOBJBKNAO;
+		end = IPCOBJBKNAO + BDBOAEGELMC;
 	}
 
 	public void SkipBits(int HDKKKCDKFEE)
 	{
 		bitBuffer >>= HDKKKCDKFEE;
-		FJPIAFJLLBI -= HDKKKCDKFEE;
+		bitsInBuffer -= HDKKKCDKFEE;
 	}
 
-	public void KHMFPEJHFHC()
+	public void SkipToByteBoundary()
 	{
-		bitBuffer >>= FJPIAFJLLBI % 8;
-		FJPIAFJLLBI -= FJPIAFJLLBI % 8;
+		bitBuffer >>= bitsInBuffer % 8;
+		bitsInBuffer -= bitsInBuffer % 8;
 	}
 }

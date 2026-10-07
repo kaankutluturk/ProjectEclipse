@@ -1,6 +1,6 @@
 public static class StageType
 {
-	public enum FDBBPEGEGMK
+	public enum Stage
 	{
 		STAGE_NONE = 0,
 		STAGE_START_STANCE = 1,
@@ -12,27 +12,27 @@ public static class StageType
 		STAGE_SHOP_TRY_ON = 7
 	}
 
-	public static FDBBPEGEGMK GetStageByName(string name)
+	public static Stage GetStageByName(string name)
 	{
 		switch (name)
 		{
 		case "StartStance":
-			return FDBBPEGEGMK.STAGE_START_STANCE;
+			return Stage.STAGE_START_STANCE;
 		case "Fight":
-			return FDBBPEGEGMK.STAGE_FIGHT;
+			return Stage.STAGE_FIGHT;
 		case "EndStance":
-			return FDBBPEGEGMK.STAGE_END_STANCE;
+			return Stage.STAGE_END_STANCE;
 		case "PeacefulStart":
-			return FDBBPEGEGMK.STAGE_SHOP_START;
+			return Stage.STAGE_SHOP_START;
 		case "ShopPurchase":
-			return FDBBPEGEGMK.STAGE_SHOP_PURCHASE;
+			return Stage.STAGE_SHOP_PURCHASE;
 		case "PeacefulRestore":
-			return FDBBPEGEGMK.STAGE_PEACEFUL_RESTORE;
+			return Stage.STAGE_PEACEFUL_RESTORE;
 		case "TryOn":
-			return FDBBPEGEGMK.STAGE_SHOP_TRY_ON;
+			return Stage.STAGE_SHOP_TRY_ON;
 		default:
-			LLLOJBFMONN.Error("StageType::getStageByName - unknown stage: %s", name);
-			return FDBBPEGEGMK.STAGE_NONE;
+			GameLog.Error("StageType::getStageByName - unknown stage: %s", name);
+			return Stage.STAGE_NONE;
 		}
 	}
 }

@@ -7,7 +7,7 @@ namespace Nekki.SF2.Core.Fights
 {
 	public class ModelContainer : SFMonoBehaviour<object>
 	{
-		public enum LKJKNILAFIO
+		public enum ModelContainerEvent
 		{
 			EventAnimationEnd = 0,
 			EventTryOnEnd = 1
@@ -17,47 +17,47 @@ namespace Nekki.SF2.Core.Fights
 		private Vector2 _modelPosition;
 
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		private float DDLANLBOIIJ;
+		private float width;
 
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		private float INKIIOKAJBE;
+		private float height;
 
 		private string _currentScene;
 
-		private bool FFDNOHEDBKB;
+		private bool needsReapplyItems;
 
-		private bool COENNLCACDI;
+		private bool isRenderContainerShown;
 
-		private bool ODEHNPJKBIA;
+		private bool isRenderReady;
 
-		private StageType.FDBBPEGEGMK PGHPNADNACH;
+		private StageType.Stage stageType;
 
-		private ModelParameters HEGIABHIPHA;
+		private ModelParameters modelParameters;
 
 		private Model _playerModel;
 
-		private RenderContainer PFELMKLNBMC;
+		private RenderContainer renderContainer;
 
 		private Location _location = new Location();
 
-		private EquippedItemsStruct OCEIGMAPCHK = new EquippedItemsStruct();
+		private EquippedItemsStruct equippedItems = new EquippedItemsStruct();
 
 		private SelectAnimation _selectAnimation = new SelectAnimation();
 
 		private List<Model> _models = new List<Model>();
 
-		private List<Model> HCPGFOCGDAA = new List<Model>();
+		private List<Model> pendingModels = new List<Model>();
 
-		private List<Model> JLEFIKJODGG = new List<Model>();
+		private List<Model> modelsToRemove = new List<Model>();
 
 		private Color _colorModel = new Color32(40, 20, 9, byte.MaxValue);
 
 		// Eclipse: a fighter to show instead of the saved player (versus loadout previews).
 		private ModelParameters _eclipseParameters;
 
-		private bool OGKFKJFGOIE = true;
+		private bool isRenderEnabled = true;
 
-		public float KBGFAKKBMCN
+		public float ContainerWidth
 		{
 			get
 			{
@@ -65,11 +65,11 @@ namespace Nekki.SF2.Core.Fights
 			}
 			protected set
 			{
-				KIBFMGKHMLI(value);
+				SetWidth(value);
 			}
 		}
 
-		public float LOAKJAJAJJC
+		public float ContainerHeight
 		{
 			get
 			{
@@ -77,11 +77,11 @@ namespace Nekki.SF2.Core.Fights
 			}
 			protected set
 			{
-				NDKNCMACEBA(value);
+				SetHeight(value);
 			}
 		}
 
-		public StageType.FDBBPEGEGMK ONOBNMHGABO
+		public StageType.Stage CurrentStageType
 		{
 			get
 			{
@@ -91,42 +91,42 @@ namespace Nekki.SF2.Core.Fights
 
 		public float get_Width()
 		{
-			return DDLANLBOIIJ;
+			return width;
 		}
 
-		protected void KIBFMGKHMLI(float value)
+		protected void SetWidth(float value)
 		{
-			DDLANLBOIIJ = value;
+			width = value;
 		}
 
 		public float get_Height()
 		{
-			return INKIIOKAJBE;
+			return height;
 		}
 
-		protected void NDKNCMACEBA(float value)
+		protected void SetHeight(float value)
 		{
-			INKIIOKAJBE = value;
+			height = value;
 		}
 
-		public StageType.FDBBPEGEGMK get__StageType()
+		public StageType.Stage get__StageType()
 		{
-			return PGHPNADNACH;
+			return stageType;
 		}
 
 		public void Init(float JMLAKAKDBBL = 0f, float FEIHFIPFNKF = 0f, float LOJLAFEALJO = 0f, float ILLMIAIFBKL = 0f)
 		{
-			KIBFMGKHMLI((JMLAKAKDBBL != 0f) ? JMLAKAKDBBL : ((float)Screen.width));
-			NDKNCMACEBA(FEIHFIPFNKF);
+			SetWidth((JMLAKAKDBBL != 0f) ? JMLAKAKDBBL : ((float)Screen.width));
+			SetHeight(FEIHFIPFNKF);
 			_location.gameLayer = new LocationSelector(0);
-			_location.gameLayer.MJNPBMOAFML().transform.SetParent(base.transform, false);
-			NFFPENNBCMB();
+			_location.gameLayer.GetLayerObject().transform.SetParent(base.transform, false);
+			RecreateRenderContainer();
 			// The title's sparring previews run before any save is loaded. Their fighter comes
 			// from ShowParameters, and UpdateModel replaces this saved-player placeholder anyway.
-			if (ListSF.CCDKHLAMKKO() == null || ListSF.GAMMAIGEIOB() == null) return;
-			HEGIABHIPHA = GameUtils.LBMPHBNJMGG();
-			HEGIABHIPHA.AiControlled = false;
-			HEGIABHIPHA.UserControlled = false;
+			if (ListSF.GetRoster() == null || ListSF.GetPlayerParameters() == null) return;
+			modelParameters = GameUtils.GetPlayerModelParameters();
+			modelParameters.AiControlled = false;
+			modelParameters.UserControlled = false;
 		}
 
 		private void OnDestroy()
@@ -134,142 +134,142 @@ namespace Nekki.SF2.Core.Fights
 			if (_playerModel != null)
 			{
 				_playerModel.RemoveEventListener(3, OnAnimationEnd);
-				_playerModel.RemoveEventListener(6, HMAGHCEBOPK);
-				_playerModel.RemoveEventListener(5, KAJHBALIMOE);
-				_playerModel.RemoveEventListener(14, NIFELGIKECC);
-				GPGGHKLFAGC();
+				_playerModel.RemoveEventListener(6, OnModelAdded);
+				_playerModel.RemoveEventListener(5, OnModelRemoved);
+				_playerModel.RemoveEventListener(14, OnTryOnEnd);
+				OnPlayerModelRemoved();
 				_models.Remove(_playerModel);
-				_playerModel.IMFOFFFLGOM();
+				_playerModel.DestroyModel();
 				_playerModel = null;
 				_models.ForEach((Model DHDMNHCIPEH) =>
 				{
-					DHDMNHCIPEH.IMFOFFFLGOM();
+					DHDMNHCIPEH.DestroyModel();
 				});
 				_models.Clear();
 			}
 		}
 
-		private void NFFPENNBCMB()
+		private void RecreateRenderContainer()
 		{
-			if (PFELMKLNBMC != null)
+			if (renderContainer != null)
 			{
-				Object.Destroy(PFELMKLNBMC.MJNPBMOAFML());
-				PFELMKLNBMC = null;
+				Object.Destroy(renderContainer.GetRootObject());
+				renderContainer = null;
 			}
-			PFELMKLNBMC = new RenderContainer();
-			PFELMKLNBMC.Init(_location);
-			PFELMKLNBMC.MJNPBMOAFML().SetActive(false);
+			renderContainer = new RenderContainer();
+			renderContainer.Init(_location);
+			renderContainer.GetRootObject().SetActive(false);
 		}
 
-		public void UpdateModel(ItemInfo item, StageType.FDBBPEGEGMK LGPIFNMFPAN, string MHOCFOODLLL)
+		public void UpdateModel(ItemInfo item, StageType.Stage LGPIFNMFPAN, string MHOCFOODLLL)
 		{
-			PGHPNADNACH = LGPIFNMFPAN;
-			NFFPENNBCMB();
+			stageType = LGPIFNMFPAN;
+			RecreateRenderContainer();
 			if (_playerModel != null)
 			{
 				_playerModel.RemoveEventListener(3, OnAnimationEnd);
-				_playerModel.RemoveEventListener(6, HMAGHCEBOPK);
-				_playerModel.RemoveEventListener(5, KAJHBALIMOE);
-				_playerModel.RemoveEventListener(14, NIFELGIKECC);
-				GPGGHKLFAGC();
+				_playerModel.RemoveEventListener(6, OnModelAdded);
+				_playerModel.RemoveEventListener(5, OnModelRemoved);
+				_playerModel.RemoveEventListener(14, OnTryOnEnd);
+				OnPlayerModelRemoved();
 				_models.Remove(_playerModel);
-				_playerModel.IMFOFFFLGOM();
+				_playerModel.DestroyModel();
 				_playerModel = null;
 				_models.ForEach((Model DHDMNHCIPEH) =>
 				{
-					DHDMNHCIPEH.IMFOFFFLGOM();
+					DHDMNHCIPEH.DestroyModel();
 				});
 				_models.Clear();
 			}
-			HEGIABHIPHA = new ModelParameters(_eclipseParameters ?? GameUtils.LBMPHBNJMGG());
-			HEGIABHIPHA.JJCKADKCDIF = new Vector3f(_modelPosition);
-			HEGIABHIPHA.AiControlled = false;
-			HEGIABHIPHA.UserControlled = false;
-			HEGIABHIPHA.IBBALIJOJMC = BMGDMKHAPEC(MHOCFOODLLL);
+			modelParameters = new ModelParameters(_eclipseParameters ?? GameUtils.GetPlayerModelParameters());
+			modelParameters.SpawnPosition = new Vector3f(_modelPosition);
+			modelParameters.AiControlled = false;
+			modelParameters.UserControlled = false;
+			modelParameters.SceneType = GetSceneTypeForItemType(MHOCFOODLLL);
 			_currentScene = MHOCFOODLLL;
 			ItemInfo dJKEECEOCJB = null;
 			if (item != null)
 			{
 				if (item.Type.Equals("Weapon"))
 				{
-					dJKEECEOCJB = OCEIGMAPCHK.JGMLKIPCFII;
-					HEGIABHIPHA.Weapon = item;
+					dJKEECEOCJB = equippedItems.Weapon;
+					modelParameters.Weapon = item;
 				}
 				else if (item.Type.Equals("Armor"))
 				{
-					dJKEECEOCJB = OCEIGMAPCHK.LKKFNMBCCDB;
-					HEGIABHIPHA.Armor = item;
+					dJKEECEOCJB = equippedItems.Armor;
+					modelParameters.Armor = item;
 				}
 				else if (item.Type.Equals("Helm"))
 				{
-					dJKEECEOCJB = OCEIGMAPCHK.FKMOLBBLKDA;
-					HEGIABHIPHA.Helm = item;
+					dJKEECEOCJB = equippedItems.Helm;
+					modelParameters.Helm = item;
 				}
 				else if (item.Type.Equals("Ranged"))
 				{
-					dJKEECEOCJB = OCEIGMAPCHK.LGHMILECPLA;
-					HEGIABHIPHA.Ranged = item;
+					dJKEECEOCJB = equippedItems.Ranged;
+					modelParameters.Ranged = item;
 				}
 				else if (item.Type.Equals("Magic"))
 				{
-					dJKEECEOCJB = OCEIGMAPCHK.ADBKGIBBNHJ;
-					HEGIABHIPHA.Magic = item;
+					dJKEECEOCJB = equippedItems.Magic;
+					modelParameters.Magic = item;
 				}
 				else if (item.Type.Equals("RaidConsumable") && item.SubType.Equals("RaidCharge"))
 				{
-					dJKEECEOCJB = OCEIGMAPCHK.LMIBBJIKLNO;
-					KAOPLEPILDH kAOPLEPILDH = HEGIABHIPHA as KAOPLEPILDH;
+					dJKEECEOCJB = equippedItems.RaidCharge;
+					RaidModelParameters kAOPLEPILDH = modelParameters as RaidModelParameters;
 					if (kAOPLEPILDH != null)
 					{
-						kAOPLEPILDH.LMIBBJIKLNO = item;
+						kAOPLEPILDH.RaidChargeItem = item;
 					}
 				}
-				HEGIABHIPHA.PPFDLIBLNDG();
+				modelParameters.BuildModelDocuments();
 			}
 			else
 			{
-				dJKEECEOCJB = CNIMJKICMBG();
+				dJKEECEOCJB = FindChangedItem();
 			}
-			HEGIABHIPHA.ALBOCOGOBCN(OCEIGMAPCHK);
+			modelParameters.CopyEquippedItemsTo(equippedItems);
 			// A shop's forced preview item is for the saved player, not a versus fighter.
-			if (_eclipseParameters == null) KCDFCHGDJBJ(HEGIABHIPHA, MHOCFOODLLL);
-			if (FFDNOHEDBKB)
+			if (_eclipseParameters == null) ApplyShopOverride(modelParameters, MHOCFOODLLL);
+			if (needsReapplyItems)
 			{
-				FFDNOHEDBKB = false;
-				HEGIABHIPHA.ALBOCOGOBCN(OCEIGMAPCHK);
+				needsReapplyItems = false;
+				modelParameters.CopyEquippedItemsTo(equippedItems);
 			}
-			COENNLCACDI = false;
-			_playerModel = new Model(HEGIABHIPHA);
-			_playerModel.CGEKLPLKIDC();
+			isRenderContainerShown = false;
+			_playerModel = new Model(modelParameters);
+			_playerModel.AttachToParent();
 			SetModelOnListening(_playerModel);
-			_selectAnimation.FDBHLFMBECM();
+			_selectAnimation.ClearModelsAndEvents();
 			_selectAnimation.AddModel(_playerModel);
 			_models.Add(_playerModel);
-			JJLIGFGHLKA();
+			ApplyStageToPlayerModel();
 			Render();
-			OPHJJEPKGPO();
+			AttachModelToRenderContainer();
 		}
 
-		private void JJLIGFGHLKA()
+		private void ApplyStageToPlayerModel()
 		{
-			_playerModel.KDAHHIMLJGG.Data = PGHPNADNACH;
-			_playerModel.JMHJDHLBHLK = (int)PGHPNADNACH;
+			_playerModel.EventData.Data = stageType;
+			_playerModel.RoundStage = (int)stageType;
 			UpdateAnimationParameters(_playerModel);
-			_selectAnimation.CheckEvent(EventAnimation.EECEJKADLCK.EVENT_ROUND_STAGE, _playerModel.KDAHHIMLJGG);
+			_selectAnimation.CheckEvent(EventAnimation.EventAnimationType.EVENT_ROUND_STAGE, _playerModel.EventData);
 		}
 
-		private void OPHJJEPKGPO()
+		private void AttachModelToRenderContainer()
 		{
-			PFELMKLNBMC.FPNKBJPKKGB().AddModel(_playerModel.CLDMEJKGLBA(), _colorModel, true);
-			PFELMKLNBMC.CDDKOOMODHG(_playerModel);
-			ODEHNPJKBIA = true;
+			renderContainer.GetViewerModel().AddModel(_playerModel.GetBodyObject(), _colorModel, true);
+			renderContainer.AttachModelEffects(_playerModel);
+			isRenderReady = true;
 		}
 
 		/// <summary>
 		/// Eclipse: shows <paramref name="parameters"/> (fully equipped) through the same menu
 		/// model path as the profile scene, instead of the saved player.
 		/// </summary>
-		internal void ShowParameters(ModelParameters parameters, StageType.FDBBPEGEGMK stage, string scene, Color tint)
+		internal void ShowParameters(ModelParameters parameters, StageType.Stage stage, string scene, Color tint)
 		{
 			_eclipseParameters = parameters;
 			_colorModel = tint;
@@ -295,7 +295,7 @@ namespace Nekki.SF2.Core.Fights
 
 		public bool TryPlayAnimation(string name)
 		{
-			InfoAnimation pJAHIOELGGD = AnimationData.BCIFKBJAFEC(name);
+			InfoAnimation pJAHIOELGGD = AnimationData.GetAnimationByName(name);
 			if (pJAHIOELGGD != null && _playerModel != null)
 			{
 				_playerModel.PlayAnimationDelay(pJAHIOELGGD);
@@ -304,17 +304,17 @@ namespace Nekki.SF2.Core.Fights
 			return false;
 		}
 
-		private void HMAGHCEBOPK(object data)
+		private void OnModelAdded(object data)
 		{
 			Model fGCODGKLHED = (Model)data;
-			HCPGFOCGDAA.Add(fGCODGKLHED);
+			pendingModels.Add(fGCODGKLHED);
 			SetModelOnListening(fGCODGKLHED);
-			PFELMKLNBMC.FPNKBJPKKGB().AddModel(fGCODGKLHED.CLDMEJKGLBA(), _colorModel, true);
-			PFELMKLNBMC.CDDKOOMODHG(fGCODGKLHED);
+			renderContainer.GetViewerModel().AddModel(fGCODGKLHED.GetBodyObject(), _colorModel, true);
+			renderContainer.AttachModelEffects(fGCODGKLHED);
 			UpdateAnimationParameters(fGCODGKLHED);
 		}
 
-		private void KAJHBALIMOE(object data)
+		private void OnModelRemoved(object data)
 		{
 			Model fGCODGKLHED = (Model)data;
 			int num = 0;
@@ -326,42 +326,42 @@ namespace Nekki.SF2.Core.Fights
 				}
 				num++;
 			}
-			JLEFIKJODGG.AddIfNotExist(fGCODGKLHED);
+			modelsToRemove.AddIfNotExist(fGCODGKLHED);
 		}
 
 		private void UpdateAnimationParameters(Model CNAAFEHFGKD)
 		{
-			ModelObject bBGCMFGFMCL = CNAAFEHFGKD.CLDMEJKGLBA();
-			bool dPKOKLCJEHI = CNAAFEHFGKD.EPCNJLEHJCB();
-			bool eMGNKKHPGCJ = CNAAFEHFGKD.NJDJHGDMCIJ() != null;
+			ModelObject bBGCMFGFMCL = CNAAFEHFGKD.GetBodyObject();
+			bool dPKOKLCJEHI = CNAAFEHFGKD.IsPlayerModel();
+			bool eMGNKKHPGCJ = CNAAFEHFGKD.GetParentModel() != null;
 			List<InfoAnimation> lNKFKJKLCKP = CNAAFEHFGKD.GetAvailableAnimations();
 			foreach (Model item in _models)
 			{
-				KMKOHGBJNBK(item, lNKFKJKLCKP, bBGCMFGFMCL, dPKOKLCJEHI, eMGNKKHPGCJ);
+				SyncAnimationParameters(item, lNKFKJKLCKP, bBGCMFGFMCL, dPKOKLCJEHI, eMGNKKHPGCJ);
 			}
-			foreach (Model item2 in HCPGFOCGDAA)
+			foreach (Model item2 in pendingModels)
 			{
-				KMKOHGBJNBK(item2, lNKFKJKLCKP, bBGCMFGFMCL, dPKOKLCJEHI, eMGNKKHPGCJ);
+				SyncAnimationParameters(item2, lNKFKJKLCKP, bBGCMFGFMCL, dPKOKLCJEHI, eMGNKKHPGCJ);
 			}
 		}
 
-		private void KMKOHGBJNBK(Model ACENLMONNPA, List<InfoAnimation> LNKFKJKLCKP, ModelObject BBGCMFGFMCL, bool DPKOKLCJEHI, bool EMGNKKHPGCJ)
+		private void SyncAnimationParameters(Model ACENLMONNPA, List<InfoAnimation> LNKFKJKLCKP, ModelObject BBGCMFGFMCL, bool DPKOKLCJEHI, bool EMGNKKHPGCJ)
 		{
 			List<InfoAnimation> list = ACENLMONNPA.GetAvailableAnimations();
 			foreach (InfoAnimation item in list)
 			{
-				item.BPHNHFJCFCD(BBGCMFGFMCL, DPKOKLCJEHI, EMGNKKHPGCJ, BBGCMFGFMCL);
+				item.UpdateModelObjects(BBGCMFGFMCL, DPKOKLCJEHI, EMGNKKHPGCJ, BBGCMFGFMCL);
 			}
-			ModelObject oIEODIEHJMH = ACENLMONNPA.CLDMEJKGLBA();
-			bool eKBOGDKIHIH = ACENLMONNPA.EPCNJLEHJCB();
-			bool pHADJMAONJG = ACENLMONNPA.NJDJHGDMCIJ() != null;
+			ModelObject oIEODIEHJMH = ACENLMONNPA.GetBodyObject();
+			bool eKBOGDKIHIH = ACENLMONNPA.IsPlayerModel();
+			bool pHADJMAONJG = ACENLMONNPA.GetParentModel() != null;
 			foreach (InfoAnimation item2 in LNKFKJKLCKP)
 			{
-				item2.BPHNHFJCFCD(oIEODIEHJMH, eKBOGDKIHIH, pHADJMAONJG, oIEODIEHJMH);
+				item2.UpdateModelObjects(oIEODIEHJMH, eKBOGDKIHIH, pHADJMAONJG, oIEODIEHJMH);
 			}
 		}
 
-		private bool BKBMDPBINNO(ItemInfo CHJGFBKFKKD, ItemInfo BGCMDCGMPPL)
+		private bool IsItemDifferent(ItemInfo CHJGFBKFKKD, ItemInfo BGCMDCGMPPL)
 		{
 			if (CHJGFBKFKKD != null && BGCMDCGMPPL != null && !CHJGFBKFKKD.Name.Equals(BGCMDCGMPPL.Name))
 			{
@@ -372,83 +372,83 @@ namespace Nekki.SF2.Core.Fights
 
 		public bool IsItemDiffer(ModelParameters JCICKLIMBEF)
 		{
-			if (BKBMDPBINNO(OCEIGMAPCHK.LKKFNMBCCDB, JCICKLIMBEF.Armor))
+			if (IsItemDifferent(equippedItems.Armor, JCICKLIMBEF.Armor))
 			{
 				return true;
 			}
-			if (BKBMDPBINNO(OCEIGMAPCHK.FKMOLBBLKDA, JCICKLIMBEF.Helm))
+			if (IsItemDifferent(equippedItems.Helm, JCICKLIMBEF.Helm))
 			{
 				return true;
 			}
-			if (BKBMDPBINNO(OCEIGMAPCHK.PILJCAOFAED, JCICKLIMBEF.Skeleton))
+			if (IsItemDifferent(equippedItems.Skeleton, JCICKLIMBEF.Skeleton))
 			{
 				return true;
 			}
-			if (BKBMDPBINNO(OCEIGMAPCHK.KKJJONOBHKI, JCICKLIMBEF.KKJJONOBHKI))
+			if (IsItemDifferent(equippedItems.Seal, JCICKLIMBEF.Seal))
 			{
 				return true;
 			}
-			if (BKBMDPBINNO(OCEIGMAPCHK.JGMLKIPCFII, JCICKLIMBEF.Weapon))
+			if (IsItemDifferent(equippedItems.Weapon, JCICKLIMBEF.Weapon))
 			{
 				return true;
 			}
-			if (BKBMDPBINNO(OCEIGMAPCHK.ADBKGIBBNHJ, JCICKLIMBEF.Magic))
+			if (IsItemDifferent(equippedItems.Magic, JCICKLIMBEF.Magic))
 			{
 				return true;
 			}
-			if (BKBMDPBINNO(OCEIGMAPCHK.LGHMILECPLA, JCICKLIMBEF.Ranged))
+			if (IsItemDifferent(equippedItems.Ranged, JCICKLIMBEF.Ranged))
 			{
 				return true;
 			}
-			KAOPLEPILDH kAOPLEPILDH = JCICKLIMBEF as KAOPLEPILDH;
-			if (kAOPLEPILDH != null && BKBMDPBINNO(OCEIGMAPCHK.LMIBBJIKLNO, kAOPLEPILDH.LMIBBJIKLNO))
+			RaidModelParameters kAOPLEPILDH = JCICKLIMBEF as RaidModelParameters;
+			if (kAOPLEPILDH != null && IsItemDifferent(equippedItems.RaidCharge, kAOPLEPILDH.RaidChargeItem))
 			{
 				return true;
 			}
 			return false;
 		}
 
-		private ItemInfo CNIMJKICMBG()
+		private ItemInfo FindChangedItem()
 		{
-			if (OCEIGMAPCHK.LKKFNMBCCDB != HEGIABHIPHA.Armor)
+			if (equippedItems.Armor != modelParameters.Armor)
 			{
-				return OCEIGMAPCHK.LKKFNMBCCDB;
+				return equippedItems.Armor;
 			}
-			if (OCEIGMAPCHK.FKMOLBBLKDA != HEGIABHIPHA.Helm)
+			if (equippedItems.Helm != modelParameters.Helm)
 			{
-				return OCEIGMAPCHK.FKMOLBBLKDA;
+				return equippedItems.Helm;
 			}
-			if (OCEIGMAPCHK.PILJCAOFAED != HEGIABHIPHA.Skeleton)
+			if (equippedItems.Skeleton != modelParameters.Skeleton)
 			{
-				return OCEIGMAPCHK.PILJCAOFAED;
+				return equippedItems.Skeleton;
 			}
-			if (OCEIGMAPCHK.KKJJONOBHKI != HEGIABHIPHA.KKJJONOBHKI)
+			if (equippedItems.Seal != modelParameters.Seal)
 			{
-				return OCEIGMAPCHK.KKJJONOBHKI;
+				return equippedItems.Seal;
 			}
-			if (OCEIGMAPCHK.JGMLKIPCFII != HEGIABHIPHA.Weapon)
+			if (equippedItems.Weapon != modelParameters.Weapon)
 			{
-				return OCEIGMAPCHK.JGMLKIPCFII;
+				return equippedItems.Weapon;
 			}
-			if (OCEIGMAPCHK.ADBKGIBBNHJ != HEGIABHIPHA.Magic)
+			if (equippedItems.Magic != modelParameters.Magic)
 			{
-				return OCEIGMAPCHK.ADBKGIBBNHJ;
+				return equippedItems.Magic;
 			}
-			if (OCEIGMAPCHK.LGHMILECPLA != HEGIABHIPHA.Ranged)
+			if (equippedItems.Ranged != modelParameters.Ranged)
 			{
-				return OCEIGMAPCHK.LGHMILECPLA;
+				return equippedItems.Ranged;
 			}
-			KAOPLEPILDH kAOPLEPILDH = HEGIABHIPHA as KAOPLEPILDH;
-			if (kAOPLEPILDH != null && OCEIGMAPCHK.LMIBBJIKLNO != kAOPLEPILDH.LMIBBJIKLNO)
+			RaidModelParameters kAOPLEPILDH = modelParameters as RaidModelParameters;
+			if (kAOPLEPILDH != null && equippedItems.RaidCharge != kAOPLEPILDH.RaidChargeItem)
 			{
-				return OCEIGMAPCHK.LMIBBJIKLNO;
+				return equippedItems.RaidCharge;
 			}
 			return null;
 		}
 
-		private void BELLAEIMEAB()
+		private void RemoveQueuedModels()
 		{
-			foreach (Model item in JLEFIKJODGG)
+			foreach (Model item in modelsToRemove)
 			{
 				int num = 0;
 				foreach (Model item2 in _models)
@@ -461,7 +461,7 @@ namespace Nekki.SF2.Core.Fights
 				}
 				RemoveModelByIndex(num, item);
 			}
-			JLEFIKJODGG.Clear();
+			modelsToRemove.Clear();
 		}
 
 		private void RemoveModelByIndex(int index, Model LEKHCMIFJAO)
@@ -475,8 +475,8 @@ namespace Nekki.SF2.Core.Fights
 			else
 			{
 				fGCODGKLHED = _models[index];
-				PFELMKLNBMC.FPNKBJPKKGB().RemoveModel(index);
-				PFELMKLNBMC.NAKJKHLEAEB(fGCODGKLHED);
+				renderContainer.GetViewerModel().RemoveModel(index);
+				renderContainer.DetachModelEffects(fGCODGKLHED);
 				_models.Remove(fGCODGKLHED);
 			}
 			RemoveModel(fGCODGKLHED);
@@ -486,29 +486,29 @@ namespace Nekki.SF2.Core.Fights
 		{
 			if (ACENLMONNPA == null)
 			{
-				LLLOJBFMONN.Error("Fight::removeModel - cant find model");
+				GameLog.Error("Fight::removeModel - cant find model");
 				return;
 			}
-			Model fGCODGKLHED = ACENLMONNPA.NJDJHGDMCIJ();
+			Model fGCODGKLHED = ACENLMONNPA.GetParentModel();
 			if (fGCODGKLHED != null)
 			{
-				fGCODGKLHED.MGGBIBAHDEE((WeaponModel)ACENLMONNPA);
+				fGCODGKLHED.RemoveWeaponModel((WeaponModel)ACENLMONNPA);
 			}
 			foreach (Model item in _models)
 			{
-				item.CNIAJPBJHIM(ACENLMONNPA);
+				item.RemoveEnemy(ACENLMONNPA);
 				item.SetNearestEnemy();
 			}
 			_selectAnimation.RemoveModel(ACENLMONNPA);
-			ACENLMONNPA.FKIBECCHIJC();
-			ACENLMONNPA.IMFOFFFLGOM();
+			ACENLMONNPA.DetachCurrentEffects();
+			ACENLMONNPA.DestroyModel();
 		}
 
-		private void GPGGHKLFAGC()
+		private void OnPlayerModelRemoved()
 		{
 		}
 
-		private SceneTypes BMGDMKHAPEC(string LFLGCDNKNJI)
+		private SceneTypes GetSceneTypeForItemType(string LFLGCDNKNJI)
 		{
 			switch (LFLGCDNKNJI)
 			{
@@ -543,7 +543,7 @@ namespace Nekki.SF2.Core.Fights
 		{
 			_selectAnimation.Reset();
 			ResetModelPosition();
-			JJLIGFGHLKA();
+			ApplyStageToPlayerModel();
 		}
 
 		public void ResetModelPosition()
@@ -555,14 +555,14 @@ namespace Nekki.SF2.Core.Fights
 			}
 		}
 
-		private void KCDFCHGDJBJ(ModelParameters JCICKLIMBEF, string NFNJJIGAKNN)
+		private void ApplyShopOverride(ModelParameters JCICKLIMBEF, string NFNJJIGAKNN)
 		{
-			ShopOverride jHJPEFFBMFM = GameUtils.JNDLCLLIMMM.GetOverrideByScreen(NFNJJIGAKNN);
+			ShopOverride jHJPEFFBMFM = GameUtils.ShopOverrides.GetOverrideByScreen(NFNJJIGAKNN);
 			if (jHJPEFFBMFM != null)
 			{
-				ItemInfo mBIJKDIEFIF = ListSF.GetItems().GetItemByName(jHJPEFFBMFM.DAOMBPLCBMN);
-				HEGIABHIPHA.OLLNIKFPMKE(jHJPEFFBMFM.Type, mBIJKDIEFIF);
-				HEGIABHIPHA.PPFDLIBLNDG();
+				ItemInfo mBIJKDIEFIF = ListSF.GetItems().GetItemByName(jHJPEFFBMFM.ItemName);
+				modelParameters.SetItemByType(jHJPEFFBMFM.Type, mBIJKDIEFIF);
+				modelParameters.BuildModelDocuments();
 			}
 		}
 
@@ -576,9 +576,9 @@ namespace Nekki.SF2.Core.Fights
 				ACENLMONNPA.SetWalls(nGHJOCKCCHH, kCNCLAANGGJ, 0, 0);
 			}
 			ACENLMONNPA.AddEventListener(3, OnAnimationEnd);
-			ACENLMONNPA.AddEventListener(6, HMAGHCEBOPK);
-			ACENLMONNPA.AddEventListener(5, KAJHBALIMOE);
-			ACENLMONNPA.AddEventListener(14, NIFELGIKECC);
+			ACENLMONNPA.AddEventListener(6, OnModelAdded);
+			ACENLMONNPA.AddEventListener(5, OnModelRemoved);
+			ACENLMONNPA.AddEventListener(14, OnTryOnEnd);
 		}
 
 		private void OnAnimationEnd(object data)
@@ -586,51 +586,51 @@ namespace Nekki.SF2.Core.Fights
 			CallEvent(0, data);
 		}
 
-		private void NIFELGIKECC(object data)
+		private void OnTryOnEnd(object data)
 		{
 			CallEvent(1, data);
 		}
 
 		private void FixedUpdate()
 		{
-			if (OGKFKJFGOIE || Eclipse.Input.EclipseInput.GetKeyDown(KeyCode.Equals))
+			if (isRenderEnabled || Eclipse.Input.EclipseInput.GetKeyDown(KeyCode.Equals))
 			{
 				Render();
 			}
 			if (Eclipse.Input.EclipseInput.GetKeyDown(KeyCode.Minus))
 			{
-				OGKFKJFGOIE = !OGKFKJFGOIE;
+				isRenderEnabled = !isRenderEnabled;
 			}
 		}
 
 		private void Render()
 		{
-			if (!ODEHNPJKBIA)
+			if (!isRenderReady)
 			{
 				return;
 			}
 			foreach (Model item in _models)
 			{
-				if (!COENNLCACDI && item.LPFPGDJALED() != -1)
+				if (!isRenderContainerShown && item.GetCurrentFrame() != -1)
 				{
-					COENNLCACDI = true;
-					PFELMKLNBMC.MJNPBMOAFML().SetActive(true);
+					isRenderContainerShown = true;
+					renderContainer.GetRootObject().SetActive(true);
 				}
 				item.Render();
 			}
-			if (HCPGFOCGDAA.Count > 0)
+			if (pendingModels.Count > 0)
 			{
-				foreach (Model item2 in HCPGFOCGDAA)
+				foreach (Model item2 in pendingModels)
 				{
 					item2.Render();
 					_models.Add(item2);
 				}
-				HCPGFOCGDAA.Clear();
+				pendingModels.Clear();
 			}
 			_selectAnimation.Render();
-			PFELMKLNBMC.GOCPBKNDKMC().DHOMHKADCFG();
-			PFELMKLNBMC.GDBMKMFFOCF().DHOMHKADCFG();
-			BELLAEIMEAB();
+			renderContainer.GetBackgroundEffects().UpdateEffects();
+			renderContainer.GetForegroundEffects().UpdateEffects();
+			RemoveQueuedModels();
 		}
 	}
 }

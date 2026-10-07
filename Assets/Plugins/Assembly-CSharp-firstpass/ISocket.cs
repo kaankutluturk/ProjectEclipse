@@ -6,9 +6,9 @@ internal interface ISocket
 
 	void OnPacket(Packet NPKADBPBKIG);
 
-	void EmitEvent(ECDAJBEFCAH LFLGCDNKNJI, params object[] LKIOKGCNKHE);
+	void EmitEvent(SocketIOEventType LFLGCDNKNJI, params object[] LKIOKGCNKHE);
 
 	void EmitEvent(string DOPHKKGNAEF, params object[] LKIOKGCNKHE);
 
-	void EmitError(CCCOMMIFIMB GNKCGOGKAEK, string CKEHOEGLMBM);
+	void EmitError(SocketIOErrors GNKCGOGKAEK, string CKEHOEGLMBM);
 }

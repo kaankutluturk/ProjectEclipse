@@ -3,7 +3,7 @@ using System.Xml;
 
 public class ActionAnimation
 {
-	public enum FADAJCEEKIO
+	public enum ActionType
 	{
 		CREATE_MODEL = 0,
 		DELETE = 1,
@@ -25,7 +25,7 @@ public class ActionAnimation
 		ENABLE_BOSS_ABILITY = 17
 	}
 
-	public enum JKEBPJCEEKM
+	public enum StartTrigger
 	{
 		START_FRAME = 0,
 		START_EVENT = 1
@@ -33,30 +33,30 @@ public class ActionAnimation
 
 	public class ActionStartParameters
 	{
-		public JKEBPJCEEKM CGEPLPNFABA;
+		public StartTrigger Trigger;
 
 		public int Frame;
 
-		public EventAnimation.EECEJKADLCK MOFKKABEFEB;
+		public EventAnimation.EventAnimationType TriggerEvent;
 	}
 
-	private FADAJCEEKIO KCIIELDOBOM;
+	private ActionType _actionType;
 
-	private ActionStartParameters GANELHAJFAO = new ActionStartParameters();
+	private ActionStartParameters _startParameters = new ActionStartParameters();
 
 	// best guess for name
-	public int? ScheduledFrame => GANELHAJFAO.CGEPLPNFABA == JKEBPJCEEKM.START_FRAME ? (int?)GANELHAJFAO.Frame : null;
+	public int? ScheduledFrame => _startParameters.Trigger == StartTrigger.START_FRAME ? (int?)_startParameters.Frame : null;
 
 	public void SetScheduledFrame(int frame)
 	{
 		if (!ScheduledFrame.HasValue) throw new System.InvalidOperationException("Event-driven actions have no scheduled frame.");
-		GANELHAJFAO.Frame = frame;
+		_startParameters.Frame = frame;
 	}
 
 
 	private Model _Model;
 
-	private ModelType.KEIDBIOIFGA OOFFOILONLO;
+	private ModelType.ModelTargetType _targetPlayer;
 
 	// Recent move data can select between several effects/sounds on the same
 	// frame by attaching a Conditions block to the individual action.  The
@@ -64,7 +64,7 @@ public class ActionAnimation
 	// caused every variant (acid + frost clouds, all three auras, etc.) to run.
 	private readonly List<ConditionAnimation> _Conditions = new List<ConditionAnimation>();
 
-	public Model KJDFJPBIGJC
+	public Model OwnerModel
 	{
 		get
 		{
@@ -76,23 +76,23 @@ public class ActionAnimation
 		}
 	}
 
-	public ModelType.KEIDBIOIFGA EFNJGJLEPNK
+	public ModelType.ModelTargetType TargetPlayer
 	{
 		get
 		{
-			return OJLDHGKPLNC();
+			return GetTargetPlayer();
 		}
 	}
 
-	public ActionAnimation(FADAJCEEKIO LFLGCDNKNJI)
+	public ActionAnimation(ActionType LFLGCDNKNJI)
 	{
-		KCIIELDOBOM = LFLGCDNKNJI;
+		_actionType = LFLGCDNKNJI;
 		_Model = null;
 	}
 
-	public FADAJCEEKIO get_Type()
+	public ActionType get_Type()
 	{
-		return KCIIELDOBOM;
+		return _actionType;
 	}
 
 	public Model get_Model()
@@ -105,26 +105,26 @@ public class ActionAnimation
 		_Model = value;
 	}
 
-	public ModelType.KEIDBIOIFGA OJLDHGKPLNC()
+	public ModelType.ModelTargetType GetTargetPlayer()
 	{
-		return OOFFOILONLO;
+		return _targetPlayer;
 	}
 
 	public bool NeedStart(int frame)
 	{
-		return GANELHAJFAO.CGEPLPNFABA == JKEBPJCEEKM.START_FRAME && GANELHAJFAO.Frame == frame;
+		return _startParameters.Trigger == StartTrigger.START_FRAME && _startParameters.Frame == frame;
 	}
 
-	public bool NeedStart(EventAnimation.EECEJKADLCK LFLGCDNKNJI)
+	public bool NeedStart(EventAnimation.EventAnimationType LFLGCDNKNJI)
 	{
-		return GANELHAJFAO.CGEPLPNFABA == JKEBPJCEEKM.START_EVENT && GANELHAJFAO.MOFKKABEFEB == LFLGCDNKNJI;
+		return _startParameters.Trigger == StartTrigger.START_EVENT && _startParameters.TriggerEvent == LFLGCDNKNJI;
 	}
 
 	public bool CanVisit(Model model)
 	{
 		if (model == null)
 			return false;
-		ModelConditions modelConditions = model.EBABHGHPLFK();
+		ModelConditions modelConditions = model.GetConditions();
 		if (modelConditions == null)
 			return false;
 		foreach (ConditionAnimation condition in _Conditions)
@@ -133,12 +133,12 @@ public class ActionAnimation
 			if (condition.Type == ConditionAnimation.ConditionType.LIST)
 			{
 				ConditionList list = condition as ConditionList;
-				matches = list != null && list.DJEJMGCMPPH(modelConditions, model, null);
+				matches = list != null && list.EvaluateWithModel(modelConditions, model, null);
 			}
 			else
 			{
-				Model target = condition.DKDAKGDMHAL(model, condition.FHBAPKNECOM());
-				ModelConditions targetConditions = (target != null) ? target.EBABHGHPLFK() : null;
+				Model target = condition.ResolveTargetModel(model, condition.GetTargetModelType());
+				ModelConditions targetConditions = (target != null) ? target.GetConditions() : null;
 				matches = targetConditions != null && condition.IsEqual(targetConditions);
 			}
 			if (!matches)
@@ -154,7 +154,7 @@ public class ActionAnimation
 
 	public virtual void Visit(Model ACENLMONNPA)
 	{
-		ACENLMONNPA.OPPIKLBKMPN(this);
+		ACENLMONNPA.StartAction(this);
 	}
 
 	protected virtual void Parse(XmlNode node)
@@ -162,16 +162,16 @@ public class ActionAnimation
 		XmlAttribute xmlAttribute = node.Attributes["Frame"];
 		if (xmlAttribute != null)
 		{
-			GANELHAJFAO.CGEPLPNFABA = JKEBPJCEEKM.START_FRAME;
-			GANELHAJFAO.Frame = xmlAttribute.ParseInt();
+			_startParameters.Trigger = StartTrigger.START_FRAME;
+			_startParameters.Frame = xmlAttribute.ParseInt();
 		}
 		else
 		{
-			GANELHAJFAO.CGEPLPNFABA = JKEBPJCEEKM.START_EVENT;
-			string gOHIIMFFFJI = node.Attributes["Event"].CIPOICEEIBK(string.Empty);
-			GANELHAJFAO.MOFKKABEFEB = EventAnimation.IOPCBLBFLKB(gOHIIMFFFJI);
+			_startParameters.Trigger = StartTrigger.START_EVENT;
+			string gOHIIMFFFJI = node.Attributes["Event"].GetStringOrDefault(string.Empty);
+			_startParameters.TriggerEvent = EventAnimation.GetTypeByName(gOHIIMFFFJI);
 		}
-		OOFFOILONLO = ModelType.EHFNOBFLAHI(node.Attributes["Player"].CIPOICEEIBK("Me"));
+		_targetPlayer = ModelType.ParseTargetType(node.Attributes["Player"].GetStringOrDefault("Me"));
 		XmlNode conditions = node["Conditions"];
 		if (conditions != null)
 			ConditionsParser.ParseInside(_Conditions, conditions);

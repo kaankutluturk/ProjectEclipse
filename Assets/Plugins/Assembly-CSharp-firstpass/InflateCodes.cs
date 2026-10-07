@@ -2,53 +2,53 @@ using System;
 
 internal sealed class InflateCodes
 {
-	private const int HNOHMIKMEGG = 0;
+	private const int START = 0;
 
-	private const int DGFBGCNDNHC = 1;
+	private const int LEN = 1;
 
-	private const int HNCLAEAKAJD = 2;
+	private const int LENEXT = 2;
 
-	private const int JJKGECHIOGB = 3;
+	private const int DIST = 3;
 
-	private const int JDKAIFINFKM = 4;
+	private const int DISTEXT = 4;
 
-	private const int EPNKALGIMJB = 5;
+	private const int COPY = 5;
 
-	private const int LEJDEIPDEMG = 6;
+	private const int LIT = 6;
 
-	private const int NMFDKKHFLAF = 7;
+	private const int WASH = 7;
 
-	private const int EIOHLLPEKKE = 8;
+	private const int END = 8;
 
-	private const int IDFCAHPKAMK = 9;
+	private const int BADCODE = 9;
 
-	internal int NMMPBADCFHK;
+	internal int mode;
 
-	internal int JCAJDBOMGOM;
+	internal int len;
 
-	internal int[] EDBPBGAMMDO;
+	internal int[] tree;
 
-	internal int HFDPNDNCFCC;
+	internal int tree_index;
 
-	internal int MANJJMDPBFL;
+	internal int need;
 
-	internal int DNOLBDAAAFD;
+	internal int lit;
 
-	internal int ACLJBJJAENG;
+	internal int bitsToGet;
 
-	internal int CGIBMHPALCO;
+	internal int dist;
 
-	internal byte MBIGEAHKFOH;
+	internal byte lbits;
 
-	internal byte GKNNODIJMEI;
+	internal byte dbits;
 
-	internal int[] JKLBBEFFMID;
+	internal int[] ltree;
 
-	internal int GAJGGDLCHFF;
+	internal int ltree_index;
 
-	internal int[] JDFLHKFAEOD;
+	internal int[] dtree;
 
-	internal int MGGEIOOOFFO;
+	internal int dtree_index;
 
 	internal InflateCodes()
 	{
@@ -56,305 +56,305 @@ internal sealed class InflateCodes
 
 	internal void Init(int GGEJHHHGPKN, int NBHIKILKMED, int[] AEFHBJIMPHM, int HLDNDJKELJE, int[] GICLKGGKJAG, int KMKIMJDIKHC)
 	{
-		NMMPBADCFHK = 0;
-		MBIGEAHKFOH = (byte)GGEJHHHGPKN;
-		GKNNODIJMEI = (byte)NBHIKILKMED;
-		JKLBBEFFMID = AEFHBJIMPHM;
-		GAJGGDLCHFF = HLDNDJKELJE;
-		JDFLHKFAEOD = GICLKGGKJAG;
-		MGGEIOOOFFO = KMKIMJDIKHC;
-		EDBPBGAMMDO = null;
+		mode = 0;
+		lbits = (byte)GGEJHHHGPKN;
+		dbits = (byte)NBHIKILKMED;
+		ltree = AEFHBJIMPHM;
+		ltree_index = HLDNDJKELJE;
+		dtree = GICLKGGKJAG;
+		dtree_index = KMKIMJDIKHC;
+		tree = null;
 	}
 
-	internal int HDEHLIKBKJG(InflateBlocks CGKHDGJKOMG, int BOPODEAIEBJ)
+	internal int Process(InflateBlocks CGKHDGJKOMG, int BOPODEAIEBJ)
 	{
 		int num = 0;
 		int num2 = 0;
 		int num3 = 0;
-		ZlibCodec cJMKCEHHMCH = CGKHDGJKOMG.CJMKCEHHMCH;
-		num3 = cJMKCEHHMCH.LMIPBGGILEJ;
-		int num4 = cJMKCEHHMCH.IAPJEIDMGNP;
-		num = CGKHDGJKOMG.FPGCIJMGFLH;
-		num2 = CGKHDGJKOMG.DBFGKGGCEAI;
-		int num5 = CGKHDGJKOMG.HBFBCHDJEBM;
-		int num6 = ((num5 >= CGKHDGJKOMG.IONENIAEDKJ) ? (CGKHDGJKOMG.PCLFFOBJJFO - num5) : (CGKHDGJKOMG.IONENIAEDKJ - num5 - 1));
+		ZlibCodec cJMKCEHHMCH = CGKHDGJKOMG._codec;
+		num3 = cJMKCEHHMCH.NextIn;
+		int num4 = cJMKCEHHMCH.AvailableBytesIn;
+		num = CGKHDGJKOMG.bitb;
+		num2 = CGKHDGJKOMG.bitk;
+		int num5 = CGKHDGJKOMG.writeAt;
+		int num6 = ((num5 >= CGKHDGJKOMG.readAt) ? (CGKHDGJKOMG.end - num5) : (CGKHDGJKOMG.readAt - num5 - 1));
 		while (true)
 		{
-			switch (NMMPBADCFHK)
+			switch (mode)
 			{
 			case 0:
 				if (num6 >= 258 && num4 >= 10)
 				{
-					CGKHDGJKOMG.FPGCIJMGFLH = num;
-					CGKHDGJKOMG.DBFGKGGCEAI = num2;
-					cJMKCEHHMCH.IAPJEIDMGNP = num4;
-					cJMKCEHHMCH.ALJBBHPGGPA += num3 - cJMKCEHHMCH.LMIPBGGILEJ;
-					cJMKCEHHMCH.LMIPBGGILEJ = num3;
-					CGKHDGJKOMG.HBFBCHDJEBM = num5;
-					BOPODEAIEBJ = HPHGIOKICCK(MBIGEAHKFOH, GKNNODIJMEI, JKLBBEFFMID, GAJGGDLCHFF, JDFLHKFAEOD, MGGEIOOOFFO, CGKHDGJKOMG, cJMKCEHHMCH);
-					num3 = cJMKCEHHMCH.LMIPBGGILEJ;
-					num4 = cJMKCEHHMCH.IAPJEIDMGNP;
-					num = CGKHDGJKOMG.FPGCIJMGFLH;
-					num2 = CGKHDGJKOMG.DBFGKGGCEAI;
-					num5 = CGKHDGJKOMG.HBFBCHDJEBM;
-					num6 = ((num5 >= CGKHDGJKOMG.IONENIAEDKJ) ? (CGKHDGJKOMG.PCLFFOBJJFO - num5) : (CGKHDGJKOMG.IONENIAEDKJ - num5 - 1));
+					CGKHDGJKOMG.bitb = num;
+					CGKHDGJKOMG.bitk = num2;
+					cJMKCEHHMCH.AvailableBytesIn = num4;
+					cJMKCEHHMCH.TotalBytesIn += num3 - cJMKCEHHMCH.NextIn;
+					cJMKCEHHMCH.NextIn = num3;
+					CGKHDGJKOMG.writeAt = num5;
+					BOPODEAIEBJ = InflateFast(lbits, dbits, ltree, ltree_index, dtree, dtree_index, CGKHDGJKOMG, cJMKCEHHMCH);
+					num3 = cJMKCEHHMCH.NextIn;
+					num4 = cJMKCEHHMCH.AvailableBytesIn;
+					num = CGKHDGJKOMG.bitb;
+					num2 = CGKHDGJKOMG.bitk;
+					num5 = CGKHDGJKOMG.writeAt;
+					num6 = ((num5 >= CGKHDGJKOMG.readAt) ? (CGKHDGJKOMG.end - num5) : (CGKHDGJKOMG.readAt - num5 - 1));
 					if (BOPODEAIEBJ != 0)
 					{
-						NMMPBADCFHK = ((BOPODEAIEBJ != 1) ? 9 : 7);
+						mode = ((BOPODEAIEBJ != 1) ? 9 : 7);
 						break;
 					}
 				}
-				MANJJMDPBFL = MBIGEAHKFOH;
-				EDBPBGAMMDO = JKLBBEFFMID;
-				HFDPNDNCFCC = GAJGGDLCHFF;
-				NMMPBADCFHK = 1;
+				need = lbits;
+				tree = ltree;
+				tree_index = ltree_index;
+				mode = 1;
 				goto case 1;
 			case 1:
 			{
 				int aCLJBJJAENG;
-				for (aCLJBJJAENG = MANJJMDPBFL; num2 < aCLJBJJAENG; num2 += 8)
+				for (aCLJBJJAENG = need; num2 < aCLJBJJAENG; num2 += 8)
 				{
 					if (num4 != 0)
 					{
 						BOPODEAIEBJ = 0;
 						num4--;
-						num |= (cJMKCEHHMCH.PEFOCMDODLD[num3++] & 0xFF) << num2;
+						num |= (cJMKCEHHMCH.InputBuffer[num3++] & 0xFF) << num2;
 						continue;
 					}
-					CGKHDGJKOMG.FPGCIJMGFLH = num;
-					CGKHDGJKOMG.DBFGKGGCEAI = num2;
-					cJMKCEHHMCH.IAPJEIDMGNP = num4;
-					cJMKCEHHMCH.ALJBBHPGGPA += num3 - cJMKCEHHMCH.LMIPBGGILEJ;
-					cJMKCEHHMCH.LMIPBGGILEJ = num3;
-					CGKHDGJKOMG.HBFBCHDJEBM = num5;
-					return CGKHDGJKOMG.MKPBJGMJPMI(BOPODEAIEBJ);
+					CGKHDGJKOMG.bitb = num;
+					CGKHDGJKOMG.bitk = num2;
+					cJMKCEHHMCH.AvailableBytesIn = num4;
+					cJMKCEHHMCH.TotalBytesIn += num3 - cJMKCEHHMCH.NextIn;
+					cJMKCEHHMCH.NextIn = num3;
+					CGKHDGJKOMG.writeAt = num5;
+					return CGKHDGJKOMG.Flush(BOPODEAIEBJ);
 				}
-				int num7 = (HFDPNDNCFCC + (num & InternalInflateConstants.PEKJPCOGGBP[aCLJBJJAENG])) * 3;
-				num >>= EDBPBGAMMDO[num7 + 1];
-				num2 -= EDBPBGAMMDO[num7 + 1];
-				int num8 = EDBPBGAMMDO[num7];
+				int num7 = (tree_index + (num & InternalInflateConstants.InflateMask[aCLJBJJAENG])) * 3;
+				num >>= tree[num7 + 1];
+				num2 -= tree[num7 + 1];
+				int num8 = tree[num7];
 				if (num8 == 0)
 				{
-					DNOLBDAAAFD = EDBPBGAMMDO[num7 + 2];
-					NMMPBADCFHK = 6;
+					lit = tree[num7 + 2];
+					mode = 6;
 					break;
 				}
 				if ((num8 & 0x10) != 0)
 				{
-					ACLJBJJAENG = num8 & 0xF;
-					JCAJDBOMGOM = EDBPBGAMMDO[num7 + 2];
-					NMMPBADCFHK = 2;
+					bitsToGet = num8 & 0xF;
+					len = tree[num7 + 2];
+					mode = 2;
 					break;
 				}
 				if ((num8 & 0x40) == 0)
 				{
-					MANJJMDPBFL = num8;
-					HFDPNDNCFCC = num7 / 3 + EDBPBGAMMDO[num7 + 2];
+					need = num8;
+					tree_index = num7 / 3 + tree[num7 + 2];
 					break;
 				}
 				if ((num8 & 0x20) != 0)
 				{
-					NMMPBADCFHK = 7;
+					mode = 7;
 					break;
 				}
-				NMMPBADCFHK = 9;
+				mode = 9;
 				cJMKCEHHMCH.Message = "invalid literal/length code";
 				BOPODEAIEBJ = -3;
-				CGKHDGJKOMG.FPGCIJMGFLH = num;
-				CGKHDGJKOMG.DBFGKGGCEAI = num2;
-				cJMKCEHHMCH.IAPJEIDMGNP = num4;
-				cJMKCEHHMCH.ALJBBHPGGPA += num3 - cJMKCEHHMCH.LMIPBGGILEJ;
-				cJMKCEHHMCH.LMIPBGGILEJ = num3;
-				CGKHDGJKOMG.HBFBCHDJEBM = num5;
-				return CGKHDGJKOMG.MKPBJGMJPMI(BOPODEAIEBJ);
+				CGKHDGJKOMG.bitb = num;
+				CGKHDGJKOMG.bitk = num2;
+				cJMKCEHHMCH.AvailableBytesIn = num4;
+				cJMKCEHHMCH.TotalBytesIn += num3 - cJMKCEHHMCH.NextIn;
+				cJMKCEHHMCH.NextIn = num3;
+				CGKHDGJKOMG.writeAt = num5;
+				return CGKHDGJKOMG.Flush(BOPODEAIEBJ);
 			}
 			case 2:
 			{
 				int aCLJBJJAENG;
-				for (aCLJBJJAENG = ACLJBJJAENG; num2 < aCLJBJJAENG; num2 += 8)
+				for (aCLJBJJAENG = bitsToGet; num2 < aCLJBJJAENG; num2 += 8)
 				{
 					if (num4 != 0)
 					{
 						BOPODEAIEBJ = 0;
 						num4--;
-						num |= (cJMKCEHHMCH.PEFOCMDODLD[num3++] & 0xFF) << num2;
+						num |= (cJMKCEHHMCH.InputBuffer[num3++] & 0xFF) << num2;
 						continue;
 					}
-					CGKHDGJKOMG.FPGCIJMGFLH = num;
-					CGKHDGJKOMG.DBFGKGGCEAI = num2;
-					cJMKCEHHMCH.IAPJEIDMGNP = num4;
-					cJMKCEHHMCH.ALJBBHPGGPA += num3 - cJMKCEHHMCH.LMIPBGGILEJ;
-					cJMKCEHHMCH.LMIPBGGILEJ = num3;
-					CGKHDGJKOMG.HBFBCHDJEBM = num5;
-					return CGKHDGJKOMG.MKPBJGMJPMI(BOPODEAIEBJ);
+					CGKHDGJKOMG.bitb = num;
+					CGKHDGJKOMG.bitk = num2;
+					cJMKCEHHMCH.AvailableBytesIn = num4;
+					cJMKCEHHMCH.TotalBytesIn += num3 - cJMKCEHHMCH.NextIn;
+					cJMKCEHHMCH.NextIn = num3;
+					CGKHDGJKOMG.writeAt = num5;
+					return CGKHDGJKOMG.Flush(BOPODEAIEBJ);
 				}
-				JCAJDBOMGOM += num & InternalInflateConstants.PEKJPCOGGBP[aCLJBJJAENG];
+				len += num & InternalInflateConstants.InflateMask[aCLJBJJAENG];
 				num >>= aCLJBJJAENG;
 				num2 -= aCLJBJJAENG;
-				MANJJMDPBFL = GKNNODIJMEI;
-				EDBPBGAMMDO = JDFLHKFAEOD;
-				HFDPNDNCFCC = MGGEIOOOFFO;
-				NMMPBADCFHK = 3;
+				need = dbits;
+				tree = dtree;
+				tree_index = dtree_index;
+				mode = 3;
 				goto case 3;
 			}
 			case 3:
 			{
 				int aCLJBJJAENG;
-				for (aCLJBJJAENG = MANJJMDPBFL; num2 < aCLJBJJAENG; num2 += 8)
+				for (aCLJBJJAENG = need; num2 < aCLJBJJAENG; num2 += 8)
 				{
 					if (num4 != 0)
 					{
 						BOPODEAIEBJ = 0;
 						num4--;
-						num |= (cJMKCEHHMCH.PEFOCMDODLD[num3++] & 0xFF) << num2;
+						num |= (cJMKCEHHMCH.InputBuffer[num3++] & 0xFF) << num2;
 						continue;
 					}
-					CGKHDGJKOMG.FPGCIJMGFLH = num;
-					CGKHDGJKOMG.DBFGKGGCEAI = num2;
-					cJMKCEHHMCH.IAPJEIDMGNP = num4;
-					cJMKCEHHMCH.ALJBBHPGGPA += num3 - cJMKCEHHMCH.LMIPBGGILEJ;
-					cJMKCEHHMCH.LMIPBGGILEJ = num3;
-					CGKHDGJKOMG.HBFBCHDJEBM = num5;
-					return CGKHDGJKOMG.MKPBJGMJPMI(BOPODEAIEBJ);
+					CGKHDGJKOMG.bitb = num;
+					CGKHDGJKOMG.bitk = num2;
+					cJMKCEHHMCH.AvailableBytesIn = num4;
+					cJMKCEHHMCH.TotalBytesIn += num3 - cJMKCEHHMCH.NextIn;
+					cJMKCEHHMCH.NextIn = num3;
+					CGKHDGJKOMG.writeAt = num5;
+					return CGKHDGJKOMG.Flush(BOPODEAIEBJ);
 				}
-				int num7 = (HFDPNDNCFCC + (num & InternalInflateConstants.PEKJPCOGGBP[aCLJBJJAENG])) * 3;
-				num >>= EDBPBGAMMDO[num7 + 1];
-				num2 -= EDBPBGAMMDO[num7 + 1];
-				int num8 = EDBPBGAMMDO[num7];
+				int num7 = (tree_index + (num & InternalInflateConstants.InflateMask[aCLJBJJAENG])) * 3;
+				num >>= tree[num7 + 1];
+				num2 -= tree[num7 + 1];
+				int num8 = tree[num7];
 				if ((num8 & 0x10) != 0)
 				{
-					ACLJBJJAENG = num8 & 0xF;
-					CGIBMHPALCO = EDBPBGAMMDO[num7 + 2];
-					NMMPBADCFHK = 4;
+					bitsToGet = num8 & 0xF;
+					dist = tree[num7 + 2];
+					mode = 4;
 					break;
 				}
 				if ((num8 & 0x40) == 0)
 				{
-					MANJJMDPBFL = num8;
-					HFDPNDNCFCC = num7 / 3 + EDBPBGAMMDO[num7 + 2];
+					need = num8;
+					tree_index = num7 / 3 + tree[num7 + 2];
 					break;
 				}
-				NMMPBADCFHK = 9;
+				mode = 9;
 				cJMKCEHHMCH.Message = "invalid distance code";
 				BOPODEAIEBJ = -3;
-				CGKHDGJKOMG.FPGCIJMGFLH = num;
-				CGKHDGJKOMG.DBFGKGGCEAI = num2;
-				cJMKCEHHMCH.IAPJEIDMGNP = num4;
-				cJMKCEHHMCH.ALJBBHPGGPA += num3 - cJMKCEHHMCH.LMIPBGGILEJ;
-				cJMKCEHHMCH.LMIPBGGILEJ = num3;
-				CGKHDGJKOMG.HBFBCHDJEBM = num5;
-				return CGKHDGJKOMG.MKPBJGMJPMI(BOPODEAIEBJ);
+				CGKHDGJKOMG.bitb = num;
+				CGKHDGJKOMG.bitk = num2;
+				cJMKCEHHMCH.AvailableBytesIn = num4;
+				cJMKCEHHMCH.TotalBytesIn += num3 - cJMKCEHHMCH.NextIn;
+				cJMKCEHHMCH.NextIn = num3;
+				CGKHDGJKOMG.writeAt = num5;
+				return CGKHDGJKOMG.Flush(BOPODEAIEBJ);
 			}
 			case 4:
 			{
 				int aCLJBJJAENG;
-				for (aCLJBJJAENG = ACLJBJJAENG; num2 < aCLJBJJAENG; num2 += 8)
+				for (aCLJBJJAENG = bitsToGet; num2 < aCLJBJJAENG; num2 += 8)
 				{
 					if (num4 != 0)
 					{
 						BOPODEAIEBJ = 0;
 						num4--;
-						num |= (cJMKCEHHMCH.PEFOCMDODLD[num3++] & 0xFF) << num2;
+						num |= (cJMKCEHHMCH.InputBuffer[num3++] & 0xFF) << num2;
 						continue;
 					}
-					CGKHDGJKOMG.FPGCIJMGFLH = num;
-					CGKHDGJKOMG.DBFGKGGCEAI = num2;
-					cJMKCEHHMCH.IAPJEIDMGNP = num4;
-					cJMKCEHHMCH.ALJBBHPGGPA += num3 - cJMKCEHHMCH.LMIPBGGILEJ;
-					cJMKCEHHMCH.LMIPBGGILEJ = num3;
-					CGKHDGJKOMG.HBFBCHDJEBM = num5;
-					return CGKHDGJKOMG.MKPBJGMJPMI(BOPODEAIEBJ);
+					CGKHDGJKOMG.bitb = num;
+					CGKHDGJKOMG.bitk = num2;
+					cJMKCEHHMCH.AvailableBytesIn = num4;
+					cJMKCEHHMCH.TotalBytesIn += num3 - cJMKCEHHMCH.NextIn;
+					cJMKCEHHMCH.NextIn = num3;
+					CGKHDGJKOMG.writeAt = num5;
+					return CGKHDGJKOMG.Flush(BOPODEAIEBJ);
 				}
-				CGIBMHPALCO += num & InternalInflateConstants.PEKJPCOGGBP[aCLJBJJAENG];
+				dist += num & InternalInflateConstants.InflateMask[aCLJBJJAENG];
 				num >>= aCLJBJJAENG;
 				num2 -= aCLJBJJAENG;
-				NMMPBADCFHK = 5;
+				mode = 5;
 				goto case 5;
 			}
 			case 5:
 			{
 				int i;
-				for (i = num5 - CGIBMHPALCO; i < 0; i += CGKHDGJKOMG.PCLFFOBJJFO)
+				for (i = num5 - dist; i < 0; i += CGKHDGJKOMG.end)
 				{
 				}
-				while (JCAJDBOMGOM != 0)
+				while (len != 0)
 				{
 					if (num6 == 0)
 					{
-						if (num5 == CGKHDGJKOMG.PCLFFOBJJFO && CGKHDGJKOMG.IONENIAEDKJ != 0)
+						if (num5 == CGKHDGJKOMG.end && CGKHDGJKOMG.readAt != 0)
 						{
 							num5 = 0;
-							num6 = ((num5 >= CGKHDGJKOMG.IONENIAEDKJ) ? (CGKHDGJKOMG.PCLFFOBJJFO - num5) : (CGKHDGJKOMG.IONENIAEDKJ - num5 - 1));
+							num6 = ((num5 >= CGKHDGJKOMG.readAt) ? (CGKHDGJKOMG.end - num5) : (CGKHDGJKOMG.readAt - num5 - 1));
 						}
 						if (num6 == 0)
 						{
-							CGKHDGJKOMG.HBFBCHDJEBM = num5;
-							BOPODEAIEBJ = CGKHDGJKOMG.MKPBJGMJPMI(BOPODEAIEBJ);
-							num5 = CGKHDGJKOMG.HBFBCHDJEBM;
-							num6 = ((num5 >= CGKHDGJKOMG.IONENIAEDKJ) ? (CGKHDGJKOMG.PCLFFOBJJFO - num5) : (CGKHDGJKOMG.IONENIAEDKJ - num5 - 1));
-							if (num5 == CGKHDGJKOMG.PCLFFOBJJFO && CGKHDGJKOMG.IONENIAEDKJ != 0)
+							CGKHDGJKOMG.writeAt = num5;
+							BOPODEAIEBJ = CGKHDGJKOMG.Flush(BOPODEAIEBJ);
+							num5 = CGKHDGJKOMG.writeAt;
+							num6 = ((num5 >= CGKHDGJKOMG.readAt) ? (CGKHDGJKOMG.end - num5) : (CGKHDGJKOMG.readAt - num5 - 1));
+							if (num5 == CGKHDGJKOMG.end && CGKHDGJKOMG.readAt != 0)
 							{
 								num5 = 0;
-								num6 = ((num5 >= CGKHDGJKOMG.IONENIAEDKJ) ? (CGKHDGJKOMG.PCLFFOBJJFO - num5) : (CGKHDGJKOMG.IONENIAEDKJ - num5 - 1));
+								num6 = ((num5 >= CGKHDGJKOMG.readAt) ? (CGKHDGJKOMG.end - num5) : (CGKHDGJKOMG.readAt - num5 - 1));
 							}
 							if (num6 == 0)
 							{
-								CGKHDGJKOMG.FPGCIJMGFLH = num;
-								CGKHDGJKOMG.DBFGKGGCEAI = num2;
-								cJMKCEHHMCH.IAPJEIDMGNP = num4;
-								cJMKCEHHMCH.ALJBBHPGGPA += num3 - cJMKCEHHMCH.LMIPBGGILEJ;
-								cJMKCEHHMCH.LMIPBGGILEJ = num3;
-								CGKHDGJKOMG.HBFBCHDJEBM = num5;
-								return CGKHDGJKOMG.MKPBJGMJPMI(BOPODEAIEBJ);
+								CGKHDGJKOMG.bitb = num;
+								CGKHDGJKOMG.bitk = num2;
+								cJMKCEHHMCH.AvailableBytesIn = num4;
+								cJMKCEHHMCH.TotalBytesIn += num3 - cJMKCEHHMCH.NextIn;
+								cJMKCEHHMCH.NextIn = num3;
+								CGKHDGJKOMG.writeAt = num5;
+								return CGKHDGJKOMG.Flush(BOPODEAIEBJ);
 							}
 						}
 					}
 					CGKHDGJKOMG.window[num5++] = CGKHDGJKOMG.window[i++];
 					num6--;
-					if (i == CGKHDGJKOMG.PCLFFOBJJFO)
+					if (i == CGKHDGJKOMG.end)
 					{
 						i = 0;
 					}
-					JCAJDBOMGOM--;
+					len--;
 				}
-				NMMPBADCFHK = 0;
+				mode = 0;
 				break;
 			}
 			case 6:
 				if (num6 == 0)
 				{
-					if (num5 == CGKHDGJKOMG.PCLFFOBJJFO && CGKHDGJKOMG.IONENIAEDKJ != 0)
+					if (num5 == CGKHDGJKOMG.end && CGKHDGJKOMG.readAt != 0)
 					{
 						num5 = 0;
-						num6 = ((num5 >= CGKHDGJKOMG.IONENIAEDKJ) ? (CGKHDGJKOMG.PCLFFOBJJFO - num5) : (CGKHDGJKOMG.IONENIAEDKJ - num5 - 1));
+						num6 = ((num5 >= CGKHDGJKOMG.readAt) ? (CGKHDGJKOMG.end - num5) : (CGKHDGJKOMG.readAt - num5 - 1));
 					}
 					if (num6 == 0)
 					{
-						CGKHDGJKOMG.HBFBCHDJEBM = num5;
-						BOPODEAIEBJ = CGKHDGJKOMG.MKPBJGMJPMI(BOPODEAIEBJ);
-						num5 = CGKHDGJKOMG.HBFBCHDJEBM;
-						num6 = ((num5 >= CGKHDGJKOMG.IONENIAEDKJ) ? (CGKHDGJKOMG.PCLFFOBJJFO - num5) : (CGKHDGJKOMG.IONENIAEDKJ - num5 - 1));
-						if (num5 == CGKHDGJKOMG.PCLFFOBJJFO && CGKHDGJKOMG.IONENIAEDKJ != 0)
+						CGKHDGJKOMG.writeAt = num5;
+						BOPODEAIEBJ = CGKHDGJKOMG.Flush(BOPODEAIEBJ);
+						num5 = CGKHDGJKOMG.writeAt;
+						num6 = ((num5 >= CGKHDGJKOMG.readAt) ? (CGKHDGJKOMG.end - num5) : (CGKHDGJKOMG.readAt - num5 - 1));
+						if (num5 == CGKHDGJKOMG.end && CGKHDGJKOMG.readAt != 0)
 						{
 							num5 = 0;
-							num6 = ((num5 >= CGKHDGJKOMG.IONENIAEDKJ) ? (CGKHDGJKOMG.PCLFFOBJJFO - num5) : (CGKHDGJKOMG.IONENIAEDKJ - num5 - 1));
+							num6 = ((num5 >= CGKHDGJKOMG.readAt) ? (CGKHDGJKOMG.end - num5) : (CGKHDGJKOMG.readAt - num5 - 1));
 						}
 						if (num6 == 0)
 						{
-							CGKHDGJKOMG.FPGCIJMGFLH = num;
-							CGKHDGJKOMG.DBFGKGGCEAI = num2;
-							cJMKCEHHMCH.IAPJEIDMGNP = num4;
-							cJMKCEHHMCH.ALJBBHPGGPA += num3 - cJMKCEHHMCH.LMIPBGGILEJ;
-							cJMKCEHHMCH.LMIPBGGILEJ = num3;
-							CGKHDGJKOMG.HBFBCHDJEBM = num5;
-							return CGKHDGJKOMG.MKPBJGMJPMI(BOPODEAIEBJ);
+							CGKHDGJKOMG.bitb = num;
+							CGKHDGJKOMG.bitk = num2;
+							cJMKCEHHMCH.AvailableBytesIn = num4;
+							cJMKCEHHMCH.TotalBytesIn += num3 - cJMKCEHHMCH.NextIn;
+							cJMKCEHHMCH.NextIn = num3;
+							CGKHDGJKOMG.writeAt = num5;
+							return CGKHDGJKOMG.Flush(BOPODEAIEBJ);
 						}
 					}
 				}
 				BOPODEAIEBJ = 0;
-				CGKHDGJKOMG.window[num5++] = (byte)DNOLBDAAAFD;
+				CGKHDGJKOMG.window[num5++] = (byte)lit;
 				num6--;
-				NMMPBADCFHK = 0;
+				mode = 0;
 				break;
 			case 7:
 				if (num2 > 7)
@@ -363,70 +363,70 @@ internal sealed class InflateCodes
 					num4++;
 					num3--;
 				}
-				CGKHDGJKOMG.HBFBCHDJEBM = num5;
-				BOPODEAIEBJ = CGKHDGJKOMG.MKPBJGMJPMI(BOPODEAIEBJ);
-				num5 = CGKHDGJKOMG.HBFBCHDJEBM;
-				num6 = ((num5 >= CGKHDGJKOMG.IONENIAEDKJ) ? (CGKHDGJKOMG.PCLFFOBJJFO - num5) : (CGKHDGJKOMG.IONENIAEDKJ - num5 - 1));
-				if (CGKHDGJKOMG.IONENIAEDKJ != CGKHDGJKOMG.HBFBCHDJEBM)
+				CGKHDGJKOMG.writeAt = num5;
+				BOPODEAIEBJ = CGKHDGJKOMG.Flush(BOPODEAIEBJ);
+				num5 = CGKHDGJKOMG.writeAt;
+				num6 = ((num5 >= CGKHDGJKOMG.readAt) ? (CGKHDGJKOMG.end - num5) : (CGKHDGJKOMG.readAt - num5 - 1));
+				if (CGKHDGJKOMG.readAt != CGKHDGJKOMG.writeAt)
 				{
-					CGKHDGJKOMG.FPGCIJMGFLH = num;
-					CGKHDGJKOMG.DBFGKGGCEAI = num2;
-					cJMKCEHHMCH.IAPJEIDMGNP = num4;
-					cJMKCEHHMCH.ALJBBHPGGPA += num3 - cJMKCEHHMCH.LMIPBGGILEJ;
-					cJMKCEHHMCH.LMIPBGGILEJ = num3;
-					CGKHDGJKOMG.HBFBCHDJEBM = num5;
-					return CGKHDGJKOMG.MKPBJGMJPMI(BOPODEAIEBJ);
+					CGKHDGJKOMG.bitb = num;
+					CGKHDGJKOMG.bitk = num2;
+					cJMKCEHHMCH.AvailableBytesIn = num4;
+					cJMKCEHHMCH.TotalBytesIn += num3 - cJMKCEHHMCH.NextIn;
+					cJMKCEHHMCH.NextIn = num3;
+					CGKHDGJKOMG.writeAt = num5;
+					return CGKHDGJKOMG.Flush(BOPODEAIEBJ);
 				}
-				NMMPBADCFHK = 8;
+				mode = 8;
 				goto case 8;
 			case 8:
 				BOPODEAIEBJ = 1;
-				CGKHDGJKOMG.FPGCIJMGFLH = num;
-				CGKHDGJKOMG.DBFGKGGCEAI = num2;
-				cJMKCEHHMCH.IAPJEIDMGNP = num4;
-				cJMKCEHHMCH.ALJBBHPGGPA += num3 - cJMKCEHHMCH.LMIPBGGILEJ;
-				cJMKCEHHMCH.LMIPBGGILEJ = num3;
-				CGKHDGJKOMG.HBFBCHDJEBM = num5;
-				return CGKHDGJKOMG.MKPBJGMJPMI(BOPODEAIEBJ);
+				CGKHDGJKOMG.bitb = num;
+				CGKHDGJKOMG.bitk = num2;
+				cJMKCEHHMCH.AvailableBytesIn = num4;
+				cJMKCEHHMCH.TotalBytesIn += num3 - cJMKCEHHMCH.NextIn;
+				cJMKCEHHMCH.NextIn = num3;
+				CGKHDGJKOMG.writeAt = num5;
+				return CGKHDGJKOMG.Flush(BOPODEAIEBJ);
 			case 9:
 				BOPODEAIEBJ = -3;
-				CGKHDGJKOMG.FPGCIJMGFLH = num;
-				CGKHDGJKOMG.DBFGKGGCEAI = num2;
-				cJMKCEHHMCH.IAPJEIDMGNP = num4;
-				cJMKCEHHMCH.ALJBBHPGGPA += num3 - cJMKCEHHMCH.LMIPBGGILEJ;
-				cJMKCEHHMCH.LMIPBGGILEJ = num3;
-				CGKHDGJKOMG.HBFBCHDJEBM = num5;
-				return CGKHDGJKOMG.MKPBJGMJPMI(BOPODEAIEBJ);
+				CGKHDGJKOMG.bitb = num;
+				CGKHDGJKOMG.bitk = num2;
+				cJMKCEHHMCH.AvailableBytesIn = num4;
+				cJMKCEHHMCH.TotalBytesIn += num3 - cJMKCEHHMCH.NextIn;
+				cJMKCEHHMCH.NextIn = num3;
+				CGKHDGJKOMG.writeAt = num5;
+				return CGKHDGJKOMG.Flush(BOPODEAIEBJ);
 			default:
 				BOPODEAIEBJ = -2;
-				CGKHDGJKOMG.FPGCIJMGFLH = num;
-				CGKHDGJKOMG.DBFGKGGCEAI = num2;
-				cJMKCEHHMCH.IAPJEIDMGNP = num4;
-				cJMKCEHHMCH.ALJBBHPGGPA += num3 - cJMKCEHHMCH.LMIPBGGILEJ;
-				cJMKCEHHMCH.LMIPBGGILEJ = num3;
-				CGKHDGJKOMG.HBFBCHDJEBM = num5;
-				return CGKHDGJKOMG.MKPBJGMJPMI(BOPODEAIEBJ);
+				CGKHDGJKOMG.bitb = num;
+				CGKHDGJKOMG.bitk = num2;
+				cJMKCEHHMCH.AvailableBytesIn = num4;
+				cJMKCEHHMCH.TotalBytesIn += num3 - cJMKCEHHMCH.NextIn;
+				cJMKCEHHMCH.NextIn = num3;
+				CGKHDGJKOMG.writeAt = num5;
+				return CGKHDGJKOMG.Flush(BOPODEAIEBJ);
 			}
 		}
 	}
 
-	internal int HPHGIOKICCK(int GGEJHHHGPKN, int NBHIKILKMED, int[] AEFHBJIMPHM, int HLDNDJKELJE, int[] GICLKGGKJAG, int KMKIMJDIKHC, InflateBlocks JDCCBCNFENK, ZlibCodec LKPCKJOLJDO)
+	internal int InflateFast(int GGEJHHHGPKN, int NBHIKILKMED, int[] AEFHBJIMPHM, int HLDNDJKELJE, int[] GICLKGGKJAG, int KMKIMJDIKHC, InflateBlocks JDCCBCNFENK, ZlibCodec LKPCKJOLJDO)
 	{
-		int lMIPBGGILEJ = LKPCKJOLJDO.LMIPBGGILEJ;
-		int num = LKPCKJOLJDO.IAPJEIDMGNP;
-		int num2 = JDCCBCNFENK.FPGCIJMGFLH;
-		int num3 = JDCCBCNFENK.DBFGKGGCEAI;
-		int num4 = JDCCBCNFENK.HBFBCHDJEBM;
-		int num5 = ((num4 >= JDCCBCNFENK.IONENIAEDKJ) ? (JDCCBCNFENK.PCLFFOBJJFO - num4) : (JDCCBCNFENK.IONENIAEDKJ - num4 - 1));
-		int num6 = InternalInflateConstants.PEKJPCOGGBP[GGEJHHHGPKN];
-		int num7 = InternalInflateConstants.PEKJPCOGGBP[NBHIKILKMED];
+		int lMIPBGGILEJ = LKPCKJOLJDO.NextIn;
+		int num = LKPCKJOLJDO.AvailableBytesIn;
+		int num2 = JDCCBCNFENK.bitb;
+		int num3 = JDCCBCNFENK.bitk;
+		int num4 = JDCCBCNFENK.writeAt;
+		int num5 = ((num4 >= JDCCBCNFENK.readAt) ? (JDCCBCNFENK.end - num4) : (JDCCBCNFENK.readAt - num4 - 1));
+		int num6 = InternalInflateConstants.InflateMask[GGEJHHHGPKN];
+		int num7 = InternalInflateConstants.InflateMask[NBHIKILKMED];
 		int num12;
 		while (true)
 		{
 			if (num3 < 20)
 			{
 				num--;
-				num2 |= (LKPCKJOLJDO.PEFOCMDODLD[lMIPBGGILEJ++] & 0xFF) << num3;
+				num2 |= (LKPCKJOLJDO.InputBuffer[lMIPBGGILEJ++] & 0xFF) << num3;
 				num3 += 8;
 				continue;
 			}
@@ -451,12 +451,12 @@ internal sealed class InflateCodes
 					if ((num11 & 0x10) != 0)
 					{
 						num11 &= 0xF;
-						num12 = array[num10 + 2] + (num2 & InternalInflateConstants.PEKJPCOGGBP[num11]);
+						num12 = array[num10 + 2] + (num2 & InternalInflateConstants.InflateMask[num11]);
 						num2 >>= num11;
 						for (num3 -= num11; num3 < 15; num3 += 8)
 						{
 							num--;
-							num2 |= (LKPCKJOLJDO.PEFOCMDODLD[lMIPBGGILEJ++] & 0xFF) << num3;
+							num2 |= (LKPCKJOLJDO.InputBuffer[lMIPBGGILEJ++] & 0xFF) << num3;
 						}
 						num8 = num2 & num7;
 						array = GICLKGGKJAG;
@@ -474,31 +474,31 @@ internal sealed class InflateCodes
 							if ((num11 & 0x40) == 0)
 							{
 								num8 += array[num10 + 2];
-								num8 += num2 & InternalInflateConstants.PEKJPCOGGBP[num11];
+								num8 += num2 & InternalInflateConstants.InflateMask[num11];
 								num10 = (num9 + num8) * 3;
 								num11 = array[num10];
 								continue;
 							}
 							LKPCKJOLJDO.Message = "invalid distance code";
-							num12 = LKPCKJOLJDO.IAPJEIDMGNP - num;
+							num12 = LKPCKJOLJDO.AvailableBytesIn - num;
 							num12 = ((num3 >> 3 >= num12) ? num12 : (num3 >> 3));
 							num += num12;
 							lMIPBGGILEJ -= num12;
 							num3 -= num12 << 3;
-							JDCCBCNFENK.FPGCIJMGFLH = num2;
-							JDCCBCNFENK.DBFGKGGCEAI = num3;
-							LKPCKJOLJDO.IAPJEIDMGNP = num;
-							LKPCKJOLJDO.ALJBBHPGGPA += lMIPBGGILEJ - LKPCKJOLJDO.LMIPBGGILEJ;
-							LKPCKJOLJDO.LMIPBGGILEJ = lMIPBGGILEJ;
-							JDCCBCNFENK.HBFBCHDJEBM = num4;
+							JDCCBCNFENK.bitb = num2;
+							JDCCBCNFENK.bitk = num3;
+							LKPCKJOLJDO.AvailableBytesIn = num;
+							LKPCKJOLJDO.TotalBytesIn += lMIPBGGILEJ - LKPCKJOLJDO.NextIn;
+							LKPCKJOLJDO.NextIn = lMIPBGGILEJ;
+							JDCCBCNFENK.writeAt = num4;
 							return -3;
 						}
 						for (num11 &= 0xF; num3 < num11; num3 += 8)
 						{
 							num--;
-							num2 |= (LKPCKJOLJDO.PEFOCMDODLD[lMIPBGGILEJ++] & 0xFF) << num3;
+							num2 |= (LKPCKJOLJDO.InputBuffer[lMIPBGGILEJ++] & 0xFF) << num3;
 						}
-						int num13 = array[num10 + 2] + (num2 & InternalInflateConstants.PEKJPCOGGBP[num11]);
+						int num13 = array[num10 + 2] + (num2 & InternalInflateConstants.InflateMask[num11]);
 						num2 >>= num11;
 						num3 -= num11;
 						num5 -= num12;
@@ -525,10 +525,10 @@ internal sealed class InflateCodes
 							num14 = num4 - num13;
 							do
 							{
-								num14 += JDCCBCNFENK.PCLFFOBJJFO;
+								num14 += JDCCBCNFENK.end;
 							}
 							while (num14 < 0);
-							num11 = JDCCBCNFENK.PCLFFOBJJFO - num14;
+							num11 = JDCCBCNFENK.end - num14;
 							if (num12 > num11)
 							{
 								num12 -= num11;
@@ -568,7 +568,7 @@ internal sealed class InflateCodes
 					if ((num11 & 0x40) == 0)
 					{
 						num8 += array[num10 + 2];
-						num8 += num2 & InternalInflateConstants.PEKJPCOGGBP[num11];
+						num8 += num2 & InternalInflateConstants.InflateMask[num11];
 						num10 = (num9 + num8) * 3;
 						if ((num11 = array[num10]) == 0)
 						{
@@ -582,31 +582,31 @@ internal sealed class InflateCodes
 					}
 					if ((num11 & 0x20) != 0)
 					{
-						num12 = LKPCKJOLJDO.IAPJEIDMGNP - num;
+						num12 = LKPCKJOLJDO.AvailableBytesIn - num;
 						num12 = ((num3 >> 3 >= num12) ? num12 : (num3 >> 3));
 						num += num12;
 						lMIPBGGILEJ -= num12;
 						num3 -= num12 << 3;
-						JDCCBCNFENK.FPGCIJMGFLH = num2;
-						JDCCBCNFENK.DBFGKGGCEAI = num3;
-						LKPCKJOLJDO.IAPJEIDMGNP = num;
-						LKPCKJOLJDO.ALJBBHPGGPA += lMIPBGGILEJ - LKPCKJOLJDO.LMIPBGGILEJ;
-						LKPCKJOLJDO.LMIPBGGILEJ = lMIPBGGILEJ;
-						JDCCBCNFENK.HBFBCHDJEBM = num4;
+						JDCCBCNFENK.bitb = num2;
+						JDCCBCNFENK.bitk = num3;
+						LKPCKJOLJDO.AvailableBytesIn = num;
+						LKPCKJOLJDO.TotalBytesIn += lMIPBGGILEJ - LKPCKJOLJDO.NextIn;
+						LKPCKJOLJDO.NextIn = lMIPBGGILEJ;
+						JDCCBCNFENK.writeAt = num4;
 						return 1;
 					}
 					LKPCKJOLJDO.Message = "invalid literal/length code";
-					num12 = LKPCKJOLJDO.IAPJEIDMGNP - num;
+					num12 = LKPCKJOLJDO.AvailableBytesIn - num;
 					num12 = ((num3 >> 3 >= num12) ? num12 : (num3 >> 3));
 					num += num12;
 					lMIPBGGILEJ -= num12;
 					num3 -= num12 << 3;
-					JDCCBCNFENK.FPGCIJMGFLH = num2;
-					JDCCBCNFENK.DBFGKGGCEAI = num3;
-					LKPCKJOLJDO.IAPJEIDMGNP = num;
-					LKPCKJOLJDO.ALJBBHPGGPA += lMIPBGGILEJ - LKPCKJOLJDO.LMIPBGGILEJ;
-					LKPCKJOLJDO.LMIPBGGILEJ = lMIPBGGILEJ;
-					JDCCBCNFENK.HBFBCHDJEBM = num4;
+					JDCCBCNFENK.bitb = num2;
+					JDCCBCNFENK.bitk = num3;
+					LKPCKJOLJDO.AvailableBytesIn = num;
+					LKPCKJOLJDO.TotalBytesIn += lMIPBGGILEJ - LKPCKJOLJDO.NextIn;
+					LKPCKJOLJDO.NextIn = lMIPBGGILEJ;
+					JDCCBCNFENK.writeAt = num4;
 					return -3;
 				}
 			}
@@ -615,17 +615,17 @@ internal sealed class InflateCodes
 				break;
 			}
 		}
-		num12 = LKPCKJOLJDO.IAPJEIDMGNP - num;
+		num12 = LKPCKJOLJDO.AvailableBytesIn - num;
 		num12 = ((num3 >> 3 >= num12) ? num12 : (num3 >> 3));
 		num += num12;
 		lMIPBGGILEJ -= num12;
 		num3 -= num12 << 3;
-		JDCCBCNFENK.FPGCIJMGFLH = num2;
-		JDCCBCNFENK.DBFGKGGCEAI = num3;
-		LKPCKJOLJDO.IAPJEIDMGNP = num;
-		LKPCKJOLJDO.ALJBBHPGGPA += lMIPBGGILEJ - LKPCKJOLJDO.LMIPBGGILEJ;
-		LKPCKJOLJDO.LMIPBGGILEJ = lMIPBGGILEJ;
-		JDCCBCNFENK.HBFBCHDJEBM = num4;
+		JDCCBCNFENK.bitb = num2;
+		JDCCBCNFENK.bitk = num3;
+		LKPCKJOLJDO.AvailableBytesIn = num;
+		LKPCKJOLJDO.TotalBytesIn += lMIPBGGILEJ - LKPCKJOLJDO.NextIn;
+		LKPCKJOLJDO.NextIn = lMIPBGGILEJ;
+		JDCCBCNFENK.writeAt = num4;
 		return 0;
 	}
 }

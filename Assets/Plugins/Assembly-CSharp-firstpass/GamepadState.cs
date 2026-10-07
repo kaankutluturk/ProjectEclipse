@@ -2,41 +2,41 @@ using UnityEngine;
 
 public class GamepadState
 {
-	public bool IEKADOOKFKG;
+	public bool A;
 
-	public bool LDKCOIHONPG;
+	public bool IsButtonBPressed;
 
-	public bool NPKMJMCLDAH;
+	public bool X;
 
-	public bool IHAHIEHHNCG;
+	public bool Y;
 
 	public bool Start;
 
-	public bool AJLBHIHFFCE;
+	public bool Back;
 
-	public bool EDCHBILGFLD;
+	public bool Left;
 
-	public bool NNCHJCLKHHA;
+	public bool Right;
 
-	public bool FJBHJIFKOMF;
+	public bool Up;
 
-	public bool HHMEIEKKDAL;
+	public bool Down;
 
-	public bool ELAPGGICPLB;
+	public bool LeftStick;
 
-	public bool KDPBFODDKOJ;
+	public bool RightStick;
 
-	public bool CLIBGHJKICF;
+	public bool RightShoulder;
 
-	public bool GGMOMECKAGP;
+	public bool LeftShoulder;
 
-	public Vector2 HNPGBMGKGEB = Vector2.zero;
+	public Vector2 LeftStickAxis = Vector2.zero;
 
-	public Vector2 IMMFMNIFNEH = Vector2.zero;
+	public Vector2 RightStickAxis = Vector2.zero;
 
-	public Vector2 PGHJPABHPLP = Vector2.zero;
+	public Vector2 DpadAxis = Vector2.zero;
 
-	public float CHJIELPPCOE;
+	public float LeftTrigger;
 
-	public float ALEANDMIOJO;
+	public float RightTrigger;
 }

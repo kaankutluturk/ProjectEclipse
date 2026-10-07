@@ -5,29 +5,29 @@ public class PerkConditionCombo : PerkConditionMatchMinMax
 {
 	public PerkConditionCombo()
 	{
-		set_Type(NHDGLPNNNLH.CONDITION_COMBO);
+		set_Type(PerkConditionType.CONDITION_COMBO);
 	}
 
 	public override void Parse(XmlNode node)
 	{
 		base.Parse(node);
-		FMKBHHJDHDM.Parse(node, this, JMDLAMHAJLN());
+		minMax.Parse(node, this, GetPerk());
 	}
 
 	public override bool IsEqual(Model ACENLMONNPA, List<string> NIKHAICFGNM)
 	{
-		Model fGCODGKLHED = EPCPGEPPHLO(ACENLMONNPA);
+		Model fGCODGKLHED = ResolveTargetModel(ACENLMONNPA);
 		if (ACENLMONNPA == null)
 		{
 			return false;
 		}
-		FMKBHHJDHDM.IBCPKBBAFNH();
-		int num = fGCODGKLHED.NPDOLGNNINO();
-		if (!FMKBHHJDHDM.KEMLMMPIPGJ() && (int)FMKBHHJDHDM.PPCEOKCAEBD() > num)
+		minMax.EvaluateFunctions();
+		int num = fGCODGKLHED.GetComboCount();
+		if (!minMax.GetMinUnbounded() && (int)minMax.GetMinValue() > num)
 		{
 			return false;
 		}
-		if (!FMKBHHJDHDM.HFGENILMBKK() && (int)FMKBHHJDHDM.EFDLCJBJNPE() < num)
+		if (!minMax.GetMaxUnbounded() && (int)minMax.GetMaxValue() < num)
 		{
 			return false;
 		}

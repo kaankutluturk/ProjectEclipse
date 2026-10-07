@@ -4,13 +4,13 @@ using System.Xml;
 public class PerkActionLifesteal : PerkAction
 {
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private float GJMNMAJANLP;
+	private float _damagePart;
 
-	public float CMFGKFFEHCA
+	public float LifestealFraction
 	{
 		get
 		{
-			return NIBCOALEIDN();
+			return GetDamagePart();
 		}
 		protected set
 		{
@@ -25,17 +25,17 @@ public class PerkActionLifesteal : PerkAction
 	public PerkActionLifesteal(PerkActionLifesteal NOLFMPDGCOC)
 		: base(NOLFMPDGCOC)
 	{
-		set_DamagePart(NOLFMPDGCOC.NIBCOALEIDN());
+		set_DamagePart(NOLFMPDGCOC.GetDamagePart());
 	}
 
-	public float NIBCOALEIDN()
+	public float GetDamagePart()
 	{
-		return GJMNMAJANLP;
+		return _damagePart;
 	}
 
 	protected void set_DamagePart(float value)
 	{
-		GJMNMAJANLP = value;
+		_damagePart = value;
 	}
 
 	public override void Parse(XmlNode node)

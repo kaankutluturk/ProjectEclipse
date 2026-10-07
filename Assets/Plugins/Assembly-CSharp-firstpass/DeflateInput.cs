@@ -1,43 +1,43 @@
 internal class DeflateInput
 {
-	internal struct BKLHEBEBFFD
+	internal struct InputState
 	{
 		internal int count;
 
-		internal int CAILGDNIKJD;
+		internal int startIndex;
 	}
 
 	private byte[] buffer;
 
 	private int count;
 
-	private int CAILGDNIKJD;
+	private int startIndex;
 
 	internal int Count
 	{
 		get
 		{
-			return OFOPFCJNEBL();
+			return GetCount();
 		}
 		set
 		{
-			CHILOKHFALD(value);
+			SetCount(value);
 		}
 	}
 
-	internal int KCJJIDMLJNK
+	internal int StartIndex
 	{
 		get
 		{
-			return JHGJIJNGNBO();
+			return GetStartIndex();
 		}
 		set
 		{
-			MOFAGMEDPNM(value);
+			SetStartIndex(value);
 		}
 	}
 
-	internal byte[] FAJIIIFCCPD()
+	internal byte[] GetBuffer()
 	{
 		return buffer;
 	}
@@ -47,43 +47,43 @@ internal class DeflateInput
 		buffer = value;
 	}
 
-	internal int OFOPFCJNEBL()
+	internal int GetCount()
 	{
 		return count;
 	}
 
-	internal void CHILOKHFALD(int value)
+	internal void SetCount(int value)
 	{
 		count = value;
 	}
 
-	internal int JHGJIJNGNBO()
+	internal int GetStartIndex()
 	{
-		return CAILGDNIKJD;
+		return startIndex;
 	}
 
-	internal void MOFAGMEDPNM(int value)
+	internal void SetStartIndex(int value)
 	{
-		CAILGDNIKJD = value;
+		startIndex = value;
 	}
 
-	internal void MBODOPCOFFE(int HDKKKCDKFEE)
+	internal void ConsumeBytes(int HDKKKCDKFEE)
 	{
-		CAILGDNIKJD += HDKKKCDKFEE;
+		startIndex += HDKKKCDKFEE;
 		count -= HDKKKCDKFEE;
 	}
 
-	internal BKLHEBEBFFD ENBODKKOALL()
+	internal InputState DumpState()
 	{
-		BKLHEBEBFFD result = default(BKLHEBEBFFD);
+		InputState result = default(InputState);
 		result.count = count;
-		result.CAILGDNIKJD = CAILGDNIKJD;
+		result.startIndex = startIndex;
 		return result;
 	}
 
-	internal void BIDLPPIPACF(BKLHEBEBFFD state)
+	internal void RestoreState(InputState state)
 	{
 		count = state.count;
-		CAILGDNIKJD = state.CAILGDNIKJD;
+		startIndex = state.startIndex;
 	}
 }

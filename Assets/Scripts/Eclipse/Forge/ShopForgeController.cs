@@ -142,12 +142,12 @@ namespace Eclipse.Forge
 
 		public bool CanOpen()
 		{
-			Roster roster = ListSF.CCDKHLAMKKO();
-			if (roster == null || !roster.IIEHAMOGEHM || _selectedItem == null || _selectedItem.OFOPFCJNEBL() <= 0)
+			Roster roster = ListSF.GetRoster();
+			if (roster == null || !roster.ShowForge || _selectedItem == null || _selectedItem.GetCount() <= 0)
 				return false;
-			if (_selectedItem.PHDBCIHJKON() != null) return false;
+			if (_selectedItem.GetRecipeDelivery() != null) return false;
 			ItemInfo info = CurrentInfo(_selectedItem);
-			return info != null && ForgeManager.ELEBLBJKDBI().IsAvailableRecipesForItemType(info.Type);
+			return info != null && ForgeManager.GetInstance().IsAvailableRecipesForItemType(info.Type);
 		}
 
 		public bool Open(string recipeName = null)
@@ -277,7 +277,7 @@ namespace Eclipse.Forge
 			_forgeOpenButton.name = "ForgeButton";
 			_forgeOpenButton.gameObject.layer = _shopButtonsContainer.layer;
 			_forgeOpenButton.onClick.RemoveAllListeners();
-			_forgeOpenButton.SetColor(LabelButton.FBMGEHJPPIK.BUTTON_GREEN);
+			_forgeOpenButton.SetColor(LabelButton.ButtonColor.BUTTON_GREEN);
 			_forgeOpenButton.SetAlias("btnEnchantment");
 			_forgeOpenButton.onClick.AddListener(() => Open());
 			RectTransform forgeRect = _forgeOpenButton.GetComponent<RectTransform>();
@@ -328,10 +328,10 @@ namespace Eclipse.Forge
 			layout.childForceExpandWidth = true;
 			layout.childForceExpandHeight = false;
 
-			_applyButton = CloneLayoutButton("EnchantApplyButton", _propertyControls.transform, LabelButton.FBMGEHJPPIK.BUTTON_WHITE, "btnApply");
+			_applyButton = CloneLayoutButton("EnchantApplyButton", _propertyControls.transform, LabelButton.ButtonColor.BUTTON_WHITE, "btnApply");
 			_applyButton.onClick.AddListener(StartEnchant);
 
-			_closeButton = CloneLayoutButton("ForgeCloseButton", _propertyControls.transform, LabelButton.FBMGEHJPPIK.BUTTON_DARK, "Settings_Back");
+			_closeButton = CloneLayoutButton("ForgeCloseButton", _propertyControls.transform, LabelButton.ButtonColor.BUTTON_DARK, "Settings_Back");
 			_closeButton.onClick.AddListener(Close);
 		}
 
@@ -503,7 +503,7 @@ namespace Eclipse.Forge
 			if (rebuild || _displayedRecipes.Count == 0)
 			{
 				_displayedRecipes.Clear();
-				IReadOnlyList<Recipe> recipes = ForgeManager.ELEBLBJKDBI().Recipes;
+				IReadOnlyList<Recipe> recipes = ForgeManager.GetInstance().Recipes;
 				for (int i = 0; i < recipes.Count; i++)
 				{
 					Recipe recipe = recipes[i];
@@ -722,7 +722,7 @@ namespace Eclipse.Forge
 			for (int i = 0; i < price.Materials.Count; i++)
 			{
 				CurrencyStruct material = price.Materials[i];
-				if (material?.BKDEAGGPNAO == null) continue;
+				if (material?.Currency == null) continue;
 				card.Materials.Add(CreateMaterial(materials.transform, material));
 			}
 			return priceRoot;
@@ -738,7 +738,7 @@ namespace Eclipse.Forge
 			materialLayout.preferredWidth = 164f;
 			materialLayout.preferredHeight = 170f;
 
-			ResolutionImage icon = CreateSprite("Icon", materialUi.transform, material.BKDEAGGPNAO.MJBPMLCLMFN, Vector2.zero, true);
+			ResolutionImage icon = CreateSprite("Icon", materialUi.transform, material.Currency.Icon, Vector2.zero, true);
 			RectTransform iconRect = icon.rectTransform;
 			iconRect.anchorMin = new Vector2(0f, 1f);
 			iconRect.anchorMax = new Vector2(1f, 1f);
@@ -827,11 +827,11 @@ namespace Eclipse.Forge
 			var lines = new System.Text.StringBuilder();
 			for (int i = 0; i < candidates.Count; i++)
 			{
-				PerkInfoItem info = GameUtils.FDEJIIDIPBI.ABAGJKMKCBA(candidates[i].get_Name());
+				PerkInfoItem info = GameUtils.PerkItemList.FindBasePerk(candidates[i].get_Name());
 				if (i > 0) lines.Append('\n');
 				if (info != null)
-					lines.Append("<quad name=").Append(info.NHKMCLPOMFK).Append(" size=48 width=1 /> ");
-				lines.Append(LocalizationManager.GetString(info != null ? info.HBCNKNFPAIM : candidates[i].get_Name()));
+					lines.Append("<quad name=").Append(info.ImageName).Append(" size=48 width=1 /> ");
+				lines.Append(LocalizationManager.GetString(info != null ? info.Alias : candidates[i].get_Name()));
 			}
 			Canvas.ForceUpdateCanvases();
 			_hintPanel.ShowListHint("hintPossibleEnchantments", lines.ToString(), card.Button.gameObject, card.PropertiesRoot);
@@ -848,7 +848,7 @@ namespace Eclipse.Forge
 		{
 			ItemInfo info = CurrentInfo(_selectedItem);
 			int itemLevel = info != null ? info.ItemLevel : 1;
-			Roster roster = ListSF.CCDKHLAMKKO();
+			Roster roster = ListSF.GetRoster();
 
 			for (int i = 0; i < _recipeCards.Count; i++)
 			{
@@ -882,7 +882,7 @@ namespace Eclipse.Forge
 					for (int m = 0; m < card.Materials.Count; m++)
 					{
 						MaterialEntry entry = card.Materials[m];
-						int owned = roster == null ? 0 : roster.GetCurrencyCount(entry.Material.BKDEAGGPNAO);
+						int owned = roster == null ? 0 : roster.GetCurrencyCount(entry.Material.Currency);
 						entry.Value.color = owned >= entry.Material.Count ? DarkText : MissingMaterialText;
 					}
 				}
@@ -893,7 +893,7 @@ namespace Eclipse.Forge
 		{
 			RecipeItem item = recipe.GetRecipeItemByItem(_selectedItem);
 			if (item == null) return;
-			int baseAspect = ForgeManager.ELEBLBJKDBI().GetAspectValueByLevel(itemLevel);
+			int baseAspect = ForgeManager.GetInstance().GetAspectValueByLevel(itemLevel);
 			int min = baseAspect + item.MinDeviation;
 			int max = baseAspect + item.MaxDeviation;
 			float fill = EnchantmentBarFill(item.BarScale, baseAspect, itemLevel);
@@ -913,19 +913,19 @@ namespace Eclipse.Forge
 		private static float EnchantmentBarFill(string barScaleName, float value, int itemLevel)
 		{
 			if (string.IsNullOrEmpty(barScaleName)) return 0f;
-			BarScale scale = GameUtils.NPHEOMBNOLK?.HNECOCDPENN(barScaleName);
+			BarScale scale = GameUtils.BarScaleTable?.GetScaleByName(barScaleName);
 			if (scale == null) return 0f;
 
-			Limit limit = scale.EHKJEKAIDFF(itemLevel) ?? scale.NMMHOKHKFEE();
+			Limit limit = scale.GetItemLimitForLevel(itemLevel) ?? scale.GetDefaultItemLimit();
 			if (limit == null) return 0f;
 
-			float rightLimit = limit.OBGGBMDABAD >= 0 && limit.NGPJDHKOEJC >= 0
-				? limit.NGPJDHKOEJC
+			float rightLimit = limit.LeftLimit >= 0 && limit.RightLimit >= 0
+				? limit.RightLimit
 				: itemLevel * limit.LevelMultiplier + limit.Shift;
 			if (rightLimit <= 0f) return 0f;
 
-			float power = scale.MFGLDPKEDJB >= 0f ? scale.MFGLDPKEDJB : 0f;
-			float minimum = scale.DPGMCKCDMBC >= 0f ? scale.DPGMCKCDMBC : 0f;
+			float power = scale.Power >= 0f ? scale.Power : 0f;
+			float minimum = scale.MinPower >= 0f ? scale.MinPower : 0f;
 			float percent;
 			if (!string.IsNullOrEmpty(scale.Type) && scale.Type.Equals("Linear"))
 			{
@@ -933,7 +933,7 @@ namespace Eclipse.Forge
 			}
 			else
 			{
-				float doublingRange = GameUtils.BGJPLNFFEOB;
+				float doublingRange = GameUtils.DamageDoublingRange;
 				if (doublingRange <= 0f) doublingRange = 10f;
 				percent = Mathf.Pow(2f, (value - rightLimit) * power / doublingRange);
 			}
@@ -976,7 +976,7 @@ namespace Eclipse.Forge
 			}
 
 			ResolveSelectedItem();
-			RecipeItemInfo pending = _selectedItem?.PHDBCIHJKON();
+			RecipeItemInfo pending = _selectedItem?.GetRecipeDelivery();
 			if (pending != null && !ListSF.ApplyRecipeToItem(pending))
 			{
 				RefreshPropertyControls();
@@ -993,7 +993,7 @@ namespace Eclipse.Forge
 
 		private bool FinishPendingEnchantment()
 		{
-			RecipeItemInfo pending = _selectedItem?.PHDBCIHJKON();
+			RecipeItemInfo pending = _selectedItem?.GetRecipeDelivery();
 			if (pending == null) return false;
 			if (!ListSF.ApplyRecipeToItem(pending)) return false;
 
@@ -1046,20 +1046,20 @@ namespace Eclipse.Forge
 
 		private bool ShouldShowForgeButton()
 		{
-			Roster roster = ListSF.CCDKHLAMKKO();
-			if (roster == null || !roster.IIEHAMOGEHM || _selectedItem == null || _selectedItem.OFOPFCJNEBL() <= 0)
+			Roster roster = ListSF.GetRoster();
+			if (roster == null || !roster.ShowForge || _selectedItem == null || _selectedItem.GetCount() <= 0)
 				return false;
 			ItemInfo info = CurrentInfo(_selectedItem);
-			return info != null && ForgeManager.ELEBLBJKDBI().IsAvailableRecipesForItemType(info.Type);
+			return info != null && ForgeManager.GetInstance().IsAvailableRecipesForItemType(info.Type);
 		}
 
 		private void ResolveSelectedItem()
 		{
-			Roster roster = ListSF.CCDKHLAMKKO();
-			_selectedItem = _selectedInfo != null ? roster?.KHCNHPCPFII()?.CMGOCLGHNLH(_selectedInfo) : null;
+			Roster roster = ListSF.GetRoster();
+			_selectedItem = _selectedInfo != null ? roster?.GetInventory()?.FindItem(_selectedInfo) : null;
 		}
 
-		private LabelButton CloneLayoutButton(string name, Transform parent, LabelButton.FBMGEHJPPIK color, string alias)
+		private LabelButton CloneLayoutButton(string name, Transform parent, LabelButton.ButtonColor color, string alias)
 		{
 			LabelButton button = UnityEngine.Object.Instantiate(_buttonTemplate, parent, false);
 			button.name = name;
@@ -1131,7 +1131,7 @@ namespace Eclipse.Forge
 			rect.anchoredPosition = anchoredPosition;
 			rect.sizeDelta = size;
 			Text text = textObject.GetComponent<Text>();
-			text.font = LocalizationManager.MBPJIKFOEBJ();
+			text.font = LocalizationManager.GetContentFont();
 			text.fontSize = fontSize;
 			text.resizeTextForBestFit = true;
 			text.resizeTextMinSize = 1;
@@ -1147,7 +1147,7 @@ namespace Eclipse.Forge
 		private static ItemInfo CurrentInfo(UserItem userItem)
 		{
 			if (userItem == null) return null;
-			return userItem.DBLCMCEGJGI(false) ?? userItem.BHKHOJPANHE();
+			return userItem.GetDisplayInfo(false) ?? userItem.GetInfo();
 		}
 
 		private sealed class RecipeCard

@@ -4,17 +4,17 @@ using UnityEngine;
 
 public class QuestActionStoryTutorialPunchbag : QuestAction
 {
-	private int FBNIMJAEJNH;
+	private int attackCount;
 
-	private int KAIPMDJFBPN = 3;
+	private int requiredAttackCount = 3;
 
 	private IEnumerator _WaitTimeCoroutine;
 
 	private bool _LastAnimationIsKick;
 
-	public override void DEJMHFMLKIC(QuestParameters GFIHPBCEEOB)
+	public override void Execute(QuestParameters GFIHPBCEEOB)
 	{
-		base.DEJMHFMLKIC(GFIHPBCEEOB);
+		base.Execute(GFIHPBCEEOB);
 		MainMenu.get_Instance().SetEnabled(false);
 		Fight gDBOMJODDEA = Fight.GetCurrentFight();
 		SFButton buttonPunch = gDBOMJODDEA.Controller.GetButtonPunch();
@@ -25,9 +25,9 @@ public class QuestActionStoryTutorialPunchbag : QuestAction
 		buttonKick.AddFlashImage("FightButtons.Kick_Highlight");
 		buttonKick.FlashingImage.rectTransform.localScale = new Vector3(1.33f, 1.33f);
 		buttonKick.set_IsFlashing(true);
-		Model fGCODGKLHED = gDBOMJODDEA.LNDLFINJHDB[0];
+		Model fGCODGKLHED = gDBOMJODDEA.ActiveModels[0];
 		fGCODGKLHED.AddEventListener(2, OnAnimationStart);
-		_WaitTimeCoroutine = IGIJPMDLDEL();
+		_WaitTimeCoroutine = WaitForTimeout();
 		CoroutineManager.get_Current().StartRoutine(_WaitTimeCoroutine);
 	}
 
@@ -36,28 +36,28 @@ public class QuestActionStoryTutorialPunchbag : QuestAction
 		if (_LastAnimationIsKick)
 		{
 			_LastAnimationIsKick = false;
-			FBNIMJAEJNH++;
-			if (FBNIMJAEJNH >= KAIPMDJFBPN)
+			attackCount++;
+			if (attackCount >= requiredAttackCount)
 			{
-				DPAAINCBKBF();
+				CompleteStep();
 			}
 		}
 		Fight gDBOMJODDEA = Fight.GetCurrentFight();
-		Model fGCODGKLHED = gDBOMJODDEA.LNDLFINJHDB[0];
-		InfoAnimation.MGHNBEPCKIF dFLPNNBIFFN = fGCODGKLHED.DFLPNNBIFFN;
-		if (dFLPNNBIFFN == InfoAnimation.MGHNBEPCKIF.AnimationAttack)
+		Model fGCODGKLHED = gDBOMJODDEA.ActiveModels[0];
+		InfoAnimation.AnimationKind dFLPNNBIFFN = fGCODGKLHED.LastAnimationType;
+		if (dFLPNNBIFFN == InfoAnimation.AnimationKind.AnimationAttack)
 		{
 			_LastAnimationIsKick = true;
 		}
 	}
 
-	private IEnumerator IGIJPMDLDEL()
+	private IEnumerator WaitForTimeout()
 	{
-		yield return new WaitForSeconds(GameUtils.AKPBNLKFONO.DefaultTutorialStepTimeout);
-		DPAAINCBKBF();
+		yield return new WaitForSeconds(GameUtils.TutorialSettings.DefaultTutorialStepTimeout);
+		CompleteStep();
 	}
 
-	private void DPAAINCBKBF()
+	private void CompleteStep()
 	{
 		if (_WaitTimeCoroutine != null)
 		{
@@ -69,8 +69,8 @@ public class QuestActionStoryTutorialPunchbag : QuestAction
 		buttonPunch.set_IsFlashing(false);
 		SFButton buttonKick = gDBOMJODDEA.Controller.GetButtonKick();
 		buttonKick.set_IsFlashing(false);
-		Model fGCODGKLHED = gDBOMJODDEA.LNDLFINJHDB[0];
+		Model fGCODGKLHED = gDBOMJODDEA.ActiveModels[0];
 		fGCODGKLHED.RemoveEventListener(2, OnAnimationStart);
-		OGIJONMKABB();
+		FinishAction();
 	}
 }

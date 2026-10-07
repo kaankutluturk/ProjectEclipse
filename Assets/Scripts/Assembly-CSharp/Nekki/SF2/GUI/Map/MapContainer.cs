@@ -6,7 +6,7 @@ namespace Nekki.SF2.GUI.Map
 {
 	public class MapContainer : SFMonoBehaviour<object>
 	{
-		public enum KEIEKJLIOFN
+		public enum MapContainerEvent
 		{
 			onBattleClick = 0,
 			onZoneSelect = 1,
@@ -30,18 +30,18 @@ namespace Nekki.SF2.GUI.Map
 		public void Init()
 		{
 			_mapPanel.Init();
-			_mapPanel.AddEventListener(0, AOGHKADFFAK);
-			_mapPanel.AddEventListener(1, GBFNCCGLEGL);
+			_mapPanel.AddEventListener(0, ForwardBattleClick);
+			_mapPanel.AddEventListener(1, ForwardZoneSelect);
 			_lampsPanel.Init();
-			_lampsPanel.AddEventListener(0, HLLNHKEKCBP);
+			_lampsPanel.AddEventListener(0, OnLampClicked);
 		}
 
 		private void OnDestroy()
 		{
-			_mapPanel.RemoveEventListener(0, AOGHKADFFAK);
-			_mapPanel.RemoveEventListener(1, GBFNCCGLEGL);
+			_mapPanel.RemoveEventListener(0, ForwardBattleClick);
+			_mapPanel.RemoveEventListener(1, ForwardZoneSelect);
 			_mapPanel = null;
-			_lampsPanel.RemoveEventListener(0, HLLNHKEKCBP);
+			_lampsPanel.RemoveEventListener(0, OnLampClicked);
 		}
 
 		public void Open()
@@ -204,27 +204,27 @@ namespace Nekki.SF2.GUI.Map
 			return false;
 		}
 
-		private void AOGHKADFFAK(object data)
+		private void ForwardBattleClick(object data)
 		{
 			CallEvent(0, data);
 		}
 
-		private void GBFNCCGLEGL(object data)
+		private void ForwardZoneSelect(object data)
 		{
 			CallEvent(1, data);
 		}
 
-		private void CBAFDCAEGNH(object data)
+		private void ForwardOpened(object data)
 		{
 			CallEvent(2, data);
 		}
 
-		private void BMALNCHKHME(object data)
+		private void ForwardClosed(object data)
 		{
 			CallEvent(3, data);
 		}
 
-		private void HLLNHKEKCBP(object data)
+		private void OnLampClicked(object data)
 		{
 			int num = (int)data;
 			int num2 = (int)Mathf.Min(LAMP_MAX_FRAMES, (float)Mathf.Abs(_lampsPanel.GetCurrentLamp() - num) * LAMP_FRAMES_PER_ZONE);
@@ -237,20 +237,20 @@ namespace Nekki.SF2.GUI.Map
 				Zone zone2 = zone.get_Zone();
 				if (zone2 != null && MapScene.IsZoneOpen(zone2) && MapScene.IsZoneHaveDontCompleteBattle(zone2))
 				{
-					MOPMPLKDEBD(zone2, zone);
+					SelectFirstOpenBattle(zone2, zone);
 				}
 			}
 		}
 
-		private void MOPMPLKDEBD(Zone HLJKOKMKMLM, ZoneScrollItem ELOKNHJDCCD)
+		private void SelectFirstOpenBattle(Zone HLJKOKMKMLM, ZoneScrollItem ELOKNHJDCCD)
 		{
-			List<string> gBDHOPBMLHK = MapGUI.JHLMDGBGGEP.GBDHOPBMLHK;
-			List<Battle> lGIIBNJFADA = HLJKOKMKMLM.LGIIBNJFADA;
+			List<string> gBDHOPBMLHK = MapGUI.ZoneSwitchFade.BattleTypeNames;
+			List<Battle> lGIIBNJFADA = HLJKOKMKMLM.Battles;
 			foreach (string item in gBDHOPBMLHK)
 			{
 				foreach (Battle item2 in lGIIBNJFADA)
 				{
-					if (DCDNICEMCCO(item, item2))
+					if (IsOpenUncompletedBattleNamed(item, item2))
 					{
 						ELOKNHJDCCD.SetLastBattle(item);
 						return;
@@ -259,14 +259,14 @@ namespace Nekki.SF2.GUI.Map
 			}
 		}
 
-		private static bool DCDNICEMCCO(string name, Battle DPOOIONCEOA)
+		private static bool IsOpenUncompletedBattleNamed(string name, Battle DPOOIONCEOA)
 		{
 			if (DPOOIONCEOA == null)
 			{
 				return false;
 			}
 			bool flag = name == DPOOIONCEOA.get_Name();
-			bool flag2 = DPOOIONCEOA.MNHLGELMOEJ() == ConditionStatus.StatusOpen && !DPOOIONCEOA.BACJPLBBCKL();
+			bool flag2 = DPOOIONCEOA.GetStatus() == ConditionStatus.StatusOpen && !DPOOIONCEOA.IsLocked();
 			return flag && flag2;
 		}
 	}

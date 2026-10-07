@@ -8,7 +8,7 @@ namespace Nekki.SF2.Core.Fights.Renders.Model
 	{
 		private Color _Color = new Color(0f, 0f, 0f, 1f);
 
-		protected MeshNode JBLMEBBICJI = new MeshNode();
+		protected MeshNode meshNode = new MeshNode();
 
 		private Mesh _Mesh;
 
@@ -47,7 +47,7 @@ namespace Nekki.SF2.Core.Fights.Renders.Model
 
 		public MeshNode get_Base()
 		{
-			return JBLMEBBICJI;
+			return meshNode;
 		}
 
 		private void Start()
@@ -96,9 +96,9 @@ namespace Nekki.SF2.Core.Fights.Renders.Model
 			_RimRenderer.SetPropertyBlock(_RimBlock);
 			float softness = Eclipse.Rendering.RimLight.Softness;
 			if (_RimFeather == null && softness > 0f)
-				_RimFeather = Eclipse.Rendering.RimFeather.Create(_RimRenderer.transform, JBLMEBBICJI.Triangles, JBLMEBBICJI.Vertices.Length);
+				_RimFeather = Eclipse.Rendering.RimFeather.Create(_RimRenderer.transform, meshNode.Triangles, meshNode.Vertices.Length);
 			if (_RimFeather != null)
-				_RimFeather.Refresh(JBLMEBBICJI.Vertices, softness, Eclipse.Rendering.RimLight.ColorFor(base.transform));
+				_RimFeather.Refresh(meshNode.Vertices, softness, Eclipse.Rendering.RimLight.ColorFor(base.transform));
 		}
 
 		// Per-renderer override of the shared material's colour; clearing it
@@ -117,30 +117,30 @@ namespace Nekki.SF2.Core.Fights.Renders.Model
 
 		private void Init()
 		{
-			JBLMEBBICJI.Init();
-			_Mesh.vertices = JBLMEBBICJI.Vertices;
-			_Mesh.triangles = JBLMEBBICJI.Triangles;
+			meshNode.Init();
+			_Mesh.vertices = meshNode.Vertices;
+			_Mesh.triangles = meshNode.Triangles;
 		}
 
 		private void Update()
 		{
-			if (JBLMEBBICJI != null)
+			if (meshNode != null)
 			{
 				bool solid = Eclipse.Rendering.ExperimentalFighterCamera.ActiveFor(transform);
 				if (solid && _Volume == null) _Volume = Eclipse.Rendering.FighterVolume.Create(transform);
 				solid = solid && _Volume != null;
 				if (_Volume != null) _Volume.gameObject.SetActive(solid);
 				_Renderer.enabled = !solid;
-				JBLMEBBICJI.Render(Eclipse.Rendering.ModelPresentation.AlphaFor(_Presentation), solid);
+				meshNode.Render(Eclipse.Rendering.ModelPresentation.AlphaFor(_Presentation), solid);
 				ApplyTint();
 				if (solid)
                 {
                     Color color = _Presentation != null ? _Presentation.Tint ?? _Color : _Color;
                     bool body = Eclipse.Rendering.ProceduralFighterBody.RenderFor(_Presentation, color);
                     float depthAnchor = body ? _Presentation.GetComponent<Eclipse.Rendering.ProceduralFighterBody>().DepthAnchor : 0;
-                    _Volume.Surface(JBLMEBBICJI.Vertices, JBLMEBBICJI.Triangles, color, JBLMEBBICJI.FigureNames, body, depthAnchor);
+                    _Volume.Surface(meshNode.Vertices, meshNode.Triangles, color, meshNode.FigureNames, body, depthAnchor);
                 }
-				_Mesh.vertices = JBLMEBBICJI.Vertices;
+				_Mesh.vertices = meshNode.Vertices;
 				_Mesh.RecalculateBounds();
 				UpdateRim();
 			}

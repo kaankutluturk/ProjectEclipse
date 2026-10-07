@@ -8,17 +8,17 @@ public class NetworkController
 
 	private static NetworkController _Instance;
 
-	private bool CHAPOJPCOJI = true;
+	private bool _isFirstLogin = true;
 
-	public readonly GiveLogin LBDHOLEICEG = new GiveLogin();
+	public readonly GiveLogin GiveLoginService = new GiveLogin();
 
-	public readonly LedgerManager KDILDKDNIID = new LedgerManager();
+	public readonly LedgerManager Ledger = new LedgerManager();
 
-	public static NetworkController BPCBBHAKFDM
+	public static NetworkController Instance
 	{
 		get
 		{
-			return ELEBLBJKDBI();
+			return GetInstance();
 		}
 	}
 
@@ -26,7 +26,7 @@ public class NetworkController
 	{
 	}
 
-	public static NetworkController ELEBLBJKDBI()
+	public static NetworkController GetInstance()
 	{
 		if (_Instance == null)
 		{
@@ -35,37 +35,37 @@ public class NetworkController
 		return _Instance;
 	}
 
-	public void IFFDOFMDABC()
+	public void CompleteLogin()
 	{
 		// Complete the local session without config fetches, cloud saves, news,
 		// licensing, or a fake successful server login.
-		if (CHAPOJPCOJI)
+		if (_isFirstLogin)
 		{
-			ListSF.GetInstance().MAOPKFNKHOI();
-			CHAPOJPCOJI = false;
+			ListSF.GetInstance().CreateMissingAchievements();
+			_isFirstLogin = false;
 		}
-		ListSF.CCDKHLAMKKO().BIHELGAGPGO();
-		AHPFEEAOFMD();
+		ListSF.GetRoster().UpdateLastDumpTime();
+		FinishLoginSequence();
 	}
 
-	private void AHPFEEAOFMD()
+	private void FinishLoginSequence()
 	{
-		LLLOJBFMONN.INNGABABJPC("Login sequence: NetworkController.LoginComplete");
-		LBDHOLEICEG.PGAJKMOPDIJ();
-		QuestParameters hHKLFIIBIFF = ListSF.GetInstance().BNMLDPNCMLB();
-		if (hHKLFIIBIFF.LBGOMJFFEPP() == null)
+		GameLog.Info("Login sequence: NetworkController.LoginComplete");
+		GiveLoginService.SendGiveLogin();
+		QuestParameters hHKLFIIBIFF = ListSF.GetInstance().GetQuestParameters();
+		if (hHKLFIIBIFF.GetFightList() == null)
 		{
-			hHKLFIIBIFF.JLGLBLDPAAF = FightIDS.Empty();
-			hHKLFIIBIFF.HEIADONEACH = string.Empty;
+			hHKLFIIBIFF.fightIds = FightIDS.Empty();
+			hHKLFIIBIFF.fightResult = string.Empty;
 		}
-		if (ListSF.GetInstance().FFBAJNGHGGD(QuestEvent.PMDPDMFLCIJ.QUEST_EVENT_LOGIN_END))
+		if (ListSF.GetInstance().RaiseQuestEvent(QuestEvent.QuestEventType.QUEST_EVENT_LOGIN_END))
 		{
-			ListSF.GetInstance().MHHNIPBJNAD();
+			ListSF.GetInstance().RunQuestActions();
 		}
 		OnLoginComplete(null);
-		if (ListSF.GetInstance().FFBAJNGHGGD(QuestEvent.PMDPDMFLCIJ.QUEST_EVENT_SESSION))
+		if (ListSF.GetInstance().RaiseQuestEvent(QuestEvent.QuestEventType.QUEST_EVENT_SESSION))
 		{
-			ListSF.GetInstance().MHHNIPBJNAD();
+			ListSF.GetInstance().RunQuestActions();
 		}
 	}
 

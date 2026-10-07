@@ -2,18 +2,18 @@ using System.Text.RegularExpressions;
 
 public class CertificateValidator
 {
-	private const string IIHOOJPKMGK = "https://";
+	private const string HttpsPrefix = "https://";
 
-	private const string KGGAPPPKGGC = "nekkimobile\\.ru";
+	private const string TrustedDomainPattern = "nekkimobile\\.ru";
 
-	private const string EHGNKEFFJOE = "^https://([^\\/]+\\.|)nekkimobile\\.ru(:[0-9]*)*(\\/([a-zA-Z0-9\\-\\.\\?\\,\\'\\/\\\\\\+&amp;%\\$#_]*)?|)$";
+	private const string TrustedUrlPattern = "^https://([^\\/]+\\.|)nekkimobile\\.ru(:[0-9]*)*(\\/([a-zA-Z0-9\\-\\.\\?\\,\\'\\/\\\\\\+&amp;%\\$#_]*)?|)$";
 
-	public static bool GLHLIEOFFLN(string BEPKJNKCKPH)
+	public static bool IsTrustedUrl(string BEPKJNKCKPH)
 	{
-		return PPMFHMDKNMG(BEPKJNKCKPH);
+		return MatchesTrustedUrl(BEPKJNKCKPH);
 	}
 
-	private static bool PPMFHMDKNMG(string BEPKJNKCKPH)
+	private static bool MatchesTrustedUrl(string BEPKJNKCKPH)
 	{
 		return new Regex("^https://([^\\/]+\\.|)nekkimobile\\.ru(:[0-9]*)*(\\/([a-zA-Z0-9\\-\\.\\?\\,\\'\\/\\\\\\+&amp;%\\$#_]*)?|)$").Matches(BEPKJNKCKPH).Count == 1;
 	}

@@ -2,21 +2,21 @@ using System.Xml;
 
 public class QuestActionActivate : QuestAction
 {
-	private string EKAMIDAEKMK = string.Empty;
+	private string targetActionId = string.Empty;
 
 	public override void Parse(XmlNode EPKLCPOEELO)
 	{
 		base.Parse(EPKLCPOEELO);
-		EKAMIDAEKMK = EPKLCPOEELO.Attributes["ActionID"].CIPOICEEIBK(string.Empty);
+		targetActionId = EPKLCPOEELO.Attributes["ActionID"].GetStringOrDefault(string.Empty);
 	}
 
-	public override void DEJMHFMLKIC(QuestParameters GFIHPBCEEOB)
+	public override void Execute(QuestParameters GFIHPBCEEOB)
 	{
-		base.DEJMHFMLKIC(GFIHPBCEEOB);
-		QuestParameters hHKLFIIBIFF = ListSF.GetInstance().BNMLDPNCMLB();
-		hHKLFIIBIFF.NPMDMOIHBFP = new RosterQuest.NOKCOAHJIPB(EKAMIDAEKMK, EKAMIDAEKMK);
-		ListSF.GetInstance().FFBAJNGHGGD(QuestEvent.PMDPDMFLCIJ.QUEST_EVENT_ACTIVATE);
-		hHKLFIIBIFF.NPMDMOIHBFP = null;
-		OGIJONMKABB();
+		base.Execute(GFIHPBCEEOB);
+		QuestParameters hHKLFIIBIFF = ListSF.GetInstance().GetQuestParameters();
+		hHKLFIIBIFF.actionId = new RosterQuest.QuestVariable(targetActionId, targetActionId);
+		ListSF.GetInstance().RaiseQuestEvent(QuestEvent.QuestEventType.QUEST_EVENT_ACTIVATE);
+		hHKLFIIBIFF.actionId = null;
+		FinishAction();
 	}
 }

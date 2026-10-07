@@ -2,12 +2,12 @@ using System.Xml;
 
 public class RemoveIntervalRule : InFightRule
 {
-	private IntervalAnimation.NGAJJDIEDGF MMNMEBICHMH;
+	private IntervalAnimation.IntervalType intervalType;
 
 	public RemoveIntervalRule(XmlNode node, RuleAppliance EJPOJJKKICO)
-		: base(BCBLLMPAMLP.RuleRemoveInterval, EJPOJJKKICO, node)
+		: base(RuleType.RuleRemoveInterval, EJPOJJKKICO, node)
 	{
-		MMNMEBICHMH = IntervalAnimation.NGAJJDIEDGF.INTERVAL_NONE;
+		intervalType = IntervalAnimation.IntervalType.INTERVAL_NONE;
 		Parse(node);
 	}
 
@@ -19,16 +19,16 @@ public class RemoveIntervalRule : InFightRule
 	public override void InitRule(object data)
 	{
 		RuleInitData oIFPCFEGFOB = (RuleInitData)data;
-		switch (NDBMMPENJNJ)
+		switch (appliance)
 		{
 		case RuleAppliance.AppliancePlayer:
-			oIFPCFEGFOB.DLPKDAIDCBF.PONNDMHBGJK(MMNMEBICHMH);
+			oIFPCFEGFOB.PlayerModel.SuppressInterval(intervalType);
 			break;
 		case RuleAppliance.ApplianceOpponent:
-			oIFPCFEGFOB.OGBHDKKOIGH.PONNDMHBGJK(MMNMEBICHMH);
+			oIFPCFEGFOB.OpponentModel.SuppressInterval(intervalType);
 			break;
 		default:
-			LLLOJBFMONN.Error("RemoveIntervalRule::initRule - wrong player appliance - %i", NDBMMPENJNJ);
+			GameLog.Error("RemoveIntervalRule::initRule - wrong player appliance - %i", appliance);
 			break;
 		}
 	}
@@ -36,28 +36,28 @@ public class RemoveIntervalRule : InFightRule
 	protected override void Parse(XmlNode node)
 	{
 		base.Parse(node);
-		switch (node.Attributes["Type"].CIPOICEEIBK(string.Empty))
+		switch (node.Attributes["Type"].GetStringOrDefault(string.Empty))
 		{
 		case "Attack":
-			MMNMEBICHMH = IntervalAnimation.NGAJJDIEDGF.INTERVAL_ATTACK;
+			intervalType = IntervalAnimation.IntervalType.INTERVAL_ATTACK;
 			break;
 		case "Block":
-			MMNMEBICHMH = IntervalAnimation.NGAJJDIEDGF.INTERVAL_BLOCK;
+			intervalType = IntervalAnimation.IntervalType.INTERVAL_BLOCK;
 			break;
 		case "Invulnerable":
-			MMNMEBICHMH = IntervalAnimation.NGAJJDIEDGF.INTERVAL_INVULNERABLE;
+			intervalType = IntervalAnimation.IntervalType.INTERVAL_INVULNERABLE;
 			break;
 		case "None":
-			MMNMEBICHMH = IntervalAnimation.NGAJJDIEDGF.INTERVAL_NONE;
+			intervalType = IntervalAnimation.IntervalType.INTERVAL_NONE;
 			break;
 		case "SelfUninterrupt":
-			MMNMEBICHMH = IntervalAnimation.NGAJJDIEDGF.INTERVAL_SELF_UNINTERRUPT;
+			intervalType = IntervalAnimation.IntervalType.INTERVAL_SELF_UNINTERRUPT;
 			break;
 		case "Uninterrupt":
-			MMNMEBICHMH = IntervalAnimation.NGAJJDIEDGF.INTERVAL_UNINTERRUPT;
+			intervalType = IntervalAnimation.IntervalType.INTERVAL_UNINTERRUPT;
 			break;
 		case "Unstable":
-			MMNMEBICHMH = IntervalAnimation.NGAJJDIEDGF.INTERVAL_UNSTABLE;
+			intervalType = IntervalAnimation.IntervalType.INTERVAL_UNSTABLE;
 			break;
 		}
 	}
@@ -65,8 +65,8 @@ public class RemoveIntervalRule : InFightRule
 	public override InFightRule Copy()
 	{
 		InFightRule aAJIFBJLJOA = null;
-		RuleAppliance eJPOJJKKICO = EDAKADCHOLE();
-		XmlNode hKPPBKPJOEO = GIFDJEEGCJI().IOJIGDNFCFL();
+		RuleAppliance eJPOJJKKICO = GetAppliance();
+		XmlNode hKPPBKPJOEO = GetXmlSource().GetNode();
 		aAJIFBJLJOA = new RemoveIntervalRule(hKPPBKPJOEO, eJPOJJKKICO);
 		aAJIFBJLJOA.IsRandom = IsRandom;
 		return aAJIFBJLJOA;

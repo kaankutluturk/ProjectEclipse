@@ -6,37 +6,37 @@ using System.Threading;
 public sealed class SampleCookieAuthentication : IAuthenticationProvider
 {
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private Uri HJCGILPDDIG;
+	private Uri authUri;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private string MHIOHGELAGB;
+	private string userName;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private string FDPDIGOJOOG;
+	private string password;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private string HCBJOGDNOBK;
+	private string userRoles;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private bool IHBBEINDOJN;
-
-	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	[CompilerGenerated]
-	private LACLODBGJEI OnAuthenticationSucceded;
+	private bool isPreAuthRequired;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
 	[CompilerGenerated]
-	private BCHANFGJONF OnAuthenticationFailed;
+	private OnAuthenticationSuccededDelegate OnAuthenticationSucceded;
 
-	private HTTPRequest KHHMDBBJJFO;
+	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
+	[CompilerGenerated]
+	private OnAuthenticationFailedDelegate OnAuthenticationFailed;
 
-	private Cookie LLOHIGOHLMI;
+	private HTTPRequest authRequest;
 
-	public Uri JLEHBPMKOCK
+	private Cookie cookie;
+
+	public Uri AuthenticationUri
 	{
 		get
 		{
-			return BDJDPKFCGCH();
+			return GetAuthUri();
 		}
 		private set
 		{
@@ -44,47 +44,47 @@ public sealed class SampleCookieAuthentication : IAuthenticationProvider
 		}
 	}
 
-	public string OEDGKJNJCEA
+	public string UserName
 	{
 		get
 		{
-			return BFFCEKDPNAM();
+			return GetUserName();
 		}
 		private set
 		{
-			IHIOOLDEDBN(value);
+			SetUserName(value);
 		}
 	}
 
-	public string LCIENEOINCL
+	public string Password
 	{
 		get
 		{
-			return LDEFEGOBBGO();
+			return GetPassword();
 		}
 		private set
 		{
-			EOMDIHIOGDO(value);
+			SetPassword(value);
 		}
 	}
 
-	public string NLAFONGMJNL
+	public string UserRoles
 	{
 		get
 		{
-			return NFJMHJJDDHC();
+			return GetUserRoles();
 		}
 		private set
 		{
-			JHPLDAEBAMH(value);
+			SetUserRoles(value);
 		}
 	}
 
-	public bool CBIBNHGGEBI
+	public bool RequiresPreAuth
 	{
 		get
 		{
-			return MCHOHLKGMBI();
+			return GetIsPreAuthRequired();
 		}
 		private set
 		{
@@ -92,188 +92,188 @@ public sealed class SampleCookieAuthentication : IAuthenticationProvider
 		}
 	}
 
-	public event LACLODBGJEI EFCGDJPAJIG
+	public event OnAuthenticationSuccededDelegate AuthenticationSucceeded
 	{
 		add
 		{
-			IJPBAJDFAED(value);
+			AddAuthenticationSucceeded(value);
 		}
 		remove
 		{
-			KFGAHIPDDOF(value);
+			RemoveAuthenticationSucceeded(value);
 		}
 	}
 
-	public event BCHANFGJONF HMIFKIFAFMK
+	public event OnAuthenticationFailedDelegate AuthenticationFailed
 	{
 		add
 		{
-			NEAGLBOCLHI(value);
+			AddAuthenticationFailed(value);
 		}
 		remove
 		{
-			BFANLHDOICD(value);
+			RemoveAuthenticationFailed(value);
 		}
 	}
 
 	public SampleCookieAuthentication(Uri EJLKINNHGHN, string KEJDJHAGBMK, string JMKKKMKEAMI, string NNMKKAKIJCP)
 	{
 		set_AuthUri(EJLKINNHGHN);
-		IHIOOLDEDBN(KEJDJHAGBMK);
-		EOMDIHIOGDO(JMKKKMKEAMI);
-		JHPLDAEBAMH(NNMKKAKIJCP);
+		SetUserName(KEJDJHAGBMK);
+		SetPassword(JMKKKMKEAMI);
+		SetUserRoles(NNMKKAKIJCP);
 		set_IsPreAuthRequired(true);
 	}
 
-	public Uri BDJDPKFCGCH()
+	public Uri GetAuthUri()
 	{
-		return HJCGILPDDIG;
+		return authUri;
 	}
 
 	private void set_AuthUri(Uri value)
 	{
-		HJCGILPDDIG = value;
+		authUri = value;
 	}
 
-	public string BFFCEKDPNAM()
+	public string GetUserName()
 	{
-		return MHIOHGELAGB;
+		return userName;
 	}
 
-	private void IHIOOLDEDBN(string value)
+	private void SetUserName(string value)
 	{
-		MHIOHGELAGB = value;
+		userName = value;
 	}
 
-	public string LDEFEGOBBGO()
+	public string GetPassword()
 	{
-		return FDPDIGOJOOG;
+		return password;
 	}
 
-	private void EOMDIHIOGDO(string value)
+	private void SetPassword(string value)
 	{
-		FDPDIGOJOOG = value;
+		password = value;
 	}
 
-	public string NFJMHJJDDHC()
+	public string GetUserRoles()
 	{
-		return HCBJOGDNOBK;
+		return userRoles;
 	}
 
-	private void JHPLDAEBAMH(string value)
+	private void SetUserRoles(string value)
 	{
-		HCBJOGDNOBK = value;
+		userRoles = value;
 	}
 
-	public bool MCHOHLKGMBI()
+	public bool GetIsPreAuthRequired()
 	{
-		return IHBBEINDOJN;
+		return isPreAuthRequired;
 	}
 
 	private void set_IsPreAuthRequired(bool value)
 	{
-		IHBBEINDOJN = value;
+		isPreAuthRequired = value;
 	}
 
-	public void IJPBAJDFAED(LACLODBGJEI value)
+	public void AddAuthenticationSucceeded(OnAuthenticationSuccededDelegate value)
 	{
-		LACLODBGJEI lACLODBGJEI = OnAuthenticationSucceded;
-		LACLODBGJEI lACLODBGJEI2;
+		OnAuthenticationSuccededDelegate lACLODBGJEI = OnAuthenticationSucceded;
+		OnAuthenticationSuccededDelegate lACLODBGJEI2;
 		do
 		{
 			lACLODBGJEI2 = lACLODBGJEI;
-			lACLODBGJEI = Interlocked.CompareExchange(ref OnAuthenticationSucceded, (LACLODBGJEI)Delegate.Combine(lACLODBGJEI2, value), lACLODBGJEI);
+			lACLODBGJEI = Interlocked.CompareExchange(ref OnAuthenticationSucceded, (OnAuthenticationSuccededDelegate)Delegate.Combine(lACLODBGJEI2, value), lACLODBGJEI);
 		}
 		while ((object)lACLODBGJEI != lACLODBGJEI2);
 	}
 
-	public void KFGAHIPDDOF(LACLODBGJEI value)
+	public void RemoveAuthenticationSucceeded(OnAuthenticationSuccededDelegate value)
 	{
-		LACLODBGJEI lACLODBGJEI = OnAuthenticationSucceded;
-		LACLODBGJEI lACLODBGJEI2;
+		OnAuthenticationSuccededDelegate lACLODBGJEI = OnAuthenticationSucceded;
+		OnAuthenticationSuccededDelegate lACLODBGJEI2;
 		do
 		{
 			lACLODBGJEI2 = lACLODBGJEI;
-			lACLODBGJEI = Interlocked.CompareExchange(ref OnAuthenticationSucceded, (LACLODBGJEI)Delegate.Remove(lACLODBGJEI2, value), lACLODBGJEI);
+			lACLODBGJEI = Interlocked.CompareExchange(ref OnAuthenticationSucceded, (OnAuthenticationSuccededDelegate)Delegate.Remove(lACLODBGJEI2, value), lACLODBGJEI);
 		}
 		while ((object)lACLODBGJEI != lACLODBGJEI2);
 	}
 
-	public void NEAGLBOCLHI(BCHANFGJONF value)
+	public void AddAuthenticationFailed(OnAuthenticationFailedDelegate value)
 	{
-		BCHANFGJONF bCHANFGJONF = OnAuthenticationFailed;
-		BCHANFGJONF bCHANFGJONF2;
+		OnAuthenticationFailedDelegate bCHANFGJONF = OnAuthenticationFailed;
+		OnAuthenticationFailedDelegate bCHANFGJONF2;
 		do
 		{
 			bCHANFGJONF2 = bCHANFGJONF;
-			bCHANFGJONF = Interlocked.CompareExchange(ref OnAuthenticationFailed, (BCHANFGJONF)Delegate.Combine(bCHANFGJONF2, value), bCHANFGJONF);
+			bCHANFGJONF = Interlocked.CompareExchange(ref OnAuthenticationFailed, (OnAuthenticationFailedDelegate)Delegate.Combine(bCHANFGJONF2, value), bCHANFGJONF);
 		}
 		while ((object)bCHANFGJONF != bCHANFGJONF2);
 	}
 
-	public void BFANLHDOICD(BCHANFGJONF value)
+	public void RemoveAuthenticationFailed(OnAuthenticationFailedDelegate value)
 	{
-		BCHANFGJONF bCHANFGJONF = OnAuthenticationFailed;
-		BCHANFGJONF bCHANFGJONF2;
+		OnAuthenticationFailedDelegate bCHANFGJONF = OnAuthenticationFailed;
+		OnAuthenticationFailedDelegate bCHANFGJONF2;
 		do
 		{
 			bCHANFGJONF2 = bCHANFGJONF;
-			bCHANFGJONF = Interlocked.CompareExchange(ref OnAuthenticationFailed, (BCHANFGJONF)Delegate.Remove(bCHANFGJONF2, value), bCHANFGJONF);
+			bCHANFGJONF = Interlocked.CompareExchange(ref OnAuthenticationFailed, (OnAuthenticationFailedDelegate)Delegate.Remove(bCHANFGJONF2, value), bCHANFGJONF);
 		}
 		while ((object)bCHANFGJONF != bCHANFGJONF2);
 	}
 
-	public void MKODIGEMHFN()
+	public void StartAuthentication()
 	{
-		KHHMDBBJJFO = new HTTPRequest(BDJDPKFCGCH(), LAAFHDKKJFL.Post, MNICDCAPDDC);
-		KHHMDBBJJFO.AddField("userName", BFFCEKDPNAM());
-		KHHMDBBJJFO.AddField("Password", LDEFEGOBBGO());
-		KHHMDBBJJFO.AddField("roles", NFJMHJJDDHC());
-		KHHMDBBJJFO.Send();
+		authRequest = new HTTPRequest(GetAuthUri(), HTTPMethods.Post, OnAuthRequestFinished);
+		authRequest.AddField("userName", GetUserName());
+		authRequest.AddField("Password", GetPassword());
+		authRequest.AddField("roles", GetUserRoles());
+		authRequest.Send();
 	}
 
-	public void PrepareRequest(HTTPRequest ONOCIELLAPL, FHIEGKMHOCC LFLGCDNKNJI)
+	public void PrepareRequest(HTTPRequest ONOCIELLAPL, SignalRRequestType LFLGCDNKNJI)
 	{
-		ONOCIELLAPL.HNDADBHDOID().Add(LLOHIGOHLMI);
+		ONOCIELLAPL.GetCookies().Add(cookie);
 	}
 
-	private void MNICDCAPDDC(HTTPRequest CGOIOKHEGOE, HTTPResponse BEIGFGCBICO)
+	private void OnAuthRequestFinished(HTTPRequest CGOIOKHEGOE, HTTPResponse BEIGFGCBICO)
 	{
-		KHHMDBBJJFO = null;
+		authRequest = null;
 		string nEPOLDCKNJL = string.Empty;
-		switch (CGOIOKHEGOE.FLBBFDNHJAJ())
+		switch (CGOIOKHEGOE.GetState())
 		{
-		case CFGBMHKCENK.Finished:
-			if (BEIGFGCBICO.AICKPAMONBH())
+		case HTTPRequestStates.Finished:
+			if (BEIGFGCBICO.GetIsSuccess())
 			{
-				LLOHIGOHLMI = ((BEIGFGCBICO.HNDADBHDOID() == null) ? null : BEIGFGCBICO.HNDADBHDOID().Find((Cookie ILHDJDNPFKH) => ILHDJDNPFKH.get_Name().Equals(".ASPXAUTH")));
-				if (LLOHIGOHLMI != null)
+				cookie = ((BEIGFGCBICO.GetCookies() == null) ? null : BEIGFGCBICO.GetCookies().Find((Cookie ILHDJDNPFKH) => ILHDJDNPFKH.get_Name().Equals(".ASPXAUTH")));
+				if (cookie != null)
 				{
-					HTTPManager.MBBMPNDDPIH().KDAFBLAKBMI("CookieAuthentication", "Auth. Cookie found!");
+					HTTPManager.GetLogger().Information("CookieAuthentication", "Auth. Cookie found!");
 					if (OnAuthenticationSucceded != null)
 					{
 						OnAuthenticationSucceded(this);
 					}
 					return;
 				}
-				HTTPManager.MBBMPNDDPIH().GLCKHLCAPIN("CookieAuthentication", nEPOLDCKNJL = "Auth. Cookie NOT found!");
+				HTTPManager.GetLogger().Warning("CookieAuthentication", nEPOLDCKNJL = "Auth. Cookie NOT found!");
 			}
 			else
 			{
-				HTTPManager.MBBMPNDDPIH().GLCKHLCAPIN("CookieAuthentication", nEPOLDCKNJL = string.Format("Request Finished Successfully, but the server sent an error. Status Code: {0}-{1} Message: {2}", BEIGFGCBICO.KNMDPGBPNED(), BEIGFGCBICO.DCKPMHKDLEJ(), BEIGFGCBICO.DPBLPGKOEJB()));
+				HTTPManager.GetLogger().Warning("CookieAuthentication", nEPOLDCKNJL = string.Format("Request Finished Successfully, but the server sent an error. Status Code: {0}-{1} Message: {2}", BEIGFGCBICO.GetStatusCode(), BEIGFGCBICO.GetMessage(), BEIGFGCBICO.GetDataAsText()));
 			}
 			break;
-		case CFGBMHKCENK.Error:
-			HTTPManager.MBBMPNDDPIH().GLCKHLCAPIN("CookieAuthentication", nEPOLDCKNJL = "Request Finished with Error! " + ((CGOIOKHEGOE.IEFGFKFHNMD() == null) ? "No Exception" : (CGOIOKHEGOE.IEFGFKFHNMD().Message + "\n" + CGOIOKHEGOE.IEFGFKFHNMD().StackTrace)));
+		case HTTPRequestStates.Error:
+			HTTPManager.GetLogger().Warning("CookieAuthentication", nEPOLDCKNJL = "Request Finished with Error! " + ((CGOIOKHEGOE.GetException() == null) ? "No Exception" : (CGOIOKHEGOE.GetException().Message + "\n" + CGOIOKHEGOE.GetException().StackTrace)));
 			break;
-		case CFGBMHKCENK.Aborted:
-			HTTPManager.MBBMPNDDPIH().GLCKHLCAPIN("CookieAuthentication", nEPOLDCKNJL = "Request Aborted!");
+		case HTTPRequestStates.Aborted:
+			HTTPManager.GetLogger().Warning("CookieAuthentication", nEPOLDCKNJL = "Request Aborted!");
 			break;
-		case CFGBMHKCENK.ConnectionTimedOut:
-			HTTPManager.MBBMPNDDPIH().Error("CookieAuthentication", nEPOLDCKNJL = "Connection Timed Out!");
+		case HTTPRequestStates.ConnectionTimedOut:
+			HTTPManager.GetLogger().Error("CookieAuthentication", nEPOLDCKNJL = "Connection Timed Out!");
 			break;
-		case CFGBMHKCENK.TimedOut:
-			HTTPManager.MBBMPNDDPIH().Error("CookieAuthentication", nEPOLDCKNJL = "Processing the request Timed Out!");
+		case HTTPRequestStates.TimedOut:
+			HTTPManager.GetLogger().Error("CookieAuthentication", nEPOLDCKNJL = "Processing the request Timed Out!");
 			break;
 		}
 		if (OnAuthenticationFailed != null)

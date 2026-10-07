@@ -21,15 +21,15 @@ class Program {
   item.Name="test_item";item.ItemLevel=40;item.UpgradeLevel=4000;
   var doc=new XmlDocument();doc.LoadXml("<Item Name='test_item'><Enchantments><Perk Name='test_effect' ItemType='Weapon|Armor'><Set Power='12' Chance='0.3'/></Perk></Enchantments></Item>");
   var reward=new RewardItem(doc.DocumentElement);
-  var original=new FightResult.ResultPrizeStruct{GBGNFPNCGED=500,PNDAIFALIKF=12,exp=30};
-  original.HELFDCAIJNE.Add(new FightResult.LJFFIBFBGID{DLKPBAJDHBO=item,NAIEGGHELIH=reward,IDGKPLBKDIB=true});
+  var original=new FightResult.ResultPrizeStruct{Money=500,Bonus=12,exp=30};
+  original.Items.Add(new FightResult.ItemGrant{Item=item,RewardSource=reward,IsDrop=true});
   var saved=new XmlDocument();saved.AppendChild(ModLotteryPrizeCodec.Write(saved,original));
   var loaded=new XmlDocument();loaded.LoadXml(saved.OuterXml);
   var restored=ModLotteryPrizeCodec.Read(loaded.DocumentElement,(name,level,upgrade)=>item,name=>null,name=>null);
-  Check(restored.GBGNFPNCGED==500&&restored.PNDAIFALIKF==12&&restored.exp==30,"Scalar prize changed");
-  Check(restored.HELFDCAIJNE.Single().DLKPBAJDHBO.UpgradeLevel==4000&&restored.HELFDCAIJNE[0].IDGKPLBKDIB,"Item upgrade/drop changed");
-  var perk=restored.HELFDCAIJNE[0].NAIEGGHELIH.LDLPCOFHFKE.Single();
-  Check(perk.get_Name()=="test_effect"&&perk.NMOKPAPJLCN.SequenceEqual(new[]{"Weapon","Armor"})&&perk.Pairs.Count==2,"Enchantment changed");
+  Check(restored.Money==500&&restored.Bonus==12&&restored.exp==30,"Scalar prize changed");
+  Check(restored.Items.Single().Item.UpgradeLevel==4000&&restored.Items[0].IsDrop,"Item upgrade/drop changed");
+  var perk=restored.Items[0].RewardSource.enchantments.Single();
+  Check(perk.get_Name()=="test_effect"&&perk.ItemTypes.SequenceEqual(new[]{"Weapon","Armor"})&&perk.Pairs.Count==2,"Enchantment changed");
   bool rejected=false;try{ModLotteryPrizeCodec.Read(loaded.DocumentElement,(name,level,upgrade)=>null,name=>null,name=>null);}catch(InvalidDataException){rejected=true;}
   Check(rejected,"Missing item silently lost");
   loaded.DocumentElement.SetAttribute("Format","2");rejected=false;

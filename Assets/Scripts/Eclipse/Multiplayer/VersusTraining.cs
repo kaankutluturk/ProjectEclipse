@@ -199,10 +199,10 @@ namespace Eclipse.Multiplayer
         /// </summary>
         private static void TrackMove(int side, Model model)
         {
-            var animation = model?.OCPMJKIEPIG();
+            var animation = model?.GetAnimationModule();
             // With no move playing (between two moves, or a ragdoll) the finished move's name
             // lingers with frame 0; that must not read as the move restarting.
-            bool playing = animation != null && animation.NMEEPBDJHMG();
+            bool playing = animation != null && animation.GetIsPlaying();
             string name = playing ? model.GetCurrentAnimation()?.Name ?? string.Empty : PhysicsState;
             int frame = playing ? animation.GetFrameInMove() : 0;
             if (name != MoveName[side] || frame < _moveFrame[side])
@@ -225,7 +225,7 @@ namespace Eclipse.Multiplayer
         private static void Refill(Fight fight, Model model)
         {
             if (model == null || model.Parameters == null) return;
-            if (model.KKMCHCNOHMB() < model.Parameters.MaxLife) fight.SetLife(model, model.Parameters.MaxLife);
+            if (model.GetLife() < model.Parameters.MaxLife) fight.SetLife(model, model.Parameters.MaxLife);
         }
 
         private const int MeasureTimeoutTicks = 400;
@@ -236,9 +236,9 @@ namespace Eclipse.Multiplayer
         /// </summary>
         private static bool Busy(Model model)
         {
-            var animation = model?.OCPMJKIEPIG();
+            var animation = model?.GetAnimationModule();
             if (animation == null) return false;
-            return !animation.NMEEPBDJHMG() || animation.HDJBHPOGKNJ(IntervalAnimation.NGAJJDIEDGF.INTERVAL_UNINTERRUPT) != null;
+            return !animation.GetIsPlaying() || animation.FindInterval(IntervalAnimation.IntervalType.INTERVAL_UNINTERRUPT) != null;
         }
 
         /// <summary>"punch_hand_right_2" as "Punch hand right 2".</summary>
@@ -321,8 +321,8 @@ namespace Eclipse.Multiplayer
         {
             var dummy = fight?.GetEnemyModel();
             var player = fight?.GetPlayerModel();
-            var dummyAt = dummy?.PLBNCDCFPML();
-            var playerAt = player?.PLBNCDCFPML();
+            var dummyAt = dummy?.GetPosition();
+            var playerAt = player?.GetPosition();
             bool dummyOnRight = dummyAt == null || playerAt == null || dummyAt.GetX() >= playerAt.GetX();
             int away = dummyOnRight ? Right : Left, toward = dummyOnRight ? Left : Right;
             if (tick % 40 == 0) VersusTraining.RandomGuard = _random.Next(2) == 0;
@@ -342,7 +342,7 @@ namespace Eclipse.Multiplayer
         private static void LogCpuState(Fight fight)
         {
             var dummy = fight?.GetEnemyModel();
-            var tactic = dummy?.Parameters?.HBFMBOHLKPJ;
+            var tactic = dummy?.Parameters?.FightTactic;
             Debug.Log("[Training] CPU dummy: aiControlled=" + (dummy?.Parameters?.AiControlled) + " tactic=" + (tactic?.get_Name() ?? "none") +
                 " aiOn=" + ModelAi.get_AiOn() + " move=" + (dummy?.GetCurrentAnimation()?.Name ?? "none"));
         }

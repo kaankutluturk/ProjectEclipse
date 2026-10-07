@@ -4,67 +4,67 @@ using System.Xml;
 
 public class RosterTimerContainer
 {
-	public enum NKFIIMIKPAO
+	public enum TimerEventType
 	{
 		TIMER_END = 0
 	}
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private XmlNode POFLFMGCMJA;
+	private XmlNode node;
 
-	private List<RosterTimer> ELALCENFCPJ = new List<RosterTimer>();
+	private List<RosterTimer> timers = new List<RosterTimer>();
 
 	public RosterTimerContainer(XmlNode node)
 	{
 		set_Node(node);
-		foreach (XmlNode childNode in LIGMHKEOJBB().ChildNodes)
+		foreach (XmlNode childNode in GetNode().ChildNodes)
 		{
-			POEJBJOHFDP(childNode);
+			AddTimer(childNode);
 		}
 	}
 
-	public XmlNode LIGMHKEOJBB()
+	public XmlNode GetNode()
 	{
-		return POFLFMGCMJA;
+		return node;
 	}
 
 	protected void set_Node(XmlNode value)
 	{
-		POFLFMGCMJA = value;
+		node = value;
 	}
 
-	public List<RosterTimer> NJCNKPFHNHB()
+	public List<RosterTimer> GetTimers()
 	{
-		return ELALCENFCPJ;
+		return timers;
 	}
 
-	public void POEJBJOHFDP(string name, long MCEDKIPLOMO)
+	public void AddTimer(string name, long MCEDKIPLOMO)
 	{
 		RosterTimer nFFICPMLCFD = new RosterTimer(name, MCEDKIPLOMO);
-		POEJBJOHFDP(nFFICPMLCFD);
+		AddTimer(nFFICPMLCFD);
 	}
 
-	public void POEJBJOHFDP(XmlNode node)
+	public void AddTimer(XmlNode node)
 	{
 		RosterTimer nFFICPMLCFD = new RosterTimer(node);
-		POEJBJOHFDP(nFFICPMLCFD);
+		AddTimer(nFFICPMLCFD);
 	}
 
-	public void POEJBJOHFDP(RosterTimer NFFICPMLCFD)
+	public void AddTimer(RosterTimer NFFICPMLCFD)
 	{
-		RosterTimer fPNMILOHPMB = PPCMACMLHCA(NFFICPMLCFD.get_Name());
+		RosterTimer fPNMILOHPMB = FindTimer(NFFICPMLCFD.get_Name());
 		if (fPNMILOHPMB == null)
 		{
-			ELALCENFCPJ.Add(NFFICPMLCFD);
+			timers.Add(NFFICPMLCFD);
 			return;
 		}
-		IPKMLCMAINI(fPNMILOHPMB);
-		POEJBJOHFDP(NFFICPMLCFD);
+		RemoveTimer(fPNMILOHPMB);
+		AddTimer(NFFICPMLCFD);
 	}
 
-	public RosterTimer PPCMACMLHCA(string name)
+	public RosterTimer FindTimer(string name)
 	{
-		foreach (RosterTimer item in ELALCENFCPJ)
+		foreach (RosterTimer item in timers)
 		{
 			if (item.get_Name().Equals(name))
 			{
@@ -74,73 +74,73 @@ public class RosterTimerContainer
 		return null;
 	}
 
-	public void IPKMLCMAINI(string name)
+	public void RemoveTimer(string name)
 	{
-		RosterTimer kIKOMNOGKDK = PPCMACMLHCA(name);
-		IPKMLCMAINI(kIKOMNOGKDK);
+		RosterTimer kIKOMNOGKDK = FindTimer(name);
+		RemoveTimer(kIKOMNOGKDK);
 	}
 
-	public void IPKMLCMAINI(RosterTimer KIKOMNOGKDK)
+	public void RemoveTimer(RosterTimer KIKOMNOGKDK)
 	{
 		if (KIKOMNOGKDK == null)
 		{
 			return;
 		}
-		for (int i = 0; i < ELALCENFCPJ.Count; i++)
+		for (int i = 0; i < timers.Count; i++)
 		{
-			RosterTimer fPNMILOHPMB = ELALCENFCPJ[i];
+			RosterTimer fPNMILOHPMB = timers[i];
 			if (fPNMILOHPMB == KIKOMNOGKDK)
 			{
-				LIGMHKEOJBB().RemoveChild(fPNMILOHPMB.LIGMHKEOJBB());
-				ELALCENFCPJ.Remove(fPNMILOHPMB);
+				GetNode().RemoveChild(fPNMILOHPMB.GetNode());
+				timers.Remove(fPNMILOHPMB);
 				break;
 			}
 		}
 	}
 
-	public void CHGALMBOHAH()
+	public void ResetNode()
 	{
-		XmlNode parentNode = LIGMHKEOJBB().ParentNode;
-		string name = LIGMHKEOJBB().Name;
-		parentNode.RemoveChild(LIGMHKEOJBB());
-		set_Node(parentNode.ACBPMPMPKJJ(name));
+		XmlNode parentNode = GetNode().ParentNode;
+		string name = GetNode().Name;
+		parentNode.RemoveChild(GetNode());
+		set_Node(parentNode.AppendElement(name));
 	}
 
 	public void CheckTimers(long LBIGLJLMIDG)
 	{
 		List<RosterTimer> list = new List<RosterTimer>();
-		foreach (RosterTimer item in ELALCENFCPJ)
+		foreach (RosterTimer item in timers)
 		{
-			if (item.CMIABOOJOEN() <= LBIGLJLMIDG)
+			if (item.GetEndTimeSeconds() <= LBIGLJLMIDG)
 			{
 				list.Add(item);
-				LIOBMNJPHFH(item);
+				FireTimerEnd(item);
 			}
 		}
 		foreach (RosterTimer item2 in list)
 		{
-			IPKMLCMAINI(item2);
+			RemoveTimer(item2);
 		}
 		list.Clear();
 	}
 
-	public void LIOBMNJPHFH(RosterTimer timer)
+	public void FireTimerEnd(RosterTimer timer)
 	{
-		LIOBMNJPHFH(timer.get_Name());
+		FireTimerEnd(timer.get_Name());
 	}
 
-	public void LIOBMNJPHFH(string name)
+	public void FireTimerEnd(string name)
 	{
-		QuestParameters hHKLFIIBIFF = ListSF.GetInstance().BNMLDPNCMLB();
-		hHKLFIIBIFF.NAMGBBCEEEI = name;
-		if (ListSF.GetInstance().FFBAJNGHGGD(QuestEvent.PMDPDMFLCIJ.QUEST_EVENT_TIMER_END))
+		QuestParameters hHKLFIIBIFF = ListSF.GetInstance().GetQuestParameters();
+		hHKLFIIBIFF.timerName = name;
+		if (ListSF.GetInstance().RaiseQuestEvent(QuestEvent.QuestEventType.QUEST_EVENT_TIMER_END))
 		{
-			ListSF.GetInstance().MHHNIPBJNAD();
+			ListSF.GetInstance().RunQuestActions();
 		}
 	}
 
-	public void BBGLKKEMOBF(string EBGIGEGKIBD)
+	public void CancelTimer(string EBGIGEGKIBD)
 	{
-		IPKMLCMAINI(EBGIGEGKIBD);
+		RemoveTimer(EBGIGEGKIBD);
 	}
 }

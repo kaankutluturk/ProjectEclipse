@@ -3,32 +3,32 @@ using System.Collections.Generic;
 
 public sealed class HeartbeatManager
 {
-	private List<IHeartbeat> KBHEHJBEGNK = new List<IHeartbeat>();
+	private List<IHeartbeat> heartbeats = new List<IHeartbeat>();
 
-	private IHeartbeat[] KHPPOHKBABK;
+	private IHeartbeat[] updateArray;
 
 	private DateTime LastUpdate = DateTime.MinValue;
 
-	public void ELAHFBCGAGL(IHeartbeat JJACIFLDCAE)
+	public void Subscribe(IHeartbeat JJACIFLDCAE)
 	{
-		lock (KBHEHJBEGNK)
+		lock (heartbeats)
 		{
-			if (!KBHEHJBEGNK.Contains(JJACIFLDCAE))
+			if (!heartbeats.Contains(JJACIFLDCAE))
 			{
-				KBHEHJBEGNK.Add(JJACIFLDCAE);
+				heartbeats.Add(JJACIFLDCAE);
 			}
 		}
 	}
 
-	public void HKMBDKKHPCB(IHeartbeat JJACIFLDCAE)
+	public void Unsubscribe(IHeartbeat JJACIFLDCAE)
 	{
-		lock (KBHEHJBEGNK)
+		lock (heartbeats)
 		{
-			KBHEHJBEGNK.Remove(JJACIFLDCAE);
+			heartbeats.Remove(JJACIFLDCAE);
 		}
 	}
 
-	public void JLPMOKPFECK()
+	public void Update()
 	{
 		if (LastUpdate == DateTime.MinValue)
 		{
@@ -38,20 +38,20 @@ public sealed class HeartbeatManager
 		TimeSpan oJOKANCMPLG = DateTime.UtcNow - LastUpdate;
 		LastUpdate = DateTime.UtcNow;
 		int num = 0;
-		lock (KBHEHJBEGNK)
+		lock (heartbeats)
 		{
-			if (KHPPOHKBABK == null || KHPPOHKBABK.Length < KBHEHJBEGNK.Count)
+			if (updateArray == null || updateArray.Length < heartbeats.Count)
 			{
-				Array.Resize(ref KHPPOHKBABK, KBHEHJBEGNK.Count);
+				Array.Resize(ref updateArray, heartbeats.Count);
 			}
-			KBHEHJBEGNK.CopyTo(0, KHPPOHKBABK, 0, KBHEHJBEGNK.Count);
-			num = KBHEHJBEGNK.Count;
+			heartbeats.CopyTo(0, updateArray, 0, heartbeats.Count);
+			num = heartbeats.Count;
 		}
 		for (int i = 0; i < num; i++)
 		{
 			try
 			{
-				KHPPOHKBABK[i].OnHeartbeatUpdate(oJOKANCMPLG);
+				updateArray[i].OnHeartbeatUpdate(oJOKANCMPLG);
 			}
 			catch
 			{

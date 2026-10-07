@@ -5,22 +5,22 @@ using System.IO;
 
 public sealed class Deserializer
 {
-	private class NLKHGNDHMPN : ITypeInspector
+	private class TypeDescriptorProxy : ITypeInspector
 	{
-		public ITypeInspector FAOFCLFMJCE;
+		public ITypeInspector TypeDescriptor;
 
-		public IEnumerable<IPropertyDescriptor> GHIBHNJKIHN(Type LFLGCDNKNJI, object EGJHGBCEPHO)
+		public IEnumerable<IPropertyDescriptor> GetProperties(Type LFLGCDNKNJI, object EGJHGBCEPHO)
 		{
-			return FAOFCLFMJCE.GHIBHNJKIHN(LFLGCDNKNJI, EGJHGBCEPHO);
+			return TypeDescriptor.GetProperties(LFLGCDNKNJI, EGJHGBCEPHO);
 		}
 
-		public IPropertyDescriptor DBLHKMEGOEK(Type LFLGCDNKNJI, object EGJHGBCEPHO, string name, bool GNFDAJLHBCN)
+		public IPropertyDescriptor GetProperty(Type LFLGCDNKNJI, object EGJHGBCEPHO, string name, bool GNFDAJLHBCN)
 		{
-			return FAOFCLFMJCE.DBLHKMEGOEK(LFLGCDNKNJI, EGJHGBCEPHO, name, GNFDAJLHBCN);
+			return TypeDescriptor.GetProperty(LFLGCDNKNJI, EGJHGBCEPHO, name, GNFDAJLHBCN);
 		}
 	}
 
-	private static readonly Dictionary<string, Type> LNGMOAOAOJD = new Dictionary<string, Type>
+	private static readonly Dictionary<string, Type> predefinedTagMappings = new Dictionary<string, Type>
 	{
 		{
 			"tag:yaml.org,2002:map",
@@ -48,101 +48,101 @@ public sealed class Deserializer
 		}
 	};
 
-	private readonly Dictionary<string, Type> NKEHCGOLJDA;
+	private readonly Dictionary<string, Type> tagMappings;
 
-	private readonly List<IYamlTypeConverter> JNONHBMNKDK;
+	private readonly List<IYamlTypeConverter> converters;
 
-	private NLKHGNDHMPN GIJPGEHPILC = new NLKHGNDHMPN();
+	private TypeDescriptorProxy typeDescriptor = new TypeDescriptorProxy();
 
-	private FFBEMOKFDNL BMPLGIJNAMB;
-
-	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private IList<INodeDeserializer> GAPFMLMAKEG;
+	private IValueDeserializer valueDeserializer;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private IList<INodeTypeResolver> AIHKIAPGMFP;
+	private IList<INodeDeserializer> nodeDeserializers;
 
-	public IList<INodeDeserializer> JLMLOIPNMMH
+	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
+	private IList<INodeTypeResolver> typeResolvers;
+
+	public IList<INodeDeserializer> NodeDeserializers
 	{
 		get
 		{
-			return BBENCENNNED();
+			return GetNodeDeserializers();
 		}
 		private set
 		{
-			LEJFLAHHNIK(value);
+			SetNodeDeserializers(value);
 		}
 	}
 
-	public IList<INodeTypeResolver> LBEGHDIFABA
+	public IList<INodeTypeResolver> TypeResolvers
 	{
 		get
 		{
-			return MJDOCMKDKCG();
+			return GetTypeResolvers();
 		}
 		private set
 		{
-			LFPINFCODLG(value);
+			SetTypeResolvers(value);
 		}
 	}
 
 	public Deserializer(IObjectFactory EJPHFDCKCCE = null, INamingConvention LELOAKPLJEH = null, bool GNFDAJLHBCN = false)
 	{
 		EJPHFDCKCCE = EJPHFDCKCCE ?? new DefaultObjectFactory();
-		LELOAKPLJEH = LELOAKPLJEH ?? new GCEHGHHBNOA();
-		GIJPGEHPILC.FAOFCLFMJCE = new YamlAttributesTypeInspector(new NamingConventionTypeInspector(new ReadableAndWritablePropertiesTypeInspector(new ReadablePropertiesTypeInspector(new NBGCAMIJKDA())), LELOAKPLJEH));
-		JNONHBMNKDK = new List<IYamlTypeConverter>();
-		foreach (IYamlTypeConverter item in YamlTypeConverters.LGAMHDFHDHG())
+		LELOAKPLJEH = LELOAKPLJEH ?? new NullNamingConvention();
+		typeDescriptor.TypeDescriptor = new YamlAttributesTypeInspector(new NamingConventionTypeInspector(new ReadableAndWritablePropertiesTypeInspector(new ReadablePropertiesTypeInspector(new StaticTypeResolver())), LELOAKPLJEH));
+		converters = new List<IYamlTypeConverter>();
+		foreach (IYamlTypeConverter item in YamlTypeConverters.GetConverters())
 		{
-			JNONHBMNKDK.Add(item);
+			converters.Add(item);
 		}
-		LEJFLAHHNIK(new List<INodeDeserializer>());
-		BBENCENNNED().Add(new TypeConverterNodeDeserializer(JNONHBMNKDK));
-		BBENCENNNED().Add(new NullNodeDeserializer());
-		BBENCENNNED().Add(new ScalarNodeDeserializer());
-		BBENCENNNED().Add(new ArrayNodeDeserializer());
-		BBENCENNNED().Add(new GenericDictionaryNodeDeserializer(EJPHFDCKCCE));
-		BBENCENNNED().Add(new EBINODDAIEO(EJPHFDCKCCE));
-		BBENCENNNED().Add(new GenericCollectionNodeDeserializer(EJPHFDCKCCE));
-		BBENCENNNED().Add(new CNJMKCEKKNN(EJPHFDCKCCE));
-		BBENCENNNED().Add(new EnumerableNodeDeserializer());
-		BBENCENNNED().Add(new ObjectNodeDeserializer(EJPHFDCKCCE, GIJPGEHPILC, GNFDAJLHBCN));
-		NKEHCGOLJDA = new Dictionary<string, Type>(LNGMOAOAOJD);
-		LFPINFCODLG(new List<INodeTypeResolver>());
-		MJDOCMKDKCG().Add(new TagNodeTypeResolver(NKEHCGOLJDA));
-		MJDOCMKDKCG().Add(new CKPADCLAMFF());
-		MJDOCMKDKCG().Add(new FDDLCAEBEHB());
-		BMPLGIJNAMB = new AliasValueDeserializer(new NodeValueDeserializer(BBENCENNNED(), MJDOCMKDKCG()));
+		SetNodeDeserializers(new List<INodeDeserializer>());
+		GetNodeDeserializers().Add(new TypeConverterNodeDeserializer(converters));
+		GetNodeDeserializers().Add(new NullNodeDeserializer());
+		GetNodeDeserializers().Add(new ScalarNodeDeserializer());
+		GetNodeDeserializers().Add(new ArrayNodeDeserializer());
+		GetNodeDeserializers().Add(new GenericDictionaryNodeDeserializer(EJPHFDCKCCE));
+		GetNodeDeserializers().Add(new NonGenericDictionaryNodeDeserializer(EJPHFDCKCCE));
+		GetNodeDeserializers().Add(new GenericCollectionNodeDeserializer(EJPHFDCKCCE));
+		GetNodeDeserializers().Add(new NonGenericListNodeDeserializer(EJPHFDCKCCE));
+		GetNodeDeserializers().Add(new EnumerableNodeDeserializer());
+		GetNodeDeserializers().Add(new ObjectNodeDeserializer(EJPHFDCKCCE, typeDescriptor, GNFDAJLHBCN));
+		tagMappings = new Dictionary<string, Type>(predefinedTagMappings);
+		SetTypeResolvers(new List<INodeTypeResolver>());
+		GetTypeResolvers().Add(new TagNodeTypeResolver(tagMappings));
+		GetTypeResolvers().Add(new TypeNameInTagNodeTypeResolver());
+		GetTypeResolvers().Add(new DefaultContainersNodeTypeResolver());
+		valueDeserializer = new AliasValueDeserializer(new NodeValueDeserializer(GetNodeDeserializers(), GetTypeResolvers()));
 	}
 
-	public IList<INodeDeserializer> BBENCENNNED()
+	public IList<INodeDeserializer> GetNodeDeserializers()
 	{
-		return GAPFMLMAKEG;
+		return nodeDeserializers;
 	}
 
-	private void LEJFLAHHNIK(IList<INodeDeserializer> value)
+	private void SetNodeDeserializers(IList<INodeDeserializer> value)
 	{
-		GAPFMLMAKEG = value;
+		nodeDeserializers = value;
 	}
 
-	public IList<INodeTypeResolver> MJDOCMKDKCG()
+	public IList<INodeTypeResolver> GetTypeResolvers()
 	{
-		return AIHKIAPGMFP;
+		return typeResolvers;
 	}
 
-	private void LFPINFCODLG(IList<INodeTypeResolver> value)
+	private void SetTypeResolvers(IList<INodeTypeResolver> value)
 	{
-		AIHKIAPGMFP = value;
+		typeResolvers = value;
 	}
 
 	public void RegisterTagMapping(string EDLADAAKMDF, Type LFLGCDNKNJI)
 	{
-		NKEHCGOLJDA.Add(EDLADAAKMDF, LFLGCDNKNJI);
+		tagMappings.Add(EDLADAAKMDF, LFLGCDNKNJI);
 	}
 
-	public void JCPBBODBIBI(IYamlTypeConverter OOBNDNCCFJI)
+	public void RegisterTypeConverter(IYamlTypeConverter OOBNDNCCFJI)
 	{
-		JNONHBMNKDK.Add(OOBNDNCCFJI);
+		converters.Add(OOBNDNCCFJI);
 	}
 
 	public T Deserialize<T>(TextReader NILNDHEKNLJ)
@@ -157,7 +157,7 @@ public sealed class Deserializer
 
 	public object Deserialize(TextReader NILNDHEKNLJ, Type LFLGCDNKNJI)
 	{
-		return Deserialize(new EventReader(new APMHDDIADMF(NILNDHEKNLJ)), LFLGCDNKNJI);
+		return Deserialize(new EventReader(new YamlEventParser(NILNDHEKNLJ)), LFLGCDNKNJI);
 	}
 
 	public T Deserialize<T>(EventReader reader)
@@ -180,24 +180,24 @@ public sealed class Deserializer
 		{
 			throw new ArgumentNullException("type");
 		}
-		bool flag = reader.GNNPKHDPGLN<StreamStart>() != null;
-		bool flag2 = reader.GNNPKHDPGLN<DocumentStart>() != null;
+		bool flag = reader.Allow<StreamStart>() != null;
+		bool flag2 = reader.Allow<DocumentStart>() != null;
 		object result = null;
-		if (!reader.GPHIFFOGOGN<DocumentEnd>() && !reader.GPHIFFOGOGN<HNKFEGCMBJB>())
+		if (!reader.Accept<DocumentEnd>() && !reader.Accept<StreamEndEvent>())
 		{
 			using (SerializerState mLKGCMPCCCB = new SerializerState())
 			{
-				result = BMPLGIJNAMB.BBNMBCMJOFM(reader, LFLGCDNKNJI, mLKGCMPCCCB, BMPLGIJNAMB);
-				mLKGCMPCCCB.INOFEFDGNFL();
+				result = valueDeserializer.DeserializeValue(reader, LFLGCDNKNJI, mLKGCMPCCCB, valueDeserializer);
+				mLKGCMPCCCB.OnDeserialization();
 			}
 		}
 		if (flag2)
 		{
-			reader.DODGGCGJJLL<DocumentEnd>();
+			reader.Expect<DocumentEnd>();
 		}
 		if (flag)
 		{
-			reader.DODGGCGJJLL<HNKFEGCMBJB>();
+			reader.Expect<StreamEndEvent>();
 		}
 		return result;
 	}

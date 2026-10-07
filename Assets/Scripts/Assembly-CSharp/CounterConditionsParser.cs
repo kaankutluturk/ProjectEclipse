@@ -3,22 +3,22 @@ using System.Xml;
 
 public static class CounterConditionsParser
 {
-	public static List<ConditionCounter> EPCNPJEALBH(XmlNode node)
+	public static List<ConditionCounter> ParseConditions(XmlNode node)
 	{
 		List<ConditionCounter> list = new List<ConditionCounter>();
-		EPCNPJEALBH(node, list);
+		ParseConditions(node, list);
 		return list;
 	}
 
-	public static void EPCNPJEALBH(XmlNode EBLIGDMALEA, List<ConditionCounter> DCJLKCFKCOM)
+	public static void ParseConditions(XmlNode EBLIGDMALEA, List<ConditionCounter> DCJLKCFKCOM)
 	{
 		foreach (XmlNode childNode in EBLIGDMALEA.ChildNodes)
 		{
-			DCJLKCFKCOM.Add(DKPIKJMJPPH(childNode));
+			DCJLKCFKCOM.Add(ParseCondition(childNode));
 		}
 	}
 
-	public static ConditionCounter DKPIKJMJPPH(XmlNode node)
+	public static ConditionCounter ParseCondition(XmlNode node)
 	{
 		string name = node.Name;
 		if (name == "Battle")
@@ -29,11 +29,11 @@ public static class CounterConditionsParser
 		{
 			return new ConditionOperator(node);
 		}
-		LLLOJBFMONN.Error(string.Format("CounterConditionsParser::parseCondition - %s", name));
+		GameLog.Error(string.Format("CounterConditionsParser::parseCondition - %s", name));
 		return null;
 	}
 
-	public static void FDABJKODMAI(XmlNode EBLIGDMALEA, ConditionOperator FMFMOPOJBOH, ConditionOfCompletionInspector GLKOKIOFOMD)
+	public static void ParseCompletionConditions(XmlNode EBLIGDMALEA, ConditionOperator FMFMOPOJBOH, ConditionOfCompletionInspector GLKOKIOFOMD)
 	{
 		foreach (XmlNode childNode in EBLIGDMALEA.ChildNodes)
 		{
@@ -43,23 +43,23 @@ public static class CounterConditionsParser
 			case "Battle":
 			{
 				ConditionBattle ePJGLECOIBG2 = new ConditionBattle(childNode);
-				FMFMOPOJBOH.BFPIIJDAEME(ePJGLECOIBG2);
+				FMFMOPOJBOH.AddCondition(ePJGLECOIBG2);
 				break;
 			}
 			case "Operator":
 			{
 				ConditionOperator ePJGLECOIBG = new ConditionOperator(childNode);
-				FMFMOPOJBOH.BFPIIJDAEME(ePJGLECOIBG);
+				FMFMOPOJBOH.AddCondition(ePJGLECOIBG);
 				break;
 			}
 			case "WinBattle":
 			{
 				ConditionOfCompletionBattle iOFGGOCEIAM = new ConditionOfCompletionBattle(childNode);
-				GLKOKIOFOMD.CHDLHMGPDHL(iOFGGOCEIAM);
+				GLKOKIOFOMD.AddCondition(iOFGGOCEIAM);
 				break;
 			}
 			default:
-				LLLOJBFMONN.Error(string.Format("CounterConditionsParser::parseCondition - %s", name));
+				GameLog.Error(string.Format("CounterConditionsParser::parseCondition - %s", name));
 				break;
 			}
 		}

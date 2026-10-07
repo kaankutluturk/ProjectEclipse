@@ -6,31 +6,31 @@ public class NekkiUri : Uri
 {
 	private readonly string _fileName;
 
-	private readonly string JOALONLENKO;
+	private readonly string _fileNameWithExtension;
 
-	private readonly string FPNPKCMKMOI;
+	private readonly string _extension;
 
 	public string FileName
 	{
 		get
 		{
-			return EPDMGFELIMC();
+			return GetFileName();
 		}
 	}
 
-	public string INECMLIOKNJ
+	public string FullFileName
 	{
 		get
 		{
-			return CABNCDDFCNN();
+			return GetFullFileName();
 		}
 	}
 
-	public string HBGKLIGDCKI
+	public string Extension
 	{
 		get
 		{
-			return GNHBNGDDOGG();
+			return GetExtension();
 		}
 	}
 
@@ -38,23 +38,23 @@ public class NekkiUri : Uri
 		: base(GDJGOEDDJIJ)
 	{
 		_fileName = Path.GetFileNameWithoutExtension(GDJGOEDDJIJ);
-		JOALONLENKO = Path.GetFileName(base.LocalPath);
-		FPNPKCMKMOI = Path.GetExtension(base.LocalPath);
+		_fileNameWithExtension = Path.GetFileName(base.LocalPath);
+		_extension = Path.GetExtension(base.LocalPath);
 	}
 
-	public string EPDMGFELIMC()
+	public string GetFileName()
 	{
 		return _fileName;
 	}
 
-	public string CABNCDDFCNN()
+	public string GetFullFileName()
 	{
-		return JOALONLENKO;
+		return _fileNameWithExtension;
 	}
 
-	public string GNHBNGDDOGG()
+	public string GetExtension()
 	{
-		return FPNPKCMKMOI;
+		return _extension;
 	}
 
 	public override string ToString()

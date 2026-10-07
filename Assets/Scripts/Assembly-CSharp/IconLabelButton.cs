@@ -7,7 +7,7 @@ public class IconLabelButton : LabelButton
 	[SerializeField]
 	private ResolutionImage _icon;
 
-	public ResolutionImage MJBPMLCLMFN
+	public ResolutionImage IconImage
 	{
 		get
 		{

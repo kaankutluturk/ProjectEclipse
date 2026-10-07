@@ -33,22 +33,22 @@ public class ConditionAnimation
         ECLIPSE_CHARACTER = 25
 	}
 
-	protected ModelType.KEIDBIOIFGA OOFFOILONLO;
+	protected ModelType.ModelTargetType _targetModelType;
 
 	public ConditionType Type;
 
 	public bool IsNot;
 
 	// best guess for name
-	public ModelType.KEIDBIOIFGA TargetModelType
+	public ModelType.ModelTargetType TargetModelType
 	{
 		get
 		{
-			return FHBAPKNECOM();
+			return GetTargetModelType();
 		}
 		set
 		{
-			GNPMNEDOFPB(value);
+			SetTargetModelType(value);
 		}
 	}
 
@@ -58,14 +58,14 @@ public class ConditionAnimation
 		IsNot = false;
 	}
 
-	public ModelType.KEIDBIOIFGA FHBAPKNECOM()
+	public ModelType.ModelTargetType GetTargetModelType()
 	{
-		return OOFFOILONLO;
+		return _targetModelType;
 	}
 
-	public void GNPMNEDOFPB(ModelType.KEIDBIOIFGA value)
+	public void SetTargetModelType(ModelType.ModelTargetType value)
 	{
-		OOFFOILONLO = value;
+		_targetModelType = value;
 	}
 
 	public virtual void Init()
@@ -74,23 +74,23 @@ public class ConditionAnimation
 
 	public virtual bool IsEqual(ModelConditions conditions)
 	{
-		LLLOJBFMONN.Error("ERROR: Unknown condition type checked: " + Type);
+		GameLog.Error("ERROR: Unknown condition type checked: " + Type);
 		return false;
 	}
 
 	public virtual bool IsEqual(Model ACENLMONNPA, InfoAnimation DBOLBEOCEME)
 	{
-		return IsEqual(ACENLMONNPA.EBABHGHPLFK());
+		return IsEqual(ACENLMONNPA.GetConditions());
 	}
 
 	public virtual void Parse(XmlNode BGPKIKNPIKP)
 	{
 		IsNot = XmlUtils.ParseBool(BGPKIKNPIKP.Attributes["Not"]);
-		OOFFOILONLO = ModelType.EHFNOBFLAHI(XmlUtils.ParseString(BGPKIKNPIKP.Attributes["Player"], "Me"));
+		_targetModelType = ModelType.ParseTargetType(XmlUtils.ParseString(BGPKIKNPIKP.Attributes["Player"], "Me"));
 		Init();
 	}
 
-	private static int IOFDJJIABEO(List<ConditionAnimation> BBNKIBKPBLO, ConditionType KLFPAELMPJL, List<ConditionAnimation> GKHEPKGMEFI)
+	private static int CollectConditionsOfType(List<ConditionAnimation> BBNKIBKPBLO, ConditionType KLFPAELMPJL, List<ConditionAnimation> GKHEPKGMEFI)
 	{
 		int count = GKHEPKGMEFI.Count;
 		foreach (ConditionAnimation item in BBNKIBKPBLO)
@@ -105,20 +105,20 @@ public class ConditionAnimation
 				if (eLFKOGJJNMN != null)
 				{
 					List<ConditionAnimation> bBNKIBKPBLO = eLFKOGJJNMN.GetConditions();
-					IOFDJJIABEO(bBNKIBKPBLO, KLFPAELMPJL, GKHEPKGMEFI);
+					CollectConditionsOfType(bBNKIBKPBLO, KLFPAELMPJL, GKHEPKGMEFI);
 				}
 			}
 		}
 		return GKHEPKGMEFI.Count - count;
 	}
 
-	public virtual Model DKDAKGDMHAL(Model BPBMKGHEEBI, ModelType.KEIDBIOIFGA LFLGCDNKNJI)
+	public virtual Model ResolveTargetModel(Model BPBMKGHEEBI, ModelType.ModelTargetType LFLGCDNKNJI)
 	{
-		return BPBMKGHEEBI.NMGNPBMFJKP(LFLGCDNKNJI);
+		return BPBMKGHEEBI.GetModelByType(LFLGCDNKNJI);
 	}
 
-	public virtual void MJFKNEHGNMB(ModelType.KEIDBIOIFGA LFLGCDNKNJI)
+	public virtual void ApplyTargetModelType(ModelType.ModelTargetType LFLGCDNKNJI)
 	{
-		OOFFOILONLO = LFLGCDNKNJI;
+		_targetModelType = LFLGCDNKNJI;
 	}
 }

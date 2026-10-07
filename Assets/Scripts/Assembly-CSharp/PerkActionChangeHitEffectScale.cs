@@ -4,13 +4,13 @@ using System.Xml;
 public class PerkActionChangeHitEffectScale : PerkAction
 {
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private float LFMJEGFEAPD;
+	private float _hitEffectScale;
 
-	public float JNKHFJJGJAF
+	public float EffectScale
 	{
 		get
 		{
-			return DNOILFCGCGD();
+			return GetHitEffectScale();
 		}
 		protected set
 		{
@@ -26,17 +26,17 @@ public class PerkActionChangeHitEffectScale : PerkAction
 	public PerkActionChangeHitEffectScale(PerkActionChangeHitEffectScale NOLFMPDGCOC)
 		: base(NOLFMPDGCOC)
 	{
-		set_HitEffectScale(NOLFMPDGCOC.DNOILFCGCGD());
+		set_HitEffectScale(NOLFMPDGCOC.GetHitEffectScale());
 	}
 
-	public float DNOILFCGCGD()
+	public float GetHitEffectScale()
 	{
-		return LFMJEGFEAPD;
+		return _hitEffectScale;
 	}
 
 	protected void set_HitEffectScale(float value)
 	{
-		LFMJEGFEAPD = value;
+		_hitEffectScale = value;
 	}
 
 	public override void Parse(XmlNode node)

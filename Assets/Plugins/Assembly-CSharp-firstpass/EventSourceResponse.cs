@@ -8,7 +8,7 @@ using System.Threading;
 internal sealed class EventSourceResponse : HTTPResponse, IProtocol
 {
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private bool KCCENMDNOOK;
+	private bool isClosed;
 
 	public Action<EventSourceResponse, Message> OnMessage;
 
@@ -22,15 +22,15 @@ internal sealed class EventSourceResponse : HTTPResponse, IProtocol
 
 	private int LineBufferPos;
 
-	private Message BCHHNNNFDGI;
+	private Message currentMessage;
 
-	private List<Message> PJLMDEGNKJK = new List<Message>();
+	private List<Message> completedMessages = new List<Message>();
 
-	public bool BILHEJLBKMF
+	public bool IsConnectionClosed
 	{
 		get
 		{
-			return HDDABMLNDPK();
+			return GetIsClosed();
 		}
 		private set
 		{
@@ -41,42 +41,42 @@ internal sealed class EventSourceResponse : HTTPResponse, IProtocol
 	internal EventSourceResponse(HTTPRequest ONOCIELLAPL, Stream ABJIEFMMIEK, bool IBIIADCLKCH, bool PEAJIKCANHP)
 		: base(ONOCIELLAPL, ABJIEFMMIEK, IBIIADCLKCH, PEAJIKCANHP)
 	{
-		DFIAKBONHGB(true);
+		SetIsClosedManually(true);
 	}
 
-	public bool HDDABMLNDPK()
+	public bool GetIsClosed()
 	{
-		return KCCENMDNOOK;
+		return isClosed;
 	}
 
 	private void set_IsClosed(bool value)
 	{
-		KCCENMDNOOK = value;
+		isClosed = value;
 	}
 
 	internal override bool Receive(int JHFPNBPNHEH = -1, bool NDCKHEGBAGO = true)
 	{
 		bool flag = base.Receive(JHFPNBPNHEH, false);
-		GCDKHOCDONK(flag && KNMDPGBPNED() == 200 && HasHeaderWithValue("content-type", "text/event-stream"));
-		if (!ODOHODEENIB())
+		SetIsUpgraded(flag && GetStatusCode() == 200 && HasHeaderWithValue("content-type", "text/event-stream"));
+		if (!GetIsUpgraded())
 		{
 			ReadPayload(JHFPNBPNHEH);
 		}
 		return flag;
 	}
 
-	internal void PBAFKNHCJHD()
+	internal void StartReceive()
 	{
-		if (ODOHODEENIB())
+		if (GetIsUpgraded())
 		{
-			ReceiverThread = new System.Threading.Thread(PCFDLMGIEKG);
+			ReceiverThread = new System.Threading.Thread(ReceiveThreadFunc);
 			ReceiverThread.Name = "EventSource Receiver Thread";
 			ReceiverThread.IsBackground = true;
 			ReceiverThread.Start();
 		}
 	}
 
-	private void PCFDLMGIEKG()
+	private void ReceiveThreadFunc()
 	{
 		try
 		{
@@ -91,12 +91,12 @@ internal sealed class EventSourceResponse : HTTPResponse, IProtocol
 		}
 		catch (ThreadAbortException)
 		{
-			KEEGKCNNPGM.set_State(CFGBMHKCENK.Aborted);
+			BaseRequest.set_State(HTTPRequestStates.Aborted);
 		}
 		catch (Exception bAINMLLIKOL)
 		{
-			KEEGKCNNPGM.set_Exception(bAINMLLIKOL);
-			KEEGKCNNPGM.set_State(CFGBMHKCENK.Error);
+			BaseRequest.set_Exception(bAINMLLIKOL);
+			BaseRequest.set_State(HTTPRequestStates.Error);
 		}
 		finally
 		{
@@ -125,11 +125,11 @@ internal sealed class EventSourceResponse : HTTPResponse, IProtocol
 				num2 += num3;
 			}
 			while (num2 < num);
-			KMDCCLDLOJL(array, num2);
-			HTTPResponse.JJFJFNEFOHK(ABJIEFMMIEK, 10);
+			FeedData(array, num2);
+			HTTPResponse.ReadTo(ABJIEFMMIEK, 10);
 			num = ReadChunkLength(ABJIEFMMIEK);
 		}
-		NEECNIHNFGI(ABJIEFMMIEK);
+		ReadHeaders(ABJIEFMMIEK);
 	}
 
 	private new void ReadRaw(Stream ABJIEFMMIEK, int HDIIBKGCCNB)
@@ -139,12 +139,12 @@ internal sealed class EventSourceResponse : HTTPResponse, IProtocol
 		do
 		{
 			num = ABJIEFMMIEK.Read(array, 0, array.Length);
-			KMDCCLDLOJL(array, num);
+			FeedData(array, num);
 		}
 		while (num > 0);
 	}
 
-	public void KMDCCLDLOJL(byte[] buffer, int count)
+	public void FeedData(byte[] buffer, int count)
 	{
 		if (count == -1)
 		{
@@ -190,24 +190,24 @@ internal sealed class EventSourceResponse : HTTPResponse, IProtocol
 			{
 				break;
 			}
-			HPDBMAIMJKJ(LineBuffer, LineBufferPos);
+			ParseLine(LineBuffer, LineBufferPos);
 			LineBufferPos = 0;
 			num += num2 + num3;
 		}
 		while (num2 != -1 && num < count);
 	}
 
-	private void HPDBMAIMJKJ(byte[] buffer, int count)
+	private void ParseLine(byte[] buffer, int count)
 	{
 		if (count == 0)
 		{
-			if (BCHHNNNFDGI != null)
+			if (currentMessage != null)
 			{
 				lock (FrameLock)
 				{
-					PJLMDEGNKJK.Add(BCHHNNNFDGI);
+					completedMessages.Add(currentMessage);
 				}
-				BCHHNNNFDGI = null;
+				currentMessage = null;
 			}
 		}
 		else
@@ -249,27 +249,27 @@ internal sealed class EventSourceResponse : HTTPResponse, IProtocol
 				text = Encoding.UTF8.GetString(buffer, 0, count);
 				text2 = string.Empty;
 			}
-			if (BCHHNNNFDGI == null)
+			if (currentMessage == null)
 			{
-				BCHHNNNFDGI = new Message();
+				currentMessage = new Message();
 			}
 			switch (text)
 			{
 			case "id":
-				BCHHNNNFDGI.MKAMABIPHEN(text2);
+				currentMessage.SetId(text2);
 				break;
 			case "event":
-				BCHHNNNFDGI.set_Event(text2);
+				currentMessage.set_Event(text2);
 				break;
 			case "data":
 			{
-				if (BCHHNNNFDGI.CHIGLEKCFFN() != null)
+				if (currentMessage.GetData() != null)
 				{
-					Message bCHHNNNFDGI = BCHHNNNFDGI;
-					bCHHNNNFDGI.set_Data(bCHHNNNFDGI.CHIGLEKCFFN() + Environment.NewLine);
+					Message bCHHNNNFDGI = currentMessage;
+					bCHHNNNFDGI.set_Data(bCHHNNNFDGI.GetData() + Environment.NewLine);
 				}
-				Message bCHHNNNFDGI2 = BCHHNNNFDGI;
-				bCHHNNNFDGI2.set_Data(bCHHNNNFDGI2.CHIGLEKCFFN() + text2);
+				Message bCHHNNNFDGI2 = currentMessage;
+				bCHHNNNFDGI2.set_Data(bCHHNNNFDGI2.GetData() + text2);
 				break;
 			}
 			case "retry":
@@ -277,7 +277,7 @@ internal sealed class EventSourceResponse : HTTPResponse, IProtocol
 				int result;
 				if (int.TryParse(text2, out result))
 				{
-					BCHHNNNFDGI.set_Retry(TimeSpan.FromMilliseconds(result));
+					currentMessage.set_Retry(TimeSpan.FromMilliseconds(result));
 				}
 				break;
 			}
@@ -289,30 +289,30 @@ internal sealed class EventSourceResponse : HTTPResponse, IProtocol
 	{
 		lock (FrameLock)
 		{
-			if (PJLMDEGNKJK.Count > 0)
+			if (completedMessages.Count > 0)
 			{
 				if (OnMessage != null)
 				{
-					for (int i = 0; i < PJLMDEGNKJK.Count; i++)
+					for (int i = 0; i < completedMessages.Count; i++)
 					{
 						try
 						{
-							OnMessage(this, PJLMDEGNKJK[i]);
+							OnMessage(this, completedMessages[i]);
 						}
 						catch (Exception mPFFFAOGBJE)
 						{
-							HTTPManager.MBBMPNDDPIH().COHEDILAHFD("EventSourceMessage", "HandleEvents - OnMessage", mPFFFAOGBJE);
+							HTTPManager.GetLogger().Exception("EventSourceMessage", "HandleEvents - OnMessage", mPFFFAOGBJE);
 						}
 					}
 				}
-				PJLMDEGNKJK.Clear();
+				completedMessages.Clear();
 			}
 		}
-		if (!HDDABMLNDPK())
+		if (!GetIsClosed())
 		{
 			return;
 		}
-		PJLMDEGNKJK.Clear();
+		completedMessages.Clear();
 		if (OnClosed == null)
 		{
 			return;
@@ -323,7 +323,7 @@ internal sealed class EventSourceResponse : HTTPResponse, IProtocol
 		}
 		catch (Exception mPFFFAOGBJE2)
 		{
-			HTTPManager.MBBMPNDDPIH().COHEDILAHFD("EventSourceMessage", "HandleEvents - OnClosed", mPFFFAOGBJE2);
+			HTTPManager.GetLogger().Exception("EventSourceMessage", "HandleEvents - OnClosed", mPFFFAOGBJE2);
 		}
 		finally
 		{

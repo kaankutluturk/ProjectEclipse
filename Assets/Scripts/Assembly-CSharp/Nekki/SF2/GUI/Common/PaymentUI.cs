@@ -17,7 +17,7 @@ namespace Nekki.SF2.GUI.Common
 		[SerializeField]
 		private UnityEvent _OnProductsUpdateEvent;
 
-		public UnityEvent OKHAFPANIDB
+		public UnityEvent ProductsUpdateEvent
 		{
 			get
 			{
@@ -33,139 +33,139 @@ namespace Nekki.SF2.GUI.Common
 		protected override void Init()
 		{
 			base.Init();
-			ADEKACKLIJG aDEKACKLIJG = ICFMIHIKGOD.OFFDIMCJOIC();
-			aDEKACKLIJG.JILHGHCHDKN = (Action<string>)Delegate.Combine(aDEKACKLIJG.JILHGHCHDKN, new Action<string>(ABAEDAIOHDI));
-			ADEKACKLIJG aDEKACKLIJG2 = ICFMIHIKGOD.OFFDIMCJOIC();
-			aDEKACKLIJG2.JEAJAJMDPNL = (Action<string>)Delegate.Combine(aDEKACKLIJG2.JEAJAJMDPNL, new Action<string>(FBGKOONDOHL));
-			ADEKACKLIJG aDEKACKLIJG3 = ICFMIHIKGOD.OFFDIMCJOIC();
-			aDEKACKLIJG3.ENCIAJBEOEA = (Action<string, PurchaseFailureReason>)Delegate.Combine(aDEKACKLIJG3.ENCIAJBEOEA, new Action<string, PurchaseFailureReason>(GJEBBAGEDKK));
-			ADEKACKLIJG aDEKACKLIJG4 = ICFMIHIKGOD.OFFDIMCJOIC();
-			aDEKACKLIJG4.DFOLPLOOOHK = (Action<string>)Delegate.Combine(aDEKACKLIJG4.DFOLPLOOOHK, new Action<string>(AMBJFJMOKDI));
-			ADEKACKLIJG aDEKACKLIJG5 = ICFMIHIKGOD.OFFDIMCJOIC();
-			aDEKACKLIJG5.OEIIAGKHMKN = (Action<string>)Delegate.Combine(aDEKACKLIJG5.OEIIAGKHMKN, new Action<string>(LBPCIPJANAE));
-			ADEKACKLIJG aDEKACKLIJG6 = ICFMIHIKGOD.OFFDIMCJOIC();
-			aDEKACKLIJG6.GMKLFLAKKOJ = (Action)Delegate.Combine(aDEKACKLIJG6.GMKLFLAKKOJ, new Action(JLDACFNJGGE));
-			ADEKACKLIJG aDEKACKLIJG7 = ICFMIHIKGOD.OFFDIMCJOIC();
-			aDEKACKLIJG7.MDBFKAJKPEH = (Action)Delegate.Combine(aDEKACKLIJG7.MDBFKAJKPEH, new Action(CEONLIFENPM));
-			ADEKACKLIJG aDEKACKLIJG8 = ICFMIHIKGOD.OFFDIMCJOIC();
-			aDEKACKLIJG8.CIIDFBBIICE = (Action)Delegate.Combine(aDEKACKLIJG8.CIIDFBBIICE, new Action(LCHCKOKGFHK));
-			ICFMIHIKGOD.OFFDIMCJOIC().BKFGAIHBCHL();
-			ICFMIHIKGOD.DCPEBKEGOHG();
+			PaymentStore aDEKACKLIJG = PaymentManager.GetStore();
+			aDEKACKLIJG.OnPurchaseCancelled = (Action<string>)Delegate.Combine(aDEKACKLIJG.OnPurchaseCancelled, new Action<string>(OnPurchaseDismissed));
+			PaymentStore aDEKACKLIJG2 = PaymentManager.GetStore();
+			aDEKACKLIJG2.OnPurchaseSucceeded = (Action<string>)Delegate.Combine(aDEKACKLIJG2.OnPurchaseSucceeded, new Action<string>(OnPurchaseSucceeded));
+			PaymentStore aDEKACKLIJG3 = PaymentManager.GetStore();
+			aDEKACKLIJG3.OnPurchaseFailed = (Action<string, PurchaseFailureReason>)Delegate.Combine(aDEKACKLIJG3.OnPurchaseFailed, new Action<string, PurchaseFailureReason>(OnPurchaseFailed));
+			PaymentStore aDEKACKLIJG4 = PaymentManager.GetStore();
+			aDEKACKLIJG4.OnPurchaseRejected = (Action<string>)Delegate.Combine(aDEKACKLIJG4.OnPurchaseRejected, new Action<string>(OnPurchaseUnsuccessful));
+			PaymentStore aDEKACKLIJG5 = PaymentManager.GetStore();
+			aDEKACKLIJG5.OnVerificationNoResponse = (Action<string>)Delegate.Combine(aDEKACKLIJG5.OnVerificationNoResponse, new Action<string>(OnServerNoResponse));
+			PaymentStore aDEKACKLIJG6 = PaymentManager.GetStore();
+			aDEKACKLIJG6.OnRestoreCompleted = (Action)Delegate.Combine(aDEKACKLIJG6.OnRestoreCompleted, new Action(OnPurchaseFlowFinished));
+			PaymentStore aDEKACKLIJG7 = PaymentManager.GetStore();
+			aDEKACKLIJG7.OnRestoreFailed = (Action)Delegate.Combine(aDEKACKLIJG7.OnRestoreFailed, new Action(OnConnectionFailed));
+			PaymentStore aDEKACKLIJG8 = PaymentManager.GetStore();
+			aDEKACKLIJG8.OnInitialized = (Action)Delegate.Combine(aDEKACKLIJG8.OnInitialized, new Action(OnProductsUpdated));
+			PaymentManager.GetStore().LoadProducts();
+			PaymentManager.ProcessPendingPayments();
 		}
 
-		protected override void PJNFHNFLNNO()
+		protected override void OnModuleShutdown()
 		{
-			base.PJNFHNFLNNO();
-			if (ICFMIHIKGOD.OFFDIMCJOIC() != null)
+			base.OnModuleShutdown();
+			if (PaymentManager.GetStore() != null)
 			{
-				ADEKACKLIJG aDEKACKLIJG = ICFMIHIKGOD.OFFDIMCJOIC();
-				aDEKACKLIJG.JILHGHCHDKN = (Action<string>)Delegate.Remove(aDEKACKLIJG.JILHGHCHDKN, new Action<string>(ABAEDAIOHDI));
-				ADEKACKLIJG aDEKACKLIJG2 = ICFMIHIKGOD.OFFDIMCJOIC();
-				aDEKACKLIJG2.JEAJAJMDPNL = (Action<string>)Delegate.Remove(aDEKACKLIJG2.JEAJAJMDPNL, new Action<string>(FBGKOONDOHL));
-				ADEKACKLIJG aDEKACKLIJG3 = ICFMIHIKGOD.OFFDIMCJOIC();
-				aDEKACKLIJG3.ENCIAJBEOEA = (Action<string, PurchaseFailureReason>)Delegate.Remove(aDEKACKLIJG3.ENCIAJBEOEA, new Action<string, PurchaseFailureReason>(GJEBBAGEDKK));
-				ADEKACKLIJG aDEKACKLIJG4 = ICFMIHIKGOD.OFFDIMCJOIC();
-				aDEKACKLIJG4.DFOLPLOOOHK = (Action<string>)Delegate.Remove(aDEKACKLIJG4.DFOLPLOOOHK, new Action<string>(AMBJFJMOKDI));
-				ADEKACKLIJG aDEKACKLIJG5 = ICFMIHIKGOD.OFFDIMCJOIC();
-				aDEKACKLIJG5.OEIIAGKHMKN = (Action<string>)Delegate.Remove(aDEKACKLIJG5.OEIIAGKHMKN, new Action<string>(LBPCIPJANAE));
-				ADEKACKLIJG aDEKACKLIJG6 = ICFMIHIKGOD.OFFDIMCJOIC();
-				aDEKACKLIJG6.GMKLFLAKKOJ = (Action)Delegate.Remove(aDEKACKLIJG6.GMKLFLAKKOJ, new Action(JLDACFNJGGE));
-				ADEKACKLIJG aDEKACKLIJG7 = ICFMIHIKGOD.OFFDIMCJOIC();
-				aDEKACKLIJG7.MDBFKAJKPEH = (Action)Delegate.Remove(aDEKACKLIJG7.MDBFKAJKPEH, new Action(CEONLIFENPM));
-				ADEKACKLIJG aDEKACKLIJG8 = ICFMIHIKGOD.OFFDIMCJOIC();
-				aDEKACKLIJG8.CIIDFBBIICE = (Action)Delegate.Remove(aDEKACKLIJG8.CIIDFBBIICE, new Action(LCHCKOKGFHK));
+				PaymentStore aDEKACKLIJG = PaymentManager.GetStore();
+				aDEKACKLIJG.OnPurchaseCancelled = (Action<string>)Delegate.Remove(aDEKACKLIJG.OnPurchaseCancelled, new Action<string>(OnPurchaseDismissed));
+				PaymentStore aDEKACKLIJG2 = PaymentManager.GetStore();
+				aDEKACKLIJG2.OnPurchaseSucceeded = (Action<string>)Delegate.Remove(aDEKACKLIJG2.OnPurchaseSucceeded, new Action<string>(OnPurchaseSucceeded));
+				PaymentStore aDEKACKLIJG3 = PaymentManager.GetStore();
+				aDEKACKLIJG3.OnPurchaseFailed = (Action<string, PurchaseFailureReason>)Delegate.Remove(aDEKACKLIJG3.OnPurchaseFailed, new Action<string, PurchaseFailureReason>(OnPurchaseFailed));
+				PaymentStore aDEKACKLIJG4 = PaymentManager.GetStore();
+				aDEKACKLIJG4.OnPurchaseRejected = (Action<string>)Delegate.Remove(aDEKACKLIJG4.OnPurchaseRejected, new Action<string>(OnPurchaseUnsuccessful));
+				PaymentStore aDEKACKLIJG5 = PaymentManager.GetStore();
+				aDEKACKLIJG5.OnVerificationNoResponse = (Action<string>)Delegate.Remove(aDEKACKLIJG5.OnVerificationNoResponse, new Action<string>(OnServerNoResponse));
+				PaymentStore aDEKACKLIJG6 = PaymentManager.GetStore();
+				aDEKACKLIJG6.OnRestoreCompleted = (Action)Delegate.Remove(aDEKACKLIJG6.OnRestoreCompleted, new Action(OnPurchaseFlowFinished));
+				PaymentStore aDEKACKLIJG7 = PaymentManager.GetStore();
+				aDEKACKLIJG7.OnRestoreFailed = (Action)Delegate.Remove(aDEKACKLIJG7.OnRestoreFailed, new Action(OnConnectionFailed));
+				PaymentStore aDEKACKLIJG8 = PaymentManager.GetStore();
+				aDEKACKLIJG8.OnInitialized = (Action)Delegate.Remove(aDEKACKLIJG8.OnInitialized, new Action(OnProductsUpdated));
 			}
 		}
 
 		public void MakePurchase(ItemInfo FAKOMBAIFPP)
 		{
-			DFOHNJEBDED();
-			ICFMIHIKGOD.OFFDIMCJOIC().BDAAKHOLPOF(FAKOMBAIFPP.JLDEALIEEJI());
+			ShowBlocker();
+			PaymentManager.GetStore().PurchaseProduct(FAKOMBAIFPP.GetMarketId());
 		}
 
 		public void RestorePurchases()
 		{
-			DFOHNJEBDED();
-			ICFMIHIKGOD.OFFDIMCJOIC().JDMELMJCKMN();
+			ShowBlocker();
+			PaymentManager.GetStore().RestorePurchases();
 		}
 
-		private void ABAEDAIOHDI(string FDKNIPNGFNF)
+		private void OnPurchaseDismissed(string FDKNIPNGFNF)
 		{
-			OBFDGDEAAIH();
+			HideBlocker();
 		}
 
-		private void FBGKOONDOHL(string FDKNIPNGFNF)
+		private void OnPurchaseSucceeded(string FDKNIPNGFNF)
 		{
-			ItemInfo fAKOMBAIFPP = ListSF.CKCMJAJAELO(FDKNIPNGFNF);
-			CNIEJAKAIFG(QuestEvent.PMDPDMFLCIJ.QUEST_EVENT_PURCHASE, fAKOMBAIFPP);
-			OBFDGDEAAIH();
+			ItemInfo fAKOMBAIFPP = ListSF.FindItemByMarketId(FDKNIPNGFNF);
+			RaisePurchaseQuestEvent(QuestEvent.QuestEventType.QUEST_EVENT_PURCHASE, fAKOMBAIFPP);
+			HideBlocker();
 		}
 
-		private void GJEBBAGEDKK(string FDKNIPNGFNF, PurchaseFailureReason ILDDNIBBANF)
+		private void OnPurchaseFailed(string FDKNIPNGFNF, PurchaseFailureReason ILDDNIBBANF)
 		{
 			if (ILDDNIBBANF != PurchaseFailureReason.UserCancelled)
 			{
-				CNIEJAKAIFG(QuestEvent.PMDPDMFLCIJ.QUEST_EVENT_PURCHASE_UNSUCCESSFUL, null, "Connection");
+				RaisePurchaseQuestEvent(QuestEvent.QuestEventType.QUEST_EVENT_PURCHASE_UNSUCCESSFUL, null, "Connection");
 			}
-			OBFDGDEAAIH();
+			HideBlocker();
 		}
 
-		private void AMBJFJMOKDI(string FDKNIPNGFNF)
+		private void OnPurchaseUnsuccessful(string FDKNIPNGFNF)
 		{
-			CNIEJAKAIFG(QuestEvent.PMDPDMFLCIJ.QUEST_EVENT_PURCHASE_UNSUCCESSFUL, null);
-			OBFDGDEAAIH();
+			RaisePurchaseQuestEvent(QuestEvent.QuestEventType.QUEST_EVENT_PURCHASE_UNSUCCESSFUL, null);
+			HideBlocker();
 		}
 
-		private void LBPCIPJANAE(string FDKNIPNGFNF)
+		private void OnServerNoResponse(string FDKNIPNGFNF)
 		{
-			CNIEJAKAIFG(QuestEvent.PMDPDMFLCIJ.QUEST_EVENT_PURCHASE_UNSUCCESSFUL, null, "ServerNoResponse");
-			OBFDGDEAAIH();
+			RaisePurchaseQuestEvent(QuestEvent.QuestEventType.QUEST_EVENT_PURCHASE_UNSUCCESSFUL, null, "ServerNoResponse");
+			HideBlocker();
 		}
 
-		private void JLDACFNJGGE()
+		private void OnPurchaseFlowFinished()
 		{
-			OBFDGDEAAIH();
+			HideBlocker();
 		}
 
-		private void CEONLIFENPM()
+		private void OnConnectionFailed()
 		{
-			CNIEJAKAIFG(QuestEvent.PMDPDMFLCIJ.QUEST_EVENT_PURCHASE_UNSUCCESSFUL, null, "Connection");
-			OBFDGDEAAIH();
+			RaisePurchaseQuestEvent(QuestEvent.QuestEventType.QUEST_EVENT_PURCHASE_UNSUCCESSFUL, null, "Connection");
+			HideBlocker();
 		}
 
-		private void LCHCKOKGFHK()
+		private void OnProductsUpdated()
 		{
 			_OnProductsUpdateEvent.Invoke();
 		}
 
-		private void CNIEJAKAIFG(QuestEvent.PMDPDMFLCIJ p_event, ItemInfo FAKOMBAIFPP, string HEMPKKHDINJ = null)
+		private void RaisePurchaseQuestEvent(QuestEvent.QuestEventType p_event, ItemInfo FAKOMBAIFPP, string HEMPKKHDINJ = null)
 		{
-			QuestParameters hHKLFIIBIFF = ListSF.GetInstance().BNMLDPNCMLB();
-			FightIDS jLGLBLDPAAF = hHKLFIIBIFF.JLGLBLDPAAF;
-			hHKLFIIBIFF.JLGLBLDPAAF = FightIDS.Empty();
-			hHKLFIIBIFF.HEIADONEACH = string.Empty;
+			QuestParameters hHKLFIIBIFF = ListSF.GetInstance().GetQuestParameters();
+			FightIDS jLGLBLDPAAF = hHKLFIIBIFF.fightIds;
+			hHKLFIIBIFF.fightIds = FightIDS.Empty();
+			hHKLFIIBIFF.fightResult = string.Empty;
 			if (FAKOMBAIFPP != null)
 			{
-				hHKLFIIBIFF.DLKPBAJDHBO = FAKOMBAIFPP;
+				hHKLFIIBIFF.purchasedItem = FAKOMBAIFPP;
 			}
 			if (!string.IsNullOrEmpty(HEMPKKHDINJ))
 			{
-				hHKLFIIBIFF.OOFHDANMCJB = HEMPKKHDINJ;
+				hHKLFIIBIFF.purchaseFailureReason = HEMPKKHDINJ;
 			}
-			if (ListSF.GetInstance().FFBAJNGHGGD(p_event))
+			if (ListSF.GetInstance().RaiseQuestEvent(p_event))
 			{
-				ListSF.GetInstance().MHHNIPBJNAD();
+				ListSF.GetInstance().RunQuestActions();
 			}
-			hHKLFIIBIFF.JLGLBLDPAAF = jLGLBLDPAAF;
+			hHKLFIIBIFF.fightIds = jLGLBLDPAAF;
 		}
 
-		private void DFOHNJEBDED()
+		private void ShowBlocker()
 		{
 			_Blocker.SetActive(true);
 			_LoadingCircle.Play();
 		}
 
-		private void OBFDGDEAAIH()
+		private void HideBlocker()
 		{
 			_LoadingCircle.Stop();
 			_Blocker.SetActive(false);

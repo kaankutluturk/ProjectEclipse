@@ -12,7 +12,7 @@ public static class PhysicsController
 
 	//Friction and FrictionForce seems to be the same value??
 
-	public static float OCIFDDGOJBH
+	public static float Friction
 	{
 		get
 		{
@@ -20,7 +20,7 @@ public static class PhysicsController
 		}
 	}
 
-	public static float FNJAONFEGPP
+	public static float Gravity
 	{
 		get
 		{
@@ -36,7 +36,7 @@ public static class PhysicsController
 		}
 	}
 
-	public static float JMGEOLKAGMH
+	public static float FrictionForce
 	{
 		get
 		{

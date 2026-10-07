@@ -1,9 +1,9 @@
 public class QuestActionResetDuelTimer : QuestAction
 {
-	public override void DEJMHFMLKIC(QuestParameters GFIHPBCEEOB)
+	public override void Execute(QuestParameters GFIHPBCEEOB)
 	{
-		base.DEJMHFMLKIC(GFIHPBCEEOB);
+		base.Execute(GFIHPBCEEOB);
 		BattlePeriodic.Reset(false);
-		OGIJONMKABB();
+		FinishAction();
 	}
 }

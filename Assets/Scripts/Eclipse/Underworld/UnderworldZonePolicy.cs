@@ -30,7 +30,7 @@ namespace Eclipse.Underworld
 				{
 					continue;
 				}
-				foreach (Battle battle in zone.LGIIBNJFADA)
+				foreach (Battle battle in zone.Battles)
 				{
 					battle.IsMapVisible = true;
 				}
@@ -45,7 +45,7 @@ namespace Eclipse.Underworld
 
 		public static void NoteFightStarted(Battle battle)
 		{
-			Zone zone = battle == null ? null : battle.OAEIILGHJMG;
+			Zone zone = battle == null ? null : battle.ParentZone;
 			_returnToRaidMap = IsRaidZone(zone);
 			_returnPowerMode = _returnToRaidMap &&
 				UI.UnderworldMapBattlePresentation.IsBattleVisible(battle, zone, true) &&
@@ -63,7 +63,7 @@ namespace Eclipse.Underworld
 		public static bool ShouldShowRoundPips(Battle battle)
 		{
 			return battle == null ||
-				(battle.get_Type() != BattleType.FightRaid && !IsRaidZone(battle.OAEIILGHJMG));
+				(battle.get_Type() != BattleType.FightRaid && !IsRaidZone(battle.ParentZone));
 		}
 	}
 }

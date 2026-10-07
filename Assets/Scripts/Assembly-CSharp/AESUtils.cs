@@ -8,7 +8,7 @@ public class AESUtils
 {
 	public static void EncryptBytesToFile(byte[] GHDPPHAAPCA, byte[] BFADPFOIPLL, byte[] EJHBCOKHNNC, string BMDJOFHDOGF)
 	{
-		byte[] bytes = CLFEAMAHJPO(GHDPPHAAPCA, BFADPFOIPLL, EJHBCOKHNNC);
+		byte[] bytes = EncryptBytes(GHDPPHAAPCA, BFADPFOIPLL, EJHBCOKHNNC);
 		File.WriteAllBytes(BMDJOFHDOGF, bytes);
 	}
 
@@ -17,7 +17,7 @@ public class AESUtils
 		try
 		{
 			byte[] gHDPPHAAPCA = ((!GIEAPLJHHDK) ? ResourceManager.GetBinary(AMNCLCPADOO) : File.ReadAllBytes(AMNCLCPADOO));
-			return KGJOIBACPOM(gHDPPHAAPCA, BFADPFOIPLL, EJHBCOKHNNC);
+			return DecryptBytes(gHDPPHAAPCA, BFADPFOIPLL, EJHBCOKHNNC);
 		}
 		catch
 		{
@@ -25,32 +25,32 @@ public class AESUtils
 		}
 	}
 
-	public static void IMLIKCDFKLF(byte[] BFADPFOIPLL, byte[] EJHBCOKHNNC, string AMNCLCPADOO, string BMDJOFHDOGF = null, bool GIEAPLJHHDK = false)
+	public static void DecryptFileToFile(byte[] BFADPFOIPLL, byte[] EJHBCOKHNNC, string AMNCLCPADOO, string BMDJOFHDOGF = null, bool GIEAPLJHHDK = false)
 	{
 		if (BMDJOFHDOGF == null)
 		{
 			BMDJOFHDOGF = AMNCLCPADOO;
 		}
 		byte[] gHDPPHAAPCA = ((!GIEAPLJHHDK) ? ResourceManager.GetBinary(AMNCLCPADOO) : File.ReadAllBytes(AMNCLCPADOO));
-		byte[] bytes = KGJOIBACPOM(gHDPPHAAPCA, BFADPFOIPLL, EJHBCOKHNNC);
+		byte[] bytes = DecryptBytes(gHDPPHAAPCA, BFADPFOIPLL, EJHBCOKHNNC);
 		File.WriteAllBytes(BMDJOFHDOGF, bytes);
 	}
 
-	public static void NKICNIBKIPB(byte[] BFADPFOIPLL, byte[] EJHBCOKHNNC, string AMNCLCPADOO, string BMDJOFHDOGF = null, bool GIEAPLJHHDK = false)
+	public static void EncryptFileToFile(byte[] BFADPFOIPLL, byte[] EJHBCOKHNNC, string AMNCLCPADOO, string BMDJOFHDOGF = null, bool GIEAPLJHHDK = false)
 	{
 		if (BMDJOFHDOGF == null)
 		{
 			BMDJOFHDOGF = AMNCLCPADOO;
 		}
 		byte[] gHDPPHAAPCA = ((!GIEAPLJHHDK) ? ResourceManager.GetBinary(AMNCLCPADOO) : File.ReadAllBytes(AMNCLCPADOO));
-		byte[] bytes = CLFEAMAHJPO(gHDPPHAAPCA, BFADPFOIPLL, EJHBCOKHNNC);
+		byte[] bytes = EncryptBytes(gHDPPHAAPCA, BFADPFOIPLL, EJHBCOKHNNC);
 		File.WriteAllBytes(BMDJOFHDOGF, bytes);
 	}
 
-	public static string AGDCAGCACKL(string GHDPPHAAPCA, byte[] BFADPFOIPLL, byte[] EJHBCOKHNNC)
+	public static string EncryptStringToBase64(string GHDPPHAAPCA, byte[] BFADPFOIPLL, byte[] EJHBCOKHNNC)
 	{
 		byte[] bytes = Encoding.UTF8.GetBytes(GHDPPHAAPCA);
-		byte[] array = CLFEAMAHJPO(bytes, BFADPFOIPLL, EJHBCOKHNNC);
+		byte[] array = EncryptBytes(bytes, BFADPFOIPLL, EJHBCOKHNNC);
 		if (array == null)
 		{
 			return string.Empty;
@@ -58,10 +58,10 @@ public class AESUtils
 		return Convert.ToBase64String(array);
 	}
 
-	public static string JLONJPHLPAL(string GHDPPHAAPCA, byte[] BFADPFOIPLL, byte[] EJHBCOKHNNC)
+	public static string DecryptBase64ToString(string GHDPPHAAPCA, byte[] BFADPFOIPLL, byte[] EJHBCOKHNNC)
 	{
 		byte[] gHDPPHAAPCA = Convert.FromBase64String(GHDPPHAAPCA);
-		byte[] array = KGJOIBACPOM(gHDPPHAAPCA, BFADPFOIPLL, EJHBCOKHNNC);
+		byte[] array = DecryptBytes(gHDPPHAAPCA, BFADPFOIPLL, EJHBCOKHNNC);
 		if (array == null)
 		{
 			return string.Empty;
@@ -69,7 +69,7 @@ public class AESUtils
 		return Encoding.UTF8.GetString(array);
 	}
 
-	public static byte[] CLFEAMAHJPO(byte[] GHDPPHAAPCA, byte[] BFADPFOIPLL, byte[] EJHBCOKHNNC)
+	public static byte[] EncryptBytes(byte[] GHDPPHAAPCA, byte[] BFADPFOIPLL, byte[] EJHBCOKHNNC)
 	{
 		try
 		{
@@ -78,7 +78,7 @@ public class AESUtils
 				aes.Key = BFADPFOIPLL;
 				aes.IV = EJHBCOKHNNC;
 				ICryptoTransform pIDLNECOJBG = aes.CreateEncryptor(aes.Key, aes.IV);
-				return CCOHBPPMEKG(GHDPPHAAPCA, pIDLNECOJBG);
+				return TransformBytes(GHDPPHAAPCA, pIDLNECOJBG);
 			}
 		}
 		catch (Exception exception)
@@ -88,7 +88,7 @@ public class AESUtils
 		return null;
 	}
 
-	public static byte[] KGJOIBACPOM(byte[] GHDPPHAAPCA, byte[] BFADPFOIPLL, byte[] EJHBCOKHNNC)
+	public static byte[] DecryptBytes(byte[] GHDPPHAAPCA, byte[] BFADPFOIPLL, byte[] EJHBCOKHNNC)
 	{
 		try
 		{
@@ -97,7 +97,7 @@ public class AESUtils
 				aes.Key = BFADPFOIPLL;
 				aes.IV = EJHBCOKHNNC;
 				ICryptoTransform pIDLNECOJBG = aes.CreateDecryptor(aes.Key, aes.IV);
-				return CCOHBPPMEKG(GHDPPHAAPCA, pIDLNECOJBG);
+				return TransformBytes(GHDPPHAAPCA, pIDLNECOJBG);
 			}
 		}
 		catch (Exception exception)
@@ -107,7 +107,7 @@ public class AESUtils
 		return null;
 	}
 
-	private static byte[] CCOHBPPMEKG(byte[] GHDPPHAAPCA, ICryptoTransform PIDLNECOJBG)
+	private static byte[] TransformBytes(byte[] GHDPPHAAPCA, ICryptoTransform PIDLNECOJBG)
 	{
 		using (MemoryStream memoryStream = new MemoryStream())
 		{

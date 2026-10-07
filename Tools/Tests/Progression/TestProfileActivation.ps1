@@ -2,7 +2,7 @@ $ErrorActionPreference='Stop'
 $root=Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $PSScriptRoot))
 $source=Get-Content -Raw -LiteralPath (Join-Path $root 'Assets/Scripts/Assembly-CSharp/ListSF.cs')
 $methods=@()
-foreach($name in @('PBNNPBEDOOJ','NHAMDLEDOHM','Reset')){
+foreach($name in @('LoadProfile','CreateRoster','Reset')){
  $match=[regex]::Match($source,'(?ms)^\t+(?:private|public static) [^\r\n]+ '+$name+'\(.*?^\t\}')
  if(!$match.Success){throw "Production profile method not found: $name"}
  $methods+=$match.Value
@@ -11,26 +11,26 @@ $fixture=@'
 using System;
 using System.Xml;
 public static class Extensions {
- public static string CIPOICEEIBK(this XmlAttribute a,string fallback=""){return a==null?fallback:a.Value;}
+ public static string GetStringOrDefault(this XmlAttribute a,string fallback=""){return a==null?fallback:a.Value;}
  public static int ParseInt(this XmlAttribute a){return a==null?0:int.Parse(a.Value);}
 }
-public static class XmlUtils {public static XmlDocument Input; public static XmlDocument AIFIAKNJMHG(string a,string b)=>Input;}
+public static class XmlUtils {public static XmlDocument Input; public static XmlDocument LoadDocumentWithHashCheck(string a,string b)=>Input;}
 public static class SF2Paths {public static string GetUserDataDirectory()=>"";}
 namespace Eclipse.Multiplayer {public static class LocalVersusSession {public static bool IsActive;}}
 namespace Eclipse.Saves {public static class CampaignSaveSession {public static string PreviewDirectory;}}
-public static class Constants {public static string OJMIJINKBPJ="";}
+public static class Constants {public static string UsersFileName="";}
 public static class GameUtils {public static string GetDefaultItem(string slot)=>"default";}
-public class ModelParameters {public XmlNode Node;public void NOBKKLBJFIL(){}}
-public class Inventory {public bool Ready;public void HOMCPNCGPDB(object x){Ready=true;}}
+public class ModelParameters {public XmlNode Node;public void CalculateAttributes(){}}
+public class Inventory {public bool Ready;public void ApplyItemInfos(object x){Ready=true;}}
 public class Roster {
  public XmlNode Node;public Inventory Inventory=new Inventory();public ModelParameters Parameters;
  public Roster(XmlNode node,ModelParameters parameters){Node=node;Parameters=parameters;
   if(NativeLoader.Loading && Eclipse.Modding.ModRuntime.Bound!=null)throw new Exception("Old profile remained bound during construction");}
- public Inventory KHCNHPCPFII()=>Inventory;
+ public Inventory GetInventory()=>Inventory;
  public ModelParameters get_Parameters()=>Parameters;
  public void AddEventListener(int n,Action<object> callback){}
 }
-public class Items {public object HCDLKHKBEPF()=>null;public object GetItemByName(string name)=>new object();}
+public class Items {public object GetAllItems()=>null;public object GetItemByName(string name)=>new object();}
 public class GlobalTimer {public static GlobalTimer get_Instance()=>new GlobalTimer();public void removeEventListener(int n,Action<object> callback){}}
 public static class QuestsManager {public static void Reset(){}}
 namespace Eclipse.Modding {
@@ -47,21 +47,21 @@ namespace Eclipse.Modding {
 public class NativeLoader {
  public static bool Loading;
  private static NativeLoader _instance;
- private static Roster ANEHEDFAPCH;
+ private static Roster _roster;
  private static Items _items=new Items();
- private XmlDocument IEDEFCBFJAD;
+ private XmlDocument userDocument;
  private bool _localVersusProfile;
  private XmlNode _CurrentUserNode;
- public static Roster Active=>ANEHEDFAPCH;
+ public static Roster Active=>_roster;
  private static Items GetItems()=>_items;
- private int HFPJDOEEDCA()=>int.Parse(IEDEFCBFJAD.SelectSingleNode("Root/CurrentUser/@ID").Value);
- private ModelParameters IAOBIMJFBMH(XmlNode n,object template,bool flag)=>new ModelParameters{Node=n};
- private void EJANJEEGOOE(object data){}
- private void ILFBDHDMHPD(object data){}
- private void JMDJEEFELCD(XmlNode node){}
+ private int GetCurrentUserId()=>int.Parse(userDocument.SelectSingleNode("Root/CurrentUser/@ID").Value);
+ private ModelParameters ParseWarriorParameters(XmlNode n,object template,bool flag)=>new ModelParameters{Node=n};
+ private void RequestSave(object data){}
+ private void OnTimerTick(object data){}
+ private void ApplyBillingPrices(XmlNode node){}
  /* METHODS */
- public void Load(){Loading=true;try{PBNNPBEDOOJ();}finally{Loading=false;}}
- public Roster Comparison(XmlNode node)=>NHAMDLEDOHM(node);
+ public void Load(){Loading=true;try{LoadProfile();}finally{Loading=false;}}
+ public Roster Comparison(XmlNode node)=>CreateRoster(node);
 }
 public static class ActivationChecks {
  public static void Run(){

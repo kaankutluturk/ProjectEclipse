@@ -14,12 +14,12 @@ public class BundleConfig
 
 	public string BundlesPath;
 
-	public static BundleConfig GMICBCCLODL(string path)
+	public static BundleConfig Load(string path)
 	{
-		return HCEPBIAOJKG.ECLCGODJFBM<BundleConfig>(path);
+		return FileUtils.ReadFileJson<BundleConfig>(path);
 	}
 
-	public List<string> EJKPFLAIICC()
+	public List<string> GetAllDependencies()
 	{
 		List<string> list = new List<string>();
 		foreach (KeyValuePair<string, BundleData> bundle in Bundles)
@@ -46,7 +46,7 @@ public class BundleConfig
 
 	public void AddAssetsData(string path, AssetsData data)
 	{
-		string key = GCEPIJDHJJO(path);
+		string key = NormalizeAssetPath(path);
 		if (!Assets.ContainsKey(key))
 		{
 			Assets.Add(key, data);
@@ -64,7 +64,7 @@ public class BundleConfig
 	public void Save(string path)
 	{
 		string dMNBDBJNKME = JsonConvert.SerializeObject(this, Formatting.Indented);
-		HCEPBIAOJKG.BJKNGNMEDOI(path, dMNBDBJNKME);
+		FileUtils.WriteText(path, dMNBDBJNKME);
 	}
 
 	public bool Equal(Hash128 HDPBNCNCMOH)
@@ -86,7 +86,7 @@ public class BundleConfig
 
 	public AssetsData GetAssetsData(string path)
 	{
-		path = GCEPIJDHJJO(path);
+		path = NormalizeAssetPath(path);
 		if (Assets.ContainsKey(path))
 		{
 			return Assets[path];
@@ -94,13 +94,13 @@ public class BundleConfig
 		return null;
 	}
 
-	private string GCEPIJDHJJO(string path)
+	private string NormalizeAssetPath(string path)
 	{
 		int length = GlobalPath.GetIndexExtension(path);
 		return path.Substring(0, length).ToLower();
 	}
 
-	public string PPICPLCLIFE(string name)
+	public string GetBundlePath(string name)
 	{
 		if (Bundles.ContainsKey(name) && Bundles[name].Available)
 		{

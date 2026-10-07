@@ -20,12 +20,12 @@ public class BundleData
 		Available = false;
 	}
 
-	public bool GACNKLDPBMH(int PPBIPCKMFKB)
+	public bool IsSupportedForValue(int PPBIPCKMFKB)
 	{
 		return true;
 	}
 
-	public bool DNIKBMGAKOF(int EILBNEKNAMO)
+	public bool IsAllowedForValue(int EILBNEKNAMO)
 	{
 		return true;
 	}

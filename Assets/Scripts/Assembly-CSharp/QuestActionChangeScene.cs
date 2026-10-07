@@ -7,30 +7,30 @@ public class QuestActionChangeScene : QuestAction
 	public override void Parse(XmlNode EPKLCPOEELO)
 	{
 		base.Parse(EPKLCPOEELO);
-		_Destination = EPKLCPOEELO.Attributes["Destination"].CIPOICEEIBK(string.Empty);
+		_Destination = EPKLCPOEELO.Attributes["Destination"].GetStringOrDefault(string.Empty);
 	}
 
-	public override void DEJMHFMLKIC(QuestParameters GFIHPBCEEOB)
+	public override void Execute(QuestParameters GFIHPBCEEOB)
 	{
-		base.DEJMHFMLKIC(GFIHPBCEEOB);
+		base.Execute(GFIHPBCEEOB);
 		string empty = string.Empty;
 		ConditionExtension.CompareResult lNIDLHOIHIM = new ConditionExtension.CompareResult();
 		QuestCondition kKDGLNECFHA = new QuestCondition();
-		kKDGLNECFHA.LIMHBJBEEIA(GFIHPBCEEOB);
-		kKDGLNECFHA.MCPIOGALBMK(_Destination, lNIDLHOIHIM);
+		kKDGLNECFHA.SetParameters(GFIHPBCEEOB);
+		kKDGLNECFHA.SetValue(_Destination, lNIDLHOIHIM);
 		empty = lNIDLHOIHIM.ToString();
-		Module.GetInstance().AddEventListener(1, DOHEMBEEHBB);
-		ScreenType kAHMHPNJBGI = Module.DFDEMKONNKK(empty);
-		OCOEIOEDCLE(kAHMHPNJBGI);
+		Module.GetInstance().AddEventListener(1, OnModuleChanged);
+		ScreenType kAHMHPNJBGI = Module.ParseScreenType(empty);
+		ChangeToScreen(kAHMHPNJBGI);
 	}
 
-	private void DOHEMBEEHBB(object data)
+	private void OnModuleChanged(object data)
 	{
-		OGIJONMKABB();
-		Module.GetInstance().RemoveEventListener(1, DOHEMBEEHBB);
+		FinishAction();
+		Module.GetInstance().RemoveEventListener(1, OnModuleChanged);
 	}
 
-	private void OCOEIOEDCLE(ScreenType KAHMHPNJBGI)
+	private void ChangeToScreen(ScreenType KAHMHPNJBGI)
 	{
 		ScreenType iPKNDMINFMJ = Module.GetInstance().GetCurrentScreenType();
 		bool flag = false;
@@ -42,15 +42,15 @@ public class QuestActionChangeScene : QuestAction
 		}
 		else if (flag3)
 		{
-			flag = !Module.DLOKJOHNDID(KAHMHPNJBGI);
+			flag = !Module.OpenScreen(KAHMHPNJBGI);
 		}
 		else
 		{
-			Module.DLOKJOHNDID(ScreenType.ModuleDojo);
+			Module.OpenScreen(ScreenType.ModuleDojo);
 		}
 		if (flag)
 		{
-			DOHEMBEEHBB(0);
+			OnModuleChanged(0);
 		}
 	}
 }

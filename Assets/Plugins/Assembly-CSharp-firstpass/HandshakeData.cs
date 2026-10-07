@@ -5,31 +5,31 @@ using System.Diagnostics;
 public sealed class HandshakeData
 {
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private string NHKGFBIECIP;
+	private string sid;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private List<string> JLFGFPBGLBD;
+	private List<string> upgrades;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private TimeSpan MLFPNHJCAFN;
+	private TimeSpan pingInterval;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private TimeSpan CIOJBNFOFAP;
+	private TimeSpan pingTimeout;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private SocketManager JNNOJIEMLEK;
+	private SocketManager manager;
 
 	public Action<HandshakeData> OnReceived;
 
 	public Action<HandshakeData, string> OnError;
 
-	private HTTPRequest EKJLAHPCEJM;
+	private HTTPRequest handshakeRequest;
 
-	public string LLPJGICMGNP
+	public string SessionId
 	{
 		get
 		{
-			return EDLOIOOBPAJ();
+			return GetSid();
 		}
 		private set
 		{
@@ -37,11 +37,11 @@ public sealed class HandshakeData
 		}
 	}
 
-	public List<string> EKJFMJBHMKK
+	public List<string> UpgradeTransports
 	{
 		get
 		{
-			return BLCLIKIBIPE();
+			return GetUpgrades();
 		}
 		private set
 		{
@@ -53,147 +53,147 @@ public sealed class HandshakeData
 	{
 		get
 		{
-			return CMFJFNKMJIP();
+			return GetPingInterval();
 		}
 		private set
 		{
-			HKOAJEPLLJO(value);
+			SetPingInterval(value);
 		}
 	}
 
-	public TimeSpan OIPKMBICKLH
+	public TimeSpan PingTimeout
 	{
 		get
 		{
-			return EPFLHIKEBFO();
+			return GetPingTimeout();
 		}
 		private set
 		{
-			FGBNJKNGKBF(value);
+			SetPingTimeout(value);
 		}
 	}
 
-	public SocketManager CPOHGNDIBJD
+	public SocketManager HandshakeManager
 	{
 		get
 		{
-			return HLBNHJADOMP();
+			return GetManager();
 		}
 		private set
 		{
-			CMOJGLBBCKC(value);
+			SetManager(value);
 		}
 	}
 
 	public HandshakeData(SocketManager BJGMPDIKEJC)
 	{
-		CMOJGLBBCKC(BJGMPDIKEJC);
+		SetManager(BJGMPDIKEJC);
 	}
 
-	public string EDLOIOOBPAJ()
+	public string GetSid()
 	{
-		return NHKGFBIECIP;
+		return sid;
 	}
 
 	private void set_Sid(string value)
 	{
-		NHKGFBIECIP = value;
+		sid = value;
 	}
 
-	public List<string> BLCLIKIBIPE()
+	public List<string> GetUpgrades()
 	{
-		return JLFGFPBGLBD;
+		return upgrades;
 	}
 
 	private void set_Upgrades(List<string> value)
 	{
-		JLFGFPBGLBD = value;
+		upgrades = value;
 	}
 
-	public TimeSpan CMFJFNKMJIP()
+	public TimeSpan GetPingInterval()
 	{
-		return MLFPNHJCAFN;
+		return pingInterval;
 	}
 
-	private void HKOAJEPLLJO(TimeSpan value)
+	private void SetPingInterval(TimeSpan value)
 	{
-		MLFPNHJCAFN = value;
+		pingInterval = value;
 	}
 
-	public TimeSpan EPFLHIKEBFO()
+	public TimeSpan GetPingTimeout()
 	{
-		return CIOJBNFOFAP;
+		return pingTimeout;
 	}
 
-	private void FGBNJKNGKBF(TimeSpan value)
+	private void SetPingTimeout(TimeSpan value)
 	{
-		CIOJBNFOFAP = value;
+		pingTimeout = value;
 	}
 
-	public SocketManager HLBNHJADOMP()
+	public SocketManager GetManager()
 	{
-		return JNNOJIEMLEK;
+		return manager;
 	}
 
-	private void CMOJGLBBCKC(SocketManager value)
+	private void SetManager(SocketManager value)
 	{
-		JNNOJIEMLEK = value;
+		manager = value;
 	}
 
 	internal void Start()
 	{
-		if (EKJLAHPCEJM == null)
+		if (handshakeRequest == null)
 		{
 			object[] obj = new object[5]
 			{
-				HLBNHJADOMP().OJBDMGBGJMA().ToString(),
+				GetManager().GetUri().ToString(),
 				4,
-				HLBNHJADOMP().GPEEDKOHFIG(),
+				GetManager().GetTimestamp(),
 				null,
 				null
 			};
-			SocketManager mFANOMMMCFG = HLBNHJADOMP();
+			SocketManager mFANOMMMCFG = GetManager();
 			ulong num;
-			mFANOMMMCFG.set_RequestCounter((num = mFANOMMMCFG.EKBGNBPGFNG()) + 1);
+			mFANOMMMCFG.set_RequestCounter((num = mFANOMMMCFG.GetRequestCounter()) + 1);
 			obj[3] = num;
-			obj[4] = HLBNHJADOMP().HLHJJJGJEEL().LEKAOBKGMPF();
-			EKJLAHPCEJM = new HTTPRequest(new Uri(string.Format("{0}?EIO={1}&transport=polling&t={2}-{3}{4}&b64=true", obj)), FHIJDHEAOLD);
-			EKJLAHPCEJM.JJCLPAGJEBJ(true);
-			EKJLAHPCEJM.Send();
-			HTTPManager.MBBMPNDDPIH().KDAFBLAKBMI("HandshakeData", "Handshake request sent");
+			obj[4] = GetManager().GetOptions().BuildQueryParams();
+			handshakeRequest = new HTTPRequest(new Uri(string.Format("{0}?EIO={1}&transport=polling&t={2}-{3}{4}&b64=true", obj)), OnHandshakeCallback);
+			handshakeRequest.SetDisableCache(true);
+			handshakeRequest.Send();
+			HTTPManager.GetLogger().Information("HandshakeData", "Handshake request sent");
 		}
 	}
 
-	internal void AKLEEMEHBIC()
+	internal void Abort()
 	{
-		if (EKJLAHPCEJM != null)
+		if (handshakeRequest != null)
 		{
-			EKJLAHPCEJM.AKLEEMEHBIC();
+			handshakeRequest.Abort();
 		}
-		EKJLAHPCEJM = null;
+		handshakeRequest = null;
 		OnReceived = null;
 		OnError = null;
 	}
 
-	private void FHIJDHEAOLD(HTTPRequest CGOIOKHEGOE, HTTPResponse BEIGFGCBICO)
+	private void OnHandshakeCallback(HTTPRequest CGOIOKHEGOE, HTTPResponse BEIGFGCBICO)
 	{
-		EKJLAHPCEJM = null;
-		switch (CGOIOKHEGOE.FLBBFDNHJAJ())
+		handshakeRequest = null;
+		switch (CGOIOKHEGOE.GetState())
 		{
-		case CFGBMHKCENK.Finished:
-			if (BEIGFGCBICO.AICKPAMONBH())
+		case HTTPRequestStates.Finished:
+			if (BEIGFGCBICO.GetIsSuccess())
 			{
-				HTTPManager.MBBMPNDDPIH().KDAFBLAKBMI("HandshakeData", "Handshake data arrived: " + BEIGFGCBICO.DPBLPGKOEJB());
-				int num = BEIGFGCBICO.DPBLPGKOEJB().IndexOf("{");
+				HTTPManager.GetLogger().Information("HandshakeData", "Handshake data arrived: " + BEIGFGCBICO.GetDataAsText());
+				int num = BEIGFGCBICO.GetDataAsText().IndexOf("{");
 				if (num < 0)
 				{
-					RaiseOnError("Invalid handshake text: " + BEIGFGCBICO.DPBLPGKOEJB());
+					RaiseOnError("Invalid handshake text: " + BEIGFGCBICO.GetDataAsText());
 					break;
 				}
-				HandshakeData pNAFNLKDFKD = Parse(BEIGFGCBICO.DPBLPGKOEJB().Substring(num));
+				HandshakeData pNAFNLKDFKD = Parse(BEIGFGCBICO.GetDataAsText().Substring(num));
 				if (pNAFNLKDFKD == null)
 				{
-					RaiseOnError("Parsing Handshake data failed: " + BEIGFGCBICO.DPBLPGKOEJB());
+					RaiseOnError("Parsing Handshake data failed: " + BEIGFGCBICO.GetDataAsText());
 				}
 				else if (OnReceived != null)
 				{
@@ -203,21 +203,21 @@ public sealed class HandshakeData
 			}
 			else
 			{
-				RaiseOnError(string.Format("Handshake request finished Successfully, but the server sent an error. Status Code: {0}-{1} Message: {2} Uri: {3}", BEIGFGCBICO.KNMDPGBPNED(), BEIGFGCBICO.DCKPMHKDLEJ(), BEIGFGCBICO.DPBLPGKOEJB(), CGOIOKHEGOE.DKAECMGPGOE()));
+				RaiseOnError(string.Format("Handshake request finished Successfully, but the server sent an error. Status Code: {0}-{1} Message: {2} Uri: {3}", BEIGFGCBICO.GetStatusCode(), BEIGFGCBICO.GetMessage(), BEIGFGCBICO.GetDataAsText(), CGOIOKHEGOE.GetCurrentUri()));
 			}
 			break;
-		case CFGBMHKCENK.Error:
-			RaiseOnError((CGOIOKHEGOE.IEFGFKFHNMD() == null) ? string.Empty : (CGOIOKHEGOE.IEFGFKFHNMD().Message + " " + CGOIOKHEGOE.IEFGFKFHNMD().StackTrace));
+		case HTTPRequestStates.Error:
+			RaiseOnError((CGOIOKHEGOE.GetException() == null) ? string.Empty : (CGOIOKHEGOE.GetException().Message + " " + CGOIOKHEGOE.GetException().StackTrace));
 			break;
 		default:
-			RaiseOnError(CGOIOKHEGOE.FLBBFDNHJAJ().ToString());
+			RaiseOnError(CGOIOKHEGOE.GetState().ToString());
 			break;
 		}
 	}
 
 	private void RaiseOnError(string KEPBNIIECPN)
 	{
-		HTTPManager.MBBMPNDDPIH().Error("HandshakeData", "Handshake request failed with error: " + KEPBNIIECPN);
+		HTTPManager.GetLogger().Error("HandshakeData", "Handshake request failed with error: " + KEPBNIIECPN);
 		if (OnError != null)
 		{
 			OnError(this, KEPBNIIECPN);
@@ -237,8 +237,8 @@ public sealed class HandshakeData
 		{
 			set_Sid(GetString(iOFHCAAOELD, "sid"));
 			set_Upgrades(GetStringList(iOFHCAAOELD, "upgrades"));
-			HKOAJEPLLJO(TimeSpan.FromMilliseconds(GetInt(iOFHCAAOELD, "pingInterval")));
-			FGBNJKNGKBF(TimeSpan.FromMilliseconds(GetInt(iOFHCAAOELD, "pingTimeout")));
+			SetPingInterval(TimeSpan.FromMilliseconds(GetInt(iOFHCAAOELD, "pingInterval")));
+			SetPingTimeout(TimeSpan.FromMilliseconds(GetInt(iOFHCAAOELD, "pingTimeout")));
 			return this;
 		}
 		catch

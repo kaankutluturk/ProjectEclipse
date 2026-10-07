@@ -2,17 +2,17 @@ using System.Collections.Generic;
 
 public class TransitionAnimation
 {
-	private List<ConditionAnimation> KEJBANPKCFA = new List<ConditionAnimation>();
+	private List<ConditionAnimation> _conditions = new List<ConditionAnimation>();
 
 	public bool IsFrameShift;
 
 	public int FrameShift;
 
-	public List<ConditionAnimation> JIFAHHGNPFH
+	public List<ConditionAnimation> Conditions
 	{
 		set
 		{
-			AJKANHBOADL(value);
+			SetConditions(value);
 		}
 	}
 
@@ -22,21 +22,21 @@ public class TransitionAnimation
 		FrameShift = 0;
 	}
 
-	public void AJKANHBOADL(List<ConditionAnimation> value)
+	public void SetConditions(List<ConditionAnimation> value)
 	{
-		KEJBANPKCFA = value;
+		_conditions = value;
 	}
 
-	public void CHDLHMGPDHL(ConditionAnimation IOFGGOCEIAM)
+	public void AddCondition(ConditionAnimation IOFGGOCEIAM)
 	{
-		KEJBANPKCFA.Add(IOFGGOCEIAM);
+		_conditions.Add(IOFGGOCEIAM);
 	}
 
-	public bool HPPGNJJCEGF(ModelConditions conditions)
+	public bool AreConditionsMet(ModelConditions conditions)
 	{
-		for (int i = 0; i < KEJBANPKCFA.Count; i++)
+		for (int i = 0; i < _conditions.Count; i++)
 		{
-			if (!KEJBANPKCFA[i].IsEqual(conditions))
+			if (!_conditions[i].IsEqual(conditions))
 			{
 				return false;
 			}

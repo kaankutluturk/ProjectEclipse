@@ -4,53 +4,53 @@ public class ModelObject
 {
 	private class ModelNodes
 	{
-		public ModelNode CHEKEGGJDBL;
+		public ModelNode Pivot;
 
-		public List<ModelNode> PIDBGGHBJCG = new List<ModelNode>();
+		public List<ModelNode> PlainNodes = new List<ModelNode>();
 
-		public List<ModelMacroNode> IAMDHKKBBOE = new List<ModelMacroNode>();
+		public List<ModelMacroNode> MacroNodes = new List<ModelMacroNode>();
 
-		public List<ModelNode> OEAFIMFONDL = new List<ModelNode>();
+		public List<ModelNode> AllNodes = new List<ModelNode>();
 
-		public Dictionary<string, ModelNode> PLBNGPFCCEG = new Dictionary<string, ModelNode>();
+		public Dictionary<string, ModelNode> NodesByName = new Dictionary<string, ModelNode>();
 
-		public List<ModelNode> NBJCHIJDDNN = new List<ModelNode>();
+		public List<ModelNode> CenterOfMassNodes = new List<ModelNode>();
 	}
 
 	private class ModelEdges
 	{
-		public List<ModelEdge> PIDBGGHBJCG = new List<ModelEdge>();
+		public List<ModelEdge> StructuralEdges = new List<ModelEdge>();
 
-		public List<ModelEdge> HKNNDIEDNDN = new List<ModelEdge>();
+		public List<ModelEdge> MuscleEdges = new List<ModelEdge>();
 
-		public List<ModelEdge> ECNOHFFDIFG = new List<ModelEdge>();
+		public List<ModelEdge> CollisionEdges = new List<ModelEdge>();
 
-		public List<ModelEdge> OEAFIMFONDL = new List<ModelEdge>();
+		public List<ModelEdge> AllEdges = new List<ModelEdge>();
 	}
 
 	private class Figures
 	{
-		public List<Capsule> NFGOBHMMJEB = new List<Capsule>();
+		public List<Capsule> Capsules = new List<Capsule>();
 
 		public List<Triangle> Triangles = new List<Triangle>();
 	}
 
 	private class AdditionalData
 	{
-		public List<global::Pair<int, int>> IANPBPEOKBH = new List<global::Pair<int, int>>();
+		public List<global::Pair<int, int>> PairNodeIds = new List<global::Pair<int, int>>();
 
 		public List<string> FileNames = new List<string>();
 	}
 
-	private ModelNodes CEHJGIHMKFF = new ModelNodes();
+	private ModelNodes nodeData = new ModelNodes();
 
-	private ModelEdges LCDOKKAKODE = new ModelEdges();
+	private ModelEdges edgeData = new ModelEdges();
 
-	private Figures CFKNNINIIEA = new Figures();
+	private Figures figureData = new Figures();
 
-	private AdditionalData DCFPONJAING = new AdditionalData();
+	private AdditionalData additionalData = new AdditionalData();
 
-	private ModelNode CNCJJDEJBNK;
+	private ModelNode centerOfMassNode;
 
 	private float _ModelWeight;
 
@@ -62,27 +62,27 @@ public class ModelObject
 
 	private string _PivotName;
 
-	public ModelNode DOEILCFFCDN
+	public ModelNode CenterOfMassNode
 	{
 		get
 		{
-			return HOFFDCFEBGA();
+			return GetCenterOfMassNode();
 		}
 	}
 
-	public float ELFFFMCCGAJ
+	public float TotalWeight
 	{
 		get
 		{
-			return PAJLIKBIAPA();
+			return GetTotalWeight();
 		}
 	}
 
-	public int OKDGCCPGLMC
+	public int NodeCount
 	{
 		get
 		{
-			return DFKIHADCFKG();
+			return GetNodeCount();
 		}
 		set
 		{
@@ -90,7 +90,7 @@ public class ModelObject
 		}
 	}
 
-	public bool PFDCDIBODCL
+	public bool ShockActive
 	{
 		get
 		{
@@ -102,7 +102,7 @@ public class ModelObject
 		}
 	}
 
-	public Model KJDFJPBIGJC
+	public Model OwnerModel
 	{
 		get
 		{
@@ -114,63 +114,63 @@ public class ModelObject
 		}
 	}
 
-	public Vector3f BPPINEHFOBB
+	public Vector3f CenterOfMassPosition
 	{
 		get
 		{
-			return PLBNCDCFPML();
+			return GetCenterOfMassPosition();
 		}
 	}
 
-	public ModelNode AFLPHBDFMGA
+	public ModelNode PivotNode
 	{
 		get
 		{
-			return CJELIBMCCMA();
+			return GetPivotNode();
 		}
 	}
 
-	public List<ModelNode> CBAECAAKAIA
+	public List<ModelNode> PlainNodes
 	{
 		get
 		{
-			return LMBNDIPLBJA();
+			return GetPlainNodes();
 		}
 	}
 
-	public List<ModelMacroNode> IPJJCFJLBKE
+	public List<ModelMacroNode> MacroNodes
 	{
 		get
 		{
-			return BLFJJAEFKKP();
+			return GetMacroNodes();
 		}
 	}
 
-	public List<ModelNode> OGPDJLAOEEO
+	public List<ModelNode> AllNodes
 	{
 		get
 		{
-			return NAMKCLGOPDD();
+			return GetAllNodes();
 		}
 	}
 
-	public Dictionary<string, ModelNode> KANEKAAJJGA
+	public Dictionary<string, ModelNode> NodesByName
 	{
 		get
 		{
-			return HKCFFKKFFFE();
+			return GetNodesByName();
 		}
 	}
 
-	private List<ModelNode> DLIKKPPEBEC
+	private List<ModelNode> MassNodes
 	{
 		get
 		{
-			return JEGHCCFLAIF();
+			return GetMassNodes();
 		}
 	}
 
-	public List<ModelEdge> OOFMOAHJEJF
+	public List<ModelEdge> CollisionEdges
 	{
 		get
 		{
@@ -178,35 +178,35 @@ public class ModelObject
 		}
 	}
 
-	public List<ModelEdge> DJNCBGONICH
+	public List<ModelEdge> StructuralEdges
 	{
 		get
 		{
-			return HABIIJGLCMA();
+			return GetStructuralEdges();
 		}
 	}
 
-	public List<ModelEdge> HKNNDIEDNDN
+	public List<ModelEdge> MuscleEdges
 	{
 		get
 		{
-			return EKOGCJAAKDN();
+			return GetMuscleEdges();
 		}
 	}
 
-	public List<ModelEdge> NNLHIICJNOG
+	public List<ModelEdge> AllEdges
 	{
 		get
 		{
-			return BKAPPJMGPKP();
+			return GetAllEdges();
 		}
 	}
 
-	public List<Capsule> NFGOBHMMJEB
+	public List<Capsule> Capsules
 	{
 		get
 		{
-			return DPIFMDIKDBC();
+			return GetCapsules();
 		}
 	}
 
@@ -214,48 +214,48 @@ public class ModelObject
 	{
 		get
 		{
-			return ELOGKMHEBGA();
+			return GetTriangles();
 		}
 	}
 
-	public List<global::Pair<int, int>> ANKDHFEFEFF
+	public List<global::Pair<int, int>> PairNodeIds
 	{
 		get
 		{
-			return DJNNIKHGGFO();
+			return GetPairNodeIds();
 		}
 	}
 
-	public Vector3f DMNHMMMGIMI
+	public Vector3f PreviousCenterOfMass
 	{
 		get
 		{
-			return BEFMLJFBPGN();
+			return GetPreviousCenterOfMass();
 		}
 	}
 
 	public ModelObject()
 	{
-		CNCJJDEJBNK = new ModelNode("_CenterOfMass_");
+		centerOfMassNode = new ModelNode("_CenterOfMass_");
 		_ModelWeight = 0f;
 		_NodesCount = 0;
 		_IsShock = false;
 		_Model = null;
-		CEHJGIHMKFF.CHEKEGGJDBL = null;
-		_PivotName = GameUtils.KEFHKHCNBOK;
+		nodeData.Pivot = null;
+		_PivotName = GameUtils.PivotNodeName;
 	}
 
-	public ModelNode HOFFDCFEBGA()
+	public ModelNode GetCenterOfMassNode()
 	{
-		return CNCJJDEJBNK;
+		return centerOfMassNode;
 	}
 
-	public float PAJLIKBIAPA()
+	public float GetTotalWeight()
 	{
 		return _ModelWeight;
 	}
 
-	public int DFKIHADCFKG()
+	public int GetNodeCount()
 	{
 		return _NodesCount;
 	}
@@ -285,85 +285,85 @@ public class ModelObject
 		_Model = value;
 	}
 
-	public Vector3f PLBNCDCFPML()
+	public Vector3f GetCenterOfMassPosition()
 	{
-		return HOFFDCFEBGA().GetStart();
+		return GetCenterOfMassNode().GetStart();
 	}
 
-	public ModelNode CJELIBMCCMA()
+	public ModelNode GetPivotNode()
 	{
-		return CEHJGIHMKFF.CHEKEGGJDBL;
+		return nodeData.Pivot;
 	}
 
-	public List<ModelNode> LMBNDIPLBJA()
+	public List<ModelNode> GetPlainNodes()
 	{
-		return CEHJGIHMKFF.PIDBGGHBJCG;
+		return nodeData.PlainNodes;
 	}
 
-	public List<ModelMacroNode> BLFJJAEFKKP()
+	public List<ModelMacroNode> GetMacroNodes()
 	{
-		return CEHJGIHMKFF.IAMDHKKBBOE;
+		return nodeData.MacroNodes;
 	}
 
-	public List<ModelNode> NAMKCLGOPDD()
+	public List<ModelNode> GetAllNodes()
 	{
-		return CEHJGIHMKFF.OEAFIMFONDL;
+		return nodeData.AllNodes;
 	}
 
-	public Dictionary<string, ModelNode> HKCFFKKFFFE()
+	public Dictionary<string, ModelNode> GetNodesByName()
 	{
-		return CEHJGIHMKFF.PLBNGPFCCEG;
+		return nodeData.NodesByName;
 	}
 
-	private List<ModelNode> JEGHCCFLAIF()
+	private List<ModelNode> GetMassNodes()
 	{
-		return (CEHJGIHMKFF.NBJCHIJDDNN.Count == 0) ? CEHJGIHMKFF.OEAFIMFONDL : CEHJGIHMKFF.NBJCHIJDDNN;
+		return (nodeData.CenterOfMassNodes.Count == 0) ? nodeData.AllNodes : nodeData.CenterOfMassNodes;
 	}
 
 	// best guess for name
 	public List<ModelEdge> GetCollisionEdges()
 	{
-		return LCDOKKAKODE.ECNOHFFDIFG;
+		return edgeData.CollisionEdges;
 	}
 
-	public List<ModelEdge> HABIIJGLCMA()
+	public List<ModelEdge> GetStructuralEdges()
 	{
-		return LCDOKKAKODE.PIDBGGHBJCG;
+		return edgeData.StructuralEdges;
 	}
 
-	public List<ModelEdge> EKOGCJAAKDN()
+	public List<ModelEdge> GetMuscleEdges()
 	{
-		return LCDOKKAKODE.HKNNDIEDNDN;
+		return edgeData.MuscleEdges;
 	}
 
-	public List<ModelEdge> BKAPPJMGPKP()
+	public List<ModelEdge> GetAllEdges()
 	{
-		return LCDOKKAKODE.OEAFIMFONDL;
+		return edgeData.AllEdges;
 	}
 
-	public List<Capsule> DPIFMDIKDBC()
+	public List<Capsule> GetCapsules()
 	{
-		return CFKNNINIIEA.NFGOBHMMJEB;
+		return figureData.Capsules;
 	}
 
-	public List<Triangle> ELOGKMHEBGA()
+	public List<Triangle> GetTriangles()
 	{
-		return CFKNNINIIEA.Triangles;
+		return figureData.Triangles;
 	}
 
-	public List<global::Pair<int, int>> DJNNIKHGGFO()
+	public List<global::Pair<int, int>> GetPairNodeIds()
 	{
-		return DCFPONJAING.IANPBPEOKBH;
+		return additionalData.PairNodeIds;
 	}
 
-	public static Vector3f MHFFCMKNIKM(ModelNode LHBNIMGFKIB, ModelNode AAOIAEJJINO)
+	public static Vector3f GetNodesMidpoint(ModelNode LHBNIMGFKIB, ModelNode AAOIAEJJINO)
 	{
 		return Vector3f.Middle(LHBNIMGFKIB.GetStart(), AAOIAEJJINO.GetStart());
 	}
 
 	public int GetNodeIDByPairName(int index)
 	{
-		List<global::Pair<int, int>> list = DJNNIKHGGFO();
+		List<global::Pair<int, int>> list = GetPairNodeIds();
 		foreach (global::Pair<int, int> item in list)
 		{
 			if (index == item.First)
@@ -378,15 +378,15 @@ public class ModelObject
 		return -1;
 	}
 
-	public ModelNode PHKIOHJBFGH(Vector2f MGMMDGFPBLP, float PKFOEAEPOAF)
+	public ModelNode FindNodeAtPoint(Vector2f MGMMDGFPBLP, float PKFOEAEPOAF)
 	{
 		ModelNode result = null;
 		PKFOEAEPOAF *= PKFOEAEPOAF;
-		List<ModelNode> list = NAMKCLGOPDD();
+		List<ModelNode> list = GetAllNodes();
 		foreach (ModelNode item in list)
 		{
 			Vector3f lHBNIMGFKIB = item.GetStart();
-			if (Vector2f.LDKCDLFIDHL(lHBNIMGFKIB, MGMMDGFPBLP) < PKFOEAEPOAF)
+			if (Vector2f.DistanceSquared2D(lHBNIMGFKIB, MGMMDGFPBLP) < PKFOEAEPOAF)
 			{
 				result = item;
 				break;
@@ -395,34 +395,34 @@ public class ModelObject
 		return result;
 	}
 
-	public ModelNode EGHIDHMENEF(string name)
+	public ModelNode GetNodeByName(string name)
 	{
-		if (CEHJGIHMKFF.CHEKEGGJDBL != null && name == _PivotName)
+		if (nodeData.Pivot != null && name == _PivotName)
 		{
-			return CEHJGIHMKFF.CHEKEGGJDBL;
+			return nodeData.Pivot;
 		}
 		ModelNode value = null;
-		if (CEHJGIHMKFF.PLBNGPFCCEG.TryGetValue(name, out value))
+		if (nodeData.NodesByName.TryGetValue(name, out value))
 		{
 			return value;
 		}
 		return null;
 	}
 
-	public ModelNode KLAPIGGACMM(string name)
+	public ModelNode GetNodeByNameOrParent(string name)
 	{
-		if (CEHJGIHMKFF.CHEKEGGJDBL != null && name == _PivotName)
+		if (nodeData.Pivot != null && name == _PivotName)
 		{
-			return CEHJGIHMKFF.CHEKEGGJDBL;
+			return nodeData.Pivot;
 		}
-		ModelNode lCDGOCIAIDK = EGHIDHMENEF(name);
+		ModelNode lCDGOCIAIDK = GetNodeByName(name);
 		if (lCDGOCIAIDK != null)
 		{
 			return lCDGOCIAIDK;
 		}
-		if (GetModel() != null && GetModel().NJDJHGDMCIJ() != null)
+		if (GetModel() != null && GetModel().GetParentModel() != null)
 		{
-			lCDGOCIAIDK = GetModel().NJDJHGDMCIJ().CLDMEJKGLBA().EGHIDHMENEF(name);
+			lCDGOCIAIDK = GetModel().GetParentModel().GetBodyObject().GetNodeByName(name);
 		}
 		return lCDGOCIAIDK;
 	}
@@ -430,14 +430,14 @@ public class ModelObject
 	// best guess for name
 	public ModelNode FindNodeOrParent(string name)
 	{
-		return KLAPIGGACMM(name);
+		return GetNodeByNameOrParent(name);
 	}
 
 	public int GetNodeIDByName(string name)
 	{
-		for (int i = 0; i < CEHJGIHMKFF.OEAFIMFONDL.Count; i++)
+		for (int i = 0; i < nodeData.AllNodes.Count; i++)
 		{
-			if (name == CEHJGIHMKFF.OEAFIMFONDL[i].GetName())
+			if (name == nodeData.AllNodes[i].GetName())
 			{
 				return i;
 			}
@@ -445,9 +445,9 @@ public class ModelObject
 		return -1;
 	}
 
-	public ModelEdge CLBHEMEAAEN(string name)
+	public ModelEdge GetEdgeByName(string name)
 	{
-		foreach (ModelEdge item in LCDOKKAKODE.OEAFIMFONDL)
+		foreach (ModelEdge item in edgeData.AllEdges)
 		{
 			if (name == item.get_Name())
 			{
@@ -457,23 +457,23 @@ public class ModelObject
 		return null;
 	}
 
-	public void GINBBKBGMDC()
+	public void CalculateTotalWeight()
 	{
 		_ModelWeight = 0f;
-		List<ModelNode> list = JEGHCCFLAIF();
+		List<ModelNode> list = GetMassNodes();
 		foreach (ModelNode item in list)
 		{
 			_ModelWeight += item.GetWeight();
 		}
 	}
 
-	public void NDDMFBCIHPC()
+	public void UpdateCenterOfMass()
 	{
 		Vector3f eMAFACPEPDK = new Vector3f();
 		Vector3f eMAFACPEPDK2 = new Vector3f();
-		Vector3f bAINMLLIKOL = new Vector3f(CNCJJDEJBNK.GetStart());
-		List<ModelNode> list = JEGHCCFLAIF();
-		CNCJJDEJBNK.GetStart().Reset();
+		Vector3f bAINMLLIKOL = new Vector3f(centerOfMassNode.GetStart());
+		List<ModelNode> list = GetMassNodes();
+		centerOfMassNode.GetStart().Reset();
 		foreach (ModelNode item in list)
 		{
 			eMAFACPEPDK2.Set(item.GetStart());
@@ -481,92 +481,92 @@ public class ModelObject
 			eMAFACPEPDK.Add(eMAFACPEPDK2);
 		}
 		eMAFACPEPDK.Multiply(1f / _ModelWeight);
-		CNCJJDEJBNK.SetStart(eMAFACPEPDK);
-		CNCJJDEJBNK.SetEnd(bAINMLLIKOL);
+		centerOfMassNode.SetStart(eMAFACPEPDK);
+		centerOfMassNode.SetEnd(bAINMLLIKOL);
 	}
 
-	public Vector3f BEFMLJFBPGN()
+	public Vector3f GetPreviousCenterOfMass()
 	{
-		return CNCJJDEJBNK.GetEnd();
+		return centerOfMassNode.GetEnd();
 	}
 
 	public void SetModelPosition(Vector3f MGMMDGFPBLP, ModelNode NFADOLIKJEA = null)
 	{
 		if (NFADOLIKJEA == null)
 		{
-			NFADOLIKJEA = EGHIDHMENEF(_PivotName);
+			NFADOLIKJEA = GetNodeByName(_PivotName);
 		}
-		if (NFADOLIKJEA == null || 0 >= CEHJGIHMKFF.OEAFIMFONDL.Count)
+		if (NFADOLIKJEA == null || 0 >= nodeData.AllNodes.Count)
 		{
 			return;
 		}
-		Vector3f bEHOPOPCJGB = new Vector3f(Vector3f.MJOKEBGPHKB(MGMMDGFPBLP, NFADOLIKJEA.GetStart()));
-		Vector3f bEHOPOPCJGB2 = new Vector3f(Vector3f.MJOKEBGPHKB(MGMMDGFPBLP, NFADOLIKJEA.GetEnd()));
-		foreach (ModelNode item in CEHJGIHMKFF.OEAFIMFONDL)
+		Vector3f bEHOPOPCJGB = new Vector3f(Vector3f.op_Subtraction(MGMMDGFPBLP, NFADOLIKJEA.GetStart()));
+		Vector3f bEHOPOPCJGB2 = new Vector3f(Vector3f.op_Subtraction(MGMMDGFPBLP, NFADOLIKJEA.GetEnd()));
+		foreach (ModelNode item in nodeData.AllNodes)
 		{
 			item.GetStart().Add(bEHOPOPCJGB);
 			item.GetEnd().Add(bEHOPOPCJGB2);
 		}
 	}
 
-	public void MNHAGALCNFB(List<Vector3f> KPLANIHPMED)
+	public void AlignToFrame(List<Vector3f> KPLANIHPMED)
 	{
 		int index = GetNodeIDByName(_PivotName);
-		Vector3f nBMEGFBPGFE = CJELIBMCCMA().GetStart();
-		Vector3f eMAFACPEPDK = Vector3f.MJOKEBGPHKB(nBMEGFBPGFE, KPLANIHPMED[index]);
+		Vector3f nBMEGFBPGFE = GetPivotNode().GetStart();
+		Vector3f eMAFACPEPDK = Vector3f.op_Subtraction(nBMEGFBPGFE, KPLANIHPMED[index]);
 		eMAFACPEPDK.SetY(0f);
 		int i = 0;
 		for (int count = KPLANIHPMED.Count; i < count; i++)
 		{
-			CEHJGIHMKFF.OEAFIMFONDL[i].SetStart(Vector3f.PHEFFKMOOCM(KPLANIHPMED[i], eMAFACPEPDK));
-			CEHJGIHMKFF.OEAFIMFONDL[i].SetEnd(Vector3f.PHEFFKMOOCM(KPLANIHPMED[i], eMAFACPEPDK));
+			nodeData.AllNodes[i].SetStart(Vector3f.op_Addition(KPLANIHPMED[i], eMAFACPEPDK));
+			nodeData.AllNodes[i].SetEnd(Vector3f.op_Addition(KPLANIHPMED[i], eMAFACPEPDK));
 		}
 	}
 
-	public void MNHAGALCNFB(List<Vector3f> KPLANIHPMED, ModelNode AECCPADGGPG)
+	public void AlignToFrame(List<Vector3f> KPLANIHPMED, ModelNode AECCPADGGPG)
 	{
 		int index = AECCPADGGPG.GetID();
 		Vector3f nBMEGFBPGFE = AECCPADGGPG.GetStart();
-		Vector3f eMAFACPEPDK = Vector3f.MJOKEBGPHKB(nBMEGFBPGFE, KPLANIHPMED[index]);
+		Vector3f eMAFACPEPDK = Vector3f.op_Subtraction(nBMEGFBPGFE, KPLANIHPMED[index]);
 		eMAFACPEPDK.SetY(0f);
 		int i = 0;
 		for (int count = KPLANIHPMED.Count; i < count; i++)
 		{
-			CEHJGIHMKFF.OEAFIMFONDL[i].SetStart(Vector3f.PHEFFKMOOCM(KPLANIHPMED[i], eMAFACPEPDK));
-			CEHJGIHMKFF.OEAFIMFONDL[i].SetEnd(Vector3f.PHEFFKMOOCM(KPLANIHPMED[i], eMAFACPEPDK));
+			nodeData.AllNodes[i].SetStart(Vector3f.op_Addition(KPLANIHPMED[i], eMAFACPEPDK));
+			nodeData.AllNodes[i].SetEnd(Vector3f.op_Addition(KPLANIHPMED[i], eMAFACPEPDK));
 		}
 	}
 
-	public void JBHFODLCNIA(Vector3f OPNPKNEOALJ)
+	public void TranslateAllNodes(Vector3f OPNPKNEOALJ)
 	{
-		foreach (ModelNode item in CEHJGIHMKFF.OEAFIMFONDL)
+		foreach (ModelNode item in nodeData.AllNodes)
 		{
 			item.GetStart().Add(OPNPKNEOALJ);
 			item.GetEnd().Add(OPNPKNEOALJ);
 		}
-		NDDMFBCIHPC();
+		UpdateCenterOfMass();
 	}
 
-	public void LKFBKGPOHPI()
+	public void FindPivotNode()
 	{
-		ModelNode lCDGOCIAIDK = EGHIDHMENEF(_PivotName);
+		ModelNode lCDGOCIAIDK = GetNodeByName(_PivotName);
 		if (lCDGOCIAIDK != null)
 		{
-			CEHJGIHMKFF.CHEKEGGJDBL = lCDGOCIAIDK;
+			nodeData.Pivot = lCDGOCIAIDK;
 		}
 	}
 
 	public void SetFileNames(List<string> CBHAEPCLDFG)
 	{
-		DCFPONJAING.FileNames.AddRange(CBHAEPCLDFG);
+		additionalData.FileNames.AddRange(CBHAEPCLDFG);
 	}
 
-	public void KJIEPFHIIKM()
+	public void ResolveMacroNodeWeights()
 	{
-		int count = CEHJGIHMKFF.IAMDHKKBBOE.Count;
+		int count = nodeData.MacroNodes.Count;
 		for (int i = 0; i < count; i++)
 		{
-			ModelMacroNode gDNAJOODAGP = CEHJGIHMKFF.IAMDHKKBBOE[i];
+			ModelMacroNode gDNAJOODAGP = nodeData.MacroNodes[i];
 			List<global::Pair<string, float>> lMPPCKACMNB = gDNAJOODAGP.NamedWeights;
 			if (lMPPCKACMNB == null)
 			{
@@ -574,87 +574,87 @@ public class ModelObject
 			}
 			foreach (global::Pair<string, float> item in lMPPCKACMNB)
 			{
-				ModelNode lCDGOCIAIDK = EGHIDHMENEF(item.First);
+				ModelNode lCDGOCIAIDK = GetNodeByName(item.First);
 				if (lCDGOCIAIDK != null)
 				{
-					gDNAJOODAGP.DNCHNPNABFH(lCDGOCIAIDK, item.Second);
+					gDNAJOODAGP.AddNodeWeight(lCDGOCIAIDK, item.Second);
 					continue;
 				}
-				LLLOJBFMONN.Error("Nodes '{0}' for macronode '{1}' was not found", item.First, gDNAJOODAGP.GetName());
+				GameLog.Error("Nodes '{0}' for macronode '{1}' was not found", item.First, gDNAJOODAGP.GetName());
 			}
 			gDNAJOODAGP.NamedWeights = null;
 		}
 	}
 
-	public void JANOFOIKIAP()
+	public void UpdateMacroNodes()
 	{
-		int count = CEHJGIHMKFF.IAMDHKKBBOE.Count;
+		int count = nodeData.MacroNodes.Count;
 		for (int i = 0; i < count; i++)
 		{
-			CEHJGIHMKFF.IAMDHKKBBOE[i].FPKMHOMMFKB();
+			nodeData.MacroNodes[i].UpdateFromWeights();
 		}
 	}
 
 	public void Clear()
 	{
-		LCDOKKAKODE.PIDBGGHBJCG.Clear();
-		LCDOKKAKODE.HKNNDIEDNDN.Clear();
-		LCDOKKAKODE.ECNOHFFDIFG.Clear();
-		LCDOKKAKODE.OEAFIMFONDL.Clear();
-		CFKNNINIIEA.NFGOBHMMJEB.Clear();
-		CFKNNINIIEA.Triangles.Clear();
-		DCFPONJAING.IANPBPEOKBH.Clear();
-		CEHJGIHMKFF.PIDBGGHBJCG.Clear();
-		CEHJGIHMKFF.IAMDHKKBBOE.Clear();
-		if (CEHJGIHMKFF.CHEKEGGJDBL != null)
+		edgeData.StructuralEdges.Clear();
+		edgeData.MuscleEdges.Clear();
+		edgeData.CollisionEdges.Clear();
+		edgeData.AllEdges.Clear();
+		figureData.Capsules.Clear();
+		figureData.Triangles.Clear();
+		additionalData.PairNodeIds.Clear();
+		nodeData.PlainNodes.Clear();
+		nodeData.MacroNodes.Clear();
+		if (nodeData.Pivot != null)
 		{
-			CEHJGIHMKFF.CHEKEGGJDBL = null;
+			nodeData.Pivot = null;
 		}
-		CEHJGIHMKFF.OEAFIMFONDL.Clear();
+		nodeData.AllNodes.Clear();
 		_Model = null;
 	}
 
 	public void Reset()
 	{
 		SetShock(false);
-		ModelReloader.NPMIHDFCBBH(this, DCFPONJAING.FileNames);
+		ModelReloader.Reload(this, additionalData.FileNames);
 	}
 
-	public void OBFONONKIAN()
+	public void ResetNodeVelocities()
 	{
-		foreach (ModelNode item in CEHJGIHMKFF.OEAFIMFONDL)
+		foreach (ModelNode item in nodeData.AllNodes)
 		{
 			item.SetEnd();
 		}
 	}
 
-	public void MDDBGGPHNLF()
+	public void BuildPairNodes()
 	{
-		EFDOLECDDHI(NAMKCLGOPDD(), DCFPONJAING.IANPBPEOKBH);
+		LinkPairNodes(GetAllNodes(), additionalData.PairNodeIds);
 	}
 
-	public void FLPIFFOGDBF()
+	public void RestoreDefaultPhysics()
 	{
-		foreach (ModelNode item in CEHJGIHMKFF.OEAFIMFONDL)
+		foreach (ModelNode item in nodeData.AllNodes)
 		{
-			item.HBPBKNDPBMG();
+			item.RestoreDefaultPhysics();
 		}
 	}
 
-	public void LEOMLPGGLNA(List<global::Pair<string, float>> MFIEGKAMKNJ)
+	public void AddCenterOfMassNodes(List<global::Pair<string, float>> MFIEGKAMKNJ)
 	{
 		foreach (global::Pair<string, float> item in MFIEGKAMKNJ)
 		{
-			ModelNode lCDGOCIAIDK = EGHIDHMENEF(item.First);
+			ModelNode lCDGOCIAIDK = GetNodeByName(item.First);
 			if (lCDGOCIAIDK == null)
 			{
-				LLLOJBFMONN.Error("ModelObject::addComNodes - no node with name: {0}", item.First);
+				GameLog.Error("ModelObject::addComNodes - no node with name: {0}", item.First);
 			}
-			CEHJGIHMKFF.NBJCHIJDDNN.Add(lCDGOCIAIDK);
+			nodeData.CenterOfMassNodes.Add(lCDGOCIAIDK);
 		}
 	}
 
-	private void EFDOLECDDHI(List<ModelNode> nodes, List<global::Pair<int, int>> OEMALIFPGPO)
+	private void LinkPairNodes(List<ModelNode> nodes, List<global::Pair<int, int>> OEMALIFPGPO)
 	{
 		OEMALIFPGPO.Clear();
 		foreach (ModelNode item in nodes)

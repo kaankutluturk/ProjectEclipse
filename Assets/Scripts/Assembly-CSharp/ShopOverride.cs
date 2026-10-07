@@ -1,8 +1,8 @@
 public class ShopOverride
 {
-	public string JEAJJFEEOCL;
+	public string Screen;
 
 	public string Type;
 
-	public string DAOMBPLCBMN;
+	public string ItemName;
 }

@@ -8,89 +8,89 @@ public class JsonReader
 
 	private Stack<int> automaton_stack;
 
-	private int NHEIKKOGHHK;
+	private int current_input;
 
-	private int LNDNLHCPNCE;
+	private int current_symbol;
 
-	private bool HEAGLCOKJFC;
+	private bool end_of_json;
 
-	private bool LGPODKLEMBP;
+	private bool end_of_input;
 
-	private Lexer NFFOIEMPKNH;
+	private Lexer lexer;
 
-	private bool PCKOPADDIEM;
+	private bool parser_in_string;
 
-	private bool DPDJCFNBHCF;
+	private bool parser_return;
 
-	private bool GBFEFPMEGNB;
+	private bool read_started;
 
 	private TextReader reader;
 
-	private bool LODIAFPNLBF;
+	private bool reader_is_owned;
 
-	private bool LPHEJAENNGN;
+	private bool skip_non_members;
 
 	private object token_value;
 
-	private GDDEBPANOCH JLFCBDKNAGP;
+	private JsonToken token;
 
-	public bool NIHDCFNOEMF
+	public bool AllowComments
 	{
 		get
 		{
-			return CGHOOPPOBJO();
+			return GetAllowComments();
 		}
 		set
 		{
-			LEONKMNNHJC(value);
+			SetAllowComments(value);
 		}
 	}
 
-	public bool CBCDIFLPHAK
+	public bool AllowSingleQuotedStrings
 	{
 		get
 		{
-			return MIPNPCEMOPG();
+			return GetAllowSingleQuotedStrings();
 		}
 		set
 		{
-			JKAFBNBJLCM(value);
+			SetAllowSingleQuotedStrings(value);
 		}
 	}
 
-	public bool GFODPGFAFDI
+	public bool SkipNonMembers
 	{
 		get
 		{
-			return AIGMJENINOM();
+			return GetSkipNonMembers();
 		}
 		set
 		{
-			HJCGOJIMALO(value);
+			SetSkipNonMembers(value);
 		}
 	}
 
-	public bool GEPCEOKMALO
+	public bool EndOfInput
 	{
 		get
 		{
-			return ELOPMJBDCEN();
+			return GetEndOfInput();
 		}
 	}
 
-	public bool JMFBDICDNFO
+	public bool EndOfJson
 	{
 		get
 		{
-			return LGNOGDFHEFA();
+			return GetEndOfJson();
 		}
 	}
 
-	public GDDEBPANOCH CJPJNFFJNGN
+	public JsonToken Token
 	{
 		get
 		{
-			return EACDJONMMAP();
+			return GetToken();
 		}
 	}
 
@@ -98,13 +98,13 @@ public class JsonReader
 	{
 		get
 		{
-			return OEAKCOHMIHH();
+			return GetValue();
 		}
 	}
 
 	static JsonReader()
 	{
-		IMLJJDMLFAK();
+		PopulateParseTable();
 	}
 
 	public JsonReader(string HLCLNMCHIHP)
@@ -123,118 +123,118 @@ public class JsonReader
 		{
 			throw new ArgumentNullException("reader");
 		}
-		PCKOPADDIEM = false;
-		DPDJCFNBHCF = false;
-		GBFEFPMEGNB = false;
+		parser_in_string = false;
+		parser_return = false;
+		read_started = false;
 		automaton_stack = new Stack<int>();
 		automaton_stack.Push(65553);
 		automaton_stack.Push(65543);
-		NFFOIEMPKNH = new Lexer(reader);
-		LGPODKLEMBP = false;
-		HEAGLCOKJFC = false;
-		LPHEJAENNGN = true;
+		lexer = new Lexer(reader);
+		end_of_input = false;
+		end_of_json = false;
+		skip_non_members = true;
 		this.reader = reader;
-		LODIAFPNLBF = MMDCAOBCJDE;
+		reader_is_owned = MMDCAOBCJDE;
 	}
 
-	public bool CGHOOPPOBJO()
+	public bool GetAllowComments()
 	{
-		return NFFOIEMPKNH.CGHOOPPOBJO();
+		return lexer.GetAllowComments();
 	}
 
-	public void LEONKMNNHJC(bool value)
+	public void SetAllowComments(bool value)
 	{
-		NFFOIEMPKNH.LEONKMNNHJC(value);
+		lexer.SetAllowComments(value);
 	}
 
-	public bool MIPNPCEMOPG()
+	public bool GetAllowSingleQuotedStrings()
 	{
-		return NFFOIEMPKNH.MIPNPCEMOPG();
+		return lexer.GetAllowSingleQuotedStrings();
 	}
 
-	public void JKAFBNBJLCM(bool value)
+	public void SetAllowSingleQuotedStrings(bool value)
 	{
-		NFFOIEMPKNH.JKAFBNBJLCM(value);
+		lexer.SetAllowSingleQuotedStrings(value);
 	}
 
-	public bool AIGMJENINOM()
+	public bool GetSkipNonMembers()
 	{
-		return LPHEJAENNGN;
+		return skip_non_members;
 	}
 
-	public void HJCGOJIMALO(bool value)
+	public void SetSkipNonMembers(bool value)
 	{
-		LPHEJAENNGN = value;
+		skip_non_members = value;
 	}
 
-	public bool ELOPMJBDCEN()
+	public bool GetEndOfInput()
 	{
-		return LGPODKLEMBP;
+		return end_of_input;
 	}
 
-	public bool LGNOGDFHEFA()
+	public bool GetEndOfJson()
 	{
-		return HEAGLCOKJFC;
+		return end_of_json;
 	}
 
-	public GDDEBPANOCH EACDJONMMAP()
+	public JsonToken GetToken()
 	{
-		return JLFCBDKNAGP;
+		return token;
 	}
 
-	public object OEAKCOHMIHH()
+	public object GetValue()
 	{
 		return token_value;
 	}
 
-	private static void IMLJJDMLFAK()
+	private static void PopulateParseTable()
 	{
 		parse_table = new Dictionary<int, IDictionary<int, int[]>>();
-		JLKFPJMCALC(ParserToken.Array);
-		IDFBOMCCDOI(ParserToken.Array, 91, 91, 65549);
-		JLKFPJMCALC(ParserToken.ArrayPrime);
-		IDFBOMCCDOI(ParserToken.ArrayPrime, 34, 65550, 65551, 93);
-		IDFBOMCCDOI(ParserToken.ArrayPrime, 91, 65550, 65551, 93);
-		IDFBOMCCDOI(ParserToken.ArrayPrime, 93, 93);
-		IDFBOMCCDOI(ParserToken.ArrayPrime, 123, 65550, 65551, 93);
-		IDFBOMCCDOI(ParserToken.ArrayPrime, 65537, 65550, 65551, 93);
-		IDFBOMCCDOI(ParserToken.ArrayPrime, 65538, 65550, 65551, 93);
-		IDFBOMCCDOI(ParserToken.ArrayPrime, 65539, 65550, 65551, 93);
-		IDFBOMCCDOI(ParserToken.ArrayPrime, 65540, 65550, 65551, 93);
-		JLKFPJMCALC(ParserToken.Object);
-		IDFBOMCCDOI(ParserToken.Object, 123, 123, 65545);
-		JLKFPJMCALC(ParserToken.ObjectPrime);
-		IDFBOMCCDOI(ParserToken.ObjectPrime, 34, 65546, 65547, 125);
-		IDFBOMCCDOI(ParserToken.ObjectPrime, 125, 125);
-		JLKFPJMCALC(ParserToken.Pair);
-		IDFBOMCCDOI(ParserToken.Pair, 34, 65552, 58, 65550);
-		JLKFPJMCALC(ParserToken.PairRest);
-		IDFBOMCCDOI(ParserToken.PairRest, 44, 44, 65546, 65547);
-		IDFBOMCCDOI(ParserToken.PairRest, 125, 65554);
-		JLKFPJMCALC(ParserToken.String);
-		IDFBOMCCDOI(ParserToken.String, 34, 34, 65541, 34);
-		JLKFPJMCALC(ParserToken.Text);
-		IDFBOMCCDOI(ParserToken.Text, 91, 65548);
-		IDFBOMCCDOI(ParserToken.Text, 123, 65544);
-		JLKFPJMCALC(ParserToken.Value);
-		IDFBOMCCDOI(ParserToken.Value, 34, 65552);
-		IDFBOMCCDOI(ParserToken.Value, 91, 65548);
-		IDFBOMCCDOI(ParserToken.Value, 123, 65544);
-		IDFBOMCCDOI(ParserToken.Value, 65537, 65537);
-		IDFBOMCCDOI(ParserToken.Value, 65538, 65538);
-		IDFBOMCCDOI(ParserToken.Value, 65539, 65539);
-		IDFBOMCCDOI(ParserToken.Value, 65540, 65540);
-		JLKFPJMCALC(ParserToken.ValueRest);
-		IDFBOMCCDOI(ParserToken.ValueRest, 44, 44, 65550, 65551);
-		IDFBOMCCDOI(ParserToken.ValueRest, 93, 65554);
+		TableAddRow(ParserToken.Array);
+		TableAddCol(ParserToken.Array, 91, 91, 65549);
+		TableAddRow(ParserToken.ArrayPrime);
+		TableAddCol(ParserToken.ArrayPrime, 34, 65550, 65551, 93);
+		TableAddCol(ParserToken.ArrayPrime, 91, 65550, 65551, 93);
+		TableAddCol(ParserToken.ArrayPrime, 93, 93);
+		TableAddCol(ParserToken.ArrayPrime, 123, 65550, 65551, 93);
+		TableAddCol(ParserToken.ArrayPrime, 65537, 65550, 65551, 93);
+		TableAddCol(ParserToken.ArrayPrime, 65538, 65550, 65551, 93);
+		TableAddCol(ParserToken.ArrayPrime, 65539, 65550, 65551, 93);
+		TableAddCol(ParserToken.ArrayPrime, 65540, 65550, 65551, 93);
+		TableAddRow(ParserToken.Object);
+		TableAddCol(ParserToken.Object, 123, 123, 65545);
+		TableAddRow(ParserToken.ObjectPrime);
+		TableAddCol(ParserToken.ObjectPrime, 34, 65546, 65547, 125);
+		TableAddCol(ParserToken.ObjectPrime, 125, 125);
+		TableAddRow(ParserToken.Pair);
+		TableAddCol(ParserToken.Pair, 34, 65552, 58, 65550);
+		TableAddRow(ParserToken.PairRest);
+		TableAddCol(ParserToken.PairRest, 44, 44, 65546, 65547);
+		TableAddCol(ParserToken.PairRest, 125, 65554);
+		TableAddRow(ParserToken.String);
+		TableAddCol(ParserToken.String, 34, 34, 65541, 34);
+		TableAddRow(ParserToken.Text);
+		TableAddCol(ParserToken.Text, 91, 65548);
+		TableAddCol(ParserToken.Text, 123, 65544);
+		TableAddRow(ParserToken.Value);
+		TableAddCol(ParserToken.Value, 34, 65552);
+		TableAddCol(ParserToken.Value, 91, 65548);
+		TableAddCol(ParserToken.Value, 123, 65544);
+		TableAddCol(ParserToken.Value, 65537, 65537);
+		TableAddCol(ParserToken.Value, 65538, 65538);
+		TableAddCol(ParserToken.Value, 65539, 65539);
+		TableAddCol(ParserToken.Value, 65540, 65540);
+		TableAddRow(ParserToken.ValueRest);
+		TableAddCol(ParserToken.ValueRest, 44, 44, 65550, 65551);
+		TableAddCol(ParserToken.ValueRest, 93, 65554);
 	}
 
-	private static void IDFBOMCCDOI(ParserToken IBAKGENOEPH, int JNCFMKPIAHB, params int[] HGDAGCFFKNJ)
+	private static void TableAddCol(ParserToken IBAKGENOEPH, int JNCFMKPIAHB, params int[] HGDAGCFFKNJ)
 	{
 		parse_table[(int)IBAKGENOEPH].Add(JNCFMKPIAHB, HGDAGCFFKNJ);
 	}
 
-	private static void JLKFPJMCALC(ParserToken HNBFMAKFJAM)
+	private static void TableAddRow(ParserToken HNBFMAKFJAM)
 	{
 		parse_table.Add((int)HNBFMAKFJAM, new Dictionary<int, int[]>());
 	}
@@ -246,117 +246,117 @@ public class JsonReader
 		long result3;
 		if ((number.IndexOf('.') != -1 || number.IndexOf('e') != -1 || number.IndexOf('E') != -1) && double.TryParse(number, out result))
 		{
-			JLFCBDKNAGP = GDDEBPANOCH.Double;
+			token = JsonToken.Double;
 			token_value = result;
 		}
 		else if (int.TryParse(number, out result2))
 		{
-			JLFCBDKNAGP = GDDEBPANOCH.Int;
+			token = JsonToken.Int;
 			token_value = result2;
 		}
 		else if (long.TryParse(number, out result3))
 		{
-			JLFCBDKNAGP = GDDEBPANOCH.Long;
+			token = JsonToken.Long;
 			token_value = result3;
 		}
 		else
 		{
-			JLFCBDKNAGP = GDDEBPANOCH.Int;
+			token = JsonToken.Int;
 			token_value = 0;
 		}
 	}
 
-	private void PBIKFHDLCLG()
+	private void ProcessSymbol()
 	{
-		if (LNDNLHCPNCE == 91)
+		if (current_symbol == 91)
 		{
-			JLFCBDKNAGP = GDDEBPANOCH.ArrayStart;
-			DPDJCFNBHCF = true;
+			token = JsonToken.ArrayStart;
+			parser_return = true;
 		}
-		else if (LNDNLHCPNCE == 93)
+		else if (current_symbol == 93)
 		{
-			JLFCBDKNAGP = GDDEBPANOCH.ArrayEnd;
-			DPDJCFNBHCF = true;
+			token = JsonToken.ArrayEnd;
+			parser_return = true;
 		}
-		else if (LNDNLHCPNCE == 123)
+		else if (current_symbol == 123)
 		{
-			JLFCBDKNAGP = GDDEBPANOCH.ObjectStart;
-			DPDJCFNBHCF = true;
+			token = JsonToken.ObjectStart;
+			parser_return = true;
 		}
-		else if (LNDNLHCPNCE == 125)
+		else if (current_symbol == 125)
 		{
-			JLFCBDKNAGP = GDDEBPANOCH.ObjectEnd;
-			DPDJCFNBHCF = true;
+			token = JsonToken.ObjectEnd;
+			parser_return = true;
 		}
-		else if (LNDNLHCPNCE == 34)
+		else if (current_symbol == 34)
 		{
-			if (PCKOPADDIEM)
+			if (parser_in_string)
 			{
-				PCKOPADDIEM = false;
-				DPDJCFNBHCF = true;
+				parser_in_string = false;
+				parser_return = true;
 				return;
 			}
-			if (JLFCBDKNAGP == GDDEBPANOCH.None)
+			if (token == JsonToken.None)
 			{
-				JLFCBDKNAGP = GDDEBPANOCH.String;
+				token = JsonToken.String;
 			}
-			PCKOPADDIEM = true;
+			parser_in_string = true;
 		}
-		else if (LNDNLHCPNCE == 65541)
+		else if (current_symbol == 65541)
 		{
-			token_value = NFFOIEMPKNH.EODMEFCBIOM();
+			token_value = lexer.GetStringValue();
 		}
-		else if (LNDNLHCPNCE == 65539)
+		else if (current_symbol == 65539)
 		{
-			JLFCBDKNAGP = GDDEBPANOCH.Boolean;
+			token = JsonToken.Boolean;
 			token_value = false;
-			DPDJCFNBHCF = true;
+			parser_return = true;
 		}
-		else if (LNDNLHCPNCE == 65540)
+		else if (current_symbol == 65540)
 		{
-			JLFCBDKNAGP = GDDEBPANOCH.Null;
-			DPDJCFNBHCF = true;
+			token = JsonToken.Null;
+			parser_return = true;
 		}
-		else if (LNDNLHCPNCE == 65537)
+		else if (current_symbol == 65537)
 		{
-			ProcessNumber(NFFOIEMPKNH.EODMEFCBIOM());
-			DPDJCFNBHCF = true;
+			ProcessNumber(lexer.GetStringValue());
+			parser_return = true;
 		}
-		else if (LNDNLHCPNCE == 65546)
+		else if (current_symbol == 65546)
 		{
-			JLFCBDKNAGP = GDDEBPANOCH.PropertyName;
+			token = JsonToken.PropertyName;
 		}
-		else if (LNDNLHCPNCE == 65538)
+		else if (current_symbol == 65538)
 		{
-			JLFCBDKNAGP = GDDEBPANOCH.Boolean;
+			token = JsonToken.Boolean;
 			token_value = true;
-			DPDJCFNBHCF = true;
+			parser_return = true;
 		}
 	}
 
-	private bool IFLJEOBDMCD()
+	private bool ReadToken()
 	{
-		if (LGPODKLEMBP)
+		if (end_of_input)
 		{
 			return false;
 		}
-		NFFOIEMPKNH.NextToken();
-		if (NFFOIEMPKNH.ELOPMJBDCEN())
+		lexer.NextToken();
+		if (lexer.GetEndOfInput())
 		{
 			Close();
 			return false;
 		}
-		NHEIKKOGHHK = NFFOIEMPKNH.EACDJONMMAP();
+		current_input = lexer.GetToken();
 		return true;
 	}
 
 	public void Close()
 	{
-		if (!LGPODKLEMBP)
+		if (!end_of_input)
 		{
-			LGPODKLEMBP = true;
-			HEAGLCOKJFC = true;
-			if (LODIAFPNLBF)
+			end_of_input = true;
+			end_of_json = true;
+			if (reader_is_owned)
 			{
 				reader.Dispose();
 			}
@@ -366,44 +366,44 @@ public class JsonReader
 
 	public bool Read()
 	{
-		if (LGPODKLEMBP)
+		if (end_of_input)
 		{
 			return false;
 		}
-		if (HEAGLCOKJFC)
+		if (end_of_json)
 		{
-			HEAGLCOKJFC = false;
+			end_of_json = false;
 			automaton_stack.Clear();
 			automaton_stack.Push(65553);
 			automaton_stack.Push(65543);
 		}
-		PCKOPADDIEM = false;
-		DPDJCFNBHCF = false;
-		JLFCBDKNAGP = GDDEBPANOCH.None;
+		parser_in_string = false;
+		parser_return = false;
+		token = JsonToken.None;
 		token_value = null;
-		if (!GBFEFPMEGNB)
+		if (!read_started)
 		{
-			GBFEFPMEGNB = true;
-			if (!IFLJEOBDMCD())
+			read_started = true;
+			if (!ReadToken())
 			{
 				return false;
 			}
 		}
 		while (true)
 		{
-			if (DPDJCFNBHCF)
+			if (parser_return)
 			{
 				if (automaton_stack.Peek() == 65553)
 				{
-					HEAGLCOKJFC = true;
+					end_of_json = true;
 				}
 				return true;
 			}
-			LNDNLHCPNCE = automaton_stack.Pop();
-			PBIKFHDLCLG();
-			if (LNDNLHCPNCE == NHEIKKOGHHK)
+			current_symbol = automaton_stack.Pop();
+			ProcessSymbol();
+			if (current_symbol == current_input)
 			{
-				if (!IFLJEOBDMCD())
+				if (!ReadToken())
 				{
 					break;
 				}
@@ -412,11 +412,11 @@ public class JsonReader
 			int[] array;
 			try
 			{
-				array = parse_table[LNDNLHCPNCE][NHEIKKOGHHK];
+				array = parse_table[current_symbol][current_input];
 			}
 			catch (KeyNotFoundException iADJLHGKHGL)
 			{
-				throw new JsonException((ParserToken)NHEIKKOGHHK, iADJLHGKHGL);
+				throw new JsonException((ParserToken)current_input, iADJLHGKHGL);
 			}
 			if (array[0] != 65554)
 			{
@@ -430,7 +430,7 @@ public class JsonReader
 		{
 			throw new JsonException("Input doesn't evaluate to proper JSON text");
 		}
-		if (DPDJCFNBHCF)
+		if (parser_return)
 		{
 			return true;
 		}

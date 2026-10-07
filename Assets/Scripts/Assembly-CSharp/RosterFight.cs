@@ -4,37 +4,37 @@ public class RosterFight
 {
 	protected XmlNode _node;
 
-	public FightList GAHNGDBKFNO;
+	public FightList LinkedFightList;
 
-	protected int JOBFHJKBJKN;
+	protected int lossCount;
 
-	protected int GDFACJKNGCB;
+	protected int winCount;
 
-	protected long DEJHGDMHGAA;
+	protected long completionTimestamp;
 
 	protected int _level;
 
 	private int _id;
 
-	private int DCBBBLMIHKN;
+	private int eclipseWinCount;
 
-	private int FGEHEIHHPJD;
+	private int eclipseLossCount;
 
-	private int EGADIFEELGM;
+	private int consecutiveLosses;
 
-	private int KOJONNKHOGP;
+	private int storyCount;
 
-	private int NBNPGBNOALB;
+	private int randomGroupSeed;
 
 	private int _randomRuleSeed;
 
 	public bool HasRandomSeeds;
 
-	private long OCNKJAGPNJH;
+	private long randomizeTimestamp;
 
-	private long HJOHKOEICAP;
+	private long elapsedSinceCompletion;
 
-	private long NCFEAANPKMI;
+	private long elapsedSinceRandomize;
 
 	private string _fightIDS = string.Empty;
 
@@ -42,11 +42,11 @@ public class RosterFight
 	{
 		get
 		{
-			return LIGMHKEOJBB();
+			return GetNode();
 		}
 	}
 
-	public int EDDMIFJFKBM
+	public int LossCount
 	{
 		get
 		{
@@ -54,11 +54,11 @@ public class RosterFight
 		}
 		set
 		{
-			NGGKBEKOJGI(value);
+			SetLossCount(value);
 		}
 	}
 
-	public int CPPGPAILEDF
+	public int WinCount
 	{
 		get
 		{
@@ -66,19 +66,19 @@ public class RosterFight
 		}
 		set
 		{
-			OBFNFKPHJIN(value);
+			SetWinCount(value);
 		}
 	}
 
-	public long CLDABPBDDGB
+	public long CompletionTimestamp
 	{
 		get
 		{
-			return ILBNPNIPEHO();
+			return GetCompletionTimestamp();
 		}
 		set
 		{
-			CKJFJFPBIFF(value);
+			SetCompletionTimestamp(value);
 		}
 	}
 
@@ -86,11 +86,11 @@ public class RosterFight
 	{
 		get
 		{
-			return PINDEKDNCNL();
+			return GetLevel();
 		}
 		set
 		{
-			DLDMOHEGENM(value);
+			SetLevel(value);
 		}
 	}
 
@@ -98,87 +98,87 @@ public class RosterFight
 	{
 		set
 		{
-			MKAMABIPHEN(value);
+			SetId(value);
 		}
 	}
 
-	public int LCDHKPEPEOB
+	public int EclipseWinCount
 	{
 		get
 		{
-			return PEHLNNEFFLI();
+			return GetEclipseWinCount();
 		}
 		set
 		{
-			BIINCAKDHLP(value);
+			SetEclipseWinCount(value);
 		}
 	}
 
-	public int KCNPAIGGBNE
+	public int EclipseLossCount
 	{
 		get
 		{
-			return PHKCBMAOHIF();
+			return GetEclipseLossCount();
 		}
 		set
 		{
-			PFFHCBCFMCM(value);
+			SetEclipseLossCount(value);
 		}
 	}
 
-	public int GKNHMGEEFNE
+	public int ConsecutiveLosses
 	{
 		get
 		{
-			return NIAHMHPBEAA();
+			return GetConsecutiveLosses();
 		}
 	}
 
-	public int HBLEGOFKICB
+	public int StoryCount
 	{
 		get
 		{
-			return LNMPOLNHCIJ();
+			return GetStoryCount();
 		}
 		set
 		{
-			LCFFEFOFJOM(value);
+			SetStoryCount(value);
 		}
 	}
 
-	public int GLLHEJIFGOJ
+	public int RandomGroupSeed
 	{
 		get
 		{
-			return PFJKCOPFNHB();
+			return GetRandomGroupSeed();
 		}
 		set
 		{
-			ELJAOONAOHJ(value);
+			SetRandomGroupSeed(value);
 		}
 	}
 
-	public int BHNAKDJODEB
+	public int RandomRuleSeed
 	{
 		get
 		{
-			return BKDOAOCGJLJ();
+			return GetRandomRuleSeed();
 		}
 		set
 		{
-			OEKFMKDLLHE(value);
+			SetRandomRuleSeed(value);
 		}
 	}
 
-	public long BDOMCCPCLNN
+	public long RandomizeTimestamp
 	{
 		get
 		{
-			return FDAEBPDIEEE();
+			return GetRandomizeTimestamp();
 		}
 		set
 		{
-			NAAHEPJIFAD(value);
+			SetRandomizeTimestamp(value);
 		}
 	}
 
@@ -186,27 +186,27 @@ public class RosterFight
 	{
 		get
 		{
-			return CCCIFDLEMPI();
+			return GetElapsedSinceCompletion();
 		}
 		set
 		{
-			ABIELBGOLCA(value);
+			UpdateElapsedSinceCompletion(value);
 		}
 	}
 
-	public long EIIOLMBDBCF
+	public long RandomizeElapsedTime
 	{
 		set
 		{
-			CLCBNOCDIPF(value);
+			UpdateElapsedSinceRandomize(value);
 		}
 	}
 
-	public string JLGLBLDPAAF
+	public string FightIdString
 	{
 		get
 		{
-			return EKOIBAIIKHL();
+			return GetFightIdString();
 		}
 		set
 		{
@@ -216,71 +216,71 @@ public class RosterFight
 
 	public RosterFight(XmlNode node)
 	{
-		HJOHKOEICAP = -1L;
-		NCFEAANPKMI = 0L;
-		GAHNGDBKFNO = null;
+		elapsedSinceCompletion = -1L;
+		elapsedSinceRandomize = 0L;
+		LinkedFightList = null;
 		_node = node;
 		if (_node.Attributes["ID"].Empty())
 		{
-			_node.LLIKNHNLGJJ("ID").Value = "-1";
+			_node.AppendAttribute("ID").Value = "-1";
 		}
 		if (_node.Attributes["IDS"].Empty())
 		{
-			_node.LLIKNHNLGJJ("IDS").Value = "-1|-1|-1";
+			_node.AppendAttribute("IDS").Value = "-1|-1|-1";
 		}
 		if (_node.Attributes["CompletedCount"].Empty())
 		{
-			_node.LLIKNHNLGJJ("CompletedCount").Value = "0";
+			_node.AppendAttribute("CompletedCount").Value = "0";
 		}
 		if (_node.Attributes["LossCount"].Empty())
 		{
-			_node.LLIKNHNLGJJ("LossCount").Value = "0";
+			_node.AppendAttribute("LossCount").Value = "0";
 		}
 		if (_node.Attributes["EclipseCompletedCount"].Empty())
 		{
-			_node.LLIKNHNLGJJ("EclipseCompletedCount").Value = "0";
+			_node.AppendAttribute("EclipseCompletedCount").Value = "0";
 		}
 		if (_node.Attributes["EclipseLossCount"].Empty())
 		{
-			_node.LLIKNHNLGJJ("EclipseLossCount").Value = "0";
+			_node.AppendAttribute("EclipseLossCount").Value = "0";
 		}
 		if (_node.Attributes["StoryCount"].Empty())
 		{
-			_node.LLIKNHNLGJJ("StoryCount").Value = "0";
+			_node.AppendAttribute("StoryCount").Value = "0";
 		}
 		if (_node.Attributes["CompletedTime"].Empty())
 		{
-			_node.LLIKNHNLGJJ("CompletedTime").Value = "0";
+			_node.AppendAttribute("CompletedTime").Value = "0";
 		}
 		if (_node.Attributes["TimeLeft"].Empty())
 		{
-			_node.LLIKNHNLGJJ("TimeLeft").Value = "0";
+			_node.AppendAttribute("TimeLeft").Value = "0";
 		}
 		if (_node.Attributes["RandomizeTimeLeft"].Empty())
 		{
-			_node.LLIKNHNLGJJ("RandomizeTimeLeft").Value = "0";
+			_node.AppendAttribute("RandomizeTimeLeft").Value = "0";
 		}
 		if (_node.Attributes["Level"].Empty())
 		{
-			_node.LLIKNHNLGJJ("Level").Value = "0";
+			_node.AppendAttribute("Level").Value = "0";
 		}
-		_fightIDS = _node.Attributes["IDS"].CIPOICEEIBK(string.Empty);
+		_fightIDS = _node.Attributes["IDS"].GetStringOrDefault(string.Empty);
 		_id = _node.Attributes["ID"].ParseInt();
-		GDFACJKNGCB = _node.Attributes["CompletedCount"].ParseInt();
-		JOBFHJKBJKN = _node.Attributes["LossCount"].ParseInt();
-		DCBBBLMIHKN = _node.Attributes["EclipseCompletedCount"].ParseInt();
-		FGEHEIHHPJD = _node.Attributes["EclipseLossCount"].ParseInt();
-		DEJHGDMHGAA = _node.Attributes["TimeLeft"].ParseLong(0L);
-		OCNKJAGPNJH = _node.Attributes["RandomizeTimeLeft"].ParseLong(0L);
-		KOJONNKHOGP = _node.Attributes["StoryCount"].ParseInt();
+		winCount = _node.Attributes["CompletedCount"].ParseInt();
+		lossCount = _node.Attributes["LossCount"].ParseInt();
+		eclipseWinCount = _node.Attributes["EclipseCompletedCount"].ParseInt();
+		eclipseLossCount = _node.Attributes["EclipseLossCount"].ParseInt();
+		completionTimestamp = _node.Attributes["TimeLeft"].ParseLong(0L);
+		randomizeTimestamp = _node.Attributes["RandomizeTimeLeft"].ParseLong(0L);
+		storyCount = _node.Attributes["StoryCount"].ParseInt();
 		_level = _node.Attributes["Level"].ParseInt();
-		NBNPGBNOALB = _node.Attributes["RandomGroupSeed"].ParseInt();
+		randomGroupSeed = _node.Attributes["RandomGroupSeed"].ParseInt();
 		_randomRuleSeed = _node.Attributes["RandomRuleSeed"].ParseInt();
-		HasRandomSeeds = NBNPGBNOALB != 0 || _randomRuleSeed != 0;
-		EGADIFEELGM = 0;
+		HasRandomSeeds = randomGroupSeed != 0 || _randomRuleSeed != 0;
+		consecutiveLosses = 0;
 	}
 
-	public XmlNode LIGMHKEOJBB()
+	public XmlNode GetNode()
 	{
 		return _node;
 	}
@@ -288,192 +288,192 @@ public class RosterFight
 	// best guess for name
 	public int GetLossCount()
 	{
-		return JOBFHJKBJKN;
+		return lossCount;
 	}
 
-	public void NGGKBEKOJGI(int value)
+	public void SetLossCount(int value)
 	{
-		JOBFHJKBJKN = value;
-		_node.Attributes["LossCount"].Value = JOBFHJKBJKN.ToString();
+		lossCount = value;
+		_node.Attributes["LossCount"].Value = lossCount.ToString();
 	}
 
 	// best guess for name
 	public int GetWinCount()
 	{
-		return GDFACJKNGCB;
+		return winCount;
 	}
 
-	public void OBFNFKPHJIN(int value)
+	public void SetWinCount(int value)
 	{
-		GDFACJKNGCB = value;
-		_node.Attributes["CompletedCount"].Value = GDFACJKNGCB.ToString();
+		winCount = value;
+		_node.Attributes["CompletedCount"].Value = winCount.ToString();
 	}
 
-	public long ILBNPNIPEHO()
+	public long GetCompletionTimestamp()
 	{
-		return DEJHGDMHGAA;
+		return completionTimestamp;
 	}
 
-	public void CKJFJFPBIFF(long value)
+	public void SetCompletionTimestamp(long value)
 	{
-		DEJHGDMHGAA = value;
-		_node.Attributes["TimeLeft"].Value = DEJHGDMHGAA.ToString();
+		completionTimestamp = value;
+		_node.Attributes["TimeLeft"].Value = completionTimestamp.ToString();
 	}
 
-	public int PINDEKDNCNL()
+	public int GetLevel()
 	{
 		return _level;
 	}
 
-	public void DLDMOHEGENM(int value)
+	public void SetLevel(int value)
 	{
 		_level = value;
 		_node.Attributes["Level"].Value = _level.ToString();
 	}
 
-	public void MKAMABIPHEN(int value)
+	public void SetId(int value)
 	{
 		_id = value;
 		_node.Attributes["ID"].Value = _id.ToString();
 	}
 
-	public int PEHLNNEFFLI()
+	public int GetEclipseWinCount()
 	{
-		return DCBBBLMIHKN;
+		return eclipseWinCount;
 	}
 
-	public void BIINCAKDHLP(int value)
+	public void SetEclipseWinCount(int value)
 	{
-		DCBBBLMIHKN = value;
-		_node.Attributes["EclipseCompletedCount"].Value = DCBBBLMIHKN.ToString();
+		eclipseWinCount = value;
+		_node.Attributes["EclipseCompletedCount"].Value = eclipseWinCount.ToString();
 	}
 
-	public void LOEBHEODPAH()
+	public void IncrementEclipseWinCount()
 	{
-		DCBBBLMIHKN++;
-		_node.Attributes["EclipseCompletedCount"].Value = DCBBBLMIHKN.ToString();
+		eclipseWinCount++;
+		_node.Attributes["EclipseCompletedCount"].Value = eclipseWinCount.ToString();
 	}
 
-	public int PHKCBMAOHIF()
+	public int GetEclipseLossCount()
 	{
-		return FGEHEIHHPJD;
+		return eclipseLossCount;
 	}
 
-	public void PFFHCBCFMCM(int value)
+	public void SetEclipseLossCount(int value)
 	{
-		FGEHEIHHPJD = value;
-		_node.Attributes["EclipseLossCount"].Value = FGEHEIHHPJD.ToString();
+		eclipseLossCount = value;
+		_node.Attributes["EclipseLossCount"].Value = eclipseLossCount.ToString();
 	}
 
-	public void HBIAOHGMLDK()
+	public void IncrementEclipseLossCount()
 	{
-		FGEHEIHHPJD++;
-		_node.Attributes["EclipseLossCount"].Value = FGEHEIHHPJD.ToString();
+		eclipseLossCount++;
+		_node.Attributes["EclipseLossCount"].Value = eclipseLossCount.ToString();
 	}
 
-	public int NIAHMHPBEAA()
+	public int GetConsecutiveLosses()
 	{
-		return EGADIFEELGM;
+		return consecutiveLosses;
 	}
 
-	public int LNMPOLNHCIJ()
+	public int GetStoryCount()
 	{
-		return KOJONNKHOGP;
+		return storyCount;
 	}
 
-	public void LCFFEFOFJOM(int value)
+	public void SetStoryCount(int value)
 	{
-		KOJONNKHOGP = value;
-		_node.Attributes["StoryCount"].Value = KOJONNKHOGP.ToString();
+		storyCount = value;
+		_node.Attributes["StoryCount"].Value = storyCount.ToString();
 	}
 
-	private void PMIDKMKNOHM()
+	private void IncrementStoryCount()
 	{
-		KOJONNKHOGP++;
-		_node.Attributes["StoryCount"].Value = KOJONNKHOGP.ToString();
+		storyCount++;
+		_node.Attributes["StoryCount"].Value = storyCount.ToString();
 	}
 
-	public int PFJKCOPFNHB()
+	public int GetRandomGroupSeed()
 	{
-		return NBNPGBNOALB;
+		return randomGroupSeed;
 	}
 
-	public void ELJAOONAOHJ(int value)
+	public void SetRandomGroupSeed(int value)
 	{
-		NBNPGBNOALB = value;
+		randomGroupSeed = value;
 		if (_node.Attributes["RandomGroupSeed"].Empty())
 		{
-			_node.LLIKNHNLGJJ("RandomGroupSeed").Value = NBNPGBNOALB.ToString();
+			_node.AppendAttribute("RandomGroupSeed").Value = randomGroupSeed.ToString();
 		}
 		else
 		{
-			_node.Attributes["RandomGroupSeed"].Value = NBNPGBNOALB.ToString();
+			_node.Attributes["RandomGroupSeed"].Value = randomGroupSeed.ToString();
 		}
 	}
 
-	public int BKDOAOCGJLJ()
+	public int GetRandomRuleSeed()
 	{
 		return _randomRuleSeed;
 	}
 
-	public void OEKFMKDLLHE(int value)
+	public void SetRandomRuleSeed(int value)
 	{
 		_randomRuleSeed = value;
 		if (_node.Attributes["RandomRuleSeed"].Empty())
 		{
-			_node.LLIKNHNLGJJ("RandomRuleSeed").Value = _randomRuleSeed.ToString();
+			_node.AppendAttribute("RandomRuleSeed").Value = _randomRuleSeed.ToString();
 		}
 		else
 		{
 			_node.Attributes["RandomRuleSeed"].Value = _randomRuleSeed.ToString();
 		}
-		if (GAHNGDBKFNO != null)
+		if (LinkedFightList != null)
 		{
-			GAHNGDBKFNO.ResetRandomRules();
+			LinkedFightList.ResetRandomRules();
 		}
 	}
 
-	public long FDAEBPDIEEE()
+	public long GetRandomizeTimestamp()
 	{
-		return OCNKJAGPNJH;
+		return randomizeTimestamp;
 	}
 
-	public void NAAHEPJIFAD(long value)
+	public void SetRandomizeTimestamp(long value)
 	{
-		OCNKJAGPNJH = value;
-		_node.Attributes["RandomizeTimeLeft"].Value = OCNKJAGPNJH.ToString();
+		randomizeTimestamp = value;
+		_node.Attributes["RandomizeTimeLeft"].Value = randomizeTimestamp.ToString();
 	}
 
-	public long CCCIFDLEMPI()
+	public long GetElapsedSinceCompletion()
 	{
-		return HJOHKOEICAP;
+		return elapsedSinceCompletion;
 	}
 
-	public void ABIELBGOLCA(long value)
+	public void UpdateElapsedSinceCompletion(long value)
 	{
-		if (DEJHGDMHGAA <= 0)
+		if (completionTimestamp <= 0)
 		{
-			HJOHKOEICAP = -1L;
-		}
-		else
-		{
-			HJOHKOEICAP = value - DEJHGDMHGAA;
-		}
-	}
-
-	public void CLCBNOCDIPF(long value)
-	{
-		if (OCNKJAGPNJH <= 0)
-		{
-			NCFEAANPKMI = -1L;
+			elapsedSinceCompletion = -1L;
 		}
 		else
 		{
-			NCFEAANPKMI = value - OCNKJAGPNJH;
+			elapsedSinceCompletion = value - completionTimestamp;
 		}
 	}
 
-	public string EKOIBAIIKHL()
+	public void UpdateElapsedSinceRandomize(long value)
+	{
+		if (randomizeTimestamp <= 0)
+		{
+			elapsedSinceRandomize = -1L;
+		}
+		else
+		{
+			elapsedSinceRandomize = value - randomizeTimestamp;
+		}
+	}
+
+	public string GetFightIdString()
 	{
 		return _fightIDS;
 	}
@@ -484,46 +484,46 @@ public class RosterFight
 		_node.Attributes["IDS"].Value = _fightIDS.ToString();
 	}
 
-	public string GIDNOKCJLPL()
+	public string GetBattleName()
 	{
 		FightIDS mOCEDDJOAEB = new FightIDS();
 		mOCEDDJOAEB.SetFightIDSByString(_fightIDS);
-		return mOCEDDJOAEB.CPHDPCAECJN();
+		return mOCEDDJOAEB.GetBattle();
 	}
 
-	public void GICDABHEMML()
+	public void RecordWin()
 	{
-		EGADIFEELGM = 0;
-		GDFACJKNGCB++;
-		_node.Attributes["CompletedCount"].Value = GDFACJKNGCB.ToString();
+		consecutiveLosses = 0;
+		winCount++;
+		_node.Attributes["CompletedCount"].Value = winCount.ToString();
 	}
 
-	public void ICAKCDMOMDF()
+	public void RecordLoss()
 	{
-		EGADIFEELGM++;
-		JOBFHJKBJKN++;
-		_node.Attributes["LossCount"].Value = JOBFHJKBJKN.ToString();
+		consecutiveLosses++;
+		lossCount++;
+		_node.Attributes["LossCount"].Value = lossCount.ToString();
 	}
 
-	public bool GHCHJIBBBOK(long value)
+	public bool IsRepeatAvailable(long value)
 	{
-		return HJOHKOEICAP < 0 || HJOHKOEICAP >= value;
+		return elapsedSinceCompletion < 0 || elapsedSinceCompletion >= value;
 	}
 
-	public void BABOCEFFPII()
+	public void RandomizeSeeds()
 	{
-		ELJAOONAOHJ(NekkiMath.randomInt(int.MaxValue));
-		OEKFMKDLLHE(NekkiMath.randomInt(int.MaxValue));
+		SetRandomGroupSeed(NekkiMath.randomInt(int.MaxValue));
+		SetRandomRuleSeed(NekkiMath.randomInt(int.MaxValue));
 		HasRandomSeeds = true;
-		NAAHEPJIFAD(ListSF.IDMJOMOMDOJ());
-		ListSF.GetInstance().EJANJEEGOOE();
+		SetRandomizeTimestamp(ListSF.GetCurrentTime());
+		ListSF.GetInstance().RequestSave();
 	}
 
-	public bool AANKNHJKJII(long LHLPFBOAEPA)
+	public bool RerandomizeIfElapsed(long LHLPFBOAEPA)
 	{
-		if (NCFEAANPKMI >= LHLPFBOAEPA || NCFEAANPKMI == -1)
+		if (elapsedSinceRandomize >= LHLPFBOAEPA || elapsedSinceRandomize == -1)
 		{
-			BABOCEFFPII();
+			RandomizeSeeds();
 			return true;
 		}
 		return false;

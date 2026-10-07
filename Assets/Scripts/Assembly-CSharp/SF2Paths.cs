@@ -4,111 +4,111 @@ using UnityEngine;
 
 public static class SF2Paths
 {
-	private const string BLINCLHGPDD = "/gamedata";
+	private const string GameDataFolder = "/gamedata";
 
-	private const string CFJCEPHKHOC = "/userdata";
+	private const string UserDataFolder = "/userdata";
 
-	private const string LNKJIIGBEDA = "/animations";
+	private const string AnimationsFolder = "/animations";
 
-	private const string LMEGBHBOMPL = "/animations/binary";
+	private const string BinaryAnimationsFolder = "/animations/binary";
 
-	private const string BPIFJBJBKHA = "/models";
+	private const string ModelsFolder = "/models";
 
-	private const string MHEBDPKJELL = "/localizations";
+	private const string LocalizationsFolder = "/localizations";
 
-	private const string IDDGKCDKBIE = "/locations";
+	private const string LocationsFolder = "/locations";
 
-	private const string PNFCONFCFHO = "/textures";
+	private const string TexturesFolder = "/textures";
 
-	private const string DNFCNIHMHAM = "textures/fullscreen/";
+	private const string FullscreenTexturesFolder = "textures/fullscreen/";
 
 	private const string _Statistics = "/statistics";
 
-	private const string PBEMFHLKNAB = "/news";
+	private const string NewsFolder = "/news";
 
-	private const string FPKLEIKDAGE = "/bundles";
+	private const string BundlesFolder = "/bundles";
 
-	private const string LIFGPEIOMIN = "/video";
+	private const string VideoFolder = "/video";
 
-	private const string MGIADGBHBNI = "/packs.xml";
+	private const string PacksFileName = "/packs.xml";
 
-	private const string IBNJHJBODKG = "Assets/src/GUI/Resources";
+	private const string GuiResourcesFolder = "Assets/src/GUI/Resources";
 
-	private const string ECEKFJBIBHL = "UI/Items/";
+	private const string ItemsUiFolder = "UI/Items/";
 
-	private const string EBDAHGLNNIL = "UI/Users/";
+	private const string UsersUiFolder = "UI/Users/";
 
-	private const string DFDNINNMFJF = "UI/Skills/";
+	private const string SkillsUiFolder = "UI/Skills/";
 
-	public const string HJMLENEHEJA = "UI/Achievements/";
+	public const string AchievementsUiFolder = "UI/Achievements/";
 
-	public const string COKGDCKBILB = "UI/Fullscreen/";
+	public const string FullscreenUiFolder = "UI/Fullscreen/";
 
-	public const string FKFCDICFJKF = "textures/Logos/";
+	public const string LogosTexturesFolder = "textures/Logos/";
 
-	public static string KBOPNEIIDNL = string.Empty;
+	public static string GameDataRoot = string.Empty;
 
-	public static string FFKEDOBDLOL = string.Empty;
+	public static string UserDataRoot = string.Empty;
 
-	public static string JKKPDAFGLJL = string.Empty;
+	public static string WritableDataRoot = string.Empty;
 
-	public static bool CGOHPKEBECD = true;
+	public static bool UseBundledResources = true;
 
-	private static bool LFGMJKBJIEG;
+	private static bool initialized;
 
-	public static string NPLCFDDGBFN
+	public static string GameDataPath
 	{
 		get
 		{
-			return KKIDGPBOBNI();
+			return GetGameDataPath();
 		}
 	}
 
-	public static string HEIDEOHCHJC
+	public static string WritableGameDataPath
 	{
 		get
 		{
-			return GBOFOFGDMBN();
+			return GetWritableGameDataPath();
 		}
 	}
 
-	public static string EEOIKBPHJOL
+	public static string AnimationsPath
 	{
 		get
 		{
-			return MCFPDHOLNGB();
+			return GetAnimationsPath();
 		}
 	}
 
-	public static string MJIAIJCJHBK
+	public static string BinaryAnimationsPath
 	{
 		get
 		{
-			return CBKLONCNPCP();
+			return GetBinaryAnimationsPath();
 		}
 	}
 
-	public static string LNDLFINJHDB
+	public static string ModelsPath
 	{
 		get
 		{
-			return BNHLPKEDMOM();
+			return GetModelsPath();
 		}
 	}
 
-	public static string FPDKKKEMMEC
+	public static string VideoPath
 	{
 		get
 		{
-			return HAHDKJAPIJL();
+			return GetVideoPath();
 		}
 	}
 
-	public static string DBIBHIGLGGL
+	public static string ItemsUiPath
 	{
 		get
 		{
-			return LFIIMPEAMFG();
+			return GetItemsUiPath();
 		}
 	}
 
@@ -116,51 +116,51 @@ public static class SF2Paths
 	{
 		get
 		{
-			return ELPBOBIMAFD();
+			return GetTexturesPath();
 		}
 	}
 
-	public static string EAMILDOGLJA
+	public static string UsersUiPath
 	{
 		get
 		{
-			return BHCPOOOJAAK();
+			return GetUsersUiPath();
 		}
 	}
 
-	public static string IJELKAEELMB
+	public static string SkillsUiPath
 	{
 		get
 		{
-			return KLIDILIHOFF();
+			return GetSkillsUiPath();
 		}
 	}
 
-	public static string ODBENFNAKOA
+	public static string FullscreenTexturesPath
 	{
 		get
 		{
-			return HIBFNEKOCHC();
+			return GetFullscreenTexturesPath();
 		}
 	}
 
-	public static string LJILMFAGLOB
+	public static string LocalizationsPath
 	{
 		get
 		{
-			return ENFGGKMDICD();
+			return GetLocalizationsPath();
 		}
 	}
 
-	public static string OKLDBDJBPDE
+	public static string LocationsPath
 	{
 		get
 		{
-			return OCAKEHJCNCC();
+			return GetLocationsPath();
 		}
 	}
 
-	public static string HHNLIOIEAGG
+	public static string UserDataPath
 	{
 		get
 		{
@@ -168,117 +168,117 @@ public static class SF2Paths
 		}
 	}
 
-	public static string GKKNJKLJAML
+	public static string StatisticsPath
 	{
 		get
 		{
-			return LCDBGFFDKJB();
+			return GetStatisticsPath();
 		}
 	}
 
-	public static string FNHPCBEDKFO
+	public static string NewsPath
 	{
 		get
 		{
-			return GJFFDOJLHGK();
+			return GetNewsPath();
 		}
 	}
 
-	public static string ELBNBMHBPDP
+	public static string BundlesPath
 	{
 		get
 		{
-			return MEKBAHBKMNB();
+			return GetBundlesPath();
 		}
 	}
 
-	public static string NNFMKNJJDDD
+	public static string PacksFilePath
 	{
 		get
 		{
-			return IDLJHPEDOEH();
+			return GetPacksFilePath();
 		}
 	}
 
-	public static string LIAIDGMCBED
+	public static string GuiResourcesRoot
 	{
 		get
 		{
-			return ECJMHJOMMBC();
+			return GetGuiResourcesRoot();
 		}
 	}
 
-	public static bool IOGMEGLBNIJ
+	public static bool IsInitialized
 	{
 		get
 		{
-			return IANJCHNLMHC();
+			return GetIsInitialized();
 		}
 	}
 
-	public static string KKIDGPBOBNI()
+	public static string GetGameDataPath()
 	{
-		return KBOPNEIIDNL + "/gamedata";
+		return GameDataRoot + "/gamedata";
 	}
 
-	public static string GBOFOFGDMBN()
+	public static string GetWritableGameDataPath()
 	{
-		return JKKPDAFGLJL + "/gamedata";
+		return WritableDataRoot + "/gamedata";
 	}
 
-	public static string MCFPDHOLNGB()
+	public static string GetAnimationsPath()
 	{
-		return KKIDGPBOBNI() + "/animations";
+		return GetGameDataPath() + "/animations";
 	}
 
-	public static string CBKLONCNPCP()
+	public static string GetBinaryAnimationsPath()
 	{
-		return KKIDGPBOBNI() + "/animations/binary";
+		return GetGameDataPath() + "/animations/binary";
 	}
 
-	public static string BNHLPKEDMOM()
+	public static string GetModelsPath()
 	{
-		return KKIDGPBOBNI() + "/models";
+		return GetGameDataPath() + "/models";
 	}
 
-	public static string HAHDKJAPIJL()
+	public static string GetVideoPath()
 	{
-		return KKIDGPBOBNI() + "/video";
+		return GetGameDataPath() + "/video";
 	}
 
-	public static string LFIIMPEAMFG()
+	public static string GetItemsUiPath()
 	{
 		return "UI/Items/";
 	}
 
-	public static string ELPBOBIMAFD()
+	public static string GetTexturesPath()
 	{
 		return "/textures";
 	}
 
-	public static string BHCPOOOJAAK()
+	public static string GetUsersUiPath()
 	{
 		return "UI/Users/";
 	}
 
-	public static string KLIDILIHOFF()
+	public static string GetSkillsUiPath()
 	{
 		return "UI/Skills/";
 	}
 
-	public static string HIBFNEKOCHC()
+	public static string GetFullscreenTexturesPath()
 	{
 		return "textures/fullscreen/";
 	}
 
-	public static string ENFGGKMDICD()
+	public static string GetLocalizationsPath()
 	{
-		return KKIDGPBOBNI() + "/localizations";
+		return GetGameDataPath() + "/localizations";
 	}
 
-	public static string OCAKEHJCNCC()
+	public static string GetLocationsPath()
 	{
-		return KKIDGPBOBNI() + "/locations";
+		return GetGameDataPath() + "/locations";
 	}
 
 	// best guess for name
@@ -289,102 +289,102 @@ public static class SF2Paths
 
 	public static string GetLegacyUserDataDirectory()
 	{
-		return FFKEDOBDLOL + "/userdata";
+		return UserDataRoot + "/userdata";
 	}
 
-	public static string LCDBGFFDKJB()
+	public static string GetStatisticsPath()
 	{
-		return GBOFOFGDMBN() + "/statistics";
+		return GetWritableGameDataPath() + "/statistics";
 	}
 
-	public static string GJFFDOJLHGK()
+	public static string GetNewsPath()
 	{
-		return GBOFOFGDMBN() + "/news";
+		return GetWritableGameDataPath() + "/news";
 	}
 
-	public static string MEKBAHBKMNB()
+	public static string GetBundlesPath()
 	{
-		return GBOFOFGDMBN() + "/bundles";
+		return GetWritableGameDataPath() + "/bundles";
 	}
 
-	public static string IDLJHPEDOEH()
+	public static string GetPacksFilePath()
 	{
-		return GBOFOFGDMBN() + "/packs.xml";
+		return GetWritableGameDataPath() + "/packs.xml";
 	}
 
-	public static string ECJMHJOMMBC()
+	public static string GetGuiResourcesRoot()
 	{
 		return "Assets/src/GUI/Resources";
 	}
 
-	public static bool IANJCHNLMHC()
+	public static bool GetIsInitialized()
 	{
-		return LFGMJKBJIEG;
+		return initialized;
 	}
 
 	public static void Init()
 	{
-		if (LFGMJKBJIEG)
+		if (initialized)
 		{
 			return;
 		}
-		LFGMJKBJIEG = true;
-		KBOPNEIIDNL = string.Empty;
-		FFKEDOBDLOL = Eclipse.Runtime.EditorPlayModeContext.PersistentDataPath;
-		JKKPDAFGLJL = Eclipse.Runtime.EditorPlayModeContext.PersistentDataPath;
-		CGOHPKEBECD = true;
-		string text = CBFMFIHKMFI();
-		if (string.IsNullOrEmpty(FFKEDOBDLOL))
+		initialized = true;
+		GameDataRoot = string.Empty;
+		UserDataRoot = Eclipse.Runtime.EditorPlayModeContext.PersistentDataPath;
+		WritableDataRoot = Eclipse.Runtime.EditorPlayModeContext.PersistentDataPath;
+		UseBundledResources = true;
+		string text = GetAndroidFilesDir();
+		if (string.IsNullOrEmpty(UserDataRoot))
 		{
-			FFKEDOBDLOL = (JKKPDAFGLJL = text);
+			UserDataRoot = (WritableDataRoot = text);
 		}
 		else
 		{
 			try
 			{
-				if (!Directory.Exists(FFKEDOBDLOL + "/userdata") && Directory.Exists(text + "/userdata"))
+				if (!Directory.Exists(UserDataRoot + "/userdata") && Directory.Exists(text + "/userdata"))
 				{
-					FFKEDOBDLOL = (JKKPDAFGLJL = text);
+					UserDataRoot = (WritableDataRoot = text);
 				}
 			}
 			catch
 			{
 			}
 		}
-		EJGMLNCEPNC();
+		EnsureDirectories();
 	}
 
-	public static void EJGMLNCEPNC()
+	public static void EnsureDirectories()
 	{
 		if (!Directory.Exists(GetUserDataDirectory()))
 		{
 			Directory.CreateDirectory(GetUserDataDirectory());
 		}
-		if (!Directory.Exists(GBOFOFGDMBN()))
+		if (!Directory.Exists(GetWritableGameDataPath()))
 		{
-			Directory.CreateDirectory(GBOFOFGDMBN());
+			Directory.CreateDirectory(GetWritableGameDataPath());
 		}
 	}
 
-	public static string COGELDOPEJG(string ONEIGMLOGDC)
+	public static string ResolveWritablePath(string ONEIGMLOGDC)
 	{
-		if (ONEIGMLOGDC.Contains(JKKPDAFGLJL))
+		if (ONEIGMLOGDC.Contains(WritableDataRoot))
 		{
 			return ONEIGMLOGDC;
 		}
-		return string.Format("{0}/{1}", JKKPDAFGLJL, ONEIGMLOGDC);
+		return string.Format("{0}/{1}", WritableDataRoot, ONEIGMLOGDC);
 	}
 
-	public static void CKCGLNHIDFN()
+	public static void ResetBundlesDirectory()
 	{
-		if (Directory.Exists(MEKBAHBKMNB()))
+		if (Directory.Exists(GetBundlesPath()))
 		{
-			Directory.Delete(MEKBAHBKMNB(), true);
+			Directory.Delete(GetBundlesPath(), true);
 		}
-		Directory.CreateDirectory(MEKBAHBKMNB());
+		Directory.CreateDirectory(GetBundlesPath());
 	}
 
-	public static string CBFMFIHKMFI()
+	public static string GetAndroidFilesDir()
 	{
 		string text = string.Empty;
 		if (Application.platform != RuntimePlatform.Android || Application.isEditor)

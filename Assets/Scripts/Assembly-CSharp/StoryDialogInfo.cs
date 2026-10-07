@@ -3,43 +3,43 @@ using System.Collections.Generic;
 
 public class StoryDialogInfo
 {
-	public string GBMEDJJOFBF;
+	public string PortraitName;
 
 	public string Title;
 
-	public List<StoryDialogContent> CHJHCGODKJM;
+	public List<StoryDialogContent> Contents;
 
 	public Action<object> Dlg;
 
-	public string KCMBJJDAGHP;
+	public string OkButtonText;
 
-	public string PDBEAEIJCBO;
+	public string CancelButtonText;
 
-	public LabelButton.FBMGEHJPPIK LEALGLNFFDI;
+	public LabelButton.ButtonColor OkButtonColor;
 
-	public LabelButton.FBMGEHJPPIK DFAGEOKEMIE;
+	public LabelButton.ButtonColor CancelButtonColor;
 
 	public float ScrollWidth;
 
-	public bool MHPGECECDGO;
+	public bool ShowCancelButton;
 
-	public bool IPOAINACEOB;
+	public bool ShowPortrait;
 
-	public bool MOOMLCGKFBA;
+	public bool UseEdgeButtons;
 
-	public StoryDialogInfo(string JFJKJIJPJJM, string HFEGNMEEDCF, List<StoryDialogContent> IHMEPGICLGF, Action<object> _dlg = null, string FLDCNEGDMCK = "", string HBBAFHJCHIC = "CANCEL", bool OJMOOJCOGCE = false, LabelButton.FBMGEHJPPIK JCAOLHHIFEC = LabelButton.FBMGEHJPPIK.BUTTON_WHITE, LabelButton.FBMGEHJPPIK OKJBFFAIJPL = LabelButton.FBMGEHJPPIK.BUTTON_DARK, bool ANIJAKJOHED = true, bool AOFKALBFNNI = false, float OCMLLEDKLFL = 840f)
+	public StoryDialogInfo(string JFJKJIJPJJM, string HFEGNMEEDCF, List<StoryDialogContent> IHMEPGICLGF, Action<object> _dlg = null, string FLDCNEGDMCK = "", string HBBAFHJCHIC = "CANCEL", bool OJMOOJCOGCE = false, LabelButton.ButtonColor JCAOLHHIFEC = LabelButton.ButtonColor.BUTTON_WHITE, LabelButton.ButtonColor OKJBFFAIJPL = LabelButton.ButtonColor.BUTTON_DARK, bool ANIJAKJOHED = true, bool AOFKALBFNNI = false, float OCMLLEDKLFL = 840f)
 	{
-		GBMEDJJOFBF = JFJKJIJPJJM;
+		PortraitName = JFJKJIJPJJM;
 		Title = HFEGNMEEDCF;
-		CHJHCGODKJM = IHMEPGICLGF;
+		Contents = IHMEPGICLGF;
 		Dlg = _dlg;
-		KCMBJJDAGHP = FLDCNEGDMCK;
-		PDBEAEIJCBO = HBBAFHJCHIC;
-		LEALGLNFFDI = JCAOLHHIFEC;
-		DFAGEOKEMIE = OKJBFFAIJPL;
+		OkButtonText = FLDCNEGDMCK;
+		CancelButtonText = HBBAFHJCHIC;
+		OkButtonColor = JCAOLHHIFEC;
+		CancelButtonColor = OKJBFFAIJPL;
 		ScrollWidth = OCMLLEDKLFL;
-		MHPGECECDGO = OJMOOJCOGCE;
-		IPOAINACEOB = ANIJAKJOHED;
-		MOOMLCGKFBA = AOFKALBFNNI;
+		ShowCancelButton = OJMOOJCOGCE;
+		ShowPortrait = ANIJAKJOHED;
+		UseEdgeButtons = AOFKALBFNNI;
 	}
 }

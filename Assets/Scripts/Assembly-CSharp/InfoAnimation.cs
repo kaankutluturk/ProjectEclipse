@@ -11,27 +11,27 @@ public class InfoAnimation
 
 		private bool _Empty;
 
-		public string BMFLPBLAFLK
+		public string NodeName
 		{
 			get
 			{
-				return FJANLLCDPCP();
+				return GetNodeName();
 			}
 		}
 
-		public string OHLBOKNDEHN
+		public string MirroredNodeName
 		{
 			get
 			{
-				return ADMAJAJNGBO();
+				return GetMirroredNodeName();
 			}
 		}
 
-		public bool OOPMAAHJMCE
+		public bool IsEmpty
 		{
 			get
 			{
-				return DAIAOBAEDCB();
+				return GetIsEmpty();
 			}
 		}
 
@@ -44,25 +44,25 @@ public class InfoAnimation
 		public MirrorNode(string name)
 		{
 			_Empty = false;
-			HHACPELEPAK(name);
+			SetNodeName(name);
 		}
 
-		public string FJANLLCDPCP()
+		public string GetNodeName()
 		{
 			return _Names.Key;
 		}
 
-		public string ADMAJAJNGBO()
+		public string GetMirroredNodeName()
 		{
 			return _Names.Value;
 		}
 
-		public bool DAIAOBAEDCB()
+		public bool GetIsEmpty()
 		{
 			return _Empty;
 		}
 
-		public void HHACPELEPAK(string name)
+		public void SetNodeName(string name)
 		{
 			if (!string.IsNullOrEmpty(name))
 			{
@@ -118,35 +118,35 @@ public class InfoAnimation
 		public string FileName;
 	}
 
-	public enum BJMGJBGBLAL
+	public enum WeaponKind
 	{
 		WeaponHand = 0,
 		WeaponThrowing = 1,
 		AnimationMagic = 2
 	}
 
-	public enum MEACEGEJEAC
+	public enum PivotSide
 	{
 		PivotNodeNone = 0,
 		PivotNodeFront = 1,
 		PivotNodeBack = 2
 	}
 
-	public enum MGHNBEPCKIF
+	public enum AnimationKind
 	{
 		AnimationNone = 0,
 		AnimationMove = 1,
 		AnimationAttack = 2
 	}
 
-	public enum EOJCAKOHCHA
+	public enum TutorialKind
 	{
 		TutorialNone = 0,
 		TutorialMove = 1,
 		TutorialAttack = 2
 	}
 
-	public enum DOLCEABGNGA
+	public enum AlignObjectType
 	{
 		ObjectNone = 0,
 		ObjectNodes = 1,
@@ -157,37 +157,37 @@ public class InfoAnimation
 
 	public class MovePivot
 	{
-		public DOLCEABGNGA CKBGFODEBAJ;
+		public AlignObjectType PivotObjectType;
 
-		public DOLCEABGNGA HHPAGAOGGLP;
+		public AlignObjectType PositionObjectType;
 
-		public int CLIPMJNJDKI = -1;
+		public int PivotNodeId = -1;
 
-		public int BAHKGNNELBL = -1;
+		public int PivotPairNodeId = -1;
 
-		public int JPKDOHPGEBA = -1;
+		public int PositionNodeId = -1;
 
-		public int KFMGKDOLKGN = -1;
+		public int PositionPairNodeId = -1;
 
-		public MEACEGEJEAC OLBDPMKCJIF;
+		public PivotSide PivotSideKind;
 
-		public bool HNDMMOGMOAN;
+		public bool AlignX;
 
-		public bool IMCDDINEFKC;
+		public bool AlignY;
 
-		public bool GHKGPDMMHHK;
+		public bool AlignZ;
 
-		public string BLODCIGDJFK = string.Empty;
+		public string PivotPart = string.Empty;
 
-		public string PMILDGBBLMF = string.Empty;
+		public string PositionPart = string.Empty;
 
-		public string BONDKHGGCDD = string.Empty;
+		public string ShiftModelNode = string.Empty;
 
-		public ModelType.KEIDBIOIFGA BAFGOANMBMI = ModelType.KEIDBIOIFGA.MODEL_THIS;
+		public ModelType.ModelTargetType PivotModelType = ModelType.ModelTargetType.MODEL_THIS;
 
-		public ModelType.KEIDBIOIFGA EDBLMNIEKBD = ModelType.KEIDBIOIFGA.MODEL_THIS;
+		public ModelType.ModelTargetType PositionModelType = ModelType.ModelTargetType.MODEL_THIS;
 
-		public Vector2f LDNPHPGEOPJ = new Vector2f();
+		public Vector2f PositionShift = new Vector2f();
 
 		public bool IsExists;
 	}
@@ -198,7 +198,7 @@ public class InfoAnimation
 		{
 			public bool IsExists;
 
-			public bool FGMBMNFANHF;
+			public bool RunOnStart;
 
 			public string AnimationName = string.Empty;
 		}
@@ -207,52 +207,52 @@ public class InfoAnimation
 		{
 			public bool IsExists;
 
-			public DistancePoint CLCFLPDNBNL = new DistancePoint();
+			public DistancePoint FromPoint = new DistancePoint();
 
-			public DistancePoint KAEAKHIEIHH = new DistancePoint();
+			public DistancePoint ToPoint = new DistancePoint();
 
-			public DistancePoint.FKIAPHGNLKC IIIDIKABLOJ;
+			public DistancePoint.ImpulseDirection ImpulseMode;
 
-			public static DistancePoint.FKIAPHGNLKC BBAGKNMNONO(XmlNode node)
+			public static DistancePoint.ImpulseDirection ParseImpulseMode(XmlNode node)
 			{
-				DistancePoint.FKIAPHGNLKC result = DistancePoint.FKIAPHGNLKC.IMPULSE_NONE;
+				DistancePoint.ImpulseDirection result = DistancePoint.ImpulseDirection.IMPULSE_NONE;
 				if (node != null && node.Name == "Impulse")
 				{
-					result = ((0 >= XmlUtils.ParseInt(node.Attributes["Reverse"])) ? DistancePoint.FKIAPHGNLKC.IMPULSE_NOT_REVERSE : DistancePoint.FKIAPHGNLKC.IMPULSE_REVERSE);
+					result = ((0 >= XmlUtils.ParseInt(node.Attributes["Reverse"])) ? DistancePoint.ImpulseDirection.IMPULSE_NOT_REVERSE : DistancePoint.ImpulseDirection.IMPULSE_REVERSE);
 				}
 				return result;
 			}
 
-			public int IMLFCBLAJGA(ModelConditions conditions)
+			public int GetDirectionSign(ModelConditions conditions)
 			{
 				float num = 0f;
-				num = ((IIIDIKABLOJ == DistancePoint.FKIAPHGNLKC.IMPULSE_NONE) ? (KAEAKHIEIHH.ILIKNABGPNK(conditions) - CLCFLPDNBNL.ILIKNABGPNK(conditions)) : ((float)((IIIDIKABLOJ != DistancePoint.FKIAPHGNLKC.IMPULSE_NOT_REVERSE) ? (conditions.BOECCPNHAII * -1) : conditions.BOECCPNHAII)));
+				num = ((ImpulseMode == DistancePoint.ImpulseDirection.IMPULSE_NONE) ? (ToPoint.GetX(conditions) - FromPoint.GetX(conditions)) : ((float)((ImpulseMode != DistancePoint.ImpulseDirection.IMPULSE_NOT_REVERSE) ? (conditions.ImpulseX * -1) : conditions.ImpulseX)));
 				return (num >= 0f) ? 1 : (-1);
 			}
 		}
 
-		public List<EventAnimation> AJCMBMJGJEG = new List<EventAnimation>();
+		public List<EventAnimation> Events = new List<EventAnimation>();
 
-		public List<ConditionAnimation> JIFAHHGNPFH = new List<ConditionAnimation>();
+		public List<ConditionAnimation> Conditions = new List<ConditionAnimation>();
 
-		public List<ConditionAnimation> NIDNJFOGBFO = new List<ConditionAnimation>();
+		public List<ConditionAnimation> TacticsConditions = new List<ConditionAnimation>();
 
 		public List<IntervalAnimation> Intervals = new List<IntervalAnimation>();
 
 		// best guess for name
 		public List<ConditionAnimation> Locks = new List<ConditionAnimation>();
 
-		public List<TransitionAnimation> ELFBPNOBDKC = new List<TransitionAnimation>();
+		public List<TransitionAnimation> Transitions = new List<TransitionAnimation>();
 
-		public List<ActionAnimation> DJBAIAKOIHM = new List<ActionAnimation>();
+		public List<ActionAnimation> Actions = new List<ActionAnimation>();
 
-		public ShopAnimation DFLNENOIMPO = new ShopAnimation();
+		public ShopAnimation ShopData = new ShopAnimation();
 
-		public MovePivot ILOEBFFAEAN = new MovePivot();
+		public MovePivot AlignData = new MovePivot();
 
-		public Direction IHJEKBAEIKK = new Direction();
+		public Direction SetDirectionData = new Direction();
 
-		public void JGMGIHIBFKA()
+		public void InitIntervals()
 		{
 			for (int i = 0; i < Intervals.Count; i++)
 			{
@@ -260,9 +260,9 @@ public class InfoAnimation
 			}
 		}
 
-		public void NKHGGBMOADI()
+		public void DetectPivotSide()
 		{
-			string bLODCIGDJFK = ILOEBFFAEAN.BLODCIGDJFK;
+			string bLODCIGDJFK = AlignData.PivotPart;
 			if (bLODCIGDJFK != null && bLODCIGDJFK.Length > 2)
 			{
 				int num = bLODCIGDJFK.Length - 1;
@@ -270,37 +270,37 @@ public class InfoAnimation
 				char c2 = bLODCIGDJFK[num - 1];
 				if (c == '1' && c2 == '_')
 				{
-					ILOEBFFAEAN.OLBDPMKCJIF = MEACEGEJEAC.PivotNodeFront;
+					AlignData.PivotSideKind = PivotSide.PivotNodeFront;
 				}
 				else if (c == '2' && c2 == '_')
 				{
-					ILOEBFFAEAN.OLBDPMKCJIF = MEACEGEJEAC.PivotNodeBack;
+					AlignData.PivotSideKind = PivotSide.PivotNodeBack;
 				}
 			}
 		}
 
-		public EventAnimation OIGBIFNICBI(EventAnimation.EECEJKADLCK LFLGCDNKNJI)
+		public EventAnimation FindEventByType(EventAnimation.EventAnimationType LFLGCDNKNJI)
 		{
-			for (int i = 0; i < AJCMBMJGJEG.Count; i++)
+			for (int i = 0; i < Events.Count; i++)
 			{
-				if (AJCMBMJGJEG[i].Type == LFLGCDNKNJI)
+				if (Events[i].Type == LFLGCDNKNJI)
 				{
-					return AJCMBMJGJEG[i];
+					return Events[i];
 				}
 			}
 			return null;
 		}
 	}
 
-	protected List<List<global::Pair<List<GroupTables>, string>>> PNBAAKIIDGG;
+	protected List<List<global::Pair<List<GroupTables>, string>>> tacticGroupTables;
 
-	public ModelShiftTable OBIBINIEJJE = new ModelShiftTable();
+	public ModelShiftTable ShiftTable = new ModelShiftTable();
 
-	public MGHNBEPCKIF Type;
+	public AnimationKind Type;
 
-	public EOJCAKOHCHA OFADIIPBEKI;
+	public TutorialKind TutorialType;
 
-	public int MNHGBPOIHKG;
+	public int MidFrames;
 
 	public int Priority;
 
@@ -322,25 +322,25 @@ public class InfoAnimation
 	public MoveInside MoveData;
 
 	// best guess for name
-	public List<ConditionAnimation> SelectionConditions => MoveData.JIFAHHGNPFH;
+	public List<ConditionAnimation> SelectionConditions => MoveData.Conditions;
 
 	// best guess for name
-	public List<ActionAnimation> ScheduledActions => MoveData.DJBAIAKOIHM;
+	public List<ActionAnimation> ScheduledActions => MoveData.Actions;
 
 
-	public bool HFBOLCPHMBB;
+	public bool NoWallRepulsion;
 
-	public bool FBKGDALBNDJ;
+	public bool HasPhysics;
 
-	public bool NHNEJKIBPJG;
+	public bool ShowInTricks;
 
-	public bool HECHJGBMHIC;
+	public bool EndsStage;
 
-	public bool JEADCBJMEGC;
+	public bool NoInterpolationFrames;
 
-	public float DCLGDANCGHC;
+	public float StyleFactor;
 
-	public bool ALFPDPEEJFO;
+	public bool AlignOnParentWallCollision;
 
 	private List<string> _TemplateNames = new List<string>();
 
@@ -348,108 +348,108 @@ public class InfoAnimation
 
 	private int _NodesCount;
 
-	private List<string> EGDIEIPCAAF = new List<string>();
+	private List<string> tacticWeapons = new List<string>();
 
-	private Vector3f KACPFNLDNND;
+	private Vector3f velocity;
 
-	private Vector3f KNBDGOJAIAF;
+	private Vector3f acceleration;
 
-	private bool AEDIIEEJKHE;
+	private bool saveVelocity;
 
-	private bool INFAGPDFGNL;
+	private bool isLooped;
 
-	private DistancePoint OJGFJBFBCAP;
+	private DistancePoint rotationPosition;
 
-	private float KPEMEDJCIIB;
+	private float rotationAngle;
 
-	private bool JCIKOMAMJDI;
+	private bool noMagicRecharge;
 
-	private StageType.FDBBPEGEGMK ENDJLOAGKGO;
+	private StageType.Stage cameraStage;
 
-	private MirrorNode FDECJHIMNGN = new MirrorNode();
+	private MirrorNode mirrorNode = new MirrorNode();
 
 	private Vector3[][] _AnimationContainer;
 
 	// best guess for name
 	public CapabilityTable PriorityConflicts = new CapabilityTable();
 
-	private static readonly List<AnimationContainerStruct> LECLDGFPOEA = new List<AnimationContainerStruct>();
+	private static readonly List<AnimationContainerStruct> animationCache = new List<AnimationContainerStruct>();
 
 	private InfoAnimation _TacticEquivalent;
 
-	public List<List<global::Pair<List<GroupTables>, string>>> DFJMOIDKKOB
+	public List<List<global::Pair<List<GroupTables>, string>>> TacticGroupTables
 	{
 		get
 		{
-			return NLCLHLIPFFH();
+			return GetTacticGroupTables();
 		}
 	}
 
-	public int OKDGCCPGLMC
+	public int NodesCount
 	{
 		get
 		{
-			return DFKIHADCFKG();
+			return GetNodesCount();
 		}
 	}
 
-	public Vector3[][] MMICPIJAFHA
+	public Vector3[][] AnimationFrames
 	{
 		get
 		{
-			return DIHJOPGKGFO();
+			return GetAnimationFrames();
 		}
 	}
 
-	public string NCKBFHLNKDD
+	public string PivotPartName
 	{
 		get
 		{
-			return KPIMAMCOEAN();
+			return GetPivotPartName();
 		}
 	}
 
-	public List<IntervalAnimation> GDAGDHGLKPB
+	public List<IntervalAnimation> AllIntervals
 	{
 		get
 		{
-			return PCKKMNHDDMP();
+			return GetAllIntervals();
 		}
 	}
 
-	public List<string> LANPOMAOOIM
+	public List<string> TemplateNames
 	{
 		get
 		{
-			return FOLOOGCLPNE();
+			return GetTemplateNames();
 		}
 	}
 
-	public int NFKBFGIACOP
+	public int FrameCount
 	{
 		get
 		{
-			return PGOFHCBPLOE();
+			return GetFrameCount();
 		}
 	}
 
-	public uint BOLFNFOHJMA
+	public uint TotalFramesUnsigned
 	{
 		get
 		{
-			return BMBKLLNAKJK();
+			return GetTotalFramesUnsigned();
 		}
 	}
 
-	public ConditionKeys OHOPGOOAEOJ
+	public ConditionKeys FirstKeysCondition
 	{
 		get
 		{
-			return ILBCHANCOBP();
+			return GetFirstKeysCondition();
 		}
 	}
 
-	public List<ConditionKeys> ODCILHKPLAF
+	public List<ConditionKeys> KeyConditions
 	{
 		get
 		{
@@ -457,11 +457,11 @@ public class InfoAnimation
 		}
 	}
 
-	public InfoAnimation JCMFPPJIIIF
+	public InfoAnimation TacticEquivalentAnimation
 	{
 		get
 		{
-			return IMFGMAAEMIC();
+			return GetTacticEquivalent();
 		}
 		set
 		{
@@ -469,95 +469,95 @@ public class InfoAnimation
 		}
 	}
 
-	public List<string> DBIKOIDEGGA
+	public List<string> TacticWeapons
 	{
 		get
 		{
-			return OIDIJEOMJCB();
+			return GetTacticWeapons();
 		}
 	}
 
-	public bool ALMDIDLDGGE
+	public bool IsSecondHeelPivot
 	{
 		get
 		{
-			return AIHDFOPLBIL();
+			return GetIsSecondHeelPivot();
 		}
 	}
 
-	public bool BPOJBMBEHOB
+	public bool IsFirstHeelPivot
 	{
 		get
 		{
-			return LIKPDIIPABF();
+			return GetIsFirstHeelPivot();
 		}
 	}
 
-	public Vector3f AIPEIJLMMPH
+	public Vector3f Velocity
 	{
 		get
 		{
-			return LBJFGCFGMDI();
+			return GetVelocity();
 		}
 		set
 		{
-			DIGCECPPHOH(value);
+			SetVelocity(value);
 		}
 	}
 
-	public Vector3f BLEMEODBIIM
+	public Vector3f Acceleration
 	{
 		get
 		{
-			return NCENGIOMKOF();
+			return GetAcceleration();
 		}
 		set
 		{
-			PICBLJDLDDN(value);
+			SetAcceleration(value);
 		}
 	}
 
-	public bool KDMHCOAAJBM
+	public bool SaveVelocity
 	{
 		get
 		{
-			return HOPDDLNABCG();
+			return GetSaveVelocity();
 		}
 		set
 		{
-			NFMLONEIJEJ(value);
+			SetSaveVelocity(value);
 		}
 	}
 
-	public DistancePoint DCMFBGCBCBM
+	public DistancePoint RotationPosition
 	{
 		get
 		{
-			return KBLFKMECMJP();
+			return GetRotationPosition();
 		}
 		set
 		{
-			HGJPLKKCKHM(value);
+			SetRotationPosition(value);
 		}
 	}
 
-	public bool FGFCNGPALBO
+	public bool NoMagicRecharge
 	{
 		get
 		{
-			return BKGIEPOEBOF();
+			return GetNoMagicRecharge();
 		}
 		set
 		{
-			PFELBJBNEEK(value);
+			SetNoMagicRecharge(value);
 		}
 	}
 
-	public float AIBCIHIKBMN
+	public float RotationAngleValue
 	{
 		get
 		{
-			return NBOLIGLFFEL();
+			return GetRotationAngle();
 		}
 		set
 		{
@@ -565,131 +565,131 @@ public class InfoAnimation
 		}
 	}
 
-	public int CPHMBEBIMII
+	public int TotalFrames
 	{
 		get
 		{
-			return ONLKMFOENEH();
+			return GetTotalFrames();
 		}
 	}
 
-	public int FCHEONGLDCL
+	public int BlendFrameCount
 	{
 		get
 		{
-			return EDDFIABEAGM();
+			return GetBlendFrameCount();
 		}
 	}
 
-	public bool LBGCFNKKJJL
+	public bool IsLooped
 	{
 		get
 		{
-			return NCEKKNIMHAG();
+			return GetIsLooped();
 		}
 		set
 		{
-			LLELLFKJKGE(value);
+			SetIsLooped(value);
 		}
 	}
 
-	public StageType.FDBBPEGEGMK ENHFGKNDOHI
+	public StageType.Stage CameraStage
 	{
 		get
 		{
-			return PHPHCKAHPOP();
+			return GetCameraStage();
 		}
 		set
 		{
-			POOOFPBAJDM(value);
+			SetCameraStage(value);
 		}
 	}
 
-	public MirrorNode GEIHPPOIONJ
+	public MirrorNode MirrorNodeInfo
 	{
 		get
 		{
-			return ECCLELFHNHE();
+			return GetMirrorNode();
 		}
 		set
 		{
-			NNFKIGLFLKL(value);
+			SetMirrorNode(value);
 		}
 	}
 
-	public Vector3[] IFHBEAOHOCI
+	public Vector3[] FirstFrameNodes
 	{
 		get
 		{
-			return BGHLLHNKFEM();
+			return GetFirstFrameNodes();
 		}
 	}
 
-	public static int MIGJEFHKGOK
+	public static int CachedAnimationCount
 	{
 		get
 		{
-			return NJKKOFDBMOO();
+			return GetCachedAnimationCount();
 		}
 	}
 
-	private AnimationContainerStruct NIFLBOLNLII
+	private AnimationContainerStruct CachedContainer
 	{
 		get
 		{
-			return IAPAKFDEKOI();
+			return FindCachedContainer();
 		}
 	}
 
 	public InfoAnimation()
 	{
-		Type = MGHNBEPCKIF.AnimationNone;
-		OFADIIPBEKI = EOJCAKOHCHA.TutorialNone;
-		MNHGBPOIHKG = 0;
+		Type = AnimationKind.AnimationNone;
+		TutorialType = TutorialKind.TutorialNone;
+		MidFrames = 0;
 		Priority = 0;
 		Id = 0;
 		FirstFrame = 0;
 		AnimationEndFrame = 0;
-		FBKGDALBNDJ = false;
-		HECHJGBMHIC = false;
-		JEADCBJMEGC = false;
-		NHNEJKIBPJG = true;
+		HasPhysics = false;
+		EndsStage = false;
+		NoInterpolationFrames = false;
+		ShowInTricks = true;
 		_TacticEquivalent = null;
-		AEDIIEEJKHE = false;
-		ENDJLOAGKGO = StageType.FDBBPEGEGMK.STAGE_NONE;
-		JCIKOMAMJDI = false;
+		saveVelocity = false;
+		cameraStage = StageType.Stage.STAGE_NONE;
+		noMagicRecharge = false;
 		MoveData = new MoveInside();
-		HFBOLCPHMBB = false;
+		NoWallRepulsion = false;
 		_NodesCount = 0;
 		_AnimationContainer = null;
-		INFAGPDFGNL = false;
-		KPEMEDJCIIB = 0f;
+		isLooped = false;
+		rotationAngle = 0f;
 		Rank = 0;
-		MoveData.ILOEBFFAEAN = new MovePivot();
-		MoveData.ILOEBFFAEAN.IsExists = false;
-		MoveData.ILOEBFFAEAN.CLIPMJNJDKI = -1;
-		MoveData.IHJEKBAEIKK.IsExists = false;
+		MoveData.AlignData = new MovePivot();
+		MoveData.AlignData.IsExists = false;
+		MoveData.AlignData.PivotNodeId = -1;
+		MoveData.SetDirectionData.IsExists = false;
 	}
 
-	public List<List<global::Pair<List<GroupTables>, string>>> NLCLHLIPFFH()
+	public List<List<global::Pair<List<GroupTables>, string>>> GetTacticGroupTables()
 	{
-		if (PNBAAKIIDGG == null)
+		if (tacticGroupTables == null)
 		{
-			PNBAAKIIDGG = new List<List<global::Pair<List<GroupTables>, string>>>();
+			tacticGroupTables = new List<List<global::Pair<List<GroupTables>, string>>>();
 			for (int i = 0; i < 3; i++)
 			{
-				PNBAAKIIDGG.Add(new List<global::Pair<List<GroupTables>, string>>());
+				tacticGroupTables.Add(new List<global::Pair<List<GroupTables>, string>>());
 			}
 		}
-		return PNBAAKIIDGG;
+		return tacticGroupTables;
 	}
 
-	public int DFKIHADCFKG()
+	public int GetNodesCount()
 	{
 		return _NodesCount;
 	}
 
-	public Vector3[][] DIHJOPGKGFO()
+	public Vector3[][] GetAnimationFrames()
 	{
 		return _AnimationContainer;
 	}
@@ -700,8 +700,8 @@ public class InfoAnimation
 
 	public void Init()
 	{
-		MoveData.JGMGIHIBFKA();
-		MoveData.NKHGGBMOADI();
+		MoveData.InitIntervals();
+		MoveData.DetectPivotSide();
 		if (_AnimationContainer != null && _AnimationContainer.Length > 0)
 		{
 			_NodesCount = _AnimationContainer[0].Length;
@@ -713,24 +713,24 @@ public class InfoAnimation
 		return true;
 	}
 
-	public string KPIMAMCOEAN()
+	public string GetPivotPartName()
 	{
 		if (MoveData == null)
 		{
-			LLLOJBFMONN.Error("moveInside is null");
+			GameLog.Error("moveInside is null");
 			return string.Empty;
 		}
-		return MoveData.ILOEBFFAEAN.BLODCIGDJFK;
+		return MoveData.AlignData.PivotPart;
 	}
 
-	public void GetIntervals(int frame, List<IntervalAnimation> NKHPLNBJKLI, List<IntervalAnimation> HLMKBLOHJGC, HashSet<IntervalAnimation.NGAJJDIEDGF> FGBOFDJKLJI = null)
+	public void GetIntervals(int frame, List<IntervalAnimation> NKHPLNBJKLI, List<IntervalAnimation> HLMKBLOHJGC, HashSet<IntervalAnimation.IntervalType> FGBOFDJKLJI = null)
 	{
 		NKHPLNBJKLI.Clear();
 		HLMKBLOHJGC.Clear();
 		foreach (IntervalAnimation item in MoveData.Intervals)
 		{
 			int num = ((item.Start < FirstFrame) ? FirstFrame : item.Start);
-			int num2 = ((item.GEJLNPIEDPF > AnimationEndFrame) ? AnimationEndFrame : item.GEJLNPIEDPF);
+			int num2 = ((item.EndFrameValue > AnimationEndFrame) ? AnimationEndFrame : item.EndFrameValue);
 			if (num <= frame && frame <= num2)
 			{
 				if (FGBOFDJKLJI == null || !FGBOFDJKLJI.Contains(item.Type))
@@ -745,14 +745,14 @@ public class InfoAnimation
 		}
 	}
 
-	public List<IntervalAnimation> PCKKMNHDDMP()
+	public List<IntervalAnimation> GetAllIntervals()
 	{
 		return MoveData.Intervals;
 	}
 
-	public bool JBALJDEOGNK(EventAnimation p_event)
+	public bool HasEvent(EventAnimation p_event)
 	{
-		foreach (EventAnimation item in MoveData.AJCMBMJGJEG)
+		foreach (EventAnimation item in MoveData.Events)
 		{
 			if (item.IsEqual(p_event))
 			{
@@ -762,13 +762,13 @@ public class InfoAnimation
 		return false;
 	}
 
-	public bool HPPGNJJCEGF(ModelConditions conditions, List<ConditionAnimation> JPGMNIFICDM = null, EventAnimation DOANBADPBGH = null)
+	public bool AreConditionsMet(ModelConditions conditions, List<ConditionAnimation> JPGMNIFICDM = null, EventAnimation DOANBADPBGH = null)
 	{
-		List<ConditionAnimation> list = ((JPGMNIFICDM == null) ? MoveData.JIFAHHGNPFH : JPGMNIFICDM);
+		List<ConditionAnimation> list = ((JPGMNIFICDM == null) ? MoveData.Conditions : JPGMNIFICDM);
 		if (DOANBADPBGH != null)
 		{
-			conditions.HFCIDBJJINB = DOANBADPBGH;
-			DOANBADPBGH.JIFAHHGNPFH = conditions;
+			conditions.CurrentEvent = DOANBADPBGH;
+			DOANBADPBGH.Conditions = conditions;
 		}
 		foreach (ConditionAnimation item in list)
 		{
@@ -780,32 +780,32 @@ public class InfoAnimation
 		return true;
 	}
 
-	public bool HPPGNJJCEGF(Model ACENLMONNPA, List<ConditionAnimation> JPGMNIFICDM = null, EventAnimation DOANBADPBGH = null)
+	public bool AreConditionsMet(Model ACENLMONNPA, List<ConditionAnimation> JPGMNIFICDM = null, EventAnimation DOANBADPBGH = null)
 	{
-		List<ConditionAnimation> list = ((JPGMNIFICDM == null) ? MoveData.JIFAHHGNPFH : JPGMNIFICDM);
+		List<ConditionAnimation> list = ((JPGMNIFICDM == null) ? MoveData.Conditions : JPGMNIFICDM);
 		for (int i = 0; i < list.Count; i++)
 		{
 			ConditionAnimation iIDOLPHMOGA = list[i];
-			ModelType.KEIDBIOIFGA kEIDBIOIFGA = iIDOLPHMOGA.FHBAPKNECOM();
-			Model fGCODGKLHED = iIDOLPHMOGA.DKDAKGDMHAL(ACENLMONNPA, kEIDBIOIFGA);
+			ModelType.ModelTargetType kEIDBIOIFGA = iIDOLPHMOGA.GetTargetModelType();
+			Model fGCODGKLHED = iIDOLPHMOGA.ResolveTargetModel(ACENLMONNPA, kEIDBIOIFGA);
 			if (fGCODGKLHED == null)
 			{
 				return false;
 			}
-			ModelConditions dGJJDPIAEAO = fGCODGKLHED.EBABHGHPLFK();
+			ModelConditions dGJJDPIAEAO = fGCODGKLHED.GetConditions();
 			if (DOANBADPBGH != null)
 			{
-				dGJJDPIAEAO.HFCIDBJJINB = DOANBADPBGH;
-				DOANBADPBGH.JIFAHHGNPFH = dGJJDPIAEAO;
+				dGJJDPIAEAO.CurrentEvent = DOANBADPBGH;
+				DOANBADPBGH.Conditions = dGJJDPIAEAO;
 			}
-			iIDOLPHMOGA.MJFKNEHGNMB(ModelType.KEIDBIOIFGA.MODEL_THIS);
+			iIDOLPHMOGA.ApplyTargetModelType(ModelType.ModelTargetType.MODEL_THIS);
 			bool flag = false;
 			if (iIDOLPHMOGA.Type == ConditionAnimation.ConditionType.LIST)
 			{
 				ConditionList eLFKOGJJNMN = iIDOLPHMOGA as ConditionList;
 				if (eLFKOGJJNMN != null)
 				{
-					flag = eLFKOGJJNMN.DJEJMGCMPPH(ACENLMONNPA.EBABHGHPLFK(), ACENLMONNPA, DOANBADPBGH);
+					flag = eLFKOGJJNMN.EvaluateWithModel(ACENLMONNPA.GetConditions(), ACENLMONNPA, DOANBADPBGH);
 				}
 			}
 			else
@@ -814,61 +814,61 @@ public class InfoAnimation
 			}
 			if (!flag)
 			{
-				iIDOLPHMOGA.GNPMNEDOFPB(kEIDBIOIFGA);
+				iIDOLPHMOGA.SetTargetModelType(kEIDBIOIFGA);
 				return false;
 			}
-			iIDOLPHMOGA.GNPMNEDOFPB(kEIDBIOIFGA);
+			iIDOLPHMOGA.SetTargetModelType(kEIDBIOIFGA);
 		}
 		return true;
 	}
 
-	public void FNGJFDNAPPH(List<global::Pair<int, int>> HMKIJOIJNJD, KeyFrames GCDAKGKMJHF, int index)
+	public void SwapNodePairs(List<global::Pair<int, int>> HMKIJOIJNJD, KeyFrames GCDAKGKMJHF, int index)
 	{
-		if (0 >= HMKIJOIJNJD.Count || index >= GCDAKGKMJHF.OLINNGEMHMG())
+		if (0 >= HMKIJOIJNJD.Count || index >= GCDAKGKMJHF.GetSize())
 		{
 			return;
 		}
-		int dGILPMANFAF = GCDAKGKMJHF.KLNOLPIADNN(index).Size;
+		int dGILPMANFAF = GCDAKGKMJHF.GetFrame(index).Size;
 		Vector3f eMAFACPEPDK = new Vector3f();
-		for (int i = index; i < GCDAKGKMJHF.OLINNGEMHMG(); i++)
+		for (int i = index; i < GCDAKGKMJHF.GetSize(); i++)
 		{
 			for (int j = 0; j < HMKIJOIJNJD.Count; j++)
 			{
 				if (HMKIJOIJNJD[j].First < dGILPMANFAF && HMKIJOIJNJD[j].Second < dGILPMANFAF)
 				{
-					eMAFACPEPDK.Set(GCDAKGKMJHF.KLNOLPIADNN(i).Data[HMKIJOIJNJD[j].First]);
-					GCDAKGKMJHF.KLNOLPIADNN(i).Data[HMKIJOIJNJD[j].First].Set(GCDAKGKMJHF.KLNOLPIADNN(i).Data[HMKIJOIJNJD[j].Second]);
-					GCDAKGKMJHF.KLNOLPIADNN(i).Data[HMKIJOIJNJD[j].Second].Set(eMAFACPEPDK);
+					eMAFACPEPDK.Set(GCDAKGKMJHF.GetFrame(i).Data[HMKIJOIJNJD[j].First]);
+					GCDAKGKMJHF.GetFrame(i).Data[HMKIJOIJNJD[j].First].Set(GCDAKGKMJHF.GetFrame(i).Data[HMKIJOIJNJD[j].Second]);
+					GCDAKGKMJHF.GetFrame(i).Data[HMKIJOIJNJD[j].Second].Set(eMAFACPEPDK);
 				}
 			}
 		}
 	}
 
-	public void HAILLLEPCHP(KeyFrames frames, int NHEIOIBOPHN, bool HOHEFHKJIOG)
+	public void FillKeyFrames(KeyFrames frames, int NHEIOIBOPHN, bool HOHEFHKJIOG)
 	{
 		int num = ((NHEIOIBOPHN <= -1) ? FirstFrame : NHEIOIBOPHN);
 		int num2 = _AnimationContainer[num].Length;
-		frames.HAILLLEPCHP(num, AnimationEndFrame, HOHEFHKJIOG, _AnimationContainer);
+		frames.SetFramesFromRange(num, AnimationEndFrame, HOHEFHKJIOG, _AnimationContainer);
 	}
 
-	public void ABEGFBOKPOI()
+	public void LoadAnimationClip()
 	{
 		if (!string.IsNullOrEmpty(FileName))
 		{
-			AnimationContainerStruct aGAMDIHPFPF = IAPAKFDEKOI();
+			AnimationContainerStruct aGAMDIHPFPF = FindCachedContainer();
 			if (aGAMDIHPFPF == null || aGAMDIHPFPF.Container == null)
 			{
 				string iFKJHHPJPLP = Eclipse.Modding.ModAssetBinding.IsQualified(FileName) ?
-					FileName : SF2Paths.CBKLONCNPCP() + "/" + FileName;
+					FileName : SF2Paths.GetBinaryAnimationsPath() + "/" + FileName;
 				LoadAnimationBinary(iFKJHHPJPLP);
 				if (_AnimationContainer != null)
 				{
-					DDPBDPEDIGC();
+					AddToAnimationCache();
 				}
 			}
 			else
 			{
-				BAIMGDMKILA(aGAMDIHPFPF);
+				ApplyCachedContainer(aGAMDIHPFPF);
 			}
 		}
 	}
@@ -890,7 +890,7 @@ public class InfoAnimation
 			// Reload directly: the parser's static cache is keyed only by filename,
 			// so an Apply & Restart with changed mod bytes must not reuse old frames.
 			string path = Eclipse.Modding.ModAssetBinding.IsQualified(fileName) ?
-				fileName : SF2Paths.CBKLONCNPCP() + "/" + fileName;
+				fileName : SF2Paths.GetBinaryAnimationsPath() + "/" + fileName;
 			LoadAnimationBinary(path);
 			if (_AnimationContainer == null || _AnimationContainer.Length == 0 ||
 				FirstFrame < 0 || FirstFrame >= _AnimationContainer.Length)
@@ -917,63 +917,63 @@ public class InfoAnimation
 		_Delays.Add(value);
 	}
 
-	public void NHAEHLFMPNK(MoveInside KECIIKEIJBH)
+	public void MergeMoveData(MoveInside KECIIKEIJBH)
 	{
 		if (MoveData != null)
 		{
-			ACGIFMKPBGC(KECIIKEIJBH.AJCMBMJGJEG);
-			CPKDGKCHOJJ(KECIIKEIJBH.NIDNJFOGBFO);
-			CHDLHMGPDHL(KECIIKEIJBH.JIFAHHGNPFH);
-			GAKOLFJGLMM(KECIIKEIJBH.Intervals);
-			OFMGLKAGCGO(KECIIKEIJBH.Locks);
-			PGMIJCNNJAG(KECIIKEIJBH.ELFBPNOBDKC);
-			FGAEEJBEGEJ(KECIIKEIJBH.DJBAIAKOIHM);
-			if (!MoveData.DFLNENOIMPO.IsExists && KECIIKEIJBH.DFLNENOIMPO.IsExists)
+			AddEvents(KECIIKEIJBH.Events);
+			AddTacticsConditions(KECIIKEIJBH.TacticsConditions);
+			AddConditions(KECIIKEIJBH.Conditions);
+			AddIntervals(KECIIKEIJBH.Intervals);
+			AddLocks(KECIIKEIJBH.Locks);
+			AddTransitions(KECIIKEIJBH.Transitions);
+			AddActions(KECIIKEIJBH.Actions);
+			if (!MoveData.ShopData.IsExists && KECIIKEIJBH.ShopData.IsExists)
 			{
-				MoveData.DFLNENOIMPO = KECIIKEIJBH.DFLNENOIMPO;
+				MoveData.ShopData = KECIIKEIJBH.ShopData;
 			}
-			if (!MoveData.ILOEBFFAEAN.IsExists && KECIIKEIJBH.ILOEBFFAEAN.IsExists)
+			if (!MoveData.AlignData.IsExists && KECIIKEIJBH.AlignData.IsExists)
 			{
-				MoveData.ILOEBFFAEAN = KECIIKEIJBH.ILOEBFFAEAN;
+				MoveData.AlignData = KECIIKEIJBH.AlignData;
 			}
-			if (!MoveData.IHJEKBAEIKK.IsExists && KECIIKEIJBH.IHJEKBAEIKK.IsExists)
+			if (!MoveData.SetDirectionData.IsExists && KECIIKEIJBH.SetDirectionData.IsExists)
 			{
-				MoveData.IHJEKBAEIKK = KECIIKEIJBH.IHJEKBAEIKK;
+				MoveData.SetDirectionData = KECIIKEIJBH.SetDirectionData;
 			}
 		}
 	}
 
-	public void OFMGLKAGCGO(List<ConditionAnimation> value)
+	public void AddLocks(List<ConditionAnimation> value)
 	{
 		MoveData.Locks.AddRange(value);
 	}
 
-	public void PGMIJCNNJAG(List<TransitionAnimation> value)
+	public void AddTransitions(List<TransitionAnimation> value)
 	{
-		MoveData.ELFBPNOBDKC.AddRange(value);
+		MoveData.Transitions.AddRange(value);
 	}
 
-	public void FGAEEJBEGEJ(List<ActionAnimation> value)
+	public void AddActions(List<ActionAnimation> value)
 	{
-		MoveData.DJBAIAKOIHM.AddRange(value);
+		MoveData.Actions.AddRange(value);
 	}
 
-	public void ACGIFMKPBGC(List<EventAnimation> value)
+	public void AddEvents(List<EventAnimation> value)
 	{
-		MoveData.AJCMBMJGJEG.AddRange(value);
+		MoveData.Events.AddRange(value);
 	}
 
-	public void CPKDGKCHOJJ(List<ConditionAnimation> value)
+	public void AddTacticsConditions(List<ConditionAnimation> value)
 	{
-		MoveData.NIDNJFOGBFO.AddRange(value);
+		MoveData.TacticsConditions.AddRange(value);
 	}
 
-	public void CHDLHMGPDHL(List<ConditionAnimation> value)
+	public void AddConditions(List<ConditionAnimation> value)
 	{
-		MoveData.JIFAHHGNPFH.AddRange(value);
+		MoveData.Conditions.AddRange(value);
 	}
 
-	public void GAKOLFJGLMM(List<IntervalAnimation> value)
+	public void AddIntervals(List<IntervalAnimation> value)
 	{
 		foreach (IntervalAnimation item in value)
 		{
@@ -991,23 +991,23 @@ public class InfoAnimation
 			ReadAnimation(array);
 			return;
 		}
-		LLLOJBFMONN.Error("File {0} not found", path);
+		GameLog.Error("File {0} not found", path);
 	}
 
 	private void ReadAnimation(byte[] data)
 	{
 		using (BinaryReaderNekki pHAPKCOJMHL = new BinaryReaderNekki(data))
 		{
-			int num = pHAPKCOJMHL.GDFKNFAHHKF();
+			int num = pHAPKCOJMHL.ReadInt32();
 			_AnimationContainer = new Vector3[num][];
 			for (int i = 0; i < num; i++)
 			{
 				pHAPKCOJMHL.ReadByte();
-				int num2 = pHAPKCOJMHL.GDFKNFAHHKF();
+				int num2 = pHAPKCOJMHL.ReadInt32();
 				_AnimationContainer[i] = new Vector3[num2];
 				for (int j = 0; j < num2; j++)
 				{
-					_AnimationContainer[i][j] = new Vector3(pHAPKCOJMHL.MMJAOEBFCLN(), 0f - pHAPKCOJMHL.MMJAOEBFCLN(), pHAPKCOJMHL.MMJAOEBFCLN());
+					_AnimationContainer[i][j] = new Vector3(pHAPKCOJMHL.ReadSingle(), 0f - pHAPKCOJMHL.ReadSingle(), pHAPKCOJMHL.ReadSingle());
 				}
 			}
 			if (AnimationEndFrame == 0)
@@ -1017,7 +1017,7 @@ public class InfoAnimation
 		}
 	}
 
-	private void BAIMGDMKILA(AnimationContainerStruct EIJNHOPFLGI)
+	private void ApplyCachedContainer(AnimationContainerStruct EIJNHOPFLGI)
 	{
 		_AnimationContainer = EIJNHOPFLGI.Container;
 		int num = _AnimationContainer.Length;
@@ -1027,30 +1027,30 @@ public class InfoAnimation
 		}
 	}
 
-	public void BPHNHFJCFCD(ModelObject OECPEDPMKCD, bool EKBOGDKIHIH, bool PHADJMAONJG, ModelObject MJCGOJBGFIE = null)
+	public void UpdateModelObjects(ModelObject OECPEDPMKCD, bool EKBOGDKIHIH, bool PHADJMAONJG, ModelObject MJCGOJBGFIE = null)
 	{
 		ModelNode aECCPADGGPG = null;
-		if (MoveData.ILOEBFFAEAN.CLIPMJNJDKI > -1 && MoveData.ILOEBFFAEAN.CLIPMJNJDKI < OECPEDPMKCD.LMBNDIPLBJA().Count)
+		if (MoveData.AlignData.PivotNodeId > -1 && MoveData.AlignData.PivotNodeId < OECPEDPMKCD.GetPlainNodes().Count)
 		{
-			aECCPADGGPG = OECPEDPMKCD.LMBNDIPLBJA()[MoveData.ILOEBFFAEAN.CLIPMJNJDKI];
+			aECCPADGGPG = OECPEDPMKCD.GetPlainNodes()[MoveData.AlignData.PivotNodeId];
 		}
-		UpdateConditions(MoveData.JIFAHHGNPFH, OECPEDPMKCD, EKBOGDKIHIH, PHADJMAONJG, MJCGOJBGFIE, aECCPADGGPG);
-		if (0 < MoveData.NIDNJFOGBFO.Count)
+		UpdateConditions(MoveData.Conditions, OECPEDPMKCD, EKBOGDKIHIH, PHADJMAONJG, MJCGOJBGFIE, aECCPADGGPG);
+		if (0 < MoveData.TacticsConditions.Count)
 		{
-			UpdateConditions(MoveData.NIDNJFOGBFO, OECPEDPMKCD, EKBOGDKIHIH, PHADJMAONJG, MJCGOJBGFIE, aECCPADGGPG);
+			UpdateConditions(MoveData.TacticsConditions, OECPEDPMKCD, EKBOGDKIHIH, PHADJMAONJG, MJCGOJBGFIE, aECCPADGGPG);
 		}
-		MoveData.IHJEKBAEIKK.CLCFLPDNBNL.UpdateNode(OECPEDPMKCD, EKBOGDKIHIH, null, PHADJMAONJG, MJCGOJBGFIE);
-		MoveData.IHJEKBAEIKK.KAEAKHIEIHH.UpdateNode(OECPEDPMKCD, EKBOGDKIHIH, null, PHADJMAONJG, MJCGOJBGFIE);
-		if (KPEMEDJCIIB != 0f)
+		MoveData.SetDirectionData.FromPoint.UpdateNode(OECPEDPMKCD, EKBOGDKIHIH, null, PHADJMAONJG, MJCGOJBGFIE);
+		MoveData.SetDirectionData.ToPoint.UpdateNode(OECPEDPMKCD, EKBOGDKIHIH, null, PHADJMAONJG, MJCGOJBGFIE);
+		if (rotationAngle != 0f)
 		{
-			OJGFJBFBCAP.UpdateNode(OECPEDPMKCD, EKBOGDKIHIH, null, PHADJMAONJG, MJCGOJBGFIE);
+			rotationPosition.UpdateNode(OECPEDPMKCD, EKBOGDKIHIH, null, PHADJMAONJG, MJCGOJBGFIE);
 		}
-		foreach (ActionAnimation item in MoveData.DJBAIAKOIHM)
+		foreach (ActionAnimation item in MoveData.Actions)
 		{
-			if (item.get_Type() == ActionAnimation.FADAJCEEKIO.EFFECT)
+			if (item.get_Type() == ActionAnimation.ActionType.EFFECT)
 			{
 				ActionEffect jFJGGMEJDPG = (ActionEffect)item;
-				jFJGGMEJDPG.KJHPCLOFDJB(OECPEDPMKCD, EKBOGDKIHIH, null, PHADJMAONJG, MJCGOJBGFIE);
+				jFJGGMEJDPG.UpdateNodes(OECPEDPMKCD, EKBOGDKIHIH, null, PHADJMAONJG, MJCGOJBGFIE);
 			}
 		}
 	}
@@ -1064,11 +1064,11 @@ public class InfoAnimation
 				ConditionDistance jNPIBKBDJAN = item as ConditionDistance;
 				if (jNPIBKBDJAN != null)
 				{
-					jNPIBKBDJAN.KJHPCLOFDJB(OECPEDPMKCD, EKBOGDKIHIH, AECCPADGGPG, PHADJMAONJG, MJCGOJBGFIE);
+					jNPIBKBDJAN.UpdateNodes(OECPEDPMKCD, EKBOGDKIHIH, AECCPADGGPG, PHADJMAONJG, MJCGOJBGFIE);
 				}
 				else
 				{
-					LLLOJBFMONN.Error("subcondition is null");
+					GameLog.Error("subcondition is null");
 				}
 			}
 			if (item.Type == ConditionAnimation.ConditionType.DIRECTION)
@@ -1076,11 +1076,11 @@ public class InfoAnimation
 				ConditionDirection cFCGJLJBOKI = item as ConditionDirection;
 				if (cFCGJLJBOKI != null)
 				{
-					cFCGJLJBOKI.KJHPCLOFDJB(OECPEDPMKCD, EKBOGDKIHIH, AECCPADGGPG, PHADJMAONJG, MJCGOJBGFIE);
+					cFCGJLJBOKI.UpdateNodes(OECPEDPMKCD, EKBOGDKIHIH, AECCPADGGPG, PHADJMAONJG, MJCGOJBGFIE);
 				}
 				else
 				{
-					LLLOJBFMONN.Error("subcondition is null");
+					GameLog.Error("subcondition is null");
 				}
 			}
 			else if (item.Type == ConditionAnimation.ConditionType.LIST)
@@ -1093,13 +1093,13 @@ public class InfoAnimation
 				}
 				else
 				{
-					LLLOJBFMONN.Error("subconditions is null");
+					GameLog.Error("subconditions is null");
 				}
 			}
 		}
 	}
 
-	private void CJAPHCKAOIE(List<ConditionAnimation> AIDMEPEKEOL)
+	private void ResetConditions(List<ConditionAnimation> AIDMEPEKEOL)
 	{
 		foreach (ConditionAnimation item in AIDMEPEKEOL)
 		{
@@ -1108,11 +1108,11 @@ public class InfoAnimation
 				ConditionDistance jNPIBKBDJAN = item as ConditionDistance;
 				if (jNPIBKBDJAN != null)
 				{
-					jNPIBKBDJAN.ABNCNNHMLII();
+					jNPIBKBDJAN.ResetNodes();
 				}
 				else
 				{
-					LLLOJBFMONN.Error("conditionDistance is null");
+					GameLog.Error("conditionDistance is null");
 				}
 			}
 			else if (item.Type == ConditionAnimation.ConditionType.DIRECTION)
@@ -1120,11 +1120,11 @@ public class InfoAnimation
 				ConditionDirection cFCGJLJBOKI = item as ConditionDirection;
 				if (cFCGJLJBOKI != null)
 				{
-					cFCGJLJBOKI.ABNCNNHMLII();
+					cFCGJLJBOKI.ResetNodes();
 				}
 				else
 				{
-					LLLOJBFMONN.Error("conditionDistance is null");
+					GameLog.Error("conditionDistance is null");
 				}
 			}
 			else if (item.Type == ConditionAnimation.ConditionType.LIST)
@@ -1133,69 +1133,69 @@ public class InfoAnimation
 				if (eLFKOGJJNMN != null)
 				{
 					List<ConditionAnimation> aIDMEPEKEOL = eLFKOGJJNMN.GetConditions();
-					CJAPHCKAOIE(aIDMEPEKEOL);
+					ResetConditions(aIDMEPEKEOL);
 				}
 				else
 				{
-					LLLOJBFMONN.Error("conditions is null");
+					GameLog.Error("conditions is null");
 				}
 			}
 		}
 	}
 
-	public void ABNCNNHMLII()
+	public void ResetModelBindings()
 	{
-		CJAPHCKAOIE(MoveData.JIFAHHGNPFH);
-		CJAPHCKAOIE(MoveData.NIDNJFOGBFO);
-		foreach (ActionAnimation item in MoveData.DJBAIAKOIHM)
+		ResetConditions(MoveData.Conditions);
+		ResetConditions(MoveData.TacticsConditions);
+		foreach (ActionAnimation item in MoveData.Actions)
 		{
-			if (item.get_Type() == ActionAnimation.FADAJCEEKIO.EFFECT)
+			if (item.get_Type() == ActionAnimation.ActionType.EFFECT)
 			{
 				ActionEffect jFJGGMEJDPG = (ActionEffect)item;
-				jFJGGMEJDPG.MGCNPBCBMHB();
+				jFJGGMEJDPG.ResetNodes();
 			}
 		}
-		MoveData.IHJEKBAEIKK.CLCFLPDNBNL.GPGKANDFLNB();
-		MoveData.IHJEKBAEIKK.KAEAKHIEIHH.GPGKANDFLNB();
-		if (OJGFJBFBCAP != null)
+		MoveData.SetDirectionData.FromPoint.ClearChildPoints();
+		MoveData.SetDirectionData.ToPoint.ClearChildPoints();
+		if (rotationPosition != null)
 		{
-			OJGFJBFBCAP.GPGKANDFLNB();
+			rotationPosition.ClearChildPoints();
 		}
 	}
 
-	public List<string> FOLOOGCLPNE()
+	public List<string> GetTemplateNames()
 	{
 		return _TemplateNames;
 	}
 
-	public int CEDEDCLGJDE(ModelConditions conditions, int CLHNIJGMKBH)
+	public int GetDirection(ModelConditions conditions, int CLHNIJGMKBH)
 	{
-		return (!MoveData.IHJEKBAEIKK.IsExists) ? CLHNIJGMKBH : MoveData.IHJEKBAEIKK.IMLFCBLAJGA(conditions);
+		return (!MoveData.SetDirectionData.IsExists) ? CLHNIJGMKBH : MoveData.SetDirectionData.GetDirectionSign(conditions);
 	}
 
-	public int PGOFHCBPLOE()
+	public int GetFrameCount()
 	{
 		return AnimationEndFrame - FirstFrame + 1;
 	}
 
-	public uint BMBKLLNAKJK()
+	public uint GetTotalFramesUnsigned()
 	{
-		return (uint)(PGOFHCBPLOE() * (MNHGBPOIHKG + 1));
+		return (uint)(GetFrameCount() * (MidFrames + 1));
 	}
 
-	public int MLLLLMFLOBG(bool NPEIEAHIDKH)
+	public int GetLastAttackFrame(bool NPEIEAHIDKH)
 	{
 		int num = 0;
 		foreach (IntervalAnimation item in MoveData.Intervals)
 		{
-			if (item.Type == IntervalAnimation.NGAJJDIEDGF.INTERVAL_ATTACK && num < item.GEJLNPIEDPF)
+			if (item.Type == IntervalAnimation.IntervalType.INTERVAL_ATTACK && num < item.EndFrameValue)
 			{
-				num = item.GEJLNPIEDPF;
+				num = item.EndFrameValue;
 			}
 		}
 		if (NPEIEAHIDKH)
 		{
-			num = DKEJBCMFJEI(num + 1) - 1;
+			num = ToInterpolatedFrame(num + 1) - 1;
 		}
 		return num;
 	}
@@ -1222,7 +1222,7 @@ public class InfoAnimation
 				ConditionList eLFKOGJJNMN = item as ConditionList;
 				if (eLFKOGJJNMN.get_Type() != ConditionList.OperatorType.OR)
 				{
-					LLLOJBFMONN.Error(string.Empty);
+					GameLog.Error(string.Empty);
 					continue;
 				}
 				List<ConditionAnimation> list = eLFKOGJJNMN.GetConditions();
@@ -1247,36 +1247,36 @@ public class InfoAnimation
 		int num = 0;
 		foreach (IntervalAnimation item in MoveData.Intervals)
 		{
-			if (NFLDEGMEJAK.Contains(item.Name) && num < item.GEJLNPIEDPF)
+			if (NFLDEGMEJAK.Contains(item.Name) && num < item.EndFrameValue)
 			{
-				num = item.GEJLNPIEDPF;
+				num = item.EndFrameValue;
 			}
 		}
 		if (0 < num)
 		{
-			return DKEJBCMFJEI(num + 1);
+			return ToInterpolatedFrame(num + 1);
 		}
 		return 0;
 	}
 
-	public int HGMPJJACFHN()
+	public int GetMoveLengthStrict()
 	{
 		List<string> nFLDEGMEJAK = AiData.get_MoveLengthIntervalsStrict();
 		return GetMoveLength(nFLDEGMEJAK);
 	}
 
-	public int JMIDABBAKEP()
+	public int GetMoveLengthExtended()
 	{
 		List<string> nFLDEGMEJAK = AiData.get_MoveLengthIntervalsExtended();
 		return GetMoveLength(nFLDEGMEJAK);
 	}
 
-	public ConditionKeys ILBCHANCOBP()
+	public ConditionKeys GetFirstKeysCondition()
 	{
-		return DHBACBKLADO(MoveData.JIFAHHGNPFH);
+		return FindKeysCondition(MoveData.Conditions);
 	}
 
-	private static ConditionKeys DHBACBKLADO(List<ConditionAnimation> conditions)
+	private static ConditionKeys FindKeysCondition(List<ConditionAnimation> conditions)
 	{
 		foreach (ConditionAnimation item in conditions)
 		{
@@ -1286,7 +1286,7 @@ public class InfoAnimation
 				if (eLFKOGJJNMN != null)
 				{
 					List<ConditionAnimation> kDOGKKGDOBK = eLFKOGJJNMN.GetConditions();
-					ConditionKeys bHDEBDIHDFM = DHBACBKLADO(kDOGKKGDOBK);
+					ConditionKeys bHDEBDIHDFM = FindKeysCondition(kDOGKKGDOBK);
 					if (bHDEBDIHDFM != null)
 					{
 						return bHDEBDIHDFM;
@@ -1294,12 +1294,12 @@ public class InfoAnimation
 				}
 				else
 				{
-					LLLOJBFMONN.Error("conditionList is null");
+					GameLog.Error("conditionList is null");
 				}
 			}
 			else
 			{
-				ConditionKeys bHDEBDIHDFM2 = JEELAPHJLOE(item);
+				ConditionKeys bHDEBDIHDFM2 = AsKeysCondition(item);
 				if (bHDEBDIHDFM2 != null)
 				{
 					return bHDEBDIHDFM2;
@@ -1313,11 +1313,11 @@ public class InfoAnimation
 	public List<ConditionKeys> CollectKeyConditions()
 	{
 		List<ConditionKeys> list = new List<ConditionKeys>();
-		CIEHMPCOKGK(MoveData.JIFAHHGNPFH, list);
+		CollectKeysConditions(MoveData.Conditions, list);
 		return list;
 	}
 
-	private static void CIEHMPCOKGK(List<ConditionAnimation> conditions, List<ConditionKeys> GKHEPKGMEFI)
+	private static void CollectKeysConditions(List<ConditionAnimation> conditions, List<ConditionKeys> GKHEPKGMEFI)
 	{
 		foreach (ConditionAnimation item in conditions)
 		{
@@ -1327,16 +1327,16 @@ public class InfoAnimation
 				if (eLFKOGJJNMN != null)
 				{
 					List<ConditionAnimation> kDOGKKGDOBK = eLFKOGJJNMN.GetConditions();
-					CIEHMPCOKGK(kDOGKKGDOBK, GKHEPKGMEFI);
+					CollectKeysConditions(kDOGKKGDOBK, GKHEPKGMEFI);
 				}
 				else
 				{
-					LLLOJBFMONN.Error("conditionList is null");
+					GameLog.Error("conditionList is null");
 				}
 			}
 			else
 			{
-				ConditionKeys bHDEBDIHDFM = JEELAPHJLOE(item);
+				ConditionKeys bHDEBDIHDFM = AsKeysCondition(item);
 				if (bHDEBDIHDFM != null)
 				{
 					GKHEPKGMEFI.Add(bHDEBDIHDFM);
@@ -1345,7 +1345,7 @@ public class InfoAnimation
 		}
 	}
 
-	public static ConditionKeys JEELAPHJLOE(ConditionAnimation IOFGGOCEIAM)
+	public static ConditionKeys AsKeysCondition(ConditionAnimation IOFGGOCEIAM)
 	{
 		if (IOFGGOCEIAM.Type == ConditionAnimation.ConditionType.KEYS)
 		{
@@ -1354,12 +1354,12 @@ public class InfoAnimation
 		return null;
 	}
 
-	public bool CNPFHBMGDFP(string name)
+	public bool HasName(string name)
 	{
-		return Name == name || LPPIKDGABOL(name);
+		return Name == name || HasTemplateName(name);
 	}
 
-	public bool LPPIKDGABOL(string IJBOAGICOON)
+	public bool HasTemplateName(string IJBOAGICOON)
 	{
 		foreach (string item in _TemplateNames)
 		{
@@ -1391,7 +1391,7 @@ public class InfoAnimation
 		return false;
 	}
 
-	public InfoAnimation IMFGMAAEMIC()
+	public InfoAnimation GetTacticEquivalent()
 	{
 		return _TacticEquivalent;
 	}
@@ -1400,43 +1400,43 @@ public class InfoAnimation
 	{
 		if (this == value)
 		{
-			LLLOJBFMONN.Error("this animation == tactic equivalent for {0}", Name);
+			GameLog.Error("this animation == tactic equivalent for {0}", Name);
 		}
 		_TacticEquivalent = value;
 	}
 
-	public List<string> OIDIJEOMJCB()
+	public List<string> GetTacticWeapons()
 	{
-		return EGDIEIPCAAF;
+		return tacticWeapons;
 	}
 
-	public void IBMFCIFKGOO(string INFFOHGHLNG)
+	public void SetTacticWeapons(string INFFOHGHLNG)
 	{
-		EGDIEIPCAAF.Clear();
+		tacticWeapons.Clear();
 		if (INFFOHGHLNG != null)
 		{
-			EGDIEIPCAAF.AddRange(INFFOHGHLNG.Split('|'));
+			tacticWeapons.AddRange(INFFOHGHLNG.Split('|'));
 		}
 	}
 
-	public bool AIHDFOPLBIL()
+	public bool GetIsSecondHeelPivot()
 	{
-		return MoveData.ILOEBFFAEAN.BLODCIGDJFK == "NHeel_2";
+		return MoveData.AlignData.PivotPart == "NHeel_2";
 	}
 
-	public bool LIKPDIIPABF()
+	public bool GetIsFirstHeelPivot()
 	{
-		return MoveData.ILOEBFFAEAN.BLODCIGDJFK == "NHeel_1";
+		return MoveData.AlignData.PivotPart == "NHeel_1";
 	}
 
-	public int IKFCNCLKDGD(bool NPEIEAHIDKH)
+	public int GetLastUninterruptFrame(bool NPEIEAHIDKH)
 	{
 		int num = 0;
 		foreach (IntervalAnimation item in MoveData.Intervals)
 		{
-			if ("Uninterrupt" == item.Name && num < item.GEJLNPIEDPF)
+			if ("Uninterrupt" == item.Name && num < item.EndFrameValue)
 			{
-				num = item.GEJLNPIEDPF;
+				num = item.EndFrameValue;
 			}
 		}
 		int lHHAGECFIOL = AnimationEndFrame;
@@ -1446,86 +1446,86 @@ public class InfoAnimation
 		}
 		if (NPEIEAHIDKH)
 		{
-			num = DKEJBCMFJEI(num + 1) - 1;
+			num = ToInterpolatedFrame(num + 1) - 1;
 		}
 		return num;
 	}
 
-	public int DKEJBCMFJEI(int frame)
+	public int ToInterpolatedFrame(int frame)
 	{
-		return (frame - FirstFrame + 1) * (MNHGBPOIHKG + 1) + 1;
+		return (frame - FirstFrame + 1) * (MidFrames + 1) + 1;
 	}
 
-	public int FALLOLJPMGF(int IHICCKAOPKG)
+	public int FromInterpolatedFrame(int IHICCKAOPKG)
 	{
-		return FirstFrame - 1 + (IHICCKAOPKG - 1) / (MNHGBPOIHKG + 1);
+		return FirstFrame - 1 + (IHICCKAOPKG - 1) / (MidFrames + 1);
 	}
 
-	public void DIGCECPPHOH(Vector3f value)
+	public void SetVelocity(Vector3f value)
 	{
-		KACPFNLDNND = value;
+		velocity = value;
 	}
 
-	public Vector3f LBJFGCFGMDI()
+	public Vector3f GetVelocity()
 	{
-		return KACPFNLDNND;
+		return velocity;
 	}
 
-	public void PICBLJDLDDN(Vector3f value)
+	public void SetAcceleration(Vector3f value)
 	{
-		KNBDGOJAIAF = value;
+		acceleration = value;
 	}
 
-	public Vector3f NCENGIOMKOF()
+	public Vector3f GetAcceleration()
 	{
-		return KNBDGOJAIAF;
+		return acceleration;
 	}
 
-	public void NFMLONEIJEJ(bool value)
+	public void SetSaveVelocity(bool value)
 	{
-		AEDIIEEJKHE = value;
+		saveVelocity = value;
 	}
 
-	public bool HOPDDLNABCG()
+	public bool GetSaveVelocity()
 	{
-		return AEDIIEEJKHE;
+		return saveVelocity;
 	}
 
-	public void HGJPLKKCKHM(DistancePoint value)
+	public void SetRotationPosition(DistancePoint value)
 	{
-		OJGFJBFBCAP = value;
+		rotationPosition = value;
 	}
 
-	public DistancePoint KBLFKMECMJP()
+	public DistancePoint GetRotationPosition()
 	{
-		return OJGFJBFBCAP;
+		return rotationPosition;
 	}
 
-	public void PFELBJBNEEK(bool value)
+	public void SetNoMagicRecharge(bool value)
 	{
-		JCIKOMAMJDI = value;
+		noMagicRecharge = value;
 	}
 
-	public bool BKGIEPOEBOF()
+	public bool GetNoMagicRecharge()
 	{
-		return JCIKOMAMJDI;
+		return noMagicRecharge;
 	}
 
 	public void set_RotationAngle(float value)
 	{
-		KPEMEDJCIIB = value;
+		rotationAngle = value;
 	}
 
-	public float NBOLIGLFFEL()
+	public float GetRotationAngle()
 	{
-		return KPEMEDJCIIB;
+		return rotationAngle;
 	}
 
-	public bool MBENIPEBGBK(string name, int frame)
+	public bool IsIntervalActive(string name, int frame)
 	{
 		foreach (IntervalAnimation item in MoveData.Intervals)
 		{
-			if (item.Name == name && item.Start <= frame && frame <= item.GEJLNPIEDPF)
+			if (item.Name == name && item.Start <= frame && frame <= item.EndFrameValue)
 			{
 				return true;
 			}
@@ -1533,13 +1533,13 @@ public class InfoAnimation
 		return false;
 	}
 
-	public bool CJAHEDOHHEG(string name, int IHICCKAOPKG)
+	public bool IsIntervalActiveAtInterpolatedFrame(string name, int IHICCKAOPKG)
 	{
-		int dBEDGEMEFNB = FALLOLJPMGF(IHICCKAOPKG);
-		return MBENIPEBGBK(name, dBEDGEMEFNB);
+		int dBEDGEMEFNB = FromInterpolatedFrame(IHICCKAOPKG);
+		return IsIntervalActive(name, dBEDGEMEFNB);
 	}
 
-	public bool EHEPILCDIDC(List<string> NIKHAICFGNM, int frame, bool FPMGBALCKPI)
+	public bool AreIntervalsActive(List<string> NIKHAICFGNM, int frame, bool FPMGBALCKPI)
 	{
 		if (FPMGBALCKPI)
 		{
@@ -1548,7 +1548,7 @@ public class InfoAnimation
 				bool flag = false;
 				foreach (IntervalAnimation item2 in MoveData.Intervals)
 				{
-					if (item2.Name == item && item2.Start <= frame && frame <= item2.GEJLNPIEDPF)
+					if (item2.Name == item && item2.Start <= frame && frame <= item2.EndFrameValue)
 					{
 						flag = true;
 						break;
@@ -1563,7 +1563,7 @@ public class InfoAnimation
 		}
 		foreach (IntervalAnimation item3 in MoveData.Intervals)
 		{
-			if (NIKHAICFGNM.Contains(item3.Name) && item3.Start <= frame && frame <= item3.GEJLNPIEDPF)
+			if (NIKHAICFGNM.Contains(item3.Name) && item3.Start <= frame && frame <= item3.EndFrameValue)
 			{
 				return true;
 			}
@@ -1571,93 +1571,93 @@ public class InfoAnimation
 		return false;
 	}
 
-	public bool FMFFHKJBHNG(List<string> NIKHAICFGNM, int IHICCKAOPKG, bool FPMGBALCKPI)
+	public bool AreIntervalsActiveAtInterpolatedFrame(List<string> NIKHAICFGNM, int IHICCKAOPKG, bool FPMGBALCKPI)
 	{
-		int dBEDGEMEFNB = FALLOLJPMGF(IHICCKAOPKG);
-		return EHEPILCDIDC(NIKHAICFGNM, dBEDGEMEFNB, FPMGBALCKPI);
+		int dBEDGEMEFNB = FromInterpolatedFrame(IHICCKAOPKG);
+		return AreIntervalsActive(NIKHAICFGNM, dBEDGEMEFNB, FPMGBALCKPI);
 	}
 
-	public EventAnimation OIGBIFNICBI(EventAnimation.EECEJKADLCK LFLGCDNKNJI)
+	public EventAnimation FindMoveEventByType(EventAnimation.EventAnimationType LFLGCDNKNJI)
 	{
 		if (MoveData != null)
 		{
-			return MoveData.OIGBIFNICBI(LFLGCDNKNJI);
+			return MoveData.FindEventByType(LFLGCDNKNJI);
 		}
 		return null;
 	}
 
-	public int ONLKMFOENEH()
+	public int GetTotalFrames()
 	{
-		return (MNHGBPOIHKG + 1) * PGOFHCBPLOE();
+		return (MidFrames + 1) * GetFrameCount();
 	}
 
-	public int EDDFIABEAGM()
+	public int GetBlendFrameCount()
 	{
-		return 2 * (MNHGBPOIHKG + 1);
+		return 2 * (MidFrames + 1);
 	}
 
 	public void PreloadEffects()
 	{
 		string text = "Textures/Effects/Magic/";
-		foreach (ActionAnimation item in MoveData.DJBAIAKOIHM)
+		foreach (ActionAnimation item in MoveData.Actions)
 		{
-			if (item.get_Type() == ActionAnimation.FADAJCEEKIO.EFFECT)
+			if (item.get_Type() == ActionAnimation.ActionType.EFFECT)
 			{
 				ActionEffect jFJGGMEJDPG = (ActionEffect)item;
-				string oNNKJLOGHGH = text + jFJGGMEJDPG.EPDMGFELIMC();
-				LocationSpriteCache.ENFOJMFEGJH(oNNKJLOGHGH);
+				string oNNKJLOGHGH = text + jFJGGMEJDPG.GetSequence();
+				LocationSpriteCache.LoadAtlasSprites(oNNKJLOGHGH);
 			}
 		}
 	}
 
 	public void PreloadSounds()
 	{
-		foreach (ActionAnimation item in MoveData.DJBAIAKOIHM)
+		foreach (ActionAnimation item in MoveData.Actions)
 		{
-			if (item.get_Type() == ActionAnimation.FADAJCEEKIO.SOUND)
+			if (item.get_Type() == ActionAnimation.ActionType.SOUND)
 			{
 				ActionSound nMLKJLJHCIA = (ActionSound)item;
-				Sound.IOIEJHLMBLI(nMLKJLJHCIA.get_Name());
+				Sound.LoadSound(nMLKJLJHCIA.get_Name());
 			}
 		}
 	}
 
-	public bool NCEKKNIMHAG()
+	public bool GetIsLooped()
 	{
-		return INFAGPDFGNL;
+		return isLooped;
 	}
 
-	public void LLELLFKJKGE(bool value)
+	public void SetIsLooped(bool value)
 	{
-		INFAGPDFGNL = value;
+		isLooped = value;
 	}
 
-	public StageType.FDBBPEGEGMK PHPHCKAHPOP()
+	public StageType.Stage GetCameraStage()
 	{
-		return ENDJLOAGKGO;
+		return cameraStage;
 	}
 
-	public void POOOFPBAJDM(StageType.FDBBPEGEGMK value)
+	public void SetCameraStage(StageType.Stage value)
 	{
-		ENDJLOAGKGO = value;
+		cameraStage = value;
 	}
 
-	public MirrorNode ECCLELFHNHE()
+	public MirrorNode GetMirrorNode()
 	{
-		return FDECJHIMNGN;
+		return mirrorNode;
 	}
 
-	public void NNFKIGLFLKL(MirrorNode value)
+	public void SetMirrorNode(MirrorNode value)
 	{
-		FDECJHIMNGN = value;
+		mirrorNode = value;
 	}
 
-	public Vector3[] BGHLLHNKFEM()
+	public Vector3[] GetFirstFrameNodes()
 	{
 		return _AnimationContainer[FirstFrame];
 	}
 
-	private void DDPBDPEDIGC()
+	private void AddToAnimationCache()
 	{
 		if (_AnimationContainer == null)
 		{
@@ -1666,26 +1666,26 @@ public class InfoAnimation
 		AnimationContainerStruct aGAMDIHPFPF = new AnimationContainerStruct();
 		aGAMDIHPFPF.FileName = FileName;
 		aGAMDIHPFPF.Container = _AnimationContainer;
-		LECLDGFPOEA.Add(aGAMDIHPFPF);
+		animationCache.Add(aGAMDIHPFPF);
 	}
 
-	public static void EGLKBMCHPNN()
+	public static void ClearAnimationCache()
 	{
-		foreach (AnimationContainerStruct item in LECLDGFPOEA)
+		foreach (AnimationContainerStruct item in animationCache)
 		{
 			item.Container = null;
 		}
-		LECLDGFPOEA.Clear();
+		animationCache.Clear();
 	}
 
-	public static int NJKKOFDBMOO()
+	public static int GetCachedAnimationCount()
 	{
-		return LECLDGFPOEA.Count;
+		return animationCache.Count;
 	}
 
-	private AnimationContainerStruct IAPAKFDEKOI()
+	private AnimationContainerStruct FindCachedContainer()
 	{
-		return LECLDGFPOEA.FirstOrDefault((AnimationContainerStruct EIJNHOPFLGI) => FileName == EIJNHOPFLGI.FileName);
+		return animationCache.FirstOrDefault((AnimationContainerStruct EIJNHOPFLGI) => FileName == EIJNHOPFLGI.FileName);
 	}
 
 	public override string ToString()

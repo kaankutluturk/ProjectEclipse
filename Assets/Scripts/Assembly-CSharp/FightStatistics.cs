@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class FightStatistics
 {
-	public enum EMKEIEJMONM
+	public enum FightStyle
 	{
 		STYLE_TURTLE = 0,
 		STYLE_HARD = 1,
@@ -14,69 +14,69 @@ public class FightStatistics
 
 	private const int MIN_COMBO = 3;
 
-	private int NPAIABEJHDI;
+	private int winCount;
 
-	private EMKEIEJMONM DFBCMLMHJKI;
+	private FightStyle style;
 
-	private int MLIIDKMAJLD;
+	private int unusedCounterA;
 
-	private int IDACPEKPPCA;
+	private int comboCount;
 
-	private int IIENCMJNOLK;
+	private int maxComboLength;
 
-	private int NLCGGNDICOK;
+	private int unusedCounterB;
 
-	private int NECLBAGGFCI;
+	private int unusedCounterC;
 
 	private bool _noStrikes = true;
 
-	private int DPGNKMGLBMG;
+	private int comboFinishDelay;
 
-	private int MFDOLKIPDHA;
+	private int currentComboHits;
 
-	public EMKEIEJMONM HCJPMGKAAMN
+	public FightStyle Style
 	{
 		get
 		{
-			return HALCJLMJDII();
+			return GetStyle();
 		}
 		set
 		{
-			KHFMMPCKMKE(value);
+			SetStyle(value);
 		}
 	}
 
-	public EMKEIEJMONM HALCJLMJDII()
+	public FightStyle GetStyle()
 	{
-		return DFBCMLMHJKI;
+		return style;
 	}
 
-	public void KHFMMPCKMKE(EMKEIEJMONM value)
+	public void SetStyle(FightStyle value)
 	{
-		DFBCMLMHJKI = (EMKEIEJMONM)Mathf.Max((int)DFBCMLMHJKI, (int)value);
+		style = (FightStyle)Mathf.Max((int)style, (int)value);
 	}
 
-	public void POPNNILNKAE(float JNNBEHPCCOB, float FEMPIBLJEAP)
+	public void RegisterWinIfEqual(float JNNBEHPCCOB, float FEMPIBLJEAP)
 	{
 		if (JNNBEHPCCOB == FEMPIBLJEAP)
 		{
-			NPAIABEJHDI++;
+			winCount++;
 		}
 	}
 
-	public void POPNNILNKAE()
+	public void RegisterWin()
 	{
-		NPAIABEJHDI++;
+		winCount++;
 	}
 
 	public void Draw()
 	{
-		if (DPGNKMGLBMG > 0)
+		if (comboFinishDelay > 0)
 		{
-			DPGNKMGLBMG--;
-			if (DPGNKMGLBMG == 0)
+			comboFinishDelay--;
+			if (comboFinishDelay == 0)
 			{
-				GBLAEAKGKLK();
+				FinishCombo();
 			}
 		}
 	}
@@ -84,22 +84,22 @@ public class FightStatistics
 	public void Reset()
 	{
 		_noStrikes = true;
-		DPGNKMGLBMG = 0;
-		MFDOLKIPDHA = 0;
+		comboFinishDelay = 0;
+		currentComboHits = 0;
 	}
 
-	private bool NDOBPFBGKHG()
+	private bool HasMinimumCombo()
 	{
-		return IIENCMJNOLK >= 3;
+		return maxComboLength >= 3;
 	}
 
-	private void GBLAEAKGKLK()
+	private void FinishCombo()
 	{
-		if (MFDOLKIPDHA > 0)
+		if (currentComboHits > 0)
 		{
-			IDACPEKPPCA++;
-			IIENCMJNOLK = Mathf.Max(IIENCMJNOLK, MFDOLKIPDHA);
-			MFDOLKIPDHA = 0;
+			comboCount++;
+			maxComboLength = Mathf.Max(maxComboLength, currentComboHits);
+			currentComboHits = 0;
 		}
 	}
 }

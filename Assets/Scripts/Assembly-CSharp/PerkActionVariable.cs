@@ -4,7 +4,7 @@ using System.Xml;
 public class PerkActionVariable : PerkActionModificator
 {
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private FunctionExtension IELPCLONGKP;
+	private FunctionExtension _value;
 
 	public PerkActionVariable()
 	{
@@ -13,31 +13,31 @@ public class PerkActionVariable : PerkActionModificator
 	public PerkActionVariable(PerkActionVariable NOLFMPDGCOC)
 		: base(NOLFMPDGCOC)
 	{
-		set_Value(NOLFMPDGCOC.OEAKCOHMIHH());
+		set_Value(NOLFMPDGCOC.GetValue());
 	}
 
-	public FunctionExtension OEAKCOHMIHH()
+	public FunctionExtension GetValue()
 	{
-		return IELPCLONGKP;
+		return _value;
 	}
 
 	protected void set_Value(FunctionExtension value)
 	{
-		IELPCLONGKP = value;
+		_value = value;
 	}
 
 	public override void Parse(XmlNode node)
 	{
 		base.Parse(node);
 		set_Type(ActionType.ACTION_VARIABLE);
-		string text = node.Attributes["Value"].CIPOICEEIBK(string.Empty);
+		string text = node.Attributes["Value"].GetStringOrDefault(string.Empty);
 		if (text != null && text != string.Empty)
 		{
 			set_Value(new FunctionExtension());
-			OEAKCOHMIHH().Parse(text);
-			OEAKCOHMIHH().PBPBNENGLPA(JMDLAMHAJLN().HJFEFJIEINN);
-			OEAKCOHMIHH().DMPCFMACDJM(JMDLAMHAJLN().OKPFNCJFLDL);
-			OEAKCOHMIHH().set_Target(this);
+			GetValue().Parse(text);
+			GetValue().SetFunctionCallback(GetPerk().EvaluateFunctionCallback);
+			GetValue().SetVariableCallback(GetPerk().OnFunctionPreCallback);
+			GetValue().set_Target(this);
 		}
 	}
 }

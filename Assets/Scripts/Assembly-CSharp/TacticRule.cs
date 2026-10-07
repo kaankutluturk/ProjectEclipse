@@ -2,29 +2,29 @@ using System.Xml;
 
 public class TacticRule : InFightRule
 {
-	private string JPGBGIMLPDN;
+	private string _tacticName;
 
 	public TacticRule(XmlNode node, RuleAppliance EJPOJJKKICO = RuleAppliance.ApplianceOpponent)
-		: base(BCBLLMPAMLP.RuleTactic, EJPOJJKKICO, node)
+		: base(RuleType.RuleTactic, EJPOJJKKICO, node)
 	{
 		Parse(node);
 	}
 
-	public string ICIKNGANCGK()
+	public string GetTacticName()
 	{
-		return JPGBGIMLPDN;
+		return _tacticName;
 	}
 
 	protected override void Parse(XmlNode node)
 	{
-		JPGBGIMLPDN = node.Attributes["Name"].CIPOICEEIBK(string.Empty);
+		_tacticName = node.Attributes["Name"].GetStringOrDefault(string.Empty);
 	}
 
 	public override InFightRule Copy()
 	{
 		InFightRule aAJIFBJLJOA = null;
-		RuleAppliance eJPOJJKKICO = EDAKADCHOLE();
-		XmlNode hKPPBKPJOEO = GIFDJEEGCJI().IOJIGDNFCFL();
+		RuleAppliance eJPOJJKKICO = GetAppliance();
+		XmlNode hKPPBKPJOEO = GetXmlSource().GetNode();
 		aAJIFBJLJOA = new TacticRule(hKPPBKPJOEO, eJPOJJKKICO);
 		aAJIFBJLJOA.IsRandom = IsRandom;
 		return aAJIFBJLJOA;

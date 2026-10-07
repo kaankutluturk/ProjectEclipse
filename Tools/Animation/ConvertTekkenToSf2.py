@@ -227,7 +227,7 @@ def retarget(args, obj, last, fps, xml):
             for point in p.values():
                 point.y -= floor
 
-        # Match ModelMacroNode.FPKMHOMMFKB and mass-weighted ModelObject COM.
+        # Match ModelMacroNode.UpdateFromWeights and mass-weighted ModelObject COM.
         for node in nodes:
             if node.attrib['Type'] == 'MacroNode':
                 p[node.tag] = sum((p[node.attrib['ChildNode'+str(i)]]*float(node.attrib['LCC'+str(i)]) for i in range(1,int(node.attrib['NodesCount'])+1)), Vector())

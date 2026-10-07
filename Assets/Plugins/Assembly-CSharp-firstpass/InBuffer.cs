@@ -4,11 +4,11 @@ public class InBuffer
 {
 	private byte[] m_Buffer;
 
-	private uint AIJNPGBGLBN;
+	private uint m_Pos;
 
-	private uint LCEJOIDPMEK;
+	private uint m_Limit;
 
-	private uint FAAGKBAPFOM;
+	private uint m_BufferSize;
 
 	private Stream m_Stream;
 
@@ -19,58 +19,58 @@ public class InBuffer
 	public InBuffer(uint KOGACKBGCFP)
 	{
 		m_Buffer = new byte[KOGACKBGCFP];
-		FAAGKBAPFOM = KOGACKBGCFP;
+		m_BufferSize = KOGACKBGCFP;
 	}
 
 	public void Init(Stream ABJIEFMMIEK)
 	{
 		m_Stream = ABJIEFMMIEK;
 		m_ProcessedSize = 0uL;
-		LCEJOIDPMEK = 0u;
-		AIJNPGBGLBN = 0u;
+		m_Limit = 0u;
+		m_Pos = 0u;
 		m_StreamWasExhausted = false;
 	}
 
-	public bool ONDIFDJPMDM()
+	public bool ReadBlock()
 	{
 		if (m_StreamWasExhausted)
 		{
 			return false;
 		}
-		m_ProcessedSize += AIJNPGBGLBN;
-		int num = m_Stream.Read(m_Buffer, 0, (int)FAAGKBAPFOM);
-		AIJNPGBGLBN = 0u;
-		LCEJOIDPMEK = (uint)num;
+		m_ProcessedSize += m_Pos;
+		int num = m_Stream.Read(m_Buffer, 0, (int)m_BufferSize);
+		m_Pos = 0u;
+		m_Limit = (uint)num;
 		m_StreamWasExhausted = num == 0;
 		return !m_StreamWasExhausted;
 	}
 
-	public void IAIFCIAAHOE()
+	public void ReleaseStream()
 	{
 		m_Stream = null;
 	}
 
 	public bool ReadByte(byte AAOIAEJJINO)
 	{
-		if (AIJNPGBGLBN >= LCEJOIDPMEK && !ONDIFDJPMDM())
+		if (m_Pos >= m_Limit && !ReadBlock())
 		{
 			return false;
 		}
-		AAOIAEJJINO = m_Buffer[AIJNPGBGLBN++];
+		AAOIAEJJINO = m_Buffer[m_Pos++];
 		return true;
 	}
 
 	public byte ReadByte()
 	{
-		if (AIJNPGBGLBN >= LCEJOIDPMEK && !ONDIFDJPMDM())
+		if (m_Pos >= m_Limit && !ReadBlock())
 		{
 			return byte.MaxValue;
 		}
-		return m_Buffer[AIJNPGBGLBN++];
+		return m_Buffer[m_Pos++];
 	}
 
-	public ulong GBFBDFIGOJE()
+	public ulong GetProcessedSize()
 	{
-		return m_ProcessedSize + AIJNPGBGLBN;
+		return m_ProcessedSize + m_Pos;
 	}
 }

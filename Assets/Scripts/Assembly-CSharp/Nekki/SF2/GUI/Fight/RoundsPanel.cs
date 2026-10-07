@@ -7,9 +7,9 @@ namespace Nekki.SF2.GUI.Fight
 	{
 		private List<ResolutionImage> _rounds = new List<ResolutionImage>();
 
-		private const string HHEJJFJALHD = "FightUI.Round_Done";
+		private const string RoundDoneSprite = "FightUI.Round_Done";
 
-		private const string BPHKOABEFBH = "FightUI.Round_Undone";
+		private const string RoundUndoneSprite = "FightUI.Round_Undone";
 
 		public void Init(int NPLGIKNJBKD)
 		{

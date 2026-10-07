@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class ModelPhysics
 {
-	public enum AEBCECIKDDD
+	public enum PhysicsEventType
 	{
 		onFalling = 0
 	}
@@ -12,9 +12,9 @@ public class ModelPhysics
 
 	private int _Iterative;
 
-	private float EPHLNOOPFJL;
+	private float wallLeftX;
 
-	private float OCAIKPKEDDN;
+	private float wallRightX;
 
 	private ModelObject _ModelObject;
 
@@ -24,7 +24,7 @@ public class ModelPhysics
 
 	private int _Frame;
 
-	public bool ADIEJNHGCNH
+	public bool PhysicsEnabled
 	{
 		get
 		{
@@ -36,11 +36,11 @@ public class ModelPhysics
 	{
 		get
 		{
-			return IDAEPMLGFLG();
+			return GetNames();
 		}
 	}
 
-	public int NFKBFGIACOP
+	public int CurrentFrame
 	{
 		get
 		{
@@ -48,18 +48,18 @@ public class ModelPhysics
 		}
 	}
 
-	public float ILJNBIKEDDP
+	public float GravityStep
 	{
 		get
 		{
-			return DBJMBDLKOPM();
+			return GetGravityStep();
 		}
 	}
 
 	public ModelPhysics(ModelObject OECPEDPMKCD)
 	{
-		EPHLNOOPFJL = 0f;
-		OCAIKPKEDDN = 0f;
+		wallLeftX = 0f;
+		wallRightX = 0f;
 		_ModelObject = OECPEDPMKCD;
 		_IsPhysics = false;
 		_Frame = 0;
@@ -72,7 +72,7 @@ public class ModelPhysics
 		return _IsPhysics;
 	}
 
-	public List<string> IDAEPMLGFLG()
+	public List<string> GetNames()
 	{
 		return _Names;
 	}
@@ -94,13 +94,13 @@ public class ModelPhysics
 
 	public void SetWallShift(float LHNCHOAEGEA, float KAEPJHHLLPK)
 	{
-		EPHLNOOPFJL = LHNCHOAEGEA;
-		OCAIKPKEDDN = KAEPJHHLLPK;
+		wallLeftX = LHNCHOAEGEA;
+		wallRightX = KAEPJHHLLPK;
 	}
 
-	public float DBJMBDLKOPM()
+	public float GetGravityStep()
 	{
-		return PhysicsController.GetGravity() / (float)(GameUtils.GGBABPJBGJB() * GameUtils.GGBABPJBGJB());
+		return PhysicsController.GetGravity() / (float)(GameUtils.GetSlowMode() * GameUtils.GetSlowMode());
 	}
 
 	public void Start(List<string> NIKHAICFGNM)
@@ -112,7 +112,7 @@ public class ModelPhysics
 		{
 			_Names.AddRange(NIKHAICFGNM);
 		}
-		_ModelObject.FLPIFFOGDBF();
+		_ModelObject.RestoreDefaultPhysics();
 	}
 
 	public void Stop()
@@ -124,15 +124,15 @@ public class ModelPhysics
 	public void IterativeProcess()
 	{
 		bool flag = _ModelObject.IsShock();
-		List<ModelNode> list = _ModelObject.NAMKCLGOPDD();
-		List<ModelEdge> list2 = _ModelObject.BKAPPJMGPKP();
+		List<ModelNode> list = _ModelObject.GetAllNodes();
+		List<ModelEdge> list2 = _ModelObject.GetAllEdges();
 		ModelNode lCDGOCIAIDK = null;
 		int count = list.Count;
 		for (int i = 0; i < count; i++)
 		{
 			lCDGOCIAIDK = list[i];
 			bool bAINMLLIKOL = lCDGOCIAIDK.IsNode() && !lCDGOCIAIDK.IsFixedAndIsNotNode() && (_IsPhysics || lCDGOCIAIDK.IsPhysics() || (flag && lCDGOCIAIDK.IsShock()));
-			lCDGOCIAIDK.BGDMKGMEIDH(bAINMLLIKOL);
+			lCDGOCIAIDK.SetPhysicsActive(bAINMLLIKOL);
 		}
 		for (int j = 0; j < _Iterative; j++)
 		{
@@ -141,7 +141,7 @@ public class ModelPhysics
 			for (int k = 0; k < count; k++)
 			{
 				nAKBKCDKEHF = list2[k];
-				if (!flag || !nAKBKCDKEHF.EDJFLMILEBA())
+				if (!flag || !nAKBKCDKEHF.GetIsShock())
 				{
 					IterativeLine(nAKBKCDKEHF);
 				}
@@ -151,7 +151,7 @@ public class ModelPhysics
 
 	public void ChangeSpeed(float ELDDBMFEFIP)
 	{
-		List<ModelNode> list = _ModelObject.NAMKCLGOPDD();
+		List<ModelNode> list = _ModelObject.GetAllNodes();
 		foreach (ModelNode item in list)
 		{
 			if (!item.IsFixedAndIsNotNode() && (_IsPhysics || item.IsPhysics() || (_ModelObject.IsShock() && item.IsShock())))
@@ -163,14 +163,14 @@ public class ModelPhysics
 
 	private void TimeStep()
 	{
-		List<ModelNode> list = _ModelObject.NAMKCLGOPDD();
+		List<ModelNode> list = _ModelObject.GetAllNodes();
 		ModelNode lCDGOCIAIDK = null;
 		for (int i = 0; i < list.Count; i++)
 		{
 			lCDGOCIAIDK = list[i];
 			if (!lCDGOCIAIDK.IsFixedAndIsNotNode() && (_IsPhysics || lCDGOCIAIDK.IsPhysics() || (_ModelObject.IsShock() && lCDGOCIAIDK.IsShock())))
 			{
-				lCDGOCIAIDK.TimeStep(DBJMBDLKOPM());
+				lCDGOCIAIDK.TimeStep(GetGravityStep());
 			}
 		}
 	}
@@ -179,16 +179,16 @@ public class ModelPhysics
 	{
 		ModelNode lCDGOCIAIDK = Edge.GetStartNode();
 		ModelNode lCDGOCIAIDK2 = Edge.GetEndNode();
-		if (lCDGOCIAIDK.NEEJAPDCCMJ())
+		if (lCDGOCIAIDK.IsPhysicsActive())
 		{
 			IterativeNode(lCDGOCIAIDK);
-			if (lCDGOCIAIDK2.NEEJAPDCCMJ())
+			if (lCDGOCIAIDK2.IsPhysicsActive())
 			{
 				IterativeNode(lCDGOCIAIDK2);
 			}
 			Edge.Iterative();
 		}
-		else if (lCDGOCIAIDK2.NEEJAPDCCMJ())
+		else if (lCDGOCIAIDK2.IsPhysicsActive())
 		{
 			IterativeNode(lCDGOCIAIDK2);
 			Edge.Iterative();
@@ -202,22 +202,22 @@ public class ModelPhysics
 		{
 			GetFrictionForce(node);
 		}
-		if (EPHLNOOPFJL != OCAIKPKEDDN)
+		if (wallLeftX != wallRightX)
 		{
-			if (eMAFACPEPDK.GetX() < EPHLNOOPFJL)
+			if (eMAFACPEPDK.GetX() < wallLeftX)
 			{
-				eMAFACPEPDK.SetX(EPHLNOOPFJL);
+				eMAFACPEPDK.SetX(wallLeftX);
 			}
-			else if (OCAIKPKEDDN < eMAFACPEPDK.GetX())
+			else if (wallRightX < eMAFACPEPDK.GetX())
 			{
-				eMAFACPEPDK.SetX(OCAIKPKEDDN);
+				eMAFACPEPDK.SetX(wallRightX);
 			}
 		}
 	}
 
 	private void GetFrictionForce(ModelNode node)
 	{
-		if (node.IsCollisible() && EPHLNOOPFJL != OCAIKPKEDDN)
+		if (node.IsCollisible() && wallLeftX != wallRightX)
 		{
 			Vector3f eMAFACPEPDK = node.GetEnd();
 			Vector3f eMAFACPEPDK2 = node.GetStart();

@@ -3,7 +3,7 @@ using System.Xml;
 
 public class RuleParser
 {
-	public static void EEPPJEMHBCK(XmlNode node, List<Rule> OEMALIFPGPO)
+	public static void ParseRules(XmlNode node, List<Rule> OEMALIFPGPO)
 	{
 		if (node == null)
 		{
@@ -17,15 +17,15 @@ public class RuleParser
 				// This runtime predates conditional rule wrappers. Keep the contained
 				// rules instead of rejecting the entire block. Their quest-style
 				// Conditions remain in the source for a future conditional-rule port.
-				EEPPJEMHBCK(childNode["RuleList"], OEMALIFPGPO);
+				ParseRules(childNode["RuleList"], OEMALIFPGPO);
 				continue;
 			}
 			if (name == "Level")
 			{
-				FHIAKFOCBNK(childNode, OEMALIFPGPO);
+				ParseLevelRules(childNode, OEMALIFPGPO);
 				continue;
 			}
-			Rule gKAJMMNJBGA = LBDEIDNPJMO(childNode);
+			Rule gKAJMMNJBGA = ParseRule(childNode);
 			if (gKAJMMNJBGA != null)
 			{
 				OEMALIFPGPO.Add(gKAJMMNJBGA);
@@ -33,7 +33,7 @@ public class RuleParser
 		}
 	}
 
-	public static Rule LBDEIDNPJMO(XmlNode node)
+	public static Rule ParseRule(XmlNode node)
 	{
 		string name = node.Name;
 		switch (name)
@@ -49,43 +49,43 @@ public class RuleParser
 		case "NoAnimation":
 			return new NoAnimationRule(node);
 		case "Ringout":
-			return HPFJOADKOEH(Rule.BCBLLMPAMLP.RuleRingout, node);
+			return ParseInFightRule(Rule.RuleType.RuleRingout, node);
 		case "HotGround":
-			return HPFJOADKOEH(Rule.BCBLLMPAMLP.RuleHotGround, node);
+			return ParseInFightRule(Rule.RuleType.RuleHotGround, node);
 		case "LoseFall":
-			return HPFJOADKOEH(Rule.BCBLLMPAMLP.RuleLoseFall, node);
+			return ParseInFightRule(Rule.RuleType.RuleLoseFall, node);
 		case "Regeneration":
-			return HPFJOADKOEH(Rule.BCBLLMPAMLP.RuleRegeneration, node);
+			return ParseInFightRule(Rule.RuleType.RuleRegeneration, node);
 		case "Attributes":
-			return HPFJOADKOEH(Rule.BCBLLMPAMLP.RuleAttributes, node);
+			return ParseInFightRule(Rule.RuleType.RuleAttributes, node);
 		case "DamageFactor":
-			return HPFJOADKOEH(Rule.BCBLLMPAMLP.RuleDamageFactor, node);
+			return ParseInFightRule(Rule.RuleType.RuleDamageFactor, node);
 		case "RemoveInterval":
-			return HPFJOADKOEH(Rule.BCBLLMPAMLP.RuleRemoveInterval, node);
+			return ParseInFightRule(Rule.RuleType.RuleRemoveInterval, node);
 		case "Crazy":
-			return HPFJOADKOEH(Rule.BCBLLMPAMLP.RuleCrazy, node);
+			return ParseInFightRule(Rule.RuleType.RuleCrazy, node);
 		case "Lifesteal":
-			return HPFJOADKOEH(Rule.BCBLLMPAMLP.RuleLifeSteal, node);
+			return ParseInFightRule(Rule.RuleType.RuleLifeSteal, node);
 		case "NoHealthBar":
-			return HPFJOADKOEH(Rule.BCBLLMPAMLP.RuleNoHealthBar, node);
+			return ParseInFightRule(Rule.RuleType.RuleNoHealthBar, node);
 		case "TimeOutWin":
-			return HPFJOADKOEH(Rule.BCBLLMPAMLP.RuleTimeoutWin, node);
+			return ParseInFightRule(Rule.RuleType.RuleTimeoutWin, node);
 		case "Combo":
-			return HPFJOADKOEH(Rule.BCBLLMPAMLP.RuleCombo, node);
+			return ParseInFightRule(Rule.RuleType.RuleCombo, node);
 		case "Darkness":
-			return HPFJOADKOEH(Rule.BCBLLMPAMLP.RuleDarkness, node);
+			return ParseInFightRule(Rule.RuleType.RuleDarkness, node);
 		case "LightInTheDarkness":
-			return HPFJOADKOEH(Rule.BCBLLMPAMLP.RuleLightInTheDarkness, node);
+			return ParseInFightRule(Rule.RuleType.RuleLightInTheDarkness, node);
 		case "Points":
-			return HPFJOADKOEH(Rule.BCBLLMPAMLP.RulePoints, node);
+			return ParseInFightRule(Rule.RuleType.RulePoints, node);
 		case "NoBulletsReplenishment":
-			return HPFJOADKOEH(Rule.BCBLLMPAMLP.RuleNoBulletsReplenishment, node);
+			return ParseInFightRule(Rule.RuleType.RuleNoBulletsReplenishment, node);
 		case "RechargeMagicEachRound":
-			return HPFJOADKOEH(Rule.BCBLLMPAMLP.RuleRechargeMagicEachRound, node);
+			return ParseInFightRule(Rule.RuleType.RuleRechargeMagicEachRound, node);
 		case "Perk":
-			return HPFJOADKOEH(Rule.BCBLLMPAMLP.RulePerk, node);
+			return ParseInFightRule(Rule.RuleType.RulePerk, node);
 		case "NoPerks":
-			return HPFJOADKOEH(Rule.BCBLLMPAMLP.RuleNoPerks, node);
+			return ParseInFightRule(Rule.RuleType.RuleNoPerks, node);
 		case "RandomRule":
 			return new RandomRule(node);
 		case "ComplexRule":
@@ -93,65 +93,65 @@ public class RuleParser
 		case "Description":
 			return new DescriptionRule(node);
 		case "WinCombo":
-			return HPFJOADKOEH(Rule.BCBLLMPAMLP.RuleWinCombo, node);
+			return ParseInFightRule(Rule.RuleType.RuleWinCombo, node);
 		case "WinStyle":
-			return HPFJOADKOEH(Rule.BCBLLMPAMLP.RuleWinStyle, node);
+			return ParseInFightRule(Rule.RuleType.RuleWinStyle, node);
 		case "WinShock":
-			return HPFJOADKOEH(Rule.BCBLLMPAMLP.RuleWinShock, node);
+			return ParseInFightRule(Rule.RuleType.RuleWinShock, node);
 		case "ChangeFight":
 			return new ChangeFightRule(node);
 		case "SetTactic":
-			return HPFJOADKOEH(Rule.BCBLLMPAMLP.RuleTactic, node);
+			return ParseInFightRule(Rule.RuleType.RuleTactic, node);
 		case "InvertJoystick":
-			return HPFJOADKOEH(Rule.BCBLLMPAMLP.RuleInvertJoystick, node);
+			return ParseInFightRule(Rule.RuleType.RuleInvertJoystick, node);
 		case "RandomArea":
-			return HPFJOADKOEH(Rule.BCBLLMPAMLP.RuleRandomArea, node);
+			return ParseInFightRule(Rule.RuleType.RuleRandomArea, node);
 		case "RatingEvaluation":
 			return new RatingEvaluationRule(node);
 		case "Invulnerability":
-			return HPFJOADKOEH(Rule.BCBLLMPAMLP.RuleInvulnerability, node);
+			return ParseInFightRule(Rule.RuleType.RuleInvulnerability, node);
 		case "CurrencyCost":
 			return new CurrencyCostRule(node);
 		case "RaidCurrencyCost":
 			return new RaidCurrencyCostRule(node);
 		case "Resistance":
-			return HPFJOADKOEH(Rule.BCBLLMPAMLP.RuleResistance, node);
+			return ParseInFightRule(Rule.RuleType.RuleResistance, node);
 		case "Avatar":
 			return new AvatarRule(node);
 		case "Name":
 			return new NameRule(node);
 		default:
-			LLLOJBFMONN.Error("RuleParser::parseRules - unknown node name: " + name);
+			GameLog.Error("RuleParser::parseRules - unknown node name: " + name);
 			return null;
 		}
 	}
 
-	public static FightStatistics.EMKEIEJMONM KMAKHHHMGMH(XmlNode node)
+	public static FightStatistics.FightStyle ParseStyleType(XmlNode node)
 	{
-		string text = node.Attributes["Type"].CIPOICEEIBK(string.Empty);
+		string text = node.Attributes["Type"].GetStringOrDefault(string.Empty);
 		switch (text)
 		{
 		case "Turtle":
-			return FightStatistics.EMKEIEJMONM.STYLE_TURTLE;
+			return FightStatistics.FightStyle.STYLE_TURTLE;
 		case "Hard":
-			return FightStatistics.EMKEIEJMONM.STYLE_HARD;
+			return FightStatistics.FightStyle.STYLE_HARD;
 		case "Brutal":
-			return FightStatistics.EMKEIEJMONM.STYLE_BRUTAL;
+			return FightStatistics.FightStyle.STYLE_BRUTAL;
 		case "Aggressive":
-			return FightStatistics.EMKEIEJMONM.STYLE_AGGRESSIVE;
+			return FightStatistics.FightStyle.STYLE_AGGRESSIVE;
 		case "Crazy":
-			return FightStatistics.EMKEIEJMONM.STYLE_CRAZY;
+			return FightStatistics.FightStyle.STYLE_CRAZY;
 		case "Fantastic":
-			return FightStatistics.EMKEIEJMONM.STYLE_FANTASTIC;
+			return FightStatistics.FightStyle.STYLE_FANTASTIC;
 		default:
-			LLLOJBFMONN.Error("RuleParser::parseStyleType - unknown type: " + text);
-			return FightStatistics.EMKEIEJMONM.STYLE_TURTLE;
+			GameLog.Error("RuleParser::parseStyleType - unknown type: " + text);
+			return FightStatistics.FightStyle.STYLE_TURTLE;
 		}
 	}
 
-	protected static InFightRule HPFJOADKOEH(Rule.BCBLLMPAMLP LFLGCDNKNJI, XmlNode node)
+	protected static InFightRule ParseInFightRule(Rule.RuleType LFLGCDNKNJI, XmlNode node)
 	{
-		string text = node.Attributes["ApplyTo"].CIPOICEEIBK("All");
+		string text = node.Attributes["ApplyTo"].GetStringOrDefault("All");
 		RuleAppliance eJPOJJKKICO = RuleAppliance.ApplianceNone;
 		switch (text)
 		{
@@ -165,82 +165,82 @@ public class RuleParser
 			eJPOJJKKICO = RuleAppliance.ApplianceAll;
 			break;
 		default:
-			LLLOJBFMONN.Error("RuleParser::parseInFightRule ERROR - wrong rule applyTo %s", text);
+			GameLog.Error("RuleParser::parseInFightRule ERROR - wrong rule applyTo %s", text);
 			break;
 		}
 		switch (LFLGCDNKNJI)
 		{
-		case Rule.BCBLLMPAMLP.RuleHotGround:
+		case Rule.RuleType.RuleHotGround:
 			return new HotGroundRule(node, eJPOJJKKICO);
-		case Rule.BCBLLMPAMLP.RuleRingout:
+		case Rule.RuleType.RuleRingout:
 			return new RingOutRule(node, eJPOJJKKICO);
-		case Rule.BCBLLMPAMLP.RuleRegeneration:
+		case Rule.RuleType.RuleRegeneration:
 			return new RegenerationRule(node, eJPOJJKKICO);
-		case Rule.BCBLLMPAMLP.RuleAttributes:
+		case Rule.RuleType.RuleAttributes:
 			return new AttributesRule(node, eJPOJJKKICO);
-		case Rule.BCBLLMPAMLP.RuleDamageFactor:
+		case Rule.RuleType.RuleDamageFactor:
 			return new DamageFactorRule(node, eJPOJJKKICO);
-		case Rule.BCBLLMPAMLP.RuleLoseFall:
+		case Rule.RuleType.RuleLoseFall:
 			return new LoseFallRule(node, eJPOJJKKICO);
-		case Rule.BCBLLMPAMLP.RuleRemoveInterval:
+		case Rule.RuleType.RuleRemoveInterval:
 			return new RemoveIntervalRule(node, eJPOJJKKICO);
-		case Rule.BCBLLMPAMLP.RuleCrazy:
+		case Rule.RuleType.RuleCrazy:
 			return new CrazyRule(node, eJPOJJKKICO);
-		case Rule.BCBLLMPAMLP.RuleLifeSteal:
+		case Rule.RuleType.RuleLifeSteal:
 			return new LifeStealRule(node, eJPOJJKKICO);
-		case Rule.BCBLLMPAMLP.RuleNoHealthBar:
+		case Rule.RuleType.RuleNoHealthBar:
 			return new NoHealthBarRule(node, eJPOJJKKICO);
-		case Rule.BCBLLMPAMLP.RuleTimeoutWin:
+		case Rule.RuleType.RuleTimeoutWin:
 			return new TimeoutWinRule(node, eJPOJJKKICO);
-		case Rule.BCBLLMPAMLP.RuleCombo:
+		case Rule.RuleType.RuleCombo:
 			return new ComboRule(node, eJPOJJKKICO);
-		case Rule.BCBLLMPAMLP.RuleDarkness:
+		case Rule.RuleType.RuleDarkness:
 			return new DarknessRule(node, RuleAppliance.AppliancePlayer);
-		case Rule.BCBLLMPAMLP.RuleLightInTheDarkness:
+		case Rule.RuleType.RuleLightInTheDarkness:
 			return new Eclipse.Combat.LightInTheDarknessRule(node, eJPOJJKKICO);
-		case Rule.BCBLLMPAMLP.RulePoints:
+		case Rule.RuleType.RulePoints:
 			return new PointsRule(node, RuleAppliance.ApplianceAll);
-		case Rule.BCBLLMPAMLP.RuleNoBulletsReplenishment:
+		case Rule.RuleType.RuleNoBulletsReplenishment:
 			return new NoBulletsReplenishmentRule(node, eJPOJJKKICO);
-		case Rule.BCBLLMPAMLP.RuleRechargeMagicEachRound:
+		case Rule.RuleType.RuleRechargeMagicEachRound:
 			return new RechargeMagicEachRoundRule(node, eJPOJJKKICO);
-		case Rule.BCBLLMPAMLP.RulePerk:
+		case Rule.RuleType.RulePerk:
 			return new PerkRule(node, eJPOJJKKICO);
-		case Rule.BCBLLMPAMLP.RuleNoPerks:
+		case Rule.RuleType.RuleNoPerks:
 			return new NoPerksRule(node, eJPOJJKKICO);
-		case Rule.BCBLLMPAMLP.RuleWinCombo:
+		case Rule.RuleType.RuleWinCombo:
 			return new WinComboRule(node, eJPOJJKKICO);
-		case Rule.BCBLLMPAMLP.RuleWinStyle:
+		case Rule.RuleType.RuleWinStyle:
 			return new WinStyleRule(node, eJPOJJKKICO);
-		case Rule.BCBLLMPAMLP.RuleWinShock:
+		case Rule.RuleType.RuleWinShock:
 			return new WinShockRule(node, eJPOJJKKICO);
-		case Rule.BCBLLMPAMLP.RuleTactic:
+		case Rule.RuleType.RuleTactic:
 			return new TacticRule(node);
-		case Rule.BCBLLMPAMLP.RuleInvertJoystick:
+		case Rule.RuleType.RuleInvertJoystick:
 			return new InvertJoystickRule(node);
-		case Rule.BCBLLMPAMLP.RuleRandomArea:
+		case Rule.RuleType.RuleRandomArea:
 			return new RandomAreaRule(node);
-		case Rule.BCBLLMPAMLP.RuleInvulnerability:
+		case Rule.RuleType.RuleInvulnerability:
 			return new InvulnerabilityRule(node, eJPOJJKKICO);
-		case Rule.BCBLLMPAMLP.RuleResistance:
+		case Rule.RuleType.RuleResistance:
 			return new ResistanceRule(node, eJPOJJKKICO);
 		default:
-			LLLOJBFMONN.Error("RuleParser::parseInFightRule ERROR - wrong rule type %i", LFLGCDNKNJI);
+			GameLog.Error("RuleParser::parseInFightRule ERROR - wrong rule type %i", LFLGCDNKNJI);
 			return null;
 		}
 	}
 
-	protected static void FHIAKFOCBNK(XmlNode node, List<Rule> OEMALIFPGPO)
+	protected static void ParseLevelRules(XmlNode node, List<Rule> OEMALIFPGPO)
 	{
 		int kLJOBCIINOF = node.Attributes["Min"].ParseInt();
 		int nMPCMFDGOKA = node.Attributes["Max"].ParseInt(int.MaxValue);
 		foreach (XmlNode childNode in node.ChildNodes)
 		{
-			Rule gKAJMMNJBGA = LBDEIDNPJMO(childNode);
+			Rule gKAJMMNJBGA = ParseRule(childNode);
 			if (gKAJMMNJBGA != null)
 			{
-				gKAJMMNJBGA.NMPCMFDGOKA = nMPCMFDGOKA;
-				gKAJMMNJBGA.KLJOBCIINOF = kLJOBCIINOF;
+				gKAJMMNJBGA.MaxLevel = nMPCMFDGOKA;
+				gKAJMMNJBGA.MinLevel = kLJOBCIINOF;
 				OEMALIFPGPO.Add(gKAJMMNJBGA);
 			}
 		}

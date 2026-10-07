@@ -107,9 +107,9 @@ foreach($zone in $archive.SelectNodes('/Stages/Zones/Zone')) {
                 Check ($actual.GetAttribute('PrizeBase') -ceq $expected.GetAttribute('PrizeBase')) ('Archive prize base mismatch '+$id)
                 # Exercise recovered Reward/RewardPrize parsing and denomination scaling.
                 foreach($exponent in @(0,2)) {
-                    $native=[Reward]::new($actual,0,$exponent).KOBOIFJNPMO(1)
-                    $baseline=[Reward]::new($expected,0,$exponent).KOBOIFJNPMO(1)
-                    Check ([uint32]$native.exp -eq [uint32]$baseline.exp -and [long]$native.PNDAIFALIKF -eq [long]$baseline.PNDAIFALIKF -and [float]$native.prizeBase -eq [float]$baseline.prizeBase) ('Native reward parser mismatch '+$id)
+                    $native=[Reward]::new($actual,0,$exponent).GetPrizeForLevel(1)
+                    $baseline=[Reward]::new($expected,0,$exponent).GetPrizeForLevel(1)
+                    Check ([uint32]$native.exp -eq [uint32]$baseline.exp -and [long]$native.bonus -eq [long]$baseline.bonus -and [float]$native.prizeBase -eq [float]$baseline.prizeBase) ('Native reward parser mismatch '+$id)
                 }
                 $actual.OuterXml | Set-Content (Join-Path $fixture ($id.Split('/')[-1]+'.xml'))
                 $wins++; $count++

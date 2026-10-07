@@ -4,7 +4,7 @@ using System.Xml;
 
 public class RosterQuest
 {
-	public class NOKCOAHJIPB
+	public class QuestVariable
 	{
 		public string Name = string.Empty;
 
@@ -12,20 +12,20 @@ public class RosterQuest
 
 		public XmlNode Node;
 
-		public NOKCOAHJIPB(string _name, string _value)
+		public QuestVariable(string _name, string _value)
 		{
 			Name = _name;
 			Value = _value;
 		}
 
-		public NOKCOAHJIPB(XmlNode PKHDLOGJKAD)
+		public QuestVariable(XmlNode PKHDLOGJKAD)
 		{
 			Node = PKHDLOGJKAD;
-			Name = Node.Attributes["Name"].CIPOICEEIBK(string.Empty);
-			Value = Node.Attributes["Value"].CIPOICEEIBK(string.Empty);
+			Name = Node.Attributes["Name"].GetStringOrDefault(string.Empty);
+			Value = Node.Attributes["Value"].GetStringOrDefault(string.Empty);
 		}
 
-		public void MCPIOGALBMK(string PKHDLOGJKAD)
+		public void SetValue(string PKHDLOGJKAD)
 		{
 			Value = PKHDLOGJKAD;
 			Node.Attributes["Value"].Value = Value;
@@ -33,7 +33,7 @@ public class RosterQuest
 	}
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private ParametersQuest AIIJHKIPJDD;
+	private ParametersQuest questParameters;
 
 	public string Name;
 
@@ -43,11 +43,11 @@ public class RosterQuest
 
 	public XmlNode Node;
 
-	public bool PLNNKKBPDJK;
+	public bool IsParametersCleared;
 
-	public List<NOKCOAHJIPB> FNGDAJJJJJD = new List<NOKCOAHJIPB>();
+	public List<QuestVariable> Variables = new List<QuestVariable>();
 
-	public ParametersQuest KMMJCHDKBDO
+	public ParametersQuest SavedParameters
 	{
 		get
 		{
@@ -55,7 +55,7 @@ public class RosterQuest
 		}
 		private set
 		{
-			HDIDFDHJENJ(value);
+			SetParameters(value);
 		}
 	}
 
@@ -66,72 +66,72 @@ public class RosterQuest
 		bool flag = false;
 		if (Node.Attributes["FileName"] != null)
 		{
-			string iFKJHHPJPLP = Node.Attributes["FileName"].CIPOICEEIBK(string.Empty);
+			string iFKJHHPJPLP = Node.Attributes["FileName"].GetStringOrDefault(string.Empty);
 			flag = DirectoryController.IsPathWithDrive(FileName);
-			iFKJHHPJPLP = DirectoryController.BAANOCLBLKM(iFKJHHPJPLP);
-			FileName = DirectoryController.BECKNKJNFJB(iFKJHHPJPLP);
+			iFKJHHPJPLP = DirectoryController.StripProtocol(iFKJHHPJPLP);
+			FileName = DirectoryController.ResolvePath(iFKJHHPJPLP);
 		}
 		if (flag)
 		{
 			SetFileName(FileName);
 		}
-		PLNNKKBPDJK = false;
-		Name = Node.Attributes["Name"].CIPOICEEIBK(string.Empty);
-		Type = Node.Attributes["Type"].CIPOICEEIBK(string.Empty);
-		HDIDFDHJENJ(null);
-		NPICECAECDI();
+		IsParametersCleared = false;
+		Name = Node.Attributes["Name"].GetStringOrDefault(string.Empty);
+		Type = Node.Attributes["Type"].GetStringOrDefault(string.Empty);
+		SetParameters(null);
+		LoadParametersFromNode();
 	}
 
 	public ParametersQuest get_Parameters()
 	{
-		return AIIJHKIPJDD;
+		return questParameters;
 	}
 
-	private void HDIDFDHJENJ(ParametersQuest value)
+	private void SetParameters(ParametersQuest value)
 	{
-		AIIJHKIPJDD = value;
+		questParameters = value;
 	}
 
-	public void NPICECAECDI()
+	public void LoadParametersFromNode()
 	{
 		XmlNode xmlNode = Node["QuestParameters"];
 		if (xmlNode != null)
 		{
-			HDIDFDHJENJ(new ParametersQuest(xmlNode));
+			SetParameters(new ParametersQuest(xmlNode));
 		}
 	}
 
-	public void ECGFFBHMIIK(object data, int AAKAPLGDGNM, int ILNNINKHPOC)
+	public void SaveCheckpoint(object data, int AAKAPLGDGNM, int ILNNINKHPOC)
 	{
 		if (get_Parameters() == null)
 		{
-			XmlNode pKHDLOGJKAD = Node.ACBPMPMPKJJ("QuestParameters");
-			HDIDFDHJENJ(new ParametersQuest(pKHDLOGJKAD));
+			XmlNode pKHDLOGJKAD = Node.AppendElement("QuestParameters");
+			SetParameters(new ParametersQuest(pKHDLOGJKAD));
 		}
 		QuestParameters hHKLFIIBIFF = (QuestParameters)data;
-		get_Parameters().IBMNACPGMLL(ILNNINKHPOC);
-		get_Parameters().MNNPHOAEMII(AAKAPLGDGNM);
-		get_Parameters().ELKOGHKIDOG((hHKLFIIBIFF.LBGOMJFFEPP() == null) ? string.Empty : hHKLFIIBIFF.LBGOMJFFEPP().FightId.ToString());
-		get_Parameters().AJBMLOLOFAN(hHKLFIIBIFF.HEIADONEACH);
-		get_Parameters().CPONINMPIJL(hHKLFIIBIFF.AIEHNBBFNPF);
-		get_Parameters().EFIFIPKDMIN(hHKLFIIBIFF.BJIDALJIKNC);
-		get_Parameters().MPFIPAANJON(hHKLFIIBIFF.JNGFNNFAAGN);
+		get_Parameters().SetCheckPointIndex(ILNNINKHPOC);
+		get_Parameters().SetScreenIndex(AAKAPLGDGNM);
+		get_Parameters().SetFightName((hHKLFIIBIFF.GetFightList() == null) ? string.Empty : hHKLFIIBIFF.GetFightList().FightId.ToString());
+		get_Parameters().SetFightResultName(hHKLFIIBIFF.fightResult);
+		get_Parameters().SetRaidResultName(hHKLFIIBIFF.raidResult);
+		get_Parameters().SetLevelUp(hHKLFIIBIFF.levelUp);
+		get_Parameters().SetPower(hHKLFIIBIFF.energyChange);
 		get_Parameters().set_FightAvgFPS(hHKLFIIBIFF.fightAvgFps);
 		Eclipse.Modding.ModRuntime.SaveQuestLotteryContext(get_Parameters(), hHKLFIIBIFF);
 	}
 
 	public void SetFileName(string _fileName)
 	{
-		_fileName = DirectoryController.BAANOCLBLKM(_fileName);
+		_fileName = DirectoryController.StripProtocol(_fileName);
 		if (Node.Attributes["FileName"] == null)
 		{
-			Node.LLIKNHNLGJJ("FileName");
+			Node.AppendAttribute("FileName");
 		}
 		Node.Attributes["FileName"].Value = _fileName;
 		FileName = _fileName;
 	}
 
-	public void LCIHKPPGNPF()
+	public void ClearParameters()
 	{
 		XmlElement xmlElement = Node["QuestParameters"];
 		if (xmlElement != null)
@@ -140,17 +140,17 @@ public class RosterQuest
 		}
 		if (get_Parameters() != null)
 		{
-			HDIDFDHJENJ(null);
+			SetParameters(null);
 		}
 	}
 
-	public int ELBKKOPHLHK()
+	public int GetCheckpointScreenType()
 	{
-		return (get_Parameters() != null) ? get_Parameters().EDADICNDCKK() : 0;
+		return (get_Parameters() != null) ? get_Parameters().GetScreenIndex() : 0;
 	}
 
-	public int NGGNCHPDOOI()
+	public int GetCheckpointIndex()
 	{
-		return (get_Parameters() != null) ? get_Parameters().CIDMJEKCDMP() : 0;
+		return (get_Parameters() != null) ? get_Parameters().GetCheckPointIndex() : 0;
 	}
 }

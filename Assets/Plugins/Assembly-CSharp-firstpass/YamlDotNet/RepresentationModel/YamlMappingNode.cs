@@ -33,7 +33,7 @@ namespace YamlDotNet.RepresentationModel
 			}
 		}
 
-		public FGDKNBEFPFN Style { get; set; }
+		public MappingStyle Style { get; set; }
 
 		public override IEnumerable<YamlNode> AllNodes
 		{
@@ -56,13 +56,13 @@ namespace YamlDotNet.RepresentationModel
 
 		internal YamlMappingNode(EventReader DNBFFLFBDOB, DocumentLoadingState state)
 		{
-			MappingStart cAJDINOLOJH = DNBFFLFBDOB.DODGGCGJJLL<MappingStart>();
+			MappingStart cAJDINOLOJH = DNBFFLFBDOB.Expect<MappingStart>();
 			Load(cAJDINOLOJH, state);
 			bool flag = false;
-			while (!DNBFFLFBDOB.GPHIFFOGOGN<BLFPJCPALDH>())
+			while (!DNBFFLFBDOB.Accept<MappingEnd>())
 			{
-				YamlNode yamlNode = YamlNode.GLNMJNFLLIN(DNBFFLFBDOB, state);
-				YamlNode yamlNode2 = YamlNode.GLNMJNFLLIN(DNBFFLFBDOB, state);
+				YamlNode yamlNode = YamlNode.ParseNode(DNBFFLFBDOB, state);
+				YamlNode yamlNode2 = YamlNode.ParseNode(DNBFFLFBDOB, state);
 				try
 				{
 					children.Add(yamlNode, yamlNode2);
@@ -75,9 +75,9 @@ namespace YamlDotNet.RepresentationModel
 			}
 			if (flag)
 			{
-				state.GOGDMGMHFOK(this);
+				state.AddNodeWithUnresolvedAliases(this);
 			}
-			DNBFFLFBDOB.DODGGCGJJLL<BLFPJCPALDH>();
+			DNBFFLFBDOB.Expect<MappingEnd>();
 		}
 
 		public YamlMappingNode()
@@ -174,7 +174,7 @@ namespace YamlDotNet.RepresentationModel
 			return null;
 		}
 
-		internal override void GPBMMFCHANP(DocumentLoadingState state)
+		internal override void ResolveAliases(DocumentLoadingState state)
 		{
 			Dictionary<YamlNode, YamlNode> dictionary = null;
 			Dictionary<YamlNode, YamlNode> dictionary2 = null;
@@ -216,7 +216,7 @@ namespace YamlDotNet.RepresentationModel
 			}
 		}
 
-		internal override void Emit(NEKGJNOFOFN NPIDIMCLNEM, EmitterState state)
+		internal override void Emit(IEmitter NPIDIMCLNEM, EmitterState state)
 		{
 			NPIDIMCLNEM.Emit(new MappingStart(base.Anchor, base.Tag, true, Style));
 			foreach (KeyValuePair<YamlNode, YamlNode> child in children)
@@ -224,10 +224,10 @@ namespace YamlDotNet.RepresentationModel
 				child.Key.Save(NPIDIMCLNEM, state);
 				child.Value.Save(NPIDIMCLNEM, state);
 			}
-			NPIDIMCLNEM.Emit(new BLFPJCPALDH());
+			NPIDIMCLNEM.Emit(new MappingEnd());
 		}
 
-		public override void GPHIFFOGOGN(IYamlVisitor NKECMANOOEM)
+		public override void Accept(IYamlVisitor NKECMANOOEM)
 		{
 			NKECMANOOEM.Visit(this);
 		}
@@ -255,8 +255,8 @@ namespace YamlDotNet.RepresentationModel
 			int num = base.GetHashCode();
 			foreach (KeyValuePair<YamlNode, YamlNode> child in children)
 			{
-				num = YamlNode.CombineHashCodes(num, YamlNode.AOJHKEDINCA(child.Key));
-				num = YamlNode.CombineHashCodes(num, YamlNode.AOJHKEDINCA(child.Value));
+				num = YamlNode.CombineHashCodes(num, YamlNode.GetHashCodeOrZero(child.Key));
+				num = YamlNode.CombineHashCodes(num, YamlNode.GetHashCodeOrZero(child.Value));
 			}
 			return num;
 		}

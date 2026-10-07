@@ -16,26 +16,26 @@ namespace Nekki.SF2.GUI.Map
 
 		public void Init()
 		{
-			MapButtonController.ELEBLBJKDBI().AddEventListener(0, CFBPBNDGJGH);
-			MapButtonController.ELEBLBJKDBI().AddEventListener(1, BJJMOMAKCGI);
+			MapButtonController.GetInstance().AddEventListener(0, OnButtonAdded);
+			MapButtonController.GetInstance().AddEventListener(1, OnButtonRemoved);
 			AddButtons();
 		}
 
 		private void OnDestroy()
 		{
-			MapButtonController.ELEBLBJKDBI().RemoveEventListener(0, CFBPBNDGJGH);
-			MapButtonController.ELEBLBJKDBI().RemoveEventListener(1, BJJMOMAKCGI);
+			MapButtonController.GetInstance().RemoveEventListener(0, OnButtonAdded);
+			MapButtonController.GetInstance().RemoveEventListener(1, OnButtonRemoved);
 		}
 
-		private void CFBPBNDGJGH(MapButtonInfo KLNKEPMAGKF)
+		private void OnButtonAdded(MapButtonInfo KLNKEPMAGKF)
 		{
-			if (KLNKEPMAGKF != null && MapButtonController.ELEBLBJKDBI().OHGCDIHFJIJ(KLNKEPMAGKF))
+			if (KLNKEPMAGKF != null && MapButtonController.GetInstance().IsStoryButton(KLNKEPMAGKF))
 			{
 				AddButton(KLNKEPMAGKF);
 			}
 		}
 
-		private void BJJMOMAKCGI(MapButtonInfo KLNKEPMAGKF)
+		private void OnButtonRemoved(MapButtonInfo KLNKEPMAGKF)
 		{
 			if (KLNKEPMAGKF != null)
 			{
@@ -45,7 +45,7 @@ namespace Nekki.SF2.GUI.Map
 
 		public void AddButtons()
 		{
-			List<MapButtonInfo> list = MapButtonController.ELEBLBJKDBI().MEPCBPIJLGB();
+			List<MapButtonInfo> list = MapButtonController.GetInstance().GetStoryButtons();
 			foreach (MapButtonInfo item in list)
 			{
 				if (item != null)
@@ -57,7 +57,7 @@ namespace Nekki.SF2.GUI.Map
 
 		public void AddButton(MapButtonInfo KLNKEPMAGKF)
 		{
-			Transform kPAICOOKACB = ((!KLNKEPMAGKF.NEOIMNAHLAN || !(_actionsPanel != null)) ? base.transform : _actionsPanel);
+			Transform kPAICOOKACB = ((!KLNKEPMAGKF.AutoPosition || !(_actionsPanel != null)) ? base.transform : _actionsPanel);
 			AddButton(KLNKEPMAGKF, kPAICOOKACB);
 		}
 
@@ -69,7 +69,7 @@ namespace Nekki.SF2.GUI.Map
 				component.gameObject.SetActive(true);
 				component.transform.SetParent(KPAICOOKACB, false);
 				component.Init(DJDNMAOEFBD);
-				component.gameObject.SetActive(_storyButtonsVisible || DJDNMAOEFBD.EDMILHNJFAA() != MapButtonInfo.HNEJAKIGDBA.Story);
+				component.gameObject.SetActive(_storyButtonsVisible || DJDNMAOEFBD.GetShowType() != MapButtonInfo.MapButtonShowType.Story);
 				_buttons.Add(component);
 			}
 		}
@@ -88,7 +88,7 @@ namespace Nekki.SF2.GUI.Map
 			foreach (MapButton button in _buttons)
 			{
 				MapButtonInfo info = button.get_MapButtonInfo();
-				bool storyOnly = info != null && info.EDMILHNJFAA() == MapButtonInfo.HNEJAKIGDBA.Story;
+				bool storyOnly = info != null && info.GetShowType() == MapButtonInfo.MapButtonShowType.Story;
 				button.gameObject.SetActive(visible || !storyOnly);
 			}
 		}

@@ -4,45 +4,45 @@ using Nekki.SF2.GUI.Shop;
 
 public class QuestActionShop : QuestAction
 {
-	private string ENBEKBKOLBA = string.Empty;
+	private string tabExpression = string.Empty;
 
 	private string item = string.Empty;
 
 	private SliderType _sliderType;
 
-	private string OHCGEEEKEJH = string.Empty;
+	private string itemName = string.Empty;
 
-	private ItemInfo PJDAGCBPLJE;
+	private ItemInfo itemInfo;
 
 	public override void Parse(XmlNode EPKLCPOEELO)
 	{
 		base.Parse(EPKLCPOEELO);
-		ENBEKBKOLBA = EPKLCPOEELO.Attributes["Tab"].CIPOICEEIBK(string.Empty);
-		item = EPKLCPOEELO.Attributes["Item"].CIPOICEEIBK(string.Empty);
+		tabExpression = EPKLCPOEELO.Attributes["Tab"].GetStringOrDefault(string.Empty);
+		item = EPKLCPOEELO.Attributes["Item"].GetStringOrDefault(string.Empty);
 	}
 
-	public override void DEJMHFMLKIC(QuestParameters GFIHPBCEEOB)
+	public override void Execute(QuestParameters GFIHPBCEEOB)
 	{
-		base.DEJMHFMLKIC(GFIHPBCEEOB);
+		base.Execute(GFIHPBCEEOB);
 		ConditionExtension.CompareResult lNIDLHOIHIM = new ConditionExtension.CompareResult();
 		ConditionExtension.CompareResult lNIDLHOIHIM2 = new ConditionExtension.CompareResult();
 		QuestCondition kKDGLNECFHA = new QuestCondition();
-		kKDGLNECFHA.LIMHBJBEEIA(GFIHPBCEEOB);
-		if (!string.IsNullOrEmpty(ENBEKBKOLBA))
+		kKDGLNECFHA.SetParameters(GFIHPBCEEOB);
+		if (!string.IsNullOrEmpty(tabExpression))
 		{
-			kKDGLNECFHA.MCPIOGALBMK(ENBEKBKOLBA, lNIDLHOIHIM);
+			kKDGLNECFHA.SetValue(tabExpression, lNIDLHOIHIM);
 		}
 		if (!string.IsNullOrEmpty(item))
 		{
-			kKDGLNECFHA.MCPIOGALBMK(item, lNIDLHOIHIM2);
+			kKDGLNECFHA.SetValue(item, lNIDLHOIHIM2);
 		}
-		_sliderType = PNEBCFOGKEE(lNIDLHOIHIM.ToString());
-		OHCGEEEKEJH = lNIDLHOIHIM2.ToString();
-		PJDAGCBPLJE = ListSF.GetItems().GetItemByName(OHCGEEEKEJH);
-		GOMCDIMDNON();
+		_sliderType = ParseSliderType(lNIDLHOIHIM.ToString());
+		itemName = lNIDLHOIHIM2.ToString();
+		itemInfo = ListSF.GetItems().GetItemByName(itemName);
+		ShowShopItem();
 	}
 
-	private SliderType PNEBCFOGKEE(string name)
+	private SliderType ParseSliderType(string name)
 	{
 		switch (name)
 		{
@@ -67,24 +67,24 @@ public class QuestActionShop : QuestAction
 		}
 	}
 
-	private void JILPFNBAKGK(object data)
+	private void OnModuleChangedScrollToItem(object data)
 	{
 		ShopScene current = Scene<ShopScene>.get_Current();
 		if (current != null)
 		{
-			current.ScrollToItemByName(_sliderType, OHCGEEEKEJH);
+			current.ScrollToItemByName(_sliderType, itemName);
 		}
-		Module.GetInstance().RemoveEventListener(1, JILPFNBAKGK);
-		OGIJONMKABB();
+		Module.GetInstance().RemoveEventListener(1, OnModuleChangedScrollToItem);
+		FinishAction();
 	}
 
-	private void DOHEMBEEHBB(object data)
+	private void OnModuleChangedComplete(object data)
 	{
-		Module.GetInstance().RemoveEventListener(1, DOHEMBEEHBB);
-		OGIJONMKABB();
+		Module.GetInstance().RemoveEventListener(1, OnModuleChangedComplete);
+		FinishAction();
 	}
 
-	private void GOMCDIMDNON()
+	private void ShowShopItem()
 	{
 		ScreenType iPKNDMINFMJ = Module.GetInstance().GetCurrentScreenType();
 		ShopScene current = Scene<ShopScene>.get_Current();
@@ -92,17 +92,17 @@ public class QuestActionShop : QuestAction
 		bool flag2 = iPKNDMINFMJ == ScreenType.ModuleShop;
 		if (flag && _sliderType != SliderType.SliderNone)
 		{
-			current.ScrollToItemByName(_sliderType, OHCGEEEKEJH);
-			OGIJONMKABB();
+			current.ScrollToItemByName(_sliderType, itemName);
+			FinishAction();
 		}
 		else if (flag2)
 		{
-			Module.GetInstance().AddEventListener(1, JILPFNBAKGK);
+			Module.GetInstance().AddEventListener(1, OnModuleChangedScrollToItem);
 		}
 		else
 		{
-			Module.GetInstance().AddEventListener(1, DOHEMBEEHBB);
-			Module.DLOKJOHNDID(ScreenType.ModuleShop, new DelayedStrike(_sliderType, PJDAGCBPLJE, true));
+			Module.GetInstance().AddEventListener(1, OnModuleChangedComplete);
+			Module.OpenScreen(ScreenType.ModuleShop, new DelayedStrike(_sliderType, itemInfo, true));
 		}
 	}
 }

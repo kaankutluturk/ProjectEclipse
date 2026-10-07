@@ -7,27 +7,27 @@ public class BundleRef
 
 	private AssetBundle _UnityBundle;
 
-	public string KDPHJBCIHEM
+	public string FilePath
 	{
 		get
 		{
-			return NAIOABAGJCN();
+			return GetFilePath();
 		}
 	}
 
-	public string FAMAOJIIPBL
+	public string BundleId
 	{
 		get
 		{
-			return ALJBPGLCKBP();
+			return GetBundleId();
 		}
 	}
 
-	public bool MOBGLOMMCJJ
+	public bool IsLoaded
 	{
 		get
 		{
-			return DFDMGDDLDNB();
+			return GetIsLoaded();
 		}
 	}
 
@@ -36,22 +36,22 @@ public class BundleRef
 		_BundleId = BKKKEENLEDP;
 	}
 
-	public string NAIOABAGJCN()
+	public string GetFilePath()
 	{
-		return SF2Paths.MEKBAHBKMNB() + "/" + _BundleId;
+		return SF2Paths.GetBundlesPath() + "/" + _BundleId;
 	}
 
-	public string ALJBPGLCKBP()
+	public string GetBundleId()
 	{
 		return _BundleId;
 	}
 
-	public bool DFDMGDDLDNB()
+	public bool GetIsLoaded()
 	{
 		return _UnityBundle != null;
 	}
 
-	public string[] OEEOEGEBBAL()
+	public string[] GetAllAssetNames()
 	{
 		if (_UnityBundle != null)
 		{
@@ -62,13 +62,13 @@ public class BundleRef
 
 	public void Load()
 	{
-		if (!(_UnityBundle != null) && File.Exists(NAIOABAGJCN()))
+		if (!(_UnityBundle != null) && File.Exists(GetFilePath()))
 		{
-			_UnityBundle = AssetBundle.LoadFromFile(NAIOABAGJCN());
+			_UnityBundle = AssetBundle.LoadFromFile(GetFilePath());
 		}
 	}
 
-	public void BPEDLFOKKNN()
+	public void Unload()
 	{
 		if (!(_UnityBundle == null))
 		{

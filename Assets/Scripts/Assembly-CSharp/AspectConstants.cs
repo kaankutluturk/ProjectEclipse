@@ -1,8 +1,8 @@
 public class AspectConstants
 {
-	public float JHJAFHLMOBJ;
+	public float DoublingRange;
 
-	public float GPEPDPOJJLM;
+	public float Limit;
 
-	public float LFIPMCAHODJ;
+	public float Antilimit;
 }

@@ -1,7 +1,7 @@
 public class QuestActionShowCredits : QuestAction
 {
-	public override void DEJMHFMLKIC(QuestParameters GFIHPBCEEOB)
+	public override void Execute(QuestParameters GFIHPBCEEOB)
 	{
-		CreditsScreen.Create(base.OGIJONMKABB);
+		CreditsScreen.Create(base.FinishAction);
 	}
 }

@@ -11,45 +11,45 @@ public class PlistElement
 
 	public void set_DLKPBAJDHBO(string KGBGENDIMBC, PlistElement value)
 	{
-		AGGAMCGBFAF(KGBGENDIMBC, value);
+		SetItem(KGBGENDIMBC, value);
 	}
 
 	protected PlistElement()
 	{
 	}
 
-	public string CIPOICEEIBK()
+	public string AsString()
 	{
 		return ((PlistElementString)this).value;
 	}
 
-	public int HJJGDHGJFEG()
+	public int AsInteger()
 	{
 		return ((PlistElementInteger)this).value;
 	}
 
-	public bool MHAKAEEDBIJ()
+	public bool AsBoolean()
 	{
 		return ((PlistElementBoolean)this).value;
 	}
 
-	public PlistElementArray GKDJFCGPACC()
+	public PlistElementArray AsArray()
 	{
 		return (PlistElementArray)this;
 	}
 
-	public PlistElementDict MKLDLPEGCDE()
+	public PlistElementDict AsDict()
 	{
 		return (PlistElementDict)this;
 	}
 
 	public PlistElement get_Item(string KGBGENDIMBC)
 	{
-		return MKLDLPEGCDE().get_Item(KGBGENDIMBC);
+		return AsDict().get_Item(KGBGENDIMBC);
 	}
 
-	public void AGGAMCGBFAF(string KGBGENDIMBC, PlistElement value)
+	public void SetItem(string KGBGENDIMBC, PlistElement value)
 	{
-		MKLDLPEGCDE().AGGAMCGBFAF(KGBGENDIMBC, value);
+		AsDict().SetItem(KGBGENDIMBC, value);
 	}
 }

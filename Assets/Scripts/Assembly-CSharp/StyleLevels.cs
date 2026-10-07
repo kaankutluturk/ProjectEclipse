@@ -5,13 +5,13 @@ public class StyleLevels
 {
 	public List<Style> Styles = new List<Style>();
 
-	public float ENKMAPMCMCM;
+	public float StylePerHit;
 
-	public float JOIJKPLCJAN;
+	public float DecreaseSpeed;
 
-	public float PKOFNMPOMKM;
+	public float Penalty;
 
-	public Style BPDFOLFPBHO(int index)
+	public Style GetStyle(int index)
 	{
 		if (Styles.Count > index)
 		{
@@ -22,7 +22,7 @@ public class StyleLevels
 
 	public float GetStyleMultiplier(int index)
 	{
-		Style mHOJFHKHIIL = BPDFOLFPBHO(index);
+		Style mHOJFHKHIIL = GetStyle(index);
 		return (mHOJFHKHIIL == null) ? 0f : mHOJFHKHIIL.StyleMultiplier;
 	}
 
@@ -32,42 +32,42 @@ public class StyleLevels
 		XmlAttribute xmlAttribute = node.Attributes["StylePerHit"];
 		if (xmlAttribute != null)
 		{
-			ENKMAPMCMCM = xmlAttribute.ParseFloat();
+			StylePerHit = xmlAttribute.ParseFloat();
 		}
 		else
 		{
-			LLLOJBFMONN.Error("Error: InternalSettings->StyleLevels: Attribute StylePerHit is absent!");
+			GameLog.Error("Error: InternalSettings->StyleLevels: Attribute StylePerHit is absent!");
 		}
 		XmlAttribute xmlAttribute2 = node.Attributes["DecreaseSpeed"];
 		if (xmlAttribute2 != null)
 		{
-			JOIJKPLCJAN = xmlAttribute2.ParseFloat();
+			DecreaseSpeed = xmlAttribute2.ParseFloat();
 		}
 		else
 		{
-			LLLOJBFMONN.Error("Error: InternalSettings->StyleLevels: Attribute DecreaseSpeed is absent!");
+			GameLog.Error("Error: InternalSettings->StyleLevels: Attribute DecreaseSpeed is absent!");
 		}
 		XmlAttribute xmlAttribute3 = node.Attributes["Penalty"];
 		if (xmlAttribute3 != null)
 		{
-			PKOFNMPOMKM = xmlAttribute3.ParseFloat();
+			Penalty = xmlAttribute3.ParseFloat();
 		}
 		else
 		{
-			LLLOJBFMONN.Error("Error: InternalSettings->StyleLevels: Attribute Penalty is absent!");
+			GameLog.Error("Error: InternalSettings->StyleLevels: Attribute Penalty is absent!");
 		}
 		foreach (XmlNode childNode in node.ChildNodes)
 		{
 			Style mHOJFHKHIIL = new Style();
-			mHOJFHKHIIL.Name = childNode.Attributes["Name"].CIPOICEEIBK(string.Empty);
+			mHOJFHKHIIL.Name = childNode.Attributes["Name"].GetStringOrDefault(string.Empty);
 			mHOJFHKHIIL.StyleMultiplier = childNode.Attributes["StyleMultiplier"].ParseFloat();
-			mHOJFHKHIIL.PDJFODICKBP = childNode.Attributes["TextImage"].CIPOICEEIBK(string.Empty);
-			mHOJFHKHIIL.MJGNPJMBNFK = childNode.Attributes["BarImage"].CIPOICEEIBK(string.Empty);
+			mHOJFHKHIIL.TextImage = childNode.Attributes["TextImage"].GetStringOrDefault(string.Empty);
+			mHOJFHKHIIL.BarImage = childNode.Attributes["BarImage"].GetStringOrDefault(string.Empty);
 			Styles.Add(mHOJFHKHIIL);
 		}
 		if (Styles.Count == 0)
 		{
-			LLLOJBFMONN.Error("Error: InternalSettings->StyleLevels: Styles is absent!");
+			GameLog.Error("Error: InternalSettings->StyleLevels: Styles is absent!");
 		}
 	}
 }

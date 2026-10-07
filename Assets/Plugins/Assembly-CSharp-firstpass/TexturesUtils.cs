@@ -8,16 +8,16 @@ public class TexturesUtils
 	private static readonly Dictionary<string, string> AtlasesNames = new Dictionary<string, string>();
 
 #if UNITY_6000_0_OR_NEWER
-	private static readonly Dictionary<EntityId, int> NJHEFKILICK = new Dictionary<EntityId, int>();
+	private static readonly Dictionary<EntityId, int> textureRefCounts = new Dictionary<EntityId, int>();
 #else
 	private static readonly Dictionary<int, int> NJHEFKILICK = new Dictionary<int, int>();
 #endif
 
-	private static readonly List<Texture> NHNONLFMFDC = new List<Texture>();
+	private static readonly List<Texture> texturesToDestroy = new List<Texture>();
 
 	public static void Init()
 	{
-		Routiner.AddUpdate(JLPMOKPFECK);
+		Routiner.AddUpdate(ProcessDestroyQueue);
 	}
 
 	public static Sprite CreateSprite(Texture2D texture)
@@ -34,11 +34,11 @@ public class TexturesUtils
 #else
 			int instanceID = texture.GetInstanceID();
 #endif
-			if (NJHEFKILICK.ContainsKey(instanceID))
+			if (textureRefCounts.ContainsKey(instanceID))
 			{
-				return NJHEFKILICK[instanceID];
+				return textureRefCounts[instanceID];
 			}
-			if (NHNONLFMFDC.Contains(texture))
+			if (texturesToDestroy.Contains(texture))
 			{
 				return 0;
 			}
@@ -46,7 +46,7 @@ public class TexturesUtils
 		return -1;
 	}
 
-	public static void NOABEDJAGHG(Texture texture)
+	public static void AddTexture(Texture texture)
 	{
 		if (texture == null)
 		{
@@ -57,22 +57,22 @@ public class TexturesUtils
 #else
 		int instanceID = texture.GetInstanceID();
 #endif
-		if (NJHEFKILICK.ContainsKey(instanceID))
+		if (textureRefCounts.ContainsKey(instanceID))
 		{
-			NJHEFKILICK[instanceID]++;
+			textureRefCounts[instanceID]++;
 		}
 		else
 		{
-			if (NHNONLFMFDC.Contains(texture))
+			if (texturesToDestroy.Contains(texture))
 			{
-				NHNONLFMFDC.Remove(texture);
+				texturesToDestroy.Remove(texture);
 			}
-			NJHEFKILICK.Add(instanceID, 1);
+			textureRefCounts.Add(instanceID, 1);
 		}
 		Log("AddTexture " + texture.name + " " + GetCountTexture(texture));
 	}
 
-	public static void OFEDABNDEAF(Texture texture)
+	public static void ReleaseTexture(Texture texture)
 	{
 		if (texture == null)
 		{
@@ -83,28 +83,28 @@ public class TexturesUtils
 #else
 		int instanceID = texture.GetInstanceID();
 #endif
-		if (NJHEFKILICK.ContainsKey(instanceID))
+		if (textureRefCounts.ContainsKey(instanceID))
 		{
-			if (NJHEFKILICK[instanceID] > 1)
+			if (textureRefCounts[instanceID] > 1)
 			{
-				NJHEFKILICK[instanceID]--;
+				textureRefCounts[instanceID]--;
 			}
 			else
 			{
-				NJHEFKILICK.Remove(instanceID);
-				NHNONLFMFDC.Add(texture);
+				textureRefCounts.Remove(instanceID);
+				texturesToDestroy.Add(texture);
 			}
 			Log("ReleaseTexture " + texture.name + " " + GetCountTexture(texture));
 		}
 	}
 
-	private static void JLPMOKPFECK()
+	private static void ProcessDestroyQueue()
 	{
-		if (NHNONLFMFDC.Count <= 0)
+		if (texturesToDestroy.Count <= 0)
 		{
 			return;
 		}
-		Texture texture = NHNONLFMFDC[0];
+		Texture texture = texturesToDestroy[0];
 		if (texture != null)
 		{
 			if (AtlasesNames.ContainsKey(texture.name))
@@ -114,9 +114,9 @@ public class TexturesUtils
 				Log("UnloadAtlas " + texture.name);
 			}
 			Log("DestroyTexture " + texture.name);
-			GlobalLoad.BPEDLFOKKNN(texture);
+			GlobalLoad.Unload(texture);
 		}
-		NHNONLFMFDC.Remove(texture);
+		texturesToDestroy.Remove(texture);
 	}
 
 	public static Sprite GetSpriteFromAtlas(string NJKCBALJDMM, string KIKMPCLOBCK, string JGIGOMLGLPN)
@@ -142,14 +142,14 @@ public class TexturesUtils
 			}
 		}
 		Log("Sprite From Atlas Not Found  - " + JGIGOMLGLPN);
-		return GlobalLoad.IHDKNNHOPFJ();
+		return GlobalLoad.GetNoImageSprite();
 	}
 
 	private static Sprite[] LoadAtlas(string path, string name = "")
 	{
 		if (!AtlasesCache.ContainsKey(path))
 		{
-			Sprite[] array = ((!name.BKOIKMEEHDK()) ? GlobalLoad.GetLoadObjectsInternal<Sprite>(path, name) : GlobalLoad.DKIOHNLLACG<Sprite>(path));
+			Sprite[] array = ((!name.IsNullOrEmpty()) ? GlobalLoad.GetLoadObjectsInternal<Sprite>(path, name) : GlobalLoad.GetLoadObjects<Sprite>(path));
 			if (array != null && array.Length > 0)
 			{
 				AtlasesCache.Add(path, array);

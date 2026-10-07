@@ -7,33 +7,33 @@ internal class CrcCalculatorStream : Stream, IDisposable
 
 	internal Stream _innerStream;
 
-	private CRC32 OGMJMDGHNDD;
+	private CRC32 _crc32;
 
 	private long _lengthLimit = -99L;
 
 	private bool _leaveOpen;
 
-	public long IDLBIAJDPOP
+	public long TotalBytesSlurped
 	{
 		get
 		{
-			return AMFBINPAOBC();
+			return GetTotalBytesSlurped();
 		}
 	}
 
-	public int LNINNEFODFM
+	public int Crc
 	{
 		get
 		{
-			return GNENPHADPHE();
+			return GetCrc();
 		}
 	}
 
-	public bool PNDPBAKKGEE
+	public bool LeaveInnerStreamOpen
 	{
 		get
 		{
-			return HCBKKKBGLDO();
+			return GetLeaveOpen();
 		}
 		set
 		{
@@ -81,22 +81,22 @@ internal class CrcCalculatorStream : Stream, IDisposable
 	private CrcCalculatorStream(bool LOLBAGJKKPH, long BDBOAEGELMC, Stream ABJIEFMMIEK, CRC32 CJGBICDHGGL)
 	{
 		_innerStream = ABJIEFMMIEK;
-		OGMJMDGHNDD = CJGBICDHGGL ?? new CRC32();
+		_crc32 = CJGBICDHGGL ?? new CRC32();
 		_lengthLimit = BDBOAEGELMC;
 		_leaveOpen = LOLBAGJKKPH;
 	}
 
-	public long AMFBINPAOBC()
+	public long GetTotalBytesSlurped()
 	{
-		return OGMJMDGHNDD.BFADCOPLBPM();
+		return _crc32.GetTotalBytesRead();
 	}
 
-	public int GNENPHADPHE()
+	public int GetCrc()
 	{
-		return OGMJMDGHNDD.MMBAMEEDDFA();
+		return _crc32.GetCrc32Result();
 	}
 
-	public bool HCBKKKBGLDO()
+	public bool GetLeaveOpen()
 	{
 		return _leaveOpen;
 	}
@@ -110,11 +110,11 @@ internal class CrcCalculatorStream : Stream, IDisposable
 	{
 		if (_lengthLimit != UnsetLengthLimit)
 		{
-			if (OGMJMDGHNDD.BFADCOPLBPM() >= _lengthLimit)
+			if (_crc32.GetTotalBytesRead() >= _lengthLimit)
 			{
 				return 0;
 			}
-			long num = _lengthLimit - OGMJMDGHNDD.BFADCOPLBPM();
+			long num = _lengthLimit - _crc32.GetTotalBytesRead();
 			if (num < count)
 			{
 				count = (int)num;
@@ -123,7 +123,7 @@ internal class CrcCalculatorStream : Stream, IDisposable
 		int num2 = _innerStream.Read(buffer, IPCOBJBKNAO, count);
 		if (num2 > 0)
 		{
-			OGMJMDGHNDD.LOAACENMBJJ(buffer, IPCOBJBKNAO, num2);
+			_crc32.SlurpBlock(buffer, IPCOBJBKNAO, num2);
 		}
 		return num2;
 	}
@@ -132,7 +132,7 @@ internal class CrcCalculatorStream : Stream, IDisposable
 	{
 		if (count > 0)
 		{
-			OGMJMDGHNDD.LOAACENMBJJ(buffer, IPCOBJBKNAO, count);
+			_crc32.SlurpBlock(buffer, IPCOBJBKNAO, count);
 		}
 		_innerStream.Write(buffer, IPCOBJBKNAO, count);
 	}
@@ -178,7 +178,7 @@ internal class CrcCalculatorStream : Stream, IDisposable
 	{
 		get
 		{
-			return OGMJMDGHNDD.BFADCOPLBPM();
+			return _crc32.GetTotalBytesRead();
 		}
 		set
 		{

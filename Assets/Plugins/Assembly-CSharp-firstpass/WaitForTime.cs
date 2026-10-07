@@ -4,33 +4,33 @@ using UnityEngine;
 public class WaitForTime : CustomYieldInstruction
 {
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private float OCOBNPGODHJ;
+	private float timeLeft;
 
-	public float BEOBDJHNHIO
+	public float TimeLeft
 	{
 		get
 		{
-			return FJKGKLJGIJI();
+			return GetTimeLeft();
 		}
 		private set
 		{
-			DKLGPGDJPGO(value);
+			SetTimeLeft(value);
 		}
 	}
 
 	public WaitForTime(float KLOJJKNBHCL)
 	{
-		DKLGPGDJPGO(KLOJJKNBHCL);
+		SetTimeLeft(KLOJJKNBHCL);
 	}
 
-	public float FJKGKLJGIJI()
+	public float GetTimeLeft()
 	{
-		return OCOBNPGODHJ;
+		return timeLeft;
 	}
 
-	private void DKLGPGDJPGO(float value)
+	private void SetTimeLeft(float value)
 	{
-		OCOBNPGODHJ = value;
+		timeLeft = value;
 	}
 
 	public override bool keepWaiting
@@ -39,9 +39,9 @@ public class WaitForTime : CustomYieldInstruction
 		{
 			if (!CoroutineManager.get_Current().get_IsPaused())
 			{
-				DKLGPGDJPGO(FJKGKLJGIJI() - Time.deltaTime);
+				SetTimeLeft(GetTimeLeft() - Time.deltaTime);
 			}
-			return FJKGKLJGIJI() >= 1E-07f;
+			return GetTimeLeft() >= 1E-07f;
 		}
 	}
 }

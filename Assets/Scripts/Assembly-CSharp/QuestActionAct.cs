@@ -5,59 +5,59 @@ public class QuestActionAct : QuestAction
 {
 	private string _text = string.Empty;
 
-	private List<KeyValuePair<string, int>> GOJABLKPFJM = new List<KeyValuePair<string, int>>();
+	private List<KeyValuePair<string, int>> textFrames = new List<KeyValuePair<string, int>>();
 
 	public override void Parse(XmlNode EPKLCPOEELO)
 	{
 		base.Parse(EPKLCPOEELO);
-		_text = EPKLCPOEELO.Attributes["Text"].CIPOICEEIBK(string.Empty);
-		EPAKNMNEIDK(EPKLCPOEELO);
+		_text = EPKLCPOEELO.Attributes["Text"].GetStringOrDefault(string.Empty);
+		ParseTextEntries(EPKLCPOEELO);
 	}
 
-	public void EPAKNMNEIDK(XmlNode EPKLCPOEELO)
+	public void ParseTextEntries(XmlNode EPKLCPOEELO)
 	{
 		foreach (XmlNode childNode in EPKLCPOEELO.ChildNodes)
 		{
-			string key = childNode.Attributes["Text"].CIPOICEEIBK(string.Empty);
+			string key = childNode.Attributes["Text"].GetStringOrDefault(string.Empty);
 			int value = childNode.Attributes["Frames"].ParseInt();
-			GOJABLKPFJM.Add(new KeyValuePair<string, int>(key, value));
+			textFrames.Add(new KeyValuePair<string, int>(key, value));
 		}
 	}
 
-	public override void DEJMHFMLKIC(QuestParameters GFIHPBCEEOB)
+	public override void Execute(QuestParameters GFIHPBCEEOB)
 	{
-		base.DEJMHFMLKIC(GFIHPBCEEOB);
-		if (GOJABLKPFJM.Count > 0)
+		base.Execute(GFIHPBCEEOB);
+		if (textFrames.Count > 0)
 		{
-			HJLLBHDCBFE(GFIHPBCEEOB);
+			ShowMultipleTexts(GFIHPBCEEOB);
 		}
 		else
 		{
-			CHBCAEBBOPJ(GFIHPBCEEOB);
+			ShowSingleText(GFIHPBCEEOB);
 		}
 	}
 
-	public void HJLLBHDCBFE(QuestParameters GFIHPBCEEOB)
+	public void ShowMultipleTexts(QuestParameters GFIHPBCEEOB)
 	{
 		List<KeyValuePair<string, int>> KPKPFFGEFGI = new List<KeyValuePair<string, int>>();
-		GOJABLKPFJM.ForEach((KeyValuePair<string, int> DHDMNHCIPEH) =>
+		textFrames.ForEach((KeyValuePair<string, int> DHDMNHCIPEH) =>
 		{
-			string key = ABMMAALFNFD.KGIEIAJLAGI(DHDMNHCIPEH.Key, GFIHPBCEEOB);
+			string key = QuestTextResolver.ResolveText(DHDMNHCIPEH.Key, GFIHPBCEEOB);
 			KPKPFFGEFGI.Add(new KeyValuePair<string, int>(key, DHDMNHCIPEH.Value));
 		});
-		GameUtils.ShowEnterScreen(KPKPFFGEFGI, GCKKOOHDJMI);
+		GameUtils.ShowEnterScreen(KPKPFFGEFGI, OnEnterScreenFinished);
 	}
 
-	public void CHBCAEBBOPJ(QuestParameters GFIHPBCEEOB)
+	public void ShowSingleText(QuestParameters GFIHPBCEEOB)
 	{
-		string hCPNFPMHFCM = ABMMAALFNFD.KGIEIAJLAGI(_text, GFIHPBCEEOB);
-		GameUtils.ShowEnterScreen(hCPNFPMHFCM, GCKKOOHDJMI);
-		string text = ABMMAALFNFD.KGIEIAJLAGI(_text, GFIHPBCEEOB);
+		string hCPNFPMHFCM = QuestTextResolver.ResolveText(_text, GFIHPBCEEOB);
+		GameUtils.ShowEnterScreen(hCPNFPMHFCM, OnEnterScreenFinished);
+		string text = QuestTextResolver.ResolveText(_text, GFIHPBCEEOB);
 	}
 
-	private void GCKKOOHDJMI()
+	private void OnEnterScreenFinished()
 	{
-		GameUtils.OFOKPNFGDMD("Chapter completed");
-		OGIJONMKABB();
+		GameUtils.TrackEvent("Chapter completed");
+		FinishAction();
 	}
 }

@@ -6,7 +6,7 @@ using UnityEngine;
 public class Render
 {
     private readonly Eclipse.Modding.ModCameraProjection _eclipseCameraProjection = new Eclipse.Modding.ModCameraProjection();
-	private enum HNGOJLFBLME
+	private enum RenderZLayer
 	{
 		Z_DARKNESS = 0,
 		Z_RINGOUT = 1,
@@ -14,123 +14,123 @@ public class Render
 		Z_HIT = 3
 	}
 
-	public const float CMDONJDIODG = 300f;
+	public const float FighterDistancePadding = 300f;
 
-	public const string FKJCEEBDDJD = "Textures/fight/pointers/arrow";
+	public const string ArrowSpritePath = "Textures/fight/pointers/arrow";
 
-	public const float APNMKDCNKOG = 10f;
+	public const float GroundMarkerOffset = 10f;
 
-	private SpriteRenderer EAJGDJLHJFD;
+	private SpriteRenderer pointerArrow;
 
-	private SpriteRenderer OEJKNMDNMAP;
+	private SpriteRenderer darknessOverlay;
 
 	private SpriteRenderer _lightInTheDarkness;
 	private Sprite _lightInTheDarknessSprite;
 	private Material _lightInTheDarknessMaterial;
 
-	private int EMKDAHLGACK;
+	private int arrowPulseFrame;
 
-	private GameObject GKLOAPHPBPB;
+	private GameObject hitLayer;
 
-	private LocationSelector EPKHDFIIFIL;
+	private LocationSelector additionalDrawsLayer;
 
-	private GameObject KPBKKJLLKIE;
+	private GameObject hitEffectObject;
 
-	private CocosAnimation PHKBOGAICCI;
+	private CocosAnimation hitAnimation;
 
-	private ChangingSprite LFPLGAMAGAC;
+	private ChangingSprite leftRingOutSprite;
 
-	private ChangingSprite MIBKDGNJKIE;
+	private ChangingSprite rightRingOutSprite;
 
-	private SpriteRenderer ALCGBGHPDCL;
+	private SpriteRenderer perkActivationArea;
 
-	private SpriteRenderer IBDNNMHPOOA;
+	private SpriteRenderer perkActivationAreaIcon;
 
 	private FightTransformInterpolation _PerkActivationAreaInterpolation;
 
-	private bool NEPJDGDCCFL;
+	private bool lockMinZoom;
 
-	private float NIKDOKGPFOI;
+	private float zoom;
 
-	private float OGPCOIODJKI;
+	private float viewportScale;
 
-	private float KKICFAMLAAK;
+	private float verticalOffset;
 
-	private float OEAGONAHCCA;
+	private float visibleWidth;
 
-	private float BGKFFAGMIDE;
+	private float minZoom;
 
-	private float JALEODAIDEO;
+	private float cameraOffsetX;
 
-	private float KAGEIEBNGPO;
+	private float unusedCameraValue;
 
 	public Location _location;
 
-	public RenderContainer PFELMKLNBMC;
+	public RenderContainer Container;
 
-	private List<BloodEffect> FPLGNMICCPH = new List<BloodEffect>();
+	private List<BloodEffect> bloodEffects = new List<BloodEffect>();
 
-	private int OBCAJAIBJHP;
+	private int bloodEffectFrame;
 
 	private GameObject _UnityObject;
 
-	public bool LDLFAJGLKBI
+	public bool LockMinZoom
 	{
 		get
 		{
-			return CHGCKFIHOBG();
+			return GetLockMinZoom();
 		}
 		set
 		{
-			AOMKPKJNIKH(value);
+			SetLockMinZoom(value);
 		}
 	}
 
-	public GameObject ICDCIANNAAI
+	public GameObject RootObject
 	{
 		get
 		{
-			return MJNPBMOAFML();
+			return GetRootObject();
 		}
 	}
 
-	public ViewerModel KCBHCAMOEAK
+	public ViewerModel ModelViewer
 	{
 		get
 		{
-			return FPNKBJPKKGB();
+			return GetViewerModel();
 		}
 	}
 
-	public EffectsContainer HKADBEAJECH
+	public EffectsContainer BackgroundEffects
 	{
 		get
 		{
-			return GOCPBKNDKMC();
+			return GetBackgroundEffects();
 		}
 	}
 
-	public EffectsContainer HMLOLLBNBIL
+	public EffectsContainer ForegroundEffects
 	{
 		get
 		{
-			return GDBMKMFFOCF();
+			return GetForegroundEffects();
 		}
 	}
 
-	public float ALOKJEILMLK
+	public float AutoZoom
 	{
 		get
 		{
-			return KMMOLDBJBIG();
+			return CalculateAutoZoom();
 		}
 	}
 
-	public float MGKJKJFOEHG
+	public float MaxZoom
 	{
 		get
 		{
-			return KGCPMIDNKKI();
+			return GetMaxZoom();
 		}
 	}
 
@@ -141,17 +141,17 @@ public class Render
 		_location = null;
 	}
 
-	public bool CHGCKFIHOBG()
+	public bool GetLockMinZoom()
 	{
-		return NEPJDGDCCFL;
+		return lockMinZoom;
 	}
 
-	public void AOMKPKJNIKH(bool value)
+	public void SetLockMinZoom(bool value)
 	{
-		NEPJDGDCCFL = value;
+		lockMinZoom = value;
 	}
 
-	public GameObject MJNPBMOAFML()
+	public GameObject GetRootObject()
 	{
 		return _UnityObject;
 	}
@@ -159,12 +159,12 @@ public class Render
 	public void Init(Location LPJNEDFCBOI)
 	{
 		_location = LPJNEDFCBOI;
-		NIKDOKGPFOI = 1f;
+		zoom = 1f;
 		RefreshViewportMetrics();
-		KKICFAMLAAK = (_location.FEIHFIPFNKF / 2f - _location.GBNPHCHGKDO) / 2f;
-		MEHIFDPJGDO();
-		PIENHGGANDI();
-		CCEDPHBFFKK();
+		verticalOffset = (_location.height / 2f - _location.floorHeight) / 2f;
+		CreateRenderContainer();
+		CreateArrow();
+		CreateHitEffectObjects();
 		_UnityObject.transform.localScale = new Vector3(1f, -1f, 1f);
 		Eclipse.Rendering.LocationAtmosphere.Attach(_UnityObject, _location);
 	}
@@ -173,15 +173,15 @@ public class Render
 	// The shop's fighter preview keeps its own authored position and renderer.
 	public void UpdateMenuBackdrop(UnityEngine.Camera camera, bool advanceAnimation, float? fightCenterX = null)
 	{
-		if (camera == null || _location == null || _location.JMLAKAKDBBL <= 0f || _location.FEIHFIPFNKF <= 0f) return;
+		if (camera == null || _location == null || _location.width <= 0f || _location.height <= 0f) return;
 		float height = camera.orthographicSize * 2f;
-		float scale = Mathf.Max(height / _location.FEIHFIPFNKF, height * camera.aspect / _location.JMLAKAKDBBL);
+		float scale = Mathf.Max(height / _location.height, height * camera.aspect / _location.width);
 		float offset = 0f;
 		if (fightCenterX.HasValue)
 		{
 			float halfVisible = height * camera.aspect / scale * .5f;
-			float center = Mathf.Clamp(fightCenterX.Value, halfVisible, _location.JMLAKAKDBBL - halfVisible);
-			offset = _location.JMLAKAKDBBL * .5f - center;
+			float center = Mathf.Clamp(fightCenterX.Value, halfVisible, _location.width - halfVisible);
+			offset = _location.width * .5f - center;
 		}
 		_UnityObject.transform.position = new Vector3(camera.transform.position.x, camera.transform.position.y, 100f + _location.layers.Count * 3f);
 		_UnityObject.transform.localScale = new Vector3(scale, -scale, 1f);
@@ -197,8 +197,8 @@ public class Render
 			layer.SetPositionX(offset * factor);
 		}
 		SyncAdditionalDrawsLayerTransform();
-		EAJGDJLHJFD.gameObject.SetActive(false);
-		if (advanceAnimation) JACOKNMGNDF();
+		pointerArrow.gameObject.SetActive(false);
+		if (advanceAnimation) RenderLayers();
 	}
 
 	public void DestroyMenuBackdrop()
@@ -209,13 +209,13 @@ public class Render
 
 	private void RefreshViewportMetrics()
 	{
-		if (_location == null || _location.FEIHFIPFNKF <= 0f || _location.JMLAKAKDBBL <= 0f)
+		if (_location == null || _location.height <= 0f || _location.width <= 0f)
 		{
 			return;
 		}
 
-		int screenWidth = SystemProperties.MCGOBLKFGHO();
-		int screenHeight = SystemProperties.OACFGEDMCOD();
+		int screenWidth = SystemProperties.GetScreenWidth();
+		int screenHeight = SystemProperties.GetScreenHeight();
 		if (screenWidth <= 0 || screenHeight <= 0)
 		{
 			return;
@@ -225,64 +225,64 @@ public class Render
 		// did not resize during a fight. Desktop windows and the Unity Game view can.
 		// Keep the original camera math, but feed it the current viewport dimensions
 		// so the Root Width clamp cannot expose space beyond the location edge.
-		OGPCOIODJKI = (float)screenHeight / _location.FEIHFIPFNKF;
-		OEAGONAHCCA = (float)screenWidth / OGPCOIODJKI;
-		BGKFFAGMIDE = OEAGONAHCCA / _location.JMLAKAKDBBL;
+		viewportScale = (float)screenHeight / _location.height;
+		visibleWidth = (float)screenWidth / viewportScale;
+		minZoom = visibleWidth / _location.width;
 	}
 
-	public void GEDDKEKGCBI(Vector3f NAAPALOFBCI, Vector3f IHFFJPLMIAL, int count)
+	public void SpawnBloodEffects(Vector3f NAAPALOFBCI, Vector3f IHFFJPLMIAL, int count)
 	{
 		if (Eclipse.Multiplayer.VersusTickDriver.IsResimulating)
 		{
 			return;
 		}
-		JBGIBKJIAPD();
+		ClearBloodEffects();
 		for (int i = 0; i < count; i++)
 		{
 			string oNEIGMLOGDC = "textures/misc/drop_blood";
 			BloodEffect gIMFFDHKFIB = new BloodEffect(IHFFJPLMIAL);
 			gIMFFDHKFIB.index = i;
-			gIMFFDHKFIB.BIPGHENGCFI = 90;
+			gIMFFDHKFIB.LifetimeFrames = 90;
 			gIMFFDHKFIB.CreateSprite(oNEIGMLOGDC, _location.modelsColor);
 			gIMFFDHKFIB.SetPosition(NAAPALOFBCI);
 			gIMFFDHKFIB.SetScale(0.4f);
-			gIMFFDHKFIB.SetParent(PFELMKLNBMC.FPNKBJPKKGB().MJNPBMOAFML());
-			FPLGNMICCPH.Add(gIMFFDHKFIB);
+			gIMFFDHKFIB.SetParent(Container.GetViewerModel().GetRootObject());
+			bloodEffects.Add(gIMFFDHKFIB);
 		}
-		OBCAJAIBJHP = 0;
+		bloodEffectFrame = 0;
 	}
 
-	public void OBNOJKGAJML()
+	public void RenderBloodEffects()
 	{
-		if (FPLGNMICCPH.Count > 0)
+		if (bloodEffects.Count > 0)
 		{
-			for (int i = 0; i < FPLGNMICCPH.Count; i++)
+			for (int i = 0; i < bloodEffects.Count; i++)
 			{
-				FPLGNMICCPH[i].Render();
+				bloodEffects[i].Render();
 			}
-			if (OBCAJAIBJHP > 90)
+			if (bloodEffectFrame > 90)
 			{
-				JBGIBKJIAPD();
+				ClearBloodEffects();
 			}
-			OBCAJAIBJHP++;
+			bloodEffectFrame++;
 		}
 	}
 
-	private void JBGIBKJIAPD()
+	private void ClearBloodEffects()
 	{
-		for (int i = 0; i < FPLGNMICCPH.Count; i++)
+		for (int i = 0; i < bloodEffects.Count; i++)
 		{
-			FPLGNMICCPH[i].AGNODHKEJCJ();
+			bloodEffects[i].Destroy();
 		}
-		FPLGNMICCPH.Clear();
+		bloodEffects.Clear();
 	}
 
-	public int OGICJPJDLNN(ModelObject ACENLMONNPA, Color color, bool IGGHECALMMP = true)
+	public int AddModel(ModelObject ACENLMONNPA, Color color, bool IGGHECALMMP = true)
 	{
-		return PFELMKLNBMC.FPNKBJPKKGB().AddModel(ACENLMONNPA, color, IGGHECALMMP);
+		return Container.GetViewerModel().AddModel(ACENLMONNPA, color, IGGHECALMMP);
 	}
 
-	public void JACOKNMGNDF()
+	public void RenderLayers()
 	{
 		List<LocationSelector> hFBEDCGJHLJ = _location.layers;
 		foreach (LocationSelector item in hFBEDCGJHLJ)
@@ -302,48 +302,48 @@ public class Render
 	private float _lightRadius;
 	private float _lightShape;
 
-	public void PCIGCDELJAL(float DHDMNHCIPEH, float BGEEALIPKCC)
+	public void UpdateArrowPointer(float DHDMNHCIPEH, float BGEEALIPKCC)
 	{
-		if (EMKDAHLGACK > BasicGUI.HNJBADGLFEC())
+		if (arrowPulseFrame > BasicGUI.GetArrowFlashingFrames())
 		{
-			EMKDAHLGACK = 0;
+			arrowPulseFrame = 0;
 		}
 		float num = 127.5f;
-		Color color = EAJGDJLHJFD.color;
-		color.a = (num + num * Mathf.Sin((float)Math.PI / (float)BasicGUI.HNJBADGLFEC() * (float)EMKDAHLGACK)) / 255f;
-		EAJGDJLHJFD.color = color;
-		EAJGDJLHJFD.transform.localPosition = new Vector3(DHDMNHCIPEH, BGEEALIPKCC, -40f);
+		Color color = pointerArrow.color;
+		color.a = (num + num * Mathf.Sin((float)Math.PI / (float)BasicGUI.GetArrowFlashingFrames() * (float)arrowPulseFrame)) / 255f;
+		pointerArrow.color = color;
+		pointerArrow.transform.localPosition = new Vector3(DHDMNHCIPEH, BGEEALIPKCC, -40f);
 		if (!PresentationPass)
 		{
-			EMKDAHLGACK++;
+			arrowPulseFrame++;
 		}
 	}
 
-	public void BHOMOMIPKGC(Vector3f NAAPALOFBCI, Vector3f IHFFJPLMIAL, float time, bool HKNHLNGMOJC, string HJCIKLIPILA, float NOOOCHHKECH)
+	public void PlayHitEffect(Vector3f NAAPALOFBCI, Vector3f IHFFJPLMIAL, float time, bool HKNHLNGMOJC, string HJCIKLIPILA, float NOOOCHHKECH)
 	{
 		if (Eclipse.Multiplayer.VersusTickDriver.IsResimulating)
 		{
 			return;
 		}
 		float num = Vector2f.GetAngle2DDegreeSigned(IHFFJPLMIAL, new Vector2f(1f));
-		PHKBOGAICCI = KPBKKJLLKIE.GetComponent<CocosAnimation>();
-		PHKBOGAICCI.Init("textures/effects/fight/" + HJCIKLIPILA, true);
-		PHKBOGAICCI.set_Iterations(1);
-		PHKBOGAICCI.set_ChangeSpriteTime(time);
-		PHKBOGAICCI.set_Autoplay(true);
-		KPBKKJLLKIE.transform.localPosition = new Vector3(NAAPALOFBCI.GetX(), NAAPALOFBCI.GetY(), 0f);
-		KPBKKJLLKIE.transform.localScale = new Vector3(NOOOCHHKECH, NOOOCHHKECH, NOOOCHHKECH);
+		hitAnimation = hitEffectObject.GetComponent<CocosAnimation>();
+		hitAnimation.Init("textures/effects/fight/" + HJCIKLIPILA, true);
+		hitAnimation.set_Iterations(1);
+		hitAnimation.set_ChangeSpriteTime(time);
+		hitAnimation.set_Autoplay(true);
+		hitEffectObject.transform.localPosition = new Vector3(NAAPALOFBCI.GetX(), NAAPALOFBCI.GetY(), 0f);
+		hitEffectObject.transform.localScale = new Vector3(NOOOCHHKECH, NOOOCHHKECH, NOOOCHHKECH);
 		// The fight render root is mirrored vertically (localScale.y = -1).
 		// A reflection reverses rotation handedness, so compensate here or an
 		// upward strike (for example an uppercut) points the effect downward.
-		KPBKKJLLKIE.transform.eulerAngles = new Vector3(0f, 0f, (!float.IsNaN(num)) ? (0f - num) : 0f);
-		KPBKKJLLKIE.SetActive(true);
+		hitEffectObject.transform.eulerAngles = new Vector3(0f, 0f, (!float.IsNaN(num)) ? (0f - num) : 0f);
+		hitEffectObject.SetActive(true);
 	}
 
-	public void BHIMNPFDCDE(bool value)
+	public void SetVisible(bool value)
 	{
-		PFELMKLNBMC.MJNPBMOAFML().SetActive(value);
-		EAJGDJLHJFD.enabled = value;
+		Container.GetRootObject().SetActive(value);
+		pointerArrow.enabled = value;
 	}
 
 	public void UpdatePosition(Vector3f GJKIKGKCGIA, Vector3f JEBIHODAIKM, float DHDMNHCIPEH, float BGEEALIPKCC, float JPJGNKGEHPI = 0f)
@@ -351,36 +351,36 @@ public class Render
         _eclipseCameraProjection.Begin();
         var camera = Fight.GetCurrentFight()?.GetEclipseCameraSettings(this);
 		RefreshViewportMetrics();
-		JALEODAIDEO = _location.JMLAKAKDBBL / 2f - (camera?.CenterX.HasValue == true ? (float)camera.CenterX.Value : GJKIKGKCGIA.GetX());
-		NIKDOKGPFOI = camera?.Zoom.HasValue == true ? (float)camera.Zoom.Value : ((!(JPJGNKGEHPI > 0f)) ? KMMOLDBJBIG() : JPJGNKGEHPI);
+		cameraOffsetX = _location.width / 2f - (camera?.CenterX.HasValue == true ? (float)camera.CenterX.Value : GJKIKGKCGIA.GetX());
+		zoom = camera?.Zoom.HasValue == true ? (float)camera.Zoom.Value : ((!(JPJGNKGEHPI > 0f)) ? CalculateAutoZoom() : JPJGNKGEHPI);
 		float num = 1f;
-		if (GameUtils.LEPANPKBBKI().IMHPAHJDAFP > 0f)
+		if (GameUtils.GetCameraSettings().MaxWidth > 0f)
 		{
-			num = GameUtils.LEPANPKBBKI().IMHPAHJDAFP / _location.JMLAKAKDBBL;
+			num = GameUtils.GetCameraSettings().MaxWidth / _location.width;
 		}
-		float num2 = BGKFFAGMIDE / num;
-		if (NIKDOKGPFOI < num2)
+		float num2 = minZoom / num;
+		if (zoom < num2)
 		{
-			NIKDOKGPFOI = num2;
-			float num3 = OEAGONAHCCA / NIKDOKGPFOI / 2f;
-			float num4 = 0f - JALEODAIDEO;
-			float num5 = DHDMNHCIPEH - _location.JMLAKAKDBBL / 2f;
-			float pHKGOBGNDEC = GameUtils.LEPANPKBBKI().PHKGOBGNDEC;
+			zoom = num2;
+			float num3 = visibleWidth / zoom / 2f;
+			float num4 = 0f - cameraOffsetX;
+			float num5 = DHDMNHCIPEH - _location.width / 2f;
+			float pHKGOBGNDEC = GameUtils.GetCameraSettings().BindingLength;
 			float num6 = num5 - num4;
 			if (camera?.CenterX.HasValue != true && Mathf.Abs(num6) + pHKGOBGNDEC > num3)
 			{
 				int num7 = ((num6 > 0f) ? 1 : (-1));
 				float num8 = (float)(-num7) * (Mathf.Abs(num6) - num3 + pHKGOBGNDEC);
-				JALEODAIDEO += num8;
+				cameraOffsetX += num8;
 			}
 		}
-		float kKPKKIJFFMP = GameUtils.LEPANPKBBKI().KKPKKIJFFMP;
-		NIKDOKGPFOI = ((!NEPJDGDCCFL) ? Mathf.Max(NIKDOKGPFOI, BGKFFAGMIDE) : BGKFFAGMIDE);
-		float num9 = (_location.JMLAKAKDBBL - kKPKKIJFFMP) * NIKDOKGPFOI / 2f - OEAGONAHCCA / 2f;
-		JALEODAIDEO *= NIKDOKGPFOI;
-		if (Mathf.Abs(JALEODAIDEO) > num9)
+		float kKPKKIJFFMP = GameUtils.GetCameraSettings().MaxWidthDelta;
+		zoom = ((!lockMinZoom) ? Mathf.Max(zoom, minZoom) : minZoom);
+		float num9 = (_location.width - kKPKKIJFFMP) * zoom / 2f - visibleWidth / 2f;
+		cameraOffsetX *= zoom;
+		if (Mathf.Abs(cameraOffsetX) > num9)
 		{
-			JALEODAIDEO = ((!(JALEODAIDEO < 0f)) ? num9 : (0f - num9));
+			cameraOffsetX = ((!(cameraOffsetX < 0f)) ? num9 : (0f - num9));
 		}
 		List<LocationSelector> hFBEDCGJHLJ = _location.layers;
 		// Eclipse: optional background depth applies only to layers drawn behind
@@ -388,107 +388,107 @@ public class Render
 		bool behindGameLayer = true;
 		foreach (LocationSelector item in hFBEDCGJHLJ)
 		{
-			if (item.BBELALLBKHH())
+			if (item.GetIsGameLayer())
 			{
 				behindGameLayer = false;
 			}
-			if (item.BBELALLBKHH() || item.OGBJCBMNJKC())
+			if (item.GetIsGameLayer() || item.GetScalingEnabled())
 			{
-				item.SetScale(NIKDOKGPFOI);
+				item.SetScale(zoom);
 			}
 			else
 			{
-				float lIAILCGJBDK = KKICFAMLAAK * (1f - NIKDOKGPFOI);
+				float lIAILCGJBDK = verticalOffset * (1f - zoom);
 				item.SetPositionY(lIAILCGJBDK);
 			}
-			float factor = item.JLBBJEELMGG();
+			float factor = item.GetFactor();
 			if (behindGameLayer)
 			{
 				factor = Eclipse.Modding.ModVisuals.BackgroundLayerFactor(factor);
 			}
-			item.SetPositionX(JALEODAIDEO * factor);
-            if (camera != null) _eclipseCameraProjection.ApplyVertical(item, camera.OffsetY, NIKDOKGPFOI, factor);
+			item.SetPositionX(cameraOffsetX * factor);
+            if (camera != null) _eclipseCameraProjection.ApplyVertical(item, camera.OffsetY, zoom, factor);
 		}
-		float dHDMNHCIPEH = JALEODAIDEO - (_location.JMLAKAKDBBL / 2f - DHDMNHCIPEH) * NIKDOKGPFOI;
-		float bGEEALIPKCC = _location.gameLayer.MJNPBMOAFML().transform.localPosition.y - 2f * KKICFAMLAAK * NIKDOKGPFOI - 10f;
+		float dHDMNHCIPEH = cameraOffsetX - (_location.width / 2f - DHDMNHCIPEH) * zoom;
+		float bGEEALIPKCC = _location.gameLayer.GetLayerObject().transform.localPosition.y - 2f * verticalOffset * zoom - 10f;
 		var versusFight = Fight.GetCurrentFight();
 		if (versusFight != null && versusFight.IsLocalVersus)
 		{
 			var player = versusFight.GetPlayerModel();
 			var enemy = versusFight.GetEnemyModel();
-			if (player != null) dHDMNHCIPEH = JALEODAIDEO - (_location.JMLAKAKDBBL / 2f - player.InterpolatedPivot().GetX()) * NIKDOKGPFOI;
+			if (player != null) dHDMNHCIPEH = cameraOffsetX - (_location.width / 2f - player.InterpolatedPivot().GetX()) * zoom;
 			if (enemy != null)
 			{
 				if (_versusPlayerTwoMarker == null)
 					_versusPlayerTwoMarker = new Eclipse.Multiplayer.VersusGroundHighlight(_UnityObject.transform);
-				float x = JALEODAIDEO - (_location.JMLAKAKDBBL / 2f - enemy.InterpolatedPivot().GetX()) * NIKDOKGPFOI;
-				_versusPlayerTwoMarker.Update(x, bGEEALIPKCC, NIKDOKGPFOI);
+				float x = cameraOffsetX - (_location.width / 2f - enemy.InterpolatedPivot().GetX()) * zoom;
+				_versusPlayerTwoMarker.Update(x, bGEEALIPKCC, zoom);
 			}
 		}
-		PCIGCDELJAL(dHDMNHCIPEH, bGEEALIPKCC);
+		UpdateArrowPointer(dHDMNHCIPEH, bGEEALIPKCC);
 	}
 
-	public void PGJEGJKFHND(float FNDOOJNDJDC, float GBCONNBABLL)
+	public void SetRootPosition(float FNDOOJNDJDC, float GBCONNBABLL)
 	{
 		_UnityObject.transform.localPosition = new Vector3(FNDOOJNDJDC, GBCONNBABLL);
 	}
 
-	public void BFLMJIEIIFM(float HIKKOEOGMEK, float NMMCJGHAJBB, float DKJCJBAGKIL, string AJBGJNMLMKE)
+	public void CreateRingOutSprites(float HIKKOEOGMEK, float NMMCJGHAJBB, float DKJCJBAGKIL, string AJBGJNMLMKE)
 	{
-		if (LFPLGAMAGAC == null)
+		if (leftRingOutSprite == null)
 		{
-			ChangingSprite fEMGGEAGICG = new ChangingSprite(ChangingSprite.MHDKGPHKHIE.AtlasBased);
-			fEMGGEAGICG.OMHFEGBJDHP(AJBGJNMLMKE, "Textures/fight/rules/ringout/", DKJCJBAGKIL, 0f, _location.JMLAKAKDBBL / 2f + HIKKOEOGMEK, 7f + 2f * _location.GBNPHCHGKDO);
-			fEMGGEAGICG.SetPosition((0f - _location.JMLAKAKDBBL) / 4f + HIKKOEOGMEK / 2f, 7f + _location.GBNPHCHGKDO - _location.FEIHFIPFNKF / 2f);
-			EPKHDFIIFIL.KGACPCKOHBC(fEMGGEAGICG, 1);
-			LFPLGAMAGAC = fEMGGEAGICG;
+			ChangingSprite fEMGGEAGICG = new ChangingSprite(ChangingSprite.SpriteEffectType.AtlasBased);
+			fEMGGEAGICG.InitAtlasAnimation(AJBGJNMLMKE, "Textures/fight/rules/ringout/", DKJCJBAGKIL, 0f, _location.width / 2f + HIKKOEOGMEK, 7f + 2f * _location.floorHeight);
+			fEMGGEAGICG.SetPosition((0f - _location.width) / 4f + HIKKOEOGMEK / 2f, 7f + _location.floorHeight - _location.height / 2f);
+			additionalDrawsLayer.AddChangingSprite(fEMGGEAGICG, 1);
+			leftRingOutSprite = fEMGGEAGICG;
 		}
-		if (MIBKDGNJKIE == null)
+		if (rightRingOutSprite == null)
 		{
-			ChangingSprite fEMGGEAGICG2 = new ChangingSprite(ChangingSprite.MHDKGPHKHIE.AtlasBased);
-			fEMGGEAGICG2.OMHFEGBJDHP(AJBGJNMLMKE, "Textures/fight/rules/ringout/", DKJCJBAGKIL, 0f, _location.JMLAKAKDBBL / 2f - NMMCJGHAJBB, 7f + 2f * _location.GBNPHCHGKDO);
-			fEMGGEAGICG2.SetPosition(_location.JMLAKAKDBBL / 4f + NMMCJGHAJBB / 2f, 7f + _location.GBNPHCHGKDO - _location.FEIHFIPFNKF / 2f);
-			EPKHDFIIFIL.KGACPCKOHBC(fEMGGEAGICG2, 1);
-			MIBKDGNJKIE = fEMGGEAGICG2;
+			ChangingSprite fEMGGEAGICG2 = new ChangingSprite(ChangingSprite.SpriteEffectType.AtlasBased);
+			fEMGGEAGICG2.InitAtlasAnimation(AJBGJNMLMKE, "Textures/fight/rules/ringout/", DKJCJBAGKIL, 0f, _location.width / 2f - NMMCJGHAJBB, 7f + 2f * _location.floorHeight);
+			fEMGGEAGICG2.SetPosition(_location.width / 4f + NMMCJGHAJBB / 2f, 7f + _location.floorHeight - _location.height / 2f);
+			additionalDrawsLayer.AddChangingSprite(fEMGGEAGICG2, 1);
+			rightRingOutSprite = fEMGGEAGICG2;
 		}
 	}
 
-	public void DKLLNGOMCHN()
+	public void RemoveRingOutSprites()
 	{
-		if (LFPLGAMAGAC != null)
+		if (leftRingOutSprite != null)
 		{
-			EPKHDFIIFIL.AJAEMLEHCCH(LFPLGAMAGAC);
-			LFPLGAMAGAC = null;
+			additionalDrawsLayer.RemoveChangingSprite(leftRingOutSprite);
+			leftRingOutSprite = null;
 		}
-		if (MIBKDGNJKIE != null)
+		if (rightRingOutSprite != null)
 		{
-			EPKHDFIIFIL.AJAEMLEHCCH(MIBKDGNJKIE);
-			MIBKDGNJKIE = null;
+			additionalDrawsLayer.RemoveChangingSprite(rightRingOutSprite);
+			rightRingOutSprite = null;
 		}
 	}
 
 	public void CreatePerkActivationArea(float JMLAKAKDBBL, string KHPKDMGDMAB, string ADONPNOBBDE)
 	{
-		ALCGBGHPDCL = new GameObject("PerkActivationArea").AddComponent<SpriteRenderer>();
-		_PerkActivationAreaInterpolation = ALCGBGHPDCL.gameObject.AddComponent<FightTransformInterpolation>();
-		ALCGBGHPDCL.sprite = ResourcesAndBundles.Load<Sprite>(KHPKDMGDMAB);
-		ALCGBGHPDCL.transform.SetParent(EPKHDFIIFIL.MJNPBMOAFML().transform, false);
-		ALCGBGHPDCL.gameObject.SetActive(false);
-		RectTransform rectTransform = ALCGBGHPDCL.gameObject.AddComponent<RectTransform>();
+		perkActivationArea = new GameObject("PerkActivationArea").AddComponent<SpriteRenderer>();
+		_PerkActivationAreaInterpolation = perkActivationArea.gameObject.AddComponent<FightTransformInterpolation>();
+		perkActivationArea.sprite = ResourcesAndBundles.Load<Sprite>(KHPKDMGDMAB);
+		perkActivationArea.transform.SetParent(additionalDrawsLayer.GetLayerObject().transform, false);
+		perkActivationArea.gameObject.SetActive(false);
+		RectTransform rectTransform = perkActivationArea.gameObject.AddComponent<RectTransform>();
 		Vector2 sizeDelta = rectTransform.sizeDelta;
-		rectTransform.localPosition = new Vector2(0f, sizeDelta.y - _location.GBNPHCHGKDO / 8f - _location.FEIHFIPFNKF / 2f);
+		rectTransform.localPosition = new Vector2(0f, sizeDelta.y - _location.floorHeight / 8f - _location.height / 2f);
 		_PerkActivationAreaInterpolation.Snap(rectTransform.localPosition, rectTransform.localRotation);
-		rectTransform.localScale = new Vector2(JMLAKAKDBBL / sizeDelta.x, _location.FEIHFIPFNKF * 2f / sizeDelta.y);
+		rectTransform.localScale = new Vector2(JMLAKAKDBBL / sizeDelta.x, _location.height * 2f / sizeDelta.y);
 		if (!string.IsNullOrEmpty(ADONPNOBBDE))
 		{
-			IBDNNMHPOOA = new GameObject("PerkActivationAreaIcon").AddComponent<SpriteRenderer>();
-			IBDNNMHPOOA.sprite = ResourcesAndBundles.Load<Sprite>(ADONPNOBBDE);
-			IBDNNMHPOOA.transform.SetParent(ALCGBGHPDCL.transform, false);
-			RectTransform rectTransform2 = IBDNNMHPOOA.gameObject.AddComponent<RectTransform>();
+			perkActivationAreaIcon = new GameObject("PerkActivationAreaIcon").AddComponent<SpriteRenderer>();
+			perkActivationAreaIcon.sprite = ResourcesAndBundles.Load<Sprite>(ADONPNOBBDE);
+			perkActivationAreaIcon.transform.SetParent(perkActivationArea.transform, false);
+			RectTransform rectTransform2 = perkActivationAreaIcon.gameObject.AddComponent<RectTransform>();
 			Vector2 sizeDelta2 = rectTransform2.sizeDelta;
-			rectTransform2.localPosition = new Vector2(0f, sizeDelta.x / 3f - _location.GBNPHCHGKDO / 8f - _location.FEIHFIPFNKF / 2f);
+			rectTransform2.localPosition = new Vector2(0f, sizeDelta.x / 3f - _location.floorHeight / 8f - _location.height / 2f);
 			float x = 0.75f * sizeDelta.x / JMLAKAKDBBL;
-			float y = 0.75f * sizeDelta.y / (_location.FEIHFIPFNKF * 2f);
+			float y = 0.75f * sizeDelta.y / (_location.height * 2f);
 			rectTransform2.localScale = new Vector2(x, y);
 		}
 	}
@@ -496,83 +496,83 @@ public class Render
 	public void UpdatePerkActivationArea(float MGMMDGFPBLP, float KGJALFLDIBG)
 	{
 		KGJALFLDIBG /= 255f;
-		if (ALCGBGHPDCL != null)
+		if (perkActivationArea != null)
 		{
-			bool firstShow = !ALCGBGHPDCL.gameObject.activeSelf;
-			ALCGBGHPDCL.gameObject.SetActive(true);
+			bool firstShow = !perkActivationArea.gameObject.activeSelf;
+			perkActivationArea.gameObject.SetActive(true);
 			Vector3 position = _PerkActivationAreaInterpolation.CurrentPosition;
 			position.x = MGMMDGFPBLP;
 			// Place a newly shown area directly; only later moves interpolate.
 			if (firstShow) _PerkActivationAreaInterpolation.Snap(position, _PerkActivationAreaInterpolation.CurrentRotation);
 			else _PerkActivationAreaInterpolation.Push(position, _PerkActivationAreaInterpolation.CurrentRotation);
-			Color color = ALCGBGHPDCL.color;
+			Color color = perkActivationArea.color;
 			color.a = KGJALFLDIBG;
-			ALCGBGHPDCL.color = color;
-			color = IBDNNMHPOOA.color;
+			perkActivationArea.color = color;
+			color = perkActivationAreaIcon.color;
 			color.a = KGJALFLDIBG;
-			IBDNNMHPOOA.color = color;
+			perkActivationAreaIcon.color = color;
 		}
 	}
 
-	public void GOCNEMPBJIH(float ALCFJHNPDGL)
+	public void FadePerkActivationArea(float ALCFJHNPDGL)
 	{
-		if (ALCGBGHPDCL != null)
+		if (perkActivationArea != null)
 		{
-			float num = ALCGBGHPDCL.color.a - ALCFJHNPDGL / 255f;
+			float num = perkActivationArea.color.a - ALCFJHNPDGL / 255f;
 			if (num < 0f)
 			{
 				num = 0f;
 			}
-			Color color = ALCGBGHPDCL.color;
+			Color color = perkActivationArea.color;
 			color.a = num;
-			ALCGBGHPDCL.color = color;
-			color = IBDNNMHPOOA.color;
+			perkActivationArea.color = color;
+			color = perkActivationAreaIcon.color;
 			color.a = num;
-			IBDNNMHPOOA.color = color;
+			perkActivationAreaIcon.color = color;
 		}
 	}
 
-	public void NPFHCPAAIFJ()
+	public void DestroyPerkActivationArea()
 	{
-		if (ALCGBGHPDCL != null)
+		if (perkActivationArea != null)
 		{
-			UnityEngine.Object.Destroy(IBDNNMHPOOA.gameObject);
-			UnityEngine.Object.Destroy(ALCGBGHPDCL.gameObject);
-			IBDNNMHPOOA = null;
-			ALCGBGHPDCL = null;
+			UnityEngine.Object.Destroy(perkActivationAreaIcon.gameObject);
+			UnityEngine.Object.Destroy(perkActivationArea.gameObject);
+			perkActivationAreaIcon = null;
+			perkActivationArea = null;
 			_PerkActivationAreaInterpolation = null;
 		}
 	}
 
-	public void DBIHABKLFHP(float KGJALFLDIBG)
+	public void SetDarknessAlpha(float KGJALFLDIBG)
 	{
-		if (OEJKNMDNMAP != null)
+		if (darknessOverlay != null)
 		{
-			OEJKNMDNMAP.color = new Color(0f, 0f, 0f, KGJALFLDIBG / 255f);
+			darknessOverlay.color = new Color(0f, 0f, 0f, KGJALFLDIBG / 255f);
 		}
 	}
 
-	public void HKOMIIDELBC()
+	public void CreateDarknessOverlay()
 	{
-		if (OEJKNMDNMAP == null)
+		if (darknessOverlay == null)
 		{
 			Texture2D texture2D = new Texture2D(1, 1);
 			texture2D.SetPixel(0, 0, Color.black);
 			texture2D.Apply();
-			OEJKNMDNMAP = new GameObject("DarknessPicture").AddComponent<SpriteRenderer>();
-			OEJKNMDNMAP.sprite = Sprite.Create(texture2D, Rect.MinMaxRect(0f, 0f, 1f, 1f), new Vector2(0.5f, 0.5f), 1f);
-			OEJKNMDNMAP.color = new Color(1f, 1f, 1f, 0f);
-			OEJKNMDNMAP.transform.localScale = new Vector2(_location.JMLAKAKDBBL * 1.5f, _location.FEIHFIPFNKF * 3f);
-			OEJKNMDNMAP.transform.SetParent(EPKHDFIIFIL.MJNPBMOAFML().transform, false);
+			darknessOverlay = new GameObject("DarknessPicture").AddComponent<SpriteRenderer>();
+			darknessOverlay.sprite = Sprite.Create(texture2D, Rect.MinMaxRect(0f, 0f, 1f, 1f), new Vector2(0.5f, 0.5f), 1f);
+			darknessOverlay.color = new Color(1f, 1f, 1f, 0f);
+			darknessOverlay.transform.localScale = new Vector2(_location.width * 1.5f, _location.height * 3f);
+			darknessOverlay.transform.SetParent(additionalDrawsLayer.GetLayerObject().transform, false);
 		}
 	}
 
-	public void OBICGGFDMLN()
+	public void DestroyDarknessOverlay()
 	{
-		if (OEJKNMDNMAP != null)
+		if (darknessOverlay != null)
 		{
-			UnityEngine.Object.Destroy(OEJKNMDNMAP.gameObject);
-			OEJKNMDNMAP = null;
+			UnityEngine.Object.Destroy(darknessOverlay.gameObject);
+			darknessOverlay = null;
 		}
 	}
 
@@ -588,7 +588,7 @@ public class Render
 		_lightInTheDarknessSprite = Sprite.Create(white, new Rect(0f, 0f, white.width, white.height),
 			new Vector2(0.5f, 0.5f), white.width);
 		_lightInTheDarkness = new GameObject("LightInTheDarkness").AddComponent<SpriteRenderer>();
-		_lightInTheDarkness.transform.SetParent(EPKHDFIIFIL.MJNPBMOAFML().transform, false);
+		_lightInTheDarkness.transform.SetParent(additionalDrawsLayer.GetLayerObject().transform, false);
 		// The later native rule stretches its mask sprite to a 2048-unit square.
 		_lightInTheDarkness.transform.localScale = new Vector3(2048f, 2048f, 1f);
 		_lightInTheDarkness.sprite = _lightInTheDarknessSprite;
@@ -600,7 +600,7 @@ public class Render
 	public void UpdateLightInTheDarkness(Model target, float radius, float shape)
 	{
 		_lightTarget = target; _lightRadius = radius; _lightShape = shape;
-		if (target != null) UpdateLightInTheDarkness(target.PLBNCDCFPML(), radius, shape);
+		if (target != null) UpdateLightInTheDarkness(target.GetPosition(), radius, shape);
 	}
 
 	internal void RefreshLightInTheDarkness()
@@ -615,7 +615,7 @@ public class Render
 		// Fighter coordinates belong to RenderContainer, whose origin is offset
 		// and mirrored inside the game layer. The mask belongs to the foreground
 		// layer, so project through both transforms before writing its UV center.
-		Vector3 fighterWorld = PFELMKLNBMC.MJNPBMOAFML().transform.TransformPoint(
+		Vector3 fighterWorld = Container.GetRootObject().transform.TransformPoint(
 			new Vector3(position.GetX(), position.GetY(), 0f));
 		Vector3 fighterOnMask = _lightInTheDarkness.transform.InverseTransformPoint(fighterWorld);
 		_lightInTheDarknessMaterial.SetVector("_Center", new Vector4(
@@ -636,112 +636,112 @@ public class Render
 		_lightInTheDarknessSprite = null;
 	}
 
-	public ViewerModel FPNKBJPKKGB()
+	public ViewerModel GetViewerModel()
 	{
-		return PFELMKLNBMC.FPNKBJPKKGB();
+		return Container.GetViewerModel();
 	}
 
-	public EffectsContainer GOCPBKNDKMC()
+	public EffectsContainer GetBackgroundEffects()
 	{
-		return PFELMKLNBMC.GOCPBKNDKMC();
+		return Container.GetBackgroundEffects();
 	}
 
-	public EffectsContainer GDBMKMFFOCF()
+	public EffectsContainer GetForegroundEffects()
 	{
-		return PFELMKLNBMC.GDBMKMFFOCF();
+		return Container.GetForegroundEffects();
 	}
 
 	public void UpdateAdditionalDrawsLayer()
 	{
 		SyncAdditionalDrawsLayerTransform();
-		EPKHDFIIFIL.Render();
+		additionalDrawsLayer.Render();
 	}
 
 	public void SyncAdditionalDrawsLayerTransform()
 	{
-		EPKHDFIIFIL.MJNPBMOAFML().transform.localScale = _location.gameLayer.MJNPBMOAFML().transform.localScale;
-		Vector3 localPosition = _location.gameLayer.MJNPBMOAFML().transform.localPosition;
-		localPosition.z = EPKHDFIIFIL.AOCHPHIHPIA;
-		EPKHDFIIFIL.MJNPBMOAFML().transform.localPosition = localPosition;
+		additionalDrawsLayer.GetLayerObject().transform.localScale = _location.gameLayer.GetLayerObject().transform.localScale;
+		Vector3 localPosition = _location.gameLayer.GetLayerObject().transform.localPosition;
+		localPosition.z = additionalDrawsLayer.layerDepth;
+		additionalDrawsLayer.GetLayerObject().transform.localPosition = localPosition;
 	}
 
-	public void CDDKOOMODHG(Model ACENLMONNPA)
+	public void AttachModelEffects(Model ACENLMONNPA)
 	{
-		PFELMKLNBMC.CDDKOOMODHG(ACENLMONNPA);
+		Container.AttachModelEffects(ACENLMONNPA);
 	}
 
-	public void NAKJKHLEAEB(Model ACENLMONNPA)
+	public void DetachModelEffects(Model ACENLMONNPA)
 	{
-		PFELMKLNBMC.NAKJKHLEAEB(ACENLMONNPA);
+		Container.DetachModelEffects(ACENLMONNPA);
 	}
 
-	public void IFDHBLGKEHN()
+	public void UpdateHitEffect()
 	{
-		if (null != PHKBOGAICCI && !PHKBOGAICCI.get_IsWork())
+		if (null != hitAnimation && !hitAnimation.get_IsWork())
 		{
-			KPBKKJLLKIE.SetActive(false);
-			PHKBOGAICCI = null;
+			hitEffectObject.SetActive(false);
+			hitAnimation = null;
 		}
 	}
 
-	public void JPPGJBHLAGC()
+	public void UpdateEffects()
 	{
-		if (PFELMKLNBMC != null)
+		if (Container != null)
 		{
-			PFELMKLNBMC.JPPGJBHLAGC();
+			Container.UpdateEffects();
 		}
 	}
 
-	public float KMMOLDBJBIG()
+	public float CalculateAutoZoom()
 	{
-		float distance = PresentationPass ? PFELMKLNBMC.FPNKBJPKKGB().InterpolatedFighterDistance() : PFELMKLNBMC.FPNKBJPKKGB().LGGKNLPOCIH();
-		return Mathf.Min(OEAGONAHCCA / (distance + 300f), 1f);
+		float distance = PresentationPass ? Container.GetViewerModel().InterpolatedFighterDistance() : Container.GetViewerModel().GetFighterDistance();
+		return Mathf.Min(visibleWidth / (distance + 300f), 1f);
 	}
 
-	public float KGCPMIDNKKI()
+	public float GetMaxZoom()
 	{
 		return 1f;
 	}
 
-	private void PIENHGGANDI()
+	private void CreateArrow()
 	{
-		EMKDAHLGACK = 0;
-		EAJGDJLHJFD = new GameObject("Arrow").AddComponent<SpriteRenderer>();
-		EAJGDJLHJFD.flipY = true;
-		EAJGDJLHJFD.sprite = ResourcesAndBundles.Load<Sprite>("Textures/fight/pointers/arrow");
-		EAJGDJLHJFD.transform.localScale = new Vector3(0.5f, -0.5f, 1f);
-		EAJGDJLHJFD.transform.SetParent(_UnityObject.transform, false);
+		arrowPulseFrame = 0;
+		pointerArrow = new GameObject("Arrow").AddComponent<SpriteRenderer>();
+		pointerArrow.flipY = true;
+		pointerArrow.sprite = ResourcesAndBundles.Load<Sprite>("Textures/fight/pointers/arrow");
+		pointerArrow.transform.localScale = new Vector3(0.5f, -0.5f, 1f);
+		pointerArrow.transform.SetParent(_UnityObject.transform, false);
 	}
 
-	private void CCEDPHBFFKK()
+	private void CreateHitEffectObjects()
 	{
 		string text = "textures/effects/fight/hit_blade";
-		KPBKKJLLKIE = new GameObject("ConteynerHit");
-		KPBKKJLLKIE.AddComponent<CocosAnimation>();
-		KPBKKJLLKIE.transform.localScale = new Vector3(0.7f, 1f, 1f);
-		GKLOAPHPBPB = new GameObject("HitLayer");
-		GKLOAPHPBPB.transform.localPosition = PFELMKLNBMC.MJNPBMOAFML().transform.localPosition;
-		GKLOAPHPBPB.transform.localScale = PFELMKLNBMC.MJNPBMOAFML().transform.localScale;
-		GKLOAPHPBPB.transform.SetParent(EPKHDFIIFIL.MJNPBMOAFML().transform, false);
-		KPBKKJLLKIE.transform.SetParent(GKLOAPHPBPB.transform, false);
+		hitEffectObject = new GameObject("ConteynerHit");
+		hitEffectObject.AddComponent<CocosAnimation>();
+		hitEffectObject.transform.localScale = new Vector3(0.7f, 1f, 1f);
+		hitLayer = new GameObject("HitLayer");
+		hitLayer.transform.localPosition = Container.GetRootObject().transform.localPosition;
+		hitLayer.transform.localScale = Container.GetRootObject().transform.localScale;
+		hitLayer.transform.SetParent(additionalDrawsLayer.GetLayerObject().transform, false);
+		hitEffectObject.transform.SetParent(hitLayer.transform, false);
 	}
 
-	private void MEHIFDPJGDO()
+	private void CreateRenderContainer()
 	{
-		PFELMKLNBMC = new RenderContainer();
-		PFELMKLNBMC.Init(_location);
+		Container = new RenderContainer();
+		Container.Init(_location);
 		foreach (LocationSelector item in _location.layers)
 		{
-			item.MJNPBMOAFML().transform.SetParent(_UnityObject.transform, false);
+			item.GetLayerObject().transform.SetParent(_UnityObject.transform, false);
 		}
-		EPKHDFIIFIL = new LocationSelector(_location.layers[_location.layers.Count - 1].AOCHPHIHPIA + -3);
-		EPKHDFIIFIL.MJNPBMOAFML().transform.SetParent(_UnityObject.transform, false);
+		additionalDrawsLayer = new LocationSelector(_location.layers[_location.layers.Count - 1].layerDepth + -3);
+		additionalDrawsLayer.GetLayerObject().transform.SetParent(_UnityObject.transform, false);
 		UpdateAdditionalDrawsLayer();
 	}
 
 	public void Clear()
 	{
 		RemoveLightInTheDarkness();
-		PFELMKLNBMC.Clear();
+		Container.Clear();
 	}
 }

@@ -35,9 +35,9 @@ namespace Nekki.SF2.GUI.Shop
 				ParameterScrollItem component = gameObject.GetComponent<ParameterScrollItem>();
 				if (component != null)
 				{
-					component.set_AtlasName(LMABGLLMHKH);
+					component.set_AtlasName(iconAtlasPrefix);
 					bool eIAKNKDEEKA = false;
-					component.Init(string.Empty, item.NHKMCLPOMFK, item.EAIDMBHDPPO, item.EAIDMBHDPPO, eIAKNKDEEKA, item.HCCKLLOEPJN);
+					component.Init(string.Empty, item.ImageName, item.BarValue, item.BarValue, eIAKNKDEEKA, item.BarScale);
 					component.set_MinHeight(100f);
 					component.interactable = false;
 					_items.Add(component);
@@ -54,19 +54,19 @@ namespace Nekki.SF2.GUI.Shop
 					}
 					gameObject2.transform.SetParent(component.transform, false);
 					gameObject2.transform.SetAsLastSibling();
-					ICHIFBFILGJ(fPDGFGEEJEA, item);
+					AddTouchListener(fPDGFGEEJEA, item);
 				}
 			}
 		}
 
-		private void ICHIFBFILGJ(TouchHandler FPDGFGEEJEA, PerkInfoItem AEFFHJGMNFI)
+		private void AddTouchListener(TouchHandler FPDGFGEEJEA, PerkInfoItem AEFFHJGMNFI)
 		{
 			if (FPDGFGEEJEA != null)
 			{
 				FPDGFGEEJEA.get_OnTouch().AddListener(() =>
 				{
 					Vector3 position = FPDGFGEEJEA.transform.position;
-					onPerksClick.Invoke(AEFFHJGMNFI, position, PDMOLDKOACF, FPDGFGEEJEA.gameObject);
+					onPerksClick.Invoke(AEFFHJGMNFI, position, hintOffset, FPDGFGEEJEA.gameObject);
 				});
 			}
 		}

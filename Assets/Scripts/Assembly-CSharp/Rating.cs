@@ -3,32 +3,32 @@ using System.Xml;
 
 public class Rating
 {
-	public string IHJJBIDMEMB;
+	public string player;
 
-	public string KFMJMBANIGF;
+	public string damageType;
 
-	public string GBOKABKLCFM;
+	public string defenseType;
 
 	public float Multiplier;
 
-	public string BIOIOGIBCOE;
+	public string enemyAttribute;
 
 	public Rating()
 	{
-		IHJJBIDMEMB = string.Empty;
-		KFMJMBANIGF = string.Empty;
-		GBOKABKLCFM = string.Empty;
+		player = string.Empty;
+		damageType = string.Empty;
+		defenseType = string.Empty;
 		Multiplier = 0f;
-		BIOIOGIBCOE = string.Empty;
+		enemyAttribute = string.Empty;
 	}
 
 	public Rating(Rating NOLFMPDGCOC)
 	{
-		IHJJBIDMEMB = NOLFMPDGCOC.IHJJBIDMEMB;
-		KFMJMBANIGF = NOLFMPDGCOC.KFMJMBANIGF;
-		GBOKABKLCFM = NOLFMPDGCOC.GBOKABKLCFM;
+		player = NOLFMPDGCOC.player;
+		damageType = NOLFMPDGCOC.damageType;
+		defenseType = NOLFMPDGCOC.defenseType;
 		Multiplier = NOLFMPDGCOC.Multiplier;
-		BIOIOGIBCOE = NOLFMPDGCOC.BIOIOGIBCOE;
+		enemyAttribute = NOLFMPDGCOC.enemyAttribute;
 	}
 
 	public void Parse(XmlNode node, PerkSetAttributes CJILONFAJIK = null)
@@ -46,9 +46,9 @@ public class Rating
 				}
 			}
 		}
-		IHJJBIDMEMB = XmlUtils.ParseString(node.Attributes["Player"], "Me");
-		KFMJMBANIGF = XmlUtils.ParseString(node.Attributes["Damage"]);
-		GBOKABKLCFM = XmlUtils.ParseString(node.Attributes["Defense"]);
+		player = XmlUtils.ParseString(node.Attributes["Player"], "Me");
+		damageType = XmlUtils.ParseString(node.Attributes["Damage"]);
+		defenseType = XmlUtils.ParseString(node.Attributes["Defense"]);
 		try
 		{
 			Multiplier = XmlUtils.ParseFloat(node.Attributes["Multiplier"]);
@@ -57,6 +57,6 @@ public class Rating
 		{
 			int num = 0;
 		}
-		BIOIOGIBCOE = XmlUtils.ParseString(node.Attributes["EnemyAttribute"]);
+		enemyAttribute = XmlUtils.ParseString(node.Attributes["EnemyAttribute"]);
 	}
 }

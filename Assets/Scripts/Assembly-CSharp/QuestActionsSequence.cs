@@ -3,45 +3,45 @@ using System.Collections.Generic;
 
 public class QuestActionsSequence : global::EventDispatcher<object>
 {
-	public enum EBMFHMPKBCI
+	public enum SequenceEvent
 	{
 		onRun = 0,
 		onComplete = 1
 	}
 
-	private Action<object> JEDPEBLEGDM;
+	private Action<object> actionCompleteHandler;
 
-	public int JJIHOMLLAOL;
+	public int currentIndex;
 
-	public QuestParameters GFIHPBCEEOB;
+	public QuestParameters parameters;
 
-	public List<QuestAction> AFENHJFICNN;
+	public List<QuestAction> actions;
 
 	public QuestActionsSequence()
 	{
-		JEDPEBLEGDM = OnActionComplete;
-		JJIHOMLLAOL = 0;
-		GFIHPBCEEOB = null;
-		AFENHJFICNN = new List<QuestAction>();
+		actionCompleteHandler = OnActionComplete;
+		currentIndex = 0;
+		parameters = null;
+		actions = new List<QuestAction>();
 	}
 
-	public void NLJLHHNPCAO(QuestAction IBODMPMJELJ)
+	public void AddAction(QuestAction IBODMPMJELJ)
 	{
-		AFENHJFICNN.Add(IBODMPMJELJ);
+		actions.Add(IBODMPMJELJ);
 	}
 
-	public void DEJMHFMLKIC(QuestParameters GFIHPBCEEOB)
+	public void Run(QuestParameters GFIHPBCEEOB)
 	{
 		CallEvent(0, GFIHPBCEEOB);
-		this.GFIHPBCEEOB = GFIHPBCEEOB;
-		int count = AFENHJFICNN.Count;
+		this.parameters = GFIHPBCEEOB;
+		int count = actions.Count;
 		if (count > 0)
 		{
-			if (JJIHOMLLAOL < count)
+			if (currentIndex < count)
 			{
-				QuestAction mBAAKHELFKL = AFENHJFICNN[JJIHOMLLAOL];
-				mBAAKHELFKL.AddEventListener(1, JEDPEBLEGDM);
-				mBAAKHELFKL.DEJMHFMLKIC(GFIHPBCEEOB);
+				QuestAction mBAAKHELFKL = actions[currentIndex];
+				mBAAKHELFKL.AddEventListener(1, actionCompleteHandler);
+				mBAAKHELFKL.Execute(GFIHPBCEEOB);
 			}
 		}
 		else
@@ -54,27 +54,27 @@ public class QuestActionsSequence : global::EventDispatcher<object>
 	{
 		if (data != null)
 		{
-			GFIHPBCEEOB = (QuestParameters)data;
+			parameters = (QuestParameters)data;
 		}
-		QuestAction mBAAKHELFKL = AFENHJFICNN[JJIHOMLLAOL];
-		mBAAKHELFKL.RemoveEventListener(1, JEDPEBLEGDM);
-		JJIHOMLLAOL++;
-		if (JJIHOMLLAOL < AFENHJFICNN.Count)
+		QuestAction mBAAKHELFKL = actions[currentIndex];
+		mBAAKHELFKL.RemoveEventListener(1, actionCompleteHandler);
+		currentIndex++;
+		if (currentIndex < actions.Count)
 		{
-			DEJMHFMLKIC(GFIHPBCEEOB);
+			Run(parameters);
 		}
 		else
 		{
-			CallEvent(1, GFIHPBCEEOB);
+			CallEvent(1, parameters);
 		}
 	}
 
-	public void FHPKJMMLIEG()
+	public void Reset()
 	{
-		JJIHOMLLAOL = 0;
-		foreach (QuestAction item in AFENHJFICNN)
+		currentIndex = 0;
+		foreach (QuestAction item in actions)
 		{
-			item.GKFMJKAAJCA();
+			item.ResetSequences();
 		}
 	}
 }

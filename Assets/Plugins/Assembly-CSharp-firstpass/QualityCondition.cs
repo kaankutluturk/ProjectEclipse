@@ -4,12 +4,12 @@ using System.Xml;
 
 public class QualityCondition
 {
-	private readonly List<ComparisonExpression> PCLCNLJDPOK = new List<ComparisonExpression>();
+	private readonly List<ComparisonExpression> expressions = new List<ComparisonExpression>();
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private string HKGHEJDKCPI;
+	private string name;
 
-	public string MENAJEAJJBE
+	public string ConditionName
 	{
 		get
 		{
@@ -29,25 +29,25 @@ public class QualityCondition
 		}
 		for (int i = 0; i < node.ChildNodes.Count; i++)
 		{
-			PCLCNLJDPOK.Add(new ComparisonExpression(node.ChildNodes[i]));
+			expressions.Add(new ComparisonExpression(node.ChildNodes[i]));
 		}
 	}
 
 	public string get_Name()
 	{
-		return HKGHEJDKCPI;
+		return name;
 	}
 
 	private void set_Name(string value)
 	{
-		HKGHEJDKCPI = value;
+		name = value;
 	}
 
-	public bool CEHMBJOALEM()
+	public bool IsSatisfied()
 	{
-		for (int i = 0; i < PCLCNLJDPOK.Count; i++)
+		for (int i = 0; i < expressions.Count; i++)
 		{
-			if (!PCLCNLJDPOK[i].Compare())
+			if (!expressions[i].Compare())
 			{
 				return false;
 			}

@@ -48,7 +48,7 @@ public static class ArcDartUnity
     }
     static object Field(object value, string name) => value.GetType().GetField(name, Hidden | BindingFlags.Public).GetValue(value);
     static void Check(bool value, string message) { checks++; if (!value) throw new Exception(message); }
-    static Model[] Darts(Fight fight) => ((IEnumerable)Field(fight, "LNDLFINJHDB")).Cast<Model>().Concat(((IEnumerable)Field(fight, "HCPGFOCGDAA")).Cast<Model>()).Where(m => m.get_Name() == Actor).ToArray();
+    static Model[] Darts(Fight fight) => ((IEnumerable)Field(fight, "ActiveModels")).Cast<Model>().Concat(((IEnumerable)Field(fight, "pendingModels")).Cast<Model>()).Where(m => m.get_Name() == Actor).ToArray();
     static void Next() { phase++; phaseAt = EditorApplication.timeSinceStartup; }
     static void Click()
     {
@@ -72,9 +72,9 @@ public static class ArcDartUnity
                 typeof(Eclipse.UI.TitleScreen).GetMethod("BeginCampaign", Hidden).Invoke(title, null);
                 var directory = SF2Paths.GetUserDataDirectory();
                 Check(Eclipse.Saves.CampaignSaveSession.PreviewDirectory == null && directory.StartsWith(Application.persistentDataPath, StringComparison.OrdinalIgnoreCase) && Application.persistentDataPath.Contains("ArcDartUnity-"), "Profile not isolated");
-                var profile = XmlUtils.OpenXMLDocument(SF2Paths.KKIDGPBOBNI(), "usersDefault.xml", XmlUtils.EBLFEPIOMOL.Normal, true, XmlCryptoUtils.NNLGALNDJCL());
+                var profile = XmlUtils.OpenXMLDocument(SF2Paths.GetGameDataPath(), "usersDefault.xml", XmlUtils.XmlSourceMode.Normal, true, XmlCryptoUtils.GetIsEncryptionEnabled());
                 ((System.Xml.XmlElement)profile.SelectSingleNode("/Root/Warriors/Warrior[@ID='1']")).SetAttribute("Tutorial", "END");
-                Directory.CreateDirectory(directory); XmlUtils.ONLDJNLKKAL(profile, Path.Combine(directory, Constants.OJMIJINKBPJ).Replace('\\', '/'));
+                Directory.CreateDirectory(directory); XmlUtils.SaveDocumentWithHash(profile, Path.Combine(directory, Constants.UsersFileName).Replace('\\', '/'));
                 campaign = true; return;
             }
             if (!entered)
@@ -83,14 +83,14 @@ public static class ArcDartUnity
                 var screen = Module.GetInstance().GetCurrentScreenType(); if (screen != ScreenType.ModuleDojo && screen != ScreenType.ModuleMap) return;
                 Check(!ModRuntime.Host.HasErrors, ModRuntime.Host.FormatReport()); Check(!ModRuntime.Scripts.HasErrors, "Startup script errors");
                 Check(ModRuntime.Host.EnabledMods.Count(m => m.Id.Value != "core") == 1 && ModRuntime.Host.EnabledMods.Any(m => m.Id.Value == "example.arc-dart"), "Fixture must enable only Arc Dart");
-                var encounter = ListSF.CHMCKGCDGCM(new FightIDS(ModRuntime.Scripts.Content.RuntimeFightId(DefinitionId.Parse("core:fights/zone_1/tournament/3"))));
+                var encounter = ListSF.GetFightById(new FightIDS(ModRuntime.Scripts.Content.RuntimeFightId(DefinitionId.Parse("core:fights/zone_1/tournament/3"))));
                 Check(encounter != null, "Core encounter missing"); entered = GameUtils.StartFight(encounter, false, null, true, false); return;
             }
             var fight = Fight.GetCurrentFight(); if (fight == null || fight.get_FightTimeInFrames() < 100) return;
             var player = fight.GetPlayerModel(); var enemy = fight.GetEnemyModel(); if (player == null || enemy == null) return;
             player.Parameters.UserControlled = false; enemy.Parameters.AiControlled = false;
             var frame = fight.get_FightTimeInFrames(); var elapsed = EditorApplication.timeSinceStartup - phaseAt;
-            if (phase == 3 && Darts(fight).Contains(dart)) travel = Math.Max(travel, Math.Abs(dart.PLBNCDCFPML().GetX() - launchX));
+            if (phase == 3 && Darts(fight).Contains(dart)) travel = Math.Max(travel, Math.Abs(dart.GetPosition().GetX() - launchX));
             switch (phase)
             {
                 case 0:
@@ -99,51 +99,51 @@ public static class ArcDartUnity
                     Check(surface.Read("status").Text == "Arc Dart ready", "Initial shipped HUD");
                     Check(player.Parameters.Ranged?.Name == "NoRanged", "Scenario accidentally relies on equipped ranged item: " + player.Parameters.Ranged?.Name);
                     Check(player.GetAvailableAnimations().Any(m => m.Name == "example.arc-dart:moves/cast"), "Owned cast not available");
-                    var pos = player.PLBNCDCFPML(); var other = enemy.PLBNCDCFPML();
+                    var pos = player.GetPosition(); var other = enemy.GetPosition();
                     enemy.ShiftModelPosition(new Vector3f(pos.GetX() + 500 - other.GetX(), 0, 0), true);
-                    before = enemy.KKMCHCNOHMB(); castFrame = frame; Click();
+                    before = enemy.GetLife(); castFrame = frame; Click();
                     Check(Darts(fight).Length == 0, "Button spawned recursively"); Next(); break;
                 case 1:
                     var children = Darts(fight); if (children.Length == 0 || children[0].GetCurrentAnimation()?.Name != Flight) return;
-                    dart = children.Single(); launchX = dart.PLBNCDCFPML().GetX();
+                    dart = children.Single(); launchX = dart.GetPosition().GetX();
                     Check(dart is WeaponModel && dart.Parameters.Skeleton.SubType == "SkeletonMissile" && dart.Parameters.Weapon.SubType == "Shuriken", "Wrong native child/rig/item");
                     Check(dart.Parameters.Weapon.Name == "RANGED_C2_Z2_MONK_SHURIKEN", "Typed item not projected into child Weapon slot");
                     Check(dart.GetRenderObject().activeInHierarchy, "Projectile render object inactive");
                     Check(surface.Read("counts").Text == "Flights: 1 | Hits: 0", "Flight notification missing");
                     Check(surface.Read("status").Text.Contains("started") && !surface.Read("cast").Enabled, "Applied receipt/cooldown missing");
-                    Check(Math.Abs(enemy.KKMCHCNOHMB() - before) < .00001, "Damage occurred before projectile travel");
+                    Check(Math.Abs(enemy.GetLife() - before) < .00001, "Damage occurred before projectile travel");
                     fight.SetPaused(true); pauseFrame = frame; pauseX = launchX;
                     new GameObject("Arc Dart capture").AddComponent<ArcDartCapture>(); Next(); break;
                 case 2:
                     if (elapsed < .5 || !captured) return;
-                    Check(fight.get_FightTimeInFrames() == pauseFrame && Math.Abs(dart.PLBNCDCFPML().GetX() - pauseX) < .00001, "Paused projectile moved");
-                    Check(Math.Abs(enemy.KKMCHCNOHMB() - before) < .00001 && Darts(fight).Length == 1, "Pause damaged enemy or removed child");
+                    Check(fight.get_FightTimeInFrames() == pauseFrame && Math.Abs(dart.GetPosition().GetX() - pauseX) < .00001, "Paused projectile moved");
+                    Check(Math.Abs(enemy.GetLife() - before) < .00001 && Darts(fight).Length == 1, "Pause damaged enemy or removed child");
                     fight.SetPaused(false); Next(); break;
                 case 3:
                     if (Darts(fight).Length > 0) return;
-                    Check(enemy.KKMCHCNOHMB() < before, "Native flight made no contact damage");
+                    Check(enemy.GetLife() < before, "Native flight made no contact damage");
                     Check(surface.Read("counts").Text == "Flights: 1 | Hits: 1", "Child damage not attributed to main fighter: " + surface.Read("counts").Text);
                     Check(travel > 100, "Projectile never travelled");
-                    Debug.Log("[ArcDartUnity] Native hit: " + before + " -> " + enemy.KKMCHCNOHMB() + "; sampled travel=" + travel); Next(); break;
+                    Debug.Log("[ArcDartUnity] Native hit: " + before + " -> " + enemy.GetLife() + "; sampled travel=" + travel); Next(); break;
                 case 4:
                     if (!surface.Read("cast").Enabled) return;
                     Check(frame >= castFrame + 181 && surface.Read("status").Text == "Arc Dart ready", "Cooldown elapsed too soon");
                     // Miss intentionally: the opponent is behind the cast-facing path
                     // after launch. Expiry must remove the child without contact.
-                    pos = player.PLBNCDCFPML(); other = enemy.PLBNCDCFPML();
+                    pos = player.GetPosition(); other = enemy.GetPosition();
                     enemy.ShiftModelPosition(new Vector3f(pos.GetX() + 500 - other.GetX(), 0, 0), true);
                     Click(); Next(); break;
                 case 5:
                     children = Darts(fight); if (children.Length == 0 || children[0].GetCurrentAnimation()?.Name != Flight) return;
-                    dart = children.Single(); before = enemy.KKMCHCNOHMB();
+                    dart = children.Single(); before = enemy.GetLife();
                     enemy.ShiftModelPosition(new Vector3f(-1500, 0, 0), true);
                     castFrame = frame; Next(); break;
                 case 6:
                     if (Darts(fight).Length > 0) return;
                     Check(frame > castFrame && frame - castFrame < 90, "Missed projectile expiry unbounded");
-                    Check(Math.Abs(enemy.KKMCHCNOHMB() - before) < .00001, "Miss caused health damage");
+                    Check(Math.Abs(enemy.GetLife() - before) < .00001, "Miss caused health damage");
                     Check(surface.Read("counts").Text == "Flights: 2 | Hits: 1", "Miss counted as hit");
-                    typeof(Fight).GetMethod("HCNDAFDHACI", Hidden).Invoke(fight, new object[] { GameOverTypes.GAME_OVER_SURRENDER });
+                    typeof(Fight).GetMethod("AbortFight", Hidden).Invoke(fight, new object[] { GameOverTypes.GAME_OVER_SURRENDER });
                     Check(surface.IsClosed && Darts(fight).Length == 0, "Surrender retained HUD/child"); Next(); break;
                 case 7:
                     if (elapsed < .2) return;

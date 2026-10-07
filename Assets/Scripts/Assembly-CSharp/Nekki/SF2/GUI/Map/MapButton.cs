@@ -14,9 +14,9 @@ namespace Nekki.SF2.GUI.Map
 		private TimerLabel _timer;
 
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		private MapButtonInfo PJHLKGGNMDI;
+		private MapButtonInfo mapButtonInfo;
 
-		public MapButtonInfo AJBOPGADJHA
+		public MapButtonInfo ButtonInfo
 		{
 			get
 			{
@@ -24,28 +24,28 @@ namespace Nekki.SF2.GUI.Map
 			}
 			protected set
 			{
-				NPPCOELPONA(value);
+				SetMapButtonInfo(value);
 			}
 		}
 
 		public MapButtonInfo get_MapButtonInfo()
 		{
-			return PJHLKGGNMDI;
+			return mapButtonInfo;
 		}
 
-		protected void NPPCOELPONA(MapButtonInfo value)
+		protected void SetMapButtonInfo(MapButtonInfo value)
 		{
-			PJHLKGGNMDI = value;
+			mapButtonInfo = value;
 		}
 
 		public void Init(MapButtonInfo DJDNMAOEFBD)
 		{
-			NPPCOELPONA(DJDNMAOEFBD);
-			ODNDDPOKNNF();
-			OKDDLEGFLAH();
+			SetMapButtonInfo(DJDNMAOEFBD);
+			ApplyButtonLayout();
+			UpdateTimer();
 		}
 
-		private void ODNDDPOKNNF()
+		private void ApplyButtonLayout()
 		{
 			if (get_MapButtonInfo() == null)
 			{
@@ -53,11 +53,11 @@ namespace Nekki.SF2.GUI.Map
 			}
 			if (_image != null)
 			{
-				if (!string.IsNullOrEmpty(get_MapButtonInfo().HFBFPBGLBOM))
+				if (!string.IsNullOrEmpty(get_MapButtonInfo().AtlasName))
 				{
-				_image.set_TexturePath(get_MapButtonInfo().HFBFPBGLBOM);
+				_image.set_TexturePath(get_MapButtonInfo().AtlasName);
 			}
-			_image.set_SpriteName(get_MapButtonInfo().NHKMCLPOMFK);
+			_image.set_SpriteName(get_MapButtonInfo().ImageName);
 			_image.SetNativeSize();
 			if (get_MapButtonInfo().Name == "EclipseModeOn" || get_MapButtonInfo().Name == "EclipseModeOff")
 			{
@@ -77,19 +77,19 @@ namespace Nekki.SF2.GUI.Map
 			{
 				rectTransform.anchorMin = new Vector2(get_MapButtonInfo().AnchorMinX, 0.5f);
 				rectTransform.anchorMax = new Vector2(get_MapButtonInfo().AnchorMaxX, 0.5f);
-				rectTransform.anchoredPosition = get_MapButtonInfo().BIJFFONMDBC;
+				rectTransform.anchoredPosition = get_MapButtonInfo().Position;
 			}
 			else
 			{
-				base.transform.localPosition = get_MapButtonInfo().BIJFFONMDBC;
+				base.transform.localPosition = get_MapButtonInfo().Position;
 			}
 		}
 
-		private void OKDDLEGFLAH()
+		private void UpdateTimer()
 		{
 			if (get_MapButtonInfo() != null && !(_timer == null))
 			{
-				RosterTimer fPNMILOHPMB = ((!string.IsNullOrEmpty(get_MapButtonInfo().Timer)) ? ListSF.CCDKHLAMKKO().AEMFLPNDDKL().PPCMACMLHCA(get_MapButtonInfo().Timer) : null);
+				RosterTimer fPNMILOHPMB = ((!string.IsNullOrEmpty(get_MapButtonInfo().Timer)) ? ListSF.GetRoster().GetTimerContainer().FindTimer(get_MapButtonInfo().Timer) : null);
 				bool flag = fPNMILOHPMB != null;
 				if (flag)
 				{
@@ -101,8 +101,8 @@ namespace Nekki.SF2.GUI.Map
 					_timer.IsDays = true;
 					_timer.IsDaysZero = false;
 					_timer.SegmentsDate = 2;
-					long num = fPNMILOHPMB.CMIABOOJOEN();
-					_timer.set_CurrentTime(num - ListSF.IDMJOMOMDOJ());
+					long num = fPNMILOHPMB.GetEndTimeSeconds();
+					_timer.set_CurrentTime(num - ListSF.GetCurrentTime());
 				}
 				_timer.gameObject.SetActive(flag);
 			}
@@ -118,16 +118,16 @@ namespace Nekki.SF2.GUI.Map
 		{
 			if (get_MapButtonInfo() != null)
 			{
-				QuestParameters hHKLFIIBIFF = ListSF.GetInstance().BNMLDPNCMLB();
-				hHKLFIIBIFF.GCKANEECDHE = get_MapButtonInfo().Name;
-				bool handled = ListSF.GetInstance().FFBAJNGHGGD(QuestEvent.PMDPDMFLCIJ.QUEST_EVENT_MAP_BUTTON_PRESS);
+				QuestParameters hHKLFIIBIFF = ListSF.GetInstance().GetQuestParameters();
+				hHKLFIIBIFF.buttonName = get_MapButtonInfo().Name;
+				bool handled = ListSF.GetInstance().RaiseQuestEvent(QuestEvent.QuestEventType.QUEST_EVENT_MAP_BUTTON_PRESS);
 				if (get_MapButtonInfo().Name == "EclipseModeOn" || get_MapButtonInfo().Name == "EclipseModeOff")
 				{
 					UnityEngine.Debug.Log("[Eclipse] button=" + get_MapButtonInfo().Name + " questHandled=" + handled);
 				}
 				if (handled)
 				{
-					ListSF.GetInstance().MHHNIPBJNAD();
+					ListSF.GetInstance().RunQuestActions();
 				}
 				return handled;
 			}

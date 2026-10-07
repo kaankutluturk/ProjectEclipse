@@ -28,34 +28,34 @@ public class CocosAnimationData
 
 	public class SpriteFrameCocos
 	{
-		private class PJGMEEGMPFF
+		private class FrameRect
 		{
-			public int NPKMJMCLDAH;
+			public int X;
 
-			public int IHAHIEHHNCG;
+			public int Y;
 
-			public int BLFBMIOIPOI;
+			public int Width;
 
-			public int CCIPIPKPHGB;
+			public int Height;
 		}
 
 		private string _Name;
 
 		private Sprite _Sprite;
 
-		private PJGMEEGMPFF CGAMKFFFCMO;
+		private FrameRect _frameRect;
 
-		private Vector2 KBOIHCPHFJL;
+		private Vector2 _offset;
 
 		private bool _Rotated;
 
-		private Vector2 MHNOMBDDNLE;
+		private Vector2 _sourceSize;
 
-		public Sprite MNMCAEJGDGG
+		public Sprite FrameSprite
 		{
 			get
 			{
-				return HJADPLOLOBH();
+				return GetSprite();
 			}
 			set
 			{
@@ -63,19 +63,19 @@ public class CocosAnimationData
 			}
 		}
 
-		public Vector2 AMAEBLJHMGG
+		public Vector2 FrameOffset
 		{
 			get
 			{
-				return LMJCBAFGAFL();
+				return GetOffset();
 			}
 		}
 
-		public bool GHEODOHGKPG
+		public bool IsRotated
 		{
 			get
 			{
-				return KGFGOFBMCCG();
+				return GetRotated();
 			}
 			set
 			{
@@ -83,11 +83,11 @@ public class CocosAnimationData
 			}
 		}
 
-		public Vector2 PLCPNLBCPCC
+		public Vector2 SourceSize
 		{
 			get
 			{
-				return PFIECJPOFFB();
+				return GetSourceSize();
 			}
 		}
 
@@ -101,7 +101,7 @@ public class CocosAnimationData
 			return _Name;
 		}
 
-		public Sprite HJADPLOLOBH()
+		public Sprite GetSprite()
 		{
 			return _Sprite;
 		}
@@ -116,21 +116,21 @@ public class CocosAnimationData
 			int num = LIAILCGJBDK.IndexOf('}');
 			string[] array = LIAILCGJBDK.Substring(2, num - 2).Split(',');
 			string[] array2 = LIAILCGJBDK.Substring(num + 3, LIAILCGJBDK.Length - (num + 5)).Split(',');
-			CGAMKFFFCMO = new PJGMEEGMPFF();
-			CGAMKFFFCMO.NPKMJMCLDAH = int.Parse(array[0]);
-			CGAMKFFFCMO.IHAHIEHHNCG = int.Parse(array[1]);
-			CGAMKFFFCMO.BLFBMIOIPOI = int.Parse(array2[0]);
-			CGAMKFFFCMO.CCIPIPKPHGB = int.Parse(array2[1]);
+			_frameRect = new FrameRect();
+			_frameRect.X = int.Parse(array[0]);
+			_frameRect.Y = int.Parse(array[1]);
+			_frameRect.Width = int.Parse(array2[0]);
+			_frameRect.Height = int.Parse(array2[1]);
 		}
 
-		public Vector2 LMJCBAFGAFL()
+		public Vector2 GetOffset()
 		{
-			return KBOIHCPHFJL;
+			return _offset;
 		}
 
-		public void CEDNGLNABAJ(string LIAILCGJBDK)
+		public void SetOffset(string LIAILCGJBDK)
 		{
-			KBOIHCPHFJL = ParseVector(LIAILCGJBDK);
+			_offset = ParseVector(LIAILCGJBDK);
 		}
 
 		public void set_Rotated(bool value)
@@ -138,19 +138,19 @@ public class CocosAnimationData
 			_Rotated = value;
 		}
 
-		public bool KGFGOFBMCCG()
+		public bool GetRotated()
 		{
 			return _Rotated;
 		}
 
-		public Vector2 PFIECJPOFFB()
+		public Vector2 GetSourceSize()
 		{
-			return MHNOMBDDNLE;
+			return _sourceSize;
 		}
 
-		public void AAHNBCAFBMG(string LIAILCGJBDK)
+		public void SetSourceSize(string LIAILCGJBDK)
 		{
-			MHNOMBDDNLE = ParseVector(LIAILCGJBDK);
+			_sourceSize = ParseVector(LIAILCGJBDK);
 		}
 
 		private static Vector2 ParseVector(string value)
@@ -170,9 +170,9 @@ public class CocosAnimationData
 			return new Vector2(x, y);
 		}
 
-		public void GCDLICFMMAL()
+		public void ValidateFrameSize()
 		{
-			if (CGAMKFFFCMO.CCIPIPKPHGB <= 2 && CGAMKFFFCMO.BLFBMIOIPOI <= 2)
+			if (_frameRect.Height <= 2 && _frameRect.Width <= 2)
 			{
 			}
 		}
@@ -184,13 +184,13 @@ public class CocosAnimationData
 
 	private string _Path;
 
-	private static Dictionary<string, CocosAnimationData> LECBCNDHDMP = new Dictionary<string, CocosAnimationData>();
+	private static Dictionary<string, CocosAnimationData> _cache = new Dictionary<string, CocosAnimationData>();
 
-	public List<SpriteFrameCocos> OCFKLCDIEBF
+	public List<SpriteFrameCocos> SpriteFrames
 	{
 		get
 		{
-			return BFJEFNHKPJI();
+			return GetFrames();
 		}
 	}
 
@@ -208,7 +208,7 @@ public class CocosAnimationData
 			}
 			if (text == "frames")
 			{
-				IPIEHGHEKOK(childNode, _Frames);
+				ParseFrames(childNode, _Frames);
 			}
 			if (!(text == "metadata"))
 			{
@@ -230,7 +230,7 @@ public class CocosAnimationData
 		}
 	}
 
-	public List<SpriteFrameCocos> BFJEFNHKPJI()
+	public List<SpriteFrameCocos> GetFrames()
 	{
 		return _Frames;
 	}
@@ -240,29 +240,29 @@ public class CocosAnimationData
 		return _Path;
 	}
 
-	public static void DECIILEPLDM()
+	public static void ClearCache()
 	{
-		LECBCNDHDMP.Clear();
+		_cache.Clear();
 	}
 
 	public static CocosAnimationData Create(string ONEIGMLOGDC, bool MPMHHEMGHOJ = false)
 	{
 		ONEIGMLOGDC = ResolveCompatibilityEffect(ONEIGMLOGDC);
-		if (LECBCNDHDMP.ContainsKey(ONEIGMLOGDC))
+		if (_cache.ContainsKey(ONEIGMLOGDC))
 		{
-			return LECBCNDHDMP[ONEIGMLOGDC];
+			return _cache[ONEIGMLOGDC];
 		}
-		XmlDocument xmlDocument = XmlUtils.OpenXMLDocument(ONEIGMLOGDC, string.Empty, MPMHHEMGHOJ ? XmlUtils.EBLFEPIOMOL.ForcedResourced : XmlUtils.EBLFEPIOMOL.Normal);
+		XmlDocument xmlDocument = XmlUtils.OpenXMLDocument(ONEIGMLOGDC, string.Empty, MPMHHEMGHOJ ? XmlUtils.XmlSourceMode.ForcedResourced : XmlUtils.XmlSourceMode.Normal);
 		if (xmlDocument == null)
 		{
 			return null;
 		}
 		CocosAnimationData nIHINKFPFLM = new CocosAnimationData(xmlDocument, ONEIGMLOGDC);
-		LECBCNDHDMP.Add(ONEIGMLOGDC, nIHINKFPFLM);
+		_cache.Add(ONEIGMLOGDC, nIHINKFPFLM);
 		return nIHINKFPFLM;
 	}
 
-	private void IPIEHGHEKOK(XmlNode OPPGGBFCIJA, List<SpriteFrameCocos> GFIODDEBNHM)
+	private void ParseFrames(XmlNode OPPGGBFCIJA, List<SpriteFrameCocos> GFIODDEBNHM)
 	{
 		string jLEKBBJBLOE = null;
 		foreach (XmlNode childNode in OPPGGBFCIJA.ChildNodes)
@@ -273,12 +273,12 @@ public class CocosAnimationData
 			}
 			else
 			{
-				GFIODDEBNHM.Add(AFHOCALJBEE(childNode, jLEKBBJBLOE));
+				GFIODDEBNHM.Add(ParseFrame(childNode, jLEKBBJBLOE));
 			}
 		}
 	}
 
-	private SpriteFrameCocos AFHOCALJBEE(XmlNode EBBAHEDDHFO, string JLEKBBJBLOE)
+	private SpriteFrameCocos ParseFrame(XmlNode EBBAHEDDHFO, string JLEKBBJBLOE)
 	{
 		SpriteFrameCocos pBAHNJDFMBO = new SpriteFrameCocos();
 		pBAHNJDFMBO.set_Name(JLEKBBJBLOE.Replace(".png", string.Empty));
@@ -296,25 +296,25 @@ public class CocosAnimationData
 				pBAHNJDFMBO.SetFrame(childNode.FirstChild.Value);
 				break;
 			case "offset":
-				pBAHNJDFMBO.CEDNGLNABAJ(childNode.FirstChild.Value);
+				pBAHNJDFMBO.SetOffset(childNode.FirstChild.Value);
 				break;
 			case "rotated":
 				pBAHNJDFMBO.set_Rotated(childNode.Name == "true");
 				break;
 			case "sourceSize":
-				pBAHNJDFMBO.AAHNBCAFBMG(childNode.FirstChild.Value);
+				pBAHNJDFMBO.SetSourceSize(childNode.FirstChild.Value);
 				break;
 			}
 		}
-		pBAHNJDFMBO.GCDLICFMMAL();
+		pBAHNJDFMBO.ValidateFrameSize();
 		return pBAHNJDFMBO;
 	}
 
-	public void AIFNJAPCCII()
+	public void LoadSprites()
 	{
 		int num = _Path.IndexOf("resources");
 		string oNEIGMLOGDC = ((num != -1) ? _Path.Substring(num) : _Path).Replace("_xml", string.Empty).Replace(".xml", string.Empty);
-		Sprite[] array = ResourcesAndBundles.BNCMBJOICHI<Sprite>(oNEIGMLOGDC);
+		Sprite[] array = ResourcesAndBundles.LoadAllAssets<Sprite>(oNEIGMLOGDC);
 		Dictionary<string, Sprite> dictionary = new Dictionary<string, Sprite>();
 		for (int i = 0; i < array.Length; i++)
 		{
@@ -341,7 +341,7 @@ public class CocosAnimationData
 		}
 	}
 
-	public void JBPCHMAGDMI()
+	public void SortFrames()
 	{
 		// Atlas dictionaries are commonly emitted in lexical order, which puts
 		// frame_10 before frame_2.  The decompiled sorter only recognized a

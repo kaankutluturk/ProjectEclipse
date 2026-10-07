@@ -9,16 +9,16 @@ public class QuestActionToggleGroup : QuestAction
 	public override void Parse(XmlNode EPKLCPOEELO)
 	{
 		base.Parse(EPKLCPOEELO);
-		_toggle = EPKLCPOEELO.Attributes["Toggle"].CIPOICEEIBK("on");
-		_name = EPKLCPOEELO.Attributes["Name"].CIPOICEEIBK(string.Empty);
+		_toggle = EPKLCPOEELO.Attributes["Toggle"].GetStringOrDefault("on");
+		_name = EPKLCPOEELO.Attributes["Name"].GetStringOrDefault(string.Empty);
 	}
 
-	public override void DEJMHFMLKIC(QuestParameters GFIHPBCEEOB)
+	public override void Execute(QuestParameters GFIHPBCEEOB)
 	{
-		base.DEJMHFMLKIC(GFIHPBCEEOB);
-		Roster nKGLHEGIKKP = ListSF.CCDKHLAMKKO();
-		nKGLHEGIKKP.AOBEHOILNOG(_name, _toggle.Equals("on"));
+		base.Execute(GFIHPBCEEOB);
+		Roster nKGLHEGIKKP = ListSF.GetRoster();
+		nKGLHEGIKKP.SetAbGroupToggle(_name, _toggle.Equals("on"));
 		ListSF.GetInstance().OnAuthenticate(true);
-		OGIJONMKABB();
+		FinishAction();
 	}
 }

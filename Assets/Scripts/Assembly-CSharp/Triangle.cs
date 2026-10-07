@@ -8,39 +8,39 @@ public class Triangle
 	// Snapshot codecs preserve the array identity as well as its node references.
 	internal ModelNode[] Nodes { get => _nodes; set => _nodes = value; }
 
-	public ModelNode IFKIMCJKHPF
+	public ModelNode FirstNode
 	{
 		get
 		{
-			return LACAPAAKHGF();
+			return GetFirstNode();
 		}
 		set
 		{
-			DGNONLPFKKL(value);
+			SetFirstNode(value);
 		}
 	}
 
-	public ModelNode IHGCBKLIDJF
+	public ModelNode SecondNode
 	{
 		get
 		{
-			return BGDMIKIODPC();
+			return GetSecondNode();
 		}
 		set
 		{
-			FCMMFAEBDDL(value);
+			SetSecondNode(value);
 		}
 	}
 
-	public ModelNode JBPNNHDCBJD
+	public ModelNode ThirdNode
 	{
 		get
 		{
-			return DBOJFAAGEKB();
+			return GetThirdNode();
 		}
 		set
 		{
-			DADGEIJKBMM(value);
+			SetThirdNode(value);
 		}
 	}
 
@@ -77,48 +77,48 @@ public class Triangle
 		_name = value;
 	}
 
-	public ModelNode LACAPAAKHGF()
+	public ModelNode GetFirstNode()
 	{
 		return _nodes[0];
 	}
 
-	public void DGNONLPFKKL(ModelNode value)
+	public void SetFirstNode(ModelNode value)
 	{
 		_nodes[0] = value;
 	}
 
-	public ModelNode BGDMIKIODPC()
+	public ModelNode GetSecondNode()
 	{
 		return _nodes[1];
 	}
 
-	public void FCMMFAEBDDL(ModelNode value)
+	public void SetSecondNode(ModelNode value)
 	{
 		_nodes[1] = value;
 	}
 
-	public ModelNode DBOJFAAGEKB()
+	public ModelNode GetThirdNode()
 	{
 		return _nodes[2];
 	}
 
-	public void DADGEIJKBMM(ModelNode value)
+	public void SetThirdNode(ModelNode value)
 	{
 		_nodes[2] = value;
 	}
 
 	public void CopyFrom(Triangle CJAGCDNBEPA)
 	{
-		_nodes[0].CopyFrom(CJAGCDNBEPA.LACAPAAKHGF());
-		_nodes[1].CopyFrom(CJAGCDNBEPA.BGDMIKIODPC());
-		_nodes[2].CopyFrom(CJAGCDNBEPA.DBOJFAAGEKB());
+		_nodes[0].CopyFrom(CJAGCDNBEPA.GetFirstNode());
+		_nodes[1].CopyFrom(CJAGCDNBEPA.GetSecondNode());
+		_nodes[2].CopyFrom(CJAGCDNBEPA.GetThirdNode());
 	}
 
-	public void GOKCABDNIKF()
+	public void Reset()
 	{
 	}
 
-	private void GBKLNGHEICJ()
+	private void InitializeNodes()
 	{
 	}
 }

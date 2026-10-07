@@ -345,7 +345,7 @@ namespace Eclipse.UI.Modding
                 var scroll = rect.gameObject.AddComponent<SFScrollRect>();
                 scroll.set_viewport(viewport); scroll.set_content(content);
                 scroll.set_horizontal(false); scroll.set_vertical(true);
-                scroll.set_movementType(SFScrollRect.MDMLKCMBBPA.Elastic);
+                scroll.set_movementType(SFScrollRect.ScrollMovementType.Elastic);
                 scroll.set_elasticity(.1f); scroll.set_inertia(true);
                 scroll.set_decelerationRate(.135f); scroll.set_scrollSensitivity(1f);
                 if (framed) DesktopScrollbars.Attach(scroll, scroll.StopMovement);

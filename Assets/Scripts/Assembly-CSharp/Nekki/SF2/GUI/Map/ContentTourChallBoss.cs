@@ -25,28 +25,28 @@ namespace Nekki.SF2.GUI.Map
 		[SerializeField]
 		private Button _challangeTouchZone;
 
-		private float JEJJAFNDNJP = 255f;
+		private float descriptionFade = 255f;
 
-		private float BIEHOAACFGA = 255f;
+		private float difficultyFade = 255f;
 
-		private bool JFJKICJIAGD;
+		private bool isDescriptionFading;
 
-		private bool LDKGAEDCFGA;
+		private bool isDescriptionFadingIn;
 
-		private bool NFOIAMOILCA;
+		private bool isDifficultyFading;
 
-		private bool JOGOAMIDLLG;
+		private bool isDifficultyFadingIn;
 
-		private bool LFOMLGFOIDI = true;
+		private bool hasDescription = true;
 
-		private int ALHECCDENMO;
+		private int fadePauseFrames;
 		private bool showDescription;
 		private float descriptionOpacity;
 		private CanvasGroup difficultyOpacity;
 
 		private void Update()
 		{
-			if (LFOMLGFOIDI)
+			if (hasDescription)
 			{
 				descriptionOpacity = Mathf.MoveTowards(descriptionOpacity, showDescription ? 1f : 0f, Time.unscaledDeltaTime / .25f);
 				ApplyDescriptionOpacity();
@@ -56,27 +56,27 @@ namespace Nekki.SF2.GUI.Map
 		public void Init(Battle DPOOIONCEOA, FightList KOMGFJOCEDN)
 		{
 			_bricksPanel.Init(DPOOIONCEOA, KOMGFJOCEDN);
-			MKHMHMAOKOA(DPOOIONCEOA);
-			bool mMDLKOPCFLK = (DPOOIONCEOA.get_Type() != BattleType.FightBosses && DPOOIONCEOA.get_Type() != BattleType.FightBossesReplayable && DPOOIONCEOA.get_Type() != BattleType.FightFinalTitan) || !KJHIOOFNKEG(KOMGFJOCEDN);
+			InitReplaysLabel(DPOOIONCEOA);
+			bool mMDLKOPCFLK = (DPOOIONCEOA.get_Type() != BattleType.FightBosses && DPOOIONCEOA.get_Type() != BattleType.FightBossesReplayable && DPOOIONCEOA.get_Type() != BattleType.FightFinalTitan) || !HasFinalRewardItem(KOMGFJOCEDN);
 			_prizePanel.Init(-1, mMDLKOPCFLK, KOMGFJOCEDN);
-			_difficultyPanel.gameObject.SetActive(DPOOIONCEOA.KCIKELGFHOA() != 0);
+			_difficultyPanel.gameObject.SetActive(DPOOIONCEOA.GetFightCount() != 0);
 			_difficultyPanel.GetComponent<CanvasGroup>().alpha = 1f;
-			_difficultyPanel.Init(GameUtils.JEILJMPPEGL(KOMGFJOCEDN));
-			NAMOMLIKKIA(DPOOIONCEOA, KOMGFJOCEDN);
-			FBOAIDMKGEB();
+			_difficultyPanel.Init(GameUtils.CalculateFightDifficulty(KOMGFJOCEDN));
+			InitDescription(DPOOIONCEOA, KOMGFJOCEDN);
+			BindTouchZoneClick();
 		}
 
-		private void NAMOMLIKKIA(Battle DPOOIONCEOA, FightList KOMGFJOCEDN)
+		private void InitDescription(Battle DPOOIONCEOA, FightList KOMGFJOCEDN)
 		{
 			bool challenge = DPOOIONCEOA.get_Type() == BattleType.FightChallenge || DPOOIONCEOA.get_Type() == BattleType.FightReplayable;
-			string description = KOMGFJOCEDN != null ? KOMGFJOCEDN.GJOAJAIJHOE() : string.Empty;
-			if (string.IsNullOrEmpty(description)) description = DPOOIONCEOA.GJOAJAIJHOE();
-			LFOMLGFOIDI = challenge && !string.IsNullOrEmpty(description) && KOMGFJOCEDN != null && KOMGFJOCEDN.ECEFCOJPBPG();
-			_lblDescription.gameObject.SetActive(LFOMLGFOIDI);
-			if (LFOMLGFOIDI) _lblDescription.SetAlias(description);
-			_challangeTouchZone.interactable = LFOMLGFOIDI;
+			string description = KOMGFJOCEDN != null ? KOMGFJOCEDN.GetDescription() : string.Empty;
+			if (string.IsNullOrEmpty(description)) description = DPOOIONCEOA.GetDescription();
+			hasDescription = challenge && !string.IsNullOrEmpty(description) && KOMGFJOCEDN != null && KOMGFJOCEDN.IsReplayAvailable();
+			_lblDescription.gameObject.SetActive(hasDescription);
+			if (hasDescription) _lblDescription.SetAlias(description);
+			_challangeTouchZone.interactable = hasDescription;
 			difficultyOpacity = _difficultyPanel.GetComponent<CanvasGroup>();
-			showDescription = LFOMLGFOIDI;
+			showDescription = hasDescription;
 			descriptionOpacity = showDescription ? 1f : 0f;
 			ApplyDescriptionOpacity();
 		}
@@ -84,11 +84,11 @@ namespace Nekki.SF2.GUI.Map
 		private void ApplyDescriptionOpacity()
 		{
 			float eased = Mathf.SmoothStep(0f, 1f, descriptionOpacity);
-			_lblDescription.HNIHBGAOAIH(eased);
+			_lblDescription.SetAlpha(eased);
 			if (difficultyOpacity != null) difficultyOpacity.alpha = 1f - eased;
 		}
 
-		private void MKHMHMAOKOA(Battle DPOOIONCEOA)
+		private void InitReplaysLabel(Battle DPOOIONCEOA)
 		{
 			if (DPOOIONCEOA.get_Type() == BattleType.FightReplayable || DPOOIONCEOA.get_Type() == BattleType.FightBossesReplayable)
 			{
@@ -102,21 +102,21 @@ namespace Nekki.SF2.GUI.Map
 			}
 		}
 
-		private bool KJHIOOFNKEG(FightList KOMGFJOCEDN)
+		private bool HasFinalRewardItem(FightList KOMGFJOCEDN)
 		{
 			if (KOMGFJOCEDN == null)
 			{
 				return false;
 			}
-			RewardStruct fDFKLPHBAHJ = KOMGFJOCEDN.APKPCGDBMEP()[KOMGFJOCEDN.APKPCGDBMEP().Count - 1];
-			int gNLOCMLBNHF = ListSF.CCDKHLAMKKO().PINDEKDNCNL();
-			RewardPrize cMHHEHILIIH = fDFKLPHBAHJ.KOBOIFJNPMO(gNLOCMLBNHF);
-			if (cMHHEHILIIH.HELFDCAIJNE.Count == 0)
+			RewardStruct fDFKLPHBAHJ = KOMGFJOCEDN.GetRewards()[KOMGFJOCEDN.GetRewards().Count - 1];
+			int gNLOCMLBNHF = ListSF.GetRoster().GetLevel();
+			RewardPrize cMHHEHILIIH = fDFKLPHBAHJ.GetPrizeForLevel(gNLOCMLBNHF);
+			if (cMHHEHILIIH.items.Count == 0)
 			{
 				return false;
 			}
-			RewardItem cACJANFAJEC = cMHHEHILIIH.HELFDCAIJNE[0];
-			if (!cACJANFAJEC.GOOBKHECJIF)
+			RewardItem cACJANFAJEC = cMHHEHILIIH.items[0];
+			if (!cACJANFAJEC.ShowReward)
 			{
 				return false;
 			}
@@ -124,114 +124,114 @@ namespace Nekki.SF2.GUI.Map
 			return dJKEECEOCJB != null;
 		}
 
-		private void DFMHJKAIJJK(bool LFGNIIJJMIG)
+		private void ResetFade(bool LFGNIIJJMIG)
 		{
-			JEJJAFNDNJP = (LFGNIIJJMIG ? 255 : 0);
-			BIEHOAACFGA = ((!LFGNIIJJMIG) ? 255 : 0);
-			ALHECCDENMO = MapGUI.HPDGECMMHBJ.CPLJCIFJAGN;
-			JFJKICJIAGD = LFGNIIJJMIG;
-			LDKGAEDCFGA = !LFGNIIJJMIG;
-			NFOIAMOILCA = !LFGNIIJJMIG;
-			JOGOAMIDLLG = LFGNIIJJMIG;
+			descriptionFade = (LFGNIIJJMIG ? 255 : 0);
+			difficultyFade = ((!LFGNIIJJMIG) ? 255 : 0);
+			fadePauseFrames = MapGUI.ChallengeFade.DelayBeforeFade;
+			isDescriptionFading = LFGNIIJJMIG;
+			isDescriptionFadingIn = !LFGNIIJJMIG;
+			isDifficultyFading = !LFGNIIJJMIG;
+			isDifficultyFadingIn = LFGNIIJJMIG;
 		}
 
-		private bool OIMAMAGKGIA()
+		private bool IsFadeSpeedZero()
 		{
-			return MapGUI.HPDGECMMHBJ.BGDLPJKHBHP == 0;
+			return MapGUI.ChallengeFade.DifficultyIsFirstFrame == 0;
 		}
 
-		private void CFFCPCEKCIE()
+		private void UpdateFade()
 		{
-			if (ALHECCDENMO > 0)
+			if (fadePauseFrames > 0)
 			{
-				ALHECCDENMO--;
+				fadePauseFrames--;
 				return;
 			}
-			if (JFJKICJIAGD)
+			if (isDescriptionFading)
 			{
-				EJIAKIMBKJK();
-				if (JEJJAFNDNJP <= (float)MapGUI.HPDGECMMHBJ.IEKAFNFKBNE && !NFOIAMOILCA)
+				StepDescriptionFade();
+				if (descriptionFade <= (float)MapGUI.ChallengeFade.MinOpacity && !isDifficultyFading)
 				{
-					NFOIAMOILCA = true;
+					isDifficultyFading = true;
 				}
-				if (JEJJAFNDNJP == 0f)
+				if (descriptionFade == 0f)
 				{
-					JFJKICJIAGD = false;
+					isDescriptionFading = false;
 				}
 			}
-			if (NFOIAMOILCA)
+			if (isDifficultyFading)
 			{
-				DNOIDOGIFNL();
-				if (BIEHOAACFGA <= (float)MapGUI.HPDGECMMHBJ.IEKAFNFKBNE && !JFJKICJIAGD)
+				StepDifficultyFade();
+				if (difficultyFade <= (float)MapGUI.ChallengeFade.MinOpacity && !isDescriptionFading)
 				{
-					JFJKICJIAGD = true;
+					isDescriptionFading = true;
 				}
-				if (BIEHOAACFGA == 0f)
+				if (difficultyFade == 0f)
 				{
-					NFOIAMOILCA = false;
+					isDifficultyFading = false;
 				}
 			}
 		}
 
-		private void EJIAKIMBKJK()
+		private void StepDescriptionFade()
 		{
-			int num = ((MapGUI.HPDGECMMHBJ.HPJHAIALGHN <= 0) ? 1 : MapGUI.HPDGECMMHBJ.HPJHAIALGHN);
-			if (LDKGAEDCFGA)
+			int num = ((MapGUI.ChallengeFade.FadeSpeed <= 0) ? 1 : MapGUI.ChallengeFade.FadeSpeed);
+			if (isDescriptionFadingIn)
 			{
-				JEJJAFNDNJP += 255f / (float)num;
-				if (JEJJAFNDNJP >= 255f)
+				descriptionFade += 255f / (float)num;
+				if (descriptionFade >= 255f)
 				{
-					JEJJAFNDNJP = 255f;
-					LDKGAEDCFGA = false;
-					ALHECCDENMO = MapGUI.HPDGECMMHBJ.CPLJCIFJAGN;
+					descriptionFade = 255f;
+					isDescriptionFadingIn = false;
+					fadePauseFrames = MapGUI.ChallengeFade.DelayBeforeFade;
 				}
 			}
 			else
 			{
-				JEJJAFNDNJP -= 255f / (float)num;
-				if (JEJJAFNDNJP <= 0f)
+				descriptionFade -= 255f / (float)num;
+				if (descriptionFade <= 0f)
 				{
-					JEJJAFNDNJP = 0f;
-					LDKGAEDCFGA = true;
+					descriptionFade = 0f;
+					isDescriptionFadingIn = true;
 				}
 			}
-			_lblDescription.HNIHBGAOAIH(JEJJAFNDNJP / 255f);
+			_lblDescription.SetAlpha(descriptionFade / 255f);
 		}
 
-		private void DNOIDOGIFNL()
+		private void StepDifficultyFade()
 		{
-			int num = ((MapGUI.HPDGECMMHBJ.HPJHAIALGHN <= 0) ? 1 : MapGUI.HPDGECMMHBJ.HPJHAIALGHN);
-			if (JOGOAMIDLLG)
+			int num = ((MapGUI.ChallengeFade.FadeSpeed <= 0) ? 1 : MapGUI.ChallengeFade.FadeSpeed);
+			if (isDifficultyFadingIn)
 			{
-				BIEHOAACFGA += 255f / (float)num;
-				if (BIEHOAACFGA >= 255f)
+				difficultyFade += 255f / (float)num;
+				if (difficultyFade >= 255f)
 				{
-					BIEHOAACFGA = 255f;
-					JOGOAMIDLLG = false;
-					ALHECCDENMO = MapGUI.HPDGECMMHBJ.CPLJCIFJAGN;
+					difficultyFade = 255f;
+					isDifficultyFadingIn = false;
+					fadePauseFrames = MapGUI.ChallengeFade.DelayBeforeFade;
 				}
 			}
 			else
 			{
-				BIEHOAACFGA -= 255f / (float)num;
-				if (BIEHOAACFGA <= 0f)
+				difficultyFade -= 255f / (float)num;
+				if (difficultyFade <= 0f)
 				{
-					BIEHOAACFGA = 0f;
-					JOGOAMIDLLG = true;
+					difficultyFade = 0f;
+					isDifficultyFadingIn = true;
 				}
 			}
-			_difficultyPanel.GetComponent<CanvasGroup>().alpha = BIEHOAACFGA / 255f;
+			_difficultyPanel.GetComponent<CanvasGroup>().alpha = difficultyFade / 255f;
 		}
 
-		private void FBOAIDMKGEB()
+		private void BindTouchZoneClick()
 		{
-			_challangeTouchZone.onClick.RemoveListener(HNLFHIMJMFJ);
-			_challangeTouchZone.onClick.AddListener(HNLFHIMJMFJ);
+			_challangeTouchZone.onClick.RemoveListener(OnTouchZoneClicked);
+			_challangeTouchZone.onClick.AddListener(OnTouchZoneClicked);
 		}
 
-		private void HNLFHIMJMFJ()
+		private void OnTouchZoneClicked()
 		{
-			if (LFOMLGFOIDI)
+			if (hasDescription)
 			{
 				showDescription = !showDescription;
 			}

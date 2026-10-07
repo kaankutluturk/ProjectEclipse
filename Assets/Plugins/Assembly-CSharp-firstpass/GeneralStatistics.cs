@@ -1,22 +1,22 @@
 public struct GeneralStatistics
 {
-	public StatisticsQueryFlags EMFKBMDJFCJ;
+	public StatisticsQueryFlags QueryFlags;
 
-	public int GKLCMJOHCBJ;
+	public int Connections;
 
-	public int BPIDLPMODDC;
+	public int ActiveConnections;
 
-	public int HHGJJICJJOJ;
+	public int FreeConnections;
 
-	public int OBMKJIOLKNI;
+	public int RecycledConnections;
 
-	public int AOIDCCECOIE;
+	public int RequestsInQueue;
 
-	public int LMEFONBEGEN;
+	public int CacheEntityCount;
 
 	public ulong CacheSize;
 
-	public int GPBFMKPPIAL;
+	public int CookieCount;
 
 	public uint CookieJarSize;
 }

@@ -4,7 +4,7 @@ using UnityEngine;
 
 public sealed class SocketIOChatSample : MonoBehaviour
 {
-	private enum BCLDBFMAKBM
+	private enum ChatState
 	{
 		Login = 0,
 		Chat = 1
@@ -12,15 +12,15 @@ public sealed class SocketIOChatSample : MonoBehaviour
 
 	private readonly TimeSpan TYPING_TIMER_LENGTH = TimeSpan.FromMilliseconds(700.0);
 
-	private SocketManager CPOHGNDIBJD;
+	private SocketManager manager;
 
-	private BCLDBFMAKBM AFINHOBCHMC;
+	private ChatState state;
 
-	private string IFCOOFDKDGL = string.Empty;
+	private string userName = string.Empty;
 
-	private string LIOGIBJBHAH = string.Empty;
+	private string message = string.Empty;
 
-	private string HJIGDBEJLGJ = string.Empty;
+	private string chatLog = string.Empty;
 
 	private Vector2 scrollPos;
 
@@ -32,33 +32,33 @@ public sealed class SocketIOChatSample : MonoBehaviour
 
 	private void Start()
 	{
-		AFINHOBCHMC = BCLDBFMAKBM.Login;
+		state = ChatState.Login;
 		SocketOptions pGHMKLAAHKP = new SocketOptions();
-		pGHMKLAAHKP.AHGIJFEGONK(false);
-		CPOHGNDIBJD = new SocketManager(new Uri("http://chat.socket.io/socket.io/"), pGHMKLAAHKP);
-		CPOHGNDIBJD.PDJFKOBODHH().JPJAFMLNALO("login", BKHJLIEAHOO);
-		CPOHGNDIBJD.PDJFKOBODHH().JPJAFMLNALO("new message", MOGAEBMBPHN);
-		CPOHGNDIBJD.PDJFKOBODHH().JPJAFMLNALO("user joined", CFAPMDGPGCA);
-		CPOHGNDIBJD.PDJFKOBODHH().JPJAFMLNALO("user left", HPJHEHHKCJD);
-		CPOHGNDIBJD.PDJFKOBODHH().JPJAFMLNALO("typing", IJHAEGHAIEM);
-		CPOHGNDIBJD.PDJFKOBODHH().JPJAFMLNALO("stop typing", HNOBHBKOHDA);
-		CPOHGNDIBJD.PDJFKOBODHH().JPJAFMLNALO(ECDAJBEFCAH.Error, (Socket JLEACANCMJF, Packet NPKADBPBKIG, object[] LKIOKGCNKHE) =>
+		pGHMKLAAHKP.SetAutoConnect(false);
+		manager = new SocketManager(new Uri("http://chat.socket.io/socket.io/"), pGHMKLAAHKP);
+		manager.GetRootSocket().On("login", OnLogin);
+		manager.GetRootSocket().On("new message", OnNewMessage);
+		manager.GetRootSocket().On("user joined", OnUserJoined);
+		manager.GetRootSocket().On("user left", OnUserLeft);
+		manager.GetRootSocket().On("typing", OnTyping);
+		manager.GetRootSocket().On("stop typing", OnStopTyping);
+		manager.GetRootSocket().On(SocketIOEventType.Error, (Socket JLEACANCMJF, Packet NPKADBPBKIG, object[] LKIOKGCNKHE) =>
 		{
-			AdvLog.CCOFFJPPAKC(string.Format("Error: {0}", LKIOKGCNKHE[0].ToString()));
+			AdvLog.LogError(string.Format("Error: {0}", LKIOKGCNKHE[0].ToString()));
 		});
-		CPOHGNDIBJD.Open();
+		manager.Open();
 	}
 
 	private void OnDestroy()
 	{
-		CPOHGNDIBJD.Close();
+		manager.Close();
 	}
 
 	private void Update()
 	{
 		if (Eclipse.Input.EclipseInput.GetKeyDown(KeyCode.Escape))
 		{
-			SampleSelector.SelectedSample.EHDDIIAKFGI();
+			SampleSelector.SelectedSample.DestroyUnityObject();
 		}
 		if (typing)
 		{
@@ -66,7 +66,7 @@ public sealed class SocketIOChatSample : MonoBehaviour
 			TimeSpan timeSpan = utcNow - lastTypingTime;
 			if (timeSpan >= TYPING_TIMER_LENGTH)
 			{
-				CPOHGNDIBJD.PDJFKOBODHH().Emit("stop typing");
+				manager.GetRootSocket().Emit("stop typing");
 				typing = false;
 			}
 		}
@@ -74,41 +74,41 @@ public sealed class SocketIOChatSample : MonoBehaviour
 
 	private void OnGUI()
 	{
-		switch (AFINHOBCHMC)
+		switch (state)
 		{
-		case BCLDBFMAKBM.Login:
-			CDFMAJDHEIL();
+		case ChatState.Login:
+			DrawLoginScreen();
 			break;
-		case BCLDBFMAKBM.Chat:
-			HMHNKACNGAI();
+		case ChatState.Chat:
+			DrawChatScreen();
 			break;
 		}
 	}
 
-	private void CDFMAJDHEIL()
+	private void DrawLoginScreen()
 	{
-		GUIHelper.ECMOBPFHNPN(GUIHelper.ClientArea, true, () =>
+		GUIHelper.DrawArea(GUIHelper.ClientArea, true, () =>
 		{
 			GUILayout.BeginVertical();
 			GUILayout.FlexibleSpace();
-			GUIHelper.GECFPNNDHHJ("What's your nickname?");
-			IFCOOFDKDGL = GUILayout.TextField(IFCOOFDKDGL);
+			GUIHelper.DrawCenteredText("What's your nickname?");
+			userName = GUILayout.TextField(userName);
 			if (GUILayout.Button("Join"))
 			{
-				BDEIGNGJHOF();
+				SetUserName();
 			}
 			GUILayout.FlexibleSpace();
 			GUILayout.EndVertical();
 		});
 	}
 
-	private void HMHNKACNGAI()
+	private void DrawChatScreen()
 	{
-		GUIHelper.ECMOBPFHNPN(GUIHelper.ClientArea, true, () =>
+		GUIHelper.DrawArea(GUIHelper.ClientArea, true, () =>
 		{
 			GUILayout.BeginVertical();
 			scrollPos = GUILayout.BeginScrollView(scrollPos);
-			GUILayout.Label(HJIGDBEJLGJ, GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
+			GUILayout.Label(chatLog, GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
 			GUILayout.EndScrollView();
 			string text = string.Empty;
 			if (typingUsers.Count > 0)
@@ -123,75 +123,75 @@ public sealed class SocketIOChatSample : MonoBehaviour
 			GUILayout.Label(text);
 			GUILayout.Label("Type here:");
 			GUILayout.BeginHorizontal();
-			LIOGIBJBHAH = GUILayout.TextField(LIOGIBJBHAH);
+			message = GUILayout.TextField(message);
 			if (GUILayout.Button("Send", GUILayout.MaxWidth(100f)))
 			{
-				CGJFNMPOGCO();
+				SendChatMessage();
 			}
 			GUILayout.EndHorizontal();
 			if (GUI.changed)
 			{
-				MMNHJJNCEJM();
+				UpdateTyping();
 			}
 			GUILayout.EndVertical();
 		});
 	}
 
-	private void BDEIGNGJHOF()
+	private void SetUserName()
 	{
-		if (!string.IsNullOrEmpty(IFCOOFDKDGL))
+		if (!string.IsNullOrEmpty(userName))
 		{
-			AFINHOBCHMC = BCLDBFMAKBM.Chat;
-			CPOHGNDIBJD.PDJFKOBODHH().Emit("add user", IFCOOFDKDGL);
+			state = ChatState.Chat;
+			manager.GetRootSocket().Emit("add user", userName);
 		}
 	}
 
-	private void CGJFNMPOGCO()
+	private void SendChatMessage()
 	{
-		if (!string.IsNullOrEmpty(LIOGIBJBHAH))
+		if (!string.IsNullOrEmpty(message))
 		{
-			CPOHGNDIBJD.PDJFKOBODHH().Emit("new message", LIOGIBJBHAH);
-			HJIGDBEJLGJ += string.Format("{0}: {1}\n", IFCOOFDKDGL, LIOGIBJBHAH);
-			LIOGIBJBHAH = string.Empty;
+			manager.GetRootSocket().Emit("new message", message);
+			chatLog += string.Format("{0}: {1}\n", userName, message);
+			message = string.Empty;
 		}
 	}
 
-	private void MMNHJJNCEJM()
+	private void UpdateTyping()
 	{
 		if (!typing)
 		{
 			typing = true;
-			CPOHGNDIBJD.PDJFKOBODHH().Emit("typing");
+			manager.GetRootSocket().Emit("typing");
 		}
 		lastTypingTime = DateTime.UtcNow;
 	}
 
-	private void DNFPAPNBKIF(Dictionary<string, object> data)
+	private void AddParticipantsMessage(Dictionary<string, object> data)
 	{
 		int num = Convert.ToInt32(data["numUsers"]);
 		if (num == 1)
 		{
-			HJIGDBEJLGJ += "there's 1 participant\n";
+			chatLog += "there's 1 participant\n";
 			return;
 		}
-		string hJIGDBEJLGJ = HJIGDBEJLGJ;
-		HJIGDBEJLGJ = hJIGDBEJLGJ + "there are " + num + " participants\n";
+		string hJIGDBEJLGJ = chatLog;
+		chatLog = hJIGDBEJLGJ + "there are " + num + " participants\n";
 	}
 
-	private void PNGFLLOBENH(Dictionary<string, object> data)
+	private void AddChatMessage(Dictionary<string, object> data)
 	{
 		string arg = data["username"] as string;
 		string arg2 = data["message"] as string;
-		HJIGDBEJLGJ += string.Format("{0}: {1}\n", arg, arg2);
+		chatLog += string.Format("{0}: {1}\n", arg, arg2);
 	}
 
-	private void KADOMLKIKJP(Dictionary<string, object> data)
+	private void AddChatTyping(Dictionary<string, object> data)
 	{
 		string item = data["username"] as string;
 		typingUsers.Add(item);
 	}
 
-	private void FFPDLNIBCNH(Dictionary<string, object> data)
+	private void RemoveChatTyping(Dictionary<string, object> data)
 	{
 		string HPCGFILEHPH = data["username"] as string;
 		int num = typingUsers.FindIndex((string name) => name.Equals(HPCGFILEHPH));
@@ -201,40 +201,40 @@ public sealed class SocketIOChatSample : MonoBehaviour
 		}
 	}
 
-	private void BKHJLIEAHOO(Socket JLEACANCMJF, Packet NPKADBPBKIG, params object[] LKIOKGCNKHE)
+	private void OnLogin(Socket JLEACANCMJF, Packet NPKADBPBKIG, params object[] LKIOKGCNKHE)
 	{
-		HJIGDBEJLGJ = "Welcome to Socket.IO Chat — \n";
-		DNFPAPNBKIF(LKIOKGCNKHE[0] as Dictionary<string, object>);
+		chatLog = "Welcome to Socket.IO Chat — \n";
+		AddParticipantsMessage(LKIOKGCNKHE[0] as Dictionary<string, object>);
 	}
 
-	private void MOGAEBMBPHN(Socket JLEACANCMJF, Packet NPKADBPBKIG, params object[] LKIOKGCNKHE)
+	private void OnNewMessage(Socket JLEACANCMJF, Packet NPKADBPBKIG, params object[] LKIOKGCNKHE)
 	{
-		PNGFLLOBENH(LKIOKGCNKHE[0] as Dictionary<string, object>);
+		AddChatMessage(LKIOKGCNKHE[0] as Dictionary<string, object>);
 	}
 
-	private void CFAPMDGPGCA(Socket JLEACANCMJF, Packet NPKADBPBKIG, params object[] LKIOKGCNKHE)
+	private void OnUserJoined(Socket JLEACANCMJF, Packet NPKADBPBKIG, params object[] LKIOKGCNKHE)
 	{
 		Dictionary<string, object> dictionary = LKIOKGCNKHE[0] as Dictionary<string, object>;
 		string arg = dictionary["username"] as string;
-		HJIGDBEJLGJ += string.Format("{0} joined\n", arg);
-		DNFPAPNBKIF(dictionary);
+		chatLog += string.Format("{0} joined\n", arg);
+		AddParticipantsMessage(dictionary);
 	}
 
-	private void HPJHEHHKCJD(Socket JLEACANCMJF, Packet NPKADBPBKIG, params object[] LKIOKGCNKHE)
+	private void OnUserLeft(Socket JLEACANCMJF, Packet NPKADBPBKIG, params object[] LKIOKGCNKHE)
 	{
 		Dictionary<string, object> dictionary = LKIOKGCNKHE[0] as Dictionary<string, object>;
 		string arg = dictionary["username"] as string;
-		HJIGDBEJLGJ += string.Format("{0} left\n", arg);
-		DNFPAPNBKIF(dictionary);
+		chatLog += string.Format("{0} left\n", arg);
+		AddParticipantsMessage(dictionary);
 	}
 
-	private void IJHAEGHAIEM(Socket JLEACANCMJF, Packet NPKADBPBKIG, params object[] LKIOKGCNKHE)
+	private void OnTyping(Socket JLEACANCMJF, Packet NPKADBPBKIG, params object[] LKIOKGCNKHE)
 	{
-		KADOMLKIKJP(LKIOKGCNKHE[0] as Dictionary<string, object>);
+		AddChatTyping(LKIOKGCNKHE[0] as Dictionary<string, object>);
 	}
 
-	private void HNOBHBKOHDA(Socket JLEACANCMJF, Packet NPKADBPBKIG, params object[] LKIOKGCNKHE)
+	private void OnStopTyping(Socket JLEACANCMJF, Packet NPKADBPBKIG, params object[] LKIOKGCNKHE)
 	{
-		FFPDLNIBCNH(LKIOKGCNKHE[0] as Dictionary<string, object>);
+		RemoveChatTyping(LKIOKGCNKHE[0] as Dictionary<string, object>);
 	}
 }

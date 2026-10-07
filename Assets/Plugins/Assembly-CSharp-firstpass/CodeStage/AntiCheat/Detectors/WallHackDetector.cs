@@ -11,19 +11,19 @@ namespace CodeStage.AntiCheat.Detectors
 	[AddComponentMenu("Code Stage/Anti-Cheat Toolkit/WallHack Detector")]
 	public class WallHackDetector : ActDetectorBase
 	{
-		internal const string JCAOMBMKNDE = "WallHack Detector";
+		internal const string ComponentName = "WallHack Detector";
 
-		internal const string MGAMICFMIJK = "[ACTk] WallHack Detector: ";
+		internal const string LogPrefix = "[ACTk] WallHack Detector: ";
 
-		private const string BJBMCGMOLEK = "[WH Detector Service]";
+		private const string ServiceContainerName = "[WH Detector Service]";
 
-		private const string BMACHGPMCME = "Hidden/ACTk/WallHackTexture";
+		private const string WireframeShaderName = "Hidden/ACTk/WallHackTexture";
 
-		private const int NJBEJKDFPDI = 4;
+		private const int ShaderTextureSize = 4;
 
-		private const int DOKJCFOCGNH = 4;
+		private const int RenderTextureSize = 4;
 
-		private readonly Vector3 PKIHJKCDMHD = new Vector3(0f, 0f, 1f);
+		private readonly Vector3 rigidPlayerVelocity = new Vector3(0f, 0f, 1f);
 
 		private static int instancesInScene;
 
@@ -59,35 +59,35 @@ namespace CodeStage.AntiCheat.Detectors
 		[Tooltip("Maximum false positives in a row for each detection module before registering a wall hack.")]
 		public byte maxFalsePositives = 3;
 
-		private GameObject CKOKDJEKEMF;
+		private GameObject serviceContainer;
 
-		private GameObject MCONGCAGIMB;
+		private GameObject solidWall;
 
-		private GameObject FBDCPDEOFGI;
+		private GameObject thinWall;
 
 		private Camera wfCamera;
 
-		private MeshRenderer NMFDCIBDLKI;
+		private MeshRenderer foregroundRenderer;
 
-		private MeshRenderer PIGHOMIKPEH;
+		private MeshRenderer backgroundRenderer;
 
-		private Color CEHKBLKIMMH = Color.black;
+		private Color foregroundColor = Color.black;
 
-		private Color HOOHEPNGMLK = Color.black;
+		private Color backgroundColor = Color.black;
 
 		private Shader wfShader;
 
 		private Material wfMaterial;
 
-		private Texture2D HJHIKCOBBKA;
+		private Texture2D shaderTexture;
 
-		private Texture2D KDCBKALFPNI;
+		private Texture2D targetTexture;
 
 		private RenderTexture renderTexture;
 
-		private int GKGKFDDEFJE = -1;
+		private int whLayer = -1;
 
-		private int PNOHJNCLGJI = -1;
+		private int raycastMask = -1;
 
 		private Rigidbody rigidPlayer;
 
@@ -95,20 +95,20 @@ namespace CodeStage.AntiCheat.Detectors
 
 		private float charControllerVelocity;
 
-		private byte AOEMKDEFLNP;
+		private byte rigidbodyDetections;
 
-		private byte KOBEPCAABCE;
+		private byte controllerDetections;
 
-		private byte BBFALJPOABG;
+		private byte wireframeDetections;
 
-		private byte CNLPNKHBPAI;
+		private byte raycastDetections;
 
-		private bool JAOPPCJPDAH;
+		private bool wireframeDetected;
 
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		private static WallHackDetector OGKMDFDNIEN;
+		private static WallHackDetector instance;
 
-		public bool MEEGFIIGOCO
+		public bool RigidbodyCheckEnabled
 		{
 			get
 			{
@@ -120,7 +120,7 @@ namespace CodeStage.AntiCheat.Detectors
 			}
 		}
 
-		public bool LKDCHIHPBKJ
+		public bool ControllerCheckEnabled
 		{
 			get
 			{
@@ -132,7 +132,7 @@ namespace CodeStage.AntiCheat.Detectors
 			}
 		}
 
-		public bool EECFNBDKOEB
+		public bool WireframeCheckEnabled
 		{
 			get
 			{
@@ -144,7 +144,7 @@ namespace CodeStage.AntiCheat.Detectors
 			}
 		}
 
-		public bool EONBNOEEILC
+		public bool RaycastCheckEnabled
 		{
 			get
 			{
@@ -156,7 +156,7 @@ namespace CodeStage.AntiCheat.Detectors
 			}
 		}
 
-		public static WallHackDetector BPCBBHAKFDM
+		public static WallHackDetector CurrentInstance
 		{
 			get
 			{
@@ -168,11 +168,11 @@ namespace CodeStage.AntiCheat.Detectors
 			}
 		}
 
-		private static WallHackDetector MCEPJKHJPIJ
+		private static WallHackDetector GetOrCreateInstance
 		{
 			get
 			{
-				return NNMHGMJELIL();
+				return GetOrCreate();
 			}
 		}
 
@@ -192,16 +192,16 @@ namespace CodeStage.AntiCheat.Detectors
 				return;
 			}
 			checkRigidbody = value;
-			if (AKFEAJDLIKF)
+			if (started)
 			{
-				JMJDMMILGMB();
+				UpdateServiceContainer();
 				if (checkRigidbody)
 				{
 					StartRigidModule();
 				}
 				else
 				{
-					OAIBAJBLCPF();
+					StopRigidModule();
 				}
 			}
 		}
@@ -218,16 +218,16 @@ namespace CodeStage.AntiCheat.Detectors
 				return;
 			}
 			checkController = value;
-			if (AKFEAJDLIKF)
+			if (started)
 			{
-				JMJDMMILGMB();
+				UpdateServiceContainer();
 				if (checkController)
 				{
 					StartControllerModule();
 				}
 				else
 				{
-					LJHNKNGKNJP();
+					StopControllerModule();
 				}
 			}
 		}
@@ -244,16 +244,16 @@ namespace CodeStage.AntiCheat.Detectors
 				return;
 			}
 			checkWireframe = value;
-			if (AKFEAJDLIKF)
+			if (started)
 			{
-				JMJDMMILGMB();
+				UpdateServiceContainer();
 				if (checkWireframe)
 				{
-					IDEIAKJHKMK();
+					StartWireframeModule();
 				}
 				else
 				{
-					OLOAFNAAFNF();
+					StopWireframeModule();
 				}
 			}
 		}
@@ -270,16 +270,16 @@ namespace CodeStage.AntiCheat.Detectors
 				return;
 			}
 			checkRaycast = value;
-			if (AKFEAJDLIKF)
+			if (started)
 			{
-				JMJDMMILGMB();
+				UpdateServiceContainer();
 				if (checkRaycast)
 				{
-					JBEFELONIIP();
+					StartRaycastModule();
 				}
 				else
 				{
-					PMLJHEJNGLM();
+					StopRaycastModule();
 				}
 			}
 		}
@@ -288,7 +288,7 @@ namespace CodeStage.AntiCheat.Detectors
 		{
 			if (get_Instance() != null)
 			{
-				get_Instance().FCJDKBEGPEF(null, get_Instance().spawnPosition, get_Instance().maxFalsePositives);
+				get_Instance().StartDetectionInternal(null, get_Instance().spawnPosition, get_Instance().maxFalsePositives);
 			}
 			else
 			{
@@ -298,24 +298,24 @@ namespace CodeStage.AntiCheat.Detectors
 
 		public static void StartDetection(UnityAction callback)
 		{
-			StartDetection(callback, NNMHGMJELIL().spawnPosition);
+			StartDetection(callback, GetOrCreate().spawnPosition);
 		}
 
 		public static void StartDetection(UnityAction callback, Vector3 PBPJOBANACG)
 		{
-			StartDetection(callback, PBPJOBANACG, NNMHGMJELIL().maxFalsePositives);
+			StartDetection(callback, PBPJOBANACG, GetOrCreate().maxFalsePositives);
 		}
 
 		public static void StartDetection(UnityAction callback, Vector3 PBPJOBANACG, byte JKBEIPOFGCI)
 		{
-			NNMHGMJELIL().FCJDKBEGPEF(callback, PBPJOBANACG, JKBEIPOFGCI);
+			GetOrCreate().StartDetectionInternal(callback, PBPJOBANACG, JKBEIPOFGCI);
 		}
 
 		public static void StopDetection()
 		{
 			if (get_Instance() != null)
 			{
-				get_Instance().DJEBEEIELBB();
+				get_Instance().StopDetectionInternal();
 			}
 		}
 
@@ -323,21 +323,21 @@ namespace CodeStage.AntiCheat.Detectors
 		{
 			if (get_Instance() != null)
 			{
-				get_Instance().HIEIKJFAIJE();
+				get_Instance().DisposeInternal();
 			}
 		}
 
 		public static WallHackDetector get_Instance()
 		{
-			return OGKMDFDNIEN;
+			return instance;
 		}
 
 		private static void set_Instance(WallHackDetector value)
 		{
-			OGKMDFDNIEN = value;
+			instance = value;
 		}
 
-		private static WallHackDetector NNMHGMJELIL()
+		private static WallHackDetector GetOrCreate()
 		{
 			if (get_Instance() != null)
 			{
@@ -358,16 +358,16 @@ namespace CodeStage.AntiCheat.Detectors
 			{
 				set_Instance(this);
 			}
-			SceneManager.sceneLoaded += FOFIOMHDCOM;
+			SceneManager.sceneLoaded += OnSceneLoaded;
 		}
 
 		protected override void OnDestroy()
 		{
 			base.OnDestroy();
 			StopAllCoroutines();
-			if (CKOKDJEKEMF != null)
+			if (serviceContainer != null)
 			{
-				UnityEngine.Object.Destroy(CKOKDJEKEMF);
+				UnityEngine.Object.Destroy(serviceContainer);
 			}
 			if (wfMaterial != null)
 			{
@@ -375,8 +375,8 @@ namespace CodeStage.AntiCheat.Detectors
 				wfMaterial.shader = null;
 				wfMaterial = null;
 				wfShader = null;
-				HJHIKCOBBKA = null;
-				KDCBKALFPNI = null;
+				shaderTexture = null;
+				targetTexture = null;
 				renderTexture.DiscardContents();
 				renderTexture.Release();
 				renderTexture = null;
@@ -384,34 +384,34 @@ namespace CodeStage.AntiCheat.Detectors
 			instancesInScene--;
 		}
 
-		private void FOFIOMHDCOM(Scene MHOCFOODLLL, LoadSceneMode NMMPBADCFHK)
+		private void OnSceneLoaded(Scene MHOCFOODLLL, LoadSceneMode NMMPBADCFHK)
 		{
-			KJCKJOKLPLL();
+			OnLevelLoadedCallback();
 		}
 
-		private void KJCKJOKLPLL()
+		private void OnLevelLoadedCallback()
 		{
 			if (instancesInScene < 2)
 			{
 				if (!keepAlive)
 				{
-					HIEIKJFAIJE();
+					DisposeInternal();
 				}
 			}
 			else if (!keepAlive && get_Instance() != this)
 			{
-				HIEIKJFAIJE();
+				DisposeInternal();
 			}
 		}
 
 		private void FixedUpdate()
 		{
-			if (EKDNCONELMD && checkRigidbody && !(rigidPlayer == null) && rigidPlayer.transform.localPosition.z > 1f)
+			if (isRunning && checkRigidbody && !(rigidPlayer == null) && rigidPlayer.transform.localPosition.z > 1f)
 			{
-				AOEMKDEFLNP++;
-				if (!CEGHFCJKFAL())
+				rigidbodyDetections++;
+				if (!Detect())
 				{
-					OAIBAJBLCPF();
+					StopRigidModule();
 					StartRigidModule();
 				}
 			}
@@ -419,25 +419,25 @@ namespace CodeStage.AntiCheat.Detectors
 
 		private void Update()
 		{
-			if (!EKDNCONELMD || !checkController || charControllerPlayer == null || !(charControllerVelocity > 0f))
+			if (!isRunning || !checkController || charControllerPlayer == null || !(charControllerVelocity > 0f))
 			{
 				return;
 			}
 			charControllerPlayer.Move(new Vector3(UnityEngine.Random.Range(-0.002f, 0.002f), 0f, charControllerVelocity));
 			if (charControllerPlayer.transform.localPosition.z > 1f)
 			{
-				KOBEPCAABCE++;
-				if (!CEGHFCJKFAL())
+				controllerDetections++;
+				if (!Detect())
 				{
-					LJHNKNGKNJP();
+					StopControllerModule();
 					StartControllerModule();
 				}
 			}
 		}
 
-		private void FCJDKBEGPEF(UnityAction callback, Vector3 MDCJBPDNAOG, byte OPBFDLIKAKP)
+		private void StartDetectionInternal(UnityAction callback, Vector3 MDCJBPDNAOG, byte OPBFDLIKAKP)
 		{
-			if (EKDNCONELMD)
+			if (isRunning)
 			{
 				UnityEngine.Debug.LogWarning("[ACTk] WallHack Detector: already running!", this);
 				return;
@@ -460,37 +460,37 @@ namespace CodeStage.AntiCheat.Detectors
 			detectionAction = callback;
 			spawnPosition = MDCJBPDNAOG;
 			maxFalsePositives = OPBFDLIKAKP;
-			AOEMKDEFLNP = 0;
-			KOBEPCAABCE = 0;
-			BBFALJPOABG = 0;
-			CNLPNKHBPAI = 0;
-			StartCoroutine(JLNJONBBDPM());
-			AKFEAJDLIKF = true;
-			EKDNCONELMD = true;
+			rigidbodyDetections = 0;
+			controllerDetections = 0;
+			wireframeDetections = 0;
+			raycastDetections = 0;
+			StartCoroutine(InitDetector());
+			started = true;
+			isRunning = true;
 		}
 
-		protected override void LICPBNOFNOB()
+		protected override void StartDetectionAutomatically()
 		{
-			FCJDKBEGPEF(null, spawnPosition, maxFalsePositives);
+			StartDetectionInternal(null, spawnPosition, maxFalsePositives);
 		}
 
-		protected override void HEGJDFPFMII()
+		protected override void PauseDetector()
 		{
-			if (EKDNCONELMD)
+			if (isRunning)
 			{
-				EKDNCONELMD = false;
-				OAIBAJBLCPF();
-				LJHNKNGKNJP();
-				OLOAFNAAFNF();
-				PMLJHEJNGLM();
+				isRunning = false;
+				StopRigidModule();
+				StopControllerModule();
+				StopWireframeModule();
+				StopRaycastModule();
 			}
 		}
 
-		protected override void KLJNEJIEMCN()
+		protected override void ResumeDetector()
 		{
 			if (detectionAction != null || detectionEventHasListener)
 			{
-				EKDNCONELMD = true;
+				isRunning = true;
 				if (checkRigidbody)
 				{
 					StartRigidModule();
@@ -501,65 +501,65 @@ namespace CodeStage.AntiCheat.Detectors
 				}
 				if (checkWireframe)
 				{
-					IDEIAKJHKMK();
+					StartWireframeModule();
 				}
 				if (checkRaycast)
 				{
-					JBEFELONIIP();
+					StartRaycastModule();
 				}
 			}
 		}
 
-		protected override void DJEBEEIELBB()
+		protected override void StopDetectionInternal()
 		{
-			if (AKFEAJDLIKF)
+			if (started)
 			{
-				HEGJDFPFMII();
+				PauseDetector();
 				detectionAction = null;
-				EKDNCONELMD = false;
+				isRunning = false;
 			}
 		}
 
-		protected override void HIEIKJFAIJE()
+		protected override void DisposeInternal()
 		{
-			base.HIEIKJFAIJE();
+			base.DisposeInternal();
 			if (get_Instance() == this)
 			{
 				set_Instance(null);
 			}
 		}
 
-		private void JMJDMMILGMB()
+		private void UpdateServiceContainer()
 		{
 			if (base.enabled && base.gameObject.activeSelf)
 			{
-				if (GKGKFDDEFJE == -1)
+				if (whLayer == -1)
 				{
-					GKGKFDDEFJE = LayerMask.NameToLayer("Ignore Raycast");
+					whLayer = LayerMask.NameToLayer("Ignore Raycast");
 				}
-				if (PNOHJNCLGJI == -1)
+				if (raycastMask == -1)
 				{
-					PNOHJNCLGJI = LayerMask.GetMask("Ignore Raycast");
+					raycastMask = LayerMask.GetMask("Ignore Raycast");
 				}
-				if (CKOKDJEKEMF == null)
+				if (serviceContainer == null)
 				{
-					CKOKDJEKEMF = new GameObject("[WH Detector Service]");
-					CKOKDJEKEMF.layer = GKGKFDDEFJE;
-					CKOKDJEKEMF.transform.position = spawnPosition;
-					UnityEngine.Object.DontDestroyOnLoad(CKOKDJEKEMF);
+					serviceContainer = new GameObject("[WH Detector Service]");
+					serviceContainer.layer = whLayer;
+					serviceContainer.transform.position = spawnPosition;
+					UnityEngine.Object.DontDestroyOnLoad(serviceContainer);
 				}
-				if ((checkRigidbody || checkController) && MCONGCAGIMB == null)
+				if ((checkRigidbody || checkController) && solidWall == null)
 				{
-					MCONGCAGIMB = new GameObject("SolidWall");
-					MCONGCAGIMB.AddComponent<BoxCollider>();
-					MCONGCAGIMB.layer = GKGKFDDEFJE;
-					MCONGCAGIMB.transform.parent = CKOKDJEKEMF.transform;
-					MCONGCAGIMB.transform.localScale = new Vector3(3f, 3f, 0.5f);
-					MCONGCAGIMB.transform.localPosition = Vector3.zero;
+					solidWall = new GameObject("SolidWall");
+					solidWall.AddComponent<BoxCollider>();
+					solidWall.layer = whLayer;
+					solidWall.transform.parent = serviceContainer.transform;
+					solidWall.transform.localScale = new Vector3(3f, 3f, 0.5f);
+					solidWall.transform.localPosition = Vector3.zero;
 				}
-				else if (!checkRigidbody && !checkController && MCONGCAGIMB != null)
+				else if (!checkRigidbody && !checkController && solidWall != null)
 				{
-					UnityEngine.Object.Destroy(MCONGCAGIMB);
+					UnityEngine.Object.Destroy(solidWall);
 				}
 				if (checkWireframe && wfCamera == null)
 				{
@@ -579,33 +579,33 @@ namespace CodeStage.AntiCheat.Detectors
 					}
 					else
 					{
-						if (CEHKBLKIMMH == Color.black)
+						if (foregroundColor == Color.black)
 						{
-							CEHKBLKIMMH = HMNELLILHHO();
+							foregroundColor = GenerateColor();
 							do
 							{
-								HOOHEPNGMLK = HMNELLILHHO();
+								backgroundColor = GenerateColor();
 							}
-							while (ColorsSimilar(CEHKBLKIMMH, HOOHEPNGMLK, 10));
+							while (ColorsSimilar(foregroundColor, backgroundColor, 10));
 						}
-						if (HJHIKCOBBKA == null)
+						if (shaderTexture == null)
 						{
-							HJHIKCOBBKA = new Texture2D(4, 4, TextureFormat.RGB24, false);
-							HJHIKCOBBKA.filterMode = FilterMode.Point;
+							shaderTexture = new Texture2D(4, 4, TextureFormat.RGB24, false);
+							shaderTexture.filterMode = FilterMode.Point;
 							Color[] array = new Color[16];
 							for (int i = 0; i < 16; i++)
 							{
 								if (i < 8)
 								{
-									array[i] = CEHKBLKIMMH;
+									array[i] = foregroundColor;
 								}
 								else
 								{
-									array[i] = HOOHEPNGMLK;
+									array[i] = backgroundColor;
 								}
 							}
-							HJHIKCOBBKA.SetPixels(array, 0);
-							HJHIKCOBBKA.Apply();
+							shaderTexture.SetPixels(array, 0);
+							shaderTexture.Apply();
 						}
 						if (renderTexture == null)
 						{
@@ -614,50 +614,50 @@ namespace CodeStage.AntiCheat.Detectors
 							renderTexture.filterMode = FilterMode.Point;
 							renderTexture.Create();
 						}
-						if (KDCBKALFPNI == null)
+						if (targetTexture == null)
 						{
-							KDCBKALFPNI = new Texture2D(4, 4, TextureFormat.RGB24, false);
-							KDCBKALFPNI.filterMode = FilterMode.Point;
+							targetTexture = new Texture2D(4, 4, TextureFormat.RGB24, false);
+							targetTexture.filterMode = FilterMode.Point;
 						}
 						if (wfMaterial == null)
 						{
 							wfMaterial = new Material(wfShader);
-							wfMaterial.mainTexture = HJHIKCOBBKA;
+							wfMaterial.mainTexture = shaderTexture;
 						}
-						if (NMFDCIBDLKI == null)
+						if (foregroundRenderer == null)
 						{
 							GameObject gameObject = GameObject.CreatePrimitive(PrimitiveType.Cube);
 							UnityEngine.Object.Destroy(gameObject.GetComponent<BoxCollider>());
 							gameObject.name = "WireframeFore";
-							gameObject.layer = GKGKFDDEFJE;
-							gameObject.transform.parent = CKOKDJEKEMF.transform;
+							gameObject.layer = whLayer;
+							gameObject.transform.parent = serviceContainer.transform;
 							gameObject.transform.localPosition = new Vector3(0f, 0f, 0f);
-							NMFDCIBDLKI = gameObject.GetComponent<MeshRenderer>();
-							NMFDCIBDLKI.sharedMaterial = wfMaterial;
-							NMFDCIBDLKI.shadowCastingMode = ShadowCastingMode.Off;
-							NMFDCIBDLKI.receiveShadows = false;
-							NMFDCIBDLKI.enabled = false;
+							foregroundRenderer = gameObject.GetComponent<MeshRenderer>();
+							foregroundRenderer.sharedMaterial = wfMaterial;
+							foregroundRenderer.shadowCastingMode = ShadowCastingMode.Off;
+							foregroundRenderer.receiveShadows = false;
+							foregroundRenderer.enabled = false;
 						}
-						if (PIGHOMIKPEH == null)
+						if (backgroundRenderer == null)
 						{
 							GameObject gameObject2 = GameObject.CreatePrimitive(PrimitiveType.Quad);
 							UnityEngine.Object.Destroy(gameObject2.GetComponent<MeshCollider>());
 							gameObject2.name = "WireframeBack";
-							gameObject2.layer = GKGKFDDEFJE;
-							gameObject2.transform.parent = CKOKDJEKEMF.transform;
+							gameObject2.layer = whLayer;
+							gameObject2.transform.parent = serviceContainer.transform;
 							gameObject2.transform.localPosition = new Vector3(0f, 0f, 1f);
 							gameObject2.transform.localScale = new Vector3(0.7f, 0.7f, 0.7f);
-							PIGHOMIKPEH = gameObject2.GetComponent<MeshRenderer>();
-							PIGHOMIKPEH.sharedMaterial = wfMaterial;
-							PIGHOMIKPEH.shadowCastingMode = ShadowCastingMode.Off;
-							PIGHOMIKPEH.receiveShadows = false;
-							PIGHOMIKPEH.enabled = false;
+							backgroundRenderer = gameObject2.GetComponent<MeshRenderer>();
+							backgroundRenderer.sharedMaterial = wfMaterial;
+							backgroundRenderer.shadowCastingMode = ShadowCastingMode.Off;
+							backgroundRenderer.receiveShadows = false;
+							backgroundRenderer.enabled = false;
 						}
 						if (wfCamera == null)
 						{
 							wfCamera = new GameObject("WireframeCamera").AddComponent<Camera>();
-							wfCamera.gameObject.layer = GKGKFDDEFJE;
-							wfCamera.transform.parent = CKOKDJEKEMF.transform;
+							wfCamera.gameObject.layer = whLayer;
+							wfCamera.transform.parent = serviceContainer.transform;
 							wfCamera.transform.localPosition = new Vector3(0f, 0f, -1f);
 							wfCamera.clearFlags = CameraClearFlags.Color;
 							wfCamera.backgroundColor = Color.black;
@@ -676,38 +676,38 @@ namespace CodeStage.AntiCheat.Detectors
 				}
 				else if (!checkWireframe && wfCamera != null)
 				{
-					UnityEngine.Object.Destroy(NMFDCIBDLKI.gameObject);
-					UnityEngine.Object.Destroy(PIGHOMIKPEH.gameObject);
+					UnityEngine.Object.Destroy(foregroundRenderer.gameObject);
+					UnityEngine.Object.Destroy(backgroundRenderer.gameObject);
 					wfCamera.targetTexture = null;
 					UnityEngine.Object.Destroy(wfCamera.gameObject);
 				}
-				if (checkRaycast && FBDCPDEOFGI == null)
+				if (checkRaycast && thinWall == null)
 				{
-					FBDCPDEOFGI = GameObject.CreatePrimitive(PrimitiveType.Plane);
-					FBDCPDEOFGI.name = "ThinWall";
-					FBDCPDEOFGI.layer = GKGKFDDEFJE;
-					FBDCPDEOFGI.transform.parent = CKOKDJEKEMF.transform;
-					FBDCPDEOFGI.transform.localScale = new Vector3(0.2f, 1f, 0.2f);
-					FBDCPDEOFGI.transform.localRotation = Quaternion.Euler(270f, 0f, 0f);
-					FBDCPDEOFGI.transform.localPosition = new Vector3(0f, 0f, 1.4f);
-					UnityEngine.Object.Destroy(FBDCPDEOFGI.GetComponent<Renderer>());
-					UnityEngine.Object.Destroy(FBDCPDEOFGI.GetComponent<MeshFilter>());
+					thinWall = GameObject.CreatePrimitive(PrimitiveType.Plane);
+					thinWall.name = "ThinWall";
+					thinWall.layer = whLayer;
+					thinWall.transform.parent = serviceContainer.transform;
+					thinWall.transform.localScale = new Vector3(0.2f, 1f, 0.2f);
+					thinWall.transform.localRotation = Quaternion.Euler(270f, 0f, 0f);
+					thinWall.transform.localPosition = new Vector3(0f, 0f, 1.4f);
+					UnityEngine.Object.Destroy(thinWall.GetComponent<Renderer>());
+					UnityEngine.Object.Destroy(thinWall.GetComponent<MeshFilter>());
 				}
-				else if (!checkRaycast && FBDCPDEOFGI != null)
+				else if (!checkRaycast && thinWall != null)
 				{
-					UnityEngine.Object.Destroy(FBDCPDEOFGI);
+					UnityEngine.Object.Destroy(thinWall);
 				}
 			}
-			else if (CKOKDJEKEMF != null)
+			else if (serviceContainer != null)
 			{
-				UnityEngine.Object.Destroy(CKOKDJEKEMF);
+				UnityEngine.Object.Destroy(serviceContainer);
 			}
 		}
 
-		private IEnumerator JLNJONBBDPM()
+		private IEnumerator InitDetector()
 		{
 			yield return waitForEndOfFrame;
-			JMJDMMILGMB();
+			UpdateServiceContainer();
 			if (checkRigidbody)
 			{
 				StartRigidModule();
@@ -718,11 +718,11 @@ namespace CodeStage.AntiCheat.Detectors
 			}
 			if (checkWireframe)
 			{
-				IDEIAKJHKMK();
+				StartWireframeModule();
 			}
 			if (checkRaycast)
 			{
-				JBEFELONIIP();
+				StartRaycastModule();
 			}
 		}
 
@@ -730,24 +730,24 @@ namespace CodeStage.AntiCheat.Detectors
 		{
 			if (!checkRigidbody)
 			{
-				OAIBAJBLCPF();
-				GBDCOPBKFBA();
-				JMJDMMILGMB();
+				StopRigidModule();
+				UninitRigidModule();
+				UpdateServiceContainer();
 				return;
 			}
 			if (!rigidPlayer)
 			{
-				FNIEFGIGGPA();
+				InitRigidModule();
 			}
-			if (rigidPlayer.transform.localPosition.z <= 1f && AOEMKDEFLNP > 0)
+			if (rigidPlayer.transform.localPosition.z <= 1f && rigidbodyDetections > 0)
 			{
-				AOEMKDEFLNP = 0;
+				rigidbodyDetections = 0;
 			}
 			rigidPlayer.rotation = Quaternion.identity;
 			rigidPlayer.angularVelocity = Vector3.zero;
 			rigidPlayer.transform.localPosition = new Vector3(0.75f, 0f, -1f);
 #if UNITY_6000_0_OR_NEWER
-			rigidPlayer.linearVelocity = PKIHJKCDMHD;
+			rigidPlayer.linearVelocity = rigidPlayerVelocity;
 #else
 			rigidPlayer.velocity = PKIHJKCDMHD;
 #endif
@@ -758,32 +758,32 @@ namespace CodeStage.AntiCheat.Detectors
 		{
 			if (!checkController)
 			{
-				LJHNKNGKNJP();
-				IPNJNBGAJLM();
-				JMJDMMILGMB();
+				StopControllerModule();
+				UninitControllerModule();
+				UpdateServiceContainer();
 				return;
 			}
 			if (!charControllerPlayer)
 			{
-				MKFDEMOFGIB();
+				InitControllerModule();
 			}
-			if (charControllerPlayer.transform.localPosition.z <= 1f && KOBEPCAABCE > 0)
+			if (charControllerPlayer.transform.localPosition.z <= 1f && controllerDetections > 0)
 			{
-				KOBEPCAABCE = 0;
+				controllerDetections = 0;
 			}
 			charControllerPlayer.transform.localPosition = new Vector3(-0.75f, 0f, -1f);
 			charControllerVelocity = 0.01f;
 			Invoke("StartControllerModule", 4f);
 		}
 
-		private void IDEIAKJHKMK()
+		private void StartWireframeModule()
 		{
 			if (!checkWireframe)
 			{
-				OLOAFNAAFNF();
-				JMJDMMILGMB();
+				StopWireframeModule();
+				UpdateServiceContainer();
 			}
-			else if (!JAOPPCJPDAH)
+			else if (!wireframeDetected)
 			{
 				Invoke("ShootWireframeModule", wireframeDelay);
 			}
@@ -791,54 +791,54 @@ namespace CodeStage.AntiCheat.Detectors
 
 		private void ShootWireframeModule()
 		{
-			StartCoroutine(KDCLKLLNDHK());
+			StartCoroutine(CaptureFrame());
 			Invoke("ShootWireframeModule", wireframeDelay);
 		}
 
-		private IEnumerator KDCLKLLNDHK()
+		private IEnumerator CaptureFrame()
 		{
 			wfCamera.enabled = true;
 			yield return waitForEndOfFrame;
-			NMFDCIBDLKI.enabled = true;
-			PIGHOMIKPEH.enabled = true;
+			foregroundRenderer.enabled = true;
+			backgroundRenderer.enabled = true;
 			RenderTexture active = RenderTexture.active;
 			RenderTexture.active = renderTexture;
 			wfCamera.Render();
-			NMFDCIBDLKI.enabled = false;
-			PIGHOMIKPEH.enabled = false;
+			foregroundRenderer.enabled = false;
+			backgroundRenderer.enabled = false;
 			while (!renderTexture.IsCreated())
 			{
 				yield return waitForEndOfFrame;
 			}
-			KDCBKALFPNI.ReadPixels(new Rect(0f, 0f, 4f, 4f), 0, 0, false);
-			KDCBKALFPNI.Apply();
+			targetTexture.ReadPixels(new Rect(0f, 0f, 4f, 4f), 0, 0, false);
+			targetTexture.Apply();
 			RenderTexture.active = active;
 			if (wfCamera == null)
 			{
 				yield return null;
 			}
 			wfCamera.enabled = false;
-			if (!(KDCBKALFPNI.GetPixel(0, 3) != CEHKBLKIMMH) && !(KDCBKALFPNI.GetPixel(0, 1) != HOOHEPNGMLK) && !(KDCBKALFPNI.GetPixel(3, 3) != CEHKBLKIMMH) && !(KDCBKALFPNI.GetPixel(3, 1) != HOOHEPNGMLK) && !(KDCBKALFPNI.GetPixel(1, 3) != CEHKBLKIMMH) && !(KDCBKALFPNI.GetPixel(2, 3) != CEHKBLKIMMH) && !(KDCBKALFPNI.GetPixel(1, 1) != HOOHEPNGMLK) && !(KDCBKALFPNI.GetPixel(2, 1) != HOOHEPNGMLK))
+			if (!(targetTexture.GetPixel(0, 3) != foregroundColor) && !(targetTexture.GetPixel(0, 1) != backgroundColor) && !(targetTexture.GetPixel(3, 3) != foregroundColor) && !(targetTexture.GetPixel(3, 1) != backgroundColor) && !(targetTexture.GetPixel(1, 3) != foregroundColor) && !(targetTexture.GetPixel(2, 3) != foregroundColor) && !(targetTexture.GetPixel(1, 1) != backgroundColor) && !(targetTexture.GetPixel(2, 1) != backgroundColor))
 			{
-				if (BBFALJPOABG > 0)
+				if (wireframeDetections > 0)
 				{
-					BBFALJPOABG = 0;
+					wireframeDetections = 0;
 				}
 			}
 			else
 			{
-				BBFALJPOABG++;
-				JAOPPCJPDAH = CEGHFCJKFAL();
+				wireframeDetections++;
+				wireframeDetected = Detect();
 			}
 			yield return null;
 		}
 
-		private void JBEFELONIIP()
+		private void StartRaycastModule()
 		{
 			if (!checkRaycast)
 			{
-				PMLJHEJNGLM();
-				JMJDMMILGMB();
+				StopRaycastModule();
+				UpdateServiceContainer();
 			}
 			else
 			{
@@ -848,17 +848,17 @@ namespace CodeStage.AntiCheat.Detectors
 
 		private void ShootRaycastModule()
 		{
-			if (Physics.Raycast(CKOKDJEKEMF.transform.position, CKOKDJEKEMF.transform.TransformDirection(Vector3.forward), 1.5f, PNOHJNCLGJI))
+			if (Physics.Raycast(serviceContainer.transform.position, serviceContainer.transform.TransformDirection(Vector3.forward), 1.5f, raycastMask))
 			{
-				if (CNLPNKHBPAI > 0)
+				if (raycastDetections > 0)
 				{
-					CNLPNKHBPAI = 0;
+					raycastDetections = 0;
 				}
 			}
 			else
 			{
-				CNLPNKHBPAI++;
-				if (CEGHFCJKFAL())
+				raycastDetections++;
+				if (Detect())
 				{
 					return;
 				}
@@ -866,7 +866,7 @@ namespace CodeStage.AntiCheat.Detectors
 			Invoke("ShootRaycastModule", raycastDelay);
 		}
 
-		private void OAIBAJBLCPF()
+		private void StopRigidModule()
 		{
 			if ((bool)rigidPlayer)
 			{
@@ -879,7 +879,7 @@ namespace CodeStage.AntiCheat.Detectors
 			CancelInvoke("StartRigidModule");
 		}
 
-		private void LJHNKNGKNJP()
+		private void StopControllerModule()
 		{
 			if ((bool)charControllerPlayer)
 			{
@@ -888,38 +888,38 @@ namespace CodeStage.AntiCheat.Detectors
 			CancelInvoke("StartControllerModule");
 		}
 
-		private void OLOAFNAAFNF()
+		private void StopWireframeModule()
 		{
 			CancelInvoke("ShootWireframeModule");
 		}
 
-		private void PMLJHEJNGLM()
+		private void StopRaycastModule()
 		{
 			CancelInvoke("ShootRaycastModule");
 		}
 
-		private void FNIEFGIGGPA()
+		private void InitRigidModule()
 		{
 			GameObject gameObject = new GameObject("RigidPlayer");
 			gameObject.AddComponent<CapsuleCollider>().height = 2f;
-			gameObject.layer = GKGKFDDEFJE;
-			gameObject.transform.parent = CKOKDJEKEMF.transform;
+			gameObject.layer = whLayer;
+			gameObject.transform.parent = serviceContainer.transform;
 			gameObject.transform.localPosition = new Vector3(0.75f, 0f, -1f);
 			rigidPlayer = gameObject.AddComponent<Rigidbody>();
 			rigidPlayer.useGravity = false;
 		}
 
-		private void MKFDEMOFGIB()
+		private void InitControllerModule()
 		{
 			GameObject gameObject = new GameObject("ControlledPlayer");
 			gameObject.AddComponent<CapsuleCollider>().height = 2f;
-			gameObject.layer = GKGKFDDEFJE;
-			gameObject.transform.parent = CKOKDJEKEMF.transform;
+			gameObject.layer = whLayer;
+			gameObject.transform.parent = serviceContainer.transform;
 			gameObject.transform.localPosition = new Vector3(-0.75f, 0f, -1f);
 			charControllerPlayer = gameObject.AddComponent<CharacterController>();
 		}
 
-		private void GBDCOPBKFBA()
+		private void UninitRigidModule()
 		{
 			if ((bool)rigidPlayer)
 			{
@@ -928,7 +928,7 @@ namespace CodeStage.AntiCheat.Detectors
 			}
 		}
 
-		private void IPNJNBGAJLM()
+		private void UninitControllerModule()
 		{
 			if ((bool)charControllerPlayer)
 			{
@@ -937,18 +937,18 @@ namespace CodeStage.AntiCheat.Detectors
 			}
 		}
 
-		private bool CEGHFCJKFAL()
+		private bool Detect()
 		{
 			bool result = false;
-			if (KOBEPCAABCE > maxFalsePositives || AOEMKDEFLNP > maxFalsePositives || BBFALJPOABG > maxFalsePositives || CNLPNKHBPAI > maxFalsePositives)
+			if (controllerDetections > maxFalsePositives || rigidbodyDetections > maxFalsePositives || wireframeDetections > maxFalsePositives || raycastDetections > maxFalsePositives)
 			{
-				MCDANNDOEIK();
+				OnCheatingDetected();
 				result = true;
 			}
 			return result;
 		}
 
-		private static Color32 HMNELLILHHO()
+		private static Color32 GenerateColor()
 		{
 			return new Color32((byte)UnityEngine.Random.Range(0, 256), (byte)UnityEngine.Random.Range(0, 256), (byte)UnityEngine.Random.Range(0, 256), byte.MaxValue);
 		}

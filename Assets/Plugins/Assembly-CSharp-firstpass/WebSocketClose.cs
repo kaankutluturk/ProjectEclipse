@@ -10,16 +10,16 @@ public sealed class WebSocketClose : WebSocketBinaryFrame
 	}
 
 	public WebSocketClose(ushort KJPGKHJNOMC, string LIOGIBJBHAH)
-		: base(GDENFGNLFKL(KJPGKHJNOMC, LIOGIBJBHAH))
+		: base(GetCloseData(KJPGKHJNOMC, LIOGIBJBHAH))
 	{
 	}
 
-	public override BECKAHJIEGE get_Type()
+	public override WebSocketFrameTypes get_Type()
 	{
-		return BECKAHJIEGE.ConnectionClose;
+		return WebSocketFrameTypes.ConnectionClose;
 	}
 
-	private static byte[] GDENFGNLFKL(ushort KJPGKHJNOMC, string LIOGIBJBHAH)
+	private static byte[] GetCloseData(ushort KJPGKHJNOMC, string LIOGIBJBHAH)
 	{
 		int byteCount = Encoding.UTF8.GetByteCount(LIOGIBJBHAH);
 		using (MemoryStream memoryStream = new MemoryStream(2 + byteCount))

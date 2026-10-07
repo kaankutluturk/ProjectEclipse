@@ -11,15 +11,15 @@ $definitionIdPath = Join-Path $root 'Assets/Scripts/Eclipse/Runtime/Modding/Defi
 # UserItem.cs makes this a regression test for the actual users.xml mutation path rather
 # than a second implementation of the persistence rules.
 $parseEnchantments = [regex]::Match($userItemSource,
-    '(?ms)^\tprivate void CHBPLGEDGAC\(XmlNode node\).*?^\t\}').Value
+    '(?ms)^\tprivate void ParseEnchantments\(XmlNode node\).*?^\t\}').Value
 $migrateKind = [regex]::Match($userItemSource,
     '(?ms)^\tprivate static void EnsureExternalEnchantmentKind\(XmlNode node, PerkInfoItem perk\).*?^\t\}').Value
 $applyEnchantments = [regex]::Match($userItemSource,
-    '(?ms)^\tpublic void GDBFNNLHPOB\(List<PerkStruct> HALHGEGADKA, int MPAGFAKIEJG, int MHNCENBCECJ\).*?^\t\}').Value
+    '(?ms)^\tpublic void ApplyEnchantments\(List<PerkStruct> HALHGEGADKA, int MPAGFAKIEJG, int MHNCENBCECJ\).*?^\t\}').Value
 $removeSingle = [regex]::Match($userItemSource,
-    '(?ms)^\tprivate void JNGJKFLJCML\(\).*?^\t\}').Value
+    '(?ms)^\tprivate void RemoveSingleEnchantments\(\).*?^\t\}').Value
 $removeCombo = [regex]::Match($userItemSource,
-    '(?ms)^\tprivate void AMCMLDINIOM\(\).*?^\t\}').Value
+    '(?ms)^\tprivate void RemoveComboEnchantments\(\).*?^\t\}').Value
 $removeSaved = [regex]::Match($userItemSource,
     '(?ms)^\tprivate void RemoveSavedExternalEnchantmentsByKind\(string kind\).*?^\t\}').Value
 $isEclipseOwned = [regex]::Match($userItemSource,
@@ -50,12 +50,12 @@ namespace Eclipse.Modding
 
 public static class XmlCompat
 {
-    public static string CIPOICEEIBK(this XmlAttribute attribute, string fallback = "")
+    public static string GetStringOrDefault(this XmlAttribute attribute, string fallback = "")
     {
         return attribute == null ? fallback : attribute.Value;
     }
 
-    public static XmlAttribute LLIKNHNLGJJ(this XmlNode node, string name)
+    public static XmlAttribute AppendAttribute(this XmlNode node, string name)
     {
         XmlAttribute attribute = node.Attributes[name];
         if (attribute != null) return attribute;
@@ -64,19 +64,19 @@ public static class XmlCompat
         return attribute;
     }
 
-    public static XmlNode ACBPMPMPKJJ(this XmlNode node, string name)
+    public static XmlNode AppendElement(this XmlNode node, string name)
     {
         XmlElement child = node.OwnerDocument.CreateElement(name);
         node.AppendChild(child);
         return child;
     }
 
-    public static XmlNode KDPLHGGPJHN(this XmlNode node, string name)
+    public static XmlNode AppendNewNode(this XmlNode node, string name)
     {
-        return node.ACBPMPMPKJJ(name);
+        return node.AppendElement(name);
     }
 
-    public static XmlNode LJGLMGNAFHJ(this XmlNode node, string childName, string attributeName, string value)
+    public static XmlNode FindChildWithAttribute(this XmlNode node, string childName, string attributeName, string value)
     {
         if (node == null) return null;
         foreach (XmlNode child in node.ChildNodes)
@@ -88,7 +88,7 @@ public static class XmlCompat
 
 public sealed class FunctionResult
 {
-    public string DCJLKCFKCOM;
+    public string Value;
 }
 
 public sealed class FunctionExtension
@@ -96,18 +96,18 @@ public sealed class FunctionExtension
     public sealed class CallbackResult { public string DCJLKCFKCOM; }
     private string _value;
     public void Parse(string value) { _value = value; }
-    public void PBPBNENGLPA(Action<CallbackResult> callback) { }
-    public void DMPCFMACDJM(Action<CallbackResult> callback) { }
-    public FunctionResult IBCPKBBAFNH() { return new FunctionResult { DCJLKCFKCOM = _value }; }
+    public void SetFunctionCallback(Action<CallbackResult> callback) { }
+    public void SetVariableCallback(Action<CallbackResult> callback) { }
+    public FunctionResult Calculate() { return new FunctionResult { Value = _value }; }
 }
 
 public sealed class PerkInfoItem
 {
-    public enum DNPGIEGCGKH { COMBO = 0, SINGLE = 1 }
+    public enum PerkKind { COMBO = 0, SINGLE = 1 }
     public string Name;
-    public DNPGIEGCGKH LELHEEDNMBP;
-    public void HJFEFJIEINN(FunctionExtension.CallbackResult value) { }
-    public void OKPFNCJFLDL(FunctionExtension.CallbackResult value) { }
+    public PerkKind Kind;
+    public void EvaluateFunctionCallback(FunctionExtension.CallbackResult value) { }
+    public void OnFunctionPreCallback(FunctionExtension.CallbackResult value) { }
 }
 
 public sealed class PerkItems
@@ -115,14 +115,14 @@ public sealed class PerkItems
     private readonly Dictionary<string, PerkInfoItem> _perks =
         new Dictionary<string, PerkInfoItem>(StringComparer.Ordinal);
 
-    public void Add(string name, PerkInfoItem.DNPGIEGCGKH kind)
+    public void Add(string name, PerkInfoItem.PerkKind kind)
     {
-        _perks[name] = new PerkInfoItem { Name = name, LELHEEDNMBP = kind };
+        _perks[name] = new PerkInfoItem { Name = name, Kind = kind };
     }
 
     public void Remove(string name) { _perks.Remove(name); }
 
-    public PerkInfoItem ABAGJKMKCBA(string name)
+    public PerkInfoItem FindBasePerk(string name)
     {
         PerkInfoItem value;
         return name != null && _perks.TryGetValue(name, out value) ? value : null;
@@ -131,49 +131,49 @@ public sealed class PerkItems
 
 public static class GameUtils
 {
-    public static readonly PerkItems FDEJIIDIPBI = new PerkItems();
+    public static readonly PerkItems PerkItemList = new PerkItems();
 }
 
 public static class ItemInfo
 {
-    public static PerkInfoItem APPAODDDDKI(XmlNode node)
+    public static PerkInfoItem ParsePerk(XmlNode node)
     {
-        string name = node?.Attributes?["Name"].CIPOICEEIBK(string.Empty);
-        PerkInfoItem source = GameUtils.FDEJIIDIPBI.ABAGJKMKCBA(name);
+        string name = node?.Attributes?["Name"].GetStringOrDefault(string.Empty);
+        PerkInfoItem source = GameUtils.PerkItemList.FindBasePerk(name);
         if (source == null) return null;
-        return new PerkInfoItem { Name = source.Name, LELHEEDNMBP = source.LELHEEDNMBP };
+        return new PerkInfoItem { Name = source.Name, Kind = source.Kind };
     }
 }
 
 public sealed class Roster
 {
-    public int MMIMAJCKFKL;
-    public bool CLODDOOGDBB;
+    public int LevelOverride;
+    public bool UseLevelOverride;
 }
 
 public static class ListSF
 {
     private static readonly Roster Roster = new Roster();
-    public static Roster CCDKHLAMKKO() { return Roster; }
+    public static Roster GetRoster() { return Roster; }
 }
 
 public sealed class UserItem
 {
     private readonly XmlNode _Node;
-    private readonly bool JGPEOEDJMHH = true;
-    private readonly List<PerkInfoItem> JCGBOOPPOLG = new List<PerkInfoItem>();
-    public IReadOnlyList<PerkInfoItem> RuntimeEnchantments => JCGBOOPPOLG.AsReadOnly();
+    private readonly bool writesToNode = true;
+    private readonly List<PerkInfoItem> enchantments = new List<PerkInfoItem>();
+    public IReadOnlyList<PerkInfoItem> RuntimeEnchantments => enchantments.AsReadOnly();
     public XmlNode Node => _Node;
 
     public UserItem(XmlNode node)
     {
         _Node = node;
-        if (node?["Enchantments"] != null) CHBPLGEDGAC(node["Enchantments"]);
+        if (node?["Enchantments"] != null) ParseEnchantments(node["Enchantments"]);
     }
 
-    private void LEFIBJHJAOD(bool includeCombo = true, bool removeNodes = false)
+    private void RemoveEnchantments(bool includeCombo = true, bool removeNodes = false)
     {
-        JCGBOOPPOLG.Clear();
+        enchantments.Clear();
     }
 
     __PARSE_ENCHANTMENTS__
@@ -231,11 +231,11 @@ public static class Program
 
     public static int Main()
     {
-        GameUtils.FDEJIIDIPBI.Add(ModPerk, PerkInfoItem.DNPGIEGCGKH.SINGLE);
-        GameUtils.FDEJIIDIPBI.Add(VanillaPerk, PerkInfoItem.DNPGIEGCGKH.SINGLE);
+        GameUtils.PerkItemList.Add(ModPerk, PerkInfoItem.PerkKind.SINGLE);
+        GameUtils.PerkItemList.Add(VanillaPerk, PerkInfoItem.PerkKind.SINGLE);
 
         // New forge candidates carry a stable public enchantment identity separately from
-        // the legacy runtime perk Name. GDBFNNLHPOB must persist both plus the evaluated Set.
+        // the legacy runtime perk Name. ApplyEnchantments must persist both plus the evaluated Set.
         var candidateDocument = new XmlDocument();
         XmlElement candidateNode = Perk(candidateDocument, ModPerk, "Single", ModEnchantment, "321");
         candidateNode.SetAttribute("ItemType", "Weapon");
@@ -250,7 +250,7 @@ public static class Program
         var itemDocument = new XmlDocument();
         itemDocument.LoadXml("<Item Name='WEAPON_KATANA'/>");
         var item = new UserItem(itemDocument.DocumentElement);
-        item.GDBFNNLHPOB(new List<PerkStruct> { new PerkStruct(candidateNode) }, 1200, 12);
+        item.ApplyEnchantments(new List<PerkStruct> { new PerkStruct(candidateNode) }, 1200, 12);
         XmlElement saved = (XmlElement)item.Node["Enchantments"].FirstChild;
         Assert(saved.GetAttribute("Name") == ModPerk &&
             saved.GetAttribute(PerkStruct.EclipseEnchantmentAttribute) == ModEnchantment &&
@@ -267,7 +267,7 @@ public static class Program
             "Installed mod enchantment did not resolve after a users.xml DOM reload.");
 
         // Removing the mod must hide the runtime effect while preserving its complete opaque node.
-        GameUtils.FDEJIIDIPBI.Remove(ModPerk);
+        GameUtils.PerkItemList.Remove(ModPerk);
         var absent = Load(firstSave);
         string absentBeforeReplacement = absent.Node["Enchantments"].FirstChild.OuterXml;
         Assert(absent.RuntimeEnchantments.Count == 0 && absentBeforeReplacement == firstSavedPerk,
@@ -283,7 +283,7 @@ public static class Program
         var vanillaCandidateDocument = new XmlDocument();
         XmlElement vanillaNode = Perk(vanillaCandidateDocument, VanillaPerk, null, null, "777");
         vanillaCandidateDocument.AppendChild(vanillaNode);
-        absent.GDBFNNLHPOB(new List<PerkStruct> { new PerkStruct(vanillaNode) }, 1200, 12);
+        absent.ApplyEnchantments(new List<PerkStruct> { new PerkStruct(vanillaNode) }, 1200, 12);
         XmlNode afterReplacement = absent.Node["Enchantments"];
         Assert(CountPerks(afterReplacement, ModPerk) == 0 && CountPerks(afterReplacement, VanillaPerk) == 1,
             "A missing external Single survived replacement by a later Single enchantment.");
@@ -292,7 +292,7 @@ public static class Program
             "Replacement deleted or normalized unrelated opaque enchantment data.");
 
         // Reinstalling the old mod must not resurrect the replaced external enchantment.
-        GameUtils.FDEJIIDIPBI.Add(ModPerk, PerkInfoItem.DNPGIEGCGKH.SINGLE);
+        GameUtils.PerkItemList.Add(ModPerk, PerkInfoItem.PerkKind.SINGLE);
         var restoredAfterReplacement = Load(absent.Node.OuterXml);
         Assert(CountPerks(restoredAfterReplacement.Node["Enchantments"], ModPerk) == 0 &&
             restoredAfterReplacement.RuntimeEnchantments.Count == 1 &&
@@ -317,16 +317,16 @@ public static class Program
 			"Resolved external perk did not repair stale replacement-kind metadata.");
 
 		const string NonPerkQualifiedName = "unrelated.mod:other/future";
-		GameUtils.FDEJIIDIPBI.Add(NonPerkQualifiedName, PerkInfoItem.DNPGIEGCGKH.SINGLE);
+		GameUtils.PerkItemList.Add(NonPerkQualifiedName, PerkInfoItem.PerkKind.SINGLE);
 		var nonPerk = Load("<Item><Enchantments><Perk Name='" + NonPerkQualifiedName +
 			"'><Set Aspect='1'/></Perk></Enchantments></Item>");
 		Assert(((XmlElement)nonPerk.Node["Enchantments"].FirstChild)
 			.GetAttribute(PerkStruct.EclipseKindAttribute) == string.Empty,
 			"Load migration tagged a namespaced runtime effect that is not an Eclipse perk definition ID.");
 
-        GameUtils.FDEJIIDIPBI.Remove(ModPerk);
+        GameUtils.PerkItemList.Remove(ModPerk);
         var legacyAbsent = Load(legacy.Node.OuterXml);
-        legacyAbsent.GDBFNNLHPOB(new List<PerkStruct> { new PerkStruct(vanillaNode) }, 1200, 12);
+        legacyAbsent.ApplyEnchantments(new List<PerkStruct> { new PerkStruct(vanillaNode) }, 1200, 12);
         Assert(CountPerks(legacyAbsent.Node["Enchantments"], ModPerk) == 0 &&
             legacyAbsent.Node["Enchantments"]["FutureNode"]?.Attributes?["Keep"]?.Value == "yes",
             "Migrated legacy external enchantment did not obey missing-mod replacement semantics.");

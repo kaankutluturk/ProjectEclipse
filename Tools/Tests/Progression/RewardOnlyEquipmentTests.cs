@@ -215,7 +215,7 @@ public sealed class Items
     }
     public void RemoveExternalItem(string name) => _items.Remove(name);
     // best guess for name: GetItemSets. Signature retained for the extracted caller.
-    public ItemSets DGKMILIPLLF() => new ItemSets();
+    public ItemSets GetItemSets() => new ItemSets();
 }
 public static class LocalizationManager
 {
@@ -223,16 +223,16 @@ public static class LocalizationManager
     public static readonly Dictionary<string, string> Base = new Dictionary<string, string>();
     public static readonly Dictionary<string, string> External = new Dictionary<string, string>();
     // best guess for name: ActiveLanguage. Signature retained for the extracted caller.
-    public static Language ILAJKOBCHFH = new Language { name = "eng" };
+    public static Language CurrentLanguage = new Language { name = "eng" };
     // best guess for name: DefaultLanguage. Signature retained for the extracted caller.
-    public static string POIPGLLCCKC = "eng";
+    public static string DefaultLanguageName = "eng";
     // best guess for name: LanguageChanged. Signature retained for the extracted caller.
-    public static event Action OCLBJLPOKLB;
+    public static event Action LanguageChanged;
     public static void SetExternalString(string key, string value) => External[key] = value;
     public static void RemoveExternalString(string key) => External.Remove(key);
     public static string Get(string key) => External.TryGetValue(key, out var value) ? value :
         Base.TryGetValue(key, out value) ? value : string.Empty;
-    public static void ChangeLanguage(string name) { ILAJKOBCHFH.name = name; OCLBJLPOKLB?.Invoke(); }
+    public static void ChangeLanguage(string name) { CurrentLanguage.name = name; LanguageChanged?.Invoke(); }
 }
 namespace Eclipse.Modding
 {
@@ -256,7 +256,7 @@ namespace Eclipse.Modding
             throw new NotSupportedException("No sets in this fixture.");
         public void RemoveTestContent()
         {
-            if (_languageSubscribed) LocalizationManager.OCLBJLPOKLB -= OnLanguageChanged;
+            if (_languageSubscribed) LocalizationManager.LanguageChanged -= OnLanguageChanged;
             RemoveLocalization();
             RemoveItems();
             _disposed = true;

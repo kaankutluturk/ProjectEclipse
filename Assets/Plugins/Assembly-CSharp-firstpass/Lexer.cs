@@ -4,23 +4,23 @@ using System.Text;
 
 internal class Lexer
 {
-	private delegate bool MGLALMHHOGL(FsmContext IEBDPKGBOGJ);
+	private delegate bool StateHandler(FsmContext IEBDPKGBOGJ);
 
 	private static int[] fsm_return_table;
 
-	private static MGLALMHHOGL[] MOCBIJNMDKH;
+	private static StateHandler[] fsm_handler_table;
 
-	private bool ILNBEIIEBMJ;
+	private bool allow_comments;
 
-	private bool KIDINKPOHCD;
+	private bool allow_single_quoted_strings;
 
-	private bool LGPODKLEMBP;
+	private bool end_of_input;
 
-	private FsmContext GFHMIGANEPF;
+	private FsmContext fsm_context;
 
-	private int KCLLHLMNMKO;
+	private int input_buffer;
 
-	private int LJJGFHFKGHN;
+	private int input_char;
 
 	private TextReader reader;
 
@@ -30,107 +30,107 @@ internal class Lexer
 
 	private string string_value;
 
-	private int JLFCBDKNAGP;
+	private int token;
 
-	private int FGCEBBKDFPE;
+	private int unichar;
 
-	public bool NIHDCFNOEMF
+	public bool AllowComments
 	{
 		get
 		{
-			return CGHOOPPOBJO();
+			return GetAllowComments();
 		}
 		set
 		{
-			LEONKMNNHJC(value);
+			SetAllowComments(value);
 		}
 	}
 
-	public bool CBCDIFLPHAK
+	public bool AllowSingleQuotedStrings
 	{
 		get
 		{
-			return MIPNPCEMOPG();
+			return GetAllowSingleQuotedStrings();
 		}
 		set
 		{
-			JKAFBNBJLCM(value);
+			SetAllowSingleQuotedStrings(value);
 		}
 	}
 
-	public bool GEPCEOKMALO
+	public bool EndOfInput
 	{
 		get
 		{
-			return ELOPMJBDCEN();
+			return GetEndOfInput();
 		}
 	}
 
-	public int CJPJNFFJNGN
+	public int Token
 	{
 		get
 		{
-			return EACDJONMMAP();
+			return GetToken();
 		}
 	}
 
-	public string OGGIEEDEKEM
+	public string StringValue
 	{
 		get
 		{
-			return EODMEFCBIOM();
+			return GetStringValue();
 		}
 	}
 
 	static Lexer()
 	{
-		NBOMPEKELBH();
+		PopulateFsmTables();
 	}
 
 	public Lexer(TextReader reader)
 	{
-		ILNBEIIEBMJ = true;
-		KIDINKPOHCD = true;
-		KCLLHLMNMKO = 0;
+		allow_comments = true;
+		allow_single_quoted_strings = true;
+		input_buffer = 0;
 		string_buffer = new StringBuilder(128);
 		state = 1;
-		LGPODKLEMBP = false;
+		end_of_input = false;
 		this.reader = reader;
-		GFHMIGANEPF = new FsmContext();
-		GFHMIGANEPF.PLHFFNOPLMM = this;
+		fsm_context = new FsmContext();
+		fsm_context.L = this;
 	}
 
-	public bool CGHOOPPOBJO()
+	public bool GetAllowComments()
 	{
-		return ILNBEIIEBMJ;
+		return allow_comments;
 	}
 
-	public void LEONKMNNHJC(bool value)
+	public void SetAllowComments(bool value)
 	{
-		ILNBEIIEBMJ = value;
+		allow_comments = value;
 	}
 
-	public bool MIPNPCEMOPG()
+	public bool GetAllowSingleQuotedStrings()
 	{
-		return KIDINKPOHCD;
+		return allow_single_quoted_strings;
 	}
 
-	public void JKAFBNBJLCM(bool value)
+	public void SetAllowSingleQuotedStrings(bool value)
 	{
-		KIDINKPOHCD = value;
+		allow_single_quoted_strings = value;
 	}
 
-	public bool ELOPMJBDCEN()
+	public bool GetEndOfInput()
 	{
-		return LGPODKLEMBP;
+		return end_of_input;
 	}
 
-	public int EACDJONMMAP()
+	public int GetToken()
 	{
-		return JLFCBDKNAGP;
+		return token;
 	}
 
-	public string EODMEFCBIOM()
+	public string GetStringValue()
 	{
 		return string_value;
 	}
@@ -162,13 +162,13 @@ internal class Lexer
 		}
 	}
 
-	private static void NBOMPEKELBH()
+	private static void PopulateFsmTables()
 	{
-		MOCBIJNMDKH = new MGLALMHHOGL[28]
+		fsm_handler_table = new StateHandler[28]
 		{
-			HJMEEAGDJCF, ANKHKJFGFPM, EJHIGDNFCDK, CLEGNLOABGG, HDCICLINCFJ, PNMFKCAGAOO, CEGCABJIFAC, BECIMMGHALF, AOMINPGADIM, DFNLBPEFAIM,
-			PNLIDPLFJND, DFBHIODPHBG, LDKFPIDDHBD, MHCNLJAHDMO, EOJOLJMHMIE, LHEDIFJCNCF, AHPOCKCJPFD, MPBAAPKKHPA, BMJONAADIEA, FILDPJMEDAL,
-			PEBHDBIELEI, HCLNFPJIEPH, LBIDLILELGF, DPLKFCBNBBI, OEIJIEICKGC, KODHDINLCML, KEHPOJHCJJI, HKPHGNANHDD
+			State1, State2, State3, State4, State5, State6, State7, State8, State9, State10,
+			State11, State12, State13, State14, State15, State16, State17, State18, State19, State20,
+			State21, State22, State23, State24, State25, State26, State27, State28
 		};
 		fsm_return_table = new int[28]
 		{
@@ -202,24 +202,24 @@ internal class Lexer
 		}
 	}
 
-	private static bool HJMEEAGDJCF(FsmContext IEBDPKGBOGJ)
+	private static bool State1(FsmContext IEBDPKGBOGJ)
 	{
-		while (IEBDPKGBOGJ.PLHFFNOPLMM.POLJELICCMK())
+		while (IEBDPKGBOGJ.L.GetChar())
 		{
-			if (IEBDPKGBOGJ.PLHFFNOPLMM.LJJGFHFKGHN == 32 || (IEBDPKGBOGJ.PLHFFNOPLMM.LJJGFHFKGHN >= 9 && IEBDPKGBOGJ.PLHFFNOPLMM.LJJGFHFKGHN <= 13))
+			if (IEBDPKGBOGJ.L.input_char == 32 || (IEBDPKGBOGJ.L.input_char >= 9 && IEBDPKGBOGJ.L.input_char <= 13))
 			{
 				continue;
 			}
-			if (IEBDPKGBOGJ.PLHFFNOPLMM.LJJGFHFKGHN >= 49 && IEBDPKGBOGJ.PLHFFNOPLMM.LJJGFHFKGHN <= 57)
+			if (IEBDPKGBOGJ.L.input_char >= 49 && IEBDPKGBOGJ.L.input_char <= 57)
 			{
-				IEBDPKGBOGJ.PLHFFNOPLMM.string_buffer.Append((char)IEBDPKGBOGJ.PLHFFNOPLMM.LJJGFHFKGHN);
-				IEBDPKGBOGJ.BKINLEDMLDJ = 3;
+				IEBDPKGBOGJ.L.string_buffer.Append((char)IEBDPKGBOGJ.L.input_char);
+				IEBDPKGBOGJ.NextState = 3;
 				return true;
 			}
-			switch (IEBDPKGBOGJ.PLHFFNOPLMM.LJJGFHFKGHN)
+			switch (IEBDPKGBOGJ.L.input_char)
 			{
 			case 34:
-				IEBDPKGBOGJ.BKINLEDMLDJ = 19;
+				IEBDPKGBOGJ.NextState = 19;
 				IEBDPKGBOGJ.Return = true;
 				return true;
 			case 44:
@@ -228,41 +228,41 @@ internal class Lexer
 			case 93:
 			case 123:
 			case 125:
-				IEBDPKGBOGJ.BKINLEDMLDJ = 1;
+				IEBDPKGBOGJ.NextState = 1;
 				IEBDPKGBOGJ.Return = true;
 				return true;
 			case 45:
-				IEBDPKGBOGJ.PLHFFNOPLMM.string_buffer.Append((char)IEBDPKGBOGJ.PLHFFNOPLMM.LJJGFHFKGHN);
-				IEBDPKGBOGJ.BKINLEDMLDJ = 2;
+				IEBDPKGBOGJ.L.string_buffer.Append((char)IEBDPKGBOGJ.L.input_char);
+				IEBDPKGBOGJ.NextState = 2;
 				return true;
 			case 48:
-				IEBDPKGBOGJ.PLHFFNOPLMM.string_buffer.Append((char)IEBDPKGBOGJ.PLHFFNOPLMM.LJJGFHFKGHN);
-				IEBDPKGBOGJ.BKINLEDMLDJ = 4;
+				IEBDPKGBOGJ.L.string_buffer.Append((char)IEBDPKGBOGJ.L.input_char);
+				IEBDPKGBOGJ.NextState = 4;
 				return true;
 			case 102:
-				IEBDPKGBOGJ.BKINLEDMLDJ = 12;
+				IEBDPKGBOGJ.NextState = 12;
 				return true;
 			case 110:
-				IEBDPKGBOGJ.BKINLEDMLDJ = 16;
+				IEBDPKGBOGJ.NextState = 16;
 				return true;
 			case 116:
-				IEBDPKGBOGJ.BKINLEDMLDJ = 9;
+				IEBDPKGBOGJ.NextState = 9;
 				return true;
 			case 39:
-				if (!IEBDPKGBOGJ.PLHFFNOPLMM.KIDINKPOHCD)
+				if (!IEBDPKGBOGJ.L.allow_single_quoted_strings)
 				{
 					return false;
 				}
-				IEBDPKGBOGJ.PLHFFNOPLMM.LJJGFHFKGHN = 34;
-				IEBDPKGBOGJ.BKINLEDMLDJ = 23;
+				IEBDPKGBOGJ.L.input_char = 34;
+				IEBDPKGBOGJ.NextState = 23;
 				IEBDPKGBOGJ.Return = true;
 				return true;
 			case 47:
-				if (!IEBDPKGBOGJ.PLHFFNOPLMM.ILNBEIIEBMJ)
+				if (!IEBDPKGBOGJ.L.allow_comments)
 				{
 					return false;
 				}
-				IEBDPKGBOGJ.BKINLEDMLDJ = 25;
+				IEBDPKGBOGJ.NextState = 25;
 				return true;
 			default:
 				return false;
@@ -271,57 +271,57 @@ internal class Lexer
 		return true;
 	}
 
-	private static bool ANKHKJFGFPM(FsmContext IEBDPKGBOGJ)
+	private static bool State2(FsmContext IEBDPKGBOGJ)
 	{
-		IEBDPKGBOGJ.PLHFFNOPLMM.POLJELICCMK();
-		if (IEBDPKGBOGJ.PLHFFNOPLMM.LJJGFHFKGHN >= 49 && IEBDPKGBOGJ.PLHFFNOPLMM.LJJGFHFKGHN <= 57)
+		IEBDPKGBOGJ.L.GetChar();
+		if (IEBDPKGBOGJ.L.input_char >= 49 && IEBDPKGBOGJ.L.input_char <= 57)
 		{
-			IEBDPKGBOGJ.PLHFFNOPLMM.string_buffer.Append((char)IEBDPKGBOGJ.PLHFFNOPLMM.LJJGFHFKGHN);
-			IEBDPKGBOGJ.BKINLEDMLDJ = 3;
+			IEBDPKGBOGJ.L.string_buffer.Append((char)IEBDPKGBOGJ.L.input_char);
+			IEBDPKGBOGJ.NextState = 3;
 			return true;
 		}
-		int lJJGFHFKGHN = IEBDPKGBOGJ.PLHFFNOPLMM.LJJGFHFKGHN;
+		int lJJGFHFKGHN = IEBDPKGBOGJ.L.input_char;
 		if (lJJGFHFKGHN == 48)
 		{
-			IEBDPKGBOGJ.PLHFFNOPLMM.string_buffer.Append((char)IEBDPKGBOGJ.PLHFFNOPLMM.LJJGFHFKGHN);
-			IEBDPKGBOGJ.BKINLEDMLDJ = 4;
+			IEBDPKGBOGJ.L.string_buffer.Append((char)IEBDPKGBOGJ.L.input_char);
+			IEBDPKGBOGJ.NextState = 4;
 			return true;
 		}
 		return false;
 	}
 
-	private static bool EJHIGDNFCDK(FsmContext IEBDPKGBOGJ)
+	private static bool State3(FsmContext IEBDPKGBOGJ)
 	{
-		while (IEBDPKGBOGJ.PLHFFNOPLMM.POLJELICCMK())
+		while (IEBDPKGBOGJ.L.GetChar())
 		{
-			if (IEBDPKGBOGJ.PLHFFNOPLMM.LJJGFHFKGHN >= 48 && IEBDPKGBOGJ.PLHFFNOPLMM.LJJGFHFKGHN <= 57)
+			if (IEBDPKGBOGJ.L.input_char >= 48 && IEBDPKGBOGJ.L.input_char <= 57)
 			{
-				IEBDPKGBOGJ.PLHFFNOPLMM.string_buffer.Append((char)IEBDPKGBOGJ.PLHFFNOPLMM.LJJGFHFKGHN);
+				IEBDPKGBOGJ.L.string_buffer.Append((char)IEBDPKGBOGJ.L.input_char);
 				continue;
 			}
-			if (IEBDPKGBOGJ.PLHFFNOPLMM.LJJGFHFKGHN == 32 || (IEBDPKGBOGJ.PLHFFNOPLMM.LJJGFHFKGHN >= 9 && IEBDPKGBOGJ.PLHFFNOPLMM.LJJGFHFKGHN <= 13))
+			if (IEBDPKGBOGJ.L.input_char == 32 || (IEBDPKGBOGJ.L.input_char >= 9 && IEBDPKGBOGJ.L.input_char <= 13))
 			{
 				IEBDPKGBOGJ.Return = true;
-				IEBDPKGBOGJ.BKINLEDMLDJ = 1;
+				IEBDPKGBOGJ.NextState = 1;
 				return true;
 			}
-			switch (IEBDPKGBOGJ.PLHFFNOPLMM.LJJGFHFKGHN)
+			switch (IEBDPKGBOGJ.L.input_char)
 			{
 			case 44:
 			case 93:
 			case 125:
-				IEBDPKGBOGJ.PLHFFNOPLMM.FMKBGGPKKEN();
+				IEBDPKGBOGJ.L.UngetChar();
 				IEBDPKGBOGJ.Return = true;
-				IEBDPKGBOGJ.BKINLEDMLDJ = 1;
+				IEBDPKGBOGJ.NextState = 1;
 				return true;
 			case 46:
-				IEBDPKGBOGJ.PLHFFNOPLMM.string_buffer.Append((char)IEBDPKGBOGJ.PLHFFNOPLMM.LJJGFHFKGHN);
-				IEBDPKGBOGJ.BKINLEDMLDJ = 5;
+				IEBDPKGBOGJ.L.string_buffer.Append((char)IEBDPKGBOGJ.L.input_char);
+				IEBDPKGBOGJ.NextState = 5;
 				return true;
 			case 69:
 			case 101:
-				IEBDPKGBOGJ.PLHFFNOPLMM.string_buffer.Append((char)IEBDPKGBOGJ.PLHFFNOPLMM.LJJGFHFKGHN);
-				IEBDPKGBOGJ.BKINLEDMLDJ = 7;
+				IEBDPKGBOGJ.L.string_buffer.Append((char)IEBDPKGBOGJ.L.input_char);
+				IEBDPKGBOGJ.NextState = 7;
 				return true;
 			default:
 				return false;
@@ -330,78 +330,78 @@ internal class Lexer
 		return true;
 	}
 
-	private static bool CLEGNLOABGG(FsmContext IEBDPKGBOGJ)
+	private static bool State4(FsmContext IEBDPKGBOGJ)
 	{
-		IEBDPKGBOGJ.PLHFFNOPLMM.POLJELICCMK();
-		if (IEBDPKGBOGJ.PLHFFNOPLMM.LJJGFHFKGHN == 32 || (IEBDPKGBOGJ.PLHFFNOPLMM.LJJGFHFKGHN >= 9 && IEBDPKGBOGJ.PLHFFNOPLMM.LJJGFHFKGHN <= 13))
+		IEBDPKGBOGJ.L.GetChar();
+		if (IEBDPKGBOGJ.L.input_char == 32 || (IEBDPKGBOGJ.L.input_char >= 9 && IEBDPKGBOGJ.L.input_char <= 13))
 		{
 			IEBDPKGBOGJ.Return = true;
-			IEBDPKGBOGJ.BKINLEDMLDJ = 1;
+			IEBDPKGBOGJ.NextState = 1;
 			return true;
 		}
-		switch (IEBDPKGBOGJ.PLHFFNOPLMM.LJJGFHFKGHN)
+		switch (IEBDPKGBOGJ.L.input_char)
 		{
 		case 44:
 		case 93:
 		case 125:
-			IEBDPKGBOGJ.PLHFFNOPLMM.FMKBGGPKKEN();
+			IEBDPKGBOGJ.L.UngetChar();
 			IEBDPKGBOGJ.Return = true;
-			IEBDPKGBOGJ.BKINLEDMLDJ = 1;
+			IEBDPKGBOGJ.NextState = 1;
 			return true;
 		case 46:
-			IEBDPKGBOGJ.PLHFFNOPLMM.string_buffer.Append((char)IEBDPKGBOGJ.PLHFFNOPLMM.LJJGFHFKGHN);
-			IEBDPKGBOGJ.BKINLEDMLDJ = 5;
+			IEBDPKGBOGJ.L.string_buffer.Append((char)IEBDPKGBOGJ.L.input_char);
+			IEBDPKGBOGJ.NextState = 5;
 			return true;
 		case 69:
 		case 101:
-			IEBDPKGBOGJ.PLHFFNOPLMM.string_buffer.Append((char)IEBDPKGBOGJ.PLHFFNOPLMM.LJJGFHFKGHN);
-			IEBDPKGBOGJ.BKINLEDMLDJ = 7;
+			IEBDPKGBOGJ.L.string_buffer.Append((char)IEBDPKGBOGJ.L.input_char);
+			IEBDPKGBOGJ.NextState = 7;
 			return true;
 		default:
 			return false;
 		}
 	}
 
-	private static bool HDCICLINCFJ(FsmContext IEBDPKGBOGJ)
+	private static bool State5(FsmContext IEBDPKGBOGJ)
 	{
-		IEBDPKGBOGJ.PLHFFNOPLMM.POLJELICCMK();
-		if (IEBDPKGBOGJ.PLHFFNOPLMM.LJJGFHFKGHN >= 48 && IEBDPKGBOGJ.PLHFFNOPLMM.LJJGFHFKGHN <= 57)
+		IEBDPKGBOGJ.L.GetChar();
+		if (IEBDPKGBOGJ.L.input_char >= 48 && IEBDPKGBOGJ.L.input_char <= 57)
 		{
-			IEBDPKGBOGJ.PLHFFNOPLMM.string_buffer.Append((char)IEBDPKGBOGJ.PLHFFNOPLMM.LJJGFHFKGHN);
-			IEBDPKGBOGJ.BKINLEDMLDJ = 6;
+			IEBDPKGBOGJ.L.string_buffer.Append((char)IEBDPKGBOGJ.L.input_char);
+			IEBDPKGBOGJ.NextState = 6;
 			return true;
 		}
 		return false;
 	}
 
-	private static bool PNMFKCAGAOO(FsmContext IEBDPKGBOGJ)
+	private static bool State6(FsmContext IEBDPKGBOGJ)
 	{
-		while (IEBDPKGBOGJ.PLHFFNOPLMM.POLJELICCMK())
+		while (IEBDPKGBOGJ.L.GetChar())
 		{
-			if (IEBDPKGBOGJ.PLHFFNOPLMM.LJJGFHFKGHN >= 48 && IEBDPKGBOGJ.PLHFFNOPLMM.LJJGFHFKGHN <= 57)
+			if (IEBDPKGBOGJ.L.input_char >= 48 && IEBDPKGBOGJ.L.input_char <= 57)
 			{
-				IEBDPKGBOGJ.PLHFFNOPLMM.string_buffer.Append((char)IEBDPKGBOGJ.PLHFFNOPLMM.LJJGFHFKGHN);
+				IEBDPKGBOGJ.L.string_buffer.Append((char)IEBDPKGBOGJ.L.input_char);
 				continue;
 			}
-			if (IEBDPKGBOGJ.PLHFFNOPLMM.LJJGFHFKGHN == 32 || (IEBDPKGBOGJ.PLHFFNOPLMM.LJJGFHFKGHN >= 9 && IEBDPKGBOGJ.PLHFFNOPLMM.LJJGFHFKGHN <= 13))
+			if (IEBDPKGBOGJ.L.input_char == 32 || (IEBDPKGBOGJ.L.input_char >= 9 && IEBDPKGBOGJ.L.input_char <= 13))
 			{
 				IEBDPKGBOGJ.Return = true;
-				IEBDPKGBOGJ.BKINLEDMLDJ = 1;
+				IEBDPKGBOGJ.NextState = 1;
 				return true;
 			}
-			switch (IEBDPKGBOGJ.PLHFFNOPLMM.LJJGFHFKGHN)
+			switch (IEBDPKGBOGJ.L.input_char)
 			{
 			case 44:
 			case 93:
 			case 125:
-				IEBDPKGBOGJ.PLHFFNOPLMM.FMKBGGPKKEN();
+				IEBDPKGBOGJ.L.UngetChar();
 				IEBDPKGBOGJ.Return = true;
-				IEBDPKGBOGJ.BKINLEDMLDJ = 1;
+				IEBDPKGBOGJ.NextState = 1;
 				return true;
 			case 69:
 			case 101:
-				IEBDPKGBOGJ.PLHFFNOPLMM.string_buffer.Append((char)IEBDPKGBOGJ.PLHFFNOPLMM.LJJGFHFKGHN);
-				IEBDPKGBOGJ.BKINLEDMLDJ = 7;
+				IEBDPKGBOGJ.L.string_buffer.Append((char)IEBDPKGBOGJ.L.input_char);
+				IEBDPKGBOGJ.NextState = 7;
 				return true;
 			default:
 				return false;
@@ -410,46 +410,46 @@ internal class Lexer
 		return true;
 	}
 
-	private static bool CEGCABJIFAC(FsmContext IEBDPKGBOGJ)
+	private static bool State7(FsmContext IEBDPKGBOGJ)
 	{
-		IEBDPKGBOGJ.PLHFFNOPLMM.POLJELICCMK();
-		if (IEBDPKGBOGJ.PLHFFNOPLMM.LJJGFHFKGHN >= 48 && IEBDPKGBOGJ.PLHFFNOPLMM.LJJGFHFKGHN <= 57)
+		IEBDPKGBOGJ.L.GetChar();
+		if (IEBDPKGBOGJ.L.input_char >= 48 && IEBDPKGBOGJ.L.input_char <= 57)
 		{
-			IEBDPKGBOGJ.PLHFFNOPLMM.string_buffer.Append((char)IEBDPKGBOGJ.PLHFFNOPLMM.LJJGFHFKGHN);
-			IEBDPKGBOGJ.BKINLEDMLDJ = 8;
+			IEBDPKGBOGJ.L.string_buffer.Append((char)IEBDPKGBOGJ.L.input_char);
+			IEBDPKGBOGJ.NextState = 8;
 			return true;
 		}
-		int lJJGFHFKGHN = IEBDPKGBOGJ.PLHFFNOPLMM.LJJGFHFKGHN;
+		int lJJGFHFKGHN = IEBDPKGBOGJ.L.input_char;
 		if (lJJGFHFKGHN == 43 || lJJGFHFKGHN == 45)
 		{
-			IEBDPKGBOGJ.PLHFFNOPLMM.string_buffer.Append((char)IEBDPKGBOGJ.PLHFFNOPLMM.LJJGFHFKGHN);
-			IEBDPKGBOGJ.BKINLEDMLDJ = 8;
+			IEBDPKGBOGJ.L.string_buffer.Append((char)IEBDPKGBOGJ.L.input_char);
+			IEBDPKGBOGJ.NextState = 8;
 			return true;
 		}
 		return false;
 	}
 
-	private static bool BECIMMGHALF(FsmContext IEBDPKGBOGJ)
+	private static bool State8(FsmContext IEBDPKGBOGJ)
 	{
-		while (IEBDPKGBOGJ.PLHFFNOPLMM.POLJELICCMK())
+		while (IEBDPKGBOGJ.L.GetChar())
 		{
-			if (IEBDPKGBOGJ.PLHFFNOPLMM.LJJGFHFKGHN >= 48 && IEBDPKGBOGJ.PLHFFNOPLMM.LJJGFHFKGHN <= 57)
+			if (IEBDPKGBOGJ.L.input_char >= 48 && IEBDPKGBOGJ.L.input_char <= 57)
 			{
-				IEBDPKGBOGJ.PLHFFNOPLMM.string_buffer.Append((char)IEBDPKGBOGJ.PLHFFNOPLMM.LJJGFHFKGHN);
+				IEBDPKGBOGJ.L.string_buffer.Append((char)IEBDPKGBOGJ.L.input_char);
 				continue;
 			}
-			if (IEBDPKGBOGJ.PLHFFNOPLMM.LJJGFHFKGHN == 32 || (IEBDPKGBOGJ.PLHFFNOPLMM.LJJGFHFKGHN >= 9 && IEBDPKGBOGJ.PLHFFNOPLMM.LJJGFHFKGHN <= 13))
+			if (IEBDPKGBOGJ.L.input_char == 32 || (IEBDPKGBOGJ.L.input_char >= 9 && IEBDPKGBOGJ.L.input_char <= 13))
 			{
 				IEBDPKGBOGJ.Return = true;
-				IEBDPKGBOGJ.BKINLEDMLDJ = 1;
+				IEBDPKGBOGJ.NextState = 1;
 				return true;
 			}
-			int lJJGFHFKGHN = IEBDPKGBOGJ.PLHFFNOPLMM.LJJGFHFKGHN;
+			int lJJGFHFKGHN = IEBDPKGBOGJ.L.input_char;
 			if (lJJGFHFKGHN == 44 || lJJGFHFKGHN == 93 || lJJGFHFKGHN == 125)
 			{
-				IEBDPKGBOGJ.PLHFFNOPLMM.FMKBGGPKKEN();
+				IEBDPKGBOGJ.L.UngetChar();
 				IEBDPKGBOGJ.Return = true;
-				IEBDPKGBOGJ.BKINLEDMLDJ = 1;
+				IEBDPKGBOGJ.NextState = 1;
 				return true;
 			}
 			return false;
@@ -457,170 +457,170 @@ internal class Lexer
 		return true;
 	}
 
-	private static bool AOMINPGADIM(FsmContext IEBDPKGBOGJ)
+	private static bool State9(FsmContext IEBDPKGBOGJ)
 	{
-		IEBDPKGBOGJ.PLHFFNOPLMM.POLJELICCMK();
-		int lJJGFHFKGHN = IEBDPKGBOGJ.PLHFFNOPLMM.LJJGFHFKGHN;
+		IEBDPKGBOGJ.L.GetChar();
+		int lJJGFHFKGHN = IEBDPKGBOGJ.L.input_char;
 		if (lJJGFHFKGHN == 114)
 		{
-			IEBDPKGBOGJ.BKINLEDMLDJ = 10;
+			IEBDPKGBOGJ.NextState = 10;
 			return true;
 		}
 		return false;
 	}
 
-	private static bool DFNLBPEFAIM(FsmContext IEBDPKGBOGJ)
+	private static bool State10(FsmContext IEBDPKGBOGJ)
 	{
-		IEBDPKGBOGJ.PLHFFNOPLMM.POLJELICCMK();
-		int lJJGFHFKGHN = IEBDPKGBOGJ.PLHFFNOPLMM.LJJGFHFKGHN;
+		IEBDPKGBOGJ.L.GetChar();
+		int lJJGFHFKGHN = IEBDPKGBOGJ.L.input_char;
 		if (lJJGFHFKGHN == 117)
 		{
-			IEBDPKGBOGJ.BKINLEDMLDJ = 11;
+			IEBDPKGBOGJ.NextState = 11;
 			return true;
 		}
 		return false;
 	}
 
-	private static bool PNLIDPLFJND(FsmContext IEBDPKGBOGJ)
+	private static bool State11(FsmContext IEBDPKGBOGJ)
 	{
-		IEBDPKGBOGJ.PLHFFNOPLMM.POLJELICCMK();
-		int lJJGFHFKGHN = IEBDPKGBOGJ.PLHFFNOPLMM.LJJGFHFKGHN;
+		IEBDPKGBOGJ.L.GetChar();
+		int lJJGFHFKGHN = IEBDPKGBOGJ.L.input_char;
 		if (lJJGFHFKGHN == 101)
 		{
 			IEBDPKGBOGJ.Return = true;
-			IEBDPKGBOGJ.BKINLEDMLDJ = 1;
+			IEBDPKGBOGJ.NextState = 1;
 			return true;
 		}
 		return false;
 	}
 
-	private static bool DFBHIODPHBG(FsmContext IEBDPKGBOGJ)
+	private static bool State12(FsmContext IEBDPKGBOGJ)
 	{
-		IEBDPKGBOGJ.PLHFFNOPLMM.POLJELICCMK();
-		int lJJGFHFKGHN = IEBDPKGBOGJ.PLHFFNOPLMM.LJJGFHFKGHN;
+		IEBDPKGBOGJ.L.GetChar();
+		int lJJGFHFKGHN = IEBDPKGBOGJ.L.input_char;
 		if (lJJGFHFKGHN == 97)
 		{
-			IEBDPKGBOGJ.BKINLEDMLDJ = 13;
+			IEBDPKGBOGJ.NextState = 13;
 			return true;
 		}
 		return false;
 	}
 
-	private static bool LDKFPIDDHBD(FsmContext IEBDPKGBOGJ)
+	private static bool State13(FsmContext IEBDPKGBOGJ)
 	{
-		IEBDPKGBOGJ.PLHFFNOPLMM.POLJELICCMK();
-		int lJJGFHFKGHN = IEBDPKGBOGJ.PLHFFNOPLMM.LJJGFHFKGHN;
+		IEBDPKGBOGJ.L.GetChar();
+		int lJJGFHFKGHN = IEBDPKGBOGJ.L.input_char;
 		if (lJJGFHFKGHN == 108)
 		{
-			IEBDPKGBOGJ.BKINLEDMLDJ = 14;
+			IEBDPKGBOGJ.NextState = 14;
 			return true;
 		}
 		return false;
 	}
 
-	private static bool MHCNLJAHDMO(FsmContext IEBDPKGBOGJ)
+	private static bool State14(FsmContext IEBDPKGBOGJ)
 	{
-		IEBDPKGBOGJ.PLHFFNOPLMM.POLJELICCMK();
-		int lJJGFHFKGHN = IEBDPKGBOGJ.PLHFFNOPLMM.LJJGFHFKGHN;
+		IEBDPKGBOGJ.L.GetChar();
+		int lJJGFHFKGHN = IEBDPKGBOGJ.L.input_char;
 		if (lJJGFHFKGHN == 115)
 		{
-			IEBDPKGBOGJ.BKINLEDMLDJ = 15;
+			IEBDPKGBOGJ.NextState = 15;
 			return true;
 		}
 		return false;
 	}
 
-	private static bool EOJOLJMHMIE(FsmContext IEBDPKGBOGJ)
+	private static bool State15(FsmContext IEBDPKGBOGJ)
 	{
-		IEBDPKGBOGJ.PLHFFNOPLMM.POLJELICCMK();
-		int lJJGFHFKGHN = IEBDPKGBOGJ.PLHFFNOPLMM.LJJGFHFKGHN;
+		IEBDPKGBOGJ.L.GetChar();
+		int lJJGFHFKGHN = IEBDPKGBOGJ.L.input_char;
 		if (lJJGFHFKGHN == 101)
 		{
 			IEBDPKGBOGJ.Return = true;
-			IEBDPKGBOGJ.BKINLEDMLDJ = 1;
+			IEBDPKGBOGJ.NextState = 1;
 			return true;
 		}
 		return false;
 	}
 
-	private static bool LHEDIFJCNCF(FsmContext IEBDPKGBOGJ)
+	private static bool State16(FsmContext IEBDPKGBOGJ)
 	{
-		IEBDPKGBOGJ.PLHFFNOPLMM.POLJELICCMK();
-		int lJJGFHFKGHN = IEBDPKGBOGJ.PLHFFNOPLMM.LJJGFHFKGHN;
+		IEBDPKGBOGJ.L.GetChar();
+		int lJJGFHFKGHN = IEBDPKGBOGJ.L.input_char;
 		if (lJJGFHFKGHN == 117)
 		{
-			IEBDPKGBOGJ.BKINLEDMLDJ = 17;
+			IEBDPKGBOGJ.NextState = 17;
 			return true;
 		}
 		return false;
 	}
 
-	private static bool AHPOCKCJPFD(FsmContext IEBDPKGBOGJ)
+	private static bool State17(FsmContext IEBDPKGBOGJ)
 	{
-		IEBDPKGBOGJ.PLHFFNOPLMM.POLJELICCMK();
-		int lJJGFHFKGHN = IEBDPKGBOGJ.PLHFFNOPLMM.LJJGFHFKGHN;
+		IEBDPKGBOGJ.L.GetChar();
+		int lJJGFHFKGHN = IEBDPKGBOGJ.L.input_char;
 		if (lJJGFHFKGHN == 108)
 		{
-			IEBDPKGBOGJ.BKINLEDMLDJ = 18;
+			IEBDPKGBOGJ.NextState = 18;
 			return true;
 		}
 		return false;
 	}
 
-	private static bool MPBAAPKKHPA(FsmContext IEBDPKGBOGJ)
+	private static bool State18(FsmContext IEBDPKGBOGJ)
 	{
-		IEBDPKGBOGJ.PLHFFNOPLMM.POLJELICCMK();
-		int lJJGFHFKGHN = IEBDPKGBOGJ.PLHFFNOPLMM.LJJGFHFKGHN;
+		IEBDPKGBOGJ.L.GetChar();
+		int lJJGFHFKGHN = IEBDPKGBOGJ.L.input_char;
 		if (lJJGFHFKGHN == 108)
 		{
 			IEBDPKGBOGJ.Return = true;
-			IEBDPKGBOGJ.BKINLEDMLDJ = 1;
+			IEBDPKGBOGJ.NextState = 1;
 			return true;
 		}
 		return false;
 	}
 
-	private static bool BMJONAADIEA(FsmContext IEBDPKGBOGJ)
+	private static bool State19(FsmContext IEBDPKGBOGJ)
 	{
-		while (IEBDPKGBOGJ.PLHFFNOPLMM.POLJELICCMK())
+		while (IEBDPKGBOGJ.L.GetChar())
 		{
-			switch (IEBDPKGBOGJ.PLHFFNOPLMM.LJJGFHFKGHN)
+			switch (IEBDPKGBOGJ.L.input_char)
 			{
 			case 34:
-				IEBDPKGBOGJ.PLHFFNOPLMM.FMKBGGPKKEN();
+				IEBDPKGBOGJ.L.UngetChar();
 				IEBDPKGBOGJ.Return = true;
-				IEBDPKGBOGJ.BKINLEDMLDJ = 20;
+				IEBDPKGBOGJ.NextState = 20;
 				return true;
 			case 92:
-				IEBDPKGBOGJ.BFIEGKKGJDD = 19;
-				IEBDPKGBOGJ.BKINLEDMLDJ = 21;
+				IEBDPKGBOGJ.StateStack = 19;
+				IEBDPKGBOGJ.NextState = 21;
 				return true;
 			}
-			IEBDPKGBOGJ.PLHFFNOPLMM.string_buffer.Append((char)IEBDPKGBOGJ.PLHFFNOPLMM.LJJGFHFKGHN);
+			IEBDPKGBOGJ.L.string_buffer.Append((char)IEBDPKGBOGJ.L.input_char);
 		}
 		return true;
 	}
 
-	private static bool FILDPJMEDAL(FsmContext IEBDPKGBOGJ)
+	private static bool State20(FsmContext IEBDPKGBOGJ)
 	{
-		IEBDPKGBOGJ.PLHFFNOPLMM.POLJELICCMK();
-		int lJJGFHFKGHN = IEBDPKGBOGJ.PLHFFNOPLMM.LJJGFHFKGHN;
+		IEBDPKGBOGJ.L.GetChar();
+		int lJJGFHFKGHN = IEBDPKGBOGJ.L.input_char;
 		if (lJJGFHFKGHN == 34)
 		{
 			IEBDPKGBOGJ.Return = true;
-			IEBDPKGBOGJ.BKINLEDMLDJ = 1;
+			IEBDPKGBOGJ.NextState = 1;
 			return true;
 		}
 		return false;
 	}
 
-	private static bool PEBHDBIELEI(FsmContext IEBDPKGBOGJ)
+	private static bool State21(FsmContext IEBDPKGBOGJ)
 	{
-		IEBDPKGBOGJ.PLHFFNOPLMM.POLJELICCMK();
-		switch (IEBDPKGBOGJ.PLHFFNOPLMM.LJJGFHFKGHN)
+		IEBDPKGBOGJ.L.GetChar();
+		switch (IEBDPKGBOGJ.L.input_char)
 		{
 		case 117:
-			IEBDPKGBOGJ.BKINLEDMLDJ = 22;
+			IEBDPKGBOGJ.NextState = 22;
 			return true;
 		case 34:
 		case 39:
@@ -631,30 +631,30 @@ internal class Lexer
 		case 110:
 		case 114:
 		case 116:
-			IEBDPKGBOGJ.PLHFFNOPLMM.string_buffer.Append(ProcessEscChar(IEBDPKGBOGJ.PLHFFNOPLMM.LJJGFHFKGHN));
-			IEBDPKGBOGJ.BKINLEDMLDJ = IEBDPKGBOGJ.BFIEGKKGJDD;
+			IEBDPKGBOGJ.L.string_buffer.Append(ProcessEscChar(IEBDPKGBOGJ.L.input_char));
+			IEBDPKGBOGJ.NextState = IEBDPKGBOGJ.StateStack;
 			return true;
 		default:
 			return false;
 		}
 	}
 
-	private static bool HCLNFPJIEPH(FsmContext IEBDPKGBOGJ)
+	private static bool State22(FsmContext IEBDPKGBOGJ)
 	{
 		int num = 0;
 		int num2 = 4096;
-		IEBDPKGBOGJ.PLHFFNOPLMM.FGCEBBKDFPE = 0;
-		while (IEBDPKGBOGJ.PLHFFNOPLMM.POLJELICCMK())
+		IEBDPKGBOGJ.L.unichar = 0;
+		while (IEBDPKGBOGJ.L.GetChar())
 		{
-			if ((IEBDPKGBOGJ.PLHFFNOPLMM.LJJGFHFKGHN >= 48 && IEBDPKGBOGJ.PLHFFNOPLMM.LJJGFHFKGHN <= 57) || (IEBDPKGBOGJ.PLHFFNOPLMM.LJJGFHFKGHN >= 65 && IEBDPKGBOGJ.PLHFFNOPLMM.LJJGFHFKGHN <= 70) || (IEBDPKGBOGJ.PLHFFNOPLMM.LJJGFHFKGHN >= 97 && IEBDPKGBOGJ.PLHFFNOPLMM.LJJGFHFKGHN <= 102))
+			if ((IEBDPKGBOGJ.L.input_char >= 48 && IEBDPKGBOGJ.L.input_char <= 57) || (IEBDPKGBOGJ.L.input_char >= 65 && IEBDPKGBOGJ.L.input_char <= 70) || (IEBDPKGBOGJ.L.input_char >= 97 && IEBDPKGBOGJ.L.input_char <= 102))
 			{
-				IEBDPKGBOGJ.PLHFFNOPLMM.FGCEBBKDFPE += HexValue(IEBDPKGBOGJ.PLHFFNOPLMM.LJJGFHFKGHN) * num2;
+				IEBDPKGBOGJ.L.unichar += HexValue(IEBDPKGBOGJ.L.input_char) * num2;
 				num++;
 				num2 /= 16;
 				if (num == 4)
 				{
-					IEBDPKGBOGJ.PLHFFNOPLMM.string_buffer.Append(Convert.ToChar(IEBDPKGBOGJ.PLHFFNOPLMM.FGCEBBKDFPE));
-					IEBDPKGBOGJ.BKINLEDMLDJ = IEBDPKGBOGJ.BFIEGKKGJDD;
+					IEBDPKGBOGJ.L.string_buffer.Append(Convert.ToChar(IEBDPKGBOGJ.L.unichar));
+					IEBDPKGBOGJ.NextState = IEBDPKGBOGJ.StateStack;
 					return true;
 				}
 				continue;
@@ -664,118 +664,118 @@ internal class Lexer
 		return true;
 	}
 
-	private static bool LBIDLILELGF(FsmContext IEBDPKGBOGJ)
+	private static bool State23(FsmContext IEBDPKGBOGJ)
 	{
-		while (IEBDPKGBOGJ.PLHFFNOPLMM.POLJELICCMK())
+		while (IEBDPKGBOGJ.L.GetChar())
 		{
-			switch (IEBDPKGBOGJ.PLHFFNOPLMM.LJJGFHFKGHN)
+			switch (IEBDPKGBOGJ.L.input_char)
 			{
 			case 39:
-				IEBDPKGBOGJ.PLHFFNOPLMM.FMKBGGPKKEN();
+				IEBDPKGBOGJ.L.UngetChar();
 				IEBDPKGBOGJ.Return = true;
-				IEBDPKGBOGJ.BKINLEDMLDJ = 24;
+				IEBDPKGBOGJ.NextState = 24;
 				return true;
 			case 92:
-				IEBDPKGBOGJ.BFIEGKKGJDD = 23;
-				IEBDPKGBOGJ.BKINLEDMLDJ = 21;
+				IEBDPKGBOGJ.StateStack = 23;
+				IEBDPKGBOGJ.NextState = 21;
 				return true;
 			}
-			IEBDPKGBOGJ.PLHFFNOPLMM.string_buffer.Append((char)IEBDPKGBOGJ.PLHFFNOPLMM.LJJGFHFKGHN);
+			IEBDPKGBOGJ.L.string_buffer.Append((char)IEBDPKGBOGJ.L.input_char);
 		}
 		return true;
 	}
 
-	private static bool DPLKFCBNBBI(FsmContext IEBDPKGBOGJ)
+	private static bool State24(FsmContext IEBDPKGBOGJ)
 	{
-		IEBDPKGBOGJ.PLHFFNOPLMM.POLJELICCMK();
-		int lJJGFHFKGHN = IEBDPKGBOGJ.PLHFFNOPLMM.LJJGFHFKGHN;
+		IEBDPKGBOGJ.L.GetChar();
+		int lJJGFHFKGHN = IEBDPKGBOGJ.L.input_char;
 		if (lJJGFHFKGHN == 39)
 		{
-			IEBDPKGBOGJ.PLHFFNOPLMM.LJJGFHFKGHN = 34;
+			IEBDPKGBOGJ.L.input_char = 34;
 			IEBDPKGBOGJ.Return = true;
-			IEBDPKGBOGJ.BKINLEDMLDJ = 1;
+			IEBDPKGBOGJ.NextState = 1;
 			return true;
 		}
 		return false;
 	}
 
-	private static bool OEIJIEICKGC(FsmContext IEBDPKGBOGJ)
+	private static bool State25(FsmContext IEBDPKGBOGJ)
 	{
-		IEBDPKGBOGJ.PLHFFNOPLMM.POLJELICCMK();
-		switch (IEBDPKGBOGJ.PLHFFNOPLMM.LJJGFHFKGHN)
+		IEBDPKGBOGJ.L.GetChar();
+		switch (IEBDPKGBOGJ.L.input_char)
 		{
 		case 42:
-			IEBDPKGBOGJ.BKINLEDMLDJ = 27;
+			IEBDPKGBOGJ.NextState = 27;
 			return true;
 		case 47:
-			IEBDPKGBOGJ.BKINLEDMLDJ = 26;
+			IEBDPKGBOGJ.NextState = 26;
 			return true;
 		default:
 			return false;
 		}
 	}
 
-	private static bool KODHDINLCML(FsmContext IEBDPKGBOGJ)
+	private static bool State26(FsmContext IEBDPKGBOGJ)
 	{
-		while (IEBDPKGBOGJ.PLHFFNOPLMM.POLJELICCMK())
+		while (IEBDPKGBOGJ.L.GetChar())
 		{
-			if (IEBDPKGBOGJ.PLHFFNOPLMM.LJJGFHFKGHN == 10)
+			if (IEBDPKGBOGJ.L.input_char == 10)
 			{
-				IEBDPKGBOGJ.BKINLEDMLDJ = 1;
+				IEBDPKGBOGJ.NextState = 1;
 				return true;
 			}
 		}
 		return true;
 	}
 
-	private static bool KEHPOJHCJJI(FsmContext IEBDPKGBOGJ)
+	private static bool State27(FsmContext IEBDPKGBOGJ)
 	{
-		while (IEBDPKGBOGJ.PLHFFNOPLMM.POLJELICCMK())
+		while (IEBDPKGBOGJ.L.GetChar())
 		{
-			if (IEBDPKGBOGJ.PLHFFNOPLMM.LJJGFHFKGHN == 42)
+			if (IEBDPKGBOGJ.L.input_char == 42)
 			{
-				IEBDPKGBOGJ.BKINLEDMLDJ = 28;
+				IEBDPKGBOGJ.NextState = 28;
 				return true;
 			}
 		}
 		return true;
 	}
 
-	private static bool HKPHGNANHDD(FsmContext IEBDPKGBOGJ)
+	private static bool State28(FsmContext IEBDPKGBOGJ)
 	{
-		while (IEBDPKGBOGJ.PLHFFNOPLMM.POLJELICCMK())
+		while (IEBDPKGBOGJ.L.GetChar())
 		{
-			if (IEBDPKGBOGJ.PLHFFNOPLMM.LJJGFHFKGHN == 42)
+			if (IEBDPKGBOGJ.L.input_char == 42)
 			{
 				continue;
 			}
-			if (IEBDPKGBOGJ.PLHFFNOPLMM.LJJGFHFKGHN == 47)
+			if (IEBDPKGBOGJ.L.input_char == 47)
 			{
-				IEBDPKGBOGJ.BKINLEDMLDJ = 1;
+				IEBDPKGBOGJ.NextState = 1;
 				return true;
 			}
-			IEBDPKGBOGJ.BKINLEDMLDJ = 27;
+			IEBDPKGBOGJ.NextState = 27;
 			return true;
 		}
 		return true;
 	}
 
-	private bool POLJELICCMK()
+	private bool GetChar()
 	{
-		if ((LJJGFHFKGHN = HPOFLMDBKKJ()) != -1)
+		if ((input_char = NextChar()) != -1)
 		{
 			return true;
 		}
-		LGPODKLEMBP = true;
+		end_of_input = true;
 		return false;
 	}
 
-	private int HPOFLMDBKKJ()
+	private int NextChar()
 	{
-		if (KCLLHLMNMKO != 0)
+		if (input_buffer != 0)
 		{
-			int kCLLHLMNMKO = KCLLHLMNMKO;
-			KCLLHLMNMKO = 0;
+			int kCLLHLMNMKO = input_buffer;
+			input_buffer = 0;
 			return kCLLHLMNMKO;
 		}
 		return reader.Read();
@@ -783,37 +783,37 @@ internal class Lexer
 
 	public bool NextToken()
 	{
-		GFHMIGANEPF.Return = false;
+		fsm_context.Return = false;
 		while (true)
 		{
-			MGLALMHHOGL mGLALMHHOGL = MOCBIJNMDKH[state - 1];
-			if (!mGLALMHHOGL(GFHMIGANEPF))
+			StateHandler mGLALMHHOGL = fsm_handler_table[state - 1];
+			if (!mGLALMHHOGL(fsm_context))
 			{
-				throw new JsonException(LJJGFHFKGHN);
+				throw new JsonException(input_char);
 			}
-			if (LGPODKLEMBP)
+			if (end_of_input)
 			{
 				return false;
 			}
-			if (GFHMIGANEPF.Return)
+			if (fsm_context.Return)
 			{
 				break;
 			}
-			state = GFHMIGANEPF.BKINLEDMLDJ;
+			state = fsm_context.NextState;
 		}
 		string_value = string_buffer.ToString();
 		string_buffer.Remove(0, string_buffer.Length);
-		JLFCBDKNAGP = fsm_return_table[state - 1];
-		if (JLFCBDKNAGP == 65542)
+		token = fsm_return_table[state - 1];
+		if (token == 65542)
 		{
-			JLFCBDKNAGP = LJJGFHFKGHN;
+			token = input_char;
 		}
-		state = GFHMIGANEPF.BKINLEDMLDJ;
+		state = fsm_context.NextState;
 		return true;
 	}
 
-	private void FMKBGGPKKEN()
+	private void UngetChar()
 	{
-		KCLLHLMNMKO = LJJGFHFKGHN;
+		input_buffer = input_char;
 	}
 }

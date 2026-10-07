@@ -29,12 +29,12 @@ namespace Eclipse.Modding
             if (_raidResult == null || _raidResultShown) return false;
             var fight = Fight.GetCurrentFight();
             if (fight == null) return false;
-            _raidResultShown = true; fight.BCFBHJOLGNL(_raidResult); return true;
+            _raidResultShown = true; fight.ShowEndFightScreen(_raidResult); return true;
         }
-        public static void Raise(QuestEvent.PMDPDMFLCIJ kind)
+        public static void Raise(QuestEvent.QuestEventType kind)
         {
             var list = ListSF.GetInstance();
-            if (list != null && list.FFBAJNGHGGD(kind)) list.MHHNIPBJNAD();
+            if (list != null && list.RaiseQuestEvent(kind)) list.RunQuestActions();
         }
         public static void Bind(XmlNode warrior) { if (_warrior != warrior) Clear(); _warrior = warrior; }
         public static void Clear() { _pending?.Invalidate(); _pending = null; _warrior = null; _activeFight = null; _activeRules = null; _raidResult = null; _raidResultShown = false; _newReservation = false; _completedMode = false; _resetMode = false; }
@@ -70,9 +70,9 @@ namespace Eclipse.Modding
                         try
                         {
                             var state = new ModModeProgress(_warrior, mode);
-                            if (state.Step < mode.Fights.Count && mode.IsAvailable(ListSF.CCDKHLAMKKO().PINDEKDNCNL(), DateTimeOffset.UtcNow.ToUnixTimeSeconds()))
+                            if (state.Step < mode.Fights.Count && mode.IsAvailable(ListSF.GetRoster().GetLevel(), DateTimeOffset.UtcNow.ToUnixTimeSeconds()))
                             {
-                                fight = ListSF.CHMCKGCDGCM(new FightIDS(content.RuntimeFightId(mode.Fights[state.Step])));
+                                fight = ListSF.GetFightById(new FightIDS(content.RuntimeFightId(mode.Fights[state.Step])));
                                 var plan = state.ReadPlan();
                                 if (plan != null) fight = BuildEncounter?.Invoke(mode,state.Step,plan) ?? throw new ModContentException("Saved encounter construction is unavailable.");
                             }
@@ -91,7 +91,7 @@ namespace Eclipse.Modding
                 var state = new ModModeProgress(_warrior, mode);
                 if (mode.HasEntryItem && !state.Entered)
                 {
-                    var item = ListSF.CCDKHLAMKKO().KHCNHPCPFII().CMGOCLGHNLH(mode.EntryItem.ToString());
+                    var item = ListSF.GetRoster().GetInventory().FindItem(mode.EntryItem.ToString());
                     int owned = item?.Count ?? 0;
                     if (owned < mode.EntryCount)
                     {
@@ -130,7 +130,7 @@ namespace Eclipse.Modding
                 if (_pending != null) return false;
                 var progress = new ModModeProgress(_warrior,mode);
                 if (progress.ReadPlan() != null || progress.Entered) return true;
-                if (progress.Step >= mode.Fights.Count || !mode.IsAvailable(ListSF.CCDKHLAMKKO().PINDEKDNCNL(),DateTimeOffset.UtcNow.ToUnixTimeSeconds()))
+                if (progress.Step >= mode.Fights.Count || !mode.IsAvailable(ListSF.GetRoster().GetLevel(),DateTimeOffset.UtcNow.ToUnixTimeSeconds()))
                     return Reject("This mode is complete or unavailable.");
                 if (Prepare == null || BuildEncounter == null || SchedulePreparation == null) return Reject("Mode preparation is unavailable.");
                 int step = progress.Step, completions = progress.Completions;
@@ -146,7 +146,7 @@ namespace Eclipse.Modding
                     // Validate native construction before committing the saved plan or charging entry.
                     if (BuildEncounter(mode,step,request.Plan) == null) throw new ModContentException("Encounter construction failed.");
                     current.SavePlan(request.Plan);
-                    ListSF.CCDKHLAMKKO().GGGEHAGCLGC(true);
+                    ListSF.GetRoster().RequestSave(true);
                     request.Invalidate();
                     resume();
                 }, () => { if (_pending == request) _pending = null; });
@@ -162,16 +162,16 @@ namespace Eclipse.Modding
             try
             {
                 var progress = new ModModeProgress(_warrior, mode);
-                if (!mode.IsAvailable(ListSF.CCDKHLAMKKO().PINDEKDNCNL(), DateTimeOffset.UtcNow.ToUnixTimeSeconds()))
+                if (!mode.IsAvailable(ListSF.GetRoster().GetLevel(), DateTimeOffset.UtcNow.ToUnixTimeSeconds()))
                     return Reject("This event is outside its schedule or level requirement.");
                 if (progress.Step >= mode.Fights.Count) return Reject("This mode is complete.");
-                var selected = ListSF.CHMCKGCDGCM(new FightIDS(ModPolicies.Content.RuntimeFightId(mode.Fights[progress.Step])));
+                var selected = ListSF.GetFightById(new FightIDS(ModPolicies.Content.RuntimeFightId(mode.Fights[progress.Step])));
                 if (selected == null) return Reject("The mode's next fight is unavailable.");
                 var plan = progress.ReadPlan();
                 if (plan != null) selected = BuildEncounter?.Invoke(mode,progress.Step,plan) ?? throw new ModContentException("Saved encounter construction is unavailable.");
                 if (mode.HasEntryItem && !progress.Entered)
                 {
-                    var item = ListSF.CCDKHLAMKKO().KHCNHPCPFII().CMGOCLGHNLH(mode.EntryItem.ToString());
+                    var item = ListSF.GetRoster().GetInventory().FindItem(mode.EntryItem.ToString());
                     if (item == null || item.Count < mode.EntryCount) return Reject("This mode requires " + mode.EntryCount + " entry item(s): " + mode.EntryItem);
                 }
                 fight = selected; return true;
@@ -184,7 +184,7 @@ namespace Eclipse.Modding
             try
             {
                 var progress = new ModModeProgress(_warrior, mode);
-                if (!mode.IsAvailable(ListSF.CCDKHLAMKKO().PINDEKDNCNL(), DateTimeOffset.UtcNow.ToUnixTimeSeconds())) return false;
+                if (!mode.IsAvailable(ListSF.GetRoster().GetLevel(), DateTimeOffset.UtcNow.ToUnixTimeSeconds())) return false;
                 if (_activeFight != null && _activeFight != fight.FightId.ToString()) return false;
                 _newReservation = _activeFight == fight.FightId.ToString() ? _newReservation : !progress.Entered;
                 if (progress.Step >= mode.Fights.Count || ModPolicies.Content.RuntimeFightId(mode.Fights[progress.Step]) != fight.FightId.ToString()) return false;
@@ -193,12 +193,12 @@ namespace Eclipse.Modding
                 {
                     if (mode.HasEntryItem)
                     {
-                        var item = ListSF.CCDKHLAMKKO().KHCNHPCPFII().CMGOCLGHNLH(mode.EntryItem.ToString());
+                        var item = ListSF.GetRoster().GetInventory().FindItem(mode.EntryItem.ToString());
                         if (item == null || item.Count < mode.EntryCount) return false;
                         item.Count -= mode.EntryCount;
                     }
                     progress.Enter();
-                    ListSF.CCDKHLAMKKO().GGGEHAGCLGC(true);
+                    ListSF.GetRoster().RequestSave(true);
                 }
                 _activeRules = selectedRules;
                 _activeFight = fight.FightId.ToString(); return true;
@@ -215,26 +215,26 @@ namespace Eclipse.Modding
                 {
                     if (mode.HasEntryItem)
                     {
-                        var item = ListSF.CCDKHLAMKKO().KHCNHPCPFII().CMGOCLGHNLH(mode.EntryItem.ToString());
+                        var item = ListSF.GetRoster().GetInventory().FindItem(mode.EntryItem.ToString());
                         if (item != null) item.Count += mode.EntryCount;
                     }
-                    progress.CancelEnter(); ListSF.CCDKHLAMKKO().GGGEHAGCLGC(true);
+                    progress.CancelEnter(); ListSF.GetRoster().RequestSave(true);
                 }
             }
             _activeFight = null; _activeRules = null; _newReservation = false;
         }
         public static void NotifyEntry(FightList fight)
         {
-            if (_newReservation && IsRaid(fight)) Raise(QuestEvent.PMDPDMFLCIJ.QUEST_EVENT_RAID_ENTER);
+            if (_newReservation && IsRaid(fight)) Raise(QuestEvent.QuestEventType.QUEST_EVENT_RAID_ENTER);
             _newReservation = false;
         }
         public static void NotifyResult(FightList fight)
         {
             if (fight == null || !TryFind(fight.FightId.ToString(), out var mode)) return;
             var list = ListSF.GetInstance();
-            if (_completedMode && mode.Raid) list.FFBAJNGHGGD(QuestEvent.PMDPDMFLCIJ.QUEST_EVENT_RAID_END);
-            if (_resetMode) list.FFBAJNGHGGD(QuestEvent.PMDPDMFLCIJ.QUEST_EVENT_RESET_ASCENSION);
-            if (mode.Raid) list.FFBAJNGHGGD(QuestEvent.PMDPDMFLCIJ.QUEST_EVENT_SHOW_RAID_LOOT);
+            if (_completedMode && mode.Raid) list.RaiseQuestEvent(QuestEvent.QuestEventType.QUEST_EVENT_RAID_END);
+            if (_resetMode) list.RaiseQuestEvent(QuestEvent.QuestEventType.QUEST_EVENT_RESET_ASCENSION);
+            if (mode.Raid) list.RaiseQuestEvent(QuestEvent.QuestEventType.QUEST_EVENT_SHOW_RAID_LOOT);
             _completedMode = false; _resetMode = false;
         }
         public static bool CanResolve(FightList fight) => fight == null || !TryFind(fight.FightId.ToString(), out var ignored) || _activeFight == fight.FightId.ToString();
@@ -258,7 +258,7 @@ namespace Eclipse.Modding
                 progress.Complete(mode, won, selected);
                 _completedMode = progress.Completions > before;
                 _resetMode = !_completedMode && !won && progress.Step == 0 && (selected.HasValue || mode.ResetOnLoss);
-                ListSF.CCDKHLAMKKO().GGGEHAGCLGC(true);
+                ListSF.GetRoster().RequestSave(true);
             }
             catch (Exception exception) { Reject(exception.Message); }
         }
@@ -276,9 +276,9 @@ namespace Eclipse.Modding
             int.TryParse(node.Attributes?["Index"]?.Value, out _index);
             _zone = node.Attributes?["Name"]?.Value;
         }
-        public override void DEJMHFMLKIC(QuestParameters parameters)
+        public override void Execute(QuestParameters parameters)
         {
-            base.DEJMHFMLKIC(parameters);
+            base.Execute(parameters);
             var map = Nekki.SF2.GUI.Scene<Nekki.SF2.GUI.Map.MapScene>.get_Current();
             if (_operation == "loot") ModModeRuntime.ShowRaidResult();
             else if (map != null)
@@ -286,13 +286,13 @@ namespace Eclipse.Modding
                 map.SetRaidToggleVisible(true);
                 if (_operation == "open")
                 {
-                    var zones = ListSF.FHAIJEAPFEA().FindAll(Eclipse.Underworld.UnderworldZonePolicy.IsRaidZone);
+                    var zones = ListSF.GetZones().FindAll(Eclipse.Underworld.UnderworldZonePolicy.IsRaidZone);
                     string name = _zone;
                     if (string.IsNullOrEmpty(name) && _index >= 0 && _index < zones.Count) name = zones[_index].get_Name();
                     if (!string.IsNullOrEmpty(name)) { map.SwitchToRaidMap(); map.GotoZoneByName(name); }
                 }
             }
-            OGIJONMKABB();
+            FinishAction();
         }
     }
 

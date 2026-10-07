@@ -22,27 +22,27 @@ public class PerkHistory
 		}
 	}
 
-	public List<Perk> JOGBKOJCINM = new List<Perk>();
+	public List<Perk> Perks = new List<Perk>();
 
 	public void Parse(XmlNode node)
 	{
-		JOGBKOJCINM.Clear();
+		Perks.Clear();
 		if (node == null)
 		{
 			return;
 		}
 		foreach (XmlNode item in node)
 		{
-			string gOHIIMFFFJI = item.Attributes["Perk"].CIPOICEEIBK();
+			string gOHIIMFFFJI = item.Attributes["Perk"].GetStringOrDefault();
 			int gNLOCMLBNHF = item.Attributes["Value"].ParseInt();
-			JOGBKOJCINM.Add(new Perk(gOHIIMFFFJI, gNLOCMLBNHF));
+			Perks.Add(new Perk(gOHIIMFFFJI, gNLOCMLBNHF));
 		}
-		JOGBKOJCINM.Sort();
+		Perks.Sort();
 	}
 
-	public Perk GNIICEKAJKC(int GNLOCMLBNHF)
+	public Perk FindPerkByLevel(int GNLOCMLBNHF)
 	{
-		foreach (Perk item in JOGBKOJCINM)
+		foreach (Perk item in Perks)
 		{
 			if (item.Level == GNLOCMLBNHF)
 			{
@@ -54,19 +54,19 @@ public class PerkHistory
 
 	private bool IsExistPerkWithLevel(int GNLOCMLBNHF)
 	{
-		return GNIICEKAJKC(GNLOCMLBNHF) != null;
+		return FindPerkByLevel(GNLOCMLBNHF) != null;
 	}
 
-	public Perk CBGCAPIMCFH(string name, int GNLOCMLBNHF)
+	public Perk AddPerk(string name, int GNLOCMLBNHF)
 	{
 		if (IsExistPerkWithLevel(GNLOCMLBNHF) || name == string.Empty)
 		{
 			return null;
 		}
 		Perk hNHILOOIIMO = new Perk(name, GNLOCMLBNHF);
-		JOGBKOJCINM.Add(hNHILOOIIMO);
-		ListSF.CCDKHLAMKKO().JLBDOBLHHAF().PBPAOBKIMKK(hNHILOOIIMO);
-		ListSF.GetInstance().EJANJEEGOOE();
+		Perks.Add(hNHILOOIIMO);
+		ListSF.GetRoster().GetPerks().SavePerkHistoryEntry(hNHILOOIIMO);
+		ListSF.GetInstance().RequestSave();
 		return hNHILOOIIMO;
 	}
 }

@@ -2,21 +2,21 @@ using System.Xml;
 
 public class QuestActionRemovePack : QuestAction
 {
-	private string GAFGMNPOEGE = string.Empty;
+	private string packName = string.Empty;
 
 	public override void Parse(XmlNode EPKLCPOEELO)
 	{
 		base.Parse(EPKLCPOEELO);
-		GAFGMNPOEGE = EPKLCPOEELO.Attributes["Name"].CIPOICEEIBK(string.Empty);
+		packName = EPKLCPOEELO.Attributes["Name"].GetStringOrDefault(string.Empty);
 	}
 
-	public override void DEJMHFMLKIC(QuestParameters GFIHPBCEEOB)
+	public override void Execute(QuestParameters GFIHPBCEEOB)
 	{
-		if (GAFGMNPOEGE != string.Empty)
+		if (packName != string.Empty)
 		{
-			PacksController.ELEBLBJKDBI().DeletePack(GAFGMNPOEGE);
-			ListSF.GetInstance().EMJLEBDAALP();
+			PacksController.GetInstance().DeletePack(packName);
+			ListSF.GetInstance().OnPacksChanged();
 		}
-		OGIJONMKABB();
+		FinishAction();
 	}
 }

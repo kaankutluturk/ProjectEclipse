@@ -15,13 +15,13 @@ public sealed class JsonEventEmitter : ChainedEventEmitter
 
 	public override void Emit(ScalarEventInfo FNHCFCAALAE)
 	{
-		FNHCFCAALAE.LBGFNDOAEED(true);
-		FNHCFCAALAE.KHFMMPCKMKE(IBEOFCPMMJJ.Plain);
-		TypeCode typeCode = ((FNHCFCAALAE.EHKMMGBHNDB().OEAKCOHMIHH() != null) ? FNHCFCAALAE.EHKMMGBHNDB().get_Type().GetTypeCode() : TypeCode.Empty);
+		FNHCFCAALAE.SetIsPlainImplicit(true);
+		FNHCFCAALAE.SetStyle(ScalarStyle.Plain);
+		TypeCode typeCode = ((FNHCFCAALAE.GetSource().GetValue() != null) ? FNHCFCAALAE.GetSource().get_Type().GetTypeCode() : TypeCode.Empty);
 		switch (typeCode)
 		{
 		case TypeCode.Boolean:
-			FNHCFCAALAE.set_RenderedValue(YamlFormatter.NMBPLFHGICK(FNHCFCAALAE.EHKMMGBHNDB().OEAKCOHMIHH()));
+			FNHCFCAALAE.set_RenderedValue(YamlFormatter.FormatBool(FNHCFCAALAE.GetSource().GetValue()));
 			break;
 		case TypeCode.SByte:
 		case TypeCode.Byte:
@@ -34,23 +34,23 @@ public sealed class JsonEventEmitter : ChainedEventEmitter
 		case TypeCode.Single:
 		case TypeCode.Double:
 		case TypeCode.Decimal:
-			FNHCFCAALAE.set_RenderedValue(YamlFormatter.DGIAFODNLNN(FNHCFCAALAE.EHKMMGBHNDB().OEAKCOHMIHH()));
+			FNHCFCAALAE.set_RenderedValue(YamlFormatter.FormatNumber(FNHCFCAALAE.GetSource().GetValue()));
 			break;
 		case TypeCode.Char:
 		case TypeCode.String:
-			FNHCFCAALAE.set_RenderedValue(FNHCFCAALAE.EHKMMGBHNDB().OEAKCOHMIHH().ToString());
-			FNHCFCAALAE.KHFMMPCKMKE(IBEOFCPMMJJ.DoubleQuoted);
+			FNHCFCAALAE.set_RenderedValue(FNHCFCAALAE.GetSource().GetValue().ToString());
+			FNHCFCAALAE.SetStyle(ScalarStyle.DoubleQuoted);
 			break;
 		case TypeCode.DateTime:
-			FNHCFCAALAE.set_RenderedValue(YamlFormatter.AHNEOKMPCPD(FNHCFCAALAE.EHKMMGBHNDB().OEAKCOHMIHH()));
+			FNHCFCAALAE.set_RenderedValue(YamlFormatter.FormatDateTime(FNHCFCAALAE.GetSource().GetValue()));
 			break;
 		case TypeCode.Empty:
 			FNHCFCAALAE.set_RenderedValue("null");
 			break;
 		default:
-			if (FNHCFCAALAE.EHKMMGBHNDB().get_Type() == typeof(TimeSpan))
+			if (FNHCFCAALAE.GetSource().get_Type() == typeof(TimeSpan))
 			{
-				FNHCFCAALAE.set_RenderedValue(YamlFormatter.ALEIMPLLAHI(FNHCFCAALAE.EHKMMGBHNDB().OEAKCOHMIHH()));
+				FNHCFCAALAE.set_RenderedValue(YamlFormatter.FormatTimeSpan(FNHCFCAALAE.GetSource().GetValue()));
 				break;
 			}
 			throw new NotSupportedException(string.Format(CultureInfo.InvariantCulture, "TypeCode.{0} is not supported.", typeCode));
@@ -58,15 +58,15 @@ public sealed class JsonEventEmitter : ChainedEventEmitter
 		base.Emit(FNHCFCAALAE);
 	}
 
-	public override void Emit(LPADMPIAIPF FNHCFCAALAE)
+	public override void Emit(MappingStartEventInfo FNHCFCAALAE)
 	{
-		FNHCFCAALAE.KHFMMPCKMKE(FGDKNBEFPFN.Flow);
+		FNHCFCAALAE.SetStyle(MappingStyle.Flow);
 		base.Emit(FNHCFCAALAE);
 	}
 
-	public override void Emit(PBGMOJFHMGI FNHCFCAALAE)
+	public override void Emit(SequenceStartEventInfo FNHCFCAALAE)
 	{
-		FNHCFCAALAE.KHFMMPCKMKE(NBCBGEPFIKG.Flow);
+		FNHCFCAALAE.SetStyle(SequenceStyle.Flow);
 		base.Emit(FNHCFCAALAE);
 	}
 }

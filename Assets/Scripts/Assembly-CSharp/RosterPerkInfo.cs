@@ -4,11 +4,11 @@ public class RosterPerkInfo
 {
 	public int Level;
 
-	public int AKKLOMFOLNO;
+	public int UpgradeLevel;
 
 	public string Name;
 
-	public PerkInfoItem GEFLIFEPDNG;
+	public PerkInfoItem PerkInfo;
 
 	public Dictionary<string, string> Pairs = new Dictionary<string, string>();
 }

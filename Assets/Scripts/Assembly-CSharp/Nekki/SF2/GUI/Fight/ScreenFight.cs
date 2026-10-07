@@ -6,58 +6,58 @@ namespace Nekki.SF2.GUI.Fight
 {
 	public class ScreenFight : MonoBehaviour
 	{
-		public struct PNCCDHPHKEM
+		public struct FightSetup
 		{
-			public ModelParameters KMMJCHDKBDO;
+			public ModelParameters playerModel;
 
-			public List<ModelParameters> BDANFHBMIOF;
+			public List<ModelParameters> enemyModels;
 
-			public int BLOOLFFMKFI;
+			public int enemyIndex;
 		}
 
-		public class JGGPBICMICP : UnityEvent<ScreenFightType>
+		public class ScreenFightTypeEvent : UnityEvent<ScreenFightType>
 		{
 		}
 
-		public JGGPBICMICP OnStartScreen = new JGGPBICMICP();
+		public ScreenFightTypeEvent OnStartScreen = new ScreenFightTypeEvent();
 
-		public JGGPBICMICP OnStopScreen = new JGGPBICMICP();
+		public ScreenFightTypeEvent OnStopScreen = new ScreenFightTypeEvent();
 
-		private const float AMNDDAEIJAH = 1.666f;
+		private const float RoundBannerDuration = 1.666f;
 
-		private const float JAOJKJJBPNL = 0.016f;
+		private const float SkipRoundDuration = 0.016f;
 
-		private const float DGDFMKKHLPO = 1.166f;
+		private const float FightBannerDuration = 1.166f;
 
-		private const float ADPBOMNDCID = 5.833f;
+		private const float RuleBannerDuration = 5.833f;
 
-		private const float JJPDKBGCCOM = 1.166f;
+		private const float WinnerBannerDuration = 1.166f;
 
-		private const float GJHANHLMFBI = 1.166f;
+		private const float TimesUpBannerDuration = 1.166f;
 
-		private const float JDNECDOHBPD = 1.166f;
+		private const float RingOutBannerDuration = 1.166f;
 
-		private const float FEECKAGKHFK = 1.166f;
+		private const float YouLoseBannerDuration = 1.166f;
 
-		private const float LDNCLBDABLG = 1.166f;
+		private const float YouWinBannerDuration = 1.166f;
 
-		private const string ILMIEAHBDCJ = "FightUI.perfect";
+		private const string PerfectSprite = "FightUI.perfect";
 
-		private const string GOGGCBPFMML = "FightUI.great";
+		private const string GreatSprite = "FightUI.great";
 
-		private const string JMLBPGBNICP = "FightUI.fight";
+		private const string FightSprite = "FightUI.fight";
 
-		private const string AIHLFHKHGJJ = "FightUI.round";
+		private const string RoundSprite = "FightUI.round";
 
-		private const string LBEMDAFJMFN = "FightUI.timesup";
+		private const string TimesUpSprite = "FightUI.timesup";
 
-		private const string NOIOFMLHJBG = "FightUI.ringout";
+		private const string RingOutSprite = "FightUI.ringout";
 
-		private const string DJPMFDKFCFA = "FightUI.youlose";
+		private const string YouLoseSprite = "FightUI.youlose";
 
-		private const string PFPAAJAEJPF = "FightUI.youwin";
+		private const string YouWinSprite = "FightUI.youwin";
 
-		private PNCCDHPHKEM BBFBFDDDJMJ = default(PNCCDHPHKEM);
+		private FightSetup fightSetup = default(FightSetup);
 
 		public ScreenFightType Type;
 
@@ -65,15 +65,15 @@ namespace Nekki.SF2.GUI.Fight
 
 		private string ruleDesc = string.Empty;
 
-		private bool KCANPMPILKI;
+		private bool isPaused;
 
-		private bool IFMCDDIGOLD;
+		private bool skipEnemiesScreen;
 
-		private bool PPIJJHJCGGB;
+		private bool enemiesFlag;
 
-		private bool GDLJMEJBGPO;
+		private bool showEnemiesScreen;
 
-		private bool KJIAPGDFEIK;
+		private bool isScreenActive;
 
 		private float timer;
 		private float bannerDuration;
@@ -102,33 +102,33 @@ namespace Nekki.SF2.GUI.Fight
 
 		public bool get_Pause()
 		{
-			return KCANPMPILKI;
+			return isPaused;
 		}
 
 		public void set_Pause(bool value)
 		{
-			KCANPMPILKI = value;
+			isPaused = value;
 		}
 
 		public void PreInit(FightList KGKDKENMAOA)
 		{
 			customVersusIntro = KGKDKENMAOA is Eclipse.Multiplayer.LocalVersusMatch match &&
 				(match.Settings.Mode == Eclipse.Multiplayer.VersusMode.Local || match.Settings.Mode == Eclipse.Multiplayer.VersusMode.Online);
-			maxRounds = KGKDKENMAOA.RoundsToWin * KGKDKENMAOA.PNHLGCBPFIG();
-			ruleDesc = KGKDKENMAOA.GJOAJAIJHOE();
+			maxRounds = KGKDKENMAOA.RoundsToWin * KGKDKENMAOA.GetTotalOpponentRounds();
+			ruleDesc = KGKDKENMAOA.GetDescription();
 			set_Pause(false);
 		}
 
 		public void CreateVS(ModelParameters JCICKLIMBEF, List<ModelParameters> IDAAONBIBJM, int OBLEMIHLFII, bool PPIJJHJCGGB, bool GDLJMEJBGPO, bool IFMCDDIGOLD)
 		{
-			BBFBFDDDJMJ.KMMJCHDKBDO = JCICKLIMBEF;
-			BBFBFDDDJMJ.BDANFHBMIOF = IDAAONBIBJM;
-			BBFBFDDDJMJ.BLOOLFFMKFI = OBLEMIHLFII;
-			this.PPIJJHJCGGB = PPIJJHJCGGB;
-			this.GDLJMEJBGPO = GDLJMEJBGPO;
+			fightSetup.playerModel = JCICKLIMBEF;
+			fightSetup.enemyModels = IDAAONBIBJM;
+			fightSetup.enemyIndex = OBLEMIHLFII;
+			this.enemiesFlag = PPIJJHJCGGB;
+			this.showEnemiesScreen = GDLJMEJBGPO;
 			if (IDAAONBIBJM.Count > 1 && GDLJMEJBGPO)
 			{
-				CreateEnemiesScreen(IDAAONBIBJM, OBLEMIHLFII, this.PPIJJHJCGGB);
+				CreateEnemiesScreen(IDAAONBIBJM, OBLEMIHLFII, this.enemiesFlag);
 				return;
 			}
 			if (IFMCDDIGOLD)
@@ -312,14 +312,14 @@ namespace Nekki.SF2.GUI.Fight
 			enemiesScreen.transform.SetParent(base.transform, false);
 			enemiesScreen.Init(IDAAONBIBJM, index, PPIJJHJCGGB);
 			StartScreen(enemiesScreen.get_AnimationTime());
-			OnStopScreen.AddListener(DKBOJEFOBCG);
+			OnStopScreen.AddListener(OnEnemiesScreenStopped);
 		}
 
-		private void DKBOJEFOBCG(ScreenFightType MPBIEONNLIJ)
+		private void OnEnemiesScreenStopped(ScreenFightType MPBIEONNLIJ)
 		{
 			if (MPBIEONNLIJ == ScreenFightType.TYPE_INFO_ENEMIES)
 			{
-				OnStopScreen.RemoveListener(DKBOJEFOBCG);
+				OnStopScreen.RemoveListener(OnEnemiesScreenStopped);
 				StartVS();
 			}
 		}
@@ -339,20 +339,20 @@ namespace Nekki.SF2.GUI.Fight
 			// for peers and saved replays, but let our persistent introduction own the art.
 			if (customVersusIntro) vsScreen.gameObject.SetActive(false);
 			ModelParameters kIKOGDEPGHB = null;
-			if (BBFBFDDDJMJ.BDANFHBMIOF.Count > BBFBFDDDJMJ.BLOOLFFMKFI)
+			if (fightSetup.enemyModels.Count > fightSetup.enemyIndex)
 			{
-				kIKOGDEPGHB = BBFBFDDDJMJ.BDANFHBMIOF[BBFBFDDDJMJ.BLOOLFFMKFI];
+				kIKOGDEPGHB = fightSetup.enemyModels[fightSetup.enemyIndex];
 			}
 			else
 			{
-				if (BBFBFDDDJMJ.BDANFHBMIOF.Count <= 0)
+				if (fightSetup.enemyModels.Count <= 0)
 				{
 					StartScreen(0f);
 					return;
 				}
-				kIKOGDEPGHB = BBFBFDDDJMJ.BDANFHBMIOF[0];
+				kIKOGDEPGHB = fightSetup.enemyModels[0];
 			}
-			vsScreen.Init(BBFBFDDDJMJ.KMMJCHDKBDO, kIKOGDEPGHB);
+			vsScreen.Init(fightSetup.playerModel, kIKOGDEPGHB);
 			StartScreen(vsScreen.get_AnimationTime());
 		}
 
@@ -381,7 +381,7 @@ namespace Nekki.SF2.GUI.Fight
 				return;
 			}
 			base.gameObject.SetActive(true);
-			KJIAPGDFEIK = true;
+			isScreenActive = true;
 			OnStartScreen.Invoke(Type);
 		}
 
@@ -392,7 +392,7 @@ namespace Nekki.SF2.GUI.Fight
 				return;
 			}
 			base.gameObject.SetActive(false);
-			KJIAPGDFEIK = false;
+			isScreenActive = false;
 			OnStopScreen.Invoke(Type);
 		}
 
@@ -400,7 +400,7 @@ namespace Nekki.SF2.GUI.Fight
 		{
 			// Versus stage changes must land on the same simulation tick for every
 			// peer and replay, so the tick driver advances the timer instead.
-			if (!KCANPMPILKI && KJIAPGDFEIK && !Eclipse.Multiplayer.VersusTickDriver.PacesFightScreens)
+			if (!isPaused && isScreenActive && !Eclipse.Multiplayer.VersusTickDriver.PacesFightScreens)
 			{
 				AdvanceTimer(Time.deltaTime);
 			}
@@ -409,7 +409,7 @@ namespace Nekki.SF2.GUI.Fight
 		/// <summary>Advances the banner by one fixed simulation step (versus only).</summary>
 		public void AdvanceSimulationStep(float step)
 		{
-			if (!KCANPMPILKI && KJIAPGDFEIK)
+			if (!isPaused && isScreenActive)
 			{
 				AdvanceTimer(step);
 			}

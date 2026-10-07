@@ -123,7 +123,7 @@ public static class ValidateDE128TierBossesNative
                 return;
             }
             var scripts = ModRuntime.Scripts;
-            var roster = ListSF.CCDKHLAMKKO();
+            var roster = ListSF.GetRoster();
             var module = Module.GetInstance();
             if (scripts == null || roster == null || module == null) return;
             if (scripts.Diagnostics.Count != 0 || scripts.StateDiagnostics.Count != 0)
@@ -148,7 +148,7 @@ public static class ValidateDE128TierBossesNative
                 if (returned == null) return;
                 if (IsSpotlightFight(Target.Id.ToString()) && GameObject.Find("LightInTheDarkness") != null)
                     throw new Exception("Spotlight survived the fight return: " + Target.Id);
-                if (returned.GetCurrentState() != MapScene.NMFLNANKNOJ.RaidMode)
+                if (returned.GetCurrentState() != MapScene.MapMode.RaidMode)
                     throw new Exception("Boss " + Target.Id + " surrendered to the story map.");
                 Debug.Log(Prefix + "Returned from " + Target.Id + " to the Underworld map.");
                 if (storyPresses > 0) storyIntros++;
@@ -207,8 +207,8 @@ public static class ValidateDE128TierBossesNative
                     }
                     return;
                 }
-                var encounter = ListSF.CHMCKGCDGCM(new FightIDS(scripts.Content.RuntimeFightId(Target.Id)));
-                if (encounter == null || !UnderworldZonePolicy.IsRaidZone(encounter.Battle?.OAEIILGHJMG))
+                var encounter = ListSF.GetFightById(new FightIDS(scripts.Content.RuntimeFightId(Target.Id)));
+                if (encounter == null || !UnderworldZonePolicy.IsRaidZone(encounter.Battle?.ParentZone))
                     throw new Exception("Tier boss has no native raid encounter: " + Target.Id);
                 bool immediate = GameUtils.StartFight(encounter, false, null, true, false);
                 entryRequested = true;
@@ -236,7 +236,7 @@ public static class ValidateDE128TierBossesNative
             }
             if (StoryBus.FightEntries.HasPending)
                 throw new Exception("Tier boss retained its native story hold: " + Target.Id);
-            var enemy = (Model)typeof(Fight).GetField("CKNCPOABFBO", Hidden).GetValue(fight);
+            var enemy = (Model)typeof(Fight).GetField("_enemyModel", Hidden).GetValue(fight);
             var player = (Model)typeof(Fight).GetField("_playerModel", Hidden).GetValue(fight);
             if (enemy == null || player == null) return;
             player.Parameters.set_IsImmortalityEnabled(true);
@@ -267,17 +267,17 @@ public static class ValidateDE128TierBossesNative
                 !ObserveMercenaryWave(fight, enemy)) return;
             var live = fight.GetFightDefinition();
             if (live?.FightId?.ToString() != new FightIDS(scripts.Content.RuntimeFightId(Target.Id)).ToString() ||
-                enemy.CLDMEJKGLBA() == null || player.CLDMEJKGLBA() == null)
+                enemy.GetBodyObject() == null || player.GetBodyObject() == null)
                 throw new Exception("Tier boss fight or native fighter rig differs: " + Target.Id);
             if (Environment.GetEnvironmentVariable("ECLIPSE_DE128_TITAN_EQUIPMENT") == "1")
             {
                 string[] names = { "de128:items/weapon/titans_desolator", "de128:items/armor/titans_form",
                     "de128:items/helm/titans_helm", "de128:items/ranged/titans_harpoon",
                     "de128:items/magic/titans_mind_throw" };
-                var equipped = player.Parameters.PJNJIJIODHE().Select(item => item.Name).ToArray();
+                var equipped = player.Parameters.GetEquippedItems().Select(item => item.Name).ToArray();
                 if (names.Any(name => !equipped.Contains(name)))
                     throw new Exception("The native fighter lost saved Titan equipment: " + string.Join(",", equipped));
-                var macros = player.CLDMEJKGLBA().BLFJJAEFKKP();
+                var macros = player.GetBodyObject().GetMacroNodes();
                 int bodyNodes = macros.Count(node => node.GetName().StartsWith("TitanBody_", StringComparison.Ordinal));
                 int headNodes = macros.Count(node => node.GetName().StartsWith("TitanHead_", StringComparison.Ordinal));
                 if (bodyNodes != 8 || headNodes != 12)
@@ -286,8 +286,8 @@ public static class ValidateDE128TierBossesNative
                 Debug.Log(Prefix + "Five saved Titan items loaded; 8 body and 12 helm macro nodes in the native rig.");
             }
             var location = (Location)typeof(Fight).GetField("_location", Hidden).GetValue(fight);
-            int sprites = location?.layers?.Sum(layer => layer.ICDCIANNAAI == null ? 0 :
-                layer.ICDCIANNAAI.GetComponentsInChildren<SpriteRenderer>(true).Length) ?? 0;
+            int sprites = location?.layers?.Sum(layer => layer.LayerObject == null ? 0 :
+                layer.LayerObject.GetComponentsInChildren<SpriteRenderer>(true).Length) ?? 0;
             if (location?.name != live.Location || sprites == 0)
                 throw new Exception("Tier boss arena did not render: " + Target.Id +
                     " location=" + location?.name + " sprites=" + sprites);
@@ -306,7 +306,7 @@ public static class ValidateDE128TierBossesNative
                     helm?.Name != "de128:items/helm/berstuuk_mask" ||
                     helm.ModelFileName != "de128:models/underworld/mdl_head_berstuuk")
                     throw new Exception("Berstuuk's native body or mask model was not equipped.");
-                var macros = enemy.CLDMEJKGLBA().BLFJJAEFKKP();
+                var macros = enemy.GetBodyObject().GetMacroNodes();
                 int bodyNodes = macros.Count(node => node.GetName().StartsWith("MacroBerstuukBody-", StringComparison.Ordinal));
                 int headNodes = macros.Count(node => node.GetName().StartsWith("MacroBerstuukHead-", StringComparison.Ordinal));
                 if (bodyNodes == 0 || headNodes == 0)
@@ -333,7 +333,7 @@ public static class ValidateDE128TierBossesNative
         {
             if (id != "de128:fights/uw_survival_demon_1")
                 throw new Exception("Widow acceptance selected the wrong survival fight.");
-            if (!enemy.Parameters.JBIOECDAAKP().Any(perk => perk.Name == "PERK_TELEPORTATION"))
+            if (!enemy.Parameters.GetAllPerks().Any(perk => perk.Name == "PERK_TELEPORTATION"))
             {
                 if (teleportEnteredAt >= 0) throw new Exception("Widow left her wave before Teleportation acceptance.");
                 if (widowWaveDefeats > 12) throw new Exception("Widow did not enter Demon survival.");
@@ -353,7 +353,7 @@ public static class ValidateDE128TierBossesNative
         if (teleportEnteredAt < 0)
         {
             teleportEnteredAt = frame;
-            var moves = (List<InfoAnimation>)typeof(Model).GetField("OHAMEHHMEAL", Hidden).GetValue(enemy);
+            var moves = (List<InfoAnimation>)typeof(Model).GetField("availableAnimations", Hidden).GetValue(enemy);
             var start = moves.SingleOrDefault(move => move.Name == "WidowTeleportationStart");
             var finish = moves.SingleOrDefault(move => move.Name == "WidowTeleportationEnd");
             if (start == null || finish == null || start.FileName != "de128:animations/widow_teleportation_start" ||
@@ -368,33 +368,33 @@ public static class ValidateDE128TierBossesNative
                 start.SelectionConditions.Any(condition => condition.Type == ConditionAnimation.ConditionType.DISTANCE) ||
                 start.SelectionConditions.Count(condition => condition.Type == ConditionAnimation.ConditionType.DIRECTION) != 1 ||
                 start.SelectionConditions.Count(condition => condition.Type == ConditionAnimation.ConditionType.CURRENT_ANIMATION &&
-                    condition.TargetModelType == ModelType.KEIDBIOIFGA.MODEL_OTHER && condition.IsNot) < 15 ||
+                    condition.TargetModelType == ModelType.ModelTargetType.MODEL_OTHER && condition.IsNot) < 15 ||
                 start.MoveData.Locks.Any(condition => condition.Type == ConditionAnimation.ConditionType.ITEM) ||
-                finish.MoveData.ILOEBFFAEAN.BONDKHGGCDD != "NPivot" ||
-                Math.Abs(finish.MoveData.ILOEBFFAEAN.LDNPHPGEOPJ.GetX() - 100f) > 0.01f)
+                finish.MoveData.AlignData.ShiftModelNode != "NPivot" ||
+                Math.Abs(finish.MoveData.AlignData.PositionShift.GetX() - 100f) > 0.01f)
                 throw new Exception("Teleportation lost its archived input, safety exclusions or alignment: " + id);
             var attack = finish.MoveData.Intervals.OfType<IntervalAttack>().SingleOrDefault();
             string[] edges = { "EForearm_1", "EHand_1", "EFingers_1", "EArm_1", "EArm_2",
                 "EForearm_2", "EHand_2", "EFingers_2", "EChest" };
             if (attack == null || attack.Start != 3 || attack.EndFrame != 4 ||
-                Math.Abs(attack.GHGGNMBCMNM() - 0.28f) > 0.0001f ||
-                !attack.MHNFFFIOIDH.SequenceEqual(edges) || !attack.HitReactions.Any(hit => hit.Name == "High"))
+                Math.Abs(attack.GetDamage() - 0.28f) > 0.0001f ||
+                !attack.AttackingParts.SequenceEqual(edges) || !attack.HitReactions.Any(hit => hit.Name == "High"))
                 throw new Exception("Teleportation finishing strike lost its body geometry or damage: " + id);
-            var locks = new ModelConditions { OJIAKDDCGLB = enemy.Parameters.PJNJIJIODHE(),
-                POBNMMADAJJ = enemy.Parameters.JBIOECDAAKP(), IBBALIJOJMC = enemy.Parameters.IBBALIJOJMC };
-            if (!start.HPPGNJJCEGF(locks, start.MoveData.Locks) ||
-                !finish.HPPGNJJCEGF(locks, finish.MoveData.Locks))
+            var locks = new ModelConditions { Items = enemy.Parameters.GetEquippedItems(),
+                SelfPerks = enemy.Parameters.GetAllPerks(), SceneType = enemy.Parameters.SceneType };
+            if (!start.AreConditionsMet(locks, start.MoveData.Locks) ||
+                !finish.AreConditionsMet(locks, finish.MoveData.Locks))
                 throw new Exception("Teleportation perk locks reject its actual fighter: " + id);
-            enemy.OCPMJKIEPIG().AddEventListener(2, value =>
+            enemy.GetAnimationModule().AddEventListener(2, value =>
             {
                 if (value is IntervalAttack &&
-                    enemy.OCPMJKIEPIG().NNMAFFCCMHC()?.Name == "WidowTeleportationEnd")
+                    enemy.GetAnimationModule().GetCurrentInfo()?.Name == "WidowTeleportationEnd")
                     teleportAttack = true;
             });
             Debug.Log(Prefix + "Loaded both archived Teleportation phases for " + id +
                 "; 15 enemy exclusions, 100-unit alignment, nine-edge 0.28 strike.");
         }
-        string animation = enemy.OCPMJKIEPIG().NNMAFFCCMHC()?.Name;
+        string animation = enemy.GetAnimationModule().GetCurrentInfo()?.Name;
         bool casting = animation == "WidowTeleportationStart";
         if (casting && !teleportWasCasting)
         {
@@ -444,12 +444,12 @@ public static class ValidateDE128TierBossesNative
     static void ObserveRootHitBox(Model child, Fight fight)
     {
         if (child == null || child.get_Name() != "RootHitBox" || raidAbilityHitbox) return;
-        var moves = (List<InfoAnimation>)typeof(Model).GetField("OHAMEHHMEAL", Hidden).GetValue(child);
+        var moves = (List<InfoAnimation>)typeof(Model).GetField("availableAnimations", Hidden).GetValue(child);
         if (child.Parameters.Weapon?.Name != "SMALL_COLLISION_BOX" ||
             !moves.Any(move => move.Name == "RootPotionAttack"))
             throw new Exception("Berstuuk's root hitbox lost its hidden item or attack move.");
         raidAbilityHitbox = true;
-        child.OCPMJKIEPIG().AddEventListener(2, action =>
+        child.GetAnimationModule().AddEventListener(2, action =>
         {
             if (action is IntervalAttack) raidAbilityChildAttack = true;
         });
@@ -477,7 +477,7 @@ public static class ValidateDE128TierBossesNative
         if (raidAbilityEnteredAt < 0)
         {
             raidAbilityEnteredAt = frame;
-            var moves = (List<InfoAnimation>)typeof(Model).GetField("OHAMEHHMEAL", Hidden).GetValue(enemy);
+            var moves = (List<InfoAnimation>)typeof(Model).GetField("availableAnimations", Hidden).GetValue(enemy);
             var names = hunter ? new[] { "HunterFly_150", "HunterFly_200", "HunterFly_300", "HunterFly_370" } :
                 new[] { caster };
             var keyNode = new XmlDocument();
@@ -502,25 +502,25 @@ public static class ValidateDE128TierBossesNative
                     string clip = arkhos ? "magic_water_wave_player" : "chest_laser_ray_player";
                     int frames = arkhos ? 29 : 61;
                     if (move.FileName != "de128:animations/" + clip ||
-                        move.DIHJOPGKGFO() == null || move.DIHJOPGKGFO().Length != frames ||
-                        move.DFKIHADCFKG() != 67)
+                        move.GetAnimationFrames() == null || move.GetAnimationFrames().Length != frames ||
+                        move.GetNodesCount() != 67)
                         throw new Exception("Archived raid caster did not load its replacement clip: " + name +
-                            " file=" + move.FileName + " frames=" + move.DIHJOPGKGFO()?.Length +
-                            " nodes=" + move.DFKIHADCFKG());
+                            " file=" + move.FileName + " frames=" + move.GetAnimationFrames()?.Length +
+                            " nodes=" + move.GetNodesCount());
                     if (tenebris && move.MoveData.Intervals.Any(interval =>
                         interval.Name == "Evade" && interval.Type.ToString() == "INTERVAL_INVULNERABLE"))
                         throw new Exception("Archived Fear Ray retained the core invulnerability interval.");
                     Debug.Log(Prefix + "Loaded " + name + " archived clip: " + frames + " frames, 67 nodes.");
                 }
             }
-            enemy.OCPMJKIEPIG().AddEventListener(2, value =>
+            enemy.GetAnimationModule().AddEventListener(2, value =>
             {
-                string stage = enemy.OCPMJKIEPIG().NNMAFFCCMHC()?.Name;
+                string stage = enemy.GetAnimationModule().GetCurrentInfo()?.Name;
                 if (!(value is IntervalAttack attack) ||
                     !(hunter ? stage != null && stage.StartsWith("HunterFly_", StringComparison.Ordinal) : stage == caster))
                     return;
                 Debug.Log(Prefix + "Raid caster attack interval: " + stage + " start=" + attack.Start +
-                    " end=" + attack.EndFrame + " bypass=" + attack.MOILKOLCNBP());
+                    " end=" + attack.EndFrame + " bypass=" + attack.GetIgnoresInvulnerable());
                 raidAbilityAttack = true;
             });
             if (berstuuk)
@@ -532,7 +532,7 @@ public static class ValidateDE128TierBossesNative
                     string childName = child.get_Name();
                     if (childName != "RootPotion" && childName != "RootPotionTrigger" &&
                         childName != "RootHitBox") return;
-                    var childMoves = (List<InfoAnimation>)typeof(Model).GetField("OHAMEHHMEAL", Hidden).GetValue(child);
+                    var childMoves = (List<InfoAnimation>)typeof(Model).GetField("availableAnimations", Hidden).GetValue(child);
                     if (childName == "RootPotion")
                     {
                         raidAbilityChild = true;
@@ -540,9 +540,9 @@ public static class ValidateDE128TierBossesNative
                             !childMoves.Any(move => move.Name == "RootPotionStart") ||
                             !childMoves.Any(move => move.Name == "RootPotionFly"))
                             throw new Exception("Berstuuk's root projectile lost its hidden item or linked phases.");
-                        child.OCPMJKIEPIG().AddEventListener(0, animation =>
+                        child.GetAnimationModule().AddEventListener(0, animation =>
                             Debug.Log(Prefix + "Root Potion projectile phase: " +
-                                child.OCPMJKIEPIG().NNMAFFCCMHC()?.Name));
+                                child.GetAnimationModule().GetCurrentInfo()?.Name));
                     }
                     else if (childName == "RootPotionTrigger")
                     {
@@ -553,19 +553,19 @@ public static class ValidateDE128TierBossesNative
                             !childMoves.Any(move => move.Name == "RootPotionTriggerFly"))
                             throw new Exception("Berstuuk's root trigger lost its hidden item or flight move.");
                         child.AddEventListener(6, value => ObserveRootHitBox(value as Model, fight));
-                        var model = child.CLDMEJKGLBA();
-                        var edges = model.HABIIJGLCMA().Concat(model.EKOGCJAAKDN())
-                            .Concat(model.GetCollisionEdges()).Concat(model.BKAPPJMGPKP())
+                        var model = child.GetBodyObject();
+                        var edges = model.GetStructuralEdges().Concat(model.GetMuscleEdges())
+                            .Concat(model.GetCollisionEdges()).Concat(model.GetAllEdges())
                             .GroupBy(edge => edge.get_Name()).Select(group => group.First()).ToArray();
                         raidTriggerEdge = edges.SingleOrDefault(edge => edge.get_Name() == "VerticalTrigger-Edge1");
                         if (raidTriggerEdge == null)
                             throw new Exception("Root trigger is missing its archived VerticalTrigger-Edge1 geometry.");
                         Debug.Log(Prefix + "Root trigger collision edge loaded at X=" +
-                            raidTriggerEdge.FHGNPPBLIIL().GetX() + ".");
-                        child.OCPMJKIEPIG().AddEventListener(0, animation =>
+                            raidTriggerEdge.GetStartPosition().GetX() + ".");
+                        child.GetAnimationModule().AddEventListener(0, animation =>
                             Debug.Log(Prefix + "Root Potion trigger phase: " +
-                                child.OCPMJKIEPIG().NNMAFFCCMHC()?.Name));
-                        child.OCPMJKIEPIG().AddEventListener(2, action =>
+                                child.GetAnimationModule().GetCurrentInfo()?.Name));
+                        child.GetAnimationModule().AddEventListener(2, action =>
                         {
                             if (action is IntervalAttack attack)
                                 Debug.Log(Prefix + "Root Potion trigger attack interval: " +
@@ -587,10 +587,10 @@ public static class ValidateDE128TierBossesNative
                     var child = value as Model;
                     if (child == null || child.get_Name() != childName) return;
                     raidAbilityChild = true;
-                    var childMoves = (List<InfoAnimation>)typeof(Model).GetField("OHAMEHHMEAL", Hidden).GetValue(child);
+                    var childMoves = (List<InfoAnimation>)typeof(Model).GetField("availableAnimations", Hidden).GetValue(child);
                     if (child.Parameters.Weapon?.Name != weapon || !childMoves.Any(move => move.Name == childMove))
                         throw new Exception("Archived raid projectile lost its hidden item or attack phase: " + childName);
-                    child.OCPMJKIEPIG().AddEventListener(2, action =>
+                    child.GetAnimationModule().AddEventListener(2, action =>
                     {
                         if (action is IntervalAttack)
                         {
@@ -603,13 +603,13 @@ public static class ValidateDE128TierBossesNative
             }
             Debug.Log(Prefix + "Reviewed raid caster and native attack graph loaded: " + id);
         }
-        string animation = enemy.OCPMJKIEPIG().NNMAFFCCMHC()?.Name;
+        string animation = enemy.GetAnimationModule().GetCurrentInfo()?.Name;
         if (berstuuk && !raidAbilityHitbox && raidTriggerModel != null && raidTriggerEdge != null &&
             frame >= raidTriggerSpawnAt && frame <= raidTriggerSpawnAt + 20)
         {
             var player = (Model)typeof(Fight).GetField("_playerModel", Hidden).GetValue(fight);
-            float edgeX = raidTriggerEdge.FHGNPPBLIIL().GetX();
-            float playerX = player.PLBNCDCFPML().GetX();
+            float edgeX = raidTriggerEdge.GetStartPosition().GetX();
+            float playerX = player.GetPosition().GetX();
             player.ShiftModelPosition(new Vector3f(edgeX - playerX, 0f, 0f), true);
         }
         bool firstRange = raidAbilitySelectedAt < 0 && frame >= initial - 10;
@@ -621,8 +621,8 @@ public static class ValidateDE128TierBossesNative
             // Keep the unattended player close enough to pursue Hunter as he
             // backs into the archived wall range for Fly.
             var player = (Model)typeof(Fight).GetField("_playerModel", Hidden).GetValue(fight);
-            float enemyX = enemy.PLBNCDCFPML().GetX();
-            float playerX = player.PLBNCDCFPML().GetX();
+            float enemyX = enemy.GetPosition().GetX();
+            float playerX = player.GetPosition().GetX();
             float separation = playerX - enemyX;
             if (Math.Abs(separation) > 330f)
             {
@@ -635,22 +635,22 @@ public static class ValidateDE128TierBossesNative
             // The original caster's AI range gate needs space that the
             // unattended player does not maintain during ordinary combat.
             var player = (Model)typeof(Fight).GetField("_playerModel", Hidden).GetValue(fight);
-            float enemyX = enemy.PLBNCDCFPML().GetX();
-            float playerX = player.PLBNCDCFPML().GetX();
+            float enemyX = enemy.GetPosition().GetX();
+            float playerX = player.GetPosition().GetX();
             float direction = playerX >= enemyX ? 1f : -1f;
             float targetRange = berstuuk ? 330f : tenebris ? 450f : arkhos ? 550f : 600f;
             player.ShiftModelPosition(new Vector3f(enemyX + direction * targetRange - playerX, 0f, 0f), true);
             float distance = (float)typeof(ModelAi).GetMethod("GetDistanceToEnemy", Hidden)
-                .Invoke(enemy.EEIGOJBKFGE(), new object[] { enemy });
+                .Invoke(enemy.GetAi(), new object[] { enemy });
             if ((arkhos || tenebris) &&
                 (distance < (arkhos ? 425f : 310f) || (tenebris && distance > 590f)))
             {
                 // The first side can be blocked by an arena wall after the
                 // opponent moves. Try the other side before rejecting range.
-                float shiftedX = player.PLBNCDCFPML().GetX();
+                float shiftedX = player.GetPosition().GetX();
                 player.ShiftModelPosition(new Vector3f(enemyX - direction * targetRange - shiftedX, 0f, 0f), true);
                 distance = (float)typeof(ModelAi).GetMethod("GetDistanceToEnemy", Hidden)
-                    .Invoke(enemy.EEIGOJBKFGE(), new object[] { enemy });
+                    .Invoke(enemy.GetAi(), new object[] { enemy });
             }
             if (distance < (arkhos ? 425f : tenebris ? 310f : hoaxen ? 400f : 250f) ||
                 (tenebris && distance > 590f))
@@ -712,7 +712,7 @@ public static class ValidateDE128TierBossesNative
         if (dandyEnteredAt < 0)
         {
             dandyEnteredAt = frame;
-            var moves = (List<InfoAnimation>)typeof(Model).GetField("OHAMEHHMEAL", Hidden).GetValue(enemy);
+            var moves = (List<InfoAnimation>)typeof(Model).GetField("availableAnimations", Hidden).GetValue(enemy);
             var caster = moves.SingleOrDefault(move => move.Name == "LightingChainPlayer");
             var keyNode = new XmlDocument();
             keyNode.LoadXml("<Keys><Key Type='RaidCharge' PressType='Tap'/></Keys>");
@@ -729,29 +729,29 @@ public static class ValidateDE128TierBossesNative
                 if (child == null || child.get_Name() != "LightningChain") return;
                 dandyChild = child;
                 dandySpawned = true;
-                var childMoves = (List<InfoAnimation>)typeof(Model).GetField("OHAMEHHMEAL", Hidden).GetValue(child);
+                var childMoves = (List<InfoAnimation>)typeof(Model).GetField("availableAnimations", Hidden).GetValue(child);
                 if (child.Parameters.Weapon?.Name != "HERMIT_STORM" ||
                     childMoves.Count(move => move.Name == "LightingChainStart" || move.Name == "LightingChain50" ||
                         move.Name == "LightingChain150" || move.Name == "LightingChain300" ||
                         move.Name == "LightingChain400") != 5)
                     throw new Exception("Dandy's hidden chain actor lost its equipment or five native phases.");
                 child.AddEventListener(5, ignored => dandyDeleted = true);
-                child.OCPMJKIEPIG().AddEventListener(2, action =>
+                child.GetAnimationModule().AddEventListener(2, action =>
                 {
-                    string stage = child.OCPMJKIEPIG().NNMAFFCCMHC()?.Name;
-                    if (action is IntervalAttack attack && attack.Start == 11 && attack.MOILKOLCNBP() &&
+                    string stage = child.GetAnimationModule().GetCurrentInfo()?.Name;
+                    if (action is IntervalAttack attack && attack.Start == 11 && attack.GetIgnoresInvulnerable() &&
                         stage != null) dandyAttacks.Add(stage);
                 });
                 child.AddEventListener(7, action =>
                 {
-                    string stage = child.OCPMJKIEPIG().NNMAFFCCMHC()?.Name;
+                    string stage = child.GetAnimationModule().GetCurrentInfo()?.Name;
                     if (action is ActionEffect effect && effect.get_Name() == "HermitStormMiddle" &&
                         stage != null) dandyEffects.Add(stage);
                 });
             });
             Debug.Log(Prefix + "Dandy's native RaidCharge caster and five linked chain phases loaded.");
         }
-        string animation = enemy.OCPMJKIEPIG().NNMAFFCCMHC()?.Name;
+        string animation = enemy.GetAnimationModule().GetCurrentInfo()?.Name;
         int cooldownFrames = power ? 500 : 600;
         bool firstRange = !dandyFirstRangeSet && frame >= 450;
         bool secondRange = dandySelectedAt >= 0 && !dandySecondRangeSet &&
@@ -762,12 +762,12 @@ public static class ValidateDE128TierBossesNative
             // player stays close while Dandy backs into the arena edge, so
             // place that player at a valid native casting distance.
             var player = (Model)typeof(Fight).GetField("_playerModel", Hidden).GetValue(fight);
-            float enemyX = enemy.PLBNCDCFPML().GetX();
-            float playerX = player.PLBNCDCFPML().GetX();
+            float enemyX = enemy.GetPosition().GetX();
+            float playerX = player.GetPosition().GetX();
             float direction = playerX >= enemyX ? 1f : -1f;
             player.ShiftModelPosition(new Vector3f(enemyX + direction * 600f - playerX, 0f, 0f), true);
             float distance = (float)typeof(ModelAi).GetMethod("GetDistanceToEnemy", Hidden)
-                .Invoke(enemy.EEIGOJBKFGE(), new object[] { enemy });
+                .Invoke(enemy.GetAi(), new object[] { enemy });
             if (distance < 450f)
                 throw new Exception("Dandy's native test arena could not establish casting range: " + distance);
             if (firstRange) dandyFirstRangeSet = true;
@@ -793,7 +793,7 @@ public static class ValidateDE128TierBossesNative
             }
         }
         dandyWasCasting = casting;
-        string childAnimation = dandyChild?.OCPMJKIEPIG()?.NNMAFFCCMHC()?.Name;
+        string childAnimation = dandyChild?.GetAnimationModule()?.GetCurrentInfo()?.Name;
         if (childAnimation != null && childAnimation.StartsWith("LightingChain", StringComparison.Ordinal))
             dandyPhases.Add(childAnimation);
         if (GameObject.Find("HermitStormMiddle") != null) dandyVisibleEffect = true;
@@ -829,7 +829,7 @@ public static class ValidateDE128TierBossesNative
         if (saturnEnteredAt < 0)
         {
             saturnEnteredAt = frame;
-            var localMoves = (List<InfoAnimation>)typeof(Model).GetField("OHAMEHHMEAL", Hidden).GetValue(enemy);
+            var localMoves = (List<InfoAnimation>)typeof(Model).GetField("availableAnimations", Hidden).GetValue(enemy);
             var caster = localMoves.SingleOrDefault(move => move.Name == "SaturnBlasterAbilityPlayer");
             var keyNode = new XmlDocument();
             keyNode.LoadXml("<Keys><Key Type='RaidCharge' PressType='Tap'/></Keys>");
@@ -846,7 +846,7 @@ public static class ValidateDE128TierBossesNative
                 var child = value as Model;
                 if (child == null) return;
                 string name = child.get_Name();
-                var childMoves = (List<InfoAnimation>)typeof(Model).GetField("OHAMEHHMEAL", Hidden).GetValue(child);
+                var childMoves = (List<InfoAnimation>)typeof(Model).GetField("availableAnimations", Hidden).GetValue(child);
                 if (name == "SaturnBlaster")
                 {
                     saturnPistol = true;
@@ -863,9 +863,9 @@ public static class ValidateDE128TierBossesNative
                         !childMoves.Any(move => move.Name == (first ? "SaturnProjectileStart1" : "SaturnProjectileStart2")))
                         throw new Exception("Saturn's native projectile lost its hidden item or flight move: " + name);
                     if (first) saturnBullet1 = true; else saturnBullet2 = true;
-                    child.OCPMJKIEPIG().AddEventListener(2, action =>
+                    child.GetAnimationModule().AddEventListener(2, action =>
                     {
-                        if (action is IntervalAttack attack && attack.Start == 2 && attack.MOILKOLCNBP())
+                        if (action is IntervalAttack attack && attack.Start == 2 && attack.GetIgnoresInvulnerable())
                         {
                             if (first) saturnBulletAttack1 = true; else saturnBulletAttack2 = true;
                         }
@@ -874,7 +874,7 @@ public static class ValidateDE128TierBossesNative
             });
             Debug.Log(Prefix + "Saturn's native RaidCharge caster, pistol branches and two projectile moves loaded.");
         }
-        string animation = enemy.OCPMJKIEPIG().NNMAFFCCMHC()?.Name;
+        string animation = enemy.GetAnimationModule().GetCurrentInfo()?.Name;
         bool casting = animation == "SaturnBlasterAbilityPlayer";
         if (casting && !saturnWasCasting)
         {
@@ -929,7 +929,7 @@ public static class ValidateDE128TierBossesNative
         if (blacknessEnteredAt < 0)
         {
             blacknessEnteredAt = frame;
-            var localMoves = (List<InfoAnimation>)typeof(Model).GetField("OHAMEHHMEAL", Hidden).GetValue(enemy);
+            var localMoves = (List<InfoAnimation>)typeof(Model).GetField("availableAnimations", Hidden).GetValue(enemy);
             var caster = localMoves.SingleOrDefault(move => move.Name == "de128:moves/blackness_grasp_player");
             if (caster == null ||
                 localMoves.Any(move => move.Name.StartsWith("BlacknessGraspAbility", StringComparison.Ordinal) &&
@@ -947,7 +947,7 @@ public static class ValidateDE128TierBossesNative
                 if (child?.get_Name() != "BlackHand") return;
                 if (child.Parameters.Weapon?.Name != "MAGIC_ACID_CLOUD")
                     throw new Exception("BlackHand lost its hidden native item.");
-                var childMoves = (List<InfoAnimation>)typeof(Model).GetField("OHAMEHHMEAL", Hidden).GetValue(child);
+                var childMoves = (List<InfoAnimation>)typeof(Model).GetField("availableAnimations", Hidden).GetValue(child);
                 if (childMoves.Count(move => move.Name == "de128:moves/blackness_grasp_hand_start" ||
                     move.Name == "de128:moves/blackness_grasp_hand_attack") != 2 ||
                     childMoves.Any(move => move.Name.StartsWith("BlacknessGraspAbilityHand", StringComparison.Ordinal) &&
@@ -958,10 +958,10 @@ public static class ValidateDE128TierBossesNative
                             move.SelectionConditions.Last().GetType().Name)));
                 blacknessHand = child;
                 blacknessChild = true;
-                child.OCPMJKIEPIG().AddEventListener(2, action =>
+                child.GetAnimationModule().AddEventListener(2, action =>
                 {
                     if (action is IntervalAttack attack && attack.Start == 7 &&
-                        attack.HitReactions.SingleOrDefault()?.Name == "Physycal" && attack.MOILKOLCNBP())
+                        attack.HitReactions.SingleOrDefault()?.Name == "Physycal" && attack.GetIgnoresInvulnerable())
                         blacknessAttack = true;
                 });
                 child.AddEventListener(5, ignored => blacknessDeleted = true);
@@ -969,14 +969,14 @@ public static class ValidateDE128TierBossesNative
             });
             Debug.Log(Prefix + "Blackness's three authored Grasp moves and timed child action loaded.");
         }
-        if (enemy.OCPMJKIEPIG().NNMAFFCCMHC()?.Name == "de128:moves/blackness_grasp_player" &&
+        if (enemy.GetAnimationModule().GetCurrentInfo()?.Name == "de128:moves/blackness_grasp_player" &&
             blacknessSelectedAt < 0)
         {
             blacknessSelectedAt = frame;
             if (frame < 600) throw new Exception("Blackness cast before the archived 600-frame opening cooldown.");
             Debug.Log(Prefix + "Blackness selected Grasp at frame " + frame + ".");
         }
-        if (blacknessHand?.OCPMJKIEPIG()?.NNMAFFCCMHC()?.Name ==
+        if (blacknessHand?.GetAnimationModule()?.GetCurrentInfo()?.Name ==
             "de128:moves/blackness_grasp_hand_attack") blacknessTransition = true;
         if (GameObject.Find("BlackHandEFX") != null)
         {
@@ -1008,7 +1008,7 @@ public static class ValidateDE128TierBossesNative
         if (warEnteredAt < 0)
         {
             warEnteredAt = frame;
-            var localMoves = (List<InfoAnimation>)typeof(Model).GetField("OHAMEHHMEAL", Hidden).GetValue(enemy);
+            var localMoves = (List<InfoAnimation>)typeof(Model).GetField("availableAnimations", Hidden).GetValue(enemy);
             var authored = localMoves.SingleOrDefault(move => move.Name == "de128:moves/war_whirl_player");
             if (authored == null || localMoves.Count(move => move.Name == "MagicWarAbilityPlayer" &&
                 move.SelectionConditions.Last().GetType().Name == "DisabledMoveCondition") != 1)
@@ -1016,30 +1016,30 @@ public static class ValidateDE128TierBossesNative
             if (authored.ScheduledActions.Count(action => action is ActionStopSound stop &&
                 stop.get_Name() == "snd_blade_fury") != 2)
                 throw new Exception("War's native Whirl lost its two sound cleanup events.");
-            enemy.OCPMJKIEPIG().AddEventListener(2, value =>
+            enemy.GetAnimationModule().AddEventListener(2, value =>
             {
-                if (enemy.OCPMJKIEPIG().NNMAFFCCMHC()?.Name != "de128:moves/war_whirl_player" ||
+                if (enemy.GetAnimationModule().GetCurrentInfo()?.Name != "de128:moves/war_whirl_player" ||
                     !(value is IntervalAttack attack)) return;
                 if (attack.Start != 14 || attack.EndFrame != 70 ||
-                    attack.HitReactions.SingleOrDefault()?.Name != "Physycal" || !attack.MOILKOLCNBP())
+                    attack.HitReactions.SingleOrDefault()?.Name != "Physycal" || !attack.GetIgnoresInvulnerable())
                     throw new Exception("War's live Whirl attack lost its archived window, hit or block bypass.");
                 warAttack = true;
             });
             enemy.AddEventListener(7, value =>
             {
-                if (enemy.OCPMJKIEPIG().NNMAFFCCMHC()?.Name != "de128:moves/war_whirl_player" ||
+                if (enemy.GetAnimationModule().GetCurrentInfo()?.Name != "de128:moves/war_whirl_player" ||
                     !(value is ActionEffect effect)) return;
-                warEffects.Add(effect.get_Name() + ":" + effect.EPDMGFELIMC());
+                warEffects.Add(effect.get_Name() + ":" + effect.GetSequence());
             });
             enemy.AddEventListener(8, value =>
             {
-                if (enemy.OCPMJKIEPIG().NNMAFFCCMHC()?.Name == "de128:moves/war_whirl_player" &&
+                if (enemy.GetAnimationModule().GetCurrentInfo()?.Name == "de128:moves/war_whirl_player" &&
                     value is ActionStopEffect effect && effect.get_Name() == "MagicWarWhirlffectMiddle")
                     warEffectStopped = true;
             });
             Debug.Log(Prefix + "War's authored Whirl, disabled core selector and native sound cleanup loaded.");
         }
-        if (enemy.OCPMJKIEPIG().NNMAFFCCMHC()?.Name == "de128:moves/war_whirl_player" &&
+        if (enemy.GetAnimationModule().GetCurrentInfo()?.Name == "de128:moves/war_whirl_player" &&
             warSelectedAt < 0)
         {
             warSelectedAt = frame;
@@ -1053,7 +1053,7 @@ public static class ValidateDE128TierBossesNative
         }
         if (frame - warEnteredAt < 1200) return false;
         int decisionFrame = (int)typeof(ModelAi).GetField("_modDecisionFrame", Hidden)
-            .GetValue(enemy.EEIGOJBKFGE());
+            .GetValue(enemy.GetAi());
         if (decisionFrame < 300 || warSelectedAt < 0 || !warAttack || !warEffectStopped || !warCaptured ||
             !warEffects.Contains("MagicWarWhirlffectStart:mgc_war_ability_start") ||
             !warEffects.Contains("MagicWarWhirlffectMiddle:mgc_war_ability_middle") ||
@@ -1074,43 +1074,43 @@ public static class ValidateDE128TierBossesNative
         if (gatekeeperEnteredAt < 0)
         {
             gatekeeperEnteredAt = frame;
-            var localMoves = (List<InfoAnimation>)typeof(Model).GetField("OHAMEHHMEAL", Hidden).GetValue(enemy);
+            var localMoves = (List<InfoAnimation>)typeof(Model).GetField("availableAnimations", Hidden).GetValue(enemy);
             var cast = localMoves.SingleOrDefault(move => move.Name == "de128:moves/gatekeeper_power_field");
             if (cast == null || localMoves.Count(move => move.Name == "GateKeeperPowerField" &&
                 move.SelectionConditions.Last().GetType().Name == "DisabledMoveCondition") != 1)
                 throw new Exception("Gatekeeper lacks the authored cast or retained the core selector.");
             var electro = cast.ScheduledActions.OfType<ActionEffect>().Single();
-            if (electro.Attachment == null || !electro.DIGCODDLDAD())
+            if (electro.Attachment == null || !electro.GetIsFollowObject())
                 throw new Exception("Gatekeeper's effect lost its native node attachment.");
             enemy.AddEventListener(7, value =>
             {
                 if (value is ActionEffect effect && effect.get_Name() == "ElectroEffect" &&
-                    enemy.OCPMJKIEPIG().NNMAFFCCMHC()?.Name == cast.Name)
+                    enemy.GetAnimationModule().GetCurrentInfo()?.Name == cast.Name)
                     gatekeeperElectro = true;
             });
             Debug.Log(Prefix + "Gatekeeper's authored cast and node attachment loaded.");
         }
-        if (enemy.OCPMJKIEPIG().NNMAFFCCMHC()?.Name == "de128:moves/gatekeeper_power_field" &&
+        if (enemy.GetAnimationModule().GetCurrentInfo()?.Name == "de128:moves/gatekeeper_power_field" &&
             gatekeeperSelectedAt < 0)
         {
             gatekeeperSelectedAt = frame;
             Debug.Log(Prefix + "Gatekeeper selected Power Field at frame " + frame + ".");
         }
-        Model child = enemy.NMGNPBMFJKP(ModelType.KEIDBIOIFGA.MODEL_CHILD);
+        Model child = enemy.GetModelByType(ModelType.ModelTargetType.MODEL_CHILD);
         if (child != null && child.get_Name() == "AbilityPowerField")
         {
             if (!gatekeeperChild)
             {
                 if (child.Parameters.Weapon?.Name != "MAGIC_FIRE_AURA")
                     throw new Exception("Gatekeeper's power field lost its hidden native item.");
-                var localMoves = (List<InfoAnimation>)typeof(Model).GetField("OHAMEHHMEAL", Hidden).GetValue(child);
+                var localMoves = (List<InfoAnimation>)typeof(Model).GetField("availableAnimations", Hidden).GetValue(child);
                 var surge = localMoves.SingleOrDefault(move => move.Name == "de128:moves/gatekeeper_power_surge");
                 if (surge == null || surge.ScheduledActions.OfType<ActionEffect>().Count(effect => effect.Attachment != null) != 2)
                     throw new Exception("Gatekeeper's spawned field lost its two parent-attached effects.");
-                child.OCPMJKIEPIG().AddEventListener(2, value =>
+                child.GetAnimationModule().AddEventListener(2, value =>
                 {
                     if (value is IntervalAttack attack && attack.Start == 2 && attack.EndFrame == 5 &&
-                        attack.HitReactions.SingleOrDefault()?.Name == "ElectrocutionPowerfield" && attack.MOILKOLCNBP())
+                        attack.HitReactions.SingleOrDefault()?.Name == "ElectrocutionPowerfield" && attack.GetIgnoresInvulnerable())
                         gatekeeperAttack = true;
                 });
                 gatekeeperChild = true;
@@ -1120,7 +1120,7 @@ public static class ValidateDE128TierBossesNative
         var electroObject = GameObject.Find("ElectroEffect");
         if (electroObject != null)
         {
-            var cast = ((List<InfoAnimation>)typeof(Model).GetField("OHAMEHHMEAL", Hidden).GetValue(enemy))
+            var cast = ((List<InfoAnimation>)typeof(Model).GetField("availableAnimations", Hidden).GetValue(enemy))
                 .Single(move => move.Name == "de128:moves/gatekeeper_power_field");
             Vector3 target;
             Quaternion orientation;
@@ -1137,7 +1137,7 @@ public static class ValidateDE128TierBossesNative
         {
             gatekeeperPowerEffects = true;
             if (child == null) throw new Exception("Gatekeeper's parent-attached effect lost its child actor.");
-            var surge = ((List<InfoAnimation>)typeof(Model).GetField("OHAMEHHMEAL", Hidden).GetValue(child))
+            var surge = ((List<InfoAnimation>)typeof(Model).GetField("availableAnimations", Hidden).GetValue(child))
                 .Single(move => move.Name == "de128:moves/gatekeeper_power_surge");
             var attachment = surge.ScheduledActions.OfType<ActionEffect>().First().Attachment;
             Vector3 target;
@@ -1197,7 +1197,7 @@ public static class ValidateDE128TierBossesNative
             hermitEnteredAt = frame;
             if (hermitWaveDefeats != 1)
                 throw new Exception("Hermit entered outside his second archived survival wave.");
-            var localMoves = (List<InfoAnimation>)typeof(Model).GetField("OHAMEHHMEAL", Hidden).GetValue(enemy);
+            var localMoves = (List<InfoAnimation>)typeof(Model).GetField("availableAnimations", Hidden).GetValue(enemy);
             foreach (string name in new[] { "player", "idle", "win" })
                 if (localMoves.Count(move => move.Name == "de128:moves/hermit_storm_" + name) != 1)
                     throw new Exception("Hermit lacks the authored Storm " + name + " move.");
@@ -1213,13 +1213,13 @@ public static class ValidateDE128TierBossesNative
                     throw new Exception("Hermit Storm child did not equip the native hidden item: " +
                         child.Parameters.Weapon?.Name);
                 hermitStormSpawns++;
-                if (enemy.OCPMJKIEPIG().NNMAFFCCMHC()?.Name == "de128:moves/hermit_storm_idle")
+                if (enemy.GetAnimationModule().GetCurrentInfo()?.Name == "de128:moves/hermit_storm_idle")
                     hermitIdleStormSpawns++;
                 Debug.Log(Prefix + "Hermit Storm child spawn " + hermitStormSpawns + ".");
             });
-            enemy.OCPMJKIEPIG().AddEventListener(2, value =>
+            enemy.GetAnimationModule().AddEventListener(2, value =>
             {
-                if (enemy.OCPMJKIEPIG().NNMAFFCCMHC()?.Name != "de128:moves/hermit_storm_player" ||
+                if (enemy.GetAnimationModule().GetCurrentInfo()?.Name != "de128:moves/hermit_storm_player" ||
                     !(value is IntervalAttack attack)) return;
                 if (attack.Start != 8 && attack.Start != 11 && attack.Start != 20)
                     throw new Exception("Hermit Storm used an unauthored attack interval: " + attack.Start);
@@ -1227,7 +1227,7 @@ public static class ValidateDE128TierBossesNative
             });
             Debug.Log(Prefix + "Reached Hermit after one native survival defeat; three DE Storm moves are installed.");
         }
-        string active = enemy.OCPMJKIEPIG().NNMAFFCCMHC()?.Name;
+        string active = enemy.GetAnimationModule().GetCurrentInfo()?.Name;
         if (hermitPlayerDefeatedAt >= 0)
         {
             if (active == "de128:moves/hermit_storm_win")
@@ -1252,7 +1252,7 @@ public static class ValidateDE128TierBossesNative
         }
         if (frame - hermitEnteredAt < 1200) return false;
         int decisionFrame = (int)typeof(ModelAi).GetField("_modDecisionFrame", Hidden)
-            .GetValue(enemy.EEIGOJBKFGE());
+            .GetValue(enemy.GetAi());
         if (decisionFrame < 300 || hermitSelectedAt < 0 || hermitIdleAt < 0 ||
             hermitStormSpawns < 3 || hermitIdleStormSpawns < 2 ||
             !hermitAttackStarts.SetEquals(new[] { 8, 11, 20 }))
@@ -1296,7 +1296,7 @@ public static class ValidateDE128TierBossesNative
             butcherEnteredAt = frame;
             if (butcherWaveDefeats != 2)
                 throw new Exception("Butcher entered outside his third archived survival wave.");
-            var localMoves = (List<InfoAnimation>)typeof(Model).GetField("OHAMEHHMEAL", Hidden).GetValue(enemy);
+            var localMoves = (List<InfoAnimation>)typeof(Model).GetField("availableAnimations", Hidden).GetValue(enemy);
             if (localMoves.Count(move => move.Name == "de128:moves/butcher_earthquake_player") != 1 ||
                 localMoves.Count(move => move.Name == "ButcherEarthquakePlayer" &&
                     move.SelectionConditions.Last().GetType().Name == "DisabledMoveCondition") != 1)
@@ -1308,17 +1308,17 @@ public static class ValidateDE128TierBossesNative
                 butcherChildSpawned = true;
                 if (child.Parameters.Weapon?.Name != "MAGIC_BUTCHER_EARTHQUAKE")
                     throw new Exception("Butcher's projectile did not equip the hidden native earthquake item.");
-                child.OCPMJKIEPIG().AddEventListener(0, animation =>
+                child.GetAnimationModule().AddEventListener(0, animation =>
                 {
                     if ((animation as InfoAnimation)?.Name == "de128:moves/butcher_earthquake_start")
                         butcherChildMove = true;
                 });
-                child.OCPMJKIEPIG().AddEventListener(2, interval =>
+                child.GetAnimationModule().AddEventListener(2, interval =>
                 {
-                    if (child.OCPMJKIEPIG().NNMAFFCCMHC()?.Name != "de128:moves/butcher_earthquake_start" ||
+                    if (child.GetAnimationModule().GetCurrentInfo()?.Name != "de128:moves/butcher_earthquake_start" ||
                         !(interval is IntervalAttack attack)) return;
                     if (attack.Start != 2 || attack.HitReactions.SingleOrDefault()?.Name != "Earthquake" ||
-                        !attack.MOILKOLCNBP())
+                        !attack.GetIgnoresInvulnerable())
                         throw new Exception("Butcher's live projectile attack lost its archived Earthquake reaction or block bypass.");
                     butcherChildAttack = true;
                 });
@@ -1327,7 +1327,7 @@ public static class ValidateDE128TierBossesNative
             });
             Debug.Log(Prefix + "Reached Butcher after two native survival defeats; DE Earthquake is selectable.");
         }
-        if (enemy.OCPMJKIEPIG().NNMAFFCCMHC()?.Name == "de128:moves/butcher_earthquake_player" &&
+        if (enemy.GetAnimationModule().GetCurrentInfo()?.Name == "de128:moves/butcher_earthquake_player" &&
             butcherSelectedAt < 0)
         {
             butcherSelectedAt = frame;
@@ -1335,7 +1335,7 @@ public static class ValidateDE128TierBossesNative
         }
         if (frame - butcherEnteredAt < 1200) return false;
         int decisionFrame = (int)typeof(ModelAi).GetField("_modDecisionFrame", Hidden)
-            .GetValue(enemy.EEIGOJBKFGE());
+            .GetValue(enemy.GetAi());
         if (decisionFrame < 300)
             throw new Exception("Butcher's Lua AI clock did not advance in live combat: " + decisionFrame);
         if (butcherSelectedAt < 0 || !butcherChildSpawned || !butcherChildMove || !butcherChildAttack || !butcherChildDeleted)
@@ -1380,7 +1380,7 @@ public static class ValidateDE128TierBossesNative
             Debug.Log(Prefix + "Reached Girl Fan after 22 native survival defeats; ceremonial armor and helm equipped.");
         }
         if (frame - mercenaryEnteredAt < 90) return false;
-        var macros = enemy.CLDMEJKGLBA()?.BLFJJAEFKKP();
+        var macros = enemy.GetBodyObject()?.GetMacroNodes();
         if (macros == null || macros.Count < 10)
             throw new Exception("Girl Fan's native fighter model did not render through 90 combat frames.");
         CaptureCombatFrame(Target.Id.ToString() + "_girl_fan");
@@ -1410,7 +1410,7 @@ public static class ValidateDE128TierBossesNative
         if (waspEnteredAt < 0)
         {
             waspEnteredAt = frame;
-            var localMoves = (List<InfoAnimation>)typeof(Model).GetField("OHAMEHHMEAL", Hidden).GetValue(enemy);
+            var localMoves = (List<InfoAnimation>)typeof(Model).GetField("availableAnimations", Hidden).GetValue(enemy);
             var registered = AnimationData.Animations.Where(move => move.Name.StartsWith("de128:moves/wasp_fly_", StringComparison.Ordinal))
                 .Select(move => move.Name).ToArray();
             var loaded = localMoves.Where(move => move.Name.StartsWith("de128:moves/wasp_fly_", StringComparison.Ordinal))
@@ -1420,26 +1420,26 @@ public static class ValidateDE128TierBossesNative
                     !move.Name.EndsWith("_PVP", StringComparison.Ordinal) &&
                     move.SelectionConditions.Last().GetType().Name == "DisabledMoveCondition") != 4)
                 throw new Exception("Wasp did not receive four selectable DE moves and four disabled core versions.");
-            var perks = enemy.Parameters.JBIOECDAAKP();
-            var items = enemy.Parameters.PJNJIJIODHE();
-            var locks = new ModelConditions { OJIAKDDCGLB = items, POBNMMADAJJ = perks,
-                IBBALIJOJMC = enemy.Parameters.IBBALIJOJMC };
+            var perks = enemy.Parameters.GetAllPerks();
+            var items = enemy.Parameters.GetEquippedItems();
+            var locks = new ModelConditions { Items = items, SelfPerks = perks,
+                SceneType = enemy.Parameters.SceneType };
             if (localMoves.Where(move => move.Name.StartsWith("de128:moves/wasp_fly_", StringComparison.Ordinal))
-                .Any(move => !move.HPPGNJJCEGF(locks, move.MoveData.Locks)))
+                .Any(move => !move.AreConditionsMet(locks, move.MoveData.Locks)))
                 throw new Exception("Wasp's DE Fly move failed its live perk or skeleton lock.");
             Debug.Log(Prefix + "Wasp Fly registered=" + string.Join(",", registered) +
                 " fighter moves=" + string.Join(",", loaded) + "; native core versions disabled.");
             Debug.Log(Prefix + "Reached Wasp at frame " + frame + " after " + waspWaveDefeats +
                 " native survival defeats.");
         }
-        bool flying = enemy.GetCurrentAnimation()?.CNPFHBMGDFP("WaspFly") == true;
+        bool flying = enemy.GetCurrentAnimation()?.HasName("WaspFly") == true;
         if (flying && waspFirstFlyAt < 0)
         {
             waspFirstFlyAt = frame;
-            var active = enemy.OCPMJKIEPIG().NNMAFFCCMHC();
+            var active = enemy.GetAnimationModule().GetCurrentInfo();
             var attack = active?.MoveData.Intervals.OfType<IntervalAttack>().SingleOrDefault();
-            if (attack == null || !attack.MOILKOLCNBP() || !attack.NPHDDMAIGKN() ||
-                attack.DNPLIFOABPB()?.Count != 0 || attack.KBENFIOADCG()?.Count != 0 ||
+            if (attack == null || !attack.GetIgnoresInvulnerable() || !attack.GetIgnoresBlock() ||
+                attack.GetIgnoredInvulnerableNames()?.Count != 0 || attack.GetIgnoredBlockNames()?.Count != 0 ||
                 attack.HitReactions.SingleOrDefault()?.Name != "WaspFly")
                 throw new Exception("Wasp's live Fly attack lost its archived hit or bypass behavior.");
             Debug.Log(Prefix + "Wasp selected Fly at frame " + frame + ".");
@@ -1469,11 +1469,11 @@ public static class ValidateDE128TierBossesNative
         }
         if (id == "de128:fights/uw_survival_mercenary_1")
         {
-            var girl = fight.OFKJMHPMCCD().Where(warrior =>
+            var girl = fight.GetOpponents().Where(warrior =>
                 warrior.Armor?.Name == "ARMOR_IM_CEREMONIAL").ToArray();
             if (girl.Length != 1 || girl[0].Helm?.Name != "HELM_IM_CEREMONIAL")
                 throw new Exception("Girl Fan's ceremonial armor and helm did not resolve in the native survival roster: " +
-                    string.Join(",", fight.OFKJMHPMCCD().Select(warrior => warrior.Armor?.Name + "/" + warrior.Helm?.Name)));
+                    string.Join(",", fight.GetOpponents().Select(warrior => warrior.Armor?.Name + "/" + warrior.Helm?.Name)));
             Debug.Log(Prefix + "Girl Fan's archived ceremonial armor and helm resolved in the native survival roster.");
         }
     }
@@ -1515,8 +1515,8 @@ public static class ValidateDE128TierBossesNative
             throw new Exception("Native spotlight material did not load: " + id);
         var material = mask.sharedMaterial;
         var center = material.GetVector("_Center");
-        var logical = player.PLBNCDCFPML();
-        var fighterWorld = player.MJNPBMOAFML().transform.parent.TransformPoint(
+        var logical = player.GetPosition();
+        var fighterWorld = player.GetGameObject().transform.parent.TransformPoint(
             new Vector3(logical.GetX(), logical.GetY(), 0f));
         var onMask = mask.transform.InverseTransformPoint(fighterWorld);
         if (Mathf.Abs(material.GetFloat("_Radius") - 0.2f) > 0.0001f ||
@@ -1627,7 +1627,7 @@ public static class ValidateDE128TierBossesNative
     static void PressBlockingStory()
     {
         if (EditorApplication.timeSinceStartup - lastPress < 0.2) return;
-        var active = typeof(DialogsManager).GetField("OALIPPPOHCL", HiddenStatic).GetValue(null) as StoryDialog;
+        var active = typeof(DialogsManager).GetField("currentDialog", HiddenStatic).GetValue(null) as StoryDialog;
         if (active == null || !active.IsQuestDialog || active.get_ButtonOK() == null) return;
         lastPress = EditorApplication.timeSinceStartup;
         PressStoryButton(active);
@@ -1635,7 +1635,7 @@ public static class ValidateDE128TierBossesNative
 
     static void PressStoryButton(StoryDialog dialog)
     {
-        typeof(StoryDialog).GetMethod("GPEKKGLDKDF", Hidden).Invoke(dialog, new object[] { null });
+        typeof(StoryDialog).GetMethod("OnNextClicked", Hidden).Invoke(dialog, new object[] { null });
     }
 
     static ModStoryEvents StoryBus => (ModStoryEvents)typeof(ModRuntime)

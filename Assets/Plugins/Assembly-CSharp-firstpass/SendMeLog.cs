@@ -17,7 +17,7 @@ public class SendMeLog : MonoBehaviour
 		_email = KCCCJAINPIG;
 		if (!_obj)
 		{
-			Application.logMessageReceived += HNDEILJJGJB;
+			Application.logMessageReceived += HandleLogMessage;
 			_active = true;
 			_obj = new GameObject("_sendMeLog", typeof(SendMeLog));
 			Object.DontDestroyOnLoad(_obj);
@@ -25,11 +25,11 @@ public class SendMeLog : MonoBehaviour
 		if (HBIAPEIOOHI > 0.1f)
 		{
 			SendMeLog component = _obj.GetComponent<SendMeLog>();
-			component.StartCoroutine(component.LKJNBAFMFKG(HBIAPEIOOHI));
+			component.StartCoroutine(component.StopAfterDelay(HBIAPEIOOHI));
 		}
 	}
 
-	private static void HNDEILJJGJB(string IOFGGOCEIAM, string BPANNMHCGBC, LogType LFLGCDNKNJI)
+	private static void HandleLogMessage(string IOFGGOCEIAM, string BPANNMHCGBC, LogType LFLGCDNKNJI)
 	{
 		if (_active)
 		{
@@ -43,7 +43,7 @@ public class SendMeLog : MonoBehaviour
 		_active = false;
 	}
 
-	private IEnumerator LKJNBAFMFKG(float time)
+	private IEnumerator StopAfterDelay(float time)
 	{
 		yield return new WaitForSeconds(time);
 		Stop();

@@ -2,27 +2,27 @@ using UnityEngine;
 
 public class Vector2D
 {
-	public static void FOJIKCBCAHC(Vector2 MLGFPMDKOHD, Vector2 DMMNCDKPCCI, EquationLine EGKHHBMCGMK)
+	public static void BuildLineEquation(Vector2 MLGFPMDKOHD, Vector2 DMMNCDKPCCI, EquationLine EGKHHBMCGMK)
 	{
 		float num = Vector2.Distance(MLGFPMDKOHD, DMMNCDKPCCI);
-		EGKHHBMCGMK.LHBNIMGFKIB = (MLGFPMDKOHD.y - DMMNCDKPCCI.y) / num;
-		EGKHHBMCGMK.AAOIAEJJINO = (DMMNCDKPCCI.x - MLGFPMDKOHD.x) / num;
-		EGKHHBMCGMK.ILHDJDNPFKH = 0f - (EGKHHBMCGMK.LHBNIMGFKIB * MLGFPMDKOHD.x + EGKHHBMCGMK.AAOIAEJJINO * MLGFPMDKOHD.y);
+		EGKHHBMCGMK.A = (MLGFPMDKOHD.y - DMMNCDKPCCI.y) / num;
+		EGKHHBMCGMK.CoefficientB = (DMMNCDKPCCI.x - MLGFPMDKOHD.x) / num;
+		EGKHHBMCGMK.ConstantC = 0f - (EGKHHBMCGMK.A * MLGFPMDKOHD.x + EGKHHBMCGMK.CoefficientB * MLGFPMDKOHD.y);
 	}
 
-	public static EquationLine FOJIKCBCAHC(Vector2 MLGFPMDKOHD, Vector2 DMMNCDKPCCI)
+	public static EquationLine BuildLineEquation(Vector2 MLGFPMDKOHD, Vector2 DMMNCDKPCCI)
 	{
 		EquationLine kEDCEHBPOIM = null;
-		FOJIKCBCAHC(MLGFPMDKOHD, DMMNCDKPCCI, kEDCEHBPOIM);
+		BuildLineEquation(MLGFPMDKOHD, DMMNCDKPCCI, kEDCEHBPOIM);
 		return kEDCEHBPOIM;
 	}
 
-	private static float KHMHNLKAENC(float value)
+	private static float Abs(float value)
 	{
 		return (!(value < 0f)) ? value : (0f - value);
 	}
 
-	public static bool PDFOIOBDHJE(Vector2 HICHONIJHKL, Vector2 LNPFHLPCLOP, float KLDFJGIKIHG, Vector2 NMAJNHKJJEM, Vector2 ONNJMGGPHEL, float MGCKDDGGCBI, ref Vector2 DNJCFHNICBH, ref Vector2 LOFMLNLKFLB, EquationLine JHMHDMOADMA, EquationLine GIMOMPLMEJH)
+	public static bool IntersectThickSegments(Vector2 HICHONIJHKL, Vector2 LNPFHLPCLOP, float KLDFJGIKIHG, Vector2 NMAJNHKJJEM, Vector2 ONNJMGGPHEL, float MGCKDDGGCBI, ref Vector2 DNJCFHNICBH, ref Vector2 LOFMLNLKFLB, EquationLine JHMHDMOADMA, EquationLine GIMOMPLMEJH)
 	{
 		Vector2 vector = HICHONIJHKL;
 		Vector2 vector2 = LNPFHLPCLOP;
@@ -31,24 +31,24 @@ public class Vector2D
 		float num = KLDFJGIKIHG + MGCKDDGGCBI;
 		if (num == 0f)
 		{
-			if (CAJCGEMHDLN(vector3, vector4, vector, vector2, DNJCFHNICBH))
+			if (SegmentIntersection(vector3, vector4, vector, vector2, DNJCFHNICBH))
 			{
 				LOFMLNLKFLB = DNJCFHNICBH;
 				return true;
 			}
 			return false;
 		}
-		EquationLine kEDCEHBPOIM = ((GIMOMPLMEJH == null) ? FOJIKCBCAHC(NMAJNHKJJEM, ONNJMGGPHEL) : GIMOMPLMEJH);
-		float num2 = kEDCEHBPOIM.LHBNIMGFKIB * vector.x + kEDCEHBPOIM.AAOIAEJJINO * vector.y + kEDCEHBPOIM.ILHDJDNPFKH;
-		float num3 = kEDCEHBPOIM.LHBNIMGFKIB * vector2.x + kEDCEHBPOIM.AAOIAEJJINO * vector2.y + kEDCEHBPOIM.ILHDJDNPFKH;
-		if (0f <= num2 * num3 && num < KHMHNLKAENC(num2) && num < KHMHNLKAENC(num3))
+		EquationLine kEDCEHBPOIM = ((GIMOMPLMEJH == null) ? BuildLineEquation(NMAJNHKJJEM, ONNJMGGPHEL) : GIMOMPLMEJH);
+		float num2 = kEDCEHBPOIM.A * vector.x + kEDCEHBPOIM.CoefficientB * vector.y + kEDCEHBPOIM.ConstantC;
+		float num3 = kEDCEHBPOIM.A * vector2.x + kEDCEHBPOIM.CoefficientB * vector2.y + kEDCEHBPOIM.ConstantC;
+		if (0f <= num2 * num3 && num < Abs(num2) && num < Abs(num3))
 		{
 			return false;
 		}
-		EquationLine kEDCEHBPOIM2 = ((JHMHDMOADMA == null) ? FOJIKCBCAHC(HICHONIJHKL, LNPFHLPCLOP) : JHMHDMOADMA);
-		float num4 = kEDCEHBPOIM2.LHBNIMGFKIB * vector3.x + kEDCEHBPOIM2.AAOIAEJJINO * vector3.y + kEDCEHBPOIM2.ILHDJDNPFKH;
-		float num5 = kEDCEHBPOIM2.LHBNIMGFKIB * vector4.x + kEDCEHBPOIM2.AAOIAEJJINO * vector4.y + kEDCEHBPOIM2.ILHDJDNPFKH;
-		if (0f <= num4 * num5 && num < KHMHNLKAENC(num4) && num < KHMHNLKAENC(num5))
+		EquationLine kEDCEHBPOIM2 = ((JHMHDMOADMA == null) ? BuildLineEquation(HICHONIJHKL, LNPFHLPCLOP) : JHMHDMOADMA);
+		float num4 = kEDCEHBPOIM2.A * vector3.x + kEDCEHBPOIM2.CoefficientB * vector3.y + kEDCEHBPOIM2.ConstantC;
+		float num5 = kEDCEHBPOIM2.A * vector4.x + kEDCEHBPOIM2.CoefficientB * vector4.y + kEDCEHBPOIM2.ConstantC;
+		if (0f <= num4 * num5 && num < Abs(num4) && num < Abs(num5))
 		{
 			return false;
 		}
@@ -61,23 +61,23 @@ public class Vector2D
 			LOFMLNLKFLB = DNJCFHNICBH;
 			return true;
 		}
-		if (DCPBKLDKIHD(num2, num, kEDCEHBPOIM, vector, ref LOFMLNLKFLB, vector3, vector4))
+		if (IsPointNearSegment(num2, num, kEDCEHBPOIM, vector, ref LOFMLNLKFLB, vector3, vector4))
 		{
 			DNJCFHNICBH = vector;
 			return true;
 		}
-		if (DCPBKLDKIHD(num3, num, kEDCEHBPOIM, vector2, ref LOFMLNLKFLB, vector3, vector4))
+		if (IsPointNearSegment(num3, num, kEDCEHBPOIM, vector2, ref LOFMLNLKFLB, vector3, vector4))
 		{
 			DNJCFHNICBH = vector2;
 			return true;
 		}
-		if (DCPBKLDKIHD(num4, num, kEDCEHBPOIM2, vector3, ref LOFMLNLKFLB, vector, vector2))
+		if (IsPointNearSegment(num4, num, kEDCEHBPOIM2, vector3, ref LOFMLNLKFLB, vector, vector2))
 		{
 			DNJCFHNICBH = vector3;
 			LOFMLNLKFLB = vector3;
 			return true;
 		}
-		if (DCPBKLDKIHD(num5, num, kEDCEHBPOIM2, vector4, ref LOFMLNLKFLB, vector, vector2))
+		if (IsPointNearSegment(num5, num, kEDCEHBPOIM2, vector4, ref LOFMLNLKFLB, vector, vector2))
 		{
 			DNJCFHNICBH = vector4;
 			LOFMLNLKFLB = vector4;
@@ -86,18 +86,18 @@ public class Vector2D
 		return false;
 	}
 
-	public static bool DCPBKLDKIHD(float OIOMNNFMDOO, float JBLFLFOGDFI, EquationLine EGKHHBMCGMK, Vector2 NAAPALOFBCI, ref Vector2 CIMNFFDLIJO, Vector2 ILENLCMAMBH, Vector2 PCLFFOBJJFO)
+	public static bool IsPointNearSegment(float OIOMNNFMDOO, float JBLFLFOGDFI, EquationLine EGKHHBMCGMK, Vector2 NAAPALOFBCI, ref Vector2 CIMNFFDLIJO, Vector2 ILENLCMAMBH, Vector2 PCLFFOBJJFO)
 	{
-		if (KHMHNLKAENC(OIOMNNFMDOO) <= JBLFLFOGDFI)
+		if (Abs(OIOMNNFMDOO) <= JBLFLFOGDFI)
 		{
-			CIMNFFDLIJO.x = NAAPALOFBCI.x - OIOMNNFMDOO * EGKHHBMCGMK.LHBNIMGFKIB;
-			CIMNFFDLIJO.y = NAAPALOFBCI.y - OIOMNNFMDOO * EGKHHBMCGMK.AAOIAEJJINO;
+			CIMNFFDLIJO.x = NAAPALOFBCI.x - OIOMNNFMDOO * EGKHHBMCGMK.A;
+			CIMNFFDLIJO.y = NAAPALOFBCI.y - OIOMNNFMDOO * EGKHHBMCGMK.CoefficientB;
 			return (((PCLFFOBJJFO.x <= CIMNFFDLIJO.x && CIMNFFDLIJO.x <= ILENLCMAMBH.x) || (ILENLCMAMBH.x <= CIMNFFDLIJO.x && CIMNFFDLIJO.x <= PCLFFOBJJFO.x)) && ((PCLFFOBJJFO.y <= CIMNFFDLIJO.y && CIMNFFDLIJO.y <= ILENLCMAMBH.y) || (ILENLCMAMBH.y <= CIMNFFDLIJO.y && CIMNFFDLIJO.y <= PCLFFOBJJFO.y))) || (NAAPALOFBCI.x - ILENLCMAMBH.x) * (NAAPALOFBCI.x - ILENLCMAMBH.x) + (NAAPALOFBCI.y - ILENLCMAMBH.y) * (NAAPALOFBCI.y - ILENLCMAMBH.y) <= JBLFLFOGDFI * JBLFLFOGDFI || (NAAPALOFBCI.x - PCLFFOBJJFO.x) * (NAAPALOFBCI.x - PCLFFOBJJFO.x) + (NAAPALOFBCI.y - PCLFFOBJJFO.y) * (NAAPALOFBCI.y - PCLFFOBJJFO.y) <= JBLFLFOGDFI * JBLFLFOGDFI;
 		}
 		return false;
 	}
 
-	public static bool CAJCGEMHDLN(Vector2 IEKADOOKFKG, Vector2 LDKCOIHONPG, Vector2 AOOIPCJPALH, Vector2 IGMCGOFHHCJ, Vector2 DCJLKCFKCOM)
+	public static bool SegmentIntersection(Vector2 IEKADOOKFKG, Vector2 LDKCOIHONPG, Vector2 AOOIPCJPALH, Vector2 IGMCGOFHHCJ, Vector2 DCJLKCFKCOM)
 	{
 		if ((IEKADOOKFKG.x == LDKCOIHONPG.x && IEKADOOKFKG.y == LDKCOIHONPG.y) || (AOOIPCJPALH.x == IGMCGOFHHCJ.x && AOOIPCJPALH.y == IGMCGOFHHCJ.y))
 		{

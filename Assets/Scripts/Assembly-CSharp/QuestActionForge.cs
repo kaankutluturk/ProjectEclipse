@@ -1,14 +1,14 @@
 public class QuestActionForge : QuestAction
 {
-	public override void DEJMHFMLKIC(QuestParameters GFIHPBCEEOB)
+	public override void Execute(QuestParameters GFIHPBCEEOB)
 	{
-		base.DEJMHFMLKIC(GFIHPBCEEOB);
-		Roster roster = ListSF.CCDKHLAMKKO();
+		base.Execute(GFIHPBCEEOB);
+		Roster roster = ListSF.GetRoster();
 		if (roster != null)
 		{
-			roster.PLBEEGGFKDH(true);
-			ListSF.GetInstance().EJANJEEGOOE();
+			roster.SetShowForge(true);
+			ListSF.GetInstance().RequestSave();
 		}
-		OGIJONMKABB();
+		FinishAction();
 	}
 }

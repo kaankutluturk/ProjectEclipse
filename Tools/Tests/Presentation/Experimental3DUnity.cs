@@ -46,7 +46,7 @@ public static class Experimental3DUnity
     static object Field(object value, string name) => value.GetType().GetField(name, Hidden | BindingFlags.Public).GetValue(value);
     static void Check(bool value, string message) { checks++; if (!value) throw new Exception(message); }
     static void Next() { phase++; phaseAt = EditorApplication.timeSinceStartup; }
-    static float[] Pose(Model model) => model.GetModelObject().NAMKCLGOPDD().SelectMany(n => new[] { n.GetStart().GetX(), n.GetStart().GetY(), n.GetStart().GetZ(), n.GetEnd().GetX(), n.GetEnd().GetY(), n.GetEnd().GetZ() }).ToArray();
+    static float[] Pose(Model model) => model.GetModelObject().GetAllNodes().SelectMany(n => new[] { n.GetStart().GetX(), n.GetStart().GetY(), n.GetStart().GetZ(), n.GetEnd().GetX(), n.GetEnd().GetY(), n.GetEnd().GetZ() }).ToArray();
     static void Capture(string filename)
     { var capture = new GameObject("3D acceptance capture").AddComponent<Experimental3DCapture>(); capture.Filename = filename; }
     static void Update()
@@ -65,9 +65,9 @@ public static class Experimental3DUnity
                 typeof(Eclipse.UI.TitleScreen).GetMethod("BeginCampaign", Hidden).Invoke(title, null);
                 var directory = SF2Paths.GetUserDataDirectory();
                 Check(directory.StartsWith(Application.persistentDataPath, StringComparison.OrdinalIgnoreCase) && Application.persistentDataPath.Contains("Experimental3DUnity-"), "Profile not isolated");
-                var profile = XmlUtils.OpenXMLDocument(SF2Paths.KKIDGPBOBNI(), "usersDefault.xml", XmlUtils.EBLFEPIOMOL.Normal, true, XmlCryptoUtils.NNLGALNDJCL());
+                var profile = XmlUtils.OpenXMLDocument(SF2Paths.GetGameDataPath(), "usersDefault.xml", XmlUtils.XmlSourceMode.Normal, true, XmlCryptoUtils.GetIsEncryptionEnabled());
                 ((System.Xml.XmlElement)profile.SelectSingleNode("/Root/Warriors/Warrior[@ID='1']")).SetAttribute("Tutorial", "END");
-                Directory.CreateDirectory(directory); XmlUtils.ONLDJNLKKAL(profile, Path.Combine(directory, Constants.OJMIJINKBPJ).Replace('\\', '/'));
+                Directory.CreateDirectory(directory); XmlUtils.SaveDocumentWithHash(profile, Path.Combine(directory, Constants.UsersFileName).Replace('\\', '/'));
                 campaign = true; return;
             }
             if (!entered)
@@ -75,7 +75,7 @@ public static class Experimental3DUnity
                 if (ModRuntime.Scripts == null || Module.GetInstance() == null) return;
                 var screen = Module.GetInstance().GetCurrentScreenType(); if (screen != ScreenType.ModuleDojo && screen != ScreenType.ModuleMap) return;
                 Check(!ModRuntime.Host.HasErrors, ModRuntime.Host.FormatReport());
-                var encounter = ListSF.CHMCKGCDGCM(new FightIDS(ModRuntime.Scripts.Content.RuntimeFightId(DefinitionId.Parse("core:fights/zone_1/tournament/3"))));
+                var encounter = ListSF.GetFightById(new FightIDS(ModRuntime.Scripts.Content.RuntimeFightId(DefinitionId.Parse("core:fights/zone_1/tournament/3"))));
                 Check(encounter != null, "Core encounter missing"); entered = GameUtils.StartFight(encounter, false, null, true, false); return;
             }
             var fight = Fight.GetCurrentFight(); if (fight == null) return;
@@ -91,12 +91,12 @@ public static class Experimental3DUnity
                 case 0:
                     if (!spacingSet)
                     {
-                        var position = player.PLBNCDCFPML(); var other = enemy.PLBNCDCFPML();
+                        var position = player.GetPosition(); var other = enemy.GetPosition();
                         enemy.ShiftModelPosition(new Vector3f(position.GetX() + 500 - other.GetX(), 0, 0), true);
                         spacingSet = true; return;
                     }
                     if (fight.get_FightTimeInFrames() < 180) return;
-                    fight.SetPaused(true); frame = fight.get_FightTimeInFrames(); pose = Pose(player); health = enemy.KKMCHCNOHMB(); mask = UnityEngine.Camera.main.cullingMask;
+                    fight.SetPaused(true); frame = fight.get_FightTimeInFrames(); pose = Pose(player); health = enemy.GetLife(); mask = UnityEngine.Camera.main.cullingMask;
                     Capture("fighters-orthographic.png"); Next(); break;
                 case 1:
                     if (captured < 1) return;
@@ -129,7 +129,7 @@ public static class Experimental3DUnity
                     float depthOrientation = perspective.WorldToViewportPoint(high).y - perspective.WorldToViewportPoint(low).y;
                     Check(originalOrientation * depthOrientation > 0, "Perspective projection inverted fighter orientation");
                     Check(volumes.All(v => v.GetComponent<MeshFilter>().sharedMesh.normals.Length == v.GetComponent<MeshFilter>().sharedMesh.vertexCount), "Missing lighting normals");
-                    Check(Pose(player).SequenceEqual(pose) && enemy.KKMCHCNOHMB() == health && fight.get_FightTimeInFrames() == frame, "Renderer mutated native simulation");
+                    Check(Pose(player).SequenceEqual(pose) && enemy.GetLife() == health && fight.get_FightTimeInFrames() == frame, "Renderer mutated native simulation");
                     Debug.Log("[Experimental3DUnity] Volumes=" + volumes.Length + "; native depth=" + player._MeshRender.get_Base().Vertices.Min(v => v.z) + ".." + player._MeshRender.get_Base().Vertices.Max(v => v.z) + "; perspective=" + perspective.transform.position + "; source=" + UnityEngine.Camera.main.transform.position + " size=" + UnityEngine.Camera.main.orthographicSize);
                     File.WriteAllLines(Path.Combine(Path.GetDirectoryName(Application.dataPath),"procedural3d-parts.txt"),
                         player._MeshRender.get_Base().FigureNames.Distinct().Concat(enemy._MeshRender.get_Base().FigureNames.Distinct()).Concat(new[]{"ACTIVE VOLUME PARENTS"}).Concat(volumes.Where(v=>v.gameObject.activeInHierarchy).Select(v=>v.transform.parent.name)));

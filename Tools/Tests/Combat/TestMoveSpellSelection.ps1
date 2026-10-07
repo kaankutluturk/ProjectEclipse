@@ -26,26 +26,26 @@ foreach($negated in @($false,$true)) {
   foreach($name in @('Sphere1','sphere1','Other')) {
    foreach($count in @(0,1,2,3)) {
     $state=[ModelConditions]::new();$state.ModelName=$name
-    $state.JJDNDOLCMMN=if($bulletType -eq 'MagicBullet'){$count}else{999}
-    $state.KHDBLNPFDPE=if($bulletType -eq 'RaidChargeBullet'){$count}else{999}
+    $state.MagicCharges=if($bulletType -eq 'MagicBullet'){$count}else{999}
+    $state.RaidCharges=if($bulletType -eq 'RaidChargeBullet'){$count}else{999}
     Check ($native[0].IsEqual($state) -eq (($name -ceq 'Sphere1') -xor $negated)) 'Actor predicate/case/negation mismatch.'
     Check ($native[1].IsEqual($state) -eq (($count -ge 1 -and $count -le 2) -xor $negated)) 'Native charge range/type/negation mismatch.'
    }
   }
  }
 }
-$velocityParser=[MovesParser].GetMethod('JGLOLDJFFKC',$staticFlags)
+$velocityParser=[MovesParser].GetMethod('ParseVelocity',$staticFlags)
 $actualMove=[InfoAnimation]::new();$expectedMove=[InfoAnimation]::new()
 $templates=[Collections.Generic.List[Xml.XmlNode]]::new()
 $null=$velocityParser.Invoke($null,@($actualMove,$node,$templates))
 $null=$velocityParser.Invoke($null,@($expectedMove,$archive.SelectSingleNode('//Move[@Name="Sphere1Middle"]'),$templates))
-foreach($method in @('LBJFGCFGMDI','NCENGIOMKOF','HOPDDLNABCG')) {
+foreach($method in @('GetVelocity','GetAcceleration','GetSaveVelocity')) {
  Check (($actualMove.$method() | ConvertTo-Json -Depth 4 -Compress) -ceq ($expectedMove.$method() | ConvertTo-Json -Depth 4 -Compress)) ('Native motion differs: '+$method)
 }
 $full=Project (Load-Lua $selectionLua.Replace('local motion={x=30}','local motion={x=-30,y=2,z=3,ax=4,ay=-5,az=6,save_velocity=true}'))
 $fullMove=[InfoAnimation]::new();$null=$velocityParser.Invoke($null,@($fullMove,$full.SelectSingleNode('//Move'),$templates))
-Check ($fullMove.LBJFGCFGMDI().GetX() -eq -30 -and $fullMove.LBJFGCFGMDI().GetY() -eq 2 -and $fullMove.LBJFGCFGMDI().GetZ() -eq 3) 'Native velocity axes lost.'
-Check ($fullMove.NCENGIOMKOF().GetX() -eq 4 -and $fullMove.NCENGIOMKOF().GetY() -eq -5 -and $fullMove.NCENGIOMKOF().GetZ() -eq 6 -and $fullMove.HOPDDLNABCG()) 'Native acceleration/preserve flag lost.'
+Check ($fullMove.GetVelocity().GetX() -eq -30 -and $fullMove.GetVelocity().GetY() -eq 2 -and $fullMove.GetVelocity().GetZ() -eq 3) 'Native velocity axes lost.'
+Check ($fullMove.GetAcceleration().GetX() -eq 4 -and $fullMove.GetAcceleration().GetY() -eq -5 -and $fullMove.GetAcceleration().GetZ() -eq 6 -and $fullMove.GetSaveVelocity()) 'Native acceleration/preserve flag lost.'
 $fingerprint=Fingerprint $catalog
 foreach($mutation in @('conditions[1].actor="Other"','conditions[1].player="Parent"','conditions[1].not_actor=conditions[1].actor;conditions[1].actor=nil',
  'conditions[2].min=2','conditions[2].max=3','conditions[2].bullets="RaidChargeBullet"','conditions[2].player="Enemy"',

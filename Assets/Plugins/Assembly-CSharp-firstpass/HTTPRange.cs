@@ -3,58 +3,58 @@ using System.Diagnostics;
 public sealed class HTTPRange
 {
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private int NFMICCCCHPL;
+	private int firstBytePos;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private int BBINNPBELEA;
+	private int lastBytePos;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private int IHMKOHOINGK;
+	private int contentLength;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private bool CNJCHGHAAJC;
+	private bool isValid;
 
-	public int MKLMNJJEEHO
+	public int FirstBytePos
 	{
 		get
 		{
-			return AHALHOCNCJK();
+			return GetFirstBytePos();
 		}
 		private set
 		{
-			ONABCINMKAH(value);
+			SetFirstBytePos(value);
 		}
 	}
 
-	public int KEGEPOAGBCM
+	public int LastBytePos
 	{
 		get
 		{
-			return CCJEDKMCDHP();
+			return GetLastBytePos();
 		}
 		private set
 		{
-			KJDKAHLIFEE(value);
+			SetLastBytePos(value);
 		}
 	}
 
-	public int NHKGOHBPMJL
+	public int ContentLength
 	{
 		get
 		{
-			return HOKMAPAFJJA();
+			return GetContentLength();
 		}
 		private set
 		{
-			OGCAJBCEANC(value);
+			SetContentLength(value);
 		}
 	}
 
-	public bool GJHHGDAOHGK
+	public bool IsValidRange
 	{
 		get
 		{
-			return DINANCBOIMJ();
+			return GetIsValid();
 		}
 		private set
 		{
@@ -64,66 +64,66 @@ public sealed class HTTPRange
 
 	internal HTTPRange()
 	{
-		OGCAJBCEANC(-1);
+		SetContentLength(-1);
 		set_IsValid(false);
 	}
 
 	internal HTTPRange(int HDIIBKGCCNB)
 	{
-		OGCAJBCEANC(HDIIBKGCCNB);
+		SetContentLength(HDIIBKGCCNB);
 		set_IsValid(false);
 	}
 
 	internal HTTPRange(int JNLLEFJLHIE, int PFOBJOCNOAP, int HDIIBKGCCNB)
 	{
-		ONABCINMKAH(JNLLEFJLHIE);
-		KJDKAHLIFEE(PFOBJOCNOAP);
-		OGCAJBCEANC(HDIIBKGCCNB);
-		set_IsValid(AHALHOCNCJK() <= CCJEDKMCDHP() && HOKMAPAFJJA() > CCJEDKMCDHP());
+		SetFirstBytePos(JNLLEFJLHIE);
+		SetLastBytePos(PFOBJOCNOAP);
+		SetContentLength(HDIIBKGCCNB);
+		set_IsValid(GetFirstBytePos() <= GetLastBytePos() && GetContentLength() > GetLastBytePos());
 	}
 
-	public int AHALHOCNCJK()
+	public int GetFirstBytePos()
 	{
-		return NFMICCCCHPL;
+		return firstBytePos;
 	}
 
-	private void ONABCINMKAH(int value)
+	private void SetFirstBytePos(int value)
 	{
-		NFMICCCCHPL = value;
+		firstBytePos = value;
 	}
 
-	public int CCJEDKMCDHP()
+	public int GetLastBytePos()
 	{
-		return BBINNPBELEA;
+		return lastBytePos;
 	}
 
-	private void KJDKAHLIFEE(int value)
+	private void SetLastBytePos(int value)
 	{
-		BBINNPBELEA = value;
+		lastBytePos = value;
 	}
 
-	public int HOKMAPAFJJA()
+	public int GetContentLength()
 	{
-		return IHMKOHOINGK;
+		return contentLength;
 	}
 
-	private void OGCAJBCEANC(int value)
+	private void SetContentLength(int value)
 	{
-		IHMKOHOINGK = value;
+		contentLength = value;
 	}
 
-	public bool DINANCBOIMJ()
+	public bool GetIsValid()
 	{
-		return CNJCHGHAAJC;
+		return isValid;
 	}
 
 	private void set_IsValid(bool value)
 	{
-		CNJCHGHAAJC = value;
+		isValid = value;
 	}
 
 	public override string ToString()
 	{
-		return string.Format("{0}-{1}/{2} (valid: {3})", AHALHOCNCJK(), CCJEDKMCDHP(), HOKMAPAFJJA(), DINANCBOIMJ());
+		return string.Format("{0}-{1}/{2} (valid: {3})", GetFirstBytePos(), GetLastBytePos(), GetContentLength(), GetIsValid());
 	}
 }

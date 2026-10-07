@@ -7,38 +7,38 @@ public class SimpleDialogInfo
 
 	public string Title = string.Empty;
 
-	public string GGDJIPKMKFC = string.Empty;
+	public string Message = string.Empty;
 
-	public BaseDialog.KBDHPMOMJLL DHKDOHFKOOJ;
+	public BaseDialog.FooterType FooterType;
 
-	public string BKANENCBCOA = string.Empty;
+	public string OkButtonText = string.Empty;
 
-	public string FFPLNDENING = string.Empty;
+	public string CancelButtonText = string.Empty;
 
-	public LabelButton.FBMGEHJPPIK HBMMFJGFCPH = LabelButton.FBMGEHJPPIK.BUTTON_WHITE;
+	public LabelButton.ButtonColor OkButtonStyle = LabelButton.ButtonColor.BUTTON_WHITE;
 
-	public LabelButton.FBMGEHJPPIK NLLFNHKKKBE;
+	public LabelButton.ButtonColor CancelButtonStyle;
 
-	public bool KIGGOAIKFCB;
+	public bool ShowCheckBox;
 
-	public bool HLFPOONJFNM;
+	public bool CheckBoxChecked;
 
-	public string CJKCAIJLFPN = string.Empty;
+	public string CheckBoxText = string.Empty;
 
 	public Action<object> Dlg;
 
-	public SimpleDialogInfo(string HHAAFADDOJB, string HCPNFPMHFCM, BaseDialog.KBDHPMOMJLL HJNAHNICGMH, string ALOJJLCOGMP, string PAJIOGEINPI, LabelButton.FBMGEHJPPIK HGAGMJENCNM, LabelButton.FBMGEHJPPIK PHBOACBIMMF, bool LMAFOFCILBL, bool KPBBOCBCMBN, string DOEEIGAHKEN, Action<object> ODDEOFKLIAG)
+	public SimpleDialogInfo(string HHAAFADDOJB, string HCPNFPMHFCM, BaseDialog.FooterType HJNAHNICGMH, string ALOJJLCOGMP, string PAJIOGEINPI, LabelButton.ButtonColor HGAGMJENCNM, LabelButton.ButtonColor PHBOACBIMMF, bool LMAFOFCILBL, bool KPBBOCBCMBN, string DOEEIGAHKEN, Action<object> ODDEOFKLIAG)
 	{
 		Title = HHAAFADDOJB;
-		GGDJIPKMKFC = HCPNFPMHFCM;
-		DHKDOHFKOOJ = HJNAHNICGMH;
-		BKANENCBCOA = ALOJJLCOGMP;
-		FFPLNDENING = PAJIOGEINPI;
-		HBMMFJGFCPH = HGAGMJENCNM;
-		NLLFNHKKKBE = PHBOACBIMMF;
-		KIGGOAIKFCB = LMAFOFCILBL;
-		HLFPOONJFNM = KPBBOCBCMBN;
-		CJKCAIJLFPN = DOEEIGAHKEN;
+		Message = HCPNFPMHFCM;
+		FooterType = HJNAHNICGMH;
+		OkButtonText = ALOJJLCOGMP;
+		CancelButtonText = PAJIOGEINPI;
+		OkButtonStyle = HGAGMJENCNM;
+		CancelButtonStyle = PHBOACBIMMF;
+		ShowCheckBox = LMAFOFCILBL;
+		CheckBoxChecked = KPBBOCBCMBN;
+		CheckBoxText = DOEEIGAHKEN;
 		Dlg = ODDEOFKLIAG;
 	}
 }

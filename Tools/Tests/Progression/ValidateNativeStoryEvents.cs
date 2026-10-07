@@ -4,12 +4,12 @@ using System.IO;
 using System.Xml;
 using Eclipse.Modding;
 
-public static class QuestEvent { public enum PMDPDMFLCIJ { QUEST_EVENT_PURCHASE, QUEST_EVENT_ENCHANTMENT, Other } }
+public static class QuestEvent { public enum QuestEventType { QUEST_EVENT_PURCHASE, QUEST_EVENT_ENCHANTMENT, Other } }
 public class ItemInfo { public string Name; public XmlNode NodeXML; }
 public class QuestParameters {
-    public ItemInfo DLKPBAJDHBO;
-    public Enchant DPLEGFCHOCE = new Enchant();
-    public class Enchant { public string OHCGEEEKEJH; public string FHELNNCGCGC; }
+    public ItemInfo purchasedItem;
+    public Enchant enchantment = new Enchant();
+    public class Enchant { public string itemName; public string recipeName; }
 }
 namespace Eclipse.Modding {
     public static class ModRuntime {
@@ -23,12 +23,12 @@ namespace Eclipse.Modding {
 }
 public class NativeList {
     public class Manager {
-        public Func<QuestEvent.PMDPDMFLCIJ,bool> Evaluate;
-        public bool ActionQuest(QuestEvent.PMDPDMFLCIJ kind) => Evaluate(kind);
+        public Func<QuestEvent.QuestEventType,bool> Evaluate;
+        public bool ActionQuest(QuestEvent.QuestEventType kind) => Evaluate(kind);
     }
     public Manager _QuestsManager = new Manager();
     public QuestParameters Parameters = new QuestParameters();
-    public QuestParameters BNMLDPNCMLB() => Parameters;
+    public QuestParameters GetQuestParameters() => Parameters;
     /* NATIVE DISPATCH */
 }
 static class Program {
@@ -48,37 +48,37 @@ static class Program {
         scope.Subscribe(ModStoryEventKind.Purchase,e=>{Check(nativeFinished,"notification preceded native evaluation");events.Add(e);});
         scope.Subscribe(ModStoryEventKind.Enchantment,e=>events.Add(e));
         var list=new NativeList();
-        list.Parameters.DLKPBAJDHBO=new ItemInfo{Name="WEAPON_NUNCHAKU",NodeXML=node};
+        list.Parameters.purchasedItem=new ItemInfo{Name="WEAPON_NUNCHAKU",NodeXML=node};
         list._QuestsManager.Evaluate=kind=>{nativeFinished=true;return true;};
-        Check(list.FFBAJNGHGGD(QuestEvent.PMDPDMFLCIJ.QUEST_EVENT_PURCHASE)&&events.Count==0,"unbound native operation changed");
+        Check(list.RaiseQuestEvent(QuestEvent.QuestEventType.QUEST_EVENT_PURCHASE)&&events.Count==0,"unbound native operation changed");
         bus.BindProfile();nativeFinished=false;
         list._QuestsManager.Evaluate=kind=>{
-            list.Parameters.DLKPBAJDHBO.Name="MUTATED";nativeFinished=true;return false;
+            list.Parameters.purchasedItem.Name="MUTATED";nativeFinished=true;return false;
         };
-        Check(!list.FFBAJNGHGGD(QuestEvent.PMDPDMFLCIJ.QUEST_EVENT_PURCHASE),"native false changed");
+        Check(!list.RaiseQuestEvent(QuestEvent.QuestEventType.QUEST_EVENT_PURCHASE),"native false changed");
         Check(events.Count==1&&events[0].Item==CoreContentImporter.WeaponId("WEAPON_NUNCHAKU"),"snapshot lost original identity");
         list._QuestsManager.Evaluate=kind=>true;
-        Check(list.FFBAJNGHGGD(QuestEvent.PMDPDMFLCIJ.Other)&&events.Count==1,"unrelated event changed");
-        list.Parameters.DPLEGFCHOCE.OHCGEEEKEJH="WEAPON_NUNCHAKU";
-        list.Parameters.DPLEGFCHOCE.FHELNNCGCGC="Simple";
-        list._QuestsManager.Evaluate=kind=>{list.Parameters.DPLEGFCHOCE.FHELNNCGCGC="MUTATED";return true;};
-        Check(list.FFBAJNGHGGD(QuestEvent.PMDPDMFLCIJ.QUEST_EVENT_ENCHANTMENT),"native true changed");
+        Check(list.RaiseQuestEvent(QuestEvent.QuestEventType.Other)&&events.Count==1,"unrelated event changed");
+        list.Parameters.enchantment.itemName="WEAPON_NUNCHAKU";
+        list.Parameters.enchantment.recipeName="Simple";
+        list._QuestsManager.Evaluate=kind=>{list.Parameters.enchantment.recipeName="MUTATED";return true;};
+        Check(list.RaiseQuestEvent(QuestEvent.QuestEventType.QUEST_EVENT_ENCHANTMENT),"native true changed");
         Check(events.Count==2&&events[1].Recipe==DefinitionId.Parse("core:forge-profiles/simple")&&events[1].Item==events[0].Item,"enchantment snapshot mapping");
-        list.Parameters.DPLEGFCHOCE.OHCGEEEKEJH="unregistered";
+        list.Parameters.enchantment.itemName="unregistered";
         list._QuestsManager.Evaluate=kind=>false;
-        list.FFBAJNGHGGD(QuestEvent.PMDPDMFLCIJ.QUEST_EVENT_ENCHANTMENT);
+        list.RaiseQuestEvent(QuestEvent.QuestEventType.QUEST_EVENT_ENCHANTMENT);
         Check(events.Count==3&&events[2].Item==null&&events[2].Recipe==null,"unknown identities fabricated or event dropped");
         list._QuestsManager.Evaluate=kind=>{bus.BindProfile();return true;};
-        list.FFBAJNGHGGD(QuestEvent.PMDPDMFLCIJ.QUEST_EVENT_ENCHANTMENT);
+        list.RaiseQuestEvent(QuestEvent.QuestEventType.QUEST_EVENT_ENCHANTMENT);
         Check(events.Count==3,"captured old-profile event reached new profile");
         list._QuestsManager.Evaluate=kind=>{throw new InvalidOperationException("native failure");};
-        bool threw=false;try{list.FFBAJNGHGGD(QuestEvent.PMDPDMFLCIJ.QUEST_EVENT_ENCHANTMENT);}catch(InvalidOperationException){threw=true;}
+        bool threw=false;try{list.RaiseQuestEvent(QuestEvent.QuestEventType.QUEST_EVENT_ENCHANTMENT);}catch(InvalidOperationException){threw=true;}
         Check(threw&&events.Count==3,"native failure masked or delivered event");
         ModRuntime._profileRoster=null;
-        Check(ModRuntime.CaptureStoryEvent(QuestEvent.PMDPDMFLCIJ.QUEST_EVENT_ENCHANTMENT,list.Parameters)==null,"inactive roster capture");
+        Check(ModRuntime.CaptureStoryEvent(QuestEvent.QuestEventType.QUEST_EVENT_ENCHANTMENT,list.Parameters)==null,"inactive roster capture");
         ModRuntime._profileRoster=new object();scope.Dispose();
-        Check(ModRuntime.CaptureStoryEvent(QuestEvent.PMDPDMFLCIJ.QUEST_EVENT_ENCHANTMENT,list.Parameters)==null,"no-subscriber capture");
-        Check(ModRuntime.CaptureStoryEvent(QuestEvent.PMDPDMFLCIJ.QUEST_EVENT_PURCHASE,null)==null,"null params capture");
+        Check(ModRuntime.CaptureStoryEvent(QuestEvent.QuestEventType.QUEST_EVENT_ENCHANTMENT,list.Parameters)==null,"no-subscriber capture");
+        Check(ModRuntime.CaptureStoryEvent(QuestEvent.QuestEventType.QUEST_EVENT_PURCHASE,null)==null,"null params capture");
         Console.WriteLine("PASS: "+checks+" production native dispatch/capture checks with controlled quest processing. No full-game or Lua delivery claimed.");
     }
 }

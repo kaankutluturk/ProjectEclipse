@@ -2,30 +2,30 @@ using System.Xml;
 
 public class CrazyRule : DamageRule
 {
-	private FightStatistics.EMKEIEJMONM HDNAANHGIDN;
+	private FightStatistics.FightStyle styleThreshold;
 
 	public CrazyRule(XmlNode node, RuleAppliance EJPOJJKKICO)
-		: base(node, EJPOJJKKICO, BCBLLMPAMLP.RuleCrazy)
+		: base(node, EJPOJJKKICO, RuleType.RuleCrazy)
 	{
-		HDNAANHGIDN = FightStatistics.EMKEIEJMONM.STYLE_TURTLE;
-		KOKHKAFELGL = false;
+		styleThreshold = FightStatistics.FightStyle.STYLE_TURTLE;
+		applianceLosesOnTrigger = false;
 		Parse(node);
-		EBJIKKBLBEM(FightEvent.CrazyEvent);
+		SubscribeEvent(FightEvent.CrazyEvent);
 	}
 
 	protected override bool CompareSingle(object data)
 	{
 		FightData hCPJJKMNMCE = (FightData)data;
-		if (hCPJJKMNMCE.KOJNCHKPLLN == FightEvent.DamageCheckEvent)
+		if (hCPJJKMNMCE.FightEventType == FightEvent.DamageCheckEvent)
 		{
 			return false;
 		}
-		return CheckIsNoDamageChange(hCPJJKMNMCE.DPBGICDNFAM < HDNAANHGIDN);
+		return CheckIsNoDamageChange(hCPJJKMNMCE.Style < styleThreshold);
 	}
 
 	protected override void Parse(XmlNode node)
 	{
 		base.Parse(node);
-		HDNAANHGIDN = RuleParser.KMAKHHHMGMH(node);
+		styleThreshold = RuleParser.ParseStyleType(node);
 	}
 }

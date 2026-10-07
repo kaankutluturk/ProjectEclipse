@@ -4,7 +4,7 @@ namespace Nekki.SF2.GUI
 {
 	public class DebugUI : ModuleHolder
 	{
-		public static ConsoleUI CAPIAHDHCOO
+		public static ConsoleUI ConsoleModule
 		{
 			get
 			{
@@ -12,7 +12,7 @@ namespace Nekki.SF2.GUI
 			}
 		}
 
-		public static ModelDebugUI COHMAEHOPLG
+		public static ModelDebugUI ModelDebugModule
 		{
 			get
 			{

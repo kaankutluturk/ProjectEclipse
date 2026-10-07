@@ -2,7 +2,7 @@ using System;
 
 public interface IValuePromise
 {
-	event Action<object> MJCKDPOOOMB;
+	event Action<object> ValueAvailableEvent;
 
 	void add_ValueAvailable(Action<object> value);
 

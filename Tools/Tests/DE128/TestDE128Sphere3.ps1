@@ -79,7 +79,7 @@ foreach($key in $mapping.Keys) {
  }
  foreach($attack in $actual.SelectNodes('./Intervals/Interval[@Type="Attack"]')) {
   $parsed=Parse-Attack $attack
-  Check ($parsed.HPLOFLKCLHG() -and $parsed.NPHDDMAIGKN() -and !$parsed.PIKCMLIAFOI()) 'Sphere native attack options lost.'
+  Check ($parsed.GetNoCritical() -and $parsed.GetIgnoresBlock() -and !$parsed.GetHasEffect()) 'Sphere native attack options lost.'
  }
 }
 Check ($archive.SelectSingleNode('//Templates/Template[@Name="Sphere3"]').ChildNodes.Count -eq 0) 'Removed archive family template is no longer empty.'
@@ -89,7 +89,7 @@ Write-Output "PASS $script:checks combined checks: complete five-move Sphere3 Lu
 $attack=$doc.SelectSingleNode('//Move[@Name="de128:moves/sphere3_middle"]/Intervals/Interval[@Type="Attack"]')
 $native=Parse-Attack $attack
 Check ($native.GetReactionName(22) -ceq 'Physycal') 'Native physical-fall reaction was rewritten.'
-Check ($native.IKPJJAEIOCG().Count -eq 5) 'Repeated archived attack edges were lost.'
+Check ($native.GetAttackingParts().Count -eq 5) 'Repeated archived attack edges were lost.'
 $reactionLua='sf2.moves.register_template {id="reaction",intervals={{type="Attack",attack={edges={"Edge"},hit="Physycal"}}}}'
 $reaction=Load-Lua $reactionLua
 Check ((Fingerprint $reaction) -cne (Fingerprint (Load-Lua $reactionLua.Replace('Physycal','High')))) 'Reaction missing from fingerprint.'

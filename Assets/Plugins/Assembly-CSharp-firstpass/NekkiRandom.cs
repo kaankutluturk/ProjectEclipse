@@ -4,43 +4,43 @@ using System.Text;
 
 public class NekkiRandom
 {
-	private RandomGenerator KIDGAELKGEI;
+	private RandomGenerator generator;
 
 	public NekkiRandom(uint OKGKLCLEDFN)
 	{
-		KIDGAELKGEI = new RandomGenerator(OKGKLCLEDFN);
+		generator = new RandomGenerator(OKGKLCLEDFN);
 	}
 
 	public NekkiRandom()
 	{
-		KIDGAELKGEI = new RandomGenerator(0u);
+		generator = new RandomGenerator(0u);
 		uint oKGKLCLEDFN = (uint)DateTime.UtcNow.Ticks;
-		KIDGAELKGEI.setSeed(oKGKLCLEDFN);
+		generator.setSeed(oKGKLCLEDFN);
 	}
 
-	public uint OHBDPMGHNFM()
+	public uint GetRandMax()
 	{
-		return RandomGenerator.HHJPLLHOGCH();
+		return RandomGenerator.GetMaxValue();
 	}
 
-	public uint DADGADIAJHI()
+	public uint NextRaw()
 	{
-		return KIDGAELKGEI.DADGADIAJHI();
+		return generator.NextRandom();
 	}
 
 	public void setSeed(uint OKGKLCLEDFN)
 	{
-		KIDGAELKGEI.setSeed(OKGKLCLEDFN);
+		generator.setSeed(OKGKLCLEDFN);
 	}
 
-	public uint EBKAFDGPLOE()
+	public uint GetSeed()
 	{
-		return KIDGAELKGEI.EBKAFDGPLOE();
+		return generator.GetSeed();
 	}
 
 	public float randomFloat()
 	{
-		return (float)DADGADIAJHI() / (float)OHBDPMGHNFM() + (float)DADGADIAJHI() / (float)OHBDPMGHNFM() / (float)OHBDPMGHNFM();
+		return (float)NextRaw() / (float)GetRandMax() + (float)NextRaw() / (float)GetRandMax() / (float)GetRandMax();
 	}
 
 	public float randomFloat(float KAEPJHHLLPK)

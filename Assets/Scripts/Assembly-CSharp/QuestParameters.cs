@@ -1,75 +1,75 @@
 public class QuestParameters
 {
-	public class BPJGDAOGHLC
+	public class EnchantmentInfo
 	{
-		public string OHCGEEEKEJH;
+		public string itemName;
 
-		public string FHELNNCGCGC;
+		public string recipeName;
 
-		public string MECEADEKGJB;
+		public string costType;
 
-		public long BMNFPNBAMAF;
+		public long endTimestamp;
 
-		public BPJGDAOGHLC()
+		public EnchantmentInfo()
 		{
-			BMNFPNBAMAF = 0L;
-			OHCGEEEKEJH = string.Empty;
-			FHELNNCGCGC = string.Empty;
-			MECEADEKGJB = string.Empty;
+			endTimestamp = 0L;
+			itemName = string.Empty;
+			recipeName = string.Empty;
+			costType = string.Empty;
 		}
 	}
 
-	public ItemInfo DLKPBAJDHBO;
+	public ItemInfo purchasedItem;
 
-	public FightIDS JLGLBLDPAAF;
+	public FightIDS fightIds;
 
-	public RosterQuest.NOKCOAHJIPB NPMDMOIHBFP;
+	public RosterQuest.QuestVariable actionId;
 
-	public LocalizationManager.Language GMGMEEIKGLG;
+	public LocalizationManager.Language chosenLanguage;
 
-	public BPJGDAOGHLC DPLEGFCHOCE;
+	public EnchantmentInfo enchantment;
 
-	public string HEIADONEACH;
+	public string fightResult;
 
-	public string OHPHPJBMNLH;
+	public string raidId;
 
-	public string AIEHNBBFNPF;
+	public string raidResult;
 
-	public string GAEPENBCCPB;
+	public string sceneFrom;
 
-	public string GMDFCHJBJGO;
+	public string sceneTo;
 
-	public string HJGNGBHONCP;
+	public string tabFrom;
 
-	public string KBKAGDKOGNJ;
+	public string tabTo;
 
-	public string BPPAPLLPBIJ;
+	public string currentSceneName;
 
-	public string OIKHBNOANPP;
+	public string currentTabName;
 
-	public string PFKPHBPBPAF;
+	public string iteratorValue;
 
-	public string LCJIAGBCJBM;
+	public string buttonType;
 
-	public string GCKANEECDHE;
+	public string buttonName;
 
-	public string JINDOHILBBO;
+	public string packName;
 
-	public string NAMGBBCEEEI;
+	public string timerName;
 
-	public string NJDDPMPFCGB;
+	public string perkName;
 
-	public string OOFHDANMCJB;
+	public string purchaseFailureReason;
 
-	public string FOODLENBJGI;
+	public string setItemName;
 
-	public int JNGFNNFAAGN;
+	public int energyChange;
 
-	public int BJIDALJIKNC;
+	public int levelUp;
 
-	public int AELDOJNIIME;
+	public int gemsPrice;
 
-	public int EGAPDJLHHNJ;
+	public int lotteryLastSpinNumber;
 
 	public float fightAvgFps;
 
@@ -78,39 +78,39 @@ public class QuestParameters
 	internal QuestParameters SnapshotForQueue()
 	{
 		var snapshot = (QuestParameters)MemberwiseClone();
-		snapshot.JLGLBLDPAAF = JLGLBLDPAAF == null ? null : new FightIDS(JLGLBLDPAAF);
-		if (DPLEGFCHOCE != null)
-			snapshot.DPLEGFCHOCE = new BPJGDAOGHLC {
-				OHCGEEEKEJH = DPLEGFCHOCE.OHCGEEEKEJH, FHELNNCGCGC = DPLEGFCHOCE.FHELNNCGCGC,
-				MECEADEKGJB = DPLEGFCHOCE.MECEADEKGJB, BMNFPNBAMAF = DPLEGFCHOCE.BMNFPNBAMAF
+		snapshot.fightIds = fightIds == null ? null : new FightIDS(fightIds);
+		if (enchantment != null)
+			snapshot.enchantment = new EnchantmentInfo {
+				itemName = enchantment.itemName, recipeName = enchantment.recipeName,
+				costType = enchantment.costType, endTimestamp = enchantment.endTimestamp
 			};
 		return snapshot;
 	}
 
 	public QuestParameters()
 	{
-		GMGMEEIKGLG = null;
-		DLKPBAJDHBO = null;
-		GAEPENBCCPB = string.Empty;
-		GMDFCHJBJGO = string.Empty;
-		HJGNGBHONCP = string.Empty;
-		KBKAGDKOGNJ = string.Empty;
-		BPPAPLLPBIJ = "None";
-		OIKHBNOANPP = string.Empty;
-		LCJIAGBCJBM = string.Empty;
-		GCKANEECDHE = string.Empty;
-		JINDOHILBBO = string.Empty;
-		FOODLENBJGI = string.Empty;
-		JNGFNNFAAGN = 0;
-		AELDOJNIIME = 0;
-		EGAPDJLHHNJ = 0;
+		chosenLanguage = null;
+		purchasedItem = null;
+		sceneFrom = string.Empty;
+		sceneTo = string.Empty;
+		tabFrom = string.Empty;
+		tabTo = string.Empty;
+		currentSceneName = "None";
+		currentTabName = string.Empty;
+		buttonType = string.Empty;
+		buttonName = string.Empty;
+		packName = string.Empty;
+		setItemName = string.Empty;
+		energyChange = 0;
+		gemsPrice = 0;
+		lotteryLastSpinNumber = 0;
 		inLottery = false;
-		JLGLBLDPAAF = null;
-		DPLEGFCHOCE = new BPJGDAOGHLC();
+		fightIds = null;
+		enchantment = new EnchantmentInfo();
 	}
 
-	public FightList LBGOMJFFEPP()
+	public FightList GetFightList()
 	{
-		return ListSF.CHMCKGCDGCM(JLGLBLDPAAF);
+		return ListSF.GetFightById(fightIds);
 	}
 }

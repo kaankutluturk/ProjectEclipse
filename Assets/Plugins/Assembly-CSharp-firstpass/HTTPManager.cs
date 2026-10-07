@@ -10,67 +10,67 @@ public static class HTTPManager
 	private static byte maxConnectionPerServer;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private static bool BEBAGLBMIDO;
+	private static bool keepAliveDefaultValue;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private static bool BHCFACLDBAM;
+	private static bool isCachingDisabled;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private static TimeSpan HACDMEKCFOJ;
+	private static TimeSpan maxConnectionIdleTime;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private static bool ENOAEBAADAD;
+	private static bool isCookiesEnabled;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private static uint AOJEMDDEFIG;
+	private static uint cookieJarSize;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private static bool NKCCPFLEILB;
+	private static bool enablePrivateBrowsing;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private static TimeSpan FNHLIDGNHLF;
+	private static TimeSpan connectTimeout;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private static TimeSpan HALNDDNKDCN;
+	private static TimeSpan requestTimeout;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private static Func<string> EDJMLMPEBBC;
+	private static Func<string> rootCacheFolderProvider;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private static HTTPProxy FGGPKCKKPNB;
+	private static HTTPProxy proxy;
 
-	private static HeartbeatManager GCJIMNCMONP;
+	private static HeartbeatManager heartbeats;
 
-	private static ILogger KCAIHGKMIIA;
-
-	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private static ICertificateVerifyer FLGLKKBJIAI;
+	private static ILogger logger;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private static bool ALIAKDLMJHI;
+	private static ICertificateVerifyer defaultCertificateVerifyer;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private static int LGCEBPKAMHG;
+	private static bool useAlternateSslDefaultValue;
 
-	private static Dictionary<string, List<HTTPConnection>> GKLCMJOHCBJ;
+	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
+	private static int maxPathLength;
 
-	private static List<HTTPConnection> BPIDLPMODDC;
+	private static Dictionary<string, List<HTTPConnection>> connections;
 
-	private static List<HTTPConnection> HHGJJICJJOJ;
+	private static List<HTTPConnection> activeConnections;
 
-	private static List<HTTPConnection> OBMKJIOLKNI;
+	private static List<HTTPConnection> freeConnections;
 
-	private static List<HTTPRequest> LCCNAGOGEBC;
+	private static List<HTTPConnection> recycledConnections;
 
-	private static bool NIEABCELPDJ;
+	private static List<HTTPRequest> requestQueue;
+
+	private static bool isCallingCallbacks;
 
 	internal static object Locker;
 
-	public static byte OFJPDEGFEBJ
+	public static byte MaxConnectionsPerServer
 	{
 		get
 		{
-			return BDCIBFLAPJN();
+			return GetMaxConnectionPerServer();
 		}
 		set
 		{
@@ -78,95 +78,95 @@ public static class HTTPManager
 		}
 	}
 
-	public static bool MBGEBPKCHIJ
+	public static bool KeepAliveDefaultValue
 	{
 		get
 		{
-			return HAIGHJHOEDH();
+			return GetKeepAliveDefaultValue();
 		}
 		set
 		{
-			CIAJMMMGKLK(value);
+			SetKeepAliveDefaultValue(value);
 		}
 	}
 
-	public static bool AKKKFHCMNLO
+	public static bool IsCachingDisabled
 	{
 		get
 		{
-			return NLGHFPFIMMH();
+			return GetIsCachingDisabled();
 		}
 		set
 		{
-			PPEMJOOLDDG(value);
+			SetIsCachingDisabled(value);
 		}
 	}
 
-	public static TimeSpan FBLNJACMCMN
+	public static TimeSpan MaxConnectionIdleTime
 	{
 		get
 		{
-			return AAKIPAJACAH();
+			return GetMaxConnectionIdleTime();
 		}
 		set
 		{
-			GIIOIOKMLKE(value);
+			SetMaxConnectionIdleTime(value);
 		}
 	}
 
-	public static bool PHLKGBCMHMO
+	public static bool IsCookiesEnabled
 	{
 		get
 		{
-			return IJJCLBHKMDJ();
+			return GetIsCookiesEnabled();
 		}
 		set
 		{
-			AGOGJCLDCGG(value);
+			SetIsCookiesEnabled(value);
 		}
 	}
 
-	public static bool HGCBJBFOBGM
+	public static bool EnablePrivateBrowsing
 	{
 		get
 		{
-			return IMFEILECHFL();
+			return GetEnablePrivateBrowsing();
 		}
 		set
 		{
-			LBKANPAKAJD(value);
+			SetEnablePrivateBrowsing(value);
 		}
 	}
 
-	public static TimeSpan PFODFFILGKE
+	public static TimeSpan ConnectTimeout
 	{
 		get
 		{
-			return DGHOJLHDGPB();
+			return GetConnectTimeout();
 		}
 		set
 		{
-			CLDOBKEACOC(value);
+			SetConnectTimeout(value);
 		}
 	}
 
-	public static TimeSpan CLKLCGGIBNI
+	public static TimeSpan RequestTimeout
 	{
 		get
 		{
-			return AFHJBDAKIPE();
+			return GetRequestTimeout();
 		}
 		set
 		{
-			MODDBPHHKDB(value);
+			SetRequestTimeout(value);
 		}
 	}
 
-	public static Func<string> MGHKKDNDOKK
+	public static Func<string> CacheFolderProvider
 	{
 		get
 		{
-			return OLFBIBGHAAC();
+			return GetRootCacheFolderProvider();
 		}
 		set
 		{
@@ -174,67 +174,67 @@ public static class HTTPManager
 		}
 	}
 
-	public static HTTPProxy DEFLNIGINCO
+	public static HTTPProxy Proxy
 	{
 		get
 		{
-			return FHGBKFBCGCO();
+			return GetProxy();
 		}
 		set
 		{
-			PNGMAECJHID(value);
+			SetProxy(value);
 		}
 	}
 
-	public static HeartbeatManager KBHEHJBEGNK
+	public static HeartbeatManager Heartbeats
 	{
 		get
 		{
-			return MAMNLAJACOD();
+			return GetHeartbeats();
 		}
 	}
 
-	public static ILogger GAEHFPGIDDH
+	public static ILogger Logger
 	{
 		get
 		{
-			return MBBMPNDDPIH();
+			return GetLogger();
 		}
 		set
 		{
-			EHLECGJCDPA(value);
+			SetLogger(value);
 		}
 	}
 
-	public static ICertificateVerifyer GELEAIBMAOF
+	public static ICertificateVerifyer DefaultCertificateVerifyer
 	{
 		get
 		{
-			return MBEAAMJILEI();
+			return GetDefaultCertificateVerifyer();
 		}
 		set
 		{
-			DLAHJOKFDKD(value);
+			SetDefaultCertificateVerifyer(value);
 		}
 	}
 
-	public static bool OILNBGELKJI
+	public static bool UseAlternateSSLDefaultValue
 	{
 		get
 		{
-			return IHBIPNGCEFM();
+			return GetUseAlternateSSLDefaultValue();
 		}
 		set
 		{
-			NNHJKFMGDDO(value);
+			SetUseAlternateSSLDefaultValue(value);
 		}
 	}
 
-	internal static int AANEKIFNLDN
+	internal static int PathLengthLimit
 	{
 		get
 		{
-			return LACBBEFPIPO();
+			return GetMaxPathLength();
 		}
 		set
 		{
@@ -244,27 +244,27 @@ public static class HTTPManager
 
 	static HTTPManager()
 	{
-		GKLCMJOHCBJ = new Dictionary<string, List<HTTPConnection>>();
-		BPIDLPMODDC = new List<HTTPConnection>();
-		HHGJJICJJOJ = new List<HTTPConnection>();
-		OBMKJIOLKNI = new List<HTTPConnection>();
-		LCCNAGOGEBC = new List<HTTPRequest>();
+		connections = new Dictionary<string, List<HTTPConnection>>();
+		activeConnections = new List<HTTPConnection>();
+		freeConnections = new List<HTTPConnection>();
+		recycledConnections = new List<HTTPConnection>();
+		requestQueue = new List<HTTPRequest>();
 		Locker = new object();
 		set_MaxConnectionPerServer(4);
-		CIAJMMMGKLK(true);
+		SetKeepAliveDefaultValue(true);
 		set_MaxPathLength(255);
-		GIIOIOKMLKE(TimeSpan.FromSeconds(30.0));
-		AGOGJCLDCGG(true);
+		SetMaxConnectionIdleTime(TimeSpan.FromSeconds(30.0));
+		SetIsCookiesEnabled(true);
 		set_CookieJarSize(10485760u);
-		LBKANPAKAJD(false);
-		CLDOBKEACOC(TimeSpan.FromSeconds(20.0));
-		MODDBPHHKDB(TimeSpan.FromSeconds(60.0));
-		KCAIHGKMIIA = new DefaultLogger();
-		DLAHJOKFDKD(null);
-		NNHJKFMGDDO(false);
+		SetEnablePrivateBrowsing(false);
+		SetConnectTimeout(TimeSpan.FromSeconds(20.0));
+		SetRequestTimeout(TimeSpan.FromSeconds(60.0));
+		logger = new DefaultLogger();
+		SetDefaultCertificateVerifyer(null);
+		SetUseAlternateSSLDefaultValue(false);
 	}
 
-	public static byte BDCIBFLAPJN()
+	public static byte GetMaxConnectionPerServer()
 	{
 		return maxConnectionPerServer;
 	}
@@ -278,278 +278,278 @@ public static class HTTPManager
 		maxConnectionPerServer = value;
 	}
 
-	public static bool HAIGHJHOEDH()
+	public static bool GetKeepAliveDefaultValue()
 	{
-		return BEBAGLBMIDO;
+		return keepAliveDefaultValue;
 	}
 
-	public static void CIAJMMMGKLK(bool value)
+	public static void SetKeepAliveDefaultValue(bool value)
 	{
-		BEBAGLBMIDO = value;
+		keepAliveDefaultValue = value;
 	}
 
-	public static bool NLGHFPFIMMH()
+	public static bool GetIsCachingDisabled()
 	{
-		return BHCFACLDBAM;
+		return isCachingDisabled;
 	}
 
-	public static void PPEMJOOLDDG(bool value)
+	public static void SetIsCachingDisabled(bool value)
 	{
-		BHCFACLDBAM = value;
+		isCachingDisabled = value;
 	}
 
-	public static TimeSpan AAKIPAJACAH()
+	public static TimeSpan GetMaxConnectionIdleTime()
 	{
-		return HACDMEKCFOJ;
+		return maxConnectionIdleTime;
 	}
 
-	public static void GIIOIOKMLKE(TimeSpan value)
+	public static void SetMaxConnectionIdleTime(TimeSpan value)
 	{
-		HACDMEKCFOJ = value;
+		maxConnectionIdleTime = value;
 	}
 
-	public static bool IJJCLBHKMDJ()
+	public static bool GetIsCookiesEnabled()
 	{
-		return ENOAEBAADAD;
+		return isCookiesEnabled;
 	}
 
-	public static void AGOGJCLDCGG(bool value)
+	public static void SetIsCookiesEnabled(bool value)
 	{
-		ENOAEBAADAD = value;
+		isCookiesEnabled = value;
 	}
 
-	public static uint CFPIDMJOENK()
+	public static uint GetCookieJarSize()
 	{
-		return AOJEMDDEFIG;
+		return cookieJarSize;
 	}
 
 	public static void set_CookieJarSize(uint value)
 	{
-		AOJEMDDEFIG = value;
+		cookieJarSize = value;
 	}
 
-	public static bool IMFEILECHFL()
+	public static bool GetEnablePrivateBrowsing()
 	{
-		return NKCCPFLEILB;
+		return enablePrivateBrowsing;
 	}
 
-	public static void LBKANPAKAJD(bool value)
+	public static void SetEnablePrivateBrowsing(bool value)
 	{
-		NKCCPFLEILB = value;
+		enablePrivateBrowsing = value;
 	}
 
-	public static TimeSpan DGHOJLHDGPB()
+	public static TimeSpan GetConnectTimeout()
 	{
-		return FNHLIDGNHLF;
+		return connectTimeout;
 	}
 
-	public static void CLDOBKEACOC(TimeSpan value)
+	public static void SetConnectTimeout(TimeSpan value)
 	{
-		FNHLIDGNHLF = value;
+		connectTimeout = value;
 	}
 
-	public static TimeSpan AFHJBDAKIPE()
+	public static TimeSpan GetRequestTimeout()
 	{
-		return HALNDDNKDCN;
+		return requestTimeout;
 	}
 
-	public static void MODDBPHHKDB(TimeSpan value)
+	public static void SetRequestTimeout(TimeSpan value)
 	{
-		HALNDDNKDCN = value;
+		requestTimeout = value;
 	}
 
-	public static Func<string> OLFBIBGHAAC()
+	public static Func<string> GetRootCacheFolderProvider()
 	{
-		return EDJMLMPEBBC;
+		return rootCacheFolderProvider;
 	}
 
 	public static void set_RootCacheFolderProvider(Func<string> value)
 	{
-		EDJMLMPEBBC = value;
+		rootCacheFolderProvider = value;
 	}
 
-	public static HTTPProxy FHGBKFBCGCO()
+	public static HTTPProxy GetProxy()
 	{
-		return FGGPKCKKPNB;
+		return proxy;
 	}
 
-	public static void PNGMAECJHID(HTTPProxy value)
+	public static void SetProxy(HTTPProxy value)
 	{
-		FGGPKCKKPNB = value;
+		proxy = value;
 	}
 
-	public static HeartbeatManager MAMNLAJACOD()
+	public static HeartbeatManager GetHeartbeats()
 	{
-		if (GCJIMNCMONP == null)
+		if (heartbeats == null)
 		{
-			GCJIMNCMONP = new HeartbeatManager();
+			heartbeats = new HeartbeatManager();
 		}
-		return GCJIMNCMONP;
+		return heartbeats;
 	}
 
-	public static ILogger MBBMPNDDPIH()
+	public static ILogger GetLogger()
 	{
-		if (KCAIHGKMIIA == null)
+		if (logger == null)
 		{
-			KCAIHGKMIIA = new DefaultLogger();
-			KCAIHGKMIIA.DLDMOHEGENM(BFNKPHDJNII.None);
+			logger = new DefaultLogger();
+			logger.SetLevel(Loglevels.None);
 		}
-		return KCAIHGKMIIA;
+		return logger;
 	}
 
-	public static void EHLECGJCDPA(ILogger value)
+	public static void SetLogger(ILogger value)
 	{
-		KCAIHGKMIIA = value;
+		logger = value;
 	}
 
-	public static ICertificateVerifyer MBEAAMJILEI()
+	public static ICertificateVerifyer GetDefaultCertificateVerifyer()
 	{
-		return FLGLKKBJIAI;
+		return defaultCertificateVerifyer;
 	}
 
-	public static void DLAHJOKFDKD(ICertificateVerifyer value)
+	public static void SetDefaultCertificateVerifyer(ICertificateVerifyer value)
 	{
-		FLGLKKBJIAI = value;
+		defaultCertificateVerifyer = value;
 	}
 
-	public static bool IHBIPNGCEFM()
+	public static bool GetUseAlternateSSLDefaultValue()
 	{
-		return ALIAKDLMJHI;
+		return useAlternateSslDefaultValue;
 	}
 
-	public static void NNHJKFMGDDO(bool value)
+	public static void SetUseAlternateSSLDefaultValue(bool value)
 	{
-		ALIAKDLMJHI = value;
+		useAlternateSslDefaultValue = value;
 	}
 
-	internal static int LACBBEFPIPO()
+	internal static int GetMaxPathLength()
 	{
-		return LGCEBPKAMHG;
+		return maxPathLength;
 	}
 
 	internal static void set_MaxPathLength(int value)
 	{
-		LGCEBPKAMHG = value;
+		maxPathLength = value;
 	}
 
-	public static void PAINOJOIGMC()
+	public static void Setup()
 	{
 		HTTPUpdateDelegator.CheckInstance();
-		HTTPCacheService.BEGBHCIIOAO();
-		CookieJar.ELIJOFFHEBP();
+		HTTPCacheService.CheckSetup();
+		CookieJar.SetupFolder();
 	}
 
-	public static HTTPRequest EMPGOCGHMBI(string BEPKJNKCKPH, OnRequestFinishedDelegate callback)
+	public static HTTPRequest SendRequest(string BEPKJNKCKPH, OnRequestFinishedDelegate callback)
 	{
-		return EMPGOCGHMBI(new HTTPRequest(new Uri(BEPKJNKCKPH), LAAFHDKKJFL.Get, callback));
+		return SendRequest(new HTTPRequest(new Uri(BEPKJNKCKPH), HTTPMethods.Get, callback));
 	}
 
-	public static HTTPRequest EMPGOCGHMBI(string BEPKJNKCKPH, LAAFHDKKJFL AMFJIGAEHLD, OnRequestFinishedDelegate callback)
+	public static HTTPRequest SendRequest(string BEPKJNKCKPH, HTTPMethods AMFJIGAEHLD, OnRequestFinishedDelegate callback)
 	{
-		return EMPGOCGHMBI(new HTTPRequest(new Uri(BEPKJNKCKPH), AMFJIGAEHLD, callback));
+		return SendRequest(new HTTPRequest(new Uri(BEPKJNKCKPH), AMFJIGAEHLD, callback));
 	}
 
-	public static HTTPRequest EMPGOCGHMBI(string BEPKJNKCKPH, LAAFHDKKJFL AMFJIGAEHLD, bool LLLAPINJJIJ, OnRequestFinishedDelegate callback)
+	public static HTTPRequest SendRequest(string BEPKJNKCKPH, HTTPMethods AMFJIGAEHLD, bool LLLAPINJJIJ, OnRequestFinishedDelegate callback)
 	{
-		return EMPGOCGHMBI(new HTTPRequest(new Uri(BEPKJNKCKPH), AMFJIGAEHLD, LLLAPINJJIJ, callback));
+		return SendRequest(new HTTPRequest(new Uri(BEPKJNKCKPH), AMFJIGAEHLD, LLLAPINJJIJ, callback));
 	}
 
-	public static HTTPRequest EMPGOCGHMBI(string BEPKJNKCKPH, LAAFHDKKJFL AMFJIGAEHLD, bool LLLAPINJJIJ, bool JNCJAGIBJFL, OnRequestFinishedDelegate callback)
+	public static HTTPRequest SendRequest(string BEPKJNKCKPH, HTTPMethods AMFJIGAEHLD, bool LLLAPINJJIJ, bool JNCJAGIBJFL, OnRequestFinishedDelegate callback)
 	{
-		return EMPGOCGHMBI(new HTTPRequest(new Uri(BEPKJNKCKPH), AMFJIGAEHLD, LLLAPINJJIJ, JNCJAGIBJFL, callback));
+		return SendRequest(new HTTPRequest(new Uri(BEPKJNKCKPH), AMFJIGAEHLD, LLLAPINJJIJ, JNCJAGIBJFL, callback));
 	}
 
-	public static HTTPRequest EMPGOCGHMBI(HTTPRequest ONOCIELLAPL)
+	public static HTTPRequest SendRequest(HTTPRequest ONOCIELLAPL)
 	{
 		ONOCIELLAPL.set_Exception(new NotSupportedException("Network services are disabled in the offline build."));
-		ONOCIELLAPL.set_State(CFGBMHKCENK.Error);
-		ONOCIELLAPL.FOIICPPDENH()?.Invoke(ONOCIELLAPL, null);
+		ONOCIELLAPL.set_State(HTTPRequestStates.Error);
+		ONOCIELLAPL.GetCallback()?.Invoke(ONOCIELLAPL, null);
 		return ONOCIELLAPL;
 	}
 
-	public static GeneralStatistics CBGIGIBGBLD(StatisticsQueryFlags AGADCPIIGLC)
+	public static GeneralStatistics GetGeneralStatistics(StatisticsQueryFlags AGADCPIIGLC)
 	{
 		GeneralStatistics result = new GeneralStatistics
 		{
-			EMFKBMDJFCJ = AGADCPIIGLC
+			QueryFlags = AGADCPIIGLC
 		};
 		if ((AGADCPIIGLC & StatisticsQueryFlags.Connections) != 0)
 		{
 			int num = 0;
-			foreach (KeyValuePair<string, List<HTTPConnection>> item in GKLCMJOHCBJ)
+			foreach (KeyValuePair<string, List<HTTPConnection>> item in connections)
 			{
 				if (item.Value != null)
 				{
 					num += item.Value.Count;
 				}
 			}
-			result.GKLCMJOHCBJ = num;
-			result.BPIDLPMODDC = BPIDLPMODDC.Count;
-			result.HHGJJICJJOJ = HHGJJICJJOJ.Count;
-			result.OBMKJIOLKNI = OBMKJIOLKNI.Count;
-			result.AOIDCCECOIE = LCCNAGOGEBC.Count;
+			result.Connections = num;
+			result.ActiveConnections = activeConnections.Count;
+			result.FreeConnections = freeConnections.Count;
+			result.RecycledConnections = recycledConnections.Count;
+			result.RequestsInQueue = requestQueue.Count;
 		}
 		if ((AGADCPIIGLC & StatisticsQueryFlags.Cache) != 0)
 		{
-			result.LMEFONBEGEN = HTTPCacheService.MDIKHCGGACM();
-			result.CacheSize = HTTPCacheService.NKOHKEGHKJN();
+			result.CacheEntityCount = HTTPCacheService.GetCacheEntityCount();
+			result.CacheSize = HTTPCacheService.GetCacheSize();
 		}
 		if ((AGADCPIIGLC & StatisticsQueryFlags.Cookies) != 0)
 		{
-			List<Cookie> list = CookieJar.CDFJFIJHDOM();
-			result.GPBFMKPPIAL = list.Count;
+			List<Cookie> list = CookieJar.GetAll();
+			result.CookieCount = list.Count;
 			uint num2 = 0u;
 			for (int i = 0; i < list.Count; i++)
 			{
-				num2 += list[i].ADGKKEKOJBD();
+				num2 += list[i].GuessSize();
 			}
 			result.CookieJarSize = num2;
 		}
 		return result;
 	}
 
-	private static void KDCMNDFKCAA(HTTPRequest ONOCIELLAPL)
+	private static void SendRequestImpl(HTTPRequest ONOCIELLAPL)
 	{
-		HTTPConnection NNLEEIONBEP = EDFODKJKANN(ONOCIELLAPL);
+		HTTPConnection NNLEEIONBEP = FindOrCreateFreeConnection(ONOCIELLAPL);
 		if (NNLEEIONBEP != null)
 		{
-			if (BPIDLPMODDC.Find((HTTPConnection ILHDJDNPFKH) => ILHDJDNPFKH == NNLEEIONBEP) == null)
+			if (activeConnections.Find((HTTPConnection ILHDJDNPFKH) => ILHDJDNPFKH == NNLEEIONBEP) == null)
 			{
-				BPIDLPMODDC.Add(NNLEEIONBEP);
+				activeConnections.Add(NNLEEIONBEP);
 			}
-			HHGJJICJJOJ.Remove(NNLEEIONBEP);
-			ONOCIELLAPL.set_State(CFGBMHKCENK.Processing);
-			ONOCIELLAPL.NDNOFGKMHDG();
-			NNLEEIONBEP.HDEHLIKBKJG(ONOCIELLAPL);
+			freeConnections.Remove(NNLEEIONBEP);
+			ONOCIELLAPL.set_State(HTTPRequestStates.Processing);
+			ONOCIELLAPL.Prepare();
+			NNLEEIONBEP.Process(ONOCIELLAPL);
 		}
 		else
 		{
-			ONOCIELLAPL.set_State(CFGBMHKCENK.Queued);
-			LCCNAGOGEBC.Add(ONOCIELLAPL);
+			ONOCIELLAPL.set_State(HTTPRequestStates.Queued);
+			requestQueue.Add(ONOCIELLAPL);
 		}
 	}
 
-	private static string NHFCAIIJAHD(HTTPRequest ONOCIELLAPL)
+	private static string GetKeyForRequest(HTTPRequest ONOCIELLAPL)
 	{
-		return ((ONOCIELLAPL.FHGBKFBCGCO() == null) ? string.Empty : new UriBuilder(ONOCIELLAPL.FHGBKFBCGCO().DNIJHGFINDG().Scheme, ONOCIELLAPL.FHGBKFBCGCO().DNIJHGFINDG().Host, ONOCIELLAPL.FHGBKFBCGCO().DNIJHGFINDG().Port).Uri.ToString()) + new UriBuilder(ONOCIELLAPL.DKAECMGPGOE().Scheme, ONOCIELLAPL.DKAECMGPGOE().Host, ONOCIELLAPL.DKAECMGPGOE().Port).Uri.ToString();
+		return ((ONOCIELLAPL.GetProxy() == null) ? string.Empty : new UriBuilder(ONOCIELLAPL.GetProxy().GetAddress().Scheme, ONOCIELLAPL.GetProxy().GetAddress().Host, ONOCIELLAPL.GetProxy().GetAddress().Port).Uri.ToString()) + new UriBuilder(ONOCIELLAPL.GetCurrentUri().Scheme, ONOCIELLAPL.GetCurrentUri().Host, ONOCIELLAPL.GetCurrentUri().Port).Uri.ToString();
 	}
 
-	private static HTTPConnection EDFODKJKANN(HTTPRequest ONOCIELLAPL)
+	private static HTTPConnection FindOrCreateFreeConnection(HTTPRequest ONOCIELLAPL)
 	{
 		HTTPConnection hPNEPPBEKGG = null;
-		string text = NHFCAIIJAHD(ONOCIELLAPL);
+		string text = GetKeyForRequest(ONOCIELLAPL);
 		List<HTTPConnection> value;
-		if (GKLCMJOHCBJ.TryGetValue(text, out value))
+		if (connections.TryGetValue(text, out value))
 		{
 			int num = 0;
 			for (int i = 0; i < value.Count; i++)
 			{
-				if (value[i].OPIAGHNCFAM())
+				if (value[i].GetIsActive())
 				{
 					num++;
 				}
 			}
-			if (num <= BDCIBFLAPJN())
+			if (num <= GetMaxConnectionPerServer())
 			{
 				for (int j = 0; j < value.Count; j++)
 				{
@@ -558,7 +558,7 @@ public static class HTTPManager
 						break;
 					}
 					HTTPConnection hPNEPPBEKGG2 = value[j];
-					if (hPNEPPBEKGG2 != null && hPNEPPBEKGG2.PMOPEALOIKF() && (!hPNEPPBEKGG2.AOPIGGFCGHC() || hPNEPPBEKGG2.PHMNCEBDLKP() == null || hPNEPPBEKGG2.PHMNCEBDLKP().Host.Equals(ONOCIELLAPL.DKAECMGPGOE().Host, StringComparison.OrdinalIgnoreCase)))
+					if (hPNEPPBEKGG2 != null && hPNEPPBEKGG2.GetIsFree() && (!hPNEPPBEKGG2.GetHasProxy() || hPNEPPBEKGG2.GetLastProcessedUri() == null || hPNEPPBEKGG2.GetLastProcessedUri().Host.Equals(ONOCIELLAPL.GetCurrentUri().Host, StringComparison.OrdinalIgnoreCase)))
 					{
 						hPNEPPBEKGG = hPNEPPBEKGG2;
 					}
@@ -567,11 +567,11 @@ public static class HTTPManager
 		}
 		else
 		{
-			GKLCMJOHCBJ.Add(text, value = new List<HTTPConnection>(BDCIBFLAPJN()));
+			connections.Add(text, value = new List<HTTPConnection>(GetMaxConnectionPerServer()));
 		}
 		if (hPNEPPBEKGG == null)
 		{
-			if (value.Count >= BDCIBFLAPJN())
+			if (value.Count >= GetMaxConnectionPerServer())
 			{
 				return null;
 			}
@@ -580,11 +580,11 @@ public static class HTTPManager
 		return hPNEPPBEKGG;
 	}
 
-	private static bool EHDFMKOHHLA()
+	private static bool CanProcessFromQueue()
 	{
-		for (int i = 0; i < LCCNAGOGEBC.Count; i++)
+		for (int i = 0; i < requestQueue.Count; i++)
 		{
-			if (EDFODKJKANN(LCCNAGOGEBC[i]) != null)
+			if (FindOrCreateFreeConnection(requestQueue[i]) != null)
 			{
 				return true;
 			}
@@ -592,20 +592,20 @@ public static class HTTPManager
 		return false;
 	}
 
-	private static void IOACJAKDNAL(HTTPConnection NNLEEIONBEP)
+	private static void RecycleConnection(HTTPConnection NNLEEIONBEP)
 	{
-		NNLEEIONBEP.FFKAKHDIBGD();
-		OBMKJIOLKNI.Add(NNLEEIONBEP);
+		NNLEEIONBEP.Recycle();
+		recycledConnections.Add(NNLEEIONBEP);
 	}
 
-	internal static HTTPConnection IBOHPADLFIM(HTTPRequest ONOCIELLAPL)
+	internal static HTTPConnection GetConnectionWith(HTTPRequest ONOCIELLAPL)
 	{
 		lock (Locker)
 		{
-			for (int i = 0; i < BPIDLPMODDC.Count; i++)
+			for (int i = 0; i < activeConnections.Count; i++)
 			{
-				HTTPConnection hPNEPPBEKGG = BPIDLPMODDC[i];
-				if (hPNEPPBEKGG.ONLLAFBCPIJ() == ONOCIELLAPL)
+				HTTPConnection hPNEPPBEKGG = activeConnections[i];
+				if (hPNEPPBEKGG.GetCurrentRequest() == ONOCIELLAPL)
 				{
 					return hPNEPPBEKGG;
 				}
@@ -614,171 +614,171 @@ public static class HTTPManager
 		}
 	}
 
-	internal static bool HHHKPIJIAPK(HTTPRequest ONOCIELLAPL)
+	internal static bool RemoveFromQueue(HTTPRequest ONOCIELLAPL)
 	{
-		return LCCNAGOGEBC.Remove(ONOCIELLAPL);
+		return requestQueue.Remove(ONOCIELLAPL);
 	}
 
-	internal static string DJHDCCJDJGJ()
+	internal static string GetRootCacheFolder()
 	{
 		try
 		{
-			if (OLFBIBGHAAC() != null)
+			if (GetRootCacheFolderProvider() != null)
 			{
-				return OLFBIBGHAAC()();
+				return GetRootCacheFolderProvider()();
 			}
 		}
 		catch (Exception mPFFFAOGBJE)
 		{
-			MBBMPNDDPIH().COHEDILAHFD("HTTPManager", "GetRootCacheFolder", mPFFFAOGBJE);
+			GetLogger().Exception("HTTPManager", "GetRootCacheFolder", mPFFFAOGBJE);
 		}
 		return Application.persistentDataPath;
 	}
 
-	public static void LCNANNAJNGG()
+	public static void OnUpdate()
 	{
 		lock (Locker)
 		{
-			NIEABCELPDJ = true;
+			isCallingCallbacks = true;
 			try
 			{
-				for (int i = 0; i < BPIDLPMODDC.Count; i++)
+				for (int i = 0; i < activeConnections.Count; i++)
 				{
-					HTTPConnection hPNEPPBEKGG = BPIDLPMODDC[i];
-					switch (hPNEPPBEKGG.FLBBFDNHJAJ())
+					HTTPConnection hPNEPPBEKGG = activeConnections[i];
+					switch (hPNEPPBEKGG.GetState())
 					{
-					case AHFEJIOPFGP.Processing:
-						hPNEPPBEKGG.PNCNLDHGDLP();
-						if (hPNEPPBEKGG.ONLLAFBCPIJ().MDEPOKKKKCL() && hPNEPPBEKGG.ONLLAFBCPIJ().POGDKNCHIBG() != null && hPNEPPBEKGG.ONLLAFBCPIJ().POGDKNCHIBG().PNOCCDHAAHI())
+					case HTTPConnectionStates.Processing:
+						hPNEPPBEKGG.HandleProgressCallback();
+						if (hPNEPPBEKGG.GetCurrentRequest().GetUseStreaming() && hPNEPPBEKGG.GetCurrentRequest().GetResponse() != null && hPNEPPBEKGG.GetCurrentRequest().GetResponse().HasStreamedFragments())
 						{
-							hPNEPPBEKGG.ICGOKIADHNK();
+							hPNEPPBEKGG.HandleCallback();
 						}
-						if (((!hPNEPPBEKGG.ONLLAFBCPIJ().MDEPOKKKKCL() && hPNEPPBEKGG.ONLLAFBCPIJ().IHMCGKHBLKN() == null) || hPNEPPBEKGG.ONLLAFBCPIJ().IFPLGJHAANE()) && DateTime.UtcNow - hPNEPPBEKGG.MJFPCJODODA() > hPNEPPBEKGG.ONLLAFBCPIJ().FJKGKLJGIJI())
+						if (((!hPNEPPBEKGG.GetCurrentRequest().GetUseStreaming() && hPNEPPBEKGG.GetCurrentRequest().GetUploadStream() == null) || hPNEPPBEKGG.GetCurrentRequest().GetEnableTimeoutForStreaming()) && DateTime.UtcNow - hPNEPPBEKGG.GetStartTime() > hPNEPPBEKGG.GetCurrentRequest().GetTimeout())
 						{
-							hPNEPPBEKGG.AKLEEMEHBIC(AHFEJIOPFGP.TimedOut);
-						}
-						break;
-					case AHFEJIOPFGP.TimedOut:
-						if (DateTime.UtcNow - hPNEPPBEKGG.MFFGFLEIPOC() > TimeSpan.FromMilliseconds(500.0))
-						{
-							MBBMPNDDPIH().KDAFBLAKBMI("HTTPManager", "Hard aborting connection becouse of a long waiting TimedOut state");
-							hPNEPPBEKGG.ONLLAFBCPIJ().AOMLIJAIJHE(null);
-							hPNEPPBEKGG.ONLLAFBCPIJ().set_State(CFGBMHKCENK.TimedOut);
-							hPNEPPBEKGG.ICGOKIADHNK();
-							IOACJAKDNAL(hPNEPPBEKGG);
+							hPNEPPBEKGG.Abort(HTTPConnectionStates.TimedOut);
 						}
 						break;
-					case AHFEJIOPFGP.Redirected:
-						EMPGOCGHMBI(hPNEPPBEKGG.ONLLAFBCPIJ());
-						IOACJAKDNAL(hPNEPPBEKGG);
+					case HTTPConnectionStates.TimedOut:
+						if (DateTime.UtcNow - hPNEPPBEKGG.GetTimedOutStart() > TimeSpan.FromMilliseconds(500.0))
+						{
+							GetLogger().Information("HTTPManager", "Hard aborting connection becouse of a long waiting TimedOut state");
+							hPNEPPBEKGG.GetCurrentRequest().SetResponse(null);
+							hPNEPPBEKGG.GetCurrentRequest().set_State(HTTPRequestStates.TimedOut);
+							hPNEPPBEKGG.HandleCallback();
+							RecycleConnection(hPNEPPBEKGG);
+						}
 						break;
-					case AHFEJIOPFGP.WaitForRecycle:
-						hPNEPPBEKGG.ONLLAFBCPIJ().NOEMFDALAGD();
-						hPNEPPBEKGG.ICGOKIADHNK();
-						IOACJAKDNAL(hPNEPPBEKGG);
+					case HTTPConnectionStates.Redirected:
+						SendRequest(hPNEPPBEKGG.GetCurrentRequest());
+						RecycleConnection(hPNEPPBEKGG);
 						break;
-					case AHFEJIOPFGP.Upgraded:
-						hPNEPPBEKGG.ICGOKIADHNK();
+					case HTTPConnectionStates.WaitForRecycle:
+						hPNEPPBEKGG.GetCurrentRequest().FinishStreaming();
+						hPNEPPBEKGG.HandleCallback();
+						RecycleConnection(hPNEPPBEKGG);
 						break;
-					case AHFEJIOPFGP.WaitForProtocolShutdown:
+					case HTTPConnectionStates.Upgraded:
+						hPNEPPBEKGG.HandleCallback();
+						break;
+					case HTTPConnectionStates.WaitForProtocolShutdown:
 					{
-						IProtocol gFACLEJNACD = hPNEPPBEKGG.ONLLAFBCPIJ().POGDKNCHIBG() as IProtocol;
+						IProtocol gFACLEJNACD = hPNEPPBEKGG.GetCurrentRequest().GetResponse() as IProtocol;
 						if (gFACLEJNACD != null)
 						{
 							gFACLEJNACD.HandleEvents();
 						}
-						if (gFACLEJNACD == null || gFACLEJNACD.HDDABMLNDPK())
+						if (gFACLEJNACD == null || gFACLEJNACD.GetIsClosed())
 						{
-							hPNEPPBEKGG.ICGOKIADHNK();
+							hPNEPPBEKGG.HandleCallback();
 							hPNEPPBEKGG.Dispose();
-							IOACJAKDNAL(hPNEPPBEKGG);
+							RecycleConnection(hPNEPPBEKGG);
 						}
 						break;
 					}
-					case AHFEJIOPFGP.AbortRequested:
+					case HTTPConnectionStates.AbortRequested:
 					{
-						IProtocol gFACLEJNACD = hPNEPPBEKGG.ONLLAFBCPIJ().POGDKNCHIBG() as IProtocol;
+						IProtocol gFACLEJNACD = hPNEPPBEKGG.GetCurrentRequest().GetResponse() as IProtocol;
 						if (gFACLEJNACD != null)
 						{
 							gFACLEJNACD.HandleEvents();
-							if (gFACLEJNACD.HDDABMLNDPK())
+							if (gFACLEJNACD.GetIsClosed())
 							{
-								hPNEPPBEKGG.ICGOKIADHNK();
+								hPNEPPBEKGG.HandleCallback();
 								hPNEPPBEKGG.Dispose();
-								IOACJAKDNAL(hPNEPPBEKGG);
+								RecycleConnection(hPNEPPBEKGG);
 							}
 						}
 						break;
 					}
-					case AHFEJIOPFGP.Closed:
-						hPNEPPBEKGG.ONLLAFBCPIJ().NOEMFDALAGD();
-						hPNEPPBEKGG.ICGOKIADHNK();
-						IOACJAKDNAL(hPNEPPBEKGG);
+					case HTTPConnectionStates.Closed:
+						hPNEPPBEKGG.GetCurrentRequest().FinishStreaming();
+						hPNEPPBEKGG.HandleCallback();
+						RecycleConnection(hPNEPPBEKGG);
 						break;
 					}
 				}
 			}
 			finally
 			{
-				NIEABCELPDJ = false;
+				isCallingCallbacks = false;
 			}
-			if (OBMKJIOLKNI.Count > 0)
+			if (recycledConnections.Count > 0)
 			{
-				for (int j = 0; j < OBMKJIOLKNI.Count; j++)
+				for (int j = 0; j < recycledConnections.Count; j++)
 				{
-					HTTPConnection hPNEPPBEKGG2 = OBMKJIOLKNI[j];
-					if (hPNEPPBEKGG2.PMOPEALOIKF())
+					HTTPConnection hPNEPPBEKGG2 = recycledConnections[j];
+					if (hPNEPPBEKGG2.GetIsFree())
 					{
-						BPIDLPMODDC.Remove(hPNEPPBEKGG2);
-						HHGJJICJJOJ.Add(hPNEPPBEKGG2);
+						activeConnections.Remove(hPNEPPBEKGG2);
+						freeConnections.Add(hPNEPPBEKGG2);
 					}
 				}
-				OBMKJIOLKNI.Clear();
+				recycledConnections.Clear();
 			}
-			if (HHGJJICJJOJ.Count > 0)
+			if (freeConnections.Count > 0)
 			{
-				for (int k = 0; k < HHGJJICJJOJ.Count; k++)
+				for (int k = 0; k < freeConnections.Count; k++)
 				{
-					HTTPConnection hPNEPPBEKGG3 = HHGJJICJJOJ[k];
-					if (hPNEPPBEKGG3.KKDOCCALBEG())
+					HTTPConnection hPNEPPBEKGG3 = freeConnections[k];
+					if (hPNEPPBEKGG3.GetIsRemovable())
 					{
 						List<HTTPConnection> value = null;
-						if (GKLCMJOHCBJ.TryGetValue(hPNEPPBEKGG3.JHAJFMBPEDL(), out value))
+						if (connections.TryGetValue(hPNEPPBEKGG3.GetServerAddress(), out value))
 						{
 							value.Remove(hPNEPPBEKGG3);
 						}
 						hPNEPPBEKGG3.Dispose();
-						HHGJJICJJOJ.RemoveAt(k);
+						freeConnections.RemoveAt(k);
 						k--;
 					}
 				}
 			}
-			if (EHDFMKOHHLA())
+			if (CanProcessFromQueue())
 			{
-				if (LCCNAGOGEBC.Find((HTTPRequest CGOIOKHEGOE) => CGOIOKHEGOE.KCKAPPJABBL() != 0) != null)
+				if (requestQueue.Find((HTTPRequest CGOIOKHEGOE) => CGOIOKHEGOE.GetPriority() != 0) != null)
 				{
-					LCCNAGOGEBC.Sort((HTTPRequest OGGFKJBFCLP, HTTPRequest GEODKIAICBK) => OGGFKJBFCLP.KCKAPPJABBL() - GEODKIAICBK.KCKAPPJABBL());
+					requestQueue.Sort((HTTPRequest OGGFKJBFCLP, HTTPRequest GEODKIAICBK) => OGGFKJBFCLP.GetPriority() - GEODKIAICBK.GetPriority());
 				}
-				HTTPRequest[] array = LCCNAGOGEBC.ToArray();
-				LCCNAGOGEBC.Clear();
+				HTTPRequest[] array = requestQueue.ToArray();
+				requestQueue.Clear();
 				for (int num = 0; num < array.Length; num++)
 				{
-					EMPGOCGHMBI(array[num]);
+					SendRequest(array[num]);
 				}
 			}
 		}
-		if (GCJIMNCMONP != null)
+		if (heartbeats != null)
 		{
-			GCJIMNCMONP.JLPMOKPFECK();
+			heartbeats.Update();
 		}
 	}
 
-	internal static void HIGDMAPIOON()
+	internal static void OnQuit()
 	{
 		lock (Locker)
 		{
-			HTTPCacheService.FIMLABMLKJF();
-			foreach (KeyValuePair<string, List<HTTPConnection>> item in GKLCMJOHCBJ)
+			HTTPCacheService.SaveLibrary();
+			foreach (KeyValuePair<string, List<HTTPConnection>> item in connections)
 			{
 				foreach (HTTPConnection item2 in item.Value)
 				{
@@ -786,7 +786,7 @@ public static class HTTPManager
 				}
 				item.Value.Clear();
 			}
-			GKLCMJOHCBJ.Clear();
+			connections.Clear();
 		}
 	}
 }

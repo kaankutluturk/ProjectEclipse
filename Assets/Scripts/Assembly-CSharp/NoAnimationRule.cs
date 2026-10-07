@@ -2,16 +2,16 @@ using System.Xml;
 
 public class NoAnimationRule : Rule
 {
-	private string CLIIIDJIBBG;
+	private string _animationName;
 
 	public NoAnimationRule(XmlNode node)
-		: base(BCBLLMPAMLP.RuleNoAnimation, node)
+		: base(RuleType.RuleNoAnimation, node)
 	{
-		CLIIIDJIBBG = node.Attributes["Name"].CIPOICEEIBK(string.Empty);
+		_animationName = node.Attributes["Name"].GetStringOrDefault(string.Empty);
 	}
 
-	public string DPKNMJMPEDM()
+	public string GetAnimationName()
 	{
-		return CLIIIDJIBBG;
+		return _animationName;
 	}
 }

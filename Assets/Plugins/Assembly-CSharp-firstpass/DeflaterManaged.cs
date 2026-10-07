@@ -2,7 +2,7 @@ using System;
 
 internal class DeflaterManaged : IDisposable, IDeflater
 {
-	private enum FKCGLKODHMG
+	private enum DeflaterState
 	{
 		NotStarted = 0,
 		SlowDownForIncompressible1 = 1,
@@ -13,33 +13,33 @@ internal class DeflaterManaged : IDisposable, IDeflater
 		HandlingSmallData = 6
 	}
 
-	private const int HHDHGAJOJDG = 256;
+	private const int MinBlockSize = 256;
 
-	private const int CFLAPKCCHDK = 120;
+	private const int MaxHeaderFooterGoo = 120;
 
-	private const int NHPIKMKOLHB = 8072;
+	private const int CleanCopySize = 8072;
 
 	private const double BadCompressionThreshold = 1.0;
 
-	private FastEncoder LIKCODMHOFC;
+	private FastEncoder deflateEncoder;
 
-	private CopyEncoder EHKLJCLGGKN;
+	private CopyEncoder copyEncoder;
 
-	private DeflateInput NILNDHEKNLJ;
+	private DeflateInput input;
 
 	private OutputBuffer output;
 
-	private FKCGLKODHMG LBINABAOCOB;
+	private DeflaterState processingState;
 
-	private DeflateInput BJOMPEOMAEB;
+	private DeflateInput inputFromHistory;
 
 	internal DeflaterManaged()
 	{
-		LIKCODMHOFC = new FastEncoder();
-		EHKLJCLGGKN = new CopyEncoder();
-		NILNDHEKNLJ = new DeflateInput();
+		deflateEncoder = new FastEncoder();
+		copyEncoder = new CopyEncoder();
+		input = new DeflateInput();
 		output = new OutputBuffer();
-		LBINABAOCOB = FKCGLKODHMG.NotStarted;
+		processingState = DeflaterState.NotStarted;
 	}
 
 	private bool NeedsInput()
@@ -49,24 +49,24 @@ internal class DeflaterManaged : IDisposable, IDeflater
 
 	bool IDeflater.NeedsInput()
 	{
-		return NILNDHEKNLJ.OFOPFCJNEBL() == 0 && LIKCODMHOFC.EHHKMDHLKHJ() == 0;
+		return input.GetCount() == 0 && deflateEncoder.GetBytesInHistory() == 0;
 	}
 
 	void IDeflater.SetInput(byte[] MMFIPPNMIKJ, int CAILGDNIKJD, int count)
 	{
-		NILNDHEKNLJ.set_Buffer(MMFIPPNMIKJ);
-		NILNDHEKNLJ.CHILOKHFALD(count);
-		NILNDHEKNLJ.MOFAGMEDPNM(CAILGDNIKJD);
+		input.set_Buffer(MMFIPPNMIKJ);
+		input.SetCount(count);
+		input.SetStartIndex(CAILGDNIKJD);
 		if (count > 0 && count < 256)
 		{
-			switch (LBINABAOCOB)
+			switch (processingState)
 			{
-			case FKCGLKODHMG.NotStarted:
-			case FKCGLKODHMG.CheckingForIncompressible:
-				LBINABAOCOB = FKCGLKODHMG.StartingSmallData;
+			case DeflaterState.NotStarted:
+			case DeflaterState.CheckingForIncompressible:
+				processingState = DeflaterState.StartingSmallData;
 				break;
-			case FKCGLKODHMG.CompressThenCheck:
-				LBINABAOCOB = FKCGLKODHMG.HandlingSmallData;
+			case DeflaterState.CompressThenCheck:
+				processingState = DeflaterState.HandlingSmallData;
 				break;
 			}
 		}
@@ -75,90 +75,90 @@ internal class DeflaterManaged : IDisposable, IDeflater
 	int IDeflater.GetDeflateOutput(byte[] EKJJNOOPFNJ)
 	{
 		output.UpdateBuffer(EKJJNOOPFNJ);
-		switch (LBINABAOCOB)
+		switch (processingState)
 		{
-		case FKCGLKODHMG.NotStarted:
+		case DeflaterState.NotStarted:
 		{
-			DeflateInput.BKLHEBEBFFD pIFKPLHIOFJ3 = NILNDHEKNLJ.ENBODKKOALL();
-			OutputBuffer.LHFANIPMGPA pIFKPLHIOFJ4 = output.ENBODKKOALL();
-			LIKCODMHOFC.ILPKALKNGIP(output);
-			LIKCODMHOFC.IOKJILLFPDI(NILNDHEKNLJ, output);
-			if (!UseCompressed(LIKCODMHOFC.LMLAIGGBPFL()))
+			DeflateInput.InputState pIFKPLHIOFJ3 = input.DumpState();
+			OutputBuffer.BufferState pIFKPLHIOFJ4 = output.DumpState();
+			deflateEncoder.GetBlockHeader(output);
+			deflateEncoder.GetCompressedData(input, output);
+			if (!UseCompressed(deflateEncoder.GetLastCompressionRatio()))
 			{
-				NILNDHEKNLJ.BIDLPPIPACF(pIFKPLHIOFJ3);
-				output.BIDLPPIPACF(pIFKPLHIOFJ4);
-				EHKLJCLGGKN.GetBlock(NILNDHEKNLJ, output, false);
-				MFMCDOAMEHP();
-				LBINABAOCOB = FKCGLKODHMG.CheckingForIncompressible;
+				input.RestoreState(pIFKPLHIOFJ3);
+				output.RestoreState(pIFKPLHIOFJ4);
+				copyEncoder.GetBlock(input, output, false);
+				FlushInputWindows();
+				processingState = DeflaterState.CheckingForIncompressible;
 			}
 			else
 			{
-				LBINABAOCOB = FKCGLKODHMG.CompressThenCheck;
+				processingState = DeflaterState.CompressThenCheck;
 			}
 			break;
 		}
-		case FKCGLKODHMG.CompressThenCheck:
-			LIKCODMHOFC.IOKJILLFPDI(NILNDHEKNLJ, output);
-			if (!UseCompressed(LIKCODMHOFC.LMLAIGGBPFL()))
+		case DeflaterState.CompressThenCheck:
+			deflateEncoder.GetCompressedData(input, output);
+			if (!UseCompressed(deflateEncoder.GetLastCompressionRatio()))
 			{
-				LBINABAOCOB = FKCGLKODHMG.SlowDownForIncompressible1;
-				BJOMPEOMAEB = LIKCODMHOFC.EGHDOBABAFB();
+				processingState = DeflaterState.SlowDownForIncompressible1;
+				inputFromHistory = deflateEncoder.GetUnprocessedInput();
 			}
 			break;
-		case FKCGLKODHMG.SlowDownForIncompressible1:
-			LIKCODMHOFC.ADMOOJIAFEI(output);
-			LBINABAOCOB = FKCGLKODHMG.SlowDownForIncompressible2;
-			goto case FKCGLKODHMG.SlowDownForIncompressible2;
-		case FKCGLKODHMG.SlowDownForIncompressible2:
-			if (BJOMPEOMAEB.OFOPFCJNEBL() > 0)
+		case DeflaterState.SlowDownForIncompressible1:
+			deflateEncoder.GetBlockFooter(output);
+			processingState = DeflaterState.SlowDownForIncompressible2;
+			goto case DeflaterState.SlowDownForIncompressible2;
+		case DeflaterState.SlowDownForIncompressible2:
+			if (inputFromHistory.GetCount() > 0)
 			{
-				EHKLJCLGGKN.GetBlock(BJOMPEOMAEB, output, false);
+				copyEncoder.GetBlock(inputFromHistory, output, false);
 			}
-			if (BJOMPEOMAEB.OFOPFCJNEBL() == 0)
+			if (inputFromHistory.GetCount() == 0)
 			{
-				LIKCODMHOFC.BMLBPABODCO();
-				LBINABAOCOB = FKCGLKODHMG.CheckingForIncompressible;
+				deflateEncoder.FlushInput();
+				processingState = DeflaterState.CheckingForIncompressible;
 			}
 			break;
-		case FKCGLKODHMG.CheckingForIncompressible:
+		case DeflaterState.CheckingForIncompressible:
 		{
-			DeflateInput.BKLHEBEBFFD pIFKPLHIOFJ = NILNDHEKNLJ.ENBODKKOALL();
-			OutputBuffer.LHFANIPMGPA pIFKPLHIOFJ2 = output.ENBODKKOALL();
-			LIKCODMHOFC.GetBlock(NILNDHEKNLJ, output, 8072);
-			if (!UseCompressed(LIKCODMHOFC.LMLAIGGBPFL()))
+			DeflateInput.InputState pIFKPLHIOFJ = input.DumpState();
+			OutputBuffer.BufferState pIFKPLHIOFJ2 = output.DumpState();
+			deflateEncoder.GetBlock(input, output, 8072);
+			if (!UseCompressed(deflateEncoder.GetLastCompressionRatio()))
 			{
-				NILNDHEKNLJ.BIDLPPIPACF(pIFKPLHIOFJ);
-				output.BIDLPPIPACF(pIFKPLHIOFJ2);
-				EHKLJCLGGKN.GetBlock(NILNDHEKNLJ, output, false);
-				MFMCDOAMEHP();
+				input.RestoreState(pIFKPLHIOFJ);
+				output.RestoreState(pIFKPLHIOFJ2);
+				copyEncoder.GetBlock(input, output, false);
+				FlushInputWindows();
 			}
 			break;
 		}
-		case FKCGLKODHMG.StartingSmallData:
-			LIKCODMHOFC.ILPKALKNGIP(output);
-			LBINABAOCOB = FKCGLKODHMG.HandlingSmallData;
-			goto case FKCGLKODHMG.HandlingSmallData;
-		case FKCGLKODHMG.HandlingSmallData:
-			LIKCODMHOFC.IOKJILLFPDI(NILNDHEKNLJ, output);
+		case DeflaterState.StartingSmallData:
+			deflateEncoder.GetBlockHeader(output);
+			processingState = DeflaterState.HandlingSmallData;
+			goto case DeflaterState.HandlingSmallData;
+		case DeflaterState.HandlingSmallData:
+			deflateEncoder.GetCompressedData(input, output);
 			break;
 		}
-		return output.GEBLFKFACKO();
+		return output.GetBytesWritten();
 	}
 
 	bool IDeflater.Finish(byte[] EKJJNOOPFNJ, out int GJBPPJIGAIG)
 	{
-		if (LBINABAOCOB == FKCGLKODHMG.NotStarted)
+		if (processingState == DeflaterState.NotStarted)
 		{
 			GJBPPJIGAIG = 0;
 			return true;
 		}
 		output.UpdateBuffer(EKJJNOOPFNJ);
-		if (LBINABAOCOB == FKCGLKODHMG.CompressThenCheck || LBINABAOCOB == FKCGLKODHMG.HandlingSmallData || LBINABAOCOB == FKCGLKODHMG.SlowDownForIncompressible1)
+		if (processingState == DeflaterState.CompressThenCheck || processingState == DeflaterState.HandlingSmallData || processingState == DeflaterState.SlowDownForIncompressible1)
 		{
-			LIKCODMHOFC.ADMOOJIAFEI(output);
+			deflateEncoder.GetBlockFooter(output);
 		}
-		PLDEOFFHGDO();
-		GJBPPJIGAIG = output.GEBLFKFACKO();
+		WriteFinal();
+		GJBPPJIGAIG = output.GetBytesWritten();
 		return true;
 	}
 
@@ -175,13 +175,13 @@ internal class DeflaterManaged : IDisposable, IDeflater
 		return ratio <= 1.0;
 	}
 
-	private void MFMCDOAMEHP()
+	private void FlushInputWindows()
 	{
-		LIKCODMHOFC.BMLBPABODCO();
+		deflateEncoder.FlushInput();
 	}
 
-	private void PLDEOFFHGDO()
+	private void WriteFinal()
 	{
-		EHKLJCLGGKN.GetBlock(null, output, true);
+		copyEncoder.GetBlock(null, output, true);
 	}
 }

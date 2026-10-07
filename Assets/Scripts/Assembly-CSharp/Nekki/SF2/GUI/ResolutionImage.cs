@@ -24,7 +24,7 @@ namespace Nekki.SF2.GUI
 		[SerializeField]
 		private string _SpriteName;
 
-		public string KBIHPPDNFJD
+		public string TexturePathProperty
 		{
 			get
 			{
@@ -36,7 +36,7 @@ namespace Nekki.SF2.GUI
 			}
 		}
 
-		public string NKMJLGBPGDD
+		public string SpriteNameProperty
 		{
 			get
 			{
@@ -48,7 +48,7 @@ namespace Nekki.SF2.GUI
 			}
 		}
 
-		public float IANOMIEILDG
+		public float AlphaProperty
 		{
 			get
 			{
@@ -73,7 +73,7 @@ namespace Nekki.SF2.GUI
 		public void set_SpriteName(string value)
 		{
 			_SpriteName = value;
-			DKGIPADFGCO();
+			ApplySprite();
 		}
 
 		public string get_SpriteName()
@@ -96,7 +96,7 @@ namespace Nekki.SF2.GUI
 		protected override void Awake()
 		{
 			base.Awake();
-			DKGIPADFGCO();
+			ApplySprite();
 		}
 
 		protected override void OnPopulateMesh(VertexHelper toFill)
@@ -167,7 +167,7 @@ namespace Nekki.SF2.GUI
 			}
 		}
 
-		private void DKGIPADFGCO()
+		private void ApplySprite()
 		{
 			// Some exported prefabs only have m_Sprite populated.  Do not erase that
 			// serialized fallback when there is no logical resource name to resolve.
@@ -242,7 +242,7 @@ namespace Nekki.SF2.GUI
 			// (VS_Fon_left.img, Map1.1, Weapon1.img_weapon_...), so a dot alone is
 			// not enough to identify an atlas reference.  Try the exact standalone
 			// asset first and only use the original atlas lookup as a fallback.
-			Sprite sprite = OPHFAHOKBOK(texturePath, JGIGOMLGLPN);
+			Sprite sprite = LoadStandaloneSprite(texturePath, JGIGOMLGLPN);
 			if (sprite != null)
 			{
 				return sprite;
@@ -250,7 +250,7 @@ namespace Nekki.SF2.GUI
 			string[] array = JGIGOMLGLPN.Split('.');
 			if (array.Length > 1)
 			{
-				sprite = MINPKAHEHDE(texturePath, JGIGOMLGLPN);
+				sprite = LoadAtlasSprite(texturePath, JGIGOMLGLPN);
 				if (sprite != null)
 				{
 					return sprite;
@@ -258,7 +258,7 @@ namespace Nekki.SF2.GUI
 
 				// AssetStudio also exported most atlas members as standalone sprites.
 				// New XML still names them Atlas.Member, so retry the member name.
-				sprite = OPHFAHOKBOK(texturePath, array[array.Length - 1]);
+				sprite = LoadStandaloneSprite(texturePath, array[array.Length - 1]);
 				if (sprite != null)
 				{
 					return sprite;
@@ -266,7 +266,7 @@ namespace Nekki.SF2.GUI
 				// Preserve compatibility for newer perks without a recovered shop glyph.
 				if (array[0].Equals("Enchantments", System.StringComparison.OrdinalIgnoreCase))
 				{
-					sprite = OPHFAHOKBOK("UI/Skills/", array[array.Length - 1]);
+					sprite = LoadStandaloneSprite("UI/Skills/", array[array.Length - 1]);
 					if (sprite != null)
 					{
 						return sprite;
@@ -305,7 +305,7 @@ namespace Nekki.SF2.GUI
 			{
 				return null;
 			}
-			Sprite sprite = OPHFAHOKBOK(texturePath, fallback);
+			Sprite sprite = LoadStandaloneSprite(texturePath, fallback);
 			if (sprite != null)
 			{
 				string key = normalizedPath + "/" + spriteName;
@@ -401,9 +401,9 @@ namespace Nekki.SF2.GUI
 			return null;
 		}
 
-		private static Sprite OPHFAHOKBOK(string texturePath, string JGIGOMLGLPN)
+		private static Sprite LoadStandaloneSprite(string texturePath, string JGIGOMLGLPN)
 		{
-			string spriteName = DIHMNAGPFCG(JGIGOMLGLPN);
+			string spriteName = NormalizeSpriteName(JGIGOMLGLPN);
 			string normalizedTexturePath = (texturePath ?? string.Empty).Replace('\\', '/');
 			string oNEIGMLOGDC = normalizedTexturePath + spriteName;
 			int dot = spriteName.IndexOf('.');
@@ -472,7 +472,7 @@ namespace Nekki.SF2.GUI
 			return repaired;
 		}
 
-		private static Sprite MINPKAHEHDE(string texturePath, string JGIGOMLGLPN)
+		private static Sprite LoadAtlasSprite(string texturePath, string JGIGOMLGLPN)
 		{
 			string[] array = JGIGOMLGLPN.Split('.');
 			string text = array[0];
@@ -480,20 +480,20 @@ namespace Nekki.SF2.GUI
 			{
 				int num = 0;
 			}
-			Sprite sprite = AtlasCache.GetSpriteFromAtlas(texturePath + MPOGAEPOJCO(text), JGIGOMLGLPN);
+			Sprite sprite = AtlasCache.GetSpriteFromAtlas(texturePath + NormalizeAtlasName(text), JGIGOMLGLPN);
 			if (sprite == null)
 			{
-				sprite = AtlasCache.GetSpriteFromAtlas("UI/Atlases/" + MPOGAEPOJCO(text), JGIGOMLGLPN);
+				sprite = AtlasCache.GetSpriteFromAtlas("UI/Atlases/" + NormalizeAtlasName(text), JGIGOMLGLPN);
 			}
 			return RepairInvalidRecoveredSprite(sprite);
 		}
 
-		protected static string DIHMNAGPFCG(string JGIGOMLGLPN)
+		protected static string NormalizeSpriteName(string JGIGOMLGLPN)
 		{
 			return JGIGOMLGLPN;
 		}
 
-		protected static string MPOGAEPOJCO(string JLEKBBJBLOE)
+		protected static string NormalizeAtlasName(string JLEKBBJBLOE)
 		{
 			return JLEKBBJBLOE;
 		}
@@ -501,10 +501,10 @@ namespace Nekki.SF2.GUI
 		public override void SetNativeSize()
 		{
 			base.SetNativeSize();
-			PMHFOCJKBGJ();
+			OnNativeSizeSet();
 		}
 
-		protected virtual void PMHFOCJKBGJ()
+		protected virtual void OnNativeSizeSet()
 		{
 		}
 

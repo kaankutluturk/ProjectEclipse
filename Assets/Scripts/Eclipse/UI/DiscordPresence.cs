@@ -92,7 +92,7 @@ namespace Eclipse.UI
             long start = sessionStart;
             try
             {
-                var roster = ListSF.CCDKHLAMKKO();
+                var roster = ListSF.GetRoster();
                 bool eclipse = roster != null && roster.IsEclipseMode();
                 if (roster != null)
                 {
@@ -142,7 +142,7 @@ namespace Eclipse.UI
             if (fight.IsLocalVersus) return "Local versus";
             var definition = fight.GetFightDefinition();
             var battle = definition == null ? null : definition.Battle;
-            string title = battle == null ? null : Localized(battle.IGPOHDHPIIL());
+            string title = battle == null ? null : Localized(battle.GetTitle());
             bool raid = definition != null && definition.get_Type() == BattleType.FightRaid;
             if (string.IsNullOrEmpty(title)) return raid ? "Raiding in the Underworld" : "In a fight";
             return (raid ? "Raid: " : "Fighting: ") + title;

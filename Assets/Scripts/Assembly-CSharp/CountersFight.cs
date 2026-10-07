@@ -3,308 +3,308 @@ using Nekki.SF2.GUI.Map;
 
 public class CountersFight : global::EventDispatcher<object>
 {
-	public enum OFMIJLDFHBO
+	public enum CounterEvent
 	{
 		OnCounterIncrement = 0
 	}
 
 	public class CurrentCounter
 	{
-		public Counter EOGLBDCLMBM;
+		public Counter Definition;
 
 		public int Value;
 
 		public bool IsNot;
 
-		public void KPPJMFDMFBK()
+		public void Increment()
 		{
 			Value++;
 		}
 	}
 
-	public class IONIIPMOMAO
+	public class CounterStorage
 	{
-		public Dictionary<string, CurrentCounter> JFPJCGPONGM = new Dictionary<string, CurrentCounter>();
+		public Dictionary<string, CurrentCounter> CountersByName = new Dictionary<string, CurrentCounter>();
 	}
 
 	private bool isFirstBlock;
 
-	private ModelParameters IHEFAMAFBIA;
+	private ModelParameters modelParameters;
 
-	private Dictionary<string, Counter> CJEMDKDMOKN = new Dictionary<string, Counter>();
+	private Dictionary<string, Counter> counterDefinitions = new Dictionary<string, Counter>();
 
-	private IONIIPMOMAO EJPOJJKKICO = new IONIIPMOMAO();
+	private CounterStorage currentCounters = new CounterStorage();
 
-	private CounterConditions EMPNPOMEAPL = new CounterConditions();
+	private CounterConditions conditions = new CounterConditions();
 
 	public void Init(Dictionary<string, Counter> GGOFNBMGJAF, ModelParameters KKNOCIPBIIK, BattleType JBJHPJMJNNF, float ratio)
 	{
-		EMPNPOMEAPL.BattleType = JBJHPJMJNNF;
-		EMPNPOMEAPL.Ratio = ratio;
-		CJEMDKDMOKN = GGOFNBMGJAF;
-		IHEFAMAFBIA = KKNOCIPBIIK;
+		conditions.BattleType = JBJHPJMJNNF;
+		conditions.Ratio = ratio;
+		counterDefinitions = GGOFNBMGJAF;
+		modelParameters = KKNOCIPBIIK;
 		isFirstBlock = false;
-		foreach (KeyValuePair<string, Counter> item in CJEMDKDMOKN)
+		foreach (KeyValuePair<string, Counter> item in counterDefinitions)
 		{
 			CurrentCounter pEMLBKDIDHA = new CurrentCounter();
-			pEMLBKDIDHA.EOGLBDCLMBM = item.Value;
+			pEMLBKDIDHA.Definition = item.Value;
 			pEMLBKDIDHA.Value = 0;
-			EJPOJJKKICO.JFPJCGPONGM[item.Key] = pEMLBKDIDHA;
+			currentCounters.CountersByName[item.Key] = pEMLBKDIDHA;
 		}
 	}
 
-	public void GCDLFJGEPNI()
+	public void LogCounters()
 	{
-		LLLOJBFMONN.INNGABABJPC("Counters ------------------------------------- ");
-		foreach (KeyValuePair<string, CurrentCounter> item in EJPOJJKKICO.JFPJCGPONGM)
+		GameLog.Info("Counters ------------------------------------- ");
+		foreach (KeyValuePair<string, CurrentCounter> item in currentCounters.CountersByName)
 		{
-			LLLOJBFMONN.INNGABABJPC("Counter: {0} -- Value: {1})", item.Key, item.Value.Value);
+			GameLog.Info("Counter: {0} -- Value: {1})", item.Key, item.Value.Value);
 		}
 	}
 
-	public void OPLKJKPHHOH()
+	public void OnNoLose()
 	{
 		CallCountersByType("NoLose");
 	}
 
-	public void DFONENABHBO()
+	public void OnBossNoLose()
 	{
 		CallCountersByType("BossNoLose");
 	}
 
-	public void LCFPCDJLDLH()
+	public void OnEnchantments()
 	{
 		CallCountersByType("Enchantments");
 	}
 
-	public void DMBJKBBFMPH()
+	public void OnPerfectRound()
 	{
 		CallCountersByType("PerfectRound");
 	}
 
-	public void PMKNEKPKFFA()
+	public void OnLoss()
 	{
 		CallCountersByType("Losses");
 	}
 
-	public void NDJHKKLEGPC()
+	public void OnShockWin()
 	{
 		CallCountersByType("ShockWin");
 	}
 
-	public void GEAEKJJBMDG()
+	public void OnBodyguardsWin()
 	{
 		CallCountersByType("BodyguardsWin");
 	}
 
-	public void MGKKANDMALJ()
+	public void OnBossWin()
 	{
 		CallCountersByType("BossWin");
 	}
 
-	public void GFENMJJDLCL()
+	public void OnTournamentBeaten()
 	{
 		CallCountersByType("TournamentsBeaten");
 	}
 
-	public void HKBNCNMLAHK()
+	public void OnDailyBeaten()
 	{
 		CallCountersByType("DailyBeaten");
 	}
 
-	public void MGANFEMKLPM()
+	public void OnChallengeBeaten()
 	{
 		CallCountersByType("ChallangesBeaten");
 	}
 
-	public void LAHGOBJIOOG()
+	public void OnChallenge2Beaten()
 	{
 		CallCountersByType("Challanges2Beaten");
 	}
 
-	public void PMEOOPEEAEM()
+	public void OnMaximumLevel()
 	{
 		CallCountersByType("MaximumLevel");
 	}
 
-	public void PIPGPHELPPK()
+	public void OnDifficultyWin()
 	{
 		CallCountersByType("DifficultyWin");
 	}
 
-	public void MEFALNAFBNG(FightIDS DIAIIPCBMFL)
+	public void OnWinBattle(FightIDS DIAIIPCBMFL)
 	{
-		List<CurrentCounter> list = DNMGGIKGNNP("WinBattle");
+		List<CurrentCounter> list = GetCountersByType("WinBattle");
 		foreach (CurrentCounter item in list)
 		{
-			if (item.EOGLBDCLMBM.CAIPCEHIBOO(DIAIIPCBMFL))
+			if (item.Definition.IsFightComplete(DIAIIPCBMFL))
 			{
-				CFCCEPKGEAH(item);
+				IncrementCounter(item);
 			}
 		}
 	}
 
-	public void MKIPHHMHIOC(int PKHDLOGJKAD)
+	public void SetComboCount(int PKHDLOGJKAD)
 	{
-		List<CurrentCounter> list = DNMGGIKGNNP("ComboCount");
+		List<CurrentCounter> list = GetCountersByType("ComboCount");
 		foreach (CurrentCounter item in list)
 		{
-			if ((float)PKHDLOGJKAD >= item.EOGLBDCLMBM.Value)
+			if ((float)PKHDLOGJKAD >= item.Definition.Value)
 			{
-				CFCCEPKGEAH(item);
+				IncrementCounter(item);
 			}
 		}
 	}
 
-	public void HFCLLLHJBGH(int PKHDLOGJKAD)
+	public void SetStyle(int PKHDLOGJKAD)
 	{
-		List<CurrentCounter> list = DNMGGIKGNNP("Style");
+		List<CurrentCounter> list = GetCountersByType("Style");
 		foreach (CurrentCounter item in list)
 		{
-			if ((float)PKHDLOGJKAD >= item.EOGLBDCLMBM.Value)
+			if ((float)PKHDLOGJKAD >= item.Definition.Value)
 			{
-				CFCCEPKGEAH(item);
+				IncrementCounter(item);
 			}
 		}
 	}
 
-	public void IHANMCFEJJG(FightIDS DIAIIPCBMFL)
+	public void OnFightBeaten(FightIDS DIAIIPCBMFL)
 	{
-		List<CurrentCounter> list = DNMGGIKGNNP("FightBeaten");
+		List<CurrentCounter> list = GetCountersByType("FightBeaten");
 		foreach (CurrentCounter item in list)
 		{
-			if (DIAIIPCBMFL.Equals(item.EOGLBDCLMBM.IOJFIFODOKO) || DIAIIPCBMFL.Equals(item.EOGLBDCLMBM.FHAGEKGLJOI))
+			if (DIAIIPCBMFL.Equals(item.Definition.FightName) || DIAIIPCBMFL.Equals(item.Definition.SecondFightName))
 			{
-				CFCCEPKGEAH(item);
+				IncrementCounter(item);
 			}
 		}
 	}
 
-	public void JKOBOBJMDDE(int value)
+	public void SetSurvivalRounds(int value)
 	{
-		List<CurrentCounter> list = DNMGGIKGNNP("SurvivalRounds");
+		List<CurrentCounter> list = GetCountersByType("SurvivalRounds");
 		foreach (CurrentCounter item in list)
 		{
-			if ((float)value >= item.EOGLBDCLMBM.Value)
+			if ((float)value >= item.Definition.Value)
 			{
-				CFCCEPKGEAH(item);
+				IncrementCounter(item);
 			}
 		}
 	}
 
 	public void SetLife(float value)
 	{
-		List<CurrentCounter> list = DNMGGIKGNNP("HealthRemained");
+		List<CurrentCounter> list = GetCountersByType("HealthRemained");
 		foreach (CurrentCounter item in list)
 		{
-			if (value <= item.EOGLBDCLMBM.Value)
+			if (value <= item.Definition.Value)
 			{
-				CFCCEPKGEAH(item);
+				IncrementCounter(item);
 			}
 		}
 	}
 
 	public void SetTime(int value)
 	{
-		List<CurrentCounter> list = DNMGGIKGNNP("RoundQuicker");
+		List<CurrentCounter> list = GetCountersByType("RoundQuicker");
 		foreach (CurrentCounter item in list)
 		{
-			if ((float)value <= item.EOGLBDCLMBM.Value)
+			if ((float)value <= item.Definition.Value)
 			{
-				CFCCEPKGEAH(item);
+				IncrementCounter(item);
 			}
 		}
-		List<CurrentCounter> list2 = DNMGGIKGNNP("RoundLonger");
+		List<CurrentCounter> list2 = GetCountersByType("RoundLonger");
 		foreach (CurrentCounter item2 in list2)
 		{
-			if ((float)value >= item2.EOGLBDCLMBM.Value)
+			if ((float)value >= item2.Definition.Value)
 			{
-				CFCCEPKGEAH(item2);
+				IncrementCounter(item2);
 			}
 		}
 	}
 
-	public void OHHKIAMNCKI(bool OOCLHFGEPML)
+	public void OnBlock(bool OOCLHFGEPML)
 	{
 		isFirstBlock = true;
-		CurrentCounter pEMLBKDIDHA = BECPDHFPNFC("BlockedRound");
+		CurrentCounter pEMLBKDIDHA = GetCounterByName("BlockedRound");
 		if (!OOCLHFGEPML && pEMLBKDIDHA != null && !pEMLBKDIDHA.IsNot)
 		{
 			pEMLBKDIDHA.IsNot = true;
 		}
 	}
 
-	public void NELEDHIIDCG(InfoAnimation DBOLBEOCEME, bool APLJLFHDJIM, bool isFirstStrike, bool INDFLCGLJPP, bool LGNDOAHHHNP, bool OOCLHFGEPML, bool EPKEEMFHHFM)
+	public void OnAnimationHit(InfoAnimation DBOLBEOCEME, bool APLJLFHDJIM, bool isFirstStrike, bool INDFLCGLJPP, bool LGNDOAHHHNP, bool OOCLHFGEPML, bool EPKEEMFHHFM)
 	{
 		if (!OOCLHFGEPML && isFirstStrike)
 		{
-			List<CurrentCounter> list = DNMGGIKGNNP("FirstHits");
+			List<CurrentCounter> list = GetCountersByType("FirstHits");
 			foreach (CurrentCounter item in list)
 			{
-				CFCCEPKGEAH(item);
+				IncrementCounter(item);
 			}
 		}
 		if (INDFLCGLJPP)
 		{
-			List<CurrentCounter> list2 = DNMGGIKGNNP("Disarm");
+			List<CurrentCounter> list2 = GetCountersByType("Disarm");
 			foreach (CurrentCounter item2 in list2)
 			{
-				CFCCEPKGEAH(item2);
+				IncrementCounter(item2);
 			}
 		}
-		List<CurrentCounter> list3 = DNMGGIKGNNP("RestrictedAnimation");
+		List<CurrentCounter> list3 = GetCountersByType("RestrictedAnimation");
 		foreach (CurrentCounter item3 in list3)
 		{
-			if (!item3.IsNot && !DBOLBEOCEME.LPPIKDGABOL(item3.EOGLBDCLMBM.FGICHADOEHF))
+			if (!item3.IsNot && !DBOLBEOCEME.HasTemplateName(item3.Definition.AnimationName))
 			{
 				item3.IsNot = true;
 			}
-			string jIIFFJAJNNN = item3.EOGLBDCLMBM.JIIFFJAJNNN;
-			if (IHEFAMAFBIA.Weapon != null && jIIFFJAJNNN != string.Empty && IHEFAMAFBIA.Weapon.Name != jIIFFJAJNNN)
+			string jIIFFJAJNNN = item3.Definition.WeaponName;
+			if (modelParameters.Weapon != null && jIIFFJAJNNN != string.Empty && modelParameters.Weapon.Name != jIIFFJAJNNN)
 			{
 				item3.IsNot = true;
 			}
 			if (LGNDOAHHHNP && !item3.IsNot)
 			{
-				CFCCEPKGEAH(item3);
+				IncrementCounter(item3);
 			}
 		}
 		if (LGNDOAHHHNP)
 		{
 			if (APLJLFHDJIM)
 			{
-				List<CurrentCounter> list4 = DNMGGIKGNNP("HeadHitRound");
+				List<CurrentCounter> list4 = GetCountersByType("HeadHitRound");
 				foreach (CurrentCounter item4 in list4)
 				{
-					CFCCEPKGEAH(item4);
+					IncrementCounter(item4);
 				}
 			}
-			CurrentCounter pEMLBKDIDHA = BECPDHFPNFC("BlockedRound");
+			CurrentCounter pEMLBKDIDHA = GetCounterByName("BlockedRound");
 			if (pEMLBKDIDHA != null && !pEMLBKDIDHA.IsNot && isFirstBlock)
 			{
-				CFCCEPKGEAH(pEMLBKDIDHA);
+				IncrementCounter(pEMLBKDIDHA);
 			}
 		}
 		if (OOCLHFGEPML || !APLJLFHDJIM)
 		{
 			return;
 		}
-		List<CurrentCounter> list5 = DNMGGIKGNNP("HeadKick");
+		List<CurrentCounter> list5 = GetCountersByType("HeadKick");
 		foreach (CurrentCounter item5 in list5)
 		{
-			if (item5 != null && DBOLBEOCEME.LPPIKDGABOL(item5.EOGLBDCLMBM.FGICHADOEHF))
+			if (item5 != null && DBOLBEOCEME.HasTemplateName(item5.Definition.AnimationName))
 			{
-				CFCCEPKGEAH(item5);
+				IncrementCounter(item5);
 			}
 		}
 	}
 
 	public void CallCountersByType(string KFLJDKNOPCE)
 	{
-		List<CurrentCounter> list = DNMGGIKGNNP(KFLJDKNOPCE);
+		List<CurrentCounter> list = GetCountersByType(KFLJDKNOPCE);
 		foreach (CurrentCounter item in list)
 		{
-			CFCCEPKGEAH(item);
+			IncrementCounter(item);
 		}
 	}
 
@@ -314,10 +314,10 @@ public class CountersFight : global::EventDispatcher<object>
 		{
 			return;
 		}
-		foreach (KeyValuePair<string, CurrentCounter> item in EJPOJJKKICO.JFPJCGPONGM)
+		foreach (KeyValuePair<string, CurrentCounter> item in currentCounters.CountersByName)
 		{
 			CurrentCounter value = item.Value;
-			if (value.EOGLBDCLMBM.CHDEIEMINPF(EMPNPOMEAPL) && value.EOGLBDCLMBM.KKNOICPMJPO == Counter.IPENPHOAEGL.SPAN_FIGHT)
+			if (value.Definition.AreConditionsMet(conditions) && value.Definition.Span == Counter.CounterSpan.SPAN_FIGHT)
 			{
 				value.Value = ((value.Value == roundTotal) ? 1 : 0);
 				CallEvent(0, value);
@@ -325,51 +325,51 @@ public class CountersFight : global::EventDispatcher<object>
 		}
 	}
 
-	public void HOCBEHCHOFL(bool CDCEOCEPMPK)
+	public void SaveCompleteValues(bool CDCEOCEPMPK)
 	{
-		foreach (KeyValuePair<string, Counter> item in CJEMDKDMOKN)
+		foreach (KeyValuePair<string, Counter> item in counterDefinitions)
 		{
 			if (!CDCEOCEPMPK || !item.Value.IsFightEnd)
 			{
-				item.Value.CompleteValue = EJPOJJKKICO.JFPJCGPONGM[item.Key].Value;
+				item.Value.CompleteValue = currentCounters.CountersByName[item.Key].Value;
 			}
 		}
-		GCDLFJGEPNI();
+		LogCounters();
 	}
 
-	public void MLJCABABNDB()
+	public void ResetRound()
 	{
 		isFirstBlock = false;
-		foreach (KeyValuePair<string, CurrentCounter> item in EJPOJJKKICO.JFPJCGPONGM)
+		foreach (KeyValuePair<string, CurrentCounter> item in currentCounters.CountersByName)
 		{
 			CurrentCounter value = item.Value;
-			if (value.EOGLBDCLMBM.KKNOICPMJPO == Counter.IPENPHOAEGL.SPAN_ROUND)
+			if (value.Definition.Span == Counter.CounterSpan.SPAN_ROUND)
 			{
 				value.IsNot = false;
 			}
 		}
 	}
 
-	private void CFCCEPKGEAH(CurrentCounter EPJGLECOIBG)
+	private void IncrementCounter(CurrentCounter EPJGLECOIBG)
 	{
-		bool flag = CheckFightType(EPJGLECOIBG.EOGLBDCLMBM.DEGIADEEFGG);
-		bool flag2 = CheckDifficult(EPJGLECOIBG.EOGLBDCLMBM.MJOJIPKLJOL, EPJGLECOIBG.EOGLBDCLMBM.GAHBCLAMANC);
-		if (EPJGLECOIBG.EOGLBDCLMBM.CHDEIEMINPF(EMPNPOMEAPL) && flag && flag2)
+		bool flag = CheckFightType(EPJGLECOIBG.Definition.FightType);
+		bool flag2 = CheckDifficult(EPJGLECOIBG.Definition.MinDifficulty, EPJGLECOIBG.Definition.MaxDifficulty);
+		if (EPJGLECOIBG.Definition.AreConditionsMet(conditions) && flag && flag2)
 		{
-			EPJGLECOIBG.KPPJMFDMFBK();
-			if (EPJGLECOIBG.EOGLBDCLMBM.KKNOICPMJPO != Counter.IPENPHOAEGL.SPAN_FIGHT)
+			EPJGLECOIBG.Increment();
+			if (EPJGLECOIBG.Definition.Span != Counter.CounterSpan.SPAN_FIGHT)
 			{
 				CallEvent(0, EPJGLECOIBG);
 			}
 		}
 	}
 
-	private List<CurrentCounter> DNMGGIKGNNP(string LFLGCDNKNJI)
+	private List<CurrentCounter> GetCountersByType(string LFLGCDNKNJI)
 	{
 		List<CurrentCounter> list = new List<CurrentCounter>();
-		foreach (KeyValuePair<string, CurrentCounter> item in EJPOJJKKICO.JFPJCGPONGM)
+		foreach (KeyValuePair<string, CurrentCounter> item in currentCounters.CountersByName)
 		{
-			if (item.Value.EOGLBDCLMBM.Type == LFLGCDNKNJI)
+			if (item.Value.Definition.Type == LFLGCDNKNJI)
 			{
 				list.Add(item.Value);
 			}
@@ -377,11 +377,11 @@ public class CountersFight : global::EventDispatcher<object>
 		return list;
 	}
 
-	private CurrentCounter BECPDHFPNFC(string name)
+	private CurrentCounter GetCounterByName(string name)
 	{
-		if (EJPOJJKKICO.JFPJCGPONGM.ContainsKey(name))
+		if (currentCounters.CountersByName.ContainsKey(name))
 		{
-			return EJPOJJKKICO.JFPJCGPONGM[name];
+			return currentCounters.CountersByName[name];
 		}
 		return null;
 	}
@@ -395,8 +395,8 @@ public class CountersFight : global::EventDispatcher<object>
 		string[] array = MPBIEONNLIJ.Split('|');
 		for (int i = 0; i < array.Length; i++)
 		{
-			BattleType pJMEMGHKKBM = ListSF.GetInstance().HIDKFHHJBDH(array[i]);
-			if (pJMEMGHKKBM == EMPNPOMEAPL.BattleType)
+			BattleType pJMEMGHKKBM = ListSF.GetInstance().GetBattleTypeByName(array[i]);
+			if (pJMEMGHKKBM == conditions.BattleType)
 			{
 				return true;
 			}
@@ -416,15 +416,15 @@ public class CountersFight : global::EventDispatcher<object>
 		float num2 = GetRationForDifficult(EBGLLCMNIED);
 		if (flag && flag2)
 		{
-			return EMPNPOMEAPL.Ratio > num && EMPNPOMEAPL.Ratio < num2;
+			return conditions.Ratio > num && conditions.Ratio < num2;
 		}
 		if (flag)
 		{
-			return EMPNPOMEAPL.Ratio > num;
+			return conditions.Ratio > num;
 		}
 		if (flag2)
 		{
-			return EMPNPOMEAPL.Ratio < num2;
+			return conditions.Ratio < num2;
 		}
 		return false;
 	}

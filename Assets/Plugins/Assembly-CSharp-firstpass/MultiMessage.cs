@@ -6,76 +6,76 @@ using System.Diagnostics;
 public sealed class MultiMessage : IServerMessage
 {
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private string NPEODIOJAMN;
+	private string messageId;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private bool MIEPCPDMMOI;
+	private bool isInitialization;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private string LNIDLMDCKLM;
+	private string groupsToken;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private bool GFLIGIBHBBD;
+	private bool shouldReconnect;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private TimeSpan? CKFDPLJIPPO;
+	private TimeSpan? pollDelay;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private List<IServerMessage> JFKBADLJJBM;
+	private List<IServerMessage> data;
 
-	public string MCGBPBPLBJJ
+	public string MessageId
 	{
 		get
 		{
-			return BJOOBDBFHGL();
+			return GetMessageId();
 		}
 		private set
 		{
-			CLKCFGEAMLM(value);
+			SetMessageId(value);
 		}
 	}
 
-	public bool KAPALNEODPA
+	public bool IsInitialization
 	{
 		get
 		{
-			return BPDICBIDIPO();
+			return GetIsInitialization();
 		}
 		private set
 		{
-			ECPFEGDPIGL(value);
+			SetIsInitialization(value);
 		}
 	}
 
-	public string LPEDAAHHCBD
+	public string GroupsToken
 	{
 		get
 		{
-			return PCINJIIKLFH();
+			return GetGroupsToken();
 		}
 		private set
 		{
-			JDJGDANMMHI(value);
+			SetGroupsToken(value);
 		}
 	}
 
-	public bool MFBBCALPODO
+	public bool ShouldReconnect
 	{
 		get
 		{
-			return ACMAJHFOIDJ();
+			return GetShouldReconnect();
 		}
 		private set
 		{
-			IFKKOHGDAKA(value);
+			SetShouldReconnect(value);
 		}
 	}
 
-	public TimeSpan? EMJECEPDOJL
+	public TimeSpan? PollInterval
 	{
 		get
 		{
-			return LNCCPGIEPOH();
+			return GetPollDelay();
 		}
 		private set
 		{
@@ -83,95 +83,95 @@ public sealed class MultiMessage : IServerMessage
 		}
 	}
 
-	public LENCKBHFKLD get_Type()
+	public MessageTypes get_Type()
 	{
-		return LENCKBHFKLD.Multiple;
+		return MessageTypes.Multiple;
 	}
 
-	public string BJOOBDBFHGL()
+	public string GetMessageId()
 	{
-		return NPEODIOJAMN;
+		return messageId;
 	}
 
-	private void CLKCFGEAMLM(string value)
+	private void SetMessageId(string value)
 	{
-		NPEODIOJAMN = value;
+		messageId = value;
 	}
 
-	public bool BPDICBIDIPO()
+	public bool GetIsInitialization()
 	{
-		return MIEPCPDMMOI;
+		return isInitialization;
 	}
 
-	private void ECPFEGDPIGL(bool value)
+	private void SetIsInitialization(bool value)
 	{
-		MIEPCPDMMOI = value;
+		isInitialization = value;
 	}
 
-	public string PCINJIIKLFH()
+	public string GetGroupsToken()
 	{
-		return LNIDLMDCKLM;
+		return groupsToken;
 	}
 
-	private void JDJGDANMMHI(string value)
+	private void SetGroupsToken(string value)
 	{
-		LNIDLMDCKLM = value;
+		groupsToken = value;
 	}
 
-	public bool ACMAJHFOIDJ()
+	public bool GetShouldReconnect()
 	{
-		return GFLIGIBHBBD;
+		return shouldReconnect;
 	}
 
-	private void IFKKOHGDAKA(bool value)
+	private void SetShouldReconnect(bool value)
 	{
-		GFLIGIBHBBD = value;
+		shouldReconnect = value;
 	}
 
-	public TimeSpan? LNCCPGIEPOH()
+	public TimeSpan? GetPollDelay()
 	{
-		return CKFDPLJIPPO;
+		return pollDelay;
 	}
 
 	private void set_PollDelay(TimeSpan? value)
 	{
-		CKFDPLJIPPO = value;
+		pollDelay = value;
 	}
 
-	public List<IServerMessage> CHIGLEKCFFN()
+	public List<IServerMessage> GetData()
 	{
-		return JFKBADLJJBM;
+		return data;
 	}
 
 	private void set_Data(List<IServerMessage> value)
 	{
-		JFKBADLJJBM = value;
+		data = value;
 	}
 
 	void IServerMessage.Parse(object data)
 	{
 		IDictionary<string, object> dictionary = data as IDictionary<string, object>;
-		CLKCFGEAMLM(dictionary["C"].ToString());
+		SetMessageId(dictionary["C"].ToString());
 		object value;
 		if (dictionary.TryGetValue("S", out value))
 		{
-			ECPFEGDPIGL(int.Parse(value.ToString()) == 1);
+			SetIsInitialization(int.Parse(value.ToString()) == 1);
 		}
 		else
 		{
-			ECPFEGDPIGL(false);
+			SetIsInitialization(false);
 		}
 		if (dictionary.TryGetValue("G", out value))
 		{
-			JDJGDANMMHI(value.ToString());
+			SetGroupsToken(value.ToString());
 		}
 		if (dictionary.TryGetValue("T", out value))
 		{
-			IFKKOHGDAKA(int.Parse(value.ToString()) == 1);
+			SetShouldReconnect(int.Parse(value.ToString()) == 1);
 		}
 		else
 		{
-			IFKKOHGDAKA(false);
+			SetShouldReconnect(false);
 		}
 		if (dictionary.TryGetValue("L", out value))
 		{
@@ -189,7 +189,7 @@ public sealed class MultiMessage : IServerMessage
 			IServerMessage bNGPAAAKBOP = null;
 			bNGPAAAKBOP = ((dictionary2 == null) ? new DataMessage() : ((!dictionary2.ContainsKey("H")) ? ((!dictionary2.ContainsKey("I")) ? ((IServerMessage)new DataMessage()) : ((IServerMessage)new ProgressMessage())) : new MethodCallMessage()));
 			bNGPAAAKBOP.Parse(item);
-			CHIGLEKCFFN().Add(bNGPAAAKBOP);
+			GetData().Add(bNGPAAAKBOP);
 		}
 	}
 }

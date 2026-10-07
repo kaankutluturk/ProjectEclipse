@@ -26,36 +26,36 @@ namespace Nekki.SF2.GUI
 		{
 		}
 
-		private class LLHOOOEJICC
+		private class HrefInfo
 		{
-			public int CAILGDNIKJD;
+			public int StartIndex;
 
-			public int FBGEOOKNPCF;
+			public int EndIndex;
 
 			public string name;
 
-			public readonly List<Rect> EGOEJCBNDIJ = new List<Rect>();
+			public readonly List<Rect> Boxes = new List<Rect>();
 		}
 
-		private readonly List<ResolutionImage> FFCOKBMOANO = new List<ResolutionImage>();
+		private readonly List<ResolutionImage> _iconImages = new List<ResolutionImage>();
 
-		private readonly List<GameObject> ECKINFOPDPD = new List<GameObject>();
+		private readonly List<GameObject> _imagesPendingDestroy = new List<GameObject>();
 
-		private bool JJLEJDCGDNL;
+		private bool _hasPendingDestroy;
 
-		private UnityEngine.Object IDADFIBEOIA = new UnityEngine.Object();
+		private UnityEngine.Object _destroyLock = new UnityEngine.Object();
 
-		private readonly List<int> PHPKKMKLNOA = new List<int>();
+		private readonly List<int> _quadVertexIndices = new List<int>();
 
-		private static readonly Regex BPNAJICGHEH = new Regex("<quad name=(.+?) size=(\\d*\\.?\\d+%?) width=(\\d*\\.?\\d+%?) />", RegexOptions.Singleline);
+		private static readonly Regex _quadRegex = new Regex("<quad name=(.+?) size=(\\d*\\.?\\d+%?) width=(\\d*\\.?\\d+%?) />", RegexOptions.Singleline);
 
-		private string HBGCAGPIGIJ;
+		private string _textWithQuads;
 
-		private string AIBLJIIKGIG;
+		private string _parsedText;
 
 		public IconName[] inspectorIconList;
 
-		private Dictionary<string, Sprite> BJMDJPDPEDH = new Dictionary<string, Sprite>();
+		private Dictionary<string, Sprite> _iconSprites = new Dictionary<string, Sprite>();
 
 		public float ImageScalingFactor = 0.5f;
 
@@ -64,24 +64,24 @@ namespace Nekki.SF2.GUI
 		[SerializeField]
 		public Vector2 imageOffset = Vector2.zero;
 
-		private Button KLNKEPMAGKF;
+		private Button _button;
 
-		private List<Vector2> MDBELBGHDFP = new List<Vector2>();
+		private List<Vector2> _quadPositions = new List<Vector2>();
 
-		private string IKDLGPNGKOO = string.Empty;
+		private string _lastText = string.Empty;
 
 		public bool isCreating_m_HrefInfos = true;
 
-		private readonly List<LLHOOOEJICC> GGAGBFDGNNP = new List<LLHOOOEJICC>();
+		private readonly List<HrefInfo> _hrefInfos = new List<HrefInfo>();
 
-		private static readonly StringBuilder GCCFOHDGODJ = new StringBuilder();
+		private static readonly StringBuilder _textBuilder = new StringBuilder();
 
-		private static readonly Regex LCHAAEKKODP = new Regex("<a href=([^>\\n\\s]+)>(.*?)(</a>)", RegexOptions.Singleline);
+		private static readonly Regex _hrefRegex = new Regex("<a href=([^>\\n\\s]+)>(.*?)(</a>)", RegexOptions.Singleline);
 
 		[SerializeField]
 		private HrefClickEvent m_OnHrefClick = new HrefClickEvent();
 
-		public HrefClickEvent GGBFIMGFIAG
+		public HrefClickEvent HrefClicked
 		{
 			get
 			{
@@ -96,45 +96,45 @@ namespace Nekki.SF2.GUI
 		public override void SetVerticesDirty()
 		{
 			base.SetVerticesDirty();
-			EOODLGNHCEB();
+			UpdateQuadImages();
 		}
 
 		private new void Start()
 		{
-			KLNKEPMAGKF = GetComponent<Button>();
+			_button = GetComponent<Button>();
 			if (inspectorIconList != null && inspectorIconList.Length > 0)
 			{
 				IconName[] array = inspectorIconList;
 				for (int i = 0; i < array.Length; i++)
 				{
 					IconName iconName = array[i];
-					BJMDJPDPEDH.Add(iconName.name, iconName.sprite);
+					_iconSprites.Add(iconName.name, iconName.sprite);
 				}
 			}
-			MNMOJPJEFFB();
+			ResetHrefInfos();
 		}
 
-		protected void EOODLGNHCEB()
+		protected void UpdateQuadImages()
 		{
-			AIBLJIIKGIG = OABONMHJBEE();
-			PHPKKMKLNOA.Clear();
-			foreach (Match item2 in BPNAJICGHEH.Matches(AIBLJIIKGIG))
+			_parsedText = GetParsedText();
+			_quadVertexIndices.Clear();
+			foreach (Match item2 in _quadRegex.Matches(_parsedText))
 			{
-				string prefix = AIBLJIIKGIG.Substring(0, item2.Index);
-                prefix = BPNAJICGHEH.Replace(prefix, "\uFFFC");
+				string prefix = _parsedText.Substring(0, item2.Index);
+                prefix = _quadRegex.Replace(prefix, "\uFFFC");
                 prefix = Regex.Replace(prefix, "</?(?:b|i|size|color|material)(?:=[^>]*)?>", "", RegexOptions.IgnoreCase);
                 // Eclipse: since Unity 2019.1 the text generator emits no quad for whitespace
                 // or line breaks. Counting them pointed past the <quad>, which then drew the
                 // font atlas instead of being collapsed under the icon overlay.
                 prefix = Regex.Replace(prefix, @"\s", "");
                 int item = prefix.Length * 4 + 3;
-				PHPKKMKLNOA.Add(item);
-				FFCOKBMOANO.RemoveAll((ResolutionImage KHPKDMGDMAB) => KHPKDMGDMAB == null);
-				if (FFCOKBMOANO.Count == 0)
+				_quadVertexIndices.Add(item);
+				_iconImages.RemoveAll((ResolutionImage KHPKDMGDMAB) => KHPKDMGDMAB == null);
+				if (_iconImages.Count == 0)
 				{
-					GetComponentsInChildren(FFCOKBMOANO);
+					GetComponentsInChildren(_iconImages);
 				}
-				if (PHPKKMKLNOA.Count > FFCOKBMOANO.Count)
+				if (_quadVertexIndices.Count > _iconImages.Count)
 				{
 					GameObject gameObject = new GameObject("ResolutionImage");
 					ResolutionImage resolutionImage = gameObject.AddComponent<ResolutionImage>();
@@ -150,7 +150,7 @@ namespace Nekki.SF2.GUI
 						rectTransform.localScale = Vector3.one;
 						rectTransform.pivot = Vector2.zero;
 					}
-					FFCOKBMOANO.Add(resolutionImage);
+					_iconImages.Add(resolutionImage);
 				}
 				string value = item2.Groups[1].Value;
 				float num;
@@ -158,7 +158,7 @@ namespace Nekki.SF2.GUI
                 bool percent = size.EndsWith("%");
                 if (!float.TryParse(size.TrimEnd('%'), System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out num)) num = fontSize;
                 if (percent) num = num * fontSize / 100f;
-				ResolutionImage resolutionImage2 = FFCOKBMOANO[PHPKKMKLNOA.Count - 1];
+				ResolutionImage resolutionImage2 = _iconImages[_quadVertexIndices.Count - 1];
 				if (resolutionImage2.get_SpriteName() != value)
 				{
 					resolutionImage2.set_SpriteName(value);
@@ -166,45 +166,45 @@ namespace Nekki.SF2.GUI
 				if (resolutionImage2.sprite == null) { resolutionImage2.enabled = false; continue; }
                 resolutionImage2.rectTransform.sizeDelta = new Vector2(num, num * resolutionImage2.sprite.rect.height / resolutionImage2.sprite.rect.width);
 				resolutionImage2.enabled = true;
-				if (MDBELBGHDFP.Count == FFCOKBMOANO.Count)
+				if (_quadPositions.Count == _iconImages.Count)
 				{
-					resolutionImage2.transform.OKHPLHPBPKJ(MDBELBGHDFP[PHPKKMKLNOA.Count - 1].x);
-					resolutionImage2.transform.BGNJGIACJBG(MDBELBGHDFP[PHPKKMKLNOA.Count - 1].y - resolutionImage2.rectTransform.rect.height / 2f + (float)(base.fontSize / 4));
+					resolutionImage2.transform.SetLocalX(_quadPositions[_quadVertexIndices.Count - 1].x);
+					resolutionImage2.transform.SetLocalY(_quadPositions[_quadVertexIndices.Count - 1].y - resolutionImage2.rectTransform.rect.height / 2f + (float)(base.fontSize / 4));
 				}
 			}
-			for (int num2 = FFCOKBMOANO.Count - 1; num2 >= PHPKKMKLNOA.Count; num2--)
+			for (int num2 = _iconImages.Count - 1; num2 >= _quadVertexIndices.Count; num2--)
 			{
-				if ((bool)FFCOKBMOANO[num2])
+				if ((bool)_iconImages[num2])
 				{
-					FFCOKBMOANO[num2].gameObject.SetActive(false);
-					FFCOKBMOANO[num2].gameObject.hideFlags = HideFlags.HideAndDontSave;
-					ECKINFOPDPD.Add(FFCOKBMOANO[num2].gameObject);
-					FFCOKBMOANO.Remove(FFCOKBMOANO[num2]);
+					_iconImages[num2].gameObject.SetActive(false);
+					_iconImages[num2].gameObject.hideFlags = HideFlags.HideAndDontSave;
+					_imagesPendingDestroy.Add(_iconImages[num2].gameObject);
+					_iconImages.Remove(_iconImages[num2]);
 				}
 			}
-			if (ECKINFOPDPD.Count > 0)
+			if (_imagesPendingDestroy.Count > 0)
 			{
-				JJLEJDCGDNL = true;
+				_hasPendingDestroy = true;
 			}
 		}
 
 		protected override void OnPopulateMesh(VertexHelper EMOHIIMOAAL)
 		{
 			string text = m_Text;
-			m_Text = AIBLJIIKGIG;
+			m_Text = _parsedText;
 			base.OnPopulateMesh(EMOHIIMOAAL);
 			m_Text = text;
-			MDBELBGHDFP.Clear();
+			_quadPositions.Clear();
 			UIVertex vertex = default(UIVertex);
-			for (int i = 0; i < PHPKKMKLNOA.Count; i++)
+			for (int i = 0; i < _quadVertexIndices.Count; i++)
 			{
-				int num = PHPKKMKLNOA[i];
-				RectTransform rectTransform = FFCOKBMOANO[i].rectTransform;
+				int num = _quadVertexIndices[i];
+				RectTransform rectTransform = _iconImages[i].rectTransform;
 				Vector2 sizeDelta = rectTransform.sizeDelta;
 				if (num < EMOHIIMOAAL.currentVertCount)
 				{
 					EMOHIIMOAAL.PopulateUIVertex(ref vertex, num);
-					MDBELBGHDFP.Add(vertex.position);
+					_quadPositions.Add(vertex.position);
 					EMOHIIMOAAL.PopulateUIVertex(ref vertex, num - 3);
 					Vector3 position = vertex.position;
 					int num2 = num;
@@ -218,28 +218,28 @@ namespace Nekki.SF2.GUI
 					}
 				}
 			}
-			if (PHPKKMKLNOA.Count != 0)
+			if (_quadVertexIndices.Count != 0)
 			{
-				PHPKKMKLNOA.Clear();
+				_quadVertexIndices.Clear();
 			}
-			foreach (LLHOOOEJICC item in GGAGBFDGNNP)
+			foreach (HrefInfo item in _hrefInfos)
 			{
-				item.EGOEJCBNDIJ.Clear();
-				if (item.CAILGDNIKJD >= EMOHIIMOAAL.currentVertCount)
+				item.Boxes.Clear();
+				if (item.StartIndex >= EMOHIIMOAAL.currentVertCount)
 				{
 					continue;
 				}
-				EMOHIIMOAAL.PopulateUIVertex(ref vertex, item.CAILGDNIKJD);
+				EMOHIIMOAAL.PopulateUIVertex(ref vertex, item.StartIndex);
 				Vector3 position2 = vertex.position;
 				Bounds bounds = new Bounds(position2, Vector3.zero);
-				int j = item.CAILGDNIKJD;
-				for (int fBGEOOKNPCF = item.FBGEOOKNPCF; j < fBGEOOKNPCF && j < EMOHIIMOAAL.currentVertCount; j++)
+				int j = item.StartIndex;
+				for (int fBGEOOKNPCF = item.EndIndex; j < fBGEOOKNPCF && j < EMOHIIMOAAL.currentVertCount; j++)
 				{
 					EMOHIIMOAAL.PopulateUIVertex(ref vertex, j);
 					position2 = vertex.position;
 					if (position2.x < bounds.min.x)
 					{
-						item.EGOEJCBNDIJ.Add(new Rect(bounds.min, bounds.size));
+						item.Boxes.Add(new Rect(bounds.min, bounds.size));
 						bounds = new Bounds(position2, Vector3.zero);
 					}
 					else
@@ -247,9 +247,9 @@ namespace Nekki.SF2.GUI
 						bounds.Encapsulate(position2);
 					}
 				}
-				item.EGOEJCBNDIJ.Add(new Rect(bounds.min, bounds.size));
+				item.Boxes.Add(new Rect(bounds.min, bounds.size));
 			}
-			EOODLGNHCEB();
+			UpdateQuadImages();
 		}
 
 		public HrefClickEvent get_onHrefClick()
@@ -262,11 +262,11 @@ namespace Nekki.SF2.GUI
 			m_OnHrefClick = value;
 		}
 
-		protected string OABONMHJBEE()
+		protected string GetParsedText()
 		{
-			GCCFOHDGODJ.Length = 0;
+			_textBuilder.Length = 0;
 			int num = 0;
-			HBGCAGPIGIJ = text;
+			_textWithQuads = text;
 			if (inspectorIconList != null && inspectorIconList.Length > 0)
 			{
 				IconName[] array = inspectorIconList;
@@ -275,50 +275,50 @@ namespace Nekki.SF2.GUI
 					IconName iconName = array[i];
 					if (iconName.name != null && iconName.name != string.Empty)
 					{
-						HBGCAGPIGIJ = HBGCAGPIGIJ.Replace(iconName.name, "<quad name=" + iconName.name + " size=" + base.fontSize + " width=1 />");
+						_textWithQuads = _textWithQuads.Replace(iconName.name, "<quad name=" + iconName.name + " size=" + base.fontSize + " width=1 />");
 					}
 				}
 			}
 			int num2 = 0;
-			foreach (Match item2 in LCHAAEKKODP.Matches(HBGCAGPIGIJ))
+			foreach (Match item2 in _hrefRegex.Matches(_textWithQuads))
 			{
-				GCCFOHDGODJ.Append(HBGCAGPIGIJ.Substring(num, item2.Index - num));
-				GCCFOHDGODJ.Append("<color=" + hyperlinkColor + ">");
+				_textBuilder.Append(_textWithQuads.Substring(num, item2.Index - num));
+				_textBuilder.Append("<color=" + hyperlinkColor + ">");
 				Group obj = item2.Groups[1];
 				if (isCreating_m_HrefInfos)
 				{
-					LLHOOOEJICC lLHOOOEJICC = new LLHOOOEJICC();
-					lLHOOOEJICC.CAILGDNIKJD = GCCFOHDGODJ.Length * 4;
-					lLHOOOEJICC.FBGEOOKNPCF = (GCCFOHDGODJ.Length + item2.Groups[2].Length - 1) * 4 + 3;
+					HrefInfo lLHOOOEJICC = new HrefInfo();
+					lLHOOOEJICC.StartIndex = _textBuilder.Length * 4;
+					lLHOOOEJICC.EndIndex = (_textBuilder.Length + item2.Groups[2].Length - 1) * 4 + 3;
 					lLHOOOEJICC.name = obj.Value;
-					LLHOOOEJICC item = lLHOOOEJICC;
-					GGAGBFDGNNP.Add(item);
+					HrefInfo item = lLHOOOEJICC;
+					_hrefInfos.Add(item);
 				}
-				else if (GGAGBFDGNNP.Count > 0)
+				else if (_hrefInfos.Count > 0)
 				{
-					GGAGBFDGNNP[num2].CAILGDNIKJD = GCCFOHDGODJ.Length * 4;
-					GGAGBFDGNNP[num2].FBGEOOKNPCF = (GCCFOHDGODJ.Length + item2.Groups[2].Length - 1) * 4 + 3;
+					_hrefInfos[num2].StartIndex = _textBuilder.Length * 4;
+					_hrefInfos[num2].EndIndex = (_textBuilder.Length + item2.Groups[2].Length - 1) * 4 + 3;
 					num2++;
 				}
-				GCCFOHDGODJ.Append(item2.Groups[2].Value);
-				GCCFOHDGODJ.Append("</color>");
+				_textBuilder.Append(item2.Groups[2].Value);
+				_textBuilder.Append("</color>");
 				num = item2.Index + item2.Length;
 			}
 			if (isCreating_m_HrefInfos)
 			{
 				isCreating_m_HrefInfos = false;
 			}
-			GCCFOHDGODJ.Append(HBGCAGPIGIJ.Substring(num, HBGCAGPIGIJ.Length - num));
-			return GCCFOHDGODJ.ToString();
+			_textBuilder.Append(_textWithQuads.Substring(num, _textWithQuads.Length - num));
+			return _textBuilder.ToString();
 		}
 
 		public void OnPointerClick(PointerEventData BHOLFGOGPCP)
 		{
 			Vector2 localPoint;
 			RectTransformUtility.ScreenPointToLocalPointInRectangle(base.rectTransform, BHOLFGOGPCP.position, BHOLFGOGPCP.pressEventCamera, out localPoint);
-			foreach (LLHOOOEJICC item in GGAGBFDGNNP)
+			foreach (HrefInfo item in _hrefInfos)
 			{
-				List<Rect> eGOEJCBNDIJ = item.EGOEJCBNDIJ;
+				List<Rect> eGOEJCBNDIJ = item.Boxes;
 				for (int i = 0; i < eGOEJCBNDIJ.Count; i++)
 				{
 					if (eGOEJCBNDIJ[i].Contains(localPoint))
@@ -332,13 +332,13 @@ namespace Nekki.SF2.GUI
 
 		public void OnPointerEnter(PointerEventData BHOLFGOGPCP)
 		{
-			if (FFCOKBMOANO.Count < 1)
+			if (_iconImages.Count < 1)
 			{
 				return;
 			}
-			foreach (ResolutionImage item in FFCOKBMOANO)
+			foreach (ResolutionImage item in _iconImages)
 			{
-				if (KLNKEPMAGKF != null && !KLNKEPMAGKF.isActiveAndEnabled)
+				if (_button != null && !_button.isActiveAndEnabled)
 				{
 				}
 			}
@@ -346,13 +346,13 @@ namespace Nekki.SF2.GUI
 
 		public void OnPointerExit(PointerEventData BHOLFGOGPCP)
 		{
-			if (FFCOKBMOANO.Count < 1)
+			if (_iconImages.Count < 1)
 			{
 				return;
 			}
-			foreach (ResolutionImage item in FFCOKBMOANO)
+			foreach (ResolutionImage item in _iconImages)
 			{
-				if (KLNKEPMAGKF != null && !KLNKEPMAGKF.isActiveAndEnabled)
+				if (_button != null && !_button.isActiveAndEnabled)
 				{
 				}
 			}
@@ -360,13 +360,13 @@ namespace Nekki.SF2.GUI
 
 		public void OnSelect(BaseEventData BHOLFGOGPCP)
 		{
-			if (FFCOKBMOANO.Count < 1)
+			if (_iconImages.Count < 1)
 			{
 				return;
 			}
-			foreach (ResolutionImage item in FFCOKBMOANO)
+			foreach (ResolutionImage item in _iconImages)
 			{
-				if (KLNKEPMAGKF != null && !KLNKEPMAGKF.isActiveAndEnabled)
+				if (_button != null && !_button.isActiveAndEnabled)
 				{
 				}
 			}
@@ -374,28 +374,28 @@ namespace Nekki.SF2.GUI
 
 		private void Update()
 		{
-			lock (IDADFIBEOIA)
+			lock (_destroyLock)
 			{
-				if (JJLEJDCGDNL)
+				if (_hasPendingDestroy)
 				{
-					for (int i = 0; i < ECKINFOPDPD.Count; i++)
+					for (int i = 0; i < _imagesPendingDestroy.Count; i++)
 					{
-						UnityEngine.Object.DestroyImmediate(ECKINFOPDPD[i]);
+						UnityEngine.Object.DestroyImmediate(_imagesPendingDestroy[i]);
 					}
-					ECKINFOPDPD.Clear();
-					JJLEJDCGDNL = false;
+					_imagesPendingDestroy.Clear();
+					_hasPendingDestroy = false;
 				}
 			}
-			if (IKDLGPNGKOO != text)
+			if (_lastText != text)
 			{
-				MNMOJPJEFFB();
+				ResetHrefInfos();
 			}
 		}
 
-		private void MNMOJPJEFFB()
+		private void ResetHrefInfos()
 		{
-			IKDLGPNGKOO = text;
-			GGAGBFDGNNP.Clear();
+			_lastText = text;
+			_hrefInfos.Clear();
 			isCreating_m_HrefInfos = true;
 		}
 	}

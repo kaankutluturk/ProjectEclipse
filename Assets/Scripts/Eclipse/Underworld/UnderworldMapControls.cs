@@ -98,7 +98,7 @@ namespace Eclipse.Underworld
 			{
 				return;
 			}
-			bool hasRaidZones = ListSF.FHAIJEAPFEA().Exists(UnderworldZonePolicy.IsRaidZone);
+			bool hasRaidZones = ListSF.GetZones().Exists(UnderworldZonePolicy.IsRaidZone);
 			if (!hasRaidZones)
 			{
 				Debug.LogWarning("[Underworld] raid toggle hidden because no raid zones were loaded");
@@ -116,7 +116,7 @@ namespace Eclipse.Underworld
 			_toggleButton.targetGraphic = _toggleImage;
 			_toggleButton.onClick.AddListener(() => _toggleMap());
 			Debug.Log("[Underworld] map toggle created with " +
-				ListSF.FHAIJEAPFEA().FindAll(UnderworldZonePolicy.IsRaidZone).Count +
+				ListSF.GetZones().FindAll(UnderworldZonePolicy.IsRaidZone).Count +
 				" raid zone(s)");
 		}
 

@@ -15,13 +15,13 @@ public class CreditsScreen : SFMonoBehaviour<object>, IPointerClickHandler, IEve
 
 	public float autoScrollSpeed = 0.01f;
 
-	private Action PIKDIOFIJDK;
+	private Action onClosed;
 
 	public static CreditsScreen Create(Action OCLNBMKHLMH = null)
 	{
 		CreditsScreen original = Resources.Load<CreditsScreen>("Prefabs/Credits/CreditsScreen");
 		original = UnityEngine.Object.Instantiate(original);
-		original.PIKDIOFIJDK = OCLNBMKHLMH;
+		original.onClosed = OCLNBMKHLMH;
 		return original;
 	}
 
@@ -30,15 +30,15 @@ public class CreditsScreen : SFMonoBehaviour<object>, IPointerClickHandler, IEve
 		Hide();
 	}
 
-	private void NGHDCFJJKKI()
+	private void LoadCredits()
 	{
-		string text = SF2Paths.KKIDGPBOBNI() + "/credits/";
-		text += ((!(LocalizationManager.ILAJKOBCHFH.name == "rus")) ? "eng.xml" : "rus.xml");
+		string text = SF2Paths.GetGameDataPath() + "/credits/";
+		text += ((!(LocalizationManager.CurrentLanguage.name == "rus")) ? "eng.xml" : "rus.xml");
 		XmlDocument xmlDocument = XmlUtils.OpenXMLDocument(text, string.Empty);
 		XmlNode xmlNode = xmlDocument["Credits"];
 		foreach (XmlNode item in xmlNode)
 		{
-			string kNNEDNHONBJ = item.Attributes["Name"].CIPOICEEIBK();
+			string kNNEDNHONBJ = item.Attributes["Name"].GetStringOrDefault();
 			string innerText = item.InnerText;
 			CreditsScreenElement creditsScreenElement = UnityEngine.Object.Instantiate(elementPrefab, content, false);
 			creditsScreenElement.Init(kNNEDNHONBJ, innerText);
@@ -47,16 +47,16 @@ public class CreditsScreen : SFMonoBehaviour<object>, IPointerClickHandler, IEve
 
 	public void Hide()
 	{
-		if (PIKDIOFIJDK != null)
+		if (onClosed != null)
 		{
-			PIKDIOFIJDK();
+			onClosed();
 		}
 		UnityEngine.Object.Destroy(base.gameObject);
 	}
 
 	private void Awake()
 	{
-		NGHDCFJJKKI();
+		LoadCredits();
 		BackKeyManager.get_Instance().AddBackKeyController(this);
 	}
 

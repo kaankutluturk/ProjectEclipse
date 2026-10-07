@@ -8,22 +8,22 @@ namespace Nekki.SF2.GUI.Fight
 	{
 		private const float MOVE_SPEED = 10f;
 
-		private float HMDCLMMEHPF;
+		private float spawnOffsetX;
 
-		private float LBLANBELAPG;
-
-		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		private string JCJNNJPNPJE;
+		private float spawnOffsetY;
 
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		private float EHAJOKOMBPK;
+		private string stackId;
 
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		private bool NCGLMKOGBCB;
+		private float finishPosX;
+
+		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
+		private bool needsDelete;
 
 		private List<ActivePerkItem> _activePerks = new List<ActivePerkItem>();
 
-		public string GJONJADIAJM
+		public string StackId
 		{
 			get
 			{
@@ -35,7 +35,7 @@ namespace Nekki.SF2.GUI.Fight
 			}
 		}
 
-		public float HIMIJMKFIPH
+		public float TargetPosX
 		{
 			get
 			{
@@ -47,7 +47,7 @@ namespace Nekki.SF2.GUI.Fight
 			}
 		}
 
-		public bool IEEIFCFIGAD
+		public bool IsMarkedForDeletion
 		{
 			get
 			{
@@ -61,38 +61,38 @@ namespace Nekki.SF2.GUI.Fight
 
 		public string get_Stack()
 		{
-			return JCJNNJPNPJE;
+			return stackId;
 		}
 
 		public void set_Stack(string value)
 		{
-			JCJNNJPNPJE = value;
+			stackId = value;
 		}
 
 		public float get_FinishPosX()
 		{
-			return EHAJOKOMBPK;
+			return finishPosX;
 		}
 
 		public void set_FinishPosX(float value)
 		{
-			EHAJOKOMBPK = value;
+			finishPosX = value;
 		}
 
 		public bool get_NeedDelete()
 		{
-			return NCGLMKOGBCB;
+			return needsDelete;
 		}
 
 		private void set_NeedDelete(bool value)
 		{
-			NCGLMKOGBCB = value;
+			needsDelete = value;
 		}
 
 		public void Init(float HLBMDDOPKKL = 0f, float ELAKEOGEDPN = 0f)
 		{
-			HMDCLMMEHPF = HLBMDDOPKKL;
-			LBLANBELAPG = ELAKEOGEDPN;
+			spawnOffsetX = HLBMDDOPKKL;
+			spawnOffsetY = ELAKEOGEDPN;
 			set_FinishPosX(0f);
 			set_NeedDelete(false);
 		}
@@ -113,7 +113,7 @@ namespace Nekki.SF2.GUI.Fight
 			}
 		}
 
-		private void JNBECGKCNBB()
+		private void MoveToFinishPosition()
 		{
 			Vector2 vector = base.transform.localPosition;
 			if (vector.x != get_FinishPosX())
@@ -137,7 +137,7 @@ namespace Nekki.SF2.GUI.Fight
 
 		public void Render()
 		{
-			JNBECGKCNBB();
+			MoveToFinishPosition();
 			List<ActivePerkItem> list = new List<ActivePerkItem>();
 			foreach (ActivePerkItem item in _activePerks)
 			{

@@ -4,14 +4,14 @@ $source = Get-Content -Raw -LiteralPath (Join-Path $root 'Assets/Scripts/Assembl
 $userItemSource = Get-Content -Raw -LiteralPath (Join-Path $root 'Assets/Scripts/Assembly-CSharp/UserItem.cs')
 # Execute the recovered inventory parse/add methods, with unrelated Unity/timer services stubbed.
 $parse = [regex]::Match($source, '(?ms)^\tpublic void Parse\(XmlNode.*?^\t\}').Value
-$add = [regex]::Match($source, '(?ms)^\tpublic UserItem GEFDJDIINND\(.*?^\t\}').Value
-$find = [regex]::Match($source, '(?ms)^\tpublic UserItem CMGOCLGHNLH\(string name\).*?^\t\}').Value
-$setEquipped = [regex]::Match($userItemSource, '(?ms)^\tpublic void JBLKCIBKMKB\(bool value\).*?^\t\}').Value
-$setCount = [regex]::Match($userItemSource, '(?ms)^\tpublic void CHILOKHFALD\(int value\).*?^\t\}').Value
+$add = [regex]::Match($source, '(?ms)^\tpublic UserItem AddItem\(.*?^\t\}').Value
+$find = [regex]::Match($source, '(?ms)^\tpublic UserItem FindItem\(string name\).*?^\t\}').Value
+$setEquipped = [regex]::Match($userItemSource, '(?ms)^\tpublic void SetIsEquipped\(bool value\).*?^\t\}').Value
+$setCount = [regex]::Match($userItemSource, '(?ms)^\tpublic void SetCount\(int value\).*?^\t\}').Value
 $setDelivery = [regex]::Match($userItemSource, '(?ms)^\tpublic void set_DeliveryTime\(long value\).*?^\t\}').Value
-$setDeliveryUpgrade = [regex]::Match($userItemSource, '(?ms)^\tpublic void BAMLNLIDEBG\(int value\).*?^\t\}').Value
-$setUpgrade = [regex]::Match($userItemSource, '(?ms)^\tpublic void FMMDLMGHPIB\(int value\).*?^\t\}').Value
-$setAcquire = [regex]::Match($userItemSource, '(?ms)^\tpublic void HJONIDFKNJH\(string value\).*?^\t\}').Value
+$setDeliveryUpgrade = [regex]::Match($userItemSource, '(?ms)^\tpublic void SetDeliveryUpgradeLevel\(int value\).*?^\t\}').Value
+$setUpgrade = [regex]::Match($userItemSource, '(?ms)^\tpublic void SetUpgradeLevel\(int value\).*?^\t\}').Value
+$setAcquire = [regex]::Match($userItemSource, '(?ms)^\tpublic void SetAcquireType\(string value\).*?^\t\}').Value
 if (!$parse -or !$add -or !$find -or !$setEquipped -or !$setCount -or !$setDelivery -or !$setDeliveryUpgrade -or !$setUpgrade -or !$setAcquire) {
     throw 'Could not extract recovered inventory/item serialization methods.'
 }
@@ -26,14 +26,14 @@ using Eclipse.Modding;
 namespace UnityEngine { public static class Debug { public static void LogWarning(object value) {} } }
 public static class XmlCompat
 {
-    public static XmlAttribute LLIKNHNLGJJ(this XmlNode node, string name)
+    public static XmlAttribute AppendAttribute(this XmlNode node, string name)
     {
         XmlAttribute attribute = node.OwnerDocument.CreateAttribute(name);
         node.Attributes.Append(attribute);
         return attribute;
     }
 }
-public sealed class ItemInfo { public string Type = "Weapon"; public void BEBDMOEIEJN(bool value) {} }
+public sealed class ItemInfo { public string Type = "Weapon"; public void SetIsNew(bool value) {} }
 public sealed class Items
 {
     public readonly Dictionary<string, ItemInfo> Definitions = new Dictionary<string, ItemInfo>();
@@ -51,31 +51,31 @@ public sealed class UserItem
 {
     public static int Constructions;
     private readonly XmlElement _Node;
-    private bool JGPEOEDJMHH = true;
-    private bool NCDLPMFEEHG;
-    private int DNIAOMIFPGD;
+    private bool writesToNode = true;
+    private bool isEquipped;
+    private int count;
     private long _DeliveryTime;
-    private int MLKADDDOCGH;
-    private int IKNDJDEODFD;
-    private string BIOPPMKLLME;
+    private int deliveryUpgradeLevel;
+    private int upgradeLevel;
+    private string acquireType;
     public UserItem(XmlNode node)
     {
         Constructions++;
         _Node = (XmlElement)node;
-        NCDLPMFEEHG = _Node.GetAttribute("Equipped") == "1";
-        int.TryParse(_Node.GetAttribute("Count"), out DNIAOMIFPGD);
+        isEquipped = _Node.GetAttribute("Equipped") == "1";
+        int.TryParse(_Node.GetAttribute("Count"), out count);
         long.TryParse(_Node.GetAttribute("DeliveryTime"), out _DeliveryTime);
-        if (!int.TryParse(_Node.GetAttribute("DeliveryUpgradeLevel"), out MLKADDDOCGH)) MLKADDDOCGH = -1;
-        if (!int.TryParse(_Node.GetAttribute("UpgradeLevel"), out IKNDJDEODFD)) IKNDJDEODFD = -1;
-        BIOPPMKLLME = _Node.GetAttribute("AcquireType");
+        if (!int.TryParse(_Node.GetAttribute("DeliveryUpgradeLevel"), out deliveryUpgradeLevel)) deliveryUpgradeLevel = -1;
+        if (!int.TryParse(_Node.GetAttribute("UpgradeLevel"), out upgradeLevel)) upgradeLevel = -1;
+        acquireType = _Node.GetAttribute("AcquireType");
     }
     public string get_Name() { return _Node.GetAttribute("Name"); }
-    public ItemInfo BHKHOJPANHE() { return null; } // Binding occurs later in HOMCPNCGPDB.
-    public long IJGAOHJNLAH() { return _DeliveryTime; }
-    public int OFOPFCJNEBL() { return DNIAOMIFPGD; }
-    public int EIMMBNNMBCN() { return MLKADDDOCGH; }
-    public int DHNNCAEEMLL() { return IKNDJDEODFD; }
-    public string GAMAMIKGDKI() { return BIOPPMKLLME; }
+    public ItemInfo GetInfo() { return null; } // Binding occurs later in ApplyItemInfos.
+    public long GetDeliveryTimestamp() { return _DeliveryTime; }
+    public int GetCount() { return count; }
+    public int GetDeliveryUpgradeLevel() { return deliveryUpgradeLevel; }
+    public int GetUpgradeLevel() { return upgradeLevel; }
+    public string GetAcquireType() { return acquireType; }
     __SET_EQUIPPED__
     __SET_COUNT__
     __SET_DELIVERY__
@@ -87,9 +87,9 @@ public sealed class UserItems
 {
     private readonly List<string> _missingModItemIds = new List<string>();
     private readonly List<UserItem> _items = new List<UserItem>();
-    private readonly List<UserItem> HBLLBGLBDGI = new List<UserItem>();
+    private readonly List<UserItem> pendingDeliveries = new List<UserItem>();
     public int Visible => _items.Count;
-    public int Deliveries => HBLLBGLBDGI.Count;
+    public int Deliveries => pendingDeliveries.Count;
     public int Missing => _missingModItemIds.Count;
     __FIND__
     __PARSE__
@@ -129,14 +129,14 @@ public static class Program
 
         // Exercise the real recovered UserItem XML mutation methods. These are the exact
         // methods used by purchase, upgrade, equip and delivery code in the game runtime.
-        UserItem live = restored.CMGOCLGHNLH(id);
+        UserItem live = restored.FindItem(id);
         Assert(live != null, "Restored mod item was not addressable through active inventory.");
-        live.CHILOKHFALD(2);
-        live.FMMDLMGHPIB(1300);
+        live.SetCount(2);
+        live.SetUpgradeLevel(1300);
         live.set_DeliveryTime(7777);
-        live.BAMLNLIDEBG(1400);
-        live.HJONIDFKNJH("Upgrade");
-        live.JBLKCIBKMKB(true);
+        live.SetDeliveryUpgradeLevel(1400);
+        live.SetAcquireType("Upgrade");
+        live.SetIsEquipped(true);
         item = (XmlElement)reloaded.DocumentElement["Items"].LastChild;
         Assert(item.GetAttribute("Count") == "2" && item.GetAttribute("UpgradeLevel") == "1300" &&
             item.GetAttribute("DeliveryTime") == "7777" && item.GetAttribute("DeliveryUpgradeLevel") == "1400" &&
@@ -144,10 +144,10 @@ public static class Program
             "Recovered purchase/upgrade/equip state did not serialize to the owned save node.");
         var lifecycleReload = new UserItems();
         lifecycleReload.Parse(reloaded.DocumentElement["Items"]);
-        UserItem lifecycleItem = lifecycleReload.CMGOCLGHNLH(id);
-        Assert(lifecycleItem != null && lifecycleItem.OFOPFCJNEBL() == 2 && lifecycleItem.DHNNCAEEMLL() == 1300 &&
-            lifecycleItem.IJGAOHJNLAH() == 7777 && lifecycleItem.EIMMBNNMBCN() == 1400 &&
-            lifecycleItem.GAMAMIKGDKI() == "Upgrade",
+        UserItem lifecycleItem = lifecycleReload.FindItem(id);
+        Assert(lifecycleItem != null && lifecycleItem.GetCount() == 2 && lifecycleItem.GetUpgradeLevel() == 1300 &&
+            lifecycleItem.GetDeliveryTimestamp() == 7777 && lifecycleItem.GetDeliveryUpgradeLevel() == 1400 &&
+            lifecycleItem.GetAcquireType() == "Upgrade",
             "Recovered purchase/upgrade/equip state did not survive a save DOM reload.");
 
         // The player chose a different weapon while this mod was absent. Do not re-equip it.
@@ -165,10 +165,10 @@ public static class Program
             "' Count='1' UpgradeLevel='1200' Equipped='1'/></Items></Warrior>");
         var aliased = new UserItems();
         aliased.Parse(aliasSave.DocumentElement["Items"]);
-        UserItem historical = aliased.CMGOCLGHNLH(id);
+        UserItem historical = aliased.FindItem(id);
         Assert(aliased.Visible == 1 && aliased.Missing == 0 && historical != null && historical.get_Name() == oldId,
             "Historical item alias did not restore ownership under the current definition.");
-        historical.CHILOKHFALD(2);
+        historical.SetCount(2);
         Assert(aliasSave.DocumentElement["Items"].FirstChild.Attributes["Name"].Value == oldId &&
             aliasSave.DocumentElement["Items"].FirstChild.Attributes["Count"].Value == "2",
             "Alias resolution rewrote the historical save ID instead of preserving it non-destructively.");

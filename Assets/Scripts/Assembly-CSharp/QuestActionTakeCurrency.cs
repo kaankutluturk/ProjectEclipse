@@ -8,26 +8,26 @@ public class QuestActionTakeCurrency : QuestAction
 
 	private string _value = string.Empty;
 
-	private QuestActionsSequence DBONDAIEBPN = new QuestActionsSequence();
+	private QuestActionsSequence successSequence = new QuestActionsSequence();
 
-	private QuestActionsSequence LDDDPGLPHCO = new QuestActionsSequence();
+	private QuestActionsSequence errorSequence = new QuestActionsSequence();
 
 	public override void Parse(XmlNode EPKLCPOEELO)
 	{
 		base.Parse(EPKLCPOEELO);
-		_type = EPKLCPOEELO.Attributes["Type"].CIPOICEEIBK(string.Empty);
-		_name = EPKLCPOEELO.Attributes["Name"].CIPOICEEIBK(string.Empty);
-		_value = EPKLCPOEELO.Attributes["Value"].CIPOICEEIBK(string.Empty);
+		_type = EPKLCPOEELO.Attributes["Type"].GetStringOrDefault(string.Empty);
+		_name = EPKLCPOEELO.Attributes["Name"].GetStringOrDefault(string.Empty);
+		_value = EPKLCPOEELO.Attributes["Value"].GetStringOrDefault(string.Empty);
 		XmlNode ePKLCPOEELO = EPKLCPOEELO["Success"];
 		XmlNode ePKLCPOEELO2 = EPKLCPOEELO["Error"];
-		APKBANHAEGN(ePKLCPOEELO, DBONDAIEBPN, OnActionComplete);
-		APKBANHAEGN(ePKLCPOEELO2, LDDDPGLPHCO, OnActionComplete);
+		ParseSequenceWithUnlock(ePKLCPOEELO, successSequence, OnActionComplete);
+		ParseSequenceWithUnlock(ePKLCPOEELO2, errorSequence, OnActionComplete);
 	}
 
-	public override void DEJMHFMLKIC(QuestParameters GFIHPBCEEOB)
+	public override void Execute(QuestParameters GFIHPBCEEOB)
 	{
-		GKFMJKAAJCA();
-		base.DEJMHFMLKIC(GFIHPBCEEOB);
+		ResetSequences();
+		base.Execute(GFIHPBCEEOB);
 		string LFLGCDNKNJI = string.Empty;
 		string name = string.Empty;
 		long value = 0L;
@@ -37,12 +37,12 @@ public class QuestActionTakeCurrency : QuestAction
 		if (flag && flag2)
 		{
 			AddCurrencyCount(LFLGCDNKNJI, name, value);
-			MenuController.IAMGKKOINFC();
-			DBONDAIEBPN.DEJMHFMLKIC(GFIHPBCEEOB);
+			MenuController.RefreshMoney();
+			successSequence.Run(GFIHPBCEEOB);
 		}
 		else
 		{
-			LDDDPGLPHCO.DEJMHFMLKIC(GFIHPBCEEOB);
+			errorSequence.Run(GFIHPBCEEOB);
 		}
 	}
 
@@ -56,12 +56,12 @@ public class QuestActionTakeCurrency : QuestAction
 			result = true;
 			break;
 		case "Currency":
-			result = ListSF.CCDKHLAMKKO().GetIsCurrencyExist(name);
+			result = ListSF.GetRoster().GetIsCurrencyExist(name);
 			break;
 		default:
 			if (LFLGCDNKNJI != string.Empty)
 			{
-				result = ListSF.CCDKHLAMKKO().GetIsCurrencyExist(LFLGCDNKNJI);
+				result = ListSF.GetRoster().GetIsCurrencyExist(LFLGCDNKNJI);
 			}
 			break;
 		}
@@ -71,13 +71,13 @@ public class QuestActionTakeCurrency : QuestAction
 	private long GetCurrencyCount(string LFLGCDNKNJI, string name)
 	{
 		long num = 0L;
-		Roster nKGLHEGIKKP = ListSF.CCDKHLAMKKO();
+		Roster nKGLHEGIKKP = ListSF.GetRoster();
 		switch (LFLGCDNKNJI)
 		{
 		case "Gold":
-			return nKGLHEGIKKP.BFBOEGMAMNF();
+			return nKGLHEGIKKP.GetMoney();
 		case "Bonus":
-			return nKGLHEGIKKP.EHFJHFDACMP();
+			return nKGLHEGIKKP.GetBonus();
 		case "Currency":
 			return nKGLHEGIKKP.GetCurrencyCount(name);
 		default:
@@ -87,14 +87,14 @@ public class QuestActionTakeCurrency : QuestAction
 
 	private void AddCurrencyCount(string LFLGCDNKNJI, string name, long value)
 	{
-		Roster nKGLHEGIKKP = ListSF.CCDKHLAMKKO();
+		Roster nKGLHEGIKKP = ListSF.GetRoster();
 		switch (LFLGCDNKNJI)
 		{
 		case "Gold":
-			nKGLHEGIKKP.OIOOMAKNIOB(nKGLHEGIKKP.BFBOEGMAMNF() - value);
+			nKGLHEGIKKP.SetMoney(nKGLHEGIKKP.GetMoney() - value);
 			return;
 		case "Bonus":
-			nKGLHEGIKKP.LLNELLFMMBB(nKGLHEGIKKP.EHFJHFDACMP() - value, Roster.HPOIJPGPOCF.CHANGE_QUEST);
+			nKGLHEGIKKP.SetBonus(nKGLHEGIKKP.GetBonus() - value, Roster.BalanceChangeType.CHANGE_QUEST);
 			return;
 		case "Currency":
 			nKGLHEGIKKP.AddCurrencyCount(name, (int)(-value));
@@ -110,25 +110,25 @@ public class QuestActionTakeCurrency : QuestAction
 	{
 		ConditionExtension.CompareResult lNIDLHOIHIM = new ConditionExtension.CompareResult();
 		QuestCondition kKDGLNECFHA = new QuestCondition();
-		kKDGLNECFHA.LIMHBJBEEIA(PAJDEKLLFNJ);
-		kKDGLNECFHA.MCPIOGALBMK(_type, lNIDLHOIHIM);
+		kKDGLNECFHA.SetParameters(Parameters);
+		kKDGLNECFHA.SetValue(_type, lNIDLHOIHIM);
 		LFLGCDNKNJI = lNIDLHOIHIM.ToString();
 		lNIDLHOIHIM.Clear();
-		kKDGLNECFHA.MCPIOGALBMK(_name, lNIDLHOIHIM);
+		kKDGLNECFHA.SetValue(_name, lNIDLHOIHIM);
 		name = lNIDLHOIHIM.ToString();
 		lNIDLHOIHIM.Clear();
-		kKDGLNECFHA.MCPIOGALBMK(_value, lNIDLHOIHIM);
+		kKDGLNECFHA.SetValue(_value, lNIDLHOIHIM);
 		value = lNIDLHOIHIM.ToString().ToLong(0L);
 	}
 
 	private void OnActionComplete(object data)
 	{
-		OGIJONMKABB();
+		FinishAction();
 	}
 
-	public override void GKFMJKAAJCA()
+	public override void ResetSequences()
 	{
-		DBONDAIEBPN.FHPKJMMLIEG();
-		LDDDPGLPHCO.FHPKJMMLIEG();
+		successSequence.Reset();
+		errorSequence.Reset();
 	}
 }

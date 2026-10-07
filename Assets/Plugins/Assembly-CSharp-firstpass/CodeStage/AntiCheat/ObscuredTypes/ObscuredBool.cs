@@ -69,25 +69,25 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 			return value != 181;
 		}
 
-		public void PKOKLDGAPEI()
+		public void ApplyNewCryptoKey()
 		{
 			if (currentCryptoKey != cryptoKey)
 			{
-				hiddenValue = Encrypt(GEKBGBJOMIA(), cryptoKey);
+				hiddenValue = Encrypt(InternalDecrypt(), cryptoKey);
 				currentCryptoKey = cryptoKey;
 			}
 		}
 
-		public void GMCADPGOCHM()
+		public void RandomizeCryptoKey()
 		{
-			bool bAINMLLIKOL = GEKBGBJOMIA();
+			bool bAINMLLIKOL = InternalDecrypt();
 			currentCryptoKey = (byte)UnityEngine.Random.Range(0, 255);
 			hiddenValue = Encrypt(bAINMLLIKOL, currentCryptoKey);
 		}
 
-		public int ECEBFGCJIDA()
+		public int GetEncrypted()
 		{
-			PKOKLDGAPEI();
+			ApplyNewCryptoKey();
 			return hiddenValue;
 		}
 
@@ -95,14 +95,14 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 		{
 			inited = true;
 			hiddenValue = ANGFOBEKKKD;
-			if (ObscuredCheatingDetector.NMACGEJHPDN())
+			if (ObscuredCheatingDetector.GetIsRunning())
 			{
-				fakeValue = GEKBGBJOMIA();
+				fakeValue = InternalDecrypt();
 				fakeValueChanged = true;
 			}
 		}
 
-		private bool GEKBGBJOMIA()
+		private bool InternalDecrypt()
 		{
 			if (!inited)
 			{
@@ -115,9 +115,9 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 			int num = hiddenValue;
 			num ^= currentCryptoKey;
 			bool flag = num != 181;
-			if (ObscuredCheatingDetector.NMACGEJHPDN() && fakeValueChanged && flag != fakeValue)
+			if (ObscuredCheatingDetector.GetIsRunning() && fakeValueChanged && flag != fakeValue)
 			{
-				ObscuredCheatingDetector.get_Instance().MCDANNDOEIK();
+				ObscuredCheatingDetector.get_Instance().OnCheatingDetected();
 			}
 			return flag;
 		}
@@ -125,7 +125,7 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 		public static implicit operator ObscuredBool(bool value)
 		{
 			ObscuredBool result = new ObscuredBool(Encrypt(value));
-			if (ObscuredCheatingDetector.NMACGEJHPDN())
+			if (ObscuredCheatingDetector.GetIsRunning())
 			{
 				result.fakeValue = value;
 				result.fakeValueChanged = true;
@@ -135,7 +135,7 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 
 		public static implicit operator bool(ObscuredBool value)
 		{
-			return value.GEKBGBJOMIA();
+			return value.InternalDecrypt();
 		}
 
 		public override bool Equals(object AOMLCBHAJJH)
@@ -158,12 +158,12 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 
 		public override int GetHashCode()
 		{
-			return GEKBGBJOMIA().GetHashCode();
+			return InternalDecrypt().GetHashCode();
 		}
 
 		public override string ToString()
 		{
-			return GEKBGBJOMIA().ToString();
+			return InternalDecrypt().ToString();
 		}
 	}
 }

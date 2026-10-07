@@ -4,5 +4,5 @@ public class GroupModel
 
 	public bool IsRandom;
 
-	public bool PMHHMDAIOGL;
+	public bool NoDoubles;
 }

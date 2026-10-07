@@ -7,18 +7,18 @@ public class TradeDialogInfo
 
 	public GameValueType Value;
 
-	public TradeDialog.LBGFOGHMBED AMKJNPOCODK;
+	public TradeDialog.TradeAction TradeType;
 
-	public long IJJJDFHBLNN;
+	public long Price;
 
-	public long JNNKILFJKPB;
+	public long DeliverySeconds;
 
-	public TradeDialogInfo(TradeDialog.LBGFOGHMBED CBFFIFKAHHN, GameValueType _value = GameValueType.Gold, long JIBAGOMMNKE = 0L, Action<object> _dlg = null, long IGMDKDOGGNA = 0L)
+	public TradeDialogInfo(TradeDialog.TradeAction CBFFIFKAHHN, GameValueType _value = GameValueType.Gold, long JIBAGOMMNKE = 0L, Action<object> _dlg = null, long IGMDKDOGGNA = 0L)
 	{
-		AMKJNPOCODK = CBFFIFKAHHN;
+		TradeType = CBFFIFKAHHN;
 		Value = _value;
-		IJJJDFHBLNN = JIBAGOMMNKE;
+		Price = JIBAGOMMNKE;
 		Dlg = _dlg;
-		JNNKILFJKPB = IGMDKDOGGNA;
+		DeliverySeconds = IGMDKDOGGNA;
 	}
 }

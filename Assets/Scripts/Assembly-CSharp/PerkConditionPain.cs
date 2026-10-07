@@ -5,29 +5,29 @@ public class PerkConditionPain : PerkConditionMatchMinMax
 {
 	public PerkConditionPain()
 	{
-		set_Type(NHDGLPNNNLH.CONDITION_PAIN);
+		set_Type(PerkConditionType.CONDITION_PAIN);
 	}
 
 	public override void Parse(XmlNode node)
 	{
 		base.Parse(node);
-		FMKBHHJDHDM.Parse(node, this, JMDLAMHAJLN());
+		minMax.Parse(node, this, GetPerk());
 	}
 
 	public override bool IsEqual(Model ACENLMONNPA, List<string> NIKHAICFGNM)
 	{
-		Model fGCODGKLHED = EPCPGEPPHLO(ACENLMONNPA);
+		Model fGCODGKLHED = ResolveTargetModel(ACENLMONNPA);
 		if (ACENLMONNPA == null)
 		{
 			return false;
 		}
-		FMKBHHJDHDM.IBCPKBBAFNH();
-		float num = fGCODGKLHED.IDFIBPDPFLK();
-		if (!FMKBHHJDHDM.KEMLMMPIPGJ() && FMKBHHJDHDM.PPCEOKCAEBD() > num)
+		minMax.EvaluateFunctions();
+		float num = fGCODGKLHED.GetPain();
+		if (!minMax.GetMinUnbounded() && minMax.GetMinValue() > num)
 		{
 			return false;
 		}
-		if (!FMKBHHJDHDM.HFGENILMBKK() && FMKBHHJDHDM.EFDLCJBJNPE() < num)
+		if (!minMax.GetMaxUnbounded() && minMax.GetMaxValue() < num)
 		{
 			return false;
 		}

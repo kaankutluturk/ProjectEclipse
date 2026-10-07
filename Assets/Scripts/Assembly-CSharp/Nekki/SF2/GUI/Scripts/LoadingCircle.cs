@@ -10,11 +10,11 @@ namespace Nekki.SF2.GUI.Scripts
 		[SerializeField]
 		private float _Timeout = 0.1f;
 
-		private float PFLLICEIKCM;
+		private float rotationTimer;
 
 		private Vector3 _Step;
 
-		public bool BDJPLHOKIPF
+		public bool IsPlayingProperty
 		{
 			get
 			{
@@ -24,7 +24,7 @@ namespace Nekki.SF2.GUI.Scripts
 
 		public void Play()
 		{
-			PFLLICEIKCM = _Timeout;
+			rotationTimer = _Timeout;
 			_Step = new Vector3(0f, 0f, -360f / (float)_SegmentsCount);
 			base.transform.localEulerAngles = Vector3.zero;
 			base.gameObject.SetActive(true);
@@ -47,12 +47,12 @@ namespace Nekki.SF2.GUI.Scripts
 
 		private void Update()
 		{
-			if (PFLLICEIKCM > 1E-06f)
+			if (rotationTimer > 1E-06f)
 			{
-				PFLLICEIKCM -= Time.deltaTime;
+				rotationTimer -= Time.deltaTime;
 				return;
 			}
-			PFLLICEIKCM = _Timeout;
+			rotationTimer = _Timeout;
 			base.transform.localEulerAngles += _Step;
 		}
 	}

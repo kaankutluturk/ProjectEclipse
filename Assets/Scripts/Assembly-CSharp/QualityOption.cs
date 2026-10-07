@@ -3,7 +3,7 @@ using System.Xml;
 
 public class QualityOption
 {
-	public enum PJGLFCCEFIL
+	public enum QualityOptionType
 	{
 		OPTION_NONE = 0,
 		OPTION_REDUCE_FPS = 1,
@@ -11,7 +11,7 @@ public class QualityOption
 		OPTION_SRQUENCES_OFF = 3
 	}
 
-	public enum HPNJCDGIHLI
+	public enum QualityLevel
 	{
 		QUALITY_LOW = 0,
 		QUALITY_MEDIUM = 1,
@@ -19,60 +19,60 @@ public class QualityOption
 		QUALITY_NONE = 3
 	}
 
-	private PJGLFCCEFIL _type;
+	private QualityOptionType _type;
 
 	private List<string> _conditions = new List<string>();
 
 	public QualityOption(XmlNode node)
 	{
-		_type = MHIPNMFFBJK(node.Attributes["Name"].CIPOICEEIBK(string.Empty));
+		_type = ParseOptionType(node.Attributes["Name"].GetStringOrDefault(string.Empty));
 		foreach (XmlNode childNode in node.ChildNodes)
 		{
-			_conditions.Add(childNode.Attributes["Name"].CIPOICEEIBK(string.Empty));
+			_conditions.Add(childNode.Attributes["Name"].GetStringOrDefault(string.Empty));
 		}
 	}
 
-	public static PJGLFCCEFIL MHIPNMFFBJK(string name)
+	public static QualityOptionType ParseOptionType(string name)
 	{
 		switch (name)
 		{
 		case "ReduceFPS":
-			return PJGLFCCEFIL.OPTION_REDUCE_FPS;
+			return QualityOptionType.OPTION_REDUCE_FPS;
 		case "ParticlesOff":
-			return PJGLFCCEFIL.OPTION_PARTICLES_OFF;
+			return QualityOptionType.OPTION_PARTICLES_OFF;
 		case "SequencesOff":
-			return PJGLFCCEFIL.OPTION_SRQUENCES_OFF;
+			return QualityOptionType.OPTION_SRQUENCES_OFF;
 		default:
-			LLLOJBFMONN.Error("QualityOption::getOptionFromString - unknown type: %s", name);
-			return PJGLFCCEFIL.OPTION_NONE;
+			GameLog.Error("QualityOption::getOptionFromString - unknown type: %s", name);
+			return QualityOptionType.OPTION_NONE;
 		}
 	}
 
-	public static HPNJCDGIHLI ONPFEBDGLFO(string name)
+	public static QualityLevel ParseQualityLevel(string name)
 	{
 		switch (name)
 		{
 		case "LOW":
-			return HPNJCDGIHLI.QUALITY_LOW;
+			return QualityLevel.QUALITY_LOW;
 		case "MEDIUM":
-			return HPNJCDGIHLI.QUALITY_MEDIUM;
+			return QualityLevel.QUALITY_MEDIUM;
 		case "HIGH":
-			return HPNJCDGIHLI.QUALITY_HIGH;
+			return QualityLevel.QUALITY_HIGH;
 		default:
-			return HPNJCDGIHLI.QUALITY_NONE;
+			return QualityLevel.QUALITY_NONE;
 		}
 	}
 
 	public static string GetNextQualityCondition(string HEPNIDFNHBA, string FPIDIHLACAM)
 	{
 		string text = "LOW";
-		switch (ONPFEBDGLFO(FPIDIHLACAM))
+		switch (ParseQualityLevel(FPIDIHLACAM))
 		{
-		case HPNJCDGIHLI.QUALITY_HIGH:
-		case HPNJCDGIHLI.QUALITY_NONE:
-			return KNBGOLLPFFI(HEPNIDFNHBA);
-		case HPNJCDGIHLI.QUALITY_MEDIUM:
-			return LNHKDBPLPAN(HEPNIDFNHBA);
+		case QualityLevel.QUALITY_HIGH:
+		case QualityLevel.QUALITY_NONE:
+			return CycleQualityUp(HEPNIDFNHBA);
+		case QualityLevel.QUALITY_MEDIUM:
+			return ToggleLowMedium(HEPNIDFNHBA);
 		default:
 			return "LOW";
 		}
@@ -80,23 +80,23 @@ public class QualityOption
 
 	public static bool CompareQualityCondition(string MKICABFAHFA, string JMLKHIPBCLI)
 	{
-		return ONPFEBDGLFO(MKICABFAHFA) > ONPFEBDGLFO(JMLKHIPBCLI);
+		return ParseQualityLevel(MKICABFAHFA) > ParseQualityLevel(JMLKHIPBCLI);
 	}
 
-	public void IOHJMJKLIOD()
+	public void ApplyIfConditionMatches()
 	{
-		string text = GraphicsController.PMAODLMLDLK();
+		string text = GraphicsController.GetEffectiveQualityCondition();
 		foreach (string item in _conditions)
 		{
 			if (item == text)
 			{
-				ACKHHGECBAE();
+				EnableOption();
 				break;
 			}
 		}
 	}
 
-	private static string KNBGOLLPFFI(string HEPNIDFNHBA)
+	private static string CycleQualityUp(string HEPNIDFNHBA)
 	{
 		switch (HEPNIDFNHBA)
 		{
@@ -111,7 +111,7 @@ public class QualityOption
 		}
 	}
 
-	private static string LNHKDBPLPAN(string HEPNIDFNHBA)
+	private static string ToggleLowMedium(string HEPNIDFNHBA)
 	{
 		if (HEPNIDFNHBA == "LOW")
 		{
@@ -124,20 +124,20 @@ public class QualityOption
 		return "MEDIUM";
 	}
 
-	private void ACKHHGECBAE()
+	private void EnableOption()
 	{
 		switch (_type)
 		{
-		case PJGLFCCEFIL.OPTION_REDUCE_FPS:
+		case QualityOptionType.OPTION_REDUCE_FPS:
 			break;
-		case PJGLFCCEFIL.OPTION_PARTICLES_OFF:
-			GameUtils.LEEIGNICAMN = true;
+		case QualityOptionType.OPTION_PARTICLES_OFF:
+			GameUtils.ParticlesDisabled = true;
 			break;
-		case PJGLFCCEFIL.OPTION_SRQUENCES_OFF:
-			GameUtils.GBCMHICHIOI = true;
+		case QualityOptionType.OPTION_SRQUENCES_OFF:
+			GameUtils.SequencesDisabled = true;
 			break;
 		default:
-			LLLOJBFMONN.Error("QualityOption::turnOption - unknown type: %s", _type);
+			GameLog.Error("QualityOption::turnOption - unknown type: %s", _type);
 			break;
 		}
 	}

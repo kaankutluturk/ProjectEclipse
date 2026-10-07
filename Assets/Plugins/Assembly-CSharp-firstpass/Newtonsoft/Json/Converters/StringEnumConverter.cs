@@ -81,7 +81,7 @@ namespace Newtonsoft.Json.Converters
 					{
 						string name = fieldInfo.Name;
 						string text = (from EnumMemberAttribute a in fieldInfo.GetCustomAttributes(typeof(EnumMemberAttribute), true)
-							select a.OEAKCOHMIHH()).SingleOrDefault() ?? fieldInfo.Name;
+							select a.GetValue()).SingleOrDefault() ?? fieldInfo.Name;
 						string first;
 						if (value.TryGetBySecond(text, out first))
 						{

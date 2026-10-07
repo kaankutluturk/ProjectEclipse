@@ -88,7 +88,7 @@ static class Program
             var fight=new Fight();Model body=fight.Player;
             if(guard=="pause")fight.Paused=true;if(guard=="title")fight.IsTitleSparring=true;if(guard=="versus")fight.IsLocalVersus=true;
             if(guard=="training")fight.FightDefinition.Type=BattleType.FightNone;if(guard=="pvp")fight.FightDefinition.Type=BattleType.FightPVP;if(guard=="online-raid")fight.FightDefinition.Type=BattleType.FightRaid;
-            if(guard=="stale")Fight.Current=null;if(guard=="closed")fight._modelTransitionsClosed=true;if(guard=="end-stage")fight.stageType=StageType.FDBBPEGEGMK.STAGE_END_STANCE;
+            if(guard=="stale")Fight.Current=null;if(guard=="closed")fight._modelTransitionsClosed=true;if(guard=="end-stage")fight.stageType=StageType.Stage.STAGE_END_STANCE;
             if(guard=="fight-end")fight._eclipseFightEndDispatched=true;if(guard=="ended-round")fight._eclipseEndedRound=1;
             if(guard=="stopped")fight.isStopFight=true;if(guard=="end-round")fight.isEndRound=true;if(guard=="game-over")fight.isGameOver=true;if(guard=="not-processing")fight.round.processing=false;
             if(guard=="dead")fight.Player.Health=0;if(guard=="child")body=new Model();if(guard=="no-session")ModRuntime.Scripts=null;

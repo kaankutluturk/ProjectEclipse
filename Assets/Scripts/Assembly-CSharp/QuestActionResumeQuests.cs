@@ -3,33 +3,33 @@ using System.Xml;
 
 public class QuestActionResumeQuests : QuestAction
 {
-	private QuestActionsSequence DBONDAIEBPN = new QuestActionsSequence();
+	private QuestActionsSequence successSequence = new QuestActionsSequence();
 
-	private QuestActionsSequence LDDDPGLPHCO = new QuestActionsSequence();
+	private QuestActionsSequence errorSequence = new QuestActionsSequence();
 
 	public override void Parse(XmlNode EPKLCPOEELO)
 	{
 		base.Parse(EPKLCPOEELO);
 		XmlNode ePKLCPOEELO = EPKLCPOEELO["Success"];
 		XmlNode ePKLCPOEELO2 = EPKLCPOEELO["Error"];
-		APKBANHAEGN(ePKLCPOEELO, DBONDAIEBPN, PMPMGDFGOML);
-		APKBANHAEGN(ePKLCPOEELO2, LDDDPGLPHCO, OnActionComplete);
+		ParseSequenceWithUnlock(ePKLCPOEELO, successSequence, OnSuccessComplete);
+		ParseSequenceWithUnlock(ePKLCPOEELO2, errorSequence, OnActionComplete);
 	}
 
-	public override void DEJMHFMLKIC(QuestParameters GFIHPBCEEOB)
+	public override void Execute(QuestParameters GFIHPBCEEOB)
 	{
-		GKFMJKAAJCA();
-		base.DEJMHFMLKIC(GFIHPBCEEOB);
-		Roster nKGLHEGIKKP = ListSF.CCDKHLAMKKO();
+		ResetSequences();
+		base.Execute(GFIHPBCEEOB);
+		Roster nKGLHEGIKKP = ListSF.GetRoster();
 		int num = 0;
-		List<RosterQuest> list = nKGLHEGIKKP.JNHBGEDJBLJ();
+		List<RosterQuest> list = nKGLHEGIKKP.GetQuests();
 		foreach (RosterQuest item in list)
 		{
 			if (ListSF.GetInstance().IsEclipseQuestSuppressed(item.Name, item.FileName)) continue;
-			if (ONGHPGEIJEN != item.Name && item.get_Parameters() != null)
+			if (QuestName != item.Name && item.get_Parameters() != null)
 			{
 				QuestStage mLLKDGBEGJI = ListSF.GetInstance().FindEclipseSavedQuest(item.Name, item.FileName);
-				if (mLLKDGBEGJI != null && !mLLKDGBEGJI.IDGAAJAFCHC())
+				if (mLLKDGBEGJI != null && !mLLKDGBEGJI.IsUnresumable())
 				{
 					num++;
 				}
@@ -39,28 +39,28 @@ public class QuestActionResumeQuests : QuestAction
 		bool flag = false;
 		if (num == 0 && (iPKNDMINFMJ == ScreenType.ModulePreloader || iPKNDMINFMJ == ScreenType.ModuleNone || flag))
 		{
-			LDDDPGLPHCO.DEJMHFMLKIC(GFIHPBCEEOB);
+			errorSequence.Run(GFIHPBCEEOB);
 		}
 		else
 		{
-			DBONDAIEBPN.DEJMHFMLKIC(GFIHPBCEEOB);
+			successSequence.Run(GFIHPBCEEOB);
 		}
 	}
 
 	private void OnActionComplete(object data)
 	{
-		OGIJONMKABB();
+		FinishAction();
 	}
 
-	private void PMPMGDFGOML(object data)
+	private void OnSuccessComplete(object data)
 	{
-		OGIJONMKABB();
-		ListSF.CCDKHLAMKKO().PBOFBNFALNN();
+		FinishAction();
+		ListSF.GetRoster().StartPendingQuests();
 	}
 
-	public override void GKFMJKAAJCA()
+	public override void ResetSequences()
 	{
-		DBONDAIEBPN.FHPKJMMLIEG();
-		LDDDPGLPHCO.FHPKJMMLIEG();
+		successSequence.Reset();
+		errorSequence.Reset();
 	}
 }

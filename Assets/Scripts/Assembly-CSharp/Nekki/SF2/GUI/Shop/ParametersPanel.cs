@@ -30,12 +30,12 @@ namespace Nekki.SF2.GUI.Shop
 		public void SetParameters(ItemInfo item, ItemInfo FJIENDKAIDO, bool OGMLCLNEAIJ)
 		{
 			Clear();
-			List<WarriorAttribute> iBLHIAHECLK = GameUtils.BGENALLCKII.IBLHIAHECLK;
+			List<WarriorAttribute> iBLHIAHECLK = GameUtils.WarriorAttributeList.AttributeList;
 			float num = 0f;
 			foreach (WarriorAttribute warriorItem in iBLHIAHECLK)
 			{
 				int OEMALIFPGPO = 0;
-				if (item == null || !item.ItemAttributes.Get(warriorItem.get_Name(), ref OEMALIFPGPO) || warriorItem.GDCBBAHKCIE || warriorItem.GDECIAJAFHH)
+				if (item == null || !item.ItemAttributes.Get(warriorItem.get_Name(), ref OEMALIFPGPO) || warriorItem.IsHidden || warriorItem.IsShopHidden)
 				{
 					continue;
 				}
@@ -52,7 +52,7 @@ namespace Nekki.SF2.GUI.Shop
 					if (component != null)
 					{
 						bool eIAKNKDEEKA = true;
-						component.Init(warriorItem.get_Name(), warriorItem.MJBPMLCLMFN, OEMALIFPGPO, OEMALIFPGPO2, eIAKNKDEEKA);
+						component.Init(warriorItem.get_Name(), warriorItem.IconName, OEMALIFPGPO, OEMALIFPGPO2, eIAKNKDEEKA);
 						num += component.get_MinHeight();
 						_items.Add(component);
 					}

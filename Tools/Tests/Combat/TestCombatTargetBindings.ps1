@@ -24,37 +24,37 @@ static class AiData {
  }
 }
 class ModelAi {
- enum CBGBLIPAMGA {SetWaitNone,OldWait}
- string HCJOIHLKOKJ="old weapon",_modDecisionTactic="keep tactic";
- InfoAnimation COKFBIJAFLH=new InfoAnimation{Name="old observed"},CGPDPHJIDPA=new InfoAnimation{Name="own"};
- int EBEHPENMJLK=77,MEHOEEIGCEP=44,NHIPFEIIPKG=18,_modDecisionFrame=123;
- bool BEEPJNOFDCK=true,_modDecisionOwned=true;
- CBGBLIPAMGA PLDABIGHHFG=CBGBLIPAMGA.OldWait;
- public string State()=>string.Join("|",HCJOIHLKOKJ,COKFBIJAFLH?.Name,CGPDPHJIDPA?.Name,
-  EBEHPENMJLK,MEHOEEIGCEP,NHIPFEIIPKG,BEEPJNOFDCK,PLDABIGHHFG,_modDecisionFrame,_modDecisionOwned,_modDecisionTactic);
- public bool Invalidated(string weapon)=>HCJOIHLKOKJ==weapon&&COKFBIJAFLH==null&&CGPDPHJIDPA.Name=="own"&&
-  EBEHPENMJLK==0&&MEHOEEIGCEP==-1&&NHIPFEIIPKG==1&&!BEEPJNOFDCK&&PLDABIGHHFG==CBGBLIPAMGA.SetWaitNone&&
+ enum WaitMode {SetWaitNone,OldWait}
+ string enemyWeaponSubtype="old weapon",_modDecisionTactic="keep tactic";
+ InfoAnimation enemyAnimation=new InfoAnimation{Name="old observed"},botAnimation=new InfoAnimation{Name="own"};
+ int responseDelay=77,enemyFrame=44,decisionWait=18,_modDecisionFrame=123;
+ bool waitRequested=true,_modDecisionOwned=true;
+ WaitMode waitMode=WaitMode.OldWait;
+ public string State()=>string.Join("|",enemyWeaponSubtype,enemyAnimation?.Name,botAnimation?.Name,
+  responseDelay,enemyFrame,decisionWait,waitRequested,waitMode,_modDecisionFrame,_modDecisionOwned,_modDecisionTactic);
+ public bool Invalidated(string weapon)=>enemyWeaponSubtype==weapon&&enemyAnimation==null&&botAnimation.Name=="own"&&
+  responseDelay==0&&enemyFrame==-1&&decisionWait==1&&!waitRequested&&waitMode==WaitMode.SetWaitNone&&
   _modDecisionFrame==-1&&!_modDecisionOwned&&_modDecisionTactic=="keep tactic";
  RESET
 }
 class ModelAnimation {
  public ModelAnimation Other; public bool Fail;
- public ModelAnimation OJKLPPNCONP()=>Other;
- public void NFEGCGJIICB(ModelAnimation value){if(Fail){Fail=false;throw new Exception("controlled binding failure");}Other=value;}
+ public ModelAnimation GetOtherAnimation()=>Other;
+ public void SetOtherAnimation(ModelAnimation value){if(Fail){Fail=false;throw new Exception("controlled binding failure");}Other=value;}
 }
 class Parameters { public Item Weapon=new Item(); }
 class Item { public string EffectiveTacticSubtype="knife"; }
 class Model {
- public class EventModel { public Model GAIBPAGPEGK; }
+ public class EventModel { public Model Opponent; }
  public List<Model> _Enemies=new List<Model>(); public ModelAnimation _Animation=new ModelAnimation();
- public ModelAi HJOGNGDMAKJ=new ModelAi(); public Model PNNMOKIBOPP;
- public EventModel KDAHHIMLJGG=new EventModel(); public int APOHBENDEKO=27;
+ public ModelAi ai=new ModelAi(); public Model combatTarget;
+ public EventModel EventData=new EventModel(); public int decisionDelay=27;
  public Parameters Parameters=new Parameters(); public Model Parent;
  public List<WeaponModel> Children=new List<WeaponModel>();
- public bool KIAFPPHPEEK()=>this is WeaponModel;
- public Model NJDJHGDMCIJ()=>Parent;
+ public bool IsWeapon()=>this is WeaponModel;
+ public Model GetParentModel()=>Parent;
  public List<WeaponModel> GetWeaponModels()=>Children;
- public void SetNearestEnemy(){PNNMOKIBOPP=_Enemies.FirstOrDefault();}
+ public void SetNearestEnemy(){combatTarget=_Enemies.FirstOrDefault();}
  METHODS
 }
 class WeaponModel:Model {}
@@ -69,27 +69,27 @@ static class Program {
   var oldChild=new WeaponModel{Parent=old};old.Children.Add(oldChild);
   var nextChild=new WeaponModel{Parent=next};next.Children.Add(nextChild);
   foreach(var source in new Model[]{root,ownChild}){
-   source._Enemies.AddRange(new Model[]{old,oldChild,friend});source.PNNMOKIBOPP=old;
-   source.KDAHHIMLJGG.GAIBPAGPEGK=old;source._Animation.Other=old._Animation;
+   source._Enemies.AddRange(new Model[]{old,oldChild,friend});source.combatTarget=old;
+   source.EventData.Opponent=old;source._Animation.Other=old._Animation;
   }
-  string aiBefore=root.HJOGNGDMAKJ.State(),childBefore=ownChild.HJOGNGDMAKJ.State();
+  string aiBefore=root.ai.State(),childBefore=ownChild.ai.State();
   var restore=root.ReplaceCombatEnemies(new[]{friend,next},next);
   foreach(var source in new Model[]{root,ownChild}){
    Check(source._Enemies.SequenceEqual(new Model[]{next,nextChild,friend}),"selected root and its children first; remaining roots retained");
-   Check(source.PNNMOKIBOPP==next,"cached target is selected root");
+   Check(source.combatTarget==next,"cached target is selected root");
    Check(source._Animation.Other==next._Animation,"animation target is selected root");
-   Check(source.KDAHHIMLJGG.GAIBPAGPEGK==next,"event target is selected root");
-   Check(source.HJOGNGDMAKJ.Invalidated("equivalent/sword"),"old AI observation, waits and handler throttle invalidated; own move and tactic retained");
-   Check(source.APOHBENDEKO==0,"native decision delay awakened");
-   source.SetNearestEnemy();Check(source.PNNMOKIBOPP==next,"insertion fallback retains explicit root target");
+   Check(source.EventData.Opponent==next,"event target is selected root");
+   Check(source.ai.Invalidated("equivalent/sword"),"old AI observation, waits and handler throttle invalidated; own move and tactic retained");
+   Check(source.decisionDelay==0,"native decision delay awakened");
+   source.SetNearestEnemy();Check(source.combatTarget==next,"insertion fallback retains explicit root target");
   }
   restore();
   foreach(var source in new Model[]{root,ownChild}){
    Check(source._Enemies.SequenceEqual(new Model[]{old,oldChild,friend}),"rollback restores exact enemy registry including child order");
-   Check(source.PNNMOKIBOPP==old&&source._Animation.Other==old._Animation&&source.KDAHHIMLJGG.GAIBPAGPEGK==old,"rollback restores cached, animation and event targets");
-   Check(source.APOHBENDEKO==27,"rollback restores native decision delay");
+   Check(source.combatTarget==old&&source._Animation.Other==old._Animation&&source.EventData.Opponent==old,"rollback restores cached, animation and event targets");
+   Check(source.decisionDelay==27,"rollback restores native decision delay");
   }
-  Check(root.HJOGNGDMAKJ.State()==aiBefore&&ownChild.HJOGNGDMAKJ.State()==childBefore,"rollback restores all touched AI state");
+  Check(root.ai.State()==aiBefore&&ownChild.ai.State()==childBefore,"rollback restores all touched AI state");
   Reject(()=>root.ReplaceCombatEnemies(null,null),"null root list rejected");
   Reject(()=>root.ReplaceCombatEnemies(new Model[]{null},null),"null root rejected");
   Reject(()=>root.ReplaceCombatEnemies(new[]{root},root),"self hostility rejected");
@@ -102,24 +102,24 @@ static class Program {
   var parented=new Model{Parent=old};Reject(()=>root.ReplaceCombatEnemies(new[]{parented},parented),"parented fighter rejected");
   var retired=new Model{_Animation=null};Reject(()=>root.ReplaceCombatEnemies(new[]{retired},retired),"retired hostile root rejected");
   var retiredSource=new Model{_Animation=null};Reject(()=>retiredSource.ReplaceCombatEnemies(new[]{next},next),"retired source rejected");
-  Check(root.HJOGNGDMAKJ.State()==aiBefore&&root.PNNMOKIBOPP==old,"validation failures leave original state");
+  Check(root.ai.State()==aiBefore&&root.combatTarget==old,"validation failures leave original state");
   next.Parameters.Weapon.EffectiveTacticSubtype="fail";
   Reject(()=>root.ReplaceCombatEnemies(new[]{next},next),"item mapping failure rejected before mutation");
-  Check(root.HJOGNGDMAKJ.State()==aiBefore&&root._Enemies[0]==old,"mapping failure leaves bindings intact");
+  Check(root.ai.State()==aiBefore&&root._Enemies[0]==old,"mapping failure leaves bindings intact");
   next.Parameters.Weapon=null;
   ownChild._Animation.Fail=true;
   Reject(()=>root.ReplaceCombatEnemies(new[]{next},next),"child binding failure propagates");
-  Check(root.HJOGNGDMAKJ.State()==aiBefore&&ownChild.HJOGNGDMAKJ.State()==childBefore,"child failure rolls back root and child AI");
-  Check(root.PNNMOKIBOPP==old&&ownChild.PNNMOKIBOPP==old&&root._Enemies.Contains(oldChild),"child failure restores target and registry");
+  Check(root.ai.State()==aiBefore&&ownChild.ai.State()==childBefore,"child failure rolls back root and child AI");
+  Check(root.combatTarget==old&&ownChild.combatTarget==old&&root._Enemies.Contains(oldChild),"child failure restores target and registry");
   var empty=root.ReplaceCombatEnemies(Array.Empty<Model>(),null);
-  Check(root._Enemies.Count==0&&ownChild._Enemies.Count==0&&root.PNNMOKIBOPP==null&&ownChild.PNNMOKIBOPP==null,"empty hostility clears root and children");
-  Check(root._Animation.Other==null&&root.KDAHHIMLJGG.GAIBPAGPEGK==null&&root.HJOGNGDMAKJ.Invalidated(null),"empty hostility clears animation/event/AI target");
+  Check(root._Enemies.Count==0&&ownChild._Enemies.Count==0&&root.combatTarget==null&&ownChild.combatTarget==null,"empty hostility clears root and children");
+  Check(root._Animation.Other==null&&root.EventData.Opponent==null&&root.ai.Invalidated(null),"empty hostility clears animation/event/AI target");
   empty();
   var unarmed=root.ReplaceCombatEnemies(new[]{next},next);
-  Check(root.HJOGNGDMAKJ.Invalidated(null),"unarmed target clears previous weapon subtype");
-  unarmed();root.KDAHHIMLJGG=null;
+  Check(root.ai.Invalidated(null),"unarmed target clears previous weapon subtype");
+  unarmed();root.EventData=null;
   var noEvent=root.ReplaceCombatEnemies(new[]{next},next);noEvent();
-  Check(root.PNNMOKIBOPP==old&&root.KDAHHIMLJGG==null,"missing event object is supported and restored");
+  Check(root.combatTarget==old&&root.EventData==null,"missing event object is supported and restored");
   Console.WriteLine("PASS: "+checks+" production atomic combat-target binding checks. AI/animation services controlled; native contacts require separate Unity acceptance.");
  }
 }

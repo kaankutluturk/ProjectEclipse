@@ -2,7 +2,7 @@ using System.Xml;
 
 public class NoButtonRule : Rule
 {
-	public enum AHIDMNNEAEC
+	public enum NoButtonType
 	{
 		ButtonTypePunch = 0,
 		ButtonTypeKick = 1,
@@ -12,39 +12,39 @@ public class NoButtonRule : Rule
 		ButtonTypeDefault = 5
 	}
 
-	private AHIDMNNEAEC EPICCMPJNOL;
+	private NoButtonType _buttonType;
 
 	public NoButtonRule(XmlNode node)
-		: base(BCBLLMPAMLP.RuleNoButton, node)
+		: base(RuleType.RuleNoButton, node)
 	{
-		EPICCMPJNOL = NHLDFLGFPPI(node);
+		_buttonType = ParseButtonType(node);
 	}
 
-	public AHIDMNNEAEC KBINIBAGEFM()
+	public NoButtonType GetButtonType()
 	{
-		return EPICCMPJNOL;
+		return _buttonType;
 	}
 
-	private AHIDMNNEAEC NHLDFLGFPPI(XmlNode node)
+	private NoButtonType ParseButtonType(XmlNode node)
 	{
-		string text = node.Attributes["Name"].CIPOICEEIBK(string.Empty);
+		string text = node.Attributes["Name"].GetStringOrDefault(string.Empty);
 		if (text != string.Empty)
 		{
 			switch (text)
 			{
 			case "Punch":
-				return AHIDMNNEAEC.ButtonTypePunch;
+				return NoButtonType.ButtonTypePunch;
 			case "Kick":
-				return AHIDMNNEAEC.ButtonTypeKick;
+				return NoButtonType.ButtonTypeKick;
 			case "Ranged":
-				return AHIDMNNEAEC.ButtonTypeRanged;
+				return NoButtonType.ButtonTypeRanged;
 			case "Magic":
-				return AHIDMNNEAEC.ButtonTypeMagic;
+				return NoButtonType.ButtonTypeMagic;
 			case "RaidCharge":
-				return AHIDMNNEAEC.ButtonTypeRaidCharge;
+				return NoButtonType.ButtonTypeRaidCharge;
 			}
 		}
-		LLLOJBFMONN.Error("Error - parseButtonType - unknown type");
-		return AHIDMNNEAEC.ButtonTypeDefault;
+		GameLog.Error("Error - parseButtonType - unknown type");
+		return NoButtonType.ButtonTypeDefault;
 	}
 }

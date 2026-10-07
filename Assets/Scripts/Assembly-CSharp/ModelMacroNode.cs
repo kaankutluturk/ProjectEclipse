@@ -8,11 +8,11 @@ public partial class ModelMacroNode : ModelNode
 	// best guess for name
 	private List<global::Pair<ModelNode, float>> _nodeWeights = new List<global::Pair<ModelNode, float>>();
 
-	public List<global::Pair<ModelNode, float>> AAHADKFKDPN
+	public List<global::Pair<ModelNode, float>> NodeWeights
 	{
 		get
 		{
-			return LDEBJOPLCKO();
+			return GetNodeWeights();
 		}
 	}
 
@@ -29,17 +29,17 @@ public partial class ModelMacroNode : ModelNode
 		SetType(NodeType.MacroNode);
 	}
 
-	public List<global::Pair<ModelNode, float>> LDEBJOPLCKO()
+	public List<global::Pair<ModelNode, float>> GetNodeWeights()
 	{
 		return _nodeWeights;
 	}
 
-	public void DNCHNPNABFH(ModelNode BFEBLBKODLK, float EBIFKGEMHLK)
+	public void AddNodeWeight(ModelNode BFEBLBKODLK, float EBIFKGEMHLK)
 	{
 		_nodeWeights.Add(new global::Pair<ModelNode, float>(BFEBLBKODLK, EBIFKGEMHLK));
 	}
 
-	public void FPKMHOMMFKB()
+	public void UpdateFromWeights()
 	{
 		if (_skipMacroUpdate)
 		{
@@ -54,7 +54,7 @@ public partial class ModelMacroNode : ModelNode
 		for (int i = 0; i < count; i++)
 		{
 			cCKLNOPEKHO = _nodeWeights[i];
-			_Start.GLGNIMKANCA(cCKLNOPEKHO.First.GetStart(), cCKLNOPEKHO.Second);
+			_Start.AddScaledXY(cCKLNOPEKHO.First.GetStart(), cCKLNOPEKHO.Second);
 		}
 	}
 }

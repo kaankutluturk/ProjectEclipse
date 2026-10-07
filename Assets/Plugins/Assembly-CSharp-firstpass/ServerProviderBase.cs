@@ -13,60 +13,60 @@ using UnityEngine;
 
 public abstract class ServerProviderBase : MonoBehaviour
 {
-	public class APKPDGMFGDL
+	public class SelectQuery
 	{
 		private string _table;
 
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		private string[] CIIOOOFFJHD;
+		private string[] fields;
 
-		private DHBAMBIHOEC[] _conditions;
+		private QueryCondition[] _conditions;
 
-		private string[] POGAKCIFKDH;
+		private string[] providerOrder;
 
 		private int? _limit;
 
-		public string[] JMKBOELCNPO
+		public string[] Fields
 		{
 			get
 			{
-				return CKOJIABCEBP();
+				return GetFields();
 			}
 			private set
 			{
-				EOJFFGAAGOA(value);
+				SetFields(value);
 			}
 		}
 
-		public APKPDGMFGDL(string BFGHBIMJHAK, string[] KHGIIFDIHHA, DHBAMBIHOEC[] conditions, string[] order, int? LOHCIKNKDEI)
+		public SelectQuery(string BFGHBIMJHAK, string[] KHGIIFDIHHA, QueryCondition[] conditions, string[] order, int? LOHCIKNKDEI)
 		{
 			_table = BFGHBIMJHAK;
-			EOJFFGAAGOA(KHGIIFDIHHA);
+			SetFields(KHGIIFDIHHA);
 			_conditions = conditions;
-			POGAKCIFKDH = order;
+			providerOrder = order;
 			_limit = LOHCIKNKDEI;
 		}
 
-		public string[] CKOJIABCEBP()
+		public string[] GetFields()
 		{
-			return CIIOOOFFJHD;
+			return fields;
 		}
 
-		private void EOJFFGAAGOA(string[] value)
+		private void SetFields(string[] value)
 		{
-			CIIOOOFFJHD = value;
+			fields = value;
 		}
 
-		private Form HLKOMKMFAHH()
+		private Form ToForm()
 		{
 			Form lBFANOCPALF = new Form();
 			lBFANOCPALF.Add("table", _table);
 			StringBuilder stringBuilder = new StringBuilder();
 			stringBuilder.Append("[");
-			for (int i = 0; i < CKOJIABCEBP().Length; i++)
+			for (int i = 0; i < GetFields().Length; i++)
 			{
-				stringBuilder.Append(string.Format("\"{0}\"", CKOJIABCEBP()[i]));
-				if (i < CKOJIABCEBP().Length - 1)
+				stringBuilder.Append(string.Format("\"{0}\"", GetFields()[i]));
+				if (i < GetFields().Length - 1)
 				{
 					stringBuilder.Append(",");
 				}
@@ -75,16 +75,16 @@ public abstract class ServerProviderBase : MonoBehaviour
 			lBFANOCPALF.Add("fields", stringBuilder.ToString());
 			if (_conditions != null)
 			{
-				lBFANOCPALF.Add("where", DHBAMBIHOEC.HLKOMKMFAHH(_conditions));
+				lBFANOCPALF.Add("where", QueryCondition.ToJson(_conditions));
 			}
-			if (POGAKCIFKDH != null)
+			if (providerOrder != null)
 			{
 				StringBuilder stringBuilder2 = new StringBuilder();
 				stringBuilder2.Append("[");
-				for (int j = 0; j < POGAKCIFKDH.Length; j++)
+				for (int j = 0; j < providerOrder.Length; j++)
 				{
-					stringBuilder2.Append(string.Format("\"{0}\"", POGAKCIFKDH[j]));
-					if (j < POGAKCIFKDH.Length - 1)
+					stringBuilder2.Append(string.Format("\"{0}\"", providerOrder[j]));
+					if (j < providerOrder.Length - 1)
 					{
 						stringBuilder2.Append(",");
 					}
@@ -101,71 +101,71 @@ public abstract class ServerProviderBase : MonoBehaviour
 		}
 
 		[SpecialName]
-		public static WWWForm op_Implicit(APKPDGMFGDL JHELEGOAKFH)
+		public static WWWForm op_Implicit(SelectQuery JHELEGOAKFH)
 		{
-			return Form.op_Implicit(JHELEGOAKFH.HLKOMKMFAHH());
+			return Form.op_Implicit(JHELEGOAKFH.ToForm());
 		}
 	}
 
-	public class DHBAMBIHOEC
+	public class QueryCondition
 	{
-		private string FEEOCAFHHFP;
+		private string field;
 
-		private string AOJJBKLCHJO;
+		private string op;
 
 		private string value;
 
-		private DHBAMBIHOEC()
+		private QueryCondition()
 		{
 		}
 
-		public static DHBAMBIHOEC IAFFDNEHLFF(string FEEOCAFHHFP, object value)
+		public static QueryCondition Greater(string FEEOCAFHHFP, object value)
 		{
-			DHBAMBIHOEC dHBAMBIHOEC = new DHBAMBIHOEC();
-			dHBAMBIHOEC.FEEOCAFHHFP = FEEOCAFHHFP;
-			dHBAMBIHOEC.AOJJBKLCHJO = ">";
+			QueryCondition dHBAMBIHOEC = new QueryCondition();
+			dHBAMBIHOEC.field = FEEOCAFHHFP;
+			dHBAMBIHOEC.op = ">";
 			dHBAMBIHOEC.value = value.ToString();
 			return dHBAMBIHOEC;
 		}
 
-		public static DHBAMBIHOEC LDCKIFIJOAH(string FEEOCAFHHFP, object value)
+		public static QueryCondition Less(string FEEOCAFHHFP, object value)
 		{
-			DHBAMBIHOEC dHBAMBIHOEC = new DHBAMBIHOEC();
-			dHBAMBIHOEC.FEEOCAFHHFP = FEEOCAFHHFP;
-			dHBAMBIHOEC.AOJJBKLCHJO = "<";
+			QueryCondition dHBAMBIHOEC = new QueryCondition();
+			dHBAMBIHOEC.field = FEEOCAFHHFP;
+			dHBAMBIHOEC.op = "<";
 			dHBAMBIHOEC.value = value.ToString();
 			return dHBAMBIHOEC;
 		}
 
-		public static DHBAMBIHOEC Equals(string FEEOCAFHHFP, object value)
+		public static QueryCondition Equals(string FEEOCAFHHFP, object value)
 		{
-			DHBAMBIHOEC dHBAMBIHOEC = new DHBAMBIHOEC();
-			dHBAMBIHOEC.FEEOCAFHHFP = FEEOCAFHHFP;
-			dHBAMBIHOEC.AOJJBKLCHJO = "=";
+			QueryCondition dHBAMBIHOEC = new QueryCondition();
+			dHBAMBIHOEC.field = FEEOCAFHHFP;
+			dHBAMBIHOEC.op = "=";
 			dHBAMBIHOEC.value = value.ToString();
 			return dHBAMBIHOEC;
 		}
 
-		public static DHBAMBIHOEC JFMBIGDDPNG(string FEEOCAFHHFP, string LADOAFMFCGL, object value)
+		public static QueryCondition Custom(string FEEOCAFHHFP, string LADOAFMFCGL, object value)
 		{
-			DHBAMBIHOEC dHBAMBIHOEC = new DHBAMBIHOEC();
-			dHBAMBIHOEC.FEEOCAFHHFP = FEEOCAFHHFP;
-			dHBAMBIHOEC.AOJJBKLCHJO = LADOAFMFCGL;
+			QueryCondition dHBAMBIHOEC = new QueryCondition();
+			dHBAMBIHOEC.field = FEEOCAFHHFP;
+			dHBAMBIHOEC.op = LADOAFMFCGL;
 			dHBAMBIHOEC.value = value.ToString();
 			return dHBAMBIHOEC;
 		}
 
-		public string HLKOMKMFAHH()
+		public string ToJson()
 		{
-			return string.Format("[\"{0}\",\"{1}\",\"{2}\"]", FEEOCAFHHFP, AOJJBKLCHJO, value);
+			return string.Format("[\"{0}\",\"{1}\",\"{2}\"]", field, op, value);
 		}
 
-		public static string HLKOMKMFAHH(DHBAMBIHOEC[] conditions)
+		public static string ToJson(QueryCondition[] conditions)
 		{
 			string text = "[";
 			for (int i = 0; i < conditions.Length; i++)
 			{
-				text += conditions[i].HLKOMKMFAHH();
+				text += conditions[i].ToJson();
 				if (i != conditions.Length - 1)
 				{
 					text += ",";
@@ -175,15 +175,15 @@ public abstract class ServerProviderBase : MonoBehaviour
 		}
 	}
 
-	public class FGHAAKOBGGN
+	public class QueryValue
 	{
 		private readonly string _value;
 
-		public string CIPOICEEIBK
+		public string AsString
 		{
 			get
 			{
-				return AKMCEMFFOBE();
+				return GetString();
 			}
 		}
 
@@ -191,7 +191,7 @@ public abstract class ServerProviderBase : MonoBehaviour
 		{
 			get
 			{
-				return DLHFMAMPMPM();
+				return GetFloat();
 			}
 		}
 
@@ -199,69 +199,69 @@ public abstract class ServerProviderBase : MonoBehaviour
 		{
 			get
 			{
-				return MKAAOLMHECH();
+				return GetInt();
 			}
 		}
 
-		public FGHAAKOBGGN(string value)
+		public QueryValue(string value)
 		{
 			_value = value ?? string.Empty;
 		}
 
-		public string AKMCEMFFOBE()
+		public string GetString()
 		{
 			return _value;
 		}
 
-		public float DLHFMAMPMPM()
+		public float GetFloat()
 		{
 			return float.Parse(_value);
 		}
 
-		public int MKAAOLMHECH()
+		public int GetInt()
 		{
 			return int.Parse(_value);
 		}
 
 		public override string ToString()
 		{
-			return AKMCEMFFOBE();
+			return GetString();
 		}
 	}
 
 	[DefaultMember("Item")]
-	public class BKPEDCFDPNN
+	public class QueryRow
 	{
-		private readonly Dictionary<string, FGHAAKOBGGN> GCGGIJDKKKO;
+		private readonly Dictionary<string, QueryValue> values;
 
 		// C# has no syntax for parameterized property 'DLKPBAJDHBO'.
-		public FGHAAKOBGGN get_DLKPBAJDHBO(string index)
+		public QueryValue get_DLKPBAJDHBO(string index)
 		{
 			return get_Item(index);
 		}
 
-		public BKPEDCFDPNN(Dictionary<string, FGHAAKOBGGN> DMNBDBJNKME)
+		public QueryRow(Dictionary<string, QueryValue> DMNBDBJNKME)
 		{
-			GCGGIJDKKKO = DMNBDBJNKME;
+			values = DMNBDBJNKME;
 		}
 
-		public FGHAAKOBGGN get_Item(string index)
+		public QueryValue get_Item(string index)
 		{
-			if (!GCGGIJDKKKO.ContainsKey(index.ToLower()))
+			if (!values.ContainsKey(index.ToLower()))
 			{
-				AdvLog.LOPHFKMOPAA("there no data for key " + index.ToLower());
+				AdvLog.LogWarning("there no data for key " + index.ToLower());
 			}
-			return GCGGIJDKKKO[index.ToLower()];
+			return values[index.ToLower()];
 		}
 	}
 
 	[DefaultMember("Item")]
-	public class NNFJBMBACHB
+	public class QueryResult
 	{
-		private readonly List<BKPEDCFDPNN> _data = new List<BKPEDCFDPNN>();
+		private readonly List<QueryRow> _data = new List<QueryRow>();
 
 		// C# has no syntax for parameterized property 'DLKPBAJDHBO'.
-		public BKPEDCFDPNN get_DLKPBAJDHBO(int index)
+		public QueryRow get_DLKPBAJDHBO(int index)
 		{
 			return get_Item(index);
 		}
@@ -270,7 +270,7 @@ public abstract class ServerProviderBase : MonoBehaviour
 		{
 			get
 			{
-				return OFOPFCJNEBL();
+				return GetCount();
 			}
 		}
 
@@ -278,34 +278,34 @@ public abstract class ServerProviderBase : MonoBehaviour
 		{
 			get
 			{
-				return KLNLNKBIDGD();
+				return IsEmpty();
 			}
 		}
 
-		public NNFJBMBACHB(JSONArray EMDHMHOKGFP, APKPDGMFGDL JHELEGOAKFH)
+		public QueryResult(JSONArray EMDHMHOKGFP, SelectQuery JHELEGOAKFH)
 		{
 			for (int i = 0; i < EMDHMHOKGFP.Count; i++)
 			{
-				Dictionary<string, FGHAAKOBGGN> dictionary = new Dictionary<string, FGHAAKOBGGN>();
-				for (int j = 0; j < JHELEGOAKFH.CKOJIABCEBP().Length; j++)
+				Dictionary<string, QueryValue> dictionary = new Dictionary<string, QueryValue>();
+				for (int j = 0; j < JHELEGOAKFH.GetFields().Length; j++)
 				{
-					dictionary.Add(JHELEGOAKFH.CKOJIABCEBP()[j].ToLower(), new FGHAAKOBGGN(EMDHMHOKGFP[i].AsArray[j]));
+					dictionary.Add(JHELEGOAKFH.GetFields()[j].ToLower(), new QueryValue(EMDHMHOKGFP[i].AsArray[j]));
 				}
-				_data.Add(new BKPEDCFDPNN(dictionary));
+				_data.Add(new QueryRow(dictionary));
 			}
 		}
 
-		public BKPEDCFDPNN get_Item(int index)
+		public QueryRow get_Item(int index)
 		{
 			return _data[index];
 		}
 
-		public int OFOPFCJNEBL()
+		public int GetCount()
 		{
 			return _data.Count;
 		}
 
-		public bool KLNLNKBIDGD()
+		public bool IsEmpty()
 		{
 			return _data.Count == 0;
 		}
@@ -313,54 +313,54 @@ public abstract class ServerProviderBase : MonoBehaviour
 
 	public class FileData
 	{
-		private string IPJFPMMAKMB;
+		private string mimeType;
 
 		private string _source;
 
-		private string PCOGLHJCLEG;
+		private string fileName;
 
-		public string GLJIAOAHJNE
+		public string MimeType
 		{
 			get
 			{
-				return DIHKMAKOHGN();
+				return GetMimeType();
 			}
 		}
 
-		public string NNPFICBIAKI
+		public string FileName
 		{
 			get
 			{
-				return EOHCHEKOMFB();
+				return GetFileName();
 			}
 		}
 
-		public string GNDLHEMMGPH
+		public string SourceName
 		{
 			get
 			{
-				return JGNPLINLCGC();
+				return GetSource();
 			}
 		}
 
 		public FileData(string BBNKIBKPBLO, string NOLDJLJIPOG, string GNIBJBFNGAD)
 		{
 			_source = BBNKIBKPBLO;
-			PCOGLHJCLEG = NOLDJLJIPOG;
-			IPJFPMMAKMB = GNIBJBFNGAD;
+			fileName = NOLDJLJIPOG;
+			mimeType = GNIBJBFNGAD;
 		}
 
-		public string DIHKMAKOHGN()
+		public string GetMimeType()
 		{
-			return IPJFPMMAKMB;
+			return mimeType;
 		}
 
-		public string EOHCHEKOMFB()
+		public string GetFileName()
 		{
-			return PCOGLHJCLEG;
+			return fileName;
 		}
 
-		public string JGNPLINLCGC()
+		public string GetSource()
 		{
 			return _source;
 		}
@@ -370,15 +370,15 @@ public abstract class ServerProviderBase : MonoBehaviour
 	{
 		private readonly List<KeyValuePair<string, string>> _data = new List<KeyValuePair<string, string>>();
 
-		private readonly List<KeyValuePair<string, FileData>> LKLAKNDFCKG = new List<KeyValuePair<string, FileData>>();
+		private readonly List<KeyValuePair<string, FileData>> files = new List<KeyValuePair<string, FileData>>();
 
 		private static string _key = "DGgim7dg7cbknRCxVOAlXfGVtjOPyZls";
 
-		public static string ENFBNOGCCBH
+		public static string SigningKey
 		{
 			get
 			{
-				return AENLBNDAEKB();
+				return GetKey();
 			}
 			set
 			{
@@ -391,7 +391,7 @@ public abstract class ServerProviderBase : MonoBehaviour
 			Add("rand", UnityEngine.Random.Range(0, int.MaxValue));
 		}
 
-		public static string AENLBNDAEKB()
+		public static string GetKey()
 		{
 			return _key;
 		}
@@ -406,16 +406,16 @@ public abstract class ServerProviderBase : MonoBehaviour
 			_data.Add(new KeyValuePair<string, string>(KGBGENDIMBC, value.ToString()));
 		}
 
-		public void HIIBLOGOILG(string KGBGENDIMBC, FileData OONGGDBLOHH)
+		public void AddFile(string KGBGENDIMBC, FileData OONGGDBLOHH)
 		{
 			KeyValuePair<string, FileData> item = new KeyValuePair<string, FileData>(KGBGENDIMBC, OONGGDBLOHH);
-			LKLAKNDFCKG.Add(item);
+			files.Add(item);
 		}
 
 		[SpecialName]
 		public static WWWForm op_Implicit(Form HOELLMLEBAK)
 		{
-			HOELLMLEBAK._data.Sort(MJKNBEKEJLP);
+			HOELLMLEBAK._data.Sort(CompareByKey);
 			WWWForm wWWForm = new WWWForm();
 			StringBuilder stringBuilder = new StringBuilder();
 			for (int i = 0; i < HOELLMLEBAK._data.Count; i++)
@@ -423,13 +423,13 @@ public abstract class ServerProviderBase : MonoBehaviour
 				stringBuilder.Append(string.Format("{0}={1}", HOELLMLEBAK._data[i].Key, HOELLMLEBAK._data[i].Value));
 				wWWForm.AddField(HOELLMLEBAK._data[i].Key, HOELLMLEBAK._data[i].Value);
 			}
-			foreach (KeyValuePair<string, FileData> item in HOELLMLEBAK.LKLAKNDFCKG)
+			foreach (KeyValuePair<string, FileData> item in HOELLMLEBAK.files)
 			{
 				string key = item.Key;
-				string iFKJHHPJPLP = item.Value.JGNPLINLCGC();
-				byte[] contents = HCEPBIAOJKG.OEPBCILIGPI(iFKJHHPJPLP);
-				string fileName = item.Value.EOHCHEKOMFB();
-				string mimeType = item.Value.DIHKMAKOHGN();
+				string iFKJHHPJPLP = item.Value.GetSource();
+				byte[] contents = FileUtils.ReadAllBytes(iFKJHHPJPLP);
+				string fileName = item.Value.GetFileName();
+				string mimeType = item.Value.GetMimeType();
 				wWWForm.AddBinaryData(key, contents, fileName, mimeType);
 			}
 			stringBuilder.Append(_key);
@@ -439,12 +439,12 @@ public abstract class ServerProviderBase : MonoBehaviour
 			return wWWForm;
 		}
 
-		private static int MJKNBEKEJLP(KeyValuePair<string, string> DIHJILMHNGB, KeyValuePair<string, string> KBEKLNMPDDE)
+		private static int CompareByKey(KeyValuePair<string, string> DIHJILMHNGB, KeyValuePair<string, string> KBEKLNMPDDE)
 		{
 			return string.Compare(DIHJILMHNGB.Key, KBEKLNMPDDE.Key, StringComparison.Ordinal);
 		}
 
-		public JSONClass LINEPHBFDFM()
+		public JSONClass ToJsonClass()
 		{
 			JSONClass jSONClass = new JSONClass();
 			for (int i = 0; i < _data.Count; i++)
@@ -465,15 +465,15 @@ public abstract class ServerProviderBase : MonoBehaviour
 		}
 	}
 
-	protected class FFCINPEAEBE
+	protected class ServerResponse
 	{
 		public string GIHDDAKBMHE;
 
 		public string JDONBAPIJCG;
 
-		public static FFCINPEAEBE Get(string EMDHMHOKGFP)
+		public static ServerResponse Get(string EMDHMHOKGFP)
 		{
-			return JsonConvert.DeserializeObject<FFCINPEAEBE>(EMDHMHOKGFP);
+			return JsonConvert.DeserializeObject<ServerResponse>(EMDHMHOKGFP);
 		}
 	}
 
@@ -482,17 +482,17 @@ public abstract class ServerProviderBase : MonoBehaviour
 	private readonly List<IEnumerator> _holdRoutine = new List<IEnumerator>();
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private static ServerProviderBase OGKMDFDNIEN;
+	private static ServerProviderBase instance;
 
-	protected static GameObject GLOLDAJOGNK
+	protected static GameObject NestedObject
 	{
 		get
 		{
-			return CCIJPFJNGCE();
+			return GetNestedObject();
 		}
 	}
 
-	public static ServerProviderBase BPCBBHAKFDM
+	public static ServerProviderBase CurrentInstance
 	{
 		get
 		{
@@ -504,9 +504,9 @@ public abstract class ServerProviderBase : MonoBehaviour
 		}
 	}
 
-	protected abstract string NFKOPHMCLFF();
+	protected abstract string GetServerUrl();
 
-	protected static GameObject CCIJPFJNGCE()
+	protected static GameObject GetNestedObject()
 	{
 		return _nestedObject;
 	}
@@ -530,12 +530,12 @@ public abstract class ServerProviderBase : MonoBehaviour
 
 	public static ServerProviderBase get_Instance()
 	{
-		return OGKMDFDNIEN;
+		return instance;
 	}
 
 	protected static void set_Instance(ServerProviderBase value)
 	{
-		OGKMDFDNIEN = value;
+		instance = value;
 	}
 
 	protected static T Init<T>() where T : ServerProviderBase
@@ -562,7 +562,7 @@ public abstract class ServerProviderBase : MonoBehaviour
 		Init();
 		if (!_nestedObject)
 		{
-			AdvLog.CCOFFJPPAKC("ServerCall terminated. you should call Init<T>() from your Init() method! (where T is your inherited class)");
+			AdvLog.LogError("ServerCall terminated. you should call Init<T>() from your Init() method! (where T is your inherited class)");
 			return false;
 		}
 		return true;
@@ -632,17 +632,17 @@ public abstract class ServerProviderBase : MonoBehaviour
 		yield break;
 	}
 
-	public virtual NNFJBMBACHB Query(APKPDGMFGDL KOGEDGJJMPO)
+	public virtual QueryResult Query(SelectQuery KOGEDGJJMPO)
 	{
 		throw new NotSupportedException("Remote queries are disabled in the offline build.");
 	}
 
-	public virtual void Query(APKPDGMFGDL KOGEDGJJMPO, Action<NNFJBMBACHB> onDone, Action<string> onError)
+	public virtual void Query(SelectQuery KOGEDGJJMPO, Action<QueryResult> onDone, Action<string> onError)
 	{
 		onError?.Invoke("offline build");
 	}
 
-	protected virtual IEnumerator LGDPJMAFNJH(APKPDGMFGDL KOGEDGJJMPO, Action<NNFJBMBACHB> onDone, Action<string> onError)
+	protected virtual IEnumerator QueryRoutine(SelectQuery KOGEDGJJMPO, Action<QueryResult> onDone, Action<string> onError)
 	{
 		onError?.Invoke("offline build");
 		yield break;

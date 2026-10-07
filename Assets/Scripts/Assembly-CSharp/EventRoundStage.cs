@@ -2,36 +2,36 @@ using System.Xml;
 
 public class EventRoundStage : EventAnimation
 {
-	private StageType.FDBBPEGEGMK ABENLPAPJIC;
+	private StageType.Stage stage;
 
-	public StageType.FDBBPEGEGMK CCELFHJCJBN
+	public StageType.Stage Stage
 	{
 		get
 		{
-			return IEDKJLFBCBK();
+			return GetStage();
 		}
 	}
 
 	public EventRoundStage()
-		: base(EECEJKADLCK.EVENT_ROUND_STAGE)
+		: base(EventAnimationType.EVENT_ROUND_STAGE)
 	{
-		ABENLPAPJIC = StageType.FDBBPEGEGMK.STAGE_NONE;
+		stage = StageType.Stage.STAGE_NONE;
 	}
 
-	public StageType.FDBBPEGEGMK IEDKJLFBCBK()
+	public StageType.Stage GetStage()
 	{
-		return ABENLPAPJIC;
+		return stage;
 	}
 
 	protected override bool Compare(EventAnimation FOPOKALJIIJ)
 	{
 		EventRoundStage gBIJAGPBADA = FOPOKALJIIJ as EventRoundStage;
-		bool flag = gBIJAGPBADA.ABENLPAPJIC == ABENLPAPJIC;
+		bool flag = gBIJAGPBADA.stage == stage;
 		return (!IsNot) ? flag : (!flag);
 	}
 
 	protected override void Parse(XmlNode MEEAKLDGLDF)
 	{
-		ABENLPAPJIC = StageType.GetStageByName(LJICHLHMBFA);
+		stage = StageType.GetStageByName(AnimationName);
 	}
 }

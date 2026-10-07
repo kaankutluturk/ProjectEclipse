@@ -6,7 +6,7 @@ public class SysDlg : MonoBehaviour
 
 	private static bool _exit;
 
-	private static SysDlg EDAPJLKMFPC;
+	private static SysDlg instance;
 
 	private static Texture2D _t;
 
@@ -19,9 +19,9 @@ public class SysDlg : MonoBehaviour
 		}
 		_message = LIOGIBJBHAH;
 		_exit = ONBPFALHBAN;
-		if (!EDAPJLKMFPC)
+		if (!instance)
 		{
-			EDAPJLKMFPC = new GameObject("_message").AddComponent<SysDlg>();
+			instance = new GameObject("_message").AddComponent<SysDlg>();
 		}
 		Time.timeScale = 0f;
 	}

@@ -7,90 +7,90 @@ using System.Text.RegularExpressions;
 using YamlDotNet.Core;
 using YamlDotNet.Core.Tokens;
 
-public class Emitter : NEKGJNOFOFN
+public class Emitter : IEmitter
 {
-	private class JOIPMMGCJDB
+	private class AnchorData
 	{
-		public string KOLNNNLOCFE;
+		public string anchor;
 
-		public bool LCPNKFDMFIA;
+		public bool isAlias;
 	}
 
-	private class PMJADAOHGKL
+	private class TagData
 	{
-		public string FODGADCGDBH;
+		public string handle;
 
-		public string NCFFAGOLJEC;
+		public string suffix;
 	}
 
-	private class APEFHDKHMCA
+	private class ScalarData
 	{
 		public string value;
 
-		public bool IKBPKEEMMCA;
+		public bool isMultiline;
 
-		public bool KBJBLFNOFKI;
+		public bool isFlowPlainAllowed;
 
-		public bool KGHHDKEBHJP;
+		public bool isBlockPlainAllowed;
 
-		public bool EFJAPPGNNIJ;
+		public bool isSingleQuotedAllowed;
 
-		public bool KHNFEFCDPKM;
+		public bool isBlockAllowed;
 
-		public IBEOFCPMMJJ KIGNIBIMLKK;
+		public ScalarStyle style;
 	}
 
-	private const int ILLDKDDPKAO = 4;
+	private const int MinBestIndent = 4;
 
-	private const int BOLCAPFKBHO = 9;
+	private const int MaxBestIndent = 9;
 
-	private const int PIKKOLCJLDD = 128;
+	private const int MaxAliasLength = 128;
 
 	private static readonly Regex uriReplacer = new Regex("[^0-9A-Za-z_\\-;?@=$~\\\\\\)\\]/:&+,\\.\\*\\(\\[!]", RegexOptions.Singleline);
 
 	private readonly TextWriter output;
 
-	private readonly bool LGDHGOGFFCJ;
+	private readonly bool isCanonical;
 
-	private readonly int EMOCJNOCJKM;
+	private readonly int bestIndent;
 
-	private readonly int CEIKEMJHLKL;
+	private readonly int bestWidth;
 
-	private PFIHGFCNOEG state;
+	private EmitterStateKind state;
 
-	private readonly Stack<PFIHGFCNOEG> LNJBMLMFKDH = new Stack<PFIHGFCNOEG>();
+	private readonly Stack<EmitterStateKind> states = new Stack<EmitterStateKind>();
 
-	private readonly Queue<ParsingEvent> DNBFFLFBDOB = new Queue<ParsingEvent>();
+	private readonly Queue<ParsingEvent> events = new Queue<ParsingEvent>();
 
 	private readonly Stack<int> indents = new Stack<int>();
 
-	private readonly TagDirectiveCollection FMCEHNBELJF = new TagDirectiveCollection();
+	private readonly TagDirectiveCollection tagDirectives = new TagDirectiveCollection();
 
-	private int AIBHPFBFGNA;
+	private int indent;
 
-	private int FLNOCBGGCPP;
+	private int flowLevel;
 
-	private bool MLJMBHGNABP;
+	private bool isMappingContext;
 
-	private bool LMHKCBPDCNH;
+	private bool isSimpleKeyContext;
 
-	private bool MIBEGFBMLEC;
+	private bool isRootContext;
 
-	private int DLPJJBPDNDE;
+	private int column;
 
-	private bool JNNJNNGLDHF;
+	private bool isWhitespace;
 
-	private bool GAMIKMDGHLL;
+	private bool isIndentation;
 
-	private bool MIBHHFPMBID;
+	private bool isOpenEnded;
 
-	private bool FDLHHPENADJ;
+	private bool isDocumentEndWritten;
 
-	private readonly JOIPMMGCJDB MOIAINBHLBA = new JOIPMMGCJDB();
+	private readonly AnchorData anchorData = new AnchorData();
 
-	private readonly PMJADAOHGKL KLIMKJBCHOC = new PMJADAOHGKL();
+	private readonly TagData tagData = new TagData();
 
-	private readonly APEFHDKHMCA AKIFIIJIHGI = new APEFHDKHMCA();
+	private readonly ScalarData scalarData = new ScalarData();
 
 	public Emitter(TextWriter output)
 		: this(output, 4)
@@ -113,72 +113,72 @@ public class Emitter : NEKGJNOFOFN
 		{
 			throw new ArgumentOutOfRangeException("bestIndent", string.Format(CultureInfo.InvariantCulture, "The bestIndent parameter must be between {0} and {1}.", 4, 9));
 		}
-		this.EMOCJNOCJKM = EMOCJNOCJKM;
+		this.bestIndent = EMOCJNOCJKM;
 		if (CEIKEMJHLKL <= EMOCJNOCJKM * 2)
 		{
 			throw new ArgumentOutOfRangeException("bestWidth", "The bestWidth parameter must be greater than bestIndent * 2.");
 		}
-		this.CEIKEMJHLKL = CEIKEMJHLKL;
-		this.LGDHGOGFFCJ = LGDHGOGFFCJ;
+		this.bestWidth = CEIKEMJHLKL;
+		this.isCanonical = LGDHGOGFFCJ;
 		this.output = output;
 	}
 
 	public void Emit(ParsingEvent KEAJCHAAIEP)
 	{
-		DNBFFLFBDOB.Enqueue(KEAJCHAAIEP);
-		while (!PDPBHNAGIGF())
+		events.Enqueue(KEAJCHAAIEP);
+		while (!NeedMoreEvents())
 		{
-			ParsingEvent iILOLJJLLGH = DNBFFLFBDOB.Peek();
+			ParsingEvent iILOLJJLLGH = events.Peek();
 			try
 			{
-				NBOGMMDPKHO(iILOLJJLLGH);
-				GIKHOKIFGLH(iILOLJJLLGH);
+				AnalyzeEvent(iILOLJJLLGH);
+				StateMachine(iILOLJJLLGH);
 			}
 			finally
 			{
-				DNBFFLFBDOB.Dequeue();
+				events.Dequeue();
 			}
 		}
 	}
 
-	private bool PDPBHNAGIGF()
+	private bool NeedMoreEvents()
 	{
-		if (DNBFFLFBDOB.Count == 0)
+		if (events.Count == 0)
 		{
 			return true;
 		}
 		int num;
-		switch (DNBFFLFBDOB.Peek().get_Type())
+		switch (events.Peek().get_Type())
 		{
-		case BHBPOHDAGPH.DocumentStart:
+		case ParsingEventType.DocumentStart:
 			num = 1;
 			break;
-		case BHBPOHDAGPH.SequenceStart:
+		case ParsingEventType.SequenceStart:
 			num = 2;
 			break;
-		case BHBPOHDAGPH.MappingStart:
+		case ParsingEventType.MappingStart:
 			num = 3;
 			break;
 		default:
 			return false;
 		}
-		if (DNBFFLFBDOB.Count > num)
+		if (events.Count > num)
 		{
 			return false;
 		}
 		int num2 = 0;
-		foreach (ParsingEvent item in DNBFFLFBDOB)
+		foreach (ParsingEvent item in events)
 		{
 			switch (item.get_Type())
 			{
-			case BHBPOHDAGPH.DocumentStart:
-			case BHBPOHDAGPH.SequenceStart:
-			case BHBPOHDAGPH.MappingStart:
+			case ParsingEventType.DocumentStart:
+			case ParsingEventType.SequenceStart:
+			case ParsingEventType.MappingStart:
 				num2++;
 				break;
-			case BHBPOHDAGPH.DocumentEnd:
-			case BHBPOHDAGPH.SequenceEnd:
-			case BHBPOHDAGPH.MappingEnd:
+			case ParsingEventType.DocumentEnd:
+			case ParsingEventType.SequenceEnd:
+			case ParsingEventType.MappingEnd:
 				num2--;
 				break;
 			}
@@ -190,15 +190,15 @@ public class Emitter : NEKGJNOFOFN
 		return true;
 	}
 
-	private void NBOGMMDPKHO(ParsingEvent IILOLJJLLGH)
+	private void AnalyzeEvent(ParsingEvent IILOLJJLLGH)
 	{
-		MOIAINBHLBA.KOLNNNLOCFE = null;
-		KLIMKJBCHOC.FODGADCGDBH = null;
-		KLIMKJBCHOC.NCFFAGOLJEC = null;
+		anchorData.anchor = null;
+		tagData.handle = null;
+		tagData.suffix = null;
 		AnchorAlias mBEGNNDMDKH = IILOLJJLLGH as AnchorAlias;
 		if (mBEGNNDMDKH != null)
 		{
-			JPNMIPPONMB(mBEGNNDMDKH.OEAKCOHMIHH(), true);
+			AnalyzeAnchor(mBEGNNDMDKH.GetValue(), true);
 			return;
 		}
 		NodeEvent dGMPGIHHKCN = IILOLJJLLGH as NodeEvent;
@@ -207,32 +207,32 @@ public class Emitter : NEKGJNOFOFN
 			Scalar lEACOCDHICF = IILOLJJLLGH as Scalar;
 			if (lEACOCDHICF != null)
 			{
-				GAJLLJBNNND(lEACOCDHICF.OEAKCOHMIHH());
+				AnalyzeScalar(lEACOCDHICF.GetValue());
 			}
-			JPNMIPPONMB(dGMPGIHHKCN.HCPOJDFJFMM(), false);
-			if (!string.IsNullOrEmpty(dGMPGIHHKCN.LOIGCKFONHJ()) && (LGDHGOGFFCJ || dGMPGIHHKCN.DOHAHEHOCLN()))
+			AnalyzeAnchor(dGMPGIHHKCN.GetAnchor(), false);
+			if (!string.IsNullOrEmpty(dGMPGIHHKCN.GetTag()) && (isCanonical || dGMPGIHHKCN.GetIsCanonical()))
 			{
-				POKPCBFFJIL(dGMPGIHHKCN.LOIGCKFONHJ());
+				AnalyzeTag(dGMPGIHHKCN.GetTag());
 			}
 		}
 	}
 
-	private void JPNMIPPONMB(string KOLNNNLOCFE, bool LCPNKFDMFIA)
+	private void AnalyzeAnchor(string KOLNNNLOCFE, bool LCPNKFDMFIA)
 	{
-		MOIAINBHLBA.KOLNNNLOCFE = KOLNNNLOCFE;
-		MOIAINBHLBA.LCPNKFDMFIA = LCPNKFDMFIA;
+		anchorData.anchor = KOLNNNLOCFE;
+		anchorData.isAlias = LCPNKFDMFIA;
 	}
 
-	private void GAJLLJBNNND(string value)
+	private void AnalyzeScalar(string value)
 	{
-		AKIFIIJIHGI.value = value;
+		scalarData.value = value;
 		if (value.Length == 0)
 		{
-			AKIFIIJIHGI.IKBPKEEMMCA = false;
-			AKIFIIJIHGI.KBJBLFNOFKI = false;
-			AKIFIIJIHGI.KGHHDKEBHJP = true;
-			AKIFIIJIHGI.EFJAPPGNNIJ = true;
-			AKIFIIJIHGI.KHNFEFCDPKM = false;
+			scalarData.isMultiline = false;
+			scalarData.isFlowPlainAllowed = false;
+			scalarData.isBlockPlainAllowed = true;
+			scalarData.isSingleQuotedAllowed = true;
+			scalarData.isBlockAllowed = false;
 			return;
 		}
 		bool flag = false;
@@ -244,7 +244,7 @@ public class Emitter : NEKGJNOFOFN
 		}
 		CharacterAnalyzer<StringLookAheadBuffer> characterAnalyzer = new CharacterAnalyzer<StringLookAheadBuffer>(new StringLookAheadBuffer(value));
 		bool flag3 = true;
-		bool flag4 = characterAnalyzer.MKOKPKHBDMD(1);
+		bool flag4 = characterAnalyzer.IsWhiteBreakOrZero(1);
 		bool flag5 = false;
 		bool flag6 = false;
 		bool flag7 = false;
@@ -299,15 +299,15 @@ public class Emitter : NEKGJNOFOFN
 					flag2 = true;
 				}
 			}
-			if (!characterAnalyzer.IGNGBDLCMGB() || (!characterAnalyzer.EAMJHPLDDLE() && !IsUnicode(output.Encoding)))
+			if (!characterAnalyzer.IsPrintable() || (!characterAnalyzer.IsAscii() && !IsUnicode(output.Encoding)))
 			{
 				flag14 = true;
 			}
-			if (characterAnalyzer.JCPPGIPDMBK())
+			if (characterAnalyzer.IsBreak())
 			{
 				flag13 = true;
 			}
-			if (characterAnalyzer.NBLLOLGNFGM())
+			if (characterAnalyzer.IsSpace())
 			{
 				if (flag15)
 				{
@@ -324,7 +324,7 @@ public class Emitter : NEKGJNOFOFN
 				flag11 = true;
 				flag12 = false;
 			}
-			else if (characterAnalyzer.JCPPGIPDMBK())
+			else if (characterAnalyzer.IsBreak())
 			{
 				if (flag15)
 				{
@@ -346,53 +346,53 @@ public class Emitter : NEKGJNOFOFN
 				flag11 = false;
 				flag12 = false;
 			}
-			flag3 = characterAnalyzer.MKOKPKHBDMD();
+			flag3 = characterAnalyzer.IsWhiteBreakOrZero();
 			characterAnalyzer.Skip(1);
 			if (!characterAnalyzer.EndOfInput)
 			{
-				flag4 = characterAnalyzer.MKOKPKHBDMD(1);
+				flag4 = characterAnalyzer.IsWhiteBreakOrZero(1);
 			}
 			flag15 = false;
 		}
-		AKIFIIJIHGI.KBJBLFNOFKI = true;
-		AKIFIIJIHGI.KGHHDKEBHJP = true;
-		AKIFIIJIHGI.EFJAPPGNNIJ = true;
-		AKIFIIJIHGI.KHNFEFCDPKM = true;
+		scalarData.isFlowPlainAllowed = true;
+		scalarData.isBlockPlainAllowed = true;
+		scalarData.isSingleQuotedAllowed = true;
+		scalarData.isBlockAllowed = true;
 		if (flag5 || flag6 || flag7 || flag8)
 		{
-			AKIFIIJIHGI.KBJBLFNOFKI = false;
-			AKIFIIJIHGI.KGHHDKEBHJP = false;
+			scalarData.isFlowPlainAllowed = false;
+			scalarData.isBlockPlainAllowed = false;
 		}
 		if (flag7)
 		{
-			AKIFIIJIHGI.KHNFEFCDPKM = false;
+			scalarData.isBlockAllowed = false;
 		}
 		if (flag9)
 		{
-			AKIFIIJIHGI.KBJBLFNOFKI = false;
-			AKIFIIJIHGI.KGHHDKEBHJP = false;
-			AKIFIIJIHGI.EFJAPPGNNIJ = false;
+			scalarData.isFlowPlainAllowed = false;
+			scalarData.isBlockPlainAllowed = false;
+			scalarData.isSingleQuotedAllowed = false;
 		}
 		if (flag10 || flag14)
 		{
-			AKIFIIJIHGI.KBJBLFNOFKI = false;
-			AKIFIIJIHGI.KGHHDKEBHJP = false;
-			AKIFIIJIHGI.EFJAPPGNNIJ = false;
-			AKIFIIJIHGI.KHNFEFCDPKM = false;
+			scalarData.isFlowPlainAllowed = false;
+			scalarData.isBlockPlainAllowed = false;
+			scalarData.isSingleQuotedAllowed = false;
+			scalarData.isBlockAllowed = false;
 		}
-		AKIFIIJIHGI.IKBPKEEMMCA = flag13;
+		scalarData.isMultiline = flag13;
 		if (flag13)
 		{
-			AKIFIIJIHGI.KBJBLFNOFKI = false;
-			AKIFIIJIHGI.KGHHDKEBHJP = false;
+			scalarData.isFlowPlainAllowed = false;
+			scalarData.isBlockPlainAllowed = false;
 		}
 		if (flag)
 		{
-			AKIFIIJIHGI.KBJBLFNOFKI = false;
+			scalarData.isFlowPlainAllowed = false;
 		}
 		if (flag2)
 		{
-			AKIFIIJIHGI.KGHHDKEBHJP = false;
+			scalarData.isBlockPlainAllowed = false;
 		}
 	}
 
@@ -401,193 +401,193 @@ public class Emitter : NEKGJNOFOFN
 		return JIBCJOMMFCO.Equals(Encoding.UTF8) || JIBCJOMMFCO.Equals(Encoding.Unicode) || JIBCJOMMFCO.Equals(Encoding.BigEndianUnicode) || JIBCJOMMFCO.Equals(Encoding.UTF7) || JIBCJOMMFCO.Equals(Encoding.UTF32);
 	}
 
-	private void POKPCBFFJIL(string EDLADAAKMDF)
+	private void AnalyzeTag(string EDLADAAKMDF)
 	{
-		KLIMKJBCHOC.FODGADCGDBH = EDLADAAKMDF;
-		foreach (TagDirective item in FMCEHNBELJF)
+		tagData.handle = EDLADAAKMDF;
+		foreach (TagDirective item in tagDirectives)
 		{
 			if (EDLADAAKMDF.StartsWith(item.Prefix, StringComparison.Ordinal))
 			{
-				KLIMKJBCHOC.FODGADCGDBH = item.Handle;
-				KLIMKJBCHOC.NCFFAGOLJEC = EDLADAAKMDF.Substring(item.Prefix.Length);
+				tagData.handle = item.Handle;
+				tagData.suffix = EDLADAAKMDF.Substring(item.Prefix.Length);
 				break;
 			}
 		}
 	}
 
-	private void GIKHOKIFGLH(ParsingEvent IILOLJJLLGH)
+	private void StateMachine(ParsingEvent IILOLJJLLGH)
 	{
 		Comment mGMGDDOIHAJ = IILOLJJLLGH as Comment;
 		if (mGMGDDOIHAJ != null)
 		{
-			CBLCGKALPNC(mGMGDDOIHAJ);
+			EmitComment(mGMGDDOIHAJ);
 			return;
 		}
 		switch (state)
 		{
-		case PFIHGFCNOEG.StreamStart:
-			AHIGMLMJDMO(IILOLJJLLGH);
+		case EmitterStateKind.StreamStart:
+			EmitStreamStart(IILOLJJLLGH);
 			break;
-		case PFIHGFCNOEG.FirstDocumentStart:
-			IDIOKNDCNBH(IILOLJJLLGH, true);
+		case EmitterStateKind.FirstDocumentStart:
+			EmitDocumentStart(IILOLJJLLGH, true);
 			break;
-		case PFIHGFCNOEG.DocumentStart:
-			IDIOKNDCNBH(IILOLJJLLGH, false);
+		case EmitterStateKind.DocumentStart:
+			EmitDocumentStart(IILOLJJLLGH, false);
 			break;
-		case PFIHGFCNOEG.DocumentContent:
-			OFOGFHMBDJF(IILOLJJLLGH);
+		case EmitterStateKind.DocumentContent:
+			EmitDocumentContent(IILOLJJLLGH);
 			break;
-		case PFIHGFCNOEG.DocumentEnd:
-			IOPKCDJBPFJ(IILOLJJLLGH);
+		case EmitterStateKind.DocumentEnd:
+			EmitDocumentEnd(IILOLJJLLGH);
 			break;
-		case PFIHGFCNOEG.FlowSequenceFirstItem:
-			MOGAEAKBOGN(IILOLJJLLGH, true);
+		case EmitterStateKind.FlowSequenceFirstItem:
+			EmitFlowSequenceItem(IILOLJJLLGH, true);
 			break;
-		case PFIHGFCNOEG.FlowSequenceItem:
-			MOGAEAKBOGN(IILOLJJLLGH, false);
+		case EmitterStateKind.FlowSequenceItem:
+			EmitFlowSequenceItem(IILOLJJLLGH, false);
 			break;
-		case PFIHGFCNOEG.FlowMappingFirstKey:
-			JGPMFBFHPLG(IILOLJJLLGH, true);
+		case EmitterStateKind.FlowMappingFirstKey:
+			EmitFlowMappingKey(IILOLJJLLGH, true);
 			break;
-		case PFIHGFCNOEG.FlowMappingKey:
-			JGPMFBFHPLG(IILOLJJLLGH, false);
+		case EmitterStateKind.FlowMappingKey:
+			EmitFlowMappingKey(IILOLJJLLGH, false);
 			break;
-		case PFIHGFCNOEG.FlowMappingSimpleValue:
-			LKMHLDHKDAM(IILOLJJLLGH, true);
+		case EmitterStateKind.FlowMappingSimpleValue:
+			EmitFlowMappingValue(IILOLJJLLGH, true);
 			break;
-		case PFIHGFCNOEG.FlowMappingValue:
-			LKMHLDHKDAM(IILOLJJLLGH, false);
+		case EmitterStateKind.FlowMappingValue:
+			EmitFlowMappingValue(IILOLJJLLGH, false);
 			break;
-		case PFIHGFCNOEG.BlockSequenceFirstItem:
-			BNNKMPFDJGP(IILOLJJLLGH, true);
+		case EmitterStateKind.BlockSequenceFirstItem:
+			EmitBlockSequenceItem(IILOLJJLLGH, true);
 			break;
-		case PFIHGFCNOEG.BlockSequenceItem:
-			BNNKMPFDJGP(IILOLJJLLGH, false);
+		case EmitterStateKind.BlockSequenceItem:
+			EmitBlockSequenceItem(IILOLJJLLGH, false);
 			break;
-		case PFIHGFCNOEG.BlockMappingFirstKey:
-			OPAIFNHGJGA(IILOLJJLLGH, true);
+		case EmitterStateKind.BlockMappingFirstKey:
+			EmitBlockMappingKey(IILOLJJLLGH, true);
 			break;
-		case PFIHGFCNOEG.BlockMappingKey:
-			OPAIFNHGJGA(IILOLJJLLGH, false);
+		case EmitterStateKind.BlockMappingKey:
+			EmitBlockMappingKey(IILOLJJLLGH, false);
 			break;
-		case PFIHGFCNOEG.BlockMappingSimpleValue:
-			PAGLCKDAPMK(IILOLJJLLGH, true);
+		case EmitterStateKind.BlockMappingSimpleValue:
+			EmitBlockMappingValue(IILOLJJLLGH, true);
 			break;
-		case PFIHGFCNOEG.BlockMappingValue:
-			PAGLCKDAPMK(IILOLJJLLGH, false);
+		case EmitterStateKind.BlockMappingValue:
+			EmitBlockMappingValue(IILOLJJLLGH, false);
 			break;
-		case PFIHGFCNOEG.StreamEnd:
+		case EmitterStateKind.StreamEnd:
 			throw new YamlException("Expected nothing after STREAM-END");
 		default:
 			throw new InvalidOperationException();
 		}
 	}
 
-	private void CBLCGKALPNC(Comment MPMFGPGDGDN)
+	private void EmitComment(Comment MPMFGPGDGDN)
 	{
-		if (MPMFGPGDGDN.IGLENNPMPDJ())
+		if (MPMFGPGDGDN.GetIsInline())
 		{
 			Write(' ');
 		}
 		else
 		{
-			NMGCFFFIFPJ();
+			WriteBreak();
 		}
 		Write("# ");
-		Write(MPMFGPGDGDN.OEAKCOHMIHH());
-		GAMIKMDGHLL = true;
+		Write(MPMFGPGDGDN.GetValue());
+		isIndentation = true;
 	}
 
-	private void AHIGMLMJDMO(ParsingEvent IILOLJJLLGH)
+	private void EmitStreamStart(ParsingEvent IILOLJJLLGH)
 	{
 		if (!(IILOLJJLLGH is StreamStart))
 		{
 			throw new ArgumentException("Expected STREAM-START.", "evt");
 		}
-		AIBHPFBFGNA = -1;
-		DLPJJBPDNDE = 0;
-		JNNJNNGLDHF = true;
-		GAMIKMDGHLL = true;
-		state = PFIHGFCNOEG.FirstDocumentStart;
+		indent = -1;
+		column = 0;
+		isWhitespace = true;
+		isIndentation = true;
+		state = EmitterStateKind.FirstDocumentStart;
 	}
 
-	private void IDIOKNDCNBH(ParsingEvent IILOLJJLLGH, bool IKNHLPGLLKB)
+	private void EmitDocumentStart(ParsingEvent IILOLJJLLGH, bool IKNHLPGLLKB)
 	{
 		DocumentStart aOGNBDOIKPE = IILOLJJLLGH as DocumentStart;
 		if (aOGNBDOIKPE != null)
 		{
-			bool flag = aOGNBDOIKPE.BBBGHODAEIN() && IKNHLPGLLKB && !LGDHGOGFFCJ;
-			TagDirectiveCollection iDHIKALFADG = GCFGDGHKLEI(aOGNBDOIKPE.FNNKPBJDMDF());
-			if (!IKNHLPGLLKB && !FDLHHPENADJ && (aOGNBDOIKPE.KCJMMIEBLHL() != null || iDHIKALFADG.Count > 0))
+			bool flag = aOGNBDOIKPE.GetIsImplicit() && IKNHLPGLLKB && !isCanonical;
+			TagDirectiveCollection iDHIKALFADG = NonDefaultTagsAmong(aOGNBDOIKPE.GetTags());
+			if (!IKNHLPGLLKB && !isDocumentEndWritten && (aOGNBDOIKPE.GetVersion() != null || iDHIKALFADG.Count > 0))
 			{
-				FDLHHPENADJ = false;
+				isDocumentEndWritten = false;
 				WriteIndicator("...", true, false, false);
-				MDBMBMENEBP();
+				WriteIndent();
 			}
-			if (aOGNBDOIKPE.KCJMMIEBLHL() != null)
+			if (aOGNBDOIKPE.GetVersion() != null)
 			{
-				AnalyzeVersionDirective(aOGNBDOIKPE.KCJMMIEBLHL());
+				AnalyzeVersionDirective(aOGNBDOIKPE.GetVersion());
 				flag = false;
 				WriteIndicator("%YAML", true, false, false);
 				WriteIndicator(string.Format(CultureInfo.InvariantCulture, "{0}.{1}", 1, 1), true, false, false);
-				MDBMBMENEBP();
+				WriteIndent();
 			}
 			foreach (TagDirective item in iDHIKALFADG)
 			{
-				PPFIAICBBBI(item, false, FMCEHNBELJF);
+				AppendTagDirectiveTo(item, false, tagDirectives);
 			}
-			TagDirective[] gNPKLFKPLCM = CHOAMHPCPFL.DefaultTagDirectives;
+			TagDirective[] gNPKLFKPLCM = YamlConstants.DefaultTagDirectives;
 			foreach (TagDirective bAINMLLIKOL in gNPKLFKPLCM)
 			{
-				PPFIAICBBBI(bAINMLLIKOL, true, FMCEHNBELJF);
+				AppendTagDirectiveTo(bAINMLLIKOL, true, tagDirectives);
 			}
 			if (iDHIKALFADG.Count > 0)
 			{
 				flag = false;
-				TagDirective[] gNPKLFKPLCM2 = CHOAMHPCPFL.DefaultTagDirectives;
+				TagDirective[] gNPKLFKPLCM2 = YamlConstants.DefaultTagDirectives;
 				foreach (TagDirective bAINMLLIKOL2 in gNPKLFKPLCM2)
 				{
-					PPFIAICBBBI(bAINMLLIKOL2, true, iDHIKALFADG);
+					AppendTagDirectiveTo(bAINMLLIKOL2, true, iDHIKALFADG);
 				}
 				foreach (TagDirective item2 in iDHIKALFADG)
 				{
 					WriteIndicator("%TAG", true, false, false);
-					IMEIEEFKHCD(item2.Handle);
-					DMCBHMNGJIP(item2.Prefix, true);
-					MDBMBMENEBP();
+					WriteTagHandle(item2.Handle);
+					WriteTagContent(item2.Prefix, true);
+					WriteIndent();
 				}
 			}
-			if (NOIMGKCEPOH())
+			if (CheckEmptyDocument())
 			{
 				flag = false;
 			}
 			if (!flag)
 			{
-				MDBMBMENEBP();
+				WriteIndent();
 				WriteIndicator("---", true, false, false);
-				if (LGDHGOGFFCJ)
+				if (isCanonical)
 				{
-					MDBMBMENEBP();
+					WriteIndent();
 				}
 			}
-			state = PFIHGFCNOEG.DocumentContent;
+			state = EmitterStateKind.DocumentContent;
 		}
 		else
 		{
-			if (!(IILOLJJLLGH is HNKFEGCMBJB))
+			if (!(IILOLJJLLGH is StreamEndEvent))
 			{
 				throw new YamlException("Expected DOCUMENT-START or STREAM-END");
 			}
-			if (MIBHHFPMBID)
+			if (isOpenEnded)
 			{
 				WriteIndicator("...", true, false, false);
-				MDBMBMENEBP();
+				WriteIndent();
 			}
-			state = PFIHGFCNOEG.StreamEnd;
+			state = EmitterStateKind.StreamEnd;
 		}
 	}
 
-	private TagDirectiveCollection GCFGDGHKLEI(IEnumerable<TagDirective> FIMJCFLNJIK)
+	private TagDirectiveCollection NonDefaultTagsAmong(IEnumerable<TagDirective> FIMJCFLNJIK)
 	{
 		TagDirectiveCollection iDHIKALFADG = new TagDirectiveCollection();
 		if (FIMJCFLNJIK == null)
@@ -596,9 +596,9 @@ public class Emitter : NEKGJNOFOFN
 		}
 		foreach (TagDirective item2 in FIMJCFLNJIK)
 		{
-			PPFIAICBBBI(item2, false, iDHIKALFADG);
+			AppendTagDirectiveTo(item2, false, iDHIKALFADG);
 		}
-		TagDirective[] gNPKLFKPLCM = CHOAMHPCPFL.DefaultTagDirectives;
+		TagDirective[] gNPKLFKPLCM = YamlConstants.DefaultTagDirectives;
 		foreach (TagDirective item in gNPKLFKPLCM)
 		{
 			iDHIKALFADG.Remove(item);
@@ -614,7 +614,7 @@ public class Emitter : NEKGJNOFOFN
 		}
 	}
 
-	private void PPFIAICBBBI(TagDirective value, bool KBLBEMDBNGB, TagDirectiveCollection FMCEHNBELJF)
+	private void AppendTagDirectiveTo(TagDirective value, bool KBLBEMDBNGB, TagDirectiveCollection FMCEHNBELJF)
 	{
 		if (FMCEHNBELJF.Contains(value))
 		{
@@ -629,127 +629,127 @@ public class Emitter : NEKGJNOFOFN
 		}
 	}
 
-	private void OFOGFHMBDJF(ParsingEvent IILOLJJLLGH)
+	private void EmitDocumentContent(ParsingEvent IILOLJJLLGH)
 	{
-		LNJBMLMFKDH.Push(PFIHGFCNOEG.DocumentEnd);
-		MIACPENCIPM(IILOLJJLLGH, true, false, false);
+		states.Push(EmitterStateKind.DocumentEnd);
+		EmitNode(IILOLJJLLGH, true, false, false);
 	}
 
-	private void MIACPENCIPM(ParsingEvent IILOLJJLLGH, bool OHJNFDICPDH, bool CLHNCJFJJKN, bool MJHMCMNBBAA)
+	private void EmitNode(ParsingEvent IILOLJJLLGH, bool OHJNFDICPDH, bool CLHNCJFJJKN, bool MJHMCMNBBAA)
 	{
-		MIBEGFBMLEC = OHJNFDICPDH;
-		MLJMBHGNABP = CLHNCJFJJKN;
-		LMHKCBPDCNH = MJHMCMNBBAA;
+		isRootContext = OHJNFDICPDH;
+		isMappingContext = CLHNCJFJJKN;
+		isSimpleKeyContext = MJHMCMNBBAA;
 		switch (IILOLJJLLGH.get_Type())
 		{
-		case BHBPOHDAGPH.Alias:
-			CECABEPJIDO();
+		case ParsingEventType.Alias:
+			EmitAlias();
 			break;
-		case BHBPOHDAGPH.Scalar:
-			JMBGOAAKBCA(IILOLJJLLGH);
+		case ParsingEventType.Scalar:
+			EmitScalar(IILOLJJLLGH);
 			break;
-		case BHBPOHDAGPH.SequenceStart:
-			NILGFBAEKHE(IILOLJJLLGH);
+		case ParsingEventType.SequenceStart:
+			EmitSequenceStart(IILOLJJLLGH);
 			break;
-		case BHBPOHDAGPH.MappingStart:
-			MHADHMBBLNP(IILOLJJLLGH);
+		case ParsingEventType.MappingStart:
+			EmitMappingStart(IILOLJJLLGH);
 			break;
 		default:
 			throw new YamlException(string.Format("Expected SCALAR, SEQUENCE-START, MAPPING-START, or ALIAS, got {0}", IILOLJJLLGH.get_Type()));
 		}
 	}
 
-	private void CECABEPJIDO()
+	private void EmitAlias()
 	{
-		OEMEDIPPEMM();
-		state = LNJBMLMFKDH.Pop();
+		ProcessAnchor();
+		state = states.Pop();
 	}
 
-	private void JMBGOAAKBCA(ParsingEvent IILOLJJLLGH)
+	private void EmitScalar(ParsingEvent IILOLJJLLGH)
 	{
-		PGBINBADAEG(IILOLJJLLGH);
-		OEMEDIPPEMM();
-		DFIHPHNPHAO();
+		SelectScalarStyle(IILOLJJLLGH);
+		ProcessAnchor();
+		ProcessTag();
 		IncreaseIndent(true, false);
-		KHMHNMAFFGO();
-		AIBHPFBFGNA = indents.Pop();
-		state = LNJBMLMFKDH.Pop();
+		ProcessScalar();
+		indent = indents.Pop();
+		state = states.Pop();
 	}
 
-	private void PGBINBADAEG(ParsingEvent IILOLJJLLGH)
+	private void SelectScalarStyle(ParsingEvent IILOLJJLLGH)
 	{
 		Scalar lEACOCDHICF = (Scalar)IILOLJJLLGH;
-		IBEOFCPMMJJ iBEOFCPMMJJ = lEACOCDHICF.HALCJLMJDII();
-		bool flag = KLIMKJBCHOC.FODGADCGDBH == null && KLIMKJBCHOC.NCFFAGOLJEC == null;
-		if (flag && !lEACOCDHICF.BIDLJMEAFMI() && !lEACOCDHICF.NIENIKOPKOG())
+		ScalarStyle iBEOFCPMMJJ = lEACOCDHICF.GetStyle();
+		bool flag = tagData.handle == null && tagData.suffix == null;
+		if (flag && !lEACOCDHICF.GetIsPlainImplicit() && !lEACOCDHICF.GetIsQuotedImplicit())
 		{
 			throw new YamlException("Neither tag nor isImplicit flags are specified.");
 		}
-		if (iBEOFCPMMJJ == IBEOFCPMMJJ.Any)
+		if (iBEOFCPMMJJ == ScalarStyle.Any)
 		{
-			iBEOFCPMMJJ = ((!AKIFIIJIHGI.IKBPKEEMMCA) ? IBEOFCPMMJJ.Plain : IBEOFCPMMJJ.Folded);
+			iBEOFCPMMJJ = ((!scalarData.isMultiline) ? ScalarStyle.Plain : ScalarStyle.Folded);
 		}
-		if (LGDHGOGFFCJ)
+		if (isCanonical)
 		{
-			iBEOFCPMMJJ = IBEOFCPMMJJ.DoubleQuoted;
+			iBEOFCPMMJJ = ScalarStyle.DoubleQuoted;
 		}
-		if (LMHKCBPDCNH && AKIFIIJIHGI.IKBPKEEMMCA)
+		if (isSimpleKeyContext && scalarData.isMultiline)
 		{
-			iBEOFCPMMJJ = IBEOFCPMMJJ.DoubleQuoted;
+			iBEOFCPMMJJ = ScalarStyle.DoubleQuoted;
 		}
-		if (iBEOFCPMMJJ == IBEOFCPMMJJ.Plain)
+		if (iBEOFCPMMJJ == ScalarStyle.Plain)
 		{
-			if ((FLNOCBGGCPP != 0 && !AKIFIIJIHGI.KBJBLFNOFKI) || (FLNOCBGGCPP == 0 && !AKIFIIJIHGI.KGHHDKEBHJP))
+			if ((flowLevel != 0 && !scalarData.isFlowPlainAllowed) || (flowLevel == 0 && !scalarData.isBlockPlainAllowed))
 			{
-				iBEOFCPMMJJ = IBEOFCPMMJJ.SingleQuoted;
+				iBEOFCPMMJJ = ScalarStyle.SingleQuoted;
 			}
-			if (string.IsNullOrEmpty(AKIFIIJIHGI.value) && (FLNOCBGGCPP != 0 || LMHKCBPDCNH))
+			if (string.IsNullOrEmpty(scalarData.value) && (flowLevel != 0 || isSimpleKeyContext))
 			{
-				iBEOFCPMMJJ = IBEOFCPMMJJ.SingleQuoted;
+				iBEOFCPMMJJ = ScalarStyle.SingleQuoted;
 			}
-			if (flag && !lEACOCDHICF.BIDLJMEAFMI())
+			if (flag && !lEACOCDHICF.GetIsPlainImplicit())
 			{
-				iBEOFCPMMJJ = IBEOFCPMMJJ.SingleQuoted;
+				iBEOFCPMMJJ = ScalarStyle.SingleQuoted;
 			}
 		}
-		if (iBEOFCPMMJJ == IBEOFCPMMJJ.SingleQuoted && !AKIFIIJIHGI.EFJAPPGNNIJ)
+		if (iBEOFCPMMJJ == ScalarStyle.SingleQuoted && !scalarData.isSingleQuotedAllowed)
 		{
-			iBEOFCPMMJJ = IBEOFCPMMJJ.DoubleQuoted;
+			iBEOFCPMMJJ = ScalarStyle.DoubleQuoted;
 		}
-		if ((iBEOFCPMMJJ == IBEOFCPMMJJ.Literal || iBEOFCPMMJJ == IBEOFCPMMJJ.Folded) && (!AKIFIIJIHGI.KHNFEFCDPKM || FLNOCBGGCPP != 0 || LMHKCBPDCNH))
+		if ((iBEOFCPMMJJ == ScalarStyle.Literal || iBEOFCPMMJJ == ScalarStyle.Folded) && (!scalarData.isBlockAllowed || flowLevel != 0 || isSimpleKeyContext))
 		{
-			iBEOFCPMMJJ = IBEOFCPMMJJ.DoubleQuoted;
+			iBEOFCPMMJJ = ScalarStyle.DoubleQuoted;
 		}
-		AKIFIIJIHGI.KIGNIBIMLKK = iBEOFCPMMJJ;
+		scalarData.style = iBEOFCPMMJJ;
 	}
 
-	private void KHMHNMAFFGO()
+	private void ProcessScalar()
 	{
-		switch (AKIFIIJIHGI.KIGNIBIMLKK)
+		switch (scalarData.style)
 		{
-		case IBEOFCPMMJJ.Plain:
-			MBNHMNOJKNI(AKIFIIJIHGI.value, !LMHKCBPDCNH);
+		case ScalarStyle.Plain:
+			WritePlainScalar(scalarData.value, !isSimpleKeyContext);
 			break;
-		case IBEOFCPMMJJ.SingleQuoted:
-			IMIJLBOINNE(AKIFIIJIHGI.value, !LMHKCBPDCNH);
+		case ScalarStyle.SingleQuoted:
+			WriteSingleQuotedScalar(scalarData.value, !isSimpleKeyContext);
 			break;
-		case IBEOFCPMMJJ.DoubleQuoted:
-			GOCAOKBNGOB(AKIFIIJIHGI.value, !LMHKCBPDCNH);
+		case ScalarStyle.DoubleQuoted:
+			WriteDoubleQuotedScalar(scalarData.value, !isSimpleKeyContext);
 			break;
-		case IBEOFCPMMJJ.Literal:
-			PCMFBAHBEBN(AKIFIIJIHGI.value);
+		case ScalarStyle.Literal:
+			WriteLiteralScalar(scalarData.value);
 			break;
-		case IBEOFCPMMJJ.Folded:
-			IDBGPLELKHA(AKIFIIJIHGI.value);
+		case ScalarStyle.Folded:
+			WriteFoldedScalar(scalarData.value);
 			break;
 		default:
 			throw new InvalidOperationException();
 		}
 	}
 
-	private void MBNHMNOJKNI(string value, bool AEMLFBEACGF)
+	private void WritePlainScalar(string value, bool AEMLFBEACGF)
 	{
-		if (!JNNJNNGLDHF)
+		if (!isWhitespace)
 		{
 			Write(' ');
 		}
@@ -758,11 +758,11 @@ public class Emitter : NEKGJNOFOFN
 		for (int i = 0; i < value.Length; i++)
 		{
 			char c = value[i];
-			if (NBLLOLGNFGM(c))
+			if (IsSpace(c))
 			{
-				if (AEMLFBEACGF && !flag && DLPJJBPDNDE > CEIKEMJHLKL && i + 1 < value.Length && value[i + 1] != ' ')
+				if (AEMLFBEACGF && !flag && column > bestWidth && i + 1 < value.Length && value[i + 1] != ' ')
 				{
-					MDBMBMENEBP();
+					WriteIndent();
 				}
 				else
 				{
@@ -771,35 +771,35 @@ public class Emitter : NEKGJNOFOFN
 				flag = true;
 				continue;
 			}
-			if (JCPPGIPDMBK(c))
+			if (IsBreak(c))
 			{
 				if (!flag2 && c == '\n')
 				{
-					NMGCFFFIFPJ();
+					WriteBreak();
 				}
-				NMGCFFFIFPJ();
-				GAMIKMDGHLL = true;
+				WriteBreak();
+				isIndentation = true;
 				flag2 = true;
 				continue;
 			}
 			if (flag2)
 			{
-				MDBMBMENEBP();
+				WriteIndent();
 			}
 			Write(c);
-			GAMIKMDGHLL = false;
+			isIndentation = false;
 			flag = false;
 			flag2 = false;
 		}
-		JNNJNNGLDHF = false;
-		GAMIKMDGHLL = false;
-		if (MIBEGFBMLEC)
+		isWhitespace = false;
+		isIndentation = false;
+		if (isRootContext)
 		{
-			MIBHHFPMBID = true;
+			isOpenEnded = true;
 		}
 	}
 
-	private void IMIJLBOINNE(string value, bool AEMLFBEACGF)
+	private void WriteSingleQuotedScalar(string value, bool AEMLFBEACGF)
 	{
 		WriteIndicator("'", true, false, false);
 		bool flag = false;
@@ -809,9 +809,9 @@ public class Emitter : NEKGJNOFOFN
 			char c = value[i];
 			if (c == ' ')
 			{
-				if (AEMLFBEACGF && !flag && DLPJJBPDNDE > CEIKEMJHLKL && i != 0 && i + 1 < value.Length && value[i + 1] != ' ')
+				if (AEMLFBEACGF && !flag && column > bestWidth && i != 0 && i + 1 < value.Length && value[i + 1] != ' ')
 				{
-					MDBMBMENEBP();
+					WriteIndent();
 				}
 				else
 				{
@@ -820,43 +820,43 @@ public class Emitter : NEKGJNOFOFN
 				flag = true;
 				continue;
 			}
-			if (JCPPGIPDMBK(c))
+			if (IsBreak(c))
 			{
 				if (!flag2 && c == '\n')
 				{
-					NMGCFFFIFPJ();
+					WriteBreak();
 				}
-				NMGCFFFIFPJ();
-				GAMIKMDGHLL = true;
+				WriteBreak();
+				isIndentation = true;
 				flag2 = true;
 				continue;
 			}
 			if (flag2)
 			{
-				MDBMBMENEBP();
+				WriteIndent();
 			}
 			if (c == '\'')
 			{
 				Write(c);
 			}
 			Write(c);
-			GAMIKMDGHLL = false;
+			isIndentation = false;
 			flag = false;
 			flag2 = false;
 		}
 		WriteIndicator("'", false, false, false);
-		JNNJNNGLDHF = false;
-		GAMIKMDGHLL = false;
+		isWhitespace = false;
+		isIndentation = false;
 	}
 
-	private void GOCAOKBNGOB(string value, bool AEMLFBEACGF)
+	private void WriteDoubleQuotedScalar(string value, bool AEMLFBEACGF)
 	{
 		WriteIndicator("\"", true, false, false);
 		bool flag = false;
 		for (int i = 0; i < value.Length; i++)
 		{
 			char c = value[i];
-			if (IGNGBDLCMGB(c) && !JCPPGIPDMBK(c))
+			if (IsPrintable(c) && !IsBreak(c))
 			{
 				switch (c)
 				{
@@ -864,9 +864,9 @@ public class Emitter : NEKGJNOFOFN
 				case '\\':
 					break;
 				case ' ':
-					if (AEMLFBEACGF && !flag && DLPJJBPDNDE > CEIKEMJHLKL && i > 0 && i + 1 < value.Length)
+					if (AEMLFBEACGF && !flag && column > bestWidth && i > 0 && i + 1 < value.Length)
 					{
-						MDBMBMENEBP();
+						WriteIndent();
 						if (value[i + 1] == ' ')
 						{
 							Write('\\');
@@ -951,206 +951,206 @@ public class Emitter : NEKGJNOFOFN
 			flag = false;
 		}
 		WriteIndicator("\"", false, false, false);
-		JNNJNNGLDHF = false;
-		GAMIKMDGHLL = false;
+		isWhitespace = false;
+		isIndentation = false;
 	}
 
-	private void PCMFBAHBEBN(string value)
+	private void WriteLiteralScalar(string value)
 	{
 		bool flag = true;
 		WriteIndicator("|", true, false, false);
-		GDBPECOIHAP(value);
-		NMGCFFFIFPJ();
-		GAMIKMDGHLL = true;
-		JNNJNNGLDHF = true;
+		WriteBlockScalarHints(value);
+		WriteBreak();
+		isIndentation = true;
+		isWhitespace = true;
 		foreach (char c in value)
 		{
-			if (JCPPGIPDMBK(c))
+			if (IsBreak(c))
 			{
-				NMGCFFFIFPJ();
-				GAMIKMDGHLL = true;
+				WriteBreak();
+				isIndentation = true;
 				flag = true;
 				continue;
 			}
 			if (flag)
 			{
-				MDBMBMENEBP();
+				WriteIndent();
 			}
 			Write(c);
-			GAMIKMDGHLL = false;
+			isIndentation = false;
 			flag = false;
 		}
 	}
 
-	private void IDBGPLELKHA(string value)
+	private void WriteFoldedScalar(string value)
 	{
 		bool flag = true;
 		bool flag2 = true;
 		WriteIndicator(">", true, false, false);
-		GDBPECOIHAP(value);
-		NMGCFFFIFPJ();
-		GAMIKMDGHLL = true;
-		JNNJNNGLDHF = true;
+		WriteBlockScalarHints(value);
+		WriteBreak();
+		isIndentation = true;
+		isWhitespace = true;
 		for (int i = 0; i < value.Length; i++)
 		{
 			char c = value[i];
-			if (JCPPGIPDMBK(c))
+			if (IsBreak(c))
 			{
 				if (!flag && !flag2 && c == '\n')
 				{
 					int j;
-					for (j = 0; i + j < value.Length && JCPPGIPDMBK(value[i + j]); j++)
+					for (j = 0; i + j < value.Length && IsBreak(value[i + j]); j++)
 					{
 					}
-					if (i + j < value.Length && !LLGAGKDMPPL(value[i + j]) && !JCPPGIPDMBK(value[i + j]))
+					if (i + j < value.Length && !IsBlank(value[i + j]) && !IsBreak(value[i + j]))
 					{
-						NMGCFFFIFPJ();
+						WriteBreak();
 					}
 				}
-				NMGCFFFIFPJ();
-				GAMIKMDGHLL = true;
+				WriteBreak();
+				isIndentation = true;
 				flag = true;
 			}
 			else
 			{
 				if (flag)
 				{
-					MDBMBMENEBP();
-					flag2 = LLGAGKDMPPL(c);
+					WriteIndent();
+					flag2 = IsBlank(c);
 				}
-				if (!flag && c == ' ' && i + 1 < value.Length && value[i + 1] != ' ' && DLPJJBPDNDE > CEIKEMJHLKL)
+				if (!flag && c == ' ' && i + 1 < value.Length && value[i + 1] != ' ' && column > bestWidth)
 				{
-					MDBMBMENEBP();
+					WriteIndent();
 				}
 				else
 				{
 					Write(c);
 				}
-				GAMIKMDGHLL = false;
+				isIndentation = false;
 				flag = false;
 			}
 		}
 	}
 
-	private static bool NBLLOLGNFGM(char KGDPNIINCJH)
+	private static bool IsSpace(char KGDPNIINCJH)
 	{
 		return KGDPNIINCJH == ' ';
 	}
 
-	private static bool JCPPGIPDMBK(char KGDPNIINCJH)
+	private static bool IsBreak(char KGDPNIINCJH)
 	{
 		return KGDPNIINCJH == '\r' || KGDPNIINCJH == '\n' || KGDPNIINCJH == '\u0085' || KGDPNIINCJH == '\u2028' || KGDPNIINCJH == '\u2029';
 	}
 
-	private static bool LLGAGKDMPPL(char KGDPNIINCJH)
+	private static bool IsBlank(char KGDPNIINCJH)
 	{
 		return KGDPNIINCJH == ' ' || KGDPNIINCJH == '\t';
 	}
 
-	private static bool IGNGBDLCMGB(char KGDPNIINCJH)
+	private static bool IsPrintable(char KGDPNIINCJH)
 	{
 		return KGDPNIINCJH == '\t' || KGDPNIINCJH == '\n' || KGDPNIINCJH == '\r' || (KGDPNIINCJH >= ' ' && KGDPNIINCJH <= '~') || KGDPNIINCJH == '\u0085' || (KGDPNIINCJH >= '\u00a0' && KGDPNIINCJH <= '\ud7ff') || (KGDPNIINCJH >= '\ue000' && KGDPNIINCJH <= '\ufffd');
 	}
 
-	private void NILGFBAEKHE(ParsingEvent IILOLJJLLGH)
+	private void EmitSequenceStart(ParsingEvent IILOLJJLLGH)
 	{
-		OEMEDIPPEMM();
-		DFIHPHNPHAO();
-		JODGINIKFJF jODGINIKFJF = (JODGINIKFJF)IILOLJJLLGH;
-		if (FLNOCBGGCPP != 0 || LGDHGOGFFCJ || jODGINIKFJF.HALCJLMJDII() == NBCBGEPFIKG.Flow || JIIDKCHJIBP())
+		ProcessAnchor();
+		ProcessTag();
+		SequenceStart jODGINIKFJF = (SequenceStart)IILOLJJLLGH;
+		if (flowLevel != 0 || isCanonical || jODGINIKFJF.GetStyle() == SequenceStyle.Flow || CheckEmptySequence())
 		{
-			state = PFIHGFCNOEG.FlowSequenceFirstItem;
+			state = EmitterStateKind.FlowSequenceFirstItem;
 		}
 		else
 		{
-			state = PFIHGFCNOEG.BlockSequenceFirstItem;
+			state = EmitterStateKind.BlockSequenceFirstItem;
 		}
 	}
 
-	private void MHADHMBBLNP(ParsingEvent IILOLJJLLGH)
+	private void EmitMappingStart(ParsingEvent IILOLJJLLGH)
 	{
-		OEMEDIPPEMM();
-		DFIHPHNPHAO();
+		ProcessAnchor();
+		ProcessTag();
 		MappingStart oGMPNFCPPDH = (MappingStart)IILOLJJLLGH;
-		if (FLNOCBGGCPP != 0 || LGDHGOGFFCJ || oGMPNFCPPDH.HALCJLMJDII() == FGDKNBEFPFN.Flow || FDHCLHDIAAM())
+		if (flowLevel != 0 || isCanonical || oGMPNFCPPDH.GetStyle() == MappingStyle.Flow || CheckEmptyMapping())
 		{
-			state = PFIHGFCNOEG.FlowMappingFirstKey;
+			state = EmitterStateKind.FlowMappingFirstKey;
 		}
 		else
 		{
-			state = PFIHGFCNOEG.BlockMappingFirstKey;
+			state = EmitterStateKind.BlockMappingFirstKey;
 		}
 	}
 
-	private void OEMEDIPPEMM()
+	private void ProcessAnchor()
 	{
-		if (MOIAINBHLBA.KOLNNNLOCFE != null)
+		if (anchorData.anchor != null)
 		{
-			WriteIndicator((!MOIAINBHLBA.LCPNKFDMFIA) ? "&" : "*", true, false, false);
-			EFKJGICEBDI(MOIAINBHLBA.KOLNNNLOCFE);
+			WriteIndicator((!anchorData.isAlias) ? "&" : "*", true, false, false);
+			WriteAnchor(anchorData.anchor);
 		}
 	}
 
-	private void DFIHPHNPHAO()
+	private void ProcessTag()
 	{
-		if (KLIMKJBCHOC.FODGADCGDBH == null && KLIMKJBCHOC.NCFFAGOLJEC == null)
+		if (tagData.handle == null && tagData.suffix == null)
 		{
 			return;
 		}
-		if (KLIMKJBCHOC.FODGADCGDBH != null)
+		if (tagData.handle != null)
 		{
-			IMEIEEFKHCD(KLIMKJBCHOC.FODGADCGDBH);
-			if (KLIMKJBCHOC.NCFFAGOLJEC != null)
+			WriteTagHandle(tagData.handle);
+			if (tagData.suffix != null)
 			{
-				DMCBHMNGJIP(KLIMKJBCHOC.NCFFAGOLJEC, false);
+				WriteTagContent(tagData.suffix, false);
 			}
 		}
 		else
 		{
 			WriteIndicator("!<", true, false, false);
-			DMCBHMNGJIP(KLIMKJBCHOC.NCFFAGOLJEC, false);
+			WriteTagContent(tagData.suffix, false);
 			WriteIndicator(">", false, false, false);
 		}
 	}
 
-	private void IOPKCDJBPFJ(ParsingEvent IILOLJJLLGH)
+	private void EmitDocumentEnd(ParsingEvent IILOLJJLLGH)
 	{
 		DocumentEnd nKCBFAMCLMO = IILOLJJLLGH as DocumentEnd;
 		if (nKCBFAMCLMO != null)
 		{
-			MDBMBMENEBP();
-			if (!nKCBFAMCLMO.BBBGHODAEIN())
+			WriteIndent();
+			if (!nKCBFAMCLMO.GetIsImplicit())
 			{
 				WriteIndicator("...", true, false, false);
-				MDBMBMENEBP();
-				FDLHHPENADJ = true;
+				WriteIndent();
+				isDocumentEndWritten = true;
 			}
-			state = PFIHGFCNOEG.DocumentStart;
-			FMCEHNBELJF.Clear();
+			state = EmitterStateKind.DocumentStart;
+			tagDirectives.Clear();
 			return;
 		}
 		throw new YamlException("Expected DOCUMENT-END.");
 	}
 
-	private void MOGAEAKBOGN(ParsingEvent IILOLJJLLGH, bool IKNHLPGLLKB)
+	private void EmitFlowSequenceItem(ParsingEvent IILOLJJLLGH, bool IKNHLPGLLKB)
 	{
 		if (IKNHLPGLLKB)
 		{
 			WriteIndicator("[", true, true, false);
 			IncreaseIndent(true, false);
-			FLNOCBGGCPP++;
+			flowLevel++;
 		}
-		if (IILOLJJLLGH is AKMKLAINLOL)
+		if (IILOLJJLLGH is SequenceEnd)
 		{
-			FLNOCBGGCPP--;
-			AIBHPFBFGNA = indents.Pop();
-			if (LGDHGOGFFCJ && !IKNHLPGLLKB)
+			flowLevel--;
+			indent = indents.Pop();
+			if (isCanonical && !IKNHLPGLLKB)
 			{
 				WriteIndicator(",", false, false, false);
-				MDBMBMENEBP();
+				WriteIndent();
 			}
 			WriteIndicator("]", false, false, false);
-			state = LNJBMLMFKDH.Pop();
+			state = states.Pop();
 		}
 		else
 		{
@@ -1158,58 +1158,58 @@ public class Emitter : NEKGJNOFOFN
 			{
 				WriteIndicator(",", false, false, false);
 			}
-			if (LGDHGOGFFCJ || DLPJJBPDNDE > CEIKEMJHLKL)
+			if (isCanonical || column > bestWidth)
 			{
-				MDBMBMENEBP();
+				WriteIndent();
 			}
-			LNJBMLMFKDH.Push(PFIHGFCNOEG.FlowSequenceItem);
-			MIACPENCIPM(IILOLJJLLGH, false, false, false);
+			states.Push(EmitterStateKind.FlowSequenceItem);
+			EmitNode(IILOLJJLLGH, false, false, false);
 		}
 	}
 
-	private void JGPMFBFHPLG(ParsingEvent IILOLJJLLGH, bool IKNHLPGLLKB)
+	private void EmitFlowMappingKey(ParsingEvent IILOLJJLLGH, bool IKNHLPGLLKB)
 	{
 		if (IKNHLPGLLKB)
 		{
 			WriteIndicator("{", true, true, false);
 			IncreaseIndent(true, false);
-			FLNOCBGGCPP++;
+			flowLevel++;
 		}
-		if (IILOLJJLLGH is BLFPJCPALDH)
+		if (IILOLJJLLGH is MappingEnd)
 		{
-			FLNOCBGGCPP--;
-			AIBHPFBFGNA = indents.Pop();
-			if (LGDHGOGFFCJ && !IKNHLPGLLKB)
+			flowLevel--;
+			indent = indents.Pop();
+			if (isCanonical && !IKNHLPGLLKB)
 			{
 				WriteIndicator(",", false, false, false);
-				MDBMBMENEBP();
+				WriteIndent();
 			}
 			WriteIndicator("}", false, false, false);
-			state = LNJBMLMFKDH.Pop();
+			state = states.Pop();
 			return;
 		}
 		if (!IKNHLPGLLKB)
 		{
 			WriteIndicator(",", false, false, false);
 		}
-		if (LGDHGOGFFCJ || DLPJJBPDNDE > CEIKEMJHLKL)
+		if (isCanonical || column > bestWidth)
 		{
-			MDBMBMENEBP();
+			WriteIndent();
 		}
-		if (!LGDHGOGFFCJ && FHCDNJHMBFN())
+		if (!isCanonical && CheckSimpleKey())
 		{
-			LNJBMLMFKDH.Push(PFIHGFCNOEG.FlowMappingSimpleValue);
-			MIACPENCIPM(IILOLJJLLGH, false, true, true);
+			states.Push(EmitterStateKind.FlowMappingSimpleValue);
+			EmitNode(IILOLJJLLGH, false, true, true);
 		}
 		else
 		{
 			WriteIndicator("?", true, false, false);
-			LNJBMLMFKDH.Push(PFIHGFCNOEG.FlowMappingValue);
-			MIACPENCIPM(IILOLJJLLGH, false, true, false);
+			states.Push(EmitterStateKind.FlowMappingValue);
+			EmitNode(IILOLJJLLGH, false, true, false);
 		}
 	}
 
-	private void LKMHLDHKDAM(ParsingEvent IILOLJJLLGH, bool FBFEFFJCLBE)
+	private void EmitFlowMappingValue(ParsingEvent IILOLJJLLGH, bool FBFEFFJCLBE)
 	{
 		if (FBFEFFJCLBE)
 		{
@@ -1217,61 +1217,61 @@ public class Emitter : NEKGJNOFOFN
 		}
 		else
 		{
-			if (LGDHGOGFFCJ || DLPJJBPDNDE > CEIKEMJHLKL)
+			if (isCanonical || column > bestWidth)
 			{
-				MDBMBMENEBP();
+				WriteIndent();
 			}
 			WriteIndicator(":", true, false, false);
 		}
-		LNJBMLMFKDH.Push(PFIHGFCNOEG.FlowMappingKey);
-		MIACPENCIPM(IILOLJJLLGH, false, true, false);
+		states.Push(EmitterStateKind.FlowMappingKey);
+		EmitNode(IILOLJJLLGH, false, true, false);
 	}
 
-	private void BNNKMPFDJGP(ParsingEvent IILOLJJLLGH, bool IKNHLPGLLKB)
+	private void EmitBlockSequenceItem(ParsingEvent IILOLJJLLGH, bool IKNHLPGLLKB)
 	{
 		if (IKNHLPGLLKB)
 		{
-			IncreaseIndent(false, MLJMBHGNABP && !GAMIKMDGHLL);
+			IncreaseIndent(false, isMappingContext && !isIndentation);
 		}
-		if (IILOLJJLLGH is AKMKLAINLOL)
+		if (IILOLJJLLGH is SequenceEnd)
 		{
-			AIBHPFBFGNA = indents.Pop();
-			state = LNJBMLMFKDH.Pop();
+			indent = indents.Pop();
+			state = states.Pop();
 			return;
 		}
-		MDBMBMENEBP();
+		WriteIndent();
 		WriteIndicator("  -", true, false, true);
-		LNJBMLMFKDH.Push(PFIHGFCNOEG.BlockSequenceItem);
-		MIACPENCIPM(IILOLJJLLGH, false, false, false);
+		states.Push(EmitterStateKind.BlockSequenceItem);
+		EmitNode(IILOLJJLLGH, false, false, false);
 	}
 
-	private void OPAIFNHGJGA(ParsingEvent IILOLJJLLGH, bool IKNHLPGLLKB)
+	private void EmitBlockMappingKey(ParsingEvent IILOLJJLLGH, bool IKNHLPGLLKB)
 	{
 		if (IKNHLPGLLKB)
 		{
 			IncreaseIndent(false, false);
 		}
-		if (IILOLJJLLGH is BLFPJCPALDH)
+		if (IILOLJJLLGH is MappingEnd)
 		{
-			AIBHPFBFGNA = indents.Pop();
-			state = LNJBMLMFKDH.Pop();
+			indent = indents.Pop();
+			state = states.Pop();
 			return;
 		}
-		MDBMBMENEBP();
-		if (FHCDNJHMBFN())
+		WriteIndent();
+		if (CheckSimpleKey())
 		{
-			LNJBMLMFKDH.Push(PFIHGFCNOEG.BlockMappingSimpleValue);
-			MIACPENCIPM(IILOLJJLLGH, false, true, true);
+			states.Push(EmitterStateKind.BlockMappingSimpleValue);
+			EmitNode(IILOLJJLLGH, false, true, true);
 		}
 		else
 		{
 			WriteIndicator("?", true, false, true);
-			LNJBMLMFKDH.Push(PFIHGFCNOEG.BlockMappingValue);
-			MIACPENCIPM(IILOLJJLLGH, false, true, false);
+			states.Push(EmitterStateKind.BlockMappingValue);
+			EmitNode(IILOLJJLLGH, false, true, false);
 		}
 	}
 
-	private void PAGLCKDAPMK(ParsingEvent IILOLJJLLGH, bool FBFEFFJCLBE)
+	private void EmitBlockMappingValue(ParsingEvent IILOLJJLLGH, bool FBFEFFJCLBE)
 	{
 		if (FBFEFFJCLBE)
 		{
@@ -1279,30 +1279,30 @@ public class Emitter : NEKGJNOFOFN
 		}
 		else
 		{
-			MDBMBMENEBP();
+			WriteIndent();
 			WriteIndicator(":", true, false, true);
 		}
-		LNJBMLMFKDH.Push(PFIHGFCNOEG.BlockMappingKey);
-		MIACPENCIPM(IILOLJJLLGH, false, true, false);
+		states.Push(EmitterStateKind.BlockMappingKey);
+		EmitNode(IILOLJJLLGH, false, true, false);
 	}
 
 	private void IncreaseIndent(bool LMEEIAPIDIJ, bool BHHEHBPGKIO)
 	{
-		indents.Push(AIBHPFBFGNA);
-		if (AIBHPFBFGNA < 0)
+		indents.Push(indent);
+		if (indent < 0)
 		{
-			AIBHPFBFGNA = (LMEEIAPIDIJ ? EMOCJNOCJKM : 0);
+			indent = (LMEEIAPIDIJ ? bestIndent : 0);
 		}
 		else if (!BHHEHBPGKIO)
 		{
-			AIBHPFBFGNA += EMOCJNOCJKM;
+			indent += bestIndent;
 		}
 	}
 
-	private bool NOIMGKCEPOH()
+	private bool CheckEmptyDocument()
 	{
 		int num = 0;
-		foreach (ParsingEvent item in DNBFFLFBDOB)
+		foreach (ParsingEvent item in events)
 		{
 			num++;
 			if (num == 2)
@@ -1310,7 +1310,7 @@ public class Emitter : NEKGJNOFOFN
 				Scalar lEACOCDHICF = item as Scalar;
 				if (lEACOCDHICF != null)
 				{
-					return string.IsNullOrEmpty(lEACOCDHICF.OEAKCOHMIHH());
+					return string.IsNullOrEmpty(lEACOCDHICF.GetValue());
 				}
 				break;
 			}
@@ -1318,38 +1318,38 @@ public class Emitter : NEKGJNOFOFN
 		return false;
 	}
 
-	private bool FHCDNJHMBFN()
+	private bool CheckSimpleKey()
 	{
-		if (DNBFFLFBDOB.Count < 1)
+		if (events.Count < 1)
 		{
 			return false;
 		}
 		int num;
-		switch (DNBFFLFBDOB.Peek().get_Type())
+		switch (events.Peek().get_Type())
 		{
-		case BHBPOHDAGPH.Alias:
-			num = SafeStringLength(MOIAINBHLBA.KOLNNNLOCFE);
+		case ParsingEventType.Alias:
+			num = SafeStringLength(anchorData.anchor);
 			break;
-		case BHBPOHDAGPH.Scalar:
-			if (AKIFIIJIHGI.IKBPKEEMMCA)
+		case ParsingEventType.Scalar:
+			if (scalarData.isMultiline)
 			{
 				return false;
 			}
-			num = SafeStringLength(MOIAINBHLBA.KOLNNNLOCFE) + SafeStringLength(KLIMKJBCHOC.FODGADCGDBH) + SafeStringLength(KLIMKJBCHOC.NCFFAGOLJEC) + SafeStringLength(AKIFIIJIHGI.value);
+			num = SafeStringLength(anchorData.anchor) + SafeStringLength(tagData.handle) + SafeStringLength(tagData.suffix) + SafeStringLength(scalarData.value);
 			break;
-		case BHBPOHDAGPH.SequenceStart:
-			if (!JIIDKCHJIBP())
+		case ParsingEventType.SequenceStart:
+			if (!CheckEmptySequence())
 			{
 				return false;
 			}
-			num = SafeStringLength(MOIAINBHLBA.KOLNNNLOCFE) + SafeStringLength(KLIMKJBCHOC.FODGADCGDBH) + SafeStringLength(KLIMKJBCHOC.NCFFAGOLJEC);
+			num = SafeStringLength(anchorData.anchor) + SafeStringLength(tagData.handle) + SafeStringLength(tagData.suffix);
 			break;
-		case BHBPOHDAGPH.MappingStart:
-			if (!JIIDKCHJIBP())
+		case ParsingEventType.MappingStart:
+			if (!CheckEmptySequence())
 			{
 				return false;
 			}
-			num = SafeStringLength(MOIAINBHLBA.KOLNNNLOCFE) + SafeStringLength(KLIMKJBCHOC.FODGADCGDBH) + SafeStringLength(KLIMKJBCHOC.NCFFAGOLJEC);
+			num = SafeStringLength(anchorData.anchor) + SafeStringLength(tagData.handle) + SafeStringLength(tagData.suffix);
 			break;
 		default:
 			return false;
@@ -1362,44 +1362,44 @@ public class Emitter : NEKGJNOFOFN
 		return (value != null) ? value.Length : 0;
 	}
 
-	private bool JIIDKCHJIBP()
+	private bool CheckEmptySequence()
 	{
-		if (DNBFFLFBDOB.Count < 2)
+		if (events.Count < 2)
 		{
 			return false;
 		}
-		global::FakeList<ParsingEvent> aGIJCJFMLNN = new global::FakeList<ParsingEvent>(DNBFFLFBDOB);
-		return aGIJCJFMLNN.get_Item(0) is JODGINIKFJF && aGIJCJFMLNN.get_Item(1) is AKMKLAINLOL;
+		global::FakeList<ParsingEvent> aGIJCJFMLNN = new global::FakeList<ParsingEvent>(events);
+		return aGIJCJFMLNN.get_Item(0) is SequenceStart && aGIJCJFMLNN.get_Item(1) is SequenceEnd;
 	}
 
-	private bool FDHCLHDIAAM()
+	private bool CheckEmptyMapping()
 	{
-		if (DNBFFLFBDOB.Count < 2)
+		if (events.Count < 2)
 		{
 			return false;
 		}
-		global::FakeList<ParsingEvent> aGIJCJFMLNN = new global::FakeList<ParsingEvent>(DNBFFLFBDOB);
-		return aGIJCJFMLNN.get_Item(0) is MappingStart && aGIJCJFMLNN.get_Item(1) is BLFPJCPALDH;
+		global::FakeList<ParsingEvent> aGIJCJFMLNN = new global::FakeList<ParsingEvent>(events);
+		return aGIJCJFMLNN.get_Item(0) is MappingStart && aGIJCJFMLNN.get_Item(1) is MappingEnd;
 	}
 
-	private void GDBPECOIHAP(string value)
+	private void WriteBlockScalarHints(string value)
 	{
 		CharacterAnalyzer<StringLookAheadBuffer> characterAnalyzer = new CharacterAnalyzer<StringLookAheadBuffer>(new StringLookAheadBuffer(value));
-		if (characterAnalyzer.NBLLOLGNFGM() || characterAnalyzer.JCPPGIPDMBK())
+		if (characterAnalyzer.IsSpace() || characterAnalyzer.IsBreak())
 		{
-			string gPKBINAOGDC = string.Format(CultureInfo.InvariantCulture, "{0}\0", EMOCJNOCJKM);
+			string gPKBINAOGDC = string.Format(CultureInfo.InvariantCulture, "{0}\0", bestIndent);
 			WriteIndicator(gPKBINAOGDC, false, false, false);
 		}
-		MIBHHFPMBID = false;
+		isOpenEnded = false;
 		string text = null;
-		if (value.Length == 0 || !characterAnalyzer.JCPPGIPDMBK(value.Length - 1))
+		if (value.Length == 0 || !characterAnalyzer.IsBreak(value.Length - 1))
 		{
 			text = "-";
 		}
-		else if (value.Length >= 2 && characterAnalyzer.JCPPGIPDMBK(value.Length - 2))
+		else if (value.Length >= 2 && characterAnalyzer.IsBreak(value.Length - 2))
 		{
 			text = "+";
-			MIBHHFPMBID = true;
+			isOpenEnded = true;
 		}
 		if (text != null)
 		{
@@ -1409,58 +1409,58 @@ public class Emitter : NEKGJNOFOFN
 
 	private void WriteIndicator(string GPKBINAOGDC, bool EMBMHCGJHDL, bool KCCMOOJPCBM, bool FCOACAMEHOE)
 	{
-		if (EMBMHCGJHDL && !JNNJNNGLDHF)
+		if (EMBMHCGJHDL && !isWhitespace)
 		{
 			Write(' ');
 		}
 		Write(GPKBINAOGDC);
-		JNNJNNGLDHF = KCCMOOJPCBM;
-		GAMIKMDGHLL &= FCOACAMEHOE;
-		MIBHHFPMBID = false;
+		isWhitespace = KCCMOOJPCBM;
+		isIndentation &= FCOACAMEHOE;
+		isOpenEnded = false;
 	}
 
-	private void MDBMBMENEBP()
+	private void WriteIndent()
 	{
-		int num = Math.Max(AIBHPFBFGNA, 0);
-		if (!GAMIKMDGHLL || DLPJJBPDNDE > num || (DLPJJBPDNDE == num && !JNNJNNGLDHF))
+		int num = Math.Max(indent, 0);
+		if (!isIndentation || column > num || (column == num && !isWhitespace))
 		{
-			NMGCFFFIFPJ();
+			WriteBreak();
 		}
-		while (DLPJJBPDNDE < num)
-		{
-			Write(' ');
-		}
-		JNNJNNGLDHF = true;
-		GAMIKMDGHLL = true;
-	}
-
-	private void EFKJGICEBDI(string value)
-	{
-		Write(value);
-		JNNJNNGLDHF = false;
-		GAMIKMDGHLL = false;
-	}
-
-	private void IMEIEEFKHCD(string value)
-	{
-		if (!JNNJNNGLDHF)
+		while (column < num)
 		{
 			Write(' ');
 		}
-		Write(value);
-		JNNJNNGLDHF = false;
-		GAMIKMDGHLL = false;
+		isWhitespace = true;
+		isIndentation = true;
 	}
 
-	private void DMCBHMNGJIP(string value, bool BFPMMILLOHL)
+	private void WriteAnchor(string value)
 	{
-		if (BFPMMILLOHL && !JNNJNNGLDHF)
+		Write(value);
+		isWhitespace = false;
+		isIndentation = false;
+	}
+
+	private void WriteTagHandle(string value)
+	{
+		if (!isWhitespace)
+		{
+			Write(' ');
+		}
+		Write(value);
+		isWhitespace = false;
+		isIndentation = false;
+	}
+
+	private void WriteTagContent(string value, bool BFPMMILLOHL)
+	{
+		if (BFPMMILLOHL && !isWhitespace)
 		{
 			Write(' ');
 		}
 		Write(UrlEncode(value));
-		JNNJNNGLDHF = false;
-		GAMIKMDGHLL = false;
+		isWhitespace = false;
+		isIndentation = false;
 	}
 
 	private string UrlEncode(string HCPNFPMHFCM)
@@ -1480,18 +1480,18 @@ public class Emitter : NEKGJNOFOFN
 	private void Write(char value)
 	{
 		output.Write(value);
-		DLPJJBPDNDE++;
+		column++;
 	}
 
 	private void Write(string value)
 	{
 		output.Write(value);
-		DLPJJBPDNDE += value.Length;
+		column += value.Length;
 	}
 
-	private void NMGCFFFIFPJ()
+	private void WriteBreak()
 	{
 		output.WriteLine();
-		DLPJJBPDNDE = 0;
+		column = 0;
 	}
 }

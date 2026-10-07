@@ -2,13 +2,13 @@ using CodeStage.AntiCheat.ObscuredTypes;
 
 public class ResistanceStruct
 {
-	public GameResistance PIFOHOOFJDE;
+	public GameResistance resistance;
 
 	public ObscuredInt Count;
 
 	public ResistanceStruct(GameResistance DHOLEOOFCMB, int _count)
 	{
-		PIFOHOOFJDE = DHOLEOOFCMB;
+		resistance = DHOLEOOFCMB;
 		Count = (ObscuredInt)(_count);
 	}
 }

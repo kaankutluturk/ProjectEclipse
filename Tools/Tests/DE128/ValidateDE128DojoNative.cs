@@ -74,7 +74,7 @@ public static class ValidateDE128DojoNative
                 return;
             }
             var scripts = ModRuntime.Scripts;
-            var roster = ListSF.CCDKHLAMKKO();
+            var roster = ListSF.GetRoster();
             var module = Module.GetInstance();
             if (scripts == null || roster == null || module == null) return;
             if (scripts.Diagnostics.Count != 0 || scripts.StateDiagnostics.Count != 0)
@@ -84,10 +84,10 @@ public static class ValidateDE128DojoNative
             {
                 if (module.GetCurrentScreenType() != ScreenType.ModuleDojo &&
                     module.GetCurrentScreenType() != ScreenType.ModuleMap) return;
-                var button = MapButtonController.ELEBLBJKDBI().MEPCBPIJLGB()
+                var button = MapButtonController.GetInstance().GetStoryButtons()
                     .SingleOrDefault(value => value.Name == "de128.dojo_changer");
-                if (button == null || button.BIJFFONMDBC.x != 240f ||
-                    button.BIJFFONMDBC.y != -650f || button.AnchorMinX != 0f)
+                if (button == null || button.Position.x != 240f ||
+                    button.Position.y != -650f || button.AnchorMinX != 0f)
                     throw new Exception("The saved off-screen map button was not repositioned after restart.");
                 string resolved = ModRuntime.ResolveDojoLocation("dojo");
                 string entry = Location.ResolveEntryLocation(BattleType.FightNone, "dojo");
@@ -118,7 +118,7 @@ public static class ValidateDE128DojoNative
                     UnityEngine.Object.FindObjectOfType<MapScene>() == null) return;
                 if (NativeBlocked())
                 {
-                    var active = typeof(DialogsManager).GetField("OALIPPPOHCL",
+                    var active = typeof(DialogsManager).GetField("currentDialog",
                         BindingFlags.Static | BindingFlags.NonPublic)?.GetValue(null) as BaseDialog;
                     if (active is StoryDialog story && story.IsQuestDialog &&
                         EditorApplication.timeSinceStartup - lastCardPress > 0.2)
@@ -130,30 +130,30 @@ public static class ValidateDE128DojoNative
                         // movement action even after SkipTutorial moved to Map.
                         // Retire that fixture card without executing its quest
                         // callback; the acceptance target is the dojo map button.
-                        DialogsManager.ELEBLBJKDBI().StopDialog(story);
+                        DialogsManager.GetInstance().StopDialog(story);
                         UnityEngine.Object.Destroy(story.gameObject);
                         Debug.Log(Prefix + "dismissed tutorial fixture card " + campaignCards);
                     }
                     return;
                 }
-                var info = MapButtonController.ELEBLBJKDBI().MEPCBPIJLGB()
+                var info = MapButtonController.GetInstance().GetStoryButtons()
                     .SingleOrDefault(value => value.Name == "de128.dojo_changer");
                 if (info == null) return;
-                if (info.NHKMCLPOMFK != "de128:sprites/dojo_changer/credits" ||
+                if (info.ImageName != "de128:sprites/dojo_changer/credits" ||
                     info.AnchorMinX != 0f || info.AnchorMaxX != 0f ||
-                    info.BIJFFONMDBC.x != 240f || info.BIJFFONMDBC.y != -650f ||
-                    info.EDMILHNJFAA() != MapButtonInfo.HNEJAKIGDBA.Both)
+                    info.Position.x != 240f || info.Position.y != -650f ||
+                    info.GetShowType() != MapButtonInfo.MapButtonShowType.Both)
                     throw new Exception("Native map-button presentation differs from the visible DE128 placement.");
                 if (!migrationChecked)
                 {
-                    var buttons = MapButtonController.ELEBLBJKDBI();
-                    buttons.GKIOOABOBFL(ArchivedButton(info));
-                    buttons.GKIOOABOBFL(info);
-                    buttons.GKIOOABOBFL(info);
+                    var buttons = MapButtonController.GetInstance();
+                    buttons.AddButton(ArchivedButton(info));
+                    buttons.AddButton(info);
+                    buttons.AddButton(info);
                     var saved = typeof(MapButtonController).GetField("_node", Hidden)
                         .GetValue(buttons) as XmlNode;
                     var entries = saved?.SelectNodes("Button[@Name='de128.dojo_changer']");
-                    if (buttons.MEPCBPIJLGB().Count(value => value.Name == info.Name) != 1 ||
+                    if (buttons.GetStoryButtons().Count(value => value.Name == info.Name) != 1 ||
                         entries == null || entries.Count != 1 ||
                         entries[0].Attributes?["X"]?.Value != "240" ||
                         entries[0].Attributes?["Y"]?.Value != "-650")
@@ -227,9 +227,9 @@ public static class ValidateDE128DojoNative
             }
             if (!legacyStored)
             {
-                var savedButton = MapButtonController.ELEBLBJKDBI().MEPCBPIJLGB()
+                var savedButton = MapButtonController.GetInstance().GetStoryButtons()
                     .Single(value => value.Name == "de128.dojo_changer");
-                MapButtonController.ELEBLBJKDBI().GKIOOABOBFL(ArchivedButton(savedButton));
+                MapButtonController.GetInstance().AddButton(ArchivedButton(savedButton));
                 legacyStored = true;
                 legacyStoredAt = EditorApplication.timeSinceStartup;
                 return;
@@ -253,7 +253,7 @@ public static class ValidateDE128DojoNative
         BindingFlags.Static | BindingFlags.NonPublic).GetValue(null);
 
     static MapButtonInfo ArchivedButton(MapButtonInfo current) =>
-        new MapButtonInfo(current.Name, current.NHKMCLPOMFK, "",
+        new MapButtonInfo(current.Name, current.ImageName, "",
             new Vector2(-3095f, -645f), anchorMinX: 1f, anchorMaxX: 1f,
             BFBFKHHANJG: "Both");
 }

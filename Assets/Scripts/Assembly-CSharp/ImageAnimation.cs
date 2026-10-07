@@ -15,9 +15,9 @@ public class ImageAnimation : MonoBehaviour
 
 	private Vector2 _startSize;
 
-	private float NJOBMGDCIMP = 0.1f;
+	private float frameDelay = 0.1f;
 
-	private float PBDGCPDCAKJ;
+	private float loopPauseDelay;
 
 	private void Start()
 	{
@@ -50,11 +50,11 @@ public class ImageAnimation : MonoBehaviour
 			}
 			if (_currentFrame != _sprites.Length - 1)
 			{
-				yield return new WaitForSeconds(NJOBMGDCIMP);
+				yield return new WaitForSeconds(frameDelay);
 			}
 			else
 			{
-				yield return new WaitForSeconds(PBDGCPDCAKJ);
+				yield return new WaitForSeconds(loopPauseDelay);
 			}
 			_currentFrame++;
 			if (_currentFrame >= _sprites.Length)
@@ -68,7 +68,7 @@ public class ImageAnimation : MonoBehaviour
 	{
 		if (!(NKNMHPLMFND <= 0f))
 		{
-			NJOBMGDCIMP = NKNMHPLMFND / (float)_sprites.Length;
+			frameDelay = NKNMHPLMFND / (float)_sprites.Length;
 		}
 	}
 
@@ -76,7 +76,7 @@ public class ImageAnimation : MonoBehaviour
 	{
 		if (!(AJANNMFPEMN <= 0f))
 		{
-			PBDGCPDCAKJ = AJANNMFPEMN;
+			loopPauseDelay = AJANNMFPEMN;
 		}
 	}
 }

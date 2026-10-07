@@ -8,7 +8,7 @@ namespace Eclipse.UI
     {
         public static string Replays(BattleReplayable battle)
         {
-            int count = battle.HLBOMMKJAAO();
+            int count = battle.GetCompletedCycles();
             string replays = LocalizationManager.GetString("replays", count.ToString());
             if (string.IsNullOrEmpty(replays)) replays = "Replays: " + count;
             bool eclipse = battle.get_Name().EndsWith("_ECLIPSEMODE", System.StringComparison.Ordinal);

@@ -74,7 +74,7 @@ public static class FighterMotionUnity
                 if(ModRuntime.Scripts==null||Module.GetInstance()==null)return;
                 var screen=Module.GetInstance().GetCurrentScreenType();if(screen!=ScreenType.ModuleDojo&&screen!=ScreenType.ModuleMap)return;
                 Check(!ModRuntime.Scripts.HasErrors,"Game session has mod startup errors");
-                var encounter=ListSF.CHMCKGCDGCM(new FightIDS(ModRuntime.Scripts.Content.RuntimeFightId(DefinitionId.Parse("core:fights/zone_1/tournament/3"))));
+                var encounter=ListSF.GetFightById(new FightIDS(ModRuntime.Scripts.Content.RuntimeFightId(DefinitionId.Parse("core:fights/zone_1/tournament/3"))));
                 Check(encounter!=null,"Core encounter missing");entered=GameUtils.StartFight(encounter,false,null,true,false);return;
             }
             var fight=Fight.GetCurrentFight();if(fight==null)return;
@@ -147,28 +147,28 @@ public static class FighterMotionUnity
         Check(Eclipse.Saves.CampaignSaveSession.PreviewDirectory==null,"Title preview was not released");
         Check(directory.StartsWith(Application.persistentDataPath,StringComparison.OrdinalIgnoreCase)&&
             Application.persistentDataPath.Contains(Path.GetFileName(root)),"Profile path was not isolated");
-        var profile=XmlUtils.OpenXMLDocument(SF2Paths.KKIDGPBOBNI(),"usersDefault.xml",XmlUtils.EBLFEPIOMOL.Normal,true,XmlCryptoUtils.NNLGALNDJCL());
+        var profile=XmlUtils.OpenXMLDocument(SF2Paths.GetGameDataPath(),"usersDefault.xml",XmlUtils.XmlSourceMode.Normal,true,XmlCryptoUtils.GetIsEncryptionEnabled());
         Check(profile!=null,"Default native profile missing");
         var warrior=profile.SelectSingleNode("/Root/Warriors/Warrior[@ID='1']") as System.Xml.XmlElement;
         Check(warrior!=null,"Default native warrior missing");
         warrior.SetAttribute("Tutorial","END");
         Directory.CreateDirectory(directory);
-        XmlUtils.ONLDJNLKKAL(profile,Path.Combine(directory,Constants.OJMIJINKBPJ).Replace('\\','/'));
+        XmlUtils.SaveDocumentWithHash(profile,Path.Combine(directory,Constants.UsersFileName).Replace('\\','/'));
         Debug.Log("[FighterMotionUnity] Seeded isolated post-tutorial profile: "+directory);
     }
     static void VerifyRigTranslation(Fight fight,Model player)
     {
-        var points=(IEnumerable)Field(Field(player.GetModelObject(),"CEHJGIHMKFF"),"OEAFIMFONDL");
+        var points=(IEnumerable)Field(Field(player.GetModelObject(),"nodeData"),"AllNodes");
         var rig=new List<(Vector3f vector,float x)>();
         foreach(ModelNode node in points){rig.Add((node.GetStart(),node.GetStart().GetX()));rig.Add((node.GetEnd(),node.GetEnd().GetX()));}
         var animation=Field(player,"_Animation");
-        var buffers=(IEnumerable)Field(animation,"AHOBIIMFNEP");
+        var buffers=(IEnumerable)Field(animation,"bufferedFrames");
         var vectors=new List<(Vector3f vector,float x)>();
         foreach(IEnumerable buffer in buffers)foreach(Vector3f vector in buffer)vectors.Add((vector,vector.GetX()));
         var frames=Field(animation,"_Frames");
-        var frameList=(IList)Field(frames,"DCFPONJAING");
+        var frameList=(IList)Field(frames,"frames");
         int first=(bool)Field(frames,"_IsInterruptFramesSeted")?2:0;
-        int last=(int)Field(frames,"BOAIMPGFINL");
+        int last=(int)Field(frames,"frameCount");
         for(int i=first;i<last;i++) {
             var item=(KeyFrames.Frame)frameList[i];for(int j=0;j<item.Size;j++)vectors.Add((item.Data[j],item.Data[j].GetX()));
         }
@@ -219,7 +219,7 @@ public static class FighterMotionUnity
         try {
             var fight=Fight.GetCurrentFight();var pulse=Surface("example.repulse","repulse");
             Queue(fight,fight.GetPlayerModel(),50);
-            typeof(Fight).GetMethod("HCNDAFDHACI",Hidden).Invoke(fight,new object[]{GameOverTypes.GAME_OVER_SURRENDER});
+            typeof(Fight).GetMethod("AbortFight",Hidden).Invoke(fight,new object[]{GameOverTypes.GAME_OVER_SURRENDER});
             Check(pulse.IsClosed,"Native surrender left shipped HUD open");
             Check(((IDictionary)Field(fight,"_eclipseFighterMotion")).Count==0,"Native surrender retained queued displacement");
             var root=Path.GetDirectoryName(Application.dataPath);

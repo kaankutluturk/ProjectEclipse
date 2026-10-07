@@ -6,7 +6,7 @@ using System.Text;
 
 public static class Extensions
 {
-	public static string JBAOFMBHJND(this byte[] KPAMPCLHCEN)
+	public static string AsciiToString(this byte[] KPAMPCLHCEN)
 	{
 		StringBuilder stringBuilder = new StringBuilder(KPAMPCLHCEN.Length);
 		foreach (byte b in KPAMPCLHCEN)
@@ -37,7 +37,7 @@ public static class Extensions
 
 	public static void WriteLine(this FileStream MEHMICNAPMK)
 	{
-		MEHMICNAPMK.Write(HTTPRequest.HGBANJPCEPF, 0, 2);
+		MEHMICNAPMK.Write(HTTPRequest.EOL, 0, 2);
 	}
 
 	public static void WriteLine(this FileStream MEHMICNAPMK, string MGPBPJOHMLH)
@@ -117,7 +117,7 @@ public static class Extensions
 		}
 	}
 
-	public static string PKBHGNMGNNO(this string IGGFGLLIGCG)
+	public static string ToStrOrEmpty(this string IGGFGLLIGCG)
 	{
 		if (IGGFGLLIGCG == null)
 		{
@@ -126,12 +126,12 @@ public static class Extensions
 		return IGGFGLLIGCG;
 	}
 
-	public static string DAOJIBHMOJK(this string NILNDHEKNLJ)
+	public static string CalculateMD5Hash(this string NILNDHEKNLJ)
 	{
-		return NILNDHEKNLJ.GetASCIIBytes().DAOJIBHMOJK();
+		return NILNDHEKNLJ.GetASCIIBytes().CalculateMD5Hash();
 	}
 
-	public static string DAOJIBHMOJK(this byte[] NILNDHEKNLJ)
+	public static string CalculateMD5Hash(this byte[] NILNDHEKNLJ)
 	{
 		byte[] array = MD5.Create().ComputeHash(NILNDHEKNLJ);
 		StringBuilder stringBuilder = new StringBuilder();
@@ -196,7 +196,7 @@ public static class Extensions
 		}
 	}
 
-	internal static string JONPEPOKJFC(this string IGGFGLLIGCG)
+	internal static string TrimAndLower(this string IGGFGLLIGCG)
 	{
 		if (IGGFGLLIGCG == null)
 		{
@@ -214,7 +214,7 @@ public static class Extensions
 		return new string(array, 0, length);
 	}
 
-	internal static List<KeyValuePair> IAFOBCFEJPH(this string IGGFGLLIGCG)
+	internal static List<KeyValuePair> ParseOptionalHeader(this string IGGFGLLIGCG)
 	{
 		List<KeyValuePair> list = new List<KeyValuePair>();
 		if (IGGFGLLIGCG == null)
@@ -224,7 +224,7 @@ public static class Extensions
 		int LCCLEFMKLPB = 0;
 		while (LCCLEFMKLPB < IGGFGLLIGCG.Length)
 		{
-			string kGBGENDIMBC = IGGFGLLIGCG.Read(ref LCCLEFMKLPB, (char KDFCGMMKAME) => KDFCGMMKAME != '=' && KDFCGMMKAME != ',').JONPEPOKJFC();
+			string kGBGENDIMBC = IGGFGLLIGCG.Read(ref LCCLEFMKLPB, (char KDFCGMMKAME) => KDFCGMMKAME != '=' && KDFCGMMKAME != ',').TrimAndLower();
 			KeyValuePair gGCJLGPPHKP = new KeyValuePair(kGBGENDIMBC);
 			if (IGGFGLLIGCG[LCCLEFMKLPB - 1] == '=')
 			{
@@ -235,7 +235,7 @@ public static class Extensions
 		return list;
 	}
 
-	internal static List<KeyValuePair> MNFHBLMMGPE(this string IGGFGLLIGCG)
+	internal static List<KeyValuePair> ParseQualityParams(this string IGGFGLLIGCG)
 	{
 		List<KeyValuePair> list = new List<KeyValuePair>();
 		if (IGGFGLLIGCG == null)
@@ -245,7 +245,7 @@ public static class Extensions
 		int LCCLEFMKLPB = 0;
 		while (LCCLEFMKLPB < IGGFGLLIGCG.Length)
 		{
-			string kGBGENDIMBC = IGGFGLLIGCG.Read(ref LCCLEFMKLPB, (char KDFCGMMKAME) => KDFCGMMKAME != ',' && KDFCGMMKAME != ';').JONPEPOKJFC();
+			string kGBGENDIMBC = IGGFGLLIGCG.Read(ref LCCLEFMKLPB, (char KDFCGMMKAME) => KDFCGMMKAME != ',' && KDFCGMMKAME != ';').TrimAndLower();
 			KeyValuePair gGCJLGPPHKP = new KeyValuePair(kGBGENDIMBC);
 			if (IGGFGLLIGCG[LCCLEFMKLPB - 1] == ';')
 			{
@@ -272,7 +272,7 @@ public static class Extensions
 		PKGAJCFLOLA.Write(buffer, 0, buffer.Length);
 	}
 
-	public static void IHOOAEHGMFO(this MemoryStream PKGAJCFLOLA, string IGGFGLLIGCG)
+	public static void WriteString(this MemoryStream PKGAJCFLOLA, string IGGFGLLIGCG)
 	{
 		byte[] bytes = Encoding.UTF8.GetBytes(IGGFGLLIGCG);
 		PKGAJCFLOLA.WriteAll(bytes);
@@ -280,12 +280,12 @@ public static class Extensions
 
 	public static void WriteLine(this MemoryStream PKGAJCFLOLA)
 	{
-		PKGAJCFLOLA.WriteAll(HTTPRequest.HGBANJPCEPF);
+		PKGAJCFLOLA.WriteAll(HTTPRequest.EOL);
 	}
 
 	public static void WriteLine(this MemoryStream PKGAJCFLOLA, string IGGFGLLIGCG)
 	{
-		PKGAJCFLOLA.IHOOAEHGMFO(IGGFGLLIGCG);
+		PKGAJCFLOLA.WriteString(IGGFGLLIGCG);
 		PKGAJCFLOLA.WriteLine();
 	}
 }

@@ -31,7 +31,7 @@ namespace UIFigures
 			_Points.Add(new Vector2(0f - vector.x, vector.y - (_AngelSize - _Width / 2f * 0.585786f)));
 			_Points.Add(new Vector2(0f - vector.x + (_AngelSize - _Width / 2f * 0.585786f), vector.y));
 			_Points.Add(new Vector2(0f, vector.y));
-			DrawFunctions.FBFOFHOLLKI(DHJBOKKAOJK, _Points, _Width, color);
+			DrawFunctions.DrawLine(DHJBOKKAOJK, _Points, _Width, color);
 		}
 	}
 }

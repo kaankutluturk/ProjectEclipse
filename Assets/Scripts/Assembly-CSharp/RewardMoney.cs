@@ -7,36 +7,36 @@ public class RewardMoney : Rewardable
 
 	private long _value;
 
-	private float HNIKLFKNLDI;
+	private float valueMultiplier;
 
 	public RewardMoney(XmlNode node)
 	{
 		Parse(node);
-		CLOGJMBMMPI = GADCOGHCGDP.REWARD_MONEY;
+		Kind = RewardKind.REWARD_MONEY;
 		_valueEmpty = node.Attributes["Value"].Empty();
 		_value = node.Attributes["Value"].ParseLong(0L);
-		HNIKLFKNLDI = node.Attributes["ValueMultiplier"].ParseFloat();
+		valueMultiplier = node.Attributes["ValueMultiplier"].ParseFloat();
 	}
 
-	public long BANPBCOOFMB()
+	public long GetValue()
 	{
-		EGIAFPBJDIF();
-		_value = BBDICEKCFAG(_value);
+		ResolveValue();
+		_value = RoundToNiceNumber(_value);
 		return _value;
 	}
 
-	private void EGIAFPBJDIF()
+	private void ResolveValue()
 	{
 		if (_valueEmpty)
 		{
-			int oMHDLKNHNMJ = ListSF.CCDKHLAMKKO().PINDEKDNCNL();
-			long num = GameUtils.NFJEPNHJPEE.GetBaseValue(oMHDLKNHNMJ);
-			_value = (long)HNIKLFKNLDI * num;
+			int oMHDLKNHNMJ = ListSF.GetRoster().GetLevel();
+			long num = GameUtils.MoneyBaseValueTable.GetBaseValue(oMHDLKNHNMJ);
+			_value = (long)valueMultiplier * num;
 			_valueEmpty = false;
 		}
 	}
 
-	private long BBDICEKCFAG(long value)
+	private long RoundToNiceNumber(long value)
 	{
 		if (value == 0)
 		{

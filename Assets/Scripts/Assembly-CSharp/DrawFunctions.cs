@@ -5,12 +5,12 @@ using UnityEngine.UI;
 
 public static class DrawFunctions
 {
-	public static void CJOMPMCKCJP(VertexHelper KMONCKJAPBB, Vector2 GIAEPIIIMDH, Vector2 LPEMPCEJFIN, float AMNCLCPADOO, float IFIOLDFCLIE, int KFDMFGBLBCO, Color OHJKNABLCMF)
+	public static void DrawArc(VertexHelper KMONCKJAPBB, Vector2 GIAEPIIIMDH, Vector2 LPEMPCEJFIN, float AMNCLCPADOO, float IFIOLDFCLIE, int KFDMFGBLBCO, Color OHJKNABLCMF)
 	{
 		KMONCKJAPBB.Clear();
 		List<UIVertex> list = new List<UIVertex>();
 		float num = (IFIOLDFCLIE - AMNCLCPADOO) / (float)KFDMFGBLBCO;
-		list.Add(FJHDOJHFEJH(GIAEPIIIMDH, new Vector2(0.5f, 0.5f), OHJKNABLCMF));
+		list.Add(CreateVertex(GIAEPIIIMDH, new Vector2(0.5f, 0.5f), OHJKNABLCMF));
 		for (int i = 0; i <= KFDMFGBLBCO; i++)
 		{
 			float f = AMNCLCPADOO + (float)i * num;
@@ -18,12 +18,12 @@ public static class DrawFunctions
 			float num3 = Mathf.Sin(f);
 			float x = num2 * LPEMPCEJFIN.x + GIAEPIIIMDH.x;
 			float y = num3 * LPEMPCEJFIN.y + GIAEPIIIMDH.y;
-			list.Add(FJHDOJHFEJH(FGFOGDLPAIC: new Vector2(num2 * 0.5f + 0.5f, num3 * 0.5f + 0.5f), GIAEPIIIMDH: new Vector2(x, y), OHJKNABLCMF: OHJKNABLCMF));
+			list.Add(CreateVertex(FGFOGDLPAIC: new Vector2(num2 * 0.5f + 0.5f, num3 * 0.5f + 0.5f), GIAEPIIIMDH: new Vector2(x, y), OHJKNABLCMF: OHJKNABLCMF));
 		}
-		KMONCKJAPBB.AddUIVertexStream(list, FigureTopology.NGPPLGNODNB(KFDMFGBLBCO));
+		KMONCKJAPBB.AddUIVertexStream(list, FigureTopology.CreateFanIndices(KFDMFGBLBCO));
 	}
 
-	public static void GAGFKBFLHHE(VertexHelper DHJBOKKAOJK, Vector2 GIAEPIIIMDH, Vector2 LPEMPCEJFIN, float JGAPNGHPJGJ, float AMNCLCPADOO, float IFIOLDFCLIE, int KFDMFGBLBCO, Color OHJKNABLCMF, Color MIHJJEICDDD)
+	public static void DrawArcBorder(VertexHelper DHJBOKKAOJK, Vector2 GIAEPIIIMDH, Vector2 LPEMPCEJFIN, float JGAPNGHPJGJ, float AMNCLCPADOO, float IFIOLDFCLIE, int KFDMFGBLBCO, Color OHJKNABLCMF, Color MIHJJEICDDD)
 	{
 		DHJBOKKAOJK.Clear();
 		List<UIVertex> list = new List<UIVertex>();
@@ -37,16 +37,16 @@ public static class DrawFunctions
 			Color oHJKNABLCMF = Color.Lerp(OHJKNABLCMF, MIHJJEICDDD, (float)i / (float)KFDMFGBLBCO);
 			Vector2 gIAEPIIIMDH = new Vector2(num2 * LPEMPCEJFIN.x + GIAEPIIIMDH.x, num3 * LPEMPCEJFIN.y + GIAEPIIIMDH.y);
 			Vector2 fGFOGDLPAIC = new Vector2(num2 * 0.5f + 0.5f, num3 * 0.5f + 0.5f);
-			list.Add(FJHDOJHFEJH(gIAEPIIIMDH, fGFOGDLPAIC, oHJKNABLCMF));
+			list.Add(CreateVertex(gIAEPIIIMDH, fGFOGDLPAIC, oHJKNABLCMF));
 			Vector2 gIAEPIIIMDH2 = new Vector2(num2 * vector.x + GIAEPIIIMDH.x, num3 * vector.y + GIAEPIIIMDH.y);
 			Vector2 vector2 = new Vector2(1f - JGAPNGHPJGJ / LPEMPCEJFIN.x, 1f - JGAPNGHPJGJ / LPEMPCEJFIN.y);
 			Vector2 fGFOGDLPAIC2 = new Vector2(num2 * vector2.x * 0.5f + 0.5f, num3 * vector2.y * 0.5f + 0.5f);
-			list.Add(FJHDOJHFEJH(gIAEPIIIMDH2, fGFOGDLPAIC2, oHJKNABLCMF));
+			list.Add(CreateVertex(gIAEPIIIMDH2, fGFOGDLPAIC2, oHJKNABLCMF));
 		}
-		DHJBOKKAOJK.AddUIVertexStream(list, FigureTopology.AMJOJPPFIEB(KFDMFGBLBCO * 2));
+		DHJBOKKAOJK.AddUIVertexStream(list, FigureTopology.CreateStripIndices(KFDMFGBLBCO * 2));
 	}
 
-	public static void FBFOFHOLLKI(VertexHelper DHJBOKKAOJK, List<Vector2> LGKJBIEDKBO, float JGAPNGHPJGJ, Color OHJKNABLCMF, bool EEIKKKPLPAA = false)
+	public static void DrawLine(VertexHelper DHJBOKKAOJK, List<Vector2> LGKJBIEDKBO, float JGAPNGHPJGJ, Color OHJKNABLCMF, bool EEIKKKPLPAA = false)
 	{
 		DHJBOKKAOJK.Clear();
 		List<UIVertex> list = new List<UIVertex>();
@@ -90,13 +90,13 @@ public static class DrawFunctions
 				num3 *= -1;
 			}
 			Vector2 fGFOGDLPAIC2 = new Vector2(x, 1f);
-			list.Add(FJHDOJHFEJH(vector4 - vector5 / 2f, fGFOGDLPAIC, OHJKNABLCMF));
-			list.Add(FJHDOJHFEJH(vector4 + vector5 / 2f, fGFOGDLPAIC2, OHJKNABLCMF));
+			list.Add(CreateVertex(vector4 - vector5 / 2f, fGFOGDLPAIC, OHJKNABLCMF));
+			list.Add(CreateVertex(vector4 + vector5 / 2f, fGFOGDLPAIC2, OHJKNABLCMF));
 		}
-		DHJBOKKAOJK.AddUIVertexStream(list, FigureTopology.AMJOJPPFIEB((LGKJBIEDKBO.Count - 1) * 2));
+		DHJBOKKAOJK.AddUIVertexStream(list, FigureTopology.CreateStripIndices((LGKJBIEDKBO.Count - 1) * 2));
 	}
 
-	private static UIVertex FJHDOJHFEJH(Vector2 GIAEPIIIMDH, Vector2 FGFOGDLPAIC, Color OHJKNABLCMF)
+	private static UIVertex CreateVertex(Vector2 GIAEPIIIMDH, Vector2 FGFOGDLPAIC, Color OHJKNABLCMF)
 	{
 		UIVertex simpleVert = UIVertex.simpleVert;
 		simpleVert.position = GIAEPIIIMDH;

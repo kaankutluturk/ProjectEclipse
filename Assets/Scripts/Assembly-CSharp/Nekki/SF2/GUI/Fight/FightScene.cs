@@ -14,9 +14,9 @@ namespace Nekki.SF2.GUI.Fight
 
 		public global::Fight Fight;
 
-		private bool CEKGNACMGDB = true;
+		private bool isInitialized = true;
 
-		public override ScreenType PNAJHDBDDLP
+		public override ScreenType SceneType
 		{
 			get
 			{
@@ -35,9 +35,9 @@ namespace Nekki.SF2.GUI.Fight
 			FightList jGMLAFOPBBC = (FightList)data;
 			if (preFight == null)
 			{
-				LLLOJBFMONN.Error("FightHolder.Start preFight is null");
+				GameLog.Error("FightHolder.Start preFight is null");
 			}
-			Fight = GameUtils.ABAIHGFPHMO(jGMLAFOPBBC, preFight, gameController);
+			Fight = GameUtils.CreateFight(jGMLAFOPBBC, preFight, gameController);
 			GC.Collect();
 		}
 
@@ -49,12 +49,12 @@ namespace Nekki.SF2.GUI.Fight
 			}
 		}
 
-		protected override void PJNFHNFLNNO()
+		protected override void OnSceneClosed()
 		{
-			base.PJNFHNFLNNO();
+			base.OnSceneClosed();
 			if (Fight != null)
 			{
-				Fight.ANIDBLANMIC();
+				Fight.Unload();
 			}
 		}
 

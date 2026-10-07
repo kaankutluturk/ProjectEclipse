@@ -16,16 +16,16 @@ class ModelParameters { public string EclipseBodyModel; public string[] EclipseS
 class Model { public ModelParameters Parameters = new ModelParameters(); }
 class ModelObject {
  public Model Model = new Model(); public Model GetModel() => Model;
- public void LKFBKGPOHPI() {} public void GINBBKBGMDC() {} public List<object> NAMKCLGOPDD() => new List<object>();
- public void SetFileNames(List<string> paths) {} public void MDDBGGPHNLF() {} public void KJIEPFHIIKM() {}
+ public void FindPivotNode() {} public void CalculateTotalWeight() {} public List<object> GetAllNodes() => new List<object>();
+ public void SetFileNames(List<string> paths) {} public void BuildPairNodes() {} public void ResolveMacroNodeWeights() {}
 }
-static class SF2Paths { public static string BNHLPKEDMOM() => "fixture"; }
-static class LLLOJBFMONN { public static void Error(string format, params object[] args) {} }
+static class SF2Paths { public static string GetModelsPath() => "fixture"; }
+static class GameLog { public static void Error(string format, params object[] args) {} }
 static class ModelLoader {
- public static int Parsed; public static readonly Cache FHGHPCACAKJ = new Cache();
- public sealed class Cache { public readonly Dictionary<string,XmlDocument> Documents = new Dictionary<string,XmlDocument>(); public XmlDocument JBJDPDOEGFO(string root,string path) => Documents[path]; }
+ public static int Parsed; public static readonly Cache DocumentCache = new Cache();
+ public sealed class Cache { public readonly Dictionary<string,XmlDocument> Documents = new Dictionary<string,XmlDocument>(); public XmlDocument GetDocument(string root,string path) => Documents[path]; }
  static void Parse(ModelObject model, XmlDocument document) { Parsed++; }
- static void DDPHOCNGAHE(List<object> nodes) {}
+ static void PostProcessNodes(List<object> nodes) {}
  LOAD
  HELPERS
 }

@@ -2,7 +2,7 @@ using System;
 
 public abstract class ChainedEventEmitter : IEventEmitter
 {
-	protected readonly IEventEmitter JDJEJDIJLLE;
+	protected readonly IEventEmitter nextEmitter;
 
 	protected ChainedEventEmitter(IEventEmitter JDJEJDIJLLE)
 	{
@@ -10,36 +10,36 @@ public abstract class ChainedEventEmitter : IEventEmitter
 		{
 			throw new ArgumentNullException("nextEmitter");
 		}
-		this.JDJEJDIJLLE = JDJEJDIJLLE;
+		this.nextEmitter = JDJEJDIJLLE;
 	}
 
 	public virtual void Emit(AliasEventInfo FNHCFCAALAE)
 	{
-		JDJEJDIJLLE.Emit(FNHCFCAALAE);
+		nextEmitter.Emit(FNHCFCAALAE);
 	}
 
 	public virtual void Emit(ScalarEventInfo FNHCFCAALAE)
 	{
-		JDJEJDIJLLE.Emit(FNHCFCAALAE);
+		nextEmitter.Emit(FNHCFCAALAE);
 	}
 
-	public virtual void Emit(LPADMPIAIPF FNHCFCAALAE)
+	public virtual void Emit(MappingStartEventInfo FNHCFCAALAE)
 	{
-		JDJEJDIJLLE.Emit(FNHCFCAALAE);
+		nextEmitter.Emit(FNHCFCAALAE);
 	}
 
-	public virtual void Emit(EKKDGIILGMA FNHCFCAALAE)
+	public virtual void Emit(MappingEndEventInfo FNHCFCAALAE)
 	{
-		JDJEJDIJLLE.Emit(FNHCFCAALAE);
+		nextEmitter.Emit(FNHCFCAALAE);
 	}
 
-	public virtual void Emit(PBGMOJFHMGI FNHCFCAALAE)
+	public virtual void Emit(SequenceStartEventInfo FNHCFCAALAE)
 	{
-		JDJEJDIJLLE.Emit(FNHCFCAALAE);
+		nextEmitter.Emit(FNHCFCAALAE);
 	}
 
-	public virtual void Emit(NCGDJIDCIIM FNHCFCAALAE)
+	public virtual void Emit(SequenceEndEventInfo FNHCFCAALAE)
 	{
-		JDJEJDIJLLE.Emit(FNHCFCAALAE);
+		nextEmitter.Emit(FNHCFCAALAE);
 	}
 }

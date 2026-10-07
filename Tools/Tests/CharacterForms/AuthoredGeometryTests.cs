@@ -69,22 +69,22 @@ static class AuthoredGeometryTests
         overlay.LoadXml(overlay.OuterXml.Replace("ChildNode1=\"A\"", "ChildNode1=\"Ghost\""));
         try { ModCharacterGeometry.Validate(new[] { "legacy", Skin }, new[] { legacy, overlay }, new HashSet<string> { Skin }); throw new Exception("Phantom node accepted"); }
         catch (InvalidDataException e) { Check(e.Message.Contains("@ChildNode1"), "Native-ignored nodes cannot satisfy bindings"); }
-        ModelLoader.FHGHPCACAKJ.Documents[Body] = Xml(Rig.Replace("End2='B'", "End2='missing'"));
+        ModelLoader.DocumentCache.Documents[Body] = Xml(Rig.Replace("End2='B'", "End2='missing'"));
         var model = new ModelObject(); model.Model.Parameters.EclipseBodyModel = Body.Substring(0, Body.Length - 4);
         try { ModelLoader.Load(model, new List<string> { Body }); throw new Exception("Loader accepted invalid model"); }
         catch (InvalidDataException) { Check(ModelLoader.Parsed == 0, "Preflight precedes recovered parsing"); }
-        ModelLoader.FHGHPCACAKJ.Documents[Body] = Xml(Rig); ModelLoader.Load(model, new List<string> { Body });
+        ModelLoader.DocumentCache.Documents[Body] = Xml(Rig); ModelLoader.Load(model, new List<string> { Body });
         Check(ModelLoader.Parsed == 1, "Validated model reaches native parser");
         var archive = new ModelObject(); archive.Model.Parameters.EclipseBodyModel = "core:models/legacy";
-        ModelLoader.FHGHPCACAKJ.Documents["core:models/legacy.xml"] = Xml("<Scene><Figures/></Scene>");
+        ModelLoader.DocumentCache.Documents["core:models/legacy.xml"] = Xml("<Scene><Figures/></Scene>");
         ModelLoader.Load(archive, new List<string> { "core:models/legacy.xml" });
         Check(ModelLoader.Parsed == 2, "Core handles keep archival parsing");
-        ModelLoader.FHGHPCACAKJ.Documents["core:models/legacy.xml"] = legacy;
-        ModelLoader.FHGHPCACAKJ.Documents[Skin] = Xml("<Scene><Nodes><M Type='MacroNode' NodesCount='1' ChildNode1='A' LCC1='1'/></Nodes><Figures/></Scene>");
+        ModelLoader.DocumentCache.Documents["core:models/legacy.xml"] = legacy;
+        ModelLoader.DocumentCache.Documents[Skin] = Xml("<Scene><Nodes><M Type='MacroNode' NodesCount='1' ChildNode1='A' LCC1='1'/></Nodes><Figures/></Scene>");
         archive.Model.Parameters.EclipseSkinModels = new[] { Skin };
         ModelLoader.Load(archive, new List<string> { "core:models/legacy.xml", Skin });
         Check(ModelLoader.Parsed == 4, "Authored skin validates against archival body before native parsing");
-        ModelLoader.FHGHPCACAKJ.Documents[Skin] = Xml("<Scene><Nodes><M Type='MacroNode' NodesCount='1' ChildNode1='missing' LCC1='1'/></Nodes><Figures/></Scene>");
+        ModelLoader.DocumentCache.Documents[Skin] = Xml("<Scene><Nodes><M Type='MacroNode' NodesCount='1' ChildNode1='missing' LCC1='1'/></Nodes><Figures/></Scene>");
         try { ModelLoader.Load(archive, new List<string> { "core:models/legacy.xml", Skin }); throw new Exception("Invalid overlay accepted"); }
         catch (InvalidDataException) { Check(ModelLoader.Parsed == 4, "Invalid later skin rejects before earlier archival body is parsed"); }
         Console.WriteLine("PASS: authored geometry " + checks + " checks; production validator and loader integration with controlled native parser.");

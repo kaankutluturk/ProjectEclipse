@@ -2,108 +2,108 @@ using System;
 
 internal class FastEncoder
 {
-	private FastEncoderWindow FLDIPHNDIAP;
+	private FastEncoderWindow inputWindow;
 
-	private Match HPFOOBECGJN;
+	private Match currentMatch;
 
 	private double lastCompressionRatio;
 
-	internal int CLLDNIDJLPI
+	internal int BytesInHistory
 	{
 		get
 		{
-			return EHHKMDHLKHJ();
+			return GetBytesInHistory();
 		}
 	}
 
-	internal DeflateInput NFFBHLDODLH
+	internal DeflateInput UnprocessedInput
 	{
 		get
 		{
-			return EGHDOBABAFB();
+			return GetUnprocessedInput();
 		}
 	}
 
-	internal double LPDJOBMKMBK
+	internal double LastCompressionRatio
 	{
 		get
 		{
-			return LMLAIGGBPFL();
+			return GetLastCompressionRatio();
 		}
 	}
 
 	public FastEncoder()
 	{
-		FLDIPHNDIAP = new FastEncoderWindow();
-		HPFOOBECGJN = new Match();
+		inputWindow = new FastEncoderWindow();
+		currentMatch = new Match();
 	}
 
-	internal int EHHKMDHLKHJ()
+	internal int GetBytesInHistory()
 	{
-		return FLDIPHNDIAP.LIPBPKCMELJ();
+		return inputWindow.GetBytesAvailable();
 	}
 
-	internal DeflateInput EGHDOBABAFB()
+	internal DeflateInput GetUnprocessedInput()
 	{
-		return FLDIPHNDIAP.EGHDOBABAFB();
+		return inputWindow.GetUnprocessedInput();
 	}
 
-	internal void BMLBPABODCO()
+	internal void FlushInput()
 	{
-		FLDIPHNDIAP.KDIBKEKLFEL();
+		inputWindow.FlushWindow();
 	}
 
-	internal double LMLAIGGBPFL()
+	internal double GetLastCompressionRatio()
 	{
 		return lastCompressionRatio;
 	}
 
 	internal void GetBlock(DeflateInput NILNDHEKNLJ, OutputBuffer output, int OADBBDFBPOG)
 	{
-		JBFANIPBMGO(output);
-		ADCHLOJOKMD(NILNDHEKNLJ, output, OADBBDFBPOG);
-		DFBFDLOPMAB(output);
+		WriteDeflatePreamble(output);
+		GetCompressedOutput(NILNDHEKNLJ, output, OADBBDFBPOG);
+		WriteEndOfBlock(output);
 	}
 
-	internal void IOKJILLFPDI(DeflateInput NILNDHEKNLJ, OutputBuffer output)
+	internal void GetCompressedData(DeflateInput NILNDHEKNLJ, OutputBuffer output)
 	{
-		ADCHLOJOKMD(NILNDHEKNLJ, output, -1);
+		GetCompressedOutput(NILNDHEKNLJ, output, -1);
 	}
 
-	internal void ILPKALKNGIP(OutputBuffer output)
+	internal void GetBlockHeader(OutputBuffer output)
 	{
-		JBFANIPBMGO(output);
+		WriteDeflatePreamble(output);
 	}
 
-	internal void ADMOOJIAFEI(OutputBuffer output)
+	internal void GetBlockFooter(OutputBuffer output)
 	{
-		DFBFDLOPMAB(output);
+		WriteEndOfBlock(output);
 	}
 
-	private void ADCHLOJOKMD(DeflateInput NILNDHEKNLJ, OutputBuffer output, int OADBBDFBPOG)
+	private void GetCompressedOutput(DeflateInput NILNDHEKNLJ, OutputBuffer output, int OADBBDFBPOG)
 	{
-		int num = output.GEBLFKFACKO();
+		int num = output.GetBytesWritten();
 		int num2 = 0;
-		int num3 = EHHKMDHLKHJ() + NILNDHEKNLJ.OFOPFCJNEBL();
+		int num3 = GetBytesInHistory() + NILNDHEKNLJ.GetCount();
 		do
 		{
-			int num4 = ((NILNDHEKNLJ.OFOPFCJNEBL() >= FLDIPHNDIAP.EHGMBKDHEGD()) ? FLDIPHNDIAP.EHGMBKDHEGD() : NILNDHEKNLJ.OFOPFCJNEBL());
+			int num4 = ((NILNDHEKNLJ.GetCount() >= inputWindow.GetFreeWindowSpace()) ? inputWindow.GetFreeWindowSpace() : NILNDHEKNLJ.GetCount());
 			if (OADBBDFBPOG >= 1)
 			{
 				num4 = Math.Min(num4, OADBBDFBPOG - num2);
 			}
 			if (num4 > 0)
 			{
-				FLDIPHNDIAP.JGEOAPANNLP(NILNDHEKNLJ.FAJIIIFCCPD(), NILNDHEKNLJ.JHGJIJNGNBO(), num4);
-				NILNDHEKNLJ.MBODOPCOFFE(num4);
+				inputWindow.CopyBytes(NILNDHEKNLJ.GetBuffer(), NILNDHEKNLJ.GetStartIndex(), num4);
+				NILNDHEKNLJ.ConsumeBytes(num4);
 				num2 += num4;
 			}
-			ADCHLOJOKMD(output);
+			GetCompressedOutput(output);
 		}
-		while (AHEDMEEIAND(output) && LFFBLHANLLM(NILNDHEKNLJ) && (OADBBDFBPOG < 1 || num2 < OADBBDFBPOG));
-		int num5 = output.GEBLFKFACKO();
+		while (SafeToWriteTo(output) && InputAvailable(NILNDHEKNLJ) && (OADBBDFBPOG < 1 || num2 < OADBBDFBPOG));
+		int num5 = output.GetBytesWritten();
 		int num6 = num5 - num;
-		int num7 = EHHKMDHLKHJ() + NILNDHEKNLJ.OFOPFCJNEBL();
+		int num7 = GetBytesInHistory() + NILNDHEKNLJ.GetCount();
 		int num8 = num3 - num7;
 		if (num6 != 0)
 		{
@@ -111,74 +111,74 @@ internal class FastEncoder
 		}
 	}
 
-	private void ADCHLOJOKMD(OutputBuffer output)
+	private void GetCompressedOutput(OutputBuffer output)
 	{
-		while (FLDIPHNDIAP.LIPBPKCMELJ() > 0 && AHEDMEEIAND(output))
+		while (inputWindow.GetBytesAvailable() > 0 && SafeToWriteTo(output))
 		{
-			FLDIPHNDIAP.MJLPAFBLONC(HPFOOBECGJN);
-			if (HPFOOBECGJN.FLBBFDNHJAJ() == CDKCDPDMGDK.HasSymbol)
+			inputWindow.GetNextSymbolOrMatch(currentMatch);
+			if (currentMatch.GetState() == MatchState.HasSymbol)
 			{
-				DEDDLLDKGBO(HPFOOBECGJN.BCHAFDDNJHG(), output);
+				WriteChar(currentMatch.GetSymbol(), output);
 				continue;
 			}
-			if (HPFOOBECGJN.FLBBFDNHJAJ() == CDKCDPDMGDK.HasMatch)
+			if (currentMatch.GetState() == MatchState.HasMatch)
 			{
-				IIPKHHPBOFA(HPFOOBECGJN.KLIOMCPELLF(), HPFOOBECGJN.ECJPLFFAMJO(), output);
+				WriteMatch(currentMatch.GetLength(), currentMatch.GetPosition(), output);
 				continue;
 			}
-			DEDDLLDKGBO(HPFOOBECGJN.BCHAFDDNJHG(), output);
-			IIPKHHPBOFA(HPFOOBECGJN.KLIOMCPELLF(), HPFOOBECGJN.ECJPLFFAMJO(), output);
+			WriteChar(currentMatch.GetSymbol(), output);
+			WriteMatch(currentMatch.GetLength(), currentMatch.GetPosition(), output);
 		}
 	}
 
-	private bool LFFBLHANLLM(DeflateInput NILNDHEKNLJ)
+	private bool InputAvailable(DeflateInput NILNDHEKNLJ)
 	{
-		return NILNDHEKNLJ.OFOPFCJNEBL() > 0 || EHHKMDHLKHJ() > 0;
+		return NILNDHEKNLJ.GetCount() > 0 || GetBytesInHistory() > 0;
 	}
 
-	private bool AHEDMEEIAND(OutputBuffer output)
+	private bool SafeToWriteTo(OutputBuffer output)
 	{
-		return output.JBPBBAEEAFO() > 16;
+		return output.GetFreeBytes() > 16;
 	}
 
-	private void DFBFDLOPMAB(OutputBuffer output)
+	private void WriteEndOfBlock(OutputBuffer output)
 	{
-		uint num = FastEncoderStatics.HEOFMEEEIKP[256];
+		uint num = FastEncoderStatics.FastEncoderLiteralCodeInfo[256];
 		int hDKKKCDKFEE = (int)(num & 0x1F);
-		output.EHFDJAJPOAO(hDKKKCDKFEE, num >> 5);
+		output.WriteBits(hDKKKCDKFEE, num >> 5);
 	}
 
-	internal static void IIPKHHPBOFA(int EEPFDKNNGJB, int MIAOKJENHOF, OutputBuffer output)
+	internal static void WriteMatch(int EEPFDKNNGJB, int MIAOKJENHOF, OutputBuffer output)
 	{
-		uint num = FastEncoderStatics.HEOFMEEEIKP[254 + EEPFDKNNGJB];
+		uint num = FastEncoderStatics.FastEncoderLiteralCodeInfo[254 + EEPFDKNNGJB];
 		int num2 = (int)(num & 0x1F);
 		if (num2 <= 16)
 		{
-			output.EHFDJAJPOAO(num2, num >> 5);
+			output.WriteBits(num2, num >> 5);
 		}
 		else
 		{
-			output.EHFDJAJPOAO(16, (num >> 5) & 0xFFFF);
-			output.EHFDJAJPOAO(num2 - 16, num >> 21);
+			output.WriteBits(16, (num >> 5) & 0xFFFF);
+			output.WriteBits(num2 - 16, num >> 21);
 		}
-		num = FastEncoderStatics.CIBAPLNOJJL[FastEncoderStatics.MFIEBGCGIDF(MIAOKJENHOF)];
-		output.EHFDJAJPOAO((int)(num & 0xF), num >> 8);
+		num = FastEncoderStatics.FastEncoderDistanceCodeInfo[FastEncoderStatics.GetSlot(MIAOKJENHOF)];
+		output.WriteBits((int)(num & 0xF), num >> 8);
 		int num3 = (int)((num >> 4) & 0xF);
 		if (num3 != 0)
 		{
-			output.EHFDJAJPOAO(num3, (uint)MIAOKJENHOF & FastEncoderStatics.EFKOOBOPIDF[num3]);
+			output.WriteBits(num3, (uint)MIAOKJENHOF & FastEncoderStatics.BitMask[num3]);
 		}
 	}
 
-	internal static void DEDDLLDKGBO(byte AAOIAEJJINO, OutputBuffer output)
+	internal static void WriteChar(byte AAOIAEJJINO, OutputBuffer output)
 	{
-		uint num = FastEncoderStatics.HEOFMEEEIKP[AAOIAEJJINO];
-		output.EHFDJAJPOAO((int)(num & 0x1F), num >> 5);
+		uint num = FastEncoderStatics.FastEncoderLiteralCodeInfo[AAOIAEJJINO];
+		output.WriteBits((int)(num & 0x1F), num >> 5);
 	}
 
-	internal static void JBFANIPBMGO(OutputBuffer output)
+	internal static void WriteDeflatePreamble(OutputBuffer output)
 	{
-		output.FJPANBOJJDI(FastEncoderStatics.KOEECIBJHJO, 0, FastEncoderStatics.KOEECIBJHJO.Length);
-		output.EHFDJAJPOAO(9, 34u);
+		output.WriteBytes(FastEncoderStatics.FastEncoderTreeStructureData, 0, FastEncoderStatics.FastEncoderTreeStructureData.Length);
+		output.WriteBits(9, 34u);
 	}
 }

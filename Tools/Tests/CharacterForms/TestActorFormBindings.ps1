@@ -25,7 +25,7 @@ class Fight{
 METHODS
 class PreparedFormModel:IDisposable{public Model Model;public static int Disposals;public PreparedFormModel(Parameters p){Model=new Model{Parameters=p};}public void Dispose(){Disposals++;}}
 Dictionary<Model,OwnedActor> _eclipseActors=new Dictionary<Model,OwnedActor>();
-List<Model> LNDLFINJHDB=new List<Model>();
+List<Model> ActiveModels=new List<Model>();
 Dictionary<Model,object> _eclipseShields=new Dictionary<Model,object>();
 Dictionary<(Model,object),object> _eclipseStatusIcons=new Dictionary<(Model,object),object>();
 Dictionary<(Model,DefinitionId),XmlNode> _eclipseOpponentInstances=new Dictionary<(Model,DefinitionId),XmlNode>(),_eclipseInnateInstances=new Dictionary<(Model,DefinitionId),XmlNode>();
@@ -38,16 +38,16 @@ static void Reject(Action action,string why){bool failed=false;try{action();}cat
 static void Main(){
  foreach(bool player in new[]{true,false}){
   var f=new Fight();var main=new Model();var old=new Model();var next=new Model{Parameters=new Parameters{IsPlayer=player,AiControlled=true,MaxLife=4}};
-  var record=new OwnedActor{Model=old,Root=main,PlayerTeam=player,TargetRequest=new Model()};f._eclipseActors.Add(old,record);f.LNDLFINJHDB.AddRange(new[]{main,old});
+  var record=new OwnedActor{Model=old,Root=main,PlayerTeam=player,TargetRequest=new Model()};f._eclipseActors.Add(old,record);f.ActiveModels.AddRange(new[]{main,old});
   var state=new XmlDocument();state.LoadXml("<State/>");var key=new DefinitionId("behavior");var shield=new object();var icon=new object();var iconKey=new object();
   f._eclipseOpponentInstances.Add((old,key),state.DocumentElement);f._eclipseInnateInstances.Add((old,key),state.DocumentElement);f._eclipseShields.Add(old,shield);f._eclipseStatusIcons.Add((old,iconKey),icon);
   var behavior=record.BehaviorInstance;var target=record.TargetRequest;
   var undo=f.BindEclipseActorFormParticipant(old,next);
-  Check(f._eclipseActors[next]==record&&!f._eclipseActors.ContainsKey(old)&&record.Model==next&&f.LNDLFINJHDB[1]==next,"native body and actor registry move together");
+  Check(f._eclipseActors[next]==record&&!f._eclipseActors.ContainsKey(old)&&record.Model==next&&f.ActiveModels[1]==next,"native body and actor registry move together");
   Check(record.Root==main&&record.TargetRequest==target&&record.BehaviorInstance==behavior&&record.Born==17&&record.PlayerTeam==player,"owner, state, birth, target and team unchanged");
-  Check(f.LNDLFINJHDB[0]==main&&f._eclipseShields[next]==shield&&f._eclipseStatusIcons[(next,iconKey)]==icon,"main slot unchanged; shields/icons transfer");
+  Check(f.ActiveModels[0]==main&&f._eclipseShields[next]==shield&&f._eclipseStatusIcons[(next,iconKey)]==icon,"main slot unchanged; shields/icons transfer");
   Check(f._eclipseOpponentInstances[(next,key)]==state.DocumentElement&&f._eclipseInnateInstances[(next,key)]==state.DocumentElement,"behavior XML retained");
-  undo();undo();Check(record.Model==old&&f._eclipseActors[old]==record&&f.LNDLFINJHDB[1]==old&&!f._eclipseActors.ContainsKey(next),"idempotent identity rollback");
+  undo();undo();Check(record.Model==old&&f._eclipseActors[old]==record&&f.ActiveModels[1]==old&&!f._eclipseActors.ContainsKey(next),"idempotent identity rollback");
   Check(f._eclipseShields[old]==shield&&f._eclipseStatusIcons[(old,iconKey)]==icon&&f._eclipseInnateInstances[(old,key)]==state.DocumentElement,"combat state rollback");
   next.Parameters.UserControlled=true;Reject(()=>f.BindEclipseActorFormParticipant(old,next),"player-controlled actor rejected");next.Parameters.UserControlled=false;
   next.Parameters.MaxLife=8;Reject(()=>f.BindEclipseActorFormParticipant(old,next),"max-health change rejected");next.Parameters.MaxLife=4;

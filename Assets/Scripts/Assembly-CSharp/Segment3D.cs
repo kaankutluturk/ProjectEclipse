@@ -1,78 +1,78 @@
 public class Segment3D
 {
-	private Vector3f LCLJKFJNPLG;
+	private Vector3f start;
 
-	private Vector3f LNBCDDCNAHB;
+	private Vector3f end;
 
-	public Vector3f LLMNFABDADF
+	public Vector3f Start
 	{
 		get
 		{
-			return NDCACMDFLJN();
+			return GetStart();
 		}
 	}
 
-	public Vector3f MKCGJNMMCCM
+	public Vector3f End
 	{
 		get
 		{
-			return MINOGAHDDHA();
+			return GetEnd();
 		}
 	}
 
-	public float LPDHNCDLFLO
+	public float Length
 	{
 		get
 		{
-			return GLOLKEBFFEG();
+			return GetLength();
 		}
 	}
 
-	public float NGKODECNPFK
+	public float Length2D
 	{
 		get
 		{
-			return LDKFFINHBOH();
+			return GetLength2D();
 		}
 	}
 
-	public Vector3f KBNMOFDDLOM
+	public Vector3f Normal
 	{
 		get
 		{
-			return GJLBOKGJMHJ();
+			return GetNormal();
 		}
 	}
 
-	public Vector2f BONEAMLIHOM
+	public Vector2f Direction2D
 	{
 		get
 		{
-			return NFOEEOBPIKO();
+			return GetDirection2D();
 		}
 	}
 
-	public Vector3f FJALJCNEPLN
+	public Vector3f Direction3D
 	{
 		get
 		{
-			return MLDFIEBFJDI();
+			return GetDirection3D();
 		}
 	}
 
-	public Vector2f DIHDLKHPHKG
+	public Vector2f Midpoint2D
 	{
 		get
 		{
-			return AHOIAJKLABL();
+			return GetMidpoint2D();
 		}
 	}
 
-	public Vector3f FILILMIGAHE
+	public Vector3f Midpoint3D
 	{
 		get
 		{
-			return IEFEGPLODCM();
+			return GetMidpoint3D();
 		}
 	}
 
@@ -82,82 +82,82 @@ public class Segment3D
 
 	public Segment3D(Vector3f ILENLCMAMBH, Vector3f BFDAHEHCAGK)
 	{
-		LCLJKFJNPLG.Set(ILENLCMAMBH);
-		LNBCDDCNAHB.Set(BFDAHEHCAGK);
+		start.Set(ILENLCMAMBH);
+		end.Set(BFDAHEHCAGK);
 	}
 
-	public Vector3f NDCACMDFLJN()
+	public Vector3f GetStart()
 	{
-		return LCLJKFJNPLG;
+		return start;
 	}
 
-	public Vector3f MINOGAHDDHA()
+	public Vector3f GetEnd()
 	{
-		return LNBCDDCNAHB;
+		return end;
 	}
 
 	public void SetSegment3D(Segment3D LEFHAGAGOME)
 	{
-		LJPOALNMEOF(LEFHAGAGOME.LCLJKFJNPLG);
-		OCEHEINNABP(LEFHAGAGOME.LNBCDDCNAHB);
+		SetStart(LEFHAGAGOME.start);
+		SetEnd(LEFHAGAGOME.end);
 	}
 
-	public float GLOLKEBFFEG()
+	public float GetLength()
 	{
-		return Vector3f.Distance(LCLJKFJNPLG, LNBCDDCNAHB);
+		return Vector3f.Distance(start, end);
 	}
 
-	public float LDKFFINHBOH()
+	public float GetLength2D()
 	{
-		return Vector2f.JOIHAKCICMP(LCLJKFJNPLG, LNBCDDCNAHB);
+		return Vector2f.Distance2D(start, end);
 	}
 
-	public Vector3f GJLBOKGJMHJ()
+	public Vector3f GetNormal()
 	{
-		return Vector3f.KBNMOFDDLOM(LCLJKFJNPLG, LNBCDDCNAHB);
+		return Vector3f.GetPerpendicularDirection(start, end);
 	}
 
-	public Vector2f NFOEEOBPIKO()
+	public Vector2f GetDirection2D()
 	{
-		return new Vector2f(LNBCDDCNAHB.GetX() - LCLJKFJNPLG.GetX(), LNBCDDCNAHB.GetY() - LCLJKFJNPLG.GetY());
+		return new Vector2f(end.GetX() - start.GetX(), end.GetY() - start.GetY());
 	}
 
-	public Vector3f MLDFIEBFJDI()
+	public Vector3f GetDirection3D()
 	{
-		return Vector3f.MJOKEBGPHKB(LNBCDDCNAHB, LCLJKFJNPLG);
+		return Vector3f.op_Subtraction(end, start);
 	}
 
-	public Vector2f AHOIAJKLABL()
+	public Vector2f GetMidpoint2D()
 	{
-		return PGNJEIBFCMJ(0.5f);
+		return GetDivisionPoint2D(0.5f);
 	}
 
-	public Vector3f IEFEGPLODCM()
+	public Vector3f GetMidpoint3D()
 	{
 		return GetDivisionPoint3D(0.5f);
 	}
 
-	public Vector2f PGNJEIBFCMJ(float ratio)
+	public Vector2f GetDivisionPoint2D(float ratio)
 	{
-		return new Vector2f(LCLJKFJNPLG.GetX() + (LNBCDDCNAHB.GetX() - LCLJKFJNPLG.GetX()) * ratio, LCLJKFJNPLG.GetY() + (LNBCDDCNAHB.GetY() - LCLJKFJNPLG.GetY()) * ratio);
+		return new Vector2f(start.GetX() + (end.GetX() - start.GetX()) * ratio, start.GetY() + (end.GetY() - start.GetY()) * ratio);
 	}
 
 	public Vector3f GetDivisionPoint3D(float ratio)
 	{
-		return Vector3f.GetDivisionPoint3D(LCLJKFJNPLG, LNBCDDCNAHB, ratio);
+		return Vector3f.GetDivisionPoint3D(start, end, ratio);
 	}
 
 	public void GetDivisionPoint3D(Vector3f OEMALIFPGPO, float ratio)
 	{
-		OEMALIFPGPO.Set(LCLJKFJNPLG.GetX() + (LNBCDDCNAHB.GetX() - LCLJKFJNPLG.GetX()) * ratio, LCLJKFJNPLG.GetY() + (LNBCDDCNAHB.GetY() - LCLJKFJNPLG.GetY()) * ratio, LCLJKFJNPLG.GetZ() + (LNBCDDCNAHB.GetZ() - LCLJKFJNPLG.GetZ()) * ratio);
+		OEMALIFPGPO.Set(start.GetX() + (end.GetX() - start.GetX()) * ratio, start.GetY() + (end.GetY() - start.GetY()) * ratio, start.GetZ() + (end.GetZ() - start.GetZ()) * ratio);
 	}
 
-	public Vector2f BCFPOPFLLGJ(Vector2f NAAPALOFBCI)
+	public Vector2f GetClosestPointOnLine2D(Vector2f NAAPALOFBCI)
 	{
 		Vector2f hEJKLMNOLLG = new Vector2f(NAAPALOFBCI);
-		Vector2f hEJKLMNOLLG2 = new Vector2f(LCLJKFJNPLG);
-		Vector2f hEJKLMNOLLG3 = NFOEEOBPIKO();
-		hEJKLMNOLLG.EHGLHOGAIDI(hEJKLMNOLLG2);
+		Vector2f hEJKLMNOLLG2 = new Vector2f(start);
+		Vector2f hEJKLMNOLLG3 = GetDirection2D();
+		hEJKLMNOLLG.SubtractXY(hEJKLMNOLLG2);
 		float num = hEJKLMNOLLG.DotProduct(hEJKLMNOLLG3);
 		float num2 = hEJKLMNOLLG3.DotProduct(hEJKLMNOLLG3);
 		float lIAILCGJBDK = ((num2 == 0f) ? 0f : (num / num2));
@@ -166,38 +166,38 @@ public class Segment3D
 		return hEJKLMNOLLG2;
 	}
 
-	public float GDNPPAEGJPF(Vector2f NAAPALOFBCI)
+	public float GetRatioFromEnd(Vector2f NAAPALOFBCI)
 	{
-		float num = Vector2f.JOIHAKCICMP(LCLJKFJNPLG, LNBCDDCNAHB);
+		float num = Vector2f.Distance2D(start, end);
 		if (num != 0f)
 		{
-			return Vector2f.JOIHAKCICMP(LNBCDDCNAHB, NAAPALOFBCI) / num;
+			return Vector2f.Distance2D(end, NAAPALOFBCI) / num;
 		}
 		return 0f;
 	}
 
-	public static bool FLCEACOFEKB(Segment3D JLIFFKIFOKM, Segment3D BCNKAGOKLCL, Vector3f ONGFADJKIBB)
+	public static bool TryGetIntersection2D(Segment3D JLIFFKIFOKM, Segment3D BCNKAGOKLCL, Vector3f ONGFADJKIBB)
 	{
-		return Vector2f.AOFPHLDNOIL(JLIFFKIFOKM.LCLJKFJNPLG, JLIFFKIFOKM.LNBCDDCNAHB, BCNKAGOKLCL.LCLJKFJNPLG, BCNKAGOKLCL.LNBCDDCNAHB, ONGFADJKIBB);
+		return Vector2f.TryGetSegmentIntersection(JLIFFKIFOKM.start, JLIFFKIFOKM.end, BCNKAGOKLCL.start, BCNKAGOKLCL.end, ONGFADJKIBB);
 	}
 
-	public void LJPOALNMEOF(Vector3f value)
+	public void SetStart(Vector3f value)
 	{
-		LCLJKFJNPLG.Set(value);
+		start.Set(value);
 	}
 
-	public void LCFIDBHFBOO(Vector3f value)
+	public void SetStartReference(Vector3f value)
 	{
-		LCLJKFJNPLG = value;
+		start = value;
 	}
 
-	public void OCEHEINNABP(Vector3f value)
+	public void SetEnd(Vector3f value)
 	{
-		LNBCDDCNAHB.Set(value);
+		end.Set(value);
 	}
 
-	public void PMGPGDDPOBB(Vector3f value)
+	public void SetEndReference(Vector3f value)
 	{
-		LNBCDDCNAHB = value;
+		end = value;
 	}
 }

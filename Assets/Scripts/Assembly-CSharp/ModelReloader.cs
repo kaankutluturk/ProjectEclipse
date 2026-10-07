@@ -3,7 +3,7 @@ using System.Xml;
 
 public static class ModelReloader
 {
-	public static void NPMIHDFCBBH(ModelObject ACENLMONNPA, List<string> CBHAEPCLDFG)
+	public static void Reload(ModelObject ACENLMONNPA, List<string> CBHAEPCLDFG)
 	{
 		if (CBHAEPCLDFG.Count > 0)
 		{
@@ -20,7 +20,7 @@ public static class ModelReloader
 		int i = 0;
 		for (int count = CBHAEPCLDFG.Count; i < count; i++)
 		{
-			XmlDocument xmlDocument = ModelLoader.FHGHPCACAKJ.JBJDPDOEGFO(SF2Paths.BNHLPKEDMOM(), CBHAEPCLDFG[i]);
+			XmlDocument xmlDocument = ModelLoader.DocumentCache.GetDocument(SF2Paths.GetModelsPath(), CBHAEPCLDFG[i]);
 			XmlNode xmlNode = ((xmlDocument == null) ? null : xmlDocument["Scene"]);
 			XmlNode xmlNode2 = ((xmlNode == null) ? null : xmlNode["Nodes"]);
 			if (xmlNode2 == null)
@@ -37,40 +37,40 @@ public static class ModelReloader
 
 	private static void Parse(ModelObject ACENLMONNPA, List<XmlNode> nodes)
 	{
-		if (!PICNEPHDGGG(ACENLMONNPA, nodes))
+		if (!ReloadNodes(ACENLMONNPA, nodes))
 		{
-			LLLOJBFMONN.Error("Nodes was not parsed");
+			GameLog.Error("Nodes was not parsed");
 		}
 	}
 
-	private static bool PICNEPHDGGG(ModelObject ACENLMONNPA, List<XmlNode> BMGDKMNOLLL)
+	private static bool ReloadNodes(ModelObject ACENLMONNPA, List<XmlNode> BMGDKMNOLLL)
 	{
 		for (int i = 0; i < BMGDKMNOLLL.Count; i++)
 		{
 			foreach (XmlNode childNode in BMGDKMNOLLL[i].ChildNodes)
 			{
-				ModelNode modelNode = ACENLMONNPA.EGHIDHMENEF(childNode.Name);
+				ModelNode modelNode = ACENLMONNPA.GetNodeByName(childNode.Name);
 				if (modelNode != null)
 				{
-					GLNMJNFLLIN(ACENLMONNPA, modelNode, childNode);
+					ReloadNode(ACENLMONNPA, modelNode, childNode);
 				}
 			}
 		}
-		ACENLMONNPA.KJIEPFHIIKM();
+		ACENLMONNPA.ResolveMacroNodeWeights();
 		return true;
 	}
 
-	private static void GLNMJNFLLIN(ModelObject ACENLMONNPA, ModelNode NPDJNAMFIKD, XmlNode EABJIAHGLEO)
+	private static void ReloadNode(ModelObject ACENLMONNPA, ModelNode NPDJNAMFIKD, XmlNode EABJIAHGLEO)
 	{
 		if (NPDJNAMFIKD.GetName() != EABJIAHGLEO.Name)
 		{
-			LLLOJBFMONN.Error("Model reload: {0} -- {1}", NPDJNAMFIKD.GetName(), EABJIAHGLEO.Name);
+			GameLog.Error("Model reload: {0} -- {1}", NPDJNAMFIKD.GetName(), EABJIAHGLEO.Name);
 		}
 		float lHNJJFDIJKK = EABJIAHGLEO.Attributes["X"].ParseFloat();
 		float fFFHIOALHGM = 0f - EABJIAHGLEO.Attributes["Y"].ParseFloat();
 		float pDCENMEKIAP = EABJIAHGLEO.Attributes["Z"].ParseFloat();
 		Vector3f bAINMLLIKOL = new Vector3f(lHNJJFDIJKK, fFFHIOALHGM, pDCENMEKIAP);
-		string text = EABJIAHGLEO.Attributes["Type"].CIPOICEEIBK();
+		string text = EABJIAHGLEO.Attributes["Type"].GetStringOrDefault();
 		NPDJNAMFIKD.SetStart(bAINMLLIKOL);
 		NPDJNAMFIKD.SetEnd(bAINMLLIKOL);
 		if (text == "Node")

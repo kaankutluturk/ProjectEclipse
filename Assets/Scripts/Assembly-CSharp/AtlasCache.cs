@@ -5,11 +5,11 @@ public static class AtlasCache
 {
 	private static Dictionary<string, Sprite[]> _CachedAtlases = new Dictionary<string, Sprite[]>();
 
-	public static Sprite[] ENFOJMFEGJH(string ONNKJLOGHGH)
+	public static Sprite[] GetAtlasSprites(string ONNKJLOGHGH)
 	{
 		if (!_CachedAtlases.ContainsKey(ONNKJLOGHGH))
 		{
-			Sprite[] array = ResourcesAndBundles.BNCMBJOICHI<Sprite>(ONNKJLOGHGH);
+			Sprite[] array = ResourcesAndBundles.LoadAllAssets<Sprite>(ONNKJLOGHGH);
 			if (array != null && array.Length != 0)
 			{
 				_CachedAtlases.Add(ONNKJLOGHGH, array);
@@ -44,13 +44,13 @@ public static class AtlasCache
 			Sprite standalone = Resources.Load<Sprite>("ui/atlases/" + CMMPHNJDOCF);
 			if (standalone != null) return standalone;
 		}
-		Sprite[] array = ENFOJMFEGJH(ONNKJLOGHGH);
+		Sprite[] array = GetAtlasSprites(ONNKJLOGHGH);
 		if ((array == null || array.Length == 0) && !string.IsNullOrEmpty(ONNKJLOGHGH))
 		{
 			string text = ONNKJLOGHGH;
 			int num = text.IndexOf('/');
 			text = (num >= 0) ? text.Substring(num + 1) : text;
-			array = ENFOJMFEGJH(text);
+			array = GetAtlasSprites(text);
 		}
 		if (array == null || array.Length == 0)
 		{

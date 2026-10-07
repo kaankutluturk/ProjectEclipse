@@ -5,13 +5,13 @@ public class ResourcesUtil
 {
 	public static T[] GetResources<T>(string path) where T : UnityEngine.Object
 	{
-		path = FKJBCOEMBOC(path);
+		path = ToResourcesRelativePath(path);
 		return Resources.LoadAll<T>(path);
 	}
 
 	public static T GetResource<T>(string path) where T : UnityEngine.Object
 	{
-		path = FKJBCOEMBOC(path);
+		path = ToResourcesRelativePath(path);
 		return Resources.Load<T>(path);
 	}
 
@@ -19,7 +19,7 @@ public class ResourcesUtil
 	{
 		if (value is GameObject)
 		{
-			GlobalLoad.CHILAIJNEHG(value, OJCKACIMFEJ);
+			GlobalLoad.DestroyObject(value, OJCKACIMFEJ);
 		}
 		else
 		{
@@ -27,12 +27,12 @@ public class ResourcesUtil
 		}
 	}
 
-	public static void KGNLHIKNDLL()
+	public static void UnloadUnusedAssets()
 	{
 		Resources.UnloadUnusedAssets();
 	}
 
-	private static string FKJBCOEMBOC(string path)
+	private static string ToResourcesRelativePath(string path)
 	{
 		string text = "resources/";
 		int num = path.LastIndexOf(text, StringComparison.OrdinalIgnoreCase);

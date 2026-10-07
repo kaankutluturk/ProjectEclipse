@@ -3,13 +3,13 @@ using UnityEngine;
 
 public class Vector2f
 {
-	public static readonly Vector2f FGGEKNJHPEG = new Vector2f();
+	public static readonly Vector2f ZeroVector = new Vector2f();
 
 	protected float X;
 
 	protected float Y;
 
-	public float NPKMJMCLDAH
+	public float XValue
 	{
 		get
 		{
@@ -21,7 +21,7 @@ public class Vector2f
 		}
 	}
 
-	public float IHAHIEHHNCG
+	public float YValue
 	{
 		get
 		{
@@ -33,11 +33,11 @@ public class Vector2f
 		}
 	}
 
-	public string OFIEAFIPOAM
+	public string FormattedValue
 	{
 		get
 		{
-			return KCHEACEFEDA();
+			return GetFormattedValue();
 		}
 	}
 
@@ -80,19 +80,19 @@ public class Vector2f
 	}
 
 	[SpecialName]
-	public static Vector2f MJOKEBGPHKB(Vector2f GIIIFLBEONP, Vector2f OIFPGODHFGH)
+	public static Vector2f op_Subtraction(Vector2f GIIIFLBEONP, Vector2f OIFPGODHFGH)
 	{
 		return new Vector2f(GIIIFLBEONP.GetX() - OIFPGODHFGH.GetX(), GIIIFLBEONP.GetY() - OIFPGODHFGH.GetY());
 	}
 
 	[SpecialName]
-	public static Vector2f PHEFFKMOOCM(Vector2f GIIIFLBEONP, Vector2f OIFPGODHFGH)
+	public static Vector2f op_Addition(Vector2f GIIIFLBEONP, Vector2f OIFPGODHFGH)
 	{
 		return new Vector2f(GIIIFLBEONP.GetX() + OIFPGODHFGH.GetX(), GIIIFLBEONP.GetY() + OIFPGODHFGH.GetY());
 	}
 
 	[SpecialName]
-	public static bool LFPMCJPCJBD(Vector2f GIIIFLBEONP, Vector2f OIFPGODHFGH)
+	public static bool op_Equality(Vector2f GIIIFLBEONP, Vector2f OIFPGODHFGH)
 	{
 		if (object.ReferenceEquals(GIIIFLBEONP, OIFPGODHFGH))
 		{
@@ -106,9 +106,9 @@ public class Vector2f
 	}
 
 	[SpecialName]
-	public static bool GLCJKGIOIEC(Vector2f GIIIFLBEONP, Vector2f OIFPGODHFGH)
+	public static bool op_Inequality(Vector2f GIIIFLBEONP, Vector2f OIFPGODHFGH)
 	{
-		return !LFPMCJPCJBD(GIIIFLBEONP, OIFPGODHFGH);
+		return !op_Equality(GIIIFLBEONP, OIFPGODHFGH);
 	}
 
 	[SpecialName]
@@ -131,7 +131,7 @@ public class Vector2f
 		return this;
 	}
 
-	public Vector2f EHGLHOGAIDI(Vector2f PALAIICCALN)
+	public Vector2f SubtractXY(Vector2f PALAIICCALN)
 	{
 		X -= PALAIICCALN.GetX();
 		Y -= PALAIICCALN.GetY();
@@ -157,7 +157,7 @@ public class Vector2f
 		Y = Round(Y, CFCPPNJKNAL);
 	}
 
-	public void MFDKMBLJNPA()
+	public void RoundToInteger()
 	{
 		X = Round(X, 1f);
 		Y = Round(Y, 1f);
@@ -168,7 +168,7 @@ public class Vector2f
 		return X * PIFPKKNEAID.GetX() + Y * PIFPKKNEAID.GetY();
 	}
 
-	public string KCHEACEFEDA()
+	public string GetFormattedValue()
 	{
 		return string.Format("[{0} {1}]", X, Y);
 	}
@@ -183,17 +183,17 @@ public class Vector2f
 		return Mathf.Floor(Value * JMLMHGAMNKN + 0.5f) / JMLMHGAMNKN;
 	}
 
-	public static float JOIHAKCICMP(Vector3f AMNCLCPADOO, Vector3f IFIOLDFCLIE)
+	public static float Distance2D(Vector3f AMNCLCPADOO, Vector3f IFIOLDFCLIE)
 	{
 		return Mathf.Sqrt((AMNCLCPADOO.GetX() - IFIOLDFCLIE.GetX()) * (AMNCLCPADOO.GetX() - IFIOLDFCLIE.GetX()) + (AMNCLCPADOO.GetY() - IFIOLDFCLIE.GetY()) * (AMNCLCPADOO.GetY() - IFIOLDFCLIE.GetY()));
 	}
 
-	public static float JOIHAKCICMP(Vector3f AMNCLCPADOO, Vector2f IFIOLDFCLIE)
+	public static float Distance2D(Vector3f AMNCLCPADOO, Vector2f IFIOLDFCLIE)
 	{
 		return Mathf.Sqrt((AMNCLCPADOO.GetX() - IFIOLDFCLIE.GetX()) * (AMNCLCPADOO.GetX() - IFIOLDFCLIE.GetX()) + (AMNCLCPADOO.GetY() - IFIOLDFCLIE.GetY()) * (AMNCLCPADOO.GetY() - IFIOLDFCLIE.GetY()));
 	}
 
-	public static bool AOFPHLDNOIL(Vector3f IEKADOOKFKG, Vector3f LDKCOIHONPG, Vector3f AOOIPCJPALH, Vector3f IGMCGOFHHCJ, Vector3f DCJLKCFKCOM)
+	public static bool TryGetSegmentIntersection(Vector3f IEKADOOKFKG, Vector3f LDKCOIHONPG, Vector3f AOOIPCJPALH, Vector3f IGMCGOFHHCJ, Vector3f DCJLKCFKCOM)
 	{
 		if ((IEKADOOKFKG.GetX() == LDKCOIHONPG.GetX() && IEKADOOKFKG.GetY() == LDKCOIHONPG.GetY()) || (AOOIPCJPALH.GetX() == IGMCGOFHHCJ.GetX() && AOOIPCJPALH.GetY() == IGMCGOFHHCJ.GetY()))
 		{
@@ -279,22 +279,22 @@ public class Vector2f
 		return false;
 	}
 
-	public static void JBLEOOBOCND(Vector3f MLGFPMDKOHD, Vector3f DMMNCDKPCCI, EquationLine EGKHHBMCGMK)
+	public static void BuildEquationLine(Vector3f MLGFPMDKOHD, Vector3f DMMNCDKPCCI, EquationLine EGKHHBMCGMK)
 	{
-		float num = JOIHAKCICMP(MLGFPMDKOHD, DMMNCDKPCCI);
-		EGKHHBMCGMK.LHBNIMGFKIB = (MLGFPMDKOHD.GetY() - DMMNCDKPCCI.GetY()) / num;
-		EGKHHBMCGMK.AAOIAEJJINO = (DMMNCDKPCCI.GetX() - MLGFPMDKOHD.GetX()) / num;
-		EGKHHBMCGMK.ILHDJDNPFKH = 0f - (EGKHHBMCGMK.LHBNIMGFKIB * MLGFPMDKOHD.GetX() + EGKHHBMCGMK.AAOIAEJJINO * MLGFPMDKOHD.GetY());
+		float num = Distance2D(MLGFPMDKOHD, DMMNCDKPCCI);
+		EGKHHBMCGMK.A = (MLGFPMDKOHD.GetY() - DMMNCDKPCCI.GetY()) / num;
+		EGKHHBMCGMK.CoefficientB = (DMMNCDKPCCI.GetX() - MLGFPMDKOHD.GetX()) / num;
+		EGKHHBMCGMK.ConstantC = 0f - (EGKHHBMCGMK.A * MLGFPMDKOHD.GetX() + EGKHHBMCGMK.CoefficientB * MLGFPMDKOHD.GetY());
 	}
 
-	public static EquationLine JBLEOOBOCND(Vector3f MLGFPMDKOHD, Vector3f DMMNCDKPCCI)
+	public static EquationLine BuildEquationLine(Vector3f MLGFPMDKOHD, Vector3f DMMNCDKPCCI)
 	{
 		EquationLine kEDCEHBPOIM = new EquationLine();
-		JBLEOOBOCND(MLGFPMDKOHD, DMMNCDKPCCI, kEDCEHBPOIM);
+		BuildEquationLine(MLGFPMDKOHD, DMMNCDKPCCI, kEDCEHBPOIM);
 		return kEDCEHBPOIM;
 	}
 
-	public static bool FLCEACOFEKB(Vector3f IEKADOOKFKG, Vector3f LDKCOIHONPG, Vector3f AOOIPCJPALH, Vector3f IGMCGOFHHCJ, Vector3f DCJLKCFKCOM)
+	public static bool TryIntersectSegments(Vector3f IEKADOOKFKG, Vector3f LDKCOIHONPG, Vector3f AOOIPCJPALH, Vector3f IGMCGOFHHCJ, Vector3f DCJLKCFKCOM)
 	{
 		if ((IEKADOOKFKG.GetX() == LDKCOIHONPG.GetX() && IEKADOOKFKG.GetY() == LDKCOIHONPG.GetY()) || (AOOIPCJPALH.GetX() == IGMCGOFHHCJ.GetX() && AOOIPCJPALH.GetY() == IGMCGOFHHCJ.GetY()))
 		{
@@ -384,35 +384,35 @@ public class Vector2f
 	{
 		if (Mathf.Abs(OIOMNNFMDOO) <= JBLFLFOGDFI)
 		{
-			_base.SetX(NAAPALOFBCI.GetX() - OIOMNNFMDOO * EGKHHBMCGMK.LHBNIMGFKIB);
-			_base.SetY(NAAPALOFBCI.GetY() - OIOMNNFMDOO * EGKHHBMCGMK.AAOIAEJJINO);
+			_base.SetX(NAAPALOFBCI.GetX() - OIOMNNFMDOO * EGKHHBMCGMK.A);
+			_base.SetY(NAAPALOFBCI.GetY() - OIOMNNFMDOO * EGKHHBMCGMK.CoefficientB);
 			return (((PCLFFOBJJFO.GetX() <= _base.GetX() && _base.GetX() <= ILENLCMAMBH.GetX()) || (ILENLCMAMBH.GetX() <= _base.GetX() && _base.GetX() <= PCLFFOBJJFO.GetX())) && ((PCLFFOBJJFO.GetY() <= _base.GetY() && _base.GetY() <= ILENLCMAMBH.GetY()) || (ILENLCMAMBH.GetY() <= _base.GetY() && _base.GetY() <= PCLFFOBJJFO.GetY()))) || (NAAPALOFBCI.GetX() - ILENLCMAMBH.GetX()) * (NAAPALOFBCI.GetX() - ILENLCMAMBH.GetX()) + (NAAPALOFBCI.GetY() - ILENLCMAMBH.GetY()) * (NAAPALOFBCI.GetY() - ILENLCMAMBH.GetY()) <= JBLFLFOGDFI * JBLFLFOGDFI || (NAAPALOFBCI.GetX() - PCLFFOBJJFO.GetX()) * (NAAPALOFBCI.GetX() - PCLFFOBJJFO.GetX()) + (NAAPALOFBCI.GetY() - PCLFFOBJJFO.GetY()) * (NAAPALOFBCI.GetY() - PCLFFOBJJFO.GetY()) <= JBLFLFOGDFI * JBLFLFOGDFI;
 		}
 		return false;
 	}
 
-	public static bool FLHCKLEBDDK(Vector3f HICHONIJHKL, Vector3f LNPFHLPCLOP, float KLDFJGIKIHG, Vector3f NMAJNHKJJEM, Vector3f ONNJMGGPHEL, float MGCKDDGGCBI, Vector3f DNJCFHNICBH, Vector3f LOFMLNLKFLB, EquationLine JHMHDMOADMA, EquationLine GIMOMPLMEJH)
+	public static bool TryIntersectThickSegments(Vector3f HICHONIJHKL, Vector3f LNPFHLPCLOP, float KLDFJGIKIHG, Vector3f NMAJNHKJJEM, Vector3f ONNJMGGPHEL, float MGCKDDGGCBI, Vector3f DNJCFHNICBH, Vector3f LOFMLNLKFLB, EquationLine JHMHDMOADMA, EquationLine GIMOMPLMEJH)
 	{
 		float num = KLDFJGIKIHG + MGCKDDGGCBI;
 		if (num == 0f)
 		{
-			if (FLCEACOFEKB(NMAJNHKJJEM, ONNJMGGPHEL, HICHONIJHKL, LNPFHLPCLOP, DNJCFHNICBH))
+			if (TryIntersectSegments(NMAJNHKJJEM, ONNJMGGPHEL, HICHONIJHKL, LNPFHLPCLOP, DNJCFHNICBH))
 			{
 				LOFMLNLKFLB.Set(DNJCFHNICBH);
 				return true;
 			}
 			return false;
 		}
-		EquationLine kEDCEHBPOIM = ((GIMOMPLMEJH == null) ? JBLEOOBOCND(NMAJNHKJJEM, ONNJMGGPHEL) : GIMOMPLMEJH);
-		float num2 = kEDCEHBPOIM.LHBNIMGFKIB * HICHONIJHKL.GetX() + kEDCEHBPOIM.AAOIAEJJINO * HICHONIJHKL.GetY() + kEDCEHBPOIM.ILHDJDNPFKH;
-		float num3 = kEDCEHBPOIM.LHBNIMGFKIB * LNPFHLPCLOP.GetX() + kEDCEHBPOIM.AAOIAEJJINO * LNPFHLPCLOP.GetY() + kEDCEHBPOIM.ILHDJDNPFKH;
+		EquationLine kEDCEHBPOIM = ((GIMOMPLMEJH == null) ? BuildEquationLine(NMAJNHKJJEM, ONNJMGGPHEL) : GIMOMPLMEJH);
+		float num2 = kEDCEHBPOIM.A * HICHONIJHKL.GetX() + kEDCEHBPOIM.CoefficientB * HICHONIJHKL.GetY() + kEDCEHBPOIM.ConstantC;
+		float num3 = kEDCEHBPOIM.A * LNPFHLPCLOP.GetX() + kEDCEHBPOIM.CoefficientB * LNPFHLPCLOP.GetY() + kEDCEHBPOIM.ConstantC;
 		if (0f <= num2 * num3 && num < Mathf.Abs(num2) && num < Mathf.Abs(num3))
 		{
 			return false;
 		}
-		EquationLine kEDCEHBPOIM2 = ((JHMHDMOADMA == null) ? JBLEOOBOCND(HICHONIJHKL, LNPFHLPCLOP) : JHMHDMOADMA);
-		float num4 = kEDCEHBPOIM2.LHBNIMGFKIB * NMAJNHKJJEM.GetX() + kEDCEHBPOIM2.AAOIAEJJINO * NMAJNHKJJEM.GetY() + kEDCEHBPOIM2.ILHDJDNPFKH;
-		float num5 = kEDCEHBPOIM2.LHBNIMGFKIB * ONNJMGGPHEL.GetX() + kEDCEHBPOIM2.AAOIAEJJINO * ONNJMGGPHEL.GetY() + kEDCEHBPOIM2.ILHDJDNPFKH;
+		EquationLine kEDCEHBPOIM2 = ((JHMHDMOADMA == null) ? BuildEquationLine(HICHONIJHKL, LNPFHLPCLOP) : JHMHDMOADMA);
+		float num4 = kEDCEHBPOIM2.A * NMAJNHKJJEM.GetX() + kEDCEHBPOIM2.CoefficientB * NMAJNHKJJEM.GetY() + kEDCEHBPOIM2.ConstantC;
+		float num5 = kEDCEHBPOIM2.A * ONNJMGGPHEL.GetX() + kEDCEHBPOIM2.CoefficientB * ONNJMGGPHEL.GetY() + kEDCEHBPOIM2.ConstantC;
 		if (0f <= num4 * num5 && num < Mathf.Abs(num4) && num < Mathf.Abs(num5))
 		{
 			return false;
@@ -420,7 +420,7 @@ public class Vector2f
 		if (num4 * num5 < 0f && num2 * num3 < 0f)
 		{
 			float lIAILCGJBDK = num4 / (num4 - num5);
-			DNJCFHNICBH.Set(Vector3f.MJOKEBGPHKB(ONNJMGGPHEL, NMAJNHKJJEM));
+			DNJCFHNICBH.Set(Vector3f.op_Subtraction(ONNJMGGPHEL, NMAJNHKJJEM));
 			DNJCFHNICBH.Multiply(lIAILCGJBDK);
 			DNJCFHNICBH.Add(NMAJNHKJJEM);
 			LOFMLNLKFLB.Set(DNJCFHNICBH);
@@ -451,7 +451,7 @@ public class Vector2f
 		return false;
 	}
 
-	public static float LDKCDLFIDHL(Vector2f LHBNIMGFKIB, Vector2f AAOIAEJJINO)
+	public static float DistanceSquared2D(Vector2f LHBNIMGFKIB, Vector2f AAOIAEJJINO)
 	{
 		return (AAOIAEJJINO.GetX() - LHBNIMGFKIB.GetX()) * (AAOIAEJJINO.GetX() - LHBNIMGFKIB.GetX()) + (AAOIAEJJINO.GetY() - LHBNIMGFKIB.GetY()) * (AAOIAEJJINO.GetY() - LHBNIMGFKIB.GetY());
 	}

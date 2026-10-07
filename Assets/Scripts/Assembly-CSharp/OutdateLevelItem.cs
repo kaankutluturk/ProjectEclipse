@@ -10,7 +10,7 @@ public class OutdateLevelItem
 	public void Parse(XmlNode node)
 	{
 		Value = node.Attributes["Value"].ParseFloat();
-		string text = node.Attributes["Type"].CIPOICEEIBK(string.Empty);
+		string text = node.Attributes["Type"].GetStringOrDefault(string.Empty);
 		if (text != null)
 		{
 			string[] collection = text.Split('|');

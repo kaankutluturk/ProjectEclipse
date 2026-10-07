@@ -4,86 +4,86 @@ using CodeStage.AntiCheat.ObscuredTypes;
 
 public partial class InfoPerk
 {
-	public enum HDDACJNDLEE
+	public enum InfoPerkEvent
 	{
 		EVENT_MOD_EXPIRES = 0
 	}
 
-	public PerkData DCMHONAFOGI;
+	public PerkData Data;
 
-	private List<PerksStage.ActionPerk> NIDKKJFBNHO = new List<PerksStage.ActionPerk>();
+	private List<PerksStage.ActionPerk> pendingActions = new List<PerksStage.ActionPerk>();
 
-	private List<PerksStage.ActionPerk> NBFBBDHELEJ = new List<PerksStage.ActionPerk>();
+	private List<PerksStage.ActionPerk> activeActions = new List<PerksStage.ActionPerk>();
 
-	private List<string> PCOPAMLECKI = new List<string>();
+	private List<string> activeActionNames = new List<string>();
 
-	private List<string> IEDBEDCKAIE = new List<string>();
+	private List<string> expiredModNames = new List<string>();
 
-	public List<PerksStage.ActionPerk> JMIIJAFLAEF
+	public List<PerksStage.ActionPerk> PendingActions
 	{
 		get
 		{
-			return MNLNLKOJPHO();
+			return GetPendingActions();
 		}
 	}
 
-	public List<PerksStage.ActionPerk> DJBAIAKOIHM
+	public List<PerksStage.ActionPerk> ActiveActions
 	{
 		get
 		{
-			return HIPOGANEPMI();
+			return GetActiveActions();
 		}
 	}
 
-	public List<string> MBMBFONBKPE
+	public List<string> ActiveActionNames
 	{
 		get
 		{
-			return BFKDLIMHGFA();
+			return GetActiveActionNames();
 		}
 	}
 
-	public List<string> HOKIPGPFMCM
+	public List<string> ExpiredModNames
 	{
 		get
 		{
-			return BKIMFEIMHCF();
+			return GetExpiredModNames();
 		}
 	}
 
-	public bool LEBLFMFDKAA
+	public bool IsOwnerPlayer
 	{
 		get
 		{
-			return IHAHGIHPNIG();
+			return GetIsOwnerPlayer();
 		}
 	}
 
-	public List<PerksStage.ActionPerk> MNLNLKOJPHO()
+	public List<PerksStage.ActionPerk> GetPendingActions()
 	{
-		return NIDKKJFBNHO;
+		return pendingActions;
 	}
 
-	public List<PerksStage.ActionPerk> HIPOGANEPMI()
+	public List<PerksStage.ActionPerk> GetActiveActions()
 	{
-		return NBFBBDHELEJ;
+		return activeActions;
 	}
 
-	public List<string> BFKDLIMHGFA()
+	public List<string> GetActiveActionNames()
 	{
-		return PCOPAMLECKI;
+		return activeActionNames;
 	}
 
-	public List<string> BKIMFEIMHCF()
+	public List<string> GetExpiredModNames()
 	{
-		return IEDBEDCKAIE;
+		return expiredModNames;
 	}
 
-	public bool IHAHGIHPNIG()
+	public bool GetIsOwnerPlayer()
 	{
-		if (DCMHONAFOGI != null && DCMHONAFOGI.MBDDKGIOOGD != null && DCMHONAFOGI.MBDDKGIOOGD.ELPJBGIPEIB() != null)
+		if (Data != null && Data.PerkInfo != null && Data.PerkInfo.GetOwnerModel() != null)
 		{
-			return DCMHONAFOGI.MBDDKGIOOGD.ELPJBGIPEIB().EPCNJLEHJCB();
+			return Data.PerkInfo.GetOwnerModel().IsPlayerModel();
 		}
 		return false;
 	}
@@ -91,181 +91,181 @@ public partial class InfoPerk
 	public void Render()
 	{
 		int num = 0;
-		int count = NBFBBDHELEJ.Count;
-		while (num < NBFBBDHELEJ.Count)
+		int count = activeActions.Count;
+		while (num < activeActions.Count)
 		{
-			count = NBFBBDHELEJ.Count;
-			PerksStage.ActionPerk oAJGINIDKJD = NBFBBDHELEJ[num];
-			CAIPNAAJICO(oAJGINIDKJD);
-			if (oAJGINIDKJD.FLNLMIHEDCI > 0)
+			count = activeActions.Count;
+			PerksStage.ActionPerk oAJGINIDKJD = activeActions[num];
+			ApplyHealthChangeTick(oAJGINIDKJD);
+			if (oAJGINIDKJD.DurationFrames > 0)
 			{
-				if (oAJGINIDKJD.KGNDJOLBBJF >= oAJGINIDKJD.FLNLMIHEDCI || oAJGINIDKJD.PLNNKKBPDJK)
+				if (oAJGINIDKJD.ElapsedFrames >= oAJGINIDKJD.DurationFrames || oAJGINIDKJD.IsExpired)
 				{
-					ACKKGAAPLDG(oAJGINIDKJD);
+					ExpireAction(oAJGINIDKJD);
 				}
-				oAJGINIDKJD.KGNDJOLBBJF++;
+				oAJGINIDKJD.ElapsedFrames++;
 			}
-			if (count == NBFBBDHELEJ.Count)
+			if (count == activeActions.Count)
 			{
 				num++;
 			}
 		}
 	}
 
-	private void CAIPNAAJICO(PerksStage.ActionPerk IBODMPMJELJ)
+	private void ApplyHealthChangeTick(PerksStage.ActionPerk IBODMPMJELJ)
 	{
-		if (IBODMPMJELJ.AMKJNPOCODK.get_Type() == ActionType.ACTION_MOD_HEALTH_CHANGE)
+		if (IBODMPMJELJ.Action.get_Type() == ActionType.ACTION_MOD_HEALTH_CHANGE)
 		{
-			DDOGCEKKDMK(IBODMPMJELJ);
+			ApplyHealthChange(IBODMPMJELJ);
 		}
 	}
 
 	public void Run()
 	{
-		if (NIDKKJFBNHO.Count > 0)
+		if (pendingActions.Count > 0)
 		{
-			MHHNIPBJNAD(NIDKKJFBNHO);
-			NIDKKJFBNHO.Clear();
+			ExecuteActions(pendingActions);
+			pendingActions.Clear();
 		}
 	}
 
-	private void ALBIODLFMAK(PerksStage.ActionPerk IBODMPMJELJ, bool PENNHKHFEOM)
+	private void LogModEvent(PerksStage.ActionPerk IBODMPMJELJ, bool PENNHKHFEOM)
 	{
 		StringBuilder stringBuilder = new StringBuilder();
 		stringBuilder.Append("PERK ----- ");
 		stringBuilder.Append((!PENNHKHFEOM) ? "ModDestruction " : "ModStart ");
 		stringBuilder.Append("PerkName: {0} ModName: {1} ModXML: {2}");
-		if (LogRules.ELEBLBJKDBI().DKHBLILFCOA())
+		if (LogRules.GetInstance().GetLogPerks())
 		{
-			LLLOJBFMONN.INNGABABJPC(stringBuilder.ToString(), IBODMPMJELJ.AMKJNPOCODK.GNDAFILBLIB().JMDLAMHAJLN().Name, IBODMPMJELJ.AMKJNPOCODK.get_Name(), IBODMPMJELJ.AMKJNPOCODK.FDEKGNPKJFL());
+			GameLog.Info(stringBuilder.ToString(), IBODMPMJELJ.Action.GetTrigger().GetPerk().Name, IBODMPMJELJ.Action.get_Name(), IBODMPMJELJ.Action.GetElementName());
 		}
 	}
 
-	public void MHHNIPBJNAD(List<PerksStage.ActionPerk> AFENHJFICNN)
+	public void ExecuteActions(List<PerksStage.ActionPerk> AFENHJFICNN)
 	{
 		foreach (PerksStage.ActionPerk item in AFENHJFICNN)
 		{
-			PerksStage.ActionPerk oAJGINIDKJD = ((!item.AMKJNPOCODK.NKAEEFNNBEN()) ? item : new PerksStage.ActionPerk(item));
-			switch (item.AMKJNPOCODK.get_Type())
+			PerksStage.ActionPerk oAJGINIDKJD = ((!item.Action.GetModificator()) ? item : new PerksStage.ActionPerk(item));
+			switch (item.Action.get_Type())
 			{
 			case ActionType.ACTION_SHOW_ICONS:
-				MBKLEKPDGOA(oAJGINIDKJD, false);
+				ApplyShowIcon(oAJGINIDKJD, false);
 				break;
 			case ActionType.ACTION_MOD_HEALTH_CHANGE:
-				IEDBKHEFKDE(oAJGINIDKJD, false);
+				ApplyHealthChangeStart(oAJGINIDKJD, false);
 				break;
 			case ActionType.ACTION_SET_ATTRIBUTES:
-				NMIGELMNBDF(oAJGINIDKJD, false);
+				ApplySetAttributes(oAJGINIDKJD, false);
 				break;
 			case ActionType.ACTION_INVISIBILITY:
-				PCCAPNKPOKB(oAJGINIDKJD, false);
+				ApplyInvisibility(oAJGINIDKJD, false);
 				break;
 			case ActionType.ACTION_DISABLE_INTERVAL:
-				LICINJMMICM(oAJGINIDKJD);
+				ApplyDisableInterval(oAJGINIDKJD);
 				break;
 			case ActionType.ACTION_SET_HIT:
-				LHNCAIDDJIJ(oAJGINIDKJD);
+				ApplySetHit(oAJGINIDKJD);
 				break;
 			case ActionType.ACTION_LIFE_STEAL:
-				GKLCDJLBBAM(oAJGINIDKJD);
+				ApplyLifeSteal(oAJGINIDKJD);
 				break;
 			case ActionType.ACTION_ADD_BULLETS:
-				KGFBIAOGHFF(oAJGINIDKJD);
+				ApplyAddBullets(oAJGINIDKJD);
 				break;
 			case ActionType.ACTION_ADD_MAGIC:
-				DLMEDFNIEHI(oAJGINIDKJD);
+				ApplyAddMagicCharge(oAJGINIDKJD);
 				break;
 			case ActionType.ACTION_SET_MOD_FRAMES:
-				AGPDKNAEDPB(oAJGINIDKJD);
+				ApplySetModFrames(oAJGINIDKJD);
 				break;
 			case ActionType.ACTION_MOD_EFFECT:
-				HNAIFDHOMPL(oAJGINIDKJD);
+				ApplySetModEffect(oAJGINIDKJD);
 				break;
 			case ActionType.ACTION_PROVOKE:
-				CPKHOBHFJDN(oAJGINIDKJD);
+				ApplyProvoke(oAJGINIDKJD);
 				break;
 			case ActionType.ACTION_SET_TACTICS:
-				DGNKIJEICCJ(oAJGINIDKJD);
+				ApplySetTactics(oAJGINIDKJD);
 				break;
 			case ActionType.ACTION_CLEAR_ACTION:
-				OLEBPFBJCII(oAJGINIDKJD);
+				ApplyClearAction(oAJGINIDKJD);
 				break;
 			case ActionType.ACTION_VARIABLE:
-				KKODDGMCDBC(oAJGINIDKJD);
+				ApplyVariable(oAJGINIDKJD);
 				break;
 			case ActionType.ACTION_SET_VARIABLE:
-				MFKFMPAPHDG(oAJGINIDKJD);
+				ApplySetVariable(oAJGINIDKJD);
 				break;
 			case ActionType.ACTION_SET_COOLDOWN:
-				LIPMLGCPAJG(oAJGINIDKJD);
+				ApplySetCooldown(oAJGINIDKJD);
 				break;
 			case ActionType.ACTION_CHANGE_IMPULSE:
-				APMFPHOALEO(oAJGINIDKJD, false);
+				ApplyChangeImpulse(oAJGINIDKJD, false);
 				break;
 			case ActionType.ACTION_CHANGE_HIT_EFFECT_SCALE:
-				IMJCCNPMHKC(oAJGINIDKJD, false);
+				ApplyChangeHitEffectScale(oAJGINIDKJD, false);
 				break;
 			case ActionType.ACTION_CHANGE_ADD_DAMAGE_VALUE:
-				BFBGNIICAHE(oAJGINIDKJD, false);
+				ApplyChangeAdditionalDamage(oAJGINIDKJD, false);
 				break;
 			case ActionType.ACTION_CHANGE_MODEL_COLOR:
-				NPNJDBJABMG(oAJGINIDKJD, false);
+				ApplyChangeModelColor(oAJGINIDKJD, false);
 				break;
 			case ActionType.ACTION_SLOW_MODEL:
-				KCELDPMGNMI(oAJGINIDKJD, false);
+				ApplySlowModel(oAJGINIDKJD, false);
 				break;
 			case ActionType.ACTION_TURN_OFF_COLLISION:
-				FHDDBMFJBJJ(oAJGINIDKJD, false);
+				ApplyTurnOffCollision(oAJGINIDKJD, false);
 				break;
 			case ActionType.ACTION_SWITCH:
-				JFNHLKEEJNC(oAJGINIDKJD);
+				ApplySwitch(oAJGINIDKJD);
 				break;
 			case ActionType.ACTION_MARK_PERK_USED:
-				PerksStage.ANPAFFMJMNG(DCMHONAFOGI.MBDDKGIOOGD.Name);
+				PerksStage.IncrementPerkUse(Data.PerkInfo.Name);
 				break;
 			case ActionType.ACTION_PERK_AREA:
-				EAFKPBMOMKI(oAJGINIDKJD, false);
+				ApplyPerkArea(oAJGINIDKJD, false);
 				break;
 			case ActionType.ACTION_MOVE_MODEL:
-				NEKDJLPGMAH(oAJGINIDKJD);
+				ApplyMoveModel(oAJGINIDKJD);
 				break;
 			case ActionType.ACTION_SET_MOVES_VARIABLE:
-				DHPEJIFPLCF(oAJGINIDKJD);
+				ApplySetMovesVariable(oAJGINIDKJD);
 				break;
 			case ActionType.ACTION_STEAL_MAGIC:
-				PHHLFMLOPEK(oAJGINIDKJD, false);
+				ApplyStealMagic(oAJGINIDKJD, false);
 				break;
 			}
-			if (item.AMKJNPOCODK.NKAEEFNNBEN())
+			if (item.Action.GetModificator())
 			{
-				NBFBBDHELEJ.Add(oAJGINIDKJD);
-				PCOPAMLECKI.Add(oAJGINIDKJD.AMKJNPOCODK.get_Name());
-				PerkActionModificator cKCICHAIMFL = (PerkActionModificator)oAJGINIDKJD.AMKJNPOCODK;
-				if (cKCICHAIMFL.IONIEDIPEGB() != string.Empty)
+				activeActions.Add(oAJGINIDKJD);
+				activeActionNames.Add(oAJGINIDKJD.Action.get_Name());
+				PerkActionModificator cKCICHAIMFL = (PerkActionModificator)oAJGINIDKJD.Action;
+				if (cKCICHAIMFL.GetNamespace() != string.Empty)
 				{
-					PerksStage.HKMMGCLNJCN(oAJGINIDKJD);
+					PerksStage.RegisterNamespaceAction(oAJGINIDKJD);
 				}
 			}
-			ALBIODLFMAK(item, true);
+			LogModEvent(item, true);
 		}
 		AFENHJFICNN.Clear();
 		ClearActions();
 	}
 
-	private void MBKLEKPDGOA(PerksStage.ActionPerk IBODMPMJELJ, bool CCBEDPIHKAD)
+	private void ApplyShowIcon(PerksStage.ActionPerk IBODMPMJELJ, bool CCBEDPIHKAD)
 	{
 		if (!CCBEDPIHKAD)
 		{
-			ACBNLJBJGDF();
+			MarkPerkUsed();
 		}
-		PerkActionShowIcon fMJDHMBCMKL = (PerkActionShowIcon)IBODMPMJELJ.AMKJNPOCODK;
-		string image = (fMJDHMBCMKL.AJAEJNGLKOK() != string.Empty)
-			? fMJDHMBCMKL.AJAEJNGLKOK()
-			: DCMHONAFOGI.MBDDKGIOOGD.NHKMCLPOMFK;
-		IBODMPMJELJ.NHKMCLPOMFK = ResolveIconPath(image);
-		IBODMPMJELJ.FLNCPBKBJBL = fMJDHMBCMKL.ECKEHGCGBBP();
-		IBODMPMJELJ.MGDCIODPHCH = fMJDHMBCMKL.NKHNFHIKGIG();
-		IBODMPMJELJ.KJDFJPBIGJC.CKCCBJKIGIO(IBODMPMJELJ, CCBEDPIHKAD);
+		PerkActionShowIcon fMJDHMBCMKL = (PerkActionShowIcon)IBODMPMJELJ.Action;
+		string image = (fMJDHMBCMKL.GetImage() != string.Empty)
+			? fMJDHMBCMKL.GetImage()
+			: Data.PerkInfo.ImageName;
+		IBODMPMJELJ.IconPath = ResolveIconPath(image);
+		IBODMPMJELJ.ShowExpiration = fMJDHMBCMKL.GetShowExpiration();
+		IBODMPMJELJ.ExpirationVersion = fMJDHMBCMKL.GetExpirationVer();
+		IBODMPMJELJ.TargetModel.NotifyPerkAction(IBODMPMJELJ, CCBEDPIHKAD);
 	}
 
 	private static string ResolveIconPath(string image)
@@ -274,27 +274,27 @@ public partial class InfoPerk
 		// fully-qualified asset IDs, which must not receive the legacy prefix.
 		return (image != null && image.IndexOf(':') > 0)
 			? image
-			: string.Format("{0}{1}", SF2Paths.KLIDILIHOFF(), image ?? string.Empty);
+			: string.Format("{0}{1}", SF2Paths.GetSkillsUiPath(), image ?? string.Empty);
 	}
 
-	private void IEDBKHEFKDE(PerksStage.ActionPerk IBODMPMJELJ, bool CCBEDPIHKAD)
+	private void ApplyHealthChangeStart(PerksStage.ActionPerk IBODMPMJELJ, bool CCBEDPIHKAD)
 	{
 	}
 
-	private void NMIGELMNBDF(PerksStage.ActionPerk IBODMPMJELJ, bool CCBEDPIHKAD)
+	private void ApplySetAttributes(PerksStage.ActionPerk IBODMPMJELJ, bool CCBEDPIHKAD)
 	{
 		int num = ((!CCBEDPIHKAD) ? 1 : (-1));
-		PerkActionSetAttributes aHFKENAALLF = (PerkActionSetAttributes)IBODMPMJELJ.AMKJNPOCODK;
+		PerkActionSetAttributes aHFKENAALLF = (PerkActionSetAttributes)IBODMPMJELJ.Action;
         var applied = CCBEDPIHKAD ? IBODMPMJELJ.AppliedAttributes : null;
         if (applied == null)
         {
             // Resolve every expression before mutation, and retain the normalized
             // deltas so expiry does not reevaluate a changed combat context.
             applied = new Dictionary<string, int>();
-            foreach (var item in aHFKENAALLF.NNBFJDJAAGI())
+            foreach (var item in aHFKENAALLF.GetAttributes())
             {
                 var attributes = new Attributes();
-                attributes.Set(item.Key, item.Value.IBCPKBBAFNH().ToInt());
+                attributes.Set(item.Key, item.Value.Calculate().ToInt());
                 int amount = 0;
                 attributes.Get(item.Key, ref amount);
                 applied.Add(item.Key, amount);
@@ -306,12 +306,12 @@ public partial class InfoPerk
 			string key = item.Key;
 			int OEMALIFPGPO = item.Value;
 			int OEMALIFPGPO2 = 0;
-			IBODMPMJELJ.KJDFJPBIGJC.Parameters.IBLHIAHECLK.Get(key, ref OEMALIFPGPO2, false, true);
-			IBODMPMJELJ.KJDFJPBIGJC.Parameters.IBLHIAHECLK.Set(key, OEMALIFPGPO2 + OEMALIFPGPO * num, true);
-			if (key == "DamageFactor" && !CCBEDPIHKAD && IHAHGIHPNIG())
+			IBODMPMJELJ.TargetModel.Parameters.FinalAttributes.Get(key, ref OEMALIFPGPO2, false, true);
+			IBODMPMJELJ.TargetModel.Parameters.FinalAttributes.Set(key, OEMALIFPGPO2 + OEMALIFPGPO * num, true);
+			if (key == "DamageFactor" && !CCBEDPIHKAD && GetIsOwnerPlayer())
 			{
-				Model.StrikeResult gHHCDAFIKJE = IBODMPMJELJ.BIKLKJMNGKP.GHHCDAFIKJE;
-				gHHCDAFIKJE.GGENIBPJPAG(DCMHONAFOGI.MBDDKGIOOGD.Id);
+				Model.StrikeResult gHHCDAFIKJE = IBODMPMJELJ.SourceModel.LastStrike;
+				gHHCDAFIKJE.AddProcedPerk(Data.PerkInfo.Id);
 			}
 		}
 	}
@@ -320,14 +320,14 @@ public partial class InfoPerk
     {
         if (action == null || expected == null || replacement == null || expected == replacement)
             throw new System.ArgumentException("Health effect transfer requires distinct models.");
-        if (!NBFBBDHELEJ.Contains(action) || !(action.AMKJNPOCODK is ModHealthChange) ||
-            (action.KJDFJPBIGJC != expected && action.BIKLKJMNGKP != expected))
+        if (!activeActions.Contains(action) || !(action.Action is ModHealthChange) ||
+            (action.TargetModel != expected && action.SourceModel != expected))
             throw new System.InvalidOperationException("The active health effect does not refer to this form.");
-        var target = action.KJDFJPBIGJC;
-        var source = action.BIKLKJMNGKP;
-        if (target == expected) action.KJDFJPBIGJC = replacement;
-        if (source == expected) action.BIKLKJMNGKP = replacement;
-        return () => { action.KJDFJPBIGJC = target; action.BIKLKJMNGKP = source; };
+        var target = action.TargetModel;
+        var source = action.SourceModel;
+        if (target == expected) action.TargetModel = replacement;
+        if (source == expected) action.SourceModel = replacement;
+        return () => { action.TargetModel = target; action.SourceModel = source; };
     }
 
     // The form coordinator retains the returned rollback until all registrations
@@ -336,11 +336,11 @@ public partial class InfoPerk
     {
         if (action == null || expected == null || replacement == null || expected == replacement)
             throw new System.ArgumentException("Attribute transfer requires an action and distinct models.");
-        if (!NBFBBDHELEJ.Contains(action) || !(action.AMKJNPOCODK is PerkActionSetAttributes) ||
-            action.KJDFJPBIGJC != expected || action.AppliedAttributes == null)
+        if (!activeActions.Contains(action) || !(action.Action is PerkActionSetAttributes) ||
+            action.TargetModel != expected || action.AppliedAttributes == null)
             throw new System.InvalidOperationException("The active attribute effect has no matching applied state.");
-        var oldAttributes = expected.Parameters.IBLHIAHECLK;
-        var newAttributes = replacement.Parameters.IBLHIAHECLK;
+        var oldAttributes = expected.Parameters.FinalAttributes;
+        var newAttributes = replacement.Parameters.FinalAttributes;
         if (ReferenceEquals(oldAttributes, newAttributes))
             throw new System.InvalidOperationException("Form parameters must own separate attributes.");
         var beforeOld = new Attributes(oldAttributes);
@@ -355,450 +355,450 @@ public partial class InfoPerk
             afterOld.Set(delta.Key, checked(oldValue - delta.Value), true);
             afterNew.Set(delta.Key, checked(newValue + delta.Value), true);
         }
-        var source = action.BIKLKJMNGKP;
+        var source = action.SourceModel;
         oldAttributes.Clear(); oldAttributes.AddRange(afterOld);
         newAttributes.Clear(); newAttributes.AddRange(afterNew);
-        action.KJDFJPBIGJC = replacement;
-        if (source == expected) action.BIKLKJMNGKP = replacement;
+        action.TargetModel = replacement;
+        if (source == expected) action.SourceModel = replacement;
         return () =>
         {
             oldAttributes.Clear(); oldAttributes.AddRange(beforeOld);
             newAttributes.Clear(); newAttributes.AddRange(beforeNew);
-            action.KJDFJPBIGJC = expected; action.BIKLKJMNGKP = source;
+            action.TargetModel = expected; action.SourceModel = source;
         };
     }
 
-	private void APMFPHOALEO(PerksStage.ActionPerk IBODMPMJELJ, bool CCBEDPIHKAD)
+	private void ApplyChangeImpulse(PerksStage.ActionPerk IBODMPMJELJ, bool CCBEDPIHKAD)
 	{
-		PerkActionChangeImpulse nKPJIECMIJB = (PerkActionChangeImpulse)IBODMPMJELJ.AMKJNPOCODK;
-		float dHDMNHCIPEH = nKPJIECMIJB.NBECOMENIEH();
-		float bGEEALIPKCC = nKPJIECMIJB.LEAGBJCDLLA();
-		float lKPCKJOLJDO = nKPJIECMIJB.HODMHJNNFFG();
+		PerkActionChangeImpulse nKPJIECMIJB = (PerkActionChangeImpulse)IBODMPMJELJ.Action;
+		float dHDMNHCIPEH = nKPJIECMIJB.GetMultiplierX();
+		float bGEEALIPKCC = nKPJIECMIJB.GetMultiplierY();
+		float lKPCKJOLJDO = nKPJIECMIJB.GetMultiplierZ();
 		if (CCBEDPIHKAD)
 		{
-			IBODMPMJELJ.KJDFJPBIGJC.MGNOBDLOINP();
+			IBODMPMJELJ.TargetModel.ResetImpulseFactor();
 		}
 		else
 		{
-			IBODMPMJELJ.KJDFJPBIGJC.SetImpulseFactor(dHDMNHCIPEH, bGEEALIPKCC, lKPCKJOLJDO);
+			IBODMPMJELJ.TargetModel.SetImpulseFactor(dHDMNHCIPEH, bGEEALIPKCC, lKPCKJOLJDO);
 		}
 	}
 
-	private void IMJCCNPMHKC(PerksStage.ActionPerk IBODMPMJELJ, bool CCBEDPIHKAD)
+	private void ApplyChangeHitEffectScale(PerksStage.ActionPerk IBODMPMJELJ, bool CCBEDPIHKAD)
 	{
-		PerkActionChangeHitEffectScale aCEHLJCDLKB = (PerkActionChangeHitEffectScale)IBODMPMJELJ.AMKJNPOCODK;
-		float bAINMLLIKOL = aCEHLJCDLKB.DNOILFCGCGD();
+		PerkActionChangeHitEffectScale aCEHLJCDLKB = (PerkActionChangeHitEffectScale)IBODMPMJELJ.Action;
+		float bAINMLLIKOL = aCEHLJCDLKB.GetHitEffectScale();
 		if (CCBEDPIHKAD)
 		{
-			IBODMPMJELJ.KJDFJPBIGJC.CKOEEMFHCFK();
+			IBODMPMJELJ.TargetModel.ResetHitEffectScale();
 		}
 		else
 		{
-			IBODMPMJELJ.KJDFJPBIGJC.set_HitEffectScale(bAINMLLIKOL);
+			IBODMPMJELJ.TargetModel.set_HitEffectScale(bAINMLLIKOL);
 		}
 	}
 
-	private void BFBGNIICAHE(PerksStage.ActionPerk IBODMPMJELJ, bool CCBEDPIHKAD)
+	private void ApplyChangeAdditionalDamage(PerksStage.ActionPerk IBODMPMJELJ, bool CCBEDPIHKAD)
 	{
-		PerkActionChangeAdditionalDamageValue dMPBHHGACBP = (PerkActionChangeAdditionalDamageValue)IBODMPMJELJ.AMKJNPOCODK;
-		float bAINMLLIKOL = dMPBHHGACBP.JKEKBCJHANF();
+		PerkActionChangeAdditionalDamageValue dMPBHHGACBP = (PerkActionChangeAdditionalDamageValue)IBODMPMJELJ.Action;
+		float bAINMLLIKOL = dMPBHHGACBP.GetAdditionalDamageValue();
 		if (CCBEDPIHKAD)
 		{
-			IBODMPMJELJ.KJDFJPBIGJC.LNBCEJDJPAH();
+			IBODMPMJELJ.TargetModel.SetAdditionalDamageToOne();
 			return;
 		}
-		IBODMPMJELJ.KJDFJPBIGJC.set_AdditionalDamageValue(bAINMLLIKOL);
-		if (IHAHGIHPNIG())
+		IBODMPMJELJ.TargetModel.set_AdditionalDamageValue(bAINMLLIKOL);
+		if (GetIsOwnerPlayer())
 		{
-			Model.StrikeResult gHHCDAFIKJE = IBODMPMJELJ.BIKLKJMNGKP.GHHCDAFIKJE;
-			gHHCDAFIKJE.GGENIBPJPAG(DCMHONAFOGI.MBDDKGIOOGD.Id);
+			Model.StrikeResult gHHCDAFIKJE = IBODMPMJELJ.SourceModel.LastStrike;
+			gHHCDAFIKJE.AddProcedPerk(Data.PerkInfo.Id);
 		}
 	}
 
-	private void NPNJDBJABMG(PerksStage.ActionPerk action, bool remove)
+	private void ApplyChangeModelColor(PerksStage.ActionPerk action, bool remove)
 	{
-		PerkActionChangeModelColor color = (PerkActionChangeModelColor)action.AMKJNPOCODK;
-		if (remove) action.KJDFJPBIGJC.ClearPerkColor();
-		else action.KJDFJPBIGJC.SetPerkColor(color.Color);
+		PerkActionChangeModelColor color = (PerkActionChangeModelColor)action.Action;
+		if (remove) action.TargetModel.ClearPerkColor();
+		else action.TargetModel.SetPerkColor(color.Color);
 	}
 
-	private void KCELDPMGNMI(PerksStage.ActionPerk action, bool remove)
+	private void ApplySlowModel(PerksStage.ActionPerk action, bool remove)
 	{
-		PerkActionSlowModel slow = (PerkActionSlowModel)action.AMKJNPOCODK;
-		action.KJDFJPBIGJC.SetPerkSlowFactor(remove ? 1 : slow.Speed);
+		PerkActionSlowModel slow = (PerkActionSlowModel)action.Action;
+		action.TargetModel.SetPerkSlowFactor(remove ? 1 : slow.Speed);
 	}
 
-	private void FHDDBMFJBJJ(PerksStage.ActionPerk action, bool remove)
+	private void ApplyTurnOffCollision(PerksStage.ActionPerk action, bool remove)
 	{
-		action.KJDFJPBIGJC.SetPerkCollisionDisabled(!remove);
+		action.TargetModel.SetPerkCollisionDisabled(!remove);
 	}
 
-	private void JFNHLKEEJNC(PerksStage.ActionPerk action)
+	private void ApplySwitch(PerksStage.ActionPerk action)
 	{
-		PerkActionSwitch switchAction = (PerkActionSwitch)action.AMKJNPOCODK;
+		PerkActionSwitch switchAction = (PerkActionSwitch)action.Action;
 		List<PerksStage.ActionPerk> selected = new List<PerksStage.ActionPerk>();
 		foreach (PerkAction nested in switchAction.SelectActions())
 		{
 			PerksStage.ActionPerk nestedAction = new PerksStage.ActionPerk();
-			nestedAction.AMKJNPOCODK = nested;
-			nestedAction.BIKLKJMNGKP = action.BIKLKJMNGKP;
-			nestedAction.KJDFJPBIGJC = nested.NKLMKGFAGFG(nested.JMDLAMHAJLN().ELPJBGIPEIB());
-			if (nestedAction.KJDFJPBIGJC != null)
+			nestedAction.Action = nested;
+			nestedAction.SourceModel = action.SourceModel;
+			nestedAction.TargetModel = nested.ResolveTargetModel(nested.GetPerk().GetOwnerModel());
+			if (nestedAction.TargetModel != null)
 				selected.Add(nestedAction);
 		}
 		if (selected.Count != 0)
-			MHHNIPBJNAD(selected);
+			ExecuteActions(selected);
 	}
 
-	private void EAFKPBMOMKI(PerksStage.ActionPerk action, bool remove)
+	private void ApplyPerkArea(PerksStage.ActionPerk action, bool remove)
 	{
 		Fight fight = Fight.GetCurrentFight();
 		if (fight == null)
 			return;
 		if (remove)
 		{
-			fight.NPFHCPAAIFJ();
+			fight.RemovePerkActivationArea();
 			return;
 		}
-		PerkActionArea area = (PerkActionArea)action.AMKJNPOCODK;
-		float x = area.PositionX.IBCPKBBAFNH().ToFloat();
+		PerkActionArea area = (PerkActionArea)action.Action;
+		float x = area.PositionX.Calculate().ToFloat();
 		fight.CreatePerkActivationArea(area.Width, area.FileName, area.get_Name());
 		fight.UpdatePerkActivationArea(x, area.ShiftY, true);
 	}
 
-	private void NEKDJLPGMAH(PerksStage.ActionPerk action)
+	private void ApplyMoveModel(PerksStage.ActionPerk action)
 	{
-		PerkActionMoveModel move = (PerkActionMoveModel)action.AMKJNPOCODK;
-		float offset = UnityEngine.Mathf.Abs(move.OffsetX.IBCPKBBAFNH().ToFloat());
-		Model target = action.KJDFJPBIGJC;
+		PerkActionMoveModel move = (PerkActionMoveModel)action.Action;
+		float offset = UnityEngine.Mathf.Abs(move.OffsetX.Calculate().ToFloat());
+		Model target = action.TargetModel;
 		if (target == null)
 			return;
 		Model enemy = target.GetCombatTarget();
 		if (enemy == null)
 			return;
-		Vector3f position = new Vector3f(target.PLBNCDCFPML());
-		float direction = enemy.PLBNCDCFPML().GetX() >= position.GetX() ? 1f : -1f;
+		Vector3f position = new Vector3f(target.GetPosition());
+		float direction = enemy.GetPosition().GetX() >= position.GetX() ? 1f : -1f;
 		position.SetX(position.GetX() + direction * offset);
 		target.SetModelPosition(position);
 	}
 
-	private void DHPEJIFPLCF(PerksStage.ActionPerk action)
+	private void ApplySetMovesVariable(PerksStage.ActionPerk action)
 	{
-		PerkActionSetMovesVariable variable = (PerkActionSetMovesVariable)action.AMKJNPOCODK;
-		FunctionResult result = variable.Value.IBCPKBBAFNH();
+		PerkActionSetMovesVariable variable = (PerkActionSetMovesVariable)action.Action;
+		FunctionResult result = variable.Value.Calculate();
 		float number;
-		if (float.TryParse(result.DCJLKCFKCOM, out number))
-			action.KJDFJPBIGJC.EBABHGHPLFK().PerkVariables[variable.get_Name()] = number;
+		if (float.TryParse(result.Value, out number))
+			action.TargetModel.GetConditions().PerkVariables[variable.get_Name()] = number;
 		else
-			action.KJDFJPBIGJC.EBABHGHPLFK().PerkStringVariables[variable.get_Name()] = result.DCJLKCFKCOM;
+			action.TargetModel.GetConditions().PerkStringVariables[variable.get_Name()] = result.Value;
 	}
 
-	private void PHHLFMLOPEK(PerksStage.ActionPerk action, bool remove)
+	private void ApplyStealMagic(PerksStage.ActionPerk action, bool remove)
 	{
 		if (remove)
 		{
 			if (action.PreviousMagic != null)
-				action.KJDFJPBIGJC.SwapPerkItem(action.PreviousMagic);
+				action.TargetModel.SwapPerkItem(action.PreviousMagic);
 			return;
 		}
-		PerkActionStealMagic steal = (PerkActionStealMagic)action.AMKJNPOCODK;
-		string magicName = steal.MagicName.IBCPKBBAFNH().DCJLKCFKCOM;
+		PerkActionStealMagic steal = (PerkActionStealMagic)action.Action;
+		string magicName = steal.MagicName.Calculate().Value;
 		ItemInfo magic = ListSF.GetItems().GetItemByName(magicName);
 		if (magic != null)
 		{
-			action.PreviousMagic = action.KJDFJPBIGJC.Parameters.Magic;
-			action.KJDFJPBIGJC.SwapPerkItem(magic);
+			action.PreviousMagic = action.TargetModel.Parameters.Magic;
+			action.TargetModel.SwapPerkItem(magic);
 		}
 	}
 
-	private void PCCAPNKPOKB(PerksStage.ActionPerk IBODMPMJELJ, bool CCBEDPIHKAD)
+	private void ApplyInvisibility(PerksStage.ActionPerk IBODMPMJELJ, bool CCBEDPIHKAD)
 	{
 		Fight gDBOMJODDEA = Fight.GetCurrentFight();
 		if (gDBOMJODDEA != null)
 		{
-			gDBOMJODDEA.PHNCLBJKCOE(IBODMPMJELJ.KJDFJPBIGJC, CCBEDPIHKAD);
+			gDBOMJODDEA.SetModelVisible(IBODMPMJELJ.TargetModel, CCBEDPIHKAD);
 		}
 	}
 
-	private void LICINJMMICM(PerksStage.ActionPerk IBODMPMJELJ)
+	private void ApplyDisableInterval(PerksStage.ActionPerk IBODMPMJELJ)
 	{
-		PerkActionDisableInterval dDALHNPFHAO = (PerkActionDisableInterval)IBODMPMJELJ.AMKJNPOCODK;
-		if (dDALHNPFHAO.KFDPPOKFMPI() != string.Empty)
+		PerkActionDisableInterval dDALHNPFHAO = (PerkActionDisableInterval)IBODMPMJELJ.Action;
+		if (dDALHNPFHAO.GetIntervalType() != string.Empty)
 		{
-			IntervalAnimation.NGAJJDIEDGF lFLGCDNKNJI = IntervalAnimation.LAJMDAFFPJE(dDALHNPFHAO.KFDPPOKFMPI());
-			IBODMPMJELJ.KJDFJPBIGJC.RemoveInterval(lFLGCDNKNJI);
+			IntervalAnimation.IntervalType lFLGCDNKNJI = IntervalAnimation.ParseIntervalType(dDALHNPFHAO.GetIntervalType());
+			IBODMPMJELJ.TargetModel.RemoveInterval(lFLGCDNKNJI);
 		}
-		else if (dDALHNPFHAO.BIIIIDOCMEK() != string.Empty)
+		else if (dDALHNPFHAO.GetIntervalName() != string.Empty)
 		{
-			IBODMPMJELJ.KJDFJPBIGJC.RemoveInterval(dDALHNPFHAO.BIIIIDOCMEK());
+			IBODMPMJELJ.TargetModel.RemoveInterval(dDALHNPFHAO.GetIntervalName());
 		}
 	}
 
-	private void GKLCDJLBBAM(PerksStage.ActionPerk IBODMPMJELJ)
+	private void ApplyLifeSteal(PerksStage.ActionPerk IBODMPMJELJ)
 	{
 		Fight gDBOMJODDEA = Fight.GetCurrentFight();
 		if (gDBOMJODDEA != null)
 		{
-			PerkActionLifesteal gGFKBGKDALP = (PerkActionLifesteal)IBODMPMJELJ.AMKJNPOCODK;
-			Model.StrikeResult gHHCDAFIKJE = IBODMPMJELJ.BIKLKJMNGKP.GHHCDAFIKJE;
-			float num = (ObscuredFloat)(IBODMPMJELJ.KJDFJPBIGJC.Parameters.KKMCHCNOHMB());
-			float aACBFABMADJ = gGFKBGKDALP.NIBCOALEIDN() * gHHCDAFIKJE.EEDJBBOCFNL * (IBODMPMJELJ.KJDFJPBIGJC.GetCombatTarget().LJCFIOPBNKD() / gHHCDAFIKJE.KJDFJPBIGJC.LJCFIOPBNKD());
-			gDBOMJODDEA.UpdateLife(IBODMPMJELJ.KJDFJPBIGJC, aACBFABMADJ);
+			PerkActionLifesteal gGFKBGKDALP = (PerkActionLifesteal)IBODMPMJELJ.Action;
+			Model.StrikeResult gHHCDAFIKJE = IBODMPMJELJ.SourceModel.LastStrike;
+			float num = (ObscuredFloat)(IBODMPMJELJ.TargetModel.Parameters.GetCurrentLife());
+			float aACBFABMADJ = gGFKBGKDALP.GetDamagePart() * gHHCDAFIKJE.FinalDamage * (IBODMPMJELJ.TargetModel.GetCombatTarget().GetPowerMultiplier() / gHHCDAFIKJE.Victim.GetPowerMultiplier());
+			gDBOMJODDEA.UpdateLife(IBODMPMJELJ.TargetModel, aACBFABMADJ);
 		}
 	}
 
-	private void LHNCAIDDJIJ(PerksStage.ActionPerk IBODMPMJELJ)
+	private void ApplySetHit(PerksStage.ActionPerk IBODMPMJELJ)
 	{
-		PerkActionSetHit jLKGFCFBJGE = (PerkActionSetHit)IBODMPMJELJ.AMKJNPOCODK;
-		Model bIKLKJMNGKP = IBODMPMJELJ.BIKLKJMNGKP;
-		Model.StrikeResult gHHCDAFIKJE = bIKLKJMNGKP.GHHCDAFIKJE;
+		PerkActionSetHit jLKGFCFBJGE = (PerkActionSetHit)IBODMPMJELJ.Action;
+		Model bIKLKJMNGKP = IBODMPMJELJ.SourceModel;
+		Model.StrikeResult gHHCDAFIKJE = bIKLKJMNGKP.LastStrike;
 		bool flag = true;
-		if (jLKGFCFBJGE.LFJCOGGNFHL() > -1)
+		if (jLKGFCFBJGE.GetCritical() > -1)
 		{
-			gHHCDAFIKJE.DNGKOMPMPCD = jLKGFCFBJGE.LFJCOGGNFHL() > 0;
-			if (!gHHCDAFIKJE.DNGKOMPMPCD)
+			gHHCDAFIKJE.IsCritical = jLKGFCFBJGE.GetCritical() > 0;
+			if (!gHHCDAFIKJE.IsCritical)
 			{
 				flag = false;
 			}
 		}
-		if (jLKGFCFBJGE.JEIAJBMLIBP() > -1)
+		if (jLKGFCFBJGE.GetShock() > -1)
 		{
-			gHHCDAFIKJE.APCAKCCOMLO = jLKGFCFBJGE.JEIAJBMLIBP() > 0;
+			gHHCDAFIKJE.IsShock = jLKGFCFBJGE.GetShock() > 0;
 		}
-		if (jLKGFCFBJGE.NALPADHBLNH() > -1)
+		if (jLKGFCFBJGE.GetDisarm() > -1)
 		{
-			gHHCDAFIKJE.NIKPBGPPFEP = jLKGFCFBJGE.NALPADHBLNH() > 0;
+			gHHCDAFIKJE.IsDisarm = jLKGFCFBJGE.GetDisarm() > 0;
 		}
-		if (jLKGFCFBJGE.IOAHLEKLBLE() > -1)
+		if (jLKGFCFBJGE.GetBlock() > -1)
 		{
-			gHHCDAFIKJE.DFOHNJEBDED = jLKGFCFBJGE.IOAHLEKLBLE() > 0;
+			gHHCDAFIKJE.IsBlocked = jLKGFCFBJGE.GetBlock() > 0;
 		}
-		if (jLKGFCFBJGE.GHGGNMBCMNM() != null)
+		if (jLKGFCFBJGE.GetDamage() != null)
 		{
-			FunctionResult dEIHAOLOPLC = jLKGFCFBJGE.GHGGNMBCMNM().IBCPKBBAFNH();
-			gHHCDAFIKJE.NPDHOJEHPDM = dEIHAOLOPLC.ToFloat();
-			gHHCDAFIKJE.EEDJBBOCFNL = dEIHAOLOPLC.ToFloat();
+			FunctionResult dEIHAOLOPLC = jLKGFCFBJGE.GetDamage().Calculate();
+			gHHCDAFIKJE.RawDamage = dEIHAOLOPLC.ToFloat();
+			gHHCDAFIKJE.FinalDamage = dEIHAOLOPLC.ToFloat();
 		}
-		if (IHAHGIHPNIG() && flag)
+		if (GetIsOwnerPlayer() && flag)
 		{
-			gHHCDAFIKJE.GGENIBPJPAG(DCMHONAFOGI.MBDDKGIOOGD.Id);
+			gHHCDAFIKJE.AddProcedPerk(Data.PerkInfo.Id);
 		}
 	}
 
-	private void DGNKIJEICCJ(PerksStage.ActionPerk IBODMPMJELJ)
+	private void ApplySetTactics(PerksStage.ActionPerk IBODMPMJELJ)
 	{
-		PerkActionSetTactics fBDAHEODOGP = (PerkActionSetTactics)IBODMPMJELJ.AMKJNPOCODK;
-		IBODMPMJELJ.KJDFJPBIGJC.CIFKBIPDCHK(fBDAHEODOGP.NLCLHLIPFFH());
+		PerkActionSetTactics fBDAHEODOGP = (PerkActionSetTactics)IBODMPMJELJ.Action;
+		IBODMPMJELJ.TargetModel.ChangeAiTactic(fBDAHEODOGP.GetTactics());
 	}
 
-	private void KGFBIAOGHFF(PerksStage.ActionPerk IBODMPMJELJ)
+	private void ApplyAddBullets(PerksStage.ActionPerk IBODMPMJELJ)
 	{
-		PerkActionAddBullets cLBEGGLEHMB = (PerkActionAddBullets)IBODMPMJELJ.AMKJNPOCODK;
-		FunctionResult dEIHAOLOPLC = cLBEGGLEHMB.OEAKCOHMIHH().IBCPKBBAFNH();
+		PerkActionAddBullets cLBEGGLEHMB = (PerkActionAddBullets)IBODMPMJELJ.Action;
+		FunctionResult dEIHAOLOPLC = cLBEGGLEHMB.GetValue().Calculate();
 		int fOIPKLDNGDL = dEIHAOLOPLC.ToInt();
-		if (cLBEGGLEHMB.MPGDOMBCAAF() == "MagicBullet")
+		if (cLBEGGLEHMB.GetBulletType() == "MagicBullet")
 		{
-			IBODMPMJELJ.KJDFJPBIGJC.IPGBFKOCOCK(fOIPKLDNGDL);
-			IBODMPMJELJ.KJDFJPBIGJC.BFBFNKMLOJA();
+			IBODMPMJELJ.TargetModel.AddMagicCharges(fOIPKLDNGDL);
+			IBODMPMJELJ.TargetModel.UpdateMagicButton();
 		}
 	}
 
-	private void DLMEDFNIEHI(PerksStage.ActionPerk IBODMPMJELJ)
+	private void ApplyAddMagicCharge(PerksStage.ActionPerk IBODMPMJELJ)
 	{
-		PerkActionAddMagicCharge aMOILMJLADC = (PerkActionAddMagicCharge)IBODMPMJELJ.AMKJNPOCODK;
-		FunctionResult dEIHAOLOPLC = aMOILMJLADC.OEAKCOHMIHH().IBCPKBBAFNH();
+		PerkActionAddMagicCharge aMOILMJLADC = (PerkActionAddMagicCharge)IBODMPMJELJ.Action;
+		FunctionResult dEIHAOLOPLC = aMOILMJLADC.GetValue().Calculate();
 		float fOIPKLDNGDL = dEIHAOLOPLC.ToFloat();
-		IBODMPMJELJ.KJDFJPBIGJC.JJHLOKBPBLD(fOIPKLDNGDL);
-		IBODMPMJELJ.KJDFJPBIGJC.BFBFNKMLOJA();
+		IBODMPMJELJ.TargetModel.AddMagicChargeFraction(fOIPKLDNGDL);
+		IBODMPMJELJ.TargetModel.UpdateMagicButton();
 	}
 
-	private void AGPDKNAEDPB(PerksStage.ActionPerk IBODMPMJELJ)
+	private void ApplySetModFrames(PerksStage.ActionPerk IBODMPMJELJ)
 	{
-		ACBNLJBJGDF();
-		PerkActionSetModFrames iGDDHFCDELM = (PerkActionSetModFrames)IBODMPMJELJ.AMKJNPOCODK;
-		iGDDHFCDELM.NFPODDJPNEL().IBCPKBBAFNH();
-		FunctionResult dEIHAOLOPLC = iGDDHFCDELM.NFPODDJPNEL().IBCPKBBAFNH();
+		MarkPerkUsed();
+		PerkActionSetModFrames iGDDHFCDELM = (PerkActionSetModFrames)IBODMPMJELJ.Action;
+		iGDDHFCDELM.GetModFrames().Calculate();
+		FunctionResult dEIHAOLOPLC = iGDDHFCDELM.GetModFrames().Calculate();
 		int fLNLMIHEDCI = dEIHAOLOPLC.ToInt();
-		foreach (PerksStage.ActionPerk item in NBFBBDHELEJ)
+		foreach (PerksStage.ActionPerk item in activeActions)
 		{
-			if (iGDDHFCDELM.CMKKGFDBBJF() == item.AMKJNPOCODK.get_Name())
+			if (iGDDHFCDELM.GetModName() == item.Action.get_Name())
 			{
-				item.FLNLMIHEDCI = fLNLMIHEDCI;
-				item.KGNDJOLBBJF = 0;
+				item.DurationFrames = fLNLMIHEDCI;
+				item.ElapsedFrames = 0;
 			}
 		}
-		if (iGDDHFCDELM.IONIEDIPEGB() == null || !(iGDDHFCDELM.IONIEDIPEGB() != string.Empty))
+		if (iGDDHFCDELM.GetNamespace() == null || !(iGDDHFCDELM.GetNamespace() != string.Empty))
 		{
 			return;
 		}
-		List<PerksStage.ActionPerk> list = PerksStage.DOAECFNPKIO(iGDDHFCDELM.IONIEDIPEGB());
+		List<PerksStage.ActionPerk> list = PerksStage.GetNamespaceActions(iGDDHFCDELM.GetNamespace());
 		if (list == null)
 		{
 			return;
 		}
 		foreach (PerksStage.ActionPerk item2 in list)
 		{
-			if (iGDDHFCDELM.CMKKGFDBBJF().Equals(item2.AMKJNPOCODK.get_Name()))
+			if (iGDDHFCDELM.GetModName().Equals(item2.Action.get_Name()))
 			{
-				item2.FLNLMIHEDCI = fLNLMIHEDCI;
-				item2.KGNDJOLBBJF = 0;
+				item2.DurationFrames = fLNLMIHEDCI;
+				item2.ElapsedFrames = 0;
 			}
 		}
 	}
 
-	private void HNAIFDHOMPL(PerksStage.ActionPerk IBODMPMJELJ)
+	private void ApplySetModEffect(PerksStage.ActionPerk IBODMPMJELJ)
 	{
-		PerkActionSetModEffect fBLKPCHKAHM = (PerkActionSetModEffect)IBODMPMJELJ.AMKJNPOCODK;
-		string text = fBLKPCHKAHM.IONIEDIPEGB();
+		PerkActionSetModEffect fBLKPCHKAHM = (PerkActionSetModEffect)IBODMPMJELJ.Action;
+		string text = fBLKPCHKAHM.GetNamespace();
 		if (text != null && text != string.Empty)
 		{
-			PerksStage.ActionPerk oAJGINIDKJD = PerksStage.AFAGHKFHHIF(fBLKPCHKAHM.CMKKGFDBBJF(), text);
+			PerksStage.ActionPerk oAJGINIDKJD = PerksStage.FindNamespaceAction(fBLKPCHKAHM.GetModName(), text);
 			if (oAJGINIDKJD != null)
 			{
-				oAJGINIDKJD.KJDFJPBIGJC.GICAFBABMGA(oAJGINIDKJD, IBODMPMJELJ);
+				oAJGINIDKJD.TargetModel.NotifyPerkActionReplaced(oAJGINIDKJD, IBODMPMJELJ);
 			}
 			return;
 		}
-		foreach (PerksStage.ActionPerk item in NBFBBDHELEJ)
+		foreach (PerksStage.ActionPerk item in activeActions)
 		{
-			if (fBLKPCHKAHM.CMKKGFDBBJF() == item.AMKJNPOCODK.get_Name())
+			if (fBLKPCHKAHM.GetModName() == item.Action.get_Name())
 			{
-				item.KJDFJPBIGJC.GICAFBABMGA(item, IBODMPMJELJ);
+				item.TargetModel.NotifyPerkActionReplaced(item, IBODMPMJELJ);
 			}
 		}
 	}
 
-	private void CPKHOBHFJDN(PerksStage.ActionPerk IBODMPMJELJ)
+	private void ApplyProvoke(PerksStage.ActionPerk IBODMPMJELJ)
 	{
 		Fight gDBOMJODDEA = Fight.GetCurrentFight();
 		if (gDBOMJODDEA == null)
 		{
 			return;
 		}
-		PerkActionProvoke bLAIFJHNJIO = (PerkActionProvoke)IBODMPMJELJ.AMKJNPOCODK;
-		PerkInfoItem aCONCDFDNJH = bLAIFJHNJIO.GNDAFILBLIB().JMDLAMHAJLN();
-		InfoPerk bPDFFLADJMJ = gDBOMJODDEA.IEEGPNLEKHH().BELALEGDCDM(IBODMPMJELJ.KJDFJPBIGJC, aCONCDFDNJH);
+		PerkActionProvoke bLAIFJHNJIO = (PerkActionProvoke)IBODMPMJELJ.Action;
+		PerkInfoItem aCONCDFDNJH = bLAIFJHNJIO.GetTrigger().GetPerk();
+		InfoPerk bPDFFLADJMJ = gDBOMJODDEA.GetPerksStage().FindInfoPerk(IBODMPMJELJ.TargetModel, aCONCDFDNJH);
 		if (bPDFFLADJMJ != null)
 		{
-			List<string> list = bPDFFLADJMJ.BFKDLIMHGFA();
+			List<string> list = bPDFFLADJMJ.GetActiveActionNames();
 		}
 		List<PerkTrigger> list2 = new List<PerkTrigger>();
-		foreach (PerkTrigger item in aCONCDFDNJH.NOJEIGNOPII())
+		foreach (PerkTrigger item in aCONCDFDNJH.GetTriggers())
 		{
-			if (item.get_Name() == bLAIFJHNJIO.FFLBCPJJKEJ() && item.IPFOGLIBLLB(IBODMPMJELJ.KJDFJPBIGJC, BFKDLIMHGFA()))
+			if (item.get_Name() == bLAIFJHNJIO.GetProvokeTrigger() && item.AreConditionsMet(IBODMPMJELJ.TargetModel, GetActiveActionNames()))
 			{
 				list2.Add(item);
 			}
 		}
 		foreach (PerkTrigger item2 in list2)
 		{
-			gDBOMJODDEA.IEEGPNLEKHH().MHHNIPBJNAD(IBODMPMJELJ.KJDFJPBIGJC, item2, true);
+			gDBOMJODDEA.GetPerksStage().ExecuteTriggerActions(IBODMPMJELJ.TargetModel, item2, true);
 		}
 	}
 
-	private void OLEBPFBJCII(PerksStage.ActionPerk IBODMPMJELJ)
+	private void ApplyClearAction(PerksStage.ActionPerk IBODMPMJELJ)
 	{
-		PerkActionClearAction hHMDDFCJDEO = (PerkActionClearAction)IBODMPMJELJ.AMKJNPOCODK;
-		foreach (PerksStage.ActionPerk item in NBFBBDHELEJ)
+		PerkActionClearAction hHMDDFCJDEO = (PerkActionClearAction)IBODMPMJELJ.Action;
+		foreach (PerksStage.ActionPerk item in activeActions)
 		{
-			if (hHMDDFCJDEO.DDBPICENEJE() == string.Empty || hHMDDFCJDEO.DDBPICENEJE() == item.AMKJNPOCODK.get_Name())
+			if (hHMDDFCJDEO.GetNameAction() == string.Empty || hHMDDFCJDEO.GetNameAction() == item.Action.get_Name())
 			{
-				item.PLNNKKBPDJK = true;
+				item.IsExpired = true;
 			}
 		}
-		if (hHMDDFCJDEO.IONIEDIPEGB() == null || !(hHMDDFCJDEO.IONIEDIPEGB() != string.Empty))
+		if (hHMDDFCJDEO.GetNamespace() == null || !(hHMDDFCJDEO.GetNamespace() != string.Empty))
 		{
 			return;
 		}
-		List<PerksStage.ActionPerk> list = PerksStage.DOAECFNPKIO(hHMDDFCJDEO.IONIEDIPEGB());
+		List<PerksStage.ActionPerk> list = PerksStage.GetNamespaceActions(hHMDDFCJDEO.GetNamespace());
 		if (list == null)
 		{
 			return;
 		}
 		foreach (PerksStage.ActionPerk item2 in list)
 		{
-			if (hHMDDFCJDEO.DDBPICENEJE() == null || hHMDDFCJDEO.DDBPICENEJE().Equals(string.Empty) || hHMDDFCJDEO.DDBPICENEJE().Equals(item2.AMKJNPOCODK.get_Name()))
+			if (hHMDDFCJDEO.GetNameAction() == null || hHMDDFCJDEO.GetNameAction().Equals(string.Empty) || hHMDDFCJDEO.GetNameAction().Equals(item2.Action.get_Name()))
 			{
-				item2.PLNNKKBPDJK = true;
+				item2.IsExpired = true;
 			}
 		}
 	}
 
-	private void DDOGCEKKDMK(PerksStage.ActionPerk IBODMPMJELJ)
+	private void ApplyHealthChange(PerksStage.ActionPerk IBODMPMJELJ)
 	{
 		Fight gDBOMJODDEA = Fight.GetCurrentFight();
 		if (gDBOMJODDEA != null)
 		{
-			ModHealthChange eFIMNMBMCIJ = (ModHealthChange)IBODMPMJELJ.AMKJNPOCODK;
-			gDBOMJODDEA.UpdateLife(IBODMPMJELJ.KJDFJPBIGJC, eFIMNMBMCIJ.JMPIBKKAHJP());
+			ModHealthChange eFIMNMBMCIJ = (ModHealthChange)IBODMPMJELJ.Action;
+			gDBOMJODDEA.UpdateLife(IBODMPMJELJ.TargetModel, eFIMNMBMCIJ.GetPerFrameValue());
 		}
 	}
 
-	private void ACBNLJBJGDF()
+	private void MarkPerkUsed()
 	{
-		if (IHAHGIHPNIG())
+		if (GetIsOwnerPlayer())
 		{
 			Fight gDBOMJODDEA = Fight.GetCurrentFight();
 			if (gDBOMJODDEA != null)
 			{
-				PerksStage.ANPAFFMJMNG(DCMHONAFOGI.MBDDKGIOOGD.Name);
+				PerksStage.IncrementPerkUse(Data.PerkInfo.Name);
 			}
 			else
 			{
-				LLLOJBFMONN.Error("Error: No fight on perk start");
+				GameLog.Error("Error: No fight on perk start");
 			}
 		}
 	}
 
-	private void ACKKGAAPLDG(PerksStage.ActionPerk IBODMPMJELJ)
+	private void ExpireAction(PerksStage.ActionPerk IBODMPMJELJ)
 	{
-		IBODMPMJELJ.FLNLMIHEDCI = 0;
-		if (IBODMPMJELJ.AMKJNPOCODK.BFJEFNHKPJI() != null)
+		IBODMPMJELJ.DurationFrames = 0;
+		if (IBODMPMJELJ.Action.GetFrames() != null)
 		{
-			FunctionResult dEIHAOLOPLC = IBODMPMJELJ.AMKJNPOCODK.BFJEFNHKPJI().IBCPKBBAFNH();
-			IBODMPMJELJ.FLNLMIHEDCI = dEIHAOLOPLC.ToInt();
+			FunctionResult dEIHAOLOPLC = IBODMPMJELJ.Action.GetFrames().Calculate();
+			IBODMPMJELJ.DurationFrames = dEIHAOLOPLC.ToInt();
 		}
-		switch (IBODMPMJELJ.AMKJNPOCODK.get_Type())
+		switch (IBODMPMJELJ.Action.get_Type())
 		{
 		case ActionType.ACTION_SHOW_ICONS:
-			MBKLEKPDGOA(IBODMPMJELJ, true);
+			ApplyShowIcon(IBODMPMJELJ, true);
 			break;
 		case ActionType.ACTION_SET_ATTRIBUTES:
-			NMIGELMNBDF(IBODMPMJELJ, true);
+			ApplySetAttributes(IBODMPMJELJ, true);
 			break;
 		case ActionType.ACTION_CHANGE_IMPULSE:
-			APMFPHOALEO(IBODMPMJELJ, true);
+			ApplyChangeImpulse(IBODMPMJELJ, true);
 			break;
 		case ActionType.ACTION_CHANGE_HIT_EFFECT_SCALE:
-			IMJCCNPMHKC(IBODMPMJELJ, true);
+			ApplyChangeHitEffectScale(IBODMPMJELJ, true);
 			break;
 		case ActionType.ACTION_CHANGE_ADD_DAMAGE_VALUE:
-			BFBGNIICAHE(IBODMPMJELJ, true);
+			ApplyChangeAdditionalDamage(IBODMPMJELJ, true);
 			break;
 		case ActionType.ACTION_CHANGE_MODEL_COLOR:
-			NPNJDBJABMG(IBODMPMJELJ, true);
+			ApplyChangeModelColor(IBODMPMJELJ, true);
 			break;
 		case ActionType.ACTION_SLOW_MODEL:
-			KCELDPMGNMI(IBODMPMJELJ, true);
+			ApplySlowModel(IBODMPMJELJ, true);
 			break;
 		case ActionType.ACTION_TURN_OFF_COLLISION:
-			FHDDBMFJBJJ(IBODMPMJELJ, true);
+			ApplyTurnOffCollision(IBODMPMJELJ, true);
 			break;
 		case ActionType.ACTION_PERK_AREA:
-			EAFKPBMOMKI(IBODMPMJELJ, true);
+			ApplyPerkArea(IBODMPMJELJ, true);
 			break;
 		case ActionType.ACTION_STEAL_MAGIC:
-			PHHLFMLOPEK(IBODMPMJELJ, true);
+			ApplyStealMagic(IBODMPMJELJ, true);
 			break;
 		case ActionType.ACTION_INVISIBILITY:
-			PCCAPNKPOKB(IBODMPMJELJ, true);
+			ApplyInvisibility(IBODMPMJELJ, true);
 			break;
 		}
-		ALBIODLFMAK(IBODMPMJELJ, false);
-		bool flag = IBODMPMJELJ.AMKJNPOCODK.NKAEEFNNBEN();
-		string value = IBODMPMJELJ.AMKJNPOCODK.get_Name();
-		Model kJDFJPBIGJC = IBODMPMJELJ.KJDFJPBIGJC;
-		BBEMBELMEGP(IBODMPMJELJ);
+		LogModEvent(IBODMPMJELJ, false);
+		bool flag = IBODMPMJELJ.Action.GetModificator();
+		string value = IBODMPMJELJ.Action.get_Name();
+		Model kJDFJPBIGJC = IBODMPMJELJ.TargetModel;
+		RemoveActiveAction(IBODMPMJELJ);
 		if (!flag)
 		{
 			return;
@@ -806,130 +806,130 @@ public partial class InfoPerk
 		Fight gDBOMJODDEA = Fight.GetCurrentFight();
 		if (gDBOMJODDEA != null)
 		{
-			PerkActionModificator cKCICHAIMFL = (PerkActionModificator)IBODMPMJELJ.AMKJNPOCODK;
-			if (cKCICHAIMFL.IONIEDIPEGB() != null && cKCICHAIMFL.IONIEDIPEGB() != string.Empty)
+			PerkActionModificator cKCICHAIMFL = (PerkActionModificator)IBODMPMJELJ.Action;
+			if (cKCICHAIMFL.GetNamespace() != null && cKCICHAIMFL.GetNamespace() != string.Empty)
 			{
-				PerksStage.AEMBNMFGDBN(IBODMPMJELJ);
+				PerksStage.UnregisterNamespaceAction(IBODMPMJELJ);
 			}
-			string text = (string)gDBOMJODDEA.IEEGPNLEKHH().OFKIKABKDFD()["ModExpires"];
+			string text = (string)gDBOMJODDEA.GetPerksStage().GetPerkMap()["ModExpires"];
 			if (text != null)
 			{
-				BKIMFEIMHCF().Add(text);
+				GetExpiredModNames().Add(text);
 			}
-			gDBOMJODDEA.IEEGPNLEKHH().OFKIKABKDFD()["ModExpires"] = value;
-			gDBOMJODDEA.IEEGPNLEKHH().OFKIKABKDFD()["Namespace"] = cKCICHAIMFL.IONIEDIPEGB();
-			gDBOMJODDEA.IEEGPNLEKHH().OFKIKABKDFD()["ParentPerk"] = cKCICHAIMFL.JMDLAMHAJLN();
-			gDBOMJODDEA.IEEGPNLEKHH().JALOHCICLGN(kJDFJPBIGJC, PerkEvent.KNKIIEPDCPN.EVENT_MOD_EXPIRES, true);
-			gDBOMJODDEA.IEEGPNLEKHH().CLBPEANCNOA(IBODMPMJELJ);
+			gDBOMJODDEA.GetPerksStage().GetPerkMap()["ModExpires"] = value;
+			gDBOMJODDEA.GetPerksStage().GetPerkMap()["Namespace"] = cKCICHAIMFL.GetNamespace();
+			gDBOMJODDEA.GetPerksStage().GetPerkMap()["ParentPerk"] = cKCICHAIMFL.GetPerk();
+			gDBOMJODDEA.GetPerksStage().FireEvent(kJDFJPBIGJC, PerkEvent.PerkEventType.EVENT_MOD_EXPIRES, true);
+			gDBOMJODDEA.GetPerksStage().AddExpiredAction(IBODMPMJELJ);
 		}
 	}
 
-	private void BBEMBELMEGP(PerksStage.ActionPerk DIMEFLGFIME)
+	private void RemoveActiveAction(PerksStage.ActionPerk DIMEFLGFIME)
 	{
-		foreach (PerksStage.ActionPerk item in NBFBBDHELEJ)
+		foreach (PerksStage.ActionPerk item in activeActions)
 		{
 			if (DIMEFLGFIME == item)
 			{
-				NBFBBDHELEJ.Remove(item);
-				PCOPAMLECKI.Remove(item.AMKJNPOCODK.get_Name());
+				activeActions.Remove(item);
+				activeActionNames.Remove(item.Action.get_Name());
 				break;
 			}
 		}
 	}
 
-	private void KKODDGMCDBC(PerksStage.ActionPerk IBODMPMJELJ)
+	private void ApplyVariable(PerksStage.ActionPerk IBODMPMJELJ)
 	{
-		PerkActionVariable nMCKMGOCCBO = (PerkActionVariable)IBODMPMJELJ.AMKJNPOCODK;
+		PerkActionVariable nMCKMGOCCBO = (PerkActionVariable)IBODMPMJELJ.Action;
 		string key = nMCKMGOCCBO.get_Name();
-		FunctionResult dEIHAOLOPLC = nMCKMGOCCBO.OEAKCOHMIHH().IBCPKBBAFNH();
+		FunctionResult dEIHAOLOPLC = nMCKMGOCCBO.GetValue().Calculate();
 		float value;
-		if (float.TryParse(dEIHAOLOPLC.DCJLKCFKCOM, out value))
+		if (float.TryParse(dEIHAOLOPLC.Value, out value))
 		{
-			IBODMPMJELJ.KJDFJPBIGJC.EBABHGHPLFK().PerkVariables[key] = value;
-			IBODMPMJELJ.KJDFJPBIGJC.EBABHGHPLFK().PerkStringVariables.Remove(key);
+			IBODMPMJELJ.TargetModel.GetConditions().PerkVariables[key] = value;
+			IBODMPMJELJ.TargetModel.GetConditions().PerkStringVariables.Remove(key);
 		}
 		else
 		{
-			IBODMPMJELJ.KJDFJPBIGJC.EBABHGHPLFK().PerkStringVariables[key] =
-				dEIHAOLOPLC.DCJLKCFKCOM ?? string.Empty;
+			IBODMPMJELJ.TargetModel.GetConditions().PerkStringVariables[key] =
+				dEIHAOLOPLC.Value ?? string.Empty;
 		}
 	}
 
-	private void MFKFMPAPHDG(PerksStage.ActionPerk IBODMPMJELJ)
+	private void ApplySetVariable(PerksStage.ActionPerk IBODMPMJELJ)
 	{
-		PerkActionSetVariable lBGDPLDCKFJ = (PerkActionSetVariable)IBODMPMJELJ.AMKJNPOCODK;
+		PerkActionSetVariable lBGDPLDCKFJ = (PerkActionSetVariable)IBODMPMJELJ.Action;
 		string text = lBGDPLDCKFJ.get_Name();
-		FunctionResult dEIHAOLOPLC = lBGDPLDCKFJ.OEAKCOHMIHH().IBCPKBBAFNH();
+		FunctionResult dEIHAOLOPLC = lBGDPLDCKFJ.GetValue().Calculate();
 		float num = dEIHAOLOPLC.ToFloat();
-		if (lBGDPLDCKFJ.CPDLBMAKCEK())
+		if (lBGDPLDCKFJ.GetHasMinValue())
 		{
-			FunctionResult dEIHAOLOPLC2 = lBGDPLDCKFJ.MCOHCDPJHAK().IBCPKBBAFNH();
+			FunctionResult dEIHAOLOPLC2 = lBGDPLDCKFJ.GetMinValue().Calculate();
 			float num2 = dEIHAOLOPLC2.ToFloat();
 			if (num < num2)
 			{
 				num = num2;
 			}
 		}
-		if (lBGDPLDCKFJ.OMLFBFOFJDD())
+		if (lBGDPLDCKFJ.GetHasMaxValue())
 		{
-			FunctionResult dEIHAOLOPLC3 = lBGDPLDCKFJ.BHIGOIHJBDK().IBCPKBBAFNH();
+			FunctionResult dEIHAOLOPLC3 = lBGDPLDCKFJ.GetMaxValue().Calculate();
 			float num3 = dEIHAOLOPLC3.ToFloat();
 			if (num > num3)
 			{
 				num = num3;
 			}
 		}
-		IBODMPMJELJ.KJDFJPBIGJC.EBABHGHPLFK().PerkVariables[text] = num;
-		if (SystemProperties.DBBOCENKMGD())
+		IBODMPMJELJ.TargetModel.GetConditions().PerkVariables[text] = num;
+		if (SystemProperties.IsDebug())
 		{
-			LLLOJBFMONN.INNGABABJPC("SetVariable {0} = {1}", text, num);
+			GameLog.Info("SetVariable {0} = {1}", text, num);
 		}
 	}
 
-	private void LIPMLGCPAJG(PerksStage.ActionPerk IBODMPMJELJ)
+	private void ApplySetCooldown(PerksStage.ActionPerk IBODMPMJELJ)
 	{
-		PerkActionSetCooldown bHPLOIHAPFP = (PerkActionSetCooldown)IBODMPMJELJ.AMKJNPOCODK;
-		int num = bHPLOIHAPFP.BFJEFNHKPJI();
-		string bAINMLLIKOL = bHPLOIHAPFP.GHHAKGGLBCN();
-		FightCID dDNBGEJJGMG = (FightCID)MovesMaps.HHBMBMNLJIE(MovesMaps.NHKAHBBOIHG.KEY_TYPE, bAINMLLIKOL);
-		IBODMPMJELJ.KJDFJPBIGJC.OBJCCBMMDJH(dDNBGEJJGMG, 0);
-		IBODMPMJELJ.KJDFJPBIGJC.PJGPCDPPOHA(dDNBGEJJGMG, num);
-		if (SystemProperties.DBBOCENKMGD())
+		PerkActionSetCooldown bHPLOIHAPFP = (PerkActionSetCooldown)IBODMPMJELJ.Action;
+		int num = bHPLOIHAPFP.GetCooldownFrames();
+		string bAINMLLIKOL = bHPLOIHAPFP.GetButtonName();
+		FightCID dDNBGEJJGMG = (FightCID)MovesMaps.GetMappedIndex(MovesMaps.MapType.KEY_TYPE, bAINMLLIKOL);
+		IBODMPMJELJ.TargetModel.ResetButtonCooldown(dDNBGEJJGMG, 0);
+		IBODMPMJELJ.TargetModel.StartButtonCooldown(dDNBGEJJGMG, num);
+		if (SystemProperties.IsDebug())
 		{
-			LLLOJBFMONN.INNGABABJPC("SetCooldown button = {0}, frames = {1}", bHPLOIHAPFP.GHHAKGGLBCN(), num);
+			GameLog.Info("SetCooldown button = {0}, frames = {1}", bHPLOIHAPFP.GetButtonName(), num);
 		}
 	}
 
 	public void ClearActions(bool GIBIGPCELOB = false)
 	{
-		if (NBFBBDHELEJ.Count <= 0)
+		if (activeActions.Count <= 0)
 		{
 			return;
 		}
 		int num = 0;
-		int count = NBFBBDHELEJ.Count;
-		while (num < NBFBBDHELEJ.Count)
+		int count = activeActions.Count;
+		while (num < activeActions.Count)
 		{
-			count = NBFBBDHELEJ.Count;
-			PerksStage.ActionPerk oAJGINIDKJD = NBFBBDHELEJ[num];
-			if (GIBIGPCELOB || oAJGINIDKJD.PLNNKKBPDJK)
+			count = activeActions.Count;
+			PerksStage.ActionPerk oAJGINIDKJD = activeActions[num];
+			if (GIBIGPCELOB || oAJGINIDKJD.IsExpired)
 			{
-				ACKKGAAPLDG(oAJGINIDKJD);
+				ExpireAction(oAJGINIDKJD);
 			}
-			if (count == NBFBBDHELEJ.Count)
+			if (count == activeActions.Count)
 			{
 				num++;
 			}
 		}
 	}
 
-	public void PANKENFPNPN()
+	public void ResetExpiredMods()
 	{
-		IEDBEDCKAIE.Clear();
+		expiredModNames.Clear();
 		Fight gDBOMJODDEA = Fight.GetCurrentFight();
 		if (gDBOMJODDEA != null)
 		{
-			gDBOMJODDEA.IEEGPNLEKHH().OFKIKABKDFD()["ModExpires"] = null;
+			gDBOMJODDEA.GetPerksStage().GetPerkMap()["ModExpires"] = null;
 		}
 	}
 }

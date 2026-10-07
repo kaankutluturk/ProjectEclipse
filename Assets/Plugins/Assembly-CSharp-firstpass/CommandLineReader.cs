@@ -8,26 +8,26 @@ public class CommandLineReader
 
 	private const char CUSTOM_ARGS_SEPARATOR = ';';
 
-	public static string[] BCFGNHKHDIC()
+	public static string[] GetCommandLineArgs()
 	{
 		return Environment.GetCommandLineArgs();
 	}
 
-	public static string FFAPOOKOGDJ()
+	public static string GetCommandLine()
 	{
-		string[] array = BCFGNHKHDIC();
+		string[] array = GetCommandLineArgs();
 		if (array.Length > 0)
 		{
 			return string.Join(" ", array);
 		}
-		AdvLog.CCOFFJPPAKC("CommandLineReader.cs - GetCommandLine() - Can't find any command line arguments!");
+		AdvLog.LogError("CommandLineReader.cs - GetCommandLine() - Can't find any command line arguments!");
 		return string.Empty;
 	}
 
-	public static Dictionary<string, string> MGCECOEGDFG()
+	public static Dictionary<string, string> GetCustomArguments()
 	{
 		Dictionary<string, string> dictionary = new Dictionary<string, string>();
-		string[] array = BCFGNHKHDIC();
+		string[] array = GetCommandLineArgs();
 		string empty = string.Empty;
 		try
 		{
@@ -35,7 +35,7 @@ public class CommandLineReader
 		}
 		catch (Exception ex)
 		{
-			AdvLog.CCOFFJPPAKC(string.Concat("CommandLineReader.cs - GetCustomArguments() - Can't retrieve any custom arguments in the command line [", array, "]. Exception: ", ex));
+			AdvLog.LogError(string.Concat("CommandLineReader.cs - GetCustomArguments() - Can't retrieve any custom arguments in the command line [", array, "]. Exception: ", ex));
 			return dictionary;
 		}
 		empty = empty.Replace("-CustomArgs:", string.Empty);
@@ -50,7 +50,7 @@ public class CommandLineReader
 			}
 			else
 			{
-				AdvLog.LOPHFKMOPAA("CommandLineReader.cs - GetCustomArguments() - The custom argument [" + text + "] seem to be malformed.");
+				AdvLog.LogWarning("CommandLineReader.cs - GetCustomArguments() - The custom argument [" + text + "] seem to be malformed.");
 			}
 		}
 		return dictionary;
@@ -58,12 +58,12 @@ public class CommandLineReader
 
 	public static string GetCustomArgument(string CDCEKJEPOAK)
 	{
-		Dictionary<string, string> dictionary = MGCECOEGDFG();
+		Dictionary<string, string> dictionary = GetCustomArguments();
 		if (dictionary.ContainsKey(CDCEKJEPOAK))
 		{
 			return dictionary[CDCEKJEPOAK];
 		}
-		AdvLog.CCOFFJPPAKC("CommandLineReader.cs - GetCustomArgument() - Can't retrieve any custom argument named [" + CDCEKJEPOAK + "] in the command line [" + FFAPOOKOGDJ() + "].");
+		AdvLog.LogError("CommandLineReader.cs - GetCustomArgument() - Can't retrieve any custom argument named [" + CDCEKJEPOAK + "] in the command line [" + GetCommandLine() + "].");
 		return string.Empty;
 	}
 }

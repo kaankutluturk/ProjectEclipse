@@ -16,7 +16,7 @@ public class Compressor
 			nKLNBIIKNBA.Write(Path.GetFileName(item));
 			nKLNBIIKNBA.Write(File.ReadAllText(item));
 		}
-		byte[] array = nKLNBIIKNBA.IBOIAEAAEGD();
+		byte[] array = nKLNBIIKNBA.ToArray();
 		using (MemoryStream memoryStream = new MemoryStream())
 		{
 			using (DeflateStream oIPMMMLGOAJ = new DeflateStream(memoryStream, System.IO.Compression.CompressionMode.Compress))
@@ -72,7 +72,7 @@ public class Compressor
 		}
 	}
 
-	public static byte[] EFJJNIMIBEO(byte[] BPLIHEIIBFP)
+	public static byte[] Decompress(byte[] BPLIHEIIBFP)
 	{
 		try
 		{

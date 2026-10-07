@@ -12,27 +12,27 @@ namespace Nekki.SF2.Core.Scripts.Primitive
 
 		private Rect _FrameRect = new Rect(0f, 0f, 1f, 1f);
 
-		private float MIHBPJAFIOC = 1f;
+		private float width = 1f;
 
-		private float PHJHMBHCDEB = 1f;
+		private float height = 1f;
 
 		private static Shader _Shader = Shader.Find("Sprites/Legacy/Default");
 
-		private static Shader CKOPCEGGGDJ = Shader.Find("Sprites/Legacy/Multiply");
+		private static Shader multiplyShader = Shader.Find("Sprites/Legacy/Multiply");
 
 		private static Material _SharedMaterial = new Material(_Shader);
 
-		private static Dictionary<Texture, Material> MLLLJIJMCGH = new Dictionary<Texture, Material>();
+		private static Dictionary<Texture, Material> materialsByTexture = new Dictionary<Texture, Material>();
 
-		private static Dictionary<Texture, Material> MIEMECLJFIG = new Dictionary<Texture, Material>();
+		private static Dictionary<Texture, Material> multiplyMaterialsByTexture = new Dictionary<Texture, Material>();
 
-		private Material JIBGIDGLPKK;
+		private Material instanceMaterial;
 
 		private MeshRenderer _MeshRender;
 
 		public Mesh _Mesh;
 
-		public Texture2D IFGDJMHCDDE
+		public Texture2D SpriteTexture
 		{
 			get
 			{
@@ -44,7 +44,7 @@ namespace Nekki.SF2.Core.Scripts.Primitive
 			}
 		}
 
-		public Rect LODDPEBLFIB
+		public Rect FrameRectangle
 		{
 			set
 			{
@@ -80,19 +80,19 @@ namespace Nekki.SF2.Core.Scripts.Primitive
 		public void set_Texture(Texture2D value)
 		{
 			_Texture = value;
-			if (JIBGIDGLPKK == null && _MeshRender != null)
+			if (instanceMaterial == null && _MeshRender != null)
 			{
-				_MeshRender.sharedMaterial = FMHMKAEFLMF(false, _Texture);
+				_MeshRender.sharedMaterial = GetMaterialForTexture(false, _Texture);
 			}
-			if (JIBGIDGLPKK != null)
+			if (instanceMaterial != null)
 			{
-				JIBGIDGLPKK.mainTexture = _Texture;
+				instanceMaterial.mainTexture = _Texture;
 			}
 		}
 
-		private static Material FMHMKAEFLMF(bool IPEKLPADIMF, Texture AOHHPLGIPDA)
+		private static Material GetMaterialForTexture(bool IPEKLPADIMF, Texture AOHHPLGIPDA)
 		{
-			Dictionary<Texture, Material> dictionary = ((!IPEKLPADIMF) ? MLLLJIJMCGH : MIEMECLJFIG);
+			Dictionary<Texture, Material> dictionary = ((!IPEKLPADIMF) ? materialsByTexture : multiplyMaterialsByTexture);
 			Material material = null;
 			if (dictionary.ContainsKey(AOHHPLGIPDA))
 			{
@@ -100,7 +100,7 @@ namespace Nekki.SF2.Core.Scripts.Primitive
 			}
 			else
 			{
-				material = new Material((!IPEKLPADIMF) ? _Shader : CKOPCEGGGDJ);
+				material = new Material((!IPEKLPADIMF) ? _Shader : multiplyShader);
 				material.mainTexture = AOHHPLGIPDA;
 				dictionary.Add(AOHHPLGIPDA, material);
 			}
@@ -110,14 +110,14 @@ namespace Nekki.SF2.Core.Scripts.Primitive
 		public void set_FrameRect(Rect value)
 		{
 			_FrameRect = value;
-			GOKLJDNDLFG();
+			UpdateUvs();
 		}
 
 		public void SetWidthHeight(float JGAPNGHPJGJ, float ANEFPJNALLK)
 		{
-			MIHBPJAFIOC = JGAPNGHPJGJ;
-			PHJHMBHCDEB = ANEFPJNALLK;
-			GCAOLAHLFBM();
+			width = JGAPNGHPJGJ;
+			height = ANEFPJNALLK;
+			UpdateVertices();
 		}
 
 		public void Start()
@@ -125,8 +125,8 @@ namespace Nekki.SF2.Core.Scripts.Primitive
 			if (_Mesh == null)
 			{
 				_Mesh = new Mesh();
-				GCAOLAHLFBM();
-				GOKLJDNDLFG();
+				UpdateVertices();
+				UpdateUvs();
 				_Mesh.triangles = new int[6] { 0, 1, 2, 1, 3, 2 };
 				_Mesh.colors = new Color[4] { _Color, _Color, _Color, _Color };
 			}
@@ -148,15 +148,15 @@ namespace Nekki.SF2.Core.Scripts.Primitive
 
 		private void OnDestroy()
 		{
-			if (_Texture != null && MLLLJIJMCGH.ContainsKey(_Texture))
+			if (_Texture != null && materialsByTexture.ContainsKey(_Texture))
 			{
-				MLLLJIJMCGH.Remove(_Texture);
+				materialsByTexture.Remove(_Texture);
 			}
 			_Texture = null;
-			JIBGIDGLPKK = null;
+			instanceMaterial = null;
 		}
 
-		private void GOKLJDNDLFG()
+		private void UpdateUvs()
 		{
 			if (!(_Mesh == null))
 			{
@@ -171,16 +171,16 @@ namespace Nekki.SF2.Core.Scripts.Primitive
 			}
 		}
 
-		private void GCAOLAHLFBM()
+		private void UpdateVertices()
 		{
 			if (!(_Mesh == null))
 			{
 				_Mesh.vertices = new Vector3[4]
 				{
-					new Vector3(0f, PHJHMBHCDEB, 0f),
-					new Vector3(MIHBPJAFIOC, PHJHMBHCDEB, 0f),
+					new Vector3(0f, height, 0f),
+					new Vector3(width, height, 0f),
 					new Vector3(0f, 0f, 0f),
-					new Vector3(MIHBPJAFIOC, 0f, 0f)
+					new Vector3(width, 0f, 0f)
 				};
 				_Mesh.RecalculateBounds();
 			}

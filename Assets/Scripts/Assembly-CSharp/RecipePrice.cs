@@ -10,13 +10,13 @@ public class RecipePrice
 	private readonly List<CurrencyStruct> _materials = new List<CurrencyStruct>();
 
 	// Recovered field names kept for existing callers.
-	public int EHKNIKHPGDN;
-	public ObscuredLong KLHOKKPALOK;
+	public int DeliveryTimeSeconds;
+	public ObscuredLong BonusDeliveryPriceValue;
 
 	public int MinLevel => _minLevel;
 	public int MaxLevel => _maxLevel;
-	public int DeliveryTime => EHKNIKHPGDN;
-	public ObscuredLong BonusDeliveryPrice => KLHOKKPALOK;
+	public int DeliveryTime => DeliveryTimeSeconds;
+	public ObscuredLong BonusDeliveryPrice => BonusDeliveryPriceValue;
 	public List<CurrencyStruct> Materials => _materials;
 
 	public RecipePrice()
@@ -41,9 +41,9 @@ public class RecipePrice
 		}
 
 		int delivery;
-		EHKNIKHPGDN = TryInt(node, "DeliveryTime", out delivery) ? delivery : 0;
+		DeliveryTimeSeconds = TryInt(node, "DeliveryTime", out delivery) ? delivery : 0;
 		long bonus;
-		KLHOKKPALOK = (ObscuredLong)(TryLong(node, "BonusDeliveryPrice", out bonus) ? bonus : 0L);
+		BonusDeliveryPriceValue = (ObscuredLong)(TryLong(node, "BonusDeliveryPrice", out bonus) ? bonus : 0L);
 
 		if (node.Attributes == null) return;
 		foreach (XmlAttribute attribute in node.Attributes)
@@ -52,11 +52,11 @@ public class RecipePrice
 			int count;
 			if (!int.TryParse(attribute.Value, NumberStyles.Integer, CultureInfo.InvariantCulture, out count) || count <= 0)
 				continue;
-			GameCurrency currency = GameUtils.AJDKHINLIDI == null
+			GameCurrency currency = GameUtils.GameCurrencies == null
 				? null
-				: GameUtils.AJDKHINLIDI.ICFINJLNCPM(attribute.Name);
+				: GameUtils.GameCurrencies.GetCurrencyByName(attribute.Name);
 			if (currency == null)
-				currency = new GameCurrency(attribute.Name, string.Empty, GameCurrency.DEFOMBPHMBP.CURRENCY_GROUP_FORGE);
+				currency = new GameCurrency(attribute.Name, string.Empty, GameCurrency.CurrencyGroup.CURRENCY_GROUP_FORGE);
 			_materials.Add(new CurrencyStruct(currency, count));
 		}
 	}
@@ -64,8 +64,8 @@ public class RecipePrice
 	public bool IsAvailableForItem(UserItem userItem)
 	{
 		if (userItem == null) return false;
-		ItemInfo info = userItem.DBLCMCEGJGI(false);
-		if (info == null) info = userItem.BHKHOJPANHE();
+		ItemInfo info = userItem.GetDisplayInfo(false);
+		if (info == null) info = userItem.GetInfo();
 		return info != null && IsAvailableForLevel(info.ItemLevel);
 	}
 

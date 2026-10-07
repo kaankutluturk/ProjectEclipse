@@ -4,47 +4,47 @@ using YamlDotNet.Core;
 
 public class EventReader
 {
-	private readonly IParser BPGMNGAJMKK;
+	private readonly IParser parser;
 
 	private bool endOfStream;
 
-	public IParser BDCBNKDELDD
+	public IParser Parser
 	{
 		get
 		{
-			return OAPMECPBPKJ();
+			return GetParser();
 		}
 	}
 
 	public EventReader(IParser BPGMNGAJMKK)
 	{
-		this.BPGMNGAJMKK = BPGMNGAJMKK;
-		PCCMLADDNDG();
+		this.parser = BPGMNGAJMKK;
+		MoveNext();
 	}
 
-	public IParser OAPMECPBPKJ()
+	public IParser GetParser()
 	{
-		return BPGMNGAJMKK;
+		return parser;
 	}
 
-	public T DODGGCGJJLL<T>() where T : ParsingEvent
+	public T Expect<T>() where T : ParsingEvent
 	{
-		T val = GNNPKHDPGLN<T>();
+		T val = Allow<T>();
 		if (val == null)
 		{
-			ParsingEvent jMKLCDAKEOG = BPGMNGAJMKK.AOJJOEHEPGM();
-			throw new YamlException(jMKLCDAKEOG.OGPHJPFHBJL(), jMKLCDAKEOG.GDJHIJHFPHA(), string.Format(CultureInfo.InvariantCulture, "Expected '{0}', got '{1}' (at {2}).", typeof(T).Name, jMKLCDAKEOG.GetType().Name, jMKLCDAKEOG.OGPHJPFHBJL()));
+			ParsingEvent jMKLCDAKEOG = parser.GetCurrent();
+			throw new YamlException(jMKLCDAKEOG.GetStart(), jMKLCDAKEOG.GetEnd(), string.Format(CultureInfo.InvariantCulture, "Expected '{0}', got '{1}' (at {2}).", typeof(T).Name, jMKLCDAKEOG.GetType().Name, jMKLCDAKEOG.GetStart()));
 		}
 		return val;
 	}
 
-	public bool GPHIFFOGOGN<T>() where T : ParsingEvent
+	public bool Accept<T>() where T : ParsingEvent
 	{
-		BPHMOEBOHLN();
-		return BPGMNGAJMKK.AOJJOEHEPGM() is T;
+		ThrowIfAtEndOfStream();
+		return parser.GetCurrent() is T;
 	}
 
-	private void BPHMOEBOHLN()
+	private void ThrowIfAtEndOfStream()
 	{
 		if (endOfStream)
 		{
@@ -52,39 +52,39 @@ public class EventReader
 		}
 	}
 
-	public T GNNPKHDPGLN<T>() where T : ParsingEvent
+	public T Allow<T>() where T : ParsingEvent
 	{
-		if (!GPHIFFOGOGN<T>())
+		if (!Accept<T>())
 		{
 			return (T)null;
 		}
-		T result = (T)BPGMNGAJMKK.AOJJOEHEPGM();
-		PCCMLADDNDG();
+		T result = (T)parser.GetCurrent();
+		MoveNext();
 		return result;
 	}
 
 	public T Peek<T>() where T : ParsingEvent
 	{
-		if (!GPHIFFOGOGN<T>())
+		if (!Accept<T>())
 		{
 			return (T)null;
 		}
-		return (T)BPGMNGAJMKK.AOJJOEHEPGM();
+		return (T)parser.GetCurrent();
 	}
 
-	public void FHCPPKNIOKB()
+	public void SkipThisAndNestedEvents()
 	{
 		int num = 0;
 		do
 		{
-			num += Peek<ParsingEvent>().DPIMLJJFMCO();
-			PCCMLADDNDG();
+			num += Peek<ParsingEvent>().GetNestingIncrease();
+			MoveNext();
 		}
 		while (num > 0);
 	}
 
-	private void PCCMLADDNDG()
+	private void MoveNext()
 	{
-		endOfStream = !BPGMNGAJMKK.PCCMLADDNDG();
+		endOfStream = !parser.MoveNext();
 	}
 }

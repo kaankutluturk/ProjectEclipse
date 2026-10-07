@@ -2,36 +2,36 @@ using System.Xml;
 
 public class ConditionWeapon : ConditionAnimation
 {
-	private string KCIIELDOBOM;
+	private string _weaponType;
 
-	private string LOKOGOFENFO;
+	private string _subType;
 
 	private string _Name;
 
-	public string MDPPNGIEJGD
+	public string SubType
 	{
 		get
 		{
-			return EAIMKPPOODM();
+			return GetSubType();
 		}
 	}
 
 	public ConditionWeapon(XmlNode node)
 		: base(ConditionType.WEAPONS)
 	{
-		KCIIELDOBOM = node.Attributes["Type"].CIPOICEEIBK(string.Empty);
-		LOKOGOFENFO = node.Attributes["SubType"].CIPOICEEIBK(string.Empty);
-		_Name = node.Attributes["Name"].CIPOICEEIBK(string.Empty);
+		_weaponType = node.Attributes["Type"].GetStringOrDefault(string.Empty);
+		_subType = node.Attributes["SubType"].GetStringOrDefault(string.Empty);
+		_Name = node.Attributes["Name"].GetStringOrDefault(string.Empty);
 	}
 
 	public string get_Type()
 	{
-		return KCIIELDOBOM;
+		return _weaponType;
 	}
 
-	public string EAIMKPPOODM()
+	public string GetSubType()
 	{
-		return LOKOGOFENFO;
+		return _subType;
 	}
 
 	public string get_Name()
@@ -41,11 +41,11 @@ public class ConditionWeapon : ConditionAnimation
 
 	public override bool IsEqual(ModelConditions conditions)
 	{
-		if (conditions.FDELMAHAAJD)
+		if (conditions.IsWeapon)
 		{
-			foreach (ItemInfo item in conditions.OJIAKDDCGLB)
+			foreach (ItemInfo item in conditions.Items)
 			{
-				if ((string.IsNullOrEmpty(KCIIELDOBOM) || KCIIELDOBOM == item.Type) && (string.IsNullOrEmpty(LOKOGOFENFO) || LOKOGOFENFO == item.SubType) && (string.IsNullOrEmpty(_Name) || _Name == item.Name))
+				if ((string.IsNullOrEmpty(_weaponType) || _weaponType == item.Type) && (string.IsNullOrEmpty(_subType) || _subType == item.SubType) && (string.IsNullOrEmpty(_Name) || _Name == item.Name))
 				{
 					return !IsNot;
 				}

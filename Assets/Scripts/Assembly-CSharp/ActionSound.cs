@@ -8,28 +8,28 @@ public class ActionSound : ActionAnimation
 
 	private string _Gender;
 
-	private bool IMOEOKFPPMJ;
+	private bool _Looped;
 
 	private float _Volume;
 
-	public bool BEMCJINPJKA
+	public bool IsLooped
 	{
 		get
 		{
-			return DBIOMDEIIKI();
+			return GetIsLooped();
 		}
 	}
 
-	public float FLJPEPPDICN
+	public float Volume
 	{
 		get
 		{
-			return AFKMLMCCJLI();
+			return GetVolume();
 		}
 	}
 
 	public ActionSound(XmlNode node)
-		: base(FADAJCEEKIO.SOUND)
+		: base(ActionType.SOUND)
 	{
 		Parse(node);
 	}
@@ -39,19 +39,19 @@ public class ActionSound : ActionAnimation
 		return _Name;
 	}
 
-	public bool DBIOMDEIIKI()
+	public bool GetIsLooped()
 	{
-		return IMOEOKFPPMJ;
+		return _Looped;
 	}
 
-	public float AFKMLMCCJLI()
+	public float GetVolume()
 	{
 		return _Volume;
 	}
 
 	public override void Visit(Model ACENLMONNPA)
 	{
-		ACENLMONNPA.OPPIKLBKMPN(this);
+		ACENLMONNPA.StartAction(this);
 	}
 
 	public bool SameGender(string EMENABICHED)
@@ -62,11 +62,11 @@ public class ActionSound : ActionAnimation
 	protected override void Parse(XmlNode node)
 	{
 		base.Parse(node);
-		_Name = node.Attributes["Name"].CIPOICEEIBK(string.Empty);
+		_Name = node.Attributes["Name"].GetStringOrDefault(string.Empty);
 		_Volume = node.Attributes["Volume"].ParseFloat(1f);
-		IMOEOKFPPMJ = node.Attributes["Looped"].ParseBool();
+		_Looped = node.Attributes["Looped"].ParseBool();
 		XmlAttribute xmlAttribute = node.Attributes["Voice"];
 		_AnyGender = xmlAttribute == null;
-		_Gender = xmlAttribute.CIPOICEEIBK(string.Empty);
+		_Gender = xmlAttribute.GetStringOrDefault(string.Empty);
 	}
 }

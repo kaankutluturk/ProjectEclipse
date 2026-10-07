@@ -5,76 +5,76 @@ using UnityEngine;
 public static class PerkGUI
 {
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private static Vector2 JPLBKPPAOBD;
+	private static Vector2 _fadeFrames;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private static Vector2 HPCEDDMDEMJ;
+	private static Vector2 _pulseAccel;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private static Vector2 HBIMMOBDEME;
+	private static Vector2 _pulseFrames;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private static Vector2 GKJGKHFHANJ;
+	private static Vector2 _spacing;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private static float PMEIDFGIEHL;
+	private static float _pulseAmplitude;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private static float HGKCCKMPNIJ;
+	private static float _rowCapacity;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private static float LNAHKGCNGLB;
+	private static float _expirationOpacity;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private static float FGCOIKOICIF;
+	private static float _stackShiftX;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private static float BJHMGAGELOO;
+	private static float _stackShiftY;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private static float GCOKELCDOKK;
+	private static float _fontScale;
 
-	public static Vector2 KINCPIGBJJN
+	public static Vector2 FadeFrames
 	{
 		get
 		{
-			return PDNIHJMHKBI();
+			return GetFadeFrames();
 		}
 		private set
 		{
-			JFEEFEGOKHM(value);
+			SetFadeFrames(value);
 		}
 	}
 
-	public static Vector2 MNOFJIPNHDK
+	public static Vector2 PulseAccel
 	{
 		get
 		{
-			return PELLCOKIJMM();
+			return GetPulseAccel();
 		}
 		private set
 		{
-			AAFOFMLICPN(value);
+			SetPulseAccel(value);
 		}
 	}
 
-	public static Vector2 BHAKGKHLAKK
+	public static Vector2 PulseFrames
 	{
 		get
 		{
-			return HGHGEAIOHJA();
+			return GetPulseFrames();
 		}
 		private set
 		{
-			BPCMKNCBNDN(value);
+			SetPulseFrames(value);
 		}
 	}
 
-	public static Vector2 EPDFGFIACAF
+	public static Vector2 IconSpacing
 	{
 		get
 		{
-			return FEHBEIFACMG();
+			return GetSpacing();
 		}
 		private set
 		{
@@ -82,193 +82,193 @@ public static class PerkGUI
 		}
 	}
 
-	public static float MHNDBNCHEEJ
+	public static float PulseAmplitude
 	{
 		get
 		{
-			return CPPMFFCKHJI();
+			return GetPulseAmplitude();
 		}
 		private set
 		{
-			HHDMIFECNNE(value);
+			SetPulseAmplitude(value);
 		}
 	}
 
-	public static float KPIBFDBDLAJ
+	public static float RowCapacity
 	{
 		get
 		{
-			return EHJFNLLGMOG();
+			return GetRowCapacity();
 		}
 		private set
 		{
-			LMIKMMMLNGJ(value);
+			SetRowCapacity(value);
 		}
 	}
 
-	public static float CFFPHNNEPAI
+	public static float ExpirationOpacity
 	{
 		get
 		{
-			return OOAHAJJKHKI();
+			return GetExpirationOpacity();
 		}
 		private set
 		{
-			LKHJKOOFAAN(value);
+			SetExpirationOpacity(value);
 		}
 	}
 
-	public static float IKBBJCPPPOI
+	public static float StackShiftX
 	{
 		get
 		{
-			return IKONKNEHCPB();
+			return GetStackShiftX();
 		}
 		private set
 		{
-			AEIGGPAGFHF(value);
+			SetStackShiftX(value);
 		}
 	}
 
-	public static float DJGCPGHCJHI
+	public static float StackShiftY
 	{
 		get
 		{
-			return FKMDJBBMJFM();
+			return GetStackShiftY();
 		}
 		private set
 		{
-			BODHOAEAHHG(value);
+			SetStackShiftY(value);
 		}
 	}
 
-	public static float LJJBGGLDBDI
+	public static float FontScale
 	{
 		get
 		{
-			return MOLPKLGMBJH();
+			return GetFontScale();
 		}
 		private set
 		{
-			GIPHCNHAADM(value);
+			SetFontScale(value);
 		}
 	}
 
-	public static Vector2 PDNIHJMHKBI()
+	public static Vector2 GetFadeFrames()
 	{
-		return JPLBKPPAOBD;
+		return _fadeFrames;
 	}
 
-	private static void JFEEFEGOKHM(Vector2 value)
+	private static void SetFadeFrames(Vector2 value)
 	{
-		JPLBKPPAOBD = value;
+		_fadeFrames = value;
 	}
 
-	public static Vector2 PELLCOKIJMM()
+	public static Vector2 GetPulseAccel()
 	{
-		return HPCEDDMDEMJ;
+		return _pulseAccel;
 	}
 
-	private static void AAFOFMLICPN(Vector2 value)
+	private static void SetPulseAccel(Vector2 value)
 	{
-		HPCEDDMDEMJ = value;
+		_pulseAccel = value;
 	}
 
-	public static Vector2 HGHGEAIOHJA()
+	public static Vector2 GetPulseFrames()
 	{
-		return HBIMMOBDEME;
+		return _pulseFrames;
 	}
 
-	private static void BPCMKNCBNDN(Vector2 value)
+	private static void SetPulseFrames(Vector2 value)
 	{
-		HBIMMOBDEME = value;
+		_pulseFrames = value;
 	}
 
-	public static Vector2 FEHBEIFACMG()
+	public static Vector2 GetSpacing()
 	{
-		return GKJGKHFHANJ;
+		return _spacing;
 	}
 
 	private static void set_Spacing(Vector2 value)
 	{
-		GKJGKHFHANJ = value;
+		_spacing = value;
 	}
 
-	public static float CPPMFFCKHJI()
+	public static float GetPulseAmplitude()
 	{
-		return PMEIDFGIEHL;
+		return _pulseAmplitude;
 	}
 
-	private static void HHDMIFECNNE(float value)
+	private static void SetPulseAmplitude(float value)
 	{
-		PMEIDFGIEHL = value;
+		_pulseAmplitude = value;
 	}
 
-	public static float EHJFNLLGMOG()
+	public static float GetRowCapacity()
 	{
-		return HGKCCKMPNIJ;
+		return _rowCapacity;
 	}
 
-	private static void LMIKMMMLNGJ(float value)
+	private static void SetRowCapacity(float value)
 	{
-		HGKCCKMPNIJ = value;
+		_rowCapacity = value;
 	}
 
-	public static float OOAHAJJKHKI()
+	public static float GetExpirationOpacity()
 	{
-		return LNAHKGCNGLB;
+		return _expirationOpacity;
 	}
 
-	private static void LKHJKOOFAAN(float value)
+	private static void SetExpirationOpacity(float value)
 	{
-		LNAHKGCNGLB = value;
+		_expirationOpacity = value;
 	}
 
-	public static float IKONKNEHCPB()
+	public static float GetStackShiftX()
 	{
-		return FGCOIKOICIF;
+		return _stackShiftX;
 	}
 
-	private static void AEIGGPAGFHF(float value)
+	private static void SetStackShiftX(float value)
 	{
-		FGCOIKOICIF = value;
+		_stackShiftX = value;
 	}
 
-	public static float FKMDJBBMJFM()
+	public static float GetStackShiftY()
 	{
-		return BJHMGAGELOO;
+		return _stackShiftY;
 	}
 
-	private static void BODHOAEAHHG(float value)
+	private static void SetStackShiftY(float value)
 	{
-		BJHMGAGELOO = value;
+		_stackShiftY = value;
 	}
 
-	public static float MOLPKLGMBJH()
+	public static float GetFontScale()
 	{
-		return GCOKELCDOKK;
+		return _fontScale;
 	}
 
-	private static void GIPHCNHAADM(float value)
+	private static void SetFontScale(float value)
 	{
-		GCOKELCDOKK = value;
+		_fontScale = value;
 	}
 
 	public static void Parse(XmlNode node)
 	{
-		JFEEFEGOKHM(node["FadeFrames"].JIIENECAAEH());
-		AAFOFMLICPN(node["PulseAccel"].JIIENECAAEH());
-		BPCMKNCBNDN(node["PulseFrames"].JIIENECAAEH());
+		SetFadeFrames(node["FadeFrames"].ParseInOut());
+		SetPulseAccel(node["PulseAccel"].ParseInOut());
+		SetPulseFrames(node["PulseFrames"].ParseInOut());
 		set_Spacing(new Vector2
 		{
 			x = node["Spacing"].Attributes["X"].ParseFloat(),
 			y = node["Spacing"].Attributes["Y"].ParseFloat()
 		});
-		HHDMIFECNNE(node["PulseAmp"].PNJPEDPDMCP().ParseFloat());
-		LMIKMMMLNGJ(node["RowCapacity"].Attributes["Value"].ParseFloat());
-		LKHJKOOFAAN(node["ExpirationOpacity"].Attributes["Value"].ParseFloat());
-		AEIGGPAGFHF(node["StackShiftX"].Attributes["Value"].ParseFloat());
-		BODHOAEAHHG(node["StackShiftY"].Attributes["Value"].ParseFloat());
-		GIPHCNHAADM(node["FontScale"].Attributes["Value"].ParseFloat());
+		SetPulseAmplitude(node["PulseAmp"].FirstAttribute().ParseFloat());
+		SetRowCapacity(node["RowCapacity"].Attributes["Value"].ParseFloat());
+		SetExpirationOpacity(node["ExpirationOpacity"].Attributes["Value"].ParseFloat());
+		SetStackShiftX(node["StackShiftX"].Attributes["Value"].ParseFloat());
+		SetStackShiftY(node["StackShiftY"].Attributes["Value"].ParseFloat());
+		SetFontScale(node["FontScale"].Attributes["Value"].ParseFloat());
 	}
 }

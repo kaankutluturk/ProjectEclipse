@@ -12,8 +12,8 @@ using System;
 using System.Collections.Generic;
 public class ModelConditions {
  public string EclipseCharacterId;
- public bool IDCHHGHAENM=true, Uninterrupt;
- public object PDKPGKPBBIL; public int PCAOCHAIBJC, FOIHIKCEBJF;
+ public bool IsKeyCheckEnabled=true, Uninterrupt;
+ public object CandidateMoveNames; public int AnimationSign, PivotPairSelector;
 }
 public class ConditionAnimation {
  public enum ConditionType { ECLIPSE_CHARACTER }
@@ -22,32 +22,32 @@ public class ConditionAnimation {
  public virtual bool IsEqual(ModelConditions conditions){return true;}
 }
 namespace Eclipse.Modding { /* CHARACTER */ }
-public class EventAnimation { public enum EECEJKADLCK { EVENT_KEY_PRESSED } }
+public class EventAnimation { public enum EventAnimationType { EVENT_KEY_PRESSED } }
 public class InfoAnimation {
  public string Name, Character="example.author:warriors/fighter";
  public bool HasKeys=true, Available=true;
  public int Evaluations;
  public class CapabilityTable { public List<InfoAnimation> HigherPriorityMoves=new List<InfoAnimation>(); }
- public class Properties { public Directions ILOEBFFAEAN=new Directions(); }
- public class Directions { public int OLBDPMKCJIF; }
+ public class Properties { public Directions AlignData=new Directions(); }
+ public class Directions { public int PivotSideKind; }
  public Properties MoveData=new Properties();
  public CapabilityTable PriorityConflicts=new CapabilityTable();
- public object ILBCHANCOBP(){return HasKeys ? this : null;}
- public object FOLOOGCLPNE(){return Name;}
- public int CEDEDCLGJDE(ModelConditions c,int direction){return direction;}
- public EventAnimation OIGBIFNICBI(EventAnimation.EECEJKADLCK e){return new EventAnimation();}
- public bool HPPGNJJCEGF(Model model,object unused,EventAnimation e){
+ public object GetFirstKeysCondition(){return HasKeys ? this : null;}
+ public object GetTemplateNames(){return Name;}
+ public int GetDirection(ModelConditions c,int direction){return direction;}
+ public EventAnimation FindMoveEventByType(EventAnimation.EventAnimationType e){return new EventAnimation();}
+ public bool AreConditionsMet(Model model,object unused,EventAnimation e){
   Evaluations++;
   return Available && !model.Conditions.Uninterrupt && new Eclipse.Modding.ModCharacterCondition(Character).IsEqual(model.Conditions);
  }
 }
 public class Model {
  public List<InfoAnimation> Moves=new List<InfoAnimation>(); public ModelConditions Conditions=new ModelConditions();
- public List<InfoAnimation> GetAvailableAnimations(){return Moves;} public ModelConditions EBABHGHPLFK(){return Conditions;}
+ public List<InfoAnimation> GetAvailableAnimations(){return Moves;} public ModelConditions GetConditions(){return Conditions;}
 }
-public class ModelAnimation { public int Facing=1; public int KFCNPADAMHA(){return Facing;} }
-public static class LLLOJBFMONN { public static void Error(string message){} }
-public static class ListExtensions { public static void CPCAJIKOIEE<T>(this List<T> items,int count){items.RemoveRange(count,items.Count-count);} }
+public class ModelAnimation { public int Facing=1; public int GetSign(){return Facing;} }
+public static class GameLog { public static void Error(string message){} }
+public static class ListExtensions { public static void Resize<T>(this List<T> items,int count){items.RemoveRange(count,items.Count-count);} }
 public class EligibilityFixture {
  readonly Model _Model; readonly ModelAnimation _ModelAnimation=new ModelAnimation();
  public EligibilityFixture(Model model){_Model=model;}

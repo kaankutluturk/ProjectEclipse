@@ -23,9 +23,9 @@ namespace Nekki.SF2.GUI
 		[SerializeField]
 		private float _spacing;
 
-		private float HAHLEDMDEOD;
+		private float _leadingPadding;
 
-		private float MINGJPDNIIK;
+		private float _trailingPadding;
 
 		[SerializeField]
 		private RectOffset padding;
@@ -45,45 +45,45 @@ namespace Nekki.SF2.GUI
 		[SerializeField]
 		private bool scrollToHighlighted = true;
 
-		private ITableViewDataSource AAOCIPABPOF;
+		private ITableViewDataSource _dataSource;
 
-		private ITableViewDelegate EMMPEMOLNLG;
+		private ITableViewDelegate _delegate;
 
 		private GameObject _cellPrefab;
 
 		private float _currentPosition;
 
-		private float MEKJIGGNMMK;
+		private float _lastRefreshPosition;
 
-		private CellSizes BKODOALFJKO;
+		private CellSizes _cellSizes;
 
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		private VisibleCells HLNOEMFPJEI;
+		private VisibleCells _visibleCells;
 
-		private ReusableCellsContainer ENLAAAJMNKF;
+		private ReusableCellsContainer _reusableCells;
 
 		private TableViewScroll tableViewScroll;
 
-		private bool LPGLCGMMPHN;
+		private bool _isEmpty;
 
-		private bool GIOKDACNHOM;
+		private bool _needsReload;
 
-		private bool LCPBMPKHPOF;
+		private bool _needsCellUpdate;
 
 		private Tween _tween;
 
-		private bool BKJCHFPNIIB;
+		private bool _isDragging;
 
 		[SerializeField]
 		public SelectCellEvent onSelectCell = new SelectCellEvent();
 
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		private TableViewCell DFOKDELLBKM;
+		private TableViewCell _selectedCell;
 
 		[SerializeField]
 		private float _MinScrollVelocity;
 
-		public float EPDFGFIACAF
+		public float SpacingValue
 		{
 			get
 			{
@@ -95,7 +95,7 @@ namespace Nekki.SF2.GUI
 			}
 		}
 
-		public ITableViewDataSource JFDKGBHEEOF
+		public ITableViewDataSource TableDataSource
 		{
 			get
 			{
@@ -107,7 +107,7 @@ namespace Nekki.SF2.GUI
 			}
 		}
 
-		public GameObject AKMFLOHDJJG
+		public GameObject RowCellPrefab
 		{
 			get
 			{
@@ -119,7 +119,7 @@ namespace Nekki.SF2.GUI
 			}
 		}
 
-		public Range NKGGFPOGKJC
+		public Range VisibleRowRange
 		{
 			get
 			{
@@ -127,7 +127,7 @@ namespace Nekki.SF2.GUI
 			}
 		}
 
-		public float ELNOAHEFGBL
+		public float TotalContentSize
 		{
 			get
 			{
@@ -135,7 +135,7 @@ namespace Nekki.SF2.GUI
 			}
 		}
 
-		public float JJCKADKCDIF
+		public float ScrollPosition
 		{
 			get
 			{
@@ -143,7 +143,7 @@ namespace Nekki.SF2.GUI
 			}
 		}
 
-		public VisibleCells EEDJOBJKDAE
+		public VisibleCells VisibleCellStore
 		{
 			get
 			{
@@ -151,11 +151,11 @@ namespace Nekki.SF2.GUI
 			}
 			private set
 			{
-				CPIKBGBHKBG(value);
+				SetVisibleCells(value);
 			}
 		}
 
-		public TableViewScroll DCIEBGPFPEB
+		public TableViewScroll ScrollComponent
 		{
 			get
 			{
@@ -163,23 +163,23 @@ namespace Nekki.SF2.GUI
 			}
 		}
 
-		private bool FMLODLPJBJJ
+		private bool IsVerticalLayout
 		{
 			get
 			{
-				return BPFHDMABJJM();
+				return CheckIsVertical();
 			}
 		}
 
-		private float EAFCNBIGKJM
+		private float ViewportExtent
 		{
 			get
 			{
-				return OKIBKGLCGMG();
+				return GetViewportExtent();
 			}
 		}
 
-		public TableViewCell PLFNODGBFKB
+		public TableViewCell CurrentCell
 		{
 			get
 			{
@@ -191,7 +191,7 @@ namespace Nekki.SF2.GUI
 			}
 		}
 
-		public float CNBIHHDLDGE
+		public float MinScrollVelocityValue
 		{
 			get
 			{
@@ -211,32 +211,32 @@ namespace Nekki.SF2.GUI
 		public void set_Spacing(float value)
 		{
 			_spacing = value;
-			if (BKODOALFJKO != null)
+			if (_cellSizes != null)
 			{
-				BKODOALFJKO.set_Spacing(_spacing);
+				_cellSizes.set_Spacing(_spacing);
 			}
 		}
 
 		public ITableViewDataSource get_DataSource()
 		{
-			return AAOCIPABPOF;
+			return _dataSource;
 		}
 
 		public void set_DataSource(ITableViewDataSource value)
 		{
-			AAOCIPABPOF = value;
-			GIOKDACNHOM = true;
+			_dataSource = value;
+			_needsReload = true;
 		}
 
 		public ITableViewDelegate Delegate
 		{
 			get
 			{
-				return EMMPEMOLNLG;
+				return _delegate;
 			}
 			set
 			{
-				EMMPEMOLNLG = value;
+				_delegate = value;
 			}
 		}
 
@@ -257,7 +257,7 @@ namespace Nekki.SF2.GUI
 
 		public float get_ContentSize()
 		{
-			return tableViewScroll.get_Size() - OKIBKGLCGMG();
+			return tableViewScroll.get_Size() - GetViewportExtent();
 		}
 
 		public float get_Position()
@@ -267,12 +267,12 @@ namespace Nekki.SF2.GUI
 
 		public VisibleCells get_visibleCells()
 		{
-			return HLNOEMFPJEI;
+			return _visibleCells;
 		}
 
-		private void CPIKBGBHKBG(VisibleCells value)
+		private void SetVisibleCells(VisibleCells value)
 		{
-			HLNOEMFPJEI = value;
+			_visibleCells = value;
 		}
 
 		public TableViewScroll get_Scroll()
@@ -280,42 +280,42 @@ namespace Nekki.SF2.GUI
 			return tableViewScroll;
 		}
 
-		private bool BPFHDMABJJM()
+		private bool CheckIsVertical()
 		{
 			return tableViewOrientation == TableViewOrientation.Vertical;
 		}
 
-		private float OKIBKGLCGMG()
+		private float GetViewportExtent()
 		{
 			Rect rect = (base.transform as RectTransform).rect;
-			return (!BPFHDMABJJM()) ? rect.width : rect.height;
+			return (!CheckIsVertical()) ? rect.width : rect.height;
 		}
 
 		public void Init(ITableViewDataSource PHPCFCPCOAG, ITableViewDelegate CGPBNFFLLDK)
 		{
-			AAOCIPABPOF = PHPCFCPCOAG;
-			EMMPEMOLNLG = CGPBNFFLLDK;
-			LPGLCGMMPHN = true;
-			BKODOALFJKO = new CellSizes();
-			BKODOALFJKO.set_Spacing(_spacing);
-			CPIKBGBHKBG(new VisibleCells());
-			ENLAAAJMNKF = new ReusableCellsContainer();
-			ENLAAAJMNKF.Init();
+			_dataSource = PHPCFCPCOAG;
+			_delegate = CGPBNFFLLDK;
+			_isEmpty = true;
+			_cellSizes = new CellSizes();
+			_cellSizes.set_Spacing(_spacing);
+			SetVisibleCells(new VisibleCells());
+			_reusableCells = new ReusableCellsContainer();
+			_reusableCells.Init();
 			tableViewScroll = base.gameObject.AddComponent<TableViewScroll>();
 			tableViewScroll.Init();
 			tableViewScroll.SetOrientation(tableViewOrientation);
 			tableViewScroll.set_elasticity(elasticity);
-			tableViewScroll.set_movementType(SFScrollRect.MDMLKCMBBPA.SF2);
+			tableViewScroll.set_movementType(SFScrollRect.ScrollMovementType.SF2);
 			tableViewScroll.set_inertia(inertia);
 			tableViewScroll.set_decelerationRate(decelerationRate);
 			tableViewScroll.set_scrollSensitivity(scrollSensitivity);
 			tableViewScroll.get_onValueChanged().AddListener(ScrollViewValueChanged);
-			tableViewScroll.onDragBegin.AddListener(CDILOAACHKK);
+			tableViewScroll.onDragBegin.AddListener(HandleDragBegin);
             tableViewScroll.onWheel.AddListener(KillTween);
             Eclipse.UI.DesktopScrollbars.Attach(tableViewScroll, KillTween);
-			tableViewScroll.onDragEnd.AddListener(CPEGCBHNHLH);
-			HAHLEDMDEOD = (int)(OKIBKGLCGMG() / 2f);
-			MINGJPDNIIK = (int)(OKIBKGLCGMG() / 2f);
+			tableViewScroll.onDragEnd.AddListener(HandleDragEnd);
+			_leadingPadding = (int)(GetViewportExtent() / 2f);
+			_trailingPadding = (int)(GetViewportExtent() / 2f);
 			base.gameObject.AddComponent<RectMask2D>();
 			base.gameObject.AddComponent<CanvasRenderer>();
 			ReloadData();
@@ -323,27 +323,27 @@ namespace Nekki.SF2.GUI
 
 		private void Update()
 		{
-			if (GIOKDACNHOM)
+			if (_needsReload)
 			{
 				ReloadData();
 			}
-			FKCENJCHLBK();
+			UpdateSelectedCell();
 		}
 
 		private void LateUpdate()
 		{
-			if (LCPBMPKHPOF)
+			if (_needsCellUpdate)
 			{
-				DMEPFNGHIMN();
+				UpdateVisibleCells();
 			}
 		}
 
 		public TableViewCell ReusableCellForRow(int IBAKGENOEPH)
 		{
-			TableViewCell tableViewCell = ENLAAAJMNKF.CBLMJDCPLCD();
+			TableViewCell tableViewCell = _reusableCells.TakeCell();
 			if (tableViewCell == null)
 			{
-				tableViewCell = BLMPEOPPMMI(IBAKGENOEPH);
+				tableViewCell = InstantiateCell(IBAKGENOEPH);
 			}
 			return tableViewCell;
 		}
@@ -359,26 +359,26 @@ namespace Nekki.SF2.GUI
 			{
 				return 0f;
 			}
-			return BKODOALFJKO.PCKBCFLHKLO(IBAKGENOEPH) - BKODOALFJKO.IEMKAEEOMIH(IBAKGENOEPH) / 2f + HAHLEDMDEOD;
+			return _cellSizes.GetCumulativeSize(IBAKGENOEPH) - _cellSizes.GetRowSize(IBAKGENOEPH) / 2f + _leadingPadding;
 		}
 
 		public void ReloadData()
 		{
-			MGKPBIEJENL();
+			RecycleAllVisibleCells();
 			set_SelectedCell(null);
 			int num = NumberOfRows();
-			BKODOALFJKO.SetRowsCount(num);
-			LPGLCGMMPHN = num == 0;
-			if (!LPGLCGMMPHN)
+			_cellSizes.SetRowsCount(num);
+			_isEmpty = num == 0;
+			if (!_isEmpty)
 			{
 				for (int i = 0; i < num; i++)
 				{
-					float pEEOEOMEBFG = AAOCIPABPOF.SizeForRowInTableView(this, i);
-					BKODOALFJKO.KJPFDBAIKAH(pEEOEOMEBFG, i);
+					float pEEOEOMEBFG = _dataSource.SizeForRowInTableView(this, i);
+					_cellSizes.SetRowSize(pEEOEOMEBFG, i);
 				}
-				tableViewScroll.set_SizeDelta(HAHLEDMDEOD + BKODOALFJKO.PCKBCFLHKLO(num - 1) + MINGJPDNIIK);
-				ELEIODCNFKD();
-				GIOKDACNHOM = false;
+				tableViewScroll.set_SizeDelta(_leadingPadding + _cellSizes.GetCumulativeSize(num - 1) + _trailingPadding);
+				RebuildVisibleCells();
+				_needsReload = false;
 			}
 		}
 
@@ -391,7 +391,7 @@ namespace Nekki.SF2.GUI
 		public void SetPosition(float FFMJGKPCBNK, float time = 0f)
 		{
 			KillTween();
-			if (BKJCHFPNIIB)
+			if (_isDragging)
 			{
 				return;
 			}
@@ -408,17 +408,17 @@ namespace Nekki.SF2.GUI
 
 		private void SetPosition(float FFMJGKPCBNK)
 		{
-			if (!LPGLCGMMPHN)
+			if (!_isEmpty)
 			{
-				FFMJGKPCBNK = Mathf.Clamp(FFMJGKPCBNK, PositionForRow(0), PositionForRow(BKODOALFJKO.HGHCEDEOMHA() - 1));
+				FFMJGKPCBNK = Mathf.Clamp(FFMJGKPCBNK, PositionForRow(0), PositionForRow(_cellSizes.GetRowCount() - 1));
 				if (_currentPosition != FFMJGKPCBNK)
 				{
-					LCPBMPKHPOF = true;
+					_needsCellUpdate = true;
 					_currentPosition = FFMJGKPCBNK;
-					float num = FFMJGKPCBNK - OKIBKGLCGMG() / 2f;
+					float num = FFMJGKPCBNK - GetViewportExtent() / 2f;
 					float num2 = num / get_ContentSize();
 					float num3 = 0f;
-					num3 = ((!BPFHDMABJJM()) ? num2 : (1f - num2));
+					num3 = ((!CheckIsVertical()) ? num2 : (1f - num2));
 					tableViewScroll.SetNormalizedPosition(num3);
 				}
 			}
@@ -433,7 +433,7 @@ namespace Nekki.SF2.GUI
 			}
 		}
 
-		private TableViewCell BLMPEOPPMMI(int IBAKGENOEPH)
+		private TableViewCell InstantiateCell(int IBAKGENOEPH)
 		{
 			if (get_CellPrefab() == null)
 			{
@@ -447,52 +447,52 @@ namespace Nekki.SF2.GUI
 		private void ScrollViewValueChanged(Vector2 PHONDPFNNGF)
 		{
 			float num = 0f;
-			num = ((!BPFHDMABJJM()) ? PHONDPFNNGF.x : (1f - PHONDPFNNGF.y));
-			_currentPosition = num * get_ContentSize() + OKIBKGLCGMG() / 2f;
-			LCPBMPKHPOF = true;
+			num = ((!CheckIsVertical()) ? PHONDPFNNGF.x : (1f - PHONDPFNNGF.y));
+			_currentPosition = num * get_ContentSize() + GetViewportExtent() / 2f;
+			_needsCellUpdate = true;
 		}
 
-		private void ELEIODCNFKD()
+		private void RebuildVisibleCells()
 		{
-			MGKPBIEJENL();
-			NBFIIJFJJID();
+			RecycleAllVisibleCells();
+			CreateVisibleCells();
 		}
 
-		private void MGKPBIEJENL()
+		private void RecycleAllVisibleCells()
 		{
-			while (get_visibleCells().OFOPFCJNEBL() > 0)
+			while (get_visibleCells().GetCount() > 0)
 			{
 				MoveCellToReusable(false);
 			}
 			get_visibleCells().IndexesRange = new Range(0, 0);
 		}
 
-		private void LNKCBPPHJCO()
+		private void DestroyAllCells()
 		{
-			if (ENLAAAJMNKF != null)
+			if (_reusableCells != null)
 			{
-				foreach (TableViewCell item in ENLAAAJMNKF.IGKHHJKCPIJ)
+				foreach (TableViewCell item in _reusableCells.cells)
 				{
 					UnityEngine.Object.Destroy(item.gameObject);
 				}
-				ENLAAAJMNKF.IGKHHJKCPIJ.Clear();
+				_reusableCells.cells.Clear();
 			}
 			if (get_visibleCells() == null)
 			{
 				return;
 			}
-			foreach (KeyValuePair<int, TableViewCell> item2 in get_visibleCells().BFNFADJMAPC())
+			foreach (KeyValuePair<int, TableViewCell> item2 in get_visibleCells().GetCells())
 			{
 				UnityEngine.Object.Destroy(item2.Value.gameObject);
 			}
 			get_visibleCells().IndexesRange = new Range(0, 0);
-			get_visibleCells().BFNFADJMAPC().Clear();
+			get_visibleCells().GetCells().Clear();
 		}
 
-		private Range FMLLLBDMIFI()
+		private Range CalculateVisibleRange()
 		{
-			float mGMMDGFPBLP = Math.Max(_currentPosition - OKIBKGLCGMG() * 1.5f, PositionForRow(0));
-			float mGMMDGFPBLP2 = Math.Min(_currentPosition + OKIBKGLCGMG() * 1.5f, PositionForRow(BKODOALFJKO.HGHCEDEOMHA() - 1));
+			float mGMMDGFPBLP = Math.Max(_currentPosition - GetViewportExtent() * 1.5f, PositionForRow(0));
+			float mGMMDGFPBLP2 = Math.Min(_currentPosition + GetViewportExtent() * 1.5f, PositionForRow(_cellSizes.GetRowCount() - 1));
 			int num = FindIndexOfRowAtPosition(mGMMDGFPBLP);
 			int num2 = FindIndexOfRowAtPosition(mGMMDGFPBLP2);
 			int valueCount = num2 - num + 1;
@@ -501,7 +501,7 @@ namespace Nekki.SF2.GUI
 
 		public int FindIndexOfRowAtPosition(float MGMMDGFPBLP)
 		{
-			return FindIndexOfRowAtPosition(MGMMDGFPBLP, 0, BKODOALFJKO.HGHCEDEOMHA() - 1);
+			return FindIndexOfRowAtPosition(MGMMDGFPBLP, 0, _cellSizes.GetRowCount() - 1);
 		}
 
 		public int FindIndexOfRowAtPosition(float MGMMDGFPBLP, int CAILGDNIKJD, int FBGEOOKNPCF)
@@ -529,9 +529,9 @@ namespace Nekki.SF2.GUI
 			return FindIndexOfRowAtPosition(MGMMDGFPBLP, num3, FBGEOOKNPCF);
 		}
 
-		private void NBFIIJFJJID()
+		private void CreateVisibleCells()
 		{
-			Range bIGCGGHIPIK = FMLLLBDMIFI();
+			Range bIGCGGHIPIK = CalculateVisibleRange();
 			for (int i = 0; i < bIGCGGHIPIK.count; i++)
 			{
 				CreateCell(bIGCGGHIPIK.from + i, true);
@@ -539,46 +539,46 @@ namespace Nekki.SF2.GUI
 			get_visibleCells().IndexesRange = bIGCGGHIPIK;
 		}
 
-		private void DMEPFNGHIMN()
+		private void UpdateVisibleCells()
 		{
-			LCPBMPKHPOF = false;
-			if (!LPGLCGMMPHN && !(Mathf.Abs(_currentPosition - MEKJIGGNMMK) < BKODOALFJKO.IEMKAEEOMIH(0) / 2f + _spacing / 2f))
+			_needsCellUpdate = false;
+			if (!_isEmpty && !(Mathf.Abs(_currentPosition - _lastRefreshPosition) < _cellSizes.GetRowSize(0) / 2f + _spacing / 2f))
 			{
-				MEKJIGGNMMK = _currentPosition;
+				_lastRefreshPosition = _currentPosition;
 				Range bIGCGGHIPIK = get_visibleCells().IndexesRange;
-				Range range = FMLLLBDMIFI();
-				if (range.from > bIGCGGHIPIK.GEMHMCFOIMJ() || range.GEMHMCFOIMJ() < bIGCGGHIPIK.from)
+				Range range = CalculateVisibleRange();
+				if (range.from > bIGCGGHIPIK.GetLastIndex() || range.GetLastIndex() < bIGCGGHIPIK.from)
 				{
-					ELEIODCNFKD();
+					RebuildVisibleCells();
 				}
 				else if (!bIGCGGHIPIK.Equals(range))
 				{
-					PKGMJPNBPIE(bIGCGGHIPIK, range);
-					AKDMLIDONIM(bIGCGGHIPIK, range);
+					RecycleCellsOutsideRange(bIGCGGHIPIK, range);
+					CreateCellsInNewRange(bIGCGGHIPIK, range);
 					get_visibleCells().IndexesRange = range;
 				}
 			}
 		}
 
-		private void PKGMJPNBPIE(Range IKJKAMKCCMB, Range MHEKHCKHNLG)
+		private void RecycleCellsOutsideRange(Range IKJKAMKCCMB, Range MHEKHCKHNLG)
 		{
 			for (int i = IKJKAMKCCMB.from; i < MHEKHCKHNLG.from; i++)
 			{
 				MoveCellToReusable(false);
 			}
-			for (int j = MHEKHCKHNLG.GEMHMCFOIMJ(); j < IKJKAMKCCMB.GEMHMCFOIMJ(); j++)
+			for (int j = MHEKHCKHNLG.GetLastIndex(); j < IKJKAMKCCMB.GetLastIndex(); j++)
 			{
 				MoveCellToReusable(true);
 			}
 		}
 
-		private void AKDMLIDONIM(Range IKJKAMKCCMB, Range MHEKHCKHNLG)
+		private void CreateCellsInNewRange(Range IKJKAMKCCMB, Range MHEKHCKHNLG)
 		{
 			for (int num = IKJKAMKCCMB.from - 1; num >= MHEKHCKHNLG.from; num--)
 			{
 				CreateCell(num, false);
 			}
-			for (int i = IKJKAMKCCMB.GEMHMCFOIMJ() + 1; i <= MHEKHCKHNLG.GEMHMCFOIMJ(); i++)
+			for (int i = IKJKAMKCCMB.GetLastIndex() + 1; i <= MHEKHCKHNLG.GetLastIndex(); i++)
 			{
 				CreateCell(i, true);
 			}
@@ -586,18 +586,18 @@ namespace Nekki.SF2.GUI
 
 		private void CreateCell(int IBAKGENOEPH, bool HJIIHCLNCGH)
 		{
-			TableViewCell hJCPCBLCJJN = AAOCIPABPOF.CellForRowInTableView(this, IBAKGENOEPH);
+			TableViewCell hJCPCBLCJJN = _dataSource.CellForRowInTableView(this, IBAKGENOEPH);
 			hJCPCBLCJJN = ConfigureCellWithRowAtEnd(hJCPCBLCJJN, IBAKGENOEPH, HJIIHCLNCGH);
 		}
 
 		private TableViewCell ConfigureCellWithRowAtEnd(TableViewCell HJCPCBLCJJN, int IBAKGENOEPH, bool HJIIHCLNCGH)
 		{
 			HJCPCBLCJJN.set_RowNumber(IBAKGENOEPH);
-			HJCPCBLCJJN.DidHighlightEvent.RemoveListener(KKBDALNMIAB);
-			HJCPCBLCJJN.DidHighlightEvent.AddListener(KKBDALNMIAB);
-			HJCPCBLCJJN.DidSelectEvent.RemoveListener(LHEJGKCNBAC);
-			HJCPCBLCJJN.DidSelectEvent.AddListener(LHEJGKCNBAC);
-			get_visibleCells().KLKJONFEGHM(IBAKGENOEPH, HJCPCBLCJJN);
+			HJCPCBLCJJN.DidHighlightEvent.RemoveListener(OnCellHighlighted);
+			HJCPCBLCJJN.DidHighlightEvent.AddListener(OnCellHighlighted);
+			HJCPCBLCJJN.DidSelectEvent.RemoveListener(OnCellSelectedByUser);
+			HJCPCBLCJJN.DidSelectEvent.AddListener(OnCellSelectedByUser);
+			get_visibleCells().SetCellAtIndex(IBAKGENOEPH, HJCPCBLCJJN);
 			if (HJIIHCLNCGH)
 			{
 				HJCPCBLCJJN.transform.SetSiblingIndex(tableViewScroll.get_content().childCount - 1);
@@ -606,67 +606,67 @@ namespace Nekki.SF2.GUI
 			{
 				HJCPCBLCJJN.transform.SetSiblingIndex(0);
 			}
-			if (!BPFHDMABJJM())
+			if (!CheckIsVertical())
 			{
-				HJCPCBLCJJN.transform.OKHPLHPBPKJ(0f - PositionForRow(IBAKGENOEPH));
+				HJCPCBLCJJN.transform.SetLocalX(0f - PositionForRow(IBAKGENOEPH));
 			}
 			else
 			{
-				HJCPCBLCJJN.transform.BGNJGIACJBG(0f - PositionForRow(IBAKGENOEPH));
+				HJCPCBLCJJN.transform.SetLocalY(0f - PositionForRow(IBAKGENOEPH));
 			}
 			return HJCPCBLCJJN;
 		}
 
 		private void MoveCellToReusable(bool IBMGAPMHMOB)
 		{
-			int num = ((!IBMGAPMHMOB) ? get_visibleCells().IndexesRange.from : get_visibleCells().IndexesRange.GEMHMCFOIMJ());
+			int num = ((!IBMGAPMHMOB) ? get_visibleCells().IndexesRange.from : get_visibleCells().IndexesRange.GetLastIndex());
 			TableViewCell tableViewCell = get_visibleCells().GetCellAtIndex(num);
 			tableViewCell.DidHighlightEvent.RemoveAllListeners();
 			tableViewCell.DidSelectEvent.RemoveAllListeners();
-			ENLAAAJMNKF.FCGLFBFIPON(tableViewCell);
+			_reusableCells.RecycleCell(tableViewCell);
 			get_visibleCells().RemoveCellAtIndex(num);
 			get_visibleCells().IndexesRange.count--;
 			if (!IBMGAPMHMOB)
 			{
 				get_visibleCells().IndexesRange.from++;
 			}
-			if (!BPFHDMABJJM())
+			if (!CheckIsVertical())
 			{
-				tableViewCell.transform.OKHPLHPBPKJ(BKODOALFJKO.IEMKAEEOMIH(num));
+				tableViewCell.transform.SetLocalX(_cellSizes.GetRowSize(num));
 			}
 			else
 			{
-				tableViewCell.transform.BGNJGIACJBG(BKODOALFJKO.IEMKAEEOMIH(num));
+				tableViewCell.transform.SetLocalY(_cellSizes.GetRowSize(num));
 			}
 		}
 
-		private void KKBDALNMIAB(int IBAKGENOEPH)
+		private void OnCellHighlighted(int IBAKGENOEPH)
 		{
-			if (EMMPEMOLNLG != null)
+			if (_delegate != null)
 			{
-				EMMPEMOLNLG.TableViewDidHighlightCellForRow(this, IBAKGENOEPH);
+				_delegate.TableViewDidHighlightCellForRow(this, IBAKGENOEPH);
 			}
 			if (!scrollToHighlighted)
 			{
 			}
 		}
 
-		private void LHEJGKCNBAC(int IBAKGENOEPH)
+		private void OnCellSelectedByUser(int IBAKGENOEPH)
 		{
-			if (EMMPEMOLNLG != null)
+			if (_delegate != null)
 			{
-				EMMPEMOLNLG.TableViewDidSelectCellForRow(this, IBAKGENOEPH);
+				_delegate.TableViewDidSelectCellForRow(this, IBAKGENOEPH);
 			}
 		}
 
 		public TableViewCell get_SelectedCell()
 		{
-			return DFOKDELLBKM;
+			return _selectedCell;
 		}
 
 		protected void set_SelectedCell(TableViewCell value)
 		{
-			DFOKDELLBKM = value;
+			_selectedCell = value;
 		}
 
 		public float get_MinScrollVelocity()
@@ -679,17 +679,17 @@ namespace Nekki.SF2.GUI
 			_MinScrollVelocity = value;
 		}
 
-		private void FKCENJCHLBK()
+		private void UpdateSelectedCell()
 		{
 			if (get_SelectedCell() != null)
 			{
 				float num = Mathf.Abs(_currentPosition - PositionForRow(get_SelectedCell().get_RowNumber()));
-				if (num <= BKODOALFJKO.IEMKAEEOMIH(get_SelectedCell().get_RowNumber()) / 2f + _spacing / 2f)
+				if (num <= _cellSizes.GetRowSize(get_SelectedCell().get_RowNumber()) / 2f + _spacing / 2f)
 				{
 					return;
 				}
 			}
-			TableViewCell tableViewCell = DLMJIOLOKAI();
+			TableViewCell tableViewCell = FindNearestVisibleCell();
 			if (tableViewCell != get_SelectedCell())
 			{
 				set_SelectedCell(tableViewCell);
@@ -706,11 +706,11 @@ namespace Nekki.SF2.GUI
 			return 0;
 		}
 
-		private TableViewCell DLMJIOLOKAI()
+		private TableViewCell FindNearestVisibleCell()
 		{
 			TableViewCell result = null;
 			float num = float.MaxValue;
-			foreach (KeyValuePair<int, TableViewCell> item in get_visibleCells().BFNFADJMAPC())
+			foreach (KeyValuePair<int, TableViewCell> item in get_visibleCells().GetCells())
 			{
 				float num2 = Mathf.Abs(_currentPosition - PositionForRow(item.Key));
 				if (num2 < num)
@@ -776,22 +776,22 @@ namespace Nekki.SF2.GUI
 
 		public int NumberOfRows()
 		{
-			return AAOCIPABPOF.NumberOfRowsInTableView(this);
+			return _dataSource.NumberOfRowsInTableView(this);
 		}
 
-		private void CDILOAACHKK()
+		private void HandleDragBegin()
 		{
-			BKJCHFPNIIB = true;
+			_isDragging = true;
 			KillTween();
 		}
 
-		private void CPEGCBHNHLH()
+		private void HandleDragEnd()
 		{
-			BKJCHFPNIIB = false;
+			_isDragging = false;
 			if (Mathf.Abs(tableViewScroll.get_velocity().magnitude) != 0f)
 			{
 				float num = 0f;
-				num = ((!BPFHDMABJJM()) ? (tableViewScroll.get_velocity().x / 2f) : (tableViewScroll.get_velocity().y / 2f));
+				num = ((!CheckIsVertical()) ? (tableViewScroll.get_velocity().x / 2f) : (tableViewScroll.get_velocity().y / 2f));
 				int iBAKGENOEPH = get_SelectedCell().get_RowNumber();
 				if (Math.Abs(num) >= Math.Abs(get_MinScrollVelocity() / 2f))
 				{

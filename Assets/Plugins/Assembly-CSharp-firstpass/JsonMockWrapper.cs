@@ -108,59 +108,59 @@ public class JsonMockWrapper : IDictionary, IList, IEnumerable, ICollection, IOr
 		LitJson_002EIOrderedDictionary_002Eset_Item(OOPOEMNCCGH, value);
 	}
 
-	public bool MENGHLDLPDP
+	public bool IsArray
 	{
 		get
 		{
-			return NKLOBJNAFOL();
+			return GetIsArray();
 		}
 	}
 
-	public bool BKKEJEHCHAK
+	public bool IsBoolean
 	{
 		get
 		{
-			return DBAOMEBNMPH();
+			return GetIsBoolean();
 		}
 	}
 
-	public bool LPEHBKJIAJB
+	public bool IsDouble
 	{
 		get
 		{
-			return OEIGDMENBKN();
+			return GetIsDouble();
 		}
 	}
 
-	public bool MKGEMBAAPBL
+	public bool IsInt
 	{
 		get
 		{
-			return BGDHACEDILB();
+			return GetIsInt();
 		}
 	}
 
-	public bool LNLKOGMCNNF
+	public bool IsLong
 	{
 		get
 		{
-			return BPKJMLDOLPH();
+			return GetIsLong();
 		}
 	}
 
-	public bool PDKNNMDCPDJ
+	public bool IsObject
 	{
 		get
 		{
-			return HKCKGNMIKBM();
+			return GetIsObject();
 		}
 	}
 
-	public bool JDALJCCIBIN
+	public bool IsString
 	{
 		get
 		{
-			return FMFILGDCAKM();
+			return GetIsString();
 		}
 	}
 
@@ -174,37 +174,37 @@ public class JsonMockWrapper : IDictionary, IList, IEnumerable, ICollection, IOr
 		throw new NotSupportedException();
 	}
 
-	public bool NKLOBJNAFOL()
+	public bool GetIsArray()
 	{
 		return false;
 	}
 
-	public bool DBAOMEBNMPH()
+	public bool GetIsBoolean()
 	{
 		return false;
 	}
 
-	public bool OEIGDMENBKN()
+	public bool GetIsDouble()
 	{
 		return false;
 	}
 
-	public bool BGDHACEDILB()
+	public bool GetIsInt()
 	{
 		return false;
 	}
 
-	public bool BPKJMLDOLPH()
+	public bool GetIsLong()
 	{
 		return false;
 	}
 
-	public bool HKCKGNMIKBM()
+	public bool GetIsObject()
 	{
 		return false;
 	}
 
-	public bool FMFILGDCAKM()
+	public bool GetIsString()
 	{
 		return false;
 	}
@@ -224,9 +224,9 @@ public class JsonMockWrapper : IDictionary, IList, IEnumerable, ICollection, IOr
 		return 0;
 	}
 
-	public GGIECEPGFNH NCGOKKHFKJF()
+	public JsonType GetJsonType()
 	{
-		return GGIECEPGFNH.None;
+		return JsonType.None;
 	}
 
 	public long GetLong()
@@ -251,7 +251,7 @@ public class JsonMockWrapper : IDictionary, IList, IEnumerable, ICollection, IOr
 	{
 	}
 
-	public void FJKDNANFIHA(GGIECEPGFNH LFLGCDNKNJI)
+	public void SetJsonType(JsonType LFLGCDNKNJI)
 	{
 	}
 

@@ -10,7 +10,7 @@ public class NekkiWebHandlerRequest : NekkiWebHandler
 		_buffer = new List<byte>();
 	}
 
-	protected override void LKECEJOMPGF(byte[] data, int IAFIGGBIKOD, int HIGBAHGOFIJ)
+	protected override void OnDataReceived(byte[] data, int IAFIGGBIKOD, int HIGBAHGOFIJ)
 	{
 		_buffer.Capacity += HIGBAHGOFIJ;
 		for (int i = 0; i < HIGBAHGOFIJ; i++)

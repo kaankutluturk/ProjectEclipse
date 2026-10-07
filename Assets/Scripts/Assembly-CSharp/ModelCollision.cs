@@ -5,60 +5,60 @@ public class ModelCollision
 {
 	public class StrikeHit
 	{
-		public ModelEdge CMGLHHEJEBN;
+		public ModelEdge VictimEdge;
 
-		public ModelEdge ALIHGFIJEDN;
+		public ModelEdge AttackerEdge;
 
-		private Vector3f BDPMMKHKFMN = new Vector3f();
+		private Vector3f point = new Vector3f();
 
-		private Vector3f BLDIOPLELIK = new Vector3f();
+		private Vector3f secondPoint = new Vector3f();
 
 		public Vector3f Point
 		{
 			get
 			{
-				return EGCPOJIDHKK();
+				return GetPoint();
 			}
 			set
 			{
-				CEDPGCAEKDD(value);
+				SetPoint(value);
 			}
 		}
 
-		public Vector3f AOFLADELDFB
+		public Vector3f SecondPoint
 		{
 			get
 			{
-				return OJOMOLOIAOJ();
+				return GetSecondPoint();
 			}
 			set
 			{
-				MNCLDJCFCEM(value);
+				SetSecondPoint(value);
 			}
 		}
 
-		public Vector3f EGCPOJIDHKK()
+		public Vector3f GetPoint()
 		{
-			return BDPMMKHKFMN;
+			return point;
 		}
 
-		public void CEDPGCAEKDD(Vector3f value)
+		public void SetPoint(Vector3f value)
 		{
-			BDPMMKHKFMN.Set(value);
+			point.Set(value);
 		}
 
-		public Vector3f OJOMOLOIAOJ()
+		public Vector3f GetSecondPoint()
 		{
-			return BLDIOPLELIK;
+			return secondPoint;
 		}
 
-		public void MNCLDJCFCEM(Vector3f value)
+		public void SetSecondPoint(Vector3f value)
 		{
-			BLDIOPLELIK.Set(value);
+			secondPoint.Set(value);
 		}
 	}
 
-	private IntervalAnimation ODIOOMNBAGF;
+	private IntervalAnimation lastStrikeInterval;
 
 	private object _LastStrikePhase;
 
@@ -68,11 +68,11 @@ public class ModelCollision
 
 	public StrikeHit Strike;
 
-	public object ILHMMOPKEIF
+	public object StrikePhase
 	{
 		get
 		{
-			return GOPPGFPKLKP();
+			return GetLastStrikePhase();
 		}
 		set
 		{
@@ -80,11 +80,11 @@ public class ModelCollision
 		}
 	}
 
-	public bool DAAACGKPJAL
+	public bool RenderEnabled
 	{
 		get
 		{
-			return KKFIJLOMOJI();
+			return GetRenderEnabled();
 		}
 		set
 		{
@@ -97,11 +97,11 @@ public class ModelCollision
 		Strike = new StrikeHit();
 		_ModelObject = ACENLMONNPA;
 		_LastStrikePhase = null;
-		ODIOOMNBAGF = null;
+		lastStrikeInterval = null;
 		_Render = true;
 	}
 
-	public object GOPPGFPKLKP()
+	public object GetLastStrikePhase()
 	{
 		return _LastStrikePhase;
 	}
@@ -111,7 +111,7 @@ public class ModelCollision
 		_LastStrikePhase = value;
 	}
 
-	public bool KKFIJLOMOJI()
+	public bool GetRenderEnabled()
 	{
 		return _Render;
 	}
@@ -141,18 +141,18 @@ public class ModelCollision
 
 	public bool Render(ModelObject HFGPAELCNMF, List<ModelEdge> BLJEFDAPKBH, IntervalAnimation NOJNPFMOFLM)
 	{
-		if (ODIOOMNBAGF == NOJNPFMOFLM)
+		if (lastStrikeInterval == NOJNPFMOFLM)
 		{
 			return false;
 		}
 		IntervalAttack hFIIPNLCIEE = NOJNPFMOFLM as IntervalAttack;
-		if (!hFIIPNLCIEE.CFADPGIEKDN())
+		if (!hFIIPNLCIEE.GetHasAttackingParts())
 		{
-			ODIOOMNBAGF = NOJNPFMOFLM;
-			Strike.ALIHGFIJEDN = null;
-			Strike.CMGLHHEJEBN = null;
-			Strike.EGCPOJIDHKK().Reset();
-			Strike.OJOMOLOIAOJ().Reset();
+			lastStrikeInterval = NOJNPFMOFLM;
+			Strike.AttackerEdge = null;
+			Strike.VictimEdge = null;
+			Strike.GetPoint().Reset();
+			Strike.GetSecondPoint().Reset();
 			return true;
 		}
 		List<ModelEdge> lONAJAHCJGH = HFGPAELCNMF.GetCollisionEdges();
@@ -160,7 +160,7 @@ public class ModelCollision
 		{
 			if (CrossModel(lONAJAHCJGH, item))
 			{
-				ODIOOMNBAGF = NOJNPFMOFLM;
+				lastStrikeInterval = NOJNPFMOFLM;
 				return true;
 			}
 		}
@@ -185,7 +185,7 @@ public class ModelCollision
 
 	public void ResetInterval()
 	{
-		ODIOOMNBAGF = null;
+		lastStrikeInterval = null;
 	}
 
 	private bool CrossModel(List<ModelEdge> LONAJAHCJGH, ModelEdge PJMKFHFECLK)
@@ -193,16 +193,16 @@ public class ModelCollision
 		Vector3f eMAFACPEPDK = new Vector3f();
 		Vector3f eMAFACPEPDK2 = new Vector3f();
 		float kLDFJGIKIHG = PJMKFHFECLK.GetCollisionRadius();
-		Vector3f hICHONIJHKL = PJMKFHFECLK.DOKBBJBFDCM();
-		Vector3f lNPFHLPCLOP = PJMKFHFECLK.EBDICFAPOME();
-		EquationLine hENNAFMBEAG = PJMKFHFECLK.HENNAFMBEAG;
+		Vector3f hICHONIJHKL = PJMKFHFECLK.GetCollisionStart();
+		Vector3f lNPFHLPCLOP = PJMKFHFECLK.GetCollisionEnd();
+		EquationLine hENNAFMBEAG = PJMKFHFECLK.LineEquation;
 		foreach (ModelEdge item in LONAJAHCJGH)
 		{
 			float mGCKDDGGCBI = item.GetCollisionRadius();
-			Vector3f nMAJNHKJJEM = item.DOKBBJBFDCM();
-			Vector3f oNNJMGGPHEL = item.EBDICFAPOME();
-			EquationLine hENNAFMBEAG2 = item.HENNAFMBEAG;
-			if (Vector2f.FLHCKLEBDDK(hICHONIJHKL, lNPFHLPCLOP, kLDFJGIKIHG, nMAJNHKJJEM, oNNJMGGPHEL, mGCKDDGGCBI, eMAFACPEPDK, eMAFACPEPDK2, hENNAFMBEAG, hENNAFMBEAG2))
+			Vector3f nMAJNHKJJEM = item.GetCollisionStart();
+			Vector3f oNNJMGGPHEL = item.GetCollisionEnd();
+			EquationLine hENNAFMBEAG2 = item.LineEquation;
+			if (Vector2f.TryIntersectThickSegments(hICHONIJHKL, lNPFHLPCLOP, kLDFJGIKIHG, nMAJNHKJJEM, oNNJMGGPHEL, mGCKDDGGCBI, eMAFACPEPDK, eMAFACPEPDK2, hENNAFMBEAG, hENNAFMBEAG2))
 			{
 				AddStrike(PJMKFHFECLK, item, eMAFACPEPDK, eMAFACPEPDK2);
 				return true;
@@ -213,18 +213,18 @@ public class ModelCollision
 
 	private void AddStrike(ModelEdge PJMKFHFECLK, ModelEdge KPEGNDLGKFB, Vector3f NAAPALOFBCI, Vector3f GKCGDDBMHNJ)
 	{
-		Strike.ALIHGFIJEDN = PJMKFHFECLK;
-		Strike.CMGLHHEJEBN = KPEGNDLGKFB;
-		Strike.CEDPGCAEKDD(NAAPALOFBCI);
-		Strike.MNCLDJCFCEM(GKCGDDBMHNJ);
+		Strike.AttackerEdge = PJMKFHFECLK;
+		Strike.VictimEdge = KPEGNDLGKFB;
+		Strike.SetPoint(NAAPALOFBCI);
+		Strike.SetSecondPoint(GKCGDDBMHNJ);
 	}
 
 	private static bool IsDistanceStrike(float OIOMNNFMDOO, float JBLFLFOGDFI, EquationLine EGKHHBMCGMK, Vector3f NAAPALOFBCI, Vector3f _base, Vector3f ILENLCMAMBH, Vector3f PCLFFOBJJFO)
 	{
 		if (OIOMNNFMDOO < JBLFLFOGDFI)
 		{
-			_base.SetX(NAAPALOFBCI.GetX() - OIOMNNFMDOO * EGKHHBMCGMK.LHBNIMGFKIB);
-			_base.SetY(NAAPALOFBCI.GetY() - OIOMNNFMDOO * EGKHHBMCGMK.AAOIAEJJINO);
+			_base.SetX(NAAPALOFBCI.GetX() - OIOMNNFMDOO * EGKHHBMCGMK.A);
+			_base.SetY(NAAPALOFBCI.GetY() - OIOMNNFMDOO * EGKHHBMCGMK.CoefficientB);
 			if (((_base.GetX() <= ILENLCMAMBH.GetX() && _base.GetX() >= PCLFFOBJJFO.GetX()) || (_base.GetX() <= PCLFFOBJJFO.GetX() && _base.GetX() >= ILENLCMAMBH.GetX())) && ((_base.GetY() <= ILENLCMAMBH.GetY() && _base.GetY() >= PCLFFOBJJFO.GetY()) || (_base.GetY() <= PCLFFOBJJFO.GetY() && _base.GetY() >= ILENLCMAMBH.GetY())))
 			{
 				return true;

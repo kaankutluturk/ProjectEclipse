@@ -137,7 +137,7 @@ namespace Eclipse.Rendering
 			// screen grades, slow motion, audio muffle or effect sounds.
 			if (Fight.GetCurrentFight()?.IsTitleSparring != true)
 				ModVisuals.NotifyHit(critical, blocked, ko);
-			if (attacker != null && attacker.NJDJHGDMCIJ() != null)
+			if (attacker != null && attacker.GetParentModel() != null)
 				foreach (FighterParticles live in Live)
 					if (live != null && live._model == attacker) live._spent = true;
 			if (victim == null || point == null) return;
@@ -195,7 +195,7 @@ namespace Eclipse.Rendering
 				(definition.Placement == ModFxPlacement.Hit ? _activeBursts : definition.Placement == ModFxPlacement.Contact ? _activeContacts : _active).Add(definition);
 				_selected.Add(definition);
 			}
-			Dictionary<string, ModelNode> nodes = _model.CLDMEJKGLBA()?.HKCFFKKFFFE();
+			Dictionary<string, ModelNode> nodes = _model.GetBodyObject()?.GetNodesByName();
 			int nodeCount = nodes != null ? nodes.Count : 0;
 			bool changed = _selected.Count != _selection.Count || !ReferenceEquals(nodes, _nodes) || nodeCount != _nodeCount;
 			for (int i = 0; !changed && i < _selected.Count; i++) changed = _selected[i] != _selection[i];
@@ -211,11 +211,11 @@ namespace Eclipse.Rendering
 			_contacts.Clear();
 			foreach (ModFxDefinition definition in _activeContacts)
 				_contacts.Add(new Burst { Definition = definition, System = FxBuilder.CreateBurst(transform, definition) });
-			ModelObject body = _model.CLDMEJKGLBA();
+			ModelObject body = _model.GetBodyObject();
 			if (body == null) return;
 			foreach (ModFxDefinition definition in _active)
 			{
-				ModelNode node = body.KLAPIGGACMM(definition.Nodes[0]);
+				ModelNode node = body.GetNodeByNameOrParent(definition.Nodes[0]);
 				if (node == null) continue;
 				ParticleSystem system = FxBuilder.CreateEmitter(transform, Vector3.zero, Vector3.one, definition, Vector2.zero, true);
 				_emitters.Add(new Emitter { Node = node, System = system });
@@ -311,9 +311,9 @@ namespace Eclipse.Rendering
 		private void UpdateGround(float alpha)
 		{
 			_hasFloorSample = false;
-			if (!FightInterpolation.IsFightActive || _model.NJDJHGDMCIJ() != null) return;
+			if (!FightInterpolation.IsFightActive || _model.GetParentModel() != null) return;
 			if (!ModVisuals.HasActiveFx(ModFxKind.Shadow) && !ModVisuals.HasActiveFx(ModFxKind.Stain) && !WantsMotion()) return;
-			Dictionary<string, ModelNode> nodes = _model.CLDMEJKGLBA()?.HKCFFKKFFFE();
+			Dictionary<string, ModelNode> nodes = _model.GetBodyObject()?.GetNodesByName();
 			if (nodes == null) return;
 			// Heights are measured upward on screen: the fight camera may show world
 			// +y pointing down, so "lowest" follows the camera, not the world axis.
@@ -341,7 +341,7 @@ namespace Eclipse.Rendering
 			if (count == 0) return;
 			_lowestX = lowestX;
 			_localCenterX = localSum / count;
-			ModelNode pivot = _model.CLDMEJKGLBA()?.HOFFDCFEBGA();
+			ModelNode pivot = _model.GetBodyObject()?.GetCenterOfMassNode();
 			_hasPivot = pivot != null;
 			if (_hasPivot)
 			{
@@ -423,15 +423,15 @@ namespace Eclipse.Rendering
 		// the nearer arena wall.
 		private void UpdateWallHit()
 		{
-			InfoAnimation current = _model.OCPMJKIEPIG()?.NNMAFFCCMHC();
+			InfoAnimation current = _model.GetAnimationModule()?.GetCurrentInfo();
 			bool inWallHit = false;
 			if (current != null)
 				foreach (string move in WallHitMoves)
-					if (current.CNPFHBMGDFP(move)) { inWallHit = true; break; }
+					if (current.HasName(move)) { inWallHit = true; break; }
 			bool started = inWallHit && !_inWallHit;
 			_inWallHit = inWallHit;
 			if (!started || !FightInterpolation.IsFightActive) return;
-			float left = GameUtils.CKOPPGCIHPL(), right = GameUtils.FBOGLADLJML();
+			float left = GameUtils.GetLeftWall(), right = GameUtils.GetRightWall();
 			bool leftWall = right > left ? _minX - left < right - _maxX : _localCenterX < 0f;
 			Fire(ModFxTrigger.Wall, leftWall ? new Vector3(_minX, _minXY, 0f) : new Vector3(_maxX, _maxXY, 0f));
 		}
@@ -527,8 +527,8 @@ namespace Eclipse.Rendering
 		{
 			ModVisualDefinition rim = ModVisuals.Active(ModVisualEffect.RimLight);
 			if (rim == null || rim.Number("ink") <= 0f) { InkWeight = 0f; return; }
-			InfoAnimation current = _model.OCPMJKIEPIG()?.NNMAFFCCMHC();
-			float target = current != null && current.CNPFHBMGDFP("MagicPlayer") ? 1f : 0f;
+			InfoAnimation current = _model.GetAnimationModule()?.GetCurrentInfo();
+			float target = current != null && current.HasName("MagicPlayer") ? 1f : 0f;
 			InkWeight = Mathf.MoveTowards(InkWeight, target, Time.unscaledDeltaTime * 5f);
 		}
 
@@ -547,8 +547,8 @@ namespace Eclipse.Rendering
 			if (ModVisuals.HasActiveFx(ModFxKind.Light))
 			{
 				bool inFight = FightInterpolation.IsFightActive;
-				ModelObject body = _model.CLDMEJKGLBA();
-				InfoAnimation current = _model.OCPMJKIEPIG()?.NNMAFFCCMHC();
+				ModelObject body = _model.GetBodyObject();
+				InfoAnimation current = _model.GetAnimationModule()?.GetCurrentInfo();
 				float unit = Mathf.Max(Mathf.Abs(transform.lossyScale.y), 1e-5f);
 				foreach (ModFxDefinition d in ModVisuals.EnumerateActiveFx(ModFxKind.Light))
 				{
@@ -562,18 +562,18 @@ namespace Eclipse.Rendering
 						if (!HasMatchingWeapon(d)) continue;
 						foreach (string name in new[] { "Weapon-Node2_1", "Weapon-Node2_2" })
 						{
-							ModelNode node = body.KLAPIGGACMM(name);
+							ModelNode node = body.GetNodeByNameOrParent(name);
 							if (node != null) AddLight(d, node, alpha, strength, unit, ref used);
 						}
 					}
-					else if (current != null && current.CNPFHBMGDFP("MagicPlayer"))
+					else if (current != null && current.HasName("MagicPlayer"))
 					{
-						ModelNode node = body.KLAPIGGACMM("Magic-Node2_1") ?? body.KLAPIGGACMM("NKnuckles_1");
+						ModelNode node = body.GetNodeByNameOrParent("Magic-Node2_1") ?? body.GetNodeByNameOrParent("NKnuckles_1");
 						if (node != null) AddLight(d, node, alpha, strength, unit, ref used);
 					}
-					else if (!_spent && current != null && current.CNPFHBMGDFP("MagicMissile") && !current.CNPFHBMGDFP("MagicMissileEnd") &&
-						body.HOFFDCFEBGA() != null)
-						AddLight(d, body.HOFFDCFEBGA(), alpha, strength, unit, ref used);
+					else if (!_spent && current != null && current.HasName("MagicMissile") && !current.HasName("MagicMissileEnd") &&
+						body.GetCenterOfMassNode() != null)
+						AddLight(d, body.GetCenterOfMassNode(), alpha, strength, unit, ref used);
 				}
 			}
 			for (int i = used; i < _glows.Count; i++)
@@ -610,7 +610,7 @@ namespace Eclipse.Rendering
 
 		private bool HasMatchingWeapon(ModFxDefinition d)
 		{
-			List<ItemInfo> items = _model.Parameters?.PJNJIJIODHE();
+			List<ItemInfo> items = _model.Parameters?.GetEquippedItems();
 			if (items == null) return false;
 			foreach (ItemInfo item in items)
 				if (item != null && item.Type == "Weapon" && d.MatchesWeapon(item.Name, item.SubType)) return true;
@@ -624,7 +624,7 @@ namespace Eclipse.Rendering
 			float total = 0f;
 			Color colour = Color.black;
 			Vector2 direction = Vector2.zero;
-			ModelNode pivot = _model.CLDMEJKGLBA()?.HOFFDCFEBGA();
+			ModelNode pivot = _model.GetBodyObject()?.GetCenterOfMassNode();
 			if (pivot != null && _lightsReady.Count != 0)
 			{
 				float x, y, z;
@@ -656,7 +656,7 @@ namespace Eclipse.Rendering
 		{
 			if (fighters == ModFxFighters.Both) return true;
 			Model owner = _model;
-			for (int i = 0; i < 4 && owner.NJDJHGDMCIJ() != null; i++) owner = owner.NJDJHGDMCIJ();
+			for (int i = 0; i < 4 && owner.GetParentModel() != null; i++) owner = owner.GetParentModel();
 			Fight fight = FightInterpolation.IsFightActive ? Fight.GetCurrentFight() : null;
 			bool player = fight == null || fight.GetPlayerModel() == owner;
 			bool opponent = fight != null && fight.GetEnemyModel() == owner;

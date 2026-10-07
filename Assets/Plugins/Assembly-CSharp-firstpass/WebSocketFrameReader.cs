@@ -6,28 +6,28 @@ using System.IO;
 public sealed class WebSocketFrameReader
 {
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private bool OIGMDFDEPHD;
+	private bool isFinal;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private BECKAHJIEGE KAHHEBMBCFA;
+	private WebSocketFrameTypes type;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private bool ACMIAFGAMGN;
+	private bool hasMask;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private ulong DCGIHLANEKJ;
+	private ulong length;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private byte[] ONMKFKCCJGC;
+	private byte[] mask;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private byte[] JFKBADLJJBM;
+	private byte[] data;
 
-	public bool EKPJBHAKGED
+	public bool FinalFragment
 	{
 		get
 		{
-			return MOOCLIBIPBI();
+			return GetIsFinal();
 		}
 		private set
 		{
@@ -35,23 +35,23 @@ public sealed class WebSocketFrameReader
 		}
 	}
 
-	public bool IILMMCDAABG
+	public bool HasMask
 	{
 		get
 		{
-			return FIDNGEELBPG();
+			return GetHasMask();
 		}
 		private set
 		{
-			PCADCFCIJDF(value);
+			SetHasMask(value);
 		}
 	}
 
-	public ulong IHGONCCOKMK
+	public ulong DataLength
 	{
 		get
 		{
-			return KLIOMCPELLF();
+			return GetLength();
 		}
 		private set
 		{
@@ -59,87 +59,87 @@ public sealed class WebSocketFrameReader
 		}
 	}
 
-	public byte[] NMHABDNGDLJ
+	public byte[] Mask
 	{
 		get
 		{
-			return JIIDHHHNCGL();
+			return GetMask();
 		}
 		private set
 		{
-			PGOEMEOOJOH(value);
+			SetMask(value);
 		}
 	}
 
-	public bool MOOCLIBIPBI()
+	public bool GetIsFinal()
 	{
-		return OIGMDFDEPHD;
+		return isFinal;
 	}
 
 	private void set_IsFinal(bool value)
 	{
-		OIGMDFDEPHD = value;
+		isFinal = value;
 	}
 
-	public BECKAHJIEGE get_Type()
+	public WebSocketFrameTypes get_Type()
 	{
-		return KAHHEBMBCFA;
+		return type;
 	}
 
-	private void set_Type(BECKAHJIEGE value)
+	private void set_Type(WebSocketFrameTypes value)
 	{
-		KAHHEBMBCFA = value;
+		type = value;
 	}
 
-	public bool FIDNGEELBPG()
+	public bool GetHasMask()
 	{
-		return ACMIAFGAMGN;
+		return hasMask;
 	}
 
-	private void PCADCFCIJDF(bool value)
+	private void SetHasMask(bool value)
 	{
-		ACMIAFGAMGN = value;
+		hasMask = value;
 	}
 
-	public ulong KLIOMCPELLF()
+	public ulong GetLength()
 	{
-		return DCGIHLANEKJ;
+		return length;
 	}
 
 	private void set_Length(ulong value)
 	{
-		DCGIHLANEKJ = value;
+		length = value;
 	}
 
-	public byte[] JIIDHHHNCGL()
+	public byte[] GetMask()
 	{
-		return ONMKFKCCJGC;
+		return mask;
 	}
 
-	private void PGOEMEOOJOH(byte[] value)
+	private void SetMask(byte[] value)
 	{
-		ONMKFKCCJGC = value;
+		mask = value;
 	}
 
-	public byte[] CHIGLEKCFFN()
+	public byte[] GetData()
 	{
-		return JFKBADLJJBM;
+		return data;
 	}
 
 	private void set_Data(byte[] value)
 	{
-		JFKBADLJJBM = value;
+		data = value;
 	}
 
 	internal void Read(Stream ABJIEFMMIEK)
 	{
 		byte b = (byte)ABJIEFMMIEK.ReadByte();
 		set_IsFinal((b & 0x80) != 0);
-		set_Type((BECKAHJIEGE)(b & 0xF));
+		set_Type((WebSocketFrameTypes)(b & 0xF));
 		b = (byte)ABJIEFMMIEK.ReadByte();
-		PCADCFCIJDF((b & 0x80) != 0);
+		SetHasMask((b & 0x80) != 0);
 		set_Length((ulong)(b & 0x7F));
-		if (KLIOMCPELLF() == 126)
+		if (GetLength() == 126)
 		{
 			byte[] array = new byte[2];
 			ABJIEFMMIEK.ReadBuffer(array);
@@ -149,7 +149,7 @@ public sealed class WebSocketFrameReader
 			}
 			set_Length(BitConverter.ToUInt16(array, 0));
 		}
-		else if (KLIOMCPELLF() == 127)
+		else if (GetLength() == 127)
 		{
 			byte[] array2 = new byte[8];
 			ABJIEFMMIEK.ReadBuffer(array2);
@@ -159,27 +159,27 @@ public sealed class WebSocketFrameReader
 			}
 			set_Length(BitConverter.ToUInt64(array2, 0));
 		}
-		if (FIDNGEELBPG())
+		if (GetHasMask())
 		{
-			PGOEMEOOJOH(new byte[4]);
-			ABJIEFMMIEK.Read(JIIDHHHNCGL(), 0, 4);
+			SetMask(new byte[4]);
+			ABJIEFMMIEK.Read(GetMask(), 0, 4);
 		}
-		set_Data(new byte[KLIOMCPELLF()]);
-		if (KLIOMCPELLF() == 0)
+		set_Data(new byte[GetLength()]);
+		if (GetLength() == 0)
 		{
 			return;
 		}
 		int num = 0;
 		do
 		{
-			num += ABJIEFMMIEK.Read(CHIGLEKCFFN(), num, CHIGLEKCFFN().Length - num);
+			num += ABJIEFMMIEK.Read(GetData(), num, GetData().Length - num);
 		}
-		while (num < CHIGLEKCFFN().Length);
-		if (FIDNGEELBPG())
+		while (num < GetData().Length);
+		if (GetHasMask())
 		{
-			for (int i = 0; i < CHIGLEKCFFN().Length; i++)
+			for (int i = 0; i < GetData().Length; i++)
 			{
-				CHIGLEKCFFN()[i] = (byte)(CHIGLEKCFFN()[i] ^ JIIDHHHNCGL()[i % 4]);
+				GetData()[i] = (byte)(GetData()[i] ^ GetMask()[i % 4]);
 			}
 		}
 	}
@@ -190,14 +190,14 @@ public sealed class WebSocketFrameReader
 		ulong num = 0uL;
 		for (int i = 0; i < DAGGODDBKDD.Count; i++)
 		{
-			num += DAGGODDBKDD[i].KLIOMCPELLF();
+			num += DAGGODDBKDD[i].GetLength();
 		}
 		byte[] array = new byte[num];
 		ulong num2 = 0uL;
 		for (int j = 0; j < DAGGODDBKDD.Count; j++)
 		{
-			Array.Copy(DAGGODDBKDD[j].CHIGLEKCFFN(), 0, array, (int)num2, (int)DAGGODDBKDD[j].KLIOMCPELLF());
-			num2 += DAGGODDBKDD[j].KLIOMCPELLF();
+			Array.Copy(DAGGODDBKDD[j].GetData(), 0, array, (int)num2, (int)DAGGODDBKDD[j].GetLength());
+			num2 += DAGGODDBKDD[j].GetLength();
 		}
 		set_Type(DAGGODDBKDD[0].get_Type());
 		set_Length(num);

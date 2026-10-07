@@ -5,40 +5,40 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using YamlDotNet.Core;
 
-public sealed class AliasValueDeserializer : FFBEMOKFDNL
+public sealed class AliasValueDeserializer : IValueDeserializer
 {
-	private sealed class DMGFMLMIFGL : Dictionary<string, JFLHKBKDOFM>, KOOPFFDDANF
+	private sealed class AliasState : Dictionary<string, ValuePromise>, IPostDeserializationCallback
 	{
-		public void INOFEFDGNFL()
+		public void OnDeserializationComplete()
 		{
-			foreach (JFLHKBKDOFM value in base.Values)
+			foreach (ValuePromise value in base.Values)
 			{
-				if (!value.DHNFINJFGJM())
+				if (!value.GetHasValue())
 				{
-					throw new AnchorNotFoundException(value.HBCNKNFPAIM.OGPHJPFHBJL(), value.HBCNKNFPAIM.GDJHIJHFPHA(), string.Format("Anchor '{0}' not found", value.HBCNKNFPAIM.OEAKCOHMIHH()));
+					throw new AnchorNotFoundException(value.Alias.GetStart(), value.Alias.GetEnd(), string.Format("Anchor '{0}' not found", value.Alias.GetValue()));
 				}
 			}
 		}
 	}
 
-	private sealed class JFLHKBKDOFM : IValuePromise
+	private sealed class ValuePromise : IValuePromise
 	{
 		[CompilerGenerated]
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
 		private Action<object> ValueAvailable;
 
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		private bool NDKANKBCEOM;
+		private bool hasValue;
 
 		private object value;
 
-		public readonly AnchorAlias HBCNKNFPAIM;
+		public readonly AnchorAlias Alias;
 
-		public bool GCKFEGDHIGI
+		public bool IsValueSet
 		{
 			get
 			{
-				return DHNFINJFGJM();
+				return GetHasValue();
 			}
 			private set
 			{
@@ -46,7 +46,7 @@ public sealed class AliasValueDeserializer : FFBEMOKFDNL
 			}
 		}
 
-		public event Action<object> MJCKDPOOOMB
+		public event Action<object> ValueAvailableEvent
 		{
 			add
 			{
@@ -58,12 +58,12 @@ public sealed class AliasValueDeserializer : FFBEMOKFDNL
 			}
 		}
 
-		public JFLHKBKDOFM(AnchorAlias LOKLDPLAPOL)
+		public ValuePromise(AnchorAlias LOKLDPLAPOL)
 		{
-			HBCNKNFPAIM = LOKLDPLAPOL;
+			Alias = LOKLDPLAPOL;
 		}
 
-		public JFLHKBKDOFM(object value)
+		public ValuePromise(object value)
 		{
 			set_HasValue(true);
 			this.value = value;
@@ -93,19 +93,19 @@ public sealed class AliasValueDeserializer : FFBEMOKFDNL
 			while ((object)action != action2);
 		}
 
-		public bool DHNFINJFGJM()
+		public bool GetHasValue()
 		{
-			return NDKANKBCEOM;
+			return hasValue;
 		}
 
 		private void set_HasValue(bool value)
 		{
-			NDKANKBCEOM = value;
+			hasValue = value;
 		}
 
-		public object OEAKCOHMIHH()
+		public object GetValue()
 		{
-			if (!DHNFINJFGJM())
+			if (!GetHasValue())
 			{
 				throw new InvalidOperationException("Value not set");
 			}
@@ -114,7 +114,7 @@ public sealed class AliasValueDeserializer : FFBEMOKFDNL
 
 		public void set_Value(object value)
 		{
-			if (DHNFINJFGJM())
+			if (GetHasValue())
 			{
 				throw new InvalidOperationException("Value already set");
 			}
@@ -127,51 +127,51 @@ public sealed class AliasValueDeserializer : FFBEMOKFDNL
 		}
 	}
 
-	private readonly FFBEMOKFDNL PMODPPCDACN;
+	private readonly IValueDeserializer innerDeserializer;
 
-	public AliasValueDeserializer(FFBEMOKFDNL PMODPPCDACN)
+	public AliasValueDeserializer(IValueDeserializer PMODPPCDACN)
 	{
 		if (PMODPPCDACN == null)
 		{
 			throw new ArgumentNullException("innerDeserializer");
 		}
-		this.PMODPPCDACN = PMODPPCDACN;
+		this.innerDeserializer = PMODPPCDACN;
 	}
 
-	public object BBNMBCMJOFM(EventReader reader, Type MBLGNMBFHBI, SerializerState state, FFBEMOKFDNL IJBAEAEDMCC)
+	public object DeserializeValue(EventReader reader, Type MBLGNMBFHBI, SerializerState state, IValueDeserializer IJBAEAEDMCC)
 	{
-		AnchorAlias mBEGNNDMDKH = reader.GNNPKHDPGLN<AnchorAlias>();
+		AnchorAlias mBEGNNDMDKH = reader.Allow<AnchorAlias>();
 		if (mBEGNNDMDKH != null)
 		{
-			DMGFMLMIFGL dMGFMLMIFGL = state.Get<DMGFMLMIFGL>();
-			JFLHKBKDOFM value;
-			if (!dMGFMLMIFGL.TryGetValue(mBEGNNDMDKH.OEAKCOHMIHH(), out value))
+			AliasState dMGFMLMIFGL = state.Get<AliasState>();
+			ValuePromise value;
+			if (!dMGFMLMIFGL.TryGetValue(mBEGNNDMDKH.GetValue(), out value))
 			{
-				value = new JFLHKBKDOFM(mBEGNNDMDKH);
-				dMGFMLMIFGL.Add(mBEGNNDMDKH.OEAKCOHMIHH(), value);
+				value = new ValuePromise(mBEGNNDMDKH);
+				dMGFMLMIFGL.Add(mBEGNNDMDKH.GetValue(), value);
 			}
-			return (!value.DHNFINJFGJM()) ? value : value.OEAKCOHMIHH();
+			return (!value.GetHasValue()) ? value : value.GetValue();
 		}
 		string text = null;
 		NodeEvent dGMPGIHHKCN = reader.Peek<NodeEvent>();
-		if (dGMPGIHHKCN != null && !string.IsNullOrEmpty(dGMPGIHHKCN.HCPOJDFJFMM()))
+		if (dGMPGIHHKCN != null && !string.IsNullOrEmpty(dGMPGIHHKCN.GetAnchor()))
 		{
-			text = dGMPGIHHKCN.HCPOJDFJFMM();
+			text = dGMPGIHHKCN.GetAnchor();
 		}
-		object obj = PMODPPCDACN.BBNMBCMJOFM(reader, MBLGNMBFHBI, state, IJBAEAEDMCC);
+		object obj = innerDeserializer.DeserializeValue(reader, MBLGNMBFHBI, state, IJBAEAEDMCC);
 		if (text != null)
 		{
-			DMGFMLMIFGL dMGFMLMIFGL2 = state.Get<DMGFMLMIFGL>();
-			JFLHKBKDOFM value2;
+			AliasState dMGFMLMIFGL2 = state.Get<AliasState>();
+			ValuePromise value2;
 			if (!dMGFMLMIFGL2.TryGetValue(text, out value2))
 			{
-				dMGFMLMIFGL2.Add(text, new JFLHKBKDOFM(obj));
+				dMGFMLMIFGL2.Add(text, new ValuePromise(obj));
 			}
 			else
 			{
-				if (value2.DHNFINJFGJM())
+				if (value2.GetHasValue())
 				{
-					throw new DuplicateAnchorException(dGMPGIHHKCN.OGPHJPFHBJL(), dGMPGIHHKCN.GDJHIJHFPHA(), string.Format("Anchor '{0}' already defined", text));
+					throw new DuplicateAnchorException(dGMPGIHHKCN.GetStart(), dGMPGIHHKCN.GetEnd(), string.Format("Anchor '{0}' already defined", text));
 				}
 				value2.set_Value(obj);
 			}

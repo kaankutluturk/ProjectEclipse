@@ -1,23 +1,23 @@
 public class EquippedItemsStruct
 {
-	public ItemInfo PILJCAOFAED;
+	public ItemInfo Skeleton;
 
-	public ItemInfo JGMLKIPCFII;
+	public ItemInfo Weapon;
 
-	public ItemInfo LKKFNMBCCDB;
+	public ItemInfo Armor;
 
-	public ItemInfo FKMOLBBLKDA;
+	public ItemInfo Helm;
 
-	public ItemInfo LGHMILECPLA;
+	public ItemInfo Ranged;
 
-	public ItemInfo ADBKGIBBNHJ;
+	public ItemInfo Magic;
 
-	public ItemInfo LMIBBJIKLNO;
+	public ItemInfo RaidCharge;
 
-	public ItemInfo KKJJONOBHKI;
+	public ItemInfo Seal;
 
 	public bool Compare(EquippedItemsStruct FNGODBOFAJD)
 	{
-		return FNGODBOFAJD.LKKFNMBCCDB == LKKFNMBCCDB && FNGODBOFAJD.FKMOLBBLKDA == FKMOLBBLKDA && FNGODBOFAJD.PILJCAOFAED == PILJCAOFAED && FNGODBOFAJD.JGMLKIPCFII == JGMLKIPCFII && FNGODBOFAJD.ADBKGIBBNHJ == ADBKGIBBNHJ && FNGODBOFAJD.LMIBBJIKLNO == LMIBBJIKLNO && FNGODBOFAJD.LGHMILECPLA == LGHMILECPLA;
+		return FNGODBOFAJD.Armor == Armor && FNGODBOFAJD.Helm == Helm && FNGODBOFAJD.Skeleton == Skeleton && FNGODBOFAJD.Weapon == Weapon && FNGODBOFAJD.Magic == Magic && FNGODBOFAJD.RaidCharge == RaidCharge && FNGODBOFAJD.Ranged == Ranged;
 	}
 }

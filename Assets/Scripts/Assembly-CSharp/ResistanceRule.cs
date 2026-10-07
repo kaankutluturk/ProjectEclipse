@@ -7,18 +7,18 @@ public class ResistanceRule : InFightRule
 	private int _resistanceValue;
 
 	public ResistanceRule(XmlNode node, RuleAppliance EJPOJJKKICO)
-		: base(BCBLLMPAMLP.RuleResistance, RuleAppliance.ApplianceAll, node)
+		: base(RuleType.RuleResistance, RuleAppliance.ApplianceAll, node)
 	{
 		Parse(node);
-		EBJIKKBLBEM(FightEvent.ResistanceCheckEvent);
+		SubscribeEvent(FightEvent.ResistanceCheckEvent);
 	}
 
-	public string DJBFLJAIKLI()
+	public string GetResistanceName()
 	{
 		return _resistanceName;
 	}
 
-	public int GLBEGDFMDBO()
+	public int GetResistanceValue()
 	{
 		return _resistanceValue;
 	}
@@ -26,7 +26,7 @@ public class ResistanceRule : InFightRule
 	protected override void Parse(XmlNode node)
 	{
 		base.Parse(node);
-		_resistanceName = node.Attributes["Name"].CIPOICEEIBK(string.Empty);
+		_resistanceName = node.Attributes["Name"].GetStringOrDefault(string.Empty);
 		_resistanceValue = node.Attributes["Value"].ParseInt();
 		if (_resistanceValue < 0)
 		{
@@ -37,8 +37,8 @@ public class ResistanceRule : InFightRule
 	public override InFightRule Copy()
 	{
 		InFightRule aAJIFBJLJOA = null;
-		RuleAppliance eJPOJJKKICO = EDAKADCHOLE();
-		XmlNode hKPPBKPJOEO = GIFDJEEGCJI().IOJIGDNFCFL();
+		RuleAppliance eJPOJJKKICO = GetAppliance();
+		XmlNode hKPPBKPJOEO = GetXmlSource().GetNode();
 		aAJIFBJLJOA = new ResistanceRule(hKPPBKPJOEO, eJPOJJKKICO);
 		aAJIFBJLJOA.IsRandom = IsRandom;
 		return aAJIFBJLJOA;

@@ -5,7 +5,7 @@ namespace Nekki.SF2.GUI.Menu
 {
 	public class MenuMaterSprite : MonoBehaviour
 	{
-		private GameCurrency JJPFBOKGIEF;
+		private GameCurrency currency;
 
 		private int _value;
 
@@ -25,16 +25,16 @@ namespace Nekki.SF2.GUI.Menu
 
 		public void Init(GameCurrency MDDNHLBDJBN)
 		{
-			JJPFBOKGIEF = MDDNHLBDJBN;
-			_value = ListSF.CCDKHLAMKKO().GetCurrencyCount(JJPFBOKGIEF);
-			string mJBPMLCLMFN = JJPFBOKGIEF.MJBPMLCLMFN;
+			currency = MDDNHLBDJBN;
+			_value = ListSF.GetRoster().GetCurrencyCount(currency);
+			string mJBPMLCLMFN = currency.Icon;
 			if (_icon != null)
 			{
 				_icon.sprite = Nekki.SF2.GUI.ResolutionImage.GetSprite("UI/Atlases/", mJBPMLCLMFN);
 			}
 			if (_valueLbl != null)
 			{
-				_valueLbl.font = LocalizationManager.MBPJIKFOEBJ();
+				_valueLbl.font = LocalizationManager.GetContentFont();
 				_valueLbl.resizeTextForBestFit = false;
 				_valueLbl.horizontalOverflow = HorizontalWrapMode.Overflow;
 				_valueLbl.verticalOverflow = VerticalWrapMode.Truncate;
@@ -59,7 +59,7 @@ namespace Nekki.SF2.GUI.Menu
 
 		public void UpdateView()
 		{
-			int num = ListSF.CCDKHLAMKKO().GetCurrencyCount(JJPFBOKGIEF);
+			int num = ListSF.GetRoster().GetCurrencyCount(currency);
 			if (_value != num)
 			{
 				_value = num;

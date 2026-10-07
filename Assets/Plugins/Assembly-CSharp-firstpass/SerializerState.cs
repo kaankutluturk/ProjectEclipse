@@ -4,30 +4,30 @@ using System.Linq;
 
 public sealed class SerializerState : IDisposable
 {
-	private readonly IDictionary<Type, object> HELFDCAIJNE = new Dictionary<Type, object>();
+	private readonly IDictionary<Type, object> items = new Dictionary<Type, object>();
 
 	public T Get<T>() where T : class, new()
 	{
 		object value;
-		if (!HELFDCAIJNE.TryGetValue(typeof(T), out value))
+		if (!items.TryGetValue(typeof(T), out value))
 		{
 			value = new T();
-			HELFDCAIJNE.Add(typeof(T), value);
+			items.Add(typeof(T), value);
 		}
 		return (T)value;
 	}
 
-	public void INOFEFDGNFL()
+	public void OnDeserialization()
 	{
-		foreach (KOOPFFDDANF item in HELFDCAIJNE.Values.OfType<KOOPFFDDANF>())
+		foreach (IPostDeserializationCallback item in items.Values.OfType<IPostDeserializationCallback>())
 		{
-			item.INOFEFDGNFL();
+			item.OnDeserializationComplete();
 		}
 	}
 
 	public void Dispose()
 	{
-		foreach (IDisposable item in HELFDCAIJNE.Values.OfType<IDisposable>())
+		foreach (IDisposable item in items.Values.OfType<IDisposable>())
 		{
 			item.Dispose();
 		}

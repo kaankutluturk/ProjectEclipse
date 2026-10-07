@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 public static class MovesMaps
 {
-	public enum NHKAHBBOIHG
+	public enum MapType
 	{
 		KEY_TYPE = 0,
 		DISTANCE_OBJECT_TYPE = 1
@@ -82,29 +82,29 @@ public static class MovesMaps
 		_Objects = null;
 	}
 
-	public static int HHBMBMNLJIE(NHKAHBBOIHG BLGLGNGBADH, string value)
+	public static int GetMappedIndex(MapType BLGLGNGBADH, string value)
 	{
 		switch (BLGLGNGBADH)
 		{
-		case NHKAHBBOIHG.KEY_TYPE:
+		case MapType.KEY_TYPE:
 			if (value == null)
 			{
 				return 0;
 			}
 			return (int)(_ControlIDs.ContainsKey(value) ? _ControlIDs[value] : FightCID.QuadrantZero);
-		case NHKAHBBOIHG.DISTANCE_OBJECT_TYPE:
+		case MapType.DISTANCE_OBJECT_TYPE:
 			if (value == null)
 			{
 				return 0;
 			}
 			return (int)(_Objects.ContainsKey(value) ? _Objects[value] : DistancePoint.Object.OBJECT_NULL);
 		default:
-			LLLOJBFMONN.Error("ERROR: MovesMaps::getIndex - no map for index: " + BLGLGNGBADH);
+			GameLog.Error("ERROR: MovesMaps::getIndex - no map for index: " + BLGLGNGBADH);
 			return -1;
 		}
 	}
 
-	public static ConditionAnimation.ConditionType MHKNIEBONKD(string value)
+	public static ConditionAnimation.ConditionType ParseConditionType(string value)
 	{
 		if (_Conditions.ContainsKey(value))
 		{

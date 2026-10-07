@@ -7,24 +7,24 @@ public class QuestActionHideMapButton : QuestAction
 	public override void Parse(XmlNode EPKLCPOEELO)
 	{
 		base.Parse(EPKLCPOEELO);
-		_name = EPKLCPOEELO.Attributes["Name"].CIPOICEEIBK(string.Empty);
+		_name = EPKLCPOEELO.Attributes["Name"].GetStringOrDefault(string.Empty);
 	}
 
-	public override void DEJMHFMLKIC(QuestParameters GFIHPBCEEOB)
+	public override void Execute(QuestParameters GFIHPBCEEOB)
 	{
-		base.DEJMHFMLKIC(GFIHPBCEEOB);
+		base.Execute(GFIHPBCEEOB);
 		string name = string.Empty;
 		GetValues(ref name);
-		MapButtonController.ELEBLBJKDBI().DMCBGLJHBPA(name);
-		OGIJONMKABB();
+		MapButtonController.GetInstance().RemoveButton(name);
+		FinishAction();
 	}
 
 	private void GetValues(ref string name)
 	{
 		ConditionExtension.CompareResult lNIDLHOIHIM = new ConditionExtension.CompareResult();
 		QuestCondition kKDGLNECFHA = new QuestCondition();
-		kKDGLNECFHA.LIMHBJBEEIA(PAJDEKLLFNJ);
-		kKDGLNECFHA.MCPIOGALBMK(_name, lNIDLHOIHIM);
+		kKDGLNECFHA.SetParameters(Parameters);
+		kKDGLNECFHA.SetValue(_name, lNIDLHOIHIM);
 		name = lNIDLHOIHIM.ToString();
 	}
 }

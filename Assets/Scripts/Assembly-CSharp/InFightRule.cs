@@ -4,22 +4,22 @@ using System.Xml;
 public class InFightRule : Rule
 {
     internal virtual System.Action PrepareModelRebind(Model expected, Model replacement) { return null; }
-	protected RuleAppliance NDBMMPENJNJ;
+	protected RuleAppliance appliance;
 
-	protected HashSet<FightEvent> PDIDNJAAPIH;
+	protected HashSet<FightEvent> subscribedEvents;
 
-	protected bool HBDGMDPIAJD;
+	protected bool isDeathRule;
 
-	protected bool KOKHKAFELGL;
+	protected bool applianceLosesOnTrigger;
 
-	public InFightRule(BCBLLMPAMLP LFLGCDNKNJI, RuleAppliance EJPOJJKKICO, XmlNode node, InFightRule CEFOMFMPHJM = null)
+	public InFightRule(RuleType LFLGCDNKNJI, RuleAppliance EJPOJJKKICO, XmlNode node, InFightRule CEFOMFMPHJM = null)
 		: base(LFLGCDNKNJI, node)
 	{
-		NDBMMPENJNJ = EJPOJJKKICO;
-		KOKHKAFELGL = true;
-		HBDGMDPIAJD = false;
-		PDIDNJAAPIH = new HashSet<FightEvent>();
-		HBDGMDPIAJD = node.Attributes["Death"].ParseBool();
+		appliance = EJPOJJKKICO;
+		applianceLosesOnTrigger = true;
+		isDeathRule = false;
+		subscribedEvents = new HashSet<FightEvent>();
+		isDeathRule = node.Attributes["Death"].ParseBool();
 	}
 
 	public virtual InFightRule Copy()
@@ -27,14 +27,14 @@ public class InFightRule : Rule
 		return null;
 	}
 
-	public void EBJIKKBLBEM(FightEvent KOJNCHKPLLN)
+	public void SubscribeEvent(FightEvent KOJNCHKPLLN)
 	{
-		PDIDNJAAPIH.Add(KOJNCHKPLLN);
+		subscribedEvents.Add(KOJNCHKPLLN);
 	}
 
-	public bool PMBJPCMHJOA(FightEvent KOJNCHKPLLN)
+	public bool IsSubscribedTo(FightEvent KOJNCHKPLLN)
 	{
-		return PDIDNJAAPIH.Contains(KOJNCHKPLLN);
+		return subscribedEvents.Contains(KOJNCHKPLLN);
 	}
 
 	public virtual void Reset()
@@ -43,15 +43,15 @@ public class InFightRule : Rule
 
 	public override bool Compare(object data)
 	{
-		AGCBHKBNMKL(data);
+		PrepareCompare(data);
 		PlayersFightData jNGGHELCPFM = (PlayersFightData)data;
-		if (NDBMMPENJNJ == RuleAppliance.AppliancePlayer)
+		if (appliance == RuleAppliance.AppliancePlayer)
 		{
-			return CompareSingle(jNGGHELCPFM.MPLPEMOFHGI);
+			return CompareSingle(jNGGHELCPFM.PlayerData);
 		}
-		if (NDBMMPENJNJ == RuleAppliance.ApplianceOpponent)
+		if (appliance == RuleAppliance.ApplianceOpponent)
 		{
-			return CompareSingle(jNGGHELCPFM.EKBMBILHBMC);
+			return CompareSingle(jNGGHELCPFM.EnemyData);
 		}
 		return false;
 	}
@@ -73,41 +73,41 @@ public class InFightRule : Rule
 	{
 	}
 
-	public bool JKDDBGJKEMC()
+	public bool DoesApplianceLoseOnTrigger()
 	{
-		return KOKHKAFELGL;
+		return applianceLosesOnTrigger;
 	}
 
-	public bool OBDNDAEPPNN()
+	public bool IsDeathRule()
 	{
-		return HBDGMDPIAJD;
+		return isDeathRule;
 	}
 
-	public RuleAppliance EDAKADCHOLE()
+	public RuleAppliance GetAppliance()
 	{
-		return NDBMMPENJNJ;
+		return appliance;
 	}
 
-	public void MOEAPHGDNAB(RuleAppliance IGFNCCEHFEK)
+	public void SetAppliance(RuleAppliance IGFNCCEHFEK)
 	{
-		NDBMMPENJNJ = IGFNCCEHFEK;
+		appliance = IGFNCCEHFEK;
 	}
 
-	public virtual RuleAppliance IMINMDOFHMG()
+	public virtual RuleAppliance GetWinnerAppliance()
 	{
-		switch (NDBMMPENJNJ)
+		switch (appliance)
 		{
 		case RuleAppliance.AppliancePlayer:
-			return (!KOKHKAFELGL) ? RuleAppliance.AppliancePlayer : RuleAppliance.ApplianceOpponent;
+			return (!applianceLosesOnTrigger) ? RuleAppliance.AppliancePlayer : RuleAppliance.ApplianceOpponent;
 		case RuleAppliance.ApplianceOpponent:
-			return KOKHKAFELGL ? RuleAppliance.AppliancePlayer : RuleAppliance.ApplianceOpponent;
+			return applianceLosesOnTrigger ? RuleAppliance.AppliancePlayer : RuleAppliance.ApplianceOpponent;
 		default:
-			LLLOJBFMONN.Error("InFightRule::getWinnerAppliance ERROR  - wrong playerAppliance " + NDBMMPENJNJ);
+			GameLog.Error("InFightRule::getWinnerAppliance ERROR  - wrong playerAppliance " + appliance);
 			return RuleAppliance.ApplianceAll;
 		}
 	}
 
-	protected virtual void AGCBHKBNMKL(object data)
+	protected virtual void PrepareCompare(object data)
 	{
 	}
 }

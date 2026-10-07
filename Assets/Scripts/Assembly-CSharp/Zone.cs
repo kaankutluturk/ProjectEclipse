@@ -8,21 +8,21 @@ public class Zone
 
 	private string _fileName;
 
-	public ConditionStatus PGBKNLAEANJ;
+	public ConditionStatus Status;
 
 	private int _index;
 
-	public List<Battle> LGIIBNJFADA = new List<Battle>();
+	public List<Battle> Battles = new List<Battle>();
 
-	private uint BELONIAAIEP;
+	private uint rewardDigits;
 
-	private uint JPMGAALMFKI;
+	private uint prizeBaseDigits;
 
-	public bool FOCAALFKCGF
+	public bool IsStart
 	{
 		get
 		{
-			return AMBLIADMEOC();
+			return GetIsStart();
 		}
 	}
 
@@ -30,7 +30,7 @@ public class Zone
 	{
 		get
 		{
-			return EPDMGFELIMC();
+			return GetFileName();
 		}
 	}
 
@@ -38,23 +38,23 @@ public class Zone
 	{
 		get
 		{
-			return KDJNDHLHAFH();
+			return GetIndex();
 		}
 	}
 
-	public uint ANHLAHFDDCE
+	public uint RewardDigits
 	{
 		get
 		{
-			return GIOJPNNLKKK();
+			return GetRewardDigits();
 		}
 	}
 
-	public uint LPMDOHPIEOP
+	public uint PrizeBaseDigits
 	{
 		get
 		{
-			return MCEGLDIFDBI();
+			return GetPrizeBaseDigits();
 		}
 	}
 
@@ -63,13 +63,13 @@ public class Zone
 		_name = name;
 		_fileName = PMFEIPCHENB;
 		_isStart = PENNHKHFEOM;
-		PGBKNLAEANJ = status;
+		Status = status;
 		_index = index;
-		BELONIAAIEP = CDCJKJNGPOE;
-		JPMGAALMFKI = MCDAHGPLLDO;
+		rewardDigits = CDCJKJNGPOE;
+		prizeBaseDigits = MCDAHGPLLDO;
 	}
 
-	public bool AMBLIADMEOC()
+	public bool GetIsStart()
 	{
 		return _isStart;
 	}
@@ -79,43 +79,43 @@ public class Zone
 		return _name;
 	}
 
-	public string EPDMGFELIMC()
+	public string GetFileName()
 	{
 		return _fileName;
 	}
 
-	public int KDJNDHLHAFH()
+	public int GetIndex()
 	{
 		return _index;
 	}
 
-	public uint GIOJPNNLKKK()
+	public uint GetRewardDigits()
 	{
-		return BELONIAAIEP;
+		return rewardDigits;
 	}
 
-	public uint MCEGLDIFDBI()
+	public uint GetPrizeBaseDigits()
 	{
-		return JPMGAALMFKI;
+		return prizeBaseDigits;
 	}
 
-	public Battle MJINKOFNIAE(string name)
+	public Battle FindBattle(string name)
 	{
-		foreach (Battle lGIIBNJFADum in LGIIBNJFADA)
+		foreach (Battle lGIIBNJFADum in Battles)
 		{
 			if (lGIIBNJFADum.get_Name() == name)
 			{
 				return lGIIBNJFADum;
 			}
 		}
-		LLLOJBFMONN.Write("Error: battle with name=" + name + " not found");
+		GameLog.Write("Error: battle with name=" + name + " not found");
 		return null;
 	}
 
-	public List<Battle> NIAMMNJLEFI(BattleType LFLGCDNKNJI)
+	public List<Battle> FindBattlesByType(BattleType LFLGCDNKNJI)
 	{
 		List<Battle> list = new List<Battle>();
-		foreach (Battle lGIIBNJFADum in LGIIBNJFADA)
+		foreach (Battle lGIIBNJFADum in Battles)
 		{
 			if (lGIIBNJFADum.get_Type() == LFLGCDNKNJI)
 			{
@@ -124,20 +124,20 @@ public class Zone
 		}
 		if (list.Count == 0)
 		{
-			LLLOJBFMONN.Write("Error: _battles with type={0} not found", LFLGCDNKNJI);
+			GameLog.Write("Error: _battles with type={0} not found", LFLGCDNKNJI);
 		}
 		return list;
 	}
 
-	public void CGJCKGAFPED()
+	public void UpdateStatus()
 	{
 		int num = 0;
 		bool flag = false;
 		int i = 0;
-		for (int count = LGIIBNJFADA.Count; i < count; i++)
+		for (int count = Battles.Count; i < count; i++)
 		{
-			Battle cGJCGEBPCAF = LGIIBNJFADA[i];
-			List<FightList> list = cGJCGEBPCAF.NAFMJGIGBGL();
+			Battle cGJCGEBPCAF = Battles[i];
+			List<FightList> list = cGJCGEBPCAF.GetLoadedFights();
 			int j = 0;
 			for (int count2 = list.Count; j < count2; j++)
 			{
@@ -145,7 +145,7 @@ public class Zone
 				ConditionStatus pGBKNLAEANJ = list[j].Status;
 				if (pGBKNLAEANJ == ConditionStatus.StatusOpen || pGBKNLAEANJ == ConditionStatus.StatusComplete)
 				{
-					PGBKNLAEANJ = ConditionStatus.StatusOpen;
+					Status = ConditionStatus.StatusOpen;
 					flag = true;
 					break;
 				}
@@ -153,16 +153,16 @@ public class Zone
 		}
 		if (num == 0 || !flag)
 		{
-			PGBKNLAEANJ = ConditionStatus.StatusIncomplete;
+			Status = ConditionStatus.StatusIncomplete;
 		}
 	}
 
 	public void SetTime(long time)
 	{
 		int i = 0;
-		for (int count = LGIIBNJFADA.Count; i < count; i++)
+		for (int count = Battles.Count; i < count; i++)
 		{
-			LGIIBNJFADA[i].SetTime(time);
+			Battles[i].SetTime(time);
 		}
 	}
 }

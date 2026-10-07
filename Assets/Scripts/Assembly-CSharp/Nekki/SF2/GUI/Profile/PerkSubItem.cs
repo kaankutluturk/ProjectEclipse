@@ -8,28 +8,28 @@ namespace Nekki.SF2.GUI.Profile
 {
 	public class PerkSubItem : SubItem
 	{
-		public enum PPAOEMJNACM
+		public enum PerkSubItemEvent
 		{
 			onPerkImprove = 12
 		}
 
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		private ProfilePerk AAJEBIINPNL;
+		private ProfilePerk perk;
 
 		protected Action<object> _dlg;
 
-		protected InfoAnimation BJONHDGCNFE;
+		protected InfoAnimation infoAnimation;
 
 		[SerializeField]
 		private ResolutionImage _upgradeLevelIcon;
 
-		protected KAHIFHMHDAF JLANLOEGGEP;
+		protected PerkContentData perkInfo;
 
-		protected bool EODJNKFPEHH;
+		protected bool isForcedLocked;
 
-		protected bool DCHFLKPBOBB;
+		protected bool isPerkChosen;
 
-		public ProfilePerk MBDDKGIOOGD
+		public ProfilePerk CurrentPerk
 		{
 			get
 			{
@@ -37,18 +37,18 @@ namespace Nekki.SF2.GUI.Profile
 			}
 			private set
 			{
-				NOLDHAFMOLF(value);
+				SetPerk(value);
 			}
 		}
 
 		public ProfilePerk get_Perk()
 		{
-			return AAJEBIINPNL;
+			return perk;
 		}
 
-		private void NOLDHAFMOLF(ProfilePerk value)
+		private void SetPerk(ProfilePerk value)
 		{
-			AAJEBIINPNL = value;
+			perk = value;
 		}
 
 		public void Init(ProfilePerk AEFFHJGMNFI, int OKNNNLIPODI)
@@ -56,31 +56,31 @@ namespace Nekki.SF2.GUI.Profile
 			Init(OKNNNLIPODI);
 			_upgradeLevelIcon.gameObject.SetActive(false);
 			Clear();
-			NOLDHAFMOLF(AEFFHJGMNFI);
+			SetPerk(AEFFHJGMNFI);
 			if (get_Perk() != null)
 			{
-				get_Perk().AddEventListener(0, NBJIGFCBEAL);
-				get_Perk().AddEventListener(1, DILLOCHIAOL);
-				get_Perk().AddEventListener(2, IKNEDPAJELH);
-				get_Perk().AddEventListener(3, BAKFAGENODP);
+				get_Perk().AddEventListener(0, OnPerkStateChanged);
+				get_Perk().AddEventListener(1, OnPerkRemoved);
+				get_Perk().AddEventListener(2, OnPerkUpgraded);
+				get_Perk().AddEventListener(3, OnPerkChanged);
 			}
-			_dlg = ADLHFBEOJPB;
-			BJONHDGCNFE = MGJFIMFODOM();
+			_dlg = OnImproveClicked;
+			infoAnimation = FindInfoAnimation();
 			if (get_Perk() != null)
 			{
-				JLANLOEGGEP = new KAHIFHMHDAF(get_Perk().KAMBOKLFBEE(), get_Perk().GJOAJAIJHOE(), get_Perk().FLBBFDNHJAJ(), _dlg, BJONHDGCNFE);
-				Data = JLANLOEGGEP;
+				perkInfo = new PerkContentData(get_Perk().GetPerkName(), get_Perk().GetDescription(), get_Perk().GetState(), _dlg, infoAnimation);
+				Data = perkInfo;
 			}
-			GJPJJHACOJJ = ((get_Perk() == null) ? string.Empty : get_Perk().OPIOIHAPMDG());
-			DCHFLKPBOBB = false;
-			EODJNKFPEHH = false;
-			BHKAAODJMJF = ProfileGUI.OJEAKFALOGE.EBDBPJNBHGI / 255f;
-			CDNOKAKOLMP = ProfileGUI.OJEAKFALOGE.DPGMCKCDMBC / 255f;
-			FOPPGHBAKHJ(true);
+			spriteName = ((get_Perk() == null) ? string.Empty : get_Perk().GetImageName());
+			isPerkChosen = false;
+			isForcedLocked = false;
+			iconMaxOpacity = ProfileGUI.PerkOpacity.Max / 255f;
+			iconMinOpacity = ProfileGUI.PerkOpacity.Min / 255f;
+			SetBackPictureVisible(true);
 			UpdateIcon();
 			UpdateState();
-			EJFGMHPJHGI();
-			if (ListSF.CCDKHLAMKKO().PINDEKDNCNL() < AEFFHJGMNFI.PINDEKDNCNL())
+			UpdateLevelIcon();
+			if (ListSF.GetRoster().GetLevel() < AEFFHJGMNFI.GetLevel())
 			{
 				SetLock(true);
 			}
@@ -96,29 +96,29 @@ namespace Nekki.SF2.GUI.Profile
 		{
 			if (get_Perk() != null)
 			{
-				get_Perk().RemoveEventListener(0, NBJIGFCBEAL);
-				get_Perk().RemoveEventListener(1, DILLOCHIAOL);
-				get_Perk().RemoveEventListener(2, IKNEDPAJELH);
-				get_Perk().RemoveEventListener(3, BAKFAGENODP);
+				get_Perk().RemoveEventListener(0, OnPerkStateChanged);
+				get_Perk().RemoveEventListener(1, OnPerkRemoved);
+				get_Perk().RemoveEventListener(2, OnPerkUpgraded);
+				get_Perk().RemoveEventListener(3, OnPerkChanged);
 			}
 		}
 
 		public override void SetLock(bool AJPDLMOHKEN)
 		{
-			EODJNKFPEHH = AJPDLMOHKEN;
-			base.SetLock(EODJNKFPEHH || (get_Perk() != null && get_Perk().FLBBFDNHJAJ() == ProfilePerk.KMHBPKKCNPP.PERK_LOCK));
+			isForcedLocked = AJPDLMOHKEN;
+			base.SetLock(isForcedLocked || (get_Perk() != null && get_Perk().GetState() == ProfilePerk.ProfilePerkState.PERK_LOCK));
 		}
 
 		public override bool GetLock()
 		{
-			return EODJNKFPEHH || get_Perk() == null || get_Perk().FLBBFDNHJAJ() == ProfilePerk.KMHBPKKCNPP.PERK_LOCK;
+			return isForcedLocked || get_Perk() == null || get_Perk().GetState() == ProfilePerk.ProfilePerkState.PERK_LOCK;
 		}
 
 		public override void Choose()
 		{
 			if (get_Perk() != null)
 			{
-				((KAHIFHMHDAF)Data).state = get_Perk().FLBBFDNHJAJ();
+				((PerkContentData)Data).state = get_Perk().GetState();
 			}
 			base.Choose();
 		}
@@ -129,42 +129,42 @@ namespace Nekki.SF2.GUI.Profile
 			{
 				return;
 			}
-			switch (get_Perk().FLBBFDNHJAJ())
+			switch (get_Perk().GetState())
 			{
-			case ProfilePerk.KMHBPKKCNPP.PERK_AVAILABLE:
-				DCHFLKPBOBB = false;
+			case ProfilePerk.ProfilePerkState.PERK_AVAILABLE:
+				isPerkChosen = false;
 				SetActive(true);
 				break;
-			case ProfilePerk.KMHBPKKCNPP.PERK_UNAVAILABLE:
-				DCHFLKPBOBB = false;
+			case ProfilePerk.ProfilePerkState.PERK_UNAVAILABLE:
+				isPerkChosen = false;
 				if ((bool)_icon)
 				{
-					UIExtensions.HNIHBGAOAIH(_icon, BHKAAODJMJF);
+					UIExtensions.SetAlpha(_icon, iconMaxOpacity);
 				}
 				SetActive(false);
 				break;
-			case ProfilePerk.KMHBPKKCNPP.PERK_SELECTED:
-				DCHFLKPBOBB = true;
+			case ProfilePerk.ProfilePerkState.PERK_SELECTED:
+				isPerkChosen = true;
 				if ((bool)_icon)
 				{
-					UIExtensions.HNIHBGAOAIH(_icon, BHKAAODJMJF);
+					UIExtensions.SetAlpha(_icon, iconMaxOpacity);
 				}
 				SetActive(true);
 				break;
-			case ProfilePerk.KMHBPKKCNPP.PERK_LOCK:
+			case ProfilePerk.ProfilePerkState.PERK_LOCK:
 				SetActive(true);
 				SetSelected(false);
 				break;
 			}
-			SetLock(EODJNKFPEHH);
-			if (!IIPJNGBMJJP)
+			SetLock(isForcedLocked);
+			if (!isLocked)
 			{
 			}
 		}
 
 		public bool IsInfoAnimation()
 		{
-			return BJONHDGCNFE != null;
+			return infoAnimation != null;
 		}
 
 		public override void OnPointerDown(PointerEventData BHOLFGOGPCP)
@@ -175,108 +175,108 @@ namespace Nekki.SF2.GUI.Profile
 			}
 		}
 
-		protected override void FGICHADOEHF()
+		protected override void UpdateSelectedFlash()
 		{
-			base.FGICHADOEHF();
-			if (get_Perk() != null && get_Perk().FLBBFDNHJAJ() == ProfilePerk.KMHBPKKCNPP.PERK_AVAILABLE)
+			base.UpdateSelectedFlash();
+			if (get_Perk() != null && get_Perk().GetState() == ProfilePerk.ProfilePerkState.PERK_AVAILABLE)
 			{
-				AJGODMIMDDP();
+				UpdateIconFlash();
 			}
 		}
 
-		protected InfoAnimation MGJFIMFODOM()
+		protected InfoAnimation FindInfoAnimation()
 		{
 			if (get_Perk() == null)
 			{
 				return null;
 			}
-			List<Trick> list = AnimationData.BFNFDDLNHPA();
+			List<Trick> list = AnimationData.GetTricks();
 			for (int i = 0; i < list.Count; i++)
 			{
-				if (get_Perk().DFOELJAEEGG() != null && list[i].Name == get_Perk().DFOELJAEEGG().JNBECGKCNBB)
+				if (get_Perk().GetPerkInfo() != null && list[i].Name == get_Perk().GetPerkInfo().MoveName)
 				{
-					return list[i].KJHMOGGECBN;
+					return list[i].Animation;
 				}
 			}
 			return null;
 		}
 
-		protected bool FNALAKIPMBN()
+		protected bool IsPerkSelected()
 		{
-			return get_Perk() != null && get_Perk().FLBBFDNHJAJ() == ProfilePerk.KMHBPKKCNPP.PERK_SELECTED;
+			return get_Perk() != null && get_Perk().GetState() == ProfilePerk.ProfilePerkState.PERK_SELECTED;
 		}
 
-		protected bool IMNGDPMMNMJ()
+		protected bool IsPerkUnavailable()
 		{
-			return get_Perk() != null && get_Perk().FLBBFDNHJAJ() == ProfilePerk.KMHBPKKCNPP.PERK_UNAVAILABLE;
+			return get_Perk() != null && get_Perk().GetState() == ProfilePerk.ProfilePerkState.PERK_UNAVAILABLE;
 		}
 
-		protected string BGDKCEBADDL()
+		protected string GetLevelSpriteName()
 		{
-			int num = ((get_Perk() == null) ? 1 : get_Perk().LMGGMMFEODJ());
+			int num = ((get_Perk() == null) ? 1 : get_Perk().GetUpgradeLevel());
 			string text = "ProfilePieces.level";
 			return text + num;
 		}
 
-		protected void EJFGMHPJHGI()
+		protected void UpdateLevelIcon()
 		{
 			if (get_Perk() != null)
 			{
-				bool flag = get_Perk().LMGGMMFEODJ() <= 0;
-				ProfilePerk.JHDKDOPHGOO jHDKDOPHGOO = get_Perk().get_Type();
-				bool flag2 = get_Perk().LMGGMMFEODJ() == 1 && jHDKDOPHGOO != ProfilePerk.JHDKDOPHGOO.TYPE_UPGRADE && jHDKDOPHGOO != ProfilePerk.JHDKDOPHGOO.TYPE_PERK_SELETED;
+				bool flag = get_Perk().GetUpgradeLevel() <= 0;
+				ProfilePerk.ProfilePerkType jHDKDOPHGOO = get_Perk().get_Type();
+				bool flag2 = get_Perk().GetUpgradeLevel() == 1 && jHDKDOPHGOO != ProfilePerk.ProfilePerkType.TYPE_UPGRADE && jHDKDOPHGOO != ProfilePerk.ProfilePerkType.TYPE_PERK_SELETED;
 				if (!flag && !flag2)
 				{
 					_upgradeLevelIcon.gameObject.SetActive(true);
-					string spriteName = BGDKCEBADDL();
+					string spriteName = GetLevelSpriteName();
 					_upgradeLevelIcon.set_SpriteName(spriteName);
 					float num = 95f;
 					float num2 = -34f;
-					_upgradeLevelIcon.transform.OKHPLHPBPKJ(num + num2);
-					_upgradeLevelIcon.transform.BGNJGIACJBG(0f - (num + num2));
+					_upgradeLevelIcon.transform.SetLocalX(num + num2);
+					_upgradeLevelIcon.transform.SetLocalY(0f - (num + num2));
 				}
 			}
 		}
 
-		protected void BMDLJNPHPGF()
+		protected void RefreshPerkInfo()
 		{
-			BJONHDGCNFE = MGJFIMFODOM();
-			if (JLANLOEGGEP != null && get_Perk() != null)
+			infoAnimation = FindInfoAnimation();
+			if (perkInfo != null && get_Perk() != null)
 			{
-				JLANLOEGGEP.name = get_Perk().KAMBOKLFBEE();
-				JLANLOEGGEP.EMDJGBHIAIA = get_Perk().GJOAJAIJHOE();
-				JLANLOEGGEP.state = get_Perk().FLBBFDNHJAJ();
-				JLANLOEGGEP.HCBDNEOKGNK = BJONHDGCNFE;
+				perkInfo.name = get_Perk().GetPerkName();
+				perkInfo.description = get_Perk().GetDescription();
+				perkInfo.state = get_Perk().GetState();
+				perkInfo.Animation = infoAnimation;
 			}
 		}
 
-		private void ADLHFBEOJPB(object data)
+		private void OnImproveClicked(object data)
 		{
 			CallEvent(12, this);
 		}
 
-		private void NBJIGFCBEAL(object data)
+		private void OnPerkStateChanged(object data)
 		{
 			UpdateState();
 		}
 
-		private void DILLOCHIAOL(object data)
+		private void OnPerkRemoved(object data)
 		{
-			NOLDHAFMOLF(null);
+			SetPerk(null);
 		}
 
-		private void IKNEDPAJELH(object data)
+		private void OnPerkUpgraded(object data)
 		{
 			UpdateIcon();
 			UpdateState();
-			BMDLJNPHPGF();
-			EJFGMHPJHGI();
+			RefreshPerkInfo();
+			UpdateLevelIcon();
 		}
 
-		private void BAKFAGENODP(object data)
+		private void OnPerkChanged(object data)
 		{
-			BMDLJNPHPGF();
-			EJFGMHPJHGI();
+			RefreshPerkInfo();
+			UpdateLevelIcon();
 		}
 	}
 }

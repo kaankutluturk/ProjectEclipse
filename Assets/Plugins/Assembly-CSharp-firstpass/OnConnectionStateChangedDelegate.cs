@@ -1,0 +1,1 @@
+public delegate void OnConnectionStateChangedDelegate(Connection MDGFGCDPGFI, ConnectionStates JOBAGBFMMFP, ConnectionStates MPJEMGJIBBD);

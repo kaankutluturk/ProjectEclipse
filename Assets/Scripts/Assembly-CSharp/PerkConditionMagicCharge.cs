@@ -3,34 +3,34 @@ using System.Xml;
 
 public class PerkConditionMagicCharge : PerkConditionMatchMinMax
 {
-	private string KCIIELDOBOM;
+	private string _chargeType;
 
 	public PerkConditionMagicCharge()
 	{
-		set_Type(NHDGLPNNNLH.CONDITION_MAGIC_CHARGE);
+		set_Type(PerkConditionType.CONDITION_MAGIC_CHARGE);
 	}
 
 	public override void Parse(XmlNode node)
 	{
 		base.Parse(node);
-		FMKBHHJDHDM.Parse(node, this, JMDLAMHAJLN());
-		KCIIELDOBOM = node.Attributes["Type"].CIPOICEEIBK(string.Empty);
+		minMax.Parse(node, this, GetPerk());
+		_chargeType = node.Attributes["Type"].GetStringOrDefault(string.Empty);
 	}
 
 	public override bool IsEqual(Model ACENLMONNPA, List<string> NIKHAICFGNM)
 	{
-		Model fGCODGKLHED = EPCPGEPPHLO(ACENLMONNPA);
+		Model fGCODGKLHED = ResolveTargetModel(ACENLMONNPA);
 		if (ACENLMONNPA == null)
 		{
 			return false;
 		}
-		FMKBHHJDHDM.IBCPKBBAFNH();
+		minMax.EvaluateFunctions();
 		float num = fGCODGKLHED.GetMagicChargeFraction();
-		if (!FMKBHHJDHDM.KEMLMMPIPGJ() && FMKBHHJDHDM.PPCEOKCAEBD() > num)
+		if (!minMax.GetMinUnbounded() && minMax.GetMinValue() > num)
 		{
 			return false;
 		}
-		if (!FMKBHHJDHDM.HFGENILMBKK() && FMKBHHJDHDM.EFDLCJBJNPE() < num)
+		if (!minMax.GetMaxUnbounded() && minMax.GetMaxValue() < num)
 		{
 			return false;
 		}

@@ -12,11 +12,11 @@ public class BundlesUtil
 	public static void InitConfig(BundleConfig IBBOLEEKAOM)
 	{
 		currentConfig = IBBOLEEKAOM;
-		POLPLFHHEBD();
-		MGDLMCKLLKE();
+		UnloadDependencies();
+		LoadDependencies();
 	}
 
-	private static void POLPLFHHEBD()
+	private static void UnloadDependencies()
 	{
 		foreach (AssetBundle item in bundlesDependencies)
 		{
@@ -25,9 +25,9 @@ public class BundlesUtil
 		bundlesDependencies.Clear();
 	}
 
-	private static void MGDLMCKLLKE()
+	private static void LoadDependencies()
 	{
-		List<string> list = currentConfig.EJKPFLAIICC();
+		List<string> list = currentConfig.GetAllDependencies();
 		foreach (string item in list)
 		{
 			AssetBundle assetBundle = GetAssetBundle(item);
@@ -63,7 +63,7 @@ public class BundlesUtil
 		if (currentConfig != null)
 		{
 			AssetsData assetsData = currentConfig.GetAssetsData(path);
-			if (!path.BKOIKMEEHDK() && assetsData != null)
+			if (!path.IsNullOrEmpty() && assetsData != null)
 			{
 				AssetBundle result = GetAssetBundle(assetsData.BundleName);
 				path = assetsData.Path;
@@ -78,7 +78,7 @@ public class BundlesUtil
 		ResourcesUtil.UnloadAsset(AOMLCBHAJJH);
 	}
 
-	public static void KGNLHIKNDLL()
+	public static void UnloadUnusedAssets()
 	{
 	}
 
@@ -90,8 +90,8 @@ public class BundlesUtil
 		}
 		if (currentConfig != null)
 		{
-			string text = currentConfig.PPICPLCLIFE(name);
-			if (!text.BKOIKMEEHDK())
+			string text = currentConfig.GetBundlePath(name);
+			if (!text.IsNullOrEmpty())
 			{
 				AssetBundle assetBundle = AssetBundle.LoadFromFile(text);
 				if ((bool)assetBundle)

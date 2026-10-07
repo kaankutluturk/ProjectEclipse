@@ -4,13 +4,13 @@ using System.Xml;
 public class PerkActionSetTactics : PerkAction
 {
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private string PLGMJAFEELF;
+	private string _tactics;
 
-	public string DFJMOIDKKOB
+	public string TacticsName
 	{
 		get
 		{
-			return NLCLHLIPFFH();
+			return GetTactics();
 		}
 		protected set
 		{
@@ -25,23 +25,23 @@ public class PerkActionSetTactics : PerkAction
 	public PerkActionSetTactics(PerkActionSetTactics NOLFMPDGCOC)
 		: base(NOLFMPDGCOC)
 	{
-		set_Tactics(NOLFMPDGCOC.NLCLHLIPFFH());
+		set_Tactics(NOLFMPDGCOC.GetTactics());
 	}
 
-	public string NLCLHLIPFFH()
+	public string GetTactics()
 	{
-		return PLGMJAFEELF;
+		return _tactics;
 	}
 
 	protected void set_Tactics(string value)
 	{
-		PLGMJAFEELF = value;
+		_tactics = value;
 	}
 
 	public override void Parse(XmlNode node)
 	{
 		base.Parse(node);
 		set_Type(ActionType.ACTION_SET_TACTICS);
-		set_Tactics(node.Attributes["Name"].CIPOICEEIBK(string.Empty));
+		set_Tactics(node.Attributes["Name"].GetStringOrDefault(string.Empty));
 	}
 }

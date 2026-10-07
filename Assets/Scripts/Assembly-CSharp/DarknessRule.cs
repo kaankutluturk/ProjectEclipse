@@ -2,7 +2,7 @@ using System.Xml;
 
 public class DarknessRule : InFightRule
 {
-	public enum CPIDLPIBLHE
+	public enum DarknessStage
 	{
 		STAGE_BLACKOUT = 0,
 		STAGE_LASTING = 1,
@@ -10,46 +10,46 @@ public class DarknessRule : InFightRule
 		STAGE_PAUSE = 3
 	}
 
-	private LocationSelectorDarknessData HNPFNOPIIMJ = new LocationSelectorDarknessData();
+	private LocationSelectorDarknessData darknessData = new LocationSelectorDarknessData();
 
 	private bool _active;
 
 	private int _currentFrame;
 
-	private float MFBOIBHHOHE;
+	private float currentAlpha;
 
-	private float GJEHCPKKOLA;
+	private float fadeInStep;
 
-	private float GJENDIFGOAF;
+	private float fadeOutStep;
 
-	protected CPIDLPIBLHE HGCCKCCJBGG;
+	protected DarknessStage stage;
 
 	public DarknessRule(XmlNode node, RuleAppliance EJPOJJKKICO)
-		: base(BCBLLMPAMLP.RuleDarkness, EJPOJJKKICO, node)
+		: base(RuleType.RuleDarkness, EJPOJJKKICO, node)
 	{
-		HNPFNOPIIMJ = new LocationSelectorDarknessData();
-		HGCCKCCJBGG = CPIDLPIBLHE.STAGE_PAUSE;
+		darknessData = new LocationSelectorDarknessData();
+		stage = DarknessStage.STAGE_PAUSE;
 		_currentFrame = 0;
-		MFBOIBHHOHE = 0f;
+		currentAlpha = 0f;
 		_active = false;
-		EBJIKKBLBEM(FightEvent.RenderEvent);
+		SubscribeEvent(FightEvent.RenderEvent);
 		Parse(node);
 	}
 
 	public override void InitRule(object data)
 	{
 		_currentFrame = 0;
-		MFBOIBHHOHE = 0f;
+		currentAlpha = 0f;
 	}
 
-	public float CFNAMMODOAA()
+	public float GetAlpha()
 	{
-		return MFBOIBHHOHE;
+		return currentAlpha;
 	}
 
-	public LocationSelectorDarknessData DFBGCBOKCBG()
+	public LocationSelectorDarknessData GetDarknessData()
 	{
-		return HNPFNOPIIMJ;
+		return darknessData;
 	}
 
 	public override void SetActive(bool value)
@@ -61,30 +61,30 @@ public class DarknessRule : InFightRule
 	protected override bool CompareSingle(object data)
 	{
 		_currentFrame++;
-		if (_currentFrame <= HNPFNOPIIMJ.KCANPMPILKI)
+		if (_currentFrame <= darknessData.lightEndFrame)
 		{
 			if (!_active)
 			{
 				_currentFrame = 0;
 			}
-			MFBOIBHHOHE = 0f;
+			currentAlpha = 0f;
 		}
-		else if (_currentFrame <= HNPFNOPIIMJ.GFDMINCFBID)
+		else if (_currentFrame <= darknessData.darkeningEndFrame)
 		{
-			MFBOIBHHOHE = (float)(_currentFrame - HNPFNOPIIMJ.KCANPMPILKI) * GJEHCPKKOLA;
+			currentAlpha = (float)(_currentFrame - darknessData.lightEndFrame) * fadeInStep;
 		}
-		else if (_currentFrame <= HNPFNOPIIMJ.NDBJNFHDGOA)
+		else if (_currentFrame <= darknessData.darkEndFrame)
 		{
-			MFBOIBHHOHE = 255f;
+			currentAlpha = 255f;
 		}
-		else if (_currentFrame <= HNPFNOPIIMJ.NJBHKDBOEAI)
+		else if (_currentFrame <= darknessData.lightingEndFrame)
 		{
-			MFBOIBHHOHE = 255f - (float)(_currentFrame - HNPFNOPIIMJ.NDBJNFHDGOA) * GJENDIFGOAF;
+			currentAlpha = 255f - (float)(_currentFrame - darknessData.darkEndFrame) * fadeOutStep;
 		}
 		else
 		{
 			_currentFrame = 0;
-			MFBOIBHHOHE = 0f;
+			currentAlpha = 0f;
 		}
 		return true;
 	}
@@ -92,12 +92,12 @@ public class DarknessRule : InFightRule
 	protected override void Parse(XmlNode node)
 	{
 		base.Parse(node);
-		HNPFNOPIIMJ.KCANPMPILKI = node.Attributes["LightLasting"].ParseInt();
-		HNPFNOPIIMJ.GFDMINCFBID = HNPFNOPIIMJ.KCANPMPILKI + node.Attributes["DarkOn"].ParseInt();
-		HNPFNOPIIMJ.NDBJNFHDGOA = HNPFNOPIIMJ.GFDMINCFBID + node.Attributes["DarkLasting"].ParseInt();
-		HNPFNOPIIMJ.NJBHKDBOEAI = HNPFNOPIIMJ.NDBJNFHDGOA + node.Attributes["LightOn"].ParseInt();
-		GJEHCPKKOLA = 255f / (float)(HNPFNOPIIMJ.GFDMINCFBID - HNPFNOPIIMJ.KCANPMPILKI);
-		GJENDIFGOAF = 255f / (float)(HNPFNOPIIMJ.NJBHKDBOEAI - HNPFNOPIIMJ.NDBJNFHDGOA);
+		darknessData.lightEndFrame = node.Attributes["LightLasting"].ParseInt();
+		darknessData.darkeningEndFrame = darknessData.lightEndFrame + node.Attributes["DarkOn"].ParseInt();
+		darknessData.darkEndFrame = darknessData.darkeningEndFrame + node.Attributes["DarkLasting"].ParseInt();
+		darknessData.lightingEndFrame = darknessData.darkEndFrame + node.Attributes["LightOn"].ParseInt();
+		fadeInStep = 255f / (float)(darknessData.darkeningEndFrame - darknessData.lightEndFrame);
+		fadeOutStep = 255f / (float)(darknessData.lightingEndFrame - darknessData.darkEndFrame);
 	}
 
 	public override void Stop()
@@ -113,8 +113,8 @@ public class DarknessRule : InFightRule
 	public override InFightRule Copy()
 	{
 		InFightRule aAJIFBJLJOA = null;
-		RuleAppliance eJPOJJKKICO = EDAKADCHOLE();
-		XmlNode hKPPBKPJOEO = GIFDJEEGCJI().IOJIGDNFCFL();
+		RuleAppliance eJPOJJKKICO = GetAppliance();
+		XmlNode hKPPBKPJOEO = GetXmlSource().GetNode();
 		aAJIFBJLJOA = new DarknessRule(hKPPBKPJOEO, eJPOJJKKICO);
 		aAJIFBJLJOA.IsRandom = IsRandom;
 		return aAJIFBJLJOA;

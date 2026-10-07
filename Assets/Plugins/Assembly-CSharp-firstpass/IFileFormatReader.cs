@@ -1,10 +1,10 @@
 internal interface IFileFormatReader
 {
-	bool DJJBPAJHJFI(InputBuffer NILNDHEKNLJ);
+	bool ReadHeader(InputBuffer NILNDHEKNLJ);
 
-	bool BEPMEBNFAEL(InputBuffer NILNDHEKNLJ);
+	bool ReadFooter(InputBuffer NILNDHEKNLJ);
 
 	void UpdateWithBytesRead(byte[] buffer, int IPCOBJBKNAO, int OGAPEFFEHIH);
 
-	void FGCBJJKKILH();
+	void Validate();
 }

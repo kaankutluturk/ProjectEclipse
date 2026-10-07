@@ -1,7 +1,7 @@
 public class QuestActionGiveFreeRecipe : QuestAction
 {
-	public override void DEJMHFMLKIC(QuestParameters GFIHPBCEEOB)
+	public override void Execute(QuestParameters GFIHPBCEEOB)
 	{
-		OGIJONMKABB();
+		FinishAction();
 	}
 }

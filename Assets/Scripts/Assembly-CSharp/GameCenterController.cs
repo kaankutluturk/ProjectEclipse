@@ -8,43 +8,43 @@ public static class GameCenterController
 	{
 		get
 		{
-			return AOJJOEHEPGM();
+			return GetCurrent();
 		}
 	}
 
-	public static bool ABFAHBGHFOB
+	public static bool IsSupported
 	{
 		get
 		{
-			return EPACOIFEICA();
+			return GetIsSupported();
 		}
 	}
 
-	public static bool JLDADBGJMFA
+	public static bool CanAutoSignIn
 	{
 		get
 		{
-			return CPOLMPAAHOL();
+			return GetCanAutoSignIn();
 		}
 	}
 
-	public static bool FJBFKLDBMDD
+	public static bool IsAuthenticated
 	{
 		get
 		{
-			return OBDJPKOJADA();
+			return GetIsAuthenticated();
 		}
 	}
 
-	public static string FFNCAFDPLPL
+	public static string UserId
 	{
 		get
 		{
-			return CONEABALMEJ();
+			return GetUserId();
 		}
 	}
 
-	public static GameCenterAbstract AOJJOEHEPGM()
+	public static GameCenterAbstract GetCurrent()
 	{
 		if (_Current == null)
 		{
@@ -62,109 +62,109 @@ public static class GameCenterController
 		}
 	}
 
-	public static void PJNFHNFLNNO()
+	public static void Free()
 	{
-		AOJJOEHEPGM().PJNFHNFLNNO();
+		GetCurrent().Free();
 	}
 
-	public static bool EPACOIFEICA()
+	public static bool GetIsSupported()
 	{
-		return AOJJOEHEPGM().EPACOIFEICA();
+		return GetCurrent().GetIsSupported();
 	}
 
-	public static bool CPOLMPAAHOL()
+	public static bool GetCanAutoSignIn()
 	{
-		return AOJJOEHEPGM().CPOLMPAAHOL();
+		return GetCurrent().GetCanAutoSignIn();
 	}
 
-	public static void EFKOIIKEHDO()
+	public static void SignIn()
 	{
-		if (EPACOIFEICA())
+		if (GetIsSupported())
 		{
-			AOJJOEHEPGM().EFKOIIKEHDO();
+			GetCurrent().SignIn();
 		}
 	}
 
-	public static void CLPNGGPKAHO()
+	public static void SignOut()
 	{
-		if (EPACOIFEICA())
+		if (GetIsSupported())
 		{
-			AOJJOEHEPGM().CLPNGGPKAHO();
+			GetCurrent().SignOut();
 		}
 	}
 
-	public static bool OBDJPKOJADA()
+	public static bool GetIsAuthenticated()
 	{
-		if (EPACOIFEICA())
+		if (GetIsSupported())
 		{
-			return AOJJOEHEPGM().OBDJPKOJADA();
+			return GetCurrent().GetIsAuthenticated();
 		}
 		return false;
 	}
 
-	public static string CONEABALMEJ()
+	public static string GetUserId()
 	{
-		if (OBDJPKOJADA())
+		if (GetIsAuthenticated())
 		{
-			return SystemProperties.MakeIdentifier(AOJJOEHEPGM().CONEABALMEJ());
+			return SystemProperties.MakeIdentifier(GetCurrent().GetUserId());
 		}
 		return string.Empty;
 	}
 
 	public static void UnlockAchievement(string OKNNNLIPODI)
 	{
-		if (OBDJPKOJADA())
+		if (GetIsAuthenticated())
 		{
-			AOJJOEHEPGM().UnlockAchievement(OKNNNLIPODI);
+			GetCurrent().UnlockAchievement(OKNNNLIPODI);
 		}
 	}
 
-	public static void MIMPHPINBNF(string OKNNNLIPODI, double EPFBHJBNIHK)
+	public static void ReportAchievementProgress(string OKNNNLIPODI, double EPFBHJBNIHK)
 	{
-		if (OBDJPKOJADA())
+		if (GetIsAuthenticated())
 		{
-			AOJJOEHEPGM().MIMPHPINBNF(OKNNNLIPODI, EPFBHJBNIHK);
+			GetCurrent().ReportAchievementProgress(OKNNNLIPODI, EPFBHJBNIHK);
 		}
 	}
 
-	public static void NPMGIFJKAEG()
+	public static void ShowAchievements()
 	{
-		if (OBDJPKOJADA())
+		if (GetIsAuthenticated())
 		{
-			AOJJOEHEPGM().KGKPLKJPDAI();
+			GetCurrent().ShowAchievements();
 		}
 	}
 
-	public static void KBAPDJLNCJE()
+	public static void LoadAchievements()
 	{
-		if (OBDJPKOJADA())
+		if (GetIsAuthenticated())
 		{
-			AOJJOEHEPGM().KBAPDJLNCJE();
+			GetCurrent().LoadAchievements();
 		}
 	}
 
-	public static void MMGHEKOEHDB()
+	public static void ResetAchievements()
 	{
-		if (OBDJPKOJADA() || SystemProperties.LHGPKEFEHDH())
+		if (GetIsAuthenticated() || SystemProperties.IsEditorPlatform())
 		{
-			AOJJOEHEPGM().MMGHEKOEHDB();
+			GetCurrent().ResetAchievements();
 		}
 	}
 
-	public static bool GEJNIMAILDA()
+	public static bool IsFeatureAvailable()
 	{
 		return false;
 	}
 
-	public static void FLJILJDHNLJ(List<SocialAchievement> CIMGCGDDKCE)
+	public static void SyncAchievements(List<SocialAchievement> CIMGCGDDKCE)
 	{
 		foreach (SocialAchievement item in CIMGCGDDKCE)
 		{
-			if (item.value < item.MFODOCNLNPH)
+			if (item.value < item.TargetValue)
 			{
 				int num = 0;
 				num = item.value;
-				MIMPHPINBNF(item.name, num);
+				ReportAchievementProgress(item.name, num);
 			}
 			else
 			{

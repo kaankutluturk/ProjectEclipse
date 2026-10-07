@@ -5,7 +5,7 @@ public static class PerksCompiler
 {
 	public static void CompilePerks(ref XmlDocument EELFNMOHGJL, string PMFEIPCHENB)
 	{
-		EELFNMOHGJL = XmlUtils.OpenXMLDocument(PMFEIPCHENB, string.Empty, XmlUtils.EBLFEPIOMOL.ForcedResourced);
+		EELFNMOHGJL = XmlUtils.OpenXMLDocument(PMFEIPCHENB, string.Empty, XmlUtils.XmlSourceMode.ForcedResourced);
 		if (EELFNMOHGJL != null)
 		{
 			XmlNode xmlNode = EELFNMOHGJL["Perks"];
@@ -18,7 +18,7 @@ public static class PerksCompiler
 						continue;
 					}
 					List<string> list = new List<string>();
-					MDPJALEPMFI(childNode, xmlNode, list);
+					ResolveTemplates(childNode, xmlNode, list);
 					XmlAttribute xmlAttribute = childNode.Attributes["Template"];
 					if (xmlAttribute != null && list.Count > 0)
 					{
@@ -38,9 +38,9 @@ public static class PerksCompiler
 			}
 		}
 		AddIDs(EELFNMOHGJL);
-		if (SystemProperties.DBBOCENKMGD())
+		if (SystemProperties.IsDebug())
 		{
-			EELFNMOHGJL.Save(string.Format("{0}/{1}", SF2Paths.GBOFOFGDMBN(), "perks_result.xml"));
+			EELFNMOHGJL.Save(string.Format("{0}/{1}", SF2Paths.GetWritableGameDataPath(), "perks_result.xml"));
 		}
 	}
 
@@ -50,18 +50,18 @@ public static class PerksCompiler
 		{
 			if (childNode.Name.Equals("Perk"))
 			{
-				string value = childNode.Attributes["Name"].CIPOICEEIBK();
+				string value = childNode.Attributes["Name"].GetStringOrDefault();
 				if (PAGGPPPLPGC.Equals(value))
 				{
 					return childNode;
 				}
 			}
 		}
-		LLLOJBFMONN.Error("Perks: tactics template '{0}' not found", PAGGPPPLPGC);
+		GameLog.Error("Perks: tactics template '{0}' not found", PAGGPPPLPGC);
 		return null;
 	}
 
-	private static void KDMOFABEMLN(XmlNode OEMALIFPGPO, XmlNode BBNKIBKPBLO)
+	private static void CopyMissingAttributes(XmlNode OEMALIFPGPO, XmlNode BBNKIBKPBLO)
 	{
 		foreach (XmlAttribute attribute in BBNKIBKPBLO.Attributes)
 		{
@@ -69,12 +69,12 @@ public static class PerksCompiler
 			XmlAttribute xmlAttribute2 = OEMALIFPGPO.Attributes[name];
 			if (xmlAttribute2 == null)
 			{
-				OEMALIFPGPO.LCOLFMJJDJE(attribute);
+				OEMALIFPGPO.CopyAttribute(attribute);
 			}
 		}
 	}
 
-	private static void OKLPIDNNLJK(XmlNode OEMALIFPGPO, XmlNode BBNKIBKPBLO)
+	private static void MergeTemplateChildren(XmlNode OEMALIFPGPO, XmlNode BBNKIBKPBLO)
 	{
 		foreach (XmlNode childNode in BBNKIBKPBLO.ChildNodes)
 		{
@@ -82,16 +82,16 @@ public static class PerksCompiler
 			XmlNode xmlNode2 = OEMALIFPGPO["Set"];
 			if (name == "Trigger" || (name == "Set" && xmlNode2 == null))
 			{
-				OEMALIFPGPO.LCOLFMJJDJE(childNode);
+				OEMALIFPGPO.AppendImportedClone(childNode);
 			}
 			else if (name == "Set" && xmlNode2 != null)
 			{
-				KDMOFABEMLN(xmlNode2, childNode);
+				CopyMissingAttributes(xmlNode2, childNode);
 			}
 		}
 	}
 
-	private static void MDPJALEPMFI(XmlNode OEMALIFPGPO, XmlNode BBNKIBKPBLO, List<string> KLFLOKHIPLN)
+	private static void ResolveTemplates(XmlNode OEMALIFPGPO, XmlNode BBNKIBKPBLO, List<string> KLFLOKHIPLN)
 	{
 		List<string> list = new List<string>();
 		XmlAttribute xmlAttribute = OEMALIFPGPO.Attributes["Template"];
@@ -99,19 +99,19 @@ public static class PerksCompiler
 		{
 			return;
 		}
-		string text = xmlAttribute.CIPOICEEIBK();
+		string text = xmlAttribute.GetStringOrDefault();
 		list.AddRange(text.Split('|'));
-		list = list.KJCJIHJOLFC();
+		list = list.GetDistinct();
 		foreach (string item in list)
 		{
 			XmlNode xmlNode = GetTemplateNode(BBNKIBKPBLO, item);
 			if (xmlNode != null)
 			{
 				XmlDocument mEEAKLDGLDF = new XmlDocument();
-				XmlNode xmlNode2 = mEEAKLDGLDF.LCOLFMJJDJE(xmlNode);
-				MDPJALEPMFI(xmlNode2, BBNKIBKPBLO, KLFLOKHIPLN);
-				KDMOFABEMLN(OEMALIFPGPO, xmlNode2);
-				OKLPIDNNLJK(OEMALIFPGPO, xmlNode2);
+				XmlNode xmlNode2 = mEEAKLDGLDF.AppendImportedClone(xmlNode);
+				ResolveTemplates(xmlNode2, BBNKIBKPBLO, KLFLOKHIPLN);
+				CopyMissingAttributes(OEMALIFPGPO, xmlNode2);
+				MergeTemplateChildren(OEMALIFPGPO, xmlNode2);
 			}
 			KLFLOKHIPLN.Add(item);
 		}
@@ -129,7 +129,7 @@ public static class PerksCompiler
 		{
 			if (childNode.Name.Equals("Perk"))
 			{
-				childNode.IHNEFFHCDDJ("ID").Value = num.ToString();
+				childNode.PrependAttribute("ID").Value = num.ToString();
 				num++;
 			}
 		}

@@ -8,62 +8,62 @@ public class TextTimer : global::EventDispatcher<object>
 	{
 		public object Data;
 
-		private TextTimer OIHKOMFCFME;
+		private TextTimer _timer;
 
 		public long Time
 		{
 			get
 			{
-				return CCCIFDLEMPI();
+				return GetTime();
 			}
 			set
 			{
-				ABIELBGOLCA(value);
+				SetTime(value);
 			}
 		}
 
 		public TimerDataStruct(TextTimer EDAIGLJNLJE, object data = null)
 		{
 			Data = data;
-			OIHKOMFCFME = EDAIGLJNLJE;
+			_timer = EDAIGLJNLJE;
 		}
 
-		public long CCCIFDLEMPI()
+		public long GetTime()
 		{
-			return OIHKOMFCFME.Time;
+			return _timer.Time;
 		}
 
-		public void ABIELBGOLCA(long value)
+		public void SetTime(long value)
 		{
-			OIHKOMFCFME.Time = value;
+			_timer.Time = value;
 		}
 	}
 
-	public string HNECCLNDKJL = ":";
+	public string Delimiter = ":";
 
-	public string DEJKIIKMGAO = "d";
+	public string DaysString = "d";
 
-	public string ELFDOAOLMOA = string.Empty;
+	public string HoursString = string.Empty;
 
-	public bool CBCBKMHGLEF = true;
+	public bool IsSeconds = true;
 
-	public bool PMNNBLHOCPH = true;
+	public bool IsMinutes = true;
 
-	public bool KFMCBOHHFNH = true;
+	public bool IsHours = true;
 
-	public bool DAPJNFEGFJL;
+	public bool IsDays;
 
-	public bool NPODIGENMMO = true;
+	public bool UseDaysDelimiter = true;
 
-	public bool LHOKGJNFELC = true;
+	public bool IsSecondsZero = true;
 
-	public bool CLFKEPDADAM = true;
+	public bool IsMinutesZero = true;
 
-	public bool HAFGMOFEJGI = true;
+	public bool IsHoursZero = true;
 
-	public bool DNLOOJOACNE = true;
+	public bool IsDaysZero = true;
 
-	private TimerDataStruct MNOHGIGAMEB;
+	private TimerDataStruct _timerData;
 
 	public Color Color = Color.black;
 
@@ -78,10 +78,10 @@ public class TextTimer : global::EventDispatcher<object>
 	public TextTimer(Action<object> ODDEOFKLIAG = null)
 	{
 		Delegate = ODDEOFKLIAG;
-		MNOHGIGAMEB = new TimerDataStruct(this, _data);
+		_timerData = new TimerDataStruct(this, _data);
 	}
 
-	public object CHIGLEKCFFN()
+	public object GetData()
 	{
 		return _data;
 	}
@@ -89,10 +89,10 @@ public class TextTimer : global::EventDispatcher<object>
 	public void set_Data(object value)
 	{
 		_data = value;
-		MNOHGIGAMEB.Data = _data;
+		_timerData.Data = _data;
 	}
 
-	public TimerLabel EDAKEMEHFIC()
+	public TimerLabel GetLabel()
 	{
 		return _timerLabel;
 	}
@@ -106,11 +106,11 @@ public class TextTimer : global::EventDispatcher<object>
 		}
 	}
 
-	public void JLPMOKPFECK()
+	public void Refresh()
 	{
 		if (Delegate != null)
 		{
-			Delegate(MNOHGIGAMEB);
+			Delegate(_timerData);
 		}
 		if (_timerLabel != null)
 		{

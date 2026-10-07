@@ -8,7 +8,7 @@ namespace Nekki.SF2.GUI.Fight
 {
 	public class ViewerFight : SFMonoBehaviour<object>
 	{
-		public enum PLGDCJPCLPN
+		public enum ViewerButton
 		{
 			ButtonPause = 0,
 			ButtonPauseSurrender = 1,
@@ -20,7 +20,7 @@ namespace Nekki.SF2.GUI.Fight
 			ButtonCheatStartBenchmark = 7
 		}
 
-		public enum NPGEGIEDHDG
+		public enum ViewerEvent
 		{
 			OnButtonClicked = 0
 		}
@@ -41,38 +41,38 @@ namespace Nekki.SF2.GUI.Fight
 		private ScreenModel rightModel;
 
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		private ComboStatistic MFKEFBLNKNL;
+		private ComboStatistic leftStatistic;
 
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		private ComboStatistic JENIPIOPHAC;
+		private ComboStatistic rightStatistic;
 
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		private Round ICFBILLNEMJ;
+		private Round round;
 
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		private bool ABCAFNFBPBD;
+		private bool isPlaying;
 
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		private bool KLIBLBIFEHC;
+		private bool isPauseAllowed;
 
 		private PointsTable pointsTable;
 
-		private ObscuredInt ENKHHGEMJCK = (ObscuredInt)(0);
+		private ObscuredInt timeCountFrames = (ObscuredInt)(0);
 
-		private ObscuredInt NFEMKPCLDDB = (ObscuredInt)(0);
+		private ObscuredInt timeSeconds = (ObscuredInt)(0);
 
 		/// <summary>Eclipse training: sets the round clock back to <paramref name="seconds"/>.</summary>
 		internal void RefillTime(int seconds)
 		{
-			ENKHHGEMJCK = (ObscuredInt)(seconds * 60);
-			NFEMKPCLDDB = (ObscuredInt)seconds;
+			timeCountFrames = (ObscuredInt)(seconds * 60);
+			timeSeconds = (ObscuredInt)seconds;
 		}
 
-		private Vector2 AKMAGAEENDB = new Vector2(-700f, 580f);
+		private Vector2 leftModelPosition = new Vector2(-700f, 580f);
 
-		private Vector2 JGKDIFJLHGO = new Vector2(700f, 580f);
+		private Vector2 rightModelPosition = new Vector2(700f, 580f);
 
-		public ScreenModel FAGKJCDPLNC
+		public ScreenModel LeftScreenModel
 		{
 			get
 			{
@@ -80,7 +80,7 @@ namespace Nekki.SF2.GUI.Fight
 			}
 		}
 
-		public ScreenModel CDMLHDLFONH
+		public ScreenModel RightScreenModel
 		{
 			get
 			{
@@ -88,55 +88,55 @@ namespace Nekki.SF2.GUI.Fight
 			}
 		}
 
-		private ComboStatistic JKEGIADAKJG
+		private ComboStatistic LeftStatistics
 		{
 			get
 			{
-				return LMPCEACEPNB();
+				return GetLeftStatistic();
 			}
 			set
 			{
-				FIPBKELAEKH(value);
+				SetLeftStatistic(value);
 			}
 		}
 
-		private ComboStatistic KMDCOGOGKKD
+		private ComboStatistic RightStatistics
 		{
 			get
 			{
-				return NMOOOABHGJD();
+				return GetRightStatistic();
 			}
 			set
 			{
-				AHBGKOHAHFL(value);
+				SetRightStatistic(value);
 			}
 		}
 
-		private bool EKEPPACCCPI
+		private bool IsPlaying
 		{
 			get
 			{
-				return NMEEPBDJHMG();
+				return GetIsPlaying();
 			}
 			set
 			{
-				HEIGKEGAJAB(value);
+				SetIsPlaying(value);
 			}
 		}
 
-		private bool KAJMPFJDMIF
+		private bool IsPauseAllowed
 		{
 			get
 			{
-				return BGLPIGEPBKM();
+				return GetIsPauseAllowed();
 			}
 			set
 			{
-				CDGCDIJDODF(value);
+				SetIsPauseAllowed(value);
 			}
 		}
 
-		public int FNKJPCPJJLN
+		public int RoundTimeSeconds
 		{
 			get
 			{
@@ -144,7 +144,7 @@ namespace Nekki.SF2.GUI.Fight
 			}
 		}
 
-		public int MBPCDFMMJDJ
+		public int RoundTimeFrames
 		{
 			get
 			{
@@ -152,7 +152,7 @@ namespace Nekki.SF2.GUI.Fight
 			}
 		}
 
-		public ObscuredInt OLOOFCNJDKF
+		public ObscuredInt RemainingFrames
 		{
 			get
 			{
@@ -160,7 +160,7 @@ namespace Nekki.SF2.GUI.Fight
 			}
 		}
 
-		public ObscuredInt KOMGBAOGMNF
+		public ObscuredInt RemainingSeconds
 		{
 			get
 			{
@@ -178,99 +178,99 @@ namespace Nekki.SF2.GUI.Fight
 			return rightModel;
 		}
 
-		private ComboStatistic LMPCEACEPNB()
+		private ComboStatistic GetLeftStatistic()
 		{
-			return MFKEFBLNKNL;
+			return leftStatistic;
 		}
 
-		private void FIPBKELAEKH(ComboStatistic value)
+		private void SetLeftStatistic(ComboStatistic value)
 		{
-			MFKEFBLNKNL = value;
+			leftStatistic = value;
 		}
 
-		private ComboStatistic NMOOOABHGJD()
+		private ComboStatistic GetRightStatistic()
 		{
-			return JENIPIOPHAC;
+			return rightStatistic;
 		}
 
-		private void AHBGKOHAHFL(ComboStatistic value)
+		private void SetRightStatistic(ComboStatistic value)
 		{
-			JENIPIOPHAC = value;
+			rightStatistic = value;
 		}
 
-		private Round DKDGOOLAAKN()
+		private Round GetRound()
 		{
-			return ICFBILLNEMJ;
+			return round;
 		}
 
 		private void set_Round(Round value)
 		{
-			ICFBILLNEMJ = value;
+			round = value;
 		}
 
-		private bool NMEEPBDJHMG()
+		private bool GetIsPlaying()
 		{
-			return ABCAFNFBPBD;
+			return isPlaying;
 		}
 
-		private void HEIGKEGAJAB(bool value)
+		private void SetIsPlaying(bool value)
 		{
-			ABCAFNFBPBD = value;
+			isPlaying = value;
 		}
 
-		private bool BGLPIGEPBKM()
+		private bool GetIsPauseAllowed()
 		{
-			return KLIBLBIFEHC;
+			return isPauseAllowed;
 		}
 
-		private void CDGCDIJDODF(bool value)
+		private void SetIsPauseAllowed(bool value)
 		{
-			KLIBLBIFEHC = value;
+			isPauseAllowed = value;
 		}
 
 		public int get_RoundTimeTotal()
 		{
-			return (DKDGOOLAAKN() != null) ? DKDGOOLAAKN().timeTotal : 0;
+			return (GetRound() != null) ? GetRound().timeTotal : 0;
 		}
 
 		public int get_RoundTimeTotalFrames()
 		{
-			return (DKDGOOLAAKN() != null) ? (DKDGOOLAAKN().timeTotal * 60) : 0;
+			return (GetRound() != null) ? (GetRound().timeTotal * 60) : 0;
 		}
 
 		public ObscuredInt get_TimeCount()
 		{
-			return ENKHHGEMJCK;
+			return timeCountFrames;
 		}
 
 		public ObscuredInt get_TimeSecond()
 		{
-			return NFEMKPCLDDB;
+			return timeSeconds;
 		}
 
 		public void RandomizeObscuredVars()
 		{
-			ENKHHGEMJCK.GMCADPGOCHM();
-			NFEMKPCLDDB.GMCADPGOCHM();
+			timeCountFrames.RandomizeCryptoKey();
+			timeSeconds.RandomizeCryptoKey();
 		}
 
 		public void PreInit(ComboStatistic AIOMDIAFHGB, ComboStatistic MJOHDCPCCKB)
 		{
             if (btnPause != null) Eclipse.UI.BattleTouchControls.ApplyPlatformVisibility(btnPause.gameObject);
-			FIPBKELAEKH(AIOMDIAFHGB);
-			AHBGKOHAHFL(MJOHDCPCCKB);
+			SetLeftStatistic(AIOMDIAFHGB);
+			SetRightStatistic(MJOHDCPCCKB);
 			set_Round(null);
-			HEIGKEGAJAB(false);
-			CDGCDIJDODF(true);
-			ApplicationController.add_OnPause(ANJFIAHNKAD);
+			SetIsPlaying(false);
+			SetIsPauseAllowed(true);
+			ApplicationController.add_OnPause(OnApplicationPaused);
 		}
 
 		private void OnDestroy()
 		{
-			ApplicationController.remove_OnPause(ANJFIAHNKAD);
+			ApplicationController.remove_OnPause(OnApplicationPaused);
 		}
 
-		private void ANJFIAHNKAD(bool OIBJJLBCEHA)
+		private void OnApplicationPaused(bool OIBJJLBCEHA)
 		{
 			if (OIBJJLBCEHA)
 			{
@@ -287,25 +287,25 @@ namespace Nekki.SF2.GUI.Fight
 				roundTimer.verticalOverflow = VerticalWrapMode.Overflow;
 			}
 			set_Round(round);
-			JJDPIAPJOHO();
-			CGEKLPLKIDC(leftModel, GKCDEPEKKEL, ENCAKAAMEPN, AKMAGAEENDB, "LeftModel");
-			CGEKLPLKIDC(rightModel, GJMOIENEDPB, ENCAKAAMEPN, JGKDIFJLHGO, "RightModel");
-			if (LMPCEACEPNB() != null && leftModel != null)
+			DisablePauseButton();
+			InitModel(leftModel, GKCDEPEKKEL, ENCAKAAMEPN, leftModelPosition, "LeftModel");
+			InitModel(rightModel, GJMOIENEDPB, ENCAKAAMEPN, rightModelPosition, "RightModel");
+			if (GetLeftStatistic() != null && leftModel != null)
 			{
-				leftModel.Statistic = LMPCEACEPNB();
+				leftModel.Statistic = GetLeftStatistic();
 			}
-			if (NMOOOABHGJD() != null && rightModel != null)
+			if (GetRightStatistic() != null && rightModel != null)
 			{
-				rightModel.Statistic = NMOOOABHGJD();
+				rightModel.Statistic = GetRightStatistic();
 			}
-			if (SystemProperties.DBBOCENKMGD())
+			if (SystemProperties.IsDebug())
 			{
-				FOLOMAHFFLG();
+				CreateBenchmarkButton();
 			}
 			Reset();
 		}
 
-		private void JJDPIAPJOHO()
+		private void DisablePauseButton()
 		{
 			if (btnPause != null)
 			{
@@ -313,7 +313,7 @@ namespace Nekki.SF2.GUI.Fight
 			}
 		}
 
-		private void FOLOMAHFFLG()
+		private void CreateBenchmarkButton()
 		{
 			GameObject gameObject = new GameObject("BenchmarkButton");
 			RectTransform rectTransform = gameObject.AddComponent<RectTransform>();
@@ -329,75 +329,75 @@ namespace Nekki.SF2.GUI.Fight
 			image.color = new Color(1f, 1f, 1f, 0f);
 			Button button = gameObject.AddComponent<Button>();
 			button.transition = Selectable.Transition.None;
-			button.onClick.AddListener(EAOAGOBOAFM);
+			button.onClick.AddListener(OnBenchmarkClicked);
 		}
 
-		private void CGEKLPLKIDC(ScreenModel ACENLMONNPA, ModelParameters KKNOCIPBIIK, bool ENCAKAAMEPN, Vector2 LCCLEFMKLPB, string name)
+		private void InitModel(ScreenModel ACENLMONNPA, ModelParameters KKNOCIPBIIK, bool ENCAKAAMEPN, Vector2 LCCLEFMKLPB, string name)
 		{
-			KKNOCIPBIIK.HJNOICKOFDL = DKDGOOLAAKN().roundTotal;
+			KKNOCIPBIIK.RoundTotal = GetRound().roundTotal;
 			ACENLMONNPA.Init(KKNOCIPBIIK, ENCAKAAMEPN);
 			ACENLMONNPA.AddEventListener(2, OnClickCheat);
 		}
 
 		private void OnClickCheat(object data)
 		{
-			PLGDCJPCLPN pLGDCJPCLPN = (((ScreenModel.JEDPGMIGGKK)data != ScreenModel.JEDPGMIGGKK.TYPE_LEFT) ? PLGDCJPCLPN.ButtonCheatLoseFight : PLGDCJPCLPN.ButtonCheatWinFight);
+			ViewerButton pLGDCJPCLPN = (((ScreenModel.ScreenSide)data != ScreenModel.ScreenSide.TYPE_LEFT) ? ViewerButton.ButtonCheatLoseFight : ViewerButton.ButtonCheatWinFight);
 			CallEvent(0, pLGDCJPCLPN);
 		}
 
-		private void EAOAGOBOAFM()
+		private void OnBenchmarkClicked()
 		{
-			CallEvent(0, PLGDCJPCLPN.ButtonCheatStartBenchmark);
+			CallEvent(0, ViewerButton.ButtonCheatStartBenchmark);
 		}
 
 		public void Render()
 		{
-			if (NMEEPBDJHMG())
+			if (GetIsPlaying())
 			{
-				if (DKDGOOLAAKN().processing)
+				if (GetRound().processing)
 				{
-					EGKFCDIMBAB();
+					TickTimer();
 				}
 				if (leftModel != null)
 				{
-					leftModel.Render(DKDGOOLAAKN().processing);
+					leftModel.Render(GetRound().processing);
 				}
 				if (rightModel != null)
 				{
-					rightModel.Render(DKDGOOLAAKN().processing);
+					rightModel.Render(GetRound().processing);
 				}
 			}
 			if (leftModel != null)
 			{
-				leftModel.FEMAFNBEFAG();
+				leftModel.RenderActivePerks();
 			}
 			if (rightModel != null)
 			{
-				rightModel.FEMAFNBEFAG();
+				rightModel.RenderActivePerks();
 			}
 		}
 
-		private void EGKFCDIMBAB()
+		private void TickTimer()
 		{
-			ENKHHGEMJCK = (ObscuredInt)((ObscuredInt)(ENKHHGEMJCK) - 1);
-			NFEMKPCLDDB = (ObscuredInt)((ObscuredInt)(ENKHHGEMJCK) / 60);
+			timeCountFrames = (ObscuredInt)((ObscuredInt)(timeCountFrames) - 1);
+			timeSeconds = (ObscuredInt)((ObscuredInt)(timeCountFrames) / 60);
 			if (roundTimer != null)
 			{
-				if ((ObscuredInt)(NFEMKPCLDDB) < 10)
+				if ((ObscuredInt)(timeSeconds) < 10)
 				{
-					roundTimer.set_text(string.Format("0{0}", Mathf.Max(0, (ObscuredInt)(NFEMKPCLDDB)).ToString()));
+					roundTimer.set_text(string.Format("0{0}", Mathf.Max(0, (ObscuredInt)(timeSeconds)).ToString()));
 				}
 				else
 				{
-					roundTimer.set_text(Mathf.Max(0, (ObscuredInt)(NFEMKPCLDDB)).ToString());
+					roundTimer.set_text(Mathf.Max(0, (ObscuredInt)(timeSeconds)).ToString());
 				}
 			}
 		}
 
 		public void Reset()
 		{
-			HEIGKEGAJAB(false);
-			ENKHHGEMJCK = (ObscuredInt)(DKDGOOLAAKN().timeTotal * 60 + 1);
+			SetIsPlaying(false);
+			timeCountFrames = (ObscuredInt)(GetRound().timeTotal * 60 + 1);
 			if (leftModel != null)
 			{
 				leftModel.Reset();
@@ -406,7 +406,7 @@ namespace Nekki.SF2.GUI.Fight
 			{
 				rightModel.Reset();
 			}
-			EGKFCDIMBAB();
+			TickTimer();
 			if (btnPause != null)
 			{
 				btnPause.interactable = false;
@@ -415,23 +415,23 @@ namespace Nekki.SF2.GUI.Fight
 
 		public void RenderComboModel()
 		{
-			if (NMEEPBDJHMG())
+			if (GetIsPlaying())
 			{
 				if (leftModel != null)
 				{
-					leftModel.CPPACKAIGEK();
+					leftModel.RenderComboModel();
 				}
 				if (rightModel != null)
 				{
-					rightModel.CPPACKAIGEK();
+					rightModel.RenderComboModel();
 				}
 			}
 		}
 
 		public void Play()
 		{
-			DKDGOOLAAKN().processing = true;
-			HEIGKEGAJAB(true);
+			GetRound().processing = true;
+			SetIsPlaying(true);
 			if (btnPause != null)
 			{
 				btnPause.interactable = true;
@@ -448,28 +448,28 @@ namespace Nekki.SF2.GUI.Fight
 			ScreenModel screenModel2 = ((LFLGCDNKNJI != 0) ? rightModel : leftModel);
 			if (EPKEEMFHHFM)
 			{
-				screenModel.DCFGPCHGHBC();
+				screenModel.AddShockCombo();
 			}
 			if (OOGIBOBMGJA)
 			{
-				screenModel.LFGCIFEHDMI();
+				screenModel.AddCriticalCombo();
 			}
 			if (!OOCLHFGEPML)
 			{
-				screenModel.CBJBDHGHJEB(IFPDGKDKJOD);
+				screenModel.UpdateStyle(IFPDGKDKJOD);
 				if (isFirstStrike)
 				{
-					screenModel.ODLBDJKMDOJ();
+					screenModel.AddFirstStrikeCombo();
 				}
 				if (FABADFPDLPG)
 				{
-					screenModel.MKHJLNAFLFN();
+					screenModel.AddHeadStrikeCombo();
 				}
 				screenModel2.IsNoBlock = false;
 			}
 			else
 			{
-				screenModel.NJMJGDDBKOB();
+				screenModel.NotifyStyleChanged();
 			}
 		}
 
@@ -477,11 +477,11 @@ namespace Nekki.SF2.GUI.Fight
 		{
 			if (leftModel != null)
 			{
-				leftModel.GMFBMONNILL();
+				leftModel.UpdateVictories();
 			}
 			if (rightModel != null)
 			{
-				rightModel.GMFBMONNILL();
+				rightModel.UpdateVictories();
 			}
 		}
 
@@ -490,13 +490,13 @@ namespace Nekki.SF2.GUI.Fight
 			base.gameObject.SetActive(value);
 			if (btnPause != null)
 			{
-				btnPause.gameObject.SetActive(BGLPIGEPBKM() && value);
+				btnPause.gameObject.SetActive(GetIsPauseAllowed() && value);
 			}
 		}
 
 		public void PauseVisible(bool value)
 		{
-			CDGCDIJDODF(value);
+			SetIsPauseAllowed(value);
 			if (btnPause != null)
 			{
 				btnPause.gameObject.SetActive(value);
@@ -505,7 +505,7 @@ namespace Nekki.SF2.GUI.Fight
 
 		public void PausePress()
 		{
-			CallEvent(0, PLGDCJPCLPN.ButtonPause);
+			CallEvent(0, ViewerButton.ButtonPause);
 		}
 
 		public void UpdateHotGroundTimer(int time, RuleAppliance EJPOJJKKICO)
@@ -541,11 +541,11 @@ namespace Nekki.SF2.GUI.Fight
 		{
 			if (leftModel != null)
 			{
-				leftModel.JAIAMEKBNCE(value);
+				leftModel.SetFightPaused(value);
 			}
 			if (rightModel != null)
 			{
-				rightModel.JAIAMEKBNCE(value);
+				rightModel.SetFightPaused(value);
 			}
 		}
 
@@ -556,23 +556,23 @@ namespace Nekki.SF2.GUI.Fight
 			case RuleAppliance.AppliancePlayer:
 				if (leftModel != null)
 				{
-					leftModel.JKPOGNMHDNK(value);
+					leftModel.SetLifeBarVisible(value);
 				}
 				break;
 			case RuleAppliance.ApplianceOpponent:
 				if (rightModel != null)
 				{
-					rightModel.JKPOGNMHDNK(value);
+					rightModel.SetLifeBarVisible(value);
 				}
 				break;
 			case RuleAppliance.ApplianceAll:
 				if (leftModel != null)
 				{
-					leftModel.JKPOGNMHDNK(value);
+					leftModel.SetLifeBarVisible(value);
 				}
 				if (rightModel != null)
 				{
-					rightModel.JKPOGNMHDNK(value);
+					rightModel.SetLifeBarVisible(value);
 				}
 				break;
 			}
@@ -626,7 +626,7 @@ namespace Nekki.SF2.GUI.Fight
 			ScreenModel screenModel = ((!EKBOGDKIHIH) ? rightModel : leftModel);
 			if (screenModel != null)
 			{
-				screenModel.LCFPHJKKDCG(value);
+				screenModel.SetLifeUpdateLocked(value);
 			}
 		}
 
@@ -649,11 +649,11 @@ namespace Nekki.SF2.GUI.Fight
 		{
 			if (leftModel != null)
 			{
-				leftModel.DGECGHDGPFO();
+				leftModel.RemoveAllCombos();
 			}
 			if (rightModel != null)
 			{
-				rightModel.DGECGHDGPFO();
+				rightModel.RemoveAllCombos();
 			}
 		}
 	}

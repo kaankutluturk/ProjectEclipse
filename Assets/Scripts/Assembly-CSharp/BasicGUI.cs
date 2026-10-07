@@ -5,113 +5,113 @@ using System.Xml;
 public static class BasicGUI
 {
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private static KeyValuePair<int, int> EOBKMNOMCDM;
+	private static KeyValuePair<int, int> _buttonWidth;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private static KeyValuePair<int, int> JEABOCGBAEG;
+	private static KeyValuePair<int, int> _hintWidth;
 
-	private static int NPAANDHOALC = 0;
+	private static int _defaultButtonCenterWidth = 0;
 
-	private static float ANFMAFNDIBG = 0f;
+	private static float _hintTimeout = 0f;
 
-	private static int MOFPGFCLIBL = 0;
+	private static int _arrowFlashingFrames = 0;
 
-	private static float BJOBJCMCGJM = 0f;
+	private static float _creditsScrollSpeed = 0f;
 
 	private static bool _ShowMenuTime = false;
 
-	private static int EJMLGPHEACK = 0;
+	private static int _defaultCounterRollTime = 0;
 
 	private static Dictionary<int, int> _CounterRollTime = new Dictionary<int, int>();
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private static float PBBPPAHGGPH;
+	private static float _notificationReadTime;
 
-	public static KeyValuePair<int, int> NCEBBPBMAPO
+	public static KeyValuePair<int, int> ButtonWidth
 	{
 		get
 		{
-			return NPLEAPOPBLG();
+			return GetButtonWidth();
 		}
 		private set
 		{
-			PDEIJLKGDIE(value);
+			SetButtonWidth(value);
 		}
 	}
 
-	public static KeyValuePair<int, int> KGBEIBIKLBO
+	public static KeyValuePair<int, int> HintWidth
 	{
 		get
 		{
-			return BHIFPDKNBBE();
+			return GetHintWidth();
 		}
 		private set
 		{
-			BHBECFMOKFK(value);
+			SetHintWidth(value);
 		}
 	}
 
-	public static int EJDEIMMODDL
+	public static int DefaultButtonCenterWidth
 	{
 		get
 		{
-			return BMLFDECMNLO();
+			return GetDefaultButtonCenterWidth();
 		}
 	}
 
-	public static float PCGLNBCBDHB
+	public static float HintTimeout
 	{
 		get
 		{
-			return NEADIBJAJCM();
+			return GetHintTimeout();
 		}
 	}
 
-	public static int MJMLIKHFJJE
+	public static int ArrowFlashingFrames
 	{
 		get
 		{
-			return HNJBADGLFEC();
+			return GetArrowFlashingFrames();
 		}
 	}
 
-	public static float IEBABMOIKEF
+	public static float CreditsScrollSpeed
 	{
 		get
 		{
-			return HLLCEHACMLI();
+			return GetCreditsScrollSpeed();
 		}
 	}
 
-	public static bool FENLEANBINI
+	public static bool ShowMenuTime
 	{
 		get
 		{
-			return JKNCLNKNOKC();
+			return GetShowMenuTime();
 		}
 	}
 
-	public static int BPKIIPLOPKF
+	public static int DefaultCounterRollTime
 	{
 		get
 		{
-			return EPBJMALCHAA();
+			return GetDefaultCounterRollTime();
 		}
 	}
 
-	public static Dictionary<int, int> PGMNMDLDGMC
+	public static Dictionary<int, int> CounterRollTime
 	{
 		get
 		{
-			return JHKFAMCDPNB();
+			return GetCounterRollTime();
 		}
 	}
 
-	public static float PFBALNJIDJP
+	public static float NotificationDefaultReadTime
 	{
 		get
 		{
-			return KMJDBLBFEMF();
+			return GetNotificationDefaultReadTime();
 		}
 		private set
 		{
@@ -121,14 +121,14 @@ public static class BasicGUI
 
 	public static void Parse(XmlNode node)
 	{
-		PDEIJLKGDIE(node["ButtonWidth"].MMHOOIPHOMI(242, 342));
-		BHBECFMOKFK(node["HintWidth"].MMHOOIPHOMI(242, 342));
-		NPAANDHOALC = node["DefaultButtonCenterWidth"].PNJPEDPDMCP().ParseInt();
-		ANFMAFNDIBG = node["HintTimeout"].PNJPEDPDMCP().ParseFloat(1f);
-		MOFPGFCLIBL = node["ArrowFlashingFrames"].PNJPEDPDMCP().ParseInt(120);
-		BJOBJCMCGJM = node["CreditsScrollSpeed"].PNJPEDPDMCP().ParseFloat(2f);
-		_ShowMenuTime = node["ShowMenuTime"].PNJPEDPDMCP().ParseBool();
-		set_NotificationReadTime(node["NotificationDlgDefaultReadTime"].PNJPEDPDMCP().ParseFloat());
+		SetButtonWidth(node["ButtonWidth"].ParseMinMax(242, 342));
+		SetHintWidth(node["HintWidth"].ParseMinMax(242, 342));
+		_defaultButtonCenterWidth = node["DefaultButtonCenterWidth"].FirstAttribute().ParseInt();
+		_hintTimeout = node["HintTimeout"].FirstAttribute().ParseFloat(1f);
+		_arrowFlashingFrames = node["ArrowFlashingFrames"].FirstAttribute().ParseInt(120);
+		_creditsScrollSpeed = node["CreditsScrollSpeed"].FirstAttribute().ParseFloat(2f);
+		_ShowMenuTime = node["ShowMenuTime"].FirstAttribute().ParseBool();
+		set_NotificationReadTime(node["NotificationDlgDefaultReadTime"].FirstAttribute().ParseFloat());
 		XmlNode xmlNode = node["CurrencyCounterRollTime"];
 		if (xmlNode == null)
 		{
@@ -139,77 +139,77 @@ public static class BasicGUI
 		{
 			if (childNode.Name.Equals("DefaultRollTime"))
 			{
-				EJMLGPHEACK = childNode.MGCGBMLHIDP().ParseInt(120);
+				_defaultCounterRollTime = childNode.LastAttribute().ParseInt(120);
 				continue;
 			}
-			int key = childNode.PNJPEDPDMCP().ParseInt();
-			int value = childNode.MGCGBMLHIDP().ParseInt();
+			int key = childNode.FirstAttribute().ParseInt();
+			int value = childNode.LastAttribute().ParseInt();
 			_CounterRollTime[key] = value;
 		}
 	}
 
-	public static KeyValuePair<int, int> NPLEAPOPBLG()
+	public static KeyValuePair<int, int> GetButtonWidth()
 	{
-		return EOBKMNOMCDM;
+		return _buttonWidth;
 	}
 
-	private static void PDEIJLKGDIE(KeyValuePair<int, int> value)
+	private static void SetButtonWidth(KeyValuePair<int, int> value)
 	{
-		EOBKMNOMCDM = value;
+		_buttonWidth = value;
 	}
 
-	public static KeyValuePair<int, int> BHIFPDKNBBE()
+	public static KeyValuePair<int, int> GetHintWidth()
 	{
-		return JEABOCGBAEG;
+		return _hintWidth;
 	}
 
-	private static void BHBECFMOKFK(KeyValuePair<int, int> value)
+	private static void SetHintWidth(KeyValuePair<int, int> value)
 	{
-		JEABOCGBAEG = value;
+		_hintWidth = value;
 	}
 
-	public static int BMLFDECMNLO()
+	public static int GetDefaultButtonCenterWidth()
 	{
-		return NPAANDHOALC;
+		return _defaultButtonCenterWidth;
 	}
 
-	public static float NEADIBJAJCM()
+	public static float GetHintTimeout()
 	{
-		return ANFMAFNDIBG;
+		return _hintTimeout;
 	}
 
-	public static int HNJBADGLFEC()
+	public static int GetArrowFlashingFrames()
 	{
-		return MOFPGFCLIBL;
+		return _arrowFlashingFrames;
 	}
 
-	public static float HLLCEHACMLI()
+	public static float GetCreditsScrollSpeed()
 	{
-		return HLLCEHACMLI();
+		return GetCreditsScrollSpeed();
 	}
 
-	public static bool JKNCLNKNOKC()
+	public static bool GetShowMenuTime()
 	{
-		return JKNCLNKNOKC();
+		return GetShowMenuTime();
 	}
 
-	public static int EPBJMALCHAA()
+	public static int GetDefaultCounterRollTime()
 	{
-		return EJMLGPHEACK;
+		return _defaultCounterRollTime;
 	}
 
-	public static Dictionary<int, int> JHKFAMCDPNB()
+	public static Dictionary<int, int> GetCounterRollTime()
 	{
 		return _CounterRollTime;
 	}
 
-	public static float KMJDBLBFEMF()
+	public static float GetNotificationDefaultReadTime()
 	{
-		return PBBPPAHGGPH;
+		return _notificationReadTime;
 	}
 
 	private static void set_NotificationReadTime(float value)
 	{
-		PBBPPAHGGPH = value;
+		_notificationReadTime = value;
 	}
 }

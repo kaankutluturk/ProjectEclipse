@@ -3,28 +3,28 @@ using System.Xml;
 
 public class RewardLottery : Rewardable
 {
-	private string PBLBEFIGNAG;
-	internal string LotteryType => PBLBEFIGNAG;
+	private string lotteryType;
+	internal string LotteryType => lotteryType;
 
-	public List<MANJCIGJPMK> EDCOGMLOEHE = new List<MANJCIGJPMK>();
+	public List<LotteryPrizeEntry> slots = new List<LotteryPrizeEntry>();
 
 	internal RewardLottery CloneForRewardComposition()
 	{
 		var clone = (RewardLottery)MemberwiseClone();
-		clone.EDCOGMLOEHE = new List<MANJCIGJPMK>(EDCOGMLOEHE);
+		clone.slots = new List<LotteryPrizeEntry>(slots);
 		return clone;
 	}
 
 	public RewardLottery(XmlNode node, ushort CDCJKJNGPOE, ushort MCDAHGPLLDO)
 	{
-		CLOGJMBMMPI = GADCOGHCGDP.REWARD_LOTTERY;
-		PBLBEFIGNAG = node.Attributes["Type"].CIPOICEEIBK(string.Empty);
+		Kind = RewardKind.REWARD_LOTTERY;
+		lotteryType = node.Attributes["Type"].GetStringOrDefault(string.Empty);
 		foreach (XmlNode childNode in node.ChildNodes)
 		{
 			if (childNode.Name == "Slot")
 			{
-				MANJCIGJPMK item = new MANJCIGJPMK(childNode, CDCJKJNGPOE, MCDAHGPLLDO);
-				EDCOGMLOEHE.Add(item);
+				LotteryPrizeEntry item = new LotteryPrizeEntry(childNode, CDCJKJNGPOE, MCDAHGPLLDO);
+				slots.Add(item);
 			}
 			else
 			{
@@ -36,12 +36,12 @@ public class RewardLottery : Rewardable
 				int cIKLDJLOFDJ = childNode.Attributes["Max"].ParseInt(-1);
 				foreach (XmlNode childNode2 in childNode.ChildNodes)
 				{
-					MANJCIGJPMK item2 = new MANJCIGJPMK(childNode2, CDCJKJNGPOE, MCDAHGPLLDO)
+					LotteryPrizeEntry item2 = new LotteryPrizeEntry(childNode2, CDCJKJNGPOE, MCDAHGPLLDO)
 					{
-						BDJKDCMHEBI = bDJKDCMHEBI,
-						CIKLDJLOFDJ = cIKLDJLOFDJ
+						MinLevel = bDJKDCMHEBI,
+						MaxLevel = cIKLDJLOFDJ
 					};
-					EDCOGMLOEHE.Add(item2);
+					slots.Add(item2);
 				}
 			}
 		}

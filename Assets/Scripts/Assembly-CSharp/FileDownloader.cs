@@ -8,7 +8,7 @@ public class FileDownloader
 
 	private Action<float> _progressCallback;
 
-	private string EBLEJDDMDAO;
+	private string destinationDirectory;
 
 	private string _name;
 
@@ -16,15 +16,15 @@ public class FileDownloader
 
 	private int _size;
 
-	public static FileDownloader BPCBBHAKFDM
+	public static FileDownloader Instance
 	{
 		get
 		{
-			return ELEBLBJKDBI();
+			return GetInstance();
 		}
 	}
 
-	public static FileDownloader ELEBLBJKDBI()
+	public static FileDownloader GetInstance()
 	{
 		if (_Instance == null)
 		{
@@ -33,17 +33,17 @@ public class FileDownloader
 		return _Instance;
 	}
 
-	public void EMANDFAOCNO(string BEPKJNKCKPH, string name, string IMFMPLFADCE, Action<bool> HKHNPNNDHFP, Action<float> OODDBFJDGJO = null, int PEEOEOMEBFG = 0)
+	public void Download(string BEPKJNKCKPH, string name, string IMFMPLFADCE, Action<bool> HKHNPNNDHFP, Action<float> OODDBFJDGJO = null, int PEEOEOMEBFG = 0)
 	{
 		_resultCallback = HKHNPNNDHFP;
 		_progressCallback = OODDBFJDGJO;
-		EBLEJDDMDAO = IMFMPLFADCE;
+		destinationDirectory = IMFMPLFADCE;
 		_name = name;
 		_size = PEEOEOMEBFG;
-		NekkiWebHelper.EMANDFAOCNO(BEPKJNKCKPH, string.Format("{0}/{1}", EBLEJDDMDAO, _name), CBKDIFCLCMO, OnError, OGLIKFCADME, null, _timeout);
+		NekkiWebHelper.Download(BEPKJNKCKPH, string.Format("{0}/{1}", destinationDirectory, _name), OnComplete, OnError, OnProgress, null, _timeout);
 	}
 
-	private void CBKDIFCLCMO(NekkiWebRequest DCJLKCFKCOM)
+	private void OnComplete(NekkiWebRequest DCJLKCFKCOM)
 	{
 		if (_resultCallback != null)
 		{
@@ -59,18 +59,18 @@ public class FileDownloader
 		}
 	}
 
-	private void OGLIKFCADME(NekkiWebRequest DCJLKCFKCOM)
+	private void OnProgress(NekkiWebRequest DCJLKCFKCOM)
 	{
 		if (_progressCallback != null)
 		{
 			if (_size > 0)
 			{
-				float obj = (float)DCJLKCFKCOM.ECJPLFFAMJO() / (float)_size;
+				float obj = (float)DCJLKCFKCOM.GetDownloadedBytes() / (float)_size;
 				_progressCallback(obj);
 			}
 			else
 			{
-				_progressCallback(DCJLKCFKCOM.ALDEPEHMGNK());
+				_progressCallback(DCJLKCFKCOM.GetProgress());
 			}
 		}
 	}

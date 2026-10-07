@@ -5,24 +5,24 @@ public class TacticalTableHolder
 {
 	private class AnimationTablesForAnimation
 	{
-		public InfoAnimation FGICHADOEHF;
+		public InfoAnimation Animation;
 
 		public List<GroupTables> Container = new List<GroupTables>();
 	}
 
-	private List<GroupTables> MELLNDMKFLD = new List<GroupTables>();
+	private List<GroupTables> _groups = new List<GroupTables>();
 
-	private List<IntervalNew> LLBNHMGFIAN;
+	private List<IntervalNew> _animationsWithIntervals;
 
-	private List<TacticalTable> ILDNLDJLPBB;
+	private List<TacticalTable> _tables;
 
-	private List<Intervals> PNKLJFBOJII;
+	private List<Intervals> _intervals;
 
 	private List<float> _distances;
 
 	private List<int> _interframes;
 
-	private List<AnimationTablesForAnimation> KMDJOANFEMG;
+	private List<AnimationTablesForAnimation> _animationTables;
 
 	private int _tableIndex;
 
@@ -41,46 +41,46 @@ public class TacticalTableHolder
 		{
 			using (BinaryReader binaryReader = new BinaryReader(input))
 			{
-				FEAJDBHBNCC(binaryReader, list);
+				ReadAnimationList(binaryReader, list);
 				ReadWeaponTypeList(binaryReader, list2);
-				PMAKBKHCGBC(binaryReader, list, list2, KOHGHADGPCE, NBJPDCDOOKH);
+				ReadTables(binaryReader, list, list2, KOHGHADGPCE, NBJPDCDOOKH);
 				if (binaryReader.BaseStream.Length != binaryReader.BaseStream.Position)
 				{
-					LLLOJBFMONN.Error("pointer != buffer.end()");
+					GameLog.Error("pointer != buffer.end()");
 				}
 			}
 		}
 	}
 
-	public void DLEINJHGIIL()
+	public void RegisterTables()
 	{
-		foreach (AnimationTablesForAnimation item in KMDJOANFEMG)
+		foreach (AnimationTablesForAnimation item in _animationTables)
 		{
-			item.FGICHADOEHF.NLCLHLIPFFH()[_tableIndex].Add(new global::Pair<List<GroupTables>, string>(item.Container, _weaponName));
+			item.Animation.GetTacticGroupTables()[_tableIndex].Add(new global::Pair<List<GroupTables>, string>(item.Container, _weaponName));
 		}
 	}
 
 	public void Clear()
 	{
-		KMDJOANFEMG.Clear();
-		MELLNDMKFLD.Clear();
-		ILDNLDJLPBB.Clear();
-		PNKLJFBOJII.Clear();
+		_animationTables.Clear();
+		_groups.Clear();
+		_tables.Clear();
+		_intervals.Clear();
 		_distances.Clear();
 		_interframes.Clear();
 	}
 
 	public bool Empty()
 	{
-		if (MELLNDMKFLD.Count == 0 || ILDNLDJLPBB.Count == 0 || PNKLJFBOJII.Count == 0 || _distances.Count == 0)
+		if (_groups.Count == 0 || _tables.Count == 0 || _intervals.Count == 0 || _distances.Count == 0)
 		{
-			LLLOJBFMONN.Write("Empty tables detected!");
+			GameLog.Write("Empty tables detected!");
 			return true;
 		}
 		return false;
 	}
 
-	private static void FEAJDBHBNCC(BinaryReader NNGPBPLGEOK, List<InfoAnimation> MAHEJFLCCHP)
+	private static void ReadAnimationList(BinaryReader NNGPBPLGEOK, List<InfoAnimation> MAHEJFLCCHP)
 	{
 		int num = (MAHEJFLCCHP.Capacity = NNGPBPLGEOK.ReadUInt16());
 		byte[] array = NNGPBPLGEOK.ReadBytes(num);
@@ -88,7 +88,7 @@ public class TacticalTableHolder
 		{
 			byte count = array[i];
 			string gOHIIMFFFJI = new string(NNGPBPLGEOK.ReadChars(count));
-			MAHEJFLCCHP.Add(AnimationData.BCIFKBJAFEC(gOHIIMFFFJI, AiData.get_IsShowErrorIfAnimationNotFound()));
+			MAHEJFLCCHP.Add(AnimationData.GetAnimationByName(gOHIIMFFFJI, AiData.get_IsShowErrorIfAnimationNotFound()));
 		}
 	}
 
@@ -103,49 +103,49 @@ public class TacticalTableHolder
 		}
 	}
 
-	private void PMAKBKHCGBC(BinaryReader LEOMHBCGLKI, List<InfoAnimation> CHNJHIPHIHA, List<string> IMOCIDBCFBA, int GAMDIAAJJMC, string EILBAKBJCIJ)
+	private void ReadTables(BinaryReader LEOMHBCGLKI, List<InfoAnimation> CHNJHIPHIHA, List<string> IMOCIDBCFBA, int GAMDIAAJJMC, string EILBAKBJCIJ)
 	{
 		_tableIndex = GAMDIAAJJMC;
 		_weaponName = EILBAKBJCIJ;
 		int num = (int)LEOMHBCGLKI.ReadUInt32();
 		int num2 = (int)LEOMHBCGLKI.ReadUInt32();
-		MELLNDMKFLD = new List<GroupTables>(num2);
+		_groups = new List<GroupTables>(num2);
 		for (int i = 0; i < num2; i++)
 		{
-			MELLNDMKFLD.Add(new GroupTables());
+			_groups.Add(new GroupTables());
 		}
 		int num3 = (int)LEOMHBCGLKI.ReadUInt32();
-		ILDNLDJLPBB = new List<TacticalTable>(num3);
+		_tables = new List<TacticalTable>(num3);
 		for (int j = 0; j < num3; j++)
 		{
-			ILDNLDJLPBB.Add(new TacticalTable());
+			_tables.Add(new TacticalTable());
 		}
 		int num4 = (int)LEOMHBCGLKI.ReadUInt32();
-		PNKLJFBOJII = new List<Intervals>(num4);
+		_intervals = new List<Intervals>(num4);
 		for (int k = 0; k < num4; k++)
 		{
-			PNKLJFBOJII.Add(new Intervals());
+			_intervals.Add(new Intervals());
 		}
 		int num5 = (int)LEOMHBCGLKI.ReadUInt32();
-		LLBNHMGFIAN = new List<IntervalNew>(num5);
+		_animationsWithIntervals = new List<IntervalNew>(num5);
 		for (int l = 0; l < num5; l++)
 		{
-			LLBNHMGFIAN.Add(new IntervalNew());
+			_animationsWithIntervals.Add(new IntervalNew());
 		}
 		int num6 = (int)LEOMHBCGLKI.ReadUInt32();
 		int num7 = (int)LEOMHBCGLKI.ReadUInt32();
-		KMDJOANFEMG = new List<AnimationTablesForAnimation>(num);
+		_animationTables = new List<AnimationTablesForAnimation>(num);
 		for (int m = 0; m < num; m++)
 		{
 			ushort num8 = LEOMHBCGLKI.ReadUInt16();
-			KMDJOANFEMG.Add(new AnimationTablesForAnimation());
+			_animationTables.Add(new AnimationTablesForAnimation());
 			if (num8 < CHNJHIPHIHA.Count)
 			{
-				KMDJOANFEMG[m].FGICHADOEHF = CHNJHIPHIHA[num8];
+				_animationTables[m].Animation = CHNJHIPHIHA[num8];
 			}
 			else
 			{
-				KMDJOANFEMG[m].FGICHADOEHF = null;
+				_animationTables[m].Animation = null;
 			}
 		}
 		short num9 = LEOMHBCGLKI.ReadInt16();
@@ -182,53 +182,53 @@ public class TacticalTableHolder
 		int num19 = 0;
 		int num20 = 0;
 		int num21 = 0;
-		foreach (AnimationTablesForAnimation item in KMDJOANFEMG)
+		foreach (AnimationTablesForAnimation item in _animationTables)
 		{
 			ushort num22 = LEOMHBCGLKI.ReadUInt16();
-			if (item.FGICHADOEHF == null)
+			if (item.Animation == null)
 			{
-				item.FGICHADOEHF = new InfoAnimation();
-				list2.Add(item.FGICHADOEHF);
+				item.Animation = new InfoAnimation();
+				list2.Add(item.Animation);
 			}
-			item.Container = MELLNDMKFLD.GetRange(num15, num22);
+			item.Container = _groups.GetRange(num15, num22);
 			num15 += num22;
 			foreach (GroupTables item2 in item.Container)
 			{
 				ushort index = LEOMHBCGLKI.ReadUInt16();
 				item2.GroupLabel = IMOCIDBCFBA[index];
 				num22 = LEOMHBCGLKI.ReadUInt16();
-				item2.DOCMMNLEAMH = ILDNLDJLPBB.GetRange(num16, num22);
+				item2.Tables = _tables.GetRange(num16, num22);
 				num16 += num22;
-				foreach (TacticalTable item3 in item2.DOCMMNLEAMH)
+				foreach (TacticalTable item3 in item2.Tables)
 				{
-					item3.Label = LNOMEMJCIAM(LEOMHBCGLKI);
+					item3.Label = ReadNullTerminatedString(LEOMHBCGLKI);
 					num22 = LEOMHBCGLKI.ReadUInt16();
 					if (0 < num22)
 					{
-						item3.OCFKLCDIEBF = PNKLJFBOJII.GetRange(num17, num22);
+						item3.IntervalList = _intervals.GetRange(num17, num22);
 						num17 += num22;
 						item3.FirstFrameIndex = LEOMHBCGLKI.ReadInt16();
-						foreach (Intervals item4 in item3.OCFKLCDIEBF)
+						foreach (Intervals item4 in item3.IntervalList)
 						{
 							ushort num23 = LEOMHBCGLKI.ReadUInt16();
-							item4.MFFPCMPGEBK = LLBNHMGFIAN.GetRange(num21, num23);
+							item4.Items = _animationsWithIntervals.GetRange(num21, num23);
 							num21 += num23;
 							if (0 >= num23)
 							{
 								continue;
 							}
-							foreach (IntervalNew item5 in item4.MFFPCMPGEBK)
+							foreach (IntervalNew item5 in item4.Items)
 							{
-								item5.FGICHADOEHF = list[num19];
+								item5.Animation = list[num19];
 								num19++;
 							}
-							foreach (IntervalNew item6 in item4.MFFPCMPGEBK)
+							foreach (IntervalNew item6 in item4.Items)
 							{
 								ushort num24 = LEOMHBCGLKI.ReadUInt16();
 								item6.Distances = _distances.GetRange(num18, num24);
 								num18 += num24;
 							}
-							foreach (IntervalNew item7 in item4.MFFPCMPGEBK)
+							foreach (IntervalNew item7 in item4.Items)
 							{
 								ushort num25 = LEOMHBCGLKI.ReadUInt16();
 								item7.Interframes = _interframes.GetRange(num20, num25);
@@ -238,55 +238,55 @@ public class TacticalTableHolder
 					}
 					else
 					{
-						item3.OCFKLCDIEBF.Clear();
+						item3.IntervalList.Clear();
 						item3.FirstFrameIndex = 0;
 					}
 				}
 			}
 		}
-		if (num15 != MELLNDMKFLD.Count)
+		if (num15 != _groups.Count)
 		{
-			LLLOJBFMONN.Error("pGroups != _groups.end()");
+			GameLog.Error("pGroups != _groups.end()");
 		}
-		if (num16 != ILDNLDJLPBB.Count)
+		if (num16 != _tables.Count)
 		{
-			LLLOJBFMONN.Error("pTables != _tables.end()");
+			GameLog.Error("pTables != _tables.end()");
 		}
-		if (num17 != PNKLJFBOJII.Count)
+		if (num17 != _intervals.Count)
 		{
-			LLLOJBFMONN.Error("pFrames != _intervals.end()");
+			GameLog.Error("pFrames != _intervals.end()");
 		}
 		if (num18 != _distances.Count)
 		{
-			LLLOJBFMONN.Error("pDistances != _distances.end()");
+			GameLog.Error("pDistances != _distances.end()");
 		}
 		if (num19 != list.Count)
 		{
-			LLLOJBFMONN.Error("pAnimations != _animations.end()");
+			GameLog.Error("pAnimations != _animations.end()");
 		}
 		if (num20 != _interframes.Count)
 		{
-			LLLOJBFMONN.Error("pInterframes != _interframes.end()");
+			GameLog.Error("pInterframes != _interframes.end()");
 		}
-		if (num21 != LLBNHMGFIAN.Count)
+		if (num21 != _animationsWithIntervals.Count)
 		{
-			LLLOJBFMONN.Error("pAnimIntervals != _animationsWithIntervals.end()");
+			GameLog.Error("pAnimIntervals != _animationsWithIntervals.end()");
 		}
 		foreach (InfoAnimation item8 in list2)
 		{
-			foreach (AnimationTablesForAnimation item9 in KMDJOANFEMG)
+			foreach (AnimationTablesForAnimation item9 in _animationTables)
 			{
-				if (item9.FGICHADOEHF == item8)
+				if (item9.Animation == item8)
 				{
-					KMDJOANFEMG.Remove(item9);
-					LLLOJBFMONN.Write(string.Format("AnimationTablesForAnimation remove for %s", item8.Name));
+					_animationTables.Remove(item9);
+					GameLog.Write(string.Format("AnimationTablesForAnimation remove for %s", item8.Name));
 					break;
 				}
 			}
 		}
 	}
 
-	public static string LNOMEMJCIAM(BinaryReader NNGPBPLGEOK)
+	public static string ReadNullTerminatedString(BinaryReader NNGPBPLGEOK)
 	{
 		string text = string.Empty;
 		for (char c = NNGPBPLGEOK.ReadChar(); c != 0; c = NNGPBPLGEOK.ReadChar())

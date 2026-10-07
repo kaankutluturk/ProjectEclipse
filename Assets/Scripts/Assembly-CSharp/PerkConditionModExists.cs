@@ -9,14 +9,14 @@ public class PerkConditionModExists : PerkCondition
 
 	public PerkConditionModExists()
 	{
-		set_Type(NHDGLPNNNLH.CONDITION_MOD_EXISTS);
+		set_Type(PerkConditionType.CONDITION_MOD_EXISTS);
 	}
 
 	public override void Parse(XmlNode node)
 	{
 		base.Parse(node);
-		Name = node.Attributes["Name"].CIPOICEEIBK(string.Empty);
-		Namespace = node.Attributes["Namespace"].CIPOICEEIBK(string.Empty);
+		Name = node.Attributes["Name"].GetStringOrDefault(string.Empty);
+		Namespace = node.Attributes["Namespace"].GetStringOrDefault(string.Empty);
 	}
 
 	public override bool IsEqual(Model ACENLMONNPA, List<string> NIKHAICFGNM)
@@ -25,7 +25,7 @@ public class PerkConditionModExists : PerkCondition
 		{
 			return true;
 		}
-		Model fGCODGKLHED = EPCPGEPPHLO(ACENLMONNPA);
+		Model fGCODGKLHED = ResolveTargetModel(ACENLMONNPA);
 		if (fGCODGKLHED == null)
 		{
 			return false;

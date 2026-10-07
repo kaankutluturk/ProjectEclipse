@@ -5,9 +5,9 @@ using Nekki.SF2.GUI.Shop;
 
 public class QuestActionChangeTab : QuestAction
 {
-	protected string HAFLDLPCMLE = string.Empty;
+	protected string tabExpression = string.Empty;
 
-	protected string OKPIBMMMIDL = string.Empty;
+	protected string focusExpression = string.Empty;
 
 	protected SliderType _TabType;
 
@@ -16,21 +16,21 @@ public class QuestActionChangeTab : QuestAction
 	public override void Parse(XmlNode EPKLCPOEELO)
 	{
 		base.Parse(EPKLCPOEELO);
-		HAFLDLPCMLE = EPKLCPOEELO.Attributes["Tab"].CIPOICEEIBK(string.Empty);
-		OKPIBMMMIDL = EPKLCPOEELO.Attributes["Focus"].CIPOICEEIBK(string.Empty);
+		tabExpression = EPKLCPOEELO.Attributes["Tab"].GetStringOrDefault(string.Empty);
+		focusExpression = EPKLCPOEELO.Attributes["Focus"].GetStringOrDefault(string.Empty);
 	}
 
-	public override void DEJMHFMLKIC(QuestParameters GFIHPBCEEOB)
+	public override void Execute(QuestParameters GFIHPBCEEOB)
 	{
-		base.DEJMHFMLKIC(GFIHPBCEEOB);
+		base.Execute(GFIHPBCEEOB);
 		string empty = string.Empty;
 		ConditionExtension.CompareResult lNIDLHOIHIM = new ConditionExtension.CompareResult();
 		QuestCondition kKDGLNECFHA = new QuestCondition();
-		kKDGLNECFHA.LIMHBJBEEIA(GFIHPBCEEOB);
-		kKDGLNECFHA.MCPIOGALBMK(HAFLDLPCMLE, lNIDLHOIHIM);
+		kKDGLNECFHA.SetParameters(GFIHPBCEEOB);
+		kKDGLNECFHA.SetValue(tabExpression, lNIDLHOIHIM);
 		empty = lNIDLHOIHIM.ToString();
-		_TabType = EPIGNANCLDB(empty);
-		_ScreenType = BODGLLCANLF(_TabType);
+		_TabType = ParseTabType(empty);
+		_ScreenType = GetScreenForTab(_TabType);
 		ScreenType iPKNDMINFMJ = Module.GetInstance().GetCurrentScreenType();
 		if (iPKNDMINFMJ == _ScreenType)
 		{
@@ -43,7 +43,7 @@ public class QuestActionChangeTab : QuestAction
 				{
 					break;
 				}
-				Module.GetInstance().AddEventListener(1, DOHEMBEEHBB);
+				Module.GetInstance().AddEventListener(1, OnModuleChanged);
 				return;
 			}
 			case ScreenType.ModuleProfile:
@@ -53,7 +53,7 @@ public class QuestActionChangeTab : QuestAction
 				{
 					break;
 				}
-				Module.GetInstance().AddEventListener(1, DOHEMBEEHBB);
+				Module.GetInstance().AddEventListener(1, OnModuleChanged);
 				return;
 			}
 			case ScreenType.ModuleMap:
@@ -64,15 +64,15 @@ public class QuestActionChangeTab : QuestAction
 					current.ScrollToItemByName(_TabType);
 					break;
 				}
-				Module.GetInstance().AddEventListener(1, DOHEMBEEHBB);
+				Module.GetInstance().AddEventListener(1, OnModuleChanged);
 				return;
 			}
 			}
 		}
-		OGIJONMKABB();
+		FinishAction();
 	}
 
-	protected void DOHEMBEEHBB(object data)
+	protected void OnModuleChanged(object data)
 	{
 		switch (_ScreenType)
 		{
@@ -102,11 +102,11 @@ public class QuestActionChangeTab : QuestAction
 			break;
 		}
 		}
-		OGIJONMKABB();
-		Module.GetInstance().RemoveEventListener(1, DOHEMBEEHBB);
+		FinishAction();
+		Module.GetInstance().RemoveEventListener(1, OnModuleChanged);
 	}
 
-	protected SliderType EPIGNANCLDB(string PMJGENGKNPA)
+	protected SliderType ParseTabType(string PMJGENGKNPA)
 	{
 		switch (PMJGENGKNPA)
 		{
@@ -141,7 +141,7 @@ public class QuestActionChangeTab : QuestAction
 		}
 	}
 
-	protected ScreenType BODGLLCANLF(SliderType _sliderType)
+	protected ScreenType GetScreenForTab(SliderType _sliderType)
 	{
 		switch (_sliderType)
 		{

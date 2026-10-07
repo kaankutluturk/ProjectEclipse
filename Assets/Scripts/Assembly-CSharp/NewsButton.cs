@@ -1,16 +1,16 @@
 public class NewsButton
 {
-	public string GGDJIPKMKFC = string.Empty;
+	public string LabelAliasName = string.Empty;
 
-	public LabelButton.FBMGEHJPPIK Color = LabelButton.FBMGEHJPPIK.BUTTON_WHITE;
+	public LabelButton.ButtonColor Color = LabelButton.ButtonColor.BUTTON_WHITE;
 
 	public string Url = string.Empty;
 
-	public string COIGFENOMJD = string.Empty;
+	public string RedirectShop = string.Empty;
 
-	public bool EGBHELMJJKO;
+	public bool GoShop;
 
-	public bool KCBCGDFKNME;
+	public bool BuyItem;
 
 	public NewsButton()
 	{
@@ -18,11 +18,11 @@ public class NewsButton
 
 	public NewsButton(NewsButton AOMLCBHAJJH)
 	{
-		GGDJIPKMKFC = AOMLCBHAJJH.GGDJIPKMKFC;
+		LabelAliasName = AOMLCBHAJJH.LabelAliasName;
 		Color = AOMLCBHAJJH.Color;
 		Url = AOMLCBHAJJH.Url;
-		COIGFENOMJD = AOMLCBHAJJH.COIGFENOMJD;
-		EGBHELMJJKO = AOMLCBHAJJH.EGBHELMJJKO;
-		KCBCGDFKNME = AOMLCBHAJJH.KCBCGDFKNME;
+		RedirectShop = AOMLCBHAJJH.RedirectShop;
+		GoShop = AOMLCBHAJJH.GoShop;
+		BuyItem = AOMLCBHAJJH.BuyItem;
 	}
 }

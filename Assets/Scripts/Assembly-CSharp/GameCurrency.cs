@@ -2,44 +2,44 @@ using System.Xml;
 
 public class GameCurrency
 {
-	public enum DEFOMBPHMBP
+	public enum CurrencyGroup
 	{
 		CURRENCY_GROUP_NONE = 0,
 		CURRENCY_GROUP_FORGE = 1
 	}
 
-	public DEFOMBPHMBP NBIHGGLGMCN;
+	public CurrencyGroup Group;
 
 	public string Name;
 
-	public string MJBPMLCLMFN;
+	public string Icon;
 
 	public GameCurrency(XmlNode node)
 	{
-		Name = node.Attributes["Name"].CIPOICEEIBK(string.Empty);
-		MJBPMLCLMFN = node.Attributes["Icon"].CIPOICEEIBK(string.Empty);
-		string text = node.Attributes["Group"].CIPOICEEIBK(string.Empty);
+		Name = node.Attributes["Name"].GetStringOrDefault(string.Empty);
+		Icon = node.Attributes["Icon"].GetStringOrDefault(string.Empty);
+		string text = node.Attributes["Group"].GetStringOrDefault(string.Empty);
 		if (text == "Forge")
 		{
-			NBIHGGLGMCN = DEFOMBPHMBP.CURRENCY_GROUP_FORGE;
+			Group = CurrencyGroup.CURRENCY_GROUP_FORGE;
 		}
 		else
 		{
-			NBIHGGLGMCN = DEFOMBPHMBP.CURRENCY_GROUP_NONE;
+			Group = CurrencyGroup.CURRENCY_GROUP_NONE;
 		}
 	}
 
-	public GameCurrency(string PIKIACPLHJE, string NFBKDDABPOM, DEFOMBPHMBP APLILFFIMMM = DEFOMBPHMBP.CURRENCY_GROUP_NONE)
+	public GameCurrency(string PIKIACPLHJE, string NFBKDDABPOM, CurrencyGroup APLILFFIMMM = CurrencyGroup.CURRENCY_GROUP_NONE)
 	{
 		Name = PIKIACPLHJE;
-		MJBPMLCLMFN = NFBKDDABPOM;
-		NBIHGGLGMCN = APLILFFIMMM;
+		Icon = NFBKDDABPOM;
+		Group = APLILFFIMMM;
 	}
 
-	public void DHCNGGCOONP(GameCurrency MDDNHLBDJBN)
+	public void CopyFrom(GameCurrency MDDNHLBDJBN)
 	{
 		Name = MDDNHLBDJBN.Name;
-		MJBPMLCLMFN = MDDNHLBDJBN.MJBPMLCLMFN;
-		NBIHGGLGMCN = MDDNHLBDJBN.NBIHGGLGMCN;
+		Icon = MDDNHLBDJBN.Icon;
+		Group = MDDNHLBDJBN.Group;
 	}
 }

@@ -2,46 +2,46 @@ using System.Collections.Generic;
 
 public class Packs
 {
-	private List<JBKAOMLJCEL> OALOKFBBHOM = new List<JBKAOMLJCEL>();
+	private List<DownloadPack> _packs = new List<DownloadPack>();
 
-	public List<JBKAOMLJCEL> KAPKIHOMADL
+	public List<DownloadPack> PackList
 	{
 		get
 		{
-			return ONJDMMIHCMG();
+			return GetPacks();
 		}
 	}
 
-	public List<JBKAOMLJCEL> ONJDMMIHCMG()
+	public List<DownloadPack> GetPacks()
 	{
-		return OALOKFBBHOM;
+		return _packs;
 	}
 
 	public void Reset()
 	{
-		OALOKFBBHOM.Clear();
+		_packs.Clear();
 	}
 
-	public void DDKKLHDOFNG(string name, string BEPKJNKCKPH, string PEEOEOMEBFG, bool LCDCAKLKHMI, string HDPBNCNCMOH, bool AHDLCJFCJMJ)
+	public void AddPack(string name, string BEPKJNKCKPH, string PEEOEOMEBFG, bool LCDCAKLKHMI, string HDPBNCNCMOH, bool AHDLCJFCJMJ)
 	{
-		JBKAOMLJCEL jBKAOMLJCEL = new JBKAOMLJCEL();
+		DownloadPack jBKAOMLJCEL = new DownloadPack();
 		jBKAOMLJCEL.Name = name;
 		jBKAOMLJCEL.Url = BEPKJNKCKPH;
 		jBKAOMLJCEL.Size = PEEOEOMEBFG;
-		jBKAOMLJCEL.EFJLHFFGCIF = LCDCAKLKHMI;
-		jBKAOMLJCEL.NDDHELJHHKI = HDPBNCNCMOH;
-		jBKAOMLJCEL.NBEEINKJMPK = AHDLCJFCJMJ;
+		jBKAOMLJCEL.Reload = LCDCAKLKHMI;
+		jBKAOMLJCEL.Checksum = HDPBNCNCMOH;
+		jBKAOMLJCEL.Attach = AHDLCJFCJMJ;
 		int result = 0;
 		if (int.TryParse(PEEOEOMEBFG, out result))
 		{
 			jBKAOMLJCEL.Size = ((float)result / 1000000f).ToString("#.#");
 		}
-		jBKAOMLJCEL.HKPOAABOLHN = result;
-		OALOKFBBHOM.Add(jBKAOMLJCEL);
+		jBKAOMLJCEL.SizeBytes = result;
+		_packs.Add(jBKAOMLJCEL);
 	}
 
-	public JBKAOMLJCEL OCKOCHAINHG(string name)
+	public DownloadPack FindPack(string name)
 	{
-		return OALOKFBBHOM.Find((JBKAOMLJCEL DHDMNHCIPEH) => DHDMNHCIPEH.Name.Equals(name));
+		return _packs.Find((DownloadPack DHDMNHCIPEH) => DHDMNHCIPEH.Name.Equals(name));
 	}
 }

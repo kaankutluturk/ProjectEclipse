@@ -2,113 +2,113 @@ using System.Xml;
 
 public class ParametersQuest
 {
-	private string MHAGBMLGJNB = string.Empty;
+	private string _fightName = string.Empty;
 
-	private string MPFLHOFEOGI = string.Empty;
+	private string _fightResultName = string.Empty;
 
-	private string ABEABNOGJDM = string.Empty;
+	private string _raidResultName = string.Empty;
 
-	private int KJBLFMHGLPF;
+	private int _levelUp;
 
 	private int _power;
 
-	private int PCJHKLGDFDH;
+	private int _screenIndex;
 
-	private int DKMFBOAKFPH;
+	private int _checkPointIndex;
 
 	private float _fightAvgFPS;
 
 	public XmlNode Node;
 
-	public string EAJKKMEDGEL
+	public string FightName
 	{
 		get
 		{
-			return HPELIEHPJCI();
+			return GetFightName();
 		}
 		set
 		{
-			ELKOGHKIDOG(value);
+			SetFightName(value);
 		}
 	}
 
-	public string JOGMEAACJED
+	public string FightResultName
 	{
 		get
 		{
-			return LIPMCBHCLKN();
+			return GetFightResultName();
 		}
 		set
 		{
-			AJBMLOLOFAN(value);
+			SetFightResultName(value);
 		}
 	}
 
-	public string BBFPIPJJCDH
+	public string RaidResultName
 	{
 		get
 		{
-			return JOLAAOAFNFF();
+			return GetRaidResultName();
 		}
 		set
 		{
-			CPONINMPIJL(value);
+			SetRaidResultName(value);
 		}
 	}
 
-	public int LCDGAGJHGBJ
+	public int LevelUp
 	{
 		get
 		{
-			return OGIPFNNJOPK();
+			return GetLevelUp();
 		}
 		set
 		{
-			EFIFIPKDMIN(value);
+			SetLevelUp(value);
 		}
 	}
 
-	public int MFGLDPKEDJB
+	public int Power
 	{
 		get
 		{
-			return NHKMGNPADKI();
+			return GetPower();
 		}
 		set
 		{
-			MPFIPAANJON(value);
+			SetPower(value);
 		}
 	}
 
-	public int OIOLMKNFHOP
+	public int ScreenIndex
 	{
 		get
 		{
-			return EDADICNDCKK();
+			return GetScreenIndex();
 		}
 		set
 		{
-			MNNPHOAEMII(value);
+			SetScreenIndex(value);
 		}
 	}
 
-	public int LHLMNEDCCDK
+	public int CheckPointIndex
 	{
 		get
 		{
-			return CIDMJEKCDMP();
+			return GetCheckPointIndex();
 		}
 		set
 		{
-			IBMNACPGMLL(value);
+			SetCheckPointIndex(value);
 		}
 	}
 
-	public float LFAPNGHLANG
+	public float AverageFightFps
 	{
 		get
 		{
-			return OEDLLJIBHFN();
+			return GetFightAvgFps();
 		}
 		set
 		{
@@ -121,124 +121,124 @@ public class ParametersQuest
 		Node = PKHDLOGJKAD;
 		if (Node.Attributes["ScreenIndex"] == null)
 		{
-			Node.LLIKNHNLGJJ("ScreenIndex").Value = "0";
+			Node.AppendAttribute("ScreenIndex").Value = "0";
 		}
 		if (Node.Attributes["ChekPointIndex"] == null)
 		{
-			Node.LLIKNHNLGJJ("ChekPointIndex").Value = "0";
+			Node.AppendAttribute("ChekPointIndex").Value = "0";
 		}
 		if (Node["FightResult"] == null)
 		{
-			Node.ACBPMPMPKJJ("FightResult").LLIKNHNLGJJ("Name");
+			Node.AppendElement("FightResult").AppendAttribute("Name");
 		}
 		if (Node["RaidResult"] == null)
 		{
-			Node.ACBPMPMPKJJ("RaidResult").LLIKNHNLGJJ("Name");
+			Node.AppendElement("RaidResult").AppendAttribute("Name");
 		}
 		if (Node["Fight"] == null)
 		{
-			Node.ACBPMPMPKJJ("Fight").LLIKNHNLGJJ("Name");
+			Node.AppendElement("Fight").AppendAttribute("Name");
 		}
 		if (Node["LevelUp"] == null)
 		{
-			Node.ACBPMPMPKJJ("LevelUp").LLIKNHNLGJJ("Value").Value = "0";
+			Node.AppendElement("LevelUp").AppendAttribute("Value").Value = "0";
 		}
 		if (Node["PowerAmount"] == null)
 		{
-			Node.ACBPMPMPKJJ("PowerAmount").LLIKNHNLGJJ("Value").Value = "0";
+			Node.AppendElement("PowerAmount").AppendAttribute("Value").Value = "0";
 		}
 		if (Node["FightAvgFPS"] == null)
 		{
-			Node.ACBPMPMPKJJ("FightAvgFPS").LLIKNHNLGJJ("Value").Value = "0";
+			Node.AppendElement("FightAvgFPS").AppendAttribute("Value").Value = "0";
 		}
-		PCJHKLGDFDH = Node.Attributes["ScreenIndex"].ParseInt();
-		DKMFBOAKFPH = Node.Attributes["ChekPointIndex"].ParseInt();
-		MPFLHOFEOGI = Node["FightResult"].Attributes["Name"].CIPOICEEIBK(string.Empty);
-		ABEABNOGJDM = Node["RaidResult"].Attributes["Name"].CIPOICEEIBK(string.Empty);
-		MHAGBMLGJNB = Node["Fight"].Attributes["Name"].CIPOICEEIBK(string.Empty);
-		KJBLFMHGLPF = Node["LevelUp"].Attributes["Value"].ParseInt();
+		_screenIndex = Node.Attributes["ScreenIndex"].ParseInt();
+		_checkPointIndex = Node.Attributes["ChekPointIndex"].ParseInt();
+		_fightResultName = Node["FightResult"].Attributes["Name"].GetStringOrDefault(string.Empty);
+		_raidResultName = Node["RaidResult"].Attributes["Name"].GetStringOrDefault(string.Empty);
+		_fightName = Node["Fight"].Attributes["Name"].GetStringOrDefault(string.Empty);
+		_levelUp = Node["LevelUp"].Attributes["Value"].ParseInt();
 		_power = Node["PowerAmount"].Attributes["Value"].ParseInt();
 		_fightAvgFPS = Node["FightAvgFPS"].Attributes["Value"].ParseFloat();
 	}
 
-	public string HPELIEHPJCI()
+	public string GetFightName()
 	{
-		return MHAGBMLGJNB;
+		return _fightName;
 	}
 
-	public void ELKOGHKIDOG(string value)
+	public void SetFightName(string value)
 	{
-		MHAGBMLGJNB = value;
-		Node["Fight"].Attributes["Name"].Value = ((MHAGBMLGJNB == null) ? string.Empty : MHAGBMLGJNB);
+		_fightName = value;
+		Node["Fight"].Attributes["Name"].Value = ((_fightName == null) ? string.Empty : _fightName);
 	}
 
-	public string LIPMCBHCLKN()
+	public string GetFightResultName()
 	{
-		return MPFLHOFEOGI;
+		return _fightResultName;
 	}
 
-	public void AJBMLOLOFAN(string value)
+	public void SetFightResultName(string value)
 	{
-		MPFLHOFEOGI = value;
-		Node["FightResult"].Attributes["Name"].Value = ((MPFLHOFEOGI == null) ? string.Empty : MPFLHOFEOGI);
+		_fightResultName = value;
+		Node["FightResult"].Attributes["Name"].Value = ((_fightResultName == null) ? string.Empty : _fightResultName);
 	}
 
-	public string JOLAAOAFNFF()
+	public string GetRaidResultName()
 	{
-		return ABEABNOGJDM;
+		return _raidResultName;
 	}
 
-	public void CPONINMPIJL(string value)
+	public void SetRaidResultName(string value)
 	{
-		ABEABNOGJDM = value;
-		Node["RaidResult"].Attributes["Name"].Value = ((ABEABNOGJDM == null) ? string.Empty : ABEABNOGJDM);
+		_raidResultName = value;
+		Node["RaidResult"].Attributes["Name"].Value = ((_raidResultName == null) ? string.Empty : _raidResultName);
 	}
 
-	public int OGIPFNNJOPK()
+	public int GetLevelUp()
 	{
-		return KJBLFMHGLPF;
+		return _levelUp;
 	}
 
-	public void EFIFIPKDMIN(int value)
+	public void SetLevelUp(int value)
 	{
-		KJBLFMHGLPF = value;
-		Node["LevelUp"].Attributes["Value"].Value = KJBLFMHGLPF.ToString();
+		_levelUp = value;
+		Node["LevelUp"].Attributes["Value"].Value = _levelUp.ToString();
 	}
 
-	public int NHKMGNPADKI()
+	public int GetPower()
 	{
 		return _power;
 	}
 
-	public void MPFIPAANJON(int value)
+	public void SetPower(int value)
 	{
 		_power = value;
-		Node["PowerAmount"].Attributes["Value"].Value = KJBLFMHGLPF.ToString();
+		Node["PowerAmount"].Attributes["Value"].Value = _levelUp.ToString();
 	}
 
-	public int EDADICNDCKK()
+	public int GetScreenIndex()
 	{
-		return PCJHKLGDFDH;
+		return _screenIndex;
 	}
 
-	public void MNNPHOAEMII(int value)
+	public void SetScreenIndex(int value)
 	{
-		PCJHKLGDFDH = value;
-		Node.Attributes["ScreenIndex"].Value = PCJHKLGDFDH.ToString();
+		_screenIndex = value;
+		Node.Attributes["ScreenIndex"].Value = _screenIndex.ToString();
 	}
 
-	public int CIDMJEKCDMP()
+	public int GetCheckPointIndex()
 	{
-		return DKMFBOAKFPH;
+		return _checkPointIndex;
 	}
 
-	public void IBMNACPGMLL(int value)
+	public void SetCheckPointIndex(int value)
 	{
-		DKMFBOAKFPH = value;
-		Node.Attributes["ChekPointIndex"].Value = DKMFBOAKFPH.ToString();
+		_checkPointIndex = value;
+		Node.Attributes["ChekPointIndex"].Value = _checkPointIndex.ToString();
 	}
 
-	public float OEDLLJIBHFN()
+	public float GetFightAvgFps()
 	{
 		return _fightAvgFPS;
 	}

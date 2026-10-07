@@ -2,15 +2,15 @@ using System;
 
 public interface IConnection
 {
-	NegotiationData IIPFKKBEANI { get; }
+	NegotiationData NegotiationResult { get; }
 
-	AJAIAKCIJIJ CBGKGGCMHLL { get; set; }
+	IJsonEncoder JsonEncoder { get; set; }
 
-	NegotiationData EOBPEOEMEDB();
+	NegotiationData GetNegotiationResult();
 
-	AJAIAKCIJIJ IBNMFHGHIBI();
+	IJsonEncoder GetJsonEncoder();
 
-	void LPEPILDNMNE(AJAIAKCIJIJ value);
+	void SetJsonEncoder(IJsonEncoder value);
 
 	void OnMessage(IServerMessage CKEHOEGLMBM);
 
@@ -22,11 +22,11 @@ public interface IConnection
 
 	void Error(string NEPOLDCKNJL);
 
-	Uri BuildUri(FHIEGKMHOCC LFLGCDNKNJI);
+	Uri BuildUri(SignalRRequestType LFLGCDNKNJI);
 
-	Uri BuildUri(FHIEGKMHOCC LFLGCDNKNJI, TransportBase CHMELBKHOPP);
+	Uri BuildUri(SignalRRequestType LFLGCDNKNJI, TransportBase CHMELBKHOPP);
 
-	HTTPRequest PrepareRequest(HTTPRequest CGOIOKHEGOE, FHIEGKMHOCC LFLGCDNKNJI);
+	HTTPRequest PrepareRequest(HTTPRequest CGOIOKHEGOE, SignalRRequestType LFLGCDNKNJI);
 
 	string ParseResponse(string GHCCHADLAEK);
 }

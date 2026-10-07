@@ -4,11 +4,11 @@ public interface IEventEmitter
 
 	void Emit(ScalarEventInfo FNHCFCAALAE);
 
-	void Emit(LPADMPIAIPF FNHCFCAALAE);
+	void Emit(MappingStartEventInfo FNHCFCAALAE);
 
-	void Emit(EKKDGIILGMA FNHCFCAALAE);
+	void Emit(MappingEndEventInfo FNHCFCAALAE);
 
-	void Emit(PBGMOJFHMGI FNHCFCAALAE);
+	void Emit(SequenceStartEventInfo FNHCFCAALAE);
 
-	void Emit(NCGDJIDCIIM FNHCFCAALAE);
+	void Emit(SequenceEndEventInfo FNHCFCAALAE);
 }

@@ -1,12 +1,12 @@
 public class PerkData
 {
-	public PerkInfoItem MBDDKGIOOGD;
+	public PerkInfoItem PerkInfo;
 
 	public bool Enabled = true;
 
 	public PerkData(PerkInfoItem AEFFHJGMNFI, bool EMMAFNNIBFJ = true)
 	{
-		MBDDKGIOOGD = AEFFHJGMNFI;
+		PerkInfo = AEFFHJGMNFI;
 		Enabled = EMMAFNNIBFJ;
 	}
 }

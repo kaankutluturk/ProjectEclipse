@@ -34,13 +34,13 @@ namespace Nekki.SF2.GUI.Dialogs
 		[SerializeField]
 		private GameObject _ExitDialogPrefab;
 
-		private Dictionary<Type, GameObject> FOICLKFONKA = new Dictionary<Type, GameObject>();
+		private Dictionary<Type, GameObject> prefabsByType = new Dictionary<Type, GameObject>();
 
 		private static DialogCanvasController _instance;
 
-		private static Canvas JIGBFKIFFIB;
+		private static Canvas dialogsCanvas;
 
-		public static DialogCanvasController BPCBBHAKFDM
+		public static DialogCanvasController SharedInstance
 		{
 			get
 			{
@@ -48,7 +48,7 @@ namespace Nekki.SF2.GUI.Dialogs
 			}
 		}
 
-		public static Canvas LHCJAFIHFEC
+		public static Canvas CanvasInstance
 		{
 			get
 			{
@@ -71,33 +71,33 @@ namespace Nekki.SF2.GUI.Dialogs
 
 		public static Canvas get_DialogsCanvas()
 		{
-			return JIGBFKIFFIB;
+			return dialogsCanvas;
 		}
 
 		private void Awake()
 		{
-			JIGBFKIFFIB = GetComponent<Canvas>();
+			dialogsCanvas = GetComponent<Canvas>();
 			_Background.gameObject.SetActive(false);
-			LEBINHFPHKP();
+			RegisterDialogPrefabs();
 		}
 
-		private void LEBINHFPHKP()
+		private void RegisterDialogPrefabs()
 		{
-			FOICLKFONKA.Add(typeof(SettingsDialog), _SettingsDialogPrefab);
-			FOICLKFONKA.Add(typeof(SettingsAdvancedDialog), _SettingsAdvancedDialogPrefab);
-			FOICLKFONKA.Add(typeof(StrangerDialog), _StrangerDialogPrefab);
-			FOICLKFONKA.Add(typeof(StoryDialog), _StoryDialogPrefab);
-			FOICLKFONKA.Add(typeof(SimpleDialog), _SimpleDialogPrefab);
-			FOICLKFONKA.Add(typeof(TradeDialog), _TradeDialogPrefab);
-			FOICLKFONKA.Add(typeof(NewsDialog), _NewsDialogPrefab);
-			FOICLKFONKA.Add(typeof(ExitDialog), _ExitDialogPrefab);
+			prefabsByType.Add(typeof(SettingsDialog), _SettingsDialogPrefab);
+			prefabsByType.Add(typeof(SettingsAdvancedDialog), _SettingsAdvancedDialogPrefab);
+			prefabsByType.Add(typeof(StrangerDialog), _StrangerDialogPrefab);
+			prefabsByType.Add(typeof(StoryDialog), _StoryDialogPrefab);
+			prefabsByType.Add(typeof(SimpleDialog), _SimpleDialogPrefab);
+			prefabsByType.Add(typeof(TradeDialog), _TradeDialogPrefab);
+			prefabsByType.Add(typeof(NewsDialog), _NewsDialogPrefab);
+			prefabsByType.Add(typeof(ExitDialog), _ExitDialogPrefab);
 		}
 
 		private void OnDestroy()
 		{
 			Eclipse.UI.Modding.ModUiGameBridge.SetNativeBlocked(false);
 			_instance = null;
-			JIGBFKIFFIB = null;
+			dialogsCanvas = null;
 		}
 
 		public void BlockTouches()
@@ -131,21 +131,21 @@ namespace Nekki.SF2.GUI.Dialogs
 		public T CreateDialog<T>() where T : BaseDialog
 		{
 			Type typeFromHandle = typeof(T);
-			if (LOHGCJOBGAE(typeFromHandle) == null)
+			if (GetPrefab(typeFromHandle) == null)
 			{
-				LLLOJBFMONN.Error("Dialog prefab is empty! Name=" + typeFromHandle.ToString());
+				GameLog.Error("Dialog prefab is empty! Name=" + typeFromHandle.ToString());
 				return (T)null;
 			}
-			T component = UnityEngine.Object.Instantiate(LOHGCJOBGAE(typeFromHandle)).GetComponent<T>();
+			T component = UnityEngine.Object.Instantiate(GetPrefab(typeFromHandle)).GetComponent<T>();
 			component.transform.SetParent(base.transform, false);
 			return component;
 		}
 
-		private GameObject LOHGCJOBGAE(Type IGABHEMGKKE)
+		private GameObject GetPrefab(Type IGABHEMGKKE)
 		{
-			if (FOICLKFONKA.ContainsKey(IGABHEMGKKE))
+			if (prefabsByType.ContainsKey(IGABHEMGKKE))
 			{
-				return FOICLKFONKA[IGABHEMGKKE];
+				return prefabsByType[IGABHEMGKKE];
 			}
 			return null;
 		}

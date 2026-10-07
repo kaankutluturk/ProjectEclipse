@@ -6,66 +6,66 @@ using System.IO;
 public sealed class Serializer
 {
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private IList<IYamlTypeConverter> BBFPDBKOOKF;
+	private IList<IYamlTypeConverter> converters;
 
-	private readonly PAFDJLCFOGH LHONCAIFCAF;
+	private readonly SerializationOptions options;
 
-	private readonly INamingConvention LELOAKPLJEH;
+	private readonly INamingConvention namingConvention;
 
-	private readonly ITypeResolver CBMKGNIHPFO;
+	private readonly ITypeResolver typeResolver;
 
-	internal IList<IYamlTypeConverter> JLJDNDGJEKC
+	internal IList<IYamlTypeConverter> Converters
 	{
 		get
 		{
-			return NGJMKPBNGPP();
+			return GetConverters();
 		}
 		private set
 		{
-			EEMMNEEEJPJ(value);
+			SetConverters(value);
 		}
 	}
 
-	public Serializer(PAFDJLCFOGH LHONCAIFCAF = PAFDJLCFOGH.None, INamingConvention LELOAKPLJEH = null)
+	public Serializer(SerializationOptions LHONCAIFCAF = SerializationOptions.None, INamingConvention LELOAKPLJEH = null)
 	{
-		this.LHONCAIFCAF = LHONCAIFCAF;
-		this.LELOAKPLJEH = LELOAKPLJEH ?? new GCEHGHHBNOA();
-		EEMMNEEEJPJ(new List<IYamlTypeConverter>());
-		foreach (IYamlTypeConverter item in YamlTypeConverters.LGAMHDFHDHG())
+		this.options = LHONCAIFCAF;
+		this.namingConvention = LELOAKPLJEH ?? new NullNamingConvention();
+		SetConverters(new List<IYamlTypeConverter>());
+		foreach (IYamlTypeConverter item in YamlTypeConverters.GetConverters())
 		{
-			NGJMKPBNGPP().Add(item);
+			GetConverters().Add(item);
 		}
 		object cBMKGNIHPFO;
-		if (KCMBMCCNOHC(PAFDJLCFOGH.DefaultToStaticType))
+		if (IsOptionSet(SerializationOptions.DefaultToStaticType))
 		{
-			ITypeResolver oEBJGLALCDH = new NBGCAMIJKDA();
+			ITypeResolver oEBJGLALCDH = new StaticTypeResolver();
 			cBMKGNIHPFO = oEBJGLALCDH;
 		}
 		else
 		{
-			cBMKGNIHPFO = new CLPJGGPLMAB();
+			cBMKGNIHPFO = new DynamicTypeResolver();
 		}
-		CBMKGNIHPFO = (ITypeResolver)cBMKGNIHPFO;
+		typeResolver = (ITypeResolver)cBMKGNIHPFO;
 	}
 
-	internal IList<IYamlTypeConverter> NGJMKPBNGPP()
+	internal IList<IYamlTypeConverter> GetConverters()
 	{
-		return BBFPDBKOOKF;
+		return converters;
 	}
 
-	private void EEMMNEEEJPJ(IList<IYamlTypeConverter> value)
+	private void SetConverters(IList<IYamlTypeConverter> value)
 	{
-		BBFPDBKOOKF = value;
+		converters = value;
 	}
 
-	private bool KCMBMCCNOHC(PAFDJLCFOGH LFJBBPIDBCL)
+	private bool IsOptionSet(SerializationOptions LFJBBPIDBCL)
 	{
-		return (LHONCAIFCAF & LFJBBPIDBCL) != 0;
+		return (options & LFJBBPIDBCL) != 0;
 	}
 
-	public void JCPBBODBIBI(IYamlTypeConverter GMPKPHNBCHA)
+	public void RegisterTypeConverter(IYamlTypeConverter GMPKPHNBCHA)
 	{
-		NGJMKPBNGPP().Add(GMPKPHNBCHA);
+		GetConverters().Add(GMPKPHNBCHA);
 	}
 
 	public void Serialize(TextWriter writer, object OFDNAFPEAGP)
@@ -78,16 +78,16 @@ public sealed class Serializer
 		Serialize(new Emitter(writer), OFDNAFPEAGP, LFLGCDNKNJI);
 	}
 
-	public void Serialize(NEKGJNOFOFN NPIDIMCLNEM, object OFDNAFPEAGP)
+	public void Serialize(IEmitter NPIDIMCLNEM, object OFDNAFPEAGP)
 	{
 		if (NPIDIMCLNEM == null)
 		{
 			throw new ArgumentNullException("emitter");
 		}
-		ELFOILDKJMP(NPIDIMCLNEM, new ObjectDescriptor(OFDNAFPEAGP, (OFDNAFPEAGP == null) ? typeof(object) : OFDNAFPEAGP.GetType(), typeof(object)));
+		EmitDocument(NPIDIMCLNEM, new ObjectDescriptor(OFDNAFPEAGP, (OFDNAFPEAGP == null) ? typeof(object) : OFDNAFPEAGP.GetType(), typeof(object)));
 	}
 
-	public void Serialize(NEKGJNOFOFN NPIDIMCLNEM, object OFDNAFPEAGP, Type LFLGCDNKNJI)
+	public void Serialize(IEmitter NPIDIMCLNEM, object OFDNAFPEAGP, Type LFLGCDNKNJI)
 	{
 		if (NPIDIMCLNEM == null)
 		{
@@ -97,61 +97,61 @@ public sealed class Serializer
 		{
 			throw new ArgumentNullException("type");
 		}
-		ELFOILDKJMP(NPIDIMCLNEM, new ObjectDescriptor(OFDNAFPEAGP, LFLGCDNKNJI, LFLGCDNKNJI));
+		EmitDocument(NPIDIMCLNEM, new ObjectDescriptor(OFDNAFPEAGP, LFLGCDNKNJI, LFLGCDNKNJI));
 	}
 
-	private void ELFOILDKJMP(NEKGJNOFOFN NPIDIMCLNEM, IObjectDescriptor OFDNAFPEAGP)
+	private void EmitDocument(IEmitter NPIDIMCLNEM, IObjectDescriptor OFDNAFPEAGP)
 	{
-		BIGFDIOHKIG bIGFDIOHKIG = KPFMLJLAEPA();
-		IEventEmitter oPIGMJHGIDL = KJGEMGOFAIA(NPIDIMCLNEM);
-		IObjectGraphVisitor nKECMANOOEM = FFCJCHJGJOD(NPIDIMCLNEM, bIGFDIOHKIG, oPIGMJHGIDL, OFDNAFPEAGP);
+		IObjectGraphTraversalStrategy bIGFDIOHKIG = CreateTraversalStrategy();
+		IEventEmitter oPIGMJHGIDL = CreateEventEmitter(NPIDIMCLNEM);
+		IObjectGraphVisitor nKECMANOOEM = CreateEmittingVisitor(NPIDIMCLNEM, bIGFDIOHKIG, oPIGMJHGIDL, OFDNAFPEAGP);
 		NPIDIMCLNEM.Emit(new StreamStart());
 		NPIDIMCLNEM.Emit(new DocumentStart());
 		bIGFDIOHKIG.Traverse(OFDNAFPEAGP, nKECMANOOEM);
 		NPIDIMCLNEM.Emit(new DocumentEnd(true));
-		NPIDIMCLNEM.Emit(new HNKFEGCMBJB());
+		NPIDIMCLNEM.Emit(new StreamEndEvent());
 	}
 
-	private IObjectGraphVisitor FFCJCHJGJOD(NEKGJNOFOFN NPIDIMCLNEM, BIGFDIOHKIG PECHNBFNJJG, IEventEmitter OPIGMJHGIDL, IObjectDescriptor OFDNAFPEAGP)
+	private IObjectGraphVisitor CreateEmittingVisitor(IEmitter NPIDIMCLNEM, IObjectGraphTraversalStrategy PECHNBFNJJG, IEventEmitter OPIGMJHGIDL, IObjectDescriptor OFDNAFPEAGP)
 	{
 		IObjectGraphVisitor gDMFLLGPLNO = new EmittingObjectGraphVisitor(OPIGMJHGIDL);
-		gDMFLLGPLNO = new CustomSerializationObjectGraphVisitor(NPIDIMCLNEM, gDMFLLGPLNO, NGJMKPBNGPP());
-		if (!KCMBMCCNOHC(PAFDJLCFOGH.DisableAliases))
+		gDMFLLGPLNO = new CustomSerializationObjectGraphVisitor(NPIDIMCLNEM, gDMFLLGPLNO, GetConverters());
+		if (!IsOptionSet(SerializationOptions.DisableAliases))
 		{
 			AnchorAssigner cKGCHJDJLCD = new AnchorAssigner();
 			PECHNBFNJJG.Traverse(OFDNAFPEAGP, cKGCHJDJLCD);
 			gDMFLLGPLNO = new AnchorAssigningObjectGraphVisitor(gDMFLLGPLNO, OPIGMJHGIDL, cKGCHJDJLCD);
 		}
-		if (!KCMBMCCNOHC(PAFDJLCFOGH.EmitDefaults))
+		if (!IsOptionSet(SerializationOptions.EmitDefaults))
 		{
 			gDMFLLGPLNO = new DefaultExclusiveObjectGraphVisitor(gDMFLLGPLNO);
 		}
 		return gDMFLLGPLNO;
 	}
 
-	private IEventEmitter KJGEMGOFAIA(NEKGJNOFOFN NPIDIMCLNEM)
+	private IEventEmitter CreateEventEmitter(IEmitter NPIDIMCLNEM)
 	{
-		DEFBJFOKOPM jDJEJDIJLLE = new DEFBJFOKOPM(NPIDIMCLNEM);
-		if (KCMBMCCNOHC(PAFDJLCFOGH.JsonCompatible))
+		WriterEventEmitter jDJEJDIJLLE = new WriterEventEmitter(NPIDIMCLNEM);
+		if (IsOptionSet(SerializationOptions.JsonCompatible))
 		{
 			return new JsonEventEmitter(jDJEJDIJLLE);
 		}
-		return new TypeAssigningEventEmitter(jDJEJDIJLLE, KCMBMCCNOHC(PAFDJLCFOGH.Roundtrip));
+		return new TypeAssigningEventEmitter(jDJEJDIJLLE, IsOptionSet(SerializationOptions.Roundtrip));
 	}
 
-	private BIGFDIOHKIG KPFMLJLAEPA()
+	private IObjectGraphTraversalStrategy CreateTraversalStrategy()
 	{
-		ITypeInspector cECGLIIIJJH = new ReadablePropertiesTypeInspector(CBMKGNIHPFO);
-		if (KCMBMCCNOHC(PAFDJLCFOGH.Roundtrip))
+		ITypeInspector cECGLIIIJJH = new ReadablePropertiesTypeInspector(typeResolver);
+		if (IsOptionSet(SerializationOptions.Roundtrip))
 		{
 			cECGLIIIJJH = new ReadableAndWritablePropertiesTypeInspector(cECGLIIIJJH);
 		}
-		cECGLIIIJJH = new NamingConventionTypeInspector(cECGLIIIJJH, LELOAKPLJEH);
+		cECGLIIIJJH = new NamingConventionTypeInspector(cECGLIIIJJH, namingConvention);
 		cECGLIIIJJH = new YamlAttributesTypeInspector(cECGLIIIJJH);
-		if (KCMBMCCNOHC(PAFDJLCFOGH.Roundtrip))
+		if (IsOptionSet(SerializationOptions.Roundtrip))
 		{
-			return new RoundtripObjectGraphTraversalStrategy(this, cECGLIIIJJH, CBMKGNIHPFO, 50);
+			return new RoundtripObjectGraphTraversalStrategy(this, cECGLIIIJJH, typeResolver, 50);
 		}
-		return new FullObjectGraphTraversalStrategy(this, cECGLIIIJJH, CBMKGNIHPFO, 50);
+		return new FullObjectGraphTraversalStrategy(this, cECGLIIIJJH, typeResolver, 50);
 	}
 }

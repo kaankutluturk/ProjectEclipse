@@ -1,22 +1,22 @@
 public class RuleInitData
 {
-	public Model OGBHDKKOIGH;
+	public Model OpponentModel;
 
-	public Model DLPKDAIDCBF;
+	public Model PlayerModel;
 
-	public ModelParameters NMNCKBPFCCP;
+	public ModelParameters PlayerParameters;
 
-	public ModelParameters AKBNKDBHCEO;
+	public ModelParameters OpponentParameters;
 
-	public Location LPJNEDFCBOI;
+	public Location FightLocation;
 
-	public PlayersFightData KNKNPEADHOF;
+	public PlayersFightData FightData;
 
 	public RuleInitData(Model _playerModel, Model CKNCPOABFBO, Location _location, PlayersFightData DPONLGICLEH)
 	{
-		DLPKDAIDCBF = _playerModel;
-		OGBHDKKOIGH = CKNCPOABFBO;
-		LPJNEDFCBOI = _location;
-		KNKNPEADHOF = DPONLGICLEH;
+		PlayerModel = _playerModel;
+		OpponentModel = CKNCPOABFBO;
+		FightLocation = _location;
+		FightData = DPONLGICLEH;
 	}
 }

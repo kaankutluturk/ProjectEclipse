@@ -1,7 +1,7 @@
 $ErrorActionPreference='Stop'
 $root=Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $PSScriptRoot))
 $source=Get-Content -Raw -LiteralPath (Join-Path $root 'Assets/Scripts/Assembly-CSharp/ItemBuyHelper.cs')
-$methods=foreach($name in @('SettleImmediatePurchase','IHHKNBPKGHD','MGMAJHLAICA','NIEAANPCGLC','ApplyImmediateCoinPurchase','ApplyImmediateGemPurchase','ApplyImmediateConsumablePurchase')) {
+$methods=foreach($name in @('SettleImmediatePurchase','BuyItemWithCoins','BuyItemWithGems','BuyConsumableWithGems','ApplyImmediateCoinPurchase','ApplyImmediateGemPurchase','ApplyImmediateConsumablePurchase')) {
     $match=[regex]::Match($source,"(?ms)^\t(?:public|private) static bool $name\(.*?^\t\}")
     if(!$match.Success){throw "Method not found: $name"}; $match.Value
 }
@@ -12,37 +12,37 @@ $fixture=Join-Path $root ('Temp/ImmediatePurchases-'+[Guid]::NewGuid().ToString(
 New-Item -ItemType Directory -Path $fixture -Force | Out-Null
 $code=@'
 using System;
-class ItemInfo { public long CoinPrice=7,GemPrice=9; public int CPODJDDPJHB=2; public string SubType="",FAEGJAEEMGH="fixture"; }
+class ItemInfo { public long CoinPrice=7,GemPrice=9; public int CurrencyValue=2; public string SubType="",CurrencyName="fixture"; }
 struct ObscuredLong { long value; public static explicit operator ObscuredLong(long n)=>new ObscuredLong{value=n}; public static implicit operator long(ObscuredLong n)=>n.value; }
 struct ObscuredInt { int value; public static explicit operator ObscuredInt(int n)=>new ObscuredInt{value=n}; public static implicit operator int(ObscuredInt n)=>n.value; }
-class UserItem { public int Count; public int OFOPFCJNEBL()=>Count; }
-class Inventory { public UserItem CMGOCLGHNLH(ItemInfo i)=>ListSF.Owner.Item; }
-class Perks { public void LCDFOLAAEGM(){ListSF.Owner.Resets++;} }
+class UserItem { public int Count; public int GetCount()=>Count; }
+class Inventory { public UserItem FindItem(ItemInfo i)=>ListSF.Owner.Item; }
+class Perks { public void ResetPerks(){ListSF.Owner.Resets++;} }
 class Roster {
- public enum HPOIJPGPOCF { CHANGE_BUY_ITEM }
+ public enum BalanceChangeType { CHANGE_BUY_ITEM }
  public UserItem Item=new UserItem(); public long Coins=100,Gems=100; public int Dirty,Resets,Currency;
- public Inventory KHCNHPCPFII()=>new Inventory(); public long BFBOEGMAMNF()=>Coins; public long EHFJHFDACMP()=>Gems;
- public void OIOOMAKNIOB(long n){Coins=n;} public void LLNELLFMMBB(long n,HPOIJPGPOCF kind){Gems=n;}
- public void GGGEHAGCLGC(bool value){Dirty++;} public Perks JLBDOBLHHAF()=>new Perks(); public void AddCurrencyCount(string name,int n){Currency+=n;}
+ public Inventory GetInventory()=>new Inventory(); public long GetMoney()=>Coins; public long GetBonus()=>Gems;
+ public void SetMoney(long n){Coins=n;} public void SetBonus(long n,BalanceChangeType kind){Gems=n;}
+ public void RequestSave(bool value){Dirty++;} public Perks GetPerks()=>new Perks(); public void AddCurrencyCount(string name,int n){Currency+=n;}
 }
-static class ListSF { public static Roster Owner; public static Roster CCDKHLAMKKO()=>Owner;
+static class ListSF { public static Roster Owner; public static Roster GetRoster()=>Owner;
 __INCREMENT__
 }
-static class StatisticsCollector { public enum CNCDMFJLMFH { Money,Bonus } }
+static class StatisticsCollector { public enum CurrencyType { Money,Bonus } }
 namespace Eclipse.Modding { static class ModRuntime {
  public static bool Deny; public static int Calls,Quantity; public static string Snapshot;
  public static bool SettleItemPurchase(ItemInfo item,int quantity,Func<bool> apply){Calls++;Quantity=quantity;if(Deny)return false;bool ok=apply();if(ok)Snapshot=$"{ListSF.Owner.Coins}/{ListSF.Owner.Gems}/{ListSF.Owner.Item.Count}";return ok;}
 } }
 static class Program {
  static int checks,grants,notifications;
- static bool KCBCGDFKNME(ItemInfo item){grants++;ListSF.Owner.Item.Count++;return true;}
- static void LMBHFAHHDKI(ItemInfo i,StatisticsCollector.CNCDMFJLMFH c,bool delivery){}
- static void CBADCGAEPGA(ItemInfo item){notifications++;}
+ static bool AddPurchasedItem(ItemInfo item){grants++;ListSF.Owner.Item.Count++;return true;}
+ static void ReportPurchaseStatistics(ItemInfo i,StatisticsCollector.CurrencyType c,bool delivery){}
+ static void NotifyPurchaseQuestEvent(ItemInfo item){notifications++;}
 __METHODS__
  static void Check(bool b,string text){checks++;if(!b)throw new Exception(text);}
  static void Reset(){ListSF.Owner=new Roster();grants=notifications=0;Eclipse.Modding.ModRuntime.Calls=0;Eclipse.Modding.ModRuntime.Deny=false;Eclipse.Modding.ModRuntime.Snapshot=null;}
  static void Main(){
-  var methods=new Func<ItemInfo,bool>[] {IHHKNBPKGHD,MGMAJHLAICA,NIEAANPCGLC};
+  var methods=new Func<ItemInfo,bool>[] {BuyItemWithCoins,BuyItemWithGems,BuyConsumableWithGems};
   for(int i=0;i<methods.Length;i++){
    var buy=methods[i]; Reset();
    Check(buy(new ItemInfo()),"Valid purchase rejected");
@@ -60,8 +60,8 @@ __METHODS__
    Check(!buy(null) && Eclipse.Modding.ModRuntime.Calls==0,"Null item entered settlement");
    ListSF.Owner=null; Check(!buy(new ItemInfo()),"Missing profile accepted");
   }
-  Reset();Check(NIEAANPCGLC(new ItemInfo{SubType="PerkReset"}) && ListSF.Owner.Resets==1,"Consumable perk reset lost");
-  Reset();Check(NIEAANPCGLC(new ItemInfo{SubType="Currency"}) && ListSF.Owner.Currency==2,"Consumable currency effect lost");
+  Reset();Check(BuyConsumableWithGems(new ItemInfo{SubType="PerkReset"}) && ListSF.Owner.Resets==1,"Consumable perk reset lost");
+  Reset();Check(BuyConsumableWithGems(new ItemInfo{SubType="Currency"}) && ListSF.Owner.Currency==2,"Consumable currency effect lost");
   Console.WriteLine("Immediate purchases: "+checks+" checks passed (production methods; settlement/roster/grant services controlled).");
  }
 }

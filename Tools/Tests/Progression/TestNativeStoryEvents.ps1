@@ -7,7 +7,7 @@ $runtime=Get-Content -LiteralPath (Join-Path $root 'Assets/Scripts/Eclipse/Moddi
 $list=Get-Content -LiteralPath (Join-Path $root 'Assets/Scripts/Assembly-CSharp/ListSF.cs') -Raw -Encoding UTF8
 $capture=[regex]::Match($runtime,'(?ms)^        internal static ModStoryEvent CaptureStoryEvent\(.*?^        \}')
 $publish=[regex]::Match($runtime,'(?ms)^        internal static void PublishStoryEvent\(.*?^        \}')
-$dispatch=[regex]::Match($list,'(?ms)^\tpublic bool FFBAJNGHGGD\(.*?^\t\}')
+$dispatch=[regex]::Match($list,'(?ms)^\tpublic bool RaiseQuestEvent\(.*?^\t\}')
 if(!$capture.Success -or !$publish.Success -or !$dispatch.Success){throw 'Production story methods not found.'}
 $code=Get-Content -LiteralPath (Join-Path $PSScriptRoot 'ValidateNativeStoryEvents.cs') -Raw -Encoding UTF8
 $code.Replace('/* HOST METHODS */',$capture.Value+[Environment]::NewLine+$publish.Value).Replace('/* NATIVE DISPATCH */',$dispatch.Value) | Set-Content -LiteralPath (Join-Path $fixture 'Program.cs') -Encoding UTF8

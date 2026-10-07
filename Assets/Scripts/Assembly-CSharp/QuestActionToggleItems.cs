@@ -5,50 +5,50 @@ public class QuestActionToggleItems : QuestAction
 {
 	private string _toggle;
 
-	private string IIPJNGBMJJP;
+	private string labelExpression;
 
 	public override void Parse(XmlNode EPKLCPOEELO)
 	{
 		base.Parse(EPKLCPOEELO);
-		_toggle = EPKLCPOEELO.Attributes["Toggle"].CIPOICEEIBK("on");
-		IIPJNGBMJJP = EPKLCPOEELO.Attributes["Label"].CIPOICEEIBK(string.Empty);
+		_toggle = EPKLCPOEELO.Attributes["Toggle"].GetStringOrDefault("on");
+		labelExpression = EPKLCPOEELO.Attributes["Label"].GetStringOrDefault(string.Empty);
 	}
 
-	public override void DEJMHFMLKIC(QuestParameters GFIHPBCEEOB)
+	public override void Execute(QuestParameters GFIHPBCEEOB)
 	{
-		base.DEJMHFMLKIC(GFIHPBCEEOB);
+		base.Execute(GFIHPBCEEOB);
 		ConditionExtension.CompareResult lNIDLHOIHIM = new ConditionExtension.CompareResult();
 		QuestCondition kKDGLNECFHA = new QuestCondition();
-		kKDGLNECFHA.LIMHBJBEEIA(GFIHPBCEEOB);
-		kKDGLNECFHA.MCPIOGALBMK(IIPJNGBMJJP, lNIDLHOIHIM);
+		kKDGLNECFHA.SetParameters(GFIHPBCEEOB);
+		kKDGLNECFHA.SetValue(labelExpression, lNIDLHOIHIM);
 		string iBBAMMHHBFE = lNIDLHOIHIM.resultSTR;
-		kKDGLNECFHA.MCPIOGALBMK(_toggle, lNIDLHOIHIM);
+		kKDGLNECFHA.SetValue(_toggle, lNIDLHOIHIM);
 		bool flag = lNIDLHOIHIM.resultSTR == "on";
-		Roster nKGLHEGIKKP = ListSF.CCDKHLAMKKO();
+		Roster nKGLHEGIKKP = ListSF.GetRoster();
 		if (flag)
 		{
 			if (nKGLHEGIKKP.AddShopLock(iBBAMMHHBFE, true))
 			{
-				LNGDHCMJOMH(iBBAMMHHBFE, true);
+				ApplyShopLockToItems(iBBAMMHHBFE, true);
 			}
 		}
-		else if (nKGLHEGIKKP.OAHDKIDMOCG(iBBAMMHHBFE))
+		else if (nKGLHEGIKKP.RemoveShopLock(iBBAMMHHBFE))
 		{
-			LNGDHCMJOMH(iBBAMMHHBFE, false);
+			ApplyShopLockToItems(iBBAMMHHBFE, false);
 		}
-		OGIJONMKABB();
+		FinishAction();
 	}
 
-	private void LNGDHCMJOMH(string ECNLPLIBNHF, bool PEJELKNFEKJ)
+	private void ApplyShopLockToItems(string ECNLPLIBNHF, bool PEJELKNFEKJ)
 	{
 		if (PEJELKNFEKJ)
 		{
-			List<ItemInfo> list = ListSF.GetItems().HCDLKHKBEPF();
-			int num = ListSF.CCDKHLAMKKO().PINDEKDNCNL();
+			List<ItemInfo> list = ListSF.GetItems().GetAllItems();
+			int num = ListSF.GetRoster().GetLevel();
 			{
 				foreach (ItemInfo item in list)
 				{
-					if (item.DCHJDPCEODD && item.MMHIKEIDDNB == ECNLPLIBNHF)
+					if (item.IsShopVisible && item.GroupId == ECNLPLIBNHF)
 					{
 						ListSF.GetItems().SetNewAddItem(item, true, (!(item.Type == "RealMoneyItem")) ? num : item.ItemLevel);
 					}
@@ -56,6 +56,6 @@ public class QuestActionToggleItems : QuestAction
 				return;
 			}
 		}
-		ListSF.GetItems().MJICEAIDCGP(ECNLPLIBNHF);
+		ListSF.GetItems().ClearNewFlagsForGroup(ECNLPLIBNHF);
 	}
 }

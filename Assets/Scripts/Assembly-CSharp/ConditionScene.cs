@@ -2,15 +2,15 @@ using System.Xml;
 
 public class ConditionScene : ConditionAnimation
 {
-	private SceneTypes KCIIELDOBOM;
+	private SceneTypes _sceneType;
 
 	private string _Name;
 
 	public ConditionScene(XmlNode node)
 		: base(ConditionType.SCREEN)
 	{
-		_Name = node.Attributes["Name"].CIPOICEEIBK(string.Empty);
-		KCIIELDOBOM = get_Type();
+		_Name = node.Attributes["Name"].GetStringOrDefault(string.Empty);
+		_sceneType = get_Type();
 	}
 
 	public SceneTypes get_Type()
@@ -65,7 +65,7 @@ public class ConditionScene : ConditionAnimation
 
 	public override bool IsEqual(ModelConditions conditions)
 	{
-		bool flag = conditions.IBBALIJOJMC == KCIIELDOBOM;
+		bool flag = conditions.SceneType == _sceneType;
 		return (!IsNot) ? flag : (!flag);
 	}
 }

@@ -33,7 +33,7 @@ namespace Eclipse.Multiplayer
                 _spriteLoaded = true;
                 if (!string.IsNullOrEmpty(Icon))
                 {
-                    try { _sprite = Nekki.SF2.GUI.ResolutionImage.GetSprite(SF2Paths.LFIIMPEAMFG(), Icon); }
+                    try { _sprite = Nekki.SF2.GUI.ResolutionImage.GetSprite(SF2Paths.GetItemsUiPath(), Icon); }
                     catch (Exception exception) { Debug.LogWarning("[Versus] No icon for " + Id + ": " + exception.Message); }
                 }
                 return _sprite;
@@ -175,7 +175,7 @@ namespace Eclipse.Multiplayer
         private static void AddAll(LoadoutSlot slot, string type, Entry defaultEntry, HashSet<string> excluded, File file)
         {
             if (defaultEntry != null && !string.IsNullOrEmpty(defaultEntry.id)) TryAdd(slot, defaultEntry.id, defaultEntry.name, requireArt: !IsGameDefault(defaultEntry.id));
-            var candidates = new List<ItemInfo>(ListSF.GetItems().ONFMAJEAACM(type) ?? new List<ItemInfo>());
+            var candidates = new List<ItemInfo>(ListSF.GetItems().GetItemsByType(type) ?? new List<ItemInfo>());
             candidates.Sort((a, b) => a.ItemLevel != b.ItemLevel ? a.ItemLevel.CompareTo(b.ItemLevel) : string.CompareOrdinal(a.Name, b.Name));
             foreach (var item in candidates)
             {
@@ -233,7 +233,7 @@ namespace Eclipse.Multiplayer
 
         private static bool LocationInstalled(string name)
         {
-            try { return !string.IsNullOrEmpty(ResourceManager.GetBundledText(SF2Paths.OCAKEHJCNCC() + "/" + name + "/params.xml")); }
+            try { return !string.IsNullOrEmpty(ResourceManager.GetBundledText(SF2Paths.GetLocationsPath() + "/" + name + "/params.xml")); }
             catch (Exception) { return false; }
         }
 

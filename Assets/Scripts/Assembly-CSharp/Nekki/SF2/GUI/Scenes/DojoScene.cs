@@ -13,13 +13,13 @@ namespace Nekki.SF2.GUI.Scenes
 		[SerializeField]
 		public GameController gameController;
 
-		private PaymentUI ODCDHJGNPEM;
+		private PaymentUI paymentUi;
 
 		public global::Fight fight;
 
-		private bool OGKFKJFGOIE = true;
+		private bool drawFightEnabled = true;
 
-		public PaymentUI GKPMFKIEPPB
+		public PaymentUI PaymentPanel
 		{
 			get
 			{
@@ -27,7 +27,7 @@ namespace Nekki.SF2.GUI.Scenes
 			}
 		}
 
-		public override ScreenType PNAJHDBDDLP
+		public override ScreenType SceneType
 		{
 			get
 			{
@@ -37,7 +37,7 @@ namespace Nekki.SF2.GUI.Scenes
 
 		public PaymentUI get_PaymentUI()
 		{
-			return ODCDHJGNPEM;
+			return paymentUi;
 		}
 
 		public override ScreenType get_SceneId()
@@ -48,25 +48,25 @@ namespace Nekki.SF2.GUI.Scenes
 		protected override void Init(object data)
 		{
 			base.Init(data);
-			ODCDHJGNPEM = IMDHIBMOAIG<PaymentUI>();
+			paymentUi = GetModule<PaymentUI>();
 			_mainMenu.Init();
-			FightList jDIPBIHBGPF = ListSF.MGABNFOMDGB().NIAMMNJLEFI(BattleType.FightNone)[0].OAJCBGAKHJJ(0);
-			jDIPBIHBGPF = GameUtils.HIPIGHPMBIJ(jDIPBIHBGPF);
-			RosterFight pIGKOIFBOME = ListSF.CCDKHLAMKKO().FindSavedFightRecord(jDIPBIHBGPF.FightId);
+			FightList jDIPBIHBGPF = ListSF.GetCurrentZone().FindBattlesByType(BattleType.FightNone)[0].GetFightByIndex(0);
+			jDIPBIHBGPF = GameUtils.GetFinalFight(jDIPBIHBGPF);
+			RosterFight pIGKOIFBOME = ListSF.GetRoster().FindSavedFightRecord(jDIPBIHBGPF.FightId);
 			if (pIGKOIFBOME == null)
 			{
-				pIGKOIFBOME = ListSF.CCDKHLAMKKO().OBAFPDGJHNN(jDIPBIHBGPF.FightId);
+				pIGKOIFBOME = ListSF.GetRoster().CreateFight(jDIPBIHBGPF.FightId);
 			}
 			jDIPBIHBGPF.SetRosterFight(pIGKOIFBOME);
-			fight = GameUtils.ABAIHGFPHMO(jDIPBIHBGPF, null, gameController);
+			fight = GameUtils.CreateFight(jDIPBIHBGPF, null, gameController);
 		}
 
-		protected override void PJNFHNFLNNO()
+		protected override void OnSceneClosed()
 		{
-			base.PJNFHNFLNNO();
+			base.OnSceneClosed();
 			if (fight != null)
 			{
-				fight.ANIDBLANMIC();
+				fight.Unload();
 			}
 		}
 
@@ -76,13 +76,13 @@ namespace Nekki.SF2.GUI.Scenes
 
 		private void FixedUpdate()
 		{
-			if ((OGKFKJFGOIE || Eclipse.Input.EclipseInput.GetKeyDown(KeyCode.Equals)) && fight != null)
+			if ((drawFightEnabled || Eclipse.Input.EclipseInput.GetKeyDown(KeyCode.Equals)) && fight != null)
 			{
 				fight.Draw();
 			}
 			if (Eclipse.Input.EclipseInput.GetKeyDown(KeyCode.Minus))
 			{
-				OGKFKJFGOIE = !OGKFKJFGOIE;
+				drawFightEnabled = !drawFightEnabled;
 			}
 		}
 	}

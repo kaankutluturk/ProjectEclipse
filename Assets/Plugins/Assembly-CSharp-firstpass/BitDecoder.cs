@@ -1,10 +1,10 @@
 internal struct BitDecoder
 {
-	public const int GMKPCANHECM = 11;
+	public const int kNumBitModelTotalBits = 11;
 
 	public const uint kBitModelTotal = 2048u;
 
-	private const int PEDEJBJFKOF = 5;
+	private const int kNumMoveBits = 5;
 
 	private uint Prob;
 
@@ -25,26 +25,26 @@ internal struct BitDecoder
 		Prob = 1024u;
 	}
 
-	public uint Decode(CEILAGAKGKF HELKEOGALEA)
+	public uint Decode(RangeDecoder HELKEOGALEA)
 	{
 		uint num = (HELKEOGALEA.Range >> 11) * Prob;
-		if (HELKEOGALEA.EDEEELJMHLG < num)
+		if (HELKEOGALEA.Code < num)
 		{
 			HELKEOGALEA.Range = num;
 			Prob += 2048 - Prob >> 5;
 			if (HELKEOGALEA.Range < 16777216)
 			{
-				HELKEOGALEA.EDEEELJMHLG = (HELKEOGALEA.EDEEELJMHLG << 8) | (byte)HELKEOGALEA.Stream.ReadByte();
+				HELKEOGALEA.Code = (HELKEOGALEA.Code << 8) | (byte)HELKEOGALEA.Stream.ReadByte();
 				HELKEOGALEA.Range <<= 8;
 			}
 			return 0u;
 		}
 		HELKEOGALEA.Range -= num;
-		HELKEOGALEA.EDEEELJMHLG -= num;
+		HELKEOGALEA.Code -= num;
 		Prob -= Prob >> 5;
 		if (HELKEOGALEA.Range < 16777216)
 		{
-			HELKEOGALEA.EDEEELJMHLG = (HELKEOGALEA.EDEEELJMHLG << 8) | (byte)HELKEOGALEA.Stream.ReadByte();
+			HELKEOGALEA.Code = (HELKEOGALEA.Code << 8) | (byte)HELKEOGALEA.Stream.ReadByte();
 			HELKEOGALEA.Range <<= 8;
 		}
 		return 1u;

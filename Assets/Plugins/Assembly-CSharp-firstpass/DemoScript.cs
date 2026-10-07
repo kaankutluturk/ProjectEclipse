@@ -3,13 +3,13 @@ using UnityEngine;
 
 public class DemoScript : MonoBehaviour
 {
-	private void OEEIEAMDKIG()
+	private void LogGamepadOneInput()
 	{
 		GamePad.GetButtonDown(GamePad.Button.A, GamePad.Player.One);
 		GamePad.GetStick(GamePad.Stick.LeftStick, GamePad.Player.One);
 		GamePad.GetTrigger(GamePad.Trigger.RightTrigger, GamePad.Player.One);
 		GamepadState iOIGCCPIJPN = GamePad.GetState(GamePad.Player.One);
-		MonoBehaviour.print("A: " + iOIGCCPIJPN.IEKADOOKFKG);
+		MonoBehaviour.print("A: " + iOIGCCPIJPN.A);
 	}
 
 	private void OnGUI()
@@ -17,47 +17,47 @@ public class DemoScript : MonoBehaviour
 		GUILayout.BeginArea(new Rect(0f, 20f, Screen.width, Screen.height));
 		GUILayout.BeginHorizontal();
 		GUILayout.FlexibleSpace();
-		AKMACMCIKGK();
+		DrawLabels();
 		for (int i = 0; i < 5; i++)
 		{
-			LCBBJNJDHOM((GamePad.Player)i);
+			DrawGamepadState((GamePad.Player)i);
 		}
 		GUILayout.FlexibleSpace();
 		GUILayout.EndHorizontal();
 		GUILayout.EndArea();
 	}
 
-	private void LCBBJNJDHOM(GamePad.Player OJINMMFLEEB)
+	private void DrawGamepadState(GamePad.Player OJINMMFLEEB)
 	{
 		GUILayout.Space(45f);
 		GUILayout.BeginVertical();
 		GamepadState iOIGCCPIJPN = GamePad.GetState(OJINMMFLEEB);
 		GUILayout.Label("Gamepad " + OJINMMFLEEB);
-		GUILayout.Label(string.Empty + iOIGCCPIJPN.IEKADOOKFKG);
-		GUILayout.Label(string.Empty + iOIGCCPIJPN.LDKCOIHONPG);
-		GUILayout.Label(string.Empty + iOIGCCPIJPN.NPKMJMCLDAH);
-		GUILayout.Label(string.Empty + iOIGCCPIJPN.IHAHIEHHNCG);
+		GUILayout.Label(string.Empty + iOIGCCPIJPN.A);
+		GUILayout.Label(string.Empty + iOIGCCPIJPN.IsButtonBPressed);
+		GUILayout.Label(string.Empty + iOIGCCPIJPN.X);
+		GUILayout.Label(string.Empty + iOIGCCPIJPN.Y);
 		GUILayout.Label(string.Empty + iOIGCCPIJPN.Start);
-		GUILayout.Label(string.Empty + iOIGCCPIJPN.AJLBHIHFFCE);
-		GUILayout.Label(string.Empty + iOIGCCPIJPN.GGMOMECKAGP);
-		GUILayout.Label(string.Empty + iOIGCCPIJPN.CLIBGHJKICF);
-		GUILayout.Label(string.Empty + iOIGCCPIJPN.EDCHBILGFLD);
-		GUILayout.Label(string.Empty + iOIGCCPIJPN.NNCHJCLKHHA);
-		GUILayout.Label(string.Empty + iOIGCCPIJPN.FJBHJIFKOMF);
-		GUILayout.Label(string.Empty + iOIGCCPIJPN.HHMEIEKKDAL);
-		GUILayout.Label(string.Empty + iOIGCCPIJPN.ELAPGGICPLB);
-		GUILayout.Label(string.Empty + iOIGCCPIJPN.KDPBFODDKOJ);
+		GUILayout.Label(string.Empty + iOIGCCPIJPN.Back);
+		GUILayout.Label(string.Empty + iOIGCCPIJPN.LeftShoulder);
+		GUILayout.Label(string.Empty + iOIGCCPIJPN.RightShoulder);
+		GUILayout.Label(string.Empty + iOIGCCPIJPN.Left);
+		GUILayout.Label(string.Empty + iOIGCCPIJPN.Right);
+		GUILayout.Label(string.Empty + iOIGCCPIJPN.Up);
+		GUILayout.Label(string.Empty + iOIGCCPIJPN.Down);
+		GUILayout.Label(string.Empty + iOIGCCPIJPN.LeftStick);
+		GUILayout.Label(string.Empty + iOIGCCPIJPN.RightStick);
 		GUILayout.Label(string.Empty);
-		GUILayout.Label(string.Empty + Math.Round(iOIGCCPIJPN.CHJIELPPCOE, 2));
-		GUILayout.Label(string.Empty + Math.Round(iOIGCCPIJPN.ALEANDMIOJO, 2));
+		GUILayout.Label(string.Empty + Math.Round(iOIGCCPIJPN.LeftTrigger, 2));
+		GUILayout.Label(string.Empty + Math.Round(iOIGCCPIJPN.RightTrigger, 2));
 		GUILayout.Label(string.Empty);
-		GUILayout.Label(string.Empty + iOIGCCPIJPN.HNPGBMGKGEB);
-		GUILayout.Label(string.Empty + iOIGCCPIJPN.IMMFMNIFNEH);
-		GUILayout.Label(string.Empty + iOIGCCPIJPN.PGHJPABHPLP);
+		GUILayout.Label(string.Empty + iOIGCCPIJPN.LeftStickAxis);
+		GUILayout.Label(string.Empty + iOIGCCPIJPN.RightStickAxis);
+		GUILayout.Label(string.Empty + iOIGCCPIJPN.DpadAxis);
 		GUILayout.EndVertical();
 	}
 
-	private void AKMACMCIKGK()
+	private void DrawLabels()
 	{
 		GUILayout.BeginVertical();
 		GUILayout.Label(" ", GUILayout.Width(80f));

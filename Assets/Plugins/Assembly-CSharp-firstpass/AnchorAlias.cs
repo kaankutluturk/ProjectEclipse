@@ -9,7 +9,7 @@ public class AnchorAlias : ParsingEvent
 	{
 		get
 		{
-			return OEAKCOHMIHH();
+			return GetValue();
 		}
 	}
 
@@ -32,12 +32,12 @@ public class AnchorAlias : ParsingEvent
 	{
 	}
 
-	internal override BHBPOHDAGPH get_Type()
+	internal override ParsingEventType get_Type()
 	{
-		return BHBPOHDAGPH.Alias;
+		return ParsingEventType.Alias;
 	}
 
-	public string OEAKCOHMIHH()
+	public string GetValue()
 	{
 		return value;
 	}
@@ -47,7 +47,7 @@ public class AnchorAlias : ParsingEvent
 		return string.Format(CultureInfo.InvariantCulture, "Alias [value = {0}]", value);
 	}
 
-	public override void GPHIFFOGOGN(IParsingEventVisitor NKECMANOOEM)
+	public override void Accept(IParsingEventVisitor NKECMANOOEM)
 	{
 		NKECMANOOEM.Visit(this);
 	}

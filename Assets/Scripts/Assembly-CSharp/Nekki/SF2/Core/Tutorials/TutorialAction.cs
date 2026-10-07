@@ -8,63 +8,63 @@ namespace Nekki.SF2.Core.Tutorials
 {
 	public class TutorialAction : SFMonoBehaviour<object>
 	{
-		public enum HEGMELMMJEG
+		public enum TutorialActionEvent
 		{
 			ACTION_EVENT_ON_COMPLETE = 0
 		}
 
-		protected Scene GGEKAKEKBEH;
+		protected Scene currentScene;
 
-		private GameObject LJKFMGOCNLE;
+		private GameObject highlightObject;
 
-		private List<GameObject> MMNBKIIDOKA = new List<GameObject>();
+		private List<GameObject> spawnedObjects = new List<GameObject>();
 
-		private List<global::Pair<GameObject, int>> AFIMKNBGNLM;
+		private List<global::Pair<GameObject, int>> trackedObjects;
 
 		public virtual void Run()
 		{
-			GGEKAKEKBEH = Module.GetInstance().HMGDPCPPEFC();
+			currentScene = Module.GetInstance().GetCurrentScene();
 		}
 
-		protected virtual bool CHDEIEMINPF()
+		protected virtual bool CanRun()
 		{
 			return true;
 		}
 
-		protected void OGIJONMKABB(int BNPIIOAIBGN = 0)
+		protected void CompleteAction(int BNPIIOAIBGN = 0)
 		{
 			CallEvent(0, BNPIIOAIBGN);
 		}
 
-		protected void OCEFGJJMKOC(Button KLNKEPMAGKF, bool KOHDJNFJLGH)
+		protected void SetButtonHighlight(Button KLNKEPMAGKF, bool KOHDJNFJLGH)
 		{
 			if (!KOHDJNFJLGH)
 			{
 			}
 		}
 
-		protected void FHAAJLCMPFD()
+		protected void DestroyHighlight()
 		{
-			Object.Destroy(LJKFMGOCNLE);
+			Object.Destroy(highlightObject);
 		}
 
-		protected void GIFJDKOJFEO(GameObject target, float KDGOIIIHPCL, float AMKFJMOMNNB, float DOBNKCHMKGE = 0f)
+		protected void HighlightTarget(GameObject target, float KDGOIIIHPCL, float AMKFJMOMNNB, float DOBNKCHMKGE = 0f)
 		{
 		}
 
-		protected void EAJHMLAGNNO()
+		protected void DestroySpawnedObjects()
 		{
-			foreach (GameObject item in MMNBKIIDOKA)
+			foreach (GameObject item in spawnedObjects)
 			{
 				Object.Destroy(item);
 			}
-			MMNBKIIDOKA.Clear();
+			spawnedObjects.Clear();
 		}
 
-		protected void BCBNPEFIEEG(GameObject GBIOHMNNEJI)
+		protected void TrackObject(GameObject GBIOHMNNEJI)
 		{
 			global::Pair<GameObject, int> item = new global::Pair<GameObject, int>(GBIOHMNNEJI, 0);
-			AFIMKNBGNLM.Add(item);
+			trackedObjects.Add(item);
 		}
 	}
 }

@@ -15,7 +15,7 @@ namespace UIFigures
 		[SerializeField]
 		private float _Width = 10f;
 
-		public List<Vector2> CMJMECFMIKP
+		public List<Vector2> PointList
 		{
 			get
 			{
@@ -23,7 +23,7 @@ namespace UIFigures
 			}
 		}
 
-		public float KBGFAKKBMCN
+		public float LineWidth
 		{
 			get
 			{
@@ -53,7 +53,7 @@ namespace UIFigures
 		protected override void OnPopulateMesh(VertexHelper DHJBOKKAOJK)
 		{
 			base.OnPopulateMesh(DHJBOKKAOJK);
-			DrawFunctions.FBFOFHOLLKI(DHJBOKKAOJK, _Points, _Width, color, _SingleTexturCord);
+			DrawFunctions.DrawLine(DHJBOKKAOJK, _Points, _Width, color, _SingleTexturCord);
 		}
 	}
 }

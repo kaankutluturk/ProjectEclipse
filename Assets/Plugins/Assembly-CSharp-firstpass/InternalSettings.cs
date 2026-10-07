@@ -52,10 +52,10 @@ public class InternalSettings
 	{
 		string value = GlobalLoad.GetLoadText("Configs/internalSettings");
 		Instance = JsonConvert.DeserializeObject<InternalSettings>(value);
-		Instance.IKFGBJDBNBP(GlobalPath.PathToLoaderFolder);
+		Instance.ResolveExternalPaths(GlobalPath.PathToLoaderFolder);
 	}
 
-	public static T MDOHDKAKHGH<T>(string name) where T : class
+	public static T GetServerSetting<T>(string name) where T : class
 	{
 		JToken jToken = Instance.ServerSettings[name];
 		if (jToken != null)
@@ -65,7 +65,7 @@ public class InternalSettings
 		return (T)null;
 	}
 
-	public static string HFGMHHDBHMH(string name)
+	public static string GetExternalPath(string name)
 	{
 		if (Instance != null && Instance.ExternalPaths.ContainsKey(name))
 		{
@@ -74,7 +74,7 @@ public class InternalSettings
 		return null;
 	}
 
-	private void IKFGBJDBNBP(string OGGDCFJAIMH)
+	private void ResolveExternalPaths(string OGGDCFJAIMH)
 	{
 		Dictionary<string, string> dictionary = new Dictionary<string, string>();
 		foreach (KeyValuePair<string, string> externalPath in ExternalPaths)

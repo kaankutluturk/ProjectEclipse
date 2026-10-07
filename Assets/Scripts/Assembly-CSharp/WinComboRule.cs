@@ -2,33 +2,33 @@ using System.Xml;
 
 public class WinComboRule : InFightRule
 {
-	private int IPGFIEDBKHA;
+	private int requiredComboLevel;
 
 	public WinComboRule(XmlNode node, RuleAppliance EJPOJJKKICO)
-		: base(BCBLLMPAMLP.RuleWinCombo, EJPOJJKKICO, node)
+		: base(RuleType.RuleWinCombo, EJPOJJKKICO, node)
 	{
 		Parse(node);
-		KOKHKAFELGL = false;
-		EBJIKKBLBEM(FightEvent.ComboEvent);
+		applianceLosesOnTrigger = false;
+		SubscribeEvent(FightEvent.ComboEvent);
 	}
 
 	protected override bool CompareSingle(object data)
 	{
 		FightData hCPJJKMNMCE = (FightData)data;
-		return hCPJJKMNMCE.currentComboLevel >= IPGFIEDBKHA;
+		return hCPJJKMNMCE.currentComboLevel >= requiredComboLevel;
 	}
 
 	protected override void Parse(XmlNode node)
 	{
 		base.Parse(node);
-		IPGFIEDBKHA = node.Attributes["Value"].ParseInt();
+		requiredComboLevel = node.Attributes["Value"].ParseInt();
 	}
 
 	public override InFightRule Copy()
 	{
 		InFightRule aAJIFBJLJOA = null;
-		RuleAppliance eJPOJJKKICO = EDAKADCHOLE();
-		XmlNode hKPPBKPJOEO = GIFDJEEGCJI().IOJIGDNFCFL();
+		RuleAppliance eJPOJJKKICO = GetAppliance();
+		XmlNode hKPPBKPJOEO = GetXmlSource().GetNode();
 		aAJIFBJLJOA = new WinComboRule(hKPPBKPJOEO, eJPOJJKKICO);
 		aAJIFBJLJOA.IsRandom = IsRandom;
 		return aAJIFBJLJOA;

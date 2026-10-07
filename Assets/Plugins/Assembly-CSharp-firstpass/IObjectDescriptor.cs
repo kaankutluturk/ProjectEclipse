@@ -4,11 +4,11 @@ public interface IObjectDescriptor
 {
 	object Value { get; }
 
-	Type CJJOAABHDGM { get; }
+	Type StaticType { get; }
 
-	object OEAKCOHMIHH();
+	object GetValue();
 
 	Type get_Type();
 
-	Type HEOINHLCBOO();
+	Type GetStaticType();
 }

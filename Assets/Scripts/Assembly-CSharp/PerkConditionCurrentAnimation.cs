@@ -7,35 +7,35 @@ public class PerkConditionCurrentAnimation : PerkConditionMatchMinMax
 
 	public PerkConditionCurrentAnimation()
 	{
-		set_Type(NHDGLPNNNLH.CONDITION_CURRENT_ANIMATION);
+		set_Type(PerkConditionType.CONDITION_CURRENT_ANIMATION);
 	}
 
 	public override void Parse(XmlNode node)
 	{
 		base.Parse(node);
-		Name = node.Attributes["Name"].CIPOICEEIBK(string.Empty);
-		FMKBHHJDHDM.Parse(node, this, JMDLAMHAJLN());
+		Name = node.Attributes["Name"].GetStringOrDefault(string.Empty);
+		minMax.Parse(node, this, GetPerk());
 	}
 
 	public override bool IsEqual(Model ACENLMONNPA, List<string> NIKHAICFGNM)
 	{
-		Model fGCODGKLHED = EPCPGEPPHLO(ACENLMONNPA);
+		Model fGCODGKLHED = ResolveTargetModel(ACENLMONNPA);
 		if (ACENLMONNPA == null)
 		{
 			return false;
 		}
 		InfoAnimation pJAHIOELGGD = fGCODGKLHED.GetCurrentAnimation();
-		if (pJAHIOELGGD == null || !pJAHIOELGGD.CNPFHBMGDFP(Name))
+		if (pJAHIOELGGD == null || !pJAHIOELGGD.HasName(Name))
 		{
 			return false;
 		}
-		FMKBHHJDHDM.IBCPKBBAFNH();
-		int num = fGCODGKLHED.LPFPGDJALED();
-		if (!FMKBHHJDHDM.KEMLMMPIPGJ() && FMKBHHJDHDM.PPCEOKCAEBD() > (float)num)
+		minMax.EvaluateFunctions();
+		int num = fGCODGKLHED.GetCurrentFrame();
+		if (!minMax.GetMinUnbounded() && minMax.GetMinValue() > (float)num)
 		{
 			return false;
 		}
-		if (!FMKBHHJDHDM.HFGENILMBKK() && FMKBHHJDHDM.EFDLCJBJNPE() < (float)num)
+		if (!minMax.GetMaxUnbounded() && minMax.GetMaxValue() < (float)num)
 		{
 			return false;
 		}

@@ -1,32 +1,32 @@
 public class FightData
 {
-	public InfoAnimation LKLHCEEMINM;
+	public InfoAnimation CurrentAnimation;
 
-	public FightEvent KOJNCHKPLLN;
+	public FightEvent FightEventType;
 
-	public FightStatistics.EMKEIEJMONM DPBGICDNFAM;
+	public FightStatistics.FightStyle Style;
 
 	public int currentComboLevel;
 
-	public float OJIKDIDLBAF;
+	public float DamageDealt;
 
-	public float PCMJEFDLCOB;
+	public float DamageReceived;
 
-	public bool FIJOEIOHJFA;
+	public bool IsBlocked;
 
-	public bool CBLNOFELDOE;
+	public bool IsUsingItem;
 
-	public bool JGNIIBBNIEI;
+	public bool IsOpponentUsingItem;
 
-	public bool OGOFFCEGLHJ;
+	public bool IsShocked;
 
-	public bool IDAJOBOKPPP;
+	public bool IsCritical;
 
-	public bool PFFJNBOFMLI;
+	public bool IsOpponentShocked;
 
-	public bool BNPGBHPDGHM;
+	public bool IsHeadHit;
 
-	public bool ONBMPLCEONN;
+	public bool IsAttacker;
 
 	public FightData()
 	{
@@ -35,19 +35,19 @@ public class FightData
 
 	public void Reset()
 	{
-		LKLHCEEMINM = null;
-		KOJNCHKPLLN = FightEvent.NoneEvent;
-		DPBGICDNFAM = FightStatistics.EMKEIEJMONM.STYLE_TURTLE;
+		CurrentAnimation = null;
+		FightEventType = FightEvent.NoneEvent;
+		Style = FightStatistics.FightStyle.STYLE_TURTLE;
 		currentComboLevel = 0;
-		OJIKDIDLBAF = 0f;
-		PCMJEFDLCOB = 0f;
-		FIJOEIOHJFA = false;
-		CBLNOFELDOE = false;
-		JGNIIBBNIEI = false;
-		OGOFFCEGLHJ = false;
-		IDAJOBOKPPP = false;
-		PFFJNBOFMLI = false;
-		BNPGBHPDGHM = false;
-		ONBMPLCEONN = false;
+		DamageDealt = 0f;
+		DamageReceived = 0f;
+		IsBlocked = false;
+		IsUsingItem = false;
+		IsOpponentUsingItem = false;
+		IsShocked = false;
+		IsCritical = false;
+		IsOpponentShocked = false;
+		IsHeadHit = false;
+		IsAttacker = false;
 	}
 }

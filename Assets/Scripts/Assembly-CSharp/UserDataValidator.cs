@@ -4,41 +4,41 @@ using Nekki.SF2.Core.Exceptions;
 
 public static class UserDataValidator
 {
-	private const string JKMJBLCHICB = ".hash";
+	private const string HashFileExtension = ".hash";
 
-	private const string APEMILJBKBG = "wqO+Qchj|r*QXg7o_KNmLYvpGHdSwqxwlQI2vy618KaD^Pwt-h3H8*uJ";
+	private const string HashSecret = "wqO+Qchj|r*QXg7o_KNmLYvpGHdSwqxwlQI2vy618KaD^Pwt-h3H8*uJ";
 
 	private static bool _IsValid = true;
 
-	public static bool GJHHGDAOHGK
+	public static bool IsValid
 	{
 		get
 		{
-			return DINANCBOIMJ();
+			return GetIsValid();
 		}
 	}
 
-	public static string CEMABBPLAGK
+	public static string HashKey
 	{
 		get
 		{
-			return GHEHGBBNMNO();
+			return GetHashKey();
 		}
 	}
 
-	public static bool DINANCBOIMJ()
+	public static bool GetIsValid()
 	{
 		return _IsValid;
 	}
 
-	public static string GHEHGBBNMNO()
+	public static string GetHashKey()
 	{
-		return SystemProperties.GLLJKPBHELE() + "wqO+Qchj|r*QXg7o_KNmLYvpGHdSwqxwlQI2vy618KaD^Pwt-h3H8*uJ";
+		return SystemProperties.GetDeviceId() + "wqO+Qchj|r*QXg7o_KNmLYvpGHdSwqxwlQI2vy618KaD^Pwt-h3H8*uJ";
 	}
 
 	public static bool CheckFileHash(XmlDocument LOBFDOKFJIP, string ONEIGMLOGDC)
 	{
-		if (!GameSettings.HCAJHNKLLGB())
+		if (!GameSettings.IsUserDataValidationEnabled())
 		{
 			return true;
 		}
@@ -48,13 +48,13 @@ public static class UserDataValidator
 
 	internal static bool CheckSnapshotHash(XmlDocument LOBFDOKFJIP, string text, string ONEIGMLOGDC)
 	{
-		if (!GameSettings.HCAJHNKLLGB()) return true;
+		if (!GameSettings.IsUserDataValidationEnabled()) return true;
 		if (string.IsNullOrEmpty(text))
 		{
 			_IsValid = false;
 			throw new HackDetectedException("[UserDataValidator]: file is missing - " + Path.GetFileName(ONEIGMLOGDC + ".hash") + " !");
 		}
-		_IsValid = MD5Utils.HGHDINBJBAD(LOBFDOKFJIP.OuterXml, text, GHEHGBBNMNO());
+		_IsValid = MD5Utils.CheckStringHash(LOBFDOKFJIP.OuterXml, text, GetHashKey());
 		if (!_IsValid)
 		{
 			throw new HackDetectedException("[UserDataValidator]: incorrect file hash - " + Path.GetFileName(ONEIGMLOGDC) + " !");
@@ -73,30 +73,30 @@ public static class UserDataValidator
 
 	public static void UpdateFileHash(string LOBFDOKFJIP)
 	{
-		if (GameSettings.HCAJHNKLLGB())
+		if (GameSettings.IsUserDataValidationEnabled())
 		{
-			string iMMGBGKAMPK = MD5Utils.PIFDHBHOMJL(LOBFDOKFJIP, GHEHGBBNMNO());
-			ECBPHPHKBPD(LOBFDOKFJIP + ".hash", iMMGBGKAMPK);
+			string iMMGBGKAMPK = MD5Utils.MD5HashFile(LOBFDOKFJIP, GetHashKey());
+			WriteHashFile(LOBFDOKFJIP + ".hash", iMMGBGKAMPK);
 		}
 	}
 
 	public static void UpdateFileHash(XmlDocument LOBFDOKFJIP, string ONEIGMLOGDC)
 	{
-		if (GameSettings.HCAJHNKLLGB())
+		if (GameSettings.IsUserDataValidationEnabled())
 		{
-			string iMMGBGKAMPK = MD5Utils.INPENHNJBGJ(LOBFDOKFJIP.OuterXml, GHEHGBBNMNO());
-			ECBPHPHKBPD(ONEIGMLOGDC + ".hash", iMMGBGKAMPK);
+			string iMMGBGKAMPK = MD5Utils.MD5HashString(LOBFDOKFJIP.OuterXml, GetHashKey());
+			WriteHashFile(ONEIGMLOGDC + ".hash", iMMGBGKAMPK);
 		}
 	}
 
-	private static void ECBPHPHKBPD(string ONEIGMLOGDC, string IMMGBGKAMPK)
+	private static void WriteHashFile(string ONEIGMLOGDC, string IMMGBGKAMPK)
 	{
 		File.WriteAllText(ONEIGMLOGDC, IMMGBGKAMPK);
 	}
 
-	public static void KAFMCNCGOJH(string ONEIGMLOGDC)
+	public static void DeleteHashFile(string ONEIGMLOGDC)
 	{
-		if (GameSettings.HCAJHNKLLGB())
+		if (GameSettings.IsUserDataValidationEnabled())
 		{
 			ONEIGMLOGDC += ".hash";
 			if (File.Exists(ONEIGMLOGDC))
@@ -106,9 +106,9 @@ public static class UserDataValidator
 		}
 	}
 
-	public static void NLIJEIGOALP(string AMNCLCPADOO, string IFIOLDFCLIE)
+	public static void CopyHashFile(string AMNCLCPADOO, string IFIOLDFCLIE)
 	{
-		if (GameSettings.HCAJHNKLLGB() && File.Exists(AMNCLCPADOO + ".hash"))
+		if (GameSettings.IsUserDataValidationEnabled() && File.Exists(AMNCLCPADOO + ".hash"))
 		{
 			File.Copy(AMNCLCPADOO + ".hash", IFIOLDFCLIE + ".hash", true);
 		}

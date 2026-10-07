@@ -3,14 +3,14 @@ using System.Xml;
 public class ActionDelete : ActionAnimation
 {
 	public ActionDelete(XmlNode node)
-		: base(FADAJCEEKIO.DELETE)
+		: base(ActionType.DELETE)
 	{
 		Parse(node);
 	}
 
 	public override void Visit(Model ACENLMONNPA)
 	{
-		ACENLMONNPA.OPPIKLBKMPN(this);
+		ACENLMONNPA.StartAction(this);
 	}
 
 	protected override void Parse(XmlNode node)

@@ -4,10 +4,10 @@ using System.Xml;
 public class PerkActionAddBullets : PerkAction
 {
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private string ABMCCMHGHAB;
+	private string _bulletType;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private FunctionExtension IELPCLONGKP;
+	private FunctionExtension _value;
 
 	public PerkActionAddBullets()
 	{
@@ -16,43 +16,43 @@ public class PerkActionAddBullets : PerkAction
 	public PerkActionAddBullets(PerkActionAddBullets NOLFMPDGCOC)
 		: base(NOLFMPDGCOC)
 	{
-		set_BulletType(NOLFMPDGCOC.MPGDOMBCAAF());
-		set_Value(NOLFMPDGCOC.OEAKCOHMIHH());
+		set_BulletType(NOLFMPDGCOC.GetBulletType());
+		set_Value(NOLFMPDGCOC.GetValue());
 	}
 
-	public string MPGDOMBCAAF()
+	public string GetBulletType()
 	{
-		return ABMCCMHGHAB;
+		return _bulletType;
 	}
 
 	protected void set_BulletType(string value)
 	{
-		ABMCCMHGHAB = value;
+		_bulletType = value;
 	}
 
-	public FunctionExtension OEAKCOHMIHH()
+	public FunctionExtension GetValue()
 	{
-		return IELPCLONGKP;
+		return _value;
 	}
 
 	protected void set_Value(FunctionExtension value)
 	{
-		IELPCLONGKP = value;
+		_value = value;
 	}
 
 	public override void Parse(XmlNode node)
 	{
 		base.Parse(node);
 		set_Type(ActionType.ACTION_ADD_BULLETS);
-		set_BulletType(node.Attributes["BulletType"].CIPOICEEIBK(string.Empty));
-		string text = node.Attributes["Value"].CIPOICEEIBK(string.Empty);
+		set_BulletType(node.Attributes["BulletType"].GetStringOrDefault(string.Empty));
+		string text = node.Attributes["Value"].GetStringOrDefault(string.Empty);
 		if (text != null && text != string.Empty)
 		{
 			set_Value(new FunctionExtension());
-			OEAKCOHMIHH().Parse(text);
-			OEAKCOHMIHH().PBPBNENGLPA(JMDLAMHAJLN().HJFEFJIEINN);
-			OEAKCOHMIHH().DMPCFMACDJM(JMDLAMHAJLN().OKPFNCJFLDL);
-			OEAKCOHMIHH().set_Target(this);
+			GetValue().Parse(text);
+			GetValue().SetFunctionCallback(GetPerk().EvaluateFunctionCallback);
+			GetValue().SetVariableCallback(GetPerk().OnFunctionPreCallback);
+			GetValue().set_Target(this);
 		}
 	}
 }

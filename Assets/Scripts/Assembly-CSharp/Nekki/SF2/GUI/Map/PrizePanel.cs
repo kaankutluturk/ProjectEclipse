@@ -22,8 +22,8 @@ namespace Nekki.SF2.GUI.Map
 				long num = 0L;
 				if (MMDLKOPCFLK)
 				{
-					bAINMLLIKOL = (ObscuredLong)(KOMGFJOCEDN.LDHOBIADNEC);
-					num = (ObscuredLong)(KOMGFJOCEDN.JBNAJPPNGFB);
+					bAINMLLIKOL = (ObscuredLong)(KOMGFJOCEDN.PrizeMoney);
+					num = (ObscuredLong)(KOMGFJOCEDN.PrizeBonus);
 				}
 				bAINMLLIKOL = GameUtils.GetDenominatedValue(bAINMLLIKOL);
 				if (count > 0)
@@ -32,22 +32,22 @@ namespace Nekki.SF2.GUI.Map
 					num *= count;
 				}
 				RewardStruct fDFKLPHBAHJ = null;
-				if (KOMGFJOCEDN.APKPCGDBMEP().Count > 0)
+				if (KOMGFJOCEDN.GetRewards().Count > 0)
 				{
-					fDFKLPHBAHJ = KOMGFJOCEDN.APKPCGDBMEP()[KOMGFJOCEDN.APKPCGDBMEP().Count - 1];
+					fDFKLPHBAHJ = KOMGFJOCEDN.GetRewards()[KOMGFJOCEDN.GetRewards().Count - 1];
 				}
 				float num2 = 0f;
 				BattleType pJMEMGHKKBM = KOMGFJOCEDN.get_Type();
 				num2 = ((pJMEMGHKKBM != BattleType.FightBosses && pJMEMGHKKBM != BattleType.FightFinalTitan) ? 200f : 300f);
-				int gNLOCMLBNHF = ListSF.CCDKHLAMKKO().PINDEKDNCNL();
-				RewardPrize dPIIJICBGGA = fDFKLPHBAHJ == null ? new RewardPrize() : fDFKLPHBAHJ.KOBOIFJNPMO(gNLOCMLBNHF);
+				int gNLOCMLBNHF = ListSF.GetRoster().GetLevel();
+				RewardPrize dPIIJICBGGA = fDFKLPHBAHJ == null ? new RewardPrize() : fDFKLPHBAHJ.GetPrizeForLevel(gNLOCMLBNHF);
 				int cFMPJLLNCFF = 68;
 				_prize.Init(bAINMLLIKOL, num, dPIIJICBGGA, 0f, num2, cFMPJLLNCFF);
-				PDDFGIGHAEE(0f, num2);
+				UpdatePrizeLayout(0f, num2);
 			}
 		}
 
-		private void PDDFGIGHAEE(float JMLAKAKDBBL, float FEIHFIPFNKF)
+		private void UpdatePrizeLayout(float JMLAKAKDBBL, float FEIHFIPFNKF)
 		{
 		}
 	}

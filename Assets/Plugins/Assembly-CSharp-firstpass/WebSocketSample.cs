@@ -3,96 +3,96 @@ using UnityEngine;
 
 public class WebSocketSample : MonoBehaviour
 {
-	private string IKHEAOEKLHL = "ws://echo.websocket.org";
+	private string address = "ws://echo.websocket.org";
 
-	private string MDOGLPLKBJO = "Hello World!";
+	private string msgToSend = "Hello World!";
 
-	private string GGDJIPKMKFC = string.Empty;
+	private string logText = string.Empty;
 
-	private WebSocket ILNFPNFEOCL;
+	private WebSocket webSocket;
 
 	private Vector2 scrollPos;
 
 	private void OnDestroy()
 	{
-		if (ILNFPNFEOCL != null)
+		if (webSocket != null)
 		{
-			ILNFPNFEOCL.Close();
+			webSocket.Close();
 		}
 	}
 
 	private void OnGUI()
 	{
-		GUIHelper.ECMOBPFHNPN(GUIHelper.ClientArea, true, () =>
+		GUIHelper.DrawArea(GUIHelper.ClientArea, true, () =>
 		{
 			scrollPos = GUILayout.BeginScrollView(scrollPos);
-			GUILayout.Label(GGDJIPKMKFC);
+			GUILayout.Label(logText);
 			GUILayout.EndScrollView();
 			GUILayout.Space(5f);
 			GUILayout.FlexibleSpace();
-			IKHEAOEKLHL = GUILayout.TextField(IKHEAOEKLHL);
-			if (ILNFPNFEOCL == null && GUILayout.Button("Open Web Socket"))
+			address = GUILayout.TextField(address);
+			if (webSocket == null && GUILayout.Button("Open Web Socket"))
 			{
-				ILNFPNFEOCL = new WebSocket(new Uri(IKHEAOEKLHL));
-				if (HTTPManager.FHGBKFBCGCO() != null)
+				webSocket = new WebSocket(new Uri(address));
+				if (HTTPManager.GetProxy() != null)
 				{
-					ILNFPNFEOCL.KGBEGJJPCKC().PNGMAECJHID(new HTTPProxy(HTTPManager.FHGBKFBCGCO().DNIJHGFINDG(), HTTPManager.FHGBKFBCGCO().HPKPFEOBIOC(), false));
+					webSocket.GetInternalRequest().SetProxy(new HTTPProxy(HTTPManager.GetProxy().GetAddress(), HTTPManager.GetProxy().GetCredentials(), false));
 				}
-				WebSocket iLNFPNFEOCL = ILNFPNFEOCL;
-				iLNFPNFEOCL.HKBKFMIBCED = (BNIEFDKHAJN)Delegate.Combine(iLNFPNFEOCL.HKBKFMIBCED, new BNIEFDKHAJN(HKBKFMIBCED));
-				WebSocket iLNFPNFEOCL2 = ILNFPNFEOCL;
-				iLNFPNFEOCL2.OnMessage = (KCEBOGOANEH)Delegate.Combine(iLNFPNFEOCL2.OnMessage, new KCEBOGOANEH(GKPFJAIFHMC));
-				WebSocket iLNFPNFEOCL3 = ILNFPNFEOCL;
+				WebSocket iLNFPNFEOCL = webSocket;
+				iLNFPNFEOCL.OnOpen = (OnWebSocketOpenDelegate)Delegate.Combine(iLNFPNFEOCL.OnOpen, new OnWebSocketOpenDelegate(OnOpen));
+				WebSocket iLNFPNFEOCL2 = webSocket;
+				iLNFPNFEOCL2.OnMessage = (OnWebSocketMessageDelegate)Delegate.Combine(iLNFPNFEOCL2.OnMessage, new OnWebSocketMessageDelegate(OnMessageReceived));
+				WebSocket iLNFPNFEOCL3 = webSocket;
 				iLNFPNFEOCL3.OnClosed = (OnWebSocketClosedDelegate)Delegate.Combine(iLNFPNFEOCL3.OnClosed, new OnWebSocketClosedDelegate(OnClosed));
-				WebSocket iLNFPNFEOCL4 = ILNFPNFEOCL;
+				WebSocket iLNFPNFEOCL4 = webSocket;
 				iLNFPNFEOCL4.OnError = (OnWebSocketErrorDelegate)Delegate.Combine(iLNFPNFEOCL4.OnError, new OnWebSocketErrorDelegate(OnError));
-				ILNFPNFEOCL.LAJCMNNNIIM();
-				GGDJIPKMKFC += "Opening Web Socket...\n";
+				webSocket.OpenWebSocket();
+				logText += "Opening Web Socket...\n";
 			}
-			if (ILNFPNFEOCL != null && ILNFPNFEOCL.DJKKJPNLOAE())
+			if (webSocket != null && webSocket.GetIsOpen())
 			{
 				GUILayout.Space(10f);
 				GUILayout.BeginHorizontal();
-				MDOGLPLKBJO = GUILayout.TextField(MDOGLPLKBJO);
+				msgToSend = GUILayout.TextField(msgToSend);
 				if (GUILayout.Button("Send", GUILayout.MaxWidth(70f)))
 				{
-					GGDJIPKMKFC += "Sending message...\n";
-					ILNFPNFEOCL.Send(MDOGLPLKBJO);
+					logText += "Sending message...\n";
+					webSocket.Send(msgToSend);
 				}
 				GUILayout.EndHorizontal();
 				GUILayout.Space(10f);
 				if (GUILayout.Button("Close"))
 				{
-					ILNFPNFEOCL.Close(1000, "Bye!");
+					webSocket.Close(1000, "Bye!");
 				}
 			}
 		});
 	}
 
-	private void HKBKFMIBCED(WebSocket IIBIPJJLEGJ)
+	private void OnOpen(WebSocket IIBIPJJLEGJ)
 	{
-		GGDJIPKMKFC += string.Format("-WebSocket Open!\n");
+		logText += string.Format("-WebSocket Open!\n");
 	}
 
-	private void GKPFJAIFHMC(WebSocket IIBIPJJLEGJ, string LIOGIBJBHAH)
+	private void OnMessageReceived(WebSocket IIBIPJJLEGJ, string LIOGIBJBHAH)
 	{
-		GGDJIPKMKFC += string.Format("-Message received: {0}\n", LIOGIBJBHAH);
+		logText += string.Format("-Message received: {0}\n", LIOGIBJBHAH);
 	}
 
 	private void OnClosed(WebSocket IIBIPJJLEGJ, ushort KJPGKHJNOMC, string LIOGIBJBHAH)
 	{
-		GGDJIPKMKFC += string.Format("-WebSocket closed! Code: {0} Message: {1}\n", KJPGKHJNOMC, LIOGIBJBHAH);
-		ILNFPNFEOCL = null;
+		logText += string.Format("-WebSocket closed! Code: {0} Message: {1}\n", KJPGKHJNOMC, LIOGIBJBHAH);
+		webSocket = null;
 	}
 
 	private void OnError(WebSocket IIBIPJJLEGJ, Exception MPFFFAOGBJE)
 	{
 		string text = string.Empty;
-		if (IIBIPJJLEGJ.KGBEGJJPCKC().POGDKNCHIBG() != null)
+		if (IIBIPJJLEGJ.GetInternalRequest().GetResponse() != null)
 		{
-			text = string.Format("Status Code from Server: {0} and Message: {1}", IIBIPJJLEGJ.KGBEGJJPCKC().POGDKNCHIBG().KNMDPGBPNED(), IIBIPJJLEGJ.KGBEGJJPCKC().POGDKNCHIBG().DCKPMHKDLEJ());
+			text = string.Format("Status Code from Server: {0} and Message: {1}", IIBIPJJLEGJ.GetInternalRequest().GetResponse().GetStatusCode(), IIBIPJJLEGJ.GetInternalRequest().GetResponse().GetMessage());
 		}
-		GGDJIPKMKFC += string.Format("-An error occured: {0}\n", (MPFFFAOGBJE == null) ? ("Unknown Error " + text) : MPFFFAOGBJE.Message);
-		ILNFPNFEOCL = null;
+		logText += string.Format("-An error occured: {0}\n", (MPFFFAOGBJE == null) ? ("Unknown Error " + text) : MPFFFAOGBJE.Message);
+		webSocket = null;
 	}
 }

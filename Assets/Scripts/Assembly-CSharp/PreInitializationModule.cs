@@ -2,22 +2,22 @@ using Nekki.SF2.Core;
 
 public class PreInitializationModule : LoadingModule
 {
-	private static bool NDHHFHHBFEC;
+	private static bool isInitialized;
 
-	public override void JLPMOKPFECK()
+	public override void ProcessStep()
 	{
-		if (!CHIHBINEGFL)
+		if (!isFinished)
 		{
 			Init();
-			CHIHBINEGFL = true;
+			isFinished = true;
 		}
 	}
 
 	private static void Init()
 	{
-		if (!NDHHFHHBFEC)
+		if (!isInitialized)
 		{
-			NDHHFHHBFEC = true;
+			isInitialized = true;
 			ApplicationController.Init();
 			RaidCheatManager.Init();
 			SF2Paths.Init();

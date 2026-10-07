@@ -55,11 +55,11 @@ public partial class ModelNode
 
 	private static Vector3f _TimeStepVector = new Vector3f();
 
-	public ModelNode KOBMPGDHMIM
+	public ModelNode PairNode
 	{
 		get
 		{
-			return PKOPJAHFNJG();
+			return GetPairNode();
 		}
 		set
 		{
@@ -67,7 +67,7 @@ public partial class ModelNode
 		}
 	}
 
-	public Vector3f HEMOJCBIJCE
+	public Vector3f StartPosition
 	{
 		get
 		{
@@ -79,7 +79,7 @@ public partial class ModelNode
 		}
 	}
 
-	public Vector3f EHHBGGDPJIM
+	public Vector3f EndPosition
 	{
 		get
 		{
@@ -91,7 +91,7 @@ public partial class ModelNode
 		}
 	}
 
-	public int GJCOGFOJAEB
+	public int NodeId
 	{
 		get
 		{
@@ -115,7 +115,7 @@ public partial class ModelNode
 		}
 	}
 
-	public float JJAMOMEPALM
+	public float AttenuationValue
 	{
 		get
 		{
@@ -127,7 +127,7 @@ public partial class ModelNode
 		}
 	}
 
-	public bool KKFBCOKMNDF
+	public bool IsPlainNode
 	{
 		get
 		{
@@ -139,7 +139,7 @@ public partial class ModelNode
 		}
 	}
 
-	public bool MFGFJBPIECB
+	public bool IsFixedNode
 	{
 		get
 		{
@@ -151,7 +151,7 @@ public partial class ModelNode
 		}
 	}
 
-	public bool FBKGDALBNDJ
+	public bool IsClothNode
 	{
 		get
 		{
@@ -163,7 +163,7 @@ public partial class ModelNode
 		}
 	}
 
-	public bool NCBPMBJCFBK
+	public bool IsPhysicsNode
 	{
 		get
 		{
@@ -171,7 +171,7 @@ public partial class ModelNode
 		}
 	}
 
-	public bool GAIIOCNEKEP
+	public bool IsFixedOrMacro
 	{
 		get
 		{
@@ -179,7 +179,7 @@ public partial class ModelNode
 		}
 	}
 
-	public bool BHIMNPFDCDE
+	public bool IsVisibleNode
 	{
 		get
 		{
@@ -191,19 +191,19 @@ public partial class ModelNode
 		}
 	}
 
-	public bool MOAOLGNKEPI
+	public bool PhysicsActive
 	{
 		get
 		{
-			return NEEJAPDCCMJ();
+			return IsPhysicsActive();
 		}
 		set
 		{
-			BGDMKGMEIDH(value);
+			SetPhysicsActive(value);
 		}
 	}
 
-	public bool PFDCDIBODCL
+	public bool IsShockNode
 	{
 		get
 		{
@@ -215,7 +215,7 @@ public partial class ModelNode
 		}
 	}
 
-	public bool NFDDEHDGAHP
+	public bool IsCollisibleNode
 	{
 		get
 		{
@@ -227,7 +227,7 @@ public partial class ModelNode
 		}
 	}
 
-	public bool OIIFIGFEKKD
+	public bool IsWeakNode
 	{
 		get
 		{
@@ -239,15 +239,15 @@ public partial class ModelNode
 		}
 	}
 
-	public bool AOFHEEAKBOM
+	public bool SkipMacroUpdate
 	{
 		get
 		{
-			return GGIDOLBCAMN();
+			return GetSkipMacroUpdate();
 		}
 		set
 		{
-			OHMNDOKBGGA(value);
+			SetSkipMacroUpdate(value);
 		}
 	}
 
@@ -290,7 +290,7 @@ public partial class ModelNode
 		CopyFrom(NPDJNAMFIKD);
 	}
 
-	public ModelNode PKOPJAHFNJG()
+	public ModelNode GetPairNode()
 	{
 		return _PairNode;
 	}
@@ -425,12 +425,12 @@ public partial class ModelNode
 		_Visible = true;
 	}
 
-	public bool NEEJAPDCCMJ()
+	public bool IsPhysicsActive()
 	{
 		return _physicsActive;
 	}
 
-	public void BGDMKGMEIDH(bool value)
+	public void SetPhysicsActive(bool value)
 	{
 		_physicsActive = value;
 	}
@@ -465,12 +465,12 @@ public partial class ModelNode
 		_Weak = value;
 	}
 
-	public bool GGIDOLBCAMN()
+	public bool GetSkipMacroUpdate()
 	{
 		return _skipMacroUpdate;
 	}
 
-	public void OHMNDOKBGGA(bool value)
+	public void SetSkipMacroUpdate(bool value)
 	{
 		_skipMacroUpdate = value;
 	}
@@ -492,7 +492,7 @@ public partial class ModelNode
 		_physicsActive = NPDJNAMFIKD._physicsActive;
 	}
 
-	public void HBPBKNDPBMG()
+	public void RestoreDefaultPhysics()
 	{
 		if (_IsNode)
 		{
@@ -505,7 +505,7 @@ public partial class ModelNode
 		}
 	}
 
-	public void KCDIAMOLAKB()
+	public void DisablePhysics()
 	{
 		if (_IsNode)
 		{
@@ -520,11 +520,11 @@ public partial class ModelNode
 
 	public void ChangeSpeed(float ELDDBMFEFIP)
 	{
-		Vector3f aKKEJFKBIHF = Vector3f.MJOKEBGPHKB(_Start, _End);
+		Vector3f aKKEJFKBIHF = Vector3f.op_Subtraction(_Start, _End);
 		if (_IsPhysics)
 		{
 		}
-		_End.Set(Vector3f.MJOKEBGPHKB(_Start, aKKEJFKBIHF));
+		_End.Set(Vector3f.op_Subtraction(_Start, aKKEJFKBIHF));
 	}
 
 	public void TimeStep(float gravity)

@@ -3,7 +3,7 @@ $root = Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $PSScriptRoot
 $fixture = Join-Path $root ('Temp/ConsumableRewards-' + [Guid]::NewGuid().ToString('N'))
 New-Item -ItemType Directory -Path $fixture | Out-Null
 $source = Get-Content -Raw (Join-Path $root 'Assets/Scripts/Assembly-CSharp/FightResult.cs')
-$method = [regex]::Match($source, '(?ms)^\t\tpublic void KFJABAMAKOD\(RewardItem.*?^\t\t\}').Value
+$method = [regex]::Match($source, '(?ms)^\t\tpublic void AddReward\(RewardItem.*?^\t\t\}').Value
 if (!$method) { throw 'Cannot extract recovered reward-item selection.' }
 $code = @'
 using System;
@@ -13,28 +13,28 @@ public class UpgradeData {}
 public class ItemInfo {
     public string Name, Type; public int ItemLevel = 1;
     public ItemInfo GetUpdateItemByLevel(int level, bool flag) => this;
-    public ItemInfo HIOBANJPMKF(int level) => this;
-    public List<UpgradeData> DNFDAGFAANJ(bool flag, int level) => new List<UpgradeData>();
-    public ItemInfo MPADIPJLMLH(UpgradeData data) => this;
+    public ItemInfo GetUpgradeItemAtOrAboveUpgradeLevel(int level) => this;
+    public List<UpgradeData> GetUpgrades(bool flag, int level) => new List<UpgradeData>();
+    public ItemInfo CreateUpgradedItem(UpgradeData data) => this;
 }
 public class RewardItem {
-    public string Name; public uint UpgradeNumber; public bool IDGKPLBKDIB = true;
+    public string Name; public uint UpgradeNumber; public bool IsDrop = true;
     public bool HasEclipseGrantConfiguration => false;
     public string UpgradeLevelExpression; public int EvaluateUpgradeLevel() => 0;
-    public int CMEFKONFDKN() => 1;
+    public int EvaluateLevel() => 1;
 }
 public class Roster {
     public HashSet<string> Owned = new HashSet<string>();
     public Dictionary<string, ItemInfo> Items = new Dictionary<string, ItemInfo>();
-    public Roster KHCNHPCPFII() => this;
-    public UserItem CMGOCLGHNLH(string name) => Owned.Contains(name) ? new UserItem() : null;
+    public Roster GetInventory() => this;
+    public UserItem FindItem(string name) => Owned.Contains(name) ? new UserItem() : null;
     public ItemInfo GetItemByName(string name) => Items.TryGetValue(name, out var item) ? item : null;
-    public int PINDEKDNCNL() => 1;
+    public int GetLevel() => 1;
     public int Level => 1;
 }
 public static class ListSF {
     public static Roster Value = new Roster();
-    public static Roster CCDKHLAMKKO() => Value;
+    public static Roster GetRoster() => Value;
     public static Roster GetItems() => Value;
 }
 namespace Eclipse.Modding {
@@ -44,8 +44,8 @@ namespace Eclipse.Modding {
 }
 namespace UnityEngine { public static class Debug { public static void LogWarning(object message) {} } }
 public class Result {
-    public class LJFFIBFBGID { public ItemInfo DLKPBAJDHBO; public RewardItem NAIEGGHELIH; public bool IDGKPLBKDIB; }
-    public List<LJFFIBFBGID> HELFDCAIJNE = new List<LJFFIBFBGID>();
+    public class ItemGrant { public ItemInfo Item; public RewardItem RewardSource; public bool IsDrop; }
+    public List<ItemGrant> Items = new List<ItemGrant>();
     /* METHOD */
 }
 public static class Program {
@@ -53,9 +53,9 @@ public static class Program {
         ListSF.Value = new Roster();
         ListSF.Value.Items[name] = new ItemInfo { Name = name, Type = type };
         if (owned) ListSF.Value.Owned.Add(name);
-        var result = new Result(); result.KFJABAMAKOD(new RewardItem { Name = name });
-        if (result.HELFDCAIJNE.Count != expected) throw new Exception("Incorrect reward eligibility: " + name);
-        if (expected == 1 && !result.HELFDCAIJNE[0].IDGKPLBKDIB) throw new Exception("Drop visibility lost.");
+        var result = new Result(); result.AddReward(new RewardItem { Name = name });
+        if (result.Items.Count != expected) throw new Exception("Incorrect reward eligibility: " + name);
+        if (expected == 1 && !result.Items[0].IsDrop) throw new Exception("Drop visibility lost.");
     }
     public static void Main() {
         Check("example.phase1:items/consumable/phase_token", "Consumable", false, 1);

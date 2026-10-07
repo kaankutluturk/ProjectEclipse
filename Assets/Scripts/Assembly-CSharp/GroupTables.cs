@@ -4,18 +4,18 @@ public class GroupTables
 {
 	public string GroupLabel;
 
-	public List<TacticalTable> DOCMMNLEAMH;
+	public List<TacticalTable> Tables;
 
 	public TacticalTable GetTacticalTableByLabel(string ICBBNJMLDJH)
 	{
-		for (int i = 0; i < DOCMMNLEAMH.Count; i++)
+		for (int i = 0; i < Tables.Count; i++)
 		{
-			if (DOCMMNLEAMH[i].Label == ICBBNJMLDJH)
+			if (Tables[i].Label == ICBBNJMLDJH)
 			{
-				return DOCMMNLEAMH[i];
+				return Tables[i];
 			}
 		}
-		LLLOJBFMONN.Error("table for label {0} not found", ICBBNJMLDJH);
+		GameLog.Error("table for label {0} not found", ICBBNJMLDJH);
 		return null;
 	}
 }

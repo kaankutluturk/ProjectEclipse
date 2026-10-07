@@ -7,7 +7,7 @@ using System.Xml;
 
 public static class TestXmlAttributeExtensions
 {
-    public static string CIPOICEEIBK(this XmlAttribute attribute, string fallback = "")
+    public static string GetStringOrDefault(this XmlAttribute attribute, string fallback = "")
     {
         return attribute == null ? fallback : attribute.Value;
     }
@@ -15,13 +15,13 @@ public static class TestXmlAttributeExtensions
 
 public static class CocosAnimationData
 {
-    public static void DECIILEPLDM() { }
+    public static void ClearCache() { }
 }
 
 public static class SF2Paths
 {
-    public static string KKIDGPBOBNI() { return Eclipse.Content.GameplayContentArchive.GetXmlRoot(); }
-    public static string ENFGGKMDICD() { return Path.Combine(KKIDGPBOBNI(), "localizations"); }
+    public static string GetGameDataPath() { return Eclipse.Content.GameplayContentArchive.GetXmlRoot(); }
+    public static string GetLocalizationsPath() { return Path.Combine(GetGameDataPath(), "localizations"); }
 }
 
 public static class XmlUtils
@@ -103,18 +103,18 @@ public sealed class UpgradeData
 {
     public sealed class Values
     {
-        public readonly Attributes IBLHIAHECLK = new Attributes();
+        public readonly Attributes Attributes = new Attributes();
         public int Level;
-        public int AKKLOMFOLNO;
+        public int UpgradeLevel;
     }
 
-    public readonly Values OGLHOJNMEBD = new Values();
+    public readonly Values Values = new Values();
 }
 
 public sealed class UpgradeDataContainer
 {
     public string Type = string.Empty;
-    public readonly List<UpgradeData> KPAPEBOAKIE = new List<UpgradeData>();
+    public readonly List<UpgradeData> Upgrades = new List<UpgradeData>();
 }
 
 public sealed class ItemInfo
@@ -152,13 +152,13 @@ public sealed class Items
         new Dictionary<string, UpgradeDataContainer>(StringComparer.Ordinal);
     private readonly ItemSets _itemSets = new ItemSets();
 
-    public List<ItemInfo> MJKFCBMNNGJ() { return _weapons; }
-    public List<ItemInfo> MCGKNJPLIIH() { return _armors; }
-    public List<ItemInfo> EKKIBLDGNHH() { return _helms; }
-    public List<ItemInfo> LKGPBHADANE() { return _ranged; }
-    public List<ItemInfo> OGFOBKIEGKA() { return _magic; }
-    public List<ItemInfo> HCDLKHKBEPF() { return _all; }
-    public ItemSets DGKMILIPLLF() { return _itemSets; }
+    public List<ItemInfo> GetWeapons() { return _weapons; }
+    public List<ItemInfo> GetArmors() { return _armors; }
+    public List<ItemInfo> GetHelms() { return _helms; }
+    public List<ItemInfo> GetRangedWeapons() { return _ranged; }
+    public List<ItemInfo> GetMagicItems() { return _magic; }
+    public List<ItemInfo> GetAllItems() { return _all; }
+    public ItemSets GetItemSets() { return _itemSets; }
 
     public UpgradeDataContainer GetUpgradeDataContainerByName(string name)
     {
@@ -176,8 +176,8 @@ public sealed class Items
             foreach (XmlNode node in containerNode.SelectNodes("Upgrade"))
             {
                 var upgrade = new UpgradeData();
-                upgrade.OGLHOJNMEBD.Level = IntAttr(node, "Level");
-                upgrade.OGLHOJNMEBD.AKKLOMFOLNO = IntAttr(node, "UpgradeLevel");
+                upgrade.Values.Level = IntAttr(node, "Level");
+                upgrade.Values.UpgradeLevel = IntAttr(node, "UpgradeLevel");
                 foreach (string attribute in new[]
                 {
                     "WeaponDamage", "BodyDefense", "UnarmedDamage", "HeadDefense", "RangedDamage", "MagicDamage"
@@ -186,9 +186,9 @@ public sealed class Items
                     XmlAttribute value = node.Attributes[attribute];
                     int parsed;
                     if (value != null && int.TryParse(value.Value, out parsed))
-                        upgrade.OGLHOJNMEBD.IBLHIAHECLK.Set(attribute, parsed);
+                        upgrade.Values.Attributes.Set(attribute, parsed);
                 }
-                container.KPAPEBOAKIE.Add(upgrade);
+                container.Upgrades.Add(upgrade);
             }
             _upgrades[name] = container;
         }
@@ -346,7 +346,7 @@ public sealed class ItemSets
 public sealed class PerkInfoItem
 {
     public string Name = string.Empty;
-    public XmlNode HAAKMBKCMCO { get; private set; }
+    public XmlNode DefaultNode { get; private set; }
 
     public void Parse(XmlNode node)
     {
@@ -355,7 +355,7 @@ public sealed class PerkInfoItem
         var document = new XmlDocument();
         XmlNode imported = document.ImportNode(node, true);
         document.AppendChild(imported);
-        HAAKMBKCMCO = imported;
+        DefaultNode = imported;
     }
 }
 
@@ -370,9 +370,9 @@ public sealed class PerkItems
     private readonly List<PerkInfoItem> _base = new List<PerkInfoItem>();
     private readonly HashSet<string> _external = new HashSet<string>(StringComparer.Ordinal);
 
-    public List<PerkInfoItem> CJJEPHDFOCJ() { return _base; }
+    public List<PerkInfoItem> GetBasePerks() { return _base; }
 
-    public PerkInfoItem ABAGJKMKCBA(string name)
+    public PerkInfoItem FindBasePerk(string name)
     {
         return _base.Find(value => value.Name == name);
     }
@@ -382,7 +382,7 @@ public sealed class PerkItems
         if (node == null) throw new ArgumentNullException("node");
         string name = node.Attributes?["Name"]?.Value ?? string.Empty;
         if (string.IsNullOrEmpty(name)) throw new ArgumentException("External perk requires Name.", "node");
-        if (ABAGJKMKCBA(name) != null) throw new InvalidOperationException("Perk already exists: " + name);
+        if (FindBasePerk(name) != null) throw new InvalidOperationException("Perk already exists: " + name);
         var perk = new PerkInfoItem();
         perk.Parse(node);
         _base.Add(perk);
@@ -393,7 +393,7 @@ public sealed class PerkItems
     public bool RemoveExternalBasePerk(string name)
     {
         if (!_external.Remove(name)) return false;
-        PerkInfoItem perk = ABAGJKMKCBA(name);
+        PerkInfoItem perk = FindBasePerk(name);
         return perk != null && _base.Remove(perk);
     }
 
@@ -450,8 +450,8 @@ public sealed class PerkItems
 
 public static class GameUtils
 {
-    public static readonly FixtureAchievCounters HHLEKNNJGMJ = new FixtureAchievCounters();
-    public static readonly PerkItems FDEJIIDIPBI = new PerkItems();
+    public static readonly FixtureAchievCounters AchievementDefinitions = new FixtureAchievCounters();
+    public static readonly PerkItems PerkItemList = new PerkItems();
 }
 
 public sealed class ForgeManager
@@ -468,7 +468,7 @@ public sealed class ForgeManager
         _recipes.Add(new Recipe("Complex"));
     }
 
-    public static ForgeManager ELEBLBJKDBI() { return Instance; }
+    public static ForgeManager GetInstance() { return Instance; }
     public IReadOnlyList<Recipe> Recipes { get { return _recipes.AsReadOnly(); } }
 
     public bool AddExternalRecipeFamily(string name, string alias, string economicProfileName,
@@ -605,7 +605,7 @@ public sealed class QuestStage
 
 public sealed class PerkTree
 {
-    public enum AAAIBJGLPAI
+    public enum PerkItemType
     {
         TYPE_PERK,
         TYPE_UPGRADE,
@@ -613,10 +613,10 @@ public sealed class PerkTree
 
     public sealed class PerkItem
     {
-        public readonly AAAIBJGLPAI Type;
+        public readonly PerkItemType Type;
         public readonly string Name;
         public readonly int Level;
-        public PerkItem(AAAIBJGLPAI type, string name, int level)
+        public PerkItem(PerkItemType type, string name, int level)
         {
             Type = type;
             Name = name;
@@ -638,7 +638,7 @@ public sealed class PerkTree
     private static readonly PerkTree Instance = new PerkTree();
     private readonly Dictionary<int, PerkBranch> _branches = new Dictionary<int, PerkBranch>();
 
-    public static PerkTree GBPBIPFIOJH() { return Instance; }
+    public static PerkTree GetInstance() { return Instance; }
 
     public PerkBranch ReplaceExternalBranch(int level, IEnumerable<PerkItem> items)
     {
@@ -657,8 +657,8 @@ public sealed class PerkTree
 
 public sealed class ListSF
 {
-    public static ListSF CCDKHLAMKKO() => Instance;
-    public FixtureUserAchievements KJNPJKEHGLE() => new FixtureUserAchievements();
+    public static ListSF GetRoster() => Instance;
+    public FixtureUserAchievements GetAchievements() => new FixtureUserAchievements();
     private static Items _items = new Items();
     private static readonly ListSF Instance = new ListSF();
     private readonly Dictionary<string, Battle> _battles = new Dictionary<string, Battle>(StringComparer.Ordinal);
@@ -709,39 +709,39 @@ public static class LocalizationManager
     public sealed class Language
     {
         public string name;
-        public string EOMNCDDELLB;
-        public string PMFEIPCHENB;
+        public string Locale;
+        public string FilePath;
         public int index;
 
         public Language(XmlNode node, int languageIndex)
         {
             name = node?.Attributes?["Name"]?.Value ?? string.Empty;
-            EOMNCDDELLB = node?.Attributes?["Locale"]?.Value ?? string.Empty;
+            Locale = node?.Attributes?["Locale"]?.Value ?? string.Empty;
             index = languageIndex;
         }
 
         public Language(string languageName)
         {
             name = languageName ?? string.Empty;
-            EOMNCDDELLB = languageName ?? string.Empty;
+            Locale = languageName ?? string.Empty;
         }
     }
 
     private static readonly Dictionary<string, string> BaseStrings = new Dictionary<string, string>();
     private static readonly Dictionary<string, string> ExternalStrings = new Dictionary<string, string>();
-    public static string POIPGLLCCKC = "eng";
-    public static List<Language> MCLNNPPCFFL = new List<Language> { new Language("eng") };
-    public static Language ILAJKOBCHFH = MCLNNPPCFFL[0];
-    public static event Action OCLBJLPOKLB;
+    public static string DefaultLanguageName = "eng";
+    public static List<Language> Languages = new List<Language> { new Language("eng") };
+    public static Language CurrentLanguage = Languages[0];
+    public static event Action LanguageChanged;
 
-    public static Language NLFKNPBICED(string name)
+    public static Language FindLanguageByName(string name)
     {
-        return MCLNNPPCFFL.Find(value => string.Equals(value.name, name, StringComparison.Ordinal));
+        return Languages.Find(value => string.Equals(value.name, name, StringComparison.Ordinal));
     }
 
-    public static Language HHKANICOAAG(string locale)
+    public static Language FindLanguageByLocale(string locale)
     {
-        return MCLNNPPCFFL.Find(value => string.Equals(value.EOMNCDDELLB, locale, StringComparison.OrdinalIgnoreCase));
+        return Languages.Find(value => string.Equals(value.Locale, locale, StringComparison.OrdinalIgnoreCase));
     }
 
     public static void SetExternalString(string key, string value) { ExternalStrings[key] = value; }
@@ -769,18 +769,18 @@ public static class LocalizationManager
     {
         BaseStrings.Clear();
         ExternalStrings.Clear();
-        POIPGLLCCKC = language;
-        MCLNNPPCFFL = new List<Language> { new Language(language) };
-        ILAJKOBCHFH = MCLNNPPCFFL[0];
+        DefaultLanguageName = language;
+        Languages = new List<Language> { new Language(language) };
+        CurrentLanguage = Languages[0];
     }
 
     public static void ChangeModdingTestLanguage(string language)
     {
         BaseStrings.Clear();
         ExternalStrings.Clear();
-        MCLNNPPCFFL = new List<Language> { new Language(language) };
-        ILAJKOBCHFH = MCLNNPPCFFL[0];
-        Action changed = OCLBJLPOKLB;
+        Languages = new List<Language> { new Language(language) };
+        CurrentLanguage = Languages[0];
+        Action changed = LanguageChanged;
         if (changed != null) changed();
     }
 }
@@ -798,11 +798,11 @@ namespace Eclipse.Modding
 
 // Achievement persistence is exercised against real native sources in
 // TestPhase3Progression.ps1; art validation only needs the host boundary.
-public sealed class FixtureAchievCounters { public readonly List<AchievCounter> MDNKEAFGAOB = new List<AchievCounter>(); }
+public sealed class FixtureAchievCounters { public readonly List<AchievCounter> Counters = new List<AchievCounter>(); }
 public sealed class AchievCounter { public AchievCounter(XmlNode node) {} }
 public sealed class FixtureUserAchievements
 {
-    public FixtureRosterCounter KJPLIHEMLJL(string name) => null;
+    public FixtureRosterCounter FindCounter(string name) => null;
     public int AdvanceExternalCounter(string name, int amount, int maximum) => amount;
 }
-public sealed class FixtureRosterCounter { public int MCIPEJBLIDC() => 0; }
+public sealed class FixtureRosterCounter { public int GetCounter() => 0; }

@@ -4,7 +4,7 @@ using System.Linq;
 
 public sealed class TypeConverterNodeDeserializer : INodeDeserializer
 {
-	private readonly IEnumerable<IYamlTypeConverter> JNONHBMNKDK;
+	private readonly IEnumerable<IYamlTypeConverter> converters;
 
 	public TypeConverterNodeDeserializer(IEnumerable<IYamlTypeConverter> JNONHBMNKDK)
 	{
@@ -12,18 +12,18 @@ public sealed class TypeConverterNodeDeserializer : INodeDeserializer
 		{
 			throw new ArgumentNullException("converters");
 		}
-		this.JNONHBMNKDK = JNONHBMNKDK;
+		this.converters = JNONHBMNKDK;
 	}
 
 	bool INodeDeserializer.Deserialize(EventReader reader, Type MBLGNMBFHBI, Func<EventReader, Type, object> IJBAEAEDMCC, out object value)
 	{
-		IYamlTypeConverter bLNPLLKJFLC = JNONHBMNKDK.FirstOrDefault((IYamlTypeConverter ILHDJDNPFKH) => ILHDJDNPFKH.EFIEKANJAEC(MBLGNMBFHBI));
+		IYamlTypeConverter bLNPLLKJFLC = converters.FirstOrDefault((IYamlTypeConverter ILHDJDNPFKH) => ILHDJDNPFKH.Accepts(MBLGNMBFHBI));
 		if (bLNPLLKJFLC == null)
 		{
 			value = null;
 			return false;
 		}
-		value = bLNPLLKJFLC.ReadYaml(reader.OAPMECPBPKJ(), MBLGNMBFHBI);
+		value = bLNPLLKJFLC.ReadYaml(reader.GetParser(), MBLGNMBFHBI);
 		return true;
 	}
 }

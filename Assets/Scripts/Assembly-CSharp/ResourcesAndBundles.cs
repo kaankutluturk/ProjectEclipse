@@ -24,7 +24,7 @@ public static class ResourcesAndBundles
 			return Resources.Load<T>(ONEIGMLOGDC);
 	}
 
-	public static T[] BNCMBJOICHI<T>(string ONEIGMLOGDC) where T : Object
+	public static T[] LoadAllAssets<T>(string ONEIGMLOGDC) where T : Object
 	{
 		T[] modAssets;
 			if (Eclipse.Modding.ModRuntime.TryLoadQualifiedWithSubAssets(ONEIGMLOGDC, out modAssets))

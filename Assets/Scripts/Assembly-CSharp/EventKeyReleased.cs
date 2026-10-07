@@ -1,7 +1,7 @@
 public class EventKeyReleased : EventAnimation
 {
 	public EventKeyReleased()
-		: base(EECEJKADLCK.EVENT_KEY_RELEASED)
+		: base(EventAnimationType.EVENT_KEY_RELEASED)
 	{
 	}
 

@@ -3,7 +3,7 @@ using System.IO;
 
 internal class CRC32
 {
-	private uint PHOKLKLMLFA;
+	private uint dwPolynomial;
 
 	private long _TotalBytesRead;
 
@@ -13,21 +13,21 @@ internal class CRC32
 
 	private const int BUFFER_SIZE = 8192;
 
-	private uint CIACMAKFIAP = uint.MaxValue;
+	private uint _register = uint.MaxValue;
 
-	public long DDBILOJCBFN
+	public long TotalBytesRead
 	{
 		get
 		{
-			return BFADCOPLBPM();
+			return GetTotalBytesRead();
 		}
 	}
 
-	public int FAJNNCGFPPF
+	public int Crc32Result
 	{
 		get
 		{
-			return MMBAMEEDDFA();
+			return GetCrc32Result();
 		}
 	}
 
@@ -44,18 +44,18 @@ internal class CRC32
 	public CRC32(int OEFFIELGAEI, bool reverseBits)
 	{
 		this.reverseBits = reverseBits;
-		PHOKLKLMLFA = (uint)OEFFIELGAEI;
-		ILBPHHDOGAI();
+		dwPolynomial = (uint)OEFFIELGAEI;
+		GenerateLookupTable();
 	}
 
-	public long BFADCOPLBPM()
+	public long GetTotalBytesRead()
 	{
 		return _TotalBytesRead;
 	}
 
-	public int MMBAMEEDDFA()
+	public int GetCrc32Result()
 	{
-		return (int)(~CIACMAKFIAP);
+		return (int)(~_register);
 	}
 
 	public int GetCrc32(Stream NILNDHEKNLJ)
@@ -80,7 +80,7 @@ internal class CRC32
 		_TotalBytesRead += num;
 		while (num > 0)
 		{
-			LOAACENMBJJ(array, 0, num);
+			SlurpBlock(array, 0, num);
 			num = NILNDHEKNLJ.Read(array, 0, count);
 			if (output != null)
 			{
@@ -88,7 +88,7 @@ internal class CRC32
 			}
 			_TotalBytesRead += num;
 		}
-		return (int)(~CIACMAKFIAP);
+		return (int)(~_register);
 	}
 
 	public int ComputeCrc32(int BLFBMIOIPOI, byte LDKCOIHONPG)
@@ -101,7 +101,7 @@ internal class CRC32
 		return (int)(crc32Table[(BLFBMIOIPOI ^ LDKCOIHONPG) & 0xFF] ^ (BLFBMIOIPOI >> 8));
 	}
 
-	public void LOAACENMBJJ(byte[] JILGHDDEMPE, int IPCOBJBKNAO, int count)
+	public void SlurpBlock(byte[] JILGHDDEMPE, int IPCOBJBKNAO, int count)
 	{
 		if (JILGHDDEMPE == null)
 		{
@@ -113,13 +113,13 @@ internal class CRC32
 			byte b = JILGHDDEMPE[num];
 			if (reverseBits)
 			{
-				uint num2 = (CIACMAKFIAP >> 24) ^ b;
-				CIACMAKFIAP = (CIACMAKFIAP << 8) ^ crc32Table[num2];
+				uint num2 = (_register >> 24) ^ b;
+				_register = (_register << 8) ^ crc32Table[num2];
 			}
 			else
 			{
-				uint num3 = (CIACMAKFIAP & 0xFF) ^ b;
-				CIACMAKFIAP = (CIACMAKFIAP >> 8) ^ crc32Table[num3];
+				uint num3 = (_register & 0xFF) ^ b;
+				_register = (_register >> 8) ^ crc32Table[num3];
 			}
 		}
 		_TotalBytesRead += count;
@@ -129,13 +129,13 @@ internal class CRC32
 	{
 		if (reverseBits)
 		{
-			uint num = (CIACMAKFIAP >> 24) ^ AAOIAEJJINO;
-			CIACMAKFIAP = (CIACMAKFIAP << 8) ^ crc32Table[num];
+			uint num = (_register >> 24) ^ AAOIAEJJINO;
+			_register = (_register << 8) ^ crc32Table[num];
 		}
 		else
 		{
-			uint num2 = (CIACMAKFIAP & 0xFF) ^ AAOIAEJJINO;
-			CIACMAKFIAP = (CIACMAKFIAP >> 8) ^ crc32Table[num2];
+			uint num2 = (_register & 0xFF) ^ AAOIAEJJINO;
+			_register = (_register >> 8) ^ crc32Table[num2];
 		}
 	}
 
@@ -145,13 +145,13 @@ internal class CRC32
 		{
 			if (reverseBits)
 			{
-				uint num = (CIACMAKFIAP >> 24) ^ AAOIAEJJINO;
-				CIACMAKFIAP = (CIACMAKFIAP << 8) ^ crc32Table[(num < 0) ? (num + 256) : num];
+				uint num = (_register >> 24) ^ AAOIAEJJINO;
+				_register = (_register << 8) ^ crc32Table[(num < 0) ? (num + 256) : num];
 			}
 			else
 			{
-				uint num2 = (CIACMAKFIAP & 0xFF) ^ AAOIAEJJINO;
-				CIACMAKFIAP = (CIACMAKFIAP >> 8) ^ crc32Table[(num2 < 0) ? (num2 + 256) : num2];
+				uint num2 = (_register & 0xFF) ^ AAOIAEJJINO;
+				_register = (_register >> 8) ^ crc32Table[(num2 < 0) ? (num2 + 256) : num2];
 			}
 		}
 	}
@@ -174,7 +174,7 @@ internal class CRC32
 		return (byte)(16781313 * (num3 + num4) >> 24);
 	}
 
-	private void ILBPHHDOGAI()
+	private void GenerateLookupTable()
 	{
 		crc32Table = new uint[256];
 		byte b = 0;
@@ -183,7 +183,7 @@ internal class CRC32
 			uint num = b;
 			for (byte b2 = 8; b2 > 0; b2--)
 			{
-				num = (((num & 1) != 1) ? (num >> 1) : ((num >> 1) ^ PHOKLKLMLFA));
+				num = (((num & 1) != 1) ? (num >> 1) : ((num >> 1) ^ dwPolynomial));
 			}
 			if (reverseBits)
 			{
@@ -230,8 +230,8 @@ internal class CRC32
 		{
 			return;
 		}
-		uint num = ~CIACMAKFIAP;
-		array2[0] = PHOKLKLMLFA;
+		uint num = ~_register;
+		array2[0] = dwPolynomial;
 		uint num2 = 1u;
 		for (int i = 1; i < 32; i++)
 		{
@@ -262,11 +262,11 @@ internal class CRC32
 		}
 		while (num3 != 0);
 		num ^= (uint)GAICMJOFOJD;
-		CIACMAKFIAP = ~num;
+		_register = ~num;
 	}
 
 	public void Reset()
 	{
-		CIACMAKFIAP = uint.MaxValue;
+		_register = uint.MaxValue;
 	}
 }

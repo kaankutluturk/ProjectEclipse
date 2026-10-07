@@ -271,7 +271,7 @@ public static class Program {
                 ModModeRuntime.CancelLaunch(raidEntry);
                 Check(ModModeRuntime.Begin(raidEntry), "Retry failed after scene-launch rollback.");
                 ModModeRuntime.NotifyEntry(raidEntry);
-                Check(ListSF.Quests.Events.Contains(QuestEvent.PMDPDMFLCIJ.QUEST_EVENT_RAID_ENTER), "Raid entry quest event missing.");
+                Check(ListSF.Quests.Events.Contains(QuestEvent.QuestEventType.QUEST_EVENT_RAID_ENTER), "Raid entry quest event missing.");
                 Check(ModModeRuntime.CanResolve(raidEntry), "Active raid result rejected.");
                 ModModeRuntime.Complete(raidEntry,true);
                 Check(!ModModeRuntime.CanResolve(raidEntry), "Duplicate raid result accepted.");
@@ -285,7 +285,7 @@ public static class Program {
                 ModModeRuntime.Complete(raidEntry,true); ModModeRuntime.NotifyResult(raidEntry);
                 Check(ModModeRuntime.TryProgress(raidEntry, out completedSteps, out stepCount) && completedSteps==0,
                     "Repeatable mode indicators did not reset after completion.");
-                Check(ListSF.Quests.Events.Contains(QuestEvent.PMDPDMFLCIJ.QUEST_EVENT_RAID_END), "Raid completion quest event missing.");
+                Check(ListSF.Quests.Events.Contains(QuestEvent.QuestEventType.QUEST_EVENT_RAID_END), "Raid completion quest event missing.");
                 ModModeRuntime.SetRaidResult(new FightResult());
                 Check(ModModeRuntime.ShowRaidResult() && !ModModeRuntime.ShowRaidResult() && Fight.Instance.Presented==1, "Raid result presentation duplicated.");
                 for (int replay=0; replay<3; replay++) {

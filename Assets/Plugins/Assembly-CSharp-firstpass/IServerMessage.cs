@@ -1,6 +1,6 @@
 public interface IServerMessage
 {
-	LENCKBHFKLD get_Type();
+	MessageTypes get_Type();
 
 	void Parse(object data);
 }

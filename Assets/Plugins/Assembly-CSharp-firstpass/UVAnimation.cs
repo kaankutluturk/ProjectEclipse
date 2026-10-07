@@ -13,10 +13,10 @@ public class UVAnimation : MonoBehaviour
 
 	private void Update()
 	{
-		JAGIBPBOMBL();
+		ScrollUvs();
 	}
 
-	private void JAGIBPBOMBL()
+	private void ScrollUvs()
 	{
 		Vector2[] uv = _mesh.uv;
 		for (int i = 0; i < uv.Length; i++)

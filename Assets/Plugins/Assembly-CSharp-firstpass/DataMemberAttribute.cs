@@ -3,39 +3,39 @@ using System;
 [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, Inherited = false, AllowMultiple = false)]
 public sealed class DataMemberAttribute : Attribute
 {
-	private bool CIJMHDHMGBB;
+	private bool isRequired;
 
-	private bool NFADCMLCMBL = true;
+	private bool emitDefaultValue = true;
 
 	private string name;
 
 	private int order = -1;
 
-	public bool HPBNIFNFJLB
+	public bool EmitDefaultValue
 	{
 		get
 		{
-			return JGDGAIBHJCO();
+			return GetEmitDefaultValue();
 		}
 		set
 		{
-			CAKJHBPFLPG(value);
+			SetEmitDefaultValue(value);
 		}
 	}
 
-	public bool ONMGNOHJBKN
+	public bool IsRequired
 	{
 		get
 		{
-			return OKKKGAKIJBA();
+			return GetIsRequired();
 		}
 		set
 		{
-			GAIALCENGJG(value);
+			SetIsRequired(value);
 		}
 	}
 
-	public string MENAJEAJJBE
+	public string MemberName
 	{
 		get
 		{
@@ -47,11 +47,11 @@ public sealed class DataMemberAttribute : Attribute
 		}
 	}
 
-	public int PECDGDLCAAA
+	public int SerializationOrder
 	{
 		get
 		{
-			return BHDEMLGCNOJ();
+			return GetOrder();
 		}
 		set
 		{
@@ -59,24 +59,24 @@ public sealed class DataMemberAttribute : Attribute
 		}
 	}
 
-	public bool JGDGAIBHJCO()
+	public bool GetEmitDefaultValue()
 	{
-		return NFADCMLCMBL;
+		return emitDefaultValue;
 	}
 
-	public void CAKJHBPFLPG(bool value)
+	public void SetEmitDefaultValue(bool value)
 	{
-		NFADCMLCMBL = value;
+		emitDefaultValue = value;
 	}
 
-	public bool OKKKGAKIJBA()
+	public bool GetIsRequired()
 	{
-		return CIJMHDHMGBB;
+		return isRequired;
 	}
 
-	public void GAIALCENGJG(bool value)
+	public void SetIsRequired(bool value)
 	{
-		CIJMHDHMGBB = value;
+		isRequired = value;
 	}
 
 	public string get_Name()
@@ -89,7 +89,7 @@ public sealed class DataMemberAttribute : Attribute
 		name = value;
 	}
 
-	public int BHDEMLGCNOJ()
+	public int GetOrder()
 	{
 		return order;
 	}

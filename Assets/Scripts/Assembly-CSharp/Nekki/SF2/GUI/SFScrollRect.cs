@@ -14,7 +14,7 @@ namespace Nekki.SF2.GUI
 	[DisallowMultipleComponent]
 	public class SFScrollRect : UIBehaviour, IEventSystemHandler, IBeginDragHandler, IDragHandler, IEndDragHandler, IInitializePotentialDragHandler, IScrollHandler, ICanvasElement, ILayoutElement, ILayoutGroup, ILayoutController
 	{
-		public enum MDMLKCMBBPA
+		public enum ScrollMovementType
 		{
 			Unrestricted = 0,
 			Elastic = 1,
@@ -22,7 +22,7 @@ namespace Nekki.SF2.GUI
 			SF2 = 3
 		}
 
-		public enum JJDKHMPDLNC
+		public enum ScrollbarVisibilityMode
 		{
 			Permanent = 0,
 			AutoHide = 1,
@@ -44,7 +44,7 @@ namespace Nekki.SF2.GUI
 		private bool m_Vertical = true;
 
 		[SerializeField]
-		private MDMLKCMBBPA m_MovementType = MDMLKCMBBPA.Elastic;
+		private ScrollMovementType m_MovementType = ScrollMovementType.Elastic;
 
 		[SerializeField]
 		private float m_Elasticity = 0.1f;
@@ -68,10 +68,10 @@ namespace Nekki.SF2.GUI
 		private Scrollbar m_VerticalScrollbar;
 
 		[SerializeField]
-		private JJDKHMPDLNC m_HorizontalScrollbarVisibility;
+		private ScrollbarVisibilityMode m_HorizontalScrollbarVisibility;
 
 		[SerializeField]
-		private JJDKHMPDLNC m_VerticalScrollbarVisibility;
+		private ScrollbarVisibilityMode m_VerticalScrollbarVisibility;
 
 		[SerializeField]
 		private float m_HorizontalScrollbarSpacing;
@@ -82,43 +82,43 @@ namespace Nekki.SF2.GUI
 		[SerializeField]
 		private ScrollRectEvent m_OnValueChanged = new ScrollRectEvent();
 
-		private Vector2 KPFNKIFLDPL = Vector2.zero;
+		private Vector2 m_PointerStartLocalCursor = Vector2.zero;
 
-		private Vector2 IDMLKGACFNO = Vector2.zero;
+		private Vector2 m_ContentStartPosition = Vector2.zero;
 
-		private RectTransform KMNHEEBLKGA;
+		private RectTransform m_ViewRect;
 
-		private Bounds GOIIEBHDLOH;
+		private Bounds m_ContentBounds;
 
-		private Bounds ALIFOBAFPOB;
+		private Bounds m_ViewBounds;
 
-		private Vector2 BKHKAOENMIG;
+		private Vector2 m_Velocity;
 
-		private bool HDDEPEAELAM;
+		private bool m_Dragging;
 
-		private Vector2 JEMEHMDEEHA = Vector2.zero;
+		private Vector2 m_PrevPosition = Vector2.zero;
 
-		private Bounds GMBMMKGKCJO;
+		private Bounds m_PrevContentBounds;
 
-		private Bounds AGCBMBCFDPE;
-
-		[NonSerialized]
-		private bool OHJMNCLNPFD;
-
-		private bool HPLLDNIDIML;
-
-		private bool FPOANPLBGGC;
-
-		private float LPOOHGINOEF;
-
-		private float NAFHJBACPDE;
+		private Bounds m_PrevViewBounds;
 
 		[NonSerialized]
-		private RectTransform HMJHIFIEKOD;
+		private bool m_HasRebuiltLayout;
 
-		private RectTransform PNMDBLOPDHA;
+		private bool m_HSliderExpand;
 
-		private RectTransform KPFFEDDJNOE;
+		private bool m_VSliderExpand;
+
+		private float m_HSliderHeight;
+
+		private float m_VSliderWidth;
+
+		[NonSerialized]
+		private RectTransform m_Rect;
+
+		private RectTransform m_HorizontalScrollbarRect;
+
+		private RectTransform m_VerticalScrollbarRect;
 
 		private DrivenRectTransformTracker m_Tracker;
 
@@ -126,11 +126,11 @@ namespace Nekki.SF2.GUI
 		private float m_ScrollFactor = 1f;
 
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		private float CEEACGHNLAE;
+		private float m_FlexibleWidth;
 
 		private readonly Vector3[] m_Corners = new Vector3[4];
 
-		public RectTransform DMNBDBJNKME
+		public RectTransform ContentRect
 		{
 			get
 			{
@@ -142,7 +142,7 @@ namespace Nekki.SF2.GUI
 			}
 		}
 
-		public bool NNLLKCNOADD
+		public bool Horizontal
 		{
 			get
 			{
@@ -154,7 +154,7 @@ namespace Nekki.SF2.GUI
 			}
 		}
 
-		public bool BFAPABIBDFB
+		public bool Vertical
 		{
 			get
 			{
@@ -166,7 +166,7 @@ namespace Nekki.SF2.GUI
 			}
 		}
 
-		public MDMLKCMBBPA DICDMCPHKMO
+		public ScrollMovementType MovementType
 		{
 			get
 			{
@@ -178,7 +178,7 @@ namespace Nekki.SF2.GUI
 			}
 		}
 
-		public float JCIOHDIOAGP
+		public float Elasticity
 		{
 			get
 			{
@@ -190,7 +190,7 @@ namespace Nekki.SF2.GUI
 			}
 		}
 
-		public bool JCIMNPMFFBK
+		public bool Inertia
 		{
 			get
 			{
@@ -202,7 +202,7 @@ namespace Nekki.SF2.GUI
 			}
 		}
 
-		public float CGDBGPDOODH
+		public float DecelerationRate
 		{
 			get
 			{
@@ -214,7 +214,7 @@ namespace Nekki.SF2.GUI
 			}
 		}
 
-		public float CFHDPILGGGO
+		public float ScrollSensitivity
 		{
 			get
 			{
@@ -226,7 +226,7 @@ namespace Nekki.SF2.GUI
 			}
 		}
 
-		public RectTransform NOPKELAGEJK
+		public RectTransform Viewport
 		{
 			get
 			{
@@ -238,7 +238,7 @@ namespace Nekki.SF2.GUI
 			}
 		}
 
-		public Scrollbar LBOAGOLPGPM
+		public Scrollbar HorizontalScrollbar
 		{
 			get
 			{
@@ -250,7 +250,7 @@ namespace Nekki.SF2.GUI
 			}
 		}
 
-		public Scrollbar DAJECJJGKIL
+		public Scrollbar VerticalScrollbar
 		{
 			get
 			{
@@ -262,7 +262,7 @@ namespace Nekki.SF2.GUI
 			}
 		}
 
-		public JJDKHMPDLNC LBENGNMGLMC
+		public ScrollbarVisibilityMode HorizontalScrollbarVisibility
 		{
 			get
 			{
@@ -274,7 +274,7 @@ namespace Nekki.SF2.GUI
 			}
 		}
 
-		public JJDKHMPDLNC GBBALIKILDM
+		public ScrollbarVisibilityMode VerticalScrollbarVisibility
 		{
 			get
 			{
@@ -286,7 +286,7 @@ namespace Nekki.SF2.GUI
 			}
 		}
 
-		public float MNOAFNGEGFN
+		public float HorizontalScrollbarSpacing
 		{
 			get
 			{
@@ -298,7 +298,7 @@ namespace Nekki.SF2.GUI
 			}
 		}
 
-		public float HNBGEEFNPPK
+		public float VerticalScrollbarSpacing
 		{
 			get
 			{
@@ -310,7 +310,7 @@ namespace Nekki.SF2.GUI
 			}
 		}
 
-		public ScrollRectEvent PIKCOEPBAJN
+		public ScrollRectEvent OnValueChangedEvent
 		{
 			get
 			{
@@ -322,15 +322,15 @@ namespace Nekki.SF2.GUI
 			}
 		}
 
-		protected RectTransform GPPCFOEEGEL
+		protected RectTransform ViewRect
 		{
 			get
 			{
-				return BIOPKLNFEJI();
+				return GetViewRect();
 			}
 		}
 
-		public Vector2 BLPIMOCGMKJ
+		public Vector2 VelocityProperty
 		{
 			get
 			{
@@ -346,11 +346,11 @@ namespace Nekki.SF2.GUI
 		{
 			get
 			{
-				return FDHIFJPGOIC();
+				return GetRectTransform();
 			}
 		}
 
-		public float OLMPCHENNHJ
+		public float ScrollFactorProperty
 		{
 			get
 			{
@@ -362,7 +362,7 @@ namespace Nekki.SF2.GUI
 			}
 		}
 
-		public Vector2 HOLFOPDJLFL
+		public Vector2 NormalizedPosition
 		{
 			get
 			{
@@ -374,7 +374,7 @@ namespace Nekki.SF2.GUI
 			}
 		}
 
-		public float AFDHGNNLHHC
+		public float HorizontalNormalizedPosition
 		{
 			get
 			{
@@ -386,7 +386,7 @@ namespace Nekki.SF2.GUI
 			}
 		}
 
-		public float JJNGHDNMAKL
+		public float VerticalNormalizedPosition
 		{
 			get
 			{
@@ -398,23 +398,23 @@ namespace Nekki.SF2.GUI
 			}
 		}
 
-		private bool CDMDGDPHMMK
+		private bool HScrollingNeeded
 		{
 			get
 			{
-				return PGFAIAPPGJA();
+				return IsHorizontalScrollingNeeded();
 			}
 		}
 
-		private bool HIHFMPDCMLL
+		private bool VScrollingNeeded
 		{
 			get
 			{
-				return KEHLLKKMOLB();
+				return IsVerticalScrollingNeeded();
 			}
 		}
 
-		public virtual float IIMDMHKPJJN
+		public virtual float LayoutMinWidth
 		{
 			get
 			{
@@ -422,7 +422,7 @@ namespace Nekki.SF2.GUI
 			}
 		}
 
-		public virtual float KFKBHBDJBLK
+		public virtual float LayoutPreferredWidth
 		{
 			get
 			{
@@ -430,7 +430,7 @@ namespace Nekki.SF2.GUI
 			}
 		}
 
-		public virtual float FOLGLLLJPCP
+		public virtual float LayoutFlexibleWidth
 		{
 			get
 			{
@@ -438,11 +438,11 @@ namespace Nekki.SF2.GUI
 			}
 			private set
 			{
-				EFFGGDHEDCM(value);
+				SetFlexibleWidth(value);
 			}
 		}
 
-		public virtual float JKKFHOLODHB
+		public virtual float LayoutMinHeight
 		{
 			get
 			{
@@ -450,7 +450,7 @@ namespace Nekki.SF2.GUI
 			}
 		}
 
-		public virtual float AMCFFDNMFFG
+		public virtual float LayoutPreferredHeight
 		{
 			get
 			{
@@ -458,7 +458,7 @@ namespace Nekki.SF2.GUI
 			}
 		}
 
-		public virtual float IPPGGFEPJMA
+		public virtual float LayoutFlexibleHeight
 		{
 			get
 			{
@@ -466,7 +466,7 @@ namespace Nekki.SF2.GUI
 			}
 		}
 
-		public virtual int BIGNCGFHNAK
+		public virtual int LayoutPriorityValue
 		{
 			get
 			{
@@ -484,7 +484,7 @@ namespace Nekki.SF2.GUI
 
 		protected SFScrollRect()
 		{
-			EFFGGDHEDCM(-1f);
+			SetFlexibleWidth(-1f);
 		}
 
 		public RectTransform get_content()
@@ -517,12 +517,12 @@ namespace Nekki.SF2.GUI
 			m_Vertical = value;
 		}
 
-		public MDMLKCMBBPA get_movementType()
+		public ScrollMovementType get_movementType()
 		{
 			return m_MovementType;
 		}
 
-		public void set_movementType(MDMLKCMBBPA value)
+		public void set_movementType(ScrollMovementType value)
 		{
 			m_MovementType = value;
 		}
@@ -575,7 +575,7 @@ namespace Nekki.SF2.GUI
 		public void set_viewport(RectTransform value)
 		{
 			m_Viewport = value;
-			KKMKEKGJLMJ();
+			SetDirtyCaching();
 		}
 
 		public Scrollbar get_horizontalScrollbar()
@@ -587,14 +587,14 @@ namespace Nekki.SF2.GUI
 		{
 			if ((bool)m_HorizontalScrollbar)
 			{
-				m_HorizontalScrollbar.onValueChanged.RemoveListener(PGGKPMBDFHH);
+				m_HorizontalScrollbar.onValueChanged.RemoveListener(SetHorizontalNormalizedPositionInternal);
 			}
 			m_HorizontalScrollbar = value;
 			if ((bool)m_HorizontalScrollbar)
 			{
-				m_HorizontalScrollbar.onValueChanged.AddListener(PGGKPMBDFHH);
+				m_HorizontalScrollbar.onValueChanged.AddListener(SetHorizontalNormalizedPositionInternal);
 			}
-			KKMKEKGJLMJ();
+			SetDirtyCaching();
 		}
 
 		public Scrollbar get_verticalScrollbar()
@@ -606,36 +606,36 @@ namespace Nekki.SF2.GUI
 		{
 			if ((bool)m_VerticalScrollbar)
 			{
-				m_VerticalScrollbar.onValueChanged.RemoveListener(GGONALKGFCG);
+				m_VerticalScrollbar.onValueChanged.RemoveListener(SetVerticalNormalizedPositionInternal);
 			}
 			m_VerticalScrollbar = value;
 			if ((bool)m_VerticalScrollbar)
 			{
-				m_VerticalScrollbar.onValueChanged.AddListener(GGONALKGFCG);
+				m_VerticalScrollbar.onValueChanged.AddListener(SetVerticalNormalizedPositionInternal);
 			}
-			KKMKEKGJLMJ();
+			SetDirtyCaching();
 		}
 
-		public JJDKHMPDLNC get_horizontalScrollbarVisibility()
+		public ScrollbarVisibilityMode get_horizontalScrollbarVisibility()
 		{
 			return m_HorizontalScrollbarVisibility;
 		}
 
-		public void set_horizontalScrollbarVisibility(JJDKHMPDLNC value)
+		public void set_horizontalScrollbarVisibility(ScrollbarVisibilityMode value)
 		{
 			m_HorizontalScrollbarVisibility = value;
-			KKMKEKGJLMJ();
+			SetDirtyCaching();
 		}
 
-		public JJDKHMPDLNC get_verticalScrollbarVisibility()
+		public ScrollbarVisibilityMode get_verticalScrollbarVisibility()
 		{
 			return m_VerticalScrollbarVisibility;
 		}
 
-		public void set_verticalScrollbarVisibility(JJDKHMPDLNC value)
+		public void set_verticalScrollbarVisibility(ScrollbarVisibilityMode value)
 		{
 			m_VerticalScrollbarVisibility = value;
-			KKMKEKGJLMJ();
+			SetDirtyCaching();
 		}
 
 		public float get_horizontalScrollbarSpacing()
@@ -646,7 +646,7 @@ namespace Nekki.SF2.GUI
 		public void set_horizontalScrollbarSpacing(float value)
 		{
 			m_HorizontalScrollbarSpacing = value;
-			FIBKLPHOCFC();
+			SetDirty();
 		}
 
 		public float get_verticalScrollbarSpacing()
@@ -657,7 +657,7 @@ namespace Nekki.SF2.GUI
 		public void set_verticalScrollbarSpacing(float value)
 		{
 			m_VerticalScrollbarSpacing = value;
-			FIBKLPHOCFC();
+			SetDirty();
 		}
 
 		public ScrollRectEvent get_onValueChanged()
@@ -670,36 +670,36 @@ namespace Nekki.SF2.GUI
 			m_OnValueChanged = value;
 		}
 
-		protected RectTransform BIOPKLNFEJI()
+		protected RectTransform GetViewRect()
 		{
-			if (KMNHEEBLKGA == null)
+			if (m_ViewRect == null)
 			{
-				KMNHEEBLKGA = m_Viewport;
+				m_ViewRect = m_Viewport;
 			}
-			if (KMNHEEBLKGA == null)
+			if (m_ViewRect == null)
 			{
-				KMNHEEBLKGA = (RectTransform)base.transform;
+				m_ViewRect = (RectTransform)base.transform;
 			}
-			return KMNHEEBLKGA;
+			return m_ViewRect;
 		}
 
 		public Vector2 get_velocity()
 		{
-			return BKHKAOENMIG;
+			return m_Velocity;
 		}
 
 		public void set_velocity(Vector2 value)
 		{
-			BKHKAOENMIG = value;
+			m_Velocity = value;
 		}
 
-		private RectTransform FDHIFJPGOIC()
+		private RectTransform GetRectTransform()
 		{
-			if (HMJHIFIEKOD == null)
+			if (m_Rect == null)
 			{
-				HMJHIFIEKOD = GetComponent<RectTransform>();
+				m_Rect = GetComponent<RectTransform>();
 			}
-			return HMJHIFIEKOD;
+			return m_Rect;
 		}
 
 		public float get_scrollFactor()
@@ -716,14 +716,14 @@ namespace Nekki.SF2.GUI
 		{
 			if (FLAKOEEDOAF == CanvasUpdate.Prelayout)
 			{
-				KOAEDAIOJIM();
+				UpdateCachedData();
 			}
 			if (FLAKOEEDOAF == CanvasUpdate.PostLayout)
 			{
-				JKFDJGELEID();
-				LOGFHHOFJAH(Vector2.zero);
-				PPBLONJPJEA();
-				OHJMNCLNPFD = true;
+				UpdateBounds();
+				UpdateScrollbars(Vector2.zero);
+				UpdatePrevData();
+				m_HasRebuiltLayout = true;
 			}
 		}
 
@@ -735,19 +735,19 @@ namespace Nekki.SF2.GUI
 		{
 		}
 
-		private void KOAEDAIOJIM()
+		private void UpdateCachedData()
 		{
 			Transform transform = base.transform;
-			PNMDBLOPDHA = ((!(m_HorizontalScrollbar == null)) ? (m_HorizontalScrollbar.transform as RectTransform) : null);
-			KPFFEDDJNOE = ((!(m_VerticalScrollbar == null)) ? (m_VerticalScrollbar.transform as RectTransform) : null);
-			bool flag = BIOPKLNFEJI().parent == transform;
-			bool flag2 = !PNMDBLOPDHA || PNMDBLOPDHA.parent == transform;
-			bool flag3 = !KPFFEDDJNOE || KPFFEDDJNOE.parent == transform;
+			m_HorizontalScrollbarRect = ((!(m_HorizontalScrollbar == null)) ? (m_HorizontalScrollbar.transform as RectTransform) : null);
+			m_VerticalScrollbarRect = ((!(m_VerticalScrollbar == null)) ? (m_VerticalScrollbar.transform as RectTransform) : null);
+			bool flag = GetViewRect().parent == transform;
+			bool flag2 = !m_HorizontalScrollbarRect || m_HorizontalScrollbarRect.parent == transform;
+			bool flag3 = !m_VerticalScrollbarRect || m_VerticalScrollbarRect.parent == transform;
 			bool flag4 = flag && flag2 && flag3;
-			HPLLDNIDIML = flag4 && (bool)PNMDBLOPDHA && get_horizontalScrollbarVisibility() == JJDKHMPDLNC.AutoHideAndExpandViewport;
-			FPOANPLBGGC = flag4 && (bool)KPFFEDDJNOE && get_verticalScrollbarVisibility() == JJDKHMPDLNC.AutoHideAndExpandViewport;
-			LPOOHGINOEF = ((!(PNMDBLOPDHA == null)) ? PNMDBLOPDHA.rect.height : 0f);
-			NAFHJBACPDE = ((!(KPFFEDDJNOE == null)) ? KPFFEDDJNOE.rect.width : 0f);
+			m_HSliderExpand = flag4 && (bool)m_HorizontalScrollbarRect && get_horizontalScrollbarVisibility() == ScrollbarVisibilityMode.AutoHideAndExpandViewport;
+			m_VSliderExpand = flag4 && (bool)m_VerticalScrollbarRect && get_verticalScrollbarVisibility() == ScrollbarVisibilityMode.AutoHideAndExpandViewport;
+			m_HSliderHeight = ((!(m_HorizontalScrollbarRect == null)) ? m_HorizontalScrollbarRect.rect.height : 0f);
+			m_VSliderWidth = ((!(m_VerticalScrollbarRect == null)) ? m_VerticalScrollbarRect.rect.width : 0f);
 		}
 
 		protected override void OnEnable()
@@ -755,11 +755,11 @@ namespace Nekki.SF2.GUI
 			base.OnEnable();
 			if ((bool)m_HorizontalScrollbar)
 			{
-				m_HorizontalScrollbar.onValueChanged.AddListener(PGGKPMBDFHH);
+				m_HorizontalScrollbar.onValueChanged.AddListener(SetHorizontalNormalizedPositionInternal);
 			}
 			if ((bool)m_VerticalScrollbar)
 			{
-				m_VerticalScrollbar.onValueChanged.AddListener(GGONALKGFCG);
+				m_VerticalScrollbar.onValueChanged.AddListener(SetVerticalNormalizedPositionInternal);
 			}
 			CanvasUpdateRegistry.RegisterCanvasElementForLayoutRebuild(this);
 		}
@@ -769,16 +769,16 @@ namespace Nekki.SF2.GUI
 			CanvasUpdateRegistry.UnRegisterCanvasElementForRebuild(this);
 			if ((bool)m_HorizontalScrollbar)
 			{
-				m_HorizontalScrollbar.onValueChanged.RemoveListener(PGGKPMBDFHH);
+				m_HorizontalScrollbar.onValueChanged.RemoveListener(SetHorizontalNormalizedPositionInternal);
 			}
 			if ((bool)m_VerticalScrollbar)
 			{
-				m_VerticalScrollbar.onValueChanged.RemoveListener(GGONALKGFCG);
+				m_VerticalScrollbar.onValueChanged.RemoveListener(SetVerticalNormalizedPositionInternal);
 			}
-			OHJMNCLNPFD = false;
+			m_HasRebuiltLayout = false;
 			m_Tracker.Clear();
-			BKHKAOENMIG = Vector2.zero;
-			LayoutRebuilder.MarkLayoutForRebuild(FDHIFJPGOIC());
+			m_Velocity = Vector2.zero;
+			LayoutRebuilder.MarkLayoutForRebuild(GetRectTransform());
 			base.OnDisable();
 		}
 
@@ -787,9 +787,9 @@ namespace Nekki.SF2.GUI
 			return base.IsActive() && m_Content != null;
 		}
 
-		private void DKAMBKOGFML()
+		private void EnsureLayoutHasRebuilt()
 		{
-			if (!OHJMNCLNPFD && !CanvasUpdateRegistry.IsRebuildingLayout())
+			if (!m_HasRebuiltLayout && !CanvasUpdateRegistry.IsRebuildingLayout())
 			{
 				Canvas.ForceUpdateCanvases();
 			}
@@ -797,7 +797,7 @@ namespace Nekki.SF2.GUI
 
 		public virtual void StopMovement()
 		{
-			BKHKAOENMIG = Vector2.zero;
+			m_Velocity = Vector2.zero;
 		}
 
 		public virtual void OnScroll(PointerEventData data)
@@ -806,8 +806,8 @@ namespace Nekki.SF2.GUI
 			{
 				return;
 			}
-			DKAMBKOGFML();
-			JKFDJGELEID();
+			EnsureLayoutHasRebuilt();
+			UpdateBounds();
 			Vector2 scrollDelta = data.scrollDelta;
 			scrollDelta.y *= -1f;
 			if (get_vertical() && !get_horizontal())
@@ -832,7 +832,7 @@ namespace Nekki.SF2.GUI
             // instead of jumping the content a full notch in one frame.
             StopMovement();
             Vector2 anchoredPosition = (wheelActive ? wheelTarget : m_Content.anchoredPosition) + scrollDelta * m_ScrollSensitivity * 100f;
-			if (m_MovementType != MDMLKCMBBPA.Unrestricted)
+			if (m_MovementType != ScrollMovementType.Unrestricted)
 			{
 				anchoredPosition += CalculateOffset(anchoredPosition - m_Content.anchoredPosition);
 			}
@@ -858,12 +858,12 @@ namespace Nekki.SF2.GUI
 		private void StepWheel(float deltaTime)
 		{
 			// Any other writer (drag, scrollbar, tween, code-driven scroll) takes over.
-			if (HDDEPEAELAM || m_Content.anchoredPosition != wheelLast)
+			if (m_Dragging || m_Content.anchoredPosition != wheelLast)
 			{
 				wheelActive = false;
 				return;
 			}
-			if (m_MovementType != MDMLKCMBBPA.Unrestricted)
+			if (m_MovementType != ScrollMovementType.Unrestricted)
 			{
 				wheelTarget += CalculateOffset(wheelTarget - m_Content.anchoredPosition);
 			}
@@ -873,7 +873,7 @@ namespace Nekki.SF2.GUI
 				position = wheelTarget;
 				wheelActive = false;
 			}
-			IKIMIDOGICB(position);
+			SetContentAnchoredPosition(position);
 			wheelLast = m_Content.anchoredPosition;
 		}
 
@@ -881,7 +881,7 @@ namespace Nekki.SF2.GUI
 		{
 			if (BHOLFGOGPCP.button == PointerEventData.InputButton.Left)
 			{
-				BKHKAOENMIG = Vector2.zero;
+				m_Velocity = Vector2.zero;
 			}
 		}
 
@@ -889,11 +889,11 @@ namespace Nekki.SF2.GUI
 		{
 			if (BHOLFGOGPCP.button == PointerEventData.InputButton.Left && IsActive())
 			{
-				JKFDJGELEID();
-				KPFNKIFLDPL = Vector2.zero;
-				RectTransformUtility.ScreenPointToLocalPointInRectangle(BIOPKLNFEJI(), BHOLFGOGPCP.position, BHOLFGOGPCP.pressEventCamera, out KPFNKIFLDPL);
-				IDMLKGACFNO = m_Content.anchoredPosition;
-				HDDEPEAELAM = true;
+				UpdateBounds();
+				m_PointerStartLocalCursor = Vector2.zero;
+				RectTransformUtility.ScreenPointToLocalPointInRectangle(GetViewRect(), BHOLFGOGPCP.position, BHOLFGOGPCP.pressEventCamera, out m_PointerStartLocalCursor);
+				m_ContentStartPosition = m_Content.anchoredPosition;
+				m_Dragging = true;
 				wheelActive = false;
 			}
 		}
@@ -902,38 +902,38 @@ namespace Nekki.SF2.GUI
 		{
 			if (BHOLFGOGPCP.button == PointerEventData.InputButton.Left)
 			{
-				HDDEPEAELAM = false;
+				m_Dragging = false;
 			}
 		}
 
 		public virtual void OnDrag(PointerEventData BHOLFGOGPCP)
 		{
 			Vector2 localPoint;
-			if (BHOLFGOGPCP.button != PointerEventData.InputButton.Left || !IsActive() || !RectTransformUtility.ScreenPointToLocalPointInRectangle(BIOPKLNFEJI(), BHOLFGOGPCP.position, BHOLFGOGPCP.pressEventCamera, out localPoint))
+			if (BHOLFGOGPCP.button != PointerEventData.InputButton.Left || !IsActive() || !RectTransformUtility.ScreenPointToLocalPointInRectangle(GetViewRect(), BHOLFGOGPCP.position, BHOLFGOGPCP.pressEventCamera, out localPoint))
 			{
 				return;
 			}
-			JKFDJGELEID();
-			Vector2 vector = localPoint - KPFNKIFLDPL;
+			UpdateBounds();
+			Vector2 vector = localPoint - m_PointerStartLocalCursor;
 			vector *= m_ScrollFactor;
-			Vector2 vector2 = IDMLKGACFNO + vector;
+			Vector2 vector2 = m_ContentStartPosition + vector;
 			Vector2 vector3 = CalculateOffset(vector2 - m_Content.anchoredPosition);
 			vector2 += vector3;
-			if (m_MovementType == MDMLKCMBBPA.Elastic)
+			if (m_MovementType == ScrollMovementType.Elastic)
 			{
 				if (vector3.x != 0f)
 				{
-					vector2.x -= IIIMENBNAKB(vector3.x, ALIFOBAFPOB.size.x);
+					vector2.x -= RubberDelta(vector3.x, m_ViewBounds.size.x);
 				}
 				if (vector3.y != 0f)
 				{
-					vector2.y -= IIIMENBNAKB(vector3.y, ALIFOBAFPOB.size.y);
+					vector2.y -= RubberDelta(vector3.y, m_ViewBounds.size.y);
 				}
 			}
-			IKIMIDOGICB(vector2);
+			SetContentAnchoredPosition(vector2);
 		}
 
-		protected virtual void IKIMIDOGICB(Vector2 MGMMDGFPBLP)
+		protected virtual void SetContentAnchoredPosition(Vector2 MGMMDGFPBLP)
 		{
 			if (!m_Horizontal)
 			{
@@ -946,7 +946,7 @@ namespace Nekki.SF2.GUI
 			if (MGMMDGFPBLP != m_Content.anchoredPosition)
 			{
 				m_Content.anchoredPosition = MGMMDGFPBLP;
-				JKFDJGELEID();
+				UpdateBounds();
 			}
 		}
 
@@ -956,84 +956,84 @@ namespace Nekki.SF2.GUI
 			{
 				return;
 			}
-			DKAMBKOGFML();
-			NFOKADBDILL();
-			JKFDJGELEID();
+			EnsureLayoutHasRebuilt();
+			UpdateScrollbarVisibility();
+			UpdateBounds();
 			float unscaledDeltaTime = Time.unscaledDeltaTime;
 			if (wheelActive)
 			{
 				StepWheel(unscaledDeltaTime);
 			}
 			Vector2 vector = CalculateOffset(Vector2.zero);
-			if (!HDDEPEAELAM && (vector != Vector2.zero || BKHKAOENMIG != Vector2.zero) && m_MovementType != MDMLKCMBBPA.SF2)
+			if (!m_Dragging && (vector != Vector2.zero || m_Velocity != Vector2.zero) && m_MovementType != ScrollMovementType.SF2)
 			{
 				Vector2 anchoredPosition = m_Content.anchoredPosition;
 				for (int i = 0; i < 2; i++)
 				{
-					if (m_MovementType == MDMLKCMBBPA.Elastic && vector[i] != 0f)
+					if (m_MovementType == ScrollMovementType.Elastic && vector[i] != 0f)
 					{
-						float currentVelocity = BKHKAOENMIG[i];
+						float currentVelocity = m_Velocity[i];
 						anchoredPosition[i] = Mathf.SmoothDamp(m_Content.anchoredPosition[i], m_Content.anchoredPosition[i] + vector[i], ref currentVelocity, m_Elasticity, float.PositiveInfinity, unscaledDeltaTime);
-						BKHKAOENMIG[i] = currentVelocity;
+						m_Velocity[i] = currentVelocity;
 					}
 					else if (m_Inertia)
 					{
-						BKHKAOENMIG[i] *= Mathf.Pow(m_DecelerationRate, unscaledDeltaTime);
-						if (Mathf.Abs(BKHKAOENMIG[i]) < 1f)
+						m_Velocity[i] *= Mathf.Pow(m_DecelerationRate, unscaledDeltaTime);
+						if (Mathf.Abs(m_Velocity[i]) < 1f)
 						{
-							BKHKAOENMIG[i] = 0f;
+							m_Velocity[i] = 0f;
 						}
-						anchoredPosition[i] += BKHKAOENMIG[i] * unscaledDeltaTime;
+						anchoredPosition[i] += m_Velocity[i] * unscaledDeltaTime;
 					}
 					else
 					{
-						BKHKAOENMIG[i] = 0f;
+						m_Velocity[i] = 0f;
 					}
 				}
-				if (BKHKAOENMIG != Vector2.zero || vector != Vector2.zero)
+				if (m_Velocity != Vector2.zero || vector != Vector2.zero)
 				{
-					if (m_MovementType == MDMLKCMBBPA.Clamped)
+					if (m_MovementType == ScrollMovementType.Clamped)
 					{
 						vector = CalculateOffset(anchoredPosition - m_Content.anchoredPosition);
 						anchoredPosition += vector;
 					}
-					IKIMIDOGICB(anchoredPosition);
+					SetContentAnchoredPosition(anchoredPosition);
 				}
 			}
-			if (HDDEPEAELAM && m_Inertia)
+			if (m_Dragging && m_Inertia)
 			{
-				Vector3 b = (m_Content.anchoredPosition - JEMEHMDEEHA) / unscaledDeltaTime;
-				BKHKAOENMIG = Vector3.Lerp(BKHKAOENMIG, b, unscaledDeltaTime * 10f);
+				Vector3 b = (m_Content.anchoredPosition - m_PrevPosition) / unscaledDeltaTime;
+				m_Velocity = Vector3.Lerp(m_Velocity, b, unscaledDeltaTime * 10f);
 			}
-			if (ALIFOBAFPOB != AGCBMBCFDPE || GOIIEBHDLOH != GMBMMKGKCJO || m_Content.anchoredPosition != JEMEHMDEEHA)
+			if (m_ViewBounds != m_PrevViewBounds || m_ContentBounds != m_PrevContentBounds || m_Content.anchoredPosition != m_PrevPosition)
 			{
-				LOGFHHOFJAH(vector);
+				UpdateScrollbars(vector);
 				m_OnValueChanged.Invoke(get_normalizedPosition());
-				PPBLONJPJEA();
+				UpdatePrevData();
 			}
 		}
 
-		private void PPBLONJPJEA()
+		private void UpdatePrevData()
 		{
 			if (m_Content == null)
 			{
-				JEMEHMDEEHA = Vector2.zero;
+				m_PrevPosition = Vector2.zero;
 			}
 			else
 			{
-				JEMEHMDEEHA = m_Content.anchoredPosition;
+				m_PrevPosition = m_Content.anchoredPosition;
 			}
-			AGCBMBCFDPE = ALIFOBAFPOB;
-			GMBMMKGKCJO = GOIIEBHDLOH;
+			m_PrevViewBounds = m_ViewBounds;
+			m_PrevContentBounds = m_ContentBounds;
 		}
 
-		private void LOGFHHOFJAH(Vector2 IPCOBJBKNAO)
+		private void UpdateScrollbars(Vector2 IPCOBJBKNAO)
 		{
 			if ((bool)m_HorizontalScrollbar)
 			{
-				if (GOIIEBHDLOH.size.x > 0f)
+				if (m_ContentBounds.size.x > 0f)
 				{
-					m_HorizontalScrollbar.size = Mathf.Clamp01((ALIFOBAFPOB.size.x - Mathf.Abs(IPCOBJBKNAO.x)) / GOIIEBHDLOH.size.x);
+					m_HorizontalScrollbar.size = Mathf.Clamp01((m_ViewBounds.size.x - Mathf.Abs(IPCOBJBKNAO.x)) / m_ContentBounds.size.x);
 				}
 				else
 				{
@@ -1043,9 +1043,9 @@ namespace Nekki.SF2.GUI
 			}
 			if ((bool)m_VerticalScrollbar)
 			{
-				if (GOIIEBHDLOH.size.y > 0f)
+				if (m_ContentBounds.size.y > 0f)
 				{
-					m_VerticalScrollbar.size = Mathf.Clamp01((ALIFOBAFPOB.size.y - Mathf.Abs(IPCOBJBKNAO.y)) / GOIIEBHDLOH.size.y);
+					m_VerticalScrollbar.size = Mathf.Clamp01((m_ViewBounds.size.y - Mathf.Abs(IPCOBJBKNAO.y)) / m_ContentBounds.size.y);
 				}
 				else
 				{
@@ -1062,91 +1062,91 @@ namespace Nekki.SF2.GUI
 
 		public void set_normalizedPosition(Vector2 value)
 		{
-			NNBELLIECIA(value.x, 0);
-			NNBELLIECIA(value.y, 1);
+			SetNormalizedPosition(value.x, 0);
+			SetNormalizedPosition(value.y, 1);
 		}
 
 		public float get_horizontalNormalizedPosition()
 		{
-			JKFDJGELEID();
-			if (GOIIEBHDLOH.size.x <= ALIFOBAFPOB.size.x)
+			UpdateBounds();
+			if (m_ContentBounds.size.x <= m_ViewBounds.size.x)
 			{
-				return (ALIFOBAFPOB.min.x > GOIIEBHDLOH.min.x) ? 1 : 0;
+				return (m_ViewBounds.min.x > m_ContentBounds.min.x) ? 1 : 0;
 			}
-			return (ALIFOBAFPOB.min.x - GOIIEBHDLOH.min.x) / (GOIIEBHDLOH.size.x - ALIFOBAFPOB.size.x);
+			return (m_ViewBounds.min.x - m_ContentBounds.min.x) / (m_ContentBounds.size.x - m_ViewBounds.size.x);
 		}
 
 		public void set_horizontalNormalizedPosition(float value)
 		{
-			NNBELLIECIA(value, 0);
+			SetNormalizedPosition(value, 0);
 		}
 
 		public float get_verticalNormalizedPosition()
 		{
-			JKFDJGELEID();
-			if (GOIIEBHDLOH.size.y <= ALIFOBAFPOB.size.y)
+			UpdateBounds();
+			if (m_ContentBounds.size.y <= m_ViewBounds.size.y)
 			{
-				return (ALIFOBAFPOB.min.y > GOIIEBHDLOH.min.y) ? 1 : 0;
+				return (m_ViewBounds.min.y > m_ContentBounds.min.y) ? 1 : 0;
 			}
-			return (ALIFOBAFPOB.min.y - GOIIEBHDLOH.min.y) / (GOIIEBHDLOH.size.y - ALIFOBAFPOB.size.y);
+			return (m_ViewBounds.min.y - m_ContentBounds.min.y) / (m_ContentBounds.size.y - m_ViewBounds.size.y);
 		}
 
 		public void set_verticalNormalizedPosition(float value)
 		{
-			NNBELLIECIA(value, 1);
+			SetNormalizedPosition(value, 1);
 		}
 
-		private void PGGKPMBDFHH(float value)
+		private void SetHorizontalNormalizedPositionInternal(float value)
 		{
-			NNBELLIECIA(value, 0);
+			SetNormalizedPosition(value, 0);
 		}
 
-		private void GGONALKGFCG(float value)
+		private void SetVerticalNormalizedPositionInternal(float value)
 		{
-			NNBELLIECIA(value, 1);
+			SetNormalizedPosition(value, 1);
 		}
 
-		private void NNBELLIECIA(float value, int NMADGDHJBGB)
+		private void SetNormalizedPosition(float value, int NMADGDHJBGB)
 		{
-			DKAMBKOGFML();
-			JKFDJGELEID();
-			float num = GOIIEBHDLOH.size[NMADGDHJBGB] - ALIFOBAFPOB.size[NMADGDHJBGB];
-			float num2 = ALIFOBAFPOB.min[NMADGDHJBGB] - value * num;
-			float num3 = m_Content.localPosition[NMADGDHJBGB] + num2 - GOIIEBHDLOH.min[NMADGDHJBGB];
+			EnsureLayoutHasRebuilt();
+			UpdateBounds();
+			float num = m_ContentBounds.size[NMADGDHJBGB] - m_ViewBounds.size[NMADGDHJBGB];
+			float num2 = m_ViewBounds.min[NMADGDHJBGB] - value * num;
+			float num3 = m_Content.localPosition[NMADGDHJBGB] + num2 - m_ContentBounds.min[NMADGDHJBGB];
 			Vector3 localPosition = m_Content.localPosition;
 			if (Mathf.Abs(localPosition[NMADGDHJBGB] - num3) > 0.01f)
 			{
 				localPosition[NMADGDHJBGB] = num3;
 				m_Content.localPosition = localPosition;
-				BKHKAOENMIG[NMADGDHJBGB] = 0f;
-				JKFDJGELEID();
+				m_Velocity[NMADGDHJBGB] = 0f;
+				UpdateBounds();
 			}
 		}
 
-		private static float IIIMENBNAKB(float LLKABJBFHKJ, float HHOGGNHEFEG)
+		private static float RubberDelta(float LLKABJBFHKJ, float HHOGGNHEFEG)
 		{
 			return (1f - 1f / (Mathf.Abs(LLKABJBFHKJ) * 0.55f / HHOGGNHEFEG + 1f)) * HHOGGNHEFEG * Mathf.Sign(LLKABJBFHKJ);
 		}
 
 		protected override void OnRectTransformDimensionsChange()
 		{
-			FIBKLPHOCFC();
+			SetDirty();
 		}
 
-		private bool PGFAIAPPGJA()
+		private bool IsHorizontalScrollingNeeded()
 		{
 			if (Application.isPlaying)
 			{
-				return GOIIEBHDLOH.size.x > ALIFOBAFPOB.size.x + 0.01f;
+				return m_ContentBounds.size.x > m_ViewBounds.size.x + 0.01f;
 			}
 			return true;
 		}
 
-		private bool KEHLLKKMOLB()
+		private bool IsVerticalScrollingNeeded()
 		{
 			if (Application.isPlaying)
 			{
-				return GOIIEBHDLOH.size.y > ALIFOBAFPOB.size.y + 0.01f;
+				return m_ContentBounds.size.y > m_ViewBounds.size.y + 0.01f;
 			}
 			return true;
 		}
@@ -1189,13 +1189,13 @@ namespace Nekki.SF2.GUI
 		{
 			get
 			{
-				return CEEACGHNLAE;
+				return m_FlexibleWidth;
 			}
 		}
 
-		private void EFFGGDHEDCM(float value)
+		private void SetFlexibleWidth(float value)
 		{
-			CEEACGHNLAE = value;
+			m_FlexibleWidth = value;
 		}
 
 		public virtual float minHeight
@@ -1243,114 +1243,114 @@ namespace Nekki.SF2.GUI
 		public virtual void SetLayoutHorizontal()
 		{
 			m_Tracker.Clear();
-			if (HPLLDNIDIML || FPOANPLBGGC)
+			if (m_HSliderExpand || m_VSliderExpand)
 			{
-				m_Tracker.Add(this, BIOPKLNFEJI(), DrivenTransformProperties.Anchors | DrivenTransformProperties.AnchoredPosition | DrivenTransformProperties.SizeDelta);
-				BIOPKLNFEJI().anchorMin = Vector2.zero;
-				BIOPKLNFEJI().anchorMax = Vector2.one;
-				BIOPKLNFEJI().sizeDelta = Vector2.zero;
-				BIOPKLNFEJI().anchoredPosition = Vector2.zero;
+				m_Tracker.Add(this, GetViewRect(), DrivenTransformProperties.Anchors | DrivenTransformProperties.AnchoredPosition | DrivenTransformProperties.SizeDelta);
+				GetViewRect().anchorMin = Vector2.zero;
+				GetViewRect().anchorMax = Vector2.one;
+				GetViewRect().sizeDelta = Vector2.zero;
+				GetViewRect().anchoredPosition = Vector2.zero;
 				LayoutRebuilder.ForceRebuildLayoutImmediate(get_content());
-				ALIFOBAFPOB = new Bounds(BIOPKLNFEJI().rect.center, BIOPKLNFEJI().rect.size);
-				GOIIEBHDLOH = BFJHGFIGKAJ();
+				m_ViewBounds = new Bounds(GetViewRect().rect.center, GetViewRect().rect.size);
+				m_ContentBounds = GetBounds();
 			}
-			if (FPOANPLBGGC && KEHLLKKMOLB())
+			if (m_VSliderExpand && IsVerticalScrollingNeeded())
 			{
-				BIOPKLNFEJI().sizeDelta = new Vector2(0f - (NAFHJBACPDE + m_VerticalScrollbarSpacing), BIOPKLNFEJI().sizeDelta.y);
+				GetViewRect().sizeDelta = new Vector2(0f - (m_VSliderWidth + m_VerticalScrollbarSpacing), GetViewRect().sizeDelta.y);
 				LayoutRebuilder.ForceRebuildLayoutImmediate(get_content());
-				ALIFOBAFPOB = new Bounds(BIOPKLNFEJI().rect.center, BIOPKLNFEJI().rect.size);
-				GOIIEBHDLOH = BFJHGFIGKAJ();
+				m_ViewBounds = new Bounds(GetViewRect().rect.center, GetViewRect().rect.size);
+				m_ContentBounds = GetBounds();
 			}
-			if (HPLLDNIDIML && PGFAIAPPGJA())
+			if (m_HSliderExpand && IsHorizontalScrollingNeeded())
 			{
-				BIOPKLNFEJI().sizeDelta = new Vector2(BIOPKLNFEJI().sizeDelta.x, 0f - (LPOOHGINOEF + m_HorizontalScrollbarSpacing));
-				ALIFOBAFPOB = new Bounds(BIOPKLNFEJI().rect.center, BIOPKLNFEJI().rect.size);
-				GOIIEBHDLOH = BFJHGFIGKAJ();
+				GetViewRect().sizeDelta = new Vector2(GetViewRect().sizeDelta.x, 0f - (m_HSliderHeight + m_HorizontalScrollbarSpacing));
+				m_ViewBounds = new Bounds(GetViewRect().rect.center, GetViewRect().rect.size);
+				m_ContentBounds = GetBounds();
 			}
-			if (FPOANPLBGGC && KEHLLKKMOLB() && BIOPKLNFEJI().sizeDelta.x == 0f && BIOPKLNFEJI().sizeDelta.y < 0f)
+			if (m_VSliderExpand && IsVerticalScrollingNeeded() && GetViewRect().sizeDelta.x == 0f && GetViewRect().sizeDelta.y < 0f)
 			{
-				BIOPKLNFEJI().sizeDelta = new Vector2(0f - (NAFHJBACPDE + m_VerticalScrollbarSpacing), BIOPKLNFEJI().sizeDelta.y);
+				GetViewRect().sizeDelta = new Vector2(0f - (m_VSliderWidth + m_VerticalScrollbarSpacing), GetViewRect().sizeDelta.y);
 			}
 		}
 
 		public virtual void SetLayoutVertical()
 		{
-			DFNHCAAKAKO();
-			ALIFOBAFPOB = new Bounds(BIOPKLNFEJI().rect.center, BIOPKLNFEJI().rect.size);
-			GOIIEBHDLOH = BFJHGFIGKAJ();
+			UpdateScrollbarLayout();
+			m_ViewBounds = new Bounds(GetViewRect().rect.center, GetViewRect().rect.size);
+			m_ContentBounds = GetBounds();
 		}
 
-		private void NFOKADBDILL()
+		private void UpdateScrollbarVisibility()
 		{
-			if ((bool)m_VerticalScrollbar && m_VerticalScrollbarVisibility != JJDKHMPDLNC.Permanent && m_VerticalScrollbar.gameObject.activeSelf != KEHLLKKMOLB())
+			if ((bool)m_VerticalScrollbar && m_VerticalScrollbarVisibility != ScrollbarVisibilityMode.Permanent && m_VerticalScrollbar.gameObject.activeSelf != IsVerticalScrollingNeeded())
 			{
-				m_VerticalScrollbar.gameObject.SetActive(KEHLLKKMOLB());
+				m_VerticalScrollbar.gameObject.SetActive(IsVerticalScrollingNeeded());
 			}
-			if ((bool)m_HorizontalScrollbar && m_HorizontalScrollbarVisibility != JJDKHMPDLNC.Permanent && m_HorizontalScrollbar.gameObject.activeSelf != PGFAIAPPGJA())
+			if ((bool)m_HorizontalScrollbar && m_HorizontalScrollbarVisibility != ScrollbarVisibilityMode.Permanent && m_HorizontalScrollbar.gameObject.activeSelf != IsHorizontalScrollingNeeded())
 			{
-				m_HorizontalScrollbar.gameObject.SetActive(PGFAIAPPGJA());
+				m_HorizontalScrollbar.gameObject.SetActive(IsHorizontalScrollingNeeded());
 			}
 		}
 
-		private void DFNHCAAKAKO()
+		private void UpdateScrollbarLayout()
 		{
-			if (FPOANPLBGGC && (bool)m_HorizontalScrollbar)
+			if (m_VSliderExpand && (bool)m_HorizontalScrollbar)
 			{
-				m_Tracker.Add(this, PNMDBLOPDHA, DrivenTransformProperties.AnchoredPositionX | DrivenTransformProperties.AnchorMinX | DrivenTransformProperties.AnchorMaxX | DrivenTransformProperties.SizeDeltaX);
-				PNMDBLOPDHA.anchorMin = new Vector2(0f, PNMDBLOPDHA.anchorMin.y);
-				PNMDBLOPDHA.anchorMax = new Vector2(1f, PNMDBLOPDHA.anchorMax.y);
-				PNMDBLOPDHA.anchoredPosition = new Vector2(0f, PNMDBLOPDHA.anchoredPosition.y);
-				if (KEHLLKKMOLB())
+				m_Tracker.Add(this, m_HorizontalScrollbarRect, DrivenTransformProperties.AnchoredPositionX | DrivenTransformProperties.AnchorMinX | DrivenTransformProperties.AnchorMaxX | DrivenTransformProperties.SizeDeltaX);
+				m_HorizontalScrollbarRect.anchorMin = new Vector2(0f, m_HorizontalScrollbarRect.anchorMin.y);
+				m_HorizontalScrollbarRect.anchorMax = new Vector2(1f, m_HorizontalScrollbarRect.anchorMax.y);
+				m_HorizontalScrollbarRect.anchoredPosition = new Vector2(0f, m_HorizontalScrollbarRect.anchoredPosition.y);
+				if (IsVerticalScrollingNeeded())
 				{
-					PNMDBLOPDHA.sizeDelta = new Vector2(0f - (NAFHJBACPDE + m_VerticalScrollbarSpacing), PNMDBLOPDHA.sizeDelta.y);
+					m_HorizontalScrollbarRect.sizeDelta = new Vector2(0f - (m_VSliderWidth + m_VerticalScrollbarSpacing), m_HorizontalScrollbarRect.sizeDelta.y);
 				}
 				else
 				{
-					PNMDBLOPDHA.sizeDelta = new Vector2(0f, PNMDBLOPDHA.sizeDelta.y);
+					m_HorizontalScrollbarRect.sizeDelta = new Vector2(0f, m_HorizontalScrollbarRect.sizeDelta.y);
 				}
 			}
-			if (HPLLDNIDIML && (bool)m_VerticalScrollbar)
+			if (m_HSliderExpand && (bool)m_VerticalScrollbar)
 			{
-				m_Tracker.Add(this, KPFFEDDJNOE, DrivenTransformProperties.AnchoredPositionY | DrivenTransformProperties.AnchorMinY | DrivenTransformProperties.AnchorMaxY | DrivenTransformProperties.SizeDeltaY);
-				KPFFEDDJNOE.anchorMin = new Vector2(KPFFEDDJNOE.anchorMin.x, 0f);
-				KPFFEDDJNOE.anchorMax = new Vector2(KPFFEDDJNOE.anchorMax.x, 1f);
-				KPFFEDDJNOE.anchoredPosition = new Vector2(KPFFEDDJNOE.anchoredPosition.x, 0f);
-				if (PGFAIAPPGJA())
+				m_Tracker.Add(this, m_VerticalScrollbarRect, DrivenTransformProperties.AnchoredPositionY | DrivenTransformProperties.AnchorMinY | DrivenTransformProperties.AnchorMaxY | DrivenTransformProperties.SizeDeltaY);
+				m_VerticalScrollbarRect.anchorMin = new Vector2(m_VerticalScrollbarRect.anchorMin.x, 0f);
+				m_VerticalScrollbarRect.anchorMax = new Vector2(m_VerticalScrollbarRect.anchorMax.x, 1f);
+				m_VerticalScrollbarRect.anchoredPosition = new Vector2(m_VerticalScrollbarRect.anchoredPosition.x, 0f);
+				if (IsHorizontalScrollingNeeded())
 				{
-					KPFFEDDJNOE.sizeDelta = new Vector2(KPFFEDDJNOE.sizeDelta.x, 0f - (LPOOHGINOEF + m_HorizontalScrollbarSpacing));
+					m_VerticalScrollbarRect.sizeDelta = new Vector2(m_VerticalScrollbarRect.sizeDelta.x, 0f - (m_HSliderHeight + m_HorizontalScrollbarSpacing));
 				}
 				else
 				{
-					KPFFEDDJNOE.sizeDelta = new Vector2(KPFFEDDJNOE.sizeDelta.x, 0f);
+					m_VerticalScrollbarRect.sizeDelta = new Vector2(m_VerticalScrollbarRect.sizeDelta.x, 0f);
 				}
 			}
 		}
 
-		private void JKFDJGELEID()
+		private void UpdateBounds()
 		{
-			ALIFOBAFPOB = new Bounds(BIOPKLNFEJI().rect.center, BIOPKLNFEJI().rect.size);
-			GOIIEBHDLOH = BFJHGFIGKAJ();
+			m_ViewBounds = new Bounds(GetViewRect().rect.center, GetViewRect().rect.size);
+			m_ContentBounds = GetBounds();
 			if (!(m_Content == null))
 			{
-				Vector3 size = GOIIEBHDLOH.size;
-				Vector3 center = GOIIEBHDLOH.center;
-				Vector3 vector = ALIFOBAFPOB.size - size;
+				Vector3 size = m_ContentBounds.size;
+				Vector3 center = m_ContentBounds.center;
+				Vector3 vector = m_ViewBounds.size - size;
 				if (vector.x > 0f)
 				{
 					center.x -= vector.x * (m_Content.pivot.x - 0.5f);
-					size.x = ALIFOBAFPOB.size.x;
+					size.x = m_ViewBounds.size.x;
 				}
 				if (vector.y > 0f)
 				{
 					center.y -= vector.y * (m_Content.pivot.y - 0.5f);
-					size.y = ALIFOBAFPOB.size.y;
+					size.y = m_ViewBounds.size.y;
 				}
-				GOIIEBHDLOH.size = size;
-				GOIIEBHDLOH.center = center;
+				m_ContentBounds.size = size;
+				m_ContentBounds.center = center;
 			}
 		}
 
-		private Bounds BFJHGFIGKAJ()
+		private Bounds GetBounds()
 		{
 			if (m_Content == null)
 			{
@@ -1358,7 +1358,7 @@ namespace Nekki.SF2.GUI
 			}
 			Vector3 vector = new Vector3(float.MaxValue, float.MaxValue, float.MaxValue);
 			Vector3 vector2 = new Vector3(float.MinValue, float.MinValue, float.MinValue);
-			Matrix4x4 worldToLocalMatrix = BIOPKLNFEJI().worldToLocalMatrix;
+			Matrix4x4 worldToLocalMatrix = GetViewRect().worldToLocalMatrix;
 			m_Content.GetWorldCorners(m_Corners);
 			for (int i = 0; i < 4; i++)
 			{
@@ -1374,55 +1374,55 @@ namespace Nekki.SF2.GUI
 		private Vector2 CalculateOffset(Vector2 FOIPKLDNGDL)
 		{
 			Vector2 zero = Vector2.zero;
-			if (m_MovementType == MDMLKCMBBPA.Unrestricted)
+			if (m_MovementType == ScrollMovementType.Unrestricted)
 			{
 				return zero;
 			}
-			Vector2 vector = GOIIEBHDLOH.min;
-			Vector2 vector2 = GOIIEBHDLOH.max;
+			Vector2 vector = m_ContentBounds.min;
+			Vector2 vector2 = m_ContentBounds.max;
 			if (m_Horizontal)
 			{
 				vector.x += FOIPKLDNGDL.x;
 				vector2.x += FOIPKLDNGDL.x;
-				if (vector.x > ALIFOBAFPOB.min.x)
+				if (vector.x > m_ViewBounds.min.x)
 				{
-					zero.x = ALIFOBAFPOB.min.x - vector.x;
+					zero.x = m_ViewBounds.min.x - vector.x;
 				}
-				else if (vector2.x < ALIFOBAFPOB.max.x)
+				else if (vector2.x < m_ViewBounds.max.x)
 				{
-					zero.x = ALIFOBAFPOB.max.x - vector2.x;
+					zero.x = m_ViewBounds.max.x - vector2.x;
 				}
 			}
 			if (m_Vertical)
 			{
 				vector.y += FOIPKLDNGDL.y;
 				vector2.y += FOIPKLDNGDL.y;
-				if (vector2.y < ALIFOBAFPOB.max.y)
+				if (vector2.y < m_ViewBounds.max.y)
 				{
-					zero.y = ALIFOBAFPOB.max.y - vector2.y;
+					zero.y = m_ViewBounds.max.y - vector2.y;
 				}
-				else if (vector.y > ALIFOBAFPOB.min.y)
+				else if (vector.y > m_ViewBounds.min.y)
 				{
-					zero.y = ALIFOBAFPOB.min.y - vector.y;
+					zero.y = m_ViewBounds.min.y - vector.y;
 				}
 			}
 			return zero;
 		}
 
-		protected void FIBKLPHOCFC()
+		protected void SetDirty()
 		{
 			if (IsActive())
 			{
-				LayoutRebuilder.MarkLayoutForRebuild(FDHIFJPGOIC());
+				LayoutRebuilder.MarkLayoutForRebuild(GetRectTransform());
 			}
 		}
 
-		protected void KKMKEKGJLMJ()
+		protected void SetDirtyCaching()
 		{
 			if (IsActive())
 			{
 				CanvasUpdateRegistry.RegisterCanvasElementForLayoutRebuild(this);
-				LayoutRebuilder.MarkLayoutForRebuild(FDHIFJPGOIC());
+				LayoutRebuilder.MarkLayoutForRebuild(GetRectTransform());
 			}
 		}
 

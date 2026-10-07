@@ -12,19 +12,19 @@ public class BattleRaid : Battle
 	public void Parse(XmlNode node)
 	{
 		XmlNode hKPPBKPJOEO = node["RaidData"];
-		JNMILPCDAFM(hKPPBKPJOEO);
+		ParseRaidData(hKPPBKPJOEO);
 	}
 
-	public bool DJCDFEAMPDA(FightList KGKDKENMAOA)
+	public bool CanAffordFightCost(FightList KGKDKENMAOA)
 	{
-		List<CurrencyCostRule> list = KGKDKENMAOA.LBGNOMEFLBA();
+		List<CurrencyCostRule> list = KGKDKENMAOA.GetCurrencyCostRules();
 		if (list.Count == 0)
 		{
 			return true;
 		}
 		foreach (CurrencyCostRule item in list)
 		{
-			string text = item.JFDCHNBPPNH();
+			string text = item.GetCurrencyName();
 			if (!(text == string.Empty))
 			{
 				continue;
@@ -33,9 +33,9 @@ public class BattleRaid : Battle
 			int num2 = 0;
 			foreach (CurrencyCostRule item2 in list)
 			{
-				if (item2.JFDCHNBPPNH() == text)
+				if (item2.GetCurrencyName() == text)
 				{
-					int num3 = item2.LHNHLANLHMN();
+					int num3 = item2.GetCurrencyValue();
 					num2 += num3;
 				}
 			}
@@ -47,7 +47,7 @@ public class BattleRaid : Battle
 		return true;
 	}
 
-	private void JNMILPCDAFM(XmlNode node)
+	private void ParseRaidData(XmlNode node)
 	{
 	}
 }

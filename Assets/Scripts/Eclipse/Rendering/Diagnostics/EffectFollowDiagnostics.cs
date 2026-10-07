@@ -19,7 +19,7 @@ namespace Eclipse.Rendering.Diagnostics
 				{
 					Debug.LogWarning("[EffectTransform] follow-jump actor=" + actor.get_Name() +
 						" action=" + action.get_Name() +
-						" sequence=" + action.EPDMGFELIMC() +
+						" sequence=" + action.GetSequence() +
 						" step=" + anchorStep +
 						" from=" + _previousAnchor.x + "," + _previousAnchor.y +
 						" to=" + anchor.x + "," + anchor.y +

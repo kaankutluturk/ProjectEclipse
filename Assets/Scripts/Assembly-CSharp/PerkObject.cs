@@ -5,20 +5,20 @@ public class PerkObject
 {
 	public bool IsNot;
 
-	public PlayerType IHJJBIDMEMB = PlayerType.PLAYER_ME;
+	public PlayerType TargetPlayer = PlayerType.PLAYER_ME;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private PerkInfoItem DHNEANFLBJI;
+	private PerkInfoItem perk;
 
-	public PerkInfoItem JMDBPECCFDF
+	public PerkInfoItem PerkInfo
 	{
 		get
 		{
-			return JMDLAMHAJLN();
+			return GetPerk();
 		}
 		protected set
 		{
-			JMOIMIHPBOM(value);
+			SetPerk(value);
 		}
 	}
 
@@ -29,34 +29,34 @@ public class PerkObject
 	public PerkObject(PerkObject NOLFMPDGCOC)
 	{
 		IsNot = NOLFMPDGCOC.IsNot;
-		IHJJBIDMEMB = NOLFMPDGCOC.IHJJBIDMEMB;
-		JMOIMIHPBOM(NOLFMPDGCOC.JMDLAMHAJLN());
+		TargetPlayer = NOLFMPDGCOC.TargetPlayer;
+		SetPerk(NOLFMPDGCOC.GetPerk());
 	}
 
-	public PerkInfoItem JMDLAMHAJLN()
+	public PerkInfoItem GetPerk()
 	{
-		return DHNEANFLBJI;
+		return perk;
 	}
 
-	protected void JMOIMIHPBOM(PerkInfoItem value)
+	protected void SetPerk(PerkInfoItem value)
 	{
-		DHNEANFLBJI = value;
+		perk = value;
 	}
 
 	public virtual void Parse(XmlNode node)
 	{
-		string text = node.Attributes["Player"].CIPOICEEIBK(string.Empty);
+		string text = node.Attributes["Player"].GetStringOrDefault(string.Empty);
 		if (text == null || text.Equals(string.Empty) || text.Equals("Me"))
 		{
-			IHJJBIDMEMB = PlayerType.PLAYER_ME;
+			TargetPlayer = PlayerType.PLAYER_ME;
 		}
 		else if (text.Equals("Enemy"))
 		{
-			IHJJBIDMEMB = PlayerType.PLAYER_ENEMY;
+			TargetPlayer = PlayerType.PLAYER_ENEMY;
 		}
 		else
 		{
-			IHJJBIDMEMB = PlayerType.PLAYER_NONE;
+			TargetPlayer = PlayerType.PLAYER_NONE;
 		}
 		IsNot = node.Attributes["Not"].ParseInt() > 0;
 	}

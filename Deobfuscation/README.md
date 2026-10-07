@@ -69,6 +69,55 @@ check name collisions, reflection and serialization first. The confirmed
 recovery scripts below do not consume these guesses. Their historical
 confidence rules and recovery reports remain separate.
 
+## Inferred names for the remaining symbols
+
+The external cross-build evidence below is no longer available on the
+maintainer machine. In October 2026 the remaining obfuscated types and members
+were named from their behavior instead. Each name was inferred from the
+declaration, implementation, string literals, call sites and Eclipse comments.
+Upstream names were used where third-party code is recognisable: BestHTTP,
+YamlDotNet, LitJson, DotNetZip/zlib, the LZMA SDK, and the Anti-Cheat Toolkit.
+These are descriptive guesses, not recovered original names.
+
+- `inferred_symbols.tsv` is the ledger: one row per renamed symbol, with the old
+  name, new name, kind, owning type, confidence (`high`, `medium` or `low`) and a
+  one-sentence evidence note. `id_at_extraction` is the renamer's stable symbol
+  key (file plus syntax-node ordinal) at the time of extraction. Phase 1 covers
+  types and members. Phase 2 (parameters and locals) is recorded as it lands.
+- `inferred_file_renames.tsv` lists every script renamed with its type. The
+  `.meta` file moved with each script, so the GUID is preserved.
+- `Tools/Recovery/SymbolRenamer` performs the renames. It builds Roslyn
+  compilations of the four project assemblies from `Assets/`, so it does not
+  depend on the stale `.csproj` files. It needs `INPUTSYSTEM_SRC` pointing at a
+  `com.unity.inputsystem` package's `InputSystem/` folder. It renames by resolved
+  symbol and keeps interface implementations consistent. It also updates
+  reflection literals next to `typeof(T)`. Before writing, it verifies that
+  every identifier token in the project still binds to the same symbol and that
+  no new compiler error appears; `--drop-conflicts` rejects offending rows.
+
+  ```bash
+  dotnet Tools/Recovery/SymbolRenamer/bin/Release/net8.0/SymbolRenamer.dll extract <out-dir>
+  dotnet Tools/Recovery/SymbolRenamer/bin/Release/net8.0/SymbolRenamer.dll apply <map.tsv> --dry-run --drop-conflicts
+  ```
+
+  `external` rewrites C# that lives outside the project, such as regression
+  validators and C# embedded in PowerShell here-strings. It runs from a pre-rename
+  checkout against the ledger. `external -` reports per-file error counts for
+  comparison.
+- Regression scripts under `Tools/Tests/` were updated in the same change. The
+  semantic pass covered C# fragments, including stub copies of recovered types,
+  matched by documentation id. Tokens that map to exactly one renamed symbol were
+  replaced as text. Ambiguous tokens were resolved per occurrence from the
+  receiver type. Literal source anchors used by the scripts were checked against
+  the renamed source.
+- Kept deliberately: the two public fields of `ServerProviderBase.FFCINPEAEBE`,
+  because their names are its JSON wire format. Also kept: a few symbols whose
+  candidate names all failed verification, still listed as obfuscated in the
+  apply logs. The server-side `ExcData PartStackTrace` filters in
+  `Assets/vanillaXml/config_cdn.xml` match obfuscated stack-trace names, so they
+  no longer match renamed types. They only affect crash reporting to the original
+  servers.
+
 ## Evidence used
 
 The principal comparison data lives outside this exported project under

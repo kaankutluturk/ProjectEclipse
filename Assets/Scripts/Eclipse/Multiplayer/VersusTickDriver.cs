@@ -45,7 +45,7 @@ namespace Eclipse.Multiplayer
         {
             public byte Left, Right;
             public bool Resync;
-            public StageType.FDBBPEGEGMK LastStage;
+            public StageType.Stage LastStage;
             public int Tick;
         }
 

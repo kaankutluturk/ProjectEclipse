@@ -9,18 +9,18 @@ public class ConditionModelMirrored : ConditionAnimation
 
 	public override bool IsEqual(Model ACENLMONNPA, InfoAnimation DBOLBEOCEME)
 	{
-		bool flag = GMEKJPICMEJ(ACENLMONNPA, DBOLBEOCEME);
+		bool flag = GetIsMirrored(ACENLMONNPA, DBOLBEOCEME);
 		return (!IsNot) ? flag : (!flag);
 	}
 
-	private bool GMEKJPICMEJ(Model ACENLMONNPA, InfoAnimation DBOLBEOCEME)
+	private bool GetIsMirrored(Model ACENLMONNPA, InfoAnimation DBOLBEOCEME)
 	{
-		ModelType.KEIDBIOIFGA oOFFOILONLO = OOFFOILONLO;
-		if (oOFFOILONLO == ModelType.KEIDBIOIFGA.MODEL_THIS)
+		ModelType.ModelTargetType oOFFOILONLO = _targetModelType;
+		if (oOFFOILONLO == ModelType.ModelTargetType.MODEL_THIS)
 		{
-			return ModelAnimation.CalcIsMirror(ACENLMONNPA.CLDMEJKGLBA(), DBOLBEOCEME.ECCLELFHNHE().FJANLLCDPCP(), ACENLMONNPA.OCPMJKIEPIG().KFCNPADAMHA(), DBOLBEOCEME.BGHLLHNKFEM(), false);
+			return ModelAnimation.CalcIsMirror(ACENLMONNPA.GetBodyObject(), DBOLBEOCEME.GetMirrorNode().GetNodeName(), ACENLMONNPA.GetAnimationModule().GetSign(), DBOLBEOCEME.GetFirstFrameNodes(), false);
 		}
-		LLLOJBFMONN.Error("ConditionModelMirrored: getMirror - wrong type: {0}", OOFFOILONLO);
+		GameLog.Error("ConditionModelMirrored: getMirror - wrong type: {0}", _targetModelType);
 		return false;
 	}
 }

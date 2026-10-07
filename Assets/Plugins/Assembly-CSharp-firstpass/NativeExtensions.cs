@@ -4,7 +4,7 @@ using UnityEngine;
 
 public static class NativeExtensions
 {
-	public static void FEEGJDJIFEF(this Action IBODMPMJELJ)
+	public static void SafeInvoke(this Action IBODMPMJELJ)
 	{
 		if (IBODMPMJELJ != null)
 		{
@@ -12,7 +12,7 @@ public static class NativeExtensions
 		}
 	}
 
-	public static void FEEGJDJIFEF<T>(this Action<T> IBODMPMJELJ, T value)
+	public static void SafeInvoke<T>(this Action<T> IBODMPMJELJ, T value)
 	{
 		if (IBODMPMJELJ != null)
 		{
@@ -20,18 +20,18 @@ public static class NativeExtensions
 		}
 	}
 
-	public static string LDNABOKCAFL<T>(this Action<T> IBODMPMJELJ)
+	public static string DescribeInvocationList<T>(this Action<T> IBODMPMJELJ)
 	{
 		return "(" + IBODMPMJELJ.GetInvocationList().Length + " total) " + string.Join(", ", (from d in IBODMPMJELJ.GetInvocationList()
 			select d.Method.Name).ToArray());
 	}
 
-	public static bool BKOIKMEEHDK<T>(this Action<T> IBODMPMJELJ)
+	public static bool IsEmpty<T>(this Action<T> IBODMPMJELJ)
 	{
 		return IBODMPMJELJ == null || IBODMPMJELJ.GetInvocationList().Length == 0;
 	}
 
-	public static float DBKEJBHHKBM(this float FINAMGBHHDL)
+	public static float MillisecondsToSeconds(this float FINAMGBHHDL)
 	{
 		return FINAMGBHHDL / 1000f;
 	}

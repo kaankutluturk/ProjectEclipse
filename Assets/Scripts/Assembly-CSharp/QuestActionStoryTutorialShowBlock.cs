@@ -10,9 +10,9 @@ public class QuestActionStoryTutorialShowBlock : QuestAction
 	private TutorialCanvas tutorialCanvas;
 	private bool running;
 
-	public override void DEJMHFMLKIC(QuestParameters GFIHPBCEEOB)
+	public override void Execute(QuestParameters GFIHPBCEEOB)
 	{
-		base.DEJMHFMLKIC(GFIHPBCEEOB);
+		base.Execute(GFIHPBCEEOB);
 		running = true;
 		profile = Scene<ProfileScene>.get_Current();
 		if (profile == null)
@@ -21,8 +21,8 @@ public class QuestActionStoryTutorialShowBlock : QuestAction
 			return;
 		}
 		// Use the profile's block demonstration, not whichever fight move sorts first.
-		List<Trick> list = GameUtils.KLLGJKHALGH(SceneTypes.SceneProfile);
-		Trick block = list.Find(trick => trick.KJHMOGGECBN != null && trick.KJHMOGGECBN.Name == "HighBlockProfile");
+		List<Trick> list = GameUtils.GetPlayerTricks(SceneTypes.SceneProfile);
+		Trick block = list.Find(trick => trick.Animation != null && trick.Animation.Name == "HighBlockProfile");
 		if (block == null)
 		{
 			Debug.LogWarning("[Tutorial] Block demonstration unavailable; releasing tutorial input.");
@@ -37,16 +37,16 @@ public class QuestActionStoryTutorialShowBlock : QuestAction
 			Complete();
 			return;
 		}
-		profile.TrickPreviewCompleted += PCOFDIIBLCB;
+		profile.TrickPreviewCompleted += OnTrickPreviewCompleted;
 		profile.ProfileClosing += OnProfileClosing;
 		tutorialCanvas = TutorialCanvas.get_Instance();
 		tutorialCanvas.set_BlockOn(true);
 		showButon.set_IsFlashing(true);
 		showButon.GetComponent<TutorialComponent>().IsActive = true;
-		showButon.onClick.AddListener(CDABOCGCPOH);
+		showButon.onClick.AddListener(OnShowButtonClicked);
 	}
 
-	private void CDABOCGCPOH()
+	private void OnShowButtonClicked()
 	{
 		// ProfileScene owns the temporary preview lock from here. The persistent
 		// tutorial canvas must not follow the player into another scene.
@@ -54,7 +54,7 @@ public class QuestActionStoryTutorialShowBlock : QuestAction
 		ClearButton();
 	}
 
-	private void PCOFDIIBLCB(object data)
+	private void OnTrickPreviewCompleted(object data)
 	{
 		Complete();
 	}
@@ -62,10 +62,10 @@ public class QuestActionStoryTutorialShowBlock : QuestAction
 	private void OnProfileClosing(object data)
 	{
 		if (!running) return;
-		GKFMJKAAJCA();
+		ResetSequences();
 		// Cancel this run without advancing SHOW_BLOCK or opening the next
 		// tutorial on a scene being destroyed. Re-entering Profile can retry it.
-		PJGEOIKPGFH();
+		CompleteQuestStage();
 	}
 
 	private void Complete()
@@ -73,7 +73,7 @@ public class QuestActionStoryTutorialShowBlock : QuestAction
 		if (!running) return;
 		running = false;
 		Cleanup();
-		OGIJONMKABB();
+		FinishAction();
 	}
 
 	private void ClearButton()
@@ -82,7 +82,7 @@ public class QuestActionStoryTutorialShowBlock : QuestAction
 		showButon.set_IsFlashing(false);
 		TutorialComponent component = showButon.GetComponent<TutorialComponent>();
 		if (component != null) component.IsActive = false;
-		showButon.onClick.RemoveListener(CDABOCGCPOH);
+		showButon.onClick.RemoveListener(OnShowButtonClicked);
 		showButon = null;
 	}
 
@@ -91,7 +91,7 @@ public class QuestActionStoryTutorialShowBlock : QuestAction
 		ClearButton();
 		if (profile != null)
 		{
-			profile.TrickPreviewCompleted -= PCOFDIIBLCB;
+			profile.TrickPreviewCompleted -= OnTrickPreviewCompleted;
 			profile.ProfileClosing -= OnProfileClosing;
 		}
 		profile = null;
@@ -99,7 +99,7 @@ public class QuestActionStoryTutorialShowBlock : QuestAction
 		tutorialCanvas = null;
 	}
 
-	public override void GKFMJKAAJCA()
+	public override void ResetSequences()
 	{
 		running = false;
 		Cleanup();

@@ -3,793 +3,793 @@ using System.Xml;
 
 public static class AssemblyController
 {
-	public const int BJFKJGDGKBJ = 30000;
+	public const int DefaultTimeout30000Ms = 30000;
 
-	public const int MCEKDLGFHLA = 3000;
+	public const int DefaultTimeout3000Ms = 3000;
 
-	public const int DHBNANMBMBK = 15000;
+	public const int DefaultSocialAuthorizeTimeoutMs = 15000;
 
-	public const int NHECGJOLGOO = 10000;
+	public const int DefaultTimeout10000Ms = 10000;
 
-	public const int FIBHCKOPFGC = 5000;
+	public const int DefaultTimeout5000MsA = 5000;
 
-	public const int MCIEJAKEKCH = 5000;
+	public const int DefaultTimeout5000MsB = 5000;
 
-	public const int KGIDPBPPEHM = 5000;
+	public const int DefaultTimeout5000MsC = 5000;
 
-	public const int IGLLFEFNMAA = 5000;
+	public const int DefaultTimeout5000MsD = 5000;
 
-	public const int BELCNPBAKBH = 5000;
+	public const int DefaultTimeout5000MsE = 5000;
 
-	public const int OBLKAEJOCKL = 8000;
+	public const int DefaultTimeout8000Ms = 8000;
 
-	public const int MHHFKPKELOB = 5000;
-
-	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private static bool OOGBCBCFOGH;
+	public const int DefaultTimeout5000MsF = 5000;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private static bool HNBACBIFKBE;
+	private static bool debugStatistics;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private static bool ODINFKCGJAK;
+	private static bool cacheTexturesLog;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private static bool BAGBAHNCNDI;
+	private static bool showIntro;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private static bool CMOPNFEFLMA;
+	private static bool showController;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private static bool GNMFBAABHGB;
+	private static bool debugOverlayEnabled;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private static bool KIMLHAPJFOO;
+	private static bool showPvp;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private static bool LGCILOHKHBH;
+	private static bool aiEnabled;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private static bool BFEHJECBEHK;
+	private static bool skipContentDownload;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private static bool PDCHHCFLLJP;
+	private static bool skipPayment;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private static bool GPGGDMJGHOJ;
+	private static bool etcEnabled;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private static bool ALFJLNJOPFJ;
+	private static bool showSensitiveArea;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private static float DBNLHIGDPBD;
+	private static bool showTimeResults;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private static float AOOHJAGDBHB;
+	private static float controllerPrimaryAngle;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private static bool EDAOHLMBGIP;
-
-	private static MarketSettings HKOIJBKJLHG = new MarketSettings();
+	private static float controllerGripRelativeRadius;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private static bool CJIIFJLGLIB;
+	private static bool enableNotifications;
+
+	private static MarketSettings market = new MarketSettings();
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private static bool BNHHGDLDNPH;
+	private static bool showCrashButtons;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private static bool JBOMBKFOHHI;
+	private static bool gamepadEnabled;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private static int LIIIGNPPIPB;
+	private static bool useLocalRaidConfig;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private static int FEAONOMNHBO;
+	private static int timeout1Ms;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private static int OEBNKOABHFG;
+	private static int timeout2Ms;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private static int IMJHLGAEDJL;
+	private static int timeout3Ms;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private static int LFFGDMFIKJI;
+	private static int timeout4Ms;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private static int ENEGGJACPIB;
+	private static int socialAuthorizeTimeoutMs;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private static int LBDAHOMPJKP;
+	private static int timeout6Ms;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private static int KCCNAGEJMJL;
+	private static int timeout7Ms;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private static int IHOMHOFHPKE;
+	private static int timeout8Ms;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private static int PPLPBAGNJLN;
+	private static int timeout9Ms;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private static int NNEAFFILFGA;
+	private static int timeout10Ms;
 
-	public static bool EIICFKMBKPL
+	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
+	private static int timeout11Ms;
+
+	public static bool DebugStatistics
 	{
 		get
 		{
-			return AIOBIKGPGHA();
+			return GetDebugStatistics();
 		}
 		private set
 		{
-			EEAELOEPAHK(value);
+			SetDebugStatistics(value);
 		}
 	}
 
-	public static bool BCGIPDDCDJL
+	public static bool CacheTexturesLog
 	{
 		get
 		{
-			return BNIHABLDELL();
+			return GetCacheTexturesLog();
 		}
 		private set
 		{
-			LKICIELIEHI(value);
+			SetCacheTexturesLog(value);
 		}
 	}
 
-	public static bool DFKHJMDLBPD
+	public static bool ShowIntro
 	{
 		get
 		{
-			return CPJFGBLMHFH();
+			return GetShowIntro();
 		}
 		private set
 		{
-			PBGEBNMMICF(value);
+			SetShowIntro(value);
 		}
 	}
 
-	public static bool PIPPEFNDNKO
+	public static bool ShowController
 	{
 		get
 		{
-			return PGFJMOGKEID();
+			return GetShowController();
 		}
 		private set
 		{
-			HIEHEKLKMAA(value);
+			SetShowController(value);
 		}
 	}
 
-	public static bool HHCGIPLIINF
+	public static bool DebugOverlayEnabled
 	{
 		get
 		{
-			return CENLLGHOFME();
+			return GetDebugOverlayEnabled();
 		}
 		private set
 		{
-			HFHIEPAGECK(value);
+			SetDebugOverlayEnabled(value);
 		}
 	}
 
-	public static bool JPIFMBLADJJ
+	public static bool ShowPvp
 	{
 		get
 		{
-			return HJKFDMNHGMB();
+			return GetShowPvp();
 		}
 		private set
 		{
-			FCNMJMKBCBA(value);
+			SetShowPvp(value);
 		}
 	}
 
-	public static bool FIMDJDJOFDM
+	public static bool AiEnabled
 	{
 		get
 		{
-			return JEEFAGGMFCK();
+			return GetAiEnabled();
 		}
 		private set
 		{
-			PNEMEJHHKKC(value);
+			SetAiEnabled(value);
 		}
 	}
 
-	public static bool FMHKOAODHIM
+	public static bool SkipContentDownload
 	{
 		get
 		{
-			return AOIJKOFDHIC();
+			return GetSkipContentDownload();
 		}
 		private set
 		{
-			CMKOIJEPNFD(value);
+			SetSkipContentDownload(value);
 		}
 	}
 
-	public static bool HFNPFFBDPIM
+	public static bool SkipPayment
 	{
 		get
 		{
-			return CFCNBIFPPGN();
+			return GetSkipPayment();
 		}
 		private set
 		{
-			KJIPINGLLNH(value);
+			SetSkipPayment(value);
 		}
 	}
 
-	public static bool LLIDCGKAEBL
+	public static bool EtcEnabled
 	{
 		get
 		{
-			return CGIDGEOJKCN();
+			return GetEtcEnabled();
 		}
 		private set
 		{
-			LDDODBMFJBP(value);
+			SetEtcEnabled(value);
 		}
 	}
 
-	public static bool JGODKHIPGKD
+	public static bool ShowSensitiveArea
 	{
 		get
 		{
-			return LKFPCHFFHKK();
+			return GetShowSensitiveArea();
 		}
 		private set
 		{
-			MMAAHGLCMFH(value);
+			SetShowSensitiveArea(value);
 		}
 	}
 
-	public static bool MCNKBLIHLIO
+	public static bool ShowTimeResults
 	{
 		get
 		{
-			return PCFLNAMNEOF();
+			return GetShowTimeResults();
 		}
 		private set
 		{
-			HFFPGLOABLD(value);
+			SetShowTimeResults(value);
 		}
 	}
 
-	public static float LDGCOMLJMGL
+	public static float ControllerPrimaryAngle
 	{
 		get
 		{
-			return AMBFLNIFDHO();
+			return GetControllerPrimaryAngle();
 		}
 		private set
 		{
-			DEJBHAHJDIP(value);
+			SetControllerPrimaryAngle(value);
 		}
 	}
 
-	public static float MMKAIMILINK
+	public static float ControllerGripRelativeRadius
 	{
 		get
 		{
-			return LJPECNLDCNO();
+			return GetControllerGripRelativeRadius();
 		}
 		private set
 		{
-			BMONFEOCFBL(value);
+			SetControllerGripRelativeRadius(value);
 		}
 	}
 
-	public static bool AGONLLFBOFG
+	public static bool EnableNotifications
 	{
 		get
 		{
-			return BNEAFMHNIPK();
+			return GetEnableNotifications();
 		}
 		private set
 		{
-			LHJMIHGIHAL(value);
+			SetEnableNotifications(value);
 		}
 	}
 
-	public static MarketSettings OBFHHFNADEJ
+	public static MarketSettings Market
 	{
 		get
 		{
-			return JONCCPLEIBE();
+			return GetMarket();
 		}
 	}
 
-	public static bool EFEGALIMNKA
+	public static bool ShowCrashButtons
 	{
 		get
 		{
-			return AOLLKDDADEN();
+			return GetShowCrashButtons();
 		}
 		private set
 		{
-			MFPOGFKKFBM(value);
+			SetShowCrashButtons(value);
 		}
 	}
 
-	public static bool NIGPDBKDFHP
+	public static bool GamepadEnabled
 	{
 		get
 		{
-			return KMEOEAGGPBI();
+			return GetGamepadEnabled();
 		}
 		private set
 		{
-			MBJGEBLFCLF(value);
+			SetGamepadEnabled(value);
 		}
 	}
 
-	public static bool KODDCCJKEIC
+	public static bool UseLocalRaidConfig
 	{
 		get
 		{
-			return JEJOJDDGNDN();
+			return GetUseLocalRaidConfig();
 		}
 		private set
 		{
-			JFCFBDAGPGG(value);
+			SetUseLocalRaidConfig(value);
 		}
 	}
 
-	public static int BFJOFBBOKOO
+	public static int Timeout1Ms
 	{
 		get
 		{
-			return NJBBJGCJBAE();
+			return GetTimeout1Ms();
 		}
 		private set
 		{
-			FLONDHGOENB(value);
+			SetTimeout1Ms(value);
 		}
 	}
 
-	public static int LNJLOGIIOJA
+	public static int Timeout2Ms
 	{
 		get
 		{
-			return FODKMFKJDAJ();
+			return GetTimeout2Ms();
 		}
 		private set
 		{
-			FJGPMCHDGOA(value);
+			SetTimeout2Ms(value);
 		}
 	}
 
-	public static int ENONFHMAEHL
+	public static int Timeout3Ms
 	{
 		get
 		{
-			return LFDFCMMOKGI();
+			return GetTimeout3Ms();
 		}
 		private set
 		{
-			JDIENOHJOJD(value);
+			SetTimeout3Ms(value);
 		}
 	}
 
-	public static int HINOKMMKNIE
+	public static int Timeout4Ms
 	{
 		get
 		{
-			return OLEAMJOHMAG();
+			return GetTimeout4Ms();
 		}
 		private set
 		{
-			MFGBCBGHHEN(value);
+			SetTimeout4Ms(value);
 		}
 	}
 
-	public static int CDIGOLPJKLG
+	public static int SocialAuthorizeTimeoutMs
 	{
 		get
 		{
-			return FNCNDGHCDLA();
+			return GetSocialAuthorizeTimeoutMs();
 		}
 		private set
 		{
-			HFKBMPGBFFI(value);
+			SetSocialAuthorizeTimeoutMs(value);
 		}
 	}
 
-	public static int IAMIFKBMEPK
+	public static int Timeout6Ms
 	{
 		get
 		{
-			return BAFKGAHBAAJ();
+			return GetTimeout6Ms();
 		}
 		private set
 		{
-			POLHOOENAAL(value);
+			SetTimeout6Ms(value);
 		}
 	}
 
-	public static int DHPPFNCJPFH
+	public static int Timeout7Ms
 	{
 		get
 		{
-			return LMMKKKPPPAD();
+			return GetTimeout7Ms();
 		}
 		private set
 		{
-			IDBJIPEJHGF(value);
+			SetTimeout7Ms(value);
 		}
 	}
 
-	public static int ALLDBLEALPF
+	public static int Timeout8Ms
 	{
 		get
 		{
-			return KKDNBDDGCLE();
+			return GetTimeout8Ms();
 		}
 		private set
 		{
-			AMGNMDCIBMH(value);
+			SetTimeout8Ms(value);
 		}
 	}
 
-	public static int NGJMOMEOHDE
+	public static int Timeout9Ms
 	{
 		get
 		{
-			return DBKGBBFNIJI();
+			return GetTimeout9Ms();
 		}
 		private set
 		{
-			ONBDBIALFDA(value);
+			SetTimeout9Ms(value);
 		}
 	}
 
-	public static int FPGLPOFKALJ
+	public static int Timeout10Ms
 	{
 		get
 		{
-			return KMDLKGLGBKM();
+			return GetTimeout10Ms();
 		}
 		private set
 		{
-			FCCCLDBNFCF(value);
+			SetTimeout10Ms(value);
 		}
 	}
 
-	public static int NEHJDONLCJI
+	public static int Timeout11Ms
 	{
 		get
 		{
-			return KIGBGDJFAIH();
+			return GetTimeout11Ms();
 		}
 		private set
 		{
-			OBIENFNOJMD(value);
+			SetTimeout11Ms(value);
 		}
 	}
 
 	public static void Parse(XmlNode node)
 	{
-		EEAELOEPAHK(node["DebugStatistics"].PNJPEDPDMCP().ParseBool());
-		JFCFBDAGPGG(node["UseLocalRaidConfig"].PNJPEDPDMCP().ParseBool());
-		AiData.DNKLLMKCNPP = node["Tactics"].PNJPEDPDMCP().ParseBool();
-		LKICIELIEHI(node["CacheTexturesLog"].PNJPEDPDMCP().ParseBool());
-		PBGEBNMMICF(node["ShowIntro"].PNJPEDPDMCP().ParseBool(true));
-		HIEHEKLKMAA(node["ShowController"].PNJPEDPDMCP().ParseBool(true));
-		FCNMJMKBCBA(node["ShowPVP"].PNJPEDPDMCP().ParseBool());
-		PNEMEJHHKKC(node["AiEnabled"].PNJPEDPDMCP().ParseBool(true));
-		CMKOIJEPNFD(node["SkipContentDownload"].PNJPEDPDMCP().ParseBool());
-		KJIPINGLLNH(node["SkipPayment"].PNJPEDPDMCP().ParseBool());
-		MMAAHGLCMFH(node["ShowSensitiveArea"].PNJPEDPDMCP().ParseBool());
-		DEJBHAHJDIP(node["ControllerPrimaryAngle"].PNJPEDPDMCP().ParseFloat());
-		BMONFEOCFBL(node["ControllerGripRelativeRadius"].PNJPEDPDMCP().ParseFloat());
-		LDDODBMFJBP(node["ETCEnabled"].PNJPEDPDMCP().ParseBool());
-		LHJMIHGIHAL(node["EnableNotifications"].PNJPEDPDMCP().ParseBool());
+		SetDebugStatistics(node["DebugStatistics"].FirstAttribute().ParseBool());
+		SetUseLocalRaidConfig(node["UseLocalRaidConfig"].FirstAttribute().ParseBool());
+		AiData.TacticsEnabled = node["Tactics"].FirstAttribute().ParseBool();
+		SetCacheTexturesLog(node["CacheTexturesLog"].FirstAttribute().ParseBool());
+		SetShowIntro(node["ShowIntro"].FirstAttribute().ParseBool(true));
+		SetShowController(node["ShowController"].FirstAttribute().ParseBool(true));
+		SetShowPvp(node["ShowPVP"].FirstAttribute().ParseBool());
+		SetAiEnabled(node["AiEnabled"].FirstAttribute().ParseBool(true));
+		SetSkipContentDownload(node["SkipContentDownload"].FirstAttribute().ParseBool());
+		SetSkipPayment(node["SkipPayment"].FirstAttribute().ParseBool());
+		SetShowSensitiveArea(node["ShowSensitiveArea"].FirstAttribute().ParseBool());
+		SetControllerPrimaryAngle(node["ControllerPrimaryAngle"].FirstAttribute().ParseFloat());
+		SetControllerGripRelativeRadius(node["ControllerGripRelativeRadius"].FirstAttribute().ParseFloat());
+		SetEtcEnabled(node["ETCEnabled"].FirstAttribute().ParseBool());
+		SetEnableNotifications(node["EnableNotifications"].FirstAttribute().ParseBool());
 		if (node["Market"] != null)
 		{
-			JONCCPLEIBE().Parse(node["Market"]);
+			GetMarket().Parse(node["Market"]);
 		}
-		MFPOGFKKFBM(node["ShowCrashButtons"].PNJPEDPDMCP().ParseBool());
-		MBJGEBLFCLF(node["Gamepad"].PNJPEDPDMCP().ParseBool());
+		SetShowCrashButtons(node["ShowCrashButtons"].FirstAttribute().ParseBool());
+		SetGamepadEnabled(node["Gamepad"].FirstAttribute().ParseBool());
 		XmlElement xmlElement = node["SocialAuthorizeTimeout"];
-		HFKBMPGBFFI((xmlElement == null) ? 15000 : xmlElement.Attributes["Value"].ParseInt());
-		HFFPGLOABLD(node["ShowTimeResults"].PNJPEDPDMCP().ParseBool());
+		SetSocialAuthorizeTimeoutMs((xmlElement == null) ? 15000 : xmlElement.Attributes["Value"].ParseInt());
+		SetShowTimeResults(node["ShowTimeResults"].FirstAttribute().ParseBool());
 	}
 
-	public static bool AIOBIKGPGHA()
+	public static bool GetDebugStatistics()
 	{
-		return OOGBCBCFOGH;
+		return debugStatistics;
 	}
 
-	private static void EEAELOEPAHK(bool value)
+	private static void SetDebugStatistics(bool value)
 	{
-		OOGBCBCFOGH = value;
+		debugStatistics = value;
 	}
 
-	public static bool BNIHABLDELL()
+	public static bool GetCacheTexturesLog()
 	{
-		return HNBACBIFKBE;
+		return cacheTexturesLog;
 	}
 
-	private static void LKICIELIEHI(bool value)
+	private static void SetCacheTexturesLog(bool value)
 	{
-		HNBACBIFKBE = value;
+		cacheTexturesLog = value;
 	}
 
-	public static bool CPJFGBLMHFH()
+	public static bool GetShowIntro()
 	{
-		return ODINFKCGJAK;
+		return showIntro;
 	}
 
-	private static void PBGEBNMMICF(bool value)
+	private static void SetShowIntro(bool value)
 	{
-		ODINFKCGJAK = value;
+		showIntro = value;
 	}
 
-	public static bool PGFJMOGKEID()
+	public static bool GetShowController()
 	{
-		return BAGBAHNCNDI;
+		return showController;
 	}
 
-	private static void HIEHEKLKMAA(bool value)
+	private static void SetShowController(bool value)
 	{
-		BAGBAHNCNDI = value;
+		showController = value;
 	}
 
-	public static bool CENLLGHOFME()
+	public static bool GetDebugOverlayEnabled()
 	{
-		return CMOPNFEFLMA;
+		return debugOverlayEnabled;
 	}
 
-	private static void HFHIEPAGECK(bool value)
+	private static void SetDebugOverlayEnabled(bool value)
 	{
-		CMOPNFEFLMA = value;
+		debugOverlayEnabled = value;
 	}
 
-	public static bool HJKFDMNHGMB()
+	public static bool GetShowPvp()
 	{
-		return GNMFBAABHGB;
+		return showPvp;
 	}
 
-	private static void FCNMJMKBCBA(bool value)
+	private static void SetShowPvp(bool value)
 	{
-		GNMFBAABHGB = value;
+		showPvp = value;
 	}
 
-	public static bool JEEFAGGMFCK()
+	public static bool GetAiEnabled()
 	{
-		return KIMLHAPJFOO;
+		return aiEnabled;
 	}
 
-	private static void PNEMEJHHKKC(bool value)
+	private static void SetAiEnabled(bool value)
 	{
-		KIMLHAPJFOO = value;
+		aiEnabled = value;
 	}
 
-	public static bool AOIJKOFDHIC()
+	public static bool GetSkipContentDownload()
 	{
-		return LGCILOHKHBH;
+		return skipContentDownload;
 	}
 
-	private static void CMKOIJEPNFD(bool value)
+	private static void SetSkipContentDownload(bool value)
 	{
-		LGCILOHKHBH = value;
+		skipContentDownload = value;
 	}
 
-	public static bool CFCNBIFPPGN()
+	public static bool GetSkipPayment()
 	{
-		return BFEHJECBEHK;
+		return skipPayment;
 	}
 
-	private static void KJIPINGLLNH(bool value)
+	private static void SetSkipPayment(bool value)
 	{
-		BFEHJECBEHK = value;
+		skipPayment = value;
 	}
 
-	public static bool CGIDGEOJKCN()
+	public static bool GetEtcEnabled()
 	{
-		return PDCHHCFLLJP;
+		return etcEnabled;
 	}
 
-	private static void LDDODBMFJBP(bool value)
+	private static void SetEtcEnabled(bool value)
 	{
-		PDCHHCFLLJP = value;
+		etcEnabled = value;
 	}
 
-	public static bool LKFPCHFFHKK()
+	public static bool GetShowSensitiveArea()
 	{
-		return GPGGDMJGHOJ;
+		return showSensitiveArea;
 	}
 
-	private static void MMAAHGLCMFH(bool value)
+	private static void SetShowSensitiveArea(bool value)
 	{
-		GPGGDMJGHOJ = value;
+		showSensitiveArea = value;
 	}
 
-	public static bool PCFLNAMNEOF()
+	public static bool GetShowTimeResults()
 	{
-		return ALFJLNJOPFJ;
+		return showTimeResults;
 	}
 
-	private static void HFFPGLOABLD(bool value)
+	private static void SetShowTimeResults(bool value)
 	{
-		ALFJLNJOPFJ = value;
+		showTimeResults = value;
 	}
 
-	public static float AMBFLNIFDHO()
+	public static float GetControllerPrimaryAngle()
 	{
-		return DBNLHIGDPBD;
+		return controllerPrimaryAngle;
 	}
 
-	private static void DEJBHAHJDIP(float value)
+	private static void SetControllerPrimaryAngle(float value)
 	{
-		DBNLHIGDPBD = value;
+		controllerPrimaryAngle = value;
 	}
 
-	public static float LJPECNLDCNO()
+	public static float GetControllerGripRelativeRadius()
 	{
-		return AOOHJAGDBHB;
+		return controllerGripRelativeRadius;
 	}
 
-	private static void BMONFEOCFBL(float value)
+	private static void SetControllerGripRelativeRadius(float value)
 	{
-		AOOHJAGDBHB = value;
+		controllerGripRelativeRadius = value;
 	}
 
-	public static bool BNEAFMHNIPK()
+	public static bool GetEnableNotifications()
 	{
-		return EDAOHLMBGIP;
+		return enableNotifications;
 	}
 
-	private static void LHJMIHGIHAL(bool value)
+	private static void SetEnableNotifications(bool value)
 	{
-		EDAOHLMBGIP = value;
+		enableNotifications = value;
 	}
 
-	public static MarketSettings JONCCPLEIBE()
+	public static MarketSettings GetMarket()
 	{
-		return HKOIJBKJLHG;
+		return market;
 	}
 
-	public static bool AOLLKDDADEN()
+	public static bool GetShowCrashButtons()
 	{
-		return CJIIFJLGLIB;
+		return showCrashButtons;
 	}
 
-	private static void MFPOGFKKFBM(bool value)
+	private static void SetShowCrashButtons(bool value)
 	{
-		CJIIFJLGLIB = value;
+		showCrashButtons = value;
 	}
 
-	public static bool KMEOEAGGPBI()
+	public static bool GetGamepadEnabled()
 	{
-		return BNHHGDLDNPH;
+		return gamepadEnabled;
 	}
 
-	private static void MBJGEBLFCLF(bool value)
+	private static void SetGamepadEnabled(bool value)
 	{
-		BNHHGDLDNPH = value;
+		gamepadEnabled = value;
 	}
 
-	public static bool JEJOJDDGNDN()
+	public static bool GetUseLocalRaidConfig()
 	{
-		return JBOMBKFOHHI;
+		return useLocalRaidConfig;
 	}
 
-	private static void JFCFBDAGPGG(bool value)
+	private static void SetUseLocalRaidConfig(bool value)
 	{
-		JBOMBKFOHHI = value;
+		useLocalRaidConfig = value;
 	}
 
-	public static int NJBBJGCJBAE()
+	public static int GetTimeout1Ms()
 	{
-		return LIIIGNPPIPB;
+		return timeout1Ms;
 	}
 
-	private static void FLONDHGOENB(int value)
+	private static void SetTimeout1Ms(int value)
 	{
-		LIIIGNPPIPB = value;
+		timeout1Ms = value;
 	}
 
-	public static int FODKMFKJDAJ()
+	public static int GetTimeout2Ms()
 	{
-		return FEAONOMNHBO;
+		return timeout2Ms;
 	}
 
-	private static void FJGPMCHDGOA(int value)
+	private static void SetTimeout2Ms(int value)
 	{
-		FEAONOMNHBO = value;
+		timeout2Ms = value;
 	}
 
-	public static int LFDFCMMOKGI()
+	public static int GetTimeout3Ms()
 	{
-		return OEBNKOABHFG;
+		return timeout3Ms;
 	}
 
-	private static void JDIENOHJOJD(int value)
+	private static void SetTimeout3Ms(int value)
 	{
-		OEBNKOABHFG = value;
+		timeout3Ms = value;
 	}
 
-	public static int OLEAMJOHMAG()
+	public static int GetTimeout4Ms()
 	{
-		return IMJHLGAEDJL;
+		return timeout4Ms;
 	}
 
-	private static void MFGBCBGHHEN(int value)
+	private static void SetTimeout4Ms(int value)
 	{
-		IMJHLGAEDJL = value;
+		timeout4Ms = value;
 	}
 
-	public static int FNCNDGHCDLA()
+	public static int GetSocialAuthorizeTimeoutMs()
 	{
-		return LFFGDMFIKJI;
+		return socialAuthorizeTimeoutMs;
 	}
 
-	private static void HFKBMPGBFFI(int value)
+	private static void SetSocialAuthorizeTimeoutMs(int value)
 	{
-		LFFGDMFIKJI = value;
+		socialAuthorizeTimeoutMs = value;
 	}
 
-	public static int BAFKGAHBAAJ()
+	public static int GetTimeout6Ms()
 	{
-		return ENEGGJACPIB;
+		return timeout6Ms;
 	}
 
-	private static void POLHOOENAAL(int value)
+	private static void SetTimeout6Ms(int value)
 	{
-		ENEGGJACPIB = value;
+		timeout6Ms = value;
 	}
 
-	public static int LMMKKKPPPAD()
+	public static int GetTimeout7Ms()
 	{
-		return LBDAHOMPJKP;
+		return timeout7Ms;
 	}
 
-	private static void IDBJIPEJHGF(int value)
+	private static void SetTimeout7Ms(int value)
 	{
-		LBDAHOMPJKP = value;
+		timeout7Ms = value;
 	}
 
-	public static int KKDNBDDGCLE()
+	public static int GetTimeout8Ms()
 	{
-		return KCCNAGEJMJL;
+		return timeout8Ms;
 	}
 
-	private static void AMGNMDCIBMH(int value)
+	private static void SetTimeout8Ms(int value)
 	{
-		KCCNAGEJMJL = value;
+		timeout8Ms = value;
 	}
 
-	public static int DBKGBBFNIJI()
+	public static int GetTimeout9Ms()
 	{
-		return IHOMHOFHPKE;
+		return timeout9Ms;
 	}
 
-	private static void ONBDBIALFDA(int value)
+	private static void SetTimeout9Ms(int value)
 	{
-		IHOMHOFHPKE = value;
+		timeout9Ms = value;
 	}
 
-	public static int KMDLKGLGBKM()
+	public static int GetTimeout10Ms()
 	{
-		return PPLPBAGNJLN;
+		return timeout10Ms;
 	}
 
-	private static void FCCCLDBNFCF(int value)
+	private static void SetTimeout10Ms(int value)
 	{
-		PPLPBAGNJLN = value;
+		timeout10Ms = value;
 	}
 
-	public static int KIGBGDJFAIH()
+	public static int GetTimeout11Ms()
 	{
-		return NNEAFFILFGA;
+		return timeout11Ms;
 	}
 
-	private static void OBIENFNOJMD(int value)
+	private static void SetTimeout11Ms(int value)
 	{
-		NNEAFFILFGA = value;
+		timeout11Ms = value;
 	}
 }

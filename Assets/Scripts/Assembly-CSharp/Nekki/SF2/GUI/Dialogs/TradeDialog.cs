@@ -5,7 +5,7 @@ namespace Nekki.SF2.GUI.Dialogs
 {
 	public class TradeDialog : BaseDialog
 	{
-		public enum LBGFOGHMBED
+		public enum TradeAction
 		{
 			A_BUY = 0,
 			A_UPGRADE = 1
@@ -16,15 +16,15 @@ namespace Nekki.SF2.GUI.Dialogs
 
 		private string _titleString = string.Empty;
 
-		private string HEGPBBJKKCJ = string.Empty;
+		private string messageKey = string.Empty;
 
-		private long LFEDAOPJBHP;
+		private long price;
 
 		private GameValueType _value;
 
-		private LBGFOGHMBED CBFFIFKAHHN;
+		private TradeAction action;
 
-		private long IGMDKDOGGNA;
+		private long waitTimeSeconds;
 
 		public override void Init(object data)
 		{
@@ -32,77 +32,77 @@ namespace Nekki.SF2.GUI.Dialogs
 			if (fOIIPALJAMM == null)
 			{
 				_value = GameValueType.Gold;
-				LFEDAOPJBHP = 0L;
-				CBFFIFKAHHN = LBGFOGHMBED.A_BUY;
-				IGMDKDOGGNA = 0L;
+				price = 0L;
+				action = TradeAction.A_BUY;
+				waitTimeSeconds = 0L;
 			}
 			else
 			{
 				_value = fOIIPALJAMM.Value;
-				LFEDAOPJBHP = fOIIPALJAMM.IJJJDFHBLNN;
-				CBFFIFKAHHN = fOIIPALJAMM.AMKJNPOCODK;
-				IGMDKDOGGNA = fOIIPALJAMM.JNNKILFJKPB;
+				price = fOIIPALJAMM.Price;
+				action = fOIIPALJAMM.TradeType;
+				waitTimeSeconds = fOIIPALJAMM.DeliverySeconds;
 			}
 			string text;
-			switch (CBFFIFKAHHN)
+			switch (action)
 			{
-			case LBGFOGHMBED.A_BUY:
+			case TradeAction.A_BUY:
 				text = "shopBuy";
 				_titleString = "dlgBuyTitle";
-				HEGPBBJKKCJ = "dlgBuyMessage";
+				messageKey = "dlgBuyMessage";
 				break;
-			case LBGFOGHMBED.A_UPGRADE:
+			case TradeAction.A_UPGRADE:
 				text = "dlgUpgradeButton";
 				_titleString = "dlgUpgradeTitle";
-				HEGPBBJKKCJ = "dlgUpgradeMessage";
+				messageKey = "dlgUpgradeMessage";
 				break;
 			default:
 				text = "OK";
 				break;
 			}
-			if (IGMDKDOGGNA > 0)
+			if (waitTimeSeconds > 0)
 			{
-				if (CBFFIFKAHHN != LBGFOGHMBED.A_UPGRADE)
+				if (action != TradeAction.A_UPGRADE)
 				{
 					text = "dlgOrderButton";
 					_titleString = "dlgOrderTitle";
-					HEGPBBJKKCJ = "dlgOrderMessage";
+					messageKey = "dlgOrderMessage";
 				}
 				else
 				{
 					text = "dlgUpgradeButton";
 					_titleString = "dlgUpgradeTitle";
-					HEGPBBJKKCJ = "dlgUpgradeMessage";
+					messageKey = "dlgUpgradeMessage";
 				}
 			}
-			BGJJDGOBPKA = text;
+			defaultOkButtonAlias = text;
 			if (fOIIPALJAMM != null && fOIIPALJAMM.Dlg != null)
 			{
 				AddEventListener(0, fOIIPALJAMM.Dlg);
 			}
-			base.Init(_titleString, text, "CANCEL", KBDHPMOMJLL.FOOTER_BOTH);
+			base.Init(_titleString, text, "CANCEL", FooterType.FOOTER_BOTH);
 		}
 
-		protected override void HLJBLAPMDCB()
+		protected override void SetupContent()
 		{
 			string text = "img::";
 			switch (_value)
 			{
 			case GameValueType.Gold:
-				text += ListSF.CCDKHLAMKKO().OGJBDMNBMLJ();
+				text += ListSF.GetRoster().GetCoinIcon();
 				break;
 			case GameValueType.Gems:
 				text += "MiscSprites.ruby";
 				break;
 			}
-			string pEMOECLNECD = "dlgCurrencyQuestion{" + text + "}{" + LFEDAOPJBHP + "}";
-			string text2 = LocalizationManager.GetString(HEGPBBJKKCJ) + "\n" + LocalizationManager.GetString(pEMOECLNECD);
+			string pEMOECLNECD = "dlgCurrencyQuestion{" + text + "}{" + price + "}";
+			string text2 = LocalizationManager.GetString(messageKey) + "\n" + LocalizationManager.GetString(pEMOECLNECD);
 			_text.set_text(text2);
-			if (IGMDKDOGGNA > 0)
+			if (waitTimeSeconds > 0)
 			{
 				string empty = string.Empty;
-				empty = ((CBFFIFKAHHN != LBGFOGHMBED.A_BUY) ? "dlgTimeUpgrade" : "dlgTimeDelivery");
-				TimeSpan timeSpan = TimeSpan.FromSeconds(IGMDKDOGGNA);
+				empty = ((action != TradeAction.A_BUY) ? "dlgTimeUpgrade" : "dlgTimeDelivery");
+				TimeSpan timeSpan = TimeSpan.FromSeconds(waitTimeSeconds);
 				string empty2 = string.Empty;
 				empty2 = ((timeSpan.Hours <= 0) ? string.Format("{0:D2}:{1:D2}", timeSpan.Minutes, timeSpan.Seconds) : string.Format("{0:D2}:{1:D2}:{2:D2}", timeSpan.Hours, timeSpan.Minutes, timeSpan.Seconds));
 				string text3 = LocalizationManager.GetString(empty, empty2);

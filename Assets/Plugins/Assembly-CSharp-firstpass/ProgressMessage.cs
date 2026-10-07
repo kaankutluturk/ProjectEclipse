@@ -4,16 +4,16 @@ using System.Diagnostics;
 public sealed class ProgressMessage : IServerMessage, IHubMessage
 {
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private ulong BIGMGMIOOMA;
+	private ulong invocationId;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private double ELHMKIJGGNL;
+	private double progress;
 
-	public ulong EBFDNDACIMG
+	public ulong InvocationIdValue
 	{
 		get
 		{
-			return HGFDDMNOPJA();
+			return GetInvocationId();
 		}
 		private set
 		{
@@ -21,11 +21,11 @@ public sealed class ProgressMessage : IServerMessage, IHubMessage
 		}
 	}
 
-	public double OIOANIMIIIA
+	public double ProgressValue
 	{
 		get
 		{
-			return ALDEPEHMGNK();
+			return GetProgress();
 		}
 		private set
 		{
@@ -33,29 +33,29 @@ public sealed class ProgressMessage : IServerMessage, IHubMessage
 		}
 	}
 
-	public LENCKBHFKLD get_Type()
+	public MessageTypes get_Type()
 	{
-		return LENCKBHFKLD.Progress;
+		return MessageTypes.Progress;
 	}
 
-	public ulong HGFDDMNOPJA()
+	public ulong GetInvocationId()
 	{
-		return BIGMGMIOOMA;
+		return invocationId;
 	}
 
 	private void set_InvocationId(ulong value)
 	{
-		BIGMGMIOOMA = value;
+		invocationId = value;
 	}
 
-	public double ALDEPEHMGNK()
+	public double GetProgress()
 	{
-		return ELHMKIJGGNL;
+		return progress;
 	}
 
 	private void set_Progress(double value)
 	{
-		ELHMKIJGGNL = value;
+		progress = value;
 	}
 
 	void IServerMessage.Parse(object data)

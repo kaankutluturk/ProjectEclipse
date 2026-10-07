@@ -4,19 +4,19 @@ using System.Diagnostics;
 public sealed class ResultMessage : IServerMessage, IHubMessage
 {
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private ulong BIGMGMIOOMA;
+	private ulong invocationId;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private object EAIPEGFMFMB;
+	private object returnValue;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private IDictionary<string, object> MKHEFCIEOCA;
+	private IDictionary<string, object> state;
 
-	public ulong EBFDNDACIMG
+	public ulong InvocationIdValue
 	{
 		get
 		{
-			return HGFDDMNOPJA();
+			return GetInvocationId();
 		}
 		private set
 		{
@@ -24,11 +24,11 @@ public sealed class ResultMessage : IServerMessage, IHubMessage
 		}
 	}
 
-	public object IHFJLIONHJJ
+	public object Result
 	{
 		get
 		{
-			return LBAIENGDLDJ();
+			return GetReturnValue();
 		}
 		private set
 		{
@@ -36,11 +36,11 @@ public sealed class ResultMessage : IServerMessage, IHubMessage
 		}
 	}
 
-	public IDictionary<string, object> AFINHOBCHMC
+	public IDictionary<string, object> HubState
 	{
 		get
 		{
-			return FLBBFDNHJAJ();
+			return GetState();
 		}
 		private set
 		{
@@ -48,39 +48,39 @@ public sealed class ResultMessage : IServerMessage, IHubMessage
 		}
 	}
 
-	public LENCKBHFKLD get_Type()
+	public MessageTypes get_Type()
 	{
-		return LENCKBHFKLD.Result;
+		return MessageTypes.Result;
 	}
 
-	public ulong HGFDDMNOPJA()
+	public ulong GetInvocationId()
 	{
-		return BIGMGMIOOMA;
+		return invocationId;
 	}
 
 	private void set_InvocationId(ulong value)
 	{
-		BIGMGMIOOMA = value;
+		invocationId = value;
 	}
 
-	public object LBAIENGDLDJ()
+	public object GetReturnValue()
 	{
-		return EAIPEGFMFMB;
+		return returnValue;
 	}
 
 	private void set_ReturnValue(object value)
 	{
-		EAIPEGFMFMB = value;
+		returnValue = value;
 	}
 
-	public IDictionary<string, object> FLBBFDNHJAJ()
+	public IDictionary<string, object> GetState()
 	{
-		return MKHEFCIEOCA;
+		return state;
 	}
 
 	private void set_State(IDictionary<string, object> value)
 	{
-		MKHEFCIEOCA = value;
+		state = value;
 	}
 
 	void IServerMessage.Parse(object data)

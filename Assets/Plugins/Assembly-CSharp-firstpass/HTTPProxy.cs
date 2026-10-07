@@ -4,25 +4,25 @@ using System.Diagnostics;
 public sealed class HTTPProxy
 {
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private Uri KLNINJOAAPG;
+	private Uri address;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private Credentials ACGBCDDPEGA;
+	private Credentials credentials;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private bool PBCPBGAKFKB;
+	private bool isTransparent;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private bool PCBBBGCHHMJ;
+	private bool sendWholeUri;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private bool ADBGDHAHGPI;
+	private bool nonTransparentForHttps;
 
-	public Uri IJMOLOMMEBG
+	public Uri ProxyAddress
 	{
 		get
 		{
-			return DNIJHGFINDG();
+			return GetAddress();
 		}
 		set
 		{
@@ -30,51 +30,51 @@ public sealed class HTTPProxy
 		}
 	}
 
-	public Credentials MADDPLIJOIP
+	public Credentials Credentials
 	{
 		get
 		{
-			return HPKPFEOBIOC();
+			return GetCredentials();
 		}
 		set
 		{
-			PJELDABIDCA(value);
+			SetCredentials(value);
 		}
 	}
 
-	public bool BKJOAAJJEAN
+	public bool IsTransparent
 	{
 		get
 		{
-			return JDBFAABAEIL();
+			return GetIsTransparent();
 		}
 		set
 		{
-			KEPJCOKKHLA(value);
+			SetIsTransparent(value);
 		}
 	}
 
-	public bool MEBCCPJFKEE
+	public bool SendWholeUri
 	{
 		get
 		{
-			return EGNDGIEKOGA();
+			return GetSendWholeUri();
 		}
 		set
 		{
-			EHCHFMOJIAP(value);
+			SetSendWholeUri(value);
 		}
 	}
 
-	public bool BEJENMBNEPC
+	public bool NonTransparentForHTTPS
 	{
 		get
 		{
-			return OHCGKBPPMEN();
+			return GetNonTransparentForHTTPS();
 		}
 		set
 		{
-			NFJNADEMMAM(value);
+			SetNonTransparentForHTTPS(value);
 		}
 	}
 
@@ -106,59 +106,59 @@ public sealed class HTTPProxy
 	public HTTPProxy(Uri IKHEAOEKLHL, Credentials JKBAHGNLECO, bool CBLAANPNDHE, bool HAIHALMOEFD, bool AGCDFHONOEF)
 	{
 		set_Address(IKHEAOEKLHL);
-		PJELDABIDCA(JKBAHGNLECO);
-		KEPJCOKKHLA(CBLAANPNDHE);
-		EHCHFMOJIAP(HAIHALMOEFD);
-		NFJNADEMMAM(AGCDFHONOEF);
+		SetCredentials(JKBAHGNLECO);
+		SetIsTransparent(CBLAANPNDHE);
+		SetSendWholeUri(HAIHALMOEFD);
+		SetNonTransparentForHTTPS(AGCDFHONOEF);
 	}
 
-	public Uri DNIJHGFINDG()
+	public Uri GetAddress()
 	{
-		return KLNINJOAAPG;
+		return address;
 	}
 
 	public void set_Address(Uri value)
 	{
-		KLNINJOAAPG = value;
+		address = value;
 	}
 
-	public Credentials HPKPFEOBIOC()
+	public Credentials GetCredentials()
 	{
-		return ACGBCDDPEGA;
+		return credentials;
 	}
 
-	public void PJELDABIDCA(Credentials value)
+	public void SetCredentials(Credentials value)
 	{
-		ACGBCDDPEGA = value;
+		credentials = value;
 	}
 
-	public bool JDBFAABAEIL()
+	public bool GetIsTransparent()
 	{
-		return PBCPBGAKFKB;
+		return isTransparent;
 	}
 
-	public void KEPJCOKKHLA(bool value)
+	public void SetIsTransparent(bool value)
 	{
-		PBCPBGAKFKB = value;
+		isTransparent = value;
 	}
 
-	public bool EGNDGIEKOGA()
+	public bool GetSendWholeUri()
 	{
-		return PCBBBGCHHMJ;
+		return sendWholeUri;
 	}
 
-	public void EHCHFMOJIAP(bool value)
+	public void SetSendWholeUri(bool value)
 	{
-		PCBBBGCHHMJ = value;
+		sendWholeUri = value;
 	}
 
-	public bool OHCGKBPPMEN()
+	public bool GetNonTransparentForHTTPS()
 	{
-		return ADBGDHAHGPI;
+		return nonTransparentForHttps;
 	}
 
-	public void NFJNADEMMAM(bool value)
+	public void SetNonTransparentForHTTPS(bool value)
 	{
-		ADBGDHAHGPI = value;
+		nonTransparentForHttps = value;
 	}
 }

@@ -6,47 +6,47 @@ public class ActionSetCooldown : ActionAnimation
 
 	private string _ButtonName;
 
-	public int KFNNOPBIOFK
+	public int Duration
 	{
 		get
 		{
-			return OMIEPGOPPBO();
+			return GetDuration();
 		}
 	}
 
-	public string NOIAMHIBHDL
+	public string CooldownButtonName
 	{
 		get
 		{
-			return GHHAKGGLBCN();
+			return GetButtonName();
 		}
 	}
 
 	public ActionSetCooldown(XmlNode node)
-		: base(FADAJCEEKIO.SET_COOLDOWN)
+		: base(ActionType.SET_COOLDOWN)
 	{
 		Parse(node);
 	}
 
-	public int OMIEPGOPPBO()
+	public int GetDuration()
 	{
 		return _Duration;
 	}
 
-	public string GHHAKGGLBCN()
+	public string GetButtonName()
 	{
 		return _ButtonName;
 	}
 
 	public override void Visit(Model ACENLMONNPA)
 	{
-		ACENLMONNPA.OPPIKLBKMPN(this);
+		ACENLMONNPA.StartAction(this);
 	}
 
 	protected override void Parse(XmlNode node)
 	{
 		base.Parse(node);
 		_Duration = node.Attributes["Duration"].ParseInt();
-		_ButtonName = node.Attributes["Button"].CIPOICEEIBK(string.Empty);
+		_ButtonName = node.Attributes["Button"].GetStringOrDefault(string.Empty);
 	}
 }

@@ -13,19 +13,19 @@ namespace Nekki.SF2.GUI.Common
 		[SerializeField]
 		private Text _EnemyAnimName;
 
-		private StringBuilder KCMLKPKALHF;
+		private StringBuilder playerTextBuilder;
 
-		private StringBuilder DKOMADOJIJG;
+		private StringBuilder enemyTextBuilder;
 
 		protected override void Init()
 		{
 			base.Init();
-			if (SceneManagerSF.EKFBDMBCDMB() != ScreenType.ModuleDojo && SceneManagerSF.EKFBDMBCDMB() != ScreenType.ModuleFight)
+			if (SceneManagerSF.GetCurrentScreen() != ScreenType.ModuleDojo && SceneManagerSF.GetCurrentScreen() != ScreenType.ModuleFight)
 			{
 				base.gameObject.SetActive(false);
 			}
-			KCMLKPKALHF = new StringBuilder();
-			DKOMADOJIJG = new StringBuilder();
+			playerTextBuilder = new StringBuilder();
+			enemyTextBuilder = new StringBuilder();
 		}
 
 		private void Update()
@@ -35,27 +35,27 @@ namespace Nekki.SF2.GUI.Common
 			{
 				return;
 			}
-			KCMLKPKALHF.Clear();
-			DKOMADOJIJG.Clear();
-			List<Model> lNDLFINJHDB = gDBOMJODDEA.LNDLFINJHDB;
+			playerTextBuilder.Clear();
+			enemyTextBuilder.Clear();
+			List<Model> lNDLFINJHDB = gDBOMJODDEA.ActiveModels;
 			for (int i = 0; i < lNDLFINJHDB.Count; i++)
 			{
 				Model fGCODGKLHED = lNDLFINJHDB[i];
-				StringBuilder stringBuilder = ((!fGCODGKLHED.EPCNJLEHJCB()) ? DKOMADOJIJG : KCMLKPKALHF);
-				if (fGCODGKLHED.Parameters.HBFMBOHLKPJ != null && fGCODGKLHED.Parameters.HBFMBOHLKPJ.get_Type() == Tactic.GKJKJFJALCA.TacticTabular)
+				StringBuilder stringBuilder = ((!fGCODGKLHED.IsPlayerModel()) ? enemyTextBuilder : playerTextBuilder);
+				if (fGCODGKLHED.Parameters.FightTactic != null && fGCODGKLHED.Parameters.FightTactic.get_Type() == Tactic.TacticType.TacticTabular)
 				{
-					stringBuilder.Append(AiData.GetTacticsTableName(fGCODGKLHED.EEIGOJBKFGE().get_ResultSource()));
+					stringBuilder.Append(AiData.GetTacticsTableName(fGCODGKLHED.GetAi().get_ResultSource()));
 					stringBuilder.Append("\n");
 				}
 			}
 			for (int j = 0; j < lNDLFINJHDB.Count; j++)
 			{
 				Model fGCODGKLHED2 = lNDLFINJHDB[j];
-				StringBuilder stringBuilder2 = ((!fGCODGKLHED2.EPCNJLEHJCB()) ? DKOMADOJIJG : KCMLKPKALHF);
-				stringBuilder2.Append(CKAAKEHFAML(fGCODGKLHED2));
+				StringBuilder stringBuilder2 = ((!fGCODGKLHED2.IsPlayerModel()) ? enemyTextBuilder : playerTextBuilder);
+				stringBuilder2.Append(FormatModelAnimationInfo(fGCODGKLHED2));
 			}
-			string text = KCMLKPKALHF.ToString();
-			string text2 = DKOMADOJIJG.ToString();
+			string text = playerTextBuilder.ToString();
+			string text2 = enemyTextBuilder.ToString();
 			if (_PlayerAnimName.text != text)
 			{
 				_PlayerAnimName.text = text;
@@ -66,15 +66,15 @@ namespace Nekki.SF2.GUI.Common
 			}
 		}
 
-		private static string CKAAKEHFAML(Model ACENLMONNPA)
+		private static string FormatModelAnimationInfo(Model ACENLMONNPA)
 		{
 			StringBuilder stringBuilder = new StringBuilder();
 			InfoAnimation pJAHIOELGGD = ACENLMONNPA.GetCurrentAnimation();
 			int num = -1;
-			if (ACENLMONNPA.NLHFJIEHKMM())
+			if (ACENLMONNPA.IsInPhysics())
 			{
-				num = ACENLMONNPA.COBOFMDFLJO().GetFrame();
-				List<string> list = ACENLMONNPA.KGHDFCKGAEO();
+				num = ACENLMONNPA.GetPhysicsModule().GetFrame();
+				List<string> list = ACENLMONNPA.GetPhysicsNames();
 				int count = list.Count;
 				for (int i = 0; i < count; i++)
 				{
@@ -88,7 +88,7 @@ namespace Nekki.SF2.GUI.Common
 			else
 			{
 				stringBuilder.Append((pJAHIOELGGD == null) ? "----" : pJAHIOELGGD.Name);
-				num = ((pJAHIOELGGD == null) ? (-1) : ACENLMONNPA.OCPMJKIEPIG().LPFPGDJALED());
+				num = ((pJAHIOELGGD == null) ? (-1) : ACENLMONNPA.GetAnimationModule().GetCurrentFrame());
 			}
 			stringBuilder.Append("    ");
 			if (num > -1)

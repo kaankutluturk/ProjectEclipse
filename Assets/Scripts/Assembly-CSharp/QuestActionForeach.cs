@@ -3,7 +3,7 @@ using System.Xml;
 
 public class QuestActionForeach : QuestAction
 {
-	public enum PDIAEAEHHPE
+	public enum ForeachType
 	{
 		FOREACH_NONE = 0,
 		FOREACH_ITEMS = 1,
@@ -14,123 +14,123 @@ public class QuestActionForeach : QuestAction
 		FOREACH_DELIVERY_ENCHANTMENTS = 6
 	}
 
-	private bool LNENABHHABO;
+	private bool continueLoop;
 
-	private bool LIJKDJEAJJJ;
+	private bool isLooping;
 
-	private QuestStage DOKAIKMLLDK;
+	private QuestStage bodyStage;
 
 	private List<string> nodes = new List<string>();
 
 	private int index = -1;
 
-	private int PEEOEOMEBFG;
+	private int nodeCount;
 
-	private QuestParameters NFIKJCJGMBB;
+	private QuestParameters questParameters;
 
 	private string name;
 
-	private PDIAEAEHHPE LFLGCDNKNJI;
+	private ForeachType foreachType;
 
 	public override void Parse(XmlNode EPKLCPOEELO)
 	{
 		base.Parse(EPKLCPOEELO);
-		LFLGCDNKNJI = GetType(EPKLCPOEELO.Attributes["Type"].CIPOICEEIBK(string.Empty));
-		name = EPKLCPOEELO.Attributes["Name"].CIPOICEEIBK(string.Empty);
+		foreachType = GetType(EPKLCPOEELO.Attributes["Type"].GetStringOrDefault(string.Empty));
+		name = EPKLCPOEELO.Attributes["Name"].GetStringOrDefault(string.Empty);
 	}
 
-	public override void DEJMHFMLKIC(QuestParameters GFIHPBCEEOB)
+	public override void Execute(QuestParameters GFIHPBCEEOB)
 	{
-		base.DEJMHFMLKIC(GFIHPBCEEOB);
+		base.Execute(GFIHPBCEEOB);
 		if (ListSF.GetInstance().IsEclipseQuestSuppressed(name))
 		{
-			OGIJONMKABB();
+			FinishAction();
 			return;
 		}
 		index = -1;
-		PEEOEOMEBFG = 0;
-		NFIKJCJGMBB = GFIHPBCEEOB;
-		DOKAIKMLLDK = ListSF.GetInstance().PBGCEEBDBGG(name);
+		nodeCount = 0;
+		questParameters = GFIHPBCEEOB;
+		bodyStage = ListSF.GetInstance().GetQuestByName(name);
 		nodes.Clear();
-		switch (LFLGCDNKNJI)
+		switch (foreachType)
 		{
-		case PDIAEAEHHPE.FOREACH_ITEMS:
-			FGFAOPOODJA();
+		case ForeachType.FOREACH_ITEMS:
+			CollectUserItems();
 			break;
-		case PDIAEAEHHPE.FOREACH_DELIVERY_ITEMS:
+		case ForeachType.FOREACH_DELIVERY_ITEMS:
 			RunDeliveryItems(false);
 			break;
-		case PDIAEAEHHPE.FOREACH_DELIVERY_UPGRADES:
+		case ForeachType.FOREACH_DELIVERY_UPGRADES:
 			RunDeliveryItems(true);
 			break;
-		case PDIAEAEHHPE.FOREACH_PAID_ITEMS:
-			KINMIFFFGDA();
+		case ForeachType.FOREACH_PAID_ITEMS:
+			CollectPaidItems();
 			break;
-		case PDIAEAEHHPE.FOREACH_BATTLES:
-			AKFLMFMBPKD();
+		case ForeachType.FOREACH_BATTLES:
+			CollectBattles();
 			break;
-		case PDIAEAEHHPE.FOREACH_DELIVERY_ENCHANTMENTS:
-			OBAKPOLFCCP();
+		case ForeachType.FOREACH_DELIVERY_ENCHANTMENTS:
+			CollectDeliveryEnchantments();
 			break;
 		}
-		PEEOEOMEBFG = nodes.Count;
-		LNENABHHABO = true;
-		AKPKHLBCOFB();
+		nodeCount = nodes.Count;
+		continueLoop = true;
+		RunLoop();
 	}
 
-	private void AKPKHLBCOFB()
+	private void RunLoop()
 	{
-		LIJKDJEAJJJ = true;
-		while (LNENABHHABO)
+		isLooping = true;
+		while (continueLoop)
 		{
 			Run();
 		}
-		LIJKDJEAJJJ = false;
+		isLooping = false;
 	}
 
 	private void Run()
 	{
-		LNENABHHABO = false;
+		continueLoop = false;
 		index++;
-		if (DOKAIKMLLDK == null || index > PEEOEOMEBFG - 1)
+		if (bodyStage == null || index > nodeCount - 1)
 		{
-			if (LFLGCDNKNJI == PDIAEAEHHPE.FOREACH_DELIVERY_ITEMS || LFLGCDNKNJI == PDIAEAEHHPE.FOREACH_DELIVERY_UPGRADES)
+			if (foreachType == ForeachType.FOREACH_DELIVERY_ITEMS || foreachType == ForeachType.FOREACH_DELIVERY_UPGRADES)
 			{
-				Roster nKGLHEGIKKP = ListSF.CCDKHLAMKKO();
-				nKGLHEGIKKP.KHCNHPCPFII().HHGJMMHMEMP.RemoveListener(JOEFPOMBMPB);
-				switch (LFLGCDNKNJI)
+				Roster nKGLHEGIKKP = ListSF.GetRoster();
+				nKGLHEGIKKP.GetInventory().ItemDelivered.RemoveListener(OnDeliveryItemAdded);
+				switch (foreachType)
 				{
-				case PDIAEAEHHPE.FOREACH_DELIVERY_ITEMS:
-					nKGLHEGIKKP.KHCNHPCPFII().EHDCCPKOANN().Clear();
+				case ForeachType.FOREACH_DELIVERY_ITEMS:
+					nKGLHEGIKKP.GetInventory().GetDeliveredItems().Clear();
 					break;
-				case PDIAEAEHHPE.FOREACH_DELIVERY_UPGRADES:
-					nKGLHEGIKKP.KHCNHPCPFII().MPACCEAFDOH().Clear();
+				case ForeachType.FOREACH_DELIVERY_UPGRADES:
+					nKGLHEGIKKP.GetInventory().GetDeliveredUpgrades().Clear();
 					break;
-				case PDIAEAEHHPE.FOREACH_DELIVERY_ENCHANTMENTS:
-					nKGLHEGIKKP.KHCNHPCPFII().LFADKPKKFMP.Clear();
+				case ForeachType.FOREACH_DELIVERY_ENCHANTMENTS:
+					nKGLHEGIKKP.GetInventory().DeliveredRecipes.Clear();
 					break;
 				}
 			}
-			else if (LFLGCDNKNJI == PDIAEAEHHPE.FOREACH_DELIVERY_ENCHANTMENTS)
+			else if (foreachType == ForeachType.FOREACH_DELIVERY_ENCHANTMENTS)
 			{
-				Roster nKGLHEGIKKP2 = ListSF.CCDKHLAMKKO();
-				nKGLHEGIKKP2.RemoveEventListener(1, BNIJKKOOAEL);
-				nKGLHEGIKKP2.KHCNHPCPFII().IJFJMMCFIGH();
+				Roster nKGLHEGIKKP2 = ListSF.GetRoster();
+				nKGLHEGIKKP2.RemoveEventListener(1, OnDeliveryEnchantmentAdded);
+				nKGLHEGIKKP2.GetInventory().ClearDeliveredRecipes();
 			}
-			OGIJONMKABB();
-			LNENABHHABO = false;
+			FinishAction();
+			continueLoop = false;
 		}
 		else
 		{
-			NFIKJCJGMBB.PFKPHBPBPAF = nodes[index];
-			if (DOKAIKMLLDK.Compare(NFIKJCJGMBB))
+			questParameters.iteratorValue = nodes[index];
+			if (bodyStage.Compare(questParameters))
 			{
-				DOKAIKMLLDK.AddEventListener(1, OnQuestComplete);
-				DOKAIKMLLDK.MHHNIPBJNAD(NFIKJCJGMBB, false);
+				bodyStage.AddEventListener(1, OnQuestComplete);
+				bodyStage.StartActions(questParameters, false);
 			}
 			else
 			{
-				LNENABHHABO = true;
+				continueLoop = true;
 			}
 		}
 	}
@@ -139,16 +139,16 @@ public class QuestActionForeach : QuestAction
 	{
 		QuestStage mLLKDGBEGJI = (QuestStage)data;
 		mLLKDGBEGJI.RemoveEventListener(1, OnQuestComplete);
-		LNENABHHABO = true;
-		if (!LIJKDJEAJJJ)
+		continueLoop = true;
+		if (!isLooping)
 		{
-			AKPKHLBCOFB();
+			RunLoop();
 		}
 	}
 
-	private void FGFAOPOODJA()
+	private void CollectUserItems()
 	{
-		List<UserItem> list = ListSF.CCDKHLAMKKO().KHCNHPCPFII().DJBOFEEKJMP();
+		List<UserItem> list = ListSF.GetRoster().GetInventory().GetItems();
 		foreach (UserItem item in list)
 		{
 			nodes.Add(item.get_Name());
@@ -157,18 +157,18 @@ public class QuestActionForeach : QuestAction
 
 	private void RunDeliveryItems(bool EIOPLHKAEPK)
 	{
-		Roster nKGLHEGIKKP = ListSF.CCDKHLAMKKO();
-		List<UserItem> list = ((!EIOPLHKAEPK) ? nKGLHEGIKKP.KHCNHPCPFII().EHDCCPKOANN() : nKGLHEGIKKP.KHCNHPCPFII().MPACCEAFDOH());
+		Roster nKGLHEGIKKP = ListSF.GetRoster();
+		List<UserItem> list = ((!EIOPLHKAEPK) ? nKGLHEGIKKP.GetInventory().GetDeliveredItems() : nKGLHEGIKKP.GetInventory().GetDeliveredUpgrades());
 		foreach (UserItem item in list)
 		{
 			nodes.Add(item.get_Name());
 		}
-		nKGLHEGIKKP.KHCNHPCPFII().HHGJMMHMEMP.AddListener(JOEFPOMBMPB);
+		nKGLHEGIKKP.GetInventory().ItemDelivered.AddListener(OnDeliveryItemAdded);
 	}
 
-	private void KINMIFFFGDA()
+	private void CollectPaidItems()
 	{
-		List<ItemInfo> list = ListSF.GetItems().ONFMAJEAACM("RealMoneyItem");
+		List<ItemInfo> list = ListSF.GetItems().GetItemsByType("RealMoneyItem");
 		if (list == null)
 		{
 			return;
@@ -179,70 +179,70 @@ public class QuestActionForeach : QuestAction
 		}
 	}
 
-	private void OBAKPOLFCCP()
+	private void CollectDeliveryEnchantments()
 	{
-		Roster nKGLHEGIKKP = ListSF.CCDKHLAMKKO();
-		List<RecipeItemInfo> lFADKPKKFMP = nKGLHEGIKKP.KHCNHPCPFII().LFADKPKKFMP;
+		Roster nKGLHEGIKKP = ListSF.GetRoster();
+		List<RecipeItemInfo> lFADKPKKFMP = nKGLHEGIKKP.GetInventory().DeliveredRecipes;
 		foreach (RecipeItemInfo item in lFADKPKKFMP)
 		{
 			nodes.Add(item.ToString());
 		}
-		nKGLHEGIKKP.AddEventListener(1, BNIJKKOOAEL);
+		nKGLHEGIKKP.AddEventListener(1, OnDeliveryEnchantmentAdded);
 	}
 
-	private void AKFLMFMBPKD()
+	private void CollectBattles()
 	{
-		List<Battle> list = ListSF.GetInstance().MMCHMBIKIEP();
+		List<Battle> list = ListSF.GetInstance().GetBattles();
 		foreach (Battle item in list)
 		{
-			nodes.Add(item.OJDNDADJBID());
+			nodes.Add(item.GetZoneBattleKey());
 		}
 	}
 
-	private void JOEFPOMBMPB(object data)
+	private void OnDeliveryItemAdded(object data)
 	{
 		if (data != null)
 		{
 			UserItem dKCHDHMLKHN = (UserItem)data;
-			if ((LFLGCDNKNJI == PDIAEAEHHPE.FOREACH_DELIVERY_ITEMS && !dKCHDHMLKHN.DBKKJGBJOEO()) || (LFLGCDNKNJI == PDIAEAEHHPE.FOREACH_DELIVERY_UPGRADES && dKCHDHMLKHN.DBKKJGBJOEO()))
+			if ((foreachType == ForeachType.FOREACH_DELIVERY_ITEMS && !dKCHDHMLKHN.GetIsUpgrade()) || (foreachType == ForeachType.FOREACH_DELIVERY_UPGRADES && dKCHDHMLKHN.GetIsUpgrade()))
 			{
 				nodes.Add(dKCHDHMLKHN.get_Name());
 			}
-			PEEOEOMEBFG = nodes.Count;
+			nodeCount = nodes.Count;
 		}
 	}
 
-	private void BNIJKKOOAEL(object data)
+	private void OnDeliveryEnchantmentAdded(object data)
 	{
 		if (data != null)
 		{
 			RecipeItemInfo bNJOCBKNPMG = (RecipeItemInfo)data;
-			if (LFLGCDNKNJI == PDIAEAEHHPE.FOREACH_DELIVERY_ENCHANTMENTS)
+			if (foreachType == ForeachType.FOREACH_DELIVERY_ENCHANTMENTS)
 			{
 				nodes.Add(bNJOCBKNPMG.ToString());
-				PEEOEOMEBFG = nodes.Count;
+				nodeCount = nodes.Count;
 			}
 		}
 	}
 
-	private PDIAEAEHHPE GetType(string _type)
+	private ForeachType GetType(string _type)
 	{
 		switch (_type)
 		{
 		case "Items":
-			return PDIAEAEHHPE.FOREACH_ITEMS;
+			return ForeachType.FOREACH_ITEMS;
 		case "DeliveryItems":
-			return PDIAEAEHHPE.FOREACH_DELIVERY_ITEMS;
+			return ForeachType.FOREACH_DELIVERY_ITEMS;
 		case "PaidItems":
-			return PDIAEAEHHPE.FOREACH_PAID_ITEMS;
+			return ForeachType.FOREACH_PAID_ITEMS;
 		case "DeliveryUpgrades":
-			return PDIAEAEHHPE.FOREACH_DELIVERY_UPGRADES;
+			return ForeachType.FOREACH_DELIVERY_UPGRADES;
 		case "Battles":
-			return PDIAEAEHHPE.FOREACH_BATTLES;
+			return ForeachType.FOREACH_BATTLES;
 		case "DeliveryEnchantments":
-			return PDIAEAEHHPE.FOREACH_DELIVERY_ENCHANTMENTS;
+			return ForeachType.FOREACH_DELIVERY_ENCHANTMENTS;
 		default:
-			return PDIAEAEHHPE.FOREACH_NONE;
+			return ForeachType.FOREACH_NONE;
 		}
 	}
 }

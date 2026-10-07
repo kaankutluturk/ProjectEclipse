@@ -11,7 +11,7 @@ function Read-Method([string]$source, [string]$name, [int]$indent = 1) {
     return $match.Value
 }
 $profile = Get-Content -Raw (Join-Path $sourceRoot 'ProfileScene.cs')
-$methods = foreach ($name in @('CGFOHBFAJBL', 'LDFKBJAHGII', 'OOHJAHDHEAP', 'HPHAOJDPNND', 'LMPGJLLBFPP', 'MONAFDKJKOP', 'PlayAnimation', 'ReleaseTrickPreviewInput')) { Read-Method $profile $name }
+$methods = foreach ($name in @('BeginTrickPreview', 'OnModelEvent', 'EndTrickPreview', 'UpdateFade', 'FadeIn', 'FadeOut', 'PlayAnimation', 'ReleaseTrickPreviewInput')) { Read-Method $profile $name }
 $model = Get-Content -Raw (Join-Path $sourceRoot 'Nekki/SF2/Core/Fights/ModelContainer.cs')
 $tryPlay = Read-Method $model 'TryPlayAnimation' 2
 $action = Get-Content -Raw (Join-Path $sourceRoot 'QuestActionStoryTutorialShowBlock.cs')

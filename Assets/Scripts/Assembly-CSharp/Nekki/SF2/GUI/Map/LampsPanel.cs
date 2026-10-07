@@ -6,7 +6,7 @@ namespace Nekki.SF2.GUI.Map
 {
 	public class LampsPanel : SFMonoBehaviour<object>
 	{
-		public enum EALAEJEKNOO
+		public enum LampsPanelEvent
 		{
 			OnClickLamp = 0
 		}
@@ -17,32 +17,32 @@ namespace Nekki.SF2.GUI.Map
 
 		public const float LAMP_WIDTH = 68f;
 
-		private List<Button> ICHBMJODKAB = new List<Button>();
+		private List<Button> lampButtons = new List<Button>();
 
-		private List<ResolutionImage> EDADANMDDCH = new List<ResolutionImage>();
+		private List<ResolutionImage> lampIndicators = new List<ResolutionImage>();
 
-		private List<Button> JMPJJMHGIKF = new List<Button>();
+		private List<Button> flashingLampButtons = new List<Button>();
 
-		private List<ResolutionImage> CGCLPOOGOGG = new List<ResolutionImage>();
+		private List<ResolutionImage> flashingLampIndicators = new List<ResolutionImage>();
 
 		[SerializeField]
 		private ResolutionImage _lampOn;
 
-		private int HPOLPFPFNHL;
+		private int currentLampIndex;
 
-		private int GCCPALLIFBO = 255;
+		private int lampOpacity = 255;
 
-		private int DDAMPCFEAKL;
+		private int indicatorOpacity;
 
-		private int ALHECCDENMO;
+		private int flashPauseFrames;
 
-		private bool BDIPNCMGEEN;
+		private bool isIndicatorFlashing;
 
-		private bool LOGDIAPFANM = true;
+		private bool isIndicatorFadingOut = true;
 
-		private bool MBIEJLCBCIM = true;
+		private bool isLampFlashing = true;
 
-		private bool HPCHHDHGDAA;
+		private bool isLampFadingOut;
 
 		[SerializeField]
 		private LabelAlias _locationName;
@@ -61,22 +61,22 @@ namespace Nekki.SF2.GUI.Map
 
 		public void Init()
 		{
-			ALHECCDENMO = MapGUI.JHLMDGBGGEP.CPLJCIFJAGN;
+			flashPauseFrames = MapGUI.ZoneSwitchFade.DelayBeforeFade;
 			_locationName.set_text("???");
 		}
 
 		public void ClearLamps()
 		{
-			foreach (Button item in ICHBMJODKAB)
+			foreach (Button item in lampButtons)
 			{
 				Object.Destroy(item.gameObject);
 			}
-			ICHBMJODKAB.Clear();
-			foreach (ResolutionImage item2 in EDADANMDDCH)
+			lampButtons.Clear();
+			foreach (ResolutionImage item2 in lampIndicators)
 			{
 				Object.Destroy(item2.gameObject);
 			}
-			EDADANMDDCH.Clear();
+			lampIndicators.Clear();
 		}
 
 		public void AddLamps(int JPCFOCCOIHL)
@@ -93,89 +93,89 @@ namespace Nekki.SF2.GUI.Map
 				float x = num - num2 / 2f + (float)i * 90f + 34f;
 				float y = -55f;
 				component.transform.localPosition = new Vector3(x, y);
-				ICHBMJODKAB.Add(component);
+				lampButtons.Add(component);
 				GameObject gameObject2 = Object.Instantiate(_lampIndicatorPrefab);
 				ResolutionImage component2 = gameObject2.GetComponent<ResolutionImage>();
 				component2.gameObject.transform.SetParent(_indicatorsContainer.transform, false);
 				component2.transform.localPosition = new Vector3(x, y);
-				UIExtensions.HNIHBGAOAIH(component2, 0f);
+				UIExtensions.SetAlpha(component2, 0f);
 				component2.raycastTarget = false;
-				EDADANMDDCH.Add(component2);
+				lampIndicators.Add(component2);
 			}
-			HPOLPFPFNHL = 0;
-			if (ICHBMJODKAB.Count > 0)
+			currentLampIndex = 0;
+			if (lampButtons.Count > 0)
 			{
-				_lampOn.transform.localPosition = ICHBMJODKAB[0].transform.localPosition;
+				_lampOn.transform.localPosition = lampButtons[0].transform.localPosition;
 			}
 		}
 
 		public List<Button> GetLamps()
 		{
-			return ICHBMJODKAB;
+			return lampButtons;
 		}
 
 		public void SetCurrentZone(int index, string ABJMDKJHJCP)
 		{
-			if (ICHBMJODKAB.Count != 0)
+			if (lampButtons.Count != 0)
 			{
-				_lampOn.transform.localPosition = ICHBMJODKAB[index].transform.localPosition;
-				HPOLPFPFNHL = index;
+				_lampOn.transform.localPosition = lampButtons[index].transform.localPosition;
+				currentLampIndex = index;
 				_locationName.SetAlias(ABJMDKJHJCP);
 			}
 		}
 
 		public int GetCurrentLamp()
 		{
-			return HPOLPFPFNHL;
+			return currentLampIndex;
 		}
 
 		public void Flashing()
 		{
-			if (ALHECCDENMO > 0)
+			if (flashPauseFrames > 0)
 			{
-				ALHECCDENMO--;
+				flashPauseFrames--;
 				return;
 			}
-			int iEKAFNFKBNE = MapGUI.JHLMDGBGGEP.IEKAFNFKBNE;
-			int hPJHAIALGHN = MapGUI.JHLMDGBGGEP.HPJHAIALGHN;
+			int iEKAFNFKBNE = MapGUI.ZoneSwitchFade.MinOpacity;
+			int hPJHAIALGHN = MapGUI.ZoneSwitchFade.FadeSpeed;
 			if (hPJHAIALGHN <= 0)
 			{
 				return;
 			}
-			if (MBIEJLCBCIM)
+			if (isLampFlashing)
 			{
-				ChangeLampOpacity(JMPJJMHGIKF);
-				if (GCCPALLIFBO <= iEKAFNFKBNE && HPCHHDHGDAA)
+				ChangeLampOpacity(flashingLampButtons);
+				if (lampOpacity <= iEKAFNFKBNE && isLampFadingOut)
 				{
-					BDIPNCMGEEN = true;
+					isIndicatorFlashing = true;
 				}
-				if (GCCPALLIFBO <= 0)
+				if (lampOpacity <= 0)
 				{
-					MBIEJLCBCIM = false;
+					isLampFlashing = false;
 				}
 			}
-			if (BDIPNCMGEEN)
+			if (isIndicatorFlashing)
 			{
-				ChangeLampIndicatorOpacity(CGCLPOOGOGG);
-				if (DDAMPCFEAKL <= iEKAFNFKBNE && LOGDIAPFANM)
+				ChangeLampIndicatorOpacity(flashingLampIndicators);
+				if (indicatorOpacity <= iEKAFNFKBNE && isIndicatorFadingOut)
 				{
-					MBIEJLCBCIM = true;
+					isLampFlashing = true;
 				}
-				if (DDAMPCFEAKL <= 0)
+				if (indicatorOpacity <= 0)
 				{
-					BDIPNCMGEEN = false;
+					isIndicatorFlashing = false;
 				}
 			}
 		}
 
 		public void CheckOpenZones(List<ZoneScrollItem> LLOGFBNDHNF)
 		{
-			JMPJJMHGIKF.Clear();
-			CGCLPOOGOGG.Clear();
+			flashingLampButtons.Clear();
+			flashingLampIndicators.Clear();
 			for (int i = 0; i < LLOGFBNDHNF.Count; i++)
 			{
 				Zone zone = LLOGFBNDHNF[i].get_Zone();
-				if (!zone.AMBLIADMEOC())
+				if (!zone.GetIsStart())
 				{
 					if (!MapScene.IsZoneOpen(zone))
 					{
@@ -183,8 +183,8 @@ namespace Nekki.SF2.GUI.Map
 					}
 					if (MapScene.IsZoneHaveDontCompleteBattle(zone))
 					{
-						JMPJJMHGIKF.Add(ICHBMJODKAB[i]);
-						CGCLPOOGOGG.Add(EDADANMDDCH[i]);
+						flashingLampButtons.Add(lampButtons[i]);
+						flashingLampIndicators.Add(lampIndicators[i]);
 					}
 				}
 			}
@@ -192,7 +192,7 @@ namespace Nekki.SF2.GUI.Map
 
 		public virtual void SetTouchEnabled(bool MINKNLEJMKF)
 		{
-			foreach (Button item in ICHBMJODKAB)
+			foreach (Button item in lampButtons)
 			{
 				item.interactable = MINKNLEJMKF;
 			}
@@ -200,28 +200,28 @@ namespace Nekki.SF2.GUI.Map
 
 		public void SetLampsVisible(bool value)
 		{
-			foreach (Button item in ICHBMJODKAB)
+			foreach (Button item in lampButtons)
 			{
 				if (item != null)
 				{
 					item.gameObject.SetActive(value);
 				}
 			}
-			foreach (ResolutionImage item2 in EDADANMDDCH)
+			foreach (ResolutionImage item2 in lampIndicators)
 			{
 				if (item2 != null)
 				{
 					item2.gameObject.SetActive(value);
 				}
 			}
-			foreach (Button item3 in JMPJJMHGIKF)
+			foreach (Button item3 in flashingLampButtons)
 			{
 				if (item3 != null)
 				{
 					item3.gameObject.SetActive(value);
 				}
 			}
-			foreach (ResolutionImage item4 in CGCLPOOGOGG)
+			foreach (ResolutionImage item4 in flashingLampIndicators)
 			{
 				if (item4 != null)
 				{
@@ -241,68 +241,68 @@ namespace Nekki.SF2.GUI.Map
 
 		private void ChangeLampOpacity(List<Button> BBHOCFECAEM)
 		{
-			int hPJHAIALGHN = MapGUI.JHLMDGBGGEP.HPJHAIALGHN;
+			int hPJHAIALGHN = MapGUI.ZoneSwitchFade.FadeSpeed;
 			if (hPJHAIALGHN <= 0)
 			{
 				return;
 			}
 			int num = 255 / hPJHAIALGHN;
-			if (HPCHHDHGDAA)
+			if (isLampFadingOut)
 			{
-				GCCPALLIFBO -= num;
-				if (GCCPALLIFBO <= 0)
+				lampOpacity -= num;
+				if (lampOpacity <= 0)
 				{
-					GCCPALLIFBO = 0;
-					HPCHHDHGDAA = false;
+					lampOpacity = 0;
+					isLampFadingOut = false;
 				}
 			}
 			else
 			{
-				GCCPALLIFBO += num;
-				if (GCCPALLIFBO >= 255)
+				lampOpacity += num;
+				if (lampOpacity >= 255)
 				{
-					GCCPALLIFBO = 255;
-					HPCHHDHGDAA = true;
-					ALHECCDENMO = MapGUI.JHLMDGBGGEP.CPLJCIFJAGN;
+					lampOpacity = 255;
+					isLampFadingOut = true;
+					flashPauseFrames = MapGUI.ZoneSwitchFade.DelayBeforeFade;
 				}
 			}
 			for (int i = 0; i < BBHOCFECAEM.Count; i++)
 			{
-				BBHOCFECAEM[i].targetGraphic.HNIHBGAOAIH(GCCPALLIFBO / 255);
+				BBHOCFECAEM[i].targetGraphic.SetAlpha(lampOpacity / 255);
 			}
 		}
 
 		private void ChangeLampIndicatorOpacity(List<ResolutionImage> IBMGHIHLOHP)
 		{
-			int hPJHAIALGHN = MapGUI.JHLMDGBGGEP.HPJHAIALGHN;
+			int hPJHAIALGHN = MapGUI.ZoneSwitchFade.FadeSpeed;
 			if (hPJHAIALGHN <= 0)
 			{
 				return;
 			}
 			int num = 255 / hPJHAIALGHN;
-			if (LOGDIAPFANM)
+			if (isIndicatorFadingOut)
 			{
-				DDAMPCFEAKL -= num;
-				if (DDAMPCFEAKL <= 0)
+				indicatorOpacity -= num;
+				if (indicatorOpacity <= 0)
 				{
-					DDAMPCFEAKL = 0;
-					LOGDIAPFANM = false;
+					indicatorOpacity = 0;
+					isIndicatorFadingOut = false;
 				}
 			}
 			else
 			{
-				DDAMPCFEAKL += num;
-				if (DDAMPCFEAKL >= 255)
+				indicatorOpacity += num;
+				if (indicatorOpacity >= 255)
 				{
-					DDAMPCFEAKL = 255;
-					LOGDIAPFANM = true;
-					ALHECCDENMO = MapGUI.JHLMDGBGGEP.CPLJCIFJAGN;
+					indicatorOpacity = 255;
+					isIndicatorFadingOut = true;
+					flashPauseFrames = MapGUI.ZoneSwitchFade.DelayBeforeFade;
 				}
 			}
 			for (int i = 0; i < IBMGHIHLOHP.Count; i++)
 			{
 				IBMGHIHLOHP[i].gameObject.SetActive(true);
-				UIExtensions.HNIHBGAOAIH(IBMGHIHLOHP[i], DDAMPCFEAKL / 255);
+				UIExtensions.SetAlpha(IBMGHIHLOHP[i], indicatorOpacity / 255);
 			}
 		}
 	}

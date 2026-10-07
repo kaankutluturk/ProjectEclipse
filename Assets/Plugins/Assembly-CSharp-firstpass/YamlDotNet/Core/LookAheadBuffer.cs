@@ -54,7 +54,7 @@ namespace YamlDotNet.Core
 			{
 				throw new ArgumentOutOfRangeException("offset", "The offset must be betwwen zero and the capacity of the buffer.");
 			}
-			CGGPDODMKCF(IPCOBJBKNAO);
+			Cache(IPCOBJBKNAO);
 			if (IPCOBJBKNAO < count)
 			{
 				return buffer[GetIndexForOffset(IPCOBJBKNAO)];
@@ -62,7 +62,7 @@ namespace YamlDotNet.Core
 			return '\0';
 		}
 
-		public void CGGPDODMKCF(int BDBOAEGELMC)
+		public void Cache(int BDBOAEGELMC)
 		{
 			while (BDBOAEGELMC >= count)
 			{

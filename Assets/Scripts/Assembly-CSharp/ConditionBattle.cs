@@ -4,28 +4,28 @@ public class ConditionBattle : ConditionCounter
 {
 	private string _type;
 
-	private BattleType JGEBALAKCIJ;
+	private BattleType _battleType;
 
 	public ConditionBattle(XmlNode node)
-		: base(FELOFIAKFCO.BATTLE)
+		: base(CounterConditionType.BATTLE)
 	{
 		Parse(node);
 	}
 
 	public override bool IsEqual(CounterConditions conditions)
 	{
-		bool dCJLKCFKCOM = conditions.BattleType == JGEBALAKCIJ;
+		bool dCJLKCFKCOM = conditions.BattleType == _battleType;
 		return IsNotCompare(dCJLKCFKCOM);
 	}
 
-	public override void AEPHNNABOEK()
+	public override void Initialize()
 	{
-		JGEBALAKCIJ = ListSF.GetInstance().HIDKFHHJBDH(_type);
+		_battleType = ListSF.GetInstance().GetBattleTypeByName(_type);
 	}
 
 	protected override void Parse(XmlNode node)
 	{
 		base.Parse(node);
-		_type = node.Attributes["Type"].CIPOICEEIBK(string.Empty);
+		_type = node.Attributes["Type"].GetStringOrDefault(string.Empty);
 	}
 }

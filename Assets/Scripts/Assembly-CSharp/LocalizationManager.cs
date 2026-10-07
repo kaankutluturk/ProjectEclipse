@@ -12,179 +12,179 @@ public class Language
 	{
 		public string name;
 
-		public string PMFEIPCHENB;
+		public string FilePath;
 
-		public string MMBELNEBNBM;
+		public string IconSprite;
 
-		public string OKGJAMBPDGO;
+		public string SelectedIconSprite;
 
-		public string EOMNCDDELLB;
+		public string Locale;
 
-		public string LOKLDPLAPOL;
+		public string Alias;
 
 		public int index;
 
-		public string JDCGKDHJLIC;
+		public string LoaderImage;
 
-		public string LEJJPMMGPAO;
+		public string PreloaderImage;
 
-		public bool MINNJBMGKLL;
+		public bool IsAsian;
 
-		public Font HKHFNJNDEND;
+		public Font ContentFont;
 
-		public Font APIDPJICKBC;
+		public Font TitleFont;
 
-		public Font LOICIDHBPMO;
+		public Font ButtonFont;
 
-		public string KPCPLLIGKCF;
+		public string ContentFontName;
 
-		public string DPPMDKCHIOA;
+		public string TitleFontName;
 
-		public string DPEBJGKEPOE;
+		public string ButtonFontName;
 
-		public float BJFEJHEJJHG = 1f;
+		public float FontSizeScale = 1f;
 
-		public float EDCKBHNGOHP = 1f;
+		public float LineSpacing = 1f;
 
-		public float EAALHHKBGHN = 1f;
+		public float CustomLineSpacingScale = 1f;
 
 		public Language(XmlNode MEEAKLDGLDF, int DCHCFFFFLLK)
 		{
-			name = MEEAKLDGLDF.Attributes["Name"].CIPOICEEIBK("Name");
-			EOMNCDDELLB = MEEAKLDGLDF.Attributes["Locale"].CIPOICEEIBK("Locale");
-			PMFEIPCHENB = SF2Paths.ENFGGKMDICD() + "/" + name + ".xml";
-			MMBELNEBNBM = "SettingsButtons." + MEEAKLDGLDF.Attributes["FileIcon"].CIPOICEEIBK("FileIcon");
+			name = MEEAKLDGLDF.Attributes["Name"].GetStringOrDefault("Name");
+			Locale = MEEAKLDGLDF.Attributes["Locale"].GetStringOrDefault("Locale");
+			FilePath = SF2Paths.GetLocalizationsPath() + "/" + name + ".xml";
+			IconSprite = "SettingsButtons." + MEEAKLDGLDF.Attributes["FileIcon"].GetStringOrDefault("FileIcon");
 			if (!MEEAKLDGLDF.Attributes["FileIconSelected"].Empty())
 			{
-				OKGJAMBPDGO = "SettingsButtons." + MEEAKLDGLDF.Attributes["FileIconSelected"].CIPOICEEIBK(string.Empty);
+				SelectedIconSprite = "SettingsButtons." + MEEAKLDGLDF.Attributes["FileIconSelected"].GetStringOrDefault(string.Empty);
 			}
 			index = DCHCFFFFLLK;
-			LOKLDPLAPOL = MEEAKLDGLDF.Attributes["Alias"].CIPOICEEIBK("Alias");
-			JDCGKDHJLIC = MEEAKLDGLDF.Attributes["LoaderImage"].CIPOICEEIBK("logo");
-			LEJJPMMGPAO = MEEAKLDGLDF.Attributes["PreloaderImage"].CIPOICEEIBK();
-			MINNJBMGKLL = MEEAKLDGLDF.Attributes["IsAsian"].ParseBool();
+			Alias = MEEAKLDGLDF.Attributes["Alias"].GetStringOrDefault("Alias");
+			LoaderImage = MEEAKLDGLDF.Attributes["LoaderImage"].GetStringOrDefault("logo");
+			PreloaderImage = MEEAKLDGLDF.Attributes["PreloaderImage"].GetStringOrDefault();
+			IsAsian = MEEAKLDGLDF.Attributes["IsAsian"].ParseBool();
 			if (MEEAKLDGLDF["Fonts"] != null)
 			{
-				JAEOIDEFOIJ(MEEAKLDGLDF["Fonts"], ref KPCPLLIGKCF, ref DPPMDKCHIOA, ref DPEBJGKEPOE, ref HKHFNJNDEND, ref APIDPJICKBC, ref LOICIDHBPMO);
-				BJFEJHEJJHG = MEEAKLDGLDF["Fonts"].Attributes["FontSizeScale"].ParseFloat(1f);
-				EDCKBHNGOHP = MEEAKLDGLDF["Fonts"].Attributes["LineSpacing"].ParseFloat(1f);
-				EAALHHKBGHN = MEEAKLDGLDF["Fonts"].Attributes["CustomLineSpacingScale"].ParseFloat(1f);
+				LoadFonts(MEEAKLDGLDF["Fonts"], ref ContentFontName, ref TitleFontName, ref ButtonFontName, ref ContentFont, ref TitleFont, ref ButtonFont);
+				FontSizeScale = MEEAKLDGLDF["Fonts"].Attributes["FontSizeScale"].ParseFloat(1f);
+				LineSpacing = MEEAKLDGLDF["Fonts"].Attributes["LineSpacing"].ParseFloat(1f);
+				CustomLineSpacingScale = MEEAKLDGLDF["Fonts"].Attributes["CustomLineSpacingScale"].ParseFloat(1f);
 			}
 		}
 
-		public void GHHCAJDOLFL()
+		public void LoadMissingFonts()
 		{
-			if (HKHFNJNDEND == null || DPPMDKCHIOA == null || DPEBJGKEPOE == null)
+			if (ContentFont == null || TitleFontName == null || ButtonFontName == null)
 			{
-				JAEOIDEFOIJ(KPCPLLIGKCF, DPPMDKCHIOA, DPEBJGKEPOE, ref HKHFNJNDEND, ref APIDPJICKBC, ref LOICIDHBPMO);
+				LoadFonts(ContentFontName, TitleFontName, ButtonFontName, ref ContentFont, ref TitleFont, ref ButtonFont);
 			}
 		}
 	}
 
-		private static Dictionary<string, string> KCAMAIIHKKH;
+		private static Dictionary<string, string> words;
 
 		private static readonly Dictionary<string, string> EclipseExternalStrings = new Dictionary<string, string>(StringComparer.Ordinal);
 
-	private const string OJPIOFPLHME = "UI/Fonts/";
+	private const string FontsPath = "UI/Fonts/";
 
-	public static bool FJLMLAGEJDL;
+	public static bool IsLoaded;
 
-	public static string POIPGLLCCKC;
+	public static string DefaultLanguageName;
 
-	public static List<Language> MCLNNPPCFFL;
+	public static List<Language> Languages;
 
-	public static Language ILAJKOBCHFH;
+	public static Language CurrentLanguage;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
 	[CompilerGenerated]
 	private static Action OnLanguageChanged;
 
-	private static string CBHGODGIABJ;
+	private static string defaultContentFontName;
 
-	private static Font KEAMIDNCCNN;
+	private static Font defaultContentFont;
 
-	private static string DJFPOPBPFGC;
+	private static string defaultTitleFontName;
 
-	private static Font IELPAJFFCIC;
+	private static Font defaultTitleFont;
 
-	private static string GBALNGFGCPI;
+	private static string defaultButtonFontName;
 
-	private static Font FKMPNFBPKCF;
+	private static Font defaultButtonFont;
 
-	public static Font HDOEFFOAEMP
+	public static Font ContentFont
 	{
 		get
 		{
-			return MBPJIKFOEBJ();
+			return GetContentFont();
 		}
 	}
 
-	public static Font OKDNDPCNJNO
+	public static Font TitleFont
 	{
 		get
 		{
-			return GNIENOIHLNO();
+			return GetTitleFont();
 		}
 	}
 
-	public static Font FJOGJJAKLGG
+	public static Font ButtonFont
 	{
 		get
 		{
-			return DIJFGLJHDBI();
+			return GetButtonFont();
 		}
 	}
 
-	public static float DMCFJFPGJNE
+	public static float FontSizeScale
 	{
 		get
 		{
-			return GCBEBEGKAOE();
+			return GetFontSizeScale();
 		}
 	}
 
-	public static float PNHLDAKNBOI
+	public static float LineSpacing
 	{
 		get
 		{
-			return DLGKFIICJMG();
+			return GetLineSpacing();
 		}
 	}
 
-	public static float ALODDAAKCEB
+	public static float CustomLineSpacingScale
 	{
 		get
 		{
-			return OKIIEMCLAHH();
+			return GetCustomLineSpacingScale();
 		}
 	}
 
-	public static bool MMJAKDAEGDM
+	public static bool HasCurrentLanguage
 	{
 		get
 		{
-			return KGEOCPBDJIF();
+			return GetHasCurrentLanguage();
 		}
 	}
 
-	public static event Action OCLBJLPOKLB
+	public static event Action LanguageChanged
 	{
 		add
 		{
-			LKFNMDCLMCD(value);
+			AddLanguageChangedHandler(value);
 		}
 		remove
 		{
-			FFIJPHDLPCF(value);
+			RemoveLanguageChangedHandler(value);
 		}
 	}
 
 	static LocalizationManager()
 	{
-		FJLMLAGEJDL = false;
+		IsLoaded = false;
 	}
 
-	public static void LKFNMDCLMCD(Action value)
+	public static void AddLanguageChangedHandler(Action value)
 	{
 		Action action = OnLanguageChanged;
 		Action action2;
@@ -196,7 +196,7 @@ public class Language
 		while ((object)action != action2);
 	}
 
-	public static void FFIJPHDLPCF(Action value)
+	public static void RemoveLanguageChangedHandler(Action value)
 	{
 		Action action = OnLanguageChanged;
 		Action action2;
@@ -208,20 +208,20 @@ public class Language
 		while ((object)action != action2);
 	}
 
-	public static Font MBPJIKFOEBJ()
+	public static Font GetContentFont()
 	{
-		if (ILAJKOBCHFH != null)
+		if (CurrentLanguage != null)
 		{
-			if (ILAJKOBCHFH.HKHFNJNDEND != null)
+			if (CurrentLanguage.ContentFont != null)
 			{
-				return ILAJKOBCHFH.HKHFNJNDEND;
+				return CurrentLanguage.ContentFont;
 			}
 		}
-		if (KEAMIDNCCNN == null)
+		if (defaultContentFont == null)
 		{
-			KEAMIDNCCNN = ResourcesAndBundles.Load<Font>("UI/Fonts/majallab");
+			defaultContentFont = ResourcesAndBundles.Load<Font>("UI/Fonts/majallab");
 		}
-		return KEAMIDNCCNN;
+		return defaultContentFont;
 	}
 
 	// Thin Eclipse modding seam. External strings are an overlay rather than destructive writes
@@ -229,7 +229,7 @@ public class Language
 	// canonical base value again, including for controlled core localization patches.
 	public static void SetExternalString(string key, string value)
 	{
-		if (KCAMAIIHKKH == null)
+		if (words == null)
 		{
 			throw new InvalidOperationException("LocalizationManager is not initialized.");
 		}
@@ -248,147 +248,147 @@ public class Language
 		}
 	}
 
-	public static Font GNIENOIHLNO()
+	public static Font GetTitleFont()
 	{
-		if (ILAJKOBCHFH != null)
+		if (CurrentLanguage != null)
 		{
-			if (ILAJKOBCHFH.APIDPJICKBC != null)
+			if (CurrentLanguage.TitleFont != null)
 			{
-				return ILAJKOBCHFH.APIDPJICKBC;
+				return CurrentLanguage.TitleFont;
 			}
 		}
-		if (IELPAJFFCIC == null)
+		if (defaultTitleFont == null)
 		{
-			IELPAJFFCIC = ResourcesAndBundles.Load<Font>("UI/Fonts/majallab");
+			defaultTitleFont = ResourcesAndBundles.Load<Font>("UI/Fonts/majallab");
 		}
-		return IELPAJFFCIC;
+		return defaultTitleFont;
 	}
 
-	public static Font DIJFGLJHDBI()
+	public static Font GetButtonFont()
 	{
-		if (ILAJKOBCHFH != null)
+		if (CurrentLanguage != null)
 		{
-			if (ILAJKOBCHFH.LOICIDHBPMO != null)
+			if (CurrentLanguage.ButtonFont != null)
 			{
-				return ILAJKOBCHFH.LOICIDHBPMO;
+				return CurrentLanguage.ButtonFont;
 			}
 		}
-		if (FKMPNFBPKCF == null)
+		if (defaultButtonFont == null)
 		{
-			FKMPNFBPKCF = ResourcesAndBundles.Load<Font>("UI/Fonts/majallab");
+			defaultButtonFont = ResourcesAndBundles.Load<Font>("UI/Fonts/majallab");
 		}
-		return FKMPNFBPKCF;
+		return defaultButtonFont;
 	}
 
-	public static float GCBEBEGKAOE()
+	public static float GetFontSizeScale()
 	{
-		if (ILAJKOBCHFH != null)
+		if (CurrentLanguage != null)
 		{
-			return ILAJKOBCHFH.BJFEJHEJJHG;
-		}
-		return 1f;
-	}
-
-	public static float DLGKFIICJMG()
-	{
-		if (ILAJKOBCHFH != null)
-		{
-			return ILAJKOBCHFH.EDCKBHNGOHP;
+			return CurrentLanguage.FontSizeScale;
 		}
 		return 1f;
 	}
 
-	public static float OKIIEMCLAHH()
+	public static float GetLineSpacing()
 	{
-		if (ILAJKOBCHFH != null)
+		if (CurrentLanguage != null)
 		{
-			return ILAJKOBCHFH.EAALHHKBGHN;
+			return CurrentLanguage.LineSpacing;
 		}
 		return 1f;
 	}
 
-	public static bool KGEOCPBDJIF()
+	public static float GetCustomLineSpacingScale()
 	{
-		return ILAJKOBCHFH != null;
+		if (CurrentLanguage != null)
+		{
+			return CurrentLanguage.CustomLineSpacingScale;
+		}
+		return 1f;
+	}
+
+	public static bool GetHasCurrentLanguage()
+	{
+		return CurrentLanguage != null;
 	}
 
 		public static void Init()
 		{
-			MCLNNPPCFFL = new List<Language>();
-			KCAMAIIHKKH = new Dictionary<string, string>();
+			Languages = new List<Language>();
+			words = new Dictionary<string, string>();
 			EclipseExternalStrings.Clear();
-			OEBFNIGOPDB();
-		foreach (Language item in MCLNNPPCFFL)
+			LoadLocalizationConfig();
+		foreach (Language item in Languages)
 		{
-			if (item.name == POIPGLLCCKC)
+			if (item.name == DefaultLanguageName)
 			{
-				ILAJKOBCHFH = item;
+				CurrentLanguage = item;
 				break;
 			}
 		}
-		NADENLPLKGC(null, false);
+		ApplyLanguage(null, false);
 	}
 
-	public static void OEBFNIGOPDB()
+	public static void LoadLocalizationConfig()
 	{
 		string text = "/localization.xml";
-		string text2 = SF2Paths.KKIDGPBOBNI();
+		string text2 = SF2Paths.GetGameDataPath();
 		XmlDocument xmlDocument = XmlUtils.OpenXMLDocument(text2 + text, string.Empty);
 		if (xmlDocument != null)
 		{
 			XmlNode xmlNode = xmlDocument["Localization"]["DefaultFonts"];
 			if (xmlNode != null)
 			{
-				JAEOIDEFOIJ(xmlNode, ref CBHGODGIABJ, ref DJFPOPBPFGC, ref GBALNGFGCPI, ref KEAMIDNCCNN, ref IELPAJFFCIC, ref FKMPNFBPKCF);
-				if (KEAMIDNCCNN == null || IELPAJFFCIC == null || FKMPNFBPKCF == null)
+				LoadFonts(xmlNode, ref defaultContentFontName, ref defaultTitleFontName, ref defaultButtonFontName, ref defaultContentFont, ref defaultTitleFont, ref defaultButtonFont);
+				if (defaultContentFont == null || defaultTitleFont == null || defaultButtonFont == null)
 				{
-					LLLOJBFMONN.Error(string.Format("ERROR: LoadFonts: one or more defalut font is missing"));
+					GameLog.Error(string.Format("ERROR: LoadFonts: one or more defalut font is missing"));
 				}
 			}
 			else
 			{
-				LLLOJBFMONN.Error("ERROR: LocalizationManager.LoadLocalization - wrong file");
+				GameLog.Error("ERROR: LocalizationManager.LoadLocalization - wrong file");
 			}
 			XmlNode xmlNode2 = xmlDocument["Localization"]["Languages"];
 			if (xmlNode2 != null)
 			{
-				COAMAKOABOP(xmlNode2);
+				ParseLanguages(xmlNode2);
 			}
 			else
 			{
-				LLLOJBFMONN.Error("ERROR: LocalizationManager.LoadLocalization - wrong file");
+				GameLog.Error("ERROR: LocalizationManager.LoadLocalization - wrong file");
 			}
 		}
 		else
 		{
-			LLLOJBFMONN.Error(string.Format("ERROR: LoadLocalization - file \"{0}\" doesn't exist", text2 + text));
+			GameLog.Error(string.Format("ERROR: LoadLocalization - file \"{0}\" doesn't exist", text2 + text));
 		}
 	}
 
-	private static void JAEOIDEFOIJ(XmlNode HPGOCHNDPOO, ref string LICDEKGKFOG, ref string PGFDIINNPIP, ref string KIAADBBGNOI, ref Font CCJIANGGFEF, ref Font DHOMOPOLLGH, ref Font PDENGPGFJOB)
+	private static void LoadFonts(XmlNode HPGOCHNDPOO, ref string LICDEKGKFOG, ref string PGFDIINNPIP, ref string KIAADBBGNOI, ref Font CCJIANGGFEF, ref Font DHOMOPOLLGH, ref Font PDENGPGFJOB)
 	{
-		LICDEKGKFOG = HPGOCHNDPOO.Attributes["ContentFont"].CIPOICEEIBK(string.Empty);
-		PGFDIINNPIP = HPGOCHNDPOO.Attributes["TitleFont"].CIPOICEEIBK(string.Empty);
-		KIAADBBGNOI = HPGOCHNDPOO.Attributes["ButtonFont"].CIPOICEEIBK(string.Empty);
-		JAEOIDEFOIJ(LICDEKGKFOG, PGFDIINNPIP, KIAADBBGNOI, ref CCJIANGGFEF, ref DHOMOPOLLGH, ref PDENGPGFJOB);
+		LICDEKGKFOG = HPGOCHNDPOO.Attributes["ContentFont"].GetStringOrDefault(string.Empty);
+		PGFDIINNPIP = HPGOCHNDPOO.Attributes["TitleFont"].GetStringOrDefault(string.Empty);
+		KIAADBBGNOI = HPGOCHNDPOO.Attributes["ButtonFont"].GetStringOrDefault(string.Empty);
+		LoadFonts(LICDEKGKFOG, PGFDIINNPIP, KIAADBBGNOI, ref CCJIANGGFEF, ref DHOMOPOLLGH, ref PDENGPGFJOB);
 	}
 
-	private static void JAEOIDEFOIJ(string LICDEKGKFOG, string PGFDIINNPIP, string KIAADBBGNOI, ref Font CCJIANGGFEF, ref Font DHOMOPOLLGH, ref Font PDENGPGFJOB)
+	private static void LoadFonts(string LICDEKGKFOG, string PGFDIINNPIP, string KIAADBBGNOI, ref Font CCJIANGGFEF, ref Font DHOMOPOLLGH, ref Font PDENGPGFJOB)
 	{
 		CCJIANGGFEF = ResourcesAndBundles.Load<Font>("UI/Fonts/" + LICDEKGKFOG);
 		DHOMOPOLLGH = ResourcesAndBundles.Load<Font>("UI/Fonts/" + PGFDIINNPIP);
 		PDENGPGFJOB = ResourcesAndBundles.Load<Font>("UI/Fonts/" + KIAADBBGNOI);
 	}
 
-	private static void COAMAKOABOP(XmlNode DAENMBIHKEB)
+	private static void ParseLanguages(XmlNode DAENMBIHKEB)
 	{
-		POIPGLLCCKC = DAENMBIHKEB.Attributes["Default"].CIPOICEEIBK(string.Empty);
-		MCLNNPPCFFL.Clear();
+		DefaultLanguageName = DAENMBIHKEB.Attributes["Default"].GetStringOrDefault(string.Empty);
+		Languages.Clear();
 		int num = 0;
 		foreach (XmlNode childNode in DAENMBIHKEB.ChildNodes)
 		{
 			Language item = new Language(childNode, num);
-			MCLNNPPCFFL.Add(item);
+			Languages.Add(item);
 			num++;
 		}
 	}
@@ -397,14 +397,14 @@ public class Language
 	// logging a missing-key error for every frame or displaying %%ERROR%%.
 	internal static string GetStringOrDefault(string key, string fallback, params string[] arguments)
 	{
-		if (string.IsNullOrEmpty(key) || ILAJKOBCHFH == null ||
-			(!EclipseExternalStrings.ContainsKey(key) && (KCAMAIIHKKH == null || !KCAMAIIHKKH.ContainsKey(key)))) return fallback;
+		if (string.IsNullOrEmpty(key) || CurrentLanguage == null ||
+			(!EclipseExternalStrings.ContainsKey(key) && (words == null || !words.ContainsKey(key)))) return fallback;
 		return GetString(key, arguments);
 	}
 
 	public static string GetString(string PEMOECLNECD, params string[] JCICKLIMBEF)
 	{
-		if (PEMOECLNECD == null || ILAJKOBCHFH == null)
+		if (PEMOECLNECD == null || CurrentLanguage == null)
 		{
 			return string.Empty;
 		}
@@ -422,11 +422,11 @@ public class Language
 			key = PEMOECLNECD.Substring(0, num).TrimEnd();
 		}
 			string text;
-			if (!EclipseExternalStrings.TryGetValue(key, out text) && !KCAMAIIHKKH.TryGetValue(key, out text))
+			if (!EclipseExternalStrings.TryGetValue(key, out text) && !words.TryGetValue(key, out text))
 			{
 				if (PEMOECLNECD != string.Empty)
 				{
-					LLLOJBFMONN.Error(string.Format("ERROR: localization does not contain title \"{0}\"", PEMOECLNECD));
+					GameLog.Error(string.Format("ERROR: localization does not contain title \"{0}\"", PEMOECLNECD));
 				}
 				return "%%ERROR%%";
 			}
@@ -439,18 +439,18 @@ public class Language
 		{
 			if (list.Count != 0)
 			{
-				LLLOJBFMONN.Error(string.Format("ERROR: GetString - parameters passed both through arguments and title in \"{0}\"", PEMOECLNECD));
+				GameLog.Error(string.Format("ERROR: GetString - parameters passed both through arguments and title in \"{0}\"", PEMOECLNECD));
 			}
 			for (int num2 = num; num2 != -1; num2 = PEMOECLNECD.IndexOf('{', num2 + 1))
 			{
 				int num3 = PEMOECLNECD.IndexOf('}', num2 + 1);
 				if ((num3 > PEMOECLNECD.IndexOf('{', num2 + 1) && PEMOECLNECD.IndexOf('{', num2 + 1) != -1) || num3 == -1)
 				{
-					LLLOJBFMONN.Error(string.Format("ERROR: GetString - parameters brackets broken in title \"{0}\"", PEMOECLNECD));
+					GameLog.Error(string.Format("ERROR: GetString - parameters brackets broken in title \"{0}\"", PEMOECLNECD));
 					break;
 				}
 				string bFFNFGKHBJA = PEMOECLNECD.Substring(num2 + 1, num3 - num2 - 1);
-				bFFNFGKHBJA = CAKFDPGBLLG(bFFNFGKHBJA);
+				bFFNFGKHBJA = ResolveEmbeddedKeys(bFFNFGKHBJA);
 				list.Add(bFFNFGKHBJA);
 			}
 		}
@@ -461,7 +461,7 @@ public class Language
 				int num5 = text.IndexOf('}', num4 + 1);
 				if ((num5 > text.IndexOf('{', num4 + 1) && text.IndexOf('{', num4 + 1) != -1) || num5 == -1)
 				{
-					LLLOJBFMONN.Error(string.Format("ERROR: GetString - parameters brackets broken in content of title \"{0}\"", PEMOECLNECD));
+					GameLog.Error(string.Format("ERROR: GetString - parameters brackets broken in content of title \"{0}\"", PEMOECLNECD));
 					break;
 				}
 				string text2 = text.Substring(num4 + 1, num5 - num4 - 1);
@@ -479,7 +479,7 @@ public class Language
 				text = text.Replace(oldValue, text3);
 			}
 		}
-		return CAKFDPGBLLG(text);
+		return ResolveEmbeddedKeys(text);
 	}
 
 	public static string DateString(long NNBJNDAFEDH)
@@ -488,7 +488,7 @@ public class Language
 		return string.Format("{0}.{1}.{2}", dateTime.Day, dateTime.Month, dateTime.Year);
 	}
 
-	private static string CAKFDPGBLLG(string BFFNFGKHBJA)
+	private static string ResolveEmbeddedKeys(string BFFNFGKHBJA)
 	{
 		string text = BFFNFGKHBJA;
 		for (int num = text.IndexOf('%'); num != -1; num = text.IndexOf('%', num + 1))
@@ -525,26 +525,26 @@ public class Language
 		return num;
 	}
 
-	public static Language KNEELNNCIBG(Language DLKMOGEJJCO = null)
+	public static Language GetNextLanguage(Language DLKMOGEJJCO = null)
 	{
 		if (DLKMOGEJJCO == null)
 		{
-			DLKMOGEJJCO = ILAJKOBCHFH;
+			DLKMOGEJJCO = CurrentLanguage;
 		}
 		int iHPMGHJPLBP = DLKMOGEJJCO.index;
-		int count = MCLNNPPCFFL.Count;
+		int count = Languages.Count;
 		iHPMGHJPLBP = (iHPMGHJPLBP + 1) % count;
-		return MCLNNPPCFFL[iHPMGHJPLBP];
+		return Languages[iHPMGHJPLBP];
 	}
 
-	public static Language NLFKNPBICED(string KEEACJILEEK)
+	public static Language FindLanguageByName(string KEEACJILEEK)
 	{
-		return MCLNNPPCFFL.Find((Language DHDMNHCIPEH) => DHDMNHCIPEH.name.Equals(KEEACJILEEK));
+		return Languages.Find((Language DHDMNHCIPEH) => DHDMNHCIPEH.name.Equals(KEEACJILEEK));
 	}
 
-	public static Language HHKANICOAAG(string EOMNCDDELLB)
+	public static Language FindLanguageByLocale(string EOMNCDDELLB)
 	{
-		return MCLNNPPCFFL.Find((Language DHDMNHCIPEH) => DHDMNHCIPEH.EOMNCDDELLB.Equals(EOMNCDDELLB));
+		return Languages.Find((Language DHDMNHCIPEH) => DHDMNHCIPEH.Locale.Equals(EOMNCDDELLB));
 	}
 
 	private static void Load(string PMFEIPCHENB)
@@ -553,69 +553,69 @@ public class Language
 		XmlDocument xmlDocument = XmlUtils.OpenXMLDocument(PMFEIPCHENB, string.Empty);
 		if (xmlDocument != null)
 		{
-			DGHGCAHEHJN(xmlDocument["Localization"]["Words"]);
-			FJLMLAGEJDL = true;
+			ParseWords(xmlDocument["Localization"]["Words"]);
+			IsLoaded = true;
 		}
 		else
 		{
-			LLLOJBFMONN.Error(string.Format("ERROR: load - file \"{0}\" doesn't exist", PMFEIPCHENB));
+			GameLog.Error(string.Format("ERROR: load - file \"{0}\" doesn't exist", PMFEIPCHENB));
 		}
 	}
 
-	private static void DGHGCAHEHJN(XmlNode FOKEBDFAEEA)
+	private static void ParseWords(XmlNode FOKEBDFAEEA)
 	{
 		foreach (XmlNode childNode in FOKEBDFAEEA.ChildNodes)
 		{
 			if (childNode.NodeType == XmlNodeType.Element)
 			{
-				KCAMAIIHKKH[childNode.Attributes["Title"].CIPOICEEIBK(string.Empty)] = childNode.InnerText;
+				words[childNode.Attributes["Title"].GetStringOrDefault(string.Empty)] = childNode.InnerText;
 			}
 		}
 	}
 
-	private static void NADENLPLKGC(Language DLKMOGEJJCO = null, bool DANDCEBFMHM = true)
+	private static void ApplyLanguage(Language DLKMOGEJJCO = null, bool DANDCEBFMHM = true)
 	{
 		if (DLKMOGEJJCO == null)
 		{
-			DLKMOGEJJCO = ILAJKOBCHFH;
+			DLKMOGEJJCO = CurrentLanguage;
 		}
-		if (!GGBKNBFCBEJ(DLKMOGEJJCO))
+		if (!HasAllFonts(DLKMOGEJJCO))
 		{
-			LLLOJBFMONN.Error(string.Format("ERROR: Language \"{0}\" doesn't have fonts", DLKMOGEJJCO.name));
+			GameLog.Error(string.Format("ERROR: Language \"{0}\" doesn't have fonts", DLKMOGEJJCO.name));
 		}
-		Load(DLKMOGEJJCO.PMFEIPCHENB);
-		ILAJKOBCHFH = DLKMOGEJJCO;
-		if (ILAJKOBCHFH != null)
+		Load(DLKMOGEJJCO.FilePath);
+		CurrentLanguage = DLKMOGEJJCO;
+		if (CurrentLanguage != null)
 		{
-			ILAJKOBCHFH.GHHCAJDOLFL();
+			CurrentLanguage.LoadMissingFonts();
 		}
 		if (DANDCEBFMHM)
 		{
-			ListSF.CCDKHLAMKKO().COKACMKOIGD(DLKMOGEJJCO.name);
-			ListSF.CCDKHLAMKKO().GGGEHAGCLGC();
+			ListSF.GetRoster().SetLanguage(DLKMOGEJJCO.name);
+			ListSF.GetRoster().RequestSave();
 		}
 	}
 
 	private static void Clear()
 	{
-		KCAMAIIHKKH.Clear();
+		words.Clear();
 		EclipseExternalStrings.Clear();
-		FJLMLAGEJDL = false;
+		IsLoaded = false;
 	}
 
-	public static bool GGBKNBFCBEJ(Language HBGOBBALPBP)
+	public static bool HasAllFonts(Language HBGOBBALPBP)
 	{
 		if (HBGOBBALPBP != null)
 		{
-			if (HBGOBBALPBP.LOICIDHBPMO == null)
+			if (HBGOBBALPBP.ButtonFont == null)
 			{
 				return false;
 			}
-			if (HBGOBBALPBP.HKHFNJNDEND == null)
+			if (HBGOBBALPBP.ContentFont == null)
 			{
 				return false;
 			}
-			if (HBGOBBALPBP.APIDPJICKBC == null)
+			if (HBGOBBALPBP.TitleFont == null)
 			{
 				return false;
 			}
@@ -624,15 +624,15 @@ public class Language
 		return false;
 	}
 
-	public static void BJPNKAGDKFL(Language HBGOBBALPBP = null)
+	public static void ChangeLanguage(Language HBGOBBALPBP = null)
 	{
 		if (HBGOBBALPBP != null)
 		{
-			NADENLPLKGC(HBGOBBALPBP);
+			ApplyLanguage(HBGOBBALPBP);
 		}
 		else
 		{
-			NADENLPLKGC(KNEELNNCIBG());
+			ApplyLanguage(GetNextLanguage());
 		}
 		if (OnLanguageChanged != null)
 		{

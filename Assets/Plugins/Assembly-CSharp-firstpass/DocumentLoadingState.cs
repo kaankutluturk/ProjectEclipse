@@ -10,7 +10,7 @@ internal class DocumentLoadingState
 
 	private readonly IList<YamlNode> nodesWithUnresolvedAliases = new List<YamlNode>();
 
-	public void BOKLCAFFHOD(YamlNode node)
+	public void AddAnchor(YamlNode node)
 	{
 		if (node.Anchor == null)
 		{
@@ -37,16 +37,16 @@ internal class DocumentLoadingState
 		return null;
 	}
 
-	public void GOGDMGMHFOK(YamlNode node)
+	public void AddNodeWithUnresolvedAliases(YamlNode node)
 	{
 		nodesWithUnresolvedAliases.Add(node);
 	}
 
-	public void GPBMMFCHANP()
+	public void ResolveAliases()
 	{
 		foreach (YamlNode item in nodesWithUnresolvedAliases)
 		{
-			item.GPBMMFCHANP(this);
+			item.ResolveAliases(this);
 		}
 	}
 }

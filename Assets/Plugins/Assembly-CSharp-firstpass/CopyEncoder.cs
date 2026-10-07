@@ -11,7 +11,7 @@ internal class CopyEncoder
 		int num = 0;
 		if (NILNDHEKNLJ != null)
 		{
-			num = Math.Min(NILNDHEKNLJ.OFOPFCJNEBL(), output.JBPBBAEEAFO() - 5 - output.DBBLKJPGAOO());
+			num = Math.Min(NILNDHEKNLJ.GetCount(), output.GetFreeBytes() - 5 - output.GetBitsInBuffer());
 			if (num > 65531)
 			{
 				num = 65531;
@@ -19,22 +19,22 @@ internal class CopyEncoder
 		}
 		if (JDHJLBBIKLM)
 		{
-			output.EHFDJAJPOAO(3, 1u);
+			output.WriteBits(3, 1u);
 		}
 		else
 		{
-			output.EHFDJAJPOAO(3, 0u);
+			output.WriteBits(3, 0u);
 		}
-		output.NOOJGJGNLBL();
-		HPGIOFEMBJM((ushort)num, output);
+		output.FlushBits();
+		WriteLenNLen((ushort)num, output);
 		if (NILNDHEKNLJ != null && num > 0)
 		{
-			output.FJPANBOJJDI(NILNDHEKNLJ.FAJIIIFCCPD(), NILNDHEKNLJ.JHGJIJNGNBO(), num);
-			NILNDHEKNLJ.MBODOPCOFFE(num);
+			output.WriteBytes(NILNDHEKNLJ.GetBuffer(), NILNDHEKNLJ.GetStartIndex(), num);
+			NILNDHEKNLJ.ConsumeBytes(num);
 		}
 	}
 
-	private void HPGIOFEMBJM(ushort JCAJDBOMGOM, OutputBuffer output)
+	private void WriteLenNLen(ushort JCAJDBOMGOM, OutputBuffer output)
 	{
 		output.WriteUInt16(JCAJDBOMGOM);
 		ushort bAINMLLIKOL = (ushort)(~JCAJDBOMGOM);

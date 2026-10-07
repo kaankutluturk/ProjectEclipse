@@ -1,24 +1,24 @@
 internal struct BitTreeEncoder
 {
-	private BitEncoder[] LNDLFINJHDB;
+	private BitEncoder[] Models;
 
 	private int NumBitLevels;
 
 	public BitTreeEncoder(int PLIPKMLGGIP)
 	{
 		NumBitLevels = PLIPKMLGGIP;
-		LNDLFINJHDB = new BitEncoder[1 << PLIPKMLGGIP];
+		Models = new BitEncoder[1 << PLIPKMLGGIP];
 	}
 
 	public void Init()
 	{
 		for (uint num = 1u; num < 1 << NumBitLevels; num++)
 		{
-			LNDLFINJHDB[num].Init();
+			Models[num].Init();
 		}
 	}
 
-	public void Encode(ABCAONADOMK JHAAEJNODIF, uint symbol)
+	public void Encode(RangeEncoder JHAAEJNODIF, uint symbol)
 	{
 		uint num = 1u;
 		int num2 = NumBitLevels;
@@ -26,18 +26,18 @@ internal struct BitTreeEncoder
 		{
 			num2--;
 			uint num3 = (symbol >> num2) & 1;
-			LNDLFINJHDB[num].Encode(JHAAEJNODIF, num3);
+			Models[num].Encode(JHAAEJNODIF, num3);
 			num = (num << 1) | num3;
 		}
 	}
 
-	public void INFLKOLKKHG(ABCAONADOMK JHAAEJNODIF, uint symbol)
+	public void ReverseEncode(RangeEncoder JHAAEJNODIF, uint symbol)
 	{
 		uint num = 1u;
 		for (uint num2 = 0u; num2 < NumBitLevels; num2++)
 		{
 			uint num3 = symbol & 1;
-			LNDLFINJHDB[num].Encode(JHAAEJNODIF, num3);
+			Models[num].Encode(JHAAEJNODIF, num3);
 			num = (num << 1) | num3;
 			symbol >>= 1;
 		}
@@ -52,13 +52,13 @@ internal struct BitTreeEncoder
 		{
 			num3--;
 			uint num4 = (symbol >> num3) & 1;
-			num += LNDLFINJHDB[num2].GetPrice(num4);
+			num += Models[num2].GetPrice(num4);
 			num2 = (num2 << 1) + num4;
 		}
 		return num;
 	}
 
-	public uint NCEFHMCLCPM(uint symbol)
+	public uint ReverseGetPrice(uint symbol)
 	{
 		uint num = 0u;
 		uint num2 = 1u;
@@ -66,13 +66,13 @@ internal struct BitTreeEncoder
 		{
 			uint num4 = symbol & 1;
 			symbol >>= 1;
-			num += LNDLFINJHDB[num2].GetPrice(num4);
+			num += Models[num2].GetPrice(num4);
 			num2 = (num2 << 1) | num4;
 		}
 		return num;
 	}
 
-	public static uint NCEFHMCLCPM(BitEncoder[] LNDLFINJHDB, uint CAILGDNIKJD, int NumBitLevels, uint symbol)
+	public static uint ReverseGetPrice(BitEncoder[] LNDLFINJHDB, uint CAILGDNIKJD, int NumBitLevels, uint symbol)
 	{
 		uint num = 0u;
 		uint num2 = 1u;
@@ -86,7 +86,7 @@ internal struct BitTreeEncoder
 		return num;
 	}
 
-	public static void INFLKOLKKHG(BitEncoder[] LNDLFINJHDB, uint CAILGDNIKJD, ABCAONADOMK JHAAEJNODIF, int NumBitLevels, uint symbol)
+	public static void ReverseEncode(BitEncoder[] LNDLFINJHDB, uint CAILGDNIKJD, RangeEncoder JHAAEJNODIF, int NumBitLevels, uint symbol)
 	{
 		uint num = 1u;
 		for (int i = 0; i < NumBitLevels; i++)

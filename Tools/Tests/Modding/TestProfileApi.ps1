@@ -23,11 +23,11 @@ public static class NativeProfileFixture {
  public static class ListSF {public static Catalog Items=new Catalog();public static Catalog GetItems()=>Items;}
 
  public class Enchantment { public string Name; }
- public class InventoryItem { public List<Enchantment> Enchantments=new List<Enchantment>();public List<Enchantment> GetEnchantments()=>Enchantments; public string Name="WEAPON_NUNCHAKU";public string get_Name()=>Name;public ItemMetadata Metadata=new ItemMetadata();public ItemMetadata BHKHOJPANHE()=>Metadata; public int Count=2; public bool EFMFGEPDAOP()=>true; public int DHNNCAEEMLL()=>3; }
- public class Inventory { public List<InventoryItem> Equipped=new List<InventoryItem>();public List<InventoryItem> JCMOHPFKPBO()=>Equipped; public InventoryItem Item=new InventoryItem(); public string Name; public InventoryItem CMGOCLGHNLH(string name){Name=name;return Item;} }
- public class Perk { public int Upgrade=2; public string get_Name()=>"TEST_PERK";public int DHNNCAEEMLL()=>Upgrade; }
- public class Perks { public System.Collections.Generic.List<Perk> Values=new System.Collections.Generic.List<Perk>();public System.Collections.Generic.List<Perk> KEHFPLBNDHI()=>Values; }
- public class Roster { public Perks Perks=new Perks();public Perks JLBDOBLHHAF()=>Perks;public int Level=12; public Inventory Items=new Inventory(); public Inventory KHCNHPCPFII()=>Items; }
+ public class InventoryItem { public List<Enchantment> Enchantments=new List<Enchantment>();public List<Enchantment> GetEnchantments()=>Enchantments; public string Name="WEAPON_NUNCHAKU";public string get_Name()=>Name;public ItemMetadata Metadata=new ItemMetadata();public ItemMetadata GetInfo()=>Metadata; public int Count=2; public bool GetIsEquipped()=>true; public int GetUpgradeLevel()=>3; }
+ public class Inventory { public List<InventoryItem> Equipped=new List<InventoryItem>();public List<InventoryItem> GetEquippedItems()=>Equipped; public InventoryItem Item=new InventoryItem(); public string Name; public InventoryItem FindItem(string name){Name=name;return Item;} }
+ public class Perk { public int Upgrade=2; public string get_Name()=>"TEST_PERK";public int GetUpgradeLevel()=>Upgrade; }
+ public class Perks { public System.Collections.Generic.List<Perk> Values=new System.Collections.Generic.List<Perk>();public System.Collections.Generic.List<Perk> GetPerks()=>Values; }
+ public class Roster { public Perks Perks=new Perks();public Perks GetPerks()=>Perks;public int Level=12; public Inventory Items=new Inventory(); public Inventory GetInventory()=>Items; }
  public class Scripts {public ModContentCatalog Content;}
  private static Roster _profileRoster;
  private static Scripts _scripts;

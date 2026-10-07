@@ -11,7 +11,7 @@ namespace Nekki.SF2.GUI
 		[SerializeField]
 		private List<UIModule> _MountOnLater = new List<UIModule>();
 
-		public List<UIModule> IHMDPCLNOEK
+		public List<UIModule> MountOnStartModules
 		{
 			get
 			{
@@ -19,7 +19,7 @@ namespace Nekki.SF2.GUI
 			}
 		}
 
-		public List<UIModule> CBMFBELIEPI
+		public List<UIModule> MountOnLaterModules
 		{
 			get
 			{
@@ -42,22 +42,22 @@ namespace Nekki.SF2.GUI
 			return base.gameObject.GetComponent<Canvas>();
 		}
 
-		protected virtual void IJDCAJHLJEJ()
+		protected virtual void OnBeforeMount()
 		{
 		}
 
-		protected virtual bool AAEAEIJJGHA()
+		protected virtual bool ShouldMountModules()
 		{
 			return true;
 		}
 
 		protected virtual void Awake()
 		{
-			IJDCAJHLJEJ();
-			KIEDCKJMDLK();
+			OnBeforeMount();
+			MountModules();
 		}
 
-		private void KIEDCKJMDLK()
+		private void MountModules()
 		{
 			foreach (UIModule item in _MountOnStart)
 			{
@@ -73,7 +73,7 @@ namespace Nekki.SF2.GUI
 		{
 		}
 
-		protected T IMDHIBMOAIG<T>() where T : UIModule
+		protected T GetModule<T>() where T : UIModule
 		{
 			return UIModule.GetModule<T>();
 		}
@@ -86,12 +86,12 @@ namespace Nekki.SF2.GUI
 		public List<UIModule> ActiveModule()
 		{
 			List<UIModule> list = new List<UIModule>();
-			PODGOONOGHK(_MountOnStart, list);
-			PODGOONOGHK(_MountOnLater, list);
+			CollectActiveModules(_MountOnStart, list);
+			CollectActiveModules(_MountOnLater, list);
 			return list;
 		}
 
-		protected static void PODGOONOGHK(List<UIModule> NGGBNMCECLM, List<UIModule> AMKKLMOONEP)
+		protected static void CollectActiveModules(List<UIModule> NGGBNMCECLM, List<UIModule> AMKKLMOONEP)
 		{
 			for (int i = 0; i < NGGBNMCECLM.Count; i++)
 			{

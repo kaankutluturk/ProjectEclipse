@@ -3,22 +3,22 @@ using System.Collections.Generic;
 
 public class TrickInfo
 {
-	public string HHAAFADDOJB;
+	public string Title;
 
-	public string EMDJGBHIAIA;
+	public string Description;
 
-	public List<float> CKKFKEIELCP;
+	public List<float> AttackDamages;
 
-	public InfoAnimation EMBBNNBFODN;
+	public InfoAnimation Animation;
 
-	public Action<object> ODDEOFKLIAG;
+	public Action<object> OnClickCallback;
 
 	public TrickInfo(string PGAFPNEHHLB, InfoAnimation HMMCEHGINBG, List<float> JOGLLIIGDMN, Action<object> _dlg = null, string _description = "")
 	{
-		HHAAFADDOJB = PGAFPNEHHLB;
-		EMDJGBHIAIA = _description;
-		EMBBNNBFODN = HMMCEHGINBG;
-		CKKFKEIELCP = JOGLLIIGDMN;
-		ODDEOFKLIAG = _dlg;
+		Title = PGAFPNEHHLB;
+		Description = _description;
+		Animation = HMMCEHGINBG;
+		AttackDamages = JOGLLIIGDMN;
+		OnClickCallback = _dlg;
 	}
 }

@@ -1,10 +1,10 @@
 public class PlayersFightData
 {
-	public FightData MPLPEMOFHGI = new FightData();
+	public FightData PlayerData = new FightData();
 
-	public FightData EKBMBILHBMC = new FightData();
+	public FightData EnemyData = new FightData();
 
 	public int SlowMode;
 
-	public RuleAppliance AHAAFDCHKOG;
+	public RuleAppliance Appliance;
 }

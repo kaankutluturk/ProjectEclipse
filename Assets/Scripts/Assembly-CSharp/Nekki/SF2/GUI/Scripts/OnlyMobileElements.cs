@@ -11,7 +11,7 @@ namespace Nekki.SF2.GUI.Scripts
 		{
 			foreach (GameObject element in Elements)
 			{
-				element.SetActive(SystemProperties.DBBOCENKMGD());
+				element.SetActive(SystemProperties.IsDebug());
 			}
 		}
 	}

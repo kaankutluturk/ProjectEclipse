@@ -3,7 +3,7 @@ $ErrorActionPreference = 'Stop'
 $root = Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $PSScriptRoot))
 $source = Get-Content -Raw (Join-Path $root 'Assets/Plugins/Assembly-CSharp-firstpass/ConditionExtension.cs')
 $fixture = @'
-public static class LLLOJBFMONN
+public static class GameLog
 {
     public static void Write(string text, params object[] args) { }
     public static void Error(string text, params object[] args) { throw new System.Exception(text); }
@@ -16,22 +16,22 @@ public class StrangerExpressionRegression : ConditionExtension
 {
     public int Level;
     public int Trigger;
-    protected override void IDHOFHMDIPL(string value, CompareResult result)
+    protected override void ResolveSessionVariable(string value, CompareResult result)
     {
         if (value != "_StrangerTriggerLevel") throw new System.Exception("Unexpected variable: " + value);
         result.resultNumber = Trigger;
     }
-    protected override void AIFNPKLNPEE(QuestFunctions function, CompareResult result)
+    protected override void FullFunction(QuestFunctions function, CompareResult result)
     {
-        switch (function.FJLOLCPJACB)
+        switch (function.functionName)
         {
             case "Player":
-                if (function.HBDLDIKHFEG != "Level") throw new System.Exception("Unknown player property: " + function.HBDLDIKHFEG);
+                if (function.property != "Level") throw new System.Exception("Unknown player property: " + function.property);
                 result.resultNumber = Level;
                 break;
-            case "Mod": MDENBJJAPMH(function, result, KDEAPAPEEAO.MATH_MOD); break;
-            case "Sum": MDENBJJAPMH(function, result, KDEAPAPEEAO.MATH_SUM); break;
-            default: throw new System.Exception("Unexpected function: " + function.FJLOLCPJACB);
+            case "Mod": MathFunction(function, result, MathFunctionType.MATH_MOD); break;
+            case "Sum": MathFunction(function, result, MathFunctionType.MATH_SUM); break;
+            default: throw new System.Exception("Unexpected function: " + function.functionName);
         }
     }
     public static void Run(string condition, string action)
@@ -42,12 +42,12 @@ public class StrangerExpressionRegression : ConditionExtension
             evaluator.Level = level;
             evaluator.Trigger = level + 1;
             var result = new CompareResult();
-            evaluator.MCPIOGALBMK(evaluator.ClearGaps(condition), result);
-            if (!result.INCOIAANDCO() || result.resultNumber != level % 6)
+            evaluator.SetValue(evaluator.ClearGaps(condition), result);
+            if (!result.IsNumber() || result.resultNumber != level % 6)
                 throw new System.Exception("Wrong level remainder at " + level);
             result = new CompareResult();
-            evaluator.MCPIOGALBMK(action, result);
-            if (!result.INCOIAANDCO() || result.resultNumber != evaluator.Trigger + 1)
+            evaluator.SetValue(action, result);
+            if (!result.IsNumber() || result.resultNumber != evaluator.Trigger + 1)
                 throw new System.Exception("Wrong trigger increment at " + level);
         }
         System.Console.WriteLine("PASS: live Stranger quest expressions evaluate correctly at all 52 levels.");

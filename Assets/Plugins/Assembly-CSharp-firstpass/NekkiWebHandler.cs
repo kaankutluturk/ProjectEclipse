@@ -4,126 +4,126 @@ public class NekkiWebHandler : DownloadHandlerScript
 {
 	private const int preallocatedSize = 8192;
 
-	private readonly NekkiUri JDNMLANMPPK;
+	private readonly NekkiUri _uri;
 
-	private bool OOGCKMCGAAH;
+	private bool _isDone;
 
-	private int HMJGFHBFNEI;
+	private int _downloadedBytes;
 
-	private int LPMBLALPBGM;
+	private int _totalBytes;
 
-	private bool GKFGGPHFEJG;
+	private bool _aborted;
 
 	public string Url
 	{
 		get
 		{
-			return KLMLKCKNNFD();
+			return GetUrl();
 		}
 	}
 
-	public int NOPMKIAONBO
+	public int TotalBytes
 	{
 		get
 		{
-			return GFLHMBOBICA();
+			return GetTotalBytes();
 		}
 	}
 
-	public int JJCKADKCDIF
+	public int DownloadedBytes
 	{
 		get
 		{
-			return ECJPLFFAMJO();
+			return GetDownloadedBytes();
 		}
 	}
 
-	public bool ECBDGAJHOPF
+	public bool IsDone
 	{
 		get
 		{
-			return KPBEHFEBJJN();
+			return GetIsDone();
 		}
 	}
 
 	public NekkiWebHandler(NekkiUri IACLKBNEBDM)
 		: base(new byte[8192])
 	{
-		JDNMLANMPPK = IACLKBNEBDM;
-		OOGCKMCGAAH = false;
-		HMJGFHBFNEI = 0;
-		LPMBLALPBGM = 0;
-		GKFGGPHFEJG = false;
+		_uri = IACLKBNEBDM;
+		_isDone = false;
+		_downloadedBytes = 0;
+		_totalBytes = 0;
+		_aborted = false;
 	}
 
-	public string KLMLKCKNNFD()
+	public string GetUrl()
 	{
-		return JDNMLANMPPK.OriginalString;
+		return _uri.OriginalString;
 	}
 
-	public int GFLHMBOBICA()
+	public int GetTotalBytes()
 	{
-		return LPMBLALPBGM;
+		return _totalBytes;
 	}
 
-	public int ECJPLFFAMJO()
+	public int GetDownloadedBytes()
 	{
-		return HMJGFHBFNEI;
+		return _downloadedBytes;
 	}
 
-	public bool KPBEHFEBJJN()
+	public bool GetIsDone()
 	{
-		return OOGCKMCGAAH;
+		return _isDone;
 	}
 
-	public virtual void AKLEEMEHBIC()
+	public virtual void Abort()
 	{
-		GKFGGPHFEJG = true;
+		_aborted = true;
 	}
 
-	public virtual void GEJLNPIEDPF()
+	public virtual void ForceComplete()
 	{
 		CompleteContent();
 	}
 
 	protected override void ReceiveContentLength(int HDIIBKGCCNB)
 	{
-		LPMBLALPBGM = HDIIBKGCCNB;
-		NMJKPDGCEOK(LPMBLALPBGM);
+		_totalBytes = HDIIBKGCCNB;
+		OnContentLength(_totalBytes);
 	}
 
 	protected override bool ReceiveData(byte[] data, int HIGBAHGOFIJ)
 	{
-		if (GKFGGPHFEJG || data == null || data.Length < 1)
+		if (_aborted || data == null || data.Length < 1)
 		{
 			return false;
 		}
-		LKECEJOMPGF(data, HMJGFHBFNEI, HIGBAHGOFIJ);
-		HMJGFHBFNEI += HIGBAHGOFIJ;
+		OnDataReceived(data, _downloadedBytes, HIGBAHGOFIJ);
+		_downloadedBytes += HIGBAHGOFIJ;
 		return true;
 	}
 
 	protected override void CompleteContent()
 	{
-		LPMBLALPBGM = HMJGFHBFNEI;
-		OOGCKMCGAAH = true;
-		HCNLJNFCBPA();
+		_totalBytes = _downloadedBytes;
+		_isDone = true;
+		OnContentComplete();
 	}
 
 	protected override float GetProgress()
 	{
-		return (HMJGFHBFNEI <= 0) ? 0f : ((float)GFLHMBOBICA() / (float)HMJGFHBFNEI);
+		return (_downloadedBytes <= 0) ? 0f : ((float)GetTotalBytes() / (float)_downloadedBytes);
 	}
 
-	protected virtual void NMJKPDGCEOK(int HDIIBKGCCNB)
+	protected virtual void OnContentLength(int HDIIBKGCCNB)
 	{
 	}
 
-	protected virtual void LKECEJOMPGF(byte[] data, int IAFIGGBIKOD, int HIGBAHGOFIJ)
+	protected virtual void OnDataReceived(byte[] data, int IAFIGGBIKOD, int HIGBAHGOFIJ)
 	{
 	}
 
-	protected virtual void HCNLJNFCBPA()
+	protected virtual void OnContentComplete()
 	{
 	}
 }

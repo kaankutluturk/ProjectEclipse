@@ -27,13 +27,13 @@ for($i=0;$i -lt 3;$i++) {
         $expectedValue=$field.GetValue($source) | ConvertTo-Json -Depth 8 -Compress
         Check ($actual -ceq $expectedValue) ('Archive native effect mismatch: '+$field.Name)
     }
-    if($i -eq 1) {Check ($native.NeedStart([EventAnimation+EECEJKADLCK]::EVENT_ANIMATION_END) -and !$native.NeedStart(2)) 'Effect event scheduling lost.'}
+    if($i -eq 1) {Check ($native.NeedStart([EventAnimation+EventAnimationType]::EVENT_ANIMATION_END) -and !$native.NeedStart(2)) 'Effect event scheduling lost.'}
     else {Check ($native.NeedStart(2) -and !$native.NeedStart(1)) 'Effect frame scheduling lost.'}
 }
 $stopFollow=[ActionsParser]::Create($nodes[3])
 Check ($stopFollow -is [ActionStopFollowEffect]) 'Wrong stop-follow native action.'
 Check ($stopFollow.get_Name() -ceq 'SmallSphereStart') 'Stop-follow name lost.'
-Check ($stopFollow.NeedStart([EventAnimation+EECEJKADLCK]::EVENT_STRIKE) -and !$stopFollow.NeedStart(2)) 'Stop-follow event lost.'
+Check ($stopFollow.NeedStart([EventAnimation+EventAnimationType]::EVENT_STRIKE) -and !$stopFollow.NeedStart(2)) 'Stop-follow event lost.'
 $defaultLua=$effectLua.Replace('timeline = actions','timeline = {[0]={effect={name="Default",core_sequence="sequence"}}}')
 $defaultDoc=Project (Load-Lua $defaultLua)
 $defaultNode=$defaultDoc.SelectSingleNode('//Move/Actions/Effect')
@@ -52,7 +52,7 @@ Check ($attachNode.GetAttribute('Player') -ceq 'Parent' -and $attachNode.GetAttr
     $attachNode.GetAttribute('AttachPoint') -ceq 'NChest' -and $attachNode.GetAttribute('OffsetVector') -ceq '15;-15' -and
     $attachNode.GetAttribute('StartRotAngle') -ceq '330') 'Effect attachment native projection differs.'
 $attached=[ActionsParser]::Create($attachNode.ParentNode)
-Check ($null -ne $attached.Attachment -and $attached.DIGCODDLDAD()) 'Native parser did not retain following attachment.'
+Check ($null -ne $attached.Attachment -and $attached.GetIsFollowObject()) 'Native parser did not retain following attachment.'
 $attachBaseline=Fingerprint $attachCatalog
 foreach($mutation in @('attach.player="Enemy"','attach.root_point="NNeck"','attach.attach_point="NHead"',
     'attach.offset_x=16','attach.offset_y=-16','attach.start_rotation=329')) {

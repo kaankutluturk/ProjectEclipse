@@ -5,73 +5,73 @@ internal class AuthenticationSample : MonoBehaviour
 {
 	private readonly Uri URI = new Uri("https://besthttpsignalr.azurewebsites.net/signalr");
 
-	private Connection FJGOJHMELAH;
+	private Connection signalRConnection;
 
-	private string IFCOOFDKDGL = string.Empty;
+	private string userName = string.Empty;
 
-	private string BOOICHNBHBL = string.Empty;
+	private string role = string.Empty;
 
 	private Vector2 scrollPos;
 
 	private void Start()
 	{
-		FJGOJHMELAH = new Connection(URI, new BaseHub("noauthhub", "Messages"), new BaseHub("invokeauthhub", "Messages Invoked By Admin or Invoker"), new BaseHub("authhub", "Messages Requiring Authentication to Send or Receive"), new BaseHub("inheritauthhub", "Messages Requiring Authentication to Send or Receive Because of Inheritance"), new BaseHub("incomingauthhub", "Messages Requiring Authentication to Send"), new BaseHub("adminauthhub", "Messages Requiring Admin Membership to Send or Receive"), new BaseHub("userandroleauthhub", "Messages Requiring Name to be \"User\" and Role to be \"Admin\" to Send or Receive"));
-		if (!string.IsNullOrEmpty(IFCOOFDKDGL) && !string.IsNullOrEmpty(BOOICHNBHBL))
+		signalRConnection = new Connection(URI, new BaseHub("noauthhub", "Messages"), new BaseHub("invokeauthhub", "Messages Invoked By Admin or Invoker"), new BaseHub("authhub", "Messages Requiring Authentication to Send or Receive"), new BaseHub("inheritauthhub", "Messages Requiring Authentication to Send or Receive Because of Inheritance"), new BaseHub("incomingauthhub", "Messages Requiring Authentication to Send"), new BaseHub("adminauthhub", "Messages Requiring Admin Membership to Send or Receive"), new BaseHub("userandroleauthhub", "Messages Requiring Name to be \"User\" and Role to be \"Admin\" to Send or Receive"));
+		if (!string.IsNullOrEmpty(userName) && !string.IsNullOrEmpty(role))
 		{
-			FJGOJHMELAH.FBFLBJGPEGA(new HeaderAuthenticator(IFCOOFDKDGL, BOOICHNBHBL));
+			signalRConnection.SetAuthenticationProvider(new HeaderAuthenticator(userName, role));
 		}
-		FJGOJHMELAH.FJBEHFPIAHI(INACOFIJGKE);
-		FJGOJHMELAH.LAJCMNNNIIM();
+		signalRConnection.AddConnectedHandler(OnSignalRConnected);
+		signalRConnection.OpenConnection();
 	}
 
 	private void OnDestroy()
 	{
-		FJGOJHMELAH.Close();
+		signalRConnection.Close();
 	}
 
 	private void OnGUI()
 	{
-		GUIHelper.ECMOBPFHNPN(GUIHelper.ClientArea, true, () =>
+		GUIHelper.DrawArea(GUIHelper.ClientArea, true, () =>
 		{
 			scrollPos = GUILayout.BeginScrollView(scrollPos, false, false);
 			GUILayout.BeginVertical();
-			if (FJGOJHMELAH.DLKDCNNCKCL() == null)
+			if (signalRConnection.GetAuthenticationProvider() == null)
 			{
 				GUILayout.BeginHorizontal();
 				GUILayout.Label("Username (Enter 'User'):");
-				IFCOOFDKDGL = GUILayout.TextField(IFCOOFDKDGL, GUILayout.MinWidth(100f));
+				userName = GUILayout.TextField(userName, GUILayout.MinWidth(100f));
 				GUILayout.EndHorizontal();
 				GUILayout.BeginHorizontal();
 				GUILayout.Label("Roles (Enter 'Invoker' or 'Admin'):");
-				BOOICHNBHBL = GUILayout.TextField(BOOICHNBHBL, GUILayout.MinWidth(100f));
+				role = GUILayout.TextField(role, GUILayout.MinWidth(100f));
 				GUILayout.EndHorizontal();
 				if (GUILayout.Button("Log in"))
 				{
-					GEBDDPAFKCH();
+					Restart();
 				}
 			}
-			for (int i = 0; i < FJGOJHMELAH.LINDGKFKGND().Length; i++)
+			for (int i = 0; i < signalRConnection.GetHubs().Length; i++)
 			{
-				(FJGOJHMELAH.LINDGKFKGND()[i] as BaseHub).MCAIPGEPMDE();
+				(signalRConnection.GetHubs()[i] as BaseHub).Draw();
 			}
 			GUILayout.EndVertical();
 			GUILayout.EndScrollView();
 		});
 	}
 
-	private void INACOFIJGKE(Connection BJGMPDIKEJC)
+	private void OnSignalRConnected(Connection BJGMPDIKEJC)
 	{
-		for (int i = 0; i < FJGOJHMELAH.LINDGKFKGND().Length; i++)
+		for (int i = 0; i < signalRConnection.GetHubs().Length; i++)
 		{
-			(FJGOJHMELAH.LINDGKFKGND()[i] as BaseHub).IJOCHDFBMJN();
+			(signalRConnection.GetHubs()[i] as BaseHub).InvokedFromClient();
 		}
 	}
 
-	private void GEBDDPAFKCH()
+	private void Restart()
 	{
-		FJGOJHMELAH.LCIOENIELOA(INACOFIJGKE);
-		FJGOJHMELAH.Close();
-		FJGOJHMELAH = null;
+		signalRConnection.RemoveConnectedHandler(OnSignalRConnected);
+		signalRConnection.Close();
+		signalRConnection = null;
 		Start();
 	}
 }

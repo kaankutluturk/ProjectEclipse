@@ -2,53 +2,53 @@ using System.Xml;
 
 public class QuestActionSetParameter : QuestAction
 {
-	private class KJHEFADMIOA
+	private class SetParameterOperands
 	{
-		public ConditionExtension.CompareResult OGCLLIKKLGN;
+		public ConditionExtension.CompareResult itemNameResult;
 
-		public ConditionExtension.CompareResult GAPPCKCCBGO;
+		public ConditionExtension.CompareResult parameterNameResult;
 
-		public ConditionExtension.CompareResult CLEFMDPKIDK;
+		public ConditionExtension.CompareResult valueResult;
 	}
 
 	private string name;
 
-	private string LECBBPAOJGF;
+	private string parameterExpression;
 
 	private string value;
 
 	public override void Parse(XmlNode EPKLCPOEELO)
 	{
 		base.Parse(EPKLCPOEELO);
-		name = EPKLCPOEELO.Attributes["Name"].CIPOICEEIBK(string.Empty);
-		LECBBPAOJGF = EPKLCPOEELO.Attributes["Parameter"].CIPOICEEIBK(string.Empty);
-		value = EPKLCPOEELO.Attributes["Value"].CIPOICEEIBK(string.Empty);
+		name = EPKLCPOEELO.Attributes["Name"].GetStringOrDefault(string.Empty);
+		parameterExpression = EPKLCPOEELO.Attributes["Parameter"].GetStringOrDefault(string.Empty);
+		value = EPKLCPOEELO.Attributes["Value"].GetStringOrDefault(string.Empty);
 	}
 
-	public override void DEJMHFMLKIC(QuestParameters GFIHPBCEEOB)
+	public override void Execute(QuestParameters GFIHPBCEEOB)
 	{
-		base.DEJMHFMLKIC(GFIHPBCEEOB);
-		KJHEFADMIOA kJHEFADMIOA = new KJHEFADMIOA();
+		base.Execute(GFIHPBCEEOB);
+		SetParameterOperands kJHEFADMIOA = new SetParameterOperands();
 		QuestCondition kKDGLNECFHA = new QuestCondition();
-		kKDGLNECFHA.LIMHBJBEEIA(GFIHPBCEEOB);
-		kKDGLNECFHA.MCPIOGALBMK(name, kJHEFADMIOA.OGCLLIKKLGN);
-		kKDGLNECFHA.MCPIOGALBMK(LECBBPAOJGF, kJHEFADMIOA.GAPPCKCCBGO);
-		kKDGLNECFHA.MCPIOGALBMK(value, kJHEFADMIOA.CLEFMDPKIDK);
-		KBNCBICGFEK(kJHEFADMIOA);
-		OGIJONMKABB();
+		kKDGLNECFHA.SetParameters(GFIHPBCEEOB);
+		kKDGLNECFHA.SetValue(name, kJHEFADMIOA.itemNameResult);
+		kKDGLNECFHA.SetValue(parameterExpression, kJHEFADMIOA.parameterNameResult);
+		kKDGLNECFHA.SetValue(value, kJHEFADMIOA.valueResult);
+		ApplyParameter(kJHEFADMIOA);
+		FinishAction();
 	}
 
-	private void KBNCBICGFEK(KJHEFADMIOA DCJLKCFKCOM)
+	private void ApplyParameter(SetParameterOperands DCJLKCFKCOM)
 	{
-		Roster nKGLHEGIKKP = ListSF.CCDKHLAMKKO();
-		UserItem dKCHDHMLKHN = nKGLHEGIKKP.KHCNHPCPFII().CMGOCLGHNLH(DCJLKCFKCOM.OGCLLIKKLGN.resultSTR);
+		Roster nKGLHEGIKKP = ListSF.GetRoster();
+		UserItem dKCHDHMLKHN = nKGLHEGIKKP.GetInventory().FindItem(DCJLKCFKCOM.itemNameResult.resultSTR);
 		if (dKCHDHMLKHN != null)
 		{
-			string iBBAMMHHBFE = DCJLKCFKCOM.GAPPCKCCBGO.resultSTR;
+			string iBBAMMHHBFE = DCJLKCFKCOM.parameterNameResult.resultSTR;
 			if (iBBAMMHHBFE.Equals("UpgradeLevel"))
 			{
-				dKCHDHMLKHN.FMMDLMGHPIB((int)DCJLKCFKCOM.CLEFMDPKIDK.resultNumber);
-				dKCHDHMLKHN.CDFODJBJIPI(nKGLHEGIKKP.PINDEKDNCNL());
+				dKCHDHMLKHN.SetUpgradeLevel((int)DCJLKCFKCOM.valueResult.resultNumber);
+				dKCHDHMLKHN.RefreshUpgradeState(nKGLHEGIKKP.GetLevel());
 			}
 		}
 	}

@@ -13,180 +13,180 @@ using UnityEngine;
 
 public class StatisticsCollector
 {
-	private enum NBGNCCPMCCD
+	private enum LoggingState
 	{
 		NotLogging = 0,
 		Logging = 1,
 		Undecided = 2
 	}
 
-	public enum CNCDMFJLMFH
+	public enum CurrencyType
 	{
 		Money = 0,
 		Bonus = 1
 	}
 
-	private const int IMADHLKIDBG = 200;
+	private const int MaxLogLines = 200;
 
 	private static StatisticsCollector _Current;
 
-	private const string MGDGCFPHODB = "full_events.json";
+	private const string FullEventsFileName = "full_events.json";
 
-	private const string PBABHJGLMCO = "events.json";
+	private const string EventsFileName = "events.json";
 
-	private const string LDKDCMJENGM = "pays.json";
+	private const string PaysFileName = "pays.json";
 
-	private const string JPOAKGGNJPO = "events_data.xml";
+	private const string DataFileName = "events_data.xml";
 
-	private const int KJHKCGNIINE = 2000000;
+	private const int MaxSendBytes = 2000000;
 
-	private int CBJGPFNDAOC;
+	private int _EventId;
 
-	private int FNHNEBKMHFA;
+	private int _PayEventId;
 
-	private int PHONHMEKDDE;
+	private int _RunCount;
 
-	private int CFAIGEIHNLK;
+	private int _SessionId;
 
-	private int JEBHJOPAIGC;
+	private int _FightAmount;
 
-	private int BLLDCBKNIJA;
+	private int _SessionLength;
 
-	private long BPGFOAHGAHE;
+	private long _EndBonus;
 
-	private long EKFPAJCKJLB;
+	private long _EndDate;
 
-	private int FIGDGGKLFDG;
+	private int _EndLevel;
 
-	private long ONLODELNKPO;
+	private long _EndMoney;
 
 	private uint _EndXp;
 
-	private int JBNACLHHBPA;
+	private int _EndEnergy;
 
-	private int MGHBCNLHCID;
+	private int _Payments;
 
-	private string LCNJJLAKEHK;
+	private string _CheatId;
 
-	private string ABOPCADKEJI;
+	private string _Info;
 
-	private int KAFIDINNDIP;
+	private int _Counter;
 
-	private long HKJHIACNECB;
+	private long _EventsFilePosition;
 
-	private long LNIMCIMMJJG;
+	private long _PaysFilePosition;
 
-	private NBGNCCPMCCD COLCBNPNLPG = NBGNCCPMCCD.Undecided;
+	private LoggingState _EventsLoggingState = LoggingState.Undecided;
 
-	private NBGNCCPMCCD ACNHHFKLKID = NBGNCCPMCCD.Undecided;
+	private LoggingState _PaysLoggingState = LoggingState.Undecided;
 
-	private StringBuilder DCFPONJAING = new StringBuilder();
+	private StringBuilder _EventsBuffer = new StringBuilder();
 
-	private StringBuilder PHGGNFPBOKD = new StringBuilder();
+	private StringBuilder _PaysBuffer = new StringBuilder();
 
-	private long PFGKFHJMMFH;
+	private long _LastSendTime;
 
 	private const int _DeltaSendTime = 900000;
 
-	private long DEBIFEKGFKD;
+	private long _FullLogPosition;
 
-	private static string CEIDLBLDKBF
+	private static string FullEventsPath
 	{
 		get
 		{
-			return ANOGPNAIFLI();
+			return GetFullEventsPath();
 		}
 	}
 
-	private static string CPCHJPKJMAN
+	private static string EventsPath
 	{
 		get
 		{
-			return GCHJLCEFNMK();
+			return GetEventsPath();
 		}
 	}
 
-	private static string HDFIGEJDAMC
+	private static string PaysPath
 	{
 		get
 		{
-			return EFILFAHEAKB();
+			return GetPaysPath();
 		}
 	}
 
-	private static string MFGCCAEIJEB
+	private static string DataFilePath
 	{
 		get
 		{
-			return JNJGGIGNFBE();
+			return GetDataFilePath();
 		}
 	}
 
-	public static StatisticsCollector BLOOLFFMKFI
+	public static StatisticsCollector Instance
 	{
 		get
 		{
-			return AOJJOEHEPGM();
+			return GetInstance();
 		}
 	}
 
-	public static int CGLECNFLHBI
+	public static int NextEventId
 	{
 		get
 		{
-			return MONNGMBGLHH();
+			return GetNextEventId();
 		}
 	}
 
-	public static int HHMNPBFGGJF
+	public static int NextPayEventId
 	{
 		get
 		{
-			return POAAIJHJFEG();
+			return GetNextPayEventId();
 		}
 	}
 
-	public static int ECCNPKGHOFF
+	public static int SessionId
 	{
 		get
 		{
-			return JGMAONJINDK();
+			return GetSessionId();
 		}
 		set
 		{
-			HIMFCMGOMGI(value);
+			SetSessionId(value);
 		}
 	}
 
-	public static int MOGCPPOKEJC
+	public static int FightAmount
 	{
 		get
 		{
-			return MHKHJJIJKCD();
+			return GetFightAmount();
 		}
 		set
 		{
-			JNGMOOOPCBN(value);
+			SetFightAmount(value);
 		}
 	}
 
-	public static int JLDNNCAPPHC
+	public static int SessionLength
 	{
 		get
 		{
-			return ODJEHEPNNHH();
+			return GetSessionLength();
 		}
 		set
 		{
-			JKHLAAKKHDI(value);
+			SetSessionLength(value);
 		}
 	}
 
-	public static long CMDLONKFNOK
+	public static long EndBonus
 	{
 		get
 		{
-			return GOBHGMIFLAA();
+			return GetEndBonus();
 		}
 	}
 
@@ -194,55 +194,55 @@ public class StatisticsCollector
 	{
 		get
 		{
-			return EJNLDIPJOOI();
+			return GetEndDate();
 		}
 	}
 
-	public static int HAHNNKPGAAM
+	public static int EndLevel
 	{
 		get
 		{
-			return FJNKLLJAPNL();
+			return GetEndLevel();
 		}
 	}
 
-	public static long DOOGNLBBALO
+	public static long EndMoney
 	{
 		get
 		{
-			return OBKJFLENCBC();
+			return GetEndMoney();
 		}
 	}
 
-	public static uint NNDDNBCPELF
+	public static uint EndXp
 	{
 		get
 		{
-			return BFKLBDEEKLN();
+			return GetEndXp();
 		}
 	}
 
-	public static int FDHKOEHKNOC
+	public static int EndEnergy
 	{
 		get
 		{
-			return CGDFOCLOHEB();
+			return GetEndEnergy();
 		}
 	}
 
-	public static int OJHDENMGCNE
+	public static int Payments
 	{
 		get
 		{
-			return FFFEOOMOJIL();
+			return GetPayments();
 		}
 	}
 
-	public static string PEFHKPHNJII
+	public static string CheatId
 	{
 		get
 		{
-			return JLFGCIGNHNC();
+			return GetCheatId();
 		}
 	}
 
@@ -250,47 +250,47 @@ public class StatisticsCollector
 	{
 		get
 		{
-			return ADAMFIJFGBE();
+			return GetInfo();
 		}
 	}
 
-	public static int EOGLBDCLMBM
+	public static int CounterValue
 	{
 		get
 		{
-			return MCIPEJBLIDC();
+			return GetCounter();
 		}
 	}
 
 	private StatisticsCollector()
 	{
-		ENMPJEFHECD();
+		LoadData();
 		GlobalTimer.get_Instance().addEventListener(0, OnTimerTick);
-		ApplicationController.add_OnPause(FFMHKLENGLP);
+		ApplicationController.add_OnPause(OnApplicationPause);
 		Send();
 	}
 
-	private static string ANOGPNAIFLI()
+	private static string GetFullEventsPath()
 	{
-		return SF2Paths.LCDBGFFDKJB() + "/full_events.json";
+		return SF2Paths.GetStatisticsPath() + "/full_events.json";
 	}
 
-	private static string GCHJLCEFNMK()
+	private static string GetEventsPath()
 	{
-		return SF2Paths.LCDBGFFDKJB() + "/events.json";
+		return SF2Paths.GetStatisticsPath() + "/events.json";
 	}
 
-	private static string EFILFAHEAKB()
+	private static string GetPaysPath()
 	{
-		return SF2Paths.LCDBGFFDKJB() + "/pays.json";
+		return SF2Paths.GetStatisticsPath() + "/pays.json";
 	}
 
-	private static string JNJGGIGNFBE()
+	private static string GetDataFilePath()
 	{
-		return SF2Paths.LCDBGFFDKJB() + "/events_data.xml";
+		return SF2Paths.GetStatisticsPath() + "/events_data.xml";
 	}
 
-	public static StatisticsCollector AOJJOEHEPGM()
+	public static StatisticsCollector GetInstance()
 	{
 		if (_Current == null)
 		{
@@ -299,186 +299,186 @@ public class StatisticsCollector
 		return _Current;
 	}
 
-	public static int MONNGMBGLHH()
+	public static int GetNextEventId()
 	{
-		AOJJOEHEPGM().CBJGPFNDAOC++;
-		_Current.AHOPPPNPOHB();
-		return _Current.CBJGPFNDAOC;
+		GetInstance()._EventId++;
+		_Current.SaveData();
+		return _Current._EventId;
 	}
 
-	public static int POAAIJHJFEG()
+	public static int GetNextPayEventId()
 	{
-		AOJJOEHEPGM().FNHNEBKMHFA++;
-		_Current.AHOPPPNPOHB();
-		return _Current.FNHNEBKMHFA;
+		GetInstance()._PayEventId++;
+		_Current.SaveData();
+		return _Current._PayEventId;
 	}
 
-	public static int JGMAONJINDK()
+	public static int GetSessionId()
 	{
-		return AOJJOEHEPGM().CFAIGEIHNLK;
+		return GetInstance()._SessionId;
 	}
 
-	public static void HIMFCMGOMGI(int value)
+	public static void SetSessionId(int value)
 	{
-		AOJJOEHEPGM().CFAIGEIHNLK = value;
-		_Current.AHOPPPNPOHB();
+		GetInstance()._SessionId = value;
+		_Current.SaveData();
 	}
 
-	public static int MHKHJJIJKCD()
+	public static int GetFightAmount()
 	{
-		return AOJJOEHEPGM().JEBHJOPAIGC;
+		return GetInstance()._FightAmount;
 	}
 
-	public static void JNGMOOOPCBN(int value)
+	public static void SetFightAmount(int value)
 	{
-		AOJJOEHEPGM().JEBHJOPAIGC = value;
-		_Current.AHOPPPNPOHB();
+		GetInstance()._FightAmount = value;
+		_Current.SaveData();
 	}
 
-	public static int ODJEHEPNNHH()
+	public static int GetSessionLength()
 	{
-		return AOJJOEHEPGM().BLLDCBKNIJA;
+		return GetInstance()._SessionLength;
 	}
 
-	public static void JKHLAAKKHDI(int value)
+	public static void SetSessionLength(int value)
 	{
-		AOJJOEHEPGM().BLLDCBKNIJA = value;
-		_Current.AHOPPPNPOHB();
+		GetInstance()._SessionLength = value;
+		_Current.SaveData();
 	}
 
-	public static long GOBHGMIFLAA()
+	public static long GetEndBonus()
 	{
-		return AOJJOEHEPGM().BPGFOAHGAHE;
+		return GetInstance()._EndBonus;
 	}
 
-	public static long EJNLDIPJOOI()
+	public static long GetEndDate()
 	{
-		return AOJJOEHEPGM().EKFPAJCKJLB;
+		return GetInstance()._EndDate;
 	}
 
-	public static int FJNKLLJAPNL()
+	public static int GetEndLevel()
 	{
-		return AOJJOEHEPGM().FIGDGGKLFDG;
+		return GetInstance()._EndLevel;
 	}
 
-	public static long OBKJFLENCBC()
+	public static long GetEndMoney()
 	{
-		return AOJJOEHEPGM().ONLODELNKPO;
+		return GetInstance()._EndMoney;
 	}
 
-	public static uint BFKLBDEEKLN()
+	public static uint GetEndXp()
 	{
-		return AOJJOEHEPGM()._EndXp;
+		return GetInstance()._EndXp;
 	}
 
-	public static int CGDFOCLOHEB()
+	public static int GetEndEnergy()
 	{
-		return AOJJOEHEPGM().JBNACLHHBPA;
+		return GetInstance()._EndEnergy;
 	}
 
-	public static int FFFEOOMOJIL()
+	public static int GetPayments()
 	{
-		return AOJJOEHEPGM().MGHBCNLHCID;
+		return GetInstance()._Payments;
 	}
 
-	public static string JLFGCIGNHNC()
+	public static string GetCheatId()
 	{
-		return AOJJOEHEPGM().LCNJJLAKEHK;
+		return GetInstance()._CheatId;
 	}
 
-	public static string ADAMFIJFGBE()
+	public static string GetInfo()
 	{
-		return AOJJOEHEPGM().ABOPCADKEJI;
+		return GetInstance()._Info;
 	}
 
-	public static int MCIPEJBLIDC()
+	public static int GetCounter()
 	{
-		return AOJJOEHEPGM().KAFIDINNDIP;
+		return GetInstance()._Counter;
 	}
 
-	public static void BPDGOKGHDHB(StatisticsEvent.JDNFFHILFAF IGABHEMGKKE, ArgsDict LKIOKGCNKHE = null)
-	{
-		// Remote analytics removed. Combat/stat counters elsewhere remain local.
-	}
-
-	public static void KBILEMGFDDC(StatisticsEvent.JDNFFHILFAF IGABHEMGKKE, ArgsDict LKIOKGCNKHE = null)
+	public static void LogEvent(StatisticsEvent.EventType IGABHEMGKKE, ArgsDict LKIOKGCNKHE = null)
 	{
 		// Remote analytics removed. Combat/stat counters elsewhere remain local.
 	}
 
-	public void GLKJABEOHDF(bool MAACIEHOLML)
+	public static void LogPayEvent(StatisticsEvent.EventType IGABHEMGKKE, ArgsDict LKIOKGCNKHE = null)
+	{
+		// Remote analytics removed. Combat/stat counters elsewhere remain local.
+	}
+
+	public void SetEventsLogging(bool MAACIEHOLML)
 	{
 		if (MAACIEHOLML)
 		{
-			COLCBNPNLPG = NBGNCCPMCCD.Logging;
+			_EventsLoggingState = LoggingState.Logging;
 			Send();
 		}
 		else
 		{
-			COLCBNPNLPG = NBGNCCPMCCD.NotLogging;
+			_EventsLoggingState = LoggingState.NotLogging;
 		}
 	}
 
-	public void IOGFHNKNGHJ(bool MAACIEHOLML)
+	public void SetPaysLogging(bool MAACIEHOLML)
 	{
 		if (MAACIEHOLML)
 		{
-			ACNHHFKLKID = NBGNCCPMCCD.Logging;
-			OPGFPNFAOLH();
+			_PaysLoggingState = LoggingState.Logging;
+			SendPayLog();
 		}
 		else
 		{
-			ACNHHFKLKID = NBGNCCPMCCD.NotLogging;
+			_PaysLoggingState = LoggingState.NotLogging;
 		}
 	}
 
-	private void ENMPJEFHECD()
+	private void LoadData()
 	{
-		if (!File.Exists(JNJGGIGNFBE()))
+		if (!File.Exists(GetDataFilePath()))
 		{
-			CBJGPFNDAOC = 0;
-			FNHNEBKMHFA = 0;
-			PHONHMEKDDE = 0;
-			CFAIGEIHNLK = 0;
-			JEBHJOPAIGC = 0;
-			BLLDCBKNIJA = 0;
-			BPGFOAHGAHE = 0L;
-			EKFPAJCKJLB = 0L;
-			FIGDGGKLFDG = 0;
-			ONLODELNKPO = 0L;
+			_EventId = 0;
+			_PayEventId = 0;
+			_RunCount = 0;
+			_SessionId = 0;
+			_FightAmount = 0;
+			_SessionLength = 0;
+			_EndBonus = 0L;
+			_EndDate = 0L;
+			_EndLevel = 0;
+			_EndMoney = 0L;
 			_EndXp = 0u;
-			JBNACLHHBPA = 0;
-			MGHBCNLHCID = 0;
-			LCNJJLAKEHK = "0";
-			ABOPCADKEJI = string.Empty;
-			KAFIDINNDIP = 0;
+			_EndEnergy = 0;
+			_Payments = 0;
+			_CheatId = "0";
+			_Info = string.Empty;
+			_Counter = 0;
 		}
 		else
 		{
-			XmlDocument xmlDocument = XmlUtils.OpenXMLDocument(JNJGGIGNFBE(), string.Empty, XmlUtils.EBLFEPIOMOL.ForcedExternal);
+			XmlDocument xmlDocument = XmlUtils.OpenXMLDocument(GetDataFilePath(), string.Empty, XmlUtils.XmlSourceMode.ForcedExternal);
 			XmlNode xmlNode = xmlDocument["Data"];
-			CBJGPFNDAOC = XmlUtils.ParseInt(xmlNode["EventID"].Attribute("Value"));
-			FNHNEBKMHFA = XmlUtils.ParseInt(xmlNode["PayEventID"].Attribute("Value"));
-			PHONHMEKDDE = XmlUtils.ParseInt(xmlNode["RunCount"].Attribute("Value"));
-			CFAIGEIHNLK = XmlUtils.ParseInt(xmlNode["SessionID"].Attribute("Value"));
-			JEBHJOPAIGC = XmlUtils.ParseInt(xmlNode["FightAmount"].Attribute("Value"));
-			BLLDCBKNIJA = XmlUtils.ParseInt(xmlNode["Length"].Attribute("Value"));
-			BPGFOAHGAHE = XmlUtils.ParseLong(xmlNode["EndBonus"].Attribute("Value"), 0L);
-			EKFPAJCKJLB = XmlUtils.ParseInt(xmlNode["EndDate"].Attribute("Value"));
-			FIGDGGKLFDG = XmlUtils.ParseInt(xmlNode["EndLevel"].Attribute("Value"));
-			ONLODELNKPO = XmlUtils.ParseLong(xmlNode["EndMoney"].Attribute("Value"), 0L);
+			_EventId = XmlUtils.ParseInt(xmlNode["EventID"].Attribute("Value"));
+			_PayEventId = XmlUtils.ParseInt(xmlNode["PayEventID"].Attribute("Value"));
+			_RunCount = XmlUtils.ParseInt(xmlNode["RunCount"].Attribute("Value"));
+			_SessionId = XmlUtils.ParseInt(xmlNode["SessionID"].Attribute("Value"));
+			_FightAmount = XmlUtils.ParseInt(xmlNode["FightAmount"].Attribute("Value"));
+			_SessionLength = XmlUtils.ParseInt(xmlNode["Length"].Attribute("Value"));
+			_EndBonus = XmlUtils.ParseLong(xmlNode["EndBonus"].Attribute("Value"), 0L);
+			_EndDate = XmlUtils.ParseInt(xmlNode["EndDate"].Attribute("Value"));
+			_EndLevel = XmlUtils.ParseInt(xmlNode["EndLevel"].Attribute("Value"));
+			_EndMoney = XmlUtils.ParseLong(xmlNode["EndMoney"].Attribute("Value"), 0L);
 			_EndXp = XmlUtils.ParseUint(xmlNode["EndXp"].Attribute("Value"));
-			JBNACLHHBPA = XmlUtils.ParseInt(xmlNode["EndEnergy"].Attribute("Value"));
-			MGHBCNLHCID = XmlUtils.ParseInt(xmlNode["Payments"].Attribute("Value"));
-			LCNJJLAKEHK = XmlUtils.ParseString(xmlNode["CheatId"].Attribute("Value"), "0");
-			ABOPCADKEJI = XmlUtils.ParseString(xmlNode["Info"].Attribute("Value"), string.Empty);
-			KAFIDINNDIP = XmlUtils.ParseInt(xmlNode["Counter"].Attribute("Value"));
-			HKJHIACNECB = XmlUtils.ParseInt(xmlNode["FilePosition"].Attribute("Value"));
-			LNIMCIMMJJG = XmlUtils.ParseInt(xmlNode["PayLogPosition"].Attribute("Value"));
+			_EndEnergy = XmlUtils.ParseInt(xmlNode["EndEnergy"].Attribute("Value"));
+			_Payments = XmlUtils.ParseInt(xmlNode["Payments"].Attribute("Value"));
+			_CheatId = XmlUtils.ParseString(xmlNode["CheatId"].Attribute("Value"), "0");
+			_Info = XmlUtils.ParseString(xmlNode["Info"].Attribute("Value"), string.Empty);
+			_Counter = XmlUtils.ParseInt(xmlNode["Counter"].Attribute("Value"));
+			_EventsFilePosition = XmlUtils.ParseInt(xmlNode["FilePosition"].Attribute("Value"));
+			_PaysFilePosition = XmlUtils.ParseInt(xmlNode["PayLogPosition"].Attribute("Value"));
 		}
 	}
 
-	private void AHOPPPNPOHB()
+	private void SaveData()
 	{
 		XmlDocument xmlDocument = new XmlDocument();
 		xmlDocument.AppendChild(xmlDocument.CreateXmlDeclaration("1.0", "UTF-8", null));
@@ -486,75 +486,75 @@ public class StatisticsCollector
 		xmlDocument.AppendChild(xmlElement);
 		XmlElement xmlElement2 = xmlDocument.CreateElement("EventID");
 		xmlElement.AppendChild(xmlElement2);
-		xmlElement2.SetAttribute("Value", CBJGPFNDAOC.ToString());
+		xmlElement2.SetAttribute("Value", _EventId.ToString());
 		XmlElement newChild = xmlDocument.CreateElement("PayEventID");
 		xmlElement.AppendChild(newChild);
-		xmlElement2.SetAttribute("Value", FNHNEBKMHFA.ToString());
+		xmlElement2.SetAttribute("Value", _PayEventId.ToString());
 		XmlElement xmlElement3 = xmlDocument.CreateElement("RunCount");
 		xmlElement.AppendChild(xmlElement3);
-		xmlElement3.SetAttribute("Value", PHONHMEKDDE.ToString());
+		xmlElement3.SetAttribute("Value", _RunCount.ToString());
 		XmlElement xmlElement4 = xmlDocument.CreateElement("SessionID");
 		xmlElement.AppendChild(xmlElement4);
-		xmlElement4.SetAttribute("Value", CFAIGEIHNLK.ToString());
+		xmlElement4.SetAttribute("Value", _SessionId.ToString());
 		XmlElement xmlElement5 = xmlDocument.CreateElement("FightAmount");
 		xmlElement.AppendChild(xmlElement5);
-		xmlElement5.SetAttribute("Value", JEBHJOPAIGC.ToString());
+		xmlElement5.SetAttribute("Value", _FightAmount.ToString());
 		XmlElement xmlElement6 = xmlDocument.CreateElement("TimeLength");
 		xmlElement.AppendChild(xmlElement6);
-		xmlElement6.SetAttribute("Value", BLLDCBKNIJA.ToString());
+		xmlElement6.SetAttribute("Value", _SessionLength.ToString());
 		XmlElement xmlElement7 = xmlDocument.CreateElement("EndBonus");
 		xmlElement.AppendChild(xmlElement7);
-		xmlElement7.SetAttribute("Value", BPGFOAHGAHE.ToString());
+		xmlElement7.SetAttribute("Value", _EndBonus.ToString());
 		XmlElement xmlElement8 = xmlDocument.CreateElement("EndDate");
 		xmlElement.AppendChild(xmlElement8);
-		xmlElement8.SetAttribute("Value", EKFPAJCKJLB.ToString());
+		xmlElement8.SetAttribute("Value", _EndDate.ToString());
 		XmlElement xmlElement9 = xmlDocument.CreateElement("EndLevel");
 		xmlElement.AppendChild(xmlElement9);
-		xmlElement9.SetAttribute("Value", FIGDGGKLFDG.ToString());
+		xmlElement9.SetAttribute("Value", _EndLevel.ToString());
 		XmlElement xmlElement10 = xmlDocument.CreateElement("EndMoney");
 		xmlElement.AppendChild(xmlElement10);
-		xmlElement10.SetAttribute("Value", ONLODELNKPO.ToString());
+		xmlElement10.SetAttribute("Value", _EndMoney.ToString());
 		XmlElement xmlElement11 = xmlDocument.CreateElement("EndXp");
 		xmlElement.AppendChild(xmlElement11);
 		xmlElement11.SetAttribute("Value", _EndXp.ToString());
 		XmlElement xmlElement12 = xmlDocument.CreateElement("EndEnergy");
 		xmlElement.AppendChild(xmlElement12);
-		xmlElement12.SetAttribute("Value", JBNACLHHBPA.ToString());
+		xmlElement12.SetAttribute("Value", _EndEnergy.ToString());
 		XmlElement xmlElement13 = xmlDocument.CreateElement("Payments");
 		xmlElement.AppendChild(xmlElement13);
-		xmlElement13.SetAttribute("Value", MGHBCNLHCID.ToString());
+		xmlElement13.SetAttribute("Value", _Payments.ToString());
 		XmlElement xmlElement14 = xmlDocument.CreateElement("CheatId");
 		xmlElement.AppendChild(xmlElement14);
-		xmlElement14.SetAttribute("Value", LCNJJLAKEHK.ToString());
+		xmlElement14.SetAttribute("Value", _CheatId.ToString());
 		XmlElement xmlElement15 = xmlDocument.CreateElement("Info");
 		xmlElement.AppendChild(xmlElement15);
-		xmlElement15.SetAttribute("Value", ABOPCADKEJI.ToString());
+		xmlElement15.SetAttribute("Value", _Info.ToString());
 		XmlElement xmlElement16 = xmlDocument.CreateElement("Counter");
 		xmlElement.AppendChild(xmlElement16);
-		xmlElement16.SetAttribute("Value", KAFIDINNDIP.ToString());
+		xmlElement16.SetAttribute("Value", _Counter.ToString());
 		XmlElement xmlElement17 = xmlDocument.CreateElement("FilePosition");
 		xmlElement.AppendChild(xmlElement17);
-		xmlElement17.SetAttribute("Value", HKJHIACNECB.ToString());
+		xmlElement17.SetAttribute("Value", _EventsFilePosition.ToString());
 		XmlElement xmlElement18 = xmlDocument.CreateElement("PayLogPosition");
 		xmlElement.AppendChild(xmlElement18);
-		xmlElement18.SetAttribute("Value", LNIMCIMMJJG.ToString());
-		if (!Directory.Exists(SF2Paths.LCDBGFFDKJB()))
+		xmlElement18.SetAttribute("Value", _PaysFilePosition.ToString());
+		if (!Directory.Exists(SF2Paths.GetStatisticsPath()))
 		{
-			Directory.CreateDirectory(SF2Paths.LCDBGFFDKJB());
+			Directory.CreateDirectory(SF2Paths.GetStatisticsPath());
 		}
-		xmlDocument.Save(JNJGGIGNFBE());
+		xmlDocument.Save(GetDataFilePath());
 	}
 
 	private void SaveFullLog()
 	{
 		try
 		{
-			FileInfo fileInfo = new FileInfo(ANOGPNAIFLI());
+			FileInfo fileInfo = new FileInfo(GetFullEventsPath());
 			if (!fileInfo.Exists)
 			{
 				fileInfo.Create().Close();
 			}
-			FileInfo fileInfo2 = new FileInfo(GCHJLCEFNMK());
+			FileInfo fileInfo2 = new FileInfo(GetEventsPath());
 			if (fileInfo2.Exists)
 			{
 				StreamWriter streamWriter = fileInfo.AppendText();
@@ -570,7 +570,7 @@ public class StatisticsCollector
 		}
 		catch (Exception ex)
 		{
-			LLLOJBFMONN.Error(ex.Message);
+			GameLog.Error(ex.Message);
 		}
 	}
 
@@ -578,7 +578,7 @@ public class StatisticsCollector
 	{
 		try
 		{
-			FileInfo fileInfo = new FileInfo(ANOGPNAIFLI());
+			FileInfo fileInfo = new FileInfo(GetFullEventsPath());
 			if (!fileInfo.Exists)
 			{
 				fileInfo.Create().Close();
@@ -590,21 +590,21 @@ public class StatisticsCollector
 		}
 		catch (Exception ex)
 		{
-			LLLOJBFMONN.Error(ex.Message);
+			GameLog.Error(ex.Message);
 		}
 	}
 
-	private void GGGEHAGCLGC()
+	private void FlushEventsBuffer()
 	{
-		GGGEHAGCLGC(DCFPONJAING, GCHJLCEFNMK());
+		FlushBuffer(_EventsBuffer, GetEventsPath());
 	}
 
-	private void AGNMPDEFABN()
+	private void FlushPaysBuffer()
 	{
-		GGGEHAGCLGC(PHGGNFPBOKD, EFILFAHEAKB());
+		FlushBuffer(_PaysBuffer, GetPaysPath());
 	}
 
-	private void GGGEHAGCLGC(StringBuilder Data, string PDLAFCOODMM)
+	private void FlushBuffer(StringBuilder Data, string PDLAFCOODMM)
 	{
 		if (Data.Length == 0)
 		{
@@ -614,9 +614,9 @@ public class StatisticsCollector
 		Data.Length = 0;
 		try
 		{
-			if (!Directory.Exists(SF2Paths.LCDBGFFDKJB()))
+			if (!Directory.Exists(SF2Paths.GetStatisticsPath()))
 			{
-				Directory.CreateDirectory(SF2Paths.LCDBGFFDKJB());
+				Directory.CreateDirectory(SF2Paths.GetStatisticsPath());
 			}
 			FileInfo fileInfo = new FileInfo(PDLAFCOODMM);
 			if (!fileInfo.Exists)
@@ -634,73 +634,73 @@ public class StatisticsCollector
 		}
 		catch (Exception ex)
 		{
-			LLLOJBFMONN.Error(ex.Message);
+			GameLog.Error(ex.Message);
 		}
 	}
 
-	public void LENBEPODJPC()
+	public void SendFullLog()
 	{
 		int pCOENEHCGNI = 2000000;
-		GGGEHAGCLGC();
+		FlushEventsBuffer();
 		SaveFullLog();
-		Send(ANOGPNAIFLI(), ref DEBIFEKGFKD, (bool AMKKLMOONEP, string GHDPPHAAPCA, object JHJDJOFPHPH, string MDIJEPEOAJH) =>
+		Send(GetFullEventsPath(), ref _FullLogPosition, (bool AMKKLMOONEP, string GHDPPHAAPCA, object JHJDJOFPHPH, string MDIJEPEOAJH) =>
 		{
-			GBNKIIILEGI(AMKKLMOONEP, GHDPPHAAPCA, JHJDJOFPHPH, MDIJEPEOAJH);
+			OnFullLogSent(AMKKLMOONEP, GHDPPHAAPCA, JHJDJOFPHPH, MDIJEPEOAJH);
 		}, pCOENEHCGNI, false, "save_full_json_log");
 	}
 
-	public void GBNKIIILEGI(bool AMKKLMOONEP, string GHDPPHAAPCA, object JHJDJOFPHPH, string CCNACAJIIGA)
+	public void OnFullLogSent(bool AMKKLMOONEP, string GHDPPHAAPCA, object JHJDJOFPHPH, string CCNACAJIIGA)
 	{
 		if (AMKKLMOONEP)
 		{
 			JSONNode jSONNode = JSON.Parse(GHDPPHAAPCA);
 			if (jSONNode != null && jSONNode["data"] != null && jSONNode["data"].Value == "ok")
 			{
-				SendOnNextFrame(LENBEPODJPC);
+				SendOnNextFrame(SendFullLog);
 			}
 		}
 	}
 
-	private void OPGFPNFAOLH()
+	private void SendPayLog()
 	{
-		if (ACNHHFKLKID != NBGNCCPMCCD.NotLogging && ACNHHFKLKID != NBGNCCPMCCD.Undecided)
+		if (_PaysLoggingState != LoggingState.NotLogging && _PaysLoggingState != LoggingState.Undecided)
 		{
 			int pCOENEHCGNI = 2000000;
-			Send(EFILFAHEAKB(), ref LNIMCIMMJJG, (bool AMKKLMOONEP, string GHDPPHAAPCA, object JHJDJOFPHPH, string MDIJEPEOAJH) =>
+			Send(GetPaysPath(), ref _PaysFilePosition, (bool AMKKLMOONEP, string GHDPPHAAPCA, object JHJDJOFPHPH, string MDIJEPEOAJH) =>
 			{
-				ADFDKDNHONL(AMKKLMOONEP, GHDPPHAAPCA, JHJDJOFPHPH, MDIJEPEOAJH);
+				OnPayLogSent(AMKKLMOONEP, GHDPPHAAPCA, JHJDJOFPHPH, MDIJEPEOAJH);
 			}, pCOENEHCGNI, false, "save_pay_log");
 		}
 	}
 
-	public void ADFDKDNHONL(bool AMKKLMOONEP, string GHDPPHAAPCA, object JHJDJOFPHPH, string CCNACAJIIGA)
+	public void OnPayLogSent(bool AMKKLMOONEP, string GHDPPHAAPCA, object JHJDJOFPHPH, string CCNACAJIIGA)
 	{
 		if (AMKKLMOONEP)
 		{
 			JSONNode jSONNode = JSON.Parse(GHDPPHAAPCA);
 			if (jSONNode != null && jSONNode["data"] != null && jSONNode["data"].Value == "ok")
 			{
-				LJBLDJPLMPL();
-				SendOnNextFrame(OPGFPNFAOLH);
+				ClearPayLogIfSent();
+				SendOnNextFrame(SendPayLog);
 			}
 		}
 	}
 
-	private void LJBLDJPLMPL()
+	private void ClearPayLogIfSent()
 	{
-		AGNMPDEFABN();
-		FileInfo fileInfo = new FileInfo(EFILFAHEAKB());
+		FlushPaysBuffer();
+		FileInfo fileInfo = new FileInfo(GetPaysPath());
 		if (fileInfo.Exists)
 		{
 			bool flag = false;
 			StreamReader streamReader = fileInfo.OpenText();
-			flag = LNIMCIMMJJG >= streamReader.BaseStream.Length;
+			flag = _PaysFilePosition >= streamReader.BaseStream.Length;
 			streamReader.Close();
 			if (flag)
 			{
 				fileInfo.Create().Close();
-				LNIMCIMMJJG = 0L;
-				AHOPPPNPOHB();
+				_PaysFilePosition = 0L;
+				SaveData();
 			}
 		}
 	}
@@ -708,13 +708,13 @@ public class StatisticsCollector
 	private void Send()
 	{
 		int pCOENEHCGNI = 2000000;
-		if (COLCBNPNLPG != NBGNCCPMCCD.NotLogging && COLCBNPNLPG != NBGNCCPMCCD.Undecided)
+		if (_EventsLoggingState != LoggingState.NotLogging && _EventsLoggingState != LoggingState.Undecided)
 		{
-			PFGKFHJMMFH = FAEJIAODPEA.IKJMBCFLHMC();
-			GGGEHAGCLGC();
-			Send(GCHJLCEFNMK(), ref HKJHIACNECB, (bool AMKKLMOONEP, string GHDPPHAAPCA, object JHJDJOFPHPH, string MDIJEPEOAJH) =>
+			_LastSendTime = GameTimeUtils.GetUnixTimeMs();
+			FlushEventsBuffer();
+			Send(GetEventsPath(), ref _EventsFilePosition, (bool AMKKLMOONEP, string GHDPPHAAPCA, object JHJDJOFPHPH, string MDIJEPEOAJH) =>
 			{
-				EBPNOCPEOFN(AMKKLMOONEP, GHDPPHAAPCA, JHJDJOFPHPH, MDIJEPEOAJH);
+				OnEventsSent(AMKKLMOONEP, GHDPPHAAPCA, JHJDJOFPHPH, MDIJEPEOAJH);
 			}, pCOENEHCGNI);
 		}
 	}
@@ -724,7 +724,7 @@ public class StatisticsCollector
 		// No telemetry transport.
 	}
 
-	public void EBPNOCPEOFN(bool AMKKLMOONEP, string GHDPPHAAPCA, object JHJDJOFPHPH, string CCNACAJIIGA)
+	public void OnEventsSent(bool AMKKLMOONEP, string GHDPPHAAPCA, object JHJDJOFPHPH, string CCNACAJIIGA)
 	{
 		if (AMKKLMOONEP)
 		{
@@ -732,26 +732,26 @@ public class StatisticsCollector
 			if (jSONNode != null && jSONNode["data"] != null && jSONNode["data"].Value == "ok")
 			{
 				SaveFullLog(CCNACAJIIGA);
-				FHOBBAHNNCL();
+				ClearEventsLogIfSent();
 			}
 		}
 	}
 
-	private void FHOBBAHNNCL()
+	private void ClearEventsLogIfSent()
 	{
-		GGGEHAGCLGC();
-		FileInfo fileInfo = new FileInfo(GCHJLCEFNMK());
+		FlushEventsBuffer();
+		FileInfo fileInfo = new FileInfo(GetEventsPath());
 		if (fileInfo.Exists)
 		{
 			bool flag = false;
 			StreamReader streamReader = fileInfo.OpenText();
-			flag = HKJHIACNECB >= streamReader.BaseStream.Length;
+			flag = _EventsFilePosition >= streamReader.BaseStream.Length;
 			streamReader.Close();
 			if (flag)
 			{
 				fileInfo.Create().Close();
-				HKJHIACNECB = 0L;
-				AHOPPPNPOHB();
+				_EventsFilePosition = 0L;
+				SaveData();
 			}
 			else
 			{
@@ -771,13 +771,13 @@ public class StatisticsCollector
 		IBODMPMJELJ();
 	}
 
-	private void NLMGNONKMBN()
+	private void TrimEventsLog()
 	{
-		if (!File.Exists(GCHJLCEFNMK()))
+		if (!File.Exists(GetEventsPath()))
 		{
 			return;
 		}
-		string[] array = File.ReadAllLines(GCHJLCEFNMK());
+		string[] array = File.ReadAllLines(GetEventsPath());
 		if (array.Length <= 200)
 		{
 			return;
@@ -790,42 +790,42 @@ public class StatisticsCollector
 			stringBuilder.AppendLine(item);
 		}
 		stringBuilder.Length--;
-		File.WriteAllText(GCHJLCEFNMK(), stringBuilder.ToString());
-		PFGKFHJMMFH = FAEJIAODPEA.IKJMBCFLHMC();
+		File.WriteAllText(GetEventsPath(), stringBuilder.ToString());
+		_LastSendTime = GameTimeUtils.GetUnixTimeMs();
 	}
 
 	public void OnTimerTick(object data)
 	{
-		BLLDCBKNIJA++;
+		_SessionLength++;
 	}
 
-	public void FFMHKLENGLP(bool FILCEHABKLK)
+	public void OnApplicationPause(bool FILCEHABKLK)
 	{
-		if (!FILCEHABKLK && FAEJIAODPEA.IKJMBCFLHMC() - PFGKFHJMMFH > 900000)
+		if (!FILCEHABKLK && GameTimeUtils.GetUnixTimeMs() - _LastSendTime > 900000)
 		{
 			Send();
 		}
 		if (FILCEHABKLK)
 		{
-			CHHJENPJGDP();
+			SaveEndState();
 		}
 	}
 
-	private void CHHJENPJGDP()
+	private void SaveEndState()
 	{
-		EKFPAJCKJLB = GlobalTimer.get_LocalTimeUTC();
-		Roster nKGLHEGIKKP = ListSF.CCDKHLAMKKO();
+		_EndDate = GlobalTimer.get_LocalTimeUTC();
+		Roster nKGLHEGIKKP = ListSF.GetRoster();
 		if (nKGLHEGIKKP != null)
 		{
-			BPGFOAHGAHE = ListSF.CCDKHLAMKKO().EHFJHFDACMP();
-			FIGDGGKLFDG = ListSF.CCDKHLAMKKO().PINDEKDNCNL();
-			ONLODELNKPO = ListSF.CCDKHLAMKKO().BFBOEGMAMNF();
-			_EndXp = ListSF.CCDKHLAMKKO().EOKLELGLHJJ();
-			JBNACLHHBPA = ListSF.CCDKHLAMKKO().NHKMGNPADKI();
+			_EndBonus = ListSF.GetRoster().GetBonus();
+			_EndLevel = ListSF.GetRoster().GetLevel();
+			_EndMoney = ListSF.GetRoster().GetMoney();
+			_EndXp = ListSF.GetRoster().GetExperience();
+			_EndEnergy = ListSF.GetRoster().GetMaxPower();
 		}
-		LCNJJLAKEHK = "0";
-		ABOPCADKEJI = string.Empty;
-		KAFIDINNDIP = 0;
-		AHOPPPNPOHB();
+		_CheatId = "0";
+		_Info = string.Empty;
+		_Counter = 0;
+		SaveData();
 	}
 }

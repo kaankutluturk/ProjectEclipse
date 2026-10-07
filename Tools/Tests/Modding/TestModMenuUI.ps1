@@ -22,7 +22,7 @@ foreach ($source in @('Assets/Scripts/Eclipse/Input/FightKeyBindings.cs', 'Asset
     Copy-Item -LiteralPath (Join-Path $root $source) -Destination (Join-Path $fixture 'Assets') -Force
 }
 $stubs = Get-Content -LiteralPath (Join-Path $PSScriptRoot '../Shared/LegacyModdingStubs.cs') -Raw
-$stubs.Replace('public static ListSF CCDKHLAMKKO() => Instance;', 'public static ListSF CCDKHLAMKKO() => Instance; public void GGGEHAGCLGC() { }') | Set-Content -LiteralPath (Join-Path $fixture 'Assets/LegacyModdingStubs.cs')
+$stubs.Replace('public static ListSF GetRoster() => Instance;', 'public static ListSF GetRoster() => Instance; public void RequestSave() { }') | Set-Content -LiteralPath (Join-Path $fixture 'Assets/LegacyModdingStubs.cs')
 foreach ($name in @('example.phase1', 'example.phase2', 'example.phase3', 'example.weapon', 'example.loadout', 'example.enchantment')) {
     $destination = Join-Path $fixture "Assets/ModMenuFixtures/$name"
     New-Item -ItemType Directory -Path $destination -Force | Out-Null

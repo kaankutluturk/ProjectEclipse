@@ -78,7 +78,7 @@ namespace Eclipse.Modding
                             !ReferenceEquals(profile, _lotteryProfileNode))
                             throw new InvalidOperationException("Profile changed during purchase settlement.");
                         reservation.Commit();
-                        owner.GGGEHAGCLGC(true);
+                        owner.RequestSave(true);
                         _profileMutationState = 0;
                         ListSF.GetInstance().OnAuthenticate(true);
                     }
@@ -97,8 +97,8 @@ namespace Eclipse.Modding
             var comparison = Path.DirectorySeparatorChar == '\\' ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
             string full = Path.GetFullPath(path);
             string directory = SF2Paths.GetUserDataDirectory();
-            return string.Equals(full, Path.GetFullPath(Path.Combine(directory, Constants.OJMIJINKBPJ)), comparison) ||
-                string.Equals(full, Path.GetFullPath(Path.Combine(directory, Constants.GHKPPHAAMBL)), comparison);
+            return string.Equals(full, Path.GetFullPath(Path.Combine(directory, Constants.UsersFileName)), comparison) ||
+                string.Equals(full, Path.GetFullPath(Path.Combine(directory, Constants.UsersBackupFileName)), comparison);
         }
 
         internal static bool TryWriteProfileSnapshot(XmlDocument document, string path)
@@ -110,8 +110,8 @@ namespace Eclipse.Modding
                 document.Save(stream);
                 snapshot = stream.ToArray();
             }
-            byte[] hash = GameSettings.HCAJHNKLLGB() ? System.Text.Encoding.UTF8.GetBytes(
-                MD5Utils.INPENHNJBGJ(document.OuterXml, UserDataValidator.GHEHGBBNMNO())) : null;
+            byte[] hash = GameSettings.IsUserDataValidationEnabled() ? System.Text.Encoding.UTF8.GetBytes(
+                MD5Utils.MD5HashString(document.OuterXml, UserDataValidator.GetHashKey())) : null;
             ModProfileWriteJournal.Write(path, snapshot, hash, ValidateProfileSnapshot);
             return true;
         }
@@ -232,8 +232,8 @@ namespace Eclipse.Modding
             DojoSelection.Clear();
             DojoSelection.SetCoreLocationValidator(name =>
                 !string.IsNullOrEmpty(ResourceManager.GetBundledText(
-                    SF2Paths.OCAKEHJCNCC() + "/" + name + "/params.xml")));
-            DojoSelection.SetSaveRequested(() => _profileRoster?.GGGEHAGCLGC(true));
+                    SF2Paths.GetLocationsPath() + "/" + name + "/params.xml")));
+            DojoSelection.SetSaveRequested(() => _profileRoster?.RequestSave(true));
             _legacyContent?.Dispose();
             _legacyContent = null;
             _scripts?.Dispose();
@@ -243,7 +243,7 @@ namespace Eclipse.Modding
             ModModeRuntime.Warning = message => Debug.LogWarning(message);
             ModPolicies.Content = null;
             _scripts = Host.StartScripts(new MoonSharpScriptRuntime(Eclipse.UI.Modding.ModUiGameBridge.Attach,
-                () => LocalizationManager.ILAJKOBCHFH == null ? LocalizationManager.POIPGLLCCKC : LocalizationManager.ILAJKOBCHFH.name, DojoSelection, StoryEvents, () => new ModAudioBackend()), LogScript, content =>
+                () => LocalizationManager.CurrentLanguage == null ? LocalizationManager.DefaultLanguageName : LocalizationManager.CurrentLanguage.name, DojoSelection, StoryEvents, () => new ModAudioBackend()), LogScript, content =>
                 {
                     var import = System.Diagnostics.Stopwatch.StartNew();
                     ImportCoreContent(content);
@@ -278,12 +278,12 @@ namespace Eclipse.Modding
             ModModeRuntime.BuildEncounter = (mode,step,plan) => {
                 if (_legacyContent == null || !_scripts.Content.TryGetFight(mode.Fights[step],out var definition))
                     throw new ModContentException("Generated encounter content is unavailable.");
-                var original = ListSF.CHMCKGCDGCM(new FightIDS(_scripts.Content.RuntimeFightId(definition.Id)));
+                var original = ListSF.GetFightById(new FightIDS(_scripts.Content.RuntimeFightId(definition.Id)));
                 if (original == null) throw new ModContentException("Generated encounter blueprint is unavailable.");
                 var node = _legacyContent.BuildEncounterNode(definition,plan);
                 if(plan.PlayerCharacter.HasValue)BuildPlayerCharacterParameters(plan.PlayerCharacter.Value);
                 var result = new FightList();
-                ListSF.GetInstance().FOKCPLOMLOK(result,node,original.get_Type(),original.Location,original.Music,original.Battle);
+                ListSF.GetInstance().ParseFight(result,node,original.get_Type(),original.Location,original.Music,original.Battle);
                 result.FightId = new FightIDS(original.FightId.ToString());
                 result.Battle = original.Battle; result.Index = original.Index;
                 if(plan.PlayerCharacter.HasValue)EncounterPlayers.Add(result,new EncounterPlayer {Character=plan.PlayerCharacter.Value});
@@ -383,7 +383,7 @@ namespace Eclipse.Modding
                 mark("adapter");
                 _legacyContent.ApplyItems(ListSF.GetItems());
                 mark("items");
-                _legacyContent.ApplyPerksAndEnchantments(GameUtils.FDEJIIDIPBI, ForgeManager.ELEBLBJKDBI());
+                _legacyContent.ApplyPerksAndEnchantments(GameUtils.PerkItemList, ForgeManager.GetInstance());
                 mark("perks and enchantments");
                 ApplyP1DContent();
                 mark("P1D");
@@ -609,7 +609,7 @@ namespace Eclipse.Modding
         internal static bool TrySetEclipseMode(bool enabled)
         {
             var map = ReadyProgressionMap();
-            if (map == null || map.GetCurrentState() != Nekki.SF2.GUI.Map.MapScene.NMFLNANKNOJ.StoryMode) return false;
+            if (map == null || map.GetCurrentState() != Nekki.SF2.GUI.Map.MapScene.MapMode.StoryMode) return false;
             if (_profileRoster.IsEclipseMode() == enabled) return true;
             var roster = _profileRoster;
             string action = enabled ? "EclipseModeOn" : "EclipseModeOff";
@@ -709,7 +709,7 @@ namespace Eclipse.Modding
                     // A reveal can have rebuilt the map earlier in this callback.
                     Canvas.ForceUpdateCanvases();
                     map.SelectBattle(native, 0f);
-                    if (map.GetCurrentState() == Nekki.SF2.GUI.Map.MapScene.NMFLNANKNOJ.RaidMode)
+                    if (map.GetCurrentState() == Nekki.SF2.GUI.Map.MapScene.MapMode.RaidMode)
                         _profileRoster.SetRaidMapFocus(nativeId.ToString());
                     else _profileRoster.SetMapFocus(nativeId.ToString());
                     ListSF.GetInstance().OnAuthenticate(true);
@@ -734,11 +734,11 @@ namespace Eclipse.Modding
             var lockScreen = Nekki.SF2.GUI.LockScreen.get_Instance();
             if (lockScreen != null && lockScreen.gameObject.activeInHierarchy) return false;
             var module = Module.GetInstance();
-            var current = SceneManagerSF.EKFBDMBCDMB();
+            var current = SceneManagerSF.GetCurrentScreen();
             // A combat exit must go through the native surrender/result workflow.
             if (current != ScreenType.ModuleMap && current != ScreenType.ModuleShop &&
                 current != ScreenType.ModuleProfile && current != ScreenType.ModuleDojo) return false;
-            if (module.BOHBCFMJPCA() == null || module.GetCurrentScreenType() != current ||
+            if (module.GetCurrentHolder() == null || module.GetCurrentScreenType() != current ||
                 UnityEngine.SceneManagement.SceneManager.GetActiveScene().buildIndex != (int)current) return false;
             // Reopening the dojo reloads it when its location choice changed.
             if (current == target && !(target == ScreenType.ModuleDojo && global::Location.DojoSelectionChanged())) return true;
@@ -747,7 +747,7 @@ namespace Eclipse.Modding
             {
                 // Keep the native quest/tab gates enabled. False can mean a native
                 // quest consumed the request; do not force a second transition.
-                return Module.DLOKJOHNDID(target);
+                return Module.OpenScreen(target);
             }
             finally { _sceneNavigationInProgress = false; }
         }
@@ -755,15 +755,15 @@ namespace Eclipse.Modding
         // Host-only selection. Eligibility policy and random sampling belong to
         // the caller; this neither evaluates unselected rewards nor grants loot.
         internal static bool TrySelectLotterySlot(RewardLottery lottery, int level, double sample,
-            Func<MANJCIGJPMK, bool> eligible, out MANJCIGJPMK selected)
+            Func<LotteryPrizeEntry, bool> eligible, out LotteryPrizeEntry selected)
         {
             if(lottery==null)throw new ArgumentNullException(nameof(lottery));
             if(level<1)throw new ArgumentOutOfRangeException(nameof(level));
             if(double.IsNaN(sample)||sample<0||sample>=1)throw new ArgumentOutOfRangeException(nameof(sample));
-            selected=default(MANJCIGJPMK);
-            var candidates=new List<MANJCIGJPMK>();
+            selected=default(LotteryPrizeEntry);
+            var candidates=new List<LotteryPrizeEntry>();
             double total=0;
-            foreach(var slot in lottery.EDCOGMLOEHE.ToArray())
+            foreach(var slot in lottery.slots.ToArray())
             {
                 if(float.IsNaN(slot.Weight)||float.IsInfinity(slot.Weight)||slot.Weight<0)
                     throw new InvalidOperationException("Lottery slot weights must be finite and nonnegative.");
@@ -825,9 +825,9 @@ namespace Eclipse.Modding
             {
                 if(_consumed || _owner==null || !ReferenceEquals(_owner,_profileRoster) ||
                     _generation!=StoryEvents.ProfileGeneration)return false;
-                if(_prize.FAPDEKOMOGH!=null)
+                if(_prize.Lottery!=null)
                     throw new InvalidOperationException("Nested lottery rewards must be resolved before claiming.");
-                if (_prize.KBMDJACLAOH.Count != 0)
+                if (_prize.Resistances.Count != 0)
                     throw new NotSupportedException("Native resistance reward granting is not implemented.");
                 if (_saved != null && (_saved.ParentNode != _lotteryProfileNode || _saved.GetAttribute("State") != "prepared")) return false;
                 if (_profileMutationState != 0) throw new InvalidOperationException("Another lottery settlement is active or requires profile reload.");
@@ -839,11 +839,11 @@ namespace Eclipse.Modding
                     _profileMutationState = 1;
                     try
                     {
-                        ListSF.GetInstance().IMDGMNFHFCN(_prize);
+                        ListSF.GetInstance().ApplyFightRewards(_prize);
                         // IMDGMNFHFCN's return value indicates level-up, not grant success.
                         if(!ReferenceEquals(_owner,_profileRoster) || _generation!=StoryEvents.ProfileGeneration)
                             throw new InvalidOperationException("Profile changed during lottery grant; the consumed claim cannot be retried.");
-                        _owner.GGGEHAGCLGC(true);
+                        _owner.RequestSave(true);
                         acknowledge?.Invoke();
                         if (_saved != null) _saved.SetAttribute("State", "claimed");
                         _profileMutationState = 0;
@@ -870,10 +870,10 @@ namespace Eclipse.Modding
             var continuation = _lotteryProfileNode.OwnerDocument.CreateElement("BattleEnd");
             continuation.SetAttribute("Format", "1");
             continuation.SetAttribute("Encounter", encounterId ?? Guid.NewGuid().ToString("N"));
-            continuation.SetAttribute("Fight", context.JLGLBLDPAAF.ToString());
+            continuation.SetAttribute("Fight", context.fightIds.ToString());
             continuation.SetAttribute("Raid", raid ? "1" : "0");
-            continuation.SetAttribute("RaidId", context.OHPHPJBMNLH ?? string.Empty);
-            continuation.SetAttribute("LevelUp", context.BJIDALJIKNC.ToString(System.Globalization.CultureInfo.InvariantCulture));
+            continuation.SetAttribute("RaidId", context.raidId ?? string.Empty);
+            continuation.SetAttribute("LevelUp", context.levelUp.ToString(System.Globalization.CultureInfo.InvariantCulture));
             continuation.SetAttribute("AverageFps", context.fightAvgFps.ToString("R", System.Globalization.CultureInfo.InvariantCulture));
             continuation.SetAttribute("Dispatched", "0");
             var claim = PrepareLotteryClaim(lottery, Math.Min(UnityEngine.Random.value, 0.9999999999999999), null, battleEnd: continuation);
@@ -909,9 +909,9 @@ namespace Eclipse.Modding
                     System.Globalization.CultureInfo.InvariantCulture, out float averageFps) || float.IsNaN(averageFps) || float.IsInfinity(averageFps))
                 throw new InvalidDataException("Invalid saved battle lottery continuation.");
             var id = new FightIDS(); id.SetFightIDSByString(continuation.GetAttribute("Fight"));
-            var context = new QuestParameters { JLGLBLDPAAF = id, HEIADONEACH = "Win", BJIDALJIKNC = levelUp,
-                fightAvgFps = averageFps, OHPHPJBMNLH = continuation.GetAttribute("RaidId"), inLottery = true,
-                FOODLENBJGI = saved["Prize"]?["Item"]?.GetAttribute("Name") ?? string.Empty };
+            var context = new QuestParameters { fightIds = id, fightResult = "Win", levelUp = levelUp,
+                fightAvgFps = averageFps, raidId = continuation.GetAttribute("RaidId"), inLottery = true,
+                setItemName = saved["Prize"]?["Item"]?.GetAttribute("Name") ?? string.Empty };
             bool queued = false;
             StoryEvents.RunDeferred(() => {
                 _profileMutationState = 1;
@@ -924,17 +924,17 @@ namespace Eclipse.Modding
                 }
                 catch { _profileMutationState = 2; throw; }
             });
-            ListSF.GetInstance().HAOHNNFLOGK = new QuestParameters();
+            ListSF.GetInstance().LotteryQuestParameters = new QuestParameters();
             _battleLotteryPresentation?.Dispose();
             _battleLotteryPresentation = null;
-            if (queued) ListSF.GetInstance().MHHNIPBJNAD();
+            if (queued) ListSF.GetInstance().RunQuestActions();
         }
 
         internal static void SaveQuestLotteryContext(ParametersQuest saved, QuestParameters context)
         {
             var parent = saved.Node;
             var previous = parent["EclipseLotteryContext"];
-            if (!context.inLottery && context.EGAPDJLHHNJ == 0 && string.IsNullOrEmpty(context.FOODLENBJGI) && string.IsNullOrEmpty(context.OHPHPJBMNLH))
+            if (!context.inLottery && context.lotteryLastSpinNumber == 0 && string.IsNullOrEmpty(context.setItemName) && string.IsNullOrEmpty(context.raidId))
             {
                 if (previous != null) parent.RemoveChild(previous);
                 return;
@@ -942,9 +942,9 @@ namespace Eclipse.Modding
             var node = parent.OwnerDocument.CreateElement("EclipseLotteryContext");
             node.SetAttribute("Format", "1");
             node.SetAttribute("InLottery", context.inLottery ? "1" : "0");
-            node.SetAttribute("Spin", context.EGAPDJLHHNJ.ToString(System.Globalization.CultureInfo.InvariantCulture));
-            node.SetAttribute("Item", context.FOODLENBJGI ?? string.Empty);
-            node.SetAttribute("Raid", context.OHPHPJBMNLH ?? string.Empty);
+            node.SetAttribute("Spin", context.lotteryLastSpinNumber.ToString(System.Globalization.CultureInfo.InvariantCulture));
+            node.SetAttribute("Item", context.setItemName ?? string.Empty);
+            node.SetAttribute("Raid", context.raidId ?? string.Empty);
             if (previous != null) parent.ReplaceChild(node, previous);
             else parent.AppendChild(node);
         }
@@ -959,9 +959,9 @@ namespace Eclipse.Modding
                     System.Globalization.CultureInfo.InvariantCulture, out int spin))
                 throw new InvalidDataException("Invalid saved quest lottery context.");
             context.inLottery = inLottery == "1";
-            context.EGAPDJLHHNJ = spin;
-            context.FOODLENBJGI = node.GetAttribute("Item");
-            context.OHPHPJBMNLH = node.GetAttribute("Raid");
+            context.lotteryLastSpinNumber = spin;
+            context.setItemName = node.GetAttribute("Item");
+            context.raidId = node.GetAttribute("Raid");
         }
 
         internal static AssetId? ResolveLotteryArtwork(LotteryClaim claim)
@@ -976,7 +976,7 @@ namespace Eclipse.Modding
                     var item = ListSF.GetItems().GetItemByName(name);
                     reference = item?.FileName ?? name;
                     if (reference.IndexOf(':') < 0)
-                        reference = "core:" + (item?.Type == "Seal" ? SF2Paths.BHCPOOOJAAK() : SF2Paths.LFIIMPEAMFG()) + reference;
+                        reference = "core:" + (item?.Type == "Seal" ? SF2Paths.GetUsersUiPath() : SF2Paths.GetItemsUiPath()) + reference;
                 }
                 if (!AssetId.TryParse(reference, out var id)) continue;
                 try
@@ -1001,12 +1001,12 @@ namespace Eclipse.Modding
                 return PrepareLotteryClaim(null, sample, null, ledger, actionIndex);
             var id = new FightIDS();
             id.SetFightIDSByString(fightName);
-            var fight = ListSF.CHMCKGCDGCM(id);
+            var fight = ListSF.GetFightById(id);
             if (fight == null) throw new InvalidOperationException("Lottery fight was not found: " + fightName);
             RewardLottery lottery = null;
-            foreach (var reward in fight.APKPCGDBMEP())
+            foreach (var reward in fight.GetRewards())
             {
-                var candidate = reward.KOBOIFJNPMO(_profileRoster.PINDEKDNCNL()).FAPDEKOMOGH;
+                var candidate = reward.GetPrizeForLevel(_profileRoster.GetLevel()).lottery;
                 if (candidate == null) continue;
                 if (lottery != null) throw new InvalidOperationException("Lottery action requires exactly one lottery reward.");
                 lottery = candidate;
@@ -1075,7 +1075,7 @@ namespace Eclipse.Modding
         }
 
         internal static LotteryClaim PrepareLotteryClaim(RewardLottery lottery, double sample,
-            Func<MANJCIGJPMK,bool> eligible, ModQuestInvocationLedger invocation = null, int actionIndex = 0, XmlElement battleEnd = null)
+            Func<LotteryPrizeEntry,bool> eligible, ModQuestInvocationLedger invocation = null, int actionIndex = 0, XmlElement battleEnd = null)
         {
             var owner=_profileRoster;
             if(owner==null)throw new InvalidOperationException("No active game profile is available.");
@@ -1098,10 +1098,10 @@ namespace Eclipse.Modding
                 return pending;
             }
             int generation=StoryEvents.ProfileGeneration;
-            int level=owner.PINDEKDNCNL();
+            int level=owner.GetLevel();
             if(!TrySelectLotterySlot(lottery,level,sample,eligible,out var selected))return null;
             var prize=BuildLotteryPrize(selected,level);
-            if (prize.KBMDJACLAOH.Count != 0)
+            if (prize.Resistances.Count != 0)
                 throw new NotSupportedException("Native resistance reward granting is not implemented.");
             if(!ReferenceEquals(owner,_profileRoster)||generation!=StoryEvents.ProfileGeneration)
                 throw new InvalidOperationException("Profile changed while preparing lottery rewards.");
@@ -1152,26 +1152,26 @@ namespace Eclipse.Modding
             var prize = ModLotteryPrizeCodec.Read(saved["Prize"], (name, level, upgrade) => {
                 var item = ListSF.GetItems().GetItemByName(name);
                 if (item == null) return null;
-                return item.ItemLevel == level && item.UpgradeLevel == upgrade ? item : item.HIOBANJPMKF(upgrade);
-            }, name => GameUtils.AJDKHINLIDI.ICFINJLNCPM(name), name => GameUtils.JNIMKHKGPHE.NDMEGBEFBPJ(name));
+                return item.ItemLevel == level && item.UpgradeLevel == upgrade ? item : item.GetUpgradeItemAtOrAboveUpgradeLevel(upgrade);
+            }, name => GameUtils.GameCurrencies.GetCurrencyByName(name), name => GameUtils.GameResistances.GetResistanceByName(name));
             return new LotteryClaim(_profileRoster, StoryEvents.ProfileGeneration, prize, saved);
         }
 
-        internal static FightResult.ResultPrizeStruct BuildLotteryPrize(MANJCIGJPMK slot, int level)
+        internal static FightResult.ResultPrizeStruct BuildLotteryPrize(LotteryPrizeEntry slot, int level)
         {
             if(!slot.TryEvaluateAtLevel(level,out var prize))
                 throw new InvalidOperationException("Lottery slot is unavailable at the selected level.");
             var result=new FightResult.ResultPrizeStruct {
-                GBGNFPNCGED=(long)prize.GBGNFPNCGED,
-                PNDAIFALIKF=(long)prize.PNDAIFALIKF,
+                Money=(long)prize.money,
+                Bonus=(long)prize.bonus,
                 exp=(uint)prize.exp
             };
-            foreach(var item in prize.MDJFGLELOBA)result.KFJABAMAKOD(item);
-            foreach(var item in prize.KIMJGOHCCPO)result.KFJABAMAKOD(item);
-            foreach(var item in prize.KBMDJACLAOH)result.KFJABAMAKOD(item);
-            if(prize.FAPDEKOMOGH!=null)result.KFJABAMAKOD(prize.FAPDEKOMOGH);
-            foreach(var item in prize.HELFDCAIJNE)result.KFJABAMAKOD(item);
-            foreach(var choice in prize.PNFMKMLLFHK)result.KFJABAMAKOD(choice.OOOBLJIHBEP());
+            foreach(var item in prize.moneyRewards)result.AddReward(item);
+            foreach(var item in prize.currencyRewards)result.AddReward(item);
+            foreach(var item in prize.resistanceRewards)result.AddReward(item);
+            if(prize.lottery!=null)result.AddReward(prize.lottery);
+            foreach(var item in prize.items)result.AddReward(item);
+            foreach(var choice in prize.choices)result.AddReward(choice.ChooseRandomReward());
             return result;
         }
 
@@ -1198,7 +1198,7 @@ namespace Eclipse.Modding
             if(player!=null)
             {
                 equipment=new List<ModBattleEquipmentSnapshot>();
-                foreach(var item in player.PJNJIJIODHE())
+                foreach(var item in player.GetEquippedItems())
                 {
                     DefinitionId? itemId=_scripts.Content.TryResolveRuntimeItem(item.Name,item.NodeXML?.OuterXml,out var resolved)?resolved:(DefinitionId?)null;
                     equipment.Add(new ModBattleEquipmentSnapshot(itemId,item.Type,item.SubType));
@@ -1260,7 +1260,7 @@ namespace Eclipse.Modding
         {
             LocalizationDefinition definition;
             if (_scripts?.Content == null || !_scripts.Content.TryGetLocalization(key, out definition)) return fallback;
-            string language = LocalizationManager.ILAJKOBCHFH == null ? LocalizationManager.POIPGLLCCKC : LocalizationManager.ILAJKOBCHFH.name;
+            string language = LocalizationManager.CurrentLanguage == null ? LocalizationManager.DefaultLanguageName : LocalizationManager.CurrentLanguage.name;
             string value;
             if (definition.TryGet(language, out value) && !string.IsNullOrEmpty(value)) return value;
             return definition.TryGet("eng", out value) && !string.IsNullOrEmpty(value) ? value : fallback;
@@ -1292,27 +1292,27 @@ namespace Eclipse.Modding
             StoryEvents.Publish(new ModStoryEvent(ModStoryEventKind.ItemAcquired, id, previousCount: previousCount, count: count));
         }
 
-        internal static ModStoryEvent CaptureStoryEvent(QuestEvent.PMDPDMFLCIJ kind, QuestParameters parameters)
+        internal static ModStoryEvent CaptureStoryEvent(QuestEvent.QuestEventType kind, QuestParameters parameters)
         {
             if (_profileRoster == null || _scripts == null || parameters == null) return null;
             ModStoryEventKind eventKind;
-            if (kind == QuestEvent.PMDPDMFLCIJ.QUEST_EVENT_PURCHASE) eventKind = ModStoryEventKind.Purchase;
-            else if (kind == QuestEvent.PMDPDMFLCIJ.QUEST_EVENT_ENCHANTMENT) eventKind = ModStoryEventKind.Enchantment;
-            else if (kind == QuestEvent.PMDPDMFLCIJ.QUEST_EVENT_MAP_BUTTON_PRESS) eventKind = ModStoryEventKind.MapButton;
+            if (kind == QuestEvent.QuestEventType.QUEST_EVENT_PURCHASE) eventKind = ModStoryEventKind.Purchase;
+            else if (kind == QuestEvent.QuestEventType.QUEST_EVENT_ENCHANTMENT) eventKind = ModStoryEventKind.Enchantment;
+            else if (kind == QuestEvent.QuestEventType.QUEST_EVENT_MAP_BUTTON_PRESS) eventKind = ModStoryEventKind.MapButton;
             else return null;
             if (!StoryEvents.HasSubscribers(eventKind)) return null;
             try
             {
                 if (eventKind == ModStoryEventKind.MapButton)
-                    return new ModStoryEvent(eventKind, null, button: parameters.GCKANEECDHE);
+                    return new ModStoryEvent(eventKind, null, button: parameters.buttonName);
                 string name = eventKind == ModStoryEventKind.Purchase
-                    ? parameters.DLKPBAJDHBO?.Name : parameters.DPLEGFCHOCE?.OHCGEEEKEJH;
-                string xml = eventKind == ModStoryEventKind.Purchase ? parameters.DLKPBAJDHBO?.NodeXML?.OuterXml : null;
+                    ? parameters.purchasedItem?.Name : parameters.enchantment?.itemName;
+                string xml = eventKind == ModStoryEventKind.Purchase ? parameters.purchasedItem?.NodeXML?.OuterXml : null;
                 DefinitionId? item = _scripts.Content.TryResolveRuntimeItem(name, xml, out var itemId) ? itemId : (DefinitionId?)null;
                 DefinitionId? recipe = null;
                 if (eventKind == ModStoryEventKind.Enchantment)
                 {
-                    string recipeName = parameters.DPLEGFCHOCE?.FHELNNCGCGC;
+                    string recipeName = parameters.enchantment?.recipeName;
                     if (DefinitionId.TryParse(recipeName, out var recipeId) && _scripts.Content.TryGetForgeRecipeFamily(recipeId, out var family))
                         recipe = family.Id;
                     else
@@ -1341,9 +1341,9 @@ namespace Eclipse.Modding
                 throw new ModContentException("Profile query references unavailable perk: " + id);
             string name = definition.IsCore && !string.IsNullOrEmpty(definition.LegacyName)
                 ? definition.LegacyName : definition.Id.ToString();
-            foreach (var perk in _profileRoster.JLBDOBLHHAF().KEHFPLBNDHI())
+            foreach (var perk in _profileRoster.GetPerks().GetPerks())
                 if (string.Equals(perk.get_Name(), name, StringComparison.Ordinal))
-                    return new ModProfilePerkSnapshot(true, perk.DHNNCAEEMLL());
+                    return new ModProfilePerkSnapshot(true, perk.GetUpgradeLevel());
             return new ModProfilePerkSnapshot(false, null);
         }
 
@@ -1366,16 +1366,16 @@ namespace Eclipse.Modding
         {
             if (_profileRoster == null || _scripts == null) return null;
             var result = new List<ModProfileEquipmentSnapshot>();
-            foreach (var item in _profileRoster.KHCNHPCPFII().JCMOHPFKPBO())
+            foreach (var item in _profileRoster.GetInventory().GetEquippedItems())
             {
-                var metadata = item.BHKHOJPANHE();
+                var metadata = item.GetInfo();
                 DefinitionId? id = _scripts.Content.TryResolveRuntimeItem(item.get_Name(), metadata?.NodeXML?.OuterXml, out var resolved)
                     ? resolved : (DefinitionId?)null;
                 var enchantments = new List<DefinitionId>();
                 foreach (var perk in item.GetEnchantments())
                     if (perk != null && TryResolveRuntimePerk(perk.Name, out var perkId)) enchantments.Add(perkId);
                 result.Add(new ModProfileEquipmentSnapshot(id,
-                    new ModProfileItemSnapshot(true, item.Count, true, item.DHNNCAEEMLL(), metadata?.Type, metadata?.SubType),
+                    new ModProfileItemSnapshot(true, item.Count, true, item.GetUpgradeLevel(), metadata?.Type, metadata?.SubType),
                     enchantments));
             }
             return result.AsReadOnly();
@@ -1398,10 +1398,10 @@ namespace Eclipse.Modding
                 throw new ModContentException("Profile query references unavailable item: " + id);
             string name = definition.IsCore && !string.IsNullOrEmpty(definition.LegacyName)
                 ? definition.LegacyName : definition.Id.ToString();
-            var item = _profileRoster.KHCNHPCPFII().CMGOCLGHNLH(name);
+            var item = _profileRoster.GetInventory().FindItem(name);
             var metadata = ListSF.GetItems()?.GetItemByName(name);
             return item == null ? new ModProfileItemSnapshot(false, 0, false, null, metadata?.Type, metadata?.SubType)
-                : new ModProfileItemSnapshot(true, item.Count, item.EFMFGEPDAOP(), item.DHNNCAEEMLL(), metadata?.Type, metadata?.SubType);
+                : new ModProfileItemSnapshot(true, item.Count, item.GetIsEquipped(), item.GetUpgradeLevel(), metadata?.Type, metadata?.SubType);
         }
 
         public static bool TryReadSavedEnchantment(XmlNode perkNode, out EnchantmentDefinition enchantment,
@@ -1799,7 +1799,7 @@ namespace Eclipse.Modding
             // All imports in this pass use the same source directory.
             string xmlRoot = GameplayContentArchive.GetXmlRoot();
             var nodes = new List<XmlNode>();
-            foreach (ItemInfo item in ListSF.GetItems().HCDLKHKBEPF())
+            foreach (ItemInfo item in ListSF.GetItems().GetAllItems())
                 if (item.Name.IndexOf(':') < 0 && item.NodeXML != null) nodes.Add(item.NodeXML);
             var languages = CoreContentImporter.ReadLocalizations(
                 Path.Combine(xmlRoot, "localizations"));
@@ -1812,7 +1812,7 @@ namespace Eclipse.Modding
             int nonEquipment = nodes.Count == 0 ? 0 : CoreContentImporter.ImportNonEquipment(content, nodes);
             LoadTimings.Mark("equipment");
             var forgeProfileNames = new List<string>();
-            ForgeManager forge = ForgeManager.ELEBLBJKDBI();
+            ForgeManager forge = ForgeManager.GetInstance();
             if (forge != null)
             {
                 foreach (Recipe recipe in forge.Recipes)

@@ -38,7 +38,7 @@ namespace Eclipse.Modding
         {
             foreach (var entry in vertical)
             {
-                var body = entry.Key.MJNPBMOAFML();
+                var body = entry.Key.GetLayerObject();
                 if (body != null) entry.Key.SetPositionY(body.transform.localPosition.y - entry.Value);
             }
             vertical.Clear();
@@ -47,9 +47,9 @@ namespace Eclipse.Modding
         {
             float amount = -(float)offset * zoom * factor;
             if (amount == 0) return;
-            float before = layer.MJNPBMOAFML().transform.localPosition.y;
+            float before = layer.GetLayerObject().transform.localPosition.y;
             layer.SetPositionY(before + amount);
-            vertical[layer] = layer.MJNPBMOAFML().transform.localPosition.y - before;
+            vertical[layer] = layer.GetLayerObject().transform.localPosition.y - before;
         }
     }
 }

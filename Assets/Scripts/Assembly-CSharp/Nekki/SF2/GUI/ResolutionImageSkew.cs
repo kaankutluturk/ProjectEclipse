@@ -12,7 +12,7 @@ namespace Nekki.SF2.GUI
 
 		protected List<UIVertex> _Vertexes = new List<UIVertex>();
 
-		public float DHFMMADMKCM
+		public float SkewAngleDegrees
 		{
 			get
 			{

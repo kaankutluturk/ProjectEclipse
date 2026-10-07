@@ -5,19 +5,19 @@ public class ConditionCurrentAnimation : ConditionAnimation
 {
 	private string _Name;
 
-	private bool HNBFHJHDCCC;
+	private bool _isNoAnimation;
 
-	private bool KMKJFLHJDAF;
+	private bool _physics;
 
 	public ConditionCurrentAnimation(XmlNode node)
 		: base(ConditionType.CURRENT_ANIMATION)
 	{
 		if (node.Attributes["Name"] != null)
 		{
-			_Name = node.Attributes["Name"].CIPOICEEIBK(string.Empty);
-			HNBFHJHDCCC = _Name == "$NoAnimation$";
+			_Name = node.Attributes["Name"].GetStringOrDefault(string.Empty);
+			_isNoAnimation = _Name == "$NoAnimation$";
 		}
-		KMKJFLHJDAF = node.Attributes["Physics"].ParseBool();
+		_physics = node.Attributes["Physics"].ParseBool();
 	}
 
 	public override bool IsEqual(ModelConditions conditions)
@@ -25,20 +25,20 @@ public class ConditionCurrentAnimation : ConditionAnimation
 		bool flag = false;
 		if (!string.IsNullOrEmpty(_Name))
 		{
-			List<string> list = LKALMFBALCN(conditions);
+			List<string> list = GetAnimationNames(conditions);
 			if (!("$Move" == _Name))
 			{
-				flag = ((!HNBFHJHDCCC) ? IsNames(_Name, list) : (list.Count == 0));
+				flag = ((!_isNoAnimation) ? IsNames(_Name, list) : (list.Count == 0));
 			}
 			else if (0 < list.Count)
 			{
-				flag = IsNames(list[0], conditions.PDKPGKPBBIL);
+				flag = IsNames(list[0], conditions.CandidateMoveNames);
 			}
 		}
 		else
 		{
-			flag = FEMJOBECCKD(conditions);
-			flag = flag == KMKJFLHJDAF;
+			flag = GetIsPhysicsAnimation(conditions);
+			flag = flag == _physics;
 		}
 		return (!IsNot) ? flag : (!flag);
 	}
@@ -70,37 +70,37 @@ public class ConditionCurrentAnimation : ConditionAnimation
 		return false;
 	}
 
-	private List<string> LKALMFBALCN(ModelConditions conditions)
+	private List<string> GetAnimationNames(ModelConditions conditions)
 	{
-		switch (OOFFOILONLO)
+		switch (_targetModelType)
 		{
-		case ModelType.KEIDBIOIFGA.MODEL_THIS:
-			return conditions.NNPJJLPCOHD;
-		case ModelType.KEIDBIOIFGA.MODEL_OTHER:
-			return conditions.MGFNFEHILNF;
-		case ModelType.KEIDBIOIFGA.MODEL_PARENT:
-			return conditions.DHHADKMMOHP;
-		case ModelType.KEIDBIOIFGA.MODEL_CHILD:
-			return conditions.NKPMIACBKDE;
+		case ModelType.ModelTargetType.MODEL_THIS:
+			return conditions.SelfAnimationNames;
+		case ModelType.ModelTargetType.MODEL_OTHER:
+			return conditions.OtherAnimationNames;
+		case ModelType.ModelTargetType.MODEL_PARENT:
+			return conditions.ParentAnimationNames;
+		case ModelType.ModelTargetType.MODEL_CHILD:
+			return conditions.ChildAnimationNames;
 		default:
-			LLLOJBFMONN.Error("ConditionCurrentAnimation: getAnimationNames - wrong type: {0}", OOFFOILONLO);
-			return conditions.NNPJJLPCOHD;
+			GameLog.Error("ConditionCurrentAnimation: getAnimationNames - wrong type: {0}", _targetModelType);
+			return conditions.SelfAnimationNames;
 		}
 	}
 
-	private bool FEMJOBECCKD(ModelConditions conditions)
+	private bool GetIsPhysicsAnimation(ModelConditions conditions)
 	{
-		switch (OOFFOILONLO)
+		switch (_targetModelType)
 		{
-		case ModelType.KEIDBIOIFGA.MODEL_THIS:
-			return conditions.NCBPMBJCFBK;
-		case ModelType.KEIDBIOIFGA.MODEL_OTHER:
-			return conditions.EKFCILFBDPO;
-		case ModelType.KEIDBIOIFGA.MODEL_PARENT:
-			return conditions.LFLDHGKEDEH;
+		case ModelType.ModelTargetType.MODEL_THIS:
+			return conditions.SelfIsPhysics;
+		case ModelType.ModelTargetType.MODEL_OTHER:
+			return conditions.OtherIsPhysics;
+		case ModelType.ModelTargetType.MODEL_PARENT:
+			return conditions.ParentIsPhysics;
 		default:
-			LLLOJBFMONN.Error("ConditionCurrentAnimation: getAnimationNames - wrong type: %i", OOFFOILONLO);
-			return conditions.NCBPMBJCFBK;
+			GameLog.Error("ConditionCurrentAnimation: getAnimationNames - wrong type: %i", _targetModelType);
+			return conditions.SelfIsPhysics;
 		}
 	}
 }

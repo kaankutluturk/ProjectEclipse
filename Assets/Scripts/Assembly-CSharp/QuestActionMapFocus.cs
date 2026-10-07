@@ -11,33 +11,33 @@ public class QuestActionMapFocus : QuestAction
 	public override void Parse(XmlNode EPKLCPOEELO)
 	{
 		base.Parse(EPKLCPOEELO);
-		_BattleName = EPKLCPOEELO.Attributes["Battle"].CIPOICEEIBK(string.Empty);
+		_BattleName = EPKLCPOEELO.Attributes["Battle"].GetStringOrDefault(string.Empty);
 		_Duration = EPKLCPOEELO.Attributes["Frames"].ParseFloat() / 60f;
 	}
 
-	public override void DEJMHFMLKIC(QuestParameters GFIHPBCEEOB)
+	public override void Execute(QuestParameters GFIHPBCEEOB)
 	{
-		base.DEJMHFMLKIC(GFIHPBCEEOB);
+		base.Execute(GFIHPBCEEOB);
 		ConditionExtension.CompareResult lNIDLHOIHIM = new ConditionExtension.CompareResult();
 		QuestCondition kKDGLNECFHA = new QuestCondition();
-		kKDGLNECFHA.LIMHBJBEEIA(PAJDEKLLFNJ);
-		kKDGLNECFHA.MCPIOGALBMK(_BattleName, lNIDLHOIHIM);
-		ListSF.CCDKHLAMKKO().SetMapFocus(lNIDLHOIHIM.ToString());
-		FightIDS dIAIIPCBMFL = ListSF.CCDKHLAMKKO().KNJNHKDCINB();
+		kKDGLNECFHA.SetParameters(Parameters);
+		kKDGLNECFHA.SetValue(_BattleName, lNIDLHOIHIM);
+		ListSF.GetRoster().SetMapFocus(lNIDLHOIHIM.ToString());
+		FightIDS dIAIIPCBMFL = ListSF.GetRoster().GetMapFocus();
 		MapScene current = Scene<MapScene>.get_Current();
 		if (current != null)
 		{
-			FightList jDIPBIHBGPF = ListSF.CHMCKGCDGCM(dIAIIPCBMFL);
+			FightList jDIPBIHBGPF = ListSF.GetFightById(dIAIIPCBMFL);
 			if (jDIPBIHBGPF != null)
 			{
 				current.SelectFight(jDIPBIHBGPF, _Duration);
 			}
 			else
 			{
-				Battle dPOOIONCEOA = ListSF.MKHAAGMJOPG(dIAIIPCBMFL);
+				Battle dPOOIONCEOA = ListSF.GetBattleById(dIAIIPCBMFL);
 				current.SelectBattle(dPOOIONCEOA, _Duration);
 			}
 		}
-		OGIJONMKABB();
+		FinishAction();
 	}
 }

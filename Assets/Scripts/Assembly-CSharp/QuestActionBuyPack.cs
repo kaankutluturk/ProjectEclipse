@@ -4,38 +4,38 @@ public class QuestActionBuyPack : QuestAction
 {
 	private string _PackName;
 
-	private QuestActionsSequence BCMBLGBENNN = new QuestActionsSequence();
+	private QuestActionsSequence successSequence = new QuestActionsSequence();
 
-	private QuestActionsSequence AKGCHOFDMDN = new QuestActionsSequence();
+	private QuestActionsSequence errorSequence = new QuestActionsSequence();
 
 	public override void Parse(XmlNode EPKLCPOEELO)
 	{
 		base.Parse(EPKLCPOEELO);
-		_PackName = EPKLCPOEELO.Attributes["PackName"].CIPOICEEIBK(string.Empty);
+		_PackName = EPKLCPOEELO.Attributes["PackName"].GetStringOrDefault(string.Empty);
 		XmlNode ePKLCPOEELO = EPKLCPOEELO["Success"];
 		XmlNode ePKLCPOEELO2 = EPKLCPOEELO["Error"];
-		APKBANHAEGN(ePKLCPOEELO, BCMBLGBENNN, OnActionComplete);
-		APKBANHAEGN(ePKLCPOEELO2, AKGCHOFDMDN, OnActionComplete);
+		ParseSequenceWithUnlock(ePKLCPOEELO, successSequence, OnActionComplete);
+		ParseSequenceWithUnlock(ePKLCPOEELO2, errorSequence, OnActionComplete);
 	}
 
-	public override void DEJMHFMLKIC(QuestParameters GFIHPBCEEOB)
+	public override void Execute(QuestParameters GFIHPBCEEOB)
 	{
-		GKFMJKAAJCA();
-		base.DEJMHFMLKIC(GFIHPBCEEOB);
+		ResetSequences();
+		base.Execute(GFIHPBCEEOB);
 		ConditionExtension.CompareResult bMDEBHIHIAJ = new ConditionExtension.CompareResult();
 		QuestCondition kKDGLNECFHA = new QuestCondition();
-		kKDGLNECFHA.LIMHBJBEEIA(GFIHPBCEEOB);
-		kKDGLNECFHA.MCPIOGALBMK(_PackName, bMDEBHIHIAJ);
+		kKDGLNECFHA.SetParameters(GFIHPBCEEOB);
+		kKDGLNECFHA.SetValue(_PackName, bMDEBHIHIAJ);
 	}
 
-	public override void GKFMJKAAJCA()
+	public override void ResetSequences()
 	{
-		BCMBLGBENNN.FHPKJMMLIEG();
-		AKGCHOFDMDN.FHPKJMMLIEG();
+		successSequence.Reset();
+		errorSequence.Reset();
 	}
 
 	private void OnActionComplete(object data)
 	{
-		OGIJONMKABB();
+		FinishAction();
 	}
 }

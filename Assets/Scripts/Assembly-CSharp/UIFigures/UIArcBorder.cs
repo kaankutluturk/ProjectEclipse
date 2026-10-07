@@ -27,7 +27,7 @@ namespace UIFigures
 		[Range(0f, (float)Math.PI * 2f)]
 		private float _To = (float)Math.PI / 2f;
 
-		public float KBGFAKKBMCN
+		public float ArcWidth
 		{
 			get
 			{
@@ -39,7 +39,7 @@ namespace UIFigures
 			}
 		}
 
-		public int MENNILNNPHH
+		public int SegmentCount
 		{
 			set
 			{
@@ -47,7 +47,7 @@ namespace UIFigures
 			}
 		}
 
-		public float CLCFLPDNBNL
+		public float FromAngle
 		{
 			get
 			{
@@ -59,7 +59,7 @@ namespace UIFigures
 			}
 		}
 
-		public float KAEAKHIEIHH
+		public float ToAngle
 		{
 			get
 			{
@@ -71,7 +71,7 @@ namespace UIFigures
 			}
 		}
 
-		public Color BOHEMLDLGFP
+		public Color AllColor
 		{
 			set
 			{
@@ -123,9 +123,9 @@ namespace UIFigures
 		protected override void OnPopulateMesh(VertexHelper DHJBOKKAOJK)
 		{
 			base.OnPopulateMesh(DHJBOKKAOJK);
-			Vector2 gIAEPIIIMDH = (OMPIACGGOAC + PMBHNNBJNKL) * 0.5f;
+			Vector2 gIAEPIIIMDH = (_LowerLeft + _UpperRight) * 0.5f;
 			Vector2 lPEMPCEJFIN = new Vector2(base.rectTransform.rect.width, base.rectTransform.rect.height) * 0.5f;
-			DrawFunctions.GAGFKBFLHHE(DHJBOKKAOJK, gIAEPIIIMDH, lPEMPCEJFIN, _Width, _To, _From, _Segments, color, (!_UseEndColor) ? color : _EndColor);
+			DrawFunctions.DrawArcBorder(DHJBOKKAOJK, gIAEPIIIMDH, lPEMPCEJFIN, _Width, _To, _From, _Segments, color, (!_UseEndColor) ? color : _EndColor);
 		}
 	}
 }

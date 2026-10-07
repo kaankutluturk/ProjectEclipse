@@ -8,9 +8,9 @@ namespace UIFigures
 	{
 		public Sprite _Sprite;
 
-		protected Vector2 OMPIACGGOAC;
+		protected Vector2 _LowerLeft;
 
-		protected Vector2 PMBHNNBJNKL;
+		protected Vector2 _UpperRight;
 
 		public override Texture mainTexture
 		{
@@ -22,12 +22,12 @@ namespace UIFigures
 
 		protected override void OnPopulateMesh(VertexHelper DHJBOKKAOJK)
 		{
-			OMPIACGGOAC = new Vector2(0f - base.rectTransform.pivot.x, 0f - base.rectTransform.pivot.y);
-			PMBHNNBJNKL = new Vector2(1f - base.rectTransform.pivot.x, 1f - base.rectTransform.pivot.y);
-			OMPIACGGOAC.x *= base.rectTransform.rect.width;
-			OMPIACGGOAC.y *= base.rectTransform.rect.height;
-			PMBHNNBJNKL.x *= base.rectTransform.rect.width;
-			PMBHNNBJNKL.y *= base.rectTransform.rect.height;
+			_LowerLeft = new Vector2(0f - base.rectTransform.pivot.x, 0f - base.rectTransform.pivot.y);
+			_UpperRight = new Vector2(1f - base.rectTransform.pivot.x, 1f - base.rectTransform.pivot.y);
+			_LowerLeft.x *= base.rectTransform.rect.width;
+			_LowerLeft.y *= base.rectTransform.rect.height;
+			_UpperRight.x *= base.rectTransform.rect.width;
+			_UpperRight.y *= base.rectTransform.rect.height;
 		}
 
 		public void Refresh()

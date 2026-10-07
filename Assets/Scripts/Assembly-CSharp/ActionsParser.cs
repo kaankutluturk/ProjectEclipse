@@ -66,7 +66,7 @@ public static class ActionsParser
 			result = new Eclipse.Content.EnableBossAbilityMoveAction(node);
 			break;
 		default:
-			LLLOJBFMONN.Error("ERROR: ActionsParser::create - no action \"{0}\" found", name);
+			GameLog.Error("ERROR: ActionsParser::create - no action \"{0}\" found", name);
 			break;
 		}
 		return result;
@@ -80,16 +80,16 @@ public class ActionAnimationModFlag : ActionAnimation
 	public string FlagName { get; private set; }
 	public int Frames { get; private set; }
 
-	public ActionAnimationModFlag(XmlNode node) : base(FADAJCEEKIO.MOD_FLAG)
+	public ActionAnimationModFlag(XmlNode node) : base(ActionType.MOD_FLAG)
 	{
 		Parse(node);
-		FlagName = node.Attributes["Name"].CIPOICEEIBK(string.Empty);
+		FlagName = node.Attributes["Name"].GetStringOrDefault(string.Empty);
 		Frames = node.Attributes["Frames"].ParseInt(1);
 	}
 
 	public override void Visit(Model model)
 	{
-		Model target = model.NMGNPBMFJKP(OJLDHGKPLNC());
+		Model target = model.GetModelByType(GetTargetPlayer());
 		if (target == null)
 			target = model;
 		target.AddTransientPerkFlag(FlagName, Frames);
@@ -99,14 +99,14 @@ public class ActionAnimationModFlag : ActionAnimation
 public class ActionSetEndStage : ActionAnimation
 {
 	public ActionSetEndStage(XmlNode node)
-		: base(FADAJCEEKIO.SET_END_STAGE)
+		: base(ActionType.SET_END_STAGE)
 	{
 		Parse(node);
 	}
 
 	public override void Visit(Model model)
 	{
-		model.OPPIKLBKMPN(this);
+		model.StartAction(this);
 	}
 }
 
@@ -117,16 +117,16 @@ public class ActionPlayAnimation : ActionAnimation
 	public bool ForcePlay { get; private set; }
 
 	public ActionPlayAnimation(XmlNode node)
-		: base(FADAJCEEKIO.PLAY_ANIMATION)
+		: base(ActionType.PLAY_ANIMATION)
 	{
 		Parse(node);
-		AnimationName = node.Attributes["Animation"].CIPOICEEIBK(string.Empty);
-		ChildName = node.Attributes["ChildName"].CIPOICEEIBK(string.Empty);
+		AnimationName = node.Attributes["Animation"].GetStringOrDefault(string.Empty);
+		ChildName = node.Attributes["ChildName"].GetStringOrDefault(string.Empty);
 		ForcePlay = node.Attributes["ForcePlay"].ParseBool();
 	}
 
 	public override void Visit(Model model)
 	{
-		model.OPPIKLBKMPN(this);
+		model.StartAction(this);
 	}
 }

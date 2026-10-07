@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class LocalNotificationManager
 {
-	private enum KDEIFBMDHNP
+	private enum NotificationId
 	{
 		PushRetention = 1,
 		PushPeriodic = 2,
@@ -15,25 +15,25 @@ public class LocalNotificationManager
 
 	private static LocalNotificationManager _instance;
 
-	private const string NMACCBOGCDN = "push_retention";
+	private const string RetentionTextKey = "push_retention";
 
-	private const string FMBLCGLILOM = "push_periodic";
+	private const string PeriodicTextKey = "push_periodic";
 
-	private const string GMMEFCDAKBG = "push_energy_to_fight";
+	private const string EnergyToFightTextKey = "push_energy_to_fight";
 
-	private const string NLEIINDMNOD = "push_full_energy";
+	private const string FullEnergyTextKey = "push_full_energy";
 
-	private bool COKIKICKGOO;
+	private bool isEnabled;
 
-	private const string AFBGPKADCOB = "id";
+	private const string IdKey = "id";
 
-	private bool BGDDAFGPPGI;
+	private bool isForced;
 
-	public static LocalNotificationManager BPCBBHAKFDM
+	public static LocalNotificationManager Instance
 	{
 		get
 		{
-			return ELEBLBJKDBI();
+			return GetInstance();
 		}
 	}
 
@@ -41,18 +41,18 @@ public class LocalNotificationManager
 	{
 		get
 		{
-			return IDLDKFEPJLI();
+			return GetTitle();
 		}
 	}
 
 	private LocalNotificationManager()
 	{
-		KKJBEGLMHCM(false);
-		COKIKICKGOO = false;
-		AGONLLFBOFG(AssemblyController.BNEAFMHNIPK());
+		SetForced(false);
+		isEnabled = false;
+		SetEnabled(AssemblyController.GetEnableNotifications());
 	}
 
-	public static LocalNotificationManager ELEBLBJKDBI()
+	public static LocalNotificationManager GetInstance()
 	{
 		if (_instance == null)
 		{
@@ -61,136 +61,136 @@ public class LocalNotificationManager
 		return _instance;
 	}
 
-	public void AGONLLFBOFG(bool value)
+	public void SetEnabled(bool value)
 	{
-		if (COKIKICKGOO != value)
+		if (isEnabled != value)
 		{
-			COKIKICKGOO = value;
+			isEnabled = value;
 		}
 	}
 
-	private string IDLDKFEPJLI()
+	private string GetTitle()
 	{
 		return Application.productName;
 	}
 
-	public void KKJBEGLMHCM(bool value)
+	public void SetForced(bool value)
 	{
-		BGDDAFGPPGI = value;
+		isForced = value;
 	}
 
-	private bool FIMGFNEAFDH()
+	private bool IsSchedulingAllowed()
 	{
-		return BGDDAFGPPGI || !SystemProperties.AFAAJMFLBIC();
+		return isForced || !SystemProperties.IsPaidApp();
 	}
 
-	public void IMABAABEIOI(long IHDMLLNEGIK)
+	public void ScheduleRetention(long IHDMLLNEGIK)
 	{
-		GAMLNBGMCHB(1, IDLDKFEPJLI(), LocalizationManager.GetString("push_retention"), IHDMLLNEGIK);
+		Schedule(1, GetTitle(), LocalizationManager.GetString("push_retention"), IHDMLLNEGIK);
 	}
 
-	public void HPCBBNCDPEB(long IHDMLLNEGIK)
+	public void SchedulePeriodic(long IHDMLLNEGIK)
 	{
-		GAMLNBGMCHB(2, IDLDKFEPJLI(), LocalizationManager.GetString("push_periodic"), IHDMLLNEGIK);
+		Schedule(2, GetTitle(), LocalizationManager.GetString("push_periodic"), IHDMLLNEGIK);
 	}
 
-	public void IOEKOAKONGH(long IHDMLLNEGIK)
+	public void ScheduleTest(long IHDMLLNEGIK)
 	{
-		GAMLNBGMCHB(7, IDLDKFEPJLI(), "Test1 notification, delay=" + IHDMLLNEGIK, IHDMLLNEGIK);
+		Schedule(7, GetTitle(), "Test1 notification, delay=" + IHDMLLNEGIK, IHDMLLNEGIK);
 	}
 
-	public void DODOMBCHMDN(long IHDMLLNEGIK)
-	{
-		// Energy is disabled; never schedule refill reminders.
-	}
-
-	public void HOHFHDMEDLI(long IHDMLLNEGIK)
+	public void ScheduleEnergy(long IHDMLLNEGIK)
 	{
 		// Energy is disabled; never schedule refill reminders.
 	}
 
-	public void EGOMGODAMFF(string LIOGIBJBHAH, long IHDMLLNEGIK)
+	public void ScheduleEnergyFull(long IHDMLLNEGIK)
 	{
-		if (FIMGFNEAFDH())
+		// Energy is disabled; never schedule refill reminders.
+	}
+
+	public void ScheduleRecipe(string LIOGIBJBHAH, long IHDMLLNEGIK)
+	{
+		if (IsSchedulingAllowed())
 		{
-			GAMLNBGMCHB(6, IDLDKFEPJLI(), LIOGIBJBHAH, IHDMLLNEGIK);
+			Schedule(6, GetTitle(), LIOGIBJBHAH, IHDMLLNEGIK);
 		}
 	}
 
-	public void HGOKJEIHKPE(string LIOGIBJBHAH, long IHDMLLNEGIK)
+	public void ScheduleItem(string LIOGIBJBHAH, long IHDMLLNEGIK)
 	{
-		if (FIMGFNEAFDH())
+		if (IsSchedulingAllowed())
 		{
-			GAMLNBGMCHB(5, IDLDKFEPJLI(), LIOGIBJBHAH, IHDMLLNEGIK);
+			Schedule(5, GetTitle(), LIOGIBJBHAH, IHDMLLNEGIK);
 		}
 	}
 
-	public void ECNMCOKOEBF()
+	public void CancelRetention()
 	{
-		MKOEHNJBKNM(KDEIFBMDHNP.PushRetention);
+		CancelNotification(NotificationId.PushRetention);
 	}
 
-	public void AHLFKAGBLEN()
+	public void CancelPeriodic()
 	{
-		MKOEHNJBKNM(KDEIFBMDHNP.PushPeriodic);
+		CancelNotification(NotificationId.PushPeriodic);
 	}
 
-	public void JHIJCEJBEGP()
+	public void CancelTest()
 	{
-		MKOEHNJBKNM(KDEIFBMDHNP.PushTest1);
+		CancelNotification(NotificationId.PushTest1);
 	}
 
-	public void OHMBBMKPAHD()
+	public void CancelEnergy()
 	{
-		MKOEHNJBKNM(KDEIFBMDHNP.PushEnergy);
+		CancelNotification(NotificationId.PushEnergy);
 	}
 
-	public void GONAFNDNGHK()
+	public void CancelEnergyFull()
 	{
-		MKOEHNJBKNM(KDEIFBMDHNP.PushEnergyFull);
+		CancelNotification(NotificationId.PushEnergyFull);
 	}
 
-	public void ENAFDJHIDJJ()
+	public void CancelRecipe()
 	{
-		MKOEHNJBKNM(KDEIFBMDHNP.PushRecipe);
+		CancelNotification(NotificationId.PushRecipe);
 	}
 
-	public void DJNHJBNKBIB()
+	public void CancelItem()
 	{
-		MKOEHNJBKNM(KDEIFBMDHNP.PushItem);
+		CancelNotification(NotificationId.PushItem);
 	}
 
-	public void PLEIIJMCPHF()
+	public void CancelAll()
 	{
-		if (COKIKICKGOO)
+		if (isEnabled)
 		{
-			OHMBBMKPAHD();
-			GONAFNDNGHK();
-			ECNMCOKOEBF();
-			AHLFKAGBLEN();
-			ENAFDJHIDJJ();
-			DJNHJBNKBIB();
-			JHIJCEJBEGP();
+			CancelEnergy();
+			CancelEnergyFull();
+			CancelRetention();
+			CancelPeriodic();
+			CancelRecipe();
+			CancelItem();
+			CancelTest();
 		}
 	}
 
-	private void MKOEHNJBKNM(KDEIFBMDHNP KEMMPFEDLAJ)
+	private void CancelNotification(NotificationId KEMMPFEDLAJ)
 	{
-		if (COKIKICKGOO)
+		if (isEnabled)
 		{
-			AndroidLocalNotification.MKOEHNJBKNM((int)KEMMPFEDLAJ);
+			AndroidLocalNotification.CancelNotification((int)KEMMPFEDLAJ);
 		}
 	}
 
-	private void GAMLNBGMCHB(int OKNNNLIPODI, string PEMOECLNECD, string LIOGIBJBHAH, long ENDPMCNJPEA)
+	private void Schedule(int OKNNNLIPODI, string PEMOECLNECD, string LIOGIBJBHAH, long ENDPMCNJPEA)
 	{
-		if (COKIKICKGOO && SystemProperties.IPJFCBAGMJJ())
+		if (isEnabled && SystemProperties.IsAndroidPlatform())
 		{
-			AndroidLocalNotification.GAMLNBGMCHB(OKNNNLIPODI, PEMOECLNECD, LIOGIBJBHAH, ENDPMCNJPEA);
+			AndroidLocalNotification.SendNotification(OKNNNLIPODI, PEMOECLNECD, LIOGIBJBHAH, ENDPMCNJPEA);
 		}
 	}
 
-	public string IINLKICBLEB()
+	public string GetUnsupportedPlatformMessage()
 	{
 		return string.Concat(Application.platform, " is not supported, only IOS devices");
 	}

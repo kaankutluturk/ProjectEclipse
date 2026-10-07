@@ -4,33 +4,33 @@ public class WarriorAttribute
 {
 	private string _Name;
 
-	public string MJBPMLCLMFN;
+	public string IconName;
 
-	public string HBCNKNFPAIM;
+	public string Alias;
 
 	public int Point;
 
-	public bool GDCBBAHKCIE;
+	public bool IsHidden;
 
-	public bool GDECIAJAFHH;
+	public bool IsShopHidden;
 
-	public bool KDKHPMHNPCN;
+	public bool IsProfileHidden;
 
-	public bool GMPLHIHNHMD;
+	public bool UnusedFlag;
 
-	public string CGNPILCDCCF;
+	public string FormatSuffix;
 
-	public string HCCKLLOEPJN;
+	public string BarScale;
 
-	public Attributes IBLHIAHECLK = new Attributes();
+	public Attributes AttributeValues = new Attributes();
 
 	public WarriorAttribute()
 	{
 		Point = 0;
-		GDCBBAHKCIE = false;
-		GDECIAJAFHH = false;
-		KDKHPMHNPCN = false;
-		GMPLHIHNHMD = false;
+		IsHidden = false;
+		IsShopHidden = false;
+		IsProfileHidden = false;
+		UnusedFlag = false;
 	}
 
 	public string get_Name()
@@ -63,6 +63,6 @@ public class WarriorAttribute
 			num = ((text3.Length - 1 != num) ? num : (num + 1));
 			text2 = text2.Substring(0, length2 + 1 - num);
 		}
-		return text2 + CGNPILCDCCF;
+		return text2 + FormatSuffix;
 	}
 }

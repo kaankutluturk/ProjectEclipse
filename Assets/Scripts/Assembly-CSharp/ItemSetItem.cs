@@ -4,26 +4,26 @@ public class ItemSetItem
 {
 	public string Name;
 
-	public float FOAHMAOBFEA;
+	public float Scale;
 
-	public float DNGPAHCJFOK;
+	public float Rotate;
 
-	public float NPKMJMCLDAH;
+	public float X;
 
-	public float IHAHIEHHNCG;
+	public float Y;
 
-	public float IJEAEHOKLAF;
+	public float IconsY;
 
-	public ItemInfo OFMCNLBFIDF;
+	public ItemInfo Item;
 
 	public ItemSetItem(XmlNode node)
 	{
-		Name = node.Attributes["Name"].CIPOICEEIBK(string.Empty);
-		FOAHMAOBFEA = node.Attributes["Scale"].ParseFloat();
-		DNGPAHCJFOK = node.Attributes["Rotate"].ParseFloat();
-		NPKMJMCLDAH = node.Attributes["X"].ParseFloat();
-		IHAHIEHHNCG = node.Attributes["Y"].ParseFloat();
-		IJEAEHOKLAF = node.Attributes["IconsY"].ParseFloat();
-		OFMCNLBFIDF = ListSF.GetItems().GetItemByName(Name);
+		Name = node.Attributes["Name"].GetStringOrDefault(string.Empty);
+		Scale = node.Attributes["Scale"].ParseFloat();
+		Rotate = node.Attributes["Rotate"].ParseFloat();
+		X = node.Attributes["X"].ParseFloat();
+		Y = node.Attributes["Y"].ParseFloat();
+		IconsY = node.Attributes["IconsY"].ParseFloat();
+		Item = ListSF.GetItems().GetItemByName(Name);
 	}
 }

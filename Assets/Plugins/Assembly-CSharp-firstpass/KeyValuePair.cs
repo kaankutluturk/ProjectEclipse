@@ -3,16 +3,16 @@ using System.Diagnostics;
 public sealed class KeyValuePair
 {
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private string DPKIBLDMMKP;
+	private string key;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private string IELPCLONGKP;
+	private string valueText;
 
-	public string ENFBNOGCCBH
+	public string PairName
 	{
 		get
 		{
-			return AENLBNDAEKB();
+			return GetKey();
 		}
 		set
 		{
@@ -25,32 +25,32 @@ public sealed class KeyValuePair
 		set_Key(KGBGENDIMBC);
 	}
 
-	public string AENLBNDAEKB()
+	public string GetKey()
 	{
-		return DPKIBLDMMKP;
+		return key;
 	}
 
 	public void set_Key(string value)
 	{
-		DPKIBLDMMKP = value;
+		key = value;
 	}
 
-	public string OEAKCOHMIHH()
+	public string GetValue()
 	{
-		return IELPCLONGKP;
+		return valueText;
 	}
 
 	public void set_Value(string value)
 	{
-		IELPCLONGKP = value;
+		valueText = value;
 	}
 
 	public override string ToString()
 	{
-		if (!string.IsNullOrEmpty(OEAKCOHMIHH()))
+		if (!string.IsNullOrEmpty(GetValue()))
 		{
-			return AENLBNDAEKB() + '=' + OEAKCOHMIHH();
+			return GetKey() + '=' + GetValue();
 		}
-		return AENLBNDAEKB();
+		return GetKey();
 	}
 }

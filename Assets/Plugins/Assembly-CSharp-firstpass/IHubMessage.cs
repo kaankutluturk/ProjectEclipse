@@ -1,6 +1,6 @@
 public interface IHubMessage
 {
-	ulong EBFDNDACIMG { get; }
+	ulong InvocationIdValue { get; }
 
-	ulong HGFDDMNOPJA();
+	ulong GetInvocationId();
 }

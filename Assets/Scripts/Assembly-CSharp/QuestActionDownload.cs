@@ -4,15 +4,15 @@ using Nekki.SF2.GUI.Dialogs;
 
 public class QuestActionDownload : QuestAction
 {
-	private QuestActionsSequence DBONDAIEBPN = new QuestActionsSequence();
+	private QuestActionsSequence successSequence = new QuestActionsSequence();
 
-	private QuestActionsSequence LDDDPGLPHCO = new QuestActionsSequence();
+	private QuestActionsSequence errorSequence = new QuestActionsSequence();
 
 	private string name;
 
-	private string KPBNOBNELAH;
+	private string progressBarTitle;
 
-	private JBKAOMLJCEL COPKLEDMPPD;
+	private DownloadPack packInfo;
 
 	private bool isRewriteHashes;
 
@@ -21,61 +21,61 @@ public class QuestActionDownload : QuestAction
 	public override void Parse(XmlNode EPKLCPOEELO)
 	{
 		base.Parse(EPKLCPOEELO);
-		name = EPKLCPOEELO.Attributes["Pack"].CIPOICEEIBK();
-		KPBNOBNELAH = EPKLCPOEELO.Attributes["ProgressBarTitle"].CIPOICEEIBK();
-		COPKLEDMPPD = null;
+		name = EPKLCPOEELO.Attributes["Pack"].GetStringOrDefault();
+		progressBarTitle = EPKLCPOEELO.Attributes["ProgressBarTitle"].GetStringOrDefault();
+		packInfo = null;
 		isRewriteHashes = EPKLCPOEELO.Attributes["RewriteHashes"].ParseInt() > 0;
 		XmlNode ePKLCPOEELO = EPKLCPOEELO["Success"];
 		XmlNode ePKLCPOEELO2 = EPKLCPOEELO["Error"];
-		APKBANHAEGN(ePKLCPOEELO, DBONDAIEBPN, OnActionComplete);
-		APKBANHAEGN(ePKLCPOEELO2, LDDDPGLPHCO, OnActionComplete);
+		ParseSequenceWithUnlock(ePKLCPOEELO, successSequence, OnActionComplete);
+		ParseSequenceWithUnlock(ePKLCPOEELO2, errorSequence, OnActionComplete);
 	}
 
 	private void OnActionComplete(object data)
 	{
-		OGIJONMKABB();
-		if (COPKLEDMPPD != null && COPKLEDMPPD.EFJLHFFGCIF)
+		FinishAction();
+		if (packInfo != null && packInfo.Reload)
 		{
-			PJGEOIKPGFH();
-			GameUtils.BKFMHANNIEF();
+			CompleteQuestStage();
+			GameUtils.ResetScenes();
 		}
 	}
 
-	public override void GKFMJKAAJCA()
+	public override void ResetSequences()
 	{
-		base.GKFMJKAAJCA();
-		DBONDAIEBPN.FHPKJMMLIEG();
-		LDDDPGLPHCO.FHPKJMMLIEG();
+		base.ResetSequences();
+		successSequence.Reset();
+		errorSequence.Reset();
 	}
 
-	public override void DEJMHFMLKIC(QuestParameters GFIHPBCEEOB)
+	public override void Execute(QuestParameters GFIHPBCEEOB)
 	{
-		GKFMJKAAJCA();
-		base.DEJMHFMLKIC(GFIHPBCEEOB);
+		ResetSequences();
+		base.Execute(GFIHPBCEEOB);
 		ConditionExtension.CompareResult lNIDLHOIHIM = new ConditionExtension.CompareResult();
 		QuestCondition kKDGLNECFHA = new QuestCondition();
-		kKDGLNECFHA.LIMHBJBEEIA(GFIHPBCEEOB);
-		kKDGLNECFHA.MCPIOGALBMK(name, lNIDLHOIHIM);
-		COPKLEDMPPD = GeneralConfig.NNFMKNJJDDD.OCKOCHAINHG(lNIDLHOIHIM.resultSTR);
-		if (COPKLEDMPPD == null)
+		kKDGLNECFHA.SetParameters(GFIHPBCEEOB);
+		kKDGLNECFHA.SetValue(name, lNIDLHOIHIM);
+		packInfo = GeneralConfig.DownloadPacks.FindPack(lNIDLHOIHIM.resultSTR);
+		if (packInfo == null)
 		{
-			LLLOJBFMONN.Error("QuestActionDownload noName: {0}", lNIDLHOIHIM.resultSTR);
-			LDDDPGLPHCO.DEJMHFMLKIC(GFIHPBCEEOB);
+			GameLog.Error("QuestActionDownload noName: {0}", lNIDLHOIHIM.resultSTR);
+			errorSequence.Run(GFIHPBCEEOB);
 			return;
 		}
 		string text = NekkiMath.randomInt(1000000).ToString();
-		string text2 = ((COPKLEDMPPD == null) ? string.Empty : COPKLEDMPPD.Url);
+		string text2 = ((packInfo == null) ? string.Empty : packInfo.Url);
 		text2 += "?";
 		text2 += text;
-		if (AssemblyController.AOIJKOFDHIC() && (SystemProperties.PPFPHAKMNLC() || SystemProperties.CEJMCBKCPOH() || SystemProperties.AOJIOMDCEKN()))
+		if (AssemblyController.GetSkipContentDownload() && (SystemProperties.IsWindowsEditorPlatform() || SystemProperties.IsWindowsPlatform() || SystemProperties.IsMacPlatform()))
 		{
 			Complete();
 			return;
 		}
 		downloadingScreen = DownloadingScreen.get_Instance();
-		downloadingScreen.set_TitleAlias(KPBNOBNELAH);
+		downloadingScreen.set_TitleAlias(progressBarTitle);
 		downloadingScreen.set_Progress(0f);
-		FileDownloader.ELEBLBJKDBI().EMANDFAOCNO(text2, COPKLEDMPPD.Name, SF2Paths.MEKBAHBKMNB(), OnLoadContent, OnProgressContent, COPKLEDMPPD.HKPOAABOLHN);
+		FileDownloader.GetInstance().Download(text2, packInfo.Name, SF2Paths.GetBundlesPath(), OnLoadContent, OnProgressContent, packInfo.SizeBytes);
 	}
 
 	private void OnProgressContent(float progress)
@@ -89,11 +89,11 @@ public class QuestActionDownload : QuestAction
 	private void OnLoadContent(bool DCJLKCFKCOM)
 	{
 		bool flag = false;
-		string text = string.Format("{0}/{1}", SF2Paths.MEKBAHBKMNB(), COPKLEDMPPD.Name);
+		string text = string.Format("{0}/{1}", SF2Paths.GetBundlesPath(), packInfo.Name);
 		if (DCJLKCFKCOM && File.Exists(text))
 		{
-			string text2 = MD5Utils.PIFDHBHOMJL(text);
-			flag = text2.Equals(COPKLEDMPPD.NDDHELJHHKI.ToUpper());
+			string text2 = MD5Utils.MD5HashFile(text);
+			flag = text2.Equals(packInfo.Checksum.ToUpper());
 		}
 		if (flag)
 		{
@@ -101,7 +101,7 @@ public class QuestActionDownload : QuestAction
 		}
 		else
 		{
-			LDDDPGLPHCO.DEJMHFMLKIC(PAJDEKLLFNJ);
+			errorSequence.Run(Parameters);
 		}
 		if (downloadingScreen != null)
 		{
@@ -112,12 +112,12 @@ public class QuestActionDownload : QuestAction
 
 	private void Complete()
 	{
-		string aHLPODLKBEP = SystemProperties.KCJMMIEBLHL().ToString();
-		PacksController.ELEBLBJKDBI().DDKKLHDOFNG(COPKLEDMPPD.Name, COPKLEDMPPD.Url, aHLPODLKBEP, -1L, COPKLEDMPPD.NBEEINKJMPK);
+		string aHLPODLKBEP = SystemProperties.GetVersion().ToString();
+		PacksController.GetInstance().AddPack(packInfo.Name, packInfo.Url, aHLPODLKBEP, -1L, packInfo.Attach);
 		if (isRewriteHashes)
 		{
-			ListSF.GetInstance().EMJLEBDAALP();
+			ListSF.GetInstance().OnPacksChanged();
 		}
-		DBONDAIEBPN.DEJMHFMLKIC(PAJDEKLLFNJ);
+		successSequence.Run(Parameters);
 	}
 }

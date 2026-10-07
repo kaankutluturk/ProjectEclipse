@@ -9,26 +9,26 @@ namespace Nekki.SF2.GUI.Fight
 	[Serializable]
 	public class ScreenModel : global::EventDispatcher<object>
 	{
-		public struct GCJMFLFFJAM
+		public struct ComboChangedEventData
 		{
-			public ComboModel.KEDKBADCLOD Info;
+			public ComboModel.ComboChangeInfo Info;
 		}
 
-		public enum GHMNFKDJNAM
+		public enum ScreenModelEvent
 		{
 			ON_STYLE_CHANGED = 0,
 			ON_COMBO_UP = 1,
 			ON_CLICK_CHEAT = 2
 		}
 
-		public enum JEDPGMIGGKK
+		public enum ScreenSide
 		{
 			TYPE_LEFT = 0,
 			TYPE_RIGHT = 1
 		}
 
 		[SerializeField]
-		private JEDPGMIGGKK _Type;
+		private ScreenSide _Type;
 
 		[SerializeField]
 		private ResolutionImageAvatar _Avatar;
@@ -80,11 +80,11 @@ namespace Nekki.SF2.GUI.Fight
 			}
 		}
 
-		public FightStatistics.EMKEIEJMONM MaxStyle
+		public FightStatistics.FightStyle MaxStyle
 		{
 			get
 			{
-				return (_stylePanel != null) ? _stylePanel.get_MaximumStyleStrip() : FightStatistics.EMKEIEJMONM.STYLE_TURTLE;
+				return (_stylePanel != null) ? _stylePanel.get_MaximumStyleStrip() : FightStatistics.FightStyle.STYLE_TURTLE;
 			}
 		}
 
@@ -119,23 +119,23 @@ namespace Nekki.SF2.GUI.Fight
 			if (_roundsPanel != null)
 				_roundsPanel.gameObject.SetActive(_showRounds);
 			IsNoBlock = true;
-			LOPIGAFLGDB();
-			COHCIHCLGKE();
-			ECHNJJALHJH();
+			SetupAvatar();
+			SetupLifeBar();
+			SetupStylePanel();
 			if (_showRounds)
 			{
-				PAOFIIBGPIJ();
+				SetupRoundsPanel();
 			}
-			APBGNJEHODB();
-			JGKPPGIHFMN();
-			DMCLPOFKHPP();
-			IJDLNKFNHIG();
+			SetupName();
+			SetupComboModel();
+			SetupActivePerkModel();
+			SetupWinButton();
 		}
 
-		private void LOPIGAFLGDB()
+		private void SetupAvatar()
 		{
-			_Avatar.set_TexturePath(SF2Paths.BHCPOOOJAAK());
-			_Avatar.set_SpriteName(_parameters.HNKFHGOOKEG);
+			_Avatar.set_TexturePath(SF2Paths.GetUsersUiPath());
+			_Avatar.set_SpriteName(_parameters.Avatar);
 			_Avatar.SetNativeSize();
 		}
 
@@ -143,13 +143,13 @@ namespace Nekki.SF2.GUI.Fight
         {
             if (expected == null || replacement == null || _parameters != expected) return false;
             _parameters = replacement;
-            LOPIGAFLGDB();
-            COHCIHCLGKE();
-            APBGNJEHODB();
+            SetupAvatar();
+            SetupLifeBar();
+            SetupName();
             return true;
         }
 
-		private void COHCIHCLGKE()
+		private void SetupLifeBar()
 		{
 			if (_raidShields != null)
 			{
@@ -157,7 +157,7 @@ namespace Nekki.SF2.GUI.Fight
 				_raidShields = null;
 			}
 			_lifeBar.Init(_parameters);
-			bool raidBoss = _Type == JEDPGMIGGKK.TYPE_RIGHT && _parameters != null && _parameters.ShieldTotal > 0;
+			bool raidBoss = _Type == ScreenSide.TYPE_RIGHT && _parameters != null && _parameters.ShieldTotal > 0;
 			_lifeBar.SetRaidStyle(raidBoss);
 			if (raidBoss)
 			{
@@ -166,20 +166,20 @@ namespace Nekki.SF2.GUI.Fight
 			}
 		}
 
-		private void ECHNJJALHJH()
+		private void SetupStylePanel()
 		{
 			_stylePanel.Init(_styleName);
 		}
 
-		private void PAOFIIBGPIJ()
+		private void SetupRoundsPanel()
 		{
 			if (_parameters != null)
 			{
-				_roundsPanel.Init(_parameters.HJNOICKOFDL);
+				_roundsPanel.Init(_parameters.RoundTotal);
 			}
 		}
 
-		private void APBGNJEHODB()
+		private void SetupName()
 		{
 			if (!(_name == null))
 			{
@@ -189,7 +189,7 @@ namespace Nekki.SF2.GUI.Fight
 				}
 				else
 				{
-					_name.SetAlias(_parameters.BMFLPBLAFLK);
+					_name.SetAlias(_parameters.FirstName);
 					// The fight HUD has one line for the name. Show a {br} two-line name
 					// ("SON OF{br}HEAVEN") on one line, shrunk to fit if needed.
 					string text = _name.get_text();
@@ -204,33 +204,33 @@ namespace Nekki.SF2.GUI.Fight
 			}
 		}
 
-		private void JGKPPGIHFMN()
+		private void SetupComboModel()
 		{
 			_comboModel.Init(_Type);
-			_comboModel.AddEventListener(0, KPAPLCPCOBE);
+			_comboModel.AddEventListener(0, OnComboChanged);
 		}
 
-		private void IJDLNKFNHIG()
+		private void SetupWinButton()
 		{
-			_WinBtn.SetActive(SystemProperties.DBBOCENKMGD());
+			_WinBtn.SetActive(SystemProperties.IsDebug());
 			_WinBtn.GetComponent<Button>().onClick.AddListener(() =>
 			{
 				CallEvent(2, _Type);
 			});
 		}
 
-		private void DMCLPOFKHPP()
+		private void SetupActivePerkModel()
 		{
 			_activePerkModel.Init();
 		}
 
-		public void CBJBDHGHJEB(InfoAnimation IFPDGKDKJOD)
+		public void UpdateStyle(InfoAnimation IFPDGKDKJOD)
 		{
 			if (_stylePanel != null)
 			{
 				_stylePanel.UpdateStyle(IFPDGKDKJOD);
 				_comboModel.AddCrazyStyle(_stylePanel.get_CurrentStyleStrip());
-				JAMCIPJEIFO(true);
+				RaiseStyleChanged(true);
 			}
 		}
 
@@ -240,11 +240,11 @@ namespace Nekki.SF2.GUI.Fight
 			{
 				_stylePanel.IncreaseStyleStripByValue(value);
 				_comboModel.AddCrazyStyle(_stylePanel.get_CurrentStyleStrip());
-				JAMCIPJEIFO(true);
+				RaiseStyleChanged(true);
 			}
 		}
 
-		public void GMFBMONNILL()
+		public void UpdateVictories()
 		{
 			if (_showRounds && !(_roundsPanel == null))
 			{
@@ -252,7 +252,7 @@ namespace Nekki.SF2.GUI.Fight
 			}
 		}
 
-		public void JAIAMEKBNCE(bool value)
+		public void SetFightPaused(bool value)
 		{
 			if (_comboModel != null)
 			{
@@ -260,7 +260,7 @@ namespace Nekki.SF2.GUI.Fight
 			}
 		}
 
-		public void JKPOGNMHDNK(bool value)
+		public void SetLifeBarVisible(bool value)
 		{
 			if (_lifeBar != null)
 			{
@@ -272,7 +272,7 @@ namespace Nekki.SF2.GUI.Fight
 			}
 		}
 
-		public void LCFPHJKKDCG(bool value)
+		public void SetLifeUpdateLocked(bool value)
 		{
 			if (_lifeBar != null)
 			{
@@ -280,12 +280,12 @@ namespace Nekki.SF2.GUI.Fight
 			}
 		}
 
-		public void NJMJGDDBKOB()
+		public void NotifyStyleChanged()
 		{
-			JAMCIPJEIFO(true);
+			RaiseStyleChanged(true);
 		}
 
-		public void CPPACKAIGEK()
+		public void RenderComboModel()
 		{
 			if (_comboModel != null)
 			{
@@ -293,7 +293,7 @@ namespace Nekki.SF2.GUI.Fight
 			}
 		}
 
-		public void FEMAFNBEFAG()
+		public void RenderActivePerks()
 		{
 			if (_activePerkModel != null)
 			{
@@ -309,12 +309,12 @@ namespace Nekki.SF2.GUI.Fight
 			}
 			if (_raidShields != null && _parameters != null)
 			{
-				_raidShields.UpdateBar((float)_parameters.KKMCHCNOHMB());
+				_raidShields.UpdateBar((float)_parameters.GetCurrentLife());
 			}
 			if (_stylePanel != null && DCAOOMFBFIO)
 			{
 				_stylePanel.Render();
-				JAMCIPJEIFO(false);
+				RaiseStyleChanged(false);
 			}
 		}
 
@@ -335,7 +335,7 @@ namespace Nekki.SF2.GUI.Fight
 			IsNoBlock = true;
 		}
 
-		public void LFGCIFEHDMI()
+		public void AddCriticalCombo()
 		{
 			if (_comboModel != null)
 			{
@@ -343,7 +343,7 @@ namespace Nekki.SF2.GUI.Fight
 			}
 		}
 
-		public void ODLBDJKMDOJ()
+		public void AddFirstStrikeCombo()
 		{
 			if (_comboModel != null)
 			{
@@ -351,7 +351,7 @@ namespace Nekki.SF2.GUI.Fight
 			}
 		}
 
-		public void MKHJLNAFLFN()
+		public void AddHeadStrikeCombo()
 		{
 			if (_comboModel != null)
 			{
@@ -359,7 +359,7 @@ namespace Nekki.SF2.GUI.Fight
 			}
 		}
 
-		public void IGFGFICFKFH()
+		public void AddPerfect()
 		{
 			if (_comboModel != null)
 			{
@@ -367,7 +367,7 @@ namespace Nekki.SF2.GUI.Fight
 			}
 		}
 
-		public void DCFGPCHGHBC()
+		public void AddShockCombo()
 		{
 			if (_comboModel != null)
 			{
@@ -391,7 +391,7 @@ namespace Nekki.SF2.GUI.Fight
 			}
 		}
 
-		public void DGECGHDGPFO()
+		public void RemoveAllCombos()
 		{
 			if (_comboModel != null)
 			{
@@ -399,7 +399,7 @@ namespace Nekki.SF2.GUI.Fight
 			}
 		}
 
-		public void PBCOANKNICH(PerksStage.ActionPerk IBODMPMJELJ)
+		public void AddActivePerk(PerksStage.ActionPerk IBODMPMJELJ)
 		{
 			if (_activePerkModel != null)
 			{
@@ -407,7 +407,7 @@ namespace Nekki.SF2.GUI.Fight
 			}
 		}
 
-		public void DHHCHBNJDGH(PerksStage.ActionPerk CKOEFOCPMGK, PerksStage.ActionPerk IBODMPMJELJ)
+		public void AddEffectPerk(PerksStage.ActionPerk CKOEFOCPMGK, PerksStage.ActionPerk IBODMPMJELJ)
 		{
 			if (_activePerkModel != null)
 			{
@@ -415,7 +415,7 @@ namespace Nekki.SF2.GUI.Fight
 			}
 		}
 
-		public void ADNAPNJMLBC(PerksStage.ActionPerk IBODMPMJELJ)
+		public void RemoveActivePerk(PerksStage.ActionPerk IBODMPMJELJ)
 		{
 			if (_activePerkModel != null)
 			{
@@ -423,7 +423,7 @@ namespace Nekki.SF2.GUI.Fight
 			}
 		}
 
-		public void IHPHKJDODLG()
+		public void HideAllActivePerks()
 		{
 			if (_activePerkModel != null)
 			{
@@ -431,7 +431,7 @@ namespace Nekki.SF2.GUI.Fight
 			}
 		}
 
-		public void IBKPFLEMEAJ()
+		public void DestroyAllActivePerks()
 		{
 			if (_activePerkModel != null)
 			{
@@ -439,10 +439,10 @@ namespace Nekki.SF2.GUI.Fight
 			}
 		}
 
-		private void JAMCIPJEIFO(bool GOAGDIANENH)
+		private void RaiseStyleChanged(bool GOAGDIANENH)
 		{
 			ModelStyleChange lONCJPNBHEA = new ModelStyleChange();
-			lONCJPNBHEA.KJDFJPBIGJC = _Type;
+			lONCJPNBHEA.Side = _Type;
 			lONCJPNBHEA.StyleIndex = CurrentStyleStrip;
 			lONCJPNBHEA.StyleName = CurrentStyleName;
 			lONCJPNBHEA.StyleGain = CurrentStyleValue;
@@ -450,9 +450,9 @@ namespace Nekki.SF2.GUI.Fight
 			CallEvent(0, lONCJPNBHEA);
 		}
 
-		private void KPAPLCPCOBE(ComboModel.KEDKBADCLOD EMBBNNBFODN)
+		private void OnComboChanged(ComboModel.ComboChangeInfo EMBBNNBFODN)
 		{
-			CallEvent(1, new GCJMFLFFJAM
+			CallEvent(1, new ComboChangedEventData
 			{
 				Info = EMBBNNBFODN
 			});

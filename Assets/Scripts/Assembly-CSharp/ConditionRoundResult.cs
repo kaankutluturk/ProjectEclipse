@@ -2,14 +2,14 @@ using System.Xml;
 
 public class ConditionRoundResult : ConditionAnimation
 {
-	public enum JBDNJGGKFDI
+	public enum RoundResultType
 	{
 		RESULT_TYPE_NONE = 0,
 		RESULT_TYPE_VICTORY = 1,
 		RESULT_TYPE_DEFEAT = 2
 	}
 
-	public enum DBLIMJMOEPB
+	public enum RoundResultSubType
 	{
 		RESULT_SUBTYPE_NONE = 0,
 		RESULT_SUBTYPE_TIMEOUT = 1,
@@ -17,45 +17,45 @@ public class ConditionRoundResult : ConditionAnimation
 		RESULT_SUBTYPE_LOSE = 3
 	}
 
-	private JBDNJGGKFDI KCIIELDOBOM;
+	private RoundResultType _resultType;
 
-	private DBLIMJMOEPB GPOHKJPLLGH;
+	private RoundResultSubType _resultSubType;
 
 	public ConditionRoundResult(XmlNode node)
 		: base(ConditionType.ROUND_RESULT)
 	{
-		string text = node.Attributes["Name"].CIPOICEEIBK(string.Empty);
-		string text2 = node.Attributes["Type"].CIPOICEEIBK(string.Empty);
+		string text = node.Attributes["Name"].GetStringOrDefault(string.Empty);
+		string text2 = node.Attributes["Type"].GetStringOrDefault(string.Empty);
 		if (text == "Victory")
 		{
-			KCIIELDOBOM = JBDNJGGKFDI.RESULT_TYPE_VICTORY;
+			_resultType = RoundResultType.RESULT_TYPE_VICTORY;
 		}
 		else if (text == "Defeat")
 		{
-			KCIIELDOBOM = JBDNJGGKFDI.RESULT_TYPE_DEFEAT;
+			_resultType = RoundResultType.RESULT_TYPE_DEFEAT;
 		}
 		else
 		{
-			KCIIELDOBOM = JBDNJGGKFDI.RESULT_TYPE_NONE;
+			_resultType = RoundResultType.RESULT_TYPE_NONE;
 		}
 		if (text2 == "Timeout")
 		{
-			GPOHKJPLLGH = DBLIMJMOEPB.RESULT_SUBTYPE_TIMEOUT;
+			_resultSubType = RoundResultSubType.RESULT_SUBTYPE_TIMEOUT;
 		}
 		else if (text2 == "Ringout")
 		{
-			GPOHKJPLLGH = DBLIMJMOEPB.RESULT_SUBTYPE_RINGOUT;
+			_resultSubType = RoundResultSubType.RESULT_SUBTYPE_RINGOUT;
 		}
 		else
 		{
-			GPOHKJPLLGH = DBLIMJMOEPB.RESULT_SUBTYPE_NONE;
+			_resultSubType = RoundResultSubType.RESULT_SUBTYPE_NONE;
 		}
 	}
 
 	public override bool IsEqual(ModelConditions conditions)
 	{
 		bool flag = false;
-		if (conditions.BHHLEBHLBLH && (KCIIELDOBOM == JBDNJGGKFDI.RESULT_TYPE_NONE || IsWinner(conditions.IsWinner)) && (GPOHKJPLLGH == DBLIMJMOEPB.RESULT_SUBTYPE_NONE || KPKMAGJMIMJ(conditions.EndRoundType)))
+		if (conditions.RoundEnded && (_resultType == RoundResultType.RESULT_TYPE_NONE || IsWinner(conditions.IsWinner)) && (_resultSubType == RoundResultSubType.RESULT_SUBTYPE_NONE || MatchesEndRoundType(conditions.EndRoundType)))
 		{
 			flag = true;
 		}
@@ -64,11 +64,11 @@ public class ConditionRoundResult : ConditionAnimation
 
 	private bool IsWinner(bool PKHDLOGJKAD)
 	{
-		return (PKHDLOGJKAD && KCIIELDOBOM == JBDNJGGKFDI.RESULT_TYPE_VICTORY) || (!PKHDLOGJKAD && KCIIELDOBOM == JBDNJGGKFDI.RESULT_TYPE_DEFEAT);
+		return (PKHDLOGJKAD && _resultType == RoundResultType.RESULT_TYPE_VICTORY) || (!PKHDLOGJKAD && _resultType == RoundResultType.RESULT_TYPE_DEFEAT);
 	}
 
-	private bool KPKMAGJMIMJ(EndRoundType LFLGCDNKNJI)
+	private bool MatchesEndRoundType(EndRoundType LFLGCDNKNJI)
 	{
-		return (LFLGCDNKNJI == EndRoundType.EndRoundTypeTimeOut && GPOHKJPLLGH == DBLIMJMOEPB.RESULT_SUBTYPE_TIMEOUT) || (LFLGCDNKNJI == EndRoundType.EndRoundTypeRingOut && GPOHKJPLLGH == DBLIMJMOEPB.RESULT_SUBTYPE_TIMEOUT) || (LFLGCDNKNJI == EndRoundType.EndRoundTypeLose && GPOHKJPLLGH == DBLIMJMOEPB.RESULT_SUBTYPE_TIMEOUT) || (LFLGCDNKNJI == EndRoundType.EndRoundTypeZeroHealth && GPOHKJPLLGH == DBLIMJMOEPB.RESULT_SUBTYPE_TIMEOUT);
+		return (LFLGCDNKNJI == EndRoundType.EndRoundTypeTimeOut && _resultSubType == RoundResultSubType.RESULT_SUBTYPE_TIMEOUT) || (LFLGCDNKNJI == EndRoundType.EndRoundTypeRingOut && _resultSubType == RoundResultSubType.RESULT_SUBTYPE_TIMEOUT) || (LFLGCDNKNJI == EndRoundType.EndRoundTypeLose && _resultSubType == RoundResultSubType.RESULT_SUBTYPE_TIMEOUT) || (LFLGCDNKNJI == EndRoundType.EndRoundTypeZeroHealth && _resultSubType == RoundResultSubType.RESULT_SUBTYPE_TIMEOUT);
 	}
 }

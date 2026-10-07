@@ -14,48 +14,48 @@ namespace Nekki.SF2.GUI.Fight
 
 		private global::Nekki.SF2.GUI.LabelAlias _eclipseStackCount;
 
-		private const float NAKDPGBCFCD = 1f;
+		private const float MaxOpacity = 1f;
 
-		private const float AIGOJMDDPDE = 0f;
-
-		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		private string HKGHEJDKCPI;
+		private const float MinOpacity = 0f;
 
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		private PerksStage.ActionPerk PMCIKHJONNM;
+		private string perkName;
 
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		private bool NCGLMKOGBCB;
-
-		private bool MGIIAEFNAIM;
-
-		private bool IAOPDCPAELB;
+		private PerksStage.ActionPerk currentAction;
 
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		private bool GPNIIJGOMKC;
+		private bool needsDelete;
+
+		private bool isShown;
+
+		private bool showsExpiration;
 
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		private float FEALIIMKDPN;
+		private bool isOpacityChanging;
 
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		private float LNAHKGCNGLB;
+		private float currentIconOpacity;
 
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		private bool IMLKFJDOOOM;
+		private float expirationOpacity;
 
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		private int IGAPOPAFKON;
+		private bool isPulseGrowing;
 
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		private int APIJKCAIHED;
+		private int pulseFrame;
 
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		private bool JHLCLPEGHKP;
+		private int pulseCount;
 
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		private bool MIKNOJCLEIM;
+		private bool deleteRequested;
 
-		public PerksStage.ActionPerk AMKJNPOCODK
+		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
+		private bool isHidden;
+
+		public PerksStage.ActionPerk PerkAction
 		{
 			get
 			{
@@ -63,11 +63,11 @@ namespace Nekki.SF2.GUI.Fight
 			}
 			private set
 			{
-				AHBNPODMIOD(value);
+				SetAction(value);
 			}
 		}
 
-		public bool IEEIFCFIGAD
+		public bool IsMarkedForDeletion
 		{
 			get
 			{
@@ -79,7 +79,7 @@ namespace Nekki.SF2.GUI.Fight
 			}
 		}
 
-		public int KGNDJOLBBJF
+		public int ElapsedFrames
 		{
 			get
 			{
@@ -87,7 +87,7 @@ namespace Nekki.SF2.GUI.Fight
 			}
 		}
 
-		public int FLNLMIHEDCI
+		public int DurationFrames
 		{
 			get
 			{
@@ -95,7 +95,7 @@ namespace Nekki.SF2.GUI.Fight
 			}
 		}
 
-		public bool OIHFMOHEBLC
+		public bool IsShown
 		{
 			get
 			{
@@ -107,7 +107,7 @@ namespace Nekki.SF2.GUI.Fight
 			}
 		}
 
-		public bool FLNCPBKBJBL
+		public bool IsExpirationShown
 		{
 			get
 			{
@@ -119,7 +119,7 @@ namespace Nekki.SF2.GUI.Fight
 			}
 		}
 
-		public bool FPEPBOBIMAD
+		public bool IsOpacityChanging
 		{
 			get
 			{
@@ -127,11 +127,11 @@ namespace Nekki.SF2.GUI.Fight
 			}
 			private set
 			{
-				DIGBNJOGMOH(value);
+				SetOpacityChanging(value);
 			}
 		}
 
-		public float CIAFHNKKCCG
+		public float IconOpacity
 		{
 			get
 			{
@@ -139,47 +139,47 @@ namespace Nekki.SF2.GUI.Fight
 			}
 			private set
 			{
-				OBPMKMGNABJ(value);
+				SetIconOpacity(value);
 			}
 		}
 
-		private float CFFPHNNEPAI
+		private float ExpirationOpacity
 		{
 			get
 			{
-				return OOAHAJJKHKI();
+				return GetExpirationOpacity();
 			}
 			set
 			{
-				LKHJKOOFAAN(value);
+				SetExpirationOpacity(value);
 			}
 		}
 
-		private bool NOEDAJCKMIB
+		private bool IsPulseGrowing
 		{
 			get
 			{
-				return IAGEBCJCFEF();
+				return GetPulseGrowing();
 			}
 			set
 			{
-				CJLDJACPNLO(value);
+				SetPulseGrowing(value);
 			}
 		}
 
-		private int NJKAGHEFHLF
+		private int PulseFrame
 		{
 			get
 			{
-				return ACMGBPEBGMD();
+				return GetPulseFrame();
 			}
 			set
 			{
-				LLCEMCONIBK(value);
+				SetPulseFrame(value);
 			}
 		}
 
-		public int HNICOKEANPK
+		public int PulseRepeats
 		{
 			get
 			{
@@ -191,7 +191,7 @@ namespace Nekki.SF2.GUI.Fight
 			}
 		}
 
-		public bool IHBPKFEPJIJ
+		public bool IsDeleteRequested
 		{
 			get
 			{
@@ -199,23 +199,23 @@ namespace Nekki.SF2.GUI.Fight
 			}
 			private set
 			{
-				GFKHNLGGGJH(value);
+				SetDeleteRequested(value);
 			}
 		}
 
-		private bool HCLJGEPIEJN
+		private bool IsHidden
 		{
 			get
 			{
-				return HKKGNLIFPDD();
+				return GetHidden();
 			}
 			set
 			{
-				LGACCOFOCNL(value);
+				SetHidden(value);
 			}
 		}
 
-		public int HKEICGDHLNH
+		public int RemainingFrames
 		{
 			get
 			{
@@ -225,147 +225,147 @@ namespace Nekki.SF2.GUI.Fight
 
 		public string get_Name()
 		{
-			return HKGHEJDKCPI;
+			return perkName;
 		}
 
 		private void set_Name(string value)
 		{
-			HKGHEJDKCPI = value;
+			perkName = value;
 		}
 
 		public PerksStage.ActionPerk get_Action()
 		{
-			return PMCIKHJONNM;
+			return currentAction;
 		}
 
-		private void AHBNPODMIOD(PerksStage.ActionPerk value)
+		private void SetAction(PerksStage.ActionPerk value)
 		{
-			PMCIKHJONNM = value;
+			currentAction = value;
 		}
 
 		public bool get_NeedDelete()
 		{
-			return NCGLMKOGBCB;
+			return needsDelete;
 		}
 
 		private void set_NeedDelete(bool value)
 		{
-			NCGLMKOGBCB = value;
+			needsDelete = value;
 		}
 
 		public int get_CurrentFrames()
 		{
-			return (get_Action() != null) ? get_Action().KGNDJOLBBJF : 0;
+			return (get_Action() != null) ? get_Action().ElapsedFrames : 0;
 		}
 
 		public int get_TotalFrames()
 		{
-			return (get_Action() != null) ? get_Action().FLNLMIHEDCI : 0;
+			return (get_Action() != null) ? get_Action().DurationFrames : 0;
 		}
 
 		public bool get_Show()
 		{
-			return MGIIAEFNAIM;
+			return isShown;
 		}
 
 		public void set_Show(bool value)
 		{
-			MGIIAEFNAIM = value;
-			DIGBNJOGMOH(true);
+			isShown = value;
+			SetOpacityChanging(true);
 		}
 
 		public bool get_ShowExpiration()
 		{
-			return IAOPDCPAELB;
+			return showsExpiration;
 		}
 
 		public void set_ShowExpiration(bool value)
 		{
-			IAOPDCPAELB = value;
+			showsExpiration = value;
 			if (_expiration != null)
 			{
-				_expiration.gameObject.SetActive(IAOPDCPAELB);
+				_expiration.gameObject.SetActive(showsExpiration);
 			}
 		}
 
 		public bool get_ChangeOpacity()
 		{
-			return GPNIIJGOMKC;
+			return isOpacityChanging;
 		}
 
-		private void DIGBNJOGMOH(bool value)
+		private void SetOpacityChanging(bool value)
 		{
-			GPNIIJGOMKC = value;
+			isOpacityChanging = value;
 		}
 
 		public float get_CurrentIconOpacity()
 		{
-			return FEALIIMKDPN;
+			return currentIconOpacity;
 		}
 
-		private void OBPMKMGNABJ(float value)
+		private void SetIconOpacity(float value)
 		{
-			FEALIIMKDPN = value;
+			currentIconOpacity = value;
 		}
 
-		private float OOAHAJJKHKI()
+		private float GetExpirationOpacity()
 		{
-			return LNAHKGCNGLB;
+			return expirationOpacity;
 		}
 
-		private void LKHJKOOFAAN(float value)
+		private void SetExpirationOpacity(float value)
 		{
-			LNAHKGCNGLB = value;
+			expirationOpacity = value;
 		}
 
-		private bool IAGEBCJCFEF()
+		private bool GetPulseGrowing()
 		{
-			return IMLKFJDOOOM;
+			return isPulseGrowing;
 		}
 
-		private void CJLDJACPNLO(bool value)
+		private void SetPulseGrowing(bool value)
 		{
-			IMLKFJDOOOM = value;
+			isPulseGrowing = value;
 		}
 
-		private int ACMGBPEBGMD()
+		private int GetPulseFrame()
 		{
-			return IGAPOPAFKON;
+			return pulseFrame;
 		}
 
-		private void LLCEMCONIBK(int value)
+		private void SetPulseFrame(int value)
 		{
-			IGAPOPAFKON = value;
+			pulseFrame = value;
 		}
 
 		public int get_PulseCount()
 		{
-			return APIJKCAIHED;
+			return pulseCount;
 		}
 
 		public void set_PulseCount(int value)
 		{
-			APIJKCAIHED = value;
+			pulseCount = value;
 		}
 
 		public bool get_DeleteRequested()
 		{
-			return JHLCLPEGHKP;
+			return deleteRequested;
 		}
 
-		private void GFKHNLGGGJH(bool value)
+		private void SetDeleteRequested(bool value)
 		{
-			JHLCLPEGHKP = value;
+			deleteRequested = value;
 		}
 
-		private bool HKKGNLIFPDD()
+		private bool GetHidden()
 		{
-			return MIKNOJCLEIM;
+			return isHidden;
 		}
 
-		private void LGACCOFOCNL(bool value)
+		private void SetHidden(bool value)
 		{
-			MIKNOJCLEIM = value;
+			isHidden = value;
 		}
 
 		public int get_FramesToEnd()
@@ -375,15 +375,15 @@ namespace Nekki.SF2.GUI.Fight
 
 		public void Init(PerksStage.ActionPerk IBODMPMJELJ)
 		{
-			AHBNPODMIOD(IBODMPMJELJ);
-			set_Name(IBODMPMJELJ.NHKMCLPOMFK);
+			SetAction(IBODMPMJELJ);
+			set_Name(IBODMPMJELJ.IconPath);
 			set_Show(true);
-			DIGBNJOGMOH(true);
-			LGACCOFOCNL(false);
+			SetOpacityChanging(true);
+			SetHidden(false);
 			set_NeedDelete(false);
-			OBPMKMGNABJ(0f);
-			LKHJKOOFAAN(PerkGUI.OOAHAJJKHKI());
-			set_ShowExpiration(IBODMPMJELJ.FLNCPBKBJBL);
+			SetIconOpacity(0f);
+			SetExpirationOpacity(PerkGUI.GetExpirationOpacity());
+			set_ShowExpiration(IBODMPMJELJ.ShowExpiration);
 			SetEclipseStackCount(IBODMPMJELJ.EclipseStackCount);
 			RectTransform rectTransform = base.transform as RectTransform;
 			if (rectTransform == null)
@@ -392,14 +392,14 @@ namespace Nekki.SF2.GUI.Fight
 			}
 			if (_icon != null)
 			{
-				_icon.set_SpriteName(IBODMPMJELJ.NHKMCLPOMFK);
+				_icon.set_SpriteName(IBODMPMJELJ.IconPath);
 				_icon.SetNativeSize();
 				_icon.set_Alpha(0f);
 				rectTransform.sizeDelta = _icon.rectTransform.sizeDelta;
 			}
 			if (_expiration != null)
 			{
-				_expiration.set_Alpha(OOAHAJJKHKI());
+				_expiration.set_Alpha(GetExpirationOpacity());
 				_expiration.fillAmount = 0f;
 			}
 		}
@@ -423,7 +423,7 @@ namespace Nekki.SF2.GUI.Fight
 				rect.offsetMin = new Vector2(4f, 2f);
 				rect.offsetMax = new Vector2(-4f, -2f);
 				_eclipseStackCount = badge.GetComponent<global::Nekki.SF2.GUI.LabelAlias>();
-				_eclipseStackCount.FontType = global::Nekki.SF2.GUI.LabelAlias.LGEOOHJJOPP.Content;
+				_eclipseStackCount.FontType = global::Nekki.SF2.GUI.LabelAlias.LabelFontType.Content;
 				_eclipseStackCount.UseLocalizationFont = true;
 				_eclipseStackCount.UseLabelFontSize = false;
 				_eclipseStackCount.fontSize = 26;
@@ -439,31 +439,31 @@ namespace Nekki.SF2.GUI.Fight
 			_eclipseStackCount.set_text(count.ToString(System.Globalization.CultureInfo.InvariantCulture));
 		}
 
-		private void BBEMBELMEGP()
+		private void ClearAction()
 		{
-			AHBNPODMIOD(null);
+			SetAction(null);
 		}
 
-		private void NNLGELLDBKN()
+		private void ForceShow()
 		{
 			if (!get_Show() && _icon != null)
 			{
 				_icon.set_Alpha(1f);
-				OBPMKMGNABJ(1f);
+				SetIconOpacity(1f);
 				set_Show(true);
 			}
 		}
 
-		private void OFIPILHODFF()
+		private void FadeIn()
 		{
 			if (get_CurrentIconOpacity() < 1f)
 			{
-				float num = 1f / PerkGUI.PDNIHJMHKBI().x;
-				OBPMKMGNABJ(get_CurrentIconOpacity() + num);
+				float num = 1f / PerkGUI.GetFadeFrames().x;
+				SetIconOpacity(get_CurrentIconOpacity() + num);
 				if (get_CurrentIconOpacity() >= 1f)
 				{
-					OBPMKMGNABJ(1f);
-					DIGBNJOGMOH(false);
+					SetIconOpacity(1f);
+					SetOpacityChanging(false);
 				}
 				if (_icon != null)
 				{
@@ -472,16 +472,16 @@ namespace Nekki.SF2.GUI.Fight
 			}
 		}
 
-		private void KMGECIDGBPA()
+		private void FadeOut()
 		{
 			if (get_CurrentIconOpacity() > 0f)
 			{
-				float num = 1f / PerkGUI.PDNIHJMHKBI().y;
-				OBPMKMGNABJ(get_CurrentIconOpacity() - num);
+				float num = 1f / PerkGUI.GetFadeFrames().y;
+				SetIconOpacity(get_CurrentIconOpacity() - num);
 				if (get_CurrentIconOpacity() <= 0f)
 				{
-					OBPMKMGNABJ(0f);
-					DIGBNJOGMOH(false);
+					SetIconOpacity(0f);
+					SetOpacityChanging(false);
 				}
 				if (_icon != null)
 				{
@@ -492,8 +492,8 @@ namespace Nekki.SF2.GUI.Fight
 
 		public void Render()
 		{
-			BHAKGKHLAKK();
-			if (IAOPDCPAELB && _expiration != null)
+			UpdatePulse();
+			if (showsExpiration && _expiration != null)
 			{
 				float fillAmount = ((get_TotalFrames() == 0) ? 0f : ((float)get_CurrentFrames() / (float)get_TotalFrames()));
 				_expiration.fillAmount = fillAmount;
@@ -502,15 +502,15 @@ namespace Nekki.SF2.GUI.Fight
 			{
 				if (get_Show())
 				{
-					OFIPILHODFF();
+					FadeIn();
 				}
 				else
 				{
-					KMGECIDGBPA();
+					FadeOut();
 				}
 				if (get_ShowExpiration() && _expiration != null)
 				{
-					_expiration.set_Alpha(get_CurrentIconOpacity() * (OOAHAJJKHKI() / 1f));
+					_expiration.set_Alpha(get_CurrentIconOpacity() * (GetExpirationOpacity() / 1f));
 				}
 				if (get_CurrentIconOpacity() == 0f)
 				{
@@ -519,33 +519,33 @@ namespace Nekki.SF2.GUI.Fight
 			}
 		}
 
-		private void BHAKGKHLAKK()
+		private void UpdatePulse()
 		{
 			if (get_PulseCount() <= 0)
 			{
 				return;
 			}
-			float num = PerkGUI.CPPMFFCKHJI();
-			float x = PerkGUI.PELLCOKIJMM().x;
-			float y = PerkGUI.PELLCOKIJMM().y;
-			float x2 = PerkGUI.HGHGEAIOHJA().x;
-			float y2 = PerkGUI.HGHGEAIOHJA().y;
-			int num2 = (int)((!IAGEBCJCFEF()) ? y2 : x2);
-			float num3 = (IAGEBCJCFEF() ? 1f : num);
-			if (ACMGBPEBGMD() > num2)
+			float num = PerkGUI.GetPulseAmplitude();
+			float x = PerkGUI.GetPulseAccel().x;
+			float y = PerkGUI.GetPulseAccel().y;
+			float x2 = PerkGUI.GetPulseFrames().x;
+			float y2 = PerkGUI.GetPulseFrames().y;
+			int num2 = (int)((!GetPulseGrowing()) ? y2 : x2);
+			float num3 = (GetPulseGrowing() ? 1f : num);
+			if (GetPulseFrame() > num2)
 			{
-				CJLDJACPNLO(!IAGEBCJCFEF());
-				LLCEMCONIBK(0);
+				SetPulseGrowing(!GetPulseGrowing());
+				SetPulseFrame(0);
 			}
-			if (ACMGBPEBGMD() <= num2)
+			if (GetPulseFrame() <= num2)
 			{
-				if (IAGEBCJCFEF())
+				if (GetPulseGrowing())
 				{
-					num3 = 1f + (num - 1f) / x2 * (x * Mathf.Pow(ACMGBPEBGMD(), 2f) / x2 + (1f - x) * (float)ACMGBPEBGMD());
+					num3 = 1f + (num - 1f) / x2 * (x * Mathf.Pow(GetPulseFrame(), 2f) / x2 + (1f - x) * (float)GetPulseFrame());
 				}
 				else
 				{
-					num3 = num - (num - 1f) / y2 * (y * Mathf.Pow(ACMGBPEBGMD(), 2f) / y2 + (1f - y) * (float)ACMGBPEBGMD());
+					num3 = num - (num - 1f) / y2 * (y * Mathf.Pow(GetPulseFrame(), 2f) / y2 + (1f - y) * (float)GetPulseFrame());
 					if (num3 <= 1f)
 					{
 						set_PulseCount(get_PulseCount() - 1);
@@ -556,13 +556,13 @@ namespace Nekki.SF2.GUI.Fight
 			vector.x = num3;
 			vector.y = num3;
 			base.transform.localScale = vector;
-			LLCEMCONIBK(ACMGBPEBGMD() + 1);
+			SetPulseFrame(GetPulseFrame() + 1);
 		}
 
 		public void Destroy()
 		{
 			set_NeedDelete(true);
-			DIGBNJOGMOH(false);
+			SetOpacityChanging(false);
 			base.gameObject.SetActive(false);
 			UnityEngine.Object.Destroy(base.gameObject);
 		}

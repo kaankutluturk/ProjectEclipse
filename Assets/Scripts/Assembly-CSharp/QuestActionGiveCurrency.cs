@@ -9,42 +9,42 @@ public class QuestActionGiveCurrency : QuestAction
 	public override void Parse(XmlNode EPKLCPOEELO)
 	{
 		base.Parse(EPKLCPOEELO);
-		Type = EPKLCPOEELO.Attributes["Type"].CIPOICEEIBK(string.Empty);
-		Value = EPKLCPOEELO.Attributes["Value"].CIPOICEEIBK(string.Empty);
+		Type = EPKLCPOEELO.Attributes["Type"].GetStringOrDefault(string.Empty);
+		Value = EPKLCPOEELO.Attributes["Value"].GetStringOrDefault(string.Empty);
 	}
 
-	public override void DEJMHFMLKIC(QuestParameters GFIHPBCEEOB)
+	public override void Execute(QuestParameters GFIHPBCEEOB)
 	{
-		base.DEJMHFMLKIC(GFIHPBCEEOB);
-		Roster nKGLHEGIKKP = ListSF.CCDKHLAMKKO();
+		base.Execute(GFIHPBCEEOB);
+		Roster nKGLHEGIKKP = ListSF.GetRoster();
 		string LFLGCDNKNJI = string.Empty;
 		long value = 0L;
 		GetValues(ref LFLGCDNKNJI, ref value);
 		if (LFLGCDNKNJI == "Gold")
 		{
-			nKGLHEGIKKP.OIOOMAKNIOB(nKGLHEGIKKP.BFBOEGMAMNF() + value);
+			nKGLHEGIKKP.SetMoney(nKGLHEGIKKP.GetMoney() + value);
 		}
 		else if (LFLGCDNKNJI == "Bonus")
 		{
-			nKGLHEGIKKP.LLNELLFMMBB(nKGLHEGIKKP.EHFJHFDACMP() + value, Roster.HPOIJPGPOCF.CHANGE_QUEST);
+			nKGLHEGIKKP.SetBonus(nKGLHEGIKKP.GetBonus() + value, Roster.BalanceChangeType.CHANGE_QUEST);
 		}
 		else if (LFLGCDNKNJI != string.Empty)
 		{
 			nKGLHEGIKKP.AddCurrencyCount(LFLGCDNKNJI, (int)value);
 		}
-		MenuController.OPPMFDNNBDE();
-		OGIJONMKABB();
+		MenuController.RecreateMoney();
+		FinishAction();
 	}
 
 	private void GetValues(ref string LFLGCDNKNJI, ref long value)
 	{
 		ConditionExtension.CompareResult lNIDLHOIHIM = new ConditionExtension.CompareResult();
 		QuestCondition kKDGLNECFHA = new QuestCondition();
-		kKDGLNECFHA.LIMHBJBEEIA(PAJDEKLLFNJ);
-		kKDGLNECFHA.MCPIOGALBMK(Type, lNIDLHOIHIM);
+		kKDGLNECFHA.SetParameters(Parameters);
+		kKDGLNECFHA.SetValue(Type, lNIDLHOIHIM);
 		LFLGCDNKNJI = lNIDLHOIHIM.ToString();
 		lNIDLHOIHIM.Clear();
-		kKDGLNECFHA.MCPIOGALBMK(Value, lNIDLHOIHIM);
+		kKDGLNECFHA.SetValue(Value, lNIDLHOIHIM);
 		value = (long)lNIDLHOIHIM.resultNumber;
 	}
 }

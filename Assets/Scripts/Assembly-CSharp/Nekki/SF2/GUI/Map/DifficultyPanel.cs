@@ -13,9 +13,9 @@ namespace Nekki.SF2.GUI.Map
 		[SerializeField]
 		private LabelAlias _difficultyLabel;
 
-		private static List<global::Pair<string, float>> KLOPLDCPGHD = new List<global::Pair<string, float>>();
+		private static List<global::Pair<string, float>> difficultyEvaluation = new List<global::Pair<string, float>>();
 
-		public static List<global::Pair<string, float>> DANAIKOCGBO
+		public static List<global::Pair<string, float>> DifficultyLevels
 		{
 			get
 			{
@@ -25,7 +25,7 @@ namespace Nekki.SF2.GUI.Map
 
 		public static List<global::Pair<string, float>> get_DifficultyEvaluation()
 		{
-			return KLOPLDCPGHD;
+			return difficultyEvaluation;
 		}
 
 		public void Init(float ratio)
@@ -33,8 +33,8 @@ namespace Nekki.SF2.GUI.Map
 			_difficultyBar.SetValueBorders(0f, 100f);
 			int num = 0;
 			int num2 = 0;
-			global::Pair<string, float> cCKLNOPEKHO = KLOPLDCPGHD[0];
-			foreach (global::Pair<string, float> item in KLOPLDCPGHD)
+			global::Pair<string, float> cCKLNOPEKHO = difficultyEvaluation[0];
+			foreach (global::Pair<string, float> item in difficultyEvaluation)
 			{
 				if (item.Second < ratio && cCKLNOPEKHO.Second < item.Second)
 				{
@@ -43,7 +43,7 @@ namespace Nekki.SF2.GUI.Map
 				}
 				num++;
 			}
-			_difficultyBar.Stripe.set_SpriteName(Constants.DNDKOMGCBLC[num2]);
+			_difficultyBar.Stripe.set_SpriteName(Constants.DifficultyBarSprites[num2]);
 			RestoreTrimmedStripeLayout();
 			_difficultyBar.SetValue(100f);
 			_difficultyLabel.SetAlias(cCKLNOPEKHO.First);
@@ -76,10 +76,10 @@ namespace Nekki.SF2.GUI.Map
 
 		public static void DifficultyEvaluationParse(XmlNode AFHNINCKJEE)
 		{
-			KLOPLDCPGHD.Clear();
+			difficultyEvaluation.Clear();
 			foreach (XmlNode childNode in AFHNINCKJEE.ChildNodes)
 			{
-				KLOPLDCPGHD.Add(new global::Pair<string, float>(childNode.Attributes["Name"].CIPOICEEIBK(string.Empty), childNode.Attributes["RatingRatioTreshold"].ParseFloat()));
+				difficultyEvaluation.Add(new global::Pair<string, float>(childNode.Attributes["Name"].GetStringOrDefault(string.Empty), childNode.Attributes["RatingRatioTreshold"].ParseFloat()));
 			}
 		}
 	}

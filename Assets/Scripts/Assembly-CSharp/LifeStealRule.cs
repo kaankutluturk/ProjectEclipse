@@ -2,32 +2,32 @@ using System.Xml;
 
 public class LifeStealRule : InFightRule
 {
-	private float JPOOKCGBLJO;
+	private float damagePart;
 
-	private float OCGGCHDAPMI;
+	private float lastLifeStolen;
 
 	public LifeStealRule(XmlNode node, RuleAppliance EJPOJJKKICO)
-		: base(BCBLLMPAMLP.RuleLifeSteal, EJPOJJKKICO, node)
+		: base(RuleType.RuleLifeSteal, EJPOJJKKICO, node)
 	{
-		OCGGCHDAPMI = 0f;
-		EBJIKKBLBEM(FightEvent.StrikeEvent);
+		lastLifeStolen = 0f;
+		SubscribeEvent(FightEvent.StrikeEvent);
 		Parse(node);
 		Reset();
 	}
 
-	public float FGJOBADADEB()
+	public float GetLastLifeStolen()
 	{
-		return OCGGCHDAPMI;
+		return lastLifeStolen;
 	}
 
 	protected override bool CompareSingle(object data)
 	{
 		FightData hCPJJKMNMCE = (FightData)data;
-		FightEvent kOJNCHKPLLN = hCPJJKMNMCE.KOJNCHKPLLN;
+		FightEvent kOJNCHKPLLN = hCPJJKMNMCE.FightEventType;
 		if (kOJNCHKPLLN == FightEvent.StrikeEvent)
 		{
-			OCGGCHDAPMI = hCPJJKMNMCE.OJIKDIDLBAF * JPOOKCGBLJO;
-			return OCGGCHDAPMI != 0f;
+			lastLifeStolen = hCPJJKMNMCE.DamageDealt * damagePart;
+			return lastLifeStolen != 0f;
 		}
 		return false;
 	}
@@ -35,14 +35,14 @@ public class LifeStealRule : InFightRule
 	protected override void Parse(XmlNode node)
 	{
 		base.Parse(node);
-		JPOOKCGBLJO = node.Attributes["DamagePart"].ParseFloat();
+		damagePart = node.Attributes["DamagePart"].ParseFloat();
 	}
 
 	public override InFightRule Copy()
 	{
 		InFightRule aAJIFBJLJOA = null;
-		RuleAppliance eJPOJJKKICO = EDAKADCHOLE();
-		XmlNode hKPPBKPJOEO = GIFDJEEGCJI().IOJIGDNFCFL();
+		RuleAppliance eJPOJJKKICO = GetAppliance();
+		XmlNode hKPPBKPJOEO = GetXmlSource().GetNode();
 		aAJIFBJLJOA = new LifeStealRule(hKPPBKPJOEO, eJPOJJKKICO);
 		aAJIFBJLJOA.IsRandom = IsRandom;
 		return aAJIFBJLJOA;

@@ -4,25 +4,25 @@ using YamlDotNet.Core.Tokens;
 
 public class DocumentStart : ParsingEvent
 {
-	private readonly TagDirectiveCollection CPAIGLNDIOK;
+	private readonly TagDirectiveCollection tags;
 
 	private readonly VersionDirective version;
 
 	private readonly bool isImplicit;
 
-	public override int OHJMGKADENE
+	public override int NestingIncrease
 	{
 		get
 		{
-			return DPIMLJJFMCO();
+			return GetNestingIncrease();
 		}
 	}
 
-	public TagDirectiveCollection DCCLDDMHOBH
+	public TagDirectiveCollection Tags
 	{
 		get
 		{
-			return FNNKPBJDMDF();
+			return GetTags();
 		}
 	}
 
@@ -30,15 +30,15 @@ public class DocumentStart : ParsingEvent
 	{
 		get
 		{
-			return KCJMMIEBLHL();
+			return GetVersion();
 		}
 	}
 
-	public bool KIOLMKCLEEB
+	public bool IsImplicit
 	{
 		get
 		{
-			return BBBGHODAEIN();
+			return GetIsImplicit();
 		}
 	}
 
@@ -46,7 +46,7 @@ public class DocumentStart : ParsingEvent
 		: base(ILENLCMAMBH, PCLFFOBJJFO)
 	{
 		this.version = version;
-		this.CPAIGLNDIOK = CPAIGLNDIOK;
+		this.tags = CPAIGLNDIOK;
 		this.isImplicit = isImplicit;
 	}
 
@@ -65,27 +65,27 @@ public class DocumentStart : ParsingEvent
 	{
 	}
 
-	public override int DPIMLJJFMCO()
+	public override int GetNestingIncrease()
 	{
 		return 1;
 	}
 
-	internal override BHBPOHDAGPH get_Type()
+	internal override ParsingEventType get_Type()
 	{
-		return BHBPOHDAGPH.DocumentStart;
+		return ParsingEventType.DocumentStart;
 	}
 
-	public TagDirectiveCollection FNNKPBJDMDF()
+	public TagDirectiveCollection GetTags()
 	{
-		return CPAIGLNDIOK;
+		return tags;
 	}
 
-	public VersionDirective KCJMMIEBLHL()
+	public VersionDirective GetVersion()
 	{
 		return version;
 	}
 
-	public bool BBBGHODAEIN()
+	public bool GetIsImplicit()
 	{
 		return isImplicit;
 	}
@@ -95,7 +95,7 @@ public class DocumentStart : ParsingEvent
 		return string.Format(CultureInfo.InvariantCulture, "Document start [isImplicit = {0}]", isImplicit);
 	}
 
-	public override void GPHIFFOGOGN(IParsingEventVisitor NKECMANOOEM)
+	public override void Accept(IParsingEventVisitor NKECMANOOEM)
 	{
 		NKECMANOOEM.Visit(this);
 	}

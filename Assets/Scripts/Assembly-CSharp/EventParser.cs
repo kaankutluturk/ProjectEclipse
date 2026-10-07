@@ -33,19 +33,19 @@ public class EventParser
 			result = new EventHit();
 			break;
 		case "Strike":
-			result = new EventAnimation(EventAnimation.EECEJKADLCK.EVENT_STRIKE);
+			result = new EventAnimation(EventAnimation.EventAnimationType.EVENT_STRIKE);
 			break;
 		case "EveryFrame":
-			result = new EventAnimation(EventAnimation.EECEJKADLCK.EVENT_EVERY_FRAME);
+			result = new EventAnimation(EventAnimation.EventAnimationType.EVENT_EVERY_FRAME);
 			break;
 		case "Birth":
-			result = new EventAnimation(EventAnimation.EECEJKADLCK.EVENT_BIRTH);
+			result = new EventAnimation(EventAnimation.EventAnimationType.EVENT_BIRTH);
 			break;
 		case "ModExpires":
 			result = new EventModExpires();
 			break;
 		default:
-			LLLOJBFMONN.Error("MovesParser::eventsParse - unknown event \"{0}\"", name);
+			GameLog.Error("MovesParser::eventsParse - unknown event \"{0}\"", name);
 			break;
 		}
 		return result;

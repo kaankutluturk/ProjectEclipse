@@ -62,11 +62,11 @@ namespace Nekki.SF2.GUI.Fight
 		[SerializeField]
 		private LabelAlias nameRight;
 
-		private float GLAMMHFCJPN;
+		private float animationTime;
 
-		private string texturePath = SF2Paths.BHCPOOOJAAK();
+		private string texturePath = SF2Paths.GetUsersUiPath();
 
-		public float ADMLKNCMFLG
+		public float AnimationDuration
 		{
 			get
 			{
@@ -76,7 +76,7 @@ namespace Nekki.SF2.GUI.Fight
 
 		public float get_AnimationTime()
 		{
-			return GLAMMHFCJPN;
+			return animationTime;
 		}
 
 		// Newer localization writes two-line fighter names with {br} ("SON OF{br}HEAVEN").
@@ -95,23 +95,23 @@ namespace Nekki.SF2.GUI.Fight
 			if (playerLeft != null)
 			{
 				playerLeft.set_TexturePath(texturePath);
-				playerLeft.set_SpriteName(KEJDJHAGBMK.HNKFHGOOKEG);
+				playerLeft.set_SpriteName(KEJDJHAGBMK.Avatar);
 				playerLeft.SetNativeSize();
 			}
 			if (playerRight != null)
 			{
 				playerRight.set_TexturePath(texturePath);
-				playerRight.set_SpriteName(HFGPAELCNMF.HNKFHGOOKEG);
+				playerRight.set_SpriteName(HFGPAELCNMF.Avatar);
 				playerRight.SetNativeSize();
 			}
 			if (nameLeft != null)
 			{
-				nameLeft.set_Alias(KEJDJHAGBMK.BMFLPBLAFLK);
+				nameLeft.set_Alias(KEJDJHAGBMK.FirstName);
 				AllowExplicitLineBreaks(nameLeft);
 			}
 			if (nameRight != null)
 			{
-				nameRight.set_Alias(HFGPAELCNMF.BMFLPBLAFLK);
+				nameRight.set_Alias(HFGPAELCNMF.FirstName);
 				AllowExplicitLineBreaks(nameRight);
 			}
 			if (playerLeft != null && playerRight != null && nameLeft != null && nameRight != null && vsImage != null && leftStripe != null && rightStripe != null)
@@ -132,10 +132,10 @@ namespace Nekki.SF2.GUI.Fight
 					nameRight.gameObject.SetActive(true);
 				});
 				s.AppendInterval(afterNameShowPause);
-				GLAMMHFCJPN = moveAvatarTime + afterMoveAvatarPause + vsImageScaleTime + afterVsImageScalePause + vsStripeFillTime + afterVsStripeFillPause + afterNameShowPause;
+				animationTime = moveAvatarTime + afterMoveAvatarPause + vsImageScaleTime + afterVsImageScalePause + vsStripeFillTime + afterVsStripeFillPause + afterNameShowPause;
 				// Keep the countdown and visual sequence on the same, shorter timeline.
 				s.timeScale = 1.5f;
-				GLAMMHFCJPN /= 1.5f;
+				animationTime /= 1.5f;
 			}
 		}
 	}

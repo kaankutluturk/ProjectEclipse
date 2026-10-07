@@ -28,9 +28,9 @@ namespace Eclipse.Modding
             foreach (var line in request.Lines)
             {
                 var entry = new StoryDialogContent(string.Empty, string.Empty, string.Empty, string.Empty);
-                entry.GGDJIPKMKFC = line.Text;
-                entry.AJELOOEBCPO = line.Button;
-                entry.NGEPEDCCMAI = StoryDialogContent.MFHMNFAPAOH.CONTENT_TYPE_REGULAR;
+                entry.Text = line.Text;
+                entry.ButtonText = line.Button;
+                entry.Type = StoryDialogContent.ContentType.CONTENT_TYPE_REGULAR;
                 content.Add(entry);
             }
             var host = new GameObject("Mod story dialog").AddComponent<ModStoryDialogPresenter>();
@@ -42,7 +42,7 @@ namespace Eclipse.Modding
                 // Same arguments as QuestActionDialog's Regular branch with one Right button.
                 string image = request.Portrait + (request.Mirrored ? "|Flip" : string.Empty);
                 // An empty portrait hides the native portrait (quest dialogs without Image).
-                host.dialog = DialogsOpener.EHMEIJCOOKP(image, request.Title, content, host.OnNativeClose, "CANCEL", false,
+                host.dialog = DialogsOpener.OpenStoryDialog(image, request.Title, content, host.OnNativeClose, "CANCEL", false,
                     request.Button, LabelButton.GetBtnColor("Beige"), LabelButton.GetBtnColor("Red"), request.Portrait.Length != 0);
                 if (host.dialog == null) { host.Finish(false, false); return null; }
                 host.dialog.IsIgnoreBack = request.IgnoreBack;

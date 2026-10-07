@@ -6,46 +6,46 @@ public class OutWindow
 
 	private uint _pos;
 
-	private uint PHCCJGNNFII;
+	private uint _windowSize;
 
-	private uint OONMJHCFEHO;
+	private uint _streamPos;
 
 	private Stream _stream;
 
-	public uint FAJMEIBMEDF;
+	public uint TrainSize;
 
 	public void Create(uint AKOEOKJFINO)
 	{
-		if (PHCCJGNNFII != AKOEOKJFINO)
+		if (_windowSize != AKOEOKJFINO)
 		{
 			_buffer = new byte[AKOEOKJFINO];
 		}
-		PHCCJGNNFII = AKOEOKJFINO;
+		_windowSize = AKOEOKJFINO;
 		_pos = 0u;
-		OONMJHCFEHO = 0u;
+		_streamPos = 0u;
 	}
 
 	public void Init(Stream ABJIEFMMIEK, bool POOADOMADDK)
 	{
-		IAIFCIAAHOE();
+		ReleaseStream();
 		_stream = ABJIEFMMIEK;
 		if (!POOADOMADDK)
 		{
-			OONMJHCFEHO = 0u;
+			_streamPos = 0u;
 			_pos = 0u;
-			FAJMEIBMEDF = 0u;
+			TrainSize = 0u;
 		}
 	}
 
 	public bool Train(Stream ABJIEFMMIEK)
 	{
 		long length = ABJIEFMMIEK.Length;
-		uint num = (FAJMEIBMEDF = (uint)((length >= PHCCJGNNFII) ? PHCCJGNNFII : length));
+		uint num = (TrainSize = (uint)((length >= _windowSize) ? _windowSize : length));
 		ABJIEFMMIEK.Position = length - num;
-		OONMJHCFEHO = (_pos = 0u);
+		_streamPos = (_pos = 0u);
 		while (num != 0)
 		{
-			uint num2 = PHCCJGNNFII - _pos;
+			uint num2 = _windowSize - _pos;
 			if (num < num2)
 			{
 				num2 = num;
@@ -57,52 +57,52 @@ public class OutWindow
 			}
 			num -= (uint)num3;
 			_pos += (uint)num3;
-			OONMJHCFEHO += (uint)num3;
-			if (_pos == PHCCJGNNFII)
+			_streamPos += (uint)num3;
+			if (_pos == _windowSize)
 			{
-				OONMJHCFEHO = (_pos = 0u);
+				_streamPos = (_pos = 0u);
 			}
 		}
 		return true;
 	}
 
-	public void IAIFCIAAHOE()
+	public void ReleaseStream()
 	{
-		MKPBJGMJPMI();
+		Flush();
 		_stream = null;
 	}
 
-	public void MKPBJGMJPMI()
+	public void Flush()
 	{
-		uint num = _pos - OONMJHCFEHO;
+		uint num = _pos - _streamPos;
 		if (num != 0)
 		{
-			_stream.Write(_buffer, (int)OONMJHCFEHO, (int)num);
-			if (_pos >= PHCCJGNNFII)
+			_stream.Write(_buffer, (int)_streamPos, (int)num);
+			if (_pos >= _windowSize)
 			{
 				_pos = 0u;
 			}
-			OONMJHCFEHO = _pos;
+			_streamPos = _pos;
 		}
 	}
 
 	public void CopyBlock(uint OIOMNNFMDOO, uint JCAJDBOMGOM)
 	{
 		uint num = _pos - OIOMNNFMDOO - 1;
-		if (num >= PHCCJGNNFII)
+		if (num >= _windowSize)
 		{
-			num += PHCCJGNNFII;
+			num += _windowSize;
 		}
 		while (JCAJDBOMGOM != 0)
 		{
-			if (num >= PHCCJGNNFII)
+			if (num >= _windowSize)
 			{
 				num = 0u;
 			}
 			_buffer[_pos++] = _buffer[num++];
-			if (_pos >= PHCCJGNNFII)
+			if (_pos >= _windowSize)
 			{
-				MKPBJGMJPMI();
+				Flush();
 			}
 			JCAJDBOMGOM--;
 		}
@@ -111,18 +111,18 @@ public class OutWindow
 	public void PutByte(byte AAOIAEJJINO)
 	{
 		_buffer[_pos++] = AAOIAEJJINO;
-		if (_pos >= PHCCJGNNFII)
+		if (_pos >= _windowSize)
 		{
-			MKPBJGMJPMI();
+			Flush();
 		}
 	}
 
 	public byte GetByte(uint OIOMNNFMDOO)
 	{
 		uint num = _pos - OIOMNNFMDOO - 1;
-		if (num >= PHCCJGNNFII)
+		if (num >= _windowSize)
 		{
-			num += PHCCJGNNFII;
+			num += _windowSize;
 		}
 		return _buffer[num];
 	}

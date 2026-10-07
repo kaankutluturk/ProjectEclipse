@@ -5,63 +5,63 @@ public class UserPerks
 {
 	private XmlNode _node;
 
-	private XmlNode BJJELGMJHJM;
+	private XmlNode perksNode;
 
-	private XmlNode HFCPHEDFGEN;
+	private XmlNode perkHistoryNode;
 
-	private List<RosterPerk> GBMLFKHHLCC = new List<RosterPerk>();
+	private List<RosterPerk> perks = new List<RosterPerk>();
 
-	public PerkHistory GIAEMMLABDL = new PerkHistory();
+	public PerkHistory History = new PerkHistory();
 
-	protected ModelParameters HEGIABHIPHA;
+	protected ModelParameters modelParameters;
 
-	public List<RosterPerk> AOMHAONDFIP
+	public List<RosterPerk> Perks
 	{
 		get
 		{
-			return KEHFPLBNDHI();
+			return GetPerks();
 		}
 	}
 
-	public int JNDHGMFINGH
+	public int FreePerkPoints
 	{
 		get
 		{
-			return OPPFMFKAOIG();
+			return GetFreePerkPoints();
 		}
 	}
 
-	public int IFNOOAECKHD
+	public int TotalPerkLevels
 	{
 		get
 		{
-			return IBAOKPECDLF();
+			return GetTotalPerkLevels();
 		}
 	}
 
-	public int MMFJLIFFJIP
+	public int PerkResetCount
 	{
 		get
 		{
-			return ICIAGDCEMEM();
+			return GetPerkResetCount();
 		}
 	}
 
 	public UserPerks(ModelParameters JCICKLIMBEF)
 	{
-		HEGIABHIPHA = JCICKLIMBEF;
+		modelParameters = JCICKLIMBEF;
 	}
 
-	public List<RosterPerk> KEHFPLBNDHI()
+	public List<RosterPerk> GetPerks()
 	{
-		return GBMLFKHHLCC;
+		return perks;
 	}
 
-	public int OPPFMFKAOIG()
+	public int GetFreePerkPoints()
 	{
-		int num = ListSF.CCDKHLAMKKO().PINDEKDNCNL() - GIAEMMLABDL.JOGBKOJCINM.Count - 1;
-		int num2 = PerkTree.GBPBIPFIOJH().KBIOIHPNLIM();
-		int count = GIAEMMLABDL.JOGBKOJCINM.Count;
+		int num = ListSF.GetRoster().GetLevel() - History.Perks.Count - 1;
+		int num2 = PerkTree.GetInstance().GetUnlockedBranchCount();
+		int count = History.Perks.Count;
 		return num2 - count;
 	}
 
@@ -72,36 +72,36 @@ public class UserPerks
 			return;
 		}
 		_node = node;
-		HFCPHEDFGEN = node["PerkHistory"];
-		GIAEMMLABDL.Parse(HFCPHEDFGEN);
-		BJJELGMJHJM = node["Perks"];
-		if (BJJELGMJHJM == null)
+		perkHistoryNode = node["PerkHistory"];
+		History.Parse(perkHistoryNode);
+		perksNode = node["Perks"];
+		if (perksNode == null)
 		{
 			return;
 		}
-		GameUtils.FDEJIIDIPBI.MHAEANEADOO(BJJELGMJHJM);
-		foreach (XmlNode childNode in BJJELGMJHJM.ChildNodes)
+		GameUtils.PerkItemList.ParseUserPerks(perksNode);
+		foreach (XmlNode childNode in perksNode.ChildNodes)
 		{
-			DDBGEFPKAPN(new RosterPerk(childNode));
+			AddPerk(new RosterPerk(childNode));
 		}
 	}
 
-	public RosterPerk HGOLHMJEPIA(RosterPerkInfo AEFFHJGMNFI)
+	public RosterPerk AddOrUpgradePerk(RosterPerkInfo AEFFHJGMNFI)
 	{
-		foreach (RosterPerk item in GBMLFKHHLCC)
+		foreach (RosterPerk item in perks)
 		{
 			bool flag = item.get_Name().Equals(AEFFHJGMNFI.Name);
 			if (flag)
 			{
-				int aKKLOMFOLNO = AEFFHJGMNFI.AKKLOMFOLNO;
+				int aKKLOMFOLNO = AEFFHJGMNFI.UpgradeLevel;
 				if (aKKLOMFOLNO > 0)
 				{
-					item.FMMDLMGHPIB(aKKLOMFOLNO);
+					item.SetUpgradeLevel(aKKLOMFOLNO);
 				}
 					item.AppendNodeChild(AEFFHJGMNFI.Pairs);
 					InitializeEclipsePerkParameters(item);
-					item.NOLDHAFMOLF(null);
-				DDBGEFPKAPN(item, AEFFHJGMNFI);
+					item.SetPerkInfo(null);
+				AddPerk(item, AEFFHJGMNFI);
 				return item;
 			}
 			bool flag2 = string.IsNullOrEmpty(AEFFHJGMNFI.Name);
@@ -115,52 +115,52 @@ public class UserPerks
 		XmlNode xmlNode = _node[text];
 		if (xmlNode == null)
 		{
-			xmlNode = _node.ACBPMPMPKJJ(text);
+			xmlNode = _node.AppendElement(text);
 		}
 		XmlNode newChild = _node.OwnerDocument.CreateNode(XmlNodeType.Element, name, null);
 		newChild = xmlNode.PrependChild(newChild);
 		RosterPerk hOGDBKBFFDJ = new RosterPerk(newChild);
-		hOGDBKBFFDJ.DLDMOHEGENM(AEFFHJGMNFI.Level);
+		hOGDBKBFFDJ.SetLevel(AEFFHJGMNFI.Level);
 		hOGDBKBFFDJ.set_Name(AEFFHJGMNFI.Name);
-		int aKKLOMFOLNO2 = AEFFHJGMNFI.AKKLOMFOLNO;
+		int aKKLOMFOLNO2 = AEFFHJGMNFI.UpgradeLevel;
 		if (aKKLOMFOLNO2 > 0)
 		{
-			hOGDBKBFFDJ.FMMDLMGHPIB(aKKLOMFOLNO2);
+			hOGDBKBFFDJ.SetUpgradeLevel(aKKLOMFOLNO2);
 		}
 			hOGDBKBFFDJ.AppendNodeChild(AEFFHJGMNFI.Pairs);
 			InitializeEclipsePerkParameters(hOGDBKBFFDJ);
-			DDBGEFPKAPN(hOGDBKBFFDJ, AEFFHJGMNFI);
+			AddPerk(hOGDBKBFFDJ, AEFFHJGMNFI);
 		return hOGDBKBFFDJ;
 	}
 
-	public RosterPerk HGOLHMJEPIA(PerkInfoItem AEFFHJGMNFI)
+	public RosterPerk AddOrUpgradePerk(PerkInfoItem AEFFHJGMNFI)
 	{
-		XmlNode hKPPBKPJOEO = (_node["Perks"] ?? _node.ACBPMPMPKJJ("Perks")).ACBPMPMPKJJ("Perk");
+		XmlNode hKPPBKPJOEO = (_node["Perks"] ?? _node.AppendElement("Perks")).AppendElement("Perk");
 		RosterPerk hOGDBKBFFDJ = new RosterPerk(hKPPBKPJOEO);
 		hOGDBKBFFDJ.set_Name(AEFFHJGMNFI.Name);
-		hOGDBKBFFDJ.DLDMOHEGENM(AEFFHJGMNFI.Level);
-			hOGDBKBFFDJ.FMMDLMGHPIB(AEFFHJGMNFI.AKKLOMFOLNO);
+		hOGDBKBFFDJ.SetLevel(AEFFHJGMNFI.Level);
+			hOGDBKBFFDJ.SetUpgradeLevel(AEFFHJGMNFI.UpgradeLevel);
 			InitializeEclipsePerkParameters(hOGDBKBFFDJ);
 			return hOGDBKBFFDJ;
 	}
 
-	public RosterPerk HGOLHMJEPIA(ProfilePerk AEFFHJGMNFI)
+	public RosterPerk AddOrUpgradePerk(ProfilePerk AEFFHJGMNFI)
 	{
-		foreach (RosterPerk item in GBMLFKHHLCC)
+		foreach (RosterPerk item in perks)
 		{
-			bool flag = item.get_Name() == AEFFHJGMNFI.KAMBOKLFBEE();
-			bool flag2 = AEFFHJGMNFI.get_Type() == ProfilePerk.JHDKDOPHGOO.TYPE_UPGRADE;
-			bool flag3 = AEFFHJGMNFI.KAMBOKLFBEE() == string.Empty;
+			bool flag = item.get_Name() == AEFFHJGMNFI.GetPerkName();
+			bool flag2 = AEFFHJGMNFI.get_Type() == ProfilePerk.ProfilePerkType.TYPE_UPGRADE;
+			bool flag3 = AEFFHJGMNFI.GetPerkName() == string.Empty;
 			if (flag && flag2)
 			{
-				int num = AEFFHJGMNFI.LMGGMMFEODJ();
+				int num = AEFFHJGMNFI.GetUpgradeLevel();
 				if (num > 0)
 				{
-					item.FMMDLMGHPIB(num);
+					item.SetUpgradeLevel(num);
 				}
-					item.NOLDHAFMOLF(null);
+					item.SetPerkInfo(null);
 					InitializeEclipsePerkParameters(item);
-					DDBGEFPKAPN(item, AEFFHJGMNFI);
+					AddPerk(item, AEFFHJGMNFI);
 				return item;
 			}
 			if (flag || flag3)
@@ -170,65 +170,65 @@ public class UserPerks
 		}
 		string text = "Perks";
 		string jLEKBBJBLOE = "Perk";
-		XmlNode mEEAKLDGLDF = ((_node[text] == null) ? _node.ACBPMPMPKJJ(text) : _node[text]);
-		XmlNode hKPPBKPJOEO = mEEAKLDGLDF.ACBPMPMPKJJ(jLEKBBJBLOE);
+		XmlNode mEEAKLDGLDF = ((_node[text] == null) ? _node.AppendElement(text) : _node[text]);
+		XmlNode hKPPBKPJOEO = mEEAKLDGLDF.AppendElement(jLEKBBJBLOE);
 		RosterPerk hOGDBKBFFDJ = new RosterPerk(hKPPBKPJOEO);
-		hOGDBKBFFDJ.DLDMOHEGENM(AEFFHJGMNFI.PINDEKDNCNL());
-		hOGDBKBFFDJ.set_Name(AEFFHJGMNFI.KAMBOKLFBEE());
-		int num2 = AEFFHJGMNFI.LMGGMMFEODJ();
+		hOGDBKBFFDJ.SetLevel(AEFFHJGMNFI.GetLevel());
+		hOGDBKBFFDJ.set_Name(AEFFHJGMNFI.GetPerkName());
+		int num2 = AEFFHJGMNFI.GetUpgradeLevel();
 			if (num2 > 0)
 			{
-				hOGDBKBFFDJ.FMMDLMGHPIB(num2);
+				hOGDBKBFFDJ.SetUpgradeLevel(num2);
 			}
 			InitializeEclipsePerkParameters(hOGDBKBFFDJ);
-			DDBGEFPKAPN(hOGDBKBFFDJ, AEFFHJGMNFI);
+			AddPerk(hOGDBKBFFDJ, AEFFHJGMNFI);
 		return hOGDBKBFFDJ;
 	}
 
-	public void PBPAOBKIMKK(PerkHistory.Perk AEFFHJGMNFI)
+	public void SavePerkHistoryEntry(PerkHistory.Perk AEFFHJGMNFI)
 	{
 		if (AEFFHJGMNFI != null)
 		{
-			LLLOJBFMONN.Write("Save " + _node.Name);
-			XmlNode mEEAKLDGLDF = _node["PerkHistory"] ?? _node.ACBPMPMPKJJ("PerkHistory");
-			XmlNode mEEAKLDGLDF2 = mEEAKLDGLDF.ACBPMPMPKJJ("Level");
-			mEEAKLDGLDF2.LLIKNHNLGJJ("Value").Value = AEFFHJGMNFI.Level.ToString();
-			mEEAKLDGLDF2.LLIKNHNLGJJ("Perk").Value = AEFFHJGMNFI.Name;
-			ListSF.CCDKHLAMKKO().GGGEHAGCLGC();
+			GameLog.Write("Save " + _node.Name);
+			XmlNode mEEAKLDGLDF = _node["PerkHistory"] ?? _node.AppendElement("PerkHistory");
+			XmlNode mEEAKLDGLDF2 = mEEAKLDGLDF.AppendElement("Level");
+			mEEAKLDGLDF2.AppendAttribute("Value").Value = AEFFHJGMNFI.Level.ToString();
+			mEEAKLDGLDF2.AppendAttribute("Perk").Value = AEFFHJGMNFI.Name;
+			ListSF.GetRoster().RequestSave();
 		}
 	}
 
-	public void DDBGEFPKAPN(RosterPerk AEFFHJGMNFI)
+	public void AddPerk(RosterPerk AEFFHJGMNFI)
 	{
 		if (AEFFHJGMNFI != null)
 		{
-			CAGEDGLJAKF(AEFFHJGMNFI);
+			RegisterPerk(AEFFHJGMNFI);
 		}
 	}
 
-	public void DDBGEFPKAPN(RosterPerk PPPNCJLGJPE, ProfilePerk AEFFHJGMNFI)
+	public void AddPerk(RosterPerk PPPNCJLGJPE, ProfilePerk AEFFHJGMNFI)
 	{
-		LHCFFCKNMOO(AEFFHJGMNFI.DFOELJAEEGG());
-		DDBGEFPKAPN(PPPNCJLGJPE);
-		ListSF.CCDKHLAMKKO().GGGEHAGCLGC();
-		Sound.IFKCCDAIADF("snd_learn");
+		RemoveLearnedPerk(AEFFHJGMNFI.GetPerkInfo());
+		AddPerk(PPPNCJLGJPE);
+		ListSF.GetRoster().RequestSave();
+		Sound.PlaySound("snd_learn");
 	}
 
-	public void DDBGEFPKAPN(RosterPerk PPPNCJLGJPE, RosterPerkInfo BPANICNCIAO)
+	public void AddPerk(RosterPerk PPPNCJLGJPE, RosterPerkInfo BPANICNCIAO)
 	{
-		LHCFFCKNMOO(BPANICNCIAO.GEFLIFEPDNG);
+		RemoveLearnedPerk(BPANICNCIAO.PerkInfo);
 		if (PPPNCJLGJPE != null)
 		{
-			CAGEDGLJAKF(PPPNCJLGJPE, true);
+			RegisterPerk(PPPNCJLGJPE, true);
 		}
-		ListSF.CCDKHLAMKKO().GGGEHAGCLGC();
+		ListSF.GetRoster().RequestSave();
 	}
 
-	public RosterPerk LKIEAGLHNON(string name)
+	public RosterPerk FindPerk(string name)
 	{
-		for (int i = 0; i < GBMLFKHHLCC.Count; i++)
+		for (int i = 0; i < perks.Count; i++)
 		{
-			RosterPerk hOGDBKBFFDJ = GBMLFKHHLCC[i];
+			RosterPerk hOGDBKBFFDJ = perks[i];
 			if (hOGDBKBFFDJ.get_Name() == name)
 			{
 				return hOGDBKBFFDJ;
@@ -246,17 +246,17 @@ public class UserPerks
 				perk.get_Name() + "': " + error);
 	}
 
-	public int IBAOKPECDLF()
+	public int GetTotalPerkLevels()
 	{
 		int num = 0;
-		foreach (RosterPerk item in GBMLFKHHLCC)
+		foreach (RosterPerk item in perks)
 		{
-			num += item.DHNNCAEEMLL();
+			num += item.GetUpgradeLevel();
 		}
 		return num;
 	}
 
-	public void LCDFOLAAEGM()
+	public void ResetPerks()
 	{
 		XmlNode xmlNode = _node["Perks"];
 		if (xmlNode != null)
@@ -273,95 +273,95 @@ public class UserPerks
 		{
 			_node.RemoveChild(xmlNode3);
 		}
-		ListSF.CCDKHLAMKKO().GGGEHAGCLGC();
-		GBMLFKHHLCC.Clear();
-		GIAEMMLABDL.JOGBKOJCINM.Clear();
-		PerkTree.GBPBIPFIOJH().LJHPGKAOIAE();
-		HEGIABHIPHA.LearnedPerks.Clear();
-		GameUtils.FDEJIIDIPBI.BPBLIPKOJOP().Clear();
+		ListSF.GetRoster().RequestSave();
+		perks.Clear();
+		History.Perks.Clear();
+		PerkTree.GetInstance().RebuildProfile();
+		modelParameters.LearnedPerks.Clear();
+		GameUtils.PerkItemList.GetUserPerks().Clear();
 	}
 
-	public int ICIAGDCEMEM()
+	public int GetPerkResetCount()
 	{
-		UserItem dKCHDHMLKHN = ListSF.CCDKHLAMKKO().KHCNHPCPFII().CMGOCLGHNLH("Perk_Reset");
+		UserItem dKCHDHMLKHN = ListSF.GetRoster().GetInventory().FindItem("Perk_Reset");
 		if (dKCHDHMLKHN != null)
 		{
-			return dKCHDHMLKHN.OFOPFCJNEBL();
+			return dKCHDHMLKHN.GetCount();
 		}
 		return 0;
 	}
 
-	public void CAGEDGLJAKF(RosterPerk value, bool PGDIBFDIEIB = false)
+	public void RegisterPerk(RosterPerk value, bool PGDIBFDIEIB = false)
 	{
-		List<PerkInfoItem> list = GameUtils.FDEJIIDIPBI.BPBLIPKOJOP();
+		List<PerkInfoItem> list = GameUtils.PerkItemList.GetUserPerks();
 		foreach (PerkInfoItem item in list)
 		{
 			bool flag = item.Name.Equals(value.get_Name());
-			bool flag2 = item.AKKLOMFOLNO == value.DHNNCAEEMLL();
+			bool flag2 = item.UpgradeLevel == value.GetUpgradeLevel();
 			if (flag && flag2)
 			{
-				value.NOLDHAFMOLF(item);
+				value.SetPerkInfo(item);
 			}
 		}
-		if (value.DFOELJAEEGG() == null)
+		if (value.GetPerkInfo() == null)
 		{
-			List<PerkInfoItem> list2 = GameUtils.FDEJIIDIPBI.GFPFNILGJML();
+			List<PerkInfoItem> list2 = GameUtils.PerkItemList.GetProgressionPerks();
 			foreach (PerkInfoItem item2 in list2)
 			{
 				bool flag3 = item2.Name.Equals(value.get_Name());
-				bool flag4 = item2.AKKLOMFOLNO == value.DHNNCAEEMLL();
+				bool flag4 = item2.UpgradeLevel == value.GetUpgradeLevel();
 				if (flag3 && flag4)
 				{
-					value.NOLDHAFMOLF(item2);
+					value.SetPerkInfo(item2);
 				}
 			}
 		}
-		if (value.DFOELJAEEGG() == null)
+		if (value.GetPerkInfo() == null)
 		{
-			List<PerkInfoItem> list3 = GameUtils.FDEJIIDIPBI.CJJEPHDFOCJ();
+			List<PerkInfoItem> list3 = GameUtils.PerkItemList.GetBasePerks();
 			foreach (PerkInfoItem item3 in list3)
 			{
 				if (item3.Name.Equals(value.get_Name()))
 				{
-					value.NOLDHAFMOLF(item3);
+					value.SetPerkInfo(item3);
 				}
 			}
 		}
-		if (value.DFOELJAEEGG() != null)
+		if (value.GetPerkInfo() != null)
 		{
-			RosterPerk hOGDBKBFFDJ = GBMLFKHHLCC.Find((RosterPerk DHDMNHCIPEH) => DHDMNHCIPEH.Equals(value.get_Name()));
+			RosterPerk hOGDBKBFFDJ = perks.Find((RosterPerk DHDMNHCIPEH) => DHDMNHCIPEH.Equals(value.get_Name()));
 			if (hOGDBKBFFDJ != null)
 			{
-				GBMLFKHHLCC.Remove(hOGDBKBFFDJ);
+				perks.Remove(hOGDBKBFFDJ);
 			}
 			if (PGDIBFDIEIB)
 			{
-				GBMLFKHHLCC.Insert(0, value);
+				perks.Insert(0, value);
 			}
 			else
 			{
-				GBMLFKHHLCC.Add(value);
+				perks.Add(value);
 			}
-			DEHDIDFCECL(value.DFOELJAEEGG());
+			AddLearnedPerk(value.GetPerkInfo());
 		}
 	}
 
-	private void DEHDIDFCECL(PerkInfoItem value)
+	private void AddLearnedPerk(PerkInfoItem value)
 	{
-		if (HEGIABHIPHA != null)
+		if (modelParameters != null)
 		{
-			HEGIABHIPHA.LearnedPerks.Add(value);
+			modelParameters.LearnedPerks.Add(value);
 		}
 	}
 
-	private void LHCFFCKNMOO(PerkInfoItem value)
+	private void RemoveLearnedPerk(PerkInfoItem value)
 	{
-		if (HEGIABHIPHA != null && value != null)
+		if (modelParameters != null && value != null)
 		{
-			PerkInfoItem aCONCDFDNJH = HEGIABHIPHA.LearnedPerks.Find((PerkInfoItem DHDMNHCIPEH) => DHDMNHCIPEH.Name.Equals(value.Name));
+			PerkInfoItem aCONCDFDNJH = modelParameters.LearnedPerks.Find((PerkInfoItem DHDMNHCIPEH) => DHDMNHCIPEH.Name.Equals(value.Name));
 			if (aCONCDFDNJH != null)
 			{
-				HEGIABHIPHA.LearnedPerks.Remove(aCONCDFDNJH);
+				modelParameters.LearnedPerks.Remove(aCONCDFDNJH);
 			}
 		}
 	}

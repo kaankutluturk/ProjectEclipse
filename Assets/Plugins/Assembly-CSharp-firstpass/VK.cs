@@ -4,27 +4,27 @@ public class VK : ISocialNetwork
 {
 	private SocialWrapper _wrap;
 
-	public bool PHKJIMLOFBA
+	public bool IsSupported
 	{
 		get
 		{
-			return CMBNMEACMMK();
+			return GetIsSupported();
 		}
 	}
 
-	public bool OJNBOLKNEPO
+	public bool HasPayments
 	{
 		get
 		{
-			return CEELEFHIJKK();
+			return GetHasPayments();
 		}
 	}
 
-	public DFIPCKIEILP FAAHDOEMDCJ
+	public SocialNetworkType NetworkType
 	{
 		get
 		{
-			return CCOHIOKHFKI();
+			return GetNetworkType();
 		}
 	}
 
@@ -33,11 +33,11 @@ public class VK : ISocialNetwork
 		_wrap = JEMGDGKGMAJ;
 	}
 
-	public void PGAMICBKPMF(string AOKMNKOIMHI)
+	public void GetUser(string AOKMNKOIMHI)
 	{
 		if (!_wrap.get_Initialized())
 		{
-			AdvLog.LOPHFKMOPAA("you must call Social.Init(..) method first");
+			AdvLog.LogWarning("you must call Social.Init(..) method first");
 			return;
 		}
 		_wrap.RequestUsersInfo(new string[1] { AOKMNKOIMHI });
@@ -47,7 +47,7 @@ public class VK : ISocialNetwork
 	{
 		if (!_wrap.get_Initialized())
 		{
-			AdvLog.LOPHFKMOPAA("you must call Social.Init(..) method first");
+			AdvLog.LogWarning("you must call Social.Init(..) method first");
 		}
 		else
 		{
@@ -55,35 +55,35 @@ public class VK : ISocialNetwork
 		}
 	}
 
-	public void LHCBELEDOEP()
+	public void RequestFriends()
 	{
 		if (!_wrap.get_Initialized())
 		{
-			AdvLog.LOPHFKMOPAA("you must call Social.Init(..) method first");
+			AdvLog.LogWarning("you must call Social.Init(..) method first");
 		}
 		else
 		{
-			_wrap.KCBMPAILEIN();
+			_wrap.RequestFriends();
 		}
 	}
 
-	public void OPDGBGPEEEE()
+	public void InviteFriends()
 	{
 		if (!_wrap.get_Initialized())
 		{
-			AdvLog.LOPHFKMOPAA("you must call Social.Init(..) method first");
+			AdvLog.LogWarning("you must call Social.Init(..) method first");
 		}
 		else
 		{
-			_wrap.NKCLMBADENN();
+			_wrap.Invite();
 		}
 	}
 
-	public void PAFIGDDLACE()
+	public void CheckBookmark()
 	{
 		if (!_wrap.get_Initialized())
 		{
-			AdvLog.LOPHFKMOPAA("you must call Social.Init(..) method first");
+			AdvLog.LogWarning("you must call Social.Init(..) method first");
 		}
 		else
 		{
@@ -91,11 +91,11 @@ public class VK : ISocialNetwork
 		}
 	}
 
-	public void DNNNAMJBEPE()
+	public void AddBookmark()
 	{
 		if (!_wrap.get_Initialized())
 		{
-			AdvLog.LOPHFKMOPAA("you must call Social.Init(..) method first");
+			AdvLog.LogWarning("you must call Social.Init(..) method first");
 		}
 		else
 		{
@@ -103,27 +103,27 @@ public class VK : ISocialNetwork
 		}
 	}
 
-	public void CLALKCGLFFM()
+	public void CheckGroupMembership()
 	{
 		if (!_wrap.get_Initialized())
 		{
-			AdvLog.LOPHFKMOPAA("you must call Social.Init(..) method first");
+			AdvLog.LogWarning("you must call Social.Init(..) method first");
 		}
 		else
 		{
-			_wrap.CNKJLMJAFNL();
+			_wrap.RequestCheckGroupMembership();
 		}
 	}
 
-	public void DNCCPGDMLON(string AOKMNKOIMHI, string LIOGIBJBHAH, string DMNBDBJNKME)
+	public void PostToWall(string AOKMNKOIMHI, string LIOGIBJBHAH, string DMNBDBJNKME)
 	{
 		if (!_wrap.get_Initialized())
 		{
-			AdvLog.LOPHFKMOPAA("you must call Social.Init(..) method first");
+			AdvLog.LogWarning("you must call Social.Init(..) method first");
 		}
 		else
 		{
-			_wrap.MGFOEBCEKNB(AOKMNKOIMHI, LIOGIBJBHAH, DMNBDBJNKME);
+			_wrap.RequestWallPost(AOKMNKOIMHI, LIOGIBJBHAH, DMNBDBJNKME);
 		}
 	}
 
@@ -131,7 +131,7 @@ public class VK : ISocialNetwork
 	{
 		if (!_wrap.get_Initialized())
 		{
-			AdvLog.LOPHFKMOPAA("you must call Social.Init(..) method first");
+			AdvLog.LogWarning("you must call Social.Init(..) method first");
 		}
 		else
 		{
@@ -143,7 +143,7 @@ public class VK : ISocialNetwork
 	{
 		if (!_wrap.get_Initialized())
 		{
-			AdvLog.LOPHFKMOPAA("you must call Social.Init(..) method first");
+			AdvLog.LogWarning("you must call Social.Init(..) method first");
 		}
 		else
 		{
@@ -151,18 +151,18 @@ public class VK : ISocialNetwork
 		}
 	}
 
-	public bool CMBNMEACMMK()
+	public bool GetIsSupported()
 	{
 		return true;
 	}
 
-	public bool CEELEFHIJKK()
+	public bool GetHasPayments()
 	{
 		return true;
 	}
 
-	public DFIPCKIEILP CCOHIOKHFKI()
+	public SocialNetworkType GetNetworkType()
 	{
-		return DFIPCKIEILP.VKontakte;
+		return SocialNetworkType.VKontakte;
 	}
 }

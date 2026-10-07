@@ -9,8 +9,8 @@ public class RewardResistance : Rewardable
 	public RewardResistance(XmlNode node)
 	{
 		Parse(node);
-		CLOGJMBMMPI = GADCOGHCGDP.REWARD_RESISTANCE;
-		Name = node.Attributes["Name"].CIPOICEEIBK(string.Empty);
+		Kind = RewardKind.REWARD_RESISTANCE;
+		Name = node.Attributes["Name"].GetStringOrDefault(string.Empty);
 		Value = node.Attributes["Value"].ParseInt();
 	}
 }

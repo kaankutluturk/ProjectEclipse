@@ -61,17 +61,17 @@ namespace Eclipse.Modding
 
         private static ModAiActionSnapshot AiActionSnapshot(InfoAnimation action)
         {
-            string type = action.Type == InfoAnimation.MGHNBEPCKIF.AnimationAttack ? "attack" :
-                action.Type == InfoAnimation.MGHNBEPCKIF.AnimationMove ? "move" : "none";
+            string type = action.Type == InfoAnimation.AnimationKind.AnimationAttack ? "attack" :
+                action.Type == InfoAnimation.AnimationKind.AnimationMove ? "move" : "none";
             var timing = new ModAiActionTiming(action.FirstFrame, action.AnimationEndFrame,
-                action.MNHGBPOIHKG, action.NCEKKNIMHAG());
+                action.MidFrames, action.GetIsLooped());
             var inputs = new System.Collections.Generic.List<ModAiActionInput>();
-            var keys = action.ILBCHANCOBP()?.RequiredKeys;
+            var keys = action.GetFirstKeysCondition()?.RequiredKeys;
             if (keys != null)
             {
-                AppendAiInputs(inputs, keys.IGEEOAGOMEM, "tap");
-                AppendAiInputs(inputs, keys.CEPODJDDLBF, "hold");
-                AppendAiInputs(inputs, keys.HPEOJLAMIHC, "release");
+                AppendAiInputs(inputs, keys.StarterKeys, "tap");
+                AppendAiInputs(inputs, keys.AdditionalKeys, "hold");
+                AppendAiInputs(inputs, keys.ReleaseKeys, "release");
             }
             return new ModAiActionSnapshot(action.Name, type, action.Priority, timing, inputs);
         }
@@ -107,21 +107,21 @@ namespace Eclipse.Modding
 
         private static ModFighterSnapshot AiSnapshot(Model model)
         {
-            if (model == null || model.Parameters == null || model.PLBNCDCFPML() == null) return null;
-            var position = model.PLBNCDCFPML();
-            return new ModFighterSnapshot(model.KKMCHCNOHMB(), model.Parameters.MaxLife,
+            if (model == null || model.Parameters == null || model.GetPosition() == null) return null;
+            var position = model.GetPosition();
+            return new ModFighterSnapshot(model.GetLife(), model.Parameters.MaxLife,
                 model.Parameters.HealthBarCount, position.GetX(),position.GetY(),position.GetZ(),
                 CaptureAnimationSnapshot(model),Fight.GetCurrentFight()?.CaptureEclipseActorIdentity(model));
         }
 
         public static ModAnimationSnapshot CaptureAnimationSnapshot(Model model)
         {
-            var controller = model?.OCPMJKIEPIG();
-            if (controller == null || !controller.NMEEPBDJHMG()) return null;
-            var animation = controller.NNMAFFCCMHC();
-            var active = controller.PCKKMNHDDMP();
+            var controller = model?.GetAnimationModule();
+            if (controller == null || !controller.GetIsPlaying()) return null;
+            var animation = controller.GetCurrentInfo();
+            var active = controller.GetActiveIntervals();
             if (animation == null || animation.Name == null || active == null || active.Count > 256) return null;
-            int facing = controller.KFCNPADAMHA();
+            int facing = controller.GetSign();
             if (facing != -1 && facing != 1) return null;
             var intervals = new ModAnimationIntervalSnapshot[active.Count];
             for (int i = 0; i < intervals.Length; i++)
@@ -131,19 +131,19 @@ namespace Eclipse.Modding
                 string kind;
                 switch (interval.Type)
                 {
-                    case IntervalAnimation.NGAJJDIEDGF.INTERVAL_UNSTABLE: kind = "unstable"; break;
-                    case IntervalAnimation.NGAJJDIEDGF.INTERVAL_UNINTERRUPT: kind = "uninterrupt"; break;
-                    case IntervalAnimation.NGAJJDIEDGF.INTERVAL_SELF_UNINTERRUPT: kind = "self_uninterrupt"; break;
-                    case IntervalAnimation.NGAJJDIEDGF.INTERVAL_ATTACK: kind = "attack"; break;
-                    case IntervalAnimation.NGAJJDIEDGF.INTERVAL_BLOCK: kind = "block"; break;
-                    case IntervalAnimation.NGAJJDIEDGF.INTERVAL_INVULNERABLE: kind = "invulnerable"; break;
-                    case IntervalAnimation.NGAJJDIEDGF.INTERVAL_INVISIBLE: kind = "invisible"; break;
+                    case IntervalAnimation.IntervalType.INTERVAL_UNSTABLE: kind = "unstable"; break;
+                    case IntervalAnimation.IntervalType.INTERVAL_UNINTERRUPT: kind = "uninterrupt"; break;
+                    case IntervalAnimation.IntervalType.INTERVAL_SELF_UNINTERRUPT: kind = "self_uninterrupt"; break;
+                    case IntervalAnimation.IntervalType.INTERVAL_ATTACK: kind = "attack"; break;
+                    case IntervalAnimation.IntervalType.INTERVAL_BLOCK: kind = "block"; break;
+                    case IntervalAnimation.IntervalType.INTERVAL_INVULNERABLE: kind = "invulnerable"; break;
+                    case IntervalAnimation.IntervalType.INTERVAL_INVISIBLE: kind = "invisible"; break;
                     default: kind = "none"; break;
                 }
                 intervals[i] = new ModAnimationIntervalSnapshot(interval.Name ?? string.Empty, kind);
             }
-            string type = animation.Type == InfoAnimation.MGHNBEPCKIF.AnimationAttack ? "attack" :
-                animation.Type == InfoAnimation.MGHNBEPCKIF.AnimationMove ? "move" : "none";
+            string type = animation.Type == InfoAnimation.AnimationKind.AnimationAttack ? "attack" :
+                animation.Type == InfoAnimation.AnimationKind.AnimationMove ? "move" : "none";
             return new ModAnimationSnapshot(animation.Name, type, facing, intervals);
         }
 

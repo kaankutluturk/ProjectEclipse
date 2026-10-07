@@ -8,9 +8,9 @@ namespace Nekki.SF2.GUI.Scenes
 {
 	public class LoaderScene : Scene<LoaderScene>
 	{
-		private static ScreenType JOLOLCEHFBO = ScreenType.ModuleNone;
+		private static ScreenType previousScene = ScreenType.ModuleNone;
 
-		private static ScreenType LMGJJNACLFG = ScreenType.ModuleNone;
+		private static ScreenType nextScene = ScreenType.ModuleNone;
 
 		[SerializeField]
 		private GameObject _LoaderType1;
@@ -18,13 +18,13 @@ namespace Nekki.SF2.GUI.Scenes
 		[SerializeField]
 		private GameObject _LoaderType2;
 
-		private Image OJCNKNALKEO;
+		private Image loadingImage;
 
-		private Text KNIMLOGHNFN;
+		private Text loadingText;
 
-		private bool PJCDILABGPP;
+		private bool isPictureChanged;
 
-		public static ScreenType GGJHDCMLGOL
+		public static ScreenType PreviousScene
 		{
 			get
 			{
@@ -36,7 +36,7 @@ namespace Nekki.SF2.GUI.Scenes
 			}
 		}
 
-		public static ScreenType HENJLOPMEHC
+		public static ScreenType NextSceneId
 		{
 			set
 			{
@@ -44,7 +44,7 @@ namespace Nekki.SF2.GUI.Scenes
 			}
 		}
 
-		public override ScreenType PNAJHDBDDLP
+		public override ScreenType SceneType
 		{
 			get
 			{
@@ -54,17 +54,17 @@ namespace Nekki.SF2.GUI.Scenes
 
 		public static ScreenType get_PrevScene()
 		{
-			return JOLOLCEHFBO;
+			return previousScene;
 		}
 
 		public static void set_PrevScene(ScreenType value)
 		{
-			JOLOLCEHFBO = value;
+			previousScene = value;
 		}
 
 		public static void set_NextScene(ScreenType value)
 		{
-			LMGJJNACLFG = value;
+			nextScene = value;
 		}
 
 		public override ScreenType get_SceneId()
@@ -75,14 +75,14 @@ namespace Nekki.SF2.GUI.Scenes
 		protected override void Init(object data)
 		{
 			base.Init(data);
-			if (LMGJJNACLFG != ScreenType.ModulePreloader)
+			if (nextScene != ScreenType.ModulePreloader)
 			{
 			}
 			AtlasCache.Clear();
 			// The Single-mode LoadSceneAsync below already unloads unused assets.
 			// An extra sweep here scans the same objects twice, followed by a forced
 			// full collection, producing long stalls even when nothing is reclaimed.
-			if (LMGJJNACLFG == ScreenType.ModuleFight && Eclipse.Multiplayer.LocalVersusMenu.VersusSplashVisible)
+			if (nextScene == ScreenType.ModuleFight && Eclipse.Multiplayer.LocalVersusMenu.VersusSplashVisible)
 			{
 				// Multiplayer's persistent VS introduction owns this transition.
 				_LoaderType1.SetActive(false);
@@ -97,14 +97,14 @@ namespace Nekki.SF2.GUI.Scenes
 			{
 				_LoaderType1.SetActive(false);
 				_LoaderType2.SetActive(true);
-				Eclipse.UI.LoaderArt.ApplyMenuSplash(_LoaderType2, get_PrevScene(), LMGJJNACLFG);
+				Eclipse.UI.LoaderArt.ApplyMenuSplash(_LoaderType2, get_PrevScene(), nextScene);
 			}
-			StartCoroutine(OBHAPHKNGFE());
+			StartCoroutine(LoadNextSceneAsync());
 		}
 
-		private IEnumerator OBHAPHKNGFE()
+		private IEnumerator LoadNextSceneAsync()
 		{
-			yield return SceneManager.LoadSceneAsync((int)LMGJJNACLFG);
+			yield return SceneManager.LoadSceneAsync((int)nextScene);
 		}
 
 		public override void UpdateScene(object data)
@@ -113,18 +113,18 @@ namespace Nekki.SF2.GUI.Scenes
 
 		public void UpdateLocalization()
 		{
-			IJEODNCIJLK();
-			ONJLCKGEHMD();
+			UpdateLoadingText();
+			UpdateLoadingPicture();
 		}
 
 		public void ChangePicture()
 		{
-			PJCDILABGPP = true;
+			isPictureChanged = true;
 		}
 
 		public void ScalePicture()
 		{
-			float nHIDNIPGCPC = SystemProperties.NHIDNIPGCPC;
+			float nHIDNIPGCPC = SystemProperties.ScaleY;
 		}
 
 		public void AddLogo()
@@ -137,9 +137,9 @@ namespace Nekki.SF2.GUI.Scenes
 
 		public void AddLoadingPic()
 		{
-			if (OJCNKNALKEO == null)
+			if (loadingImage == null)
 			{
-				float nHIDNIPGCPC = SystemProperties.NHIDNIPGCPC;
+				float nHIDNIPGCPC = SystemProperties.ScaleY;
 			}
 		}
 
@@ -147,7 +147,7 @@ namespace Nekki.SF2.GUI.Scenes
 		{
 		}
 
-		private void ONJLCKGEHMD()
+		private void UpdateLoadingPicture()
 		{
 		}
 
@@ -155,7 +155,7 @@ namespace Nekki.SF2.GUI.Scenes
 		{
 		}
 
-		private void IJEODNCIJLK()
+		private void UpdateLoadingText()
 		{
 		}
 	}

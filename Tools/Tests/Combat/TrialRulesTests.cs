@@ -151,17 +151,17 @@ internal static class TrialRulesTests
     {
         var projection = new TrialRuleProjection(catalog);
         HotGroundRule hot = new HotGroundRule(projection.Build(Rule(catalog, "hot")), RuleAppliance.AppliancePlayer);
-        Check(hot.NNOHILNKJEN() == 7 && hot.CheckAnimation("Jump"), "Recovered HotGroundRule did not consume frames/animations.");
-        hot.Reset(); Check(hot.NNOHILNKJEN() == 7, "Recovered HotGroundRule reset lost its timer.");
+        Check(hot.GetRemainingSeconds() == 7 && hot.CheckAnimation("Jump"), "Recovered HotGroundRule did not consume frames/animations.");
+        hot.Reset(); Check(hot.GetRemainingSeconds() == 7, "Recovered HotGroundRule reset lost its timer.");
 
         RingOutRule ring = new RingOutRule(projection.Build(Rule(catalog, "ring")), RuleAppliance.AppliancePlayer);
-        Check(ring.EJHLFJBJHAN() == -600f && ring.JFBOKNFDFDO() == 600f && ring.Copy() is RingOutRule,
+        Check(ring.GetMinX() == -600f && ring.GetMaxX() == 600f && ring.Copy() is RingOutRule,
             "Recovered RingOutRule did not consume/copy bounds.");
         RegenerationRule regen = new RegenerationRule(projection.Build(Rule(catalog, "regen")), RuleAppliance.ApplianceOpponent);
-        Check(Math.Abs(regen.BIGCPKBIJNA() - 0.001f) < 0.000001f && regen.Copy() is RegenerationRule,
+        Check(Math.Abs(regen.GetRate() - 0.001f) < 0.000001f && regen.Copy() is RegenerationRule,
             "Recovered RegenerationRule did not consume/copy rate.");
         NoAnimationRule noAnimation = new NoAnimationRule(projection.Build(Rule(catalog, "no_jump")));
-        Check(noAnimation.DPKNMJMPEDM() == "Jump", "Recovered NoAnimationRule did not consume name.");
+        Check(noAnimation.GetAnimationName() == "Jump", "Recovered NoAnimationRule did not consume name.");
         RemoveIntervalRule remove = new RemoveIntervalRule(projection.Build(Rule(catalog, "no_block")), RuleAppliance.AppliancePlayer);
         Check(remove.Copy() is RemoveIntervalRule, "Recovered RemoveIntervalRule copy failed.");
         var light = new Eclipse.Combat.LightInTheDarknessRule(projection.Build(Rule(catalog, "light")), RuleAppliance.AppliancePlayer);

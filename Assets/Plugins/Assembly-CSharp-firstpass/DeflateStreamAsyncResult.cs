@@ -5,29 +5,29 @@ internal class DeflateStreamAsyncResult : IAsyncResult
 {
 	public byte[] buffer;
 
-	public int IPCOBJBKNAO;
+	public int offset;
 
 	public int count;
 
-	public bool NHHJKCGAGPP;
+	public bool isWrite;
 
-	private object IJMABMIINAB;
+	private object m_AsyncObject;
 
-	private object EHNEPDNDBED;
+	private object m_AsyncState;
 
 	private AsyncCallback m_AsyncCallback;
 
-	private object MGGFAMGCHCL;
+	private object m_AsyncResult;
 
-	internal bool CHGOEKFDFME;
+	internal bool m_CompletedSynchronously;
 
-	private int ABBAMCKIJGB;
+	private int m_InvokedCallback;
 
-	private int OBPDLMDNOEM;
+	private int m_Completed;
 
-	private object KAMHMIPFCNB;
+	private object m_Event;
 
-	public object ABIIHLJKHEI
+	public object AsyncStateObject
 	{
 		get
 		{
@@ -35,7 +35,7 @@ internal class DeflateStreamAsyncResult : IAsyncResult
 		}
 	}
 
-	public WaitHandle MAHFIFOFJJI
+	public WaitHandle CompletionWaitHandle
 	{
 		get
 		{
@@ -43,7 +43,7 @@ internal class DeflateStreamAsyncResult : IAsyncResult
 		}
 	}
 
-	public bool LIHCAGEHNMF
+	public bool IsCompletedSynchronously
 	{
 		get
 		{
@@ -51,7 +51,7 @@ internal class DeflateStreamAsyncResult : IAsyncResult
 		}
 	}
 
-	public bool FDDOKOEBOAG
+	public bool HasCompleted
 	{
 		get
 		{
@@ -59,22 +59,22 @@ internal class DeflateStreamAsyncResult : IAsyncResult
 		}
 	}
 
-	internal object CFFJPCJGMDA
+	internal object Result
 	{
 		get
 		{
-			return JLDIDDAAFIL();
+			return GetResult();
 		}
 	}
 
 	public DeflateStreamAsyncResult(object FKBFNLAMILO, object LEGPNOBHGIE, AsyncCallback FCLGHDMMEBC, byte[] buffer, int IPCOBJBKNAO, int count)
 	{
 		this.buffer = buffer;
-		this.IPCOBJBKNAO = IPCOBJBKNAO;
+		this.offset = IPCOBJBKNAO;
 		this.count = count;
-		CHGOEKFDFME = true;
-		IJMABMIINAB = FKBFNLAMILO;
-		EHNEPDNDBED = LEGPNOBHGIE;
+		m_CompletedSynchronously = true;
+		m_AsyncObject = FKBFNLAMILO;
+		m_AsyncState = LEGPNOBHGIE;
 		m_AsyncCallback = FCLGHDMMEBC;
 	}
 
@@ -82,7 +82,7 @@ internal class DeflateStreamAsyncResult : IAsyncResult
 	{
 		get
 		{
-			return EHNEPDNDBED;
+			return m_AsyncState;
 		}
 	}
 
@@ -90,13 +90,13 @@ internal class DeflateStreamAsyncResult : IAsyncResult
 	{
 		get
 		{
-		int oBPDLMDNOEM = OBPDLMDNOEM;
-		if (KAMHMIPFCNB == null)
+		int oBPDLMDNOEM = m_Completed;
+		if (m_Event == null)
 		{
-			Interlocked.CompareExchange(ref KAMHMIPFCNB, new ManualResetEvent(oBPDLMDNOEM != 0), null);
+			Interlocked.CompareExchange(ref m_Event, new ManualResetEvent(oBPDLMDNOEM != 0), null);
 		}
-		ManualResetEvent manualResetEvent = (ManualResetEvent)KAMHMIPFCNB;
-		if (oBPDLMDNOEM == 0 && OBPDLMDNOEM != 0)
+		ManualResetEvent manualResetEvent = (ManualResetEvent)m_Event;
+		if (oBPDLMDNOEM == 0 && m_Completed != 0)
 		{
 			manualResetEvent.Set();
 		}
@@ -108,7 +108,7 @@ internal class DeflateStreamAsyncResult : IAsyncResult
 	{
 		get
 		{
-			return CHGOEKFDFME;
+			return m_CompletedSynchronously;
 		}
 	}
 
@@ -116,48 +116,48 @@ internal class DeflateStreamAsyncResult : IAsyncResult
 	{
 		get
 		{
-			return OBPDLMDNOEM != 0;
+			return m_Completed != 0;
 		}
 	}
 
-	internal object JLDIDDAAFIL()
+	internal object GetResult()
 	{
-		return MGGFAMGCHCL;
+		return m_AsyncResult;
 	}
 
 	internal void Close()
 	{
-		if (KAMHMIPFCNB != null)
+		if (m_Event != null)
 		{
-			((ManualResetEvent)KAMHMIPFCNB).Close();
+			((ManualResetEvent)m_Event).Close();
 		}
 	}
 
-	internal void FHIHMGIFNAF(bool ALLIOBCJDGG, object DCJLKCFKCOM)
+	internal void InvokeCallback(bool ALLIOBCJDGG, object DCJLKCFKCOM)
 	{
 		Complete(ALLIOBCJDGG, DCJLKCFKCOM);
 	}
 
-	internal void FHIHMGIFNAF(object DCJLKCFKCOM)
+	internal void InvokeCallback(object DCJLKCFKCOM)
 	{
 		Complete(DCJLKCFKCOM);
 	}
 
 	private void Complete(bool ALLIOBCJDGG, object DCJLKCFKCOM)
 	{
-		CHGOEKFDFME = ALLIOBCJDGG;
+		m_CompletedSynchronously = ALLIOBCJDGG;
 		Complete(DCJLKCFKCOM);
 	}
 
 	private void Complete(object DCJLKCFKCOM)
 	{
-		MGGFAMGCHCL = DCJLKCFKCOM;
-		Interlocked.Increment(ref OBPDLMDNOEM);
-		if (KAMHMIPFCNB != null)
+		m_AsyncResult = DCJLKCFKCOM;
+		Interlocked.Increment(ref m_Completed);
+		if (m_Event != null)
 		{
-			((ManualResetEvent)KAMHMIPFCNB).Set();
+			((ManualResetEvent)m_Event).Set();
 		}
-		if (Interlocked.Increment(ref ABBAMCKIJGB) == 1 && m_AsyncCallback != null)
+		if (Interlocked.Increment(ref m_InvokedCallback) == 1 && m_AsyncCallback != null)
 		{
 			m_AsyncCallback(this);
 		}

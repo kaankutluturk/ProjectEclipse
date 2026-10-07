@@ -6,19 +6,19 @@ using System.Reflection;
 
 public sealed class ReadablePropertiesTypeInspector : TypeInspectorSkeleton
 {
-	private sealed class DADEDECJHLJ : IPropertyDescriptor
+	private sealed class ReflectionPropertyDescriptor : IPropertyDescriptor
 	{
 		private readonly PropertyInfo _propertyInfo;
 
-		private readonly ITypeResolver IIIIGEFELNH;
+		private readonly ITypeResolver typeResolver;
 
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		private Type CHCJICCKKDF;
+		private Type typeOverride;
 
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		private int PAOBFNKOJED;
+		private int order;
 
-		public string MENAJEAJJBE
+		public string PropertyName
 		{
 			get
 			{
@@ -26,11 +26,11 @@ public sealed class ReadablePropertiesTypeInspector : TypeInspectorSkeleton
 			}
 		}
 
-		public Type JDCDCGFHLPC
+		public Type OverrideType
 		{
 			get
 			{
-				return MAGHEGMMNOF();
+				return GetTypeOverride();
 			}
 			set
 			{
@@ -38,11 +38,11 @@ public sealed class ReadablePropertiesTypeInspector : TypeInspectorSkeleton
 			}
 		}
 
-		public int PECDGDLCAAA
+		public int SortOrder
 		{
 			get
 			{
-				return BHDEMLGCNOJ();
+				return GetOrder();
 			}
 			set
 			{
@@ -50,18 +50,18 @@ public sealed class ReadablePropertiesTypeInspector : TypeInspectorSkeleton
 			}
 		}
 
-		public bool KBHICFPAIFJ
+		public bool CanWrite
 		{
 			get
 			{
-				return HHHGHBBDMHC();
+				return GetCanWrite();
 			}
 		}
 
-		public DADEDECJHLJ(PropertyInfo OOEBLPMKOIH, ITypeResolver CBMKGNIHPFO)
+		public ReflectionPropertyDescriptor(PropertyInfo OOEBLPMKOIH, ITypeResolver CBMKGNIHPFO)
 		{
 			_propertyInfo = OOEBLPMKOIH;
-			IIIIGEFELNH = CBMKGNIHPFO;
+			typeResolver = CBMKGNIHPFO;
 		}
 
 		public string get_Name()
@@ -74,27 +74,27 @@ public sealed class ReadablePropertiesTypeInspector : TypeInspectorSkeleton
 			return _propertyInfo.PropertyType;
 		}
 
-		public Type MAGHEGMMNOF()
+		public Type GetTypeOverride()
 		{
-			return CHCJICCKKDF;
+			return typeOverride;
 		}
 
 		public void set_TypeOverride(Type value)
 		{
-			CHCJICCKKDF = value;
+			typeOverride = value;
 		}
 
-		public int BHDEMLGCNOJ()
+		public int GetOrder()
 		{
-			return PAOBFNKOJED;
+			return order;
 		}
 
 		public void set_Order(int value)
 		{
-			PAOBFNKOJED = value;
+			order = value;
 		}
 
-		public bool HHHGHBBDMHC()
+		public bool GetCanWrite()
 		{
 			return _propertyInfo.CanWrite;
 		}
@@ -104,7 +104,7 @@ public sealed class ReadablePropertiesTypeInspector : TypeInspectorSkeleton
 			_propertyInfo.SetValue(target, value, null);
 		}
 
-		public T PJLLHGDNCIF<T>() where T : Attribute
+		public T GetCustomAttribute<T>() where T : Attribute
 		{
 			object[] customAttributes = _propertyInfo.GetCustomAttributes(typeof(T), true);
 			return (T)customAttributes.FirstOrDefault();
@@ -113,12 +113,12 @@ public sealed class ReadablePropertiesTypeInspector : TypeInspectorSkeleton
 		public IObjectDescriptor Read(object target)
 		{
 			object value = _propertyInfo.GetValue(target, null);
-			Type lFLGCDNKNJI = MAGHEGMMNOF() ?? IIIIGEFELNH.Resolve(get_Type(), value);
+			Type lFLGCDNKNJI = GetTypeOverride() ?? typeResolver.Resolve(get_Type(), value);
 			return new ObjectDescriptor(value, lFLGCDNKNJI, get_Type());
 		}
 	}
 
-	private readonly ITypeResolver IIIIGEFELNH;
+	private readonly ITypeResolver typeResolver;
 
 	public ReadablePropertiesTypeInspector(ITypeResolver CBMKGNIHPFO)
 	{
@@ -126,16 +126,16 @@ public sealed class ReadablePropertiesTypeInspector : TypeInspectorSkeleton
 		{
 			throw new ArgumentNullException("typeResolver");
 		}
-		IIIIGEFELNH = CBMKGNIHPFO;
+		typeResolver = CBMKGNIHPFO;
 	}
 
-	private static bool DKAIPPGKJKP(PropertyInfo JLCGLCLEGBD)
+	private static bool IsValidProperty(PropertyInfo JLCGLCLEGBD)
 	{
 		return JLCGLCLEGBD.CanRead && JLCGLCLEGBD.GetGetMethod().GetParameters().Length == 0;
 	}
 
-	public override IEnumerable<IPropertyDescriptor> GHIBHNJKIHN(Type LFLGCDNKNJI, object EGJHGBCEPHO)
+	public override IEnumerable<IPropertyDescriptor> GetProperties(Type LFLGCDNKNJI, object EGJHGBCEPHO)
 	{
-		return LFLGCDNKNJI.GetPublicProperties().Where(DKAIPPGKJKP).Select((Func<PropertyInfo, IPropertyDescriptor>)((PropertyInfo PIIEECCHMAC) => new DADEDECJHLJ(PIIEECCHMAC, IIIIGEFELNH)));
+		return LFLGCDNKNJI.GetPublicProperties().Where(IsValidProperty).Select((Func<PropertyInfo, IPropertyDescriptor>)((PropertyInfo PIIEECCHMAC) => new ReflectionPropertyDescriptor(PIIEECCHMAC, typeResolver)));
 	}
 }

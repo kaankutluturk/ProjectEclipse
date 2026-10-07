@@ -12,14 +12,14 @@ public class QuestActionShowRaidToggleBtn : QuestAction
 		_visible = node.Attributes["Value"].ParseInt(1) != 0;
 	}
 
-	public override void DEJMHFMLKIC(QuestParameters GFIHPBCEEOB)
+	public override void Execute(QuestParameters GFIHPBCEEOB)
 	{
-		base.DEJMHFMLKIC(GFIHPBCEEOB);
+		base.Execute(GFIHPBCEEOB);
 		MapScene current = Scene<MapScene>.get_Current();
 		if (current != null)
 		{
 			current.SetRaidToggleVisible(_visible);
 		}
-		OGIJONMKABB();
+		FinishAction();
 	}
 }

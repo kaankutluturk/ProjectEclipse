@@ -4,7 +4,7 @@ public class ConditionOfCompletionInspector
 {
 	private List<ConditionOfCompletion> _conditions = new List<ConditionOfCompletion>();
 
-	public bool OPKPFKJPHNN(FightIDS DIAIIPCBMFL)
+	public bool AreAllComplete(FightIDS DIAIIPCBMFL)
 	{
 		for (int i = 0; i < _conditions.Count; i++)
 		{
@@ -16,12 +16,12 @@ public class ConditionOfCompletionInspector
 		return true;
 	}
 
-	public void CHDLHMGPDHL(ConditionOfCompletion IOFGGOCEIAM)
+	public void AddCondition(ConditionOfCompletion IOFGGOCEIAM)
 	{
 		_conditions.Add(IOFGGOCEIAM);
 	}
 
-	public void EGGLLLLFMCO(List<ConditionOfCompletion> conditions)
+	public void AddConditions(List<ConditionOfCompletion> conditions)
 	{
 		_conditions.AddRange(conditions);
 	}

@@ -96,7 +96,7 @@ namespace Eclipse.UI
         private void Update()
         {
             if (panel == null) return;
-            bool open = menu != null && menu.Scroll != null && menu.Scroll.CurScrollState == MenuScroll.ANJKEGGALAG.ScrollOpen &&
+            bool open = menu != null && menu.Scroll != null && menu.Scroll.CurScrollState == MenuScroll.ScrollState.ScrollOpen &&
                 !TitleScreen.IsOpen && !GameSessionRestart.IsRestarting && !ReturnToTitleTransition.Running;
             float dt = Time.unscaledDeltaTime;
             shown = Mathf.MoveTowards(shown, open ? 1f : 0f, dt / FadeSeconds);

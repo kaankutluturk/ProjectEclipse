@@ -3,7 +3,7 @@ using UnityEngine;
 
 public sealed class CacheMaintenanceSample : MonoBehaviour
 {
-	private enum KNMPMKLLPMH
+	private enum TimeSpans
 	{
 		Days = 0,
 		Hours = 1,
@@ -11,50 +11,50 @@ public sealed class CacheMaintenanceSample : MonoBehaviour
 		Secs = 3
 	}
 
-	private KNMPMKLLPMH PFPLMJNDEKI = KNMPMKLLPMH.Secs;
+	private TimeSpans timespan = TimeSpans.Secs;
 
 	private int value = 10;
 
-	private int EBFOBGKCGJP = 5242880;
+	private int maxCacheSize = 5242880;
 
 	private void OnGUI()
 	{
-		GUIHelper.ECMOBPFHNPN(GUIHelper.ClientArea, true, () =>
+		GUIHelper.DrawArea(GUIHelper.ClientArea, true, () =>
 		{
 			GUILayout.BeginHorizontal();
 			GUILayout.Label("Delete cached entities older then");
 			GUILayout.Label(value.ToString(), GUILayout.MinWidth(50f));
 			value = (int)GUILayout.HorizontalSlider(value, 1f, 60f, GUILayout.MinWidth(100f));
 			GUILayout.Space(10f);
-			PFPLMJNDEKI = (KNMPMKLLPMH)GUILayout.SelectionGrid((int)PFPLMJNDEKI, new string[4] { "Days", "Hours", "Mins", "Secs" }, 4);
+			timespan = (TimeSpans)GUILayout.SelectionGrid((int)timespan, new string[4] { "Days", "Hours", "Mins", "Secs" }, 4);
 			GUILayout.FlexibleSpace();
 			GUILayout.EndHorizontal();
 			GUILayout.Space(10f);
 			GUILayout.BeginHorizontal();
 			GUILayout.Label("Max Cache Size (bytes): ", GUILayout.Width(150f));
-			GUILayout.Label(EBFOBGKCGJP.ToString("N0"), GUILayout.Width(70f));
-			EBFOBGKCGJP = (int)GUILayout.HorizontalSlider(EBFOBGKCGJP, 1024f, 10485760f);
+			GUILayout.Label(maxCacheSize.ToString("N0"), GUILayout.Width(70f));
+			maxCacheSize = (int)GUILayout.HorizontalSlider(maxCacheSize, 1024f, 10485760f);
 			GUILayout.EndHorizontal();
 			GUILayout.Space(10f);
 			if (GUILayout.Button("Maintenance"))
 			{
 				TimeSpan hJELDPKENPC = TimeSpan.FromDays(14.0);
-				switch (PFPLMJNDEKI)
+				switch (timespan)
 				{
-				case KNMPMKLLPMH.Days:
+				case TimeSpans.Days:
 					hJELDPKENPC = TimeSpan.FromDays(value);
 					break;
-				case KNMPMKLLPMH.Hours:
+				case TimeSpans.Hours:
 					hJELDPKENPC = TimeSpan.FromHours(value);
 					break;
-				case KNMPMKLLPMH.Mins:
+				case TimeSpans.Mins:
 					hJELDPKENPC = TimeSpan.FromMinutes(value);
 					break;
-				case KNMPMKLLPMH.Secs:
+				case TimeSpans.Secs:
 					hJELDPKENPC = TimeSpan.FromSeconds(value);
 					break;
 				}
-				HTTPCacheService.JJFFGOABNOA(new HTTPCacheMaintananceParams(hJELDPKENPC, (ulong)EBFOBGKCGJP));
+				HTTPCacheService.BeginMaintainence(new HTTPCacheMaintananceParams(hJELDPKENPC, (ulong)maxCacheSize));
 			}
 		});
 	}

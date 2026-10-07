@@ -1,12 +1,12 @@
 public sealed class WebSocketPong : WebSocketBinaryFrame
 {
 	public WebSocketPong(WebSocketFrameReader CEHDEHABCNL)
-		: base(CEHDEHABCNL.CHIGLEKCFFN())
+		: base(CEHDEHABCNL.GetData())
 	{
 	}
 
-	public override BECKAHJIEGE get_Type()
+	public override WebSocketFrameTypes get_Type()
 	{
-		return BECKAHJIEGE.Pong;
+		return WebSocketFrameTypes.Pong;
 	}
 }

@@ -1,26 +1,26 @@
 public class ComboStatisticPrize
 {
-	public long POPNFGNAOJD;
+	public long TotalGold;
 
-	public long AMFFCKOAAED;
+	public long TotalExperience;
 
-	public long MKNGIDKGOLE;
+	public long PerfectGold;
 
-	public long LOONMILKCFK;
+	public long FirstStrikeGold;
 
-	public long GKAEJDCDMHC;
+	public long ComboGold;
 
-	public long MLNBGDHDKLL;
+	public long CriticalGold;
 
-	public long APCAKCCOMLO;
+	public long ShockGold;
 
-	public long AIJNPAIMPHG;
+	public long StyleGold;
 
-	public long PJBCIEMHPNN;
+	public long BaseBonusValue;
 
-	public long PDJPOBHLIHA;
+	public long BaseGold;
 
-	public long JNCDLOAEMCG;
+	public long Experience;
 
-	public long JACAJHEOPOE;
+	public long ExtraGold;
 }

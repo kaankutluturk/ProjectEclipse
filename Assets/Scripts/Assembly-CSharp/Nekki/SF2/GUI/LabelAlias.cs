@@ -7,7 +7,7 @@ namespace Nekki.SF2.GUI
 	[AddComponentMenu("UI_Nekki/LabelAlias")]
 	public class LabelAlias : TextPic
 	{
-		public enum LGEOOHJJOPP
+		public enum LabelFontType
 		{
 			Content = 0,
 			Title = 1,
@@ -17,10 +17,10 @@ namespace Nekki.SF2.GUI
 		[Tooltip("If true target will use font from localization settings")]
 		public bool UseLocalizationFont = true;
 
-		private static readonly Regex BPNAJICGHEH = new Regex("<quad name=(.+?) size=(\\d*\\.?\\d+%?) width=(\\d*\\.?\\d+%?) />", RegexOptions.Singleline);
+		private static readonly Regex QuadTagRegex = new Regex("<quad name=(.+?) size=(\\d*\\.?\\d+%?) width=(\\d*\\.?\\d+%?) />", RegexOptions.Singleline);
 
 		[Tooltip("Type of font. Choose font from languages.yaml")]
-		public LGEOOHJJOPP FontType;
+		public LabelFontType FontType;
 
 		[Tooltip("Flag for turn on/off using custom font size.")]
 		public bool UseLabelFontSize = true;
@@ -44,7 +44,7 @@ namespace Nekki.SF2.GUI
 		[SerializeField]
 		private bool _ToUpperCase;
 
-		public int LFBOJOLEJED
+		public int BaseFontSize
 		{
 			get
 			{
@@ -56,7 +56,7 @@ namespace Nekki.SF2.GUI
 			}
 		}
 
-		public float KHKIIEDIEBL
+		public float BaseLineSpacing
 		{
 			get
 			{
@@ -68,7 +68,7 @@ namespace Nekki.SF2.GUI
 			}
 		}
 
-		public string HBCNKNFPAIM
+		public string AliasKey
 		{
 			get
 			{
@@ -80,7 +80,7 @@ namespace Nekki.SF2.GUI
 			}
 		}
 
-		public bool GKEJOPJGFLM
+		public bool UppercaseText
 		{
 			get
 			{
@@ -92,7 +92,7 @@ namespace Nekki.SF2.GUI
 			}
 		}
 
-		public string HCPNFPMHFCM
+		public string DisplayText
 		{
 			get
 			{
@@ -104,19 +104,19 @@ namespace Nekki.SF2.GUI
 			}
 		}
 
-		private string DEEKEDAKOBM
+		private string LocalizedText
 		{
 			get
 			{
-				return KHDALILJDCM();
+				return GetLocalizedAlias();
 			}
 		}
 
-		private Font NOIMBKHLOLN
+		private Font LocalizedFont
 		{
 			get
 			{
-				return PIBHLLOJEKK();
+				return GetLocalizationFont();
 			}
 		}
 
@@ -170,7 +170,7 @@ namespace Nekki.SF2.GUI
 		public void set_text(string value)
 		{
 			string text = value ?? string.Empty;
-			foreach (Match item in BPNAJICGHEH.Matches(text))
+			foreach (Match item in QuadTagRegex.Matches(text))
 			{
 				string valueText = item.Groups[1].Value;
 				Sprite sprite = ResolutionImage.GetSprite(string.Empty, valueText);
@@ -181,31 +181,31 @@ namespace Nekki.SF2.GUI
 			base.text = text;
 			if (UseLocalizationFont)
 			{
-				base.font = PIBHLLOJEKK();
+				base.font = GetLocalizationFont();
 			}
 		}
 
-		private string KHDALILJDCM()
+		private string GetLocalizedAlias()
 		{
 			return LocalizationManager.GetString(_Alias);
 		}
 
-		private Font PIBHLLOJEKK()
+		private Font GetLocalizationFont()
 		{
 			switch (FontType)
 			{
-			case LGEOOHJJOPP.Content:
-				return LocalizationManager.MBPJIKFOEBJ();
-			case LGEOOHJJOPP.Title:
-				return LocalizationManager.GNIENOIHLNO();
-			case LGEOOHJJOPP.Button:
-				return LocalizationManager.DIJFGLJHDBI();
+			case LabelFontType.Content:
+				return LocalizationManager.GetContentFont();
+			case LabelFontType.Title:
+				return LocalizationManager.GetTitleFont();
+			case LabelFontType.Button:
+				return LocalizationManager.GetButtonFont();
 			default:
-				return LocalizationManager.MBPJIKFOEBJ();
+				return LocalizationManager.GetContentFont();
 			}
 		}
 
-		private List<string> BCFAGNEMKPJ()
+		private List<string> ExtractCaretSegments()
 		{
 			List<string> list = new List<string>();
 			string text = null;
@@ -245,7 +245,7 @@ namespace Nekki.SF2.GUI
 			// bypasses set_text. Apply their configured font independently of text.
 			if (UseLocalizationFont)
 			{
-				Font localizedFont = PIBHLLOJEKK();
+				Font localizedFont = GetLocalizationFont();
 				if (localizedFont != null)
 				{
 					base.font = localizedFont;
@@ -254,22 +254,22 @@ namespace Nekki.SF2.GUI
 			UpdateLabelFontSize();
 			UpdateLabelLineSpacing();
 			UpdateVerticalOverflow();
-			LocalizationManager.LKFNMDCLMCD(OCLBJLPOKLB);
-			if (LocalizationManager.KGEOCPBDJIF() && _Alias != null && _Alias.Length != 0)
+			LocalizationManager.AddLanguageChangedHandler(RefreshLocalizedText);
+			if (LocalizationManager.GetHasCurrentLanguage() && _Alias != null && _Alias.Length != 0)
 			{
-				OCLBJLPOKLB();
+				RefreshLocalizedText();
 			}
 		}
 
 		protected override void OnDestroy()
 		{
 			base.OnDestroy();
-			LocalizationManager.FFIJPHDLPCF(OCLBJLPOKLB);
+			LocalizationManager.RemoveLanguageChangedHandler(RefreshLocalizedText);
 		}
 
-		private void OCLBJLPOKLB()
+		private void RefreshLocalizedText()
 		{
-			string text = KHDALILJDCM().TrimStart(' ');
+			string text = GetLocalizedAlias().TrimStart(' ');
 			if (_ToUpperCase)
 			{
 				text = text.ToUpper();
@@ -284,7 +284,7 @@ namespace Nekki.SF2.GUI
 			}
 			if (UseLocalizationFont)
 			{
-				base.font = PIBHLLOJEKK();
+				base.font = GetLocalizationFont();
 			}
 			UpdateLabelFontSize();
 			UpdateLabelLineSpacing();
@@ -296,7 +296,7 @@ namespace Nekki.SF2.GUI
 			_Alias = HCPNFPMHFCM ?? string.Empty;
 			// Explicit clears must discard text left by a previous tooltip or item.
 			if (_Alias.Length == 0) set_text(string.Empty);
-			OCLBJLPOKLB();
+			RefreshLocalizedText();
 		}
 
 		public int CalculateLengthOfMessage()
@@ -317,7 +317,7 @@ namespace Nekki.SF2.GUI
 		{
 			if (UseLabelFontSize)
 			{
-				int num = (int)((float)_labelFontSize * LocalizationManager.GCBEBEGKAOE());
+				int num = (int)((float)_labelFontSize * LocalizationManager.GetFontSizeScale());
 				if (base.fontSize != num)
 				{
 					base.fontSize = num;
@@ -329,7 +329,7 @@ namespace Nekki.SF2.GUI
 		public void UpdateLabelLineSpacing()
 		{
 			float num = 0f;
-			num = ((!UseLabelLineSpacing) ? LocalizationManager.DLGKFIICJMG() : (_labelLineSpacing * LocalizationManager.OKIIEMCLAHH()));
+			num = ((!UseLabelLineSpacing) ? LocalizationManager.GetLineSpacing() : (_labelLineSpacing * LocalizationManager.GetCustomLineSpacingScale()));
 			if (base.lineSpacing != num)
 			{
 				base.lineSpacing = num;
@@ -338,7 +338,7 @@ namespace Nekki.SF2.GUI
 
 		public void UpdateVerticalOverflow()
 		{
-			if (LocalizationManager.ILAJKOBCHFH != null && LocalizationManager.ILAJKOBCHFH.MINNJBMGKLL)
+			if (LocalizationManager.CurrentLanguage != null && LocalizationManager.CurrentLanguage.IsAsian)
 			{
 				base.verticalOverflow = VerticalWrapMode.Overflow;
 			}

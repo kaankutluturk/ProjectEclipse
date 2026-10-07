@@ -16,19 +16,19 @@ namespace Nekki.SF2.GUI.Map
 		public void Init(Battle DPOOIONCEOA, FightList KOMGFJOCEDN)
 		{
 			string empty = string.Empty;
-			empty = ((DPOOIONCEOA.get_Type() == BattleType.FightBosses || DPOOIONCEOA.get_Type() == BattleType.FightBossesReplayable || DPOOIONCEOA.get_Type() == BattleType.FightFinalTitan) ? (LocalizationManager.GetString(DPOOIONCEOA.IGPOHDHPIIL()) + " " + LocalizationManager.GetString("challengeBoss")) : LocalizationManager.GetString(DPOOIONCEOA.GJOAJAIJHOE()));
+			empty = ((DPOOIONCEOA.get_Type() == BattleType.FightBosses || DPOOIONCEOA.get_Type() == BattleType.FightBossesReplayable || DPOOIONCEOA.get_Type() == BattleType.FightFinalTitan) ? (LocalizationManager.GetString(DPOOIONCEOA.GetTitle()) + " " + LocalizationManager.GetString("challengeBoss")) : LocalizationManager.GetString(DPOOIONCEOA.GetDescription()));
             if (DPOOIONCEOA.get_Type() == BattleType.FightRaid)
             {
-                empty = LocalizationManager.GetString(DPOOIONCEOA.IGPOHDHPIIL()) + " " +
+                empty = LocalizationManager.GetString(DPOOIONCEOA.GetTitle()) + " " +
                     LocalizationManager.GetString("challengeBoss") + ".";
             }
 			_lblDescription.set_text(empty);
-			MKHMHMAOKOA(DPOOIONCEOA);
-			bool mMDLKOPCFLK = (DPOOIONCEOA.get_Type() != BattleType.FightBosses && DPOOIONCEOA.get_Type() != BattleType.FightBossesReplayable && DPOOIONCEOA.get_Type() != BattleType.FightFinalTitan) || !KJHIOOFNKEG(KOMGFJOCEDN);
+			UpdateReplaysLabel(DPOOIONCEOA);
+			bool mMDLKOPCFLK = (DPOOIONCEOA.get_Type() != BattleType.FightBosses && DPOOIONCEOA.get_Type() != BattleType.FightBossesReplayable && DPOOIONCEOA.get_Type() != BattleType.FightFinalTitan) || !HasRewardItem(KOMGFJOCEDN);
 			_prizePanel.Init(-1, mMDLKOPCFLK, KOMGFJOCEDN);
 		}
 
-		private void MKHMHMAOKOA(Battle DPOOIONCEOA)
+		private void UpdateReplaysLabel(Battle DPOOIONCEOA)
 		{
 			if (DPOOIONCEOA.get_Type() == BattleType.FightFinalReplayable)
 			{
@@ -42,21 +42,21 @@ namespace Nekki.SF2.GUI.Map
 			}
 		}
 
-		private bool KJHIOOFNKEG(FightList KOMGFJOCEDN)
+		private bool HasRewardItem(FightList KOMGFJOCEDN)
 		{
 			if (KOMGFJOCEDN == null)
 			{
 				return false;
 			}
-			RewardStruct fDFKLPHBAHJ = KOMGFJOCEDN.APKPCGDBMEP()[KOMGFJOCEDN.APKPCGDBMEP().Count - 1];
-			int gNLOCMLBNHF = ListSF.CCDKHLAMKKO().PINDEKDNCNL();
-			RewardPrize cMHHEHILIIH = fDFKLPHBAHJ.KOBOIFJNPMO(gNLOCMLBNHF);
-			if (cMHHEHILIIH.HELFDCAIJNE.Count == 0)
+			RewardStruct fDFKLPHBAHJ = KOMGFJOCEDN.GetRewards()[KOMGFJOCEDN.GetRewards().Count - 1];
+			int gNLOCMLBNHF = ListSF.GetRoster().GetLevel();
+			RewardPrize cMHHEHILIIH = fDFKLPHBAHJ.GetPrizeForLevel(gNLOCMLBNHF);
+			if (cMHHEHILIIH.items.Count == 0)
 			{
 				return false;
 			}
-			RewardItem cACJANFAJEC = cMHHEHILIIH.HELFDCAIJNE[0];
-			if (!cACJANFAJEC.GOOBKHECJIF)
+			RewardItem cACJANFAJEC = cMHHEHILIIH.items[0];
+			if (!cACJANFAJEC.ShowReward)
 			{
 				return false;
 			}

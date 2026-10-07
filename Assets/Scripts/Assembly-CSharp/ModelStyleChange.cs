@@ -8,7 +8,7 @@ public class ModelStyleChange
 
 	public float StyleGain;
 
-	public ScreenModel.JEDPGMIGGKK KJDFJPBIGJC;
+	public ScreenModel.ScreenSide Side;
 
 	public bool IsHit;
 }

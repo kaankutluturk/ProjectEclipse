@@ -2,7 +2,7 @@ public class ConditionFight
 {
 	public ConditionType Type;
 
-	public ConditionSubType DCJPHFALIND;
+	public ConditionSubType SubType;
 
 	public int Count;
 
@@ -10,20 +10,20 @@ public class ConditionFight
 
 	private FightIDS _fightIDS;
 
-	public FightIDS CPIFJJBGHBH
+	public FightIDS FightIds
 	{
 		get
 		{
-			return CCILLAHEENI();
+			return GetFightIds();
 		}
 	}
 
-	public FightIDS CCILLAHEENI()
+	public FightIDS GetFightIds()
 	{
 		return _fightIDS;
 	}
 
-	public void IGBNKIKIDII(string DIAIIPCBMFL)
+	public void SetFightIds(string DIAIIPCBMFL)
 	{
 		_fightIDS.SetFightIDSByString(DIAIIPCBMFL);
 	}

@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class ConditionDistance : ConditionAnimation
 {
-	private enum HENHJEAEGLG
+	private enum DistanceAxis
 	{
 		LENGTH_X = 0,
 		LENGTH_Y = 1,
@@ -12,60 +12,60 @@ public class ConditionDistance : ConditionAnimation
 
 	public const float nonlimit = 1000000f;
 
-	private float LHNCHOAEGEA;
+	private float _min;
 
-	private float KAEPJHHLLPK;
+	private float _max;
 
-	private HENHJEAEGLG MKNFOOEOMAO;
+	private DistanceAxis _axis;
 
-	private DistancePoint PNFEMBMAEGA = new DistancePoint();
+	private DistancePoint _from = new DistancePoint();
 
-	private DistancePoint LEAEOECEOPG = new DistancePoint();
+	private DistancePoint _to = new DistancePoint();
 
 	public ConditionDistance(XmlNode node)
 		: base(ConditionType.DISTANCE)
 	{
 		XmlAttribute xmlAttribute = node.Attributes["Axis"];
-		MKNFOOEOMAO = ((xmlAttribute == null) ? HENHJEAEGLG.LENGTH_FULL : ((!(xmlAttribute.Value == "X")) ? HENHJEAEGLG.LENGTH_Y : HENHJEAEGLG.LENGTH_X));
-		LHNCHOAEGEA = node.Attributes["Min"].ParseFloat(-1000000f);
-		KAEPJHHLLPK = node.Attributes["Max"].ParseFloat(1000000f);
-		PNFEMBMAEGA.Create(node["From"]);
-		LEAEOECEOPG.Create(node["To"]);
+		_axis = ((xmlAttribute == null) ? DistanceAxis.LENGTH_FULL : ((!(xmlAttribute.Value == "X")) ? DistanceAxis.LENGTH_Y : DistanceAxis.LENGTH_X));
+		_min = node.Attributes["Min"].ParseFloat(-1000000f);
+		_max = node.Attributes["Max"].ParseFloat(1000000f);
+		_from.Create(node["From"]);
+		_to.Create(node["To"]);
 	}
 
 	public override bool IsEqual(ModelConditions conditions)
 	{
 		float num = 0f;
-		switch (MKNFOOEOMAO)
+		switch (_axis)
 		{
-		case HENHJEAEGLG.LENGTH_X:
-			num = LEAEOECEOPG.ILIKNABGPNK(conditions) - PNFEMBMAEGA.ILIKNABGPNK(conditions);
-			num *= (float)conditions.PCAOCHAIBJC;
+		case DistanceAxis.LENGTH_X:
+			num = _to.GetX(conditions) - _from.GetX(conditions);
+			num *= (float)conditions.AnimationSign;
 			break;
-		case HENHJEAEGLG.LENGTH_Y:
-			num = LEAEOECEOPG.MJPKHPNIJGK(conditions) - PNFEMBMAEGA.MJPKHPNIJGK(conditions);
+		case DistanceAxis.LENGTH_Y:
+			num = _to.GetY(conditions) - _from.GetY(conditions);
 			break;
-		case HENHJEAEGLG.LENGTH_FULL:
+		case DistanceAxis.LENGTH_FULL:
 		{
-			Vector3f eMAFACPEPDK = Vector3f.op_Implicit(LEAEOECEOPG.EMGKDOAMBOH(conditions));
-			Vector3f eMAFACPEPDK2 = Vector3f.op_Implicit(PNFEMBMAEGA.EMGKDOAMBOH(conditions));
+			Vector3f eMAFACPEPDK = Vector3f.op_Implicit(_to.GetPosition(conditions));
+			Vector3f eMAFACPEPDK2 = Vector3f.op_Implicit(_from.GetPosition(conditions));
 			num = Mathf.Sqrt((eMAFACPEPDK.GetX() - eMAFACPEPDK2.GetX()) * (eMAFACPEPDK.GetX() - eMAFACPEPDK2.GetX()) + (eMAFACPEPDK.GetY() - eMAFACPEPDK2.GetY()) * (eMAFACPEPDK.GetY() - eMAFACPEPDK2.GetY()));
 			break;
 		}
 		}
-		bool flag = LHNCHOAEGEA <= num && num <= KAEPJHHLLPK;
+		bool flag = _min <= num && num <= _max;
 		return (!IsNot) ? flag : (!flag);
 	}
 
-	public void KJHPCLOFDJB(ModelObject OECPEDPMKCD, bool EKBOGDKIHIH, ModelNode AECCPADGGPG, bool PHADJMAONJG, ModelObject MJCGOJBGFIE = null)
+	public void UpdateNodes(ModelObject OECPEDPMKCD, bool EKBOGDKIHIH, ModelNode AECCPADGGPG, bool PHADJMAONJG, ModelObject MJCGOJBGFIE = null)
 	{
-		PNFEMBMAEGA.UpdateNode(OECPEDPMKCD, EKBOGDKIHIH, AECCPADGGPG, PHADJMAONJG, MJCGOJBGFIE);
-		LEAEOECEOPG.UpdateNode(OECPEDPMKCD, EKBOGDKIHIH, AECCPADGGPG, PHADJMAONJG, MJCGOJBGFIE);
+		_from.UpdateNode(OECPEDPMKCD, EKBOGDKIHIH, AECCPADGGPG, PHADJMAONJG, MJCGOJBGFIE);
+		_to.UpdateNode(OECPEDPMKCD, EKBOGDKIHIH, AECCPADGGPG, PHADJMAONJG, MJCGOJBGFIE);
 	}
 
-	public void ABNCNNHMLII()
+	public void ResetNodes()
 	{
-		PNFEMBMAEGA.GPGKANDFLNB();
-		LEAEOECEOPG.GPGKANDFLNB();
+		_from.ClearChildPoints();
+		_to.ClearChildPoints();
 	}
 }

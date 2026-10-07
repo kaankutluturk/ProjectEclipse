@@ -5,14 +5,14 @@ namespace Nekki.SF2.GUI.Profile
 {
 	public class PerkCell : ProfileCell
 	{
-		public enum EEFNKDAOIPC
+		public enum PerkCellEvent
 		{
 			OnSubItemClick = 0
 		}
 
-		private const int AMOABLNHGGK = 1;
+		private const int CELL_KIND_ID = 1;
 
-		private const int PPALNLKHEPL = 95;
+		private const int ICON_SPACING = 95;
 
 		[SerializeField]
 		private PerkSubItem _iconLeft;
@@ -23,12 +23,12 @@ namespace Nekki.SF2.GUI.Profile
 		[SerializeField]
 		private PerkTreeLines _perkLines;
 
-		private bool KJLENNAOHCE;
+		private bool hasTwoPerks;
 
-		private void BHNDDBGCBNP(PerkSubItem MDPMIEBJMMD)
+		private void BindSubItem(PerkSubItem MDPMIEBJMMD)
 		{
 			MDPMIEBJMMD.ParentCell = this;
-			MDPMIEBJMMD.transform.BGNJGIACJBG(0f);
+			MDPMIEBJMMD.transform.SetLocalY(0f);
 			MDPMIEBJMMD.SetSelectFlashing(true);
 			MDPMIEBJMMD.SetSelectFlashingMinOpacity(1f / 3f);
 			MDPMIEBJMMD.RemoveAllEventListener();
@@ -40,10 +40,10 @@ namespace Nekki.SF2.GUI.Profile
 		public void Init(ProfilePerkContainer IFIEEAGMMMF, int BIPGPCAHKIG, bool NMBEADHHHFH, bool IBMGAPMHMOB)
 		{
 			Clear();
-			BHNDDBGCBNP(_iconLeft);
-			BHNDDBGCBNP(_iconRight);
-			MCLBLABBIJA(IFIEEAGMMMF.JOGBKOJCINM, BIPGPCAHKIG);
-			_perkLines.Init(KJLENNAOHCE, NMBEADHHHFH, IBMGAPMHMOB);
+			BindSubItem(_iconLeft);
+			BindSubItem(_iconRight);
+			SetPerks(IFIEEAGMMMF.Perks, BIPGPCAHKIG);
+			_perkLines.Init(hasTwoPerks, NMBEADHHHFH, IBMGAPMHMOB);
 		}
 
 		public override SubItem GetFirstIcon()
@@ -54,7 +54,7 @@ namespace Nekki.SF2.GUI.Profile
 		public override void UpdateState()
 		{
 			_iconLeft.UpdateState();
-			if (KJLENNAOHCE)
+			if (hasTwoPerks)
 			{
 				_iconRight.UpdateState();
 			}
@@ -62,7 +62,7 @@ namespace Nekki.SF2.GUI.Profile
 
 		public override void Clear()
 		{
-			KJLENNAOHCE = false;
+			hasTwoPerks = false;
 			Scene<ProfileScene>.get_Current().SubItems.Remove(_iconLeft);
 			Scene<ProfileScene>.get_Current().SubItems.Remove(_iconRight);
 			_iconLeft.Clear();
@@ -70,19 +70,19 @@ namespace Nekki.SF2.GUI.Profile
 			_iconRight.gameObject.SetActive(false);
 		}
 
-		private void OELPCLPNGGF()
+		private void LayoutIcons()
 		{
-			if (!KJLENNAOHCE)
+			if (!hasTwoPerks)
 			{
-				_iconLeft.transform.OKHPLHPBPKJ(0f);
+				_iconLeft.transform.SetLocalX(0f);
 				return;
 			}
 			float num = _iconLeft.GetComponent<RectTransform>().rect.width / 2f + 95f;
-			_iconLeft.transform.OKHPLHPBPKJ(0f - num);
-			_iconRight.transform.OKHPLHPBPKJ(num);
+			_iconLeft.transform.SetLocalX(0f - num);
+			_iconRight.transform.SetLocalX(num);
 		}
 
-		private void MCLBLABBIJA(List<ProfilePerk> JOGBKOJCINM, int IBAKGENOEPH)
+		private void SetPerks(List<ProfilePerk> JOGBKOJCINM, int IBAKGENOEPH)
 		{
 			if (JOGBKOJCINM == null || JOGBKOJCINM.Count == 0)
 			{
@@ -91,19 +91,19 @@ namespace Nekki.SF2.GUI.Profile
 				return;
 			}
 			_iconLeft.gameObject.SetActive(true);
-			KJLENNAOHCE = JOGBKOJCINM.Count > 1;
+			hasTwoPerks = JOGBKOJCINM.Count > 1;
 			int num = 10000 + IBAKGENOEPH * 10;
-			LJAJFDHGPJM(_iconLeft, JOGBKOJCINM[0], num);
-			if (KJLENNAOHCE)
+			InitSubItem(_iconLeft, JOGBKOJCINM[0], num);
+			if (hasTwoPerks)
 			{
 				_iconRight.gameObject.SetActive(true);
 				int iPFAAJAOIJL = num + 1;
-				LJAJFDHGPJM(_iconRight, JOGBKOJCINM[1], iPFAAJAOIJL);
+				InitSubItem(_iconRight, JOGBKOJCINM[1], iPFAAJAOIJL);
 			}
-			OELPCLPNGGF();
+			LayoutIcons();
 		}
 
-		private void LJAJFDHGPJM(PerkSubItem MDPMIEBJMMD, ProfilePerk CENAOGICAAK, int IPFAAJAOIJL)
+		private void InitSubItem(PerkSubItem MDPMIEBJMMD, ProfilePerk CENAOGICAAK, int IPFAAJAOIJL)
 		{
 			MDPMIEBJMMD.Init(CENAOGICAAK, IPFAAJAOIJL);
 			Scene<ProfileScene>.get_Current().SubItems.Add(MDPMIEBJMMD);
@@ -111,7 +111,7 @@ namespace Nekki.SF2.GUI.Profile
 
 		public void ChoosePerkByName(string NJDDPMPFCGB)
 		{
-			if (_iconLeft.get_Perk().KAMBOKLFBEE() == NJDDPMPFCGB)
+			if (_iconLeft.get_Perk().GetPerkName() == NJDDPMPFCGB)
 			{
 				_iconLeft.Choose();
 			}

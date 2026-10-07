@@ -1,9 +1,9 @@
 public class QuestActionUpgradesCleanup : QuestAction
 {
-	public override void DEJMHFMLKIC(QuestParameters GFIHPBCEEOB)
+	public override void Execute(QuestParameters GFIHPBCEEOB)
 	{
-		base.DEJMHFMLKIC(GFIHPBCEEOB);
-		ListSF.CCDKHLAMKKO().KHCNHPCPFII().PHMMJIENGEP();
-		OGIJONMKABB();
+		base.Execute(GFIHPBCEEOB);
+		ListSF.GetRoster().GetInventory().CorrectUpgradeLevels();
+		FinishAction();
 	}
 }

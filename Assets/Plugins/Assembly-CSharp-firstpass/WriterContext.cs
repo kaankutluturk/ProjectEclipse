@@ -2,11 +2,11 @@ internal class WriterContext
 {
 	public int Count;
 
-	public bool HOILJAFJHLM;
+	public bool InArray;
 
-	public bool MHABHHKLDFO;
+	public bool InObject;
 
-	public bool DPMHKEGECAM;
+	public bool ExpectingValue;
 
-	public int GAMMEFMGEFP;
+	public int Padding;
 }

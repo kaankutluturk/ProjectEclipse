@@ -6,50 +6,50 @@ using System.Runtime.CompilerServices;
 public class UserInfo
 {
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private string MACAPENACJP;
+	private string firstName;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private string CMIPHMMCMDH;
+	private string lastName;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private string EOICEMDPEEO;
+	private string photoUrl;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private string GGBOJPFJBJH;
+	private string userId;
 
-	public string BMFLPBLAFLK
+	public string FirstName
 	{
 		get
 		{
-			return FJANLLCDPCP();
+			return GetFirstName();
 		}
 		private set
 		{
-			DJJONJEKILE(value);
+			SetFirstName(value);
 		}
 	}
 
-	public string FMOKLKFCCKF
+	public string LastName
 	{
 		get
 		{
-			return GKKFLFIACMN();
+			return GetLastName();
 		}
 		private set
 		{
-			HEMAEFLGOOH(value);
+			SetLastName(value);
 		}
 	}
 
-	public string CPJJFKNOCJE
+	public string PhotoUrl
 	{
 		get
 		{
-			return CIHLLDHJLON();
+			return GetPhotoUrl();
 		}
 		private set
 		{
-			NFDAFCJJDCO(value);
+			SetPhotoUrl(value);
 		}
 	}
 
@@ -57,82 +57,82 @@ public class UserInfo
 	{
 		get
 		{
-			return NDLJPNCIJIP();
+			return GetUserId();
 		}
 		private set
 		{
-			MNNHKMOFMMK(value);
+			SetUserId(value);
 		}
 	}
 
 	internal UserInfo(string BBNKIBKPBLO)
 	{
 		string[] array = BBNKIBKPBLO.Split('|');
-		MNNHKMOFMMK(array[0]);
-		NFDAFCJJDCO(array[1]);
+		SetUserId(array[0]);
+		SetPhotoUrl(array[1]);
 		if (array[2].Contains(" "))
 		{
 			string[] array2 = array[2].Split(' ');
-			DJJONJEKILE(array2[0]);
-			HEMAEFLGOOH(array2[1]);
+			SetFirstName(array2[0]);
+			SetLastName(array2[1]);
 		}
 		else
 		{
-			DJJONJEKILE(array[2]);
-			HEMAEFLGOOH(string.Empty);
+			SetFirstName(array[2]);
+			SetLastName(string.Empty);
 		}
 	}
 
 	internal UserInfo(string MEEFALMGOMC, string NEEAGKJGKDM, string HGLELKMAJMJ, string PDJEDKAFEAK)
 	{
-		DJJONJEKILE(PDJEDKAFEAK);
-		HEMAEFLGOOH(HGLELKMAJMJ);
-		NFDAFCJJDCO(NEEAGKJGKDM);
-		MNNHKMOFMMK(MEEFALMGOMC);
+		SetFirstName(PDJEDKAFEAK);
+		SetLastName(HGLELKMAJMJ);
+		SetPhotoUrl(NEEAGKJGKDM);
+		SetUserId(MEEFALMGOMC);
 	}
 
 	private UserInfo()
 	{
 	}
 
-	public string FJANLLCDPCP()
+	public string GetFirstName()
 	{
-		return MACAPENACJP;
+		return firstName;
 	}
 
-	private void DJJONJEKILE(string value)
+	private void SetFirstName(string value)
 	{
-		MACAPENACJP = value;
+		firstName = value;
 	}
 
-	public string GKKFLFIACMN()
+	public string GetLastName()
 	{
-		return CMIPHMMCMDH;
+		return lastName;
 	}
 
-	private void HEMAEFLGOOH(string value)
+	private void SetLastName(string value)
 	{
-		CMIPHMMCMDH = value;
+		lastName = value;
 	}
 
-	public string CIHLLDHJLON()
+	public string GetPhotoUrl()
 	{
-		return EOICEMDPEEO;
+		return photoUrl;
 	}
 
-	private void NFDAFCJJDCO(string value)
+	private void SetPhotoUrl(string value)
 	{
-		EOICEMDPEEO = value;
+		photoUrl = value;
 	}
 
-	public string NDLJPNCIJIP()
+	public string GetUserId()
 	{
-		return GGBOJPFJBJH;
+		return userId;
 	}
 
-	private void MNNHKMOFMMK(string value)
+	private void SetUserId(string value)
 	{
-		GGBOJPFJBJH = value;
+		userId = value;
 	}
 
 	internal static Dictionary<string, UserInfo> GetInfos(string BBNKIBKPBLO)
@@ -142,13 +142,13 @@ public class UserInfo
 		for (int i = 0; i < array.Length; i++)
 		{
 			UserInfo jPKEEFNNAAP = new UserInfo(array[i]);
-			if (!dictionary.ContainsKey(jPKEEFNNAAP.NDLJPNCIJIP()))
+			if (!dictionary.ContainsKey(jPKEEFNNAAP.GetUserId()))
 			{
-				dictionary.Add(jPKEEFNNAAP.NDLJPNCIJIP(), jPKEEFNNAAP);
+				dictionary.Add(jPKEEFNNAAP.GetUserId(), jPKEEFNNAAP);
 			}
 			else
 			{
-				dictionary[jPKEEFNNAAP.NDLJPNCIJIP()] = jPKEEFNNAAP;
+				dictionary[jPKEEFNNAAP.GetUserId()] = jPKEEFNNAAP;
 			}
 		}
 		return dictionary;

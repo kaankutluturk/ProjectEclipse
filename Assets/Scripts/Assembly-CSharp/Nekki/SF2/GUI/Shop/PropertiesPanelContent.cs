@@ -11,7 +11,7 @@ namespace Nekki.SF2.GUI.Shop
 		[SerializeField]
 		private PropertiesPerksPanel _propertiesPanel;
 
-		public PropertiesPerksPanel FJHPAJLEHLI
+		public PropertiesPerksPanel PropertiesPanelComponent
 		{
 			get
 			{
@@ -32,7 +32,7 @@ namespace Nekki.SF2.GUI.Shop
 		{
 			if (_propertiesPanel != null && PJDAGCBPLJE != null)
 			{
-				List<PerkInfoItem> list = ListSF.EIMKEJNJMEJ(PJDAGCBPLJE);
+				List<PerkInfoItem> list = ListSF.GetItemEnchantments(PJDAGCBPLJE);
 				if (list.Count > 0)
 				{
 					_propertiesPanel.gameObject.SetActive(true);

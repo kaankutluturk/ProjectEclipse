@@ -22,9 +22,9 @@ namespace UnityEngine {
     public static class Debug { public static void LogException(Exception e) {} }
 }
 namespace Eclipse.UI { public static class TitleScreen { public static void PrepareForRestart() => Calls.Log.Add("title"); } }
-public class Roster { public bool Fail; public void GGGEHAGCLGC() { Calls.Log.Add("save"); if (Fail) throw new Exception("save failed"); } }
-public static class ListSF { public static Roster Current; public static Roster CCDKHLAMKKO() => Current; }
-public static class Sound { public static void StopMusic() => Calls.Log.Add("music-stop"); public static void GKMINHHAMAK() => Calls.Log.Add("effects-stop"); }
+public class Roster { public bool Fail; public void RequestSave() { Calls.Log.Add("save"); if (Fail) throw new Exception("save failed"); } }
+public static class ListSF { public static Roster Current; public static Roster GetRoster() => Current; }
+public static class Sound { public static void StopMusic() => Calls.Log.Add("music-stop"); public static void StopAllSounds() => Calls.Log.Add("effects-stop"); }
 public enum ScreenType { ModulePreloader }
 public static class SceneManagerSF { public static void Load(ScreenType t) => Calls.Log.Add("load"); }
 public static class Program {
@@ -60,17 +60,17 @@ public class GlobalTimer {
 }
 public class ResetProbe {
     static ResetProbe _instance;
-    static object ANEHEDFAPCH;
+    static object _roster;
     static Items _items;
     static int callbacks;
-    void ILFBDHDMHPD(object data) { if (ANEHEDFAPCH == null) throw new Exception("Stale timer callback after roster reset"); callbacks++; }
+    void OnTimerTick(object data) { if (_roster == null) throw new Exception("Stale timer callback after roster reset"); callbacks++; }
     RESET_METHOD
     public static void Test() {
         int unrelated = 0;
         GlobalTimer.get_Instance().Tick += _ => unrelated++;
         for (int i=0; i<3; i++) {
-            _instance = new ResetProbe(); ANEHEDFAPCH = new object();
-            GlobalTimer.get_Instance().Tick += _instance.ILFBDHDMHPD;
+            _instance = new ResetProbe(); _roster = new object();
+            GlobalTimer.get_Instance().Tick += _instance.OnTimerTick;
             GlobalTimer.get_Instance().Fire();
             Reset(); Reset(); GlobalTimer.get_Instance().Fire();
         }

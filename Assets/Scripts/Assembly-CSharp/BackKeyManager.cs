@@ -7,9 +7,9 @@ public class BackKeyManager : SFMonoBehaviour<object>
 {
 	private static BackKeyManager _instance;
 
-	private List<BackKeyController> BOFDPBGOPEI = new List<BackKeyController>();
+	private List<BackKeyController> controllers = new List<BackKeyController>();
 
-	public static BackKeyManager BPCBBHAKFDM
+	public static BackKeyManager SharedInstance
 	{
 		get
 		{
@@ -36,17 +36,17 @@ public class BackKeyManager : SFMonoBehaviour<object>
 
 	public void AddBackKeyController(BackKeyController OJINMMFLEEB)
 	{
-		BOFDPBGOPEI.AddIfNotExist(OJINMMFLEEB);
+		controllers.AddIfNotExist(OJINMMFLEEB);
 	}
 
 	public void RemoveBackKeyController(BackKeyController OJINMMFLEEB)
 	{
-		BOFDPBGOPEI.Remove(OJINMMFLEEB);
+		controllers.Remove(OJINMMFLEEB);
 	}
 
 	public void Clear()
 	{
-		BOFDPBGOPEI.Clear();
+		controllers.Clear();
 	}
 
 	private void Update()
@@ -55,18 +55,18 @@ public class BackKeyManager : SFMonoBehaviour<object>
 		{
 			OnBackKeyClicked();
 		}
-		Eclipse.Input.FightPauseKey.Tick(BOFDPBGOPEI.Count);
+		Eclipse.Input.FightPauseKey.Tick(controllers.Count);
 	}
 
 	public void OnBackKeyClicked()
 	{
 		if (Eclipse.UI.Modding.ModUiGameBridge.TryHandleBack()) return;
-		if (BOFDPBGOPEI.Count > 0)
+		if (controllers.Count > 0)
 		{
-			BOFDPBGOPEI[BOFDPBGOPEI.Count - 1].OnBackKeyClicked(0);
+			controllers[controllers.Count - 1].OnBackKeyClicked(0);
 			return;
 		}
-		switch (SceneManagerSF.EKFBDMBCDMB())
+		switch (SceneManagerSF.GetCurrentScreen())
 		{
 		case ScreenType.ModuleFight:
 		{
@@ -78,12 +78,12 @@ public class BackKeyManager : SFMonoBehaviour<object>
 			break;
 		}
 		case ScreenType.ModuleDojo:
-			DialogsOpener.PMMOGEADGNL();
+			DialogsOpener.OpenExitDialog();
 			break;
 		case ScreenType.ModuleShop:
 		case ScreenType.ModuleMap:
 		case ScreenType.ModuleProfile:
-			Module.DLOKJOHNDID(ScreenType.ModuleDojo);
+			Module.OpenScreen(ScreenType.ModuleDojo);
 			break;
 		}
 	}

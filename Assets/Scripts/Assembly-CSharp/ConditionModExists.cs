@@ -5,21 +5,21 @@ public class ConditionModExists : ConditionAnimation
 {
 	private string _Name;
 
-	private string LJMGGAJCOBF;
+	private string _perk;
 
-	public string MBDDKGIOOGD
+	public string PerkId
 	{
 		get
 		{
-			return DFOELJAEEGG();
+			return GetPerk();
 		}
 	}
 
 	public ConditionModExists(XmlNode node)
 		: base(ConditionType.MOD_EXISTS)
 	{
-		_Name = node.Attributes["Name"].CIPOICEEIBK(string.Empty);
-		LJMGGAJCOBF = node.Attributes["Perk"].CIPOICEEIBK(string.Empty);
+		_Name = node.Attributes["Name"].GetStringOrDefault(string.Empty);
+		_perk = node.Attributes["Perk"].GetStringOrDefault(string.Empty);
 	}
 
 	public string get_Name()
@@ -27,25 +27,25 @@ public class ConditionModExists : ConditionAnimation
 		return _Name;
 	}
 
-	public string DFOELJAEEGG()
+	public string GetPerk()
 	{
-		return LJMGGAJCOBF;
+		return _perk;
 	}
 
 	public override bool IsEqual(ModelConditions conditions)
 	{
 		List<PerksStage.ActionPerk> list = null;
-		switch (OOFFOILONLO)
+		switch (_targetModelType)
 		{
-		case ModelType.KEIDBIOIFGA.MODEL_THIS:
-			list = conditions.LPGJIICFIKF;
+		case ModelType.ModelTargetType.MODEL_THIS:
+			list = conditions.SelfActionPerks;
 			break;
-		case ModelType.KEIDBIOIFGA.MODEL_OTHER:
-			list = conditions.CBMFGJHKKMJ;
+		case ModelType.ModelTargetType.MODEL_OTHER:
+			list = conditions.OtherActionPerks;
 			break;
-		case ModelType.KEIDBIOIFGA.MODEL_BOTH:
-			list = new List<PerksStage.ActionPerk>(conditions.LPGJIICFIKF);
-			list.AddRange(conditions.CBMFGJHKKMJ);
+		case ModelType.ModelTargetType.MODEL_BOTH:
+			list = new List<PerksStage.ActionPerk>(conditions.SelfActionPerks);
+			list.AddRange(conditions.OtherActionPerks);
 			break;
 		}
 		bool flag = false;
@@ -53,7 +53,7 @@ public class ConditionModExists : ConditionAnimation
 		for (int i = 0; i < list.Count; i++)
 		{
 			oAJGINIDKJD = list[i];
-			if ((string.IsNullOrEmpty(LJMGGAJCOBF) || LJMGGAJCOBF.Equals(oAJGINIDKJD.LGMFEIFGGDG())) && _Name.Equals(oAJGINIDKJD.DDBPICENEJE()))
+			if ((string.IsNullOrEmpty(_perk) || _perk.Equals(oAJGINIDKJD.GetPerkName())) && _Name.Equals(oAJGINIDKJD.GetModName()))
 			{
 				flag = true;
 				break;

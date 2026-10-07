@@ -8,7 +8,7 @@ namespace Eclipse.UI.Settings
 	public sealed class DesktopRenderSettingsControls
 	{
 		public delegate void ConfigureButton(ResolutionButton button, string normalSprite, string selectedSprite,
-			float x, float y, SettingsDialog.AHDEAELNGBD buttonId);
+			float x, float y, SettingsDialog.SettingsButtonId buttonId);
 
 		private static readonly int[] FrameRateOptions = { 0, 60, 120, 144, 165, 240, 360 };
 
@@ -76,13 +76,13 @@ namespace Eclipse.UI.Settings
 			}
 
 			_configureButton(_interpolationButton, "SettingsButtons.graphics", "SettingsButtons.graphics_selected",
-				-620f, 325f, SettingsDialog.AHDEAELNGBD.BTN_RENDER_INTERPOLATION);
+				-620f, 325f, SettingsDialog.SettingsButtonId.BTN_RENDER_INTERPOLATION);
 			_configureButton(_frameRateButton, "SettingsButtons.graphics", "SettingsButtons.graphics_selected",
-				-620f, 185f, SettingsDialog.AHDEAELNGBD.BTN_MAX_FRAME_RATE);
+				-620f, 185f, SettingsDialog.SettingsButtonId.BTN_MAX_FRAME_RATE);
 			_configureButton(_motionBlurButton, "SettingsButtons.graphics", "SettingsButtons.graphics_selected",
-				-620f, 45f, SettingsDialog.AHDEAELNGBD.BTN_MOTION_BLUR);
+				-620f, 45f, SettingsDialog.SettingsButtonId.BTN_MOTION_BLUR);
 			_configureButton(_controllerButton, "SettingsButtons.controller", "SettingsButtons.controller_selected",
-				-620f, -95f, SettingsDialog.AHDEAELNGBD.BTN_CONTROLLER);
+				-620f, -95f, SettingsDialog.SettingsButtonId.BTN_CONTROLLER);
 
 			_configureMusicButton();
 			_configureSoundButton();
@@ -91,19 +91,19 @@ namespace Eclipse.UI.Settings
 			UpdateLabels();
 		}
 
-		public bool HandleClick(SettingsDialog.AHDEAELNGBD buttonId)
+		public bool HandleClick(SettingsDialog.SettingsButtonId buttonId)
 		{
 			switch (buttonId)
 			{
-			case SettingsDialog.AHDEAELNGBD.BTN_RENDER_INTERPOLATION:
+			case SettingsDialog.SettingsButtonId.BTN_RENDER_INTERPOLATION:
 				SF2DisplayFrameRate.ToggleInterpolation();
 				UpdateLabels();
 				return true;
-			case SettingsDialog.AHDEAELNGBD.BTN_MAX_FRAME_RATE:
+			case SettingsDialog.SettingsButtonId.BTN_MAX_FRAME_RATE:
 				CycleMaxFrameRate();
 				UpdateLabels();
 				return true;
-			case SettingsDialog.AHDEAELNGBD.BTN_MOTION_BLUR:
+			case SettingsDialog.SettingsButtonId.BTN_MOTION_BLUR:
 				SF2DisplayFrameRate.ToggleMotionBlur();
 				UpdateLabels();
 				return true;
@@ -134,7 +134,7 @@ namespace Eclipse.UI.Settings
 			label.set_Alias(string.Empty);
 			label.alignment = TextAnchor.MiddleLeft;
 			label.set_LabelFontSize(101);
-			label.color = Constants.PJJIMHMJPAL;
+			label.color = Constants.DialogTextColor;
 			label.set_text(text);
 		}
 

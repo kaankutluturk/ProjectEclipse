@@ -1,12 +1,12 @@
 public class IntervalSet
 {
-	public float GKIHFPFHKCI;
+	public float Duration;
 
 	public float value;
 
-	public float JENJFNNFGLD;
+	public float Acceleration;
 
-	public float AAOIAEJJINO;
+	public float SlopeOrShift;
 
-	public float ILHDJDNPFKH;
+	public float BaseValue;
 }

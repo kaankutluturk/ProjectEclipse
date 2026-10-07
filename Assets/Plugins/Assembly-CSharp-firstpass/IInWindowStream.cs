@@ -6,11 +6,11 @@ internal interface IInWindowStream
 
 	void Init();
 
-	void IAIFCIAAHOE();
+	void ReleaseStream();
 
 	byte GetIndexByte(int index);
 
 	uint GetMatchLen(int index, uint OIOMNNFMDOO, uint LOHCIKNKDEI);
 
-	uint HBJMPBCHFJB();
+	uint GetNumAvailableBytes();
 }

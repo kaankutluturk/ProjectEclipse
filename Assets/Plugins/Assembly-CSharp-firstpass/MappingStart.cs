@@ -5,88 +5,88 @@ public class MappingStart : NodeEvent
 {
 	private readonly bool isImplicit;
 
-	private readonly FGDKNBEFPFN KIGNIBIMLKK;
+	private readonly MappingStyle style;
 
-	public override int OHJMGKADENE
+	public override int NestingIncrease
 	{
 		get
 		{
-			return DPIMLJJFMCO();
+			return GetNestingIncrease();
 		}
 	}
 
-	public bool KIOLMKCLEEB
+	public bool IsImplicit
 	{
 		get
 		{
-			return BBBGHODAEIN();
+			return GetIsImplicit();
 		}
 	}
 
-	public override bool MKCFJALADOA
+	public override bool IsCanonical
 	{
 		get
 		{
-			return DOHAHEHOCLN();
+			return GetIsCanonical();
 		}
 	}
 
-	public FGDKNBEFPFN HCJPMGKAAMN
+	public MappingStyle Style
 	{
 		get
 		{
-			return HALCJLMJDII();
+			return GetStyle();
 		}
 	}
 
-	public MappingStart(string KOLNNNLOCFE, string EDLADAAKMDF, bool isImplicit, FGDKNBEFPFN KIGNIBIMLKK, Mark ILENLCMAMBH, Mark PCLFFOBJJFO)
+	public MappingStart(string KOLNNNLOCFE, string EDLADAAKMDF, bool isImplicit, MappingStyle KIGNIBIMLKK, Mark ILENLCMAMBH, Mark PCLFFOBJJFO)
 		: base(KOLNNNLOCFE, EDLADAAKMDF, ILENLCMAMBH, PCLFFOBJJFO)
 	{
 		this.isImplicit = isImplicit;
-		this.KIGNIBIMLKK = KIGNIBIMLKK;
+		this.style = KIGNIBIMLKK;
 	}
 
-	public MappingStart(string KOLNNNLOCFE, string EDLADAAKMDF, bool isImplicit, FGDKNBEFPFN KIGNIBIMLKK)
+	public MappingStart(string KOLNNNLOCFE, string EDLADAAKMDF, bool isImplicit, MappingStyle KIGNIBIMLKK)
 		: this(KOLNNNLOCFE, EDLADAAKMDF, isImplicit, KIGNIBIMLKK, Mark.Empty, Mark.Empty)
 	{
 	}
 
 	public MappingStart()
-		: this(null, null, true, FGDKNBEFPFN.Any, Mark.Empty, Mark.Empty)
+		: this(null, null, true, MappingStyle.Any, Mark.Empty, Mark.Empty)
 	{
 	}
 
-	public override int DPIMLJJFMCO()
+	public override int GetNestingIncrease()
 	{
 		return 1;
 	}
 
-	internal override BHBPOHDAGPH get_Type()
+	internal override ParsingEventType get_Type()
 	{
-		return BHBPOHDAGPH.MappingStart;
+		return ParsingEventType.MappingStart;
 	}
 
-	public bool BBBGHODAEIN()
+	public bool GetIsImplicit()
 	{
 		return isImplicit;
 	}
 
-	public override bool DOHAHEHOCLN()
+	public override bool GetIsCanonical()
 	{
 		return !isImplicit;
 	}
 
-	public FGDKNBEFPFN HALCJLMJDII()
+	public MappingStyle GetStyle()
 	{
-		return KIGNIBIMLKK;
+		return style;
 	}
 
 	public override string ToString()
 	{
-		return string.Format(CultureInfo.InvariantCulture, "Mapping start [anchor = {0}, tag = {1}, isImplicit = {2}, style = {3}]", HCPOJDFJFMM(), LOIGCKFONHJ(), isImplicit, KIGNIBIMLKK);
+		return string.Format(CultureInfo.InvariantCulture, "Mapping start [anchor = {0}, tag = {1}, isImplicit = {2}, style = {3}]", GetAnchor(), GetTag(), isImplicit, style);
 	}
 
-	public override void GPHIFFOGOGN(IParsingEventVisitor NKECMANOOEM)
+	public override void Accept(IParsingEventVisitor NKECMANOOEM)
 	{
 		NKECMANOOEM.Visit(this);
 	}

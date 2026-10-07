@@ -5,16 +5,16 @@ namespace Nekki.SF2.Core.Tutorials
 {
 	public class TutorialRaid : SFMonoBehaviour<object>
 	{
-		public enum AMFHDCJOOHE
+		public enum TutorialRaidEvent
 		{
 			ON_TUTORIAL_RAID_COMPLETE = 0
 		}
 
-		private List<TutorialAction> MLALLKGGODN = new List<TutorialAction>();
+		private List<TutorialAction> actions = new List<TutorialAction>();
 
-		private int FEHIABBOPPL = -1;
+		private int currentActionIndex = -1;
 
-		private bool PPFECHDPFEJ;
+		private bool advancePending;
 
 		public TutorialRaid()
 		{
@@ -23,7 +23,7 @@ namespace Nekki.SF2.Core.Tutorials
 
 		public void Run()
 		{
-			PPFECHDPFEJ = true;
+			advancePending = true;
 		}
 
 		public virtual bool Init()
@@ -33,48 +33,48 @@ namespace Nekki.SF2.Core.Tutorials
 
 		public void Clear()
 		{
-			foreach (TutorialAction item in MLALLKGGODN)
+			foreach (TutorialAction item in actions)
 			{
 			}
-			MLALLKGGODN.Clear();
+			actions.Clear();
 		}
 
 		public virtual void Draw()
 		{
-			if (PPFECHDPFEJ)
+			if (advancePending)
 			{
-				PPFECHDPFEJ = false;
-				FEHIABBOPPL++;
-				if (MLALLKGGODN.Count - 1 >= FEHIABBOPPL)
+				advancePending = false;
+				currentActionIndex++;
+				if (actions.Count - 1 >= currentActionIndex)
 				{
-					MLALLKGGODN[FEHIABBOPPL].Run();
+					actions[currentActionIndex].Run();
 				}
 				else
 				{
-					OGIJONMKABB();
+					CompleteTutorial();
 				}
 			}
 		}
 
-		private void NLJLHHNPCAO(TutorialAction IBODMPMJELJ)
+		private void AddAction(TutorialAction IBODMPMJELJ)
 		{
 			IBODMPMJELJ.AddEventListener(0, OnActionComplete);
-			MLALLKGGODN.Add(IBODMPMJELJ);
+			actions.Add(IBODMPMJELJ);
 		}
 
 		private void OnActionComplete(object data)
 		{
 			if (data == null)
 			{
-				PPFECHDPFEJ = true;
+				advancePending = true;
 			}
 			else
 			{
-				OGIJONMKABB();
+				CompleteTutorial();
 			}
 		}
 
-		private void OGIJONMKABB()
+		private void CompleteTutorial()
 		{
 			CallEvent(0, null);
 		}

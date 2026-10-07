@@ -2,56 +2,56 @@ using System;
 
 internal class OutputWindow
 {
-	private const int FGIEBNCIJLK = 32768;
+	private const int WindowSize = 32768;
 
-	private const int CCLGMCFNNNN = 32767;
+	private const int WindowMask = 32767;
 
 	private byte[] window = new byte[32768];
 
-	private int PCLFFOBJJFO;
+	private int end;
 
-	private int HLNCODHLPID;
+	private int bytesUsed;
 
-	public int BMDIGKGNDPO
+	public int FreeBytes
 	{
 		get
 		{
-			return JBPBBAEEAFO();
+			return GetFreeBytes();
 		}
 	}
 
-	public int EDCELODAANL
+	public int AvailableBytes
 	{
 		get
 		{
-			return EJAHIMFDFJI();
+			return GetAvailableBytes();
 		}
 	}
 
 	public void Write(byte AAOIAEJJINO)
 	{
-		window[PCLFFOBJJFO++] = AAOIAEJJINO;
-		PCLFFOBJJFO &= 32767;
-		HLNCODHLPID++;
+		window[end++] = AAOIAEJJINO;
+		end &= 32767;
+		bytesUsed++;
 	}
 
 	public void WriteLengthDistance(int BDBOAEGELMC, int OIOMNNFMDOO)
 	{
-		HLNCODHLPID += BDBOAEGELMC;
-		int num = (PCLFFOBJJFO - OIOMNNFMDOO) & 0x7FFF;
+		bytesUsed += BDBOAEGELMC;
+		int num = (end - OIOMNNFMDOO) & 0x7FFF;
 		int num2 = 32768 - BDBOAEGELMC;
-		if (num <= num2 && PCLFFOBJJFO < num2)
+		if (num <= num2 && end < num2)
 		{
 			if (BDBOAEGELMC <= OIOMNNFMDOO)
 			{
-				Array.Copy(window, num, window, PCLFFOBJJFO, BDBOAEGELMC);
-				PCLFFOBJJFO += BDBOAEGELMC;
+				Array.Copy(window, num, window, end, BDBOAEGELMC);
+				end += BDBOAEGELMC;
 			}
 			else
 			{
 				while (BDBOAEGELMC-- > 0)
 				{
-					window[PCLFFOBJJFO++] = window[num++];
+					window[end++] = window[num++];
 				}
 			}
 		}
@@ -59,8 +59,8 @@ internal class OutputWindow
 		{
 			while (BDBOAEGELMC-- > 0)
 			{
-				window[PCLFFOBJJFO++] = window[num++];
-				PCLFFOBJJFO &= 32767;
+				window[end++] = window[num++];
+				end &= 32767;
 				num &= 0x7FFF;
 			}
 		}
@@ -68,12 +68,12 @@ internal class OutputWindow
 
 	public int CopyFrom(InputBuffer NILNDHEKNLJ, int BDBOAEGELMC)
 	{
-		BDBOAEGELMC = Math.Min(Math.Min(BDBOAEGELMC, 32768 - HLNCODHLPID), NILNDHEKNLJ.EJAHIMFDFJI());
-		int num = 32768 - PCLFFOBJJFO;
+		BDBOAEGELMC = Math.Min(Math.Min(BDBOAEGELMC, 32768 - bytesUsed), NILNDHEKNLJ.GetAvailableBytes());
+		int num = 32768 - end;
 		int num2;
 		if (BDBOAEGELMC > num)
 		{
-			num2 = NILNDHEKNLJ.CopyTo(window, PCLFFOBJJFO, num);
+			num2 = NILNDHEKNLJ.CopyTo(window, end, num);
 			if (num2 == num)
 			{
 				num2 += NILNDHEKNLJ.CopyTo(window, 0, BDBOAEGELMC - num);
@@ -81,34 +81,34 @@ internal class OutputWindow
 		}
 		else
 		{
-			num2 = NILNDHEKNLJ.CopyTo(window, PCLFFOBJJFO, BDBOAEGELMC);
+			num2 = NILNDHEKNLJ.CopyTo(window, end, BDBOAEGELMC);
 		}
-		PCLFFOBJJFO = (PCLFFOBJJFO + num2) & 0x7FFF;
-		HLNCODHLPID += num2;
+		end = (end + num2) & 0x7FFF;
+		bytesUsed += num2;
 		return num2;
 	}
 
-	public int JBPBBAEEAFO()
+	public int GetFreeBytes()
 	{
-		return 32768 - HLNCODHLPID;
+		return 32768 - bytesUsed;
 	}
 
-	public int EJAHIMFDFJI()
+	public int GetAvailableBytes()
 	{
-		return HLNCODHLPID;
+		return bytesUsed;
 	}
 
 	public int CopyTo(byte[] output, int IPCOBJBKNAO, int BDBOAEGELMC)
 	{
 		int num;
-		if (BDBOAEGELMC > HLNCODHLPID)
+		if (BDBOAEGELMC > bytesUsed)
 		{
-			num = PCLFFOBJJFO;
-			BDBOAEGELMC = HLNCODHLPID;
+			num = end;
+			BDBOAEGELMC = bytesUsed;
 		}
 		else
 		{
-			num = (PCLFFOBJJFO - HLNCODHLPID + BDBOAEGELMC) & 0x7FFF;
+			num = (end - bytesUsed + BDBOAEGELMC) & 0x7FFF;
 		}
 		int num2 = BDBOAEGELMC;
 		int num3 = BDBOAEGELMC - num;
@@ -119,7 +119,7 @@ internal class OutputWindow
 			BDBOAEGELMC = num;
 		}
 		Array.Copy(window, num - BDBOAEGELMC, output, IPCOBJBKNAO, BDBOAEGELMC);
-		HLNCODHLPID -= num2;
+		bytesUsed -= num2;
 		return num2;
 	}
 }

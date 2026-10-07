@@ -9,39 +9,39 @@ namespace Nekki.SF2.GUI.Dialogs
 {
 	public class StrangerDialog : StoryDialog
 	{
-		private const int KHKOLFGFPCM = 2;
+		private const int AcceptButtonId = 2;
 
-		private const int DLPMGPHJGAN = 0;
+		private const int RejectButtonId = 0;
 
-		private const int CDOMLIBFMGN = 1;
+		private const int StoreButtonId = 1;
 
-		private const int PELMMKODEME = 3;
+		private const int CheckBoxButtonId = 3;
 
-		private const int EIHCJGIBION = 13;
+		private const int WaitButtonId = 13;
 
-		private const int LOMFJFMBMCN = 1;
+		private const int GoodbyeButtonId = 1;
 
-		private const int IONANDLGODB = 100;
+		private const int CheckBoxButtonOffset = 100;
 
-		private const int OHEMMPFCFLO = 90;
+		private const int CheckBoxOffsetY = 90;
 
-		private const int GHPHGGJADMI = -80;
+		private const int DifficultyBarOffsetY = -80;
 
-		private const int LPKENGHDHIA = -60;
+		private const int DifficultyLabelOffsetY = -60;
 
-		private const int KMMBFLDHAKE = 280;
+		private const int DifficultyX = 280;
 
-		private const int DPJCJMNHJPA = 130;
+		private const int ButtonsBottomOffset = 130;
 
-		private const int FKGKGIAJOMH = 87;
+		private const int WaitButtonFontSize = 87;
 
-		private const int LLLAOBBPFHK = 40;
+		private const int ButtonGap = 40;
 
-		private const int EHMDBBMBFMJ = 40;
+		private const int PortraitTextGap = 40;
 
-		private const int EGKAICLFKGD = 900;
+		private const int TextWidthWithPortrait = 900;
 
-		private const int OHPAGLENIIM = 103;
+		private const int CheckBoxLabelFontSize = 103;
 
 		[SerializeField]
 		private LabelButton _rejectButton;
@@ -64,154 +64,154 @@ namespace Nekki.SF2.GUI.Dialogs
 		[SerializeField]
 		private LabelAlias _difficultLabel;
 
-		private string EEJJDEHIDEH;
+		private string rejectButtonText;
 
-		private string OPHCGFOHKAN;
+		private string acceptButtonText;
 
-		private string PHCMDJCMPDF;
+		private string storeButtonText;
 
-		private LabelButton.FBMGEHJPPIK NBJEHGNACHH;
+		private LabelButton.ButtonColor rejectButtonColor;
 
-		private LabelButton.FBMGEHJPPIK PHLHOABOODK;
+		private LabelButton.ButtonColor acceptButtonColor;
 
-		private LabelButton.FBMGEHJPPIK CKFCBIOHFAF;
+		private LabelButton.ButtonColor storeButtonColor;
 
 		private float _ratio;
 
-		private bool HFCFEKNIEEA;
+		private bool showDifficulty;
 
-		private bool LOOHNJPAAHD;
+		private bool hasCheckBox;
 
-		private bool CJJBDGPDOFF;
+		private bool checkBoxInitialValue;
 
-		private string IAHHOEJJJHP = string.Empty;
+		private string checkBoxText = string.Empty;
 
 		private Action<object> _dlg;
 
 		public override void Init(object data)
 		{
 			StrangerDialogInfo gCPCDFIBLGN = (StrangerDialogInfo)data;
-			IHMEPGICLGF = gCPCDFIBLGN.CHJHCGODKJM;
-			NBJEHGNACHH = gCPCDFIBLGN.IGHFDCLELCO;
-			EEJJDEHIDEH = gCPCDFIBLGN.OMPNOCLIPEO;
-			PHLHOABOODK = gCPCDFIBLGN.AEBLFMOIEKM;
-			OPHCGFOHKAN = gCPCDFIBLGN.GPDFOBPMAAG;
-			CKFCBIOHFAF = gCPCDFIBLGN.IOFGJDJFMOD;
-			PHCMDJCMPDF = gCPCDFIBLGN.AFFLDJOMBNM;
+			contents = gCPCDFIBLGN.Contents;
+			rejectButtonColor = gCPCDFIBLGN.RejectButtonColor;
+			rejectButtonText = gCPCDFIBLGN.RejectButtonText;
+			acceptButtonColor = gCPCDFIBLGN.AcceptButtonColor;
+			acceptButtonText = gCPCDFIBLGN.AcceptButtonText;
+			storeButtonColor = gCPCDFIBLGN.StoreButtonColor;
+			storeButtonText = gCPCDFIBLGN.StoreButtonText;
 			_ratio = gCPCDFIBLGN.Ratio;
-			HFCFEKNIEEA = gCPCDFIBLGN.PLAFJPIFHHL;
-			GIGHCCNJNGA = gCPCDFIBLGN.MOOMLCGKFBA;
-			LOOHNJPAAHD = gCPCDFIBLGN.KIGGOAIKFCB;
-			CJJBDGPDOFF = gCPCDFIBLGN.HLFPOONJFNM;
-			IAHHOEJJJHP = gCPCDFIBLGN.CJKCAIJLFPN;
+			showDifficulty = gCPCDFIBLGN.ShowDifficulty;
+			showAllContents = gCPCDFIBLGN.UseEdgeButtons;
+			hasCheckBox = gCPCDFIBLGN.ShowCheckBox;
+			checkBoxInitialValue = gCPCDFIBLGN.CheckBoxChecked;
+			checkBoxText = gCPCDFIBLGN.CheckBoxText;
 			if (gCPCDFIBLGN.Dlg != null)
 			{
 				_dlg = gCPCDFIBLGN.Dlg.Invoke;
 				AddEventListener(0, gCPCDFIBLGN.Dlg);
 			}
-			GlobalTimer.get_Instance().addEventListener(0, ILFBDHDMHPD);
-			AKNJEGGNNBJ = gCPCDFIBLGN.GBMEDJJOFBF;
+			GlobalTimer.get_Instance().addEventListener(0, OnTimerTick);
+			portraitSpriteName = gCPCDFIBLGN.PortraitName;
 			base.Init(gCPCDFIBLGN.Title, "dlgButtonWait", "dlgStoryBtnGoodbye");
 		}
 
 		private new void Start()
 		{
 			base.Start();
-			GJKBCJBPHEE();
-			CHFENJOILAB();
+			UpdateDifficultyRating();
+			PositionButtons();
 		}
 
 		private void OnDestroy()
 		{
-			GlobalTimer.get_Instance().removeEventListener(0, ILFBDHDMHPD);
+			GlobalTimer.get_Instance().removeEventListener(0, OnTimerTick);
 		}
 
-		protected override void MAGOIKICKAH(KBDHPMOMJLL IOJJEMLBKOA)
+		protected override void SetupFooter(FooterType IOJJEMLBKOA)
 		{
-			OPFBDPMJCHH();
-			if (LOOHNJPAAHD)
+			SetupButtons();
+			if (hasCheckBox)
 			{
-				CGKGDKAGFLI();
-				KJHPCLOFDJB();
+				FitContentSize();
+				RelayoutDialog();
 			}
-			if (GIGHCCNJNGA && NLOKJHGPOIF() < 3)
+			if (showAllContents && GetVisibleButtonCount() < 3)
 			{
 				_btnOK = GetEdgeButton(true);
 				LabelButton labelButton = GetEdgeButton(false);
 				_btnCancel = ((!(labelButton != _btnOK)) ? null : labelButton);
-				CHFENJOILAB();
+				PositionButtons();
 			}
 		}
 
-		protected override void HLJBLAPMDCB()
+		protected override void SetupContent()
 		{
-			base.HLJBLAPMDCB();
-			PHGFOLEOFOD();
-			if (LOOHNJPAAHD)
+			base.SetupContent();
+			SetupDifficultyBar();
+			if (hasCheckBox)
 			{
 				float bAINMLLIKOL = _content.transform.localPosition.y + 50f + 20f;
-				_content.transform.BGNJGIACJBG(bAINMLLIKOL);
+				_content.transform.SetLocalY(bAINMLLIKOL);
 			}
 		}
 
-		protected override void BHLHODFNHHO()
+		protected override void ApplyPlatformLayout()
 		{
-			base.BHLHODFNHHO();
+			base.ApplyPlatformLayout();
 		}
 
-		protected override void FLOHKIBCOKG()
+		protected override void LayoutStripes()
 		{
-			base.FLOHKIBCOKG();
-			if (LOOHNJPAAHD)
+			base.LayoutStripes();
+			if (hasCheckBox)
 			{
 				float bAINMLLIKOL = _topStripe.transform.localPosition.y + 12f;
-				_topStripe.transform.BGNJGIACJBG(bAINMLLIKOL);
+				_topStripe.transform.SetLocalY(bAINMLLIKOL);
 				bAINMLLIKOL = _bottomStripe.transform.localPosition.y - 12f;
-				_bottomStripe.transform.BGNJGIACJBG(bAINMLLIKOL);
+				_bottomStripe.transform.SetLocalY(bAINMLLIKOL);
 			}
 		}
 
-		protected override void CHFENJOILAB()
+		protected override void PositionButtons()
 		{
-			base.CHFENJOILAB();
-			if (NLOKJHGPOIF() == 3)
+			base.PositionButtons();
+			if (GetVisibleButtonCount() == 3)
 			{
 				float y = _bottomStripe.transform.localPosition.y;
 				float num = y + 130f;
-				if (LOOHNJPAAHD)
+				if (hasCheckBox)
 				{
 					num += 130f;
 				}
-				_storeButton.transform.BGNJGIACJBG(num);
-				_acceptButton.transform.BGNJGIACJBG(num);
-				_rejectButton.transform.BGNJGIACJBG(num);
+				_storeButton.transform.SetLocalY(num);
+				_acceptButton.transform.SetLocalY(num);
+				_rejectButton.transform.SetLocalY(num);
 			}
-			if (LOOHNJPAAHD)
+			if (hasCheckBox)
 			{
 				if (_btnOK.gameObject.activeSelf)
 				{
 					float bAINMLLIKOL = _btnOK.transform.localPosition.y + 100f + 30f;
-					_btnOK.transform.BGNJGIACJBG(bAINMLLIKOL);
+					_btnOK.transform.SetLocalY(bAINMLLIKOL);
 				}
 				if (_btnCancel != null && _btnCancel.gameObject.activeSelf)
 				{
 					float bAINMLLIKOL2 = _btnCancel.transform.localPosition.y + 100f + 30f;
-					_btnCancel.transform.BGNJGIACJBG(bAINMLLIKOL2);
+					_btnCancel.transform.SetLocalY(bAINMLLIKOL2);
 				}
 				if (_checkBox.gameObject.activeSelf)
 				{
 					float bAINMLLIKOL3 = _bottomStripe.transform.localPosition.y + 90f;
-					_checkBox.transform.BGNJGIACJBG(bAINMLLIKOL3);
-					_checkBoxLabel.transform.BGNJGIACJBG(bAINMLLIKOL3);
+					_checkBox.transform.SetLocalY(bAINMLLIKOL3);
+					_checkBoxLabel.transform.SetLocalY(bAINMLLIKOL3);
 					float num2 = _checkBox.GetComponent<RectTransform>().rect.width / 2f + _checkBoxLabel.preferredWidth;
-					_checkBox.transform.OKHPLHPBPKJ((0f - num2) / 2f);
+					_checkBox.transform.SetLocalX((0f - num2) / 2f);
 					float num3 = _checkBox.transform.localPosition.x + _checkBox.GetComponent<RectTransform>().rect.width / 2f;
-					_checkBoxLabel.transform.OKHPLHPBPKJ(num3 + _checkBoxLabel.preferredWidth / 2f);
+					_checkBoxLabel.transform.SetLocalX(num3 + _checkBoxLabel.preferredWidth / 2f);
 				}
 			}
 		}
 
-		protected override void CGKGDKAGFLI()
+		protected override void FitContentSize()
 		{
 			float num = 0f;
 			if (_text.get_text() != string.Empty)
@@ -226,17 +226,17 @@ namespace Nekki.SF2.GUI.Dialogs
 			{
 				num += _checkBox.GetComponent<RectTransform>().rect.height;
 			}
-			if (HFCFEKNIEEA)
+			if (showDifficulty)
 			{
 				num += 240f;
 			}
-			float b = CJDGAIICNGM * 0.9f * 0.8f;
+			float b = referenceHeight * 0.9f * 0.8f;
 			float num2 = Mathf.Max(num, b);
 			if (_footerTextsSprite.gameObject.activeSelf)
 			{
 				float num3 = _footerTextsSprite.GetComponent<RectTransform>().rect.height + 60f + 30f;
 				num2 += num3;
-				_content.transform.BGNJGIACJBG(_content.transform.localPosition.y + num3 / 2f);
+				_content.transform.SetLocalY(_content.transform.localPosition.y + num3 / 2f);
 			}
 			Vector2 sizeDelta = new Vector2(_content.GetComponent<RectTransform>().rect.width, num2);
 			_content.GetComponent<RectTransform>().sizeDelta = sizeDelta;
@@ -247,7 +247,7 @@ namespace Nekki.SF2.GUI.Dialogs
 			return GetEdgeButton(false).ButtonId;
 		}
 
-		private void OPFBDPMJCHH()
+		private void SetupButtons()
 		{
 			if (_btnCancel != null)
 			{
@@ -257,102 +257,102 @@ namespace Nekki.SF2.GUI.Dialogs
 			{
 				_btnOK.gameObject.SetActive(false);
 			}
-			PHKIJLEICHE(_rejectButton, NBJEHGNACHH, EEJJDEHIDEH, 0);
+			SetupButton(_rejectButton, rejectButtonColor, rejectButtonText, 0);
 			_rejectButton.RemoveEventListener(2, ButtonCallback);
 			_rejectButton.AddEventListener(2, ButtonCallback);
-			_rejectButton.gameObject.SetActive(EEJJDEHIDEH != string.Empty);
-			PHKIJLEICHE(_acceptButton, PHLHOABOODK, OPHCGFOHKAN, 2);
+			_rejectButton.gameObject.SetActive(rejectButtonText != string.Empty);
+			SetupButton(_acceptButton, acceptButtonColor, acceptButtonText, 2);
 			_acceptButton.RemoveEventListener(2, ButtonCallback);
 			_acceptButton.AddEventListener(2, ButtonCallback);
-			_acceptButton.gameObject.SetActive(OPHCGFOHKAN != string.Empty);
-			PHKIJLEICHE(_storeButton, CKFCBIOHFAF, PHCMDJCMPDF, 1);
+			_acceptButton.gameObject.SetActive(acceptButtonText != string.Empty);
+			SetupButton(_storeButton, storeButtonColor, storeButtonText, 1);
 			_storeButton.RemoveEventListener(2, ButtonCallback);
 			_storeButton.AddEventListener(2, ButtonCallback);
-			_storeButton.gameObject.SetActive(PHCMDJCMPDF != string.Empty);
+			_storeButton.gameObject.SetActive(storeButtonText != string.Empty);
 			float num = 0f;
 			float bAINMLLIKOL = _bottomStripe.transform.localPosition.y + 130f;
 			num = (0f - _acceptButton.GetComponent<RectTransform>().rect.width) / 2f - 40f - _rejectButton.GetComponent<RectTransform>().rect.width / 2f;
-			_rejectButton.transform.OKHPLHPBPKJ(num);
-			_rejectButton.transform.BGNJGIACJBG(bAINMLLIKOL);
+			_rejectButton.transform.SetLocalX(num);
+			_rejectButton.transform.SetLocalY(bAINMLLIKOL);
 			num = 0f;
-			_acceptButton.transform.OKHPLHPBPKJ(num);
-			_acceptButton.transform.BGNJGIACJBG(bAINMLLIKOL);
+			_acceptButton.transform.SetLocalX(num);
+			_acceptButton.transform.SetLocalY(bAINMLLIKOL);
 			num = _acceptButton.GetComponent<RectTransform>().rect.width / 2f + 40f + _storeButton.GetComponent<RectTransform>().rect.width / 2f;
-			_storeButton.transform.OKHPLHPBPKJ(num);
-			_storeButton.transform.BGNJGIACJBG(bAINMLLIKOL);
-			if (LOOHNJPAAHD)
+			_storeButton.transform.SetLocalX(num);
+			_storeButton.transform.SetLocalY(bAINMLLIKOL);
+			if (hasCheckBox)
 			{
 				_checkBox.gameObject.SetActive(true);
-				_checkBox.isOn = CJJBDGPDOFF;
+				_checkBox.isOn = checkBoxInitialValue;
 				_checkBox.onValueChanged.AddListener((bool value) =>
 				{
 					ButtonCallback(3);
 				});
-				_checkBox.transform.BGNJGIACJBG(bAINMLLIKOL);
+				_checkBox.transform.SetLocalY(bAINMLLIKOL);
 				_checkBoxLabel.gameObject.SetActive(true);
 				_checkBoxLabel.set_LabelFontSize(103);
-				_checkBoxLabel.color = Constants.PJJIMHMJPAL;
-				_checkBoxLabel.set_Alias(IAHHOEJJJHP);
-				_checkBoxLabel.transform.BGNJGIACJBG(bAINMLLIKOL);
+				_checkBoxLabel.color = Constants.DialogTextColor;
+				_checkBoxLabel.set_Alias(checkBoxText);
+				_checkBoxLabel.transform.SetLocalY(bAINMLLIKOL);
 			}
 		}
 
-		protected override void FALMBFKEGIE()
+		protected override void ShowLastPageButtons()
 		{
-			BGJJDGOBPKA = "dlgButtonWait";
-			base.MAGOIKICKAH(KBDHPMOMJLL.FOOTER_BOTH);
+			defaultOkButtonAlias = "dlgButtonWait";
+			base.SetupFooter(FooterType.FOOTER_BOTH);
 			_acceptButton.gameObject.SetActive(false);
 			_rejectButton.gameObject.SetActive(false);
 			_storeButton.gameObject.SetActive(false);
 			float bAINMLLIKOL = 20f + _btnOK.GetComponent<RectTransform>().rect.width / 2f;
 			float bAINMLLIKOL2 = _bottomStripe.transform.localPosition.y + 130f;
-			_btnOK.transform.OKHPLHPBPKJ(bAINMLLIKOL);
-			_btnOK.transform.BGNJGIACJBG(bAINMLLIKOL2);
+			_btnOK.transform.SetLocalX(bAINMLLIKOL);
+			_btnOK.transform.SetLocalY(bAINMLLIKOL2);
 			_btnOK.Label.set_LabelFontSize(87);
 			_btnOK.ButtonId = 13;
 			_btnOK.RemoveEventListener(2, OnClose);
 			_btnOK.AddEventListener(2, ButtonCallback);
 			bAINMLLIKOL = -20f - _btnCancel.GetComponent<RectTransform>().rect.width / 2f;
-			_btnCancel.transform.OKHPLHPBPKJ(bAINMLLIKOL);
-			_btnCancel.transform.BGNJGIACJBG(bAINMLLIKOL2);
+			_btnCancel.transform.SetLocalX(bAINMLLIKOL);
+			_btnCancel.transform.SetLocalY(bAINMLLIKOL2);
 			_btnCancel.Label.set_LabelFontSize(87);
 			_btnCancel.ButtonId = 1;
 			_btnCancel.RemoveEventListener(2, OnClose);
 			_btnCancel.AddEventListener(2, ButtonCallback);
-			CHFENJOILAB();
+			PositionButtons();
 		}
 
-		protected override void KCDJNNNDJCE()
+		protected override void ApplyMessageText()
 		{
-			_text.set_text(APBAOFGMAAA);
-			_text.transform.OKHPLHPBPKJ(_portrait.transform.localPosition.x + 40f + CJDGAIICNGM * 0.9f / 2f + _text.rectTransform.rect.width / 2f);
-			_text.transform.BGNJGIACJBG(0f);
+			_text.set_text(messageText);
+			_text.transform.SetLocalX(_portrait.transform.localPosition.x + 40f + referenceHeight * 0.9f / 2f + _text.rectTransform.rect.width / 2f);
+			_text.transform.SetLocalY(0f);
 			if (_difficult.gameObject.activeSelf)
 			{
-				_difficult.transform.OKHPLHPBPKJ(280f);
-				_difficultLabel.transform.OKHPLHPBPKJ(280f);
-				_text.transform.BGNJGIACJBG(70f + _difficultLabel.preferredHeight / 4f);
-				_difficult.transform.BGNJGIACJBG(-80f + _text.transform.localPosition.y - _text.preferredHeight / 2f);
-				_difficultLabel.transform.BGNJGIACJBG(-60f + _difficult.transform.localPosition.y - _difficultLabel.preferredHeight / 4f);
+				_difficult.transform.SetLocalX(280f);
+				_difficultLabel.transform.SetLocalX(280f);
+				_text.transform.SetLocalY(70f + _difficultLabel.preferredHeight / 4f);
+				_difficult.transform.SetLocalY(-80f + _text.transform.localPosition.y - _text.preferredHeight / 2f);
+				_difficultLabel.transform.SetLocalY(-60f + _difficult.transform.localPosition.y - _difficultLabel.preferredHeight / 4f);
 			}
-			JJAMIENHFPJ();
-			CGKGDKAGFLI();
-			KJHPCLOFDJB();
-			CHFENJOILAB();
+			UpdateTimerLabel();
+			FitContentSize();
+			RelayoutDialog();
+			PositionButtons();
 		}
 
-		private int NLOKJHGPOIF()
+		private int GetVisibleButtonCount()
 		{
 			int num = 0;
-			if (EEJJDEHIDEH != string.Empty)
+			if (rejectButtonText != string.Empty)
 			{
 				num++;
 			}
-			if (PHCMDJCMPDF != string.Empty)
+			if (storeButtonText != string.Empty)
 			{
 				num++;
 			}
-			if (OPHCGFOHKAN != string.Empty)
+			if (acceptButtonText != string.Empty)
 			{
 				num++;
 			}
@@ -368,7 +368,7 @@ namespace Nekki.SF2.GUI.Dialogs
 			return _rejectButton.gameObject.activeSelf ? _rejectButton : (_acceptButton.gameObject.activeSelf ? _acceptButton : ((!_storeButton.gameObject.activeSelf) ? null : _storeButton));
 		}
 
-		private void PHKIJLEICHE(LabelButton GAMILDJHFDB, LabelButton.FBMGEHJPPIK color, string LOKLDPLAPOL, int OKNNNLIPODI)
+		private void SetupButton(LabelButton GAMILDJHFDB, LabelButton.ButtonColor color, string LOKLDPLAPOL, int OKNNNLIPODI)
 		{
 			GAMILDJHFDB.gameObject.SetActive(true);
 			GAMILDJHFDB.SetColor(color);
@@ -376,18 +376,18 @@ namespace Nekki.SF2.GUI.Dialogs
 			GAMILDJHFDB.ButtonId = OKNNNLIPODI;
 		}
 
-		private void PHGFOLEOFOD()
+		private void SetupDifficultyBar()
 		{
 			_difficult.SetValueBorders(0f, 100f);
-			_difficult.gameObject.SetActive(HFCFEKNIEEA);
+			_difficult.gameObject.SetActive(showDifficulty);
 			_difficultLabel.set_Alias(string.Empty);
 			_difficultLabel.set_text("???");
 			_difficultLabel.set_LabelFontSize(103);
-			_difficultLabel.color = Constants.PJJIMHMJPAL;
-			_difficultLabel.gameObject.SetActive(HFCFEKNIEEA);
+			_difficultLabel.color = Constants.DialogTextColor;
+			_difficultLabel.gameObject.SetActive(showDifficulty);
 		}
 
-		private void GJKBCJBPHEE()
+		private void UpdateDifficultyRating()
 		{
 			if (_ratio < 0f)
 			{
@@ -406,7 +406,7 @@ namespace Nekki.SF2.GUI.Dialogs
 				}
 				num++;
 			}
-			_difficult.Stripe.set_SpriteName(Constants.DNDKOMGCBLC[num2]);
+			_difficult.Stripe.set_SpriteName(Constants.DifficultyBarSprites[num2]);
 			if (cCKLNOPEKHO != null)
 			{
 				_difficult.SetValue(100f);

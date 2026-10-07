@@ -2,7 +2,7 @@ using System;
 
 public class ScreenInfo
 {
-	public ScreenType HKJFKDEEIDJ = ScreenType.ModuleNone;
+	public ScreenType PreviousScreenType = ScreenType.ModuleNone;
 
 	public ScreenType ScreenType = ScreenType.ModuleNone;
 

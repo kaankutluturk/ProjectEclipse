@@ -8,7 +8,7 @@ namespace YamlDotNet.RepresentationModel
 	[Serializable]
 	public class YamlDocument
 	{
-		private class OMDIOFCAGOO : YamlVisitor
+		private class AnchorAssigningVisitor : YamlVisitor
 		{
 			private readonly HashSet<string> existingAnchors = new HashSet<string>();
 
@@ -18,7 +18,7 @@ namespace YamlDotNet.RepresentationModel
 			{
 				existingAnchors.Clear();
 				visitedNodes.Clear();
-				DPMKHPJABAF.GPHIFFOGOGN(this);
+				DPMKHPJABAF.Accept(this);
 				Random random = new Random();
 				foreach (KeyValuePair<YamlNode, bool> item in visitedNodes)
 				{
@@ -98,26 +98,26 @@ namespace YamlDotNet.RepresentationModel
 		internal YamlDocument(EventReader DNBFFLFBDOB)
 		{
 			DocumentLoadingState jPGMAPEHLAB = new DocumentLoadingState();
-			DNBFFLFBDOB.DODGGCGJJLL<DocumentStart>();
-			while (!DNBFFLFBDOB.GPHIFFOGOGN<DocumentEnd>())
+			DNBFFLFBDOB.Expect<DocumentStart>();
+			while (!DNBFFLFBDOB.Accept<DocumentEnd>())
 			{
-				RootNode = YamlNode.GLNMJNFLLIN(DNBFFLFBDOB, jPGMAPEHLAB);
+				RootNode = YamlNode.ParseNode(DNBFFLFBDOB, jPGMAPEHLAB);
 				if (RootNode is YamlAliasNode)
 				{
 					throw new YamlException();
 				}
 			}
-			jPGMAPEHLAB.GPBMMFCHANP();
-			DNBFFLFBDOB.DODGGCGJJLL<DocumentEnd>();
+			jPGMAPEHLAB.ResolveAliases();
+			DNBFFLFBDOB.Expect<DocumentEnd>();
 		}
 
 		private void AssignAnchors()
 		{
-			OMDIOFCAGOO oMDIOFCAGOO = new OMDIOFCAGOO();
+			AnchorAssigningVisitor oMDIOFCAGOO = new AnchorAssigningVisitor();
 			oMDIOFCAGOO.AssignAnchors(this);
 		}
 
-		internal void Save(NEKGJNOFOFN NPIDIMCLNEM, bool EENMGCCBIHF = true)
+		internal void Save(IEmitter NPIDIMCLNEM, bool EENMGCCBIHF = true)
 		{
 			if (EENMGCCBIHF)
 			{
@@ -128,7 +128,7 @@ namespace YamlDotNet.RepresentationModel
 			NPIDIMCLNEM.Emit(new DocumentEnd(false));
 		}
 
-		public void GPHIFFOGOGN(IYamlVisitor NKECMANOOEM)
+		public void Accept(IYamlVisitor NKECMANOOEM)
 		{
 			NKECMANOOEM.Visit(this);
 		}

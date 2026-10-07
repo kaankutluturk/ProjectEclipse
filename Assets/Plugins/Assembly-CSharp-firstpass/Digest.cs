@@ -6,43 +6,43 @@ using System.Text;
 internal sealed class Digest
 {
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private Uri NHCOGAAPOAB;
+	private Uri uri;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private BMBGFBGIAPL KAHHEBMBCFA;
+	private AuthenticationTypes type;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private string OPEKCOFPAKK;
+	private string realm;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private bool DAPBCAMFDNK;
+	private bool stale;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private string ILFNAADCHNH;
+	private string nonce;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private string HBNIABHGCLL;
+	private string opaque;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private string KAGNAOMBBEM;
+	private string algorithm;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private List<string> EBAINKEOJPE;
+	private List<string> protectedUris;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private string EHEBENAMEGP;
+	private string qualityOfProtections;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private int GFDDCEIJDCN;
+	private int nonceCount;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private string CBPAMELDDOK;
+	private string ha1Sess;
 
-	public Uri GJIGOCNEPME
+	public Uri DigestUri
 	{
 		get
 		{
-			return OJBDMGBGJMA();
+			return GetUri();
 		}
 		private set
 		{
@@ -50,23 +50,23 @@ internal sealed class Digest
 		}
 	}
 
-	public string CLACHGOIEHH
+	public string Realm
 	{
 		get
 		{
-			return LAEOPDGLBMO();
+			return GetRealm();
 		}
 		private set
 		{
-			NDLNONPPIJL(value);
+			SetRealm(value);
 		}
 	}
 
-	public bool BCNLCFEBBEH
+	public bool IsNonceStale
 	{
 		get
 		{
-			return OCBMLPLDMOO();
+			return GetStale();
 		}
 		private set
 		{
@@ -74,47 +74,47 @@ internal sealed class Digest
 		}
 	}
 
-	private string DNLHOEFAPOG
+	private string Nonce
 	{
 		get
 		{
-			return CINJMLJPGGE();
+			return GetNonce();
 		}
 		set
 		{
-			MLKDAKOIOEC(value);
+			SetNonce(value);
 		}
 	}
 
-	private string HKLBDMFKKGH
+	private string Opaque
 	{
 		get
 		{
-			return NBDLOHFGNHI();
+			return GetOpaque();
 		}
 		set
 		{
-			JBDMKFHHGHE(value);
+			SetOpaque(value);
 		}
 	}
 
-	private string DFAEENLMOLN
+	private string Algorithm
 	{
 		get
 		{
-			return EFJHDNIJDNN();
+			return GetAlgorithm();
 		}
 		set
 		{
-			HCAIPEONAMO(value);
+			SetAlgorithm(value);
 		}
 	}
 
-	public List<string> LIPMKBKNOAF
+	public List<string> ProtectedUriList
 	{
 		get
 		{
-			return DGAJBCGFAKI();
+			return GetProtectedUris();
 		}
 		private set
 		{
@@ -122,23 +122,23 @@ internal sealed class Digest
 		}
 	}
 
-	private string IGIFOLFOALA
+	private string QualityOfProtections
 	{
 		get
 		{
-			return OKNGMJFJPJM();
+			return GetQualityOfProtections();
 		}
 		set
 		{
-			KFNMAJDFPJK(value);
+			SetQualityOfProtections(value);
 		}
 	}
 
-	private int KFOCJOCPJNC
+	private int NonceCounter
 	{
 		get
 		{
-			return PFLKBJDJLIK();
+			return GetNonceCount();
 		}
 		set
 		{
@@ -146,242 +146,242 @@ internal sealed class Digest
 		}
 	}
 
-	private string KMJHEHFGBGM
+	private string HA1Sess
 	{
 		get
 		{
-			return ADPBKDPPKIK();
+			return GetHA1Sess();
 		}
 		set
 		{
-			HPIBIHECJJP(value);
+			SetHA1Sess(value);
 		}
 	}
 
 	internal Digest(Uri KJHNCLAJMLO)
 	{
 		set_Uri(KJHNCLAJMLO);
-		HCAIPEONAMO("md5");
+		SetAlgorithm("md5");
 	}
 
-	public Uri OJBDMGBGJMA()
+	public Uri GetUri()
 	{
-		return NHCOGAAPOAB;
+		return uri;
 	}
 
 	private void set_Uri(Uri value)
 	{
-		NHCOGAAPOAB = value;
+		uri = value;
 	}
 
-	public BMBGFBGIAPL get_Type()
+	public AuthenticationTypes get_Type()
 	{
-		return KAHHEBMBCFA;
+		return type;
 	}
 
-	private void set_Type(BMBGFBGIAPL value)
+	private void set_Type(AuthenticationTypes value)
 	{
-		KAHHEBMBCFA = value;
+		type = value;
 	}
 
-	public string LAEOPDGLBMO()
+	public string GetRealm()
 	{
-		return OPEKCOFPAKK;
+		return realm;
 	}
 
-	private void NDLNONPPIJL(string value)
+	private void SetRealm(string value)
 	{
-		OPEKCOFPAKK = value;
+		realm = value;
 	}
 
-	public bool OCBMLPLDMOO()
+	public bool GetStale()
 	{
-		return DAPBCAMFDNK;
+		return stale;
 	}
 
 	private void set_Stale(bool value)
 	{
-		DAPBCAMFDNK = value;
+		stale = value;
 	}
 
-	private string CINJMLJPGGE()
+	private string GetNonce()
 	{
-		return ILFNAADCHNH;
+		return nonce;
 	}
 
-	private void MLKDAKOIOEC(string value)
+	private void SetNonce(string value)
 	{
-		ILFNAADCHNH = value;
+		nonce = value;
 	}
 
-	private string NBDLOHFGNHI()
+	private string GetOpaque()
 	{
-		return HBNIABHGCLL;
+		return opaque;
 	}
 
-	private void JBDMKFHHGHE(string value)
+	private void SetOpaque(string value)
 	{
-		HBNIABHGCLL = value;
+		opaque = value;
 	}
 
-	private string EFJHDNIJDNN()
+	private string GetAlgorithm()
 	{
-		return KAGNAOMBBEM;
+		return algorithm;
 	}
 
-	private void HCAIPEONAMO(string value)
+	private void SetAlgorithm(string value)
 	{
-		KAGNAOMBBEM = value;
+		algorithm = value;
 	}
 
-	public List<string> DGAJBCGFAKI()
+	public List<string> GetProtectedUris()
 	{
-		return EBAINKEOJPE;
+		return protectedUris;
 	}
 
 	private void set_ProtectedUris(List<string> value)
 	{
-		EBAINKEOJPE = value;
+		protectedUris = value;
 	}
 
-	private string OKNGMJFJPJM()
+	private string GetQualityOfProtections()
 	{
-		return EHEBENAMEGP;
+		return qualityOfProtections;
 	}
 
-	private void KFNMAJDFPJK(string value)
+	private void SetQualityOfProtections(string value)
 	{
-		EHEBENAMEGP = value;
+		qualityOfProtections = value;
 	}
 
-	private int PFLKBJDJLIK()
+	private int GetNonceCount()
 	{
-		return GFDDCEIJDCN;
+		return nonceCount;
 	}
 
 	private void set_NonceCount(int value)
 	{
-		GFDDCEIJDCN = value;
+		nonceCount = value;
 	}
 
-	private string ADPBKDPPKIK()
+	private string GetHA1Sess()
 	{
-		return CBPAMELDDOK;
+		return ha1Sess;
 	}
 
-	private void HPIBIHECJJP(string value)
+	private void SetHA1Sess(string value)
 	{
-		CBPAMELDDOK = value;
+		ha1Sess = value;
 	}
 
-	public void CKNNIILGPNN(string HHAAFADDOJB)
+	public void ParseChallange(string HHAAFADDOJB)
 	{
-		set_Type(BMBGFBGIAPL.Unknown);
+		set_Type(AuthenticationTypes.Unknown);
 		set_Stale(false);
-		JBDMKFHHGHE(null);
-		HPIBIHECJJP(null);
+		SetOpaque(null);
+		SetHA1Sess(null);
 		set_NonceCount(0);
-		KFNMAJDFPJK(null);
-		if (DGAJBCGFAKI() != null)
+		SetQualityOfProtections(null);
+		if (GetProtectedUris() != null)
 		{
-			DGAJBCGFAKI().Clear();
+			GetProtectedUris().Clear();
 		}
 		WWWAuthenticateHeaderParser iIGMPGDLCCK = new WWWAuthenticateHeaderParser(HHAAFADDOJB);
-		foreach (KeyValuePair item2 in iIGMPGDLCCK.CCEDNLIDAND())
+		foreach (KeyValuePair item2 in iIGMPGDLCCK.GetValues())
 		{
-			switch (item2.AENLBNDAEKB())
+			switch (item2.GetKey())
 			{
 			case "basic":
-				set_Type(BMBGFBGIAPL.Basic);
+				set_Type(AuthenticationTypes.Basic);
 				break;
 			case "digest":
-				set_Type(BMBGFBGIAPL.Digest);
+				set_Type(AuthenticationTypes.Digest);
 				break;
 			case "realm":
-				NDLNONPPIJL(item2.OEAKCOHMIHH());
+				SetRealm(item2.GetValue());
 				break;
 			case "domain":
-				if (!string.IsNullOrEmpty(item2.OEAKCOHMIHH()) && item2.OEAKCOHMIHH().Length != 0)
+				if (!string.IsNullOrEmpty(item2.GetValue()) && item2.GetValue().Length != 0)
 				{
-					if (DGAJBCGFAKI() == null)
+					if (GetProtectedUris() == null)
 					{
 						set_ProtectedUris(new List<string>());
 					}
 					int LCCLEFMKLPB = 0;
-					string item = item2.OEAKCOHMIHH().Read(ref LCCLEFMKLPB, ' ');
+					string item = item2.GetValue().Read(ref LCCLEFMKLPB, ' ');
 					do
 					{
-						DGAJBCGFAKI().Add(item);
-						item = item2.OEAKCOHMIHH().Read(ref LCCLEFMKLPB, ' ');
+						GetProtectedUris().Add(item);
+						item = item2.GetValue().Read(ref LCCLEFMKLPB, ' ');
 					}
-					while (LCCLEFMKLPB < item2.OEAKCOHMIHH().Length);
+					while (LCCLEFMKLPB < item2.GetValue().Length);
 				}
 				break;
 			case "nonce":
-				MLKDAKOIOEC(item2.OEAKCOHMIHH());
+				SetNonce(item2.GetValue());
 				break;
 			case "qop":
-				KFNMAJDFPJK(item2.OEAKCOHMIHH());
+				SetQualityOfProtections(item2.GetValue());
 				break;
 			case "stale":
-				set_Stale(bool.Parse(item2.OEAKCOHMIHH()));
+				set_Stale(bool.Parse(item2.GetValue()));
 				break;
 			case "opaque":
-				JBDMKFHHGHE(item2.OEAKCOHMIHH());
+				SetOpaque(item2.GetValue());
 				break;
 			case "algorithm":
-				HCAIPEONAMO(item2.OEAKCOHMIHH());
+				SetAlgorithm(item2.GetValue());
 				break;
 			}
 		}
 	}
 
-	public string CIIGLAEHAOJ(HTTPRequest ONOCIELLAPL, Credentials JKBAHGNLECO)
+	public string GenerateResponseHeader(HTTPRequest ONOCIELLAPL, Credentials JKBAHGNLECO)
 	{
 		try
 		{
 			switch (get_Type())
 			{
-			case BMBGFBGIAPL.Basic:
-				return "Basic " + Convert.ToBase64String(Encoding.UTF8.GetBytes(string.Format("{0}:{1}", JKBAHGNLECO.BFFCEKDPNAM(), JKBAHGNLECO.LDEFEGOBBGO())));
-			case BMBGFBGIAPL.Digest:
+			case AuthenticationTypes.Basic:
+				return "Basic " + Convert.ToBase64String(Encoding.UTF8.GetBytes(string.Format("{0}:{1}", JKBAHGNLECO.GetUserName(), JKBAHGNLECO.GetPassword())));
+			case AuthenticationTypes.Digest:
 			{
-				set_NonceCount(PFLKBJDJLIK() + 1);
+				set_NonceCount(GetNonceCount() + 1);
 				string empty = string.Empty;
 				string text = new Random(ONOCIELLAPL.GetHashCode()).Next(int.MinValue, int.MaxValue).ToString("X8");
-				string text2 = PFLKBJDJLIK().ToString("X8");
-				switch (EFJHDNIJDNN().JONPEPOKJFC())
+				string text2 = GetNonceCount().ToString("X8");
+				switch (GetAlgorithm().TrimAndLower())
 				{
 				case "md5":
-					empty = string.Format("{0}:{1}:{2}", JKBAHGNLECO.BFFCEKDPNAM(), LAEOPDGLBMO(), JKBAHGNLECO.LDEFEGOBBGO()).DAOJIBHMOJK();
+					empty = string.Format("{0}:{1}:{2}", JKBAHGNLECO.GetUserName(), GetRealm(), JKBAHGNLECO.GetPassword()).CalculateMD5Hash();
 					break;
 				case "md5-sess":
-					if (string.IsNullOrEmpty(ADPBKDPPKIK()))
+					if (string.IsNullOrEmpty(GetHA1Sess()))
 					{
-						HPIBIHECJJP(string.Format("{0}:{1}:{2}:{3}:{4}", JKBAHGNLECO.BFFCEKDPNAM(), LAEOPDGLBMO(), JKBAHGNLECO.LDEFEGOBBGO(), CINJMLJPGGE(), text2).DAOJIBHMOJK());
+						SetHA1Sess(string.Format("{0}:{1}:{2}:{3}:{4}", JKBAHGNLECO.GetUserName(), GetRealm(), JKBAHGNLECO.GetPassword(), GetNonce(), text2).CalculateMD5Hash());
 					}
-					empty = ADPBKDPPKIK();
+					empty = GetHA1Sess();
 					break;
 				default:
 					return string.Empty;
 				}
 				string empty2 = string.Empty;
-				string text3 = ((OKNGMJFJPJM() == null) ? null : OKNGMJFJPJM().JONPEPOKJFC());
+				string text3 = ((GetQualityOfProtections() == null) ? null : GetQualityOfProtections().TrimAndLower());
 				if (text3 == null)
 				{
-					string arg = (ONOCIELLAPL.JCHNIGKBBMI().ToString().ToUpper() + ":" + ONOCIELLAPL.DKAECMGPGOE().PathAndQuery).DAOJIBHMOJK();
-					empty2 = string.Format("{0}:{1}:{2}", empty, CINJMLJPGGE(), arg).DAOJIBHMOJK();
+					string arg = (ONOCIELLAPL.GetMethodType().ToString().ToUpper() + ":" + ONOCIELLAPL.GetCurrentUri().PathAndQuery).CalculateMD5Hash();
+					empty2 = string.Format("{0}:{1}:{2}", empty, GetNonce(), arg).CalculateMD5Hash();
 				}
 				else if (text3.Contains("auth-int"))
 				{
 					text3 = "auth-int";
-					byte[] array = ONOCIELLAPL.JLLCKEFOEBF();
+					byte[] array = ONOCIELLAPL.GetEntityBody();
 					if (array == null)
 					{
 						array = string.Empty.GetASCIIBytes();
 					}
-					string text4 = string.Format("{0}:{1}:{2}", ONOCIELLAPL.JCHNIGKBBMI().ToString().ToUpper(), ONOCIELLAPL.DKAECMGPGOE().PathAndQuery, array.DAOJIBHMOJK()).DAOJIBHMOJK();
-					empty2 = string.Format("{0}:{1}:{2}:{3}:{4}:{5}", empty, CINJMLJPGGE(), text2, text, text3, text4).DAOJIBHMOJK();
+					string text4 = string.Format("{0}:{1}:{2}", ONOCIELLAPL.GetMethodType().ToString().ToUpper(), ONOCIELLAPL.GetCurrentUri().PathAndQuery, array.CalculateMD5Hash()).CalculateMD5Hash();
+					empty2 = string.Format("{0}:{1}:{2}:{3}:{4}:{5}", empty, GetNonce(), text2, text, text3, text4).CalculateMD5Hash();
 				}
 				else
 				{
@@ -390,17 +390,17 @@ internal sealed class Digest
 						return string.Empty;
 					}
 					text3 = "auth";
-					string text5 = (ONOCIELLAPL.JCHNIGKBBMI().ToString().ToUpper() + ":" + ONOCIELLAPL.DKAECMGPGOE().PathAndQuery).DAOJIBHMOJK();
-					empty2 = string.Format("{0}:{1}:{2}:{3}:{4}:{5}", empty, CINJMLJPGGE(), text2, text, text3, text5).DAOJIBHMOJK();
+					string text5 = (ONOCIELLAPL.GetMethodType().ToString().ToUpper() + ":" + ONOCIELLAPL.GetCurrentUri().PathAndQuery).CalculateMD5Hash();
+					empty2 = string.Format("{0}:{1}:{2}:{3}:{4}:{5}", empty, GetNonce(), text2, text, text3, text5).CalculateMD5Hash();
 				}
-				string text6 = string.Format("Digest username=\"{0}\", realm=\"{1}\", nonce=\"{2}\", uri=\"{3}\", cnonce=\"{4}\", response=\"{5}\"", JKBAHGNLECO.BFFCEKDPNAM(), LAEOPDGLBMO(), CINJMLJPGGE(), ONOCIELLAPL.OJBDMGBGJMA().PathAndQuery, text, empty2);
+				string text6 = string.Format("Digest username=\"{0}\", realm=\"{1}\", nonce=\"{2}\", uri=\"{3}\", cnonce=\"{4}\", response=\"{5}\"", JKBAHGNLECO.GetUserName(), GetRealm(), GetNonce(), ONOCIELLAPL.GetUri().PathAndQuery, text, empty2);
 				if (text3 != null)
 				{
 					text6 = string.Concat(text6, ", qop=\"" + text3 + "\", nc=" + text2);
 				}
-				if (!string.IsNullOrEmpty(NBDLOHFGNHI()))
+				if (!string.IsNullOrEmpty(GetOpaque()))
 				{
-					text6 = text6 + ", opaque=\"" + NBDLOHFGNHI() + "\"";
+					text6 = text6 + ", opaque=\"" + GetOpaque() + "\"";
 				}
 				return text6;
 			}
@@ -414,16 +414,16 @@ internal sealed class Digest
 
 	public bool IsUriProtected(Uri KJHNCLAJMLO)
 	{
-		if (string.CompareOrdinal(KJHNCLAJMLO.Host, OJBDMGBGJMA().Host) != 0)
+		if (string.CompareOrdinal(KJHNCLAJMLO.Host, GetUri().Host) != 0)
 		{
 			return false;
 		}
 		string text = KJHNCLAJMLO.ToString();
-		if (DGAJBCGFAKI() != null && DGAJBCGFAKI().Count > 0)
+		if (GetProtectedUris() != null && GetProtectedUris().Count > 0)
 		{
-			for (int i = 0; i < DGAJBCGFAKI().Count; i++)
+			for (int i = 0; i < GetProtectedUris().Count; i++)
 			{
-				if (text.Contains(DGAJBCGFAKI()[i]))
+				if (text.Contains(GetProtectedUris()[i]))
 				{
 					return true;
 				}

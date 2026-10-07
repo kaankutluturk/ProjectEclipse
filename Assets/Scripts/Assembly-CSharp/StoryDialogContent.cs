@@ -2,21 +2,21 @@ using UnityEngine;
 
 public class StoryDialogContent
 {
-	public enum MFHMNFAPAOH
+	public enum ContentType
 	{
 		CONTENT_TYPE_REGULAR = 0,
 		CONTENT_TYPE_PRICELINE = 1
 	}
 
-	public string GGDJIPKMKFC = string.Empty;
+	public string Text = string.Empty;
 
-	public string AJELOOEBCPO = string.Empty;
+	public string ButtonText = string.Empty;
 
-	public string LKIKHJNCBEI = string.Empty;
+	public string FontName = string.Empty;
 
-	public string DLKPBAJDHBO = string.Empty;
+	public string ItemName = string.Empty;
 
-	public string KEHBCHJDCND = string.Empty;
+	public string EnchantmentName = string.Empty;
 
 	public int Id;
 
@@ -24,59 +24,59 @@ public class StoryDialogContent
 
 	public bool CheckTimer;
 
-	public UserItem FGBNJDPGOFN;
+	public UserItem OwnedItem;
 
-	public RecipeItemInfo KMNGHHBCEGD;
+	public RecipeItemInfo Recipe;
 
-	public TextTimer MALKNOOGNBA;
+	public TextTimer ItemTimer;
 
-	public MFHMNFAPAOH NGEPEDCCMAI;
+	public ContentType Type;
 
-	public Color FontColor = Constants.PJJIMHMJPAL;
+	public Color FontColor = Constants.DialogTextColor;
 
-	public StoryDialogContent(string _text = "", string ADDKGJGCBMB = "", string KLIDPJCCAME = "", string MJEBMLFLLHO = "", int KMFDBBKMLOO = 0, int _id = -1, UserItem NKBIOFJMONB = null, TextTimer OIHKOMFCFME = null, MFHMNFAPAOH _type = MFHMNFAPAOH.CONTENT_TYPE_REGULAR, RecipeItemInfo DMDLCMBKEHA = null)
+	public StoryDialogContent(string _text = "", string ADDKGJGCBMB = "", string KLIDPJCCAME = "", string MJEBMLFLLHO = "", int KMFDBBKMLOO = 0, int _id = -1, UserItem NKBIOFJMONB = null, TextTimer OIHKOMFCFME = null, ContentType _type = ContentType.CONTENT_TYPE_REGULAR, RecipeItemInfo DMDLCMBKEHA = null)
 	{
-		GGDJIPKMKFC = _text;
-		AJELOOEBCPO = ADDKGJGCBMB;
-		DLKPBAJDHBO = KLIDPJCCAME;
-		KEHBCHJDCND = MJEBMLFLLHO;
+		Text = _text;
+		ButtonText = ADDKGJGCBMB;
+		ItemName = KLIDPJCCAME;
+		EnchantmentName = MJEBMLFLLHO;
 		Id = _id;
 		Timer = KMFDBBKMLOO;
-		FGBNJDPGOFN = NKBIOFJMONB;
-		KMNGHHBCEGD = DMDLCMBKEHA;
-		MALKNOOGNBA = OIHKOMFCFME;
-		NGEPEDCCMAI = _type;
+		OwnedItem = NKBIOFJMONB;
+		Recipe = DMDLCMBKEHA;
+		ItemTimer = OIHKOMFCFME;
+		Type = _type;
 	}
 
 	public StoryDialogContent(StoryDialogContent NOLFMPDGCOC)
 	{
-		GGDJIPKMKFC = NOLFMPDGCOC.GGDJIPKMKFC;
-		AJELOOEBCPO = NOLFMPDGCOC.AJELOOEBCPO;
-		DLKPBAJDHBO = NOLFMPDGCOC.DLKPBAJDHBO;
-		KEHBCHJDCND = NOLFMPDGCOC.KEHBCHJDCND;
+		Text = NOLFMPDGCOC.Text;
+		ButtonText = NOLFMPDGCOC.ButtonText;
+		ItemName = NOLFMPDGCOC.ItemName;
+		EnchantmentName = NOLFMPDGCOC.EnchantmentName;
 		Id = NOLFMPDGCOC.Id;
 		Timer = NOLFMPDGCOC.Timer;
-		FGBNJDPGOFN = NOLFMPDGCOC.FGBNJDPGOFN;
-		KMNGHHBCEGD = NOLFMPDGCOC.KMNGHHBCEGD;
-		MALKNOOGNBA = NOLFMPDGCOC.MALKNOOGNBA;
-		NGEPEDCCMAI = NOLFMPDGCOC.NGEPEDCCMAI;
+		OwnedItem = NOLFMPDGCOC.OwnedItem;
+		Recipe = NOLFMPDGCOC.Recipe;
+		ItemTimer = NOLFMPDGCOC.ItemTimer;
+		Type = NOLFMPDGCOC.Type;
 	}
 
-	public bool JHOPPPIADHN()
+	public bool RefreshItemTimer()
 	{
-		if (DLKPBAJDHBO != string.Empty || KEHBCHJDCND != string.Empty)
+		if (ItemName != string.Empty || EnchantmentName != string.Empty)
 		{
-			UserItem dKCHDHMLKHN = ListSF.CMGOCLGHNLH(DLKPBAJDHBO);
+			UserItem dKCHDHMLKHN = ListSF.GetUserItem(ItemName);
 			if (dKCHDHMLKHN == null)
 			{
 				Timer = 0L;
 			}
 			else
 			{
-				Timer = GameUtils.GetLeftTime(dKCHDHMLKHN.IJGAOHJNLAH());
+				Timer = GameUtils.GetLeftTime(dKCHDHMLKHN.GetDeliveryTimestamp());
 			}
 			CheckTimer = true;
-			FGBNJDPGOFN = dKCHDHMLKHN;
+			OwnedItem = dKCHDHMLKHN;
 			if (Timer == 0)
 			{
 				return false;

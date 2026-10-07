@@ -48,8 +48,8 @@ public static class RangedActorsUnity
     static object Field(object target,string name)=>target.GetType().GetField(name,Hidden|BindingFlags.Public).GetValue(target);
     static object Invoke(object target,string name,params object[] args)=>target.GetType().GetMethod(name,Hidden|BindingFlags.Public).Invoke(target,args);
     static void Check(bool condition,string message){checks++;if(!condition)throw new Exception(message);}
-    static Model[] Models(Fight fight)=>fight.LNDLFINJHDB.Where(m=>m!=null&&!(m is WeaponModel)&&m!=fight.GetPlayerModel()&&m!=fight.GetEnemyModel()).ToArray();
-    static WeaponModel[] Children(Fight fight)=>fight.LNDLFINJHDB.OfType<WeaponModel>().Where(m=>m.get_Name()=="example.ranged-actors.dart").ToArray();
+    static Model[] Models(Fight fight)=>fight.ActiveModels.Where(m=>m!=null&&!(m is WeaponModel)&&m!=fight.GetPlayerModel()&&m!=fight.GetEnemyModel()).ToArray();
+    static WeaponModel[] Children(Fight fight)=>fight.ActiveModels.OfType<WeaponModel>().Where(m=>m.get_Name()=="example.ranged-actors.dart").ToArray();
     static IModActor Actor(Fight fight,Model model)=>(IModActor)((IDictionary)Field(fight,"_eclipseActors"))[model];
     static ModFighterSnapshot Capture(Model model)=>(ModFighterSnapshot)typeof(Fight).GetNestedType("EclipseFighterOperations",BindingFlags.NonPublic).GetMethod("Capture",BindingFlags.Static|BindingFlags.NonPublic).Invoke(null,new object[]{model});
     static ModUiSurface Surface()
@@ -84,9 +84,9 @@ public static class RangedActorsUnity
                 if((bool)Field(title,"splashing")||(string)Field(title,"currentPage")!="Home")return;
                 Invoke(title,"BeginCampaign");var directory=SF2Paths.GetUserDataDirectory();
                 Check(directory.StartsWith(Application.persistentDataPath,StringComparison.OrdinalIgnoreCase)&&Application.persistentDataPath.Contains("RangedActorsUnity-"),"Profile not isolated");
-                var profile=XmlUtils.OpenXMLDocument(SF2Paths.KKIDGPBOBNI(),"usersDefault.xml",XmlUtils.EBLFEPIOMOL.Normal,true,XmlCryptoUtils.NNLGALNDJCL());
+                var profile=XmlUtils.OpenXMLDocument(SF2Paths.GetGameDataPath(),"usersDefault.xml",XmlUtils.XmlSourceMode.Normal,true,XmlCryptoUtils.GetIsEncryptionEnabled());
                 ((System.Xml.XmlElement)profile.SelectSingleNode("/Root/Warriors/Warrior[@ID='1']")).SetAttribute("Tutorial","END");
-                Directory.CreateDirectory(directory);XmlUtils.ONLDJNLKKAL(profile,Path.Combine(directory,Constants.OJMIJINKBPJ).Replace('\\','/'));campaign=true;return;
+                Directory.CreateDirectory(directory);XmlUtils.SaveDocumentWithHash(profile,Path.Combine(directory,Constants.UsersFileName).Replace('\\','/'));campaign=true;return;
             }
             if(!entered)
             {
@@ -95,7 +95,7 @@ public static class RangedActorsUnity
                 Check(!ModRuntime.Host.HasErrors,ModRuntime.Host.FormatReport());
                 Check(ModRuntime.Scripts.ActiveMods.Any(m=>m.Id.Value=="example.ranged-actors"),"Ranged example did not finish registration");
                 Check(ModRuntime.Host.EnabledMods.All(m=>m.Id.Value=="core"||m.Id.Value=="example.ranged-actors"),"Unexpected user mods");
-                var encounter=ListSF.CHMCKGCDGCM(new FightIDS(ModRuntime.Scripts.Content.RuntimeFightId(DefinitionId.Parse("core:fights/zone_1/tournament/3"))));
+                var encounter=ListSF.GetFightById(new FightIDS(ModRuntime.Scripts.Content.RuntimeFightId(DefinitionId.Parse("core:fights/zone_1/tournament/3"))));
                 Check(encounter!=null,"Core encounter missing");entered=GameUtils.StartFight(encounter,false,null,true,false);return;
             }
             var fight=Fight.GetCurrentFight();if(fight==null)return;accepted=fight;
@@ -167,7 +167,7 @@ public static class RangedActorsUnity
                     Check(((IList)Field(fight,"_eclipseProjectileSpawns")).Count==0,"Retirement left reserved spawn capacity");
                     Check(ended.Count==3&&ended.Values.All(count=>count==1),"Single actor retirement ended siblings or duplicated callbacks");
                     Check(Children(fight).Any(child=>child.GetRootModel()==Models(fight)[0]),"Retiring one actor removed its sibling's live children");
-                    Invoke(fight,"OBNEDPKCNKJ");Next(fight);break;
+                    Invoke(fight,"Surrender");Next(fight);break;
                 case 10:
                     if(Models(fight).Length!=0||Children(fight).Length!=0)return;
                     Check(((IDictionary)Field(fight,"_eclipseProjectiles")).Count==0&&((IList)Field(fight,"_eclipseProjectileSpawns")).Count==0&&surface.IsClosed,"Surrender retained projectile ownership, births or HUD");

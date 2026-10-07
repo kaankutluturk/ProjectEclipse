@@ -5,24 +5,24 @@ using UnityEngine;
 
 public class QuestActionStoryTutorialMove : QuestAction
 {
-	private int CAGOGNNAONE;
+	private int moveCount;
 
-	private int BABODCPGPEN = 3;
+	private int requiredMoveCount = 3;
 
 	private IEnumerator _WaitTimeCoroutine;
 
 	private bool _LastAnimationIsMove;
 
-	public override void DEJMHFMLKIC(QuestParameters GFIHPBCEEOB)
+	public override void Execute(QuestParameters GFIHPBCEEOB)
 	{
-		base.DEJMHFMLKIC(GFIHPBCEEOB);
+		base.Execute(GFIHPBCEEOB);
 		MainMenu.get_Instance().SetEnabled(false);
 		Fight gDBOMJODDEA = Fight.GetCurrentFight();
 		Stick joystick = gDBOMJODDEA.Controller.GetJoystick();
 		joystick.SetIsFlashing(true);
-		Model fGCODGKLHED = gDBOMJODDEA.LNDLFINJHDB[0];
+		Model fGCODGKLHED = gDBOMJODDEA.ActiveModels[0];
 		fGCODGKLHED.AddEventListener(2, OnAnimationStart);
-		_WaitTimeCoroutine = IGIJPMDLDEL();
+		_WaitTimeCoroutine = WaitForTimeout();
 		CoroutineManager.get_Current().StartRoutine(_WaitTimeCoroutine);
 	}
 
@@ -31,28 +31,28 @@ public class QuestActionStoryTutorialMove : QuestAction
 		if (_LastAnimationIsMove)
 		{
 			_LastAnimationIsMove = false;
-			CAGOGNNAONE++;
-			if (CAGOGNNAONE >= BABODCPGPEN)
+			moveCount++;
+			if (moveCount >= requiredMoveCount)
 			{
-				DPAAINCBKBF();
+				CompleteStep();
 			}
 		}
 		Fight gDBOMJODDEA = Fight.GetCurrentFight();
-		Model fGCODGKLHED = gDBOMJODDEA.LNDLFINJHDB[0];
-		InfoAnimation.MGHNBEPCKIF dFLPNNBIFFN = fGCODGKLHED.DFLPNNBIFFN;
-		if (dFLPNNBIFFN == InfoAnimation.MGHNBEPCKIF.AnimationMove)
+		Model fGCODGKLHED = gDBOMJODDEA.ActiveModels[0];
+		InfoAnimation.AnimationKind dFLPNNBIFFN = fGCODGKLHED.LastAnimationType;
+		if (dFLPNNBIFFN == InfoAnimation.AnimationKind.AnimationMove)
 		{
 			_LastAnimationIsMove = true;
 		}
 	}
 
-	private IEnumerator IGIJPMDLDEL()
+	private IEnumerator WaitForTimeout()
 	{
-		yield return new WaitForSeconds(GameUtils.AKPBNLKFONO.DefaultTutorialStepTimeout);
-		DPAAINCBKBF();
+		yield return new WaitForSeconds(GameUtils.TutorialSettings.DefaultTutorialStepTimeout);
+		CompleteStep();
 	}
 
-	private void DPAAINCBKBF()
+	private void CompleteStep()
 	{
 		if (_WaitTimeCoroutine != null)
 		{
@@ -62,8 +62,8 @@ public class QuestActionStoryTutorialMove : QuestAction
 		Fight gDBOMJODDEA = Fight.GetCurrentFight();
 		Stick joystick = gDBOMJODDEA.Controller.GetJoystick();
 		joystick.SetIsFlashing(false);
-		Model fGCODGKLHED = gDBOMJODDEA.LNDLFINJHDB[0];
+		Model fGCODGKLHED = gDBOMJODDEA.ActiveModels[0];
 		fGCODGKLHED.RemoveEventListener(2, OnAnimationStart);
-		OGIJONMKABB();
+		FinishAction();
 	}
 }

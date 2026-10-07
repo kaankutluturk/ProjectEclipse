@@ -3,61 +3,61 @@ using UnityEngine;
 
 public class DistancePointFollow : DistancePoint
 {
-	private bool MJPLGHIKGPG;
+	private bool follow;
 
-	private bool EIBLPPEGAMJ;
+	private bool isPositionComputed;
 
 	private Vector3 _ComputedPosition;
 
 	public DistancePointFollow()
 	{
-		EIBLPPEGAMJ = false;
+		isPositionComputed = false;
 	}
 
 	public DistancePointFollow(XmlNode node)
 		: base(node)
 	{
-		EIBLPPEGAMJ = false;
+		isPositionComputed = false;
 	}
 
 	public override void Create(XmlNode node)
 	{
 		base.Create(node);
-		MJPLGHIKGPG = node.Attributes["Follow"].ParseBool();
+		follow = node.Attributes["Follow"].ParseBool();
 	}
 
-	public override float ILIKNABGPNK(ModelConditions conditions)
+	public override float GetX(ModelConditions conditions)
 	{
-		EJDNAPALIDH(conditions);
-		if (!conditions.FAHHBNIFAMB)
+		UpdateComputedPosition(conditions);
+		if (!conditions.HasOther)
 		{
 			return 0f;
 		}
 		return _ComputedPosition.x;
 	}
 
-	public override float MJPKHPNIJGK(ModelConditions conditions)
+	public override float GetY(ModelConditions conditions)
 	{
-		EJDNAPALIDH(conditions);
-		if (!conditions.FAHHBNIFAMB)
+		UpdateComputedPosition(conditions);
+		if (!conditions.HasOther)
 		{
 			return 0f;
 		}
 		return -1f * _ComputedPosition.y;
 	}
 
-	public override Vector3 EMGKDOAMBOH(ModelConditions conditions)
+	public override Vector3 GetPosition(ModelConditions conditions)
 	{
-		EJDNAPALIDH(conditions);
+		UpdateComputedPosition(conditions);
 		return _ComputedPosition;
 	}
 
-	private void EJDNAPALIDH(ModelConditions conditions)
+	private void UpdateComputedPosition(ModelConditions conditions)
 	{
-		if (MJPLGHIKGPG || !EIBLPPEGAMJ)
+		if (follow || !isPositionComputed)
 		{
-			_ComputedPosition = base.EMGKDOAMBOH(conditions);
-			EIBLPPEGAMJ = true;
+			_ComputedPosition = base.GetPosition(conditions);
+			isPositionComputed = true;
 		}
 	}
 }

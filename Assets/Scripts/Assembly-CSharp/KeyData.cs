@@ -3,26 +3,26 @@ using System.Runtime.CompilerServices;
 
 public class KeyData
 {
-	public enum MCIDLLKHKDE
+	public enum PressType
 	{
 		BOTH = 0,
 		SEQUENCE = 1
 	}
 
-	public class JABEIBOFKDM
+	public class DistanceRange
 	{
-		public float DPGMCKCDMBC;
+		public float Min;
 
-		public float EBDBPJNBHGI;
+		public float Max;
 	}
 
 	public class Distances
 	{
-		public JABEIBOFKDM GAIBPAGPEGK;
+		public DistanceRange NearRange;
 
-		public JABEIBOFKDM DEJPGJNPKFC;
+		public DistanceRange MiddleRange;
 
-		public JABEIBOFKDM DJJJNIEAKGJ;
+		public DistanceRange FarRange;
 
 		public Distances()
 		{
@@ -30,48 +30,48 @@ public class KeyData
 
 		public Distances(Distances NBMGOEMJJAF)
 		{
-			GAIBPAGPEGK = NBMGOEMJJAF.GAIBPAGPEGK;
-			DEJPGJNPKFC = NBMGOEMJJAF.DEJPGJNPKFC;
-			DJJJNIEAKGJ = NBMGOEMJJAF.DJJJNIEAKGJ;
+			NearRange = NBMGOEMJJAF.NearRange;
+			MiddleRange = NBMGOEMJJAF.MiddleRange;
+			FarRange = NBMGOEMJJAF.FarRange;
 		}
 	}
 
-	public List<int> IGEEOAGOMEM = new List<int>();
+	public List<int> StarterKeys = new List<int>();
 
-	public List<int> CEPODJDDLBF = new List<int>();
+	public List<int> AdditionalKeys = new List<int>();
 
-	public List<int> HPEOJLAMIHC = new List<int>();
+	public List<int> ReleaseKeys = new List<int>();
 
-	public Distances CAGHDJNDFLJ = new Distances();
+	public Distances DistanceRanges = new Distances();
 
-	public MCIDLLKHKDE HGPMABCJGGN;
+	public PressType PressTypeMode;
 
 	public bool IsInverted;
 
 	public KeyData()
 	{
 		IsInverted = false;
-		HGPMABCJGGN = MCIDLLKHKDE.BOTH;
+		PressTypeMode = PressType.BOTH;
 	}
 
 	public KeyData(KeyData NBMGOEMJJAF)
 	{
-		IGEEOAGOMEM = new List<int>(NBMGOEMJJAF.IGEEOAGOMEM);
-		CEPODJDDLBF = new List<int>(NBMGOEMJJAF.CEPODJDDLBF);
-		HPEOJLAMIHC = new List<int>(NBMGOEMJJAF.HPEOJLAMIHC);
-		CAGHDJNDFLJ = new Distances(NBMGOEMJJAF.CAGHDJNDFLJ);
-		HGPMABCJGGN = NBMGOEMJJAF.HGPMABCJGGN;
+		StarterKeys = new List<int>(NBMGOEMJJAF.StarterKeys);
+		AdditionalKeys = new List<int>(NBMGOEMJJAF.AdditionalKeys);
+		ReleaseKeys = new List<int>(NBMGOEMJJAF.ReleaseKeys);
+		DistanceRanges = new Distances(NBMGOEMJJAF.DistanceRanges);
+		PressTypeMode = NBMGOEMJJAF.PressTypeMode;
 		IsInverted = NBMGOEMJJAF.IsInverted;
 	}
 
 	public void Set(KeyData NBMGOEMJJAF)
 	{
 		Clear();
-		IGEEOAGOMEM.Clear();
-		IGEEOAGOMEM.AddRange(NBMGOEMJJAF.IGEEOAGOMEM);
-		CEPODJDDLBF.AddRange(NBMGOEMJJAF.CEPODJDDLBF);
-		HPEOJLAMIHC.AddRange(NBMGOEMJJAF.HPEOJLAMIHC);
-		HGPMABCJGGN = NBMGOEMJJAF.HGPMABCJGGN;
+		StarterKeys.Clear();
+		StarterKeys.AddRange(NBMGOEMJJAF.StarterKeys);
+		AdditionalKeys.AddRange(NBMGOEMJJAF.AdditionalKeys);
+		ReleaseKeys.AddRange(NBMGOEMJJAF.ReleaseKeys);
+		PressTypeMode = NBMGOEMJJAF.PressTypeMode;
 	}
 
 	public KeyData Copy()
@@ -83,27 +83,27 @@ public class KeyData
 	{
 		if (AOJJBKLCHJO < 0)
 		{
-			MirrorKeys(CEPODJDDLBF);
-			MirrorKeys(IGEEOAGOMEM);
-			MirrorKeys(HPEOJLAMIHC);
+			MirrorKeys(AdditionalKeys);
+			MirrorKeys(StarterKeys);
+			MirrorKeys(ReleaseKeys);
 		}
 	}
 
 	public bool IsVariable(KeyData OKJABKNIBEO)
 	{
-		return CompareKeys(IGEEOAGOMEM, OKJABKNIBEO.IGEEOAGOMEM) && CompareKeys(CEPODJDDLBF, OKJABKNIBEO.CEPODJDDLBF) && CompareKeys(HPEOJLAMIHC, OKJABKNIBEO.HPEOJLAMIHC);
+		return CompareKeys(StarterKeys, OKJABKNIBEO.StarterKeys) && CompareKeys(AdditionalKeys, OKJABKNIBEO.AdditionalKeys) && CompareKeys(ReleaseKeys, OKJABKNIBEO.ReleaseKeys);
 	}
 
 	public void Clear()
 	{
-		CEPODJDDLBF.Clear();
-		HPEOJLAMIHC.Clear();
-		HGPMABCJGGN = MCIDLLKHKDE.BOTH;
+		AdditionalKeys.Clear();
+		ReleaseKeys.Clear();
+		PressTypeMode = PressType.BOTH;
 	}
 
-	public string EIHLEEHGEEO()
+	public string ToDebugString()
 	{
-		if (IGEEOAGOMEM.Count == 0 && CEPODJDDLBF.Count == 0)
+		if (StarterKeys.Count == 0 && AdditionalKeys.Count == 0)
 		{
 			return string.Empty;
 		}
@@ -111,39 +111,39 @@ public class KeyData
 		string empty = string.Empty;
 		string text = "KeyData: ";
 		text += "starter:";
-		foreach (int item in IGEEOAGOMEM)
+		foreach (int item in StarterKeys)
 		{
-			empty = ((num < IGEEOAGOMEM.Count - 1) ? "," : string.Empty);
+			empty = ((num < StarterKeys.Count - 1) ? "," : string.Empty);
 			text = text + item + empty;
 			num++;
 		}
 		num = 0;
 		text += " additional:";
-		foreach (int item2 in CEPODJDDLBF)
+		foreach (int item2 in AdditionalKeys)
 		{
-			empty = ((num < CEPODJDDLBF.Count - 1) ? "," : string.Empty);
+			empty = ((num < AdditionalKeys.Count - 1) ? "," : string.Empty);
 			text = text + item2 + empty;
 			num++;
 		}
 		text += " pressType:";
-		switch (HGPMABCJGGN)
+		switch (PressTypeMode)
 		{
-		case MCIDLLKHKDE.BOTH:
+		case PressType.BOTH:
 			return text + "BOTH";
-		case MCIDLLKHKDE.SEQUENCE:
+		case PressType.SEQUENCE:
 			return text + "SEQUENCE";
 		default:
 			return text + "? ";
 		}
 	}
 
-	public string HDIPIBOONDG()
+	public string ToDisplayString()
 	{
 		string text = string.Empty;
 		int i = 0;
-		for (int count = IGEEOAGOMEM.Count; i < count; i++)
+		for (int count = StarterKeys.Count; i < count; i++)
 		{
-			int mJGKGLGJHHK = IGEEOAGOMEM[i];
+			int mJGKGLGJHHK = StarterKeys[i];
 			text += KeyToString(mJGKGLGJHHK);
 			if (i < count - 1)
 			{
@@ -152,9 +152,9 @@ public class KeyData
 		}
 		text += " ADD: ";
 		int j = 0;
-		for (int count2 = CEPODJDDLBF.Count; j < count2; j++)
+		for (int count2 = AdditionalKeys.Count; j < count2; j++)
 		{
-			int mJGKGLGJHHK2 = CEPODJDDLBF[j];
+			int mJGKGLGJHHK2 = AdditionalKeys[j];
 			text += KeyToString(mJGKGLGJHHK2);
 			if (j < count2 - 1)
 			{
@@ -162,12 +162,12 @@ public class KeyData
 			}
 		}
 		text += " PressType: ";
-		switch (HGPMABCJGGN)
+		switch (PressTypeMode)
 		{
-		case MCIDLLKHKDE.BOTH:
+		case PressType.BOTH:
 			text += "Both";
 			break;
-		case MCIDLLKHKDE.SEQUENCE:
+		case PressType.SEQUENCE:
 			text += "Sequence";
 			break;
 		}
@@ -176,29 +176,29 @@ public class KeyData
 
 	public void ResetPressType()
 	{
-		if (IGEEOAGOMEM.Count == 1)
+		if (StarterKeys.Count == 1)
 		{
-			HGPMABCJGGN = MCIDLLKHKDE.BOTH;
+			PressTypeMode = PressType.BOTH;
 			return;
 		}
-		foreach (int item in IGEEOAGOMEM)
+		foreach (int item in StarterKeys)
 		{
-			foreach (int item2 in CEPODJDDLBF)
+			foreach (int item2 in AdditionalKeys)
 			{
 				if (item == item2)
 				{
-					HGPMABCJGGN = MCIDLLKHKDE.BOTH;
+					PressTypeMode = PressType.BOTH;
 					return;
 				}
 			}
 		}
-		HGPMABCJGGN = MCIDLLKHKDE.SEQUENCE;
+		PressTypeMode = PressType.SEQUENCE;
 	}
 
 	[SpecialName]
-	public static bool LFPMCJPCJBD(KeyData LHBNIMGFKIB, KeyData AAOIAEJJINO)
+	public static bool AreEqual(KeyData LHBNIMGFKIB, KeyData AAOIAEJJINO)
 	{
-		if (LHBNIMGFKIB.IsInverted == AAOIAEJJINO.IsInverted && LHBNIMGFKIB.HGPMABCJGGN == AAOIAEJJINO.HGPMABCJGGN && LHBNIMGFKIB.IGEEOAGOMEM.Count == AAOIAEJJINO.IGEEOAGOMEM.Count && LHBNIMGFKIB.CEPODJDDLBF.Count == AAOIAEJJINO.CEPODJDDLBF.Count && LHBNIMGFKIB.IGEEOAGOMEM == AAOIAEJJINO.IGEEOAGOMEM && LHBNIMGFKIB.CEPODJDDLBF == AAOIAEJJINO.CEPODJDDLBF)
+		if (LHBNIMGFKIB.IsInverted == AAOIAEJJINO.IsInverted && LHBNIMGFKIB.PressTypeMode == AAOIAEJJINO.PressTypeMode && LHBNIMGFKIB.StarterKeys.Count == AAOIAEJJINO.StarterKeys.Count && LHBNIMGFKIB.AdditionalKeys.Count == AAOIAEJJINO.AdditionalKeys.Count && LHBNIMGFKIB.StarterKeys == AAOIAEJJINO.StarterKeys && LHBNIMGFKIB.AdditionalKeys == AAOIAEJJINO.AdditionalKeys)
 		{
 			return true;
 		}
@@ -206,9 +206,9 @@ public class KeyData
 	}
 
 	[SpecialName]
-	public static bool GLCJKGIOIEC(KeyData LHBNIMGFKIB, KeyData AAOIAEJJINO)
+	public static bool AreNotEqual(KeyData LHBNIMGFKIB, KeyData AAOIAEJJINO)
 	{
-		return !LFPMCJPCJBD(LHBNIMGFKIB, AAOIAEJJINO);
+		return !AreEqual(LHBNIMGFKIB, AAOIAEJJINO);
 	}
 
 	private static void MirrorKeys(List<int> EGJHGBCEPHO)
@@ -241,7 +241,7 @@ public class KeyData
 
 	private static bool CompareKeys(List<int> BMKNHNOGIHO, List<int> GDOOLJGKOMG)
 	{
-		return GDOOLJGKOMG.ANNPHPHLNEH(BMKNHNOGIHO);
+		return GDOOLJGKOMG.ContainsAllItems(BMKNHNOGIHO);
 	}
 
 	private static string KeyToString(int MJGKGLGJHHK)

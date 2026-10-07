@@ -49,16 +49,16 @@ public static class ArenaUnity
                 typeof(Eclipse.UI.TitleScreen).GetMethod("BeginCampaign",Hidden).Invoke(title,null);
                 var directory=SF2Paths.GetUserDataDirectory();
                 Check(Eclipse.Saves.CampaignSaveSession.PreviewDirectory==null&&directory.StartsWith(Application.persistentDataPath,StringComparison.OrdinalIgnoreCase)&&Application.persistentDataPath.Contains("ArenaUnity-"),"Profile not isolated");
-                var profile=XmlUtils.OpenXMLDocument(SF2Paths.KKIDGPBOBNI(),"usersDefault.xml",XmlUtils.EBLFEPIOMOL.Normal,true,XmlCryptoUtils.NNLGALNDJCL());
+                var profile=XmlUtils.OpenXMLDocument(SF2Paths.GetGameDataPath(),"usersDefault.xml",XmlUtils.XmlSourceMode.Normal,true,XmlCryptoUtils.GetIsEncryptionEnabled());
                 ((System.Xml.XmlElement)profile.SelectSingleNode("/Root/Warriors/Warrior[@ID='1']")).SetAttribute("Tutorial","END");
-                Directory.CreateDirectory(directory);XmlUtils.ONLDJNLKKAL(profile,Path.Combine(directory,Constants.OJMIJINKBPJ).Replace('\\','/'));
+                Directory.CreateDirectory(directory);XmlUtils.SaveDocumentWithHash(profile,Path.Combine(directory,Constants.UsersFileName).Replace('\\','/'));
                 campaign=true;return;
             }
             if(!entered){
                 if(ModRuntime.Scripts==null||Module.GetInstance()==null||Eclipse.UI.TitleScreen.IsOpen||UnityEngine.Object.FindFirstObjectByType<Eclipse.UI.EclipseLoadingOverlay>()!=null)return;
                 var screen=Module.GetInstance().GetCurrentScreenType();if(screen!=ScreenType.ModuleDojo&&screen!=ScreenType.ModuleMap)return;
                 Check(!ModRuntime.Host.HasErrors,ModRuntime.Host.FormatReport());Check(ModRuntime.Host.EnabledMods.Any(m=>m.Id.Value=="example.pulse-arena"),"Pulse Arena not enabled");Check(!ModRuntime.Scripts.HasErrors,"Startup mod errors");
-                var encounter=ListSF.CHMCKGCDGCM(new FightIDS(ModRuntime.Scripts.Content.RuntimeFightId(DefinitionId.Parse("core:fights/zone_1/tournament/3"))));
+                var encounter=ListSF.GetFightById(new FightIDS(ModRuntime.Scripts.Content.RuntimeFightId(DefinitionId.Parse("core:fights/zone_1/tournament/3"))));
                 Check(encounter!=null,"Core encounter missing");entered=GameUtils.StartFight(encounter,false,null,true,false);return;
             }
             var fight=Fight.GetCurrentFight();if(fight==null||fight.get_FightTimeInFrames()<10)return;
@@ -79,43 +79,43 @@ public static class ArenaUnity
                 Check(initialUV.Max(v=>v.y)-initialUV.Min(v=>v.y)<.251f,"Sprite crop expanded into whole atlas");
                 var type=typeof(Fight).GetNestedType("EclipseFighterOperations",BindingFlags.NonPublic);
                 sensor=(IModFighterRegions)Activator.CreateInstance(type,new object[]{fight,player,null,null,null,null,false});
-                var pos=player.PLBNCDCFPML();player.ShiftModelPosition(new Vector3f((float)(region.X+80)-pos.GetX(),0,0),true);
-                var other=enemy.PLBNCDCFPML();enemy.ShiftModelPosition(new Vector3f((float)(region.X+region.Width+350)-other.GetX(),0,0),true);
+                var pos=player.GetPosition();player.ShiftModelPosition(new Vector3f((float)(region.X+80)-pos.GetX(),0,0),true);
+                var other=enemy.GetPosition();enemy.ShiftModelPosition(new Vector3f((float)(region.X+region.Width+350)-other.GetX(),0,0),true);
                 Check(Inside(region),"Actual native player capsules did not overlap column");
                 Check(!Inside(new ModArenaRect(8000,8000,20,20)),"Far empty region overlapped");
                 Check(!Inside(new ModArenaRect(-50,-10000,20,20)),"Wrong Y region overlapped");
                 Check(Markers()[0].sharedMaterial.color.g>.7f&&Markers()[0].sharedMaterial.color.a<.5f,"Warning material");
                 var transform=Markers()[0].transform;Check(transform.parent==player.GetRenderObject().transform.parent,"Marker not arena-owned");
                 Check(Vector3.Distance(transform.TransformPoint(new Vector3((float)region.X,(float)region.Y,-.25f)),player.GetRenderObject().transform.TransformPoint(new Vector3((float)region.X,(float)region.Y,-.25f)))<.001f,"Marker/native coordinate projection mismatch");
-                health=player.KKMCHCNOHMB();new GameObject("Pulse capture").AddComponent<ArenaCapture>();Next();break;
+                health=player.GetLife();new GameObject("Pulse capture").AddComponent<ArenaCapture>();Next();break;
             case 1:
                 if(surface.Read("status").Text!="Pulse active")return;
                 if(surface.Read("contacts").Text=="Contacts: 0")return;
                 Check(Markers().Length==1&&Markers()[0].sharedMaterial.color.g<.3f,"Shipped active warning recolor");
-                Check(player.KKMCHCNOHMB()<health,"Actual Lua hazard failed native health loss");
+                Check(player.GetLife()<health,"Actual Lua hazard failed native health loss");
                 Check(surface.Read("contacts").Text!="Contacts: 0","Actual Lua capsule sensor/contact counter: "+surface.Read("contacts").Text+" failures="+string.Join(";",ModRuntime.Scripts.CallbackDiagnostics.RecentFailures.Select(f=>f.ToString())));
                 Check(Markers()[0].GetComponent<MeshFilter>().sharedMesh==initialMesh&&Markers()[0].sharedMaterial==initialMaterial,"Artwork update respawned geometry/material");
                 Check(!initialMesh.uv.SequenceEqual(initialUV),"Native atlas UVs did not animate across warning/active phases");
                 Check(Math.Abs(initialMesh.bounds.min.x-initialX)>1&&fight.get_FightTimeInFrames()>movementFrame,"Native sprite rectangle did not follow Lua sweep");
                 pausedVertices=initialMesh.vertices;pausedUV=initialMesh.uv;
                 new GameObject("Active pulse capture").AddComponent<ArenaActiveCapture>();
-                fight.SetPaused(true);health=player.KKMCHCNOHMB();pausedFrame=fight.get_FightTimeInFrames();Next();break;
+                fight.SetPaused(true);health=player.GetLife();pausedFrame=fight.get_FightTimeInFrames();Next();break;
             case 2:
                 if(elapsed<.5)return;
                 Check(fight.get_FightTimeInFrames()==pausedFrame,"Paused simulation advanced hazard clock");
-                Check(Math.Abs(player.KKMCHCNOHMB()-health)<.00001,"Paused hazard damaged fighter");
+                Check(Math.Abs(player.GetLife()-health)<.00001,"Paused hazard damaged fighter");
                 Check(Markers().Length==1&&Markers()[0].sharedMaterial.color.g<.3f,"Pause lost current marker");
                 Check(initialMesh.vertices.SequenceEqual(pausedVertices)&&initialMesh.uv.SequenceEqual(pausedUV),"Pause advanced Lua sprite geometry or atlas frame");
                 fight.SetPaused(false);Next();break;
             case 3:
                 if(surface.Read("status").Text!="Safe: pulse recovering")return;
-                Check(player.KKMCHCNOHMB()<health,"Resumed hazard failed subsequent pulse");
-                Check(Markers().Length==0,"Recovery retained native marker");health=player.KKMCHCNOHMB();Next();break;
+                Check(player.GetLife()<health,"Resumed hazard failed subsequent pulse");
+                Check(Markers().Length==0,"Recovery retained native marker");health=player.GetLife();Next();break;
             case 4:
                 if(surface.Read("status").Text!="Warning: leave the column")return;
-                Check(Math.Abs(player.KKMCHCNOHMB()-health)<.00001,"Safe phase inflicted health loss");Check(Markers().Length==1,"Next cycle did not create owned marker");
+                Check(Math.Abs(player.GetLife()-health)<.00001,"Safe phase inflicted health loss");Check(Markers().Length==1,"Next cycle did not create owned marker");
                 // Move out of the column. Geometric sampling must follow actual pose.
-                var here=player.PLBNCDCFPML();player.ShiftModelPosition(new Vector3f((float)(region.X-350)-here.GetX(),0,0),true);
+                var here=player.GetPosition();player.ShiftModelPosition(new Vector3f((float)(region.X-350)-here.GetX(),0,0),true);
                 Check(!Inside(region),"Displaced native rig still overlaps fixed sensor");
                 scope=new ModArenaMarkerScope();Check(scope.TryCreate(sensor,region,new ModUiColor("#33ccff66"),out var owned,out var failure),failure);
                 Check(owned.IsActive,"Owned native marker inactive");scope.Dispose();Check(!owned.IsActive,"Scope disposal retained marker");
@@ -126,7 +126,7 @@ public static class ArenaUnity
                 // Unclaimed native marker proves automatic cleanup independently of
                 // the example's explicit Lua on_round_end remove.
                 Check(sensor.TryMarkRect(region,new ModUiColor("#33ccff66"),out orphan,out failure),failure);
-                typeof(Fight).GetMethod("HCNDAFDHACI",Hidden).Invoke(fight,new object[]{GameOverTypes.GAME_OVER_SURRENDER});
+                typeof(Fight).GetMethod("AbortFight",Hidden).Invoke(fight,new object[]{GameOverTypes.GAME_OVER_SURRENDER});
                 Check(surface.IsClosed,"Surrender left shipped HUD");Check(!orphan.IsActive,"Surrender left unclaimed native marker");
                 Check(!sensor.TryOverlapRect(region,out _,out _),"Ended round permitted native sensor");
                 long before=ModRuntime.Scripts.CallbackDiagnostics.TimedCalls;

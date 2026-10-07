@@ -6,19 +6,19 @@ using YamlDotNet.Core;
 
 public sealed class MergingParser : IParser
 {
-	private class JLKAJHOJBDF : IParsingEventVisitor
+	private class ParsingEventCloner : IParsingEventVisitor
 	{
-		private ParsingEvent ACADPLINCAN;
+		private ParsingEvent clonedEvent;
 
 		public ParsingEvent Clone(ParsingEvent FOPOKALJIIJ)
 		{
-			FOPOKALJIIJ.GPHIFFOGOGN(this);
-			return ACADPLINCAN;
+			FOPOKALJIIJ.Accept(this);
+			return clonedEvent;
 		}
 
 		void IParsingEventVisitor.Visit(AnchorAlias FOPOKALJIIJ)
 		{
-			ACADPLINCAN = new AnchorAlias(FOPOKALJIIJ.OEAKCOHMIHH(), FOPOKALJIIJ.OGPHJPFHBJL(), FOPOKALJIIJ.GDJHIJHFPHA());
+			clonedEvent = new AnchorAlias(FOPOKALJIIJ.GetValue(), FOPOKALJIIJ.GetStart(), FOPOKALJIIJ.GetEnd());
 		}
 
 		void IParsingEventVisitor.Visit(StreamStart FOPOKALJIIJ)
@@ -26,7 +26,7 @@ public sealed class MergingParser : IParser
 			throw new NotSupportedException();
 		}
 
-		void IParsingEventVisitor.Visit(HNKFEGCMBJB FOPOKALJIIJ)
+		void IParsingEventVisitor.Visit(StreamEndEvent FOPOKALJIIJ)
 		{
 			throw new NotSupportedException();
 		}
@@ -43,27 +43,27 @@ public sealed class MergingParser : IParser
 
 		void IParsingEventVisitor.Visit(Scalar FOPOKALJIIJ)
 		{
-			ACADPLINCAN = new Scalar(null, FOPOKALJIIJ.LOIGCKFONHJ(), FOPOKALJIIJ.OEAKCOHMIHH(), FOPOKALJIIJ.HALCJLMJDII(), FOPOKALJIIJ.BIDLJMEAFMI(), FOPOKALJIIJ.NIENIKOPKOG(), FOPOKALJIIJ.OGPHJPFHBJL(), FOPOKALJIIJ.GDJHIJHFPHA());
+			clonedEvent = new Scalar(null, FOPOKALJIIJ.GetTag(), FOPOKALJIIJ.GetValue(), FOPOKALJIIJ.GetStyle(), FOPOKALJIIJ.GetIsPlainImplicit(), FOPOKALJIIJ.GetIsQuotedImplicit(), FOPOKALJIIJ.GetStart(), FOPOKALJIIJ.GetEnd());
 		}
 
-		void IParsingEventVisitor.Visit(JODGINIKFJF FOPOKALJIIJ)
+		void IParsingEventVisitor.Visit(SequenceStart FOPOKALJIIJ)
 		{
-			ACADPLINCAN = new JODGINIKFJF(null, FOPOKALJIIJ.LOIGCKFONHJ(), FOPOKALJIIJ.BBBGHODAEIN(), FOPOKALJIIJ.HALCJLMJDII(), FOPOKALJIIJ.OGPHJPFHBJL(), FOPOKALJIIJ.GDJHIJHFPHA());
+			clonedEvent = new SequenceStart(null, FOPOKALJIIJ.GetTag(), FOPOKALJIIJ.GetIsImplicit(), FOPOKALJIIJ.GetStyle(), FOPOKALJIIJ.GetStart(), FOPOKALJIIJ.GetEnd());
 		}
 
-		void IParsingEventVisitor.Visit(AKMKLAINLOL FOPOKALJIIJ)
+		void IParsingEventVisitor.Visit(SequenceEnd FOPOKALJIIJ)
 		{
-			ACADPLINCAN = new AKMKLAINLOL(FOPOKALJIIJ.OGPHJPFHBJL(), FOPOKALJIIJ.GDJHIJHFPHA());
+			clonedEvent = new SequenceEnd(FOPOKALJIIJ.GetStart(), FOPOKALJIIJ.GetEnd());
 		}
 
 		void IParsingEventVisitor.Visit(MappingStart FOPOKALJIIJ)
 		{
-			ACADPLINCAN = new MappingStart(null, FOPOKALJIIJ.LOIGCKFONHJ(), FOPOKALJIIJ.BBBGHODAEIN(), FOPOKALJIIJ.HALCJLMJDII(), FOPOKALJIIJ.OGPHJPFHBJL(), FOPOKALJIIJ.GDJHIJHFPHA());
+			clonedEvent = new MappingStart(null, FOPOKALJIIJ.GetTag(), FOPOKALJIIJ.GetIsImplicit(), FOPOKALJIIJ.GetStyle(), FOPOKALJIIJ.GetStart(), FOPOKALJIIJ.GetEnd());
 		}
 
-		void IParsingEventVisitor.Visit(BLFPJCPALDH FOPOKALJIIJ)
+		void IParsingEventVisitor.Visit(MappingEnd FOPOKALJIIJ)
 		{
-			ACADPLINCAN = new BLFPJCPALDH(FOPOKALJIIJ.OGPHJPFHBJL(), FOPOKALJIIJ.GDJHIJHFPHA());
+			clonedEvent = new MappingEnd(FOPOKALJIIJ.GetStart(), FOPOKALJIIJ.GetEnd());
 		}
 
 		void IParsingEventVisitor.Visit(Comment FOPOKALJIIJ)
@@ -72,81 +72,81 @@ public sealed class MergingParser : IParser
 		}
 	}
 
-	private readonly List<ParsingEvent> CHKBHFONNGG = new List<ParsingEvent>();
+	private readonly List<ParsingEvent> events = new List<ParsingEvent>();
 
-	private readonly IParser ICOLPJPILCG;
+	private readonly IParser innerParser;
 
 	private int _currentIndex = -1;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private ParsingEvent EADAACFGGGM;
+	private ParsingEvent current;
 
-	public ParsingEvent BLOOLFFMKFI
+	public ParsingEvent CurrentEvent
 	{
 		get
 		{
-			return AOJJOEHEPGM();
+			return GetCurrent();
 		}
 		private set
 		{
-			GAKMJOBBBAD(value);
+			SetCurrent(value);
 		}
 	}
 
 	public MergingParser(IParser FIMPGLKJDKK)
 	{
-		ICOLPJPILCG = FIMPGLKJDKK;
+		innerParser = FIMPGLKJDKK;
 	}
 
-	public ParsingEvent AOJJOEHEPGM()
+	public ParsingEvent GetCurrent()
 	{
-		return EADAACFGGGM;
+		return current;
 	}
 
-	private void GAKMJOBBBAD(ParsingEvent value)
+	private void SetCurrent(ParsingEvent value)
 	{
-		EADAACFGGGM = value;
+		current = value;
 	}
 
-	public bool PCCMLADDNDG()
+	public bool MoveNext()
 	{
 		if (_currentIndex < 0)
 		{
-			while (ICOLPJPILCG.PCCMLADDNDG())
+			while (innerParser.MoveNext())
 			{
-				CHKBHFONNGG.Add(ICOLPJPILCG.AOJJOEHEPGM());
+				events.Add(innerParser.GetCurrent());
 			}
-			for (int num = CHKBHFONNGG.Count - 2; num >= 0; num--)
+			for (int num = events.Count - 2; num >= 0; num--)
 			{
-				Scalar lEACOCDHICF = CHKBHFONNGG[num] as Scalar;
-				if (lEACOCDHICF == null || !(lEACOCDHICF.OEAKCOHMIHH() == "<<"))
+				Scalar lEACOCDHICF = events[num] as Scalar;
+				if (lEACOCDHICF == null || !(lEACOCDHICF.GetValue() == "<<"))
 				{
 					continue;
 				}
-				AnchorAlias mBEGNNDMDKH = CHKBHFONNGG[num + 1] as AnchorAlias;
+				AnchorAlias mBEGNNDMDKH = events[num + 1] as AnchorAlias;
 				if (mBEGNNDMDKH != null)
 				{
-					IEnumerable<ParsingEvent> collection = LCHALMNNAGA(mBEGNNDMDKH.OEAKCOHMIHH());
-					CHKBHFONNGG.RemoveRange(num, 2);
-					CHKBHFONNGG.InsertRange(num, collection);
+					IEnumerable<ParsingEvent> collection = GetMappingEvents(mBEGNNDMDKH.GetValue());
+					events.RemoveRange(num, 2);
+					events.InsertRange(num, collection);
 					continue;
 				}
-				JODGINIKFJF jODGINIKFJF = CHKBHFONNGG[num + 1] as JODGINIKFJF;
+				SequenceStart jODGINIKFJF = events[num + 1] as SequenceStart;
 				if (jODGINIKFJF != null)
 				{
 					List<IEnumerable<ParsingEvent>> list = new List<IEnumerable<ParsingEvent>>();
 					bool flag = false;
-					for (int i = num + 2; i < CHKBHFONNGG.Count; i++)
+					for (int i = num + 2; i < events.Count; i++)
 					{
-						mBEGNNDMDKH = CHKBHFONNGG[i] as AnchorAlias;
+						mBEGNNDMDKH = events[i] as AnchorAlias;
 						if (mBEGNNDMDKH != null)
 						{
-							list.Add(LCHALMNNAGA(mBEGNNDMDKH.OEAKCOHMIHH()));
+							list.Add(GetMappingEvents(mBEGNNDMDKH.GetValue()));
 						}
-						else if (CHKBHFONNGG[i] is AKMKLAINLOL)
+						else if (events[i] is SequenceEnd)
 						{
-							CHKBHFONNGG.RemoveRange(num, i - num + 1);
-							CHKBHFONNGG.InsertRange(num, list.SelectMany((IEnumerable<ParsingEvent> FOPOKALJIIJ) => FOPOKALJIIJ));
+							events.RemoveRange(num, i - num + 1);
+							events.InsertRange(num, list.SelectMany((IEnumerable<ParsingEvent> FOPOKALJIIJ) => FOPOKALJIIJ));
 							flag = true;
 							break;
 						}
@@ -156,28 +156,28 @@ public sealed class MergingParser : IParser
 						continue;
 					}
 				}
-				throw new SemanticErrorException(lEACOCDHICF.OGPHJPFHBJL(), lEACOCDHICF.GDJHIJHFPHA(), "Unrecognized merge key pattern");
+				throw new SemanticErrorException(lEACOCDHICF.GetStart(), lEACOCDHICF.GetEnd(), "Unrecognized merge key pattern");
 			}
 		}
 		int num2 = _currentIndex + 1;
-		if (num2 < CHKBHFONNGG.Count)
+		if (num2 < events.Count)
 		{
-			GAKMJOBBBAD(CHKBHFONNGG[num2]);
+			SetCurrent(events[num2]);
 			_currentIndex = num2;
 			return true;
 		}
 		return false;
 	}
 
-	private IEnumerable<ParsingEvent> LCHALMNNAGA(string mappingAlias)
+	private IEnumerable<ParsingEvent> GetMappingEvents(string mappingAlias)
 	{
-		JLKAJHOJBDF PFCAJIFNHMC = new JLKAJHOJBDF();
+		ParsingEventCloner PFCAJIFNHMC = new ParsingEventCloner();
 		int nesting = 0;
-		return (from FOPOKALJIIJ in CHKBHFONNGG.SkipWhile((ParsingEvent FOPOKALJIIJ) =>
+		return (from FOPOKALJIIJ in events.SkipWhile((ParsingEvent FOPOKALJIIJ) =>
 			{
 				MappingStart oGMPNFCPPDH = FOPOKALJIIJ as MappingStart;
-				return oGMPNFCPPDH == null || oGMPNFCPPDH.HCPOJDFJFMM() != mappingAlias;
-			}).Skip(1).TakeWhile((ParsingEvent FOPOKALJIIJ) => (nesting += FOPOKALJIIJ.DPIMLJJFMCO()) >= 0)
+				return oGMPNFCPPDH == null || oGMPNFCPPDH.GetAnchor() != mappingAlias;
+			}).Skip(1).TakeWhile((ParsingEvent FOPOKALJIIJ) => (nesting += FOPOKALJIIJ.GetNestingIncrease()) >= 0)
 			select PFCAJIFNHMC.Clone(FOPOKALJIIJ)).ToList();
 	}
 }

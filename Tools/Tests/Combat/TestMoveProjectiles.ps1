@@ -29,8 +29,8 @@ for($i=0;$i -lt 3;$i++) {
   Check (($field.GetValue($native) | ConvertTo-Json -Depth 10 -Compress) -ceq ($field.GetValue($source) | ConvertTo-Json -Depth 10 -Compress)) ('Native projectile field differs: '+$field.Name)
  }
  if($i -eq 2) {
-  Check ($native.NeedStart([EventAnimation+EECEJKADLCK]::EVENT_STRIKE) -and !$native.NeedStart(0)) 'Delete scheduling lost.'
-  Check ($native.OJLDHGKPLNC() -eq $source.OJLDHGKPLNC()) 'Delete target differs.'
+  Check ($native.NeedStart([EventAnimation+EventAnimationType]::EVENT_STRIKE) -and !$native.NeedStart(0)) 'Delete scheduling lost.'
+  Check ($native.GetTargetPlayer() -eq $source.GetTargetPlayer()) 'Delete target differs.'
  } else {Check ($native.NeedStart([int]$nodes[$i].GetAttribute('Frame'))) 'Projectile frame scheduling lost.'}
 }
 foreach($choice in @('projectile.core_start_animation="ShopMagicSphere1"','projectile.start_move=child')) {

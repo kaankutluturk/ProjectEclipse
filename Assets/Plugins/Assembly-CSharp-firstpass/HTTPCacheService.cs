@@ -9,153 +9,153 @@ public static class HTTPCacheService
 {
 	private const int LibraryVersion = 2;
 
-	private static bool BIJLAGAGJJP;
+	private static bool isSupported;
 
-	private static bool PFEOIGKNHKB;
+	private static bool isSupportedCheckDone;
 
-	private static Dictionary<Uri, HTTPCacheFileInfo> DJPHBDDJMOJ;
+	private static Dictionary<Uri, HTTPCacheFileInfo> library;
 
-	private static Dictionary<ulong, HTTPCacheFileInfo> DALAFDNPDGB;
-
-	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private static string JEBOIEBCAJE;
+	private static Dictionary<ulong, HTTPCacheFileInfo> usedIndexes;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private static string OFLEPKHJLFB;
+	private static string cacheFolder;
 
-	private static bool GIDPNJIHGFN;
+	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
+	private static string libraryPath;
 
-	private static bool PLPAFAKMOBF;
+	private static bool inClearThread;
+
+	private static bool inMaintainenceThread;
 
 	private static ulong NextNameIDX;
 
-	public static bool ABFAHBGHFOB
+	public static bool IsSupported
 	{
 		get
 		{
-			return EPACOIFEICA();
+			return GetIsSupported();
 		}
 	}
 
-	private static Dictionary<Uri, HTTPCacheFileInfo> OHNIOLNCGPP
+	private static Dictionary<Uri, HTTPCacheFileInfo> Library
 	{
 		get
 		{
-			return MGHJNDBKNEC();
+			return GetLibrary();
 		}
 	}
 
-	internal static string KCHHBBGFGIG
+	internal static string CacheFolder
 	{
 		get
 		{
-			return MJJLGGBAMJE();
+			return GetCacheFolder();
 		}
 		private set
 		{
-			LMFJMCCBLBJ(value);
+			SetCacheFolder(value);
 		}
 	}
 
-	private static string OHOPINMBPPJ
+	private static string LibraryPath
 	{
 		get
 		{
-			return HIJIPJKMFNH();
+			return GetLibraryPath();
 		}
 		set
 		{
-			DBLJMNJMAHF(value);
+			SetLibraryPath(value);
 		}
 	}
 
 	static HTTPCacheService()
 	{
-		DALAFDNPDGB = new Dictionary<ulong, HTTPCacheFileInfo>();
+		usedIndexes = new Dictionary<ulong, HTTPCacheFileInfo>();
 		NextNameIDX = 1uL;
 	}
 
-	public static bool EPACOIFEICA()
+	public static bool GetIsSupported()
 	{
-		if (PFEOIGKNHKB)
+		if (isSupportedCheckDone)
 		{
-			return BIJLAGAGJJP;
+			return isSupported;
 		}
 		try
 		{
-			File.Exists(HTTPManager.DJHDCCJDJGJ());
-			BIJLAGAGJJP = true;
+			File.Exists(HTTPManager.GetRootCacheFolder());
+			isSupported = true;
 		}
 		catch
 		{
-			BIJLAGAGJJP = false;
-			HTTPManager.MBBMPNDDPIH().GLCKHLCAPIN("HTTPCacheService", "Cache Service Disabled!");
+			isSupported = false;
+			HTTPManager.GetLogger().Warning("HTTPCacheService", "Cache Service Disabled!");
 		}
 		finally
 		{
-			PFEOIGKNHKB = true;
+			isSupportedCheckDone = true;
 		}
-		return BIJLAGAGJJP;
+		return isSupported;
 	}
 
-	private static Dictionary<Uri, HTTPCacheFileInfo> MGHJNDBKNEC()
+	private static Dictionary<Uri, HTTPCacheFileInfo> GetLibrary()
 	{
-		IOBILFLFODD();
-		return DJPHBDDJMOJ;
+		LoadLibrary();
+		return library;
 	}
 
-	internal static string MJJLGGBAMJE()
+	internal static string GetCacheFolder()
 	{
-		return JEBOIEBCAJE;
+		return cacheFolder;
 	}
 
-	private static void LMFJMCCBLBJ(string value)
+	private static void SetCacheFolder(string value)
 	{
-		JEBOIEBCAJE = value;
+		cacheFolder = value;
 	}
 
-	private static string HIJIPJKMFNH()
+	private static string GetLibraryPath()
 	{
-		return OFLEPKHJLFB;
+		return libraryPath;
 	}
 
-	private static void DBLJMNJMAHF(string value)
+	private static void SetLibraryPath(string value)
 	{
-		OFLEPKHJLFB = value;
+		libraryPath = value;
 	}
 
-	internal static void BEGBHCIIOAO()
+	internal static void CheckSetup()
 	{
-		if (!EPACOIFEICA())
+		if (!GetIsSupported())
 		{
 			return;
 		}
 		try
 		{
-			KDACPEKJHPP();
-			IOBILFLFODD();
+			SetupCacheFolder();
+			LoadLibrary();
 		}
 		catch
 		{
 		}
 	}
 
-	internal static void KDACPEKJHPP()
+	internal static void SetupCacheFolder()
 	{
-		if (!EPACOIFEICA())
+		if (!GetIsSupported())
 		{
 			return;
 		}
 		try
 		{
-			if (string.IsNullOrEmpty(MJJLGGBAMJE()) || string.IsNullOrEmpty(HIJIPJKMFNH()))
+			if (string.IsNullOrEmpty(GetCacheFolder()) || string.IsNullOrEmpty(GetLibraryPath()))
 			{
-				LMFJMCCBLBJ(Path.Combine(HTTPManager.DJHDCCJDJGJ(), "HTTPCache"));
-				if (!Directory.Exists(MJJLGGBAMJE()))
+				SetCacheFolder(Path.Combine(HTTPManager.GetRootCacheFolder(), "HTTPCache"));
+				if (!Directory.Exists(GetCacheFolder()))
 				{
-					Directory.CreateDirectory(MJJLGGBAMJE());
+					Directory.CreateDirectory(GetCacheFolder());
 				}
-				DBLJMNJMAHF(Path.Combine(HTTPManager.DJHDCCJDJGJ(), "Library"));
+				SetLibraryPath(Path.Combine(HTTPManager.GetRootCacheFolder(), "Library"));
 			}
 		}
 		catch
@@ -163,35 +163,35 @@ public static class HTTPCacheService
 		}
 	}
 
-	internal static ulong OKGJODFOLBM()
+	internal static ulong GetNameIdx()
 	{
-		lock (MGHJNDBKNEC())
+		lock (GetLibrary())
 		{
 			ulong kDIGFPPHJDL = NextNameIDX;
 			do
 			{
 				NextNameIDX = ++NextNameIDX % ulong.MaxValue;
 			}
-			while (DALAFDNPDGB.ContainsKey(NextNameIDX));
+			while (usedIndexes.ContainsKey(NextNameIDX));
 			return kDIGFPPHJDL;
 		}
 	}
 
 	internal static bool HasEntity(Uri KJHNCLAJMLO)
 	{
-		if (!EPACOIFEICA())
+		if (!GetIsSupported())
 		{
 			return false;
 		}
-		lock (MGHJNDBKNEC())
+		lock (GetLibrary())
 		{
-			return MGHJNDBKNEC().ContainsKey(KJHNCLAJMLO);
+			return GetLibrary().ContainsKey(KJHNCLAJMLO);
 		}
 	}
 
 	internal static bool DeleteEntity(Uri KJHNCLAJMLO, bool IPHPJPNKPMD = true)
 	{
-		if (!EPACOIFEICA())
+		if (!GetIsSupported())
 		{
 			return false;
 		}
@@ -200,18 +200,18 @@ public static class HTTPCacheService
 		{
 			try
 			{
-				lock (MGHJNDBKNEC())
+				lock (GetLibrary())
 				{
 					HTTPCacheFileInfo value;
-					bool flag = MGHJNDBKNEC().TryGetValue(KJHNCLAJMLO, out value);
+					bool flag = GetLibrary().TryGetValue(KJHNCLAJMLO, out value);
 					if (flag)
 					{
-						value.JEHBFCLLPCL();
+						value.Delete();
 					}
 					if (flag && IPHPJPNKPMD)
 					{
-						MGHJNDBKNEC().Remove(KJHNCLAJMLO);
-						DALAFDNPDGB.Remove(value.KDBDNGPOENN());
+						GetLibrary().Remove(KJHNCLAJMLO);
+						usedIndexes.Remove(value.GetMappedNameIdx());
 					}
 					return true;
 				}
@@ -222,35 +222,35 @@ public static class HTTPCacheService
 		}
 	}
 
-	internal static bool BEBFIMACMEK(HTTPRequest ONOCIELLAPL)
+	internal static bool IsCachedEntityExpiresInTheFuture(HTTPRequest ONOCIELLAPL)
 	{
-		if (!EPACOIFEICA())
+		if (!GetIsSupported())
 		{
 			return false;
 		}
-		lock (MGHJNDBKNEC())
+		lock (GetLibrary())
 		{
 			HTTPCacheFileInfo value;
-			if (MGHJNDBKNEC().TryGetValue(ONOCIELLAPL.DKAECMGPGOE(), out value))
+			if (GetLibrary().TryGetValue(ONOCIELLAPL.GetCurrentUri(), out value))
 			{
-				return value.IDGHLAOFMEO();
+				return value.WillExpireInTheFuture();
 			}
 		}
 		return false;
 	}
 
-	internal static void JGLDNKPBBGC(HTTPRequest ONOCIELLAPL)
+	internal static void SetHeaders(HTTPRequest ONOCIELLAPL)
 	{
-		if (!EPACOIFEICA())
+		if (!GetIsSupported())
 		{
 			return;
 		}
-		lock (MGHJNDBKNEC())
+		lock (GetLibrary())
 		{
 			HTTPCacheFileInfo value;
-			if (MGHJNDBKNEC().TryGetValue(ONOCIELLAPL.DKAECMGPGOE(), out value))
+			if (GetLibrary().TryGetValue(ONOCIELLAPL.GetCurrentUri(), out value))
 			{
-				value.EKLOPCNGGED(ONOCIELLAPL);
+				value.SetUpRevalidationHeaders(ONOCIELLAPL);
 			}
 		}
 	}
@@ -258,14 +258,14 @@ public static class HTTPCacheService
 	internal static Stream GetBody(Uri KJHNCLAJMLO, out int BDBOAEGELMC)
 	{
 		BDBOAEGELMC = 0;
-		if (!EPACOIFEICA())
+		if (!GetIsSupported())
 		{
 			return null;
 		}
-		lock (MGHJNDBKNEC())
+		lock (GetLibrary())
 		{
 			HTTPCacheFileInfo value;
-			if (MGHJNDBKNEC().TryGetValue(KJHNCLAJMLO, out value))
+			if (GetLibrary().TryGetValue(KJHNCLAJMLO, out value))
 			{
 				return value.GetBodyStream(out BDBOAEGELMC);
 			}
@@ -273,30 +273,30 @@ public static class HTTPCacheService
 		return null;
 	}
 
-	internal static HTTPResponse HLLKJACMILI(HTTPRequest ONOCIELLAPL)
+	internal static HTTPResponse GetFullResponse(HTTPRequest ONOCIELLAPL)
 	{
-		if (!EPACOIFEICA())
+		if (!GetIsSupported())
 		{
 			return null;
 		}
-		lock (MGHJNDBKNEC())
+		lock (GetLibrary())
 		{
 			HTTPCacheFileInfo value;
-			if (MGHJNDBKNEC().TryGetValue(ONOCIELLAPL.DKAECMGPGOE(), out value))
+			if (GetLibrary().TryGetValue(ONOCIELLAPL.GetCurrentUri(), out value))
 			{
-				return value.IFPJHJFHJDK(ONOCIELLAPL);
+				return value.ReadResponseTo(ONOCIELLAPL);
 			}
 		}
 		return null;
 	}
 
-	internal static bool HCCGCAKPOGB(Uri KJHNCLAJMLO, LAAFHDKKJFL FJLOLCPJACB, HTTPResponse GIHDDAKBMHE)
+	internal static bool IsCacheble(Uri KJHNCLAJMLO, HTTPMethods FJLOLCPJACB, HTTPResponse GIHDDAKBMHE)
 	{
-		if (!EPACOIFEICA())
+		if (!GetIsSupported())
 		{
 			return false;
 		}
-		if (FJLOLCPJACB != LAAFHDKKJFL.Get)
+		if (FJLOLCPJACB != HTTPMethods.Get)
 		{
 			return false;
 		}
@@ -304,11 +304,11 @@ public static class HTTPCacheService
 		{
 			return false;
 		}
-		if (GIHDDAKBMHE.KNMDPGBPNED() == 304)
+		if (GIHDDAKBMHE.GetStatusCode() == 304)
 		{
 			return false;
 		}
-		if (GIHDDAKBMHE.KNMDPGBPNED() < 200 || GIHDDAKBMHE.KNMDPGBPNED() >= 400)
+		if (GIHDDAKBMHE.GetStatusCode() < 200 || GIHDDAKBMHE.GetStatusCode() >= 400)
 		{
 			return false;
 		}
@@ -338,27 +338,27 @@ public static class HTTPCacheService
 		return true;
 	}
 
-	internal static HTTPCacheFileInfo LDFKMIOPLKA(Uri KJHNCLAJMLO, LAAFHDKKJFL FJLOLCPJACB, HTTPResponse GIHDDAKBMHE)
+	internal static HTTPCacheFileInfo Store(Uri KJHNCLAJMLO, HTTPMethods FJLOLCPJACB, HTTPResponse GIHDDAKBMHE)
 	{
-		if (GIHDDAKBMHE == null || GIHDDAKBMHE.CHIGLEKCFFN() == null || GIHDDAKBMHE.CHIGLEKCFFN().Length == 0)
+		if (GIHDDAKBMHE == null || GIHDDAKBMHE.GetData() == null || GIHDDAKBMHE.GetData().Length == 0)
 		{
 			return null;
 		}
-		if (!EPACOIFEICA())
+		if (!GetIsSupported())
 		{
 			return null;
 		}
 		HTTPCacheFileInfo value = null;
-		lock (MGHJNDBKNEC())
+		lock (GetLibrary())
 		{
-			if (!MGHJNDBKNEC().TryGetValue(KJHNCLAJMLO, out value))
+			if (!GetLibrary().TryGetValue(KJHNCLAJMLO, out value))
 			{
-				MGHJNDBKNEC().Add(KJHNCLAJMLO, value = new HTTPCacheFileInfo(KJHNCLAJMLO));
-				DALAFDNPDGB.Add(value.KDBDNGPOENN(), value);
+				GetLibrary().Add(KJHNCLAJMLO, value = new HTTPCacheFileInfo(KJHNCLAJMLO));
+				usedIndexes.Add(value.GetMappedNameIdx(), value);
 			}
 			try
 			{
-				value.LDFKMIOPLKA(GIHDDAKBMHE);
+				value.Store(GIHDDAKBMHE);
 				return value;
 			}
 			catch
@@ -369,23 +369,23 @@ public static class HTTPCacheService
 		}
 	}
 
-	internal static Stream KHGFDHOJOOG(Uri KJHNCLAJMLO, HTTPResponse GIHDDAKBMHE)
+	internal static Stream PrepareStreamed(Uri KJHNCLAJMLO, HTTPResponse GIHDDAKBMHE)
 	{
-		if (!EPACOIFEICA())
+		if (!GetIsSupported())
 		{
 			return null;
 		}
-		lock (MGHJNDBKNEC())
+		lock (GetLibrary())
 		{
 			HTTPCacheFileInfo value;
-			if (!MGHJNDBKNEC().TryGetValue(KJHNCLAJMLO, out value))
+			if (!GetLibrary().TryGetValue(KJHNCLAJMLO, out value))
 			{
-				MGHJNDBKNEC().Add(KJHNCLAJMLO, value = new HTTPCacheFileInfo(KJHNCLAJMLO));
-				DALAFDNPDGB.Add(value.KDBDNGPOENN(), value);
+				GetLibrary().Add(KJHNCLAJMLO, value = new HTTPCacheFileInfo(KJHNCLAJMLO));
+				usedIndexes.Add(value.GetMappedNameIdx(), value);
 			}
 			try
 			{
-				return value.GOGEGGPBPBP(GIHDDAKBMHE);
+				return value.GetSaveStream(GIHDDAKBMHE);
 			}
 			catch
 			{
@@ -395,25 +395,25 @@ public static class HTTPCacheService
 		}
 	}
 
-	public static void ACMOEBGCPML()
+	public static void BeginClear()
 	{
-		if (EPACOIFEICA() && !GIDPNJIHGFN)
+		if (GetIsSupported() && !inClearThread)
 		{
-			GIDPNJIHGFN = true;
-			KDACPEKJHPP();
+			inClearThread = true;
+			SetupCacheFolder();
 			new Thread(ClearImpl).Start();
 		}
 	}
 
 	private static void ClearImpl(object KKNOCIPBIIK)
 	{
-		if (!EPACOIFEICA())
+		if (!GetIsSupported())
 		{
 			return;
 		}
 		try
 		{
-			string[] files = Directory.GetFiles(MJJLGGBAMJE());
+			string[] files = Directory.GetFiles(GetCacheFolder());
 			for (int i = 0; i < files.Length; i++)
 			{
 				try
@@ -427,64 +427,64 @@ public static class HTTPCacheService
 		}
 		finally
 		{
-			DALAFDNPDGB.Clear();
-			DJPHBDDJMOJ.Clear();
+			usedIndexes.Clear();
+			library.Clear();
 			NextNameIDX = 1uL;
-			FIMLABMLKJF();
-			GIDPNJIHGFN = false;
+			SaveLibrary();
+			inClearThread = false;
 		}
 	}
 
-	public static void JJFFGOABNOA(HTTPCacheMaintananceParams HFBDNDCABLM)
+	public static void BeginMaintainence(HTTPCacheMaintananceParams HFBDNDCABLM)
 	{
 		if (HFBDNDCABLM == null)
 		{
 			throw new ArgumentNullException("maintananceParams == null");
 		}
-		if (!EPACOIFEICA() || PLPAFAKMOBF)
+		if (!GetIsSupported() || inMaintainenceThread)
 		{
 			return;
 		}
-		PLPAFAKMOBF = true;
-		KDACPEKJHPP();
+		inMaintainenceThread = true;
+		SetupCacheFolder();
 		new Thread((object KKNOCIPBIIK) =>
 		{
 			try
 			{
-				lock (MGHJNDBKNEC())
+				lock (GetLibrary())
 				{
-					DateTime dateTime = DateTime.UtcNow - HFBDNDCABLM.DKAPKJDOAEJ();
+					DateTime dateTime = DateTime.UtcNow - HFBDNDCABLM.GetDeleteOlder();
 					List<HTTPCacheFileInfo> list = new List<HTTPCacheFileInfo>();
-					foreach (KeyValuePair<Uri, HTTPCacheFileInfo> item in MGHJNDBKNEC())
+					foreach (KeyValuePair<Uri, HTTPCacheFileInfo> item in GetLibrary())
 					{
-						if (item.Value.PPHKANGFLHJ() < dateTime && DeleteEntity(item.Key, false))
+						if (item.Value.GetLastAccess() < dateTime && DeleteEntity(item.Key, false))
 						{
 							list.Add(item.Value);
 						}
 					}
 					for (int i = 0; i < list.Count; i++)
 					{
-						MGHJNDBKNEC().Remove(list[i].OJBDMGBGJMA());
-						DALAFDNPDGB.Remove(list[i].KDBDNGPOENN());
+						GetLibrary().Remove(list[i].GetUri());
+						usedIndexes.Remove(list[i].GetMappedNameIdx());
 					}
 					list.Clear();
-					ulong num = NKOHKEGHKJN();
-					if (num > HFBDNDCABLM.GAJGIIJPPBF())
+					ulong num = GetCacheSize();
+					if (num > HFBDNDCABLM.GetMaxCacheSize())
 					{
-						List<HTTPCacheFileInfo> list2 = new List<HTTPCacheFileInfo>(DJPHBDDJMOJ.Count);
-						foreach (KeyValuePair<Uri, HTTPCacheFileInfo> item2 in DJPHBDDJMOJ)
+						List<HTTPCacheFileInfo> list2 = new List<HTTPCacheFileInfo>(library.Count);
+						foreach (KeyValuePair<Uri, HTTPCacheFileInfo> item2 in library)
 						{
 							list2.Add(item2.Value);
 						}
 						list2.Sort();
 						int num2 = 0;
-						while (num >= HFBDNDCABLM.GAJGIIJPPBF() && num2 < list2.Count)
+						while (num >= HFBDNDCABLM.GetMaxCacheSize() && num2 < list2.Count)
 						{
 							try
 							{
 								HTTPCacheFileInfo aEMMGBPFAHD = list2[num2];
-								ulong num3 = (ulong)aEMMGBPFAHD.NHCAEHOHBEE();
-								DeleteEntity(aEMMGBPFAHD.OJBDMGBGJMA());
+								ulong num3 = (ulong)aEMMGBPFAHD.GetBodyLength();
+								DeleteEntity(aEMMGBPFAHD.GetUri());
 								num -= num3;
 							}
 							catch
@@ -500,64 +500,64 @@ public static class HTTPCacheService
 			}
 			finally
 			{
-				FIMLABMLKJF();
-				PLPAFAKMOBF = false;
+				SaveLibrary();
+				inMaintainenceThread = false;
 			}
 		}).Start();
 	}
 
-	public static int MDIKHCGGACM()
+	public static int GetCacheEntityCount()
 	{
-		if (!EPACOIFEICA())
+		if (!GetIsSupported())
 		{
 			return 0;
 		}
-		BEGBHCIIOAO();
-		lock (MGHJNDBKNEC())
+		CheckSetup();
+		lock (GetLibrary())
 		{
-			return MGHJNDBKNEC().Count;
+			return GetLibrary().Count;
 		}
 	}
 
-	public static ulong NKOHKEGHKJN()
+	public static ulong GetCacheSize()
 	{
 		ulong num = 0uL;
-		if (!EPACOIFEICA())
+		if (!GetIsSupported())
 		{
 			return num;
 		}
-		BEGBHCIIOAO();
-		lock (MGHJNDBKNEC())
+		CheckSetup();
+		lock (GetLibrary())
 		{
-			foreach (KeyValuePair<Uri, HTTPCacheFileInfo> item in MGHJNDBKNEC())
+			foreach (KeyValuePair<Uri, HTTPCacheFileInfo> item in GetLibrary())
 			{
-				if (item.Value.NHCAEHOHBEE() > 0)
+				if (item.Value.GetBodyLength() > 0)
 				{
-					num += (ulong)item.Value.NHCAEHOHBEE();
+					num += (ulong)item.Value.GetBodyLength();
 				}
 			}
 			return num;
 		}
 	}
 
-	private static void IOBILFLFODD()
+	private static void LoadLibrary()
 	{
-		if (DJPHBDDJMOJ != null || !EPACOIFEICA())
+		if (library != null || !GetIsSupported())
 		{
 			return;
 		}
-		DJPHBDDJMOJ = new Dictionary<Uri, HTTPCacheFileInfo>();
-		if (!File.Exists(HIJIPJKMFNH()))
+		library = new Dictionary<Uri, HTTPCacheFileInfo>();
+		if (!File.Exists(GetLibraryPath()))
 		{
-			LKBJMMEEHPB();
+			DeleteUnusedFiles();
 			return;
 		}
 		try
 		{
 			int num;
-			lock (DJPHBDDJMOJ)
+			lock (library)
 			{
-				using (FileStream input = new FileStream(HIJIPJKMFNH(), FileMode.Open))
+				using (FileStream input = new FileStream(GetLibraryPath(), FileMode.Open))
 				{
 					using (BinaryReader binaryReader = new BinaryReader(input))
 					{
@@ -573,10 +573,10 @@ public static class HTTPCacheService
 							HTTPCacheFileInfo aEMMGBPFAHD = new HTTPCacheFileInfo(uri, binaryReader, num);
 							if (aEMMGBPFAHD.IsExists())
 							{
-								DJPHBDDJMOJ.Add(uri, aEMMGBPFAHD);
+								library.Add(uri, aEMMGBPFAHD);
 								if (num > 1)
 								{
-									DALAFDNPDGB.Add(aEMMGBPFAHD.KDBDNGPOENN(), aEMMGBPFAHD);
+									usedIndexes.Add(aEMMGBPFAHD.GetMappedNameIdx(), aEMMGBPFAHD);
 								}
 							}
 						}
@@ -585,11 +585,11 @@ public static class HTTPCacheService
 			}
 			if (num == 1)
 			{
-				ACMOEBGCPML();
+				BeginClear();
 			}
 			else
 			{
-				LKBJMMEEHPB();
+				DeleteUnusedFiles();
 			}
 		}
 		catch
@@ -597,24 +597,24 @@ public static class HTTPCacheService
 		}
 	}
 
-	internal static void FIMLABMLKJF()
+	internal static void SaveLibrary()
 	{
-		if (DJPHBDDJMOJ == null || !EPACOIFEICA())
+		if (library == null || !GetIsSupported())
 		{
 			return;
 		}
 		try
 		{
-			lock (MGHJNDBKNEC())
+			lock (GetLibrary())
 			{
-				using (FileStream output = new FileStream(HIJIPJKMFNH(), FileMode.Create))
+				using (FileStream output = new FileStream(GetLibraryPath(), FileMode.Create))
 				{
 					using (BinaryWriter binaryWriter = new BinaryWriter(output))
 					{
 						binaryWriter.Write(2);
 						binaryWriter.Write(NextNameIDX);
-						binaryWriter.Write(MGHJNDBKNEC().Count);
-						foreach (KeyValuePair<Uri, HTTPCacheFileInfo> item in MGHJNDBKNEC())
+						binaryWriter.Write(GetLibrary().Count);
+						foreach (KeyValuePair<Uri, HTTPCacheFileInfo> item in GetLibrary())
 						{
 							binaryWriter.Write(item.Key.ToString());
 							item.Value.SaveTo(binaryWriter);
@@ -630,31 +630,31 @@ public static class HTTPCacheService
 
 	internal static void SetBodyLength(Uri KJHNCLAJMLO, int DEFBMELCOHO)
 	{
-		if (!EPACOIFEICA())
+		if (!GetIsSupported())
 		{
 			return;
 		}
-		lock (MGHJNDBKNEC())
+		lock (GetLibrary())
 		{
 			HTTPCacheFileInfo value;
-			if (MGHJNDBKNEC().TryGetValue(KJHNCLAJMLO, out value))
+			if (GetLibrary().TryGetValue(KJHNCLAJMLO, out value))
 			{
 				value.set_BodyLength(DEFBMELCOHO);
 				return;
 			}
-			MGHJNDBKNEC().Add(KJHNCLAJMLO, value = new HTTPCacheFileInfo(KJHNCLAJMLO, DateTime.UtcNow, DEFBMELCOHO));
-			DALAFDNPDGB.Add(value.KDBDNGPOENN(), value);
+			GetLibrary().Add(KJHNCLAJMLO, value = new HTTPCacheFileInfo(KJHNCLAJMLO, DateTime.UtcNow, DEFBMELCOHO));
+			usedIndexes.Add(value.GetMappedNameIdx(), value);
 		}
 	}
 
-	private static void LKBJMMEEHPB()
+	private static void DeleteUnusedFiles()
 	{
-		if (!EPACOIFEICA())
+		if (!GetIsSupported())
 		{
 			return;
 		}
-		BEGBHCIIOAO();
-		string[] files = Directory.GetFiles(MJJLGGBAMJE());
+		CheckSetup();
+		string[] files = Directory.GetFiles(GetCacheFolder());
 		for (int i = 0; i < files.Length; i++)
 		{
 			try
@@ -664,9 +664,9 @@ public static class HTTPCacheService
 				bool flag = false;
 				if (ulong.TryParse(fileName, NumberStyles.AllowHexSpecifier, null, out result))
 				{
-					lock (MGHJNDBKNEC())
+					lock (GetLibrary())
 					{
-						flag = !DALAFDNPDGB.ContainsKey(result);
+						flag = !usedIndexes.ContainsKey(result);
 					}
 				}
 				else

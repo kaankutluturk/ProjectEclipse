@@ -9,19 +9,19 @@ public class ExtentionBehaviour : MonoBehaviour
 	public class CallEventArgs
 	{
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		private object JFELNKAOJEO;
+		private object target;
 
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		private int MJDIHAAHDIC;
+		private int eventId;
 
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		private object NKLJPKKFKEH;
+		private object content;
 
-		public int MOFKKABEFEB
+		public int ExtEventId
 		{
 			get
 			{
-				return EMCEPDNKAPK();
+				return GetEventId();
 			}
 			private set
 			{
@@ -33,49 +33,49 @@ public class ExtentionBehaviour : MonoBehaviour
 		{
 			get
 			{
-				return DIPHGGNBBFM();
+				return GetContent();
 			}
 			private set
 			{
-				EOBBNCNJKCP(value);
+				SetContent(value);
 			}
 		}
 
 		public CallEventArgs(int IILOLJJLLGH, object DMNBDBJNKME, object target)
 		{
 			set_Target(target);
-			EOBBNCNJKCP(DMNBDBJNKME);
+			SetContent(DMNBDBJNKME);
 			set_Event(IILOLJJLLGH);
 		}
 
-		public object IDPLAGOELKE()
+		public object GetTarget()
 		{
-			return JFELNKAOJEO;
+			return target;
 		}
 
 		private void set_Target(object value)
 		{
-			JFELNKAOJEO = value;
+			target = value;
 		}
 
-		public int EMCEPDNKAPK()
+		public int GetEventId()
 		{
-			return MJDIHAAHDIC;
+			return eventId;
 		}
 
 		private void set_Event(int value)
 		{
-			MJDIHAAHDIC = value;
+			eventId = value;
 		}
 
-		public object DIPHGGNBBFM()
+		public object GetContent()
 		{
-			return NKLJPKKFKEH;
+			return content;
 		}
 
-		private void EOBBNCNJKCP(object value)
+		private void SetContent(object value)
 		{
-			NKLJPKKFKEH = value;
+			content = value;
 		}
 
 		public CallEventArgs SwitchTarget(object target)
@@ -85,7 +85,7 @@ public class ExtentionBehaviour : MonoBehaviour
 		}
 	}
 
-	public enum FBIAIDGAHHO
+	public enum BehaviourEventType
 	{
 		SimpeEvent = 0
 	}
@@ -98,9 +98,9 @@ public class ExtentionBehaviour : MonoBehaviour
 
 	private Animator _animator;
 
-	private readonly Dictionary<int, List<Action<CallEventArgs>>> GJKNDHMHLCL = new Dictionary<int, List<Action<CallEventArgs>>>();
+	private readonly Dictionary<int, List<Action<CallEventArgs>>> eventListeners = new Dictionary<int, List<Action<CallEventArgs>>>();
 
-	public GameObject DONFADGOEDE
+	public GameObject CachedGameObject
 	{
 		get
 		{
@@ -108,7 +108,7 @@ public class ExtentionBehaviour : MonoBehaviour
 		}
 	}
 
-	public Transform KGOIHPPNFGC
+	public Transform CachedTransform
 	{
 		get
 		{
@@ -116,7 +116,7 @@ public class ExtentionBehaviour : MonoBehaviour
 		}
 	}
 
-	public Renderer KHMOPNAHLNK
+	public Renderer CachedRenderer
 	{
 		get
 		{
@@ -124,7 +124,7 @@ public class ExtentionBehaviour : MonoBehaviour
 		}
 	}
 
-	public Animator PIIKKKEANMK
+	public Animator CachedAnimator
 	{
 		get
 		{
@@ -137,14 +137,14 @@ public class ExtentionBehaviour : MonoBehaviour
 		AdvLog.Log(LIOGIBJBHAH, BBNKIBKPBLO ?? this);
 	}
 
-	protected void LOPHFKMOPAA(object LIOGIBJBHAH, UnityEngine.Object BBNKIBKPBLO = null)
+	protected void LogWarning(object LIOGIBJBHAH, UnityEngine.Object BBNKIBKPBLO = null)
 	{
-		AdvLog.LOPHFKMOPAA(LIOGIBJBHAH, BBNKIBKPBLO ?? this);
+		AdvLog.LogWarning(LIOGIBJBHAH, BBNKIBKPBLO ?? this);
 	}
 
-	protected void CCOFFJPPAKC(object LIOGIBJBHAH, UnityEngine.Object BBNKIBKPBLO = null)
+	protected void LogError(object LIOGIBJBHAH, UnityEngine.Object BBNKIBKPBLO = null)
 	{
-		AdvLog.CCOFFJPPAKC(LIOGIBJBHAH, BBNKIBKPBLO ?? this);
+		AdvLog.LogError(LIOGIBJBHAH, BBNKIBKPBLO ?? this);
 	}
 
 	protected void LogException(Exception MPFFFAOGBJE, UnityEngine.Object BBNKIBKPBLO = null)
@@ -201,11 +201,11 @@ public class ExtentionBehaviour : MonoBehaviour
 
 	public void addEventListener(int IILOLJJLLGH, Action<CallEventArgs> callback)
 	{
-		if (!GJKNDHMHLCL.ContainsKey(IILOLJJLLGH))
+		if (!eventListeners.ContainsKey(IILOLJJLLGH))
 		{
-			GJKNDHMHLCL.Add(IILOLJJLLGH, new List<Action<CallEventArgs>>());
+			eventListeners.Add(IILOLJJLLGH, new List<Action<CallEventArgs>>());
 		}
-		GJKNDHMHLCL[IILOLJJLLGH].Add(callback);
+		eventListeners[IILOLJJLLGH].Add(callback);
 	}
 
 	public void addEventListener(int[] IILOLJJLLGH, Action<CallEventArgs> callback)
@@ -216,45 +216,45 @@ public class ExtentionBehaviour : MonoBehaviour
 		}
 	}
 
-	private void ELCIDNJGFHP()
+	private void RemoveAllEventListeners()
 	{
-		GJKNDHMHLCL.Clear();
+		eventListeners.Clear();
 	}
 
 	public void removeEvent(int IILOLJJLLGH)
 	{
-		if (GJKNDHMHLCL.ContainsKey(IILOLJJLLGH))
+		if (eventListeners.ContainsKey(IILOLJJLLGH))
 		{
-			GJKNDHMHLCL.Remove(IILOLJJLLGH);
+			eventListeners.Remove(IILOLJJLLGH);
 		}
 	}
 
 	public void removeEventListener(int IILOLJJLLGH, Action<CallEventArgs> callback)
 	{
-		if (GJKNDHMHLCL.ContainsKey(IILOLJJLLGH))
+		if (eventListeners.ContainsKey(IILOLJJLLGH))
 		{
-			while (GJKNDHMHLCL[IILOLJJLLGH].Contains(callback))
+			while (eventListeners[IILOLJJLLGH].Contains(callback))
 			{
-				GJKNDHMHLCL[IILOLJJLLGH].Remove(callback);
+				eventListeners[IILOLJJLLGH].Remove(callback);
 			}
 		}
 	}
 
 	protected virtual void OnDestroy()
 	{
-		ELCIDNJGFHP();
+		RemoveAllEventListeners();
 	}
 
 	public void callEvent(int IILOLJJLLGH, object DMNBDBJNKME = null)
 	{
-		if (!GJKNDHMHLCL.ContainsKey(IILOLJJLLGH))
+		if (!eventListeners.ContainsKey(IILOLJJLLGH))
 		{
 			return;
 		}
-		List<Action<CallEventArgs>> list = new List<Action<CallEventArgs>>(GJKNDHMHLCL[IILOLJJLLGH]);
+		List<Action<CallEventArgs>> list = new List<Action<CallEventArgs>>(eventListeners[IILOLJJLLGH]);
 		for (int i = 0; i < list.Count; i++)
 		{
-			if (list[i] != null && GJKNDHMHLCL.ContainsKey(IILOLJJLLGH) && GJKNDHMHLCL[IILOLJJLLGH].Contains(list[i]))
+			if (list[i] != null && eventListeners.ContainsKey(IILOLJJLLGH) && eventListeners[IILOLJJLLGH].Contains(list[i]))
 			{
 				list[i](new CallEventArgs(IILOLJJLLGH, DMNBDBJNKME, this));
 			}

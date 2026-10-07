@@ -2,42 +2,42 @@ using System.Xml;
 
 public class Shock
 {
-	public float LILMAHHANIL;
+	public float Threshold;
 
-	public float LPHBGLLAEOG;
+	public float FrameReduction;
 
-	public float NIPKAAEFMNG;
+	public float CriticalHitChanceBase;
 
-	public string ADAOLENDOME;
+	public string CriticalHitChanceAttribute;
 
-	public float PAKGFJEEJLD;
+	public float HeadHitChanceBase;
 
-	public string POJAOGMJBDC;
+	public string HeadHitChanceAttribute;
 
-	public int JKOMIENEACF;
+	public int LooseningDelayFrames;
 
-	public string JIIFFJAJNNN;
+	public string WeaponName;
 
-	public string APJJEFJHJGK;
+	public string SetAttributeName;
 
-	public int OMPDIOBDAKB;
+	public int SetAttributeValue;
 
-	public Vector3f IIIDIKABLOJ = new Vector3f();
+	public Vector3f Impulse = new Vector3f();
 
 	public void Parse(XmlNode node)
 	{
-		LILMAHHANIL = node["Treshold"].Attributes["Value"].ParseFloat();
-		LPHBGLLAEOG = node["FrameReduction"].Attributes["Value"].ParseFloat();
-		JKOMIENEACF = node["LooseningDelay"].Attributes["Frames"].ParseInt();
-		JIIFFJAJNNN = node["Weapon"].Attributes["Name"].CIPOICEEIBK(string.Empty);
-		APJJEFJHJGK = node["SetAttribute"].Attributes["Name"].CIPOICEEIBK(string.Empty);
-		OMPDIOBDAKB = node["SetAttribute"].Attributes["Value"].ParseInt();
-		NIPKAAEFMNG = node["CriticalHitChance"].Attributes["Base"].ParseFloat();
-		ADAOLENDOME = node["CriticalHitChance"].Attributes["Attribute"].CIPOICEEIBK(string.Empty);
-		PAKGFJEEJLD = node["HeadHitChance"].Attributes["Base"].ParseFloat();
-		POJAOGMJBDC = node["HeadHitChance"].Attributes["Attribute"].CIPOICEEIBK(string.Empty);
-		IIIDIKABLOJ.SetX(node["Impulse"].Attributes["X"].ParseFloat());
-		IIIDIKABLOJ.SetY(node["Impulse"].Attributes["Y"].ParseFloat());
-		IIIDIKABLOJ.SetZ(node["Impulse"].Attributes["Z"].ParseFloat());
+		Threshold = node["Treshold"].Attributes["Value"].ParseFloat();
+		FrameReduction = node["FrameReduction"].Attributes["Value"].ParseFloat();
+		LooseningDelayFrames = node["LooseningDelay"].Attributes["Frames"].ParseInt();
+		WeaponName = node["Weapon"].Attributes["Name"].GetStringOrDefault(string.Empty);
+		SetAttributeName = node["SetAttribute"].Attributes["Name"].GetStringOrDefault(string.Empty);
+		SetAttributeValue = node["SetAttribute"].Attributes["Value"].ParseInt();
+		CriticalHitChanceBase = node["CriticalHitChance"].Attributes["Base"].ParseFloat();
+		CriticalHitChanceAttribute = node["CriticalHitChance"].Attributes["Attribute"].GetStringOrDefault(string.Empty);
+		HeadHitChanceBase = node["HeadHitChance"].Attributes["Base"].ParseFloat();
+		HeadHitChanceAttribute = node["HeadHitChance"].Attributes["Attribute"].GetStringOrDefault(string.Empty);
+		Impulse.SetX(node["Impulse"].Attributes["X"].ParseFloat());
+		Impulse.SetY(node["Impulse"].Attributes["Y"].ParseFloat());
+		Impulse.SetZ(node["Impulse"].Attributes["Z"].ParseFloat());
 	}
 }

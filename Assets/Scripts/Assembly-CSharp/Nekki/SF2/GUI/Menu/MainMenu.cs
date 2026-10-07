@@ -9,7 +9,7 @@ namespace Nekki.SF2.GUI.Menu
 {
 	public class MainMenu : SFMonoBehaviour<object>, BackKeyController
 	{
-		public enum BGGGJCMEGPH
+		public enum MenuButtonType
 		{
 			MENU_DOJO = 0,
 			MENU_SHOP = 1,
@@ -21,7 +21,7 @@ namespace Nekki.SF2.GUI.Menu
 			MENU_DOJO_DISCIPLE = 7
 		}
 
-		private enum NNKHJFKDPHJ
+		private enum MainMenuLayer
 		{
 			ZCompare = 0,
 			ZDojoDisciple = 1,
@@ -41,9 +41,9 @@ namespace Nekki.SF2.GUI.Menu
 
 		public const string MENU_BUTTON_DISCIPLE_OFF = "MenuButtons.btn_disciple";
 
-		private bool LGIPIBGBOOG = true;
+		private bool isEnabled = true;
 
-		private bool BFKILDFOEBD = true;
+		private bool enableAiOnClose = true;
 
 		[SerializeField]
 		private MenuExpPanel _experience;
@@ -84,11 +84,11 @@ namespace Nekki.SF2.GUI.Menu
 		[SerializeField]
 		private LabelAlias _menuLabel;
 
-		private Slider JFMPFHEPMIE;
+		private Slider unusedSlider;
 
-		private SliderType GNECFGFOMCO;
+		private SliderType shopSliderType;
 
-		private SectionButton HNCLEDJDODK;
+		private SectionButton currentButton;
 
 		[SerializeField]
 		private SectionButton btnDojo;
@@ -122,14 +122,14 @@ namespace Nekki.SF2.GUI.Menu
 
 		private int _sliderVisibleItems;
 
-		private float HNOJHOEAHIJ;
+		private float unusedFloat;
 
-		private MenuScroll.ANJKEGGALAG GLJEDBNOHBM = MenuScroll.ANJKEGGALAG.ScrollOpen;
+		private MenuScroll.ScrollState scrollState = MenuScroll.ScrollState.ScrollOpen;
 
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		private static MainMenu OGKMDFDNIEN;
+		private static MainMenu instance;
 
-		public static MainMenu BPCBBHAKFDM
+		public static MainMenu CurrentInstance
 		{
 			get
 			{
@@ -143,12 +143,12 @@ namespace Nekki.SF2.GUI.Menu
 
 		public static MainMenu get_Instance()
 		{
-			return OGKMDFDNIEN;
+			return instance;
 		}
 
 		public static void set_Instance(MainMenu value)
 		{
-			OGKMDFDNIEN = value;
+			instance = value;
 		}
 
 		public void Init()
@@ -161,16 +161,16 @@ namespace Nekki.SF2.GUI.Menu
 			DesktopTopBarLayout.Configure(_experience, _energy, _money);
 			ConfigureMenuScrollLayout();
             Eclipse.UI.ReturnToTitleButton.Attach(this);
-			LGGBLFOKHAO();
-			GBKFLJIEHBH();
-			HIPEIJPLBJJ();
-			LFJEDFKNKCH();
-			AIJADDNEMIP();
-			AMLMDKMDLEA();
-			IDEDNCKEDHG();
-			KEBHMKNOOFC();
-			LINDDBLFMHJ();
-			if (AssemblyController.KMEOEAGGPBI())
+			InitBackgroundMetrics();
+			InitScroll();
+			InitExperiencePanel();
+			InitEnergyPanel();
+			InitSkipTutorialButton();
+			InitMoneyPanel();
+			InitMaterialsPanel();
+			InitDojoDiscipleButton();
+			UpdatePanelsLayout();
+			if (AssemblyController.GetGamepadEnabled())
 			{
 			}
 			SetNormalViewMode(false);
@@ -193,7 +193,7 @@ namespace Nekki.SF2.GUI.Menu
 
 		public void Destroy()
 		{
-			if (AssemblyController.KMEOEAGGPBI())
+			if (AssemblyController.GetGamepadEnabled())
 			{
 			}
 			_skipTutorialBtn.onClick.RemoveListener(() =>
@@ -289,78 +289,78 @@ namespace Nekki.SF2.GUI.Menu
 			rect.localRotation = Quaternion.identity;
 		}
 
-		private void LGGBLFOKHAO()
+		private void InitBackgroundMetrics()
 		{
-			GameUtils.LHHKFKLELMK = _backgroundPicture.rectTransform.rect.height;
-			GameUtils.FPDINCCPGMO = 20f;
+			GameUtils.MenuBackgroundHeight = _backgroundPicture.rectTransform.rect.height;
+			GameUtils.MenuBackgroundPadding = 20f;
 		}
 
-		private void GBKFLJIEHBH()
+		private void InitScroll()
 		{
-			BOJNFFALDHH();
-			AOLACIPNFFP();
-			FEOMOKGELOH();
+			InitMenuButtons();
+			HideNewPerksBadge();
+			HideNewItemsBadge();
 			Scroll.Init();
 			Scroll.SetAllowRolling(true);
 			Scroll.SetOutsideTouchProperties(true);
-			Scroll.AddEventListener(2, IDFCHLJMFJC);
-			Scroll.AddEventListener(3, FCLOKKBAMIL);
-			Scroll.AddEventListener(4, NPPDCDCLJKN);
+			Scroll.AddEventListener(2, OnScrollChanging);
+			Scroll.AddEventListener(3, OnScrollRolling);
+			Scroll.AddEventListener(4, OnScrollTouch);
 			Scroll.Collapse(0f);
-			NIGAFHNNOPH();
+			UpdateMenuExtras();
 			ScreenType cCGJDFLIKFN = Module.GetInstance().GetCurrentScreenType();
 			UpdateCurrentButton(cCGJDFLIKFN);
 		}
 
-		private void NIGAFHNNOPH()
+		private void UpdateMenuExtras()
 		{
 		}
 
-		private string BJHIIKEJKMM()
+		private string GetMenuLabelText()
 		{
 			return string.Empty;
 		}
 
-		private void IDFCHLJMFJC(object data)
+		private void OnScrollChanging(object data)
 		{
 		}
 
-		private void HNNNDCPDOJF()
+		private void OnScrollOpened()
 		{
 		}
 
-		private void OGGMAHKAJNL()
+		private void OnScrollClosed()
 		{
 		}
 
-		private void FCLOKKBAMIL(object data)
+		private void OnScrollRolling(object data)
 		{
-			MenuScroll.ANJKEGGALAG aNJKEGGALAG = (MenuScroll.ANJKEGGALAG)data;
-			if (GLJEDBNOHBM == aNJKEGGALAG)
+			MenuScroll.ScrollState aNJKEGGALAG = (MenuScroll.ScrollState)data;
+			if (scrollState == aNJKEGGALAG)
 			{
 				return;
 			}
-			GLJEDBNOHBM = aNJKEGGALAG;
+			scrollState = aNJKEGGALAG;
 			switch (aNJKEGGALAG)
 			{
-			case MenuScroll.ANJKEGGALAG.ScrollOpen:
-				BFKILDFOEBD = true;
+			case MenuScroll.ScrollState.ScrollOpen:
+				enableAiOnClose = true;
 				ModelAi.set_AiOn(false);
 				BackKeyManager.get_Instance().AddBackKeyController(this);
-				HNNNDCPDOJF();
+				OnScrollOpened();
 				break;
-			case MenuScroll.ANJKEGGALAG.ScrollClose:
-				if (BFKILDFOEBD)
+			case MenuScroll.ScrollState.ScrollClose:
+				if (enableAiOnClose)
 				{
 					ModelAi.set_AiOn(true);
 				}
 				BackKeyManager.get_Instance().RemoveBackKeyController(this);
-				OGGMAHKAJNL();
+				OnScrollClosed();
 				break;
 			}
 		}
 
-		private void NPPDCDCLJKN(object data)
+		private void OnScrollTouch(object data)
 		{
 			if (!Scroll.IsExpanded())
 			{
@@ -374,27 +374,27 @@ namespace Nekki.SF2.GUI.Menu
 			UpdateNewPerks();
 		}
 
-		private void BOJNFFALDHH()
+		private void InitMenuButtons()
 		{
 			btnDojo.onClick.AddListener(() =>
 			{
-				OnClickButton(BGGGJCMEGPH.MENU_DOJO);
+				OnClickButton(MenuButtonType.MENU_DOJO);
 			});
 			btnMap.onClick.AddListener(() =>
 			{
-				OnClickButton(BGGGJCMEGPH.MENU_MAP);
+				OnClickButton(MenuButtonType.MENU_MAP);
 			});
 			btnShop.onClick.AddListener(() =>
 			{
-				OnClickButton(BGGGJCMEGPH.MENU_SHOP);
+				OnClickButton(MenuButtonType.MENU_SHOP);
 			});
 			btnProfile.onClick.AddListener(() =>
 			{
-				OnClickButton(BGGGJCMEGPH.MENU_PROFILE);
+				OnClickButton(MenuButtonType.MENU_PROFILE);
 			});
 			btnSettings.onClick.AddListener(() =>
 			{
-				OnClickButton(BGGGJCMEGPH.MENU_SETTINGS);
+				OnClickButton(MenuButtonType.MENU_SETTINGS);
 			});
 			if (btnDojoDisciple != null)
 			{
@@ -412,13 +412,13 @@ namespace Nekki.SF2.GUI.Menu
 		{
 			if (Module.GetInstance().GetCurrentScreenType() == ScreenType.ModuleDojo)
 			{
-				OnClickButton(BGGGJCMEGPH.MENU_DOJO_DISCIPLE);
+				OnClickButton(MenuButtonType.MENU_DOJO_DISCIPLE);
 			}
 		}
 
-		private void HIPEIJPLBJJ()
+		private void InitExperiencePanel()
 		{
-			_experience.AddEventListener(0, GAHLLNAMBAG);
+			_experience.AddEventListener(0, OnLevelHintClicked);
 		}
 
 		public void UpdateLevel()
@@ -436,9 +436,9 @@ namespace Nekki.SF2.GUI.Menu
 			}
 		}
 
-		private void AIJADDNEMIP()
+		private void InitSkipTutorialButton()
 		{
-			bool flag = SystemProperties.DBBOCENKMGD() && Module.GetInstance().OMDLOOFIJDF();
+			bool flag = SystemProperties.IsDebug() && Module.GetInstance().IsUserTutorialComplete();
 			_skipTutorialBtn.gameObject.SetActive(flag);
 			if (flag)
 			{
@@ -449,9 +449,9 @@ namespace Nekki.SF2.GUI.Menu
 			}
 		}
 
-		private void AMLMDKMDLEA()
+		private void InitMoneyPanel()
 		{
-			_money.AddEventListener(0, LCLMOFGJJBB);
+			_money.AddEventListener(0, OnMoneyButtonClicked);
 		}
 
 		public void UpdateMoney()
@@ -479,7 +479,7 @@ namespace Nekki.SF2.GUI.Menu
 			return _money.GetRubyBtn();
 		}
 
-		private void IDEDNCKEDHG()
+		private void InitMaterialsPanel()
 		{
 			_materials.gameObject.SetActive(false);
 		}
@@ -498,9 +498,9 @@ namespace Nekki.SF2.GUI.Menu
 			}
 		}
 
-		private void LFJEDFKNKCH()
+		private void InitEnergyPanel()
 		{
-			_energy.AddEventListener(0, PDAINDBEFAH);
+			_energy.AddEventListener(0, OnEnergyBarClicked);
 		}
 
 		public void UpdateBarEnergy()
@@ -511,20 +511,20 @@ namespace Nekki.SF2.GUI.Menu
 		public void UpdateEnergyView()
 		{
 			_energy.UpdateView();
-			LINDDBLFMHJ();
+			UpdatePanelsLayout();
 		}
 
-		private void PDAINDBEFAH(object data)
+		private void OnEnergyBarClicked(object data)
 		{
-			if (!ListSF.CCDKHLAMKKO().ADKHNLAMDJP && ListSF.GetInstance().FFBAJNGHGGD(QuestEvent.PMDPDMFLCIJ.QUEST_EVENT_ENERGY_BAR_PRESS))
+			if (!ListSF.GetRoster().HasUnlimitedEnergy && ListSF.GetInstance().RaiseQuestEvent(QuestEvent.QuestEventType.QUEST_EVENT_ENERGY_BAR_PRESS))
 			{
-				ListSF.GetInstance().MHHNIPBJNAD();
+				ListSF.GetInstance().RunQuestActions();
 			}
 		}
 
 		public void UpdateMenu()
 		{
-			Roster nKGLHEGIKKP = ListSF.CCDKHLAMKKO();
+			Roster nKGLHEGIKKP = ListSF.GetRoster();
 			if (0 == 0)
 			{
 				_experience.gameObject.SetActive(true);
@@ -534,7 +534,7 @@ namespace Nekki.SF2.GUI.Menu
 					_raidRating.gameObject.SetActive(false);
 				}
 				UpdateLevel();
-				UpdateBarExp(nKGLHEGIKKP.EOKLELGLHJJ(), nKGLHEGIKKP.HEOHJNFGEDH());
+				UpdateBarExp(nKGLHEGIKKP.GetExperience(), nKGLHEGIKKP.GetExperienceToNextLevel());
 			}
 			else
 			{
@@ -548,7 +548,7 @@ namespace Nekki.SF2.GUI.Menu
 			UpdateNewItems();
 			UpdateMaterials();
 			UpdateBarEnergy();
-			LINDDBLFMHJ();
+			UpdatePanelsLayout();
 		}
 
 		public void UpdateMenuSize()
@@ -561,57 +561,57 @@ namespace Nekki.SF2.GUI.Menu
 			Scroll.Collapse(_Duration);
 		}
 
-		private void LCLMOFGJJBB(object data)
+		private void OnMoneyButtonClicked(object data)
 		{
-			OnClickButton(BGGGJCMEGPH.MENU_MONEY);
+			OnClickButton(MenuButtonType.MENU_MONEY);
 		}
 
-		private void OnClickButton(BGGGJCMEGPH KNCNFGABHCL)
+		private void OnClickButton(MenuButtonType KNCNFGABHCL)
 		{
-			BFKILDFOEBD = true;
+			enableAiOnClose = true;
 			switch (KNCNFGABHCL)
 			{
-			case BGGGJCMEGPH.MENU_DOJO:
-				Module.DLOKJOHNDID(ScreenType.ModuleDojo);
+			case MenuButtonType.MENU_DOJO:
+				Module.OpenScreen(ScreenType.ModuleDojo);
 				break;
-			case BGGGJCMEGPH.MENU_SHOP:
-				Module.DLOKJOHNDID(ScreenType.ModuleShop);
+			case MenuButtonType.MENU_SHOP:
+				Module.OpenScreen(ScreenType.ModuleShop);
 				break;
-			case BGGGJCMEGPH.MENU_MAP:
-				Module.DLOKJOHNDID(ScreenType.ModuleMap);
+			case MenuButtonType.MENU_MAP:
+				Module.OpenScreen(ScreenType.ModuleMap);
 				break;
-			case BGGGJCMEGPH.MENU_EXIT:
-				GameUtils.PGLIKMEJBPK();
+			case MenuButtonType.MENU_EXIT:
+				GameUtils.ExitApplication();
 				break;
-			case BGGGJCMEGPH.MENU_PROFILE:
-				Module.DLOKJOHNDID(ScreenType.ModuleProfile);
+			case MenuButtonType.MENU_PROFILE:
+				Module.OpenScreen(ScreenType.ModuleProfile);
 				break;
-			case BGGGJCMEGPH.MENU_MONEY:
+			case MenuButtonType.MENU_MONEY:
 			{
-				GNECFGFOMCO = SliderType.SliderRuby;
+				shopSliderType = SliderType.SliderRuby;
 				ShopScene current = Scene<ShopScene>.get_Current();
 				if (current != null)
 				{
-					current.GoToSlider(GNECFGFOMCO);
+					current.GoToSlider(shopSliderType);
 				}
 				else
 				{
-					Module.DLOKJOHNDID(ScreenType.ModuleShop, new DelayedStrike(GNECFGFOMCO));
+					Module.OpenScreen(ScreenType.ModuleShop, new DelayedStrike(shopSliderType));
 				}
 				break;
 			}
-			case BGGGJCMEGPH.MENU_SETTINGS:
-				BFKILDFOEBD = false;
-				DialogsOpener.DBHBIMGMIEH();
+			case MenuButtonType.MENU_SETTINGS:
+				enableAiOnClose = false;
+				DialogsOpener.OpenSettingsDialog();
 				CloseMenu(0.25f);
 				break;
-			case BGGGJCMEGPH.MENU_DOJO_DISCIPLE:
-				ListSF.CCDKHLAMKKO().MHGIEFLBBGM();
+			case MenuButtonType.MENU_DOJO_DISCIPLE:
+				ListSF.GetRoster().ToggleDiscipleMode();
 				UpdateDojoDiscipleButton();
-				Module.DLOKJOHNDID(ScreenType.ModuleDojo);
+				Module.OpenScreen(ScreenType.ModuleDojo);
 				break;
 			}
-			if (KNCNFGABHCL == BGGGJCMEGPH.MENU_SETTINGS)
+			if (KNCNFGABHCL == MenuButtonType.MENU_SETTINGS)
 			{
 			}
 		}
@@ -620,9 +620,9 @@ namespace Nekki.SF2.GUI.Menu
 		{
 			if (IsEnabled() != PKHDLOGJKAD)
 			{
-				LGIPIBGBOOG = PKHDLOGJKAD;
-				_menuBlocker.gameObject.SetActive(!LGIPIBGBOOG);
-				if (!LGIPIBGBOOG)
+				isEnabled = PKHDLOGJKAD;
+				_menuBlocker.gameObject.SetActive(!isEnabled);
+				if (!isEnabled)
 				{
 					Scroll.Collapse(0f);
 				}
@@ -631,23 +631,23 @@ namespace Nekki.SF2.GUI.Menu
 
 		public bool IsEnabled()
 		{
-			return LGIPIBGBOOG;
+			return isEnabled;
 		}
 
 		public void SkipTutorial()
 		{
-			if (ListSF.GetInstance().OMDLOOFIJDF())
+			if (ListSF.GetInstance().IsTutorialComplete())
 			{
 				string currentQuestName = QuestsManager.get_Instance().CurrentQuestName;
 				QuestStage questByName = QuestsManager.get_Instance().GetQuestByName(currentQuestName);
 				if (questByName != null)
 				{
-					questByName.MFGLIALECAM();
+					questByName.FinishQuest();
 				}
 			}
-			ListSF.CCDKHLAMKKO().BKBHIMEEDBG().set_StoryTutorialStep(GameUtils.AKPBNLKFONO.StepsNames[GameUtils.AKPBNLKFONO.StepsNames.Count - 1]);
+			ListSF.GetRoster().GetTutorials().set_StoryTutorialStep(GameUtils.TutorialSettings.StepsNames[GameUtils.TutorialSettings.StepsNames.Count - 1]);
 			_skipTutorialBtn.gameObject.SetActive(false);
-			Module.DLOKJOHNDID(ScreenType.ModuleMap);
+			Module.OpenScreen(ScreenType.ModuleMap);
 		}
 
 		public void UpdateCurrentButton(ScreenType CCGJDFLIKFN)
@@ -690,12 +690,12 @@ namespace Nekki.SF2.GUI.Menu
 			}
 		}
 
-		private void KEBHMKNOOFC()
+		private void InitDojoDiscipleButton()
 		{
-			bool flag = ListSF.CCDKHLAMKKO().BGBFBIDOECK() == 1;
+			bool flag = ListSF.GetRoster().GetDiscipleMode() == 1;
 			ResolutionImage resolutionImage = btnDojoDisciple.targetGraphic as ResolutionImage;
 			resolutionImage.set_SpriteName((!flag) ? "MenuButtons.btn_disciple" : "MenuButtons.btn_punching_bag");
-			Roster roster = ListSF.CCDKHLAMKKO();
+			Roster roster = ListSF.GetRoster();
 			UpdateDojoDiscipleVisibility(Module.GetInstance().GetCurrentScreenType());
 		}
 
@@ -706,8 +706,8 @@ namespace Nekki.SF2.GUI.Menu
 				return;
 			}
 			Eclipse.UI.ModDojoButtons.Update(btnDojoDisciple.transform as RectTransform, screen == ScreenType.ModuleDojo);
-			Roster roster = ListSF.CCDKHLAMKKO();
-			bool unlocked = roster != null && roster.FJGCOOAACLD("ShowDojoDisciple") &&
+			Roster roster = ListSF.GetRoster();
+			bool unlocked = roster != null && roster.HasSessionSetting("ShowDojoDisciple") &&
 				roster.GetSettingsXML("ShowDojoDisciple") != "0";
 			btnDojoDisciple.gameObject.SetActive(unlocked && screen == ScreenType.ModuleDojo);
 		}
@@ -716,7 +716,7 @@ namespace Nekki.SF2.GUI.Menu
 		{
 			if (btnDojoDisciple != null)
 			{
-				bool flag = ListSF.CCDKHLAMKKO().BGBFBIDOECK() == 1;
+				bool flag = ListSF.GetRoster().GetDiscipleMode() == 1;
 				ResolutionImage resolutionImage = btnDojoDisciple.targetGraphic as ResolutionImage;
 				resolutionImage.set_SpriteName((!flag) ? "MenuButtons.btn_disciple" : "MenuButtons.btn_punching_bag");
 			}
@@ -730,43 +730,43 @@ namespace Nekki.SF2.GUI.Menu
 			}
 		}
 
-		private void LINDDBLFMHJ()
+		private void UpdatePanelsLayout()
 		{
 		}
 
-		private void GAHLLNAMBAG(object EMBBNNBFODN)
+		private void OnLevelHintClicked(object EMBBNNBFODN)
 		{
-			Roster nKGLHEGIKKP = ListSF.CCDKHLAMKKO();
-			string hCPNFPMHFCM = ((nKGLHEGIKKP.EOKLELGLHJJ() != nKGLHEGIKKP.HEOHJNFGEDH()) ? LocalizationManager.GetString("experienceHint", nKGLHEGIKKP.EOKLELGLHJJ().ToString(), nKGLHEGIKKP.HEOHJNFGEDH().ToString()) : LocalizationManager.GetString("dlgComingSoonText"));
+			Roster nKGLHEGIKKP = ListSF.GetRoster();
+			string hCPNFPMHFCM = ((nKGLHEGIKKP.GetExperience() != nKGLHEGIKKP.GetExperienceToNextLevel()) ? LocalizationManager.GetString("experienceHint", nKGLHEGIKKP.GetExperience().ToString(), nKGLHEGIKKP.GetExperienceToNextLevel().ToString()) : LocalizationManager.GetString("dlgComingSoonText"));
 			_experience.ShowHint(hCPNFPMHFCM);
 		}
 
-		private void LIMBEOKCMOD()
+		private void ResetBadgesAndExtras()
 		{
-			NIGAFHNNOPH();
-			FEOMOKGELOH();
-			AOLACIPNFFP();
+			UpdateMenuExtras();
+			HideNewItemsBadge();
+			HideNewPerksBadge();
 		}
 
-		private int AJENLAJMCCI()
+		private int GetCurrentButtonIndex()
 		{
-			if (HNCLEDJDODK == btnDojo)
+			if (currentButton == btnDojo)
 			{
 				return 0;
 			}
-			if (HNCLEDJDODK == btnMap)
+			if (currentButton == btnMap)
 			{
 				return 1;
 			}
-			if (HNCLEDJDODK == btnShop)
+			if (currentButton == btnShop)
 			{
 				return 2;
 			}
-			if (HNCLEDJDODK == btnProfile)
+			if (currentButton == btnProfile)
 			{
 				return 3;
 			}
-			if (HNCLEDJDODK == btnSettings)
+			if (currentButton == btnSettings)
 			{
 				return 4;
 			}
@@ -783,14 +783,14 @@ namespace Nekki.SF2.GUI.Menu
 			BackKeyManager.get_Instance().RemoveBackKeyController(this);
 		}
 
-		private void AOLACIPNFFP()
+		private void HideNewPerksBadge()
 		{
 			_newPerksCircle.gameObject.SetActive(false);
 			_newPerksEllipse.gameObject.SetActive(false);
 			_newPerksLabel.gameObject.SetActive(false);
 		}
 
-		private void FEOMOKGELOH()
+		private void HideNewItemsBadge()
 		{
 			_newItemsCircle.gameObject.SetActive(false);
 			_newItemsEllipse.gameObject.SetActive(false);
@@ -802,7 +802,7 @@ namespace Nekki.SF2.GUI.Menu
 			_newPerksCircle.gameObject.SetActive(false);
 			_newPerksEllipse.gameObject.SetActive(false);
 			_newPerksLabel.gameObject.SetActive(false);
-			int num = ListSF.CCDKHLAMKKO().JLBDOBLHHAF().OPPFMFKAOIG() + ListSF.CCDKHLAMKKO().KJNPJKEHGLE().JKGGEMEBPCP() + ListSF.CCDKHLAMKKO().NPKBPGMNDFJ() + ListSF.CCDKHLAMKKO().CNFOLIEFJCE();
+			int num = ListSF.GetRoster().GetPerks().GetFreePerkPoints() + ListSF.GetRoster().GetAchievements().CountCompletedAchievements() + ListSF.GetRoster().CountNewTricks() + ListSF.GetRoster().CountOwnedSeals();
 			if (num > 0)
 			{
 				if (num < 10)
@@ -823,7 +823,7 @@ namespace Nekki.SF2.GUI.Menu
 			_newItemsCircle.gameObject.SetActive(false);
 			_newItemsEllipse.gameObject.SetActive(false);
 			_newItemsLabel.gameObject.SetActive(false);
-			int num = ListSF.GetItems().EFEJPENECKN();
+			int num = ListSF.GetItems().GetNewItemsCount();
 			if (num > 0)
 			{
 				if (num < 10)
@@ -844,49 +844,49 @@ namespace Nekki.SF2.GUI.Menu
 			if ((bool)_materials)
 			{
 				_materials.UpdateView();
-				LINDDBLFMHJ();
+				UpdatePanelsLayout();
 			}
 		}
 
-		private void BMCLJOPBBNA(object data)
+		private void OnMenuEvent(object data)
 		{
 		}
 
-		private void GAALGNEPKEF()
+		private void CloseMenuIfNotCurrent()
 		{
 			ScreenType cCGJDFLIKFN = Module.GetInstance().GetCurrentScreenType();
-			if (HNCLEDJDODK != GetButtonFromScreen(cCGJDFLIKFN))
+			if (currentButton != GetButtonFromScreen(cCGJDFLIKFN))
 			{
 				CloseMenu(0.25f);
 			}
 		}
 
-		private void INCIAEMHDHE()
+		private void CloseMenuAnimated()
 		{
 			CloseMenu(0.25f);
 		}
 
 		public void SetCurrentButton(SectionButton KLNKEPMAGKF)
 		{
-			if ((bool)HNCLEDJDODK)
+			if ((bool)currentButton)
 			{
-				HNCLEDJDODK.interactable = true;
-				HNCLEDJDODK.transition = Selectable.Transition.ColorTint;
-				HNCLEDJDODK.OFPNNIBBNCE(NFOGOFFAPPP.HHGPKAJENGF.PressNormal);
+				currentButton.interactable = true;
+				currentButton.transition = Selectable.Transition.ColorTint;
+				currentButton.SetPressType(ButtonStateExtensions.ButtonPressType.PressNormal);
 			}
-			HNCLEDJDODK = KLNKEPMAGKF;
-			if ((bool)HNCLEDJDODK)
+			currentButton = KLNKEPMAGKF;
+			if ((bool)currentButton)
 			{
-				HNCLEDJDODK.interactable = false;
-				HNCLEDJDODK.transition = Selectable.Transition.SpriteSwap;
-				HNCLEDJDODK.OFPNNIBBNCE(NFOGOFFAPPP.HHGPKAJENGF.PressInactive);
+				currentButton.interactable = false;
+				currentButton.transition = Selectable.Transition.SpriteSwap;
+				currentButton.SetPressType(ButtonStateExtensions.ButtonPressType.PressInactive);
 			}
 		}
 
 		public void RecreateMoney()
 		{
-			AMLMDKMDLEA();
-			LINDDBLFMHJ();
+			InitMoneyPanel();
+			UpdatePanelsLayout();
 			UpdateMenu();
 		}
 
@@ -894,15 +894,15 @@ namespace Nekki.SF2.GUI.Menu
 		{
 			_energy.gameObject.SetActive(false);
 			_money.SetNormalViewMode();
-			BHBADDAEICJ(DGNLFEPIANN);
+			HideMaterialsForNormalView(DGNLFEPIANN);
 		}
 
 		public void SetForgeViewMode(bool DGNLFEPIANN)
 		{
-			PDBCNNFEMJA(DGNLFEPIANN);
+			ApplyForgeView(DGNLFEPIANN);
 		}
 
-		private void BHBADDAEICJ(bool DGNLFEPIANN)
+		private void HideMaterialsForNormalView(bool DGNLFEPIANN)
 		{
 			if (_materials != null)
 			{
@@ -910,14 +910,14 @@ namespace Nekki.SF2.GUI.Menu
 			}
 		}
 
-		private void DMNJFBBNOOO()
+		private void HideMaterialsPanel()
 		{
 			_materials.gameObject.SetActive(false);
 		}
 
-		private void PDBCNNFEMJA(bool DGNLFEPIANN)
+		private void ApplyForgeView(bool DGNLFEPIANN)
 		{
-			GAAPKDHPJNB();
+			ApplyForgeMoneyView();
 			if (_materials != null)
 			{
 				_materials.gameObject.SetActive(true);
@@ -925,23 +925,23 @@ namespace Nekki.SF2.GUI.Menu
 			}
 		}
 
-		private void GAAPKDHPJNB()
+		private void ApplyForgeMoneyView()
 		{
 			_energy.gameObject.SetActive(false);
 			_money.SetForgeViewMode();
 		}
 
-		private void GAKACHNBENN()
+		private void OnDojoEntered()
 		{
-			NIGAFHNNOPH();
+			UpdateMenuExtras();
 			if (!btnDojoDisciple)
 			{
 			}
 		}
 
-		private void KAMOJAKJILE()
+		private void OnDojoExited()
 		{
-			NIGAFHNNOPH();
+			UpdateMenuExtras();
 			if (!btnDojoDisciple)
 			{
 			}

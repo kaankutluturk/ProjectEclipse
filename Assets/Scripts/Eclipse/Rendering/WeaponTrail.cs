@@ -258,7 +258,7 @@ namespace Eclipse.Rendering
 				_selected.Add(definition);
 			}
 			changed |= UpdateSelection(_glints, _selected);
-			Dictionary<string, ModelNode> nodes = _model.CLDMEJKGLBA()?.HKCFFKKFFFE();
+			Dictionary<string, ModelNode> nodes = _model.GetBodyObject()?.GetNodesByName();
 			int nodeCount = nodes != null ? nodes.Count : 0;
 			if (!changed && ReferenceEquals(nodes, _nodes) && nodeCount == _nodeCount) return;
 			_preset = preset; _nodes = nodes; _nodeCount = nodeCount;
@@ -340,22 +340,22 @@ namespace Eclipse.Rendering
 
 		private void ResolveBlades(Stream stream)
 		{
-			ModelObject body = _model.CLDMEJKGLBA();
-			Dictionary<string, ModelNode> nodes = body?.HKCFFKKFFFE();
+			ModelObject body = _model.GetBodyObject();
+			Dictionary<string, ModelNode> nodes = body?.GetNodesByName();
 			if (nodes == null) return;
-			Vector3 pivot = body.HOFFDCFEBGA() != null ? ToVector(body.HOFFDCFEBGA().GetStart()) : Vector3.zero;
+			Vector3 pivot = body.GetCenterOfMassNode() != null ? ToVector(body.GetCenterOfMassNode().GetStart()) : Vector3.zero;
 
 			if (!stream.Weapon)
 			{
 				// Two named nodes: the first is the inner end, the second the moving end.
-				ModelNode inner = body.KLAPIGGACMM(stream.Nodes[0]);
-				ModelNode outer = body.KLAPIGGACMM(stream.Nodes[1]);
+				ModelNode inner = body.GetNodeByNameOrParent(stream.Nodes[0]);
+				ModelNode outer = body.GetNodeByNameOrParent(stream.Nodes[1]);
 				if (inner != null && outer != null && inner != outer) stream.Blades.Add(new Blade { Grip = inner, Tip = outer });
 				return;
 			}
 
 			// 1. Explicit blade edges.
-			List<ModelEdge> edges = body.BKAPPJMGPKP();
+			List<ModelEdge> edges = body.GetAllEdges();
 			if (edges != null)
 				foreach (ModelEdge edge in edges)
 				{
@@ -395,7 +395,7 @@ namespace Eclipse.Rendering
 		private static string WeaponHand(ModelMacroNode macro)
 		{
 			var names = new List<string>();
-			List<global::Pair<ModelNode, float>> bound = macro.LDEBJOPLCKO();
+			List<global::Pair<ModelNode, float>> bound = macro.GetNodeWeights();
 			if (bound != null && bound.Count > 0)
 			{
 				foreach (var child in bound) names.Add(child?.First?.GetName());

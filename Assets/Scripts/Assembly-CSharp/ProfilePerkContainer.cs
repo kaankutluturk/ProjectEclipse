@@ -4,7 +4,7 @@ public class ProfilePerkContainer
 {
 	public int Level;
 
-	public List<ProfilePerk> JOGBKOJCINM = new List<ProfilePerk>();
+	public List<ProfilePerk> Perks = new List<ProfilePerk>();
 
 	public ProfilePerkContainer(int _level)
 	{

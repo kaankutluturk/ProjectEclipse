@@ -5,13 +5,13 @@ public class TemplateAnimation
 {
 	private string _Name;
 
-	private List<InfoAnimation> LKBADGFHJHK = new List<InfoAnimation>();
+	private List<InfoAnimation> _animations = new List<InfoAnimation>();
 
-	public List<InfoAnimation> AAHADKFKDPN
+	public List<InfoAnimation> Animations
 	{
 		get
 		{
-			return LDEBJOPLCKO();
+			return GetAnimations();
 		}
 	}
 
@@ -23,7 +23,7 @@ public class TemplateAnimation
 	public TemplateAnimation(InfoAnimation EDMCLHEOJGD)
 	{
 		_Name = EDMCLHEOJGD.Name;
-		MBJCDIDIBDJ(EDMCLHEOJGD);
+		AddAnimation(EDMCLHEOJGD);
 	}
 
 	public string get_Name()
@@ -31,14 +31,14 @@ public class TemplateAnimation
 		return _Name;
 	}
 
-	public List<InfoAnimation> LDEBJOPLCKO()
+	public List<InfoAnimation> GetAnimations()
 	{
-		return LKBADGFHJHK;
+		return _animations;
 	}
 
-	public void MBJCDIDIBDJ(InfoAnimation DBOLBEOCEME)
+	public void AddAnimation(InfoAnimation DBOLBEOCEME)
 	{
-		LKBADGFHJHK.AddIfNotExist(DBOLBEOCEME);
+		_animations.AddIfNotExist(DBOLBEOCEME);
 		DBOLBEOCEME.AddTemplateName(_Name);
 	}
 }

@@ -21,7 +21,7 @@ public class TacticsCompiler
 			{
 				continue;
 			}
-			string text = xmlAttribute.CIPOICEEIBK(string.Empty);
+			string text = xmlAttribute.GetStringOrDefault(string.Empty);
 			string[] array = text.Split('|');
 			List<string> list = new List<string>();
 			list.AddRange(array);
@@ -30,7 +30,7 @@ public class TacticsCompiler
 			if (0 < num)
 			{
 				int iHPMGHJPLBP = 0;
-				JKJLFOAOLFI(xmlNode, childNode, list, iHPMGHJPLBP);
+				ApplyTemplates(xmlNode, childNode, list, iHPMGHJPLBP);
 			}
 			if (list.Count == 0)
 			{
@@ -49,7 +49,7 @@ public class TacticsCompiler
 		}
 	}
 
-	private static void JKJLFOAOLFI(XmlNode AFHNINCKJEE, XmlNode OEMALIFPGPO, List<string> JIGEFEPNCIN, int index)
+	private static void ApplyTemplates(XmlNode AFHNINCKJEE, XmlNode OEMALIFPGPO, List<string> JIGEFEPNCIN, int index)
 	{
 		if (JIGEFEPNCIN.Count <= index)
 		{
@@ -59,19 +59,19 @@ public class TacticsCompiler
 		XmlNode xmlNode = GetTemplateNode(AFHNINCKJEE, pAGGPPPLPGC);
 		if (xmlNode != null)
 		{
-			KDMOFABEMLN(OEMALIFPGPO, xmlNode);
-			OKLPIDNNLJK(OEMALIFPGPO, xmlNode);
+			MergeAttributes(OEMALIFPGPO, xmlNode);
+			MergeChildNodes(OEMALIFPGPO, xmlNode);
 			XmlAttribute xmlAttribute = xmlNode.Attributes["Template"];
 			if (xmlAttribute != null)
 			{
-				string text = xmlAttribute.CIPOICEEIBK(string.Empty);
+				string text = xmlAttribute.GetStringOrDefault(string.Empty);
 				List<string> list = new List<string>();
 				string[] collection = text.Split('|');
 				list.AddRange(collection);
 				JIGEFEPNCIN.AddIfNotExist(list);
 			}
 		}
-		JKJLFOAOLFI(AFHNINCKJEE, OEMALIFPGPO, JIGEFEPNCIN, index + 1);
+		ApplyTemplates(AFHNINCKJEE, OEMALIFPGPO, JIGEFEPNCIN, index + 1);
 	}
 
 	private static XmlNode GetTemplateNode(XmlNode AFHNINCKJEE, string PAGGPPPLPGC)
@@ -80,18 +80,18 @@ public class TacticsCompiler
 		{
 			if (childNode.Name == "Tactic")
 			{
-				string text = childNode.Attributes["Name"].CIPOICEEIBK(string.Empty);
+				string text = childNode.Attributes["Name"].GetStringOrDefault(string.Empty);
 				if (PAGGPPPLPGC == text)
 				{
 					return childNode;
 				}
 			}
 		}
-		LLLOJBFMONN.Error("TacticsSettings: tactics template " + PAGGPPPLPGC + " not found");
+		GameLog.Error("TacticsSettings: tactics template " + PAGGPPPLPGC + " not found");
 		return null;
 	}
 
-	public static void KDMOFABEMLN(XmlNode OEMALIFPGPO, XmlNode BBNKIBKPBLO, bool HPKBCMPEBJF = false)
+	public static void MergeAttributes(XmlNode OEMALIFPGPO, XmlNode BBNKIBKPBLO, bool HPKBCMPEBJF = false)
 	{
 		foreach (XmlAttribute attribute in BBNKIBKPBLO.Attributes)
 		{
@@ -99,7 +99,7 @@ public class TacticsCompiler
 			XmlAttribute xmlAttribute2 = OEMALIFPGPO.Attributes[name];
 			if (xmlAttribute2 == null)
 			{
-				OEMALIFPGPO.LCOLFMJJDJE(attribute);
+				OEMALIFPGPO.CopyAttribute(attribute);
 			}
 			else if (HPKBCMPEBJF)
 			{
@@ -108,7 +108,7 @@ public class TacticsCompiler
 		}
 	}
 
-	public static void OKLPIDNNLJK(XmlNode OEMALIFPGPO, XmlNode BBNKIBKPBLO)
+	public static void MergeChildNodes(XmlNode OEMALIFPGPO, XmlNode BBNKIBKPBLO)
 	{
 		foreach (XmlNode childNode in BBNKIBKPBLO.ChildNodes)
 		{
@@ -116,12 +116,12 @@ public class TacticsCompiler
 			XmlNode xmlNode2 = OEMALIFPGPO[name];
 			if (xmlNode2 == null)
 			{
-				OEMALIFPGPO.LCOLFMJJDJE(childNode);
+				OEMALIFPGPO.AppendImportedClone(childNode);
 			}
 		}
 	}
 
-	public static void AEGPGGKJBLG(XmlNode OEMALIFPGPO, XmlNode BBNKIBKPBLO)
+	public static void MergeTactics(XmlNode OEMALIFPGPO, XmlNode BBNKIBKPBLO)
 	{
 		XmlNode mEEAKLDGLDF = OEMALIFPGPO["TacticsSettings"]["Tactics"];
 		XmlNode xmlNode = BBNKIBKPBLO["TacticsSettings"]["Tactics"];
@@ -132,13 +132,13 @@ public class TacticsCompiler
 			{
 				continue;
 			}
-			string text = childNode.Attributes["Name"].CIPOICEEIBK(string.Empty);
+			string text = childNode.Attributes["Name"].GetStringOrDefault(string.Empty);
 			bool flag = false;
 			foreach (XmlNode childNode2 in OEMALIFPGPO.ChildNodes)
 			{
 				if (!(name != "Tactic"))
 				{
-					string text2 = childNode2.Attributes["Name"].CIPOICEEIBK(string.Empty);
+					string text2 = childNode2.Attributes["Name"].GetStringOrDefault(string.Empty);
 					if (text == text2)
 					{
 						flag = true;
@@ -148,7 +148,7 @@ public class TacticsCompiler
 			}
 			if (!flag)
 			{
-				mEEAKLDGLDF.LCOLFMJJDJE(childNode);
+				mEEAKLDGLDF.AppendImportedClone(childNode);
 			}
 		}
 	}

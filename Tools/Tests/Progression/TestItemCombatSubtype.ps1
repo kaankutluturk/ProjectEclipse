@@ -28,7 +28,7 @@ foreach ($case in @(@('Weapon','Spear','Naginata'),@('Weapon','Claws','HunterCla
     Check ($effective.GetValue($item) -eq $case[2]) 'AI fallback did not follow subtype.'
     [xml]$conditionXml='<Item Type="'+$case[0]+'" SubType="'+$case[2]+'"/>'
     $condition=[ConditionItemInfo]::new($conditionXml.DocumentElement)
-    $conditions=[ModelConditions]::new();$conditions.OJIAKDDCGLB=[Collections.Generic.List[ItemInfo]]::new();$conditions.OJIAKDDCGLB.Add($item)
+    $conditions=[ModelConditions]::new();$conditions.Items=[Collections.Generic.List[ItemInfo]]::new();$conditions.Items.Add($item)
     Check ($condition.IsEqual($conditions)) 'Native move condition did not see subtype.'
     $snapshot=$item.Clone()
     Check ($snapshot.SubType -eq $case[2]) 'New fighter snapshot lost subtype.'
@@ -71,7 +71,7 @@ $remove=[Eclipse.Modding.LegacyContentAdapter].GetMethod('RemovePerksAndEnchantm
 foreach($broken in @($false,$true,$false)) {
     $adapter=[Eclipse.Modding.LegacyContentAdapter]::new((Catalog $broken));$adapter.ApplyItems($items)
     $failure=$null
-    try {$adapter.ApplyPerksAndEnchantments([GameUtils]::FDEJIIDIPBI,[ForgeManager]::new())}catch{$failure=$_}
+    try {$adapter.ApplyPerksAndEnchantments([GameUtils]::PerkItemList,[ForgeManager]::new())}catch{$failure=$_}
     if($broken) {
         Check ($null -ne $failure -and $failure.ToString().Contains('combat subtype')) 'Missing native target accepted.'
         Check ($item.SubType -eq 'Spear' -and $second.SubType -eq 'RifleBullet') 'Partial native application failed to roll back.'

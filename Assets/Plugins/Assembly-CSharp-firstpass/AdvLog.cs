@@ -8,7 +8,7 @@ using UnityEngine;
 
 public static class AdvLog
 {
-	public enum NKKBMLLIKHH
+	public enum LogLevel
 	{
 		Log = 0,
 		Warn = 1,
@@ -19,11 +19,11 @@ public static class AdvLog
 
 	private static string _filePath;
 
-	public static bool LGJMHNJEPDK
+	public static bool LoggingEnabled
 	{
 		get
 		{
-			return PNBOAKLOFCE();
+			return GetLogNow();
 		}
 		set
 		{
@@ -31,7 +31,7 @@ public static class AdvLog
 		}
 	}
 
-	public static bool PNBOAKLOFCE()
+	public static bool GetLogNow()
 	{
 		return _logNow;
 	}
@@ -53,7 +53,7 @@ public static class AdvLog
 		if (string.IsNullOrEmpty(_filePath))
 		{
 			Application.logMessageReceived += ApplicationLogSubsctiption;
-			_filePath = Path.Combine(GlobalPaths.MNACDIFKBDG(), string.Format("log_{0}.log", DateTime.Now.ToString("yy_MM_dd__hh_mm_ss")));
+			_filePath = Path.Combine(GlobalPaths.GetExternalResourcesPath(), string.Format("log_{0}.log", DateTime.Now.ToString("yy_MM_dd__hh_mm_ss")));
 			File.WriteAllText(_filePath, string.Empty);
 		}
 	}
@@ -63,15 +63,15 @@ public static class AdvLog
 		switch (LFLGCDNKNJI)
 		{
 		case LogType.Log:
-			CNBFNEHEDKP(NKKBMLLIKHH.Log, IOFGGOCEIAM + " - " + HHLCHHIFDCM);
+			WriteToFile(LogLevel.Log, IOFGGOCEIAM + " - " + HHLCHHIFDCM);
 			break;
 		case LogType.Warning:
-			CNBFNEHEDKP(NKKBMLLIKHH.Warn, IOFGGOCEIAM + " - " + HHLCHHIFDCM);
+			WriteToFile(LogLevel.Warn, IOFGGOCEIAM + " - " + HHLCHHIFDCM);
 			break;
 		case LogType.Error:
 		case LogType.Assert:
 		case LogType.Exception:
-			CNBFNEHEDKP(NKKBMLLIKHH.Error, IOFGGOCEIAM + " - " + HHLCHHIFDCM);
+			WriteToFile(LogLevel.Error, IOFGGOCEIAM + " - " + HHLCHHIFDCM);
 			break;
 		}
 	}
@@ -96,9 +96,9 @@ public static class AdvLog
 		}
 	}
 
-	private static void CNBFNEHEDKP(NKKBMLLIKHH GNLOCMLBNHF, object LIOGIBJBHAH)
+	private static void WriteToFile(LogLevel GNLOCMLBNHF, object LIOGIBJBHAH)
 	{
-		if (LIOGIBJBHAH != null && !string.IsNullOrEmpty(LIOGIBJBHAH.ToString()) && PNBOAKLOFCE())
+		if (LIOGIBJBHAH != null && !string.IsNullOrEmpty(LIOGIBJBHAH.ToString()) && GetLogNow())
 		{
 			PushToFile(string.Format("[{0}:{1}] {2}", DateTime.Now, GNLOCMLBNHF, LIOGIBJBHAH));
 		}
@@ -111,7 +111,7 @@ public static class AdvLog
 
 	public static void Log(object LIOGIBJBHAH)
 	{
-		if (PNBOAKLOFCE())
+		if (GetLogNow())
 		{
 			Debug.Log(LIOGIBJBHAH);
 		}
@@ -119,87 +119,87 @@ public static class AdvLog
 
 	public static void Log(object LIOGIBJBHAH, UnityEngine.Object PDCAHMPCPOC)
 	{
-		if (PNBOAKLOFCE())
+		if (GetLogNow())
 		{
 			Debug.Log(LIOGIBJBHAH, PDCAHMPCPOC);
 		}
 	}
 
-	public static void HOGCGGPHKFC(UnityEngine.Object PDCAHMPCPOC, string LBOHOKIBHOH, params object[] LKIOKGCNKHE)
+	public static void LogFormat(UnityEngine.Object PDCAHMPCPOC, string LBOHOKIBHOH, params object[] LKIOKGCNKHE)
 	{
-		if (PNBOAKLOFCE())
+		if (GetLogNow())
 		{
 			Debug.LogFormat(PDCAHMPCPOC, LBOHOKIBHOH, LKIOKGCNKHE);
 		}
 	}
 
-	public static void HOGCGGPHKFC(string LBOHOKIBHOH, params object[] LKIOKGCNKHE)
+	public static void LogFormat(string LBOHOKIBHOH, params object[] LKIOKGCNKHE)
 	{
-		if (PNBOAKLOFCE())
+		if (GetLogNow())
 		{
 			Debug.LogFormat(LBOHOKIBHOH, LKIOKGCNKHE);
 		}
 	}
 
-	public static void LOPHFKMOPAA(object LIOGIBJBHAH)
+	public static void LogWarning(object LIOGIBJBHAH)
 	{
-		if (PNBOAKLOFCE())
+		if (GetLogNow())
 		{
 			Debug.LogWarning(LIOGIBJBHAH);
 		}
 	}
 
-	public static void LOPHFKMOPAA(object LIOGIBJBHAH, UnityEngine.Object PDCAHMPCPOC)
+	public static void LogWarning(object LIOGIBJBHAH, UnityEngine.Object PDCAHMPCPOC)
 	{
-		if (PNBOAKLOFCE())
+		if (GetLogNow())
 		{
 			Debug.LogWarning(LIOGIBJBHAH, PDCAHMPCPOC);
 		}
 	}
 
-	public static void FCGBAOEMDAI(UnityEngine.Object PDCAHMPCPOC, string LBOHOKIBHOH, params object[] LKIOKGCNKHE)
+	public static void LogWarningFormat(UnityEngine.Object PDCAHMPCPOC, string LBOHOKIBHOH, params object[] LKIOKGCNKHE)
 	{
-		if (PNBOAKLOFCE())
+		if (GetLogNow())
 		{
 			Debug.LogWarningFormat(PDCAHMPCPOC, LBOHOKIBHOH, LKIOKGCNKHE);
 		}
 	}
 
-	public static void FCGBAOEMDAI(string LBOHOKIBHOH, params object[] LKIOKGCNKHE)
+	public static void LogWarningFormat(string LBOHOKIBHOH, params object[] LKIOKGCNKHE)
 	{
-		if (PNBOAKLOFCE())
+		if (GetLogNow())
 		{
 			Debug.LogWarningFormat(LBOHOKIBHOH, LKIOKGCNKHE);
 		}
 	}
 
-	public static void CCOFFJPPAKC(object LIOGIBJBHAH)
+	public static void LogError(object LIOGIBJBHAH)
 	{
-		if (PNBOAKLOFCE())
+		if (GetLogNow())
 		{
 			Debug.LogError(LIOGIBJBHAH);
 		}
 	}
 
-	public static void CCOFFJPPAKC(object LIOGIBJBHAH, UnityEngine.Object PDCAHMPCPOC)
+	public static void LogError(object LIOGIBJBHAH, UnityEngine.Object PDCAHMPCPOC)
 	{
-		if (PNBOAKLOFCE())
+		if (GetLogNow())
 		{
 			Debug.LogError(LIOGIBJBHAH, PDCAHMPCPOC);
 		}
 	}
 
-	public static void DJGJADAFGKK(UnityEngine.Object PDCAHMPCPOC, string LBOHOKIBHOH, params object[] LKIOKGCNKHE)
+	public static void LogErrorFormat(UnityEngine.Object PDCAHMPCPOC, string LBOHOKIBHOH, params object[] LKIOKGCNKHE)
 	{
-		if (PNBOAKLOFCE())
+		if (GetLogNow())
 		{
 			Debug.LogErrorFormat(PDCAHMPCPOC, LBOHOKIBHOH, LKIOKGCNKHE);
 		}
 	}
 
-	public static void DJGJADAFGKK(string LBOHOKIBHOH, params object[] LKIOKGCNKHE)
+	public static void LogErrorFormat(string LBOHOKIBHOH, params object[] LKIOKGCNKHE)
 	{
-		if (PNBOAKLOFCE())
+		if (GetLogNow())
 		{
 			Debug.LogErrorFormat(LBOHOKIBHOH, LKIOKGCNKHE);
 		}
@@ -207,7 +207,7 @@ public static class AdvLog
 
 	public static void LogException(Exception MPFFFAOGBJE)
 	{
-		if (PNBOAKLOFCE())
+		if (GetLogNow())
 		{
 			Debug.LogException(MPFFFAOGBJE);
 		}
@@ -215,7 +215,7 @@ public static class AdvLog
 
 	public static void LogException(Exception MPFFFAOGBJE, UnityEngine.Object PDCAHMPCPOC)
 	{
-		if (PNBOAKLOFCE())
+		if (GetLogNow())
 		{
 			Debug.LogException(MPFFFAOGBJE, PDCAHMPCPOC);
 		}
@@ -223,21 +223,21 @@ public static class AdvLog
 
 	public static void Assert(bool IOFGGOCEIAM)
 	{
-		if (PNBOAKLOFCE())
+		if (GetLogNow())
 		{
 		}
 	}
 
 	public static void Assert(bool IOFGGOCEIAM, string LIOGIBJBHAH)
 	{
-		if (PNBOAKLOFCE())
+		if (GetLogNow())
 		{
 		}
 	}
 
 	public static void Assert(bool IOFGGOCEIAM, string LBOHOKIBHOH, params object[] LKIOKGCNKHE)
 	{
-		if (PNBOAKLOFCE())
+		if (GetLogNow())
 		{
 		}
 	}

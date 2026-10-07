@@ -3,21 +3,21 @@ using System.Diagnostics;
 public sealed class DataMessage : IServerMessage
 {
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private object JFKBADLJJBM;
+	private object data;
 
-	public LENCKBHFKLD get_Type()
+	public MessageTypes get_Type()
 	{
-		return LENCKBHFKLD.Data;
+		return MessageTypes.Data;
 	}
 
-	public object CHIGLEKCFFN()
+	public object GetData()
 	{
-		return JFKBADLJJBM;
+		return data;
 	}
 
 	private void set_Data(object value)
 	{
-		JFKBADLJJBM = value;
+		data = value;
 	}
 
 	void IServerMessage.Parse(object data)

@@ -6,7 +6,7 @@ namespace Nekki.SF2.GUI.Fight
 {
 	public class PauseScreen : MonoBehaviour
 	{
-		public class OLFKCBNNBFI : UnityEvent
+		public class PauseEvent : UnityEvent
 		{
 		}
 
@@ -24,30 +24,30 @@ namespace Nekki.SF2.GUI.Fight
 
 		public LabelAlias RulesLabel;
 
-		public OLFKCBNNBFI OnPlay = new OLFKCBNNBFI();
+		public PauseEvent OnPlay = new PauseEvent();
 
-		public OLFKCBNNBFI OnSurrender = new OLFKCBNNBFI();
+		public PauseEvent OnSurrender = new PauseEvent();
 
 		public void Init()
 		{
 			if (musicOn != null)
 			{
-				musicOn.gameObject.SetActive(!SoundController.ELHMADOKHHE());
+				musicOn.gameObject.SetActive(!SoundController.GetMusicMuted());
 			}
 			if (musicOff != null)
 			{
-				musicOff.gameObject.SetActive(SoundController.ELHMADOKHHE());
+				musicOff.gameObject.SetActive(SoundController.GetMusicMuted());
 			}
 			if (soundOn != null)
 			{
-				soundOn.gameObject.SetActive(!SoundController.AAFLCDKJEPL());
+				soundOn.gameObject.SetActive(!SoundController.GetSoundMuted());
 			}
 			if (soundOff != null)
 			{
-				soundOff.gameObject.SetActive(SoundController.AAFLCDKJEPL());
+				soundOff.gameObject.SetActive(SoundController.GetSoundMuted());
 			}
-			Sound.PMOECBEJGBL();
-			PBFOLPNNGOJ();
+			Sound.PauseAllSounds();
+			UpdateRulesLabel();
 			RebuildButtonsLayout();
 		}
 
@@ -61,9 +61,9 @@ namespace Nekki.SF2.GUI.Fight
 			}
 		}
 
-		private void PBFOLPNNGOJ()
+		private void UpdateRulesLabel()
 		{
-			string text = global::Fight.GetCurrentFight().GetFightDefinition().GJOAJAIJHOE();
+			string text = global::Fight.GetCurrentFight().GetFightDefinition().GetDescription();
 			bool flag = !string.IsNullOrEmpty(text);
 			RulesLabel.gameObject.SetActive(flag);
 			if (flag)
@@ -74,13 +74,13 @@ namespace Nekki.SF2.GUI.Fight
 
 		public void OnHomeClick()
 		{
-			Sound.BPPCHJFPEHB();
+			Sound.ResumeAllSounds();
 			OnSurrender.Invoke();
 		}
 
 		public void OnPlayClick()
 		{
-			Sound.BPPCHJFPEHB();
+			Sound.ResumeAllSounds();
 			OnPlay.Invoke();
 		}
 
@@ -94,7 +94,7 @@ namespace Nekki.SF2.GUI.Fight
 			{
 				musicOff.gameObject.SetActive(true);
 			}
-			SoundController.FMLHEDIPGAF(true);
+			SoundController.SetMusicMuted(true);
 			RebuildButtonsLayout();
 		}
 
@@ -108,7 +108,7 @@ namespace Nekki.SF2.GUI.Fight
 			{
 				musicOff.gameObject.SetActive(false);
 			}
-			SoundController.FMLHEDIPGAF(false);
+			SoundController.SetMusicMuted(false);
 			RebuildButtonsLayout();
 		}
 
@@ -122,7 +122,7 @@ namespace Nekki.SF2.GUI.Fight
 			{
 				soundOff.gameObject.SetActive(true);
 			}
-			SoundController.FLOFHMBDHNM(true);
+			SoundController.SetSoundMuted(true);
 			RebuildButtonsLayout();
 		}
 
@@ -136,7 +136,7 @@ namespace Nekki.SF2.GUI.Fight
 			{
 				soundOff.gameObject.SetActive(false);
 			}
-			SoundController.FLOFHMBDHNM(false);
+			SoundController.SetSoundMuted(false);
 			RebuildButtonsLayout();
 		}
 	}

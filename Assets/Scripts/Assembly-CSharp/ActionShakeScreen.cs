@@ -2,40 +2,40 @@ using System.Xml;
 
 public class ActionShakeScreen : ActionAnimation
 {
-	private GameUtils.HitEffect PMAEMMNLJJL = new GameUtils.HitEffect();
+	private GameUtils.HitEffect _Effect = new GameUtils.HitEffect();
 
-	public GameUtils.HitEffect NFOANIDAFGD
+	public GameUtils.HitEffect Effect
 	{
 		get
 		{
-			return CBNIELBJDAO();
+			return GetEffect();
 		}
 	}
 
 	public ActionShakeScreen(XmlNode node)
-		: base(FADAJCEEKIO.SHAKE_SCREEN)
+		: base(ActionType.SHAKE_SCREEN)
 	{
 		Parse(node);
 	}
 
-	public GameUtils.HitEffect CBNIELBJDAO()
+	public GameUtils.HitEffect GetEffect()
 	{
-		return PMAEMMNLJJL;
+		return _Effect;
 	}
 
 	public override void Visit(Model ACENLMONNPA)
 	{
-		ACENLMONNPA.OPPIKLBKMPN(this);
+		ACENLMONNPA.StartAction(this);
 	}
 
 	protected override void Parse(XmlNode node)
 	{
 		base.Parse(node);
-		PMAEMMNLJJL.NHKPODHHDPF = node.Attributes["PauseTime"].ParseInt();
-		PMAEMMNLJJL.OFJCKMNLAEP = node.Attributes["EffectTime"].ParseInt();
-		PMAEMMNLJJL.FMICELIGLPG = node.Attributes["AmplitudeX"].ParseFloat();
-		PMAEMMNLJJL.PPKAMOILNLN = node.Attributes["AmplitudeY"].ParseFloat();
-		PMAEMMNLJJL.KFEMKHHANDC = node.Attributes["FrequencyX"].ParseFloat();
-		PMAEMMNLJJL.GGJBPLHAHFH = node.Attributes["FrequencyY"].ParseFloat();
+		_Effect.PauseTime = node.Attributes["PauseTime"].ParseInt();
+		_Effect.EffectTime = node.Attributes["EffectTime"].ParseInt();
+		_Effect.AmplitudeX = node.Attributes["AmplitudeX"].ParseFloat();
+		_Effect.AmplitudeY = node.Attributes["AmplitudeY"].ParseFloat();
+		_Effect.FrequencyX = node.Attributes["FrequencyX"].ParseFloat();
+		_Effect.FrequencyY = node.Attributes["FrequencyY"].ParseFloat();
 	}
 }

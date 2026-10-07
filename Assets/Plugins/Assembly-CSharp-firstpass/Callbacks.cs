@@ -3,21 +3,21 @@ using System.Collections.Generic;
 
 public class Callbacks
 {
-	public Action<DFIPCKIEILP, string> AJHHICIMCDF;
+	public Action<SocialNetworkType, string> OnInitialized;
 
-	public Action<UserInfo> FAHEIIBEFGE;
+	public Action<UserInfo> OnUserInfo;
 
-	public Action<Dictionary<string, UserInfo>> MIMEMJDABNC;
+	public Action<Dictionary<string, UserInfo>> OnFriendsInfo;
 
-	public Action<Dictionary<string, UserInfo>> JKJFMHDBJCC;
+	public Action<Dictionary<string, UserInfo>> OnAppFriendsInfo;
 
-	public Action<bool> LNCNJPOAMLL;
+	public Action<bool> OnBookmarkState;
 
-	public Action<bool> EEBEIFHLHLM;
+	public Action<bool> OnGroupMembership;
 
-	public Action<string> BACNFJLHGNG;
+	public Action<string> OnWallPostResult;
 
-	public Action<string> BDKEHMPGDDH;
+	public Action<string> OnBuyResult;
 
-	public Action<bool> OBJFKDMJLJD;
+	public Action<bool> OnOrderCompleted;
 }

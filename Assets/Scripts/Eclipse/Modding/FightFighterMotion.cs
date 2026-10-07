@@ -18,7 +18,7 @@ public partial class Fight
         !IsLocalVersus && !IsTitleSparring && FightDefinition != null &&
         FightDefinition.get_Type() != BattleType.FightNone && FightDefinition.get_Type() != BattleType.FightPVP &&
         (!get_IsRaidFight() || ModModeRuntime.IsRaid(FightDefinition)) &&
-        stageType == StageType.FDBBPEGEGMK.STAGE_FIGHT && !isEndRound && !isGameOver && !isStopFight &&
+        stageType == StageType.Stage.STAGE_FIGHT && !isEndRound && !isGameOver && !isStopFight &&
         !_modelTransitionsClosed && round.processing &&
         !_eclipseFightEndDispatched && _eclipseEndedRound != round.round &&
         (model == GetPlayerModel() || model == GetEnemyModel()) &&

@@ -3,30 +3,30 @@ using UnityEngine;
 
 public class PlayCommand
 {
-	private float LNBIJCDHCIA;
+	private float volume;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private int IICMKGHFCHE;
+	private int chanelId;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private string CDCOKIBCAML;
+	private string sound;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private bool FPKOIEJFJOK;
+	private bool loop;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private bool ECNEEOIOLLG;
+	private bool overlap;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private bool GHKEHHMNBLO;
+	private bool isMusic;
 
-	private AudioSettings HPOJCCHMKOP;
+	private AudioSettings audioSettings;
 
-	public int GJKIMBMKCGN
+	public int ChannelId
 	{
 		get
 		{
-			return OKFNIMIANKK();
+			return GetChanelID();
 		}
 		private set
 		{
@@ -34,11 +34,11 @@ public class PlayCommand
 		}
 	}
 
-	public string MGCIEBJAJAL
+	public string SoundName
 	{
 		get
 		{
-			return JIKANFGDMJN();
+			return GetSound();
 		}
 		private set
 		{
@@ -46,35 +46,35 @@ public class PlayCommand
 		}
 	}
 
-	public bool OGBDAKHHGID
+	public bool Loop
 	{
 		get
 		{
-			return ADCBILEEEEO();
+			return GetLoop();
 		}
 		private set
 		{
-			KFEBCEOJLEI(value);
+			SetLoop(value);
 		}
 	}
 
-	public bool BDOLJOBHMNJ
+	public bool Overlap
 	{
 		get
 		{
-			return FKGNNDDNJDN();
+			return GetOverlap();
 		}
 		private set
 		{
-			KHKMBMCPLIC(value);
+			SetOverlap(value);
 		}
 	}
 
-	public bool MKAGGEPMEHF
+	public bool IsMusicTrack
 	{
 		get
 		{
-			return AGEEHOABFFF();
+			return GetIsMusic();
 		}
 		private set
 		{
@@ -82,94 +82,94 @@ public class PlayCommand
 		}
 	}
 
-	public float FLJPEPPDICN
+	public float Volume
 	{
 		get
 		{
-			return AFKMLMCCJLI();
+			return GetVolume();
 		}
 		set
 		{
-			EGGPLDIFDBC(value);
+			SetVolume(value);
 		}
 	}
 
 	public PlayCommand(int ADNDLGKIJJK, string LGLFOBEIPKB, bool KKHJAJFEPPA, bool HBCDAPJLKOJ, float JIJAJFEJJHK)
 	{
-		EGGPLDIFDBC(JIJAJFEJJHK);
-		KHKMBMCPLIC(HBCDAPJLKOJ);
-		KFEBCEOJLEI(KKHJAJFEPPA);
+		SetVolume(JIJAJFEJJHK);
+		SetOverlap(HBCDAPJLKOJ);
+		SetLoop(KKHJAJFEPPA);
 		set_Sound(LGLFOBEIPKB);
 		set_ChanelID(ADNDLGKIJJK);
 	}
 
-	public int OKFNIMIANKK()
+	public int GetChanelID()
 	{
-		return IICMKGHFCHE;
+		return chanelId;
 	}
 
 	private void set_ChanelID(int value)
 	{
-		IICMKGHFCHE = value;
+		chanelId = value;
 	}
 
-	public string JIKANFGDMJN()
+	public string GetSound()
 	{
-		return CDCOKIBCAML;
+		return sound;
 	}
 
 	private void set_Sound(string value)
 	{
-		CDCOKIBCAML = value;
+		sound = value;
 	}
 
-	public bool ADCBILEEEEO()
+	public bool GetLoop()
 	{
-		return FPKOIEJFJOK;
+		return loop;
 	}
 
-	private void KFEBCEOJLEI(bool value)
+	private void SetLoop(bool value)
 	{
-		FPKOIEJFJOK = value;
+		loop = value;
 	}
 
-	public bool FKGNNDDNJDN()
+	public bool GetOverlap()
 	{
-		return ECNEEOIOLLG;
+		return overlap;
 	}
 
-	private void KHKMBMCPLIC(bool value)
+	private void SetOverlap(bool value)
 	{
-		ECNEEOIOLLG = value;
+		overlap = value;
 	}
 
-	public bool AGEEHOABFFF()
+	public bool GetIsMusic()
 	{
-		return GHKEHHMNBLO;
+		return isMusic;
 	}
 
 	private void set_IsMusic(bool value)
 	{
-		GHKEHHMNBLO = value;
+		isMusic = value;
 	}
 
-	public float AFKMLMCCJLI()
+	public float GetVolume()
 	{
-		return LNBIJCDHCIA * ((!AGEEHOABFFF()) ? HPOJCCHMKOP.NBHPABEBLOP() : HPOJCCHMKOP.EAIGFAPKILL());
+		return volume * ((!GetIsMusic()) ? audioSettings.GetSoundsVolume() : audioSettings.GetMusicVolume());
 	}
 
-	public void EGGPLDIFDBC(float value)
+	public void SetVolume(float value)
 	{
-		LNBIJCDHCIA = Mathf.Clamp01(value);
+		volume = Mathf.Clamp01(value);
 	}
 
-	internal void KICCODIDHAP(bool MHAFPAHIFKP)
+	internal void SetMusic(bool MHAFPAHIFKP)
 	{
 		set_IsMusic(MHAFPAHIFKP);
 	}
 
-	internal void JJOFEEGNEDM(AudioSettings CCKFFGJGEJE)
+	internal void SetAudioSettings(AudioSettings CCKFFGJGEJE)
 	{
-		HPOJCCHMKOP = CCKFFGJGEJE;
+		audioSettings = CCKFFGJGEJE;
 	}
 }

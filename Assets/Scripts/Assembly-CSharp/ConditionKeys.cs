@@ -5,37 +5,37 @@ public class ConditionKeys : ConditionAnimation
 	// best guess for name
 	public KeyData RequiredKeys = new KeyData();
 
-	public KeyData GNNEIPGALBE;
+	public KeyData ReversedKeys;
 
 	public ConditionKeys(XmlNode node)
 		: base(ConditionType.KEYS)
 	{
 		foreach (XmlNode childNode in node.ChildNodes)
 		{
-			string bAINMLLIKOL = childNode.Attributes["Type"].CIPOICEEIBK(string.Empty);
-			FightCID item = (FightCID)MovesMaps.HHBMBMNLJIE(MovesMaps.NHKAHBBOIHG.KEY_TYPE, bAINMLLIKOL);
-			switch (childNode.Attributes["PressType"].CIPOICEEIBK(string.Empty))
+			string bAINMLLIKOL = childNode.Attributes["Type"].GetStringOrDefault(string.Empty);
+			FightCID item = (FightCID)MovesMaps.GetMappedIndex(MovesMaps.MapType.KEY_TYPE, bAINMLLIKOL);
+			switch (childNode.Attributes["PressType"].GetStringOrDefault(string.Empty))
 			{
 			case "Hold":
-				RequiredKeys.CEPODJDDLBF.Add((int)item);
+				RequiredKeys.AdditionalKeys.Add((int)item);
 				break;
 			case "Tap":
-				RequiredKeys.IGEEOAGOMEM.Add((int)item);
+				RequiredKeys.StarterKeys.Add((int)item);
 				break;
 			case "Release":
-				RequiredKeys.HPEOJLAMIHC.Add((int)item);
+				RequiredKeys.ReleaseKeys.Add((int)item);
 				break;
 			}
 		}
 		RequiredKeys.ResetPressType();
-		GNNEIPGALBE = new KeyData(RequiredKeys);
-		GNNEIPGALBE.Reverse(-1);
+		ReversedKeys = new KeyData(RequiredKeys);
+		ReversedKeys.Reverse(-1);
 	}
 
 	public override bool IsEqual(ModelConditions conditions)
 	{
-		KeyData oHGJEGDLEJK = ((!conditions.BJACLIMKPAE.IsInverted && conditions.PCAOCHAIBJC <= 0) ? GNNEIPGALBE : RequiredKeys);
-		bool flag = !conditions.IDCHHGHAENM || oHGJEGDLEJK.IsVariable(conditions.BJACLIMKPAE);
+		KeyData oHGJEGDLEJK = ((!conditions.PressedKeys.IsInverted && conditions.AnimationSign <= 0) ? ReversedKeys : RequiredKeys);
+		bool flag = !conditions.IsKeyCheckEnabled || oHGJEGDLEJK.IsVariable(conditions.PressedKeys);
 		return (!IsNot) ? flag : (!flag);
 	}
 

@@ -1,11 +1,11 @@
 public class InitializationModule : LoadingModule
 {
-	public override void JLPMOKPFECK()
+	public override void ProcessStep()
 	{
-		base.JLPMOKPFECK();
-		if (!CHIHBINEGFL)
+		base.ProcessStep();
+		if (!isFinished)
 		{
-			CHIHBINEGFL = true;
+			isFinished = true;
 		}
 	}
 }

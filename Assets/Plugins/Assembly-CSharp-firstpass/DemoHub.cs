@@ -4,89 +4,89 @@ internal class DemoHub : Hub
 {
 	private float longRunningJobProgress;
 
-	private string BDKGKIDENLD = "Not Started!";
+	private string longRunningJobStatus = "Not Started!";
 
-	private string PHBPEDLIAHI = string.Empty;
+	private string fromArbitraryCodeResult = string.Empty;
 
-	private string PEHHMKLDCIA = string.Empty;
+	private string groupAddedResult = string.Empty;
 
-	private string NMNIPAJGJEH = string.Empty;
+	private string dynamicTaskResult = string.Empty;
 
-	private string MELKHOCJFKD = string.Empty;
+	private string genericTaskResult = string.Empty;
 
-	private string ECACBKPAHAK = string.Empty;
+	private string taskWithExceptionResult = string.Empty;
 
-	private string GFAHEKCBLIF = string.Empty;
+	private string genericTaskWithExceptionResult = string.Empty;
 
-	private string DFLJODIKLEC = string.Empty;
+	private string synchronousExceptionResult = string.Empty;
 
-	private string AFFOCCDOAFH = string.Empty;
+	private string invokingHubMethodWithDynamicResult = string.Empty;
 
-	private string NMIIENFDDKD = string.Empty;
+	private string simpleArrayResult = string.Empty;
 
-	private string LPDPBBDNMLH = string.Empty;
+	private string complexTypeResult = string.Empty;
 
-	private string ANGAKMDNJEE = string.Empty;
+	private string complexArrayResult = string.Empty;
 
-	private string KPAPCGMIHNG = string.Empty;
+	private string voidOverloadResult = string.Empty;
 
-	private string IHNKPDBBHIE = string.Empty;
+	private string intOverloadResult = string.Empty;
 
-	private string MCGCCGAPGFK = string.Empty;
+	private string readStateResult = string.Empty;
 
-	private string IGHEAAICFLE = string.Empty;
+	private string plainTaskResult = string.Empty;
 
-	private string GINNBAGEJLG = string.Empty;
+	private string genericTaskWithContinueWithResult = string.Empty;
 
-	private GUIMessageList GGEMCGHOEBD = new GUIMessageList();
+	private GUIMessageList invokeResults = new GUIMessageList();
 
 	public DemoHub()
 		: base("demo")
 	{
-		JPJAFMLNALO("invoke", Invoke);
-		JPJAFMLNALO("signal", IANOIACGNAM);
-		JPJAFMLNALO("groupAdded", HNGKPFGMNIA);
-		JPJAFMLNALO("fromArbitraryCode", CCBJFGDFGJK);
+		On("invoke", Invoke);
+		On("signal", Signal);
+		On("groupAdded", GroupAdded);
+		On("fromArbitraryCode", FromArbitraryCode);
 	}
 
 	public void ReportProgress(string EHCLMBADLKH)
 	{
-		Call("reportProgress", ENCKNNJMOME, null, INPEMAAGEME, EHCLMBADLKH);
+		Call("reportProgress", OnLongRunningJob_Done, null, OnLongRunningJob_Progress, EHCLMBADLKH);
 	}
 
-	public void INPEMAAGEME(Hub CGFIJCNNCKP, ClientMessage JBEJKCPHFJP, ProgressMessage progress)
+	public void OnLongRunningJob_Progress(Hub CGFIJCNNCKP, ClientMessage JBEJKCPHFJP, ProgressMessage progress)
 	{
-		longRunningJobProgress = (float)progress.ALDEPEHMGNK();
-		BDKGKIDENLD = progress.ALDEPEHMGNK() + "%";
+		longRunningJobProgress = (float)progress.GetProgress();
+		longRunningJobStatus = progress.GetProgress() + "%";
 	}
 
-	public void ENCKNNJMOME(Hub CGFIJCNNCKP, ClientMessage BKNEELNMDHH, ResultMessage DCJLKCFKCOM)
+	public void OnLongRunningJob_Done(Hub CGFIJCNNCKP, ClientMessage BKNEELNMDHH, ResultMessage DCJLKCFKCOM)
 	{
-		BDKGKIDENLD = DCJLKCFKCOM.LBAIENGDLDJ().ToString();
-		BGFONCHEPJK();
+		longRunningJobStatus = DCJLKCFKCOM.GetReturnValue().ToString();
+		MultipleCalls();
 	}
 
-	public void BGFONCHEPJK()
+	public void MultipleCalls()
 	{
 		Call("multipleCalls");
 	}
 
-	public void LACEDJJCILL()
+	public void DynamicTask()
 	{
-		Call("dynamicTask", APPGLEMDACM, CBDBEDBEIHP);
+		Call("dynamicTask", OnDynamicTask_Done, OnDynamicTask_Failed);
 	}
 
-	private void CBDBEDBEIHP(Hub CGFIJCNNCKP, ClientMessage BKNEELNMDHH, FailureMessage DCJLKCFKCOM)
+	private void OnDynamicTask_Failed(Hub CGFIJCNNCKP, ClientMessage BKNEELNMDHH, FailureMessage DCJLKCFKCOM)
 	{
-		NMNIPAJGJEH = string.Format("The dynamic task failed :( {0}", DCJLKCFKCOM.LCHHLEOPONE());
+		dynamicTaskResult = string.Format("The dynamic task failed :( {0}", DCJLKCFKCOM.GetErrorMessage());
 	}
 
-	private void APPGLEMDACM(Hub CGFIJCNNCKP, ClientMessage BKNEELNMDHH, ResultMessage DCJLKCFKCOM)
+	private void OnDynamicTask_Done(Hub CGFIJCNNCKP, ClientMessage BKNEELNMDHH, ResultMessage DCJLKCFKCOM)
 	{
-		NMNIPAJGJEH = string.Format("The dynamic task! {0}", DCJLKCFKCOM.LBAIENGDLDJ());
+		dynamicTaskResult = string.Format("The dynamic task! {0}", DCJLKCFKCOM.GetReturnValue());
 	}
 
-	public void MDGBAIHKMPE()
+	public void AddToGroups()
 	{
 		Call("addToGroups");
 	}
@@ -95,39 +95,39 @@ internal class DemoHub : Hub
 	{
 		Call("getValue", (Hub CGFIJCNNCKP, ClientMessage CKEHOEGLMBM, ResultMessage DCJLKCFKCOM) =>
 		{
-			MELKHOCJFKD = string.Format("The value is {0} after 5 seconds", DCJLKCFKCOM.LBAIENGDLDJ());
+			genericTaskResult = string.Format("The value is {0} after 5 seconds", DCJLKCFKCOM.GetReturnValue());
 		});
 	}
 
-	public void GEEDKDFKMOI()
+	public void TaskWithException()
 	{
 		Call("taskWithException", null, (Hub CGFIJCNNCKP, ClientMessage CKEHOEGLMBM, FailureMessage JDONBAPIJCG) =>
 		{
-			ECACBKPAHAK = string.Format("Error: {0}", JDONBAPIJCG.LCHHLEOPONE());
+			taskWithExceptionResult = string.Format("Error: {0}", JDONBAPIJCG.GetErrorMessage());
 		});
 	}
 
-	public void MBDPOHEEJGO()
+	public void GenericTaskWithException()
 	{
 		Call("genericTaskWithException", null, (Hub CGFIJCNNCKP, ClientMessage CKEHOEGLMBM, FailureMessage JDONBAPIJCG) =>
 		{
-			GFAHEKCBLIF = string.Format("Error: {0}", JDONBAPIJCG.LCHHLEOPONE());
+			genericTaskWithExceptionResult = string.Format("Error: {0}", JDONBAPIJCG.GetErrorMessage());
 		});
 	}
 
-	public void FBDHPAIGJBG()
+	public void SynchronousException()
 	{
 		Call("synchronousException", null, (Hub CGFIJCNNCKP, ClientMessage CKEHOEGLMBM, FailureMessage JDONBAPIJCG) =>
 		{
-			DFLJODIKLEC = string.Format("Error: {0}", JDONBAPIJCG.LCHHLEOPONE());
+			synchronousExceptionResult = string.Format("Error: {0}", JDONBAPIJCG.GetErrorMessage());
 		});
 	}
 
-	public void ILAAHBOFIIM(object FAFBDKBGDNM)
+	public void PassingDynamicComplex(object FAFBDKBGDNM)
 	{
 		Call("passingDynamicComplex", (Hub CGFIJCNNCKP, ClientMessage CKEHOEGLMBM, ResultMessage DCJLKCFKCOM) =>
 		{
-			AFFOCCDOAFH = string.Format("The person's age is {0}", DCJLKCFKCOM.LBAIENGDLDJ());
+			invokingHubMethodWithDynamicResult = string.Format("The person's age is {0}", DCJLKCFKCOM.GetReturnValue());
 		}, FAFBDKBGDNM);
 	}
 
@@ -135,15 +135,15 @@ internal class DemoHub : Hub
 	{
 		Call("simpleArray", (Hub CGFIJCNNCKP, ClientMessage CKEHOEGLMBM, ResultMessage DCJLKCFKCOM) =>
 		{
-			NMIIENFDDKD = "Simple array works!";
+			simpleArrayResult = "Simple array works!";
 		}, HFPDMGAEJJE);
 	}
 
-	public void MJLIGOHOKLH(object FAFBDKBGDNM)
+	public void ComplexType(object FAFBDKBGDNM)
 	{
 		Call("complexType", (Hub CGFIJCNNCKP, ClientMessage CKEHOEGLMBM, ResultMessage DCJLKCFKCOM) =>
 		{
-			LPDPBBDNMLH = string.Format("Complex Type -> {0}", ((IHub)this).BAFGHLCPPHM.IBNMFHGHIBI().Encode(FLBBFDNHJAJ()["person"]));
+			complexTypeResult = string.Format("Complex Type -> {0}", ((IHub)this).HubConnection.GetJsonEncoder().Encode(GetState()["person"]));
 		}, FAFBDKBGDNM);
 	}
 
@@ -151,107 +151,107 @@ internal class DemoHub : Hub
 	{
 		Call("ComplexArray", (Hub CGFIJCNNCKP, ClientMessage CKEHOEGLMBM, ResultMessage DCJLKCFKCOM) =>
 		{
-			ANGAKMDNJEE = "Complex Array Works!";
+			complexArrayResult = "Complex Array Works!";
 		}, new object[1] { OEOJFDNOEAO });
 	}
 
 	public void Overload()
 	{
-		Call("Overload", MDKHINHJHNG);
+		Call("Overload", OnVoidOverload_Done);
 	}
 
-	private void MDKHINHJHNG(Hub CGFIJCNNCKP, ClientMessage BKNEELNMDHH, ResultMessage DCJLKCFKCOM)
+	private void OnVoidOverload_Done(Hub CGFIJCNNCKP, ClientMessage BKNEELNMDHH, ResultMessage DCJLKCFKCOM)
 	{
-		KPAPCGMIHNG = "Void Overload called";
+		voidOverloadResult = "Void Overload called";
 		Overload(101);
 	}
 
 	public void Overload(int number)
 	{
-		Call("Overload", FIOFLIGAFMC, number);
+		Call("Overload", OnIntOverload_Done, number);
 	}
 
-	private void FIOFLIGAFMC(Hub CGFIJCNNCKP, ClientMessage BKNEELNMDHH, ResultMessage DCJLKCFKCOM)
+	private void OnIntOverload_Done(Hub CGFIJCNNCKP, ClientMessage BKNEELNMDHH, ResultMessage DCJLKCFKCOM)
 	{
-		IHNKPDBBHIE = string.Format("Overload with return value called => {0}", DCJLKCFKCOM.LBAIENGDLDJ().ToString());
+		intOverloadResult = string.Format("Overload with return value called => {0}", DCJLKCFKCOM.GetReturnValue().ToString());
 	}
 
-	public void LLBPNJCDCBB()
+	public void ReadStateValue()
 	{
 		Call("readStateValue", (Hub CGFIJCNNCKP, ClientMessage CKEHOEGLMBM, ResultMessage DCJLKCFKCOM) =>
 		{
-			MCGCCGAPGFK = string.Format("Read some state! => {0}", DCJLKCFKCOM.LBAIENGDLDJ());
+			readStateResult = string.Format("Read some state! => {0}", DCJLKCFKCOM.GetReturnValue());
 		});
 	}
 
-	public void IHIBHBFIMCJ()
+	public void PlainTask()
 	{
 		Call("plainTask", (Hub CGFIJCNNCKP, ClientMessage CKEHOEGLMBM, ResultMessage DCJLKCFKCOM) =>
 		{
-			IGHEAAICFLE = "Plain Task Result";
+			plainTaskResult = "Plain Task Result";
 		});
 	}
 
-	public void PJKALCNNLBD()
+	public void GenericTaskWithContinueWith()
 	{
 		Call("genericTaskWithContinueWith", (Hub CGFIJCNNCKP, ClientMessage CKEHOEGLMBM, ResultMessage DCJLKCFKCOM) =>
 		{
-			GINNBAGEJLG = DCJLKCFKCOM.LBAIENGDLDJ().ToString();
+			genericTaskWithContinueWithResult = DCJLKCFKCOM.GetReturnValue().ToString();
 		});
 	}
 
-	private void CCBJFGDFGJK(Hub CGFIJCNNCKP, MethodCallMessage BOPGDKGIGHM)
+	private void FromArbitraryCode(Hub CGFIJCNNCKP, MethodCallMessage BOPGDKGIGHM)
 	{
-		PHBPEDLIAHI = BOPGDKGIGHM.FNKPHEHFKEI()[0] as string;
+		fromArbitraryCodeResult = BOPGDKGIGHM.GetArguments()[0] as string;
 	}
 
-	private void HNGKPFGMNIA(Hub CGFIJCNNCKP, MethodCallMessage BOPGDKGIGHM)
+	private void GroupAdded(Hub CGFIJCNNCKP, MethodCallMessage BOPGDKGIGHM)
 	{
-		if (!string.IsNullOrEmpty(PEHHMKLDCIA))
+		if (!string.IsNullOrEmpty(groupAddedResult))
 		{
-			PEHHMKLDCIA = "Group Already Added!";
+			groupAddedResult = "Group Already Added!";
 		}
 		else
 		{
-			PEHHMKLDCIA = "Group Added!";
+			groupAddedResult = "Group Added!";
 		}
 	}
 
-	private void IANOIACGNAM(Hub CGFIJCNNCKP, MethodCallMessage BOPGDKGIGHM)
+	private void Signal(Hub CGFIJCNNCKP, MethodCallMessage BOPGDKGIGHM)
 	{
-		NMNIPAJGJEH = string.Format("The dynamic task! {0}", BOPGDKGIGHM.FNKPHEHFKEI()[0]);
+		dynamicTaskResult = string.Format("The dynamic task! {0}", BOPGDKGIGHM.GetArguments()[0]);
 	}
 
 	private void Invoke(Hub CGFIJCNNCKP, MethodCallMessage BOPGDKGIGHM)
 	{
-		GGEMCGHOEBD.Add(string.Format("{0} client state index -> {1}", BOPGDKGIGHM.FNKPHEHFKEI()[0], FLBBFDNHJAJ()["index"]));
+		invokeResults.Add(string.Format("{0} client state index -> {1}", BOPGDKGIGHM.GetArguments()[0], GetState()["index"]));
 	}
 
-	public void MCAIPGEPMDE()
+	public void Draw()
 	{
 		GUILayout.Label("Arbitrary Code");
 		GUILayout.BeginHorizontal();
 		GUILayout.Space(20f);
-		GUILayout.Label(string.Format("Sending {0} from arbitrary code without the hub itself!", PHBPEDLIAHI));
+		GUILayout.Label(string.Format("Sending {0} from arbitrary code without the hub itself!", fromArbitraryCodeResult));
 		GUILayout.EndHorizontal();
 		GUILayout.Space(10f);
 		GUILayout.Label("Group Added");
 		GUILayout.BeginHorizontal();
 		GUILayout.Space(20f);
-		GUILayout.Label(PEHHMKLDCIA);
+		GUILayout.Label(groupAddedResult);
 		GUILayout.EndHorizontal();
 		GUILayout.Space(10f);
 		GUILayout.Label("Dynamic Task");
 		GUILayout.BeginHorizontal();
 		GUILayout.Space(20f);
-		GUILayout.Label(NMNIPAJGJEH);
+		GUILayout.Label(dynamicTaskResult);
 		GUILayout.EndHorizontal();
 		GUILayout.Space(10f);
 		GUILayout.Label("Report Progress");
 		GUILayout.BeginHorizontal();
 		GUILayout.Space(20f);
 		GUILayout.BeginVertical();
-		GUILayout.Label(BDKGKIDENLD);
+		GUILayout.Label(longRunningJobStatus);
 		GUILayout.HorizontalSlider(longRunningJobProgress, 0f, 100f);
 		GUILayout.EndVertical();
 		GUILayout.EndHorizontal();
@@ -259,82 +259,82 @@ internal class DemoHub : Hub
 		GUILayout.Label("Generic Task");
 		GUILayout.BeginHorizontal();
 		GUILayout.Space(20f);
-		GUILayout.Label(MELKHOCJFKD);
+		GUILayout.Label(genericTaskResult);
 		GUILayout.EndHorizontal();
 		GUILayout.Space(10f);
 		GUILayout.Label("Task With Exception");
 		GUILayout.BeginHorizontal();
 		GUILayout.Space(20f);
-		GUILayout.Label(ECACBKPAHAK);
+		GUILayout.Label(taskWithExceptionResult);
 		GUILayout.EndHorizontal();
 		GUILayout.Space(10f);
 		GUILayout.Label("Generic Task With Exception");
 		GUILayout.BeginHorizontal();
 		GUILayout.Space(20f);
-		GUILayout.Label(GFAHEKCBLIF);
+		GUILayout.Label(genericTaskWithExceptionResult);
 		GUILayout.EndHorizontal();
 		GUILayout.Space(10f);
 		GUILayout.Label("Synchronous Exception");
 		GUILayout.BeginHorizontal();
 		GUILayout.Space(20f);
-		GUILayout.Label(DFLJODIKLEC);
+		GUILayout.Label(synchronousExceptionResult);
 		GUILayout.EndHorizontal();
 		GUILayout.Space(10f);
 		GUILayout.Label("Invoking hub method with dynamic");
 		GUILayout.BeginHorizontal();
 		GUILayout.Space(20f);
-		GUILayout.Label(AFFOCCDOAFH);
+		GUILayout.Label(invokingHubMethodWithDynamicResult);
 		GUILayout.EndHorizontal();
 		GUILayout.Space(10f);
 		GUILayout.Label("Simple Array");
 		GUILayout.BeginHorizontal();
 		GUILayout.Space(20f);
-		GUILayout.Label(NMIIENFDDKD);
+		GUILayout.Label(simpleArrayResult);
 		GUILayout.EndHorizontal();
 		GUILayout.Space(10f);
 		GUILayout.Label("Complex Type");
 		GUILayout.BeginHorizontal();
 		GUILayout.Space(20f);
-		GUILayout.Label(LPDPBBDNMLH);
+		GUILayout.Label(complexTypeResult);
 		GUILayout.EndHorizontal();
 		GUILayout.Space(10f);
 		GUILayout.Label("Complex Array");
 		GUILayout.BeginHorizontal();
 		GUILayout.Space(20f);
-		GUILayout.Label(ANGAKMDNJEE);
+		GUILayout.Label(complexArrayResult);
 		GUILayout.EndHorizontal();
 		GUILayout.Space(10f);
 		GUILayout.Label("Overloads");
 		GUILayout.BeginHorizontal();
 		GUILayout.Space(20f);
 		GUILayout.BeginVertical();
-		GUILayout.Label(KPAPCGMIHNG);
-		GUILayout.Label(IHNKPDBBHIE);
+		GUILayout.Label(voidOverloadResult);
+		GUILayout.Label(intOverloadResult);
 		GUILayout.EndVertical();
 		GUILayout.EndHorizontal();
 		GUILayout.Space(10f);
 		GUILayout.Label("Read State Value");
 		GUILayout.BeginHorizontal();
 		GUILayout.Space(20f);
-		GUILayout.Label(MCGCCGAPGFK);
+		GUILayout.Label(readStateResult);
 		GUILayout.EndHorizontal();
 		GUILayout.Space(10f);
 		GUILayout.Label("Plain Task");
 		GUILayout.BeginHorizontal();
 		GUILayout.Space(20f);
-		GUILayout.Label(IGHEAAICFLE);
+		GUILayout.Label(plainTaskResult);
 		GUILayout.EndHorizontal();
 		GUILayout.Space(10f);
 		GUILayout.Label("Generic Task With ContinueWith");
 		GUILayout.BeginHorizontal();
 		GUILayout.Space(20f);
-		GUILayout.Label(GINNBAGEJLG);
+		GUILayout.Label(genericTaskWithContinueWithResult);
 		GUILayout.EndHorizontal();
 		GUILayout.Space(10f);
 		GUILayout.Label("Message Pump");
 		GUILayout.BeginHorizontal();
 		GUILayout.Space(20f);
-		GGEMCGHOEBD.MCAIPGEPMDE(Screen.width - 40, 270f);
+		invokeResults.Draw(Screen.width - 40, 270f);
 		GUILayout.EndHorizontal();
 		GUILayout.Space(10f);
 	}

@@ -12,35 +12,35 @@ namespace CodeStage.AntiCheat.Detectors
 	[AddComponentMenu("Code Stage/Anti-Cheat Toolkit/Injection Detector")]
 	public class InjectionDetector : ActDetectorBase
 	{
-		private class FCBAKCJACOA
+		private class AllowedAssembly
 		{
 			public readonly string name;
 
-			public readonly int[] DEACEHPECDK;
+			public readonly int[] hashes;
 
-			public FCBAKCJACOA(string name, int[] DEACEHPECDK)
+			public AllowedAssembly(string name, int[] DEACEHPECDK)
 			{
 				this.name = name;
-				this.DEACEHPECDK = DEACEHPECDK;
+				this.hashes = DEACEHPECDK;
 			}
 		}
 
-		internal const string JCAOMBMKNDE = "Injection Detector";
+		internal const string ComponentName = "Injection Detector";
 
-		internal const string MGAMICFMIJK = "[ACTk] Injection Detector: ";
+		internal const string LogPrefix = "[ACTk] Injection Detector: ";
 
 		private static int instancesInScene;
 
-		private bool EGAAPPNDOML;
+		private bool signaturesAreNotGenuine;
 
-		private FCBAKCJACOA[] FPJFAKAJEPE;
+		private AllowedAssembly[] allowedAssemblies;
 
-		private string[] EMJOPBIEHFC;
+		private string[] hexTable;
 
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		private static InjectionDetector OGKMDFDNIEN;
+		private static InjectionDetector instance;
 
-		public static InjectionDetector BPCBBHAKFDM
+		public static InjectionDetector CurrentInstance
 		{
 			get
 			{
@@ -52,11 +52,11 @@ namespace CodeStage.AntiCheat.Detectors
 			}
 		}
 
-		private static InjectionDetector MCEPJKHJPIJ
+		private static InjectionDetector GetOrCreateInstance
 		{
 			get
 			{
-				return NNMHGMJELIL();
+				return GetOrCreate();
 			}
 		}
 
@@ -68,7 +68,7 @@ namespace CodeStage.AntiCheat.Detectors
 		{
 			if (get_Instance() != null)
 			{
-				get_Instance().FCJDKBEGPEF(null);
+				get_Instance().StartDetectionInternal(null);
 			}
 			else
 			{
@@ -78,14 +78,14 @@ namespace CodeStage.AntiCheat.Detectors
 
 		public static void StartDetection(UnityAction callback)
 		{
-			NNMHGMJELIL().FCJDKBEGPEF(callback);
+			GetOrCreate().StartDetectionInternal(callback);
 		}
 
 		public static void StopDetection()
 		{
 			if (get_Instance() != null)
 			{
-				get_Instance().DJEBEEIELBB();
+				get_Instance().StopDetectionInternal();
 			}
 		}
 
@@ -93,21 +93,21 @@ namespace CodeStage.AntiCheat.Detectors
 		{
 			if (get_Instance() != null)
 			{
-				get_Instance().HIEIKJFAIJE();
+				get_Instance().DisposeInternal();
 			}
 		}
 
 		public static InjectionDetector get_Instance()
 		{
-			return OGKMDFDNIEN;
+			return instance;
 		}
 
 		private static void set_Instance(InjectionDetector value)
 		{
-			OGKMDFDNIEN = value;
+			instance = value;
 		}
 
-		private static InjectionDetector NNMHGMJELIL()
+		private static InjectionDetector GetOrCreate()
 		{
 			if (get_Instance() != null)
 			{
@@ -128,7 +128,7 @@ namespace CodeStage.AntiCheat.Detectors
 			{
 				set_Instance(this);
 			}
-			SceneManager.sceneLoaded += FOFIOMHDCOM;
+			SceneManager.sceneLoaded += OnSceneLoaded;
 		}
 
 		protected override void OnDestroy()
@@ -137,29 +137,29 @@ namespace CodeStage.AntiCheat.Detectors
 			instancesInScene--;
 		}
 
-		private void FOFIOMHDCOM(Scene MHOCFOODLLL, LoadSceneMode NMMPBADCFHK)
+		private void OnSceneLoaded(Scene MHOCFOODLLL, LoadSceneMode NMMPBADCFHK)
 		{
-			KJCKJOKLPLL();
+			OnLevelLoadedCallback();
 		}
 
-		private void KJCKJOKLPLL()
+		private void OnLevelLoadedCallback()
 		{
 			if (instancesInScene < 2)
 			{
 				if (!keepAlive)
 				{
-					HIEIKJFAIJE();
+					DisposeInternal();
 				}
 			}
 			else if (!keepAlive && get_Instance() != this)
 			{
-				HIEIKJFAIJE();
+				DisposeInternal();
 			}
 		}
 
-		private void FCJDKBEGPEF(UnityAction callback)
+		private void StartDetectionInternal(UnityAction callback)
 		{
-			if (EKDNCONELMD)
+			if (isRunning)
 			{
 				UnityEngine.Debug.LogWarning("[ACTk] Injection Detector: already running!", this);
 				return;
@@ -180,75 +180,75 @@ namespace CodeStage.AntiCheat.Detectors
 				return;
 			}
 			detectionAction = callback;
-			AKFEAJDLIKF = true;
-			EKDNCONELMD = true;
-			if (FPJFAKAJEPE == null)
+			started = true;
+			isRunning = true;
+			if (allowedAssemblies == null)
 			{
-				BCPPMOGBHGO();
+				LoadAndParseAllowedAssemblies();
 			}
-			if (EGAAPPNDOML)
+			if (signaturesAreNotGenuine)
 			{
-				MCDANNDOEIK();
+				OnCheatingDetected();
 			}
-			else if (!DDHLLHCAAIN())
+			else if (!FindInjectionInCurrentAssemblies())
 			{
-				AppDomain.CurrentDomain.AssemblyLoad += JLPHDNIMOJE;
+				AppDomain.CurrentDomain.AssemblyLoad += OnNewAssemblyLoaded;
 			}
 			else
 			{
-				MCDANNDOEIK();
+				OnCheatingDetected();
 			}
 		}
 
-		protected override void LICPBNOFNOB()
+		protected override void StartDetectionAutomatically()
 		{
-			FCJDKBEGPEF(null);
+			StartDetectionInternal(null);
 		}
 
-		protected override void HEGJDFPFMII()
+		protected override void PauseDetector()
 		{
-			EKDNCONELMD = false;
-			AppDomain.CurrentDomain.AssemblyLoad -= JLPHDNIMOJE;
+			isRunning = false;
+			AppDomain.CurrentDomain.AssemblyLoad -= OnNewAssemblyLoaded;
 		}
 
-		protected override void KLJNEJIEMCN()
+		protected override void ResumeDetector()
 		{
 			if (detectionAction != null || detectionEventHasListener)
 			{
-				EKDNCONELMD = true;
-				AppDomain.CurrentDomain.AssemblyLoad += JLPHDNIMOJE;
+				isRunning = true;
+				AppDomain.CurrentDomain.AssemblyLoad += OnNewAssemblyLoaded;
 			}
 		}
 
-		protected override void DJEBEEIELBB()
+		protected override void StopDetectionInternal()
 		{
-			if (AKFEAJDLIKF)
+			if (started)
 			{
-				AppDomain.CurrentDomain.AssemblyLoad -= JLPHDNIMOJE;
+				AppDomain.CurrentDomain.AssemblyLoad -= OnNewAssemblyLoaded;
 				detectionAction = null;
-				AKFEAJDLIKF = false;
-				EKDNCONELMD = false;
+				started = false;
+				isRunning = false;
 			}
 		}
 
-		protected override void HIEIKJFAIJE()
+		protected override void DisposeInternal()
 		{
-			base.HIEIKJFAIJE();
+			base.DisposeInternal();
 			if (get_Instance() == this)
 			{
 				set_Instance(null);
 			}
 		}
 
-		private void JLPHDNIMOJE(object ABONPDBPJBA, AssemblyLoadEventArgs LKIOKGCNKHE)
+		private void OnNewAssemblyLoaded(object ABONPDBPJBA, AssemblyLoadEventArgs LKIOKGCNKHE)
 		{
-			if (!BAPALPIJPBP(LKIOKGCNKHE.LoadedAssembly))
+			if (!AssemblyAllowed(LKIOKGCNKHE.LoadedAssembly))
 			{
-				MCDANNDOEIK();
+				OnCheatingDetected();
 			}
 		}
 
-		private bool DDHLLHCAAIN()
+		private bool FindInjectionInCurrentAssemblies()
 		{
 			bool result = false;
 			Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
@@ -261,7 +261,7 @@ namespace CodeStage.AntiCheat.Detectors
 				Assembly[] array = assemblies;
 				foreach (Assembly eHKCIGHDNMI in array)
 				{
-					if (!BAPALPIJPBP(eHKCIGHDNMI))
+					if (!AssemblyAllowed(eHKCIGHDNMI))
 					{
 						result = true;
 						break;
@@ -271,15 +271,15 @@ namespace CodeStage.AntiCheat.Detectors
 			return result;
 		}
 
-		private bool BAPALPIJPBP(Assembly EHKCIGHDNMI)
+		private bool AssemblyAllowed(Assembly EHKCIGHDNMI)
 		{
 			string text = EHKCIGHDNMI.GetName().Name;
-			int value = DNBGCOIKKIC(EHKCIGHDNMI);
+			int value = GetAssemblyHash(EHKCIGHDNMI);
 			bool result = false;
-			for (int i = 0; i < FPJFAKAJEPE.Length; i++)
+			for (int i = 0; i < allowedAssemblies.Length; i++)
 			{
-				FCBAKCJACOA fCBAKCJACOA = FPJFAKAJEPE[i];
-				if (fCBAKCJACOA.name == text && Array.IndexOf(fCBAKCJACOA.DEACEHPECDK, value) != -1)
+				AllowedAssembly fCBAKCJACOA = allowedAssemblies[i];
+				if (fCBAKCJACOA.name == text && Array.IndexOf(fCBAKCJACOA.hashes, value) != -1)
 				{
 					result = true;
 					break;
@@ -288,19 +288,19 @@ namespace CodeStage.AntiCheat.Detectors
 			return result;
 		}
 
-		private void BCPPMOGBHGO()
+		private void LoadAndParseAllowedAssemblies()
 		{
 			TextAsset textAsset = (TextAsset)Resources.Load("fndid", typeof(TextAsset));
 			if (textAsset == null)
 			{
-				EGAAPPNDOML = true;
+				signaturesAreNotGenuine = true;
 				return;
 			}
 			string[] separator = new string[1] { ":" };
 			MemoryStream memoryStream = new MemoryStream(textAsset.bytes);
 			BinaryReader binaryReader = new BinaryReader(memoryStream);
 			int num = binaryReader.ReadInt32();
-			FPJFAKAJEPE = new FCBAKCJACOA[num];
+			allowedAssemblies = new AllowedAssembly[num];
 			for (int i = 0; i < num; i++)
 			{
 				string bAINMLLIKOL = binaryReader.ReadString();
@@ -315,10 +315,10 @@ namespace CodeStage.AntiCheat.Detectors
 					{
 						array2[j - 1] = int.Parse(array[j]);
 					}
-					FPJFAKAJEPE[i] = new FCBAKCJACOA(gOHIIMFFFJI, array2);
+					allowedAssemblies[i] = new AllowedAssembly(gOHIIMFFFJI, array2);
 					continue;
 				}
-				EGAAPPNDOML = true;
+				signaturesAreNotGenuine = true;
 				binaryReader.Close();
 				memoryStream.Close();
 				return;
@@ -326,18 +326,18 @@ namespace CodeStage.AntiCheat.Detectors
 			binaryReader.Close();
 			memoryStream.Close();
 			Resources.UnloadAsset(textAsset);
-			EMJOPBIEHFC = new string[256];
+			hexTable = new string[256];
 			for (int k = 0; k < 256; k++)
 			{
-				EMJOPBIEHFC[k] = k.ToString("x2");
+				hexTable[k] = k.ToString("x2");
 			}
 		}
 
-		private int DNBGCOIKKIC(Assembly EHKCIGHDNMI)
+		private int GetAssemblyHash(Assembly EHKCIGHDNMI)
 		{
 			AssemblyName assemblyName = EHKCIGHDNMI.GetName();
 			byte[] publicKeyToken = assemblyName.GetPublicKeyToken();
-			string text = ((publicKeyToken.Length < 8) ? assemblyName.Name : (assemblyName.Name + DMCNCEOHHFI(publicKeyToken)));
+			string text = ((publicKeyToken.Length < 8) ? assemblyName.Name : (assemblyName.Name + PublicKeyTokenToString(publicKeyToken)));
 			int num = 0;
 			int length = text.Length;
 			for (int i = 0; i < length; i++)
@@ -351,12 +351,12 @@ namespace CodeStage.AntiCheat.Detectors
 			return num + (num << 15);
 		}
 
-		private string DMCNCEOHHFI(byte[] KPAMPCLHCEN)
+		private string PublicKeyTokenToString(byte[] KPAMPCLHCEN)
 		{
 			string text = string.Empty;
 			for (int i = 0; i < 8; i++)
 			{
-				text += EMJOPBIEHFC[KPAMPCLHCEN[i]];
+				text += hexTable[KPAMPCLHCEN[i]];
 			}
 			return text;
 		}

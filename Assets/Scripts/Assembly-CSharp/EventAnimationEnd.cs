@@ -5,14 +5,14 @@ public class EventAnimationEnd : EventAnimation
 	public string Name;
 
 	public EventAnimationEnd()
-		: base(EECEJKADLCK.EVENT_ANIMATION_END)
+		: base(EventAnimationType.EVENT_ANIMATION_END)
 	{
 	}
 
 	protected override bool Compare(EventAnimation FOPOKALJIIJ)
 	{
 		EventAnimationEnd aFNEGONBIKF = FOPOKALJIIJ as EventAnimationEnd;
-		bool flag = IsCompareNames(aFNEGONBIKF.JIFAHHGNPFH.NNPJJLPCOHD);
+		bool flag = IsCompareNames(aFNEGONBIKF.Conditions.SelfAnimationNames);
 		return (!IsNot) ? flag : (!flag);
 	}
 
@@ -21,7 +21,7 @@ public class EventAnimationEnd : EventAnimation
 		int i = 0;
 		for (int count = NIKHAICFGNM.Count; i < count; i++)
 		{
-			if (NIKHAICFGNM[i] == LJICHLHMBFA)
+			if (NIKHAICFGNM[i] == AnimationName)
 			{
 				return true;
 			}

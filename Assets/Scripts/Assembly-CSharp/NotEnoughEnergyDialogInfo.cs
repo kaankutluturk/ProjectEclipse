@@ -1,15 +1,15 @@
 public class NotEnoughEnergyDialogInfo
 {
-	public int CLDABPBDDGB;
+	public int WaitSeconds;
 
-	public GameValueType HGIKOMLPBMJ;
+	public GameValueType ValueType;
 
 	public int Value;
 
 	public NotEnoughEnergyDialogInfo(int PEEHDJAJHFF, GameValueType EJGJHBGMCDM, int value)
 	{
-		CLDABPBDDGB = PEEHDJAJHFF;
-		HGIKOMLPBMJ = EJGJHBGMCDM;
+		WaitSeconds = PEEHDJAJHFF;
+		ValueType = EJGJHBGMCDM;
 		Value = value;
 	}
 }

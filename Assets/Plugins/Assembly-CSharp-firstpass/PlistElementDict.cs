@@ -4,13 +4,13 @@ using System.Reflection;
 [DefaultMember("Item")]
 public class PlistElementDict : PlistElement
 {
-	private SortedDictionary<string, PlistElement> BIHJIEHMAFC = new SortedDictionary<string, PlistElement>();
+	private SortedDictionary<string, PlistElement> m_PrivateValue = new SortedDictionary<string, PlistElement>();
 
-	public IDictionary<string, PlistElement> AMMFNLMJJFM
+	public IDictionary<string, PlistElement> values
 	{
 		get
 		{
-			return NGEGAPEEGPN();
+			return GetValues();
 		}
 	}
 
@@ -22,54 +22,54 @@ public class PlistElementDict : PlistElement
 
 	public void set_DLKPBAJDHBO(string KGBGENDIMBC, PlistElement value)
 	{
-		AGGAMCGBFAF(KGBGENDIMBC, value);
+		SetItem(KGBGENDIMBC, value);
 	}
 
-	public IDictionary<string, PlistElement> NGEGAPEEGPN()
+	public IDictionary<string, PlistElement> GetValues()
 	{
-		return BIHJIEHMAFC;
+		return m_PrivateValue;
 	}
 
 	public new PlistElement get_Item(string KGBGENDIMBC)
 	{
-		if (NGEGAPEEGPN().ContainsKey(KGBGENDIMBC))
+		if (GetValues().ContainsKey(KGBGENDIMBC))
 		{
-			return NGEGAPEEGPN()[KGBGENDIMBC];
+			return GetValues()[KGBGENDIMBC];
 		}
 		return null;
 	}
 
-	public new void AGGAMCGBFAF(string KGBGENDIMBC, PlistElement value)
+	public new void SetItem(string KGBGENDIMBC, PlistElement value)
 	{
-		NGEGAPEEGPN()[KGBGENDIMBC] = value;
+		GetValues()[KGBGENDIMBC] = value;
 	}
 
 	public void SetInteger(string KGBGENDIMBC, int PKHDLOGJKAD)
 	{
-		NGEGAPEEGPN()[KGBGENDIMBC] = new PlistElementInteger(PKHDLOGJKAD);
+		GetValues()[KGBGENDIMBC] = new PlistElementInteger(PKHDLOGJKAD);
 	}
 
 	public void SetString(string KGBGENDIMBC, string PKHDLOGJKAD)
 	{
-		NGEGAPEEGPN()[KGBGENDIMBC] = new PlistElementString(PKHDLOGJKAD);
+		GetValues()[KGBGENDIMBC] = new PlistElementString(PKHDLOGJKAD);
 	}
 
 	public void SetBoolean(string KGBGENDIMBC, bool PKHDLOGJKAD)
 	{
-		NGEGAPEEGPN()[KGBGENDIMBC] = new PlistElementBoolean(PKHDLOGJKAD);
+		GetValues()[KGBGENDIMBC] = new PlistElementBoolean(PKHDLOGJKAD);
 	}
 
-	public PlistElementArray IKMCPPMBAMN(string KGBGENDIMBC)
+	public PlistElementArray CreateArray(string KGBGENDIMBC)
 	{
 		PlistElementArray gHFPDLCPEBH = new PlistElementArray();
-		NGEGAPEEGPN()[KGBGENDIMBC] = gHFPDLCPEBH;
+		GetValues()[KGBGENDIMBC] = gHFPDLCPEBH;
 		return gHFPDLCPEBH;
 	}
 
 	public PlistElementDict CreateDict(string KGBGENDIMBC)
 	{
 		PlistElementDict jDMGABPEDFI = new PlistElementDict();
-		NGEGAPEEGPN()[KGBGENDIMBC] = jDMGABPEDFI;
+		GetValues()[KGBGENDIMBC] = jDMGABPEDFI;
 		return jDMGABPEDFI;
 	}
 }

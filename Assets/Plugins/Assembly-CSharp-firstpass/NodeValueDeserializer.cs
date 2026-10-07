@@ -2,11 +2,11 @@ using System;
 using System.Collections.Generic;
 using YamlDotNet.Core;
 
-public sealed class NodeValueDeserializer : FFBEMOKFDNL
+public sealed class NodeValueDeserializer : IValueDeserializer
 {
-	private readonly IList<INodeDeserializer> JJAHDOOOGFH;
+	private readonly IList<INodeDeserializer> deserializers;
 
-	private readonly IList<INodeTypeResolver> FFEOGMPHPBI;
+	private readonly IList<INodeTypeResolver> typeResolvers;
 
 	public NodeValueDeserializer(IList<INodeDeserializer> JJAHDOOOGFH, IList<INodeTypeResolver> FFEOGMPHPBI)
 	{
@@ -14,24 +14,24 @@ public sealed class NodeValueDeserializer : FFBEMOKFDNL
 		{
 			throw new ArgumentNullException("deserializers");
 		}
-		this.JJAHDOOOGFH = JJAHDOOOGFH;
+		this.deserializers = JJAHDOOOGFH;
 		if (FFEOGMPHPBI == null)
 		{
 			throw new ArgumentNullException("typeResolvers");
 		}
-		this.FFEOGMPHPBI = FFEOGMPHPBI;
+		this.typeResolvers = FFEOGMPHPBI;
 	}
 
-	public object BBNMBCMJOFM(EventReader reader, Type MBLGNMBFHBI, SerializerState state, FFBEMOKFDNL IJBAEAEDMCC)
+	public object DeserializeValue(EventReader reader, Type MBLGNMBFHBI, SerializerState state, IValueDeserializer IJBAEAEDMCC)
 	{
 		NodeEvent dGMPGIHHKCN = reader.Peek<NodeEvent>();
-		Type mBLGNMBFHBI = KFGNLMDILOC(dGMPGIHHKCN, MBLGNMBFHBI);
+		Type mBLGNMBFHBI = GetTypeFromEvent(dGMPGIHHKCN, MBLGNMBFHBI);
 		try
 		{
-			foreach (INodeDeserializer item in JJAHDOOOGFH)
+			foreach (INodeDeserializer item in deserializers)
 			{
 				object value;
-				if (item.Deserialize(reader, mBLGNMBFHBI, (EventReader BOPODEAIEBJ, Type GNAONAPDDLD) => IJBAEAEDMCC.BBNMBCMJOFM(BOPODEAIEBJ, GNAONAPDDLD, state, IJBAEAEDMCC), out value))
+				if (item.Deserialize(reader, mBLGNMBFHBI, (EventReader BOPODEAIEBJ, Type GNAONAPDDLD) => IJBAEAEDMCC.DeserializeValue(BOPODEAIEBJ, GNAONAPDDLD, state, IJBAEAEDMCC), out value))
 				{
 					return value;
 				}
@@ -43,14 +43,14 @@ public sealed class NodeValueDeserializer : FFBEMOKFDNL
 		}
 		catch (Exception oLABPFGLNFC)
 		{
-			throw new YamlException(dGMPGIHHKCN.OGPHJPFHBJL(), dGMPGIHHKCN.GDJHIJHFPHA(), "Exception during deserialization", oLABPFGLNFC);
+			throw new YamlException(dGMPGIHHKCN.GetStart(), dGMPGIHHKCN.GetEnd(), "Exception during deserialization", oLABPFGLNFC);
 		}
-		throw new YamlException(dGMPGIHHKCN.OGPHJPFHBJL(), dGMPGIHHKCN.GDJHIJHFPHA(), string.Format("No node deserializer was able to deserialize the node into type {0}", MBLGNMBFHBI.AssemblyQualifiedName));
+		throw new YamlException(dGMPGIHHKCN.GetStart(), dGMPGIHHKCN.GetEnd(), string.Format("No node deserializer was able to deserialize the node into type {0}", MBLGNMBFHBI.AssemblyQualifiedName));
 	}
 
-	private Type KFGNLMDILOC(NodeEvent ABOEBNGCALL, Type PHOBEGPKAKH)
+	private Type GetTypeFromEvent(NodeEvent ABOEBNGCALL, Type PHOBEGPKAKH)
 	{
-		foreach (INodeTypeResolver item in FFEOGMPHPBI)
+		foreach (INodeTypeResolver item in typeResolvers)
 		{
 			if (item.Resolve(ABOEBNGCALL, ref PHOBEGPKAKH))
 			{

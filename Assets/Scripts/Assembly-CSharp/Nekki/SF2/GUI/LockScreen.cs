@@ -28,7 +28,7 @@ namespace Nekki.SF2.GUI
 		private Tween tween;
 
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		private static LockScreen OGKMDFDNIEN;
+		private static LockScreen instance;
 
 		public static LockScreen BPCBBHAKFDM
 		{
@@ -49,12 +49,12 @@ namespace Nekki.SF2.GUI
 
 		public static LockScreen get_Instance()
 		{
-			return OGKMDFDNIEN;
+			return instance;
 		}
 
 		private static void set_Instance(LockScreen value)
 		{
-			OGKMDFDNIEN = value;
+			instance = value;
 		}
 
 		private void Start()
@@ -65,7 +65,7 @@ namespace Nekki.SF2.GUI
 		public void Init()
 		{
 			set_Instance(this);
-			CDIGPOBDCMD(false);
+			SetLocked(false);
 			Object.DontDestroyOnLoad(base.gameObject);
 		}
 
@@ -73,13 +73,13 @@ namespace Nekki.SF2.GUI
 		{
 			if (get_Instance() != null)
 			{
-				get_Instance().CDIGPOBDCMD(IJHFJPBBNEJ, KFIECNIMAOA);
+				get_Instance().SetLocked(IJHFJPBBNEJ, KFIECNIMAOA);
 				return true;
 			}
 			return false;
 		}
 
-		private void CDIGPOBDCMD(bool IJHFJPBBNEJ, bool KFIECNIMAOA = false)
+		private void SetLocked(bool IJHFJPBBNEJ, bool KFIECNIMAOA = false)
 		{
 			if (base.gameObject != null)
 			{
@@ -92,11 +92,11 @@ namespace Nekki.SF2.GUI
 			if (rotateImg != null)
 			{
 				rotateImg.gameObject.SetActive(IJHFJPBBNEJ && KFIECNIMAOA);
-				DNGPAHCJFOK(IJHFJPBBNEJ && KFIECNIMAOA);
+				SetSpinnerRotating(IJHFJPBBNEJ && KFIECNIMAOA);
 			}
 		}
 
-		private void DNGPAHCJFOK(bool IJHFJPBBNEJ)
+		private void SetSpinnerRotating(bool IJHFJPBBNEJ)
 		{
 			if (tween != null)
 			{

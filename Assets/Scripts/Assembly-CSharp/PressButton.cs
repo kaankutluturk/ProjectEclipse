@@ -26,15 +26,15 @@ public class PressButton : Button
 
 	private RectTransform rectTransform;
 
-	private RectTransform DIBDBBCPEGN
+	private RectTransform CachedRectTransform
 	{
 		get
 		{
-			return CNPGGHONDII();
+			return GetRectTransform();
 		}
 	}
 
-	private RectTransform CNPGGHONDII()
+	private RectTransform GetRectTransform()
 	{
 		if (rectTransform == null)
 		{
@@ -47,17 +47,17 @@ public class PressButton : Button
 	{
 		if (AOIODPAABDM == null)
 		{
-			LLLOJBFMONN.Error("PressButton.Init normalImage is null");
+			GameLog.Error("PressButton.Init normalImage is null");
 			return;
 		}
 		if (OMDLMOMCPLG == null)
 		{
-			LLLOJBFMONN.Error("PressButton.Init pressImage is null");
+			GameLog.Error("PressButton.Init pressImage is null");
 			return;
 		}
 		if (layoutElement == null)
 		{
-			LLLOJBFMONN.Error("PressButton.Init layoutElement is null");
+			GameLog.Error("PressButton.Init layoutElement is null");
 			return;
 		}
 		if (texturePath != string.Empty)
@@ -70,7 +70,7 @@ public class PressButton : Button
 		normalImage.SetNativeSize();
 		pressImage.SetNativeSize();
 		Vector2 size = normalImage.rectTransform.rect.size;
-		CNPGGHONDII().sizeDelta = size;
+		GetRectTransform().sizeDelta = size;
 		layoutElement.minWidth = size.x;
 		layoutElement.minHeight = size.y;
 	}
@@ -80,15 +80,15 @@ public class PressButton : Button
 		base.DoStateTransition(state, PJHFBFHIGNN);
 		if (state == SelectionState.Pressed)
 		{
-			NOHEFAKEHEF();
+			ShowPressedState();
 		}
 		else
 		{
-			PHOJODFJOOI();
+			ShowNormalState();
 		}
 	}
 
-	private void NOHEFAKEHEF()
+	private void ShowPressedState()
 	{
 		switch (transitionType)
 		{
@@ -109,7 +109,7 @@ public class PressButton : Button
 		}
 	}
 
-	private void PHOJODFJOOI()
+	private void ShowNormalState()
 	{
 		if (pressImage != null)
 		{

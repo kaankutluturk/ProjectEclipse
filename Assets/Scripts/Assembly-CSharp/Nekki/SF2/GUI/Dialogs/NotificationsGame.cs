@@ -9,20 +9,20 @@ namespace Nekki.SF2.GUI.Dialogs
 {
 	public class NotificationsGame : SFMonoBehaviour<object>, BackKeyController
 	{
-		public enum HMFHPEHAOFK
+		public enum NotificationsGameEvent
 		{
 			ON_CLOSE = 0
 		}
 
 		public const float SCROLL_SECONDS = 0.5f;
 
-		private static bool GLABMAEJPPN;
+		private static bool isOpen;
 
-		private bool DAJKLNPEONE;
+		private bool isDismissable;
 
-		private bool KKGOCBCNLGF;
+		private bool reopenAfterClose;
 
-		private bool KNHMOOPFLJJ;
+		private bool buttonClicked;
 
 		[SerializeField]
 		private MenuScroll _scroll;
@@ -36,23 +36,23 @@ namespace Nekki.SF2.GUI.Dialogs
 		[SerializeField]
 		private LabelButton _button;
 
-		private string JGPEECABCHF = string.Empty;
+		private string imagePath = string.Empty;
 
-		private string HCPNFPMHFCM = string.Empty;
+		private string messageText = string.Empty;
 
-		private string CAHABJBMIKJ = string.Empty;
+		private string buttonAlias = string.Empty;
 
-		private LabelButton.FBMGEHJPPIK CJCHGLEFGED = LabelButton.FBMGEHJPPIK.BUTTON_WHITE;
+		private LabelButton.ButtonColor buttonColor = LabelButton.ButtonColor.BUTTON_WHITE;
 
-		private float FFLLNCBOGJJ;
+		private float dismissDelay;
 
 		private Action<object> callback;
 
-		private IEnumerator AHMGGJBPHHO;
+		private IEnumerator dismissDelayRoutine;
 
 		private static NotificationsGame _instance;
 
-		public static bool PLCIGHLBOPP
+		public static bool IsNotificationOpen
 		{
 			get
 			{
@@ -60,7 +60,7 @@ namespace Nekki.SF2.GUI.Dialogs
 			}
 		}
 
-		public static NotificationsGame BPCBBHAKFDM
+		public static NotificationsGame SharedInstance
 		{
 			get
 			{
@@ -70,7 +70,7 @@ namespace Nekki.SF2.GUI.Dialogs
 
 		public static bool get_IsOpen()
 		{
-			return GLABMAEJPPN;
+			return isOpen;
 		}
 
 		public static NotificationsGame get_Instance()
@@ -88,7 +88,7 @@ namespace Nekki.SF2.GUI.Dialogs
 
 		public void Init()
 		{
-			KFIMLFDHHEL();
+			InitScroll();
 		}
 
 		public static void CloseNotifications()
@@ -104,36 +104,36 @@ namespace Nekki.SF2.GUI.Dialogs
 			_instance = null;
 		}
 
-		public void OpenNotification(string KCDCAGJFHJF, List<StoryDialogContent> IHMEPGICLGF, Action<object> CGGAFBLKFBP, string JEDLCDIIFDN, LabelButton.FBMGEHJPPIK JNBBEBBCEJK, float HEPAGADOKGI)
+		public void OpenNotification(string KCDCAGJFHJF, List<StoryDialogContent> IHMEPGICLGF, Action<object> CGGAFBLKFBP, string JEDLCDIIFDN, LabelButton.ButtonColor JNBBEBBCEJK, float HEPAGADOKGI)
 		{
-			if (HDLDBIJDEIL())
+			if (CanShowNotification())
 			{
-				JGPEECABCHF = KCDCAGJFHJF;
-				NBGHLFJPOGM(IHMEPGICLGF);
-				CAHABJBMIKJ = JEDLCDIIFDN;
-				CJCHGLEFGED = JNBBEBBCEJK;
+				imagePath = KCDCAGJFHJF;
+				BuildMessageText(IHMEPGICLGF);
+				buttonAlias = JEDLCDIIFDN;
+				buttonColor = JNBBEBBCEJK;
 				callback = CGGAFBLKFBP;
-				FFLLNCBOGJJ = HEPAGADOKGI;
-				EGHJDCCGLOD();
-				if (AHMGGJBPHHO != null)
+				dismissDelay = HEPAGADOKGI;
+				ShowNotification();
+				if (dismissDelayRoutine != null)
 				{
-					CoroutineManager.get_Current().StopRoutine(AHMGGJBPHHO);
+					CoroutineManager.get_Current().StopRoutine(dismissDelayRoutine);
 				}
-				AHMGGJBPHHO = ENMNDLBFNMN();
-				CoroutineManager.get_Current().StartRoutine(AHMGGJBPHHO);
+				dismissDelayRoutine = DismissDelayRoutine();
+				CoroutineManager.get_Current().StartRoutine(dismissDelayRoutine);
 			}
 		}
 
-		private IEnumerator ENMNDLBFNMN()
+		private IEnumerator DismissDelayRoutine()
 		{
-			DAJKLNPEONE = false;
-			yield return new WaitForSeconds(FFLLNCBOGJJ);
-			DAJKLNPEONE = true;
+			isDismissable = false;
+			yield return new WaitForSeconds(dismissDelay);
+			isDismissable = true;
 		}
 
 		private void Update()
 		{
-			if ((Eclipse.Input.EclipseInput.GetMouseButtonDown(0) || Eclipse.Input.EclipseInput.touchCount > 0) && DAJKLNPEONE)
+			if ((Eclipse.Input.EclipseInput.GetMouseButtonDown(0) || Eclipse.Input.EclipseInput.touchCount > 0) && isDismissable)
 			{
 				_scroll.OnBackgroundClick();
 			}
@@ -141,58 +141,58 @@ namespace Nekki.SF2.GUI.Dialogs
 
 		public void OnBackKeyClicked(object data)
 		{
-			if (DAJKLNPEONE)
+			if (isDismissable)
 			{
 				Close();
 			}
 		}
 
-		private void NBGHLFJPOGM(List<StoryDialogContent> IHMEPGICLGF)
+		private void BuildMessageText(List<StoryDialogContent> IHMEPGICLGF)
 		{
-			HCPNFPMHFCM = string.Empty;
+			messageText = string.Empty;
 			for (int i = 0; i < IHMEPGICLGF.Count; i++)
 			{
-				HCPNFPMHFCM += LocalizationManager.GetString(IHMEPGICLGF[i].GGDJIPKMKFC);
+				messageText += LocalizationManager.GetString(IHMEPGICLGF[i].Text);
 				if (i + 1 < IHMEPGICLGF.Count)
 				{
-					HCPNFPMHFCM += "\n";
+					messageText += "\n";
 				}
 			}
 		}
 
-		private void EGHJDCCGLOD()
+		private void ShowNotification()
 		{
-			if (GLABMAEJPPN)
+			if (isOpen)
 			{
-				GMOKBKIGGFN();
+				CloseAndReopen();
 				return;
 			}
 			_scroll.SetOutsideTouchProperties(false);
-			string[] array = JGPEECABCHF.Split('|');
-			string[] array2 = JGPEECABCHF.Split('/');
+			string[] array = imagePath.Split('|');
+			string[] array2 = imagePath.Split('/');
 			string[] array3 = array2[array2.Length - 1].Split('.');
-			_image.set_TexturePath(SF2Paths.BHCPOOOJAAK());
+			_image.set_TexturePath(SF2Paths.GetUsersUiPath());
 			_image.set_SpriteName(array3[0]);
-			_label.set_text(HCPNFPMHFCM);
-			_button.gameObject.SetActive(CAHABJBMIKJ == string.Empty);
-			_button.interactable = CAHABJBMIKJ == string.Empty;
-			if (CAHABJBMIKJ == string.Empty)
+			_label.set_text(messageText);
+			_button.gameObject.SetActive(buttonAlias == string.Empty);
+			_button.interactable = buttonAlias == string.Empty;
+			if (buttonAlias == string.Empty)
 			{
-				_button.SetColor(CJCHGLEFGED);
-				_button.SetAlias(CAHABJBMIKJ);
+				_button.SetColor(buttonColor);
+				_button.SetAlias(buttonAlias);
 				_button.AddEventListener(2, OnButtonClick);
 			}
-			LAJCMNNNIIM();
+			ExpandNotification();
 		}
 
-		private void IDFCHLJMFJC(object data)
+		private void OnScrollStateChanged(object data)
 		{
-			GLABMAEJPPN = (bool)data;
-			if (!GLABMAEJPPN)
+			isOpen = (bool)data;
+			if (!isOpen)
 			{
 				_scroll.gameObject.SetActive(false);
-				IMHFKNLNEEJ(KNHMOOPFLJJ ? 1 : 0);
-				KNHMOOPFLJJ = false;
+				InvokeCallback(buttonClicked ? 1 : 0);
+				buttonClicked = false;
 				_scroll.SetOutsideTouchProperties(false);
 			}
 			else
@@ -201,37 +201,37 @@ namespace Nekki.SF2.GUI.Dialogs
 			}
 		}
 
-		private void AHHJGONNGHF(object data)
+		private void OnScrollAnimationFinished(object data)
 		{
 			CallEvent(0, 0);
-			if (KKGOCBCNLGF)
+			if (reopenAfterClose)
 			{
-				KKGOCBCNLGF = false;
-				EGHJDCCGLOD();
+				reopenAfterClose = false;
+				ShowNotification();
 			}
 		}
 
 		private void OnButtonClick(object data)
 		{
-			if (GLABMAEJPPN)
+			if (isOpen)
 			{
-				KNHMOOPFLJJ = true;
+				buttonClicked = true;
 				Close();
 			}
 		}
 
-		private void KFIMLFDHHEL()
+		private void InitScroll()
 		{
-			_scroll.Init(MenuScroll.GLLGENPACJB.Horizontal);
+			_scroll.Init(MenuScroll.ScrollOrientation.Horizontal);
 			_scroll.SetOutsideTouchProperties(false);
 			_scroll.Collapse(0f);
-			_scroll.AddEventListener(2, IDFCHLJMFJC);
-			_scroll.AddEventListener(1, AHHJGONNGHF);
+			_scroll.AddEventListener(2, OnScrollStateChanged);
+			_scroll.AddEventListener(1, OnScrollAnimationFinished);
 			_scroll.GetButton().interactable = false;
 			_scroll.gameObject.SetActive(false);
 		}
 
-		private void LAJCMNNNIIM()
+		private void ExpandNotification()
 		{
 			BackKeyManager.get_Instance().AddBackKeyController(this);
 			_scroll.gameObject.SetActive(true);
@@ -249,23 +249,23 @@ namespace Nekki.SF2.GUI.Dialogs
 			_scroll.Collapse(0.5f);
 		}
 
-		private void GMOKBKIGGFN()
+		private void CloseAndReopen()
 		{
-			KKGOCBCNLGF = true;
+			reopenAfterClose = true;
 			Close();
 		}
 
-		private void IMHFKNLNEEJ(int value)
+		private void InvokeCallback(int value)
 		{
 			callback(value);
 		}
 
-		private void IAIDJOCDLJA(object data)
+		private void OnBackgroundClicked(object data)
 		{
 			Close();
 		}
 
-		private bool HDLDBIJDEIL()
+		private bool CanShowNotification()
 		{
 			switch (Module.GetInstance().GetCurrentScreenType())
 			{

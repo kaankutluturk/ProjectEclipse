@@ -2,33 +2,33 @@ using System.Xml;
 
 public class WinStyleRule : InFightRule
 {
-	private FightStatistics.EMKEIEJMONM LPBLPMKABDP;
+	private FightStatistics.FightStyle requiredStyle;
 
 	public WinStyleRule(XmlNode node, RuleAppliance EJPOJJKKICO)
-		: base(BCBLLMPAMLP.RuleWinStyle, EJPOJJKKICO, node)
+		: base(RuleType.RuleWinStyle, EJPOJJKKICO, node)
 	{
 		Parse(node);
-		KOKHKAFELGL = false;
-		EBJIKKBLBEM(FightEvent.CrazyEvent);
+		applianceLosesOnTrigger = false;
+		SubscribeEvent(FightEvent.CrazyEvent);
 	}
 
 	protected override bool CompareSingle(object data)
 	{
 		FightData hCPJJKMNMCE = (FightData)data;
-		return hCPJJKMNMCE.DPBGICDNFAM >= LPBLPMKABDP;
+		return hCPJJKMNMCE.Style >= requiredStyle;
 	}
 
 	protected override void Parse(XmlNode node)
 	{
 		base.Parse(node);
-		LPBLPMKABDP = RuleParser.KMAKHHHMGMH(node);
+		requiredStyle = RuleParser.ParseStyleType(node);
 	}
 
 	public override InFightRule Copy()
 	{
 		InFightRule aAJIFBJLJOA = null;
-		RuleAppliance eJPOJJKKICO = EDAKADCHOLE();
-		XmlNode hKPPBKPJOEO = GIFDJEEGCJI().IOJIGDNFCFL();
+		RuleAppliance eJPOJJKKICO = GetAppliance();
+		XmlNode hKPPBKPJOEO = GetXmlSource().GetNode();
 		aAJIFBJLJOA = new WinStyleRule(hKPPBKPJOEO, eJPOJJKKICO);
 		aAJIFBJLJOA.IsRandom = IsRandom;
 		return aAJIFBJLJOA;

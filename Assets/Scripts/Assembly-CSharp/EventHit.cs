@@ -1,7 +1,7 @@
 public class EventHit : EventAnimation
 {
 	public EventHit()
-		: base(EECEJKADLCK.EVENT_HIT)
+		: base(EventAnimationType.EVENT_HIT)
 	{
 	}
 
@@ -9,29 +9,29 @@ public class EventHit : EventAnimation
 	{
 		bool flag = false;
 		EventHit eLGNDOJMOBH = FOPOKALJIIJ as EventHit;
-		if (string.IsNullOrEmpty(LJICHLHMBFA))
+		if (string.IsNullOrEmpty(AnimationName))
 		{
 			flag = true;
 		}
 		else
 		{
-			Model.StrikeResult jEGHAGLEJCB = (Model.StrikeResult)FOPOKALJIIJ.JIFAHHGNPFH.StrikeResult;
+			Model.StrikeResult jEGHAGLEJCB = (Model.StrikeResult)FOPOKALJIIJ.Conditions.StrikeResult;
 			Model gAIBPAGPEGK = jEGHAGLEJCB.AttackerModel;
-			IntervalAttack hFIIPNLCIEE = (IntervalAttack)gAIBPAGPEGK.OCPMJKIEPIG().HDJBHPOGKNJ(IntervalAnimation.NGAJJDIEDGF.INTERVAL_ATTACK);
+			IntervalAttack hFIIPNLCIEE = (IntervalAttack)gAIBPAGPEGK.GetAnimationModule().FindInterval(IntervalAnimation.IntervalType.INTERVAL_ATTACK);
 			if (hFIIPNLCIEE != null)
 			{
-				string text = hFIIPNLCIEE.GetReactionName(gAIBPAGPEGK.NODAINEDAKJ());
-				flag = text == LJICHLHMBFA;
+				string text = hFIIPNLCIEE.GetReactionName(gAIBPAGPEGK.GetReactionFrame());
+				flag = text == AnimationName;
 			}
 		}
-		if (flag && !LONCGFHLFKA.BKOIKMEEHDK())
+		if (flag && !HitType.IsNullOrEmpty())
 		{
-			bool flag2 = LONCGFHLFKA == eLGNDOJMOBH.LONCGFHLFKA;
+			bool flag2 = HitType == eLGNDOJMOBH.HitType;
 			flag = flag && flag2;
 		}
-		if (flag && !PLNBENLPIBD.BKOIKMEEHDK())
+		if (flag && !StageName.IsNullOrEmpty())
 		{
-			bool flag3 = PLNBENLPIBD == eLGNDOJMOBH.PLNBENLPIBD;
+			bool flag3 = StageName == eLGNDOJMOBH.StageName;
 			flag = flag && flag3;
 		}
 		return flag;

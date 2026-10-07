@@ -5,15 +5,15 @@ using SimpleJSON;
 
 public class GiveLogin
 {
-	public bool DCHJDPCEODD;
+	public bool HasPendingGive;
 
-	public bool GMBOPFIPNAE;
+	public bool WasGiveApplied;
 
-	public long OHHLCBPGOIM;
+	public long BonusAmount;
 
-	public long JDPAGMPKLHB;
+	public long MoneyAmount;
 
-	public List<GiveItemLogin> OJIAKDDCGLB = new List<GiveItemLogin>();
+	public List<GiveItemLogin> Items = new List<GiveItemLogin>();
 
 	public void Parse(JSONNode value)
 	{
@@ -56,82 +56,82 @@ public class GiveLogin
 					GiveItemLogin item = new GiveItemLogin
 					{
 						Name = valueText,
-						AKKLOMFOLNO = aKKLOMFOLNO,
+						UpgradeLevel = aKKLOMFOLNO,
 						Count = num3,
 						Equip = (num4 > 0)
 					};
-					OJIAKDDCGLB.Add(item);
+					Items.Add(item);
 				}
 			}
 		}
-		OHHLCBPGOIM = oHHLCBPGOIM;
-		JDPAGMPKLHB = jDPAGMPKLHB;
-		DCHJDPCEODD = true;
+		BonusAmount = oHHLCBPGOIM;
+		MoneyAmount = jDPAGMPKLHB;
+		HasPendingGive = true;
 	}
 
-	public void PGAJKMOPDIJ()
+	public void SendGiveLogin()
 	{
-		GMBOPFIPNAE = false;
-		if (DCHJDPCEODD)
+		WasGiveApplied = false;
+		if (HasPendingGive)
 		{
-			ServerProvider.get_Instance().SendGiveLogin(MELKJFNJGGP);
+			ServerProvider.get_Instance().SendGiveLogin(OnGiveLoginResponse);
 		}
 	}
 
-	private void MELKJFNJGGP(bool DCJLKCFKCOM, string data, object IEHMCKBJCAK)
+	private void OnGiveLoginResponse(bool DCJLKCFKCOM, string data, object IEHMCKBJCAK)
 	{
 		if (DCJLKCFKCOM)
 		{
 			JSONNode jSONNode = JSON.Parse(data)["data"];
 			if (jSONNode != null && jSONNode.Value.Equals("success"))
 			{
-				OEJJNNMGOHO();
+				ApplyGives();
 			}
 		}
 	}
 
-	private void OEJJNNMGOHO()
+	private void ApplyGives()
 	{
-		Roster GJJHILBJOGF = ListSF.CCDKHLAMKKO();
-		if (JDPAGMPKLHB != 0)
+		Roster GJJHILBJOGF = ListSF.GetRoster();
+		if (MoneyAmount != 0)
 		{
-			GJJHILBJOGF.OIOOMAKNIOB(Math.Max(0L, GJJHILBJOGF.BFBOEGMAMNF() + JDPAGMPKLHB));
+			GJJHILBJOGF.SetMoney(Math.Max(0L, GJJHILBJOGF.GetMoney() + MoneyAmount));
 		}
-		if (OHHLCBPGOIM != 0)
+		if (BonusAmount != 0)
 		{
-			GJJHILBJOGF.LLNELLFMMBB(Math.Max(0L, GJJHILBJOGF.EHFJHFDACMP() + OHHLCBPGOIM), Roster.HPOIJPGPOCF.CHANGE_SERVER_GIVE);
+			GJJHILBJOGF.SetBonus(Math.Max(0L, GJJHILBJOGF.GetBonus() + BonusAmount), Roster.BalanceChangeType.CHANGE_SERVER_GIVE);
 		}
-		if (JDPAGMPKLHB != 0 || OHHLCBPGOIM != 0)
+		if (MoneyAmount != 0 || BonusAmount != 0)
 		{
-			MenuController.IAMGKKOINFC();
+			MenuController.RefreshMoney();
 		}
-		foreach (GiveItemLogin item in OJIAKDDCGLB)
+		foreach (GiveItemLogin item in Items)
 		{
-			ListSF.GetItems().CKCMJAJAELO(item.Name).ForEach((ItemInfo PJDAGCBPLJE) =>
+			ListSF.GetItems().GetItemsByMarketId(item.Name).ForEach((ItemInfo PJDAGCBPLJE) =>
 			{
 				if (item.Equip)
 				{
-					ListSF.FAAAGBACKAE(PJDAGCBPLJE);
+					ListSF.UnequipOtherItemsOfType(PJDAGCBPLJE);
 				}
-				ListSF.GEFDJDIINND(PJDAGCBPLJE, item.Count, 0L, item.Equip);
-				if (PJDAGCBPLJE.ItemLevel <= GJJHILBJOGF.PINDEKDNCNL())
+				ListSF.AddItem(PJDAGCBPLJE, item.Count, 0L, item.Equip);
+				if (PJDAGCBPLJE.ItemLevel <= GJJHILBJOGF.GetLevel())
 				{
-					PJDAGCBPLJE.BEBDMOEIEJN(true);
+					PJDAGCBPLJE.SetIsNew(true);
 				}
-				if (item.AKKLOMFOLNO > 0)
+				if (item.UpgradeLevel > 0)
 				{
-					PJDAGCBPLJE.UpgradeLevel = item.AKKLOMFOLNO;
+					PJDAGCBPLJE.UpgradeLevel = item.UpgradeLevel;
 					ItemInfo HDMHCCKLLGK = null;
 					ItemInfo JLNLOCNBGEK = null;
-					PJDAGCBPLJE.NHJAHNDOLAE(GJJHILBJOGF.PINDEKDNCNL(), item.AKKLOMFOLNO, ref HDMHCCKLLGK, ref JLNLOCNBGEK);
+					PJDAGCBPLJE.FindNextUpgradeItems(GJJHILBJOGF.GetLevel(), item.UpgradeLevel, ref HDMHCCKLLGK, ref JLNLOCNBGEK);
 				}
 			});
 		}
-		DCHJDPCEODD = false;
-		GMBOPFIPNAE = OHHLCBPGOIM != 0 || JDPAGMPKLHB != 0 || OJIAKDDCGLB.Count > 0;
-		if (ListSF.GetInstance().FFBAJNGHGGD(QuestEvent.PMDPDMFLCIJ.QUEST_EVENT_SERVER_CURRENCY))
+		HasPendingGive = false;
+		WasGiveApplied = BonusAmount != 0 || MoneyAmount != 0 || Items.Count > 0;
+		if (ListSF.GetInstance().RaiseQuestEvent(QuestEvent.QuestEventType.QUEST_EVENT_SERVER_CURRENCY))
 		{
-			ListSF.GetInstance().MHHNIPBJNAD();
+			ListSF.GetInstance().RunQuestActions();
 		}
 	}
 }

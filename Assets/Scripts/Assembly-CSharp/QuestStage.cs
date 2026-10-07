@@ -6,42 +6,42 @@ using System.Xml;
 
 public class QuestStage : global::EventDispatcher<object>, IComparable<QuestStage>
 {
-	public enum HPOLGFKCOOE
+	public enum QuestState
 	{
 		QUEST_UNCOMPLETE = 0,
 		QUEST_ACTIONS = 1,
 		QUEST_COMPLETE = 2
 	}
 
-	public enum KPNDBFINCMM
+	public enum QuestStageEvent
 	{
 		OnComplete = 0,
 		OnCompleteQuest = 1
 	}
 
-	private List<QuestEvent> DNBFFLFBDOB = new List<QuestEvent>();
+	private List<QuestEvent> events = new List<QuestEvent>();
 
 	private List<QuestCondition> conditions = new List<QuestCondition>();
 
-	private List<QuestActionCheckPoint> KKEDDLHBJHA = new List<QuestActionCheckPoint>();
+	private List<QuestActionCheckPoint> checkPoints = new List<QuestActionCheckPoint>();
 
-	private List<string> FAKEEEIEBFI = new List<string>();
+	private List<string> marks = new List<string>();
 
-	private List<string> FBDKJJBICOK = new List<string>();
+	private List<string> groups = new List<string>();
 
-	private QuestActionsSequence AFENHJFICNN = new QuestActionsSequence();
+	private QuestActionsSequence actions = new QuestActionsSequence();
 
-	private QuestActionCheckPoint JAPJJHBDLKB;
+	private QuestActionCheckPoint firstCheckPoint;
 
-	private QuestParameters NFIKJCJGMBB;
+	private QuestParameters lastParameters;
 
-	private int NCIGHJBBMJK;
+	private int placeId;
 
-	public int DEFHBAPNPHI;
+	public int priority;
 
 	public int index;
 
-	public int ABBODBKGCCL;
+	public int unresumable;
 
 	public bool allowDoubles;
 
@@ -55,110 +55,110 @@ public class QuestStage : global::EventDispatcher<object>, IComparable<QuestStag
 	public string EclipseSourceFile { get; private set; }
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private string HKGHEJDKCPI;
+	private string name;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private string NICJKIEBEOP;
+	private string fileName;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private RosterQuest CGOHBJELBLF;
+	private RosterQuest rosterQuest;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private HPOLGFKCOOE DDBFPPBBDLL;
+	private QuestState state;
 
 	public string FileName
 	{
 		get
 		{
-			return EPDMGFELIMC();
+			return GetFileName();
 		}
 		private set
 		{
-			IMMLGNKJPKA(value);
+			SetFileName(value);
 		}
 	}
 
-	public RosterQuest NAHAGPHNGBG
+	public RosterQuest LinkedRosterQuest
 	{
 		get
 		{
-			return LBIPHHIJEFP();
+			return GetRosterQuest();
 		}
 		private set
 		{
-			IOFIGEAFDEI(value);
+			SetRosterQuest(value);
 		}
 	}
 
-	public HPOLGFKCOOE GMMGAEANIAH
+	public QuestState StageStatus
 	{
 		get
 		{
-			return MHFPGCBLGIP();
+			return GetState();
 		}
 		private set
 		{
-			GKJHJHMAGLE(value);
+			SetState(value);
 		}
 	}
 
 	public QuestStage(XmlNode node, string PMFEIPCHENB)
 	{
-		IMMLGNKJPKA(PMFEIPCHENB);
+		SetFileName(PMFEIPCHENB);
 		EclipseSourceFile = (node.Attributes?["EclipseSourceFile"]?.Value ?? PMFEIPCHENB).Replace('\\', '/');
 		set_Name(XmlUtils.ParseString(node.Attributes["Name"], string.Empty));
-		FBDKJJBICOK.Add(get_Name());
+		groups.Add(get_Name());
 		string text = XmlUtils.ParseString(node.Attributes["Group"], string.Empty);
-		FBDKJJBICOK.AddRange(text.Split('|'));
-		GKJHJHMAGLE(HPOLGFKCOOE.QUEST_UNCOMPLETE);
-		DEFHBAPNPHI = XmlUtils.ParseInt(node.Attributes["Priority"]);
-		ABBODBKGCCL = XmlUtils.ParseInt(node.Attributes["Unresumable"]);
+		groups.AddRange(text.Split('|'));
+		SetState(QuestState.QUEST_UNCOMPLETE);
+		priority = XmlUtils.ParseInt(node.Attributes["Priority"]);
+		unresumable = XmlUtils.ParseInt(node.Attributes["Unresumable"]);
 		allowDoubles = XmlUtils.ParseBool(node.Attributes["AllowDoubles"]);
 		EclipseActionsDefinition = node["Actions"]?.OuterXml ?? string.Empty;
-		JBNILFIHMMK(node["Events"], DNBFFLFBDOB, this);
-		DKPIKJMJPPH(node["Conditions"], conditions, this);
-		EFJHONIPBOC(node["Actions"], AFENHJFICNN, this);
-		ParseMarks(node["Marks"], FAKEEEIEBFI, this);
+		ParseEvents(node["Events"], events, this);
+		ParseConditions(node["Conditions"], conditions, this);
+		ParseActions(node["Actions"], actions, this);
+		ParseMarks(node["Marks"], marks, this);
 	}
 
 	public string get_Name()
 	{
-		return HKGHEJDKCPI;
+		return name;
 	}
 
 	private void set_Name(string value)
 	{
-		HKGHEJDKCPI = value;
+		name = value;
 	}
 
-	public string EPDMGFELIMC()
+	public string GetFileName()
 	{
-		return NICJKIEBEOP;
+		return fileName;
 	}
 
-	private void IMMLGNKJPKA(string value)
+	private void SetFileName(string value)
 	{
-		NICJKIEBEOP = value;
+		fileName = value;
 	}
 
-	public RosterQuest LBIPHHIJEFP()
+	public RosterQuest GetRosterQuest()
 	{
-		return CGOHBJELBLF;
+		return rosterQuest;
 	}
 
-	private void IOFIGEAFDEI(RosterQuest value)
+	private void SetRosterQuest(RosterQuest value)
 	{
-		CGOHBJELBLF = value;
+		rosterQuest = value;
 	}
 
-	public HPOLGFKCOOE MHFPGCBLGIP()
+	public QuestState GetState()
 	{
-		return DDBFPPBBDLL;
+		return state;
 	}
 
-	private void GKJHJHMAGLE(HPOLGFKCOOE value)
+	private void SetState(QuestState value)
 	{
-		DDBFPPBBDLL = value;
+		state = value;
 	}
 
 	private void ParseMarks(XmlNode CDFJOIJHJDA, List<string> GENLBPMKENI, QuestStage PJEAMPLHPOH)
@@ -175,7 +175,7 @@ public class QuestStage : global::EventDispatcher<object>, IComparable<QuestStag
 		}
 	}
 
-	private void JBNILFIHMMK(XmlNode MKFADLKDEJM, List<QuestEvent> GENLBPMKENI, QuestStage PJEAMPLHPOH = null)
+	private void ParseEvents(XmlNode MKFADLKDEJM, List<QuestEvent> GENLBPMKENI, QuestStage PJEAMPLHPOH = null)
 	{
 		if (MKFADLKDEJM == null)
 		{
@@ -190,7 +190,7 @@ public class QuestStage : global::EventDispatcher<object>, IComparable<QuestStag
 		}
 	}
 
-	private void DKPIKJMJPPH(XmlNode IPDGDBMMHEP, List<QuestCondition> GENLBPMKENI, QuestStage PJEAMPLHPOH = null)
+	private void ParseConditions(XmlNode IPDGDBMMHEP, List<QuestCondition> GENLBPMKENI, QuestStage PJEAMPLHPOH = null)
 	{
 		if (IPDGDBMMHEP == null)
 		{
@@ -201,70 +201,70 @@ public class QuestStage : global::EventDispatcher<object>, IComparable<QuestStag
 		{
 			QuestCondition kKDGLNECFHA = new QuestCondition();
 			kKDGLNECFHA.Parse(item);
-			if (kKDGLNECFHA.LFLGCDNKNJI == QuestCondition.NFFNINLIPJJ.QUEST_CONDITION_OPERATOR)
+			if (kKDGLNECFHA.comparison == QuestCondition.ComparisonType.QUEST_CONDITION_OPERATOR)
 			{
-				DKPIKJMJPPH(item, kKDGLNECFHA.conditions);
+				ParseConditions(item, kKDGLNECFHA.conditions);
 			}
 			GENLBPMKENI.Add(kKDGLNECFHA);
 		}
 	}
 
-	private void EFJHONIPBOC(XmlNode EPKLCPOEELO, QuestActionsSequence GENLBPMKENI, QuestStage PJEAMPLHPOH = null)
+	private void ParseActions(XmlNode EPKLCPOEELO, QuestActionsSequence GENLBPMKENI, QuestStage PJEAMPLHPOH = null)
 	{
 		if (EPKLCPOEELO == null)
 		{
 			return;
 		}
 		string bAINMLLIKOL = XmlUtils.ParseString(EPKLCPOEELO.Attributes["Place"], "Map");
-		NCIGHJBBMJK = NMCNDOPKFJD(bAINMLLIKOL);
+		placeId = ParsePlace(bAINMLLIKOL);
 		int num = 0;
 		foreach (XmlNode childNode in EPKLCPOEELO.ChildNodes)
 		{
 			if (num == 0)
 			{
-				JAPJJHBDLKB = new QuestActionCheckPoint();
-				JAPJJHBDLKB.ONGHPGEIJEN = get_Name();
-				JAPJJHBDLKB.AEHNKDOJALB = EPDMGFELIMC();
-				JAPJJHBDLKB.Index = 0;
-				JAPJJHBDLKB.AMIMGEOENPL = NCIGHJBBMJK;
-				JAPJJHBDLKB.Parse(childNode);
-				JAPJJHBDLKB.EPFCAILHDII(this);
-				JAPJJHBDLKB.AddEventListener(2, DAEMPBALNGM);
-				KKEDDLHBJHA.Add(JAPJJHBDLKB);
+				firstCheckPoint = new QuestActionCheckPoint();
+				firstCheckPoint.QuestName = get_Name();
+				firstCheckPoint.QuestFileName = GetFileName();
+				firstCheckPoint.Index = 0;
+				firstCheckPoint.StageIndex = placeId;
+				firstCheckPoint.Parse(childNode);
+				firstCheckPoint.SetStage(this);
+				firstCheckPoint.AddEventListener(2, OnCheckPointRosterQuestChanged);
+				checkPoints.Add(firstCheckPoint);
 			}
-			FGAEEJBEGEJ(childNode.Name, childNode, GENLBPMKENI, num);
+			ParseAction(childNode.Name, childNode, GENLBPMKENI, num);
 			num++;
 		}
-		IOFIGEAFDEI(ListSF.CCDKHLAMKKO().OOMJEHAKOBA(get_Name()));
+		SetRosterQuest(ListSF.GetRoster().FindQuest(get_Name()));
 		GENLBPMKENI.AddEventListener(1, OnActionComplete);
 	}
 
 	private void OnActionComplete(object data)
 	{
-		MFGLIALECAM();
+		FinishQuest();
 	}
 
-	private void DAEMPBALNGM(object data)
+	private void OnCheckPointRosterQuestChanged(object data)
 	{
 		if (data != null)
 		{
-			IOFIGEAFDEI((RosterQuest)data);
+			SetRosterQuest((RosterQuest)data);
 		}
 	}
 
-	private void FGAEEJBEGEJ(string LJICOHPCPKO, XmlNode node, QuestActionsSequence GENLBPMKENI, int index)
+	private void ParseAction(string LJICOHPCPKO, XmlNode node, QuestActionsSequence GENLBPMKENI, int index)
 	{
 		QuestAction mBAAKHELFKL = QuestAction.GetClassActionByName(LJICOHPCPKO);
-		mBAAKHELFKL.ONGHPGEIJEN = get_Name();
-		mBAAKHELFKL.AEHNKDOJALB = EPDMGFELIMC();
-		mBAAKHELFKL.EPFCAILHDII(this);
+		mBAAKHELFKL.QuestName = get_Name();
+		mBAAKHELFKL.QuestFileName = GetFileName();
+		mBAAKHELFKL.SetStage(this);
 		mBAAKHELFKL.Index = index;
-		mBAAKHELFKL.AMIMGEOENPL = NCIGHJBBMJK;
+		mBAAKHELFKL.StageIndex = placeId;
 		mBAAKHELFKL.Parse(node);
-		GENLBPMKENI.NLJLHHNPCAO(mBAAKHELFKL);
+		GENLBPMKENI.AddAction(mBAAKHELFKL);
 	}
 
-	public static int NMCNDOPKFJD(string value)
+	public static int ParsePlace(string value)
 	{
 		if (value.Equals("Fight"))
 		{
@@ -281,31 +281,31 @@ public class QuestStage : global::EventDispatcher<object>, IComparable<QuestStag
 		return -1;
 	}
 
-	public void MFGLIALECAM()
+	public void FinishQuest()
 	{
-		if (AGJGEBBLFGA())
+		if (MarkComplete())
 		{
-			if (GameUtils.IEJDNMPFLPP.GLHICPIHDKA)
+			if (GameUtils.LogSettings.LogQuests)
 			{
 				string text = "Quest ";
 				text += get_Name();
 				text += " completed";
-				LLLOJBFMONN.INNGABABJPC(text);
+				GameLog.Info(text);
 			}
 			CallEvent(0, this);
 		}
 		CallEvent(1, this);
 	}
 
-	public QuestEvent HAANFOGOEHM(string MCGHIOHACBJ)
+	public QuestEvent FindEvent(string MCGHIOHACBJ)
 	{
-		QuestEvent.PMDPDMFLCIJ mCGHIOHACBJ = QuestEvent.HDPFFPAGOPE(MCGHIOHACBJ);
-		return HAANFOGOEHM(mCGHIOHACBJ);
+		QuestEvent.QuestEventType mCGHIOHACBJ = QuestEvent.ParseEventType(MCGHIOHACBJ);
+		return FindEvent(mCGHIOHACBJ);
 	}
 
-	public QuestEvent HAANFOGOEHM(QuestEvent.PMDPDMFLCIJ MCGHIOHACBJ)
+	public QuestEvent FindEvent(QuestEvent.QuestEventType MCGHIOHACBJ)
 	{
-		foreach (QuestEvent item in DNBFFLFBDOB)
+		foreach (QuestEvent item in events)
 		{
 			if (item.IsEvent(MCGHIOHACBJ))
 			{
@@ -317,13 +317,13 @@ public class QuestStage : global::EventDispatcher<object>, IComparable<QuestStag
 
 	public bool IsEvent(string MCGHIOHACBJ)
 	{
-		QuestEvent.PMDPDMFLCIJ mCGHIOHACBJ = QuestEvent.HDPFFPAGOPE(MCGHIOHACBJ);
+		QuestEvent.QuestEventType mCGHIOHACBJ = QuestEvent.ParseEventType(MCGHIOHACBJ);
 		return IsEvent(mCGHIOHACBJ);
 	}
 
-	public bool IsEvent(QuestEvent.PMDPDMFLCIJ MCGHIOHACBJ)
+	public bool IsEvent(QuestEvent.QuestEventType MCGHIOHACBJ)
 	{
-		QuestEvent hKFNABCMDCB = HAANFOGOEHM(MCGHIOHACBJ);
+		QuestEvent hKFNABCMDCB = FindEvent(MCGHIOHACBJ);
 		return hKFNABCMDCB != null;
 	}
 
@@ -331,7 +331,7 @@ public class QuestStage : global::EventDispatcher<object>, IComparable<QuestStag
 	{
 		foreach (string item in FBDKJJBICOK)
 		{
-			foreach (string item2 in this.FBDKJJBICOK)
+			foreach (string item2 in this.groups)
 			{
 				if (item.Equals(item2))
 				{
@@ -346,7 +346,7 @@ public class QuestStage : global::EventDispatcher<object>, IComparable<QuestStag
 	{
         string sourcePath = (FileName ?? "").Replace('\\', '/');
         if (sourcePath.IndexOf("/battle_pass/", StringComparison.OrdinalIgnoreCase) >= 0 && !Eclipse.Modding.ModPolicies.FeatureEnabled("battle_pass")) return false;
-        foreach (string group in FBDKJJBICOK)
+        foreach (string group in groups)
         {
             string feature = group == "Advertising" ? "ads" : group == "BattlePass" ? "battle_pass" :
                 group == "Offers" ? "paid_offers" : group == "RewardedVideo" ? "rewarded_video" :
@@ -355,7 +355,7 @@ public class QuestStage : global::EventDispatcher<object>, IComparable<QuestStag
         }
 		foreach (QuestCondition item in conditions)
 		{
-			if (!item.Compare(GFIHPBCEEOB, LBIPHHIJEFP()))
+			if (!item.Compare(GFIHPBCEEOB, GetRosterQuest()))
 			{
 				return false;
 			}
@@ -363,73 +363,73 @@ public class QuestStage : global::EventDispatcher<object>, IComparable<QuestStag
 		return true;
 	}
 
-	public void MHNEBBGMOLA(QuestParameters GFIHPBCEEOB)
+	public void QueueForRun(QuestParameters GFIHPBCEEOB)
 	{
 		EclipseQueuedParameters = GFIHPBCEEOB.SnapshotForQueue();
 		EclipseQueuedResume = false;
-		if (JAPJJHBDLKB != null)
+		if (firstCheckPoint != null)
 		{
-			JAPJJHBDLKB.OIPDKFAJILO(EclipseQueuedParameters);
+			firstCheckPoint.SaveCheckPoint(EclipseQueuedParameters);
 		}
 	}
 
-	public void MHHNIPBJNAD(QuestParameters GFIHPBCEEOB, bool MKBPLLIHMPE)
+	public void StartActions(QuestParameters GFIHPBCEEOB, bool MKBPLLIHMPE)
 	{
 		EclipseQueuedParameters = null;
 		EclipseQueuedResume = false;
 		EclipseLotteryInvocations = null;
 		EclipseResumeActions = MKBPLLIHMPE;
-		if (LogRules.ELEBLBJKDBI().MDKADLMMJLD())
+		if (LogRules.GetInstance().GetLogQuests())
 		{
 			StringBuilder stringBuilder = new StringBuilder();
 			stringBuilder.Append("Quest ");
 			stringBuilder.Append(get_Name());
 			stringBuilder.Append(" started");
-			LLLOJBFMONN.INNGABABJPC(stringBuilder.ToString());
+			GameLog.Info(stringBuilder.ToString());
 		}
-		GKJHJHMAGLE(HPOLGFKCOOE.QUEST_ACTIONS);
-		AFENHJFICNN.JJIHOMLLAOL = ((MKBPLLIHMPE && LBIPHHIJEFP() != null) ? LBIPHHIJEFP().NGGNCHPDOOI() : 0);
-		AFENHJFICNN.DEJMHFMLKIC(GFIHPBCEEOB);
+		SetState(QuestState.QUEST_ACTIONS);
+		actions.currentIndex = ((MKBPLLIHMPE && GetRosterQuest() != null) ? GetRosterQuest().GetCheckpointIndex() : 0);
+		actions.Run(GFIHPBCEEOB);
 	}
 
-	public string OCMHJBKFABM(HPOLGFKCOOE value)
+	public string StateToString(QuestState value)
 	{
 		switch (value)
 		{
-		case HPOLGFKCOOE.QUEST_UNCOMPLETE:
+		case QuestState.QUEST_UNCOMPLETE:
 			return "UNCOMPLETE";
-		case HPOLGFKCOOE.QUEST_ACTIONS:
+		case QuestState.QUEST_ACTIONS:
 			return "ACTIONS";
-		case HPOLGFKCOOE.QUEST_COMPLETE:
+		case QuestState.QUEST_COMPLETE:
 			return "COMPLETE";
 		default:
 			return string.Empty;
 		}
 	}
 
-	public HPOLGFKCOOE LNOHCOCPGJL(string value)
+	public QuestState StateFromString(string value)
 	{
 		switch (value)
 		{
 		case "UNCOMPLETE":
-			return HPOLGFKCOOE.QUEST_UNCOMPLETE;
+			return QuestState.QUEST_UNCOMPLETE;
 		case "ACTIONS":
-			return HPOLGFKCOOE.QUEST_ACTIONS;
+			return QuestState.QUEST_ACTIONS;
 		case "COMPLETE":
-			return HPOLGFKCOOE.QUEST_COMPLETE;
+			return QuestState.QUEST_COMPLETE;
 		default:
-			return HPOLGFKCOOE.QUEST_UNCOMPLETE;
+			return QuestState.QUEST_UNCOMPLETE;
 		}
 	}
 
-	public bool AGJGEBBLFGA()
+	public bool MarkComplete()
 	{
 		bool saveLotteryRun = Eclipse.Modding.ModRuntime.CompleteQuestLotteryRun(this);
-		GKJHJHMAGLE(HPOLGFKCOOE.QUEST_COMPLETE);
-		if (LBIPHHIJEFP() != null)
+		SetState(QuestState.QUEST_COMPLETE);
+		if (GetRosterQuest() != null)
 		{
-			LBIPHHIJEFP().LCIHKPPGNPF();
-			ListSF.GetInstance().EJANJEEGOOE();
+			GetRosterQuest().ClearParameters();
+			ListSF.GetInstance().RequestSave();
 			if (saveLotteryRun) ListSF.GetInstance().OnAuthenticate(true);
 			return true;
 		}
@@ -437,32 +437,32 @@ public class QuestStage : global::EventDispatcher<object>, IComparable<QuestStag
 		return false;
 	}
 
-	public bool IDGAAJAFCHC()
+	public bool IsUnresumable()
 	{
-		return ABBODBKGCCL > 0;
+		return unresumable > 0;
 	}
 
-	public QuestParameters AFALCHHKLFP()
+	public QuestParameters GetSavedParameters()
 	{
-		if (LBIPHHIJEFP() != null)
+		if (GetRosterQuest() != null)
 		{
-			return JMHGHCAGFDI(LBIPHHIJEFP().get_Parameters());
+			return RestoreParameters(GetRosterQuest().get_Parameters());
 		}
 		return new QuestParameters();
 	}
 
-	public QuestParameters JMHGHCAGFDI(ParametersQuest KKNOCIPBIIK)
+	public QuestParameters RestoreParameters(ParametersQuest KKNOCIPBIIK)
 	{
 		QuestParameters hHKLFIIBIFF = new QuestParameters();
 		if (KKNOCIPBIIK != null)
 		{
-			FightList jDIPBIHBGPF = ListSF.GetInstance().AOEPHEPGLAK(KKNOCIPBIIK.HPELIEHPJCI());
-			hHKLFIIBIFF.JLGLBLDPAAF = ((jDIPBIHBGPF == null) ? FightIDS.Empty() : jDIPBIHBGPF.FightId);
-			hHKLFIIBIFF.HEIADONEACH = KKNOCIPBIIK.LIPMCBHCLKN();
-			hHKLFIIBIFF.AIEHNBBFNPF = KKNOCIPBIIK.JOLAAOAFNFF();
-			hHKLFIIBIFF.BJIDALJIKNC = KKNOCIPBIIK.OGIPFNNJOPK();
-			hHKLFIIBIFF.JNGFNNFAAGN = KKNOCIPBIIK.NHKMGNPADKI();
-			hHKLFIIBIFF.fightAvgFps = KKNOCIPBIIK.OEDLLJIBHFN();
+			FightList jDIPBIHBGPF = ListSF.GetInstance().GetFightByIdString(KKNOCIPBIIK.GetFightName());
+			hHKLFIIBIFF.fightIds = ((jDIPBIHBGPF == null) ? FightIDS.Empty() : jDIPBIHBGPF.FightId);
+			hHKLFIIBIFF.fightResult = KKNOCIPBIIK.GetFightResultName();
+			hHKLFIIBIFF.raidResult = KKNOCIPBIIK.GetRaidResultName();
+			hHKLFIIBIFF.levelUp = KKNOCIPBIIK.GetLevelUp();
+			hHKLFIIBIFF.energyChange = KKNOCIPBIIK.GetPower();
+			hHKLFIIBIFF.fightAvgFps = KKNOCIPBIIK.GetFightAvgFps();
 			Eclipse.Modding.ModRuntime.RestoreQuestLotteryContext(KKNOCIPBIIK, hHKLFIIBIFF);
 		}
 		return hHKLFIIBIFF;
@@ -475,12 +475,12 @@ public class QuestStage : global::EventDispatcher<object>, IComparable<QuestStag
 			return 1;
 		}
 		// Pending quests precede running actions; equal states use descending priority.
-		bool running = MHFPGCBLGIP() == HPOLGFKCOOE.QUEST_ACTIONS;
-		bool otherRunning = NOLFMPDGCOC.MHFPGCBLGIP() == HPOLGFKCOOE.QUEST_ACTIONS;
+		bool running = GetState() == QuestState.QUEST_ACTIONS;
+		bool otherRunning = NOLFMPDGCOC.GetState() == QuestState.QUEST_ACTIONS;
 		if (running != otherRunning)
 		{
 			return running ? 1 : -1;
 		}
-		return NOLFMPDGCOC.DEFHBAPNPHI.CompareTo(DEFHBAPNPHI);
+		return NOLFMPDGCOC.priority.CompareTo(priority);
 	}
 }

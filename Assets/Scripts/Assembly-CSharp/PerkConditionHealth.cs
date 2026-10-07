@@ -6,30 +6,30 @@ public class PerkConditionHealth : PerkConditionMatchMinMax
 {
 	public PerkConditionHealth()
 	{
-		set_Type(NHDGLPNNNLH.CONDITION_HEALTH);
+		set_Type(PerkConditionType.CONDITION_HEALTH);
 	}
 
 	public override void Parse(XmlNode node)
 	{
 		base.Parse(node);
-		FMKBHHJDHDM.Parse(node, this, JMDLAMHAJLN());
+		minMax.Parse(node, this, GetPerk());
 	}
 
 	public override bool IsEqual(Model ACENLMONNPA, List<string> NIKHAICFGNM)
 	{
-		Model fGCODGKLHED = EPCPGEPPHLO(ACENLMONNPA);
+		Model fGCODGKLHED = ResolveTargetModel(ACENLMONNPA);
 		if (ACENLMONNPA == null)
 		{
-			LLLOJBFMONN.Error("PerkConditionHealth::isEqual - model is null");
+			GameLog.Error("PerkConditionHealth::isEqual - model is null");
 			return false;
 		}
-		FMKBHHJDHDM.IBCPKBBAFNH();
-		float num = (ObscuredFloat)(fGCODGKLHED.Parameters.KKMCHCNOHMB());
-		if (!FMKBHHJDHDM.KEMLMMPIPGJ() && FMKBHHJDHDM.PPCEOKCAEBD() > num)
+		minMax.EvaluateFunctions();
+		float num = (ObscuredFloat)(fGCODGKLHED.Parameters.GetCurrentLife());
+		if (!minMax.GetMinUnbounded() && minMax.GetMinValue() > num)
 		{
 			return false;
 		}
-		if (!FMKBHHJDHDM.HFGENILMBKK() && FMKBHHJDHDM.EFDLCJBJNPE() < num)
+		if (!minMax.GetMaxUnbounded() && minMax.GetMaxValue() < num)
 		{
 			return false;
 		}

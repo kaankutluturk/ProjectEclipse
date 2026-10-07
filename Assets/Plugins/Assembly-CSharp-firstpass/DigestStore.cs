@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 internal static class DigestStore
 {
-	private static Dictionary<string, Digest> MNHMKFLCJHI = new Dictionary<string, Digest>();
+	private static Dictionary<string, Digest> Digests = new Dictionary<string, Digest>();
 
 	private static object Locker = new object();
 
@@ -14,7 +14,7 @@ internal static class DigestStore
 		lock (Locker)
 		{
 			Digest value = null;
-			if (MNHMKFLCJHI.TryGetValue(KJHNCLAJMLO.Host, out value) && !value.IsUriProtected(KJHNCLAJMLO))
+			if (Digests.TryGetValue(KJHNCLAJMLO.Host, out value) && !value.IsUriProtected(KJHNCLAJMLO))
 			{
 				return null;
 			}
@@ -22,14 +22,14 @@ internal static class DigestStore
 		}
 	}
 
-	public static Digest NLJEDHBBPKK(Uri KJHNCLAJMLO)
+	public static Digest GetOrCreate(Uri KJHNCLAJMLO)
 	{
 		lock (Locker)
 		{
 			Digest value = null;
-			if (!MNHMKFLCJHI.TryGetValue(KJHNCLAJMLO.Host, out value))
+			if (!Digests.TryGetValue(KJHNCLAJMLO.Host, out value))
 			{
-				MNHMKFLCJHI.Add(KJHNCLAJMLO.Host, value = new Digest(KJHNCLAJMLO));
+				Digests.Add(KJHNCLAJMLO.Host, value = new Digest(KJHNCLAJMLO));
 			}
 			return value;
 		}
@@ -39,7 +39,7 @@ internal static class DigestStore
 	{
 		lock (Locker)
 		{
-			MNHMKFLCJHI.Remove(KJHNCLAJMLO.Host);
+			Digests.Remove(KJHNCLAJMLO.Host);
 		}
 	}
 

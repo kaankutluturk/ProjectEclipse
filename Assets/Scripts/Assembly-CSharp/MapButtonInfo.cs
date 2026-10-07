@@ -2,13 +2,13 @@ using UnityEngine;
 
 public class MapButtonInfo
 {
-	public enum FOMHAJMHHJK
+	public enum MapButtonType
 	{
 		IMAGE = 0,
 		SEQUENCE = 1
 	}
 
-	public enum HNEJAKIGDBA
+	public enum MapButtonShowType
 	{
 		Both = 0,
 		Story = 1,
@@ -17,15 +17,15 @@ public class MapButtonInfo
 
 	public string Name = string.Empty;
 
-	public string NHKMCLPOMFK = string.Empty;
+	public string ImageName = string.Empty;
 
 	public string Timer = string.Empty;
 
-	public string HFBFPBGLBOM = string.Empty;
+	public string AtlasName = string.Empty;
 
-	public string KMEDBHDDDJA = string.Empty;
+	public string TypeName = string.Empty;
 
-	public Vector2 BIJFFONMDBC = default(Vector2);
+	public Vector2 Position = default(Vector2);
 
 	// Newer gamedata positions some buttons relative to a canvas edge.  The
 	// decompiled runtime had lost these XML fields and treated every position as
@@ -34,13 +34,13 @@ public class MapButtonInfo
 
 	public float AnchorMaxX = 0.5f;
 
-	public bool NEOIMNAHLAN;
+	public bool AutoPosition;
 
-	public float BOEJEFCDIAD;
+	public float Speed;
 
 	public float Pause;
 
-	public string MLKPBAALMBC = string.Empty;
+	public string ShowTypeName = string.Empty;
 
 	public MapButtonInfo()
 	{
@@ -49,39 +49,39 @@ public class MapButtonInfo
 	public MapButtonInfo(string _name, string NCKCDCODNHA, string KMFDBBKMLOO, Vector2 LGDMCAAHPOC, bool _AutoPosition = false, string Atlas = "", string IOKOBBFCIGE = "IMAGE", float AMEGCDJDGPB = 0f, float JDDJEAGMNMP = 0f, string BFBFKHHANJG = "Story", float anchorMinX = 0.5f, float anchorMaxX = 0.5f)
 	{
 		Name = _name;
-		NHKMCLPOMFK = NCKCDCODNHA;
+		ImageName = NCKCDCODNHA;
 		Timer = KMFDBBKMLOO;
-		HFBFPBGLBOM = Atlas;
-		KMEDBHDDDJA = IOKOBBFCIGE;
-		BIJFFONMDBC = LGDMCAAHPOC;
-		NEOIMNAHLAN = _AutoPosition;
-		BOEJEFCDIAD = AMEGCDJDGPB;
+		AtlasName = Atlas;
+		TypeName = IOKOBBFCIGE;
+		Position = LGDMCAAHPOC;
+		AutoPosition = _AutoPosition;
+		Speed = AMEGCDJDGPB;
 		Pause = JDDJEAGMNMP;
-		MLKPBAALMBC = BFBFKHHANJG;
+		ShowTypeName = BFBFKHHANJG;
 		AnchorMinX = anchorMinX;
 		AnchorMaxX = anchorMaxX;
 	}
 
-	public FOMHAJMHHJK KCADIADFGDJ()
+	public MapButtonType GetButtonType()
 	{
-		FOMHAJMHHJK result = FOMHAJMHHJK.IMAGE;
-		if (KMEDBHDDDJA == "Sequence")
+		MapButtonType result = MapButtonType.IMAGE;
+		if (TypeName == "Sequence")
 		{
-			result = FOMHAJMHHJK.SEQUENCE;
+			result = MapButtonType.SEQUENCE;
 		}
 		return result;
 	}
 
-	public HNEJAKIGDBA EDMILHNJFAA()
+	public MapButtonShowType GetShowType()
 	{
-		HNEJAKIGDBA result = HNEJAKIGDBA.Both;
-		if (MLKPBAALMBC == "Story")
+		MapButtonShowType result = MapButtonShowType.Both;
+		if (ShowTypeName == "Story")
 		{
-			result = HNEJAKIGDBA.Story;
+			result = MapButtonShowType.Story;
 		}
-		if (MLKPBAALMBC == "Raid")
+		if (ShowTypeName == "Raid")
 		{
-			result = HNEJAKIGDBA.Raid;
+			result = MapButtonShowType.Raid;
 		}
 		return result;
 	}

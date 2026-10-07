@@ -12,7 +12,7 @@ public class FightHolder : MonoBehaviour
 
 	private static FightHolder _Current;
 
-	public Fight HGFJGOBMCFF
+	public Fight FightInstance
 	{
 		get
 		{
@@ -20,7 +20,7 @@ public class FightHolder : MonoBehaviour
 		}
 	}
 
-	public static FightHolder BLOOLFFMKFI
+	public static FightHolder Instance
 	{
 		get
 		{
@@ -47,14 +47,14 @@ public class FightHolder : MonoBehaviour
 	{
 		if (fightList == null)
 		{
-			LLLOJBFMONN.Error("FightHolder - Start() - FightList is empty!");
-			Module.DLOKJOHNDID(ScreenType.ModuleDojo);
+			GameLog.Error("FightHolder - Start() - FightList is empty!");
+			Module.OpenScreen(ScreenType.ModuleDojo);
 		}
 		if (preFight == null)
 		{
-			LLLOJBFMONN.Error("FightHolder.Start preFight is null");
+			GameLog.Error("FightHolder.Start preFight is null");
 		}
-		fight = GameUtils.ABAIHGFPHMO(fightList, preFight);
+		fight = GameUtils.CreateFight(fightList, preFight);
 	}
 
 	private void FixedUpdate()

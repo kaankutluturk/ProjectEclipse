@@ -2,52 +2,52 @@ using System.Xml;
 
 public class ConditionBullets : ConditionAnimation
 {
-	private BulletType KCIIELDOBOM;
+	private BulletType _bulletType;
 
-	private int KOOPPGNGIFM;
+	private int _min;
 
-	private int BCMMPCOHJNF;
+	private int _max;
 
 	public ConditionBullets(XmlNode node)
 		: base(ConditionType.BULLETS)
 	{
-		string text = node.Attributes["Type"].CIPOICEEIBK(string.Empty);
+		string text = node.Attributes["Type"].GetStringOrDefault(string.Empty);
 		if (text == "MagicBullet")
 		{
-			KCIIELDOBOM = BulletType.MAGIC_BULLET;
+			_bulletType = BulletType.MAGIC_BULLET;
 		}
 		else if (text == "RaidChargeBullet")
 		{
-			KCIIELDOBOM = BulletType.RAID_CHARGE_BULLET;
+			_bulletType = BulletType.RAID_CHARGE_BULLET;
 		}
 		else
 		{
-			LLLOJBFMONN.Error("ERROR: Unknown bulletType");
+			GameLog.Error("ERROR: Unknown bulletType");
 		}
-		KOOPPGNGIFM = node.Attributes["Min"].ParseInt();
-		BCMMPCOHJNF = node.Attributes["Max"].ParseInt(int.MaxValue);
-		if ((KCIIELDOBOM == BulletType.MAGIC_BULLET || KCIIELDOBOM == BulletType.RAID_CHARGE_BULLET) && GameUtils.GLHMHHIADMK)
+		_min = node.Attributes["Min"].ParseInt();
+		_max = node.Attributes["Max"].ParseInt(int.MaxValue);
+		if ((_bulletType == BulletType.MAGIC_BULLET || _bulletType == BulletType.RAID_CHARGE_BULLET) && GameUtils.AlwaysMagicMode)
 		{
-			KOOPPGNGIFM = 0;
+			_min = 0;
 		}
 	}
 
 	public override bool IsEqual(ModelConditions conditions)
 	{
 		int num = 0;
-		switch (KCIIELDOBOM)
+		switch (_bulletType)
 		{
 		case BulletType.MAGIC_BULLET:
-			num = conditions.JJDNDOLCMMN;
+			num = conditions.MagicCharges;
 			break;
 		case BulletType.RAID_CHARGE_BULLET:
-			num = conditions.KHDBLNPFDPE;
+			num = conditions.RaidCharges;
 			break;
 		default:
-			LLLOJBFMONN.Error("Strange type condition bullet");
+			GameLog.Error("Strange type condition bullet");
 			break;
 		}
-		bool flag = KOOPPGNGIFM <= num && num <= BCMMPCOHJNF;
+		bool flag = _min <= num && num <= _max;
 		return (!IsNot) ? flag : (!flag);
 	}
 }

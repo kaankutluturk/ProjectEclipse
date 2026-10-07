@@ -9,12 +9,12 @@ public class RoundtripObjectGraphTraversalStrategy : FullObjectGraphTraversalStr
 	{
 	}
 
-	protected override void FGAICKPNBIH(IObjectDescriptor value, IObjectGraphVisitor NKECMANOOEM, int KDONPJHEEBI)
+	protected override void TraverseProperties(IObjectDescriptor value, IObjectGraphVisitor NKECMANOOEM, int KDONPJHEEBI)
 	{
-		if (!value.get_Type().HNJLMKINHHM() && !MGFPEIHBMLD.NGJMKPBNGPP().Any((IYamlTypeConverter ILHDJDNPFKH) => ILHDJDNPFKH.EFIEKANJAEC(value.get_Type())))
+		if (!value.get_Type().HasDefaultConstructor() && !serializer.GetConverters().Any((IYamlTypeConverter ILHDJDNPFKH) => ILHDJDNPFKH.Accepts(value.get_Type())))
 		{
 			throw new InvalidOperationException(string.Format(CultureInfo.InvariantCulture, "Type '{0}' cannot be deserialized because it does not have a default constructor or a type converter.", value.get_Type()));
 		}
-		base.FGAICKPNBIH(value, NKECMANOOEM, KDONPJHEEBI);
+		base.TraverseProperties(value, NKECMANOOEM, KDONPJHEEBI);
 	}
 }

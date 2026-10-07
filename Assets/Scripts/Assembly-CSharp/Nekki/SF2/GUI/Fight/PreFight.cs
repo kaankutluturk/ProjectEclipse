@@ -7,13 +7,13 @@ namespace Nekki.SF2.GUI.Fight
 {
 	public class PreFight : MonoBehaviour
 	{
-		public class LDFICONDCGC : UnityEvent<ViewerFight.PLGDCJPCLPN>
+		public class ViewerButtonClickEvent : UnityEvent<ViewerFight.ViewerButton>
 		{
 		}
 
-		public LDFICONDCGC OnButtonClick = new LDFICONDCGC();
+		public ViewerButtonClickEvent OnButtonClick = new ViewerButtonClickEvent();
 
-		public ScreenFight.JGGPBICMICP OnStopScreen = new ScreenFight.JGGPBICMICP();
+		public ScreenFight.ScreenFightTypeEvent OnStopScreen = new ScreenFight.ScreenFightTypeEvent();
 
 		public UnityEvent OnAchievementMessageHide = new UnityEvent();
 
@@ -32,19 +32,19 @@ namespace Nekki.SF2.GUI.Fight
 		[SerializeField]
 		private GameObject achievementMessagePrefab;
 
-		private FightList KGKDKENMAOA;
+		private FightList fightList;
 
 		private ViewerFight viewerFight;
 
 		private ScreenFight screenFight;
 
-		private PauseScreen BMIDCILCFNK;
+		private PauseScreen pauseScreen;
 
-		private EndFightScreen JJGINCAHMMP;
+		private EndFightScreen endFightScreen;
 
 		private AchievementMessage achievementMessage;
 
-		public ViewerFight NLMBMKAABLF
+		public ViewerFight Viewer
 		{
 			get
 			{
@@ -52,7 +52,7 @@ namespace Nekki.SF2.GUI.Fight
 			}
 		}
 
-		public int CLDABPBDDGB
+		public int TimeLeftSeconds
 		{
 			get
 			{
@@ -60,7 +60,7 @@ namespace Nekki.SF2.GUI.Fight
 			}
 		}
 
-		public int APOMCBJKMLJ
+		public int FramesRemaining
 		{
 			get
 			{
@@ -68,7 +68,7 @@ namespace Nekki.SF2.GUI.Fight
 			}
 		}
 
-		public int BLOMEBACGDF
+		public int FramesElapsed
 		{
 			get
 			{
@@ -76,7 +76,7 @@ namespace Nekki.SF2.GUI.Fight
 			}
 		}
 
-		public int PJPKOGPLCBH
+		public int RoundTotalFrames
 		{
 			get
 			{
@@ -136,7 +136,7 @@ namespace Nekki.SF2.GUI.Fight
 
 		public void Init(FightList KGKDKENMAOA)
 		{
-			this.KGKDKENMAOA = KGKDKENMAOA;
+			this.fightList = KGKDKENMAOA;
 			InitPreFight();
 		}
 
@@ -155,33 +155,33 @@ namespace Nekki.SF2.GUI.Fight
 				screenFight.transform.SetParent(base.transform, false);
 				screenFight.gameObject.SetActive(false);
 				screenFight.OnStopScreen.AddListener(OnScreenStop);
-				screenFight.PreInit(KGKDKENMAOA);
+				screenFight.PreInit(fightList);
 			}
 			VisibleViewer(false);
 		}
 
 		public void OpenPauseScreen()
 		{
-			if (pauseScreenPrefab != null && BMIDCILCFNK == null)
+			if (pauseScreenPrefab != null && pauseScreen == null)
 			{
-				BMIDCILCFNK = Object.Instantiate(pauseScreenPrefab).GetComponent<PauseScreen>();
-				BMIDCILCFNK.gameObject.SetActive(true);
-				BMIDCILCFNK.transform.SetParent(base.transform, false);
-				BMIDCILCFNK.transform.SetAsLastSibling();
-				BMIDCILCFNK.OnSurrender.AddListener(HNHMFDIFEML);
-				BMIDCILCFNK.OnPlay.AddListener(CHJNNHEJFKO);
-				BMIDCILCFNK.Init();
-				Eclipse.UI.FightPauseCinematic.Play(BMIDCILCFNK.gameObject);
+				pauseScreen = Object.Instantiate(pauseScreenPrefab).GetComponent<PauseScreen>();
+				pauseScreen.gameObject.SetActive(true);
+				pauseScreen.transform.SetParent(base.transform, false);
+				pauseScreen.transform.SetAsLastSibling();
+				pauseScreen.OnSurrender.AddListener(OnSurrenderClicked);
+				pauseScreen.OnPlay.AddListener(OnPlayClicked);
+				pauseScreen.Init();
+				Eclipse.UI.FightPauseCinematic.Play(pauseScreen.gameObject);
 			}
 		}
 
 		public void ClosePauseScreen()
 		{
-			if (BMIDCILCFNK != null)
+			if (pauseScreen != null)
 			{
 				// Eclipse: fades out over the resumed fight instead of cutting.
-				Eclipse.UI.FightPauseCinematic.Close(BMIDCILCFNK.gameObject);
-				BMIDCILCFNK = null;
+				Eclipse.UI.FightPauseCinematic.Close(pauseScreen.gameObject);
+				pauseScreen = null;
 			}
 		}
 
@@ -189,12 +189,12 @@ namespace Nekki.SF2.GUI.Fight
 		{
 			if (endFightScreenPrefab != null)
 			{
-				JJGINCAHMMP = Object.Instantiate(endFightScreenPrefab).GetComponent<EndFightScreen>();
-				JJGINCAHMMP.gameObject.SetActive(true);
+				endFightScreen = Object.Instantiate(endFightScreenPrefab).GetComponent<EndFightScreen>();
+				endFightScreen.gameObject.SetActive(true);
 				Transform parent = ((!(base.transform.parent != null)) ? base.transform : base.transform.parent);
-				JJGINCAHMMP.transform.SetParent(parent, false);
-				JJGINCAHMMP.transform.SetAsLastSibling();
-				JJGINCAHMMP.Init(DCJLKCFKCOM);
+				endFightScreen.transform.SetParent(parent, false);
+				endFightScreen.transform.SetAsLastSibling();
+				endFightScreen.Init(DCJLKCFKCOM);
 			}
 		}
 
@@ -283,7 +283,7 @@ namespace Nekki.SF2.GUI.Fight
 			}
 			viewerFight = null;
 			screenFight = null;
-			BMIDCILCFNK = null;
+			pauseScreen = null;
 		}
 
 		public void CreateVS(ModelParameters JCICKLIMBEF, List<ModelParameters> IDAAONBIBJM, int OBLEMIHLFII, bool BBBNBKIMHJC, bool GDLJMEJBGPO, bool IFMCDDIGOLD)
@@ -342,7 +342,7 @@ namespace Nekki.SF2.GUI.Fight
 			}
 			if (MBDILDFLMBL && viewerFight != null)
 			{
-				viewerFight.GetScreenModel(0).IGFGFICFKFH();
+				viewerFight.GetScreenModel(0).AddPerfect();
 			}
 		}
 
@@ -497,19 +497,19 @@ namespace Nekki.SF2.GUI.Fight
 			}
 		}
 
-		private void HNHMFDIFEML()
+		private void OnSurrenderClicked()
 		{
-			OnButtonClick.Invoke(ViewerFight.PLGDCJPCLPN.ButtonPauseSurrender);
+			OnButtonClick.Invoke(ViewerFight.ViewerButton.ButtonPauseSurrender);
 		}
 
-		private void CHJNNHEJFKO()
+		private void OnPlayClicked()
 		{
-			OnButtonClick.Invoke(ViewerFight.PLGDCJPCLPN.ButtonPausePlay);
+			OnButtonClick.Invoke(ViewerFight.ViewerButton.ButtonPausePlay);
 		}
 
 		private void OnButtonClicked(object data)
 		{
-			ViewerFight.PLGDCJPCLPN arg = (ViewerFight.PLGDCJPCLPN)data;
+			ViewerFight.ViewerButton arg = (ViewerFight.ViewerButton)data;
 			OnButtonClick.Invoke(arg);
 		}
 	}

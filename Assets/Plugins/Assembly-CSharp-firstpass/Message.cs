@@ -4,34 +4,34 @@ using System.Diagnostics;
 public sealed class Message
 {
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private string DGDIGIMFGMI;
+	private string id;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private string MJDIHAAHDIC;
+	private string eventName;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private string JFKBADLJJBM;
+	private string data;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private TimeSpan BPBMHJKAIPG;
+	private TimeSpan retry;
 
 	public string Id
 	{
 		get
 		{
-			return IMMIJJCLPBO();
+			return GetMessageId();
 		}
 		internal set
 		{
-			MKAMABIPHEN(value);
+			SetId(value);
 		}
 	}
 
-	public string MOFKKABEFEB
+	public string EventName
 	{
 		get
 		{
-			return EMCEPDNKAPK();
+			return GetEvent();
 		}
 		internal set
 		{
@@ -39,11 +39,11 @@ public sealed class Message
 		}
 	}
 
-	public TimeSpan DOIGOILHAKM
+	public TimeSpan RetryInterval
 	{
 		get
 		{
-			return GOOCPGAOBBH();
+			return GetRetry();
 		}
 		internal set
 		{
@@ -51,48 +51,48 @@ public sealed class Message
 		}
 	}
 
-	public string IMMIJJCLPBO()
+	public string GetMessageId()
 	{
-		return DGDIGIMFGMI;
+		return id;
 	}
 
-	internal void MKAMABIPHEN(string value)
+	internal void SetId(string value)
 	{
-		DGDIGIMFGMI = value;
+		id = value;
 	}
 
-	public string EMCEPDNKAPK()
+	public string GetEvent()
 	{
-		return MJDIHAAHDIC;
+		return eventName;
 	}
 
 	internal void set_Event(string value)
 	{
-		MJDIHAAHDIC = value;
+		eventName = value;
 	}
 
-	public string CHIGLEKCFFN()
+	public string GetData()
 	{
-		return JFKBADLJJBM;
+		return data;
 	}
 
 	internal void set_Data(string value)
 	{
-		JFKBADLJJBM = value;
+		data = value;
 	}
 
-	public TimeSpan GOOCPGAOBBH()
+	public TimeSpan GetRetry()
 	{
-		return BPBMHJKAIPG;
+		return retry;
 	}
 
 	internal void set_Retry(TimeSpan value)
 	{
-		BPBMHJKAIPG = value;
+		retry = value;
 	}
 
 	public override string ToString()
 	{
-		return string.Format("\"{0}\": \"{1}\"", EMCEPDNKAPK(), CHIGLEKCFFN());
+		return string.Format("\"{0}\": \"{1}\"", GetEvent(), GetData());
 	}
 }

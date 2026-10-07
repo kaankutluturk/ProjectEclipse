@@ -556,16 +556,16 @@ namespace Newtonsoft.Json.Utilities
 				select new
 				{
 					Count = g.Count(),
-					CLGAMCDEMEI = g.Cast<MemberInfo>()
+					Members = g.Cast<MemberInfo>()
 				};
 			foreach (var item in enumerable)
 			{
 				if (item.Count == 1)
 				{
-					list2.Add(item.CLGAMCDEMEI.First());
+					list2.Add(item.Members.First());
 					continue;
 				}
-				IEnumerable<MemberInfo> collection = from m in item.CLGAMCDEMEI
+				IEnumerable<MemberInfo> collection = from m in item.Members
 					where !IsOverridenGenericMember(m, bindingAttr) || m.Name == "Item"
 					select m;
 				list2.AddRange(collection);

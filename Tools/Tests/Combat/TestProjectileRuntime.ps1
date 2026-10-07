@@ -32,7 +32,7 @@ namespace ProjectileNormalizationTest {
         }
     }
     public static class XmlExtensions {
-        public static string CIPOICEEIBK(this XmlAttribute attribute, string fallback) {
+        public static string GetStringOrDefault(this XmlAttribute attribute, string fallback) {
             return attribute == null ? fallback : attribute.Value;
         }
     }
@@ -79,7 +79,7 @@ function Parse-Moves([xml]$document, [string[]]$names) {
     [MovesMaps]::Clear()
     [MovesMaps]::Init()
     $templates = New-Object 'System.Collections.Generic.Dictionary[string,TemplateAnimation]'
-    $parser.GetMethod('AKGCKOGKJBD', $flags).Invoke($null, @($document.Movesxml.Templates, $templates.PSObject.BaseObject)) | Out-Null
+    $parser.GetMethod('ParseTemplates', $flags).Invoke($null, @($document.Movesxml.Templates, $templates.PSObject.BaseObject)) | Out-Null
     $legacyTemplates = New-Object 'System.Collections.Generic.Dictionary[string,System.Xml.XmlNode]'
     foreach ($template in $document.SelectNodes('/Movesxml/LegacyTemplates/Template')) {
         $legacyTemplates.Add($template.GetAttribute('Name'), $template)
@@ -96,7 +96,7 @@ function Parse-Moves([xml]$document, [string[]]$names) {
     }
     $moves = New-Object 'System.Collections.Generic.List[InfoAnimation]'
     $tricks = New-Object 'System.Collections.Generic.List[Trick]'
-    $parser.GetMethod('MNCBOOGMKGB', $flags).Invoke($null, @($selected, $templates.PSObject.BaseObject, $moves.PSObject.BaseObject, $tricks.PSObject.BaseObject)) | Out-Null
+    $parser.GetMethod('ParseMoves', $flags).Invoke($null, @($selected, $templates.PSObject.BaseObject, $moves.PSObject.BaseObject, $tricks.PSObject.BaseObject)) | Out-Null
     return ,$moves
 }
 $names = @('EnergyballStart','IceballStart','HermitStormStart','RangedShurikenWeapon','ShurikenFly','RangedKunaiWeapon','KunaiFly','RangedHeavyWeapon','ChakramFly')
@@ -108,15 +108,15 @@ Assert-True ($byName.IceballStart.IsItemRequired('Weapon','IceBall')) 'Iceball l
 foreach ($name in @('EnergyballStart','IceballStart','HermitStormStart')) {
     $move = $byName[$name]
     Assert-True ($move.MoveData.Locks.Count -gt 0) ($name + ' is unrestricted')
-    Assert-True ($move.MoveData.JIFAHHGNPFH.Count -gt 0) ($name + ' lost inherited conditions')
+    Assert-True ($move.MoveData.Conditions.Count -gt 0) ($name + ' lost inherited conditions')
 }
 # Original template membership is a runtime contract for CurrentAnimation
 # conditions and AI queries; do not replace it with renamed template tags.
 $originalParsed = Parse-Moves $baseline @('EnergyballStart','IceballStart','HermitStormStart')
 foreach ($original in $originalParsed) {
     $move = $byName[$original.Name]
-    Assert-True (($move.FOLOOGCLPNE() -join '|') -ceq ($original.FOLOOGCLPNE() -join '|')) ($original.Name + ' template membership changed')
-    foreach ($field in @('Locks','JIFAHHGNPFH','DJBAIAKOIHM','AJCMBMJGJEG')) {
+    Assert-True (($move.GetTemplateNames() -join '|') -ceq ($original.GetTemplateNames() -join '|')) ($original.Name + ' template membership changed')
+    foreach ($field in @('Locks','Conditions','Actions','Events')) {
         Assert-True ($move.MoveData.$field.Count -eq $original.MoveData.$field.Count) ($original.Name + ' inherited rule count changed: ' + $field)
     }
 }
@@ -125,50 +125,50 @@ foreach ($original in $originalParsed) {
 # reject the magic birth moves while retaining their own launch/flight moves.
 foreach ($subtype in @('Shuriken','Kunai','Chakram')) {
     $conditions = New-Object ModelConditions
-    $conditions.OJIAKDDCGLB = New-Object 'System.Collections.Generic.List[ItemInfo]'
+    $conditions.Items = New-Object 'System.Collections.Generic.List[ItemInfo]'
     foreach ($spec in @(@('Weapon',$subtype),@('Skeleton','SkeletonMissile'))) {
         $item = New-Object ItemInfo -ArgumentList @($null)
         $item.Type = $spec[0]
         $item.SubType = $spec[1]
         $item.Name = if ($spec[0] -eq 'Weapon') { 'RANGED_BP_S5_TIME_SHIFTER' } else { 'SkeletonMissile' }
-        $conditions.OJIAKDDCGLB.Add($item)
+        $conditions.Items.Add($item)
     }
     foreach ($name in @('EnergyballStart','IceballStart','HermitStormStart')) {
         $move = $byName[$name]
-        Assert-True (!$move.HPPGNJJCEGF($conditions, $move.MoveData.Locks)) ($subtype + ' can select ' + $name)
+        Assert-True (!$move.AreConditionsMet($conditions, $move.MoveData.Locks)) ($subtype + ' can select ' + $name)
     }
     $launch = if ($subtype -eq 'Chakram') { 'RangedHeavyWeapon' } else { 'Ranged' + $subtype + 'Weapon' }
     foreach ($name in @($launch, ($subtype + 'Fly'))) {
         $move = $byName[$name]
-        Assert-True ($move.HPPGNJJCEGF($conditions, $move.MoveData.Locks)) ($subtype + ' cannot select ' + $name)
+        Assert-True ($move.AreConditionsMet($conditions, $move.MoveData.Locks)) ($subtype + ' cannot select ' + $name)
     }
 }
 foreach ($case in @(@('EnergyballStart','EnergyBall','MAGIC_ENERGY_BALL'),@('IceballStart','IceBall','MAGIC_BP_S5_TIME_SHIFTER'),@('HermitStormStart','','HERMIT_STORM'))) {
     $conditions = New-Object ModelConditions
-    $conditions.OJIAKDDCGLB = New-Object 'System.Collections.Generic.List[ItemInfo]'
+    $conditions.Items = New-Object 'System.Collections.Generic.List[ItemInfo]'
     $item = New-Object ItemInfo -ArgumentList @($null)
     $item.Type = 'Weapon'
     $item.SubType = $case[1]
     $item.Name = $case[2]
-    $conditions.OJIAKDDCGLB.Add($item)
+    $conditions.Items.Add($item)
     $skeleton = New-Object ItemInfo -ArgumentList @($null)
     $skeleton.Type = 'Skeleton'
     $skeleton.SubType = 'SkeletonMagic'
-    $conditions.OJIAKDDCGLB.Add($skeleton)
+    $conditions.Items.Add($skeleton)
     $move = $byName[$case[0]]
-    Assert-True ($move.HPPGNJJCEGF($conditions, $move.MoveData.Locks)) ($case[0] + ' rejects its intended magic item')
+    Assert-True ($move.AreConditionsMet($conditions, $move.MoveData.Locks)) ($case[0] + ' rejects its intended magic item')
 }
 # Exercise the actual block-removal branch from Model.Strike with compiled
 # IntervalAttack/Model/ModelAnimation objects. Only unrelated AI, collision,
 # damage and event dispatch are excluded from this focused hit-path fixture.
 $modelSource = Get-Content -Raw (Join-Path $projectPath 'Assets/Scripts/Assembly-CSharp/Model.cs')
-$blockBranch = [regex]::Match($modelSource, '(?ms)^\t\tif \(hFIIPNLCIEE\.NPHDDMAIGKN\(\)\)\r?\n\t\t\{.*?^\t\t\}')
+$blockBranch = [regex]::Match($modelSource, '(?ms)^\t\tif \(hFIIPNLCIEE\.GetIgnoresBlock\(\)\)\r?\n\t\t\{.*?^\t\t\}')
 Assert-True $blockBranch.Success 'Cannot find strike block-bypass branch'
 $blockSource = @'
 public static class ProjectileBlockTest {
     public static bool Resolve(Model defender, IntervalAttack hFIIPNLCIEE) {
 /* BLOCK */
-        return defender.AMGHOKDANGN();
+        return defender.IsBlocking();
     }
 }
 '@
@@ -187,14 +187,14 @@ function New-BlockingDefender {
     $animation = [Runtime.Serialization.FormatterServices]::GetUninitializedObject([ModelAnimation])
     $intervals = New-Object 'System.Collections.Generic.List[IntervalAnimation]'
     foreach ($name in @('GuardHigh','GuardLow')) {
-        $guard = New-Object IntervalAnimation ([IntervalAnimation+NGAJJDIEDGF]::INTERVAL_BLOCK)
+        $guard = New-Object IntervalAnimation ([IntervalAnimation+IntervalType]::INTERVAL_BLOCK)
         $guard.Name = $name
         $intervals.Add($guard)
     }
-    $evade = New-Object IntervalAnimation ([IntervalAnimation+NGAJJDIEDGF]::INTERVAL_INVULNERABLE)
+    $evade = New-Object IntervalAnimation ([IntervalAnimation+IntervalType]::INTERVAL_INVULNERABLE)
     $evade.Name = 'Evade'
     $intervals.Add($evade)
-    [ModelAnimation].GetField('KKNKJMCFIJK', $instanceFlags).SetValue($animation, $intervals.PSObject.BaseObject)
+    [ModelAnimation].GetField('activeIntervals', $instanceFlags).SetValue($animation, $intervals.PSObject.BaseObject)
     [Model].GetField('_Animation', $instanceFlags).SetValue($defender, $animation)
     return $defender
 }
@@ -218,9 +218,9 @@ foreach ($case in @(
     $attack = Parse-Attack $attackXml.DocumentElement
     $defender = New-BlockingDefender
     Assert-True ([ProjectileBlockTest]::Resolve($defender, $attack) -eq $case[2]) ('Wrong blocked state for ' + $case[1] + ': ' + $case[0])
-    Assert-True ($null -ne $defender.OCPMJKIEPIG().HDJBHPOGKNJ('Evade')) 'Block bypass removed dodge invulnerability'
+    Assert-True ($null -ne $defender.GetAnimationModule().FindInterval('Evade')) 'Block bypass removed dodge invulnerability'
     if ($case[0] -eq '<IgnoresBlock Name="GuardHigh" />') {
-        Assert-True ($null -eq $defender.OCPMJKIEPIG().HDJBHPOGKNJ('GuardHigh')) 'Named block bypass did not remove its target'
+        Assert-True ($null -eq $defender.GetAnimationModule().FindInterval('GuardHigh')) 'Named block bypass did not remove its target'
     }
 }
 $projectileIntervals = $adapted.SelectNodes('/Movesxml/Moves/Move/Intervals/Interval[@Type="Attack"][Damage/Damage[@Type="RangedDamage" or @Type="MagicDamage"]]')

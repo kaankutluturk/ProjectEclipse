@@ -5,120 +5,120 @@ using System.Diagnostics;
 public sealed class Socket : ISocket
 {
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private SocketManager JNNOJIEMLEK;
+	private SocketManager manager;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private string HCHALPNMNMK;
+	private string namespaceName;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private bool KNBOFMPBFKN;
+	private bool isOpen;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private bool BABMNMGKNMB;
+	private bool autoDecodePayload;
 
-	private Dictionary<int, LKDPANKMCOG> CKMOJINNGDG;
+	private Dictionary<int, SocketIOAckCallback> ackCallbacks;
 
-	private EventTable FNFJJIMFOAD;
+	private EventTable eventCallbacks;
 
 	private List<object> arguments = new List<object>();
 
-	public SocketManager CPOHGNDIBJD
+	public SocketManager OwnerManager
 	{
 		get
 		{
-			return HLBNHJADOMP();
+			return GetManager();
 		}
 		private set
 		{
-			CMOJGLBBCKC(value);
+			SetManager(value);
 		}
 	}
 
-	public bool PLCIGHLBOPP
+	public bool IsOpen
 	{
 		get
 		{
-			return DJKKJPNLOAE();
+			return GetIsOpen();
 		}
 		private set
 		{
-			JDHIENHFJCE(value);
+			SetIsOpen(value);
 		}
 	}
 
-	public bool KCIILHEGDAG
+	public bool AutoDecodePayload
 	{
 		get
 		{
-			return CAACHPIAHIJ();
+			return GetAutoDecodePayload();
 		}
 		set
 		{
-			FEDKJGINJID(value);
+			SetAutoDecodePayload(value);
 		}
 	}
 
 	internal Socket(string JBALIKEKHGL, SocketManager BJGMPDIKEJC)
 	{
 		set_Namespace(JBALIKEKHGL);
-		CMOJGLBBCKC(BJGMPDIKEJC);
-		JDHIENHFJCE(false);
-		FEDKJGINJID(true);
-		FNFJJIMFOAD = new EventTable(this);
+		SetManager(BJGMPDIKEJC);
+		SetIsOpen(false);
+		SetAutoDecodePayload(true);
+		eventCallbacks = new EventTable(this);
 	}
 
-	public SocketManager HLBNHJADOMP()
+	public SocketManager GetManager()
 	{
-		return JNNOJIEMLEK;
+		return manager;
 	}
 
-	private void CMOJGLBBCKC(SocketManager value)
+	private void SetManager(SocketManager value)
 	{
-		JNNOJIEMLEK = value;
+		manager = value;
 	}
 
-	public string IONIEDIPEGB()
+	public string GetNamespace()
 	{
-		return HCHALPNMNMK;
+		return namespaceName;
 	}
 
 	private void set_Namespace(string value)
 	{
-		HCHALPNMNMK = value;
+		namespaceName = value;
 	}
 
-	public bool DJKKJPNLOAE()
+	public bool GetIsOpen()
 	{
-		return KNBOFMPBFKN;
+		return isOpen;
 	}
 
-	private void JDHIENHFJCE(bool value)
+	private void SetIsOpen(bool value)
 	{
-		KNBOFMPBFKN = value;
+		isOpen = value;
 	}
 
-	public bool CAACHPIAHIJ()
+	public bool GetAutoDecodePayload()
 	{
-		return BABMNMGKNMB;
+		return autoDecodePayload;
 	}
 
-	public void FEDKJGINJID(bool value)
+	public void SetAutoDecodePayload(bool value)
 	{
-		BABMNMGKNMB = value;
+		autoDecodePayload = value;
 	}
 
 	void ISocket.Open()
 	{
-		if (HLBNHJADOMP().FLBBFDNHJAJ() == SocketManager.IFLBJIKPLOL.Open)
+		if (GetManager().GetState() == SocketManager.SocketManagerState.Open)
 		{
-			OLLDDGGCLGO(HLBNHJADOMP().PDJFKOBODHH(), null);
+			OnTransportOpen(GetManager().GetRootSocket(), null);
 			return;
 		}
-		HLBNHJADOMP().PDJFKOBODHH().Off("connect", OLLDDGGCLGO);
-		HLBNHJADOMP().PDJFKOBODHH().JPJAFMLNALO("connect", OLLDDGGCLGO);
-		if (HLBNHJADOMP().HLHJJJGJEEL().JLCKLGDFADC() && HLBNHJADOMP().FLBBFDNHJAJ() == SocketManager.IFLBJIKPLOL.Initial)
+		GetManager().GetRootSocket().Off("connect", OnTransportOpen);
+		GetManager().GetRootSocket().On("connect", OnTransportOpen);
+		if (GetManager().GetOptions().GetAutoConnect() && GetManager().GetState() == SocketManager.SocketManagerState.Initial)
 		{
-			HLBNHJADOMP().Open();
+			GetManager().Open();
 		}
 	}
 
@@ -129,21 +129,21 @@ public sealed class Socket : ISocket
 
 	void ISocket.Disconnect(bool GGONLJPAABO)
 	{
-		if (DJKKJPNLOAE())
+		if (GetIsOpen())
 		{
-			Packet nPKADBPBKIG = new Packet(HJDLGPHLPNF.Message, ECDAJBEFCAH.Disconnect, IONIEDIPEGB(), string.Empty);
-			((IManager)HLBNHJADOMP()).SendPacket(nPKADBPBKIG);
-			JDHIENHFJCE(false);
+			Packet nPKADBPBKIG = new Packet(TransportEventTypes.Message, SocketIOEventType.Disconnect, GetNamespace(), string.Empty);
+			((IManager)GetManager()).SendPacket(nPKADBPBKIG);
+			SetIsOpen(false);
 			((ISocket)this).OnPacket(nPKADBPBKIG);
 		}
-		if (CKMOJINNGDG != null)
+		if (ackCallbacks != null)
 		{
-			CKMOJINNGDG.Clear();
+			ackCallbacks.Clear();
 		}
 		if (GGONLJPAABO)
 		{
-			FNFJJIMFOAD.Clear();
-			((IManager)HLBNHJADOMP()).Remove(this);
+			eventCallbacks.Clear();
+			((IManager)GetManager()).Remove(this);
 		}
 	}
 
@@ -152,7 +152,7 @@ public sealed class Socket : ISocket
 		return Emit(DOPHKKGNAEF, null, LKIOKGCNKHE);
 	}
 
-	public Socket Emit(string DOPHKKGNAEF, LKDPANKMCOG callback, params object[] LKIOKGCNKHE)
+	public Socket Emit(string DOPHKKGNAEF, SocketIOAckCallback callback, params object[] LKIOKGCNKHE)
 	{
 		if (EventNames.IsBlacklisted(DOPHKKGNAEF))
 		{
@@ -185,11 +185,11 @@ public sealed class Socket : ISocket
 		string text = null;
 		try
 		{
-			text = HLBNHJADOMP().KCMCCGKJGLE().Encode(arguments);
+			text = GetManager().GetEncoder().Encode(arguments);
 		}
 		catch (Exception ex)
 		{
-			((ISocket)this).EmitError(CCCOMMIFIMB.Internal, "Error while encoding payload: " + ex.Message + " " + ex.StackTrace);
+			((ISocket)this).EmitError(SocketIOErrors.Internal, "Error while encoding payload: " + ex.Message + " " + ex.StackTrace);
 			return this;
 		}
 		arguments.Clear();
@@ -200,29 +200,29 @@ public sealed class Socket : ISocket
 		int num2 = 0;
 		if (callback != null)
 		{
-			num2 = HLBNHJADOMP().ICKFNGAOMFI();
-			if (CKMOJINNGDG == null)
+			num2 = GetManager().GetNextAckId();
+			if (ackCallbacks == null)
 			{
-				CKMOJINNGDG = new Dictionary<int, LKDPANKMCOG>();
+				ackCallbacks = new Dictionary<int, SocketIOAckCallback>();
 			}
-			CKMOJINNGDG[num2] = callback;
+			ackCallbacks[num2] = callback;
 		}
-		Packet cMPKPLIGKLC = new Packet(HJDLGPHLPNF.Message, (list != null) ? ECDAJBEFCAH.BinaryEvent : ECDAJBEFCAH.Event, IONIEDIPEGB(), text, 0, num2);
+		Packet cMPKPLIGKLC = new Packet(TransportEventTypes.Message, (list != null) ? SocketIOEventType.BinaryEvent : SocketIOEventType.Event, GetNamespace(), text, 0, num2);
 		if (list != null)
 		{
 			cMPKPLIGKLC.set_Attachments(list);
 		}
-		((IManager)HLBNHJADOMP()).SendPacket(cMPKPLIGKLC);
+		((IManager)GetManager()).SendPacket(cMPKPLIGKLC);
 		return this;
 	}
 
-	public Socket DPILHMMKPHD(Packet FMAMCLDBKFM, params object[] LKIOKGCNKHE)
+	public Socket EmitAck(Packet FMAMCLDBKFM, params object[] LKIOKGCNKHE)
 	{
 		if (FMAMCLDBKFM == null)
 		{
 			throw new ArgumentNullException("originalPacket == null!");
 		}
-		if (FMAMCLDBKFM.CMEHGNCCCIN() != ECDAJBEFCAH.Event && FMAMCLDBKFM.CMEHGNCCCIN() != ECDAJBEFCAH.BinaryEvent)
+		if (FMAMCLDBKFM.GetSocketIOEvent() != SocketIOEventType.Event && FMAMCLDBKFM.GetSocketIOEvent() != SocketIOEventType.BinaryEvent)
 		{
 			throw new ArgumentException("Wrong packet - you can't send an Ack for a packet with id == 0 and SocketIOEvent != Event or SocketIOEvent != BinaryEvent!");
 		}
@@ -234,160 +234,160 @@ public sealed class Socket : ISocket
 		string text = null;
 		try
 		{
-			text = HLBNHJADOMP().KCMCCGKJGLE().Encode(arguments);
+			text = GetManager().GetEncoder().Encode(arguments);
 		}
 		catch (Exception ex)
 		{
-			((ISocket)this).EmitError(CCCOMMIFIMB.Internal, "Error while encoding payload: " + ex.Message + " " + ex.StackTrace);
+			((ISocket)this).EmitError(SocketIOErrors.Internal, "Error while encoding payload: " + ex.Message + " " + ex.StackTrace);
 			return this;
 		}
 		if (text == null)
 		{
 			throw new ArgumentException("Encoding the arguments to JSON failed!");
 		}
-		Packet nPKADBPBKIG = new Packet(HJDLGPHLPNF.Message, (FMAMCLDBKFM.CMEHGNCCCIN() != ECDAJBEFCAH.Event) ? ECDAJBEFCAH.BinaryAck : ECDAJBEFCAH.Ack, IONIEDIPEGB(), text, 0, FMAMCLDBKFM.IMMIJJCLPBO());
-		((IManager)HLBNHJADOMP()).SendPacket(nPKADBPBKIG);
+		Packet nPKADBPBKIG = new Packet(TransportEventTypes.Message, (FMAMCLDBKFM.GetSocketIOEvent() != SocketIOEventType.Event) ? SocketIOEventType.BinaryAck : SocketIOEventType.Ack, GetNamespace(), text, 0, FMAMCLDBKFM.GetPacketId());
+		((IManager)GetManager()).SendPacket(nPKADBPBKIG);
 		return this;
 	}
 
-	public void JPJAFMLNALO(string DOPHKKGNAEF, BLIMHGJLDLD callback)
+	public void On(string DOPHKKGNAEF, SocketIOCallback callback)
 	{
-		FNFJJIMFOAD.DNKHCGPPBAE(DOPHKKGNAEF, callback, false, CAACHPIAHIJ());
+		eventCallbacks.Register(DOPHKKGNAEF, callback, false, GetAutoDecodePayload());
 	}
 
-	public void JPJAFMLNALO(ECDAJBEFCAH LFLGCDNKNJI, BLIMHGJLDLD callback)
+	public void On(SocketIOEventType LFLGCDNKNJI, SocketIOCallback callback)
 	{
-		string dOPHKKGNAEF = EventNames.ICAIODPBKBO(LFLGCDNKNJI);
-		FNFJJIMFOAD.DNKHCGPPBAE(dOPHKKGNAEF, callback, false, CAACHPIAHIJ());
+		string dOPHKKGNAEF = EventNames.GetNameFor(LFLGCDNKNJI);
+		eventCallbacks.Register(dOPHKKGNAEF, callback, false, GetAutoDecodePayload());
 	}
 
-	public void JPJAFMLNALO(string DOPHKKGNAEF, BLIMHGJLDLD callback, bool EJDLINOJJIF)
+	public void On(string DOPHKKGNAEF, SocketIOCallback callback, bool EJDLINOJJIF)
 	{
-		FNFJJIMFOAD.DNKHCGPPBAE(DOPHKKGNAEF, callback, false, EJDLINOJJIF);
+		eventCallbacks.Register(DOPHKKGNAEF, callback, false, EJDLINOJJIF);
 	}
 
-	public void JPJAFMLNALO(ECDAJBEFCAH LFLGCDNKNJI, BLIMHGJLDLD callback, bool EJDLINOJJIF)
+	public void On(SocketIOEventType LFLGCDNKNJI, SocketIOCallback callback, bool EJDLINOJJIF)
 	{
-		string dOPHKKGNAEF = EventNames.ICAIODPBKBO(LFLGCDNKNJI);
-		FNFJJIMFOAD.DNKHCGPPBAE(dOPHKKGNAEF, callback, false, EJDLINOJJIF);
+		string dOPHKKGNAEF = EventNames.GetNameFor(LFLGCDNKNJI);
+		eventCallbacks.Register(dOPHKKGNAEF, callback, false, EJDLINOJJIF);
 	}
 
-	public void FKIKKBDNCNP(string DOPHKKGNAEF, BLIMHGJLDLD callback)
+	public void Once(string DOPHKKGNAEF, SocketIOCallback callback)
 	{
-		FNFJJIMFOAD.DNKHCGPPBAE(DOPHKKGNAEF, callback, true, CAACHPIAHIJ());
+		eventCallbacks.Register(DOPHKKGNAEF, callback, true, GetAutoDecodePayload());
 	}
 
-	public void FKIKKBDNCNP(ECDAJBEFCAH LFLGCDNKNJI, BLIMHGJLDLD callback)
+	public void Once(SocketIOEventType LFLGCDNKNJI, SocketIOCallback callback)
 	{
-		FNFJJIMFOAD.DNKHCGPPBAE(EventNames.ICAIODPBKBO(LFLGCDNKNJI), callback, true, CAACHPIAHIJ());
+		eventCallbacks.Register(EventNames.GetNameFor(LFLGCDNKNJI), callback, true, GetAutoDecodePayload());
 	}
 
-	public void FKIKKBDNCNP(string DOPHKKGNAEF, BLIMHGJLDLD callback, bool EJDLINOJJIF)
+	public void Once(string DOPHKKGNAEF, SocketIOCallback callback, bool EJDLINOJJIF)
 	{
-		FNFJJIMFOAD.DNKHCGPPBAE(DOPHKKGNAEF, callback, true, EJDLINOJJIF);
+		eventCallbacks.Register(DOPHKKGNAEF, callback, true, EJDLINOJJIF);
 	}
 
-	public void FKIKKBDNCNP(ECDAJBEFCAH LFLGCDNKNJI, BLIMHGJLDLD callback, bool EJDLINOJJIF)
+	public void Once(SocketIOEventType LFLGCDNKNJI, SocketIOCallback callback, bool EJDLINOJJIF)
 	{
-		FNFJJIMFOAD.DNKHCGPPBAE(EventNames.ICAIODPBKBO(LFLGCDNKNJI), callback, true, EJDLINOJJIF);
+		eventCallbacks.Register(EventNames.GetNameFor(LFLGCDNKNJI), callback, true, EJDLINOJJIF);
 	}
 
 	public void Off()
 	{
-		FNFJJIMFOAD.Clear();
+		eventCallbacks.Clear();
 	}
 
 	public void Off(string DOPHKKGNAEF)
 	{
-		FNFJJIMFOAD.Unregister(DOPHKKGNAEF);
+		eventCallbacks.Unregister(DOPHKKGNAEF);
 	}
 
-	public void Off(ECDAJBEFCAH LFLGCDNKNJI)
+	public void Off(SocketIOEventType LFLGCDNKNJI)
 	{
-		Off(EventNames.ICAIODPBKBO(LFLGCDNKNJI));
+		Off(EventNames.GetNameFor(LFLGCDNKNJI));
 	}
 
-	public void Off(string DOPHKKGNAEF, BLIMHGJLDLD callback)
+	public void Off(string DOPHKKGNAEF, SocketIOCallback callback)
 	{
-		FNFJJIMFOAD.Unregister(DOPHKKGNAEF, callback);
+		eventCallbacks.Unregister(DOPHKKGNAEF, callback);
 	}
 
-	public void Off(ECDAJBEFCAH LFLGCDNKNJI, BLIMHGJLDLD callback)
+	public void Off(SocketIOEventType LFLGCDNKNJI, SocketIOCallback callback)
 	{
-		FNFJJIMFOAD.Unregister(EventNames.ICAIODPBKBO(LFLGCDNKNJI), callback);
+		eventCallbacks.Unregister(EventNames.GetNameFor(LFLGCDNKNJI), callback);
 	}
 
 	void ISocket.OnPacket(Packet NPKADBPBKIG)
 	{
-		switch (NPKADBPBKIG.CMEHGNCCCIN())
+		switch (NPKADBPBKIG.GetSocketIOEvent())
 		{
-		case ECDAJBEFCAH.Disconnect:
-			if (DJKKJPNLOAE())
+		case SocketIOEventType.Disconnect:
+			if (GetIsOpen())
 			{
-				JDHIENHFJCE(false);
+				SetIsOpen(false);
 				Disconnect();
 			}
 			break;
-		case ECDAJBEFCAH.Error:
+		case SocketIOEventType.Error:
 		{
 			bool IBFAPIMOMBA = false;
-			Dictionary<string, object> dictionary = Json.Decode(NPKADBPBKIG.NLHGDFGNIHB(), ref IBFAPIMOMBA) as Dictionary<string, object>;
+			Dictionary<string, object> dictionary = Json.Decode(NPKADBPBKIG.GetPayload(), ref IBFAPIMOMBA) as Dictionary<string, object>;
 			if (IBFAPIMOMBA)
 			{
-				Error eOFKDCNBPHO = new Error((CCCOMMIFIMB)Convert.ToInt32(dictionary["code"]), dictionary["message"] as string);
-				FNFJJIMFOAD.Call(EventNames.ICAIODPBKBO(ECDAJBEFCAH.Error), NPKADBPBKIG, eOFKDCNBPHO);
+				Error eOFKDCNBPHO = new Error((SocketIOErrors)Convert.ToInt32(dictionary["code"]), dictionary["message"] as string);
+				eventCallbacks.Call(EventNames.GetNameFor(SocketIOEventType.Error), NPKADBPBKIG, eOFKDCNBPHO);
 				return;
 			}
 			break;
 		}
 		}
-		FNFJJIMFOAD.Call(NPKADBPBKIG);
-		if ((NPKADBPBKIG.CMEHGNCCCIN() != ECDAJBEFCAH.Ack && NPKADBPBKIG.CMEHGNCCCIN() != ECDAJBEFCAH.BinaryAck) || CKMOJINNGDG == null)
+		eventCallbacks.Call(NPKADBPBKIG);
+		if ((NPKADBPBKIG.GetSocketIOEvent() != SocketIOEventType.Ack && NPKADBPBKIG.GetSocketIOEvent() != SocketIOEventType.BinaryAck) || ackCallbacks == null)
 		{
 			return;
 		}
-		LKDPANKMCOG value = null;
-		if (CKMOJINNGDG.TryGetValue(NPKADBPBKIG.IMMIJJCLPBO(), out value) && value != null)
+		SocketIOAckCallback value = null;
+		if (ackCallbacks.TryGetValue(NPKADBPBKIG.GetPacketId(), out value) && value != null)
 		{
 			try
 			{
-				value(this, NPKADBPBKIG, NPKADBPBKIG.Decode(HLBNHJADOMP().KCMCCGKJGLE()));
+				value(this, NPKADBPBKIG, NPKADBPBKIG.Decode(GetManager().GetEncoder()));
 			}
 			catch (Exception mPFFFAOGBJE)
 			{
-				HTTPManager.MBBMPNDDPIH().COHEDILAHFD("Socket", "ackCallback", mPFFFAOGBJE);
+				HTTPManager.GetLogger().Exception("Socket", "ackCallback", mPFFFAOGBJE);
 			}
 		}
-		CKMOJINNGDG.Remove(NPKADBPBKIG.IMMIJJCLPBO());
+		ackCallbacks.Remove(NPKADBPBKIG.GetPacketId());
 	}
 
-	void ISocket.EmitEvent(ECDAJBEFCAH LFLGCDNKNJI, params object[] LKIOKGCNKHE)
+	void ISocket.EmitEvent(SocketIOEventType LFLGCDNKNJI, params object[] LKIOKGCNKHE)
 	{
-		((ISocket)this).EmitEvent(EventNames.ICAIODPBKBO(LFLGCDNKNJI), LKIOKGCNKHE);
+		((ISocket)this).EmitEvent(EventNames.GetNameFor(LFLGCDNKNJI), LKIOKGCNKHE);
 	}
 
 	void ISocket.EmitEvent(string DOPHKKGNAEF, params object[] LKIOKGCNKHE)
 	{
 		if (!string.IsNullOrEmpty(DOPHKKGNAEF))
 		{
-			FNFJJIMFOAD.Call(DOPHKKGNAEF, null, LKIOKGCNKHE);
+			eventCallbacks.Call(DOPHKKGNAEF, null, LKIOKGCNKHE);
 		}
 	}
 
-	void ISocket.EmitError(CCCOMMIFIMB GNKCGOGKAEK, string CKEHOEGLMBM)
+	void ISocket.EmitError(SocketIOErrors GNKCGOGKAEK, string CKEHOEGLMBM)
 	{
-		((ISocket)this).EmitEvent(ECDAJBEFCAH.Error, new object[1]
+		((ISocket)this).EmitEvent(SocketIOEventType.Error, new object[1]
 		{
 			new Error(GNKCGOGKAEK, CKEHOEGLMBM)
 		});
 	}
 
-	private void OLLDDGGCLGO(Socket JLEACANCMJF, Packet NPKADBPBKIG, params object[] LKIOKGCNKHE)
+	private void OnTransportOpen(Socket JLEACANCMJF, Packet NPKADBPBKIG, params object[] LKIOKGCNKHE)
 	{
-		if (IONIEDIPEGB() != "/")
+		if (GetNamespace() != "/")
 		{
-			((IManager)HLBNHJADOMP()).SendPacket(new Packet(HJDLGPHLPNF.Message, ECDAJBEFCAH.Connect, IONIEDIPEGB(), string.Empty));
+			((IManager)GetManager()).SendPacket(new Packet(TransportEventTypes.Message, SocketIOEventType.Connect, GetNamespace(), string.Empty));
 		}
-		JDHIENHFJCE(true);
+		SetIsOpen(true);
 	}
 }

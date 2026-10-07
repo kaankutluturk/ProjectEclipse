@@ -66,7 +66,7 @@ public static class ValidateDE128TitanWinNative
                 return;
             }
             var scripts = ModRuntime.Scripts;
-            var roster = ListSF.CCDKHLAMKKO();
+            var roster = ListSF.GetRoster();
             var module = Module.GetInstance();
             if (scripts == null || roster == null || module == null) return;
             if (scripts.Diagnostics.Count != 0 || scripts.StateDiagnostics.Count != 0)
@@ -84,10 +84,10 @@ public static class ValidateDE128TitanWinNative
             }
             if (!fightRequested && module.GetCurrentScreenType() == ScreenType.ModuleMap)
             {
-                if (Names.Any(name => roster.KHCNHPCPFII().CMGOCLGHNLH(name) != null))
+                if (Names.Any(name => roster.GetInventory().FindItem(name) != null))
                     throw new Exception("Titan victory acceptance needs a profile without prior reward items.");
                 var id = DefinitionId.Parse("core:fights/zone_7/c3_boss_titan_eclipsemode/6");
-                var encounter = ListSF.CHMCKGCDGCM(new FightIDS(scripts.Content.RuntimeFightId(id)));
+                var encounter = ListSF.GetFightById(new FightIDS(scripts.Content.RuntimeFightId(id)));
                 if (encounter == null) throw new Exception("Final Eclipse Titan fight missing.");
                 Debug.Log(Prefix + "Starting " + id + ", Eclipse=" + roster.IsEclipseMode());
                 GameUtils.StartFight(encounter, false, null, true, false);
@@ -98,12 +98,12 @@ public static class ValidateDE128TitanWinNative
             var resultScreen = UnityEngine.Object.FindObjectOfType<EndFightScreen>();
             if (resultScreen != null && !resultSeen)
             {
-                var result = (FightResult)typeof(EndFightScreen).GetField("MPFLHOFEOGI", Hidden).GetValue(resultScreen);
-                var grants = result.PMIHPJFAJIO.HELFDCAIJNE;
+                var result = (FightResult)typeof(EndFightScreen).GetField("fightResult", Hidden).GetValue(resultScreen);
+                var grants = result.Prize.Items;
                 if (!result.IsWinner() || grants.Count != 5 ||
-                    !grants.Select(value => value.NAIEGGHELIH.Name).SequenceEqual(Names))
+                    !grants.Select(value => value.RewardSource.Name).SequenceEqual(Names))
                     throw new Exception("Victory screen has wrong five-item prize: " +
-                        string.Join(",", grants.Select(value => value.NAIEGGHELIH.Name)));
+                        string.Join(",", grants.Select(value => value.RewardSource.Name)));
                 resultSeen = true;
                 Debug.Log(Prefix + "Actual victory screen projects five ordered Titan items.");
             }
@@ -118,8 +118,8 @@ public static class ValidateDE128TitanWinNative
             {
                 if (module.GetCurrentScreenType() != ScreenType.ModuleMap &&
                     module.GetCurrentScreenType() != ScreenType.ModuleDojo) return;
-                var inventory = roster.KHCNHPCPFII();
-                if (Names.Any(name => inventory.CMGOCLGHNLH(name) == null))
+                var inventory = roster.GetInventory();
+                if (Names.Any(name => inventory.FindItem(name) == null))
                     throw new Exception("Actual victory did not settle all Titan items.");
                 Debug.Log(Prefix + "PASS: native Eclipse Titan victory screen, five grants and inventory settlement.");
                 Finish(0);

@@ -11,7 +11,7 @@ namespace Eclipse.Underworld.Diagnostics
 		public static void LogEnemies(FightList fight, ModelParameters player, List<ModelParameters> enemies)
 		{
 			Battle battle = fight.Battle;
-			Zone zone = battle == null ? null : battle.OAEIILGHJMG;
+			Zone zone = battle == null ? null : battle.ParentZone;
 			if (!UnderworldZonePolicy.IsRaidZone(zone))
 			{
 				return;
@@ -23,12 +23,12 @@ namespace Eclipse.Underworld.Diagnostics
 				int defense = 0;
 				int playerWeapon = 0;
 				int playerDefense = 0;
-				enemy.IBLHIAHECLK.Get("WeaponDamage", ref weapon);
-				enemy.IBLHIAHECLK.Get("BodyDefense", ref defense);
-				player.IBLHIAHECLK.Get("WeaponDamage", ref playerWeapon);
-				player.IBLHIAHECLK.Get("BodyDefense", ref playerDefense);
+				enemy.FinalAttributes.Get("WeaponDamage", ref weapon);
+				enemy.FinalAttributes.Get("BodyDefense", ref defense);
+				player.FinalAttributes.Get("WeaponDamage", ref playerWeapon);
+				player.FinalAttributes.Get("BodyDefense", ref playerDefense);
 				Debug.Log("[Underworld] battle=" + battle.get_Name() +
-					" warriorPower=" + enemy.FPIMGHKNHMO + " healthBars=" + enemy.HealthBarCount +
+					" warriorPower=" + enemy.WarriorPower + " healthBars=" + enemy.HealthBarCount +
 					" bossWeapon=" + weapon + " bossDefense=" + defense +
 					" playerWeapon=" + playerWeapon + " playerDefense=" + playerDefense +
 					" alignmentRules=" + enemy.AttributeAlignments.Count);

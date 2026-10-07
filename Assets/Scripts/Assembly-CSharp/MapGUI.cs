@@ -3,53 +3,53 @@ using System.Xml;
 
 public class MapGUI
 {
-	public struct IKOLLMFIEPA
+	public struct ChallengeFadeSettings
 	{
-		public int IEKAFNFKBNE;
+		public int MinOpacity;
 
-		public int HPJHAIALGHN;
+		public int FadeSpeed;
 
-		public int CPLJCIFJAGN;
+		public int DelayBeforeFade;
 
-		public int BGDLPJKHBHP;
+		public int DifficultyIsFirstFrame;
 	}
 
-	public struct PLDPCIECIIF
+	public struct RaidInfoFadeSettings
 	{
-		public int IEKAFNFKBNE;
+		public int MinOpacity;
 
-		public int HPJHAIALGHN;
+		public int FadeSpeed;
 
-		public int CPLJCIFJAGN;
+		public int DelayBeforeFade;
 
-		public int LHMLMFOMALK;
+		public int PrizeIsFirstFrame;
 	}
 
-	public struct FFOFPPKGDCH
+	public struct ZoneSwitchFadeSettings
 	{
-		public int IEKAFNFKBNE;
+		public int MinOpacity;
 
-		public int HPJHAIALGHN;
+		public int FadeSpeed;
 
-		public int CPLJCIFJAGN;
+		public int DelayBeforeFade;
 
-		public List<string> GBDHOPBMLHK;
+		public List<string> BattleTypeNames;
 	}
 
-	public struct KJNFHJIMBDB
+	public struct RewardLineOscillationSettings
 	{
-		public float MNADIKCPPIG;
+		public float OscillationPeriod;
 
-		public float MIFFMBOIAGC;
+		public float OscillationFactor;
 	}
 
-	public static IKOLLMFIEPA HPDGECMMHBJ = default(IKOLLMFIEPA);
+	public static ChallengeFadeSettings ChallengeFade = default(ChallengeFadeSettings);
 
-	public static FFOFPPKGDCH JHLMDGBGGEP = default(FFOFPPKGDCH);
+	public static ZoneSwitchFadeSettings ZoneSwitchFade = default(ZoneSwitchFadeSettings);
 
-	public static KJNFHJIMBDB ELPKAJAKAEL = default(KJNFHJIMBDB);
+	public static RewardLineOscillationSettings RewardLineOscillation = default(RewardLineOscillationSettings);
 
-	public static PLDPCIECIIF GMKNDIELELN = default(PLDPCIECIIF);
+	public static RaidInfoFadeSettings RaidInfoFade = default(RaidInfoFadeSettings);
 
 	public static void Parse(XmlNode node)
 	{
@@ -58,31 +58,31 @@ public class MapGUI
 			return;
 		}
 		XmlNode xmlNode = node["RewardLine"];
-		ELPKAJAKAEL.MNADIKCPPIG = xmlNode["OscillationPeriod"].Attributes["Value"].ParseFloat();
-		ELPKAJAKAEL.MIFFMBOIAGC = xmlNode["OscillationFactor"].Attributes["Value"].ParseFloat();
+		RewardLineOscillation.OscillationPeriod = xmlNode["OscillationPeriod"].Attributes["Value"].ParseFloat();
+		RewardLineOscillation.OscillationFactor = xmlNode["OscillationFactor"].Attributes["Value"].ParseFloat();
 		XmlNode xmlNode2 = node["Challenge"];
-		HPDGECMMHBJ.IEKAFNFKBNE = xmlNode2["MinOpacity"].PNJPEDPDMCP().ParseInt();
-		HPDGECMMHBJ.HPJHAIALGHN = xmlNode2["FadeSpeed"].PNJPEDPDMCP().ParseInt();
-		HPDGECMMHBJ.CPLJCIFJAGN = xmlNode2["DelayBeforeFade"].Attributes["Value"].ParseInt();
-		HPDGECMMHBJ.BGDLPJKHBHP = xmlNode2["DifficultyIsFirstFrame"].Attributes["Value"].ParseInt();
+		ChallengeFade.MinOpacity = xmlNode2["MinOpacity"].FirstAttribute().ParseInt();
+		ChallengeFade.FadeSpeed = xmlNode2["FadeSpeed"].FirstAttribute().ParseInt();
+		ChallengeFade.DelayBeforeFade = xmlNode2["DelayBeforeFade"].Attributes["Value"].ParseInt();
+		ChallengeFade.DifficultyIsFirstFrame = xmlNode2["DifficultyIsFirstFrame"].Attributes["Value"].ParseInt();
 		XmlNode xmlNode3 = node["RaidInfo"];
 		if (xmlNode3 != null)
 		{
-			GMKNDIELELN.IEKAFNFKBNE = xmlNode3["MinOpacity"].PNJPEDPDMCP().ParseInt();
-			GMKNDIELELN.HPJHAIALGHN = xmlNode3["FadeSpeed"].PNJPEDPDMCP().ParseInt();
-			GMKNDIELELN.CPLJCIFJAGN = xmlNode3["DelayBeforeFade"].Attributes["Value"].ParseInt();
-			GMKNDIELELN.LHMLMFOMALK = xmlNode3["PrizeIsFirstFrame"].Attributes["Value"].ParseInt();
+			RaidInfoFade.MinOpacity = xmlNode3["MinOpacity"].FirstAttribute().ParseInt();
+			RaidInfoFade.FadeSpeed = xmlNode3["FadeSpeed"].FirstAttribute().ParseInt();
+			RaidInfoFade.DelayBeforeFade = xmlNode3["DelayBeforeFade"].Attributes["Value"].ParseInt();
+			RaidInfoFade.PrizeIsFirstFrame = xmlNode3["PrizeIsFirstFrame"].Attributes["Value"].ParseInt();
 		}
 		XmlNode xmlNode4 = node["ZoneSwitch"];
-		JHLMDGBGGEP.IEKAFNFKBNE = xmlNode4["MinOpacity"].Attributes["Value"].ParseInt();
-		JHLMDGBGGEP.HPJHAIALGHN = xmlNode4["FadeSpeed"].Attributes["Value"].ParseInt();
-		JHLMDGBGGEP.CPLJCIFJAGN = xmlNode4["DelayBeforeFade"].Attributes["Value"].ParseInt();
-		JHLMDGBGGEP.GBDHOPBMLHK = new List<string>();
+		ZoneSwitchFade.MinOpacity = xmlNode4["MinOpacity"].Attributes["Value"].ParseInt();
+		ZoneSwitchFade.FadeSpeed = xmlNode4["FadeSpeed"].Attributes["Value"].ParseInt();
+		ZoneSwitchFade.DelayBeforeFade = xmlNode4["DelayBeforeFade"].Attributes["Value"].ParseInt();
+		ZoneSwitchFade.BattleTypeNames = new List<string>();
 		XmlNode xmlNode5 = xmlNode4["BattleTypes"];
 		foreach (XmlNode childNode in xmlNode5.ChildNodes)
 		{
-			string item = childNode.Attributes["Name"].CIPOICEEIBK(string.Empty);
-			JHLMDGBGGEP.GBDHOPBMLHK.Add(item);
+			string item = childNode.Attributes["Name"].GetStringOrDefault(string.Empty);
+			ZoneSwitchFade.BattleTypeNames.Add(item);
 		}
 	}
 }

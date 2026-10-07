@@ -2,21 +2,21 @@ using System.Collections.Generic;
 
 public class RatingEvaluation
 {
-	public string DNKAJNCEGKF;
+	public string nodeName;
 
-	public string AOAPDHDACPJ;
+	public string evaluationName;
 
-	public string GMODDPGBGHM;
+	public string cancellingItem;
 
-	public float BEAGNAOOHBP;
+	public float averageQuantity;
 
-	public float CDCIEOFCKNO;
+	public float averageBaseDamage;
 
-	public float GCOFCDFHMGL;
+	public float rechargeRate;
 
-	public float OFHGAJDLIDB;
+	public float magicRechargeRate;
 
-	public List<Evaluation> IBLHIAHECLK = new List<Evaluation>();
+	public List<Evaluation> evaluations = new List<Evaluation>();
 
-	public List<Defense> CKJBFNJEDHH = new List<Defense>();
+	public List<Defense> defenses = new List<Defense>();
 }

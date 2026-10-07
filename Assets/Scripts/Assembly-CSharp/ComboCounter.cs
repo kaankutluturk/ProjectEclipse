@@ -1,108 +1,108 @@
 public class ComboCounter : global::EventDispatcher<object>
 {
-	public enum ADPEHMMNJIA
+	public enum ComboCounterEvent
 	{
 		ON_COMBO_CHANGE = 0
 	}
 
-	private int IHLGIDMENOP;
+	private int _comboCount;
 
-	private int PFGLKBODOPG;
+	private int _hitCount;
 
-	private int LMEPJHBGOAE;
+	private int _framesSinceHit;
 
-	private int JLDAIMMOAMC;
+	private int _lastComboCount;
 
-	private bool LHJIAOJDHLB;
+	private bool _isCounting;
 
-	public int GKAEJDCDMHC
+	public int ComboCount
 	{
 		get
 		{
-			return NPDOLGNNINO();
+			return GetComboCount();
 		}
 	}
 
-	public int AAKOCIPFDNM
+	public int HitCount
 	{
 		get
 		{
-			return POKBOKHJJPL();
+			return GetHitCount();
 		}
 	}
 
-	public int DEENENNCBBC
+	public int LastComboCount
 	{
 		get
 		{
-			return CLPDEPPPJFE();
+			return GetLastComboCount();
 		}
 	}
 
-	public bool BKLPNNIBJBE
+	public bool IsCounting
 	{
 		get
 		{
-			return FPPKOMOPDJJ();
+			return GetIsCounting();
 		}
 	}
 
-	public int NPDOLGNNINO()
+	public int GetComboCount()
 	{
-		return IHLGIDMENOP;
+		return _comboCount;
 	}
 
-	public int POKBOKHJJPL()
+	public int GetHitCount()
 	{
-		return PFGLKBODOPG;
+		return _hitCount;
 	}
 
-	public int CLPDEPPPJFE()
+	public int GetLastComboCount()
 	{
-		return JLDAIMMOAMC;
+		return _lastComboCount;
 	}
 
-	public bool FPPKOMOPDJJ()
+	public bool GetIsCounting()
 	{
-		return LHJIAOJDHLB;
+		return _isCounting;
 	}
 
-	public void HHHDLDIHKBJ()
+	public void UpdateCombo()
 	{
-		if (!LHJIAOJDHLB)
+		if (!_isCounting)
 		{
 			return;
 		}
-		LMEPJHBGOAE++;
-		if (LMEPJHBGOAE > GameUtils.KCBHAMHLGBC())
+		_framesSinceHit++;
+		if (_framesSinceHit > GameUtils.GetComboTime())
 		{
-			JLDAIMMOAMC = IHLGIDMENOP;
+			_lastComboCount = _comboCount;
 			Reset();
-			if (JLDAIMMOAMC >= GameUtils.NPDOLGNNINO())
+			if (_lastComboCount >= GameUtils.GetComboMinHits())
 			{
-				CallEvent(0, IHLGIDMENOP);
+				CallEvent(0, _comboCount);
 			}
 		}
 	}
 
-	public void INNGMENHNEL()
+	public void RegisterHit()
 	{
-		LHJIAOJDHLB = true;
-		LMEPJHBGOAE = 0;
-		PFGLKBODOPG++;
-		if (PFGLKBODOPG >= GameUtils.NPDOLGNNINO())
+		_isCounting = true;
+		_framesSinceHit = 0;
+		_hitCount++;
+		if (_hitCount >= GameUtils.GetComboMinHits())
 		{
-			IHLGIDMENOP = PFGLKBODOPG;
-			JLDAIMMOAMC = IHLGIDMENOP;
-			CallEvent(0, IHLGIDMENOP);
+			_comboCount = _hitCount;
+			_lastComboCount = _comboCount;
+			CallEvent(0, _comboCount);
 		}
 	}
 
 	public void Reset()
 	{
-		LHJIAOJDHLB = false;
-		LMEPJHBGOAE = 0;
-		PFGLKBODOPG = 0;
-		IHLGIDMENOP = 0;
+		_isCounting = false;
+		_framesSinceHit = 0;
+		_hitCount = 0;
+		_comboCount = 0;
 	}
 }

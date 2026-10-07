@@ -8,13 +8,13 @@ using UnityEngine.Video;
 
 public class VideoPlayerController : MonoBehaviour
 {
-	public delegate void PPCCKEGFAHH();
+	public delegate void ShowCompletedHandler();
 
-	private VideoPlayer FGLGMBPGLHP;
+	private VideoPlayer videoPlayer;
 
-	private AudioSource EPAIJBJBACG;
+	private AudioSource audioSource;
 
-	private bool GHCOIBINJBP;
+	private bool isPlaying;
 
 	private bool completionRaised;
 
@@ -25,9 +25,9 @@ public class VideoPlayerController : MonoBehaviour
 
 	[CompilerGenerated]
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private PPCCKEGFAHH ShowCompleted;
+	private ShowCompletedHandler ShowCompleted;
 
-	public event PPCCKEGFAHH FCMPLHIDMJK
+	public event ShowCompletedHandler Completed
 	{
 		add
 		{
@@ -39,155 +39,155 @@ public class VideoPlayerController : MonoBehaviour
 		}
 	}
 
-	public void add_ShowCompleted(PPCCKEGFAHH value)
+	public void add_ShowCompleted(ShowCompletedHandler value)
 	{
-		PPCCKEGFAHH pPCCKEGFAHH = ShowCompleted;
-		PPCCKEGFAHH pPCCKEGFAHH2;
+		ShowCompletedHandler pPCCKEGFAHH = ShowCompleted;
+		ShowCompletedHandler pPCCKEGFAHH2;
 		do
 		{
 			pPCCKEGFAHH2 = pPCCKEGFAHH;
-			pPCCKEGFAHH = Interlocked.CompareExchange(ref ShowCompleted, (PPCCKEGFAHH)Delegate.Combine(pPCCKEGFAHH2, value), pPCCKEGFAHH);
+			pPCCKEGFAHH = Interlocked.CompareExchange(ref ShowCompleted, (ShowCompletedHandler)Delegate.Combine(pPCCKEGFAHH2, value), pPCCKEGFAHH);
 		}
 		while ((object)pPCCKEGFAHH != pPCCKEGFAHH2);
 	}
 
-	public void remove_ShowCompleted(PPCCKEGFAHH value)
+	public void remove_ShowCompleted(ShowCompletedHandler value)
 	{
-		PPCCKEGFAHH pPCCKEGFAHH = ShowCompleted;
-		PPCCKEGFAHH pPCCKEGFAHH2;
+		ShowCompletedHandler pPCCKEGFAHH = ShowCompleted;
+		ShowCompletedHandler pPCCKEGFAHH2;
 		do
 		{
 			pPCCKEGFAHH2 = pPCCKEGFAHH;
-			pPCCKEGFAHH = Interlocked.CompareExchange(ref ShowCompleted, (PPCCKEGFAHH)Delegate.Remove(pPCCKEGFAHH2, value), pPCCKEGFAHH);
+			pPCCKEGFAHH = Interlocked.CompareExchange(ref ShowCompleted, (ShowCompletedHandler)Delegate.Remove(pPCCKEGFAHH2, value), pPCCKEGFAHH);
 		}
 		while ((object)pPCCKEGFAHH != pPCCKEGFAHH2);
 	}
 
 	public void Init()
 	{
-		FGLGMBPGLHP = GetComponent<VideoPlayer>();
-		EPAIJBJBACG = GetComponent<AudioSource>();
-		FGLGMBPGLHP.audioOutputMode = VideoAudioOutputMode.AudioSource;
-		FGLGMBPGLHP.controlledAudioTrackCount = 1;
-		FGLGMBPGLHP.EnableAudioTrack(0, true);
-		FGLGMBPGLHP.SetTargetAudioSource(0, EPAIJBJBACG);
-		FGLGMBPGLHP.loopPointReached += PDIMNFGFIOF;
-		FGLGMBPGLHP.prepareCompleted += KMKFIJPBBPC;
-		FGLGMBPGLHP.errorReceived += OnVideoError;
-		FGLGMBPGLHP.targetCamera = UnityEngine.Camera.main;
+		videoPlayer = GetComponent<VideoPlayer>();
+		audioSource = GetComponent<AudioSource>();
+		videoPlayer.audioOutputMode = VideoAudioOutputMode.AudioSource;
+		videoPlayer.controlledAudioTrackCount = 1;
+		videoPlayer.EnableAudioTrack(0, true);
+		videoPlayer.SetTargetAudioSource(0, audioSource);
+		videoPlayer.loopPointReached += OnPlaybackFinished;
+		videoPlayer.prepareCompleted += OnPrepareCompleted;
+		videoPlayer.errorReceived += OnVideoError;
+		videoPlayer.targetCamera = UnityEngine.Camera.main;
 		UnityEngine.Camera.main.backgroundColor = Color.black;
 		completionRaised = false;
 	}
 
 	private void Update()
 	{
-		if (!GHCOIBINJBP)
+		if (!isPlaying)
 		{
 			return;
 		}
 		if (Time.frameCount > playStartedFrame + 1 && (Eclipse.Input.EclipseInput.touchCount > 0 || Eclipse.Input.EclipseInput.anyKeyDown || Eclipse.Input.EclipseInput.GetMouseButtonDown(0)))
 		{
-			PNANBCJNMAL();
+			SkipVideo();
 			return;
 		}
-		if (FGLGMBPGLHP != null && !FGLGMBPGLHP.isPrepared && Time.realtimeSinceStartup - prepareStartedAt >= PrepareTimeoutSeconds)
+		if (videoPlayer != null && !videoPlayer.isPrepared && Time.realtimeSinceStartup - prepareStartedAt >= PrepareTimeoutSeconds)
 		{
-			UnityEngine.Debug.LogWarning("[Video] Preparation timed out; continuing without video: " + FGLGMBPGLHP.url);
-			PNANBCJNMAL();
+			UnityEngine.Debug.LogWarning("[Video] Preparation timed out; continuing without video: " + videoPlayer.url);
+			SkipVideo();
 		}
 	}
 
 	public void Play(string BEPKJNKCKPH)
 	{
 		Screen.sleepTimeout = -1;
-		FGLGMBPGLHP.source = VideoSource.Url;
-		if (FGLGMBPGLHP != null)
+		videoPlayer.source = VideoSource.Url;
+		if (videoPlayer != null)
 		{
-			FGLGMBPGLHP.url = BEPKJNKCKPH;
-			FGLGMBPGLHP.audioOutputMode = VideoAudioOutputMode.AudioSource;
-			FGLGMBPGLHP.controlledAudioTrackCount = 1;
-			FGLGMBPGLHP.EnableAudioTrack(0, true);
-			FGLGMBPGLHP.SetTargetAudioSource(0, EPAIJBJBACG);
+			videoPlayer.url = BEPKJNKCKPH;
+			videoPlayer.audioOutputMode = VideoAudioOutputMode.AudioSource;
+			videoPlayer.controlledAudioTrackCount = 1;
+			videoPlayer.EnableAudioTrack(0, true);
+			videoPlayer.SetTargetAudioSource(0, audioSource);
 			playStartedFrame = Time.frameCount;
 			prepareStartedAt = Time.realtimeSinceStartup;
-			FGLGMBPGLHP.Prepare();
-			GHCOIBINJBP = true;
+			videoPlayer.Prepare();
+			isPlaying = true;
 		}
 	}
 
 	public void Play(VideoClip PIKHEAGHOKB)
 	{
 		Screen.sleepTimeout = -1;
-		FGLGMBPGLHP.source = VideoSource.VideoClip;
-		if (FGLGMBPGLHP != null)
+		videoPlayer.source = VideoSource.VideoClip;
+		if (videoPlayer != null)
 		{
-			FGLGMBPGLHP.clip = PIKHEAGHOKB;
+			videoPlayer.clip = PIKHEAGHOKB;
 			playStartedFrame = Time.frameCount;
 			prepareStartedAt = Time.realtimeSinceStartup;
-			FGLGMBPGLHP.Prepare();
-			GHCOIBINJBP = true;
+			videoPlayer.Prepare();
+			isPlaying = true;
 		}
 	}
 
-	private void KMKFIJPBBPC(VideoPlayer EJPOJJKKICO)
+	private void OnPrepareCompleted(VideoPlayer EJPOJJKKICO)
 	{
-		Sound.CKIHDLJBGAE();
-		AJKJNJDGBAM(false);
-		if (FGLGMBPGLHP != null)
+		Sound.PauseMusic();
+		SetUiCanvasEnabled(false);
+		if (videoPlayer != null)
 		{
-			FGLGMBPGLHP.prepareCompleted -= KMKFIJPBBPC;
-			FGLGMBPGLHP.Play();
+			videoPlayer.prepareCompleted -= OnPrepareCompleted;
+			videoPlayer.Play();
 		}
-		if (EPAIJBJBACG != null)
+		if (audioSource != null)
 		{
-			EPAIJBJBACG.Play();
+			audioSource.Play();
 		}
 	}
 
-	private void PDIMNFGFIOF(VideoPlayer EJPOJJKKICO = null)
+	private void OnPlaybackFinished(VideoPlayer EJPOJJKKICO = null)
 	{
 		if (completionRaised)
 		{
 			return;
 		}
 		completionRaised = true;
-		GHCOIBINJBP = false;
-		AJKJNJDGBAM(true);
-		if (FGLGMBPGLHP != null)
+		isPlaying = false;
+		SetUiCanvasEnabled(true);
+		if (videoPlayer != null)
 		{
-			FGLGMBPGLHP.loopPointReached -= PDIMNFGFIOF;
-			FGLGMBPGLHP.prepareCompleted -= KMKFIJPBBPC;
-			FGLGMBPGLHP.errorReceived -= OnVideoError;
+			videoPlayer.loopPointReached -= OnPlaybackFinished;
+			videoPlayer.prepareCompleted -= OnPrepareCompleted;
+			videoPlayer.errorReceived -= OnVideoError;
 		}
 		Screen.sleepTimeout = -2;
-		Sound.MPAHNMFMHHK();
+		Sound.ResumeMusic();
 		ShowCompleted();
-		FGLGMBPGLHP = null;
-		EPAIJBJBACG = null;
+		videoPlayer = null;
+		audioSource = null;
 	}
 
 	private void OnVideoError(VideoPlayer source, string message)
 	{
 		UnityEngine.Debug.LogWarning("[Video] Playback failed; continuing without video: " + message);
-		PDIMNFGFIOF(source);
+		OnPlaybackFinished(source);
 	}
 
-	private void PNANBCJNMAL()
+	private void SkipVideo()
 	{
-		if (FGLGMBPGLHP != null)
+		if (videoPlayer != null)
 		{
-			FGLGMBPGLHP.Stop();
+			videoPlayer.Stop();
 		}
-		if (EPAIJBJBACG != null)
+		if (audioSource != null)
 		{
-			EPAIJBJBACG.Stop();
+			audioSource.Stop();
 		}
-		PDIMNFGFIOF();
+		OnPlaybackFinished();
 	}
 
-	private void AJKJNJDGBAM(bool value)
+	private void SetUiCanvasEnabled(bool value)
 	{
-		ModuleHolder moduleHolder = Module.GetInstance().BOHBCFMJPCA();
+		ModuleHolder moduleHolder = Module.GetInstance().GetCurrentHolder();
 		if (moduleHolder != null)
 		{
 			moduleHolder.GetCanvas().enabled = value;

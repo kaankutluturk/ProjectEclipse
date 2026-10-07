@@ -6,29 +6,29 @@ public class NewsItem
 
 	public string Url = string.Empty;
 
-	public string MDDOAGNHAHE = string.Empty;
+	public string ImageUrl = string.Empty;
 
-	public string NHKMCLPOMFK = string.Empty;
+	public string LocalImagePath = string.Empty;
 
 	public string Title = string.Empty;
 
-	public string COIGFENOMJD = string.Empty;
+	public string RedirectShop = string.Empty;
 
-	public string KJHMHHBJEDH = string.Empty;
+	public string SpenderTypeId = string.Empty;
 
-	public bool DCHJDPCEODD;
+	public bool IsActive;
 
-	public bool CIKJHDEGHGD;
+	public bool WasShown;
 
-	public bool GAHGCJNGDMH;
+	public bool IsImageReady;
 
-	public bool EGBHELMJJKO;
+	public bool GoShop;
 
 	public int Id;
 
 	public long EndDate;
 
-	public List<NewsButton> DHKDOHFKOOJ = new List<NewsButton>();
+	public List<NewsButton> Buttons = new List<NewsButton>();
 
 	public NewsItem()
 	{
@@ -38,35 +38,35 @@ public class NewsItem
 	{
 		Name = AOMLCBHAJJH.Name;
 		Url = AOMLCBHAJJH.Url;
-		MDDOAGNHAHE = AOMLCBHAJJH.MDDOAGNHAHE;
-		NHKMCLPOMFK = AOMLCBHAJJH.NHKMCLPOMFK;
+		ImageUrl = AOMLCBHAJJH.ImageUrl;
+		LocalImagePath = AOMLCBHAJJH.LocalImagePath;
 		Title = AOMLCBHAJJH.Title;
-		COIGFENOMJD = AOMLCBHAJJH.COIGFENOMJD;
-		KJHMHHBJEDH = AOMLCBHAJJH.KJHMHHBJEDH;
-		DCHJDPCEODD = AOMLCBHAJJH.DCHJDPCEODD;
-		CIKJHDEGHGD = AOMLCBHAJJH.CIKJHDEGHGD;
-		GAHGCJNGDMH = AOMLCBHAJJH.GAHGCJNGDMH;
-		EGBHELMJJKO = AOMLCBHAJJH.EGBHELMJJKO;
+		RedirectShop = AOMLCBHAJJH.RedirectShop;
+		SpenderTypeId = AOMLCBHAJJH.SpenderTypeId;
+		IsActive = AOMLCBHAJJH.IsActive;
+		WasShown = AOMLCBHAJJH.WasShown;
+		IsImageReady = AOMLCBHAJJH.IsImageReady;
+		GoShop = AOMLCBHAJJH.GoShop;
 		Id = AOMLCBHAJJH.Id;
 		EndDate = AOMLCBHAJJH.EndDate;
-		foreach (NewsButton item in AOMLCBHAJJH.DHKDOHFKOOJ)
+		foreach (NewsButton item in AOMLCBHAJJH.Buttons)
 		{
-			DHKDOHFKOOJ.Add(new NewsButton(item));
+			Buttons.Add(new NewsButton(item));
 		}
 	}
 
-	public bool FLEKKICJCNK(string value)
+	public bool HasRedirectTarget(string value)
 	{
 		bool result = false;
-		if (COIGFENOMJD == value)
+		if (RedirectShop == value)
 		{
 			result = true;
 		}
 		else
 		{
-			foreach (NewsButton item in DHKDOHFKOOJ)
+			foreach (NewsButton item in Buttons)
 			{
-				if (item.COIGFENOMJD == value)
+				if (item.RedirectShop == value)
 				{
 					result = true;
 					break;

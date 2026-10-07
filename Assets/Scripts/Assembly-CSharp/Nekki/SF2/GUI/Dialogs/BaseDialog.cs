@@ -6,14 +6,14 @@ namespace Nekki.SF2.GUI.Dialogs
 {
 	public class BaseDialog : SFMonoBehaviour<object>, BackKeyController
 	{
-		public enum IPJEOLNMLEH
+		public enum DialogCloseEvent
 		{
 			OnPopupClose = 0,
 			OnPopupCloseOK = 1,
 			OnPopupCloseCascade = 2
 		}
 
-		public enum KBDHPMOMJLL
+		public enum FooterType
 		{
 			FOOTER_NONE = 0,
 			FOOTER_OK = 1,
@@ -25,25 +25,25 @@ namespace Nekki.SF2.GUI.Dialogs
 
 		public const int BASE_LINE_HEIGHT = 180;
 
-		private const int JNBAAMAKFJJ = 64;
+		private const int HeaderOffset = 64;
 
-		private const int KHCBFOBKIDF = 86;
+		private const int ContentMarginSmall = 86;
 
-		private const int KENGHLNFHBD = 100;
+		private const int ContentMarginLarge = 100;
 
-		private const int IBNKNFCOHMM = 64;
+		private const int ButtonGap = 64;
 
-		private const int JJFGJMBLINP = 272;
+		private const int MinContentHalfHeight = 272;
 
-		private const int PGFJCKPKNJN = 544;
+		private const int MaxContentHalfHeight = 544;
 
-		private const int HIIJFINAAJK = 60;
+		private const int ContentPadding = 60;
 
-		private const int ADLDBOPPCIO = 152;
+		private const int HeaderFontSize = 152;
 
 		protected List<Button> _btns = new List<Button>();
 
-		protected List<TextTimer> ELALCENFCPJ = new List<TextTimer>();
+		protected List<TextTimer> textTimers = new List<TextTimer>();
 
 		[SerializeField]
 		protected ResolutionImage _topStripe;
@@ -63,17 +63,17 @@ namespace Nekki.SF2.GUI.Dialogs
 		[SerializeField]
 		protected LabelButton _btnOK;
 
-		protected string ODLPOMFLOCP = string.Empty;
+		protected string titleAlias = string.Empty;
 
-		protected string BGJJDGOBPKA = string.Empty;
+		protected string defaultOkButtonAlias = string.Empty;
 
-		protected string EBCJGLPLHAD = string.Empty;
+		protected string cancelButtonAlias = string.Empty;
 
-		protected bool PJMJIOICBMN;
+		protected bool unusedFlag;
 
-		protected static int KPMBLKKFMAI;
+		protected static int unusedStaticCounter;
 
-		protected bool PLBDNCCGLIA;
+		protected bool unusedSecondFlag;
 
 		protected float _fadeDuration = 1f;
 
@@ -81,7 +81,7 @@ namespace Nekki.SF2.GUI.Dialogs
 
 		public bool IsQuestDialog;
 
-		protected KBDHPMOMJLL GBECKKCHAFI;
+		protected FooterType footerType;
 
 		public bool IsPausing = true;
 
@@ -95,7 +95,7 @@ namespace Nekki.SF2.GUI.Dialogs
 			}
 		}
 
-		public LabelButton OAKHBCBKCMN
+		public LabelButton CancelButton
 		{
 			get
 			{
@@ -103,7 +103,7 @@ namespace Nekki.SF2.GUI.Dialogs
 			}
 		}
 
-		public LabelButton MBKMPHMFMOG
+		public LabelButton OkButton
 		{
 			get
 			{
@@ -131,32 +131,32 @@ namespace Nekki.SF2.GUI.Dialogs
 			Init(string.Empty);
 		}
 
-		public virtual void Init(string DIKEFIIPNBE = "", string EHMEFCPIODJ = "OK", string EOCPGMKEEHK = "CANCEL", KBDHPMOMJLL HJNAHNICGMH = KBDHPMOMJLL.FOOTER_NONE)
+		public virtual void Init(string DIKEFIIPNBE = "", string EHMEFCPIODJ = "OK", string EOCPGMKEEHK = "CANCEL", FooterType HJNAHNICGMH = FooterType.FOOTER_NONE)
 		{
-			ODLPOMFLOCP = DIKEFIIPNBE;
-			BGJJDGOBPKA = EHMEFCPIODJ;
-			EBCJGLPLHAD = EOCPGMKEEHK;
-			GBECKKCHAFI = HJNAHNICGMH;
+			titleAlias = DIKEFIIPNBE;
+			defaultOkButtonAlias = EHMEFCPIODJ;
+			cancelButtonAlias = EOCPGMKEEHK;
+			footerType = HJNAHNICGMH;
 			BackKeyManager.get_Instance().AddBackKeyController(this);
 		}
 
 		protected virtual void Start()
 		{
-			HLJBLAPMDCB();
-			CGKGDKAGFLI();
-			FLOHKIBCOKG();
-			SetupHeader(ODLPOMFLOCP);
-			MAGOIKICKAH(GBECKKCHAFI);
-			if (AssemblyController.KMEOEAGGPBI())
+			SetupContent();
+			FitContentSize();
+			LayoutStripes();
+			SetupHeader(titleAlias);
+			SetupFooter(footerType);
+			if (AssemblyController.GetGamepadEnabled())
 			{
-				BHLHODFNHHO();
+				ApplyPlatformLayout();
 			}
 			Eclipse.UI.DialogCinematic.Play(base.gameObject, _content);
 		}
 
 		private void OnDestroy()
 		{
-			foreach (TextTimer item in ELALCENFCPJ)
+			foreach (TextTimer item in textTimers)
 			{
 				item.set_Label(null);
 			}
@@ -164,7 +164,7 @@ namespace Nekki.SF2.GUI.Dialogs
 
 		public virtual void Close(object data)
 		{
-			IPJEOLNMLEH iPJEOLNMLEH = IPJEOLNMLEH.OnPopupCloseOK;
+			DialogCloseEvent iPJEOLNMLEH = DialogCloseEvent.OnPopupCloseOK;
 			OnClose(iPJEOLNMLEH);
 		}
 
@@ -174,7 +174,7 @@ namespace Nekki.SF2.GUI.Dialogs
 			// Release the global raycaster lock before purchase/upgrade callbacks
 			// rebuild and refocus the shop UI.  If a callback opens another dialog,
 			// that dialog will establish its own lock normally.
-			DialogsManager.ELEBLBJKDBI().StopDialog(this);
+			DialogsManager.GetInstance().StopDialog(this);
 			BackKeyManager.get_Instance().RemoveBackKeyController(this);
 			try
 			{
@@ -182,7 +182,7 @@ namespace Nekki.SF2.GUI.Dialogs
 			}
 			finally
 			{
-				LNJOJHJJPOM();
+				DestroyDialog();
 			}
 		}
 
@@ -197,87 +197,87 @@ namespace Nekki.SF2.GUI.Dialogs
 
 		public virtual int GetLeftButtonId()
 		{
-			IPJEOLNMLEH result = IPJEOLNMLEH.OnPopupCloseOK;
+			DialogCloseEvent result = DialogCloseEvent.OnPopupCloseOK;
 			if (_btnCancel != null)
 			{
-				result = (IPJEOLNMLEH)_btnCancel.ButtonId;
+				result = (DialogCloseEvent)_btnCancel.ButtonId;
 			}
 			else if (_btnOK != null)
 			{
-				result = (IPJEOLNMLEH)_btnOK.ButtonId;
+				result = (DialogCloseEvent)_btnOK.ButtonId;
 			}
 			return (int)result;
 		}
 
-		protected virtual void HLJBLAPMDCB()
+		protected virtual void SetupContent()
 		{
 		}
 
-		protected virtual void FLOHKIBCOKG()
+		protected virtual void LayoutStripes()
 		{
-			float num = FFIJLPAAJKB();
+			float num = GetHalfContentHeight();
 			if (_topStripe != null)
 			{
-				_topStripe.transform.BGNJGIACJBG(150f + num);
+				_topStripe.transform.SetLocalY(150f + num);
 			}
 			if (_bottomStripe != null)
 			{
-				_bottomStripe.transform.BGNJGIACJBG(0f - (160f + num));
+				_bottomStripe.transform.SetLocalY(0f - (160f + num));
 			}
 		}
 
-		protected virtual void MAGOIKICKAH(KBDHPMOMJLL HJNAHNICGMH)
+		protected virtual void SetupFooter(FooterType HJNAHNICGMH)
 		{
-			bool flag = HJNAHNICGMH == KBDHPMOMJLL.FOOTER_BOTH;
+			bool flag = HJNAHNICGMH == FooterType.FOOTER_BOTH;
 			_btns.Clear();
-			if (flag || HJNAHNICGMH == KBDHPMOMJLL.FOOTER_OK)
+			if (flag || HJNAHNICGMH == FooterType.FOOTER_OK)
 			{
-				PHKIJLEICHE(_btnOK, KBDHPMOMJLL.FOOTER_OK);
-				_btnOK.transform.OKHPLHPBPKJ((!flag) ? 0f : (_btnOK.get_rect().width / 2f + 32f));
+				SetupButton(_btnOK, FooterType.FOOTER_OK);
+				_btnOK.transform.SetLocalX((!flag) ? 0f : (_btnOK.get_rect().width / 2f + 32f));
 				_btns.Add(_btnOK);
 			}
 			else
 			{
 				_btnOK.gameObject.SetActive(false);
 			}
-			if (flag || HJNAHNICGMH == KBDHPMOMJLL.FOOTER_CANCEL)
+			if (flag || HJNAHNICGMH == FooterType.FOOTER_CANCEL)
 			{
-				PHKIJLEICHE(_btnCancel, KBDHPMOMJLL.FOOTER_CANCEL);
-				_btnCancel.transform.OKHPLHPBPKJ((!flag) ? 0f : (0f - (_btnCancel.get_rect().width / 2f + 32f)));
+				SetupButton(_btnCancel, FooterType.FOOTER_CANCEL);
+				_btnCancel.transform.SetLocalX((!flag) ? 0f : (0f - (_btnCancel.get_rect().width / 2f + 32f)));
 				_btns.Add(_btnCancel);
 			}
 			else
 			{
 				_btnCancel.gameObject.SetActive(false);
 			}
-			NCDPGDINBPH();
+			PositionButtons();
 		}
 
-		protected virtual void NCDPGDINBPH()
+		protected virtual void PositionButtons()
 		{
-			float num = FFIJLPAAJKB() + 60f;
+			float num = GetHalfContentHeight() + 60f;
 			foreach (LabelButton item in _btns)
 			{
-				item.transform.BGNJGIACJBG(0f - num);
+				item.transform.SetLocalY(0f - num);
 			}
 		}
 
-		protected virtual void PHKIJLEICHE(LabelButton GAMILDJHFDB, KBDHPMOMJLL MOPOCBKIKBI)
+		protected virtual void SetupButton(LabelButton GAMILDJHFDB, FooterType MOPOCBKIKBI)
 		{
 			GAMILDJHFDB.gameObject.SetActive(true);
 			string alias = string.Empty;
 			int buttonId = 0;
-			LabelButton.FBMGEHJPPIK color = LabelButton.FBMGEHJPPIK.BUTTON_WHITE;
+			LabelButton.ButtonColor color = LabelButton.ButtonColor.BUTTON_WHITE;
 			switch (MOPOCBKIKBI)
 			{
-			case KBDHPMOMJLL.FOOTER_CANCEL:
-				alias = EBCJGLPLHAD;
-				color = LabelButton.FBMGEHJPPIK.BUTTON_DARK;
+			case FooterType.FOOTER_CANCEL:
+				alias = cancelButtonAlias;
+				color = LabelButton.ButtonColor.BUTTON_DARK;
 				buttonId = 0;
 				break;
-			case KBDHPMOMJLL.FOOTER_OK:
-				alias = BGJJDGOBPKA;
-				color = LabelButton.FBMGEHJPPIK.BUTTON_WHITE;
+			case FooterType.FOOTER_OK:
+				alias = defaultOkButtonAlias;
+				color = LabelButton.ButtonColor.BUTTON_WHITE;
 				buttonId = 1;
 				break;
 			}
@@ -286,10 +286,10 @@ namespace Nekki.SF2.GUI.Dialogs
 			GAMILDJHFDB.ButtonId = buttonId;
 			GAMILDJHFDB.RemoveEventListener(2, OnClose);
 			GAMILDJHFDB.AddEventListener(2, OnClose);
-			GAMILDJHFDB.transform.OKHPLHPBPKJ(0f);
+			GAMILDJHFDB.transform.SetLocalX(0f);
 		}
 
-		protected virtual void CGKGDKAGFLI()
+		protected virtual void FitContentSize()
 		{
 			if (_content.transform.childCount == 0)
 			{
@@ -319,16 +319,16 @@ namespace Nekki.SF2.GUI.Dialogs
 			_content.GetComponent<RectTransform>().sizeDelta = sizeDelta;
 		}
 
-		protected virtual void LNJOJHJJPOM()
+		protected virtual void DestroyDialog()
 		{
 			Object.Destroy(base.gameObject);
 		}
 
-		protected virtual void BHLHODFNHHO()
+		protected virtual void ApplyPlatformLayout()
 		{
 		}
 
-		protected virtual float FFIJLPAAJKB()
+		protected virtual float GetHalfContentHeight()
 		{
 			if (_content == null)
 			{
@@ -341,7 +341,7 @@ namespace Nekki.SF2.GUI.Dialogs
 		protected virtual void SetupHeader(string HCPNFPMHFCM)
 		{
 			_header.set_LabelFontSize(152);
-			_header.color = Constants.KLLKHFKHCGK;
+			_header.color = Constants.DialogHeaderColor;
 			_header.set_Alias(HCPNFPMHFCM);
 			float x = _content.GetComponent<RectTransform>().rect.width - 120f;
 			_header.rectTransform.sizeDelta = new Vector2(x, _header.rectTransform.rect.height);
@@ -350,22 +350,22 @@ namespace Nekki.SF2.GUI.Dialogs
 
 		public virtual void UpdateHeaderPosition()
 		{
-			float num = FFIJLPAAJKB();
-			_header.transform.BGNJGIACJBG(num + 64f);
+			float num = GetHalfContentHeight();
+			_header.transform.SetLocalY(num + 64f);
 		}
 
-		protected virtual void KJHPCLOFDJB()
+		protected virtual void RelayoutDialog()
 		{
-			FLOHKIBCOKG();
+			LayoutStripes();
 			UpdateHeaderPosition();
-			NCDPGDINBPH();
+			PositionButtons();
 		}
 
-		protected virtual void FFALBJIJIIP(object data)
+		protected virtual void RefreshTextTimers(object data)
 		{
-			foreach (TextTimer item in ELALCENFCPJ)
+			foreach (TextTimer item in textTimers)
 			{
-				item.JLPMOKPFECK();
+				item.Refresh();
 			}
 		}
 	}

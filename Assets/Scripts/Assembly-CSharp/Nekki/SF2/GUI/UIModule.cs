@@ -18,18 +18,18 @@ namespace Nekki.SF2.GUI
 		[CompilerGenerated]
 		private static Action<UIModule> OnModuleDeactivated;
 
-		private static List<UIModule> AINKGBEPGIN = new List<UIModule>();
+		private static List<UIModule> _modules = new List<UIModule>();
 
 		[SerializeField]
 		private int _Order;
 
-		private Canvas GGAPKCADNFJ;
+		private Canvas _sceneCanvas;
 
-		protected bool NDHHFHHBFEC;
+		protected bool initialized;
 
-		protected bool CPOMIKGDIEK;
+		protected bool shutDown;
 
-		public bool DCHJDPCEODD
+		public bool IsModuleActive
 		{
 			get
 			{
@@ -37,7 +37,7 @@ namespace Nekki.SF2.GUI
 			}
 		}
 
-		public static event Action<UIModule> PGCFMKIAFLP
+		public static event Action<UIModule> ModuleActivated
 		{
 			add
 			{
@@ -49,7 +49,7 @@ namespace Nekki.SF2.GUI
 			}
 		}
 
-		public static event Action<UIModule> MEEGEAAIBMI
+		public static event Action<UIModule> ModuleDeactivated
 		{
 			add
 			{
@@ -121,7 +121,7 @@ namespace Nekki.SF2.GUI
 			gameObject.transform.localScale = Vector3.one;
 			gameObject.SetActive(false);
 			UIModule component = gameObject.GetComponent<UIModule>();
-			component.GGAPKCADNFJ = PKHKBAJOHHF.GetComponent<Canvas>();
+			component._sceneCanvas = PKHKBAJOHHF.GetComponent<Canvas>();
 			if (CMDIBEFNCOE)
 			{
 				component.Activate();
@@ -131,11 +131,11 @@ namespace Nekki.SF2.GUI
 
 		public static T GetModule<T>() where T : UIModule
 		{
-			for (int i = 0; i < AINKGBEPGIN.Count; i++)
+			for (int i = 0; i < _modules.Count; i++)
 			{
-				if (AINKGBEPGIN[i] is T)
+				if (_modules[i] is T)
 				{
-					return AINKGBEPGIN[i] as T;
+					return _modules[i] as T;
 				}
 			}
 			return (T)null;
@@ -143,11 +143,11 @@ namespace Nekki.SF2.GUI
 
 		public static UIModule GetModuleByName(string JLEKBBJBLOE)
 		{
-			for (int i = 0; i < AINKGBEPGIN.Count; i++)
+			for (int i = 0; i < _modules.Count; i++)
 			{
-				if (AINKGBEPGIN[i].name == JLEKBBJBLOE)
+				if (_modules[i].name == JLEKBBJBLOE)
 				{
-					return AINKGBEPGIN[i];
+					return _modules[i];
 				}
 			}
 			return null;
@@ -157,22 +157,22 @@ namespace Nekki.SF2.GUI
 		{
 			base.gameObject.SetActive(true);
 			GetComponent<RectTransform>().SetSiblingIndex(_Order);
-			if (!NDHHFHHBFEC)
+			if (!initialized)
 			{
 				Init();
 			}
-			FKEGAGCFPNI();
-			CoroutineManager.get_Current().StartCoroutine(EENKOHKBLOC(OnModuleActivated));
+			OnModuleActivatedHook();
+			CoroutineManager.get_Current().StartCoroutine(InvokeAtEndOfFrame(OnModuleActivated));
 		}
 
 		public void DeActivate()
 		{
 			base.gameObject.SetActive(false);
-			FKJHCGLMGLF();
-			CoroutineManager.get_Current().StartCoroutine(EENKOHKBLOC(OnModuleDeactivated));
+			OnModuleDeactivatedHook();
+			CoroutineManager.get_Current().StartCoroutine(InvokeAtEndOfFrame(OnModuleDeactivated));
 		}
 
-		private IEnumerator EENKOHKBLOC(Action<UIModule> p_event)
+		private IEnumerator InvokeAtEndOfFrame(Action<UIModule> p_event)
 		{
 			yield return new WaitForEndOfFrame();
 			if (p_event != null)
@@ -188,40 +188,40 @@ namespace Nekki.SF2.GUI
 
 		public void MoveToSceneCanvas()
 		{
-			base.transform.SetParent(GGAPKCADNFJ.transform, false);
+			base.transform.SetParent(_sceneCanvas.transform, false);
 			Activate();
 		}
 
 		protected virtual void Init()
 		{
-			NDHHFHHBFEC = true;
+			initialized = true;
 		}
 
-		protected virtual void PJNFHNFLNNO()
+		protected virtual void OnModuleShutdown()
 		{
-			CPOMIKGDIEK = true;
+			shutDown = true;
 		}
 
-		protected virtual void FKEGAGCFPNI()
+		protected virtual void OnModuleActivatedHook()
 		{
 		}
 
-		protected virtual void FKJHCGLMGLF()
+		protected virtual void OnModuleDeactivatedHook()
 		{
 		}
 
 		private void Awake()
 		{
-			AINKGBEPGIN.Add(this);
+			_modules.Add(this);
 		}
 
 		private void OnDestroy()
 		{
-			if (!CPOMIKGDIEK)
+			if (!shutDown)
 			{
-				PJNFHNFLNNO();
+				OnModuleShutdown();
 			}
-			AINKGBEPGIN.Remove(this);
+			_modules.Remove(this);
 		}
 	}
 }

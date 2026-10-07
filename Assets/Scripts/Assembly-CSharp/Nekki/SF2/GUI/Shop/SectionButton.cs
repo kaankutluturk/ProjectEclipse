@@ -14,11 +14,11 @@ namespace Nekki.SF2.GUI.Shop
 		[SerializeField]
 		private LabelAlias _newItemsLabel;
 
-		private bool FGDFEHNEGCF;
+		private bool _spritesResolved;
 
-		private int BONAMONOIIC;
+		private int _newItemsCount;
 
-		public int HMFKGPPNJEP
+		public int NewItemsAmount
 		{
 			get
 			{
@@ -32,29 +32,29 @@ namespace Nekki.SF2.GUI.Shop
 
 		public int get_NewItemsCount()
 		{
-			return BONAMONOIIC;
+			return _newItemsCount;
 		}
 
 		public void set_NewItemsCount(int value)
 		{
-			BONAMONOIIC = value;
-			PFLEKAHHIDB();
+			_newItemsCount = value;
+			UpdateNewItemsIndicator();
 		}
 
-		private void PFLEKAHHIDB()
+		private void UpdateNewItemsIndicator()
 		{
 			if (_newItemsCircle == null || _newItemsEllipse == null || _newItemsLabel == null)
 			{
-				LLLOJBFMONN.Error("SectionButton.UpdateNewItemsIndicator some field is null");
+				GameLog.Error("SectionButton.UpdateNewItemsIndicator some field is null");
 				return;
 			}
-			if (1 > BONAMONOIIC)
+			if (1 > _newItemsCount)
 			{
 				_newItemsCircle.gameObject.SetActive(false);
 				_newItemsEllipse.gameObject.SetActive(false);
 				_newItemsLabel.gameObject.SetActive(false);
 			}
-			else if (10 > BONAMONOIIC)
+			else if (10 > _newItemsCount)
 			{
 				_newItemsCircle.gameObject.SetActive(true);
 				_newItemsEllipse.gameObject.SetActive(false);
@@ -66,32 +66,32 @@ namespace Nekki.SF2.GUI.Shop
 				_newItemsEllipse.gameObject.SetActive(true);
 				_newItemsLabel.gameObject.SetActive(true);
 			}
-			_newItemsLabel.set_text(BONAMONOIIC.ToString());
+			_newItemsLabel.set_text(_newItemsCount.ToString());
 		}
 
-		private void BMJDFBAGEDG()
+		private void ResolveStateSprites()
 		{
 			SpriteState spriteState = base.spriteState;
-			Sprite sprite = PPBEKKDIJKC(spriteState.highlightedSprite);
+			Sprite sprite = GetResolutionSprite(spriteState.highlightedSprite);
 			if (sprite != null)
 			{
 				spriteState.highlightedSprite = sprite;
 			}
-			sprite = PPBEKKDIJKC(spriteState.disabledSprite);
+			sprite = GetResolutionSprite(spriteState.disabledSprite);
 			if (sprite != null)
 			{
 				spriteState.disabledSprite = sprite;
 			}
-			sprite = PPBEKKDIJKC(spriteState.pressedSprite);
+			sprite = GetResolutionSprite(spriteState.pressedSprite);
 			if (sprite != null)
 			{
 				spriteState.pressedSprite = sprite;
 			}
-			FGDFEHNEGCF = true;
+			_spritesResolved = true;
 			base.spriteState = spriteState;
 		}
 
-		private Sprite PPBEKKDIJKC(Sprite GBIOHMNNEJI)
+		private Sprite GetResolutionSprite(Sprite GBIOHMNNEJI)
 		{
 			if (GBIOHMNNEJI != null)
 			{
@@ -106,9 +106,9 @@ namespace Nekki.SF2.GUI.Shop
 
 		protected override void DoStateTransition(SelectionState state, bool PJHFBFHIGNN)
 		{
-			if (!FGDFEHNEGCF)
+			if (!_spritesResolved)
 			{
-				BMJDFBAGEDG();
+				ResolveStateSprites();
 			}
 			base.DoStateTransition(state, PJHFBFHIGNN);
 		}

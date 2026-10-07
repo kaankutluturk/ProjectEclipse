@@ -5,69 +5,69 @@ internal sealed class ConnectionStatusSample : MonoBehaviour
 {
 	private readonly Uri URI = new Uri("http://besthttpsignalr.azurewebsites.net/signalr");
 
-	private Connection FJGOJHMELAH;
+	private Connection signalRConnection;
 
 	private GUIMessageList messages = new GUIMessageList();
 
 	private void Start()
 	{
-		FJGOJHMELAH = new Connection(URI, "StatusHub");
-		FJGOJHMELAH.EHOAGKMPCJH(ECBGAEFNPBA);
-		FJGOJHMELAH.BJDMHEHILEO(KGKBELBAKJO);
-		FJGOJHMELAH.FADMHEJNPJO(DLJDCFEGCOE);
-		FJGOJHMELAH.get_Item("StatusHub").OPHFDPDINKG(HAOGIBHGBNP);
-		FJGOJHMELAH.LAJCMNNNIIM();
+		signalRConnection = new Connection(URI, "StatusHub");
+		signalRConnection.AddNonHubMessageHandler(OnNonHubMessage);
+		signalRConnection.AddErrorHandler(OnError);
+		signalRConnection.AddStateChangedHandler(OnStateChanged);
+		signalRConnection.get_Item("StatusHub").AddOnMethodCall(OnStatusHubMethod);
+		signalRConnection.OpenConnection();
 	}
 
 	private void OnDestroy()
 	{
-		FJGOJHMELAH.Close();
+		signalRConnection.Close();
 	}
 
 	private void OnGUI()
 	{
-		GUIHelper.ECMOBPFHNPN(GUIHelper.ClientArea, true, () =>
+		GUIHelper.DrawArea(GUIHelper.ClientArea, true, () =>
 		{
 			GUILayout.BeginHorizontal();
-			if (GUILayout.Button("START") && FJGOJHMELAH.FLBBFDNHJAJ() != OHLFKFFAOMF.Connected)
+			if (GUILayout.Button("START") && signalRConnection.GetState() != ConnectionStates.Connected)
 			{
-				FJGOJHMELAH.LAJCMNNNIIM();
+				signalRConnection.OpenConnection();
 			}
-			if (GUILayout.Button("STOP") && FJGOJHMELAH.FLBBFDNHJAJ() == OHLFKFFAOMF.Connected)
+			if (GUILayout.Button("STOP") && signalRConnection.GetState() == ConnectionStates.Connected)
 			{
-				FJGOJHMELAH.Close();
+				signalRConnection.Close();
 				messages.Clear();
 			}
-			if (GUILayout.Button("PING") && FJGOJHMELAH.FLBBFDNHJAJ() == OHLFKFFAOMF.Connected)
+			if (GUILayout.Button("PING") && signalRConnection.GetState() == ConnectionStates.Connected)
 			{
-				FJGOJHMELAH.get_Item("StatusHub").Call("Ping");
+				signalRConnection.get_Item("StatusHub").Call("Ping");
 			}
 			GUILayout.EndHorizontal();
 			GUILayout.Space(20f);
 			GUILayout.Label("Connection Status Messages");
 			GUILayout.BeginHorizontal();
 			GUILayout.Space(20f);
-			messages.MCAIPGEPMDE(Screen.width - 20, 0f);
+			messages.Draw(Screen.width - 20, 0f);
 			GUILayout.EndHorizontal();
 		});
 	}
 
-	private void ECBGAEFNPBA(Connection BJGMPDIKEJC, object data)
+	private void OnNonHubMessage(Connection BJGMPDIKEJC, object data)
 	{
 		messages.Add("[Server Message] " + data.ToString());
 	}
 
-	private void DLJDCFEGCOE(Connection BJGMPDIKEJC, OHLFKFFAOMF JOBAGBFMMFP, OHLFKFFAOMF MPJEMGJIBBD)
+	private void OnStateChanged(Connection BJGMPDIKEJC, ConnectionStates JOBAGBFMMFP, ConnectionStates MPJEMGJIBBD)
 	{
 		messages.Add(string.Format("[State Change] {0} => {1}", JOBAGBFMMFP, MPJEMGJIBBD));
 	}
 
-	private void KGKBELBAKJO(Connection BJGMPDIKEJC, string JDONBAPIJCG)
+	private void OnError(Connection BJGMPDIKEJC, string JDONBAPIJCG)
 	{
 		messages.Add("[Error] " + JDONBAPIJCG);
 	}
 
-	private void HAOGIBHGBNP(Hub CGFIJCNNCKP, string FJLOLCPJACB, params object[] LKIOKGCNKHE)
+	private void OnStatusHubMethod(Hub CGFIJCNNCKP, string FJLOLCPJACB, params object[] LKIOKGCNKHE)
 	{
 		string arg = ((LKIOKGCNKHE.Length <= 0) ? string.Empty : (LKIOKGCNKHE[0] as string));
 		string arg2 = ((LKIOKGCNKHE.Length <= 1) ? string.Empty : LKIOKGCNKHE[1].ToString());

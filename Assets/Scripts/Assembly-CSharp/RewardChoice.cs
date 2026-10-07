@@ -3,58 +3,58 @@ using System.Xml;
 
 public class RewardChoice
 {
-	public struct GIMEDBLIEFF
+	public struct WeightedReward
 	{
-		public Rewardable PACEDHFLGHK;
+		public Rewardable reward;
 
-		public float PIHKGGPCADE;
+		public float weight;
 
-		public GIMEDBLIEFF(XmlNode node)
+		public WeightedReward(XmlNode node)
 		{
-			PIHKGGPCADE = node.Attributes["Weight"].ParseFloat(1f);
+			weight = node.Attributes["Weight"].ParseFloat(1f);
 			switch (node.Name)
 			{
 			case "Item":
-				PACEDHFLGHK = new RewardItem(node);
+				reward = new RewardItem(node);
 				break;
 			case "Money":
-				PACEDHFLGHK = new RewardMoney(node);
+				reward = new RewardMoney(node);
 				break;
 			case "Currency":
-				PACEDHFLGHK = new RewardCurrency(node);
+				reward = new RewardCurrency(node);
 				break;
 			case "Resistance":
-				PACEDHFLGHK = new RewardResistance(node);
+				reward = new RewardResistance(node);
 				break;
 			case "Lottery":
-				PACEDHFLGHK = new RewardLottery(node, 0, 0);
+				reward = new RewardLottery(node, 0, 0);
 				break;
 			default:
-				PACEDHFLGHK = null;
+				reward = null;
 				break;
 			}
 		}
 	}
 
-	private List<GIMEDBLIEFF> GKOHOFKFDFP = new List<GIMEDBLIEFF>();
+	private List<WeightedReward> choices = new List<WeightedReward>();
 
 	public RewardChoice(XmlNode node)
 	{
 		foreach (XmlNode childNode in node.ChildNodes)
 		{
-			GIMEDBLIEFF item = new GIMEDBLIEFF(childNode);
-			GKOHOFKFDFP.Add(item);
+			WeightedReward item = new WeightedReward(childNode);
+			choices.Add(item);
 		}
 	}
 
-	public Rewardable OOOBLJIHBEP()
+	public Rewardable ChooseRandomReward()
 	{
 		float num = 0f;
 		List<float> list = new List<float>();
 		list.Add(0f);
-		foreach (GIMEDBLIEFF item in GKOHOFKFDFP)
+		foreach (WeightedReward item in choices)
 		{
-			num += item.PIHKGGPCADE;
+			num += item.weight;
 			list.Add(num);
 		}
 		int index = 0;
@@ -68,6 +68,6 @@ public class RewardChoice
 				break;
 			}
 		}
-		return GKOHOFKFDFP[index].PACEDHFLGHK;
+		return choices[index].reward;
 	}
 }

@@ -39,7 +39,7 @@ try
         if (!move.Name.Contains("shop_"))
         {
             foreach (var interval in move.MoveData.Intervals)
-                if (interval.Type == IntervalAnimation.NGAJJDIEDGF.INTERVAL_ATTACK && interval.GEJLNPIEDPF >= samples.Length)
+                if (interval.Type == IntervalAnimation.IntervalType.INTERVAL_ATTACK && interval.EndFrameValue >= samples.Length)
                     throw new Exception("Attack extends beyond recovered binary.");
             var active = new System.Collections.Generic.List<IntervalAnimation>();
             var ended = new System.Collections.Generic.List<IntervalAnimation>();
@@ -56,12 +56,12 @@ try
                 if (float.IsNaN(point.x) || float.IsInfinity(point.x) || float.IsNaN(point.y) || float.IsInfinity(point.y) || float.IsNaN(point.z) || float.IsInfinity(point.z)) throw new Exception("Nonfinite animation point.");
         }
         var state = new ModelConditions();
-        state.IBBALIJOJMC = move.Name.Contains("shop_") ? SceneTypes.SceneShopWeapon : SceneTypes.SceneFight;
-        state.OJIAKDDCGLB = new System.Collections.Generic.List<ItemInfo>();
-        state.OJIAKDDCGLB.Add(new ItemInfo(null) { Type = "Weapon", SubType = "ChineseSwords" });
-        state.OJIAKDDCGLB.Add(new ItemInfo(null) { Type = "Skeleton", SubType = "Skeleton" });
+        state.SceneType = move.Name.Contains("shop_") ? SceneTypes.SceneShopWeapon : SceneTypes.SceneFight;
+        state.Items = new System.Collections.Generic.List<ItemInfo>();
+        state.Items.Add(new ItemInfo(null) { Type = "Weapon", SubType = "ChineseSwords" });
+        state.Items.Add(new ItemInfo(null) { Type = "Skeleton", SubType = "Skeleton" });
         foreach (var condition in move.MoveData.Locks) if (!condition.IsEqual(state)) throw new Exception("Native eligibility failed: " + move.Name);
-        state.OJIAKDDCGLB[0].SubType = "Katana";
+        state.Items[0].SubType = "Katana";
         bool rejected = false;
         foreach (var condition in move.MoveData.Locks) if (!condition.IsEqual(state)) rejected = true;
         if (!rejected) throw new Exception("Unrelated equipment accepted.");

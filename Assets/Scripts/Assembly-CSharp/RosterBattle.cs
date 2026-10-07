@@ -5,33 +5,33 @@ public class RosterBattle
 {
 	private XmlNode _node;
 
-	public Battle EDHMHFONDAI;
+	public Battle LinkedBattle;
 
-	private bool LNKJGCAAJHN;
+	private bool locked;
 
-	private bool FMFGNJBDGKG;
+	private bool hidden;
 
-	public bool DFMKJHFFCMD;
+	public bool RuntimeFlagA;
 
-	public bool EFJKJPCHFMB;
+	public bool RuntimeFlagB;
 
-	private FightIDS FMOAFHBHOJD = new FightIDS();
+	private FightIDS battleId = new FightIDS();
 
 	private long _randomRuleSeed;
 
-	private long NBNPGBNOALB;
+	private long randomGroupSeed;
 
-	private int JENKECCDPGP;
+	private int replayCount;
 
-	private bool JONEMNHBCHA;
+	private bool hasRandomRuleSeed;
 
-	private bool IMEMIMFNKFD;
+	private bool hasRandomGroupSeed;
 
-	private bool IKCHAEKOMBN;
+	private bool hasAscensionLevel;
 
-	private int HGCCKCCJBGG = -1;
+	private int ascensionLevel = -1;
 
-	public bool CNNCIENODGE
+	public bool Locked
 	{
 		get
 		{
@@ -43,19 +43,19 @@ public class RosterBattle
 		}
 	}
 
-	public bool GDCBBAHKCIE
+	public bool Hidden
 	{
 		get
 		{
-			return KAPIELMDIIK();
+			return IsHidden();
 		}
 		set
 		{
-			HCEOCBOFIGC(value);
+			SetHidden(value);
 		}
 	}
 
-	public FightIDS ODNEGHOCMDE
+	public FightIDS BattleId
 	{
 		get
 		{
@@ -63,240 +63,240 @@ public class RosterBattle
 		}
 		set
 		{
-			GEGKFFGACDI(value);
+			SetBattleId(value);
 		}
 	}
 
-	public long BHNAKDJODEB
+	public long RandomRuleSeed
 	{
 		get
 		{
-			return BKDOAOCGJLJ();
+			return GetRandomRuleSeed();
 		}
 		set
 		{
-			OEKFMKDLLHE(value);
+			SetRandomRuleSeed(value);
 		}
 	}
 
-	public long GLLHEJIFGOJ
+	public long RandomGroupSeed
 	{
 		get
 		{
-			return PFJKCOPFNHB();
+			return GetRandomGroupSeed();
 		}
 		set
 		{
-			ELJAOONAOHJ(value);
+			SetRandomGroupSeed(value);
 		}
 	}
 
-	public int EPKLHKJHAPL
+	public int ReplayCount
 	{
 		get
 		{
-			return ODCFKCJJDKN();
+			return GetReplayCount();
 		}
 		set
 		{
-			FHCHCHPPMEI(value);
+			SetReplayCount(value);
 		}
 	}
 
-	public bool EAIODKMKPGB
+	public bool HasRandomRuleSeed
 	{
 		get
 		{
-			return FBIHFOCDCAA();
+			return IsRandomRuleSeedSet();
 		}
 	}
 
-	public bool LCNAHCKMMFL
+	public bool HasRandomGroupSeed
 	{
 		get
 		{
-			return NFOFEJPJDLL();
+			return IsRandomGroupSeedSet();
 		}
 	}
 
-	public bool PBKCGOBMCBP
+	public bool HasAscensionLevel
 	{
 		get
 		{
-			return GCMLGEGODDB();
+			return IsAscensionLevelSet();
 		}
 	}
 
-	public int JBAGJHBMKBK
+	public int AscensionLevel
 	{
 		get
 		{
-			return PHCFNACJAAJ();
+			return GetAscensionLevel();
 		}
 		set
 		{
-			EAONJGHNJGB(value);
+			SetAscensionLevel(value);
 		}
 	}
 
 	public RosterBattle(XmlNode node)
 	{
 		_node = node;
-		EDHMHFONDAI = null;
-		DFMKJHFFCMD = false;
-		EFJKJPCHFMB = false;
-		NBNPGBNOALB = 0L;
+		LinkedBattle = null;
+		RuntimeFlagA = false;
+		RuntimeFlagB = false;
+		randomGroupSeed = 0L;
 		_randomRuleSeed = 0L;
-		JENKECCDPGP = 0;
-		IMEMIMFNKFD = false;
-		JONEMNHBCHA = false;
-		IKCHAEKOMBN = false;
-		HGCCKCCJBGG = 1;
+		replayCount = 0;
+		hasRandomGroupSeed = false;
+		hasRandomRuleSeed = false;
+		hasAscensionLevel = false;
+		ascensionLevel = 1;
 		if (_node.Attributes["Name"].Empty())
 		{
-			_node.LLIKNHNLGJJ("Name").Value = string.Empty;
+			_node.AppendAttribute("Name").Value = string.Empty;
 		}
 		if (_node.Attributes["Locked"].Empty())
 		{
-			_node.LLIKNHNLGJJ("Locked").Value = "0";
+			_node.AppendAttribute("Locked").Value = "0";
 		}
-		LNKJGCAAJHN = _node.Attributes["Locked"].ParseBool();
-		FMFGNJBDGKG = _node.Attributes["Hidden"].ParseBool();
-		FMOAFHBHOJD = new FightIDS();
-		FMOAFHBHOJD.SetFightIDSByString(_node.Attributes["Name"].CIPOICEEIBK(string.Empty));
-		IMEMIMFNKFD = !node.Attributes["RandomGroupSeed"].Empty();
-		JONEMNHBCHA = !node.Attributes["RandomRuleSeed"].Empty();
-		if (IMEMIMFNKFD)
+		locked = _node.Attributes["Locked"].ParseBool();
+		hidden = _node.Attributes["Hidden"].ParseBool();
+		battleId = new FightIDS();
+		battleId.SetFightIDSByString(_node.Attributes["Name"].GetStringOrDefault(string.Empty));
+		hasRandomGroupSeed = !node.Attributes["RandomGroupSeed"].Empty();
+		hasRandomRuleSeed = !node.Attributes["RandomRuleSeed"].Empty();
+		if (hasRandomGroupSeed)
 		{
-			NBNPGBNOALB = node.Attributes["RandomGroupSeed"].ParseInt();
+			randomGroupSeed = node.Attributes["RandomGroupSeed"].ParseInt();
 		}
-		if (JONEMNHBCHA)
+		if (hasRandomRuleSeed)
 		{
 			_randomRuleSeed = node.Attributes["RandomRuleSeed"].ParseInt();
 		}
-		JENKECCDPGP = node.Attributes["ReplayCount"].ParseInt();
-		IKCHAEKOMBN = !node.Attributes["Fight"].Empty();
-		if (IKCHAEKOMBN)
+		replayCount = node.Attributes["ReplayCount"].ParseInt();
+		hasAscensionLevel = !node.Attributes["Fight"].Empty();
+		if (hasAscensionLevel)
 		{
-			HGCCKCCJBGG = node.Attributes["Fight"].ParseInt();
+			ascensionLevel = node.Attributes["Fight"].ParseInt();
 		}
 	}
 
 	// best guess for name
 	public bool IsLocked()
 	{
-		return LNKJGCAAJHN;
+		return locked;
 	}
 
 	// best guess for name
 	public void SetLocked(bool value)
 	{
-		LNKJGCAAJHN = value;
-		_node.Attributes["Locked"].Value = Convert.ToInt32(LNKJGCAAJHN).ToString();
+		locked = value;
+		_node.Attributes["Locked"].Value = Convert.ToInt32(locked).ToString();
 	}
 
-	public bool KAPIELMDIIK()
+	public bool IsHidden()
 	{
-		return FMFGNJBDGKG;
+		return hidden;
 	}
 
-	public void HCEOCBOFIGC(bool value)
+	public void SetHidden(bool value)
 	{
-		FMFGNJBDGKG = value;
+		hidden = value;
 		if (_node.Attributes["Hidden"] == null)
 		{
-			_node.LLIKNHNLGJJ("Hidden");
+			_node.AppendAttribute("Hidden");
 		}
-		_node.Attributes["Hidden"].Value = Convert.ToInt32(FMFGNJBDGKG).ToString();
+		_node.Attributes["Hidden"].Value = Convert.ToInt32(hidden).ToString();
 	}
 
 	// best guess for name
 	public FightIDS GetBattleId()
 	{
-		return FMOAFHBHOJD;
+		return battleId;
 	}
 
-	public void GEGKFFGACDI(FightIDS value)
+	public void SetBattleId(FightIDS value)
 	{
-		FMOAFHBHOJD = value;
-		_node.Attributes["Name"].Value = FMOAFHBHOJD.ToString();
+		battleId = value;
+		_node.Attributes["Name"].Value = battleId.ToString();
 	}
 
-	public long BKDOAOCGJLJ()
+	public long GetRandomRuleSeed()
 	{
 		return _randomRuleSeed;
 	}
 
-	public void OEKFMKDLLHE(long value)
+	public void SetRandomRuleSeed(long value)
 	{
-		JONEMNHBCHA = true;
+		hasRandomRuleSeed = true;
 		_randomRuleSeed = value;
 		if (_node.Attributes["RandomRuleSeed"] == null)
 		{
-			_node.LLIKNHNLGJJ("RandomRuleSeed");
+			_node.AppendAttribute("RandomRuleSeed");
 		}
 		_node.Attributes["RandomRuleSeed"].Value = _randomRuleSeed.ToString();
 	}
 
-	public long PFJKCOPFNHB()
+	public long GetRandomGroupSeed()
 	{
-		return NBNPGBNOALB;
+		return randomGroupSeed;
 	}
 
-	public void ELJAOONAOHJ(long value)
+	public void SetRandomGroupSeed(long value)
 	{
-		IMEMIMFNKFD = true;
-		NBNPGBNOALB = value;
+		hasRandomGroupSeed = true;
+		randomGroupSeed = value;
 		if (_node.Attributes["RandomGroupSeed"] == null)
 		{
-			_node.LLIKNHNLGJJ("RandomGroupSeed");
+			_node.AppendAttribute("RandomGroupSeed");
 		}
-		_node.Attributes["RandomGroupSeed"].Value = NBNPGBNOALB.ToString();
+		_node.Attributes["RandomGroupSeed"].Value = randomGroupSeed.ToString();
 	}
 
-	public int ODCFKCJJDKN()
+	public int GetReplayCount()
 	{
-		return JENKECCDPGP;
+		return replayCount;
 	}
 
-	public void FHCHCHPPMEI(int value)
+	public void SetReplayCount(int value)
 	{
-		JENKECCDPGP = value;
+		replayCount = value;
 		if (_node.Attributes["ReplayCount"].Empty())
 		{
-			_node.LLIKNHNLGJJ("ReplayCount");
+			_node.AppendAttribute("ReplayCount");
 		}
-		_node.Attributes["ReplayCount"].Value = JENKECCDPGP.ToString();
+		_node.Attributes["ReplayCount"].Value = replayCount.ToString();
 	}
 
-	public bool FBIHFOCDCAA()
+	public bool IsRandomRuleSeedSet()
 	{
-		return JONEMNHBCHA;
+		return hasRandomRuleSeed;
 	}
 
-	public bool NFOFEJPJDLL()
+	public bool IsRandomGroupSeedSet()
 	{
-		return IMEMIMFNKFD;
+		return hasRandomGroupSeed;
 	}
 
-	public bool GCMLGEGODDB()
+	public bool IsAscensionLevelSet()
 	{
-		return IKCHAEKOMBN;
+		return hasAscensionLevel;
 	}
 
-	public int PHCFNACJAAJ()
+	public int GetAscensionLevel()
 	{
-		return HGCCKCCJBGG;
+		return ascensionLevel;
 	}
 
-	public void EAONJGHNJGB(int value)
+	public void SetAscensionLevel(int value)
 	{
-		IKCHAEKOMBN = true;
-		HGCCKCCJBGG = value;
+		hasAscensionLevel = true;
+		ascensionLevel = value;
 		if (_node.Attributes["Fight"].Empty())
 		{
-			_node.LLIKNHNLGJJ("Fight");
+			_node.AppendAttribute("Fight");
 		}
-		_node.Attributes["Fight"].Value = HGCCKCCJBGG.ToString();
+		_node.Attributes["Fight"].Value = ascensionLevel.ToString();
 	}
 }

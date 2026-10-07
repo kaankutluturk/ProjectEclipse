@@ -8,121 +8,121 @@ using Nekki.Utils;
 
 public class GeneralConfig
 {
-	private const string PNMKCPIEPCO = "/config_cdn.xml";
+	private const string ConfigCdnFileName = "/config_cdn.xml";
 
-	public static News FNHPCBEDKFO = new News();
+	public static News CurrentNews = new News();
 
-	public static Packs NNFMKNJJDDD = new Packs();
+	public static Packs DownloadPacks = new Packs();
 
-	public static PricesDataContainer IHHMHNHOLCB = new PricesDataContainer();
+	public static PricesDataContainer Prices = new PricesDataContainer();
 
 	private Action<bool> _Callback;
 
-	private Action<object> IJHFDMNNJJI;
+	private Action<object> progressCallback;
 
-	private List<JBKAOMLJCEL> MJLGAEJFDPK;
+	private List<DownloadPack> pendingItems;
 
-	private int FHHIKLABEHN;
+	private int downloadTimeout;
 
-	private int AEABMNJHLLC;
+	private int reservedParam;
 
-	private XmlDocument JNHOOLOOPMO;
+	private XmlDocument configDocument;
 
-	private bool OIPHJPKPPAJ;
+	private bool callbackResult;
 
-	private string KFNGFONMBCA;
+	private string platformName;
 
-	private bool PELGCIAEKIB = true;
+	private bool isConfigValid = true;
 
-	private bool ODHPOJMNFIN = true;
-
-	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private LedgerSettings MNIDDMLBPHB;
+	private bool isVersionSupported = true;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private VerificationSettings EFAGAACJHED;
+	private LedgerSettings ledgerSettings;
+
+	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
+	private VerificationSettings verificationSettings;
 
 	private static GeneralConfig _Instance = null;
 
-	public bool DMIHGNFGFCF
+	public bool IsConfigValid
 	{
 		get
 		{
-			return IHGDCIFNAOA();
+			return GetIsConfigValid();
 		}
 	}
 
-	public bool FGEBFKEMFEC
+	public bool IsVersionSupported
 	{
 		get
 		{
-			return CHAPIILIEPK();
+			return GetIsVersionSupported();
 		}
 	}
 
-	public LedgerSettings JFCEPCNJMIH
+	public LedgerSettings LedgerConfig
 	{
 		get
 		{
-			return IMOKGIDCANG();
+			return GetLedgerSettings();
 		}
 		private set
 		{
-			DPHOIOBJABC(value);
+			SetLedgerSettings(value);
 		}
 	}
 
-	public VerificationSettings LAELKCACBBL
+	public VerificationSettings VerificationConfig
 	{
 		get
 		{
-			return OKJAHGKBGMK();
+			return GetVerificationSettings();
 		}
 		private set
 		{
-			KHGMAIADCLI(value);
+			SetVerificationSettings(value);
 		}
 	}
 
-	public static GeneralConfig BPCBBHAKFDM
+	public static GeneralConfig Instance
 	{
 		get
 		{
-			return ELEBLBJKDBI();
+			return GetInstance();
 		}
 	}
 
-	public bool IHGDCIFNAOA()
+	public bool GetIsConfigValid()
 	{
-		return PELGCIAEKIB;
+		return isConfigValid;
 	}
 
-	public bool CHAPIILIEPK()
+	public bool GetIsVersionSupported()
 	{
-		return ODHPOJMNFIN;
+		return isVersionSupported;
 	}
 
-	public LedgerSettings IMOKGIDCANG()
+	public LedgerSettings GetLedgerSettings()
 	{
-		return MNIDDMLBPHB;
+		return ledgerSettings;
 	}
 
-	private void DPHOIOBJABC(LedgerSettings value)
+	private void SetLedgerSettings(LedgerSettings value)
 	{
-		MNIDDMLBPHB = value;
+		ledgerSettings = value;
 	}
 
-	public VerificationSettings OKJAHGKBGMK()
+	public VerificationSettings GetVerificationSettings()
 	{
-		return EFAGAACJHED;
+		return verificationSettings;
 	}
 
-	private void KHGMAIADCLI(VerificationSettings value)
+	private void SetVerificationSettings(VerificationSettings value)
 	{
-		EFAGAACJHED = value;
+		verificationSettings = value;
 	}
 
-	public static GeneralConfig ELEBLBJKDBI()
+	public static GeneralConfig GetInstance()
 	{
 		if (_Instance == null)
 		{
@@ -131,28 +131,28 @@ public class GeneralConfig
 		return _Instance;
 	}
 
-	public void DOJCMIFHJKM(string path, Action<bool> callback, Action<object> IPDNNACNOEN, List<JBKAOMLJCEL> DEJEBFLAOIB, int HCCLKJOCHGP, int INGCPFFHBOG)
+	public void LoadConfig(string path, Action<bool> callback, Action<object> IPDNNACNOEN, List<DownloadPack> DEJEBFLAOIB, int HCCLKJOCHGP, int INGCPFFHBOG)
 	{
 		_Callback = callback;
-		IJHFDMNNJJI = IPDNNACNOEN;
-		MJLGAEJFDPK = DEJEBFLAOIB;
-		FHHIKLABEHN = HCCLKJOCHGP;
-		AEABMNJHLLC = INGCPFFHBOG;
+		progressCallback = IPDNNACNOEN;
+		pendingItems = DEJEBFLAOIB;
+		downloadTimeout = HCCLKJOCHGP;
+		reservedParam = INGCPFFHBOG;
 		if (string.IsNullOrEmpty(path))
 		{
-			OGIJONMKABB();
+			InvokeCallback();
 			return;
 		}
 		string arg = NekkiMath.randomInt(1000000).ToString();
 		string mGPGDPOOCBK = string.Format("{0}?{1}", path, arg);
-		ServerProvider.get_Instance().DownloadFile(mGPGDPOOCBK, OnLoadConfig, null, FHHIKLABEHN);
+		ServerProvider.get_Instance().DownloadFile(mGPGDPOOCBK, OnLoadConfig, null, downloadTimeout);
 	}
 
 	private void OnLoadConfig(byte[] data, string JDONBAPIJCG, string BEPKJNKCKPH)
 	{
 		if (string.IsNullOrEmpty(JDONBAPIJCG) && data != null)
 		{
-			File.WriteAllBytes(SF2Paths.GBOFOFGDMBN() + "/config_cdn.xml", data);
+			File.WriteAllBytes(SF2Paths.GetWritableGameDataPath() + "/config_cdn.xml", data);
 		}
 		else
 		{
@@ -162,7 +162,7 @@ public class GeneralConfig
 			}
 			else
 			{
-				LLLOJBFMONN.Error("[Config]: failed to download config because " + JDONBAPIJCG);
+				GameLog.Error("[Config]: failed to download config because " + JDONBAPIJCG);
 			}
 		}
 		Parse(true);
@@ -173,33 +173,33 @@ public class GeneralConfig
 		bool flag = true;
 		if (EJGPPDALIOJ)
 		{
-			JNHOOLOOPMO = XmlUtils.OpenXMLDocument(SF2Paths.GBOFOFGDMBN(), "/config_cdn.xml", XmlUtils.EBLFEPIOMOL.ForcedExternal);
-			if (JNHOOLOOPMO == null)
+			configDocument = XmlUtils.OpenXMLDocument(SF2Paths.GetWritableGameDataPath(), "/config_cdn.xml", XmlUtils.XmlSourceMode.ForcedExternal);
+			if (configDocument == null)
 			{
-				JNHOOLOOPMO = XmlUtils.OpenXMLDocument(SF2Paths.KKIDGPBOBNI() + "/config_cdn.xml", string.Empty);
+				configDocument = XmlUtils.OpenXMLDocument(SF2Paths.GetGameDataPath() + "/config_cdn.xml", string.Empty);
 			}
 		}
 		if (flag)
 		{
-			KPLGMLEJLFA();
+			ParseXml();
 		}
 		else
 		{
-			PELGCIAEKIB = false;
-			OGIJONMKABB();
+			isConfigValid = false;
+			InvokeCallback();
 		}
-		JNHOOLOOPMO = null;
+		configDocument = null;
 		return flag;
 	}
 
-	private void KPLGMLEJLFA()
+	private void ParseXml()
 	{
-		if (JNHOOLOOPMO == null)
+		if (configDocument == null)
 		{
-			LLLOJBFMONN.Error("GeneralConfig.ParseXML: _DocConfig is null");
+			GameLog.Error("GeneralConfig.ParseXML: _DocConfig is null");
 			return;
 		}
-		XmlNode xmlNode = JNHOOLOOPMO["data"];
+		XmlNode xmlNode = configDocument["data"];
 		XmlNode xmlNode2 = xmlNode["platform"];
 		XmlNode xmlNode3 = xmlNode["versions"];
 		XmlNode xmlNode4 = xmlNode["settings"];
@@ -207,126 +207,126 @@ public class GeneralConfig
 		XmlNode xmlNode6 = xmlNode["price"];
 		if (xmlNode2 != null)
 		{
-			EDJJHECLEIN(xmlNode2);
+			ParsePlatform(xmlNode2);
 		}
 		if (xmlNode3 != null)
 		{
-			MPKFAGOPGPP(xmlNode3);
+			ParseVersions(xmlNode3);
 		}
 		if (xmlNode4 != null)
 		{
-			IOBGEFFIKJA(xmlNode4);
+			ParseSettings(xmlNode4);
 		}
 		if (xmlNode5 != null)
 		{
-			CJFMDMDCFDF(xmlNode5);
+			ParseNews(xmlNode5);
 		}
-		KCPJMMDJEMN(xmlNode);
+		ParseDownloads(xmlNode);
 		if (xmlNode6 != null)
 		{
-			EKAHAGFFJOO(xmlNode6);
+			ParsePrices(xmlNode6);
 		}
-		OGIJONMKABB();
+		InvokeCallback();
 	}
 
-	private void EDJJHECLEIN(XmlNode GLCBJNIIPDG)
+	private void ParsePlatform(XmlNode GLCBJNIIPDG)
 	{
-		KFNGFONMBCA = "unknown";
+		platformName = "unknown";
 		foreach (XmlNode childNode in GLCBJNIIPDG.ChildNodes)
 		{
 			int bAINMLLIKOL = childNode.Attributes["PlatformID"].ParseInt();
 			if (CheckPlatform(bAINMLLIKOL))
 			{
-				KFNGFONMBCA = childNode.Attributes["Name"].CIPOICEEIBK(KFNGFONMBCA);
+				platformName = childNode.Attributes["Name"].GetStringOrDefault(platformName);
 			}
 		}
 	}
 
-	private void MPKFAGOPGPP(XmlNode BPDFMKIGEKF)
+	private void ParseVersions(XmlNode BPDFMKIGEKF)
 	{
 		bool oDHPOJMNFIN = false;
-		VersionContainer aAOIAEJJINO = SystemProperties.KCJMMIEBLHL();
+		VersionContainer aAOIAEJJINO = SystemProperties.GetVersion();
 		foreach (XmlNode childNode in BPDFMKIGEKF.ChildNodes)
 		{
 			int bAINMLLIKOL = childNode.Attributes["PlatformID"].ParseInt();
 			if (CheckPlatform(bAINMLLIKOL))
 			{
 				VersionContainer pAMHFPMEPCH = new VersionContainer();
-				pAMHFPMEPCH.SetVersion(childNode.Attributes["Version"].CIPOICEEIBK());
-				if (VersionContainer.CGMHEDJDOEK(pAMHFPMEPCH, aAOIAEJJINO))
+				pAMHFPMEPCH.SetVersion(childNode.Attributes["Version"].GetStringOrDefault());
+				if (VersionContainer.IsGreater(pAMHFPMEPCH, aAOIAEJJINO))
 				{
 					oDHPOJMNFIN = true;
 					break;
 				}
 			}
 		}
-		ODHPOJMNFIN = oDHPOJMNFIN;
+		isVersionSupported = oDHPOJMNFIN;
 	}
 
-	private void IOBGEFFIKJA(XmlNode node)
+	private void ParseSettings(XmlNode node)
 	{
 		XmlNode aIDFCDDECJB = node["time"];
 		XmlNode aIDFCDDECJB2 = node["dumps"];
 		XmlNode aIDFCDDECJB3 = node["server"];
-		KeyValuePair<string, string> hFCAPMDHLJN = KMJMDEKMCNO(aIDFCDDECJB);
-		KeyValuePair<string, string> hFCAPMDHLJN2 = KMJMDEKMCNO(aIDFCDDECJB2);
-		KeyValuePair<string, string> hFCAPMDHLJN3 = KMJMDEKMCNO(aIDFCDDECJB3);
-		if (!KANBBNPLMMM(hFCAPMDHLJN))
+		KeyValuePair<string, string> hFCAPMDHLJN = ParseUrlPair(aIDFCDDECJB);
+		KeyValuePair<string, string> hFCAPMDHLJN2 = ParseUrlPair(aIDFCDDECJB2);
+		KeyValuePair<string, string> hFCAPMDHLJN3 = ParseUrlPair(aIDFCDDECJB3);
+		if (!IsEmptyPair(hFCAPMDHLJN))
 		{
 			ServerProvider.set_TimeServerURL(hFCAPMDHLJN.Value);
 		}
-		if (!KANBBNPLMMM(hFCAPMDHLJN2))
+		if (!IsEmptyPair(hFCAPMDHLJN2))
 		{
 			ServerProvider.set_DumpPutURL(hFCAPMDHLJN2.Key);
 			ServerProvider.set_DumpGetURL(hFCAPMDHLJN2.Value);
 		}
-		if (!KANBBNPLMMM(hFCAPMDHLJN3))
+		if (!IsEmptyPair(hFCAPMDHLJN3))
 		{
 			ServerProvider.set_PutURL(hFCAPMDHLJN3.Key);
 			ServerProvider.set_GetURL(hFCAPMDHLJN3.Value);
 		}
 		XmlNode hKPPBKPJOEO = node["verification"];
-		KINLHDGNIIO(hKPPBKPJOEO);
+		ParseVerification(hKPPBKPJOEO);
 		XmlNode hKPPBKPJOEO2 = node["ledger"];
-		IPDGIOGEGOA(hKPPBKPJOEO2);
+		ParseLedger(hKPPBKPJOEO2);
 	}
 
-	private void KINLHDGNIIO(XmlNode node)
+	private void ParseVerification(XmlNode node)
 	{
-		KHGMAIADCLI(new VerificationSettings(node.Attributes["Url"].CIPOICEEIBK(string.Empty), node.Attributes["Timeout"].ParseInt(), node.Attributes["MaxRetry"].ParseInt(), node.Attributes["Frequency"].ParseInt()));
+		SetVerificationSettings(new VerificationSettings(node.Attributes["Url"].GetStringOrDefault(string.Empty), node.Attributes["Timeout"].ParseInt(), node.Attributes["MaxRetry"].ParseInt(), node.Attributes["Frequency"].ParseInt()));
 	}
 
-	private void IPDGIOGEGOA(XmlNode node)
+	private void ParseLedger(XmlNode node)
 	{
-		DPHOIOBJABC(new LedgerSettings(node.Attributes["Url"].CIPOICEEIBK(string.Empty), node.Attributes["Timeout"].ParseInt(), node.Attributes["MaxRetry"].ParseInt()));
+		SetLedgerSettings(new LedgerSettings(node.Attributes["Url"].GetStringOrDefault(string.Empty), node.Attributes["Timeout"].ParseInt(), node.Attributes["MaxRetry"].ParseInt()));
 	}
 
-	private void KCPJMMDJEMN(XmlNode node)
+	private void ParseDownloads(XmlNode node)
 	{
-		NNFMKNJJDDD.Reset();
+		DownloadPacks.Reset();
 		XmlNode xmlNode = node["packs"];
 		XmlNode xmlNode2 = node["fonts"];
 		XmlNode xmlNode3 = node["video"];
 		if (xmlNode != null)
 		{
-			GDNFPIBDDBO(xmlNode);
+			ParsePackGroup(xmlNode);
 		}
 		if (xmlNode2 != null)
 		{
-			GDNFPIBDDBO(xmlNode2);
+			ParsePackGroup(xmlNode2);
 		}
 		if (xmlNode3 != null)
 		{
-			GDNFPIBDDBO(xmlNode3);
+			ParsePackGroup(xmlNode3);
 		}
 	}
 
-	private void GDNFPIBDDBO(XmlNode MEEAKLDGLDF)
+	private void ParsePackGroup(XmlNode MEEAKLDGLDF)
 	{
 		Dictionary<string, List<XmlNode>> dictionary = new Dictionary<string, List<XmlNode>>();
 		foreach (XmlNode childNode in MEEAKLDGLDF.ChildNodes)
 		{
-			string key = childNode.Attributes["Name"].CIPOICEEIBK(string.Empty);
+			string key = childNode.Attributes["Name"].GetStringOrDefault(string.Empty);
 			if (!dictionary.ContainsKey(key))
 			{
 				dictionary[key] = new List<XmlNode>();
@@ -344,18 +344,18 @@ public class GeneralConfig
 				int bAINMLLIKOL = item2.Attributes["PlatformID"].ParseInt();
 				if (CheckPlatform(bAINMLLIKOL))
 				{
-					xmlNode2.LCOLFMJJDJE(item2);
+					xmlNode2.AppendImportedClone(item2);
 				}
 			}
 			XmlNode xmlNode3 = ClosestVersion(xmlNode2);
-			string text = ((xmlNode3 == null) ? null : xmlNode3.Attributes["Url"].CIPOICEEIBK());
-			string pEEOEOMEBFG = ((xmlNode3 == null) ? null : xmlNode3.Attributes["Size"].CIPOICEEIBK());
+			string text = ((xmlNode3 == null) ? null : xmlNode3.Attributes["Url"].GetStringOrDefault());
+			string pEEOEOMEBFG = ((xmlNode3 == null) ? null : xmlNode3.Attributes["Size"].GetStringOrDefault());
 			bool lCDCAKLKHMI = xmlNode3 != null && xmlNode3.Attributes["Reload"].ParseBool();
-			string hDPBNCNCMOH = ((xmlNode3 == null) ? null : xmlNode3.Attributes["Hash"].CIPOICEEIBK());
+			string hDPBNCNCMOH = ((xmlNode3 == null) ? null : xmlNode3.Attributes["Hash"].GetStringOrDefault());
 			bool aHDLCJFCJMJ = xmlNode3 != null && xmlNode3.Attributes["Attach"].ParseBool();
 			if (!string.IsNullOrEmpty(text))
 			{
-				NNFMKNJJDDD.DDKKLHDOFNG(key2, text, pEEOEOMEBFG, lCDCAKLKHMI, hDPBNCNCMOH, aHDLCJFCJMJ);
+				DownloadPacks.AddPack(key2, text, pEEOEOMEBFG, lCDCAKLKHMI, hDPBNCNCMOH, aHDLCJFCJMJ);
 			}
 		}
 	}
@@ -364,7 +364,7 @@ public class GeneralConfig
 	{
 		XmlNode result = null;
 		VersionContainer aAOIAEJJINO = new VersionContainer();
-		VersionContainer pAMHFPMEPCH = SystemProperties.KCJMMIEBLHL();
+		VersionContainer pAMHFPMEPCH = SystemProperties.GetVersion();
 		foreach (XmlNode childNode in nodes.ChildNodes)
 		{
 			if (MGMDADDKPMP)
@@ -376,16 +376,16 @@ public class GeneralConfig
 				}
 			}
 			VersionContainer pAMHFPMEPCH2 = new VersionContainer();
-			pAMHFPMEPCH2.SetVersion(childNode.Attributes["MinVersion"].CIPOICEEIBK());
+			pAMHFPMEPCH2.SetVersion(childNode.Attributes["MinVersion"].GetStringOrDefault());
 			if (!DFOOHEFGEBG)
 			{
-				if (VersionContainer.BCCGLNMPHCE(pAMHFPMEPCH2, aAOIAEJJINO) && VersionContainer.CDOCLICKACF(pAMHFPMEPCH2, pAMHFPMEPCH))
+				if (VersionContainer.IsGreaterOrEqual(pAMHFPMEPCH2, aAOIAEJJINO) && VersionContainer.IsLessOrEqual(pAMHFPMEPCH2, pAMHFPMEPCH))
 				{
 					aAOIAEJJINO = pAMHFPMEPCH2;
 					result = childNode;
 				}
 			}
-			else if (VersionContainer.LFPMCJPCJBD(pAMHFPMEPCH, pAMHFPMEPCH2))
+			else if (VersionContainer.IsEqual(pAMHFPMEPCH, pAMHFPMEPCH2))
 			{
 				result = childNode;
 				break;
@@ -394,9 +394,9 @@ public class GeneralConfig
 		return result;
 	}
 
-	private void CJFMDMDCFDF(XmlNode node)
+	private void ParseNews(XmlNode node)
 	{
-		if (!ParseNewsForLocale(node, SystemProperties.NICPICAMAOH().OAPHJAPMKJG) && !ParseNewsForLocale(node, SystemProperties.NICPICAMAOH().OHCHKFMFDKM()) && !ParseNewsForLocale(node, "Other"))
+		if (!ParseNewsForLocale(node, SystemProperties.GetDeviceInfo().Locale) && !ParseNewsForLocale(node, SystemProperties.GetDeviceInfo().GetLanguage()) && !ParseNewsForLocale(node, "Other"))
 		{
 		}
 	}
@@ -404,7 +404,7 @@ public class GeneralConfig
 	private bool ParseNewsForLocale(XmlNode MEEAKLDGLDF, string EADIFEPJKJK)
 	{
 		bool result = false;
-		VersionContainer lHBNIMGFKIB = SystemProperties.KCJMMIEBLHL();
+		VersionContainer lHBNIMGFKIB = SystemProperties.GetVersion();
 		foreach (XmlNode childNode in MEEAKLDGLDF.ChildNodes)
 		{
 			if (childNode.Name != "item")
@@ -412,35 +412,35 @@ public class GeneralConfig
 				continue;
 			}
 			int bAINMLLIKOL = childNode.Attributes["PlatformID"].ParseInt();
-			if (!CheckPlatform(bAINMLLIKOL) || !IsOkLocale(childNode.Attributes["LangID"].CIPOICEEIBK(), EADIFEPJKJK))
+			if (!CheckPlatform(bAINMLLIKOL) || !IsOkLocale(childNode.Attributes["LangID"].GetStringOrDefault(), EADIFEPJKJK))
 			{
 				continue;
 			}
 			VersionContainer pAMHFPMEPCH = new VersionContainer();
-			pAMHFPMEPCH.SetVersion(childNode.Attributes["MinVersion"].CIPOICEEIBK());
-			if (VersionContainer.GLLHGKILFFH(lHBNIMGFKIB, pAMHFPMEPCH))
+			pAMHFPMEPCH.SetVersion(childNode.Attributes["MinVersion"].GetStringOrDefault());
+			if (VersionContainer.IsLess(lHBNIMGFKIB, pAMHFPMEPCH))
 			{
 				continue;
 			}
 			long num = childNode.Attributes["StartDate"].ParseLong(0L);
-			num += SystemProperties.JOFIGLFDPDE();
+			num += SystemProperties.GetUtcOffsetSeconds();
 			if (GlobalTimer.get_LocalTimeUTC() >= num)
 			{
 				long num2 = childNode.Attributes["EndDate"].ParseLong(-1L);
-				num2 += SystemProperties.JOFIGLFDPDE();
+				num2 += SystemProperties.GetUtcOffsetSeconds();
 				if (num2 <= 0 || num2 >= GlobalTimer.get_LocalTimeUTC())
 				{
-					string pEMOECLNECD = childNode.Attributes["Title"].CIPOICEEIBK(string.Empty);
-					string gOHIIMFFFJI = childNode.Attributes["Name"].CIPOICEEIBK(string.Empty);
-					string bEPKJNKCKPH = childNode.Attributes["Url"].CIPOICEEIBK(string.Empty);
-					string mDDOAGNHAHE = childNode.Attributes["ImageURL"].CIPOICEEIBK(string.Empty);
+					string pEMOECLNECD = childNode.Attributes["Title"].GetStringOrDefault(string.Empty);
+					string gOHIIMFFFJI = childNode.Attributes["Name"].GetStringOrDefault(string.Empty);
+					string bEPKJNKCKPH = childNode.Attributes["Url"].GetStringOrDefault(string.Empty);
+					string mDDOAGNHAHE = childNode.Attributes["ImageURL"].GetStringOrDefault(string.Empty);
 					int oKNNNLIPODI = childNode.Attributes["ID"].ParseInt();
 					bool eIKKPDKMMHK = childNode.Attributes["GoShop"].ParseBool();
-					string kINPMPFPFHD = childNode.Attributes["RedirectShop"].CIPOICEEIBK(string.Empty);
-					string eJENJNPEDOH = childNode.Attributes["SpenderTypeID"].CIPOICEEIBK(string.Empty);
+					string kINPMPFPFHD = childNode.Attributes["RedirectShop"].GetStringOrDefault(string.Empty);
+					string eJENJNPEDOH = childNode.Attributes["SpenderTypeID"].GetStringOrDefault(string.Empty);
 					bool hNJDHGDLLPD = childNode.Attributes["Active"].ParseBool();
-					List<NewsButton> hJNAHNICGMH = KBHBNGCIOEO(childNode);
-					FNHPCBEDKFO.EJDDCELLCBK(gOHIIMFFFJI, bEPKJNKCKPH, mDDOAGNHAHE, oKNNNLIPODI, hNJDHGDLLPD, num2, hJNAHNICGMH, pEMOECLNECD, eIKKPDKMMHK, kINPMPFPFHD, eJENJNPEDOH);
+					List<NewsButton> hJNAHNICGMH = ParseNewsButtons(childNode);
+					CurrentNews.AddOrReplaceItem(gOHIIMFFFJI, bEPKJNKCKPH, mDDOAGNHAHE, oKNNNLIPODI, hNJDHGDLLPD, num2, hJNAHNICGMH, pEMOECLNECD, eIKKPDKMMHK, kINPMPFPFHD, eJENJNPEDOH);
 					result = true;
 				}
 			}
@@ -448,29 +448,29 @@ public class GeneralConfig
 		return result;
 	}
 
-	private List<NewsButton> KBHBNGCIOEO(XmlNode MEEAKLDGLDF)
+	private List<NewsButton> ParseNewsButtons(XmlNode MEEAKLDGLDF)
 	{
 		List<NewsButton> list = new List<NewsButton>();
 		foreach (XmlNode item in MEEAKLDGLDF)
 		{
 			NewsButton fBKMFDJBJIB = new NewsButton();
-			fBKMFDJBJIB.GGDJIPKMKFC = item.Attributes["Text"].CIPOICEEIBK(string.Empty);
-			fBKMFDJBJIB.Color = LabelButton.GetBtnColor(item.Attributes["Color"].CIPOICEEIBK(string.Empty));
-			fBKMFDJBJIB.Url = item.Attributes["Url"].CIPOICEEIBK(string.Empty);
-			fBKMFDJBJIB.EGBHELMJJKO = item.Attributes["GoShop"].ParseBool();
-			fBKMFDJBJIB.KCBCGDFKNME = item.Attributes["BuyItem"].ParseBool();
-			fBKMFDJBJIB.COIGFENOMJD = item.Attributes["RedirectShop"].CIPOICEEIBK(string.Empty);
+			fBKMFDJBJIB.LabelAliasName = item.Attributes["Text"].GetStringOrDefault(string.Empty);
+			fBKMFDJBJIB.Color = LabelButton.GetBtnColor(item.Attributes["Color"].GetStringOrDefault(string.Empty));
+			fBKMFDJBJIB.Url = item.Attributes["Url"].GetStringOrDefault(string.Empty);
+			fBKMFDJBJIB.GoShop = item.Attributes["GoShop"].ParseBool();
+			fBKMFDJBJIB.BuyItem = item.Attributes["BuyItem"].ParseBool();
+			fBKMFDJBJIB.RedirectShop = item.Attributes["RedirectShop"].GetStringOrDefault(string.Empty);
 			list.Add(fBKMFDJBJIB);
 		}
 		return list;
 	}
 
-	private bool KANBBNPLMMM(KeyValuePair<string, string> HFCAPMDHLJN)
+	private bool IsEmptyPair(KeyValuePair<string, string> HFCAPMDHLJN)
 	{
 		return string.IsNullOrEmpty(HFCAPMDHLJN.Key) && string.IsNullOrEmpty(HFCAPMDHLJN.Value);
 	}
 
-	private KeyValuePair<string, string> KMJMDEKMCNO(XmlNode AIDFCDDECJB)
+	private KeyValuePair<string, string> ParseUrlPair(XmlNode AIDFCDDECJB)
 	{
 		string key = null;
 		string value = null;
@@ -479,20 +479,20 @@ public class GeneralConfig
 			int bAINMLLIKOL = childNode.Attributes["PlatformID"].ParseInt();
 			if (CheckPlatform(bAINMLLIKOL))
 			{
-				key = childNode.Attributes["PutUrl"].CIPOICEEIBK(string.Empty);
-				value = childNode.Attributes["GetUrl"].CIPOICEEIBK(string.Empty);
+				key = childNode.Attributes["PutUrl"].GetStringOrDefault(string.Empty);
+				value = childNode.Attributes["GetUrl"].GetStringOrDefault(string.Empty);
 			}
 		}
 		return new KeyValuePair<string, string>(key, value);
 	}
 
-	private void EKAHAGFFJOO(XmlNode node)
+	private void ParsePrices(XmlNode node)
 	{
 		if (node.ChildNodes.Count != 0)
 		{
-			IHHMHNHOLCB.GMCBGMPEHLF().Clear();
-			ParsePricesForLocale(node, SystemProperties.NICPICAMAOH().OAPHJAPMKJG);
-			ParsePricesForLocale(node, SystemProperties.NICPICAMAOH().OHCHKFMFDKM());
+			Prices.GetPrices().Clear();
+			ParsePricesForLocale(node, SystemProperties.GetDeviceInfo().Locale);
+			ParsePricesForLocale(node, SystemProperties.GetDeviceInfo().GetLanguage());
 		}
 	}
 
@@ -504,61 +504,61 @@ public class GeneralConfig
 			{
 				continue;
 			}
-			PricesData bEOLBLGJCKA = FFMKNHLDFDF(childNode);
-			if (!string.IsNullOrEmpty(bEOLBLGJCKA.EOMNCDDELLB) && !IsOkLocale(bEOLBLGJCKA.EOMNCDDELLB, EADIFEPJKJK))
+			PricesData bEOLBLGJCKA = ParsePriceNode(childNode);
+			if (!string.IsNullOrEmpty(bEOLBLGJCKA.Locale) && !IsOkLocale(bEOLBLGJCKA.Locale, EADIFEPJKJK))
 			{
 				continue;
 			}
-			PricesData bEOLBLGJCKA2 = IHHMHNHOLCB.CCFOOCDFGMF(bEOLBLGJCKA.GNIJPFLLNIC);
+			PricesData bEOLBLGJCKA2 = Prices.FindByProductId(bEOLBLGJCKA.ProductId);
 			if (bEOLBLGJCKA2 == null)
 			{
-				IHHMHNHOLCB.GMCBGMPEHLF().Add(bEOLBLGJCKA);
+				Prices.GetPrices().Add(bEOLBLGJCKA);
 				continue;
 			}
-			bool flag = bEOLBLGJCKA.PHMJCFDJAMJ == bEOLBLGJCKA2.PHMJCFDJAMJ;
-			bool flag2 = bEOLBLGJCKA.EJENJNPEDOH == bEOLBLGJCKA2.EJENJNPEDOH || string.IsNullOrEmpty(bEOLBLGJCKA2.EJENJNPEDOH);
+			bool flag = bEOLBLGJCKA.GroupId == bEOLBLGJCKA2.GroupId;
+			bool flag2 = bEOLBLGJCKA.SpenderTypeId == bEOLBLGJCKA2.SpenderTypeId || string.IsNullOrEmpty(bEOLBLGJCKA2.SpenderTypeId);
 			if (flag && flag2)
 			{
-				if (string.IsNullOrEmpty(bEOLBLGJCKA2.EOMNCDDELLB))
+				if (string.IsNullOrEmpty(bEOLBLGJCKA2.Locale))
 				{
-					IHHMHNHOLCB.GMCBGMPEHLF().Remove(bEOLBLGJCKA2);
-					IHHMHNHOLCB.GMCBGMPEHLF().Add(bEOLBLGJCKA);
+					Prices.GetPrices().Remove(bEOLBLGJCKA2);
+					Prices.GetPrices().Add(bEOLBLGJCKA);
 				}
 			}
 			else
 			{
-				IHHMHNHOLCB.GMCBGMPEHLF().Add(bEOLBLGJCKA);
+				Prices.GetPrices().Add(bEOLBLGJCKA);
 			}
 		}
 	}
 
-	private PricesData FFMKNHLDFDF(XmlNode node)
+	private PricesData ParsePriceNode(XmlNode node)
 	{
 		PricesData bEOLBLGJCKA = new PricesData();
-		bEOLBLGJCKA.GNIJPFLLNIC = node.Attributes["ProductID"].CIPOICEEIBK();
-		bEOLBLGJCKA.GFMKCJPKMOK = node.Attributes["NewProductID"].CIPOICEEIBK();
-		bEOLBLGJCKA.NICNMHCJIBJ = node.Attributes["Amount"].ParseLong(0L);
-		bEOLBLGJCKA.AJKMNFGEHIJ = node.Attributes["NewAmount"].ParseLong(0L);
-		bEOLBLGJCKA.ABAINMKLBAM = node.Attributes["AddAmount"].ParseLong(0L);
-		bEOLBLGJCKA.IIHKEOHAKDJ = node.Attributes["NewAddAmount"].ParseLong(0L);
-		bEOLBLGJCKA.LMNMPHGIFAF = node.Attributes["Price"].CIPOICEEIBK();
-		bEOLBLGJCKA.DDHOJFFGBKM = node.Attributes["NewPrice"].CIPOICEEIBK();
-		bEOLBLGJCKA.JGMODPBJHAD = node.Attributes["Currency"].ParseInt();
-		bEOLBLGJCKA.KBCEJHOADJK = node.Attributes["AddCurrency"].CIPOICEEIBK();
-		bEOLBLGJCKA.name = node.Attributes["Name"].CIPOICEEIBK();
-		bEOLBLGJCKA.OFPIHGHEJAH = node.Attributes["StartDate"].ParseInt();
-		bEOLBLGJCKA.MCEDKIPLOMO = node.Attributes["EndDate"].ParseInt();
-		bEOLBLGJCKA.AOJJBKLCHJO = node.Attributes["Sign"].CIPOICEEIBK();
-		bEOLBLGJCKA.AIFNAPNLOML = node.Attributes["SignCode"].CIPOICEEIBK("USD");
-		bEOLBLGJCKA.ICBBNJMLDJH = node.Attributes["Label"].CIPOICEEIBK(string.Empty);
-		bEOLBLGJCKA.PHMJCFDJAMJ = node.Attributes["GroupID"].CIPOICEEIBK(string.Empty);
-		bEOLBLGJCKA.BKDNJPAOAEL = node.Attributes["AddPercent"].ParseInt();
-		bEOLBLGJCKA.EOMNCDDELLB = node.Attributes["Locale"].CIPOICEEIBK(string.Empty);
-		bEOLBLGJCKA.PBAMOKEPKBG = node.Attributes["Focus"].ParseBool();
-		bEOLBLGJCKA.GGDANLHOOKB = node.Attributes["MobileOperator"].CIPOICEEIBK(string.Empty);
-		bEOLBLGJCKA.EJENJNPEDOH = node.Attributes["SpenderTypeID"].CIPOICEEIBK(string.Empty);
+		bEOLBLGJCKA.ProductId = node.Attributes["ProductID"].GetStringOrDefault();
+		bEOLBLGJCKA.NewProductId = node.Attributes["NewProductID"].GetStringOrDefault();
+		bEOLBLGJCKA.Amount = node.Attributes["Amount"].ParseLong(0L);
+		bEOLBLGJCKA.NewAmount = node.Attributes["NewAmount"].ParseLong(0L);
+		bEOLBLGJCKA.AddAmount = node.Attributes["AddAmount"].ParseLong(0L);
+		bEOLBLGJCKA.NewAddAmount = node.Attributes["NewAddAmount"].ParseLong(0L);
+		bEOLBLGJCKA.Price = node.Attributes["Price"].GetStringOrDefault();
+		bEOLBLGJCKA.NewPrice = node.Attributes["NewPrice"].GetStringOrDefault();
+		bEOLBLGJCKA.Currency = node.Attributes["Currency"].ParseInt();
+		bEOLBLGJCKA.AddCurrency = node.Attributes["AddCurrency"].GetStringOrDefault();
+		bEOLBLGJCKA.name = node.Attributes["Name"].GetStringOrDefault();
+		bEOLBLGJCKA.StartDate = node.Attributes["StartDate"].ParseInt();
+		bEOLBLGJCKA.EndDate = node.Attributes["EndDate"].ParseInt();
+		bEOLBLGJCKA.Sign = node.Attributes["Sign"].GetStringOrDefault();
+		bEOLBLGJCKA.SignCode = node.Attributes["SignCode"].GetStringOrDefault("USD");
+		bEOLBLGJCKA.Label = node.Attributes["Label"].GetStringOrDefault(string.Empty);
+		bEOLBLGJCKA.GroupId = node.Attributes["GroupID"].GetStringOrDefault(string.Empty);
+		bEOLBLGJCKA.AddPercent = node.Attributes["AddPercent"].ParseInt();
+		bEOLBLGJCKA.Locale = node.Attributes["Locale"].GetStringOrDefault(string.Empty);
+		bEOLBLGJCKA.Focus = node.Attributes["Focus"].ParseBool();
+		bEOLBLGJCKA.MobileOperator = node.Attributes["MobileOperator"].GetStringOrDefault(string.Empty);
+		bEOLBLGJCKA.SpenderTypeId = node.Attributes["SpenderTypeID"].GetStringOrDefault(string.Empty);
 		PricesData bEOLBLGJCKA2 = bEOLBLGJCKA;
-		bEOLBLGJCKA2.ALAFFFIOIFI = node.Attributes["ProductType"].ParseInt(1) != 2;
+		bEOLBLGJCKA2.IsConsumable = node.Attributes["ProductType"].ParseInt(1) != 2;
 		return bEOLBLGJCKA2;
 	}
 
@@ -582,22 +582,22 @@ public class GeneralConfig
 
 	private bool CheckPlatform(int value)
 	{
-		return value == 0 || (SystemProperties.MEBGOGMJFLM() && value == 1) || (SystemProperties.IPJFCBAGMJJ() && value == 2) || (SystemProperties.LHGPKEFEHDH() && value == 3) || (SystemProperties.AFKGHBJPLOK() && value == 4) || (SystemProperties.NFFOJCHNPJD() && value == 5);
+		return value == 0 || (SystemProperties.IsIosPlatform() && value == 1) || (SystemProperties.IsAndroidPlatform() && value == 2) || (SystemProperties.IsEditorPlatform() && value == 3) || (SystemProperties.IsMetroArmPlatform() && value == 4) || (SystemProperties.IsWindowsStorePlatform() && value == 5);
 	}
 
-	private void OGIJONMKABB()
+	private void InvokeCallback()
 	{
 		if (_Callback != null)
 		{
-			_Callback(OIPHJPKPPAJ);
-			OIPHJPKPPAJ = false;
+			_Callback(callbackResult);
+			callbackResult = false;
 			_Callback = null;
 		}
 	}
 
-	public static void LOGLOMLEHFI()
+	public static void WipeExternalConfig()
 	{
-		LLLOJBFMONN.Write("[GeneralConfig] wipe external config");
-		HCEPBIAOJKG.BKLIKICKDPH(SF2Paths.GBOFOFGDMBN() + "/config_cdn.xml");
+		GameLog.Write("[GeneralConfig] wipe external config");
+		FileUtils.DeleteFile(SF2Paths.GetWritableGameDataPath() + "/config_cdn.xml");
 	}
 }

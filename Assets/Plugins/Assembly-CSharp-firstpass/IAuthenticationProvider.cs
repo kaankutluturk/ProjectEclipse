@@ -1,22 +1,22 @@
 public interface IAuthenticationProvider
 {
-	bool CBIBNHGGEBI { get; }
+	bool RequiresPreAuth { get; }
 
-	event LACLODBGJEI EFCGDJPAJIG;
+	event OnAuthenticationSuccededDelegate AuthenticationSucceeded;
 
-	event BCHANFGJONF HMIFKIFAFMK;
+	event OnAuthenticationFailedDelegate AuthenticationFailed;
 
-	bool MCHOHLKGMBI();
+	bool GetIsPreAuthRequired();
 
-	void IJPBAJDFAED(LACLODBGJEI value);
+	void AddAuthenticationSucceeded(OnAuthenticationSuccededDelegate value);
 
-	void KFGAHIPDDOF(LACLODBGJEI value);
+	void RemoveAuthenticationSucceeded(OnAuthenticationSuccededDelegate value);
 
-	void NEAGLBOCLHI(BCHANFGJONF value);
+	void AddAuthenticationFailed(OnAuthenticationFailedDelegate value);
 
-	void BFANLHDOICD(BCHANFGJONF value);
+	void RemoveAuthenticationFailed(OnAuthenticationFailedDelegate value);
 
-	void MKODIGEMHFN();
+	void StartAuthentication();
 
-	void PrepareRequest(HTTPRequest ONOCIELLAPL, FHIEGKMHOCC LFLGCDNKNJI);
+	void PrepareRequest(HTTPRequest ONOCIELLAPL, SignalRRequestType LFLGCDNKNJI);
 }

@@ -2,7 +2,7 @@ using System;
 
 internal sealed class InflateBlocks
 {
-	private enum NHGOBMFNMLD
+	private enum InflateBlockMode
 	{
 		TYPE = 0,
 		LENS = 1,
@@ -18,90 +18,90 @@ internal sealed class InflateBlocks
 
 	private const int MANY = 1440;
 
-	internal static readonly int[] LCKCNAGJMGG = new int[19]
+	internal static readonly int[] border = new int[19]
 	{
 		16, 17, 18, 0, 8, 7, 9, 6, 10, 5,
 		11, 4, 12, 3, 13, 2, 14, 1, 15
 	};
 
-	private NHGOBMFNMLD NMMPBADCFHK;
+	private InflateBlockMode mode;
 
-	internal int MKICABFAHFA;
+	internal int left;
 
-	internal int BFGHBIMJHAK;
+	internal int table;
 
 	internal int index;
 
-	internal int[] DKFIBIMAJLL;
+	internal int[] blens;
 
-	internal int[] KKFMKNCBLDC = new int[1];
+	internal int[] bb = new int[1];
 
-	internal int[] ILPHPGNPGAE = new int[1];
+	internal int[] tb = new int[1];
 
-	internal InflateCodes ELBFMJHINKF = new InflateCodes();
+	internal InflateCodes codes = new InflateCodes();
 
-	internal int IBMGAPMHMOB;
+	internal int last;
 
-	internal ZlibCodec CJMKCEHHMCH;
+	internal ZlibCodec _codec;
 
-	internal int DBFGKGGCEAI;
+	internal int bitk;
 
-	internal int FPGCIJMGFLH;
+	internal int bitb;
 
-	internal int[] GAMNAIHAIDP;
+	internal int[] hufts;
 
 	internal byte[] window;
 
-	internal int PCLFFOBJJFO;
+	internal int end;
 
-	internal int IONENIAEDKJ;
+	internal int readAt;
 
-	internal int HBFBCHDJEBM;
+	internal int writeAt;
 
 	internal object checkfn;
 
 	internal uint check;
 
-	internal InfTree BPLHOPHCKPC = new InfTree();
+	internal InfTree inftree = new InfTree();
 
 	internal InflateBlocks(ZlibCodec HNJFOALABOA, object checkfn, int OKPHBCHECPI)
 	{
-		CJMKCEHHMCH = HNJFOALABOA;
-		GAMNAIHAIDP = new int[4320];
+		_codec = HNJFOALABOA;
+		hufts = new int[4320];
 		window = new byte[OKPHBCHECPI];
-		PCLFFOBJJFO = OKPHBCHECPI;
+		end = OKPHBCHECPI;
 		this.checkfn = checkfn;
-		NMMPBADCFHK = NHGOBMFNMLD.TYPE;
+		mode = InflateBlockMode.TYPE;
 		Reset();
 	}
 
 	internal uint Reset()
 	{
 		uint iADLPBPGLKO = check;
-		NMMPBADCFHK = NHGOBMFNMLD.TYPE;
-		DBFGKGGCEAI = 0;
-		FPGCIJMGFLH = 0;
-		IONENIAEDKJ = (HBFBCHDJEBM = 0);
+		mode = InflateBlockMode.TYPE;
+		bitk = 0;
+		bitb = 0;
+		readAt = (writeAt = 0);
 		if (checkfn != null)
 		{
-			CJMKCEHHMCH._Adler32 = (check = Adler.IAJPFDALGJM(0u, null, 0, 0));
+			_codec._Adler32 = (check = Adler.Adler32(0u, null, 0, 0));
 		}
 		return iADLPBPGLKO;
 	}
 
-	internal int HDEHLIKBKJG(int BOPODEAIEBJ)
+	internal int Process(int BOPODEAIEBJ)
 	{
-		int num = CJMKCEHHMCH.LMIPBGGILEJ;
-		int num2 = CJMKCEHHMCH.IAPJEIDMGNP;
-		int num3 = FPGCIJMGFLH;
-		int i = DBFGKGGCEAI;
-		int num4 = HBFBCHDJEBM;
-		int num5 = ((num4 >= IONENIAEDKJ) ? (PCLFFOBJJFO - num4) : (IONENIAEDKJ - num4 - 1));
+		int num = _codec.NextIn;
+		int num2 = _codec.AvailableBytesIn;
+		int num3 = bitb;
+		int i = bitk;
+		int num4 = writeAt;
+		int num5 = ((num4 >= readAt) ? (end - num4) : (readAt - num4 - 1));
 		while (true)
 		{
-			switch (NMMPBADCFHK)
+			switch (mode)
 			{
-			case NHGOBMFNMLD.TYPE:
+			case InflateBlockMode.TYPE:
 			{
 				for (; i < 3; i += 8)
 				{
@@ -109,19 +109,19 @@ internal sealed class InflateBlocks
 					{
 						BOPODEAIEBJ = 0;
 						num2--;
-						num3 |= (CJMKCEHHMCH.PEFOCMDODLD[num++] & 0xFF) << i;
+						num3 |= (_codec.InputBuffer[num++] & 0xFF) << i;
 						continue;
 					}
-					FPGCIJMGFLH = num3;
-					DBFGKGGCEAI = i;
-					CJMKCEHHMCH.IAPJEIDMGNP = num2;
-					CJMKCEHHMCH.ALJBBHPGGPA += num - CJMKCEHHMCH.LMIPBGGILEJ;
-					CJMKCEHHMCH.LMIPBGGILEJ = num;
-					HBFBCHDJEBM = num4;
-					return MKPBJGMJPMI(BOPODEAIEBJ);
+					bitb = num3;
+					bitk = i;
+					_codec.AvailableBytesIn = num2;
+					_codec.TotalBytesIn += num - _codec.NextIn;
+					_codec.NextIn = num;
+					writeAt = num4;
+					return Flush(BOPODEAIEBJ);
 				}
 				int num6 = num3 & 7;
-				IBMGAPMHMOB = num6 & 1;
+				last = num6 & 1;
 				switch ((uint)num6 >> 1)
 				{
 				case 0u:
@@ -130,7 +130,7 @@ internal sealed class InflateBlocks
 					num6 = i & 7;
 					num3 >>= num6;
 					i -= num6;
-					NMMPBADCFHK = NHGOBMFNMLD.LENS;
+					mode = InflateBlockMode.LENS;
 					break;
 				case 1u:
 				{
@@ -138,113 +138,113 @@ internal sealed class InflateBlocks
 					int[] array2 = new int[1];
 					int[][] array3 = new int[1][];
 					int[][] array4 = new int[1][];
-					InfTree.KFBEFCDGIDA(array, array2, array3, array4, CJMKCEHHMCH);
-					ELBFMJHINKF.Init(array[0], array2[0], array3[0], 0, array4[0], 0);
+					InfTree.inflate_trees_fixed(array, array2, array3, array4, _codec);
+					codes.Init(array[0], array2[0], array3[0], 0, array4[0], 0);
 					num3 >>= 3;
 					i -= 3;
-					NMMPBADCFHK = NHGOBMFNMLD.CODES;
+					mode = InflateBlockMode.CODES;
 					break;
 				}
 				case 2u:
 					num3 >>= 3;
 					i -= 3;
-					NMMPBADCFHK = NHGOBMFNMLD.TABLE;
+					mode = InflateBlockMode.TABLE;
 					break;
 				case 3u:
 					num3 >>= 3;
 					i -= 3;
-					NMMPBADCFHK = NHGOBMFNMLD.BAD;
-					CJMKCEHHMCH.Message = "invalid block type";
+					mode = InflateBlockMode.BAD;
+					_codec.Message = "invalid block type";
 					BOPODEAIEBJ = -3;
-					FPGCIJMGFLH = num3;
-					DBFGKGGCEAI = i;
-					CJMKCEHHMCH.IAPJEIDMGNP = num2;
-					CJMKCEHHMCH.ALJBBHPGGPA += num - CJMKCEHHMCH.LMIPBGGILEJ;
-					CJMKCEHHMCH.LMIPBGGILEJ = num;
-					HBFBCHDJEBM = num4;
-					return MKPBJGMJPMI(BOPODEAIEBJ);
+					bitb = num3;
+					bitk = i;
+					_codec.AvailableBytesIn = num2;
+					_codec.TotalBytesIn += num - _codec.NextIn;
+					_codec.NextIn = num;
+					writeAt = num4;
+					return Flush(BOPODEAIEBJ);
 				}
 				break;
 			}
-			case NHGOBMFNMLD.LENS:
+			case InflateBlockMode.LENS:
 				for (; i < 32; i += 8)
 				{
 					if (num2 != 0)
 					{
 						BOPODEAIEBJ = 0;
 						num2--;
-						num3 |= (CJMKCEHHMCH.PEFOCMDODLD[num++] & 0xFF) << i;
+						num3 |= (_codec.InputBuffer[num++] & 0xFF) << i;
 						continue;
 					}
-					FPGCIJMGFLH = num3;
-					DBFGKGGCEAI = i;
-					CJMKCEHHMCH.IAPJEIDMGNP = num2;
-					CJMKCEHHMCH.ALJBBHPGGPA += num - CJMKCEHHMCH.LMIPBGGILEJ;
-					CJMKCEHHMCH.LMIPBGGILEJ = num;
-					HBFBCHDJEBM = num4;
-					return MKPBJGMJPMI(BOPODEAIEBJ);
+					bitb = num3;
+					bitk = i;
+					_codec.AvailableBytesIn = num2;
+					_codec.TotalBytesIn += num - _codec.NextIn;
+					_codec.NextIn = num;
+					writeAt = num4;
+					return Flush(BOPODEAIEBJ);
 				}
 				if (((~num3 >> 16) & 0xFFFF) != (num3 & 0xFFFF))
 				{
-					NMMPBADCFHK = NHGOBMFNMLD.BAD;
-					CJMKCEHHMCH.Message = "invalid stored block lengths";
+					mode = InflateBlockMode.BAD;
+					_codec.Message = "invalid stored block lengths";
 					BOPODEAIEBJ = -3;
-					FPGCIJMGFLH = num3;
-					DBFGKGGCEAI = i;
-					CJMKCEHHMCH.IAPJEIDMGNP = num2;
-					CJMKCEHHMCH.ALJBBHPGGPA += num - CJMKCEHHMCH.LMIPBGGILEJ;
-					CJMKCEHHMCH.LMIPBGGILEJ = num;
-					HBFBCHDJEBM = num4;
-					return MKPBJGMJPMI(BOPODEAIEBJ);
+					bitb = num3;
+					bitk = i;
+					_codec.AvailableBytesIn = num2;
+					_codec.TotalBytesIn += num - _codec.NextIn;
+					_codec.NextIn = num;
+					writeAt = num4;
+					return Flush(BOPODEAIEBJ);
 				}
-				MKICABFAHFA = num3 & 0xFFFF;
+				left = num3 & 0xFFFF;
 				num3 = (i = 0);
-				NMMPBADCFHK = ((MKICABFAHFA != 0) ? NHGOBMFNMLD.STORED : ((IBMGAPMHMOB != 0) ? NHGOBMFNMLD.DRY : NHGOBMFNMLD.TYPE));
+				mode = ((left != 0) ? InflateBlockMode.STORED : ((last != 0) ? InflateBlockMode.DRY : InflateBlockMode.TYPE));
 				break;
-			case NHGOBMFNMLD.STORED:
+			case InflateBlockMode.STORED:
 			{
 				if (num2 == 0)
 				{
-					FPGCIJMGFLH = num3;
-					DBFGKGGCEAI = i;
-					CJMKCEHHMCH.IAPJEIDMGNP = num2;
-					CJMKCEHHMCH.ALJBBHPGGPA += num - CJMKCEHHMCH.LMIPBGGILEJ;
-					CJMKCEHHMCH.LMIPBGGILEJ = num;
-					HBFBCHDJEBM = num4;
-					return MKPBJGMJPMI(BOPODEAIEBJ);
+					bitb = num3;
+					bitk = i;
+					_codec.AvailableBytesIn = num2;
+					_codec.TotalBytesIn += num - _codec.NextIn;
+					_codec.NextIn = num;
+					writeAt = num4;
+					return Flush(BOPODEAIEBJ);
 				}
 				if (num5 == 0)
 				{
-					if (num4 == PCLFFOBJJFO && IONENIAEDKJ != 0)
+					if (num4 == end && readAt != 0)
 					{
 						num4 = 0;
-						num5 = ((num4 >= IONENIAEDKJ) ? (PCLFFOBJJFO - num4) : (IONENIAEDKJ - num4 - 1));
+						num5 = ((num4 >= readAt) ? (end - num4) : (readAt - num4 - 1));
 					}
 					if (num5 == 0)
 					{
-						HBFBCHDJEBM = num4;
-						BOPODEAIEBJ = MKPBJGMJPMI(BOPODEAIEBJ);
-						num4 = HBFBCHDJEBM;
-						num5 = ((num4 >= IONENIAEDKJ) ? (PCLFFOBJJFO - num4) : (IONENIAEDKJ - num4 - 1));
-						if (num4 == PCLFFOBJJFO && IONENIAEDKJ != 0)
+						writeAt = num4;
+						BOPODEAIEBJ = Flush(BOPODEAIEBJ);
+						num4 = writeAt;
+						num5 = ((num4 >= readAt) ? (end - num4) : (readAt - num4 - 1));
+						if (num4 == end && readAt != 0)
 						{
 							num4 = 0;
-							num5 = ((num4 >= IONENIAEDKJ) ? (PCLFFOBJJFO - num4) : (IONENIAEDKJ - num4 - 1));
+							num5 = ((num4 >= readAt) ? (end - num4) : (readAt - num4 - 1));
 						}
 						if (num5 == 0)
 						{
-							FPGCIJMGFLH = num3;
-							DBFGKGGCEAI = i;
-							CJMKCEHHMCH.IAPJEIDMGNP = num2;
-							CJMKCEHHMCH.ALJBBHPGGPA += num - CJMKCEHHMCH.LMIPBGGILEJ;
-							CJMKCEHHMCH.LMIPBGGILEJ = num;
-							HBFBCHDJEBM = num4;
-							return MKPBJGMJPMI(BOPODEAIEBJ);
+							bitb = num3;
+							bitk = i;
+							_codec.AvailableBytesIn = num2;
+							_codec.TotalBytesIn += num - _codec.NextIn;
+							_codec.NextIn = num;
+							writeAt = num4;
+							return Flush(BOPODEAIEBJ);
 						}
 					}
 				}
 				BOPODEAIEBJ = 0;
-				int num6 = MKICABFAHFA;
+				int num6 = left;
 				if (num6 > num2)
 				{
 					num6 = num2;
@@ -253,18 +253,18 @@ internal sealed class InflateBlocks
 				{
 					num6 = num5;
 				}
-				Array.Copy(CJMKCEHHMCH.PEFOCMDODLD, num, window, num4, num6);
+				Array.Copy(_codec.InputBuffer, num, window, num4, num6);
 				num += num6;
 				num2 -= num6;
 				num4 += num6;
 				num5 -= num6;
-				if ((MKICABFAHFA -= num6) == 0)
+				if ((left -= num6) == 0)
 				{
-					NMMPBADCFHK = ((IBMGAPMHMOB != 0) ? NHGOBMFNMLD.DRY : NHGOBMFNMLD.TYPE);
+					mode = ((last != 0) ? InflateBlockMode.DRY : InflateBlockMode.TYPE);
 				}
 				break;
 			}
-			case NHGOBMFNMLD.TABLE:
+			case InflateBlockMode.TABLE:
 			{
 				for (; i < 14; i += 8)
 				{
@@ -272,49 +272,49 @@ internal sealed class InflateBlocks
 					{
 						BOPODEAIEBJ = 0;
 						num2--;
-						num3 |= (CJMKCEHHMCH.PEFOCMDODLD[num++] & 0xFF) << i;
+						num3 |= (_codec.InputBuffer[num++] & 0xFF) << i;
 						continue;
 					}
-					FPGCIJMGFLH = num3;
-					DBFGKGGCEAI = i;
-					CJMKCEHHMCH.IAPJEIDMGNP = num2;
-					CJMKCEHHMCH.ALJBBHPGGPA += num - CJMKCEHHMCH.LMIPBGGILEJ;
-					CJMKCEHHMCH.LMIPBGGILEJ = num;
-					HBFBCHDJEBM = num4;
-					return MKPBJGMJPMI(BOPODEAIEBJ);
+					bitb = num3;
+					bitk = i;
+					_codec.AvailableBytesIn = num2;
+					_codec.TotalBytesIn += num - _codec.NextIn;
+					_codec.NextIn = num;
+					writeAt = num4;
+					return Flush(BOPODEAIEBJ);
 				}
-				int num6 = (BFGHBIMJHAK = num3 & 0x3FFF);
+				int num6 = (table = num3 & 0x3FFF);
 				if ((num6 & 0x1F) > 29 || ((num6 >> 5) & 0x1F) > 29)
 				{
-					NMMPBADCFHK = NHGOBMFNMLD.BAD;
-					CJMKCEHHMCH.Message = "too many length or distance symbols";
+					mode = InflateBlockMode.BAD;
+					_codec.Message = "too many length or distance symbols";
 					BOPODEAIEBJ = -3;
-					FPGCIJMGFLH = num3;
-					DBFGKGGCEAI = i;
-					CJMKCEHHMCH.IAPJEIDMGNP = num2;
-					CJMKCEHHMCH.ALJBBHPGGPA += num - CJMKCEHHMCH.LMIPBGGILEJ;
-					CJMKCEHHMCH.LMIPBGGILEJ = num;
-					HBFBCHDJEBM = num4;
-					return MKPBJGMJPMI(BOPODEAIEBJ);
+					bitb = num3;
+					bitk = i;
+					_codec.AvailableBytesIn = num2;
+					_codec.TotalBytesIn += num - _codec.NextIn;
+					_codec.NextIn = num;
+					writeAt = num4;
+					return Flush(BOPODEAIEBJ);
 				}
 				num6 = 258 + (num6 & 0x1F) + ((num6 >> 5) & 0x1F);
-				if (DKFIBIMAJLL == null || DKFIBIMAJLL.Length < num6)
+				if (blens == null || blens.Length < num6)
 				{
-					DKFIBIMAJLL = new int[num6];
+					blens = new int[num6];
 				}
 				else
 				{
-					Array.Clear(DKFIBIMAJLL, 0, num6);
+					Array.Clear(blens, 0, num6);
 				}
 				num3 >>= 14;
 				i -= 14;
 				index = 0;
-				NMMPBADCFHK = NHGOBMFNMLD.BTREE;
-				goto case NHGOBMFNMLD.BTREE;
+				mode = InflateBlockMode.BTREE;
+				goto case InflateBlockMode.BTREE;
 			}
-			case NHGOBMFNMLD.BTREE:
+			case InflateBlockMode.BTREE:
 			{
-				while (index < 4 + (BFGHBIMJHAK >> 10))
+				while (index < 4 + (table >> 10))
 				{
 					for (; i < 3; i += 8)
 					{
@@ -322,81 +322,81 @@ internal sealed class InflateBlocks
 						{
 							BOPODEAIEBJ = 0;
 							num2--;
-							num3 |= (CJMKCEHHMCH.PEFOCMDODLD[num++] & 0xFF) << i;
+							num3 |= (_codec.InputBuffer[num++] & 0xFF) << i;
 							continue;
 						}
-						FPGCIJMGFLH = num3;
-						DBFGKGGCEAI = i;
-						CJMKCEHHMCH.IAPJEIDMGNP = num2;
-						CJMKCEHHMCH.ALJBBHPGGPA += num - CJMKCEHHMCH.LMIPBGGILEJ;
-						CJMKCEHHMCH.LMIPBGGILEJ = num;
-						HBFBCHDJEBM = num4;
-						return MKPBJGMJPMI(BOPODEAIEBJ);
+						bitb = num3;
+						bitk = i;
+						_codec.AvailableBytesIn = num2;
+						_codec.TotalBytesIn += num - _codec.NextIn;
+						_codec.NextIn = num;
+						writeAt = num4;
+						return Flush(BOPODEAIEBJ);
 					}
-					DKFIBIMAJLL[LCKCNAGJMGG[index++]] = num3 & 7;
+					blens[border[index++]] = num3 & 7;
 					num3 >>= 3;
 					i -= 3;
 				}
 				while (index < 19)
 				{
-					DKFIBIMAJLL[LCKCNAGJMGG[index++]] = 0;
+					blens[border[index++]] = 0;
 				}
-				KKFMKNCBLDC[0] = 7;
-				int num6 = BPLHOPHCKPC.NLOHPGJGJJN(DKFIBIMAJLL, KKFMKNCBLDC, ILPHPGNPGAE, GAMNAIHAIDP, CJMKCEHHMCH);
+				bb[0] = 7;
+				int num6 = inftree.inflate_trees_bits(blens, bb, tb, hufts, _codec);
 				if (num6 != 0)
 				{
 					BOPODEAIEBJ = num6;
 					if (BOPODEAIEBJ == -3)
 					{
-						DKFIBIMAJLL = null;
-						NMMPBADCFHK = NHGOBMFNMLD.BAD;
+						blens = null;
+						mode = InflateBlockMode.BAD;
 					}
-					FPGCIJMGFLH = num3;
-					DBFGKGGCEAI = i;
-					CJMKCEHHMCH.IAPJEIDMGNP = num2;
-					CJMKCEHHMCH.ALJBBHPGGPA += num - CJMKCEHHMCH.LMIPBGGILEJ;
-					CJMKCEHHMCH.LMIPBGGILEJ = num;
-					HBFBCHDJEBM = num4;
-					return MKPBJGMJPMI(BOPODEAIEBJ);
+					bitb = num3;
+					bitk = i;
+					_codec.AvailableBytesIn = num2;
+					_codec.TotalBytesIn += num - _codec.NextIn;
+					_codec.NextIn = num;
+					writeAt = num4;
+					return Flush(BOPODEAIEBJ);
 				}
 				index = 0;
-				NMMPBADCFHK = NHGOBMFNMLD.DTREE;
-				goto case NHGOBMFNMLD.DTREE;
+				mode = InflateBlockMode.DTREE;
+				goto case InflateBlockMode.DTREE;
 			}
-			case NHGOBMFNMLD.DTREE:
+			case InflateBlockMode.DTREE:
 			{
 				int num6;
 				while (true)
 				{
-					num6 = BFGHBIMJHAK;
+					num6 = table;
 					if (index >= 258 + (num6 & 0x1F) + ((num6 >> 5) & 0x1F))
 					{
 						break;
 					}
-					for (num6 = KKFMKNCBLDC[0]; i < num6; i += 8)
+					for (num6 = bb[0]; i < num6; i += 8)
 					{
 						if (num2 != 0)
 						{
 							BOPODEAIEBJ = 0;
 							num2--;
-							num3 |= (CJMKCEHHMCH.PEFOCMDODLD[num++] & 0xFF) << i;
+							num3 |= (_codec.InputBuffer[num++] & 0xFF) << i;
 							continue;
 						}
-						FPGCIJMGFLH = num3;
-						DBFGKGGCEAI = i;
-						CJMKCEHHMCH.IAPJEIDMGNP = num2;
-						CJMKCEHHMCH.ALJBBHPGGPA += num - CJMKCEHHMCH.LMIPBGGILEJ;
-						CJMKCEHHMCH.LMIPBGGILEJ = num;
-						HBFBCHDJEBM = num4;
-						return MKPBJGMJPMI(BOPODEAIEBJ);
+						bitb = num3;
+						bitk = i;
+						_codec.AvailableBytesIn = num2;
+						_codec.TotalBytesIn += num - _codec.NextIn;
+						_codec.NextIn = num;
+						writeAt = num4;
+						return Flush(BOPODEAIEBJ);
 					}
-					num6 = GAMNAIHAIDP[(ILPHPGNPGAE[0] + (num3 & InternalInflateConstants.PEKJPCOGGBP[num6])) * 3 + 1];
-					int num7 = GAMNAIHAIDP[(ILPHPGNPGAE[0] + (num3 & InternalInflateConstants.PEKJPCOGGBP[num6])) * 3 + 2];
+					num6 = hufts[(tb[0] + (num3 & InternalInflateConstants.InflateMask[num6])) * 3 + 1];
+					int num7 = hufts[(tb[0] + (num3 & InternalInflateConstants.InflateMask[num6])) * 3 + 2];
 					if (num7 < 16)
 					{
 						num3 >>= num6;
 						i -= num6;
-						DKFIBIMAJLL[index++] = num7;
+						blens[index++] = num7;
 						continue;
 					}
 					int num8 = ((num7 != 18) ? (num7 - 14) : 7);
@@ -407,170 +407,170 @@ internal sealed class InflateBlocks
 						{
 							BOPODEAIEBJ = 0;
 							num2--;
-							num3 |= (CJMKCEHHMCH.PEFOCMDODLD[num++] & 0xFF) << i;
+							num3 |= (_codec.InputBuffer[num++] & 0xFF) << i;
 							continue;
 						}
-						FPGCIJMGFLH = num3;
-						DBFGKGGCEAI = i;
-						CJMKCEHHMCH.IAPJEIDMGNP = num2;
-						CJMKCEHHMCH.ALJBBHPGGPA += num - CJMKCEHHMCH.LMIPBGGILEJ;
-						CJMKCEHHMCH.LMIPBGGILEJ = num;
-						HBFBCHDJEBM = num4;
-						return MKPBJGMJPMI(BOPODEAIEBJ);
+						bitb = num3;
+						bitk = i;
+						_codec.AvailableBytesIn = num2;
+						_codec.TotalBytesIn += num - _codec.NextIn;
+						_codec.NextIn = num;
+						writeAt = num4;
+						return Flush(BOPODEAIEBJ);
 					}
 					num3 >>= num6;
 					i -= num6;
-					num9 += num3 & InternalInflateConstants.PEKJPCOGGBP[num8];
+					num9 += num3 & InternalInflateConstants.InflateMask[num8];
 					num3 >>= num8;
 					i -= num8;
 					num8 = index;
-					num6 = BFGHBIMJHAK;
+					num6 = table;
 					if (num8 + num9 > 258 + (num6 & 0x1F) + ((num6 >> 5) & 0x1F) || (num7 == 16 && num8 < 1))
 					{
-						DKFIBIMAJLL = null;
-						NMMPBADCFHK = NHGOBMFNMLD.BAD;
-						CJMKCEHHMCH.Message = "invalid bit length repeat";
+						blens = null;
+						mode = InflateBlockMode.BAD;
+						_codec.Message = "invalid bit length repeat";
 						BOPODEAIEBJ = -3;
-						FPGCIJMGFLH = num3;
-						DBFGKGGCEAI = i;
-						CJMKCEHHMCH.IAPJEIDMGNP = num2;
-						CJMKCEHHMCH.ALJBBHPGGPA += num - CJMKCEHHMCH.LMIPBGGILEJ;
-						CJMKCEHHMCH.LMIPBGGILEJ = num;
-						HBFBCHDJEBM = num4;
-						return MKPBJGMJPMI(BOPODEAIEBJ);
+						bitb = num3;
+						bitk = i;
+						_codec.AvailableBytesIn = num2;
+						_codec.TotalBytesIn += num - _codec.NextIn;
+						_codec.NextIn = num;
+						writeAt = num4;
+						return Flush(BOPODEAIEBJ);
 					}
-					num7 = ((num7 == 16) ? DKFIBIMAJLL[num8 - 1] : 0);
+					num7 = ((num7 == 16) ? blens[num8 - 1] : 0);
 					do
 					{
-						DKFIBIMAJLL[num8++] = num7;
+						blens[num8++] = num7;
 					}
 					while (--num9 != 0);
 					index = num8;
 				}
-				ILPHPGNPGAE[0] = -1;
+				tb[0] = -1;
 				int[] array5 = new int[1] { 9 };
 				int[] array6 = new int[1] { 6 };
 				int[] array7 = new int[1];
 				int[] array8 = new int[1];
-				num6 = BFGHBIMJHAK;
-				num6 = BPLHOPHCKPC.ENIFNPJMGIB(257 + (num6 & 0x1F), 1 + ((num6 >> 5) & 0x1F), DKFIBIMAJLL, array5, array6, array7, array8, GAMNAIHAIDP, CJMKCEHHMCH);
+				num6 = table;
+				num6 = inftree.inflate_trees_dynamic(257 + (num6 & 0x1F), 1 + ((num6 >> 5) & 0x1F), blens, array5, array6, array7, array8, hufts, _codec);
 				if (num6 != 0)
 				{
 					if (num6 == -3)
 					{
-						DKFIBIMAJLL = null;
-						NMMPBADCFHK = NHGOBMFNMLD.BAD;
+						blens = null;
+						mode = InflateBlockMode.BAD;
 					}
 					BOPODEAIEBJ = num6;
-					FPGCIJMGFLH = num3;
-					DBFGKGGCEAI = i;
-					CJMKCEHHMCH.IAPJEIDMGNP = num2;
-					CJMKCEHHMCH.ALJBBHPGGPA += num - CJMKCEHHMCH.LMIPBGGILEJ;
-					CJMKCEHHMCH.LMIPBGGILEJ = num;
-					HBFBCHDJEBM = num4;
-					return MKPBJGMJPMI(BOPODEAIEBJ);
+					bitb = num3;
+					bitk = i;
+					_codec.AvailableBytesIn = num2;
+					_codec.TotalBytesIn += num - _codec.NextIn;
+					_codec.NextIn = num;
+					writeAt = num4;
+					return Flush(BOPODEAIEBJ);
 				}
-				ELBFMJHINKF.Init(array5[0], array6[0], GAMNAIHAIDP, array7[0], GAMNAIHAIDP, array8[0]);
-				NMMPBADCFHK = NHGOBMFNMLD.CODES;
-				goto case NHGOBMFNMLD.CODES;
+				codes.Init(array5[0], array6[0], hufts, array7[0], hufts, array8[0]);
+				mode = InflateBlockMode.CODES;
+				goto case InflateBlockMode.CODES;
 			}
-			case NHGOBMFNMLD.CODES:
-				FPGCIJMGFLH = num3;
-				DBFGKGGCEAI = i;
-				CJMKCEHHMCH.IAPJEIDMGNP = num2;
-				CJMKCEHHMCH.ALJBBHPGGPA += num - CJMKCEHHMCH.LMIPBGGILEJ;
-				CJMKCEHHMCH.LMIPBGGILEJ = num;
-				HBFBCHDJEBM = num4;
-				BOPODEAIEBJ = ELBFMJHINKF.HDEHLIKBKJG(this, BOPODEAIEBJ);
+			case InflateBlockMode.CODES:
+				bitb = num3;
+				bitk = i;
+				_codec.AvailableBytesIn = num2;
+				_codec.TotalBytesIn += num - _codec.NextIn;
+				_codec.NextIn = num;
+				writeAt = num4;
+				BOPODEAIEBJ = codes.Process(this, BOPODEAIEBJ);
 				if (BOPODEAIEBJ != 1)
 				{
-					return MKPBJGMJPMI(BOPODEAIEBJ);
+					return Flush(BOPODEAIEBJ);
 				}
 				BOPODEAIEBJ = 0;
-				num = CJMKCEHHMCH.LMIPBGGILEJ;
-				num2 = CJMKCEHHMCH.IAPJEIDMGNP;
-				num3 = FPGCIJMGFLH;
-				i = DBFGKGGCEAI;
-				num4 = HBFBCHDJEBM;
-				num5 = ((num4 >= IONENIAEDKJ) ? (PCLFFOBJJFO - num4) : (IONENIAEDKJ - num4 - 1));
-				if (IBMGAPMHMOB == 0)
+				num = _codec.NextIn;
+				num2 = _codec.AvailableBytesIn;
+				num3 = bitb;
+				i = bitk;
+				num4 = writeAt;
+				num5 = ((num4 >= readAt) ? (end - num4) : (readAt - num4 - 1));
+				if (last == 0)
 				{
-					NMMPBADCFHK = NHGOBMFNMLD.TYPE;
+					mode = InflateBlockMode.TYPE;
 					break;
 				}
-				NMMPBADCFHK = NHGOBMFNMLD.DRY;
-				goto case NHGOBMFNMLD.DRY;
-			case NHGOBMFNMLD.DRY:
-				HBFBCHDJEBM = num4;
-				BOPODEAIEBJ = MKPBJGMJPMI(BOPODEAIEBJ);
-				num4 = HBFBCHDJEBM;
-				num5 = ((num4 >= IONENIAEDKJ) ? (PCLFFOBJJFO - num4) : (IONENIAEDKJ - num4 - 1));
-				if (IONENIAEDKJ != HBFBCHDJEBM)
+				mode = InflateBlockMode.DRY;
+				goto case InflateBlockMode.DRY;
+			case InflateBlockMode.DRY:
+				writeAt = num4;
+				BOPODEAIEBJ = Flush(BOPODEAIEBJ);
+				num4 = writeAt;
+				num5 = ((num4 >= readAt) ? (end - num4) : (readAt - num4 - 1));
+				if (readAt != writeAt)
 				{
-					FPGCIJMGFLH = num3;
-					DBFGKGGCEAI = i;
-					CJMKCEHHMCH.IAPJEIDMGNP = num2;
-					CJMKCEHHMCH.ALJBBHPGGPA += num - CJMKCEHHMCH.LMIPBGGILEJ;
-					CJMKCEHHMCH.LMIPBGGILEJ = num;
-					HBFBCHDJEBM = num4;
-					return MKPBJGMJPMI(BOPODEAIEBJ);
+					bitb = num3;
+					bitk = i;
+					_codec.AvailableBytesIn = num2;
+					_codec.TotalBytesIn += num - _codec.NextIn;
+					_codec.NextIn = num;
+					writeAt = num4;
+					return Flush(BOPODEAIEBJ);
 				}
-				NMMPBADCFHK = NHGOBMFNMLD.DONE;
-				goto case NHGOBMFNMLD.DONE;
-			case NHGOBMFNMLD.DONE:
+				mode = InflateBlockMode.DONE;
+				goto case InflateBlockMode.DONE;
+			case InflateBlockMode.DONE:
 				BOPODEAIEBJ = 1;
-				FPGCIJMGFLH = num3;
-				DBFGKGGCEAI = i;
-				CJMKCEHHMCH.IAPJEIDMGNP = num2;
-				CJMKCEHHMCH.ALJBBHPGGPA += num - CJMKCEHHMCH.LMIPBGGILEJ;
-				CJMKCEHHMCH.LMIPBGGILEJ = num;
-				HBFBCHDJEBM = num4;
-				return MKPBJGMJPMI(BOPODEAIEBJ);
-			case NHGOBMFNMLD.BAD:
+				bitb = num3;
+				bitk = i;
+				_codec.AvailableBytesIn = num2;
+				_codec.TotalBytesIn += num - _codec.NextIn;
+				_codec.NextIn = num;
+				writeAt = num4;
+				return Flush(BOPODEAIEBJ);
+			case InflateBlockMode.BAD:
 				BOPODEAIEBJ = -3;
-				FPGCIJMGFLH = num3;
-				DBFGKGGCEAI = i;
-				CJMKCEHHMCH.IAPJEIDMGNP = num2;
-				CJMKCEHHMCH.ALJBBHPGGPA += num - CJMKCEHHMCH.LMIPBGGILEJ;
-				CJMKCEHHMCH.LMIPBGGILEJ = num;
-				HBFBCHDJEBM = num4;
-				return MKPBJGMJPMI(BOPODEAIEBJ);
+				bitb = num3;
+				bitk = i;
+				_codec.AvailableBytesIn = num2;
+				_codec.TotalBytesIn += num - _codec.NextIn;
+				_codec.NextIn = num;
+				writeAt = num4;
+				return Flush(BOPODEAIEBJ);
 			default:
 				BOPODEAIEBJ = -2;
-				FPGCIJMGFLH = num3;
-				DBFGKGGCEAI = i;
-				CJMKCEHHMCH.IAPJEIDMGNP = num2;
-				CJMKCEHHMCH.ALJBBHPGGPA += num - CJMKCEHHMCH.LMIPBGGILEJ;
-				CJMKCEHHMCH.LMIPBGGILEJ = num;
-				HBFBCHDJEBM = num4;
-				return MKPBJGMJPMI(BOPODEAIEBJ);
+				bitb = num3;
+				bitk = i;
+				_codec.AvailableBytesIn = num2;
+				_codec.TotalBytesIn += num - _codec.NextIn;
+				_codec.NextIn = num;
+				writeAt = num4;
+				return Flush(BOPODEAIEBJ);
 			}
 		}
 	}
 
-	internal void PJNFHNFLNNO()
+	internal void Free()
 	{
 		Reset();
 		window = null;
-		GAMNAIHAIDP = null;
+		hufts = null;
 	}
 
 	internal void SetDictionary(byte[] d, int ILENLCMAMBH, int HDKKKCDKFEE)
 	{
 		Array.Copy(d, ILENLCMAMBH, window, 0, HDKKKCDKFEE);
-		IONENIAEDKJ = (HBFBCHDJEBM = HDKKKCDKFEE);
+		readAt = (writeAt = HDKKKCDKFEE);
 	}
 
-	internal int NGLFANAHOJJ()
+	internal int SyncPoint()
 	{
-		return (NMMPBADCFHK == NHGOBMFNMLD.LENS) ? 1 : 0;
+		return (mode == InflateBlockMode.LENS) ? 1 : 0;
 	}
 
-	internal int MKPBJGMJPMI(int BOPODEAIEBJ)
+	internal int Flush(int BOPODEAIEBJ)
 	{
 		for (int i = 0; i < 2; i++)
 		{
-			int num = ((i != 0) ? (HBFBCHDJEBM - IONENIAEDKJ) : (((IONENIAEDKJ > HBFBCHDJEBM) ? PCLFFOBJJFO : HBFBCHDJEBM) - IONENIAEDKJ));
+			int num = ((i != 0) ? (writeAt - readAt) : (((readAt > writeAt) ? end : writeAt) - readAt));
 			if (num == 0)
 			{
 				if (BOPODEAIEBJ == -5)
@@ -579,29 +579,29 @@ internal sealed class InflateBlocks
 				}
 				return BOPODEAIEBJ;
 			}
-			if (num > CJMKCEHHMCH.NBNGINIIKNA)
+			if (num > _codec.AvailableBytesOut)
 			{
-				num = CJMKCEHHMCH.NBNGINIIKNA;
+				num = _codec.AvailableBytesOut;
 			}
 			if (num != 0 && BOPODEAIEBJ == -5)
 			{
 				BOPODEAIEBJ = 0;
 			}
-			CJMKCEHHMCH.NBNGINIIKNA -= num;
-			CJMKCEHHMCH.HCDKLJJLMOD += num;
+			_codec.AvailableBytesOut -= num;
+			_codec.TotalBytesOut += num;
 			if (checkfn != null)
 			{
-				CJMKCEHHMCH._Adler32 = (check = Adler.IAJPFDALGJM(check, window, IONENIAEDKJ, num));
+				_codec._Adler32 = (check = Adler.Adler32(check, window, readAt, num));
 			}
-			Array.Copy(window, IONENIAEDKJ, CJMKCEHHMCH.DKCGBABIAEN, CJMKCEHHMCH.EIBFDELHKNM, num);
-			CJMKCEHHMCH.EIBFDELHKNM += num;
-			IONENIAEDKJ += num;
-			if (IONENIAEDKJ == PCLFFOBJJFO && i == 0)
+			Array.Copy(window, readAt, _codec.OutputBuffer, _codec.NextOut, num);
+			_codec.NextOut += num;
+			readAt += num;
+			if (readAt == end && i == 0)
 			{
-				IONENIAEDKJ = 0;
-				if (HBFBCHDJEBM == PCLFFOBJJFO)
+				readAt = 0;
+				if (writeAt == end)
 				{
-					HBFBCHDJEBM = 0;
+					writeAt = 0;
 				}
 			}
 			else

@@ -9,7 +9,7 @@ namespace Nekki.SF2.GUI.Arrows
 		[SerializeField]
 		private Arrow _arrow;
 
-		public static ArrowCanvas BPCBBHAKFDM
+		public static ArrowCanvas SharedInstance
 		{
 			get
 			{

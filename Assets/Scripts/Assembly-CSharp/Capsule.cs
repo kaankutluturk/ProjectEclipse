@@ -7,82 +7,82 @@ public class Capsule : Segment3D
 	{
 		public string Name;
 
-		public float IHHHADPCJPH;
+		public float Radius1;
 
-		public float DPKIEPHDEFJ;
+		public float Radius2;
 
-		public float GCCJLEGCLGN;
+		public float Margin1;
 
-		public float BGJOLDMBEGI;
+		public float Margin2;
 
-		public float NFOMECHPEOP;
+		public float Thickness;
 	}
 
-	public const float FOKLLBKBCGM = 1f;
+	public const float DefaultRadius1 = 1f;
 
-	public const float BKADCDECIFC = 1f;
+	public const float DefaultRadius2 = 1f;
 
-	public const float HDEKABMEKDI = 1f;
+	public const float DefaultMargin1 = 1f;
 
-	public const float NKOPAKJBJHC = 1f;
+	public const float DefaultMargin2 = 1f;
 
-	private AdditionalData DCFPONJAING = new AdditionalData();
+	private AdditionalData _data = new AdditionalData();
 
 	private CapsuleRender _CapsuleRender;
 
-	public float NFOMECHPEOP
+	public float Thickness
 	{
 		get
 		{
-			return IHEKOJKHPGP();
+			return GetThickness();
 		}
 		set
 		{
-			IJIGFKFDKGM(value);
+			SetThickness(value);
 		}
 	}
 
-	public float IHHHADPCJPH
+	public float Radius1
 	{
 		get
 		{
-			return DOCOPPOLBMM();
+			return GetRadius1();
 		}
 	}
 
-	public float DPKIEPHDEFJ
+	public float Radius2
 	{
 		get
 		{
-			return BAHOBNFOFCF();
+			return GetRadius2();
 		}
 	}
 
-	public float GCCJLEGCLGN
+	public float Margin1
 	{
 		get
 		{
-			return JAEOCMCOEFE();
+			return GetMargin1();
 		}
 	}
 
-	public float BGJOLDMBEGI
+	public float Margin2
 	{
 		get
 		{
-			return PLFEEBJMGAK();
+			return GetMargin2();
 		}
 	}
 
 	public Capsule(Segment3D LEFHAGAGOME)
 	{
-		LCFIDBHFBOO(LEFHAGAGOME.NDCACMDFLJN());
-		PMGPGDDPOBB(LEFHAGAGOME.MINOGAHDDHA());
+		SetStartReference(LEFHAGAGOME.GetStart());
+		SetEndReference(LEFHAGAGOME.GetEnd());
 	}
 
 	public CapsuleRender CreateUI(Transform GLKEHHPBGKP)
 	{
-		GameObject gameObject = new GameObject(DCFPONJAING.Name);
+		GameObject gameObject = new GameObject(_data.Name);
 		CapsuleRender capsuleRender = gameObject.AddComponent<CapsuleRender>();
 		capsuleRender.set_Base(this);
 		gameObject.transform.SetParent(GLKEHHPBGKP, false);
@@ -91,67 +91,67 @@ public class Capsule : Segment3D
 
 	public string get_Name()
 	{
-		return DCFPONJAING.Name;
+		return _data.Name;
 	}
 
 	public void set_Name(string value)
 	{
-		DCFPONJAING.Name = value;
+		_data.Name = value;
 	}
 
-	public float IHEKOJKHPGP()
+	public float GetThickness()
 	{
-		return DCFPONJAING.NFOMECHPEOP;
+		return _data.Thickness;
 	}
 
-	public void IJIGFKFDKGM(float value)
+	public void SetThickness(float value)
 	{
-		DCFPONJAING.NFOMECHPEOP = value;
+		_data.Thickness = value;
 	}
 
-	public float DOCOPPOLBMM()
+	public float GetRadius1()
 	{
-		return DCFPONJAING.IHHHADPCJPH;
+		return _data.Radius1;
 	}
 
-	public float BAHOBNFOFCF()
+	public float GetRadius2()
 	{
-		return DCFPONJAING.DPKIEPHDEFJ;
+		return _data.Radius2;
 	}
 
-	public float JAEOCMCOEFE()
+	public float GetMargin1()
 	{
-		return DCFPONJAING.GCCJLEGCLGN;
+		return _data.Margin1;
 	}
 
-	public float PLFEEBJMGAK()
+	public float GetMargin2()
 	{
-		return DCFPONJAING.BGJOLDMBEGI;
+		return _data.Margin2;
 	}
 
-	public void CNEEGAJGBEI(float value = 1f)
+	public void SetRadius1(float value = 1f)
 	{
-		DCFPONJAING.IHHHADPCJPH = value;
+		_data.Radius1 = value;
 	}
 
-	public void BLHHLPDEAKF(float value = 1f)
+	public void SetRadius2(float value = 1f)
 	{
-		DCFPONJAING.DPKIEPHDEFJ = value;
+		_data.Radius2 = value;
 	}
 
-	public void GKBFHLAHCFG(float value = 1f)
+	public void SetMargin1(float value = 1f)
 	{
-		DCFPONJAING.GCCJLEGCLGN = value;
+		_data.Margin1 = value;
 	}
 
-	public void HCCIGEIFEOF(float value = 1f)
+	public void SetMargin2(float value = 1f)
 	{
-		DCFPONJAING.BGJOLDMBEGI = value;
+		_data.Margin2 = value;
 	}
 
-	private void JLCOIIBBKEF(Segment3D OEMALIFPGPO)
+	private void ApplyMarginsToSegment(Segment3D OEMALIFPGPO)
 	{
-		OEMALIFPGPO.LJPOALNMEOF(GetDivisionPoint3D(DCFPONJAING.GCCJLEGCLGN));
-		OEMALIFPGPO.OCEHEINNABP(GetDivisionPoint3D(1f - DCFPONJAING.BGJOLDMBEGI));
+		OEMALIFPGPO.SetStart(GetDivisionPoint3D(_data.Margin1));
+		OEMALIFPGPO.SetEnd(GetDivisionPoint3D(1f - _data.Margin2));
 	}
 }

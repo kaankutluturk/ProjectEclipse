@@ -6,19 +6,19 @@ namespace Nekki.SF2.GUI.Menu
 {
 	public class MenuEnergyPanel : SFMonoBehaviour<object>
 	{
-		public enum PGDGDNCJEIC
+		public enum MenuEnergyPanelEvent
 		{
 			onBarClicked = 0
 		}
 
-		private enum COILLEPJHCP
+		private enum EnergyViewMode
 		{
 			InvisibleView = 0,
 			NormalView = 1,
 			UnlimitedView = 2
 		}
 
-		private COILLEPJHCP EDEPKCAONJK;
+		private EnergyViewMode viewMode;
 
 		[SerializeField]
 		private Image _icon;
@@ -34,7 +34,7 @@ namespace Nekki.SF2.GUI.Menu
 
 		public void Init()
 		{
-			int num = GameUtils.NAMEDMHAFKA();
+			int num = GameUtils.GetMaxPower();
 			float num2 = 100f / (float)num;
 			List<int> list = new List<int>();
 			for (int i = 0; i <= num; i++)
@@ -43,28 +43,28 @@ namespace Nekki.SF2.GUI.Menu
 			}
 			_bar.Init();
 			_bar.SetPercent(list);
-			if (ListSF.CCDKHLAMKKO().ADKHNLAMDJP)
+			if (ListSF.GetRoster().HasUnlimitedEnergy)
 			{
 				_bar.gameObject.SetActive(false);
 			}
 			_dialogButton.onClick.AddListener(() =>
 			{
-				HCADFMMDHOF();
+				OnDialogButtonClicked();
 			});
 			UpdateView();
 		}
 
-		private void CHILAIJNEHG()
+		private void RemoveListeners()
 		{
 			_dialogButton.onClick.RemoveListener(() =>
 			{
-				HCADFMMDHOF();
+				OnDialogButtonClicked();
 			});
 		}
 
 		public void UpdateView()
 		{
-			if (!ListSF.CCDKHLAMKKO().ADKHNLAMDJP)
+			if (!ListSF.GetRoster().HasUnlimitedEnergy)
 			{
 				_icon.gameObject.SetActive(true);
 				_bar.gameObject.SetActive(true);
@@ -81,16 +81,16 @@ namespace Nekki.SF2.GUI.Menu
 
 		public void UpdateBar()
 		{
-			int num = ListSF.CCDKHLAMKKO().NHKMGNPADKI();
+			int num = ListSF.GetRoster().GetMaxPower();
 			if (_bar.GetValue() != (float)num)
 			{
 				_bar.SetValue(num);
 			}
 		}
 
-		public void SetDialogBtnPressType(NFOGOFFAPPP.HHGPKAJENGF LFLGCDNKNJI, bool GHJGPAEDIHG)
+		public void SetDialogBtnPressType(ButtonStateExtensions.ButtonPressType LFLGCDNKNJI, bool GHJGPAEDIHG)
 		{
-			_dialogButton.OFPNNIBBNCE(LFLGCDNKNJI, GHJGPAEDIHG);
+			_dialogButton.SetPressType(LFLGCDNKNJI, GHJGPAEDIHG);
 		}
 
 		public virtual void SetTouchEnabled(bool value)
@@ -98,7 +98,7 @@ namespace Nekki.SF2.GUI.Menu
 			_dialogButton.gameObject.SetActive(value);
 		}
 
-		private void HCADFMMDHOF()
+		private void OnDialogButtonClicked()
 		{
 			CallEvent(0, 0);
 		}

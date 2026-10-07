@@ -10,24 +10,24 @@ public class AspectDoublingRange
 	{
 		get
 		{
-			return OEAKCOHMIHH();
+			return GetValue();
 		}
 	}
 
-	public int FEJMNPFIHFI
+	public int LevelStep
 	{
 		get
 		{
-			return MAIPAOKJMED();
+			return GetLevelStep();
 		}
 	}
 
-	public float OEAKCOHMIHH()
+	public float GetValue()
 	{
 		return _value;
 	}
 
-	public int MAIPAOKJMED()
+	public int GetLevelStep()
 	{
 		return _levelStep;
 	}

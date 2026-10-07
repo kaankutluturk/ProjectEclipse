@@ -1,6 +1,6 @@
 public static class ModelType
 {
-	public enum KEIDBIOIFGA
+	public enum ModelTargetType
 	{
 		MODEL_NULL = 0,
 		MODEL_THIS = 1,
@@ -11,27 +11,27 @@ public static class ModelType
 		MODEL_OTHER_CHILD = 6
 	}
 
-	public static KEIDBIOIFGA EHFNOBFLAHI(string LFLGCDNKNJI)
+	public static ModelTargetType ParseTargetType(string LFLGCDNKNJI)
 	{
 		switch (LFLGCDNKNJI)
 		{
 		case "Me":
-			return KEIDBIOIFGA.MODEL_THIS;
+			return ModelTargetType.MODEL_THIS;
 		case "Enemy":
-			return KEIDBIOIFGA.MODEL_OTHER;
+			return ModelTargetType.MODEL_OTHER;
 		case "Parent":
-			return KEIDBIOIFGA.MODEL_PARENT;
+			return ModelTargetType.MODEL_PARENT;
 		case "Both":
-			return KEIDBIOIFGA.MODEL_BOTH;
+			return ModelTargetType.MODEL_BOTH;
 		case "Null":
-			return KEIDBIOIFGA.MODEL_NULL;
+			return ModelTargetType.MODEL_NULL;
 		case "Child":
-			return KEIDBIOIFGA.MODEL_CHILD;
+			return ModelTargetType.MODEL_CHILD;
 		case "EnemyChild":
-			return KEIDBIOIFGA.MODEL_OTHER_CHILD;
+			return ModelTargetType.MODEL_OTHER_CHILD;
 		default:
-			LLLOJBFMONN.Error("ModelType - parseType - unknownType: " + LFLGCDNKNJI);
-			return KEIDBIOIFGA.MODEL_NULL;
+			GameLog.Error("ModelType - parseType - unknownType: " + LFLGCDNKNJI);
+			return ModelTargetType.MODEL_NULL;
 		}
 	}
 }

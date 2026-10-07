@@ -32,32 +32,32 @@ static class Program
 {
     public static void Main(string[] args)
     {
-        SF2Paths.FFKEDOBDLOL = args[0]; Directory.CreateDirectory(args[0]);
+        SF2Paths.UserDataRoot = args[0]; Directory.CreateDirectory(args[0]);
         foreach (bool local in new[] { false, true })
         {
             Probe.Clean();
             TitleScreen.Load(); TitleScreen.Load();
             var items = ListSF.GetItems(); var scripts = ModRuntime.Scripts;
-            var oldRoster = ListSF.CCDKHLAMKKO();
+            var oldRoster = ListSF.GetRoster();
             string preview = Eclipse.Saves.CampaignSaveSession.PreviewDirectory;
             Probe.Check(Probe.Count("scripts") == 1 && Probe.Count("items") == 1, "Preview loaded twice");
             Probe.Check(Probe.Count("bind") == 0 && Probe.Count("migrate") == 0 && Probe.Count("story") == 0, "Preview bound mod save state");
             Probe.Check(items.Price == 1000 && Probe.Count("denominate") == 0 && Probe.Count("billing") == 0, "Preview changed shared prices");
             Probe.Check(Directory.Exists(preview), "Preview sandbox missing");
-            Probe.Check(GameUtils.FDEJIIDIPBI.GFPFNILGJML().Count == 2 && PerkTree.GBPBIPFIOJH().Available == "campaign", "Preview mutated perk catalog");
-            var hidden = new ItemInfo { DCHJDPCEODD = false, UpgradeLevel = 7 };
-            var previewItem = new UserItem(); previewItem.KIGHKCOCJFJ(hidden);
-            Probe.Check(!hidden.DCHJDPCEODD && previewItem.Definition.DCHJDPCEODD && !ReferenceEquals(hidden, previewItem.Definition), "Preview unlocked shared shop definition");
+            Probe.Check(GameUtils.PerkItemList.GetProgressionPerks().Count == 2 && PerkTree.GetInstance().Available == "campaign", "Preview mutated perk catalog");
+            var hidden = new ItemInfo { IsShopVisible = false, UpgradeLevel = 7 };
+            var previewItem = new UserItem(); previewItem.SetInfo(hidden);
+            Probe.Check(!hidden.IsShopVisible && previewItem.Definition.IsShopVisible && !ReferenceEquals(hidden, previewItem.Definition), "Preview unlocked shared shop definition");
             Eclipse.Multiplayer.LocalVersusSession.IsActive = local;
             TitleScreen.Enter(); TitleScreen.Enter();
-            Probe.Check(ListSF.CCDKHLAMKKO() == null && !oldRoster.HasSaveListener, "Preview roster still attached");
+            Probe.Check(ListSF.GetRoster() == null && !oldRoster.HasSaveListener, "Preview roster still attached");
             Probe.Check(ListSF.GetInstance().ProfileReleased, "Preview XML/pending save retained");
             Probe.Check(Eclipse.Saves.CampaignSaveSession.PreviewDirectory == null && !Directory.Exists(preview), "Sandbox survived handoff");
             previewItem.Definition.IsNew = true;
             Probe.Check(!hidden.IsNew, "Delayed preview inventory changed shared item");
-            var gameItem = new UserItem(); gameItem.KIGHKCOCJFJ(hidden);
-            Probe.Check(ReferenceEquals(gameItem.Definition, hidden) && hidden.DCHJDPCEODD, "Real inventory did not unlock its shared definition");
-            var parse = new ParseModule(); parse.JLPMOKPFECK(); parse.JLPMOKPFECK();
+            var gameItem = new UserItem(); gameItem.SetInfo(hidden);
+            Probe.Check(ReferenceEquals(gameItem.Definition, hidden) && hidden.IsShopVisible, "Real inventory did not unlock its shared definition");
+            var parse = new ParseModule(); parse.ProcessStep(); parse.ProcessStep();
             Probe.Check(ReferenceEquals(items, ListSF.GetItems()) && ReferenceEquals(scripts, ModRuntime.Scripts), "Content session replaced on entry");
             foreach (string step in new[] { "settings", "animations", "AI", "items", "scripts", "conditions", "battle types", "sound", "localization" })
                 Probe.Check(Probe.Count(step) == 1, "Shared step repeated: " + step);
@@ -66,30 +66,30 @@ static class Program
             foreach (string step in new[] { "denominate", "warriors", "zones", "stages", "quests", "mod quests", "periodic", "packs", "timer", "locale metadata", "legacy localization", "roster finish", "bind", "migrate", "story", "billing" })
                 Probe.Check(Probe.Count(step) == 1, "Campaign step did not run once: " + step);
             Probe.Check(items.Price == 10, "Selected profile denomination not applied exactly once");
-            Probe.Check(GameUtils.FDEJIIDIPBI.GFPFNILGJML().Count == 2 && PerkTree.GBPBIPFIOJH().Available == "preview", "Campaign inherited preview perk choices");
-            Probe.Check(!ReferenceEquals(oldRoster, ListSF.CCDKHLAMKKO()) && ListSF.CCDKHLAMKKO().Denomination == 2, "Selected profile not loaded");
+            Probe.Check(GameUtils.PerkItemList.GetProgressionPerks().Count == 2 && PerkTree.GetInstance().Available == "preview", "Campaign inherited preview perk choices");
+            Probe.Check(!ReferenceEquals(oldRoster, ListSF.GetRoster()) && ListSF.GetRoster().Denomination == 2, "Selected profile not loaded");
             Probe.Check(ListSF.GetInstance().IsDisposable == local, "Local versus profile ownership lost");
             Probe.Check(ReferenceEquals(ModRuntime.BoundWarrior.OwnerDocument, XmlUtils.Selected) != local, "Local profile clone ownership incorrect");
             Probe.Check(!TitleScreen.TryResumeGameDataPreview(), "Handoff consumed twice");
         }
         Probe.Clean(); TitleScreen.Load(); var priorItems = ListSF.GetItems(); var priorScripts = ModRuntime.Scripts;
         TitleScreen.Discard();
-        Probe.Check(!ListSF.CanResumeTitlePreview && ListSF.CCDKHLAMKKO() == null && ModRuntime.Scripts == null, "Mod restart retained content");
-        TitleScreen.Load(); TitleScreen.Enter(); new ParseModule().JLPMOKPFECK();
+        Probe.Check(!ListSF.CanResumeTitlePreview && ListSF.GetRoster() == null && ModRuntime.Scripts == null, "Mod restart retained content");
+        TitleScreen.Load(); TitleScreen.Enter(); new ParseModule().ProcessStep();
         Probe.Check(Probe.Count("scripts") == 2 && Probe.Count("animations") == 2, "Mod restart did not reload content");
         Probe.Check(!ReferenceEquals(priorItems, ListSF.GetItems()) && !ReferenceEquals(priorScripts, ModRuntime.Scripts), "Restart reused old selection");
-        Probe.Clean(); new ParseModule().JLPMOKPFECK();
+        Probe.Clean(); new ParseModule().ProcessStep();
         Probe.Check(Probe.Count("scripts") == 1 && Probe.Count("profile") == 1 && Probe.Count("zones") == 1, "Cold boot broken");
         Probe.Clean(); Probe.FailPreview = true; TitleScreen.Load(); Probe.FailPreview = false;
         Probe.Check(!ListSF.CanResumeTitlePreview && Eclipse.Saves.CampaignSaveSession.PreviewDirectory == null, "Failed preview retained partial content");
-        new ParseModule().JLPMOKPFECK(); Probe.Check(Probe.Count("zones") == 1 && Probe.Count("bind") == 1, "Failed preview blocked cold boot");
+        new ParseModule().ProcessStep(); Probe.Check(Probe.Count("zones") == 1 && Probe.Count("bind") == 1, "Failed preview blocked cold boot");
         Probe.Clean(); TitleScreen.Load(); TitleScreen.Enter();
-        Nekki.SF2.GUI.Scenes.GameLoaderScene.Stop(); new ParseModule().JLPMOKPFECK();
+        Nekki.SF2.GUI.Scenes.GameLoaderScene.Stop(); new ParseModule().ProcessStep();
         Probe.Check(Probe.Count("scripts") == 2 && Probe.Count("zones") == 1, "Stale handoff skipped cold boot");
         Probe.Clean(); TitleScreen.Load(); TitleScreen.Enter(); Probe.FailZones = true;
-        try { new ParseModule().JLPMOKPFECK(); throw new Exception("Expected load failure"); } catch (InvalidOperationException) { }
+        try { new ParseModule().ProcessStep(); throw new Exception("Expected load failure"); } catch (InvalidOperationException) { }
         Probe.Check(!ListSF.CanResumeTitlePreview && ModRuntime.Scripts == null, "Failed handoff retained partial state");
-        Probe.FailZones = false; new ParseModule().JLPMOKPFECK();
+        Probe.FailZones = false; new ParseModule().ProcessStep();
         Probe.Check(Probe.Count("scripts") == 2 && Probe.Count("denominate") == 2 && ListSF.GetItems().Price == 10, "Failed handoff retry reused denominated items");
         Console.WriteLine("PASS: " + Probe.Checks + " title/campaign/local-versus reuse, profile isolation, denominations, restart and failure checks.");
         Probe.Clean();
@@ -97,104 +97,104 @@ static class Program
 }
 
 namespace UnityEngine { public static class Debug { public static void Log(object value) {} public static void LogWarning(object value) {} } }
-public class LoadingModule { protected bool CHIHBINEGFL; public virtual void Start() {} public bool GCHANFIHDGH() => CHIHBINEGFL; public virtual void JLPMOKPFECK() { CHIHBINEGFL = true; } }
+public class LoadingModule { protected bool isFinished; public virtual void Start() {} public bool IsFinished() => isFinished; public virtual void ProcessStep() { isFinished = true; } }
 public class PreInitializationModule : LoadingModule { }
 public class AntichitingModule : LoadingModule { }
 public class InitializationModule : LoadingModule { }
-public static class SF2Paths { public static string FFKEDOBDLOL; public static string KKIDGPBOBNI() => "content"; public static string GetUserDataDirectory() => Eclipse.Saves.CampaignSaveSession.PreviewDirectory ?? "selected"; }
-public static class Constants { public const string OJMIJINKBPJ = "users.xml"; }
-public static class XmlCryptoUtils { public static object NNLGALNDJCL() => null; }
+public static class SF2Paths { public static string UserDataRoot; public static string GetGameDataPath() => "content"; public static string GetUserDataDirectory() => Eclipse.Saves.CampaignSaveSession.PreviewDirectory ?? "selected"; }
+public static class Constants { public const string UsersFileName = "users.xml"; }
+public static class XmlCryptoUtils { public static object GetIsEncryptionEnabled() => null; }
 public static class XmlUtils
 {
-    public enum EBLFEPIOMOL { Normal }
+    public enum XmlSourceMode { Normal }
     public static XmlDocument Selected = Probe.Profile(2);
-    public static XmlDocument OpenXMLDocument(string path, string name, EBLFEPIOMOL mode, bool required, object crypto) => Probe.Profile(1);
-    public static void ONLDJNLKKAL(XmlDocument doc, string path) => doc.Save(path);
-    public static XmlDocument AIFIAKNJMHG(string path, string name)
+    public static XmlDocument OpenXMLDocument(string path, string name, XmlSourceMode mode, bool required, object crypto) => Probe.Profile(1);
+    public static void SaveDocumentWithHash(XmlDocument doc, string path) => doc.Save(path);
+    public static XmlDocument LoadDocumentWithHashCheck(string path, string name)
     {
         Probe.Hit("profile");
         if (path == "selected") return Selected;
         var doc = new XmlDocument(); doc.Load(Path.Combine(path, name)); return doc;
     }
 }
-public static class XmlExtensions { public static string CIPOICEEIBK(this XmlAttribute value, string fallback = "") => value?.Value ?? fallback; public static int ParseInt(this XmlAttribute value) => int.Parse(value.Value); }
-public class Items { public int Price = 1000; public object HCDLKHKBEPF() => this; }
+public static class XmlExtensions { public static string GetStringOrDefault(this XmlAttribute value, string fallback = "") => value?.Value ?? fallback; public static int ParseInt(this XmlAttribute value) => int.Parse(value.Value); }
+public class Items { public int Price = 1000; public object GetAllItems() => this; }
 public class Roster
 {
     public int Denomination; public bool HasSaveListener = true;
     public Roster(XmlNode node, object parameters) { Denomination = int.Parse(node?.Attributes["Denomination"].Value ?? "0"); }
     public void RemoveEventListener(int id, Action<object> handler) => HasSaveListener = false;
-    public Roster KHCNHPCPFII() => this; public void HOMCPNCGPDB(object items) { }
-    public Roster get_Parameters() => this; public void NOBKKLBJFIL() { }
-    public void AFAKCAMAACM() => Probe.Hit("roster finish");
-    public Roster JLBDOBLHHAF() => this;
-    public PerkHistory GIAEMMLABDL => new() { JOGBKOJCINM = new() { new PerkHistory.Perk { Name = Denomination == 1 ? "preview" : "campaign" } } };
+    public Roster GetInventory() => this; public void ApplyItemInfos(object items) { }
+    public Roster get_Parameters() => this; public void CalculateAttributes() { }
+    public void ApplyLanguage() => Probe.Hit("roster finish");
+    public Roster GetPerks() => this;
+    public PerkHistory History => new() { Perks = new() { new PerkHistory.Perk { Name = Denomination == 1 ? "preview" : "campaign" } } };
 }
 public partial class ListSF
 {
-    static ListSF _instance; static Roster ANEHEDFAPCH; static Items _items = new();
-    XmlDocument IEDEFCBFJAD, IEGJHNHFJFA; XmlNode _CurrentUserNode;
-    bool _localVersusProfile, GJEJCLBAPMP, JGFGMICMBKL;
+    static ListSF _instance; static Roster _roster; static Items _items = new();
+    XmlDocument userDocument, stagesDocument; XmlNode _CurrentUserNode;
+    bool _localVersusProfile, isSaveRequested, IsContentLoaded;
     internal static Action<string, long> StepTimer;
-    public bool ProfileReleased => IEDEFCBFJAD == null && _CurrentUserNode == null && !GJEJCLBAPMP;
+    public bool ProfileReleased => userDocument == null && _CurrentUserNode == null && !isSaveRequested;
     public bool IsDisposable => _localVersusProfile;
     public static ListSF GetInstance() => _instance ??= new();
-    public static Roster CCDKHLAMKKO() => ANEHEDFAPCH;
+    public static Roster GetRoster() => _roster;
     public static Items GetItems() => _items;
-    void EJANJEEGOOE(object data) => GJEJCLBAPMP = true;
-    void ILFBDHDMHPD(object data) { }
-    void EAFEBFMIDLF() => Probe.Hit("battle types");
-    void NMMBHENGDJO() => Probe.Hit("items");
-    void OFIPOGGCKIN() => Probe.Hit("warriors");
-    void KIEEPEOPJGB() { if (Probe.FailZones) throw new InvalidOperationException("zones failed"); Probe.Hit("zones"); }
-    void PDCHBPKOBFI(string source) => Probe.Hit("quests");
-    void LDADJAGGGPA() => Probe.Hit("periodic");
-    Roster NHAMDLEDOHM(XmlNode node) => new(node, null);
-    void JMDJEEFELCD(XmlNode node) => Probe.Hit("billing");
+    void RequestSave(object data) => isSaveRequested = true;
+    void OnTimerTick(object data) { }
+    void InitBattleTypes() => Probe.Hit("battle types");
+    void LoadItems() => Probe.Hit("items");
+    void LoadWarriors() => Probe.Hit("warriors");
+    void LoadZones() { if (Probe.FailZones) throw new InvalidOperationException("zones failed"); Probe.Hit("zones"); }
+    void LoadQuests(string source) => Probe.Hit("quests");
+    void InitPeriodicBattles() => Probe.Hit("periodic");
+    Roster CreateRoster(XmlNode node) => new(node, null);
+    void ApplyBillingPrices(XmlNode node) => Probe.Hit("billing");
 }
 public class ItemInfo
 {
-    public bool DCHJDPCEODD, IsNew; public int UpgradeLevel;
+    public bool IsShopVisible, IsNew; public int UpgradeLevel;
     public ItemInfo Clone() => (ItemInfo)MemberwiseClone();
-    public static void DenominateItems() { Probe.Hit("denominate"); ListSF.GetItems().Price /= (int)Math.Pow(10, ListSF.CCDKHLAMKKO().Denomination); }
+    public static void DenominateItems() { Probe.Hit("denominate"); ListSF.GetItems().Price /= (int)Math.Pow(10, ListSF.GetRoster().Denomination); }
 }
 public partial class UserItem
 {
-    ItemInfo EOFKPLMPGLD; int IKNDJDEODFD = -1;
-    public ItemInfo Definition => EOFKPLMPGLD;
-    void FMMDLMGHPIB(int level) => IKNDJDEODFD = level;
+    ItemInfo itemInfo; int upgradeLevel = -1;
+    public ItemInfo Definition => itemInfo;
+    void SetUpgradeLevel(int level) => upgradeLevel = level;
 }
 public class GlobalTimer { static readonly GlobalTimer Timer = new(); public static GlobalTimer get_Instance() => Timer; public void removeEventListener(int id, Action<object> action) {} public void addEventListener(int id, Action<object> action) => Probe.Hit("timer"); }
 public static class QuestsManager { public static void Reset() {} }
 public static class Module { public static void Reset() {} }
 public static class ServerProvider { public static void Reset() {} }
-public static class AnimationData { public static void BCILLFEBJHK() {} }
+public static class AnimationData { public static void ClearAnimations() {} }
 public static class AiData { public static void ClearAll() {} }
-public class PacksController { public static PacksController ELEBLBJKDBI() => new(); public void GDNFPIBDDBO() => Probe.Hit("packs"); }
+public class PacksController { public static PacksController GetInstance() => new(); public void LoadPacks() => Probe.Hit("packs"); }
 public static class GameUtils
 {
-    public static bool OBJEKOBDMOE, GCDIGFODNFO;
-    public static Conditions OJNHPHEPFLI = new();
-    public static PerkItems FDEJIIDIPBI = new();
-    public class Conditions { public void AEPHNNABOEK() => Probe.Hit("conditions"); }
-    public static void InitVariables() {} public static void OEKOKKCILAG() => Probe.Hit("finish");
+    public static bool IsLoginComplete, ShowNews;
+    public static Conditions ModeCounters = new();
+    public static PerkItems PerkItemList = new();
+    public class Conditions { public void InitConditions() => Probe.Hit("conditions"); }
+    public static void InitVariables() {} public static void ScheduleStartupNotifications() => Probe.Hit("finish");
 }
-public static class GameSettings { public static void OCIPKAONMOP() => Probe.Hit("settings"); public static void LNNLDPLDABI() => Probe.Hit("settings finish"); }
-public static class GameLoader { public static void BJLLJHDFMOO() { Probe.Hit("animations"); if (Probe.FailPreview) throw new Exception("animations failed"); } public static void POLKDKOOACO() => Probe.Hit("AI"); public static void SetSound() => Probe.Hit("sound"); }
+public static class GameSettings { public static void LoadAllSettings() => Probe.Hit("settings"); public static void ApplyQualityOptions() => Probe.Hit("settings finish"); }
+public static class GameLoader { public static void LoadAnimations() { Probe.Hit("animations"); if (Probe.FailPreview) throw new Exception("animations failed"); } public static void LoadAi() => Probe.Hit("AI"); public static void SetSound() => Probe.Hit("sound"); }
 public static class LocalizationManager { public static void Init() => Probe.Hit("localization"); }
 public class PerkInfoItem { public string Name; }
-public class PerkHistory { public class Perk { public string Name; } public List<Perk> JOGBKOJCINM; }
-public class PerkItems { readonly List<PerkInfoItem> Definitions = new() { new() { Name = "preview" }, new() { Name = "campaign" } }; public List<PerkInfoItem> GFPFNILGJML() => Definitions; }
+public class PerkHistory { public class Perk { public string Name; } public List<Perk> Perks; }
+public class PerkItems { readonly List<PerkInfoItem> Definitions = new() { new() { Name = "preview" }, new() { Name = "campaign" } }; public List<PerkInfoItem> GetProgressionPerks() => Definitions; }
 public partial class PerkTree
 {
-    static readonly PerkTree Instance = new(); public static PerkTree GBPBIPFIOJH() => Instance;
-    public class PerkBranch { public int Level; public List<object> OJIAKDDCGLB = new(); }
-    List<object> HBDGGFOPFFB = new(), DPPMNFCIIGP = new(); List<PerkInfoItem> PPHJHENDCLL = new();
-    public string Available => PPHJHENDCLL.Count == 1 ? PPHJHENDCLL[0].Name : "";
-    public List<PerkBranch> LGGMDGDHJJP() => new(); void AHPDPEDGJLM(int level, int count) { }
-    void AEOKBBBAANA(PerkBranch branch) { }
-    void AEOKBBBAANA(PerkHistory.Perk perk) => PPHJHENDCLL.RemoveAll(p => p.Name == perk.Name);
-    void DCBCNJJCAMP() => Probe.Hit("perk tree");
+    static readonly PerkTree Instance = new(); public static PerkTree GetInstance() => Instance;
+    public class PerkBranch { public int Level; public List<object> Items = new(); }
+    List<object> levelContainers = new(), profilePerks = new(); List<PerkInfoItem> availablePerkInfos = new();
+    public string Available => availablePerkInfos.Count == 1 ? availablePerkInfos[0].Name : "";
+    public List<PerkBranch> GetBranches() => new(); void AddEmptyContainer(int level, int count) { }
+    void RefreshBranch(PerkBranch branch) { }
+    void ApplyLearnedPerk(PerkHistory.Perk perk) => availablePerkInfos.RemoveAll(p => p.Name == perk.Name);
+    void UnlockFirstLevelPerks() => Probe.Hit("perk tree");
 }
 namespace Eclipse.Saves { public static class CampaignSaveSession { public static string PreviewDirectory; } }
 namespace Eclipse.Multiplayer

@@ -4,19 +4,19 @@ using System.Reflection;
 
 public sealed class GenericInstanceMethod<TInstance>
 {
-	private readonly MethodInfo DLMNFPDKIEI;
+	private readonly MethodInfo methodToCall;
 
 	public GenericInstanceMethod(Expression<Action<TInstance>> BOPGDKGIGHM)
 	{
 		MethodCallExpression methodCallExpression = (MethodCallExpression)BOPGDKGIGHM.Body;
-		DLMNFPDKIEI = methodCallExpression.Method.GetGenericMethodDefinition();
+		methodToCall = methodCallExpression.Method.GetGenericMethodDefinition();
 	}
 
 	public object Invoke(Type[] GIAFINCFDLC, TInstance instance, params object[] arguments)
 	{
 		try
 		{
-			return DLMNFPDKIEI.MakeGenericMethod(GIAFINCFDLC).Invoke(instance, arguments);
+			return methodToCall.MakeGenericMethod(GIAFINCFDLC).Invoke(instance, arguments);
 		}
 		catch (TargetInvocationException mPFFFAOGBJE)
 		{

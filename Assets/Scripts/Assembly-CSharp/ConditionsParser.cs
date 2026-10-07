@@ -8,7 +8,7 @@ public class ConditionsParser
 		ConditionAnimation result = null;
 		string name = node.Name;
         if (name == "EclipseCharacter") return new Eclipse.Modding.ModCharacterCondition(node.Attributes["Name"]?.Value);
-		switch (MovesMaps.MHKNIEBONKD(name))
+		switch (MovesMaps.ParseConditionType(name))
 		{
 		case ConditionAnimation.ConditionType.ROUND:
 			result = new ConditionRound(node);
@@ -87,7 +87,7 @@ public class ConditionsParser
 			result = new Eclipse.Content.BossAbilityStateMoveCondition(node);
 			break;
 		default:
-			LLLOJBFMONN.Error("ERROR: ConditionsParser - no condition for \"{0}\"", name);
+			GameLog.Error("ERROR: ConditionsParser - no condition for \"{0}\"", name);
 			break;
 		}
 		return result;

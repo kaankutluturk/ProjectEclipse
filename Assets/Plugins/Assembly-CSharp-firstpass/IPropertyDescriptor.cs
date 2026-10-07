@@ -2,29 +2,29 @@ using System;
 
 public interface IPropertyDescriptor
 {
-	string MENAJEAJJBE { get; }
+	string PropertyName { get; }
 
-	bool KBHICFPAIFJ { get; }
+	bool CanWrite { get; }
 
-	Type JDCDCGFHLPC { get; set; }
+	Type OverrideType { get; set; }
 
-	int PECDGDLCAAA { get; set; }
+	int SortOrder { get; set; }
 
 	string get_Name();
 
-	bool HHHGHBBDMHC();
+	bool GetCanWrite();
 
 	Type get_Type();
 
-	Type MAGHEGMMNOF();
+	Type GetTypeOverride();
 
 	void set_TypeOverride(Type value);
 
-	int BHDEMLGCNOJ();
+	int GetOrder();
 
 	void set_Order(int value);
 
-	T PJLLHGDNCIF<T>() where T : Attribute;
+	T GetCustomAttribute<T>() where T : Attribute;
 
 	IObjectDescriptor Read(object target);
 

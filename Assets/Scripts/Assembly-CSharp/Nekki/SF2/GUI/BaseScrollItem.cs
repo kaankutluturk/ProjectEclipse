@@ -8,18 +8,18 @@ namespace Nekki.SF2.GUI
 	public class BaseScrollItem : Button
 	{
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		private string HKGHEJDKCPI;
+		private string itemName;
 
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		private ButtonClickedEvent EIAODLFEAPA;
+		private ButtonClickedEvent doubleClickEvent;
 
-		protected float BFOEJPPDBAA = 1f;
+		protected float maxOpacity = 1f;
 
-		protected float PNOCLNNCEBB;
+		protected float minOpacity;
 
-		protected float MGPPBIADMJM = 1f;
+		protected float currentOpacity = 1f;
 
-		public ButtonClickedEvent AGPIEADCCOC
+		public ButtonClickedEvent DoubleClickEvent
 		{
 			get
 			{
@@ -31,7 +31,7 @@ namespace Nekki.SF2.GUI
 			}
 		}
 
-		public virtual Vector3 GEHBDCJNJMJ
+		public virtual Vector3 CenterWorldPosition
 		{
 			get
 			{
@@ -39,7 +39,7 @@ namespace Nekki.SF2.GUI
 			}
 		}
 
-		public float JCMBJGNEBPM
+		public float MaximumOpacity
 		{
 			get
 			{
@@ -51,7 +51,7 @@ namespace Nekki.SF2.GUI
 			}
 		}
 
-		public float GDMHGFKKIDL
+		public float MinimumOpacity
 		{
 			get
 			{
@@ -63,7 +63,7 @@ namespace Nekki.SF2.GUI
 			}
 		}
 
-		public virtual float NLLBLGNNFBA
+		public virtual float CurrentOpacity
 		{
 			get
 			{
@@ -83,22 +83,22 @@ namespace Nekki.SF2.GUI
 
 		public string get_Name()
 		{
-			return HKGHEJDKCPI;
+			return itemName;
 		}
 
 		public void set_Name(string value)
 		{
-			HKGHEJDKCPI = value;
+			itemName = value;
 		}
 
 		public ButtonClickedEvent get_onDoubleClick()
 		{
-			return EIAODLFEAPA;
+			return doubleClickEvent;
 		}
 
 		public void set_onDoubleClick(ButtonClickedEvent value)
 		{
-			EIAODLFEAPA = value;
+			doubleClickEvent = value;
 		}
 
 		public virtual Vector2 get_Size()
@@ -120,32 +120,32 @@ namespace Nekki.SF2.GUI
 
 		public float get_MaxOpacity()
 		{
-			return BFOEJPPDBAA;
+			return maxOpacity;
 		}
 
 		public void set_MaxOpacity(float value)
 		{
-			BFOEJPPDBAA = value;
+			maxOpacity = value;
 		}
 
 		public float get_MinOpacity()
 		{
-			return PNOCLNNCEBB;
+			return minOpacity;
 		}
 
 		public void set_MinOpacity(float value)
 		{
-			PNOCLNNCEBB = value;
+			minOpacity = value;
 		}
 
 		public virtual float get_Opacity()
 		{
-			return MGPPBIADMJM;
+			return currentOpacity;
 		}
 
 		public virtual void set_Opacity(float value)
 		{
-			MGPPBIADMJM = value;
+			currentOpacity = value;
 		}
 
 		public override void OnPointerClick(PointerEventData BHOLFGOGPCP)

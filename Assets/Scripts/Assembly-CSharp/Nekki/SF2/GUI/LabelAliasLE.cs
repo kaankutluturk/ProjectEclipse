@@ -10,7 +10,7 @@ namespace Nekki.SF2.GUI
 		[SerializeField]
 		private LayoutElement _LayoutElement;
 
-		public LayoutElement CMFIABIFDDD
+		public LayoutElement LayoutElementRef
 		{
 			get
 			{
@@ -22,7 +22,7 @@ namespace Nekki.SF2.GUI
 			}
 		}
 
-		public new string HCPNFPMHFCM
+		public new string DisplayText
 		{
 			get
 			{

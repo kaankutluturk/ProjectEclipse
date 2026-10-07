@@ -3,25 +3,25 @@ using System.Xml;
 
 public class ConditionOperator : ConditionCounter
 {
-	public enum EENJGHHIHIH
+	public enum OperatorKind
 	{
 		TYPE_NONE = 0,
 		TYPE_OR = 1,
 		TYPE_AND = 2
 	}
 
-	public EENJGHHIHIH Type;
+	public OperatorKind Type;
 
 	private List<ConditionCounter> _conditions = new List<ConditionCounter>();
 
 	public ConditionOperator()
-		: base(FELOFIAKFCO.OPERATOR)
+		: base(CounterConditionType.OPERATOR)
 	{
-		Type = EENJGHHIHIH.TYPE_AND;
+		Type = OperatorKind.TYPE_AND;
 	}
 
 	public ConditionOperator(XmlNode node)
-		: base(FELOFIAKFCO.OPERATOR)
+		: base(CounterConditionType.OPERATOR)
 	{
 		Parse(node);
 	}
@@ -31,33 +31,33 @@ public class ConditionOperator : ConditionCounter
 		foreach (ConditionCounter item in _conditions)
 		{
 			bool flag = item.IsEqual(conditions);
-			if (Type == EENJGHHIHIH.TYPE_AND && !flag)
+			if (Type == OperatorKind.TYPE_AND && !flag)
 			{
 				return IsNotCompare(false);
 			}
-			if (Type == EENJGHHIHIH.TYPE_OR && flag)
+			if (Type == OperatorKind.TYPE_OR && flag)
 			{
 				return IsNotCompare(true);
 			}
 		}
-		if (Type == EENJGHHIHIH.TYPE_AND)
+		if (Type == OperatorKind.TYPE_AND)
 		{
 			return IsNotCompare(true);
 		}
-		if (Type == EENJGHHIHIH.TYPE_OR)
+		if (Type == OperatorKind.TYPE_OR)
 		{
 			return IsNotCompare(false);
 		}
-		LLLOJBFMONN.Error(string.Format("ConditionOperator::isEqual - wrong type: %i", Type));
+		GameLog.Error(string.Format("ConditionOperator::isEqual - wrong type: %i", Type));
 		return false;
 	}
 
-	public void DIJNEIJHDIN(XmlNode EBLIGDMALEA)
+	public void ParseConditions(XmlNode EBLIGDMALEA)
 	{
 		_conditions.Clear();
 		foreach (XmlNode childNode in EBLIGDMALEA.ChildNodes)
 		{
-			ConditionCounter kAJIECHJBNL = CounterConditionsParser.DKPIKJMJPPH(childNode);
+			ConditionCounter kAJIECHJBNL = CounterConditionsParser.ParseCondition(childNode);
 			if (kAJIECHJBNL != null)
 			{
 				_conditions.Add(kAJIECHJBNL);
@@ -65,15 +65,15 @@ public class ConditionOperator : ConditionCounter
 		}
 	}
 
-	public override void AEPHNNABOEK()
+	public override void Initialize()
 	{
 		foreach (ConditionCounter item in _conditions)
 		{
-			item.AEPHNNABOEK();
+			item.Initialize();
 		}
 	}
 
-	public void BFPIIJDAEME(ConditionCounter EPJGLECOIBG)
+	public void AddCondition(ConditionCounter EPJGLECOIBG)
 	{
 		_conditions.Add(EPJGLECOIBG);
 	}
@@ -81,20 +81,20 @@ public class ConditionOperator : ConditionCounter
 	protected override void Parse(XmlNode node)
 	{
 		base.Parse(node);
-		string text = node.Attributes["Type"].CIPOICEEIBK();
+		string text = node.Attributes["Type"].GetStringOrDefault();
 		if (text == "OR")
 		{
-			Type = EENJGHHIHIH.TYPE_OR;
+			Type = OperatorKind.TYPE_OR;
 		}
 		else if (text == "AND")
 		{
-			Type = EENJGHHIHIH.TYPE_AND;
+			Type = OperatorKind.TYPE_AND;
 		}
 		else
 		{
-			LLLOJBFMONN.Error("ConditionOperator::ConditionOperator - wrong type: %s", text);
-			Type = EENJGHHIHIH.TYPE_NONE;
+			GameLog.Error("ConditionOperator::ConditionOperator - wrong type: %s", text);
+			Type = OperatorKind.TYPE_NONE;
 		}
-		DIJNEIJHDIN(node);
+		ParseConditions(node);
 	}
 }

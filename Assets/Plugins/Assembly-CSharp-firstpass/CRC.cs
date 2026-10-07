@@ -23,12 +23,12 @@ internal class CRC
 		_value = uint.MaxValue;
 	}
 
-	public void ACPKJBOHJPM(byte AAOIAEJJINO)
+	public void UpdateByte(byte AAOIAEJJINO)
 	{
 		_value = Table[(byte)_value ^ AAOIAEJJINO] ^ (_value >> 8);
 	}
 
-	public void JLPMOKPFECK(byte[] data, uint IPCOBJBKNAO, uint PEEOEOMEBFG)
+	public void Update(byte[] data, uint IPCOBJBKNAO, uint PEEOEOMEBFG)
 	{
 		for (uint num = 0u; num < PEEOEOMEBFG; num++)
 		{
@@ -36,20 +36,20 @@ internal class CRC
 		}
 	}
 
-	public uint KJNMNANMEFG()
+	public uint GetDigest()
 	{
 		return _value ^ 0xFFFFFFFFu;
 	}
 
-	private static uint MBNDDIKGGFC(byte[] data, uint IPCOBJBKNAO, uint PEEOEOMEBFG)
+	private static uint CalculateDigest(byte[] data, uint IPCOBJBKNAO, uint PEEOEOMEBFG)
 	{
 		CRC nEOAHLMJHKC = new CRC();
-		nEOAHLMJHKC.JLPMOKPFECK(data, IPCOBJBKNAO, PEEOEOMEBFG);
-		return nEOAHLMJHKC.KJNMNANMEFG();
+		nEOAHLMJHKC.Update(data, IPCOBJBKNAO, PEEOEOMEBFG);
+		return nEOAHLMJHKC.GetDigest();
 	}
 
-	private static bool PKINCIJAPJM(uint MODPGIJPPMP, byte[] data, uint IPCOBJBKNAO, uint PEEOEOMEBFG)
+	private static bool VerifyDigest(uint MODPGIJPPMP, byte[] data, uint IPCOBJBKNAO, uint PEEOEOMEBFG)
 	{
-		return MBNDDIKGGFC(data, IPCOBJBKNAO, PEEOEOMEBFG) == MODPGIJPPMP;
+		return CalculateDigest(data, IPCOBJBKNAO, PEEOEOMEBFG) == MODPGIJPPMP;
 	}
 }

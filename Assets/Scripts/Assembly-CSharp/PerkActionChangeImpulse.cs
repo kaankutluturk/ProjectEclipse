@@ -4,101 +4,101 @@ using System.Xml;
 public class PerkActionChangeImpulse : PerkAction
 {
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private float BPKFKDMGJPO;
+	private float _multiplierX;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private float GCJFHFFIBEB;
+	private float _multiplierY;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private float PAEPBIJKLOJ;
+	private float _multiplierZ;
 
-	public float JMDNHEBNGKD
+	public float ImpulseMultiplierX
 	{
 		get
 		{
-			return NBECOMENIEH();
+			return GetMultiplierX();
 		}
 		protected set
 		{
-			KMIBMHIIFDD(value);
+			SetMultiplierX(value);
 		}
 	}
 
-	public float IDMCNBHKHFB
+	public float ImpulseMultiplierY
 	{
 		get
 		{
-			return LEAGBJCDLLA();
+			return GetMultiplierY();
 		}
 		protected set
 		{
-			IIMEGJODOLL(value);
+			SetMultiplierY(value);
 		}
 	}
 
-	public float MCEMNPAGNHH
+	public float ImpulseMultiplierZ
 	{
 		get
 		{
-			return HODMHJNNFFG();
+			return GetMultiplierZ();
 		}
 		protected set
 		{
-			DIMJPGEPCMF(value);
+			SetMultiplierZ(value);
 		}
 	}
 
 	public PerkActionChangeImpulse()
 	{
-		KMIBMHIIFDD(1f);
-		IIMEGJODOLL(1f);
-		DIMJPGEPCMF(1f);
+		SetMultiplierX(1f);
+		SetMultiplierY(1f);
+		SetMultiplierZ(1f);
 	}
 
 	public PerkActionChangeImpulse(PerkActionChangeImpulse NOLFMPDGCOC)
 		: base(NOLFMPDGCOC)
 	{
-		KMIBMHIIFDD(NOLFMPDGCOC.NBECOMENIEH());
-		IIMEGJODOLL(NOLFMPDGCOC.LEAGBJCDLLA());
-		DIMJPGEPCMF(NOLFMPDGCOC.HODMHJNNFFG());
+		SetMultiplierX(NOLFMPDGCOC.GetMultiplierX());
+		SetMultiplierY(NOLFMPDGCOC.GetMultiplierY());
+		SetMultiplierZ(NOLFMPDGCOC.GetMultiplierZ());
 	}
 
-	public float NBECOMENIEH()
+	public float GetMultiplierX()
 	{
-		return BPKFKDMGJPO;
+		return _multiplierX;
 	}
 
-	protected void KMIBMHIIFDD(float value)
+	protected void SetMultiplierX(float value)
 	{
-		BPKFKDMGJPO = value;
+		_multiplierX = value;
 	}
 
-	public float LEAGBJCDLLA()
+	public float GetMultiplierY()
 	{
-		return GCJFHFFIBEB;
+		return _multiplierY;
 	}
 
-	protected void IIMEGJODOLL(float value)
+	protected void SetMultiplierY(float value)
 	{
-		GCJFHFFIBEB = value;
+		_multiplierY = value;
 	}
 
-	public float HODMHJNNFFG()
+	public float GetMultiplierZ()
 	{
-		return PAEPBIJKLOJ;
+		return _multiplierZ;
 	}
 
-	protected void DIMJPGEPCMF(float value)
+	protected void SetMultiplierZ(float value)
 	{
-		PAEPBIJKLOJ = value;
+		_multiplierZ = value;
 	}
 
 	public override void Parse(XmlNode node)
 	{
 		base.Parse(node);
 		set_Type(ActionType.ACTION_CHANGE_IMPULSE);
-		KMIBMHIIFDD(node.Attributes["MultiplierX"].ParseFloat());
-		IIMEGJODOLL(node.Attributes["MultiplierY"].ParseFloat());
-		DIMJPGEPCMF(node.Attributes["MultiplierZ"].ParseFloat());
+		SetMultiplierX(node.Attributes["MultiplierX"].ParseFloat());
+		SetMultiplierY(node.Attributes["MultiplierY"].ParseFloat());
+		SetMultiplierZ(node.Attributes["MultiplierZ"].ParseFloat());
 	}
 }

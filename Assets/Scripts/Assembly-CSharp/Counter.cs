@@ -2,14 +2,14 @@ using System.Xml;
 
 public class Counter
 {
-	public enum IPENPHOAEGL
+	public enum CounterSpan
 	{
 		SPAN_NONE = 0,
 		SPAN_ROUND = 1,
 		SPAN_FIGHT = 2
 	}
 
-	public enum NENOEMHAEFH
+	public enum CounterMode
 	{
 		ECLIPSE_MODE = 0,
 		NORMAL_MODE = 1,
@@ -21,23 +21,23 @@ public class Counter
 
 	public string Type;
 
-	public string DEGIADEEFGG;
+	public string FightType;
 
-	public string FGICHADOEHF;
+	public string AnimationName;
 
-	public string JIIFFJAJNNN;
+	public string WeaponName;
 
-	public string IOJFIFODOKO;
+	public string FightName;
 
-	public string FHAGEKGLJOI;
+	public string SecondFightName;
 
-	public string GAHBCLAMANC;
+	public string MaxDifficulty;
 
-	public string MJOJIPKLJOL;
+	public string MinDifficulty;
 
-	public IPENPHOAEGL KKNOICPMJPO;
+	public CounterSpan Span;
 
-	public NENOEMHAEFH NHDPMIGHKPF;
+	public CounterMode Mode;
 
 	public float Value;
 
@@ -45,90 +45,90 @@ public class Counter
 
 	public bool IsFightEnd;
 
-	public ConditionOperator JIFAHHGNPFH = new ConditionOperator();
+	public ConditionOperator Conditions = new ConditionOperator();
 
-	public ConditionOfCompletionInspector DCIAEOCNHNO = new ConditionOfCompletionInspector();
+	public ConditionOfCompletionInspector CompletionInspector = new ConditionOfCompletionInspector();
 
 	public Counter(XmlNode node)
 	{
-		Name = node.Attributes["Name"].CIPOICEEIBK(string.Empty);
+		Name = node.Attributes["Name"].GetStringOrDefault(string.Empty);
 		Value = node.Attributes["Value"].ParseFloat();
-		FGICHADOEHF = node.Attributes["Animation"].CIPOICEEIBK(string.Empty);
-		JIIFFJAJNNN = node.Attributes["Weapon"].CIPOICEEIBK(string.Empty);
-		IOJFIFODOKO = node.Attributes["Fight"].CIPOICEEIBK(string.Empty);
-		FHAGEKGLJOI = node.Attributes["Fight2"].CIPOICEEIBK(string.Empty);
-		Type = node.Attributes["Type"].CIPOICEEIBK(string.Empty);
-		DEGIADEEFGG = node.Attributes["FightType"].CIPOICEEIBK(string.Empty);
-		GAHBCLAMANC = node.Attributes["MaxDifficulty"].CIPOICEEIBK(string.Empty);
-		MJOJIPKLJOL = node.Attributes["MinDifficulty"].CIPOICEEIBK(string.Empty);
+		AnimationName = node.Attributes["Animation"].GetStringOrDefault(string.Empty);
+		WeaponName = node.Attributes["Weapon"].GetStringOrDefault(string.Empty);
+		FightName = node.Attributes["Fight"].GetStringOrDefault(string.Empty);
+		SecondFightName = node.Attributes["Fight2"].GetStringOrDefault(string.Empty);
+		Type = node.Attributes["Type"].GetStringOrDefault(string.Empty);
+		FightType = node.Attributes["FightType"].GetStringOrDefault(string.Empty);
+		MaxDifficulty = node.Attributes["MaxDifficulty"].GetStringOrDefault(string.Empty);
+		MinDifficulty = node.Attributes["MinDifficulty"].GetStringOrDefault(string.Empty);
 		IsFightEnd = node.Attributes["OnFightEnd"].ParseBool();
 		CompleteValue = 0;
-		SetSpan(node.Attributes["CounterSpan"].CIPOICEEIBK(string.Empty));
-		CCKKOCDBPBE(node);
-		JIFAHHGNPFH.Type = ConditionOperator.EENJGHHIHIH.TYPE_AND;
-		CounterConditionsParser.FDABJKODMAI(node, JIFAHHGNPFH, DCIAEOCNHNO);
+		SetSpan(node.Attributes["CounterSpan"].GetStringOrDefault(string.Empty));
+		ParseMode(node);
+		Conditions.Type = ConditionOperator.OperatorKind.TYPE_AND;
+		CounterConditionsParser.ParseCompletionConditions(node, Conditions, CompletionInspector);
 	}
 
 	public void SetSpan(string name)
 	{
 		if (name == "Round")
 		{
-			KKNOICPMJPO = IPENPHOAEGL.SPAN_ROUND;
+			Span = CounterSpan.SPAN_ROUND;
 		}
 		else if (name == "Fight")
 		{
-			KKNOICPMJPO = IPENPHOAEGL.SPAN_FIGHT;
+			Span = CounterSpan.SPAN_FIGHT;
 		}
 		else
 		{
-			KKNOICPMJPO = IPENPHOAEGL.SPAN_NONE;
+			Span = CounterSpan.SPAN_NONE;
 		}
 	}
 
-	public void CCKKOCDBPBE(XmlNode node)
+	public void ParseMode(XmlNode node)
 	{
 		if (node.Attributes["RaidMode"].ParseBool())
 		{
-			NHDPMIGHKPF = NENOEMHAEFH.RAID_MODE;
+			Mode = CounterMode.RAID_MODE;
 			return;
 		}
-		string text = node.Attributes["EclipseMode"].CIPOICEEIBK();
+		string text = node.Attributes["EclipseMode"].GetStringOrDefault();
 		if (text == "1")
 		{
-			NHDPMIGHKPF = NENOEMHAEFH.ECLIPSE_MODE;
+			Mode = CounterMode.ECLIPSE_MODE;
 		}
 		else if (text == "0")
 		{
-			NHDPMIGHKPF = NENOEMHAEFH.NORMAL_MODE;
+			Mode = CounterMode.NORMAL_MODE;
 		}
 		else
 		{
-			NHDPMIGHKPF = NENOEMHAEFH.NONE_MODE;
+			Mode = CounterMode.NONE_MODE;
 		}
 	}
 
-	public void EPCNPJEALBH(XmlNode node)
+	public void ParseConditions(XmlNode node)
 	{
-		JIFAHHGNPFH.Type = ConditionOperator.EENJGHHIHIH.TYPE_AND;
-		JIFAHHGNPFH.DIJNEIJHDIN(node);
+		Conditions.Type = ConditionOperator.OperatorKind.TYPE_AND;
+		Conditions.ParseConditions(node);
 	}
 
-	public bool CHDEIEMINPF(CounterConditions conditions)
+	public bool AreConditionsMet(CounterConditions conditions)
 	{
-		return JIFAHHGNPFH.IsEqual(conditions);
+		return Conditions.IsEqual(conditions);
 	}
 
-	public bool CAIPCEHIBOO(FightIDS DIAIIPCBMFL)
+	public bool IsFightComplete(FightIDS DIAIIPCBMFL)
 	{
-		return DCIAEOCNHNO.OPKPFKJPHNN(DIAIIPCBMFL);
+		return CompletionInspector.AreAllComplete(DIAIIPCBMFL);
 	}
 
-	public void AEPHNNABOEK()
+	public void Initialize()
 	{
-		JIFAHHGNPFH.AEPHNNABOEK();
+		Conditions.Initialize();
 	}
 
-	public void CPMPOPHBFKJ()
+	public void ResetCompleteValue()
 	{
 		CompleteValue = 0;
 	}

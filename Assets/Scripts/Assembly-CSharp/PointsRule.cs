@@ -2,95 +2,95 @@ using System.Xml;
 
 public class PointsRule : InFightRule
 {
-	public enum KEJJHEAMBAP
+	public enum StrikeZone
 	{
 		STRIKE_ZONE_HEAD = 0,
 		STRIKE_ZONE_BODY = 1,
 		STRIKE_ZONE_ALL = 2
 	}
 
-	private PointsTableType FMLJFBHMJKK;
+	private PointsTableType tableType;
 
-	private int HEKFOIEOBPN;
+	private int pointsPerHit;
 
-	private int DIHLAMOGKJE;
+	private int playerPoints;
 
-	private int KNDGDKJILNN;
+	private int opponentPoints;
 
-	private int OIHDELFOFHF;
+	private int maxPoints;
 
-	private bool ECLDOOLAMPF;
+	private bool isFinished;
 
-	private bool CPGDLAMPMLP;
+	private bool requiredBlock;
 
-	private bool GGOMIDAKMKN;
+	private bool requiredCritical;
 
-	private bool NEGPPGMNLGG;
+	private bool requiredShock;
 
-	private bool GMMFLGHLNPE;
+	private bool hasBlockFilter;
 
-	private bool ENCPNDEDFPC;
+	private bool hasCriticalFilter;
 
-	private bool ELLKDNDKKKA;
+	private bool hasShockFilter;
 
-	private KEJJHEAMBAP DHKCMCEOEOH;
+	private StrikeZone strikeZone;
 
 	public PointsRule(XmlNode node, RuleAppliance EJPOJJKKICO)
-		: base(BCBLLMPAMLP.RulePoints, EJPOJJKKICO, node)
+		: base(RuleType.RulePoints, EJPOJJKKICO, node)
 	{
-		KNDGDKJILNN = 0;
-		DIHLAMOGKJE = 0;
-		ECLDOOLAMPF = false;
-		DHKCMCEOEOH = KEJJHEAMBAP.STRIKE_ZONE_ALL;
-		FMLJFBHMJKK = PointsTableType.POINTS_TABLE_CONTEST;
-		CPGDLAMPMLP = false;
-		GGOMIDAKMKN = false;
-		NEGPPGMNLGG = false;
-		KOKHKAFELGL = false;
-		EBJIKKBLBEM(FightEvent.StrikeEvent);
-		EBJIKKBLBEM(FightEvent.TimeoutEvent);
+		opponentPoints = 0;
+		playerPoints = 0;
+		isFinished = false;
+		strikeZone = StrikeZone.STRIKE_ZONE_ALL;
+		tableType = PointsTableType.POINTS_TABLE_CONTEST;
+		requiredBlock = false;
+		requiredCritical = false;
+		requiredShock = false;
+		applianceLosesOnTrigger = false;
+		SubscribeEvent(FightEvent.StrikeEvent);
+		SubscribeEvent(FightEvent.TimeoutEvent);
 		Parse(node);
 		Reset();
 	}
 
 	public override void Reset()
 	{
-		KNDGDKJILNN = 0;
-		DIHLAMOGKJE = 0;
-		ECLDOOLAMPF = false;
+		opponentPoints = 0;
+		playerPoints = 0;
+		isFinished = false;
 	}
 
 	public override bool Compare(object data)
 	{
-		AGCBHKBNMKL(data);
+		PrepareCompare(data);
 		PlayersFightData jNGGHELCPFM = (PlayersFightData)data;
-		bool result = false || IPJHOBCMOAC(jNGGHELCPFM.MPLPEMOFHGI, jNGGHELCPFM.EKBMBILHBMC, true) || IPJHOBCMOAC(jNGGHELCPFM.EKBMBILHBMC, jNGGHELCPFM.MPLPEMOFHGI, false);
-		if (jNGGHELCPFM.MPLPEMOFHGI.KOJNCHKPLLN == FightEvent.TimeoutEvent || jNGGHELCPFM.EKBMBILHBMC.KOJNCHKPLLN == FightEvent.TimeoutEvent)
+		bool result = false || TryCountStrike(jNGGHELCPFM.PlayerData, jNGGHELCPFM.EnemyData, true) || TryCountStrike(jNGGHELCPFM.EnemyData, jNGGHELCPFM.PlayerData, false);
+		if (jNGGHELCPFM.PlayerData.FightEventType == FightEvent.TimeoutEvent || jNGGHELCPFM.EnemyData.FightEventType == FightEvent.TimeoutEvent)
 		{
-			ECLDOOLAMPF = true;
+			isFinished = true;
 			result = true;
 		}
 		return result;
 	}
 
-	public int BDHKJEFJNFJ()
+	public int GetPlayerPoints()
 	{
-		return DIHLAMOGKJE;
+		return playerPoints;
 	}
 
-	public int MHCBPGMIEEH()
+	public int GetOpponentPoints()
 	{
-		return KNDGDKJILNN;
+		return opponentPoints;
 	}
 
-	public int OEDHHGKAMID()
+	public int GetMaxPoints()
 	{
-		return OIHDELFOFHF;
+		return maxPoints;
 	}
 
-	public bool FEIKKONCLFE()
+	public bool GetIsFinished()
 	{
-		return ECLDOOLAMPF;
+		return isFinished;
 	}
 
 	public override void InitRule(object data)
@@ -98,14 +98,14 @@ public class PointsRule : InFightRule
 		Reset();
 	}
 
-	public override RuleAppliance IMINMDOFHMG()
+	public override RuleAppliance GetWinnerAppliance()
 	{
-		switch (FMLJFBHMJKK)
+		switch (tableType)
 		{
 		case PointsTableType.POINTS_TABLE_CONTEST:
-			return (DIHLAMOGKJE > KNDGDKJILNN) ? RuleAppliance.AppliancePlayer : RuleAppliance.ApplianceOpponent;
+			return (playerPoints > opponentPoints) ? RuleAppliance.AppliancePlayer : RuleAppliance.ApplianceOpponent;
 		case PointsTableType.POINTS_TABLE_SCORE:
-			if (DIHLAMOGKJE >= OIHDELFOFHF)
+			if (playerPoints >= maxPoints)
 			{
 				return RuleAppliance.AppliancePlayer;
 			}
@@ -115,74 +115,74 @@ public class PointsRule : InFightRule
 		}
 	}
 
-	public PointsTableType GCKBDFJKPDC()
+	public PointsTableType GetTableType()
 	{
-		return FMLJFBHMJKK;
+		return tableType;
 	}
 
 	protected override void Parse(XmlNode node)
 	{
 		base.Parse(node);
-		string text = node.Attributes["Type"].CIPOICEEIBK("Contest");
+		string text = node.Attributes["Type"].GetStringOrDefault("Contest");
 		if (text == "Contest")
 		{
-			FMLJFBHMJKK = PointsTableType.POINTS_TABLE_CONTEST;
+			tableType = PointsTableType.POINTS_TABLE_CONTEST;
 		}
 		else if (text == "Score")
 		{
-			FMLJFBHMJKK = PointsTableType.POINTS_TABLE_SCORE;
+			tableType = PointsTableType.POINTS_TABLE_SCORE;
 		}
-		OIHDELFOFHF = node.Attributes["Max"].ParseInt();
-		HEKFOIEOBPN = node.Attributes["PointsPerHit"].ParseInt();
-		GMMFLGHLNPE = !node.Attributes["Block"].Empty();
-		CPGDLAMPMLP = node.Attributes["Block"].ParseBool();
-		ENCPNDEDFPC = !node.Attributes["Critical"].Empty();
-		GGOMIDAKMKN = node.Attributes["Critical"].ParseBool();
-		ELLKDNDKKKA = !node.Attributes["Shock"].Empty();
-		NEGPPGMNLGG = node.Attributes["Shock"].ParseBool();
-		MPHICIMMGJB(node);
+		maxPoints = node.Attributes["Max"].ParseInt();
+		pointsPerHit = node.Attributes["PointsPerHit"].ParseInt();
+		hasBlockFilter = !node.Attributes["Block"].Empty();
+		requiredBlock = node.Attributes["Block"].ParseBool();
+		hasCriticalFilter = !node.Attributes["Critical"].Empty();
+		requiredCritical = node.Attributes["Critical"].ParseBool();
+		hasShockFilter = !node.Attributes["Shock"].Empty();
+		requiredShock = node.Attributes["Shock"].ParseBool();
+		ParseStrikeZone(node);
 	}
 
-	protected void MPHICIMMGJB(XmlNode node)
+	protected void ParseStrikeZone(XmlNode node)
 	{
-		string text = node.Attributes["Defense"].CIPOICEEIBK(string.Empty);
+		string text = node.Attributes["Defense"].GetStringOrDefault(string.Empty);
 		if (text == string.Empty)
 		{
-			DHKCMCEOEOH = KEJJHEAMBAP.STRIKE_ZONE_ALL;
+			strikeZone = StrikeZone.STRIKE_ZONE_ALL;
 		}
 		else if (text == "BodyDefense")
 		{
-			DHKCMCEOEOH = KEJJHEAMBAP.STRIKE_ZONE_BODY;
+			strikeZone = StrikeZone.STRIKE_ZONE_BODY;
 		}
 		else if (text == "HeadDefense")
 		{
-			DHKCMCEOEOH = KEJJHEAMBAP.STRIKE_ZONE_HEAD;
+			strikeZone = StrikeZone.STRIKE_ZONE_HEAD;
 		}
 	}
 
 	protected bool CheckStrikeZone(bool BNPGBHPDGHM)
 	{
-		return DHKCMCEOEOH == KEJJHEAMBAP.STRIKE_ZONE_ALL || (DHKCMCEOEOH == KEJJHEAMBAP.STRIKE_ZONE_HEAD && BNPGBHPDGHM) || (DHKCMCEOEOH == KEJJHEAMBAP.STRIKE_ZONE_BODY && !BNPGBHPDGHM);
+		return strikeZone == StrikeZone.STRIKE_ZONE_ALL || (strikeZone == StrikeZone.STRIKE_ZONE_HEAD && BNPGBHPDGHM) || (strikeZone == StrikeZone.STRIKE_ZONE_BODY && !BNPGBHPDGHM);
 	}
 
-	protected bool IPJHOBCMOAC(FightData MKIPNLEHIGE, FightData PHPLHIDFGMG, bool AKBKFMJLNFK)
+	protected bool TryCountStrike(FightData MKIPNLEHIGE, FightData PHPLHIDFGMG, bool AKBKFMJLNFK)
 	{
-		bool flag = !GMMFLGHLNPE || MKIPNLEHIGE.FIJOEIOHJFA == CPGDLAMPMLP;
-		bool flag2 = !ENCPNDEDFPC || MKIPNLEHIGE.IDAJOBOKPPP == GGOMIDAKMKN;
-		bool flag3 = !ELLKDNDKKKA || PHPLHIDFGMG.OGOFFCEGLHJ == NEGPPGMNLGG;
-		if (MKIPNLEHIGE.KOJNCHKPLLN == FightEvent.StrikeEvent && MKIPNLEHIGE.ONBMPLCEONN && flag && CheckStrikeZone(MKIPNLEHIGE.BNPGBHPDGHM) && flag2 && flag3)
+		bool flag = !hasBlockFilter || MKIPNLEHIGE.IsBlocked == requiredBlock;
+		bool flag2 = !hasCriticalFilter || MKIPNLEHIGE.IsCritical == requiredCritical;
+		bool flag3 = !hasShockFilter || PHPLHIDFGMG.IsShocked == requiredShock;
+		if (MKIPNLEHIGE.FightEventType == FightEvent.StrikeEvent && MKIPNLEHIGE.IsAttacker && flag && CheckStrikeZone(MKIPNLEHIGE.IsHeadHit) && flag2 && flag3)
 		{
 			if (AKBKFMJLNFK)
 			{
-				DIHLAMOGKJE++;
+				playerPoints++;
 			}
 			else
 			{
-				KNDGDKJILNN++;
+				opponentPoints++;
 			}
-			if (FMLJFBHMJKK == PointsTableType.POINTS_TABLE_SCORE && ((AKBKFMJLNFK && DIHLAMOGKJE >= OIHDELFOFHF) || (!AKBKFMJLNFK && KNDGDKJILNN >= OIHDELFOFHF)))
+			if (tableType == PointsTableType.POINTS_TABLE_SCORE && ((AKBKFMJLNFK && playerPoints >= maxPoints) || (!AKBKFMJLNFK && opponentPoints >= maxPoints)))
 			{
-				ECLDOOLAMPF = true;
+				isFinished = true;
 			}
 			return true;
 		}
@@ -192,8 +192,8 @@ public class PointsRule : InFightRule
 	public override InFightRule Copy()
 	{
 		InFightRule aAJIFBJLJOA = null;
-		RuleAppliance eJPOJJKKICO = EDAKADCHOLE();
-		XmlNode hKPPBKPJOEO = GIFDJEEGCJI().IOJIGDNFCFL();
+		RuleAppliance eJPOJJKKICO = GetAppliance();
+		XmlNode hKPPBKPJOEO = GetXmlSource().GetNode();
 		aAJIFBJLJOA = new PointsRule(hKPPBKPJOEO, eJPOJJKKICO);
 		aAJIFBJLJOA.IsRandom = IsRandom;
 		return aAJIFBJLJOA;

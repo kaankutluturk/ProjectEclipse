@@ -3,7 +3,7 @@ using UnityEngine;
 
 public sealed class ConnectionAPISample : MonoBehaviour
 {
-	private enum AGFILDNOCMD
+	private enum MessageType
 	{
 		Send = 0,
 		Broadcast = 1,
@@ -17,15 +17,15 @@ public sealed class ConnectionAPISample : MonoBehaviour
 
 	private readonly Uri URI = new Uri("http://besthttpsignalr.azurewebsites.net/raw-connection/");
 
-	private Connection FJGOJHMELAH;
+	private Connection signalRConnection;
 
-	private string GOKALAMDGAL = string.Empty;
+	private string toEverybodyText = string.Empty;
 
-	private string AJHINGDCGLO = string.Empty;
+	private string toMeText = string.Empty;
 
-	private string AIDLJIEDHKI = string.Empty;
+	private string privateMessageText = string.Empty;
 
-	private string KPKDNFNLLHH = string.Empty;
+	private string privateMessageUserOrGroupName = string.Empty;
 
 	private GUIMessageList messages = new GUIMessageList();
 
@@ -35,82 +35,82 @@ public sealed class ConnectionAPISample : MonoBehaviour
 		{
 			CookieJar.Set(URI, new Cookie("user", PlayerPrefs.GetString("userName")));
 		}
-		FJGOJHMELAH = new Connection(URI);
-		FJGOJHMELAH.LPEPILDNMNE(new PEELJCOAGOH());
-		FJGOJHMELAH.FADMHEJNPJO(DLJDCFEGCOE);
-		FJGOJHMELAH.EHOAGKMPCJH(ECDBJNFKOKI);
-		FJGOJHMELAH.LAJCMNNNIIM();
+		signalRConnection = new Connection(URI);
+		signalRConnection.SetJsonEncoder(new LitJsonEncoder());
+		signalRConnection.AddStateChangedHandler(OnStateChanged);
+		signalRConnection.AddNonHubMessageHandler(OnNonHubMessage);
+		signalRConnection.OpenConnection();
 	}
 
 	private void OnGUI()
 	{
-		GUIHelper.ECMOBPFHNPN(GUIHelper.ClientArea, true, () =>
+		GUIHelper.DrawArea(GUIHelper.ClientArea, true, () =>
 		{
 			GUILayout.BeginVertical();
 			GUILayout.Label("To Everybody");
 			GUILayout.BeginHorizontal();
-			GOKALAMDGAL = GUILayout.TextField(GOKALAMDGAL, GUILayout.MinWidth(100f));
+			toEverybodyText = GUILayout.TextField(toEverybodyText, GUILayout.MinWidth(100f));
 			if (GUILayout.Button("Broadcast"))
 			{
-				DADCDNNAHIE(GOKALAMDGAL);
+				Broadcast(toEverybodyText);
 			}
 			if (GUILayout.Button("Broadcast (All Except Me)"))
 			{
-				NDIOIGGMBEE(GOKALAMDGAL);
+				BroadcastExceptMe(toEverybodyText);
 			}
 			if (GUILayout.Button("Enter Name"))
 			{
-				AMLMKONNCMJ(GOKALAMDGAL);
+				EnterName(toEverybodyText);
 			}
 			if (GUILayout.Button("Join Group"))
 			{
-				DEDGJIFLHLH(GOKALAMDGAL);
+				JoinGroup(toEverybodyText);
 			}
 			if (GUILayout.Button("Leave Group"))
 			{
-				OGJBPKPJCIL(GOKALAMDGAL);
+				LeaveGroup(toEverybodyText);
 			}
 			GUILayout.EndHorizontal();
 			GUILayout.Label("To Me");
 			GUILayout.BeginHorizontal();
-			AJHINGDCGLO = GUILayout.TextField(AJHINGDCGLO, GUILayout.MinWidth(100f));
+			toMeText = GUILayout.TextField(toMeText, GUILayout.MinWidth(100f));
 			if (GUILayout.Button("Send to me"))
 			{
-				KNHFPLLADPB(AJHINGDCGLO);
+				SendToMe(toMeText);
 			}
 			GUILayout.EndHorizontal();
 			GUILayout.Label("Private Message");
 			GUILayout.BeginHorizontal();
 			GUILayout.Label("Message:");
-			AIDLJIEDHKI = GUILayout.TextField(AIDLJIEDHKI, GUILayout.MinWidth(100f));
+			privateMessageText = GUILayout.TextField(privateMessageText, GUILayout.MinWidth(100f));
 			GUILayout.Label("User or Group name:");
-			KPKDNFNLLHH = GUILayout.TextField(KPKDNFNLLHH, GUILayout.MinWidth(100f));
+			privateMessageUserOrGroupName = GUILayout.TextField(privateMessageUserOrGroupName, GUILayout.MinWidth(100f));
 			if (GUILayout.Button("Send to user"))
 			{
-				PNHJAFFODNO(KPKDNFNLLHH, AIDLJIEDHKI);
+				SendToUser(privateMessageUserOrGroupName, privateMessageText);
 			}
 			if (GUILayout.Button("Send to group"))
 			{
-				ALFMFLDILFE(KPKDNFNLLHH, AIDLJIEDHKI);
+				SendToGroup(privateMessageUserOrGroupName, privateMessageText);
 			}
 			GUILayout.EndHorizontal();
 			GUILayout.Space(20f);
-			if (FJGOJHMELAH.FLBBFDNHJAJ() == OHLFKFFAOMF.Closed)
+			if (signalRConnection.GetState() == ConnectionStates.Closed)
 			{
 				if (GUILayout.Button("Start Connection"))
 				{
-					FJGOJHMELAH.LAJCMNNNIIM();
+					signalRConnection.OpenConnection();
 				}
 			}
 			else if (GUILayout.Button("Stop Connection"))
 			{
-				FJGOJHMELAH.Close();
+				signalRConnection.Close();
 			}
 			GUILayout.Space(20f);
 			GUILayout.Label("Messages");
 			GUILayout.BeginHorizontal();
 			GUILayout.Space(20f);
-			messages.MCAIPGEPMDE(Screen.width - 20, 0f);
+			messages.Draw(Screen.width - 20, 0f);
 			GUILayout.EndHorizontal();
 			GUILayout.EndVertical();
 		});
@@ -118,88 +118,88 @@ public sealed class ConnectionAPISample : MonoBehaviour
 
 	private void OnDestroy()
 	{
-		FJGOJHMELAH.Close();
+		signalRConnection.Close();
 	}
 
-	private void ECDBJNFKOKI(Connection BJGMPDIKEJC, object data)
+	private void OnNonHubMessage(Connection BJGMPDIKEJC, object data)
 	{
 		string text = Json.Encode(data);
 		messages.Add("[Server Message] " + text);
 	}
 
-	private void DLJDCFEGCOE(Connection BJGMPDIKEJC, OHLFKFFAOMF JOBAGBFMMFP, OHLFKFFAOMF MPJEMGJIBBD)
+	private void OnStateChanged(Connection BJGMPDIKEJC, ConnectionStates JOBAGBFMMFP, ConnectionStates MPJEMGJIBBD)
 	{
 		messages.Add(string.Format("[State Change] {0} => {1}", JOBAGBFMMFP.ToString(), MPJEMGJIBBD.ToString()));
 	}
 
-	private void DADCDNNAHIE(string HCPNFPMHFCM)
+	private void Broadcast(string HCPNFPMHFCM)
 	{
-		FJGOJHMELAH.Send(new
+		signalRConnection.Send(new
 		{
-			Type = AGFILDNOCMD.Broadcast,
+			Type = MessageType.Broadcast,
 			Value = HCPNFPMHFCM
 		});
 	}
 
-	private void NDIOIGGMBEE(string HCPNFPMHFCM)
+	private void BroadcastExceptMe(string HCPNFPMHFCM)
 	{
-		FJGOJHMELAH.Send(new
+		signalRConnection.Send(new
 		{
-			Type = AGFILDNOCMD.BroadcastExceptMe,
+			Type = MessageType.BroadcastExceptMe,
 			Value = HCPNFPMHFCM
 		});
 	}
 
-	private void AMLMKONNCMJ(string name)
+	private void EnterName(string name)
 	{
-		FJGOJHMELAH.Send(new
+		signalRConnection.Send(new
 		{
-			Type = AGFILDNOCMD.Join,
+			Type = MessageType.Join,
 			Value = name
 		});
 	}
 
-	private void DEDGJIFLHLH(string LKLJOLILPCJ)
+	private void JoinGroup(string LKLJOLILPCJ)
 	{
-		FJGOJHMELAH.Send(new
+		signalRConnection.Send(new
 		{
-			Type = AGFILDNOCMD.AddToGroup,
+			Type = MessageType.AddToGroup,
 			Value = LKLJOLILPCJ
 		});
 	}
 
-	private void OGJBPKPJCIL(string LKLJOLILPCJ)
+	private void LeaveGroup(string LKLJOLILPCJ)
 	{
-		FJGOJHMELAH.Send(new
+		signalRConnection.Send(new
 		{
-			Type = AGFILDNOCMD.RemoveFromGroup,
+			Type = MessageType.RemoveFromGroup,
 			Value = LKLJOLILPCJ
 		});
 	}
 
-	private void KNHFPLLADPB(string HCPNFPMHFCM)
+	private void SendToMe(string HCPNFPMHFCM)
 	{
-		FJGOJHMELAH.Send(new
+		signalRConnection.Send(new
 		{
-			Type = AGFILDNOCMD.Send,
+			Type = MessageType.Send,
 			Value = HCPNFPMHFCM
 		});
 	}
 
-	private void PNHJAFFODNO(string HIMLMCMHHGJ, string HCPNFPMHFCM)
+	private void SendToUser(string HIMLMCMHHGJ, string HCPNFPMHFCM)
 	{
-		FJGOJHMELAH.Send(new
+		signalRConnection.Send(new
 		{
-			Type = AGFILDNOCMD.PrivateMessage,
+			Type = MessageType.PrivateMessage,
 			Value = string.Format("{0}|{1}", HIMLMCMHHGJ, HCPNFPMHFCM)
 		});
 	}
 
-	private void ALFMFLDILFE(string HIMLMCMHHGJ, string HCPNFPMHFCM)
+	private void SendToGroup(string HIMLMCMHHGJ, string HCPNFPMHFCM)
 	{
-		FJGOJHMELAH.Send(new
+		signalRConnection.Send(new
 		{
-			Type = AGFILDNOCMD.SendToGroup,
+			Type = MessageType.SendToGroup,
 			Value = string.Format("{0}|{1}", HIMLMCMHHGJ, HCPNFPMHFCM)
 		});
 	}

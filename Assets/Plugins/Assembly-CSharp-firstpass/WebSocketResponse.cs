@@ -11,47 +11,47 @@ public sealed class WebSocketResponse : HTTPResponse, IHeartbeat, IProtocol
 
 	public Action<WebSocketResponse, byte[]> OnBinary;
 
-	public Action<WebSocketResponse, WebSocketFrameReader> GJADNPIKFEL;
+	public Action<WebSocketResponse, WebSocketFrameReader> OnIncompleteFrame;
 
 	public Action<WebSocketResponse, ushort, string> OnClosed;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private TimeSpan HEDIFJHLGPB;
+	private TimeSpan pingFrequency;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private ushort OILAMPHCBBD;
+	private ushort maxFragmentSize;
 
-	private List<WebSocketFrameReader> OCKKDCBJLAK = new List<WebSocketFrameReader>();
+	private List<WebSocketFrameReader> incompleteFrames = new List<WebSocketFrameReader>();
 
-	private List<WebSocketFrameReader> IDBIIDBEJMF = new List<WebSocketFrameReader>();
+	private List<WebSocketFrameReader> completedFrames = new List<WebSocketFrameReader>();
 
-	private WebSocketFrameReader HHFKHCLMIPO;
+	private WebSocketFrameReader closeFrame;
 
 	private System.Threading.Thread ReceiverThread;
 
 	private object FrameLock = new object();
 
-	private object AINBLIFIDOL = new object();
+	private object sendLock = new object();
 
-	private bool MPDJPMMICIK;
+	private bool closeSent;
 
-	private bool BHJMGNNGEPC;
+	private bool closed;
 
 	private DateTime lastPing = DateTime.MinValue;
 
-	public bool BILHEJLBKMF
+	public bool IsConnectionClosed
 	{
 		get
 		{
-			return HDDABMLNDPK();
+			return GetIsClosed();
 		}
 	}
 
-	public TimeSpan OJIEBBAHBII
+	public TimeSpan PingInterval
 	{
 		get
 		{
-			return BKCALOLNDNA();
+			return GetPingFrequency();
 		}
 		private set
 		{
@@ -59,11 +59,11 @@ public sealed class WebSocketResponse : HTTPResponse, IHeartbeat, IProtocol
 		}
 	}
 
-	public ushort PMDGMFOEDNA
+	public ushort MaxFragmentLength
 	{
 		get
 		{
-			return DCLJBIMGBOE();
+			return GetMaxFragmentSize();
 		}
 		private set
 		{
@@ -74,41 +74,41 @@ public sealed class WebSocketResponse : HTTPResponse, IHeartbeat, IProtocol
 	internal WebSocketResponse(HTTPRequest ONOCIELLAPL, Stream ABJIEFMMIEK, bool IBIIADCLKCH, bool PEAJIKCANHP)
 		: base(ONOCIELLAPL, ABJIEFMMIEK, IBIIADCLKCH, PEAJIKCANHP)
 	{
-		DFIAKBONHGB(true);
-		BHJMGNNGEPC = false;
+		SetIsClosedManually(true);
+		closed = false;
 		set_MaxFragmentSize(32767);
 	}
 
-	public bool HDDABMLNDPK()
+	public bool GetIsClosed()
 	{
-		return BHJMGNNGEPC;
+		return closed;
 	}
 
-	public TimeSpan BKCALOLNDNA()
+	public TimeSpan GetPingFrequency()
 	{
-		return HEDIFJHLGPB;
+		return pingFrequency;
 	}
 
 	private void set_PingFrequnecy(TimeSpan value)
 	{
-		HEDIFJHLGPB = value;
+		pingFrequency = value;
 	}
 
-	public ushort DCLJBIMGBOE()
+	public ushort GetMaxFragmentSize()
 	{
-		return OILAMPHCBBD;
+		return maxFragmentSize;
 	}
 
 	private void set_MaxFragmentSize(ushort value)
 	{
-		OILAMPHCBBD = value;
+		maxFragmentSize = value;
 	}
 
-	internal void PBAFKNHCJHD()
+	internal void StartReceive()
 	{
-		if (ODOHODEENIB())
+		if (GetIsUpgraded())
 		{
-			ReceiverThread = new System.Threading.Thread(PCFDLMGIEKG);
+			ReceiverThread = new System.Threading.Thread(ReceiveThreadFunc);
 			ReceiverThread.Name = "WebSocket Receiver Thread";
 			ReceiverThread.IsBackground = true;
 			ReceiverThread.Start();
@@ -121,7 +121,7 @@ public sealed class WebSocketResponse : HTTPResponse, IHeartbeat, IProtocol
 		{
 			throw new ArgumentNullException("message must not be null!");
 		}
-		Send(new AEGCCCNBCML(LIOGIBJBHAH));
+		Send(new WebSocketTextFrame(LIOGIBJBHAH));
 	}
 
 	public void Send(byte[] data)
@@ -130,15 +130,15 @@ public sealed class WebSocketResponse : HTTPResponse, IHeartbeat, IProtocol
 		{
 			throw new ArgumentNullException("data must not be null!");
 		}
-		if ((long)data.Length > (long)(int)DCLJBIMGBOE())
+		if ((long)data.Length > (long)(int)GetMaxFragmentSize())
 		{
-			lock (AINBLIFIDOL)
+			lock (sendLock)
 			{
-				Send(new WebSocketBinaryFrame(data, 0uL, DCLJBIMGBOE(), false));
+				Send(new WebSocketBinaryFrame(data, 0uL, GetMaxFragmentSize(), false));
 				ulong num2;
-				for (ulong num = DCLJBIMGBOE(); num < (ulong)data.Length; num += num2)
+				for (ulong num = GetMaxFragmentSize(); num < (ulong)data.Length; num += num2)
 				{
-					num2 = Math.Min(DCLJBIMGBOE(), (ulong)data.Length - num);
+					num2 = Math.Min(GetMaxFragmentSize(), (ulong)data.Length - num);
 					Send(new WebSocketContinuationFrame(data, num, num2, num + num2 >= (ulong)data.Length));
 				}
 				return;
@@ -157,15 +157,15 @@ public sealed class WebSocketResponse : HTTPResponse, IHeartbeat, IProtocol
 		{
 			throw new ArgumentOutOfRangeException("offset + count >= data.Length");
 		}
-		if ((long)count > (long)(int)DCLJBIMGBOE())
+		if ((long)count > (long)(int)GetMaxFragmentSize())
 		{
-			lock (AINBLIFIDOL)
+			lock (sendLock)
 			{
-				Send(new WebSocketBinaryFrame(data, IPCOBJBKNAO, DCLJBIMGBOE(), false));
+				Send(new WebSocketBinaryFrame(data, IPCOBJBKNAO, GetMaxFragmentSize(), false));
 				ulong num2;
-				for (ulong num = IPCOBJBKNAO + DCLJBIMGBOE(); num < count; num += num2)
+				for (ulong num = IPCOBJBKNAO + GetMaxFragmentSize(); num < count; num += num2)
 				{
-					num2 = Math.Min(DCLJBIMGBOE(), count - num);
+					num2 = Math.Min(GetMaxFragmentSize(), count - num);
 					Send(new WebSocketContinuationFrame(data, num, num2, num + num2 >= count));
 				}
 				return;
@@ -180,17 +180,17 @@ public sealed class WebSocketResponse : HTTPResponse, IHeartbeat, IProtocol
 		{
 			throw new ArgumentNullException("frame is null!");
 		}
-		if (!BHJMGNNGEPC)
+		if (!closed)
 		{
 			byte[] array = frame.Get();
-			lock (AINBLIFIDOL)
+			lock (sendLock)
 			{
 				Stream.Write(array, 0, array.Length);
 				Stream.Flush();
 			}
-			if (frame.get_Type() == BECKAHJIEGE.ConnectionClose)
+			if (frame.get_Type() == WebSocketFrameTypes.ConnectionClose)
 			{
-				MPDJPMMICIK = true;
+				closeSent = true;
 			}
 		}
 	}
@@ -202,7 +202,7 @@ public sealed class WebSocketResponse : HTTPResponse, IHeartbeat, IProtocol
 
 	public void Close(ushort KJPGKHJNOMC, string CKEHOEGLMBM)
 	{
-		if (!BHJMGNNGEPC)
+		if (!closed)
 		{
 			Send(new WebSocketClose(KJPGKHJNOMC, CKEHOEGLMBM));
 		}
@@ -215,91 +215,91 @@ public sealed class WebSocketResponse : HTTPResponse, IHeartbeat, IProtocol
 			throw new ArgumentException("frequency must be at least 100 millisec!");
 		}
 		set_PingFrequnecy(TimeSpan.FromMilliseconds(ONDDDDCAPFG));
-		HTTPManager.MAMNLAJACOD().ELAHFBCGAGL(this);
+		HTTPManager.GetHeartbeats().Subscribe(this);
 	}
 
-	private void PCFDLMGIEKG()
+	private void ReceiveThreadFunc()
 	{
 		try
 		{
-			while (!BHJMGNNGEPC)
+			while (!closed)
 			{
 				try
 				{
 					WebSocketFrameReader hENOIJFGGOF = new WebSocketFrameReader();
 					hENOIJFGGOF.Read(Stream);
-					if (hENOIJFGGOF.FIDNGEELBPG())
+					if (hENOIJFGGOF.GetHasMask())
 					{
 						Close(1002, "Protocol Error: masked frame received from server!");
 						continue;
 					}
-					if (!hENOIJFGGOF.MOOCLIBIPBI())
+					if (!hENOIJFGGOF.GetIsFinal())
 					{
-						if (GJADNPIKFEL == null)
+						if (OnIncompleteFrame == null)
 						{
-							OCKKDCBJLAK.Add(hENOIJFGGOF);
+							incompleteFrames.Add(hENOIJFGGOF);
 							continue;
 						}
 						lock (FrameLock)
 						{
-							IDBIIDBEJMF.Add(hENOIJFGGOF);
+							completedFrames.Add(hENOIJFGGOF);
 						}
 						continue;
 					}
 					switch (hENOIJFGGOF.get_Type())
 					{
-					case BECKAHJIEGE.Continuation:
-						if (GJADNPIKFEL == null)
+					case WebSocketFrameTypes.Continuation:
+						if (OnIncompleteFrame == null)
 						{
-							hENOIJFGGOF.Assemble(OCKKDCBJLAK);
-							OCKKDCBJLAK.Clear();
-							goto case BECKAHJIEGE.Text;
+							hENOIJFGGOF.Assemble(incompleteFrames);
+							incompleteFrames.Clear();
+							goto case WebSocketFrameTypes.Text;
 						}
 						lock (FrameLock)
 						{
-							IDBIIDBEJMF.Add(hENOIJFGGOF);
+							completedFrames.Add(hENOIJFGGOF);
 						}
 						break;
-					case BECKAHJIEGE.Text:
-					case BECKAHJIEGE.Binary:
+					case WebSocketFrameTypes.Text:
+					case WebSocketFrameTypes.Binary:
 						lock (FrameLock)
 						{
-							IDBIIDBEJMF.Add(hENOIJFGGOF);
+							completedFrames.Add(hENOIJFGGOF);
 						}
 						break;
-					case BECKAHJIEGE.Ping:
-						if (!MPDJPMMICIK && !BHJMGNNGEPC)
+					case WebSocketFrameTypes.Ping:
+						if (!closeSent && !closed)
 						{
 							Send(new WebSocketPong(hENOIJFGGOF));
 						}
 						break;
-					case BECKAHJIEGE.ConnectionClose:
-						HHFKHCLMIPO = hENOIJFGGOF;
-						if (!MPDJPMMICIK)
+					case WebSocketFrameTypes.ConnectionClose:
+						closeFrame = hENOIJFGGOF;
+						if (!closeSent)
 						{
 							Send(new WebSocketClose());
 						}
-						BHJMGNNGEPC = MPDJPMMICIK;
+						closed = closeSent;
 						break;
 					}
 				}
 				catch (ThreadAbortException)
 				{
-					OCKKDCBJLAK.Clear();
-					KEEGKCNNPGM.set_State(CFGBMHKCENK.Aborted);
-					BHJMGNNGEPC = true;
+					incompleteFrames.Clear();
+					BaseRequest.set_State(HTTPRequestStates.Aborted);
+					closed = true;
 				}
 				catch (Exception bAINMLLIKOL)
 				{
-					KEEGKCNNPGM.set_Exception(bAINMLLIKOL);
-					KEEGKCNNPGM.set_State(CFGBMHKCENK.Error);
-					BHJMGNNGEPC = true;
+					BaseRequest.set_Exception(bAINMLLIKOL);
+					BaseRequest.set_State(HTTPRequestStates.Error);
+					closed = true;
 				}
 			}
 		}
 		finally
 		{
-			HTTPManager.MAMNLAJACOD().HKMBDKKHPCB(this);
+			HTTPManager.GetHeartbeats().Unsubscribe(this);
 		}
 	}
 
@@ -307,57 +307,57 @@ public sealed class WebSocketResponse : HTTPResponse, IHeartbeat, IProtocol
 	{
 		lock (FrameLock)
 		{
-			for (int i = 0; i < IDBIIDBEJMF.Count; i++)
+			for (int i = 0; i < completedFrames.Count; i++)
 			{
-				WebSocketFrameReader hENOIJFGGOF = IDBIIDBEJMF[i];
+				WebSocketFrameReader hENOIJFGGOF = completedFrames[i];
 				try
 				{
-					BECKAHJIEGE bECKAHJIEGE = hENOIJFGGOF.get_Type();
-					if (bECKAHJIEGE == BECKAHJIEGE.Continuation)
+					WebSocketFrameTypes bECKAHJIEGE = hENOIJFGGOF.get_Type();
+					if (bECKAHJIEGE == WebSocketFrameTypes.Continuation)
 					{
 						goto IL_0041;
 					}
-					if (bECKAHJIEGE != BECKAHJIEGE.Text)
+					if (bECKAHJIEGE != WebSocketFrameTypes.Text)
 					{
-						if (bECKAHJIEGE == BECKAHJIEGE.Binary)
+						if (bECKAHJIEGE == WebSocketFrameTypes.Binary)
 						{
-							if (!hENOIJFGGOF.MOOCLIBIPBI())
+							if (!hENOIJFGGOF.GetIsFinal())
 							{
 								goto IL_0041;
 							}
 							if (OnBinary != null)
 							{
-								OnBinary(this, hENOIJFGGOF.CHIGLEKCFFN());
+								OnBinary(this, hENOIJFGGOF.GetData());
 							}
 						}
 					}
 					else
 					{
-						if (!hENOIJFGGOF.MOOCLIBIPBI())
+						if (!hENOIJFGGOF.GetIsFinal())
 						{
 							goto IL_0041;
 						}
 						if (OnText != null)
 						{
-							OnText(this, Encoding.UTF8.GetString(hENOIJFGGOF.CHIGLEKCFFN(), 0, hENOIJFGGOF.CHIGLEKCFFN().Length));
+							OnText(this, Encoding.UTF8.GetString(hENOIJFGGOF.GetData(), 0, hENOIJFGGOF.GetData().Length));
 						}
 					}
 					goto end_IL_0021;
 					IL_0041:
-					if (GJADNPIKFEL != null)
+					if (OnIncompleteFrame != null)
 					{
-						GJADNPIKFEL(this, hENOIJFGGOF);
+						OnIncompleteFrame(this, hENOIJFGGOF);
 					}
 					end_IL_0021:;
 				}
 				catch (Exception mPFFFAOGBJE)
 				{
-					HTTPManager.MBBMPNDDPIH().COHEDILAHFD("WebSocketResponse", "HandleEvents", mPFFFAOGBJE);
+					HTTPManager.GetLogger().Exception("WebSocketResponse", "HandleEvents", mPFFFAOGBJE);
 				}
 			}
-			IDBIIDBEJMF.Clear();
+			completedFrames.Clear();
 		}
-		if (!HDDABMLNDPK() || OnClosed == null || KEEGKCNNPGM.FLBBFDNHJAJ() != CFGBMHKCENK.Processing)
+		if (!GetIsClosed() || OnClosed == null || BaseRequest.GetState() != HTTPRequestStates.Processing)
 		{
 			return;
 		}
@@ -365,23 +365,23 @@ public sealed class WebSocketResponse : HTTPResponse, IHeartbeat, IProtocol
 		{
 			ushort arg = 0;
 			string arg2 = string.Empty;
-			if (HHFKHCLMIPO != null && HHFKHCLMIPO.CHIGLEKCFFN() != null && HHFKHCLMIPO.CHIGLEKCFFN().Length >= 2)
+			if (closeFrame != null && closeFrame.GetData() != null && closeFrame.GetData().Length >= 2)
 			{
 				if (BitConverter.IsLittleEndian)
 				{
-					Array.Reverse(HHFKHCLMIPO.CHIGLEKCFFN(), 0, 2);
+					Array.Reverse(closeFrame.GetData(), 0, 2);
 				}
-				arg = BitConverter.ToUInt16(HHFKHCLMIPO.CHIGLEKCFFN(), 0);
-				if (HHFKHCLMIPO.CHIGLEKCFFN().Length > 2)
+				arg = BitConverter.ToUInt16(closeFrame.GetData(), 0);
+				if (closeFrame.GetData().Length > 2)
 				{
-					arg2 = Encoding.UTF8.GetString(HHFKHCLMIPO.CHIGLEKCFFN(), 2, HHFKHCLMIPO.CHIGLEKCFFN().Length - 2);
+					arg2 = Encoding.UTF8.GetString(closeFrame.GetData(), 2, closeFrame.GetData().Length - 2);
 				}
 			}
 			OnClosed(this, arg, arg2);
 		}
 		catch (Exception mPFFFAOGBJE2)
 		{
-			HTTPManager.MBBMPNDDPIH().COHEDILAHFD("WebSocketResponse", "HandleEvents - OnClosed", mPFFFAOGBJE2);
+			HTTPManager.GetLogger().Exception("WebSocketResponse", "HandleEvents - OnClosed", mPFFFAOGBJE2);
 		}
 	}
 
@@ -391,9 +391,9 @@ public sealed class WebSocketResponse : HTTPResponse, IHeartbeat, IProtocol
 		{
 			lastPing = DateTime.UtcNow;
 		}
-		else if (DateTime.UtcNow - lastPing >= BKCALOLNDNA())
+		else if (DateTime.UtcNow - lastPing >= GetPingFrequency())
 		{
-			Send(new HKALCPMGELL(string.Empty));
+			Send(new WebSocketPing(string.Empty));
 			lastPing = DateTime.UtcNow;
 		}
 	}

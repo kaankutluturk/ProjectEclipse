@@ -83,16 +83,16 @@ foreach ($invalid in @(@(0,0), @(-1,0), @(0,2147483648))) {
     Check (!(Price $item $invalid[0] $invalid[1]).Success) 'Invalid native shop price accepted.'
 }
 $priceScope = Price $item 0 39
-Check ($priceScope.Success -and !$item.INCBGIDFIDN() -and $item.PLBFFNCCCGO() -and
-    $item.OHBBLIMNIMJ() -eq 0 -and $item.MCNMMBCJADI() -eq 39) 'Native gem price/currency override failed.'
-Check ($item.Clone().MCNMMBCJADI() -eq 39 -and !(Price $item 5 0).Success) 'Shop price copy or duplicate guard failed.'
+Check ($priceScope.Success -and !$item.HasCoinPrice() -and $item.HasGemPrice() -and
+    $item.GetCoinPrice() -eq 0 -and $item.GetGemPrice() -eq 39) 'Native gem price/currency override failed.'
+Check ($item.Clone().GetGemPrice() -eq 39 -and !(Price $item 5 0).Success) 'Shop price copy or duplicate guard failed.'
 $priceScope.Lifetime.Dispose()
-Check ($item.OHBBLIMNIMJ() -eq 7 -and $item.MCNMMBCJADI() -eq 30) 'Native shop price rollback failed.'
+Check ($item.GetCoinPrice() -eq 7 -and $item.GetGemPrice() -eq 30) 'Native shop price rollback failed.'
 $dualScope = Price $item 2550000 97
-Check ($dualScope.Success -and $item.OHBBLIMNIMJ() -eq 2550000 -and
-    $item.MCNMMBCJADI() -eq 97 -and $item.Clone().OHBBLIMNIMJ() -eq 2550000) 'Dual native price or copy failed.'
+Check ($dualScope.Success -and $item.GetCoinPrice() -eq 2550000 -and
+    $item.GetGemPrice() -eq 97 -and $item.Clone().GetCoinPrice() -eq 2550000) 'Dual native price or copy failed.'
 $dualScope.Lifetime.Dispose()
-Check ($item.OHBBLIMNIMJ() -eq 7 -and $item.MCNMMBCJADI() -eq 30) 'Dual native price rollback failed.'
+Check ($item.GetCoinPrice() -eq 7 -and $item.GetGemPrice() -eq 30) 'Dual native price rollback failed.'
 $presentationMethod = [ItemInfo].GetMethod('TryOverridePresentation', $flags)
 function Presentation($item, [string]$icon, [string]$model) {
     $arguments = [object[]]@($icon, $model, $null)
@@ -105,7 +105,7 @@ Check ($artScope.Success -and $item.FileName -eq 'core:ui/items/new_icon' -and
     $item.ModelFileName -eq 'core:gamedata/models/new_model' -and
     $item.Clone().ModelFileName -eq 'core:gamedata/models/new_model') 'Native item presentation or copy failed.'
 $fighterModel = [ModelParameters]::new(); $fighterModel.Weapon = $item
-$fighterModel.PPFDLIBLNDG()
+$fighterModel.BuildModelDocuments()
 Check ($fighterModel.ModelDocuments.Contains('core:gamedata/models/new_model.xml')) 'Fighter model preparation missed the patched model.'
 Check (!(Presentation $item 'core:ui/items/other' $null).Success) 'Duplicate native presentation accepted.'
 $artScope.Lifetime.Dispose()
@@ -132,27 +132,27 @@ $missingTemplate = $false
 try { $adapter.ApplyItems($items) }
 catch { $missingTemplate = $_.Exception.ToString().Contains('Initial profile upgrade template is unavailable') }
 Check ($missingTemplate -and $item.UpgradeTemplateName -eq 'Paid_Weapon_Bonus') 'Unavailable template did not reject atomically.'
-$items.CEKOFEFDMLJ.Add(([UpgradeDataContainer]::new()))
-$items.CEKOFEFDMLJ[0].Type = 'Weapon_Bonus'
+$items.UpgradeContainers.Add(([UpgradeDataContainer]::new()))
+$items.UpgradeContainers[0].Type = 'Weapon_Bonus'
 $adapter.ApplyItems($items)
 Check ($item.ItemLevel -eq 15 -and (RawStat $item 'WeaponDamage').Value -eq 342 -and
     $item.UpgradeTemplateName -eq 'Weapon_Bonus' -and $item.LegacyPaidItem -eq 'None' -and
-    $item.OHBBLIMNIMJ() -eq 0 -and $item.MCNMMBCJADI() -eq 39 -and
+    $item.GetCoinPrice() -eq 0 -and $item.GetGemPrice() -eq 39 -and
     $item.FileName -eq 'core:ui/items/weapon_kunai' -and
     $item.ModelFileName -eq 'core:gamedata/models/mdl_weapon_cool_katana') 'Adapter did not apply the profile, price and art.'
 [xml]$newPurchaseNode = '<Item Name="fixture" Count="1" UpgradeLevel="-1" Equipped="0"/>'
 $newPurchase = [UserItem]::new($newPurchaseNode.DocumentElement)
-$newPurchase.KIGHKCOCJFJ($item)
-Check ($newPurchase.DHNNCAEEMLL() -eq 1500 -and
-    [object]::ReferenceEquals($newPurchase.BHKHOJPANHE(), $item)) 'New inventory item did not inherit the patched catalog profile.'
+$newPurchase.SetInfo($item)
+Check ($newPurchase.GetUpgradeLevel() -eq 1500 -and
+    [object]::ReferenceEquals($newPurchase.GetInfo(), $item)) 'New inventory item did not inherit the patched catalog profile.'
 [xml]$savedNode = '<Item Name="fixture" Count="1" UpgradeLevel="600" Equipped="0"/>'
 $savedItem = [UserItem]::new($savedNode.DocumentElement)
-$savedItem.KIGHKCOCJFJ($item)
-Check ($savedItem.DHNNCAEEMLL() -eq 600) 'Existing saved upgrade level was migrated unexpectedly.'
+$savedItem.SetInfo($item)
+Check ($savedItem.GetUpgradeLevel() -eq 600) 'Existing saved upgrade level was migrated unexpectedly.'
 $null = [Eclipse.Modding.LegacyContentAdapter].GetMethod('RemoveItems', $flags).Invoke($adapter, @())
 Check ($item.ItemLevel -eq 1 -and (RawStat $item 'WeaponDamage').Value -eq 5 -and
     $item.UpgradeTemplateName -eq 'Paid_Weapon_Bonus' -and $item.LegacyPaidItem -eq 'Paid' -and
-    $item.OHBBLIMNIMJ() -eq 7 -and $item.MCNMMBCJADI() -eq 30 -and
+    $item.GetCoinPrice() -eq 7 -and $item.GetGemPrice() -eq 30 -and
     $item.FileName -eq 'core:ui/items/old_icon' -and
     $item.ModelFileName -eq 'core:gamedata/models/old_model') 'Adapter did not roll back the profile, price and art.'
 Write-Output "PASS $script:checks native item initial-profile checks. Cloning, invalid input and adapter rollback; no Unity purchase or save."

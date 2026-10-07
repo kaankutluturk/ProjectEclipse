@@ -14,7 +14,7 @@ $document = [xml]'<Movesxml><Moves/><Triggers/></Movesxml>'
 $null = $document.DocumentElement.PrependChild($document.ImportNode($source.SelectSingleNode('/Movesxml/Templates'), $true))
 $nativeType = $assembly.GetType('InfoAnimation', $true)
 $read = $nativeType.GetMethod('ReadAnimation', [Reflection.BindingFlags]'NonPublic,Instance')
-$cache = $nativeType.GetMethod('DDPBDPEDIGC', [Reflection.BindingFlags]'NonPublic,Instance')
+$cache = $nativeType.GetMethod('AddToAnimationCache', [Reflection.BindingFlags]'NonPublic,Instance')
 $adapter = $assembly.GetType('Eclipse.Modding.ModRuntime', $true).GetMethod('AiActionSnapshot', [Reflection.BindingFlags]'NonPublic,Static')
 $checks = 0
 function Check([bool]$value, [string]$message) { $script:checks++; if (!$value) { throw $message } }
@@ -28,7 +28,7 @@ foreach ($name in $names) {
     $bytes = [IO.File]::ReadAllBytes((Join-Path $root ('Assets/Resources/gamedata/animations/binary/' + $clip.FileName)))
     $null = $read.Invoke($clip, [object[]]@(,$bytes))
     $null = $cache.Invoke($clip, $null)
-    Check ($clip.DIHJOPGKGFO().Length -gt 0) "Clip reader returned no frames: $name"
+    Check ($clip.GetAnimationFrames().Length -gt 0) "Clip reader returned no frames: $name"
 }
 $moves = [Collections.Generic.List[InfoAnimation]]::new()
 $templates = [Collections.Generic.Dictionary[string,TemplateAnimation]]::new()
@@ -42,8 +42,8 @@ foreach ($move in $moves) {
     $snapshot = $adapter.Invoke($null, [object[]]@($move))
     Check ($snapshot.Name -eq $move.Name) 'Native adapter changed move identity'
     Check ($snapshot.Timing.LastSample -ge $snapshot.Timing.FirstSample) "Unresolved clip bounds: $($move.Name)"
-    Check ($snapshot.Timing.NominalFrames -eq $move.ONLKMFOENEH()) "Native duration mismatch: $($move.Name)"
-    Check ($move.DFKIHADCFKG() -eq 67) "Unexpected native rig size: $($move.Name)"
+    Check ($snapshot.Timing.NominalFrames -eq $move.GetTotalFrames()) "Native duration mismatch: $($move.Name)"
+    Check ($move.GetNodesCount() -eq 67) "Unexpected native rig size: $($move.Name)"
     if ($move.Name -like '*StepBack') {
         Check ($snapshot.Type -eq 'move') "Retreat is not classified as a move: $($move.Name)"
         Check (@($snapshot.Inputs | Where-Object { $_.Control -eq 'Back' -and $_.Press -in @('tap','hold') }).Count -gt 0) "Retreat control unavailable: $($move.Name)"

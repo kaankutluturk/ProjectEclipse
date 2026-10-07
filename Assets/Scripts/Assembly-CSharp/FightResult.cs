@@ -4,158 +4,158 @@ using UnityEngine;
 
 public class FightResult
 {
-	public class LJFFIBFBGID
+	public class ItemGrant
 	{
-		public ItemInfo DLKPBAJDHBO;
+		public ItemInfo Item;
 
-		public RewardItem NAIEGGHELIH;
+		public RewardItem RewardSource;
 
-		public bool IDGKPLBKDIB;
+		public bool IsDrop;
 	}
 
-	public class NCHCEPNIDGO
+	public class MoneyGrant
 	{
-		public MoneyStruct EOBGMFMAMOK;
+		public MoneyStruct Money;
 
-		public bool IDGKPLBKDIB;
+		public bool IsDrop;
 	}
 
-	public class NFBOLAJJIAD
+	public class CurrencyGrant
 	{
-		public CurrencyStruct NAKKNKPJNHB;
+		public CurrencyStruct Currency;
 
-		public bool IDGKPLBKDIB;
+		public bool IsDrop;
 	}
 
-	public class OLJIFHLGHNM
+	public class ResistanceGrant
 	{
-		public ResistanceStruct JIDLBLPFAAE;
+		public ResistanceStruct Resistance;
 
-		public bool IDGKPLBKDIB;
+		public bool IsDrop;
 	}
 
 	public class ResultPrizeStruct
 	{
-		public long GBGNFPNCGED;
+		public long Money;
 
-		public long PNDAIFALIKF;
+		public long Bonus;
 
 		public uint exp;
 
-		public List<LJFFIBFBGID> HELFDCAIJNE = new List<LJFFIBFBGID>();
+		public List<ItemGrant> Items = new List<ItemGrant>();
 
-		public List<NFBOLAJJIAD> KIMJGOHCCPO = new List<NFBOLAJJIAD>();
+		public List<CurrencyGrant> Currencies = new List<CurrencyGrant>();
 
-		public List<OLJIFHLGHNM> KBMDJACLAOH = new List<OLJIFHLGHNM>();
+		public List<ResistanceGrant> Resistances = new List<ResistanceGrant>();
 
-		public RewardLottery FAPDEKOMOGH;
+		public RewardLottery Lottery;
 
 		public void Clear()
 		{
-			GBGNFPNCGED = 0L;
-			PNDAIFALIKF = 0L;
+			Money = 0L;
+			Bonus = 0L;
 			exp = 0u;
-			HELFDCAIJNE.Clear();
-			KIMJGOHCCPO.Clear();
-			KBMDJACLAOH.Clear();
-			FAPDEKOMOGH = null;
+			Items.Clear();
+			Currencies.Clear();
+			Resistances.Clear();
+			Lottery = null;
 		}
 
-		public void KFJABAMAKOD(Rewardable POHFOGPKMMK)
+		public void AddReward(Rewardable POHFOGPKMMK)
 		{
 			if (POHFOGPKMMK != null)
 			{
-				switch (POHFOGPKMMK.CLOGJMBMMPI)
+				switch (POHFOGPKMMK.Kind)
 				{
-				case Rewardable.GADCOGHCGDP.REWARD_ITEM:
+				case Rewardable.RewardKind.REWARD_ITEM:
 				{
 					RewardItem jJBPBGKBEED = (RewardItem)POHFOGPKMMK;
-					KFJABAMAKOD(jJBPBGKBEED);
+					AddReward(jJBPBGKBEED);
 					break;
 				}
-				case Rewardable.GADCOGHCGDP.REWARD_MONEY:
+				case Rewardable.RewardKind.REWARD_MONEY:
 				{
 					RewardMoney mNEDNJMBHMF = (RewardMoney)POHFOGPKMMK;
-					KFJABAMAKOD(mNEDNJMBHMF);
+					AddReward(mNEDNJMBHMF);
 					break;
 				}
-				case Rewardable.GADCOGHCGDP.REWARD_CURRENCY:
+				case Rewardable.RewardKind.REWARD_CURRENCY:
 				{
 					RewardCurrency oIPIAAJCEOO = (RewardCurrency)POHFOGPKMMK;
-					KFJABAMAKOD(oIPIAAJCEOO);
+					AddReward(oIPIAAJCEOO);
 					break;
 				}
-				case Rewardable.GADCOGHCGDP.REWARD_RESISTANCE:
+				case Rewardable.RewardKind.REWARD_RESISTANCE:
 				{
 					RewardResistance gBKBCEGJNLA = (RewardResistance)POHFOGPKMMK;
-					KFJABAMAKOD(gBKBCEGJNLA);
+					AddReward(gBKBCEGJNLA);
 					break;
 				}
-				case Rewardable.GADCOGHCGDP.REWARD_LOTTERY:
+				case Rewardable.RewardKind.REWARD_LOTTERY:
 				{
 					RewardLottery mIPHAMDMKJB = (RewardLottery)POHFOGPKMMK;
-					KFJABAMAKOD(mIPHAMDMKJB);
+					AddReward(mIPHAMDMKJB);
 					break;
 				}
 				}
 			}
 		}
 
-		public void KFJABAMAKOD(RewardMoney MNEDNJMBHMF)
+		public void AddReward(RewardMoney MNEDNJMBHMF)
 		{
-			GBGNFPNCGED += MNEDNJMBHMF.BANPBCOOFMB();
+			Money += MNEDNJMBHMF.GetValue();
 		}
 
-		public void KFJABAMAKOD(RewardCurrency OIPIAAJCEOO)
+		public void AddReward(RewardCurrency OIPIAAJCEOO)
 		{
 			if (OIPIAAJCEOO == null)
 			{
 				return;
 			}
-			GameCurrency cJJOFMHLFFM = GameUtils.AJDKHINLIDI.ICFINJLNCPM(OIPIAAJCEOO.Name);
+			GameCurrency cJJOFMHLFFM = GameUtils.GameCurrencies.GetCurrencyByName(OIPIAAJCEOO.Name);
 			if (cJJOFMHLFFM == null)
 			{
 				return;
 			}
-			foreach (NFBOLAJJIAD item in KIMJGOHCCPO)
+			foreach (CurrencyGrant item in Currencies)
 			{
-				if (item.NAKKNKPJNHB.BKDEAGGPNAO == cJJOFMHLFFM)
+				if (item.Currency.Currency == cJJOFMHLFFM)
 				{
-					int num = (ObscuredInt)(item.NAKKNKPJNHB.Count);
-					num += OIPIAAJCEOO.NAHFILGJAPC();
-					item.NAKKNKPJNHB.Count = (ObscuredInt)(num);
+					int num = (ObscuredInt)(item.Currency.Count);
+					num += OIPIAAJCEOO.RollAmount();
+					item.Currency.Count = (ObscuredInt)(num);
 					return;
 				}
 			}
-			int num2 = OIPIAAJCEOO.NAHFILGJAPC();
+			int num2 = OIPIAAJCEOO.RollAmount();
 			if (num2 > 0)
 			{
 				CurrencyStruct nAKKNKPJNHB = new CurrencyStruct(cJJOFMHLFFM, num2);
-				NFBOLAJJIAD nFBOLAJJIAD = new NFBOLAJJIAD();
-				nFBOLAJJIAD.NAKKNKPJNHB = nAKKNKPJNHB;
-				nFBOLAJJIAD.IDGKPLBKDIB = OIPIAAJCEOO.IDGKPLBKDIB;
-				KIMJGOHCCPO.Add(nFBOLAJJIAD);
+				CurrencyGrant nFBOLAJJIAD = new CurrencyGrant();
+				nFBOLAJJIAD.Currency = nAKKNKPJNHB;
+				nFBOLAJJIAD.IsDrop = OIPIAAJCEOO.IsDrop;
+				Currencies.Add(nFBOLAJJIAD);
 			}
 		}
 
-		public void KFJABAMAKOD(RewardResistance GBKBCEGJNLA)
+		public void AddReward(RewardResistance GBKBCEGJNLA)
 		{
 			if (GBKBCEGJNLA == null)
 			{
 				return;
 			}
-			GameResistance oOJJEOFENBJ = GameUtils.JNIMKHKGPHE.NDMEGBEFBPJ(GBKBCEGJNLA.Name);
+			GameResistance oOJJEOFENBJ = GameUtils.GameResistances.GetResistanceByName(GBKBCEGJNLA.Name);
 			if (oOJJEOFENBJ == null)
 			{
 				return;
 			}
-			foreach (OLJIFHLGHNM item in KBMDJACLAOH)
+			foreach (ResistanceGrant item in Resistances)
 			{
-				if (item.JIDLBLPFAAE.PIFOHOOFJDE == oOJJEOFENBJ)
+				if (item.Resistance.resistance == oOJJEOFENBJ)
 				{
-					int num = (ObscuredInt)(item.JIDLBLPFAAE.Count);
+					int num = (ObscuredInt)(item.Resistance.Count);
 					num += GBKBCEGJNLA.Value;
-					item.JIDLBLPFAAE.Count = (ObscuredInt)(num);
+					item.Resistance.Count = (ObscuredInt)(num);
 					return;
 				}
 			}
@@ -163,35 +163,35 @@ public class FightResult
 			if (iOHAOMLJECE > 0)
 			{
 				ResistanceStruct jIDLBLPFAAE = new ResistanceStruct(oOJJEOFENBJ, iOHAOMLJECE);
-				OLJIFHLGHNM oLJIFHLGHNM = new OLJIFHLGHNM();
-				oLJIFHLGHNM.JIDLBLPFAAE = jIDLBLPFAAE;
-				oLJIFHLGHNM.IDGKPLBKDIB = GBKBCEGJNLA.IDGKPLBKDIB;
-				KBMDJACLAOH.Add(oLJIFHLGHNM);
+				ResistanceGrant oLJIFHLGHNM = new ResistanceGrant();
+				oLJIFHLGHNM.Resistance = jIDLBLPFAAE;
+				oLJIFHLGHNM.IsDrop = GBKBCEGJNLA.IsDrop;
+				Resistances.Add(oLJIFHLGHNM);
 			}
 		}
 
-		public void KFJABAMAKOD(RewardLottery MIPHAMDMKJB)
+		public void AddReward(RewardLottery MIPHAMDMKJB)
 		{
 			if (MIPHAMDMKJB != null)
 			{
-				if (FAPDEKOMOGH == null)
+				if (Lottery == null)
 				{
-					FAPDEKOMOGH = MIPHAMDMKJB.CloneForRewardComposition();
+					Lottery = MIPHAMDMKJB.CloneForRewardComposition();
 				}
 				else
 				{
-					FAPDEKOMOGH.EDCOGMLOEHE.AddRange(MIPHAMDMKJB.EDCOGMLOEHE);
+					Lottery.slots.AddRange(MIPHAMDMKJB.slots);
 				}
 			}
 		}
 
-		public void KFJABAMAKOD(RewardItem JJBPBGKBEED)
+		public void AddReward(RewardItem JJBPBGKBEED)
 		{
 			if (JJBPBGKBEED == null)
 			{
 				return;
 			}
-			UserItem dKCHDHMLKHN = ListSF.CCDKHLAMKKO().KHCNHPCPFII().CMGOCLGHNLH(JJBPBGKBEED.Name);
+			UserItem dKCHDHMLKHN = ListSF.GetRoster().GetInventory().FindItem(JJBPBGKBEED.Name);
 			Eclipse.Modding.DefinitionId rewardId;
 			bool repeatableModConsumable = Eclipse.Modding.DefinitionId.TryParse(JJBPBGKBEED.Name, out rewardId) &&
 				rewardId.Namespace.Value != "core" && rewardId.Category == "items" &&
@@ -208,7 +208,7 @@ public class FightResult
 			bool configuredRewardGrant = JJBPBGKBEED.HasEclipseGrantConfiguration;
 			if (configuredRewardGrant)
 			{
-				int playerLevelSnapshot = ListSF.CCDKHLAMKKO().Level;
+				int playerLevelSnapshot = ListSF.GetRoster().Level;
 				RewardItem configuredReward;
 				string configurationError;
 				if (!Eclipse.Modding.ModRuntime.TryConfigureRewardGrant(JJBPBGKBEED, playerLevelSnapshot,
@@ -220,8 +220,8 @@ public class FightResult
 				}
 				JJBPBGKBEED = configuredReward;
 			}
-			int requestedLevel = JJBPBGKBEED.CMEFKONFDKN();
-			int num = requestedLevel <= 0 ? ListSF.CCDKHLAMKKO().PINDEKDNCNL() : requestedLevel;
+			int requestedLevel = JJBPBGKBEED.EvaluateLevel();
+			int num = requestedLevel <= 0 ? ListSF.GetRoster().GetLevel() : requestedLevel;
 			ItemInfo dJKEECEOCJB2 = null;
 			if (dJKEECEOCJB.ItemLevel == num)
 			{
@@ -244,13 +244,13 @@ public class FightResult
 				if (upgradeLevel < 0)
 					throw new System.InvalidOperationException("Negative reward upgrade level: " + JJBPBGKBEED.Name);
 				// The native quest grant uses this encoded-level lookup, not an ordinal.
-				dJKEECEOCJB2 = dJKEECEOCJB.HIOBANJPMKF(upgradeLevel);
+				dJKEECEOCJB2 = dJKEECEOCJB.GetUpgradeItemAtOrAboveUpgradeLevel(upgradeLevel);
 				if (dJKEECEOCJB2 == null)
 					throw new System.InvalidOperationException("Reward upgrade level is unavailable: " + JJBPBGKBEED.Name + " / " + upgradeLevel);
 			}
 			else if (JJBPBGKBEED.UpgradeNumber != 0)
 			{
-				List<UpgradeData> list = dJKEECEOCJB2.DNFDAGFAANJ(true, dJKEECEOCJB2.ItemLevel);
+				List<UpgradeData> list = dJKEECEOCJB2.GetUpgrades(true, dJKEECEOCJB2.ItemLevel);
 				uint count = (uint)list.Count;
 				if (count != 0)
 				{
@@ -259,206 +259,206 @@ public class FightResult
 					{
 						num2 = count - 1;
 					}
-					dJKEECEOCJB2 = dJKEECEOCJB.MPADIPJLMLH(list[(int)num2]);
+					dJKEECEOCJB2 = dJKEECEOCJB.CreateUpgradedItem(list[(int)num2]);
 				}
 			}
-			LJFFIBFBGID lJFFIBFBGID = new LJFFIBFBGID();
-			lJFFIBFBGID.DLKPBAJDHBO = dJKEECEOCJB2;
-			lJFFIBFBGID.NAIEGGHELIH = JJBPBGKBEED;
-			lJFFIBFBGID.IDGKPLBKDIB = JJBPBGKBEED.IDGKPLBKDIB;
-			HELFDCAIJNE.Add(lJFFIBFBGID);
+			ItemGrant lJFFIBFBGID = new ItemGrant();
+			lJFFIBFBGID.Item = dJKEECEOCJB2;
+			lJFFIBFBGID.RewardSource = JJBPBGKBEED;
+			lJFFIBFBGID.IsDrop = JJBPBGKBEED.IsDrop;
+			Items.Add(lJFFIBFBGID);
 		}
 
-		public List<ItemInfo> PJNJIJIODHE(bool NLDNIHHPEFI = false)
+		public List<ItemInfo> GetItems(bool NLDNIHHPEFI = false)
 		{
 			List<ItemInfo> list = new List<ItemInfo>();
-			foreach (LJFFIBFBGID item in HELFDCAIJNE)
+			foreach (ItemGrant item in Items)
 			{
-				if (!NLDNIHHPEFI || item.IDGKPLBKDIB)
+				if (!NLDNIHHPEFI || item.IsDrop)
 				{
-					list.Add(item.DLKPBAJDHBO);
+					list.Add(item.Item);
 				}
 			}
 			return list;
 		}
 
-		public List<CurrencyStruct> JGJLJMHKJBM(bool NLDNIHHPEFI = false)
+		public List<CurrencyStruct> GetCurrencies(bool NLDNIHHPEFI = false)
 		{
 			List<CurrencyStruct> list = new List<CurrencyStruct>();
-			foreach (NFBOLAJJIAD item in KIMJGOHCCPO)
+			foreach (CurrencyGrant item in Currencies)
 			{
-				if (!NLDNIHHPEFI || item.IDGKPLBKDIB)
+				if (!NLDNIHHPEFI || item.IsDrop)
 				{
-					list.Add(item.NAKKNKPJNHB);
+					list.Add(item.Currency);
 				}
 			}
 			return list;
 		}
 
-		public List<ResistanceStruct> IHLPFEPHBPG(bool NLDNIHHPEFI = false)
+		public List<ResistanceStruct> GetResistances(bool NLDNIHHPEFI = false)
 		{
 			List<ResistanceStruct> list = new List<ResistanceStruct>();
-			foreach (OLJIFHLGHNM item in KBMDJACLAOH)
+			foreach (ResistanceGrant item in Resistances)
 			{
-				if (!NLDNIHHPEFI || item.IDGKPLBKDIB)
+				if (!NLDNIHHPEFI || item.IsDrop)
 				{
-					list.Add(item.JIDLBLPFAAE);
+					list.Add(item.Resistance);
 				}
 			}
 			return list;
 		}
 
-		public RewardLottery LNKIDFKKABB()
+		public RewardLottery GetLottery()
 		{
-			return FAPDEKOMOGH;
+			return Lottery;
 		}
 	}
 
-	public GameOverTypes MHNEKAEGNBO = GameOverTypes.GAME_OVER_NONE;
+	public GameOverTypes GameOverType = GameOverTypes.GAME_OVER_NONE;
 
-	public ResultPrizeStruct PMIHPJFAJIO = new ResultPrizeStruct();
+	public ResultPrizeStruct Prize = new ResultPrizeStruct();
 
-	public BattleType LFLGCDNKNJI;
+	public BattleType FightType;
 
-	public int OKNNNLIPODI;
+	public int FightValue;
 
-	public FightIDS DIAIIPCBMFL;
+	public FightIDS FightId;
 
-	public float NJNKGLJNNDH;
+	public float ExpReward;
 
-	public ComboStatistic AIOMDIAFHGB;
+	public ComboStatistic PlayerStatistics;
 
-	public ComboStatistic MOJHPBGGNAH;
+	public ComboStatistic OpponentStatistics;
 
-	public FightStatistics GBGNFPNCGED;
+	public FightStatistics Statistics;
 
-	public int HNDHMPKKPJF;
+	public int PlayerRoundsWon;
 
-	public int IMIEKGEIOLN;
+	public int OpponentRoundsWon;
 
-	public int PNDAIFALIKF;
+	public int TotalRounds;
 
-	public List<ItemInfo> CBAHALBKMHC = new List<ItemInfo>();
+	public List<ItemInfo> DroppedItems = new List<ItemInfo>();
 
-	public ModelParameters ABKBEJBICOA;
+	public ModelParameters PlayerParameters;
 
-	public ModelParameters LEBLJJCFKOP;
+	public ModelParameters OpponentParameters;
 
-	public FightList KGKDKENMAOA;
+	public FightList FightDefinition;
 
-	public void FMNLAFLKFOO(long BLOOFMGLMHP, long GICNLBOICGP, float KNDKJANLIDI, float BHGNKHIKGOG, float FKHKEHICPAH, float IFCOPPPDOCD, float LMKJOMKPOAM, float OJIPBDBMLLO, List<float> JGANMCPMMLN)
+	public void RecordPrizeStatistics(long BLOOFMGLMHP, long GICNLBOICGP, float KNDKJANLIDI, float BHGNKHIKGOG, float FKHKEHICPAH, float IFCOPPPDOCD, float LMKJOMKPOAM, float OJIPBDBMLLO, List<float> JGANMCPMMLN)
 	{
-		if (AIOMDIAFHGB != null)
+		if (PlayerStatistics != null)
 		{
-			AIOMDIAFHGB.EAOGOCDLLBD(BLOOFMGLMHP, GICNLBOICGP, (long)KNDKJANLIDI, BHGNKHIKGOG, FKHKEHICPAH, IFCOPPPDOCD, LMKJOMKPOAM, OJIPBDBMLLO, JGANMCPMMLN);
+			PlayerStatistics.AddPrizes(BLOOFMGLMHP, GICNLBOICGP, (long)KNDKJANLIDI, BHGNKHIKGOG, FKHKEHICPAH, IFCOPPPDOCD, LMKJOMKPOAM, OJIPBDBMLLO, JGANMCPMMLN);
 		}
 	}
 
-	public long KMGLLBMIDHJ()
+	public long GetMoneyReward()
 	{
-		return PMIHPJFAJIO.GBGNFPNCGED;
+		return Prize.Money;
 	}
 
-	public long BNILCODHHKC()
+	public long GetGemsReward()
 	{
-		return PMIHPJFAJIO.PNDAIFALIKF;
+		return Prize.Bonus;
 	}
 
-	public float JGPIEDFAKLC()
+	public float GetExpReward()
 	{
-		return PMIHPJFAJIO.exp;
+		return Prize.exp;
 	}
 
 	public bool IsWinner()
 	{
-		return MHNEKAEGNBO == GameOverTypes.GAME_OVER_WIN;
+		return GameOverType == GameOverTypes.GAME_OVER_WIN;
 	}
 
-	public bool EKBAHCGBNEM()
+	public bool IsRaidRoundTimeout()
 	{
-		return MHNEKAEGNBO == GameOverTypes.GAME_OVER_RAID_ROUND_TIMEOUT;
+		return GameOverType == GameOverTypes.GAME_OVER_RAID_ROUND_TIMEOUT;
 	}
 
-	public void FCKFOPMNFOF(RewardStruct LGDIIADDFLH, ComboStatistic AIOMDIAFHGB, ComboStatistic MOJHPBGGNAH, FightList KGKDKENMAOA)
+	public void CalculateRewards(RewardStruct LGDIIADDFLH, ComboStatistic AIOMDIAFHGB, ComboStatistic MOJHPBGGNAH, FightList KGKDKENMAOA)
 	{
 		if (LGDIIADDFLH == null)
 		{
-			this.AIOMDIAFHGB = AIOMDIAFHGB;
-			this.MOJHPBGGNAH = MOJHPBGGNAH;
+			this.PlayerStatistics = AIOMDIAFHGB;
+			this.OpponentStatistics = MOJHPBGGNAH;
 			return;
 		}
-		PMIHPJFAJIO.Clear();
-		Reward lOELDGJGPIF = ((!ListSF.CCDKHLAMKKO().IsEclipseMode()) ? LGDIIADDFLH.FMOGFMIGLNP : LGDIIADDFLH.LJLIFMOIAJJ);
+		Prize.Clear();
+		Reward lOELDGJGPIF = ((!ListSF.GetRoster().IsEclipseMode()) ? LGDIIADDFLH.NormalModeReward : LGDIIADDFLH.EclipseModeReward);
 		bool bLBDMKNOJEJ = true;
-		Roster nKGLHEGIKKP = ListSF.CCDKHLAMKKO();
-		if ((ObscuredFloat)(LGDIIADDFLH.BBCCBPIIELF.KOBOIFJNPMO(nKGLHEGIKKP.PINDEKDNCNL()).prizeBase) > 0f || (lOELDGJGPIF != null && (ObscuredFloat)(lOELDGJGPIF.KOBOIFJNPMO(nKGLHEGIKKP.PINDEKDNCNL()).prizeBase) > 0f) || KGKDKENMAOA.MOPEDKMDLFA > 0f)
+		Roster nKGLHEGIKKP = ListSF.GetRoster();
+		if ((ObscuredFloat)(LGDIIADDFLH.CommonReward.GetPrizeForLevel(nKGLHEGIKKP.GetLevel()).prizeBase) > 0f || (lOELDGJGPIF != null && (ObscuredFloat)(lOELDGJGPIF.GetPrizeForLevel(nKGLHEGIKKP.GetLevel()).prizeBase) > 0f) || KGKDKENMAOA.PrizeBase > 0f)
 		{
 			bLBDMKNOJEJ = false;
 		}
-		BDLLAEPPAKL(LGDIIADDFLH.BBCCBPIIELF, KGKDKENMAOA.MOPEDKMDLFA, AIOMDIAFHGB, MOJHPBGGNAH, bLBDMKNOJEJ);
-		BDLLAEPPAKL(lOELDGJGPIF, KGKDKENMAOA.MOPEDKMDLFA, AIOMDIAFHGB, MOJHPBGGNAH, bLBDMKNOJEJ);
+		ApplyReward(LGDIIADDFLH.CommonReward, KGKDKENMAOA.PrizeBase, AIOMDIAFHGB, MOJHPBGGNAH, bLBDMKNOJEJ);
+		ApplyReward(lOELDGJGPIF, KGKDKENMAOA.PrizeBase, AIOMDIAFHGB, MOJHPBGGNAH, bLBDMKNOJEJ);
 	}
 
-	public void BDLLAEPPAKL(Reward POHFOGPKMMK, float prizeBase, ComboStatistic ODOJIOOGLJM, ComboStatistic IHNEOCGCCJO, bool BLBDMKNOJEJ)
+	public void ApplyReward(Reward POHFOGPKMMK, float prizeBase, ComboStatistic ODOJIOOGLJM, ComboStatistic IHNEOCGCCJO, bool BLBDMKNOJEJ)
 	{
 		if (POHFOGPKMMK == null)
 		{
 			return;
 		}
-		Roster nKGLHEGIKKP = ListSF.CCDKHLAMKKO();
-		RewardPrize cMHHEHILIIH = POHFOGPKMMK.KOBOIFJNPMO(nKGLHEGIKKP.PINDEKDNCNL());
+		Roster nKGLHEGIKKP = ListSF.GetRoster();
+		RewardPrize cMHHEHILIIH = POHFOGPKMMK.GetPrizeForLevel(nKGLHEGIKKP.GetLevel());
 		float num = (ObscuredUInt)((POHFOGPKMMK == null) ? (ObscuredUInt)(0u) : cMHHEHILIIH.exp);
-		NJNKGLJNNDH += num;
-		AIOMDIAFHGB = ODOJIOOGLJM;
-		MOJHPBGGNAH = IHNEOCGCCJO;
-		long num2 = (ObscuredLong)((POHFOGPKMMK == null) ? (ObscuredLong)(0L) : cMHHEHILIIH.GBGNFPNCGED);
-		float kNDKJANLIDI = (ObscuredLong)((POHFOGPKMMK == null) ? (ObscuredLong)(0L) : cMHHEHILIIH.PNDAIFALIKF);
+		ExpReward += num;
+		PlayerStatistics = ODOJIOOGLJM;
+		OpponentStatistics = IHNEOCGCCJO;
+		long num2 = (ObscuredLong)((POHFOGPKMMK == null) ? (ObscuredLong)(0L) : cMHHEHILIIH.money);
+		float kNDKJANLIDI = (ObscuredLong)((POHFOGPKMMK == null) ? (ObscuredLong)(0L) : cMHHEHILIIH.bonus);
 		float num3 = 0f;
-		num3 = ((POHFOGPKMMK != null && (ObscuredFloat)(cMHHEHILIIH.prizeBase) > 0f) ? (float)(ObscuredFloat)(cMHHEHILIIH.prizeBase) : ((prizeBase >= 0f) ? prizeBase : ((!BLBDMKNOJEJ) ? 0f : Mathf.Ceil((float)num2 * GameUtils.AAKJKANGFMJ.PMPDAOIGCLP))));
-		FMNLAFLKFOO((long)num3, num2, kNDKJANLIDI, GameUtils.AAKJKANGFMJ.NJAIKCKFMNN, GameUtils.AAKJKANGFMJ.LOONMILKCFK, GameUtils.AAKJKANGFMJ.MLNBGDHDKLL, GameUtils.AAKJKANGFMJ.GKAEJDCDMHC, GameUtils.AAKJKANGFMJ.APCAKCCOMLO, GameUtils.AAKJKANGFMJ.Styles);
-		PMIHPJFAJIO.GBGNFPNCGED = ENKOCJBKOMF();
-		PMIHPJFAJIO.PNDAIFALIKF = AIJNEGMOOML();
-		PMIHPJFAJIO.exp += (ObscuredUInt)(cMHHEHILIIH.exp);
-		foreach (RewardMoney item in cMHHEHILIIH.MDJFGLELOBA)
+		num3 = ((POHFOGPKMMK != null && (ObscuredFloat)(cMHHEHILIIH.prizeBase) > 0f) ? (float)(ObscuredFloat)(cMHHEHILIIH.prizeBase) : ((prizeBase >= 0f) ? prizeBase : ((!BLBDMKNOJEJ) ? 0f : Mathf.Ceil((float)num2 * GameUtils.RewardsPrizeSettings.DefaultPrizeBaseFactor))));
+		RecordPrizeStatistics((long)num3, num2, kNDKJANLIDI, GameUtils.RewardsPrizeSettings.PerfectFactor, GameUtils.RewardsPrizeSettings.FirstStrikeFactor, GameUtils.RewardsPrizeSettings.HeadShotFactor, GameUtils.RewardsPrizeSettings.ComboCountFactor, GameUtils.RewardsPrizeSettings.ShockFactor, GameUtils.RewardsPrizeSettings.Styles);
+		Prize.Money = GetComboMoneyReward();
+		Prize.Bonus = GetComboBonusReward();
+		Prize.exp += (ObscuredUInt)(cMHHEHILIIH.exp);
+		foreach (RewardMoney item in cMHHEHILIIH.moneyRewards)
 		{
-			PMIHPJFAJIO.KFJABAMAKOD(item);
+			Prize.AddReward(item);
 		}
-		foreach (RewardCurrency item2 in cMHHEHILIIH.KIMJGOHCCPO)
+		foreach (RewardCurrency item2 in cMHHEHILIIH.currencyRewards)
 		{
-			PMIHPJFAJIO.KFJABAMAKOD(item2);
+			Prize.AddReward(item2);
 		}
-		foreach (RewardResistance item3 in cMHHEHILIIH.KBMDJACLAOH)
+		foreach (RewardResistance item3 in cMHHEHILIIH.resistanceRewards)
 		{
-			PMIHPJFAJIO.KFJABAMAKOD(item3);
+			Prize.AddReward(item3);
 		}
-		if (cMHHEHILIIH.FAPDEKOMOGH != null)
+		if (cMHHEHILIIH.lottery != null)
 		{
-			PMIHPJFAJIO.KFJABAMAKOD(cMHHEHILIIH.FAPDEKOMOGH);
+			Prize.AddReward(cMHHEHILIIH.lottery);
 		}
-		foreach (RewardItem item4 in cMHHEHILIIH.HELFDCAIJNE)
+		foreach (RewardItem item4 in cMHHEHILIIH.items)
 		{
-			PMIHPJFAJIO.KFJABAMAKOD(item4);
+			Prize.AddReward(item4);
 		}
-		foreach (RewardChoice item5 in cMHHEHILIIH.PNFMKMLLFHK)
+		foreach (RewardChoice item5 in cMHHEHILIIH.choices)
 		{
-			PMIHPJFAJIO.KFJABAMAKOD(item5.OOOBLJIHBEP());
+			Prize.AddReward(item5.ChooseRandomReward());
 		}
 	}
 
-	private long AIJNEGMOOML()
+	private long GetComboBonusReward()
 	{
-		if (AIOMDIAFHGB != null)
+		if (PlayerStatistics != null)
 		{
-			return AIOMDIAFHGB.ECOOCLMNFJM.AMFFCKOAAED;
+			return PlayerStatistics.Prize.TotalExperience;
 		}
 		return 0L;
 	}
 
-	private long ENKOCJBKOMF()
+	private long GetComboMoneyReward()
 	{
-		if (AIOMDIAFHGB != null)
+		if (PlayerStatistics != null)
 		{
-			return AIOMDIAFHGB.ECOOCLMNFJM.POPNFGNAOJD;
+			return PlayerStatistics.Prize.TotalGold;
 		}
 		return 0L;
 	}

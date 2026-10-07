@@ -6,20 +6,20 @@ $program=@'
 using System;
 using System.Xml;
 public static class Scalars {
- public static string CIPOICEEIBK(this XmlNode n,string fallback)=>n?.Value??fallback;
+ public static string GetStringOrDefault(this XmlNode n,string fallback)=>n?.Value??fallback;
  public static uint ParseUint(this XmlNode n)=>n==null?0:uint.Parse(n.Value);
  public static int ToInt(this string value)=>int.TryParse(value,out int result)?result:0;
 }
-public enum GADCOGHCGDP {REWARD_ITEM}
-public class Rewardable {protected GADCOGHCGDP CLOGJMBMMPI;protected void Parse(XmlNode n){}}
+public enum RewardKind {REWARD_ITEM}
+public class Rewardable {protected RewardKind Kind;protected void Parse(XmlNode n){}}
 public class PerkStruct {public const string EclipseKindAttribute="EclipseKind";public PerkStruct(XmlNode n){}}
-public class ListSF {public static int Level;public static ListSF CCDKHLAMKKO()=>new ListSF();public int PINDEKDNCNL()=>Level;}
+public class ListSF {public static int Level;public static ListSF GetRoster()=>new ListSF();public int GetLevel()=>Level;}
 class Program {
  static void Main(){int checks=0;
  foreach(int level in new[]{1,4,40,52}){
   ListSF.Level=level;var doc=new XmlDocument();doc.LoadXml("<Item Name='test' Level='?Player[].Level' UpgradeLevel='?Player[].Level*100'/>");
   var item=new RewardItem(doc.DocumentElement);
-  if(item.CMEFKONFDKN()!=level||item.EvaluateUpgradeLevel()!=level*100)throw new Exception("Native expression mismatch at "+level);checks++;
+  if(item.EvaluateLevel()!=level||item.EvaluateUpgradeLevel()!=level*100)throw new Exception("Native expression mismatch at "+level);checks++;
  }
  var invalid=new XmlDocument();invalid.LoadXml("<Item Name='test' UpgradeLevel='1.5'/>");
  bool rejected=false;try{new RewardItem(invalid.DocumentElement).EvaluateUpgradeLevel();}catch(FormatException){rejected=true;}

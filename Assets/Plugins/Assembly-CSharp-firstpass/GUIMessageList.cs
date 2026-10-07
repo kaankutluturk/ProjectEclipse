@@ -7,12 +7,12 @@ public class GUIMessageList
 
 	private Vector2 scrollPos;
 
-	public void MCAIPGEPMDE()
+	public void Draw()
 	{
-		MCAIPGEPMDE(Screen.width, 0f);
+		Draw(Screen.width, 0f);
 	}
 
-	public void MCAIPGEPMDE(float IIMDMHKPJJN, float JKKFHOLODHB)
+	public void Draw(float IIMDMHKPJJN, float JKKFHOLODHB)
 	{
 		scrollPos = GUILayout.BeginScrollView(scrollPos, false, false, GUILayout.MinHeight(JKKFHOLODHB));
 		for (int i = 0; i < messages.Count; i++)

@@ -3,14 +3,14 @@ $ErrorActionPreference='Stop'
 $root=Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $PSScriptRoot))
 $manager=Get-Content -Raw -LiteralPath (Join-Path $root 'Assets/Scripts/Assembly-CSharp/Nekki/SF2/Core/Quests/QuestsManager.cs')
 $events=Get-Content -Raw -LiteralPath (Join-Path $root 'Assets/Scripts/Assembly-CSharp/QuestEvent.cs')
-$enum=[regex]::Match($events,'(?s)public enum PMDPDMFLCIJ\s*\{.*?\}')
+$enum=[regex]::Match($events,'(?s)public enum QuestEventType\s*\{.*?\}')
 if (!$enum.Success) { throw 'Native quest enum not found' }
 $compatibility=Get-Content -Raw -LiteralPath (Join-Path $root 'Assets/Scripts/Eclipse/Content/QuestCompatibility.cs')
 $stamp=[regex]::Match($compatibility,'(?ms)^\t\tpublic static void StampQuestSource\(.*?^\t\t\}')
 $merge=[regex]::Match($compatibility,'(?ms)^\t\tpublic static void AddQuestWithConditions\(.*?^\t\t\}')
 if (!$stamp.Success -or !$merge.Success) { throw 'Quest provenance methods not found' }
 $stageSource=Get-Content -Raw -LiteralPath (Join-Path $root 'Assets/Scripts/Assembly-CSharp/QuestStage.cs')
-$prepare=[regex]::Match($stageSource,'(?ms)^\tpublic void MHNEBBGMOLA\(.*?^\t\}')
+$prepare=[regex]::Match($stageSource,'(?ms)^\tpublic void QueueForRun\(.*?^\t\}')
 if (!$prepare.Success) { throw 'Quest context capture method not found' }
 $stubs=@'
 using System;
@@ -26,34 +26,34 @@ public class ItemInfo {}
 public class FightList {}
 public static class LocalizationManager { public class Language {} }
 public class ParametersQuest { public QuestParameters Context=new QuestParameters(); }
-public class RosterQuest { public enum NOKCOAHJIPB { None } public int Deletes; public ParametersQuest Saved=new ParametersQuest(); public ParametersQuest get_Parameters(){return Saved;} public void LCIHKPPGNPF(){Deletes++;} }
+public class RosterQuest { public enum QuestVariable { None } public int Deletes; public ParametersQuest Saved=new ParametersQuest(); public ParametersQuest get_Parameters(){return Saved;} public void ClearParameters(){Deletes++;} }
 public class Module { public static Module GetInstance(){return new Module();} public Nekki.SF2.GUI.ScreenType GetCurrentScreenType(){return Nekki.SF2.GUI.ScreenType.Map;} }
-public class NGOFBFGBICM { public static NGOFBFGBICM ELEBLBJKDBI(){return new NGOFBFGBICM();} public void HIHDEKHLHKP(string n){} }
-public class ListSF { public static ListSF GetInstance(){return new ListSF();} public void EJANJEEGOOE(){} public static FightList CHMCKGCDGCM(FightIDS id){return null;} }
-public class SystemProperties { public static bool DBBOCENKMGD(){return true;} }
-public class LLLOJBFMONN { public static void Error(string s){throw new Exception(s);} }
+public class CrashBreadcrumbTracker { public static CrashBreadcrumbTracker GetInstance(){return new CrashBreadcrumbTracker();} public void AddBreadcrumb(string n){} }
+public class ListSF { public static ListSF GetInstance(){return new ListSF();} public void RequestSave(){} public static FightList GetFightById(FightIDS id){return null;} }
+public class SystemProperties { public static bool IsDebug(){return true;} }
+public class GameLog { public static void Error(string s){throw new Exception(s);} }
 public class QuestStage:IComparable<QuestStage> {
- public enum HPOLGFKCOOE { QUEST_UNCOMPLETE, QUEST_ACTIONS }
- public string Source="quests.xml", Container; public string EclipseSourceFile { get { return Source; } } public string EPDMGFELIMC(){return Container ?? Source;} public string Name; public bool allowDoubles; public int index, Compared, Prepared, Started, Restored;
- public RosterQuest Roster=new RosterQuest(); public HashSet<QuestEvent.PMDPDMFLCIJ> Events=new HashSet<QuestEvent.PMDPDMFLCIJ>();
- public string get_Name(){return Name;} public bool IsEvent(QuestEvent.PMDPDMFLCIJ e){return Events.Contains(e);}
+ public enum QuestState { QUEST_UNCOMPLETE, QUEST_ACTIONS }
+ public string Source="quests.xml", Container; public string EclipseSourceFile { get { return Source; } } public string GetFileName(){return Container ?? Source;} public string Name; public bool allowDoubles; public int index, Compared, Prepared, Started, Restored;
+ public RosterQuest Roster=new RosterQuest(); public HashSet<QuestEvent.QuestEventType> Events=new HashSet<QuestEvent.QuestEventType>();
+ public string get_Name(){return Name;} public bool IsEvent(QuestEvent.QuestEventType e){return Events.Contains(e);}
  public QuestParameters EclipseQueuedParameters, StartedWith; public bool EclipseQueuedResume, StartedAsResume;
- private Checkpoint JAPJJHBDLKB; public QuestStage(){JAPJJHBDLKB=new Checkpoint(this);}
- private class Checkpoint { readonly QuestStage owner; public Checkpoint(QuestStage q){owner=q;} public void OIPDKFAJILO(QuestParameters p){owner.Prepared++;owner.Roster.Saved.Context=p.SnapshotForQueue();} }
+ private Checkpoint firstCheckPoint; public QuestStage(){firstCheckPoint=new Checkpoint(this);}
+ private class Checkpoint { readonly QuestStage owner; public Checkpoint(QuestStage q){owner=q;} public void SaveCheckPoint(QuestParameters p){owner.Prepared++;owner.Roster.Saved.Context=p.SnapshotForQueue();} }
  public bool Compare(QuestParameters p){Compared++;return true;}
  /* CAPTURE */
- public RosterQuest LBIPHHIJEFP(){return Roster;} public QuestParameters JMHGHCAGFDI(ParametersQuest p){Restored++;return p.Context.SnapshotForQueue();}
- public void MHHNIPBJNAD(QuestParameters p,bool b){Started++;StartedWith=p;StartedAsResume=b;}
+ public RosterQuest GetRosterQuest(){return Roster;} public QuestParameters RestoreParameters(ParametersQuest p){Restored++;return p.Context.SnapshotForQueue();}
+ public void StartActions(QuestParameters p,bool b){Started++;StartedWith=p;StartedAsResume=b;}
  private Action<object> completed; public void AddEventListener(int n,Action<object> a){completed+=a;} public void RemoveEventListener(int n,Action<object> a){completed-=a;} public void Complete(){completed?.Invoke(this);}
- public HPOLGFKCOOE MHFPGCBLGIP(){return HPOLGFKCOOE.QUEST_UNCOMPLETE;} public bool IsGroup(List<string> g){return g.Contains(Name);}
+ public QuestState GetState(){return QuestState.QUEST_UNCOMPLETE;} public bool IsGroup(List<string> g){return g.Contains(Name);}
  public int CompareTo(QuestStage q){return string.CompareOrdinal(Name,q.Name);}
 }
 public static class QuestSuppressionTests {
  static int checks; static void Check(bool b,string s){checks++;if(!b)throw new Exception(s);}
  static QuestStage Q(string name){return new QuestStage{Name=name};}
  public static void Run(){
-  foreach(QuestEvent.PMDPDMFLCIJ e in Enum.GetValues(typeof(QuestEvent.PMDPDMFLCIJ))){
-   if(e==QuestEvent.PMDPDMFLCIJ.QUEST_EVENT_NONE)continue;
+  foreach(QuestEvent.QuestEventType e in Enum.GetValues(typeof(QuestEvent.QuestEventType))){
+   if(e==QuestEvent.QuestEventType.QUEST_EVENT_NONE)continue;
    var m=new Nekki.SF2.Core.Quests.QuestsManager(); var q=Q("original");q.Events.Add(e);m.AddQuest(q);
    m.SetEclipseSuppressedQuests(new[]{"quests.xml#original"});
    Check(!m.ActionQuest(e),"suppressed event returned active: "+e);
@@ -76,7 +76,7 @@ public static class QuestSuppressionTests {
   var included=new Nekki.SF2.Core.Quests.QuestsManager();var imported=Q("included");imported.Source="quest_extensions/story.xml";imported.Container="quests.xml";included.AddQuest(imported);
   included.SetEclipseSuppressedQuests(new[]{"quest_extensions/story.xml#included"});
   Check(included.IsEclipseQuestSuppressed("included","quests.xml") && !included.AddQuestToStek(imported),"flattened include provenance lost");
-  Check(imported.EPDMGFELIMC()=="quests.xml","saved loader identity changed");
+  Check(imported.GetFileName()=="quests.xml","saved loader identity changed");
   var source=new System.Xml.XmlDocument();source.LoadXml("<Quests><Quest Name='included'><Actions/></Quest></Quests>");
   Provenance.StampQuestSource(source,"quest_extensions/story.xml");
   var output=new System.Xml.XmlDocument();output.LoadXml("<Quests/>");
@@ -91,27 +91,27 @@ public static class QuestSuppressionTests {
   Check(!mixed.AddQuestToStek(hidden),"failed configuration was not atomic");Check(mixed.AddQuestToStek(Q("Hidden")),"names are not ordinal");
   mixed.ClearEclipseQuestSuppression();Check(mixed.AddQuestToStek(hidden),"teardown did not restore eligibility alongside another queued quest");
   var queue=new Nekki.SF2.Core.Quests.QuestsManager();var a=Q("a");var b=Q("b");
-  var original=new QuestParameters{JLGLBLDPAAF=new FightIDS("act|boss|1"),inLottery=true,FOODLENBJGI="reward",fightAvgFps=59.5f};
-  original.DPLEGFCHOCE.OHCGEEEKEJH="purchase";original.DPLEGFCHOCE.BMNFPNBAMAF=17;
+  var original=new QuestParameters{fightIds=new FightIDS("act|boss|1"),inLottery=true,setItemName="reward",fightAvgFps=59.5f};
+  original.enchantment.itemName="purchase";original.enchantment.endTimestamp=17;
   queue.QuestParameters=original;queue.AddQuestToStek(a);
-  original.JLGLBLDPAAF.SetFightIDSByString("act|other|2");original.FOODLENBJGI="changed";original.inLottery=false;
-  original.DPLEGFCHOCE.OHCGEEEKEJH="changed";original.DPLEGFCHOCE.BMNFPNBAMAF=99;
-  queue.QuestParameters=new QuestParameters{FOODLENBJGI="second"};queue.AddQuestToStek(b);queue.RunActionsAll();
-  Check(a.StartedWith.inLottery&&a.StartedWith.FOODLENBJGI=="reward"&&a.StartedWith.JLGLBLDPAAF.ToString()=="act|boss|1","queued event overwritten before execution");
-  Check(a.StartedWith.DPLEGFCHOCE.OHCGEEEKEJH=="purchase"&&a.StartedWith.DPLEGFCHOCE.BMNFPNBAMAF==17,"purchase payload aliased caller mutation");
-  queue.QuestParameters.FOODLENBJGI="third";a.Complete();queue.Update();
-  Check(b.StartedWith.FOODLENBJGI=="second","waiting quest consumed a later event");
+  original.fightIds.SetFightIDSByString("act|other|2");original.setItemName="changed";original.inLottery=false;
+  original.enchantment.itemName="changed";original.enchantment.endTimestamp=99;
+  queue.QuestParameters=new QuestParameters{setItemName="second"};queue.AddQuestToStek(b);queue.RunActionsAll();
+  Check(a.StartedWith.inLottery&&a.StartedWith.setItemName=="reward"&&a.StartedWith.fightIds.ToString()=="act|boss|1","queued event overwritten before execution");
+  Check(a.StartedWith.enchantment.itemName=="purchase"&&a.StartedWith.enchantment.endTimestamp==17,"purchase payload aliased caller mutation");
+  queue.QuestParameters.setItemName="third";a.Complete();queue.Update();
+  Check(b.StartedWith.setItemName=="second","waiting quest consumed a later event");
   queue=new Nekki.SF2.Core.Quests.QuestsManager();a=Q("a");b=Q("b");
-  a.Roster.Saved.Context=new QuestParameters{FOODLENBJGI="saved-a",inLottery=true};
-  b.Roster.Saved.Context=new QuestParameters{FOODLENBJGI="saved-b",fightAvgFps=58};
+  a.Roster.Saved.Context=new QuestParameters{setItemName="saved-a",inLottery=true};
+  b.Roster.Saved.Context=new QuestParameters{setItemName="saved-b",fightAvgFps=58};
   var latest=queue.QuestParameters;queue.AddActionQuest(new List<QuestStage>{a,b});
   Check(ReferenceEquals(queue.QuestParameters,latest),"resume replaced unrelated event context");
-  Check(a.Roster.Saved.Context.FOODLENBJGI=="saved-a"&&b.Roster.Saved.Context.FOODLENBJGI=="saved-b","resume rewrote different checkpoints with first context");
+  Check(a.Roster.Saved.Context.setItemName=="saved-a"&&b.Roster.Saved.Context.setItemName=="saved-b","resume rewrote different checkpoints with first context");
   Check(a.Prepared==0&&b.Prepared==0,"restoring queue reran initial checkpoint");
-  queue.RunActionsAll();Check(a.StartedAsResume&&a.StartedWith.inLottery&&a.StartedWith.FOODLENBJGI=="saved-a","first saved quest context/resume flag lost");
-  a.Complete();queue.Update();Check(b.StartedAsResume&&b.StartedWith.FOODLENBJGI=="saved-b"&&b.StartedWith.fightAvgFps==58,"second saved quest used first context or restarted");
-  var empty=new QuestParameters{JLGLBLDPAAF=null,DPLEGFCHOCE=null}.SnapshotForQueue();
-  Check(empty.JLGLBLDPAAF==null&&empty.DPLEGFCHOCE==null,"null optional payload snapshot failed");
+  queue.RunActionsAll();Check(a.StartedAsResume&&a.StartedWith.inLottery&&a.StartedWith.setItemName=="saved-a","first saved quest context/resume flag lost");
+  a.Complete();queue.Update();Check(b.StartedAsResume&&b.StartedWith.setItemName=="saved-b"&&b.StartedWith.fightAvgFps==58,"second saved quest used first context or restarted");
+  var empty=new QuestParameters{fightIds=null,enchantment=null}.SnapshotForQueue();
+  Check(empty.fightIds==null&&empty.enchantment==null,"null optional payload snapshot failed");
   Console.WriteLine("PASS: "+checks+" production quest routing checks; event/name/object/saved entry, restoration, atomic config and progress preservation.");
  }
 }

@@ -4,28 +4,28 @@ using System.Diagnostics;
 public sealed class FailureMessage : IServerMessage, IHubMessage
 {
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private ulong BIGMGMIOOMA;
+	private ulong invocationId;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private bool KNLKFJBNGOC;
+	private bool isHubError;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private string OPFGDBPMJLC;
+	private string errorMessage;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private IDictionary<string, object> DAEBIGKGOGL;
+	private IDictionary<string, object> additionalData;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private string AKBMKGOFAON;
+	private string stackTrace;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private IDictionary<string, object> MKHEFCIEOCA;
+	private IDictionary<string, object> state;
 
-	public ulong EBFDNDACIMG
+	public ulong InvocationIdValue
 	{
 		get
 		{
-			return HGFDDMNOPJA();
+			return GetInvocationId();
 		}
 		private set
 		{
@@ -33,11 +33,11 @@ public sealed class FailureMessage : IServerMessage, IHubMessage
 		}
 	}
 
-	public bool DIDEDJPCHNE
+	public bool IsHubErrorValue
 	{
 		get
 		{
-			return MCCOIIEILFP();
+			return GetIsHubError();
 		}
 		private set
 		{
@@ -45,47 +45,47 @@ public sealed class FailureMessage : IServerMessage, IHubMessage
 		}
 	}
 
-	public string FHIJGLJLLGL
+	public string ErrorMessage
 	{
 		get
 		{
-			return LCHHLEOPONE();
+			return GetErrorMessage();
 		}
 		private set
 		{
-			JBOLKCMBOLO(value);
+			SetErrorMessage(value);
 		}
 	}
 
-	public IDictionary<string, object> AEONJODMKMG
+	public IDictionary<string, object> AdditionalData
 	{
 		get
 		{
-			return GNIMEFNENEK();
+			return GetAdditionalData();
 		}
 		private set
 		{
-			JBIBAFGIOCB(value);
+			SetAdditionalData(value);
 		}
 	}
 
-	public string IHJKCGACBBD
+	public string StackTrace
 	{
 		get
 		{
-			return DLHBLMLNKJF();
+			return GetStackTrace();
 		}
 		private set
 		{
-			MGOGKLCPLFL(value);
+			SetStackTrace(value);
 		}
 	}
 
-	public IDictionary<string, object> AFINHOBCHMC
+	public IDictionary<string, object> StateData
 	{
 		get
 		{
-			return FLBBFDNHJAJ();
+			return GetState();
 		}
 		private set
 		{
@@ -93,69 +93,69 @@ public sealed class FailureMessage : IServerMessage, IHubMessage
 		}
 	}
 
-	public LENCKBHFKLD get_Type()
+	public MessageTypes get_Type()
 	{
-		return LENCKBHFKLD.Failure;
+		return MessageTypes.Failure;
 	}
 
-	public ulong HGFDDMNOPJA()
+	public ulong GetInvocationId()
 	{
-		return BIGMGMIOOMA;
+		return invocationId;
 	}
 
 	private void set_InvocationId(ulong value)
 	{
-		BIGMGMIOOMA = value;
+		invocationId = value;
 	}
 
-	public bool MCCOIIEILFP()
+	public bool GetIsHubError()
 	{
-		return KNLKFJBNGOC;
+		return isHubError;
 	}
 
 	private void set_IsHubError(bool value)
 	{
-		KNLKFJBNGOC = value;
+		isHubError = value;
 	}
 
-	public string LCHHLEOPONE()
+	public string GetErrorMessage()
 	{
-		return OPFGDBPMJLC;
+		return errorMessage;
 	}
 
-	private void JBOLKCMBOLO(string value)
+	private void SetErrorMessage(string value)
 	{
-		OPFGDBPMJLC = value;
+		errorMessage = value;
 	}
 
-	public IDictionary<string, object> GNIMEFNENEK()
+	public IDictionary<string, object> GetAdditionalData()
 	{
-		return DAEBIGKGOGL;
+		return additionalData;
 	}
 
-	private void JBIBAFGIOCB(IDictionary<string, object> value)
+	private void SetAdditionalData(IDictionary<string, object> value)
 	{
-		DAEBIGKGOGL = value;
+		additionalData = value;
 	}
 
-	public string DLHBLMLNKJF()
+	public string GetStackTrace()
 	{
-		return AKBMKGOFAON;
+		return stackTrace;
 	}
 
-	private void MGOGKLCPLFL(string value)
+	private void SetStackTrace(string value)
 	{
-		AKBMKGOFAON = value;
+		stackTrace = value;
 	}
 
-	public IDictionary<string, object> FLBBFDNHJAJ()
+	public IDictionary<string, object> GetState()
 	{
-		return MKHEFCIEOCA;
+		return state;
 	}
 
 	private void set_State(IDictionary<string, object> value)
 	{
-		MKHEFCIEOCA = value;
+		state = value;
 	}
 
 	void IServerMessage.Parse(object data)
@@ -165,7 +165,7 @@ public sealed class FailureMessage : IServerMessage, IHubMessage
 		object value;
 		if (dictionary.TryGetValue("E", out value))
 		{
-			JBOLKCMBOLO(value.ToString());
+			SetErrorMessage(value.ToString());
 		}
 		if (dictionary.TryGetValue("H", out value))
 		{
@@ -173,11 +173,11 @@ public sealed class FailureMessage : IServerMessage, IHubMessage
 		}
 		if (dictionary.TryGetValue("D", out value))
 		{
-			JBIBAFGIOCB(value as IDictionary<string, object>);
+			SetAdditionalData(value as IDictionary<string, object>);
 		}
 		if (dictionary.TryGetValue("T", out value))
 		{
-			MGOGKLCPLFL(value.ToString());
+			SetStackTrace(value.ToString());
 		}
 		if (dictionary.TryGetValue("S", out value))
 		{

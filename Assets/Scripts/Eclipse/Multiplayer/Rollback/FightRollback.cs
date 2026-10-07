@@ -49,12 +49,12 @@ namespace Eclipse.Multiplayer.Rollback
         // Fields that hold presentation: restoring them would orphan scene objects.
         private static readonly HashSet<(Type, string)> SkippedFields = new HashSet<(Type, string)>
         {
-            (typeof(Model), "BJKJBIMPPAM"),   // Effects attached to the model.
-            (typeof(Render), "FPLGNMICCPH"),  // Blood drops,
-            (typeof(Render), "OBCAJAIBJHP"),  // and their lifetime counter.
+            (typeof(Model), "currentEffects"),   // Effects attached to the model.
+            (typeof(Render), "bloodEffects"),  // Blood drops,
+            (typeof(Render), "bloodEffectFrame"),  // and their lifetime counter.
             // The playing hit-effect animation. Only a tick's first run sets it, so a
             // restored null would strand the effect object switched on.
-            (typeof(Render), "PHKBOGAICCI"),
+            (typeof(Render), "hitAnimation"),
         };
 
         private static readonly PropertyInfo FillAmount = typeof(UnityEngine.UI.Image).GetProperty("fillAmount");
@@ -441,7 +441,7 @@ namespace Eclipse.Multiplayer.Rollback
             var fields = new List<FieldInfo>();
             const BindingFlags flags = BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public;
             // Perk registrations and remaining uses, and the fight speed factor.
-            foreach (var (owner, name) in new[] { (typeof(PerksStage), "PNAALKAHAKG"), (typeof(PerksStage), "PerkUsesLeft"), (typeof(GameUtils), "NJDEBAFKGID") })
+            foreach (var (owner, name) in new[] { (typeof(PerksStage), "actionsByNamespace"), (typeof(PerksStage), "PerkUsesLeft"), (typeof(GameUtils), "slowMode") })
             {
                 var field = owner.GetField(name, flags);
                 if (field != null) fields.Add(field);

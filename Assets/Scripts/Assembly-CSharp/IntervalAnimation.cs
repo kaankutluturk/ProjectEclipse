@@ -2,7 +2,7 @@ using System.Xml;
 
 public class IntervalAnimation
 {
-	public enum NGAJJDIEDGF
+	public enum IntervalType
 	{
 		INTERVAL_NONE = 0,
 		INTERVAL_UNSTABLE = 1,
@@ -16,31 +16,31 @@ public class IntervalAnimation
 
 	private int _Id;
 
-	private int MLIGJHGMOAA;
+	private int animationFinishFrame;
 
 	public int Start;
 
-	public int GEJLNPIEDPF;
+	public int EndFrameValue;
 
 	// best guess for name
-	public int EndFrame { get => GEJLNPIEDPF; set => GEJLNPIEDPF = value; }
+	public int EndFrame { get => EndFrameValue; set => EndFrameValue = value; }
 
 
 	public string Name;
 
-	public NGAJJDIEDGF Type;
+	public IntervalType Type;
 
 	public XmlNode NodeInterval;
 
-	public int GJCOGFOJAEB
+	public int AnimationId
 	{
 		get
 		{
-			return ANAECCFDHMI();
+			return GetAnimationId();
 		}
 	}
 
-	public int LJNBFJKKLKM
+	public int FinishFrame
 	{
 		set
 		{
@@ -48,21 +48,21 @@ public class IntervalAnimation
 		}
 	}
 
-	public IntervalAnimation(NGAJJDIEDGF AFGJECLDAIG)
+	public IntervalAnimation(IntervalType AFGJECLDAIG)
 	{
 		_Id = -1;
-		MLIGJHGMOAA = int.MaxValue;
+		animationFinishFrame = int.MaxValue;
 		Type = AFGJECLDAIG;
 	}
 
-	public int ANAECCFDHMI()
+	public int GetAnimationId()
 	{
 		return _Id;
 	}
 
 	public void set_AnimationFinishFrame(int value)
 	{
-		MLIGJHGMOAA = value;
+		animationFinishFrame = value;
 	}
 
 	public virtual void Parse(XmlNode MEEAKLDGLDF)
@@ -76,66 +76,66 @@ public class IntervalAnimation
 		Name = XmlUtils.ParseString(NodeInterval.Attributes["Name"]);
 		if (Name == "Unstable")
 		{
-			Type = NGAJJDIEDGF.INTERVAL_UNSTABLE;
+			Type = IntervalType.INTERVAL_UNSTABLE;
 		}
 		else if (Name == "Uninterrupt")
 		{
-			Type = NGAJJDIEDGF.INTERVAL_UNINTERRUPT;
+			Type = IntervalType.INTERVAL_UNINTERRUPT;
 		}
 		else if (Name == "SelfUninterrupt")
 		{
-			Type = NGAJJDIEDGF.INTERVAL_SELF_UNINTERRUPT;
+			Type = IntervalType.INTERVAL_SELF_UNINTERRUPT;
 		}
 		Start = XmlUtils.ParseInt(NodeInterval.Attributes["Start"]);
 		bool flag = NodeInterval.Attributes["End"] != null;
-		GEJLNPIEDPF = ((!flag) ? (MLIGJHGMOAA + 2) : XmlUtils.ParseInt(NodeInterval.Attributes["End"], int.MaxValue));
-		if (Start > GEJLNPIEDPF)
+		EndFrameValue = ((!flag) ? (animationFinishFrame + 2) : XmlUtils.ParseInt(NodeInterval.Attributes["End"], int.MaxValue));
+		if (Start > EndFrameValue)
 		{
 			// Newer templates can override Start while inheriting an older End.
 			// The modern merger treats that as an open-ended interval; this legacy
 			// merger leaves the stale End behind. Preserve a valid one-frame window.
-			GEJLNPIEDPF = Start;
+			EndFrameValue = Start;
 		}
 		ParseInside();
 		NodeInterval = null;
 	}
 
-	public static NGAJJDIEDGF LAJMDAFFPJE(string LFLGCDNKNJI)
+	public static IntervalType ParseIntervalType(string LFLGCDNKNJI)
 	{
 		switch (LFLGCDNKNJI)
 		{
 		case "Attack":
-			return NGAJJDIEDGF.INTERVAL_ATTACK;
+			return IntervalType.INTERVAL_ATTACK;
 		case "Block":
-			return NGAJJDIEDGF.INTERVAL_BLOCK;
+			return IntervalType.INTERVAL_BLOCK;
 		case "Invulnerable":
-			return NGAJJDIEDGF.INTERVAL_INVULNERABLE;
+			return IntervalType.INTERVAL_INVULNERABLE;
 		case "Invisible":
-			return NGAJJDIEDGF.INTERVAL_INVISIBLE;
+			return IntervalType.INTERVAL_INVISIBLE;
 		default:
-			return NGAJJDIEDGF.INTERVAL_NONE;
+			return IntervalType.INTERVAL_NONE;
 		}
 	}
 
-	private static string KNCNACGPAMA(NGAJJDIEDGF LFLGCDNKNJI)
+	private static string IntervalTypeToString(IntervalType LFLGCDNKNJI)
 	{
 		switch (LFLGCDNKNJI)
 		{
-		case NGAJJDIEDGF.INTERVAL_NONE:
+		case IntervalType.INTERVAL_NONE:
 			return string.Empty;
-		case NGAJJDIEDGF.INTERVAL_UNSTABLE:
+		case IntervalType.INTERVAL_UNSTABLE:
 			return "Unstable";
-		case NGAJJDIEDGF.INTERVAL_UNINTERRUPT:
+		case IntervalType.INTERVAL_UNINTERRUPT:
 			return "Uninterrupt";
-		case NGAJJDIEDGF.INTERVAL_SELF_UNINTERRUPT:
+		case IntervalType.INTERVAL_SELF_UNINTERRUPT:
 			return "SelfUninterrupt";
-		case NGAJJDIEDGF.INTERVAL_ATTACK:
+		case IntervalType.INTERVAL_ATTACK:
 			return "Attack";
-		case NGAJJDIEDGF.INTERVAL_BLOCK:
+		case IntervalType.INTERVAL_BLOCK:
 			return "Block";
-		case NGAJJDIEDGF.INTERVAL_INVULNERABLE:
+		case IntervalType.INTERVAL_INVULNERABLE:
 			return "Invulnerable";
-		case NGAJJDIEDGF.INTERVAL_INVISIBLE:
+		case IntervalType.INTERVAL_INVISIBLE:
 			return "Invisible";
 		default:
 			return string.Empty;

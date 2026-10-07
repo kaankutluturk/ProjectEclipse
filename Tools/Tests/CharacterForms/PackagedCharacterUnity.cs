@@ -65,16 +65,16 @@ public static class PackagedCharacterUnity
                 typeof(Eclipse.UI.TitleScreen).GetMethod("BeginCampaign",Hidden).Invoke(title,null);
                 var directory=SF2Paths.GetUserDataDirectory();
                 Check(Eclipse.Saves.CampaignSaveSession.PreviewDirectory==null&&directory.StartsWith(Application.persistentDataPath,StringComparison.OrdinalIgnoreCase)&&Application.persistentDataPath.Contains("PackagedCharacterUnity-"),"Profile not isolated");
-                var profile=XmlUtils.OpenXMLDocument(SF2Paths.KKIDGPBOBNI(),"usersDefault.xml",XmlUtils.EBLFEPIOMOL.Normal,true,XmlCryptoUtils.NNLGALNDJCL());
+                var profile=XmlUtils.OpenXMLDocument(SF2Paths.GetGameDataPath(),"usersDefault.xml",XmlUtils.XmlSourceMode.Normal,true,XmlCryptoUtils.GetIsEncryptionEnabled());
                 ((System.Xml.XmlElement)profile.SelectSingleNode("/Root/Warriors/Warrior[@ID='1']")).SetAttribute("Tutorial","END");
-                Directory.CreateDirectory(directory);XmlUtils.ONLDJNLKKAL(profile,Path.Combine(directory,Constants.OJMIJINKBPJ).Replace('\\','/'));
+                Directory.CreateDirectory(directory);XmlUtils.SaveDocumentWithHash(profile,Path.Combine(directory,Constants.UsersFileName).Replace('\\','/'));
                 campaign=true;return;
             }
             if(!entered){
                 if(ModRuntime.Scripts==null||Module.GetInstance()==null||Eclipse.UI.TitleScreen.IsOpen||UnityEngine.Object.FindFirstObjectByType<Eclipse.UI.EclipseLoadingOverlay>()!=null)return;
                 var screen=Module.GetInstance().GetCurrentScreenType();if(screen!=ScreenType.ModuleDojo&&screen!=ScreenType.ModuleMap)return;
                 Check(!ModRuntime.Host.HasErrors,ModRuntime.Host.FormatReport());Check(ModRuntime.Host.EnabledMods.Any(m=>m.Id.Value==owner),"Generated character package not enabled");Check(!ModRuntime.Scripts.HasErrors,"Startup mod errors");
-                var encounter=ListSF.CHMCKGCDGCM(new FightIDS(ModRuntime.Scripts.Content.RuntimeFightId(DefinitionId.Parse(owner+":fights/preview"))));
+                var encounter=ListSF.GetFightById(new FightIDS(ModRuntime.Scripts.Content.RuntimeFightId(DefinitionId.Parse(owner+":fights/preview"))));
                 Check(encounter!=null,"Core encounter missing");entered=GameUtils.StartFight(encounter,false,null,true,false);return;
             }
             var fight=Fight.GetCurrentFight();if(fight==null||fight.get_FightTimeInFrames()<10)return;
@@ -106,7 +106,7 @@ public static class PackagedCharacterUnity
             case 3:
                 if(frame-phaseFrame>=3)Send(fight,1);
                 if(player.GetCurrentAnimation()?.Name==Move){
-                    if(!sawMove&&phase==3){var animation=Field(player,"_Animation");Check((int)Field(animation,"JMKAHNADIOI")==-1,"Native exported Punch faces opposite direction");}
+                    if(!sawMove&&phase==3){var animation=Field(player,"_Animation");Check((int)Field(animation,"sign")==-1,"Native exported Punch faces opposite direction");}
                     if(!sawMove){var data=(Vector3[][])Field(player.GetCurrentAnimation(),"_AnimationContainer");Check(data.Length==60&&data.All(f=>f.Length==67),"Unmodified exported clip loads native point count");}
                     sawMove=true;var wrist=player.GetModelObject().FindNodeOrParent("NWrist_1").GetEnd();var pivot=player.GetModelObject().FindNodeOrParent("NPivot").GetEnd();
                     float value=wrist.GetY()-pivot.GetY();minWrist=Mathf.Min(minWrist,value);maxWrist=Mathf.Max(maxWrist,value);
@@ -129,7 +129,7 @@ public static class PackagedCharacterUnity
                 if(!sawMove||enemy.GetCurrentAnimation()?.Name==Move)return;
                 Check(sawMove,"Generated Lua tactic reaches native opponent animation");ValidateSkin(enemy);
                 if(!captured){captured=true;new GameObject("Packaged opponent capture").AddComponent<PackagedCharacterCapture>();}
-                typeof(Fight).GetMethod("HCNDAFDHACI",Hidden).Invoke(fight,new object[]{GameOverTypes.GAME_OVER_SURRENDER});phase=5;phaseFrame=frame;break;
+                typeof(Fight).GetMethod("AbortFight",Hidden).Invoke(fight,new object[]{GameOverTypes.GAME_OVER_SURRENDER});phase=5;phaseFrame=frame;break;
             case 5:
                 if(!PackagedCharacterCapture.Done)return;
                 Check(ModRuntime.Scripts.CallbackDiagnostics.RecentFailures.Count==0,"Generated package callback errors");
@@ -145,7 +145,7 @@ public static class PackagedCharacterUnity
     {
         switch(phase){
         case 0:
-            if(fight.stageType!=StageType.FDBBPEGEGMK.STAGE_FIGHT)return;
+            if(fight.stageType!=StageType.Stage.STAGE_FIGHT)return;
             enemy.Parameters.AiControlled=false;
             if(UnityEngine.Object.FindFirstObjectByType<Eclipse.UI.EclipseLoadingOverlay>()!=null||!fight.Controller.IsQuadrantEnabled(FightCID.Punch))return;
             Check(player.Parameters.EclipseCharacterId==Character&&enemy.Parameters.EclipseCharacterId==Character,"Imported motion uses public player/opponent identities");
@@ -186,7 +186,7 @@ public static class PackagedCharacterUnity
             phase=5;break;
         case 5:
             if(!PackagedCharacterCapture.Done)return;
-            typeof(Fight).GetMethod("HCNDAFDHACI",Hidden).Invoke(fight,new object[]{GameOverTypes.GAME_OVER_SURRENDER});phase=6;break;
+            typeof(Fight).GetMethod("AbortFight",Hidden).Invoke(fight,new object[]{GameOverTypes.GAME_OVER_SURRENDER});phase=6;break;
         case 6:
             Check(ModRuntime.Scripts.CallbackDiagnostics.RecentFailures.Count==0&&!Eclipse.UI.Modding.ModUiGameBridge.BlocksGameplayInput,"Imported motion cleanup");
             File.WriteAllText(Path.Combine(Path.GetDirectoryName(Application.dataPath),"packaged-character-result.txt"),"PASS: "+checks+" imported source-motion assertions; unchanged exported payload, public Lua/native player input on both controlled facings, visible wrist movement, weighted skin bounds, eligible-action Lua AI and surrender cleanup. Most assertions compare binary points. No authored attacks, physical devices, arbitrary actions/body plans or exported platforms are accepted; screenshot requires inspection.");
@@ -244,14 +244,14 @@ public static class PackagedCharacterUnity
             Control(fight,0,FightCID.Punch);phase=1;phaseFrame=frame;break;
         case 1:
             if(frame-phaseFrame>=3)Control(fight,1,FightCID.Punch);
-            importedAttack|=player.GetCurrentAnimation()?.Type==InfoAnimation.MGHNBEPCKIF.AnimationAttack;
+            importedAttack|=player.GetCurrentAnimation()?.Type==InfoAnimation.AnimationKind.AnimationAttack;
             importedReaction|=enemy.GetCurrentAnimation()?.Name!="StanceIdle";
             if(!importedPunchCaptured&&enemy.Parameters.RemainingHealthInDamageUnits<importedEnemyLife){
                 importedPunchCaptured=true;PackagedCharacterCapture.Done=false;
                 new GameObject("Imported contact capture").AddComponent<PackagedCharacterCapture>().FileName="imported-character-punch.png";
             }
             if(frame-phaseFrame>240)throw new Exception("Imported native Punch/contact failed: "+player.GetCurrentAnimation()?.Name+" enemy="+enemy.GetCurrentAnimation()?.Name+" sawAttack="+importedAttack+" health="+enemy.Parameters.RemainingHealthInDamageUnits+" before="+importedEnemyLife);
-            if(!importedAttack||enemy.Parameters.RemainingHealthInDamageUnits>=importedEnemyLife||player.GetCurrentAnimation()?.Type==InfoAnimation.MGHNBEPCKIF.AnimationAttack)return;
+            if(!importedAttack||enemy.Parameters.RemainingHealthInDamageUnits>=importedEnemyLife||player.GetCurrentAnimation()?.Type==InfoAnimation.AnimationKind.AnimationAttack)return;
             Check(importedAttack&&importedReaction,"Imported core attack and native victim reaction");ValidateImportedSkin(player);
             Position(player,1000);Position(enemy,450);phase=2;phaseFrame=frame;break;
         case 2:
@@ -262,22 +262,22 @@ public static class PackagedCharacterUnity
             importedAttack=false;Control(fight,0,FightCID.Kick);phase=3;phaseFrame=frame;break;
         case 3:
             if(frame-phaseFrame>=3)Control(fight,1,FightCID.Kick);
-            importedAttack|=player.GetCurrentAnimation()?.Type==InfoAnimation.MGHNBEPCKIF.AnimationAttack;
+            importedAttack|=player.GetCurrentAnimation()?.Type==InfoAnimation.AnimationKind.AnimationAttack;
             if(frame-phaseFrame>240)throw new Exception("Imported mirrored Kick input failed");
-            if(!importedAttack||frame-phaseFrame<30||player.GetCurrentAnimation()?.Type==InfoAnimation.MGHNBEPCKIF.AnimationAttack)return;
+            if(!importedAttack||frame-phaseFrame<30||player.GetCurrentAnimation()?.Type==InfoAnimation.AnimationKind.AnimationAttack)return;
             Check(importedAttack,"Imported native mirrored Kick");ValidateImportedSkin(player);
             Check(player.FacingSign==-1,"Imported native Kick preserves mirrored facing");
             Position(player,650);Position(enemy,550);enemy.Parameters.AiControlled=true;
             importedPlayerLife=player.Parameters.RemainingHealthInDamageUnits;phase=4;phaseFrame=frame;break;
         case 4:
-            importedAi|=enemy.GetCurrentAnimation()?.Type==InfoAnimation.MGHNBEPCKIF.AnimationAttack;
+            importedAi|=enemy.GetCurrentAnimation()?.Type==InfoAnimation.AnimationKind.AnimationAttack;
             if(frame-phaseFrame>1200)throw new Exception("Imported Standard AI made no native incoming contact");
             if(!importedAi||player.Parameters.RemainingHealthInDamageUnits>=importedPlayerLife)return;
             Check(importedAi,"Imported Standard AI attacks with native damage");ValidateImportedSkin(enemy);ValidateImportedSkin(player);
             captured=true;PackagedCharacterCapture.Done=false;new GameObject("Imported fighter capture").AddComponent<PackagedCharacterCapture>();phase=5;phaseFrame=frame;break;
         case 5:
             if(!PackagedCharacterCapture.Done)return;
-            typeof(Fight).GetMethod("HCNDAFDHACI",Hidden).Invoke(fight,new object[]{GameOverTypes.GAME_OVER_SURRENDER});phase=6;phaseFrame=frame;break;
+            typeof(Fight).GetMethod("AbortFight",Hidden).Invoke(fight,new object[]{GameOverTypes.GAME_OVER_SURRENDER});phase=6;phaseFrame=frame;break;
         case 6:
             Check(ModRuntime.Scripts.CallbackDiagnostics.RecentFailures.Count==0&&!Eclipse.UI.Modding.ModUiGameBridge.BlocksGameplayInput,"Imported encounter cleanup");
             File.WriteAllText(Path.Combine(Path.GetDirectoryName(Application.dataPath),"packaged-character-result.txt"),"PASS: "+checks+" imported-rig native checks; public Lua player/opponent identities, inherited animation eligibility without authored clips, movement, native Punch/contact/reaction, controlled mirrored stance and Kick, Standard AI incoming contact, weighted skin coordinates and geometry bounds on both facings and surrender cleanup. Selected imported humanoid source "+owner+"; arbitrary body plans, source animation import, physical input and exported platforms remain unverified. Screenshot requires separate visual inspection.");
@@ -289,7 +289,7 @@ public static class PackagedCharacterUnity
         var document=new System.Xml.XmlDocument();document.Load(Path.Combine(Argument("-characterPackageModsRoot"),owner,"assets/models/skin1.xml"));
         var helpers=document.SelectNodes("/Scene/Nodes/*[@Type='SkinnedNode']");Check(helpers.Count>0,"Imported weighted skin mounted");
         var body=model.GetModelObject();
-        var driver=body.NAMKCLGOPDD().Take(67).Select(n=>n.GetStart()).ToArray();
+        var driver=body.GetAllNodes().Take(67).Select(n=>n.GetStart()).ToArray();
         float minX=driver.Min(p=>p.GetX()),maxX=driver.Max(p=>p.GetX()),minY=driver.Min(p=>p.GetY()),maxY=driver.Max(p=>p.GetY());
         float allowance=Math.Max(100,Math.Max(maxX-minX,maxY-minY));
         bool bounded=true;
@@ -312,7 +312,7 @@ public static class PackagedCharacterUnity
     static void ValidateSkin(Model model){
         var body=model.GetModelObject();var node=body.FindNodeOrParent("EclipseFixtureNode-3");Check(node!=null,"Exported Gymnast skin helper mounted");
         // ModelMacroNode computes current Start XY from child Starts through
-        // Vector3f.GLGNIMKANCA, which deliberately excludes Z. End retains the
+        // Vector3f.AddScaledXY, which deliberately excludes Z. End retains the
         // previous helper pose. This proves planar native skin binding only.
         var actual=node.GetStart();var expected=new Vector3();
         // Coefficients come from the actual upstream HEAD_GEAR export, not a

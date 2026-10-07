@@ -2,112 +2,112 @@ using System;
 
 internal class OutputBuffer
 {
-	internal struct LHFANIPMGPA
+	internal struct BufferState
 	{
-		internal int LCCLEFMKLPB;
+		internal int pos;
 
 		internal uint bitBuf;
 
-		internal int EGEFBPOCGGN;
+		internal int bitCount;
 	}
 
 	private byte[] byteBuffer;
 
-	private int LCCLEFMKLPB;
+	private int pos;
 
 	private uint bitBuf;
 
-	private int EGEFBPOCGGN;
+	private int bitCount;
 
-	internal int DPJJAFPABEE
+	internal int BytesWritten
 	{
 		get
 		{
-			return GEBLFKFACKO();
+			return GetBytesWritten();
 		}
 	}
 
-	internal int BMDIGKGNDPO
+	internal int FreeBytes
 	{
 		get
 		{
-			return JBPBBAEEAFO();
+			return GetFreeBytes();
 		}
 	}
 
-	internal int OHONOONEGAG
+	internal int BitsInBuffer
 	{
 		get
 		{
-			return DBBLKJPGAOO();
+			return GetBitsInBuffer();
 		}
 	}
 
 	internal void UpdateBuffer(byte[] output)
 	{
 		byteBuffer = output;
-		LCCLEFMKLPB = 0;
+		pos = 0;
 	}
 
-	internal int GEBLFKFACKO()
+	internal int GetBytesWritten()
 	{
-		return LCCLEFMKLPB;
+		return pos;
 	}
 
-	internal int JBPBBAEEAFO()
+	internal int GetFreeBytes()
 	{
-		return byteBuffer.Length - LCCLEFMKLPB;
+		return byteBuffer.Length - pos;
 	}
 
 	internal void WriteUInt16(ushort value)
 	{
-		byteBuffer[LCCLEFMKLPB++] = (byte)value;
-		byteBuffer[LCCLEFMKLPB++] = (byte)(value >> 8);
+		byteBuffer[pos++] = (byte)value;
+		byteBuffer[pos++] = (byte)(value >> 8);
 	}
 
-	internal void EHFDJAJPOAO(int HDKKKCDKFEE, uint HLFOKLCKNEE)
+	internal void WriteBits(int HDKKKCDKFEE, uint HLFOKLCKNEE)
 	{
-		bitBuf |= HLFOKLCKNEE << EGEFBPOCGGN;
-		EGEFBPOCGGN += HDKKKCDKFEE;
-		if (EGEFBPOCGGN >= 16)
+		bitBuf |= HLFOKLCKNEE << bitCount;
+		bitCount += HDKKKCDKFEE;
+		if (bitCount >= 16)
 		{
-			byteBuffer[LCCLEFMKLPB++] = (byte)bitBuf;
-			byteBuffer[LCCLEFMKLPB++] = (byte)(bitBuf >> 8);
-			EGEFBPOCGGN -= 16;
+			byteBuffer[pos++] = (byte)bitBuf;
+			byteBuffer[pos++] = (byte)(bitBuf >> 8);
+			bitCount -= 16;
 			bitBuf >>= 16;
 		}
 	}
 
-	internal void NOOJGJGNLBL()
+	internal void FlushBits()
 	{
-		while (EGEFBPOCGGN >= 8)
+		while (bitCount >= 8)
 		{
-			byteBuffer[LCCLEFMKLPB++] = (byte)bitBuf;
-			EGEFBPOCGGN -= 8;
+			byteBuffer[pos++] = (byte)bitBuf;
+			bitCount -= 8;
 			bitBuf >>= 8;
 		}
-		if (EGEFBPOCGGN > 0)
+		if (bitCount > 0)
 		{
-			byteBuffer[LCCLEFMKLPB++] = (byte)bitBuf;
+			byteBuffer[pos++] = (byte)bitBuf;
 			bitBuf = 0u;
-			EGEFBPOCGGN = 0;
+			bitCount = 0;
 		}
 	}
 
-	internal void FJPANBOJJDI(byte[] HFADMOEOHFA, int IPCOBJBKNAO, int count)
+	internal void WriteBytes(byte[] HFADMOEOHFA, int IPCOBJBKNAO, int count)
 	{
-		if (EGEFBPOCGGN == 0)
+		if (bitCount == 0)
 		{
-			Array.Copy(HFADMOEOHFA, IPCOBJBKNAO, byteBuffer, LCCLEFMKLPB, count);
-			LCCLEFMKLPB += count;
+			Array.Copy(HFADMOEOHFA, IPCOBJBKNAO, byteBuffer, pos, count);
+			pos += count;
 		}
 		else
 		{
-			LELLIEHNDLB(HFADMOEOHFA, IPCOBJBKNAO, count);
+			WriteBytesUnaligned(HFADMOEOHFA, IPCOBJBKNAO, count);
 		}
 	}
 
-	private void LELLIEHNDLB(byte[] HFADMOEOHFA, int IPCOBJBKNAO, int count)
+	private void WriteBytesUnaligned(byte[] HFADMOEOHFA, int IPCOBJBKNAO, int count)
 	{
 		for (int i = 0; i < count; i++)
 		{
@@ -118,27 +118,27 @@ internal class OutputBuffer
 
 	private void WriteByteUnaligned(byte AAOIAEJJINO)
 	{
-		EHFDJAJPOAO(8, AAOIAEJJINO);
+		WriteBits(8, AAOIAEJJINO);
 	}
 
-	internal int DBBLKJPGAOO()
+	internal int GetBitsInBuffer()
 	{
-		return EGEFBPOCGGN / 8 + 1;
+		return bitCount / 8 + 1;
 	}
 
-	internal LHFANIPMGPA ENBODKKOALL()
+	internal BufferState DumpState()
 	{
-		LHFANIPMGPA result = default(LHFANIPMGPA);
-		result.LCCLEFMKLPB = LCCLEFMKLPB;
+		BufferState result = default(BufferState);
+		result.pos = pos;
 		result.bitBuf = bitBuf;
-		result.EGEFBPOCGGN = EGEFBPOCGGN;
+		result.bitCount = bitCount;
 		return result;
 	}
 
-	internal void BIDLPPIPACF(LHFANIPMGPA state)
+	internal void RestoreState(BufferState state)
 	{
-		LCCLEFMKLPB = state.LCCLEFMKLPB;
+		pos = state.pos;
 		bitBuf = state.bitBuf;
-		EGEFBPOCGGN = state.EGEFBPOCGGN;
+		bitCount = state.bitCount;
 	}
 }

@@ -3,12 +3,12 @@ using System.Collections.Generic;
 
 internal class OrderedDictionaryEnumerator : IEnumerator, IDictionaryEnumerator
 {
-	private IEnumerator<KeyValuePair<string, JsonData>> CNFOENGMCMB;
+	private IEnumerator<KeyValuePair<string, JsonData>> listEnumerator;
 
 
 	public OrderedDictionaryEnumerator(IEnumerator<KeyValuePair<string, JsonData>> GEJJPNMHBJO)
 	{
-		CNFOENGMCMB = GEJJPNMHBJO;
+		listEnumerator = GEJJPNMHBJO;
 	}
 
 	public object Current
@@ -23,7 +23,7 @@ internal class OrderedDictionaryEnumerator : IEnumerator, IDictionaryEnumerator
 	{
 		get
 		{
-			KeyValuePair<string, JsonData> current = CNFOENGMCMB.Current;
+			KeyValuePair<string, JsonData> current = listEnumerator.Current;
 			return new DictionaryEntry(current.Key, current.Value);
 		}
 	}
@@ -32,7 +32,7 @@ internal class OrderedDictionaryEnumerator : IEnumerator, IDictionaryEnumerator
 	{
 		get
 		{
-			return CNFOENGMCMB.Current.Key;
+			return listEnumerator.Current.Key;
 		}
 	}
 
@@ -40,17 +40,17 @@ internal class OrderedDictionaryEnumerator : IEnumerator, IDictionaryEnumerator
 	{
 		get
 		{
-			return CNFOENGMCMB.Current.Value;
+			return listEnumerator.Current.Value;
 		}
 	}
 
 	public bool MoveNext()
 	{
-		return CNFOENGMCMB.MoveNext();
+		return listEnumerator.MoveNext();
 	}
 
 	public void Reset()
 	{
-		CNFOENGMCMB.Reset();
+		listEnumerator.Reset();
 	}
 }

@@ -5,17 +5,17 @@ using UnityEngine.Events;
 
 public class UserItems
 {
-	public class LNLLFLPJIEM : UnityEvent<List<UserItem>>
+	public class ItemsDeliveredEvent : UnityEvent<List<UserItem>>
 	{
 	}
 
-	public class DNJBDLFKHPG : UnityEvent<UserItem>
+	public class ItemDeliveredEvent : UnityEvent<UserItem>
 	{
 	}
 
-	public LNLLFLPJIEM LHNOOJJNDPK = new LNLLFLPJIEM();
+	public ItemsDeliveredEvent ItemsDelivered = new ItemsDeliveredEvent();
 
-	public DNJBDLFKHPG HHGJMMHMEMP = new DNJBDLFKHPG();
+	public ItemDeliveredEvent ItemDelivered = new ItemDeliveredEvent();
 
 	private List<UserItem> _items = new List<UserItem>();
 
@@ -23,56 +23,56 @@ public class UserItems
 
 	public IReadOnlyList<string> MissingModItemIds => _missingModItemIds.AsReadOnly();
 
-	private List<UserItem> HBLLBGLBDGI = new List<UserItem>();
+	private List<UserItem> pendingDeliveries = new List<UserItem>();
 
-	public List<UserItem> CGJGNEADJBH = new List<UserItem>();
+	public List<UserItem> DeliveredItems = new List<UserItem>();
 
-	public List<UserItem> KDIJGMMNFHH = new List<UserItem>();
+	public List<UserItem> DeliveredUpgrades = new List<UserItem>();
 
-	public List<RecipeItemInfo> LFADKPKKFMP = new List<RecipeItemInfo>();
+	public List<RecipeItemInfo> DeliveredRecipes = new List<RecipeItemInfo>();
 
-	public List<UserItem> OJIAKDDCGLB
+	public List<UserItem> Items
 	{
 		get
 		{
-			return DJBOFEEKJMP();
+			return GetItems();
 		}
 	}
 
-	public List<UserItem> JAHAJKEAECA
+	public List<UserItem> DeliveredItemList
 	{
 		get
 		{
-			return EHDCCPKOANN();
+			return GetDeliveredItems();
 		}
 	}
 
-	public List<UserItem> KJBABANBOEF
+	public List<UserItem> DeliveredUpgradeList
 	{
 		get
 		{
-			return MPACCEAFDOH();
+			return GetDeliveredUpgrades();
 		}
 	}
 
 	public UserItems()
 	{
-		GlobalTimer.get_Instance().addEventListener(0, ILFBDHDMHPD);
+		GlobalTimer.get_Instance().addEventListener(0, OnTimerTick);
 	}
 
-	public List<UserItem> DJBOFEEKJMP()
+	public List<UserItem> GetItems()
 	{
 		return _items;
 	}
 
-	public List<UserItem> EHDCCPKOANN()
+	public List<UserItem> GetDeliveredItems()
 	{
-		return CGJGNEADJBH;
+		return DeliveredItems;
 	}
 
-	public List<UserItem> MPACCEAFDOH()
+	public List<UserItem> GetDeliveredUpgrades()
 	{
-		return KDIJGMMNFHH;
+		return DeliveredUpgrades;
 	}
 
 	public void Parse(XmlNode EPGOOPEHFMO)
@@ -95,20 +95,20 @@ public class UserItems
 			{
 				ItemInfo definition = ListSF.GetItems().GetItemByName(item.get_Name());
 				XmlAttribute equipped = EPGOOPEHFMO.ParentNode?.Attributes?[definition.Type];
-				if (equipped != null) item.JBLKCIBKMKB(equipped.Value == item.get_Name());
+				if (equipped != null) item.SetIsEquipped(equipped.Value == item.get_Name());
 			}
-			GEFDJDIINND(item);
+			AddItem(item);
 		}
 		if (_missingModItemIds.Count > 0)
 			UnityEngine.Debug.LogWarning("[ModSave] Preserved " + _missingModItemIds.Count +
 				" unavailable mod item(s) in the save: " + string.Join(", ", _missingModItemIds));
 	}
 
-	public UserItem GEFDJDIINND(UserItem value, bool HPCLCADMKCG = false)
+	public UserItem AddItem(UserItem value, bool HPCLCADMKCG = false)
 	{
-		if (value.BHKHOJPANHE() != null && value.BHKHOJPANHE().Type == "Seal")
+		if (value.GetInfo() != null && value.GetInfo().Type == "Seal")
 		{
-			value.BHKHOJPANHE().BEBDMOEIEJN(true);
+			value.GetInfo().SetIsNew(true);
 		}
 		if (HPCLCADMKCG)
 		{
@@ -128,19 +128,19 @@ public class UserItems
 		{
 			_items.Add(value);
 		}
-		if (value.IJGAOHJNLAH() > 0)
+		if (value.GetDeliveryTimestamp() > 0)
 		{
-			HBLLBGLBDGI.Add(value);
+			pendingDeliveries.Add(value);
 		}
 		return value;
 	}
 
-	public UserItem CMGOCLGHNLH(ItemInfo item)
+	public UserItem FindItem(ItemInfo item)
 	{
-		return (item == null) ? null : CMGOCLGHNLH(item.Name);
+		return (item == null) ? null : FindItem(item.Name);
 	}
 
-	public UserItem CMGOCLGHNLH(string name)
+	public UserItem FindItem(string name)
 	{
 		foreach (UserItem item in _items)
 		{
@@ -164,17 +164,17 @@ public class UserItems
 		return null;
 	}
 
-	public List<UserItem> HOPBBLJLHOB(string LFLGCDNKNJI, string GIGAFKGDKNH = "", bool isActive = true)
+	public List<UserItem> FindItemsByType(string LFLGCDNKNJI, string GIGAFKGDKNH = "", bool isActive = true)
 	{
 		List<UserItem> list = new List<UserItem>();
 		foreach (UserItem item in _items)
 		{
-			ItemInfo dJKEECEOCJB = item.BHKHOJPANHE();
+			ItemInfo dJKEECEOCJB = item.GetInfo();
 			if (dJKEECEOCJB != null)
 			{
 				bool flag = dJKEECEOCJB.Type.Equals(LFLGCDNKNJI);
 				bool flag2 = dJKEECEOCJB.SubType.Equals(GIGAFKGDKNH) || GIGAFKGDKNH.Equals(string.Empty);
-				bool flag3 = dJKEECEOCJB.DCHJDPCEODD || !isActive;
+				bool flag3 = dJKEECEOCJB.IsShopVisible || !isActive;
 				if (flag && flag2 && flag3)
 				{
 					list.Add(item);
@@ -184,111 +184,111 @@ public class UserItems
 		return list;
 	}
 
-	public bool MHMFKLLIFEJ(ItemInfo item)
+	public bool HasItem(ItemInfo item)
 	{
-		UserItem dKCHDHMLKHN = CMGOCLGHNLH(item);
-		return dKCHDHMLKHN != null && dKCHDHMLKHN.OFOPFCJNEBL() > 0;
+		UserItem dKCHDHMLKHN = FindItem(item);
+		return dKCHDHMLKHN != null && dKCHDHMLKHN.GetCount() > 0;
 	}
 
-	public void JALMHIICOPB(ItemInfo item, bool GHLLDFNGMAE)
+	public void ResetToDefaultItem(ItemInfo item, bool GHLLDFNGMAE)
 	{
 		if (item == null)
 		{
 			return;
 		}
 		string gOHIIMFFFJI = GameUtils.GetDefaultItem(item.Type);
-		UserItem dKCHDHMLKHN = CMGOCLGHNLH(gOHIIMFFFJI);
-		if (dKCHDHMLKHN == null || dKCHDHMLKHN.BHKHOJPANHE() == null)
+		UserItem dKCHDHMLKHN = FindItem(gOHIIMFFFJI);
+		if (dKCHDHMLKHN == null || dKCHDHMLKHN.GetInfo() == null)
 		{
 			return;
 		}
-		ListSF.CCDKHLAMKKO().get_Parameters().OLLNIKFPMKE(dKCHDHMLKHN.BHKHOJPANHE().Type, dKCHDHMLKHN.BHKHOJPANHE());
+		ListSF.GetRoster().get_Parameters().SetItemByType(dKCHDHMLKHN.GetInfo().Type, dKCHDHMLKHN.GetInfo());
 		if (GHLLDFNGMAE)
 		{
-			UserItem dKCHDHMLKHN2 = CMGOCLGHNLH(item);
+			UserItem dKCHDHMLKHN2 = FindItem(item);
 			if (dKCHDHMLKHN2 != null)
 			{
 				var activeSets = IsPlayerItems() ? Eclipse.UI.SetBonusNotice.ActiveCombos() : null;
-				dKCHDHMLKHN2.JBLKCIBKMKB(false);
-				dKCHDHMLKHN.JBLKCIBKMKB(true);
-				ListSF.CCDKHLAMKKO().BMADIJMPENJ(dKCHDHMLKHN);
-				ListSF.CCDKHLAMKKO().GGGEHAGCLGC();
+				dKCHDHMLKHN2.SetIsEquipped(false);
+				dKCHDHMLKHN.SetIsEquipped(true);
+				ListSF.GetRoster().EquipItem(dKCHDHMLKHN);
+				ListSF.GetRoster().RequestSave();
 				Eclipse.UI.SetBonusNotice.AnnounceNew(activeSets);
 			}
 		}
 	}
 
-	public void EEDJEDBMIMI(ItemInfo item, bool GHLLDFNGMAE)
+	public void EquipItem(ItemInfo item, bool GHLLDFNGMAE)
 	{
 		if (item == null)
 		{
 			return;
 		}
-		ListSF.CCDKHLAMKKO().get_Parameters().OLLNIKFPMKE(item.Type, item);
+		ListSF.GetRoster().get_Parameters().SetItemByType(item.Type, item);
 		if (!GHLLDFNGMAE)
 		{
 			return;
 		}
-		UserItem dKCHDHMLKHN = CMGOCLGHNLH(item);
-		if (dKCHDHMLKHN != null && dKCHDHMLKHN.GKGIKMCMCPB())
+		UserItem dKCHDHMLKHN = FindItem(item);
+		if (dKCHDHMLKHN != null && dKCHDHMLKHN.GetIsOwned())
 		{
 			var activeSets = IsPlayerItems() ? Eclipse.UI.SetBonusNotice.ActiveCombos() : null;
-			List<UserItem> list = HOPBBLJLHOB(item.Type, string.Empty);
+			List<UserItem> list = FindItemsByType(item.Type, string.Empty);
 			list.ForEach((UserItem DHDMNHCIPEH) =>
 			{
-				DHDMNHCIPEH.JBLKCIBKMKB(false);
+				DHDMNHCIPEH.SetIsEquipped(false);
 			});
-			dKCHDHMLKHN.JBLKCIBKMKB(true);
-			ListSF.CCDKHLAMKKO().BMADIJMPENJ(dKCHDHMLKHN);
-			ListSF.CCDKHLAMKKO().GGGEHAGCLGC();
+			dKCHDHMLKHN.SetIsEquipped(true);
+			ListSF.GetRoster().EquipItem(dKCHDHMLKHN);
+			ListSF.GetRoster().RequestSave();
 			Eclipse.UI.SetBonusNotice.AnnounceNew(activeSets);
 		}
 	}
 
 	private bool IsPlayerItems()
 	{
-		Roster roster = ListSF.CCDKHLAMKKO();
-		return roster != null && ReferenceEquals(this, roster.KHCNHPCPFII());
+		Roster roster = ListSF.GetRoster();
+		return roster != null && ReferenceEquals(this, roster.GetInventory());
 	}
 
-	public void HOMCPNCGPDB(List<ItemInfo> HELFDCAIJNE)
+	public void ApplyItemInfos(List<ItemInfo> HELFDCAIJNE)
 	{
-		ModelParameters kIKOGDEPGHB = ListSF.CCDKHLAMKKO().get_Parameters();
+		ModelParameters kIKOGDEPGHB = ListSF.GetRoster().get_Parameters();
 		if (kIKOGDEPGHB == null)
 		{
 			return;
 		}
-		kIKOGDEPGHB.HEKILHEHMMH.Clear();
+		kIKOGDEPGHB.DecorateItems.Clear();
 		foreach (ItemInfo item in HELFDCAIJNE)
 		{
-			UserItem dKCHDHMLKHN = CMGOCLGHNLH(item);
+			UserItem dKCHDHMLKHN = FindItem(item);
 			if (dKCHDHMLKHN != null)
 			{
-				dKCHDHMLKHN.KIGHKCOCJFJ(item);
-				if (dKCHDHMLKHN.EFMFGEPDAOP() && item.Type.Equals("Decorate"))
+				dKCHDHMLKHN.SetInfo(item);
+				if (dKCHDHMLKHN.GetIsEquipped() && item.Type.Equals("Decorate"))
 				{
-					kIKOGDEPGHB.HEKILHEHMMH.Add(item);
+					kIKOGDEPGHB.DecorateItems.Add(item);
 				}
 			}
 		}
-		NHJAHNDOLAE();
+		RefreshUpgradeStates();
 	}
 
-	public void NHJAHNDOLAE()
+	public void RefreshUpgradeStates()
 	{
 		_items.ForEach((UserItem DHDMNHCIPEH) =>
 		{
-			DHDMNHCIPEH.CDFODJBJIPI(ListSF.CCDKHLAMKKO().PINDEKDNCNL());
+			DHDMNHCIPEH.RefreshUpgradeState(ListSF.GetRoster().GetLevel());
 		});
 	}
 
-	public void DINFNDFAJMB()
+	public void ProcessDeliveries()
 	{
 		List<UserItem> list = new List<UserItem>();
 		bool flag = false;
-		foreach (UserItem item in HBLLBGLBDGI)
+		foreach (UserItem item in pendingDeliveries)
 		{
-			if (item.IJGAOHJNLAH() <= 0)
+			if (item.GetDeliveryTimestamp() <= 0)
 			{
 				list.Add(item);
 			}
@@ -296,7 +296,7 @@ public class UserItems
 			{
 				// Migrate any delivery already persisted by an older build on the next
 				// timer tick. New shop purchases no longer enter this queue.
-				GBLHFNGPIOF(item);
+				CompleteDelivery(item);
 				list.Add(item);
 				flag = true;
 			}
@@ -305,61 +305,61 @@ public class UserItems
 		{
 			if (flag)
 			{
-				LHNOOJJNDPK.Invoke(list);
+				ItemsDelivered.Invoke(list);
 			}
 			list.ForEach((UserItem DHDMNHCIPEH) =>
 			{
-				HBLLBGLBDGI.Remove(DHDMNHCIPEH);
+				pendingDeliveries.Remove(DHDMNHCIPEH);
 			});
 		}
 	}
 
-	public void GBLHFNGPIOF(UserItem NDMCFNGEPOA)
+	public void CompleteDelivery(UserItem NDMCFNGEPOA)
 	{
-		if (NDMCFNGEPOA != null && NDMCFNGEPOA.IJGAOHJNLAH() > 0)
+		if (NDMCFNGEPOA != null && NDMCFNGEPOA.GetDeliveryTimestamp() > 0)
 		{
-			Roster acquisitionRoster = ListSF.CCDKHLAMKKO();
+			Roster acquisitionRoster = ListSF.GetRoster();
 			int acquisitionProfile = Eclipse.Modding.ModRuntime.StoryEvents.ProfileGeneration;
 			int previousCount = -1;
-			if (NDMCFNGEPOA.DBKKJGBJOEO())
+			if (NDMCFNGEPOA.GetIsUpgrade())
 			{
-				MPACCEAFDOH().Add(NDMCFNGEPOA);
+				GetDeliveredUpgrades().Add(NDMCFNGEPOA);
 			}
 			else
 			{
-				EHDCCPKOANN().Add(NDMCFNGEPOA);
+				GetDeliveredItems().Add(NDMCFNGEPOA);
 			}
-			HHGJMMHMEMP.Invoke(NDMCFNGEPOA);
-			QuestParameters hHKLFIIBIFF = ListSF.GetInstance().BNMLDPNCMLB();
-			hHKLFIIBIFF.DLKPBAJDHBO = NDMCFNGEPOA.BHKHOJPANHE();
-			if (ListSF.GetInstance().FFBAJNGHGGD(QuestEvent.PMDPDMFLCIJ.QUEST_EVENT_DELIVERY))
+			ItemDelivered.Invoke(NDMCFNGEPOA);
+			QuestParameters hHKLFIIBIFF = ListSF.GetInstance().GetQuestParameters();
+			hHKLFIIBIFF.purchasedItem = NDMCFNGEPOA.GetInfo();
+			if (ListSF.GetInstance().RaiseQuestEvent(QuestEvent.QuestEventType.QUEST_EVENT_DELIVERY))
 			{
-				ListSF.GetInstance().MHHNIPBJNAD();
+				ListSF.GetInstance().RunQuestActions();
 			}
-			if (NDMCFNGEPOA.OFOPFCJNEBL() <= 0)
+			if (NDMCFNGEPOA.GetCount() <= 0)
 			{
-				previousCount = NDMCFNGEPOA.OFOPFCJNEBL();
-				NDMCFNGEPOA.CHILOKHFALD(1);
+				previousCount = NDMCFNGEPOA.GetCount();
+				NDMCFNGEPOA.SetCount(1);
 				NDMCFNGEPOA.set_DeliveryTime(-1L);
 			}
-			if (NDMCFNGEPOA.EIMMBNNMBCN() > 0 && NDMCFNGEPOA.EIMMBNNMBCN() > NDMCFNGEPOA.DHNNCAEEMLL())
+			if (NDMCFNGEPOA.GetDeliveryUpgradeLevel() > 0 && NDMCFNGEPOA.GetDeliveryUpgradeLevel() > NDMCFNGEPOA.GetUpgradeLevel())
 			{
-				NDMCFNGEPOA.FMMDLMGHPIB(NDMCFNGEPOA.EIMMBNNMBCN());
+				NDMCFNGEPOA.SetUpgradeLevel(NDMCFNGEPOA.GetDeliveryUpgradeLevel());
 				NDMCFNGEPOA.set_DeliveryTime(-1L);
 			}
-			NDMCFNGEPOA.CDFODJBJIPI(ListSF.CCDKHLAMKKO().PINDEKDNCNL());
-			ListSF.CCDKHLAMKKO().GGGEHAGCLGC();
-			if (previousCount >= 0 && ReferenceEquals(this, acquisitionRoster.KHCNHPCPFII()))
-				Eclipse.Modding.ModRuntime.PublishItemAcquired(acquisitionRoster, NDMCFNGEPOA.BHKHOJPANHE(), previousCount, 1, acquisitionProfile);
+			NDMCFNGEPOA.RefreshUpgradeState(ListSF.GetRoster().GetLevel());
+			ListSF.GetRoster().RequestSave();
+			if (previousCount >= 0 && ReferenceEquals(this, acquisitionRoster.GetInventory()))
+				Eclipse.Modding.ModRuntime.PublishItemAcquired(acquisitionRoster, NDMCFNGEPOA.GetInfo(), previousCount, 1, acquisitionProfile);
 		}
 	}
 
-	public UserItem PKKKAFIHHMI(string LFLGCDNKNJI)
+	public UserItem GetRandomItemOfType(string LFLGCDNKNJI)
 	{
 		List<UserItem> list = new List<UserItem>();
 		foreach (UserItem item in _items)
 		{
-			ItemInfo dJKEECEOCJB = item.BHKHOJPANHE();
+			ItemInfo dJKEECEOCJB = item.GetInfo();
 			if (dJKEECEOCJB != null && dJKEECEOCJB.Type == LFLGCDNKNJI)
 			{
 				list.Add(item);
@@ -373,12 +373,12 @@ public class UserItems
 		return null;
 	}
 
-	public List<UserItem> HECLNLNGFCD()
+	public List<UserItem> GetItemsInDelivery()
 	{
 		List<UserItem> list = new List<UserItem>();
 		foreach (UserItem item in _items)
 		{
-			if (item.IJGAOHJNLAH() > 0)
+			if (item.GetDeliveryTimestamp() > 0)
 			{
 				list.Add(item);
 			}
@@ -386,12 +386,12 @@ public class UserItems
 		return list;
 	}
 
-	public List<UserItem> JCMOHPFKPBO()
+	public List<UserItem> GetEquippedItems()
 	{
 		List<UserItem> list = new List<UserItem>();
 		foreach (UserItem item in _items)
 		{
-			if (item.EFMFGEPDAOP())
+			if (item.GetIsEquipped())
 			{
 				list.Add(item);
 			}
@@ -399,14 +399,14 @@ public class UserItems
 		return list;
 	}
 
-	public List<RecipeItemInfo> PHKEAPFEOLP()
+	public List<RecipeItemInfo> GetRecipeDeliveries()
 	{
 		List<RecipeItemInfo> list = new List<RecipeItemInfo>();
 		foreach (UserItem item in _items)
 		{
-			if (item.PHDBCIHJKON() != null)
+			if (item.GetRecipeDelivery() != null)
 			{
-				list.Add(item.PHDBCIHJKON());
+				list.Add(item.GetRecipeDelivery());
 			}
 		}
 		return list;
@@ -414,15 +414,15 @@ public class UserItems
 
 	public bool FinishDeliveryRecipe(RecipeItemInfo recipeItem, bool runEvent = true)
 	{
-		if (recipeItem == null || recipeItem.MFEAIEJFDAM() == null) return false;
-		RecipeItemInfo pending = recipeItem.MFEAIEJFDAM().PHDBCIHJKON();
+		if (recipeItem == null || recipeItem.GetUserItem() == null) return false;
+		RecipeItemInfo pending = recipeItem.GetUserItem().GetRecipeDelivery();
 		if (pending == null || pending.ItemAndRecipeInfo != recipeItem.ItemAndRecipeInfo) return false;
 		if (pending.IsStillInOrder && !Eclipse.Modding.ModPolicies.SkipEnabled("forge")) return false;
-		if (!ForgeManager.ELEBLBJKDBI().FinishEnchant(pending)) return false;
-		if (!LFADKPKKFMP.Contains(pending)) LFADKPKKFMP.Add(pending);
+		if (!ForgeManager.GetInstance().FinishEnchant(pending)) return false;
+		if (!DeliveredRecipes.Contains(pending)) DeliveredRecipes.Add(pending);
 		if (runEvent)
 		{
-			Roster roster = ListSF.CCDKHLAMKKO();
+			Roster roster = ListSF.GetRoster();
 			if (roster != null) roster.CallEvent(1, pending);
 		}
 		return true;
@@ -430,32 +430,32 @@ public class UserItems
 
 	public List<RecipeItemInfo> GetRecipesDelivered()
 	{
-		return LFADKPKKFMP;
+		return DeliveredRecipes;
 	}
 
 	public void UpdateLockItems(int OMHDLKNHNMJ)
 	{
-		List<ItemInfo> list = ListSF.GetItems().HCDLKHKBEPF();
+		List<ItemInfo> list = ListSF.GetItems().GetAllItems();
 		foreach (ItemInfo item in list)
 		{
-			if (item.DCHJDPCEODD)
+			if (item.IsShopVisible)
 			{
 				ListSF.GetItems().SetNewAddItem(item, true, OMHDLKNHNMJ);
 			}
 		}
 	}
 
-	public void PHMMJIENGEP()
+	public void CorrectUpgradeLevels()
 	{
 		foreach (UserItem item in _items)
 		{
-			GJGJALKONNA(item, item.BHKHOJPANHE());
+			CorrectUpgradeLevel(item, item.GetInfo());
 		}
 	}
 
-	public void GJGJALKONNA(UserItem NDMCFNGEPOA, ItemInfo PJDAGCBPLJE)
+	public void CorrectUpgradeLevel(UserItem NDMCFNGEPOA, ItemInfo PJDAGCBPLJE)
 	{
-		int num = NDMCFNGEPOA.DHNNCAEEMLL();
+		int num = NDMCFNGEPOA.GetUpgradeLevel();
 		if (PJDAGCBPLJE == null || PJDAGCBPLJE.UpgradeLevel == num)
 		{
 			return;
@@ -464,11 +464,11 @@ public class UserItems
 		int num3 = int.MinValue;
 		int num4 = 0;
 		bool flag = false;
-		NDMCFNGEPOA.HJONIDFKNJH("Upgrade");
-		List<UpgradeData> list = PJDAGCBPLJE.DNFDAGFAANJ();
+		NDMCFNGEPOA.SetAcquireType("Upgrade");
+		List<UpgradeData> list = PJDAGCBPLJE.GetUpgrades();
 		foreach (UpgradeData item in list)
 		{
-			num4 = item.OGLHOJNMEBD.AKKLOMFOLNO;
+			num4 = item.Values.UpgradeLevel;
 			if (num4 == num)
 			{
 				return;
@@ -483,17 +483,17 @@ public class UserItems
 				num3 = num4;
 			}
 		}
-		NDMCFNGEPOA.FMMDLMGHPIB((!flag) ? num3 : num2);
-		NDMCFNGEPOA.CDFODJBJIPI(ListSF.CCDKHLAMKKO().PINDEKDNCNL());
+		NDMCFNGEPOA.SetUpgradeLevel((!flag) ? num3 : num2);
+		NDMCFNGEPOA.RefreshUpgradeState(ListSF.GetRoster().GetLevel());
 	}
 
-	private void ILFBDHDMHPD(ExtentionBehaviour.CallEventArgs JKOCDNPPJDG)
+	private void OnTimerTick(ExtentionBehaviour.CallEventArgs JKOCDNPPJDG)
 	{
-		DINFNDFAJMB();
+		ProcessDeliveries();
 	}
 
-	public void IJFJMMCFIGH()
+	public void ClearDeliveredRecipes()
 	{
-		LFADKPKKFMP.Clear();
+		DeliveredRecipes.Clear();
 	}
 }

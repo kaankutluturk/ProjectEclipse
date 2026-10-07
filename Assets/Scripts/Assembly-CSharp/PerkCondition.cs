@@ -4,7 +4,7 @@ using System.Xml;
 
 public abstract class PerkCondition : PerkObject
 {
-	public enum NHDGLPNNNLH
+	public enum PerkConditionType
 	{
 		CONDITION_NONE = 0,
 		CONDITION_RANDOM = 1,
@@ -29,21 +29,21 @@ public abstract class PerkCondition : PerkObject
 	protected object Info;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private NHDGLPNNNLH KAHHEBMBCFA;
+	private PerkConditionType _type;
 
 	public PerkCondition()
 	{
-		set_Type(NHDGLPNNNLH.CONDITION_NONE);
+		set_Type(PerkConditionType.CONDITION_NONE);
 	}
 
-	public NHDGLPNNNLH get_Type()
+	public PerkConditionType get_Type()
 	{
-		return KAHHEBMBCFA;
+		return _type;
 	}
 
-	protected void set_Type(NHDGLPNNNLH value)
+	protected void set_Type(PerkConditionType value)
 	{
-		KAHHEBMBCFA = value;
+		_type = value;
 	}
 
 	public static List<PerkCondition> Create(XmlNode node, PerkInfoItem AEFFHJGMNFI)
@@ -57,7 +57,7 @@ public abstract class PerkCondition : PerkObject
 		{
 			PerkCondition iDJILNODHAD = null;
 			string name = childNode.Name;
-			if (FunctionExtension.MHKNIEBONKD(name) != FunctionExtension.DLLJOIFFBPL.COMPARE_NONE)
+			if (FunctionExtension.ParseCompareType(name) != FunctionExtension.CompareType.COMPARE_NONE)
 			{
 				iDJILNODHAD = new PerkConditionComparison();
 			}
@@ -118,7 +118,7 @@ public abstract class PerkCondition : PerkObject
 			}
 			if (iDJILNODHAD != null)
 			{
-				iDJILNODHAD.JMOIMIHPBOM(AEFFHJGMNFI);
+				iDJILNODHAD.SetPerk(AEFFHJGMNFI);
 				iDJILNODHAD.Parse(childNode);
 				list.Add(iDJILNODHAD);
 			}
@@ -128,13 +128,13 @@ public abstract class PerkCondition : PerkObject
 
 	public abstract bool IsEqual(Model ACENLMONNPA, List<string> NIKHAICFGNM);
 
-	protected Model EPCPGEPPHLO(Model ACENLMONNPA)
+	protected Model ResolveTargetModel(Model ACENLMONNPA)
 	{
-		if (IHJJBIDMEMB == PlayerType.PLAYER_ME)
+		if (TargetPlayer == PlayerType.PLAYER_ME)
 		{
 			return ACENLMONNPA;
 		}
-		if (IHJJBIDMEMB == PlayerType.PLAYER_ENEMY)
+		if (TargetPlayer == PlayerType.PLAYER_ENEMY)
 		{
 			return ACENLMONNPA.GetCombatTarget();
 		}

@@ -14,9 +14,9 @@ namespace Nekki.SF2.GUI.Fight
 		[SerializeField]
 		private LayoutElement layoutElement;
 
-		private string texturePath = SF2Paths.BHCPOOOJAAK();
+		private string texturePath = SF2Paths.GetUsersUiPath();
 
-		public ResolutionImageAvatar HNKFHGOOKEG
+		public ResolutionImageAvatar AvatarImage
 		{
 			get
 			{

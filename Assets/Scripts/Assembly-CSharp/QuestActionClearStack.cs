@@ -3,20 +3,20 @@ using System.Xml;
 
 public class QuestActionClearStack : QuestAction
 {
-	private List<string> NIKHAICFGNM = new List<string>();
+	private List<string> questNames = new List<string>();
 
 	public override void Parse(XmlNode EPKLCPOEELO)
 	{
 		base.Parse(EPKLCPOEELO);
-		string text = EPKLCPOEELO.Attributes["Name"].CIPOICEEIBK(string.Empty);
+		string text = EPKLCPOEELO.Attributes["Name"].GetStringOrDefault(string.Empty);
 		string[] collection = text.Split('|');
-		NIKHAICFGNM.AddRange(collection);
+		questNames.AddRange(collection);
 	}
 
-	public override void DEJMHFMLKIC(QuestParameters GFIHPBCEEOB)
+	public override void Execute(QuestParameters GFIHPBCEEOB)
 	{
-		base.DEJMHFMLKIC(GFIHPBCEEOB);
-		ListSF.GetInstance().ClearQuestsStack(NIKHAICFGNM);
-		OGIJONMKABB();
+		base.Execute(GFIHPBCEEOB);
+		ListSF.GetInstance().ClearQuestsStack(questNames);
+		FinishAction();
 	}
 }

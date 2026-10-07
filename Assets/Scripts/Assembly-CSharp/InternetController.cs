@@ -3,14 +3,14 @@ using System.Xml;
 
 public static class InternetController
 {
-	public class CFEEBFOFKMK
+	public class LikeUrlInfo
 	{
 		public string Url;
 
-		public string OLLDPHHNBCC;
+		public string AltUrl;
 	}
 
-	public enum MIPPFGJMDLI
+	public enum PlatformType
 	{
 		ANDROID = 0,
 		IOS = 1,
@@ -19,67 +19,67 @@ public static class InternetController
 	}
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private static string FICHLPIOEGM;
+	private static string postPictureUrl;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private static CFEEBFOFKMK IIMMBPJFCJE;
+	private static LikeUrlInfo likeUrls;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private static string CKKPPGNBPMM;
+	private static string postLinkUrl;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private static bool NFEKIAEFMHK;
+	private static bool isPostAchievements;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private static string ODMEFCDBNAK;
+	private static string musicStoreUrl;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private static string IGPCLMEJCJL;
+	private static string rateUrl;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private static string BIHMBFOCAMI;
+	private static string defaultConfigUrl;
 
-	public static string FDNBEILEAEM
+	public static string PostPictureUrl
 	{
 		get
 		{
-			return HPCFJDPAMFE();
+			return GetPostPictureUrl();
 		}
 		private set
 		{
-			PMGKDPFHJNM(value);
+			SetPostPictureUrl(value);
 		}
 	}
 
-	public static CFEEBFOFKMK PMELEALOLCF
+	public static LikeUrlInfo LikeUrls
 	{
 		get
 		{
-			return BKGEABLMGKL();
+			return GetLikeUrls();
 		}
 		private set
 		{
-			LMBHNMBAFDB(value);
+			SetLikeUrls(value);
 		}
 	}
 
-	public static string HLBBCJLIDFJ
+	public static string PostLinkUrl
 	{
 		get
 		{
-			return HHJPCEDCLGH();
+			return GetPostLinkUrl();
 		}
 		private set
 		{
-			KJDJHGODMPA(value);
+			SetPostLinkUrl(value);
 		}
 	}
 
-	public static bool GGCOEPEDGLP
+	public static bool PostAchievementsEnabled
 	{
 		get
 		{
-			return DHDGLNKILPM();
+			return IsPostAchievementsEnabled();
 		}
 		private set
 		{
@@ -87,142 +87,142 @@ public static class InternetController
 		}
 	}
 
-	public static string MAGGMIHDODO
+	public static string MusicStoreUrl
 	{
 		get
 		{
-			return MMIHGFKCMCC();
+			return GetMusicStoreUrl();
 		}
 		private set
 		{
-			GNKHLLKFFJL(value);
+			SetMusicStoreUrl(value);
 		}
 	}
 
-	public static string JDFFNAPHIPJ
+	public static string RateUrl
 	{
 		get
 		{
-			return DMFANLAIJMN();
+			return GetRateUrl();
 		}
 		private set
 		{
-			CBKDHJJKMIC(value);
+			SetRateUrl(value);
 		}
 	}
 
-	public static string AEBDFOCDINJ
+	public static string DefaultConfigUrl
 	{
 		get
 		{
-			return PPPALDPCFPL();
+			return GetDefaultConfigUrl();
 		}
 		private set
 		{
-			BNAJCBJJHPN(value);
+			SetDefaultConfigUrl(value);
 		}
 	}
 
-	public static string HPCFJDPAMFE()
+	public static string GetPostPictureUrl()
 	{
-		return FICHLPIOEGM;
+		return postPictureUrl;
 	}
 
-	private static void PMGKDPFHJNM(string value)
+	private static void SetPostPictureUrl(string value)
 	{
-		FICHLPIOEGM = value;
+		postPictureUrl = value;
 	}
 
-	public static CFEEBFOFKMK BKGEABLMGKL()
+	public static LikeUrlInfo GetLikeUrls()
 	{
-		return IIMMBPJFCJE;
+		return likeUrls;
 	}
 
-	private static void LMBHNMBAFDB(CFEEBFOFKMK value)
+	private static void SetLikeUrls(LikeUrlInfo value)
 	{
-		IIMMBPJFCJE = value;
+		likeUrls = value;
 	}
 
-	public static string HHJPCEDCLGH()
+	public static string GetPostLinkUrl()
 	{
-		return CKKPPGNBPMM;
+		return postLinkUrl;
 	}
 
-	private static void KJDJHGODMPA(string value)
+	private static void SetPostLinkUrl(string value)
 	{
-		CKKPPGNBPMM = value;
+		postLinkUrl = value;
 	}
 
-	public static bool DHDGLNKILPM()
+	public static bool IsPostAchievementsEnabled()
 	{
-		return NFEKIAEFMHK;
+		return isPostAchievements;
 	}
 
 	private static void set_IsPostAchievements(bool value)
 	{
-		NFEKIAEFMHK = value;
+		isPostAchievements = value;
 	}
 
-	public static string MMIHGFKCMCC()
+	public static string GetMusicStoreUrl()
 	{
-		return ODMEFCDBNAK;
+		return musicStoreUrl;
 	}
 
-	private static void GNKHLLKFFJL(string value)
+	private static void SetMusicStoreUrl(string value)
 	{
-		ODMEFCDBNAK = value;
+		musicStoreUrl = value;
 	}
 
-	public static string DMFANLAIJMN()
+	public static string GetRateUrl()
 	{
-		return IGPCLMEJCJL;
+		return rateUrl;
 	}
 
-	private static void CBKDHJJKMIC(string value)
+	private static void SetRateUrl(string value)
 	{
-		IGPCLMEJCJL = value;
+		rateUrl = value;
 	}
 
-	public static string PPPALDPCFPL()
+	public static string GetDefaultConfigUrl()
 	{
-		return BIHMBFOCAMI;
+		return defaultConfigUrl;
 	}
 
-	private static void BNAJCBJJHPN(string value)
+	private static void SetDefaultConfigUrl(string value)
 	{
-		BIHMBFOCAMI = value;
+		defaultConfigUrl = value;
 	}
 
 	public static void Parse(XmlNode node)
 	{
-		PMGKDPFHJNM(node["FBPostPicture"].Attributes["Url"].CIPOICEEIBK(string.Empty));
+		SetPostPictureUrl(node["FBPostPicture"].Attributes["Url"].GetStringOrDefault(string.Empty));
 		XmlNode hKPPBKPJOEO = node["Android"];
-		MIPPFGJMDLI jGJNNAHDPBA = MIPPFGJMDLI.ANDROID;
-		AKEJKLCMBNP(hKPPBKPJOEO, jGJNNAHDPBA);
+		PlatformType jGJNNAHDPBA = PlatformType.ANDROID;
+		ParsePlatformNode(hKPPBKPJOEO, jGJNNAHDPBA);
 		ParseServer(node["Server"]);
 	}
 
-	private static void AKEJKLCMBNP(XmlNode node, MIPPFGJMDLI JGJNNAHDPBA)
+	private static void ParsePlatformNode(XmlNode node, PlatformType JGJNNAHDPBA)
 	{
-		LMBHNMBAFDB(new CFEEBFOFKMK());
+		SetLikeUrls(new LikeUrlInfo());
 		if (node["FBLikeUrl"] != null)
 		{
-			BKGEABLMGKL().Url = node["FBLikeUrl"].Attributes["Url"].CIPOICEEIBK(string.Empty);
-			BKGEABLMGKL().OLLDPHHNBCC = node["FBLikeUrl"].Attributes["AltUrl"].CIPOICEEIBK(string.Empty);
+			GetLikeUrls().Url = node["FBLikeUrl"].Attributes["Url"].GetStringOrDefault(string.Empty);
+			GetLikeUrls().AltUrl = node["FBLikeUrl"].Attributes["AltUrl"].GetStringOrDefault(string.Empty);
 		}
 		if (node["FBPostLink"] != null)
 		{
-			if (AssemblyController.JONCCPLEIBE().OPCBKOOFMAK())
+			if (AssemblyController.GetMarket().GetIsAmazonMobileMarket())
 			{
-				KJDJHGODMPA(node["FBPostLink"].Attributes["Amazon"].CIPOICEEIBK(string.Empty));
+				SetPostLinkUrl(node["FBPostLink"].Attributes["Amazon"].GetStringOrDefault(string.Empty));
 			}
-			else if (SystemProperties.IPJFCBAGMJJ())
+			else if (SystemProperties.IsAndroidPlatform())
 			{
-				KJDJHGODMPA(node["FBPostLink"].Attributes["PlayMarket"].CIPOICEEIBK(string.Empty));
+				SetPostLinkUrl(node["FBPostLink"].Attributes["PlayMarket"].GetStringOrDefault(string.Empty));
 			}
 			else
 			{
-				KJDJHGODMPA(node["FBPostLink"].Attributes["Url"].CIPOICEEIBK(string.Empty));
+				SetPostLinkUrl(node["FBPostLink"].Attributes["Url"].GetStringOrDefault(string.Empty));
 			}
 		}
 		if (node["PostAchievements"] != null)
@@ -231,26 +231,26 @@ public static class InternetController
 		}
 		if (node["MusicStore"] != null)
 		{
-			if (AssemblyController.JONCCPLEIBE().OPCBKOOFMAK())
+			if (AssemblyController.GetMarket().GetIsAmazonMobileMarket())
 			{
-				GNKHLLKFFJL(node["MusicStore"].Attributes["Amazon"].CIPOICEEIBK(string.Empty));
+				SetMusicStoreUrl(node["MusicStore"].Attributes["Amazon"].GetStringOrDefault(string.Empty));
 			}
 			else
 			{
-				GNKHLLKFFJL(node["MusicStore"].Attributes["Url"].CIPOICEEIBK(string.Empty));
+				SetMusicStoreUrl(node["MusicStore"].Attributes["Url"].GetStringOrDefault(string.Empty));
 			}
 		}
 		string name = "Url";
-		if (JGJNNAHDPBA == MIPPFGJMDLI.ANDROID)
+		if (JGJNNAHDPBA == PlatformType.ANDROID)
 		{
-			name = ((!AssemblyController.JONCCPLEIBE().BKGIFIPIHAL()) ? "PlayMarket" : "China360");
-			name = ((!AssemblyController.JONCCPLEIBE().OPCBKOOFMAK()) ? name : "Amazon");
+			name = ((!AssemblyController.GetMarket().GetIsChinaMarket()) ? "PlayMarket" : "China360");
+			name = ((!AssemblyController.GetMarket().GetIsAmazonMobileMarket()) ? name : "Amazon");
 		}
-		CBKDHJJKMIC(node["RateUrl"].Attributes[name].CIPOICEEIBK(string.Empty));
+		SetRateUrl(node["RateUrl"].Attributes[name].GetStringOrDefault(string.Empty));
 	}
 
 	private static void ParseServer(XmlNode node)
 	{
-		BNAJCBJJHPN(node["DefaultConfigUrl"].Attributes["Url"].CIPOICEEIBK(string.Empty));
+		SetDefaultConfigUrl(node["DefaultConfigUrl"].Attributes["Url"].GetStringOrDefault(string.Empty));
 	}
 }

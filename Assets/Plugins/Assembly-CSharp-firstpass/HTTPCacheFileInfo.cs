@@ -6,49 +6,49 @@ using System.IO;
 internal class HTTPCacheFileInfo : IComparable<HTTPCacheFileInfo>
 {
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private Uri NHCOGAAPOAB;
+	private Uri uri;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private DateTime KLMBGHCOBPE;
+	private DateTime lastAccess;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private int MHLKLAEBFCD;
+	private int bodyLength;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private string KCEOHKJOHFB;
+	private string eTag;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private string FLJCNLNAENP;
+	private string lastModified;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private DateTime DCBEPAGIKAK;
+	private DateTime expires;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private long NGMJOLHOLKL;
+	private long age;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private long DLAMLEBFCJO;
+	private long maxAge;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private DateTime DLHGOFDMCHO;
+	private DateTime date;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private bool LEBBJPJPCLA;
+	private bool mustRevalidate;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private DateTime EOHJKHPPCCN;
+	private DateTime received;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private string NIGDFDADGKD;
+	private string constructedPath;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private ulong HDEPIILJKIN;
+	private ulong mappedNameIdx;
 
-	internal Uri GJIGOCNEPME
+	internal Uri CachedUri
 	{
 		get
 		{
-			return OJBDMGBGJMA();
+			return GetUri();
 		}
 		set
 		{
@@ -56,23 +56,23 @@ internal class HTTPCacheFileInfo : IComparable<HTTPCacheFileInfo>
 		}
 	}
 
-	internal DateTime BINEABBDPDH
+	internal DateTime LastAccess
 	{
 		get
 		{
-			return PPHKANGFLHJ();
+			return GetLastAccess();
 		}
 		set
 		{
-			ABGLCGLPNKO(value);
+			SetLastAccess(value);
 		}
 	}
 
-	internal int MADCPBFOEOG
+	internal int CachedBodyLength
 	{
 		get
 		{
-			return NHCAEHOHBEE();
+			return GetBodyLength();
 		}
 		set
 		{
@@ -80,15 +80,15 @@ internal class HTTPCacheFileInfo : IComparable<HTTPCacheFileInfo>
 		}
 	}
 
-	private string MFCFBMCBJMI
+	private string ETag
 	{
 		get
 		{
-			return HEIJBOKAMJI();
+			return GetETag();
 		}
 		set
 		{
-			FKPPFMHIBJM(value);
+			SetETag(value);
 		}
 	}
 
@@ -96,43 +96,43 @@ internal class HTTPCacheFileInfo : IComparable<HTTPCacheFileInfo>
 	{
 		get
 		{
-			return FKJJDHNKOLH();
+			return GetLastModified();
 		}
 		set
 		{
-			ICHJGCIBBGC(value);
+			SetLastModified(value);
 		}
 	}
 
-	private DateTime FCFCGJHCJJL
+	private DateTime Expires
 	{
 		get
 		{
-			return EPCHAKMLDFN();
+			return GetExpires();
 		}
 		set
 		{
-			PGAOJGPAMND(value);
+			SetExpires(value);
 		}
 	}
 
-	private long IDGJLEBFHOK
+	private long CacheAge
 	{
 		get
 		{
-			return DMCMJJCMLGP();
+			return GetAge();
 		}
 		set
 		{
-			FFGJFMNGBDK(value);
+			SetAge(value);
 		}
 	}
 
-	private long JHJOIHEHOEP
+	private long MaxAgeSeconds
 	{
 		get
 		{
-			return FCBEBMKLFIO();
+			return GetMaxAge();
 		}
 		set
 		{
@@ -140,23 +140,23 @@ internal class HTTPCacheFileInfo : IComparable<HTTPCacheFileInfo>
 		}
 	}
 
-	private DateTime IPJJMANFBBF
+	private DateTime Date
 	{
 		get
 		{
-			return DJPNPAGCDKB();
+			return GetDate();
 		}
 		set
 		{
-			MPHLCKEMAIL(value);
+			SetDate(value);
 		}
 	}
 
-	private bool OBNKAIAGJFG
+	private bool RequiresRevalidation
 	{
 		get
 		{
-			return EJCIFAGMCIE();
+			return GetMustRevalidate();
 		}
 		set
 		{
@@ -164,35 +164,35 @@ internal class HTTPCacheFileInfo : IComparable<HTTPCacheFileInfo>
 		}
 	}
 
-	private DateTime LDFMDJGCLGM
+	private DateTime Received
 	{
 		get
 		{
-			return EHEDLEAKOHD();
+			return GetReceived();
 		}
 		set
 		{
-			JBEBONEKNJP(value);
+			SetReceived(value);
 		}
 	}
 
-	private string KMEPDJGCKKL
+	private string ConstructedPath
 	{
 		get
 		{
-			return IBMNGGCCEOL();
+			return GetConstructedPath();
 		}
 		set
 		{
-			FKIBPCNPPJA(value);
+			SetConstructedPath(value);
 		}
 	}
 
-	internal ulong DIFCEKMFBBL
+	internal ulong MappedNameIndex
 	{
 		get
 		{
-			return KDBDNGPOENN();
+			return GetMappedNameIdx();
 		}
 		set
 		{
@@ -208,16 +208,16 @@ internal class HTTPCacheFileInfo : IComparable<HTTPCacheFileInfo>
 	internal HTTPCacheFileInfo(Uri KJHNCLAJMLO, DateTime HMHMICPJKOF, int DEFBMELCOHO)
 	{
 		set_Uri(KJHNCLAJMLO);
-		ABGLCGLPNKO(HMHMICPJKOF);
+		SetLastAccess(HMHMICPJKOF);
 		set_BodyLength(DEFBMELCOHO);
 		set_MaxAge(-1L);
-		set_MappedNameIDX(HTTPCacheService.OKGJODFOLBM());
+		set_MappedNameIDX(HTTPCacheService.GetNameIdx());
 	}
 
 	internal HTTPCacheFileInfo(Uri KJHNCLAJMLO, BinaryReader reader, int version)
 	{
 		set_Uri(KJHNCLAJMLO);
-		ABGLCGLPNKO(DateTime.FromBinary(reader.ReadInt64()));
+		SetLastAccess(DateTime.FromBinary(reader.ReadInt64()));
 		set_BodyLength(reader.ReadInt32());
 		switch (version)
 		{
@@ -229,188 +229,188 @@ internal class HTTPCacheFileInfo : IComparable<HTTPCacheFileInfo>
 		case 1:
 			break;
 		}
-		FKPPFMHIBJM(reader.ReadString());
-		ICHJGCIBBGC(reader.ReadString());
-		PGAOJGPAMND(DateTime.FromBinary(reader.ReadInt64()));
-		FFGJFMNGBDK(reader.ReadInt64());
+		SetETag(reader.ReadString());
+		SetLastModified(reader.ReadString());
+		SetExpires(DateTime.FromBinary(reader.ReadInt64()));
+		SetAge(reader.ReadInt64());
 		set_MaxAge(reader.ReadInt64());
-		MPHLCKEMAIL(DateTime.FromBinary(reader.ReadInt64()));
+		SetDate(DateTime.FromBinary(reader.ReadInt64()));
 		set_MustRevalidate(reader.ReadBoolean());
-		JBEBONEKNJP(DateTime.FromBinary(reader.ReadInt64()));
+		SetReceived(DateTime.FromBinary(reader.ReadInt64()));
 	}
 
-	internal Uri OJBDMGBGJMA()
+	internal Uri GetUri()
 	{
-		return NHCOGAAPOAB;
+		return uri;
 	}
 
 	internal void set_Uri(Uri value)
 	{
-		NHCOGAAPOAB = value;
+		uri = value;
 	}
 
-	internal DateTime PPHKANGFLHJ()
+	internal DateTime GetLastAccess()
 	{
-		return KLMBGHCOBPE;
+		return lastAccess;
 	}
 
-	internal void ABGLCGLPNKO(DateTime value)
+	internal void SetLastAccess(DateTime value)
 	{
-		KLMBGHCOBPE = value;
+		lastAccess = value;
 	}
 
-	internal int NHCAEHOHBEE()
+	internal int GetBodyLength()
 	{
-		return MHLKLAEBFCD;
+		return bodyLength;
 	}
 
 	internal void set_BodyLength(int value)
 	{
-		MHLKLAEBFCD = value;
+		bodyLength = value;
 	}
 
-	private string HEIJBOKAMJI()
+	private string GetETag()
 	{
-		return KCEOHKJOHFB;
+		return eTag;
 	}
 
-	private void FKPPFMHIBJM(string value)
+	private void SetETag(string value)
 	{
-		KCEOHKJOHFB = value;
+		eTag = value;
 	}
 
-	private string FKJJDHNKOLH()
+	private string GetLastModified()
 	{
-		return FLJCNLNAENP;
+		return lastModified;
 	}
 
-	private void ICHJGCIBBGC(string value)
+	private void SetLastModified(string value)
 	{
-		FLJCNLNAENP = value;
+		lastModified = value;
 	}
 
-	private DateTime EPCHAKMLDFN()
+	private DateTime GetExpires()
 	{
-		return DCBEPAGIKAK;
+		return expires;
 	}
 
-	private void PGAOJGPAMND(DateTime value)
+	private void SetExpires(DateTime value)
 	{
-		DCBEPAGIKAK = value;
+		expires = value;
 	}
 
-	private long DMCMJJCMLGP()
+	private long GetAge()
 	{
-		return NGMJOLHOLKL;
+		return age;
 	}
 
-	private void FFGJFMNGBDK(long value)
+	private void SetAge(long value)
 	{
-		NGMJOLHOLKL = value;
+		age = value;
 	}
 
-	private long FCBEBMKLFIO()
+	private long GetMaxAge()
 	{
-		return DLAMLEBFCJO;
+		return maxAge;
 	}
 
 	private void set_MaxAge(long value)
 	{
-		DLAMLEBFCJO = value;
+		maxAge = value;
 	}
 
-	private DateTime DJPNPAGCDKB()
+	private DateTime GetDate()
 	{
-		return DLHGOFDMCHO;
+		return date;
 	}
 
-	private void MPHLCKEMAIL(DateTime value)
+	private void SetDate(DateTime value)
 	{
-		DLHGOFDMCHO = value;
+		date = value;
 	}
 
-	private bool EJCIFAGMCIE()
+	private bool GetMustRevalidate()
 	{
-		return LEBBJPJPCLA;
+		return mustRevalidate;
 	}
 
 	private void set_MustRevalidate(bool value)
 	{
-		LEBBJPJPCLA = value;
+		mustRevalidate = value;
 	}
 
-	private DateTime EHEDLEAKOHD()
+	private DateTime GetReceived()
 	{
-		return EOHJKHPPCCN;
+		return received;
 	}
 
-	private void JBEBONEKNJP(DateTime value)
+	private void SetReceived(DateTime value)
 	{
-		EOHJKHPPCCN = value;
+		received = value;
 	}
 
-	private string IBMNGGCCEOL()
+	private string GetConstructedPath()
 	{
-		return NIGDFDADGKD;
+		return constructedPath;
 	}
 
-	private void FKIBPCNPPJA(string value)
+	private void SetConstructedPath(string value)
 	{
-		NIGDFDADGKD = value;
+		constructedPath = value;
 	}
 
-	internal ulong KDBDNGPOENN()
+	internal ulong GetMappedNameIdx()
 	{
-		return HDEPIILJKIN;
+		return mappedNameIdx;
 	}
 
 	internal void set_MappedNameIDX(ulong value)
 	{
-		HDEPIILJKIN = value;
+		mappedNameIdx = value;
 	}
 
 	internal void SaveTo(BinaryWriter writer)
 	{
-		writer.Write(PPHKANGFLHJ().ToBinary());
-		writer.Write(NHCAEHOHBEE());
-		writer.Write(KDBDNGPOENN());
-		writer.Write(HEIJBOKAMJI());
-		writer.Write(FKJJDHNKOLH());
-		writer.Write(EPCHAKMLDFN().ToBinary());
-		writer.Write(DMCMJJCMLGP());
-		writer.Write(FCBEBMKLFIO());
-		writer.Write(DJPNPAGCDKB().ToBinary());
-		writer.Write(EJCIFAGMCIE());
-		writer.Write(EHEDLEAKOHD().ToBinary());
+		writer.Write(GetLastAccess().ToBinary());
+		writer.Write(GetBodyLength());
+		writer.Write(GetMappedNameIdx());
+		writer.Write(GetETag());
+		writer.Write(GetLastModified());
+		writer.Write(GetExpires().ToBinary());
+		writer.Write(GetAge());
+		writer.Write(GetMaxAge());
+		writer.Write(GetDate().ToBinary());
+		writer.Write(GetMustRevalidate());
+		writer.Write(GetReceived().ToBinary());
 	}
 
-	private string HFGMHHDBHMH()
+	private string GetPath()
 	{
-		if (IBMNGGCCEOL() != null)
+		if (GetConstructedPath() != null)
 		{
-			return IBMNGGCCEOL();
+			return GetConstructedPath();
 		}
-		string text = Path.Combine(HTTPCacheService.MJJLGGBAMJE(), KDBDNGPOENN().ToString("X"));
-		FKIBPCNPPJA(text);
+		string text = Path.Combine(HTTPCacheService.GetCacheFolder(), GetMappedNameIdx().ToString("X"));
+		SetConstructedPath(text);
 		return text;
 	}
 
 	internal bool IsExists()
 	{
-		if (!HTTPCacheService.EPACOIFEICA())
+		if (!HTTPCacheService.GetIsSupported())
 		{
 			return false;
 		}
-		return File.Exists(HFGMHHDBHMH());
+		return File.Exists(GetPath());
 	}
 
-	internal void JEHBFCLLPCL()
+	internal void Delete()
 	{
-		if (!HTTPCacheService.EPACOIFEICA())
+		if (!HTTPCacheService.GetIsSupported())
 		{
 			return;
 		}
-		string path = HFGMHHDBHMH();
+		string path = GetPath();
 		try
 		{
 			File.Delete(path);
@@ -428,23 +428,23 @@ internal class HTTPCacheFileInfo : IComparable<HTTPCacheFileInfo>
 	{
 		set_MappedNameIDX(0uL);
 		set_BodyLength(-1);
-		FKPPFMHIBJM(string.Empty);
-		PGAOJGPAMND(DateTime.FromBinary(0L));
-		ICHJGCIBBGC(string.Empty);
-		FFGJFMNGBDK(0L);
+		SetETag(string.Empty);
+		SetExpires(DateTime.FromBinary(0L));
+		SetLastModified(string.Empty);
+		SetAge(0L);
 		set_MaxAge(-1L);
-		MPHLCKEMAIL(DateTime.FromBinary(0L));
+		SetDate(DateTime.FromBinary(0L));
 		set_MustRevalidate(false);
-		JBEBONEKNJP(DateTime.FromBinary(0L));
+		SetReceived(DateTime.FromBinary(0L));
 	}
 
-	private void NDENMNGKBPG(HTTPResponse GIHDDAKBMHE)
+	private void SetUpCachingValues(HTTPResponse GIHDDAKBMHE)
 	{
-		FKPPFMHIBJM(GIHDDAKBMHE.GetFirstHeaderValue("ETag").PKBHGNMGNNO());
-		PGAOJGPAMND(GIHDDAKBMHE.GetFirstHeaderValue("Expires").ToDateTime(DateTime.FromBinary(0L)));
-		ICHJGCIBBGC(GIHDDAKBMHE.GetFirstHeaderValue("Last-Modified").PKBHGNMGNNO());
-		FFGJFMNGBDK(GIHDDAKBMHE.GetFirstHeaderValue("Age").ToInt64(0L));
-		MPHLCKEMAIL(GIHDDAKBMHE.GetFirstHeaderValue("Date").ToDateTime(DateTime.FromBinary(0L)));
+		SetETag(GIHDDAKBMHE.GetFirstHeaderValue("ETag").ToStrOrEmpty());
+		SetExpires(GIHDDAKBMHE.GetFirstHeaderValue("Expires").ToDateTime(DateTime.FromBinary(0L)));
+		SetLastModified(GIHDDAKBMHE.GetFirstHeaderValue("Last-Modified").ToStrOrEmpty());
+		SetAge(GIHDDAKBMHE.GetFirstHeaderValue("Age").ToInt64(0L));
+		SetDate(GIHDDAKBMHE.GetFirstHeaderValue("Date").ToDateTime(DateTime.FromBinary(0L)));
 		string text = GIHDDAKBMHE.GetFirstHeaderValue("cache-control");
 		if (!string.IsNullOrEmpty(text))
 		{
@@ -456,41 +456,41 @@ internal class HTTPCacheFileInfo : IComparable<HTTPCacheFileInfo>
 			}
 			set_MustRevalidate(text.ToLower().Contains("must-revalidate"));
 		}
-		JBEBONEKNJP(DateTime.UtcNow);
+		SetReceived(DateTime.UtcNow);
 	}
 
-	internal bool IDGHLAOFMEO()
+	internal bool WillExpireInTheFuture()
 	{
 		if (!IsExists())
 		{
 			return false;
 		}
-		if (EJCIFAGMCIE())
+		if (GetMustRevalidate())
 		{
 			return false;
 		}
-		if (FCBEBMKLFIO() != -1)
+		if (GetMaxAge() != -1)
 		{
-			long val = Math.Max(0L, (long)(EHEDLEAKOHD() - DJPNPAGCDKB()).TotalSeconds);
-			long num = Math.Max(val, DMCMJJCMLGP());
-			long num2 = (long)(DateTime.UtcNow - DJPNPAGCDKB()).TotalSeconds;
+			long val = Math.Max(0L, (long)(GetReceived() - GetDate()).TotalSeconds);
+			long num = Math.Max(val, GetAge());
+			long num2 = (long)(DateTime.UtcNow - GetDate()).TotalSeconds;
 			long num3 = num + num2;
-			return num3 < FCBEBMKLFIO();
+			return num3 < GetMaxAge();
 		}
-		return EPCHAKMLDFN() > DateTime.UtcNow;
+		return GetExpires() > DateTime.UtcNow;
 	}
 
-	internal void EKLOPCNGGED(HTTPRequest ONOCIELLAPL)
+	internal void SetUpRevalidationHeaders(HTTPRequest ONOCIELLAPL)
 	{
 		if (IsExists())
 		{
-			if (!string.IsNullOrEmpty(HEIJBOKAMJI()))
+			if (!string.IsNullOrEmpty(GetETag()))
 			{
-				ONOCIELLAPL.AddHeader("If-None-Match", HEIJBOKAMJI());
+				ONOCIELLAPL.AddHeader("If-None-Match", GetETag());
 			}
-			if (!string.IsNullOrEmpty(FKJJDHNKOLH()))
+			if (!string.IsNullOrEmpty(GetLastModified()))
 			{
-				ONOCIELLAPL.AddHeader("If-Modified-Since", FKJJDHNKOLH());
+				ONOCIELLAPL.AddHeader("If-Modified-Since", GetLastModified());
 			}
 		}
 	}
@@ -502,47 +502,47 @@ internal class HTTPCacheFileInfo : IComparable<HTTPCacheFileInfo>
 			BDBOAEGELMC = 0;
 			return null;
 		}
-		BDBOAEGELMC = NHCAEHOHBEE();
-		ABGLCGLPNKO(DateTime.UtcNow);
-		FileStream fileStream = new FileStream(HFGMHHDBHMH(), FileMode.Open);
+		BDBOAEGELMC = GetBodyLength();
+		SetLastAccess(DateTime.UtcNow);
+		FileStream fileStream = new FileStream(GetPath(), FileMode.Open);
 		fileStream.Seek(-BDBOAEGELMC, SeekOrigin.End);
 		return fileStream;
 	}
 
-	internal HTTPResponse IFPJHJFHJDK(HTTPRequest ONOCIELLAPL)
+	internal HTTPResponse ReadResponseTo(HTTPRequest ONOCIELLAPL)
 	{
 		if (!IsExists())
 		{
 			return null;
 		}
-		ABGLCGLPNKO(DateTime.UtcNow);
-		using (FileStream aBJIEFMMIEK = new FileStream(HFGMHHDBHMH(), FileMode.Open))
+		SetLastAccess(DateTime.UtcNow);
+		using (FileStream aBJIEFMMIEK = new FileStream(GetPath(), FileMode.Open))
 		{
-			HTTPResponse iLGKJGGJHAJ = new HTTPResponse(ONOCIELLAPL, aBJIEFMMIEK, ONOCIELLAPL.MDEPOKKKKCL(), true);
-			iLGKJGGJHAJ.Receive(NHCAEHOHBEE());
+			HTTPResponse iLGKJGGJHAJ = new HTTPResponse(ONOCIELLAPL, aBJIEFMMIEK, ONOCIELLAPL.GetUseStreaming(), true);
+			iLGKJGGJHAJ.Receive(GetBodyLength());
 			return iLGKJGGJHAJ;
 		}
 	}
 
-	internal void LDFKMIOPLKA(HTTPResponse GIHDDAKBMHE)
+	internal void Store(HTTPResponse GIHDDAKBMHE)
 	{
-		if (!HTTPCacheService.EPACOIFEICA())
+		if (!HTTPCacheService.GetIsSupported())
 		{
 			return;
 		}
-		string text = HFGMHHDBHMH();
-		if (text.Length > HTTPManager.LACBBEFPIPO())
+		string text = GetPath();
+		if (text.Length > HTTPManager.GetMaxPathLength())
 		{
 			return;
 		}
 		if (File.Exists(text))
 		{
-			JEHBFCLLPCL();
+			Delete();
 		}
 		using (FileStream fileStream = new FileStream(text, FileMode.Create))
 		{
-			fileStream.WriteLine("HTTP/1.1 {0} {1}", GIHDDAKBMHE.KNMDPGBPNED(), GIHDDAKBMHE.DCKPMHKDLEJ());
-			foreach (KeyValuePair<string, List<string>> item in GIHDDAKBMHE.AJCCGKHBNML())
+			fileStream.WriteLine("HTTP/1.1 {0} {1}", GIHDDAKBMHE.GetStatusCode(), GIHDDAKBMHE.GetMessage());
+			foreach (KeyValuePair<string, List<string>> item in GIHDDAKBMHE.GetHeaders())
 			{
 				for (int i = 0; i < item.Value.Count; i++)
 				{
@@ -550,33 +550,33 @@ internal class HTTPCacheFileInfo : IComparable<HTTPCacheFileInfo>
 				}
 			}
 			fileStream.WriteLine();
-			fileStream.Write(GIHDDAKBMHE.CHIGLEKCFFN(), 0, GIHDDAKBMHE.CHIGLEKCFFN().Length);
+			fileStream.Write(GIHDDAKBMHE.GetData(), 0, GIHDDAKBMHE.GetData().Length);
 		}
-		set_BodyLength(GIHDDAKBMHE.CHIGLEKCFFN().Length);
-		ABGLCGLPNKO(DateTime.UtcNow);
-		NDENMNGKBPG(GIHDDAKBMHE);
+		set_BodyLength(GIHDDAKBMHE.GetData().Length);
+		SetLastAccess(DateTime.UtcNow);
+		SetUpCachingValues(GIHDDAKBMHE);
 	}
 
-	internal Stream GOGEGGPBPBP(HTTPResponse GIHDDAKBMHE)
+	internal Stream GetSaveStream(HTTPResponse GIHDDAKBMHE)
 	{
-		if (!HTTPCacheService.EPACOIFEICA())
+		if (!HTTPCacheService.GetIsSupported())
 		{
 			return null;
 		}
-		ABGLCGLPNKO(DateTime.UtcNow);
-		string text = HFGMHHDBHMH();
+		SetLastAccess(DateTime.UtcNow);
+		string text = GetPath();
 		if (File.Exists(text))
 		{
-			JEHBFCLLPCL();
+			Delete();
 		}
-		if (text.Length > HTTPManager.LACBBEFPIPO())
+		if (text.Length > HTTPManager.GetMaxPathLength())
 		{
 			return null;
 		}
 		using (FileStream mEHMICNAPMK = new FileStream(text, FileMode.Create))
 		{
-			mEHMICNAPMK.WriteLine("HTTP/1.1 {0} {1}", GIHDDAKBMHE.KNMDPGBPNED(), GIHDDAKBMHE.DCKPMHKDLEJ());
-			foreach (KeyValuePair<string, List<string>> item in GIHDDAKBMHE.AJCCGKHBNML())
+			mEHMICNAPMK.WriteLine("HTTP/1.1 {0} {1}", GIHDDAKBMHE.GetStatusCode(), GIHDDAKBMHE.GetMessage());
+			foreach (KeyValuePair<string, List<string>> item in GIHDDAKBMHE.GetHeaders())
 			{
 				for (int i = 0; i < item.Value.Count; i++)
 				{
@@ -585,16 +585,16 @@ internal class HTTPCacheFileInfo : IComparable<HTTPCacheFileInfo>
 			}
 			mEHMICNAPMK.WriteLine();
 		}
-		if (GIHDDAKBMHE.LOHDBJLLKEE() && !GIHDDAKBMHE.AJCCGKHBNML().ContainsKey("content-length"))
+		if (GIHDDAKBMHE.GetIsFromCache() && !GIHDDAKBMHE.GetHeaders().ContainsKey("content-length"))
 		{
-			GIHDDAKBMHE.AJCCGKHBNML().Add("content-length", new List<string> { NHCAEHOHBEE().ToString() });
+			GIHDDAKBMHE.GetHeaders().Add("content-length", new List<string> { GetBodyLength().ToString() });
 		}
-		NDENMNGKBPG(GIHDDAKBMHE);
-		return new FileStream(HFGMHHDBHMH(), FileMode.Append);
+		SetUpCachingValues(GIHDDAKBMHE);
+		return new FileStream(GetPath(), FileMode.Append);
 	}
 
 	public int CompareTo(HTTPCacheFileInfo NOLFMPDGCOC)
 	{
-		return PPHKANGFLHJ().CompareTo(NOLFMPDGCOC.PPHKANGFLHJ());
+		return GetLastAccess().CompareTo(NOLFMPDGCOC.GetLastAccess());
 	}
 }

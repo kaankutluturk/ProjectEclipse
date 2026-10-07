@@ -35,14 +35,14 @@ static class Program
         string prefix=Flight+Prefab;
         using(var l=Load("if calls==1 then request=fighter:spawn_projectile(prefab,12,-30,nil);assert(request.status=='queued' and not request.projectile_id);assert(#(fighter:projectiles())==0) else assert(request.status=='applied' and request.projectile_id=='1' and not request.error);local p=fighter:projectiles()[1];assert(p:snapshot().position.x==112 and p:snapshot().position.y==-25 and p:snapshot().age_frames==0) end",prefix:prefix))
         {
-            var f=Native(l);Event(l,f);Check(f.HCPGFOCGDAA.Count==0,"Spawn ran during Lua");f.Player.X=100;f.Player.Y=5;
-            f.Materialize();Check(f.HCPGFOCGDAA.Count==1,"Queued factory did not run");
+            var f=Native(l);Event(l,f);Check(f.pendingModels.Count==0,"Spawn ran during Lua");f.Player.X=100;f.Player.Y=5;
+            f.Materialize();Check(f.pendingModels.Count==1,"Queued factory did not run");
             Check(f.Query(f.Player,l.Mod.Id,out var list,out _)&&list.Count==0,"Uninitialized child exposed");
-            f.InitializeBirths();Event(l,f);Check(f.HCPGFOCGDAA.Single().X==112,"Offset used stale request-time position");
-            f.ProjectileStep();Check(f.HCPGFOCGDAA.Count==1,"Spawn repeated");
+            f.InitializeBirths();Event(l,f);Check(f.pendingModels.Single().X==112,"Offset used stale request-time position");
+            f.ProjectileStep();Check(f.pendingModels.Count==1,"Spawn repeated");
         }
         foreach(string call in new[]{"","{} ,0,0","{id=prefab.id},0,0","move,0,0","prefab,0","prefab,'x',0","prefab,0,0,'z'","prefab,1001,0","prefab,0/0,0","prefab,1/0,0","prefab,0,0,0,0"})
-        {using var l=Load("fighter:spawn_projectile("+call+")",prefix:prefix);var f=Native(l);Check(!Invoke(l,f,out _),"Invalid spawn accepted: "+call);f.ProjectileStep();Check(f.HCPGFOCGDAA.Count==0,"Invalid spawn reached native factory");}
+        {using var l=Load("fighter:spawn_projectile("+call+")",prefix:prefix);var f=Native(l);Check(!Invoke(l,f,out _),"Invalid spawn accepted: "+call);f.ProjectileStep();Check(f.pendingModels.Count==0,"Invalid spawn reached native factory");}
         using(var l=Load("if calls==1 then saved=fighter else saved:spawn_projectile(prefab,0,0) end",prefix:prefix))
         {var f=Native(l);Event(l,f);Check(!Invoke(l,f,out var e)&&e.Contains("expired"),"Retained spawn closure did not expire");}
         using(var l=Load("fighter.opponent:spawn_projectile(prefab,0,0)",prefix:prefix))
@@ -52,11 +52,11 @@ static class Program
         using(var l=Load("fighter:spawn_projectile(prefab,0,0)","content.register",prefix:prefix))
         {Check(!Invoke(l,Native(l),out var e)&&e.Contains("capability"),"Unprivileged spawn accepted");}
         using(var l=Load("if calls==1 then for i=1,16 do assert(fighter:spawn_projectile(prefab,0,0).status=='queued') end;assert(fighter:spawn_projectile(prefab,0,0).status=='failed') else assert(#(fighter:projectiles())==16) end",prefix:prefix))
-        {var f=Native(l);Event(l,f);Check(f.Spawn(f.Player,l.Mod.Id.Value)==null,"Native timeline ignored queued capacity reservations");f.ProjectileStep();Check(f.HCPGFOCGDAA.Count==16,"Reserved factory batch rejected its own capacity");Event(l,f);}
+        {var f=Native(l);Event(l,f);Check(f.Spawn(f.Player,l.Mod.Id.Value)==null,"Native timeline ignored queued capacity reservations");f.ProjectileStep();Check(f.pendingModels.Count==16,"Reserved factory batch rejected its own capacity");Event(l,f);}
         using(var l=Load("if calls==1 then request=fighter:spawn_projectile(prefab,0,0) else assert(request.status=='applied') end",prefix:prefix))
-        {var f=Native(l);Event(l,f);f.Materialize();f.HCPGFOCGDAA.Single().DriftPasses=3;f.InitializeBirths();Event(l,f);Check(f.HCPGFOCGDAA.Single().Y==0,"Birth constraint residual not corrected");}
+        {var f=Native(l);Event(l,f);f.Materialize();f.pendingModels.Single().DriftPasses=3;f.InitializeBirths();Event(l,f);Check(f.pendingModels.Single().Y==0,"Birth constraint residual not corrected");}
         using(var l=Load("if calls==1 then request=fighter:spawn_projectile(prefab,0,0) else assert(request.status=='failed' and request.error:find('constraints') and not request.projectile_id) end",prefix:prefix))
-        {var f=Native(l);Event(l,f);f.Materialize();var child=f.HCPGFOCGDAA.Single();child.ClampPosition=true;f.InitializeBirths();Check(child.Translations==5,"Birth correction exceeded four-pass bound");f.ProjectileStep();Event(l,f);Check(f.HCPGFOCGDAA.Count==0,"Constraint-rejected child retained");}
+        {var f=Native(l);Event(l,f);f.Materialize();var child=f.pendingModels.Single();child.ClampPosition=true;f.InitializeBirths();Check(child.Translations==5,"Birth correction exceeded four-pass bound");f.ProjectileStep();Event(l,f);Check(f.pendingModels.Count==0,"Constraint-rejected child retained");}
         using(var l=Load("",prefix:prefix))
         {
             var peers=Enumerable.Range(0,4).Select(i=>Load("",id:"fixture.reserve"+i)).ToArray();
@@ -68,19 +68,19 @@ static class Program
                 Check(f.QueueSpawn(f.Enemy,l.Mod.Id,def,0,0,0,(_,__)=>{},out _),"Final global reservation failed");
                 Check(f.Spawn(f.Player,peers[3].Mod.Id.Value)==null,"Global native spawn ignored queued reservation");
                 Check(!f.QueueSpawn(f.Player,l.Mod.Id,def,0,0,0,(_,__)=>{},out _),"Per-mod capacity omitted opposite-root reservation");
-                f.ProjectileStep();Check(f.HCPGFOCGDAA.Count==64,"Final reserved slot did not materialize");
-                f.CancelProjectiles();f.ProjectileStep();Check(f.HCPGFOCGDAA.Count==0,"Global reservation cleanup failed");
+                f.ProjectileStep();Check(f.pendingModels.Count==64,"Final reserved slot did not materialize");
+                f.CancelProjectiles();f.ProjectileStep();Check(f.pendingModels.Count==0,"Global reservation cleanup failed");
             }finally{foreach(var peer in peers)peer.Dispose();}
         }
         foreach(string state in new[]{"pause","round","session","owner","death","cancel","factory","after-create","birth","position"})
         using(var l=Load("if calls==1 then request=fighter:spawn_projectile(prefab,0,0) else assert(request.status=='failed' and request.error and not request.projectile_id) end",prefix:prefix))
         {
             var f=Native(l);Event(l,f);
-            switch(state){case "pause":f.Paused=true;f.ProjectileStep();Check(f.HCPGFOCGDAA.Count==0,"Pause materialized spawn");f.Paused=false;f.CancelProjectiles();break;case "round":f.round.round++;break;case "session":ModRuntime.Scripts=new ModScriptSession();break;case "owner":ModRuntime.Scripts.ActiveMods.Clear();break;case "death":f.Player.Health=0;break;case "cancel":f.CancelProjectiles();break;case "factory":ModRuntime.FailSpawn=true;break;case "after-create":ModRuntime.FailAfterCreate=true;break;case "birth":ModRuntime.FailBirth=true;break;case "position":f.Materialize();f.HCPGFOCGDAA.Single().Throw=true;break;}
-            f.ProjectileStep();Event(l,f);Check(f.HCPGFOCGDAA.Count==0,"Failed spawn left child: "+state);
+            switch(state){case "pause":f.Paused=true;f.ProjectileStep();Check(f.pendingModels.Count==0,"Pause materialized spawn");f.Paused=false;f.CancelProjectiles();break;case "round":f.round.round++;break;case "session":ModRuntime.Scripts=new ModScriptSession();break;case "owner":ModRuntime.Scripts.ActiveMods.Clear();break;case "death":f.Player.Health=0;break;case "cancel":f.CancelProjectiles();break;case "factory":ModRuntime.FailSpawn=true;break;case "after-create":ModRuntime.FailAfterCreate=true;break;case "birth":ModRuntime.FailBirth=true;break;case "position":f.Materialize();f.pendingModels.Single().Throw=true;break;}
+            f.ProjectileStep();Event(l,f);Check(f.pendingModels.Count==0,"Failed spawn left child: "+state);
         }
         using(var l=Load("if calls==1 then request=fighter:spawn_projectile(prefab,0,0) else assert(request.status=='failed') end",prefix:prefix))
-        {var f=Native(l);Event(l,f);f.Materialize();f.CancelProjectiles();f.InitializeBirths();f.ProjectileStep();Event(l,f);Check(f.HCPGFOCGDAA.Count==0,"Cancelled birth survived");}
+        {var f=Native(l);Event(l,f);f.Materialize();f.CancelProjectiles();f.InitializeBirths();f.ProjectileStep();Event(l,f);Check(f.pendingModels.Count==0,"Cancelled birth survived");}
         foreach(string spec in new[]{"id='dart',name='fixture.dart',core_skeleton='SkeletonMissile',copy_parent_type='Ranged'","id='dart',name='fixture.dart',core_skeleton='SkeletonMissile',copy_parent_type='Ranged',start_move=move,core_start_animation='Fly'","id='dart',name='fixture.dart',core_skeleton='SkeletonMissile',copy_parent_type='Ranged',start_move=move,lifetime_frames=601"})
         {bool failed=false;try{using var l=Load("",prefix:Flight+"sf2.projectiles.register{"+spec+"}");}catch(Exception){failed=true;}Check(failed,"Invalid registered prefab accepted");}
         using(var l=Load("",prefix:prefix))
@@ -102,14 +102,14 @@ static class Program
         {
             var f=Native(l);var body=f.AddActor(l.Mod.Id);body.X=100;
             Check(Invoke(l,f,out var error,ModEffectEvent.ActorSpawn,f.Operations(body)),error);
-            f.ProjectileStep();Check(f.HCPGFOCGDAA.Single().GetRootModel()==body,"Child rooted in main instead of actor");
+            f.ProjectileStep();Check(f.pendingModels.Single().GetRootModel()==body,"Child rooted in main instead of actor");
             Check(f.Query(f.Player,l.Mod.Id,out var main,out _)&&main.Count==0,"Main query leaked actor children");
             var peer=f.AddActor(l.Mod.Id);Check(f.Query(peer,l.Mod.Id,out var empty,out _)&&empty.Count==0,"Sibling query leaked actor children");
-            Check(Invoke(l,f,out error,operations:f.Operations(body)),error);f.ProjectileStep();Check(f.HCPGFOCGDAA.Single().X==120,"Actor child motion did not apply");
-            var source=f.Attack(f.HCPGFOCGDAA.Single(),new Model.StrikeResult{Point=new Vector3f(0,0,0),AttackAnimation=new InfoAnimation{Name="flight"}});
+            Check(Invoke(l,f,out error,operations:f.Operations(body)),error);f.ProjectileStep();Check(f.pendingModels.Single().X==120,"Actor child motion did not apply");
+            var source=f.Attack(f.pendingModels.Single(),new Model.StrikeResult{Point=new Vector3f(0,0,0),AttackAnimation=new InfoAnimation{Name="flight"}});
             Check(source.Kind=="projectile"&&source.ActorId=="a1"&&source.ProjectileId=="1"&&source.ActorOwner==l.Mod.Id.Value,"Actor/projectile provenance missing");
             Check(!Invoke(l,f,out error,ModEffectEvent.ActorEnd,f.Operations(body))&&error.Contains("simulation"),"Terminal actor callback acquired projectile authority");
-            f.RetireActor(body);f.ProjectileStep();Check(f.HCPGFOCGDAA.Count==0,"Actor retirement retained initialized child");
+            f.RetireActor(body);f.ProjectileStep();Check(f.pendingModels.Count==0,"Actor retirement retained initialized child");
         }
         foreach(string state in new[]{"unborn","birth","unavailable","owner-death","actor-death","pause","round","retire-before-create","retire-before-init"})
         using(var l=Load("request=fighter:spawn_projectile(prefab,0,0)",prefix:prefix))
@@ -122,11 +122,11 @@ static class Program
             if(state=="pause")f.Paused=true;
             bool queued=f.QueueSpawn(body,l.Mod.Id,l.Content.Projectiles.Single().Id,0,0,0,(id,error)=>{receiptId=id;receiptError=error;completed=true;},out _);
             bool shouldQueue=state=="round"||state.StartsWith("retire-");Check(queued==shouldQueue,"Actor eligibility mismatch: "+state);
-            if(!queued){Check(f.HCPGFOCGDAA.Count==0,"Rejected actor reached factory");continue;}
+            if(!queued){Check(f.pendingModels.Count==0,"Rejected actor reached factory");continue;}
             if(state=="round")f.round.round++;
             if(state=="retire-before-init")f.Materialize();
             if(state.StartsWith("retire-"))f.RetireActor(body);
-            f.ProjectileStep();Check(completed&&receiptId==null&&receiptError!=null&&f.HCPGFOCGDAA.Count==0,"Actor cancellation did not fail receipt/clean child: "+state);
+            f.ProjectileStep();Check(completed&&receiptId==null&&receiptError!=null&&f.pendingModels.Count==0,"Actor cancellation did not fail receipt/clean child: "+state);
         }
         using(var l=Load("fighter:projectiles()", "content.register",prefix:prefix))
         {var f=Native(l);var body=f.AddActor(l.Mod.Id);Check(!Invoke(l,f,out var error,operations:f.Operations(body))&&error.Contains("capability"),"Actor bypassed combat.projectiles");}
@@ -150,9 +150,9 @@ static class Program
             new Dictionary<string,string>{{"side","player"},{"round",f.round.round.ToString()},{"source","rule"}},fighter,out var error),error);}
         Event(ModEffectEvent.RoundBegin);var hud=surfaces.Single();Check(hud.Read("fire").Enabled,"Shipped burst HUD disabled initially");
         Check(hud.TryClick("fire"),"Shipped burst click rejected");Event(ModEffectEvent.Tick);
-        Check(f.HCPGFOCGDAA.Count==0&&!hud.Read("fire").Enabled&&f.Player.Plays==0,"Shipped burst created recursively or played a caster move");
-        f.ProjectileStep();Check(f.HCPGFOCGDAA.Count==3,"Shipped burst did not materialize three children");
-        var first=f.HCPGFOCGDAA[0];double x=first.X;f.Clock++;Event(ModEffectEvent.Tick);f.ProjectileStep();
+        Check(f.pendingModels.Count==0&&!hud.Read("fire").Enabled&&f.Player.Plays==0,"Shipped burst created recursively or played a caster move");
+        f.ProjectileStep();Check(f.pendingModels.Count==3,"Shipped burst did not materialize three children");
+        var first=f.pendingModels[0];double x=first.X;f.Clock++;Event(ModEffectEvent.Tick);f.ProjectileStep();
         Check(first.X==x+10,"Shipped burst did not match applied receipt ID to live child motion");
         ops.DamageEvent=new ModDamageEvent(1,1,.9,false,false,f.Attack(first,new Model.StrikeResult{Point=new Vector3f(0,0,0),AttackAnimation=new InfoAnimation{Name=content.Moves.Single().RuntimeName}}));
         Event(ModEffectEvent.DamageDealt);Check(hud.Read("status").Text=="Native hits: 1","Shipped burst source filter/count");ops.DamageEvent=null;
@@ -160,7 +160,7 @@ static class Program
         for(int i=0;i<180;i++){f.Clock++;Event(ModEffectEvent.Tick);}Check(hud.Read("fire").Enabled,"Shipped burst cooldown did not recover");
         for(int i=0;i<15;i++)Check(f.Spawn(f.Player,mod.Id.Value)!=null,"Partial burst setup failed");
         Check(hud.TryClick("fire"),"Partial burst button rejected");Event(ModEffectEvent.Tick);f.ProjectileStep();f.Clock++;Event(ModEffectEvent.Tick);
-        Check(f.HCPGFOCGDAA.Count==16&&!hud.Read("fire").Enabled,"Partial burst did not retain accepted child and cooldown");
+        Check(f.pendingModels.Count==16&&!hud.Read("fire").Enabled,"Partial burst did not retain accepted child and cooldown");
         Event(ModEffectEvent.RoundEnd);Check(hud.IsClosed,"Shipped burst HUD leaked on round end");f.CancelProjectiles();f.ProjectileStep();f.round.round++;
         Event(ModEffectEvent.RoundBegin);Check(surfaces.Last().Read("fire").Enabled,"Shipped burst next-round state did not reset");Event(ModEffectEvent.FightEnd);
         Check(surfaces.Last().IsClosed,"Shipped burst HUD leaked on fight end");
@@ -208,7 +208,7 @@ static class Program
         {var f=Native(l);var child=f.Spawn(f.Player,l.Mod.Id.Value);Event(l,f);Check(child.Translations==0,"Lua moved synchronously");f.ProjectileStep();Check(child.X==13&&child.Y==2&&child.AnimationShifted,"Queued additive displacement failed");f.ProjectileStep();Check(child.Translations==1,"Command repeated");}
         using(var l=Load("local list=fighter:projectiles();assert(#list==1);assert(#(fighter:projectiles())==1)"))
         using(var peer=Load("assert(#(fighter:projectiles())==1)",id:"fixture.peer"))
-        {var f=Native(l,peer);f.Spawn(f.Player,l.Mod.Id.Value);f.Spawn(f.Enemy,l.Mod.Id.Value);f.Spawn(f.Player,peer.Mod.Id.Value);f.HCPGFOCGDAA.Add(new Model{Parent=f.Player});Event(l,f);Event(peer,f);}
+        {var f=Native(l,peer);f.Spawn(f.Player,l.Mod.Id.Value);f.Spawn(f.Enemy,l.Mod.Id.Value);f.Spawn(f.Player,peer.Mod.Id.Value);f.pendingModels.Add(new Model{Parent=f.Player});Event(l,f);Event(peer,f);}
         foreach(string call in new[]{"p:move_by()","p:move_by('1',0)","p:move_by(1/0,0)","p:move_by(0/0,0)","p:move_by(101,0)","p:move_by(1,0,0,0)","p:snapshot({})","p:remove({})","p.snapshot({})","p.move_by({},0)","fighter:projectiles(1)"})
         {using var l=Load("local p=fighter:projectiles()[1];"+call);var f=Native(l);var child=f.Spawn(f.Player,l.Mod.Id.Value);Check(!Invoke(l,f,out _),"Invalid arguments accepted: "+call);f.ProjectileStep();Check(child.Translations==0,"Invalid call moved child");}
         using(var l=Load("local p=fighter:projectiles()[1];assert(p:move_by(60,0));local ok,e=p:move_by(41,0);assert(not ok and e);for i=1,31 do assert(p:move_by(1,0)) end;assert(not p:move_by(1,0));assert(p:move_by(0,0))"))
@@ -218,16 +218,16 @@ static class Program
         foreach(string action in new[]{"saved:snapshot()","saved:move_by(1,0)","saved:remove()"})
         {using var l=Load("if calls==1 then saved=fighter:projectiles()[1] else "+action+" end");var f=Native(l);f.Spawn(f.Player,l.Mod.Id.Value);Event(l,f);Check(!Invoke(l,f,out var e)&&e.Contains("expired"),"Retained reference stayed live");}
         using(var l=Load("local p=fighter:projectiles()[1];assert(p:move_by(10,0));assert(p:remove());assert(not p:remove());assert(not p:move_by(1,0));assert(p:snapshot()==nil);assert(#(fighter:projectiles())==0)"))
-        {var f=Native(l);var child=f.Spawn(f.Player,l.Mod.Id.Value);Event(l,f);Check(f.HCPGFOCGDAA.Contains(child),"Delete synchronous");f.ProjectileStep();Check(child.X==0&&!f.HCPGFOCGDAA.Contains(child),"Removal failed/cancelled motion survived");}
+        {var f=Native(l);var child=f.Spawn(f.Player,l.Mod.Id.Value);Event(l,f);Check(f.pendingModels.Contains(child),"Delete synchronous");f.ProjectileStep();Check(child.X==0&&!f.pendingModels.Contains(child),"Removal failed/cancelled motion survived");}
         foreach(var kind in new[]{ModEffectEvent.FightBegin,ModEffectEvent.RoundBegin,ModEffectEvent.RoundEnd,ModEffectEvent.FightEnd})
         {using var l=Load("fighter:projectiles()");var f=Native(l);Check(!Invoke(l,f,out var e,kind)&&e.Contains("simulation"),"Forbidden lifecycle accepted");}
         using(var l=Load("fighter:projectiles()","content.register")){Check(!Invoke(l,Native(l),out var e)&&e.Contains("capability"),"Missing capability accepted");}
         foreach(string state in new[]{"pause","round","session","disposed","owner","root","death","cancel","native-delete"})
         {using var l=Load("local p=fighter:projectiles()[1];assert(p:move_by(10,0))");var f=Native(l);var child=f.Spawn(f.Player,l.Mod.Id.Value);Event(l,f);
-         switch(state){case "pause":f.Paused=true;f.ProjectileStep();Check(child.X==0,"Pause consumed command");f.Paused=false;break;case "round":f.round.round++;break;case "session":ModRuntime.Scripts=new ModScriptSession();break;case "disposed":ModRuntime.Scripts.IsDisposed=true;break;case "owner":ModRuntime.Scripts.ActiveMods.Clear();break;case "root":child.Parent=f.Enemy;break;case "death":f.Player.Health=0;break;case "cancel":f.CancelProjectiles();break;case "native-delete":f.JLEFIKJODGG.Add(child);break;}
-         f.ProjectileStep();Check(child.X==(state=="pause"?10:0),"Stale command applied: "+state);Check(state=="pause"||!f.HCPGFOCGDAA.Contains(child),"Retired child survived: "+state);}
+         switch(state){case "pause":f.Paused=true;f.ProjectileStep();Check(child.X==0,"Pause consumed command");f.Paused=false;break;case "round":f.round.round++;break;case "session":ModRuntime.Scripts=new ModScriptSession();break;case "disposed":ModRuntime.Scripts.IsDisposed=true;break;case "owner":ModRuntime.Scripts.ActiveMods.Clear();break;case "root":child.Parent=f.Enemy;break;case "death":f.Player.Health=0;break;case "cancel":f.CancelProjectiles();break;case "native-delete":f.modelsToRemove.Add(child);break;}
+         f.ProjectileStep();Check(child.X==(state=="pause"?10:0),"Stale command applied: "+state);Check(state=="pause"||!f.pendingModels.Contains(child),"Retired child survived: "+state);}
         using(var l=Load("assert(#(fighter:projectiles())==0)"))
-        {var f=Native(l);var child=f.Spawn(f.Player,l.Mod.Id.Value,2);f.Age();Check(f.HCPGFOCGDAA.Contains(child),"Early expiry");f.Age();Event(l,f);f.ProjectileStep();Check(!f.HCPGFOCGDAA.Contains(child),"TTL retained native child");}
+        {var f=Native(l);var child=f.Spawn(f.Player,l.Mod.Id.Value,2);f.Age();Check(f.pendingModels.Contains(child),"Early expiry");f.Age();Event(l,f);f.ProjectileStep();Check(!f.pendingModels.Contains(child),"TTL retained native child");}
         using(var l=Load(""))
         {var f=Native(l);for(int i=0;i<16;i++)Check(f.Spawn(i%2==0?f.Player:f.Enemy,l.Mod.Id.Value)!=null,"Capacity rejected early");Check(f.Spawn(f.Player,l.Mod.Id.Value)==null,"Per-mod bound missing");f.CancelProjectiles();f.ProjectileStep();Check(f.Spawn(f.Player,l.Mod.Id.Value)!=null,"Capacity not released");}
         using(var l=Load(""))

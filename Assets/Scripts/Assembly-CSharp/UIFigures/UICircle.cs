@@ -13,9 +13,9 @@ namespace UIFigures
 		protected override void OnPopulateMesh(VertexHelper DHJBOKKAOJK)
 		{
 			base.OnPopulateMesh(DHJBOKKAOJK);
-			Vector2 gIAEPIIIMDH = (OMPIACGGOAC + PMBHNNBJNKL) * 0.5f;
+			Vector2 gIAEPIIIMDH = (_LowerLeft + _UpperRight) * 0.5f;
 			Vector2 lPEMPCEJFIN = new Vector2(base.rectTransform.rect.width, base.rectTransform.rect.height) * 0.5f;
-			DrawFunctions.CJOMPMCKCJP(DHJBOKKAOJK, gIAEPIIIMDH, lPEMPCEJFIN, 0f, (float)Math.PI * 2f, _Segments, color);
+			DrawFunctions.DrawArc(DHJBOKKAOJK, gIAEPIIIMDH, lPEMPCEJFIN, 0f, (float)Math.PI * 2f, _Segments, color);
 		}
 	}
 }

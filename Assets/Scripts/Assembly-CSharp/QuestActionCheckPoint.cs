@@ -1,24 +1,24 @@
 public class QuestActionCheckPoint : QuestAction
 {
-	public override void DEJMHFMLKIC(QuestParameters GFIHPBCEEOB)
+	public override void Execute(QuestParameters GFIHPBCEEOB)
 	{
-		base.DEJMHFMLKIC(GFIHPBCEEOB);
-		OIPDKFAJILO(GFIHPBCEEOB);
-		ListSF.GetInstance().EJANJEEGOOE();
-		OGIJONMKABB();
+		base.Execute(GFIHPBCEEOB);
+		SaveCheckPoint(GFIHPBCEEOB);
+		ListSF.GetInstance().RequestSave();
+		FinishAction();
 	}
 
-	public void OIPDKFAJILO(QuestParameters GFIHPBCEEOB)
+	public void SaveCheckPoint(QuestParameters GFIHPBCEEOB)
 	{
-		Roster nKGLHEGIKKP = ListSF.CCDKHLAMKKO();
-		RosterQuest dKBDLDGOFDN = nKGLHEGIKKP.OOMJEHAKOBA(ONGHPGEIJEN);
+		Roster nKGLHEGIKKP = ListSF.GetRoster();
+		RosterQuest dKBDLDGOFDN = nKGLHEGIKKP.FindQuest(QuestName);
 		if (dKBDLDGOFDN == null)
 		{
-			dKBDLDGOFDN = ListSF.CCDKHLAMKKO().FLMIDLIKKOG(ONGHPGEIJEN, AEHNKDOJALB);
+			dKBDLDGOFDN = ListSF.GetRoster().AddQuest(QuestName, QuestFileName);
 			CallEvent(2, dKBDLDGOFDN);
 		}
-		dKBDLDGOFDN.ECGFFBHMIIK(GFIHPBCEEOB, AMIMGEOENPL, Index);
-		dKBDLDGOFDN.FileName = AEHNKDOJALB;
-		ListSF.GetInstance().EJANJEEGOOE();
+		dKBDLDGOFDN.SaveCheckpoint(GFIHPBCEEOB, StageIndex, Index);
+		dKBDLDGOFDN.FileName = QuestFileName;
+		ListSF.GetInstance().RequestSave();
 	}
 }

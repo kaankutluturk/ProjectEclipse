@@ -8,18 +8,18 @@ public class PerkConditionPerkStart : PerkCondition
 
 	public PerkConditionPerkStart(string OCIEELPKJKL, bool EKBOGDKIHIH)
 	{
-		set_Type(NHDGLPNNNLH.CONDITION_PERK_START);
+		set_Type(PerkConditionType.CONDITION_PERK_START);
 		ParentPerkName = OCIEELPKJKL;
 		IsPlayer = EKBOGDKIHIH;
 	}
 
 	public override bool IsEqual(Model ACENLMONNPA, List<string> NIKHAICFGNM)
 	{
-		if (!JMDLAMHAJLN().ELPJBGIPEIB().EPCNJLEHJCB())
+		if (!GetPerk().GetOwnerModel().IsPlayerModel())
 		{
 			return true;
 		}
-		KAOPLEPILDH kAOPLEPILDH = JMDLAMHAJLN().ELPJBGIPEIB().Parameters as KAOPLEPILDH;
+		RaidModelParameters kAOPLEPILDH = GetPerk().GetOwnerModel().Parameters as RaidModelParameters;
 		if (kAOPLEPILDH == null)
 		{
 			return true;

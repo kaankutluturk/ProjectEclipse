@@ -13,7 +13,7 @@ namespace UIFigures
 		[SerializeField]
 		protected float _ChangeAllRadius = 10f;
 
-		private float HIOFLBEBMAN = 10f;
+		private float _PreviousChangeAllRadius = 10f;
 
 		[SerializeField]
 		protected float _RadiusUpLeft = 10f;
@@ -36,7 +36,7 @@ namespace UIFigures
 		protected override void OnPopulateMesh(VertexHelper DHJBOKKAOJK)
 		{
 			base.OnPopulateMesh(DHJBOKKAOJK);
-			Vector2 eFOBPHOJNJF = (OMPIACGGOAC + PMBHNNBJNKL) * 0.5f;
+			Vector2 eFOBPHOJNJF = (_LowerLeft + _UpperRight) * 0.5f;
 			Vector2 dGHIGGGFNLP = new Vector2(base.rectTransform.rect.width, base.rectTransform.rect.height) * 0.5f;
 			Draw(DHJBOKKAOJK, eFOBPHOJNJF, dGHIGGGFNLP);
 		}
@@ -51,7 +51,7 @@ namespace UIFigures
 			AddArc(new Vector2(DGHIGGGFNLP.x - _RadiusBottomRight, 0f - DGHIGGGFNLP.y + _RadiusBottomRight), _RadiusBottomRight, 4.712389f);
 			AddVertex(new Vector2(DGHIGGGFNLP.x, DGHIGGGFNLP.y - _RadiusUpRight));
 			AddVertex(new Vector2(DGHIGGGFNLP.x - _Width, DGHIGGGFNLP.y - _RadiusUpRight));
-			DHJBOKKAOJK.AddUIVertexStream(_Vertexes, FigureTopology.AMJOJPPFIEB((_Sectors + 1) * 8));
+			DHJBOKKAOJK.AddUIVertexStream(_Vertexes, FigureTopology.CreateStripIndices((_Sectors + 1) * 8));
 		}
 
 		protected void AddArc(Vector3 EFOBPHOJNJF, float LPEMPCEJFIN, float AMNCLCPADOO, bool MEFMAPOEPNE = true)
@@ -90,9 +90,9 @@ namespace UIFigures
 
 		protected void Update()
 		{
-			if (Math.Abs(HIOFLBEBMAN - _ChangeAllRadius) > 0.01f)
+			if (Math.Abs(_PreviousChangeAllRadius - _ChangeAllRadius) > 0.01f)
 			{
-				HIOFLBEBMAN = _ChangeAllRadius;
+				_PreviousChangeAllRadius = _ChangeAllRadius;
 				_RadiusBottomLeft = _ChangeAllRadius;
 				_RadiusBottomRight = _ChangeAllRadius;
 				_RadiusUpLeft = _ChangeAllRadius;

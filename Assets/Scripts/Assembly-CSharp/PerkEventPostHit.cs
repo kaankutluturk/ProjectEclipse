@@ -5,79 +5,79 @@ using System.Xml;
 public class PerkEventPostHit : PerkEvent
 {
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private string HBOIDIAFOLL;
+	private string _defense;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private string NCKLKPMLJBI;
+	private string _animation;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private int BKKNGMFIJOK;
+	private int _block;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private int NPOILBCHAKH;
+	private int _critical;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private int FKDHEOMLJGF;
+	private int _shock;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private float BMJGECOIEHP;
+	private float _damageMin;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private float CHFBEEIDMCI;
+	private float _damageMax;
 
-	public string GBOKABKLCFM
+	public string DefenseName
 	{
 		get
 		{
-			return NLLGDDMMJJN();
+			return GetDefense();
 		}
 		protected set
 		{
-			CFFCAJLFBEM(value);
+			SetDefense(value);
 		}
 	}
 
-	public string FGICHADOEHF
+	public string AnimationName
 	{
 		get
 		{
-			return NNMAFFCCMHC();
+			return GetAnimation();
 		}
 		protected set
 		{
-			DBDJHIHLCFD(value);
+			SetAnimation(value);
 		}
 	}
 
-	public int FHJMFEEMMGO
+	public int BlockFilter
 	{
 		get
 		{
-			return KDCHLKEMDPC();
+			return GetBlock();
 		}
 		protected set
 		{
-			NDIGOAPGCPI(value);
+			SetBlock(value);
 		}
 	}
 
-	public int POCBCFMBKLO
+	public int CriticalFilter
 	{
 		get
 		{
-			return MONOMCAGAEO();
+			return GetCritical();
 		}
 		protected set
 		{
-			MPCHGJHHJMC(value);
+			SetCritical(value);
 		}
 	}
 
-	public int PFDCDIBODCL
+	public int ShockFilter
 	{
 		get
 		{
-			return EDJFLMILEBA();
+			return GetIsShock();
 		}
 		protected set
 		{
@@ -85,27 +85,27 @@ public class PerkEventPostHit : PerkEvent
 		}
 	}
 
-	public float NDLKKCILIPA
+	public float MinDamage
 	{
 		get
 		{
-			return KJPMFOLDHJH();
+			return GetDamageMin();
 		}
 		protected set
 		{
-			OGAJJIPGFGK(value);
+			SetDamageMin(value);
 		}
 	}
 
-	public float MOFNJCLLKMB
+	public float MaxDamage
 	{
 		get
 		{
-			return GLIHMMBPDKB();
+			return GetDamageMax();
 		}
 		protected set
 		{
-			MJLFPHCPKBN(value);
+			SetDamageMax(value);
 		}
 	}
 
@@ -116,95 +116,95 @@ public class PerkEventPostHit : PerkEvent
 	public PerkEventPostHit(PerkEventPostHit NOLFMPDGCOC)
 		: base(NOLFMPDGCOC)
 	{
-		CFFCAJLFBEM(NOLFMPDGCOC.NLLGDDMMJJN());
-		DBDJHIHLCFD(NOLFMPDGCOC.NNMAFFCCMHC());
-		NDIGOAPGCPI(NOLFMPDGCOC.KDCHLKEMDPC());
-		MPCHGJHHJMC(NOLFMPDGCOC.MONOMCAGAEO());
-		set_IsShock(NOLFMPDGCOC.EDJFLMILEBA());
-		OGAJJIPGFGK(NOLFMPDGCOC.KJPMFOLDHJH());
-		MJLFPHCPKBN(NOLFMPDGCOC.GLIHMMBPDKB());
+		SetDefense(NOLFMPDGCOC.GetDefense());
+		SetAnimation(NOLFMPDGCOC.GetAnimation());
+		SetBlock(NOLFMPDGCOC.GetBlock());
+		SetCritical(NOLFMPDGCOC.GetCritical());
+		set_IsShock(NOLFMPDGCOC.GetIsShock());
+		SetDamageMin(NOLFMPDGCOC.GetDamageMin());
+		SetDamageMax(NOLFMPDGCOC.GetDamageMax());
 	}
 
-	public string NLLGDDMMJJN()
+	public string GetDefense()
 	{
-		return HBOIDIAFOLL;
+		return _defense;
 	}
 
-	protected void CFFCAJLFBEM(string value)
+	protected void SetDefense(string value)
 	{
-		HBOIDIAFOLL = value;
+		_defense = value;
 	}
 
-	public string NNMAFFCCMHC()
+	public string GetAnimation()
 	{
-		return NCKLKPMLJBI;
+		return _animation;
 	}
 
-	protected void DBDJHIHLCFD(string value)
+	protected void SetAnimation(string value)
 	{
-		NCKLKPMLJBI = value;
+		_animation = value;
 	}
 
-	public int KDCHLKEMDPC()
+	public int GetBlock()
 	{
-		return BKKNGMFIJOK;
+		return _block;
 	}
 
-	protected void NDIGOAPGCPI(int value)
+	protected void SetBlock(int value)
 	{
-		BKKNGMFIJOK = value;
+		_block = value;
 	}
 
-	public int MONOMCAGAEO()
+	public int GetCritical()
 	{
-		return NPOILBCHAKH;
+		return _critical;
 	}
 
-	protected void MPCHGJHHJMC(int value)
+	protected void SetCritical(int value)
 	{
-		NPOILBCHAKH = value;
+		_critical = value;
 	}
 
-	public int EDJFLMILEBA()
+	public int GetIsShock()
 	{
-		return FKDHEOMLJGF;
+		return _shock;
 	}
 
 	protected void set_IsShock(int value)
 	{
-		FKDHEOMLJGF = value;
+		_shock = value;
 	}
 
-	public float KJPMFOLDHJH()
+	public float GetDamageMin()
 	{
-		return BMJGECOIEHP;
+		return _damageMin;
 	}
 
-	protected void OGAJJIPGFGK(float value)
+	protected void SetDamageMin(float value)
 	{
-		BMJGECOIEHP = value;
+		_damageMin = value;
 	}
 
-	public float GLIHMMBPDKB()
+	public float GetDamageMax()
 	{
-		return CHFBEEIDMCI;
+		return _damageMax;
 	}
 
-	protected void MJLFPHCPKBN(float value)
+	protected void SetDamageMax(float value)
 	{
-		CHFBEEIDMCI = value;
+		_damageMax = value;
 	}
 
 	public override void Parse(XmlNode node)
 	{
 		base.Parse(node);
-		CFFCAJLFBEM(node.Attributes["Defense"].CIPOICEEIBK(string.Empty));
-		NDIGOAPGCPI(node.Attributes["Block"].ParseInt(-1));
-		MPCHGJHHJMC(node.Attributes["Critical"].ParseInt(-1));
+		SetDefense(node.Attributes["Defense"].GetStringOrDefault(string.Empty));
+		SetBlock(node.Attributes["Block"].ParseInt(-1));
+		SetCritical(node.Attributes["Critical"].ParseInt(-1));
 		set_IsShock(node.Attributes["Shock"].ParseInt(-1));
-		DBDJHIHLCFD(node.Attributes["Animation"].CIPOICEEIBK(string.Empty));
-		OGAJJIPGFGK(node.Attributes["DamageMin"].ParseFloat(-1f));
-		MJLFPHCPKBN(node.Attributes["DamageMax"].ParseFloat(-1f));
+		SetAnimation(node.Attributes["Animation"].GetStringOrDefault(string.Empty));
+		SetDamageMin(node.Attributes["DamageMin"].ParseFloat(-1f));
+		SetDamageMax(node.Attributes["DamageMax"].ParseFloat(-1f));
 	}
 
 	public override bool IsEqual(EventStruct EJMEALJNNIL)
@@ -220,31 +220,31 @@ public class PerkEventPostHit : PerkEvent
 		bool flag2 = dictionary.ContainsKey("Shock") && (bool)dictionary["Shock"];
 		bool flag3 = dictionary.ContainsKey("Block") && (bool)dictionary["Block"];
 		float num = ((!dictionary.ContainsKey("Damage")) ? 0f : ((float)dictionary["Damage"]));
-		if (NLLGDDMMJJN() != string.Empty && NLLGDDMMJJN() != text)
+		if (GetDefense() != string.Empty && GetDefense() != text)
 		{
 			return false;
 		}
-		if (NNMAFFCCMHC() != null && !NNMAFFCCMHC().Equals(string.Empty) && (pJAHIOELGGD == null || !pJAHIOELGGD.CNPFHBMGDFP(NNMAFFCCMHC())))
+		if (GetAnimation() != null && !GetAnimation().Equals(string.Empty) && (pJAHIOELGGD == null || !pJAHIOELGGD.HasName(GetAnimation())))
 		{
 			return false;
 		}
-		if (MONOMCAGAEO() > -1 && MONOMCAGAEO() != (flag ? 1 : 0))
+		if (GetCritical() > -1 && GetCritical() != (flag ? 1 : 0))
 		{
 			return false;
 		}
-		if (EDJFLMILEBA() > -1 && EDJFLMILEBA() != (flag2 ? 1 : 0))
+		if (GetIsShock() > -1 && GetIsShock() != (flag2 ? 1 : 0))
 		{
 			return false;
 		}
-		if (KDCHLKEMDPC() > -1 && KDCHLKEMDPC() != (flag3 ? 1 : 0))
+		if (GetBlock() > -1 && GetBlock() != (flag3 ? 1 : 0))
 		{
 			return false;
 		}
-		if (KJPMFOLDHJH() > -1f && num < KJPMFOLDHJH())
+		if (GetDamageMin() > -1f && num < GetDamageMin())
 		{
 			return false;
 		}
-		if (GLIHMMBPDKB() > -1f && num > GLIHMMBPDKB())
+		if (GetDamageMax() > -1f && num > GetDamageMax())
 		{
 			return false;
 		}

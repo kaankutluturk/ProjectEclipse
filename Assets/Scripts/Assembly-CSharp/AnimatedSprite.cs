@@ -7,19 +7,19 @@ public class AnimatedSprite : MonoBehaviour
 
 	private SpriteRenderer _SpriteRender;
 
-	private float LICAFNLFJHO;
+	private float _elapsedTime;
 
-	private float GCGNEEFNHFK;
+	private float _changeSpriteTime;
 
-	private int EBFEKKMDNIN;
+	private int _currentFrame;
 
-	private int LDDLAKECNEG;
+	private int _frameCount;
 
 	private bool _IsWork;
 
-	private int NHHKFIHBMKL = -1;
+	private int _iterations = -1;
 
-	public List<Sprite> OCFKLCDIEBF
+	public List<Sprite> FrameList
 	{
 		get
 		{
@@ -27,7 +27,7 @@ public class AnimatedSprite : MonoBehaviour
 		}
 	}
 
-	public float IEOOOFNGMBL
+	public float ChangeSpriteInterval
 	{
 		set
 		{
@@ -35,7 +35,7 @@ public class AnimatedSprite : MonoBehaviour
 		}
 	}
 
-	public bool OMJMJIBPGDN
+	public bool IsWorking
 	{
 		get
 		{
@@ -43,7 +43,7 @@ public class AnimatedSprite : MonoBehaviour
 		}
 	}
 
-	public int BEJMHOGHCPA
+	public int IterationCount
 	{
 		set
 		{
@@ -58,7 +58,7 @@ public class AnimatedSprite : MonoBehaviour
 
 	public void set_ChangeSpriteTime(float value)
 	{
-		GCGNEEFNHFK = value;
+		_changeSpriteTime = value;
 	}
 
 	public bool get_IsWork()
@@ -68,13 +68,13 @@ public class AnimatedSprite : MonoBehaviour
 
 	public void set_Iterations(int value)
 	{
-		NHHKFIHBMKL = value;
+		_iterations = value;
 	}
 
 	public void SetFrames(Sprite[] DHOFFFHGIDL)
 	{
 		_Frames = new List<Sprite>(DHOFFFHGIDL);
-		LDDLAKECNEG = _Frames.Count;
+		_frameCount = _Frames.Count;
 		_IsWork = true;
 	}
 
@@ -92,28 +92,28 @@ public class AnimatedSprite : MonoBehaviour
 	{
 		if (_IsWork && !(_SpriteRender == null))
 		{
-			LICAFNLFJHO += PPOFNJGPHGP;
-			if (LICAFNLFJHO >= GCGNEEFNHFK)
+			_elapsedTime += PPOFNJGPHGP;
+			if (_elapsedTime >= _changeSpriteTime)
 			{
-				CPBBGPPOOGL();
-				LICAFNLFJHO = 0f;
+				AdvanceFrame();
+				_elapsedTime = 0f;
 			}
 		}
 	}
 
-	private void CPBBGPPOOGL()
+	private void AdvanceFrame()
 	{
-		SetSpriteFrame(EBFEKKMDNIN);
-		EBFEKKMDNIN++;
-		if (EBFEKKMDNIN < LDDLAKECNEG)
+		SetSpriteFrame(_currentFrame);
+		_currentFrame++;
+		if (_currentFrame < _frameCount)
 		{
 			return;
 		}
-		EBFEKKMDNIN = 0;
-		if (NHHKFIHBMKL != -1)
+		_currentFrame = 0;
+		if (_iterations != -1)
 		{
-			NHHKFIHBMKL--;
-			if (NHHKFIHBMKL <= 0)
+			_iterations--;
+			if (_iterations <= 0)
 			{
 				_IsWork = false;
 			}
@@ -122,7 +122,7 @@ public class AnimatedSprite : MonoBehaviour
 
 	private void SetSpriteFrame(int DCHCFFFFLLK)
 	{
-		if (DCHCFFFFLLK < LDDLAKECNEG)
+		if (DCHCFFFFLLK < _frameCount)
 		{
 			_SpriteRender.sprite = _Frames[DCHCFFFFLLK];
 		}

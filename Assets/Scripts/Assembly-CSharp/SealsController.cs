@@ -5,23 +5,23 @@ using UnityEngine;
 
 public class SealsController : ITableViewDataSource, ITableViewDelegate
 {
-	private const int ILLBMINOHCF = 4;
+	private const int ColumnCount = 4;
 
-	private TableView FEFDHNFOJLF;
+	private TableView tableView;
 
-	private List<UserItem> ICNPIFCMLLC = new List<UserItem>();
+	private List<UserItem> sealItems = new List<UserItem>();
 
 	public SealsController(TableView OIDFBEAABBA, GameObject CGLPIDAECLH)
 	{
-		FEFDHNFOJLF = OIDFBEAABBA;
-		NFDKBNIMBOF();
+		tableView = OIDFBEAABBA;
+		LoadSeals();
 		OIDFBEAABBA.set_CellPrefab(CGLPIDAECLH);
 		OIDFBEAABBA.Init(this, this);
 	}
 
 	public int NumberOfRowsInTableView(TableView OIDFBEAABBA)
 	{
-		return ICNPIFCMLLC.Count;
+		return sealItems.Count;
 	}
 
 	public float SizeForRowInTableView(TableView OIDFBEAABBA, int IBAKGENOEPH)
@@ -35,7 +35,7 @@ public class SealsController : ITableViewDataSource, ITableViewDelegate
 		ShopTableViewCell component = tableViewCell.GetComponent<ShopTableViewCell>();
 		component.set_BaseSize(Constants.SEAL_SIZE);
 		component.set_IconPanelActive(false);
-		ItemInfo itemInfo = ICNPIFCMLLC[IBAKGENOEPH].BHKHOJPANHE();
+		ItemInfo itemInfo = sealItems[IBAKGENOEPH].GetInfo();
 		component.SetItemInfo(itemInfo);
 		return tableViewCell;
 	}
@@ -46,29 +46,29 @@ public class SealsController : ITableViewDataSource, ITableViewDelegate
 
 	public void TableViewDidSelectCellForRow(TableView OIDFBEAABBA, int IBAKGENOEPH)
 	{
-		FEFDHNFOJLF.ScrollToCell(IBAKGENOEPH, 0.5f);
+		tableView.ScrollToCell(IBAKGENOEPH, 0.5f);
 	}
 
-	private void NFDKBNIMBOF()
+	private void LoadSeals()
 	{
-		Roster nKGLHEGIKKP = ListSF.CCDKHLAMKKO();
-		List<UserItem> list = nKGLHEGIKKP.KHCNHPCPFII().HOPBBLJLHOB("Seal", string.Empty);
+		Roster nKGLHEGIKKP = ListSF.GetRoster();
+		List<UserItem> list = nKGLHEGIKKP.GetInventory().FindItemsByType("Seal", string.Empty);
 		foreach (UserItem item in list)
 		{
-			if (item.OFOPFCJNEBL() != 0)
+			if (item.GetCount() != 0)
 			{
-				ICNPIFCMLLC.Add(item);
+				sealItems.Add(item);
 			}
 		}
 	}
 
-	public void KCAAFPNBEGL(string EOIDIMBBLFB)
+	public void ScrollToSeal(string EOIDIMBBLFB)
 	{
 		int num = -1;
 		int i = 0;
-		for (int count = ICNPIFCMLLC.Count; i < count; i++)
+		for (int count = sealItems.Count; i < count; i++)
 		{
-			string text = ICNPIFCMLLC[i].get_Name();
+			string text = sealItems[i].get_Name();
 			if (text == EOIDIMBBLFB)
 			{
 				num = i;
@@ -77,7 +77,7 @@ public class SealsController : ITableViewDataSource, ITableViewDelegate
 		}
 		if (num > -1)
 		{
-			FEFDHNFOJLF.ScrollToCell(num);
+			tableView.ScrollToCell(num);
 		}
 	}
 }

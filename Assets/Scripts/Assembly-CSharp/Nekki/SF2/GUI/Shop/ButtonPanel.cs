@@ -89,13 +89,13 @@ namespace Nekki.SF2.GUI.Shop
 				if (!(button == null))
 				{
 					int kGDHCBNKLMF = _buttons.IndexOf(button);
-					string lFLGCDNKNJI = KHNCOFCHCCD((ShopSection)kGDHCBNKLMF);
+					string lFLGCDNKNJI = GetItemTypeBySection((ShopSection)kGDHCBNKLMF);
 					button.set_NewItemsCount(ListSF.GetItems().GetCountNewItemsByType(lFLGCDNKNJI));
 				}
 			}
 		}
 
-		private string KHNCOFCHCCD(ShopSection KGDHCBNKLMF)
+		private string GetItemTypeBySection(ShopSection KGDHCBNKLMF)
 		{
 			switch (KGDHCBNKLMF)
 			{

@@ -22,7 +22,7 @@ namespace Nekki.Yaml
 			foreach (Node node in KBFJEPICNNB)
 			{
 				_mapping.Add(node.key, node.value);
-				nodesInside.Add(Node.AGFNPDIMEDI(node.key, node.value));
+				nodesInside.Add(Node.CreateNode(node.key, node.value));
 			}
 		}
 
@@ -47,11 +47,11 @@ namespace Nekki.Yaml
 			nodesInside = new List<Node>();
 			foreach (KeyValuePair<YamlNode, YamlNode> item in _mapping)
 			{
-				nodesInside.Add(Node.AGFNPDIMEDI(item.Key.ToString(), item.Value));
+				nodesInside.Add(Node.CreateNode(item.Key.ToString(), item.Value));
 			}
 		}
 
-		public int NMALBAPGAFM()
+		public int GetCount()
 		{
 			return nodesInside.Count;
 		}
@@ -65,7 +65,7 @@ namespace Nekki.Yaml
 			return null;
 		}
 
-		public List<Node> DBPKFJFFKPC()
+		public List<Node> GetNodes()
 		{
 			return nodesInside;
 		}

@@ -16,7 +16,7 @@ public class DialogsOpener
 	public static void OpenLocalAlertDialog(string title, string message, string ok, string cancel, Action onOk, Action onCancel)
 	{
 		bool completed = false;
-		PEDJMOMBJJI(title, message, ok, cancel, result =>
+		OpenSimpleDialog(title, message, ok, cancel, result =>
 		{
 			if (completed) return;
 			completed = true;
@@ -25,41 +25,41 @@ public class DialogsOpener
 		}, literalText: true);
 	}
 
-	public const float HFHFJGIMFED = 65f;
+	public const float HeaderHeight = 65f;
 
-	public const float OFMFMJCFEPF = 90f;
+	public const float FooterHeight = 90f;
 
-	public const float OJCFPNJFKEO = 470f;
+	public const float ContentWidth = 470f;
 
-	private static bool IJEDODAJGDD;
+	private static bool appleIdWarningAcknowledged;
 
-	public static bool GLLHPJKFCDM
+	public static bool IsAppleIdWarningAcknowledged
 	{
 		get
 		{
-			return MOAEBPJBDCD();
+			return GetAppleIdWarningAcknowledged();
 		}
 	}
 
-	public static void NGAMLDNIJID(TradeDialog.LBGFOGHMBED IBODMPMJELJ, GameValueType value, long GLGKKGBLFPH, Action<object> ODDEOFKLIAG, long CNIOCCCBDBJ = 0L)
+	public static void OpenTradeDialog(TradeDialog.TradeAction IBODMPMJELJ, GameValueType value, long GLGKKGBLFPH, Action<object> ODDEOFKLIAG, long CNIOCCCBDBJ = 0L)
 	{
 		TradeDialogInfo jGMLAFOPBBC = new TradeDialogInfo(IBODMPMJELJ, value, GLGKKGBLFPH, ODDEOFKLIAG, CNIOCCCBDBJ);
-		DialogsManager.LAEGPJHIGAM(DialogType.DialogBuy, jGMLAFOPBBC);
+		DialogsManager.ShowDialog(DialogType.DialogBuy, jGMLAFOPBBC);
 	}
 
-	public static void ENBLMFGOCEL(ImpossibleDialog.MAKDAMIONLL IBODMPMJELJ, Action<object> ODDEOFKLIAG = null, object DMNBDBJNKME = null)
+	public static void OpenImpossibleDialog(ImpossibleDialog.ImpossibleDialogType IBODMPMJELJ, Action<object> ODDEOFKLIAG = null, object DMNBDBJNKME = null)
 	{
 		ImpossibleDialogInfo jGMLAFOPBBC = new ImpossibleDialogInfo(IBODMPMJELJ, ODDEOFKLIAG, DMNBDBJNKME);
-		DialogsManager.LAEGPJHIGAM(DialogType.DialogImpossible, jGMLAFOPBBC);
+		DialogsManager.ShowDialog(DialogType.DialogImpossible, jGMLAFOPBBC);
 	}
 
-	public static BaseDialog DKBFJMGFEEB(string JIAKJEOEIMF, string GIBEOPMGOPG, List<StoryDialogContent> PBCJDMAPOOB, float ratio, Action<object> ODDEOFKLIAG = null, string FGJCMOLFFGH = "", string NMFJJEJEHMC = "", string BFNHNNFIBNM = "", LabelButton.FBMGEHJPPIK IDHJGMKHNOP = LabelButton.FBMGEHJPPIK.BUTTON_WHITE, LabelButton.FBMGEHJPPIK CPKKNLPKBIO = LabelButton.FBMGEHJPPIK.BUTTON_DARK, LabelButton.FBMGEHJPPIK NFDONPAIONH = LabelButton.FBMGEHJPPIK.BUTTON_WHITE, bool HNNKHNCELDA = true, bool MHLJPGALMFO = false, bool NKPIIFBDEIB = false, bool CJJBDGPDOFF = false, string IAHHOEJJJHP = "")
+	public static BaseDialog OpenStrangerDialog(string JIAKJEOEIMF, string GIBEOPMGOPG, List<StoryDialogContent> PBCJDMAPOOB, float ratio, Action<object> ODDEOFKLIAG = null, string FGJCMOLFFGH = "", string NMFJJEJEHMC = "", string BFNHNNFIBNM = "", LabelButton.ButtonColor IDHJGMKHNOP = LabelButton.ButtonColor.BUTTON_WHITE, LabelButton.ButtonColor CPKKNLPKBIO = LabelButton.ButtonColor.BUTTON_DARK, LabelButton.ButtonColor NFDONPAIONH = LabelButton.ButtonColor.BUTTON_WHITE, bool HNNKHNCELDA = true, bool MHLJPGALMFO = false, bool NKPIIFBDEIB = false, bool CJJBDGPDOFF = false, string IAHHOEJJJHP = "")
 	{
 		bool flag = true;
 		for (int i = 0; i < PBCJDMAPOOB.Count; i++)
 		{
 			StoryDialogContent nJEPNCJLPPF = PBCJDMAPOOB[i];
-			if (!nJEPNCJLPPF.JHOPPPIADHN())
+			if (!nJEPNCJLPPF.RefreshItemTimer())
 			{
 				flag = false;
 			}
@@ -74,20 +74,20 @@ public class DialogsOpener
 			return null;
 		}
 		StrangerDialogInfo jGMLAFOPBBC = new StrangerDialogInfo(JIAKJEOEIMF, GIBEOPMGOPG, PBCJDMAPOOB, ratio, ODDEOFKLIAG, FGJCMOLFFGH, NMFJJEJEHMC, BFNHNNFIBNM, IDHJGMKHNOP, CPKKNLPKBIO, NFDONPAIONH, HNNKHNCELDA, MHLJPGALMFO, NKPIIFBDEIB, CJJBDGPDOFF, IAHHOEJJJHP);
-		return DialogsManager.LAEGPJHIGAM(DialogType.DialogStranger, jGMLAFOPBBC);
+		return DialogsManager.ShowDialog(DialogType.DialogStranger, jGMLAFOPBBC);
 	}
 
-	public static BaseDialog PEDJMOMBJJI(string HHAAFADDOJB, string HCPNFPMHFCM, string ALOJJLCOGMP, string PAJIOGEINPI = "", Action<object> ODDEOFKLIAG = null, LabelButton.FBMGEHJPPIK HGAGMJENCNM = LabelButton.FBMGEHJPPIK.BUTTON_WHITE, LabelButton.FBMGEHJPPIK PHBOACBIMMF = LabelButton.FBMGEHJPPIK.BUTTON_DARK, bool LMAFOFCILBL = false, bool EPHHGNKDPEG = false, string DOEEIGAHKEN = "", bool literalText = false)
+	public static BaseDialog OpenSimpleDialog(string HHAAFADDOJB, string HCPNFPMHFCM, string ALOJJLCOGMP, string PAJIOGEINPI = "", Action<object> ODDEOFKLIAG = null, LabelButton.ButtonColor HGAGMJENCNM = LabelButton.ButtonColor.BUTTON_WHITE, LabelButton.ButtonColor PHBOACBIMMF = LabelButton.ButtonColor.BUTTON_DARK, bool LMAFOFCILBL = false, bool EPHHGNKDPEG = false, string DOEEIGAHKEN = "", bool literalText = false)
 	{
-		BaseDialog.KBDHPMOMJLL hJNAHNICGMH = BaseDialog.KBDHPMOMJLL.FOOTER_BOTH;
+		BaseDialog.FooterType hJNAHNICGMH = BaseDialog.FooterType.FOOTER_BOTH;
 		if (ALOJJLCOGMP == string.Empty || PAJIOGEINPI == string.Empty)
 		{
-			hJNAHNICGMH = BaseDialog.KBDHPMOMJLL.FOOTER_NONE;
-			hJNAHNICGMH = ((ALOJJLCOGMP != string.Empty) ? BaseDialog.KBDHPMOMJLL.FOOTER_OK : ((PAJIOGEINPI != string.Empty) ? BaseDialog.KBDHPMOMJLL.FOOTER_CANCEL : BaseDialog.KBDHPMOMJLL.FOOTER_NONE));
+			hJNAHNICGMH = BaseDialog.FooterType.FOOTER_NONE;
+			hJNAHNICGMH = ((ALOJJLCOGMP != string.Empty) ? BaseDialog.FooterType.FOOTER_OK : ((PAJIOGEINPI != string.Empty) ? BaseDialog.FooterType.FOOTER_CANCEL : BaseDialog.FooterType.FOOTER_NONE));
 		}
 		SimpleDialogInfo jGMLAFOPBBC = new SimpleDialogInfo(HHAAFADDOJB, HCPNFPMHFCM, hJNAHNICGMH, ALOJJLCOGMP, PAJIOGEINPI, HGAGMJENCNM, PHBOACBIMMF, LMAFOFCILBL, EPHHGNKDPEG, DOEEIGAHKEN, ODDEOFKLIAG);
 		jGMLAFOPBBC.UseLiteralText = literalText;
-		BaseDialog baseDialog = DialogsManager.LAEGPJHIGAM(DialogType.DialogSimple, jGMLAFOPBBC);
+		BaseDialog baseDialog = DialogsManager.ShowDialog(DialogType.DialogSimple, jGMLAFOPBBC);
 		if (ODDEOFKLIAG != null)
 		{
 			baseDialog.AddEventListener(0, ODDEOFKLIAG);
@@ -95,131 +95,131 @@ public class DialogsOpener
 		return baseDialog;
 	}
 
-	public static bool MOAEBPJBDCD()
+	public static bool GetAppleIdWarningAcknowledged()
 	{
-		return IJEDODAJGDD;
+		return appleIdWarningAcknowledged;
 	}
 
-	public static BaseDialog FEAHBJGCNLC(Action JPCNFOHPAOB)
+	public static BaseDialog OpenAppleIdRequiredDialog(Action JPCNFOHPAOB)
 	{
 		string hHAAFADDOJB = "dlgWarning";
 		string hCPNFPMHFCM = "dlg_appleID_required";
 		string aLOJJLCOGMP = "OK";
 		string empty = string.Empty;
-		return PEDJMOMBJJI(hHAAFADDOJB, hCPNFPMHFCM, aLOJJLCOGMP, empty, (object KFBMKMCEMGG) =>
+		return OpenSimpleDialog(hHAAFADDOJB, hCPNFPMHFCM, aLOJJLCOGMP, empty, (object KFBMKMCEMGG) =>
 		{
-			IJEDODAJGDD = true;
+			appleIdWarningAcknowledged = true;
 			JPCNFOHPAOB();
-		}, LabelButton.FBMGEHJPPIK.BUTTON_WHITE, LabelButton.FBMGEHJPPIK.BUTTON_DARK, false, false, string.Empty);
+		}, LabelButton.ButtonColor.BUTTON_WHITE, LabelButton.ButtonColor.BUTTON_DARK, false, false, string.Empty);
 	}
 
-	public static BaseDialog OFIOGLOLIJP(Action JPCNFOHPAOB)
+	public static BaseDialog OpenNoInternetValidationDialog(Action JPCNFOHPAOB)
 	{
 		string hHAAFADDOJB = "Error";
 		string hCPNFPMHFCM = "Error_validation_nointernet";
 		string aLOJJLCOGMP = "OK";
 		string empty = string.Empty;
-		return PEDJMOMBJJI(hHAAFADDOJB, hCPNFPMHFCM, aLOJJLCOGMP, empty, (object KFBMKMCEMGG) =>
+		return OpenSimpleDialog(hHAAFADDOJB, hCPNFPMHFCM, aLOJJLCOGMP, empty, (object KFBMKMCEMGG) =>
 		{
 			JPCNFOHPAOB();
-		}, LabelButton.FBMGEHJPPIK.BUTTON_WHITE, LabelButton.FBMGEHJPPIK.BUTTON_DARK, false, false, string.Empty);
+		}, LabelButton.ButtonColor.BUTTON_WHITE, LabelButton.ButtonColor.BUTTON_DARK, false, false, string.Empty);
 	}
 
-	public static BaseDialog FPCPKGBNEPD()
+	public static BaseDialog OpenValidationFailedDialog()
 	{
 		string hHAAFADDOJB = "Error";
 		string hCPNFPMHFCM = "Error_validation_failed";
 		string aLOJJLCOGMP = "OK";
 		string empty = string.Empty;
-		return PEDJMOMBJJI(hHAAFADDOJB, hCPNFPMHFCM, aLOJJLCOGMP, empty, (object KFBMKMCEMGG) =>
+		return OpenSimpleDialog(hHAAFADDOJB, hCPNFPMHFCM, aLOJJLCOGMP, empty, (object KFBMKMCEMGG) =>
 		{
 			ApplicationController.Quit();
-		}, LabelButton.FBMGEHJPPIK.BUTTON_WHITE, LabelButton.FBMGEHJPPIK.BUTTON_DARK, false, false, string.Empty);
+		}, LabelButton.ButtonColor.BUTTON_WHITE, LabelButton.ButtonColor.BUTTON_DARK, false, false, string.Empty);
 	}
 
-	public static BaseDialog BGHNEGGJIJC()
+	public static BaseDialog OpenNoNetworkDialog()
 	{
 		string hHAAFADDOJB = "dlgNotNetworkTitle";
 		string hCPNFPMHFCM = "dlgNotNetworkMessage";
 		string aLOJJLCOGMP = "OK";
 		string empty = string.Empty;
-		return PEDJMOMBJJI(hHAAFADDOJB, hCPNFPMHFCM, aLOJJLCOGMP, empty, null, LabelButton.FBMGEHJPPIK.BUTTON_WHITE, LabelButton.FBMGEHJPPIK.BUTTON_DARK, false, false, string.Empty);
+		return OpenSimpleDialog(hHAAFADDOJB, hCPNFPMHFCM, aLOJJLCOGMP, empty, null, LabelButton.ButtonColor.BUTTON_WHITE, LabelButton.ButtonColor.BUTTON_DARK, false, false, string.Empty);
 	}
 
-	public static BaseDialog DNFMECAEDLJ()
+	public static BaseDialog OpenDuelLockedDialog()
 	{
 		string hHAAFADDOJB = "dlgDuelLockedTitle";
 		string hCPNFPMHFCM = "dlgDuelLockedMessage";
 		string aLOJJLCOGMP = "OK";
 		string empty = string.Empty;
-		return PEDJMOMBJJI(hHAAFADDOJB, hCPNFPMHFCM, aLOJJLCOGMP, empty, null, LabelButton.FBMGEHJPPIK.BUTTON_WHITE, LabelButton.FBMGEHJPPIK.BUTTON_DARK, false, false, string.Empty);
+		return OpenSimpleDialog(hHAAFADDOJB, hCPNFPMHFCM, aLOJJLCOGMP, empty, null, LabelButton.ButtonColor.BUTTON_WHITE, LabelButton.ButtonColor.BUTTON_DARK, false, false, string.Empty);
 	}
 
-	public static BaseDialog PBKDJENGJKB()
+	public static BaseDialog OpenNotAvailableDialog()
 	{
 		string hHAAFADDOJB = "dlgNotAvaliableTitle";
 		string hCPNFPMHFCM = "dlgNotAvaliableMessage";
 		string aLOJJLCOGMP = "OK";
 		string empty = string.Empty;
-		return PEDJMOMBJJI(hHAAFADDOJB, hCPNFPMHFCM, aLOJJLCOGMP, empty, null, LabelButton.FBMGEHJPPIK.BUTTON_WHITE, LabelButton.FBMGEHJPPIK.BUTTON_DARK, false, false, string.Empty);
+		return OpenSimpleDialog(hHAAFADDOJB, hCPNFPMHFCM, aLOJJLCOGMP, empty, null, LabelButton.ButtonColor.BUTTON_WHITE, LabelButton.ButtonColor.BUTTON_DARK, false, false, string.Empty);
 	}
 
-	public static BaseDialog PMMOGEADGNL()
+	public static BaseDialog OpenExitDialog()
 	{
-		return DialogsManager.LAEGPJHIGAM(DialogType.DialogExit, null);
+		return DialogsManager.ShowDialog(DialogType.DialogExit, null);
 	}
 
-	public static BaseDialog OEDGOIHPJJK(Action<object> _dlg)
+	public static BaseDialog OpenSurrenderDialog(Action<object> _dlg)
 	{
-		return DialogsManager.LAEGPJHIGAM(DialogType.DialogExit, new GBAEHLPNDAC(true, _dlg));
+		return DialogsManager.ShowDialog(DialogType.DialogExit, new ExitDialogData(true, _dlg));
 	}
 
-	public static BaseDialog DBHBIMGMIEH()
+	public static BaseDialog OpenSettingsDialog()
 	{
-		return DialogsManager.LAEGPJHIGAM(DialogType.DialogSettings, null);
+		return DialogsManager.ShowDialog(DialogType.DialogSettings, null);
 	}
 
-	public static BaseDialog CLOCBDBIAEF()
+	public static BaseDialog OpenAdvancedSettingsDialog()
 	{
-		return DialogsManager.LAEGPJHIGAM(DialogType.DialogSettingsAdvenced, null);
+		return DialogsManager.ShowDialog(DialogType.DialogSettingsAdvenced, null);
 	}
 
-	public static BaseDialog CNDJILOPFJC(NewsDialogInfo EMBBNNBFODN)
+	public static BaseDialog OpenNewsDialog(NewsDialogInfo EMBBNNBFODN)
 	{
-		return DialogsManager.LAEGPJHIGAM(DialogType.DialogNews, EMBBNNBFODN);
+		return DialogsManager.ShowDialog(DialogType.DialogNews, EMBBNNBFODN);
 	}
 
-	public static void CNDJILOPFJC()
+	public static void OpenNewsDialog()
 	{
-		if (!GameUtils.GCDIGFODNFO || GeneralConfig.FNHPCBEDKFO.MEFNHIALOED().Count == 0)
+		if (!GameUtils.ShowNews || GeneralConfig.CurrentNews.GetItems().Count == 0)
 		{
 			return;
 		}
 		List<NewsItem> list = new List<NewsItem>();
-		foreach (NewsItem item in GeneralConfig.FNHPCBEDKFO.MEFNHIALOED())
+		foreach (NewsItem item in GeneralConfig.CurrentNews.GetItems())
 		{
-			bool flag = item.EndDate < 0 || item.EndDate > GameUtils.ECCPJAPIABG();
-			bool flag2 = !item.CIKJHDEGHGD;
-			bool flag3 = ListSF.GetInstance().NKLCAPEMDIO(item.KJHMHHBJEDH);
-			if (item.DCHJDPCEODD && item.GAHGCJNGDMH && flag && flag2 && flag3)
+			bool flag = item.EndDate < 0 || item.EndDate > GameUtils.GetCurrentTime();
+			bool flag2 = !item.WasShown;
+			bool flag3 = ListSF.GetInstance().IsAdvertGroupAllowed(item.SpenderTypeId);
+			if (item.IsActive && item.IsImageReady && flag && flag2 && flag3)
 			{
-				item.CIKJHDEGHGD = true;
+				item.WasShown = true;
 				list.Add(item);
 			}
 		}
 		if (list.Count != 0)
 		{
 			NewsDialogInfo eMBBNNBFODN = new NewsDialogInfo(list);
-			CNDJILOPFJC(eMBBNNBFODN);
+			OpenNewsDialog(eMBBNNBFODN);
 		}
 	}
 
-	public static BaseDialog EHMEIJCOOKP(string GDLKNAOPKIL, string PEMOECLNECD, List<StoryDialogContent> PBCJDMAPOOB, Action<object> ODDEOFKLIAG = null, string AGEBBHHPFME = "CANCEL", bool IJCBBJHLGFI = false, string NGJFMFPMAFL = "", LabelButton.FBMGEHJPPIK FHNFKIHDCPC = LabelButton.FBMGEHJPPIK.BUTTON_WHITE, LabelButton.FBMGEHJPPIK ICLJIMNHGMN = LabelButton.FBMGEHJPPIK.BUTTON_DARK, bool JLBJMEGPNPF = true, bool MHLJPGALMFO = false)
+	public static BaseDialog OpenStoryDialog(string GDLKNAOPKIL, string PEMOECLNECD, List<StoryDialogContent> PBCJDMAPOOB, Action<object> ODDEOFKLIAG = null, string AGEBBHHPFME = "CANCEL", bool IJCBBJHLGFI = false, string NGJFMFPMAFL = "", LabelButton.ButtonColor FHNFKIHDCPC = LabelButton.ButtonColor.BUTTON_WHITE, LabelButton.ButtonColor ICLJIMNHGMN = LabelButton.ButtonColor.BUTTON_DARK, bool JLBJMEGPNPF = true, bool MHLJPGALMFO = false)
 	{
 		for (int i = 0; i < PBCJDMAPOOB.Count; i++)
 		{
 			StoryDialogContent nJEPNCJLPPF = PBCJDMAPOOB[i];
-			nJEPNCJLPPF.JHOPPPIADHN();
+			nJEPNCJLPPF.RefreshItemTimer();
 		}
 		if (PBCJDMAPOOB.Count > 0 && PBCJDMAPOOB[0].CheckTimer && PBCJDMAPOOB[0].Timer <= 0)
 		{
@@ -231,11 +231,11 @@ public class DialogsOpener
 			return null;
 		}
 		StoryDialogInfo jGMLAFOPBBC = new StoryDialogInfo(GDLKNAOPKIL, PEMOECLNECD, PBCJDMAPOOB, ODDEOFKLIAG, NGJFMFPMAFL, AGEBBHHPFME, IJCBBJHLGFI, FHNFKIHDCPC, ICLJIMNHGMN, JLBJMEGPNPF, MHLJPGALMFO);
-		return DialogsManager.LAEGPJHIGAM(DialogType.DialogStory, jGMLAFOPBBC);
+		return DialogsManager.ShowDialog(DialogType.DialogStory, jGMLAFOPBBC);
 	}
 
-	public static void LMHIIMALDKF()
+	public static void OpenExternalLink()
 	{
-		OfflineServices.OpenExternalUrl(InternetController.DMFANLAIJMN());
+		OfflineServices.OpenExternalUrl(InternetController.GetRateUrl());
 	}
 }

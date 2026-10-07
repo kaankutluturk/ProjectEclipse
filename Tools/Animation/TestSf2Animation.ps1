@@ -21,7 +21,7 @@ foreach ($directory in @('Assets/Editor','Packages','ProjectSettings')) {
 # Compile the exact recovered reader method, extracted from the working tree.
 # Only its containing class is reduced to the two fields the method uses.
 $source = Get-Content -Raw -LiteralPath (Join-Path $root 'Assets/Scripts/Assembly-CSharp/InfoAnimation.cs')
-$method = [regex]::Match($source, '(?s)\tprivate void ReadAnimation\(byte\[\] data\).*?(?=\r?\n\tprivate void BAIMGDMKILA)')
+$method = [regex]::Match($source, '(?s)\tprivate void ReadAnimation\(byte\[\] data\).*?(?=\r?\n\tprivate void ApplyCachedContainer)')
 if (!$method.Success) { throw 'Recovered reader boundary changed; review the fixture extractor.' }
 $reader = "using UnityEngine;`npublic class RecoveredAnimationReader {`npublic Vector3[][] _AnimationContainer;`npublic int AnimationEndFrame;`npublic void Read(byte[] data) { ReadAnimation(data); }`n" + $method.Value + "`n}`n"
 [IO.File]::WriteAllText((Join-Path $fixture 'Assets/Editor/RecoveredAnimationReader.cs'), $reader)

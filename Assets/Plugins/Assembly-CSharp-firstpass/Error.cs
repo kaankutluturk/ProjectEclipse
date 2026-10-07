@@ -3,51 +3,51 @@ using System.Diagnostics;
 public sealed class Error
 {
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private CCCOMMIFIMB OAMDJDNMMCH;
+	private SocketIOErrors code;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private string AGEPKFMGHGA;
+	private string message;
 
-	public CCCOMMIFIMB EDEEELJMHLG
+	public SocketIOErrors Code
 	{
 		get
 		{
-			return AKOMBGCDEHG();
+			return GetCode();
 		}
 		private set
 		{
-			KMPELENHJBK(value);
+			SetCode(value);
 		}
 	}
 
-	public Error(CCCOMMIFIMB KJPGKHJNOMC, string CKEHOEGLMBM)
+	public Error(SocketIOErrors KJPGKHJNOMC, string CKEHOEGLMBM)
 	{
-		KMPELENHJBK(KJPGKHJNOMC);
+		SetCode(KJPGKHJNOMC);
 		set_Message(CKEHOEGLMBM);
 	}
 
-	public CCCOMMIFIMB AKOMBGCDEHG()
+	public SocketIOErrors GetCode()
 	{
-		return OAMDJDNMMCH;
+		return code;
 	}
 
-	private void KMPELENHJBK(CCCOMMIFIMB value)
+	private void SetCode(SocketIOErrors value)
 	{
-		OAMDJDNMMCH = value;
+		code = value;
 	}
 
-	public string DCKPMHKDLEJ()
+	public string GetMessage()
 	{
-		return AGEPKFMGHGA;
+		return message;
 	}
 
 	private void set_Message(string value)
 	{
-		AGEPKFMGHGA = value;
+		message = value;
 	}
 
 	public override string ToString()
 	{
-		return string.Format("Code: {0} Message: \"{1}\"", AKOMBGCDEHG().ToString(), DCKPMHKDLEJ());
+		return string.Format("Code: {0} Message: \"{1}\"", GetCode().ToString(), GetMessage());
 	}
 }

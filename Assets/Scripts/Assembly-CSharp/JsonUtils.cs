@@ -61,7 +61,7 @@ public static class JsonUtils
 		return MEEAKLDGLDF.Value;
 	}
 
-	public static string CIPOICEEIBK(this JSONNode MEEAKLDGLDF, string KDLNPAGLMHF = null)
+	public static string GetString(this JSONNode MEEAKLDGLDF, string KDLNPAGLMHF = null)
 	{
 		if (MEEAKLDGLDF == null)
 		{

@@ -8,11 +8,11 @@ public class RosterAchievement
 
 	private bool _reward;
 
-	public bool HMKHIDIHDAK
+	public bool RewardObtained
 	{
 		get
 		{
-			return BLHBOBGKMBN();
+			return GetReward();
 		}
 		set
 		{
@@ -23,8 +23,8 @@ public class RosterAchievement
 	public RosterAchievement(XmlNode node)
 	{
 		_node = node;
-		_name = node.Attributes["Name"].CIPOICEEIBK(string.Empty);
-		_reward = node.Attributes["ObtainedReward"].CIPOICEEIBK(string.Empty) == "true" || node.Attributes["ObtainedReward"].CIPOICEEIBK(string.Empty) == "1";
+		_name = node.Attributes["Name"].GetStringOrDefault(string.Empty);
+		_reward = node.Attributes["ObtainedReward"].GetStringOrDefault(string.Empty) == "true" || node.Attributes["ObtainedReward"].GetStringOrDefault(string.Empty) == "1";
 	}
 
 	public string get_Name()
@@ -37,12 +37,12 @@ public class RosterAchievement
 		_name = value;
 		if (_node.Attributes["Name"] == null)
 		{
-			_node.LLIKNHNLGJJ("Name");
+			_node.AppendAttribute("Name");
 		}
 		_node.Attributes["Name"].Value = _name;
 	}
 
-	public bool BLHBOBGKMBN()
+	public bool GetReward()
 	{
 		return _reward;
 	}
@@ -52,7 +52,7 @@ public class RosterAchievement
 		_reward = value;
 		if (_node.Attributes["ObtainedReward"] == null)
 		{
-			_node.LLIKNHNLGJJ("ObtainedReward");
+			_node.AppendAttribute("ObtainedReward");
 		}
 		_node.Attributes["ObtainedReward"].Value = ((!_reward) ? "false" : "true");
 	}

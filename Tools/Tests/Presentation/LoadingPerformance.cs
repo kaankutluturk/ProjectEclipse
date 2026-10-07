@@ -23,8 +23,8 @@ public sealed class InfoAnimation
     public CapabilityTable PriorityConflicts = new CapabilityTable();
     public List<ConditionKeys> Keys = new List<ConditionKeys>();
     public static int Collections;
-    public List<ConditionKeys> MOPMGFIIFGA() { Collections++; return new List<ConditionKeys>(Keys); }
-    public List<ConditionKeys> CollectKeyConditions() => MOPMGFIIFGA();
+    public List<ConditionKeys> GetAllKeyConditions() { Collections++; return new List<ConditionKeys>(Keys); }
+    public List<ConditionKeys> CollectKeyConditions() => GetAllKeyConditions();
 }
 static class Program
 {

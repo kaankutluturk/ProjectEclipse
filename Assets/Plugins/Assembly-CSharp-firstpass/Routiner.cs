@@ -4,59 +4,59 @@ using UnityEngine;
 
 public class Routiner : MonoBehaviour
 {
-	private static Routiner EDAPJLKMFPC;
+	private static Routiner instance;
 
-	private Action FJHOJLPOBJA;
+	private Action onUpdate;
 
-	private const float LMJAKBLNLHN = 0.0001f;
+	private const float DelayEpsilon = 0.0001f;
 
 	public static void Init()
 	{
-		if (!EDAPJLKMFPC || !EDAPJLKMFPC.gameObject)
+		if (!instance || !instance.gameObject)
 		{
-			EDAPJLKMFPC = new GameObject("_routine").AddComponent<Routiner>();
-			StaticObjectsManager.AddObject(EDAPJLKMFPC.gameObject, false);
+			instance = new GameObject("_routine").AddComponent<Routiner>();
+			StaticObjectsManager.AddObject(instance.gameObject, false);
 		}
 	}
 
 	public static Coroutine Go(IEnumerator DCOLKHNLFNI)
 	{
 		Init();
-		return EDAPJLKMFPC.StartCoroutine(DCOLKHNLFNI);
+		return instance.StartCoroutine(DCOLKHNLFNI);
 	}
 
 	public static void Stop(Coroutine DCOLKHNLFNI)
 	{
-		if (!(EDAPJLKMFPC == null) && DCOLKHNLFNI != null)
+		if (!(instance == null) && DCOLKHNLFNI != null)
 		{
-			EDAPJLKMFPC.StopCoroutine(DCOLKHNLFNI);
+			instance.StopCoroutine(DCOLKHNLFNI);
 		}
 	}
 
 	public static void AddUpdate(Action IBODMPMJELJ)
 	{
 		Init();
-		Routiner eDAPJLKMFPC = EDAPJLKMFPC;
-		eDAPJLKMFPC.FJHOJLPOBJA = (Action)Delegate.Combine(eDAPJLKMFPC.FJHOJLPOBJA, IBODMPMJELJ);
+		Routiner eDAPJLKMFPC = instance;
+		eDAPJLKMFPC.onUpdate = (Action)Delegate.Combine(eDAPJLKMFPC.onUpdate, IBODMPMJELJ);
 	}
 
 	private void Update()
 	{
-		if (EDAPJLKMFPC.FJHOJLPOBJA != null)
+		if (instance.onUpdate != null)
 		{
-			EDAPJLKMFPC.FJHOJLPOBJA();
+			instance.onUpdate();
 		}
 	}
 
 	public static Coroutine GoDelayed(Action IBODMPMJELJ, float IHDMLLNEGIK)
 	{
 		Init();
-		return EDAPJLKMFPC.StartCoroutine(EDAPJLKMFPC.CEKNIMELBPB(IBODMPMJELJ, IHDMLLNEGIK));
+		return instance.StartCoroutine(instance.DelayedRoutine(IBODMPMJELJ, IHDMLLNEGIK));
 	}
 
-	private IEnumerator CEKNIMELBPB(Action IBODMPMJELJ, float IHDMLLNEGIK)
+	private IEnumerator DelayedRoutine(Action IBODMPMJELJ, float IHDMLLNEGIK)
 	{
-		IEnumerator enumerator = NFDPAGGCDNH(IHDMLLNEGIK);
+		IEnumerator enumerator = WaitRealtime(IHDMLLNEGIK);
 		while (enumerator.MoveNext())
 		{
 			yield return enumerator.Current;
@@ -67,12 +67,12 @@ public class Routiner : MonoBehaviour
 	public static Coroutine GoDelayed(IEnumerator DCOLKHNLFNI, float IHDMLLNEGIK)
 	{
 		Init();
-		return EDAPJLKMFPC.StartCoroutine(EDAPJLKMFPC.CEKNIMELBPB(DCOLKHNLFNI, IHDMLLNEGIK));
+		return instance.StartCoroutine(instance.DelayedRoutine(DCOLKHNLFNI, IHDMLLNEGIK));
 	}
 
-	private IEnumerator CEKNIMELBPB(IEnumerator DCOLKHNLFNI, float IHDMLLNEGIK)
+	private IEnumerator DelayedRoutine(IEnumerator DCOLKHNLFNI, float IHDMLLNEGIK)
 	{
-		IEnumerator enumerator = NFDPAGGCDNH(IHDMLLNEGIK);
+		IEnumerator enumerator = WaitRealtime(IHDMLLNEGIK);
 		while (enumerator.MoveNext())
 		{
 			yield return enumerator.Current;
@@ -83,7 +83,7 @@ public class Routiner : MonoBehaviour
 		}
 	}
 
-	private static IEnumerator NFDPAGGCDNH(float IHDMLLNEGIK)
+	private static IEnumerator WaitRealtime(float IHDMLLNEGIK)
 	{
 		float realtimeSinceStartup = Time.realtimeSinceStartup;
 		while (Time.realtimeSinceStartup <= realtimeSinceStartup + IHDMLLNEGIK + 0.0001f)

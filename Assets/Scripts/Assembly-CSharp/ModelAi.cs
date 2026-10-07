@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class ModelAi
 {
-	public enum CBGBLIPAMGA
+	public enum WaitMode
 	{
 		SetWaitNone = 0,
 		SetWaitRandAttack = 1,
@@ -12,20 +12,20 @@ public class ModelAi
 		SetWaitAnimationLength = 3
 	}
 
-	public enum CNDJFAIJOOH
+	public enum AiState
 	{
 		Nostate = 0,
 		Move = 1,
 		ConterAttack = 2
 	}
 
-	public enum BHIOPDNPEPA
+	public enum AnimationListType
 	{
 		Standard = 0,
 		Missile = 1
 	}
 
-	private enum FOOLLKCDGFP
+	private enum DefenceMode
 	{
 		DefenceUseNone = 0,
 		DefenceUseRandom = 1,
@@ -34,13 +34,13 @@ public class ModelAi
 		DefenceUseBlock = 4
 	}
 
-	private enum MFHIONPNAGO
+	private enum MissileKind
 	{
 		SimpleMissile = 0,
 		MagicMissile = 1
 	}
 
-	private enum CIDKMPMMEDB
+	private enum AttackMode
 	{
 		AttackUseRandom = 0,
 		AttackUseTableAttack = 1
@@ -48,73 +48,73 @@ public class ModelAi
 
 	private class Decision
 	{
-		public InfoAnimation FGICHADOEHF;
+		public InfoAnimation Animation;
 
 		public int Wait;
 
-		public bool MNOFIOIEIBE
+		public bool IsAnimationSet
 		{
 			get
 			{
-				return OPLCCACOEGL();
+				return HasAnimation();
 			}
 		}
 
-		public bool GDHDPELHMOF
+		public bool IsWaitSet
 		{
 			get
 			{
-				return JPDLFMAEOED();
+				return HasWait();
 			}
 		}
 
 		public Decision()
 		{
-			FGICHADOEHF = null;
+			Animation = null;
 			Wait = 0;
 		}
 
 		public Decision(InfoAnimation DBOLBEOCEME, int JOHDCPNACOC)
 		{
-			FGICHADOEHF = DBOLBEOCEME;
+			Animation = DBOLBEOCEME;
 			Wait = JOHDCPNACOC;
 		}
 
-		public bool OPLCCACOEGL()
+		public bool HasAnimation()
 		{
-			return FGICHADOEHF != null;
+			return Animation != null;
 		}
 
-		public bool JPDLFMAEOED()
+		public bool HasWait()
 		{
 			return Wait != -1;
 		}
 	}
 
-	private class BHDKGLJIOJD
+	private class ChanceRoll
 	{
-		public float PAIFCMNKFCP;
+		public float Chance;
 
-		public float NKFHNNFHLMM;
+		public float Roll;
 
 		public bool Flag;
 	}
 
-	private CBGBLIPAMGA PLDABIGHHFG;
+	private WaitMode waitMode;
 
-	private CNDJFAIJOOH EBMMKHGDFCE;
+	private AiState aiState;
 
-	private FOOLLKCDGFP MKMJONLDKEM;
+	private DefenceMode defenceMode;
 
-	private CIDKMPMMEDB IMFEKHJDABH;
+	private AttackMode attackMode;
 
-	private static bool LCAHJDGGJPD = true;
+	private static bool aiOn = true;
 
-	private bool OMECHFOGFBO;
+	private bool unusedFlag;
 
-	private int MEHOEEIGCEP;
+	private int enemyFrame;
 
-	private int NJPDFMHHIDE;
+	private int ownFrame;
 
 	private Model _Model;
 
@@ -128,85 +128,85 @@ public class ModelAi
 
 	private ModelPhysics _ModelPhysics;
 
-	private ModelParameters NHDAJBADMND;
+	private ModelParameters parameters;
 
-	private string EIMKBOMDAAE;
+	private string botWeaponSubtype;
 
-	private string HCJOIHLKOKJ;
+	private string enemyWeaponSubtype;
 
-	private int NHIPFEIIPKG;
+	private int decisionWait;
 
-	private int EBEHPENMJLK;
+	private int responseDelay;
 
-	private bool EOGGOEGGONJ;
+	private bool waitElapsed;
 
-	private bool BEEPJNOFDCK;
+	private bool waitRequested;
 
-	private InfoAnimation COKFBIJAFLH;
+	private InfoAnimation enemyAnimation;
 
-	private InfoAnimation CGPDPHJIDPA;
+	private InfoAnimation botAnimation;
 
-	private float OCCHDKNLAON;
+	private float distanceError;
 
-	private int KHMLCMMKMBD;
+	private int frameError;
 
-	private int NFMNJOPBCBC;
+	private int unusedCounter;
 
-	private AiData.HDHPLDFCDOF DOPHKPJFBJN;
+	private AiData.TableType resultSource;
 
-	private Tactic GIBODDNLGJH;
+	private Tactic tactic;
 
-	private bool PMOBMNECIBC;
+	private bool dodgeMissile;
 
-	private float DGEFLLCBODI;
+	private float dodgeMissileChance;
 
-	private bool NHBNECINMPM;
+	private bool dodgeMagic;
 
-	private float CAGEDGKGHEL;
+	private float dodgeMagicChance;
 
-	private bool EHAPKBCGPIA;
+	private bool offKeyFrame;
 
-	private bool FHBHNNIIBDD;
+	private bool useSafeAttack;
 
-	private bool EKOFADCNGAF;
+	private bool useTableAttack;
 
-	private List<BHDKGLJIOJD> OAPNPEFCBJB = new List<BHDKGLJIOJD>();
+	private List<ChanceRoll> quickAttackRolls = new List<ChanceRoll>();
 
-	private List<BHDKGLJIOJD> JNOMCJLDJGE = new List<BHDKGLJIOJD>();
+	private List<ChanceRoll> evadeRolls = new List<ChanceRoll>();
 
-	private bool JOOELCENMFC;
+	private bool useCautiousMovement;
 
-	private float CAONFMOKPKA;
+	private float attackRoll;
 
-	private float CIIDKJINKJG;
+	private float safeAttackRoll;
 
-	private float JLKJCIMKKOH;
+	private float tableAttackRoll;
 
-	private float BDEKBEEKIKA;
+	private float cautiousMovementRoll;
 
-	private float IHOMGPBJEEG;
+	private float dodgeMissileRoll;
 
-	private float GIKAFLJDHHJ;
+	private float dodgeMagicRoll;
 
-	private bool BECCDKJJDAC;
+	private bool enemyCanEvade;
 
-	private List<Decision> NCBNEMAOHJE = new List<Decision>();
+	private List<Decision> decisions = new List<Decision>();
 
-	private List<InfoAnimation> PIOGLIJBPLL = new List<InfoAnimation>();
+	private List<InfoAnimation> candidateAnimations = new List<InfoAnimation>();
 
-	private float CJBHLGHFEGC;
+	private float counterAttackChance;
 
-	private float DDLPBPJJJNC;
+	private float dodgeChance;
 
-	private float FKPMMOGNMLK;
+	private float blockChance;
 
-	private float HFGEBCOFPCA;
+	private float safeAttackChance;
 
-	private float PMLLPOAPOFA;
+	private float tableAttackChance;
 
-	private float MFJFKFOJJEK;
+	private float cautiousMovementChance;
 
-	public static bool PBKOKPCKMPK
+	public static bool AiEnabled
 	{
 		get
 		{
@@ -218,7 +218,7 @@ public class ModelAi
 		}
 	}
 
-	public Model KJDFJPBIGJC
+	public Model OwnerModel
 	{
 		get
 		{
@@ -230,7 +230,7 @@ public class ModelAi
 		}
 	}
 
-	public AiData.HDHPLDFCDOF IOPJIIJDHOE
+	public AiData.TableType ResultTable
 	{
 		get
 		{
@@ -238,7 +238,7 @@ public class ModelAi
 		}
 	}
 
-	public Tactic HBFMBOHLKPJ
+	public Tactic CurrentTactic
 	{
 		get
 		{
@@ -246,7 +246,7 @@ public class ModelAi
 		}
 	}
 
-	private bool HAMEBOCOHHJ
+	private bool IsAiActive
 	{
 		get
 		{
@@ -258,47 +258,47 @@ public class ModelAi
 	{
 		_ModelAnimation = MEKLGEGJPFP;
 		_ModelPhysics = LBELNKIDMIB;
-		COKFBIJAFLH = null;
-		CGPDPHJIDPA = null;
-		EIMKBOMDAAE = AiData.GetItemEquivalent(PPIEODBOOJA);
-		OCCHDKNLAON = 0f;
-		KHMLCMMKMBD = 0;
-		NFMNJOPBCBC = 0;
-		NHDAJBADMND = JCICKLIMBEF;
-		DOPHKPJFBJN = AiData.HDHPLDFCDOF.noneTable;
-		OMECHFOGFBO = false;
-		EBMMKHGDFCE = CNDJFAIJOOH.Nostate;
-		BEEPJNOFDCK = false;
-		EBEHPENMJLK = 0;
-		MKMJONLDKEM = FOOLLKCDGFP.DefenceUseRandom;
-		IMFEKHJDABH = CIDKMPMMEDB.AttackUseRandom;
-		MEHOEEIGCEP = 0;
-		NJPDFMHHIDE = 0;
-		BECCDKJJDAC = false;
-		NHIPFEIIPKG = 1;
-		EOGGOEGGONJ = false;
-		PLDABIGHHFG = CBGBLIPAMGA.SetWaitNone;
+		enemyAnimation = null;
+		botAnimation = null;
+		botWeaponSubtype = AiData.GetItemEquivalent(PPIEODBOOJA);
+		distanceError = 0f;
+		frameError = 0;
+		unusedCounter = 0;
+		parameters = JCICKLIMBEF;
+		resultSource = AiData.TableType.noneTable;
+		unusedFlag = false;
+		aiState = AiState.Nostate;
+		waitRequested = false;
+		responseDelay = 0;
+		defenceMode = DefenceMode.DefenceUseRandom;
+		attackMode = AttackMode.AttackUseRandom;
+		enemyFrame = 0;
+		ownFrame = 0;
+		enemyCanEvade = false;
+		decisionWait = 1;
+		waitElapsed = false;
+		waitMode = WaitMode.SetWaitNone;
 		_Model = null;
-		EHAPKBCGPIA = false;
-		FHBHNNIIBDD = false;
-		EKOFADCNGAF = false;
-		JOOELCENMFC = false;
-		GIBODDNLGJH = null;
-		CAONFMOKPKA = 0f;
-		CIIDKJINKJG = 0f;
-		JLKJCIMKKOH = 0f;
-		BDEKBEEKIKA = 0f;
+		offKeyFrame = false;
+		useSafeAttack = false;
+		useTableAttack = false;
+		useCautiousMovement = false;
+		tactic = null;
+		attackRoll = 0f;
+		safeAttackRoll = 0f;
+		tableAttackRoll = 0f;
+		cautiousMovementRoll = 0f;
 		LoadParameters();
 	}
 
 	public static bool get_AiOn()
 	{
-		return LCAHJDGGJPD;
+		return aiOn;
 	}
 
 	public static void set_AiOn(bool value)
 	{
-		LCAHJDGGJPD = value;
+		aiOn = value;
 	}
 
 	public void set_Model(Model value)
@@ -311,14 +311,14 @@ public class ModelAi
 		return _Model;
 	}
 
-	public AiData.HDHPLDFCDOF get_ResultSource()
+	public AiData.TableType get_ResultSource()
 	{
-		return DOPHKPJFBJN;
+		return resultSource;
 	}
 
 	public Tactic get_Tactic()
 	{
-		return GIBODDNLGJH;
+		return tactic;
 	}
 
 	public void setAvailableAnimations(List<InfoAnimation> MAHEJFLCCHP)
@@ -327,80 +327,80 @@ public class ModelAi
 
 	public InfoAnimation Render(Model FNKFIMEDNLP, int JLLPJLEDBPG)
 	{
-		if (!get_IsEnabled() || FNKFIMEDNLP == null || _ModelAnimation.NNMAFFCCMHC() == null)
+		if (!get_IsEnabled() || FNKFIMEDNLP == null || _ModelAnimation.GetCurrentInfo() == null)
 		{
 			return null;
 		}
         // A newly created controller can join while its opponent is already
         // animating, before another animation-start notification arrives.
-        if (COKFBIJAFLH == null)
+        if (enemyAnimation == null)
         {
             StartAnimationEnemy(FNKFIMEDNLP);
-            if (COKFBIJAFLH == null) return null;
+            if (enemyAnimation == null) return null;
         }
         // A controller joining an ongoing fight may miss its own animation-start
         // notification. Seed that observation in every fight mode; otherwise
         // IsFitIntervalAndMove refuses its decisions despite a running idle move.
-        if (CGPDPHJIDPA == null && _ModelAnimation.NMEEPBDJHMG() && Fight.GetCurrentFight() != null)
+        if (botAnimation == null && _ModelAnimation.GetIsPlaying() && Fight.GetCurrentFight() != null)
         {
-            StartAnimationBot(_ModelAnimation.NNMAFFCCMHC());
+            StartAnimationBot(_ModelAnimation.GetCurrentInfo());
         }
-		ModelAnimation oJIEPADIEDE = FNKFIMEDNLP.OCPMJKIEPIG();
+		ModelAnimation oJIEPADIEDE = FNKFIMEDNLP.GetAnimationModule();
 		TacticFactors fJCBLOKOBBD = SetFactors(FNKFIMEDNLP);
-		if (oJIEPADIEDE.NMEEPBDJHMG())
+		if (oJIEPADIEDE.GetIsPlaying())
 		{
 			int num = oJIEPADIEDE.GetFrameInMove();
-			int num2 = oJIEPADIEDE.KOCKCMNHPMC();
+			int num2 = oJIEPADIEDE.GetStartFrameOffset();
 			int num3 = GetFrameError(fJCBLOKOBBD);
-			MEHOEEIGCEP = num + num2 + num3;
+			enemyFrame = num + num2 + num3;
 		}
 		else
 		{
-			MEHOEEIGCEP = -1;
+			enemyFrame = -1;
 		}
-		if (_ModelAnimation.NMEEPBDJHMG())
+		if (_ModelAnimation.GetIsPlaying())
 		{
 			int num4 = _ModelAnimation.GetFrameInMove();
-			int num5 = _ModelAnimation.KOCKCMNHPMC();
-			NJPDFMHHIDE = num4 + num5;
+			int num5 = _ModelAnimation.GetStartFrameOffset();
+			ownFrame = num4 + num5;
 		}
 		else
 		{
-			NJPDFMHHIDE = -1;
+			ownFrame = -1;
 		}
-		if (BEEPJNOFDCK)
+		if (waitRequested)
 		{
-			BEEPJNOFDCK = false;
-			if (_ModelAnimation.NMEEPBDJHMG() && oJIEPADIEDE.NMEEPBDJHMG())
+			waitRequested = false;
+			if (_ModelAnimation.GetIsPlaying() && oJIEPADIEDE.GetIsPlaying())
 			{
-				InfoAnimation pJAHIOELGGD = _ModelAnimation.NNMAFFCCMHC();
-				InfoAnimation pJAHIOELGGD2 = oJIEPADIEDE.NNMAFFCCMHC();
+				InfoAnimation pJAHIOELGGD = _ModelAnimation.GetCurrentInfo();
+				InfoAnimation pJAHIOELGGD2 = oJIEPADIEDE.GetCurrentInfo();
 				if (pJAHIOELGGD != null && pJAHIOELGGD2 != null)
 				{
-					int num6 = pJAHIOELGGD.HGMPJJACFHN();
-					switch (PLDABIGHHFG)
+					int num6 = pJAHIOELGGD.GetMoveLengthStrict();
+					switch (waitMode)
 					{
-					case CBGBLIPAMGA.SetWaitRandAttack:
-						NHIPFEIIPKG = pJAHIOELGGD2.MLLLLMFLOBG(true) - MEHOEEIGCEP + 1;
-						NHIPFEIIPKG = Mathf.Min(NHIPFEIIPKG, pJAHIOELGGD.JMIDABBAKEP());
-						if (num6 > NHIPFEIIPKG)
+					case WaitMode.SetWaitRandAttack:
+						decisionWait = pJAHIOELGGD2.GetLastAttackFrame(true) - enemyFrame + 1;
+						decisionWait = Mathf.Min(decisionWait, pJAHIOELGGD.GetMoveLengthExtended());
+						if (num6 > decisionWait)
 						{
-							NHIPFEIIPKG = num6;
+							decisionWait = num6;
 						}
-						NHIPFEIIPKG--;
+						decisionWait--;
 						break;
-					case CBGBLIPAMGA.SetWaitRandUnint:
-						NHIPFEIIPKG = pJAHIOELGGD2.IKFCNCLKDGD(true) - MEHOEEIGCEP + 1;
-						NHIPFEIIPKG = Mathf.Min(NHIPFEIIPKG, pJAHIOELGGD.JMIDABBAKEP());
-						if (num6 > NHIPFEIIPKG)
+					case WaitMode.SetWaitRandUnint:
+						decisionWait = pJAHIOELGGD2.GetLastUninterruptFrame(true) - enemyFrame + 1;
+						decisionWait = Mathf.Min(decisionWait, pJAHIOELGGD.GetMoveLengthExtended());
+						if (num6 > decisionWait)
 						{
-							NHIPFEIIPKG = num6;
+							decisionWait = num6;
 						}
-						NHIPFEIIPKG--;
+						decisionWait--;
 						break;
-					case CBGBLIPAMGA.SetWaitAnimationLength:
-						NHIPFEIIPKG = num6;
-						NHIPFEIIPKG--;
+					case WaitMode.SetWaitAnimationLength:
+						decisionWait = num6;
+						decisionWait--;
 						break;
 					}
 				}
@@ -408,26 +408,26 @@ public class ModelAi
 		}
 		else
 		{
-			CBGBLIPAMGA pLDABIGHHFG = PLDABIGHHFG;
-			if (pLDABIGHHFG == CBGBLIPAMGA.SetWaitRandAttack || pLDABIGHHFG == CBGBLIPAMGA.SetWaitRandUnint || pLDABIGHHFG == CBGBLIPAMGA.SetWaitAnimationLength)
+			WaitMode pLDABIGHHFG = waitMode;
+			if (pLDABIGHHFG == WaitMode.SetWaitRandAttack || pLDABIGHHFG == WaitMode.SetWaitRandUnint || pLDABIGHHFG == WaitMode.SetWaitAnimationLength)
 			{
-				LLLOJBFMONN.Error("!");
+				GameLog.Error("!");
 			}
 		}
-		PLDABIGHHFG = CBGBLIPAMGA.SetWaitNone;
-		if (1 < NHIPFEIIPKG)
+		waitMode = WaitMode.SetWaitNone;
+		if (1 < decisionWait)
 		{
-			NHIPFEIIPKG--;
+			decisionWait--;
 			return null;
 		}
-		InfoAnimation pJAHIOELGGD3 = oJIEPADIEDE.NNMAFFCCMHC();
+		InfoAnimation pJAHIOELGGD3 = oJIEPADIEDE.GetCurrentInfo();
 		if (pJAHIOELGGD3 != null)
 		{
 			bool flag = false;
 			List<TemplateAnimation> list = AiData.get_RandomizingEnemyAnimation();
 			foreach (TemplateAnimation item in list)
 			{
-				List<InfoAnimation> list2 = item.LDEBJOPLCKO();
+				List<InfoAnimation> list2 = item.GetAnimations();
 				if (list2.Contains(pJAHIOELGGD3))
 				{
 					flag = true;
@@ -475,58 +475,58 @@ public class ModelAi
                 if (chosen.HasValue) return chosen.Value >= 0 && chosen.Value < available.Count ? available[chosen.Value] : null;
             }
         }
-		MKMJONLDKEM = SelectDefenceMode(FNKFIMEDNLP);
-		HFGEBCOFPCA = GIBODDNLGJH.GetUseSafeAttackChance(fJCBLOKOBBD);
-		FHBHNNIIBDD = CIIDKJINKJG < HFGEBCOFPCA;
-		PMLLPOAPOFA = GIBODDNLGJH.GetTableAttackChance(fJCBLOKOBBD);
-		EKOFADCNGAF = JLKJCIMKKOH < PMLLPOAPOFA;
+		defenceMode = SelectDefenceMode(FNKFIMEDNLP);
+		safeAttackChance = tactic.GetUseSafeAttackChance(fJCBLOKOBBD);
+		useSafeAttack = safeAttackRoll < safeAttackChance;
+		tableAttackChance = tactic.GetTableAttackChance(fJCBLOKOBBD);
+		useTableAttack = tableAttackRoll < tableAttackChance;
 		SetQuickAttackChances(fJCBLOKOBBD);
 		SetEvadesChances(fJCBLOKOBBD);
-		MFJFKFOJJEK = GIBODDNLGJH.GetCautiousMovementsChance(fJCBLOKOBBD);
-		JOOELCENMFC = BDEKBEEKIKA < MFJFKFOJJEK;
-		DGEFLLCBODI = GIBODDNLGJH.GetDodgeMissileChance(fJCBLOKOBBD);
-		PMOBMNECIBC = IHOMGPBJEEG < DGEFLLCBODI;
-		CAGEDGKGHEL = GIBODDNLGJH.GetDodgeMagicChance(fJCBLOKOBBD);
-		NHBNECINMPM = GIKAFLJDHHJ < CAGEDGKGHEL;
+		cautiousMovementChance = tactic.GetCautiousMovementsChance(fJCBLOKOBBD);
+		useCautiousMovement = cautiousMovementRoll < cautiousMovementChance;
+		dodgeMissileChance = tactic.GetDodgeMissileChance(fJCBLOKOBBD);
+		dodgeMissile = dodgeMissileRoll < dodgeMissileChance;
+		dodgeMagicChance = tactic.GetDodgeMagicChance(fJCBLOKOBBD);
+		dodgeMagic = dodgeMagicRoll < dodgeMagicChance;
 		int num7 = SetDecisionList(FNKFIMEDNLP, JLLPJLEDBPG);
 		if (0 < num7)
 		{
-			EOGGOEGGONJ = false;
-			GetPlayableAnimations(NCBNEMAOHJE);
+			waitElapsed = false;
+			GetPlayableAnimations(decisions);
 			DecisionsToAimationsList();
-			int num8 = SelectAnimationWithWeights(PIOGLIJBPLL);
+			int num8 = SelectAnimationWithWeights(candidateAnimations);
 			if (-1 < num8)
 			{
-				NHIPFEIIPKG = _InterframesList[num8];
-				InfoAnimation dBOLBEOCEME = PIOGLIJBPLL[num8];
-				LogTable(FNKFIMEDNLP.OCPMJKIEPIG(), JLLPJLEDBPG, num7, dBOLBEOCEME, NHIPFEIIPKG);
-				return PIOGLIJBPLL[num8];
+				decisionWait = _InterframesList[num8];
+				InfoAnimation dBOLBEOCEME = candidateAnimations[num8];
+				LogTable(FNKFIMEDNLP.GetAnimationModule(), JLLPJLEDBPG, num7, dBOLBEOCEME, decisionWait);
+				return candidateAnimations[num8];
 			}
 		}
-		else if (BEEPJNOFDCK)
+		else if (waitRequested)
 		{
-			LogTable(FNKFIMEDNLP.OCPMJKIEPIG(), JLLPJLEDBPG - 1, 1, null, 0);
-			EOGGOEGGONJ = false;
+			LogTable(FNKFIMEDNLP.GetAnimationModule(), JLLPJLEDBPG - 1, 1, null, 0);
+			waitElapsed = false;
 		}
 		return null;
 	}
 
 	public void RandomizeBehavior(Model OGBHDKKOIGH)
 	{
-		TacticFactors oHKCJDCMOKN = new TacticFactors(_Model.FGACEEPJBIF(), _Model.GLEKCPCMINJ(), _Model.GetMagicCharges());
-		_Model.FGACEEPJBIF().GetCountAndDamage(true, COKFBIJAFLH, ref oHKCJDCMOKN.EOGLBDCLMBM, ref oHKCJDCMOKN.KFMJMBANIGF, ref oHKCJDCMOKN.AAKOCIPFDNM);
-		oHKCJDCMOKN.MGICNNKKCAN = (ObscuredFloat)(_Model.Parameters.KKMCHCNOHMB());
-		oHKCJDCMOKN.DDGNCMJGDAG = (ObscuredFloat)(OGBHDKKOIGH.Parameters.KKMCHCNOHMB());
-		oHKCJDCMOKN.OLCKGMBDGOG = OGBHDKKOIGH.OCPMJKIEPIG().GetFrameInMove();
-		oHKCJDCMOKN.NGMLGDJGBCD = ChildMaxModelFrame(OGBHDKKOIGH);
-		CAONFMOKPKA = NekkiMath.randomFloat();
-		CIIDKJINKJG = NekkiMath.randomFloat();
-		JLKJCIMKKOH = NekkiMath.randomFloat();
-		BDEKBEEKIKA = NekkiMath.randomFloat();
-		IHOMGPBJEEG = NekkiMath.randomFloat();
-		GIKAFLJDHHJ = NekkiMath.randomFloat();
-		OCCHDKNLAON = GetDistanceError(oHKCJDCMOKN);
-		KHMLCMMKMBD = GetFrameError(oHKCJDCMOKN);
+		TacticFactors oHKCJDCMOKN = new TacticFactors(_Model.GetModelStats(), _Model.GetNoRangedFlag(), _Model.GetMagicCharges());
+		_Model.GetModelStats().GetCountAndDamage(true, enemyAnimation, ref oHKCJDCMOKN.FactorsCount, ref oHKCJDCMOKN.Damage, ref oHKCJDCMOKN.Hits);
+		oHKCJDCMOKN.Health = (ObscuredFloat)(_Model.Parameters.GetCurrentLife());
+		oHKCJDCMOKN.EnemyHealth = (ObscuredFloat)(OGBHDKKOIGH.Parameters.GetCurrentLife());
+		oHKCJDCMOKN.AnimationFrames = OGBHDKKOIGH.GetAnimationModule().GetFrameInMove();
+		oHKCJDCMOKN.ChildFrames = ChildMaxModelFrame(OGBHDKKOIGH);
+		attackRoll = NekkiMath.randomFloat();
+		safeAttackRoll = NekkiMath.randomFloat();
+		tableAttackRoll = NekkiMath.randomFloat();
+		cautiousMovementRoll = NekkiMath.randomFloat();
+		dodgeMissileRoll = NekkiMath.randomFloat();
+		dodgeMagicRoll = NekkiMath.randomFloat();
+		distanceError = GetDistanceError(oHKCJDCMOKN);
+		frameError = GetFrameError(oHKCJDCMOKN);
 	}
 
 	private int ChildMaxModelFrame(Model ACENLMONNPA)
@@ -538,7 +538,7 @@ public class ModelAi
 			WeaponModel gKIANLDJFCH = ACENLMONNPA.GetWeaponModels()[i];
 			if (gKIANLDJFCH != null)
 			{
-				int num2 = gKIANLDJFCH.OCPMJKIEPIG().JFGEHNHLDJM();
+				int num2 = gKIANLDJFCH.GetAnimationModule().GetRenderTickCount();
 				if (num2 > num)
 				{
 					num = num2;
@@ -554,25 +554,25 @@ public class ModelAi
 		{
 			return;
 		}
-		if (_ModelAnimation.NMEEPBDJHMG() && DBOLBEOCEME != null)
+		if (_ModelAnimation.GetIsPlaying() && DBOLBEOCEME != null)
 		{
-			InfoAnimation pJAHIOELGGD = DBOLBEOCEME.IMFGMAAEMIC();
+			InfoAnimation pJAHIOELGGD = DBOLBEOCEME.GetTacticEquivalent();
 			if (pJAHIOELGGD != null)
 			{
-				CGPDPHJIDPA = pJAHIOELGGD;
+				botAnimation = pJAHIOELGGD;
 			}
 			else
 			{
-				CGPDPHJIDPA = DBOLBEOCEME;
+				botAnimation = DBOLBEOCEME;
 			}
 		}
 		else
 		{
-			CGPDPHJIDPA = null;
+			botAnimation = null;
 		}
-		if (IsFitStartAnimation(CGPDPHJIDPA))
+		if (IsFitStartAnimation(botAnimation))
 		{
-			NHIPFEIIPKG = 1;
+			decisionWait = 1;
 		}
 	}
 
@@ -582,30 +582,30 @@ public class ModelAi
 		{
 			return;
 		}
-		ModelAnimation oJIEPADIEDE = OGBHDKKOIGH.OCPMJKIEPIG();
-		InfoAnimation pJAHIOELGGD = oJIEPADIEDE.NNMAFFCCMHC();
-		if (oJIEPADIEDE.NMEEPBDJHMG() && pJAHIOELGGD != null)
+		ModelAnimation oJIEPADIEDE = OGBHDKKOIGH.GetAnimationModule();
+		InfoAnimation pJAHIOELGGD = oJIEPADIEDE.GetCurrentInfo();
+		if (oJIEPADIEDE.GetIsPlaying() && pJAHIOELGGD != null)
 		{
-			InfoAnimation pJAHIOELGGD2 = pJAHIOELGGD.IMFGMAAEMIC();
+			InfoAnimation pJAHIOELGGD2 = pJAHIOELGGD.GetTacticEquivalent();
 			if (pJAHIOELGGD2 == null)
 			{
-				COKFBIJAFLH = pJAHIOELGGD;
+				enemyAnimation = pJAHIOELGGD;
 			}
 			else
 			{
-				COKFBIJAFLH = pJAHIOELGGD2;
+				enemyAnimation = pJAHIOELGGD2;
 			}
-			InfoAnimation cOKFBIJAFLH = COKFBIJAFLH;
+			InfoAnimation cOKFBIJAFLH = enemyAnimation;
 			RandomizeBehavior(OGBHDKKOIGH);
 			if (!IsIgnoredEnemyAnimation(cOKFBIJAFLH))
 			{
-				TacticFactors oHKCJDCMOKN = new TacticFactors(_Model.FGACEEPJBIF(), _Model.GLEKCPCMINJ(), _Model.GetMagicCharges());
-				_Model.FGACEEPJBIF().GetCountAndDamage(true, COKFBIJAFLH, ref oHKCJDCMOKN.EOGLBDCLMBM, ref oHKCJDCMOKN.KFMJMBANIGF, ref oHKCJDCMOKN.AAKOCIPFDNM);
-				oHKCJDCMOKN.MGICNNKKCAN = (ObscuredFloat)(_Model.Parameters.KKMCHCNOHMB());
-				oHKCJDCMOKN.DDGNCMJGDAG = (ObscuredFloat)(OGBHDKKOIGH.Parameters.KKMCHCNOHMB());
-				oHKCJDCMOKN.OLCKGMBDGOG = OGBHDKKOIGH.OCPMJKIEPIG().GetFrameInMove();
-				oHKCJDCMOKN.NGMLGDJGBCD = ChildMaxModelFrame(OGBHDKKOIGH);
-				EBEHPENMJLK = GetResponseDelay(oHKCJDCMOKN);
+				TacticFactors oHKCJDCMOKN = new TacticFactors(_Model.GetModelStats(), _Model.GetNoRangedFlag(), _Model.GetMagicCharges());
+				_Model.GetModelStats().GetCountAndDamage(true, enemyAnimation, ref oHKCJDCMOKN.FactorsCount, ref oHKCJDCMOKN.Damage, ref oHKCJDCMOKN.Hits);
+				oHKCJDCMOKN.Health = (ObscuredFloat)(_Model.Parameters.GetCurrentLife());
+				oHKCJDCMOKN.EnemyHealth = (ObscuredFloat)(OGBHDKKOIGH.Parameters.GetCurrentLife());
+				oHKCJDCMOKN.AnimationFrames = OGBHDKKOIGH.GetAnimationModule().GetFrameInMove();
+				oHKCJDCMOKN.ChildFrames = ChildMaxModelFrame(OGBHDKKOIGH);
+				responseDelay = GetResponseDelay(oHKCJDCMOKN);
 			}
 		}
 	}
@@ -615,7 +615,7 @@ public class ModelAi
 		List<string> list = AiData.get_IgnoredEnemyAnimations();
 		foreach (string item in list)
 		{
-			if (DBOLBEOCEME.CNPFHBMGDFP(item))
+			if (DBOLBEOCEME.HasName(item))
 			{
 				return true;
 			}
@@ -627,19 +627,19 @@ public class ModelAi
 	{
 		if (get_IsEnabled())
 		{
-			NHIPFEIIPKG = 1;
+			decisionWait = 1;
 		}
 	}
 
 	public void SetWeaponEnemy(string PPIEODBOOJA)
 	{
-		HCJOIHLKOKJ = AiData.GetItemEquivalent(PPIEODBOOJA);
+		enemyWeaponSubtype = AiData.GetItemEquivalent(PPIEODBOOJA);
 	}
 
     internal System.Action CaptureEnemyWeapon()
     {
-        var weapon = HCJOIHLKOKJ;
-        return () => HCJOIHLKOKJ = weapon;
+        var weapon = enemyWeaponSubtype;
+        return () => enemyWeaponSubtype = weapon;
     }
 
     // Changing an actor's target invalidates observations and waits belonging to
@@ -648,36 +648,36 @@ public class ModelAi
     internal System.Action ResetCombatTarget(string weaponSubtype)
     {
         var weapon = AiData.GetItemEquivalent(weaponSubtype);
-        var oldWeapon = HCJOIHLKOKJ;
-        var observed = COKFBIJAFLH;
-        var response = EBEHPENMJLK;
-        var frame = MEHOEEIGCEP;
-        var wait = NHIPFEIIPKG;
-        var deferred = BEEPJNOFDCK;
-        var waitKind = PLDABIGHHFG;
+        var oldWeapon = enemyWeaponSubtype;
+        var observed = enemyAnimation;
+        var response = responseDelay;
+        var frame = enemyFrame;
+        var wait = decisionWait;
+        var deferred = waitRequested;
+        var waitKind = waitMode;
         var decisionFrame = _modDecisionFrame;
         var decisionOwned = _modDecisionOwned;
-        HCJOIHLKOKJ = weapon;
-        COKFBIJAFLH = null;
-        EBEHPENMJLK = 0;
-        MEHOEEIGCEP = -1;
-        NHIPFEIIPKG = 1;
-        BEEPJNOFDCK = false;
-        PLDABIGHHFG = CBGBLIPAMGA.SetWaitNone;
+        enemyWeaponSubtype = weapon;
+        enemyAnimation = null;
+        responseDelay = 0;
+        enemyFrame = -1;
+        decisionWait = 1;
+        waitRequested = false;
+        waitMode = WaitMode.SetWaitNone;
         _modDecisionFrame = -1;
         _modDecisionOwned = false;
         return () =>
         {
-            HCJOIHLKOKJ = oldWeapon; COKFBIJAFLH = observed;
-            EBEHPENMJLK = response; MEHOEEIGCEP = frame; NHIPFEIIPKG = wait;
-            BEEPJNOFDCK = deferred; PLDABIGHHFG = waitKind;
+            enemyWeaponSubtype = oldWeapon; enemyAnimation = observed;
+            responseDelay = response; enemyFrame = frame; decisionWait = wait;
+            waitRequested = deferred; waitMode = waitKind;
             _modDecisionFrame = decisionFrame; _modDecisionOwned = decisionOwned;
         };
     }
 
 	public void SetWeaponBot(string PPIEODBOOJA)
 	{
-		EIMKBOMDAAE = AiData.GetItemEquivalent(PPIEODBOOJA);
+		botWeaponSubtype = AiData.GetItemEquivalent(PPIEODBOOJA);
 	}
 
 	public void OnGetHit()
@@ -701,7 +701,7 @@ public class ModelAi
 		{
 			Model fNKFIMEDNLP = fGCODGKLHED.GetRootModel();
 			TacticFactors fJCBLOKOBBD = SetFactors(fNKFIMEDNLP);
-			return GIBODDNLGJH.SelectAnimationWithWeights(MAHEJFLCCHP, CGPDPHJIDPA, fJCBLOKOBBD);
+			return tactic.SelectAnimationWithWeights(MAHEJFLCCHP, botAnimation, fJCBLOKOBBD);
 		}
 		return -1;
 	}
@@ -716,28 +716,28 @@ public class ModelAi
 	{
 		if (BJBIGPGJKIE != null)
 		{
-			GIBODDNLGJH = BJBIGPGJKIE;
+			tactic = BJBIGPGJKIE;
 		}
 	}
 
 	private int GetResponseDelay(TacticFactors FJCBLOKOBBD)
 	{
-		return GIBODDNLGJH.GetResponseDelay(FJCBLOKOBBD) + 1;
+		return tactic.GetResponseDelay(FJCBLOKOBBD) + 1;
 	}
 
 	private float GetDistanceError(TacticFactors FJCBLOKOBBD)
 	{
-		return GIBODDNLGJH.GetDistanceError(FJCBLOKOBBD);
+		return tactic.GetDistanceError(FJCBLOKOBBD);
 	}
 
 	private int GetFrameError(TacticFactors FJCBLOKOBBD)
 	{
-		return GIBODDNLGJH.GetFrameError(FJCBLOKOBBD);
+		return tactic.GetFrameError(FJCBLOKOBBD);
 	}
 
 	private int GetEnemyResponseDelay(TacticFactors FJCBLOKOBBD)
 	{
-		return GIBODDNLGJH.GetEnemyResponseDelay(FJCBLOKOBBD);
+		return tactic.GetEnemyResponseDelay(FJCBLOKOBBD);
 	}
 
 	private static bool GetRandomFlag(float KFJGPCLOMIG)
@@ -748,10 +748,10 @@ public class ModelAi
 
 	private void LoadParameters()
 	{
-		Tactic hBFMBOHLKPJ = NHDAJBADMND.HBFMBOHLKPJ;
+		Tactic hBFMBOHLKPJ = parameters.FightTactic;
 		if (hBFMBOHLKPJ != null)
 		{
-			GIBODDNLGJH = hBFMBOHLKPJ;
+			tactic = hBFMBOHLKPJ;
 		}
 	}
 
@@ -765,25 +765,25 @@ public class ModelAi
 
 	private int GetNearestKeyFrameId(int KKEGODOKGCB)
 	{
-		if (KKEGODOKGCB % AiData.KINPOOFGAGD == 0)
+		if (KKEGODOKGCB % AiData.MovementsStep == 0)
 		{
 			return KKEGODOKGCB;
 		}
 		if (0 < KKEGODOKGCB)
 		{
-			return KKEGODOKGCB - KKEGODOKGCB % AiData.KINPOOFGAGD + AiData.KINPOOFGAGD;
+			return KKEGODOKGCB - KKEGODOKGCB % AiData.MovementsStep + AiData.MovementsStep;
 		}
-		return KKEGODOKGCB - KKEGODOKGCB % AiData.KINPOOFGAGD;
+		return KKEGODOKGCB - KKEGODOKGCB % AiData.MovementsStep;
 	}
 
 	private bool IsFitStartAnimation(InfoAnimation DBOLBEOCEME)
 	{
-		if (_ModelAnimation.NMEEPBDJHMG() && DBOLBEOCEME != null)
+		if (_ModelAnimation.GetIsPlaying() && DBOLBEOCEME != null)
 		{
 			List<string> list = AiData.get_UnexpectedMoves();
 			foreach (string item in list)
 			{
-				if (DBOLBEOCEME.CNPFHBMGDFP(item))
+				if (DBOLBEOCEME.HasName(item))
 				{
 					return true;
 				}
@@ -792,23 +792,23 @@ public class ModelAi
 		return false;
 	}
 
-	private bool IsFitBotAnimation(InfoAnimation DBOLBEOCEME, BHIOPDNPEPA LFLGCDNKNJI = BHIOPDNPEPA.Standard)
+	private bool IsFitBotAnimation(InfoAnimation DBOLBEOCEME, AnimationListType LFLGCDNKNJI = AnimationListType.Standard)
 	{
 		if (DBOLBEOCEME != null)
 		{
 			List<string> list = null;
 			switch (LFLGCDNKNJI)
 			{
-			case BHIOPDNPEPA.Standard:
+			case AnimationListType.Standard:
 				list = AiData.get_MovesLastIteration();
 				break;
-			case BHIOPDNPEPA.Missile:
+			case AnimationListType.Missile:
 				list = AiData.get_MissilesLastIteration();
 				break;
 			}
 			foreach (string item in list)
 			{
-				if (DBOLBEOCEME.CNPFHBMGDFP(item))
+				if (DBOLBEOCEME.HasName(item))
 				{
 					return true;
 				}
@@ -822,7 +822,7 @@ public class ModelAi
 		List<string> list = AiData.get_SafeDodgesAnimations();
 		foreach (string item in list)
 		{
-			if (DBOLBEOCEME.CNPFHBMGDFP(item))
+			if (DBOLBEOCEME.HasName(item))
 			{
 				return true;
 			}
@@ -835,19 +835,19 @@ public class ModelAi
 		List<string> list = AiData.get_NoDecisionIntervals();
 		foreach (string item in list)
 		{
-			IntervalAnimation mNOIEOBBCMI = _ModelAnimation.HDJBHPOGKNJ(item);
+			IntervalAnimation mNOIEOBBCMI = _ModelAnimation.FindInterval(item);
 			if (mNOIEOBBCMI != null)
 			{
 				return false;
 			}
 		}
-		if (_ModelAnimation.NMEEPBDJHMG() && CGPDPHJIDPA != null)
+		if (_ModelAnimation.GetIsPlaying() && botAnimation != null)
 		{
-			InfoAnimation cGPDPHJIDPA = CGPDPHJIDPA;
+			InfoAnimation cGPDPHJIDPA = botAnimation;
 			List<string> list2 = AiData.get_NoDecisionMoves();
 			foreach (string item2 in list2)
 			{
-				if (cGPDPHJIDPA.CNPFHBMGDFP(item2))
+				if (cGPDPHJIDPA.HasName(item2))
 				{
 					return false;
 				}
@@ -876,7 +876,7 @@ public class ModelAi
 		{
 			foreach (TemplateAnimation item in NNGPIGIMNPD)
 			{
-				List<InfoAnimation> list = item.LDEBJOPLCKO();
+				List<InfoAnimation> list = item.GetAnimations();
 				if (list.Contains(DBOLBEOCEME))
 				{
 					result = true;
@@ -887,7 +887,7 @@ public class ModelAi
 		return result;
 	}
 
-	private bool GetUseChildrenDodge(Model FNKFIMEDNLP, MFHIONPNAGO LFLGCDNKNJI)
+	private bool GetUseChildrenDodge(Model FNKFIMEDNLP, MissileKind LFLGCDNKNJI)
 	{
 		if (FNKFIMEDNLP.GetWeaponModels().Count == 0 || _Model == null)
 		{
@@ -897,13 +897,13 @@ public class ModelAi
 		int num = GetModelDirection(_Model, FNKFIMEDNLP);
 		foreach (WeaponModel item in FNKFIMEDNLP.GetWeaponModels())
 		{
-			if (item.OCPMJKIEPIG() != null && (item.OCPMJKIEPIG() == null || item.OCPMJKIEPIG().JJBEAOPDGCO() != null) && (IsMissileAnimation(item.OCPMJKIEPIG().NNMAFFCCMHC()) || LFLGCDNKNJI != MFHIONPNAGO.SimpleMissile) && (IsMagicAnimation(item.OCPMJKIEPIG().NNMAFFCCMHC()) || LFLGCDNKNJI != MFHIONPNAGO.MagicMissile))
+			if (item.GetAnimationModule() != null && (item.GetAnimationModule() == null || item.GetAnimationModule().GetFirstInfo() != null) && (IsMissileAnimation(item.GetAnimationModule().GetCurrentInfo()) || LFLGCDNKNJI != MissileKind.SimpleMissile) && (IsMagicAnimation(item.GetAnimationModule().GetCurrentInfo()) || LFLGCDNKNJI != MissileKind.MagicMissile))
 			{
-				float num2 = _Model.CLDMEJKGLBA().CJELIBMCCMA().GetStart()
+				float num2 = _Model.GetBodyObject().GetPivotNode().GetStart()
 					.GetX();
-				float num3 = item.CLDMEJKGLBA().NAMKCLGOPDD()[0].GetStart().GetX();
+				float num3 = item.GetBodyObject().GetAllNodes()[0].GetStart().GetX();
 				int num4 = ((num2 - num3 < 0f) ? 1 : (-1));
-				int num5 = item.OCPMJKIEPIG().KFCNPADAMHA();
+				int num5 = item.GetAnimationModule().GetSign();
 				if (num4 * num5 < 0)
 				{
 					result = true;
@@ -917,35 +917,35 @@ public class ModelAi
 		return result;
 	}
 
-	private FOOLLKCDGFP SelectDefenceMode(Model FNKFIMEDNLP)
+	private DefenceMode SelectDefenceMode(Model FNKFIMEDNLP)
 	{
 		float num = NekkiMath.randomFloat();
 		TacticFactors fJCBLOKOBBD = SetFactors(FNKFIMEDNLP);
-		CJBHLGHFEGC = GIBODDNLGJH.GetCounterAttackChance(fJCBLOKOBBD);
-		DDLPBPJJJNC = GIBODDNLGJH.GetDodgeChance(fJCBLOKOBBD);
-		FKPMMOGNMLK = GIBODDNLGJH.GetBlockChance(fJCBLOKOBBD);
-		float cJBHLGHFEGC = CJBHLGHFEGC;
-		if (num < CJBHLGHFEGC)
+		counterAttackChance = tactic.GetCounterAttackChance(fJCBLOKOBBD);
+		dodgeChance = tactic.GetDodgeChance(fJCBLOKOBBD);
+		blockChance = tactic.GetBlockChance(fJCBLOKOBBD);
+		float cJBHLGHFEGC = counterAttackChance;
+		if (num < counterAttackChance)
 		{
-			return FOOLLKCDGFP.DefenceUseCounterAttack;
+			return DefenceMode.DefenceUseCounterAttack;
 		}
-		cJBHLGHFEGC += DDLPBPJJJNC;
+		cJBHLGHFEGC += dodgeChance;
 		if (num < cJBHLGHFEGC)
 		{
-			return FOOLLKCDGFP.DefenceUseDodge;
+			return DefenceMode.DefenceUseDodge;
 		}
-		cJBHLGHFEGC += FKPMMOGNMLK;
+		cJBHLGHFEGC += blockChance;
 		if (num < cJBHLGHFEGC)
 		{
-			return FOOLLKCDGFP.DefenceUseBlock;
+			return DefenceMode.DefenceUseBlock;
 		}
-		return FOOLLKCDGFP.DefenceUseRandom;
+		return DefenceMode.DefenceUseRandom;
 	}
 
 	private float GetNodeX(string IMGCANJHPND, Model ACENLMONNPA, Model FNKFIMEDNLP)
 	{
 		int aOJJBKLCHJO = GetModelDirection(ACENLMONNPA, FNKFIMEDNLP);
-		ModelNode lCDGOCIAIDK = ACENLMONNPA.OCPMJKIEPIG().EGHIDHMENEF(IMGCANJHPND, aOJJBKLCHJO);
+		ModelNode lCDGOCIAIDK = ACENLMONNPA.GetAnimationModule().GetNodeByNameForSign(IMGCANJHPND, aOJJBKLCHJO);
 		if (lCDGOCIAIDK != null)
 		{
 			return lCDGOCIAIDK.GetStart().GetX();
@@ -967,10 +967,10 @@ public class ModelAi
 
 	private void SetRandomAnimation()
 	{
-		_Model.JAOKKOPAKKL(false);
-		DOPHKPJFBJN = AiData.HDHPLDFCDOF.randomAnimation;
-		BEEPJNOFDCK = true;
-		NHIPFEIIPKG = int.MinValue;
+		_Model.TriggerRandomAnimation(false);
+		resultSource = AiData.TableType.randomAnimation;
+		waitRequested = true;
+		decisionWait = int.MinValue;
 	}
 
 	private int GetPlayableAnimations(List<InfoAnimation> MAHEJFLCCHP, List<int> FIFFFOLGCND = null, bool AEGBKDJEABP = false)
@@ -978,13 +978,13 @@ public class ModelAi
 		List<InfoAnimation> list = _Model.GetAvailableAnimations();
 		int num = 0;
 		int count = MAHEJFLCCHP.Count;
-		ModelConditions dGJJDPIAEAO = get_Model().EBABHGHPLFK();
+		ModelConditions dGJJDPIAEAO = get_Model().GetConditions();
 		if (dGJJDPIAEAO == null)
 		{
-			LLLOJBFMONN.Error("modelConditions is null");
+			GameLog.Error("modelConditions is null");
 			return 0;
 		}
-		dGJJDPIAEAO.IDCHHGHAENM = false;
+		dGJJDPIAEAO.IsKeyCheckEnabled = false;
 		for (int i = 0; i < count; i++)
 		{
 			InfoAnimation pJAHIOELGGD = MAHEJFLCCHP[i];
@@ -998,10 +998,10 @@ public class ModelAi
 				num++;
 			}
 		}
-		MAHEJFLCCHP.CPCAJIKOIEE(num);
+		MAHEJFLCCHP.Resize(num);
 		if (FIFFFOLGCND != null)
 		{
-			FIFFFOLGCND.CPCAJIKOIEE(num);
+			FIFFFOLGCND.Resize(num);
 		}
 		return num;
 	}
@@ -1011,23 +1011,23 @@ public class ModelAi
 		List<InfoAnimation> list = _Model.GetAvailableAnimations();
 		int num = 0;
 		int count = PJGOCFKJGJJ.Count;
-		ModelConditions dGJJDPIAEAO = get_Model().EBABHGHPLFK();
+		ModelConditions dGJJDPIAEAO = get_Model().GetConditions();
 		if (dGJJDPIAEAO == null)
 		{
-			LLLOJBFMONN.Error("modelConditions is null");
+			GameLog.Error("modelConditions is null");
 			return 0;
 		}
-		dGJJDPIAEAO.IDCHHGHAENM = false;
+		dGJJDPIAEAO.IsKeyCheckEnabled = false;
 		for (int i = 0; i < count; i++)
 		{
-			InfoAnimation fGICHADOEHF = PJGOCFKJGJJ[i].FGICHADOEHF;
+			InfoAnimation fGICHADOEHF = PJGOCFKJGJJ[i].Animation;
 			if (fGICHADOEHF == null || IsPlayableAnimations(fGICHADOEHF))
 			{
 				PJGOCFKJGJJ[num] = PJGOCFKJGJJ[i];
 				num++;
 			}
 		}
-		PJGOCFKJGJJ.CPCAJIKOIEE(num);
+		PJGOCFKJGJJ.Resize(num);
 		return num;
 	}
 
@@ -1035,18 +1035,18 @@ public class ModelAi
 	{
 		// AI executes its choices through key input. Event-only animations are
 		// started by their runtime events and cannot be selected by this path.
-		if (DBOLBEOCEME.ILBCHANCOBP() == null) return false;
+		if (DBOLBEOCEME.GetFirstKeysCondition() == null) return false;
 		List<InfoAnimation> list = _Model.GetAvailableAnimations();
 		if (!list.Contains(DBOLBEOCEME))
 		{
 			return false;
 		}
-		ModelConditions dGJJDPIAEAO = get_Model().EBABHGHPLFK();
-		dGJJDPIAEAO.IDCHHGHAENM = false;
-		dGJJDPIAEAO.PDKPGKPBBIL = DBOLBEOCEME.FOLOOGCLPNE();
-		dGJJDPIAEAO.PCAOCHAIBJC = DBOLBEOCEME.CEDEDCLGJDE(dGJJDPIAEAO, _ModelAnimation.KFCNPADAMHA());
-		dGJJDPIAEAO.FOIHIKCEBJF = (int)DBOLBEOCEME.MoveData.ILOEBFFAEAN.OLBDPMKCJIF;
-		if (!DBOLBEOCEME.HPPGNJJCEGF(get_Model(), null, DBOLBEOCEME.OIGBIFNICBI(EventAnimation.EECEJKADLCK.EVENT_KEY_PRESSED)))
+		ModelConditions dGJJDPIAEAO = get_Model().GetConditions();
+		dGJJDPIAEAO.IsKeyCheckEnabled = false;
+		dGJJDPIAEAO.CandidateMoveNames = DBOLBEOCEME.GetTemplateNames();
+		dGJJDPIAEAO.AnimationSign = DBOLBEOCEME.GetDirection(dGJJDPIAEAO, _ModelAnimation.GetSign());
+		dGJJDPIAEAO.PivotPairSelector = (int)DBOLBEOCEME.MoveData.AlignData.PivotSideKind;
+		if (!DBOLBEOCEME.AreConditionsMet(get_Model(), null, DBOLBEOCEME.FindMoveEventByType(EventAnimation.EventAnimationType.EVENT_KEY_PRESSED)))
 		{
 			return false;
 		}
@@ -1056,12 +1056,12 @@ public class ModelAi
 		{
 			foreach (InfoAnimation item in iCANLHJKKNE.HigherPriorityMoves)
 			{
-				if (list.Contains(item) && item.ILBCHANCOBP() != null)
+				if (list.Contains(item) && item.GetFirstKeysCondition() != null)
 				{
-					dGJJDPIAEAO.PDKPGKPBBIL = item.FOLOOGCLPNE();
-					dGJJDPIAEAO.PCAOCHAIBJC = item.CEDEDCLGJDE(dGJJDPIAEAO, _ModelAnimation.KFCNPADAMHA());
-					dGJJDPIAEAO.FOIHIKCEBJF = (int)item.MoveData.ILOEBFFAEAN.OLBDPMKCJIF;
-					if (item.HPPGNJJCEGF(get_Model(), null, DBOLBEOCEME.OIGBIFNICBI(EventAnimation.EECEJKADLCK.EVENT_KEY_PRESSED)))
+					dGJJDPIAEAO.CandidateMoveNames = item.GetTemplateNames();
+					dGJJDPIAEAO.AnimationSign = item.GetDirection(dGJJDPIAEAO, _ModelAnimation.GetSign());
+					dGJJDPIAEAO.PivotPairSelector = (int)item.MoveData.AlignData.PivotSideKind;
+					if (item.AreConditionsMet(get_Model(), null, DBOLBEOCEME.FindMoveEventByType(EventAnimation.EventAnimationType.EVENT_KEY_PRESSED)))
 					{
 						return false;
 					}
@@ -1073,18 +1073,18 @@ public class ModelAi
 
 	private bool IsTacticPlayableAnimations(InfoAnimation DBOLBEOCEME)
 	{
-		if (DBOLBEOCEME.ILBCHANCOBP() == null) return false;
+		if (DBOLBEOCEME.GetFirstKeysCondition() == null) return false;
 		List<InfoAnimation> list = _Model.GetAvailableAnimations();
 		if (!list.Contains(DBOLBEOCEME))
 		{
 			return false;
 		}
-		ModelConditions dGJJDPIAEAO = get_Model().EBABHGHPLFK();
-		dGJJDPIAEAO.IDCHHGHAENM = false;
-		dGJJDPIAEAO.PDKPGKPBBIL = DBOLBEOCEME.FOLOOGCLPNE();
-		dGJJDPIAEAO.PCAOCHAIBJC = DBOLBEOCEME.CEDEDCLGJDE(dGJJDPIAEAO, _ModelAnimation.KFCNPADAMHA());
-		dGJJDPIAEAO.FOIHIKCEBJF = (int)DBOLBEOCEME.MoveData.ILOEBFFAEAN.OLBDPMKCJIF;
-		if (!DBOLBEOCEME.HPPGNJJCEGF(_Model.EBABHGHPLFK(), DBOLBEOCEME.MoveData.NIDNJFOGBFO, DBOLBEOCEME.OIGBIFNICBI(EventAnimation.EECEJKADLCK.EVENT_KEY_PRESSED)))
+		ModelConditions dGJJDPIAEAO = get_Model().GetConditions();
+		dGJJDPIAEAO.IsKeyCheckEnabled = false;
+		dGJJDPIAEAO.CandidateMoveNames = DBOLBEOCEME.GetTemplateNames();
+		dGJJDPIAEAO.AnimationSign = DBOLBEOCEME.GetDirection(dGJJDPIAEAO, _ModelAnimation.GetSign());
+		dGJJDPIAEAO.PivotPairSelector = (int)DBOLBEOCEME.MoveData.AlignData.PivotSideKind;
+		if (!DBOLBEOCEME.AreConditionsMet(_Model.GetConditions(), DBOLBEOCEME.MoveData.TacticsConditions, DBOLBEOCEME.FindMoveEventByType(EventAnimation.EventAnimationType.EVENT_KEY_PRESSED)))
 		{
 			return false;
 		}
@@ -1093,8 +1093,8 @@ public class ModelAi
 
 	private float GetCurrentDirectionToEnemy(ModelAnimation HFGPAELCNMF)
 	{
-		ModelNode lCDGOCIAIDK = HFGPAELCNMF.CJELIBMCCMA();
-		ModelNode lCDGOCIAIDK2 = _ModelAnimation.CJELIBMCCMA();
+		ModelNode lCDGOCIAIDK = HFGPAELCNMF.GetPlayingNode();
+		ModelNode lCDGOCIAIDK2 = _ModelAnimation.GetPlayingNode();
 		if (lCDGOCIAIDK == null || lCDGOCIAIDK2 == null)
 		{
 			return 0f;
@@ -1109,196 +1109,196 @@ public class ModelAi
 
 	private bool IsFitCondition(InfoAnimation DBOLBEOCEME, bool EMALNKEEEEN)
 	{
-		ModelConditions dGJJDPIAEAO = get_Model().EBABHGHPLFK();
+		ModelConditions dGJJDPIAEAO = get_Model().GetConditions();
 		if (dGJJDPIAEAO == null)
 		{
-			LLLOJBFMONN.Error("modelConditions is null");
+			GameLog.Error("modelConditions is null");
 			return false;
 		}
-		dGJJDPIAEAO.PDKPGKPBBIL = DBOLBEOCEME.FOLOOGCLPNE();
-		dGJJDPIAEAO.PCAOCHAIBJC = DBOLBEOCEME.CEDEDCLGJDE(dGJJDPIAEAO, _ModelAnimation.KFCNPADAMHA());
-		dGJJDPIAEAO.FOIHIKCEBJF = (int)DBOLBEOCEME.MoveData.ILOEBFFAEAN.OLBDPMKCJIF;
-		return DBOLBEOCEME.HPPGNJJCEGF(dGJJDPIAEAO, (!EMALNKEEEEN) ? null : DBOLBEOCEME.MoveData.NIDNJFOGBFO);
+		dGJJDPIAEAO.CandidateMoveNames = DBOLBEOCEME.GetTemplateNames();
+		dGJJDPIAEAO.AnimationSign = DBOLBEOCEME.GetDirection(dGJJDPIAEAO, _ModelAnimation.GetSign());
+		dGJJDPIAEAO.PivotPairSelector = (int)DBOLBEOCEME.MoveData.AlignData.PivotSideKind;
+		return DBOLBEOCEME.AreConditionsMet(dGJJDPIAEAO, (!EMALNKEEEEN) ? null : DBOLBEOCEME.MoveData.TacticsConditions);
 	}
 
 	private int SetDecisionList(Model FNKFIMEDNLP, int JLLPJLEDBPG)
 	{
-		NCBNEMAOHJE.Clear();
-		ModelAnimation oJIEPADIEDE = FNKFIMEDNLP.OCPMJKIEPIG();
-		if (GetCurrentDirectionToEnemy(oJIEPADIEDE) * (float)oJIEPADIEDE.KFCNPADAMHA() > 0f)
+		decisions.Clear();
+		ModelAnimation oJIEPADIEDE = FNKFIMEDNLP.GetAnimationModule();
+		if (GetCurrentDirectionToEnemy(oJIEPADIEDE) * (float)oJIEPADIEDE.GetSign() > 0f)
 		{
 			SetRandomAnimation();
-			PLDABIGHHFG = CBGBLIPAMGA.SetWaitAnimationLength;
+			waitMode = WaitMode.SetWaitAnimationLength;
 			return 0;
 		}
 		bool flag = false;
-		if (GetUseChildrenDodge(FNKFIMEDNLP, MFHIONPNAGO.SimpleMissile) && PMOBMNECIBC)
+		if (GetUseChildrenDodge(FNKFIMEDNLP, MissileKind.SimpleMissile) && dodgeMissile)
 		{
-			int num = GetForDodgeMissiles(FNKFIMEDNLP, MFHIONPNAGO.SimpleMissile);
-			DOPHKPJFBJN = AiData.HDHPLDFCDOF.dodgeTable;
+			int num = GetForDodgeMissiles(FNKFIMEDNLP, MissileKind.SimpleMissile);
+			resultSource = AiData.TableType.dodgeTable;
 			flag = true;
 		}
-		if (NHBNECINMPM && GetUseChildrenDodge(FNKFIMEDNLP, MFHIONPNAGO.MagicMissile))
+		if (dodgeMagic && GetUseChildrenDodge(FNKFIMEDNLP, MissileKind.MagicMissile))
 		{
-			int num2 = GetForDodgeMissiles(FNKFIMEDNLP, MFHIONPNAGO.MagicMissile);
-			DOPHKPJFBJN = AiData.HDHPLDFCDOF.dodgeTable;
+			int num2 = GetForDodgeMissiles(FNKFIMEDNLP, MissileKind.MagicMissile);
+			resultSource = AiData.TableType.dodgeTable;
 			flag = true;
 		}
 		if (flag)
 		{
-			return NCBNEMAOHJE.Count;
+			return decisions.Count;
 		}
 		int num3 = oJIEPADIEDE.GetFrameInMove();
-		if (EBEHPENMJLK < num3 && !IsUninteruptIntervalEnd(oJIEPADIEDE))
+		if (responseDelay < num3 && !IsUninteruptIntervalEnd(oJIEPADIEDE))
 		{
-			if (COKFBIJAFLH.CJAHEDOHHEG("Uninterrupt", MEHOEEIGCEP))
+			if (enemyAnimation.IsIntervalActiveAtInterpolatedFrame("Uninterrupt", enemyFrame))
 			{
 				if (!IsAttackIntervalEnd(oJIEPADIEDE))
 				{
-					switch (MKMJONLDKEM)
+					switch (defenceMode)
 					{
-					case FOOLLKCDGFP.DefenceUseCounterAttack:
+					case DefenceMode.DefenceUseCounterAttack:
 					{
 						int num5 = GetFromTablesMove(FNKFIMEDNLP);
 						if (0 < num5)
 						{
-							DOPHKPJFBJN = AiData.HDHPLDFCDOF.movementsTable;
+							resultSource = AiData.TableType.movementsTable;
 						}
 						if (num5 == 0)
 						{
 							num5 = GetFromTablesDodge(FNKFIMEDNLP);
 							if (0 < num5)
 							{
-								DOPHKPJFBJN = AiData.HDHPLDFCDOF.dodgeTable;
+								resultSource = AiData.TableType.dodgeTable;
 							}
 						}
 						return num5;
 					}
-					case FOOLLKCDGFP.DefenceUseDodge:
+					case DefenceMode.DefenceUseDodge:
 					{
 						int num4 = GetFromTablesDodge(FNKFIMEDNLP);
 						if (0 < num4)
 						{
-							DOPHKPJFBJN = AiData.HDHPLDFCDOF.dodgeTable;
+							resultSource = AiData.TableType.dodgeTable;
 						}
 						return num4;
 					}
-					case FOOLLKCDGFP.DefenceUseBlock:
-						DOPHKPJFBJN = AiData.HDHPLDFCDOF.block;
+					case DefenceMode.DefenceUseBlock:
+						resultSource = AiData.TableType.block;
 						return 0;
 					default:
 						SetRandomAnimation();
-						PLDABIGHHFG = CBGBLIPAMGA.SetWaitRandAttack;
+						waitMode = WaitMode.SetWaitRandAttack;
 						return 0;
 					}
 				}
-				if (FHBHNNIIBDD)
+				if (useSafeAttack)
 				{
 					int num6 = GetFromTablesMove(FNKFIMEDNLP);
 					if (0 < num6)
 					{
-						DOPHKPJFBJN = AiData.HDHPLDFCDOF.movementsTable;
+						resultSource = AiData.TableType.movementsTable;
 					}
-					if (EHAPKBCGPIA || 0 < num6)
+					if (offKeyFrame || 0 < num6)
 					{
-						return NCBNEMAOHJE.Count;
+						return decisions.Count;
 					}
 				}
-				if (EKOFADCNGAF)
+				if (useTableAttack)
 				{
 					int num7 = GetFromTablesAttack(FNKFIMEDNLP);
 					if (0 < num7)
 					{
-						DOPHKPJFBJN = AiData.HDHPLDFCDOF.outcometablesforattack;
+						resultSource = AiData.TableType.outcometablesforattack;
 					}
-					if (EHAPKBCGPIA || 0 < num7)
+					if (offKeyFrame || 0 < num7)
 					{
-						return NCBNEMAOHJE.Count;
+						return decisions.Count;
 					}
 				}
-				if (JOOELCENMFC)
+				if (useCautiousMovement)
 				{
 					List<TemplateAnimation> list = AiData.get_CautiousMovements();
-					InfoAnimation pJAHIOELGGD = FNKFIMEDNLP.OCPMJKIEPIG().NNMAFFCCMHC();
+					InfoAnimation pJAHIOELGGD = FNKFIMEDNLP.GetAnimationModule().GetCurrentInfo();
 					int num8 = 0;
-					if (pJAHIOELGGD != null && FNKFIMEDNLP.OCPMJKIEPIG().NMEEPBDJHMG())
+					if (pJAHIOELGGD != null && FNKFIMEDNLP.GetAnimationModule().GetIsPlaying())
 					{
-						num8 = pJAHIOELGGD.IKFCNCLKDGD(true) - MEHOEEIGCEP + 1;
+						num8 = pJAHIOELGGD.GetLastUninterruptFrame(true) - enemyFrame + 1;
 					}
-					NCBNEMAOHJE.Clear();
+					decisions.Clear();
 					foreach (TemplateAnimation item in list)
 					{
-						List<InfoAnimation> list2 = item.LDEBJOPLCKO();
+						List<InfoAnimation> list2 = item.GetAnimations();
 						foreach (InfoAnimation item2 in list2)
 						{
 							int a = num8;
-							a = Mathf.Min(a, item2.JMIDABBAKEP());
-							int num9 = item2.HGMPJJACFHN();
+							a = Mathf.Min(a, item2.GetMoveLengthExtended());
+							int num9 = item2.GetMoveLengthStrict();
 							if (num9 > a)
 							{
 								a = num9;
 							}
-							NCBNEMAOHJE.Add(new Decision(item2, a));
+							decisions.Add(new Decision(item2, a));
 						}
 					}
-					int count = NCBNEMAOHJE.Count;
+					int count = decisions.Count;
 					if (0 < count)
 					{
-						DOPHKPJFBJN = AiData.HDHPLDFCDOF.safeTable;
+						resultSource = AiData.TableType.safeTable;
 					}
-					return NCBNEMAOHJE.Count;
+					return decisions.Count;
 				}
 				SetRandomAnimation();
-				PLDABIGHHFG = CBGBLIPAMGA.SetWaitRandUnint;
+				waitMode = WaitMode.SetWaitRandUnint;
 				return 0;
 			}
 			return 0;
 		}
 		bool flag2 = false;
-		int count2 = OAPNPEFCBJB.Count;
-		List<global::Pair<string, TacticValue>> list3 = GIBODDNLGJH.get_QuickAttacks();
+		int count2 = quickAttackRolls.Count;
+		List<global::Pair<string, TacticValue>> list3 = tactic.get_QuickAttacks();
 		for (int i = 0; i < count2; i++)
 		{
-			BHDKGLJIOJD bHDKGLJIOJD = OAPNPEFCBJB[i];
+			ChanceRoll bHDKGLJIOJD = quickAttackRolls[i];
 			if (!bHDKGLJIOJD.Flag)
 			{
 				continue;
 			}
 			global::Pair<string, TacticValue> cCKLNOPEKHO = list3[i];
 			List<InfoAnimation> list4 = new List<InfoAnimation>();
-			AnimationData.NEBELEFIDMB(cCKLNOPEKHO.First, list4);
+			AnimationData.AddTemplateAnimations(cCKLNOPEKHO.First, list4);
 			foreach (InfoAnimation item3 in list4)
 			{
 				if (item3 != null && IsPlayableAnimations(item3))
 				{
-					int jOHDCPNACOC = item3.HGMPJJACFHN();
-					NCBNEMAOHJE.Add(new Decision(item3, jOHDCPNACOC));
+					int jOHDCPNACOC = item3.GetMoveLengthStrict();
+					decisions.Add(new Decision(item3, jOHDCPNACOC));
 					flag2 = true;
 				}
 			}
 		}
 		if (flag2)
 		{
-			DOPHKPJFBJN = AiData.HDHPLDFCDOF.quickAttact;
+			resultSource = AiData.TableType.quickAttact;
 		}
-		BECCDKJJDAC = false;
-		int count3 = JNOMCJLDJGE.Count;
-		List<global::Pair<string, TacticValue>> list5 = GIBODDNLGJH.get_Evades();
+		enemyCanEvade = false;
+		int count3 = evadeRolls.Count;
+		List<global::Pair<string, TacticValue>> list5 = tactic.get_Evades();
 		for (int j = 0; j < count3; j++)
 		{
-			if (BECCDKJJDAC)
+			if (enemyCanEvade)
 			{
 				break;
 			}
-			BHDKGLJIOJD bHDKGLJIOJD2 = JNOMCJLDJGE[j];
+			ChanceRoll bHDKGLJIOJD2 = evadeRolls[j];
 			if (!bHDKGLJIOJD2.Flag)
 			{
 				continue;
 			}
 			global::Pair<string, TacticValue> cCKLNOPEKHO2 = list5[j];
 			List<InfoAnimation> list6 = new List<InfoAnimation>();
-			AnimationData.NEBELEFIDMB(cCKLNOPEKHO2.First, list6);
-			ModelAi pCFGKAFOCDO = FNKFIMEDNLP.EEIGOJBKFGE();
+			AnimationData.AddTemplateAnimations(cCKLNOPEKHO2.First, list6);
+			ModelAi pCFGKAFOCDO = FNKFIMEDNLP.GetAi();
 			if (pCFGKAFOCDO == null)
 			{
 				continue;
@@ -1307,13 +1307,13 @@ public class ModelAi
 			{
 				if (item4 != null && pCFGKAFOCDO.IsPlayableAnimations(item4))
 				{
-					BECCDKJJDAC = true;
+					enemyCanEvade = true;
 					break;
 				}
 			}
 		}
 		TacticFactors fJCBLOKOBBD = SetFactors(FNKFIMEDNLP);
-		float num10 = GIBODDNLGJH.GetExpectedWait(CGPDPHJIDPA, fJCBLOKOBBD);
+		float num10 = tactic.GetExpectedWait(botAnimation, fJCBLOKOBBD);
 		if (num10 < 1f)
 		{
 			num10 = 1f;
@@ -1322,88 +1322,88 @@ public class ModelAi
 		float num12 = NekkiMath.randomFloat();
 		if (num11 < num12)
 		{
-			EOGGOEGGONJ = true;
+			waitElapsed = true;
 		}
-		if (EOGGOEGGONJ || BECCDKJJDAC)
+		if (waitElapsed || enemyCanEvade)
 		{
 			int num13 = 0;
-			if (EKOFADCNGAF)
+			if (useTableAttack)
 			{
 				num13 = GetFromTablesAttack(FNKFIMEDNLP);
 				if (0 < num13)
 				{
-					DOPHKPJFBJN = AiData.HDHPLDFCDOF.outcometablesforattack;
+					resultSource = AiData.TableType.outcometablesforattack;
 				}
-				if (EHAPKBCGPIA && !BECCDKJJDAC)
+				if (offKeyFrame && !enemyCanEvade)
 				{
-					return NCBNEMAOHJE.Count;
+					return decisions.Count;
 				}
 				if (0 < num13)
 				{
 					return num13;
 				}
 			}
-			if (BECCDKJJDAC)
+			if (enemyCanEvade)
 			{
 				List<TemplateAnimation> list7 = AiData.get_EvadeThrowDodges();
-				NCBNEMAOHJE.Clear();
+				decisions.Clear();
 				foreach (TemplateAnimation item5 in list7)
 				{
-					List<InfoAnimation> list8 = item5.LDEBJOPLCKO();
+					List<InfoAnimation> list8 = item5.GetAnimations();
 					foreach (InfoAnimation item6 in list8)
 					{
-						int jOHDCPNACOC2 = item6.HGMPJJACFHN();
-						NCBNEMAOHJE.Add(new Decision(item6, jOHDCPNACOC2));
+						int jOHDCPNACOC2 = item6.GetMoveLengthStrict();
+						decisions.Add(new Decision(item6, jOHDCPNACOC2));
 					}
 				}
-				num13 = NCBNEMAOHJE.Count;
+				num13 = decisions.Count;
 				if (0 < num13)
 				{
-					DOPHKPJFBJN = AiData.HDHPLDFCDOF.evadeList;
+					resultSource = AiData.TableType.evadeList;
 				}
 			}
-			else if (JOOELCENMFC)
+			else if (useCautiousMovement)
 			{
 				List<TemplateAnimation> list9 = AiData.get_CautiousMovements();
-				NCBNEMAOHJE.Clear();
+				decisions.Clear();
 				foreach (TemplateAnimation item7 in list9)
 				{
-					List<InfoAnimation> list10 = item7.LDEBJOPLCKO();
+					List<InfoAnimation> list10 = item7.GetAnimations();
 					foreach (InfoAnimation item8 in list10)
 					{
-						int jOHDCPNACOC3 = item8.HGMPJJACFHN();
-						NCBNEMAOHJE.Add(new Decision(item8, jOHDCPNACOC3));
+						int jOHDCPNACOC3 = item8.GetMoveLengthStrict();
+						decisions.Add(new Decision(item8, jOHDCPNACOC3));
 					}
 				}
-				num13 = NCBNEMAOHJE.Count;
+				num13 = decisions.Count;
 				if (0 < num13)
 				{
-					DOPHKPJFBJN = AiData.HDHPLDFCDOF.safeTable;
+					resultSource = AiData.TableType.safeTable;
 				}
 			}
 			if (num13 == 0)
 			{
 				SetRandomAnimation();
-				PLDABIGHHFG = CBGBLIPAMGA.SetWaitAnimationLength;
-				if (BECCDKJJDAC)
+				waitMode = WaitMode.SetWaitAnimationLength;
+				if (enemyCanEvade)
 				{
 					RemoveEvadeUnsafeDodgesAnimations();
 				}
 				return 0;
 			}
 		}
-		return NCBNEMAOHJE.Count;
+		return decisions.Count;
 	}
 
 	private static bool IsUninteruptIntervalEnd(ModelAnimation MEKLGEGJPFP)
 	{
-		if (MEKLGEGJPFP.NMEEPBDJHMG())
+		if (MEKLGEGJPFP.GetIsPlaying())
 		{
-			InfoAnimation pJAHIOELGGD = MEKLGEGJPFP.NNMAFFCCMHC();
+			InfoAnimation pJAHIOELGGD = MEKLGEGJPFP.GetCurrentInfo();
 			if (pJAHIOELGGD != null)
 			{
-				int num = pJAHIOELGGD.IKFCNCLKDGD(false);
-				int num2 = MEKLGEGJPFP.LPFPGDJALED();
+				int num = pJAHIOELGGD.GetLastUninterruptFrame(false);
+				int num2 = MEKLGEGJPFP.GetCurrentFrame();
 				if (num2 <= num)
 				{
 					return false;
@@ -1415,13 +1415,13 @@ public class ModelAi
 
 	private static bool IsAttackIntervalEnd(ModelAnimation MEKLGEGJPFP)
 	{
-		if (MEKLGEGJPFP.NMEEPBDJHMG())
+		if (MEKLGEGJPFP.GetIsPlaying())
 		{
-			InfoAnimation pJAHIOELGGD = MEKLGEGJPFP.NNMAFFCCMHC();
+			InfoAnimation pJAHIOELGGD = MEKLGEGJPFP.GetCurrentInfo();
 			if (pJAHIOELGGD != null)
 			{
-				int num = pJAHIOELGGD.MLLLLMFLOBG(false);
-				int num2 = MEKLGEGJPFP.LPFPGDJALED();
+				int num = pJAHIOELGGD.GetLastAttackFrame(false);
+				int num2 = MEKLGEGJPFP.GetCurrentFrame();
 				if (num2 <= num)
 				{
 					return false;
@@ -1435,12 +1435,12 @@ public class ModelAi
 	{
 		int num = 0;
 		List<string> list = AiData.get_EvadeUnsafeDodgesAnimations();
-		foreach (Decision item in NCBNEMAOHJE)
+		foreach (Decision item in decisions)
 		{
 			bool flag = true;
 			foreach (string item2 in list)
 			{
-				if (item.FGICHADOEHF.CNPFHBMGDFP(item2))
+				if (item.Animation.HasName(item2))
 				{
 					flag = false;
 					break;
@@ -1448,7 +1448,7 @@ public class ModelAi
 			}
 			if (flag)
 			{
-				NCBNEMAOHJE[num] = item;
+				decisions[num] = item;
 				num++;
 			}
 		}
@@ -1459,18 +1459,18 @@ public class ModelAi
 	{
 		List<string> nIKHAICFGNM = AiData.get_ThrowableIntervals();
 		bool fPMGBALCKPI = true;
-		return DBOLBEOCEME.FMFFHKJBHNG(nIKHAICFGNM, IHICCKAOPKG, fPMGBALCKPI);
+		return DBOLBEOCEME.AreIntervalsActiveAtInterpolatedFrame(nIKHAICFGNM, IHICCKAOPKG, fPMGBALCKPI);
 	}
 
 	private bool IsModelCanThrow(Model ACENLMONNPA)
 	{
-		PIOGLIJBPLL.Clear();
+		candidateAnimations.Clear();
 		List<string> nIKHAICFGNM = AiData.get_Throws();
-		AnimationData.OCMIKNOMINM(nIKHAICFGNM, PIOGLIJBPLL);
-		int num = PIOGLIJBPLL.Count;
+		AnimationData.AddTemplateAnimationsByNames(nIKHAICFGNM, candidateAnimations);
+		int num = candidateAnimations.Count;
 		if (0 < num)
 		{
-			num = ACENLMONNPA.EEIGOJBKFGE().GetPlayableAnimations(PIOGLIJBPLL);
+			num = ACENLMONNPA.GetAi().GetPlayableAnimations(candidateAnimations);
 		}
 		if (0 < num)
 		{
@@ -1481,16 +1481,16 @@ public class ModelAi
 
 	private bool get_IsEnabled()
 	{
-		return get_AiOn() && (NHDAJBADMND.AiControlled || AiData.get_BothBotEnabled());
+		return get_AiOn() && (parameters.AiControlled || AiData.get_BothBotEnabled());
 	}
 
 	private int DecisionsToAimationsList()
 	{
-		PIOGLIJBPLL.Clear();
+		candidateAnimations.Clear();
 		_InterframesList.Clear();
-		foreach (Decision item in NCBNEMAOHJE)
+		foreach (Decision item in decisions)
 		{
-			PIOGLIJBPLL.Add(item.FGICHADOEHF);
+			candidateAnimations.Add(item.Animation);
 			_InterframesList.Add(item.Wait);
 		}
 		return 0;
@@ -1499,68 +1499,68 @@ public class ModelAi
 	private int GetSafetyAnimations(Model FNKFIMEDNLP)
 	{
 		List<TemplateAnimation> list = AiData.get_CautiousMovements();
-		PIOGLIJBPLL.Clear();
+		candidateAnimations.Clear();
 		foreach (TemplateAnimation item in list)
 		{
-			List<InfoAnimation> list2 = item.LDEBJOPLCKO();
+			List<InfoAnimation> list2 = item.GetAnimations();
 			foreach (InfoAnimation item2 in list2)
 			{
-				PIOGLIJBPLL.Add(item2);
+				candidateAnimations.Add(item2);
 			}
 		}
-		InfoAnimation pJAHIOELGGD = FNKFIMEDNLP.OCPMJKIEPIG().NNMAFFCCMHC();
-		NCBNEMAOHJE.Clear();
-		foreach (InfoAnimation item3 in PIOGLIJBPLL)
+		InfoAnimation pJAHIOELGGD = FNKFIMEDNLP.GetAnimationModule().GetCurrentInfo();
+		decisions.Clear();
+		foreach (InfoAnimation item3 in candidateAnimations)
 		{
 			int num = 0;
-			if (pJAHIOELGGD != null && FNKFIMEDNLP.OCPMJKIEPIG().NMEEPBDJHMG())
+			if (pJAHIOELGGD != null && FNKFIMEDNLP.GetAnimationModule().GetIsPlaying())
 			{
-				int num2 = item3.HGMPJJACFHN();
-				num = pJAHIOELGGD.IKFCNCLKDGD(true) - MEHOEEIGCEP + 1;
+				int num2 = item3.GetMoveLengthStrict();
+				num = pJAHIOELGGD.GetLastUninterruptFrame(true) - enemyFrame + 1;
 				if (num2 < num)
 				{
 					num = num2;
 				}
 			}
-			NCBNEMAOHJE.Add(new Decision(item3, num));
+			decisions.Add(new Decision(item3, num));
 		}
-		return NCBNEMAOHJE.Count;
+		return decisions.Count;
 	}
 
 	private int GetFromTablesMove(Model FNKFIMEDNLP)
 	{
-		if (MEHOEEIGCEP % AiData.KINPOOFGAGD != 0)
+		if (enemyFrame % AiData.MovementsStep != 0)
 		{
-			EHAPKBCGPIA = true;
+			offKeyFrame = true;
 		}
 		else
 		{
-			EHAPKBCGPIA = false;
+			offKeyFrame = false;
 		}
-		if (CGPDPHJIDPA != null && COKFBIJAFLH != null)
+		if (botAnimation != null && enemyAnimation != null)
 		{
-			int num = GetFromTablesMove(FNKFIMEDNLP, CGPDPHJIDPA, COKFBIJAFLH, _ModelAnimation.FHGNPPBLIIL(), FNKFIMEDNLP.OCPMJKIEPIG().FHGNPPBLIIL(), NJPDFMHHIDE, MEHOEEIGCEP, OCCHDKNLAON);
+			int num = GetFromTablesMove(FNKFIMEDNLP, botAnimation, enemyAnimation, _ModelAnimation.GetStartPosition(), FNKFIMEDNLP.GetAnimationModule().GetStartPosition(), ownFrame, enemyFrame, distanceError);
 			if (0 < num)
 			{
-				num = GetPlayableAnimations(NCBNEMAOHJE);
+				num = GetPlayableAnimations(decisions);
 			}
 			if (0 < num)
 			{
 				int num2 = 0;
 				for (int i = 0; i < num; i++)
 				{
-					InfoAnimation fGICHADOEHF = NCBNEMAOHJE[i].FGICHADOEHF;
+					InfoAnimation fGICHADOEHF = decisions[i].Animation;
 					if (fGICHADOEHF == null || TestWall(fGICHADOEHF, _Model, FNKFIMEDNLP))
 					{
 						if (num2 < i)
 						{
-							NCBNEMAOHJE[num2] = NCBNEMAOHJE[i];
+							decisions[num2] = decisions[i];
 						}
 						num2++;
 					}
 				}
 				num = num2;
-				NCBNEMAOHJE.CPCAJIKOIEE(num);
+				decisions.Resize(num);
 			}
 			return num;
 		}
@@ -1569,19 +1569,19 @@ public class ModelAi
 
 	private int GetFromTablesMove(Model FNKFIMEDNLP, InfoAnimation GJAGBKICAGF, InfoAnimation GPHCOBPINCK, float JPPHFIKBFDM, float KACDJBFHICO, int FIPCJOMEPCJ, int FHDLJPNEOLD, float GLFFEFOFCFE, List<global::Pair<string, float>> PJCNHALDPHO = null)
 	{
-		NCBNEMAOHJE.Clear();
+		decisions.Clear();
 		GroupTables kMLMHGLLOHM = null;
-		List<global::Pair<List<GroupTables>, string>> list = GPHCOBPINCK.NLCLHLIPFFH()[1];
+		List<global::Pair<List<GroupTables>, string>> list = GPHCOBPINCK.GetTacticGroupTables()[1];
 		foreach (global::Pair<List<GroupTables>, string> item in list)
 		{
-			if (!(EIMKBOMDAAE == item.Second))
+			if (!(botWeaponSubtype == item.Second))
 			{
 				continue;
 			}
 			List<GroupTables> lLHEDBIEHAA = item.First;
 			foreach (GroupTables item2 in lLHEDBIEHAA)
 			{
-				if (EIMKBOMDAAE == item2.GroupLabel)
+				if (botWeaponSubtype == item2.GroupLabel)
 				{
 					kMLMHGLLOHM = item2;
 					break;
@@ -1591,82 +1591,82 @@ public class ModelAi
 		}
 		if (kMLMHGLLOHM != null)
 		{
-			ModelAnimation oJIEPADIEDE = FNKFIMEDNLP.OCPMJKIEPIG();
-			int num = oJIEPADIEDE.KFCNPADAMHA();
+			ModelAnimation oJIEPADIEDE = FNKFIMEDNLP.GetAnimationModule();
+			int num = oJIEPADIEDE.GetSign();
 			if (IsFitBotAnimation(GJAGBKICAGF))
 			{
 				GroupTables cIHPJCIFLHN = kMLMHGLLOHM;
-				string mMJNDPGKNPM = GJAGBKICAGF.KPIMAMCOEAN();
+				string mMJNDPGKNPM = GJAGBKICAGF.GetPivotPartName();
 				int num2 = FHDLJPNEOLD - FIPCJOMEPCJ;
 				int num3 = GetNearestKeyFrameId(num2);
 				int num4 = num3 - num2;
 				float oIOMNNFMDOO = (float)num * (JPPHFIKBFDM - KACDJBFHICO) + GLFFEFOFCFE;
-				NCBNEMAOHJE.Clear();
-				int num5 = GetRow(cIHPJCIFLHN, mMJNDPGKNPM, num3, oIOMNNFMDOO, NCBNEMAOHJE);
-				foreach (Decision item3 in NCBNEMAOHJE)
+				decisions.Clear();
+				int num5 = GetRow(cIHPJCIFLHN, mMJNDPGKNPM, num3, oIOMNNFMDOO, decisions);
+				foreach (Decision item3 in decisions)
 				{
-					if (GJAGBKICAGF == item3.FGICHADOEHF)
+					if (GJAGBKICAGF == item3.Animation)
 					{
 						int num6 = item3.Wait - FIPCJOMEPCJ + num4;
-						NCBNEMAOHJE.Clear();
+						decisions.Clear();
 						if (0 < num6)
 						{
-							NCBNEMAOHJE.Add(new Decision(null, num6));
-							return NCBNEMAOHJE.Count;
+							decisions.Add(new Decision(null, num6));
+							return decisions.Count;
 						}
 						break;
 					}
 				}
 			}
-			int num7 = ((FHDLJPNEOLD % AiData.KINPOOFGAGD == 0) ? FHDLJPNEOLD : (FHDLJPNEOLD + AiData.KINPOOFGAGD - FHDLJPNEOLD % AiData.KINPOOFGAGD));
-			NCBNEMAOHJE.Clear();
-			int num8 = _ModelAnimation.KFCNPADAMHA();
+			int num7 = ((FHDLJPNEOLD % AiData.MovementsStep == 0) ? FHDLJPNEOLD : (FHDLJPNEOLD + AiData.MovementsStep - FHDLJPNEOLD % AiData.MovementsStep));
+			decisions.Clear();
+			int num8 = _ModelAnimation.GetSign();
 			int num9 = 0;
-			int count = kMLMHGLLOHM.DOCMMNLEAMH.Count;
+			int count = kMLMHGLLOHM.Tables.Count;
 			for (int i = 0; i < count; i++)
 			{
-				string hOGFLOLGGOL = kMLMHGLLOHM.DOCMMNLEAMH[i].Label;
+				string hOGFLOLGGOL = kMLMHGLLOHM.Tables[i].Label;
 				float num10 = ((PJCNHALDPHO != null) ? GetNodeX(hOGFLOLGGOL, PJCNHALDPHO) : GetNodeX(hOGFLOLGGOL, _Model, FNKFIMEDNLP));
-				float num11 = GJAGBKICAGF.OBIBINIEJJE.GetDistance(FHDLJPNEOLD, hOGFLOLGGOL);
-				float num12 = GJAGBKICAGF.OBIBINIEJJE.GetDistance(num7, hOGFLOLGGOL);
+				float num11 = GJAGBKICAGF.ShiftTable.GetDistance(FHDLJPNEOLD, hOGFLOLGGOL);
+				float num12 = GJAGBKICAGF.ShiftTable.GetDistance(num7, hOGFLOLGGOL);
 				float num13 = num12 - num11;
 				float oIOMNNFMDOO2 = (float)num * (num10 + num13 * (float)num8 - KACDJBFHICO) + GLFFEFOFCFE;
-				num9 += GetRow(kMLMHGLLOHM, hOGFLOLGGOL, num7, oIOMNNFMDOO2, NCBNEMAOHJE);
+				num9 += GetRow(kMLMHGLLOHM, hOGFLOLGGOL, num7, oIOMNNFMDOO2, decisions);
 			}
 			if (num7 == FHDLJPNEOLD || num9 == 0)
 			{
 				return num9;
 			}
-			NCBNEMAOHJE.Clear();
-			NCBNEMAOHJE.Add(new Decision(null, num7 - FHDLJPNEOLD));
+			decisions.Clear();
+			decisions.Add(new Decision(null, num7 - FHDLJPNEOLD));
 			return 1;
 		}
-		return NCBNEMAOHJE.Count;
+		return decisions.Count;
 	}
 
 	private int GetFromTablesAttack(Model FNKFIMEDNLP)
 	{
-		NCBNEMAOHJE.Clear();
-		if (MEHOEEIGCEP % AiData.KINPOOFGAGD != 0)
+		decisions.Clear();
+		if (enemyFrame % AiData.MovementsStep != 0)
 		{
-			EHAPKBCGPIA = true;
+			offKeyFrame = true;
 			return 0;
 		}
-		EHAPKBCGPIA = false;
+		offKeyFrame = false;
 		TacticFactors fJCBLOKOBBD = SetFactors(FNKFIMEDNLP);
 		int num = GetEnemyResponseDelay(fJCBLOKOBBD);
 		GroupTables kMLMHGLLOHM = null;
-		List<global::Pair<List<GroupTables>, string>> list = COKFBIJAFLH.NLCLHLIPFFH()[0];
+		List<global::Pair<List<GroupTables>, string>> list = enemyAnimation.GetTacticGroupTables()[0];
 		foreach (global::Pair<List<GroupTables>, string> item in list)
 		{
-			if (!(EIMKBOMDAAE == item.Second))
+			if (!(botWeaponSubtype == item.Second))
 			{
 				continue;
 			}
 			List<GroupTables> lLHEDBIEHAA = item.First;
 			foreach (GroupTables item2 in lLHEDBIEHAA)
 			{
-				if (EIMKBOMDAAE == item2.GroupLabel)
+				if (botWeaponSubtype == item2.GroupLabel)
 				{
 					kMLMHGLLOHM = item2;
 					break;
@@ -1676,93 +1676,93 @@ public class ModelAi
 		}
 		if (kMLMHGLLOHM != null)
 		{
-			ModelAnimation oJIEPADIEDE = FNKFIMEDNLP.OCPMJKIEPIG();
-			int mEHOEEIGCEP = MEHOEEIGCEP;
-			int nJPDFMHHIDE = NJPDFMHHIDE;
-			float num2 = oJIEPADIEDE.FHGNPPBLIIL();
-			int num3 = oJIEPADIEDE.KFCNPADAMHA();
-			int count = kMLMHGLLOHM.DOCMMNLEAMH.Count;
-			PIOGLIJBPLL.Clear();
+			ModelAnimation oJIEPADIEDE = FNKFIMEDNLP.GetAnimationModule();
+			int mEHOEEIGCEP = enemyFrame;
+			int nJPDFMHHIDE = ownFrame;
+			float num2 = oJIEPADIEDE.GetStartPosition();
+			int num3 = oJIEPADIEDE.GetSign();
+			int count = kMLMHGLLOHM.Tables.Count;
+			candidateAnimations.Clear();
 			_InterframesList.Clear();
-			int num4 = MEHOEEIGCEP + num;
+			int num4 = enemyFrame + num;
 			for (int i = 0; i < count; i++)
 			{
-				TacticalTable iCLOAGENLJG = kMLMHGLLOHM.DOCMMNLEAMH[i];
+				TacticalTable iCLOAGENLJG = kMLMHGLLOHM.Tables[i];
 				int num5 = iCLOAGENLJG.GetArrayIndexByFrameIndex(mEHOEEIGCEP);
 				if (-1 >= num5)
 				{
 					continue;
 				}
 				float num6 = GetNodeX(iCLOAGENLJG.Label, _Model, FNKFIMEDNLP);
-				float oIOMNNFMDOO = (float)num3 * (num6 - num2) + OCCHDKNLAON;
-				List<IntervalNew> mFFPCMPGEBK = iCLOAGENLJG.OCFKLCDIEBF[num5].MFFPCMPGEBK;
+				float oIOMNNFMDOO = (float)num3 * (num6 - num2) + distanceError;
+				List<IntervalNew> mFFPCMPGEBK = iCLOAGENLJG.IntervalList[num5].Items;
 				foreach (IntervalNew item3 in mFFPCMPGEBK)
 				{
 					int num7 = item3.GetInterframeByDistance(oIOMNNFMDOO);
 					if (0 < num7 && num7 <= num4)
 					{
-						PIOGLIJBPLL.Add(item3.FGICHADOEHF);
-						_InterframesList.Add(item3.FGICHADOEHF.HGMPJJACFHN());
+						candidateAnimations.Add(item3.Animation);
+						_InterframesList.Add(item3.Animation.GetMoveLengthStrict());
 					}
 				}
 			}
-			int num8 = PIOGLIJBPLL.Count;
+			int num8 = candidateAnimations.Count;
 			if (0 < num8)
 			{
-				num8 = GetPlayableAnimations(PIOGLIJBPLL, _InterframesList);
+				num8 = GetPlayableAnimations(candidateAnimations, _InterframesList);
 			}
 			if (0 < num8)
 			{
 				int num9 = 0;
 				for (int j = 0; j < num8; j++)
 				{
-					InfoAnimation pJAHIOELGGD = PIOGLIJBPLL[j];
+					InfoAnimation pJAHIOELGGD = candidateAnimations[j];
 					if (TestWall(pJAHIOELGGD, _Model, FNKFIMEDNLP))
 					{
 						if (num9 < j)
 						{
-							PIOGLIJBPLL[num9] = pJAHIOELGGD;
+							candidateAnimations[num9] = pJAHIOELGGD;
 							_InterframesList[num9] = _InterframesList[j];
 						}
 						num9++;
 					}
 				}
 				num8 = num9;
-				PIOGLIJBPLL.CPCAJIKOIEE(num8);
-				_InterframesList.CPCAJIKOIEE(num8);
+				candidateAnimations.Resize(num8);
+				_InterframesList.Resize(num8);
 			}
 			for (int k = 0; k < num8; k++)
 			{
-				NCBNEMAOHJE.Add(new Decision(PIOGLIJBPLL[k], _InterframesList[k]));
+				decisions.Add(new Decision(candidateAnimations[k], _InterframesList[k]));
 			}
 		}
-		return NCBNEMAOHJE.Count;
+		return decisions.Count;
 	}
 
-	private int GetFromTablesDodge(Model FNKFIMEDNLP, BHIOPDNPEPA NPIOFGMJDKI = BHIOPDNPEPA.Standard)
+	private int GetFromTablesDodge(Model FNKFIMEDNLP, AnimationListType NPIOFGMJDKI = AnimationListType.Standard)
 	{
-		NCBNEMAOHJE.Clear();
+		decisions.Clear();
 		int num = 0;
 		switch (NPIOFGMJDKI)
 		{
-		case BHIOPDNPEPA.Standard:
-			num = MEHOEEIGCEP;
+		case AnimationListType.Standard:
+			num = enemyFrame;
 			break;
-		case BHIOPDNPEPA.Missile:
-			num = FNKFIMEDNLP.OCPMJKIEPIG().JFGEHNHLDJM();
+		case AnimationListType.Missile:
+			num = FNKFIMEDNLP.GetAnimationModule().GetRenderTickCount();
 			break;
 		}
-		if (num % AiData.KINPOOFGAGD != 0)
+		if (num % AiData.MovementsStep != 0)
 		{
 			switch (NPIOFGMJDKI)
 			{
-			case BHIOPDNPEPA.Standard:
-				EHAPKBCGPIA = true;
+			case AnimationListType.Standard:
+				offKeyFrame = true;
 				break;
-			case BHIOPDNPEPA.Missile:
+			case AnimationListType.Missile:
 			{
-				EHAPKBCGPIA = false;
-				int num2 = (num / AiData.KINPOOFGAGD + 1) * AiData.KINPOOFGAGD;
+				offKeyFrame = false;
+				int num2 = (num / AiData.MovementsStep + 1) * AiData.MovementsStep;
 				int num3 = num2 - num;
 				break;
 			}
@@ -1770,22 +1770,22 @@ public class ModelAi
 		}
 		else
 		{
-			EHAPKBCGPIA = false;
+			offKeyFrame = false;
 		}
 		InfoAnimation pJAHIOELGGD = null;
 		switch (NPIOFGMJDKI)
 		{
-		case BHIOPDNPEPA.Standard:
-			pJAHIOELGGD = FNKFIMEDNLP.OCPMJKIEPIG().NNMAFFCCMHC();
+		case AnimationListType.Standard:
+			pJAHIOELGGD = FNKFIMEDNLP.GetAnimationModule().GetCurrentInfo();
 			break;
-		case BHIOPDNPEPA.Missile:
-			pJAHIOELGGD = FNKFIMEDNLP.OCPMJKIEPIG().JJBEAOPDGCO();
+		case AnimationListType.Missile:
+			pJAHIOELGGD = FNKFIMEDNLP.GetAnimationModule().GetFirstInfo();
 			break;
 		}
 		GroupTables kMLMHGLLOHM = null;
-		List<global::Pair<List<GroupTables>, string>> list = pJAHIOELGGD.NLCLHLIPFFH()[2];
+		List<global::Pair<List<GroupTables>, string>> list = pJAHIOELGGD.GetTacticGroupTables()[2];
 		// Event-only poses/steps can legitimately have no precomputed dodge table.
-		if (list.Count == 0 && NPIOFGMJDKI == BHIOPDNPEPA.Standard && pJAHIOELGGD.ILBCHANCOBP() == null)
+		if (list.Count == 0 && NPIOFGMJDKI == AnimationListType.Standard && pJAHIOELGGD.GetFirstKeysCondition() == null)
 			return 0;
 		if (list.Count == 1)
 		{
@@ -1799,20 +1799,20 @@ public class ModelAi
 					List<string> list2 = null;
 					switch (NPIOFGMJDKI)
 					{
-					case BHIOPDNPEPA.Standard:
+					case AnimationListType.Standard:
 						nIKHAICFGNM = AiData.get_MovesFirstIteration();
 						list2 = AiData.get_MovesLastIteration();
 						break;
-					case BHIOPDNPEPA.Missile:
+					case AnimationListType.Missile:
 						nIKHAICFGNM = AiData.get_MissilesFirstIteration();
 						list2 = AiData.get_MissilesLastIteration();
 						break;
 					}
-					ModelAnimation oJIEPADIEDE = FNKFIMEDNLP.OCPMJKIEPIG();
-					InfoAnimation pJAHIOELGGD2 = CGPDPHJIDPA;
-					if (_ModelAnimation.NMEEPBDJHMG() && pJAHIOELGGD2 != null)
+					ModelAnimation oJIEPADIEDE = FNKFIMEDNLP.GetAnimationModule();
+					InfoAnimation pJAHIOELGGD2 = botAnimation;
+					if (_ModelAnimation.GetIsPlaying() && pJAHIOELGGD2 != null)
 					{
-						InfoAnimation pJAHIOELGGD3 = pJAHIOELGGD2.IMFGMAAEMIC();
+						InfoAnimation pJAHIOELGGD3 = pJAHIOELGGD2.GetTacticEquivalent();
 						if (pJAHIOELGGD3 != null)
 						{
 							pJAHIOELGGD2 = pJAHIOELGGD3;
@@ -1820,7 +1820,7 @@ public class ModelAi
 						bool flag = false;
 						foreach (string item in list2)
 						{
-							if (pJAHIOELGGD2.CNPFHBMGDFP(item))
+							if (pJAHIOELGGD2.HasName(item))
 							{
 								flag = true;
 								break;
@@ -1828,29 +1828,29 @@ public class ModelAi
 						}
 						if (flag)
 						{
-							string iCBBNJMLDJH = pJAHIOELGGD2.KPIMAMCOEAN();
+							string iCBBNJMLDJH = pJAHIOELGGD2.GetPivotPartName();
 							TacticalTable iCLOAGENLJG = kMLMHGLLOHM.GetTacticalTableByLabel(iCBBNJMLDJH);
 							if (iCLOAGENLJG != null)
 							{
-								int num4 = num - NJPDFMHHIDE;
+								int num4 = num - ownFrame;
 								int num5 = GetNearestKeyFrameId(num4);
 								int num6 = num5 - num4;
 								int num7 = iCLOAGENLJG.GetArrayIndexByFrameIndex(num5);
 								if (-1 < num7)
 								{
-									float num8 = oJIEPADIEDE.FHGNPPBLIIL();
-									if (NPIOFGMJDKI == BHIOPDNPEPA.Missile)
+									float num8 = oJIEPADIEDE.GetStartPosition();
+									if (NPIOFGMJDKI == AnimationListType.Missile)
 									{
-										num8 = oJIEPADIEDE.LPNPNBJGKJM();
+										num8 = oJIEPADIEDE.GetFirstStartPositionX();
 									}
-									int num9 = oJIEPADIEDE.KFCNPADAMHA();
-									float num10 = _ModelAnimation.FHGNPPBLIIL();
-									float oIOMNNFMDOO = (float)num9 * (num10 - num8) + OCCHDKNLAON;
-									Intervals gOOGNIPMCEM = iCLOAGENLJG.OCFKLCDIEBF[num7];
+									int num9 = oJIEPADIEDE.GetSign();
+									float num10 = _ModelAnimation.GetStartPosition();
+									float oIOMNNFMDOO = (float)num9 * (num10 - num8) + distanceError;
+									Intervals gOOGNIPMCEM = iCLOAGENLJG.IntervalList[num7];
 									bool flag2 = false;
-									foreach (IntervalNew item2 in gOOGNIPMCEM.MFFPCMPGEBK)
+									foreach (IntervalNew item2 in gOOGNIPMCEM.Items)
 									{
-										if (item2.FGICHADOEHF == pJAHIOELGGD2)
+										if (item2.Animation == pJAHIOELGGD2)
 										{
 											int num11 = item2.GetInterframeByDistance(oIOMNNFMDOO);
 											if (0 < num11)
@@ -1862,27 +1862,27 @@ public class ModelAi
 									}
 									if (!flag2)
 									{
-										int num12 = pJAHIOELGGD.MLLLLMFLOBG(true);
-										int jOHDCPNACOC = num12 - MEHOEEIGCEP + 1;
-										NCBNEMAOHJE.Add(new Decision(null, jOHDCPNACOC));
-										return NCBNEMAOHJE.Count;
+										int num12 = pJAHIOELGGD.GetLastAttackFrame(true);
+										int jOHDCPNACOC = num12 - enemyFrame + 1;
+										decisions.Add(new Decision(null, jOHDCPNACOC));
+										return decisions.Count;
 									}
 								}
 							}
 						}
 					}
-					if (num % AiData.KINPOOFGAGD != 0)
+					if (num % AiData.MovementsStep != 0)
 					{
 						switch (NPIOFGMJDKI)
 						{
-						case BHIOPDNPEPA.Standard:
-							EHAPKBCGPIA = true;
-							NCBNEMAOHJE.Clear();
+						case AnimationListType.Standard:
+							offKeyFrame = true;
+							decisions.Clear();
 							return 0;
-						case BHIOPDNPEPA.Missile:
+						case AnimationListType.Missile:
 						{
-							EHAPKBCGPIA = false;
-							int num13 = (num / AiData.KINPOOFGAGD + 1) * AiData.KINPOOFGAGD;
+							offKeyFrame = false;
+							int num13 = (num / AiData.MovementsStep + 1) * AiData.MovementsStep;
 							int num3 = num13 - num;
 							break;
 						}
@@ -1890,37 +1890,37 @@ public class ModelAi
 					}
 					else
 					{
-						EHAPKBCGPIA = false;
+						offKeyFrame = false;
 					}
-					PIOGLIJBPLL.Clear();
-					AnimationData.OCMIKNOMINM(nIKHAICFGNM, PIOGLIJBPLL);
-					int count = PIOGLIJBPLL.Count;
+					candidateAnimations.Clear();
+					AnimationData.AddTemplateAnimationsByNames(nIKHAICFGNM, candidateAnimations);
+					int count = candidateAnimations.Count;
 					int num14 = 0;
 					for (int i = 0; i < count; i++)
 					{
-						InfoAnimation pJAHIOELGGD4 = PIOGLIJBPLL[i];
+						InfoAnimation pJAHIOELGGD4 = candidateAnimations[i];
 						if (TestWall(pJAHIOELGGD4, _Model, FNKFIMEDNLP))
 						{
 							if (num14 < i)
 							{
-								PIOGLIJBPLL[num14] = pJAHIOELGGD4;
+								candidateAnimations[num14] = pJAHIOELGGD4;
 							}
 							num14++;
 						}
 					}
 					count = num14;
-					PIOGLIJBPLL.CPCAJIKOIEE(count);
-					float num15 = oJIEPADIEDE.FHGNPPBLIIL();
-					if (NPIOFGMJDKI == BHIOPDNPEPA.Missile)
+					candidateAnimations.Resize(count);
+					float num15 = oJIEPADIEDE.GetStartPosition();
+					if (NPIOFGMJDKI == AnimationListType.Missile)
 					{
-						num15 = oJIEPADIEDE.LPNPNBJGKJM();
+						num15 = oJIEPADIEDE.GetFirstStartPositionX();
 					}
-					int num16 = oJIEPADIEDE.KFCNPADAMHA();
-					foreach (TacticalTable item3 in kMLMHGLLOHM.DOCMMNLEAMH)
+					int num16 = oJIEPADIEDE.GetSign();
+					foreach (TacticalTable item3 in kMLMHGLLOHM.Tables)
 					{
 						string hOGFLOLGGOL = item3.Label;
 						int num17;
-						if (NPIOFGMJDKI == BHIOPDNPEPA.Missile)
+						if (NPIOFGMJDKI == AnimationListType.Missile)
 						{
 							num17 = num;
 						}
@@ -1933,10 +1933,10 @@ public class ModelAi
 						if (-1 < num17)
 						{
 							float num20 = GetNodeX(hOGFLOLGGOL, _Model, FNKFIMEDNLP.GetRootModel());
-							float oIOMNNFMDOO2 = (float)num16 * (num20 - num15) + OCCHDKNLAON;
+							float oIOMNNFMDOO2 = (float)num16 * (num20 - num15) + distanceError;
 							Intervals gOOGNIPMCEM2 = null;
-							gOOGNIPMCEM2 = ((num17 >= item3.OCFKLCDIEBF.Count) ? item3.OCFKLCDIEBF[0] : item3.OCFKLCDIEBF[num17]);
-							foreach (IntervalNew item4 in gOOGNIPMCEM2.MFFPCMPGEBK)
+							gOOGNIPMCEM2 = ((num17 >= item3.IntervalList.Count) ? item3.IntervalList[0] : item3.IntervalList[num17]);
+							foreach (IntervalNew item4 in gOOGNIPMCEM2.Items)
 							{
 								int num21 = item4.GetInterframeByDistance(oIOMNNFMDOO2);
 								if (0 >= num21)
@@ -1945,10 +1945,10 @@ public class ModelAi
 								}
 								for (int j = 0; j < count; j++)
 								{
-									if (PIOGLIJBPLL[j] == item4.FGICHADOEHF)
+									if (candidateAnimations[j] == item4.Animation)
 									{
 										count--;
-										PIOGLIJBPLL[j] = PIOGLIJBPLL[count];
+										candidateAnimations[j] = candidateAnimations[count];
 										break;
 									}
 								}
@@ -1959,90 +1959,90 @@ public class ModelAi
 							count = 0;
 						}
 					}
-					PIOGLIJBPLL.CPCAJIKOIEE(count);
-					IntervalAnimation mNOIEOBBCMI = oJIEPADIEDE.HDJBHPOGKNJ(IntervalAnimation.NGAJJDIEDGF.INTERVAL_UNINTERRUPT);
+					candidateAnimations.Resize(count);
+					IntervalAnimation mNOIEOBBCMI = oJIEPADIEDE.FindInterval(IntervalAnimation.IntervalType.INTERVAL_UNINTERRUPT);
 					InfoAnimation pJAHIOELGGD5 = pJAHIOELGGD;
-					bool flag3 = oJIEPADIEDE.NMEEPBDJHMG();
+					bool flag3 = oJIEPADIEDE.GetIsPlaying();
 					if (mNOIEOBBCMI != null && pJAHIOELGGD5 != null && flag3)
 					{
-						int num22 = pJAHIOELGGD5.IKFCNCLKDGD(true);
-						int num23 = num22 - MEHOEEIGCEP;
+						int num22 = pJAHIOELGGD5.GetLastUninterruptFrame(true);
+						int num23 = num22 - enemyFrame;
 						for (int k = 0; k < count; k++)
 						{
-							InfoAnimation pJAHIOELGGD6 = PIOGLIJBPLL[k];
-							int num24 = pJAHIOELGGD6.IKFCNCLKDGD(true);
+							InfoAnimation pJAHIOELGGD6 = candidateAnimations[k];
+							int num24 = pJAHIOELGGD6.GetLastUninterruptFrame(true);
 							if (num23 <= num24 && !IsSafeDodges(pJAHIOELGGD6))
 							{
 								count--;
-								PIOGLIJBPLL[k] = PIOGLIJBPLL[count];
+								candidateAnimations[k] = candidateAnimations[count];
 								k--;
 							}
 						}
-						PIOGLIJBPLL.CPCAJIKOIEE(count);
+						candidateAnimations.Resize(count);
 					}
-					int count2 = PIOGLIJBPLL.Count;
+					int count2 = candidateAnimations.Count;
 					if (0 < count2)
 					{
-						count2 = GetPlayableAnimations(PIOGLIJBPLL);
+						count2 = GetPlayableAnimations(candidateAnimations);
 					}
-					if (PIOGLIJBPLL.Count == 0 && NPIOFGMJDKI == BHIOPDNPEPA.Standard)
+					if (candidateAnimations.Count == 0 && NPIOFGMJDKI == AnimationListType.Standard)
 					{
 						List<TemplateAnimation> list3 = AiData.get_EmergencyDodgesAnimations();
 						foreach (TemplateAnimation item5 in list3)
 						{
-							List<InfoAnimation> list4 = item5.LDEBJOPLCKO();
+							List<InfoAnimation> list4 = item5.GetAnimations();
 							foreach (InfoAnimation item6 in list4)
 							{
-								PIOGLIJBPLL.Add(item6);
+								candidateAnimations.Add(item6);
 							}
 						}
-						count2 = GetPlayableAnimations(PIOGLIJBPLL, null, true);
+						count2 = GetPlayableAnimations(candidateAnimations, null, true);
 					}
-					int num25 = PIOGLIJBPLL.Count;
+					int num25 = candidateAnimations.Count;
 					if (0 < num25)
 					{
-						num25 = GetPlayableAnimations(PIOGLIJBPLL);
+						num25 = GetPlayableAnimations(candidateAnimations);
 					}
 					for (int l = 0; l < num25; l++)
 					{
-						int num26 = pJAHIOELGGD.MLLLLMFLOBG(true);
-						int jOHDCPNACOC2 = num26 - MEHOEEIGCEP + 1;
-						NCBNEMAOHJE.Add(new Decision(PIOGLIJBPLL[l], jOHDCPNACOC2));
+						int num26 = pJAHIOELGGD.GetLastAttackFrame(true);
+						int jOHDCPNACOC2 = num26 - enemyFrame + 1;
+						decisions.Add(new Decision(candidateAnimations[l], jOHDCPNACOC2));
 					}
 				}
-				return NCBNEMAOHJE.Count;
+				return decisions.Count;
 			}
-			LLLOJBFMONN.Write("null dodge table");
+			GameLog.Write("null dodge table");
 			return 0;
 		}
-		LLLOJBFMONN.Write("null dodge table");
+		GameLog.Write("null dodge table");
 		return 0;
 	}
 
-	private int GetForDodgeMissiles(Model FNKFIMEDNLP, MFHIONPNAGO OKIFFDGBGDA)
+	private int GetForDodgeMissiles(Model FNKFIMEDNLP, MissileKind OKIFFDGBGDA)
 	{
 		int num = 0;
 		List<Decision> list = new List<Decision>();
-		List<Decision> list2 = new List<Decision>(NCBNEMAOHJE);
+		List<Decision> list2 = new List<Decision>(decisions);
 		int i = 0;
 		for (int count = FNKFIMEDNLP.GetWeaponModels().Count; i < count; i++)
 		{
 			WeaponModel gKIANLDJFCH = FNKFIMEDNLP.GetWeaponModels()[i];
 			List<Decision> jOJBDADJOAP = new List<Decision>(list);
-			if ((IsMissileAnimation(gKIANLDJFCH.OCPMJKIEPIG().NNMAFFCCMHC()) || OKIFFDGBGDA != MFHIONPNAGO.SimpleMissile) && (IsMagicAnimation(gKIANLDJFCH.OCPMJKIEPIG().NNMAFFCCMHC()) || OKIFFDGBGDA != MFHIONPNAGO.MagicMissile) && gKIANLDJFCH.OCPMJKIEPIG().NNMAFFCCMHC() != null)
+			if ((IsMissileAnimation(gKIANLDJFCH.GetAnimationModule().GetCurrentInfo()) || OKIFFDGBGDA != MissileKind.SimpleMissile) && (IsMagicAnimation(gKIANLDJFCH.GetAnimationModule().GetCurrentInfo()) || OKIFFDGBGDA != MissileKind.MagicMissile) && gKIANLDJFCH.GetAnimationModule().GetCurrentInfo() != null)
 			{
-				num = GetFromTablesDodge(gKIANLDJFCH, BHIOPDNPEPA.Missile);
-				list = ((list.Count <= 0) ? new List<Decision>(NCBNEMAOHJE) : Intersection(jOJBDADJOAP, NCBNEMAOHJE));
+				num = GetFromTablesDodge(gKIANLDJFCH, AnimationListType.Missile);
+				list = ((list.Count <= 0) ? new List<Decision>(decisions) : Intersection(jOJBDADJOAP, decisions));
 			}
 		}
 		num = list.Count;
 		if (list2.Count != 0)
 		{
-			NCBNEMAOHJE = Intersection(list2, list);
+			decisions = Intersection(list2, list);
 		}
 		else
 		{
-			NCBNEMAOHJE = list;
+			decisions = list;
 		}
 		return num;
 	}
@@ -2061,13 +2061,13 @@ public class ModelAi
 			Intervals gOOGNIPMCEM = iCLOAGENLJG.GetFrameByFrameIndex(FMNGLKIGFNA);
 			if (gOOGNIPMCEM != null)
 			{
-				foreach (IntervalNew item in gOOGNIPMCEM.MFFPCMPGEBK)
+				foreach (IntervalNew item in gOOGNIPMCEM.Items)
 				{
 					int num = item.GetInterframeByDistance(OIOMNNFMDOO);
 					if (0 < num)
 					{
-						OEMALIFPGPO.Add(new Decision(item.FGICHADOEHF, num));
-						AddModTacticAlternatives(item.FGICHADOEHF, num, OEMALIFPGPO);
+						OEMALIFPGPO.Add(new Decision(item.Animation, num));
+						AddModTacticAlternatives(item.Animation, num, OEMALIFPGPO);
 					}
 				}
 			}
@@ -2103,7 +2103,7 @@ public class ModelAi
 			_modTacticAlternatives.Clear();
 			foreach (InfoAnimation move in available)
 			{
-				InfoAnimation native = move?.IMFGMAAEMIC();
+				InfoAnimation native = move?.GetTacticEquivalent();
 				// Mod runtime names are content IDs; native move names never contain ':'.
 				if (native == null || move.Name == null || move.Name.IndexOf(':') < 0)
 				{
@@ -2128,12 +2128,12 @@ public class ModelAi
 	private int GetModelDirection(Model ACENLMONNPA, Model FNKFIMEDNLP)
 	{
 		int num = 0;
-		if (ACENLMONNPA.CLDMEJKGLBA().CJELIBMCCMA() == null || FNKFIMEDNLP.CLDMEJKGLBA().CJELIBMCCMA() == null)
+		if (ACENLMONNPA.GetBodyObject().GetPivotNode() == null || FNKFIMEDNLP.GetBodyObject().GetPivotNode() == null)
 		{
 			return 0;
 		}
-		return (ACENLMONNPA.CLDMEJKGLBA().CJELIBMCCMA().GetStart()
-			.GetX() < FNKFIMEDNLP.CLDMEJKGLBA().CJELIBMCCMA().GetStart()
+		return (ACENLMONNPA.GetBodyObject().GetPivotNode().GetStart()
+			.GetX() < FNKFIMEDNLP.GetBodyObject().GetPivotNode().GetStart()
 			.GetX()) ? 1 : (-1);
 	}
 
@@ -2144,7 +2144,7 @@ public class ModelAi
 		{
 			foreach (Decision item2 in DLADGODCJMD)
 			{
-				if (item2.FGICHADOEHF == item.FGICHADOEHF)
+				if (item2.Animation == item.Animation)
 				{
 					list.Add(item);
 				}
@@ -2167,30 +2167,30 @@ public class ModelAi
 
 	private bool TestBack(InfoAnimation DBOLBEOCEME, Model ACENLMONNPA, Model FNKFIMEDNLP, string name, string ODEADGPBDEM)
 	{
-		float num = ACENLMONNPA.CLDMEJKGLBA().EGHIDHMENEF(name).GetStart()
+		float num = ACENLMONNPA.GetBodyObject().GetNodeByName(name).GetStart()
 			.GetX();
-		float num2 = FNKFIMEDNLP.CLDMEJKGLBA().EGHIDHMENEF(ODEADGPBDEM).GetStart()
+		float num2 = FNKFIMEDNLP.GetBodyObject().GetNodeByName(ODEADGPBDEM).GetStart()
 			.GetX();
-		int num3 = DBOLBEOCEME.IKFCNCLKDGD(true);
+		int num3 = DBOLBEOCEME.GetLastUninterruptFrame(true);
 		if (num3 < 0)
 		{
 			num3 = 0;
 		}
-		float num4 = DBOLBEOCEME.OBIBINIEJJE.GetDistance(num3, name);
+		float num4 = DBOLBEOCEME.ShiftTable.GetDistance(num3, name);
 		float num5 = num + (float)GetModelDirection(ACENLMONNPA, FNKFIMEDNLP) * num4;
 		float num8;
-		if (FNKFIMEDNLP.OCPMJKIEPIG().NMEEPBDJHMG())
+		if (FNKFIMEDNLP.GetAnimationModule().GetIsPlaying())
 		{
-			InfoAnimation pJAHIOELGGD = FNKFIMEDNLP.OCPMJKIEPIG().NNMAFFCCMHC();
-			int mEHOEEIGCEP = MEHOEEIGCEP;
+			InfoAnimation pJAHIOELGGD = FNKFIMEDNLP.GetAnimationModule().GetCurrentInfo();
+			int mEHOEEIGCEP = enemyFrame;
 			int jAPBDIJOKDJ = mEHOEEIGCEP + num3;
-			float num6 = pJAHIOELGGD.OBIBINIEJJE.GetDistance(jAPBDIJOKDJ, ODEADGPBDEM);
-			float num7 = FNKFIMEDNLP.OCPMJKIEPIG().FHGNPPBLIIL();
-			num8 = num7 + (float)FNKFIMEDNLP.KFCNPADAMHA() * num6;
+			float num6 = pJAHIOELGGD.ShiftTable.GetDistance(jAPBDIJOKDJ, ODEADGPBDEM);
+			float num7 = FNKFIMEDNLP.GetAnimationModule().GetStartPosition();
+			num8 = num7 + (float)FNKFIMEDNLP.GetFacingSign() * num6;
 		}
 		else
 		{
-			num8 = FNKFIMEDNLP.CLDMEJKGLBA().EGHIDHMENEF(ODEADGPBDEM).GetStart()
+			num8 = FNKFIMEDNLP.GetBodyObject().GetNodeByName(ODEADGPBDEM).GetStart()
 				.GetX();
 		}
 		if ((num - num2) * (num5 - num8) < 0f)
@@ -2202,19 +2202,19 @@ public class ModelAi
 
 	private bool TestWall(InfoAnimation DBOLBEOCEME, Model ACENLMONNPA, Model FNKFIMEDNLP, string name)
 	{
-		int num = DBOLBEOCEME.IKFCNCLKDGD(true);
+		int num = DBOLBEOCEME.GetLastUninterruptFrame(true);
 		if (num < 0)
 		{
 			num = 0;
 		}
-		float num2 = ACENLMONNPA.CLDMEJKGLBA().EGHIDHMENEF(name).GetStart()
+		float num2 = ACENLMONNPA.GetBodyObject().GetNodeByName(name).GetStart()
 			.GetX();
-		float num3 = DBOLBEOCEME.OBIBINIEJJE.GetDistance(num, name);
+		float num3 = DBOLBEOCEME.ShiftTable.GetDistance(num, name);
 		float num4 = num2 + (float)GetModelDirection(ACENLMONNPA, FNKFIMEDNLP) * num3;
-		float num5 = ACENLMONNPA.OCPMJKIEPIG().KJFIBMMOEPI();
-		float num6 = ACENLMONNPA.OCPMJKIEPIG().PHHHEGOBAPB();
-		float num7 = ACENLMONNPA.OCPMJKIEPIG().IHKKEEOCOOF();
-		float num8 = ACENLMONNPA.OCPMJKIEPIG().INAOPLIFJEJ();
+		float num5 = ACENLMONNPA.GetAnimationModule().GetLeftWallX();
+		float num6 = ACENLMONNPA.GetAnimationModule().GetRightWallX();
+		float num7 = ACENLMONNPA.GetAnimationModule().GetFrontAlignMargin();
+		float num8 = ACENLMONNPA.GetAnimationModule().GetBackAlignMargin();
 		float num9 = ((!(num8 < num7)) ? num8 : num7);
 		if (num4 - num9 < num5 || num6 < num4 + num9)
 		{
@@ -2228,7 +2228,7 @@ public class ModelAi
 		List<IntervalAnimation> cAANBJEPGAA = DBOLBEOCEME.MoveData.Intervals;
 		foreach (IntervalAnimation item in cAANBJEPGAA)
 		{
-			if (item.Type == IntervalAnimation.NGAJJDIEDGF.INTERVAL_ATTACK)
+			if (item.Type == IntervalAnimation.IntervalType.INTERVAL_ATTACK)
 			{
 				return true;
 			}
@@ -2238,47 +2238,47 @@ public class ModelAi
 
 	private void SetQuickAttackRnd()
 	{
-		List<global::Pair<string, TacticValue>> list = GIBODDNLGJH.get_QuickAttacks();
+		List<global::Pair<string, TacticValue>> list = tactic.get_QuickAttacks();
 		int count = list.Count;
-		OAPNPEFCBJB.CPCAJIKOIEE(count);
-		foreach (BHDKGLJIOJD item in OAPNPEFCBJB)
+		quickAttackRolls.Resize(count);
+		foreach (ChanceRoll item in quickAttackRolls)
 		{
-			item.NKFHNNFHLMM = NekkiMath.randomFloat();
+			item.Roll = NekkiMath.randomFloat();
 		}
 	}
 
 	private void SetQuickAttackChances(TacticFactors FJCBLOKOBBD)
 	{
-		List<global::Pair<string, TacticValue>> list = GIBODDNLGJH.get_QuickAttacks();
+		List<global::Pair<string, TacticValue>> list = tactic.get_QuickAttacks();
 		int count = list.Count;
 		for (int i = 0; i < count; i++)
 		{
-			BHDKGLJIOJD bHDKGLJIOJD = OAPNPEFCBJB[i];
-			bHDKGLJIOJD.PAIFCMNKFCP = list[i].Second.GetValue(FJCBLOKOBBD);
-			bHDKGLJIOJD.Flag = bHDKGLJIOJD.NKFHNNFHLMM < bHDKGLJIOJD.PAIFCMNKFCP;
+			ChanceRoll bHDKGLJIOJD = quickAttackRolls[i];
+			bHDKGLJIOJD.Chance = list[i].Second.GetValue(FJCBLOKOBBD);
+			bHDKGLJIOJD.Flag = bHDKGLJIOJD.Roll < bHDKGLJIOJD.Chance;
 		}
 	}
 
 	private void SetEvadesRnd()
 	{
-		List<global::Pair<string, TacticValue>> list = GIBODDNLGJH.get_Evades();
+		List<global::Pair<string, TacticValue>> list = tactic.get_Evades();
 		int count = list.Count;
-		JNOMCJLDJGE.CPCAJIKOIEE(count);
-		foreach (BHDKGLJIOJD item in JNOMCJLDJGE)
+		evadeRolls.Resize(count);
+		foreach (ChanceRoll item in evadeRolls)
 		{
-			item.NKFHNNFHLMM = NekkiMath.randomFloat();
+			item.Roll = NekkiMath.randomFloat();
 		}
 	}
 
 	private void SetEvadesChances(TacticFactors FJCBLOKOBBD)
 	{
-		List<global::Pair<string, TacticValue>> list = GIBODDNLGJH.get_Evades();
+		List<global::Pair<string, TacticValue>> list = tactic.get_Evades();
 		int count = list.Count;
 		for (int i = 0; i < count; i++)
 		{
-			BHDKGLJIOJD bHDKGLJIOJD = JNOMCJLDJGE[i];
-			bHDKGLJIOJD.PAIFCMNKFCP = list[i].Second.GetValue(FJCBLOKOBBD);
-			bHDKGLJIOJD.Flag = bHDKGLJIOJD.NKFHNNFHLMM < bHDKGLJIOJD.PAIFCMNKFCP;
+			ChanceRoll bHDKGLJIOJD = evadeRolls[i];
+			bHDKGLJIOJD.Chance = list[i].Second.GetValue(FJCBLOKOBBD);
+			bHDKGLJIOJD.Flag = bHDKGLJIOJD.Roll < bHDKGLJIOJD.Chance;
 		}
 	}
 
@@ -2286,9 +2286,9 @@ public class ModelAi
 	{
 		int aOJJBKLCHJO = GetModelDirection(ACENLMONNPA, ACENLMONNPA.GetCombatTarget().GetRootModel());
 		int aOJJBKLCHJO2 = GetModelDirection(ACENLMONNPA.GetCombatTarget().GetRootModel(), ACENLMONNPA);
-		ModelNode lCDGOCIAIDK = ACENLMONNPA.OCPMJKIEPIG().EGHIDHMENEF(AiData.get_DistanceNode(), aOJJBKLCHJO);
-		ModelNode lCDGOCIAIDK2 = ACENLMONNPA.GetCombatTarget().GetRootModel().OCPMJKIEPIG()
-			.EGHIDHMENEF(AiData.get_DistanceNode(), aOJJBKLCHJO2);
+		ModelNode lCDGOCIAIDK = ACENLMONNPA.GetAnimationModule().GetNodeByNameForSign(AiData.get_DistanceNode(), aOJJBKLCHJO);
+		ModelNode lCDGOCIAIDK2 = ACENLMONNPA.GetCombatTarget().GetRootModel().GetAnimationModule()
+			.GetNodeByNameForSign(AiData.get_DistanceNode(), aOJJBKLCHJO2);
 		if (lCDGOCIAIDK != null && lCDGOCIAIDK2 != null)
 		{
 			float f = lCDGOCIAIDK.GetStart().GetX() - lCDGOCIAIDK2.GetStart().GetX();
@@ -2299,15 +2299,15 @@ public class ModelAi
 
 	private TacticFactors SetFactors(Model FNKFIMEDNLP)
 	{
-		TacticFactors oHKCJDCMOKN = new TacticFactors(_Model.FGACEEPJBIF(), _Model.GLEKCPCMINJ(), _Model.GetMagicCharges());
-		_Model.FGACEEPJBIF().GetCountAndDamage(true, COKFBIJAFLH, ref oHKCJDCMOKN.EOGLBDCLMBM, ref oHKCJDCMOKN.KFMJMBANIGF, ref oHKCJDCMOKN.AAKOCIPFDNM);
-		oHKCJDCMOKN.MGICNNKKCAN = (ObscuredFloat)(_Model.Parameters.KKMCHCNOHMB());
-		oHKCJDCMOKN.DDGNCMJGDAG = (ObscuredFloat)(FNKFIMEDNLP.Parameters.KKMCHCNOHMB());
-		oHKCJDCMOKN.OLCKGMBDGOG = FNKFIMEDNLP.OCPMJKIEPIG().GetFrameInMove();
-		oHKCJDCMOKN.NGMLGDJGBCD = ChildMaxModelFrame(FNKFIMEDNLP);
-		oHKCJDCMOKN.DDFBIOFIDIH = GetDistanceToEnemy(_Model);
-		oHKCJDCMOKN.HDCPIAPMFNO = _Model.OCPMJKIEPIG().NNMAFFCCMHC();
-		oHKCJDCMOKN.PBDLLNEOIDG = FNKFIMEDNLP.OCPMJKIEPIG().NNMAFFCCMHC();
+		TacticFactors oHKCJDCMOKN = new TacticFactors(_Model.GetModelStats(), _Model.GetNoRangedFlag(), _Model.GetMagicCharges());
+		_Model.GetModelStats().GetCountAndDamage(true, enemyAnimation, ref oHKCJDCMOKN.FactorsCount, ref oHKCJDCMOKN.Damage, ref oHKCJDCMOKN.Hits);
+		oHKCJDCMOKN.Health = (ObscuredFloat)(_Model.Parameters.GetCurrentLife());
+		oHKCJDCMOKN.EnemyHealth = (ObscuredFloat)(FNKFIMEDNLP.Parameters.GetCurrentLife());
+		oHKCJDCMOKN.AnimationFrames = FNKFIMEDNLP.GetAnimationModule().GetFrameInMove();
+		oHKCJDCMOKN.ChildFrames = ChildMaxModelFrame(FNKFIMEDNLP);
+		oHKCJDCMOKN.Distance = GetDistanceToEnemy(_Model);
+		oHKCJDCMOKN.CurrentAnimation = _Model.GetAnimationModule().GetCurrentInfo();
+		oHKCJDCMOKN.EnemyCurrentAnimation = FNKFIMEDNLP.GetAnimationModule().GetCurrentInfo();
 		return oHKCJDCMOKN;
 	}
 }

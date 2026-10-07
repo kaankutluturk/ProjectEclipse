@@ -11,7 +11,7 @@ public class PerkStruct
 
 	private List<string> _itemTypes = new List<string>();
 
-	private List<KeyValuePair<string, string>> MAPHFLOPAOD = new List<KeyValuePair<string, string>>();
+	private List<KeyValuePair<string, string>> setPairs = new List<KeyValuePair<string, string>>();
 
 	private string _eclipseEnchantment = string.Empty;
 
@@ -20,11 +20,11 @@ public class PerkStruct
 	private readonly Dictionary<string, string> _eclipseParameters =
 		new Dictionary<string, string>(System.StringComparer.Ordinal);
 
-	public List<string> NMOKPAPJLCN
+	public List<string> ItemTypes
 	{
 		get
 		{
-			return DCAOANOEJGF();
+			return GetItemTypes();
 		}
 	}
 
@@ -32,7 +32,7 @@ public class PerkStruct
 	{
 		get
 		{
-			return EOLPAHGCMHH();
+			return GetPairs();
 		}
 	}
 
@@ -66,21 +66,21 @@ public class PerkStruct
 		{
 			_itemTypes.Add(string.Copy(DHDMNHCIPEH));
 		});
-		MAPHFLOPAOD = new List<KeyValuePair<string, string>>();
-		NOLFMPDGCOC.MAPHFLOPAOD.ForEach((KeyValuePair<string, string> DHDMNHCIPEH) =>
+		setPairs = new List<KeyValuePair<string, string>>();
+		NOLFMPDGCOC.setPairs.ForEach((KeyValuePair<string, string> DHDMNHCIPEH) =>
 		{
 			string key = string.Copy(DHDMNHCIPEH.Key);
 			string value = string.Copy(DHDMNHCIPEH.Value);
-			MAPHFLOPAOD.Add(new KeyValuePair<string, string>(key, value));
+			setPairs.Add(new KeyValuePair<string, string>(key, value));
 		});
 	}
 
 	public PerkStruct(XmlNode node)
 	{
-		_name = node.Attributes["Name"].CIPOICEEIBK(string.Empty);
-		_eclipseEnchantment = node.Attributes[EclipseEnchantmentAttribute].CIPOICEEIBK(string.Empty);
-		_eclipseKind = node.Attributes[EclipseKindAttribute].CIPOICEEIBK(string.Empty);
-		string text = node.Attributes["ItemType"].CIPOICEEIBK(string.Empty);
+		_name = node.Attributes["Name"].GetStringOrDefault(string.Empty);
+		_eclipseEnchantment = node.Attributes[EclipseEnchantmentAttribute].GetStringOrDefault(string.Empty);
+		_eclipseKind = node.Attributes[EclipseKindAttribute].GetStringOrDefault(string.Empty);
+		string text = node.Attributes["ItemType"].GetStringOrDefault(string.Empty);
 		if (text != null)
 		{
 			string[] collection = text.Split('|');
@@ -104,8 +104,8 @@ public class PerkStruct
 		{
 			foreach (XmlAttribute attribute in xmlNode.Attributes)
 			{
-				KeyValuePair<string, string> item = new KeyValuePair<string, string>(attribute.Name, attribute.CIPOICEEIBK(string.Empty));
-				MAPHFLOPAOD.Add(item);
+				KeyValuePair<string, string> item = new KeyValuePair<string, string>(attribute.Name, attribute.GetStringOrDefault(string.Empty));
+				setPairs.Add(item);
 			}
 		}
 	}
@@ -115,14 +115,14 @@ public class PerkStruct
 		return _name;
 	}
 
-	public List<string> DCAOANOEJGF()
+	public List<string> GetItemTypes()
 	{
 		return _itemTypes;
 	}
 
-	public List<KeyValuePair<string, string>> EOLPAHGCMHH()
+	public List<KeyValuePair<string, string>> GetPairs()
 	{
-		return MAPHFLOPAOD;
+		return setPairs;
 	}
 
 	private bool CompareItemType(string LMNNBBKHMEI)
@@ -137,23 +137,23 @@ public class PerkStruct
 		return false;
 	}
 
-	public void MLONLJGHDEA()
+	public void EvaluatePairValues()
 	{
 		FunctionExtension oPIFBDJNMKD = new FunctionExtension();
-		PerkInfoItem aCONCDFDNJH = GameUtils.FDEJIIDIPBI.ABAGJKMKCBA(_name);
+		PerkInfoItem aCONCDFDNJH = GameUtils.PerkItemList.FindBasePerk(_name);
 		if (aCONCDFDNJH == null)
 		{
 			return;
 		}
 		List<KeyValuePair<string, string>> list = new List<KeyValuePair<string, string>>();
-		foreach (KeyValuePair<string, string> item in MAPHFLOPAOD)
+		foreach (KeyValuePair<string, string> item in setPairs)
 		{
 			oPIFBDJNMKD.Parse(item.Value);
-			oPIFBDJNMKD.PBPBNENGLPA(aCONCDFDNJH.HJFEFJIEINN);
-			oPIFBDJNMKD.DMPCFMACDJM(aCONCDFDNJH.OKPFNCJFLDL);
-			FunctionResult dEIHAOLOPLC = oPIFBDJNMKD.IBCPKBBAFNH();
-			list.Add(new KeyValuePair<string, string>(item.Key, dEIHAOLOPLC.DCJLKCFKCOM));
+			oPIFBDJNMKD.SetFunctionCallback(aCONCDFDNJH.EvaluateFunctionCallback);
+			oPIFBDJNMKD.SetVariableCallback(aCONCDFDNJH.OnFunctionPreCallback);
+			FunctionResult dEIHAOLOPLC = oPIFBDJNMKD.Calculate();
+			list.Add(new KeyValuePair<string, string>(item.Key, dEIHAOLOPLC.Value));
 		}
-		MAPHFLOPAOD = list;
+		setPairs = list;
 	}
 }

@@ -12,19 +12,19 @@ namespace Nekki.SF2.GUI
 			{
 				base.targetGraphic = base.gameObject.GetComponent<ResolutionImage>();
 			}
-			FMMBMFBAFKJ();
+			RemapStateSprites();
 		}
 
-		private void FMMBMFBAFKJ()
+		private void RemapStateSprites()
 		{
 			SpriteState spriteState = base.spriteState;
-			GCOCMIMOIBH(spriteState.disabledSprite);
-			GCOCMIMOIBH(spriteState.highlightedSprite);
-			GCOCMIMOIBH(spriteState.pressedSprite);
+			RemapSprite(spriteState.disabledSprite);
+			RemapSprite(spriteState.highlightedSprite);
+			RemapSprite(spriteState.pressedSprite);
 			base.spriteState = spriteState;
 		}
 
-		private void GCOCMIMOIBH(Sprite GBIOHMNNEJI)
+		private void RemapSprite(Sprite GBIOHMNNEJI)
 		{
 			if (!(GBIOHMNNEJI == null))
 			{
@@ -38,7 +38,7 @@ namespace Nekki.SF2.GUI
 		{
 			SpriteState spriteState = base.spriteState;
 			spriteState.disabledSprite = GBIOHMNNEJI;
-			GCOCMIMOIBH(spriteState.disabledSprite);
+			RemapSprite(spriteState.disabledSprite);
 			base.spriteState = spriteState;
 		}
 
@@ -53,7 +53,7 @@ namespace Nekki.SF2.GUI
 		{
 			SpriteState spriteState = base.spriteState;
 			spriteState.highlightedSprite = GBIOHMNNEJI;
-			GCOCMIMOIBH(spriteState.highlightedSprite);
+			RemapSprite(spriteState.highlightedSprite);
 			base.spriteState = spriteState;
 		}
 
@@ -68,7 +68,7 @@ namespace Nekki.SF2.GUI
 		{
 			SpriteState spriteState = base.spriteState;
 			spriteState.pressedSprite = GBIOHMNNEJI;
-			GCOCMIMOIBH(spriteState.pressedSprite);
+			RemapSprite(spriteState.pressedSprite);
 			base.spriteState = spriteState;
 		}
 

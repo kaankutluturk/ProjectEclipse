@@ -3,21 +3,21 @@ using Unity.IO.Compression;
 
 internal class Inflater
 {
-	private static readonly byte[] DEODDHFPBFE = new byte[29]
+	private static readonly byte[] extraLengthBits = new byte[29]
 	{
 		0, 0, 0, 0, 0, 0, 0, 0, 1, 1,
 		1, 1, 2, 2, 2, 2, 3, 3, 3, 3,
 		4, 4, 4, 4, 5, 5, 5, 5, 0
 	};
 
-	private static readonly int[] NMNHMEJNLKB = new int[29]
+	private static readonly int[] lengthBase = new int[29]
 	{
 		3, 4, 5, 6, 7, 8, 9, 10, 11, 13,
 		15, 17, 19, 23, 27, 31, 35, 43, 51, 59,
 		67, 83, 99, 115, 131, 163, 195, 227, 258
 	};
 
-	private static readonly int[] KCGFDBBLOLL = new int[32]
+	private static readonly int[] distanceBasePosition = new int[32]
 	{
 		1, 2, 3, 4, 5, 7, 9, 13, 17, 25,
 		33, 49, 65, 97, 129, 193, 257, 385, 513, 769,
@@ -25,13 +25,13 @@ internal class Inflater
 		0, 0
 	};
 
-	private static readonly byte[] KCDJIAOANON = new byte[19]
+	private static readonly byte[] codeOrder = new byte[19]
 	{
 		16, 17, 18, 0, 8, 7, 9, 6, 10, 5,
 		11, 4, 12, 3, 13, 2, 14, 1, 15
 	};
 
-	private static readonly byte[] MIHBNJNICPA = new byte[32]
+	private static readonly byte[] staticDistanceTreeTable = new byte[32]
 	{
 		0, 16, 8, 24, 4, 20, 12, 28, 2, 18,
 		10, 26, 6, 22, 14, 30, 1, 17, 9, 25,
@@ -41,70 +41,70 @@ internal class Inflater
 
 	private OutputWindow output;
 
-	private InputBuffer NILNDHEKNLJ;
+	private InputBuffer input;
 
-	private HuffmanTree BADNHOBGEBO;
+	private HuffmanTree literalLengthTree;
 
-	private HuffmanTree IOBEEOPEKJJ;
+	private HuffmanTree distanceTree;
 
-	private BGMMMMHMIJF state;
+	private InflaterState state;
 
 	private bool hasFormatReader;
 
-	private int PCLGPAHIBGH;
+	private int bfinal;
 
-	private BPKEFFDGEIC AGJCDPOFIFE;
+	private BlockType blockType;
 
-	private byte[] JEGPOHGJPIK = new byte[4];
+	private byte[] blockLengthBuffer = new byte[4];
 
-	private int IHIGJLEBJBI;
+	private int blockLength;
 
-	private int BDBOAEGELMC;
+	private int length;
 
-	private int GHCFEMCPBFA;
+	private int distanceCode;
 
 	private int extraBits;
 
-	private int DOLKGPHFKPJ;
+	private int loopCounter;
 
-	private int GOIJLBOAAJO;
+	private int literalLengthCodeCount;
 
-	private int NHDAMIACBBI;
+	private int distanceCodeCount;
 
-	private int DIOGELJGGFC;
+	private int codeLengthCodeCount;
 
-	private int AGBMNMICLFA;
+	private int codeArraySize;
 
-	private int PCPIKCIKHLO;
+	private int lengthCode;
 
-	private byte[] OBEOJJGLMFG;
+	private byte[] codeList;
 
-	private byte[] KKIAJONPLKI;
+	private byte[] codeLengthTreeCodeLength;
 
-	private HuffmanTree PFCJKHONLFF;
+	private HuffmanTree codeLengthTree;
 
-	private IFileFormatReader IECPCDGIJGM;
+	private IFileFormatReader formatReader;
 
-	public int GBEPDJCMOPF
+	public int AvailableOutput
 	{
 		get
 		{
-			return MLAADGBFCOP();
+			return GetAvailableOutput();
 		}
 	}
 
 	public Inflater()
 	{
 		output = new OutputWindow();
-		NILNDHEKNLJ = new InputBuffer();
-		OBEOJJGLMFG = new byte[320];
-		KKIAJONPLKI = new byte[19];
+		input = new InputBuffer();
+		codeList = new byte[320];
+		codeLengthTreeCodeLength = new byte[19];
 		Reset();
 	}
 
-	internal void LDBNNMLIKOC(IFileFormatReader reader)
+	internal void SetFileFormatReader(IFileFormatReader reader)
 	{
-		IECPCDGIJGM = reader;
+		formatReader = reader;
 		hasFormatReader = true;
 		Reset();
 	}
@@ -113,32 +113,32 @@ internal class Inflater
 	{
 		if (hasFormatReader)
 		{
-			state = BGMMMMHMIJF.ReadingHeader;
+			state = InflaterState.ReadingHeader;
 		}
 		else
 		{
-			state = BGMMMMHMIJF.ReadingBFinal;
+			state = InflaterState.ReadingBFinal;
 		}
 	}
 
 	public void SetInput(byte[] APACFLKJCKF, int IPCOBJBKNAO, int BDBOAEGELMC)
 	{
-		NILNDHEKNLJ.SetInput(APACFLKJCKF, IPCOBJBKNAO, BDBOAEGELMC);
+		input.SetInput(APACFLKJCKF, IPCOBJBKNAO, BDBOAEGELMC);
 	}
 
-	public bool ALDLIOBKDFF()
+	public bool Finished()
 	{
-		return state == BGMMMMHMIJF.Done || state == BGMMMMHMIJF.VerifyingFooter;
+		return state == InflaterState.Done || state == InflaterState.VerifyingFooter;
 	}
 
-	public int MLAADGBFCOP()
+	public int GetAvailableOutput()
 	{
-		return output.EJAHIMFDFJI();
+		return output.GetAvailableBytes();
 	}
 
 	public bool NeedsInput()
 	{
-		return NILNDHEKNLJ.NeedsInput();
+		return input.NeedsInput();
 	}
 
 	public int Inflate(byte[] KPAMPCLHCEN, int IPCOBJBKNAO, int BDBOAEGELMC)
@@ -151,17 +151,17 @@ internal class Inflater
 			{
 				if (hasFormatReader)
 				{
-					IECPCDGIJGM.UpdateWithBytesRead(KPAMPCLHCEN, IPCOBJBKNAO, num2);
+					formatReader.UpdateWithBytesRead(KPAMPCLHCEN, IPCOBJBKNAO, num2);
 				}
 				IPCOBJBKNAO += num2;
 				num += num2;
 				BDBOAEGELMC -= num2;
 			}
 		}
-		while (BDBOAEGELMC != 0 && !ALDLIOBKDFF() && Decode());
-		if (state == BGMMMMHMIJF.VerifyingFooter && output.EJAHIMFDFJI() == 0)
+		while (BDBOAEGELMC != 0 && !Finished() && Decode());
+		if (state == InflaterState.VerifyingFooter && output.GetAvailableBytes() == 0)
 		{
-			IECPCDGIJGM.FGCBJJKKILH();
+			formatReader.Validate();
 		}
 		return num;
 	}
@@ -170,140 +170,140 @@ internal class Inflater
 	{
 		bool DNCHJPDPNJK = false;
 		bool flag = false;
-		if (ALDLIOBKDFF())
+		if (Finished())
 		{
 			return true;
 		}
 		if (hasFormatReader)
 		{
-			if (state == BGMMMMHMIJF.ReadingHeader)
+			if (state == InflaterState.ReadingHeader)
 			{
-				if (!IECPCDGIJGM.DJJBPAJHJFI(NILNDHEKNLJ))
+				if (!formatReader.ReadHeader(input))
 				{
 					return false;
 				}
-				state = BGMMMMHMIJF.ReadingBFinal;
+				state = InflaterState.ReadingBFinal;
 			}
-			else if (state == BGMMMMHMIJF.StartReadingFooter || state == BGMMMMHMIJF.ReadingFooter)
+			else if (state == InflaterState.StartReadingFooter || state == InflaterState.ReadingFooter)
 			{
-				if (!IECPCDGIJGM.BEPMEBNFAEL(NILNDHEKNLJ))
+				if (!formatReader.ReadFooter(input))
 				{
 					return false;
 				}
-				state = BGMMMMHMIJF.VerifyingFooter;
+				state = InflaterState.VerifyingFooter;
 				return true;
 			}
 		}
-		if (state == BGMMMMHMIJF.ReadingBFinal)
+		if (state == InflaterState.ReadingBFinal)
 		{
-			if (!NILNDHEKNLJ.EnsureBitsAvailable(1))
+			if (!input.EnsureBitsAvailable(1))
 			{
 				return false;
 			}
-			PCLGPAHIBGH = NILNDHEKNLJ.GetBits(1);
-			state = BGMMMMHMIJF.ReadingBType;
+			bfinal = input.GetBits(1);
+			state = InflaterState.ReadingBType;
 		}
-		if (state == BGMMMMHMIJF.ReadingBType)
+		if (state == InflaterState.ReadingBType)
 		{
-			if (!NILNDHEKNLJ.EnsureBitsAvailable(2))
+			if (!input.EnsureBitsAvailable(2))
 			{
-				state = BGMMMMHMIJF.ReadingBType;
+				state = InflaterState.ReadingBType;
 				return false;
 			}
-			AGJCDPOFIFE = (BPKEFFDGEIC)NILNDHEKNLJ.GetBits(2);
-			if (AGJCDPOFIFE == BPKEFFDGEIC.Dynamic)
+			blockType = (BlockType)input.GetBits(2);
+			if (blockType == BlockType.Dynamic)
 			{
-				state = BGMMMMHMIJF.ReadingNumLitCodes;
+				state = InflaterState.ReadingNumLitCodes;
 			}
-			else if (AGJCDPOFIFE == BPKEFFDGEIC.Static)
+			else if (blockType == BlockType.Static)
 			{
-				BADNHOBGEBO = HuffmanTree.CMJKCGMHABI();
-				IOBEEOPEKJJ = HuffmanTree.CECHGKLBAAN();
-				state = BGMMMMHMIJF.DecodeTop;
+				literalLengthTree = HuffmanTree.GetStaticLiteralLengthTree();
+				distanceTree = HuffmanTree.GetStaticDistanceTree();
+				state = InflaterState.DecodeTop;
 			}
 			else
 			{
-				if (AGJCDPOFIFE != BPKEFFDGEIC.Uncompressed)
+				if (blockType != BlockType.Uncompressed)
 				{
 					throw new InvalidDataException(SR.GetString("Unknown block type"));
 				}
-				state = BGMMMMHMIJF.UncompressedAligning;
+				state = InflaterState.UncompressedAligning;
 			}
 		}
-		if (AGJCDPOFIFE == BPKEFFDGEIC.Dynamic)
+		if (blockType == BlockType.Dynamic)
 		{
-			flag = ((state >= BGMMMMHMIJF.DecodeTop) ? ILMILAAOOIJ(out DNCHJPDPNJK) : JOMLEBOKPNI());
+			flag = ((state >= InflaterState.DecodeTop) ? DecodeBlock(out DNCHJPDPNJK) : DecodeDynamicBlockHeader());
 		}
-		else if (AGJCDPOFIFE == BPKEFFDGEIC.Static)
+		else if (blockType == BlockType.Static)
 		{
-			flag = ILMILAAOOIJ(out DNCHJPDPNJK);
+			flag = DecodeBlock(out DNCHJPDPNJK);
 		}
 		else
 		{
-			if (AGJCDPOFIFE != BPKEFFDGEIC.Uncompressed)
+			if (blockType != BlockType.Uncompressed)
 			{
 				throw new InvalidDataException(SR.GetString("Unknown block type"));
 			}
-			flag = PPHOKJAMIOE(out DNCHJPDPNJK);
+			flag = DecodeUncompressedBlock(out DNCHJPDPNJK);
 		}
-		if (DNCHJPDPNJK && PCLGPAHIBGH != 0)
+		if (DNCHJPDPNJK && bfinal != 0)
 		{
 			if (hasFormatReader)
 			{
-				state = BGMMMMHMIJF.StartReadingFooter;
+				state = InflaterState.StartReadingFooter;
 			}
 			else
 			{
-				state = BGMMMMHMIJF.Done;
+				state = InflaterState.Done;
 			}
 		}
 		return flag;
 	}
 
-	private bool PPHOKJAMIOE(out bool DNCHJPDPNJK)
+	private bool DecodeUncompressedBlock(out bool DNCHJPDPNJK)
 	{
 		DNCHJPDPNJK = false;
 		while (true)
 		{
 			switch (state)
 			{
-			case BGMMMMHMIJF.UncompressedAligning:
-				NILNDHEKNLJ.KHMFPEJHFHC();
-				state = BGMMMMHMIJF.UncompressedByte1;
-				goto case BGMMMMHMIJF.UncompressedByte1;
-			case BGMMMMHMIJF.UncompressedByte1:
-			case BGMMMMHMIJF.UncompressedByte2:
-			case BGMMMMHMIJF.UncompressedByte3:
-			case BGMMMMHMIJF.UncompressedByte4:
+			case InflaterState.UncompressedAligning:
+				input.SkipToByteBoundary();
+				state = InflaterState.UncompressedByte1;
+				goto case InflaterState.UncompressedByte1;
+			case InflaterState.UncompressedByte1:
+			case InflaterState.UncompressedByte2:
+			case InflaterState.UncompressedByte3:
+			case InflaterState.UncompressedByte4:
 			{
-				int num2 = NILNDHEKNLJ.GetBits(8);
+				int num2 = input.GetBits(8);
 				if (num2 < 0)
 				{
 					return false;
 				}
-				JEGPOHGJPIK[(int)(state - 16)] = (byte)num2;
-				if (state == BGMMMMHMIJF.UncompressedByte4)
+				blockLengthBuffer[(int)(state - 16)] = (byte)num2;
+				if (state == InflaterState.UncompressedByte4)
 				{
-					IHIGJLEBJBI = JEGPOHGJPIK[0] + JEGPOHGJPIK[1] * 256;
-					int num3 = JEGPOHGJPIK[2] + JEGPOHGJPIK[3] * 256;
-					if ((ushort)IHIGJLEBJBI != (ushort)(~num3))
+					blockLength = blockLengthBuffer[0] + blockLengthBuffer[1] * 256;
+					int num3 = blockLengthBuffer[2] + blockLengthBuffer[3] * 256;
+					if ((ushort)blockLength != (ushort)(~num3))
 					{
 						throw new InvalidDataException(SR.GetString("Invalid block length"));
 					}
 				}
 				break;
 			}
-			case BGMMMMHMIJF.DecodingUncompressed:
+			case InflaterState.DecodingUncompressed:
 			{
-				int num = output.CopyFrom(NILNDHEKNLJ, IHIGJLEBJBI);
-				IHIGJLEBJBI -= num;
-				if (IHIGJLEBJBI == 0)
+				int num = output.CopyFrom(input, blockLength);
+				blockLength -= num;
+				if (blockLength == 0)
 				{
-					state = BGMMMMHMIJF.ReadingBFinal;
+					state = InflaterState.ReadingBFinal;
 					DNCHJPDPNJK = true;
 					return true;
 				}
-				if (output.JBPBBAEEAFO() == 0)
+				if (output.GetFreeBytes() == 0)
 				{
 					return true;
 				}
@@ -316,17 +316,17 @@ internal class Inflater
 		}
 	}
 
-	private bool ILMILAAOOIJ(out bool COIHANBPBME)
+	private bool DecodeBlock(out bool COIHANBPBME)
 	{
 		COIHANBPBME = false;
-		int num = output.JBPBBAEEAFO();
+		int num = output.GetFreeBytes();
 		while (num > 258)
 		{
 			switch (state)
 			{
-			case BGMMMMHMIJF.DecodeTop:
+			case InflaterState.DecodeTop:
 			{
-				int num2 = BADNHOBGEBO.NBKGIKBOJGM(NILNDHEKNLJ);
+				int num2 = literalLengthTree.GetNextSymbol(input);
 				if (num2 < 0)
 				{
 					return false;
@@ -340,7 +340,7 @@ internal class Inflater
 				if (num2 == 256)
 				{
 					COIHANBPBME = true;
-					state = BGMMMMHMIJF.ReadingBFinal;
+					state = InflaterState.ReadingBFinal;
 					return true;
 				}
 				num2 -= 257;
@@ -356,71 +356,71 @@ internal class Inflater
 				}
 				else
 				{
-					if (num2 < 0 || num2 >= DEODDHFPBFE.Length)
+					if (num2 < 0 || num2 >= extraLengthBits.Length)
 					{
 						throw new InvalidDataException(SR.GetString("Invalid data"));
 					}
-					extraBits = DEODDHFPBFE[num2];
+					extraBits = extraLengthBits[num2];
 				}
-				BDBOAEGELMC = num2;
-				goto case BGMMMMHMIJF.HaveInitialLength;
+				length = num2;
+				goto case InflaterState.HaveInitialLength;
 			}
-			case BGMMMMHMIJF.HaveInitialLength:
+			case InflaterState.HaveInitialLength:
 				if (extraBits > 0)
 				{
-					state = BGMMMMHMIJF.HaveInitialLength;
-					int num4 = NILNDHEKNLJ.GetBits(extraBits);
+					state = InflaterState.HaveInitialLength;
+					int num4 = input.GetBits(extraBits);
 					if (num4 < 0)
 					{
 						return false;
 					}
-					if (BDBOAEGELMC < 0 || BDBOAEGELMC >= NMNHMEJNLKB.Length)
+					if (length < 0 || length >= lengthBase.Length)
 					{
 						throw new InvalidDataException(SR.GetString("Invalid data"));
 					}
-					BDBOAEGELMC = NMNHMEJNLKB[BDBOAEGELMC] + num4;
+					length = lengthBase[length] + num4;
 				}
-				state = BGMMMMHMIJF.HaveFullLength;
-				goto case BGMMMMHMIJF.HaveFullLength;
-			case BGMMMMHMIJF.HaveFullLength:
-				if (AGJCDPOFIFE == BPKEFFDGEIC.Dynamic)
+				state = InflaterState.HaveFullLength;
+				goto case InflaterState.HaveFullLength;
+			case InflaterState.HaveFullLength:
+				if (blockType == BlockType.Dynamic)
 				{
-					GHCFEMCPBFA = IOBEEOPEKJJ.NBKGIKBOJGM(NILNDHEKNLJ);
+					distanceCode = distanceTree.GetNextSymbol(input);
 				}
 				else
 				{
-					GHCFEMCPBFA = NILNDHEKNLJ.GetBits(5);
-					if (GHCFEMCPBFA >= 0)
+					distanceCode = input.GetBits(5);
+					if (distanceCode >= 0)
 					{
-						GHCFEMCPBFA = MIHBNJNICPA[GHCFEMCPBFA];
+						distanceCode = staticDistanceTreeTable[distanceCode];
 					}
 				}
-				if (GHCFEMCPBFA < 0)
+				if (distanceCode < 0)
 				{
 					return false;
 				}
-				state = BGMMMMHMIJF.HaveDistCode;
-				goto case BGMMMMHMIJF.HaveDistCode;
-			case BGMMMMHMIJF.HaveDistCode:
+				state = InflaterState.HaveDistCode;
+				goto case InflaterState.HaveDistCode;
+			case InflaterState.HaveDistCode:
 			{
 				int oIOMNNFMDOO;
-				if (GHCFEMCPBFA > 3)
+				if (distanceCode > 3)
 				{
-					extraBits = GHCFEMCPBFA - 2 >> 1;
-					int num3 = NILNDHEKNLJ.GetBits(extraBits);
+					extraBits = distanceCode - 2 >> 1;
+					int num3 = input.GetBits(extraBits);
 					if (num3 < 0)
 					{
 						return false;
 					}
-					oIOMNNFMDOO = KCGFDBBLOLL[GHCFEMCPBFA] + num3;
+					oIOMNNFMDOO = distanceBasePosition[distanceCode] + num3;
 				}
 				else
 				{
-					oIOMNNFMDOO = GHCFEMCPBFA + 1;
+					oIOMNNFMDOO = distanceCode + 1;
 				}
-				output.WriteLengthDistance(BDBOAEGELMC, oIOMNNFMDOO);
-				num -= BDBOAEGELMC;
-				state = BGMMMMHMIJF.DecodeTop;
+				output.WriteLengthDistance(length, oIOMNNFMDOO);
+				num -= length;
+				state = InflaterState.DecodeTop;
 				break;
 			}
 			default:
@@ -430,135 +430,135 @@ internal class Inflater
 		return true;
 	}
 
-	private bool JOMLEBOKPNI()
+	private bool DecodeDynamicBlockHeader()
 	{
 		switch (state)
 		{
-		case BGMMMMHMIJF.ReadingNumLitCodes:
-			GOIJLBOAAJO = NILNDHEKNLJ.GetBits(5);
-			if (GOIJLBOAAJO < 0)
+		case InflaterState.ReadingNumLitCodes:
+			literalLengthCodeCount = input.GetBits(5);
+			if (literalLengthCodeCount < 0)
 			{
 				return false;
 			}
-			GOIJLBOAAJO += 257;
-			state = BGMMMMHMIJF.ReadingNumDistCodes;
-			goto case BGMMMMHMIJF.ReadingNumDistCodes;
-		case BGMMMMHMIJF.ReadingNumDistCodes:
-			NHDAMIACBBI = NILNDHEKNLJ.GetBits(5);
-			if (NHDAMIACBBI < 0)
+			literalLengthCodeCount += 257;
+			state = InflaterState.ReadingNumDistCodes;
+			goto case InflaterState.ReadingNumDistCodes;
+		case InflaterState.ReadingNumDistCodes:
+			distanceCodeCount = input.GetBits(5);
+			if (distanceCodeCount < 0)
 			{
 				return false;
 			}
-			NHDAMIACBBI++;
-			state = BGMMMMHMIJF.ReadingNumCodeLengthCodes;
-			goto case BGMMMMHMIJF.ReadingNumCodeLengthCodes;
-		case BGMMMMHMIJF.ReadingNumCodeLengthCodes:
-			DIOGELJGGFC = NILNDHEKNLJ.GetBits(4);
-			if (DIOGELJGGFC < 0)
+			distanceCodeCount++;
+			state = InflaterState.ReadingNumCodeLengthCodes;
+			goto case InflaterState.ReadingNumCodeLengthCodes;
+		case InflaterState.ReadingNumCodeLengthCodes:
+			codeLengthCodeCount = input.GetBits(4);
+			if (codeLengthCodeCount < 0)
 			{
 				return false;
 			}
-			DIOGELJGGFC += 4;
-			DOLKGPHFKPJ = 0;
-			state = BGMMMMHMIJF.ReadingCodeLengthCodes;
-			goto case BGMMMMHMIJF.ReadingCodeLengthCodes;
-		case BGMMMMHMIJF.ReadingCodeLengthCodes:
+			codeLengthCodeCount += 4;
+			loopCounter = 0;
+			state = InflaterState.ReadingCodeLengthCodes;
+			goto case InflaterState.ReadingCodeLengthCodes;
+		case InflaterState.ReadingCodeLengthCodes:
 		{
-			while (DOLKGPHFKPJ < DIOGELJGGFC)
+			while (loopCounter < codeLengthCodeCount)
 			{
-				int num2 = NILNDHEKNLJ.GetBits(3);
+				int num2 = input.GetBits(3);
 				if (num2 < 0)
 				{
 					return false;
 				}
-				KKIAJONPLKI[KCDJIAOANON[DOLKGPHFKPJ]] = (byte)num2;
-				DOLKGPHFKPJ++;
+				codeLengthTreeCodeLength[codeOrder[loopCounter]] = (byte)num2;
+				loopCounter++;
 			}
-			for (int l = DIOGELJGGFC; l < KCDJIAOANON.Length; l++)
+			for (int l = codeLengthCodeCount; l < codeOrder.Length; l++)
 			{
-				KKIAJONPLKI[KCDJIAOANON[l]] = 0;
+				codeLengthTreeCodeLength[codeOrder[l]] = 0;
 			}
-			PFCJKHONLFF = new HuffmanTree(KKIAJONPLKI);
-			AGBMNMICLFA = GOIJLBOAAJO + NHDAMIACBBI;
-			DOLKGPHFKPJ = 0;
-			state = BGMMMMHMIJF.ReadingTreeCodesBefore;
-			goto case BGMMMMHMIJF.ReadingTreeCodesBefore;
+			codeLengthTree = new HuffmanTree(codeLengthTreeCodeLength);
+			codeArraySize = literalLengthCodeCount + distanceCodeCount;
+			loopCounter = 0;
+			state = InflaterState.ReadingTreeCodesBefore;
+			goto case InflaterState.ReadingTreeCodesBefore;
 		}
-		case BGMMMMHMIJF.ReadingTreeCodesBefore:
-		case BGMMMMHMIJF.ReadingTreeCodesAfter:
+		case InflaterState.ReadingTreeCodesBefore:
+		case InflaterState.ReadingTreeCodesAfter:
 		{
-			while (DOLKGPHFKPJ < AGBMNMICLFA)
+			while (loopCounter < codeArraySize)
 			{
-				if (state == BGMMMMHMIJF.ReadingTreeCodesBefore && (PCPIKCIKHLO = PFCJKHONLFF.NBKGIKBOJGM(NILNDHEKNLJ)) < 0)
+				if (state == InflaterState.ReadingTreeCodesBefore && (lengthCode = codeLengthTree.GetNextSymbol(input)) < 0)
 				{
 					return false;
 				}
-				if (PCPIKCIKHLO <= 15)
+				if (lengthCode <= 15)
 				{
-					OBEOJJGLMFG[DOLKGPHFKPJ++] = (byte)PCPIKCIKHLO;
+					codeList[loopCounter++] = (byte)lengthCode;
 				}
 				else
 				{
-					if (!NILNDHEKNLJ.EnsureBitsAvailable(7))
+					if (!input.EnsureBitsAvailable(7))
 					{
-						state = BGMMMMHMIJF.ReadingTreeCodesAfter;
+						state = InflaterState.ReadingTreeCodesAfter;
 						return false;
 					}
-					if (PCPIKCIKHLO == 16)
+					if (lengthCode == 16)
 					{
-						if (DOLKGPHFKPJ == 0)
+						if (loopCounter == 0)
 						{
 							throw new InvalidDataException();
 						}
-						byte b = OBEOJJGLMFG[DOLKGPHFKPJ - 1];
-						int num = NILNDHEKNLJ.GetBits(2) + 3;
-						if (DOLKGPHFKPJ + num > AGBMNMICLFA)
+						byte b = codeList[loopCounter - 1];
+						int num = input.GetBits(2) + 3;
+						if (loopCounter + num > codeArraySize)
 						{
 							throw new InvalidDataException();
 						}
 						for (int i = 0; i < num; i++)
 						{
-							OBEOJJGLMFG[DOLKGPHFKPJ++] = b;
+							codeList[loopCounter++] = b;
 						}
 					}
-					else if (PCPIKCIKHLO == 17)
+					else if (lengthCode == 17)
 					{
-						int num = NILNDHEKNLJ.GetBits(3) + 3;
-						if (DOLKGPHFKPJ + num > AGBMNMICLFA)
+						int num = input.GetBits(3) + 3;
+						if (loopCounter + num > codeArraySize)
 						{
 							throw new InvalidDataException();
 						}
 						for (int j = 0; j < num; j++)
 						{
-							OBEOJJGLMFG[DOLKGPHFKPJ++] = 0;
+							codeList[loopCounter++] = 0;
 						}
 					}
 					else
 					{
-						int num = NILNDHEKNLJ.GetBits(7) + 11;
-						if (DOLKGPHFKPJ + num > AGBMNMICLFA)
+						int num = input.GetBits(7) + 11;
+						if (loopCounter + num > codeArraySize)
 						{
 							throw new InvalidDataException();
 						}
 						for (int k = 0; k < num; k++)
 						{
-							OBEOJJGLMFG[DOLKGPHFKPJ++] = 0;
+							codeList[loopCounter++] = 0;
 						}
 					}
 				}
-				state = BGMMMMHMIJF.ReadingTreeCodesBefore;
+				state = InflaterState.ReadingTreeCodesBefore;
 			}
 			byte[] array = new byte[288];
 			byte[] array2 = new byte[32];
-			Array.Copy(OBEOJJGLMFG, array, GOIJLBOAAJO);
-			Array.Copy(OBEOJJGLMFG, GOIJLBOAAJO, array2, 0, NHDAMIACBBI);
+			Array.Copy(codeList, array, literalLengthCodeCount);
+			Array.Copy(codeList, literalLengthCodeCount, array2, 0, distanceCodeCount);
 			if (array[256] == 0)
 			{
 				throw new InvalidDataException();
 			}
-			BADNHOBGEBO = new HuffmanTree(array);
-			IOBEEOPEKJJ = new HuffmanTree(array2);
-			state = BGMMMMHMIJF.DecodeTop;
+			literalLengthTree = new HuffmanTree(array);
+			distanceTree = new HuffmanTree(array2);
+			state = InflaterState.DecodeTop;
 			return true;
 		}
 		default:

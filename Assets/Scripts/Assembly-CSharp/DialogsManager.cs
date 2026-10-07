@@ -4,31 +4,31 @@ using UnityEngine;
 
 public class DialogsManager : global::EventDispatcher<object>
 {
-	public enum OEKBGPDCCEK
+	public enum DialogEvent
 	{
 		OnStopDialog = 0
 	}
 
 	private static DialogsManager _instance;
 
-	private static List<BaseDialog> ICAMFDCLGDD = new List<BaseDialog>();
+	private static List<BaseDialog> openDialogs = new List<BaseDialog>();
 
-	private static DialogType AKJJGFIGFMJ;
+	private static DialogType currentDialogType;
 
-	private static BaseDialog OALIPPPOHCL = null;
+	private static BaseDialog currentDialog = null;
 
 	[SerializeField]
 	private static GameObject _SettingsDialogPrefab;
 
-	public static DialogsManager BPCBBHAKFDM
+	public static DialogsManager Instance
 	{
 		get
 		{
-			return ELEBLBJKDBI();
+			return GetInstance();
 		}
 	}
 
-	public static DialogsManager ELEBLBJKDBI()
+	public static DialogsManager GetInstance()
 	{
 		if (_instance == null)
 		{
@@ -37,29 +37,29 @@ public class DialogsManager : global::EventDispatcher<object>
 		return _instance;
 	}
 
-	public static BaseDialog LAEGPJHIGAM(DialogType FPEKKMJIKBG, object data)
+	public static BaseDialog ShowDialog(DialogType FPEKKMJIKBG, object data)
 	{
-		AKJJGFIGFMJ = FPEKKMJIKBG;
-		DABAPEPMIHP(data);
-		return OALIPPPOHCL;
+		currentDialogType = FPEKKMJIKBG;
+		OpenDialog(data);
+		return currentDialog;
 	}
 
-	public static void DABAPEPMIHP(object data)
+	public static void OpenDialog(object data)
 	{
-		OALIPPPOHCL = NHBCKGFBGMN(AKJJGFIGFMJ);
-		if (!(OALIPPPOHCL == null))
+		currentDialog = CreateDialog(currentDialogType);
+		if (!(currentDialog == null))
 		{
-			OALIPPPOHCL.Init(data);
+			currentDialog.Init(data);
 			if (NotificationsGame.get_IsOpen())
 			{
 				NotificationsGame.CloseNotifications();
 			}
 			DialogCanvasController.get_Instance().BlockNotDialogTouches();
-			if (OALIPPPOHCL.TopMenuIsActive)
+			if (currentDialog.TopMenuIsActive)
 			{
 			}
-			ICAMFDCLGDD.Add(OALIPPPOHCL);
-			if (!OALIPPPOHCL.IsPausing)
+			openDialogs.Add(currentDialog);
+			if (!currentDialog.IsPausing)
 			{
 			}
 		}
@@ -74,12 +74,12 @@ public class DialogsManager : global::EventDispatcher<object>
 		// pressed.  Remove the closing dialog, duplicates, and stale entries in one
 		// backwards pass before deciding whether input should remain blocked.
 		int staleCount = 0;
-		for (int i = ICAMFDCLGDD.Count - 1; i >= 0; i--)
+		for (int i = openDialogs.Count - 1; i >= 0; i--)
 		{
-			BaseDialog baseDialog = ICAMFDCLGDD[i];
+			BaseDialog baseDialog = openDialogs[i];
 			if (baseDialog == null || baseDialog == MDOHPMBJFIL || !baseDialog.gameObject.activeInHierarchy)
 			{
-				ICAMFDCLGDD.RemoveAt(i);
+				openDialogs.RemoveAt(i);
 				if (baseDialog != MDOHPMBJFIL)
 				{
 					staleCount++;
@@ -90,17 +90,17 @@ public class DialogsManager : global::EventDispatcher<object>
 		{
 			Debug.LogWarning("[Dialogs] Removed " + staleCount + " stale dialog blocker(s).");
 		}
-		if (ICAMFDCLGDD.Count > 0)
+		if (openDialogs.Count > 0)
 		{
-			OALIPPPOHCL = ICAMFDCLGDD[ICAMFDCLGDD.Count - 1];
+			currentDialog = openDialogs[openDialogs.Count - 1];
 			DialogCanvasController.get_Instance().BlockNotDialogTouches();
-			for (int j = 0; j < ICAMFDCLGDD.Count; j++)
+			for (int j = 0; j < openDialogs.Count; j++)
 			{
 			}
 		}
 		else
 		{
-			OALIPPPOHCL = null;
+			currentDialog = null;
 			DialogCanvasController.get_Instance().UnBlockTouches();
 		}
 		if (MDOHPMBJFIL.IsPausing)
@@ -109,19 +109,19 @@ public class DialogsManager : global::EventDispatcher<object>
 		CallEvent(0, MDOHPMBJFIL);
 	}
 
-	public static void HNEGECPBALO()
+	public static void CloseNonQuestDialogs()
 	{
-		BaseDialog baseDialog = ((!(OALIPPPOHCL != null)) ? null : OALIPPPOHCL);
+		BaseDialog baseDialog = ((!(currentDialog != null)) ? null : currentDialog);
 		bool flag = baseDialog != null && !baseDialog.IsQuestDialog;
 		while (flag)
 		{
-			OALIPPPOHCL.Close(0);
-			baseDialog = ((!(OALIPPPOHCL != null)) ? null : OALIPPPOHCL);
+			currentDialog.Close(0);
+			baseDialog = ((!(currentDialog != null)) ? null : currentDialog);
 			flag = baseDialog != null && !baseDialog.IsQuestDialog;
 		}
 	}
 
-	public static BaseDialog NHBCKGFBGMN(DialogType IOCONKEEGKL)
+	public static BaseDialog CreateDialog(DialogType IOCONKEEGKL)
 	{
 		switch (IOCONKEEGKL)
 		{
@@ -144,7 +144,7 @@ public class DialogsManager : global::EventDispatcher<object>
 		case DialogType.DialogNews:
 			return DialogCanvasController.get_Instance().CreateDialog<NewsDialog>();
 		default:
-			LLLOJBFMONN.Write("ERROR: getDialog - unknown dialog type: " + IOCONKEEGKL);
+			GameLog.Write("ERROR: getDialog - unknown dialog type: " + IOCONKEEGKL);
 			return null;
 		}
 	}

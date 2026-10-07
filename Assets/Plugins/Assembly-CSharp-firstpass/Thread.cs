@@ -2,11 +2,11 @@ using System;
 
 public class Thread
 {
-	public bool MNKAOBELMEL
+	public bool Background
 	{
 		get
 		{
-			return AKAMHGBBOEK();
+			return GetIsBackground();
 		}
 		set
 		{
@@ -14,7 +14,7 @@ public class Thread
 		}
 	}
 
-	public Thread(AJFBHEIDBOE ILENLCMAMBH)
+	public Thread(ThreadStartDelegate ILENLCMAMBH)
 	{
 		throw new NotSupportedException();
 	}
@@ -24,7 +24,7 @@ public class Thread
 		throw new NotSupportedException();
 	}
 
-	public bool AKAMHGBBOEK()
+	public bool GetIsBackground()
 	{
 		return true;
 	}
@@ -34,7 +34,7 @@ public class Thread
 		throw new NotImplementedException("currently always on background");
 	}
 
-	public void AKLEEMEHBIC()
+	public void Abort()
 	{
 		throw new NotSupportedException();
 	}
@@ -54,7 +54,7 @@ public class Thread
 		throw new NotSupportedException();
 	}
 
-	public static void DBAFMHNDEKC(int PKGAJCFLOLA)
+	public static void Sleep(int PKGAJCFLOLA)
 	{
 		throw new NotSupportedException();
 	}

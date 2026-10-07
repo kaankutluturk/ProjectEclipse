@@ -30,13 +30,13 @@ namespace Nekki.SF2.GUI.Fight
 		[SerializeField]
 		private float minAlpha;
 
-		private Achievement JJGCLBIGIPL;
+		private Achievement achievement;
 
 		public UnityEvent OnHide = new UnityEvent();
 
 		public void Init(Achievement NCCHENOEPNF)
 		{
-			JJGCLBIGIPL = NCCHENOEPNF;
+			achievement = NCCHENOEPNF;
 			if (text != null && NCCHENOEPNF != null)
 			{
 				text.SetAlias(NCCHENOEPNF.Name);
@@ -44,7 +44,7 @@ namespace Nekki.SF2.GUI.Fight
 			if (icon != null && NCCHENOEPNF != null)
 			{
 				icon.set_TexturePath("UI/Achievements/");
-				icon.set_SpriteName(NCCHENOEPNF.MJBPMLCLMFN);
+				icon.set_SpriteName(NCCHENOEPNF.IconName);
 			}
 			if (canvasGroup != null)
 			{

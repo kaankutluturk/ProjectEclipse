@@ -12,12 +12,12 @@ $code=@'
 using System;
 using System.Collections.Generic;
 class ModelNode{}
-class ModelObject{public Dictionary<string,ModelNode> Nodes=new Dictionary<string,ModelNode>();public ModelNode EGHIDHMENEF(string name)=>Nodes.TryGetValue(name,out var n)?n:null;}
-class Model{public ModelObject Body=new ModelObject();public ModelObject CLDMEJKGLBA()=>Body;}
+class ModelObject{public Dictionary<string,ModelNode> Nodes=new Dictionary<string,ModelNode>();public ModelNode GetNodeByName(string name)=>Nodes.TryGetValue(name,out var n)?n:null;}
+class Model{public ModelObject Body=new ModelObject();public ModelObject GetBodyObject()=>Body;}
 class InFightRule{internal virtual Action PrepareModelRebind(Model a,Model b)=>null;}
 class RingOutRule:InFightRule{public ModelNode _node;public string _nodeName="foot"; RING }
 class LoseFallRule:InFightRule{public ModelNode _node;public string _nodeName="foot"; FALL }
-class HotGroundRule:InFightRule{public class LimitedNode{public ModelNode node;public string name;}public List<LimitedNode> CFPIOKDFJCH=new List<LimitedNode>(); HOT }
+class HotGroundRule:InFightRule{public class LimitedNode{public ModelNode node;public string name;}public List<LimitedNode> limitedNodes=new List<LimitedNode>(); HOT }
 class RulesInspector{public List<InFightRule> _inFightRules=new List<InFightRule>(); INSPECTOR }
 class Program{
  static void Check(bool x,string why){if(!x)throw new Exception(why);}
@@ -26,16 +26,16 @@ class Program{
   var next=new Model();next.Body.Nodes["foot"]=new ModelNode();
   var other=new Model();other.Body.Nodes["foot"]=new ModelNode();
   var ring=new RingOutRule{_node=old.Body.Nodes["foot"]};var fall=new LoseFallRule{_node=old.Body.Nodes["foot"]};var untouched=new RingOutRule{_node=other.Body.Nodes["foot"]};
-  var hot=new HotGroundRule();hot.CFPIOKDFJCH.Add(new HotGroundRule.LimitedNode{name="foot",node=old.Body.Nodes["foot"]});hot.CFPIOKDFJCH.Add(new HotGroundRule.LimitedNode{name="hand",node=old.Body.Nodes["hand"]});
+  var hot=new HotGroundRule();hot.limitedNodes.Add(new HotGroundRule.LimitedNode{name="foot",node=old.Body.Nodes["foot"]});hot.limitedNodes.Add(new HotGroundRule.LimitedNode{name="hand",node=old.Body.Nodes["hand"]});
   var inspector=new RulesInspector();inspector._inFightRules.AddRange(new InFightRule[]{ring,fall,untouched,hot});
   bool failed=false;try{inspector.PrepareModelRebind(old,next);}catch(InvalidOperationException e){failed=e.Message.Contains("hand");}
-  Check(failed&&ring._node==old.Body.Nodes["foot"]&&fall._node==old.Body.Nodes["foot"]&&hot.CFPIOKDFJCH[0].node==old.Body.Nodes["foot"],"missing later node leaves all earlier rule bindings untouched");
+  Check(failed&&ring._node==old.Body.Nodes["foot"]&&fall._node==old.Body.Nodes["foot"]&&hot.limitedNodes[0].node==old.Body.Nodes["foot"],"missing later node leaves all earlier rule bindings untouched");
   next.Body.Nodes["hand"]=new ModelNode();var commit=inspector.PrepareModelRebind(old,next);
   Check(ring._node==old.Body.Nodes["foot"],"preparation is read-only");commit();
   Check(ring._node==next.Body.Nodes["foot"]&&fall._node==next.Body.Nodes["foot"],"single-node rules rebound");
-  Check(hot.CFPIOKDFJCH[0].node==next.Body.Nodes["foot"]&&hot.CFPIOKDFJCH[1].node==next.Body.Nodes["hand"],"all hot-ground nodes rebound");
+  Check(hot.limitedNodes[0].node==next.Body.Nodes["foot"]&&hot.limitedNodes[1].node==next.Body.Nodes["hand"],"all hot-ground nodes rebound");
   Check(untouched._node==other.Body.Nodes["foot"],"other fighter untouched");
-  inspector.PrepareModelRebind(next,old)();Check(ring._node==old.Body.Nodes["foot"]&&hot.CFPIOKDFJCH[1].node==old.Body.Nodes["hand"],"reverse rebind");
+  inspector.PrepareModelRebind(next,old)();Check(ring._node==old.Body.Nodes["foot"]&&hot.limitedNodes[1].node==old.Body.Nodes["hand"],"reverse rebind");
   Console.WriteLine("PASS: production rule rebind preparation/commit; no partial changes on missing nodes, all three cached-node rules, other-fighter isolation and reverse binding. Native node services controlled.");
  }
 }

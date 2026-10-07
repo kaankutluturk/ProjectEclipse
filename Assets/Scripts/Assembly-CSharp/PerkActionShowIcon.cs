@@ -4,19 +4,19 @@ using System.Xml;
 public class PerkActionShowIcon : PerkActionModificator
 {
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private string JDDPALEMDNE;
+	private string _image;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private bool KKDOCIKMKDB;
+	private bool _showExpiration;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private int KOCNAIJGEMK;
+	private int _expirationVer;
 
-	public string NHKMCLPOMFK
+	public string ImageName
 	{
 		get
 		{
-			return AJAEJNGLKOK();
+			return GetImage();
 		}
 		protected set
 		{
@@ -24,11 +24,11 @@ public class PerkActionShowIcon : PerkActionModificator
 		}
 	}
 
-	public bool FLNCPBKBJBL
+	public bool ShowsExpiration
 	{
 		get
 		{
-			return ECKEHGCGBBP();
+			return GetShowExpiration();
 		}
 		protected set
 		{
@@ -36,11 +36,11 @@ public class PerkActionShowIcon : PerkActionModificator
 		}
 	}
 
-	public int MGDCIODPHCH
+	public int ExpirationVersion
 	{
 		get
 		{
-			return NKHNFHIKGIG();
+			return GetExpirationVer();
 		}
 		protected set
 		{
@@ -55,46 +55,46 @@ public class PerkActionShowIcon : PerkActionModificator
 	public PerkActionShowIcon(PerkActionShowIcon NOLFMPDGCOC)
 		: base(NOLFMPDGCOC)
 	{
-		set_Image(NOLFMPDGCOC.AJAEJNGLKOK());
-		set_ShowExpiration(NOLFMPDGCOC.ECKEHGCGBBP());
-		set_ExpirationVer(NOLFMPDGCOC.NKHNFHIKGIG());
+		set_Image(NOLFMPDGCOC.GetImage());
+		set_ShowExpiration(NOLFMPDGCOC.GetShowExpiration());
+		set_ExpirationVer(NOLFMPDGCOC.GetExpirationVer());
 	}
 
-	public string AJAEJNGLKOK()
+	public string GetImage()
 	{
-		return JDDPALEMDNE;
+		return _image;
 	}
 
 	protected void set_Image(string value)
 	{
-		JDDPALEMDNE = value;
+		_image = value;
 	}
 
-	public bool ECKEHGCGBBP()
+	public bool GetShowExpiration()
 	{
-		return KKDOCIKMKDB;
+		return _showExpiration;
 	}
 
 	protected void set_ShowExpiration(bool value)
 	{
-		KKDOCIKMKDB = value;
+		_showExpiration = value;
 	}
 
-	public int NKHNFHIKGIG()
+	public int GetExpirationVer()
 	{
-		return KOCNAIJGEMK;
+		return _expirationVer;
 	}
 
 	protected void set_ExpirationVer(int value)
 	{
-		KOCNAIJGEMK = value;
+		_expirationVer = value;
 	}
 
 	public override void Parse(XmlNode node)
 	{
 		base.Parse(node);
 		set_Type(ActionType.ACTION_SHOW_ICONS);
-		set_Image(node.Attributes["Image"].CIPOICEEIBK(string.Empty));
+		set_Image(node.Attributes["Image"].GetStringOrDefault(string.Empty));
 		set_ShowExpiration(node.Attributes["ShowExpiration"].ParseBool());
 		set_ExpirationVer(node.Attributes["ExpirationVer"].ParseInt());
 	}

@@ -4,13 +4,13 @@ using System.Xml;
 public class PerkEventRoundStage : PerkEvent
 {
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private int ELDMMPIAAHG;
+	private int _roundStage;
 
-	public int JMHJDHLBHLK
+	public int RoundStageIndex
 	{
 		get
 		{
-			return OLFNNDNPDNH();
+			return GetRoundStageIndex();
 		}
 		protected set
 		{
@@ -25,23 +25,23 @@ public class PerkEventRoundStage : PerkEvent
 	public PerkEventRoundStage(PerkEventRoundStage NOLFMPDGCOC)
 		: base(NOLFMPDGCOC)
 	{
-		set_RoundStage(NOLFMPDGCOC.OLFNNDNPDNH());
+		set_RoundStage(NOLFMPDGCOC.GetRoundStageIndex());
 	}
 
-	public int OLFNNDNPDNH()
+	public int GetRoundStageIndex()
 	{
-		return ELDMMPIAAHG;
+		return _roundStage;
 	}
 
 	protected void set_RoundStage(int value)
 	{
-		ELDMMPIAAHG = value;
+		_roundStage = value;
 	}
 
 	public override void Parse(XmlNode node)
 	{
 		base.Parse(node);
-		set_RoundStage(GetRoundStage(node.Attributes["Name"].CIPOICEEIBK(string.Empty)));
+		set_RoundStage(GetRoundStage(node.Attributes["Name"].GetStringOrDefault(string.Empty)));
 	}
 
 	public override bool IsEqual(EventStruct EJMEALJNNIL)
@@ -50,8 +50,8 @@ public class PerkEventRoundStage : PerkEvent
 		{
 			return false;
 		}
-		int jMHJDHLBHLK = EJMEALJNNIL.BIKLKJMNGKP.JMHJDHLBHLK;
-		if (OLFNNDNPDNH() != 0 && OLFNNDNPDNH() != jMHJDHLBHLK)
+		int jMHJDHLBHLK = EJMEALJNNIL.EventModel.RoundStage;
+		if (GetRoundStageIndex() != 0 && GetRoundStageIndex() != jMHJDHLBHLK)
 		{
 			return false;
 		}

@@ -2,41 +2,41 @@ using System;
 
 public static class EventNames
 {
-	public const string NDCILHIAPIK = "connect";
+	public const string Connect = "connect";
 
 	public const string Disconnect = "disconnect";
 
-	public const string MOFKKABEFEB = "event";
+	public const string Event = "event";
 
-	public const string FIGCHOHPPPI = "ack";
+	public const string Ack = "ack";
 
 	public const string Error = "error";
 
-	public const string AMLMOEEMOEO = "binaryevent";
+	public const string BinaryEvent = "binaryevent";
 
-	public const string FJLJMLNKCBG = "binaryack";
+	public const string BinaryAck = "binaryack";
 
-	private static string[] LCBKLNLLBOE = new string[8] { "unknown", "connect", "disconnect", "event", "ack", "error", "binaryevent", "binaryack" };
+	private static string[] SocketIONames = new string[8] { "unknown", "connect", "disconnect", "event", "ack", "error", "binaryevent", "binaryack" };
 
-	private static string[] AGDHHPCMOGF = new string[8] { "unknown", "open", "close", "ping", "pong", "message", "upgrade", "noop" };
+	private static string[] TransportNames = new string[8] { "unknown", "open", "close", "ping", "pong", "message", "upgrade", "noop" };
 
-	private static string[] DMMFNNALHJN = new string[10] { "connect", "connect_error", "connect_timeout", "disconnect", "error", "reconnect", "reconnect_attempt", "reconnect_failed", "reconnect_error", "reconnecting" };
+	private static string[] BlacklistedEvents = new string[10] { "connect", "connect_error", "connect_timeout", "disconnect", "error", "reconnect", "reconnect_attempt", "reconnect_failed", "reconnect_error", "reconnecting" };
 
-	public static string ICAIODPBKBO(ECDAJBEFCAH LFLGCDNKNJI)
+	public static string GetNameFor(SocketIOEventType LFLGCDNKNJI)
 	{
-		return LCBKLNLLBOE[(int)(LFLGCDNKNJI + 1)];
+		return SocketIONames[(int)(LFLGCDNKNJI + 1)];
 	}
 
-	public static string ICAIODPBKBO(HJDLGPHLPNF AJONKGOAHJH)
+	public static string GetNameFor(TransportEventTypes AJONKGOAHJH)
 	{
-		return AGDHHPCMOGF[(int)(AJONKGOAHJH + 1)];
+		return TransportNames[(int)(AJONKGOAHJH + 1)];
 	}
 
 	public static bool IsBlacklisted(string DOPHKKGNAEF)
 	{
-		for (int i = 0; i < DMMFNNALHJN.Length; i++)
+		for (int i = 0; i < BlacklistedEvents.Length; i++)
 		{
-			if (string.Compare(DMMFNNALHJN[i], DOPHKKGNAEF, StringComparison.OrdinalIgnoreCase) == 0)
+			if (string.Compare(BlacklistedEvents[i], DOPHKKGNAEF, StringComparison.OrdinalIgnoreCase) == 0)
 			{
 				return true;
 			}

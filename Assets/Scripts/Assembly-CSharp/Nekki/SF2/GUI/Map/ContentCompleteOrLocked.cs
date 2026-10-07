@@ -15,18 +15,18 @@ namespace Nekki.SF2.GUI.Map
 		[SerializeField]
 		protected Button _btnPlayVideo;
 
-		private Battle FODLHLABAMI;
+		private Battle battle;
 
-		private FightIDS DICGPFLPAIH = new FightIDS();
+		private FightIDS fightId = new FightIDS();
 
 		private void Update()
 		{
-			FightList jDIPBIHBGPF = ListSF.CHMCKGCDGCM(DICGPFLPAIH);
+			FightList jDIPBIHBGPF = ListSF.GetFightById(fightId);
 			if (jDIPBIHBGPF != null)
 			{
-				if (!jDIPBIHBGPF.ECEFCOJPBPG() && _lblTime != null)
+				if (!jDIPBIHBGPF.IsReplayAvailable() && _lblTime != null)
 				{
-					long num = jDIPBIHBGPF.RepeatTime - jDIPBIHBGPF.FLKFFDLLBKA().CCCIFDLEMPI();
+					long num = jDIPBIHBGPF.RepeatTime - jDIPBIHBGPF.GetRosterFight().GetElapsedSinceCompletion();
 					TimeSpan timeSpan = TimeSpan.FromSeconds(num);
 					string empty = string.Empty;
 					empty = ((timeSpan.Hours <= 0) ? string.Format("{0:D2}:{1:D2}", timeSpan.Minutes, timeSpan.Seconds) : string.Format("{0:D2}:{1:D2}:{2:D2}", timeSpan.Hours, timeSpan.Minutes, timeSpan.Seconds));
@@ -34,25 +34,25 @@ namespace Nekki.SF2.GUI.Map
 				}
 				else
 				{
-					CallEvent(0, FODLHLABAMI);
+					CallEvent(0, battle);
 				}
 			}
 		}
 
 		public void Init(Battle DPOOIONCEOA, FightIDS MMEJHKCKFDD)
 		{
-			FODLHLABAMI = DPOOIONCEOA;
-			DICGPFLPAIH = new FightIDS(MMEJHKCKFDD);
-			bool flag = DPOOIONCEOA.MNHLGELMOEJ() == ConditionStatus.StatusComplete;
+			battle = DPOOIONCEOA;
+			fightId = new FightIDS(MMEJHKCKFDD);
+			bool flag = DPOOIONCEOA.GetStatus() == ConditionStatus.StatusComplete;
 			string empty = string.Empty;
-			empty = ((DPOOIONCEOA.KCIKELGFHOA() != 0) ? ((!flag) ? "battleLocked" : "battleCompleted") : "battleComingSoon");
+			empty = ((DPOOIONCEOA.GetFightCount() != 0) ? ((!flag) ? "battleLocked" : "battleCompleted") : "battleComingSoon");
 			_lblLocked.SetAlias(empty);
 			if (_lblTime != null)
 			{
 				_lblTime.text = string.Empty;
 			}
-			_btnPlayVideo.onClick.RemoveListener(INDMIAIIHDD);
-			_btnPlayVideo.onClick.AddListener(INDMIAIIHDD);
+			_btnPlayVideo.onClick.RemoveListener(OnPlayVideoClicked);
+			_btnPlayVideo.onClick.AddListener(OnPlayVideoClicked);
 			if (DPOOIONCEOA.get_Type() == BattleType.FightFinal || DPOOIONCEOA.get_Type() == BattleType.FightFinalTitan)
 			{
 				_btnPlayVideo.gameObject.SetActive(true);
@@ -63,11 +63,11 @@ namespace Nekki.SF2.GUI.Map
 			}
 		}
 
-		private void INDMIAIIHDD()
+		private void OnPlayVideoClicked()
 		{
-			if (ListSF.GetInstance().FFBAJNGHGGD(QuestEvent.PMDPDMFLCIJ.QUEST_EVENT_VIDEO_BUTTON_PRESS))
+			if (ListSF.GetInstance().RaiseQuestEvent(QuestEvent.QuestEventType.QUEST_EVENT_VIDEO_BUTTON_PRESS))
 			{
-				ListSF.GetInstance().MHHNIPBJNAD();
+				ListSF.GetInstance().RunQuestActions();
 			}
 		}
 

@@ -4,11 +4,11 @@ using System.Xml;
 
 public class PerkItems
 {
-	private List<PerkInfoItem> BJHCPMLJOEK = new List<PerkInfoItem>();
+	private List<PerkInfoItem> basePerks = new List<PerkInfoItem>();
 
-	private List<PerkInfoItem> PAABAIILNEG = new List<PerkInfoItem>();
+	private List<PerkInfoItem> progressionPerks = new List<PerkInfoItem>();
 
-	private List<PerkInfoItem> NIOMJEOEMDL = new List<PerkInfoItem>();
+	private List<PerkInfoItem> userPerks = new List<PerkInfoItem>();
 
 	private HashSet<string> externalBasePerkNames = new HashSet<string>(StringComparer.Ordinal);
 	private readonly HashSet<PerkInfoItem> externalUpgradeVariants = new HashSet<PerkInfoItem>();
@@ -16,82 +16,82 @@ public class PerkItems
     public void AddExternalPerkUpgrades(string name, XmlNode upgrades, int initialUpgradeLevel = 0)
 	{
 		if (!externalBasePerkNames.Contains(name)) throw new InvalidOperationException("Upgrade owner is not an external perk: " + name);
-		if (GAEHBOAPMLI(name).Count != 0) throw new InvalidOperationException("Progression variants already exist: " + name);
-		PerkInfoItem original = ABAGJKMKCBA(name);
+		if (GetProgressionVariants(name).Count != 0) throw new InvalidOperationException("Progression variants already exist: " + name);
+		PerkInfoItem original = FindBasePerk(name);
 		var variants = new List<PerkInfoItem>();
         if (upgrades == null || initialUpgradeLevel < 0)
             throw new ArgumentException("Perk upgrades require a nonnegative initial level and a table.");
         if (initialUpgradeLevel == 0)
         {
             var baseline = original.Clone(null, null);
-            baseline.AKKLOMFOLNO = 0;
+            baseline.UpgradeLevel = 0;
             variants.Add(baseline);
         }
         foreach (XmlNode node in upgrades.ChildNodes)
             if (node.Name == "UpgradeLevel")
             {
-                var variant = HDIPMKIGKDA(original, node);
-                if (variant.AKKLOMFOLNO >= initialUpgradeLevel) variants.Add(variant);
+                var variant = CreateUpgradeVariant(original, node);
+                if (variant.UpgradeLevel >= initialUpgradeLevel) variants.Add(variant);
             }
-        if (variants.Count == 0 || variants[0].AKKLOMFOLNO != initialUpgradeLevel)
+        if (variants.Count == 0 || variants[0].UpgradeLevel != initialUpgradeLevel)
             throw new InvalidOperationException("Initial perk upgrade is unavailable: " + name + "/" + initialUpgradeLevel);
 		foreach (var variant in variants)
 		{
-			variant.GDCBBAHKCIE = false;
-			PAABAIILNEG.Add(variant);
+			variant.IsHidden = false;
+			progressionPerks.Add(variant);
 			externalUpgradeVariants.Add(variant);
 		}
 	}
 
-	public List<PerkInfoItem> MHEJPIPKEFP
+	public List<PerkInfoItem> BasePerks
 	{
 		get
 		{
-			return CJJEPHDFOCJ();
+			return GetBasePerks();
 		}
 	}
 
-	public List<PerkInfoItem> ICIFLAKCNBH
+	public List<PerkInfoItem> ProgressionPerks
 	{
 		get
 		{
-			return GFPFNILGJML();
+			return GetProgressionPerks();
 		}
 	}
 
-	public List<PerkInfoItem> FEPAABCBGGN
+	public List<PerkInfoItem> UserPerks
 	{
 		get
 		{
-			return BPBLIPKOJOP();
+			return GetUserPerks();
 		}
 	}
 
-	public List<PerkInfoItem> CJJEPHDFOCJ()
+	public List<PerkInfoItem> GetBasePerks()
 	{
-		return BJHCPMLJOEK;
+		return basePerks;
 	}
 
-	public List<PerkInfoItem> GFPFNILGJML()
+	public List<PerkInfoItem> GetProgressionPerks()
 	{
-		return PAABAIILNEG;
+		return progressionPerks;
 	}
 
-	public List<PerkInfoItem> BPBLIPKOJOP()
+	public List<PerkInfoItem> GetUserPerks()
 	{
-		return NIOMJEOEMDL;
+		return userPerks;
 	}
 
 	public void Parse(XmlNode node)
 	{
-		BJHCPMLJOEK.Clear();
+		basePerks.Clear();
 		externalBasePerkNames.Clear();
 		foreach (XmlNode childNode in node.ChildNodes)
 		{
 			PerkInfoItem aCONCDFDNJH = new PerkInfoItem();
 			aCONCDFDNJH.Parse(childNode);
-			aCONCDFDNJH.BGFEPJKDHFB = false;
-			BJHCPMLJOEK.Add(aCONCDFDNJH);
+			aCONCDFDNJH.IsClone = false;
+			basePerks.Add(aCONCDFDNJH);
 		}
 	}
 
@@ -105,20 +105,20 @@ public class PerkItems
 		{
 			throw new ArgumentException("External base perk node must be a complete Perk element.", "node");
 		}
-		string name = node.Attributes["Name"].CIPOICEEIBK(string.Empty);
+		string name = node.Attributes["Name"].GetStringOrDefault(string.Empty);
 		if (string.IsNullOrEmpty(name))
 		{
 			throw new ArgumentException("External base perk requires a non-empty Name attribute.", "node");
 		}
-		if (ABAGJKMKCBA(name) != null)
+		if (FindBasePerk(name) != null)
 		{
 			throw new InvalidOperationException("Perk already exists: " + name);
 		}
 
 		PerkInfoItem perk = new PerkInfoItem();
 		perk.Parse(node);
-		perk.BGFEPJKDHFB = false;
-		BJHCPMLJOEK.Add(perk);
+		perk.IsClone = false;
+		basePerks.Add(perk);
 		externalBasePerkNames.Add(name);
 		return perk;
 	}
@@ -129,12 +129,12 @@ public class PerkItems
 		{
 			return false;
 		}
-		for (int i = 0; i < BJHCPMLJOEK.Count; i++)
+		for (int i = 0; i < basePerks.Count; i++)
 		{
-			if (BJHCPMLJOEK[i].Name.Equals(name, StringComparison.Ordinal))
+			if (basePerks[i].Name.Equals(name, StringComparison.Ordinal))
 			{
-				BJHCPMLJOEK.RemoveAt(i);
-				PAABAIILNEG.RemoveAll(perk => perk.Name == name && externalUpgradeVariants.Remove(perk));
+				basePerks.RemoveAt(i);
+				progressionPerks.RemoveAll(perk => perk.Name == name && externalUpgradeVariants.Remove(perk));
 				externalBasePerkNames.Remove(name);
 				return true;
 			}
@@ -142,52 +142,52 @@ public class PerkItems
 		return false;
 	}
 
-	public void NLLMCPOPFCI(XmlNode node)
+	public void ParseProgression(XmlNode node)
 	{
-		PAABAIILNEG.Clear();
+		progressionPerks.Clear();
 		foreach (XmlNode childNode in node.ChildNodes)
 		{
-			string text = childNode.Attributes["Name"].CIPOICEEIBK(string.Empty);
+			string text = childNode.Attributes["Name"].GetStringOrDefault(string.Empty);
 			if (string.IsNullOrEmpty(text))
 			{
 				continue;
 			}
 			int gNLOCMLBNHF = childNode.Attributes["Level"].ParseInt();
-			string eMDJGBHIAIA = childNode.Attributes["Description"].CIPOICEEIBK(string.Empty);
-			string cMGIPKIPIPA = childNode.Attributes["Move"].CIPOICEEIBK(string.Empty);
-			PerkInfoItem aCONCDFDNJH = ABAGJKMKCBA(text);
+			string eMDJGBHIAIA = childNode.Attributes["Description"].GetStringOrDefault(string.Empty);
+			string cMGIPKIPIPA = childNode.Attributes["Move"].GetStringOrDefault(string.Empty);
+			PerkInfoItem aCONCDFDNJH = FindBasePerk(text);
 			if (aCONCDFDNJH == null)
 			{
 				continue;
 			}
 			if (childNode.ChildNodes.Count > 0)
 			{
-				PerkInfoItem aCONCDFDNJH2 = LEPHEFBINCL(aCONCDFDNJH, childNode);
+				PerkInfoItem aCONCDFDNJH2 = CloneIfOverridden(aCONCDFDNJH, childNode);
 				if (aCONCDFDNJH2 != aCONCDFDNJH)
 				{
-					PJIBJPOKIOC(aCONCDFDNJH2, gNLOCMLBNHF, eMDJGBHIAIA, cMGIPKIPIPA);
+					AddProgressionVariant(aCONCDFDNJH2, gNLOCMLBNHF, eMDJGBHIAIA, cMGIPKIPIPA);
 				}
 				foreach (XmlNode childNode2 in childNode.ChildNodes)
 				{
 					if (childNode2.Name.Equals("UpgradeLevel"))
 					{
-						PerkInfoItem aEFFHJGMNFI = HDIPMKIGKDA(aCONCDFDNJH, childNode2);
-						PJIBJPOKIOC(aEFFHJGMNFI, gNLOCMLBNHF, eMDJGBHIAIA, cMGIPKIPIPA);
+						PerkInfoItem aEFFHJGMNFI = CreateUpgradeVariant(aCONCDFDNJH, childNode2);
+						AddProgressionVariant(aEFFHJGMNFI, gNLOCMLBNHF, eMDJGBHIAIA, cMGIPKIPIPA);
 					}
 				}
 			}
 			else
 			{
-				PJIBJPOKIOC(aCONCDFDNJH, gNLOCMLBNHF, eMDJGBHIAIA, cMGIPKIPIPA);
+				AddProgressionVariant(aCONCDFDNJH, gNLOCMLBNHF, eMDJGBHIAIA, cMGIPKIPIPA);
 			}
 		}
 	}
 
-	public void MHAEANEADOO(XmlNode node, bool BBMAPFNKPBO = true, bool OPBAFPEJNNO = false)
+	public void ParseUserPerks(XmlNode node, bool BBMAPFNKPBO = true, bool OPBAFPEJNNO = false)
 	{
 		if (BBMAPFNKPBO)
 		{
-			NIOMJEOEMDL.Clear();
+			userPerks.Clear();
 		}
 		foreach (XmlNode childNode in node.ChildNodes)
 		{
@@ -197,8 +197,8 @@ public class PerkItems
 			{
 				continue;
 			}
-			string gOHIIMFFFJI = childNode.Attributes["Name"].CIPOICEEIBK(string.Empty);
-			List<PerkInfoItem> list = GAEHBOAPMLI(gOHIIMFFFJI);
+			string gOHIIMFFFJI = childNode.Attributes["Name"].GetStringOrDefault(string.Empty);
+			List<PerkInfoItem> list = GetProgressionVariants(gOHIIMFFFJI);
 			foreach (PerkInfoItem item in list)
 			{
 				PerkInfoItem aCONCDFDNJH = item.Clone(xmlNode2, xmlNode3);
@@ -206,33 +206,33 @@ public class PerkItems
 				{
 					RemoveUsersPerkByName(aCONCDFDNJH.Name);
 				}
-				NIOMJEOEMDL.Add(aCONCDFDNJH);
+				userPerks.Add(aCONCDFDNJH);
 			}
 		}
 	}
 
 	private void RemoveUsersPerkByName(string name)
 	{
-		PerkInfoItem aCONCDFDNJH = NIOMJEOEMDL.Find((PerkInfoItem DHDMNHCIPEH) => DHDMNHCIPEH.Name.Equals(name));
+		PerkInfoItem aCONCDFDNJH = userPerks.Find((PerkInfoItem DHDMNHCIPEH) => DHDMNHCIPEH.Name.Equals(name));
 		if (aCONCDFDNJH != null)
 		{
-			NIOMJEOEMDL.Remove(aCONCDFDNJH);
+			userPerks.Remove(aCONCDFDNJH);
 		}
 	}
 
-	private void PJIBJPOKIOC(PerkInfoItem AEFFHJGMNFI, int GNLOCMLBNHF, string EMDJGBHIAIA, string CMGIPKIPIPA)
+	private void AddProgressionVariant(PerkInfoItem AEFFHJGMNFI, int GNLOCMLBNHF, string EMDJGBHIAIA, string CMGIPKIPIPA)
 	{
 		if (!string.IsNullOrEmpty(EMDJGBHIAIA))
 		{
-			AEFFHJGMNFI.MGNNJPBCOGD = EMDJGBHIAIA;
+			AEFFHJGMNFI.DescriptionKey = EMDJGBHIAIA;
 		}
-		AEFFHJGMNFI.GDCBBAHKCIE = false;
+		AEFFHJGMNFI.IsHidden = false;
 		AEFFHJGMNFI.Level = GNLOCMLBNHF;
-		AEFFHJGMNFI.JNBECGKCNBB = CMGIPKIPIPA;
-		PAABAIILNEG.Add(AEFFHJGMNFI);
+		AEFFHJGMNFI.MoveName = CMGIPKIPIPA;
+		progressionPerks.Add(AEFFHJGMNFI);
 	}
 
-	private PerkInfoItem LEPHEFBINCL(PerkInfoItem AEFFHJGMNFI, XmlNode node)
+	private PerkInfoItem CloneIfOverridden(PerkInfoItem AEFFHJGMNFI, XmlNode node)
 	{
 		PerkInfoItem result = AEFFHJGMNFI;
 		XmlNode xmlNode = node["Set"];
@@ -244,22 +244,22 @@ public class PerkItems
 		return result;
 	}
 
-	private PerkInfoItem HDIPMKIGKDA(PerkInfoItem AEFFHJGMNFI, XmlNode node)
+	private PerkInfoItem CreateUpgradeVariant(PerkInfoItem AEFFHJGMNFI, XmlNode node)
 	{
 		PerkInfoItem aCONCDFDNJH = AEFFHJGMNFI.Clone(node["Set"], node["RatingEvaluation"]);
-		string text = node.Attributes["Description"].CIPOICEEIBK(string.Empty);
+		string text = node.Attributes["Description"].GetStringOrDefault(string.Empty);
 		int aKKLOMFOLNO = node.Attributes["Value"].ParseInt();
 		if (!string.IsNullOrEmpty(text))
 		{
-			aCONCDFDNJH.MGNNJPBCOGD = text;
+			aCONCDFDNJH.DescriptionKey = text;
 		}
-		aCONCDFDNJH.AKKLOMFOLNO = aKKLOMFOLNO;
+		aCONCDFDNJH.UpgradeLevel = aKKLOMFOLNO;
 		return aCONCDFDNJH;
 	}
 
-	public PerkInfoItem ABAGJKMKCBA(string name)
+	public PerkInfoItem FindBasePerk(string name)
 	{
-		foreach (PerkInfoItem item in BJHCPMLJOEK)
+		foreach (PerkInfoItem item in basePerks)
 		{
 			if (item.Name.Equals(name))
 			{
@@ -269,23 +269,23 @@ public class PerkItems
 		return null;
 	}
 
-	public PerkInfoItem MNMFPCBNLJI(string name)
+	public PerkInfoItem FindUserPerk(string name)
 	{
-		return NIOMJEOEMDL.Find((PerkInfoItem DHDMNHCIPEH) => DHDMNHCIPEH.Name.Equals(name));
+		return userPerks.Find((PerkInfoItem DHDMNHCIPEH) => DHDMNHCIPEH.Name.Equals(name));
 	}
 
-	public PerkInfoItem LAAJJBEEDKL(string name, int upgradeLevel = -1)
+	public PerkInfoItem FindProgressionPerk(string name, int upgradeLevel = -1)
 	{
-		return PAABAIILNEG.Find((PerkInfoItem DHDMNHCIPEH) =>
+		return progressionPerks.Find((PerkInfoItem DHDMNHCIPEH) =>
 		{
 			bool flag = DHDMNHCIPEH.Name.Equals(name);
-			bool flag2 = upgradeLevel < 0 || DHDMNHCIPEH.AKKLOMFOLNO == upgradeLevel;
+			bool flag2 = upgradeLevel < 0 || DHDMNHCIPEH.UpgradeLevel == upgradeLevel;
 			return flag && flag2;
 		});
 	}
 
-	public List<PerkInfoItem> GAEHBOAPMLI(string name)
+	public List<PerkInfoItem> GetProgressionVariants(string name)
 	{
-		return PAABAIILNEG.FindAll((PerkInfoItem DHDMNHCIPEH) => DHDMNHCIPEH.Name.Equals(name));
+		return progressionPerks.FindAll((PerkInfoItem DHDMNHCIPEH) => DHDMNHCIPEH.Name.Equals(name));
 	}
 }

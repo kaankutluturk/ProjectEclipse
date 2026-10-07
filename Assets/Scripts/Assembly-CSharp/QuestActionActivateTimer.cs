@@ -2,29 +2,29 @@ using System.Xml;
 
 public class QuestActionActivateTimer : QuestAction
 {
-	private string GAADCGKKMEN;
+	private string timerName;
 
-	private string GHGKCHMAEKC;
+	private string durationExpression;
 
 	public override void Parse(XmlNode EPKLCPOEELO)
 	{
 		base.Parse(EPKLCPOEELO);
-		GAADCGKKMEN = EPKLCPOEELO.Attributes["Name"].CIPOICEEIBK(string.Empty);
-		GHGKCHMAEKC = EPKLCPOEELO.Attributes["Value"].CIPOICEEIBK(string.Empty);
+		timerName = EPKLCPOEELO.Attributes["Name"].GetStringOrDefault(string.Empty);
+		durationExpression = EPKLCPOEELO.Attributes["Value"].GetStringOrDefault(string.Empty);
 	}
 
-	public override void DEJMHFMLKIC(QuestParameters GFIHPBCEEOB)
+	public override void Execute(QuestParameters GFIHPBCEEOB)
 	{
-		base.DEJMHFMLKIC(GFIHPBCEEOB);
+		base.Execute(GFIHPBCEEOB);
 		ConditionExtension.CompareResult lNIDLHOIHIM = new ConditionExtension.CompareResult();
 		QuestCondition kKDGLNECFHA = new QuestCondition();
-		kKDGLNECFHA.LIMHBJBEEIA(GFIHPBCEEOB);
-		kKDGLNECFHA.MCPIOGALBMK(GHGKCHMAEKC, lNIDLHOIHIM);
+		kKDGLNECFHA.SetParameters(GFIHPBCEEOB);
+		kKDGLNECFHA.SetValue(durationExpression, lNIDLHOIHIM);
 		long num = (long)lNIDLHOIHIM.resultNumber;
-		long num2 = ListSF.IDMJOMOMDOJ();
-		Roster nKGLHEGIKKP = ListSF.CCDKHLAMKKO();
-		RosterTimerContainer kCMICMHCEBB = nKGLHEGIKKP.AEMFLPNDDKL();
-		kCMICMHCEBB.POEJBJOHFDP(GAADCGKKMEN, num2 + num);
-		OGIJONMKABB();
+		long num2 = ListSF.GetCurrentTime();
+		Roster nKGLHEGIKKP = ListSF.GetRoster();
+		RosterTimerContainer kCMICMHCEBB = nKGLHEGIKKP.GetTimerContainer();
+		kCMICMHCEBB.AddTimer(timerName, num2 + num);
+		FinishAction();
 	}
 }

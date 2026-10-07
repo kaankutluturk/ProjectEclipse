@@ -5,14 +5,14 @@ using System.Text;
 
 public class FunctionExtension : global::EventDispatcher<object>
 {
-	public enum AFILEBFICDF
+	public enum VariableType
 	{
 		VARIABLE_NONE = 0,
 		VARIABLE_STRING = 1,
 		VARIABLE_NUMBER = 2
 	}
 
-	public enum DLLJOIFFBPL
+	public enum CompareType
 	{
 		COMPARE_NONE = 0,
 		COMPARE_EQUAL = 1,
@@ -22,7 +22,7 @@ public class FunctionExtension : global::EventDispatcher<object>
 		COMPARE_LESS_EQUAL = 5
 	}
 
-	public enum PLGKHFNOBCB
+	public enum ObjectType
 	{
 		TYPE_VALUE = 0,
 		TYPE_FUNCTION = 1,
@@ -30,7 +30,7 @@ public class FunctionExtension : global::EventDispatcher<object>
 		TYPE_SEPARATOR = 3
 	}
 
-	public class CCDGFNHLMCG
+	public class VariableObject
 	{
 		public string name = string.Empty;
 
@@ -45,103 +45,103 @@ public class FunctionExtension : global::EventDispatcher<object>
 
 		public object data;
 
-		public FunctionResult NAGGNMIFFGK;
+		public FunctionResult result;
 	}
 
 	public class FunctionObject
 	{
-		public PLGKHFNOBCB LFLGCDNKNJI;
+		public ObjectType type;
 
 		public string body = string.Empty;
 
-		public FunctionResult DCJLKCFKCOM = new FunctionResult();
+		public FunctionResult result = new FunctionResult();
 	}
 
-	public class GLBAFLLMOOH : FunctionObject
+	public class FunctionCall : FunctionObject
 	{
-		public string FJLOLCPJACB = string.Empty;
+		public string functionName = string.Empty;
 
 		public string arguments = string.Empty;
 
-		public string HBDLDIKHFEG = string.Empty;
+		public string propertyName = string.Empty;
 
 		public string name = string.Empty;
 
-		public List<FunctionObject> EIALKNELNMB = new List<FunctionObject>();
+		public List<FunctionObject> argumentValues = new List<FunctionObject>();
 
-		public List<FunctionObject> EJMMIOKEPHC = new List<FunctionObject>();
+		public List<FunctionObject> children = new List<FunctionObject>();
 
-		public GLBAFLLMOOH()
+		public FunctionCall()
 		{
-			LFLGCDNKNJI = PLGKHFNOBCB.TYPE_FUNCTION;
+			type = ObjectType.TYPE_FUNCTION;
 		}
 	}
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private Action<CallbackResult> DEGCIDCPOBA;
+	private Action<CallbackResult> variableCallback;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private Action<CallbackResult> GLPCLEMBAJJ;
+	private Action<CallbackResult> functionCallback;
 
-	private List<CCDGFNHLMCG> LOEIIBBBOCF = new List<CCDGFNHLMCG>();
+	private List<VariableObject> variables = new List<VariableObject>();
 
-	private List<FunctionObject> AHGOKKLEGBP = new List<FunctionObject>();
+	private List<FunctionObject> valueObjects = new List<FunctionObject>();
 
-	private List<FunctionObject> FMBAPDNOOGG = new List<FunctionObject>();
+	private List<FunctionObject> functionObjects = new List<FunctionObject>();
 
 	private int countFuncName;
 
-	private GLBAFLLMOOH GJBGEHPMBCN = new GLBAFLLMOOH();
+	private FunctionCall rootFunction = new FunctionCall();
 
-	private FunctionResult NAGGNMIFFGK = new FunctionResult();
+	private FunctionResult result = new FunctionResult();
 
 	private object target;
 
-	public Action<CallbackResult> ILFGMIMMCOF
+	public Action<CallbackResult> VariableCallback
 	{
 		get
 		{
-			return GOPDKBFNDPJ();
+			return GetVariableCallback();
 		}
 		set
 		{
-			DMPCFMACDJM(value);
+			SetVariableCallback(value);
 		}
 	}
 
-	public Action<CallbackResult> BLGIIGFKFPN
+	public Action<CallbackResult> FunctionCallback
 	{
 		get
 		{
-			return KAJPFGAIDCE();
+			return GetFunctionCallback();
 		}
 		set
 		{
-			PBPBNENGLPA(value);
+			SetFunctionCallback(value);
 		}
 	}
 
-	public Action<CallbackResult> GOPDKBFNDPJ()
+	public Action<CallbackResult> GetVariableCallback()
 	{
-		return DEGCIDCPOBA;
+		return variableCallback;
 	}
 
-	public void DMPCFMACDJM(Action<CallbackResult> value)
+	public void SetVariableCallback(Action<CallbackResult> value)
 	{
-		DEGCIDCPOBA = value;
+		variableCallback = value;
 	}
 
-	public Action<CallbackResult> KAJPFGAIDCE()
+	public Action<CallbackResult> GetFunctionCallback()
 	{
-		return GLPCLEMBAJJ;
+		return functionCallback;
 	}
 
-	public void PBPBNENGLPA(Action<CallbackResult> value)
+	public void SetFunctionCallback(Action<CallbackResult> value)
 	{
-		GLPCLEMBAJJ = value;
+		functionCallback = value;
 	}
 
-	public object IDPLAGOELKE()
+	public object GetTarget()
 	{
 		return target;
 	}
@@ -158,56 +158,56 @@ public class FunctionExtension : global::EventDispatcher<object>
 		stringBuilder.Append("?Root[");
 		stringBuilder.Append(value);
 		stringBuilder.Append("]");
-		GJBGEHPMBCN = JCJHEBOMKIC(stringBuilder.ToString());
+		rootFunction = ParseFunction(stringBuilder.ToString());
 	}
 
-	public static DLLJOIFFBPL MHKNIEBONKD(string LFLGCDNKNJI)
+	public static CompareType ParseCompareType(string LFLGCDNKNJI)
 	{
 		switch (LFLGCDNKNJI)
 		{
 		case "Equal":
-			return DLLJOIFFBPL.COMPARE_EQUAL;
+			return CompareType.COMPARE_EQUAL;
 		case "Greater":
-			return DLLJOIFFBPL.COMPARE_GREATER;
+			return CompareType.COMPARE_GREATER;
 		case "GreaterEqual":
-			return DLLJOIFFBPL.COMPARE_GREATER_EQUAL;
+			return CompareType.COMPARE_GREATER_EQUAL;
 		case "Less":
-			return DLLJOIFFBPL.COMPARE_LESS;
+			return CompareType.COMPARE_LESS;
 		case "LessEqual":
-			return DLLJOIFFBPL.COMPARE_LESS_EQUAL;
+			return CompareType.COMPARE_LESS_EQUAL;
 		default:
-			return DLLJOIFFBPL.COMPARE_NONE;
+			return CompareType.COMPARE_NONE;
 		}
 	}
 
-	public static AFILEBFICDF FANCHMOGIEI(string value)
+	public static VariableType GetVariableType(string value)
 	{
 		if (value.Length == 0)
 		{
-			LLLOJBFMONN.Error("Value of QuestConditionVariable is empty");
+			GameLog.Error("Value of QuestConditionVariable is empty");
 		}
-		Dictionary<string, RpnParser.PHNLIHEJEPK> pPEABEJMCPI = new Dictionary<string, RpnParser.PHNLIHEJEPK>();
+		Dictionary<string, RpnParser.VariableDelegate> pPEABEJMCPI = new Dictionary<string, RpnParser.VariableDelegate>();
 		Dictionary<string, RpnParser.ParameterDelegate> gIOGAJGIGMO = new Dictionary<string, RpnParser.ParameterDelegate>();
 		RpnParser.init(pPEABEJMCPI, gIOGAJGIGMO);
 		RpnParser.Formula lANLKOHCGEJ = new RpnParser.Formula(value);
-		if (lANLKOHCGEJ.OJEHEKMJJBL() == 0)
+		if (lANLKOHCGEJ.GetVariableCount() == 0)
 		{
-			return AFILEBFICDF.VARIABLE_NUMBER;
+			return VariableType.VARIABLE_NUMBER;
 		}
-		return AFILEBFICDF.VARIABLE_STRING;
+		return VariableType.VARIABLE_STRING;
 	}
 
 	public void SetVariable(string name, string value)
 	{
-		CCDGFNHLMCG cCDGFNHLMCG = new CCDGFNHLMCG();
+		VariableObject cCDGFNHLMCG = new VariableObject();
 		cCDGFNHLMCG.name = name;
 		cCDGFNHLMCG.value = value;
-		LOEIIBBBOCF.Add(cCDGFNHLMCG);
+		variables.Add(cCDGFNHLMCG);
 	}
 
-	public CCDGFNHLMCG GBNDBKOIEJA(string name)
+	public VariableObject GetVariable(string name)
 	{
-		foreach (CCDGFNHLMCG item in LOEIIBBBOCF)
+		foreach (VariableObject item in variables)
 		{
 			if (item.name.Equals(name))
 			{
@@ -217,32 +217,32 @@ public class FunctionExtension : global::EventDispatcher<object>
 		return null;
 	}
 
-	public List<CCDGFNHLMCG> ICGHBLMJENJ()
+	public List<VariableObject> GetVariables()
 	{
-		return LOEIIBBBOCF;
+		return variables;
 	}
 
-	public List<FunctionObject> COGDGCDPOBJ()
+	public List<FunctionObject> GetValueObjects()
 	{
-		return AHGOKKLEGBP;
+		return valueObjects;
 	}
 
-	public FunctionResult IBCPKBBAFNH()
+	public FunctionResult Calculate()
 	{
-		NAGGNMIFFGK.DCJLKCFKCOM = null;
-		GHBKAIFOPPC(GJBGEHPMBCN, NAGGNMIFFGK);
-		NAGGNMIFFGK.DCJLKCFKCOM = CalculateResult(NAGGNMIFFGK.DCJLKCFKCOM);
-		return NAGGNMIFFGK;
+		result.Value = null;
+		EvaluateFunction(rootFunction, result);
+		result.Value = CalculateResult(result.Value);
+		return result;
 	}
 
-	public FunctionResult DIHPNAJEENI()
+	public FunctionResult GetResult()
 	{
-		return NAGGNMIFFGK;
+		return result;
 	}
 
-	public bool ENCHAAJAMIM()
+	public bool IsResultEmpty()
 	{
-		return NAGGNMIFFGK.DCJLKCFKCOM.Equals(string.Empty);
+		return result.Value.Equals(string.Empty);
 	}
 
 	public string CalculateResult(string target)
@@ -267,13 +267,13 @@ public class FunctionExtension : global::EventDispatcher<object>
 		{
 			return target;
 		}
-		Dictionary<string, RpnParser.PHNLIHEJEPK> pPEABEJMCPI = new Dictionary<string, RpnParser.PHNLIHEJEPK>();
+		Dictionary<string, RpnParser.VariableDelegate> pPEABEJMCPI = new Dictionary<string, RpnParser.VariableDelegate>();
 		Dictionary<string, RpnParser.ParameterDelegate> gIOGAJGIGMO = new Dictionary<string, RpnParser.ParameterDelegate>();
 		RpnParser.init(pPEABEJMCPI, gIOGAJGIGMO);
 		RpnParser.Formula lANLKOHCGEJ = new RpnParser.Formula(target);
-		if (lANLKOHCGEJ.OJEHEKMJJBL() == 0)
+		if (lANLKOHCGEJ.GetVariableCount() == 0)
 		{
-			object obj = lANLKOHCGEJ.ODHJHHMEEOI();
+			object obj = lANLKOHCGEJ.Calculate();
 			string text = ((obj == null) ? string.Empty : obj.ToString());
 			double result;
 			if (double.TryParse(text, out result) && result >= 0.0)
@@ -285,89 +285,89 @@ public class FunctionExtension : global::EventDispatcher<object>
 		return target;
 	}
 
-	private void GHBKAIFOPPC(GLBAFLLMOOH KJFKPMCPIBH, FunctionResult DCJLKCFKCOM)
+	private void EvaluateFunction(FunctionCall KJFKPMCPIBH, FunctionResult DCJLKCFKCOM)
 	{
-		foreach (FunctionObject item in KJFKPMCPIBH.EJMMIOKEPHC)
+		foreach (FunctionObject item in KJFKPMCPIBH.children)
 		{
-			if (item.LFLGCDNKNJI == PLGKHFNOBCB.TYPE_FUNCTION)
+			if (item.type == ObjectType.TYPE_FUNCTION)
 			{
-				GLBAFLLMOOH gLBAFLLMOOH = item as GLBAFLLMOOH;
+				FunctionCall gLBAFLLMOOH = item as FunctionCall;
 				if (gLBAFLLMOOH != null)
 				{
-					GHBKAIFOPPC(gLBAFLLMOOH, item.DCJLKCFKCOM);
+					EvaluateFunction(gLBAFLLMOOH, item.result);
 				}
 			}
-			else if (item.LFLGCDNKNJI == PLGKHFNOBCB.TYPE_VARIABLE)
+			else if (item.type == ObjectType.TYPE_VARIABLE)
 			{
-				KKODDGMCDBC(item.body, item.DCJLKCFKCOM);
+				ResolveVariable(item.body, item.result);
 			}
 			else
 			{
-				item.DCJLKCFKCOM.DCJLKCFKCOM = item.body;
+				item.result.Value = item.body;
 			}
 		}
-		CBBHKMCGFKC(KJFKPMCPIBH, DCJLKCFKCOM);
+		InvokeFunction(KJFKPMCPIBH, DCJLKCFKCOM);
 	}
 
-	private void CBBHKMCGFKC(GLBAFLLMOOH KJFKPMCPIBH, FunctionResult DCJLKCFKCOM)
+	private void InvokeFunction(FunctionCall KJFKPMCPIBH, FunctionResult DCJLKCFKCOM)
 	{
-		CBMFNEPCOCP(KJFKPMCPIBH, ref DCJLKCFKCOM);
-		FAKNFAMNNIL(KJFKPMCPIBH, DCJLKCFKCOM);
-		DCJLKCFKCOM.DCJLKCFKCOM = CalculateResult(DCJLKCFKCOM.DCJLKCFKCOM);
-		if (KAJPFGAIDCE() != null)
+		SubstituteArguments(KJFKPMCPIBH, ref DCJLKCFKCOM);
+		SplitArgumentValues(KJFKPMCPIBH, DCJLKCFKCOM);
+		DCJLKCFKCOM.Value = CalculateResult(DCJLKCFKCOM.Value);
+		if (GetFunctionCallback() != null)
 		{
 			CallbackResult oMJHHJNIJOL = new CallbackResult();
 			oMJHHJNIJOL.data = KJFKPMCPIBH;
-			oMJHHJNIJOL.NAGGNMIFFGK = DCJLKCFKCOM;
+			oMJHHJNIJOL.result = DCJLKCFKCOM;
 			oMJHHJNIJOL.target = target;
-			KAJPFGAIDCE()(oMJHHJNIJOL);
+			GetFunctionCallback()(oMJHHJNIJOL);
 		}
-		KJFKPMCPIBH.EIALKNELNMB.Clear();
+		KJFKPMCPIBH.argumentValues.Clear();
 	}
 
-	private void FAKNFAMNNIL(GLBAFLLMOOH KJFKPMCPIBH, FunctionResult DCJLKCFKCOM)
+	private void SplitArgumentValues(FunctionCall KJFKPMCPIBH, FunctionResult DCJLKCFKCOM)
 	{
-		KJFKPMCPIBH.EIALKNELNMB.Clear();
+		KJFKPMCPIBH.argumentValues.Clear();
 		StringBuilder stringBuilder = new StringBuilder();
-		PLGKHFNOBCB pLGKHFNOBCB = PLGKHFNOBCB.TYPE_SEPARATOR;
+		ObjectType pLGKHFNOBCB = ObjectType.TYPE_SEPARATOR;
 		char c = ',';
-		string dCJLKCFKCOM = DCJLKCFKCOM.DCJLKCFKCOM;
+		string dCJLKCFKCOM = DCJLKCFKCOM.Value;
 		int i = 0;
 		for (int length = dCJLKCFKCOM.Length; i < length; i++)
 		{
 			char c2 = dCJLKCFKCOM[i];
 			bool flag = c2 == ',';
 			bool flag2 = c == ',';
-			if (pLGKHFNOBCB == PLGKHFNOBCB.TYPE_VALUE && flag)
+			if (pLGKHFNOBCB == ObjectType.TYPE_VALUE && flag)
 			{
 				if (!stringBuilder.Equals(string.Empty))
 				{
 					FunctionObject pENDFCHBHIB = new FunctionObject();
-					Dictionary<string, RpnParser.PHNLIHEJEPK> pPEABEJMCPI = new Dictionary<string, RpnParser.PHNLIHEJEPK>();
+					Dictionary<string, RpnParser.VariableDelegate> pPEABEJMCPI = new Dictionary<string, RpnParser.VariableDelegate>();
 					Dictionary<string, RpnParser.ParameterDelegate> gIOGAJGIGMO = new Dictionary<string, RpnParser.ParameterDelegate>();
 					RpnParser.init(pPEABEJMCPI, gIOGAJGIGMO);
 					RpnParser.Formula lANLKOHCGEJ = new RpnParser.Formula(stringBuilder.ToString());
-					if (lANLKOHCGEJ.OJEHEKMJJBL() == 0)
+					if (lANLKOHCGEJ.GetVariableCount() == 0)
 					{
-						pENDFCHBHIB.body = lANLKOHCGEJ.ODHJHHMEEOI().ToString();
+						pENDFCHBHIB.body = lANLKOHCGEJ.Calculate().ToString();
 					}
 					else
 					{
 						pENDFCHBHIB.body = stringBuilder.ToString();
 					}
-					pENDFCHBHIB.LFLGCDNKNJI = PLGKHFNOBCB.TYPE_VALUE;
-					KJFKPMCPIBH.EIALKNELNMB.Add(pENDFCHBHIB);
+					pENDFCHBHIB.type = ObjectType.TYPE_VALUE;
+					KJFKPMCPIBH.argumentValues.Add(pENDFCHBHIB);
 					stringBuilder.Clear();
 				}
-				pLGKHFNOBCB = PLGKHFNOBCB.TYPE_SEPARATOR;
+				pLGKHFNOBCB = ObjectType.TYPE_SEPARATOR;
 			}
-			if (pLGKHFNOBCB == PLGKHFNOBCB.TYPE_SEPARATOR && !flag)
+			if (pLGKHFNOBCB == ObjectType.TYPE_SEPARATOR && !flag)
 			{
 				if (!stringBuilder.Equals(string.Empty))
 				{
 					stringBuilder.Clear();
 				}
-				pLGKHFNOBCB = PLGKHFNOBCB.TYPE_VALUE;
+				pLGKHFNOBCB = ObjectType.TYPE_VALUE;
 			}
 			c = c2;
 			stringBuilder.Append(c2);
@@ -376,57 +376,57 @@ public class FunctionExtension : global::EventDispatcher<object>
 		if (!text.Equals(string.Empty))
 		{
 			FunctionObject pENDFCHBHIB2 = new FunctionObject();
-			Dictionary<string, RpnParser.PHNLIHEJEPK> pPEABEJMCPI2 = new Dictionary<string, RpnParser.PHNLIHEJEPK>();
+			Dictionary<string, RpnParser.VariableDelegate> pPEABEJMCPI2 = new Dictionary<string, RpnParser.VariableDelegate>();
 			Dictionary<string, RpnParser.ParameterDelegate> gIOGAJGIGMO2 = new Dictionary<string, RpnParser.ParameterDelegate>();
 			RpnParser.init(pPEABEJMCPI2, gIOGAJGIGMO2);
 			RpnParser.Formula lANLKOHCGEJ2 = new RpnParser.Formula(text);
-			if (lANLKOHCGEJ2.OJEHEKMJJBL() == 0)
+			if (lANLKOHCGEJ2.GetVariableCount() == 0)
 			{
-				pENDFCHBHIB2.body = lANLKOHCGEJ2.ODHJHHMEEOI().ToString();
+				pENDFCHBHIB2.body = lANLKOHCGEJ2.Calculate().ToString();
 			}
 			else
 			{
 				pENDFCHBHIB2.body = stringBuilder.ToString();
 			}
-			pENDFCHBHIB2.LFLGCDNKNJI = PLGKHFNOBCB.TYPE_VALUE;
-			KJFKPMCPIBH.EIALKNELNMB.Add(pENDFCHBHIB2);
+			pENDFCHBHIB2.type = ObjectType.TYPE_VALUE;
+			KJFKPMCPIBH.argumentValues.Add(pENDFCHBHIB2);
 		}
 	}
 
-	private void KKODDGMCDBC(string body, FunctionResult DCJLKCFKCOM)
+	private void ResolveVariable(string body, FunctionResult DCJLKCFKCOM)
 	{
 		if (((body.Length <= 1) ? '_' : body[1]).Equals('$'))
 		{
-			if (GOPDKBFNDPJ() != null)
+			if (GetVariableCallback() != null)
 			{
 				CallbackResult oMJHHJNIJOL = new CallbackResult();
 				oMJHHJNIJOL.data = body;
-				oMJHHJNIJOL.NAGGNMIFFGK = DCJLKCFKCOM;
+				oMJHHJNIJOL.result = DCJLKCFKCOM;
 				oMJHHJNIJOL.target = target;
-				GOPDKBFNDPJ()(oMJHHJNIJOL);
+				GetVariableCallback()(oMJHHJNIJOL);
 			}
 		}
 		else
 		{
 			string text = null;
 			text = ((body.Length <= 0 || !body[0].Equals('_')) ? body : body.Substring(1));
-			CCDGFNHLMCG cCDGFNHLMCG = GBNDBKOIEJA(text);
+			VariableObject cCDGFNHLMCG = GetVariable(text);
 			if (cCDGFNHLMCG != null)
 			{
-				DCJLKCFKCOM.DCJLKCFKCOM = cCDGFNHLMCG.value;
+				DCJLKCFKCOM.Value = cCDGFNHLMCG.value;
 			}
 		}
 	}
 
-	private void CBMFNEPCOCP(GLBAFLLMOOH KJFKPMCPIBH, ref FunctionResult DCJLKCFKCOM)
+	private void SubstituteArguments(FunctionCall KJFKPMCPIBH, ref FunctionResult DCJLKCFKCOM)
 	{
 		StringBuilder stringBuilder = new StringBuilder();
 		stringBuilder.Append(KJFKPMCPIBH.arguments);
-		foreach (FunctionObject item in KJFKPMCPIBH.EJMMIOKEPHC)
+		foreach (FunctionObject item in KJFKPMCPIBH.children)
 		{
-			stringBuilder.Replace(item.body, item.DCJLKCFKCOM.DCJLKCFKCOM);
+			stringBuilder.Replace(item.body, item.result.Value);
 		}
-		DCJLKCFKCOM.DCJLKCFKCOM = stringBuilder.ToString();
+		DCJLKCFKCOM.Value = stringBuilder.ToString();
 	}
 
 	private string ClearGaps(string target)
@@ -442,27 +442,27 @@ public class FunctionExtension : global::EventDispatcher<object>
 		return stringBuilder.ToString();
 	}
 
-	private GLBAFLLMOOH JCJHEBOMKIC(string target)
+	private FunctionCall ParseFunction(string target)
 	{
 		int num = target.IndexOf('[');
 		int num2 = target.LastIndexOf(']');
 		int num3 = target.LastIndexOf('.');
-		GLBAFLLMOOH gLBAFLLMOOH = new GLBAFLLMOOH();
-		gLBAFLLMOOH.FJLOLCPJACB = target.Substring(1, num - 1);
+		FunctionCall gLBAFLLMOOH = new FunctionCall();
+		gLBAFLLMOOH.functionName = target.Substring(1, num - 1);
 		gLBAFLLMOOH.arguments = target.Substring(num + 1, num2 - num - 1);
-		gLBAFLLMOOH.HBDLDIKHFEG = ((num3 <= num2) ? string.Empty : target.Substring(num3 + 1, target.Length - num3 - 1));
+		gLBAFLLMOOH.propertyName = ((num3 <= num2) ? string.Empty : target.Substring(num3 + 1, target.Length - num3 - 1));
 		gLBAFLLMOOH.body = target;
 		gLBAFLLMOOH.name = "Function";
 		gLBAFLLMOOH.name += countFuncName;
 		countFuncName++;
-		HDDGCAHGNIB(gLBAFLLMOOH);
+		ParseObjects(gLBAFLLMOOH);
 		return gLBAFLLMOOH;
 	}
 
-	private void HDDGCAHGNIB(GLBAFLLMOOH KJFKPMCPIBH)
+	private void ParseObjects(FunctionCall KJFKPMCPIBH)
 	{
 		StringBuilder stringBuilder = new StringBuilder();
-		PLGKHFNOBCB pLGKHFNOBCB = PLGKHFNOBCB.TYPE_SEPARATOR;
+		ObjectType pLGKHFNOBCB = ObjectType.TYPE_SEPARATOR;
 		int num = 0;
 		bool flag = false;
 		char c = ',';
@@ -471,9 +471,9 @@ public class FunctionExtension : global::EventDispatcher<object>
 		for (int length = mAABDFKMACJ.Length; i < length; i++)
 		{
 			char c2 = mAABDFKMACJ[i];
-			bool flag2 = (RpnParser.MHPHPJEMDNH(c2) || c2 == ',') && c2 != '?' && c2 != '_';
-			bool flag3 = RpnParser.MHPHPJEMDNH(c) || c == ',';
-			if (pLGKHFNOBCB == PLGKHFNOBCB.TYPE_FUNCTION)
+			bool flag2 = (RpnParser.IsOperatorSymbol(c2) || c2 == ',') && c2 != '?' && c2 != '_';
+			bool flag3 = RpnParser.IsOperatorSymbol(c) || c == ',';
+			if (pLGKHFNOBCB == ObjectType.TYPE_FUNCTION)
 			{
 				switch (c2)
 				{
@@ -485,7 +485,7 @@ public class FunctionExtension : global::EventDispatcher<object>
 					num--;
 					if (num < 0)
 					{
-						LLLOJBFMONN.Error("FunctionExtension::parseObjects error! Brackets not valid. {0}", mAABDFKMACJ);
+						GameLog.Error("FunctionExtension::parseObjects error! Brackets not valid. {0}", mAABDFKMACJ);
 					}
 					break;
 				default:
@@ -493,63 +493,63 @@ public class FunctionExtension : global::EventDispatcher<object>
 					{
 						if (!stringBuilder.Equals(string.Empty))
 						{
-							GLJMJOACEIP(KJFKPMCPIBH, stringBuilder.ToString(), pLGKHFNOBCB);
+							AddObject(KJFKPMCPIBH, stringBuilder.ToString(), pLGKHFNOBCB);
 							stringBuilder.Clear();
 						}
-						pLGKHFNOBCB = PLGKHFNOBCB.TYPE_SEPARATOR;
+						pLGKHFNOBCB = ObjectType.TYPE_SEPARATOR;
 					}
 					break;
 				}
 			}
-			if (pLGKHFNOBCB == PLGKHFNOBCB.TYPE_VARIABLE && flag2)
+			if (pLGKHFNOBCB == ObjectType.TYPE_VARIABLE && flag2)
 			{
 				if (!stringBuilder.Equals(string.Empty))
 				{
-					GLJMJOACEIP(KJFKPMCPIBH, stringBuilder.ToString(), pLGKHFNOBCB);
+					AddObject(KJFKPMCPIBH, stringBuilder.ToString(), pLGKHFNOBCB);
 					stringBuilder.Clear();
 				}
-				pLGKHFNOBCB = PLGKHFNOBCB.TYPE_SEPARATOR;
+				pLGKHFNOBCB = ObjectType.TYPE_SEPARATOR;
 			}
-			if (pLGKHFNOBCB == PLGKHFNOBCB.TYPE_VALUE && flag2)
+			if (pLGKHFNOBCB == ObjectType.TYPE_VALUE && flag2)
 			{
 				if (!stringBuilder.Equals(string.Empty))
 				{
-					GLJMJOACEIP(KJFKPMCPIBH, stringBuilder.ToString(), pLGKHFNOBCB);
+					AddObject(KJFKPMCPIBH, stringBuilder.ToString(), pLGKHFNOBCB);
 					stringBuilder.Clear();
 				}
-				pLGKHFNOBCB = PLGKHFNOBCB.TYPE_SEPARATOR;
+				pLGKHFNOBCB = ObjectType.TYPE_SEPARATOR;
 			}
-			if (pLGKHFNOBCB == PLGKHFNOBCB.TYPE_SEPARATOR)
+			if (pLGKHFNOBCB == ObjectType.TYPE_SEPARATOR)
 			{
 				switch (c2)
 				{
 				case '?':
 					if (!stringBuilder.Equals(string.Empty))
 					{
-						GLJMJOACEIP(KJFKPMCPIBH, stringBuilder.ToString(), pLGKHFNOBCB);
+						AddObject(KJFKPMCPIBH, stringBuilder.ToString(), pLGKHFNOBCB);
 						stringBuilder.Clear();
 					}
-					pLGKHFNOBCB = PLGKHFNOBCB.TYPE_FUNCTION;
+					pLGKHFNOBCB = ObjectType.TYPE_FUNCTION;
 					num = 0;
 					flag = false;
 					break;
 				case '_':
 					if (!stringBuilder.Equals(string.Empty))
 					{
-						GLJMJOACEIP(KJFKPMCPIBH, stringBuilder.ToString(), pLGKHFNOBCB);
+						AddObject(KJFKPMCPIBH, stringBuilder.ToString(), pLGKHFNOBCB);
 						stringBuilder.Clear();
 					}
-					pLGKHFNOBCB = PLGKHFNOBCB.TYPE_VARIABLE;
+					pLGKHFNOBCB = ObjectType.TYPE_VARIABLE;
 					break;
 				default:
 					if (!flag2)
 					{
 						if (!stringBuilder.Equals(string.Empty))
 						{
-							GLJMJOACEIP(KJFKPMCPIBH, stringBuilder.ToString(), pLGKHFNOBCB);
+							AddObject(KJFKPMCPIBH, stringBuilder.ToString(), pLGKHFNOBCB);
 							stringBuilder.Clear();
 						}
-						pLGKHFNOBCB = PLGKHFNOBCB.TYPE_VALUE;
+						pLGKHFNOBCB = ObjectType.TYPE_VALUE;
 					}
 					break;
 				}
@@ -559,80 +559,80 @@ public class FunctionExtension : global::EventDispatcher<object>
 		}
 		if (!stringBuilder.Equals(string.Empty))
 		{
-			GLJMJOACEIP(KJFKPMCPIBH, stringBuilder.ToString(), pLGKHFNOBCB);
+			AddObject(KJFKPMCPIBH, stringBuilder.ToString(), pLGKHFNOBCB);
 		}
 	}
 
-	private void GLJMJOACEIP(GLBAFLLMOOH KJFKPMCPIBH, string HGFADEKMPAK, PLGKHFNOBCB LFLGCDNKNJI)
+	private void AddObject(FunctionCall KJFKPMCPIBH, string HGFADEKMPAK, ObjectType LFLGCDNKNJI)
 	{
 		switch (LFLGCDNKNJI)
 		{
-		case PLGKHFNOBCB.TYPE_FUNCTION:
-			DMEMAJBIOKE(KJFKPMCPIBH, HGFADEKMPAK);
+		case ObjectType.TYPE_FUNCTION:
+			AddFunction(KJFKPMCPIBH, HGFADEKMPAK);
 			break;
-		case PLGKHFNOBCB.TYPE_VARIABLE:
-			DEGGADHPIPO(KJFKPMCPIBH, HGFADEKMPAK, true);
+		case ObjectType.TYPE_VARIABLE:
+			AddValue(KJFKPMCPIBH, HGFADEKMPAK, true);
 			break;
-		case PLGKHFNOBCB.TYPE_VALUE:
-			DEGGADHPIPO(KJFKPMCPIBH, HGFADEKMPAK, false);
+		case ObjectType.TYPE_VALUE:
+			AddValue(KJFKPMCPIBH, HGFADEKMPAK, false);
 			break;
-		case PLGKHFNOBCB.TYPE_SEPARATOR:
-			AMDGNEHFPOK(KJFKPMCPIBH, HGFADEKMPAK);
+		case ObjectType.TYPE_SEPARATOR:
+			AddSeparator(KJFKPMCPIBH, HGFADEKMPAK);
 			break;
 		}
 	}
 
-	private void DMEMAJBIOKE(GLBAFLLMOOH KJFKPMCPIBH, string target)
+	private void AddFunction(FunctionCall KJFKPMCPIBH, string target)
 	{
 		if (!target.Equals(string.Empty))
 		{
-			GLBAFLLMOOH gLBAFLLMOOH = JCJHEBOMKIC(target);
-			gLBAFLLMOOH.LFLGCDNKNJI = PLGKHFNOBCB.TYPE_FUNCTION;
-			KJFKPMCPIBH.EJMMIOKEPHC.Add(gLBAFLLMOOH);
+			FunctionCall gLBAFLLMOOH = ParseFunction(target);
+			gLBAFLLMOOH.type = ObjectType.TYPE_FUNCTION;
+			KJFKPMCPIBH.children.Add(gLBAFLLMOOH);
 			target = string.Empty;
-			FMBAPDNOOGG.Add(gLBAFLLMOOH);
+			functionObjects.Add(gLBAFLLMOOH);
 		}
 	}
 
-	private void DEGGADHPIPO(GLBAFLLMOOH KJFKPMCPIBH, string target, bool HHEKDBGADGC)
+	private void AddValue(FunctionCall KJFKPMCPIBH, string target, bool HHEKDBGADGC)
 	{
 		if (!target.Equals(string.Empty))
 		{
 			FunctionObject pENDFCHBHIB = new FunctionObject();
 			pENDFCHBHIB.body = target;
-			pENDFCHBHIB.LFLGCDNKNJI = (HHEKDBGADGC ? PLGKHFNOBCB.TYPE_VARIABLE : PLGKHFNOBCB.TYPE_VALUE);
-			KJFKPMCPIBH.EJMMIOKEPHC.Add(pENDFCHBHIB);
+			pENDFCHBHIB.type = (HHEKDBGADGC ? ObjectType.TYPE_VARIABLE : ObjectType.TYPE_VALUE);
+			KJFKPMCPIBH.children.Add(pENDFCHBHIB);
 			target = string.Empty;
-			AHGOKKLEGBP.Add(pENDFCHBHIB);
+			valueObjects.Add(pENDFCHBHIB);
 		}
 	}
 
-	private void AMDGNEHFPOK(GLBAFLLMOOH KJFKPMCPIBH, string target)
+	private void AddSeparator(FunctionCall KJFKPMCPIBH, string target)
 	{
 		if (!target.Equals(string.Empty))
 		{
 			FunctionObject pENDFCHBHIB = new FunctionObject();
 			pENDFCHBHIB.body = target;
-			pENDFCHBHIB.LFLGCDNKNJI = PLGKHFNOBCB.TYPE_SEPARATOR;
-			KJFKPMCPIBH.EJMMIOKEPHC.Add(pENDFCHBHIB);
+			pENDFCHBHIB.type = ObjectType.TYPE_SEPARATOR;
+			KJFKPMCPIBH.children.Add(pENDFCHBHIB);
 			target = string.Empty;
-			AHGOKKLEGBP.Add(pENDFCHBHIB);
+			valueObjects.Add(pENDFCHBHIB);
 		}
 	}
 
-	public static bool NumberCompare(float KONPFNHLPJG, float BABJGGEOCBG, DLLJOIFFBPL LFLGCDNKNJI)
+	public static bool NumberCompare(float KONPFNHLPJG, float BABJGGEOCBG, CompareType LFLGCDNKNJI)
 	{
 		switch (LFLGCDNKNJI)
 		{
-		case DLLJOIFFBPL.COMPARE_EQUAL:
+		case CompareType.COMPARE_EQUAL:
 			return KONPFNHLPJG == BABJGGEOCBG;
-		case DLLJOIFFBPL.COMPARE_GREATER:
+		case CompareType.COMPARE_GREATER:
 			return KONPFNHLPJG > BABJGGEOCBG;
-		case DLLJOIFFBPL.COMPARE_GREATER_EQUAL:
+		case CompareType.COMPARE_GREATER_EQUAL:
 			return KONPFNHLPJG >= BABJGGEOCBG;
-		case DLLJOIFFBPL.COMPARE_LESS:
+		case CompareType.COMPARE_LESS:
 			return KONPFNHLPJG < BABJGGEOCBG;
-		case DLLJOIFFBPL.COMPARE_LESS_EQUAL:
+		case CompareType.COMPARE_LESS_EQUAL:
 			return KONPFNHLPJG <= BABJGGEOCBG;
 		default:
 			return false;
@@ -645,33 +645,33 @@ public class FunctionExtension : global::EventDispatcher<object>
 		List<string> list = new List<string>(collection);
 		if (list.Count > 2)
 		{
-			AFILEBFICDF aFILEBFICDF = FANCHMOGIEI(list[0]);
-			AFILEBFICDF aFILEBFICDF2 = FANCHMOGIEI(list[1]);
-			DLLJOIFFBPL lFLGCDNKNJI = MHKNIEBONKD(list[2]);
+			VariableType aFILEBFICDF = GetVariableType(list[0]);
+			VariableType aFILEBFICDF2 = GetVariableType(list[1]);
+			CompareType lFLGCDNKNJI = ParseCompareType(list[2]);
 			if (aFILEBFICDF == aFILEBFICDF2)
 			{
 				switch (aFILEBFICDF)
 				{
-				case AFILEBFICDF.VARIABLE_NUMBER:
+				case VariableType.VARIABLE_NUMBER:
 				{
-					Dictionary<string, RpnParser.PHNLIHEJEPK> pPEABEJMCPI = new Dictionary<string, RpnParser.PHNLIHEJEPK>();
+					Dictionary<string, RpnParser.VariableDelegate> pPEABEJMCPI = new Dictionary<string, RpnParser.VariableDelegate>();
 					Dictionary<string, RpnParser.ParameterDelegate> gIOGAJGIGMO = new Dictionary<string, RpnParser.ParameterDelegate>();
 					RpnParser.init(pPEABEJMCPI, gIOGAJGIGMO);
 					RpnParser.Formula lANLKOHCGEJ = new RpnParser.Formula(list[0]);
 					RpnParser.Formula lANLKOHCGEJ2 = new RpnParser.Formula(list[1]);
 					float result;
-					if (!float.TryParse(lANLKOHCGEJ.ODHJHHMEEOI().ToString(), out result))
+					if (!float.TryParse(lANLKOHCGEJ.Calculate().ToString(), out result))
 					{
 						result = 0f;
 					}
 					float result2;
-					if (!float.TryParse(lANLKOHCGEJ2.ODHJHHMEEOI().ToString(), out result2))
+					if (!float.TryParse(lANLKOHCGEJ2.Calculate().ToString(), out result2))
 					{
 						result2 = 0f;
 					}
 					return NumberCompare(result, result2, lFLGCDNKNJI);
 				}
-				case AFILEBFICDF.VARIABLE_STRING:
+				case VariableType.VARIABLE_STRING:
 					return list[0].Equals(list[1]);
 				}
 			}

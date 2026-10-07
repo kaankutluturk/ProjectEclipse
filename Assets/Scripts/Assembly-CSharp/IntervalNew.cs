@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 public class IntervalNew
 {
-	public InfoAnimation FGICHADOEHF;
+	public InfoAnimation Animation;
 
 	public List<float> Distances = new List<float>();
 

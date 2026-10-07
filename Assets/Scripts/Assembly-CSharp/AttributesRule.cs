@@ -3,14 +3,14 @@ using System.Xml;
 
 public class AttributesRule : InFightRule
 {
-	private Dictionary<string, float> OCCMEFFDJEH = new Dictionary<string, float>();
+	private Dictionary<string, float> attributeValues = new Dictionary<string, float>();
 
 	public AttributesRule(XmlNode node, RuleAppliance EJPOJJKKICO)
-		: base(BCBLLMPAMLP.RuleAttributes, EJPOJJKKICO, node)
+		: base(RuleType.RuleAttributes, EJPOJJKKICO, node)
 	{
-		foreach (GameUtils.AlignTargetAttribute item in GameUtils.FPIDOGKOPGC)
+		foreach (GameUtils.AlignTargetAttribute item in GameUtils.AlignTargetAttributes)
 		{
-			OCCMEFFDJEH[item.Name] = 0f;
+			attributeValues[item.Name] = 0f;
 		}
 		Parse(node);
 	}
@@ -18,27 +18,27 @@ public class AttributesRule : InFightRule
 	public override void InitRule(object data)
 	{
 		RuleInitData oIFPCFEGFOB = (RuleInitData)data;
-		foreach (KeyValuePair<string, float> item in OCCMEFFDJEH)
+		foreach (KeyValuePair<string, float> item in attributeValues)
 		{
 			float value = item.Value;
-			switch (NDBMMPENJNJ)
+			switch (appliance)
 			{
 			case RuleAppliance.AppliancePlayer:
 			{
 				int OEMALIFPGPO2 = 0;
-				oIFPCFEGFOB.NMNCKBPFCCP.IBLHIAHECLK.Get(item.Key, ref OEMALIFPGPO2);
-				oIFPCFEGFOB.NMNCKBPFCCP.IBLHIAHECLK.Set(item.Key, OEMALIFPGPO2 + (int)value);
+				oIFPCFEGFOB.PlayerParameters.FinalAttributes.Get(item.Key, ref OEMALIFPGPO2);
+				oIFPCFEGFOB.PlayerParameters.FinalAttributes.Set(item.Key, OEMALIFPGPO2 + (int)value);
 				break;
 			}
 			case RuleAppliance.ApplianceOpponent:
 			{
 				int OEMALIFPGPO = 0;
-				oIFPCFEGFOB.AKBNKDBHCEO.IBLHIAHECLK.Get(item.Key, ref OEMALIFPGPO);
-				oIFPCFEGFOB.AKBNKDBHCEO.IBLHIAHECLK.Set(item.Key, OEMALIFPGPO + (int)value);
+				oIFPCFEGFOB.OpponentParameters.FinalAttributes.Get(item.Key, ref OEMALIFPGPO);
+				oIFPCFEGFOB.OpponentParameters.FinalAttributes.Set(item.Key, OEMALIFPGPO + (int)value);
 				break;
 			}
 			default:
-				LLLOJBFMONN.Error("AttributesRule::initRule - wrong appliance - %i", NDBMMPENJNJ);
+				GameLog.Error("AttributesRule::initRule - wrong appliance - %i", appliance);
 				break;
 			}
 		}
@@ -51,13 +51,13 @@ public class AttributesRule : InFightRule
 		{
 			if (attribute.Name != "Round" && attribute.Name != "ApplyTo" && attribute.Name != "Eclipse" && attribute.Name != "WarriorPower")
 			{
-				if (!OCCMEFFDJEH.ContainsKey(attribute.Name))
+				if (!attributeValues.ContainsKey(attribute.Name))
 				{
-					OCCMEFFDJEH.Add(attribute.Name, attribute.ParseFloat());
+					attributeValues.Add(attribute.Name, attribute.ParseFloat());
 				}
 				else
 				{
-					OCCMEFFDJEH[attribute.Name] += attribute.ParseFloat();
+					attributeValues[attribute.Name] += attribute.ParseFloat();
 				}
 			}
 			if (!(attribute.Name == "WarriorPower"))
@@ -65,27 +65,27 @@ public class AttributesRule : InFightRule
 				continue;
 			}
 			List<string> list = new List<string>();
-			foreach (KeyValuePair<string, float> item in OCCMEFFDJEH)
+			foreach (KeyValuePair<string, float> item in attributeValues)
 			{
 				list.Add(item.Key);
 			}
 			foreach (string item2 in list)
 			{
-				OCCMEFFDJEH[item2] += attribute.ParseFloat();
+				attributeValues[item2] += attribute.ParseFloat();
 			}
 		}
 	}
 
-	public Dictionary<string, float> MAKMDLMJNPO()
+	public Dictionary<string, float> GetAttributeValues()
 	{
-		return OCCMEFFDJEH;
+		return attributeValues;
 	}
 
 	public override InFightRule Copy()
 	{
 		InFightRule aAJIFBJLJOA = null;
-		RuleAppliance eJPOJJKKICO = EDAKADCHOLE();
-		XmlNode hKPPBKPJOEO = GIFDJEEGCJI().IOJIGDNFCFL();
+		RuleAppliance eJPOJJKKICO = GetAppliance();
+		XmlNode hKPPBKPJOEO = GetXmlSource().GetNode();
 		aAJIFBJLJOA = new AttributesRule(hKPPBKPJOEO, eJPOJJKKICO);
 		aAJIFBJLJOA.IsRandom = IsRandom;
 		return aAJIFBJLJOA;

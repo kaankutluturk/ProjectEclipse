@@ -4,7 +4,7 @@ using UnityEngine;
 
 public sealed class SocketIOWePlaySample : MonoBehaviour
 {
-	private enum ODEGBLBHENN
+	private enum WePlayConnectionState
 	{
 		Connecting = 0,
 		WaitForNick = 1,
@@ -15,17 +15,17 @@ public sealed class SocketIOWePlaySample : MonoBehaviour
 
 	private const float ratio = 1.5f;
 
-	private int DNJCIJMNIAP = 50;
+	private int maxMessages = 50;
 
-	private ODEGBLBHENN AFINHOBCHMC;
+	private WePlayConnectionState state;
 
-	private Socket KNPLDJGCAKJ;
+	private Socket socket;
 
-	private string PLNHHIOPCMM = string.Empty;
+	private string nick = string.Empty;
 
-	private string IPNDLNBHBED = string.Empty;
+	private string messageToSend = string.Empty;
 
-	private int PHINJLLLGOK;
+	private int connections;
 
 	private List<string> messages = new List<string>();
 
@@ -36,75 +36,75 @@ public sealed class SocketIOWePlaySample : MonoBehaviour
 	private void Start()
 	{
 		SocketOptions pGHMKLAAHKP = new SocketOptions();
-		pGHMKLAAHKP.AHGIJFEGONK(false);
+		pGHMKLAAHKP.SetAutoConnect(false);
 		SocketManager mFANOMMMCFG = new SocketManager(new Uri("http://io.weplay.io/socket.io/"), pGHMKLAAHKP);
-		KNPLDJGCAKJ = mFANOMMMCFG.PDJFKOBODHH();
-		KNPLDJGCAKJ.JPJAFMLNALO(ECDAJBEFCAH.Connect, PIGDCLOPNKJ);
-		KNPLDJGCAKJ.JPJAFMLNALO("joined", DPIKEOICPHA);
-		KNPLDJGCAKJ.JPJAFMLNALO("connections", PFJGKIABBEA);
-		KNPLDJGCAKJ.JPJAFMLNALO("join", DEEFHPDIEEA);
-		KNPLDJGCAKJ.JPJAFMLNALO("move", DLGGMAJKJNO);
-		KNPLDJGCAKJ.JPJAFMLNALO("message", OnMessage);
-		KNPLDJGCAKJ.JPJAFMLNALO("reload", GFOOJBJJICD);
-		KNPLDJGCAKJ.JPJAFMLNALO("frame", FJMAEKAMKCP, false);
-		KNPLDJGCAKJ.JPJAFMLNALO(ECDAJBEFCAH.Error, OnError);
+		socket = mFANOMMMCFG.GetRootSocket();
+		socket.On(SocketIOEventType.Connect, OnConnected);
+		socket.On("joined", OnJoined);
+		socket.On("connections", OnConnections);
+		socket.On("join", OnJoin);
+		socket.On("move", OnMove);
+		socket.On("message", OnMessage);
+		socket.On("reload", OnReload);
+		socket.On("frame", OnFrame, false);
+		socket.On(SocketIOEventType.Error, OnError);
 		mFANOMMMCFG.Open();
-		AFINHOBCHMC = ODEGBLBHENN.Connecting;
+		state = WePlayConnectionState.Connecting;
 	}
 
 	private void OnDestroy()
 	{
-		KNPLDJGCAKJ.HLBNHJADOMP().Close();
+		socket.GetManager().Close();
 	}
 
 	private void Update()
 	{
 		if (Eclipse.Input.EclipseInput.GetKeyDown(KeyCode.Escape))
 		{
-			SampleSelector.SelectedSample.EHDDIIAKFGI();
+			SampleSelector.SelectedSample.DestroyUnityObject();
 		}
 	}
 
 	private void OnGUI()
 	{
-		switch (AFINHOBCHMC)
+		switch (state)
 		{
-		case ODEGBLBHENN.Connecting:
-			GUIHelper.ECMOBPFHNPN(GUIHelper.ClientArea, true, () =>
+		case WePlayConnectionState.Connecting:
+			GUIHelper.DrawArea(GUIHelper.ClientArea, true, () =>
 			{
 				GUILayout.BeginVertical();
 				GUILayout.FlexibleSpace();
-				GUIHelper.GECFPNNDHHJ("Connecting to the server...");
+				GUIHelper.DrawCenteredText("Connecting to the server...");
 				GUILayout.FlexibleSpace();
 				GUILayout.EndVertical();
 			});
 			break;
-		case ODEGBLBHENN.WaitForNick:
-			GUIHelper.ECMOBPFHNPN(GUIHelper.ClientArea, true, () =>
+		case WePlayConnectionState.WaitForNick:
+			GUIHelper.DrawArea(GUIHelper.ClientArea, true, () =>
 			{
-				CDFMAJDHEIL();
+				DrawLoginScreen();
 			});
 			break;
-		case ODEGBLBHENN.Joined:
-			GUIHelper.ECMOBPFHNPN(GUIHelper.ClientArea, true, () =>
+		case WePlayConnectionState.Joined:
+			GUIHelper.DrawArea(GUIHelper.ClientArea, true, () =>
 			{
 				if (FrameTexture != null)
 				{
 					GUILayout.Box(FrameTexture);
 				}
-				DBGDPNOGLMG();
+				DrawControls();
 				DrawChat();
 			});
 			break;
 		}
 	}
 
-	private void CDFMAJDHEIL()
+	private void DrawLoginScreen()
 	{
 		GUILayout.BeginVertical();
 		GUILayout.FlexibleSpace();
-		GUIHelper.GECFPNNDHHJ("What's your nickname?");
-		PLNHHIOPCMM = GUILayout.TextField(PLNHHIOPCMM);
+		GUIHelper.DrawCenteredText("What's your nickname?");
+		nick = GUILayout.TextField(nick);
 		if (GUILayout.Button("Join"))
 		{
 			Join();
@@ -113,7 +113,7 @@ public sealed class SocketIOWePlaySample : MonoBehaviour
 		GUILayout.EndVertical();
 	}
 
-	private void DBGDPNOGLMG()
+	private void DrawControls()
 	{
 		GUILayout.BeginHorizontal();
 		GUILayout.Label("Controls:");
@@ -121,10 +121,10 @@ public sealed class SocketIOWePlaySample : MonoBehaviour
 		{
 			if (GUILayout.Button(controls[i]))
 			{
-				KNPLDJGCAKJ.Emit("move", controls[i]);
+				socket.Emit("move", controls[i]);
 			}
 		}
-		GUILayout.Label(" Connections: " + PHINJLLLGOK);
+		GUILayout.Label(" Connections: " + connections);
 		GUILayout.EndHorizontal();
 	}
 
@@ -141,10 +141,10 @@ public sealed class SocketIOWePlaySample : MonoBehaviour
 		{
 			GUILayout.Label("Your message: ");
 			GUILayout.BeginHorizontal();
-			IPNDLNBHBED = GUILayout.TextField(IPNDLNBHBED);
+			messageToSend = GUILayout.TextField(messageToSend);
 			if (GUILayout.Button("Send", GUILayout.MaxWidth(100f)))
 			{
-				CGJFNMPOGCO();
+				SendChatMessage();
 			}
 			GUILayout.EndHorizontal();
 		}
@@ -154,61 +154,61 @@ public sealed class SocketIOWePlaySample : MonoBehaviour
 	private void AddMessage(string CKEHOEGLMBM)
 	{
 		messages.Insert(0, CKEHOEGLMBM);
-		if (messages.Count > DNJCIJMNIAP)
+		if (messages.Count > maxMessages)
 		{
-			messages.RemoveRange(DNJCIJMNIAP, messages.Count - DNJCIJMNIAP);
+			messages.RemoveRange(maxMessages, messages.Count - maxMessages);
 		}
 	}
 
-	private void CGJFNMPOGCO()
+	private void SendChatMessage()
 	{
-		if (!string.IsNullOrEmpty(IPNDLNBHBED))
+		if (!string.IsNullOrEmpty(messageToSend))
 		{
-			KNPLDJGCAKJ.Emit("message", IPNDLNBHBED);
-			AddMessage(string.Format("{0}: {1}", PLNHHIOPCMM, IPNDLNBHBED));
-			IPNDLNBHBED = string.Empty;
+			socket.Emit("message", messageToSend);
+			AddMessage(string.Format("{0}: {1}", nick, messageToSend));
+			messageToSend = string.Empty;
 		}
 	}
 
 	private void Join()
 	{
-		PlayerPrefs.SetString("Nick", PLNHHIOPCMM);
-		KNPLDJGCAKJ.Emit("join", PLNHHIOPCMM);
+		PlayerPrefs.SetString("Nick", nick);
+		socket.Emit("join", nick);
 	}
 
-	private void NPMIHDFCBBH()
+	private void Reload()
 	{
 		FrameTexture = null;
-		if (KNPLDJGCAKJ != null)
+		if (socket != null)
 		{
-			KNPLDJGCAKJ.HLBNHJADOMP().Close();
-			KNPLDJGCAKJ = null;
+			socket.GetManager().Close();
+			socket = null;
 			Start();
 		}
 	}
 
-	private void PIGDCLOPNKJ(Socket JLEACANCMJF, Packet NPKADBPBKIG, params object[] LKIOKGCNKHE)
+	private void OnConnected(Socket JLEACANCMJF, Packet NPKADBPBKIG, params object[] LKIOKGCNKHE)
 	{
 		if (PlayerPrefs.HasKey("Nick"))
 		{
-			PLNHHIOPCMM = PlayerPrefs.GetString("Nick", "NickName");
+			nick = PlayerPrefs.GetString("Nick", "NickName");
 			Join();
 		}
 		else
 		{
-			AFINHOBCHMC = ODEGBLBHENN.WaitForNick;
+			state = WePlayConnectionState.WaitForNick;
 		}
 		AddMessage("connected");
 	}
 
-	private void DPIKEOICPHA(Socket JLEACANCMJF, Packet NPKADBPBKIG, params object[] LKIOKGCNKHE)
+	private void OnJoined(Socket JLEACANCMJF, Packet NPKADBPBKIG, params object[] LKIOKGCNKHE)
 	{
-		AFINHOBCHMC = ODEGBLBHENN.Joined;
+		state = WePlayConnectionState.Joined;
 	}
 
-	private void GFOOJBJJICD(Socket JLEACANCMJF, Packet NPKADBPBKIG, params object[] LKIOKGCNKHE)
+	private void OnReload(Socket JLEACANCMJF, Packet NPKADBPBKIG, params object[] LKIOKGCNKHE)
 	{
-		NPMIHDFCBBH();
+		Reload();
 	}
 
 	private void OnMessage(Socket JLEACANCMJF, Packet NPKADBPBKIG, params object[] LKIOKGCNKHE)
@@ -223,32 +223,32 @@ public sealed class SocketIOWePlaySample : MonoBehaviour
 		}
 	}
 
-	private void DLGGMAJKJNO(Socket JLEACANCMJF, Packet NPKADBPBKIG, params object[] LKIOKGCNKHE)
+	private void OnMove(Socket JLEACANCMJF, Packet NPKADBPBKIG, params object[] LKIOKGCNKHE)
 	{
 		AddMessage(string.Format("{0} pressed {1}", LKIOKGCNKHE[1], LKIOKGCNKHE[0]));
 	}
 
-	private void DEEFHPDIEEA(Socket JLEACANCMJF, Packet NPKADBPBKIG, params object[] LKIOKGCNKHE)
+	private void OnJoin(Socket JLEACANCMJF, Packet NPKADBPBKIG, params object[] LKIOKGCNKHE)
 	{
 		string arg = ((LKIOKGCNKHE.Length <= 1) ? string.Empty : string.Format("({0})", LKIOKGCNKHE[1]));
 		AddMessage(string.Format("{0} joined {1}", LKIOKGCNKHE[0], arg));
 	}
 
-	private void PFJGKIABBEA(Socket JLEACANCMJF, Packet NPKADBPBKIG, params object[] LKIOKGCNKHE)
+	private void OnConnections(Socket JLEACANCMJF, Packet NPKADBPBKIG, params object[] LKIOKGCNKHE)
 	{
-		PHINJLLLGOK = Convert.ToInt32(LKIOKGCNKHE[0]);
+		connections = Convert.ToInt32(LKIOKGCNKHE[0]);
 	}
 
-	private void FJMAEKAMKCP(Socket JLEACANCMJF, Packet NPKADBPBKIG, params object[] LKIOKGCNKHE)
+	private void OnFrame(Socket JLEACANCMJF, Packet NPKADBPBKIG, params object[] LKIOKGCNKHE)
 	{
-		if (AFINHOBCHMC == ODEGBLBHENN.Joined)
+		if (state == WePlayConnectionState.Joined)
 		{
 			if (FrameTexture == null)
 			{
 				FrameTexture = new Texture2D(0, 0, TextureFormat.RGBA32, false);
 				FrameTexture.filterMode = FilterMode.Point;
 			}
-			byte[] data = NPKADBPBKIG.BINAPGLGAGE()[0];
+			byte[] data = NPKADBPBKIG.GetAttachments()[0];
 			FrameTexture.LoadImage(data);
 		}
 	}

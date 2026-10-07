@@ -18,13 +18,13 @@ internal class OverallUnitPool
 		}
 	}
 
-	internal static AudioUnit NGDGDCCFONE()
+	internal static AudioUnit GetFreeUnit()
 	{
 		for (int i = 0; i < _sources.Count; i++)
 		{
-			if (_sources[i].CNMPNLDPPEL())
+			if (_sources[i].GetIsFree())
 			{
-				_sources[i].PJNFHNFLNNO();
+				_sources[i].ReturnToChanel();
 				return _sources[i];
 			}
 		}

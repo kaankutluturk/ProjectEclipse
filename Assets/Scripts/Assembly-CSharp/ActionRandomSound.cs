@@ -10,19 +10,19 @@ public class ActionRandomSound : ActionAnimation
 	private string _Gender;
 
 	public ActionRandomSound(XmlNode node)
-		: base(FADAJCEEKIO.RANDOM_SOUND)
+		: base(ActionType.RANDOM_SOUND)
 	{
 		Parse(node);
 	}
 
 	public string get_Name()
 	{
-		return _Names.CJBCAIOBHMP();
+		return _Names.GetRandomElement();
 	}
 
 	public override void Visit(Model ACENLMONNPA)
 	{
-		ACENLMONNPA.OPPIKLBKMPN(this);
+		ACENLMONNPA.StartAction(this);
 	}
 
 	public bool SameGender(string EMENABICHED)
@@ -35,10 +35,10 @@ public class ActionRandomSound : ActionAnimation
 		base.Parse(node);
 		XmlAttribute xmlAttribute = node.Attributes["Voice"];
 		_AnyGender = xmlAttribute == null;
-		_Gender = xmlAttribute.CIPOICEEIBK(string.Empty);
+		_Gender = xmlAttribute.GetStringOrDefault(string.Empty);
 		foreach (XmlNode childNode in node.ChildNodes)
 		{
-			_Names.Add(childNode.Attributes["Name"].CIPOICEEIBK("ERR_RAND_SOUND_NO_NAME"));
+			_Names.Add(childNode.Attributes["Name"].GetStringOrDefault("ERR_RAND_SOUND_NO_NAME"));
 		}
 	}
 }

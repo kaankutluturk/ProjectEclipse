@@ -5,37 +5,37 @@ public class ModelConditions
 {
 	public class ModelPositions
 	{
-		public Vector2 BOGHNBAKCEL = default(Vector2);
+		public Vector2 LeftWall = default(Vector2);
 
-		public Vector2 PCIBKEOCFAO = default(Vector2);
+		public Vector2 RightWall = default(Vector2);
 
-		public ModelObject CBAECAAKAIA;
+		public ModelObject Body;
 
 		public void Clear()
 		{
-			CBAECAAKAIA = null;
+			Body = null;
 		}
 	}
 
-	public KeyData BJACLIMKPAE;
+	public KeyData PressedKeys;
 
-	public List<ItemInfo> OJIAKDDCGLB;
+	public List<ItemInfo> Items;
 
 	public List<IntervalAnimation> Intervals;
 
-	public List<IntervalAnimation> FJFOIEFFMEM;
+	public List<IntervalAnimation> OtherIntervals;
 
-	public List<IntervalAnimation> JLCFPNDDGCJ;
+	public List<IntervalAnimation> ParentIntervals;
 
-	public List<string> PDKPGKPBBIL = new List<string>();
+	public List<string> CandidateMoveNames = new List<string>();
 
-	public List<string> NNPJJLPCOHD = new List<string>();
+	public List<string> SelfAnimationNames = new List<string>();
 
-	public List<string> MGFNFEHILNF = new List<string>();
+	public List<string> OtherAnimationNames = new List<string>();
 
-	public List<string> DHHADKMMOHP = new List<string>();
+	public List<string> ParentAnimationNames = new List<string>();
 
-	public List<string> NKPMIACBKDE = new List<string>();
+	public List<string> ChildAnimationNames = new List<string>();
 
 	public Dictionary<string, float> PerkVariables = new Dictionary<string, float>();
 
@@ -44,97 +44,97 @@ public class ModelConditions
 	public string ModelName;
     public string EclipseCharacterId;
 
-	public SceneTypes IBBALIJOJMC;
+	public SceneTypes SceneType;
 
-	public ModelNode AFLPHBDFMGA;
+	public ModelNode SelfNode;
 
-	public ModelNode CJELGCJHMHI;
+	public ModelNode ParentNode;
 
-	public ModelNode EJFOAKCDPHH;
+	public ModelNode OtherNode;
 
-	public ModelNode JMMGJGCDPGE;
+	public ModelNode ChildNode;
 
-	public EventAnimation HFCIDBJJINB;
+	public EventAnimation CurrentEvent;
 
 	public EndRoundType EndRoundType;
 
 	public int BossAbilityState;
 
-	public int PCAOCHAIBJC;
+	public int AnimationSign;
 
-	public int FOIHIKCEBJF;
+	public int PivotPairSelector;
 
-	public int GFHOIKMBNHF;
+	public int SelfSign;
 
-	public int OLNDCCIPJAE;
+	public int OtherSign;
 
-	public int CDPEPJDJIPK;
+	public int ParentSign;
 
-	public int CNNMAMCKCMO;
+	public int ChildSign;
 
-	public float BFLPOMAHPJD;
+	public float CurrentHealth;
 
-	public float KGCJIBCACBH;
+	public float MaxHealth;
 
-	public int JMHJDHLBHLK;
+	public int RoundStage;
 
-	public bool IDCHHGHAENM;
+	public bool IsKeyCheckEnabled;
 
 	public bool IsPlayer;
 
-	public bool FAHHBNIFAMB;
+	public bool HasOther;
 
-	public bool FDELMAHAAJD;
+	public bool IsWeapon;
 
-	public bool NCBPMBJCFBK;
+	public bool SelfIsPhysics;
 
-	public bool EKFCILFBDPO;
+	public bool OtherIsPhysics;
 
-	public bool LFLDHGKEDEH;
+	public bool ParentIsPhysics;
 
-	public int KAKMANLHJOA;
+	public int CurrentFrame;
 
-	public int BOECCPNHAII;
+	public int ImpulseX;
 
-	public bool BHHLEBHLBLH;
+	public bool RoundEnded;
 
 	public bool IsWinner;
 
 	public object StrikeResult;
 
-	public List<PerkInfoItem> POBNMMADAJJ;
+	public List<PerkInfoItem> SelfPerks;
 
-	public List<PerkInfoItem> CFPLPALGCMK;
+	public List<PerkInfoItem> OtherPerks;
 
-	public List<PerksStage.ActionPerk> LPGJIICFIKF = new List<PerksStage.ActionPerk>();
+	public List<PerksStage.ActionPerk> SelfActionPerks = new List<PerksStage.ActionPerk>();
 
-	public List<PerksStage.ActionPerk> CBMFGJHKKMJ = new List<PerksStage.ActionPerk>();
+	public List<PerksStage.ActionPerk> OtherActionPerks = new List<PerksStage.ActionPerk>();
 
-	public List<PerksStage.ActionPerk> FPFKABHOEHP = new List<PerksStage.ActionPerk>();
+	public List<PerksStage.ActionPerk> SelfExpiredPerks = new List<PerksStage.ActionPerk>();
 
-	public List<PerksStage.ActionPerk> ENBHOAKMCIG = new List<PerksStage.ActionPerk>();
+	public List<PerksStage.ActionPerk> OtherActionPerksSecondary = new List<PerksStage.ActionPerk>();
 
-	public int PKMHOICGDIM;
+	public int NoRangedFlag;
 
-	public int JJDNDOLCMMN;
+	public int MagicCharges;
 
-	public int KHDBLNPFDPE;
+	public int RaidCharges;
 
-	public ModelPositions JBNPEMEEMLK = new ModelPositions();
+	public ModelPositions ParentPositions = new ModelPositions();
 
-	public ModelPositions IHJJBIDMEMB = new ModelPositions();
+	public ModelPositions SelfPositions = new ModelPositions();
 
-	public ModelPositions GAIBPAGPEGK = new ModelPositions();
+	public ModelPositions OtherPositions = new ModelPositions();
 
-	public ModelPositions NECEKOMIPIB = new ModelPositions();
+	public ModelPositions ChildPositions = new ModelPositions();
 
 	public void Reset()
 	{
 		PerkVariables.Clear();
 		PerkStringVariables.Clear();
-		JBNPEMEEMLK.Clear();
-		IHJJBIDMEMB.Clear();
-		GAIBPAGPEGK.Clear();
-		NECEKOMIPIB.Clear();
+		ParentPositions.Clear();
+		SelfPositions.Clear();
+		OtherPositions.Clear();
+		ChildPositions.Clear();
 	}
 }

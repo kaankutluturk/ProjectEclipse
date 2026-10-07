@@ -6,162 +6,162 @@ public class LogRules
 	private static LogRules instance;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private bool ENHCEHLAMMH;
+	private bool logEnabled;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private bool NAOCDIGNDDF;
+	private bool logQuests;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private bool KHEIMJHEKJI;
+	private bool logQuestActions;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private bool HNNNPDIBBIF;
+	private bool logAnimations;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private bool LCNBCCGBONK;
+	private bool logHits;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private bool HLCEMMFOJNJ;
+	private bool logHitDamage;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private bool INJGBGBBJPC;
+	private bool logHitStyle;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private bool LIPLBNBAGCP;
+	private bool logTactics;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private bool ENGCLADFDKK;
+	private bool logPerks;
 
-	public static LogRules BPCBBHAKFDM
+	public static LogRules Instance
 	{
 		get
 		{
-			return ELEBLBJKDBI();
+			return GetInstance();
 		}
 	}
 
-	public bool CJGACJBAFLB
+	public bool LogEnabled
 	{
 		get
 		{
-			return AEAIDFAJDDK();
+			return GetLogEnabled();
 		}
 		set
 		{
-			BLCHPOJDLOB(value);
+			SetLogEnabled(value);
 		}
 	}
 
-	public bool GLHICPIHDKA
+	public bool LogQuests
 	{
 		get
 		{
-			return MDKADLMMJLD();
+			return GetLogQuests();
 		}
 		set
 		{
-			CEEBLKBHOOA(value);
+			SetLogQuests(value);
 		}
 	}
 
-	public bool ACNLGBKEKNA
+	public bool LogQuestActions
 	{
 		get
 		{
-			return PIAKPGMPGMN();
+			return GetLogQuestActions();
 		}
 		set
 		{
-			NMLHALIEGID(value);
+			SetLogQuestActions(value);
 		}
 	}
 
-	public bool CHDBPGDJLIL
+	public bool LogAnimations
 	{
 		get
 		{
-			return JFHDKEJCLIL();
+			return GetLogAnimations();
 		}
 		set
 		{
-			LBNKDCHANDE(value);
+			SetLogAnimations(value);
 		}
 	}
 
-	public bool LLNGIKNDILO
+	public bool LogHits
 	{
 		get
 		{
-			return OLCCPLPEBNG();
+			return GetLogHits();
 		}
 		set
 		{
-			MLOKOKJBCBI(value);
+			SetLogHits(value);
 		}
 	}
 
-	public bool IOLEMKNCHOC
+	public bool LogHitDamage
 	{
 		get
 		{
-			return CHLJPKPGAMB();
+			return GetLogHitDamage();
 		}
 		set
 		{
-			NDGLEJOKMIL(value);
+			SetLogHitDamage(value);
 		}
 	}
 
-	public bool LGAFEIJMKGL
+	public bool LogHitStyle
 	{
 		get
 		{
-			return PKFOGIBLDJK();
+			return GetLogHitStyle();
 		}
 		set
 		{
-			JBDJFDBPMPL(value);
+			SetLogHitStyle(value);
 		}
 	}
 
-	public bool AEMOAEPCCMM
+	public bool LogTactics
 	{
 		get
 		{
-			return BJCOMMOMKCJ();
+			return GetLogTactics();
 		}
 		set
 		{
-			FLFFOMGNACI(value);
+			SetLogTactics(value);
 		}
 	}
 
-	public bool JHMKINJHFGM
+	public bool LogPerks
 	{
 		get
 		{
-			return DKHBLILFCOA();
+			return GetLogPerks();
 		}
 		set
 		{
-			AJIGADCNOON(value);
+			SetLogPerks(value);
 		}
 	}
 
 	private LogRules()
 	{
-		BLCHPOJDLOB(false);
-		CEEBLKBHOOA(false);
-		NMLHALIEGID(false);
-		LBNKDCHANDE(false);
-		MLOKOKJBCBI(false);
-		NDGLEJOKMIL(false);
-		JBDJFDBPMPL(false);
-		FLFFOMGNACI(false);
-		AJIGADCNOON(false);
+		SetLogEnabled(false);
+		SetLogQuests(false);
+		SetLogQuestActions(false);
+		SetLogAnimations(false);
+		SetLogHits(false);
+		SetLogHitDamage(false);
+		SetLogHitStyle(false);
+		SetLogTactics(false);
+		SetLogPerks(false);
 	}
 
-	public static LogRules ELEBLBJKDBI()
+	public static LogRules GetInstance()
 	{
 		if (instance == null)
 		{
@@ -170,122 +170,122 @@ public class LogRules
 		return instance;
 	}
 
-	public bool AEAIDFAJDDK()
+	public bool GetLogEnabled()
 	{
-		return ENHCEHLAMMH;
+		return logEnabled;
 	}
 
-	public void BLCHPOJDLOB(bool value)
+	public void SetLogEnabled(bool value)
 	{
-		ENHCEHLAMMH = value;
+		logEnabled = value;
 	}
 
-	public bool MDKADLMMJLD()
+	public bool GetLogQuests()
 	{
-		return NAOCDIGNDDF;
+		return logQuests;
 	}
 
-	public void CEEBLKBHOOA(bool value)
+	public void SetLogQuests(bool value)
 	{
-		NAOCDIGNDDF = value;
+		logQuests = value;
 	}
 
-	public bool PIAKPGMPGMN()
+	public bool GetLogQuestActions()
 	{
-		return KHEIMJHEKJI;
+		return logQuestActions;
 	}
 
-	public void NMLHALIEGID(bool value)
+	public void SetLogQuestActions(bool value)
 	{
-		KHEIMJHEKJI = value;
+		logQuestActions = value;
 	}
 
-	public bool JFHDKEJCLIL()
+	public bool GetLogAnimations()
 	{
-		return HNNNPDIBBIF;
+		return logAnimations;
 	}
 
-	public void LBNKDCHANDE(bool value)
+	public void SetLogAnimations(bool value)
 	{
-		HNNNPDIBBIF = value;
+		logAnimations = value;
 	}
 
-	public bool OLCCPLPEBNG()
+	public bool GetLogHits()
 	{
-		return LCNBCCGBONK;
+		return logHits;
 	}
 
-	public void MLOKOKJBCBI(bool value)
+	public void SetLogHits(bool value)
 	{
-		LCNBCCGBONK = value;
+		logHits = value;
 	}
 
-	public bool CHLJPKPGAMB()
+	public bool GetLogHitDamage()
 	{
-		return HLCEMMFOJNJ;
+		return logHitDamage;
 	}
 
-	public void NDGLEJOKMIL(bool value)
+	public void SetLogHitDamage(bool value)
 	{
-		HLCEMMFOJNJ = value;
+		logHitDamage = value;
 	}
 
-	public bool PKFOGIBLDJK()
+	public bool GetLogHitStyle()
 	{
-		return INJGBGBBJPC;
+		return logHitStyle;
 	}
 
-	public void JBDJFDBPMPL(bool value)
+	public void SetLogHitStyle(bool value)
 	{
-		INJGBGBBJPC = value;
+		logHitStyle = value;
 	}
 
-	public bool BJCOMMOMKCJ()
+	public bool GetLogTactics()
 	{
-		return LIPLBNBAGCP;
+		return logTactics;
 	}
 
-	public void FLFFOMGNACI(bool value)
+	public void SetLogTactics(bool value)
 	{
-		LIPLBNBAGCP = value;
+		logTactics = value;
 	}
 
-	public bool DKHBLILFCOA()
+	public bool GetLogPerks()
 	{
-		return ENGCLADFDKK;
+		return logPerks;
 	}
 
-	public void AJIGADCNOON(bool value)
+	public void SetLogPerks(bool value)
 	{
-		ENGCLADFDKK = value;
+		logPerks = value;
 	}
 
-	private bool EBFKDDAMNHD(XmlNode node, bool AGADEMLBJGJ = false)
+	private bool ParseFlag(XmlNode node, bool AGADEMLBJGJ = false)
 	{
 		return (node == null) ? AGADEMLBJGJ : XmlUtils.ParseBool(node.Attributes[0], AGADEMLBJGJ);
 	}
 
 	public void Parse(XmlNode node)
 	{
-		BLCHPOJDLOB(EBFKDDAMNHD(node));
-		if (AEAIDFAJDDK())
+		SetLogEnabled(ParseFlag(node));
+		if (GetLogEnabled())
 		{
 			XmlNode xmlNode = node["Quests"];
-			CEEBLKBHOOA(EBFKDDAMNHD(xmlNode));
-			if (MDKADLMMJLD())
+			SetLogQuests(ParseFlag(xmlNode));
+			if (GetLogQuests())
 			{
 				XmlNode hKPPBKPJOEO = xmlNode["Actions"];
-				NMLHALIEGID(EBFKDDAMNHD(hKPPBKPJOEO));
+				SetLogQuestActions(ParseFlag(hKPPBKPJOEO));
 			}
-			LBNKDCHANDE(EBFKDDAMNHD(node["Animations"]));
-			FLFFOMGNACI(EBFKDDAMNHD(node["Tactics"]));
-			AJIGADCNOON(EBFKDDAMNHD(node["Perks"]));
+			SetLogAnimations(ParseFlag(node["Animations"]));
+			SetLogTactics(ParseFlag(node["Tactics"]));
+			SetLogPerks(ParseFlag(node["Perks"]));
 			XmlNode xmlNode2 = node["Hits"];
-			MLOKOKJBCBI(EBFKDDAMNHD(xmlNode2));
-			if (OLCCPLPEBNG())
+			SetLogHits(ParseFlag(xmlNode2));
+			if (GetLogHits())
 			{
-				NDGLEJOKMIL(EBFKDDAMNHD(xmlNode2["Damage"]));
-				JBDJFDBPMPL(EBFKDDAMNHD(xmlNode2["Style"]));
+				SetLogHitDamage(ParseFlag(xmlNode2["Damage"]));
+				SetLogHitStyle(ParseFlag(xmlNode2["Style"]));
 			}
 		}
 	}

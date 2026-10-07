@@ -76,7 +76,7 @@ public static class AnimationData
 {
     public static readonly List<InfoAnimation> Animations=new List<InfoAnimation>();
 }
-public static class SF2Paths { public static string FFKEDOBDLOL = "userdata"; public static string MCFPDHOLNGB()=>"fixture"; }
+public static class SF2Paths { public static string UserDataRoot = "userdata"; public static string GetAnimationsPath()=>"fixture"; }
 public static class XmlUtils
 {
     public static XmlDocument Source;
@@ -86,7 +86,7 @@ public static class ResourceManager
 {
     public static int Reads;
     public static string GetText(string path) { Reads++; return XmlUtils.Source.OuterXml; }
-    public static string KIHHJGJKMIC(string path) => GetText(path);
+    public static string GetFileOrDevText(string path) => GetText(path);
 }
 
 internal static class Program
@@ -129,7 +129,7 @@ internal static class Program
         cached["A"]["Locks"].RemoveAll(); probe.DocumentElement.RemoveAll();
         MovesParser.TryReadBaseMoveLockSources(new HashSet<string> { "A" }, out cached);
         Assert(cached["A"]["Locks"]["Perk"].GetAttribute("Name") == "Last", "Caller or parser mutation changed base locks");
-        MovesParser.CHILAIJNEHG();
+        MovesParser.ClearCaches();
         Assert(!MovesParser.TryReadBaseMoveLockSources(wanted, out _), "Parser reset retained a stale base snapshot");
         var read = typeof(ExternalCombatContentRuntime).GetMethod("ReadRecoveredMoves", BindingFlags.Static | BindingFlags.NonPublic);
         var fallback = (Dictionary<string, XmlNode>)read.Invoke(null, new object[] { wanted });
@@ -139,7 +139,7 @@ internal static class Program
         foreach (string name in Moves) Assert(fromCache[name]["Locks"].OuterXml == fallback[name]["Locks"].OuterXml, "Cached direct locks differ from recovered reader for " + name);
         Assert(ResourceManager.Reads == 1, "Warm lock lookup reread moves.xml");
         var nextBoot = new XmlDocument(); nextBoot.LoadXml("<Moves><Move Name='Fresh'><Locks><Perk Name='New'/></Locks></Move></Moves>");
-        MovesParser.CHILAIJNEHG(); MovesParser.Seed(nextBoot.DocumentElement);
+        MovesParser.ClearCaches(); MovesParser.Seed(nextBoot.DocumentElement);
         MovesParser.TryReadBaseMoveLockSources(new HashSet<string> { "Fresh", Moves[0] }, out cached);
         Assert(cached.Count == 1 && cached.ContainsKey("Fresh"), "Next boot reused old XML locks");
         MovesParser.Seed(vanilla["Movesxml"]["Moves"]);

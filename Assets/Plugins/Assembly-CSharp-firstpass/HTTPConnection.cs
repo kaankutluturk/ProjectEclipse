@@ -12,7 +12,7 @@ using SocketEx;
 
 internal sealed class HTTPConnection : IDisposable
 {
-	private enum AKALLIGHOHC
+	private enum RetryCauses
 	{
 		None = 0,
 		Reconnect = 1,
@@ -21,37 +21,37 @@ internal sealed class HTTPConnection : IDisposable
 	}
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private string NFIMMCFCEKO;
+	private string serverAddress;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private AHFEJIOPFGP MKHEFCIEOCA;
+	private HTTPConnectionStates state;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private HTTPRequest BOLACMMLMLJ;
+	private HTTPRequest currentRequest;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private DateTime OIFJPKPOAKI;
+	private DateTime startTime;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private DateTime PIPBEMBBOKM;
+	private DateTime timedOutStart;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private HTTPProxy FGGPKCKKPNB;
+	private HTTPProxy proxy;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private Uri DCMBFNKDCIF;
+	private Uri lastProcessedUri;
 
 	private TcpClient Client;
 
 	private Stream Stream;
 
-	private DateTime LNDDFLHCGIM;
+	private DateTime lastProcessTime;
 
-	internal string BICNDKPNCEP
+	internal string ConnectionAddress
 	{
 		get
 		{
-			return JHAJFMBPEDL();
+			return GetServerAddress();
 		}
 		private set
 		{
@@ -59,11 +59,11 @@ internal sealed class HTTPConnection : IDisposable
 		}
 	}
 
-	internal AHFEJIOPFGP AFINHOBCHMC
+	internal HTTPConnectionStates ConnectionState
 	{
 		get
 		{
-			return FLBBFDNHJAJ();
+			return GetState();
 		}
 		private set
 		{
@@ -71,91 +71,91 @@ internal sealed class HTTPConnection : IDisposable
 		}
 	}
 
-	internal bool HACILDMBCMN
+	internal bool IsFree
 	{
 		get
 		{
-			return PMOPEALOIKF();
+			return GetIsFree();
 		}
 	}
 
-	internal bool DCHJDPCEODD
+	internal bool IsActive
 	{
 		get
 		{
-			return OPIAGHNCFAM();
+			return GetIsActive();
 		}
 	}
 
-	internal HTTPRequest ECKDGLMPIHP
+	internal HTTPRequest CurrentRequest
 	{
 		get
 		{
-			return ONLLAFBCPIJ();
+			return GetCurrentRequest();
 		}
 		private set
 		{
-			NJHEPFCAFAK(value);
+			SetCurrentRequest(value);
 		}
 	}
 
-	internal bool DGDKKNCNGGE
+	internal bool IsRemovable
 	{
 		get
 		{
-			return KKDOCCALBEG();
+			return GetIsRemovable();
 		}
 	}
 
-	internal DateTime PIOONMEEKHO
+	internal DateTime StartTime
 	{
 		get
 		{
-			return MJFPCJODODA();
+			return GetStartTime();
 		}
 		private set
 		{
-			OJDGGOOJNJM(value);
+			SetStartTime(value);
 		}
 	}
 
-	internal DateTime HEDGMGEBLOA
+	internal DateTime TimedOutStart
 	{
 		get
 		{
-			return MFFGFLEIPOC();
+			return GetTimedOutStart();
 		}
 		private set
 		{
-			HCKHGGHLFAN(value);
+			SetTimedOutStart(value);
 		}
 	}
 
-	internal HTTPProxy DEFLNIGINCO
+	internal HTTPProxy Proxy
 	{
 		get
 		{
-			return FHGBKFBCGCO();
+			return GetProxy();
 		}
 		private set
 		{
-			PNGMAECJHID(value);
+			SetProxy(value);
 		}
 	}
 
-	internal bool JKNCBCEAILF
+	internal bool HasProxy
 	{
 		get
 		{
-			return AOPIGGFCGHC();
+			return GetHasProxy();
 		}
 	}
 
-	internal Uri IHKGJONICKF
+	internal Uri ProcessedUri
 	{
 		get
 		{
-			return PHMNCEBDLKP();
+			return GetLastProcessedUri();
 		}
 		private set
 		{
@@ -166,134 +166,134 @@ internal sealed class HTTPConnection : IDisposable
 	internal HTTPConnection(string FDFCPOOHGLE)
 	{
 		set_ServerAddress(FDFCPOOHGLE);
-		set_State(AHFEJIOPFGP.Initial);
-		LNDDFLHCGIM = DateTime.UtcNow;
+		set_State(HTTPConnectionStates.Initial);
+		lastProcessTime = DateTime.UtcNow;
 	}
 
-	internal string JHAJFMBPEDL()
+	internal string GetServerAddress()
 	{
-		return NFIMMCFCEKO;
+		return serverAddress;
 	}
 
 	private void set_ServerAddress(string value)
 	{
-		NFIMMCFCEKO = value;
+		serverAddress = value;
 	}
 
-	internal AHFEJIOPFGP FLBBFDNHJAJ()
+	internal HTTPConnectionStates GetState()
 	{
-		return MKHEFCIEOCA;
+		return state;
 	}
 
-	private void set_State(AHFEJIOPFGP value)
+	private void set_State(HTTPConnectionStates value)
 	{
-		MKHEFCIEOCA = value;
+		state = value;
 	}
 
-	internal bool PMOPEALOIKF()
+	internal bool GetIsFree()
 	{
-		return FLBBFDNHJAJ() == AHFEJIOPFGP.Initial || FLBBFDNHJAJ() == AHFEJIOPFGP.Free;
+		return GetState() == HTTPConnectionStates.Initial || GetState() == HTTPConnectionStates.Free;
 	}
 
-	internal bool OPIAGHNCFAM()
+	internal bool GetIsActive()
 	{
-		return FLBBFDNHJAJ() > AHFEJIOPFGP.Initial && FLBBFDNHJAJ() < AHFEJIOPFGP.Free;
+		return GetState() > HTTPConnectionStates.Initial && GetState() < HTTPConnectionStates.Free;
 	}
 
-	internal HTTPRequest ONLLAFBCPIJ()
+	internal HTTPRequest GetCurrentRequest()
 	{
-		return BOLACMMLMLJ;
+		return currentRequest;
 	}
 
-	private void NJHEPFCAFAK(HTTPRequest value)
+	private void SetCurrentRequest(HTTPRequest value)
 	{
-		BOLACMMLMLJ = value;
+		currentRequest = value;
 	}
 
-	internal bool KKDOCCALBEG()
+	internal bool GetIsRemovable()
 	{
-		return PMOPEALOIKF() && DateTime.UtcNow - LNDDFLHCGIM > HTTPManager.AAKIPAJACAH();
+		return GetIsFree() && DateTime.UtcNow - lastProcessTime > HTTPManager.GetMaxConnectionIdleTime();
 	}
 
-	internal DateTime MJFPCJODODA()
+	internal DateTime GetStartTime()
 	{
-		return OIFJPKPOAKI;
+		return startTime;
 	}
 
-	private void OJDGGOOJNJM(DateTime value)
+	private void SetStartTime(DateTime value)
 	{
-		OIFJPKPOAKI = value;
+		startTime = value;
 	}
 
-	internal DateTime MFFGFLEIPOC()
+	internal DateTime GetTimedOutStart()
 	{
-		return PIPBEMBBOKM;
+		return timedOutStart;
 	}
 
-	private void HCKHGGHLFAN(DateTime value)
+	private void SetTimedOutStart(DateTime value)
 	{
-		PIPBEMBBOKM = value;
+		timedOutStart = value;
 	}
 
-	internal HTTPProxy FHGBKFBCGCO()
+	internal HTTPProxy GetProxy()
 	{
-		return FGGPKCKKPNB;
+		return proxy;
 	}
 
-	private void PNGMAECJHID(HTTPProxy value)
+	private void SetProxy(HTTPProxy value)
 	{
-		FGGPKCKKPNB = value;
+		proxy = value;
 	}
 
-	internal bool AOPIGGFCGHC()
+	internal bool GetHasProxy()
 	{
-		return FHGBKFBCGCO() != null;
+		return GetProxy() != null;
 	}
 
-	internal Uri PHMNCEBDLKP()
+	internal Uri GetLastProcessedUri()
 	{
-		return DCMBFNKDCIF;
+		return lastProcessedUri;
 	}
 
 	private void set_LastProcessedUri(Uri value)
 	{
-		DCMBFNKDCIF = value;
+		lastProcessedUri = value;
 	}
 
-	internal void HDEHLIKBKJG(HTTPRequest ONOCIELLAPL)
+	internal void Process(HTTPRequest ONOCIELLAPL)
 	{
-		if (FLBBFDNHJAJ() == AHFEJIOPFGP.Processing)
+		if (GetState() == HTTPConnectionStates.Processing)
 		{
 			throw new Exception("Connection already processing a request!");
 		}
-		OJDGGOOJNJM(DateTime.MaxValue);
-		set_State(AHFEJIOPFGP.Processing);
-		NJHEPFCAFAK(ONOCIELLAPL);
+		SetStartTime(DateTime.MaxValue);
+		set_State(HTTPConnectionStates.Processing);
+		SetCurrentRequest(ONOCIELLAPL);
 		new System.Threading.Thread(ThreadFunc).Start();
 	}
 
-	internal void FFKAKHDIBGD()
+	internal void Recycle()
 	{
-		if (FLBBFDNHJAJ() == AHFEJIOPFGP.TimedOut)
+		if (GetState() == HTTPConnectionStates.TimedOut)
 		{
-			LNDDFLHCGIM = DateTime.MinValue;
+			lastProcessTime = DateTime.MinValue;
 		}
-		set_State(AHFEJIOPFGP.Free);
-		NJHEPFCAFAK(null);
+		set_State(HTTPConnectionStates.Free);
+		SetCurrentRequest(null);
 	}
 
 	private void ThreadFunc(object KKNOCIPBIIK)
 	{
 		bool flag = false;
 		bool flag2 = false;
-		AKALLIGHOHC aKALLIGHOHC = AKALLIGHOHC.None;
+		RetryCauses aKALLIGHOHC = RetryCauses.None;
 		try
 		{
-			if (!AOPIGGFCGHC() && ONLLAFBCPIJ().AOPIGGFCGHC())
+			if (!GetHasProxy() && GetCurrentRequest().GetHasProxy())
 			{
-				PNGMAECJHID(ONLLAFBCPIJ().FHGBKFBCGCO());
+				SetProxy(GetCurrentRequest().GetProxy());
 			}
-			if (DECKPAHHIDJ())
+			if (TryLoadAllFromCache())
 			{
 				return;
 			}
@@ -303,90 +303,90 @@ internal sealed class HTTPConnection : IDisposable
 			}
 			do
 			{
-				if (aKALLIGHOHC == AKALLIGHOHC.Reconnect)
+				if (aKALLIGHOHC == RetryCauses.Reconnect)
 				{
 					Close();
 					System.Threading.Thread.Sleep(100);
 				}
-				set_LastProcessedUri(ONLLAFBCPIJ().DKAECMGPGOE());
-				aKALLIGHOHC = AKALLIGHOHC.None;
-				NDCILHIAPIK();
-				if (FLBBFDNHJAJ() == AHFEJIOPFGP.AbortRequested)
+				set_LastProcessedUri(GetCurrentRequest().GetCurrentUri());
+				aKALLIGHOHC = RetryCauses.None;
+				Connect();
+				if (GetState() == HTTPConnectionStates.AbortRequested)
 				{
 					throw new Exception("AbortRequested");
 				}
-				if (!ONLLAFBCPIJ().DCOLJJKGFGD())
+				if (!GetCurrentRequest().GetDisableCache())
 				{
-					HTTPCacheService.JGLDNKPBBGC(ONLLAFBCPIJ());
+					HTTPCacheService.SetHeaders(GetCurrentRequest());
 				}
 				bool flag3 = false;
 				try
 				{
-					ONLLAFBCPIJ().SendOutTo(Stream);
+					GetCurrentRequest().SendOutTo(Stream);
 					flag3 = true;
 				}
 				catch (Exception ex)
 				{
 					Close();
-					if (FLBBFDNHJAJ() == AHFEJIOPFGP.TimedOut)
+					if (GetState() == HTTPConnectionStates.TimedOut)
 					{
 						throw new Exception("AbortRequested");
 					}
-					if (flag || ONLLAFBCPIJ().CKLEKLGMEAG())
+					if (flag || GetCurrentRequest().GetDisableRetry())
 					{
 						throw ex;
 					}
 					flag = true;
-					aKALLIGHOHC = AKALLIGHOHC.Reconnect;
+					aKALLIGHOHC = RetryCauses.Reconnect;
 				}
 				if (!flag3)
 				{
 					continue;
 				}
 				bool flag4 = Receive();
-				if (FLBBFDNHJAJ() == AHFEJIOPFGP.TimedOut)
+				if (GetState() == HTTPConnectionStates.TimedOut)
 				{
 					throw new Exception("AbortRequested");
 				}
-				if (!flag4 && !flag && !ONLLAFBCPIJ().CKLEKLGMEAG())
+				if (!flag4 && !flag && !GetCurrentRequest().GetDisableRetry())
 				{
 					flag = true;
-					aKALLIGHOHC = AKALLIGHOHC.Reconnect;
+					aKALLIGHOHC = RetryCauses.Reconnect;
 				}
-				if (ONLLAFBCPIJ().POGDKNCHIBG() == null)
+				if (GetCurrentRequest().GetResponse() == null)
 				{
 					continue;
 				}
-				switch (ONLLAFBCPIJ().POGDKNCHIBG().KNMDPGBPNED())
+				switch (GetCurrentRequest().GetResponse().GetStatusCode())
 				{
 				case 401:
 				{
-					string text3 = DigestStore.FindBest(ONLLAFBCPIJ().POGDKNCHIBG().GetHeaderValues("www-authenticate"));
+					string text3 = DigestStore.FindBest(GetCurrentRequest().GetResponse().GetHeaderValues("www-authenticate"));
 					if (!string.IsNullOrEmpty(text3))
 					{
-						Digest kHNAPCOOAEF2 = DigestStore.NLJEDHBBPKK(ONLLAFBCPIJ().DKAECMGPGOE());
-						kHNAPCOOAEF2.CKNNIILGPNN(text3);
-						if (ONLLAFBCPIJ().HPKPFEOBIOC() != null && kHNAPCOOAEF2.IsUriProtected(ONLLAFBCPIJ().DKAECMGPGOE()) && (!ONLLAFBCPIJ().HasHeader("Authorization") || kHNAPCOOAEF2.OCBMLPLDMOO()))
+						Digest kHNAPCOOAEF2 = DigestStore.GetOrCreate(GetCurrentRequest().GetCurrentUri());
+						kHNAPCOOAEF2.ParseChallange(text3);
+						if (GetCurrentRequest().GetCredentials() != null && kHNAPCOOAEF2.IsUriProtected(GetCurrentRequest().GetCurrentUri()) && (!GetCurrentRequest().HasHeader("Authorization") || kHNAPCOOAEF2.GetStale()))
 						{
-							aKALLIGHOHC = AKALLIGHOHC.Authenticate;
+							aKALLIGHOHC = RetryCauses.Authenticate;
 						}
 					}
 					break;
 				}
 				case 407:
 				{
-					if (!ONLLAFBCPIJ().AOPIGGFCGHC())
+					if (!GetCurrentRequest().GetHasProxy())
 					{
 						break;
 					}
-					string text2 = DigestStore.FindBest(ONLLAFBCPIJ().POGDKNCHIBG().GetHeaderValues("proxy-authenticate"));
+					string text2 = DigestStore.FindBest(GetCurrentRequest().GetResponse().GetHeaderValues("proxy-authenticate"));
 					if (!string.IsNullOrEmpty(text2))
 					{
-						Digest kHNAPCOOAEF = DigestStore.NLJEDHBBPKK(ONLLAFBCPIJ().FHGBKFBCGCO().DNIJHGFINDG());
-						kHNAPCOOAEF.CKNNIILGPNN(text2);
-						if (ONLLAFBCPIJ().FHGBKFBCGCO().HPKPFEOBIOC() != null && kHNAPCOOAEF.IsUriProtected(ONLLAFBCPIJ().FHGBKFBCGCO().DNIJHGFINDG()) && (!ONLLAFBCPIJ().HasHeader("Proxy-Authorization") || kHNAPCOOAEF.OCBMLPLDMOO()))
+						Digest kHNAPCOOAEF = DigestStore.GetOrCreate(GetCurrentRequest().GetProxy().GetAddress());
+						kHNAPCOOAEF.ParseChallange(text2);
+						if (GetCurrentRequest().GetProxy().GetCredentials() != null && kHNAPCOOAEF.IsUriProtected(GetCurrentRequest().GetProxy().GetAddress()) && (!GetCurrentRequest().HasHeader("Proxy-Authorization") || kHNAPCOOAEF.GetStale()))
 						{
-							aKALLIGHOHC = AKALLIGHOHC.ProxyAuthenticate;
+							aKALLIGHOHC = RetryCauses.ProxyAuthenticate;
 						}
 					}
 					break;
@@ -395,70 +395,70 @@ internal sealed class HTTPConnection : IDisposable
 				case 302:
 				case 307:
 				case 308:
-					if (ONLLAFBCPIJ().FJNLLEMJKDC() < ONLLAFBCPIJ().MNBNOBNFOJH())
+					if (GetCurrentRequest().GetRedirectCount() < GetCurrentRequest().GetMaxRedirects())
 					{
-						HTTPRequest iPLGNIDJDCF = ONLLAFBCPIJ();
-						iPLGNIDJDCF.NDCFOHCFKHE(iPLGNIDJDCF.FJNLLEMJKDC() + 1);
-						string text = ONLLAFBCPIJ().POGDKNCHIBG().GetFirstHeaderValue("location");
+						HTTPRequest iPLGNIDJDCF = GetCurrentRequest();
+						iPLGNIDJDCF.SetRedirectCount(iPLGNIDJDCF.GetRedirectCount() + 1);
+						string text = GetCurrentRequest().GetResponse().GetFirstHeaderValue("location");
 						if (string.IsNullOrEmpty(text))
 						{
-							throw new MissingFieldException(string.Format("Got redirect status({0}) without 'location' header!", ONLLAFBCPIJ().POGDKNCHIBG().KNMDPGBPNED().ToString()));
+							throw new MissingFieldException(string.Format("Got redirect status({0}) without 'location' header!", GetCurrentRequest().GetResponse().GetStatusCode().ToString()));
 						}
 						Uri uri = GetRedirectUri(text);
-						if (!ONLLAFBCPIJ().CallOnBeforeRedirection(uri))
+						if (!GetCurrentRequest().CallOnBeforeRedirection(uri))
 						{
-							HTTPManager.MBBMPNDDPIH().KDAFBLAKBMI("HTTPConnection", "OnBeforeRedirection returned False");
+							HTTPManager.GetLogger().Information("HTTPConnection", "OnBeforeRedirection returned False");
 							break;
 						}
-						ONLLAFBCPIJ().KKCENCBJJIJ("Host");
-						ONLLAFBCPIJ().MMPFBNNMGED("Referer", ONLLAFBCPIJ().DKAECMGPGOE().ToString());
-						ONLLAFBCPIJ().NPFNLBPENAC(uri);
-						ONLLAFBCPIJ().AOMLIJAIJHE(null);
+						GetCurrentRequest().RemoveHeader("Host");
+						GetCurrentRequest().SetHeader("Referer", GetCurrentRequest().GetCurrentUri().ToString());
+						GetCurrentRequest().SetRedirectUri(uri);
+						GetCurrentRequest().SetResponse(null);
 						bool flag5 = true;
-						ONLLAFBCPIJ().MAKPGAOFDOD(flag5);
+						GetCurrentRequest().SetIsRedirected(flag5);
 						flag2 = flag5;
 					}
 					break;
 				}
-				if (ONLLAFBCPIJ().IJJCLBHKMDJ())
+				if (GetCurrentRequest().GetIsCookiesEnabled())
 				{
-					CookieJar.Set(ONLLAFBCPIJ().POGDKNCHIBG());
+					CookieJar.Set(GetCurrentRequest().GetResponse());
 				}
-				ANGJGJLIODI();
-				if (ONLLAFBCPIJ().POGDKNCHIBG() == null || (!ONLLAFBCPIJ().POGDKNCHIBG().MLPKGGIKCDF() && ONLLAFBCPIJ().POGDKNCHIBG().HasHeaderWithValue("connection", "close")))
+				TryStoreInCache();
+				if (GetCurrentRequest().GetResponse() == null || (!GetCurrentRequest().GetResponse().GetIsClosedManually() && GetCurrentRequest().GetResponse().HasHeaderWithValue("connection", "close")))
 				{
 					Close();
 				}
 			}
-			while (aKALLIGHOHC != AKALLIGHOHC.None);
+			while (aKALLIGHOHC != RetryCauses.None);
 		}
 		catch (TimeoutException bAINMLLIKOL)
 		{
-			ONLLAFBCPIJ().AOMLIJAIJHE(null);
-			ONLLAFBCPIJ().set_Exception(bAINMLLIKOL);
-			ONLLAFBCPIJ().set_State(CFGBMHKCENK.ConnectionTimedOut);
+			GetCurrentRequest().SetResponse(null);
+			GetCurrentRequest().set_Exception(bAINMLLIKOL);
+			GetCurrentRequest().set_State(HTTPRequestStates.ConnectionTimedOut);
 			Close();
 		}
 		catch (Exception bAINMLLIKOL2)
 		{
-			if (ONLLAFBCPIJ() != null)
+			if (GetCurrentRequest() != null)
 			{
-				if (ONLLAFBCPIJ().MDEPOKKKKCL())
+				if (GetCurrentRequest().GetUseStreaming())
 				{
-					HTTPCacheService.DeleteEntity(ONLLAFBCPIJ().DKAECMGPGOE());
+					HTTPCacheService.DeleteEntity(GetCurrentRequest().GetCurrentUri());
 				}
-				ONLLAFBCPIJ().AOMLIJAIJHE(null);
-				switch (FLBBFDNHJAJ())
+				GetCurrentRequest().SetResponse(null);
+				switch (GetState())
 				{
-				case AHFEJIOPFGP.AbortRequested:
-					ONLLAFBCPIJ().set_State(CFGBMHKCENK.Aborted);
+				case HTTPConnectionStates.AbortRequested:
+					GetCurrentRequest().set_State(HTTPRequestStates.Aborted);
 					break;
-				case AHFEJIOPFGP.TimedOut:
-					ONLLAFBCPIJ().set_State(CFGBMHKCENK.TimedOut);
+				case HTTPConnectionStates.TimedOut:
+					GetCurrentRequest().set_State(HTTPRequestStates.TimedOut);
 					break;
 				default:
-					ONLLAFBCPIJ().set_Exception(bAINMLLIKOL2);
-					ONLLAFBCPIJ().set_State(CFGBMHKCENK.Error);
+					GetCurrentRequest().set_Exception(bAINMLLIKOL2);
+					GetCurrentRequest().set_State(HTTPRequestStates.Error);
 					break;
 				}
 			}
@@ -466,71 +466,71 @@ internal sealed class HTTPConnection : IDisposable
 		}
 		finally
 		{
-			if (ONLLAFBCPIJ() != null)
+			if (GetCurrentRequest() != null)
 			{
 				lock (HTTPManager.Locker)
 				{
-					if (ONLLAFBCPIJ() != null && ONLLAFBCPIJ().POGDKNCHIBG() != null && ONLLAFBCPIJ().POGDKNCHIBG().ODOHODEENIB())
+					if (GetCurrentRequest() != null && GetCurrentRequest().GetResponse() != null && GetCurrentRequest().GetResponse().GetIsUpgraded())
 					{
-						set_State(AHFEJIOPFGP.Upgraded);
+						set_State(HTTPConnectionStates.Upgraded);
 					}
 					else
 					{
-						set_State(flag2 ? AHFEJIOPFGP.Redirected : ((Client != null) ? AHFEJIOPFGP.WaitForRecycle : AHFEJIOPFGP.Closed));
+						set_State(flag2 ? HTTPConnectionStates.Redirected : ((Client != null) ? HTTPConnectionStates.WaitForRecycle : HTTPConnectionStates.Closed));
 					}
-					if (ONLLAFBCPIJ().FLBBFDNHJAJ() == CFGBMHKCENK.Processing && (FLBBFDNHJAJ() == AHFEJIOPFGP.Closed || FLBBFDNHJAJ() == AHFEJIOPFGP.WaitForRecycle))
+					if (GetCurrentRequest().GetState() == HTTPRequestStates.Processing && (GetState() == HTTPConnectionStates.Closed || GetState() == HTTPConnectionStates.WaitForRecycle))
 					{
-						if (ONLLAFBCPIJ().POGDKNCHIBG() != null)
+						if (GetCurrentRequest().GetResponse() != null)
 						{
-							ONLLAFBCPIJ().set_State(CFGBMHKCENK.Finished);
+							GetCurrentRequest().set_State(HTTPRequestStates.Finished);
 						}
 						else
 						{
-							ONLLAFBCPIJ().set_State(CFGBMHKCENK.Error);
+							GetCurrentRequest().set_State(HTTPRequestStates.Error);
 						}
 					}
-					if (ONLLAFBCPIJ().FLBBFDNHJAJ() == CFGBMHKCENK.ConnectionTimedOut)
+					if (GetCurrentRequest().GetState() == HTTPRequestStates.ConnectionTimedOut)
 					{
-						set_State(AHFEJIOPFGP.Closed);
+						set_State(HTTPConnectionStates.Closed);
 					}
-					LNDDFLHCGIM = DateTime.UtcNow;
+					lastProcessTime = DateTime.UtcNow;
 				}
-				HTTPCacheService.FIMLABMLKJF();
-				CookieJar.AENFMDELLBM();
+				HTTPCacheService.SaveLibrary();
+				CookieJar.Persist();
 			}
 		}
 	}
 
-	private void NDCILHIAPIK()
+	private void Connect()
 	{
-		Uri uri = ((!ONLLAFBCPIJ().AOPIGGFCGHC()) ? ONLLAFBCPIJ().DKAECMGPGOE() : ONLLAFBCPIJ().FHGBKFBCGCO().DNIJHGFINDG());
+		Uri uri = ((!GetCurrentRequest().GetHasProxy()) ? GetCurrentRequest().GetCurrentUri() : GetCurrentRequest().GetProxy().GetAddress());
 		if (Client == null)
 		{
 			Client = new TcpClient();
 		}
 		if (!Client.Connected)
 		{
-			Client.ConnectTimeout = ONLLAFBCPIJ().DGHOJLHDGPB();
+			Client.ConnectTimeout = GetCurrentRequest().GetConnectTimeout();
 			Client.Connect(uri.Host, uri.Port);
-			if (HTTPManager.MBBMPNDDPIH().PINDEKDNCNL() <= BFNKPHDJNII.Information)
+			if (HTTPManager.GetLogger().GetLevel() <= Loglevels.Information)
 			{
-				HTTPManager.MBBMPNDDPIH().KDAFBLAKBMI("HTTPConnection", "Connected to " + uri.Host + ":" + uri.Port);
+				HTTPManager.GetLogger().Information("HTTPConnection", "Connected to " + uri.Host + ":" + uri.Port);
 			}
 		}
-		else if (HTTPManager.MBBMPNDDPIH().PINDEKDNCNL() <= BFNKPHDJNII.Information)
+		else if (HTTPManager.GetLogger().GetLevel() <= Loglevels.Information)
 		{
-			HTTPManager.MBBMPNDDPIH().KDAFBLAKBMI("HTTPConnection", "Already connected to " + uri.Host + ":" + uri.Port);
+			HTTPManager.GetLogger().Information("HTTPConnection", "Already connected to " + uri.Host + ":" + uri.Port);
 		}
 		lock (HTTPManager.Locker)
 		{
-			OJDGGOOJNJM(DateTime.UtcNow);
+			SetStartTime(DateTime.UtcNow);
 		}
 		if (Stream != null)
 		{
 			return;
 		}
-		bool flag = HTTPProtocolFactory.IsSecureProtocol(ONLLAFBCPIJ().DKAECMGPGOE());
-		if (AOPIGGFCGHC() && (!FHGBKFBCGCO().JDBFAABAEIL() || (flag && FHGBKFBCGCO().OHCGKBPPMEN())))
+		bool flag = HTTPProtocolFactory.IsSecureProtocol(GetCurrentRequest().GetCurrentUri());
+		if (GetHasProxy() && (!GetProxy().GetIsTransparent() || (flag && GetProxy().GetNonTransparentForHTTPS())))
 		{
 			Stream = Client.GetStream();
 			BinaryWriter binaryWriter = new BinaryWriter(Stream);
@@ -538,86 +538,86 @@ internal sealed class HTTPConnection : IDisposable
 			do
 			{
 				flag2 = false;
-				binaryWriter.SendAsASCII(string.Format("CONNECT {0}:{1} HTTP/1.1", ONLLAFBCPIJ().DKAECMGPGOE().Host, ONLLAFBCPIJ().DKAECMGPGOE().Port));
-				binaryWriter.Write(HTTPRequest.HGBANJPCEPF);
+				binaryWriter.SendAsASCII(string.Format("CONNECT {0}:{1} HTTP/1.1", GetCurrentRequest().GetCurrentUri().Host, GetCurrentRequest().GetCurrentUri().Port));
+				binaryWriter.Write(HTTPRequest.EOL);
 				binaryWriter.SendAsASCII("Proxy-Connection: Keep-Alive");
-				binaryWriter.Write(HTTPRequest.HGBANJPCEPF);
+				binaryWriter.Write(HTTPRequest.EOL);
 				binaryWriter.SendAsASCII("Connection: Keep-Alive");
-				binaryWriter.Write(HTTPRequest.HGBANJPCEPF);
-				binaryWriter.SendAsASCII(string.Format("Host: {0}:{1}", ONLLAFBCPIJ().DKAECMGPGOE().Host, ONLLAFBCPIJ().DKAECMGPGOE().Port));
-				binaryWriter.Write(HTTPRequest.HGBANJPCEPF);
-				if (AOPIGGFCGHC() && FHGBKFBCGCO().HPKPFEOBIOC() != null)
+				binaryWriter.Write(HTTPRequest.EOL);
+				binaryWriter.SendAsASCII(string.Format("Host: {0}:{1}", GetCurrentRequest().GetCurrentUri().Host, GetCurrentRequest().GetCurrentUri().Port));
+				binaryWriter.Write(HTTPRequest.EOL);
+				if (GetHasProxy() && GetProxy().GetCredentials() != null)
 				{
-					switch (FHGBKFBCGCO().HPKPFEOBIOC().get_Type())
+					switch (GetProxy().GetCredentials().get_Type())
 					{
-					case BMBGFBGIAPL.Basic:
-						binaryWriter.Write(string.Format("Proxy-Authorization: {0}", "Basic " + Convert.ToBase64String(Encoding.UTF8.GetBytes(FHGBKFBCGCO().HPKPFEOBIOC().BFFCEKDPNAM() + ":" + FHGBKFBCGCO().HPKPFEOBIOC().LDEFEGOBBGO()))).GetASCIIBytes());
-						binaryWriter.Write(HTTPRequest.HGBANJPCEPF);
+					case AuthenticationTypes.Basic:
+						binaryWriter.Write(string.Format("Proxy-Authorization: {0}", "Basic " + Convert.ToBase64String(Encoding.UTF8.GetBytes(GetProxy().GetCredentials().GetUserName() + ":" + GetProxy().GetCredentials().GetPassword()))).GetASCIIBytes());
+						binaryWriter.Write(HTTPRequest.EOL);
 						break;
-					case BMBGFBGIAPL.Unknown:
-					case BMBGFBGIAPL.Digest:
+					case AuthenticationTypes.Unknown:
+					case AuthenticationTypes.Digest:
 					{
-						Digest kHNAPCOOAEF = DigestStore.Get(FHGBKFBCGCO().DNIJHGFINDG());
+						Digest kHNAPCOOAEF = DigestStore.Get(GetProxy().GetAddress());
 						if (kHNAPCOOAEF != null)
 						{
-							string text = kHNAPCOOAEF.CIIGLAEHAOJ(ONLLAFBCPIJ(), FHGBKFBCGCO().HPKPFEOBIOC());
+							string text = kHNAPCOOAEF.GenerateResponseHeader(GetCurrentRequest(), GetProxy().GetCredentials());
 							if (!string.IsNullOrEmpty(text))
 							{
 								binaryWriter.Write(string.Format("Proxy-Authorization: {0}", text).GetASCIIBytes());
-								binaryWriter.Write(HTTPRequest.HGBANJPCEPF);
+								binaryWriter.Write(HTTPRequest.EOL);
 							}
 						}
 						break;
 					}
 					}
 				}
-				binaryWriter.Write(HTTPRequest.HGBANJPCEPF);
+				binaryWriter.Write(HTTPRequest.EOL);
 				binaryWriter.Flush();
-				ONLLAFBCPIJ().FFBIEJDBKIL(new HTTPResponse(ONLLAFBCPIJ(), Stream, false, false));
-				if (!ONLLAFBCPIJ().MJKNMBDFBID().Receive())
+				GetCurrentRequest().SetProxyResponse(new HTTPResponse(GetCurrentRequest(), Stream, false, false));
+				if (!GetCurrentRequest().GetProxyResponse().Receive())
 				{
 					throw new Exception("Connection to the Proxy Server failed!");
 				}
-				if (HTTPManager.MBBMPNDDPIH().PINDEKDNCNL() <= BFNKPHDJNII.Information)
+				if (HTTPManager.GetLogger().GetLevel() <= Loglevels.Information)
 				{
-					HTTPManager.MBBMPNDDPIH().KDAFBLAKBMI("HTTPConnection", "Proxy returned - status code: " + ONLLAFBCPIJ().MJKNMBDFBID().KNMDPGBPNED() + " message: " + ONLLAFBCPIJ().MJKNMBDFBID().DCKPMHKDLEJ());
+					HTTPManager.GetLogger().Information("HTTPConnection", "Proxy returned - status code: " + GetCurrentRequest().GetProxyResponse().GetStatusCode() + " message: " + GetCurrentRequest().GetProxyResponse().GetMessage());
 				}
-				int num = ONLLAFBCPIJ().MJKNMBDFBID().KNMDPGBPNED();
+				int num = GetCurrentRequest().GetProxyResponse().GetStatusCode();
 				if (num == 407)
 				{
-					string text2 = DigestStore.FindBest(ONLLAFBCPIJ().MJKNMBDFBID().GetHeaderValues("proxy-authenticate"));
+					string text2 = DigestStore.FindBest(GetCurrentRequest().GetProxyResponse().GetHeaderValues("proxy-authenticate"));
 					if (!string.IsNullOrEmpty(text2))
 					{
-						Digest kHNAPCOOAEF2 = DigestStore.NLJEDHBBPKK(FHGBKFBCGCO().DNIJHGFINDG());
-						kHNAPCOOAEF2.CKNNIILGPNN(text2);
-						if (FHGBKFBCGCO().HPKPFEOBIOC() != null && kHNAPCOOAEF2.IsUriProtected(FHGBKFBCGCO().DNIJHGFINDG()) && (!ONLLAFBCPIJ().HasHeader("Proxy-Authorization") || kHNAPCOOAEF2.OCBMLPLDMOO()))
+						Digest kHNAPCOOAEF2 = DigestStore.GetOrCreate(GetProxy().GetAddress());
+						kHNAPCOOAEF2.ParseChallange(text2);
+						if (GetProxy().GetCredentials() != null && kHNAPCOOAEF2.IsUriProtected(GetProxy().GetAddress()) && (!GetCurrentRequest().HasHeader("Proxy-Authorization") || kHNAPCOOAEF2.GetStale()))
 						{
 							flag2 = true;
 						}
 					}
 				}
-				else if (!ONLLAFBCPIJ().MJKNMBDFBID().AICKPAMONBH())
+				else if (!GetCurrentRequest().GetProxyResponse().GetIsSuccess())
 				{
-					throw new Exception(string.Format("Proxy returned Status Code: \"{0}\", Message: \"{1}\" and Response: {2}", ONLLAFBCPIJ().MJKNMBDFBID().KNMDPGBPNED(), ONLLAFBCPIJ().MJKNMBDFBID().DCKPMHKDLEJ(), ONLLAFBCPIJ().MJKNMBDFBID().DPBLPGKOEJB()));
+					throw new Exception(string.Format("Proxy returned Status Code: \"{0}\", Message: \"{1}\" and Response: {2}", GetCurrentRequest().GetProxyResponse().GetStatusCode(), GetCurrentRequest().GetProxyResponse().GetMessage(), GetCurrentRequest().GetProxyResponse().GetDataAsText()));
 				}
 			}
 			while (flag2);
 		}
 		if (flag)
 		{
-			if (ONLLAFBCPIJ().KMOEMMLAJNC())
+			if (GetCurrentRequest().GetUseAlternateSSL())
 			{
 				TlsClientProtocol tlsClientProtocol = new TlsClientProtocol(Client.GetStream(), new SecureRandom());
 				List<string> list = new List<string>(1);
-				list.Add(ONLLAFBCPIJ().DKAECMGPGOE().Host);
-				tlsClientProtocol.Connect(new LegacyTlsClient(ONLLAFBCPIJ().DKAECMGPGOE(), (ONLLAFBCPIJ().KNFEJHLHPDO() != null) ? ONLLAFBCPIJ().KNFEJHLHPDO() : new AlwaysValidVerifyer(), null, list));
+				list.Add(GetCurrentRequest().GetCurrentUri().Host);
+				tlsClientProtocol.Connect(new LegacyTlsClient(GetCurrentRequest().GetCurrentUri(), (GetCurrentRequest().GetCustomCertificateVerifyer() != null) ? GetCurrentRequest().GetCustomCertificateVerifyer() : new AlwaysValidVerifyer(), null, list));
 				Stream = tlsClientProtocol.Stream;
 				return;
 			}
-			SslStream sslStream = new SslStream(Client.GetStream(), false, (object ABONPDBPJBA, X509Certificate DBCFDLIJOBD, X509Chain GCONPBMJDFL, SslPolicyErrors FKDNIHKLCGP) => ONLLAFBCPIJ().IMMANGELKAN(DBCFDLIJOBD, GCONPBMJDFL));
+			SslStream sslStream = new SslStream(Client.GetStream(), false, (object ABONPDBPJBA, X509Certificate DBCFDLIJOBD, X509Chain GCONPBMJDFL, SslPolicyErrors FKDNIHKLCGP) => GetCurrentRequest().CallCustomCertificationValidator(DBCFDLIJOBD, GCONPBMJDFL));
 			if (!sslStream.IsAuthenticated)
 			{
-				sslStream.AuthenticateAsClient(ONLLAFBCPIJ().DKAECMGPGOE().Host);
+				sslStream.AuthenticateAsClient(GetCurrentRequest().GetCurrentUri().Host);
 			}
 			Stream = sslStream;
 		}
@@ -629,41 +629,41 @@ internal sealed class HTTPConnection : IDisposable
 
 	private bool Receive()
 	{
-		OBBKIBFJEMI eNLHAIGCCBO = ((ONLLAFBCPIJ().BEKFCACGBLL() != OBBKIBFJEMI.Unknown) ? ONLLAFBCPIJ().BEKFCACGBLL() : HTTPProtocolFactory.AOMOKHPFJFA(ONLLAFBCPIJ().DKAECMGPGOE()));
-		ONLLAFBCPIJ().AOMLIJAIJHE(HTTPProtocolFactory.Get(eNLHAIGCCBO, ONLLAFBCPIJ(), Stream, ONLLAFBCPIJ().MDEPOKKKKCL(), false));
-		if (!ONLLAFBCPIJ().POGDKNCHIBG().Receive())
+		SupportedProtocols eNLHAIGCCBO = ((GetCurrentRequest().GetProtocolHandler() != SupportedProtocols.Unknown) ? GetCurrentRequest().GetProtocolHandler() : HTTPProtocolFactory.GetProtocolFromUri(GetCurrentRequest().GetCurrentUri()));
+		GetCurrentRequest().SetResponse(HTTPProtocolFactory.Get(eNLHAIGCCBO, GetCurrentRequest(), Stream, GetCurrentRequest().GetUseStreaming(), false));
+		if (!GetCurrentRequest().GetResponse().Receive())
 		{
-			ONLLAFBCPIJ().AOMLIJAIJHE(null);
+			GetCurrentRequest().SetResponse(null);
 			return false;
 		}
-		if (ONLLAFBCPIJ().POGDKNCHIBG().KNMDPGBPNED() == 304)
+		if (GetCurrentRequest().GetResponse().GetStatusCode() == 304)
 		{
 			int BDBOAEGELMC;
-			using (Stream aBJIEFMMIEK = HTTPCacheService.GetBody(ONLLAFBCPIJ().DKAECMGPGOE(), out BDBOAEGELMC))
+			using (Stream aBJIEFMMIEK = HTTPCacheService.GetBody(GetCurrentRequest().GetCurrentUri(), out BDBOAEGELMC))
 			{
-				if (!ONLLAFBCPIJ().POGDKNCHIBG().HasHeader("content-length"))
+				if (!GetCurrentRequest().GetResponse().HasHeader("content-length"))
 				{
-					ONLLAFBCPIJ().POGDKNCHIBG().AJCCGKHBNML().Add("content-length", new List<string>(1) { BDBOAEGELMC.ToString() });
+					GetCurrentRequest().GetResponse().GetHeaders().Add("content-length", new List<string>(1) { BDBOAEGELMC.ToString() });
 				}
-				ONLLAFBCPIJ().POGDKNCHIBG().KBOCENDKCJO(true);
-				ONLLAFBCPIJ().POGDKNCHIBG().ReadRaw(aBJIEFMMIEK, BDBOAEGELMC);
+				GetCurrentRequest().GetResponse().SetIsFromCache(true);
+				GetCurrentRequest().GetResponse().ReadRaw(aBJIEFMMIEK, BDBOAEGELMC);
 			}
 		}
 		return true;
 	}
 
-	private bool DECKPAHHIDJ()
+	private bool TryLoadAllFromCache()
 	{
-		if (ONLLAFBCPIJ().DCOLJJKGFGD() || !HTTPCacheService.EPACOIFEICA())
+		if (GetCurrentRequest().GetDisableCache() || !HTTPCacheService.GetIsSupported())
 		{
 			return false;
 		}
 		try
 		{
-			if (HTTPCacheService.BEBFIMACMEK(ONLLAFBCPIJ()))
+			if (HTTPCacheService.IsCachedEntityExpiresInTheFuture(GetCurrentRequest()))
 			{
-				ONLLAFBCPIJ().AOMLIJAIJHE(HTTPCacheService.HLLKJACMILI(ONLLAFBCPIJ()));
-				if (ONLLAFBCPIJ().POGDKNCHIBG() != null)
+				GetCurrentRequest().SetResponse(HTTPCacheService.GetFullResponse(GetCurrentRequest()));
+				if (GetCurrentRequest().GetResponse() != null)
 				{
 					return true;
 				}
@@ -671,16 +671,16 @@ internal sealed class HTTPConnection : IDisposable
 		}
 		catch
 		{
-			HTTPCacheService.DeleteEntity(ONLLAFBCPIJ().DKAECMGPGOE());
+			HTTPCacheService.DeleteEntity(GetCurrentRequest().GetCurrentUri());
 		}
 		return false;
 	}
 
-	private void ANGJGJLIODI()
+	private void TryStoreInCache()
 	{
-		if (!ONLLAFBCPIJ().MDEPOKKKKCL() && !ONLLAFBCPIJ().DCOLJJKGFGD() && ONLLAFBCPIJ().POGDKNCHIBG() != null && HTTPCacheService.EPACOIFEICA() && HTTPCacheService.HCCGCAKPOGB(ONLLAFBCPIJ().DKAECMGPGOE(), ONLLAFBCPIJ().JCHNIGKBBMI(), ONLLAFBCPIJ().POGDKNCHIBG()))
+		if (!GetCurrentRequest().GetUseStreaming() && !GetCurrentRequest().GetDisableCache() && GetCurrentRequest().GetResponse() != null && HTTPCacheService.GetIsSupported() && HTTPCacheService.IsCacheble(GetCurrentRequest().GetCurrentUri(), GetCurrentRequest().GetMethodType(), GetCurrentRequest().GetResponse()))
 		{
-			HTTPCacheService.LDFKMIOPLKA(ONLLAFBCPIJ().DKAECMGPGOE(), ONLLAFBCPIJ().JCHNIGKBBMI(), ONLLAFBCPIJ().POGDKNCHIBG());
+			HTTPCacheService.Store(GetCurrentRequest().GetCurrentUri(), GetCurrentRequest().GetMethodType(), GetCurrentRequest().GetResponse());
 		}
 	}
 
@@ -693,71 +693,71 @@ internal sealed class HTTPConnection : IDisposable
 		}
 		catch (UriFormatException)
 		{
-			Uri uri2 = ONLLAFBCPIJ().OJBDMGBGJMA();
+			Uri uri2 = GetCurrentRequest().GetUri();
 			UriBuilder uriBuilder = new UriBuilder(uri2.Scheme, uri2.Host, uri2.Port, LPJNEDFCBOI);
 			return uriBuilder.Uri;
 		}
 	}
 
-	internal void PNCNLDHGDLP()
+	internal void HandleProgressCallback()
 	{
-		if (ONLLAFBCPIJ().OGLIKFCADME != null && ONLLAFBCPIJ().BOABEDJEDDC())
+		if (GetCurrentRequest().OnProgress != null && GetCurrentRequest().GetDownloadProgressChanged())
 		{
 			try
 			{
-				ONLLAFBCPIJ().OGLIKFCADME(ONLLAFBCPIJ(), ONLLAFBCPIJ().IBILKGBKKOI(), ONLLAFBCPIJ().ELADIMFGGEO());
+				GetCurrentRequest().OnProgress(GetCurrentRequest(), GetCurrentRequest().GetDownloaded(), GetCurrentRequest().GetDownloadLength());
 			}
 			catch (Exception mPFFFAOGBJE)
 			{
-				HTTPManager.MBBMPNDDPIH().COHEDILAHFD("HTTPManager", "HandleProgressCallback - OnProgress", mPFFFAOGBJE);
+				HTTPManager.GetLogger().Exception("HTTPManager", "HandleProgressCallback - OnProgress", mPFFFAOGBJE);
 			}
-			ONLLAFBCPIJ().HNPAEADANKK(false);
+			GetCurrentRequest().SetDownloadProgressChanged(false);
 		}
-		if (ONLLAFBCPIJ().EEPGPFILKFI != null && ONLLAFBCPIJ().LCECFOLDKHH())
+		if (GetCurrentRequest().OnUploadProgress != null && GetCurrentRequest().GetUploadProgressChanged())
 		{
 			try
 			{
-				ONLLAFBCPIJ().EEPGPFILKFI(ONLLAFBCPIJ(), ONLLAFBCPIJ().MJBCCNEIBDA(), ONLLAFBCPIJ().LKHMFMMBAHL());
+				GetCurrentRequest().OnUploadProgress(GetCurrentRequest(), GetCurrentRequest().GetUploaded(), GetCurrentRequest().GetUploadLength());
 			}
 			catch (Exception mPFFFAOGBJE2)
 			{
-				HTTPManager.MBBMPNDDPIH().COHEDILAHFD("HTTPManager", "HandleProgressCallback - OnUploadProgress", mPFFFAOGBJE2);
+				HTTPManager.GetLogger().Exception("HTTPManager", "HandleProgressCallback - OnUploadProgress", mPFFFAOGBJE2);
 			}
-			ONLLAFBCPIJ().MBNHNNCHJAG(false);
+			GetCurrentRequest().SetUploadProgressChanged(false);
 		}
 	}
 
-	internal void ICGOKIADHNK()
+	internal void HandleCallback()
 	{
 		try
 		{
-			PNCNLDHGDLP();
-			if (FLBBFDNHJAJ() == AHFEJIOPFGP.Upgraded)
+			HandleProgressCallback();
+			if (GetState() == HTTPConnectionStates.Upgraded)
 			{
-				if (ONLLAFBCPIJ() != null && ONLLAFBCPIJ().POGDKNCHIBG() != null && ONLLAFBCPIJ().POGDKNCHIBG().ODOHODEENIB())
+				if (GetCurrentRequest() != null && GetCurrentRequest().GetResponse() != null && GetCurrentRequest().GetResponse().GetIsUpgraded())
 				{
-					ONLLAFBCPIJ().PPNNNGLBPFD();
+					GetCurrentRequest().UpgradeCallback();
 				}
-				set_State(AHFEJIOPFGP.WaitForProtocolShutdown);
+				set_State(HTTPConnectionStates.WaitForProtocolShutdown);
 			}
 			else
 			{
-				ONLLAFBCPIJ().FLNDBIJDGMH();
+				GetCurrentRequest().CallCallback();
 			}
 		}
 		catch (Exception mPFFFAOGBJE)
 		{
-			HTTPManager.MBBMPNDDPIH().COHEDILAHFD("HTTPManager", "HandleCallback", mPFFFAOGBJE);
+			HTTPManager.GetLogger().Exception("HTTPManager", "HandleCallback", mPFFFAOGBJE);
 		}
 	}
 
-	internal void AKLEEMEHBIC(AHFEJIOPFGP MPJEMGJIBBD)
+	internal void Abort(HTTPConnectionStates MPJEMGJIBBD)
 	{
 		set_State(MPJEMGJIBBD);
-		AHFEJIOPFGP aHFEJIOPFGP = FLBBFDNHJAJ();
-		if (aHFEJIOPFGP == AHFEJIOPFGP.TimedOut)
+		HTTPConnectionStates aHFEJIOPFGP = GetState();
+		if (aHFEJIOPFGP == HTTPConnectionStates.TimedOut)
 		{
-			HCKHGGHLFAN(DateTime.UtcNow);
+			SetTimedOutStart(DateTime.UtcNow);
 		}
 		if (Stream != null)
 		{

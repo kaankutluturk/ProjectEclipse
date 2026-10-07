@@ -4,96 +4,96 @@ public class RandomAreaRule : InFightRule
 {
 	public const string FILE_PATH_PERK_ACTIVATION_AREA = "Textures/fight/rules/randomarea/";
 
-	private NekkiRandom OOPIJCGCFAP = new NekkiRandom();
+	private NekkiRandom random = new NekkiRandom();
 
-	private float GEFOLNHPJMI;
+	private float areaWidth;
 
-	private float MPBBJKDIKDD;
+	private float areaPositionX;
 
-	private float DMKOKMCMCDE;
+	private float minPositionX;
 
-	private float GOGMIBDBJPG;
+	private float maxPositionX;
 
-	private string NCKCDCODNHA;
+	private string imagePath;
 
-	private string KENGIGPHMPK;
+	private string iconPath;
 
-	public bool HADLDHHEOKM;
+	public bool IsMarkerHidden;
 
-	private LocationSelectorDarknessData EHIDGLBHJCH = new LocationSelectorDarknessData();
+	private LocationSelectorDarknessData phaseFrames = new LocationSelectorDarknessData();
 
 	private bool _active;
 
-	private bool PNJBGMPOCBM;
+	private bool isAreaVisible;
 
 	private int _currentFrame;
 
-	private float MFBOIBHHOHE;
+	private float alpha;
 
-	private float GJEHCPKKOLA;
+	private float fadeInStep;
 
-	private float GJENDIFGOAF;
+	private float fadeOutStep;
 
 	public RandomAreaRule(XmlNode node)
-		: base(BCBLLMPAMLP.RuleRandomArea, RuleAppliance.AppliancePlayer, node)
+		: base(RuleType.RuleRandomArea, RuleAppliance.AppliancePlayer, node)
 	{
-		GEFOLNHPJMI = 0f;
-		NCKCDCODNHA = string.Empty;
-		KENGIGPHMPK = string.Empty;
-		MPBBJKDIKDD = 0f;
+		areaWidth = 0f;
+		imagePath = string.Empty;
+		iconPath = string.Empty;
+		areaPositionX = 0f;
 		_currentFrame = 0;
-		DMKOKMCMCDE = -50f;
-		GOGMIBDBJPG = 50f;
-		HADLDHHEOKM = false;
+		minPositionX = -50f;
+		maxPositionX = 50f;
+		IsMarkerHidden = false;
 		_active = true;
-		PNJBGMPOCBM = false;
-		MFBOIBHHOHE = 0f;
-		GJEHCPKKOLA = 0f;
-		GJENDIFGOAF = 0f;
-		EHIDGLBHJCH = new LocationSelectorDarknessData();
-		EBJIKKBLBEM(FightEvent.RenderEvent);
+		isAreaVisible = false;
+		alpha = 0f;
+		fadeInStep = 0f;
+		fadeOutStep = 0f;
+		phaseFrames = new LocationSelectorDarknessData();
+		SubscribeEvent(FightEvent.RenderEvent);
 		Parse(node);
 	}
 
 	public override void InitRule(object data)
 	{
 		RuleInitData oIFPCFEGFOB = (RuleInitData)data;
-		OOPIJCGCFAP.setSeed((uint)ListSF.IDMJOMOMDOJ());
-		DMKOKMCMCDE = (0f - oIFPCFEGFOB.LPJNEDFCBOI.JMLAKAKDBBL) / 2f + oIFPCFEGFOB.LPJNEDFCBOI.MFAPMDDJBBL + GEFOLNHPJMI / 2f;
-		GOGMIBDBJPG = oIFPCFEGFOB.LPJNEDFCBOI.JMLAKAKDBBL / 2f - oIFPCFEGFOB.LPJNEDFCBOI.MFAPMDDJBBL - GEFOLNHPJMI / 2f;
+		random.setSeed((uint)ListSF.GetCurrentTime());
+		minPositionX = (0f - oIFPCFEGFOB.FightLocation.width) / 2f + oIFPCFEGFOB.FightLocation.wallWidth + areaWidth / 2f;
+		maxPositionX = oIFPCFEGFOB.FightLocation.width / 2f - oIFPCFEGFOB.FightLocation.wallWidth - areaWidth / 2f;
 		_currentFrame = 0;
-		MFBOIBHHOHE = 0f;
-		PNJBGMPOCBM = false;
+		alpha = 0f;
+		isAreaVisible = false;
 	}
 
-	public float BOCHPMJBLGA()
+	public float GetPositionX()
 	{
-		return MPBBJKDIKDD;
+		return areaPositionX;
 	}
 
-	public float HFDJFADIAEP()
+	public float GetWidth()
 	{
-		return GEFOLNHPJMI;
+		return areaWidth;
 	}
 
-	public string BPMABAFDFJK()
+	public string GetImagePath()
 	{
-		return NCKCDCODNHA;
+		return imagePath;
 	}
 
-	public string AJIAFONPDKE()
+	public string GetIconPath()
 	{
-		return KENGIGPHMPK;
+		return iconPath;
 	}
 
-	public bool JFFONEBNBMP()
+	public bool IsAreaVisible()
 	{
-		return PNJBGMPOCBM;
+		return isAreaVisible;
 	}
 
-	public float CFNAMMODOAA()
+	public float GetAlpha()
 	{
-		return MFBOIBHHOHE;
+		return alpha;
 	}
 
 	public override void Stop()
@@ -115,36 +115,36 @@ public class RandomAreaRule : InFightRule
 	protected override bool CompareSingle(object data)
 	{
 		_currentFrame++;
-		if (_currentFrame <= EHIDGLBHJCH.KCANPMPILKI)
+		if (_currentFrame <= phaseFrames.lightEndFrame)
 		{
 			if (!_active)
 			{
 				_currentFrame = 0;
 			}
-			MFBOIBHHOHE = 0f;
-			PNJBGMPOCBM = false;
+			alpha = 0f;
+			isAreaVisible = false;
 		}
-		else if (_currentFrame <= EHIDGLBHJCH.GFDMINCFBID)
+		else if (_currentFrame <= phaseFrames.darkeningEndFrame)
 		{
-			MFBOIBHHOHE = (float)(_currentFrame - EHIDGLBHJCH.KCANPMPILKI) * GJEHCPKKOLA;
-			PNJBGMPOCBM = true;
+			alpha = (float)(_currentFrame - phaseFrames.lightEndFrame) * fadeInStep;
+			isAreaVisible = true;
 		}
-		else if (_currentFrame <= EHIDGLBHJCH.NDBJNFHDGOA)
+		else if (_currentFrame <= phaseFrames.darkEndFrame)
 		{
-			MFBOIBHHOHE = 255f;
-			PNJBGMPOCBM = true;
+			alpha = 255f;
+			isAreaVisible = true;
 		}
-		else if (_currentFrame <= EHIDGLBHJCH.NJBHKDBOEAI)
+		else if (_currentFrame <= phaseFrames.lightingEndFrame)
 		{
-			MFBOIBHHOHE = 255f - (float)(_currentFrame - EHIDGLBHJCH.NDBJNFHDGOA) * GJENDIFGOAF;
-			PNJBGMPOCBM = true;
+			alpha = 255f - (float)(_currentFrame - phaseFrames.darkEndFrame) * fadeOutStep;
+			isAreaVisible = true;
 		}
 		else
 		{
 			_currentFrame = 0;
-			MFBOIBHHOHE = 0f;
-			PNJBGMPOCBM = false;
-			FNJCCOBCGBI();
+			alpha = 0f;
+			isAreaVisible = false;
+			RandomizePosition();
 		}
 		return true;
 	}
@@ -152,31 +152,31 @@ public class RandomAreaRule : InFightRule
 	protected override void Parse(XmlNode node)
 	{
 		base.Parse(node);
-		GEFOLNHPJMI = node.Attributes["Width"].ParseFloat();
-		NCKCDCODNHA += "Textures/fight/rules/randomarea/";
-		NCKCDCODNHA += node.Attributes["Image"].CIPOICEEIBK(string.Empty);
+		areaWidth = node.Attributes["Width"].ParseFloat();
+		imagePath += "Textures/fight/rules/randomarea/";
+		imagePath += node.Attributes["Image"].GetStringOrDefault(string.Empty);
 		if (!node.Attributes["Icon"].Empty())
 		{
-			KENGIGPHMPK += "Textures/fight/rules/randomarea/";
-			KENGIGPHMPK += node.Attributes["Icon"].CIPOICEEIBK(string.Empty);
+			iconPath += "Textures/fight/rules/randomarea/";
+			iconPath += node.Attributes["Icon"].GetStringOrDefault(string.Empty);
 		}
-		EHIDGLBHJCH.KCANPMPILKI = node.Attributes["FadeIn"].ParseInt();
-		EHIDGLBHJCH.GFDMINCFBID = EHIDGLBHJCH.KCANPMPILKI + node.Attributes["FramesOn"].ParseInt();
-		EHIDGLBHJCH.NDBJNFHDGOA = EHIDGLBHJCH.GFDMINCFBID + node.Attributes["FadeOut"].ParseInt();
-		EHIDGLBHJCH.NJBHKDBOEAI = EHIDGLBHJCH.NDBJNFHDGOA + node.Attributes["FramesOff"].ParseInt();
-		GJEHCPKKOLA = 255f / (float)(EHIDGLBHJCH.GFDMINCFBID - EHIDGLBHJCH.KCANPMPILKI);
-		GJENDIFGOAF = 255f / (float)(EHIDGLBHJCH.NJBHKDBOEAI - EHIDGLBHJCH.NDBJNFHDGOA);
+		phaseFrames.lightEndFrame = node.Attributes["FadeIn"].ParseInt();
+		phaseFrames.darkeningEndFrame = phaseFrames.lightEndFrame + node.Attributes["FramesOn"].ParseInt();
+		phaseFrames.darkEndFrame = phaseFrames.darkeningEndFrame + node.Attributes["FadeOut"].ParseInt();
+		phaseFrames.lightingEndFrame = phaseFrames.darkEndFrame + node.Attributes["FramesOff"].ParseInt();
+		fadeInStep = 255f / (float)(phaseFrames.darkeningEndFrame - phaseFrames.lightEndFrame);
+		fadeOutStep = 255f / (float)(phaseFrames.lightingEndFrame - phaseFrames.darkEndFrame);
 	}
 
-	protected void FNJCCOBCGBI()
+	protected void RandomizePosition()
 	{
-		MPBBJKDIKDD = OOPIJCGCFAP.randomFloat(DMKOKMCMCDE, GOGMIBDBJPG);
+		areaPositionX = random.randomFloat(minPositionX, maxPositionX);
 	}
 
 	public override InFightRule Copy()
 	{
 		InFightRule aAJIFBJLJOA = null;
-		XmlNode hKPPBKPJOEO = GIFDJEEGCJI().IOJIGDNFCFL();
+		XmlNode hKPPBKPJOEO = GetXmlSource().GetNode();
 		aAJIFBJLJOA = new RandomAreaRule(hKPPBKPJOEO);
 		aAJIFBJLJOA.IsRandom = IsRandom;
 		return aAJIFBJLJOA;

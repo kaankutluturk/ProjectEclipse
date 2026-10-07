@@ -11,25 +11,25 @@ namespace Eclipse.Modding
         internal static XmlElement Write(XmlDocument document, FightResult.ResultPrizeStruct prize)
         {
             if (prize == null) throw new ArgumentNullException(nameof(prize));
-            if (prize.FAPDEKOMOGH != null)
+            if (prize.Lottery != null)
                 throw new InvalidOperationException("Resolve nested lottery draws before persisting a prize.");
             var root = document.CreateElement("Prize");
             root.SetAttribute("Format", "1");
-            Set(root, "Money", prize.GBGNFPNCGED);
-            Set(root, "Bonus", prize.PNDAIFALIKF);
+            Set(root, "Money", prize.Money);
+            Set(root, "Bonus", prize.Bonus);
             Set(root, "Experience", prize.exp);
-            foreach (var grant in prize.HELFDCAIJNE)
+            foreach (var grant in prize.Items)
             {
                 var item = document.CreateElement("Item");
-                item.SetAttribute("Name", grant.DLKPBAJDHBO.Name);
-                Set(item, "Level", grant.DLKPBAJDHBO.ItemLevel);
-                Set(item, "Upgrade", grant.DLKPBAJDHBO.UpgradeLevel);
-                item.SetAttribute("Drop", grant.IDGKPLBKDIB ? "1" : "0");
-                foreach (var perk in grant.NAIEGGHELIH.LDLPCOFHFKE)
+                item.SetAttribute("Name", grant.Item.Name);
+                Set(item, "Level", grant.Item.ItemLevel);
+                Set(item, "Upgrade", grant.Item.UpgradeLevel);
+                item.SetAttribute("Drop", grant.IsDrop ? "1" : "0");
+                foreach (var perk in grant.RewardSource.enchantments)
                 {
                     var effect = document.CreateElement("Perk");
                     effect.SetAttribute("Name", perk.get_Name());
-                    effect.SetAttribute("ItemType", string.Join("|", perk.NMOKPAPJLCN));
+                    effect.SetAttribute("ItemType", string.Join("|", perk.ItemTypes));
                     effect.SetAttribute(PerkStruct.EclipseEnchantmentAttribute, perk.EclipseEnchantment);
                     effect.SetAttribute(PerkStruct.EclipseKindAttribute, perk.EclipseKind);
                     var values = document.CreateElement("Set");
@@ -49,20 +49,20 @@ namespace Eclipse.Modding
                 }
                 root.AppendChild(item);
             }
-            foreach (var grant in prize.KIMJGOHCCPO)
+            foreach (var grant in prize.Currencies)
             {
                 var currency = document.CreateElement("Currency");
-                currency.SetAttribute("Name", grant.NAKKNKPJNHB.BKDEAGGPNAO.Name);
-                Set(currency, "Count", (int)grant.NAKKNKPJNHB.Count);
-                currency.SetAttribute("Drop", grant.IDGKPLBKDIB ? "1" : "0");
+                currency.SetAttribute("Name", grant.Currency.Currency.Name);
+                Set(currency, "Count", (int)grant.Currency.Count);
+                currency.SetAttribute("Drop", grant.IsDrop ? "1" : "0");
                 root.AppendChild(currency);
             }
-            foreach (var grant in prize.KBMDJACLAOH)
+            foreach (var grant in prize.Resistances)
             {
                 var resistance = document.CreateElement("Resistance");
-                resistance.SetAttribute("Name", grant.JIDLBLPFAAE.PIFOHOOFJDE.Name);
-                Set(resistance, "Count", (int)grant.JIDLBLPFAAE.Count);
-                resistance.SetAttribute("Drop", grant.IDGKPLBKDIB ? "1" : "0");
+                resistance.SetAttribute("Name", grant.Resistance.resistance.Name);
+                Set(resistance, "Count", (int)grant.Resistance.Count);
+                resistance.SetAttribute("Drop", grant.IsDrop ? "1" : "0");
                 root.AppendChild(resistance);
             }
             return root;
@@ -76,7 +76,7 @@ namespace Eclipse.Modding
             if (root == null || root.Name != "Prize" || root.GetAttribute("Format") != "1")
                 throw new InvalidDataException("Unsupported saved lottery prize.");
             var prize = new FightResult.ResultPrizeStruct {
-                GBGNFPNCGED = Number(root, "Money"), PNDAIFALIKF = Number(root, "Bonus"),
+                Money = Number(root, "Money"), Bonus = Number(root, "Bonus"),
                 exp = checked((uint)Number(root, "Experience"))
             };
             foreach (XmlNode child in root.ChildNodes)
@@ -102,24 +102,24 @@ namespace Eclipse.Modding
                         {
                             if (!(effect is XmlElement)) continue;
                             if (effect.Name != "Perk") throw new InvalidDataException("Unknown saved item payload.");
-                            reward.LDLPCOFHFKE.Add(new PerkStruct(effect));
+                            reward.enchantments.Add(new PerkStruct(effect));
                         }
-                        prize.HELFDCAIJNE.Add(new FightResult.LJFFIBFBGID {
-                            DLKPBAJDHBO = item, NAIEGGHELIH = reward, IDGKPLBKDIB = drop
+                        prize.Items.Add(new FightResult.ItemGrant {
+                            Item = item, RewardSource = reward, IsDrop = drop
                         });
                         break;
                     case "Currency":
                         var currency = resolveCurrency(name);
                         if (currency == null || currency.Name != name) throw new InvalidDataException("Saved lottery currency unavailable: " + name);
-                        prize.KIMJGOHCCPO.Add(new FightResult.NFBOLAJJIAD {
-                            NAKKNKPJNHB = new CurrencyStruct(currency, checked((int)Number(node, "Count"))), IDGKPLBKDIB = drop
+                        prize.Currencies.Add(new FightResult.CurrencyGrant {
+                            Currency = new CurrencyStruct(currency, checked((int)Number(node, "Count"))), IsDrop = drop
                         });
                         break;
                     case "Resistance":
                         var resistance = resolveResistance(name);
                         if (resistance == null || resistance.Name != name) throw new InvalidDataException("Saved lottery resistance unavailable: " + name);
-                        prize.KBMDJACLAOH.Add(new FightResult.OLJIFHLGHNM {
-                            JIDLBLPFAAE = new ResistanceStruct(resistance, checked((int)Number(node, "Count"))), IDGKPLBKDIB = drop
+                        prize.Resistances.Add(new FightResult.ResistanceGrant {
+                            Resistance = new ResistanceStruct(resistance, checked((int)Number(node, "Count"))), IsDrop = drop
                         });
                         break;
                     default: throw new InvalidDataException("Unknown saved lottery prize entry: " + node.Name);

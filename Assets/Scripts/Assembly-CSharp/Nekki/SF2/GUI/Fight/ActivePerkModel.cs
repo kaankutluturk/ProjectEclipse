@@ -5,14 +5,14 @@ namespace Nekki.SF2.GUI.Fight
 {
 	public class ActivePerkModel : MonoBehaviour
 	{
-		public enum OKCGIBOLEKD
+		public enum PerkAlignment
 		{
 			ActivePerkLeft = 0,
 			ActivePerkRight = 1
 		}
 
 		[SerializeField]
-		private OKCGIBOLEKD _align;
+		private PerkAlignment _align;
 
 		[SerializeField]
 		private GameObject _activePerkItemPrefab;
@@ -30,7 +30,7 @@ namespace Nekki.SF2.GUI.Fight
 
 		public void Init()
 		{
-			_spacing = PerkGUI.FEHBEIFACMG();
+			_spacing = PerkGUI.GetSpacing();
 		}
 
 		// Perk icons are presentation and are not rebuilt by rollback re-simulation.
@@ -40,12 +40,12 @@ namespace Nekki.SF2.GUI.Fight
 			{
 				return;
 			}
-			PerkActionSetModEffect fBLKPCHKAHM = (PerkActionSetModEffect)IBODMPMJELJ.AMKJNPOCODK;
-			PerkActionSetModEffect.COLPJOBKGEI cOLPJOBKGEI = fBLKPCHKAHM.CKEDENENELC();
+			PerkActionSetModEffect fBLKPCHKAHM = (PerkActionSetModEffect)IBODMPMJELJ.Action;
+			PerkActionSetModEffect.ModEffectType cOLPJOBKGEI = fBLKPCHKAHM.GetEffectType();
 			foreach (ActivePerkItem item in _activePerks)
 			{
 				PerksStage.ActionPerk action = item.get_Action();
-				if (action == CKOEFOCPMGK && cOLPJOBKGEI == PerkActionSetModEffect.COLPJOBKGEI.EFFECT_PULSE)
+				if (action == CKOEFOCPMGK && cOLPJOBKGEI == PerkActionSetModEffect.ModEffectType.EFFECT_PULSE)
 				{
 					item.set_PulseCount(item.get_PulseCount() + 1);
 				}
@@ -60,25 +60,25 @@ namespace Nekki.SF2.GUI.Fight
 			}
 			if (IBODMPMJELJ != null)
 			{
-				MMIOFGHCNFC(IBODMPMJELJ);
+				CreateActivePerkItem(IBODMPMJELJ);
 			}
 		}
 
-		private void MMIOFGHCNFC(PerksStage.ActionPerk IBODMPMJELJ)
+		private void CreateActivePerkItem(PerksStage.ActionPerk IBODMPMJELJ)
 		{
 			if (_activePerkItemPrefab == null)
 			{
-				LLLOJBFMONN.Error("ActivePerkModel.CreateActivePerkItem: _activePerkItemPrefab is null");
+				GameLog.Error("ActivePerkModel.CreateActivePerkItem: _activePerkItemPrefab is null");
 				return;
 			}
 			ActivePerkItem component = Object.Instantiate(_activePerkItemPrefab).GetComponent<ActivePerkItem>();
 			if (component == null)
 			{
-				LLLOJBFMONN.Error("ActivePerkModel.CreateActivePerkItem: item is null");
+				GameLog.Error("ActivePerkModel.CreateActivePerkItem: item is null");
 				return;
 			}
 			component.Init(IBODMPMJELJ);
-			string FMHAGIPOIBJ = IBODMPMJELJ.GJONJADIAJM;
+			string FMHAGIPOIBJ = IBODMPMJELJ.StackKey;
 			ActivePerkItemContainer activePerkItemContainer = null;
 			if (!FMHAGIPOIBJ.Equals(string.Empty))
 			{
@@ -88,21 +88,21 @@ namespace Nekki.SF2.GUI.Fight
 			{
 				if (_activePerkItemContainerPrefab == null)
 				{
-					LLLOJBFMONN.Error("ActivePerkModel.CreateActivePerkItem: _activePerkItemContainerPrefab is null");
+					GameLog.Error("ActivePerkModel.CreateActivePerkItem: _activePerkItemContainerPrefab is null");
 					return;
 				}
 				activePerkItemContainer = Object.Instantiate(_activePerkItemContainerPrefab).GetComponent<ActivePerkItemContainer>();
 				if (activePerkItemContainer == null)
 				{
-					LLLOJBFMONN.Error("ActivePerkModel.CreateActivePerkItem: itemContainer is null");
+					GameLog.Error("ActivePerkModel.CreateActivePerkItem: itemContainer is null");
 					return;
 				}
-				if (_align == OKCGIBOLEKD.ActivePerkRight)
+				if (_align == PerkAlignment.ActivePerkRight)
 				{
 					activePerkItemContainer.transform.localRotation = _containerRotation;
 				}
 				activePerkItemContainer.transform.SetParent(base.transform, false);
-				activePerkItemContainer.Init(PerkGUI.IKONKNEHCPB(), PerkGUI.FKMDJBBMJFM());
+				activePerkItemContainer.Init(PerkGUI.GetStackShiftX(), PerkGUI.GetStackShiftY());
 				activePerkItemContainer.set_Stack(FMHAGIPOIBJ);
 				_activePerksContainer.Add(activePerkItemContainer);
 			}
@@ -148,7 +148,7 @@ namespace Nekki.SF2.GUI.Fight
 			_activePerksContainer.Clear();
 		}
 
-		private void AAFJILIOPBG()
+		private void LayoutContainers()
 		{
 			float num = 0f;
 			float x = _spacing.x;
@@ -188,7 +188,7 @@ namespace Nekki.SF2.GUI.Fight
 					j--;
 				}
 			}
-			AAFJILIOPBG();
+			LayoutContainers();
 		}
 	}
 }

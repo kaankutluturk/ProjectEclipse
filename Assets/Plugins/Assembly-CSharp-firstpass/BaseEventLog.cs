@@ -1,41 +1,41 @@
 public class BaseEventLog : global::EventDispatcher<object>
 {
-	public enum MAPBOFEBBKD
+	public enum LoggingState
 	{
 		NotLogging = 0,
 		Logging = 1,
 		Undecided = 2
 	}
 
-	private MAPBOFEBBKD PCFBFCODIED;
+	private LoggingState loggingState;
 
-	public bool CFBGHLDIEOH
+	public bool IsLogging
 	{
 		get
 		{
-			return DKKNEBIGLPJ();
+			return GetIsLogging();
 		}
 		set
 		{
-			AHPANGPNJPG(value);
+			SetIsLogging(value);
 		}
 	}
 
-	public bool DKKNEBIGLPJ()
+	public bool GetIsLogging()
 	{
-		return PCFBFCODIED != MAPBOFEBBKD.NotLogging;
+		return loggingState != LoggingState.NotLogging;
 	}
 
-	public void AHPANGPNJPG(bool value)
+	public void SetIsLogging(bool value)
 	{
 		if (value)
 		{
-			PCFBFCODIED = MAPBOFEBBKD.Logging;
+			loggingState = LoggingState.Logging;
 			Send();
 		}
 		else
 		{
-			PCFBFCODIED = MAPBOFEBBKD.NotLogging;
+			loggingState = LoggingState.NotLogging;
 		}
 	}
 

@@ -31,14 +31,14 @@ namespace Eclipse.UI
             var result = new HashSet<string>();
             try
             {
-                Roster roster = ListSF.CCDKHLAMKKO();
-                if (roster == null || roster.KHCNHPCPFII() == null) return result;
-                foreach (UserItem item in roster.KHCNHPCPFII().JCMOHPFKPBO())
+                Roster roster = ListSF.GetRoster();
+                if (roster == null || roster.GetInventory() == null) return result;
+                foreach (UserItem item in roster.GetInventory().GetEquippedItems())
                 {
-                    ItemInfo info = item.BHKHOJPANHE();
+                    ItemInfo info = item.GetInfo();
                     if (info == null || info.IgnoreInventoryEnchantments) continue;
                     foreach (PerkInfoItem perk in item.GetEnchantments())
-                        if (perk != null && perk.LELHEEDNMBP == PerkInfoItem.DNPGIEGCGKH.COMBO && GameUtils.ILFJCODGINO(perk))
+                        if (perk != null && perk.Kind == PerkInfoItem.PerkKind.COMBO && GameUtils.IsPerkCompatibleWithEquipment(perk))
                             result.Add(perk.Name);
                 }
             }
@@ -57,7 +57,7 @@ namespace Eclipse.UI
             foreach (string name in now)
             {
                 if (before.Contains(name)) continue;
-                PerkInfoItem perk = GameUtils.FDEJIIDIPBI.ABAGJKMKCBA(name);
+                PerkInfoItem perk = GameUtils.PerkItemList.FindBasePerk(name);
                 if (perk != null) Instance().Enqueue(perk);
             }
         }
@@ -146,14 +146,14 @@ namespace Eclipse.UI
             PerkInfoItem perk = _pending.Dequeue();
             ItemSet set = FindSet(perk);
             string name = set != null ? Localized(set.Title) : string.Empty;
-            if (string.IsNullOrEmpty(name)) name = Localized(perk.HBCNKNFPAIM);
+            if (string.IsNullOrEmpty(name)) name = Localized(perk.Alias);
             if (string.IsNullOrEmpty(name)) name = perk.Name;
             _title.text = "SET BONUS ACTIVE: " + name;
-            string brief = set != null ? Localized(set.LHOJGHFGLFD) : string.Empty;
-            if (string.IsNullOrEmpty(brief)) brief = Localized(perk.MGNNJPBCOGD);
+            string brief = set != null ? Localized(set.Brief) : string.Empty;
+            if (string.IsNullOrEmpty(brief)) brief = Localized(perk.DescriptionKey);
             _brief.text = Markup.Replace(brief ?? string.Empty, string.Empty).Trim();
-            _icon.enabled = !string.IsNullOrEmpty(perk.NHKMCLPOMFK);
-            if (_icon.enabled) _icon.set_SpriteName(perk.NHKMCLPOMFK);
+            _icon.enabled = !string.IsNullOrEmpty(perk.ImageName);
+            if (_icon.enabled) _icon.set_SpriteName(perk.ImageName);
             _group.gameObject.SetActive(true);
             _group.alpha = 0f;
             _shownAt = Time.unscaledTime;
@@ -161,11 +161,11 @@ namespace Eclipse.UI
 
         private static ItemSet FindSet(PerkInfoItem perk)
         {
-            ItemSets sets = ListSF.GetItems()?.DGKMILIPLLF();
+            ItemSets sets = ListSF.GetItems()?.GetItemSets();
             if (sets == null) return null;
-            if (!string.IsNullOrEmpty(perk.DIJBDEJFKKF))
+            if (!string.IsNullOrEmpty(perk.ItemSetName))
             {
-                ItemSet named = sets.IGHHCHBEHOH(perk.DIJBDEJFKKF);
+                ItemSet named = sets.GetSetByName(perk.ItemSetName);
                 if (named != null) return named;
             }
             foreach (ItemSet set in sets.Sets)

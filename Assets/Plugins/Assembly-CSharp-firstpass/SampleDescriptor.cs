@@ -5,55 +5,55 @@ using UnityEngine;
 public sealed class SampleDescriptor
 {
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private bool FACBGDJBENJ;
+	private bool isLabel;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private Type KAHHEBMBCFA;
+	private Type type;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private string GHOHHEPOKHM;
+	private string displayName;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private string BMFPPGBCFMO;
+	private string description;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private string GEOFNNHICMG;
+	private string codeBlock;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private bool HILJNEINPDH;
+	private bool isSelected;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private GameObject OHKBFKDFEDN;
+	private GameObject unityObject;
 
-	public bool GDJOOEAAJBH
+	public bool IsLabel
 	{
 		get
 		{
-			return AFDFPBKGIIL();
+			return GetIsLabel();
 		}
 		set
 		{
-			FPEMDEEFJEL(value);
+			SetIsLabel(value);
 		}
 	}
 
-	public string LONIGNIEBHJ
+	public string DisplayName
 	{
 		get
 		{
-			return IFBOMKBDANN();
+			return GetDisplayName();
 		}
 		set
 		{
-			MAKOKOKCOOB(value);
+			SetDisplayName(value);
 		}
 	}
 
-	public string MGNNJPBCOGD
+	public string DescriptionText
 	{
 		get
 		{
-			return GJOAJAIJHOE();
+			return GetDescription();
 		}
 		set
 		{
@@ -61,35 +61,35 @@ public sealed class SampleDescriptor
 		}
 	}
 
-	public string EDAPEBIEBMG
+	public string CodeBlock
 	{
 		get
 		{
-			return PHHICBFIMJE();
+			return GetCodeBlock();
 		}
 		set
 		{
-			OMPKDJLKOLH(value);
+			SetCodeBlock(value);
 		}
 	}
 
-	public bool JPMGJAMMLOA
+	public bool IsSelected
 	{
 		get
 		{
-			return NHMPPLCPEEP();
+			return GetIsSelected();
 		}
 		set
 		{
-			OBNFCPCDNEJ(value);
+			SetIsSelected(value);
 		}
 	}
 
-	public GameObject ICDCIANNAAI
+	public GameObject SampleObject
 	{
 		get
 		{
-			return MJNPBMOAFML();
+			return GetUnityObject();
 		}
 		set
 		{
@@ -97,111 +97,111 @@ public sealed class SampleDescriptor
 		}
 	}
 
-	public bool OEDPHHDKECI
+	public bool IsSampleRunning
 	{
 		get
 		{
-			return NMACGEJHPDN();
+			return GetIsRunning();
 		}
 	}
 
 	public SampleDescriptor(Type LFLGCDNKNJI, string IEJOMILJAOK, string EMDJGBHIAIA, string LCNMGAJENGL)
 	{
 		set_Type(LFLGCDNKNJI);
-		MAKOKOKCOOB(IEJOMILJAOK);
+		SetDisplayName(IEJOMILJAOK);
 		set_Description(EMDJGBHIAIA);
-		OMPKDJLKOLH(LCNMGAJENGL);
+		SetCodeBlock(LCNMGAJENGL);
 	}
 
-	public bool AFDFPBKGIIL()
+	public bool GetIsLabel()
 	{
-		return FACBGDJBENJ;
+		return isLabel;
 	}
 
-	public void FPEMDEEFJEL(bool value)
+	public void SetIsLabel(bool value)
 	{
-		FACBGDJBENJ = value;
+		isLabel = value;
 	}
 
 	public Type get_Type()
 	{
-		return KAHHEBMBCFA;
+		return type;
 	}
 
 	public void set_Type(Type value)
 	{
-		KAHHEBMBCFA = value;
+		type = value;
 	}
 
-	public string IFBOMKBDANN()
+	public string GetDisplayName()
 	{
-		return GHOHHEPOKHM;
+		return displayName;
 	}
 
-	public void MAKOKOKCOOB(string value)
+	public void SetDisplayName(string value)
 	{
-		GHOHHEPOKHM = value;
+		displayName = value;
 	}
 
-	public string GJOAJAIJHOE()
+	public string GetDescription()
 	{
-		return BMFPPGBCFMO;
+		return description;
 	}
 
 	public void set_Description(string value)
 	{
-		BMFPPGBCFMO = value;
+		description = value;
 	}
 
-	public string PHHICBFIMJE()
+	public string GetCodeBlock()
 	{
-		return GEOFNNHICMG;
+		return codeBlock;
 	}
 
-	public void OMPKDJLKOLH(string value)
+	public void SetCodeBlock(string value)
 	{
-		GEOFNNHICMG = value;
+		codeBlock = value;
 	}
 
-	public bool NHMPPLCPEEP()
+	public bool GetIsSelected()
 	{
-		return HILJNEINPDH;
+		return isSelected;
 	}
 
-	public void OBNFCPCDNEJ(bool value)
+	public void SetIsSelected(bool value)
 	{
-		HILJNEINPDH = value;
+		isSelected = value;
 	}
 
-	public GameObject MJNPBMOAFML()
+	public GameObject GetUnityObject()
 	{
-		return OHKBFKDFEDN;
+		return unityObject;
 	}
 
 	public void set_UnityObject(GameObject value)
 	{
-		OHKBFKDFEDN = value;
+		unityObject = value;
 	}
 
-	public bool NMACGEJHPDN()
+	public bool GetIsRunning()
 	{
-		return MJNPBMOAFML() != null;
+		return GetUnityObject() != null;
 	}
 
 	public void CreateUnityObject()
 	{
-		if (!(MJNPBMOAFML() != null))
+		if (!(GetUnityObject() != null))
 		{
-			set_UnityObject(new GameObject(IFBOMKBDANN()));
-			MJNPBMOAFML().AddComponent(get_Type());
+			set_UnityObject(new GameObject(GetDisplayName()));
+			GetUnityObject().AddComponent(get_Type());
 		}
 	}
 
-	public void EHDDIIAKFGI()
+	public void DestroyUnityObject()
 	{
-		if (MJNPBMOAFML() != null)
+		if (GetUnityObject() != null)
 		{
-			UnityEngine.Object.Destroy(MJNPBMOAFML());
+			UnityEngine.Object.Destroy(GetUnityObject());
 			set_UnityObject(null);
 		}
 	}

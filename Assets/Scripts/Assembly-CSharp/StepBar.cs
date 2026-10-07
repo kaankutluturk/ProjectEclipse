@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 public class StepBar : ProgressBar
 {
-	private List<int> EOHNNHKBLON;
+	private List<int> _percentValues;
 
 	private void Start()
 	{
@@ -31,14 +31,14 @@ public class StepBar : ProgressBar
 
 	public void SetPercent(List<int> ONDOPPJBEEF)
 	{
-		EOHNNHKBLON = ONDOPPJBEEF;
+		_percentValues = ONDOPPJBEEF;
 		SetValue(0);
 	}
 
 	public int GetPercentIndex(float AMBMJABLPFE)
 	{
 		int num = 0;
-		foreach (int item in EOHNNHKBLON)
+		foreach (int item in _percentValues)
 		{
 			if ((float)item == AMBMJABLPFE)
 			{
@@ -51,19 +51,19 @@ public class StepBar : ProgressBar
 
 	private float GetPercentValue(int value)
 	{
-		int count = EOHNNHKBLON.Count;
+		int count = _percentValues.Count;
 		if (count == 0)
 		{
 			return 0f;
 		}
 		if (value < 0)
 		{
-			return EOHNNHKBLON[0];
+			return _percentValues[0];
 		}
 		if (count <= value)
 		{
-			return EOHNNHKBLON[count - 1];
+			return _percentValues[count - 1];
 		}
-		return EOHNNHKBLON[value];
+		return _percentValues[value];
 	}
 }

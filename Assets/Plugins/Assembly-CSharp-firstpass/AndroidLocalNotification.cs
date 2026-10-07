@@ -2,16 +2,16 @@ using UnityEngine;
 
 public class AndroidLocalNotification
 {
-	public enum OIBFFILFNNB
+	public enum NotificationExecuteMode
 	{
 		Inexact = 0,
 		Exact = 1,
 		ExactAndAllowWhileIdle = 2
 	}
 
-	private static string CJEBLHDIJGP()
+	private static string GetPluginClassName()
 	{
-		return JJHBPGBNFPC.DKDDEIHHMJP(new byte[128]
+		return RsaPublicKeyDecryptor.Decrypt(new byte[128]
 		{
 			81, 107, 67, 67, 156, 185, 73, 198, 152, 218,
 			37, 217, 110, 245, 89, 191, 150, 199, 136, 53,
@@ -29,9 +29,9 @@ public class AndroidLocalNotification
 		}, false);
 	}
 
-	private static string EMIDJPIBPKK()
+	private static string GetUnityClassName()
 	{
-		return JJHBPGBNFPC.DKDDEIHHMJP(new byte[128]
+		return RsaPublicKeyDecryptor.Decrypt(new byte[128]
 		{
 			100, 34, 209, 163, 88, 249, 11, 238, 36, 48,
 			5, 74, 218, 140, 52, 48, 136, 26, 39, 132,
@@ -49,23 +49,23 @@ public class AndroidLocalNotification
 		}, false);
 	}
 
-	public static void GAMLNBGMCHB(int OKNNNLIPODI, string PEMOECLNECD, string LIOGIBJBHAH, long ENDPMCNJPEA)
+	public static void SendNotification(int OKNNNLIPODI, string PEMOECLNECD, string LIOGIBJBHAH, long ENDPMCNJPEA)
 	{
-		ADDHDJPBKGD(OKNNNLIPODI, ENDPMCNJPEA, PEMOECLNECD, LIOGIBJBHAH, Color.black);
+		SetNotification(OKNNNLIPODI, ENDPMCNJPEA, PEMOECLNECD, LIOGIBJBHAH, Color.black);
 	}
 
-	private static void ADDHDJPBKGD(int OKNNNLIPODI, long ENDPMCNJPEA, string PEMOECLNECD, string LIOGIBJBHAH, Color32 NPCPKCNJCOM, bool LGLFOBEIPKB = true, bool CEGOKEEKHDP = true, bool KILOFHBEDKP = true, OIBFFILFNNB GFGGECPLIID = OIBFFILFNNB.Inexact)
+	private static void SetNotification(int OKNNNLIPODI, long ENDPMCNJPEA, string PEMOECLNECD, string LIOGIBJBHAH, Color32 NPCPKCNJCOM, bool LGLFOBEIPKB = true, bool CEGOKEEKHDP = true, bool KILOFHBEDKP = true, NotificationExecuteMode GFGGECPLIID = NotificationExecuteMode.Inexact)
 	{
-		AndroidJavaClass androidJavaClass = new AndroidJavaClass(CJEBLHDIJGP());
+		AndroidJavaClass androidJavaClass = new AndroidJavaClass(GetPluginClassName());
 		if (androidJavaClass != null)
 		{
-			androidJavaClass.CallStatic("SetNotification", OKNNNLIPODI, ENDPMCNJPEA * 1000, PEMOECLNECD, LIOGIBJBHAH, LIOGIBJBHAH, LGLFOBEIPKB ? 1 : 0, CEGOKEEKHDP ? 1 : 0, KILOFHBEDKP ? 1 : 0, "app_icon", "notify_icon_small", NPCPKCNJCOM.r * 65536 + NPCPKCNJCOM.g * 256 + NPCPKCNJCOM.b, (int)GFGGECPLIID, EMIDJPIBPKK());
+			androidJavaClass.CallStatic("SetNotification", OKNNNLIPODI, ENDPMCNJPEA * 1000, PEMOECLNECD, LIOGIBJBHAH, LIOGIBJBHAH, LGLFOBEIPKB ? 1 : 0, CEGOKEEKHDP ? 1 : 0, KILOFHBEDKP ? 1 : 0, "app_icon", "notify_icon_small", NPCPKCNJCOM.r * 65536 + NPCPKCNJCOM.g * 256 + NPCPKCNJCOM.b, (int)GFGGECPLIID, GetUnityClassName());
 		}
 	}
 
-	public static void MKOEHNJBKNM(int OKNNNLIPODI)
+	public static void CancelNotification(int OKNNNLIPODI)
 	{
-		AndroidJavaClass androidJavaClass = new AndroidJavaClass(CJEBLHDIJGP());
+		AndroidJavaClass androidJavaClass = new AndroidJavaClass(GetPluginClassName());
 		if (androidJavaClass != null)
 		{
 			androidJavaClass.CallStatic("CancelNotification", OKNNNLIPODI);

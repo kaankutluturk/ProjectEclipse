@@ -2,36 +2,36 @@ using System.Xml;
 
 public class ActionZoomEffect : ActionAnimation
 {
-	private GameUtils.ZoomEffect BBJLALGOMLM = new GameUtils.ZoomEffect();
+	private GameUtils.ZoomEffect _Effect = new GameUtils.ZoomEffect();
 
-	public GameUtils.ZoomEffect KIBLEHOADMI
+	public GameUtils.ZoomEffect Effect
 	{
 		get
 		{
-			return DJDCBEMKLIP();
+			return GetEffect();
 		}
 	}
 
 	public ActionZoomEffect(XmlNode node)
-		: base(FADAJCEEKIO.ZOOM_EFFECT)
+		: base(ActionType.ZOOM_EFFECT)
 	{
 		Parse(node);
 	}
 
-	public GameUtils.ZoomEffect DJDCBEMKLIP()
+	public GameUtils.ZoomEffect GetEffect()
 	{
-		return BBJLALGOMLM;
+		return _Effect;
 	}
 
 	public override void Visit(Model ACENLMONNPA)
 	{
-		ACENLMONNPA.OPPIKLBKMPN(this);
+		ACENLMONNPA.StartAction(this);
 	}
 
 	protected override void Parse(XmlNode node)
 	{
 		base.Parse(node);
-		BBJLALGOMLM.OFJCKMNLAEP = node.Attributes["EffectTime"].ParseInt();
-		BBJLALGOMLM.JCNPAOMNJCL = node.Attributes["ZoomScale"].ParseFloat();
+		_Effect.EffectTime = node.Attributes["EffectTime"].ParseInt();
+		_Effect.TargetScale = node.Attributes["ZoomScale"].ParseFloat();
 	}
 }

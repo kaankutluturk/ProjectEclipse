@@ -5,16 +5,16 @@ using System.Xml;
 public class PerkEventModExpires : PerkEvent
 {
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private string OPAFELFOFFB;
+	private string _modName;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private string HCHALPNMNMK;
+	private string _namespace;
 
-	public string POLPHCDNLEL
+	public string ExpiredModName
 	{
 		get
 		{
-			return CMKKGFDBBJF();
+			return GetModName();
 		}
 		protected set
 		{
@@ -29,47 +29,47 @@ public class PerkEventModExpires : PerkEvent
 	public PerkEventModExpires(PerkEventModExpires NOLFMPDGCOC)
 		: base(NOLFMPDGCOC)
 	{
-		set_ModName(NOLFMPDGCOC.CMKKGFDBBJF());
-		set_Namespace(NOLFMPDGCOC.IONIEDIPEGB());
+		set_ModName(NOLFMPDGCOC.GetModName());
+		set_Namespace(NOLFMPDGCOC.GetNamespace());
 	}
 
-	public string CMKKGFDBBJF()
+	public string GetModName()
 	{
-		return OPAFELFOFFB;
+		return _modName;
 	}
 
 	protected void set_ModName(string value)
 	{
-		OPAFELFOFFB = value;
+		_modName = value;
 	}
 
-	public string IONIEDIPEGB()
+	public string GetNamespace()
 	{
-		return HCHALPNMNMK;
+		return _namespace;
 	}
 
 	protected void set_Namespace(string value)
 	{
-		HCHALPNMNMK = value;
+		_namespace = value;
 	}
 
 	public override void Parse(XmlNode node)
 	{
 		base.Parse(node);
-		set_ModName(node.Attributes["Name"].CIPOICEEIBK(string.Empty));
-		set_Namespace(node.Attributes["Namespace"].CIPOICEEIBK(string.Empty));
+		set_ModName(node.Attributes["Name"].GetStringOrDefault(string.Empty));
+		set_Namespace(node.Attributes["Namespace"].GetStringOrDefault(string.Empty));
 	}
 
 	public override bool IsEqual(EventStruct EJMEALJNNIL)
 	{
-		if (IONIEDIPEGB() == null || IONIEDIPEGB() == string.Empty)
+		if (GetNamespace() == null || GetNamespace() == string.Empty)
 		{
 			if (!base.IsEqual(EJMEALJNNIL) || EJMEALJNNIL == null || EJMEALJNNIL.Info == null)
 			{
 				return false;
 			}
 		}
-		else if (IONIEDIPEGB().Equals(EJMEALJNNIL.Namespace))
+		else if (GetNamespace().Equals(EJMEALJNNIL.Namespace))
 		{
 			return false;
 		}
@@ -78,7 +78,7 @@ public class PerkEventModExpires : PerkEvent
 		{
 			string value = ((!dictionary.ContainsKey("ModExpires")) ? null : ((string)dictionary["ModExpires"]));
 			PerkInfoItem aCONCDFDNJH = ((!dictionary.ContainsKey("ParentPerk")) ? null : ((PerkInfoItem)dictionary["ParentPerk"]));
-			if (aCONCDFDNJH == JMDLAMHAJLN() && (CMKKGFDBBJF() == null || CMKKGFDBBJF() == string.Empty || CMKKGFDBBJF().Equals(value)))
+			if (aCONCDFDNJH == GetPerk() && (GetModName() == null || GetModName() == string.Empty || GetModName().Equals(value)))
 			{
 				return true;
 			}

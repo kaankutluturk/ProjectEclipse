@@ -5,7 +5,7 @@ public class ActionStopSound : ActionAnimation
 	private string _Name;
 
 	public ActionStopSound(XmlNode node)
-		: base(FADAJCEEKIO.STOP_SOUND)
+		: base(ActionType.STOP_SOUND)
 	{
 		Parse(node);
 	}
@@ -17,12 +17,12 @@ public class ActionStopSound : ActionAnimation
 
 	public override void Visit(Model ACENLMONNPA)
 	{
-		ACENLMONNPA.OPPIKLBKMPN(this);
+		ACENLMONNPA.StartAction(this);
 	}
 
 	protected override void Parse(XmlNode node)
 	{
 		base.Parse(node);
-		_Name = node.Attributes["Name"].CIPOICEEIBK(string.Empty);
+		_Name = node.Attributes["Name"].GetStringOrDefault(string.Empty);
 	}
 }

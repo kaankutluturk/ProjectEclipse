@@ -20,26 +20,26 @@ namespace Nekki.SF2.GUI.Fight
 
 		private UnityEvent endEvent = new UnityEvent();
 
-		private long OPDBMDGCGFO;
+		private long targetExp;
 
-		private long NOCNKGALGHF;
+		private long displayedExp;
 
-		private long PHGCCAFJFLL;
+		private long targetMoney;
 
-		private long CDGOOJOAOPL;
+		private long displayedMoney;
 
 		private bool needShowExpAndMoney;
 
 		public void Init(long exp, long GBGNFPNCGED)
 		{
 			needShowExpAndMoney = true;
-			OPDBMDGCGFO = exp;
-			NOCNKGALGHF = 0L;
-			PHGCCAFJFLL = GBGNFPNCGED;
-			CDGOOJOAOPL = 0L;
+			targetExp = exp;
+			displayedExp = 0L;
+			targetMoney = GBGNFPNCGED;
+			displayedMoney = 0L;
 			if (moneyCount != null)
 			{
-				moneyCount.SetIcon(ListSF.CCDKHLAMKKO().OGJBDMNBMLJ());
+				moneyCount.SetIcon(ListSF.GetRoster().GetCoinIcon());
 			}
 			VisibleExpAndMoney(false);
 		}
@@ -54,7 +54,7 @@ namespace Nekki.SF2.GUI.Fight
 			}
 			else
 			{
-				KDIBKONDDOO();
+				PlayCountAnimation();
 			}
 		}
 
@@ -65,17 +65,17 @@ namespace Nekki.SF2.GUI.Fight
 			NumberFormatInfo numberFormatInfo2 = numberFormatInfo;
 			if (exp != null)
 			{
-				exp.SetText(NOCNKGALGHF.ToString("N0", numberFormatInfo2));
+				exp.SetText(displayedExp.ToString("N0", numberFormatInfo2));
 				exp.gameObject.SetActive(KFIECNIMAOA);
 			}
 			if (moneyCount != null)
 			{
-				moneyCount.SetText(CDGOOJOAOPL.ToString("N0", numberFormatInfo2));
+				moneyCount.SetText(displayedMoney.ToString("N0", numberFormatInfo2));
 				moneyCount.gameObject.SetActive(KFIECNIMAOA);
 			}
 		}
 
-		private void KDIBKONDDOO()
+		private void PlayCountAnimation()
 		{
 			NumberFormatInfo f = new NumberFormatInfo
 			{
@@ -84,17 +84,17 @@ namespace Nekki.SF2.GUI.Fight
 			sequence = DOTween.Sequence();
 			if (moneyCount != null && exp != null)
 			{
-				Tweener t = DOTween.To(() => CDGOOJOAOPL, (long DHDMNHCIPEH) =>
+				Tweener t = DOTween.To(() => displayedMoney, (long DHDMNHCIPEH) =>
 				{
-					CDGOOJOAOPL = DHDMNHCIPEH;
-					moneyCount.SetText(CDGOOJOAOPL.ToString("N0", f));
-				}, PHGCCAFJFLL, moneyAddTime);
+					displayedMoney = DHDMNHCIPEH;
+					moneyCount.SetText(displayedMoney.ToString("N0", f));
+				}, targetMoney, moneyAddTime);
 				sequence.Append(t);
-				Tweener t2 = DOTween.To(() => NOCNKGALGHF, (long DHDMNHCIPEH) =>
+				Tweener t2 = DOTween.To(() => displayedExp, (long DHDMNHCIPEH) =>
 				{
-					NOCNKGALGHF = DHDMNHCIPEH;
-					exp.SetText(NOCNKGALGHF.ToString("N0", f));
-				}, OPDBMDGCGFO, moneyAddTime);
+					displayedExp = DHDMNHCIPEH;
+					exp.SetText(displayedExp.ToString("N0", f));
+				}, targetExp, moneyAddTime);
 				sequence.Join(t2);
 				sequence.AppendCallback(() =>
 				{
@@ -127,13 +127,13 @@ namespace Nekki.SF2.GUI.Fight
 			VisibleExpAndMoney(true);
 			if (exp != null)
 			{
-				NOCNKGALGHF = OPDBMDGCGFO;
-				exp.SetText(NOCNKGALGHF.ToString());
+				displayedExp = targetExp;
+				exp.SetText(displayedExp.ToString());
 			}
 			if (moneyCount != null)
 			{
-				CDGOOJOAOPL = PHGCCAFJFLL;
-				moneyCount.SetText(CDGOOJOAOPL.ToString());
+				displayedMoney = targetMoney;
+				moneyCount.SetText(displayedMoney.ToString());
 			}
 		}
 	}

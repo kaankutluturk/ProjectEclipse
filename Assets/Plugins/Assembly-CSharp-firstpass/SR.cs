@@ -1,42 +1,42 @@
 internal class SR
 {
-	public const string KCIHCBECLEH = "Argument out of range";
+	public const string ArgumentOutOfRange_Enum = "Argument out of range";
 
-	public const string NKPBOIJFOAP = "Corrupted gzip header";
+	public const string CorruptedGZipHeader = "Corrupted gzip header";
 
-	public const string LMGAFEBGEIC = "Cannot read from deflate stream";
+	public const string CannotReadFromDeflateStream = "Cannot read from deflate stream";
 
-	public const string ANCDKJBKDLO = "Cannot write to deflate stream";
+	public const string CannotWriteToDeflateStream = "Cannot write to deflate stream";
 
-	public const string AGPAJIINPLG = "Invalid data";
+	public const string GenericInvalidData = "Invalid data";
 
-	public const string DBNCNIEIPID = "Invalid CRC";
+	public const string InvalidCRC = "Invalid CRC";
 
-	public const string CDNFLEDJBCJ = "Invalid stream size";
+	public const string InvalidStreamSize = "Invalid stream size";
 
-	public const string MHHOHOJGKHE = "Invalid Huffman data";
+	public const string InvalidHuffmanData = "Invalid Huffman data";
 
-	public const string GMAHHKPECNI = "Invalid begin call";
+	public const string InvalidBeginCall = "Invalid begin call";
 
-	public const string MLPFLNKLCII = "Invalid end call";
+	public const string InvalidEndCall = "Invalid end call";
 
-	public const string OJPAFLHEFAP = "Invalid block length";
+	public const string InvalidBlockLength = "Invalid block length";
 
-	public const string GGEMKJHDAFI = "Invalid argument offset count";
+	public const string InvalidArgumentOffsetCount = "Invalid argument offset count";
 
-	public const string EAOIBPPDGBF = "Not supported";
+	public const string NotSupported = "Not supported";
 
-	public const string BIOOEGPOGNB = "Not a writeable stream";
+	public const string NotWriteableStream = "Not a writeable stream";
 
-	public const string PEOJKKOJHBP = "Not a readable stream";
+	public const string NotReadableStream = "Not a readable stream";
 
-	public const string DIIEPCEKJEL = "Object disposed";
+	public const string ObjectDisposed_StreamClosed = "Object disposed";
 
-	public const string MDALMILGLCH = "Unknown state";
+	public const string UnknownState = "Unknown state";
 
-	public const string PBPMNCOPDCA = "Unknown compression mode";
+	public const string UnknownCompressionMode = "Unknown compression mode";
 
-	public const string FPODHOJMHEK = "Unknown block type";
+	public const string UnknownBlockType = "Unknown block type";
 
 	private SR()
 	{

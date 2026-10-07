@@ -4,28 +4,28 @@ using UnityEngine.SceneManagement;
 
 public static class SceneManagerSF
 {
-	private static ScreenType MHOCFOODLLL;
+	private static ScreenType currentScreen;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private static bool BPBEHJPPEOO;
+	private static bool initialized;
 
-	public static ScreenType DAINBPONGAB
+	public static ScreenType CurrentScreen
 	{
 		get
 		{
-			return EKFBDMBCDMB();
+			return GetCurrentScreen();
 		}
 		set
 		{
-			DJKMOGJMHLO(value);
+			SetCurrentScreen(value);
 		}
 	}
 
-	public static bool IOGMEGLBNIJ
+	public static bool Initialized
 	{
 		get
 		{
-			return IANJCHNLMHC();
+			return GetIsInitialized();
 		}
 		private set
 		{
@@ -33,29 +33,29 @@ public static class SceneManagerSF
 		}
 	}
 
-	public static ScreenType EKFBDMBCDMB()
+	public static ScreenType GetCurrentScreen()
 	{
-		return MHOCFOODLLL;
+		return currentScreen;
 	}
 
-	public static void DJKMOGJMHLO(ScreenType value)
+	public static void SetCurrentScreen(ScreenType value)
 	{
-		MHOCFOODLLL = value;
+		currentScreen = value;
 	}
 
-	public static bool IANJCHNLMHC()
+	public static bool GetIsInitialized()
 	{
-		return BPBEHJPPEOO;
+		return initialized;
 	}
 
 	private static void set_IsInitialized(bool value)
 	{
-		BPBEHJPPEOO = value;
+		initialized = value;
 	}
 
 	public static bool Init(ScreenType DAINBPONGAB)
 	{
-		if (!IANJCHNLMHC())
+		if (!GetIsInitialized())
 		{
 			set_IsInitialized(true);
 			if (DAINBPONGAB != ScreenType.ModulePreloader)
@@ -77,13 +77,13 @@ public static class SceneManagerSF
 	{
 		if (MHOCFOODLLL != ScreenType.Loader)
 		{
-			LoaderScene.set_PrevScene(EKFBDMBCDMB());
+			LoaderScene.set_PrevScene(GetCurrentScreen());
 			LoaderScene.set_NextScene(MHOCFOODLLL);
 		}
 		SceneManager.LoadSceneAsync(1);
 	}
 
-	public static Scene GAFDMIPPIAL()
+	public static Scene GetActiveScene()
 	{
 		return SceneManager.GetActiveScene();
 	}

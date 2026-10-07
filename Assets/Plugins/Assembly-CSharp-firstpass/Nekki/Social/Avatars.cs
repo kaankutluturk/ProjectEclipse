@@ -7,18 +7,18 @@ namespace Nekki.Social
 {
 	public class Avatars : MonoBehaviour
 	{
-		private class ALPOFHNCFOE
+		private class AvatarRequest
 		{
 			public UserInfo Info;
 
 			public Action<string, Texture> OnDone;
 		}
 
-		private static Avatars EDAPJLKMFPC;
+		private static Avatars _instance;
 
 		private static readonly Dictionary<string, Texture> _avatars = new Dictionary<string, Texture>();
 
-		private static readonly Dictionary<string, ALPOFHNCFOE> ECDIFOJMMEL = new Dictionary<string, ALPOFHNCFOE>();
+		private static readonly Dictionary<string, AvatarRequest> _requests = new Dictionary<string, AvatarRequest>();
 
 		private static string _current;
 
@@ -26,22 +26,22 @@ namespace Nekki.Social
 
 		private static void Init()
 		{
-			if (!EDAPJLKMFPC)
+			if (!_instance)
 			{
-				EDAPJLKMFPC = new GameObject("_avatar").AddComponent<Avatars>();
-				UnityEngine.Object.DontDestroyOnLoad(EDAPJLKMFPC.gameObject);
+				_instance = new GameObject("_avatar").AddComponent<Avatars>();
+				UnityEngine.Object.DontDestroyOnLoad(_instance.gameObject);
 			}
 		}
 
 		public static void GetAvatar(UserInfo EMBBNNBFODN, Action<string, Texture> onDone)
 		{
 			Init();
-			if (_avatars.ContainsKey(EMBBNNBFODN.NDLJPNCIJIP()))
+			if (_avatars.ContainsKey(EMBBNNBFODN.GetUserId()))
 			{
-				onDone(EMBBNNBFODN.NDLJPNCIJIP(), _avatars[EMBBNNBFODN.NDLJPNCIJIP()]);
+				onDone(EMBBNNBFODN.GetUserId(), _avatars[EMBBNNBFODN.GetUserId()]);
 				return;
 			}
-			ECDIFOJMMEL.Add(EMBBNNBFODN.NDLJPNCIJIP(), new ALPOFHNCFOE
+			_requests.Add(EMBBNNBFODN.GetUserId(), new AvatarRequest
 			{
 				Info = EMBBNNBFODN,
 				OnDone = onDone
@@ -50,7 +50,7 @@ namespace Nekki.Social
 
 		private void Update()
 		{
-			if (!_inProcess && ECDIFOJMMEL.Count > 0)
+			if (!_inProcess && _requests.Count > 0)
 			{
 				StartCoroutine(Load());
 			}
@@ -58,7 +58,7 @@ namespace Nekki.Social
 
 		private IEnumerator Load()
 		{
-			ECDIFOJMMEL.Clear();
+			_requests.Clear();
 			_inProcess = false;
 			yield break;
 		}

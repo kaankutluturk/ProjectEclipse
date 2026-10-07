@@ -29,7 +29,7 @@ public class PerkStruct {
 }
 public class ItemInfo { public string Type; }
 public class RecipeItem { public string ItemType; public int MinDeviation,MaxDeviation; }
-public class UserItem { public ItemInfo Info; public List<PerkStruct> JAJNJAIJOPA=new List<PerkStruct>(); }
+public class UserItem { public ItemInfo Info; public List<PerkStruct> Enchantments=new List<PerkStruct>(); }
 public class Variation {
  public List<PerkStruct> Enchantments=new List<PerkStruct>();
  public bool CheckConditions(UserItem item,int level){return level>=1;}
@@ -66,7 +66,7 @@ public static class Tests {
   recipe.External("Weapon","set",5,20);
   Check(Pool(recipe,weapon)=="ordinary,set","Native exclusion hid an independently added replacement");
   Check(Pool(recipe,weapon,21)=="ordinary","External replacement lost level eligibility");
-  weapon.JAJNJAIJOPA.Add(new PerkStruct("ordinary"));
+  weapon.Enchantments.Add(new PerkStruct("ordinary"));
   Check(Pool(recipe,weapon,10,true)=="set","Existing enchantment filter changed");
   Check(Pool(recipe,weapon,0)=="","Native/external eligibility bypassed");
   Check(recipe.TryExcludeNativeCandidate("Weapon","ordinary",out var second),"Independent exclusion rejected");

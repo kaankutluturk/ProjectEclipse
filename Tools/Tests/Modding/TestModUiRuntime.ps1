@@ -11,7 +11,7 @@ dotnet run --project (Join-Path $fixture 'Ui.csproj')
 if ($LASTEXITCODE -ne 0) { throw 'Mod UI lifecycle fixture failed.' }
 $controller = Get-Content -Raw -Encoding UTF8 (Join-Path $root 'Assets/Scripts/Assembly-CSharp/Nekki/SF2/Core/Fights/Controller/GameController.cs')
 if ([regex]::Matches($controller, '\bCallEvent\(').Count -ne 2 -or
-    $controller -notmatch '(?s)private void Update\(\).*?SyncModUiCapture\(\);.*?NBMONJPAMHI.Render\(\);' -or
+    $controller -notmatch '(?s)private void Update\(\).*?SyncModUiCapture\(\);.*?keyboardInput.Render\(\);' -or
     $controller -notmatch '_modUiControls.SetCaptured\(Eclipse.UI.Modding.ModUiGameBridge.BlocksGameplayInput\)' -or
     $controller -notmatch 'eventType == 0 \? _modUiControls.Press\(key\) : _modUiControls.Release\(key\)') {
     throw 'Native fight inputs must route through the capture gate while continuing to observe physical release edges.'

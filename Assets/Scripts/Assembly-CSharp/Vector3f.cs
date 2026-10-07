@@ -8,7 +8,7 @@ public class Vector3f : Vector2f
 {
 	private float Z;
 
-	public float MMHBGPFEICN
+	public float ZValue
 	{
 		get
 		{
@@ -20,43 +20,43 @@ public class Vector3f : Vector2f
 		}
 	}
 
-	public float IHGONCCOKMK
+	public float Magnitude
 	{
 		get
 		{
-			return KLIOMCPELLF();
+			return GetMagnitude();
 		}
 	}
 
-	public float EDEIJKAKONA
+	public float Length2D
 	{
 		get
 		{
-			return IGJNMAOKEKK();
+			return GetLength2D();
 		}
 	}
 
-	public static Vector3f NNCHJCLKHHA
+	public static Vector3f UnitX
 	{
 		get
 		{
-			return GGGOJLHLFOJ();
+			return GetUnitX();
 		}
 	}
 
-	public static Vector3f FJBHJIFKOMF
+	public static Vector3f UnitY
 	{
 		get
 		{
-			return LOOCMJMEFIM();
+			return GetUnitY();
 		}
 	}
 
-	public static Vector3f DDLDNKIDIGO
+	public static Vector3f Up
 	{
 		get
 		{
-			return JCFHLFIGEMK();
+			return GetUp();
 		}
 	}
 
@@ -64,15 +64,15 @@ public class Vector3f : Vector2f
 	{
 		get
 		{
-			return GIJAIFMOOOI();
+			return GetZero();
 		}
 	}
 
-	public static Vector3f MOAPAKKGMPF
+	public static Vector3f One
 	{
 		get
 		{
-			return GMFLBGGIMBL();
+			return GetOne();
 		}
 	}
 
@@ -112,61 +112,61 @@ public class Vector3f : Vector2f
 		Z = value;
 	}
 
-	public float KLIOMCPELLF()
+	public float GetMagnitude()
 	{
 		return Mathf.Sqrt(X * X + Y * Y + Z * Z);
 	}
 
-	public float IGJNMAOKEKK()
+	public float GetLength2D()
 	{
 		return Mathf.Sqrt(X * X + Y * Y);
 	}
 
-	public static Vector3f GGGOJLHLFOJ()
+	public static Vector3f GetUnitX()
 	{
 		return new Vector3f(1f);
 	}
 
-	public static Vector3f LOOCMJMEFIM()
+	public static Vector3f GetUnitY()
 	{
 		return new Vector3f(0f, 1f);
 	}
 
-	public static Vector3f JCFHLFIGEMK()
+	public static Vector3f GetUp()
 	{
 		return new Vector3f(0f, 1f);
 	}
 
-	public static Vector3f GIJAIFMOOOI()
+	public static Vector3f GetZero()
 	{
 		return new Vector3f(0f);
 	}
 
-	public static Vector3f GMFLBGGIMBL()
+	public static Vector3f GetOne()
 	{
 		return new Vector3f(1f, 1f, 1f);
 	}
 
 	[SpecialName]
-	public static Vector3f PHEFFKMOOCM(Vector3f BEHOPOPCJGB, float LIAILCGJBDK)
+	public static Vector3f op_Addition(Vector3f BEHOPOPCJGB, float LIAILCGJBDK)
 	{
 		return new Vector3f(BEHOPOPCJGB.GetX() + LIAILCGJBDK, BEHOPOPCJGB.GetY() + LIAILCGJBDK, BEHOPOPCJGB.GetZ() + LIAILCGJBDK);
 	}
 
 	[SpecialName]
-	public static Vector3f PHEFFKMOOCM(Vector3f NBMEGFBPGFE, Vector3f AKKEJFKBIHF)
+	public static Vector3f op_Addition(Vector3f NBMEGFBPGFE, Vector3f AKKEJFKBIHF)
 	{
 		return new Vector3f(NBMEGFBPGFE.GetX() + AKKEJFKBIHF.GetX(), NBMEGFBPGFE.GetY() + AKKEJFKBIHF.GetY(), NBMEGFBPGFE.GetZ() + AKKEJFKBIHF.GetZ());
 	}
 
 	[SpecialName]
-	public static Vector3f MJOKEBGPHKB(Vector3f BEHOPOPCJGB, float LIAILCGJBDK)
+	public static Vector3f op_Subtraction(Vector3f BEHOPOPCJGB, float LIAILCGJBDK)
 	{
 		return new Vector3f(BEHOPOPCJGB.GetX() - LIAILCGJBDK, BEHOPOPCJGB.GetY() - LIAILCGJBDK, BEHOPOPCJGB.GetZ() - LIAILCGJBDK);
 	}
 
 	[SpecialName]
-	public static Vector3f MJOKEBGPHKB(Vector3f NBMEGFBPGFE, Vector3f AKKEJFKBIHF)
+	public static Vector3f op_Subtraction(Vector3f NBMEGFBPGFE, Vector3f AKKEJFKBIHF)
 	{
 		return new Vector3f(NBMEGFBPGFE.GetX() - AKKEJFKBIHF.GetX(), NBMEGFBPGFE.GetY() - AKKEJFKBIHF.GetY(), NBMEGFBPGFE.GetZ() - AKKEJFKBIHF.GetZ());
 	}
@@ -239,7 +239,7 @@ public class Vector3f : Vector2f
 		Z += BEHOPOPCJGB.Z * LMBKGOKPDGM;
 	}
 
-	public void GLGNIMKANCA(Vector3f BEHOPOPCJGB, float LMBKGOKPDGM)
+	public void AddScaledXY(Vector3f BEHOPOPCJGB, float LMBKGOKPDGM)
 	{
 		X += BEHOPOPCJGB.X * LMBKGOKPDGM;
 		Y += BEHOPOPCJGB.Y * LMBKGOKPDGM;
@@ -276,7 +276,7 @@ public class Vector3f : Vector2f
 		return this;
 	}
 
-	public new Vector3f EHGLHOGAIDI(Vector2f PALAIICCALN)
+	public new Vector3f SubtractXY(Vector2f PALAIICCALN)
 	{
 		X -= PALAIICCALN.GetX();
 		Y -= PALAIICCALN.GetY();
@@ -335,7 +335,7 @@ public class Vector3f : Vector2f
 
 	public static Vector3f Middle(Vector3f GIIIFLBEONP, Vector3f OIFPGODHFGH)
 	{
-		return PHEFFKMOOCM(GIIIFLBEONP, op_Multiply(MJOKEBGPHKB(OIFPGODHFGH, GIIIFLBEONP), 0.5f));
+		return op_Addition(GIIIFLBEONP, op_Multiply(op_Subtraction(OIFPGODHFGH, GIIIFLBEONP), 0.5f));
 	}
 
 	public static void Middle(Vector3f GIIIFLBEONP, Vector3f OIFPGODHFGH, Vector3f AMKKLMOONEP)
@@ -347,7 +347,7 @@ public class Vector3f : Vector2f
 
 	public static Vector3f Closest(Vector3f PALAIICCALN, Vector3f NJIAPLENBIL, Vector3f COMFFMDIPBM)
 	{
-		Vector3f nBMEGFBPGFE = MJOKEBGPHKB(PALAIICCALN, NJIAPLENBIL);
+		Vector3f nBMEGFBPGFE = op_Subtraction(PALAIICCALN, NJIAPLENBIL);
 		float num = op_Multiply(nBMEGFBPGFE, COMFFMDIPBM);
 		float num2 = op_Multiply(COMFFMDIPBM, COMFFMDIPBM);
 		float lIAILCGJBDK = 0f;
@@ -355,7 +355,7 @@ public class Vector3f : Vector2f
 		{
 			lIAILCGJBDK = num / num2;
 		}
-		return PHEFFKMOOCM(NJIAPLENBIL, op_Multiply(COMFFMDIPBM, lIAILCGJBDK));
+		return op_Addition(NJIAPLENBIL, op_Multiply(COMFFMDIPBM, lIAILCGJBDK));
 	}
 
 	public void Reset()
@@ -381,9 +381,9 @@ public class Vector3f : Vector2f
 		return this;
 	}
 
-	public Vector3f NBDMEIKNJBG()
+	public Vector3f Normalize()
 	{
-		float num = KLIOMCPELLF();
+		float num = GetMagnitude();
 		if (num != 0f)
 		{
 			num = 1f / num;
@@ -394,9 +394,9 @@ public class Vector3f : Vector2f
 		return this;
 	}
 
-	public static Vector3f KBNMOFDDLOM(Vector3f NBMEGFBPGFE, Vector3f AKKEJFKBIHF)
+	public static Vector3f GetPerpendicularDirection(Vector3f NBMEGFBPGFE, Vector3f AKKEJFKBIHF)
 	{
-		return MJOKEBGPHKB(NBMEGFBPGFE, AKKEJFKBIHF).Cross(JCFHLFIGEMK()).NBDMEIKNJBG();
+		return op_Subtraction(NBMEGFBPGFE, AKKEJFKBIHF).Cross(GetUp()).Normalize();
 	}
 
 	public static float Factor(Vector3f AKDMNIEKKKC, Vector3f FOIDOJMGNHP, Vector3f CJJFBEHAMBL)
@@ -443,7 +443,7 @@ public class Vector3f : Vector2f
 		Z = LHBNIMGFKIB.GetZ() + (AAOIAEJJINO.GetZ() - LHBNIMGFKIB.GetZ()) * 0.5f;
 	}
 
-	public void OBGEKPIDMOP()
+	public void Truncate()
 	{
 		X = (int)X;
 		Y = (int)Y;

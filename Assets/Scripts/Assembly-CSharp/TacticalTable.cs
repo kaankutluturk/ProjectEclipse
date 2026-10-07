@@ -2,13 +2,13 @@ using System.Collections.Generic;
 
 public class TacticalTable
 {
-	public List<Intervals> OCFKLCDIEBF = new List<Intervals>();
+	public List<Intervals> IntervalList = new List<Intervals>();
 
 	public string Label = string.Empty;
 
 	public int FirstFrameIndex;
 
-	public int GLJMJNIAKFN
+	public int LastFrameIndex
 	{
 		get
 		{
@@ -18,7 +18,7 @@ public class TacticalTable
 
 	public int get_MaxFrame()
 	{
-		return FirstFrameIndex + OCFKLCDIEBF.Count - 1;
+		return FirstFrameIndex + IntervalList.Count - 1;
 	}
 
 	private static void Load(string PMFEIPCHENB)
@@ -30,7 +30,7 @@ public class TacticalTable
 		int num = GetArrayIndexByFrameIndex(FMNGLKIGFNA);
 		if (-1 < num)
 		{
-			return OCFKLCDIEBF[num];
+			return IntervalList[num];
 		}
 		return null;
 	}
@@ -38,7 +38,7 @@ public class TacticalTable
 	public int GetArrayIndexByFrameIndex(int FMNGLKIGFNA)
 	{
 		int num = FMNGLKIGFNA - FirstFrameIndex;
-		if (num < OCFKLCDIEBF.Count)
+		if (num < IntervalList.Count)
 		{
 			return num;
 		}

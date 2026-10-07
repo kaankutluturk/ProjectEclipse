@@ -3,12 +3,12 @@ using System.Text;
 
 internal class SharedUtils
 {
-	public static int AMEAMGBOINH(int number, int HLFOKLCKNEE)
+	public static int URShift(int number, int HLFOKLCKNEE)
 	{
 		return (int)((uint)number >> HLFOKLCKNEE);
 	}
 
-	public static int OEFEKLAOOLO(TextReader INLPHNJBHCP, byte[] target, int ILENLCMAMBH, int count)
+	public static int ReadInput(TextReader INLPHNJBHCP, byte[] target, int ILENLCMAMBH, int count)
 	{
 		if (target.Length == 0)
 		{

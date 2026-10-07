@@ -179,7 +179,7 @@ namespace Eclipse.Content
 		public float Delay { get; private set; }
 
 		public CameraWeightMoveAction(XmlNode node)
-			: base(FADAJCEEKIO.CAMERA_WEIGHT)
+			: base(ActionType.CAMERA_WEIGHT)
 		{
 			Parse(node);
 			MeWeight = node.Attributes["MeWeight"].ParseFloat(0.5f);
@@ -202,7 +202,7 @@ namespace Eclipse.Content
 		private readonly int _state;
 
 		public EnableBossAbilityMoveAction(XmlNode node)
-			: base(FADAJCEEKIO.ENABLE_BOSS_ABILITY)
+			: base(ActionType.ENABLE_BOSS_ABILITY)
 		{
 			Parse(node);
 			_state = node == null || node.Attributes == null
@@ -216,12 +216,12 @@ namespace Eclipse.Content
 			{
 				return;
 			}
-			global::Model target = model.NMGNPBMFJKP(OJLDHGKPLNC());
+			global::Model target = model.GetModelByType(GetTargetPlayer());
 			if (target == null)
 			{
 				target = model;
 			}
-			global::ModelConditions conditions = target.EBABHGHPLFK();
+			global::ModelConditions conditions = target.GetConditions();
 			if (conditions != null)
 			{
 				conditions.BossAbilityState = _state;

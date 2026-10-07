@@ -2,18 +2,18 @@ using System.Xml;
 
 public class QuestActionSetRaidInfoTutorialStep : QuestAction
 {
-	private string NOFMEBBEDKK = string.Empty;
+	private string valueExpression = string.Empty;
 
 	public override void Parse(XmlNode EPKLCPOEELO)
 	{
 		base.Parse(EPKLCPOEELO);
-		NOFMEBBEDKK = EPKLCPOEELO.Attributes["Value"].CIPOICEEIBK(string.Empty);
+		valueExpression = EPKLCPOEELO.Attributes["Value"].GetStringOrDefault(string.Empty);
 	}
 
-	public override void DEJMHFMLKIC(QuestParameters GFIHPBCEEOB)
+	public override void Execute(QuestParameters GFIHPBCEEOB)
 	{
-		base.DEJMHFMLKIC(GFIHPBCEEOB);
-		ListSF.CCDKHLAMKKO().BKBHIMEEDBG().PECCKNJMNJP(GameUtils.PHHOCKCCGMM(NOFMEBBEDKK));
-		OGIJONMKABB();
+		base.Execute(GFIHPBCEEOB);
+		ListSF.GetRoster().GetTutorials().SetRaidStep(GameUtils.GetRaidTutorialStepByName(valueExpression));
+		FinishAction();
 	}
 }

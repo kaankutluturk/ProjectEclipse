@@ -12,7 +12,7 @@ namespace Nekki.SF2.GUI.Dialogs
 
 		private static DownloadingScreen _Instance;
 
-		public string NDHINIHBPOB
+		public string TitleLabelText
 		{
 			get
 			{
@@ -24,7 +24,7 @@ namespace Nekki.SF2.GUI.Dialogs
 			}
 		}
 
-		public string LCPOPHCLIEP
+		public string TitleLabelAlias
 		{
 			get
 			{
@@ -36,7 +36,7 @@ namespace Nekki.SF2.GUI.Dialogs
 			}
 		}
 
-		public float OIOANIMIIIA
+		public float ProgressValue
 		{
 			get
 			{
@@ -48,7 +48,7 @@ namespace Nekki.SF2.GUI.Dialogs
 			}
 		}
 
-		public static DownloadingScreen BPCBBHAKFDM
+		public static DownloadingScreen SharedInstance
 		{
 			get
 			{

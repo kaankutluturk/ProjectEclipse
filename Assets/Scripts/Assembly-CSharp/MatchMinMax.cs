@@ -4,163 +4,163 @@ using System.Xml;
 public class MatchMinMax
 {
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private float ADKLBHJHNHH;
+	private float minValue;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private float PEBIPGIDELJ;
+	private float maxValue;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private bool CKMPECJMKFP;
+	private bool minUnbounded;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private bool CHMPMCGENFK;
+	private bool maxUnbounded;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private FunctionExtension OPNEPGNBKPC;
+	private FunctionExtension minFunction;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private FunctionExtension IKMOJIGKDNJ;
+	private FunctionExtension maxFunction;
 
-	public float DPGMCKCDMBC
+	public float MinValue
 	{
 		get
 		{
-			return PPCEOKCAEBD();
+			return GetMinValue();
 		}
 		set
 		{
-			KPPNJLNHGME(value);
+			SetMinValue(value);
 		}
 	}
 
-	public float EBDBPJNBHGI
+	public float MaxValue
 	{
 		get
 		{
-			return EFDLCJBJNPE();
+			return GetMaxValue();
 		}
 		set
 		{
-			BIPMDHGOMBG(value);
+			SetMaxValue(value);
 		}
 	}
 
-	public bool ABMGNIIELAL
+	public bool MinUnbounded
 	{
 		get
 		{
-			return KEMLMMPIPGJ();
+			return GetMinUnbounded();
 		}
 		set
 		{
-			DGGMKIGCGLI(value);
+			SetMinUnbounded(value);
 		}
 	}
 
-	public bool AFGKKJHBEKM
+	public bool MaxUnbounded
 	{
 		get
 		{
-			return HFGENILMBKK();
+			return GetMaxUnbounded();
 		}
 		set
 		{
-			ENIOHPINGMP(value);
+			SetMaxUnbounded(value);
 		}
 	}
 
-	public FunctionExtension HHHDNKDGMMI
+	public FunctionExtension MinFunction
 	{
 		get
 		{
-			return CIAFOALFPKM();
+			return GetMinFunction();
 		}
 		protected set
 		{
-			KHAKPIDDGDC(value);
+			SetMinFunction(value);
 		}
 	}
 
-	public FunctionExtension GMKLGOJMMHD
+	public FunctionExtension MaxFunction
 	{
 		get
 		{
-			return GOEMPDFINCL();
+			return GetMaxFunction();
 		}
 		protected set
 		{
-			COADNHJEPHE(value);
+			SetMaxFunction(value);
 		}
 	}
 
 	public MatchMinMax()
 	{
-		KPPNJLNHGME(0f);
-		BIPMDHGOMBG(0f);
-		DGGMKIGCGLI(true);
-		ENIOHPINGMP(true);
-		KHAKPIDDGDC(new FunctionExtension());
-		COADNHJEPHE(new FunctionExtension());
+		SetMinValue(0f);
+		SetMaxValue(0f);
+		SetMinUnbounded(true);
+		SetMaxUnbounded(true);
+		SetMinFunction(new FunctionExtension());
+		SetMaxFunction(new FunctionExtension());
 	}
 
-	public float PPCEOKCAEBD()
+	public float GetMinValue()
 	{
-		return ADKLBHJHNHH;
+		return minValue;
 	}
 
-	public void KPPNJLNHGME(float value)
+	public void SetMinValue(float value)
 	{
-		ADKLBHJHNHH = value;
+		minValue = value;
 	}
 
-	public float EFDLCJBJNPE()
+	public float GetMaxValue()
 	{
-		return PEBIPGIDELJ;
+		return maxValue;
 	}
 
-	public void BIPMDHGOMBG(float value)
+	public void SetMaxValue(float value)
 	{
-		PEBIPGIDELJ = value;
+		maxValue = value;
 	}
 
-	public bool KEMLMMPIPGJ()
+	public bool GetMinUnbounded()
 	{
-		return CKMPECJMKFP;
+		return minUnbounded;
 	}
 
-	public void DGGMKIGCGLI(bool value)
+	public void SetMinUnbounded(bool value)
 	{
-		CKMPECJMKFP = value;
+		minUnbounded = value;
 	}
 
-	public bool HFGENILMBKK()
+	public bool GetMaxUnbounded()
 	{
-		return CHMPMCGENFK;
+		return maxUnbounded;
 	}
 
-	public void ENIOHPINGMP(bool value)
+	public void SetMaxUnbounded(bool value)
 	{
-		CHMPMCGENFK = value;
+		maxUnbounded = value;
 	}
 
-	public FunctionExtension CIAFOALFPKM()
+	public FunctionExtension GetMinFunction()
 	{
-		return OPNEPGNBKPC;
+		return minFunction;
 	}
 
-	protected void KHAKPIDDGDC(FunctionExtension value)
+	protected void SetMinFunction(FunctionExtension value)
 	{
-		OPNEPGNBKPC = value;
+		minFunction = value;
 	}
 
-	public FunctionExtension GOEMPDFINCL()
+	public FunctionExtension GetMaxFunction()
 	{
-		return IKMOJIGKDNJ;
+		return maxFunction;
 	}
 
-	protected void COADNHJEPHE(FunctionExtension value)
+	protected void SetMaxFunction(FunctionExtension value)
 	{
-		IKMOJIGKDNJ = value;
+		maxFunction = value;
 	}
 
 	public void Parse(XmlNode node, PerkCondition IOFGGOCEIAM, PerkInfoItem IOHONODPIIO)
@@ -168,30 +168,30 @@ public class MatchMinMax
 		XmlAttribute cJBEMNNNHDM = node.Attributes["Min"];
 		if (!cJBEMNNNHDM.Empty())
 		{
-			string bLLCOEAOJGF = cJBEMNNNHDM.CIPOICEEIBK(string.Empty);
-			CIAFOALFPKM().Parse(bLLCOEAOJGF);
-			DGGMKIGCGLI(false);
+			string bLLCOEAOJGF = cJBEMNNNHDM.GetStringOrDefault(string.Empty);
+			GetMinFunction().Parse(bLLCOEAOJGF);
+			SetMinUnbounded(false);
 		}
 		XmlAttribute cJBEMNNNHDM2 = node.Attributes["Max"];
 		if (!cJBEMNNNHDM2.Empty())
 		{
-			string bLLCOEAOJGF2 = cJBEMNNNHDM2.CIPOICEEIBK(string.Empty);
-			GOEMPDFINCL().Parse(bLLCOEAOJGF2);
-			ENIOHPINGMP(false);
+			string bLLCOEAOJGF2 = cJBEMNNNHDM2.GetStringOrDefault(string.Empty);
+			GetMaxFunction().Parse(bLLCOEAOJGF2);
+			SetMaxUnbounded(false);
 		}
-		CIAFOALFPKM().PBPBNENGLPA(IOHONODPIIO.HJFEFJIEINN);
-		CIAFOALFPKM().DMPCFMACDJM(IOHONODPIIO.OKPFNCJFLDL);
-		CIAFOALFPKM().set_Target(IOFGGOCEIAM);
-		GOEMPDFINCL().PBPBNENGLPA(IOHONODPIIO.HJFEFJIEINN);
-		GOEMPDFINCL().DMPCFMACDJM(IOHONODPIIO.OKPFNCJFLDL);
-		GOEMPDFINCL().set_Target(IOFGGOCEIAM);
+		GetMinFunction().SetFunctionCallback(IOHONODPIIO.EvaluateFunctionCallback);
+		GetMinFunction().SetVariableCallback(IOHONODPIIO.OnFunctionPreCallback);
+		GetMinFunction().set_Target(IOFGGOCEIAM);
+		GetMaxFunction().SetFunctionCallback(IOHONODPIIO.EvaluateFunctionCallback);
+		GetMaxFunction().SetVariableCallback(IOHONODPIIO.OnFunctionPreCallback);
+		GetMaxFunction().set_Target(IOFGGOCEIAM);
 	}
 
-	public void IBCPKBBAFNH()
+	public void EvaluateFunctions()
 	{
-		FunctionResult dEIHAOLOPLC = CIAFOALFPKM().IBCPKBBAFNH();
-		FunctionResult dEIHAOLOPLC2 = GOEMPDFINCL().IBCPKBBAFNH();
-		KPPNJLNHGME(dEIHAOLOPLC.DCJLKCFKCOM.ToFloat());
-		BIPMDHGOMBG(dEIHAOLOPLC2.DCJLKCFKCOM.ToFloat());
+		FunctionResult dEIHAOLOPLC = GetMinFunction().Calculate();
+		FunctionResult dEIHAOLOPLC2 = GetMaxFunction().Calculate();
+		SetMinValue(dEIHAOLOPLC.Value.ToFloat());
+		SetMaxValue(dEIHAOLOPLC2.Value.ToFloat());
 	}
 }

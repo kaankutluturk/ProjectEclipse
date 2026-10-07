@@ -4,21 +4,21 @@ public class RegenerationRule : InFightRule
 {
 	private float _frames;
 
-	private float GGJKPLJLFLC;
+	private float framesAfterHit;
 
-	private float AAIJMKAHNKP;
+	private float rate;
 
 	private bool _isWeaponStrike;
 
 	public RegenerationRule(XmlNode node, RuleAppliance EJPOJJKKICO)
-		: base(BCBLLMPAMLP.RuleRegeneration, EJPOJJKKICO, node)
+		: base(RuleType.RuleRegeneration, EJPOJJKKICO, node)
 	{
 		_frames = 0f;
-		GGJKPLJLFLC = 0f;
-		AAIJMKAHNKP = 0f;
+		framesAfterHit = 0f;
+		rate = 0f;
 		_isWeaponStrike = false;
-		EBJIKKBLBEM(FightEvent.HitEvent);
-		EBJIKKBLBEM(FightEvent.RenderEvent);
+		SubscribeEvent(FightEvent.HitEvent);
+		SubscribeEvent(FightEvent.RenderEvent);
 		Parse(node);
 		Reset();
 	}
@@ -28,23 +28,23 @@ public class RegenerationRule : InFightRule
 		_frames = 0f;
 	}
 
-	public float BIGCPKBIJNA()
+	public float GetRate()
 	{
-		return AAIJMKAHNKP;
+		return rate;
 	}
 
 	protected override bool CompareSingle(object data)
 	{
 		FightData hCPJJKMNMCE = (FightData)data;
-		switch (hCPJJKMNMCE.KOJNCHKPLLN)
+		switch (hCPJJKMNMCE.FightEventType)
 		{
 		case FightEvent.RenderEvent:
 			_frames++;
-			if (_isWeaponStrike && hCPJJKMNMCE.CBLNOFELDOE)
+			if (_isWeaponStrike && hCPJJKMNMCE.IsUsingItem)
 			{
 				return false;
 			}
-			if (_frames >= GGJKPLJLFLC)
+			if (_frames >= framesAfterHit)
 			{
 				return true;
 			}
@@ -59,16 +59,16 @@ public class RegenerationRule : InFightRule
 	protected override void Parse(XmlNode node)
 	{
 		base.Parse(node);
-		GGJKPLJLFLC = node.Attributes["FramesAfterHit"].ParseFloat();
-		AAIJMKAHNKP = node.Attributes["Rate"].ParseFloat();
+		framesAfterHit = node.Attributes["FramesAfterHit"].ParseFloat();
+		rate = node.Attributes["Rate"].ParseFloat();
 		_isWeaponStrike = node.Attributes["WeaponStrike"].ParseBool();
 	}
 
 	public override InFightRule Copy()
 	{
 		InFightRule aAJIFBJLJOA = null;
-		RuleAppliance eJPOJJKKICO = EDAKADCHOLE();
-		XmlNode hKPPBKPJOEO = GIFDJEEGCJI().IOJIGDNFCFL();
+		RuleAppliance eJPOJJKKICO = GetAppliance();
+		XmlNode hKPPBKPJOEO = GetXmlSource().GetNode();
 		aAJIFBJLJOA = new RegenerationRule(hKPPBKPJOEO, eJPOJJKKICO);
 		aAJIFBJLJOA.IsRandom = IsRandom;
 		return aAJIFBJLJOA;

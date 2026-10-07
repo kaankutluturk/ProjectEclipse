@@ -7,15 +7,15 @@ public class BattleAscension : BattleReplayable
 	{
 	}
 
-	public void FLMLLDJIHMD()
+	public void RefreshAllFightStatuses()
 	{
 		int num = 0;
-		if (!NLLECKHLMAN)
+		if (!_fightsParsed)
 		{
-			PDFECMAJIEC();
+			LoadAllFights();
 		}
-		int num2 = MNDMLMGAMPH();
-		foreach (FightList item in JNPMCNMEOLE)
+		int num2 = GetAscensionLevel();
+		foreach (FightList item in _fights)
 		{
 			if (num + 1 < num2)
 			{
@@ -29,12 +29,12 @@ public class BattleAscension : BattleReplayable
 		}
 	}
 
-	public new virtual void MJJFFAOLCCK(FightList KGKDKENMAOA)
+	public new virtual void RefreshFightStatus(FightList KGKDKENMAOA)
 	{
 		int num = 0;
 		bool flag = false;
-		int num2 = ((MEOMPEEPCJJ == null) ? 1 : MEOMPEEPCJJ.PHCFNACJAAJ());
-		foreach (FightList item in JNPMCNMEOLE)
+		int num2 = ((_rosterBattle == null) ? 1 : _rosterBattle.GetAscensionLevel());
+		foreach (FightList item in _fights)
 		{
 			if (item == KGKDKENMAOA)
 			{
@@ -56,40 +56,40 @@ public class BattleAscension : BattleReplayable
 		}
 	}
 
-	public new virtual void PDFECMAJIEC()
+	public new virtual void LoadAllFights()
 	{
-		base.PDFECMAJIEC();
-		FLMLLDJIHMD();
+		base.LoadAllFights();
+		RefreshAllFightStatuses();
 	}
 
-	public int MNDMLMGAMPH()
+	public int GetAscensionLevel()
 	{
-		return (MEOMPEEPCJJ == null) ? 1 : MEOMPEEPCJJ.PHCFNACJAAJ();
+		return (_rosterBattle == null) ? 1 : _rosterBattle.GetAscensionLevel();
 	}
 
-	public void LAGLOEEPGIO(int value)
+	public void SetAscensionLevel(int value)
 	{
-		if (MEOMPEEPCJJ != null)
+		if (_rosterBattle != null)
 		{
-			MEOMPEEPCJJ.EAONJGHNJGB(value);
+			_rosterBattle.SetAscensionLevel(value);
 		}
-		ListSF.GetInstance().EJANJEEGOOE();
+		ListSF.GetInstance().RequestSave();
 	}
 
-	public void IDLDHJBJEII(FightList KGKDKENMAOA)
+	public void AdvanceAscensionAfterFight(FightList KGKDKENMAOA)
 	{
-		int num = EBLOIAEMCPN(KGKDKENMAOA);
+		int num = GetFightIndex(KGKDKENMAOA);
 		if (num >= 0)
 		{
-			LAGLOEEPGIO(num + 2);
+			SetAscensionLevel(num + 2);
 		}
 	}
 
-	public int EBLOIAEMCPN(FightList KGKDKENMAOA)
+	public int GetFightIndex(FightList KGKDKENMAOA)
 	{
 		int num = 0;
 		bool flag = false;
-		foreach (FightList item in JNPMCNMEOLE)
+		foreach (FightList item in _fights)
 		{
 			if (item == KGKDKENMAOA)
 			{

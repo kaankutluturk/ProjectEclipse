@@ -4,85 +4,85 @@ public static class Constants
 {
 	public const float FRAME_RATE_F = 60f;
 
-	public const int IBEHFMMNGNF = 60;
+	public const int FrameRateInt = 60;
 
-	public const int AGCHPCKLOCE = int.MaxValue;
+	public const int UnlimitedValue = int.MaxValue;
 
-	public const string OJLONABHLCH = "NHeel_1";
+	public const string HeelNodeName1 = "NHeel_1";
 
-	public const string BFFKDEPHEPN = "NHeel_2";
+	public const string HeelNodeName2 = "NHeel_2";
 
-	public static Color GJKMPOAJDCF = new Color(155f / 255f, 28f / 255f, 7f / 255f, 1f);
+	public static Color NegativeValueColor = new Color(155f / 255f, 28f / 255f, 7f / 255f, 1f);
 
-	public static Color NHHLHLAMFMO = new Color(4f / 15f, 122f / 255f, 0.007843137f, 1f);
+	public static Color PositiveValueColor = new Color(4f / 15f, 122f / 255f, 0.007843137f, 1f);
 
-	public const string LEGBBPGDPNJ = "assets/list.xml";
+	public const string AssetsListPath = "assets/list.xml";
 
-	public const string DMIIPPJJHAJ = "stages.xml";
+	public const string StagesFileName = "stages.xml";
 
-	public const string PMIHMOHINEE = "assets/raid_stages_default.xml";
+	public const string DefaultRaidStagesPath = "assets/raid_stages_default.xml";
 
-	public const string NBFILONGEBL = "quests.xml";
+	public const string QuestsFileName = "quests.xml";
 
-	public const string LDEIJAINMBG = "assets/packs.xml";
+	public const string PacksPath = "assets/packs.xml";
 
-	public const string MHNIJNCMBJL = "usersDefault.xml";
+	public const string DefaultUsersFileName = "usersDefault.xml";
 
-	public const string FCCDIPLGOKN = "versionController.xml";
+	public const string VersionControllerFileName = "versionController.xml";
 
-	public const string NCNNNAAKJEH = "devices.xml";
+	public const string DevicesFileName = "devices.xml";
 
-	public static string OJMIJINKBPJ = "users.xml";
+	public static string UsersFileName = "users.xml";
 
-	public static string GHKPPHAAMBL = "users_backup.xml";
+	public static string UsersBackupFileName = "users_backup.xml";
 
-	public static string BICBNMCJFLK = ((!SystemProperties.MEBGOGMJFLM()) ? "assets/localSettings.bin" : "ram://assets/localSettings.bin");
+	public static string LocalSettingsPath = ((!SystemProperties.IsIosPlatform()) ? "assets/localSettings.bin" : "ram://assets/localSettings.bin");
 
-	public static string BCLABJJMIKI = "dump.bin";
+	public static string DumpFileName = "dump.bin";
 
-	public const string NCHCADDBJGM = "MiscSprites";
+	public const string MiscSpritesAtlas = "MiscSprites";
 
-	public const string CKFMBALMLNF = "MiscSprites.gold";
+	public const string GoldSpriteName = "MiscSprites.gold";
 
-	public const string DGGPKJHLMAB = "MiscSprites.ruby";
+	public const string RubySpriteName = "MiscSprites.ruby";
 
-	public const string NKOHAFLCHNJ = "MiscSprites.energy";
+	public const string EnergySpriteName = "MiscSprites.energy";
 
-	public const string JEBKFJJJKIL = "startLoadingChina";
+	public const string StartLoadingChinaSprite = "startLoadingChina";
 
-	public const string FEHKOIHHFKL = "startLoadingJapan";
+	public const string StartLoadingJapanSprite = "startLoadingJapan";
 
-	public const string BDNFKCJNBCB = "startLoadingKorea";
+	public const string StartLoadingKoreaSprite = "startLoadingKorea";
 
-	public const string DFMDJFBMLGO = "logoChina";
+	public const string LogoChinaSprite = "logoChina";
 
-	public const string GNOKOMFBCBM = "logoJapan";
+	public const string LogoJapanSprite = "logoJapan";
 
-	public const string BAFEFNOFNKH = "logoKorea";
+	public const string LogoKoreaSprite = "logoKorea";
 
-	public static string[] DNDKOMGCBLC = new string[5] { "DifficultyBars.very_easy", "DifficultyBars.easy", "DifficultyBars.middle", "DifficultyBars.hard", "DifficultyBars.very_hard" };
+	public static string[] DifficultyBarSprites = new string[5] { "DifficultyBars.very_easy", "DifficultyBars.easy", "DifficultyBars.middle", "DifficultyBars.hard", "DifficultyBars.very_hard" };
 
-	public static Color PJJIMHMJPAL = new Color(47f / 255f, 37f / 255f, 27f / 255f);
+	public static Color DialogTextColor = new Color(47f / 255f, 37f / 255f, 27f / 255f);
 
-	public static Color OGMKEJDOKHH = new Color(211f / 255f, 182f / 255f, 135f / 255f);
+	public static Color LightTanColor = new Color(211f / 255f, 182f / 255f, 135f / 255f);
 
-	public static Color MLCECCEJAEH = new Color(254f / 255f, 251f / 255f, 200f / 255f);
+	public static Color PaleYellowColor = new Color(254f / 255f, 251f / 255f, 200f / 255f);
 
-	public static Color KLLKHFKHCGK = new Color(103f / 255f, 62f / 255f, 36f / 255f);
+	public static Color DialogHeaderColor = new Color(103f / 255f, 62f / 255f, 36f / 255f);
 
-	public static Color MKFGEKLCEPB = new Color(220f / 255f, 1f / 85f, 13f / 255f);
+	public static Color BrightRedColor = new Color(220f / 255f, 1f / 85f, 13f / 255f);
 
-	public static Color NMCGIIIEKLM = new Color(155f / 255f, 28f / 255f, 7f / 255f);
+	public static Color DarkRedColor = new Color(155f / 255f, 28f / 255f, 7f / 255f);
 
-	public static Color BCLJOKIFJCE = new Color(210f / 255f, 178f / 255f, 117f / 255f);
+	public static Color SandColor = new Color(210f / 255f, 178f / 255f, 117f / 255f);
 
-	public static Color NFCKPNAEDNO = new Color(106f / 255f, 93f / 255f, 84f / 255f);
+	public static Color GrayBrownColor = new Color(106f / 255f, 93f / 255f, 84f / 255f);
 
-	public static Color INPDJDEGBGN = new Color(1f, 183f / 255f, 57f / 255f);
+	public static Color AmberColor = new Color(1f, 183f / 255f, 57f / 255f);
 
-	public static Color PLIDKLDIOKM = new Color(254f / 255f, 223f / 255f, 179f / 255f);
+	public static Color ProfileLabelColor = new Color(254f / 255f, 223f / 255f, 179f / 255f);
 
-	public static readonly byte[] ECHOPKKPDFD = new byte[32]
+	public static readonly byte[] EncryptionKey = new byte[32]
 	{
 		122, 203, 36, 192, 222, 9, 97, 139, 213, 121,
 		43, 73, 92, 233, 134, 223, 108, 58, 58, 207,
@@ -90,55 +90,55 @@ public static class Constants
 		80, 149
 	};
 
-	public static readonly byte[] MCCEADFMLGA = new byte[16]
+	public static readonly byte[] EncryptionIv = new byte[16]
 	{
 		93, 229, 177, 186, 185, 109, 234, 77, 121, 222,
 		80, 121, 201, 150, 108, 102
 	};
 
-	public const string MJDIBBGJELM = "ComboButtons.icon_down";
+	public const string ComboIconDown = "ComboButtons.icon_down";
 
-	public const string OHHIGCINEJD = "ComboButtons.icon_kick";
+	public const string ComboIconKick = "ComboButtons.icon_kick";
 
-	public const string PGEEICGKGIP = "ComboButtons.icon_left";
+	public const string ComboIconLeft = "ComboButtons.icon_left";
 
-	public const string CKMHGPPPJFF = "ComboButtons.icon_plus";
+	public const string ComboIconPlus = "ComboButtons.icon_plus";
 
-	public const string NDDFBMNFONF = "ComboButtons.icon_punch";
+	public const string ComboIconPunch = "ComboButtons.icon_punch";
 
-	public const string IFFIHANCLEN = "ComboButtons.icon_right";
+	public const string ComboIconRight = "ComboButtons.icon_right";
 
-	public const string OLFOFABPDHG = "ComboButtons.icon_up";
+	public const string ComboIconUp = "ComboButtons.icon_up";
 
-	public const string MMBHBPLKEOH = "Textures/fight/rules/ringout/";
+	public const string RingoutTexturePath = "Textures/fight/rules/ringout/";
 
-	public const string LGMDFCDMGAF = "ringout";
+	public const string RingoutName = "ringout";
 
-	public static Color GFBLKELEBEH = new Color(163f / 255f, 163f / 255f, 163f / 255f);
+	public static Color DimmedBackgroundColor = new Color(163f / 255f, 163f / 255f, 163f / 255f);
 
-	public static Color EKJMAIDGKME = Color.white;
+	public static Color NormalBackgroundColor = Color.white;
 
 	public static Vector2 SEAL_SIZE = new Vector2(660f, 660f);
 
-	public static string LFIKFDNNKKN
+	public static string PrimaryDecryptedString
 	{
 		get
 		{
-			return DPMDLBCBJJD();
+			return GetPrimaryDecryptedString();
 		}
 	}
 
-	public static string CKFKJCKKOHO
+	public static string SecondaryDecryptedString
 	{
 		get
 		{
-			return JFCAJKAOPLL();
+			return GetSecondaryDecryptedString();
 		}
 	}
 
-	private static string PNBOPIGKPLO()
+	private static string DecryptPrimaryStringVariantA()
 	{
-		return DMMJEFCLAJF.DKDDEIHHMJP(new byte[512]
+		return RsaStringDecryptor.Decrypt(new byte[512]
 		{
 			75, 89, 3, 90, 174, 28, 190, 222, 166, 236,
 			236, 108, 175, 48, 58, 29, 150, 224, 132, 103,
@@ -195,9 +195,9 @@ public static class Constants
 		}, false);
 	}
 
-	private static string BOKDHGKMAHA()
+	private static string DecryptPrimaryStringVariantB()
 	{
-		return DMMJEFCLAJF.DKDDEIHHMJP(new byte[512]
+		return RsaStringDecryptor.Decrypt(new byte[512]
 		{
 			24, 23, 250, 251, 25, 7, 197, 45, 80, 161,
 			1, 80, 230, 166, 98, 249, 131, 77, 171, 34,
@@ -254,14 +254,14 @@ public static class Constants
 		}, false);
 	}
 
-	public static string DPMDLBCBJJD()
+	public static string GetPrimaryDecryptedString()
 	{
-		return (!SystemProperties.AFAAJMFLBIC()) ? BOKDHGKMAHA() : PNBOPIGKPLO();
+		return (!SystemProperties.IsPaidApp()) ? DecryptPrimaryStringVariantB() : DecryptPrimaryStringVariantA();
 	}
 
-	private static string DKIGGMJHKGC()
+	private static string DecryptSecondaryString()
 	{
-		return DMMJEFCLAJF.DKDDEIHHMJP(new byte[128]
+		return RsaStringDecryptor.Decrypt(new byte[128]
 		{
 			69, 159, 41, 62, 230, 118, 70, 243, 242, 199,
 			99, 83, 250, 143, 213, 31, 36, 4, 121, 113,
@@ -279,8 +279,8 @@ public static class Constants
 		}, false);
 	}
 
-	public static string JFCAJKAOPLL()
+	public static string GetSecondaryDecryptedString()
 	{
-		return DKIGGMJHKGC();
+		return DecryptSecondaryString();
 	}
 }

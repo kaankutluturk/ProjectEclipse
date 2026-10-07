@@ -9,9 +9,9 @@ namespace Nekki.SF2.GUI
 
 		public TableViewCellDidHighlightEvent DidHighlightEvent;
 
-		private int HNFJENJIGMO;
+		private int _rowNumber;
 
-		public int MCJDAIBJHMA
+		public int RowIndex
 		{
 			get
 			{
@@ -25,12 +25,12 @@ namespace Nekki.SF2.GUI
 
 		public int get_RowNumber()
 		{
-			return HNFJENJIGMO;
+			return _rowNumber;
 		}
 
 		public void set_RowNumber(int value)
 		{
-			HNFJENJIGMO = value;
+			_rowNumber = value;
 			Display();
 		}
 
@@ -50,7 +50,7 @@ namespace Nekki.SF2.GUI
 			SetHighlighted();
 			if (DidHighlightEvent != null)
 			{
-				DidHighlightEvent.Invoke(HNFJENJIGMO);
+				DidHighlightEvent.Invoke(_rowNumber);
 			}
 		}
 
@@ -59,7 +59,7 @@ namespace Nekki.SF2.GUI
 			SetSelected();
 			if (DidSelectEvent != null)
 			{
-				DidSelectEvent.Invoke(HNFJENJIGMO);
+				DidSelectEvent.Invoke(_rowNumber);
 			}
 		}
 
@@ -68,7 +68,7 @@ namespace Nekki.SF2.GUI
 			SetSelected();
 			if (DidSelectEvent != null)
 			{
-				DidSelectEvent.Invoke(HNFJENJIGMO);
+				DidSelectEvent.Invoke(_rowNumber);
 			}
 		}
 

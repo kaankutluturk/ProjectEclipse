@@ -6,7 +6,7 @@ using UnityEngine;
 
 public class NekkiLog : MonoBehaviour
 {
-	public enum FKOLAIBBDOL : byte
+	public enum LogLevel : byte
 	{
 		Log = 0,
 		Warning = 1,
@@ -15,27 +15,27 @@ public class NekkiLog : MonoBehaviour
 		Assert = 4
 	}
 
-	private static string KHHDGDJEOMP = string.Empty;
+	private static string _directory = string.Empty;
 
 	private static StringBuilder _items = new StringBuilder();
 
 	private static DateTime _now;
 
-	private static NekkiLog EDAPJLKMFPC;
+	private static NekkiLog _instance;
 
-	private static bool FOCMMGJPNKB;
+	private static bool _captureUnityLog;
 
 	private static string _fileName = "log";
 
-	private static bool MOIBEJDDBLK = true;
+	private static bool _notInitialized = true;
 
-	private static bool HHPCLONKLLF = true;
+	private static bool _dateInFileName = true;
 
-	private static bool ODFLEIBIPMB = true;
+	private static bool _writeTimestamps = true;
 
-	private static FKOLAIBBDOL FFJAMOKDGLA = FKOLAIBBDOL.Log;
+	private static LogLevel _minLevel = LogLevel.Log;
 
-	private bool IBBMAINEMIM;
+	private bool _isWriting;
 
 	private static readonly object LOCKER = new object();
 
@@ -43,58 +43,58 @@ public class NekkiLog : MonoBehaviour
 	{
 		get
 		{
-			return EPDMGFELIMC();
+			return GetFileName();
 		}
 	}
 
-	private static string NGMCEBMMKHP
+	private static string FilePath
 	{
 		get
 		{
-			return DEIEDODNANN();
+			return GetFilePath();
 		}
 	}
 
-	private static string EPDMGFELIMC()
+	private static string GetFileName()
 	{
-		if (!HHPCLONKLLF)
+		if (!_dateInFileName)
 		{
 			return string.Format("{0}.nekkilog", _fileName);
 		}
 		return string.Format("{3} {0}.{1}.{2}.nekkilog", _now.Year.ToString("0000"), _now.Month.ToString("00"), _now.Day.ToString("00"), _fileName);
 	}
 
-	private static string DEIEDODNANN()
+	private static string GetFilePath()
 	{
-		if (string.IsNullOrEmpty(KHHDGDJEOMP))
+		if (string.IsNullOrEmpty(_directory))
 		{
-			return Path.Combine(Application.persistentDataPath, EPDMGFELIMC());
+			return Path.Combine(Application.persistentDataPath, GetFileName());
 		}
-		return Path.Combine(KHHDGDJEOMP, EPDMGFELIMC());
+		return Path.Combine(_directory, GetFileName());
 	}
 
-	public static void Init(string KOBDDMHGOPJ, string PMFEIPCHENB, bool DHFCJMJBFDP, bool AJDGNMMKEBE, bool AODCELGDHPO, FKOLAIBBDOL JJAFNMOOCKJ)
+	public static void Init(string KOBDDMHGOPJ, string PMFEIPCHENB, bool DHFCJMJBFDP, bool AJDGNMMKEBE, bool AODCELGDHPO, LogLevel JJAFNMOOCKJ)
 	{
-		if ((bool)EDAPJLKMFPC)
+		if ((bool)_instance)
 		{
-			EDAPJLKMFPC.Write();
+			_instance.Write();
 		}
-		KHHDGDJEOMP = KOBDDMHGOPJ.TrimEnd('/').TrimEnd('\\');
-		FFJAMOKDGLA = JJAFNMOOCKJ;
-		HHPCLONKLLF = AJDGNMMKEBE;
-		ODFLEIBIPMB = AODCELGDHPO;
-		FOCMMGJPNKB = DHFCJMJBFDP;
+		_directory = KOBDDMHGOPJ.TrimEnd('/').TrimEnd('\\');
+		_minLevel = JJAFNMOOCKJ;
+		_dateInFileName = AJDGNMMKEBE;
+		_writeTimestamps = AODCELGDHPO;
+		_captureUnityLog = DHFCJMJBFDP;
 		if (!string.IsNullOrEmpty(PMFEIPCHENB))
 		{
 			_fileName = PMFEIPCHENB;
 		}
-		KJGIHCKDOLO();
-		MOIBEJDDBLK = false;
+		EnsureInstance();
+		_notInitialized = false;
 		if (!Directory.Exists(KOBDDMHGOPJ))
 		{
 			Directory.CreateDirectory(KOBDDMHGOPJ);
 		}
-		FileInfo fileInfo = new FileInfo(DEIEDODNANN());
+		FileInfo fileInfo = new FileInfo(GetFilePath());
 		if (!fileInfo.Exists)
 		{
 			FileStream fileStream = fileInfo.Create();
@@ -102,15 +102,15 @@ public class NekkiLog : MonoBehaviour
 		}
 	}
 
-	private static void KJGIHCKDOLO()
+	private static void EnsureInstance()
 	{
-		if (!EDAPJLKMFPC)
+		if (!_instance)
 		{
 			GameObject gameObject = new GameObject("_log");
-			EDAPJLKMFPC = gameObject.AddComponent<NekkiLog>();
+			_instance = gameObject.AddComponent<NekkiLog>();
 			UnityEngine.Object.DontDestroyOnLoad(gameObject);
-			EDAPJLKMFPC.Update();
-			EDAPJLKMFPC.StartCoroutine(EDAPJLKMFPC.GGGEHAGCLGC());
+			_instance.Update();
+			_instance.StartCoroutine(_instance.WriteLoop());
 			Application.logMessageReceived += _unityLogCallback;
 		}
 	}
@@ -123,12 +123,12 @@ public class NekkiLog : MonoBehaviour
 	private void OnEnable()
 	{
 		StopAllCoroutines();
-		StartCoroutine(GGGEHAGCLGC());
+		StartCoroutine(WriteLoop());
 	}
 
 	private static void _unityLogCallback(string IOFGGOCEIAM, string HHLCHHIFDCM, LogType LFLGCDNKNJI)
 	{
-		if (FOCMMGJPNKB)
+		if (_captureUnityLog)
 		{
 			switch (LFLGCDNKNJI)
 			{
@@ -145,7 +145,7 @@ public class NekkiLog : MonoBehaviour
 				Log(IOFGGOCEIAM, HHLCHHIFDCM);
 				break;
 			case LogType.Exception:
-				COHEDILAHFD(IOFGGOCEIAM, HHLCHHIFDCM);
+				LogException(IOFGGOCEIAM, HHLCHHIFDCM);
 				break;
 			}
 		}
@@ -153,7 +153,7 @@ public class NekkiLog : MonoBehaviour
 
 	private void Update()
 	{
-		if (ODFLEIBIPMB || HHPCLONKLLF)
+		if (_writeTimestamps || _dateInFileName)
 		{
 			_now = DateTime.Now;
 		}
@@ -161,67 +161,67 @@ public class NekkiLog : MonoBehaviour
 
 	public static void Log(object LIOGIBJBHAH, string HHLCHHIFDCM = null)
 	{
-		FCLECKJKEII(FKOLAIBBDOL.Log, LIOGIBJBHAH, HHLCHHIFDCM);
+		AppendEntry(LogLevel.Log, LIOGIBJBHAH, HHLCHHIFDCM);
 	}
 
 	public static void Warning(object LIOGIBJBHAH, string HHLCHHIFDCM = null)
 	{
-		FCLECKJKEII(FKOLAIBBDOL.Warning, LIOGIBJBHAH, HHLCHHIFDCM);
+		AppendEntry(LogLevel.Warning, LIOGIBJBHAH, HHLCHHIFDCM);
 	}
 
 	public static void Error(object LIOGIBJBHAH, string HHLCHHIFDCM = null)
 	{
-		FCLECKJKEII(FKOLAIBBDOL.Error, LIOGIBJBHAH, HHLCHHIFDCM);
+		AppendEntry(LogLevel.Error, LIOGIBJBHAH, HHLCHHIFDCM);
 	}
 
 	public static void Exception(Exception MPFFFAOGBJE)
 	{
-		FCLECKJKEII(FKOLAIBBDOL.Exception, MPFFFAOGBJE.Message, MPFFFAOGBJE.StackTrace);
+		AppendEntry(LogLevel.Exception, MPFFFAOGBJE.Message, MPFFFAOGBJE.StackTrace);
 	}
 
-	private static void COHEDILAHFD(object LIOGIBJBHAH, string HHLCHHIFDCM)
+	private static void LogException(object LIOGIBJBHAH, string HHLCHHIFDCM)
 	{
-		FCLECKJKEII(FKOLAIBBDOL.Exception, LIOGIBJBHAH, HHLCHHIFDCM);
+		AppendEntry(LogLevel.Exception, LIOGIBJBHAH, HHLCHHIFDCM);
 	}
 
 	public static void Assert(object LIOGIBJBHAH, string HHLCHHIFDCM = null)
 	{
-		FCLECKJKEII(FKOLAIBBDOL.Assert, LIOGIBJBHAH, HHLCHHIFDCM);
+		AppendEntry(LogLevel.Assert, LIOGIBJBHAH, HHLCHHIFDCM);
 	}
 
 	public static void Stop()
 	{
-		EDAPJLKMFPC.Write();
-		MOIBEJDDBLK = true;
+		_instance.Write();
+		_notInitialized = true;
 	}
 
-	private static string LEBKHJNLJBE(FKOLAIBBDOL GNLOCMLBNHF, object IOFGGOCEIAM, string HHLCHHIFDCM = null)
+	private static string FormatEntry(LogLevel GNLOCMLBNHF, object IOFGGOCEIAM, string HHLCHHIFDCM = null)
 	{
 		object obj = ((!string.IsNullOrEmpty(HHLCHHIFDCM)) ? string.Format("{0} at: {1}", IOFGGOCEIAM, HHLCHHIFDCM) : IOFGGOCEIAM);
-		if (!ODFLEIBIPMB)
+		if (!_writeTimestamps)
 		{
 			return string.Format("{0}\n", obj);
 		}
 		return string.Format("[{3}] [{0}:{1}:{2}] {4}\n", _now.Hour.ToString("00"), _now.Minute.ToString("00"), _now.Second.ToString("00"), GNLOCMLBNHF, obj);
 	}
 
-	private static void FCLECKJKEII(FKOLAIBBDOL GNLOCMLBNHF, object LIOGIBJBHAH, string HHLCHHIFDCM = null)
+	private static void AppendEntry(LogLevel GNLOCMLBNHF, object LIOGIBJBHAH, string HHLCHHIFDCM = null)
 	{
-		if (MOIBEJDDBLK)
+		if (_notInitialized)
 		{
-			AdvLog.LOPHFKMOPAA("you must init log system first!");
+			AdvLog.LogWarning("you must init log system first!");
 		}
-		else if ((int)GNLOCMLBNHF >= (int)FFJAMOKDGLA)
+		else if ((int)GNLOCMLBNHF >= (int)_minLevel)
 		{
-			KJGIHCKDOLO();
+			EnsureInstance();
 			lock (LOCKER)
 			{
-				_items.Append(LEBKHJNLJBE(GNLOCMLBNHF, LIOGIBJBHAH, HHLCHHIFDCM));
+				_items.Append(FormatEntry(GNLOCMLBNHF, LIOGIBJBHAH, HHLCHHIFDCM));
 			}
 		}
 	}
 
-	private IEnumerator GGGEHAGCLGC()
+	private IEnumerator WriteLoop()
 	{
 		while ((bool)base.transform)
 		{
@@ -232,11 +232,11 @@ public class NekkiLog : MonoBehaviour
 
 	private void Write()
 	{
-		if (IBBMAINEMIM)
+		if (_isWriting)
 		{
 			return;
 		}
-		IBBMAINEMIM = true;
+		_isWriting = true;
 		string value;
 		lock (LOCKER)
 		{
@@ -245,7 +245,7 @@ public class NekkiLog : MonoBehaviour
 		}
 		try
 		{
-			FileInfo fileInfo = new FileInfo(DEIEDODNANN());
+			FileInfo fileInfo = new FileInfo(GetFilePath());
 			if (!fileInfo.Exists)
 			{
 				FileStream fileStream = fileInfo.Create();
@@ -259,6 +259,6 @@ public class NekkiLog : MonoBehaviour
 		{
 			MonoBehaviour.print(ex.Message);
 		}
-		IBBMAINEMIM = false;
+		_isWriting = false;
 	}
 }

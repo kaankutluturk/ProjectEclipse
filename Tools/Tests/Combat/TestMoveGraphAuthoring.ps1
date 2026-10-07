@@ -28,14 +28,14 @@ foreach($section in @('Locks','Align','SetDirection')) {Check ((Shape $preview[$
 
 # Invoke real native graph parsers without loading animation/rig resources.
 $staticFlags=[Reflection.BindingFlags]'Static,NonPublic'
-foreach($case in @(@('KFPHEGLHEMM','Transitions'),@('PLMHJKGIHLB','Align'))) {
+foreach($case in @(@('ParseTransitions','Transitions'),@('ParseAlignPivot','Align'))) {
     $method=[MovesParser].GetMethod($case[0],$staticFlags)
     $a=$method.Invoke($null,@($slash[$case[1]]));$b=$method.Invoke($null,@($expected[$case[1]]))
     Check (($a | ConvertTo-Json -Depth 9 -Compress) -ceq ($b | ConvertTo-Json -Depth 9 -Compress)) ('Native graph parse differs: '+$case[1])
 }
-$dirParser=[MovesParser].GetMethod('JOLJIHDPADK',[Reflection.BindingFlags]'Static,Public')
+$dirParser=[MovesParser].GetMethod('ParseDirection',[Reflection.BindingFlags]'Static,Public')
 Check (($dirParser.Invoke($null,@($slash.SetDirection)) | ConvertTo-Json -Depth 9 -Compress) -ceq ($dirParser.Invoke($null,@($expected.SetDirection)) | ConvertTo-Json -Depth 9 -Compress)) 'Native direction differs.'
-$alignParser=[MovesParser].GetMethod('PLMHJKGIHLB',$staticFlags)
+$alignParser=[MovesParser].GetMethod('ParseAlignPivot',$staticFlags)
 Check (($alignParser.Invoke($null,@($preview.Align)) | ConvertTo-Json -Depth 9 -Compress) -ceq ($alignParser.Invoke($null,@($expectedPreview.Align)) | ConvertTo-Json -Depth 9 -Compress)) 'Native preview shift differs.'
 
 [xml]$baseMoves=Get-Content -Raw (Join-Path $root 'Assets/vanillaXml/animations/moves.xml')
@@ -57,8 +57,8 @@ $nativeRuntime=[Eclipse.Modding.LegacyContentAdapter].Assembly.GetType('Eclipse.
 $apply=$nativeRuntime.GetMethod('ApplyItemLockExtensions',$staticFlags)
 function Apply-Extensions($moves,$entries) { return $apply.Invoke($null,[object[]]@($moves,$entries)) }
 function Eligible($move,[string]$subtype,[string]$skeleton='Skeleton',[SceneTypes]$scene=[SceneTypes]::SceneFight) {
-    $state=[ModelConditions]::new();$state.OJIAKDDCGLB=[Collections.Generic.List[ItemInfo]]::new();$state.IBBALIJOJMC=$scene
-    foreach($entry in @(@('Weapon',$subtype),@('Skeleton',$skeleton))) {$item=[ItemInfo]::new($null);$item.Type=$entry[0];$item.SubType=$entry[1];$state.OJIAKDDCGLB.Add($item)}
+    $state=[ModelConditions]::new();$state.Items=[Collections.Generic.List[ItemInfo]]::new();$state.SceneType=$scene
+    foreach($entry in @(@('Weapon',$subtype),@('Skeleton',$skeleton))) {$item=[ItemInfo]::new($null);$item.Type=$entry[0];$item.SubType=$entry[1];$state.Items.Add($item)}
     foreach($condition in $move.MoveData.Locks) { if(!$condition.IsEqual($state)) {return $false} }
     return $true
 }
@@ -118,7 +118,7 @@ $baseFingerprint=Fingerprint $graphCatalog
 Check ($baseFingerprint -ceq (Fingerprint (Load-Lua $graphLua))) 'Graph reload fingerprint changed.'
 Check ($baseFingerprint -cne (Fingerprint (Load-Lua $graphLua.Replace('source_subtype="Sai"','source_subtype="HermitSwords"')))) 'Extension selector omitted from fingerprint.'
 $absoluteDoc=Project (Load-Lua $graphLua.Replace('local animation=','data.transitions[1].frame_shift=nil; data.transitions[1].first_frame=4' + "`n" + 'local animation='))
-$absoluteTransitions=[MovesParser].GetMethod('KFPHEGLHEMM',$staticFlags).Invoke($null,@($absoluteDoc.SelectSingleNode('//Move[contains(@Name,"slash")]/Transitions')))
+$absoluteTransitions=[MovesParser].GetMethod('ParseTransitions',$staticFlags).Invoke($null,@($absoluteDoc.SelectSingleNode('//Move[contains(@Name,"slash")]/Transitions')))
 Check (!$absoluteTransitions[0].IsFrameShift -and $absoluteTransitions[0].FrameShift -eq 4) 'Absolute transition frame became a relative shift.'
 $emptyGraph='sf2.moves.register_template {id="empty"}'
 Check ((Fingerprint (Load-Lua $emptyGraph)) -ceq (Fingerprint (Load-Lua $emptyGraph.Replace('id="empty"','id="empty",locks={}')))) 'Empty graph changed existing content fingerprint.'

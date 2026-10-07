@@ -2,28 +2,28 @@ using System;
 
 public class AchievementInfo
 {
-	public string HHAAFADDOJB;
+	public string Title;
 
-	public string MJBLCNPNOBC;
+	public string Description;
 
-	public int PNDAIFALIKF;
+	public int BonusPrize;
 
-	public int GBGNFPNCGED;
+	public int MoneyPrize;
 
-	public Action<object> ODDEOFKLIAG;
+	public Action<object> OnTakeReward;
 
-	public bool DJGOCCEOAKD;
+	public bool CanTakeReward;
 
-	public bool NNEHNDILGDP;
+	public bool IsCompleted;
 
 	public AchievementInfo(string PGAFPNEHHLB, string EFBADJCNDMG, int MJBFFBPLAGC, int BDONIKLHFLJ, Action<object> _dlg = null, bool BODCOGFGHAD = false, bool DPJOPMHPGKG = false)
 	{
-		HHAAFADDOJB = PGAFPNEHHLB;
-		MJBLCNPNOBC = EFBADJCNDMG;
-		GBGNFPNCGED = MJBFFBPLAGC;
-		PNDAIFALIKF = BDONIKLHFLJ;
-		ODDEOFKLIAG = _dlg;
-		DJGOCCEOAKD = BODCOGFGHAD;
-		NNEHNDILGDP = DPJOPMHPGKG;
+		Title = PGAFPNEHHLB;
+		Description = EFBADJCNDMG;
+		MoneyPrize = MJBFFBPLAGC;
+		BonusPrize = BDONIKLHFLJ;
+		OnTakeReward = _dlg;
+		CanTakeReward = BODCOGFGHAD;
+		IsCompleted = DPJOPMHPGKG;
 	}
 }

@@ -22,28 +22,28 @@ $code = @'
 using System;
 using ObscuredFloat = System.Single;
 using System.Collections.Generic;
-public class LoadingModule { protected bool CHIHBINEGFL; public virtual void JLPMOKPFECK() {} }
+public class LoadingModule { protected bool isFinished; public virtual void ProcessStep() {} }
 public static class Debug { public static void Log(object x) {} public static void LogError(object x) {} }
-public static class GameUtils { public static void InitVariables() {} public static void OEKOKKCILAG() {} }
-public static class GameSettings { public static void OCIPKAONMOP() {} public static void LNNLDPLDABI() {} }
-public static class GameLoader { public static void BJLLJHDFMOO() {} public static void POLKDKOOACO() {} public static void SetSound() {} }
+public static class GameUtils { public static void InitVariables() {} public static void ScheduleStartupNotifications() {} }
+public static class GameSettings { public static void LoadAllSettings() {} public static void ApplyQualityOptions() {} }
+public static class GameLoader { public static void LoadAnimations() {} public static void LoadAi() {} public static void SetSound() {} }
 public static class LocalizationManager { public static void Init() {} }
-public class PerkTree { public static PerkTree GBPBIPFIOJH() => new PerkTree(); public void LJHPGKAOIAE() {} }
+public class PerkTree { public static PerkTree GetInstance() => new PerkTree(); public void RebuildProfile() {} }
 public class ListSF {
     public static int Parses;
     public static ListSF GetInstance() => new ListSF();
-    public static ListSF CCDKHLAMKKO() => new ListSF();
-    public void AFAKCAMAACM() {}
-    public void IIKDNMBIHCM() { Parses++; Eclipse.Modding.ModRuntime.ApplyStageContent(); Eclipse.Modding.ModRuntime.ApplyQuestContent(); }
+    public static ListSF GetRoster() => new ListSF();
+    public void ApplyLanguage() {}
+    public void LoadGameContent() { Parses++; Eclipse.Modding.ModRuntime.ApplyStageContent(); Eclipse.Modding.ModRuntime.ApplyQuestContent(); }
 }
 public enum EndRoundType { EndRoundTypeZeroHealth, Timeout }
 public enum RuleAppliance { AppliancePlayer, ApplianceOpponent }
-public class EndRule { public RuleAppliance IMINMDOFHMG() => RuleAppliance.AppliancePlayer; }
-public class ModelParameters { public float Life; public float KKMCHCNOHMB() => Life; }
+public class EndRule { public RuleAppliance GetWinnerAppliance() => RuleAppliance.AppliancePlayer; }
+public class ModelParameters { public float Life; public float GetCurrentLife() => Life; }
 public class WinnerProbe {
     object FightDefinition;
-    public ModelParameters NMNCKBPFCCP = new ModelParameters { Life = 1 };
-    public ModelParameters AKBNKDBHCEO = new ModelParameters { Life = 0.1f };
+    public ModelParameters playerParameters = new ModelParameters { Life = 1 };
+    public ModelParameters enemyParameters = new ModelParameters { Life = 0.1f };
     EndRoundType _endRoundType = EndRoundType.Timeout;
     EndRule _endFightRule = null;
     __WINNER__
@@ -81,17 +81,17 @@ public static class Program {
         if (Eclipse.Modding.Adapter.RaidKind() != "RAID") throw new Exception("Raid XML mapping missing");
         var probe = new WinnerProbe();
         Eclipse.Modding.ModModeRuntime.Enabled = true;
-        if (probe.Winner(true) != probe.AKBNKDBHCEO || probe.Winner(false) != probe.NMNCKBPFCCP) throw new Exception("Raid timeout granted a health-percentage victory");
-        probe.AKBNKDBHCEO.Life = 0;
-        if (probe.Winner(true) != probe.NMNCKBPFCCP || probe.Winner(false) != probe.AKBNKDBHCEO) throw new Exception("Exhausted raid boss did not lose");
-        Eclipse.Modding.ModModeRuntime.Enabled = false; probe.AKBNKDBHCEO.Life = 0.1f;
-        if (probe.Winner(true) != probe.NMNCKBPFCCP) throw new Exception("Ordinary timeout semantics changed");
+        if (probe.Winner(true) != probe.enemyParameters || probe.Winner(false) != probe.playerParameters) throw new Exception("Raid timeout granted a health-percentage victory");
+        probe.enemyParameters.Life = 0;
+        if (probe.Winner(true) != probe.playerParameters || probe.Winner(false) != probe.enemyParameters) throw new Exception("Exhausted raid boss did not lose");
+        Eclipse.Modding.ModModeRuntime.Enabled = false; probe.enemyParameters.Life = 0.1f;
+        if (probe.Winner(true) != probe.playerParameters) throw new Exception("Ordinary timeout semantics changed");
         for (int failure = 0; failure < 3; failure++) {
             ListSF.Parses = 0;
             Eclipse.Modding.ModRuntime.Shutdowns = 0;
             Eclipse.Modding.ModRuntime._legacyContent = new Eclipse.Modding.Adapter { FailStage = failure == 1, FailQuest = failure == 2 };
             var parser = new ParseModule();
-            parser.JLPMOKPFECK(); parser.JLPMOKPFECK();
+            parser.ProcessStep(); parser.ProcessStep();
             if (ListSF.Parses != 1) throw new Exception("Loader reparsed base content after mod failure");
             if (Eclipse.Modding.ModRuntime.Shutdowns != (failure == 0 ? 0 : 1)) throw new Exception("Incorrect mod shutdown");
         }

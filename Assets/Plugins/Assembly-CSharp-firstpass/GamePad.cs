@@ -64,7 +64,7 @@ public static class GamePad
 		return Eclipse.Input.EclipseInput.GetGamepadTrigger((int)CPBHKJFPFJB, (int)EKFPHMLKDAP, IMFLNPNECCO);
 	}
 
-	private static KeyCode KNBAPAJMFIN(Button KLNKEPMAGKF, Player EKFPHMLKDAP)
+	private static KeyCode GetKeyCode(Button KLNKEPMAGKF, Player EKFPHMLKDAP)
 	{
 		switch (EKFPHMLKDAP)
 		{
@@ -200,25 +200,25 @@ public static class GamePad
 	public static GamepadState GetState(Player EKFPHMLKDAP, bool IMFLNPNECCO = false)
 	{
 		GamepadState iOIGCCPIJPN = new GamepadState();
-		iOIGCCPIJPN.IEKADOOKFKG = GetButton(Button.A, EKFPHMLKDAP);
-		iOIGCCPIJPN.LDKCOIHONPG = GetButton(Button.B, EKFPHMLKDAP);
-		iOIGCCPIJPN.IHAHIEHHNCG = GetButton(Button.Y, EKFPHMLKDAP);
-		iOIGCCPIJPN.NPKMJMCLDAH = GetButton(Button.X, EKFPHMLKDAP);
-		iOIGCCPIJPN.CLIBGHJKICF = GetButton(Button.RightShoulder, EKFPHMLKDAP);
-		iOIGCCPIJPN.GGMOMECKAGP = GetButton(Button.LeftShoulder, EKFPHMLKDAP);
-		iOIGCCPIJPN.KDPBFODDKOJ = GetButton(Button.RightStick, EKFPHMLKDAP);
-		iOIGCCPIJPN.ELAPGGICPLB = GetButton(Button.LeftStick, EKFPHMLKDAP);
+		iOIGCCPIJPN.A = GetButton(Button.A, EKFPHMLKDAP);
+		iOIGCCPIJPN.IsButtonBPressed = GetButton(Button.B, EKFPHMLKDAP);
+		iOIGCCPIJPN.Y = GetButton(Button.Y, EKFPHMLKDAP);
+		iOIGCCPIJPN.X = GetButton(Button.X, EKFPHMLKDAP);
+		iOIGCCPIJPN.RightShoulder = GetButton(Button.RightShoulder, EKFPHMLKDAP);
+		iOIGCCPIJPN.LeftShoulder = GetButton(Button.LeftShoulder, EKFPHMLKDAP);
+		iOIGCCPIJPN.RightStick = GetButton(Button.RightStick, EKFPHMLKDAP);
+		iOIGCCPIJPN.LeftStick = GetButton(Button.LeftStick, EKFPHMLKDAP);
 		iOIGCCPIJPN.Start = GetButton(Button.Start, EKFPHMLKDAP);
-		iOIGCCPIJPN.AJLBHIHFFCE = GetButton(Button.Back, EKFPHMLKDAP);
-		iOIGCCPIJPN.HNPGBMGKGEB = GetStick(Stick.LeftStick, EKFPHMLKDAP, IMFLNPNECCO);
-		iOIGCCPIJPN.IMMFMNIFNEH = GetStick(Stick.RightStick, EKFPHMLKDAP, IMFLNPNECCO);
-		iOIGCCPIJPN.PGHJPABHPLP = GetStick(Stick.Dpad, EKFPHMLKDAP, IMFLNPNECCO);
-		iOIGCCPIJPN.EDCHBILGFLD = iOIGCCPIJPN.PGHJPABHPLP.x < 0f;
-		iOIGCCPIJPN.NNCHJCLKHHA = iOIGCCPIJPN.PGHJPABHPLP.x > 0f;
-		iOIGCCPIJPN.FJBHJIFKOMF = iOIGCCPIJPN.PGHJPABHPLP.y > 0f;
-		iOIGCCPIJPN.HHMEIEKKDAL = iOIGCCPIJPN.PGHJPABHPLP.y < 0f;
-		iOIGCCPIJPN.CHJIELPPCOE = GetTrigger(Trigger.LeftTrigger, EKFPHMLKDAP, IMFLNPNECCO);
-		iOIGCCPIJPN.ALEANDMIOJO = GetTrigger(Trigger.RightTrigger, EKFPHMLKDAP, IMFLNPNECCO);
+		iOIGCCPIJPN.Back = GetButton(Button.Back, EKFPHMLKDAP);
+		iOIGCCPIJPN.LeftStickAxis = GetStick(Stick.LeftStick, EKFPHMLKDAP, IMFLNPNECCO);
+		iOIGCCPIJPN.RightStickAxis = GetStick(Stick.RightStick, EKFPHMLKDAP, IMFLNPNECCO);
+		iOIGCCPIJPN.DpadAxis = GetStick(Stick.Dpad, EKFPHMLKDAP, IMFLNPNECCO);
+		iOIGCCPIJPN.Left = iOIGCCPIJPN.DpadAxis.x < 0f;
+		iOIGCCPIJPN.Right = iOIGCCPIJPN.DpadAxis.x > 0f;
+		iOIGCCPIJPN.Up = iOIGCCPIJPN.DpadAxis.y > 0f;
+		iOIGCCPIJPN.Down = iOIGCCPIJPN.DpadAxis.y < 0f;
+		iOIGCCPIJPN.LeftTrigger = GetTrigger(Trigger.LeftTrigger, EKFPHMLKDAP, IMFLNPNECCO);
+		iOIGCCPIJPN.RightTrigger = GetTrigger(Trigger.RightTrigger, EKFPHMLKDAP, IMFLNPNECCO);
 		return iOIGCCPIJPN;
 	}
 }

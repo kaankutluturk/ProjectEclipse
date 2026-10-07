@@ -1,6 +1,6 @@
 public abstract class PerkConditionMatchMinMax : PerkCondition
 {
-	protected MatchMinMax FMKBHHJDHDM = new MatchMinMax();
+	protected MatchMinMax minMax = new MatchMinMax();
 
 	public PerkConditionMatchMinMax()
 	{

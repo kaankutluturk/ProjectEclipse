@@ -5,49 +5,49 @@ public class ModelStatistics
 {
 	private class AttackStatistics
 	{
-		private InfoAnimation IBMJEFJBOIK;
+		private InfoAnimation animation;
 
-		private float CJOJDEOLBND;
+		private float pendingDamage;
 
-		private float JOGLLIIGDMN;
+		private float totalDamage;
 
 		private float _count;
 
-		private float ONOLEKBJIEJ;
+		private float pendingHitCount;
 
-		private float AFFJHCAGHGI;
+		private float totalHitCount;
 
 		private int _strikeIndex;
 
-		public InfoAnimation FGICHADOEHF
+		public InfoAnimation Animation
 		{
 			get
 			{
-				return NNMAFFCCMHC();
+				return GetAnimation();
 			}
 		}
 
-		public float EMHIAONANOJ
+		public float PendingDamage
 		{
 			get
 			{
-				return PANEJCCDFFP();
+				return GetPendingDamage();
 			}
 			set
 			{
-				ENCKIHKPKCO(value);
+				SetPendingDamage(value);
 			}
 		}
 
-		public float KFMJMBANIGF
+		public float TotalDamage
 		{
 			get
 			{
-				return GHGGNMBCMNM();
+				return GetTotalDamage();
 			}
 			set
 			{
-				PJEADIKBIGL(value);
+				SetTotalDamage(value);
 			}
 		}
 
@@ -55,176 +55,176 @@ public class ModelStatistics
 		{
 			get
 			{
-				return OFOPFCJNEBL();
+				return GetCount();
 			}
 			set
 			{
-				CHILOKHFALD(value);
+				SetCount(value);
 			}
 		}
 
-		public float AAKOCIPFDNM
+		public float TotalHitCount
 		{
 			get
 			{
-				return POKBOKHJJPL();
+				return GetTotalHitCount();
 			}
 			set
 			{
-				BEHDBJOCHGM(value);
+				SetTotalHitCount(value);
 			}
 		}
 
 		public AttackStatistics(InfoAnimation DBOLBEOCEME)
 		{
-			IBMJEFJBOIK = DBOLBEOCEME;
-			JOGLLIIGDMN = 0f;
-			CJOJDEOLBND = 0f;
+			animation = DBOLBEOCEME;
+			totalDamage = 0f;
+			pendingDamage = 0f;
 			_count = 0f;
-			AFFJHCAGHGI = 0f;
-			ONOLEKBJIEJ = 0f;
+			totalHitCount = 0f;
+			pendingHitCount = 0f;
 			_strikeIndex = 0;
 		}
 
 		public AttackStatistics(AttackStatistics NBMGOEMJJAF)
 		{
-			IBMJEFJBOIK = NBMGOEMJJAF.IBMJEFJBOIK;
-			JOGLLIIGDMN = NBMGOEMJJAF.JOGLLIIGDMN;
-			CJOJDEOLBND = NBMGOEMJJAF.CJOJDEOLBND;
+			animation = NBMGOEMJJAF.animation;
+			totalDamage = NBMGOEMJJAF.totalDamage;
+			pendingDamage = NBMGOEMJJAF.pendingDamage;
 			_count = NBMGOEMJJAF._count;
-			AFFJHCAGHGI = NBMGOEMJJAF.AFFJHCAGHGI;
-			ONOLEKBJIEJ = NBMGOEMJJAF.ONOLEKBJIEJ;
+			totalHitCount = NBMGOEMJJAF.totalHitCount;
+			pendingHitCount = NBMGOEMJJAF.pendingHitCount;
 			_strikeIndex = 0;
 		}
 
-		public InfoAnimation NNMAFFCCMHC()
+		public InfoAnimation GetAnimation()
 		{
-			return IBMJEFJBOIK;
+			return animation;
 		}
 
-		public float PANEJCCDFFP()
+		public float GetPendingDamage()
 		{
-			return CJOJDEOLBND;
+			return pendingDamage;
 		}
 
-		public void ENCKIHKPKCO(float value)
+		public void SetPendingDamage(float value)
 		{
-			CJOJDEOLBND = value;
+			pendingDamage = value;
 		}
 
-		public float GHGGNMBCMNM()
+		public float GetTotalDamage()
 		{
-			return JOGLLIIGDMN;
+			return totalDamage;
 		}
 
-		public void PJEADIKBIGL(float value)
+		public void SetTotalDamage(float value)
 		{
-			JOGLLIIGDMN = value;
+			totalDamage = value;
 		}
 
-		public float OFOPFCJNEBL()
+		public float GetCount()
 		{
 			return _count;
 		}
 
-		public void CHILOKHFALD(float value)
+		public void SetCount(float value)
 		{
 			_count = value;
 		}
 
-		public float POKBOKHJJPL()
+		public float GetTotalHitCount()
 		{
-			return AFFJHCAGHGI;
+			return totalHitCount;
 		}
 
-		public void BEHDBJOCHGM(float value)
+		public void SetTotalHitCount(float value)
 		{
-			AFFJHCAGHGI = value;
+			totalHitCount = value;
 		}
 
-		private void NNNFJNLCMMO(int BCAOGKPNMFG, float DAIGFEOMFIE)
+		private void ApplyDecay(int BCAOGKPNMFG, float DAIGFEOMFIE)
 		{
 			int num = BCAOGKPNMFG - _strikeIndex;
 			if (0 < num)
 			{
 				float num2 = Mathf.Pow(2f, (0f - (float)num) / DAIGFEOMFIE);
-				JOGLLIIGDMN *= num2;
-				CJOJDEOLBND *= num2;
+				totalDamage *= num2;
+				pendingDamage *= num2;
 				_count *= num2;
-				AFFJHCAGHGI *= num2;
-				ONOLEKBJIEJ *= num2;
+				totalHitCount *= num2;
+				pendingHitCount *= num2;
 			}
 			_strikeIndex = BCAOGKPNMFG;
 		}
 
-		public void LPCJBPFDFLD(float CKKFKEIELCP, int BCAOGKPNMFG, float DAIGFEOMFIE)
+		public void AddDamage(float CKKFKEIELCP, int BCAOGKPNMFG, float DAIGFEOMFIE)
 		{
-			NNNFJNLCMMO(BCAOGKPNMFG, DAIGFEOMFIE);
-			CJOJDEOLBND += CKKFKEIELCP;
-			ONOLEKBJIEJ++;
+			ApplyDecay(BCAOGKPNMFG, DAIGFEOMFIE);
+			pendingDamage += CKKFKEIELCP;
+			pendingHitCount++;
 		}
 
-		public void PIOIIIMCFMJ()
+		public void CommitPending()
 		{
-			JOGLLIIGDMN += CJOJDEOLBND;
-			CJOJDEOLBND = 0f;
-			AFFJHCAGHGI += ONOLEKBJIEJ;
-			ONOLEKBJIEJ = 0f;
+			totalDamage += pendingDamage;
+			pendingDamage = 0f;
+			totalHitCount += pendingHitCount;
+			pendingHitCount = 0f;
 		}
 
-		public void NFPKBOGGPBA(int BCAOGKPNMFG, float DAIGFEOMFIE)
+		public void AddUse(int BCAOGKPNMFG, float DAIGFEOMFIE)
 		{
-			NNNFJNLCMMO(BCAOGKPNMFG, DAIGFEOMFIE);
+			ApplyDecay(BCAOGKPNMFG, DAIGFEOMFIE);
 			_count++;
 		}
 
-		public float KDPAKCJCNMI(int BCAOGKPNMFG, float DAIGFEOMFIE)
+		public float GetDecayedTotalDamage(int BCAOGKPNMFG, float DAIGFEOMFIE)
 		{
-			NNNFJNLCMMO(BCAOGKPNMFG, DAIGFEOMFIE);
-			return JOGLLIIGDMN;
+			ApplyDecay(BCAOGKPNMFG, DAIGFEOMFIE);
+			return totalDamage;
 		}
 
-		public float GCGFLOAGMHP(int BCAOGKPNMFG, float DAIGFEOMFIE)
+		public float GetDecayedCount(int BCAOGKPNMFG, float DAIGFEOMFIE)
 		{
-			NNNFJNLCMMO(BCAOGKPNMFG, DAIGFEOMFIE);
+			ApplyDecay(BCAOGKPNMFG, DAIGFEOMFIE);
 			return _count;
 		}
 
-		public float KELJBLCCOMH(int BCAOGKPNMFG, float DAIGFEOMFIE)
+		public float GetDecayedTotalHitCount(int BCAOGKPNMFG, float DAIGFEOMFIE)
 		{
-			NNNFJNLCMMO(BCAOGKPNMFG, DAIGFEOMFIE);
-			return AFFJHCAGHGI;
+			ApplyDecay(BCAOGKPNMFG, DAIGFEOMFIE);
+			return totalHitCount;
 		}
 
-		public void CIJNPJFOBHI(float ratio)
+		public void ScaleAll(float ratio)
 		{
-			JOGLLIIGDMN *= ratio;
-			CJOJDEOLBND *= ratio;
+			totalDamage *= ratio;
+			pendingDamage *= ratio;
 			_count *= ratio;
-			AFFJHCAGHGI *= ratio;
-			ONOLEKBJIEJ *= ratio;
+			totalHitCount *= ratio;
+			pendingHitCount *= ratio;
 		}
 	}
 
 	private Model _model;
 
-	private Dictionary<InfoAnimation, AttackStatistics> OJMNFIAGGFI = new Dictionary<InfoAnimation, AttackStatistics>();
+	private Dictionary<InfoAnimation, AttackStatistics> dealtStats = new Dictionary<InfoAnimation, AttackStatistics>();
 
-	private Dictionary<InfoAnimation, AttackStatistics> HIJMNFKPJOJ = new Dictionary<InfoAnimation, AttackStatistics>();
+	private Dictionary<InfoAnimation, AttackStatistics> receivedStats = new Dictionary<InfoAnimation, AttackStatistics>();
 
-	private List<InfoAnimation> PIHGLDCAEIF = new List<InfoAnimation>();
+	private List<InfoAnimation> animationBuffer = new List<InfoAnimation>();
 
-	private static AttackStatistics FINNGOADIDP;
+	private static AttackStatistics unusedStatistics;
 
-	private int IKBOCLPGIEP;
+	private int raidHitCount;
 
-	private int KCFFFLKIDLN;
+	private int raidCritCount;
 
-	public bool ECMICCIOLLM
+	public bool IsCritAvailable
 	{
 		get
 		{
-			return FMGDKLFNKGM();
+			return CheckCritAvailable();
 		}
 	}
 
@@ -239,9 +239,9 @@ public class ModelStatistics
         _model = model;
     }
 
-	private AttackStatistics IAMEMEDKMOB(bool MNJPFPLKNFA, InfoAnimation DBOLBEOCEME)
+	private AttackStatistics GetOrCreateStatistics(bool MNJPFPLKNFA, InfoAnimation DBOLBEOCEME)
 	{
-		Dictionary<InfoAnimation, AttackStatistics> dictionary = ((!MNJPFPLKNFA) ? HIJMNFKPJOJ : OJMNFIAGGFI);
+		Dictionary<InfoAnimation, AttackStatistics> dictionary = ((!MNJPFPLKNFA) ? receivedStats : dealtStats);
 		if (dictionary.ContainsKey(DBOLBEOCEME))
 		{
 			return dictionary[DBOLBEOCEME];
@@ -251,51 +251,51 @@ public class ModelStatistics
 		return iINOIHKEDDJ;
 	}
 
-	public void LPCJBPFDFLD(bool MNJPFPLKNFA, InfoAnimation DBOLBEOCEME, float CKKFKEIELCP)
+	public void RecordDamage(bool MNJPFPLKNFA, InfoAnimation DBOLBEOCEME, float CKKFKEIELCP)
 	{
-		int bCAOGKPNMFG = _model.EJJIGHLCKEN();
-		float dAIGFEOMFIE = KDGHCGHAIDA();
-		AttackStatistics iINOIHKEDDJ = IAMEMEDKMOB(MNJPFPLKNFA, DBOLBEOCEME);
-		iINOIHKEDDJ.LPCJBPFDFLD(CKKFKEIELCP, bCAOGKPNMFG, dAIGFEOMFIE);
+		int bCAOGKPNMFG = _model.GetStrikesTaken();
+		float dAIGFEOMFIE = GetStrikeHalfLife();
+		AttackStatistics iINOIHKEDDJ = GetOrCreateStatistics(MNJPFPLKNFA, DBOLBEOCEME);
+		iINOIHKEDDJ.AddDamage(CKKFKEIELCP, bCAOGKPNMFG, dAIGFEOMFIE);
 	}
 
-	public void PIOIIIMCFMJ(bool MNJPFPLKNFA, InfoAnimation DBOLBEOCEME)
+	public void CommitPendingStatistics(bool MNJPFPLKNFA, InfoAnimation DBOLBEOCEME)
 	{
-		AttackStatistics iINOIHKEDDJ = IAMEMEDKMOB(MNJPFPLKNFA, DBOLBEOCEME);
-		iINOIHKEDDJ.PIOIIIMCFMJ();
+		AttackStatistics iINOIHKEDDJ = GetOrCreateStatistics(MNJPFPLKNFA, DBOLBEOCEME);
+		iINOIHKEDDJ.CommitPending();
 	}
 
-	public void NFPKBOGGPBA(bool MNJPFPLKNFA, InfoAnimation DBOLBEOCEME)
+	public void RecordUse(bool MNJPFPLKNFA, InfoAnimation DBOLBEOCEME)
 	{
-		int bCAOGKPNMFG = _model.EJJIGHLCKEN();
-		float dAIGFEOMFIE = KDGHCGHAIDA();
-		AttackStatistics iINOIHKEDDJ = IAMEMEDKMOB(MNJPFPLKNFA, DBOLBEOCEME);
-		iINOIHKEDDJ.NFPKBOGGPBA(bCAOGKPNMFG, dAIGFEOMFIE);
+		int bCAOGKPNMFG = _model.GetStrikesTaken();
+		float dAIGFEOMFIE = GetStrikeHalfLife();
+		AttackStatistics iINOIHKEDDJ = GetOrCreateStatistics(MNJPFPLKNFA, DBOLBEOCEME);
+		iINOIHKEDDJ.AddUse(bCAOGKPNMFG, dAIGFEOMFIE);
 	}
 
 	public void Reset()
 	{
-		OJMNFIAGGFI.Clear();
-		HIJMNFKPJOJ.Clear();
+		dealtStats.Clear();
+		receivedStats.Clear();
 	}
 
-	public void MLJCABABNDB()
+	public void ApplyRoundFactor()
 	{
-		foreach (AttackStatistics value in OJMNFIAGGFI.Values)
+		foreach (AttackStatistics value in dealtStats.Values)
 		{
-			value.CHILOKHFALD(value.OFOPFCJNEBL() * GGLHHPCOABD());
-			value.PJEADIKBIGL(value.GHGGNMBCMNM() * GGLHHPCOABD());
-			value.ENCKIHKPKCO(value.PANEJCCDFFP() * GGLHHPCOABD());
-			value.BEHDBJOCHGM(value.POKBOKHJJPL() * GGLHHPCOABD());
-			value.CIJNPJFOBHI(GGLHHPCOABD());
+			value.SetCount(value.GetCount() * GetRoundFactor());
+			value.SetTotalDamage(value.GetTotalDamage() * GetRoundFactor());
+			value.SetPendingDamage(value.GetPendingDamage() * GetRoundFactor());
+			value.SetTotalHitCount(value.GetTotalHitCount() * GetRoundFactor());
+			value.ScaleAll(GetRoundFactor());
 		}
-		foreach (AttackStatistics value2 in HIJMNFKPJOJ.Values)
+		foreach (AttackStatistics value2 in receivedStats.Values)
 		{
-			value2.CHILOKHFALD(value2.OFOPFCJNEBL() * GGLHHPCOABD());
-			value2.PJEADIKBIGL(value2.GHGGNMBCMNM() * GGLHHPCOABD());
-			value2.ENCKIHKPKCO(value2.PANEJCCDFFP() * GGLHHPCOABD());
-			value2.BEHDBJOCHGM(value2.POKBOKHJJPL() * GGLHHPCOABD());
-			value2.CIJNPJFOBHI(GGLHHPCOABD());
+			value2.SetCount(value2.GetCount() * GetRoundFactor());
+			value2.SetTotalDamage(value2.GetTotalDamage() * GetRoundFactor());
+			value2.SetPendingDamage(value2.GetPendingDamage() * GetRoundFactor());
+			value2.SetTotalHitCount(value2.GetTotalHitCount() * GetRoundFactor());
+			value2.ScaleAll(GetRoundFactor());
 		}
 	}
 
@@ -303,14 +303,14 @@ public class ModelStatistics
 	{
 		count = 0f;
 		CKKFKEIELCP = 0f;
-		PIHGLDCAEIF.Clear();
-		AnimationData.NEBELEFIDMB(KCAIJCBMNKP, PIHGLDCAEIF);
+		animationBuffer.Clear();
+		AnimationData.AddTemplateAnimations(KCAIJCBMNKP, animationBuffer);
 		float BLJGEOEHIGP2 = 0f;
 		float CKKFKEIELCP2 = 0f;
 		float JOOJIMPEPOJ2 = 0f;
-		for (int i = 0; i < PIHGLDCAEIF.Count; i++)
+		for (int i = 0; i < animationBuffer.Count; i++)
 		{
-			GetCountAndDamage(MNJPFPLKNFA, PIHGLDCAEIF[i], ref BLJGEOEHIGP2, ref CKKFKEIELCP2, ref JOOJIMPEPOJ2);
+			GetCountAndDamage(MNJPFPLKNFA, animationBuffer[i], ref BLJGEOEHIGP2, ref CKKFKEIELCP2, ref JOOJIMPEPOJ2);
 			count += BLJGEOEHIGP2;
 			CKKFKEIELCP += CKKFKEIELCP2;
 			JOOJIMPEPOJ += JOOJIMPEPOJ2;
@@ -319,39 +319,39 @@ public class ModelStatistics
 
 	public void GetCountAndDamage(bool MNJPFPLKNFA, InfoAnimation DBOLBEOCEME, ref float count, ref float CKKFKEIELCP, ref float JOOJIMPEPOJ)
 	{
-		AttackStatistics iINOIHKEDDJ = IAMEMEDKMOB(MNJPFPLKNFA, DBOLBEOCEME);
-		int bCAOGKPNMFG = _model.EJJIGHLCKEN();
-		float dAIGFEOMFIE = KDGHCGHAIDA();
-		count = iINOIHKEDDJ.GCGFLOAGMHP(bCAOGKPNMFG, dAIGFEOMFIE);
-		CKKFKEIELCP = iINOIHKEDDJ.KDPAKCJCNMI(bCAOGKPNMFG, dAIGFEOMFIE);
-		JOOJIMPEPOJ = iINOIHKEDDJ.KELJBLCCOMH(bCAOGKPNMFG, dAIGFEOMFIE);
+		AttackStatistics iINOIHKEDDJ = GetOrCreateStatistics(MNJPFPLKNFA, DBOLBEOCEME);
+		int bCAOGKPNMFG = _model.GetStrikesTaken();
+		float dAIGFEOMFIE = GetStrikeHalfLife();
+		count = iINOIHKEDDJ.GetDecayedCount(bCAOGKPNMFG, dAIGFEOMFIE);
+		CKKFKEIELCP = iINOIHKEDDJ.GetDecayedTotalDamage(bCAOGKPNMFG, dAIGFEOMFIE);
+		JOOJIMPEPOJ = iINOIHKEDDJ.GetDecayedTotalHitCount(bCAOGKPNMFG, dAIGFEOMFIE);
 	}
 
-	private float KDGHCGHAIDA()
+	private float GetStrikeHalfLife()
 	{
 		float result = 0f;
-		ModelAi pCFGKAFOCDO = _model.EEIGOJBKFGE();
+		ModelAi pCFGKAFOCDO = _model.GetAi();
 		if (pCFGKAFOCDO != null)
 		{
 			Tactic eEJNOAKLOLG = pCFGKAFOCDO.get_Tactic();
 			if (eEJNOAKLOLG != null)
 			{
-				result = eEJNOAKLOLG.DHPIKOMPJEK.CJKKOJCLIGK;
+				result = eEJNOAKLOLG.MemoryConfig.Strikes;
 			}
 		}
 		return result;
 	}
 
-	private float GGLHHPCOABD()
+	private float GetRoundFactor()
 	{
 		float result = 0f;
-		ModelAi pCFGKAFOCDO = _model.EEIGOJBKFGE();
+		ModelAi pCFGKAFOCDO = _model.GetAi();
 		if (pCFGKAFOCDO != null)
 		{
 			Tactic eEJNOAKLOLG = pCFGKAFOCDO.get_Tactic();
 			if (eEJNOAKLOLG != null)
 			{
-				result = eEJNOAKLOLG.DHPIKOMPJEK.HHGKEGHMMCP;
+				result = eEJNOAKLOLG.MemoryConfig.RoundFactor;
 			}
 		}
 		return result;
@@ -361,20 +361,20 @@ public class ModelStatistics
 	{
 		if (!OOCLHFGEPML)
 		{
-			IKBOCLPGIEP++;
+			raidHitCount++;
 		}
 		if (OOGIBOBMGJA)
 		{
-			KCFFFLKIDLN++;
+			raidCritCount++;
 		}
 	}
 
-	public bool FMGDKLFNKGM()
+	public bool CheckCritAvailable()
 	{
-		int pOJMKEEPBJK = QuestUtils.BKBHIHMEMEH().JOPIIDEIJEF().CritAdditional;
-		float iMPHONCGFGP = QuestUtils.BKBHIHMEMEH().JOPIIDEIJEF().CritProbablity;
-		int num = pOJMKEEPBJK + (int)((float)IKBOCLPGIEP * iMPHONCGFGP);
-		if (KCFFFLKIDLN + 1 <= num)
+		int pOJMKEEPBJK = QuestUtils.GetNoAnimationMoves().GetCritSettings().CritAdditional;
+		float iMPHONCGFGP = QuestUtils.GetNoAnimationMoves().GetCritSettings().CritProbablity;
+		int num = pOJMKEEPBJK + (int)((float)raidHitCount * iMPHONCGFGP);
+		if (raidCritCount + 1 <= num)
 		{
 			return true;
 		}

@@ -37,7 +37,7 @@ try
     content.SetParent(scrollObject.transform, false); content.sizeDelta = new Vector2(1800,200);
     var scroll = scrollObject.GetComponent<Nekki.SF2.GUI.SFScrollRect>();
     scroll.set_content(content); scroll.set_horizontal(true); scroll.set_vertical(false);
-    scroll.set_movementType(Nekki.SF2.GUI.SFScrollRect.MDMLKCMBBPA.Clamped);
+    scroll.set_movementType(Nekki.SF2.GUI.SFScrollRect.ScrollMovementType.Clamped);
     scroll.set_horizontalNormalizedPosition(.5f);
     float before = content.anchoredPosition.x;
     scroll.OnScroll(new UnityEngine.EventSystems.PointerEventData(null) { scrollDelta = new Vector2(0,-1) });

@@ -94,7 +94,7 @@ public static class ValidateTitleMeshNative
                 if (fight == null) throw new Exception("Title sparring stopped.");
                 foreach (var model in new[] { fight.GetPlayerModel(), fight.GetEnemyModel() })
                 {
-                    foreach (var renderer in model.MJNPBMOAFML().GetComponentsInChildren<MeshRender>())
+                    foreach (var renderer in model.GetGameObject().GetComponentsInChildren<MeshRender>())
                     {
                         var mesh = renderer.get_Base();
                         if (mesh.Vertices == null) continue; // Unity Start has not run yet.

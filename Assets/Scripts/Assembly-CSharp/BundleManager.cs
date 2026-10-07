@@ -3,74 +3,74 @@ using UnityEngine;
 
 public static class BundleManager
 {
-	private static Dictionary<string, BundleRef> DHNMJFPPGJL = new Dictionary<string, BundleRef>();
+	private static Dictionary<string, BundleRef> _bundlesByAssetName = new Dictionary<string, BundleRef>();
 
-	private static BundleRef EBKGJFPJDJJ = null;
+	private static BundleRef _currentBundle = null;
 
 	public static void AddBundle(string name)
 	{
 		BundleRef fJMBOHIMAMI = new BundleRef(name);
 		fJMBOHIMAMI.Load();
-		if (fJMBOHIMAMI.DFDMGDDLDNB())
+		if (fJMBOHIMAMI.GetIsLoaded())
 		{
-			string[] array = fJMBOHIMAMI.OEEOEGEBBAL();
+			string[] array = fJMBOHIMAMI.GetAllAssetNames();
 			string[] array2 = array;
 			foreach (string jHEMALDDIFN in array2)
 			{
-				string key = AssetBundleExtension.NCDIGHNCMFH(jHEMALDDIFN);
-				DHNMJFPPGJL[key] = fJMBOHIMAMI;
+				string key = AssetBundleExtension.GetSimplifiedAssetName(jHEMALDDIFN);
+				_bundlesByAssetName[key] = fJMBOHIMAMI;
 			}
 		}
-		fJMBOHIMAMI.BPEDLFOKKNN();
+		fJMBOHIMAMI.Unload();
 	}
 
 	public static T LoadAsset<T>(string name) where T : Object
 	{
-		name = AssetBundleExtension.NCDIGHNCMFH(name);
+		name = AssetBundleExtension.GetSimplifiedAssetName(name);
 		BundleRef value = null;
-		if (!DHNMJFPPGJL.TryGetValue(name, out value))
+		if (!_bundlesByAssetName.TryGetValue(name, out value))
 		{
 			return (T)null;
 		}
-		EICEEPBNHOG(value);
-		return (!value.DFDMGDDLDNB()) ? ((T)null) : value.LoadAsset<T>(name);
+		ActivateBundle(value);
+		return (!value.GetIsLoaded()) ? ((T)null) : value.LoadAsset<T>(name);
 	}
 
 	public static T[] LoadAssetWithSubAssets<T>(string name) where T : Object
 	{
-		name = AssetBundleExtension.NCDIGHNCMFH(name);
+		name = AssetBundleExtension.GetSimplifiedAssetName(name);
 		BundleRef value = null;
-		if (!DHNMJFPPGJL.TryGetValue(name, out value))
+		if (!_bundlesByAssetName.TryGetValue(name, out value))
 		{
 			return null;
 		}
-		EICEEPBNHOG(value);
-		return (!value.DFDMGDDLDNB()) ? null : value.LoadAssetWithSubAssets<T>(name);
+		ActivateBundle(value);
+		return (!value.GetIsLoaded()) ? null : value.LoadAssetWithSubAssets<T>(name);
 	}
 
-	private static void EICEEPBNHOG(BundleRef bundle)
+	private static void ActivateBundle(BundleRef bundle)
 	{
-		if (bundle != null && EBKGJFPJDJJ != bundle)
+		if (bundle != null && _currentBundle != bundle)
 		{
-			if (EBKGJFPJDJJ != null)
+			if (_currentBundle != null)
 			{
-				EBKGJFPJDJJ.BPEDLFOKKNN();
+				_currentBundle.Unload();
 			}
 			bundle.Load();
-			if (bundle.DFDMGDDLDNB())
+			if (bundle.GetIsLoaded())
 			{
-				EBKGJFPJDJJ = bundle;
+				_currentBundle = bundle;
 			}
 		}
 	}
 
 	public static void Reset()
 	{
-		if (EBKGJFPJDJJ != null)
+		if (_currentBundle != null)
 		{
-			EBKGJFPJDJJ.BPEDLFOKKNN();
-			EBKGJFPJDJJ = null;
+			_currentBundle.Unload();
+			_currentBundle = null;
 		}
-		DHNMJFPPGJL.Clear();
+		_bundlesByAssetName.Clear();
 	}
 }

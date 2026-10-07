@@ -6,161 +6,161 @@ using System.Threading;
 internal class HeaderAuthenticator : IAuthenticationProvider
 {
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private string KGDNJPINPMN;
+	private string user;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private string JLGKGECFBII;
+	private string roles;
 
 	[CompilerGenerated]
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private LACLODBGJEI OnAuthenticationSucceded;
+	private OnAuthenticationSuccededDelegate OnAuthenticationSucceded;
 
 	[CompilerGenerated]
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private BCHANFGJONF OnAuthenticationFailed;
+	private OnAuthenticationFailedDelegate OnAuthenticationFailed;
 
-	public string NKHIGHOCKOP
+	public string User
 	{
 		get
 		{
-			return MDBKLAILOEA();
+			return GetUser();
 		}
 		private set
 		{
-			PEHJEBAJFKA(value);
+			SetUser(value);
 		}
 	}
 
-	public string NNJOKOABFAL
+	public string Roles
 	{
 		get
 		{
-			return HEDILAFLPHJ();
+			return GetRoles();
 		}
 		private set
 		{
-			PELNBAHFEIO(value);
+			SetRoles(value);
 		}
 	}
 
-	public bool CBIBNHGGEBI
+	public bool RequiresPreAuth
 	{
 		get
 		{
-			return MCHOHLKGMBI();
+			return GetIsPreAuthRequired();
 		}
 	}
 
-	public event LACLODBGJEI EFCGDJPAJIG
+	public event OnAuthenticationSuccededDelegate AuthenticationSucceeded
 	{
 		add
 		{
-			IJPBAJDFAED(value);
+			AddAuthenticationSucceeded(value);
 		}
 		remove
 		{
-			KFGAHIPDDOF(value);
+			RemoveAuthenticationSucceeded(value);
 		}
 	}
 
-	public event BCHANFGJONF HMIFKIFAFMK
+	public event OnAuthenticationFailedDelegate AuthenticationFailed
 	{
 		add
 		{
-			NEAGLBOCLHI(value);
+			AddAuthenticationFailed(value);
 		}
 		remove
 		{
-			BFANLHDOICD(value);
+			RemoveAuthenticationFailed(value);
 		}
 	}
 
 	public HeaderAuthenticator(string KEJDJHAGBMK, string NNMKKAKIJCP)
 	{
-		PEHJEBAJFKA(KEJDJHAGBMK);
-		PELNBAHFEIO(NNMKKAKIJCP);
+		SetUser(KEJDJHAGBMK);
+		SetRoles(NNMKKAKIJCP);
 	}
 
-	public string MDBKLAILOEA()
+	public string GetUser()
 	{
-		return KGDNJPINPMN;
+		return user;
 	}
 
-	private void PEHJEBAJFKA(string value)
+	private void SetUser(string value)
 	{
-		KGDNJPINPMN = value;
+		user = value;
 	}
 
-	public string HEDILAFLPHJ()
+	public string GetRoles()
 	{
-		return JLGKGECFBII;
+		return roles;
 	}
 
-	private void PELNBAHFEIO(string value)
+	private void SetRoles(string value)
 	{
-		JLGKGECFBII = value;
+		roles = value;
 	}
 
-	public bool MCHOHLKGMBI()
+	public bool GetIsPreAuthRequired()
 	{
 		return false;
 	}
 
-	public void IJPBAJDFAED(LACLODBGJEI value)
+	public void AddAuthenticationSucceeded(OnAuthenticationSuccededDelegate value)
 	{
-		LACLODBGJEI lACLODBGJEI = OnAuthenticationSucceded;
-		LACLODBGJEI lACLODBGJEI2;
+		OnAuthenticationSuccededDelegate lACLODBGJEI = OnAuthenticationSucceded;
+		OnAuthenticationSuccededDelegate lACLODBGJEI2;
 		do
 		{
 			lACLODBGJEI2 = lACLODBGJEI;
-			lACLODBGJEI = Interlocked.CompareExchange(ref OnAuthenticationSucceded, (LACLODBGJEI)Delegate.Combine(lACLODBGJEI2, value), lACLODBGJEI);
+			lACLODBGJEI = Interlocked.CompareExchange(ref OnAuthenticationSucceded, (OnAuthenticationSuccededDelegate)Delegate.Combine(lACLODBGJEI2, value), lACLODBGJEI);
 		}
 		while ((object)lACLODBGJEI != lACLODBGJEI2);
 	}
 
-	public void KFGAHIPDDOF(LACLODBGJEI value)
+	public void RemoveAuthenticationSucceeded(OnAuthenticationSuccededDelegate value)
 	{
-		LACLODBGJEI lACLODBGJEI = OnAuthenticationSucceded;
-		LACLODBGJEI lACLODBGJEI2;
+		OnAuthenticationSuccededDelegate lACLODBGJEI = OnAuthenticationSucceded;
+		OnAuthenticationSuccededDelegate lACLODBGJEI2;
 		do
 		{
 			lACLODBGJEI2 = lACLODBGJEI;
-			lACLODBGJEI = Interlocked.CompareExchange(ref OnAuthenticationSucceded, (LACLODBGJEI)Delegate.Remove(lACLODBGJEI2, value), lACLODBGJEI);
+			lACLODBGJEI = Interlocked.CompareExchange(ref OnAuthenticationSucceded, (OnAuthenticationSuccededDelegate)Delegate.Remove(lACLODBGJEI2, value), lACLODBGJEI);
 		}
 		while ((object)lACLODBGJEI != lACLODBGJEI2);
 	}
 
-	public void NEAGLBOCLHI(BCHANFGJONF value)
+	public void AddAuthenticationFailed(OnAuthenticationFailedDelegate value)
 	{
-		BCHANFGJONF bCHANFGJONF = OnAuthenticationFailed;
-		BCHANFGJONF bCHANFGJONF2;
+		OnAuthenticationFailedDelegate bCHANFGJONF = OnAuthenticationFailed;
+		OnAuthenticationFailedDelegate bCHANFGJONF2;
 		do
 		{
 			bCHANFGJONF2 = bCHANFGJONF;
-			bCHANFGJONF = Interlocked.CompareExchange(ref OnAuthenticationFailed, (BCHANFGJONF)Delegate.Combine(bCHANFGJONF2, value), bCHANFGJONF);
+			bCHANFGJONF = Interlocked.CompareExchange(ref OnAuthenticationFailed, (OnAuthenticationFailedDelegate)Delegate.Combine(bCHANFGJONF2, value), bCHANFGJONF);
 		}
 		while ((object)bCHANFGJONF != bCHANFGJONF2);
 	}
 
-	public void BFANLHDOICD(BCHANFGJONF value)
+	public void RemoveAuthenticationFailed(OnAuthenticationFailedDelegate value)
 	{
-		BCHANFGJONF bCHANFGJONF = OnAuthenticationFailed;
-		BCHANFGJONF bCHANFGJONF2;
+		OnAuthenticationFailedDelegate bCHANFGJONF = OnAuthenticationFailed;
+		OnAuthenticationFailedDelegate bCHANFGJONF2;
 		do
 		{
 			bCHANFGJONF2 = bCHANFGJONF;
-			bCHANFGJONF = Interlocked.CompareExchange(ref OnAuthenticationFailed, (BCHANFGJONF)Delegate.Remove(bCHANFGJONF2, value), bCHANFGJONF);
+			bCHANFGJONF = Interlocked.CompareExchange(ref OnAuthenticationFailed, (OnAuthenticationFailedDelegate)Delegate.Remove(bCHANFGJONF2, value), bCHANFGJONF);
 		}
 		while ((object)bCHANFGJONF != bCHANFGJONF2);
 	}
 
-	public void MKODIGEMHFN()
+	public void StartAuthentication()
 	{
 	}
 
-	public void PrepareRequest(HTTPRequest ONOCIELLAPL, FHIEGKMHOCC LFLGCDNKNJI)
+	public void PrepareRequest(HTTPRequest ONOCIELLAPL, SignalRRequestType LFLGCDNKNJI)
 	{
-		ONOCIELLAPL.MMPFBNNMGED("username", MDBKLAILOEA());
-		ONOCIELLAPL.MMPFBNNMGED("roles", HEDILAFLPHJ());
+		ONOCIELLAPL.SetHeader("username", GetUser());
+		ONOCIELLAPL.SetHeader("roles", GetRoles());
 	}
 }

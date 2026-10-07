@@ -8,9 +8,9 @@ namespace CodeStage.AntiCheat.Detectors
 	[AddComponentMenu("Code Stage/Anti-Cheat Toolkit/Obscured Cheating Detector")]
 	public class ObscuredCheatingDetector : ActDetectorBase
 	{
-		internal const string JCAOMBMKNDE = "Obscured Cheating Detector";
+		internal const string ComponentName = "Obscured Cheating Detector";
 
-		internal const string MGAMICFMIJK = "[ACTk] Obscured Cheating Detector: ";
+		internal const string LogPrefix = "[ACTk] Obscured Cheating Detector: ";
 
 		private static int instancesInScene;
 
@@ -27,9 +27,9 @@ namespace CodeStage.AntiCheat.Detectors
 		public float quaternionEpsilon = 0.1f;
 
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		private static ObscuredCheatingDetector OGKMDFDNIEN;
+		private static ObscuredCheatingDetector instance;
 
-		public static ObscuredCheatingDetector BPCBBHAKFDM
+		public static ObscuredCheatingDetector CurrentInstance
 		{
 			get
 			{
@@ -41,19 +41,19 @@ namespace CodeStage.AntiCheat.Detectors
 			}
 		}
 
-		private static ObscuredCheatingDetector MCEPJKHJPIJ
+		private static ObscuredCheatingDetector GetOrCreateInstance
 		{
 			get
 			{
-				return NNMHGMJELIL();
+				return GetOrCreate();
 			}
 		}
 
-		internal static bool OEDPHHDKECI
+		internal static bool IsDetectionRunning
 		{
 			get
 			{
-				return NMACGEJHPDN();
+				return GetIsRunning();
 			}
 		}
 
@@ -65,7 +65,7 @@ namespace CodeStage.AntiCheat.Detectors
 		{
 			if (get_Instance() != null)
 			{
-				get_Instance().FCJDKBEGPEF(null);
+				get_Instance().StartDetectionInternal(null);
 			}
 			else
 			{
@@ -75,14 +75,14 @@ namespace CodeStage.AntiCheat.Detectors
 
 		public static void StartDetection(UnityAction callback)
 		{
-			NNMHGMJELIL().FCJDKBEGPEF(callback);
+			GetOrCreate().StartDetectionInternal(callback);
 		}
 
 		public static void StopDetection()
 		{
 			if (get_Instance() != null)
 			{
-				get_Instance().DJEBEEIELBB();
+				get_Instance().StopDetectionInternal();
 			}
 		}
 
@@ -90,21 +90,21 @@ namespace CodeStage.AntiCheat.Detectors
 		{
 			if (get_Instance() != null)
 			{
-				get_Instance().HIEIKJFAIJE();
+				get_Instance().DisposeInternal();
 			}
 		}
 
 		public static ObscuredCheatingDetector get_Instance()
 		{
-			return OGKMDFDNIEN;
+			return instance;
 		}
 
 		private static void set_Instance(ObscuredCheatingDetector value)
 		{
-			OGKMDFDNIEN = value;
+			instance = value;
 		}
 
-		private static ObscuredCheatingDetector NNMHGMJELIL()
+		private static ObscuredCheatingDetector GetOrCreate()
 		{
 			if (get_Instance() != null)
 			{
@@ -118,9 +118,9 @@ namespace CodeStage.AntiCheat.Detectors
 			return get_Instance();
 		}
 
-		internal static bool NMACGEJHPDN()
+		internal static bool GetIsRunning()
 		{
-			return (object)get_Instance() != null && get_Instance().EKDNCONELMD;
+			return (object)get_Instance() != null && get_Instance().isRunning;
 		}
 
 		private void Awake()
@@ -130,7 +130,7 @@ namespace CodeStage.AntiCheat.Detectors
 			{
 				set_Instance(this);
 			}
-			SceneManager.sceneLoaded += FOFIOMHDCOM;
+			SceneManager.sceneLoaded += OnSceneLoaded;
 		}
 
 		protected override void OnDestroy()
@@ -139,29 +139,29 @@ namespace CodeStage.AntiCheat.Detectors
 			instancesInScene--;
 		}
 
-		private void FOFIOMHDCOM(Scene MHOCFOODLLL, LoadSceneMode NMMPBADCFHK)
+		private void OnSceneLoaded(Scene MHOCFOODLLL, LoadSceneMode NMMPBADCFHK)
 		{
-			KJCKJOKLPLL();
+			OnLevelLoadedCallback();
 		}
 
-		private void KJCKJOKLPLL()
+		private void OnLevelLoadedCallback()
 		{
 			if (instancesInScene < 2)
 			{
 				if (!keepAlive)
 				{
-					HIEIKJFAIJE();
+					DisposeInternal();
 				}
 			}
 			else if (!keepAlive && get_Instance() != this)
 			{
-				HIEIKJFAIJE();
+				DisposeInternal();
 			}
 		}
 
-		private void FCJDKBEGPEF(UnityAction callback)
+		private void StartDetectionInternal(UnityAction callback)
 		{
-			if (EKDNCONELMD)
+			if (isRunning)
 			{
 				UnityEngine.Debug.LogWarning("[ACTk] Obscured Cheating Detector: already running!", this);
 				return;
@@ -183,42 +183,42 @@ namespace CodeStage.AntiCheat.Detectors
 			else
 			{
 				detectionAction = callback;
-				AKFEAJDLIKF = true;
-				EKDNCONELMD = true;
+				started = true;
+				isRunning = true;
 			}
 		}
 
-		protected override void LICPBNOFNOB()
+		protected override void StartDetectionAutomatically()
 		{
-			FCJDKBEGPEF(null);
+			StartDetectionInternal(null);
 		}
 
-		protected override void HEGJDFPFMII()
+		protected override void PauseDetector()
 		{
-			EKDNCONELMD = false;
+			isRunning = false;
 		}
 
-		protected override void KLJNEJIEMCN()
+		protected override void ResumeDetector()
 		{
 			if (detectionAction != null || detectionEventHasListener)
 			{
-				EKDNCONELMD = true;
+				isRunning = true;
 			}
 		}
 
-		protected override void DJEBEEIELBB()
+		protected override void StopDetectionInternal()
 		{
-			if (AKFEAJDLIKF)
+			if (started)
 			{
 				detectionAction = null;
-				AKFEAJDLIKF = false;
-				EKDNCONELMD = false;
+				started = false;
+				isRunning = false;
 			}
 		}
 
-		protected override void HIEIKJFAIJE()
+		protected override void DisposeInternal()
 		{
-			base.HIEIKJFAIJE();
+			base.DisposeInternal();
 			if (get_Instance() == this)
 			{
 				set_Instance(null);

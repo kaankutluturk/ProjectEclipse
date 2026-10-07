@@ -100,7 +100,7 @@ public static class ValidateDE128CombatNative
             }
             if (!entered)
             {
-                if (ModRuntime.Scripts == null || ListSF.CCDKHLAMKKO() == null || Module.GetInstance() == null) return;
+                if (ModRuntime.Scripts == null || ListSF.GetRoster() == null || Module.GetInstance() == null) return;
                 var screen = Module.GetInstance().GetCurrentScreenType();
                 if (screen != ScreenType.ModuleDojo && screen != ScreenType.ModuleMap) return;
                 if (!mapLockChecked)
@@ -114,7 +114,7 @@ public static class ValidateDE128CombatNative
                             throw new Exception("Reveal/focus accepted outside map.");
                         // This fixture tests map progression, not campaign tab gates.
                         // The ordinary scene loader still initializes the actual map.
-                        Module.DLOKJOHNDID(ScreenType.ModuleMap, null, null, false);
+                        Module.OpenScreen(ScreenType.ModuleMap, null, null, false);
                         return;
                     }
                     if (!CheckActScreen()) return;
@@ -134,7 +134,7 @@ public static class ValidateDE128CombatNative
                 CheckProfileFightProgress();
                 var definition = ModRuntime.Scripts.Content.Fights.FirstOrDefault(value => value.Id.ToString() == "fixture.de128-combat:fights/" + (Spell == "Sphere1" ? "jian" : Spell.ToLowerInvariant()));
                 if (definition == null) throw new Exception("Fixture fight missing; check mod initialization errors.");
-                var encounter = ListSF.CHMCKGCDGCM(new FightIDS(ModRuntime.Scripts.Content.RuntimeFightId(definition.Id)));
+                var encounter = ListSF.GetFightById(new FightIDS(ModRuntime.Scripts.Content.RuntimeFightId(definition.Id)));
                 entered = GameUtils.StartFight(encounter, false, null, true, false);
                 if (!StoryBus.FightEntries.HasPending) throw new Exception("Native entry was not held by Lua");
                 if (GameUtils.StartFight(encounter, false, null, true, false)) throw new Exception("Concurrent pending native entry was accepted");
@@ -154,7 +154,7 @@ public static class ValidateDE128CombatNative
                 Debug.Log("[DE128Native] PASS actual Lua fight-entry hold, timed screen and modal acknowledgement, concurrent rejection, same-fight continuation and stale-request rejection.");
             }
             var fight = Fight.GetCurrentFight(); if (fight == null) return;
-            var enemy = (Model)typeof(Fight).GetField("CKNCPOABFBO", Hidden).GetValue(fight);
+            var enemy = (Model)typeof(Fight).GetField("_enemyModel", Hidden).GetValue(fight);
             var player = (Model)typeof(Fight).GetField("_playerModel", Hidden).GetValue(fight);
             if (enemy == null || player == null || fight.get_FightTimeInFrames() < 1) return;
             int frame = fight.get_FightTimeInFrames();
@@ -162,17 +162,17 @@ public static class ValidateDE128CombatNative
             enemy.Parameters.AiControlled = false;
             if (!attached)
             {
-                var weapon = enemy.Parameters.DGMDEDKLGMB().FirstOrDefault(item => item.Type == "Weapon");
+                var weapon = enemy.Parameters.GetEquippedItemsByType().FirstOrDefault(item => item.Type == "Weapon");
                 if (weapon == null || weapon.Name != "WEAPON_CHNY21_JIAN" || weapon.SubType != "ChineseSwords") throw new Exception("Jian runtime equipment/subtype incorrect: " + weapon?.Name + "/" + weapon?.SubType);
                 actor = enemy; attached = true;
-                fight.IEEGPNLEKHH().AddEventListener((int)PerkEvent.KNKIIEPDCPN.EVENT_MOD_EXPIRES, value => {
+                fight.GetPerksStage().AddEventListener((int)PerkEvent.PerkEventType.EVENT_MOD_EXPIRES, value => {
                     if ((value?.Data as string) == FlagName) flagExpiries++;
                     if ((value?.Data as string) == "de128:behaviors/mind_throw:pending") mindExpiries++;
                 });
-                player.OCPMJKIEPIG().AddEventListener(0, value => {
+                player.GetAnimationModule().AddEventListener(0, value => {
                     if ((value as InfoAnimation)?.Name == "de128:moves/mind_throw_hit") mindHit = true;
                 });
-                var animation = actor.OCPMJKIEPIG();
+                var animation = actor.GetAnimationModule();
                 animation.AddEventListener(0, OnAnimation);
                 animation.AddEventListener(1, OnAnimationEnd);
                 animation.AddEventListener(2, OnInterval);
@@ -185,12 +185,12 @@ public static class ValidateDE128CombatNative
                 var keys = new KeyData(move.CollectKeyConditions().Single().RequiredKeys);
                 // KeyData at the controller boundary uses screen directions;
                 // the move's Forward condition is relative to the fighter.
-                keys.Reverse(actor.KFCNPADAMHA());
+                keys.Reverse(actor.GetFacingSign());
                 actor.PlayAnimation(keys);
                 requested = true; requestedAt = frame;
                 Debug.Log("[DE128Native] Submitted native double-tap/Forward input at " + frame);
             }
-            if (requested && !selected && frame > requestedAt + 30) throw new Exception("Native input did not select ChineseSwords; current=" + actor.OCPMJKIEPIG().NNMAFFCCMHC()?.Name);
+            if (requested && !selected && frame > requestedAt + 30) throw new Exception("Native input did not select ChineseSwords; current=" + actor.GetAnimationModule().GetCurrentInfo()?.Name);
             if (selected && !released)
             {
                 // End the synthetic tap/hold sequence; this enemy has no physical
@@ -201,7 +201,7 @@ public static class ValidateDE128CombatNative
             {
                 if (!finished || attacks != 4 || swishes != 4 || !AttackFrames.SetEquals(new[] { 11, 19, 27, 32 }) || !SoundFrames.SetEquals(new[] { 8, 17, 28, 33 }))
                     throw new Exception("Incomplete animation: ended=" + finished + " attacks=" + attacks + " swishes=" + swishes);
-                if (actor.CLDMEJKGLBA() == null || actor.MJNPBMOAFML() == null || !actor.MJNPBMOAFML().activeInHierarchy) throw new Exception("Fighter lost active native rig.");
+                if (actor.GetBodyObject() == null || actor.GetGameObject() == null || !actor.GetGameObject().activeInHierarchy) throw new Exception("Fighter lost active native rig.");
                 CheckLiveSphere(frame, player);
             }
         }
@@ -216,17 +216,17 @@ public static class ValidateDE128CombatNative
             // so the projectile can finish its damaging startup before contact.
             actor.ShiftModelPosition(new Vector3f(400, 0, 0), true);
             target.ShiftModelPosition(new Vector3f(-200, 0, 0), true);
-            actor.JJDNDOLCMMN = 1;
+            actor.MagicCharges = 1;
             actor.AddEventListener(6, OnSphereCreated);
             var cast = AnimationData.Animations.Single(value => value.Name == SpellMove);
             var keys = new KeyData(cast.CollectKeyConditions().Single().RequiredKeys);
-            keys.Reverse(actor.KFCNPADAMHA());
+            keys.Reverse(actor.GetFacingSign());
             spellRequested = true; spellFrame = frame; actor.PlayAnimation(keys);
             Debug.Log("[DE128Native] Requested " + Spell + " through native Magic input at " + frame);
         }
-        if (!spellSelected && frame > spellFrame + 30) throw new Exception(Spell + " native input selection failed; current=" + actor.OCPMJKIEPIG().NNMAFFCCMHC()?.Name);
+        if (!spellSelected && frame > spellFrame + 30) throw new Exception(Spell + " native input selection failed; current=" + actor.GetAnimationModule().GetCurrentInfo()?.Name);
         if (spellSelected && !spellReleased) { actor.PlayAnimation(new KeyData()); spellReleased = true; }
-        if (spellSelected && actor.JJDNDOLCMMN == 0) chargeConsumed = true;
+        if (spellSelected && actor.MagicCharges == 0) chargeConsumed = true;
         // Leave the initial crouched fists stance through normal movement input.
         if (Spell == "MindThrowNormal" && !WallMiss && !targetStepped && frame >= spellFrame + 1) {
             target.PressAnyKey(FightCID.QuadrantForward); targetStepped = true;
@@ -234,9 +234,9 @@ public static class ValidateDE128CombatNative
         if (targetStepped && !targetReleased && frame >= spellFrame + 10) {
             target.ReleaseAnyKey(FightCID.QuadrantForward); targetReleased = true;
         }
-        if (sphere != null && sphere.OCPMJKIEPIG()?.NNMAFFCCMHC()?.Name == SpellMiddle) sphereMiddle = true;
+        if (sphere != null && sphere.GetAnimationModule()?.GetCurrentInfo()?.Name == SpellMiddle) sphereMiddle = true;
         if (frame > spellFrame + 360 && !sphereDeleted)
-            throw new Exception(Spell + " cleanup failed; count=" + sphereCount + " child=" + sphere?.OCPMJKIEPIG()?.NNMAFFCCMHC()?.Name);
+            throw new Exception(Spell + " cleanup failed; count=" + sphereCount + " child=" + sphere?.GetAnimationModule()?.GetCurrentInfo()?.Name);
         if (sphereDeleted && frame > spellFrame + 240)
         {
             if (sphereCount != 1 || (!sphereMiddle && Spell != "MindThrowNormal") || !chargeConsumed || actor.GetWeaponModels().Contains(sphere as WeaponModel))
@@ -273,7 +273,7 @@ public static class ValidateDE128CombatNative
         var child = value as Model;
         if (child?.get_Name() != Spell) return;
         sphere = child; sphereCount++;
-        child.OCPMJKIEPIG().AddEventListener(0, animation => {
+        child.GetAnimationModule().AddEventListener(0, animation => {
             var name = (animation as InfoAnimation)?.Name;
             if (name == "de128:moves/mind_throw_wall") mindWall = true;
             if (name == SpellMiddle) sphereMiddle = true;
@@ -294,7 +294,7 @@ public static class ValidateDE128CombatNative
         var operations=typeof(Fight).GetNestedType("EclipseFighterOperations",BindingFlags.NonPublic);
         IModFighterControls Controls(Model model)=>(IModFighterControls)Activator.CreateInstance(operations,new object[]{fight,model,null,null,null,null,false});
         var player=(Model)typeof(Fight).GetField("_playerModel",Hidden).GetValue(fight);
-        var opponent=(Model)typeof(Fight).GetField("CKNCPOABFBO",Hidden).GetValue(fight);
+        var opponent=(Model)typeof(Fight).GetField("_enemyModel",Hidden).GetValue(fight);
         var owner=new object();
         if(!Controls(player).TrySetControlBlocked(owner,"kick",true,out var error)||!restrictions.IsBlocked(FightCID.Kick))throw new Exception("Native player control bridge refused: "+error);
         if(Controls(opponent).TrySetControlBlocked(owner,"kick",false,out _)||!restrictions.IsBlocked(FightCID.Kick))throw new Exception("Opponent changed player control claims.");
@@ -334,7 +334,7 @@ public static class ValidateDE128CombatNative
                         default: buttons.ShowRaidCharge(value);break;
                     }
                 }
-                void Input(int kind)=>emit.Invoke(controller,new object[]{kind,new CBBEIGACPPD{Index=0,KMOPCKPBHIA=pair.Item2}});
+                void Input(int kind)=>emit.Invoke(controller,new object[]{kind,new FightControlEventData{Index=0,Control=pair.Item2}});
                 controller.SetButtonRuleEnabled(pair.Item2,true);Show(true);
                 int beforePress=presses,beforeRelease=releases;
                 Input(0);
@@ -384,8 +384,8 @@ public static class ValidateDE128CombatNative
         {
             var definition=catalog.FightRules.Single(rule=>rule.Id.ToString()=="fixture.de128-combat:rules/sensei_ronin_"+suffix);
             var node=(System.Xml.XmlElement)build.Invoke(adapter,new object[]{new System.Xml.XmlDocument(),definition});
-            var native=RuleParser.LBDEIDNPJMO(node);
-            if(native.PGOPBNMFAAG!=Rule.DIMPPDKCBLE.MODE_ECLIPSE)throw new Exception("Lua Eclipse rule parsed in the wrong native mode.");
+            var native=RuleParser.ParseRule(node);
+            if(native.ModeFilter!=Rule.RuleModeFilter.MODE_ECLIPSE)throw new Exception("Lua Eclipse rule parsed in the wrong native mode.");
         }
         Debug.Log("[DE128Native] PASS Sensei Ronin attribute rules retain Eclipse-only native mode.");
     }
@@ -400,31 +400,31 @@ public static class ValidateDE128CombatNative
         var expected = new ActionCreateModel(doc.SelectSingleNode("//Move[@Name='Sphere1Player']/Actions/CreatePlayer"));
         if (spawn.ModelName != expected.ModelName || !spawn.NeedStart(2) || spawn.StartAnimation != expected.StartAnimation)
             throw new Exception("Projectile native name/frame/start differ from archive.");
-        var itemsField = typeof(ActionCreateModel).GetField("IOHGFGNNCFA", Hidden);
+        var itemsField = typeof(ActionCreateModel).GetField("_CopyItems", Hidden);
         var actualItems = (List<CopyItemInfo>)itemsField.GetValue(spawn);
         var expectedItems = (List<CopyItemInfo>)itemsField.GetValue(expected);
         if (actualItems.Count != 2 || actualItems.Count != expectedItems.Count) throw new Exception("Projectile item count differs.");
         for (int i = 0; i < actualItems.Count; i++)
         {
             var a = actualItems[i]; var b = expectedItems[i];
-            if (a.Type != b.Type || a.Name != b.Name || a.BLIKNEDFOFG != b.BLIKNEDFOFG || a.PCOBPICANEP != b.PCOBPICANEP)
+            if (a.Type != b.Type || a.Name != b.Name || a.CopyParentType != b.CopyParentType || a.CopyParentSubtype != b.CopyParentSubtype)
                 throw new Exception("Projectile native equipment inheritance differs.");
         }
         var preview = actions.OfType<ActionCreateModel>().Last();
         if (preview.StartAnimation != "fixture.de128-combat:moves/projectile_child" || !preview.NeedStart(3))
             throw new Exception("Owned projectile start_move did not reach native parser.");
         var child = AnimationData.Animations.Single(value => value.Name == preview.StartAnimation);
-        var state = new ModelConditions { ModelName = "FixtureSphere", JJDNDOLCMMN = 1 };
+        var state = new ModelConditions { ModelName = "FixtureSphere", MagicCharges = 1 };
         var nameCondition = child.SelectionConditions.OfType<ConditionName>().Single();
         var chargeCondition = child.SelectionConditions.OfType<ConditionBullets>().Single();
         if (!nameCondition.IsEqual(state) || !chargeCondition.IsEqual(state)) throw new Exception("Native spell conditions rejected matching state.");
-        state.ModelName = "Other"; state.JJDNDOLCMMN = 0;
+        state.ModelName = "Other"; state.MagicCharges = 0;
         if (nameCondition.IsEqual(state) || chargeCondition.IsEqual(state)) throw new Exception("Native spell conditions accepted invalid state.");
-        var velocity = (Vector3f)typeof(InfoAnimation).GetField("KACPFNLDNND", Hidden).GetValue(child);
-        var acceleration = (Vector3f)typeof(InfoAnimation).GetField("KNBDGOJAIAF", Hidden).GetValue(child);
+        var velocity = (Vector3f)typeof(InfoAnimation).GetField("velocity", Hidden).GetValue(child);
+        var acceleration = (Vector3f)typeof(InfoAnimation).GetField("acceleration", Hidden).GetValue(child);
         if (velocity.GetX() != 30 || acceleration.GetY() != -2 ||
-            !(bool)typeof(InfoAnimation).GetField("AEDIIEEJKHE", Hidden).GetValue(child) ||
-            !(bool)typeof(InfoAnimation).GetField("JCIKOMAMJDI", Hidden).GetValue(child))
+            !(bool)typeof(InfoAnimation).GetField("saveVelocity", Hidden).GetValue(child) ||
+            !(bool)typeof(InfoAnimation).GetField("noMagicRecharge", Hidden).GetValue(child))
             throw new Exception("Native projectile velocity/acceleration/recharge flags differ.");
         Debug.Log("[DE128Native] Authored actor/charge predicates and velocity, acceleration, preservation and no-recharge flags passed actual move parsing.");
         var bullets = actions.OfType<ActionAddBullets>().Single();
@@ -432,7 +432,7 @@ public static class ValidateDE128CombatNative
         if (bullets.Value != expectedBullets.Value || bullets.Value != -1 || !bullets.NeedStart(7))
             throw new Exception("Projectile charge action differs.");
         var delete = actions.OfType<ActionDelete>().Single();
-        if (!delete.NeedStart(EventAnimation.EECEJKADLCK.EVENT_STRIKE)) throw new Exception("Projectile delete event differs.");
+        if (!delete.NeedStart(EventAnimation.EventAnimationType.EVENT_STRIKE)) throw new Exception("Projectile delete event differs.");
         Debug.Log("[DE128Native] Lua projectile actions match archived native equipment inheritance, owned start move, charge and deletion scheduling. Parsing only; no live projectile claim.");
     }
 
@@ -449,9 +449,9 @@ public static class ValidateDE128CombatNative
             var node = (System.Xml.XmlElement)typeof(LegacyContentAdapter).GetMethod("BuildWarriorNode", Hidden).Invoke(adapter, new object[] { document, warrior });
             foreach (System.Xml.XmlElement perk in node.SelectNodes("Perks/Perk"))
             {
-                var baseline = GameUtils.FDEJIIDIPBI.ABAGJKMKCBA(perk.GetAttribute("Name"));
+                var baseline = GameUtils.PerkItemList.FindBasePerk(perk.GetAttribute("Name"));
                 if (baseline == null) throw new Exception("Missing native perk " + perk.GetAttribute("Name"));
-                var originals=new[]{"Aspect","ChanceFactor","Chance","Frames"}.ToDictionary(field=>field,field=>baseline.EPBADFHIJAH().GetValue(field));
+                var originals=new[]{"Aspect","ChanceFactor","Chance","Frames"}.ToDictionary(field=>field,field=>baseline.GetPerkSet().GetValue(field));
                 var native = baseline.Clone(perk["Set"], null);
                 var secondSettings = document.CreateElement("Set");
                 secondSettings.SetAttribute("Aspect", "0");
@@ -463,8 +463,8 @@ public static class ValidateDE128CombatNative
                 {
                     string original=originals[field];
                     string expected=perk["Set"].HasAttribute(field)?perk["Set"].GetAttribute(field):original;
-                    if(baseline.EPBADFHIJAH().GetValue(field)!=original || native.EPBADFHIJAH().GetValue(field)!=expected || inherited.EPBADFHIJAH().GetValue(field)!=original ||
-                        second.EPBADFHIJAH().GetValue(field)!=(secondSettings.HasAttribute(field)?"0":original))
+                    if(baseline.GetPerkSet().GetValue(field)!=original || native.GetPerkSet().GetValue(field)!=expected || inherited.GetPerkSet().GetValue(field)!=original ||
+                        second.GetPerkSet().GetValue(field)!=(secondSettings.HasAttribute(field)?"0":original))
                         throw new Exception("Native warrior clone lost settings/defaults or leaked between instances: "+warrior.Id+" "+field);
                 }
                 checkedPerks++;
@@ -498,10 +498,10 @@ public static class ValidateDE128CombatNative
             // A native quest lock must also survive cancellation of our lease.
             var questScreen=ModActScreenAccess.Open(lines,done=>{});
             if(questScreen==null)throw new Exception("Cancelled screen remained busy");
-            Module.GetInstance().DIDFMBMPEAF(true,false);
+            Module.GetInstance().SetQuestInputLock(true,false);
             questScreen.Dispose();
             if(!Nekki.SF2.GUI.LockScreen.get_Instance().gameObject.activeInHierarchy)throw new Exception("Presentation released native quest lock");
-            Module.GetInstance().DIDFMBMPEAF(false,false);
+            Module.GetInstance().SetQuestInputLock(false,false);
             var bus=(ModStoryEvents)typeof(ModRuntime).GetField("StoryEvents",BindingFlags.Static|BindingFlags.NonPublic).GetValue(null);
             actStarted=EditorApplication.timeSinceStartup;actPhase=1;
             actScene=UnityEngine.SceneManagement.SceneManager.GetActiveScene();actGeneration=bus.ProfileGeneration;
@@ -545,7 +545,7 @@ public static class ValidateDE128CombatNative
         var definition = catalog.Battles.Single(value => value.Id == id);
         var zone = catalog.Zones.Single(value => value.Id == definition.Zone);
         var nativeId = new FightIDS(zone.LegacyName + "|" + definition.LegacyName + "|");
-        var roster = ListSF.CCDKHLAMKKO();
+        var roster = ListSF.GetRoster();
         var record = roster.GetSavedBattles().SingleOrDefault(value => value.GetBattleId().Equals(nativeId));
         if (record == null)
         {
@@ -553,7 +553,7 @@ public static class ValidateDE128CombatNative
             // lock, not native quest/session timing or initial story revelation.
             if (ModBattleAccess.SetLocked(id, false)) throw new Exception("Missing map entry was fabricated by a lock query.");
             roster.AddBattle(nativeId, true, true, true, false, 7);
-            ListSF.MKHAAGMJOPG(nativeId).IsMapVisible = true;
+            ListSF.GetBattleById(nativeId).IsMapVisible = true;
             record = roster.GetSavedBattles().Single(value => value.GetBattleId().Equals(nativeId));
         }
         var nodeField = typeof(RosterBattle).GetField("_node", Hidden);
@@ -578,7 +578,7 @@ public static class ValidateDE128CombatNative
         expected.DocumentElement.SetAttribute("Locked", "0");
         if (node.OuterXml != expected.DocumentElement.OuterXml) throw new Exception("Lock update changed unrelated battle save fields.");
         var map = Nekki.SF2.GUI.Scene<Nekki.SF2.GUI.Map.MapScene>.get_Current();
-        var nativeBattle = ListSF.MKHAAGMJOPG(nativeId);
+        var nativeBattle = ListSF.GetBattleById(nativeId);
         Func<Nekki.SF2.GUI.Map.BattleButton> currentButton = () => map.GetComponentsInChildren<Nekki.SF2.GUI.Map.MapPanel>(true)
             .SelectMany(panel => panel.GetZones()).Select(item => item.GetButtonByBattle(nativeBattle)).FirstOrDefault(value => value != null);
         var button = currentButton();
@@ -602,11 +602,11 @@ public static class ValidateDE128CombatNative
         var definition = catalog.Battles.Single(value => value.Id == id);
         var zone = catalog.Zones.Single(value => value.Id == definition.Zone);
         var nativeId = new FightIDS(zone.LegacyName + "|" + definition.LegacyName + "|");
-        var roster = ListSF.CCDKHLAMKKO();
+        var roster = ListSF.GetRoster();
         var native = ListSF.GetInstance().FindBattleForModding(zone.LegacyName, definition.LegacyName);
         var map = Nekki.SF2.GUI.Scene<Nekki.SF2.GUI.Map.MapScene>.get_Current();
         // Repeatable isolated fixture: remove this test entry, never an owner save.
-        roster.HEHJKDPAPLA(nativeId);
+        roster.RemoveBattle(nativeId);
         native.IsMapVisible = false;
         map.ReloadZones();
         int before = roster.GetSavedBattles().Count;
@@ -627,23 +627,23 @@ public static class ValidateDE128CombatNative
             .SelectMany(panel => panel.GetZones()).Select(item => item.GetButtonByBattle(native)).FirstOrDefault(value => value != null);
         if (currentButton() == null || !currentButton().Locked || !currentButton().gameObject.activeSelf)
             throw new Exception("Fresh zone/battle not rendered after reveal.");
-        record.FHCHCHPPMEI(7);
+        record.SetReplayCount(7);
         var node = (System.Xml.XmlNode)typeof(RosterBattle).GetField("_node", Hidden).GetValue(record);
         string saved = node.OuterXml;
         if (!ModBattleAccess.Reveal(id, false) || node.OuterXml != saved || roster.GetSavedBattles().Count != before + 1)
             throw new Exception("Repeated reveal reset an existing lock/replay count or duplicated it.");
         if (!ModBattleAccess.Focus(id)) throw new Exception("Visible locked entry could not be focused.");
-        var focus = roster.KNJNHKDCINB();
-        if (focus.PELHCAEAOFE() != zone.LegacyName || focus.CPHDPCAECJN() != definition.LegacyName)
+        var focus = roster.GetMapFocus();
+        if (focus.GetZone() != zone.LegacyName || focus.GetBattle() != definition.LegacyName)
             throw new Exception("Focus did not update native profile selection.");
         if (!map.GetComponentsInChildren<Nekki.SF2.GUI.Map.MapPanel>(true).Any(panel => panel.GetCurrentZone()?.get_LastBattle() == native))
             throw new Exception("Focus did not select the live map entry.");
-        record.HCEOCBOFIGC(true);
+        record.SetHidden(true);
         map.ReloadZones();
         saved = node.OuterXml;
         if (ModBattleAccess.Focus(id) || !ModBattleAccess.Reveal(id, false) || node.OuterXml != saved)
             throw new Exception("Focus/reveal bypassed existing hidden state.");
-        record.HCEOCBOFIGC(false);
+        record.SetHidden(false);
         map.ReloadZones();
         if (!ModBattleAccess.SetLocked(id, false) || !ModBattleAccess.Reveal(id, true) || record.IsLocked())
             throw new Exception("Initial lock value was reapplied after progression.");
@@ -655,7 +655,7 @@ public static class ValidateDE128CombatNative
 
     static void CheckLockedEclipsePair()
     {
-        var roster = ListSF.CCDKHLAMKKO();
+        var roster = ListSF.GetRoster();
         var map = Nekki.SF2.GUI.Scene<Nekki.SF2.GUI.Map.MapScene>.get_Current();
         const string zone = "fixture.de128-combat:zones/trial";
         const string normalName = "fixture.de128-combat:battles/pair_normal";
@@ -664,8 +664,8 @@ public static class ValidateDE128CombatNative
         var eclipse = ListSF.GetInstance().FindBattleForModding(zone, eclipseName);
         var normalId = DefinitionId.Parse(normalName);
         // Reset only this isolated fixture pair, preserving the user's editor/save.
-        roster.HEHJKDPAPLA(new FightIDS(zone + "|" + normalName + "|"));
-        roster.HEHJKDPAPLA(new FightIDS(zone + "|" + eclipseName + "|"));
+        roster.RemoveBattle(new FightIDS(zone + "|" + normalName + "|"));
+        roster.RemoveBattle(new FightIDS(zone + "|" + eclipseName + "|"));
         normal.IsMapVisible = false; eclipse.IsMapVisible = false;
         map.ReloadZones();
         if (!ModBattleAccess.Reveal(normalId, true) || !ModBattleAccess.Focus(normalId))
@@ -674,22 +674,22 @@ public static class ValidateDE128CombatNative
         var actionDocument = new System.Xml.XmlDocument();
         actionDocument.LoadXml("<UpdateEclipseBattles />");
         action.Parse(actionDocument.DocumentElement);
-        void Update(bool mode) { roster.SetEclipseMode(mode); action.DEJMHFMLKIC(ListSF.GetInstance().BNMLDPNCMLB()); }
-        bool IsHidden(Battle value) => value.NNPNEABKHPP()?.KAPIELMDIIK() ?? true;
+        void Update(bool mode) { roster.SetEclipseMode(mode); action.Execute(ListSF.GetInstance().GetQuestParameters()); }
+        bool IsHidden(Battle value) => value.GetRosterBattle()?.IsHidden() ?? true;
         foreach (bool mode in new[] { false, true, false, true })
         {
             Update(mode);
-            if (eclipse.NNPNEABKHPP() != null || IsHidden(normal) || !normal.NNPNEABKHPP().IsLocked())
+            if (eclipse.GetRosterBattle() != null || IsHidden(normal) || !normal.GetRosterBattle().IsLocked())
                 throw new Exception("Mode switch bypassed locked native pair.");
         }
         if (!ModBattleAccess.SetLocked(normalId, false)) throw new Exception("Native pair unlock failed.");
         Update(true);
-        if (eclipse.NNPNEABKHPP() == null || IsHidden(eclipse) || !IsHidden(normal))
+        if (eclipse.GetRosterBattle() == null || IsHidden(eclipse) || !IsHidden(normal))
             throw new Exception("Unlock did not introduce Eclipse counterpart.");
-        var eclipseRecord = eclipse.NNPNEABKHPP();
-        eclipseRecord.FHCHCHPPMEI(7);
+        var eclipseRecord = eclipse.GetRosterBattle();
+        eclipseRecord.SetReplayCount(7);
         map.SelectBattle(eclipse, 0f);
-        normal.NNPNEABKHPP().SetLocked(true);
+        normal.GetRosterBattle().SetLocked(true);
         Update(true);
         if (IsHidden(normal) || !IsHidden(eclipse) || eclipseRecord.IsLocked() || ((System.Xml.XmlNode)typeof(RosterBattle).GetField("_node", Hidden).GetValue(eclipseRecord)).Attributes["ReplayCount"].Value != "7")
             throw new Exception("Relock failed visibility or reset counterpart history.");
@@ -708,14 +708,14 @@ public static class ValidateDE128CombatNative
 
     static void CheckEclipseModeSwitch()
     {
-        var roster=ListSF.CCDKHLAMKKO();
+        var roster=ListSF.GetRoster();
         var map=Nekki.SF2.GUI.Scene<Nekki.SF2.GUI.Map.MapScene>.get_Current();
-        var buttons=MapButtonController.ELEBLBJKDBI();
+        var buttons=MapButtonController.GetInstance();
         // Controlled native initial state in this isolated acceptance profile only.
         roster.SetEclipseMode(true);
-        buttons.DMCBGLJHBPA("EclipseModeOff");buttons.DMCBGLJHBPA("EclipseModeOn");
+        buttons.RemoveButton("EclipseModeOff");buttons.RemoveButton("EclipseModeOn");
         if(ModProfileAccess.SetEclipseMode(false)||!roster.IsEclipseMode())throw new Exception("Missing switch bypassed native availability.");
-        buttons.GKIOOABOBFL(new MapButtonInfo("EclipseModeOff","eclipse","",new Vector2(-876,432),anchorMinX:1,anchorMaxX:1));
+        buttons.AddButton(new MapButtonInfo("EclipseModeOff","eclipse","",new Vector2(-876,432),anchorMinX:1,anchorMaxX:1));
         Eclipse.UI.Modding.ModUiGameBridge.SetNativeBlocked(true);
         try { if(ModProfileAccess.SetEclipseMode(false)||!roster.IsEclipseMode())throw new Exception("Blocked switch changed mode."); }
         finally { Eclipse.UI.Modding.ModUiGameBridge.SetNativeBlocked(false); }
@@ -723,7 +723,7 @@ public static class ValidateDE128CombatNative
         var active=map.GetComponentsInChildren<Nekki.SF2.GUI.Map.MapButton>().Where(button=>button.isActiveAndEnabled).ToArray();
         if(!active.Any(button=>button.get_MapButtonInfo().Name=="EclipseModeOn") || active.Any(button=>button.get_MapButtonInfo().Name=="EclipseModeOff"))
             throw new Exception("Native mode quest did not replace switch artwork/action.");
-        if(roster.EPEDEDLCAJF()!=Color.white)throw new Exception("Native mode quest did not reset map tint.");
+        if(roster.GetMapMaskColor()!=Color.white)throw new Exception("Native mode quest did not reset map tint.");
         if(!ModProfileAccess.SetEclipseMode(false))throw new Exception("Repeated mode request failed.");
         Debug.Log("[DE128Native] PASS Eclipse mode request: missing/blocked switch refused, actual map-button quest changed mode, replacement button and white map tint, idempotent repeat. Isolated profile only.");
     }
@@ -732,8 +732,8 @@ public static class ValidateDE128CombatNative
     {
         var id = CoreContentImporter.FightId("ZONE_1", "Tournament", "3");
         string nativeId = ModRuntime.Scripts.Content.RuntimeFightId(id);
-        var roster = ListSF.CCDKHLAMKKO();
-        var records = roster.NIDBIFOJMAP();
+        var roster = ListSF.GetRoster();
+        var records = roster.GetSavedFights();
         var before = records.ToArray();
         var profileField = typeof(ModRuntime).GetField("_profileRoster", BindingFlags.Static | BindingFlags.NonPublic);
         var bound = profileField.GetValue(null);
@@ -751,7 +751,7 @@ public static class ValidateDE128CombatNative
             var snapshot = ModProfileAccess.Fight(id);
             if (!snapshot.Present || snapshot.Wins != 7 || snapshot.Losses != 3 || document.OuterXml != saved || records.Count != 1)
                 throw new Exception("Fight snapshot differs from saved native counters or mutates save data.");
-            record.OBFNFKPHJIN(8);
+            record.SetWinCount(8);
             if (ModProfileAccess.Fight(id).Wins != 8 || snapshot.Wins != 7)
                 throw new Exception("Fight snapshot is cached or mutable.");
             bool rejected = false;
@@ -789,12 +789,12 @@ public static class ValidateDE128CombatNative
                 {
                     var result = EvaluateReward(actual, exponent);
                     var baseline = EvaluateReward(expected, exponent);
-                    if (result.PMIHPJFAJIO.exp != baseline.PMIHPJFAJIO.exp || result.KMGLLBMIDHJ() != baseline.KMGLLBMIDHJ() ||
-                        result.BNILCODHHKC() != baseline.BNILCODHHKC() ||
-                        result.AIOMDIAFHGB.ECOOCLMNFJM.PJBCIEMHPNN != baseline.AIOMDIAFHGB.ECOOCLMNFJM.PJBCIEMHPNN)
+                    if (result.Prize.exp != baseline.Prize.exp || result.GetMoneyReward() != baseline.GetMoneyReward() ||
+                        result.GetGemsReward() != baseline.GetGemsReward() ||
+                        result.PlayerStatistics.Prize.BaseBonusValue != baseline.PlayerStatistics.Prize.BaseBonusValue)
                         throw new Exception("Sensei native result differs from archive: " + id);
-                    if ((uint)result.PMIHPJFAJIO.exp != definition.Experience || result.BNILCODHHKC() != definition.Gems ||
-                        result.AIOMDIAFHGB.ECOOCLMNFJM.PJBCIEMHPNN != (long)(definition.PrizeBase.Value * Mathf.Pow(10, exponent)))
+                    if ((uint)result.Prize.exp != definition.Experience || result.GetGemsReward() != definition.Gems ||
+                        result.PlayerStatistics.Prize.BaseBonusValue != (long)(definition.PrizeBase.Value * Mathf.Pow(10, exponent)))
                         throw new Exception("Sensei native result lost configured scalar: " + id);
                 }
                 wins++; count++;
@@ -809,8 +809,8 @@ public static class ValidateDE128CombatNative
         // Detached native results exercise the actual bonus calculation without
         // awarding currency/experience to any profile or starting story fights.
         var result = new FightResult();
-        var statistics = new ComboStatistic { JDKFHFOJKPI = 2, MOLDOOIJELI = 1, KKJHBKBMPGN = 3, OGMOILIMCOM = 1 };
-        result.BDLLAEPPAKL(new Reward(node, 0, exponent), -1, statistics, new ComboStatistic(), false);
+        var statistics = new ComboStatistic { PerfectCount = 2, FirstStrikeCount = 1, MaxCombo = 3, ShockCount = 1 };
+        result.ApplyReward(new Reward(node, 0, exponent), -1, statistics, new ComboStatistic(), false);
         return result;
     }
 
@@ -832,13 +832,13 @@ public static class ValidateDE128CombatNative
             if (!(move.SelectionConditions.Last() is ConditionModExists condition) || condition.get_Name() != "Stun" || !condition.IsNot)
                 throw new Exception("DE not-Stun condition missing from " + name);
             var parameters = new ModelConditions();
-            typeof(ModelConditions).GetField("LPGJIICFIKF").SetValue(parameters,new System.Collections.Generic.List<PerksStage.ActionPerk>());
+            typeof(ModelConditions).GetField("SelfActionPerks").SetValue(parameters,new System.Collections.Generic.List<PerksStage.ActionPerk>());
             if (!condition.IsEqual(parameters)) throw new Exception("DE not-Stun condition rejected an unstunned fighter.");
             var action = new PerkAction();
             typeof(PerkAction).GetMethod("set_Name",Hidden).Invoke(action,new object[] { "Stun" });
             var active = new PerksStage.ActionPerk();
-            typeof(PerksStage.ActionPerk).GetField("AMKJNPOCODK").SetValue(active,action);
-            ((System.Collections.Generic.List<PerksStage.ActionPerk>)typeof(ModelConditions).GetField("LPGJIICFIKF").GetValue(parameters)).Add(active);
+            typeof(PerksStage.ActionPerk).GetField("Action").SetValue(active,action);
+            ((System.Collections.Generic.List<PerksStage.ActionPerk>)typeof(ModelConditions).GetField("SelfActionPerks").GetValue(parameters)).Add(active);
             if (condition.IsEqual(parameters)) throw new Exception("DE not-Stun condition accepted a stunned fighter.");
         }
         CheckNativePatchLifecycle();
@@ -852,7 +852,7 @@ public static class ValidateDE128CombatNative
         foreach (bool initialized in new[] { false,true })
         {
             var move = new InfoAnimation { Name = "FixturePatchLifecycle" };
-            var interval = new IntervalAnimation(IntervalAnimation.NGAJJDIEDGF.INTERVAL_NONE);
+            var interval = new IntervalAnimation(IntervalAnimation.IntervalType.INTERVAL_NONE);
             interval.Parse(source.SelectSingleNode("//Moves/Move[@Name='RangedHeavyPlayer']/Intervals/Interval[@Name='Uninterrupt']").CloneNode(true));
             var attack = new IntervalAttack();
             attack.Parse(source.SelectSingleNode("//Moves/Move[@Name='ChakramFly']/Intervals/Interval[@Type='Attack']").CloneNode(true));
@@ -936,7 +936,7 @@ public static class ValidateDE128CombatNative
             if (granted.get_Name() != expectedPerk.Attributes["Name"].Value ||
                 granted.Pairs.Single(pair => pair.Key == "Aspect").Value != expectedPerk["Set"].Attributes["Aspect"].Value)
                 throw new Exception("Native enchantment identity/aspect mismatch: " + weapon.Id);
-            if ((string)typeof(ItemInfo).GetField("MMHIKEIDDNB").GetValue(item) != row.GetAttribute("PackLabel"))
+            if ((string)typeof(ItemInfo).GetField("GroupId").GetValue(item) != row.GetAttribute("PackLabel"))
                 throw new Exception("Native quest notification group mismatch: " + weapon.Id);
             var assets = new CoreAssetProvider();
             string modelText; UnityEngine.Sprite icon;
@@ -954,12 +954,12 @@ public static class ValidateDE128CombatNative
             if (actual != expected || beforePresent != afterPresent) throw new Exception("Native archived damage semantics differ: " + weapon.Id);
             if (row.GetAttribute("Name") == "WEAPON_MOON_FANS")
             {
-                var upgrades = (System.Collections.Generic.List<UpgradeData>)typeof(ItemInfo).GetMethod("DNFDAGFAANJ")
+                var upgrades = (System.Collections.Generic.List<UpgradeData>)typeof(ItemInfo).GetMethod("GetUpgrades")
                     .Invoke(item, new object[] { true, int.MaxValue });
                 if (upgrades.Count == 0) throw new Exception("Moon Fans lost native upgrades.");
                 var copy = item.Clone(); var archiveCopy = archived.Clone();
-                typeof(ItemInfo).GetMethod("HPCGCMMGAAP").Invoke(copy, new object[] { upgrades[0] });
-                typeof(ItemInfo).GetMethod("HPCGCMMGAAP").Invoke(archiveCopy, new object[] { upgrades[0] });
+                typeof(ItemInfo).GetMethod("ApplyUpgrade").Invoke(copy, new object[] { upgrades[0] });
+                typeof(ItemInfo).GetMethod("ApplyUpgrade").Invoke(archiveCopy, new object[] { upgrades[0] });
                 int upgraded = 0, archivedUpgrade = 0;
                 if (!((Attributes)attributes.GetValue(copy)).Get("WeaponDamage", ref upgraded, false) ||
                     !((Attributes)attributes.GetValue(archiveCopy)).Get("WeaponDamage", ref archivedUpgrade, false) ||
@@ -987,15 +987,15 @@ public static class ValidateDE128CombatNative
     static void OnAnimationEnd(object value) { if ((value as InfoAnimation)?.Name == Move) finished = true; }
     static void OnInterval(object value)
     {
-        if (actor.OCPMJKIEPIG().NNMAFFCCMHC()?.Name == "de128:moves/mind_throw_player2" && value is IntervalAttack final && final.Start == 48) mindFinalAttack = true;
-        if (actor.OCPMJKIEPIG().NNMAFFCCMHC()?.Name != Move || !(value is IntervalAttack attack)) return;
-        var edges = (System.Collections.ICollection)typeof(ModelAnimation).GetField("ECNLLKIJIGP", Hidden).GetValue(actor.OCPMJKIEPIG());
-        if (edges.Count != attack.IKPJJAEIOCG().Count) failure = "Attack edge binding failed at sample " + attack.Start + ": " + edges.Count + "/" + attack.IKPJJAEIOCG().Count;
+        if (actor.GetAnimationModule().GetCurrentInfo()?.Name == "de128:moves/mind_throw_player2" && value is IntervalAttack final && final.Start == 48) mindFinalAttack = true;
+        if (actor.GetAnimationModule().GetCurrentInfo()?.Name != Move || !(value is IntervalAttack attack)) return;
+        var edges = (System.Collections.ICollection)typeof(ModelAnimation).GetField("attackingEdges", Hidden).GetValue(actor.GetAnimationModule());
+        if (edges.Count != attack.GetAttackingParts().Count) failure = "Attack edge binding failed at sample " + attack.Start + ": " + edges.Count + "/" + attack.GetAttackingParts().Count;
         attacks++; AttackFrames.Add(attack.Start);
     }
     static void OnActions(object value)
     {
-        if (actor.OCPMJKIEPIG().NNMAFFCCMHC()?.Name != Move || !(value is List<ActionAnimation> actions)) return;
+        if (actor.GetAnimationModule().GetCurrentInfo()?.Name != Move || !(value is List<ActionAnimation> actions)) return;
         foreach (var action in actions)
             if (action is ActionRandomSound)
                 foreach (int frame in new[] { 8, 17, 28, 33 }) if (action.NeedStart(frame)) { swishes++; SoundFrames.Add(frame); }
@@ -1012,9 +1012,9 @@ public static class ValidateDE128CombatNative
         {
             try
             {
-                var stage = Fight.GetCurrentFight().IEEGPNLEKHH();
+                var stage = Fight.GetCurrentFight().GetPerksStage();
                 var state = new ModelConditions();
-                stage.AINGCNFDFMM(actor, state.LPGJIICFIKF);
+                stage.CollectActiveActions(actor, state.SelfActionPerks);
                 var doc = new System.Xml.XmlDocument();
                 doc.LoadXml("<ModExists Player='Me' Name='" + FlagName + "'/>");
                 var condition = new ConditionModExists(doc.DocumentElement);
@@ -1022,14 +1022,14 @@ public static class ValidateDE128CombatNative
                 bool exists = condition.IsEqual(state);
                 if (message.Contains("set|"))
                 {
-                    if (!exists || state.LPGJIICFIKF.Count(value => value.DDBPICENEJE() == FlagName) != 1)
+                    if (!exists || state.SelfActionPerks.Count(value => value.GetModName() == FlagName) != 1)
                         throw new Exception("Lua set_flag did not create exactly one native flag.");
                     flagSetChecked = true;
                 }
                 else
                 {
-                    stage.KCEBAJBMJGF(actor, state.FPFKABHOEHP);
-                    if (exists || flagExpiries != 1 || state.FPFKABHOEHP.Count(value => value.DDBPICENEJE() == FlagName) != 1)
+                    stage.CollectExpiredActions(actor, state.SelfExpiredPerks);
+                    if (exists || flagExpiries != 1 || state.SelfExpiredPerks.Count(value => value.GetModName() == FlagName) != 1)
                         throw new Exception("Lua clear_flag did not record exactly one native expiry.");
                     flagClearChecked = true;
                 }

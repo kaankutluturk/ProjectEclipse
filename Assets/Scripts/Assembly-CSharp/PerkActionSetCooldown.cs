@@ -4,16 +4,16 @@ using System.Xml;
 public class PerkActionSetCooldown : PerkAction
 {
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private int PJKLJNAGNCJ;
+	private int _cooldownFrames;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private string PLKHBNBNCDD;
+	private string _buttonName;
 
-	public new int OCFKLCDIEBF
+	public new int CooldownFrames
 	{
 		get
 		{
-			return BFJEFNHKPJI();
+			return GetCooldownFrames();
 		}
 		protected set
 		{
@@ -21,11 +21,11 @@ public class PerkActionSetCooldown : PerkAction
 		}
 	}
 
-	public string NOIAMHIBHDL
+	public string CooldownButtonName
 	{
 		get
 		{
-			return GHHAKGGLBCN();
+			return GetButtonName();
 		}
 		protected set
 		{
@@ -40,28 +40,28 @@ public class PerkActionSetCooldown : PerkAction
 	public PerkActionSetCooldown(PerkActionSetCooldown NOLFMPDGCOC)
 		: base(NOLFMPDGCOC)
 	{
-		set_Frames(NOLFMPDGCOC.BFJEFNHKPJI());
-		set_ButtonName(NOLFMPDGCOC.GHHAKGGLBCN());
+		set_Frames(NOLFMPDGCOC.GetCooldownFrames());
+		set_ButtonName(NOLFMPDGCOC.GetButtonName());
 	}
 
-	public new int BFJEFNHKPJI()
+	public new int GetCooldownFrames()
 	{
-		return PJKLJNAGNCJ;
+		return _cooldownFrames;
 	}
 
 	protected void set_Frames(int value)
 	{
-		PJKLJNAGNCJ = value;
+		_cooldownFrames = value;
 	}
 
-	public string GHHAKGGLBCN()
+	public string GetButtonName()
 	{
-		return PLKHBNBNCDD;
+		return _buttonName;
 	}
 
 	protected void set_ButtonName(string value)
 	{
-		PLKHBNBNCDD = value;
+		_buttonName = value;
 	}
 
 	public override void Parse(XmlNode node)
@@ -69,6 +69,6 @@ public class PerkActionSetCooldown : PerkAction
 		base.Parse(node);
 		set_Type(ActionType.ACTION_SET_COOLDOWN);
 		set_Frames(node.Attributes["Frames"].ParseInt());
-		set_ButtonName(node.Attributes["Button"].CIPOICEEIBK(string.Empty));
+		set_ButtonName(node.Attributes["Button"].GetStringOrDefault(string.Empty));
 	}
 }

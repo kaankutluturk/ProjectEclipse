@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class ChangingSprite
 {
-	public enum MHDKGPHKHIE
+	public enum SpriteEffectType
 	{
 		PictureBased = 0,
 		AtlasBased = 1,
@@ -11,166 +11,166 @@ public class ChangingSprite
 		None = 3
 	}
 
-	private bool JJDBFBGNALI;
+	private bool _isFirstRender;
 
-	private float AHKMGNOGIJP;
+	private float _animationOffset;
 
-	private float ALNFDKLOOIL;
+	private float _elapsedFrames;
 
-	private MHDKGPHKHIE _type;
+	private SpriteEffectType _type;
 
-	private CocosAnimation ANHELIPPFLA;
+	private CocosAnimation _animation;
 
-	private Interpolator APCJDEEGPNM = new Interpolator();
+	private Interpolator _oscillationX = new Interpolator();
 
-	private Interpolator MCHBNCHNFKE = new Interpolator();
+	private Interpolator _oscillationY = new Interpolator();
 
-	private Interpolator LECGMOJJMGD = new Interpolator();
+	private Interpolator _transparency = new Interpolator();
 
-	private Interpolator NHBGIIHNIBA = new Interpolator();
+	private Interpolator _rotation = new Interpolator();
 
-	private ChanceAndFlag KGFDGKDKOBN = new ChanceAndFlag();
+	private ChanceAndFlag _reappearX = new ChanceAndFlag();
 
-	private ChanceAndFlag JKCNCFJPOKI = new ChanceAndFlag();
+	private ChanceAndFlag _reappearY = new ChanceAndFlag();
 
-	private float CEHGMLJILJH;
+	private float _speedX;
 
-	private float GIFPDCPHLMB;
+	private float _speedY;
 
-	private float KKMDAOEBJDJ;
+	private float _positionX;
 
-	private float FLIBIFJKJOD;
+	private float _positionY;
 
-	private float CLPCFGNDNIM;
+	private float _animationTime;
 
-	private float EMPIEIGBPKB;
+	private float _animationDuration;
 
-	private float MFOJNBJIJIB;
+	private float _pauseElapsed;
 
-	private float ELEHKLGPKDM;
+	private float _pauseDuration;
 
-	private float IIDGEEMOJJA;
+	private float _spriteOffsetX;
 
-	private float NNFMOFODOKF;
+	private float _spriteOffsetY;
 
-	public GameObject NJKCDEJGJLF;
+	public GameObject SpriteObject;
 
-	public ParticleSystem FOECAMJDAOI;
+	public ParticleSystem Particles;
 
-	public float JKEOLJBKDCD
+	public float PositionX
 	{
 		set
 		{
-			PFLIOHNFLIM(value);
+			SetPositionX(value);
 		}
 	}
 
-	public float NJDDPGAKPLJ
+	public float PositionY
 	{
 		set
 		{
-			ICFECICLMOJ(value);
+			SetPositionY(value);
 		}
 	}
 
-	public ChangingSprite(MHDKGPHKHIE LFLGCDNKNJI)
+	public ChangingSprite(SpriteEffectType LFLGCDNKNJI)
 	{
-		ALNFDKLOOIL = 0f;
-		CEHGMLJILJH = 0f;
-		GIFPDCPHLMB = 0f;
-		KKMDAOEBJDJ = 0f;
-		FLIBIFJKJOD = 0f;
-		JJDBFBGNALI = true;
-		CLPCFGNDNIM = 0f;
-		EMPIEIGBPKB = 0f;
-		MFOJNBJIJIB = 0f;
-		ELEHKLGPKDM = 0f;
-		IIDGEEMOJJA = 0f;
-		NNFMOFODOKF = 0f;
+		_elapsedFrames = 0f;
+		_speedX = 0f;
+		_speedY = 0f;
+		_positionX = 0f;
+		_positionY = 0f;
+		_isFirstRender = true;
+		_animationTime = 0f;
+		_animationDuration = 0f;
+		_pauseElapsed = 0f;
+		_pauseDuration = 0f;
+		_spriteOffsetX = 0f;
+		_spriteOffsetY = 0f;
 		_type = LFLGCDNKNJI;
 	}
 
-	public void PFLIOHNFLIM(float value)
+	public void SetPositionX(float value)
 	{
-		KKMDAOEBJDJ = value;
+		_positionX = value;
 	}
 
-	public void ICFECICLMOJ(float value)
+	public void SetPositionY(float value)
 	{
-		FLIBIFJKJOD = value;
+		_positionY = value;
 	}
 
-	public virtual bool OMHFEGBJDHP(string PMFEIPCHENB, string path, float time, float ILENLCMAMBH, float JMLAKAKDBBL, float FEIHFIPFNKF)
+	public virtual bool InitAtlasAnimation(string PMFEIPCHENB, string path, float time, float ILENLCMAMBH, float JMLAKAKDBBL, float FEIHFIPFNKF)
 	{
-		if (_type != MHDKGPHKHIE.AtlasBased)
+		if (_type != SpriteEffectType.AtlasBased)
 		{
 			return false;
 		}
-		AHKMGNOGIJP = ILENLCMAMBH;
-		NJKCDEJGJLF = new GameObject(PMFEIPCHENB);
-		ANHELIPPFLA = NJKCDEJGJLF.AddComponent<CocosAnimation>();
-		if (!ANHELIPPFLA.Init(path + PMFEIPCHENB, true))
+		_animationOffset = ILENLCMAMBH;
+		SpriteObject = new GameObject(PMFEIPCHENB);
+		_animation = SpriteObject.AddComponent<CocosAnimation>();
+		if (!_animation.Init(path + PMFEIPCHENB, true))
 		{
-			LLLOJBFMONN.Write("Anim NO " + path + PMFEIPCHENB);
+			GameLog.Write("Anim NO " + path + PMFEIPCHENB);
 			return false;
 		}
-		ANHELIPPFLA.SetFirstFrame();
-		ANHELIPPFLA.set_ChangeSpriteTime(time / 60f);
-		EMPIEIGBPKB = time * (float)ANHELIPPFLA.get_TotalFrames() + 1f;
-		float x = ANHELIPPFLA.get_AnimationData().BFJEFNHKPJI()[0].PFIECJPOFFB().x;
-		float y = ANHELIPPFLA.get_AnimationData().BFJEFNHKPJI()[0].PFIECJPOFFB().y;
+		_animation.SetFirstFrame();
+		_animation.set_ChangeSpriteTime(time / 60f);
+		_animationDuration = time * (float)_animation.get_TotalFrames() + 1f;
+		float x = _animation.get_AnimationData().GetFrames()[0].GetSourceSize().x;
+		float y = _animation.get_AnimationData().GetFrames()[0].GetSourceSize().y;
 		Vector3 localScale = new Vector3(JMLAKAKDBBL / x, FEIHFIPFNKF / y, 1f);
 		localScale.x = (float)Math.Round(localScale.x, 4, MidpointRounding.AwayFromZero);
 		localScale.y = (float)Math.Round(localScale.y, 4, MidpointRounding.AwayFromZero);
-		NJKCDEJGJLF.transform.localScale = localScale;
+		SpriteObject.transform.localScale = localScale;
 		return true;
 	}
 
-	public virtual void OGBLGCKOCLL(float GCMMAPEFEBG)
+	public virtual void SetPause(float GCMMAPEFEBG)
 	{
-		ELEHKLGPKDM = GCMMAPEFEBG;
+		_pauseDuration = GCMMAPEFEBG;
 	}
 
-	public virtual void LDEAPJCKFMP(string GPNPNHFACPO, string ODMCNMJPHFJ, string GAKBMMOOGDB, CocosAnimationData.SpriteFrameCocos PIDBGGLFBCO, float JMLAKAKDBBL, float FEIHFIPFNKF)
+	public virtual void InitPicture(string GPNPNHFACPO, string ODMCNMJPHFJ, string GAKBMMOOGDB, CocosAnimationData.SpriteFrameCocos PIDBGGLFBCO, float JMLAKAKDBBL, float FEIHFIPFNKF)
 	{
-		if (_type != MHDKGPHKHIE.PictureBased)
+		if (_type != SpriteEffectType.PictureBased)
 		{
 			return;
 		}
-		Sprite sprite = LocationSpriteCache.PPBEKKDIJKC(GPNPNHFACPO, ODMCNMJPHFJ, GAKBMMOOGDB);
+		Sprite sprite = LocationSpriteCache.GetSprite(GPNPNHFACPO, ODMCNMJPHFJ, GAKBMMOOGDB);
 		if (sprite == null)
 		{
-			LLLOJBFMONN.Write("Pic: {0}", ODMCNMJPHFJ);
+			GameLog.Write("Pic: {0}", ODMCNMJPHFJ);
 			return;
 		}
-		NJKCDEJGJLF = new GameObject(ODMCNMJPHFJ);
-		SpriteRenderer spriteRenderer = NJKCDEJGJLF.AddComponent<SpriteRenderer>();
+		SpriteObject = new GameObject(ODMCNMJPHFJ);
+		SpriteRenderer spriteRenderer = SpriteObject.AddComponent<SpriteRenderer>();
 		spriteRenderer.sprite = sprite;
 		float num = sprite.rect.size.x;
 		float num2 = sprite.rect.size.y;
-		IIDGEEMOJJA = 0f;
-		NNFMOFODOKF = 0f;
+		_spriteOffsetX = 0f;
+		_spriteOffsetY = 0f;
 		bool flag = false;
 		if (PIDBGGLFBCO != null)
 		{
-			flag = PIDBGGLFBCO.KGFGOFBMCCG();
-			IIDGEEMOJJA = PIDBGGLFBCO.LMJCBAFGAFL().x;
-			NNFMOFODOKF = PIDBGGLFBCO.LMJCBAFGAFL().y;
+			flag = PIDBGGLFBCO.GetRotated();
+			_spriteOffsetX = PIDBGGLFBCO.GetOffset().x;
+			_spriteOffsetY = PIDBGGLFBCO.GetOffset().y;
 			if (flag)
 			{
 				float num3 = num;
 				num = num2;
 				num2 = num3;
 			}
-			num = ((!(PIDBGGLFBCO.PFIECJPOFFB().x < num)) ? PIDBGGLFBCO.PFIECJPOFFB().x : num);
-			num2 = ((!(PIDBGGLFBCO.PFIECJPOFFB().y < num2)) ? PIDBGGLFBCO.PFIECJPOFFB().y : num2);
+			num = ((!(PIDBGGLFBCO.GetSourceSize().x < num)) ? PIDBGGLFBCO.GetSourceSize().x : num);
+			num2 = ((!(PIDBGGLFBCO.GetSourceSize().y < num2)) ? PIDBGGLFBCO.GetSourceSize().y : num2);
 		}
-		Vector3 localPosition = NJKCDEJGJLF.transform.localPosition;
-		NJKCDEJGJLF.transform.localPosition = new Vector3(IIDGEEMOJJA, NNFMOFODOKF, localPosition.z);
+		Vector3 localPosition = SpriteObject.transform.localPosition;
+		SpriteObject.transform.localPosition = new Vector3(_spriteOffsetX, _spriteOffsetY, localPosition.z);
 		Vector3 vector = default(Vector3);
 		if (flag)
 		{
-			NJKCDEJGJLF.transform.Rotate(0f, 0f, 90f);
+			SpriteObject.transform.Rotate(0f, 0f, 90f);
 			vector = new Vector3(FEIHFIPFNKF / num2, JMLAKAKDBBL / num, 1f);
 		}
 		else
@@ -183,211 +183,211 @@ public class ChangingSprite
 			vector.x *= sprite.pixelsPerUnit;
 			vector.y *= sprite.pixelsPerUnit;
 		}
-		NJKCDEJGJLF.transform.localScale = vector;
+		SpriteObject.transform.localScale = vector;
 	}
 
-	public virtual bool AFPMFHFIBBO(string JIPAAPBPNJM, float FNDOOJNDJDC, float GBCONNBABLL)
+	public virtual bool InitParticles(string JIPAAPBPNJM, float FNDOOJNDJDC, float GBCONNBABLL)
 	{
 		GameObject gameObject = Resources.Load<GameObject>(JIPAAPBPNJM);
 		if (gameObject != null && gameObject != null)
 		{
 			GameObject gameObject2 = UnityEngine.Object.Instantiate(gameObject);
 			gameObject2.transform.localPosition = new Vector3(FNDOOJNDJDC, GBCONNBABLL, -0.1f);
-			FOECAMJDAOI = gameObject2.GetComponent<ParticleSystem>();
-			FOECAMJDAOI.Pause();
+			Particles = gameObject2.GetComponent<ParticleSystem>();
+			Particles.Pause();
 			return true;
 		}
-		LLLOJBFMONN.Write("Particles NO " + JIPAAPBPNJM);
+		GameLog.Write("Particles NO " + JIPAAPBPNJM);
 		GameObject gameObject3 = new GameObject("NO " + JIPAAPBPNJM);
-		FOECAMJDAOI = gameObject3.AddComponent<ParticleSystem>();
+		Particles = gameObject3.AddComponent<ParticleSystem>();
 		gameObject3.transform.localPosition = new Vector3(FNDOOJNDJDC, GBCONNBABLL, -0.1f);
 		return true;
 	}
 
-	public virtual bool FJPPLGAABLM(string JIPAAPBPNJM, float FNDOOJNDJDC, float GBCONNBABLL, int HJAHHPHOMDO = 0, int JAJICKINNCP = 0, int FKFCKIDMFCP = 24)
+	public virtual bool InitParticlesExtended(string JIPAAPBPNJM, float FNDOOJNDJDC, float GBCONNBABLL, int HJAHHPHOMDO = 0, int JAJICKINNCP = 0, int FKFCKIDMFCP = 24)
 	{
 		return true;
 	}
 
 	public virtual void SetPosition(float DHDMNHCIPEH, float BGEEALIPKCC)
 	{
-		KKMDAOEBJDJ = DHDMNHCIPEH;
-		FLIBIFJKJOD = BGEEALIPKCC;
+		_positionX = DHDMNHCIPEH;
+		_positionY = BGEEALIPKCC;
 	}
 
-	public void NOHGIBJKJNC(float GKIHFPFHKCI, float value, float JENJFNNFGLD)
+	public void AddOscillationXKeyframe(float GKIHFPFHKCI, float value, float JENJFNNFGLD)
 	{
-		APCJDEEGPNM.EIOGKOBGBFK(GKIHFPFHKCI, value, JENJFNNFGLD);
+		_oscillationX.AddInterval(GKIHFPFHKCI, value, JENJFNNFGLD);
 	}
 
-	public void PBDEFHJGBML(float IPCOBJBKNAO)
+	public void SetOscillationXOffset(float IPCOBJBKNAO)
 	{
-		APCJDEEGPNM.HJGPLENNFCK(IPCOBJBKNAO);
+		_oscillationX.AdvanceTime(IPCOBJBKNAO);
 	}
 
-	public void HMLBMLMDLOP(float GKIHFPFHKCI, float value, float JENJFNNFGLD)
+	public void AddOscillationYKeyframe(float GKIHFPFHKCI, float value, float JENJFNNFGLD)
 	{
-		MCHBNCHNFKE.EIOGKOBGBFK(GKIHFPFHKCI, value, JENJFNNFGLD);
+		_oscillationY.AddInterval(GKIHFPFHKCI, value, JENJFNNFGLD);
 	}
 
-	public void INPLHCAAJKP(float IPCOBJBKNAO)
+	public void SetOscillationYOffset(float IPCOBJBKNAO)
 	{
-		MCHBNCHNFKE.HJGPLENNFCK(IPCOBJBKNAO);
+		_oscillationY.AdvanceTime(IPCOBJBKNAO);
 	}
 
-	public virtual void KEOBIGPEGEO(float GKIHFPFHKCI, float value, float JENJFNNFGLD)
+	public virtual void AddRotationKeyframe(float GKIHFPFHKCI, float value, float JENJFNNFGLD)
 	{
-		NHBGIIHNIBA.EIOGKOBGBFK(GKIHFPFHKCI, value, JENJFNNFGLD);
+		_rotation.AddInterval(GKIHFPFHKCI, value, JENJFNNFGLD);
 	}
 
-	public virtual void MBGHNIKNNPJ(float IPCOBJBKNAO)
+	public virtual void SetRotationOffset(float IPCOBJBKNAO)
 	{
-		NHBGIIHNIBA.HJGPLENNFCK(IPCOBJBKNAO);
+		_rotation.AdvanceTime(IPCOBJBKNAO);
 	}
 
-	public virtual void JNLCGHHDBBE(float LKMBEJFMCHJ, float IAKJEEBPDBE)
+	public virtual void SetSpeed(float LKMBEJFMCHJ, float IAKJEEBPDBE)
 	{
-		CEHGMLJILJH = LKMBEJFMCHJ;
-		GIFPDCPHLMB = IAKJEEBPDBE;
+		_speedX = LKMBEJFMCHJ;
+		_speedY = IAKJEEBPDBE;
 	}
 
-	public virtual void KGJGDKNJPJH(float GKIHFPFHKCI, float value, float JENJFNNFGLD)
+	public virtual void AddTransparencyKeyframe(float GKIHFPFHKCI, float value, float JENJFNNFGLD)
 	{
 		value = Mathf.Max(0f, value);
 		value = Mathf.Min(100f, value);
-		LECGMOJJMGD.EIOGKOBGBFK(GKIHFPFHKCI, value, JENJFNNFGLD);
+		_transparency.AddInterval(GKIHFPFHKCI, value, JENJFNNFGLD);
 	}
 
-	public virtual void CNECHMNCAHM(float IPCOBJBKNAO)
+	public virtual void SetTransparencyOffset(float IPCOBJBKNAO)
 	{
-		LECGMOJJMGD.HJGPLENNFCK(IPCOBJBKNAO);
+		_transparency.AdvanceTime(IPCOBJBKNAO);
 	}
 
-	public virtual void FDMODLLENAE(float LHNCHOAEGEA, float KAEPJHHLLPK)
+	public virtual void SetReappearX(float LHNCHOAEGEA, float KAEPJHHLLPK)
 	{
-		KGFDGKDKOBN.state = true;
-		KGFDGKDKOBN.LHNCHOAEGEA = LHNCHOAEGEA;
-		KGFDGKDKOBN.KAEPJHHLLPK = KAEPJHHLLPK;
+		_reappearX.state = true;
+		_reappearX.Min = LHNCHOAEGEA;
+		_reappearX.Max = KAEPJHHLLPK;
 	}
 
-	public virtual void FNPELDEJFGN(float LHNCHOAEGEA, float KAEPJHHLLPK)
+	public virtual void SetReappearY(float LHNCHOAEGEA, float KAEPJHHLLPK)
 	{
-		JKCNCFJPOKI.state = true;
-		JKCNCFJPOKI.LHNCHOAEGEA = LHNCHOAEGEA;
-		JKCNCFJPOKI.KAEPJHHLLPK = KAEPJHHLLPK;
+		_reappearY.state = true;
+		_reappearY.Min = LHNCHOAEGEA;
+		_reappearY.Max = KAEPJHHLLPK;
 	}
 
 	public virtual void Render(float KBBLAECAAFG = 1f)
 	{
 		float num = 1f / 60f * KBBLAECAAFG;
-		if (JJDBFBGNALI)
+		if (_isFirstRender)
 		{
-			if (_type == MHDKGPHKHIE.ParticleBased && FOECAMJDAOI != null)
+			if (_type == SpriteEffectType.ParticleBased && Particles != null)
 			{
 				for (int i = 0; i < 150; i++)
 				{
-					FOECAMJDAOI.Simulate(Mathf.Max(0f, num * 2f));
+					Particles.Simulate(Mathf.Max(0f, num * 2f));
 				}
 			}
-			JJDBFBGNALI = false;
+			_isFirstRender = false;
 		}
-		if (_type == MHDKGPHKHIE.ParticleBased && FOECAMJDAOI != null)
+		if (_type == SpriteEffectType.ParticleBased && Particles != null)
 		{
-			FOECAMJDAOI.Simulate(Mathf.Max(0f, num), true, false);
+			Particles.Simulate(Mathf.Max(0f, num), true, false);
 			return;
 		}
-		ALNFDKLOOIL += KBBLAECAAFG;
-		if (_type == MHDKGPHKHIE.AtlasBased)
+		_elapsedFrames += KBBLAECAAFG;
+		if (_type == SpriteEffectType.AtlasBased)
 		{
 			float num2 = UpdateAnimation(KBBLAECAAFG);
 			if (num2 > 0f)
 			{
-				ANHELIPPFLA.Render(1f / 60f * num2);
+				_animation.Render(1f / 60f * num2);
 			}
 		}
-		KKMDAOEBJDJ += CEHGMLJILJH;
-		float kKMDAOEBJDJ = KKMDAOEBJDJ;
-		APCJDEEGPNM.HJGPLENNFCK(num);
-		kKMDAOEBJDJ += APCJDEEGPNM.OAGPELOHACM();
-		FLIBIFJKJOD += GIFPDCPHLMB;
-		float fLIBIFJKJOD = FLIBIFJKJOD;
-		MCHBNCHNFKE.HJGPLENNFCK(num);
-		fLIBIFJKJOD += MCHBNCHNFKE.OAGPELOHACM();
-		Vector3 localPosition = NJKCDEJGJLF.transform.localPosition;
-		NJKCDEJGJLF.transform.localPosition = new Vector3(kKMDAOEBJDJ + IIDGEEMOJJA, fLIBIFJKJOD + NNFMOFODOKF, localPosition.z);
-		if (NHBGIIHNIBA.HNJDHGDLLPD())
+		_positionX += _speedX;
+		float kKMDAOEBJDJ = _positionX;
+		_oscillationX.AdvanceTime(num);
+		kKMDAOEBJDJ += _oscillationX.GetCurrentValue();
+		_positionY += _speedY;
+		float fLIBIFJKJOD = _positionY;
+		_oscillationY.AdvanceTime(num);
+		fLIBIFJKJOD += _oscillationY.GetCurrentValue();
+		Vector3 localPosition = SpriteObject.transform.localPosition;
+		SpriteObject.transform.localPosition = new Vector3(kKMDAOEBJDJ + _spriteOffsetX, fLIBIFJKJOD + _spriteOffsetY, localPosition.z);
+		if (_rotation.HasIntervals())
 		{
-			NHBGIIHNIBA.HJGPLENNFCK(num);
-			float z = NHBGIIHNIBA.OAGPELOHACM();
-			NJKCDEJGJLF.transform.eulerAngles = new Vector3(0f, 0f, z);
+			_rotation.AdvanceTime(num);
+			float z = _rotation.GetCurrentValue();
+			SpriteObject.transform.eulerAngles = new Vector3(0f, 0f, z);
 		}
-		if (LECGMOJJMGD.HNJDHGDLLPD())
+		if (_transparency.HasIntervals())
 		{
-			LECGMOJJMGD.HJGPLENNFCK(num);
-			SpriteRenderer component = NJKCDEJGJLF.GetComponent<SpriteRenderer>();
+			_transparency.AdvanceTime(num);
+			SpriteRenderer component = SpriteObject.GetComponent<SpriteRenderer>();
 			Color color = component.color;
-			color.a = 2.55f * LECGMOJJMGD.OAGPELOHACM() / 255f;
+			color.a = 2.55f * _transparency.GetCurrentValue() / 255f;
 			component.color = color;
 		}
-		if (KGFDGKDKOBN.state)
+		if (_reappearX.state)
 		{
-			if (kKMDAOEBJDJ > KGFDGKDKOBN.KAEPJHHLLPK)
+			if (kKMDAOEBJDJ > _reappearX.Max)
 			{
-				KKMDAOEBJDJ = KGFDGKDKOBN.LHNCHOAEGEA + (kKMDAOEBJDJ - KGFDGKDKOBN.KAEPJHHLLPK);
+				_positionX = _reappearX.Min + (kKMDAOEBJDJ - _reappearX.Max);
 			}
-			if (kKMDAOEBJDJ < KGFDGKDKOBN.LHNCHOAEGEA)
+			if (kKMDAOEBJDJ < _reappearX.Min)
 			{
-				KKMDAOEBJDJ = KGFDGKDKOBN.KAEPJHHLLPK - (KGFDGKDKOBN.LHNCHOAEGEA - kKMDAOEBJDJ);
+				_positionX = _reappearX.Max - (_reappearX.Min - kKMDAOEBJDJ);
 			}
 		}
-		if (JKCNCFJPOKI.state)
+		if (_reappearY.state)
 		{
-			if (fLIBIFJKJOD > JKCNCFJPOKI.KAEPJHHLLPK)
+			if (fLIBIFJKJOD > _reappearY.Max)
 			{
-				FLIBIFJKJOD = JKCNCFJPOKI.LHNCHOAEGEA + (fLIBIFJKJOD - JKCNCFJPOKI.KAEPJHHLLPK);
+				_positionY = _reappearY.Min + (fLIBIFJKJOD - _reappearY.Max);
 			}
-			if (fLIBIFJKJOD < JKCNCFJPOKI.LHNCHOAEGEA)
+			if (fLIBIFJKJOD < _reappearY.Min)
 			{
-				FLIBIFJKJOD = JKCNCFJPOKI.KAEPJHHLLPK - (JKCNCFJPOKI.LHNCHOAEGEA - fLIBIFJKJOD);
+				_positionY = _reappearY.Max - (_reappearY.Min - fLIBIFJKJOD);
 			}
 		}
 	}
 
-	public void BJNAECMLBHL()
+	public void Release()
 	{
 	}
 
 	private float UpdateAnimation(float HDJFIPHOLMP)
 	{
-		if (HDJFIPHOLMP > EMPIEIGBPKB + ELEHKLGPKDM)
+		if (HDJFIPHOLMP > _animationDuration + _pauseDuration)
 		{
-			HDJFIPHOLMP -= (float)(int)(HDJFIPHOLMP / (EMPIEIGBPKB + ELEHKLGPKDM)) * (EMPIEIGBPKB + ELEHKLGPKDM);
+			HDJFIPHOLMP -= (float)(int)(HDJFIPHOLMP / (_animationDuration + _pauseDuration)) * (_animationDuration + _pauseDuration);
 		}
-		if (MFOJNBJIJIB == 0f)
+		if (_pauseElapsed == 0f)
 		{
-			CLPCFGNDNIM += HDJFIPHOLMP;
-			if (CLPCFGNDNIM < EMPIEIGBPKB)
+			_animationTime += HDJFIPHOLMP;
+			if (_animationTime < _animationDuration)
 			{
 				return HDJFIPHOLMP;
 			}
-			MFOJNBJIJIB += CLPCFGNDNIM - EMPIEIGBPKB;
-			if (MFOJNBJIJIB >= ELEHKLGPKDM)
+			_pauseElapsed += _animationTime - _animationDuration;
+			if (_pauseElapsed >= _pauseDuration)
 			{
-				float hDJFIPHOLMP = MFOJNBJIJIB - ELEHKLGPKDM;
-				CLPCFGNDNIM = 0f;
-				MFOJNBJIJIB = 0f;
+				float hDJFIPHOLMP = _pauseElapsed - _pauseDuration;
+				_animationTime = 0f;
+				_pauseElapsed = 0f;
 				return UpdateAnimation(hDJFIPHOLMP);
 			}
-			return EMPIEIGBPKB - (CLPCFGNDNIM - HDJFIPHOLMP + 1E-05f);
+			return _animationDuration - (_animationTime - HDJFIPHOLMP + 1E-05f);
 		}
-		MFOJNBJIJIB += HDJFIPHOLMP;
-		if (MFOJNBJIJIB < ELEHKLGPKDM)
+		_pauseElapsed += HDJFIPHOLMP;
+		if (_pauseElapsed < _pauseDuration)
 		{
 			return 0f;
 		}
-		float mFOJNBJIJIB = MFOJNBJIJIB;
-		CLPCFGNDNIM = 0f;
-		MFOJNBJIJIB = 0f;
-		return UpdateAnimation(mFOJNBJIJIB - ELEHKLGPKDM);
+		float mFOJNBJIJIB = _pauseElapsed;
+		_animationTime = 0f;
+		_pauseElapsed = 0f;
+		return UpdateAnimation(mFOJNBJIJIB - _pauseDuration);
 	}
 }

@@ -4,16 +4,16 @@ namespace Nekki.SF2.GUI.Profile
 {
 	public class AchievementCell : ProfileCell
 	{
-		private const int HLPKKEEPNCJ = 3;
+		private const int CELL_KIND_ID = 3;
 
 		[SerializeField]
 		private AchievementSubItem achievSubItem;
 
-		private void BHNDDBGCBNP()
+		private void BindSubItem()
 		{
 			achievSubItem.ParentCell = this;
-			achievSubItem.transform.BGNJGIACJBG(0f);
-			achievSubItem.transform.OKHPLHPBPKJ(-240f);
+			achievSubItem.transform.SetLocalY(0f);
+			achievSubItem.transform.SetLocalX(-240f);
 			achievSubItem.RemoveAllEventListener();
 			achievSubItem.AddEventListener(2, OnSubItemClick);
 			achievSubItem.AddEventListener(10, Scene<ProfileScene>.get_Current().OnSubItemClick);
@@ -23,10 +23,10 @@ namespace Nekki.SF2.GUI.Profile
 		public void Init(Achievement PGAGNLJABIE, int EPJGLECOIBG, int IBAKGENOEPH)
 		{
 			Clear();
-			BHNDDBGCBNP();
-			string kHPKDMGDMAB = PGAGNLJABIE.CIOKDNDHFBE();
+			BindSubItem();
+			string kHPKDMGDMAB = PGAGNLJABIE.GetIconName();
 			int oKNNNLIPODI = 30000 + IBAKGENOEPH * 10;
-			achievSubItem.Init(kHPKDMGDMAB, PGAGNLJABIE.Name, PGAGNLJABIE.MGNNJPBCOGD, PGAGNLJABIE.EOGLBDCLMBM, EPJGLECOIBG, oKNNNLIPODI, PGAGNLJABIE);
+			achievSubItem.Init(kHPKDMGDMAB, PGAGNLJABIE.Name, PGAGNLJABIE.Description, PGAGNLJABIE.CounterValue, EPJGLECOIBG, oKNNNLIPODI, PGAGNLJABIE);
 			Scene<ProfileScene>.get_Current().SubItems.Add(achievSubItem);
 		}
 

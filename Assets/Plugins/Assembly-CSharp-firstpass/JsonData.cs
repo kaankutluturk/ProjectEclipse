@@ -20,11 +20,11 @@ public class JsonData : IEquatable<JsonData>, IDictionary, IList, IEnumerable, I
 
 	private IDictionary<string, JsonData> inst_object;
 
-	private string MBHOBGCDLDB;
+	private string inst_string;
 
-	private string EMDHMHOKGFP;
+	private string json;
 
-	private GGIECEPGFNH LFLGCDNKNJI;
+	private JsonType type;
 
 	private IList<KeyValuePair<string, JsonData>> object_list;
 
@@ -32,7 +32,7 @@ public class JsonData : IEquatable<JsonData>, IDictionary, IList, IEnumerable, I
 	{
 		get
 		{
-			return OFOPFCJNEBL();
+			return GetCount();
 		}
 	}
 
@@ -40,7 +40,7 @@ public class JsonData : IEquatable<JsonData>, IDictionary, IList, IEnumerable, I
 	{
 		get
 		{
-			return ECPEGHBJOKG().IsSynchronized;
+			return EnsureCollection().IsSynchronized;
 		}
 	}
 
@@ -48,7 +48,7 @@ public class JsonData : IEquatable<JsonData>, IDictionary, IList, IEnumerable, I
 	{
 		get
 		{
-			return ECPEGHBJOKG().SyncRoot;
+			return EnsureCollection().SyncRoot;
 		}
 	}
 
@@ -56,7 +56,7 @@ public class JsonData : IEquatable<JsonData>, IDictionary, IList, IEnumerable, I
 	{
 		get
 		{
-			return DBMLGGNFGFM().IsFixedSize;
+			return EnsureDictionary().IsFixedSize;
 		}
 	}
 
@@ -64,7 +64,7 @@ public class JsonData : IEquatable<JsonData>, IDictionary, IList, IEnumerable, I
 	{
 		get
 		{
-			return DBMLGGNFGFM().IsReadOnly;
+			return EnsureDictionary().IsReadOnly;
 		}
 	}
 
@@ -72,7 +72,7 @@ public class JsonData : IEquatable<JsonData>, IDictionary, IList, IEnumerable, I
 	{
 		get
 		{
-			DBMLGGNFGFM();
+			EnsureDictionary();
 			IList<string> list = new List<string>();
 			foreach (KeyValuePair<string, JsonData> item in object_list)
 			{
@@ -86,7 +86,7 @@ public class JsonData : IEquatable<JsonData>, IDictionary, IList, IEnumerable, I
 	{
 		get
 		{
-			DBMLGGNFGFM();
+			EnsureDictionary();
 			IList<JsonData> list = new List<JsonData>();
 			foreach (KeyValuePair<string, JsonData> item in object_list)
 			{
@@ -100,7 +100,7 @@ public class JsonData : IEquatable<JsonData>, IDictionary, IList, IEnumerable, I
 	{
 		get
 		{
-			return BFMPNAHENOG().IsFixedSize;
+			return EnsureList().IsFixedSize;
 		}
 	}
 
@@ -108,7 +108,7 @@ public class JsonData : IEquatable<JsonData>, IDictionary, IList, IEnumerable, I
 	{
 		get
 		{
-			return BFMPNAHENOG().IsReadOnly;
+			return EnsureList().IsReadOnly;
 		}
 	}
 
@@ -116,7 +116,7 @@ public class JsonData : IEquatable<JsonData>, IDictionary, IList, IEnumerable, I
 	{
 		get
 		{
-			return DBMLGGNFGFM()[KGBGENDIMBC];
+			return EnsureDictionary()[KGBGENDIMBC];
 		}
 		set
 		{
@@ -144,11 +144,11 @@ public class JsonData : IEquatable<JsonData>, IDictionary, IList, IEnumerable, I
 	{
 		get
 		{
-			return BFMPNAHENOG()[index];
+			return EnsureList()[index];
 		}
 		set
 		{
-			BFMPNAHENOG();
+			EnsureList();
 			JsonData bAINMLLIKOL = ToJsonData(value);
 			set_Item(index, bAINMLLIKOL);
 		}
@@ -158,71 +158,71 @@ public class JsonData : IEquatable<JsonData>, IDictionary, IList, IEnumerable, I
 	{
 		get
 		{
-			return OFOPFCJNEBL();
+			return GetCount();
 		}
 	}
 
-	public bool MENGHLDLPDP
+	public bool IsArray
 	{
 		get
 		{
-			return NKLOBJNAFOL();
+			return GetIsArray();
 		}
 	}
 
-	public bool BKKEJEHCHAK
+	public bool IsBoolean
 	{
 		get
 		{
-			return DBAOMEBNMPH();
+			return GetIsBoolean();
 		}
 	}
 
-	public bool LPEHBKJIAJB
+	public bool IsDouble
 	{
 		get
 		{
-			return OEIGDMENBKN();
+			return GetIsDouble();
 		}
 	}
 
-	public bool MKGEMBAAPBL
+	public bool IsInt
 	{
 		get
 		{
-			return BGDHACEDILB();
+			return GetIsInt();
 		}
 	}
 
-	public bool LNLKOGMCNNF
+	public bool IsLong
 	{
 		get
 		{
-			return BPKJMLDOLPH();
+			return GetIsLong();
 		}
 	}
 
-	public bool PDKNNMDCPDJ
+	public bool IsObject
 	{
 		get
 		{
-			return HKCKGNMIKBM();
+			return GetIsObject();
 		}
 	}
 
-	public bool JDALJCCIBIN
+	public bool IsString
 	{
 		get
 		{
-			return FMFILGDCAKM();
+			return GetIsString();
 		}
 	}
 
-	public ICollection<string> BJACLIMKPAE
+	public ICollection<string> Keys
 	{
 		get
 		{
-			return IPPIHHKHGNI();
+			return GetKeys();
 		}
 	}
 
@@ -264,25 +264,25 @@ public class JsonData : IEquatable<JsonData>, IDictionary, IList, IEnumerable, I
 
 	public JsonData(bool CIGMFMBICLJ)
 	{
-		LFLGCDNKNJI = GGIECEPGFNH.Boolean;
+		type = JsonType.Boolean;
 		inst_boolean = CIGMFMBICLJ;
 	}
 
 	public JsonData(double number)
 	{
-		LFLGCDNKNJI = GGIECEPGFNH.Double;
+		type = JsonType.Double;
 		inst_double = number;
 	}
 
 	public JsonData(int number)
 	{
-		LFLGCDNKNJI = GGIECEPGFNH.Int;
+		type = JsonType.Int;
 		inst_int = number;
 	}
 
 	public JsonData(long number)
 	{
-		LFLGCDNKNJI = GGIECEPGFNH.Long;
+		type = JsonType.Long;
 		inst_long = number;
 	}
 
@@ -290,32 +290,32 @@ public class JsonData : IEquatable<JsonData>, IDictionary, IList, IEnumerable, I
 	{
 		if (AOMLCBHAJJH is bool)
 		{
-			LFLGCDNKNJI = GGIECEPGFNH.Boolean;
+			type = JsonType.Boolean;
 			inst_boolean = (bool)AOMLCBHAJJH;
 			return;
 		}
 		if (AOMLCBHAJJH is double)
 		{
-			LFLGCDNKNJI = GGIECEPGFNH.Double;
+			type = JsonType.Double;
 			inst_double = (double)AOMLCBHAJJH;
 			return;
 		}
 		if (AOMLCBHAJJH is int)
 		{
-			LFLGCDNKNJI = GGIECEPGFNH.Int;
+			type = JsonType.Int;
 			inst_int = (int)AOMLCBHAJJH;
 			return;
 		}
 		if (AOMLCBHAJJH is long)
 		{
-			LFLGCDNKNJI = GGIECEPGFNH.Long;
+			type = JsonType.Long;
 			inst_long = (long)AOMLCBHAJJH;
 			return;
 		}
 		if (AOMLCBHAJJH is string)
 		{
-			LFLGCDNKNJI = GGIECEPGFNH.String;
-			MBHOBGCDLDB = (string)AOMLCBHAJJH;
+			type = JsonType.String;
+			inst_string = (string)AOMLCBHAJJH;
 			return;
 		}
 		throw new ArgumentException("Unable to wrap the given object with JsonData");
@@ -323,100 +323,100 @@ public class JsonData : IEquatable<JsonData>, IDictionary, IList, IEnumerable, I
 
 	public JsonData(string IGGFGLLIGCG)
 	{
-		LFLGCDNKNJI = GGIECEPGFNH.String;
-		MBHOBGCDLDB = IGGFGLLIGCG;
+		type = JsonType.String;
+		inst_string = IGGFGLLIGCG;
 	}
 
-	public int OFOPFCJNEBL()
+	public int GetCount()
 	{
-		return ECPEGHBJOKG().Count;
+		return EnsureCollection().Count;
 	}
 
-	public bool NKLOBJNAFOL()
+	public bool GetIsArray()
 	{
-		return LFLGCDNKNJI == GGIECEPGFNH.Array;
+		return type == JsonType.Array;
 	}
 
-	public bool DBAOMEBNMPH()
+	public bool GetIsBoolean()
 	{
-		return LFLGCDNKNJI == GGIECEPGFNH.Boolean;
+		return type == JsonType.Boolean;
 	}
 
-	public bool OEIGDMENBKN()
+	public bool GetIsDouble()
 	{
-		return LFLGCDNKNJI == GGIECEPGFNH.Double;
+		return type == JsonType.Double;
 	}
 
-	public bool BGDHACEDILB()
+	public bool GetIsInt()
 	{
-		return LFLGCDNKNJI == GGIECEPGFNH.Int;
+		return type == JsonType.Int;
 	}
 
-	public bool BPKJMLDOLPH()
+	public bool GetIsLong()
 	{
-		return LFLGCDNKNJI == GGIECEPGFNH.Long;
+		return type == JsonType.Long;
 	}
 
-	public bool HKCKGNMIKBM()
+	public bool GetIsObject()
 	{
-		return LFLGCDNKNJI == GGIECEPGFNH.Object;
+		return type == JsonType.Object;
 	}
 
-	public bool FMFILGDCAKM()
+	public bool GetIsString()
 	{
-		return LFLGCDNKNJI == GGIECEPGFNH.String;
+		return type == JsonType.String;
 	}
 
-	public ICollection<string> IPPIHHKHGNI()
+	public ICollection<string> GetKeys()
 	{
-		DBMLGGNFGFM();
+		EnsureDictionary();
 		return inst_object.Keys;
 	}
 
 	private bool LitJson_002EIJsonWrapper_002Eget_IsArray()
 	{
-		return NKLOBJNAFOL();
+		return GetIsArray();
 	}
 
 	private bool LitJson_002EIJsonWrapper_002Eget_IsBoolean()
 	{
-		return DBAOMEBNMPH();
+		return GetIsBoolean();
 	}
 
 	private bool LitJson_002EIJsonWrapper_002Eget_IsDouble()
 	{
-		return OEIGDMENBKN();
+		return GetIsDouble();
 	}
 
 	private bool LitJson_002EIJsonWrapper_002Eget_IsInt()
 	{
-		return BGDHACEDILB();
+		return GetIsInt();
 	}
 
 	private bool LitJson_002EIJsonWrapper_002Eget_IsLong()
 	{
-		return BPKJMLDOLPH();
+		return GetIsLong();
 	}
 
 	private bool LitJson_002EIJsonWrapper_002Eget_IsObject()
 	{
-		return HKCKGNMIKBM();
+		return GetIsObject();
 	}
 
 	private bool LitJson_002EIJsonWrapper_002Eget_IsString()
 	{
-		return FMFILGDCAKM();
+		return GetIsString();
 	}
 
 	private object LitJson_002EIOrderedDictionary_002Eget_Item(int OOPOEMNCCGH)
 	{
-		DBMLGGNFGFM();
+		EnsureDictionary();
 		return object_list[OOPOEMNCCGH].Value;
 	}
 
 	private void LitJson_002EIOrderedDictionary_002Eset_Item(int OOPOEMNCCGH, object value)
 	{
-		DBMLGGNFGFM();
+		EnsureDictionary();
 		JsonData jsonData = ToJsonData(value);
 		KeyValuePair<string, JsonData> keyValuePair = object_list[OOPOEMNCCGH];
 		inst_object[keyValuePair.Key] = jsonData;
@@ -426,13 +426,13 @@ public class JsonData : IEquatable<JsonData>, IDictionary, IList, IEnumerable, I
 
 	public JsonData get_Item(string FGGONFKCLMP)
 	{
-		DBMLGGNFGFM();
+		EnsureDictionary();
 		return inst_object[FGGONFKCLMP];
 	}
 
 	public void set_Item(string FGGONFKCLMP, JsonData value)
 	{
-		DBMLGGNFGFM();
+		EnsureDictionary();
 		KeyValuePair<string, JsonData> keyValuePair = new KeyValuePair<string, JsonData>(FGGONFKCLMP, value);
 		if (inst_object.ContainsKey(FGGONFKCLMP))
 		{
@@ -450,13 +450,13 @@ public class JsonData : IEquatable<JsonData>, IDictionary, IList, IEnumerable, I
 			object_list.Add(keyValuePair);
 		}
 		inst_object[FGGONFKCLMP] = value;
-		EMDHMHOKGFP = null;
+		json = null;
 	}
 
 	public JsonData get_Item(int index)
 	{
-		ECPEGHBJOKG();
-		if (LFLGCDNKNJI == GGIECEPGFNH.Array)
+		EnsureCollection();
+		if (type == JsonType.Array)
 		{
 			return inst_array[index];
 		}
@@ -465,8 +465,8 @@ public class JsonData : IEquatable<JsonData>, IDictionary, IList, IEnumerable, I
 
 	public void set_Item(int index, JsonData value)
 	{
-		ECPEGHBJOKG();
-		if (LFLGCDNKNJI == GGIECEPGFNH.Array)
+		EnsureCollection();
+		if (type == JsonType.Array)
 		{
 			inst_array[index] = value;
 		}
@@ -477,7 +477,7 @@ public class JsonData : IEquatable<JsonData>, IDictionary, IList, IEnumerable, I
 			object_list[index] = keyValuePair2;
 			inst_object[keyValuePair.Key] = keyValuePair2.Value;
 		}
-		EMDHMHOKGFP = null;
+		json = null;
 	}
 
 	[SpecialName]
@@ -512,7 +512,7 @@ public class JsonData : IEquatable<JsonData>, IDictionary, IList, IEnumerable, I
 
 	public static explicit operator bool(JsonData data)
 	{
-		if (data.LFLGCDNKNJI != GGIECEPGFNH.Boolean)
+		if (data.type != JsonType.Boolean)
 		{
 			throw new InvalidCastException("Instance of JsonData doesn't hold a double");
 		}
@@ -521,7 +521,7 @@ public class JsonData : IEquatable<JsonData>, IDictionary, IList, IEnumerable, I
 
 	public static explicit operator double(JsonData data)
 	{
-		if (data.LFLGCDNKNJI != GGIECEPGFNH.Double)
+		if (data.type != JsonType.Double)
 		{
 			throw new InvalidCastException("Instance of JsonData doesn't hold a double");
 		}
@@ -530,7 +530,7 @@ public class JsonData : IEquatable<JsonData>, IDictionary, IList, IEnumerable, I
 
 	public static explicit operator int(JsonData data)
 	{
-		if (data.LFLGCDNKNJI != GGIECEPGFNH.Int)
+		if (data.type != JsonType.Int)
 		{
 			throw new InvalidCastException("Instance of JsonData doesn't hold an int");
 		}
@@ -539,7 +539,7 @@ public class JsonData : IEquatable<JsonData>, IDictionary, IList, IEnumerable, I
 
 	public static explicit operator long(JsonData data)
 	{
-		if (data.LFLGCDNKNJI != GGIECEPGFNH.Long)
+		if (data.type != JsonType.Long)
 		{
 			throw new InvalidCastException("Instance of JsonData doesn't hold an int");
 		}
@@ -548,37 +548,37 @@ public class JsonData : IEquatable<JsonData>, IDictionary, IList, IEnumerable, I
 
 	public static explicit operator string(JsonData data)
 	{
-		if (data.LFLGCDNKNJI != GGIECEPGFNH.String)
+		if (data.type != JsonType.String)
 		{
 			throw new InvalidCastException("Instance of JsonData doesn't hold a string");
 		}
-		return data.MBHOBGCDLDB;
+		return data.inst_string;
 	}
 
 	void ICollection.CopyTo(Array HFPDMGAEJJE, int index)
 	{
-		ECPEGHBJOKG().CopyTo(HFPDMGAEJJE, index);
+		EnsureCollection().CopyTo(HFPDMGAEJJE, index);
 	}
 
 	void IDictionary.Add(object KGBGENDIMBC, object value)
 	{
 		JsonData jsonData = ToJsonData(value);
-		DBMLGGNFGFM().Add(KGBGENDIMBC, jsonData);
+		EnsureDictionary().Add(KGBGENDIMBC, jsonData);
 		KeyValuePair<string, JsonData> item = new KeyValuePair<string, JsonData>((string)KGBGENDIMBC, jsonData);
 		object_list.Add(item);
-		EMDHMHOKGFP = null;
+		json = null;
 	}
 
 	void IDictionary.Clear()
 	{
-		DBMLGGNFGFM().Clear();
+		EnsureDictionary().Clear();
 		object_list.Clear();
-		EMDHMHOKGFP = null;
+		json = null;
 	}
 
 	bool IDictionary.Contains(object KGBGENDIMBC)
 	{
-		return DBMLGGNFGFM().Contains(KGBGENDIMBC);
+		return EnsureDictionary().Contains(KGBGENDIMBC);
 	}
 
 	IDictionaryEnumerator IDictionary.GetEnumerator()
@@ -588,7 +588,7 @@ public class JsonData : IEquatable<JsonData>, IDictionary, IList, IEnumerable, I
 
 	void IDictionary.Remove(object KGBGENDIMBC)
 	{
-		DBMLGGNFGFM().Remove(KGBGENDIMBC);
+		EnsureDictionary().Remove(KGBGENDIMBC);
 		for (int i = 0; i < object_list.Count; i++)
 		{
 			if (object_list[i].Key == (string)KGBGENDIMBC)
@@ -597,17 +597,17 @@ public class JsonData : IEquatable<JsonData>, IDictionary, IList, IEnumerable, I
 				break;
 			}
 		}
-		EMDHMHOKGFP = null;
+		json = null;
 	}
 
 	IEnumerator IEnumerable.GetEnumerator()
 	{
-		return ECPEGHBJOKG().GetEnumerator();
+		return EnsureCollection().GetEnumerator();
 	}
 
 	bool IJsonWrapper.GetBoolean()
 	{
-		if (LFLGCDNKNJI != GGIECEPGFNH.Boolean)
+		if (type != JsonType.Boolean)
 		{
 			throw new InvalidOperationException("JsonData instance doesn't hold a boolean");
 		}
@@ -616,7 +616,7 @@ public class JsonData : IEquatable<JsonData>, IDictionary, IList, IEnumerable, I
 
 	double IJsonWrapper.GetDouble()
 	{
-		if (LFLGCDNKNJI != GGIECEPGFNH.Double)
+		if (type != JsonType.Double)
 		{
 			throw new InvalidOperationException("JsonData instance doesn't hold a double");
 		}
@@ -625,7 +625,7 @@ public class JsonData : IEquatable<JsonData>, IDictionary, IList, IEnumerable, I
 
 	int IJsonWrapper.GetInt()
 	{
-		if (LFLGCDNKNJI != GGIECEPGFNH.Int)
+		if (type != JsonType.Int)
 		{
 			throw new InvalidOperationException("JsonData instance doesn't hold an int");
 		}
@@ -634,7 +634,7 @@ public class JsonData : IEquatable<JsonData>, IDictionary, IList, IEnumerable, I
 
 	long IJsonWrapper.GetLong()
 	{
-		if (LFLGCDNKNJI != GGIECEPGFNH.Long)
+		if (type != JsonType.Long)
 		{
 			throw new InvalidOperationException("JsonData instance doesn't hold a long");
 		}
@@ -643,46 +643,46 @@ public class JsonData : IEquatable<JsonData>, IDictionary, IList, IEnumerable, I
 
 	string IJsonWrapper.GetString()
 	{
-		if (LFLGCDNKNJI != GGIECEPGFNH.String)
+		if (type != JsonType.String)
 		{
 			throw new InvalidOperationException("JsonData instance doesn't hold a string");
 		}
-		return MBHOBGCDLDB;
+		return inst_string;
 	}
 
 	void IJsonWrapper.SetBoolean(bool PKHDLOGJKAD)
 	{
-		LFLGCDNKNJI = GGIECEPGFNH.Boolean;
+		type = JsonType.Boolean;
 		inst_boolean = PKHDLOGJKAD;
-		EMDHMHOKGFP = null;
+		json = null;
 	}
 
 	void IJsonWrapper.SetDouble(double PKHDLOGJKAD)
 	{
-		LFLGCDNKNJI = GGIECEPGFNH.Double;
+		type = JsonType.Double;
 		inst_double = PKHDLOGJKAD;
-		EMDHMHOKGFP = null;
+		json = null;
 	}
 
 	void IJsonWrapper.SetInt(int PKHDLOGJKAD)
 	{
-		LFLGCDNKNJI = GGIECEPGFNH.Int;
+		type = JsonType.Int;
 		inst_int = PKHDLOGJKAD;
-		EMDHMHOKGFP = null;
+		json = null;
 	}
 
 	void IJsonWrapper.SetLong(long PKHDLOGJKAD)
 	{
-		LFLGCDNKNJI = GGIECEPGFNH.Long;
+		type = JsonType.Long;
 		inst_long = PKHDLOGJKAD;
-		EMDHMHOKGFP = null;
+		json = null;
 	}
 
 	void IJsonWrapper.SetString(string PKHDLOGJKAD)
 	{
-		LFLGCDNKNJI = GGIECEPGFNH.String;
-		MBHOBGCDLDB = PKHDLOGJKAD;
-		EMDHMHOKGFP = null;
+		type = JsonType.String;
+		inst_string = PKHDLOGJKAD;
+		json = null;
 	}
 
 	string IJsonWrapper.ToJson()
@@ -702,41 +702,41 @@ public class JsonData : IEquatable<JsonData>, IDictionary, IList, IEnumerable, I
 
 	void IList.Clear()
 	{
-		BFMPNAHENOG().Clear();
-		EMDHMHOKGFP = null;
+		EnsureList().Clear();
+		json = null;
 	}
 
 	bool IList.Contains(object value)
 	{
-		return BFMPNAHENOG().Contains(value);
+		return EnsureList().Contains(value);
 	}
 
 	int IList.IndexOf(object value)
 	{
-		return BFMPNAHENOG().IndexOf(value);
+		return EnsureList().IndexOf(value);
 	}
 
 	void IList.Insert(int index, object value)
 	{
-		BFMPNAHENOG().Insert(index, value);
-		EMDHMHOKGFP = null;
+		EnsureList().Insert(index, value);
+		json = null;
 	}
 
 	void IList.Remove(object value)
 	{
-		BFMPNAHENOG().Remove(value);
-		EMDHMHOKGFP = null;
+		EnsureList().Remove(value);
+		json = null;
 	}
 
 	void IList.RemoveAt(int index)
 	{
-		BFMPNAHENOG().RemoveAt(index);
-		EMDHMHOKGFP = null;
+		EnsureList().RemoveAt(index);
+		json = null;
 	}
 
 	IDictionaryEnumerator IOrderedDictionary.GetEnumerator()
 	{
-		DBMLGGNFGFM();
+		EnsureDictionary();
 		return new OrderedDictionaryEnumerator(object_list.GetEnumerator());
 	}
 
@@ -751,51 +751,51 @@ public class JsonData : IEquatable<JsonData>, IDictionary, IList, IEnumerable, I
 
 	void IOrderedDictionary.RemoveAt(int OOPOEMNCCGH)
 	{
-		DBMLGGNFGFM();
+		EnsureDictionary();
 		inst_object.Remove(object_list[OOPOEMNCCGH].Key);
 		object_list.RemoveAt(OOPOEMNCCGH);
 	}
 
-	private ICollection ECPEGHBJOKG()
+	private ICollection EnsureCollection()
 	{
-		if (LFLGCDNKNJI == GGIECEPGFNH.Array)
+		if (type == JsonType.Array)
 		{
 			return (ICollection)inst_array;
 		}
-		if (LFLGCDNKNJI == GGIECEPGFNH.Object)
+		if (type == JsonType.Object)
 		{
 			return (ICollection)inst_object;
 		}
 		throw new InvalidOperationException("The JsonData instance has to be initialized first");
 	}
 
-	private IDictionary DBMLGGNFGFM()
+	private IDictionary EnsureDictionary()
 	{
-		if (LFLGCDNKNJI == GGIECEPGFNH.Object)
+		if (type == JsonType.Object)
 		{
 			return (IDictionary)inst_object;
 		}
-		if (LFLGCDNKNJI != GGIECEPGFNH.None)
+		if (type != JsonType.None)
 		{
 			throw new InvalidOperationException("Instance of JsonData is not a dictionary");
 		}
-		LFLGCDNKNJI = GGIECEPGFNH.Object;
+		type = JsonType.Object;
 		inst_object = new Dictionary<string, JsonData>();
 		object_list = new List<KeyValuePair<string, JsonData>>();
 		return (IDictionary)inst_object;
 	}
 
-	private IList BFMPNAHENOG()
+	private IList EnsureList()
 	{
-		if (LFLGCDNKNJI == GGIECEPGFNH.Array)
+		if (type == JsonType.Array)
 		{
 			return (IList)inst_array;
 		}
-		if (LFLGCDNKNJI != GGIECEPGFNH.None)
+		if (type != JsonType.None)
 		{
 			throw new InvalidOperationException("Instance of JsonData is not a list");
 		}
-		LFLGCDNKNJI = GGIECEPGFNH.Array;
+		type = JsonType.Array;
 		inst_array = new List<JsonData>();
 		return (IList)inst_array;
 	}
@@ -813,71 +813,71 @@ public class JsonData : IEquatable<JsonData>, IDictionary, IList, IEnumerable, I
 		return new JsonData(AOMLCBHAJJH);
 	}
 
-	private static void CHOOAGEMOMD(IJsonWrapper AOMLCBHAJJH, JsonWriter writer)
+	private static void WriteJson(IJsonWrapper AOMLCBHAJJH, JsonWriter writer)
 	{
 		if (AOMLCBHAJJH == null)
 		{
 			writer.Write(null);
 		}
-		else if (AOMLCBHAJJH.FMFILGDCAKM())
+		else if (AOMLCBHAJJH.GetIsString())
 		{
 			writer.Write(AOMLCBHAJJH.GetString());
 		}
-		else if (AOMLCBHAJJH.DBAOMEBNMPH())
+		else if (AOMLCBHAJJH.GetIsBoolean())
 		{
 			writer.Write(AOMLCBHAJJH.GetBoolean());
 		}
-		else if (AOMLCBHAJJH.OEIGDMENBKN())
+		else if (AOMLCBHAJJH.GetIsDouble())
 		{
 			writer.Write(AOMLCBHAJJH.GetDouble());
 		}
-		else if (AOMLCBHAJJH.BGDHACEDILB())
+		else if (AOMLCBHAJJH.GetIsInt())
 		{
 			writer.Write(AOMLCBHAJJH.GetInt());
 		}
-		else if (AOMLCBHAJJH.BPKJMLDOLPH())
+		else if (AOMLCBHAJJH.GetIsLong())
 		{
 			writer.Write(AOMLCBHAJJH.GetLong());
 		}
-		else if (AOMLCBHAJJH.NKLOBJNAFOL())
+		else if (AOMLCBHAJJH.GetIsArray())
 		{
-			writer.AGGBIHCJOKF();
+			writer.WriteArrayStart();
 			foreach (object item in (IEnumerable)AOMLCBHAJJH)
 			{
-				CHOOAGEMOMD((JsonData)item, writer);
+				WriteJson((JsonData)item, writer);
 			}
-			writer.FMIALOIGMFH();
+			writer.WriteArrayEnd();
 		}
 		else
 		{
-			if (!AOMLCBHAJJH.HKCKGNMIKBM())
+			if (!AOMLCBHAJJH.GetIsObject())
 			{
 				return;
 			}
-			writer.ACCDHGHBCHM();
+			writer.WriteObjectStart();
 			foreach (DictionaryEntry item2 in (IDictionary)AOMLCBHAJJH)
 			{
-				writer.MPKEMEAPPJL((string)item2.Key);
-				CHOOAGEMOMD((JsonData)item2.Value, writer);
+				writer.WritePropertyName((string)item2.Key);
+				WriteJson((JsonData)item2.Value, writer);
 			}
-			writer.KDAIDMBDFHB();
+			writer.WriteObjectEnd();
 		}
 	}
 
 	public int Add(object value)
 	{
 		JsonData jsonData = ToJsonData(value);
-		EMDHMHOKGFP = null;
-		return BFMPNAHENOG().Add(jsonData);
+		json = null;
+		return EnsureList().Add(jsonData);
 	}
 
 	public void Clear()
 	{
-		if (HKCKGNMIKBM())
+		if (GetIsObject())
 		{
 			((IDictionary)this).Clear();
 		}
-		else if (NKLOBJNAFOL())
+		else if (GetIsArray())
 		{
 			((IList)this).Clear();
 		}
@@ -889,111 +889,111 @@ public class JsonData : IEquatable<JsonData>, IDictionary, IList, IEnumerable, I
 		{
 			return false;
 		}
-		if (DHDMNHCIPEH.LFLGCDNKNJI != LFLGCDNKNJI)
+		if (DHDMNHCIPEH.type != type)
 		{
 			return false;
 		}
-		switch (LFLGCDNKNJI)
+		switch (type)
 		{
-		case GGIECEPGFNH.None:
+		case JsonType.None:
 			return true;
-		case GGIECEPGFNH.Object:
+		case JsonType.Object:
 			return inst_object.Equals(DHDMNHCIPEH.inst_object);
-		case GGIECEPGFNH.Array:
+		case JsonType.Array:
 			return inst_array.Equals(DHDMNHCIPEH.inst_array);
-		case GGIECEPGFNH.String:
-			return MBHOBGCDLDB.Equals(DHDMNHCIPEH.MBHOBGCDLDB);
-		case GGIECEPGFNH.Int:
+		case JsonType.String:
+			return inst_string.Equals(DHDMNHCIPEH.inst_string);
+		case JsonType.Int:
 			return inst_int.Equals(DHDMNHCIPEH.inst_int);
-		case GGIECEPGFNH.Long:
+		case JsonType.Long:
 			return inst_long.Equals(DHDMNHCIPEH.inst_long);
-		case GGIECEPGFNH.Double:
+		case JsonType.Double:
 			return inst_double.Equals(DHDMNHCIPEH.inst_double);
-		case GGIECEPGFNH.Boolean:
+		case JsonType.Boolean:
 			return inst_boolean.Equals(DHDMNHCIPEH.inst_boolean);
 		default:
 			return false;
 		}
 	}
 
-	public GGIECEPGFNH NCGOKKHFKJF()
+	public JsonType GetJsonType()
 	{
-		return LFLGCDNKNJI;
+		return type;
 	}
 
-	public void FJKDNANFIHA(GGIECEPGFNH LFLGCDNKNJI)
+	public void SetJsonType(JsonType LFLGCDNKNJI)
 	{
-		if (this.LFLGCDNKNJI != LFLGCDNKNJI)
+		if (this.type != LFLGCDNKNJI)
 		{
 			switch (LFLGCDNKNJI)
 			{
-			case GGIECEPGFNH.Object:
+			case JsonType.Object:
 				inst_object = new Dictionary<string, JsonData>();
 				object_list = new List<KeyValuePair<string, JsonData>>();
 				break;
-			case GGIECEPGFNH.Array:
+			case JsonType.Array:
 				inst_array = new List<JsonData>();
 				break;
-			case GGIECEPGFNH.String:
-				MBHOBGCDLDB = null;
+			case JsonType.String:
+				inst_string = null;
 				break;
-			case GGIECEPGFNH.Int:
+			case JsonType.Int:
 				inst_int = 0;
 				break;
-			case GGIECEPGFNH.Long:
+			case JsonType.Long:
 				inst_long = 0L;
 				break;
-			case GGIECEPGFNH.Double:
+			case JsonType.Double:
 				inst_double = 0.0;
 				break;
-			case GGIECEPGFNH.Boolean:
+			case JsonType.Boolean:
 				inst_boolean = false;
 				break;
 			}
-			this.LFLGCDNKNJI = LFLGCDNKNJI;
+			this.type = LFLGCDNKNJI;
 		}
 	}
 
 	public string ToJson()
 	{
-		if (EMDHMHOKGFP != null)
+		if (json != null)
 		{
-			return EMDHMHOKGFP;
+			return json;
 		}
 		StringWriter stringWriter = new StringWriter();
 		JsonWriter iGOCJFDLBMG = new JsonWriter(stringWriter);
-		iGOCJFDLBMG.BHMCFLJJJNM(false);
-		CHOOAGEMOMD(this, iGOCJFDLBMG);
-		EMDHMHOKGFP = stringWriter.ToString();
-		return EMDHMHOKGFP;
+		iGOCJFDLBMG.SetValidate(false);
+		WriteJson(this, iGOCJFDLBMG);
+		json = stringWriter.ToString();
+		return json;
 	}
 
 	public void ToJson(JsonWriter writer)
 	{
-		bool bAINMLLIKOL = writer.EPCAKOLMCMC();
-		writer.BHMCFLJJJNM(false);
-		CHOOAGEMOMD(this, writer);
-		writer.BHMCFLJJJNM(bAINMLLIKOL);
+		bool bAINMLLIKOL = writer.GetValidate();
+		writer.SetValidate(false);
+		WriteJson(this, writer);
+		writer.SetValidate(bAINMLLIKOL);
 	}
 
 	public override string ToString()
 	{
-		switch (LFLGCDNKNJI)
+		switch (type)
 		{
-		case GGIECEPGFNH.Array:
+		case JsonType.Array:
 			return "JsonData array";
-		case GGIECEPGFNH.Boolean:
+		case JsonType.Boolean:
 			return inst_boolean.ToString();
-		case GGIECEPGFNH.Double:
+		case JsonType.Double:
 			return inst_double.ToString();
-		case GGIECEPGFNH.Int:
+		case JsonType.Int:
 			return inst_int.ToString();
-		case GGIECEPGFNH.Long:
+		case JsonType.Long:
 			return inst_long.ToString();
-		case GGIECEPGFNH.Object:
+		case JsonType.Object:
 			return "JsonData object";
-		case GGIECEPGFNH.String:
-			return MBHOBGCDLDB;
+		case JsonType.String:
+			return inst_string;
 		default:
 			return "Uninitialized JsonData";
 		}

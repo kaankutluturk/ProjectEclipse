@@ -27,31 +27,31 @@ function New-BattleFixture([System.Xml.XmlElement]$definition, [int]$wins = 0, [
     Set-BattleField $battle '_type' $type
     $data = New-Object DeflatedString
     $data.Set($definition)
-    Set-BattleField $battle 'CMDDPMAAJOF' $data
+    Set-BattleField $battle '_sourceDefinition' $data
     [xml]$save = '<Battle Name="ZONE_2|Test|" ReplayCount="0" Locked="0" Hidden="0" />'
     $roster = New-Object RosterBattle -ArgumentList $save.DocumentElement
-    $roster.FHCHCHPPMEI($cycle)
-    $battle.FOMHAGJJCLJ($roster)
+    $roster.SetReplayCount($cycle)
+    $battle.SetRosterBattle($roster)
     $fights = New-Object 'System.Collections.Generic.List[FightList]'
     foreach ($node in $definition.SelectNodes('Fight')) {
         $fight = [Runtime.Serialization.FormatterServices]::GetUninitializedObject([FightList])
         $fight.Name = $node.GetAttribute('Name')
         $fight.Index = $fights.Count
         $fight.Battle = $battle
-        $fight.EJGGHHEOGPG = [int]$node.GetAttribute('Replays')
+        $fight.ReplayCount = [int]$node.GetAttribute('Replays')
         $fight.set_Type($type)
         [xml]$fightSave = '<Fight CompletedCount="0" EclipseCompletedCount="0" LossCount="3" EclipseLossCount="2" StoryCount="4" RandomGroupSeed="123" RandomRuleSeed="456" />'
         $rosterFight = New-Object RosterFight -ArgumentList $fightSave.DocumentElement
-        $rosterFight.OBFNFKPHJIN($wins * $fight.EJGGHHEOGPG)
-        $rosterFight.BIINCAKDHLP($wins * $fight.EJGGHHEOGPG)
+        $rosterFight.SetWinCount($wins * $fight.ReplayCount)
+        $rosterFight.SetEclipseWinCount($wins * $fight.ReplayCount)
         $fight.SetRosterFight($rosterFight)
-        if ($battle -is [BattleReplayable]) { $battle.MJJFFAOLCCK($fight) }
+        if ($battle -is [BattleReplayable]) { $battle.RefreshFightStatus($fight) }
         else { $fight.Status = [ConditionStatus]::StatusComplete }
         $fights.Add($fight)
     }
-    Set-BattleField $battle 'JNPMCNMEOLE' $fights
-    Set-BattleField $battle 'AIKIOPMGCEG' ([ushort]$fights.Count)
-    Set-BattleField $battle 'NLLECKHLMAN' $true
+    Set-BattleField $battle '_fights' $fights
+    Set-BattleField $battle '_fightCount' ([ushort]$fights.Count)
+    Set-BattleField $battle '_fightsParsed' $true
     return $battle
 }
 
@@ -62,7 +62,7 @@ function New-ItemRuleSourceFixture([System.Xml.XmlElement]$definition) {
     $rule = [Runtime.Serialization.FormatterServices]::GetUninitializedObject([ItemRule])
     $data = New-Object DeflatedString
     $data.Set($definition)
-    [Rule].GetField('HEPAHAKDDGC', $flags).SetValue($rule, $data)
+    [Rule].GetField('xmlSource', $flags).SetValue($rule, $data)
     return $rule
 }
 $equipRule = New-ItemRuleSourceFixture $equipRuleXml.DocumentElement
@@ -113,21 +113,21 @@ foreach ($definition in $definitions) {
     for ($cycle = 1; $cycle -le 3; $cycle++) {
         $fights = $battle.GetFights()
         foreach ($fight in $fights) {
-            for ($win = 0; $win -lt $fight.EJGGHHEOGPG; $win++) {
-                $fight.FLKFFDLLBKA().GICDABHEMML()
-                $fight.FLKFFDLLBKA().LOEBHEODPAH()
+            for ($win = 0; $win -lt $fight.ReplayCount; $win++) {
+                $fight.GetRosterFight().RecordWin()
+                $fight.GetRosterFight().IncrementEclipseWinCount()
             }
-            $battle.MJJFFAOLCCK($fight)
+            $battle.RefreshFightStatus($fight)
             if ($fight -ne $fights[$fights.Count - 1]) {
                 Assert-True (!$battle.TryStartNextReplay()) ($battle.get_Name() + ': partial segment reset')
             }
         }
-        $before = @($fights | ForEach-Object { $_.FLKFFDLLBKA().LIGMHKEOJBB().OuterXml }) -join "`n"
+        $before = @($fights | ForEach-Object { $_.GetRosterFight().GetNode().OuterXml }) -join "`n"
         Assert-True ($battle.TryStartNextReplay()) ($battle.get_Name() + ': completed segment did not reopen')
-        Assert-True ($battle.HLBOMMKJAAO() -eq $cycle) 'Wrong replay cycle'
-        Assert-True ($battle.FBFHBKPFLJC() -eq $fights[0]) 'Replay did not restart at first opponent'
-        Assert-True ($battle.MNHLGELMOEJ() -eq [ConditionStatus]::StatusOpen) 'Battle remains completed'
-        $after = @($fights | ForEach-Object { $_.FLKFFDLLBKA().LIGMHKEOJBB().OuterXml }) -join "`n"
+        Assert-True ($battle.GetCompletedCycles() -eq $cycle) 'Wrong replay cycle'
+        Assert-True ($battle.GetFirstOpenFight() -eq $fights[0]) 'Replay did not restart at first opponent'
+        Assert-True ($battle.GetStatus() -eq [ConditionStatus]::StatusOpen) 'Battle remains completed'
+        $after = @($fights | ForEach-Object { $_.GetRosterFight().GetNode().OuterXml }) -join "`n"
         Assert-True ($before -ceq $after) 'Replay changed lifetime wins/losses, seeds or story counters'
         Assert-True (!$battle.TryStartNextReplay()) 'Replay update was not idempotent'
     }
@@ -136,27 +136,27 @@ foreach ($definition in $definitions) {
 $hermit = $stages.SelectSingleNode('//Zone[@Name="ZONE_2"]/Battle[@Name="BOSS_HERMIT_ECLIPSEMODE"]')
 $battle = New-BattleFixture $hermit 4 0
 Assert-True ($battle.TryStartNextReplay()) 'Stale completed save did not recover'
-Assert-True ($battle.HLBOMMKJAAO() -eq 4) 'Stale cycle did not catch up to saved wins'
-$rosterNode = [RosterBattle].GetField('_node', $flags).GetValue($battle.NNPNEABKHPP())
+Assert-True ($battle.GetCompletedCycles() -eq 4) 'Stale cycle did not catch up to saved wins'
+$rosterNode = [RosterBattle].GetField('_node', $flags).GetValue($battle.GetRosterBattle())
 $reloaded = New-Object RosterBattle -ArgumentList $rosterNode.CloneNode($true)
-Assert-True ($reloaded.ODCFKCJJDKN() -eq 4) 'ReplayCount was not serialized'
-$battle.FOMHAGJJCLJ($reloaded)
+Assert-True ($reloaded.GetReplayCount() -eq 4) 'ReplayCount was not serialized'
+$battle.SetRosterBattle($reloaded)
 Assert-True (!$battle.TryStartNextReplay()) 'Reload advanced the cycle again'
-$battle.GetFights()[0].FLKFFDLLBKA().GICDABHEMML()
-$battle.MJJFFAOLCCK($battle.GetFights()[0])
+$battle.GetFights()[0].GetRosterFight().RecordWin()
+$battle.RefreshFightStatus($battle.GetFights()[0])
 Assert-True (!$battle.TryStartNextReplay()) 'Partially replayed bodyguards reset'
-Assert-True ($battle.FBFHBKPFLJC().Index -eq 1) 'Partial replay lost its next opponent'
+Assert-True ($battle.GetFirstOpenFight().Index -eq 1) 'Partial replay lost its next opponent'
 $battle = New-BattleFixture $hermit 1
-$battle.NNPNEABKHPP().SetLocked($true)
+$battle.GetRosterBattle().SetLocked($true)
 Assert-True (!$battle.TryStartNextReplay()) 'Explicitly locked battle was reopened'
 $battle = New-BattleFixture $hermit 1
-Set-BattleField $battle 'MEOMPEEPCJJ' $null
+Set-BattleField $battle '_rosterBattle' $null
 Assert-True (!$battle.TryStartNextReplay()) 'Missing roster was reopened'
 $battle = New-BattleFixture $hermit 1
-[FightList].GetField('ECHMHCODAFA', $flags).SetValue($battle.GetFights()[0], $null)
+[FightList].GetField('rosterFight', $flags).SetValue($battle.GetFights()[0], $null)
 Assert-True (!$battle.TryStartNextReplay()) 'Missing fight progress was treated as complete'
 $battle = New-BattleFixture $hermit 1
-$battle.GetFights()[0].EJGGHHEOGPG = 0
+$battle.GetFights()[0].ReplayCount = 0
 Assert-True (!$battle.TryStartNextReplay()) 'Unlimited fight was treated as a finite segment'
 
 # Run the production Eclipse action with actual Battle/RosterFight objects.
@@ -171,8 +171,8 @@ using System.Xml;
 namespace EclipseRuntimeTest {
     public class QuestParameters { }
     public class QuestAction {
-        public virtual void DEJMHFMLKIC(QuestParameters parameters) { }
-        protected void OGIJONMKABB() { }
+        public virtual void Execute(QuestParameters parameters) { }
+        protected void FinishAction() { }
     }
     public class Roster {
         public bool EclipseMode = true;
@@ -182,9 +182,9 @@ namespace EclipseRuntimeTest {
 			XmlDocument save = new XmlDocument();
 			save.LoadXml("<Battle Name='test' Locked='0' Hidden='0' ReplayCount='0' />");
 			RosterBattle roster = new RosterBattle(save.DocumentElement);
-			roster.HCEOCBOFIGC(hidden);
-			roster.FHCHCHPPMEI(replayCount);
-			battle.FOMHAGJJCLJ(roster);
+			roster.SetHidden(hidden);
+			roster.SetReplayCount(replayCount);
+			battle.SetRosterBattle(roster);
 			Adds++;
 		}
     }
@@ -194,9 +194,9 @@ namespace EclipseRuntimeTest {
         public List<Battle> Battles = new List<Battle>();
         public int Saves;
         public static ListSF GetInstance() { return Instance; }
-        public static Roster CCDKHLAMKKO() { return Roster; }
-        public List<Battle> MMCHMBIKIEP() { return Battles; }
-        public void EJANJEEGOOE() { Saves++; }
+        public static Roster GetRoster() { return Roster; }
+        public List<Battle> GetBattles() { return Battles; }
+        public void RequestSave() { Saves++; }
     }
     public class Scene<T> where T : new() {
         public static T Current = new T();
@@ -226,88 +226,88 @@ if ($PSVersionTable.PSEdition -eq 'Core') {
 Add-Type -TypeDefinition $shim.Replace('/* ACTION */', $action.Value) -ReferencedAssemblies $refs
 $normal = New-BattleFixture $stages.SelectSingleNode('//Zone[@Name="ZONE_2"]/Battle[@Name="BOSS_HERMIT"]') 1
 $eclipse = New-BattleFixture $hermit 1
-$eclipse.FOMHAGJJCLJ($null)
+$eclipse.SetRosterBattle($null)
 $zone = New-Object Zone -ArgumentList @('ZONE_2','test')
 foreach ($entry in @($normal, $eclipse)) {
-    $entry.EENNGGIMMMI($zone)
-    $zone.LGIIBNJFADA.Add($entry)
+    $entry.SetZone($zone)
+    $zone.Battles.Add($entry)
     [EclipseRuntimeTest.ListSF]::Instance.Battles.Add($entry)
 }
-$normal.NNPNEABKHPP().HCEOCBOFIGC($true)
+$normal.GetRosterBattle().SetHidden($true)
 $map = [EclipseRuntimeTest.Scene[EclipseRuntimeTest.MapScene]]::Current
 $map.Zone.Selected = $eclipse
 $update = New-Object EclipseRuntimeTest.QuestActionUpdateEclipseBattles
-$update.DEJMHFMLKIC($null)
+$update.Execute($null)
 Assert-True ([EclipseRuntimeTest.ListSF]::Roster.Adds -eq 1) 'Missing Eclipse roster entry was not introduced'
-Assert-True ($eclipse.HLBOMMKJAAO() -eq 1) 'Eclipse action did not advance completed Hermit'
+Assert-True ($eclipse.GetCompletedCycles() -eq 1) 'Eclipse action did not advance completed Hermit'
 Assert-True ([EclipseRuntimeTest.ListSF]::Instance.Saves -eq 1) 'Progress-only change was not saved'
 Assert-True ($map.Reselections -eq 1) 'Progress-only change did not rebuild selected preview'
-Assert-True ($normal.MNHLGELMOEJ() -eq [ConditionStatus]::StatusComplete) 'Normal story completion changed'
-$update.DEJMHFMLKIC($null)
+Assert-True ($normal.GetStatus() -eq [ConditionStatus]::StatusComplete) 'Normal story completion changed'
+$update.Execute($null)
 Assert-True ([EclipseRuntimeTest.ListSF]::Instance.Saves -eq 1) 'Repeated update rewrote progress'
-$eclipse.GetFights()[0].FLKFFDLLBKA().GICDABHEMML()
-$eclipse.MJJFFAOLCCK($eclipse.GetFights()[0])
+$eclipse.GetFights()[0].GetRosterFight().RecordWin()
+$eclipse.RefreshFightStatus($eclipse.GetFights()[0])
 foreach ($mode in @($false, $true, $false, $true)) {
     [EclipseRuntimeTest.ListSF]::Roster.EclipseMode = $mode
-    $update.DEJMHFMLKIC($null)
-    Assert-True ($eclipse.HLBOMMKJAAO() -eq 1) 'Mode toggle reset a partial replay'
-    Assert-True ($eclipse.FBFHBKPFLJC().Index -eq 1) 'Mode toggle lost bodyguard progress'
-    Assert-True ($eclipse.KBPNDJPMCCG() -eq !$mode) 'Eclipse visibility did not follow mode'
+    $update.Execute($null)
+    Assert-True ($eclipse.GetCompletedCycles() -eq 1) 'Mode toggle reset a partial replay'
+    Assert-True ($eclipse.GetFirstOpenFight().Index -eq 1) 'Mode toggle lost bodyguard progress'
+    Assert-True ($eclipse.IsHidden() -eq !$mode) 'Eclipse visibility did not follow mode'
 }
 # Revealing a future story entry must not unlock its Eclipse counterpart.
-$savedCounterpart=$eclipse.NNPNEABKHPP()
+$savedCounterpart=$eclipse.GetRosterBattle()
 $adds=[EclipseRuntimeTest.ListSF]::Roster.Adds
-$eclipse.FOMHAGJJCLJ($null)
-$normal.NNPNEABKHPP().SetLocked($true)
+$eclipse.SetRosterBattle($null)
+$normal.GetRosterBattle().SetLocked($true)
 foreach($mode in @($false,$true,$false,$true)) {
     [EclipseRuntimeTest.ListSF]::Roster.EclipseMode=$mode
-    $normal.NNPNEABKHPP().HCEOCBOFIGC($true)
+    $normal.GetRosterBattle().SetHidden($true)
     $map.Zone.Selected=$normal
-    $update.DEJMHFMLKIC($null)
+    $update.Execute($null)
     Assert-True ([EclipseRuntimeTest.ListSF]::Roster.Adds -eq $adds) 'Locked source introduced an unlocked counterpart'
-    Assert-True ($null -eq $eclipse.NNPNEABKHPP()) 'Locked source acquired a saved counterpart'
-    Assert-True (!$normal.KBPNDJPMCCG() -and $normal.NNPNEABKHPP().IsLocked()) 'Locked source disappeared or unlocked on mode switch'
+    Assert-True ($null -eq $eclipse.GetRosterBattle()) 'Locked source acquired a saved counterpart'
+    Assert-True (!$normal.IsHidden() -and $normal.GetRosterBattle().IsLocked()) 'Locked source disappeared or unlocked on mode switch'
 }
 # Old saves may already contain an exposed counterpart. Hide it without resetting
 # its own lock, completed rounds or replay history, and repair selected preview.
-$eclipse.FOMHAGJJCLJ($savedCounterpart)
+$eclipse.SetRosterBattle($savedCounterpart)
 $savedCounterpart.SetLocked($false)
-$savedCounterpart.HCEOCBOFIGC($false)
+$savedCounterpart.SetHidden($false)
 $map.Zone.Selected=$eclipse
-$roundBefore=$eclipse.FBFHBKPFLJC().Index
-$replayBefore=$eclipse.HLBOMMKJAAO()
-$update.DEJMHFMLKIC($null)
-Assert-True ($eclipse.KBPNDJPMCCG() -and !$normal.KBPNDJPMCCG()) 'Locked source left old Eclipse counterpart visible'
+$roundBefore=$eclipse.GetFirstOpenFight().Index
+$replayBefore=$eclipse.GetCompletedCycles()
+$update.Execute($null)
+Assert-True ($eclipse.IsHidden() -and !$normal.IsHidden()) 'Locked source left old Eclipse counterpart visible'
 Assert-True ([object]::ReferenceEquals($map.Zone.Selected,$normal)) 'Hidden Eclipse selection did not return to locked normal entry'
-Assert-True (!$savedCounterpart.IsLocked() -and $eclipse.HLBOMMKJAAO() -eq $replayBefore -and $eclipse.FBFHBKPFLJC().Index -eq $roundBefore) 'Lock gate reset counterpart progress'
+Assert-True (!$savedCounterpart.IsLocked() -and $eclipse.GetCompletedCycles() -eq $replayBefore -and $eclipse.GetFirstOpenFight().Index -eq $roundBefore) 'Lock gate reset counterpart progress'
 $savesBefore=[EclipseRuntimeTest.ListSF]::Instance.Saves
-$update.DEJMHFMLKIC($null)
+$update.Execute($null)
 Assert-True ([EclipseRuntimeTest.ListSF]::Instance.Saves -eq $savesBefore) 'Repeated locked update rewrote profile'
-$normal.NNPNEABKHPP().SetLocked($false)
+$normal.GetRosterBattle().SetLocked($false)
 $savedCounterpart.SetLocked($true)
-$update.DEJMHFMLKIC($null)
-Assert-True (!$eclipse.KBPNDJPMCCG() -and $normal.KBPNDJPMCCG() -and $savedCounterpart.IsLocked()) 'Unlocked source overwrote independently locked counterpart'
-Assert-True ($eclipse.HLBOMMKJAAO() -eq $replayBefore -and $eclipse.FBFHBKPFLJC().Index -eq $roundBefore) 'Unlock reset counterpart history'
+$update.Execute($null)
+Assert-True (!$eclipse.IsHidden() -and $normal.IsHidden() -and $savedCounterpart.IsLocked()) 'Unlocked source overwrote independently locked counterpart'
+Assert-True ($eclipse.GetCompletedCycles() -eq $replayBefore -and $eclipse.GetFirstOpenFight().Index -eq $roundBefore) 'Unlock reset counterpart history'
 
 # A saved intermission source owns a shared counterpart even if the obsolete base
 # source remains locked. Exercise both enumeration orders.
 $intermissionNode=$stages.SelectSingleNode('//Zone[@Name="ZONE_2"]/Battle[@Name="BOSS_HERMIT"]').CloneNode($true)
 $intermissionNode.SetAttribute('Name','BOSS_HERMIT_INTERMISSION')
 $intermission=New-BattleFixture $intermissionNode 1
-$intermission.EENNGGIMMMI($zone)
-$zone.LGIIBNJFADA.Add($intermission)
-$normal.NNPNEABKHPP().SetLocked($true)
+$intermission.SetZone($zone)
+$zone.Battles.Add($intermission)
+$normal.GetRosterBattle().SetLocked($true)
 foreach($reverse in @($false,$true)) {
     [EclipseRuntimeTest.ListSF]::Instance.Battles.Clear()
     $ordered=if($reverse){@($intermission,$normal,$eclipse)}else{@($normal,$eclipse,$intermission)}
     foreach($entry in $ordered){[EclipseRuntimeTest.ListSF]::Instance.Battles.Add($entry)}
     foreach($locked in @($false,$true)) {
-        $intermission.NNPNEABKHPP().SetLocked($locked)
+        $intermission.GetRosterBattle().SetLocked($locked)
         foreach($mode in @($false,$true)) {
             [EclipseRuntimeTest.ListSF]::Roster.EclipseMode=$mode
-            $update.DEJMHFMLKIC($null)
-            Assert-True ($eclipse.KBPNDJPMCCG() -eq ($locked -or !$mode)) 'Obsolete base lock overrode intermission visibility'
-            Assert-True ($intermission.KBPNDJPMCCG() -eq (!$locked -and $mode)) 'Intermission source visibility differs'
+            $update.Execute($null)
+            Assert-True ($eclipse.IsHidden() -eq ($locked -or !$mode)) 'Obsolete base lock overrode intermission visibility'
+            Assert-True ($intermission.IsHidden() -eq (!$locked -and $mode)) 'Intermission source visibility differs'
         }
     }
 }
@@ -319,20 +319,20 @@ $openNormal = New-BattleFixture $stages.SelectSingleNode('//Zone[@Name="ZONE_2"]
 $openEclipse = New-BattleFixture $hermit 0
 # Non-replayable fixtures start complete; leave the last fight of this one unwon.
 $openNormal.GetFights()[$openNormal.GetFights().Count - 1].Status = [ConditionStatus]::StatusOpen
-foreach ($entry in @($openNormal, $openEclipse)) { $entry.EENNGGIMMMI($openZone); $openZone.LGIIBNJFADA.Add($entry) }
+foreach ($entry in @($openNormal, $openEclipse)) { $entry.SetZone($openZone); $openZone.Battles.Add($entry) }
 [EclipseRuntimeTest.ListSF]::Instance.Battles.Clear()
 foreach ($entry in @($openNormal, $openEclipse)) { [EclipseRuntimeTest.ListSF]::Instance.Battles.Add($entry) }
-$openNormal.NNPNEABKHPP().HCEOCBOFIGC($true)
-$openEclipse.NNPNEABKHPP().HCEOCBOFIGC($false)
+$openNormal.GetRosterBattle().SetHidden($true)
+$openEclipse.GetRosterBattle().SetHidden($false)
 $map.Zone.Selected = $openEclipse
 [EclipseRuntimeTest.ListSF]::Roster.EclipseMode = $true
 $adds = [EclipseRuntimeTest.ListSF]::Roster.Adds
-Assert-True ($openNormal.MNHLGELMOEJ() -ne [ConditionStatus]::StatusComplete) 'Fixture battle is unexpectedly complete'
-$update.DEJMHFMLKIC($null)
-Assert-True (!$openNormal.KBPNDJPMCCG() -and $openEclipse.KBPNDJPMCCG()) 'Unfinished battle was replaced by its Eclipse replay'
+Assert-True ($openNormal.GetStatus() -ne [ConditionStatus]::StatusComplete) 'Fixture battle is unexpectedly complete'
+$update.Execute($null)
+Assert-True (!$openNormal.IsHidden() -and $openEclipse.IsHidden()) 'Unfinished battle was replaced by its Eclipse replay'
 Assert-True ([object]::ReferenceEquals($map.Zone.Selected, $openNormal)) 'Selection did not return to the unfinished battle'
 Assert-True ([EclipseRuntimeTest.ListSF]::Roster.Adds -eq $adds) 'Unfinished battle introduced a replay counterpart'
-$openEclipse.FOMHAGJJCLJ($null)
-$update.DEJMHFMLKIC($null)
-Assert-True ([EclipseRuntimeTest.ListSF]::Roster.Adds -eq $adds -and $null -eq $openEclipse.NNPNEABKHPP()) 'Unfinished battle acquired a saved replay counterpart'
+$openEclipse.SetRosterBattle($null)
+$update.Execute($null)
+Assert-True ([EclipseRuntimeTest.ListSF]::Roster.Adds -eq $adds -and $null -eq $openEclipse.GetRosterBattle()) 'Unfinished battle acquired a saved replay counterpart'
 Write-Output "PASS: $checks Eclipse assertions across $($definitions.Count) replay segments (three cycles each, saved progress, action integration, locked pairs, intermission ownership, unfinished battles and map refresh)."

@@ -92,7 +92,7 @@ internal static class DE128EquipmentTests
             check(actual.Perk == CoreContentImporter.PerkId(expected.GetAttribute("Name")) &&
                 actual.Aspect == int.Parse(expected["Set"].GetAttribute("Aspect")), "Restored equipment enchantment drift.");
             ModRuntime.Scripts = new ModScriptSession { Content = catalog };
-            var native = new ItemInfo { Name = item.Id.ToString(), DCHJDPCEODD = true };
+            var native = new ItemInfo { Name = item.Id.ToString(), IsShopVisible = true };
             var player = new Roster { Level = listing.Level, Group = "" };
             check(!ShopAvailabilityPolicy.IsAvailable(native, player), "Restored equipment bypassed group gate.");
             player.Group = policy.RequiredGroup; player.Level--;

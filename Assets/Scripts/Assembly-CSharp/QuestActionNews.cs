@@ -1,9 +1,9 @@
 public class QuestActionNews : QuestAction
 {
-	public override void DEJMHFMLKIC(QuestParameters GFIHPBCEEOB)
+	public override void Execute(QuestParameters GFIHPBCEEOB)
 	{
-		base.DEJMHFMLKIC(GFIHPBCEEOB);
-		DialogsOpener.CNDJILOPFJC();
-		OGIJONMKABB();
+		base.Execute(GFIHPBCEEOB);
+		DialogsOpener.OpenNewsDialog();
+		FinishAction();
 	}
 }

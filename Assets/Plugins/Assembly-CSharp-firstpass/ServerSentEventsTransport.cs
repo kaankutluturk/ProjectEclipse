@@ -2,13 +2,13 @@ using System;
 
 public sealed class ServerSentEventsTransport : PostSendTransportBase
 {
-	private EventSource BFKJAGPIDJO;
+	private EventSource eventSource;
 
-	public override bool ODFCAGMNOHK
+	public override bool SupportsKeepAlive
 	{
 		get
 		{
-			return IBMJBEKAIAH();
+			return GetSupportsKeepAlive();
 		}
 	}
 
@@ -17,108 +17,108 @@ public sealed class ServerSentEventsTransport : PostSendTransportBase
 	{
 	}
 
-	public override bool IBMJBEKAIAH()
+	public override bool GetSupportsKeepAlive()
 	{
 		return true;
 	}
 
-	public override AHLJIMDEAJD get_Type()
+	public override TransportTypes get_Type()
 	{
-		return AHLJIMDEAJD.ServerSentEvents;
+		return TransportTypes.ServerSentEvents;
 	}
 
-	public override void NDCILHIAPIK()
+	public override void Connect()
 	{
-		if (BFKJAGPIDJO != null)
+		if (eventSource != null)
 		{
-			HTTPManager.MBBMPNDDPIH().GLCKHLCAPIN("ServerSentEventsTransport", "Start - EventSource already created!");
+			HTTPManager.GetLogger().Warning("ServerSentEventsTransport", "Start - EventSource already created!");
 			return;
 		}
-		if (FLBBFDNHJAJ() != LJLKMCGDKJK.Reconnecting)
+		if (GetState() != TransportStates.Reconnecting)
 		{
-			set_State(LJLKMCGDKJK.Connecting);
+			set_State(TransportStates.Connecting);
 		}
-		FHIEGKMHOCC lFLGCDNKNJI = ((FLBBFDNHJAJ() != LJLKMCGDKJK.Reconnecting) ? FHIEGKMHOCC.Connect : FHIEGKMHOCC.Reconnect);
-		Uri kJHNCLAJMLO = BAFGHLCPPHM().BuildUri(lFLGCDNKNJI, this);
-		BFKJAGPIDJO = new EventSource(kJHNCLAJMLO);
-		BFKJAGPIDJO.LMOIENENDCP(AHBKKGHHAJH);
-		BFKJAGPIDJO.LIMLEFJPHPP(NDPKMPBOIGA);
-		BFKJAGPIDJO.BJDMHEHILEO(NFOPKNNGAON);
-		BFKJAGPIDJO.IDCIMGLDBJG(GAHKIGNMDKI);
-		BFKJAGPIDJO.CKMLLHFIEJG((EventSource LDKKPKBGFOK) => false);
-		BFKJAGPIDJO.LAJCMNNNIIM();
+		SignalRRequestType lFLGCDNKNJI = ((GetState() != TransportStates.Reconnecting) ? SignalRRequestType.Connect : SignalRRequestType.Reconnect);
+		Uri kJHNCLAJMLO = GetConnection().BuildUri(lFLGCDNKNJI, this);
+		eventSource = new EventSource(kJHNCLAJMLO);
+		eventSource.AddOnOpen(OnEventSourceOpen);
+		eventSource.AddOnMessage(OnEventSourceMessage);
+		eventSource.AddOnError(OnEventSourceError);
+		eventSource.AddOnClosed(OnEventSourceClosed);
+		eventSource.AddOnRetry((EventSource LDKKPKBGFOK) => false);
+		eventSource.OpenEventSource();
 	}
 
 	public override void Stop()
 	{
-		BFKJAGPIDJO.IIGDNCOBGDB(AHBKKGHHAJH);
-		BFKJAGPIDJO.FEJIPPJIAHH(NDPKMPBOIGA);
-		BFKJAGPIDJO.LEIDAIFMPCE(NFOPKNNGAON);
-		BFKJAGPIDJO.OIBOHOKKFKE(GAHKIGNMDKI);
-		BFKJAGPIDJO.Close();
-		BFKJAGPIDJO = null;
+		eventSource.RemoveOnOpen(OnEventSourceOpen);
+		eventSource.RemoveOnMessage(OnEventSourceMessage);
+		eventSource.RemoveOnError(OnEventSourceError);
+		eventSource.RemoveOnClosed(OnEventSourceClosed);
+		eventSource.Close();
+		eventSource = null;
 	}
 
-	protected override void HHLGNIDNLNG()
+	protected override void OnStarted()
 	{
 	}
 
-	public override void AKLEEMEHBIC()
+	public override void Abort()
 	{
-		base.AKLEEMEHBIC();
-		BFKJAGPIDJO.Close();
+		base.Abort();
+		eventSource.Close();
 	}
 
-	protected override void NGGKNLJALML()
+	protected override void OnAborted()
 	{
-		if (FLBBFDNHJAJ() == LJLKMCGDKJK.Closing)
+		if (GetState() == TransportStates.Closing)
 		{
-			set_State(LJLKMCGDKJK.Closed);
+			set_State(TransportStates.Closed);
 		}
 	}
 
-	private void AHBKKGHHAJH(EventSource GLFHBCIPCBD)
+	private void OnEventSourceOpen(EventSource GLFHBCIPCBD)
 	{
-		HTTPManager.MBBMPNDDPIH().KDAFBLAKBMI("Transport - " + get_Name(), "OnEventSourceOpen");
+		HTTPManager.GetLogger().Information("Transport - " + get_Name(), "OnEventSourceOpen");
 	}
 
-	private void NDPKMPBOIGA(EventSource GLFHBCIPCBD, Message LIOGIBJBHAH)
+	private void OnEventSourceMessage(EventSource GLFHBCIPCBD, Message LIOGIBJBHAH)
 	{
-		if (LIOGIBJBHAH.CHIGLEKCFFN().Equals("initialized"))
+		if (LIOGIBJBHAH.GetData().Equals("initialized"))
 		{
-			PIGDCLOPNKJ();
+			OnConnected();
 			return;
 		}
-		IServerMessage bNGPAAAKBOP = TransportBase.Parse(BAFGHLCPPHM().IBNMFHGHIBI(), LIOGIBJBHAH.CHIGLEKCFFN());
+		IServerMessage bNGPAAAKBOP = TransportBase.Parse(GetConnection().GetJsonEncoder(), LIOGIBJBHAH.GetData());
 		if (bNGPAAAKBOP != null)
 		{
-			BAFGHLCPPHM().OnMessage(bNGPAAAKBOP);
+			GetConnection().OnMessage(bNGPAAAKBOP);
 		}
 	}
 
-	private void NFOPKNNGAON(EventSource GLFHBCIPCBD, string JDONBAPIJCG)
+	private void OnEventSourceError(EventSource GLFHBCIPCBD, string JDONBAPIJCG)
 	{
-		HTTPManager.MBBMPNDDPIH().KDAFBLAKBMI("Transport - " + get_Name(), "OnEventSourceError");
-		if (FLBBFDNHJAJ() == LJLKMCGDKJK.Reconnecting)
+		HTTPManager.GetLogger().Information("Transport - " + get_Name(), "OnEventSourceError");
+		if (GetState() == TransportStates.Reconnecting)
 		{
-			NDCILHIAPIK();
+			Connect();
 		}
-		else if (FLBBFDNHJAJ() != LJLKMCGDKJK.Closed)
+		else if (GetState() != TransportStates.Closed)
 		{
-			if (FLBBFDNHJAJ() == LJLKMCGDKJK.Closing)
+			if (GetState() == TransportStates.Closing)
 			{
-				set_State(LJLKMCGDKJK.Closed);
+				set_State(TransportStates.Closed);
 			}
 			else
 			{
-				BAFGHLCPPHM().Error(JDONBAPIJCG);
+				GetConnection().Error(JDONBAPIJCG);
 			}
 		}
 	}
 
-	private void GAHKIGNMDKI(EventSource GLFHBCIPCBD)
+	private void OnEventSourceClosed(EventSource GLFHBCIPCBD)
 	{
-		HTTPManager.MBBMPNDDPIH().KDAFBLAKBMI("Transport - " + get_Name(), "OnEventSourceClosed");
-		NFOPKNNGAON(GLFHBCIPCBD, "EventSource Closed!");
+		HTTPManager.GetLogger().Information("Transport - " + get_Name(), "OnEventSourceClosed");
+		OnEventSourceError(GLFHBCIPCBD, "EventSource Closed!");
 	}
 }

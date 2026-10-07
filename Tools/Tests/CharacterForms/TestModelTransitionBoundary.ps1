@@ -5,7 +5,7 @@ $queue=[regex]::Match($source,'(?s)    private sealed class PendingModelTransiti
 $queue=[regex]::Replace($queue,'(?s)    // A reversible registration stage.*?(?=    private readonly Dictionary<Model, PendingModelTransition>)','')
 $render=[regex]::Match($source,'(?ms)^\tpublic void Render\(\).*?^\t\}').Value
 if (!$queue -or !$render) { throw 'Production boundary extraction failed.' }
-if ($source -notmatch 'public void ANIDBLANMIC\(\)\s*\{\s*CloseModelTransitions\(\);') { throw 'Unload cancellation hook missing.' }
+if ($source -notmatch 'public void Unload\(\)\s*\{\s*CloseModelTransitions\(\);') { throw 'Unload cancellation hook missing.' }
 $fixture=Join-Path $root ('Temp/ModelTransition-'+[Guid]::NewGuid().ToString('N'))
 New-Item -ItemType Directory -Path $fixture | Out-Null
 $code=@'
@@ -22,7 +22,7 @@ namespace Eclipse.Rendering.Interpolation {
         public static void MarkCameraStep()=>CameraStep();
     }
 }
-class Model { public float Health=100; public float KKMCHCNOHMB()=>Health; }
+class Model { public float Health=100; public float GetLife()=>Health; }
 class Round { public bool processing=true; public int round=1; }
 class Fight {
 QUEUE
@@ -36,8 +36,8 @@ RENDER
     void CancelEclipseProjectiles(){projectileCancels++;}
     void CancelEclipseActors(string reason){actorCancels++;actorEndReason=reason;}
     HashSet<Model> actors=new HashSet<Model>();
-    bool IsEclipseFormParticipant(Model model)=>model==_playerModel||model==CKNCPOABFBO||actors.Contains(model);
-    Round round=new Round(); Model _playerModel=new Model(),CKNCPOABFBO=new Model();
+    bool IsEclipseFormParticipant(Model model)=>model==_playerModel||model==_enemyModel||actors.Contains(model);
+    Round round=new Round(); Model _playerModel=new Model(),_enemyModel=new Model();
     bool _eclipseFightEndDispatched=false,isRenderFight=true,isRenderCamera=true,IsLocalVersus; int frame;
     Action Step=()=>{}; List<string> order=new List<string>();
     void RenderFight(){order.Add("step"); Step();}
@@ -75,7 +75,7 @@ RENDER
         Check(!f.QueueModelTransition(f._playerModel,()=>{},e=>{}),"closed queue");
         var g=new Fight();int other=0,done=0;
         g.QueueModelTransition(g._playerModel,()=>g.CloseModelTransitions(),e=>done++);
-        g.QueueModelTransition(g.CKNCPOABFBO,()=>other++,e=>done++);
+        g.QueueModelTransition(g._enemyModel,()=>other++,e=>done++);
         g.Render();Check(other==0&&done==2,"unload during drain cancels remaining exactly once");
         var local=new Fight{IsLocalVersus=true};int confirmed=0,finished=0;
         local.QueueModelTransition(local._playerModel,()=>confirmed++,e=>{Check(e==null,"confirmed completion");finished++;});

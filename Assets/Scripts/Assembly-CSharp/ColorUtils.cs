@@ -3,7 +3,7 @@ using UnityEngine;
 
 public static class ColorUtils
 {
-	public static Color DAAIIECAAFO(string OHJKNABLCMF, float KGJALFLDIBG = 1f)
+	public static Color ParseHexColor(string OHJKNABLCMF, float KGJALFLDIBG = 1f)
 	{
 		OHJKNABLCMF = OHJKNABLCMF.Replace("#", string.Empty);
 		OHJKNABLCMF = OHJKNABLCMF.Replace("0x", string.Empty);

@@ -1,6 +1,6 @@
 function Export-RoundOutcomeFixture([string]$Root, [string]$Destination) {
     $source = [IO.File]::ReadAllText((Join-Path $Root 'Assets/Scripts/Assembly-CSharp/Fight.cs'))
-    $blocks = foreach ($signature in @('private bool TryQueueRoundOutcome(', 'private void RenderRound()', 'private void EndRound(', 'private ModelParameters GetWinner(', 'private void FinishRound()', 'private void FinishStance(', 'private void HCNDAFDHACI(')) {
+    $blocks = foreach ($signature in @('private bool TryQueueRoundOutcome(', 'private void RenderRound()', 'private void EndRound(', 'private ModelParameters GetWinner(', 'private void FinishRound()', 'private void FinishStance(', 'private void AbortFight(')) {
         $start = $source.IndexOf($signature)
         if ($start -lt 0) { throw "Missing production method: $signature" }
         $open = $source.IndexOf('{', $start); $depth = 1; $end = $open + 1

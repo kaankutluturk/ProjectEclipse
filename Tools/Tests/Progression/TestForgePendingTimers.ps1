@@ -13,10 +13,10 @@ function Method([string]$file,[string]$signature) {
     $s.Substring($start,$end-$start)
 }
 $test=[IO.File]::ReadAllText((Join-Path $PSScriptRoot 'ForgePendingTimerTests.cs'))
-$user=@('public RecipeItemInfo PHDBCIHJKON()', 'public bool SetRecipeDelivery(', 'public void ClearRecipeDelivery()', 'private static void SetNodeAttribute(') | ForEach-Object {Method 'UserItem' $_}
+$user=@('public RecipeItemInfo GetRecipeDelivery()', 'public bool SetRecipeDelivery(', 'public void ClearRecipeDelivery()', 'private static void SetNodeAttribute(') | ForEach-Object {Method 'UserItem' $_}
 $test=$test.Replace('// INSERT_USERITEMS',(Method 'UserItems' 'public bool FinishDeliveryRecipe('))
 $test=$test.Replace('// INSERT_USERITEM',($user -join "`n"))
-$test=$test.Replace('// INSERT_LISTSF',(Method 'ListSF' 'private void GHDNJMDEALP('))
+$test=$test.Replace('// INSERT_LISTSF',(Method 'ListSF' 'private void DeliverReadyRecipes('))
 $test=$test.Replace('// INSERT_FORGE',(Method 'ForgeManager' 'public bool FinishEnchant('))
 [IO.File]::WriteAllText((Join-Path $fixture 'Program.cs'),$test)
 Copy-Item (Join-Path $root 'Assets/Scripts/Assembly-CSharp/RecipeItemInfo.cs') $fixture

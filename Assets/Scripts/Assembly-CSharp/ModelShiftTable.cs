@@ -4,27 +4,27 @@ using System.Linq;
 
 public class ModelShiftTable : List<List<float>>
 {
-	private const string CGKGCCGKKNI = "assets/tactics/shift/";
+	private const string ShiftDirectory = "assets/tactics/shift/";
 
-	private const string HBGKLIGDCKI = ".stb";
+	private const string FileExtension = ".stb";
 
 	private List<string> _NodeNames = new List<string>();
 
 	private InfoAnimation _Animation;
 
-	public List<string> IFOCBIGHBBP
+	public List<string> NodeNames
 	{
 		get
 		{
-			return OJCPLCLNLPI();
+			return GetNodeNames();
 		}
 	}
 
-	public InfoAnimation FGICHADOEHF
+	public InfoAnimation Animation
 	{
 		get
 		{
-			return NNMAFFCCMHC();
+			return GetAnimation();
 		}
 	}
 
@@ -33,12 +33,12 @@ public class ModelShiftTable : List<List<float>>
 		_Animation = null;
 	}
 
-	public List<string> OJCPLCLNLPI()
+	public List<string> GetNodeNames()
 	{
 		return _NodeNames;
 	}
 
-	public InfoAnimation NNMAFFCCMHC()
+	public InfoAnimation GetAnimation()
 	{
 		return _Animation;
 	}
@@ -56,7 +56,7 @@ public class ModelShiftTable : List<List<float>>
 		}
 		if (_Animation != null)
 		{
-			LLLOJBFMONN.Error("heel {0} not found in shift table for {1}", IMGCANJHPND, _Animation.Name);
+			GameLog.Error("heel {0} not found in shift table for {1}", IMGCANJHPND, _Animation.Name);
 		}
 		return -1;
 	}
@@ -77,11 +77,11 @@ public class ModelShiftTable : List<List<float>>
 			int num2 = PEEOEOMEBFG - num;
 			if (num2 % 4 != 0)
 			{
-				LLLOJBFMONN.Error("count % 4 != 0");
+				GameLog.Error("count % 4 != 0");
 			}
 			if (num2 / 4 % count != 0)
 			{
-				LLLOJBFMONN.Error("count % nodeCount != 0");
+				GameLog.Error("count % nodeCount != 0");
 			}
 			int num3 = num2 / 4;
 			List<float> list = new List<float>(num3);
@@ -108,7 +108,7 @@ public class ModelShiftTable : List<List<float>>
 		_NodeNames.Clear();
 		for (int i = 0; i < num2; i++)
 		{
-			string text = TacticalTableHolder.LNOMEMJCIAM(buffer);
+			string text = TacticalTableHolder.ReadNullTerminatedString(buffer);
 			num += text.Length + 1;
 			_NodeNames.Add(text);
 		}
@@ -124,7 +124,7 @@ public class ModelShiftTable : List<List<float>>
 			{
 				return this.ElementAt(JAPBDIJOKDJ)[num];
 			}
-			LLLOJBFMONN.Error("node {1} not found", IMGCANJHPND);
+			GameLog.Error("node {1} not found", IMGCANJHPND);
 		}
 		return 0f;
 	}

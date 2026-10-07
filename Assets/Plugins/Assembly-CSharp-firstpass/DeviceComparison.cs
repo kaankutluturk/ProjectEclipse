@@ -2,7 +2,7 @@ using System.Xml;
 
 public class DeviceComparison : ComparisonExpression
 {
-	public enum DPBGDMLNHGA
+	public enum DeviceParameter
 	{
 		PARAMETER_NONE = 0,
 		MEMORY_TOTAL = 1,
@@ -10,55 +10,55 @@ public class DeviceComparison : ComparisonExpression
 		CORES_COUNT = 3
 	}
 
-	private DPBGDMLNHGA OCDIMEJGIGP;
+	private DeviceParameter parameter;
 
 	public DeviceComparison(XmlNode node)
 		: base(node)
 	{
 		if (node.Attributes != null)
 		{
-			OCDIMEJGIGP = GMEPNMHBPDN((node.Attributes["Value"] != null) ? node.Attributes["Value"].Value : null);
-			DIKPCBMONEH = float.Parse(node.Attributes["Than"].Value);
+			parameter = GetParameterFromString((node.Attributes["Value"] != null) ? node.Attributes["Value"].Value : null);
+			_thanValue = float.Parse(node.Attributes["Than"].Value);
 		}
-		JBMIOBKHDHK();
+		UpdateParameter();
 	}
 
-	public static DPBGDMLNHGA GMEPNMHBPDN(string name)
+	public static DeviceParameter GetParameterFromString(string name)
 	{
 		if (string.IsNullOrEmpty(name))
 		{
-			AdvLog.CCOFFJPPAKC("DeviceComparison::GetParameterFromString - empty parameter name");
-			return DPBGDMLNHGA.PARAMETER_NONE;
+			AdvLog.LogError("DeviceComparison::GetParameterFromString - empty parameter name");
+			return DeviceParameter.PARAMETER_NONE;
 		}
 		switch (name)
 		{
 		case "_DeviceTotalMem":
-			return DPBGDMLNHGA.MEMORY_TOTAL;
+			return DeviceParameter.MEMORY_TOTAL;
 		case "_DeviceFreeMem":
-			return DPBGDMLNHGA.MEMORY_FREE;
+			return DeviceParameter.MEMORY_FREE;
 		case "_DeviceCoresNum":
-			return DPBGDMLNHGA.CORES_COUNT;
+			return DeviceParameter.CORES_COUNT;
 		default:
-			AdvLog.CCOFFJPPAKC(string.Format("DeviceComparison::GetParameterFromString - unknown type: {0}", name));
-			return DPBGDMLNHGA.PARAMETER_NONE;
+			AdvLog.LogError(string.Format("DeviceComparison::GetParameterFromString - unknown type: {0}", name));
+			return DeviceParameter.PARAMETER_NONE;
 		}
 	}
 
-	public void JBMIOBKHDHK()
+	public void UpdateParameter()
 	{
-		switch (OCDIMEJGIGP)
+		switch (parameter)
 		{
-		case DPBGDMLNHGA.MEMORY_TOTAL:
-			MAFCNMOAIDA = SystemProperties.NICPICAMAOH().AOJLHDILEBJ / 1024;
+		case DeviceParameter.MEMORY_TOTAL:
+			_actualValue = SystemProperties.GetDeviceInfo().TotalRam / 1024;
 			break;
-		case DPBGDMLNHGA.MEMORY_FREE:
-			MAFCNMOAIDA = SystemProperties.NICPICAMAOH().LGEEAANABHH / 1024;
+		case DeviceParameter.MEMORY_FREE:
+			_actualValue = SystemProperties.GetDeviceInfo().FreeRam / 1024;
 			break;
-		case DPBGDMLNHGA.CORES_COUNT:
-			MAFCNMOAIDA = SystemProperties.NICPICAMAOH().MOMPODBNJNE;
+		case DeviceParameter.CORES_COUNT:
+			_actualValue = SystemProperties.GetDeviceInfo().CpuCount;
 			break;
 		default:
-			AdvLog.CCOFFJPPAKC(string.Format("DeviceComparison::UpdateParameter - unknown type: {0}", OCDIMEJGIGP));
+			AdvLog.LogError(string.Format("DeviceComparison::UpdateParameter - unknown type: {0}", parameter));
 			break;
 		}
 	}

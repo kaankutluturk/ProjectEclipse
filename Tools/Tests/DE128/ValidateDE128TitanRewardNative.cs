@@ -69,7 +69,7 @@ public static class ValidateDE128TitanRewardNative
                 return;
             }
             var scripts = ModRuntime.Scripts;
-            var roster = ListSF.CCDKHLAMKKO();
+            var roster = ListSF.GetRoster();
             var module = Module.GetInstance();
             if (scripts == null || roster == null || module == null) return;
             if (module.GetCurrentScreenType() != ScreenType.ModuleDojo && module.GetCurrentScreenType() != ScreenType.ModuleMap) return;
@@ -90,41 +90,41 @@ public static class ValidateDE128TitanRewardNative
     {
         roster.Level = 52;
         var id = DefinitionId.Parse("core:fights/zone_7/c3_boss_titan_eclipsemode/6");
-        var fight = ListSF.CHMCKGCDGCM(new FightIDS(scripts.Content.RuntimeFightId(id)));
-        var eclipse = fight?.OOOBLJIHBEP(1)?.LJLIFMOIAJJ;
+        var fight = ListSF.GetFightById(new FightIDS(scripts.Content.RuntimeFightId(id)));
+        var eclipse = fight?.GetRewardAt(1)?.EclipseModeReward;
         if (eclipse == null) throw new Exception("Final Eclipse Titan reward slot is unavailable.");
-        var prize = eclipse.KOBOIFJNPMO(1);
-        if (prize.HELFDCAIJNE.Count != 5)
-            throw new Exception("Expected five live Titan drops, found " + prize.HELFDCAIJNE.Count);
+        var prize = eclipse.GetPrizeForLevel(1);
+        if (prize.Items.Count != 5)
+            throw new Exception("Expected five live Titan drops, found " + prize.Items.Count);
         var result = new FightResult.ResultPrizeStruct();
         for (int i = 0; i < Names.Length; i++)
         {
-            var grant = prize.HELFDCAIJNE[i];
+            var grant = prize.Items[i];
             bool configured = (bool)typeof(RewardItem).GetProperty("HasEclipseGrantConfiguration", Hidden).GetValue(grant);
             int grantIndex = (int)typeof(RewardItem).GetProperty("EclipseGrantIndex", Hidden).GetValue(grant);
             if (grant.Name != Names[i] || !configured || grantIndex != i)
                 throw new Exception("Titan reward identity or grant marker differs: " + i);
-            result.KFJABAMAKOD(grant);
-            if (result.HELFDCAIJNE.Count != i + 1)
+            result.AddReward(grant);
+            if (result.Items.Count != i + 1)
                 throw new Exception("Native Titan reward configuration skipped grant " + i);
-            var projected = result.HELFDCAIJNE[i];
-            if (projected.DLKPBAJDHBO.ItemLevel != roster.Level ||
-                projected.NAIEGGHELIH.LDLPCOFHFKE.Count != 1 ||
-                projected.NAIEGGHELIH.LDLPCOFHFKE[0].get_Name() != Perks[i])
+            var projected = result.Items[i];
+            if (projected.Item.ItemLevel != roster.Level ||
+                projected.RewardSource.enchantments.Count != 1 ||
+                projected.RewardSource.enchantments[0].get_Name() != Perks[i])
                 throw new Exception("Native level or enchantment projection differs: " + i);
-            Debug.Log(Prefix + "Projected " + Names[i] + " at level " + projected.DLKPBAJDHBO.ItemLevel);
+            Debug.Log(Prefix + "Projected " + Names[i] + " at level " + projected.Item.ItemLevel);
         }
-        ListSF.GetInstance().IMDGMNFHFCN(result);
-        var inventory = roster.KHCNHPCPFII();
+        ListSF.GetInstance().ApplyFightRewards(result);
+        var inventory = roster.GetInventory();
         for (int i = 0; i < Names.Length; i++)
         {
-            var owned = inventory.CMGOCLGHNLH(Names[i]);
-            if (owned == null || owned.OFOPFCJNEBL() != 1 ||
+            var owned = inventory.FindItem(Names[i]);
+            if (owned == null || owned.GetCount() != 1 ||
                 owned.Node?["Enchantments"]?["Perk"]?.Attributes?["Name"]?.Value != Perks[i])
                 throw new Exception("Titan reward did not settle into native inventory: " + Names[i]);
-            inventory.EEDJEDBMIMI(ListSF.GetItems().GetItemByName(Names[i]), true);
+            inventory.EquipItem(ListSF.GetItems().GetItemByName(Names[i]), true);
         }
-        if (roster.get_Parameters().DGMDEDKLGMB().Count(item => Names.Contains(item.Name)) != 5)
+        if (roster.get_Parameters().GetEquippedItemsByType().Count(item => Names.Contains(item.Name)) != 5)
             throw new Exception("The five Titan items did not equip on the player.");
         // Load every shipped model through the production typed loader. The XML
         // parser is the base game's native geometry path, not DE128 Lua content.
@@ -142,20 +142,20 @@ public static class ValidateDE128TitanRewardNative
     static void Reload(Roster roster)
     {
         if (roster.Level != 52) throw new Exception("Titan reward player level did not survive reload.");
-        var inventory = roster.KHCNHPCPFII();
+        var inventory = roster.GetInventory();
         for (int i = 0; i < Names.Length; i++)
         {
-            var owned = inventory.CMGOCLGHNLH(Names[i]);
+            var owned = inventory.FindItem(Names[i]);
             string aspectText = owned?.Node?["Enchantments"]?["Perk"]?["Set"]?.Attributes?["Aspect"]?.Value;
             double aspect;
-            if (owned == null || owned.OFOPFCJNEBL() != 1 || !owned.EFMFGEPDAOP() ||
+            if (owned == null || owned.GetCount() != 1 || !owned.GetIsEquipped() ||
                 owned.Node?["Enchantments"]?["Perk"]?.Attributes?["Name"]?.Value != Perks[i] ||
                 !double.TryParse(aspectText, System.Globalization.NumberStyles.Float,
                     System.Globalization.CultureInfo.InvariantCulture, out aspect) ||
                 Math.Abs(aspect - 1952.28) > 0.0001)
                 throw new Exception("Saved Titan item or enchantment did not reload: " + Names[i]);
         }
-        if (roster.get_Parameters().DGMDEDKLGMB().Count(item => Names.Contains(item.Name)) != 5)
+        if (roster.get_Parameters().GetEquippedItemsByType().Count(item => Names.Contains(item.Name)) != 5)
             throw new Exception("Saved Titan equipment did not project after reload.");
     }
 

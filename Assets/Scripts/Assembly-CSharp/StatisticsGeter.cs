@@ -6,32 +6,32 @@ using UnityEngine;
 
 public static class StatisticsGeter
 {
-	private class IECDAEPLNEP
+	private class FightCounts
 	{
 		public string Name;
 
-		public int OONPNMEPOCC;
+		public int WinCount;
 
-		public int FPGNLGFKJAP;
+		public int LossCount;
 
-		public int FIMCLKNJDGM;
+		public int EclipseWinCount;
 
-		public int HMNNFOAPIHD;
+		public int EclipseLossCount;
 	}
 
-	public static void IJFOCLBKGPP(JSONClass MEEAKLDGLDF, string BFADPFOIPLL = "b_id")
+	public static void AddBundleId(JSONClass MEEAKLDGLDF, string BFADPFOIPLL = "b_id")
 	{
 		MEEAKLDGLDF.Add(BFADPFOIPLL, Application.identifier);
 	}
 
-	public static void HJPFOFKCLFC(JSONClass MEEAKLDGLDF)
+	public static void AddCurrencies(JSONClass MEEAKLDGLDF)
 	{
 		JSONArray jSONArray = new JSONArray();
-		List<GameCurrency> list = GameUtils.AJDKHINLIDI.IIAPDCECFCN();
+		List<GameCurrency> list = GameUtils.GameCurrencies.GetCurrencies();
 		foreach (GameCurrency item in list)
 		{
 			string mENAJEAJJBE = item.Name;
-			int num = ListSF.CCDKHLAMKKO().GetCurrencyCount(mENAJEAJJBE);
+			int num = ListSF.GetRoster().GetCurrencyCount(mENAJEAJJBE);
 			JSONClass jSONClass = new JSONClass();
 			jSONClass["name"] = mENAJEAJJBE;
 			jSONClass["amount"] = num;
@@ -40,7 +40,7 @@ public static class StatisticsGeter
 		MEEAKLDGLDF.Add("currencies", jSONArray);
 	}
 
-	public static void IPJPNKDOKKE(JSONClass MEEAKLDGLDF, ArgsDict PCJAKPJMKGN)
+	public static void AddGemsChange(JSONClass MEEAKLDGLDF, ArgsDict PCJAKPJMKGN)
 	{
 		long num = ((!PCJAKPJMKGN.ContainsKey("changed")) ? 0 : ((long)PCJAKPJMKGN["changed"]));
 		string text = ((!PCJAKPJMKGN.ContainsKey("type")) ? string.Empty : PCJAKPJMKGN["type"].ToString());
@@ -50,36 +50,36 @@ public static class StatisticsGeter
 		MEEAKLDGLDF["gems_paid_changed"] = ((!flag) ? 0 : num);
 	}
 
-	public static void GMNACHGHPAI(JSONClass MEEAKLDGLDF, string name)
+	public static void AddPriceUsd(JSONClass MEEAKLDGLDF, string name)
 	{
 		float HCHKFOJEEBK = 0f;
-		GeneralConfig.IHHMHNHOLCB.LIKBNIAJHKA(name, out HCHKFOJEEBK);
+		GeneralConfig.Prices.TryGetPriceValue(name, out HCHKFOJEEBK);
 		MEEAKLDGLDF["price_USD"] = HCHKFOJEEBK;
 	}
 
-	public static void NJAJIJKINBL(JSONClass MEEAKLDGLDF)
+	public static void AddBalances(JSONClass MEEAKLDGLDF)
 	{
-		MEEAKLDGLDF["money"] = ListSF.CCDKHLAMKKO().BFBOEGMAMNF().ToString();
-		MEEAKLDGLDF["gems_paid"] = (long)(ListSF.CCDKHLAMKKO().FJGHKGPAPPN());
-		MEEAKLDGLDF["gems_free"] = ListSF.CCDKHLAMKKO().EHFJHFDACMP() - (long)(ListSF.CCDKHLAMKKO().FJGHKGPAPPN());
+		MEEAKLDGLDF["money"] = ListSF.GetRoster().GetMoney().ToString();
+		MEEAKLDGLDF["gems_paid"] = (long)(ListSF.GetRoster().GetPaidBonus());
+		MEEAKLDGLDF["gems_free"] = ListSF.GetRoster().GetBonus() - (long)(ListSF.GetRoster().GetPaidBonus());
 	}
 
-	public static void BDJADPLCHDA(JSONClass MEEAKLDGLDF, ArgsDict PCJAKPJMKGN)
+	public static void AddPurchaseInfo(JSONClass MEEAKLDGLDF, ArgsDict PCJAKPJMKGN)
 	{
 		ItemInfo dJKEECEOCJB = ((!PCJAKPJMKGN.ContainsKey("item")) ? null : (PCJAKPJMKGN["item"] as ItemInfo));
 		if (dJKEECEOCJB == null)
 		{
 			return;
 		}
-		StatisticsCollector.CNCDMFJLMFH cNCDMFJLMFH = (PCJAKPJMKGN.ContainsKey("type") ? ((StatisticsCollector.CNCDMFJLMFH)PCJAKPJMKGN["type"]) : StatisticsCollector.CNCDMFJLMFH.Money);
+		StatisticsCollector.CurrencyType cNCDMFJLMFH = (PCJAKPJMKGN.ContainsKey("type") ? ((StatisticsCollector.CurrencyType)PCJAKPJMKGN["type"]) : StatisticsCollector.CurrencyType.Money);
 		bool flag = PCJAKPJMKGN.ContainsKey("immediatelyDelivery") && (bool)PCJAKPJMKGN["immediatelyDelivery"];
 		long OMALFAGNPEE = 0L;
 		long DBMJEEHOABD = 0L;
-		BJINPFAPMGO(dJKEECEOCJB, cNCDMFJLMFH, flag, ref OMALFAGNPEE, ref DBMJEEHOABD);
+		GetPurchaseCost(dJKEECEOCJB, cNCDMFJLMFH, flag, ref OMALFAGNPEE, ref DBMJEEHOABD);
 		long num = 0L;
 		long num2 = 0L;
 		long num3 = 0L;
-		if (cNCDMFJLMFH == StatisticsCollector.CNCDMFJLMFH.Money)
+		if (cNCDMFJLMFH == StatisticsCollector.CurrencyType.Money)
 		{
 			num = OMALFAGNPEE + DBMJEEHOABD;
 		}
@@ -99,9 +99,9 @@ public static class StatisticsGeter
 		}
 		else
 		{
-			long num4 = ((!flag) ? (-1) : GameUtils.GetLeftTime(dJKEECEOCJB.EHKNIKHPGDN));
+			long num4 = ((!flag) ? (-1) : GameUtils.GetLeftTime(dJKEECEOCJB.DeliveryTime));
 			bool flag2 = num4 > -1;
-			bool aCOIHHPOBDH = dJKEECEOCJB.ACOIHHPOBDH;
+			bool aCOIHHPOBDH = dJKEECEOCJB.IsUpgradePurchase;
 			if (flag2)
 			{
 				text += "finish_";
@@ -115,54 +115,54 @@ public static class StatisticsGeter
 		MEEAKLDGLDF["money_changed"] = num;
 		MEEAKLDGLDF["gems_free_changed"] = num2;
 		MEEAKLDGLDF["gems_paid_changed"] = num3;
-		MEEAKLDGLDF["upgrade"] = ((!dJKEECEOCJB.INEOECGAGGD()) ? "0" : "1");
+		MEEAKLDGLDF["upgrade"] = ((!dJKEECEOCJB.IsUpgradeVariant()) ? "0" : "1");
 		MEEAKLDGLDF["paid_item"] = dJKEECEOCJB.LegacyPaidItem;
 	}
 
-	private static void BJINPFAPMGO(ItemInfo item, StatisticsCollector.CNCDMFJLMFH LFLGCDNKNJI, bool CNIOCCCBDBJ, ref long OMALFAGNPEE, ref long DBMJEEHOABD)
+	private static void GetPurchaseCost(ItemInfo item, StatisticsCollector.CurrencyType LFLGCDNKNJI, bool CNIOCCCBDBJ, ref long OMALFAGNPEE, ref long DBMJEEHOABD)
 	{
-		if (LFLGCDNKNJI == StatisticsCollector.CNCDMFJLMFH.Bonus)
+		if (LFLGCDNKNJI == StatisticsCollector.CurrencyType.Bonus)
 		{
-			DBMJEEHOABD = item.PEGDPDINDDO;
+			DBMJEEHOABD = item.MissingGems;
 			if (CNIOCCCBDBJ)
 			{
-				OMALFAGNPEE = (ObscuredLong)(item.KLHOKKPALOK) - DBMJEEHOABD;
+				OMALFAGNPEE = (ObscuredLong)(item.DeliveryGemPrice) - DBMJEEHOABD;
 			}
 			else
 			{
-				OMALFAGNPEE = item.MCNMMBCJADI() - DBMJEEHOABD;
+				OMALFAGNPEE = item.GetGemPrice() - DBMJEEHOABD;
 			}
 		}
 		else
 		{
-			DBMJEEHOABD = item.NNLMNNAEDIE;
+			DBMJEEHOABD = item.MissingCoins;
 			if (CNIOCCCBDBJ)
 			{
-				OMALFAGNPEE = (ObscuredLong)(item.NDCOLFHCNLD) - DBMJEEHOABD;
+				OMALFAGNPEE = (ObscuredLong)(item.DeliveryCoinPrice) - DBMJEEHOABD;
 			}
 			else
 			{
-				OMALFAGNPEE = item.OHBBLIMNIMJ() - DBMJEEHOABD;
+				OMALFAGNPEE = item.GetCoinPrice() - DBMJEEHOABD;
 			}
 		}
 	}
 
-	public static void MGKINBGMKKE(JSONClass MEEAKLDGLDF)
+	public static void AddFpsLimit(JSONClass MEEAKLDGLDF)
 	{
-		int num = GameUtils.CDILOOACLKK;
-		if (GameUtils.LDBMFAMEMPF)
+		int num = GameUtils.FrameRate;
+		if (GameUtils.ReduceFps)
 		{
-			num /= GameUtils.MAEBANCIBOP;
+			num /= GameUtils.FpsReductionDivisor;
 		}
 		MEEAKLDGLDF["fps_limit"] = num;
 	}
 
-	public static void IFKJOJGPEHM(JSONClass MEEAKLDGLDF)
+	public static void AddEclipseMode(JSONClass MEEAKLDGLDF)
 	{
-		MEEAKLDGLDF["eclipse"] = (ListSF.CCDKHLAMKKO().IsEclipseMode() ? 1 : 0);
+		MEEAKLDGLDF["eclipse"] = (ListSF.GetRoster().IsEclipseMode() ? 1 : 0);
 	}
 
-	public static void KOOBIPOFAEF(JSONClass MEEAKLDGLDF, ArgsDict PCJAKPJMKGN)
+	public static void AddRounds(JSONClass MEEAKLDGLDF, ArgsDict PCJAKPJMKGN)
 	{
 		if (PCJAKPJMKGN.ContainsKey("completedRounds"))
 		{
@@ -170,7 +170,7 @@ public static class StatisticsGeter
 		}
 	}
 
-	public static void ACEGMLHJLEO(JSONClass MEEAKLDGLDF, ArgsDict PCJAKPJMKGN)
+	public static void AddAverageFps(JSONClass MEEAKLDGLDF, ArgsDict PCJAKPJMKGN)
 	{
 		if (PCJAKPJMKGN.ContainsKey("avgFps"))
 		{
@@ -178,7 +178,7 @@ public static class StatisticsGeter
 		}
 	}
 
-	public static void BPGIGFJGJPD(JSONClass MEEAKLDGLDF, ArgsDict PCJAKPJMKGN)
+	public static void AddFightTimeElapsed(JSONClass MEEAKLDGLDF, ArgsDict PCJAKPJMKGN)
 	{
 		if (PCJAKPJMKGN.ContainsKey("fightTimeElapsed"))
 		{
@@ -186,7 +186,7 @@ public static class StatisticsGeter
 		}
 	}
 
-	public static void OGLDPCFFKEE(JSONClass MEEAKLDGLDF, FightList KGKDKENMAOA)
+	public static void AddReplayCount(JSONClass MEEAKLDGLDF, FightList KGKDKENMAOA)
 	{
 		int num = 0;
 		if (KGKDKENMAOA != null)
@@ -194,61 +194,61 @@ public static class StatisticsGeter
 			Battle cNAOMDMIGLJ = KGKDKENMAOA.Battle;
 			if (cNAOMDMIGLJ != null)
 			{
-				RosterBattle dDNLCGOPAGC = cNAOMDMIGLJ.NNPNEABKHPP();
+				RosterBattle dDNLCGOPAGC = cNAOMDMIGLJ.GetRosterBattle();
 				if (dDNLCGOPAGC != null)
 				{
-					num = dDNLCGOPAGC.ODCFKCJJDKN();
+					num = dDNLCGOPAGC.GetReplayCount();
 				}
 			}
 		}
 		MEEAKLDGLDF["replay_count"] = num;
 	}
 
-	public static void EGHFFAOJCJG(JSONClass MEEAKLDGLDF, ArgsDict PCJAKPJMKGN)
+	public static void AddFightResult(JSONClass MEEAKLDGLDF, ArgsDict PCJAKPJMKGN)
 	{
 		FightResult nHIDAJFLHJN = ((!PCJAKPJMKGN.ContainsKey("fightList")) ? null : (PCJAKPJMKGN["fightResult"] as FightResult));
 		if (nHIDAJFLHJN != null)
 		{
-			MEEAKLDGLDF["money_reward"] = nHIDAJFLHJN.KMGLLBMIDHJ();
-			MEEAKLDGLDF["gems_reward"] = nHIDAJFLHJN.BNILCODHHKC();
+			MEEAKLDGLDF["money_reward"] = nHIDAJFLHJN.GetMoneyReward();
+			MEEAKLDGLDF["gems_reward"] = nHIDAJFLHJN.GetGemsReward();
 			int num = ((!PCJAKPJMKGN.ContainsKey("isSurrender") || !(bool)PCJAKPJMKGN["isSurrender"]) ? Convert.ToInt32(nHIDAJFLHJN.IsWinner()) : (-1));
 			MEEAKLDGLDF["fight_result"] = num;
-			DetailedDamages mNDEOFOHLHI = nHIDAJFLHJN.AIOMDIAFHGB.MNDEOFOHLHI;
-			DetailedDamages mNDEOFOHLHI2 = nHIDAJFLHJN.MOJHPBGGNAH.MNDEOFOHLHI;
-			GFNHHDPOEIB(MEEAKLDGLDF, "player_damage", mNDEOFOHLHI2);
-			GFNHHDPOEIB(MEEAKLDGLDF, "enemy_damage", mNDEOFOHLHI);
-			ComboStatistic aIOMDIAFHGB = nHIDAJFLHJN.AIOMDIAFHGB;
-			ComboStatistic mOJHPBGGNAH = nHIDAJFLHJN.MOJHPBGGNAH;
-			GPIGNONFFPJ(MEEAKLDGLDF, "player", aIOMDIAFHGB);
-			GPIGNONFFPJ(MEEAKLDGLDF, "enemy", mOJHPBGGNAH);
-			ModelParameters kIKOGDEPGHB = ((!nHIDAJFLHJN.IsWinner()) ? nHIDAJFLHJN.LEBLJJCFKOP : nHIDAJFLHJN.ABKBEJBICOA);
+			DetailedDamages mNDEOFOHLHI = nHIDAJFLHJN.PlayerStatistics.Damages;
+			DetailedDamages mNDEOFOHLHI2 = nHIDAJFLHJN.OpponentStatistics.Damages;
+			AddDetailedDamages(MEEAKLDGLDF, "player_damage", mNDEOFOHLHI2);
+			AddDetailedDamages(MEEAKLDGLDF, "enemy_damage", mNDEOFOHLHI);
+			ComboStatistic aIOMDIAFHGB = nHIDAJFLHJN.PlayerStatistics;
+			ComboStatistic mOJHPBGGNAH = nHIDAJFLHJN.OpponentStatistics;
+			AddComboStatistics(MEEAKLDGLDF, "player", aIOMDIAFHGB);
+			AddComboStatistics(MEEAKLDGLDF, "enemy", mOJHPBGGNAH);
+			ModelParameters kIKOGDEPGHB = ((!nHIDAJFLHJN.IsWinner()) ? nHIDAJFLHJN.OpponentParameters : nHIDAJFLHJN.PlayerParameters);
 			if (kIKOGDEPGHB != null)
 			{
-				BNHIGONAEJG(MEEAKLDGLDF, kIKOGDEPGHB);
+				AddEquipment(MEEAKLDGLDF, kIKOGDEPGHB);
 			}
 		}
 	}
 
-	public static void GPIGNONFFPJ(JSONClass MEEAKLDGLDF, string JMOHMLIGHHD, ComboStatistic AIOMDIAFHGB)
+	public static void AddComboStatistics(JSONClass MEEAKLDGLDF, string JMOHMLIGHHD, ComboStatistic AIOMDIAFHGB)
 	{
 		if (AIOMDIAFHGB != null)
 		{
-			MEEAKLDGLDF[JMOHMLIGHHD + "_perfects"] = AIOMDIAFHGB.JDKFHFOJKPI;
-			MEEAKLDGLDF[JMOHMLIGHHD + "_first_strikes"] = AIOMDIAFHGB.MOLDOOIJELI;
-			MEEAKLDGLDF[JMOHMLIGHHD + "_shocks"] = AIOMDIAFHGB.OGMOILIMCOM;
-			MEEAKLDGLDF[JMOHMLIGHHD + "_max_combo"] = AIOMDIAFHGB.KKJHBKBMPGN;
-			MEEAKLDGLDF[JMOHMLIGHHD + "_max_crazy"] = AIOMDIAFHGB.OLONAJAOFOA();
+			MEEAKLDGLDF[JMOHMLIGHHD + "_perfects"] = AIOMDIAFHGB.PerfectCount;
+			MEEAKLDGLDF[JMOHMLIGHHD + "_first_strikes"] = AIOMDIAFHGB.FirstStrikeCount;
+			MEEAKLDGLDF[JMOHMLIGHHD + "_shocks"] = AIOMDIAFHGB.ShockCount;
+			MEEAKLDGLDF[JMOHMLIGHHD + "_max_combo"] = AIOMDIAFHGB.MaxCombo;
+			MEEAKLDGLDF[JMOHMLIGHHD + "_max_crazy"] = AIOMDIAFHGB.GetCrazyStyleAlias();
 		}
 	}
 
-	public static void GFNHHDPOEIB(JSONClass MEEAKLDGLDF, string IMGCANJHPND, DetailedDamages KNKLGEAIKGE)
+	public static void AddDetailedDamages(JSONClass MEEAKLDGLDF, string IMGCANJHPND, DetailedDamages KNKLGEAIKGE)
 	{
 		JSONClass jSONClass = (JSONClass)(MEEAKLDGLDF[IMGCANJHPND] = new JSONClass());
 		if (KNKLGEAIKGE == null)
 		{
 			return;
 		}
-		Dictionary<string, Dictionary<string, float>> bEOLFOFKIAG = KNKLGEAIKGE.BEOLFOFKIAG;
+		Dictionary<string, Dictionary<string, float>> bEOLFOFKIAG = KNKLGEAIKGE.DamagesByType;
 		foreach (KeyValuePair<string, Dictionary<string, float>> item in bEOLFOFKIAG)
 		{
 			JSONClass jSONClass2 = new JSONClass();
@@ -260,93 +260,93 @@ public static class StatisticsGeter
 		}
 	}
 
-	public static void NCECDOKNALB(JSONClass MEEAKLDGLDF, ArgsDict PCJAKPJMKGN)
+	public static void AddFightInfo(JSONClass MEEAKLDGLDF, ArgsDict PCJAKPJMKGN)
 	{
 		FightList jDIPBIHBGPF = ((!PCJAKPJMKGN.ContainsKey("fightList")) ? null : (PCJAKPJMKGN["fightList"] as FightList));
 		if (jDIPBIHBGPF != null)
 		{
-			MEEAKLDGLDF["zone"] = jDIPBIHBGPF.FightId.PELHCAEAOFE();
-			MEEAKLDGLDF["fight_name"] = jDIPBIHBGPF.FightId.CPHDPCAECJN();
-			MEEAKLDGLDF["fight_type"] = ListSF.GetInstance().ADHNLNFEOKN(jDIPBIHBGPF.get_Type());
-			MEEAKLDGLDF["stage_number"] = jDIPBIHBGPF.FightId.EJPNIFANKDG();
-			MEEAKLDGLDF["difficulty"] = GameUtils.JEILJMPPEGL(jDIPBIHBGPF);
-			OGLDPCFFKEE(MEEAKLDGLDF, jDIPBIHBGPF);
+			MEEAKLDGLDF["zone"] = jDIPBIHBGPF.FightId.GetZone();
+			MEEAKLDGLDF["fight_name"] = jDIPBIHBGPF.FightId.GetBattle();
+			MEEAKLDGLDF["fight_type"] = ListSF.GetInstance().GetBattleTypeName(jDIPBIHBGPF.get_Type());
+			MEEAKLDGLDF["stage_number"] = jDIPBIHBGPF.FightId.GetFight();
+			MEEAKLDGLDF["difficulty"] = GameUtils.CalculateFightDifficulty(jDIPBIHBGPF);
+			AddReplayCount(MEEAKLDGLDF, jDIPBIHBGPF);
 		}
 	}
 
 	public static void AddFights(JSONClass MEEAKLDGLDF, int GNLOCMLBNHF)
 	{
-		Dictionary<string, IECDAEPLNEP> dictionary = new Dictionary<string, IECDAEPLNEP>();
-		List<RosterFight> list = ListSF.CCDKHLAMKKO().FHDLNKAAAOK(GNLOCMLBNHF);
+		Dictionary<string, FightCounts> dictionary = new Dictionary<string, FightCounts>();
+		List<RosterFight> list = ListSF.GetRoster().FindFightsByLevel(GNLOCMLBNHF);
 		foreach (RosterFight item in list)
 		{
-			string text = item.GIDNOKCJLPL();
+			string text = item.GetBattleName();
 			if (dictionary.ContainsKey(text))
 			{
-				IECDAEPLNEP iECDAEPLNEP = dictionary[text];
-				iECDAEPLNEP.OONPNMEPOCC += item.GetWinCount();
-				iECDAEPLNEP.FPGNLGFKJAP += item.GetLossCount();
-				iECDAEPLNEP.FIMCLKNJDGM += item.PEHLNNEFFLI();
-				iECDAEPLNEP.HMNNFOAPIHD += item.PHKCBMAOHIF();
+				FightCounts iECDAEPLNEP = dictionary[text];
+				iECDAEPLNEP.WinCount += item.GetWinCount();
+				iECDAEPLNEP.LossCount += item.GetLossCount();
+				iECDAEPLNEP.EclipseWinCount += item.GetEclipseWinCount();
+				iECDAEPLNEP.EclipseLossCount += item.GetEclipseLossCount();
 			}
 			else
 			{
-				IECDAEPLNEP iECDAEPLNEP2 = new IECDAEPLNEP();
+				FightCounts iECDAEPLNEP2 = new FightCounts();
 				iECDAEPLNEP2.Name = text;
-				iECDAEPLNEP2.OONPNMEPOCC = item.GetWinCount();
-				iECDAEPLNEP2.FPGNLGFKJAP = item.GetLossCount();
-				iECDAEPLNEP2.FIMCLKNJDGM = item.PEHLNNEFFLI();
-				iECDAEPLNEP2.HMNNFOAPIHD = item.PHKCBMAOHIF();
-				IECDAEPLNEP value = iECDAEPLNEP2;
+				iECDAEPLNEP2.WinCount = item.GetWinCount();
+				iECDAEPLNEP2.LossCount = item.GetLossCount();
+				iECDAEPLNEP2.EclipseWinCount = item.GetEclipseWinCount();
+				iECDAEPLNEP2.EclipseLossCount = item.GetEclipseLossCount();
+				FightCounts value = iECDAEPLNEP2;
 				dictionary[text] = value;
 			}
 		}
-		foreach (KeyValuePair<string, IECDAEPLNEP> item2 in dictionary)
+		foreach (KeyValuePair<string, FightCounts> item2 in dictionary)
 		{
 			JSONClass jSONClass = new JSONClass();
 			jSONClass["fight_name"] = item2.Value.Name;
-			jSONClass["win_count"] = item2.Value.OONPNMEPOCC;
-			jSONClass["loss_count"] = item2.Value.FPGNLGFKJAP;
-			jSONClass["eclipse_win_count"] = item2.Value.FIMCLKNJDGM;
-			jSONClass["eclipse_loss_count"] = item2.Value.HMNNFOAPIHD;
+			jSONClass["win_count"] = item2.Value.WinCount;
+			jSONClass["loss_count"] = item2.Value.LossCount;
+			jSONClass["eclipse_win_count"] = item2.Value.EclipseWinCount;
+			jSONClass["eclipse_loss_count"] = item2.Value.EclipseLossCount;
 			MEEAKLDGLDF["fights"] = jSONClass;
 		}
 	}
 
-	public static void PFJFKPJDHIN(JSONClass MEEAKLDGLDF, string BFADPFOIPLL = "perks")
+	public static void AddPerks(JSONClass MEEAKLDGLDF, string BFADPFOIPLL = "perks")
 	{
 		JSONArray jSONArray = new JSONArray();
-		List<RosterPerk> list = ListSF.CCDKHLAMKKO().JLBDOBLHHAF().KEHFPLBNDHI();
+		List<RosterPerk> list = ListSF.GetRoster().GetPerks().GetPerks();
 		foreach (RosterPerk item in list)
 		{
 			JSONClass jSONClass = new JSONClass();
 			jSONClass["perk"] = item.get_Name();
-			jSONClass["upgrade_level"] = item.DHNNCAEEMLL();
+			jSONClass["upgrade_level"] = item.GetUpgradeLevel();
 			jSONArray.Add(jSONClass);
 		}
 		MEEAKLDGLDF[BFADPFOIPLL] = jSONArray;
 	}
 
-	public static void HJECOKNPLPA(JSONClass MEEAKLDGLDF, ArgsDict PCJAKPJMKGN)
+	public static void AddPerkChoice(JSONClass MEEAKLDGLDF, ArgsDict PCJAKPJMKGN)
 	{
 		if (PCJAKPJMKGN.ContainsKey("learnedPerk"))
 		{
 			PerkInfoItem aCONCDFDNJH = (PerkInfoItem)PCJAKPJMKGN["learnedPerk"];
 			MEEAKLDGLDF["taken"] = aCONCDFDNJH.Name;
-			MEEAKLDGLDF["taken_upgrade_level"] = aCONCDFDNJH.AKKLOMFOLNO;
+			MEEAKLDGLDF["taken_upgrade_level"] = aCONCDFDNJH.UpgradeLevel;
 		}
 		if (PCJAKPJMKGN.ContainsKey("rejectedPerk"))
 		{
 			PerkInfoItem aCONCDFDNJH2 = (PerkInfoItem)PCJAKPJMKGN["rejectedPerk"];
 			MEEAKLDGLDF["rejected"] = aCONCDFDNJH2.Name;
-			MEEAKLDGLDF["rejected_upgrade_level"] = aCONCDFDNJH2.AKKLOMFOLNO;
+			MEEAKLDGLDF["rejected_upgrade_level"] = aCONCDFDNJH2.UpgradeLevel;
 		}
 	}
 
-	public static void IOHNPPCBIFL(ItemInfo item, JSONClass MEEAKLDGLDF, string IMGCANJHPND)
+	public static void AddEnchantments(ItemInfo item, JSONClass MEEAKLDGLDF, string IMGCANJHPND)
 	{
 		JSONArray jSONArray = null;
-		List<PerkInfoItem> list = ListSF.EIMKEJNJMEJ(item);
+		List<PerkInfoItem> list = ListSF.GetItemEnchantments(item);
 		if (list.Count > 0)
 		{
 			jSONArray = new JSONArray();
@@ -354,7 +354,7 @@ public static class StatisticsGeter
 			{
 				JSONClass jSONClass = new JSONClass();
 				jSONClass["perk"] = perkInfo.Name;
-				jSONClass["aspect"] = perkInfo.NGNJGOJJPLD("Aspect");
+				jSONClass["aspect"] = perkInfo.GetSetValue("Aspect");
 				jSONArray.Add(jSONClass);
 			}
 		}
@@ -364,110 +364,110 @@ public static class StatisticsGeter
 		}
 	}
 
-	public static void FHKAFKBFJLI(JSONClass MEEAKLDGLDF, string JMOHMLIGHHD, ItemInfo item)
+	public static void AddEquippedItem(JSONClass MEEAKLDGLDF, string JMOHMLIGHHD, ItemInfo item)
 	{
 		if (item != null)
 		{
 			MEEAKLDGLDF[JMOHMLIGHHD + "_name"] = item.Name;
 			MEEAKLDGLDF[JMOHMLIGHHD + "_upg_level"] = item.UpgradeLevel;
-			IOHNPPCBIFL(item, MEEAKLDGLDF, JMOHMLIGHHD + "_enchantments");
+			AddEnchantments(item, MEEAKLDGLDF, JMOHMLIGHHD + "_enchantments");
 		}
 	}
 
-	public static void BNHIGONAEJG(JSONClass MEEAKLDGLDF, ModelParameters JCICKLIMBEF)
+	public static void AddEquipment(JSONClass MEEAKLDGLDF, ModelParameters JCICKLIMBEF)
 	{
 		if (JCICKLIMBEF != null)
 		{
-			FHKAFKBFJLI(MEEAKLDGLDF, "weapon", JCICKLIMBEF.Weapon);
-			FHKAFKBFJLI(MEEAKLDGLDF, "armor", JCICKLIMBEF.Armor);
-			FHKAFKBFJLI(MEEAKLDGLDF, "helmet", JCICKLIMBEF.Helm);
-			FHKAFKBFJLI(MEEAKLDGLDF, "ranged", JCICKLIMBEF.Ranged);
-			FHKAFKBFJLI(MEEAKLDGLDF, "magic", JCICKLIMBEF.Magic);
+			AddEquippedItem(MEEAKLDGLDF, "weapon", JCICKLIMBEF.Weapon);
+			AddEquippedItem(MEEAKLDGLDF, "armor", JCICKLIMBEF.Armor);
+			AddEquippedItem(MEEAKLDGLDF, "helmet", JCICKLIMBEF.Helm);
+			AddEquippedItem(MEEAKLDGLDF, "ranged", JCICKLIMBEF.Ranged);
+			AddEquippedItem(MEEAKLDGLDF, "magic", JCICKLIMBEF.Magic);
 		}
 	}
 
-	public static void CDLBBCPOPAL(JSONClass MEEAKLDGLDF, string BFADPFOIPLL = "rank")
+	public static void AddRank(JSONClass MEEAKLDGLDF, string BFADPFOIPLL = "rank")
 	{
 	}
 
-	public static void LJFCIKFBDHA(JSONClass MEEAKLDGLDF, string BFADPFOIPLL = "ranks")
+	public static void AddRanks(JSONClass MEEAKLDGLDF, string BFADPFOIPLL = "ranks")
 	{
 		JSONArray aItem = new JSONArray();
 		MEEAKLDGLDF.Add(BFADPFOIPLL, aItem);
 	}
 
-	public static void PKLKDFIPCAG(JSONClass MEEAKLDGLDF, string BFADPFOIPLL = "energy")
+	public static void AddEnergy(JSONClass MEEAKLDGLDF, string BFADPFOIPLL = "energy")
 	{
 	}
 
-	public static void CLFIGOGBMCP(JSONClass MEEAKLDGLDF, string BFADPFOIPLL = "runs")
+	public static void AddRuns(JSONClass MEEAKLDGLDF, string BFADPFOIPLL = "runs")
 	{
 	}
 
-	public static void PPLGCOOMBIA(JSONClass MEEAKLDGLDF, string BFADPFOIPLL = "seed")
+	public static void AddSeed(JSONClass MEEAKLDGLDF, string BFADPFOIPLL = "seed")
 	{
 	}
 
-	public static void BIOFFBEPDEO(JSONClass MEEAKLDGLDF, string BFADPFOIPLL = "floor")
+	public static void AddFloor(JSONClass MEEAKLDGLDF, string BFADPFOIPLL = "floor")
 	{
 	}
 
-	public static void CJLPNFIODNF(JSONClass MEEAKLDGLDF, string BFADPFOIPLL = "time")
+	public static void AddTime(JSONClass MEEAKLDGLDF, string BFADPFOIPLL = "time")
 	{
 	}
 
-	public static void EMCBGFOBEMA(JSONClass MEEAKLDGLDF)
+	public static void AddUnusedData(JSONClass MEEAKLDGLDF)
 	{
 	}
 
-	public static void PMANGDENICN(JSONClass MEEAKLDGLDF, string BFADPFOIPLL = "prev_floor_time")
+	public static void AddPreviousFloorTime(JSONClass MEEAKLDGLDF, string BFADPFOIPLL = "prev_floor_time")
 	{
 	}
 
-	public static void LCBNLAIDCNA(JSONClass MEEAKLDGLDF, string BFADPFOIPLL = "scene")
+	public static void AddScene(JSONClass MEEAKLDGLDF, string BFADPFOIPLL = "scene")
 	{
 	}
 
-	public static void JIALMFBGDII(JSONClass MEEAKLDGLDF, string BFADPFOIPLL = "screen")
+	public static void AddScreen(JSONClass MEEAKLDGLDF, string BFADPFOIPLL = "screen")
 	{
 	}
 
-	public static void BFFEGBEDLPF(JSONClass MEEAKLDGLDF)
+	public static void AddLevelUpItems(JSONClass MEEAKLDGLDF)
 	{
-		List<UserItem> list = ListSF.CCDKHLAMKKO().KHCNHPCPFII().DJBOFEEKJMP();
+		List<UserItem> list = ListSF.GetRoster().GetInventory().GetItems();
 		foreach (UserItem item in list)
 		{
-			int num = NNFFKNCIHHK(item);
-			if (num == ListSF.CCDKHLAMKKO().PINDEKDNCNL() - 1)
+			int num = GetItemLevel(item);
+			if (num == ListSF.GetRoster().GetLevel() - 1)
 			{
 				JSONClass jSONClass = null;
 				jSONClass = ((!MEEAKLDGLDF.HasValue("items")) ? new JSONClass() : ((JSONClass)MEEAKLDGLDF["items"]));
-				LMCHCDJEDID(jSONClass, item);
+				AddUserItem(jSONClass, item);
 				MEEAKLDGLDF["items"] = jSONClass;
 			}
 		}
 	}
 
-	public static void LMCHCDJEDID(JSONClass MEEAKLDGLDF, UserItem item)
+	public static void AddUserItem(JSONClass MEEAKLDGLDF, UserItem item)
 	{
 		MEEAKLDGLDF["name"] = item.get_Name();
-		MEEAKLDGLDF["upgrade_level"] = item.DHNNCAEEMLL();
-		MEEAKLDGLDF["type"] = item.BHKHOJPANHE().Type;
-		IOHNPPCBIFL(item.BHKHOJPANHE(), MEEAKLDGLDF, "enchantments");
+		MEEAKLDGLDF["upgrade_level"] = item.GetUpgradeLevel();
+		MEEAKLDGLDF["type"] = item.GetInfo().Type;
+		AddEnchantments(item.GetInfo(), MEEAKLDGLDF, "enchantments");
 	}
 
-	private static int NNFFKNCIHHK(UserItem item)
+	private static int GetItemLevel(UserItem item)
 	{
-		ItemInfo dJKEECEOCJB = item.AKKBIFEFDCI();
+		ItemInfo dJKEECEOCJB = item.GetCurrentUpgradeItem();
 		if (dJKEECEOCJB == null)
 		{
-			dJKEECEOCJB = item.BHKHOJPANHE();
+			dJKEECEOCJB = item.GetInfo();
 		}
 		if (dJKEECEOCJB != null)
 		{
 			return dJKEECEOCJB.ItemLevel;
 		}
-		LLLOJBFMONN.Error("logging UserItem without ItemInfo");
+		GameLog.Error("logging UserItem without ItemInfo");
 		return 0;
 	}
 }

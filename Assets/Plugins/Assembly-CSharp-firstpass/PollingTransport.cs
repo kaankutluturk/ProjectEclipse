@@ -4,17 +4,17 @@ public sealed class PollingTransport : PostSendTransportBase, IHeartbeat
 {
 	private DateTime LastPoll;
 
-	private TimeSpan EMJECEPDOJL;
+	private TimeSpan PollDelay;
 
-	private TimeSpan NNAPNJNKFEG;
+	private TimeSpan PollTimeout;
 
-	private HTTPRequest KMAGLDDNDHP;
+	private HTTPRequest pollRequest;
 
-	public override bool ODFCAGMNOHK
+	public override bool SupportsKeepAlive
 	{
 		get
 		{
-			return IBMJBEKAIAH();
+			return GetSupportsKeepAlive();
 		}
 	}
 
@@ -22,160 +22,160 @@ public sealed class PollingTransport : PostSendTransportBase, IHeartbeat
 		: base("longPolling", MDGFGCDPGFI)
 	{
 		LastPoll = DateTime.MinValue;
-		NNAPNJNKFEG = MDGFGCDPGFI.EOBPEOEMEDB().LFLAILLBGOF() + TimeSpan.FromSeconds(10.0);
+		PollTimeout = MDGFGCDPGFI.GetNegotiationResult().GetConnectionTimeout() + TimeSpan.FromSeconds(10.0);
 	}
 
-	public override bool IBMJBEKAIAH()
+	public override bool GetSupportsKeepAlive()
 	{
 		return false;
 	}
 
-	public override AHLJIMDEAJD get_Type()
+	public override TransportTypes get_Type()
 	{
-		return AHLJIMDEAJD.LongPoll;
+		return TransportTypes.LongPoll;
 	}
 
-	public override void NDCILHIAPIK()
+	public override void Connect()
 	{
-		HTTPManager.MBBMPNDDPIH().KDAFBLAKBMI("Transport - " + get_Name(), "Sending Open Request");
-		if (FLBBFDNHJAJ() != LJLKMCGDKJK.Reconnecting)
+		HTTPManager.GetLogger().Information("Transport - " + get_Name(), "Sending Open Request");
+		if (GetState() != TransportStates.Reconnecting)
 		{
-			set_State(LJLKMCGDKJK.Connecting);
+			set_State(TransportStates.Connecting);
 		}
-		FHIEGKMHOCC lFLGCDNKNJI = ((FLBBFDNHJAJ() != LJLKMCGDKJK.Reconnecting) ? FHIEGKMHOCC.Connect : FHIEGKMHOCC.Reconnect);
-		HTTPRequest iPLGNIDJDCF = new HTTPRequest(BAFGHLCPPHM().BuildUri(lFLGCDNKNJI, this), LAAFHDKKJFL.Get, true, true, HJFCHFIBCPH);
-		BAFGHLCPPHM().PrepareRequest(iPLGNIDJDCF, lFLGCDNKNJI);
+		SignalRRequestType lFLGCDNKNJI = ((GetState() != TransportStates.Reconnecting) ? SignalRRequestType.Connect : SignalRRequestType.Reconnect);
+		HTTPRequest iPLGNIDJDCF = new HTTPRequest(GetConnection().BuildUri(lFLGCDNKNJI, this), HTTPMethods.Get, true, true, OnConnectRequestFinished);
+		GetConnection().PrepareRequest(iPLGNIDJDCF, lFLGCDNKNJI);
 		iPLGNIDJDCF.Send();
 	}
 
 	public override void Stop()
 	{
-		HTTPManager.MAMNLAJACOD().HKMBDKKHPCB(this);
-		if (KMAGLDDNDHP != null)
+		HTTPManager.GetHeartbeats().Unsubscribe(this);
+		if (pollRequest != null)
 		{
-			KMAGLDDNDHP.AKLEEMEHBIC();
-			KMAGLDDNDHP = null;
+			pollRequest.Abort();
+			pollRequest = null;
 		}
 	}
 
-	protected override void HHLGNIDNLNG()
+	protected override void OnStarted()
 	{
 		LastPoll = DateTime.UtcNow;
-		HTTPManager.MAMNLAJACOD().ELAHFBCGAGL(this);
+		HTTPManager.GetHeartbeats().Subscribe(this);
 	}
 
-	protected override void NGGKNLJALML()
+	protected override void OnAborted()
 	{
-		HTTPManager.MAMNLAJACOD().HKMBDKKHPCB(this);
+		HTTPManager.GetHeartbeats().Unsubscribe(this);
 	}
 
-	private void HJFCHFIBCPH(HTTPRequest CGOIOKHEGOE, HTTPResponse BEIGFGCBICO)
+	private void OnConnectRequestFinished(HTTPRequest CGOIOKHEGOE, HTTPResponse BEIGFGCBICO)
 	{
 		string text = string.Empty;
-		switch (CGOIOKHEGOE.FLBBFDNHJAJ())
+		switch (CGOIOKHEGOE.GetState())
 		{
-		case CFGBMHKCENK.Finished:
-			if (BEIGFGCBICO.AICKPAMONBH())
+		case HTTPRequestStates.Finished:
+			if (BEIGFGCBICO.GetIsSuccess())
 			{
-				HTTPManager.MBBMPNDDPIH().KDAFBLAKBMI("Transport - " + get_Name(), "Connect - Request Finished Successfully! " + BEIGFGCBICO.DPBLPGKOEJB());
-				PIGDCLOPNKJ();
-				IServerMessage bNGPAAAKBOP = TransportBase.Parse(BAFGHLCPPHM().IBNMFHGHIBI(), BEIGFGCBICO.DPBLPGKOEJB());
+				HTTPManager.GetLogger().Information("Transport - " + get_Name(), "Connect - Request Finished Successfully! " + BEIGFGCBICO.GetDataAsText());
+				OnConnected();
+				IServerMessage bNGPAAAKBOP = TransportBase.Parse(GetConnection().GetJsonEncoder(), BEIGFGCBICO.GetDataAsText());
 				if (bNGPAAAKBOP != null)
 				{
-					BAFGHLCPPHM().OnMessage(bNGPAAAKBOP);
+					GetConnection().OnMessage(bNGPAAAKBOP);
 					MultiMessage eIKBBLMECNO = bNGPAAAKBOP as MultiMessage;
-					if (eIKBBLMECNO != null && eIKBBLMECNO.LNCCPGIEPOH().HasValue)
+					if (eIKBBLMECNO != null && eIKBBLMECNO.GetPollDelay().HasValue)
 					{
-						EMJECEPDOJL = eIKBBLMECNO.LNCCPGIEPOH().Value;
+						PollDelay = eIKBBLMECNO.GetPollDelay().Value;
 					}
 				}
 			}
 			else
 			{
-				text = string.Format("Connect - Request Finished Successfully, but the server sent an error. Status Code: {0}-{1} Message: {2}", BEIGFGCBICO.KNMDPGBPNED(), BEIGFGCBICO.DCKPMHKDLEJ(), BEIGFGCBICO.DPBLPGKOEJB());
+				text = string.Format("Connect - Request Finished Successfully, but the server sent an error. Status Code: {0}-{1} Message: {2}", BEIGFGCBICO.GetStatusCode(), BEIGFGCBICO.GetMessage(), BEIGFGCBICO.GetDataAsText());
 			}
 			break;
-		case CFGBMHKCENK.Error:
-			text = "Connect - Request Finished with Error! " + ((CGOIOKHEGOE.IEFGFKFHNMD() == null) ? "No Exception" : (CGOIOKHEGOE.IEFGFKFHNMD().Message + "\n" + CGOIOKHEGOE.IEFGFKFHNMD().StackTrace));
+		case HTTPRequestStates.Error:
+			text = "Connect - Request Finished with Error! " + ((CGOIOKHEGOE.GetException() == null) ? "No Exception" : (CGOIOKHEGOE.GetException().Message + "\n" + CGOIOKHEGOE.GetException().StackTrace));
 			break;
-		case CFGBMHKCENK.Aborted:
+		case HTTPRequestStates.Aborted:
 			text = "Connect - Request Aborted!";
 			break;
-		case CFGBMHKCENK.ConnectionTimedOut:
+		case HTTPRequestStates.ConnectionTimedOut:
 			text = "Connect - Connection Timed Out!";
 			break;
-		case CFGBMHKCENK.TimedOut:
+		case HTTPRequestStates.TimedOut:
 			text = "Connect - Processing the request Timed Out!";
 			break;
 		}
 		if (!string.IsNullOrEmpty(text))
 		{
-			BAFGHLCPPHM().Error(text);
+			GetConnection().Error(text);
 		}
 	}
 
-	private void BMOLBAJPGDJ(HTTPRequest CGOIOKHEGOE, HTTPResponse BEIGFGCBICO)
+	private void OnPollRequestFinished(HTTPRequest CGOIOKHEGOE, HTTPResponse BEIGFGCBICO)
 	{
-		if (CGOIOKHEGOE.FLBBFDNHJAJ() == CFGBMHKCENK.Aborted)
+		if (CGOIOKHEGOE.GetState() == HTTPRequestStates.Aborted)
 		{
-			HTTPManager.MBBMPNDDPIH().GLCKHLCAPIN("Transport - " + get_Name(), "Poll - Request Aborted!");
+			HTTPManager.GetLogger().Warning("Transport - " + get_Name(), "Poll - Request Aborted!");
 			return;
 		}
-		KMAGLDDNDHP = null;
+		pollRequest = null;
 		string text = string.Empty;
-		switch (CGOIOKHEGOE.FLBBFDNHJAJ())
+		switch (CGOIOKHEGOE.GetState())
 		{
-		case CFGBMHKCENK.Finished:
-			if (BEIGFGCBICO.AICKPAMONBH())
+		case HTTPRequestStates.Finished:
+			if (BEIGFGCBICO.GetIsSuccess())
 			{
-				HTTPManager.MBBMPNDDPIH().KDAFBLAKBMI("Transport - " + get_Name(), "Poll - Request Finished Successfully! " + BEIGFGCBICO.DPBLPGKOEJB());
-				IServerMessage bNGPAAAKBOP = TransportBase.Parse(BAFGHLCPPHM().IBNMFHGHIBI(), BEIGFGCBICO.DPBLPGKOEJB());
+				HTTPManager.GetLogger().Information("Transport - " + get_Name(), "Poll - Request Finished Successfully! " + BEIGFGCBICO.GetDataAsText());
+				IServerMessage bNGPAAAKBOP = TransportBase.Parse(GetConnection().GetJsonEncoder(), BEIGFGCBICO.GetDataAsText());
 				if (bNGPAAAKBOP != null)
 				{
-					BAFGHLCPPHM().OnMessage(bNGPAAAKBOP);
+					GetConnection().OnMessage(bNGPAAAKBOP);
 					MultiMessage eIKBBLMECNO = bNGPAAAKBOP as MultiMessage;
-					if (eIKBBLMECNO != null && eIKBBLMECNO.LNCCPGIEPOH().HasValue)
+					if (eIKBBLMECNO != null && eIKBBLMECNO.GetPollDelay().HasValue)
 					{
-						EMJECEPDOJL = eIKBBLMECNO.LNCCPGIEPOH().Value;
+						PollDelay = eIKBBLMECNO.GetPollDelay().Value;
 					}
 					LastPoll = DateTime.UtcNow;
 				}
 			}
 			else
 			{
-				text = string.Format("Poll - Request Finished Successfully, but the server sent an error. Status Code: {0}-{1} Message: {2}", BEIGFGCBICO.KNMDPGBPNED(), BEIGFGCBICO.DCKPMHKDLEJ(), BEIGFGCBICO.DPBLPGKOEJB());
+				text = string.Format("Poll - Request Finished Successfully, but the server sent an error. Status Code: {0}-{1} Message: {2}", BEIGFGCBICO.GetStatusCode(), BEIGFGCBICO.GetMessage(), BEIGFGCBICO.GetDataAsText());
 			}
 			break;
-		case CFGBMHKCENK.Error:
-			text = "Poll - Request Finished with Error! " + ((CGOIOKHEGOE.IEFGFKFHNMD() == null) ? "No Exception" : (CGOIOKHEGOE.IEFGFKFHNMD().Message + "\n" + CGOIOKHEGOE.IEFGFKFHNMD().StackTrace));
+		case HTTPRequestStates.Error:
+			text = "Poll - Request Finished with Error! " + ((CGOIOKHEGOE.GetException() == null) ? "No Exception" : (CGOIOKHEGOE.GetException().Message + "\n" + CGOIOKHEGOE.GetException().StackTrace));
 			break;
-		case CFGBMHKCENK.ConnectionTimedOut:
+		case HTTPRequestStates.ConnectionTimedOut:
 			text = "Poll - Connection Timed Out!";
 			break;
-		case CFGBMHKCENK.TimedOut:
+		case HTTPRequestStates.TimedOut:
 			text = "Poll - Processing the request Timed Out!";
 			break;
 		}
 		if (!string.IsNullOrEmpty(text))
 		{
-			BAFGHLCPPHM().Error(text);
+			GetConnection().Error(text);
 		}
 	}
 
-	private void GNGIDEJLNCF()
+	private void Poll()
 	{
-		KMAGLDDNDHP = new HTTPRequest(BAFGHLCPPHM().BuildUri(FHIEGKMHOCC.Poll, this), LAAFHDKKJFL.Get, true, true, BMOLBAJPGDJ);
-		BAFGHLCPPHM().PrepareRequest(KMAGLDDNDHP, FHIEGKMHOCC.Poll);
-		KMAGLDDNDHP.DKLGPGDJPGO(NNAPNJNKFEG);
-		KMAGLDDNDHP.Send();
+		pollRequest = new HTTPRequest(GetConnection().BuildUri(SignalRRequestType.Poll, this), HTTPMethods.Get, true, true, OnPollRequestFinished);
+		GetConnection().PrepareRequest(pollRequest, SignalRRequestType.Poll);
+		pollRequest.SetTimeout(PollTimeout);
+		pollRequest.Send();
 	}
 
 	void IHeartbeat.OnHeartbeatUpdate(TimeSpan OJOKANCMPLG)
 	{
-		LJLKMCGDKJK lJLKMCGDKJK = FLBBFDNHJAJ();
-		if (lJLKMCGDKJK == LJLKMCGDKJK.Started && KMAGLDDNDHP == null && DateTime.UtcNow >= LastPoll + EMJECEPDOJL + BAFGHLCPPHM().EOBPEOEMEDB().NCMIDNBFDID())
+		TransportStates lJLKMCGDKJK = GetState();
+		if (lJLKMCGDKJK == TransportStates.Started && pollRequest == null && DateTime.UtcNow >= LastPoll + PollDelay + GetConnection().GetNegotiationResult().GetLongPollDelay())
 		{
-			GNGIDEJLNCF();
+			Poll();
 		}
 	}
 }

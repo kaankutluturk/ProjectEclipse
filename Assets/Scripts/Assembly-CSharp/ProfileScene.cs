@@ -9,13 +9,13 @@ using UnityEngine.UI;
 
 public class ProfileScene : Scene<ProfileScene>
 {
-	private const int LLKBFIONHPF = 30;
+	private const int FadeFrameCount = 30;
 
-	private const string NOBEALMIHAN = "image/skills/";
+	private const string SkillImagePath = "image/skills/";
 
-	private const int DDLPJCNEMCD = 1000;
+	private const int PreviewTimeout = 1000;
 
-	private const int OLMIKNCJKMJ = 30;
+	private const int PanelSlideStep = 30;
 
 	public MainMenu mainMenu;
 
@@ -61,7 +61,7 @@ public class ProfileScene : Scene<ProfileScene>
 	[SerializeField]
 	private GameObject _achievementCellPrefab;
 
-	private AchievementsController DLJFCPJPCHI;
+	private AchievementsController achievementsController;
 
 	[SerializeField]
 	private TableView _sealsTable;
@@ -69,27 +69,27 @@ public class ProfileScene : Scene<ProfileScene>
 	[SerializeField]
 	private GameObject _sealCellPrefab;
 
-	private SealsController JHEHMDFDJEC;
+	private SealsController sealsController;
 
-	private TableView DOOGDEDCHBO;
+	private TableView activeTable;
 
-	private bool KMIJDCPHHML;
+	private bool isGameCenterConnected;
 
-	private InfoAnimation MKGONDJABAH;
+	private InfoAnimation pendingPreviewAnimation;
 
-	private bool EIDKMLIOKOD;
+	private bool isFading;
 
-	private bool OHDPMGDBCCF = true;
+	private bool isFadingIn = true;
 
-	private bool IBADMKPHOOJ;
+	private bool isPreviewAnimationPlaying;
 	private bool _trickPreviewActive;
 	private string _previewAnimationName;
 	public event System.Action<object> TrickPreviewCompleted;
 	public event System.Action<object> ProfileClosing;
 
-	private float BKACEHDPGKC = 1f;
+	private float uiAlpha = 1f;
 
-	private int KKEHAMGBIEA;
+	private int nextSubItemId;
 
 	[SerializeField]
 	private SectionButton _btnPerks;
@@ -103,14 +103,14 @@ public class ProfileScene : Scene<ProfileScene>
 	[SerializeField]
 	private SectionButton _btnSeals;
 
-	private List<SectionButton> JHFCFBIPGPF = new List<SectionButton>();
+	private List<SectionButton> sectionButtons = new List<SectionButton>();
 
-	private SectionButton HNCLEDJDODK;
+	private SectionButton activeSectionButton;
 
 	[SerializeField]
 	private SFButton _showAchievementButton;
 
-	private SliderType MFCFAGFGEKJ;
+	private SliderType currentSliderType;
 
 	[SerializeField]
 	private ResolutionImage _achievementCircle;
@@ -148,17 +148,17 @@ public class ProfileScene : Scene<ProfileScene>
 	[SerializeField]
 	private Text _sealLabel;
 
-	private float AAAAENBBFMI;
+	private float leftPanelHiddenX;
 
-	private float GOGMJFKMPAM;
+	private float leftPanelShownX;
 
-	private bool JGEAEFCNCIL;
+	private bool isPanelSliding;
 
-	private bool BPNNOHDIMFG;
+	private bool isPanelShowing;
 
 	public List<SubItem> SubItems = new List<SubItem>();
 
-	private SubItem IFOGILFLCJO;
+	private SubItem selectedSubItem;
 
 	[SerializeField]
 	private CanvasGroup _profileUIGroup;
@@ -166,7 +166,7 @@ public class ProfileScene : Scene<ProfileScene>
 	[SerializeField]
 	private CanvasGroup _bottomUIGroup;
 
-	public override ScreenType PNAJHDBDDLP
+	public override ScreenType SceneType
 	{
 		get
 		{
@@ -182,31 +182,31 @@ public class ProfileScene : Scene<ProfileScene>
 	protected override void Init(object data)
 	{
 		Eclipse.UI.ProfileBottomBarLayout.Configure(_btnPerks, _btnTricks, _btnAchievements, _btnSeals);
-		KMIJDCPHHML = GameCenterController.OBDJPKOJADA();
+		isGameCenterConnected = GameCenterController.GetIsAuthenticated();
 		mainMenu.Init();
-		KIHHCIHBNLB();
-		IJAFAMPCNIJ();
-		BLKEFMCNCFO();
-		PFJBDAMNBIO();
-		CADAAFJHCCC();
-		KCBJGFPAOHC();
-		JEOAHMHNAEM();
-		if (!BKDDIHINJNM())
+		InitModelContainer();
+		InitPanels();
+		InitControllers();
+		InitSectionButtons();
+		HideAllBadges();
+		InitAchievementButton();
+		ScrollPerksToCurrentLevel();
+		if (!HasAvailablePerks())
 		{
-			IGNOGLBBHDG(_perksTable);
+			RestoreSliderPosition(_perksTable);
 		}
-		IGNOGLBBHDG(_achievementsTable);
-		IGNOGLBBHDG(_tricksTable);
-		IGNOGLBBHDG(_sealsTable);
+		RestoreSliderPosition(_achievementsTable);
+		RestoreSliderPosition(_tricksTable);
+		RestoreSliderPosition(_sealsTable);
 		SetScreen(SliderType.SliderPerks);
-		HPPBLKIPPME();
+		UpdateBadges();
 	}
 
-	private void KIHHCIHBNLB()
+	private void InitModelContainer()
 	{
 		ModelContainer.Init();
-		ModelContainer.UpdateModel(null, StageType.FDBBPEGEGMK.STAGE_SHOP_START, "Profile");
-		ModelContainer.AddEventListener(0, LDFKBJAHGII);
+		ModelContainer.UpdateModel(null, StageType.Stage.STAGE_SHOP_START, "Profile");
+		ModelContainer.AddEventListener(0, OnModelEvent);
 	}
 
 	public void OnTrickShow(object data)
@@ -215,132 +215,132 @@ public class ProfileScene : Scene<ProfileScene>
 		{
 			TrickSubItem trickSubItem = (TrickSubItem)data;
 			Trick trick = trickSubItem.GetTrick();
-			MKGONDJABAH = trick.KJHMOGGECBN;
-			_backgroundLeft.color = Constants.EKJMAIDGKME;
-			_backgroundRight.color = Constants.EKJMAIDGKME;
-			CGFOHBFAJBL();
+			pendingPreviewAnimation = trick.Animation;
+			_backgroundLeft.color = Constants.NormalBackgroundColor;
+			_backgroundRight.color = Constants.NormalBackgroundColor;
+			BeginTrickPreview();
 		}
 	}
 
-	private void CGFOHBFAJBL()
+	private void BeginTrickPreview()
 	{
 		_trickPreviewActive = true;
 		_leftPanel.gameObject.SetActive(false);
-		EIDKMLIOKOD = true;
-		OHDPMGDBCCF = false;
+		isFading = true;
+		isFadingIn = false;
 		_profileUIGroup.blocksRaycasts = false;
 		_bottomUIGroup.blocksRaycasts = false;
-		for (int i = 0; i < JHFCFBIPGPF.Count; i++)
+		for (int i = 0; i < sectionButtons.Count; i++)
 		{
 		}
 		SubItem.EnableAnimation(false);
-		GameUtils.FMICOICLCNL(false);
+		GameUtils.LockInput(false);
 	}
 
-	private void LDFKBJAHGII(object data)
+	private void OnModelEvent(object data)
 	{
 		Model.EventModel modelEvent = data as Model.EventModel;
 		InfoAnimation animation = modelEvent == null ? null : modelEvent.Data as InfoAnimation;
-		if (IBADMKPHOOJ && animation != null && animation.Name == _previewAnimationName)
+		if (isPreviewAnimationPlaying && animation != null && animation.Name == _previewAnimationName)
 		{
-			IBADMKPHOOJ = false;
+			isPreviewAnimationPlaying = false;
 			_previewAnimationName = null;
 			ModelContainer.ResetModel();
-			_backgroundLeft.color = Constants.GFBLKELEBEH;
-			_backgroundRight.color = Constants.GFBLKELEBEH;
-			OOHJAHDHEAP();
+			_backgroundLeft.color = Constants.DimmedBackgroundColor;
+			_backgroundRight.color = Constants.DimmedBackgroundColor;
+			EndTrickPreview();
 		}
 	}
 
-	private void OOHJAHDHEAP()
+	private void EndTrickPreview()
 	{
-		EIDKMLIOKOD = true;
-		OHDPMGDBCCF = true;
+		isFading = true;
+		isFadingIn = true;
 		_profileUIGroup.blocksRaycasts = true;
 		_bottomUIGroup.blocksRaycasts = true;
-		for (int i = 0; i < JHFCFBIPGPF.Count; i++)
+		for (int i = 0; i < sectionButtons.Count; i++)
 		{
 		}
 	}
 
 	private void Update()
 	{
-		IBGCDOFNIIF();
-		HPHAOJDPNND();
-		bool flag = GameCenterController.OBDJPKOJADA();
-		if (KMIJDCPHHML != flag)
+		UpdatePanelSlide();
+		UpdateFade();
+		bool flag = GameCenterController.GetIsAuthenticated();
+		if (isGameCenterConnected != flag)
 		{
-			INKIBPEDNJL();
-			KMIJDCPHHML = flag;
+			UpdateAchievementButtonVisibility();
+			isGameCenterConnected = flag;
 		}
 	}
 
-	private void HPHAOJDPNND()
+	private void UpdateFade()
 	{
-		if (EIDKMLIOKOD)
+		if (isFading)
 		{
-			if (OHDPMGDBCCF)
+			if (isFadingIn)
 			{
-				LMPGJLLBFPP();
+				FadeIn();
 			}
 			else
 			{
-				MONAFDKJKOP();
+				FadeOut();
 			}
 		}
 	}
 
-	private void LMPGJLLBFPP()
+	private void FadeIn()
 	{
-		if (EIDKMLIOKOD)
+		if (isFading)
 		{
 			float num = 1f / 30f;
-			BKACEHDPGKC += num;
-			if (BKACEHDPGKC >= 1f)
+			uiAlpha += num;
+			if (uiAlpha >= 1f)
 			{
-				BKACEHDPGKC = 1f;
-				EIDKMLIOKOD = false;
+				uiAlpha = 1f;
+				isFading = false;
 				_leftPanel.gameObject.SetActive(true);
 				bool completedPreview = _trickPreviewActive;
 				ReleaseTrickPreviewInput();
 				if (completedPreview) TrickPreviewCompleted?.Invoke(null);
 			}
-			_profileUIGroup.alpha = BKACEHDPGKC;
+			_profileUIGroup.alpha = uiAlpha;
 		}
 	}
 
-	private void MONAFDKJKOP()
+	private void FadeOut()
 	{
-		if (EIDKMLIOKOD)
+		if (isFading)
 		{
 			float num = 1f / 30f;
-			BKACEHDPGKC -= num;
-			if (BKACEHDPGKC <= 0f)
+			uiAlpha -= num;
+			if (uiAlpha <= 0f)
 			{
-				BKACEHDPGKC = 0f;
-				EIDKMLIOKOD = false;
+				uiAlpha = 0f;
+				isFading = false;
 				PlayAnimation();
 			}
-			_profileUIGroup.alpha = BKACEHDPGKC;
+			_profileUIGroup.alpha = uiAlpha;
 		}
 	}
 
 	private void PlayAnimation()
 	{
-		if (MKGONDJABAH != null)
+		if (pendingPreviewAnimation != null)
 		{
-			IBADMKPHOOJ = true;
-			_previewAnimationName = MKGONDJABAH.Name;
-			MKGONDJABAH = null;
+			isPreviewAnimationPlaying = true;
+			_previewAnimationName = pendingPreviewAnimation.Name;
+			pendingPreviewAnimation = null;
 			if (ModelContainer.TryPlayAnimation(_previewAnimationName)) return;
 		}
 		// A missing recovered animation must not strand the hidden UI/input lock.
 		Debug.LogWarning("[Profile] Preview unavailable; restoring profile controls.");
-		IBADMKPHOOJ = false;
+		isPreviewAnimationPlaying = false;
 		_previewAnimationName = null;
-		_backgroundLeft.color = Constants.GFBLKELEBEH;
-		_backgroundRight.color = Constants.GFBLKELEBEH;
-		OOHJAHDHEAP();
+		_backgroundLeft.color = Constants.DimmedBackgroundColor;
+		_backgroundRight.color = Constants.DimmedBackgroundColor;
+		EndTrickPreview();
 	}
 
 	private void ReleaseTrickPreviewInput()
@@ -348,12 +348,12 @@ public class ProfileScene : Scene<ProfileScene>
 		if (!_trickPreviewActive) return;
 		_trickPreviewActive = false;
 		SubItem.EnableAnimation(true);
-		GameUtils.KKNGFGMJKHG();
+		GameUtils.UnlockInput();
 	}
 
-	private void INKIBPEDNJL()
+	private void UpdateAchievementButtonVisibility()
 	{
-		if (SystemProperties.IPJFCBAGMJJ() && !AssemblyController.JONCCPLEIBE().BKGIFIPIHAL() && !AssemblyController.JONCCPLEIBE().NPNOMBEEPJD() && !AssemblyController.JONCCPLEIBE().OPCBKOOFMAK() && GameCenterController.OBDJPKOJADA() && DOOGDEDCHBO == _achievementsTable)
+		if (SystemProperties.IsAndroidPlatform() && !AssemblyController.GetMarket().GetIsChinaMarket() && !AssemblyController.GetMarket().GetIsAmazonMarket() && !AssemblyController.GetMarket().GetIsAmazonMobileMarket() && GameCenterController.GetIsAuthenticated() && activeTable == _achievementsTable)
 		{
 			_showAchievementButton.gameObject.SetActive(true);
 		}
@@ -363,106 +363,106 @@ public class ProfileScene : Scene<ProfileScene>
 		}
 	}
 
-	private void BLKEFMCNCFO()
+	private void InitControllers()
 	{
 		_perksCtrl = new PerksController(_perksTable, _perkCellPrefab);
-		_perksTable.onSelectCell.AddListener(ONPNNPPAGGK);
+		_perksTable.onSelectCell.AddListener(OnTableCellSelected);
 		_perksTable.gameObject.SetActive(false);
-		DLJFCPJPCHI = new AchievementsController(_achievementsTable, _achievementCellPrefab);
-		_achievementsTable.onSelectCell.AddListener(ONPNNPPAGGK);
-		_achievementsTable.onSelectCell.AddListener(PDDILIPNJEN);
+		achievementsController = new AchievementsController(_achievementsTable, _achievementCellPrefab);
+		_achievementsTable.onSelectCell.AddListener(OnTableCellSelected);
+		_achievementsTable.onSelectCell.AddListener(OnTableCellChosen);
 		_tricksCtrl = new TricksController(_tricksTable, _trickCellPrefab);
-		_tricksTable.onSelectCell.AddListener(ONPNNPPAGGK);
-		_tricksTable.onSelectCell.AddListener(PDDILIPNJEN);
-		OKJCEACNIDC();
-		ADAMNHCPBPG();
-		CJKBAILOPLN();
+		_tricksTable.onSelectCell.AddListener(OnTableCellSelected);
+		_tricksTable.onSelectCell.AddListener(OnTableCellChosen);
+		HideAchievementsTable();
+		HideTricksTable();
+		InitSealsController();
 	}
 
 	public void SetScreen(SliderType LFLGCDNKNJI)
 	{
-		QuestParameters hHKLFIIBIFF = ListSF.GetInstance().BNMLDPNCMLB();
-		if (MFCFAGFGEKJ != LFLGCDNKNJI && GameUtils.MKADBAEEMFA(GameUtils.NAMBCLFLNIN(hHKLFIIBIFF.OIKHBNOANPP), LFLGCDNKNJI))
+		QuestParameters hHKLFIIBIFF = ListSF.GetInstance().GetQuestParameters();
+		if (currentSliderType != LFLGCDNKNJI && GameUtils.NotifyTabChanged(GameUtils.GetSliderTypeByName(hHKLFIIBIFF.currentTabName), LFLGCDNKNJI))
 		{
 			return;
 		}
 		if (LFLGCDNKNJI == SliderType.SliderPerks)
 		{
-			JFBPMBFPKHC();
+			ShowLeftPanel();
 		}
 		else
 		{
-			LGPACAHLAGO();
+			HideLeftPanel();
 		}
-		if (DOOGDEDCHBO != null)
+		if (activeTable != null)
 		{
-			DOOGDEDCHBO.gameObject.SetActive(false);
+			activeTable.gameObject.SetActive(false);
 		}
-		if (HNCLEDJDODK != null && DOOGDEDCHBO != null)
+		if (activeSectionButton != null && activeTable != null)
 		{
-			HNCLEDJDODK.interactable = true;
+			activeSectionButton.interactable = true;
 		}
-		HPPBLKIPPME();
+		UpdateBadges();
 		_rightPanel.Clear();
 		switch (LFLGCDNKNJI)
 		{
 		case SliderType.SliderPerks:
 		{
-			JFBPMBFPKHC();
-			DOOGDEDCHBO = _perksTable;
-			HNCLEDJDODK = _btnPerks;
-			string noContentMessage = ((!BKDDIHINJNM()) ? "profileNoSkills" : "profileSelectSkill");
+			ShowLeftPanel();
+			activeTable = _perksTable;
+			activeSectionButton = _btnPerks;
+			string noContentMessage = ((!HasAvailablePerks()) ? "profileNoSkills" : "profileSelectSkill");
 			_rightPanel.SetNoContentMessage(noContentMessage);
 			break;
 		}
 		case SliderType.SliderTricks:
-			LGPACAHLAGO();
-			DOOGDEDCHBO = _tricksTable;
-			HNCLEDJDODK = _btnTricks;
-			DOOGDEDCHBO.ScrollToCell(0);
-			PDDILIPNJEN(0);
-			KAHCAGHOMLJ(_tricksTable);
-			BMLFAEOGIAN();
-			OEDOBIIJGBC();
+			HideLeftPanel();
+			activeTable = _tricksTable;
+			activeSectionButton = _btnTricks;
+			activeTable.ScrollToCell(0);
+			OnTableCellChosen(0);
+			UpdateVisibleCellStates(_tricksTable);
+			UpdateTricksController();
+			ClearNewTrickFlags();
 			break;
 		case SliderType.SliderAchievements:
-			LGPACAHLAGO();
-			DOOGDEDCHBO = _achievementsTable;
-			HNCLEDJDODK = _btnAchievements;
-			if (DLJFCPJPCHI.IGGFLBOBGLN())
+			HideLeftPanel();
+			activeTable = _achievementsTable;
+			activeSectionButton = _btnAchievements;
+			if (achievementsController.HasNewAchievement())
 			{
-				DLJFCPJPCHI.ICDEBPNMLFB();
+				achievementsController.ScrollToFirstNewAchievement();
 			}
 			else
 			{
-				DOOGDEDCHBO.ScrollToCell(0);
+				activeTable.ScrollToCell(0);
 			}
-			PDDILIPNJEN(0);
+			OnTableCellChosen(0);
 			break;
 		case SliderType.SliderSeals:
-			LGPACAHLAGO();
-			BHKDPICIGDI();
-			HPPBLKIPPME();
-			DOOGDEDCHBO = _sealsTable;
-			HNCLEDJDODK = _btnSeals;
-			DOOGDEDCHBO.ScrollToCell(0);
-			PDDILIPNJEN(0);
+			HideLeftPanel();
+			ClearNewSealFlags();
+			UpdateBadges();
+			activeTable = _sealsTable;
+			activeSectionButton = _btnSeals;
+			activeTable.ScrollToCell(0);
+			OnTableCellChosen(0);
 			break;
 		default:
-			LLLOJBFMONN.Write("ERROR: ProfileScreen - onTypeSelect (data = %i)", LFLGCDNKNJI);
+			GameLog.Write("ERROR: ProfileScreen - onTypeSelect (data = %i)", LFLGCDNKNJI);
 			break;
 		}
-		if ((bool)DOOGDEDCHBO)
+		if ((bool)activeTable)
 		{
-			DOOGDEDCHBO.gameObject.SetActive(true);
+			activeTable.gameObject.SetActive(true);
 		}
-		if (HNCLEDJDODK != null)
+		if (activeSectionButton != null)
 		{
-			HNCLEDJDODK.interactable = false;
+			activeSectionButton.interactable = false;
 		}
-		INKIBPEDNJL();
-		MFCFAGFGEKJ = LFLGCDNKNJI;
-		hHKLFIIBIFF.OIKHBNOANPP = GameUtils.IPFBLJOALBN[MFCFAGFGEKJ];
+		UpdateAchievementButtonVisibility();
+		currentSliderType = LFLGCDNKNJI;
+		hHKLFIIBIFF.currentTabName = GameUtils.SliderNames[currentSliderType];
 	}
 
 	public void ScrollToItemByName(SliderType _sliderType, string OHCGEEEKEJH)
@@ -473,16 +473,16 @@ public class ProfileScene : Scene<ProfileScene>
 			switch (_sliderType)
 			{
 			case SliderType.SliderPerks:
-				_perksCtrl.EENODCGBNHC(OHCGEEEKEJH);
+				_perksCtrl.ScrollToPerk(OHCGEEEKEJH);
 				break;
 			case SliderType.SliderTricks:
-				_tricksCtrl.FEKDKAPJDCJ(OHCGEEEKEJH);
+				_tricksCtrl.SelectTrickByName(OHCGEEEKEJH);
 				break;
 			case SliderType.SliderAchievements:
-				DLJFCPJPCHI.BDHALBHODPG(OHCGEEEKEJH);
+				achievementsController.ScrollToAchievement(OHCGEEEKEJH);
 				break;
 			case SliderType.SliderSeals:
-				JHEHMDFDJEC.KCAAFPNBEGL(OHCGEEEKEJH);
+				sealsController.ScrollToSeal(OHCGEEEKEJH);
 				break;
 			}
 		}
@@ -491,7 +491,7 @@ public class ProfileScene : Scene<ProfileScene>
 	public void AddSubItem(SubItem item)
 	{
 		item.AddEventListener(10, OnSubItemClick);
-		item.ButtonId = KKEHAMGBIEA++;
+		item.ButtonId = nextSubItemId++;
 		SubItems.Add(item);
 	}
 
@@ -522,101 +522,101 @@ public class ProfileScene : Scene<ProfileScene>
 		}
 	}
 
-	private void PFJBDAMNBIO()
+	private void InitSectionButtons()
 	{
-		OHDFPIADEIG(_btnPerks, SliderType.SliderPerks);
-		OHDFPIADEIG(_btnTricks, SliderType.SliderTricks);
-		OHDFPIADEIG(_btnAchievements, SliderType.SliderAchievements);
-		OHDFPIADEIG(_btnSeals, SliderType.SliderSeals);
-		DEHENFMAKKM();
+		RegisterSectionButton(_btnPerks, SliderType.SliderPerks);
+		RegisterSectionButton(_btnTricks, SliderType.SliderTricks);
+		RegisterSectionButton(_btnAchievements, SliderType.SliderAchievements);
+		RegisterSectionButton(_btnSeals, SliderType.SliderSeals);
+		DisableSealsButtonIfEmpty();
 	}
 
-	private void CADAAFJHCCC()
+	private void HideAllBadges()
 	{
-		CBDKOFGFMLB(_achievementCircle, _achievementEllipse, _achievementLabel, _btnAchievements);
-		CBDKOFGFMLB(_trickCircle, _trickEllipse, _trickLabel, _btnTricks);
-		CBDKOFGFMLB(_perkCircle, _perkEllipse, _perkLabel, _btnPerks);
-		CBDKOFGFMLB(_sealCircle, _sealEllipse, _sealLabel, _btnSeals);
+		HideBadge(_achievementCircle, _achievementEllipse, _achievementLabel, _btnAchievements);
+		HideBadge(_trickCircle, _trickEllipse, _trickLabel, _btnTricks);
+		HideBadge(_perkCircle, _perkEllipse, _perkLabel, _btnPerks);
+		HideBadge(_sealCircle, _sealEllipse, _sealLabel, _btnSeals);
 	}
 
-	private void CBDKOFGFMLB(ResolutionImage MJOHJFEFNGF, ResolutionImage DGLDPAOMOPH, Text ICBBNJMLDJH, SectionButton GAMILDJHFDB)
+	private void HideBadge(ResolutionImage MJOHJFEFNGF, ResolutionImage DGLDPAOMOPH, Text ICBBNJMLDJH, SectionButton GAMILDJHFDB)
 	{
 		MJOHJFEFNGF.gameObject.SetActive(false);
 		DGLDPAOMOPH.gameObject.SetActive(false);
 		ICBBNJMLDJH.gameObject.SetActive(false);
-		ICBBNJMLDJH.color = Constants.PLIDKLDIOKM;
+		ICBBNJMLDJH.color = Constants.ProfileLabelColor;
 	}
 
-	private void OKJCEACNIDC()
+	private void HideAchievementsTable()
 	{
 		_achievementsTable.gameObject.SetActive(false);
 	}
 
-	private void ADAMNHCPBPG()
+	private void HideTricksTable()
 	{
 		_tricksTable.gameObject.SetActive(false);
 	}
 
-	private void CJKBAILOPLN()
+	private void InitSealsController()
 	{
-		JHEHMDFDJEC = new SealsController(_sealsTable, _sealCellPrefab);
+		sealsController = new SealsController(_sealsTable, _sealCellPrefab);
 		_sealsTable.gameObject.SetActive(false);
-		_sealsTable.onSelectCell.AddListener(PDDILIPNJEN);
+		_sealsTable.onSelectCell.AddListener(OnTableCellChosen);
 		_sealsTable.ScrollToCell(_sealsTable.NumberOfRows() - 1);
 	}
 
-	private void KCBJGFPAOHC()
+	private void InitAchievementButton()
 	{
 		_showAchievementButton.AddEventListener(2, OnClickButton);
 	}
 
-	private void IBGCDOFNIIF()
+	private void UpdatePanelSlide()
 	{
-		if (JGEAEFCNCIL && _leftPanel != null)
+		if (isPanelSliding && _leftPanel != null)
 		{
-			if ((BPNNOHDIMFG && _leftPanel.transform.localPosition.x <= GOGMJFKMPAM + 0.01f) || (!BPNNOHDIMFG && _leftPanel.transform.localPosition.x >= AAAAENBBFMI + 0.01f))
+			if ((isPanelShowing && _leftPanel.transform.localPosition.x <= leftPanelShownX + 0.01f) || (!isPanelShowing && _leftPanel.transform.localPosition.x >= leftPanelHiddenX + 0.01f))
 			{
-				JGEAEFCNCIL = false;
+				isPanelSliding = false;
 			}
-			else if (BPNNOHDIMFG)
+			else if (isPanelShowing)
 			{
-				_leftPanel.transform.OKHPLHPBPKJ(_leftPanel.transform.localPosition.x - 30f);
+				_leftPanel.transform.SetLocalX(_leftPanel.transform.localPosition.x - 30f);
 			}
 			else
 			{
-				_leftPanel.transform.OKHPLHPBPKJ(_leftPanel.transform.localPosition.x + 30f);
+				_leftPanel.transform.SetLocalX(_leftPanel.transform.localPosition.x + 30f);
 			}
 		}
 	}
 
-	private void JFBPMBFPKHC()
+	private void ShowLeftPanel()
 	{
-		JGEAEFCNCIL = true;
-		BPNNOHDIMFG = true;
+		isPanelSliding = true;
+		isPanelShowing = true;
 	}
 
-	private void LGPACAHLAGO()
+	private void HideLeftPanel()
 	{
-		JGEAEFCNCIL = true;
-		BPNNOHDIMFG = false;
+		isPanelSliding = true;
+		isPanelShowing = false;
 	}
 
-	private void OHDFPIADEIG(SectionButton GAMILDJHFDB, SliderType OKNNNLIPODI)
+	private void RegisterSectionButton(SectionButton GAMILDJHFDB, SliderType OKNNNLIPODI)
 	{
 		GAMILDJHFDB.ButtonId = (int)OKNNNLIPODI;
-		GAMILDJHFDB.AddEventListener(2, NKJAOBEMLBM);
-		JHFCFBIPGPF.Add(GAMILDJHFDB);
+		GAMILDJHFDB.AddEventListener(2, OnSectionButtonClick);
+		sectionButtons.Add(GAMILDJHFDB);
 	}
 
 	private void OnClickButton(object data)
 	{
-		if (GameCenterController.OBDJPKOJADA())
+		if (GameCenterController.GetIsAuthenticated())
 		{
-			GameCenterController.NPMGIFJKAEG();
+			GameCenterController.ShowAchievements();
 		}
 	}
 
-	private void NKJAOBEMLBM(object data)
+	private void OnSectionButtonClick(object data)
 	{
 		if (data != null)
 		{
@@ -625,27 +625,27 @@ public class ProfileScene : Scene<ProfileScene>
 		}
 	}
 
-	private void ONPNNPPAGGK(object data)
+	private void OnTableCellSelected(object data)
 	{
-		if (!(DOOGDEDCHBO == null))
+		if (!(activeTable == null))
 		{
-			LFAJDIBPGOH();
-			if (DOOGDEDCHBO == _perksTable)
+			SaveSliderPosition();
+			if (activeTable == _perksTable)
 			{
-				JCMCECGPNGC();
+				OnPerksCellSelected();
 			}
 		}
 	}
 
-	private void PDDILIPNJEN(object data)
+	private void OnTableCellChosen(object data)
 	{
-		if (DOOGDEDCHBO == null || (DOOGDEDCHBO != _tricksTable && DOOGDEDCHBO != _achievementsTable && DOOGDEDCHBO != _sealsTable))
+		if (activeTable == null || (activeTable != _tricksTable && activeTable != _achievementsTable && activeTable != _sealsTable))
 		{
 			return;
 		}
-		if (DOOGDEDCHBO != _sealsTable)
+		if (activeTable != _sealsTable)
 		{
-			ProfileCell profileCell = (ProfileCell)DOOGDEDCHBO.get_SelectedCell();
+			ProfileCell profileCell = (ProfileCell)activeTable.get_SelectedCell();
 			if (profileCell != null)
 			{
 				SubItem firstIcon = profileCell.GetFirstIcon();
@@ -654,7 +654,7 @@ public class ProfileScene : Scene<ProfileScene>
 		}
 		else
 		{
-			ShopTableViewCell shopTableViewCell = (ShopTableViewCell)DOOGDEDCHBO.get_SelectedCell();
+			ShopTableViewCell shopTableViewCell = (ShopTableViewCell)activeTable.get_SelectedCell();
 			if (shopTableViewCell != null)
 			{
 				ItemInfo itemInfo = shopTableViewCell.get_ItemInfo();
@@ -666,32 +666,32 @@ public class ProfileScene : Scene<ProfileScene>
 	public void OnSubItemClick(object data)
 	{
 		int oKNNNLIPODI = (int)data;
-		if (IFOGILFLCJO != null)
+		if (selectedSubItem != null)
 		{
-			IFOGILFLCJO.SetSelected(false);
+			selectedSubItem.SetSelected(false);
 		}
-		IFOGILFLCJO = OHNODOAGBJG(oKNNNLIPODI);
-		if (IFOGILFLCJO == null)
+		selectedSubItem = FindSubItemById(oKNNNLIPODI);
+		if (selectedSubItem == null)
 		{
 			return;
 		}
-		IFOGILFLCJO.SetSelected(true);
-		if (IFOGILFLCJO.Data != null)
+		selectedSubItem.SetSelected(true);
+		if (selectedSubItem.Data != null)
 		{
-			if (DOOGDEDCHBO == _perksTable)
+			if (activeTable == _perksTable)
 			{
-				KAHIFHMHDAF kAHIFHMHDAF = (KAHIFHMHDAF)IFOGILFLCJO.Data;
-				kAHIFHMHDAF.JMLAKAKDBBL = _rightPanel.GetLabelWidth();
+				PerkContentData kAHIFHMHDAF = (PerkContentData)selectedSubItem.Data;
+				kAHIFHMHDAF.LabelWidth = _rightPanel.GetLabelWidth();
 				_rightPanel.SetPerkInfo(kAHIFHMHDAF);
 			}
-			else if (DOOGDEDCHBO == _tricksTable)
+			else if (activeTable == _tricksTable)
 			{
-				TrickInfo trickInfo = (TrickInfo)IFOGILFLCJO.Data;
+				TrickInfo trickInfo = (TrickInfo)selectedSubItem.Data;
 				_rightPanel.SetTrickInfo(trickInfo);
 			}
-			else if (DOOGDEDCHBO == _achievementsTable)
+			else if (activeTable == _achievementsTable)
 			{
-				AchievementInfo achievementInfo = (AchievementInfo)IFOGILFLCJO.Data;
+				AchievementInfo achievementInfo = (AchievementInfo)selectedSubItem.Data;
 				_rightPanel.SetAchievementInfo(achievementInfo);
 			}
 		}
@@ -709,18 +709,18 @@ public class ProfileScene : Scene<ProfileScene>
 		{
 			return;
 		}
-		RosterPerk hOGDBKBFFDJ = ListSF.CCDKHLAMKKO().JLBDOBLHHAF().HGOLHMJEPIA(perk);
-		PerkHistory.Perk hNHILOOIIMO = ListSF.CCDKHLAMKKO().JLBDOBLHHAF().GIAEMMLABDL.CBGCAPIMCFH(perk.KAMBOKLFBEE(), perk.PINDEKDNCNL());
-		PerkTree.GBPBIPFIOJH().AEOKBBBAANA(hNHILOOIIMO);
-		_leftPanel.AddItem(hOGDBKBFFDJ.DFOELJAEEGG());
+		RosterPerk hOGDBKBFFDJ = ListSF.GetRoster().GetPerks().AddOrUpgradePerk(perk);
+		PerkHistory.Perk hNHILOOIIMO = ListSF.GetRoster().GetPerks().History.AddPerk(perk.GetPerkName(), perk.GetLevel());
+		PerkTree.GetInstance().ApplyLearnedPerk(hNHILOOIIMO);
+		_leftPanel.AddItem(hOGDBKBFFDJ.GetPerkInfo());
 		perkSubItem.Choose();
 		if (hNHILOOIIMO != null)
 		{
-			PerkCell perkCell = GCFBNDPAMLA((PerkCell)perkSubItem.ParentCell);
-			ProfilePerkContainer fHPJJGPJLHD = PerkTree.GBPBIPFIOJH().HPKLHAAFPHK(hNHILOOIIMO.Level);
+			PerkCell perkCell = GetNextRowPerkCell((PerkCell)perkSubItem.ParentCell);
+			ProfilePerkContainer fHPJJGPJLHD = PerkTree.GetInstance().GetNextContainerAfterLevel(hNHILOOIIMO.Level);
 			if (perkCell != null && fHPJJGPJLHD != null)
 			{
-				_perksCtrl.LAJJAAAGDLI(perkCell.get_RowNumber());
+				_perksCtrl.RefreshCell(perkCell.get_RowNumber());
 			}
 			// Eclipse: bring the next level's choices into view once this one is learned.
 			PerkCell learnedCell = perkSubItem.ParentCell as PerkCell;
@@ -728,28 +728,28 @@ public class ProfileScene : Scene<ProfileScene>
 			{
 				_perksTable.ScrollToCell(learnedCell.get_RowNumber() + 1, 0.5f);
 			}
-			_tricksCtrl.LLIMHAHIMML();
+			_tricksCtrl.Reload();
 			mainMenu.UpdateNewPerks();
 			if (perkSubItem.IsInfoAnimation())
 			{
 			}
-			Trick iHNIKIHKFHC = GameUtils.NMNIGIDFKOA(perk.CEENDGFFEFM());
+			Trick iHNIKIHKFHC = GameUtils.GetTrickByName(perk.GetMoveName());
 			if (iHNIKIHKFHC != null)
 			{
-				ListSF.CCDKHLAMKKO().ENFKEIHBICK(iHNIKIHKFHC.Name);
+				ListSF.GetRoster().AddOpenTrick(iHNIKIHKFHC.Name);
 			}
-			HPPBLKIPPME();
-			ProfilePerk pLKCIINIFMJ = HEKMFIFGALO(hNHILOOIIMO.Level, hOGDBKBFFDJ);
+			UpdateBadges();
+			ProfilePerk pLKCIINIFMJ = FindRejectedPerk(hNHILOOIIMO.Level, hOGDBKBFFDJ);
 			ArgsDict kEMMIFBFDPK = new ArgsDict();
 			if (hOGDBKBFFDJ != null)
 			{
-				kEMMIFBFDPK["learnedPerk"] = hOGDBKBFFDJ.DFOELJAEEGG();
+				kEMMIFBFDPK["learnedPerk"] = hOGDBKBFFDJ.GetPerkInfo();
 			}
 			if (pLKCIINIFMJ != null)
 			{
-				kEMMIFBFDPK["rejectedPerk"] = pLKCIINIFMJ.DFOELJAEEGG();
+				kEMMIFBFDPK["rejectedPerk"] = pLKCIINIFMJ.GetPerkInfo();
 			}
-			StatisticsCollector.BPDGOKGHDHB(StatisticsEvent.JDNFFHILFAF.Perk, kEMMIFBFDPK);
+			StatisticsCollector.LogEvent(StatisticsEvent.EventType.Perk, kEMMIFBFDPK);
 		}
 	}
 
@@ -761,45 +761,45 @@ public class ProfileScene : Scene<ProfileScene>
 		}
 		AchievementSubItem achievementSubItem = (AchievementSubItem)data;
 		Achievement achievement = achievementSubItem.GetAchievement();
-		if (!achievement.NMCBAKACIGK)
+		if (!achievement.RewardClaimed)
 		{
-			achievement.NMCBAKACIGK = true;
-			achievement.BEBDMOEIEJN(false);
-			ListSF.CCDKHLAMKKO().KJNPJKEHGLE().POKNGJJAHAL(achievement);
-			Roster nKGLHEGIKKP = ListSF.CCDKHLAMKKO();
-			if (achievement.ANCDKCFLHOL > 0)
+			achievement.RewardClaimed = true;
+			achievement.SetIsNew(false);
+			ListSF.GetRoster().GetAchievements().UnlockAchievement(achievement);
+			Roster nKGLHEGIKKP = ListSF.GetRoster();
+			if (achievement.MoneyPrize > 0)
 			{
-				nKGLHEGIKKP.OIOOMAKNIOB(nKGLHEGIKKP.BFBOEGMAMNF() + achievement.ANCDKCFLHOL);
+				nKGLHEGIKKP.SetMoney(nKGLHEGIKKP.GetMoney() + achievement.MoneyPrize);
 			}
-			if (achievement.LBJFKGAHBBG > 0)
+			if (achievement.BonusPrize > 0)
 			{
-				nKGLHEGIKKP.LLNELLFMMBB(nKGLHEGIKKP.EHFJHFDACMP() + achievement.LBJFKGAHBBG, Roster.HPOIJPGPOCF.CHANGE_ACHIEVEMENT);
+				nKGLHEGIKKP.SetBonus(nKGLHEGIKKP.GetBonus() + achievement.BonusPrize, Roster.BalanceChangeType.CHANGE_ACHIEVEMENT);
 			}
 			mainMenu.UpdateMenu();
-			Sound.IFKCCDAIADF("snd_buy");
+			Sound.PlaySound("snd_buy");
 		}
 		achievementSubItem.ResetOpacity();
 		achievementSubItem.Choose();
-		HPPBLKIPPME();
-		DLJFCPJPCHI.ICDEBPNMLFB(ProfileGUI.SpeedScrollAchievements);
+		UpdateBadges();
+		achievementsController.ScrollToFirstNewAchievement(ProfileGUI.SpeedScrollAchievements);
 	}
 
-	private void JEOAHMHNAEM()
+	private void ScrollPerksToCurrentLevel()
 	{
 		int num = -1;
 		int num2 = -1;
-		List<ProfilePerk> list = PerkTree.GBPBIPFIOJH().JGCHDCOOGII();
+		List<ProfilePerk> list = PerkTree.GetInstance().GetProfilePerks();
 		for (int i = 0; i < list.Count; i++)
 		{
 			ProfilePerk pLKCIINIFMJ = list[i];
-			ProfilePerk.KMHBPKKCNPP kMHBPKKCNPP = list[i].FLBBFDNHJAJ();
-			if (kMHBPKKCNPP == ProfilePerk.KMHBPKKCNPP.PERK_LOCK || ListSF.CCDKHLAMKKO().PINDEKDNCNL() < list[i].PINDEKDNCNL())
+			ProfilePerk.ProfilePerkState kMHBPKKCNPP = list[i].GetState();
+			if (kMHBPKKCNPP == ProfilePerk.ProfilePerkState.PERK_LOCK || ListSF.GetRoster().GetLevel() < list[i].GetLevel())
 			{
 				break;
 			}
-			if (list[i].PINDEKDNCNL() > num2)
+			if (list[i].GetLevel() > num2)
 			{
-				num2 = list[i].PINDEKDNCNL();
+				num2 = list[i].GetLevel();
 				num++;
 			}
 		}
@@ -813,24 +813,24 @@ public class ProfileScene : Scene<ProfileScene>
 		}
 	}
 
-	private void BMLFAEOGIAN()
+	private void UpdateTricksController()
 	{
-		if (!(DOOGDEDCHBO != _tricksTable))
+		if (!(activeTable != _tricksTable))
 		{
-			_tricksCtrl.ADDALEKEMCD();
+			_tricksCtrl.ScrollToNewTrick();
 		}
 	}
 
-	private void JCMCECGPNGC()
+	private void OnPerksCellSelected()
 	{
 	}
 
-	private bool BKDDIHINJNM()
+	private bool HasAvailablePerks()
 	{
-		List<ProfilePerk> list = PerkTree.GBPBIPFIOJH().JGCHDCOOGII();
+		List<ProfilePerk> list = PerkTree.GetInstance().GetProfilePerks();
 		for (int i = 0; i < list.Count; i++)
 		{
-			if (list[i].FLBBFDNHJAJ() == ProfilePerk.KMHBPKKCNPP.PERK_AVAILABLE && ListSF.CCDKHLAMKKO().PINDEKDNCNL() >= list[i].PINDEKDNCNL())
+			if (list[i].GetState() == ProfilePerk.ProfilePerkState.PERK_AVAILABLE && ListSF.GetRoster().GetLevel() >= list[i].GetLevel())
 			{
 				return true;
 			}
@@ -838,28 +838,28 @@ public class ProfileScene : Scene<ProfileScene>
 		return false;
 	}
 
-	private void LFAJDIBPGOH()
+	private void SaveSliderPosition()
 	{
-		if (!(DOOGDEDCHBO == null))
+		if (!(activeTable == null))
 		{
-			string text = HPPLHBAOOHN(DOOGDEDCHBO);
+			string text = GetSliderKey(activeTable);
 			if (text != string.Empty)
 			{
-				GameUtils.LMGAGBOKCFC.KJIGJEBMILC(text, DOOGDEDCHBO.GetCurrentCellRow());
+				GameUtils.SliderIndices.SetIndex(text, activeTable.GetCurrentCellRow());
 			}
 		}
 	}
 
-	private void IGNOGLBBHDG(TableView BFGHBIMJHAK)
+	private void RestoreSliderPosition(TableView BFGHBIMJHAK)
 	{
 		if (BFGHBIMJHAK == null)
 		{
 			return;
 		}
-		string text = HPPLHBAOOHN(BFGHBIMJHAK);
+		string text = GetSliderKey(BFGHBIMJHAK);
 		if (text != string.Empty)
 		{
-			int num = GameUtils.LMGAGBOKCFC.MILAHFHNIIP(text);
+			int num = GameUtils.SliderIndices.GetIndex(text);
 			if (num >= 0 && num < BFGHBIMJHAK.NumberOfRows())
 			{
 				BFGHBIMJHAK.ScrollToCell(num);
@@ -867,7 +867,7 @@ public class ProfileScene : Scene<ProfileScene>
 		}
 	}
 
-	private string HPPLHBAOOHN(TableView BFGHBIMJHAK = null)
+	private string GetSliderKey(TableView BFGHBIMJHAK = null)
 	{
 		string result = string.Empty;
 		if (BFGHBIMJHAK == _tricksTable)
@@ -889,7 +889,7 @@ public class ProfileScene : Scene<ProfileScene>
 		return result;
 	}
 
-	private SubItem OHNODOAGBJG(int OKNNNLIPODI)
+	private SubItem FindSubItemById(int OKNNNLIPODI)
 	{
 		for (int i = 0; i < SubItems.Count; i++)
 		{
@@ -901,7 +901,7 @@ public class ProfileScene : Scene<ProfileScene>
 		return null;
 	}
 
-	private PerkCell GCFBNDPAMLA(PerkCell HJCPCBLCJJN)
+	private PerkCell GetNextRowPerkCell(PerkCell HJCPCBLCJJN)
 	{
 		if (HJCPCBLCJJN == null)
 		{
@@ -915,18 +915,18 @@ public class ProfileScene : Scene<ProfileScene>
 		return null;
 	}
 
-	private void DEHENFMAKKM()
+	private void DisableSealsButtonIfEmpty()
 	{
-		Roster nKGLHEGIKKP = ListSF.CCDKHLAMKKO();
+		Roster nKGLHEGIKKP = ListSF.GetRoster();
 		if (nKGLHEGIKKP == null)
 		{
 			return;
 		}
-		List<UserItem> list = nKGLHEGIKKP.KHCNHPCPFII().HOPBBLJLHOB("Seal", string.Empty);
+		List<UserItem> list = nKGLHEGIKKP.GetInventory().FindItemsByType("Seal", string.Empty);
 		int num = 0;
 		foreach (UserItem item in list)
 		{
-			if (item.OFOPFCJNEBL() > 0)
+			if (item.GetCount() > 0)
 			{
 				num++;
 			}
@@ -937,9 +937,9 @@ public class ProfileScene : Scene<ProfileScene>
 		}
 	}
 
-	private void KAHCAGHOMLJ(TableView BFGHBIMJHAK)
+	private void UpdateVisibleCellStates(TableView BFGHBIMJHAK)
 	{
-		Dictionary<int, TableViewCell> dictionary = BFGHBIMJHAK.get_visibleCells().BFNFADJMAPC();
+		Dictionary<int, TableViewCell> dictionary = BFGHBIMJHAK.get_visibleCells().GetCells();
 		foreach (KeyValuePair<int, TableViewCell> item in dictionary)
 		{
 			ProfileCell profileCell = (ProfileCell)item.Value;
@@ -947,7 +947,7 @@ public class ProfileScene : Scene<ProfileScene>
 		}
 	}
 
-	private void DJBBJPLEBMN(ResolutionImage MJOHJFEFNGF, ResolutionImage DGLDPAOMOPH, Text ICBBNJMLDJH, int count)
+	private void UpdateBadge(ResolutionImage MJOHJFEFNGF, ResolutionImage DGLDPAOMOPH, Text ICBBNJMLDJH, int count)
 	{
 		MJOHJFEFNGF.gameObject.SetActive(false);
 		DGLDPAOMOPH.gameObject.SetActive(false);
@@ -967,51 +967,51 @@ public class ProfileScene : Scene<ProfileScene>
 		}
 	}
 
-	private void HPPBLKIPPME()
+	private void UpdateBadges()
 	{
-		DJBBJPLEBMN(_achievementCircle, _achievementEllipse, _achievementLabel, ListSF.CCDKHLAMKKO().KJNPJKEHGLE().JKGGEMEBPCP());
-		DJBBJPLEBMN(_trickCircle, _trickEllipse, _trickLabel, ListSF.CCDKHLAMKKO().NPKBPGMNDFJ());
-		DJBBJPLEBMN(_perkCircle, _perkEllipse, _perkLabel, ListSF.CCDKHLAMKKO().JLBDOBLHHAF().OPPFMFKAOIG());
-		DJBBJPLEBMN(_sealCircle, _sealEllipse, _sealLabel, ListSF.CCDKHLAMKKO().CNFOLIEFJCE());
+		UpdateBadge(_achievementCircle, _achievementEllipse, _achievementLabel, ListSF.GetRoster().GetAchievements().CountCompletedAchievements());
+		UpdateBadge(_trickCircle, _trickEllipse, _trickLabel, ListSF.GetRoster().CountNewTricks());
+		UpdateBadge(_perkCircle, _perkEllipse, _perkLabel, ListSF.GetRoster().GetPerks().GetFreePerkPoints());
+		UpdateBadge(_sealCircle, _sealEllipse, _sealLabel, ListSF.GetRoster().CountOwnedSeals());
 	}
 
-	private void OEDOBIIJGBC()
+	private void ClearNewTrickFlags()
 	{
-		List<Trick> list = GameUtils.KLLGJKHALGH();
+		List<Trick> list = GameUtils.GetPlayerTricks();
 		foreach (Trick item in list)
 		{
 			if (item.IsNew)
 			{
 				item.IsNew = false;
-				ListSF.CCDKHLAMKKO().DECNJIOFODA(item.Name);
+				ListSF.GetRoster().RemoveOpenTrick(item.Name);
 			}
 		}
 	}
 
-	private void BHKDPICIGDI()
+	private void ClearNewSealFlags()
 	{
-		Roster nKGLHEGIKKP = ListSF.CCDKHLAMKKO();
+		Roster nKGLHEGIKKP = ListSF.GetRoster();
 		if (nKGLHEGIKKP == null)
 		{
 			return;
 		}
-		List<UserItem> list = nKGLHEGIKKP.KHCNHPCPFII().HOPBBLJLHOB("Seal", string.Empty);
+		List<UserItem> list = nKGLHEGIKKP.GetInventory().FindItemsByType("Seal", string.Empty);
 		foreach (UserItem item in list)
 		{
-			item.BHKHOJPANHE().BEBDMOEIEJN(false);
+			item.GetInfo().SetIsNew(false);
 		}
 	}
 
-	private void PMLKFAFGJDC(object data)
+	private void OnUnusedEvent(object data)
 	{
 	}
 
-	private ProfilePerk HEKMFIFGALO(int GNLOCMLBNHF, RosterPerk PPPNCJLGJPE)
+	private ProfilePerk FindRejectedPerk(int GNLOCMLBNHF, RosterPerk PPPNCJLGJPE)
 	{
-		List<ProfilePerk> jOGBKOJCINM = PerkTree.GBPBIPFIOJH().HKCIFHMLKKM(GNLOCMLBNHF).JOGBKOJCINM;
+		List<ProfilePerk> jOGBKOJCINM = PerkTree.GetInstance().GetContainerAtLevel(GNLOCMLBNHF).Perks;
 		for (int i = 0; i < jOGBKOJCINM.Count; i++)
 		{
-			if (jOGBKOJCINM[i].KAMBOKLFBEE() != PPPNCJLGJPE.get_Name())
+			if (jOGBKOJCINM[i].GetPerkName() != PPPNCJLGJPE.get_Name())
 			{
 				return jOGBKOJCINM[i];
 			}
@@ -1019,20 +1019,20 @@ public class ProfileScene : Scene<ProfileScene>
 		return null;
 	}
 
-	private void IJAFAMPCNIJ()
+	private void InitPanels()
 	{
-		FANKDNGGHJG();
-		PEKFLFMNMEP();
+		InitLeftPanel();
+		InitRightPanel();
 	}
 
-	private void FANKDNGGHJG()
+	private void InitLeftPanel()
 	{
 		_leftPanel.Init();
-		GOGMJFKMPAM = _leftPanel.transform.localPosition.x;
-		AAAAENBBFMI = GOGMJFKMPAM + _leftPanel.GetComponent<RectTransform>().rect.width;
+		leftPanelShownX = _leftPanel.transform.localPosition.x;
+		leftPanelHiddenX = leftPanelShownX + _leftPanel.GetComponent<RectTransform>().rect.width;
 	}
 
-	private void PEKFLFMNMEP()
+	private void InitRightPanel()
 	{
 		_rightPanel.Init();
 	}
@@ -1053,11 +1053,11 @@ public class ProfileScene : Scene<ProfileScene>
 		});
 		SubItems = null;
 		_showAchievementButton.RemoveAllEventListener();
-		JHFCFBIPGPF.ForEach((SectionButton AAOIAEJJINO) =>
+		sectionButtons.ForEach((SectionButton AAOIAEJJINO) =>
 		{
 			AAOIAEJJINO.RemoveAllEventListener();
 		});
-		JHFCFBIPGPF = null;
+		sectionButtons = null;
 		_perkCellPrefab = null;
 		_profileTableViewCellPrefab = null;
 		_trickCellPrefab = null;

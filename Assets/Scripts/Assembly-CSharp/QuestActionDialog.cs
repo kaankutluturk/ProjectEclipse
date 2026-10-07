@@ -7,7 +7,7 @@ using UnityEngine;
 
 public class QuestActionDialog : QuestAction
 {
-	public enum BEMAILNFOHL
+	public enum DialogButtonType
 	{
 		BUTTON_TYPE_NONE = 0,
 		BUTTON_TYPE_LEFT = 1,
@@ -15,87 +15,87 @@ public class QuestActionDialog : QuestAction
 		BUTTON_TYPE_MIDDLE = 3
 	}
 
-	public class FFIBFAFPEGF
+	public class DialogButton
 	{
-		public BEMAILNFOHL Type;
+		public DialogButtonType Type;
 
-		public string GGDJIPKMKFC = string.Empty;
+		public string Text = string.Empty;
 
-		public QuestActionsSequence DJBAIAKOIHM = new QuestActionsSequence();
+		public QuestActionsSequence Actions = new QuestActionsSequence();
 
 		public string Color = string.Empty;
 	}
 
-	public class CLNIMHCJIAL
+	public class LineActionBinding
 	{
 		public int Id;
 
-		public QuestActionsSequence DJBAIAKOIHM = new QuestActionsSequence();
+		public QuestActionsSequence Actions = new QuestActionsSequence();
 	}
 
 	public class DialogCheckBox
 	{
-		public string JKHGBEJBCDG = string.Empty;
+		public string InitialValue = string.Empty;
 
-		public string GGDJIPKMKFC = string.Empty;
+		public string Text = string.Empty;
 
-		public QuestActionsSequence LCBILMMHDGP = new QuestActionsSequence();
+		public QuestActionsSequence OnActions = new QuestActionsSequence();
 
-		public QuestActionsSequence ENHDNOBHIHA = new QuestActionsSequence();
+		public QuestActionsSequence OffActions = new QuestActionsSequence();
 	}
 
-	private string PEMOECLNECD = string.Empty;
+	private string title = string.Empty;
 
-	private string KHPKDMGDMAB = string.Empty;
+	private string image = string.Empty;
 
-	private string LFLGCDNKNJI = string.Empty;
+	private string dialogType = string.Empty;
 
-	private string FKKMHPFLIME = string.Empty;
+	private string itemIcon = string.Empty;
 
-	private string KGHEOKCBOLP = string.Empty;
+	private string itemBefore = string.Empty;
 
-	private string LCJIJENEPMC = string.Empty;
+	private string itemAfter = string.Empty;
 
-	private bool NHIFNDHPKLJ;
+	private bool isMirrored;
 
-	private bool CBAANFEMIOP;
+	private bool ignoreBack;
 
-	private bool IDIHEPPFMMF;
+	private bool isButtonHandled;
 
-	private float FFLLNCBOGJJ;
+	private float readTime;
 
-	private List<StoryDialogContent> IGLEKOAILHD = new List<StoryDialogContent>();
+	private List<StoryDialogContent> lines = new List<StoryDialogContent>();
 
-	private FFIBFAFPEGF GEIEBHILDME;
+	private DialogButton leftButton;
 
-	private FFIBFAFPEGF JFKGFNHJLLE;
+	private DialogButton rightButton;
 
-	private FFIBFAFPEGF KJBKIDGAPJH;
+	private DialogButton middleButton;
 
-	private List<CLNIMHCJIAL> KEJEJIIBBGM = new List<CLNIMHCJIAL>();
+	private List<LineActionBinding> lineActions = new List<LineActionBinding>();
 
-	private string EBGIGEGKIBD = string.Empty;
+	private string timerName = string.Empty;
 
-	private DialogCheckBox GDOAGJEBCFK;
+	private DialogCheckBox checkBox;
 
 	private int timersID = 5;
 
-	private string KOGNLFOPACB = string.Empty;
+	private string fightExpression = string.Empty;
 
-	private QuestParameters EHMMGHDNIJL;
+	private QuestParameters runParameters;
 
 	public override void Parse(XmlNode EPKLCPOEELO)
 	{
 		base.Parse(EPKLCPOEELO);
-		PEMOECLNECD = EPKLCPOEELO.Attributes["Title"].CIPOICEEIBK(string.Empty);
-		KHPKDMGDMAB += EPKLCPOEELO.Attributes["Image"].CIPOICEEIBK(string.Empty);
-		FKKMHPFLIME = EPKLCPOEELO.Attributes["ItemIcon"].CIPOICEEIBK(string.Empty);
-		KGHEOKCBOLP = EPKLCPOEELO.Attributes["ItemBefore"].CIPOICEEIBK(string.Empty);
-		LCJIJENEPMC = EPKLCPOEELO.Attributes["ItemAfter"].CIPOICEEIBK(string.Empty);
-		LFLGCDNKNJI = EPKLCPOEELO.Attributes["Type"].CIPOICEEIBK("Regular");
-		CBAANFEMIOP = EPKLCPOEELO.Attributes["IgnoreBack"].ParseBool();
-		NHIFNDHPKLJ = EPKLCPOEELO.Attributes["Mirrored"].ParseBool();
-		FFLLNCBOGJJ = EPKLCPOEELO.Attributes["ReadTime"].ParseFloat(BasicGUI.KMJDBLBFEMF());
+		title = EPKLCPOEELO.Attributes["Title"].GetStringOrDefault(string.Empty);
+		image += EPKLCPOEELO.Attributes["Image"].GetStringOrDefault(string.Empty);
+		itemIcon = EPKLCPOEELO.Attributes["ItemIcon"].GetStringOrDefault(string.Empty);
+		itemBefore = EPKLCPOEELO.Attributes["ItemBefore"].GetStringOrDefault(string.Empty);
+		itemAfter = EPKLCPOEELO.Attributes["ItemAfter"].GetStringOrDefault(string.Empty);
+		dialogType = EPKLCPOEELO.Attributes["Type"].GetStringOrDefault("Regular");
+		ignoreBack = EPKLCPOEELO.Attributes["IgnoreBack"].ParseBool();
+		isMirrored = EPKLCPOEELO.Attributes["Mirrored"].ParseBool();
+		readTime = EPKLCPOEELO.Attributes["ReadTime"].ParseFloat(BasicGUI.GetNotificationDefaultReadTime());
 		foreach (XmlNode childNode in EPKLCPOEELO.ChildNodes)
 		{
 			switch (childNode.Name)
@@ -103,50 +103,50 @@ public class QuestActionDialog : QuestAction
 			case "Line":
 			case "DeliveryDelay":
 			case "PriceLine":
-				OECMOJEDJHP(childNode);
+				ParseLine(childNode);
 				break;
 			case "Button":
-				KDFIOMJEFAC(childNode);
+				ParseButton(childNode);
 				break;
 			case "DifficultyOf":
-				KPINGLIDIGI(childNode);
+				ParseDifficultyOf(childNode);
 				break;
 			case "CheckBox":
-				BCLEMHHFPDO(childNode);
+				ParseCheckBox(childNode);
 				break;
 			case "Timer":
-				EBGIGEGKIBD = childNode.Attributes["Name"].CIPOICEEIBK(string.Empty);
+				timerName = childNode.Attributes["Name"].GetStringOrDefault(string.Empty);
 				break;
 			}
 		}
 	}
 
-	public override void DEJMHFMLKIC(QuestParameters JCICKLIMBEF)
+	public override void Execute(QuestParameters JCICKLIMBEF)
 	{
-		GKFMJKAAJCA();
-		base.DEJMHFMLKIC(JCICKLIMBEF);
-		EHMMGHDNIJL = JCICKLIMBEF;
-		IDIHEPPFMMF = false;
-		float lDHEHCLPMOK = MPNBGBIMEIP();
-		Action<object> action = EGCODMJHDBI;
-		string pMDPPGNJAFE = ((GEIEBHILDME == null) ? "dlgStoryNegative" : GEIEBHILDME.GGDJIPKMKFC);
-		string pMDPPGNJAFE2 = ((JFKGFNHJLLE == null) ? "dlgStoryPositive" : JFKGFNHJLLE.GGDJIPKMKFC);
-		string pMDPPGNJAFE3 = ((KJBKIDGAPJH == null) ? "dlgButtonFight" : KJBKIDGAPJH.GGDJIPKMKFC);
-		pMDPPGNJAFE = ABMMAALFNFD.KGIEIAJLAGI(pMDPPGNJAFE, JCICKLIMBEF);
-		pMDPPGNJAFE2 = ABMMAALFNFD.KGIEIAJLAGI(pMDPPGNJAFE2, JCICKLIMBEF);
-		pMDPPGNJAFE3 = ABMMAALFNFD.KGIEIAJLAGI(pMDPPGNJAFE3, JCICKLIMBEF);
-		LabelButton.FBMGEHJPPIK fBMGEHJPPIK = ((GEIEBHILDME == null || !(GEIEBHILDME.Color != string.Empty)) ? LabelButton.GetBtnColor("Red") : LabelButton.GetBtnColor(GEIEBHILDME.Color));
-		LabelButton.FBMGEHJPPIK fBMGEHJPPIK2 = ((JFKGFNHJLLE == null || !(JFKGFNHJLLE.Color != string.Empty)) ? LabelButton.GetBtnColor("Beige") : LabelButton.GetBtnColor(JFKGFNHJLLE.Color));
-		LabelButton.FBMGEHJPPIK nFDONPAIONH = ((KJBKIDGAPJH == null || !(KJBKIDGAPJH.Color != string.Empty)) ? LabelButton.GetBtnColor("Beige") : LabelButton.GetBtnColor(KJBKIDGAPJH.Color));
-		string text = ((JFKGFNHJLLE == null) ? string.Empty : pMDPPGNJAFE2);
-		string text2 = ((GEIEBHILDME == null) ? string.Empty : pMDPPGNJAFE);
-		string bFNHNNFIBNM = ((KJBKIDGAPJH == null) ? string.Empty : pMDPPGNJAFE3);
+		ResetSequences();
+		base.Execute(JCICKLIMBEF);
+		runParameters = JCICKLIMBEF;
+		isButtonHandled = false;
+		float lDHEHCLPMOK = GetFightDifficulty();
+		Action<object> action = OnButtonPressed;
+		string pMDPPGNJAFE = ((leftButton == null) ? "dlgStoryNegative" : leftButton.Text);
+		string pMDPPGNJAFE2 = ((rightButton == null) ? "dlgStoryPositive" : rightButton.Text);
+		string pMDPPGNJAFE3 = ((middleButton == null) ? "dlgButtonFight" : middleButton.Text);
+		pMDPPGNJAFE = QuestTextResolver.ResolveText(pMDPPGNJAFE, JCICKLIMBEF);
+		pMDPPGNJAFE2 = QuestTextResolver.ResolveText(pMDPPGNJAFE2, JCICKLIMBEF);
+		pMDPPGNJAFE3 = QuestTextResolver.ResolveText(pMDPPGNJAFE3, JCICKLIMBEF);
+		LabelButton.ButtonColor fBMGEHJPPIK = ((leftButton == null || !(leftButton.Color != string.Empty)) ? LabelButton.GetBtnColor("Red") : LabelButton.GetBtnColor(leftButton.Color));
+		LabelButton.ButtonColor fBMGEHJPPIK2 = ((rightButton == null || !(rightButton.Color != string.Empty)) ? LabelButton.GetBtnColor("Beige") : LabelButton.GetBtnColor(rightButton.Color));
+		LabelButton.ButtonColor nFDONPAIONH = ((middleButton == null || !(middleButton.Color != string.Empty)) ? LabelButton.GetBtnColor("Beige") : LabelButton.GetBtnColor(middleButton.Color));
+		string text = ((rightButton == null) ? string.Empty : pMDPPGNJAFE2);
+		string text2 = ((leftButton == null) ? string.Empty : pMDPPGNJAFE);
+		string bFNHNNFIBNM = ((middleButton == null) ? string.Empty : pMDPPGNJAFE3);
 		ConditionExtension.CompareResult lNIDLHOIHIM = new ConditionExtension.CompareResult();
 		QuestCondition kKDGLNECFHA = new QuestCondition();
-		kKDGLNECFHA.LIMHBJBEEIA(JCICKLIMBEF);
-		kKDGLNECFHA.MCPIOGALBMK(PEMOECLNECD, lNIDLHOIHIM);
-		string text3 = ABMMAALFNFD.KGIEIAJLAGI(lNIDLHOIHIM.resultSTR, JCICKLIMBEF);
-		kKDGLNECFHA.MCPIOGALBMK(KHPKDMGDMAB, lNIDLHOIHIM);
+		kKDGLNECFHA.SetParameters(JCICKLIMBEF);
+		kKDGLNECFHA.SetValue(title, lNIDLHOIHIM);
+		string text3 = QuestTextResolver.ResolveText(lNIDLHOIHIM.resultSTR, JCICKLIMBEF);
+		kKDGLNECFHA.SetValue(image, lNIDLHOIHIM);
 		string iBBAMMHHBFE = lNIDLHOIHIM.resultSTR;
 		string empty = string.Empty;
 		if (!iBBAMMHHBFE.Contains("/"))
@@ -157,128 +157,128 @@ public class QuestActionDialog : QuestAction
 		{
 			empty += ".png";
 		}
-		if (NHIFNDHPKLJ)
+		if (isMirrored)
 		{
 			empty += "|Flip";
 		}
 		BaseDialog baseDialog = null;
 		List<StoryDialogContent> list = new List<StoryDialogContent>();
-		for (int i = 0; i < IGLEKOAILHD.Count; i++)
+		for (int i = 0; i < lines.Count; i++)
 		{
-			StoryDialogContent nJEPNCJLPPF = new StoryDialogContent(IGLEKOAILHD[i]);
-			if (nJEPNCJLPPF.DLKPBAJDHBO != string.Empty)
+			StoryDialogContent nJEPNCJLPPF = new StoryDialogContent(lines[i]);
+			if (nJEPNCJLPPF.ItemName != string.Empty)
 			{
-				kKDGLNECFHA.MCPIOGALBMK(nJEPNCJLPPF.DLKPBAJDHBO, lNIDLHOIHIM);
-				nJEPNCJLPPF.DLKPBAJDHBO = lNIDLHOIHIM.resultSTR;
+				kKDGLNECFHA.SetValue(nJEPNCJLPPF.ItemName, lNIDLHOIHIM);
+				nJEPNCJLPPF.ItemName = lNIDLHOIHIM.resultSTR;
 			}
-			if (nJEPNCJLPPF.KEHBCHJDCND != string.Empty)
+			if (nJEPNCJLPPF.EnchantmentName != string.Empty)
 			{
-				kKDGLNECFHA.MCPIOGALBMK(nJEPNCJLPPF.KEHBCHJDCND, lNIDLHOIHIM);
-				nJEPNCJLPPF.KEHBCHJDCND = lNIDLHOIHIM.resultSTR;
+				kKDGLNECFHA.SetValue(nJEPNCJLPPF.EnchantmentName, lNIDLHOIHIM);
+				nJEPNCJLPPF.EnchantmentName = lNIDLHOIHIM.resultSTR;
 			}
-			kKDGLNECFHA.MCPIOGALBMK(nJEPNCJLPPF.GGDJIPKMKFC, lNIDLHOIHIM);
-			nJEPNCJLPPF.GGDJIPKMKFC = lNIDLHOIHIM.ToString();
-			nJEPNCJLPPF.GGDJIPKMKFC = ABMMAALFNFD.KGIEIAJLAGI(nJEPNCJLPPF.GGDJIPKMKFC, JCICKLIMBEF);
+			kKDGLNECFHA.SetValue(nJEPNCJLPPF.Text, lNIDLHOIHIM);
+			nJEPNCJLPPF.Text = lNIDLHOIHIM.ToString();
+			nJEPNCJLPPF.Text = QuestTextResolver.ResolveText(nJEPNCJLPPF.Text, JCICKLIMBEF);
 			list.Add(nJEPNCJLPPF);
 		}
-		if (LFLGCDNKNJI == "Regular")
+		if (dialogType == "Regular")
 		{
-			baseDialog = DialogsOpener.EHMEIJCOOKP(empty, text3, list, action, pMDPPGNJAFE, GEIEBHILDME != null && JFKGFNHJLLE != null, pMDPPGNJAFE2, fBMGEHJPPIK2, fBMGEHJPPIK);
+			baseDialog = DialogsOpener.OpenStoryDialog(empty, text3, list, action, pMDPPGNJAFE, leftButton != null && rightButton != null, pMDPPGNJAFE2, fBMGEHJPPIK2, fBMGEHJPPIK);
 		}
-		else if (LFLGCDNKNJI == "Stranger")
+		else if (dialogType == "Stranger")
 		{
-			baseDialog = DialogsOpener.DKBFJMGFEEB(empty, text3, list, lDHEHCLPMOK, action, text, text2, bFNHNNFIBNM, fBMGEHJPPIK2, fBMGEHJPPIK, nFDONPAIONH, true, false, false, false, string.Empty);
+			baseDialog = DialogsOpener.OpenStrangerDialog(empty, text3, list, lDHEHCLPMOK, action, text, text2, bFNHNNFIBNM, fBMGEHJPPIK2, fBMGEHJPPIK, nFDONPAIONH, true, false, false, false, string.Empty);
 		}
-		else if (LFLGCDNKNJI == "NoAvatar")
+		else if (dialogType == "NoAvatar")
 		{
-			string dOEEIGAHKEN = ((GDOAGJEBCFK == null) ? string.Empty : GDOAGJEBCFK.GGDJIPKMKFC);
+			string dOEEIGAHKEN = ((checkBox == null) ? string.Empty : checkBox.Text);
 			bool ePHHGNKDPEG = false;
-			if (GDOAGJEBCFK != null)
+			if (checkBox != null)
 			{
 				ConditionExtension.CompareResult lNIDLHOIHIM2 = new ConditionExtension.CompareResult();
 				QuestCondition kKDGLNECFHA2 = new QuestCondition();
-				kKDGLNECFHA2.LIMHBJBEEIA(JCICKLIMBEF);
-				kKDGLNECFHA2.MCPIOGALBMK(GDOAGJEBCFK.JKHGBEJBCDG, lNIDLHOIHIM2);
+				kKDGLNECFHA2.SetParameters(JCICKLIMBEF);
+				kKDGLNECFHA2.SetValue(checkBox.InitialValue, lNIDLHOIHIM2);
 				ePHHGNKDPEG = lNIDLHOIHIM2.resultNumber == 1.0;
 			}
-			bool lMAFOFCILBL = GDOAGJEBCFK != null;
+			bool lMAFOFCILBL = checkBox != null;
 			StoryDialogContent nJEPNCJLPPF2 = list[0];
-			string hCPNFPMHFCM = ((list.Count <= 0) ? string.Empty : ABMMAALFNFD.KGIEIAJLAGI(nJEPNCJLPPF2.GGDJIPKMKFC, JCICKLIMBEF));
-			baseDialog = DialogsOpener.PEDJMOMBJJI(text3, hCPNFPMHFCM, text, text2, action, fBMGEHJPPIK2, fBMGEHJPPIK, lMAFOFCILBL, ePHHGNKDPEG, dOEEIGAHKEN);
+			string hCPNFPMHFCM = ((list.Count <= 0) ? string.Empty : QuestTextResolver.ResolveText(nJEPNCJLPPF2.Text, JCICKLIMBEF));
+			baseDialog = DialogsOpener.OpenSimpleDialog(text3, hCPNFPMHFCM, text, text2, action, fBMGEHJPPIK2, fBMGEHJPPIK, lMAFOFCILBL, ePHHGNKDPEG, dOEEIGAHKEN);
 		}
-		else if (LFLGCDNKNJI == "ThreeButtons")
+		else if (dialogType == "ThreeButtons")
 		{
-			baseDialog = DialogsOpener.DKBFJMGFEEB(empty, text3, list, 0f, action, text, text2, bFNHNNFIBNM, fBMGEHJPPIK2, fBMGEHJPPIK, nFDONPAIONH, false, false, false, false, string.Empty);
+			baseDialog = DialogsOpener.OpenStrangerDialog(empty, text3, list, 0f, action, text, text2, bFNHNNFIBNM, fBMGEHJPPIK2, fBMGEHJPPIK, nFDONPAIONH, false, false, false, false, string.Empty);
 		}
-		else if (LFLGCDNKNJI == "Multiline")
+		else if (dialogType == "Multiline")
 		{
-			string iAHHOEJJJHP = ((GDOAGJEBCFK == null) ? string.Empty : GDOAGJEBCFK.GGDJIPKMKFC);
+			string iAHHOEJJJHP = ((checkBox == null) ? string.Empty : checkBox.Text);
 			bool cJJBDGPDOFF = false;
-			if (GDOAGJEBCFK != null)
+			if (checkBox != null)
 			{
 				ConditionExtension.CompareResult lNIDLHOIHIM3 = new ConditionExtension.CompareResult();
 				QuestCondition kKDGLNECFHA3 = new QuestCondition();
-				kKDGLNECFHA3.LIMHBJBEEIA(JCICKLIMBEF);
-				kKDGLNECFHA3.MCPIOGALBMK(GDOAGJEBCFK.JKHGBEJBCDG, lNIDLHOIHIM3);
+				kKDGLNECFHA3.SetParameters(JCICKLIMBEF);
+				kKDGLNECFHA3.SetValue(checkBox.InitialValue, lNIDLHOIHIM3);
 				cJJBDGPDOFF = lNIDLHOIHIM3.resultNumber == 1.0;
 			}
-			bool nKPIIFBDEIB = GDOAGJEBCFK != null;
-			baseDialog = DialogsOpener.DKBFJMGFEEB(empty, text3, list, 0f, action, text, text2, bFNHNNFIBNM, fBMGEHJPPIK2, fBMGEHJPPIK, nFDONPAIONH, false, true, nKPIIFBDEIB, cJJBDGPDOFF, iAHHOEJJJHP);
+			bool nKPIIFBDEIB = checkBox != null;
+			baseDialog = DialogsOpener.OpenStrangerDialog(empty, text3, list, 0f, action, text, text2, bFNHNNFIBNM, fBMGEHJPPIK2, fBMGEHJPPIK, nFDONPAIONH, false, true, nKPIIFBDEIB, cJJBDGPDOFF, iAHHOEJJJHP);
 		}
-		else if (LFLGCDNKNJI == "Notification")
+		else if (dialogType == "Notification")
 		{
-			NotificationsGame.get_Instance().OpenNotification(empty, list, action, text, fBMGEHJPPIK2, FFLLNCBOGJJ);
+			NotificationsGame.get_Instance().OpenNotification(empty, list, action, text, fBMGEHJPPIK2, readTime);
 		}
 		if (baseDialog != null)
 		{
-			baseDialog.IsIgnoreBack = CBAANFEMIOP;
+			baseDialog.IsIgnoreBack = ignoreBack;
 			baseDialog.IsQuestDialog = true;
 		}
 		else
 		{
-			OGIJONMKABB();
+			FinishAction();
 		}
 	}
 
-	public override void GKFMJKAAJCA()
+	public override void ResetSequences()
 	{
-		if (GEIEBHILDME != null)
+		if (leftButton != null)
 		{
-			GEIEBHILDME.DJBAIAKOIHM.FHPKJMMLIEG();
+			leftButton.Actions.Reset();
 		}
-		if (JFKGFNHJLLE != null)
+		if (rightButton != null)
 		{
-			JFKGFNHJLLE.DJBAIAKOIHM.FHPKJMMLIEG();
+			rightButton.Actions.Reset();
 		}
-		if (KJBKIDGAPJH != null)
+		if (middleButton != null)
 		{
-			KJBKIDGAPJH.DJBAIAKOIHM.FHPKJMMLIEG();
+			middleButton.Actions.Reset();
 		}
-		for (int i = 0; i < KEJEJIIBBGM.Count; i++)
+		for (int i = 0; i < lineActions.Count; i++)
 		{
-			KEJEJIIBBGM[i].DJBAIAKOIHM.FHPKJMMLIEG();
+			lineActions[i].Actions.Reset();
 		}
-		BCDBAPMJOJD();
+		ResetCheckBoxSequences();
 	}
 
-	private void OECMOJEDJHP(XmlNode EPKLCPOEELO)
+	private void ParseLine(XmlNode EPKLCPOEELO)
 	{
 		StoryDialogContent nJEPNCJLPPF = new StoryDialogContent(string.Empty, string.Empty, string.Empty, string.Empty);
-		nJEPNCJLPPF.GGDJIPKMKFC = EPKLCPOEELO.Attributes["Text"].CIPOICEEIBK(string.Empty);
-		nJEPNCJLPPF.AJELOOEBCPO = EPKLCPOEELO.Attributes["ButtonText"].CIPOICEEIBK(string.Empty);
-		nJEPNCJLPPF.LKIKHJNCBEI = EPKLCPOEELO.Attributes["FontName"].CIPOICEEIBK(string.Empty);
-		nJEPNCJLPPF.DLKPBAJDHBO = EPKLCPOEELO.Attributes["Item"].CIPOICEEIBK(string.Empty);
-		nJEPNCJLPPF.KEHBCHJDCND = EPKLCPOEELO.Attributes["Enchantment"].CIPOICEEIBK(string.Empty);
+		nJEPNCJLPPF.Text = EPKLCPOEELO.Attributes["Text"].GetStringOrDefault(string.Empty);
+		nJEPNCJLPPF.ButtonText = EPKLCPOEELO.Attributes["ButtonText"].GetStringOrDefault(string.Empty);
+		nJEPNCJLPPF.FontName = EPKLCPOEELO.Attributes["FontName"].GetStringOrDefault(string.Empty);
+		nJEPNCJLPPF.ItemName = EPKLCPOEELO.Attributes["Item"].GetStringOrDefault(string.Empty);
+		nJEPNCJLPPF.EnchantmentName = EPKLCPOEELO.Attributes["Enchantment"].GetStringOrDefault(string.Empty);
 		string name = EPKLCPOEELO.Name;
 		if (name == "PriceLine")
 		{
-			nJEPNCJLPPF.NGEPEDCCMAI = StoryDialogContent.MFHMNFAPAOH.CONTENT_TYPE_PRICELINE;
+			nJEPNCJLPPF.Type = StoryDialogContent.ContentType.CONTENT_TYPE_PRICELINE;
 		}
 		else
 		{
-			nJEPNCJLPPF.NGEPEDCCMAI = StoryDialogContent.MFHMNFAPAOH.CONTENT_TYPE_REGULAR;
+			nJEPNCJLPPF.Type = StoryDialogContent.ContentType.CONTENT_TYPE_REGULAR;
 		}
-		string text = EPKLCPOEELO.Attributes["TextColor"].CIPOICEEIBK(string.Empty);
+		string text = EPKLCPOEELO.Attributes["TextColor"].GetStringOrDefault(string.Empty);
 		text = text.Replace("0x", string.Empty);
 		text = text.Replace("#", string.Empty);
 		if (text.Length == 8)
@@ -293,117 +293,117 @@ public class QuestActionDialog : QuestAction
 		{
 			if (childNode.Name == "Timer")
 			{
-				nJEPNCJLPPF.MALKNOOGNBA = POAECPMINAM(childNode, nJEPNCJLPPF.LKIKHJNCBEI);
+				nJEPNCJLPPF.ItemTimer = CreateTextTimer(childNode, nJEPNCJLPPF.FontName);
 			}
 		}
-		if (nJEPNCJLPPF.DLKPBAJDHBO != null || nJEPNCJLPPF.KEHBCHJDCND != null)
+		if (nJEPNCJLPPF.ItemName != null || nJEPNCJLPPF.EnchantmentName != null)
 		{
-			CLNIMHCJIAL cLNIMHCJIAL = new CLNIMHCJIAL();
-			cLNIMHCJIAL.DJBAIAKOIHM.AddEventListener(1, OnActionComplete);
+			LineActionBinding cLNIMHCJIAL = new LineActionBinding();
+			cLNIMHCJIAL.Actions.AddEventListener(1, OnActionComplete);
 			cLNIMHCJIAL.Id = timersID++;
 			nJEPNCJLPPF.Id = cLNIMHCJIAL.Id;
 			foreach (XmlNode childNode2 in EPKLCPOEELO.ChildNodes)
 			{
 				QuestAction mBAAKHELFKL = QuestAction.GetClassActionByName(childNode2.Name);
-				mBAAKHELFKL.ONGHPGEIJEN = ONGHPGEIJEN;
+				mBAAKHELFKL.QuestName = QuestName;
 				mBAAKHELFKL.Parse(childNode2);
-				cLNIMHCJIAL.DJBAIAKOIHM.NLJLHHNPCAO(mBAAKHELFKL);
+				cLNIMHCJIAL.Actions.AddAction(mBAAKHELFKL);
 			}
-			KEJEJIIBBGM.Add(cLNIMHCJIAL);
+			lineActions.Add(cLNIMHCJIAL);
 		}
-		IGLEKOAILHD.Add(nJEPNCJLPPF);
+		lines.Add(nJEPNCJLPPF);
 	}
 
-	private void KDFIOMJEFAC(XmlNode EPKLCPOEELO)
+	private void ParseButton(XmlNode EPKLCPOEELO)
 	{
-		string text = EPKLCPOEELO.Attributes["Type"].CIPOICEEIBK(string.Empty);
-		string gGDJIPKMKFC = EPKLCPOEELO.Attributes["Text"].CIPOICEEIBK(string.Empty);
-		string mDADHHOFCNG = EPKLCPOEELO.Attributes["Color"].CIPOICEEIBK(string.Empty);
-		FFIBFAFPEGF fFIBFAFPEGF = null;
+		string text = EPKLCPOEELO.Attributes["Type"].GetStringOrDefault(string.Empty);
+		string gGDJIPKMKFC = EPKLCPOEELO.Attributes["Text"].GetStringOrDefault(string.Empty);
+		string mDADHHOFCNG = EPKLCPOEELO.Attributes["Color"].GetStringOrDefault(string.Empty);
+		DialogButton fFIBFAFPEGF = null;
 		switch (text)
 		{
 		case "Left":
-			GEIEBHILDME = new FFIBFAFPEGF();
-			GEIEBHILDME.Type = BEMAILNFOHL.BUTTON_TYPE_LEFT;
-			fFIBFAFPEGF = GEIEBHILDME;
+			leftButton = new DialogButton();
+			leftButton.Type = DialogButtonType.BUTTON_TYPE_LEFT;
+			fFIBFAFPEGF = leftButton;
 			break;
 		case "Right":
-			JFKGFNHJLLE = new FFIBFAFPEGF();
-			JFKGFNHJLLE.Type = BEMAILNFOHL.BUTTON_TYPE_RIGHT;
-			fFIBFAFPEGF = JFKGFNHJLLE;
+			rightButton = new DialogButton();
+			rightButton.Type = DialogButtonType.BUTTON_TYPE_RIGHT;
+			fFIBFAFPEGF = rightButton;
 			break;
 		case "Middle":
-			KJBKIDGAPJH = new FFIBFAFPEGF();
-			KJBKIDGAPJH.Type = BEMAILNFOHL.BUTTON_TYPE_MIDDLE;
-			fFIBFAFPEGF = KJBKIDGAPJH;
+			middleButton = new DialogButton();
+			middleButton.Type = DialogButtonType.BUTTON_TYPE_MIDDLE;
+			fFIBFAFPEGF = middleButton;
 			break;
 		default:
-			LLLOJBFMONN.Error("Strange typeName %s", text);
+			GameLog.Error("Strange typeName %s", text);
 			break;
 		}
 		if (fFIBFAFPEGF != null)
 		{
-			fFIBFAFPEGF.GGDJIPKMKFC = gGDJIPKMKFC;
+			fFIBFAFPEGF.Text = gGDJIPKMKFC;
 			fFIBFAFPEGF.Color = mDADHHOFCNG;
-			fFIBFAFPEGF.DJBAIAKOIHM.AddEventListener(1, OnActionComplete);
-			NLJLHHNPCAO(EPKLCPOEELO, fFIBFAFPEGF.DJBAIAKOIHM);
+			fFIBFAFPEGF.Actions.AddEventListener(1, OnActionComplete);
+			ParseActionSequence(EPKLCPOEELO, fFIBFAFPEGF.Actions);
 		}
 		else
 		{
-			LLLOJBFMONN.Error("button is null");
+			GameLog.Error("button is null");
 		}
 	}
 
-	private void KPINGLIDIGI(XmlNode EPKLCPOEELO)
+	private void ParseDifficultyOf(XmlNode EPKLCPOEELO)
 	{
-		KOGNLFOPACB = EPKLCPOEELO.Attributes["Fight"].CIPOICEEIBK(string.Empty);
+		fightExpression = EPKLCPOEELO.Attributes["Fight"].GetStringOrDefault(string.Empty);
 	}
 
-	private void BCLEMHHFPDO(XmlNode EPKLCPOEELO)
+	private void ParseCheckBox(XmlNode EPKLCPOEELO)
 	{
-		GDOAGJEBCFK = new DialogCheckBox();
-		GDOAGJEBCFK.JKHGBEJBCDG = EPKLCPOEELO.Attributes["InitialValue"].CIPOICEEIBK(string.Empty);
-		GDOAGJEBCFK.GGDJIPKMKFC = EPKLCPOEELO.Attributes["Text"].CIPOICEEIBK(string.Empty);
+		checkBox = new DialogCheckBox();
+		checkBox.InitialValue = EPKLCPOEELO.Attributes["InitialValue"].GetStringOrDefault(string.Empty);
+		checkBox.Text = EPKLCPOEELO.Attributes["Text"].GetStringOrDefault(string.Empty);
 		foreach (XmlNode childNode in EPKLCPOEELO.ChildNodes)
 		{
 			string name = childNode.Name;
 			if (name == "On")
 			{
-				NLJLHHNPCAO(childNode, GDOAGJEBCFK.LCBILMMHDGP);
+				ParseActionSequence(childNode, checkBox.OnActions);
 			}
 			else if (name == "Off")
 			{
-				NLJLHHNPCAO(childNode, GDOAGJEBCFK.ENHDNOBHIHA);
+				ParseActionSequence(childNode, checkBox.OffActions);
 			}
 		}
 	}
 
-	private TextTimer POAECPMINAM(XmlNode node, string IFHPLGGBDPM)
+	private TextTimer CreateTextTimer(XmlNode node, string IFHPLGGBDPM)
 	{
-		string text = node.Attributes["Name"].CIPOICEEIBK(string.Empty);
+		string text = node.Attributes["Name"].GetStringOrDefault(string.Empty);
 		TextTimer dKPAACCMAPO = new TextTimer();
-		dKPAACCMAPO.Color = Constants.KLLKHFKHCGK;
+		dKPAACCMAPO.Color = Constants.DialogHeaderColor;
 		switch (text)
 		{
 		case "EnergyRefillTimer":
-			dKPAACCMAPO.Delegate = ListSF.GetInstance().BBDOJLNOHLO;
+			dKPAACCMAPO.Delegate = ListSF.GetInstance().UpdateEnergyRefillTimer;
 			break;
 		case "DuelAccessibilityTimer":
-			dKPAACCMAPO.Delegate = ListSF.GetInstance().JNKBLMLEJGE;
+			dKPAACCMAPO.Delegate = ListSF.GetInstance().UpdateDuelAccessibilityTimer;
 			break;
 		case "DeliveryTimer":
 		{
-			dKPAACCMAPO.Delegate = ListSF.GetInstance().ENMEBKHLCHF;
-			string gOHIIMFFFJI = node.Attributes["Item"].CIPOICEEIBK(string.Empty);
-			UserItem bAINMLLIKOL = ListSF.CMGOCLGHNLH(gOHIIMFFFJI);
+			dKPAACCMAPO.Delegate = ListSF.GetInstance().UpdateDeliveryTimer;
+			string gOHIIMFFFJI = node.Attributes["Item"].GetStringOrDefault(string.Empty);
+			UserItem bAINMLLIKOL = ListSF.GetUserItem(gOHIIMFFFJI);
 			dKPAACCMAPO.set_Data(bAINMLLIKOL);
 			break;
 		}
 		case "StarterPackTimer":
-			dKPAACCMAPO.Delegate = ListSF.GetInstance().OKNJMHBIIGJ;
+			dKPAACCMAPO.Delegate = ListSF.GetInstance().UpdateStartPackTimer;
 			break;
 		default:
-			dKPAACCMAPO.Delegate = ListSF.GetInstance().IAKAPNOBAMJ;
+			dKPAACCMAPO.Delegate = ListSF.GetInstance().UpdateCustomRosterTimer;
 			dKPAACCMAPO.set_Data(text);
 			break;
 		}
@@ -411,74 +411,74 @@ public class QuestActionDialog : QuestAction
 		return dKPAACCMAPO;
 	}
 
-	private void BCDBAPMJOJD()
+	private void ResetCheckBoxSequences()
 	{
-		if (GDOAGJEBCFK != null)
+		if (checkBox != null)
 		{
-			GDOAGJEBCFK.LCBILMMHDGP.FHPKJMMLIEG();
-			GDOAGJEBCFK.ENHDNOBHIHA.FHPKJMMLIEG();
+			checkBox.OnActions.Reset();
+			checkBox.OffActions.Reset();
 		}
 	}
 
-	private float MPNBGBIMEIP()
+	private float GetFightDifficulty()
 	{
 		float result = -1f;
-		if (KOGNLFOPACB != string.Empty)
+		if (fightExpression != string.Empty)
 		{
 			ConditionExtension.CompareResult lNIDLHOIHIM = new ConditionExtension.CompareResult();
 			QuestCondition kKDGLNECFHA = new QuestCondition();
-			kKDGLNECFHA.LIMHBJBEEIA(EHMMGHDNIJL);
-			kKDGLNECFHA.MCPIOGALBMK(KOGNLFOPACB, lNIDLHOIHIM);
+			kKDGLNECFHA.SetParameters(runParameters);
+			kKDGLNECFHA.SetValue(fightExpression, lNIDLHOIHIM);
 			FightIDS mOCEDDJOAEB = new FightIDS();
 			mOCEDDJOAEB.SetFightIDSByString(lNIDLHOIHIM.resultSTR);
-			FightList jDIPBIHBGPF = ListSF.CHMCKGCDGCM(mOCEDDJOAEB);
+			FightList jDIPBIHBGPF = ListSF.GetFightById(mOCEDDJOAEB);
 			if (jDIPBIHBGPF != null)
 			{
-				List<ModelParameters> list = GameUtils.IGNNMAKHBFF(jDIPBIHBGPF.OFKJMHPMCCD());
-				ModelParameters aCENLMONNPA = GameUtils.LBMPHBNJMGG();
-				result = jDIPBIHBGPF.MPNBGBIMEIP(aCENLMONNPA, list);
+				List<ModelParameters> list = GameUtils.CreateOpponentParameters(jDIPBIHBGPF.GetOpponents());
+				ModelParameters aCENLMONNPA = GameUtils.GetPlayerModelParameters();
+				result = jDIPBIHBGPF.CalculateDifficultyVsLastOpponent(aCENLMONNPA, list);
 				list.Clear();
 			}
 		}
 		return result;
 	}
 
-	private void EGCODMJHDBI(object data)
+	private void OnButtonPressed(object data)
 	{
-		if (IDIHEPPFMMF)
+		if (isButtonHandled)
 		{
 			return;
 		}
 		int num = ((data != null) ? ((int)data) : 0);
-		if (num == 0 && GEIEBHILDME != null)
+		if (num == 0 && leftButton != null)
 		{
-			IDIHEPPFMMF = true;
-			GEIEBHILDME.DJBAIAKOIHM.DEJMHFMLKIC(EHMMGHDNIJL);
+			isButtonHandled = true;
+			leftButton.Actions.Run(runParameters);
 		}
-		else if (num == 0 && GEIEBHILDME == null)
+		else if (num == 0 && leftButton == null)
 		{
-			IDIHEPPFMMF = true;
-			OGIJONMKABB();
+			isButtonHandled = true;
+			FinishAction();
 		}
-		else if (num == 1 && JFKGFNHJLLE != null)
+		else if (num == 1 && rightButton != null)
 		{
-			IDIHEPPFMMF = true;
-			JFKGFNHJLLE.DJBAIAKOIHM.DEJMHFMLKIC(EHMMGHDNIJL);
+			isButtonHandled = true;
+			rightButton.Actions.Run(runParameters);
 		}
-		else if (num == 2 && KJBKIDGAPJH != null)
+		else if (num == 2 && middleButton != null)
 		{
-			IDIHEPPFMMF = true;
-			KJBKIDGAPJH.DJBAIAKOIHM.DEJMHFMLKIC(EHMMGHDNIJL);
+			isButtonHandled = true;
+			middleButton.Actions.Run(runParameters);
 		}
-		else if (num == 3 && GDOAGJEBCFK != null)
+		else if (num == 3 && checkBox != null)
 		{
-			GDOAGJEBCFK.LCBILMMHDGP.DEJMHFMLKIC(EHMMGHDNIJL);
-			BCDBAPMJOJD();
+			checkBox.OnActions.Run(runParameters);
+			ResetCheckBoxSequences();
 		}
-		else if (num == 4 && GDOAGJEBCFK != null)
+		else if (num == 4 && checkBox != null)
 		{
-			GDOAGJEBCFK.ENHDNOBHIHA.DEJMHFMLKIC(EHMMGHDNIJL);
-			BCDBAPMJOJD();
+			checkBox.OffActions.Run(runParameters);
+			ResetCheckBoxSequences();
 		}
 		else
 		{
@@ -486,12 +486,12 @@ public class QuestActionDialog : QuestAction
 			{
 				return;
 			}
-			for (int i = 0; i < KEJEJIIBBGM.Count; i++)
+			for (int i = 0; i < lineActions.Count; i++)
 			{
-				CLNIMHCJIAL cLNIMHCJIAL = KEJEJIIBBGM[i];
+				LineActionBinding cLNIMHCJIAL = lineActions[i];
 				if (cLNIMHCJIAL.Id == num)
 				{
-					cLNIMHCJIAL.DJBAIAKOIHM.DEJMHFMLKIC(EHMMGHDNIJL);
+					cLNIMHCJIAL.Actions.Run(runParameters);
 					break;
 				}
 			}
@@ -500,18 +500,18 @@ public class QuestActionDialog : QuestAction
 
 	private void OnActionComplete(object data)
 	{
-		OGIJONMKABB();
+		FinishAction();
 	}
 
-	protected virtual void NLJLHHNPCAO(XmlNode EPKLCPOEELO, QuestActionsSequence AFENHJFICNN)
+	protected virtual void ParseActionSequence(XmlNode EPKLCPOEELO, QuestActionsSequence AFENHJFICNN)
 	{
 		foreach (XmlNode childNode in EPKLCPOEELO.ChildNodes)
 		{
 			string name = childNode.Name;
 			QuestAction mBAAKHELFKL = QuestAction.GetClassActionByName(name);
-			mBAAKHELFKL.ONGHPGEIJEN = ONGHPGEIJEN;
+			mBAAKHELFKL.QuestName = QuestName;
 			mBAAKHELFKL.Parse(childNode);
-			AFENHJFICNN.NLJLHHNPCAO(mBAAKHELFKL);
+			AFENHJFICNN.AddAction(mBAAKHELFKL);
 		}
 	}
 }

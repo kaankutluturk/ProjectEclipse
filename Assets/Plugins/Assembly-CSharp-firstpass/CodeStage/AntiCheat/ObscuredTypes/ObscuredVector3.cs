@@ -39,16 +39,16 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 			get
 			{
 				float num = InternalDecryptField(hiddenValue.x);
-				if (ObscuredCheatingDetector.NMACGEJHPDN() && !fakeValue.Equals(initialFakeValue) && Math.Abs(num - fakeValue.x) > ObscuredCheatingDetector.get_Instance().vector3Epsilon)
+				if (ObscuredCheatingDetector.GetIsRunning() && !fakeValue.Equals(initialFakeValue) && Math.Abs(num - fakeValue.x) > ObscuredCheatingDetector.get_Instance().vector3Epsilon)
 				{
-					ObscuredCheatingDetector.get_Instance().MCDANNDOEIK();
+					ObscuredCheatingDetector.get_Instance().OnCheatingDetected();
 				}
 				return num;
 			}
 			set
 			{
 				hiddenValue.x = InternalEncryptField(value);
-				if (ObscuredCheatingDetector.NMACGEJHPDN())
+				if (ObscuredCheatingDetector.GetIsRunning())
 				{
 					fakeValue.x = value;
 				}
@@ -60,16 +60,16 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 			get
 			{
 				float num = InternalDecryptField(hiddenValue.y);
-				if (ObscuredCheatingDetector.NMACGEJHPDN() && !fakeValue.Equals(initialFakeValue) && Math.Abs(num - fakeValue.y) > ObscuredCheatingDetector.get_Instance().vector3Epsilon)
+				if (ObscuredCheatingDetector.GetIsRunning() && !fakeValue.Equals(initialFakeValue) && Math.Abs(num - fakeValue.y) > ObscuredCheatingDetector.get_Instance().vector3Epsilon)
 				{
-					ObscuredCheatingDetector.get_Instance().MCDANNDOEIK();
+					ObscuredCheatingDetector.get_Instance().OnCheatingDetected();
 				}
 				return num;
 			}
 			set
 			{
 				hiddenValue.y = InternalEncryptField(value);
-				if (ObscuredCheatingDetector.NMACGEJHPDN())
+				if (ObscuredCheatingDetector.GetIsRunning())
 				{
 					fakeValue.y = value;
 				}
@@ -81,16 +81,16 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 			get
 			{
 				float num = InternalDecryptField(hiddenValue.z);
-				if (ObscuredCheatingDetector.NMACGEJHPDN() && !fakeValue.Equals(initialFakeValue) && Math.Abs(num - fakeValue.z) > ObscuredCheatingDetector.get_Instance().vector3Epsilon)
+				if (ObscuredCheatingDetector.GetIsRunning() && !fakeValue.Equals(initialFakeValue) && Math.Abs(num - fakeValue.z) > ObscuredCheatingDetector.get_Instance().vector3Epsilon)
 				{
-					ObscuredCheatingDetector.get_Instance().MCDANNDOEIK();
+					ObscuredCheatingDetector.get_Instance().OnCheatingDetected();
 				}
 				return num;
 			}
 			set
 			{
 				hiddenValue.z = InternalEncryptField(value);
-				if (ObscuredCheatingDetector.NMACGEJHPDN())
+				if (ObscuredCheatingDetector.GetIsRunning())
 				{
 					fakeValue.z = value;
 				}
@@ -181,25 +181,25 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 			return result;
 		}
 
-		public void PKOKLDGAPEI()
+		public void ApplyNewCryptoKey()
 		{
 			if (currentCryptoKey != cryptoKey)
 			{
-				hiddenValue = Encrypt(GEKBGBJOMIA(), cryptoKey);
+				hiddenValue = Encrypt(InternalDecrypt(), cryptoKey);
 				currentCryptoKey = cryptoKey;
 			}
 		}
 
-		public void GMCADPGOCHM()
+		public void RandomizeCryptoKey()
 		{
-			Vector3 bAINMLLIKOL = GEKBGBJOMIA();
+			Vector3 bAINMLLIKOL = InternalDecrypt();
 			currentCryptoKey = UnityEngine.Random.Range(int.MinValue, int.MaxValue);
 			hiddenValue = Encrypt(bAINMLLIKOL, currentCryptoKey);
 		}
 
-		public RawEncryptedVector3 ECEBFGCJIDA()
+		public RawEncryptedVector3 GetEncrypted()
 		{
-			PKOKLDGAPEI();
+			ApplyNewCryptoKey();
 			return hiddenValue;
 		}
 
@@ -207,13 +207,13 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 		{
 			inited = true;
 			hiddenValue = ANGFOBEKKKD;
-			if (ObscuredCheatingDetector.NMACGEJHPDN())
+			if (ObscuredCheatingDetector.GetIsRunning())
 			{
-				fakeValue = GEKBGBJOMIA();
+				fakeValue = InternalDecrypt();
 			}
 		}
 
-		private Vector3 GEKBGBJOMIA()
+		private Vector3 InternalDecrypt()
 		{
 			if (!inited)
 			{
@@ -226,9 +226,9 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 			vector.x = ObscuredFloat.Decrypt(hiddenValue.x, currentCryptoKey);
 			vector.y = ObscuredFloat.Decrypt(hiddenValue.y, currentCryptoKey);
 			vector.z = ObscuredFloat.Decrypt(hiddenValue.z, currentCryptoKey);
-			if (ObscuredCheatingDetector.NMACGEJHPDN() && !fakeValue.Equals(Vector3.zero) && !CompareVectorsWithTolerance(vector, fakeValue))
+			if (ObscuredCheatingDetector.GetIsRunning() && !fakeValue.Equals(Vector3.zero) && !CompareVectorsWithTolerance(vector, fakeValue))
 			{
-				ObscuredCheatingDetector.get_Instance().MCDANNDOEIK();
+				ObscuredCheatingDetector.get_Instance().OnCheatingDetected();
 			}
 			return vector;
 		}
@@ -257,7 +257,7 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 		public static implicit operator ObscuredVector3(Vector3 value)
 		{
 			ObscuredVector3 result = new ObscuredVector3(Encrypt(value, cryptoKey));
-			if (ObscuredCheatingDetector.NMACGEJHPDN())
+			if (ObscuredCheatingDetector.GetIsRunning())
 			{
 				result.fakeValue = value;
 			}
@@ -266,123 +266,123 @@ namespace CodeStage.AntiCheat.ObscuredTypes
 
 		public static implicit operator Vector3(ObscuredVector3 value)
 		{
-			return value.GEKBGBJOMIA();
+			return value.InternalDecrypt();
 		}
 
 		[SpecialName]
-		public static ObscuredVector3 PHEFFKMOOCM(ObscuredVector3 LHBNIMGFKIB, ObscuredVector3 AAOIAEJJINO)
+		public static ObscuredVector3 op_Addition(ObscuredVector3 LHBNIMGFKIB, ObscuredVector3 AAOIAEJJINO)
 		{
-			return (ObscuredVector3)(LHBNIMGFKIB.GEKBGBJOMIA() + AAOIAEJJINO.GEKBGBJOMIA());
+			return (ObscuredVector3)(LHBNIMGFKIB.InternalDecrypt() + AAOIAEJJINO.InternalDecrypt());
 		}
 
 		[SpecialName]
-		public static ObscuredVector3 PHEFFKMOOCM(Vector3 LHBNIMGFKIB, ObscuredVector3 AAOIAEJJINO)
+		public static ObscuredVector3 op_Addition(Vector3 LHBNIMGFKIB, ObscuredVector3 AAOIAEJJINO)
 		{
-			return (ObscuredVector3)(LHBNIMGFKIB + AAOIAEJJINO.GEKBGBJOMIA());
+			return (ObscuredVector3)(LHBNIMGFKIB + AAOIAEJJINO.InternalDecrypt());
 		}
 
 		[SpecialName]
-		public static ObscuredVector3 PHEFFKMOOCM(ObscuredVector3 LHBNIMGFKIB, Vector3 AAOIAEJJINO)
+		public static ObscuredVector3 op_Addition(ObscuredVector3 LHBNIMGFKIB, Vector3 AAOIAEJJINO)
 		{
-			return (ObscuredVector3)(LHBNIMGFKIB.GEKBGBJOMIA() + AAOIAEJJINO);
+			return (ObscuredVector3)(LHBNIMGFKIB.InternalDecrypt() + AAOIAEJJINO);
 		}
 
 		[SpecialName]
-		public static ObscuredVector3 MJOKEBGPHKB(ObscuredVector3 LHBNIMGFKIB, ObscuredVector3 AAOIAEJJINO)
+		public static ObscuredVector3 op_Subtraction(ObscuredVector3 LHBNIMGFKIB, ObscuredVector3 AAOIAEJJINO)
 		{
-			return (ObscuredVector3)(LHBNIMGFKIB.GEKBGBJOMIA() - AAOIAEJJINO.GEKBGBJOMIA());
+			return (ObscuredVector3)(LHBNIMGFKIB.InternalDecrypt() - AAOIAEJJINO.InternalDecrypt());
 		}
 
 		[SpecialName]
-		public static ObscuredVector3 MJOKEBGPHKB(Vector3 LHBNIMGFKIB, ObscuredVector3 AAOIAEJJINO)
+		public static ObscuredVector3 op_Subtraction(Vector3 LHBNIMGFKIB, ObscuredVector3 AAOIAEJJINO)
 		{
-			return (ObscuredVector3)(LHBNIMGFKIB - AAOIAEJJINO.GEKBGBJOMIA());
+			return (ObscuredVector3)(LHBNIMGFKIB - AAOIAEJJINO.InternalDecrypt());
 		}
 
 		[SpecialName]
-		public static ObscuredVector3 MJOKEBGPHKB(ObscuredVector3 LHBNIMGFKIB, Vector3 AAOIAEJJINO)
+		public static ObscuredVector3 op_Subtraction(ObscuredVector3 LHBNIMGFKIB, Vector3 AAOIAEJJINO)
 		{
-			return (ObscuredVector3)(LHBNIMGFKIB.GEKBGBJOMIA() - AAOIAEJJINO);
+			return (ObscuredVector3)(LHBNIMGFKIB.InternalDecrypt() - AAOIAEJJINO);
 		}
 
 		[SpecialName]
 		public static ObscuredVector3 op_UnaryNegation(ObscuredVector3 LHBNIMGFKIB)
 		{
-			return (ObscuredVector3)(-LHBNIMGFKIB.GEKBGBJOMIA());
+			return (ObscuredVector3)(-LHBNIMGFKIB.InternalDecrypt());
 		}
 
 		[SpecialName]
 		public static ObscuredVector3 op_Multiply(ObscuredVector3 LHBNIMGFKIB, float d)
 		{
-			return (ObscuredVector3)(LHBNIMGFKIB.GEKBGBJOMIA() * d);
+			return (ObscuredVector3)(LHBNIMGFKIB.InternalDecrypt() * d);
 		}
 
 		[SpecialName]
 		public static ObscuredVector3 op_Multiply(float d, ObscuredVector3 LHBNIMGFKIB)
 		{
-			return (ObscuredVector3)(d * LHBNIMGFKIB.GEKBGBJOMIA());
+			return (ObscuredVector3)(d * LHBNIMGFKIB.InternalDecrypt());
 		}
 
 		[SpecialName]
-		public static ObscuredVector3 GFLOJCCKHAO(ObscuredVector3 LHBNIMGFKIB, float d)
+		public static ObscuredVector3 op_Division(ObscuredVector3 LHBNIMGFKIB, float d)
 		{
-			return (ObscuredVector3)(LHBNIMGFKIB.GEKBGBJOMIA() / d);
+			return (ObscuredVector3)(LHBNIMGFKIB.InternalDecrypt() / d);
 		}
 
 		[SpecialName]
-		public static bool LFPMCJPCJBD(ObscuredVector3 FBENKEEDIKJ, ObscuredVector3 PGKPNBGIGEI)
+		public static bool op_Equality(ObscuredVector3 FBENKEEDIKJ, ObscuredVector3 PGKPNBGIGEI)
 		{
-			return FBENKEEDIKJ.GEKBGBJOMIA() == PGKPNBGIGEI.GEKBGBJOMIA();
+			return FBENKEEDIKJ.InternalDecrypt() == PGKPNBGIGEI.InternalDecrypt();
 		}
 
 		[SpecialName]
-		public static bool LFPMCJPCJBD(Vector3 FBENKEEDIKJ, ObscuredVector3 PGKPNBGIGEI)
+		public static bool op_Equality(Vector3 FBENKEEDIKJ, ObscuredVector3 PGKPNBGIGEI)
 		{
-			return FBENKEEDIKJ == PGKPNBGIGEI.GEKBGBJOMIA();
+			return FBENKEEDIKJ == PGKPNBGIGEI.InternalDecrypt();
 		}
 
 		[SpecialName]
-		public static bool LFPMCJPCJBD(ObscuredVector3 FBENKEEDIKJ, Vector3 PGKPNBGIGEI)
+		public static bool op_Equality(ObscuredVector3 FBENKEEDIKJ, Vector3 PGKPNBGIGEI)
 		{
-			return FBENKEEDIKJ.GEKBGBJOMIA() == PGKPNBGIGEI;
+			return FBENKEEDIKJ.InternalDecrypt() == PGKPNBGIGEI;
 		}
 
 		[SpecialName]
-		public static bool GLCJKGIOIEC(ObscuredVector3 FBENKEEDIKJ, ObscuredVector3 PGKPNBGIGEI)
+		public static bool op_Inequality(ObscuredVector3 FBENKEEDIKJ, ObscuredVector3 PGKPNBGIGEI)
 		{
-			return FBENKEEDIKJ.GEKBGBJOMIA() != PGKPNBGIGEI.GEKBGBJOMIA();
+			return FBENKEEDIKJ.InternalDecrypt() != PGKPNBGIGEI.InternalDecrypt();
 		}
 
 		[SpecialName]
-		public static bool GLCJKGIOIEC(Vector3 FBENKEEDIKJ, ObscuredVector3 PGKPNBGIGEI)
+		public static bool op_Inequality(Vector3 FBENKEEDIKJ, ObscuredVector3 PGKPNBGIGEI)
 		{
-			return FBENKEEDIKJ != PGKPNBGIGEI.GEKBGBJOMIA();
+			return FBENKEEDIKJ != PGKPNBGIGEI.InternalDecrypt();
 		}
 
 		[SpecialName]
-		public static bool GLCJKGIOIEC(ObscuredVector3 FBENKEEDIKJ, Vector3 PGKPNBGIGEI)
+		public static bool op_Inequality(ObscuredVector3 FBENKEEDIKJ, Vector3 PGKPNBGIGEI)
 		{
-			return FBENKEEDIKJ.GEKBGBJOMIA() != PGKPNBGIGEI;
+			return FBENKEEDIKJ.InternalDecrypt() != PGKPNBGIGEI;
 		}
 
 		public override bool Equals(object NOLFMPDGCOC)
 		{
-			return GEKBGBJOMIA().Equals(NOLFMPDGCOC);
+			return InternalDecrypt().Equals(NOLFMPDGCOC);
 		}
 
 		public override int GetHashCode()
 		{
-			return GEKBGBJOMIA().GetHashCode();
+			return InternalDecrypt().GetHashCode();
 		}
 
 		public override string ToString()
 		{
-			return GEKBGBJOMIA().ToString();
+			return InternalDecrypt().ToString();
 		}
 
 		public string ToString(string LBOHOKIBHOH)
 		{
-			return GEKBGBJOMIA().ToString(LBOHOKIBHOH);
+			return InternalDecrypt().ToString(LBOHOKIBHOH);
 		}
 	}
 }

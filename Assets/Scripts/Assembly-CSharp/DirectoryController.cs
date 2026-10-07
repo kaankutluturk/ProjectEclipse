@@ -6,20 +6,20 @@ public class DirectoryController
 
 	private List<string> _searchDirectory = new List<string>();
 
-	public static DirectoryController BPCBBHAKFDM
+	public static DirectoryController Instance
 	{
 		get
 		{
-			return ELEBLBJKDBI();
+			return GetInstance();
 		}
 	}
 
 	private DirectoryController()
 	{
-		KBOEEMIOFOG();
+		ResetSearchDirectories();
 	}
 
-	public static DirectoryController ELEBLBJKDBI()
+	public static DirectoryController GetInstance()
 	{
 		if (_instance == null)
 		{
@@ -28,18 +28,18 @@ public class DirectoryController
 		return _instance;
 	}
 
-	public static int KGHANHJHINK(string path, string MNMPGNFFOGA)
+	public static int GetIndexAfterMarker(string path, string MNMPGNFFOGA)
 	{
 		int num = path.IndexOf(MNMPGNFFOGA);
 		return (num != -1) ? (num + MNMPGNFFOGA.Length) : 0;
 	}
 
-	public static string BJHBMEEAHIM()
+	public static string GetDrivePrefix()
 	{
 		return string.Empty;
 	}
 
-	public static string BECKNKJNFJB(string path)
+	public static string ResolvePath(string path)
 	{
 		if (IsPathWithDrive(path))
 		{
@@ -51,13 +51,13 @@ public class DirectoryController
 
 	public static bool IsPathWithDrive(string path)
 	{
-		string value = BJHBMEEAHIM();
+		string value = GetDrivePrefix();
 		return path.Contains(value);
 	}
 
-	public static string BAANOCLBLKM(string path)
+	public static string StripProtocol(string path)
 	{
-		int num = KGHANHJHINK(path, "://");
+		int num = GetIndexAfterMarker(path, "://");
 		string result = path;
 		if (num < path.Length)
 		{
@@ -66,7 +66,7 @@ public class DirectoryController
 		return result;
 	}
 
-	private void KBOEEMIOFOG()
+	private void ResetSearchDirectories()
 	{
 		_searchDirectory.Clear();
 		_searchDirectory.Add(string.Empty);

@@ -9,11 +9,11 @@ namespace Nekki.SF2.GUI.Map
 		[SerializeField]
 		private string _battleName = string.Empty;
 
-		private Battle LDHBJAHPENM;
+		private Battle battleData;
 
 		public bool Locked;
 
-		private bool INMFGOMPJEO;
+		private bool isHidden;
 
 		[SerializeField]
 		private LabelAlias _lblName;
@@ -22,7 +22,7 @@ namespace Nekki.SF2.GUI.Map
 
 		private Tween _tween;
 
-		public Battle EDHMHFONDAI
+		public Battle BattleRef
 		{
 			get
 			{
@@ -34,7 +34,7 @@ namespace Nekki.SF2.GUI.Map
 			}
 		}
 
-		public bool GDCBBAHKCIE
+		public bool IsHiddenOnMap
 		{
 			get
 			{
@@ -48,24 +48,24 @@ namespace Nekki.SF2.GUI.Map
 
 		public Battle get_Battle()
 		{
-			return LDHBJAHPENM;
+			return battleData;
 		}
 
 		public void set_Battle(Battle value)
 		{
-			LDHBJAHPENM = value;
-			_battleName = LDHBJAHPENM.get_Name();
+			battleData = value;
+			_battleName = battleData.get_Name();
 		}
 
 		public bool get_Hidden()
 		{
-			return INMFGOMPJEO;
+			return isHidden;
 		}
 
 		public void set_Hidden(bool value)
 		{
-			INMFGOMPJEO = value;
-			base.gameObject.SetActive(get_Battle().IsMapVisible && !INMFGOMPJEO);
+			isHidden = value;
+			base.gameObject.SetActive(get_Battle().IsMapVisible && !isHidden);
 		}
 
 		public void Init(string LPCAHLHLBJE, string KEIJPCJFLEO, string HHBECAKNFHD, string NGHGFJCOMIP, bool NIBIMBDBPMI, string iconAtlas = "")
@@ -161,16 +161,16 @@ namespace Nekki.SF2.GUI.Map
 			KillTween();
 			if (!base.gameObject.activeSelf || time <= 0f)
 			{
-				COAKLBIEPLH(PGFIPOJBNFC);
+				ApplyAlpha(PGFIPOJBNFC);
 				return;
 			}
 			_tween = DOTween.To(() => _CurrentAlpha, (float DHDMNHCIPEH) =>
 			{
-				COAKLBIEPLH(DHDMNHCIPEH);
+				ApplyAlpha(DHDMNHCIPEH);
 			}, PGFIPOJBNFC, time);
 		}
 
-		private void COAKLBIEPLH(float PGFIPOJBNFC)
+		private void ApplyAlpha(float PGFIPOJBNFC)
 		{
 			if (_CurrentAlpha != PGFIPOJBNFC)
 			{

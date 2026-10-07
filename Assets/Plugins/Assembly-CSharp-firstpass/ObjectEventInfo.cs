@@ -3,28 +3,28 @@ using System.Diagnostics;
 public class ObjectEventInfo : EventInfo
 {
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private string FFPMNAFPPAL;
+	private string anchor;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private string LMKADGBMEDI;
+	private string tag;
 
-	public string BJKKJNDLDJN
+	public string Anchor
 	{
 		get
 		{
-			return HCPOJDFJFMM();
+			return GetAnchor();
 		}
 		set
 		{
-			PAANCDPFGCI(value);
+			SetAnchor(value);
 		}
 	}
 
-	public string DDFDDHGJFBO
+	public string EventTag
 	{
 		get
 		{
-			return LOIGCKFONHJ();
+			return GetTag();
 		}
 		set
 		{
@@ -37,23 +37,23 @@ public class ObjectEventInfo : EventInfo
 	{
 	}
 
-	public string HCPOJDFJFMM()
+	public string GetAnchor()
 	{
-		return FFPMNAFPPAL;
+		return anchor;
 	}
 
-	public void PAANCDPFGCI(string value)
+	public void SetAnchor(string value)
 	{
-		FFPMNAFPPAL = value;
+		anchor = value;
 	}
 
-	public string LOIGCKFONHJ()
+	public string GetTag()
 	{
-		return LMKADGBMEDI;
+		return tag;
 	}
 
 	public void set_Tag(string value)
 	{
-		LMKADGBMEDI = value;
+		tag = value;
 	}
 }

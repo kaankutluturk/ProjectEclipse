@@ -2,22 +2,22 @@ using System.Xml;
 
 public class RandomAquiredItemRule : ItemRule
 {
-	private string OLAAAIPEBBF;
+	private string itemType;
 
 	public RandomAquiredItemRule(XmlNode node)
 		: base(node, false)
 	{
-		_type = BCBLLMPAMLP.RuleRandomAquiredItem;
-		OLAAAIPEBBF = node.Attributes["Type"].CIPOICEEIBK(string.Empty);
-		PINICFPAOAK();
+		_type = RuleType.RuleRandomAquiredItem;
+		itemType = node.Attributes["Type"].GetStringOrDefault(string.Empty);
+		RefreshItems();
 	}
 
-	public void PINICFPAOAK()
+	public void RefreshItems()
 	{
-		PMKLKLNMEKL = ListSF.CCDKHLAMKKO().KHCNHPCPFII().PKKKAFIHHMI(OLAAAIPEBBF);
+		item = ListSF.GetRoster().GetInventory().GetRandomItemOfType(itemType);
 	}
 
-	protected virtual void JOKNKEAIIKM()
+	protected virtual void OnItemsRefreshed()
 	{
 	}
 }

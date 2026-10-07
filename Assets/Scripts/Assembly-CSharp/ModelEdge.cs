@@ -3,77 +3,77 @@ using UnityEngine;
 
 public class ModelEdge : Segment3D
 {
-	public EquationLine HENNAFMBEAG = new EquationLine();
+	public EquationLine LineEquation = new EquationLine();
 
 	private string _Name;
 
 	private string _BodyPart;
 
-	private string DJAKNGMKAAL;
+	private string defense;
 
 	private EdgeType _Type;
 
-	private EdgeSubType GPOHKJPLLGH;
+	private EdgeSubType subType;
 
 	private ModelNode StartNode;
 
 	private ModelNode EndNode;
 
-	private float NBPKNIADCFH;
+	private float length;
 
-	private float BOKNFPBHOLN;
+	private float collisionRadius;
 
-	private float LEAKPNNFJJM;
+	private float startMargin;
 
-	private float HGNFLOJMJNG;
+	private float endMargin;
 
 	private int _Collisible;
 
-	private bool KCJMHGNKFNG;
+	private bool hasBlood;
 
 	private bool _IsShock;
 
-	private Vector3f ELBIOKIIBGH = new Vector3f();
+	private Vector3f collisionStart = new Vector3f();
 
-	private Vector3f GALMBGKDCFO = new Vector3f();
+	private Vector3f collisionEnd = new Vector3f();
 
-	public string EMMANKFGLLL
+	public string BodyPart
 	{
 		get
 		{
-			return ELHIBCEADCG();
+			return GetBodyPart();
 		}
 		set
 		{
-			MCDGHEAJGGP(value);
+			SetBodyPart(value);
 		}
 	}
 
-	public string GBOKABKLCFM
+	public string Defense
 	{
 		get
 		{
-			return NLLGDDMMJJN();
+			return GetDefense();
 		}
 		set
 		{
-			CFFCAJLFBEM(value);
+			SetDefense(value);
 		}
 	}
 
-	public EdgeSubType MPDIDJJJJGD
+	public EdgeSubType SubType
 	{
 		get
 		{
-			return DDFEOAHFFLO();
+			return GetSubType();
 		}
 		set
 		{
-			JIDPIOJGNBP(value);
+			SetSubType(value);
 		}
 	}
 
-	public ModelNode FJGONMIBEHC
+	public ModelNode FromNode
 	{
 		get
 		{
@@ -81,7 +81,7 @@ public class ModelEdge : Segment3D
 		}
 	}
 
-	public ModelNode HGCKGAJDCDL
+	public ModelNode ToNode
 	{
 		get
 		{
@@ -89,11 +89,11 @@ public class ModelEdge : Segment3D
 		}
 	}
 
-	public float IHGONCCOKMK
+	public float EdgeLength
 	{
 		get
 		{
-			return KLIOMCPELLF();
+			return GetLength();
 		}
 		set
 		{
@@ -101,7 +101,7 @@ public class ModelEdge : Segment3D
 		}
 	}
 
-	public float AGODBAOHPJC
+	public float CollisionRadius
 	{
 		get
 		{
@@ -109,11 +109,11 @@ public class ModelEdge : Segment3D
 		}
 		set
 		{
-			OIEJCNEODGC(value);
+			SetCollisionRadius(value);
 		}
 	}
 
-	public float FKKPDAIDLIM
+	public float StartMargin
 	{
 		get
 		{
@@ -121,11 +121,11 @@ public class ModelEdge : Segment3D
 		}
 		set
 		{
-			LADPGJPABHO(value);
+			SetStartMargin(value);
 		}
 	}
 
-	public float JJDGKALDIAJ
+	public float EndMargin
 	{
 		get
 		{
@@ -133,15 +133,15 @@ public class ModelEdge : Segment3D
 		}
 		set
 		{
-			EJIOOIMBAEA(value);
+			SetEndMargin(value);
 		}
 	}
 
-	public int NIDJNCALPII
+	public int CollisibleLevel
 	{
 		get
 		{
-			return NPMBEKDLAJO();
+			return GetCollisible();
 		}
 		set
 		{
@@ -149,23 +149,23 @@ public class ModelEdge : Segment3D
 		}
 	}
 
-	public bool JOPBOBKMOCH
+	public bool HasBlood
 	{
 		get
 		{
-			return KPEHIHNEKAF();
+			return GetHasBlood();
 		}
 		set
 		{
-			DIIBABHCHFP(value);
+			SetHasBlood(value);
 		}
 	}
 
-	public bool PFDCDIBODCL
+	public bool ShockEdge
 	{
 		get
 		{
-			return EDJFLMILEBA();
+			return GetIsShock();
 		}
 		set
 		{
@@ -173,27 +173,27 @@ public class ModelEdge : Segment3D
 		}
 	}
 
-	public Vector3f CCMHKFHDFNM
+	public Vector3f CollisionStart
 	{
 		get
 		{
-			return DOKBBJBFDCM();
+			return GetCollisionStart();
 		}
 	}
 
-	public Vector3f MBLICPBLEFC
+	public Vector3f CollisionEnd
 	{
 		get
 		{
-			return EBDICFAPOME();
+			return GetCollisionEnd();
 		}
 	}
 
-	public new float LPDHNCDLFLO
+	public new float NodeDistance
 	{
 		get
 		{
-			return GLOLKEBFFEG();
+			return GetNodeDistance();
 		}
 	}
 
@@ -201,22 +201,22 @@ public class ModelEdge : Segment3D
 	{
 		get
 		{
-			return FHGNPPBLIIL();
+			return GetStartPosition();
 		}
 	}
 
-	public Vector3f FMMOHDJIABO
+	public Vector3f EndPosition
 	{
 		get
 		{
-			return FLCHIAEKIOO();
+			return GetEndPosition();
 		}
 	}
 
 	public ModelEdge(ModelNode ILENLCMAMBH, ModelNode BFDAHEHCAGK)
 	{
-		EMGJLKDNNMM(ILENLCMAMBH);
-		MCAEBMFHCIN(BFDAHEHCAGK);
+		AttachStartNode(ILENLCMAMBH);
+		AttachEndNode(BFDAHEHCAGK);
 	}
 
 	public string get_Name()
@@ -229,24 +229,24 @@ public class ModelEdge : Segment3D
 		_Name = value;
 	}
 
-	public string ELHIBCEADCG()
+	public string GetBodyPart()
 	{
 		return _BodyPart;
 	}
 
-	public void MCDGHEAJGGP(string value)
+	public void SetBodyPart(string value)
 	{
 		_BodyPart = value;
 	}
 
-	public string NLLGDDMMJJN()
+	public string GetDefense()
 	{
-		return DJAKNGMKAAL;
+		return defense;
 	}
 
-	public void CFFCAJLFBEM(string value)
+	public void SetDefense(string value)
 	{
-		DJAKNGMKAAL = value;
+		defense = value;
 	}
 
 	public EdgeType GetEdgeType()
@@ -259,14 +259,14 @@ public class ModelEdge : Segment3D
 		_Type = value;
 	}
 
-	public EdgeSubType DDFEOAHFFLO()
+	public EdgeSubType GetSubType()
 	{
-		return GPOHKJPLLGH;
+		return subType;
 	}
 
-	public void JIDPIOJGNBP(EdgeSubType value)
+	public void SetSubType(EdgeSubType value)
 	{
-		GPOHKJPLLGH = value;
+		subType = value;
 	}
 
 	public ModelNode GetStartNode()
@@ -279,50 +279,50 @@ public class ModelEdge : Segment3D
 		return EndNode;
 	}
 
-	public float KLIOMCPELLF()
+	public float GetLength()
 	{
-		return NBPKNIADCFH;
+		return length;
 	}
 
 	public void set_Length(float value)
 	{
-		NBPKNIADCFH = value;
+		length = value;
 	}
 
 	// best guess for name
 	public float GetCollisionRadius()
 	{
-		return BOKNFPBHOLN;
+		return collisionRadius;
 	}
 
-	public void OIEJCNEODGC(float value)
+	public void SetCollisionRadius(float value)
 	{
-		BOKNFPBHOLN = value;
+		collisionRadius = value;
 	}
 
-	public void LADPGJPABHO(float value)
+	public void SetStartMargin(float value)
 	{
-		LEAKPNNFJJM = value;
+		startMargin = value;
 	}
 
 	// best guess for name
 	public float GetStartMargin()
 	{
-		return LEAKPNNFJJM;
+		return startMargin;
 	}
 
 	// best guess for name
 	public float GetEndMargin()
 	{
-		return HGNFLOJMJNG;
+		return endMargin;
 	}
 
-	public void EJIOOIMBAEA(float value)
+	public void SetEndMargin(float value)
 	{
-		HGNFLOJMJNG = value;
+		endMargin = value;
 	}
 
-	public int NPMBEKDLAJO()
+	public int GetCollisible()
 	{
 		return _Collisible;
 	}
@@ -332,17 +332,17 @@ public class ModelEdge : Segment3D
 		_Collisible = value;
 	}
 
-	public bool KPEHIHNEKAF()
+	public bool GetHasBlood()
 	{
-		return KCJMHGNKFNG;
+		return hasBlood;
 	}
 
-	public void DIIBABHCHFP(bool value)
+	public void SetHasBlood(bool value)
 	{
-		KCJMHGNKFNG = value;
+		hasBlood = value;
 	}
 
-	public bool EDJFLMILEBA()
+	public bool GetIsShock()
 	{
 		return _IsShock;
 	}
@@ -352,14 +352,14 @@ public class ModelEdge : Segment3D
 		_IsShock = value;
 	}
 
-	public Vector3f DOKBBJBFDCM()
+	public Vector3f GetCollisionStart()
 	{
-		return ELBIOKIIBGH;
+		return collisionStart;
 	}
 
-	public Vector3f EBDICFAPOME()
+	public Vector3f GetCollisionEnd()
 	{
-		return GALMBGKDCFO;
+		return collisionEnd;
 	}
 
 	public EdgeRender CreateUI(Transform GLKEHHPBGKP)
@@ -371,16 +371,16 @@ public class ModelEdge : Segment3D
 		return edgeRender;
 	}
 
-	public void FCEPJPDNNCM(ModelNode node)
+	public void ReplaceStartNode(ModelNode node)
 	{
-		CGHDODPMAOD();
-		EMGJLKDNNMM(node);
+		DetachStartNode();
+		AttachStartNode(node);
 	}
 
-	public void KBBPEMKDDGB(ModelNode node)
+	public void ReplaceEndNode(ModelNode node)
 	{
-		OACACMPBJFO();
-		MCAEBMFHCIN(node);
+		DetachEndNode();
+		AttachEndNode(node);
 	}
 
 	public void Iterative(Vector3f MGMMDGFPBLP)
@@ -389,7 +389,7 @@ public class ModelEdge : Segment3D
 		float num2 = EndNode.GetWeight();
 		Vector3f eMAFACPEPDK = StartNode.GetStart();
 		Vector3f eMAFACPEPDK2 = EndNode.GetStart();
-		float num3 = NBPKNIADCFH / Vector3f.Distance(eMAFACPEPDK, eMAFACPEPDK2);
+		float num3 = length / Vector3f.Distance(eMAFACPEPDK, eMAFACPEPDK2);
 		float num4 = (1f - num3) / (num + num2);
 		float num5 = num * num4;
 		float num6 = num2 * num4;
@@ -400,25 +400,25 @@ public class ModelEdge : Segment3D
 
 	public void Iterative()
 	{
-		if (StartNode.NEEJAPDCCMJ() || EndNode.NEEJAPDCCMJ())
+		if (StartNode.IsPhysicsActive() || EndNode.IsPhysicsActive())
 		{
 			float num = StartNode.GetWeight();
 			float num2 = EndNode.GetWeight();
 			Vector3f eMAFACPEPDK = StartNode.GetStart();
 			Vector3f eMAFACPEPDK2 = EndNode.GetStart();
-			float num3 = NBPKNIADCFH / Vector3f.Distance(eMAFACPEPDK, eMAFACPEPDK2);
+			float num3 = length / Vector3f.Distance(eMAFACPEPDK, eMAFACPEPDK2);
 			float num4 = (1f - num3) / (num + num2);
 			float num5 = num * num4;
 			float num6 = num2 * num4;
 			float lHNJJFDIJKK = eMAFACPEPDK.GetX() * num5 + eMAFACPEPDK2.GetX() * num6;
 			float fFFHIOALHGM = eMAFACPEPDK.GetY() * num5 + eMAFACPEPDK2.GetY() * num6;
 			float pDCENMEKIAP = eMAFACPEPDK.GetZ() * num5 + eMAFACPEPDK2.GetZ() * num6;
-			if (StartNode.NEEJAPDCCMJ())
+			if (StartNode.IsPhysicsActive())
 			{
 				eMAFACPEPDK.Multiply(num3);
 				eMAFACPEPDK.Add(lHNJJFDIJKK, fFFHIOALHGM, pDCENMEKIAP);
 			}
-			if (EndNode.NEEJAPDCCMJ())
+			if (EndNode.IsPhysicsActive())
 			{
 				eMAFACPEPDK2.Multiply(num3);
 				eMAFACPEPDK2.Add(lHNJJFDIJKK, fFFHIOALHGM, pDCENMEKIAP);
@@ -426,53 +426,53 @@ public class ModelEdge : Segment3D
 		}
 	}
 
-	public new float GLOLKEBFFEG()
+	public new float GetNodeDistance()
 	{
 		return Vector3f.Distance(StartNode.GetStart(), EndNode.GetStart());
 	}
 
-	public void AGMHEHLBFCG()
+	public void UpdateCollisionGeometry()
 	{
-		OCGGJGCMNCH();
-		Vector2f.JBLEOOBOCND(FHGNPPBLIIL(), FLCHIAEKIOO(), HENNAFMBEAG);
+		UpdateCollisionPoints();
+		Vector2f.BuildEquationLine(GetStartPosition(), GetEndPosition(), LineEquation);
 	}
 
-	public void OCGGJGCMNCH()
+	public void UpdateCollisionPoints()
 	{
-		Vector3f lHBNIMGFKIB = FHGNPPBLIIL();
-		Vector3f aAOIAEJJINO = FLCHIAEKIOO();
-		Vector3f.GetDivisionPoint3D(lHBNIMGFKIB, aAOIAEJJINO, LEAKPNNFJJM, ELBIOKIIBGH);
-		Vector3f.GetDivisionPoint3D(lHBNIMGFKIB, aAOIAEJJINO, 1f - HGNFLOJMJNG, GALMBGKDCFO);
+		Vector3f lHBNIMGFKIB = GetStartPosition();
+		Vector3f aAOIAEJJINO = GetEndPosition();
+		Vector3f.GetDivisionPoint3D(lHBNIMGFKIB, aAOIAEJJINO, startMargin, collisionStart);
+		Vector3f.GetDivisionPoint3D(lHBNIMGFKIB, aAOIAEJJINO, 1f - endMargin, collisionEnd);
 	}
 
-	public Vector3f FHGNPPBLIIL()
+	public Vector3f GetStartPosition()
 	{
 		return StartNode.GetStart();
 	}
 
-	public Vector3f FLCHIAEKIOO()
+	public Vector3f GetEndPosition()
 	{
 		return EndNode.GetStart();
 	}
 
-	private void EMGJLKDNNMM(ModelNode node)
+	private void AttachStartNode(ModelNode node)
 	{
 		StartNode = node;
-		LCFIDBHFBOO(node.GetStart());
+		SetStartReference(node.GetStart());
 	}
 
-	private void MCAEBMFHCIN(ModelNode node)
+	private void AttachEndNode(ModelNode node)
 	{
 		EndNode = node;
-		PMGPGDDPOBB(node.GetStart());
+		SetEndReference(node.GetStart());
 	}
 
-	private void CGHDODPMAOD()
+	private void DetachStartNode()
 	{
 		StartNode = null;
 	}
 
-	private void OACACMPBJFO()
+	private void DetachEndNode()
 	{
 		EndNode = null;
 	}

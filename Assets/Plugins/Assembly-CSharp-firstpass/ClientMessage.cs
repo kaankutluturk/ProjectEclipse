@@ -1,6 +1,6 @@
 public struct ClientMessage
 {
-	public readonly Hub LHDEDFFGBHI;
+	public readonly Hub OwnerHub;
 
 	public readonly string Method;
 
@@ -8,20 +8,20 @@ public struct ClientMessage
 
 	public readonly ulong CallIdx;
 
-	public readonly FEENMMBNDJA CJPBGBGPFCA;
+	public readonly OnMethodResultDelegate ResultCallback;
 
-	public readonly FGNDEBGHBMC LIDCKDCPGBB;
+	public readonly OnMethodFailedDelegate ResultErrorCallback;
 
-	public readonly NNBBLIKMEDJ KLNBGJEPNHP;
+	public readonly OnMethodProgressDelegate ProgressCallback;
 
-	public ClientMessage(Hub CGFIJCNNCKP, string FJLOLCPJACB, object[] LKIOKGCNKHE, ulong KKAADAAPLDC, FEENMMBNDJA HKHNPNNDHFP, FGNDEBGHBMC HFFMDOCLOHA, NNBBLIKMEDJ OODDBFJDGJO)
+	public ClientMessage(Hub CGFIJCNNCKP, string FJLOLCPJACB, object[] LKIOKGCNKHE, ulong KKAADAAPLDC, OnMethodResultDelegate HKHNPNNDHFP, OnMethodFailedDelegate HFFMDOCLOHA, OnMethodProgressDelegate OODDBFJDGJO)
 	{
-		LHDEDFFGBHI = CGFIJCNNCKP;
+		OwnerHub = CGFIJCNNCKP;
 		Method = FJLOLCPJACB;
 		Args = LKIOKGCNKHE;
 		CallIdx = KKAADAAPLDC;
-		CJPBGBGPFCA = HKHNPNNDHFP;
-		LIDCKDCPGBB = HFFMDOCLOHA;
-		KLNBGJEPNHP = OODDBFJDGJO;
+		ResultCallback = HKHNPNNDHFP;
+		ResultErrorCallback = HFFMDOCLOHA;
+		ProgressCallback = OODDBFJDGJO;
 	}
 }

@@ -101,7 +101,7 @@ static class Program
             foreach(var native in new[]{"lethal","timeout","rule","surrender"})
             {
                 var fight=Native(loaded);Check(Invoke(loaded,fight,out var error),error);
-                if(native=="lethal") {fight.Player.Health=0;fight.Player.PCALDKCJGCK=true;}
+                if(native=="lethal") {fight.Player.Health=0;fight.Player.IsDead=true;}
                 if(native=="timeout") fight.preFight.Timeout=true;
                 if(native=="rule") {fight._endFightRule=new Rule{Target=RuleAppliance.ApplianceOpponent};fight._endRoundType=EndRoundType.EndRoundTypeLose;}
                 if(native=="surrender") fight.Surrender();else fight.Step();
@@ -115,7 +115,7 @@ static class Program
                 if(guard=="pause")fight.Paused=true;if(guard=="versus")fight.IsLocalVersus=true;
                 if(guard=="training")fight.FightDefinition.Type=BattleType.FightNone;if(guard=="title")fight.IsTitleSparring=true;
                 if(guard=="online-raid")fight.FightDefinition.Type=BattleType.FightRaid;if(guard=="pvp")fight.FightDefinition.Type=BattleType.FightPVP;
-                if(guard=="stale")Fight.Current=null;if(guard=="end-stage")fight.stageType=StageType.FDBBPEGEGMK.STAGE_END_STANCE;
+                if(guard=="stale")Fight.Current=null;if(guard=="end-stage")fight.stageType=StageType.Stage.STAGE_END_STANCE;
                 if(guard=="fight-end")fight._eclipseFightEndDispatched=true;
                 Check(!fight.TryEndRound(loaded.Rule.Id,true,out var error),"Guard failed: "+guard);
             }
@@ -128,7 +128,7 @@ static class Program
             paused.Paused=false;paused.Step();Check(paused.Player.RoundsWon==1,"Resume did not consume pending request once");
             var dying=Native(loaded);Check(Invoke(loaded,dying,out var dyingError),dyingError);
             dying.Player.Health=0;dying.Step();Check(dying.Player.RoundsWon==0,"Queued objective overrode zero health before native death was ready");
-            dying.Player.PCALDKCJGCK=true;dying.Step();Check(dying.Enemy.RoundsWon==1 && !dying._eclipseRoundOutcomes.ResolvedPlayerWins.HasValue,"Native death completion lost precedence");
+            dying.Player.IsDead=true;dying.Step();Check(dying.Enemy.RoundsWon==1 && !dying._eclipseRoundOutcomes.ResolvedPlayerWins.HasValue,"Native death completion lost precedence");
             var detached=Native(loaded);Check(Invoke(loaded,detached,out var detachedError),detachedError);Fight.Current=null;detached.Step();
             Check(detached.Player.RoundsWon==0,"Detached fight consumed pending objective");
         }
@@ -139,7 +139,7 @@ static class Program
             var native=Native(loaded);
             Check(!Invoke(loaded,native,out var error)&&error.Contains("combat.round_outcome"),"Invocation skipped capability guard");
             Check(!native.TryEndRound(loaded.Rule.Id,true,out error),"Ordinary rule acquired host authority");
-            native.Player.Health=0;native.Player.PCALDKCJGCK=true;native.Step();
+            native.Player.Health=0;native.Player.IsDead=true;native.Step();
             Check(native.Enemy.RoundsWon==1 && native.Winner()==native.Enemy,"Ordinary native result changed without controller");
         }
         using(var loaded=Load("if saved then saved:end_round('win') else saved=fighter end"))

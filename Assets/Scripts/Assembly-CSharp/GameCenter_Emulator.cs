@@ -2,35 +2,35 @@ using UnityEngine.SocialPlatforms;
 
 public class GameCenter_Emulator : GameCenterAbstract
 {
-	public override bool ABFAHBGHFOB
+	public override bool IsSupported
 	{
 		get
 		{
-			return EPACOIFEICA();
+			return GetIsSupported();
 		}
 	}
 
-	public override bool JLDADBGJMFA
+	public override bool CanAutoSignIn
 	{
 		get
 		{
-			return CPOLMPAAHOL();
+			return GetCanAutoSignIn();
 		}
 	}
 
-	public override bool FJBFKLDBMDD
+	public override bool IsAuthenticated
 	{
 		get
 		{
-			return OBDJPKOJADA();
+			return GetIsAuthenticated();
 		}
 	}
 
-	public override string FFNCAFDPLPL
+	public override string UserId
 	{
 		get
 		{
-			return CONEABALMEJ();
+			return GetUserId();
 		}
 	}
 
@@ -39,74 +39,74 @@ public class GameCenter_Emulator : GameCenterAbstract
 		Log("[GameCenter_Emulator]: Init");
 	}
 
-	public override void PJNFHNFLNNO()
+	public override void Free()
 	{
 		Log("[GameCenter_Emulator]: Free");
 	}
 
-	private void JDJNLPHEOAP(bool BPEIMKJIMOF)
+	private void HandleAuthenticated(bool BPEIMKJIMOF)
 	{
 		Log("[GameCenter_Emulator]: CB_Authenticate, authed = " + BPEIMKJIMOF);
 	}
 
-	private void NDDDABCMLEI(IAchievement[] HELFDCAIJNE)
+	private void HandleAchievementsLoaded(IAchievement[] HELFDCAIJNE)
 	{
 		Log("[GameCenter_Emulator]: CB_LoadAchievements");
 	}
 
-	private void HFCGCEIPGFJ(string OKNNNLIPODI)
+	private void HandleAchievementUnlocked(string OKNNNLIPODI)
 	{
 		Log("[GameCenter_Emulator]: CB_AchievementUnlocked, id = " + OKNNNLIPODI);
 	}
 
-	private void ALFBABCJCDN(string HMDBGGEMICE, int EPFBHJBNIHK)
+	private void HandleAchievementProgress(string HMDBGGEMICE, int EPFBHJBNIHK)
 	{
 		Log("[GameCenter_Emulator]: OnAchievementProgess id = " + HMDBGGEMICE + " progress = " + EPFBHJBNIHK);
 	}
 
-	public override bool EPACOIFEICA()
+	public override bool GetIsSupported()
 	{
 		return false;
 	}
 
-	public override bool CPOLMPAAHOL()
+	public override bool GetCanAutoSignIn()
 	{
 		return false;
 	}
 
-	public override void EFKOIIKEHDO()
+	public override void SignIn()
 	{
 		Log("[GameCenter_Emulator]: SignIn");
 	}
 
-	public override void CLPNGGPKAHO()
+	public override void SignOut()
 	{
 		Log("[GameCenter_Emulator]: SignOut");
 	}
 
-	public override bool OBDJPKOJADA()
+	public override bool GetIsAuthenticated()
 	{
 		return false;
 	}
 
-	public override string CONEABALMEJ()
+	public override string GetUserId()
 	{
 		return string.Empty;
 	}
 
-	public override void KBAPDJLNCJE()
+	public override void LoadAchievements()
 	{
 	}
 
-	public override void KGKPLKJPDAI()
+	public override void ShowAchievements()
 	{
 		Log("[GameCenter_Emulator]: ShowAchievements");
 	}
 
-	public override void MMGHEKOEHDB()
+	public override void ResetAchievements()
 	{
 		Log("[GameCenter_Emulator]: ResetAchievements");
-		GameCenterAbstract.ALEHBEKFIAN(true);
+		GameCenterAbstract.OnResetAchievements(true);
 	}
 
 	public override void UnlockAchievement(string OKNNNLIPODI)
@@ -114,7 +114,7 @@ public class GameCenter_Emulator : GameCenterAbstract
 		Log("[GameCenter_Emulator]: UnlockAchievement " + OKNNNLIPODI);
 	}
 
-	public override void MIMPHPINBNF(string OKNNNLIPODI, double EPFBHJBNIHK)
+	public override void ReportAchievementProgress(string OKNNNLIPODI, double EPFBHJBNIHK)
 	{
 		Log("[GameCenter_Emulator]: AchievementProgress id = " + OKNNNLIPODI + " ,progress = " + EPFBHJBNIHK);
 	}

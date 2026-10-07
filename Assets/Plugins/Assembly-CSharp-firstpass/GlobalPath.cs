@@ -8,64 +8,64 @@ public class GlobalPath
 
 	public static readonly string PathToLoaderFolder = "assets/gamedata/" + "Resources".ToLower();
 
-	public static string FDIJFOKPBHM
+	public static string LogsPath
 	{
 		get
 		{
-			return LCHPJEDOJKK();
+			return GetLogsPath();
 		}
 	}
 
-	public static string EKBALHCKKFO
+	public static string ExternalResourcesPath
 	{
 		get
 		{
-			return MNACDIFKBDG();
+			return GetExternalResourcesPath();
 		}
 	}
 
-	public static string NJIAIFAKOAF
+	public static string InternalResourcesPath
 	{
 		get
 		{
-			return DPPLJPBLPKF();
+			return GetInternalResourcesPath();
 		}
 	}
 
-	public static string BOMMODFGANC
+	public static string ExternalGameDataPath
 	{
 		get
 		{
-			return AIHMCHABGKO();
+			return GetExternalGameDataPath();
 		}
 	}
 
-	public static string KIEDBJBBHOF
+	public static string InternalGameDataPath
 	{
 		get
 		{
-			return ENDDFPLIPNK();
+			return GetInternalGameDataPath();
 		}
 	}
 
-	public static string LCHPJEDOJKK()
+	public static string GetLogsPath()
 	{
-		return AIHMCHABGKO() + "/Logs";
+		return GetExternalGameDataPath() + "/Logs";
 	}
 
-	public static string MNACDIFKBDG()
+	public static string GetExternalResourcesPath()
 	{
-		return AIHMCHABGKO() + "/Resources";
+		return GetExternalGameDataPath() + "/Resources";
 	}
 
-	public static string DPPLJPBLPKF()
+	public static string GetInternalResourcesPath()
 	{
-		return ENDDFPLIPNK() + "/Resources";
+		return GetInternalGameDataPath() + "/Resources";
 	}
 
-	public static string AIHMCHABGKO()
+	public static string GetExternalGameDataPath()
 	{
-		if (SystemProperties.GAAMHGCDANB())
+		if (SystemProperties.IsMobilePlatform())
 		{
 			return Application.persistentDataPath + "/gamedata";
 		}
@@ -73,7 +73,7 @@ public class GlobalPath
 		return text + "/gamedata";
 	}
 
-	public static string ENDDFPLIPNK()
+	public static string GetInternalGameDataPath()
 	{
 		return Application.dataPath + "/gamedata";
 	}
@@ -84,22 +84,22 @@ public class GlobalPath
 		return (num <= -1) ? (path.Length - BOGBPHDFGGB) : (num - BOGBPHDFGGB);
 	}
 
-	public static string FGGDOBKOCAN(string path)
+	public static string CombineExternalGameDataPath(string path)
 	{
-		return Path.Combine(AIHMCHABGKO(), path);
+		return Path.Combine(GetExternalGameDataPath(), path);
 	}
 
-	private static string HFGMHHDBHMH(string KGBGENDIMBC)
+	private static string GetExternalPathByKey(string KGBGENDIMBC)
 	{
-		return InternalSettings.HFGMHHDBHMH(KGBGENDIMBC);
+		return InternalSettings.GetExternalPath(KGBGENDIMBC);
 	}
 
 	public static string GetInternalPath(string KGBGENDIMBC, string name = "")
 	{
-		return HFGMHHDBHMH(KGBGENDIMBC) + name;
+		return GetExternalPathByKey(KGBGENDIMBC) + name;
 	}
 
-	public static string FLBGANCBDBB(string path)
+	public static string GetLoaderPath(string path)
 	{
 		return PathToLoaderFolder + "/" + path;
 	}

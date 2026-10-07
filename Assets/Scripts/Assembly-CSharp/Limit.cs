@@ -8,7 +8,7 @@ public class Limit
 
 	public int Shift;
 
-	public int OBGGBMDABAD;
+	public int LeftLimit;
 
-	public int NGPJDHKOEJC;
+	public int RightLimit;
 }

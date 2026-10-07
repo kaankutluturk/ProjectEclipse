@@ -5,12 +5,12 @@ namespace Nekki.SF2.GUI.Menu
 {
 	public class MenuMaterialsPanel : MonoBehaviour
 	{
-		public enum LOECKBOPFGK
+		public enum MenuMaterialsPanelEvent
 		{
 			onMaterialsBtnClicked = 0
 		}
 
-		private enum NOBMHDGALLH
+		private enum MenuMaterialsPanelLayer
 		{
 			zContent = 0
 		}
@@ -18,7 +18,7 @@ namespace Nekki.SF2.GUI.Menu
 		[SerializeField]
 		private GameObject MaterialPrefab;
 
-		private List<MenuMaterSprite> OHPKMMJMLHE = new List<MenuMaterSprite>();
+		private List<MenuMaterSprite> materialSprites = new List<MenuMaterSprite>();
 
 		private void Start()
 		{
@@ -30,29 +30,29 @@ namespace Nekki.SF2.GUI.Menu
 
 		public void Init()
 		{
-			OFLLLFJNDCO();
+			CreateMaterialSprites();
 		}
 
-		private void CHILAIJNEHG()
+		private void RemoveListeners()
 		{
 		}
 
 		public void UpdateView()
 		{
-			for (int i = 0; i < OHPKMMJMLHE.Count; i++)
+			for (int i = 0; i < materialSprites.Count; i++)
 			{
-				MenuMaterSprite menuMaterSprite = OHPKMMJMLHE[i];
+				MenuMaterSprite menuMaterSprite = materialSprites[i];
 				menuMaterSprite.UpdateView();
 			}
 		}
 
-		private void OFLLLFJNDCO()
+		private void CreateMaterialSprites()
 		{
 			foreach (Transform item in base.transform)
 			{
 				Object.Destroy(item.gameObject);
 			}
-			List<GameCurrency> list = GameUtils.AJDKHINLIDI.IIAPDCECFCN();
+			List<GameCurrency> list = GameUtils.GameCurrencies.GetCurrencies();
 			if (list.Count == 0)
 			{
 				return;
@@ -60,7 +60,7 @@ namespace Nekki.SF2.GUI.Menu
 			for (int i = 0; i < list.Count; i++)
 			{
 				GameCurrency cJJOFMHLFFM = list[i];
-				if (cJJOFMHLFFM.NBIHGGLGMCN == GameCurrency.DEFOMBPHMBP.CURRENCY_GROUP_FORGE)
+				if (cJJOFMHLFFM.Group == GameCurrency.CurrencyGroup.CURRENCY_GROUP_FORGE)
 				{
 					GameObject gameObject = Object.Instantiate(MaterialPrefab);
 					MenuMaterSprite component = gameObject.GetComponent<MenuMaterSprite>();
@@ -68,7 +68,7 @@ namespace Nekki.SF2.GUI.Menu
 					// makes these UI entries oversized or offset under a scaled Canvas.
 					component.transform.SetParent(base.transform, false);
 					component.Init(cJJOFMHLFFM);
-					OHPKMMJMLHE.Add(component);
+					materialSprites.Add(component);
 				}
 			}
 		}

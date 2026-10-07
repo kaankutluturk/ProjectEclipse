@@ -7,16 +7,16 @@ namespace Nekki.SF2.GUI.Dialogs
 	{
 		public const float CONTENT_PADDING = 40f;
 
-		private bool MGEJCGPMJPF;
+		private bool isFightExit;
 
-		private Action<object> AGEGHEGOGOI;
+		private Action<object> exitCallback;
 
 		private static bool _isOpened;
 
 		[SerializeField]
 		protected LabelAlias _text;
 
-		public static bool DDKFMBKFGKJ
+		public static bool IsDialogOpen
 		{
 			get
 			{
@@ -33,15 +33,15 @@ namespace Nekki.SF2.GUI.Dialogs
 		{
 			if (data != null)
 			{
-				GBAEHLPNDAC gBAEHLPNDAC = (GBAEHLPNDAC)data;
-				MGEJCGPMJPF = gBAEHLPNDAC.BCIFHFCOCKI;
-				AGEGHEGOGOI = gBAEHLPNDAC.Dlg;
-				if (MGEJCGPMJPF)
+				ExitDialogData gBAEHLPNDAC = (ExitDialogData)data;
+				isFightExit = gBAEHLPNDAC.IsInFight;
+				exitCallback = gBAEHLPNDAC.Dlg;
+				if (isFightExit)
 				{
 					IsPausing = false;
 				}
 			}
-			base.Init((!MGEJCGPMJPF) ? "dlgExitTitle" : "dlgExitFightTitle", "dlgExitButton", "CANCEL", KBDHPMOMJLL.FOOTER_BOTH);
+			base.Init((!isFightExit) ? "dlgExitTitle" : "dlgExitFightTitle", "dlgExitButton", "CANCEL", FooterType.FOOTER_BOTH);
 			_isOpened = true;
 		}
 
@@ -50,32 +50,32 @@ namespace Nekki.SF2.GUI.Dialogs
 			_isOpened = false;
 		}
 
-		protected override void HLJBLAPMDCB()
+		protected override void SetupContent()
 		{
 			_text.alignment = TextAnchor.MiddleCenter;
-			_text.transform.OKHPLHPBPKJ(0f);
-			_text.transform.BGNJGIACJBG(0f);
+			_text.transform.SetLocalX(0f);
+			_text.transform.SetLocalY(0f);
 			_text.set_LabelFontSize(103);
-			_text.color = Constants.PJJIMHMJPAL;
-			_text.set_Alias((!MGEJCGPMJPF) ? "dlgExitMessage" : "dlgExitFightMessage");
+			_text.color = Constants.DialogTextColor;
+			_text.set_Alias((!isFightExit) ? "dlgExitMessage" : "dlgExitFightMessage");
 		}
 
-		protected override void MAGOIKICKAH(KBDHPMOMJLL HJNAHNICGMH)
+		protected override void SetupFooter(FooterType HJNAHNICGMH)
 		{
-			base.MAGOIKICKAH(HJNAHNICGMH);
+			base.SetupFooter(HJNAHNICGMH);
 			_btnOK.RemoveAllEventListener();
-			_btnOK.AddEventListener(2, BGGEHPLONFP);
+			_btnOK.AddEventListener(2, OnExitConfirmed);
 		}
 
-		private void BGGEHPLONFP(object data)
+		private void OnExitConfirmed(object data)
 		{
-			if (MGEJCGPMJPF)
+			if (isFightExit)
 			{
-				AGEGHEGOGOI(0);
+				exitCallback(0);
 			}
 			else
 			{
-				GameUtils.PGLIKMEJBPK();
+				GameUtils.ExitApplication();
 			}
 			base.OnClose(data);
 		}

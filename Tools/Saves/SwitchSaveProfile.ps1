@@ -17,7 +17,7 @@ $completeDirectory = Join-Path $profileDirectory 'Complete'
 $vanillaMaxDirectory = Join-Path $profileDirectory 'VanillaMax'
 $safetyDirectory = Join-Path $profileDirectory 'Safety'
 
-# These are the files ListSF.CELGPFFHLIM clears when the game resets a user.
+# These are the files ListSF.DeleteUserDataAndQuit clears when the game resets a user.
 # Keep their hash companions with each profile too, for builds where user-data
 # validation is enabled.
 $saveFiles = @(

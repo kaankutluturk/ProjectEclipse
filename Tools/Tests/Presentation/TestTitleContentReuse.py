@@ -38,9 +38,9 @@ def main():
     methods = "\n".join(extract(list_sf, signature) for signature in [
         "public static void Reset()", "private static void TimeStep(",
         "internal void LoadTitlePreview()", "internal void DetachTitleProfile()",
-        "internal void ResumeTitlePreview()", "public void IIKDNMBIHCM()",
-        "private void CompleteGameContentLoad()", "private void PBNNPBEDOOJ()",
-        "private int HFPJDOEEDCA()"])
+        "internal void ResumeTitlePreview()", "public void LoadGameContent()",
+        "private void CompleteGameContentLoad()", "private void LoadProfile()",
+        "private int GetCurrentUserId()"])
     production = """using System; using System.IO; using System.Xml;
 using System.Collections.Generic; using UnityEngine;
 namespace Eclipse.UI { public static class TitleScreen {
@@ -55,11 +55,11 @@ internal static bool TryResumeGameDataPreview() => TitleGameData.TryResume();
     production += "\nnamespace Eclipse.Modding { public static partial class ModRuntime {\n"
     production += extract(runtime, "public static void RecordSaveContext(") + "}}\n"
     production += "namespace Nekki.SF2.GUI.Scenes { public static class GameLoaderScene {\n"
-    production += "public static bool PIHEPFHMJHJ;\n" + extract(scene, "public static void Stop()")
+    production += "public static bool isSessionLoaded;\n" + extract(scene, "public static void Stop()")
     production += "\n" + extract(scene, "public static void DiscardTitlePreview()") + "}}\n"
-    production += "public partial class UserItem {\n" + extract(read("Assets/Scripts/Assembly-CSharp/UserItem.cs"), "public void KIGHKCOCJFJ(") + "}\n"
+    production += "public partial class UserItem {\n" + extract(read("Assets/Scripts/Assembly-CSharp/UserItem.cs"), "public void SetInfo(") + "}\n"
     perks = read("Assets/Scripts/Assembly-CSharp/PerkTree.cs")
-    production += "public partial class PerkTree {\n" + extract(perks, "public void FAGKACLCCPE()") + "\n" + extract(perks, "public void LJHPGKAOIAE()") + "}\n"
+    production += "public partial class PerkTree {\n" + extract(perks, "public void ClearProfileState()") + "\n" + extract(perks, "public void RebuildProfile()") + "}\n"
     (fixture / "Production.cs").write_text(production, encoding="utf-8")
     (fixture / "Test.csproj").write_text('<Project Sdk="Microsoft.NET.Sdk"><PropertyGroup><OutputType>Exe</OutputType><TargetFramework>net10.0</TargetFramework></PropertyGroup><ItemGroup><Compile Include="../../Tools/Tests/Presentation/TitleContentReuseTests.cs" /></ItemGroup></Project>', encoding="utf-8")
     subprocess.run(["dotnet", "run", "--project", str(fixture / "Test.csproj"), "--verbosity", "quiet", "--", str(fixture / "userdata")], cwd=root, check=True)

@@ -4,32 +4,32 @@ using System.Globalization;
 
 public sealed class AnchorAssigner : IAliasProvider, IObjectGraphVisitor
 {
-	private class EOMGEBLLMMG
+	private class AnchorAssignment
 	{
-		public string BJKKJNDLDJN;
+		public string Anchor;
 	}
 
-	private readonly IDictionary<object, EOMGEBLLMMG> AOPBKMDMKDB = new Dictionary<object, EOMGEBLLMMG>();
+	private readonly IDictionary<object, AnchorAssignment> assignments = new Dictionary<object, AnchorAssignment>();
 
 	private uint nextId;
 
 	bool IObjectGraphVisitor.Enter(IObjectDescriptor value)
 	{
-		if (value.OEAKCOHMIHH() == null || value.get_Type().GetTypeCode() != TypeCode.Object)
+		if (value.GetValue() == null || value.get_Type().GetTypeCode() != TypeCode.Object)
 		{
 			return false;
 		}
-		EOMGEBLLMMG aliasInfo;
-		if (AOPBKMDMKDB.TryGetValue(value.OEAKCOHMIHH(), out aliasInfo))
+		AnchorAssignment aliasInfo;
+		if (assignments.TryGetValue(value.GetValue(), out aliasInfo))
 		{
-			if (aliasInfo.BJKKJNDLDJN == null)
+			if (aliasInfo.Anchor == null)
 			{
-				aliasInfo.BJKKJNDLDJN = "o" + nextId.ToString(CultureInfo.InvariantCulture);
+				aliasInfo.Anchor = "o" + nextId.ToString(CultureInfo.InvariantCulture);
 				nextId++;
 			}
 			return false;
 		}
-		AOPBKMDMKDB.Add(value.OEAKCOHMIHH(), new EOMGEBLLMMG());
+		assignments.Add(value.GetValue(), new AnchorAssignment());
 		return true;
 	}
 
@@ -65,10 +65,10 @@ public sealed class AnchorAssigner : IAliasProvider, IObjectGraphVisitor
 
 	string IAliasProvider.GetAlias(object target)
 	{
-		EOMGEBLLMMG aliasInfo;
-		if (target != null && AOPBKMDMKDB.TryGetValue(target, out aliasInfo))
+		AnchorAssignment aliasInfo;
+		if (target != null && assignments.TryGetValue(target, out aliasInfo))
 		{
-			return aliasInfo.BJKKJNDLDJN;
+			return aliasInfo.Anchor;
 		}
 		return null;
 	}

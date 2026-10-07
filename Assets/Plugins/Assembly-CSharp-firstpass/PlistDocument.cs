@@ -8,13 +8,13 @@ using System.Xml.XPath;
 
 public class PlistDocument
 {
-	public PlistElementDict AFHNINCKJEE;
+	public PlistElementDict root;
 
 	public string version;
 
 	public PlistDocument()
 	{
-		AFHNINCKJEE = new PlistElementDict();
+		root = new PlistElementDict();
 		version = "1.0";
 	}
 
@@ -44,7 +44,7 @@ public class PlistDocument
 			select DHDMNHCIPEH.Value).ToArray());
 	}
 
-	private static PlistElement JPHIJFLDECK(XElement GGBAJPGKOEM)
+	private static PlistElement ParseValue(XElement GGBAJPGKOEM)
 	{
 		switch (GGBAJPGKOEM.Name.LocalName)
 		{
@@ -63,11 +63,11 @@ public class PlistDocument
 					throw new Exception("Malformed plist file");
 				}
 				string kGBGENDIMBC = GetText(list2[i]).Trim();
-				PlistElement lBMGKAJIDAJ2 = JPHIJFLDECK(list2[i + 1]);
+				PlistElement lBMGKAJIDAJ2 = ParseValue(list2[i + 1]);
 				if (lBMGKAJIDAJ2 != null)
 				{
 					i++;
-					jDMGABPEDFI.AGGAMCGBFAF(kGBGENDIMBC, lBMGKAJIDAJ2);
+					jDMGABPEDFI.SetItem(kGBGENDIMBC, lBMGKAJIDAJ2);
 				}
 			}
 			return jDMGABPEDFI;
@@ -79,10 +79,10 @@ public class PlistDocument
 			{
 				foreach (XElement item in list)
 				{
-					PlistElement lBMGKAJIDAJ = JPHIJFLDECK(item);
+					PlistElement lBMGKAJIDAJ = ParseValue(item);
 					if (lBMGKAJIDAJ != null)
 					{
-						gHFPDLCPEBH.AMMFNLMJJFM.Add(lBMGKAJIDAJ);
+						gHFPDLCPEBH.values.Add(lBMGKAJIDAJ);
 					}
 				}
 				return gHFPDLCPEBH;
@@ -108,34 +108,34 @@ public class PlistDocument
 		}
 	}
 
-	public void LJJFGDFHEDG(string path)
+	public void ReadFromFile(string path)
 	{
-		AJBOOGKEGID(File.ReadAllText(path));
+		ReadFromString(File.ReadAllText(path));
 	}
 
 	public void ReadFromStream(TextReader JFOEFIABDEO)
 	{
-		AJBOOGKEGID(JFOEFIABDEO.ReadToEnd());
+		ReadFromString(JFOEFIABDEO.ReadToEnd());
 	}
 
-	public void AJBOOGKEGID(string HCPNFPMHFCM)
+	public void ReadFromString(string HCPNFPMHFCM)
 	{
 		XDocument xDocument = ParseXmlNoDtd(HCPNFPMHFCM);
 		version = (string)xDocument.Root.Attribute("version");
 		XElement gGBAJPGKOEM = xDocument.XPathSelectElement("plist/dict");
-		PlistElement lBMGKAJIDAJ = JPHIJFLDECK(gGBAJPGKOEM);
+		PlistElement lBMGKAJIDAJ = ParseValue(gGBAJPGKOEM);
 		if (lBMGKAJIDAJ == null)
 		{
 			throw new Exception("Error parsing plist file");
 		}
-		AFHNINCKJEE = lBMGKAJIDAJ as PlistElementDict;
-		if (AFHNINCKJEE == null)
+		root = lBMGKAJIDAJ as PlistElementDict;
+		if (root == null)
 		{
 			throw new Exception("Malformed plist file");
 		}
 	}
 
-	private static XElement AOHOBAEHMCO(PlistElement NCDBEBJGHPP)
+	private static XElement WriteElement(PlistElement NCDBEBJGHPP)
 	{
 		if (NCDBEBJGHPP is PlistElementBoolean)
 		{
@@ -157,10 +157,10 @@ public class PlistDocument
 			PlistElementDict jDMGABPEDFI = NCDBEBJGHPP as PlistElementDict;
 			XElement xElement = new XElement("dict");
 			{
-				foreach (KeyValuePair<string, PlistElement> item in jDMGABPEDFI.NGEGAPEEGPN())
+				foreach (KeyValuePair<string, PlistElement> item in jDMGABPEDFI.GetValues())
 				{
 					XElement content = new XElement("key", item.Key);
-					XElement xElement2 = AOHOBAEHMCO(item.Value);
+					XElement xElement2 = WriteElement(item.Value);
 					if (xElement2 != null)
 					{
 						xElement.Add(content);
@@ -175,9 +175,9 @@ public class PlistDocument
 			PlistElementArray gHFPDLCPEBH = NCDBEBJGHPP as PlistElementArray;
 			XElement xElement3 = new XElement("array");
 			{
-				foreach (PlistElement item2 in gHFPDLCPEBH.AMMFNLMJJFM)
+				foreach (PlistElement item2 in gHFPDLCPEBH.values)
 				{
-					XElement xElement4 = AOHOBAEHMCO(item2);
+					XElement xElement4 = WriteElement(item2);
 					if (xElement4 != null)
 					{
 						xElement3.Add(xElement4);
@@ -189,19 +189,19 @@ public class PlistDocument
 		return null;
 	}
 
-	public void OBPOMPDFKAD(string path)
+	public void WriteToFile(string path)
 	{
-		File.WriteAllText(path, AEGHEINPNIM());
+		File.WriteAllText(path, WriteToString());
 	}
 
 	public void WriteToStream(TextWriter MOAHDLDDEDF)
 	{
-		MOAHDLDDEDF.Write(AEGHEINPNIM());
+		MOAHDLDDEDF.Write(WriteToString());
 	}
 
-	public string AEGHEINPNIM()
+	public string WriteToString()
 	{
-		XElement content = AOHOBAEHMCO(AFHNINCKJEE);
+		XElement content = WriteElement(root);
 		XElement xElement = new XElement("plist");
 		xElement.Add(new XAttribute("version", version));
 		xElement.Add(content);

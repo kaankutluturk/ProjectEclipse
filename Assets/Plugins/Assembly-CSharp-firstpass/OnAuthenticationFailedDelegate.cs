@@ -1,0 +1,1 @@
+public delegate void OnAuthenticationFailedDelegate(IAuthenticationProvider EEGMFLOPLLH, string NEPOLDCKNJL);

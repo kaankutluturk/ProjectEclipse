@@ -34,8 +34,8 @@ foreach ($record in $records) {
     Check ($effective.GetValue($item) -eq $record.GetAttribute('TacticSubtype')) ('Canonical grouping lost: '+$record.GetAttribute('Name'))
 }
 $ai=[Runtime.Serialization.FormatterServices]::GetUninitializedObject([ModelAi])
-$own=[ModelAi].GetField('EIMKBOMDAAE',$flags)
-$enemy=[ModelAi].GetField('HCJOIHLKOKJ',$flags)
+$own=[ModelAi].GetField('botWeaponSubtype',$flags)
+$enemy=[ModelAi].GetField('enemyWeaponSubtype',$flags)
 $ai.SetWeaponEnemy('Katars')
 $ai.SetWeaponBot($effective.GetValue($mace))
 Check ($own.GetValue($ai) -eq 'TwoHanded' -and $enemy.GetValue($ai) -eq 'Katars') 'Own weapon update clobbered enemy grouping.'
@@ -103,10 +103,10 @@ try {
     Check ($null -ne $failure -and $failure.ToString().Contains('already patched')) 'Committed group conflict accepted.'
 } finally { $tx.Dispose() }
 Check ($mutable.ItemTacticSubtypes.Count -eq 1 -and $mutable.ItemTacticSubtypes[0].Group -eq 'Katars') 'Failed transaction partially published grouping.'
-$items=[Items]::new(); $mace.Name='fixture_weapon'; $items.HCDLKHKBEPF().Add($mace)
+$items=[Items]::new(); $mace.Name='fixture_weapon'; $items.GetAllItems().Add($mace)
 $adapter=[Eclipse.Modding.LegacyContentAdapter]::new($catalog)
 $adapter.ApplyItems($items)
-$adapter.ApplyPerksAndEnchantments([GameUtils]::FDEJIIDIPBI,[ForgeManager]::new())
+$adapter.ApplyPerksAndEnchantments([GameUtils]::PerkItemList,[ForgeManager]::new())
 Check ($effective.GetValue($mace) -eq 'Katars') 'Catalog group did not reach native item.'
 $remove=[Eclipse.Modding.LegacyContentAdapter].GetMethod('RemovePerksAndEnchantments',$flags)
 $null=$remove.Invoke($adapter,@())
@@ -114,10 +114,10 @@ Check ($effective.GetValue($mace) -eq 'TwoHanded') 'Adapter teardown did not res
 $broken=[Eclipse.Modding.LegacyContentAdapter]::new((Catalog 'Staff' $true))
 $broken.ApplyItems($items)
 $failure=$null
-try { $broken.ApplyPerksAndEnchantments([GameUtils]::FDEJIIDIPBI,[ForgeManager]::new()) } catch { $failure=$_ }
+try { $broken.ApplyPerksAndEnchantments([GameUtils]::PerkItemList,[ForgeManager]::new()) } catch { $failure=$_ }
 Check ($null -ne $failure -and $failure.ToString().Contains('tactic subtype')) 'Missing later native target did not fail.'
 Check ($effective.GetValue($mace) -eq 'TwoHanded') 'Partial application did not restore earlier native target.'
-$adapter.ApplyPerksAndEnchantments([GameUtils]::FDEJIIDIPBI,[ForgeManager]::new())
+$adapter.ApplyPerksAndEnchantments([GameUtils]::PerkItemList,[ForgeManager]::new())
 Check ($effective.GetValue($mace) -eq 'Katars') 'Rollback prevented later application.'
 $null=$remove.Invoke($adapter,@())
 Write-Output "Native item tactic subtype: $script:checks checks passed."

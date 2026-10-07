@@ -2,18 +2,18 @@ using System.Xml;
 
 public class QuestActionGiveAchievement : QuestAction
 {
-	private string KPONJNPDLCE = string.Empty;
+	private string achievementName = string.Empty;
 
 	public override void Parse(XmlNode EPKLCPOEELO)
 	{
 		base.Parse(EPKLCPOEELO);
-		KPONJNPDLCE = EPKLCPOEELO.Attributes["Name"].CIPOICEEIBK();
+		achievementName = EPKLCPOEELO.Attributes["Name"].GetStringOrDefault();
 	}
 
-	public override void DEJMHFMLKIC(QuestParameters GFIHPBCEEOB)
+	public override void Execute(QuestParameters GFIHPBCEEOB)
 	{
-		base.DEJMHFMLKIC(GFIHPBCEEOB);
-		Achievement jNPIOKEKMII = GameUtils.POFHBHOIMAI(KPONJNPDLCE);
-		OGIJONMKABB();
+		base.Execute(GFIHPBCEEOB);
+		Achievement jNPIOKEKMII = GameUtils.GiveAchievement(achievementName);
+		FinishAction();
 	}
 }

@@ -20,7 +20,7 @@ namespace Nekki.SF2.GUI.Fight
 			{
 				icon.set_SpriteName(INFKLFKKJOJ);
 			}
-			PMHOLIPDBLC();
+			UpdateLayoutWidth();
 		}
 
 		public void SetText(string value)
@@ -33,10 +33,10 @@ namespace Nekki.SF2.GUI.Fight
 				text.verticalOverflow = VerticalWrapMode.Overflow;
 				text.set_text(value);
 			}
-			PMHOLIPDBLC();
+			UpdateLayoutWidth();
 		}
 
-		private void PMHOLIPDBLC()
+		private void UpdateLayoutWidth()
 		{
 			if (layoutElement != null)
 			{

@@ -2,21 +2,21 @@ using System.Xml;
 
 public class QuestActionAttachFile : QuestAction
 {
-	private string IEICEKFPADK = string.Empty;
+	private string fileName = string.Empty;
 
 	public override void Parse(XmlNode EPKLCPOEELO)
 	{
 		base.Parse(EPKLCPOEELO);
-		IEICEKFPADK = EPKLCPOEELO.Attributes["File"].CIPOICEEIBK(string.Empty);
+		fileName = EPKLCPOEELO.Attributes["File"].GetStringOrDefault(string.Empty);
 	}
 
-	public override void DEJMHFMLKIC(QuestParameters GFIHPBCEEOB)
+	public override void Execute(QuestParameters GFIHPBCEEOB)
 	{
-		base.DEJMHFMLKIC(GFIHPBCEEOB);
-		if (IEICEKFPADK != string.Empty)
+		base.Execute(GFIHPBCEEOB);
+		if (fileName != string.Empty)
 		{
-			ListSF.GetInstance().PDCHBPKOBFI(IEICEKFPADK);
+			ListSF.GetInstance().LoadQuests(fileName);
 		}
-		OGIJONMKABB();
+		FinishAction();
 	}
 }

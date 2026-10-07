@@ -6,7 +6,7 @@ public class ComplexRule : Rule
 	private List<Rule> _rules = new List<Rule>();
 
 	public ComplexRule(XmlNode node)
-		: base(BCBLLMPAMLP.RuleComplex, node)
+		: base(RuleType.RuleComplex, node)
 	{
 		Parse(node);
 	}
@@ -20,7 +20,7 @@ public class ComplexRule : Rule
 		}
 	}
 
-	public List<Rule> BONNMLEJBJH()
+	public List<Rule> GetRules()
 	{
 		return _rules;
 	}
@@ -29,7 +29,7 @@ public class ComplexRule : Rule
 	{
 		foreach (XmlNode childNode in node.ChildNodes)
 		{
-			Rule gKAJMMNJBGA = RuleParser.LBDEIDNPJMO(childNode);
+			Rule gKAJMMNJBGA = RuleParser.ParseRule(childNode);
 			if (gKAJMMNJBGA != null)
 			{
 				_rules.Add(gKAJMMNJBGA);

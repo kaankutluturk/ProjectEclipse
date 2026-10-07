@@ -7,7 +7,7 @@ if ($start -lt 0 -or $end -le $start) { throw 'Native lifecycle methods not foun
 $methods = $source.Substring($start, $end - $start)
 foreach ($kind in @('Start','End')) {
     $hook = $source.IndexOf('public void OnAnimation' + $kind + '(object data)')
-    $native = $source.IndexOf('PerkEvent.KNKIIEPDCPN.EVENT_ANIMATION_' + $kind.ToUpperInvariant() + ', true);', $hook)
+    $native = $source.IndexOf('PerkEvent.PerkEventType.EVENT_ANIMATION_' + $kind.ToUpperInvariant() + ', true);', $hook)
     $notify = $source.IndexOf('NotifyEclipseAnimation(oJDOHGBGPFK.SourceModel, value, ModEffectEvent.Animation' + $kind + ');', $native)
     if ($hook -lt 0 -or $native -le $hook -or $notify -le $native -or ($notify-$native) -gt 160) {
         throw 'Lifecycle hook must immediately follow native perk notification.'
@@ -28,7 +28,7 @@ public class Round { public bool processing=true; public int round=1; }
 public class Harness {
     bool IsLocalVersus, _eclipseFightEndDispatched, _eclipseCombatDispatching, _eclipseOpponentDispatching;
     bool _eclipseFightBeginDispatched=true;
-    Model _playerModel=new Model(), CKNCPOABFBO=new Model();
+    Model _playerModel=new Model(), _enemyModel=new Model();
     Round round=new Round(); int fightTimeInFrame=42;
     public List<string> Seen=new List<string>();
     public Action<string> During;
@@ -48,7 +48,7 @@ __METHODS__
     public static void Main() {
         var h=new Harness(); var move=new InfoAnimation{Name="cast"};
         h.During=side=> { if(side=="player" && h.Seen.Count==1) {
-            h.NotifyEclipseAnimation(h.CKNCPOABFBO,new InfoAnimation{Name="hit"},ModEffectEvent.AnimationStart);
+            h.NotifyEclipseAnimation(h._enemyModel,new InfoAnimation{Name="hit"},ModEffectEvent.AnimationStart);
             h.NotifyEclipseAnimation(new Model(),move,ModEffectEvent.AnimationEnd);
             move.Name="mutated";h.fightTimeInFrame=43;
         }};

@@ -30,49 +30,49 @@ public class NekkiWebRequest
 
 	private object _externalData;
 
-	private Coroutine IFFCDIDKGCB;
+	private Coroutine _routine;
 
-	private UnityWebRequest AGGJFGBFMEH;
+	private UnityWebRequest _request;
 
-	private NekkiWebHandler KLHDMNAMAGH;
+	private NekkiWebHandler _handler;
 
-	private bool OHLIBLCPNEI;
+	private bool _aborted;
 
-	private bool CBBLPPKALMA;
+	private bool _timedOut;
 
-	private float DKNHEPEDDNG;
+	private float _lastProgressTime;
 
-	private readonly float ECCNMMJJKPC;
+	private readonly float _timeout;
 
 	private int _currentPosition;
 
-	private NekkiUri JDNMLANMPPK;
+	private NekkiUri _uri;
 
-	private bool JIHAABLAAOL;
+	private bool _checkCertificate;
 
-	private bool NCOLKNHMCPJ;
+	private bool _sendBlocked;
 
-	public bool ECBDGAJHOPF
+	public bool IsDone
 	{
 		get
 		{
-			return KPBEHFEBJJN();
+			return GetIsDone();
 		}
 	}
 
-	public bool KKIAPBNCOFH
+	public bool IsSuccessful
 	{
 		get
 		{
-			return BPILNIINAGK();
+			return GetIsSuccessful();
 		}
 	}
 
-	public bool DJIBNNOHJNO
+	public bool HasError
 	{
 		get
 		{
-			return OAOPGDNDGMF();
+			return GetHasError();
 		}
 	}
 
@@ -80,7 +80,7 @@ public class NekkiWebRequest
 	{
 		get
 		{
-			return KLMLKCKNNFD();
+			return GetUrl();
 		}
 	}
 
@@ -88,59 +88,59 @@ public class NekkiWebRequest
 	{
 		get
 		{
-			return KNFHEKMDFGM();
+			return GetError();
 		}
 	}
 
-	public byte[] IOBFHIMBDKM
+	public byte[] Bytes
 	{
 		get
 		{
-			return KJBFBPBCAOH();
+			return GetBytes();
 		}
 	}
 
-	public string GGDJIPKMKFC
+	public string Text
 	{
 		get
 		{
-			return ILMJJEMPKCN();
+			return GetText();
 		}
 	}
 
-	public float OIOANIMIIIA
+	public float DownloadProgress
 	{
 		get
 		{
-			return ALDEPEHMGNK();
+			return GetProgress();
 		}
 	}
 
-	public int NOPMKIAONBO
+	public int TotalBytes
 	{
 		get
 		{
-			return GFLHMBOBICA();
+			return GetTotalBytes();
 		}
 	}
 
-	public int JJCKADKCDIF
+	public int DownloadedBytes
 	{
 		get
 		{
-			return ECJPLFFAMJO();
+			return GetDownloadedBytes();
 		}
 	}
 
-	public event Action<NekkiWebRequest> CBKDIFCLCMO
+	public event Action<NekkiWebRequest> OnSuccess
 	{
 		add
 		{
-			FGJPDDAPFME(value);
+			AddOnSuccess(value);
 		}
 		remove
 		{
-			HDCJMHKBLIC(value);
+			RemoveOnSuccess(value);
 		}
 	}
 
@@ -148,83 +148,83 @@ public class NekkiWebRequest
 	{
 		add
 		{
-			BJDMHEHILEO(value);
+			AddOnError(value);
 		}
 		remove
 		{
-			LEIDAIFMPCE(value);
+			RemoveOnError(value);
 		}
 	}
 
-	public event Action<NekkiWebRequest> OGLIKFCADME
+	public event Action<NekkiWebRequest> OnProgressChanged
 	{
 		add
 		{
-			JIMPDHAOECM(value);
+			AddOnProgress(value);
 		}
 		remove
 		{
-			ECLIHLAOFNK(value);
+			RemoveOnProgress(value);
 		}
 	}
 
 	public NekkiWebRequest(float DGDKHFPEHOG = 5f)
 	{
-		ECCNMMJJKPC = DGDKHFPEHOG;
+		_timeout = DGDKHFPEHOG;
 		Reset();
 	}
 
-	public bool KPBEHFEBJJN()
+	public bool GetIsDone()
 	{
-		return AGGJFGBFMEH != null && (AGGJFGBFMEH.isDone || OAOPGDNDGMF());
+		return _request != null && (_request.isDone || GetHasError());
 	}
 
-	public bool BPILNIINAGK()
+	public bool GetIsSuccessful()
 	{
-		return KPBEHFEBJJN() && !OAOPGDNDGMF();
+		return GetIsDone() && !GetHasError();
 	}
 
-	public bool OAOPGDNDGMF()
+	public bool GetHasError()
 	{
-		return NCOLKNHMCPJ || AGGJFGBFMEH.isNetworkError || CBBLPPKALMA || (!AALFCHMFOEH() && !ECLICGHFOOP());
+		return _sendBlocked || _request.isNetworkError || _timedOut || (!IsSuccessStatusCode() && !IsPending());
 	}
 
-	public string KLMLKCKNNFD()
+	public string GetUrl()
 	{
-		return JDNMLANMPPK.OriginalString;
+		return _uri.OriginalString;
 	}
 
-	public string KNFHEKMDFGM()
+	public string GetError()
 	{
-		return IJEOAHEAEDC();
+		return BuildErrorText();
 	}
 
-	public byte[] KJBFBPBCAOH()
+	public byte[] GetBytes()
 	{
-		return AGGJFGBFMEH.downloadHandler.data;
+		return _request.downloadHandler.data;
 	}
 
-	public string ILMJJEMPKCN()
+	public string GetText()
 	{
-		return AGGJFGBFMEH.downloadHandler.text;
+		return _request.downloadHandler.text;
 	}
 
-	public float ALDEPEHMGNK()
+	public float GetProgress()
 	{
-		return (GFLHMBOBICA() <= 0) ? 0f : ((float)ECJPLFFAMJO() / (float)GFLHMBOBICA());
+		return (GetTotalBytes() <= 0) ? 0f : ((float)GetDownloadedBytes() / (float)GetTotalBytes());
 	}
 
-	public int GFLHMBOBICA()
+	public int GetTotalBytes()
 	{
-		return (!NekkiUtils.JDIKHMODKKF()) ? KLHDMNAMAGH.GFLHMBOBICA() : 0;
+		return (!NekkiUtils.IsEditorNotPlaying()) ? _handler.GetTotalBytes() : 0;
 	}
 
-	public int ECJPLFFAMJO()
+	public int GetDownloadedBytes()
 	{
-		return (!NekkiUtils.JDIKHMODKKF()) ? KLHDMNAMAGH.ECJPLFFAMJO() : ((int)AGGJFGBFMEH.downloadedBytes);
+		return (!NekkiUtils.IsEditorNotPlaying()) ? _handler.GetDownloadedBytes() : ((int)_request.downloadedBytes);
 	}
 
-	public void FGJPDDAPFME(Action<NekkiWebRequest> value)
+	public void AddOnSuccess(Action<NekkiWebRequest> value)
 	{
 		Action<NekkiWebRequest> action = OnSuccessful;
 		Action<NekkiWebRequest> action2;
@@ -236,7 +236,7 @@ public class NekkiWebRequest
 		while ((object)action != action2);
 	}
 
-	public void HDCJMHKBLIC(Action<NekkiWebRequest> value)
+	public void RemoveOnSuccess(Action<NekkiWebRequest> value)
 	{
 		Action<NekkiWebRequest> action = OnSuccessful;
 		Action<NekkiWebRequest> action2;
@@ -248,7 +248,7 @@ public class NekkiWebRequest
 		while ((object)action != action2);
 	}
 
-	public void BJDMHEHILEO(Action<NekkiWebRequest> value)
+	public void AddOnError(Action<NekkiWebRequest> value)
 	{
 		Action<NekkiWebRequest> action = onErrorField;
 		Action<NekkiWebRequest> action2;
@@ -260,7 +260,7 @@ public class NekkiWebRequest
 		while ((object)action != action2);
 	}
 
-	public void LEIDAIFMPCE(Action<NekkiWebRequest> value)
+	public void RemoveOnError(Action<NekkiWebRequest> value)
 	{
 		Action<NekkiWebRequest> action = onErrorField;
 		Action<NekkiWebRequest> action2;
@@ -272,7 +272,7 @@ public class NekkiWebRequest
 		while ((object)action != action2);
 	}
 
-	public void JIMPDHAOECM(Action<NekkiWebRequest> value)
+	public void AddOnProgress(Action<NekkiWebRequest> value)
 	{
 		Action<NekkiWebRequest> action = OnProgress;
 		Action<NekkiWebRequest> action2;
@@ -284,7 +284,7 @@ public class NekkiWebRequest
 		while ((object)action != action2);
 	}
 
-	public void ECLIHLAOFNK(Action<NekkiWebRequest> value)
+	public void RemoveOnProgress(Action<NekkiWebRequest> value)
 	{
 		Action<NekkiWebRequest> action = OnProgress;
 		Action<NekkiWebRequest> action2;
@@ -298,119 +298,119 @@ public class NekkiWebRequest
 
 	public virtual void Send(string JJEOAIKCKAM, bool GHIGJJCMEDI)
 	{
-		JIHAABLAAOL = GHIGJJCMEDI;
+		_checkCertificate = GHIGJJCMEDI;
 		Send(UnityWebRequest.Get(JJEOAIKCKAM));
 	}
 
 	public virtual void Send(string JJEOAIKCKAM, string MHAANIPLCJD, bool GHIGJJCMEDI)
 	{
-		JIHAABLAAOL = GHIGJJCMEDI;
+		_checkCertificate = GHIGJJCMEDI;
 		Send(UnityWebRequest.PostWwwForm(JJEOAIKCKAM, MHAANIPLCJD));
 	}
 
 	public virtual void Send(string JJEOAIKCKAM, Dictionary<string, string> MHAANIPLCJD, bool GHIGJJCMEDI)
 	{
-		JIHAABLAAOL = GHIGJJCMEDI;
+		_checkCertificate = GHIGJJCMEDI;
 		Send(UnityWebRequest.Post(JJEOAIKCKAM, MHAANIPLCJD));
 	}
 
 	private void Send(UnityWebRequest DLILAFJFLAI)
 	{
-		JDNMLANMPPK = new NekkiUri(DLILAFJFLAI.url);
-		KLHDMNAMAGH = GBMIBHMCDHC(JDNMLANMPPK);
-		DKNHEPEDDNG = Time.realtimeSinceStartup;
-		AGGJFGBFMEH = DLILAFJFLAI;
-		if (NekkiUtils.JDIKHMODKKF())
+		_uri = new NekkiUri(DLILAFJFLAI.url);
+		_handler = CreateHandler(_uri);
+		_lastProgressTime = Time.realtimeSinceStartup;
+		_request = DLILAFJFLAI;
+		if (NekkiUtils.IsEditorNotPlaying())
 		{
-			GPAGLIBCPFC();
+			SendBlocking();
 			return;
 		}
-		AGGJFGBFMEH.downloadHandler = KLHDMNAMAGH;
-		IFFCDIDKGCB = Routiner.Go(PHIJHLDLJGO());
+		_request.downloadHandler = _handler;
+		_routine = Routiner.Go(SendRoutine());
 	}
 
-	private IEnumerator PHIJHLDLJGO()
+	private IEnumerator SendRoutine()
 	{
-		EMPGOCGHMBI();
-		while (!KPBEHFEBJJN())
+		BeginSend();
+		while (!GetIsDone())
 		{
 			yield return new WaitForSecondsRealtime(1f / 60f);
-			DFGFNFFMCEC();
+			UpdateProgress();
 		}
-		FPKKPFBDEAG();
+		FinishRequest();
 	}
 
-	private void GPAGLIBCPFC()
+	private void SendBlocking()
 	{
-		EMPGOCGHMBI();
-		while (!KPBEHFEBJJN())
+		BeginSend();
+		while (!GetIsDone())
 		{
-			DFGFNFFMCEC();
+			UpdateProgress();
 		}
-		FPKKPFBDEAG();
+		FinishRequest();
 	}
 
-	private void EMPGOCGHMBI()
+	private void BeginSend()
 	{
-		NCOLKNHMCPJ = false;
-		if (!OfflineServices.IsLocalContent(KLMLKCKNNFD()))
+		_sendBlocked = false;
+		if (!OfflineServices.IsLocalContent(GetUrl()))
 		{
-			NCOLKNHMCPJ = true;
+			_sendBlocked = true;
 			return; // Completion/error handling remains in the normal request loop.
 		}
-		Log("WebRequest Send " + KLMLKCKNNFD());
-		if (JIHAABLAAOL && !CertificateValidator.GLHLIEOFFLN(KLMLKCKNNFD()))
+		Log("WebRequest Send " + GetUrl());
+		if (_checkCertificate && !CertificateValidator.IsTrustedUrl(GetUrl()))
 		{
-			NCOLKNHMCPJ = true;
+			_sendBlocked = true;
 			SendError(true);
 		}
 		else
 		{
-			AGGJFGBFMEH.Send();
+			_request.Send();
 		}
 	}
 
-	private void DFGFNFFMCEC()
+	private void UpdateProgress()
 	{
-		if (_currentPosition != ECJPLFFAMJO())
+		if (_currentPosition != GetDownloadedBytes())
 		{
-			_currentPosition = ECJPLFFAMJO();
-			DKNHEPEDDNG = Time.realtimeSinceStartup;
+			_currentPosition = GetDownloadedBytes();
+			_lastProgressTime = Time.realtimeSinceStartup;
 		}
 		else
 		{
-			CBBLPPKALMA = Time.realtimeSinceStartup - DKNHEPEDDNG >= ECCNMMJJKPC;
+			_timedOut = Time.realtimeSinceStartup - _lastProgressTime >= _timeout;
 		}
-		HMDOPBIDDMC();
+		SendProgress();
 	}
 
-	private void FPKKPFBDEAG()
+	private void FinishRequest()
 	{
-		if (KLHDMNAMAGH != null && NekkiUtils.JDIKHMODKKF())
+		if (_handler != null && NekkiUtils.IsEditorNotPlaying())
 		{
-			KLHDMNAMAGH.GEJLNPIEDPF();
+			_handler.ForceComplete();
 		}
-		if (BPILNIINAGK())
+		if (GetIsSuccessful())
 		{
-			JBEBPLHMDPF();
+			SendSuccess();
 		}
 		else
 		{
 			SendError();
 		}
-		AKLEEMEHBIC();
+		Abort();
 	}
 
-	protected virtual void JBEBPLHMDPF()
+	protected virtual void SendSuccess()
 	{
-		Log("WebRequest Successful " + KLMLKCKNNFD());
-		OnSuccessful.FEEGJDJIFEF(this);
-		DHFMAAFDMMM();
+		Log("WebRequest Successful " + GetUrl());
+		OnSuccessful.SafeInvoke(this);
+		ClearCallbacks();
 	}
 
 	protected virtual void SendError(bool BALCNGAKGKN = false)
 	{
-		string text = "WebRequest Error " + KLMLKCKNNFD() + " " + KNFHEKMDFGM();
+		string text = "WebRequest Error " + GetUrl() + " " + GetError();
 		if (BALCNGAKGKN)
 		{
 			UnityEngine.Debug.LogError(text);
@@ -419,50 +419,50 @@ public class NekkiWebRequest
 		{
 			Log(text);
 		}
-		onErrorField.FEEGJDJIFEF(this);
-		DHFMAAFDMMM();
+		onErrorField.SafeInvoke(this);
+		ClearCallbacks();
 	}
 
-	protected virtual void HMDOPBIDDMC()
+	protected virtual void SendProgress()
 	{
-		OnProgress.FEEGJDJIFEF(this);
+		OnProgress.SafeInvoke(this);
 	}
 
-	protected virtual NekkiWebHandler GBMIBHMCDHC(NekkiUri KJHNCLAJMLO)
+	protected virtual NekkiWebHandler CreateHandler(NekkiUri KJHNCLAJMLO)
 	{
 		return new NekkiWebHandlerRequest(KJHNCLAJMLO);
 	}
 
-	public void AKLEEMEHBIC(bool CMBGKNNPACJ = false)
+	public void Abort(bool CMBGKNNPACJ = false)
 	{
 		if (CMBGKNNPACJ)
 		{
 			SendError();
 		}
-		if (!OHLIBLCPNEI)
+		if (!_aborted)
 		{
-			AGGJFGBFMEH.Abort();
-			KLHDMNAMAGH.AKLEEMEHBIC();
-			OHLIBLCPNEI = true;
+			_request.Abort();
+			_handler.Abort();
+			_aborted = true;
 			_externalData = null;
 		}
-		if (IFFCDIDKGCB != null)
+		if (_routine != null)
 		{
-			Routiner.Stop(IFFCDIDKGCB);
-			IFFCDIDKGCB = null;
+			Routiner.Stop(_routine);
+			_routine = null;
 		}
 		Reset();
 	}
 
 	private void Reset()
 	{
-		OHLIBLCPNEI = false;
-		CBBLPPKALMA = false;
-		DKNHEPEDDNG = 0f;
+		_aborted = false;
+		_timedOut = false;
+		_lastProgressTime = 0f;
 		_currentPosition = 0;
 	}
 
-	private void DHFMAAFDMMM()
+	private void ClearCallbacks()
 	{
 		OnSuccessful = null;
 		onErrorField = null;
@@ -474,39 +474,39 @@ public class NekkiWebRequest
 		UnityEngine.Debug.Log(value);
 	}
 
-	private bool AALFCHMFOEH()
+	private bool IsSuccessStatusCode()
 	{
-		return 200 <= AGGJFGBFMEH.responseCode && AGGJFGBFMEH.responseCode < 300;
+		return 200 <= _request.responseCode && _request.responseCode < 300;
 	}
 
-	private bool ECLICGHFOOP()
+	private bool IsPending()
 	{
-		return !AGGJFGBFMEH.isDone;
+		return !_request.isDone;
 	}
 
-	private string IJEOAHEAEDC()
+	private string BuildErrorText()
 	{
-		if (NCOLKNHMCPJ)
+		if (_sendBlocked)
 		{
-			if (!OfflineServices.IsLocalContent(KLMLKCKNNFD())) return OfflineServices.Unavailable;
+			if (!OfflineServices.IsLocalContent(GetUrl())) return OfflineServices.Unavailable;
 			return "HTTPS certificate check error";
 		}
-		if (CBBLPPKALMA)
+		if (_timedOut)
 		{
 			return "Failed with timeout";
 		}
-		if (!AALFCHMFOEH())
+		if (!IsSuccessStatusCode())
 		{
-			return "Failed with responseCode - " + AGGJFGBFMEH.responseCode + " " + AGGJFGBFMEH.error;
+			return "Failed with responseCode - " + _request.responseCode + " " + _request.error;
 		}
-		return AGGJFGBFMEH.error;
+		return _request.error;
 	}
 
-	public T DNMMOIIDLOO<T>() where T : class
+	public T ParseJson<T>() where T : class
 	{
 		try
 		{
-			return JsonConvert.DeserializeObject<T>(ILMJJEMPKCN());
+			return JsonConvert.DeserializeObject<T>(GetText());
 		}
 		catch (Exception ex)
 		{
@@ -520,7 +520,7 @@ public class NekkiWebRequest
 		_externalData = value;
 	}
 
-	public T AMDAHKFJDNG<T>()
+	public T GetExternalData<T>()
 	{
 		return (T)_externalData;
 	}

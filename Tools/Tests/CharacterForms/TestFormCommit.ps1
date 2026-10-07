@@ -10,35 +10,35 @@ using System;
 using System.Collections.Generic;
 namespace UnityEngine{static class Debug{public static int Errors;public static void LogException(Exception e){Errors++;}}}
 class Surface{public bool activeSelf=true,FailNext;public void SetActive(bool value){if(FailNext){FailNext=false;throw new Exception("visibility");}activeSelf=value;}}
-class Model{public Model Owner;public Surface Surface=new Surface();public List<Model> Children=new List<Model>();public int Disposals;public bool FailDispose;public Model GetRootModel()=>Owner==null?this:Owner.GetRootModel();public List<Model>GetWeaponModels()=>Children;public Surface MJNPBMOAFML()=>Surface;public void FKIBECCHIJC(){}public void IMFOFFFLGOM(){Disposals++;if(FailDispose)throw new Exception("cleanup");}}
+class Model{public Model Owner;public Surface Surface=new Surface();public List<Model> Children=new List<Model>();public int Disposals;public bool FailDispose;public Model GetRootModel()=>Owner==null?this:Owner.GetRootModel();public List<Model>GetWeaponModels()=>Children;public Surface GetGameObject()=>Surface;public void DetachCurrentEffects(){}public void DestroyModel(){Disposals++;if(FailDispose)throw new Exception("cleanup");}}
 class Perks{public bool Reject;public HashSet<Model> Seen;public void RequireFormReferencesTransferred(ISet<Model> retired){Seen=new HashSet<Model>(retired);if(Reject)throw new InvalidOperationException("effect still references old body");}}
 class Fight{
 METHOD
-internal class PreparedFormModel:IDisposable{public Model Model;public Model Take(){var model=Model;Model=null;return model;}public void Dispose(){if(Model!=null){Model.IMFOFFFLGOM();Model=null;}}}
+internal class PreparedFormModel:IDisposable{public Model Model;public Model Take(){var model=Model;Model=null;return model;}public void Dispose(){if(Model!=null){Model.DestroyModel();Model=null;}}}
 internal class FormRenderBindings{public Fight Fight;public Model Old,Next;public bool Committed;public bool Owns(Fight fight,Model old,Model next)=>!Committed&&Fight==fight&&Old==old&&Next==next;public void Commit(){Committed=true;}}
-Model _playerModel,CKNCPOABFBO=new Model();HashSet<Model> _retiredFormBodies=new HashSet<Model>();
-List<Model> LNDLFINJHDB=new List<Model>(),HCPGFOCGDAA=new List<Model>(),JLEFIKJODGG=new List<Model>();Perks EPBDEDGLHJE=new Perks();
+Model _playerModel,_enemyModel=new Model();HashSet<Model> _retiredFormBodies=new HashSet<Model>();
+List<Model> ActiveModels=new List<Model>(),pendingModels=new List<Model>(),modelsToRemove=new List<Model>();Perks perksStage=new Perks();
 Model ActorBody,CancelledCaster;bool FailCancel;int ProjectileCancels;
-bool IsEclipseFormParticipant(Model model)=>model==_playerModel||model==CKNCPOABFBO||model==ActorBody;
+bool IsEclipseFormParticipant(Model model)=>model==_playerModel||model==_enemyModel||model==ActorBody;
 bool IsEclipseActorModel(Model model)=>model==ActorBody;
 void CancelEclipseActorProjectiles(Model model){CancelledCaster=model;ProjectileCancels++;if(FailCancel)throw new Exception("projectile cleanup");}
-void RemoveModel(Model model){model.IMFOFFFLGOM();}
+void RemoveModel(Model model){model.DestroyModel();}
 static void Check(bool value,string message){if(!value)throw new Exception(message);}
 static void Main(){
  foreach(bool visible in new[]{true,false}){
   var f=new Fight();var old=new Model();old.Surface.activeSelf=visible;var next=new Model();next.Surface.activeSelf=false;f._playerModel=next;
   var child=new Model{Owner=old};var nested=new Model{Owner=child};old.Children.Add(child);child.Children.Add(nested);
-  f.LNDLFINJHDB.AddRange(new[]{next,f.CKNCPOABFBO,child});f.HCPGFOCGDAA.Add(nested);f.JLEFIKJODGG.Add(child);
+  f.ActiveModels.AddRange(new[]{next,f._enemyModel,child});f.pendingModels.Add(nested);f.modelsToRemove.Add(child);
   var p=new PreparedFormModel{Model=next};var bindings=new FormRenderBindings{Fight=f,Old=old,Next=next};
-  f.EPBDEDGLHJE.Reject=true;bool failed=false;try{f.CommitPreparedForm(old,p,bindings);}catch(InvalidOperationException){failed=true;}
+  f.perksStage.Reject=true;bool failed=false;try{f.CommitPreparedForm(old,p,bindings);}catch(InvalidOperationException){failed=true;}
   Check(failed&&!bindings.Committed&&p.Model==next&&old.Disposals==0&&old.Surface.activeSelf==visible,"reference rejection before visibility/ownership/disposal");
-  f.EPBDEDGLHJE.Reject=false;next.Surface.FailNext=true;failed=false;try{f.CommitPreparedForm(old,p,bindings);}catch(Exception){failed=true;}
+  f.perksStage.Reject=false;next.Surface.FailNext=true;failed=false;try{f.CommitPreparedForm(old,p,bindings);}catch(Exception){failed=true;}
   Check(failed&&p.Model==next&&!bindings.Committed&&!next.Surface.activeSelf&&old.Surface.activeSelf==visible,"visibility failure keeps preparation and old body intact");
   f.CommitPreparedForm(old,p,bindings);p.Dispose();
   Check(bindings.Committed&&p.Model==null&&next.Disposals==0&&next.Surface.activeSelf==visible,"active body ownership and invisibility");
   Check(old.Disposals==1&&child.Disposals==1&&nested.Disposals==1,"body and nested helpers cleaned once");
-  Check(f.LNDLFINJHDB.Count==2&&f.HCPGFOCGDAA.Count==0&&f.JLEFIKJODGG.Count==0,"retired entries removed from simulation queues");
-  Check(f.EPBDEDGLHJE.Seen.Count==3,"reference preflight covers nested helpers");
+  Check(f.ActiveModels.Count==2&&f.pendingModels.Count==0&&f.modelsToRemove.Count==0,"retired entries removed from simulation queues");
+  Check(f.perksStage.Seen.Count==3,"reference preflight covers nested helpers");
   failed=false;try{f.CommitPreparedForm(old,p,bindings);}catch(InvalidOperationException){failed=true;}
   Check(failed&&old.Disposals==1&&next.Disposals==0,"duplicate commit rejected");
  }
@@ -46,11 +46,11 @@ static void Main(){
  var prepared=new PreparedFormModel{Model=active};var registration=new FormRenderBindings{Fight=cleanup,Old=retired,Next=active};
  cleanup.CommitPreparedForm(retired,prepared,registration);prepared.Dispose();
  Check(UnityEngine.Debug.Errors==1&&registration.Committed&&active.Disposals==0,"post-commit cleanup failure cannot dispose or reject replacement");
- var actorFight=new Fight();var oldActor=new Model();var nextActor=new Model();actorFight.ActorBody=nextActor;actorFight.LNDLFINJHDB.Add(nextActor);
+ var actorFight=new Fight();var oldActor=new Model();var nextActor=new Model();actorFight.ActorBody=nextActor;actorFight.ActiveModels.Add(nextActor);
  var actorPrepared=new PreparedFormModel{Model=nextActor};var actorBinding=new FormRenderBindings{Fight=actorFight,Old=oldActor,Next=nextActor};
- actorFight.EPBDEDGLHJE.Reject=true;bool actorRejected=false;try{actorFight.CommitPreparedForm(oldActor,actorPrepared,actorBinding);}catch(InvalidOperationException){actorRejected=true;}
+ actorFight.perksStage.Reject=true;bool actorRejected=false;try{actorFight.CommitPreparedForm(oldActor,actorPrepared,actorBinding);}catch(InvalidOperationException){actorRejected=true;}
  Check(actorRejected&&actorFight.ProjectileCancels==0&&actorPrepared.Model==nextActor,"rejected actor form keeps old caster projectiles and preparation");
- actorFight.EPBDEDGLHJE.Reject=false;actorFight.FailCancel=true;actorFight.CommitPreparedForm(oldActor,actorPrepared,actorBinding);actorPrepared.Dispose();
+ actorFight.perksStage.Reject=false;actorFight.FailCancel=true;actorFight.CommitPreparedForm(oldActor,actorPrepared,actorBinding);actorPrepared.Dispose();
  Check(actorFight.ProjectileCancels==1&&actorFight.CancelledCaster==oldActor&&actorBinding.Committed&&actorPrepared.Model==null&&nextActor.Disposals==0&&oldActor.Disposals==1,"committed actor form cancels old caster only; cancellation failure cannot reject or destroy active body");
  Console.WriteLine("PASS: production form commit; reference/visibility rejection, invisibility, ownership transfer, helper/queue retirement, duplicate commit and cleanup failure. Native object and registration services controlled.");
 }

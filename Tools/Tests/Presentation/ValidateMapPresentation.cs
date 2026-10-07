@@ -17,17 +17,17 @@ public class ProgressBar : MonoBehaviour {
     public ResolutionImage Background, Stripe;
     public void SetValueBorders(float a,float b) {} public void SetValue(float value) { Stripe.fillAmount=1; }
 }
-public static class Constants { public static string[] DNDKOMGCBLC = {"DifficultyBars.very_easy","DifficultyBars.easy","DifficultyBars.middle","DifficultyBars.hard","DifficultyBars.very_hard"}; }
+public static class Constants { public static string[] DifficultyBarSprites = {"DifficultyBars.very_easy","DifficultyBars.easy","DifficultyBars.middle","DifficultyBars.hard","DifficultyBars.very_hard"}; }
 public static class XmlHelpers {
-    public static string CIPOICEEIBK(this XmlAttribute a,string fallback) { return a == null ? fallback : a.Value; }
+    public static string GetStringOrDefault(this XmlAttribute a,string fallback) { return a == null ? fallback : a.Value; }
     public static float ParseFloat(this XmlAttribute a) { return float.Parse(a.Value,System.Globalization.CultureInfo.InvariantCulture); }
 }
 public static class ResourcesAndBundles { public static T Load<T>(string path) where T:UnityEngine.Object { return Resources.Load<T>(path); } }
 public static class AtlasCache { public static Sprite GetSpriteFromAtlas(string path,string name) { return null; } }
-public class GameCurrency { public string MJBPMLCLMFN="ComboButtons.base_damage"; }
+public class GameCurrency { public string Icon="ComboButtons.base_damage"; }
 public class Roster { public int GetCurrencyCount(GameCurrency c) { return int.MaxValue; } }
-public static class ListSF { public static Roster CCDKHLAMKKO() { return new Roster(); } }
-public static class LocalizationManager { public static Font MBPJIKFOEBJ() { return Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf"); } }
+public static class ListSF { public static Roster GetRoster() { return new Roster(); } }
+public static class LocalizationManager { public static Font GetContentFont() { return Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf"); } }
 public static class ValidateMapPresentation {
     static void Require(bool ok,string message) { if(!ok) throw new Exception(message); }
     static void Field(object target,string name,object value) { target.GetType().GetField(name,BindingFlags.NonPublic|BindingFlags.Instance).SetValue(target,value); }

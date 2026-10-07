@@ -10,30 +10,30 @@ public class MeshNode
 
 	public Vector3[] Vertices;
 
-	private List<ModelNode> MFONEBKEMAD = new List<ModelNode>();
+	private List<ModelNode> nodes = new List<ModelNode>();
 
 	private List<int> _TrianglesList = new List<int>();
 
 	// best guess for name
 	public void AddTriangle(ModelNode FJKBEFJGAHF, ModelNode GMHJFPCFFMM, ModelNode PNMPELDMCJF, string figureName = "")
 	{
-		int item = ENNKELDABMG(FJKBEFJGAHF);
-		int item2 = ENNKELDABMG(GMHJFPCFFMM);
-		int item3 = ENNKELDABMG(PNMPELDMCJF);
+		int item = GetOrAddNodeIndex(FJKBEFJGAHF);
+		int item2 = GetOrAddNodeIndex(GMHJFPCFFMM);
+		int item3 = GetOrAddNodeIndex(PNMPELDMCJF);
 		_TrianglesList.Add(item);
 		_TrianglesList.Add(item2);
 		_TrianglesList.Add(item3);
         _FigureNames.Add(figureName);
 	}
 
-	private int ENNKELDABMG(ModelNode MEEAKLDGLDF)
+	private int GetOrAddNodeIndex(ModelNode MEEAKLDGLDF)
 	{
-		if (MFONEBKEMAD.Contains(MEEAKLDGLDF))
+		if (nodes.Contains(MEEAKLDGLDF))
 		{
-			return MFONEBKEMAD.IndexOf(MEEAKLDGLDF);
+			return nodes.IndexOf(MEEAKLDGLDF);
 		}
-		MFONEBKEMAD.Add(MEEAKLDGLDF);
-		return MFONEBKEMAD.Count - 1;
+		nodes.Add(MEEAKLDGLDF);
+		return nodes.Count - 1;
 	}
 
 	public void Init()
@@ -41,7 +41,7 @@ public class MeshNode
 		Triangles = _TrianglesList.ToArray();
         FigureNames = _FigureNames.ToArray();
         _FigureNames = null;
-		Vertices = new Vector3[MFONEBKEMAD.Count];
+		Vertices = new Vector3[nodes.Count];
 		_TrianglesList = null;
 	}
 
@@ -52,7 +52,7 @@ public class MeshNode
 			float x;
 			float y;
 			float z;
-			FightInterpolation.SamplePosition(MFONEBKEMAD[i], alpha, out x, out y, out z);
+			FightInterpolation.SamplePosition(nodes[i], alpha, out x, out y, out z);
 			Vertices[i].Set(x, y, preserveDepth ? z : 0f);
 		}
 	}

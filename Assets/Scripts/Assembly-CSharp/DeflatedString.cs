@@ -10,12 +10,12 @@ public class DeflatedString
 		_Node = node;
 	}
 
-	public XmlNode IOJIGDNFCFL()
+	public XmlNode GetNode()
 	{
 		return _Node;
 	}
 
-	public static string ECDPKBEEPEE(XmlNode node, int FCOACAMEHOE = 0)
+	public static string NodeToString(XmlNode node, int FCOACAMEHOE = 0)
 	{
 		using (StringWriter stringWriter = new StringWriter())
 		{

@@ -45,7 +45,7 @@ public class EnterScreen : MonoBehaviour
 	// best guess for name
 	private float _originalMusicVolume;
 
-	private float ALGOCMIFECI;
+	private float currentMusicVolume;
 
 	public static EnterScreen Create()
 	{
@@ -67,8 +67,8 @@ public class EnterScreen : MonoBehaviour
 	{
 		_dlg = ODDEOFKLIAG;
 		SetVisible(false);
-		CCDGDBJLLNG();
-		PDCFDHNFCIG(MIN_OPACITY);
+		CaptureMusicVolume();
+		SetForegroundAlpha(MIN_OPACITY);
 		if (_label != null && IGLEKOAILHD.Count > 0)
 		{
 			SetLine(IGLEKOAILHD[0].Key, resolved);
@@ -114,8 +114,8 @@ public class EnterScreen : MonoBehaviour
 			_label.set_Alias(HCPNFPMHFCM);
 		}
 		SetVisible(false);
-		CCDGDBJLLNG();
-		PDCFDHNFCIG(MIN_OPACITY);
+		CaptureMusicVolume();
+		SetForegroundAlpha(MIN_OPACITY);
 		DG.Tweening.Sequence t = MuteMusicSequence();
 		DG.Tweening.Sequence s = DOTween.Sequence();
         _presentation = s;
@@ -138,14 +138,14 @@ public class EnterScreen : MonoBehaviour
 	public DG.Tweening.Sequence MuteMusicSequence()
 	{
 		DG.Tweening.Sequence sequence = DOTween.Sequence();
-		sequence.Append(DOTween.To(() => ALGOCMIFECI, (float DHDMNHCIPEH) =>
+		sequence.Append(DOTween.To(() => currentMusicVolume, (float DHDMNHCIPEH) =>
 		{
-			ALGOCMIFECI = DHDMNHCIPEH;
-			Sound.OAFCOFNOIJK(ALGOCMIFECI);
+			currentMusicVolume = DHDMNHCIPEH;
+			Sound.SetMusicVolume(currentMusicVolume);
 		}, 0f, fadeTime));
 		sequence.AppendCallback(() =>
 		{
-			Sound.OAFCOFNOIJK(_originalMusicVolume);
+			Sound.SetMusicVolume(_originalMusicVolume);
 			Sound.StopMusic();
 		});
 		return sequence;
@@ -174,11 +174,11 @@ public class EnterScreen : MonoBehaviour
         _dlg = null;
         _presentation?.Kill();
         _presentation = null;
-		if (_musicCaptured) Sound.OAFCOFNOIJK(_originalMusicVolume);
-		if (_musicCaptured && !Sound.ELHMADOKHHE())
+		if (_musicCaptured) Sound.SetMusicVolume(_originalMusicVolume);
+		if (_musicCaptured && !Sound.GetMusicMuted())
 		{
 			SoundController.IsBackgroundMusicIntro = false;
-			SoundController.KHPHDKFDCLL();
+			SoundController.StartBackgroundMusic();
 		}
 		if (destroyObject) UnityEngine.Object.Destroy(base.gameObject);
 	}
@@ -214,26 +214,26 @@ public class EnterScreen : MonoBehaviour
 
 	private void PlayMusic()
 	{
-		if (!Sound.ELHMADOKHHE())
+		if (!Sound.GetMusicMuted())
 		{
-			Sound.OAFCOFNOIJK(_originalMusicVolume);
+			Sound.SetMusicVolume(_originalMusicVolume);
 			Sound.StopMusic();
 			SoundController.IsBackgroundMusicIntro = false;
-			SoundController.KHPHDKFDCLL("act", false);
+			SoundController.StartBackgroundMusic("act", false);
 		}
 	}
 
-	private void CCDGDBJLLNG()
+	private void CaptureMusicVolume()
 	{
-		if (!Sound.ELHMADOKHHE())
+		if (!Sound.GetMusicMuted())
 		{
-			_originalMusicVolume = Sound.EAIGFAPKILL();
+			_originalMusicVolume = Sound.GetMusicVolume();
             _musicCaptured = true;
-			ALGOCMIFECI = _originalMusicVolume;
+			currentMusicVolume = _originalMusicVolume;
 		}
 	}
 
-	private void PDCFDHNFCIG(float KGJALFLDIBG)
+	private void SetForegroundAlpha(float KGJALFLDIBG)
 	{
 		if (_foreground != null)
 		{

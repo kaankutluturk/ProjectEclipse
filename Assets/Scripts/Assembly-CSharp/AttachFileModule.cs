@@ -1,11 +1,11 @@
 public class AttachFileModule : LoadingModule
 {
-	public override void JLPMOKPFECK()
+	public override void ProcessStep()
 	{
-		if (!CHIHBINEGFL)
+		if (!isFinished)
 		{
-			GameLoader.EIBJELAJHCH();
-			CHIHBINEGFL = true;
+			GameLoader.LoadSettings();
+			isFinished = true;
 		}
 	}
 }

@@ -363,7 +363,7 @@ namespace Eclipse.UI
             // the given viewport aspect) to the fight's x coordinate (0 at the left wall).
             public float PageToFightX(float pageOffset, float aspect)
             {
-                float height = location.FEIHFIPFNKF, width = location.JMLAKAKDBBL;
+                float height = location.height, width = location.width;
                 float visible = Mathf.Min(height, width / Mathf.Max(.01f, aspect));
                 return width * .5f + pageOffset * visible / (720f * StageOverscan);
             }
@@ -378,7 +378,7 @@ namespace Eclipse.UI
                 var first = Eclipse.Multiplayer.LocalVersusMatch.PrepareTitleFighter(left, true, "Standard");
                 var second = Eclipse.Multiplayer.LocalVersusMatch.PrepareTitleFighter(right, false, "Aggressive");
                 sparring = Fight.CreateTitleSparring(location, render, first, second, leftX, rightX,
-                    location.MFAPMDDJBBL, location.JMLAKAKDBBL - location.MFAPMDDJBBL);
+                    location.wallWidth, location.width - location.wallWidth);
             }
 
             public void RemoveFighters()
@@ -393,9 +393,9 @@ namespace Eclipse.UI
             // the fight floor sits Floor units above the location's bottom edge.
             public float GroundFraction(float aspect)
             {
-                float height = location.FEIHFIPFNKF, width = location.JMLAKAKDBBL;
+                float height = location.height, width = location.width;
                 float visible = Mathf.Min(height, width / Mathf.Max(.01f, aspect));
-                float ground = height * .5f - location.GBNPHCHGKDO;
+                float ground = height * .5f - location.floorHeight;
                 return .5f + ground / visible;
             }
 
@@ -482,10 +482,10 @@ namespace Eclipse.UI
                         if (module is AntichitingModule) CreateSandbox();
                         var moduleWatch = System.Diagnostics.Stopwatch.StartNew();
                         module.Start();
-                        for (int step = 0; !module.GCHANFIHDGH(); step++)
+                        for (int step = 0; !module.IsFinished(); step++)
                         {
                             if (step > 16) throw new InvalidOperationException(module.GetType().Name + " did not finish.");
-                            module.JLPMOKPFECK();
+                            module.ProcessStep();
                         }
                         record(module.GetType().Name, moduleWatch.ElapsedMilliseconds);
                     }
@@ -515,22 +515,22 @@ namespace Eclipse.UI
                     record(name, timer.ElapsedMilliseconds);
                 };
                 step("variables", GameUtils.InitVariables);
-                step("settings", GameSettings.OCIPKAONMOP);
-                step("animations", GameLoader.BJLLJHDFMOO);
-                step("AI", GameLoader.POLKDKOOACO);
+                step("settings", GameSettings.LoadAllSettings);
+                step("animations", GameLoader.LoadAnimations);
+                step("AI", GameLoader.LoadAi);
                 step("ListSF", () => ListSF.GetInstance().LoadTitlePreview());
-                step("perk tree", () => PerkTree.GBPBIPFIOJH().LJHPGKAOIAE());
-                step("settings finish", GameSettings.LNNLDPLDABI);
+                step("perk tree", () => PerkTree.GetInstance().RebuildProfile());
+                step("settings finish", GameSettings.ApplyQualityOptions);
                 step("sound", GameLoader.SetSound);
                 step("localization", LocalizationManager.Init);
-                step("finish", GameUtils.OEKOKKCILAG);
+                step("finish", GameUtils.ScheduleStartupNotifications);
             }
 
             // The game reads user data from disk only under its data root (XmlUtils.OpenXMLDocument
             // treats any other path as a bundled resource), so the sandbox sits beside userdata.
             private static void CreateSandbox()
             {
-                string root = SF2Paths.FFKEDOBDLOL;
+                string root = SF2Paths.UserDataRoot;
                 if (string.IsNullOrEmpty(root)) throw new InvalidOperationException("The game data root is not set up.");
                 sandbox = (root.TrimEnd('/', '\\') + "/EclipseTitlePreview").Replace('\\', '/');
                 if (Directory.Exists(sandbox)) Directory.Delete(sandbox, true);
@@ -543,10 +543,10 @@ namespace Eclipse.UI
             // sandbox directly, leaving that module's version bookkeeping untouched.
             private static void SeedSandboxProfile()
             {
-                var profile = XmlUtils.OpenXMLDocument(SF2Paths.KKIDGPBOBNI(), "usersDefault.xml", XmlUtils.EBLFEPIOMOL.Normal, true,
-                    XmlCryptoUtils.NNLGALNDJCL());
+                var profile = XmlUtils.OpenXMLDocument(SF2Paths.GetGameDataPath(), "usersDefault.xml", XmlUtils.XmlSourceMode.Normal, true,
+                    XmlCryptoUtils.GetIsEncryptionEnabled());
                 if (profile == null) throw new InvalidOperationException("usersDefault.xml is missing.");
-                XmlUtils.ONLDJNLKKAL(profile, Path.Combine(sandbox, Constants.OJMIJINKBPJ).Replace('\\', '/'));
+                XmlUtils.SaveDocumentWithHash(profile, Path.Combine(sandbox, Constants.UsersFileName).Replace('\\', '/'));
             }
 
             public static void PrepareForEntry()

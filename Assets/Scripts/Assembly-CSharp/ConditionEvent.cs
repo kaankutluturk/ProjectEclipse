@@ -2,18 +2,18 @@ using System.Xml;
 
 public class ConditionEvent : ConditionAnimation
 {
-	private EventAnimation MHPOELBJAIJ;
+	private EventAnimation _event;
 
 	public ConditionEvent(XmlNode node)
 		: base(ConditionType.EVENT)
 	{
-		MHPOELBJAIJ = EventParser.Create(node);
-		MHPOELBJAIJ.Init(node);
+		_event = EventParser.Create(node);
+		_event.Init(node);
 	}
 
 	public override bool IsEqual(ModelConditions conditions)
 	{
-		bool flag = MHPOELBJAIJ.IsEqual(conditions.HFCIDBJJINB);
+		bool flag = _event.IsEqual(conditions.CurrentEvent);
 		return (!IsNot) ? flag : (!flag);
 	}
 }

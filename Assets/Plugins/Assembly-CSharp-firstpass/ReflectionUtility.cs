@@ -5,11 +5,11 @@ using System.Reflection;
 
 internal static class ReflectionUtility
 {
-	public static Type JIDNEGBGBGL(Type LFLGCDNKNJI, Type GLBGHAEDBDC)
+	public static Type GetImplementedGenericInterface(Type LFLGCDNKNJI, Type GLBGHAEDBDC)
 	{
 		foreach (Type item in GetImplementedInterfaces(LFLGCDNKNJI))
 		{
-			if (item.DOGPNFBHJAC() && item.GetGenericTypeDefinition() == GLBGHAEDBDC)
+			if (item.IsGenericTypeCheck() && item.GetGenericTypeDefinition() == GLBGHAEDBDC)
 			{
 				return item;
 			}
@@ -19,7 +19,7 @@ internal static class ReflectionUtility
 
 	public static IEnumerable<Type> GetImplementedInterfaces(Type LFLGCDNKNJI)
 	{
-		if (LFLGCDNKNJI.EDALBNGKHAD())
+		if (LFLGCDNKNJI.IsInterfaceCheck())
 		{
 			yield return LFLGCDNKNJI;
 		}

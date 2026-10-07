@@ -47,16 +47,16 @@ public static class CameraUnity
                 typeof(Eclipse.UI.TitleScreen).GetMethod("BeginCampaign",Hidden).Invoke(title,null);
                 var directory=SF2Paths.GetUserDataDirectory();
                 Check(Eclipse.Saves.CampaignSaveSession.PreviewDirectory==null&&directory.StartsWith(Application.persistentDataPath,StringComparison.OrdinalIgnoreCase)&&Application.persistentDataPath.Contains("CameraUnity-"),"Profile not isolated");
-                var profile=XmlUtils.OpenXMLDocument(SF2Paths.KKIDGPBOBNI(),"usersDefault.xml",XmlUtils.EBLFEPIOMOL.Normal,true,XmlCryptoUtils.NNLGALNDJCL());
+                var profile=XmlUtils.OpenXMLDocument(SF2Paths.GetGameDataPath(),"usersDefault.xml",XmlUtils.XmlSourceMode.Normal,true,XmlCryptoUtils.GetIsEncryptionEnabled());
                 ((System.Xml.XmlElement)profile.SelectSingleNode("/Root/Warriors/Warrior[@ID='1']")).SetAttribute("Tutorial","END");
-                Directory.CreateDirectory(directory);XmlUtils.ONLDJNLKKAL(profile,Path.Combine(directory,Constants.OJMIJINKBPJ).Replace('\\','/'));
+                Directory.CreateDirectory(directory);XmlUtils.SaveDocumentWithHash(profile,Path.Combine(directory,Constants.UsersFileName).Replace('\\','/'));
                 campaign=true;return;
             }
             if(!entered){
                 if(ModRuntime.Scripts==null||Module.GetInstance()==null||Eclipse.UI.TitleScreen.IsOpen||UnityEngine.Object.FindFirstObjectByType<Eclipse.UI.EclipseLoadingOverlay>()!=null)return;
                 var screen=Module.GetInstance().GetCurrentScreenType();if(screen!=ScreenType.ModuleDojo&&screen!=ScreenType.ModuleMap)return;
                 Check(!ModRuntime.Host.HasErrors,ModRuntime.Host.FormatReport());Check(ModRuntime.Host.EnabledMods.Any(m=>m.Id.Value=="example.camera-lab"),"Camera Lab not enabled");Check(!ModRuntime.Scripts.HasErrors,"Startup mod errors");
-                var encounter=ListSF.CHMCKGCDGCM(new FightIDS(ModRuntime.Scripts.Content.RuntimeFightId(DefinitionId.Parse("core:fights/zone_1/tournament/3"))));
+                var encounter=ListSF.GetFightById(new FightIDS(ModRuntime.Scripts.Content.RuntimeFightId(DefinitionId.Parse("core:fights/zone_1/tournament/3"))));
                 Check(encounter!=null,"Core encounter missing");entered=GameUtils.StartFight(encounter,false,null,true,false);return;
             }
             var fight=Fight.GetCurrentFight();if(fight==null||fight.get_FightTimeInFrames()<10)return;
@@ -75,41 +75,41 @@ public static class CameraUnity
                 slot=(ModCameraSlot)Field(fight,"_eclipseCamera");camera=(global::Camera)Field(fight,"_Camera");
                 var render=camera.GetRender();if(render==null)return;
                 gameLayer=(LocationSelector)Field(Field(render,"_location"),"gameLayer");
-                initialLayer=gameLayer.MJNPBMOAFML().transform.localPosition;initialScale=gameLayer.MJNPBMOAFML().transform.localScale.x;
+                initialLayer=gameLayer.GetLayerObject().transform.localPosition;initialScale=gameLayer.GetLayerObject().transform.localScale.x;
                 Check(slot.Settings==null&&surface.Read("status").Text=="Camera: released","Camera starts released");
                 Check(surface.TryClick("focus"),"Public Lua focus button");Next();break;
             case 1:
                 if(surface.Read("status").Text!="Camera: focus"||slot.Settings==null)return;
                 Check(slot.Settings.Zoom==1.3&&slot.Settings.OffsetY==-40,"Public Lua requested focus settings");
-                if(Math.Abs(gameLayer.MJNPBMOAFML().transform.localScale.x-initialScale)<.01)return;
-                Check(gameLayer.MJNPBMOAFML().transform.localPosition.y>initialLayer.y+20,"Native vertical pan applied");
+                if(Math.Abs(gameLayer.GetLayerObject().transform.localScale.x-initialScale)<.01)return;
+                Check(gameLayer.GetLayerObject().transform.localPosition.y>initialLayer.y+20,"Native vertical pan applied");
                 new GameObject("Camera focus capture").AddComponent<CameraFocusCapture>();
                 Check(surface.TryClick("sweep"),"Public Lua sweep button");Next();break;
             case 2:
                 if(surface.Read("status").Text!="Camera: sweep"||elapsed<.4)return;
                 Check(slot.Settings.Zoom==1.2&&slot.Settings.CenterX.HasValue,"Sweep replaced focus settings");
                 fight.SetPaused(true);pausedFrame=fight.get_FightTimeInFrames();
-                pausedLayer=gameLayer.MJNPBMOAFML().transform.localPosition;
+                pausedLayer=gameLayer.GetLayerObject().transform.localPosition;
                 playerPosition=player.GetRenderObject().transform.localPosition;enemyPosition=enemy.GetRenderObject().transform.localPosition;
-                playerHealth=player.KKMCHCNOHMB();enemyHealth=enemy.KKMCHCNOHMB();Next();break;
+                playerHealth=player.GetLife();enemyHealth=enemy.GetLife();Next();break;
             case 3:
                 if(elapsed<.5)return;
                 Check(fight.get_FightTimeInFrames()==pausedFrame,"Simulation clock paused");
-                Check(Vector3.Distance(gameLayer.MJNPBMOAFML().transform.localPosition,pausedLayer)<.02,"Lua sweep paused");
+                Check(Vector3.Distance(gameLayer.GetLayerObject().transform.localPosition,pausedLayer)<.02,"Lua sweep paused");
                 for(int i=0;i<200;i++)camera.RenderInterpolatedPresentation();
-                Check(Vector3.Distance(gameLayer.MJNPBMOAFML().transform.localPosition,pausedLayer)<.02,"Repeated native presentations do not accumulate pan");
-                Check(player.KKMCHCNOHMB()==playerHealth&&enemy.KKMCHCNOHMB()==enemyHealth,"Presentation redraw leaves health unchanged");
+                Check(Vector3.Distance(gameLayer.GetLayerObject().transform.localPosition,pausedLayer)<.02,"Repeated native presentations do not accumulate pan");
+                Check(player.GetLife()==playerHealth&&enemy.GetLife()==enemyHealth,"Presentation redraw leaves health unchanged");
                 Check(Vector3.Distance(player.GetRenderObject().transform.localPosition,playerPosition)<.001&&Vector3.Distance(enemy.GetRenderObject().transform.localPosition,enemyPosition)<.001,"Presentation redraw leaves local fighter poses unchanged");
                 Check(surface.TryClick("release")&&slot.Settings==null,"Release button works while paused");
                 camera.RenderInterpolatedPresentation();
-                Check(Math.Abs(gameLayer.MJNPBMOAFML().transform.localPosition.y-initialLayer.y)<.02,"Release removes vertical contribution");
-                Check(Math.Abs(gameLayer.MJNPBMOAFML().transform.localScale.x-initialScale)<.02,"Release restores current native zoom");
+                Check(Math.Abs(gameLayer.GetLayerObject().transform.localPosition.y-initialLayer.y)<.02,"Release removes vertical contribution");
+                Check(Math.Abs(gameLayer.GetLayerObject().transform.localScale.x-initialScale)<.02,"Release restores current native zoom");
                 Check(surface.TryClick("native"),"Native view button queues next tick");Check(slot.Settings==null,"Pause does not acquire new ownership");
                 fight.SetPaused(false);Next();break;
             case 4:
                 if(surface.Read("status").Text!="Camera: native"||slot.Settings==null)return;
                 Check(slot.Settings.CenterX==null&&slot.Settings.Zoom==null&&slot.Settings.OffsetY==0,"Owned native view uses defaults");
-                Check(Math.Abs(gameLayer.MJNPBMOAFML().transform.localPosition.y-initialLayer.y)<.02,"Owned native view has no pan");
+                Check(Math.Abs(gameLayer.GetLayerObject().transform.localPosition.y-initialLayer.y)<.02,"Owned native view has no pan");
                 Check(surface.TryClick("focus"),"Reacquire focus through retained handle");Next();break;
             case 5:
                 if(surface.Read("status").Text!="Camera: focus"||slot.Settings?.Zoom!=1.3)return;
@@ -121,7 +121,7 @@ public static class CameraUnity
                 surface.Close();Check(slot.Settings==null,"HUD close releases retained Lua ownership");
                 Check(provider.TryAcquireCamera(ModId.Parse("example.camera-lab"),new ModCameraSettings(600,-40,1.3),out orphan,out error),error);
                 Check(orphan.IsActive,"Unclaimed native control active");
-                typeof(Fight).GetMethod("HCNDAFDHACI",Hidden).Invoke(fight,new object[]{GameOverTypes.GAME_OVER_SURRENDER});
+                typeof(Fight).GetMethod("AbortFight",Hidden).Invoke(fight,new object[]{GameOverTypes.GAME_OVER_SURRENDER});
                 Check(!orphan.IsActive&&slot.Settings==null,"Surrender releases unclaimed ownership");
                 long before=ModRuntime.Scripts.CallbackDiagnostics.TimedCalls;
                 typeof(Fight).GetMethod("DispatchEclipseCombatEvent",Hidden).Invoke(fight,new object[]{ModEffectEvent.Tick,null,null,null,null});

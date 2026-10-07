@@ -6,9 +6,9 @@ using System.Reflection;
 
 public static class TypeConverterHelper
 {
-	public delegate bool DNEKCDAFFIG<T>(string value, out T DCJLKCFKCOM);
+	public delegate bool TryParseDelegate<T>(string value, out T DCJLKCFKCOM);
 
-	public static void JCPBBODBIBI<TConvertible, TConverter>() where TConverter : global::System.ComponentModel.TypeConverter
+	public static void RegisterTypeConverter<TConvertible, TConverter>() where TConverter : global::System.ComponentModel.TypeConverter
 	{
 		if (!TypeDescriptor.GetAttributes(typeof(TConvertible)).OfType<TypeConverterAttribute>().Any((TypeConverterAttribute LHBNIMGFKIB) => LHBNIMGFKIB.ConverterTypeName == typeof(TConverter).AssemblyQualifiedName))
 		{
@@ -45,14 +45,14 @@ public static class TypeConverterHelper
 	{
 		if (value == null || value is DBNull)
 		{
-			return (!ILDBENPMPNB.KLAAGAMNBOB()) ? null : Activator.CreateInstance(ILDBENPMPNB);
+			return (!ILDBENPMPNB.IsValueTypeCheck()) ? null : Activator.CreateInstance(ILDBENPMPNB);
 		}
 		Type type = value.GetType();
 		if (ILDBENPMPNB.IsAssignableFrom(type))
 		{
 			return value;
 		}
-		if (ILDBENPMPNB.DOGPNFBHJAC())
+		if (ILDBENPMPNB.IsGenericTypeCheck())
 		{
 			Type genericTypeDefinition = ILDBENPMPNB.GetGenericTypeDefinition();
 			if (genericTypeDefinition == typeof(Nullable<>))
@@ -62,7 +62,7 @@ public static class TypeConverterHelper
 				return Activator.CreateInstance(ILDBENPMPNB, obj);
 			}
 		}
-		if (ILDBENPMPNB.LCAJNDEBEFB())
+		if (ILDBENPMPNB.IsEnumCheck())
 		{
 			string text = value as string;
 			return (text == null) ? value : Enum.Parse(ILDBENPMPNB, text, true);
@@ -115,12 +115,12 @@ public static class TypeConverterHelper
 		{
 			try
 			{
-				MethodInfo methodInfo = ILDBENPMPNB.HBBFJLHBHPF("Parse", typeof(string), typeof(IFormatProvider));
+				MethodInfo methodInfo = ILDBENPMPNB.GetPublicStaticMethod("Parse", typeof(string), typeof(IFormatProvider));
 				if (methodInfo != null)
 				{
 					return methodInfo.Invoke(null, new object[2] { value, AGADJJPNKHG });
 				}
-				methodInfo = ILDBENPMPNB.HBBFJLHBHPF("Parse", typeof(string));
+				methodInfo = ILDBENPMPNB.GetPublicStaticMethod("Parse", typeof(string));
 				if (methodInfo != null)
 				{
 					return methodInfo.Invoke(null, new object[1] { value });
@@ -173,7 +173,7 @@ public static class TypeConverterHelper
 		}
 	}
 
-	public static T? TryParse<T>(string value, DNEKCDAFFIG<T> EGJGOEKBKEK) where T : struct
+	public static T? TryParse<T>(string value, TryParseDelegate<T> EGJGOEKBKEK) where T : struct
 	{
 		T DCJLKCFKCOM;
 		return (!EGJGOEKBKEK(value, out DCJLKCFKCOM)) ? ((T?)null) : new T?(DCJLKCFKCOM);

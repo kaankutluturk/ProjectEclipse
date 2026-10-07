@@ -6,75 +6,75 @@ using UnityEngine;
 
 public class Camera : global::EventDispatcher<object>
 {
-	private class IODNDCNLGEL
+	private class PendingBloodEffect
 	{
-		public Vector3f NAAPALOFBCI = new Vector3f();
+		public Vector3f Position = new Vector3f();
 
-		public Vector3f IHFFJPLMIAL = new Vector3f();
+		public Vector3f Impulse = new Vector3f();
 
 		public int count;
 
 		public bool isActive;
 	}
 
-	public enum KCEJHLIBPBL
+	public enum CameraEvent
 	{
 		onPauseFight = 0,
 		onResumeFight = 1,
 		onStopEffect = 2
 	}
 
-	private const float PNFKEBICIMM = 200f;
+	private const float MaxFollowSpeed = 200f;
 
-	private const float GKJLEIPCADD = 50f;
+	private const float MaxFollowDistance = 50f;
 
-	private IODNDCNLGEL JOGMEKGACJL = new IODNDCNLGEL();
+	private PendingBloodEffect _pendingBlood = new PendingBloodEffect();
 
-	private Render BMBGCIEFJGB;
+	private Render _render;
 
-	private GameUtils.HitEffect IONLHJIDACJ;
+	private GameUtils.HitEffect _hitEffect;
 
-	private GameUtils.ZoomEffect OOFFFLEFKFA;
+	private GameUtils.ZoomEffect _zoomEffect;
 
 	private List<Model> _models = new List<Model>();
 
-	private ModelNode NGOEHKEKBIL;
+	private ModelNode _targetNode;
 
-	private ModelNode JNBAHPMBLOL;
+	private ModelNode _positionNode;
 
 	private Location _location;
 
-	private ModelNode CIJJBMDDAFL;
+	private ModelNode _focusNode;
 
-	private ModelNode BGFPBMFKFGJ;
+	private ModelNode _secondaryFocusNode;
 
 	private PreFight _preFight;
 
-	private bool PMNEFPDLPCC;
+	private bool _isShowPending;
 
-	private bool HLDMKKKKAMI;
+	private bool _isHitPaused;
 
-	private float LLLNHELEKNF;
+	private float _hitPauseFrames;
 
-	private bool OHNBKMHOMJI;
+	private bool _isShaking;
 
-	private float BIPHAGJDGOL;
+	private float _shakeFramesLeft;
 
-	private float EPIPOLDCCHD;
+	private float _shakeDuration;
 
-	private bool NOLKMEPOJIE;
+	private bool _isZooming;
 
 	private int showZoomEffectCount;
 
-	private bool PMJCGFONEPA;
+	private bool _isEnabled;
 
-	public GameController OJINMMFLEEB;
+	public GameController FightController;
 
 	private GameObject _UnityObject;
 
 	private readonly FightCameraInterpolation _RenderInterpolation = new FightCameraInterpolation();
 
-	public Render DAAACGKPJAL
+	public Render ActiveRender
 	{
 		get
 		{
@@ -82,101 +82,101 @@ public class Camera : global::EventDispatcher<object>
 		}
 	}
 
-	public PreFight DJDMFJJBCEN
+	public PreFight PreFightView
 	{
 		get
 		{
-			return MCLEFJNHJIK();
+			return GetPreFight();
 		}
 	}
 
-	public bool FPCPJGBCFAA
+	public bool IsEnabled
 	{
 		get
 		{
-			return LIPGMBDIPBB();
+			return GetEnabled();
 		}
 		set
 		{
-			CLOBNBAHAHF(value);
+			SetEnabled(value);
 		}
 	}
 
-	public GameObject ICDCIANNAAI
+	public GameObject CameraObject
 	{
 		get
 		{
-			return MJNPBMOAFML();
+			return GetCameraObject();
 		}
 	}
 
-	public Vector3f EDJMMFAMBOD
+	public Vector3f FocusPosition
 	{
 		get
 		{
-			return HOKLGMEOMEI();
+			return GetFocusPosition();
 		}
 	}
 
-	public Vector3f CIFKJPOJHOL
+	public Vector3f CameraTarget
 	{
 		get
 		{
-			return NPJHOCJIPDL();
+			return GetCameraTarget();
 		}
 		set
 		{
-			MHKHHEMJFOK(value);
+			SetCameraTarget(value);
 		}
 	}
 
 	public Camera(Transform PKHKBAJOHHF)
 	{
 		CreateUnityObject(PKHKBAJOHHF);
-		NGOEHKEKBIL = new ModelNode("Camera");
-		JNBAHPMBLOL = new ModelNode("Position");
-		BMBGCIEFJGB = null;
+		_targetNode = new ModelNode("Camera");
+		_positionNode = new ModelNode("Position");
+		_render = null;
 		_preFight = null;
 		_location = null;
-		CIJJBMDDAFL = null;
-		HLDMKKKKAMI = false;
-		LLLNHELEKNF = 0f;
-		OHNBKMHOMJI = false;
-		BIPHAGJDGOL = 0f;
-		EPIPOLDCCHD = 0f;
-		IONLHJIDACJ = null;
+		_focusNode = null;
+		_isHitPaused = false;
+		_hitPauseFrames = 0f;
+		_isShaking = false;
+		_shakeFramesLeft = 0f;
+		_shakeDuration = 0f;
+		_hitEffect = null;
 		showZoomEffectCount = 0;
-		PMNEFPDLPCC = false;
-		PMJCGFONEPA = true;
+		_isShowPending = false;
+		_isEnabled = true;
 	}
 
 	// best guess for name
 	public Render GetRender()
 	{
-		return BMBGCIEFJGB;
+		return _render;
 	}
 
-	public PreFight MCLEFJNHJIK()
+	public PreFight GetPreFight()
 	{
 		return _preFight;
 	}
 
-	public bool LIPGMBDIPBB()
+	public bool GetEnabled()
 	{
-		return PMJCGFONEPA;
+		return _isEnabled;
 	}
 
-	public void CLOBNBAHAHF(bool value)
+	public void SetEnabled(bool value)
 	{
-		PMJCGFONEPA = value;
+		_isEnabled = value;
 	}
 
-	public GameObject MJNPBMOAFML()
+	public GameObject GetCameraObject()
 	{
 		return _UnityObject;
 	}
 
-	private float FGLAIPPLINB()
+	private float GetControllerScale()
 	{
 		float result = 1f;
 		if (!GraphicsController.LargeControlsEnabled())
@@ -188,24 +188,24 @@ public class Camera : global::EventDispatcher<object>
 
 	private void UpdateCameraPosition()
 	{
-		NGOEHKEKBIL.SetEnd();
-		ModelObject oIEODIEHJMH = BMBGCIEFJGB.FPNKBJPKKGB().KBMBCHDBMML();
-		ModelObject oIEODIEHJMH2 = BMBGCIEFJGB.FPNKBJPKKGB().BNGBCPKIHPD();
+		_targetNode.SetEnd();
+		ModelObject oIEODIEHJMH = _render.GetViewerModel().GetFirstFighter();
+		ModelObject oIEODIEHJMH2 = _render.GetViewerModel().GetSecondFighter();
 		if (oIEODIEHJMH != null && oIEODIEHJMH2 != null)
 		{
-			NGOEHKEKBIL.SetStart(Model.MHFFCMKNIKM(oIEODIEHJMH, oIEODIEHJMH2));
+			_targetNode.SetStart(Model.GetCameraMidpoint(oIEODIEHJMH, oIEODIEHJMH2));
 		}
 	}
 
 	private void CameraUpdate()
 	{
-		if (PMJCGFONEPA)
+		if (_isEnabled)
 		{
-			JNBAHPMBLOL.TimeStep(0f);
-			Vector3f eMAFACPEPDK = new Vector3f(NGOEHKEKBIL.GetEnd());
-			Vector3f eMAFACPEPDK2 = new Vector3f(NGOEHKEKBIL.GetStart());
-			Vector3f eMAFACPEPDK3 = new Vector3f(JNBAHPMBLOL.GetEnd());
-			Vector3f eMAFACPEPDK4 = new Vector3f(JNBAHPMBLOL.GetStart());
+			_positionNode.TimeStep(0f);
+			Vector3f eMAFACPEPDK = new Vector3f(_targetNode.GetEnd());
+			Vector3f eMAFACPEPDK2 = new Vector3f(_targetNode.GetStart());
+			Vector3f eMAFACPEPDK3 = new Vector3f(_positionNode.GetEnd());
+			Vector3f eMAFACPEPDK4 = new Vector3f(_positionNode.GetStart());
 			float num = 0f;
 			eMAFACPEPDK4.SetZ(num);
 			num = num;
@@ -213,54 +213,54 @@ public class Camera : global::EventDispatcher<object>
 			num = num;
 			eMAFACPEPDK2.SetZ(num);
 			eMAFACPEPDK.SetZ(num);
-			Vector3f aKKEJFKBIHF = Vector3f.MJOKEBGPHKB(eMAFACPEPDK2, eMAFACPEPDK);
-			Vector3f nBMEGFBPGFE = Vector3f.PHEFFKMOOCM(eMAFACPEPDK3, aKKEJFKBIHF);
-			Vector3f nBMEGFBPGFE2 = Vector3f.MJOKEBGPHKB(nBMEGFBPGFE, eMAFACPEPDK4);
-			Vector3f eMAFACPEPDK5 = Vector3f.MJOKEBGPHKB(eMAFACPEPDK2, eMAFACPEPDK4);
+			Vector3f aKKEJFKBIHF = Vector3f.op_Subtraction(eMAFACPEPDK2, eMAFACPEPDK);
+			Vector3f nBMEGFBPGFE = Vector3f.op_Addition(eMAFACPEPDK3, aKKEJFKBIHF);
+			Vector3f nBMEGFBPGFE2 = Vector3f.op_Subtraction(nBMEGFBPGFE, eMAFACPEPDK4);
+			Vector3f eMAFACPEPDK5 = Vector3f.op_Subtraction(eMAFACPEPDK2, eMAFACPEPDK4);
 			eMAFACPEPDK5.Multiply(0.15f);
-			Vector3f eMAFACPEPDK6 = Vector3f.PHEFFKMOOCM(nBMEGFBPGFE2, eMAFACPEPDK5);
-			if (eMAFACPEPDK6.IGJNMAOKEKK() > 200f)
+			Vector3f eMAFACPEPDK6 = Vector3f.op_Addition(nBMEGFBPGFE2, eMAFACPEPDK5);
+			if (eMAFACPEPDK6.GetLength2D() > 200f)
 			{
-				eMAFACPEPDK6.NBDMEIKNJBG();
+				eMAFACPEPDK6.Normalize();
 				eMAFACPEPDK6.Multiply(200f);
 			}
 			eMAFACPEPDK4.Add(eMAFACPEPDK6);
-			Vector3f eMAFACPEPDK7 = Vector3f.MJOKEBGPHKB(eMAFACPEPDK4, eMAFACPEPDK3);
-			float num2 = eMAFACPEPDK7.IGJNMAOKEKK();
+			Vector3f eMAFACPEPDK7 = Vector3f.op_Subtraction(eMAFACPEPDK4, eMAFACPEPDK3);
+			float num2 = eMAFACPEPDK7.GetLength2D();
 			if (num2 > 50f)
 			{
 				eMAFACPEPDK7.Multiply(50f / num2);
-				eMAFACPEPDK4 = Vector3f.PHEFFKMOOCM(eMAFACPEPDK3, eMAFACPEPDK7);
+				eMAFACPEPDK4 = Vector3f.op_Addition(eMAFACPEPDK3, eMAFACPEPDK7);
 			}
-			JNBAHPMBLOL.SetStart(eMAFACPEPDK4);
+			_positionNode.SetStart(eMAFACPEPDK4);
 		}
 	}
 
 	private void DrawPosition()
 	{
-		Vector3f jEBIHODAIKM = NGOEHKEKBIL.GetStart();
-		Vector3f eMAFACPEPDK = CIJJBMDDAFL.GetStart();
-		if (NOLKMEPOJIE)
+		Vector3f jEBIHODAIKM = _targetNode.GetStart();
+		Vector3f eMAFACPEPDK = _focusNode.GetStart();
+		if (_isZooming)
 		{
-			BMBGCIEFJGB.UpdatePosition(JNBAHPMBLOL.GetStart(), jEBIHODAIKM, eMAFACPEPDK.GetX(), eMAFACPEPDK.GetY(), OOFFFLEFKFA.ALOKJEILMLK);
+			_render.UpdatePosition(_positionNode.GetStart(), jEBIHODAIKM, eMAFACPEPDK.GetX(), eMAFACPEPDK.GetY(), _zoomEffect.CurrentScale);
 		}
 		else
 		{
-			BMBGCIEFJGB.UpdatePosition(JNBAHPMBLOL.GetStart(), jEBIHODAIKM, eMAFACPEPDK.GetX(), eMAFACPEPDK.GetY());
+			_render.UpdatePosition(_positionNode.GetStart(), jEBIHODAIKM, eMAFACPEPDK.GetX(), eMAFACPEPDK.GetY());
 		}
 	}
 
 	private void DrawInterpolatedPosition(float alpha)
 	{
-		if (CIJJBMDDAFL == null)
+		if (_focusNode == null)
 		{
 			return;
 		}
-		_RenderInterpolation.SamplePositions(JNBAHPMBLOL, NGOEHKEKBIL, CIJJBMDDAFL, alpha);
-		if (NOLKMEPOJIE)
+		_RenderInterpolation.SamplePositions(_positionNode, _targetNode, _focusNode, alpha);
+		if (_isZooming)
 		{
 			float zoomScale = _RenderInterpolation.SampleZoomScale(alpha);
-			BMBGCIEFJGB.UpdatePosition(
+			_render.UpdatePosition(
 				_RenderInterpolation.CameraPosition,
 				_RenderInterpolation.CameraTarget,
 				_RenderInterpolation.FocusPosition.GetX(),
@@ -269,7 +269,7 @@ public class Camera : global::EventDispatcher<object>
 		}
 		else
 		{
-			BMBGCIEFJGB.UpdatePosition(
+			_render.UpdatePosition(
 				_RenderInterpolation.CameraPosition,
 				_RenderInterpolation.CameraTarget,
 				_RenderInterpolation.FocusPosition.GetX(),
@@ -279,106 +279,106 @@ public class Camera : global::EventDispatcher<object>
 
 	private void DrawQuakeEffect()
 	{
-		if (OHNBKMHOMJI && IONLHJIDACJ != null)
+		if (_isShaking && _hitEffect != null)
 		{
-			float ePIPOLDCCHD = EPIPOLDCCHD;
-			float num = EPIPOLDCCHD - BIPHAGJDGOL;
-			float strength = IONLHJIDACJ.Type == "CriticalHit" ? Eclipse.UI.AccessibilitySettings.CriticalShake : 1f;
-			float fMICELIGLPG = IONLHJIDACJ.FMICELIGLPG * strength;
-			float pPKAMOILNLN = IONLHJIDACJ.PPKAMOILNLN * strength;
-			float kFEMKHHANDC = IONLHJIDACJ.KFEMKHHANDC;
-			float gGJBPLHAHFH = IONLHJIDACJ.GGJBPLHAHFH;
+			float ePIPOLDCCHD = _shakeDuration;
+			float num = _shakeDuration - _shakeFramesLeft;
+			float strength = _hitEffect.Type == "CriticalHit" ? Eclipse.UI.AccessibilitySettings.CriticalShake : 1f;
+			float fMICELIGLPG = _hitEffect.AmplitudeX * strength;
+			float pPKAMOILNLN = _hitEffect.AmplitudeY * strength;
+			float kFEMKHHANDC = _hitEffect.FrequencyX;
+			float gGJBPLHAHFH = _hitEffect.FrequencyY;
 			float num2 = Mathf.Sin(kFEMKHHANDC * num) * fMICELIGLPG * (ePIPOLDCCHD - num) / ePIPOLDCCHD;
 			float num3 = Mathf.Sin(gGJBPLHAHFH * num) * pPKAMOILNLN * (ePIPOLDCCHD - num) / ePIPOLDCCHD;
-			num2 *= SystemProperties.NHIDNIPGCPC;
-			num3 *= SystemProperties.NHIDNIPGCPC;
-			BMBGCIEFJGB.PGJEGJKFHND(num2, num3);
+			num2 *= SystemProperties.ScaleY;
+			num3 *= SystemProperties.ScaleY;
+			_render.SetRootPosition(num2, num3);
 		}
 	}
 
 	private void DrawInterpolatedQuakeEffect(float alpha)
 	{
-		if (OHNBKMHOMJI && IONLHJIDACJ != null)
+		if (_isShaking && _hitEffect != null)
 		{
-			float duration = EPIPOLDCCHD;
-			float elapsed = Mathf.Max(0f, EPIPOLDCCHD - BIPHAGJDGOL - (1f - alpha));
-			float x = Mathf.Sin(IONLHJIDACJ.KFEMKHHANDC * elapsed) * IONLHJIDACJ.FMICELIGLPG * (duration - elapsed) / duration;
-			float y = Mathf.Sin(IONLHJIDACJ.GGJBPLHAHFH * elapsed) * IONLHJIDACJ.PPKAMOILNLN * (duration - elapsed) / duration;
-			float strength = IONLHJIDACJ.Type == "CriticalHit" ? Eclipse.UI.AccessibilitySettings.CriticalShake : 1f;
-			BMBGCIEFJGB.PGJEGJKFHND(x * SystemProperties.NHIDNIPGCPC * strength, y * SystemProperties.NHIDNIPGCPC * strength);
+			float duration = _shakeDuration;
+			float elapsed = Mathf.Max(0f, _shakeDuration - _shakeFramesLeft - (1f - alpha));
+			float x = Mathf.Sin(_hitEffect.FrequencyX * elapsed) * _hitEffect.AmplitudeX * (duration - elapsed) / duration;
+			float y = Mathf.Sin(_hitEffect.FrequencyY * elapsed) * _hitEffect.AmplitudeY * (duration - elapsed) / duration;
+			float strength = _hitEffect.Type == "CriticalHit" ? Eclipse.UI.AccessibilitySettings.CriticalShake : 1f;
+			_render.SetRootPosition(x * SystemProperties.ScaleY * strength, y * SystemProperties.ScaleY * strength);
 		}
 	}
 
 	private void DrawZoomEffect()
 	{
-		if (!NOLKMEPOJIE)
+		if (!_isZooming)
 		{
 			return;
 		}
-		float num = Mathf.Abs(OOFFFLEFKFA.JCNPAOMNJCL - OOFFFLEFKFA.AFBPPNDBMEC) / ((float)OOFFFLEFKFA.OFJCKMNLAEP / 2f);
-		if (OOFFFLEFKFA.BJDFMKOCNBN <= OOFFFLEFKFA.OFJCKMNLAEP / 2)
+		float num = Mathf.Abs(_zoomEffect.TargetScale - _zoomEffect.StartScale) / ((float)_zoomEffect.EffectTime / 2f);
+		if (_zoomEffect.ElapsedFrames <= _zoomEffect.EffectTime / 2)
 		{
-			OOFFFLEFKFA.ALOKJEILMLK -= num;
-			if (OOFFFLEFKFA.ALOKJEILMLK < OOFFFLEFKFA.JCNPAOMNJCL)
+			_zoomEffect.CurrentScale -= num;
+			if (_zoomEffect.CurrentScale < _zoomEffect.TargetScale)
 			{
-				OOFFFLEFKFA.ALOKJEILMLK = OOFFFLEFKFA.JCNPAOMNJCL;
+				_zoomEffect.CurrentScale = _zoomEffect.TargetScale;
 			}
 		}
 		else
 		{
-			OOFFFLEFKFA.ALOKJEILMLK += num;
-			if (OOFFFLEFKFA.ALOKJEILMLK > OOFFFLEFKFA.AFBPPNDBMEC)
+			_zoomEffect.CurrentScale += num;
+			if (_zoomEffect.CurrentScale > _zoomEffect.StartScale)
 			{
-				OOFFFLEFKFA.ALOKJEILMLK = OOFFFLEFKFA.AFBPPNDBMEC;
+				_zoomEffect.CurrentScale = _zoomEffect.StartScale;
 			}
 		}
-		OOFFFLEFKFA.BJDFMKOCNBN++;
-		_RenderInterpolation.PushZoomScale(OOFFFLEFKFA.ALOKJEILMLK);
+		_zoomEffect.ElapsedFrames++;
+		_RenderInterpolation.PushZoomScale(_zoomEffect.CurrentScale);
 	}
 
 	private void RenderEffect()
 	{
-		if (HLDMKKKKAMI)
+		if (_isHitPaused)
 		{
-			if (LLLNHELEKNF <= 0f)
+			if (_hitPauseFrames <= 0f)
 			{
-				HLDMKKKKAMI = false;
-				HOGCLFMOHLE();
+				_isHitPaused = false;
+				OnHitPauseEnded();
 			}
-			LLLNHELEKNF--;
+			_hitPauseFrames--;
 		}
-		if (OHNBKMHOMJI)
+		if (_isShaking)
 		{
-			if (BIPHAGJDGOL <= 0f)
+			if (_shakeFramesLeft <= 0f)
 			{
-				OHNBKMHOMJI = false;
-				LJIJAPMBLFM();
+				_isShaking = false;
+				OnShakeEnded();
 			}
-			BIPHAGJDGOL--;
+			_shakeFramesLeft--;
 		}
-		if (NOLKMEPOJIE)
+		if (_isZooming)
 		{
 			if (showZoomEffectCount <= 0)
 			{
-				NOLKMEPOJIE = false;
+				_isZooming = false;
 			}
 			showZoomEffectCount--;
 		}
 	}
 
-	private void HOGCLFMOHLE()
+	private void OnHitPauseEnded()
 	{
 		CallEvent(1, null);
-		if (JOGMEKGACJL.isActive)
+		if (_pendingBlood.isActive)
 		{
-			BMBGCIEFJGB.GEDDKEKGCBI(JOGMEKGACJL.NAAPALOFBCI, JOGMEKGACJL.IHFFJPLMIAL, JOGMEKGACJL.count);
-			JOGMEKGACJL.isActive = false;
+			_render.SpawnBloodEffects(_pendingBlood.Position, _pendingBlood.Impulse, _pendingBlood.count);
+			_pendingBlood.isActive = false;
 		}
 	}
 
-	private void LJIJAPMBLFM()
+	private void OnShakeEnded()
 	{
-		EPIPOLDCCHD = 0f;
+		_shakeDuration = 0f;
 		CallEvent(2, null);
 	}
 
@@ -392,28 +392,28 @@ public class Camera : global::EventDispatcher<object>
 
 	public void Clear()
 	{
-		BMBGCIEFJGB.Clear();
-		BMBGCIEFJGB = null;
+		_render.Clear();
+		_render = null;
 	}
 
 	public virtual void Init(Location LPJNEDFCBOI)
 	{
-		BMBGCIEFJGB = new Render(_UnityObject);
-		JNBAHPMBLOL.SetAttenuation(0f);
-		NGOEHKEKBIL.SetAttenuation(0f);
+		_render = new Render(_UnityObject);
+		_positionNode.SetAttenuation(0f);
+		_targetNode.SetAttenuation(0f);
 		_location = LPJNEDFCBOI;
-		BMBGCIEFJGB.Init(_location);
-		Vector3f bAINMLLIKOL = _location.GOEOFEIOAPC();
-		JNBAHPMBLOL.SetStart(bAINMLLIKOL);
-		JNBAHPMBLOL.SetEnd(bAINMLLIKOL);
-		NGOEHKEKBIL.SetStart(bAINMLLIKOL);
-		NGOEHKEKBIL.SetEnd(bAINMLLIKOL);
-		BIPHAGJDGOL = 0f;
-		OHNBKMHOMJI = false;
-		LLLNHELEKNF = 0f;
-		HLDMKKKKAMI = false;
+		_render.Init(_location);
+		Vector3f bAINMLLIKOL = _location.GetModelsCenter();
+		_positionNode.SetStart(bAINMLLIKOL);
+		_positionNode.SetEnd(bAINMLLIKOL);
+		_targetNode.SetStart(bAINMLLIKOL);
+		_targetNode.SetEnd(bAINMLLIKOL);
+		_shakeFramesLeft = 0f;
+		_isShaking = false;
+		_hitPauseFrames = 0f;
+		_isHitPaused = false;
 		showZoomEffectCount = 0;
-		NOLKMEPOJIE = false;
+		_isZooming = false;
 		_RenderInterpolation.ResetZoomScale(0f);
 	}
 
@@ -421,7 +421,7 @@ public class Camera : global::EventDispatcher<object>
 	internal void InitTitleBackdrop(Location location, Render render)
 	{
 		_location = location;
-		BMBGCIEFJGB = render;
+		_render = render;
 		// The title frames the borrowed renderer. The gameplay interpolation
 		// driver otherwise applies an uninitialized fight camera in LateUpdate,
 		// shifting/scaling the location layers after the title has drawn them.
@@ -430,23 +430,23 @@ public class Camera : global::EventDispatcher<object>
 
 	public void Render()
 	{
-		if (PMNEFPDLPCC)
+		if (_isShowPending)
 		{
 			bool flag = true;
 			foreach (Model item in _models)
 			{
-				if (item.LPFPGDJALED() == -1)
+				if (item.GetCurrentFrame() == -1)
 				{
 					flag = false;
 				}
 			}
 			if (flag)
 			{
-				CCLHMAFDAPI();
-				PMNEFPDLPCC = false;
+				ShowRender();
+				_isShowPending = false;
 			}
 		}
-		if (PMJCGFONEPA)
+		if (_isEnabled)
 		{
 			RenderEffect();
 			UpdateCameraPosition();
@@ -459,63 +459,63 @@ public class Camera : global::EventDispatcher<object>
 
 	public void RenderInterpolatedPresentation()
 	{
-		if (!PMJCGFONEPA || BMBGCIEFJGB == null)
+		if (!_isEnabled || _render == null)
 		{
 			return;
 		}
 		float alpha = FightInterpolation.CameraAlpha;
-		BMBGCIEFJGB.PresentationPass = true;
+		_render.PresentationPass = true;
 		try
 		{
 			DrawInterpolatedPosition(alpha);
 			DrawInterpolatedQuakeEffect(alpha);
-			BMBGCIEFJGB.RefreshLightInTheDarkness();
+			_render.RefreshLightInTheDarkness();
 		}
-		finally { BMBGCIEFJGB.PresentationPass = false; }
-		BMBGCIEFJGB.SyncAdditionalDrawsLayerTransform();
+		finally { _render.PresentationPass = false; }
+		_render.SyncAdditionalDrawsLayerTransform();
 	}
 
-	public void PHGNIPMBJEH(Vector3f NAAPALOFBCI, Vector3f KKIKIDNALOL, float time, bool HKNHLNGMOJC, string HJCIKLIPILA, float NOOOCHHKECH)
+	public void PlayEffectAnimation(Vector3f NAAPALOFBCI, Vector3f KKIKIDNALOL, float time, bool HKNHLNGMOJC, string HJCIKLIPILA, float NOOOCHHKECH)
 	{
-		BMBGCIEFJGB.BHOMOMIPKGC(NAAPALOFBCI, KKIKIDNALOL, time, HKNHLNGMOJC, HJCIKLIPILA, NOOOCHHKECH);
+		_render.PlayHitEffect(NAAPALOFBCI, KKIKIDNALOL, time, HKNHLNGMOJC, HJCIKLIPILA, NOOOCHHKECH);
 	}
 
-	public void LCBPCEHILJD(Vector3f NAAPALOFBCI, Vector3f IHFFJPLMIAL, int count = 4)
+	public void QueueBloodEffect(Vector3f NAAPALOFBCI, Vector3f IHFFJPLMIAL, int count = 4)
 	{
-		JOGMEKGACJL.NAAPALOFBCI.Set(NAAPALOFBCI);
-		JOGMEKGACJL.IHFFJPLMIAL.Set(IHFFJPLMIAL);
-		JOGMEKGACJL.count = count;
-		JOGMEKGACJL.isActive = true;
+		_pendingBlood.Position.Set(NAAPALOFBCI);
+		_pendingBlood.Impulse.Set(IHFFJPLMIAL);
+		_pendingBlood.count = count;
+		_pendingBlood.isActive = true;
 	}
 
-	public void HDFAOMAONJI(GameController value)
+	public void SetController(GameController value)
 	{
-		OJINMMFLEEB = value;
-		OJINMMFLEEB.SetScale(FGLAIPPLINB());
-		OJINMMFLEEB.InitController();
+		FightController = value;
+		FightController.SetScale(GetControllerScale());
+		FightController.InitController();
 	}
 
-	public void DFKKNMDAFDC(bool value)
+	public void SetFightVisible(bool value)
 	{
 		if (_preFight != null)
 		{
 			_preFight.VisibleViewer(value);
 		}
-		OJINMMFLEEB.gameObject.SetActive(value);
+		FightController.gameObject.SetActive(value);
 		if (value)
 		{
-			PMNEFPDLPCC = value;
+			_isShowPending = value;
 		}
 		else
 		{
-			BMBGCIEFJGB.BHIMNPFDCDE(value);
+			_render.SetVisible(value);
 		}
 	}
 
 	public void RemoveObjectByIndex(int index)
 	{
-		BMBGCIEFJGB.FPNKBJPKKGB().RemoveModel(index);
-		BMBGCIEFJGB.NAKJKHLEAEB(_models[index]);
+		_render.GetViewerModel().RemoveModel(index);
+		_render.DetachModelEffects(_models[index]);
 		_models.RemoveAt(index);
 	}
 
@@ -532,104 +532,104 @@ public class Camera : global::EventDispatcher<object>
 	{
 		int result = -1;
 		_models.Add(ACENLMONNPA);
-		BMBGCIEFJGB.CDDKOOMODHG(ACENLMONNPA);
+		_render.AttachModelEffects(ACENLMONNPA);
 		if (EKBOGDKIHIH)
 		{
-			CIJJBMDDAFL = ACENLMONNPA.CLDMEJKGLBA().EGHIDHMENEF(GameUtils.LEPANPKBBKI().MNDFNOCCOKI);
-			BGFPBMFKFGJ = ACENLMONNPA.CLDMEJKGLBA().EGHIDHMENEF(GameUtils.LEPANPKBBKI().MEIHGLKHLFC);
+			_focusNode = ACENLMONNPA.GetBodyObject().GetNodeByName(GameUtils.GetCameraSettings().BindingNode);
+			_secondaryFocusNode = ACENLMONNPA.GetBodyObject().GetNodeByName(GameUtils.GetCameraSettings().CameraNode);
 		}
-		if (BMBGCIEFJGB != null)
+		if (_render != null)
 		{
-			result = BMBGCIEFJGB.OGICJPJDLNN(ACENLMONNPA.CLDMEJKGLBA(), _location.modelsColor, IGGHECALMMP);
+			result = _render.AddModel(ACENLMONNPA.GetBodyObject(), _location.modelsColor, IGGHECALMMP);
 		}
 		return result;
 	}
 
     internal bool ReplaceModel(Model expected, Model replacement, bool player)
     {
-        if (expected == null || replacement == null || BMBGCIEFJGB == null || _models.Contains(replacement)) return false;
+        if (expected == null || replacement == null || _render == null || _models.Contains(replacement)) return false;
         int index = _models.IndexOf(expected);
-        if (index < 0 || replacement.CLDMEJKGLBA() == null) return false;
+        if (index < 0 || replacement.GetBodyObject() == null) return false;
         ModelNode focus = null, secondaryFocus = null;
         if (player)
         {
-            focus = replacement.CLDMEJKGLBA().EGHIDHMENEF(GameUtils.LEPANPKBBKI().MNDFNOCCOKI);
-            secondaryFocus = replacement.CLDMEJKGLBA().EGHIDHMENEF(GameUtils.LEPANPKBBKI().MEIHGLKHLFC);
+            focus = replacement.GetBodyObject().GetNodeByName(GameUtils.GetCameraSettings().BindingNode);
+            secondaryFocus = replacement.GetBodyObject().GetNodeByName(GameUtils.GetCameraSettings().CameraNode);
             if (focus == null || secondaryFocus == null) return false;
         }
-        BMBGCIEFJGB.CDDKOOMODHG(replacement);
+        _render.AttachModelEffects(replacement);
         bool replaced = false;
         try
         {
-            replaced = BMBGCIEFJGB.FPNKBJPKKGB().ReplaceModel(index, expected.CLDMEJKGLBA(),
-                replacement.CLDMEJKGLBA(), _location.modelsColor);
+            replaced = _render.GetViewerModel().ReplaceModel(index, expected.GetBodyObject(),
+                replacement.GetBodyObject(), _location.modelsColor);
             if (!replaced) return false;
         }
         finally
         {
-            if (!replaced) BMBGCIEFJGB.NAKJKHLEAEB(replacement);
+            if (!replaced) _render.DetachModelEffects(replacement);
         }
-        BMBGCIEFJGB.NAKJKHLEAEB(expected);
+        _render.DetachModelEffects(expected);
         _models[index] = replacement;
         replacement.Index = expected.Index;
-        if (player) { CIJJBMDDAFL = focus; BGFPBMFKFGJ = secondaryFocus; }
+        if (player) { _focusNode = focus; _secondaryFocusNode = secondaryFocus; }
         return true;
     }
 
-	public void FIEBIONJCCI(GameUtils.HitEffect HJLADIDMFOM)
+	public void ApplyHitEffect(GameUtils.HitEffect HJLADIDMFOM)
 	{
 		if (Fight.GetCurrentFight()?.IsTitleSparring == true) return;
 		if (HJLADIDMFOM != null)
 		{
-			IONLHJIDACJ = HJLADIDMFOM;
+			_hitEffect = HJLADIDMFOM;
 			// Mod-configured impact effect; critical hits respect the shake slider.
 			if (!Eclipse.Multiplayer.VersusTickDriver.IsResimulating)
-				Eclipse.Modding.ModVisuals.TriggerImpact(IONLHJIDACJ.Type,
-					IONLHJIDACJ.Type == "CriticalHit" ? Eclipse.UI.AccessibilitySettings.CriticalShake : 1f);
-			bool wasPaused = HLDMKKKKAMI;
-			LLLNHELEKNF = IONLHJIDACJ.NHKPODHHDPF * (IONLHJIDACJ.Type == "CriticalHit" ? (Eclipse.Multiplayer.VersusDeterminism.Active ? Eclipse.Multiplayer.VersusDeterminism.CriticalPause : Eclipse.UI.AccessibilitySettings.CriticalPause) : 1f);
-			OHNBKMHOMJI = true;
-			BIPHAGJDGOL = IONLHJIDACJ.OFJCKMNLAEP;
-			EPIPOLDCCHD = IONLHJIDACJ.OFJCKMNLAEP;
-            HLDMKKKKAMI = LLLNHELEKNF > 0f;
-            if (HLDMKKKKAMI) CallEvent(0, null);
-            else if (wasPaused) HOGCLFMOHLE();
+				Eclipse.Modding.ModVisuals.TriggerImpact(_hitEffect.Type,
+					_hitEffect.Type == "CriticalHit" ? Eclipse.UI.AccessibilitySettings.CriticalShake : 1f);
+			bool wasPaused = _isHitPaused;
+			_hitPauseFrames = _hitEffect.PauseTime * (_hitEffect.Type == "CriticalHit" ? (Eclipse.Multiplayer.VersusDeterminism.Active ? Eclipse.Multiplayer.VersusDeterminism.CriticalPause : Eclipse.UI.AccessibilitySettings.CriticalPause) : 1f);
+			_isShaking = true;
+			_shakeFramesLeft = _hitEffect.EffectTime;
+			_shakeDuration = _hitEffect.EffectTime;
+            _isHitPaused = _hitPauseFrames > 0f;
+            if (_isHitPaused) CallEvent(0, null);
+            else if (wasPaused) OnHitPauseEnded();
 		}
 	}
 
-	public void FFIAMGHGPPA(GameUtils.ZoomEffect DCLANCDBJLM)
+	public void ApplyZoomEffect(GameUtils.ZoomEffect DCLANCDBJLM)
 	{
 		if (Fight.GetCurrentFight()?.IsTitleSparring == true) return;
 		if (DCLANCDBJLM != null)
 		{
-			NOLKMEPOJIE = true;
-			OOFFFLEFKFA = DCLANCDBJLM;
-			float num = BMBGCIEFJGB.KGCPMIDNKKI();
-			if (OOFFFLEFKFA.JCNPAOMNJCL < num)
+			_isZooming = true;
+			_zoomEffect = DCLANCDBJLM;
+			float num = _render.GetMaxZoom();
+			if (_zoomEffect.TargetScale < num)
 			{
-				OOFFFLEFKFA.JCNPAOMNJCL = num;
+				_zoomEffect.TargetScale = num;
 			}
-			OOFFFLEFKFA.AFBPPNDBMEC = BMBGCIEFJGB.KMMOLDBJBIG();
-			OOFFFLEFKFA.ALOKJEILMLK = OOFFFLEFKFA.AFBPPNDBMEC;
-			_RenderInterpolation.ResetZoomScale(OOFFFLEFKFA.ALOKJEILMLK);
-			OOFFFLEFKFA.BJDFMKOCNBN = 0;
-			showZoomEffectCount = OOFFFLEFKFA.OFJCKMNLAEP;
+			_zoomEffect.StartScale = _render.CalculateAutoZoom();
+			_zoomEffect.CurrentScale = _zoomEffect.StartScale;
+			_RenderInterpolation.ResetZoomScale(_zoomEffect.CurrentScale);
+			_zoomEffect.ElapsedFrames = 0;
+			showZoomEffectCount = _zoomEffect.EffectTime;
 		}
 	}
 
-	public Vector3f HOKLGMEOMEI()
+	public Vector3f GetFocusPosition()
 	{
-		return CIJJBMDDAFL.GetStart();
+		return _focusNode.GetStart();
 	}
 
-	public void OMPFAMELAII()
+	public void RenderBloodEffects()
 	{
-		BMBGCIEFJGB.OBNOJKGAJML();
+		_render.RenderBloodEffects();
 	}
 
-	public void GDOPCJEGPFL()
+	public void RenderLocationLayers()
 	{
-		BMBGCIEFJGB.JACOKNMGNDF();
+		_render.RenderLayers();
 	}
 
 	public void AddPreFight(PreFight value)
@@ -637,28 +637,28 @@ public class Camera : global::EventDispatcher<object>
 		_preFight = value;
 	}
 
-	public void CCLHMAFDAPI()
+	public void ShowRender()
 	{
-		BMBGCIEFJGB.BHIMNPFDCDE(true);
+		_render.SetVisible(true);
 	}
 
-	public void NPFMKCHKGND()
+	public void RefreshControllerScale()
 	{
-		OJINMMFLEEB.SetScale(FGLAIPPLINB());
+		FightController.SetScale(GetControllerScale());
 	}
 
-	public Vector3f NPJHOCJIPDL()
+	public Vector3f GetCameraTarget()
 	{
-		return NGOEHKEKBIL.GetStart();
+		return _targetNode.GetStart();
 	}
 
-	public void MHKHHEMJFOK(Vector3f value)
+	public void SetCameraTarget(Vector3f value)
 	{
-		NGOEHKEKBIL.SetStart(value);
+		_targetNode.SetStart(value);
 	}
 
-	public void JMGBMIDNCFP()
+	public void ToggleMinScale()
 	{
-		BMBGCIEFJGB.AOMKPKJNIKH(!BMBGCIEFJGB.CHGCKFIHOBG());
+		_render.SetLockMinZoom(!_render.GetLockMinZoom());
 	}
 }

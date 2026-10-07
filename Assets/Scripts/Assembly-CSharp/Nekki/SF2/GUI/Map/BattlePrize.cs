@@ -8,17 +8,17 @@ namespace Nekki.SF2.GUI.Map
 	{
 		public const float BATTLE_GOLD_SIZE = 40f;
 
-		private List<BattlePrizeElement> DEKNGFABMJA = new List<BattlePrizeElement>();
+		private List<BattlePrizeElement> prizeElements = new List<BattlePrizeElement>();
 
-		private float GEFOLNHPJMI = -1f;
+		private float maxWidth = -1f;
 
-		private float BKNHLFAFGHO = -1f;
+		private float itemIconHeight = -1f;
 
-		private float FKGFPGOOJIB;
+		private float unusedWidth;
 
-		private float FJGELPELEMN;
+		private float unusedHeight;
 
-		private bool NDDFNGNAPIC;
+		private bool needsScroll;
 
 		[SerializeField]
 		private GameObject _prizeElemPrefab;
@@ -29,78 +29,78 @@ namespace Nekki.SF2.GUI.Map
 		[SerializeField]
 		private ResolutionImage _itemIcon;
 
-		private float KNMFEAMFMFK;
+		private float totalContentWidth;
 
 		private float _spacing = 20f;
 
-		private static int GNAONAPDDLD = 360;
+		private static int scrollFrameCounter = 360;
 
 		public void Init(long GBGNFPNCGED, long PAGGOKFIEOP, RewardPrize DPIIJICBGGA, float HOJOKAOLMGN, float AHKNBOHOOOK, int CFMPJLLNCFF)
 		{
 			float jPDGMJHNKPK = 1f;
 			float jPDGMJHNKPK2 = 1f;
-			foreach (BattlePrizeElement item in DEKNGFABMJA)
+			foreach (BattlePrizeElement item in prizeElements)
 			{
 				Object.Destroy(item.gameObject);
 			}
-			DEKNGFABMJA.Clear();
+			prizeElements.Clear();
 			_itemIcon.gameObject.SetActive(false);
-			GEFOLNHPJMI = HOJOKAOLMGN;
-			BKNHLFAFGHO = AHKNBOHOOOK;
+			maxWidth = HOJOKAOLMGN;
+			itemIconHeight = AHKNBOHOOOK;
 			string aDONPNOBBDE = "MiscSprites.ruby";
-			string aDONPNOBBDE2 = ListSF.CCDKHLAMKKO().OGJBDMNBMLJ();
-			KNMFEAMFMFK = 0f;
+			string aDONPNOBBDE2 = ListSF.GetRoster().GetCoinIcon();
+			totalContentWidth = 0f;
 			if (GBGNFPNCGED > 0)
 			{
 				BattlePrizeElement component = Object.Instantiate(_prizeElemPrefab).GetComponent<BattlePrizeElement>();
 				component.Init(aDONPNOBBDE2, GBGNFPNCGED, CFMPJLLNCFF, jPDGMJHNKPK);
-				GLJMJOACEIP(component);
+				AddPrizeElement(component);
 			}
 			if (PAGGOKFIEOP > 0)
 			{
 				BattlePrizeElement component2 = Object.Instantiate(_prizeElemPrefab).GetComponent<BattlePrizeElement>();
 				component2.Init(aDONPNOBBDE, PAGGOKFIEOP, CFMPJLLNCFF, jPDGMJHNKPK2);
-				GLJMJOACEIP(component2);
+				AddPrizeElement(component2);
 			}
-			foreach (RewardCurrency item2 in DPIIJICBGGA.KIMJGOHCCPO)
+			foreach (RewardCurrency item2 in DPIIJICBGGA.currencyRewards)
 			{
-				if (item2.GOOBKHECJIF)
+				if (item2.ShowReward)
 				{
-					GameCurrency cJJOFMHLFFM = GameUtils.AJDKHINLIDI.ICFINJLNCPM(item2.Name);
+					GameCurrency cJJOFMHLFFM = GameUtils.GameCurrencies.GetCurrencyByName(item2.Name);
 					if (cJJOFMHLFFM != null)
 					{
-						string mJBPMLCLMFN = cJJOFMHLFFM.MJBPMLCLMFN;
-						long bAINMLLIKOL = item2.MFPJMGJLKMH();
+						string mJBPMLCLMFN = cJJOFMHLFFM.Icon;
+						long bAINMLLIKOL = item2.GetMinimumAmount();
 						BattlePrizeElement component3 = Object.Instantiate(_prizeElemPrefab).GetComponent<BattlePrizeElement>();
 						component3.Init(mJBPMLCLMFN, bAINMLLIKOL, CFMPJLLNCFF);
-						GLJMJOACEIP(component3);
+						AddPrizeElement(component3);
 					}
 				}
 			}
-			foreach (RewardResistance item3 in DPIIJICBGGA.KBMDJACLAOH)
+			foreach (RewardResistance item3 in DPIIJICBGGA.resistanceRewards)
 			{
-				if (item3.GOOBKHECJIF)
+				if (item3.ShowReward)
 				{
-					GameResistance oOJJEOFENBJ = GameUtils.JNIMKHKGPHE.NDMEGBEFBPJ(item3.Name);
+					GameResistance oOJJEOFENBJ = GameUtils.GameResistances.GetResistanceByName(item3.Name);
 					if (oOJJEOFENBJ != null)
 					{
-						string aDONPNOBBDE3 = oOJJEOFENBJ.CIOKDNDHFBE();
+						string aDONPNOBBDE3 = oOJJEOFENBJ.GetIcon();
 						long bAINMLLIKOL2 = item3.Value;
 						BattlePrizeElement component4 = Object.Instantiate(_prizeElemPrefab).GetComponent<BattlePrizeElement>();
 						component4.Init(aDONPNOBBDE3, bAINMLLIKOL2, CFMPJLLNCFF);
-						GLJMJOACEIP(component4);
+						AddPrizeElement(component4);
 					}
 				}
 			}
 			_layoutGroup.spacing = _spacing;
-			_layoutGroup.GetComponent<RectTransform>().sizeDelta = new Vector2(KNMFEAMFMFK, _layoutGroup.GetComponent<RectTransform>().sizeDelta.y);
-			JPDODBLOPFJ();
-			foreach (RewardItem item4 in DPIIJICBGGA.HELFDCAIJNE)
+			_layoutGroup.GetComponent<RectTransform>().sizeDelta = new Vector2(totalContentWidth, _layoutGroup.GetComponent<RectTransform>().sizeDelta.y);
+			UpdateScrollState();
+			foreach (RewardItem item4 in DPIIJICBGGA.items)
 			{
-				if (item4.GOOBKHECJIF)
+				if (item4.ShowReward)
 				{
 					ItemInfo dJKEECEOCJB = ListSF.GetItems().GetItemByName(item4.Name);
-					UserItem dKCHDHMLKHN = ListSF.CCDKHLAMKKO().KHCNHPCPFII().CMGOCLGHNLH(dJKEECEOCJB);
+					UserItem dKCHDHMLKHN = ListSF.GetRoster().GetInventory().FindItem(dJKEECEOCJB);
 					if (dKCHDHMLKHN == null)
 					{
 						AddItem(dJKEECEOCJB);
@@ -114,59 +114,59 @@ namespace Nekki.SF2.GUI.Map
 		{
 			if (PJDAGCBPLJE.Type == "Seal")
 			{
-				_itemIcon.set_TexturePath(SF2Paths.BHCPOOOJAAK());
+				_itemIcon.set_TexturePath(SF2Paths.GetUsersUiPath());
 			}
 			else
 			{
-				_itemIcon.set_TexturePath(SF2Paths.LFIIMPEAMFG());
+				_itemIcon.set_TexturePath(SF2Paths.GetItemsUiPath());
 			}
 			_itemIcon.set_SpriteName(PJDAGCBPLJE.FileName);
 			_itemIcon.gameObject.SetActive(true);
 			_itemIcon.preserveAspect = true;
-			foreach (BattlePrizeElement item in DEKNGFABMJA)
+			foreach (BattlePrizeElement item in prizeElements)
 			{
 				item.gameObject.SetActive(false);
 			}
-			JPDODBLOPFJ();
+			UpdateScrollState();
 		}
 
 		private void Update()
 		{
-			if (NDDFNGNAPIC)
+			if (needsScroll)
 			{
-				OMAPINCCAFA();
+				ScrollPrizes();
 			}
 		}
 
-		private void GLJMJOACEIP(BattlePrizeElement DGNDGHPMPJD)
+		private void AddPrizeElement(BattlePrizeElement DGNDGHPMPJD)
 		{
 			if (DGNDGHPMPJD != null)
 			{
-				KNMFEAMFMFK += DGNDGHPMPJD.GetComponent<LayoutElement>().preferredWidth;
-				KNMFEAMFMFK += _spacing;
+				totalContentWidth += DGNDGHPMPJD.GetComponent<LayoutElement>().preferredWidth;
+				totalContentWidth += _spacing;
 				DGNDGHPMPJD.transform.SetParent(_layoutGroup.transform, false);
-				DEKNGFABMJA.Add(DGNDGHPMPJD);
+				prizeElements.Add(DGNDGHPMPJD);
 			}
 		}
 
-		private void JPDODBLOPFJ()
+		private void UpdateScrollState()
 		{
-			NDDFNGNAPIC = _layoutGroup.GetComponent<RectTransform>().rect.width > GetComponent<RectTransform>().rect.width;
+			needsScroll = _layoutGroup.GetComponent<RectTransform>().rect.width > GetComponent<RectTransform>().rect.width;
 			if (null != _itemIcon)
 			{
-				_itemIcon.rectTransform.sizeDelta = new Vector2(500f, BKNHLFAFGHO);
+				_itemIcon.rectTransform.sizeDelta = new Vector2(500f, itemIconHeight);
 			}
 		}
 
-		private void OMAPINCCAFA()
+		private void ScrollPrizes()
 		{
-			GNAONAPDDLD++;
-			float mNADIKCPPIG = MapGUI.ELPKAJAKAEL.MNADIKCPPIG;
-			float mIFFMBOIAGC = MapGUI.ELPKAJAKAEL.MIFFMBOIAGC;
+			scrollFrameCounter++;
+			float mNADIKCPPIG = MapGUI.RewardLineOscillation.OscillationPeriod;
+			float mIFFMBOIAGC = MapGUI.RewardLineOscillation.OscillationFactor;
 			float num = _layoutGroup.GetComponent<RectTransform>().rect.width - GetComponent<RectTransform>().rect.width;
 			float num2 = num / (2f * mNADIKCPPIG);
-			float bAINMLLIKOL = num2 * mNADIKCPPIG * Mathf.Cos(mIFFMBOIAGC * (float)GNAONAPDDLD);
-			_layoutGroup.transform.OKHPLHPBPKJ(bAINMLLIKOL);
+			float bAINMLLIKOL = num2 * mNADIKCPPIG * Mathf.Cos(mIFFMBOIAGC * (float)scrollFrameCounter);
+			_layoutGroup.transform.SetLocalX(bAINMLLIKOL);
 		}
 	}
 }

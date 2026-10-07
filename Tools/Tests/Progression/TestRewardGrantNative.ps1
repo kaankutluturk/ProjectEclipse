@@ -35,8 +35,8 @@ $buildRewardItemNode = Extract-Method $adapterSource 'private XmlElement BuildRe
 $legacyItemName = Extract-Method $adapterSource 'private string LegacyItemName(DefinitionId id)'
 $configureReward = Extract-Method $runtimeSource 'internal static bool TryConfigureRewardGrant(RewardItem source, int playerLevel,'
 $activeDependency = Extract-Method $runtimeSource 'private static bool IsActiveRewardDependency(ModDescriptor owner, ModId dependencyId)'
-$fightReward = Extract-Method $fightResultSource 'public void KFJABAMAKOD(RewardItem JJBPBGKBEED)'
-$grantEnchantments = Extract-Method $userItemSource 'public void GDBFNNLHPOB(List<PerkStruct> HALHGEGADKA, int MPAGFAKIEJG, int MHNCENBCECJ)'
+$fightReward = Extract-Method $fightResultSource 'public void AddReward(RewardItem JJBPBGKBEED)'
+$grantEnchantments = Extract-Method $userItemSource 'public void ApplyEnchantments(List<PerkStruct> HALHGEGADKA, int MPAGFAKIEJG, int MHNCENBCECJ)'
 $rewardDropApply = Extract-Method $contentSource 'public static void Apply(System.Xml.XmlElement fight, int resultIndex, ModRuleMode mode,'
 $rewardDropReadBound = Extract-Method $contentSource 'private static int? ReadBound(System.Xml.XmlElement element, string name)'
 $rewardDropRequireChoice = Extract-Method $contentSource 'private static void RequireItemChoice(System.Xml.XmlElement choice)'
@@ -74,7 +74,7 @@ public partial class FightResult
 {
     public partial class ResultPrizeStruct
     {
-        public readonly List<LJFFIBFBGID> HELFDCAIJNE = new List<LJFFIBFBGID>();
+        public readonly List<ItemGrant> Items = new List<ItemGrant>();
 $fightReward
     }
 }

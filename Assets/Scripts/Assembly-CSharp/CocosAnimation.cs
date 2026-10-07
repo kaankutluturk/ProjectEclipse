@@ -2,27 +2,27 @@ using UnityEngine;
 
 public class CocosAnimation : MonoBehaviour
 {
-	private bool EEKENEDOAPH;
+	private bool _autoplay;
 
-	private float LICAFNLFJHO;
+	private float _frameTimer;
 
-	private float GCGNEEFNHFK = 0.03f;
+	private float _changeSpriteTime = 0.03f;
 
 	private CocosAnimationData _Animation;
 
-	private GameObject CHDIDLJNAHI;
+	private GameObject _childObject;
 
 	private SpriteRenderer _SpriteRender;
 
-	private int EBFEKKMDNIN;
+	private int _currentFrame;
 
-	private int LDDLAKECNEG;
+	private int _totalFrames;
 
 	private bool _IsWork;
 
-	private int NHHKFIHBMKL = -1;
+	private int _iterations = -1;
 
-	public bool GDMEDOKBKJC
+	public bool IsAutoplay
 	{
 		get
 		{
@@ -34,7 +34,7 @@ public class CocosAnimation : MonoBehaviour
 		}
 	}
 
-	public float IEOOOFNGMBL
+	public float FrameInterval
 	{
 		set
 		{
@@ -42,7 +42,7 @@ public class CocosAnimation : MonoBehaviour
 		}
 	}
 
-	public CocosAnimationData JKHHHCNJIJJ
+	public CocosAnimationData AnimationInfo
 	{
 		get
 		{
@@ -50,7 +50,7 @@ public class CocosAnimation : MonoBehaviour
 		}
 	}
 
-	public int FLNLMIHEDCI
+	public int FrameCount
 	{
 		get
 		{
@@ -58,7 +58,7 @@ public class CocosAnimation : MonoBehaviour
 		}
 	}
 
-	public bool OMJMJIBPGDN
+	public bool IsAnimationRunning
 	{
 		get
 		{
@@ -66,7 +66,7 @@ public class CocosAnimation : MonoBehaviour
 		}
 	}
 
-	public int BEJMHOGHCPA
+	public int IterationCount
 	{
 		set
 		{
@@ -76,17 +76,17 @@ public class CocosAnimation : MonoBehaviour
 
 	public bool get_Autoplay()
 	{
-		return EEKENEDOAPH;
+		return _autoplay;
 	}
 
 	public void set_Autoplay(bool value)
 	{
-		EEKENEDOAPH = value;
+		_autoplay = value;
 	}
 
 	public void set_ChangeSpriteTime(float value)
 	{
-		GCGNEEFNHFK = value;
+		_changeSpriteTime = value;
 	}
 
 	public CocosAnimationData get_AnimationData()
@@ -96,7 +96,7 @@ public class CocosAnimation : MonoBehaviour
 
 	public int get_TotalFrames()
 	{
-		return LDDLAKECNEG;
+		return _totalFrames;
 	}
 
 	public bool get_IsWork()
@@ -106,7 +106,7 @@ public class CocosAnimation : MonoBehaviour
 
 	public void set_Iterations(int value)
 	{
-		NHHKFIHBMKL = value;
+		_iterations = value;
 	}
 
 	public void SetSortingOrder(int value)
@@ -122,15 +122,15 @@ public class CocosAnimation : MonoBehaviour
 		{
 			return false;
 		}
-		if (CHDIDLJNAHI == null)
+		if (_childObject == null)
 		{
-			CHDIDLJNAHI = new GameObject("Child");
-			CHDIDLJNAHI.transform.SetParent(base.transform, false);
-			_SpriteRender = CHDIDLJNAHI.AddComponent<SpriteRenderer>();
+			_childObject = new GameObject("Child");
+			_childObject.transform.SetParent(base.transform, false);
+			_SpriteRender = _childObject.AddComponent<SpriteRenderer>();
 		}
-		_Animation.AIFNJAPCCII();
-		_Animation.JBPCHMAGDMI();
-		LDDLAKECNEG = _Animation.BFJEFNHKPJI().Count;
+		_Animation.LoadSprites();
+		_Animation.SortFrames();
+		_totalFrames = _Animation.GetFrames().Count;
 		_IsWork = true;
 		return true;
 	}
@@ -142,7 +142,7 @@ public class CocosAnimation : MonoBehaviour
 
 	private void Update()
 	{
-		if (EEKENEDOAPH)
+		if (_autoplay)
 		{
 			Render(Time.deltaTime);
 		}
@@ -152,28 +152,28 @@ public class CocosAnimation : MonoBehaviour
 	{
 		if (_IsWork && !(_SpriteRender == null))
 		{
-			LICAFNLFJHO += PPOFNJGPHGP;
-			while (LICAFNLFJHO >= GCGNEEFNHFK)
+			_frameTimer += PPOFNJGPHGP;
+			while (_frameTimer >= _changeSpriteTime)
 			{
-				CPBBGPPOOGL();
-				LICAFNLFJHO -= GCGNEEFNHFK;
+				AdvanceFrame();
+				_frameTimer -= _changeSpriteTime;
 			}
 		}
 	}
 
-	private void CPBBGPPOOGL()
+	private void AdvanceFrame()
 	{
-		SetSpriteFrame(EBFEKKMDNIN);
-		EBFEKKMDNIN++;
-		if (EBFEKKMDNIN < LDDLAKECNEG)
+		SetSpriteFrame(_currentFrame);
+		_currentFrame++;
+		if (_currentFrame < _totalFrames)
 		{
 			return;
 		}
-		EBFEKKMDNIN = 0;
-		if (NHHKFIHBMKL != -1)
+		_currentFrame = 0;
+		if (_iterations != -1)
 		{
-			NHHKFIHBMKL--;
-			if (NHHKFIHBMKL <= 0)
+			_iterations--;
+			if (_iterations <= 0)
 			{
 				_IsWork = false;
 			}
@@ -182,17 +182,17 @@ public class CocosAnimation : MonoBehaviour
 
 	private void SetSpriteFrame(int DCHCFFFFLLK)
 	{
-		if (DCHCFFFFLLK < LDDLAKECNEG)
+		if (DCHCFFFFLLK < _totalFrames)
 		{
-			CocosAnimationData.SpriteFrameCocos pBAHNJDFMBO = _Animation.BFJEFNHKPJI()[DCHCFFFFLLK];
-			_SpriteRender.sprite = pBAHNJDFMBO.HJADPLOLOBH();
-			CHDIDLJNAHI.transform.localEulerAngles = new Vector3(0f, 0f, pBAHNJDFMBO.KGFGOFBMCCG() ? 90 : 0);
+			CocosAnimationData.SpriteFrameCocos pBAHNJDFMBO = _Animation.GetFrames()[DCHCFFFFLLK];
+			_SpriteRender.sprite = pBAHNJDFMBO.GetSprite();
+			_childObject.transform.localEulerAngles = new Vector3(0f, 0f, pBAHNJDFMBO.GetRotated() ? 90 : 0);
 			// Preserve the Cocos/TexturePacker frame offset exactly. The recovered
 			// XML matches the original plist metadata, and the original Mono build
 			// applies this offset without inverting it. Negating it makes trim
 			// compensation run in the wrong direction and visibly shakes sequences.
-			Vector2 frameOffset = pBAHNJDFMBO.LMJCBAFGAFL();
-			CHDIDLJNAHI.transform.localPosition = new Vector3(frameOffset.x, frameOffset.y, 0f);
+			Vector2 frameOffset = pBAHNJDFMBO.GetOffset();
+			_childObject.transform.localPosition = new Vector3(frameOffset.x, frameOffset.y, 0f);
 		}
 	}
 }

@@ -2,47 +2,47 @@ using Nekki.Social;
 
 public class Social
 {
-	private static ISocialNetwork DKIPAEBHDDI;
+	private static ISocialNetwork network;
 
 	private static SocialWrapper _wrap;
 
-	public static UserInfo LFIBBPIPPFJ
+	public static UserInfo CurrentUser
 	{
 		get
 		{
-			return NLEKLPFPLPC();
+			return GetCurrentUser();
 		}
 	}
 
-	public static ISocialNetwork FAAHDOEMDCJ
+	public static ISocialNetwork Network
 	{
 		get
 		{
-			return CCOHIOKHFKI();
+			return GetNetwork();
 		}
 	}
 
-	public static UserInfo NLEKLPFPLPC()
+	public static UserInfo GetCurrentUser()
 	{
-		return SocialWrapper.NLEKLPFPLPC();
+		return SocialWrapper.GetCurrentUser();
 	}
 
-	public static ISocialNetwork CCOHIOKHFKI()
+	public static ISocialNetwork GetNetwork()
 	{
-		return DKIPAEBHDDI;
+		return network;
 	}
 
 	public static void Init(Callbacks EODBKOHACMO)
 	{
-		_wrap = SocialWrapper.Init(EODBKOHACMO, NNHKEJNGNKE);
+		_wrap = SocialWrapper.Init(EODBKOHACMO, OnNetworkSelected);
 	}
 
-	private static void NNHKEJNGNKE(DFIPCKIEILP KPJKACAJHDF)
+	private static void OnNetworkSelected(SocialNetworkType KPJKACAJHDF)
 	{
-		if (KPJKACAJHDF != DFIPCKIEILP.None && KPJKACAJHDF == DFIPCKIEILP.VKontakte)
+		if (KPJKACAJHDF != SocialNetworkType.None && KPJKACAJHDF == SocialNetworkType.VKontakte)
 		{
-			DKIPAEBHDDI = new VK();
-			DKIPAEBHDDI.Init(_wrap);
+			network = new VK();
+			network.Init(_wrap);
 		}
 	}
 }

@@ -13,10 +13,10 @@ public sealed class HTTPMultiPartForm : HTTPFormBase
 
 	public override void PrepareRequest(HTTPRequest ONOCIELLAPL)
 	{
-		ONOCIELLAPL.MMPFBNNMGED("Content-Type", "multipart/form-data; boundary=\"" + Boundary + "\"");
+		ONOCIELLAPL.SetHeader("Content-Type", "multipart/form-data; boundary=\"" + Boundary + "\"");
 	}
 
-	public override byte[] GDENFGNLFKL()
+	public override byte[] GetData()
 	{
 		if (CachedData != null)
 		{
@@ -24,22 +24,22 @@ public sealed class HTTPMultiPartForm : HTTPFormBase
 		}
 		using (MemoryStream memoryStream = new MemoryStream())
 		{
-			for (int i = 0; i < CKOJIABCEBP().Count; i++)
+			for (int i = 0; i < GetFields().Count; i++)
 			{
-				HTTPFieldData iIMHHCDGJOL = CKOJIABCEBP()[i];
+				HTTPFieldData iIMHHCDGJOL = GetFields()[i];
 				memoryStream.WriteLine("--" + Boundary);
-				memoryStream.WriteLine("Content-Disposition: form-data; name=\"" + iIMHHCDGJOL.get_Name() + "\"" + (string.IsNullOrEmpty(iIMHHCDGJOL.EPDMGFELIMC()) ? string.Empty : ("; filename=\"" + iIMHHCDGJOL.EPDMGFELIMC() + "\"")));
-				if (!string.IsNullOrEmpty(iIMHHCDGJOL.DIHKMAKOHGN()))
+				memoryStream.WriteLine("Content-Disposition: form-data; name=\"" + iIMHHCDGJOL.get_Name() + "\"" + (string.IsNullOrEmpty(iIMHHCDGJOL.GetFileName()) ? string.Empty : ("; filename=\"" + iIMHHCDGJOL.GetFileName() + "\"")));
+				if (!string.IsNullOrEmpty(iIMHHCDGJOL.GetMimeType()))
 				{
-					memoryStream.WriteLine("Content-Type: " + iIMHHCDGJOL.DIHKMAKOHGN());
+					memoryStream.WriteLine("Content-Type: " + iIMHHCDGJOL.GetMimeType());
 				}
-				memoryStream.WriteLine("Content-Length: " + iIMHHCDGJOL.NLHGDFGNIHB().Length);
+				memoryStream.WriteLine("Content-Length: " + iIMHHCDGJOL.GetPayload().Length);
 				memoryStream.WriteLine();
-				memoryStream.Write(iIMHHCDGJOL.NLHGDFGNIHB(), 0, iIMHHCDGJOL.NLHGDFGNIHB().Length);
-				memoryStream.Write(HTTPRequest.HGBANJPCEPF, 0, HTTPRequest.HGBANJPCEPF.Length);
+				memoryStream.Write(iIMHHCDGJOL.GetPayload(), 0, iIMHHCDGJOL.GetPayload().Length);
+				memoryStream.Write(HTTPRequest.EOL, 0, HTTPRequest.EOL.Length);
 			}
 			memoryStream.WriteLine("--" + Boundary + "--");
-			AKIGPOBCEOC(false);
+			SetIsChanged(false);
 			return CachedData = memoryStream.ToArray();
 		}
 	}

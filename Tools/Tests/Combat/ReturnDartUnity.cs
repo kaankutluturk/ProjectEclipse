@@ -107,8 +107,8 @@ end
     }
     static object Field(object value, string name) => value.GetType().GetField(name, Hidden | BindingFlags.Public).GetValue(value);
     static void Check(bool value, string message) { checks++; if (!value) throw new Exception(message); }
-    static Model[] Darts(Fight fight) => ((IEnumerable)Field(fight, "LNDLFINJHDB")).Cast<Model>().Concat(((IEnumerable)Field(fight, "HCPGFOCGDAA")).Cast<Model>()).Where(m => m.get_Name() == Actor).ToArray();
-    static Model[] Bursts(Fight fight) => ((IEnumerable)Field(fight,"LNDLFINJHDB")).Cast<Model>().Concat(((IEnumerable)Field(fight,"HCPGFOCGDAA")).Cast<Model>()).Where(m=>m.get_Name()=="example.return-dart.burst").ToArray();
+    static Model[] Darts(Fight fight) => ((IEnumerable)Field(fight, "ActiveModels")).Cast<Model>().Concat(((IEnumerable)Field(fight, "pendingModels")).Cast<Model>()).Where(m => m.get_Name() == Actor).ToArray();
+    static Model[] Bursts(Fight fight) => ((IEnumerable)Field(fight,"ActiveModels")).Cast<Model>().Concat(((IEnumerable)Field(fight,"pendingModels")).Cast<Model>()).Where(m=>m.get_Name()=="example.return-dart.burst").ToArray();
     static void Next() { phase++; phaseAt = EditorApplication.timeSinceStartup; }
     static void Click()
     {
@@ -132,9 +132,9 @@ end
                 typeof(Eclipse.UI.TitleScreen).GetMethod("BeginCampaign", Hidden).Invoke(title, null);
                 var directory = SF2Paths.GetUserDataDirectory();
                 Check(Eclipse.Saves.CampaignSaveSession.PreviewDirectory == null && directory.StartsWith(Application.persistentDataPath, StringComparison.OrdinalIgnoreCase) && Application.persistentDataPath.Contains("ReturnDartUnity-"), "Profile not isolated");
-                var profile = XmlUtils.OpenXMLDocument(SF2Paths.KKIDGPBOBNI(), "usersDefault.xml", XmlUtils.EBLFEPIOMOL.Normal, true, XmlCryptoUtils.NNLGALNDJCL());
+                var profile = XmlUtils.OpenXMLDocument(SF2Paths.GetGameDataPath(), "usersDefault.xml", XmlUtils.XmlSourceMode.Normal, true, XmlCryptoUtils.GetIsEncryptionEnabled());
                 ((System.Xml.XmlElement)profile.SelectSingleNode("/Root/Warriors/Warrior[@ID='1']")).SetAttribute("Tutorial", "END");
-                Directory.CreateDirectory(directory); XmlUtils.ONLDJNLKKAL(profile, Path.Combine(directory, Constants.OJMIJINKBPJ).Replace('\\', '/'));
+                Directory.CreateDirectory(directory); XmlUtils.SaveDocumentWithHash(profile, Path.Combine(directory, Constants.UsersFileName).Replace('\\', '/'));
                 campaign = true; return;
             }
             if (!entered)
@@ -143,7 +143,7 @@ end
                 var screen = Module.GetInstance().GetCurrentScreenType(); if (screen != ScreenType.ModuleDojo && screen != ScreenType.ModuleMap) return;
                 Check(!ModRuntime.Host.HasErrors, ModRuntime.Host.FormatReport()); Check(!ModRuntime.Scripts.HasErrors, ModRuntime.Scripts.FormatReport());
                 Check(ModRuntime.Host.EnabledMods.Count(m => m.Id.Value != "core") == 1 && ModRuntime.Host.EnabledMods.Any(m => m.Id.Value == "example.return-dart"), "Fixture must enable only Return Dart");
-                var encounter = ListSF.CHMCKGCDGCM(new FightIDS(ModRuntime.Scripts.Content.RuntimeFightId(DefinitionId.Parse("core:fights/zone_1/tournament/3"))));
+                var encounter = ListSF.GetFightById(new FightIDS(ModRuntime.Scripts.Content.RuntimeFightId(DefinitionId.Parse("core:fights/zone_1/tournament/3"))));
                 Check(encounter != null, "Core encounter missing"); entered = GameUtils.StartFight(encounter, false, null, true, false); return;
             }
             if (phase == 9)
@@ -159,7 +159,7 @@ end
             var player = fight.GetPlayerModel(); var enemy = fight.GetEnemyModel(); if (player == null || enemy == null) return;
             player.Parameters.UserControlled = false; enemy.Parameters.AiControlled = false;
             var frame = fight.get_FightTimeInFrames(); var elapsed = EditorApplication.timeSinceStartup - phaseAt;
-            if (phase == 3 && Darts(fight).Contains(dart)) travel = Math.Max(travel, Math.Abs(dart.PLBNCDCFPML().GetX() - launchX));
+            if (phase == 3 && Darts(fight).Contains(dart)) travel = Math.Max(travel, Math.Abs(dart.GetPosition().GetX() - launchX));
             switch (phase)
             {
                 case 0:
@@ -168,77 +168,77 @@ end
                     Check(surface.Read("status").Text == "Return Dart ready", "Initial shipped HUD");
                     Check(player.Parameters.Ranged?.Name == "NoRanged", "Scenario accidentally relies on equipped ranged item: " + player.Parameters.Ranged?.Name);
                     Check(player.GetAvailableAnimations().Any(m => m.Name == "example.return-dart:moves/cast"), "Owned cast not available");
-                    var pos = player.PLBNCDCFPML(); var other = enemy.PLBNCDCFPML();
+                    var pos = player.GetPosition(); var other = enemy.GetPosition();
                     enemy.ShiftModelPosition(new Vector3f(pos.GetX() + 900 - other.GetX(), 0, 0), true);
-                    before = enemy.KKMCHCNOHMB(); castFrame = frame; Click();
+                    before = enemy.GetLife(); castFrame = frame; Click();
                     Check(Darts(fight).Length == 0, "Button spawned recursively"); Next(); break;
                 case 1:
                     var children = Darts(fight); if (children.Length == 0 || children[0].GetCurrentAnimation()?.Name != Flight) return;
-                    dart = children.Single(); launchX = dart.PLBNCDCFPML().GetX();
+                    dart = children.Single(); launchX = dart.GetPosition().GetX();
                     targetX = launchX + 220;
-                    enemy.ShiftModelPosition(new Vector3f(targetX-enemy.PLBNCDCFPML().GetX(),0,0),true);
+                    enemy.ShiftModelPosition(new Vector3f(targetX-enemy.GetPosition().GetX(),0,0),true);
                     Check(dart is WeaponModel && dart.Parameters.Skeleton.SubType == "SkeletonMissile" && dart.Parameters.Weapon.SubType == "Shuriken", "Wrong native child/rig/item");
                     Check(dart.Parameters.Weapon.Name == "RANGED_C2_Z2_MONK_SHURIKEN", "Typed item not projected into child Weapon slot");
                     Check(dart.GetRenderObject().activeInHierarchy, "Projectile render object inactive");
                     Check(surface.Read("counts").Text == "Flights: 1 | Hits: 0", "Flight notification missing");
                     Check(surface.Read("status").Text.Contains("started") && !surface.Read("cast").Enabled, "Applied receipt/cooldown missing");
-                    Check(Math.Abs(enemy.KKMCHCNOHMB() - before) < .00001, "Damage occurred before projectile travel");
+                    Check(Math.Abs(enemy.GetLife() - before) < .00001, "Damage occurred before projectile travel");
                     fight.SetPaused(true); pauseFrame = frame; pauseX = launchX;
                     new GameObject("Return Dart capture").AddComponent<ReturnDartCapture>(); Next(); break;
                 case 2:
                     if (elapsed < .5 || !captured) return;
-                    Check(fight.get_FightTimeInFrames() == pauseFrame && Math.Abs(dart.PLBNCDCFPML().GetX() - pauseX) < .00001, "Paused projectile moved");
-                    Check(Math.Abs(enemy.KKMCHCNOHMB() - before) < .00001 && Darts(fight).Length == 1, "Pause damaged enemy or removed child");
+                    Check(fight.get_FightTimeInFrames() == pauseFrame && Math.Abs(dart.GetPosition().GetX() - pauseX) < .00001, "Paused projectile moved");
+                    Check(Math.Abs(enemy.GetLife() - before) < .00001 && Darts(fight).Length == 1, "Pause damaged enemy or removed child");
                     fight.SetPaused(false); Next(); break;
                 case 3:
-                    if (Darts(fight).Length > 0) { enemy.ShiftModelPosition(new Vector3f(targetX-enemy.PLBNCDCFPML().GetX(),0,0),true); return; }
-                    Debug.Log("[ReturnDartUnity] First flight finished: travel="+travel+"; launchX="+launchX+"; frame="+frame+"; cast="+castFrame+"; enemyX="+enemy.PLBNCDCFPML().GetX()+"; failures="+string.Join("; ",ModRuntime.Scripts.CallbackDiagnostics.RecentFailures.Select(f=>f.Error)));
-                    Check(enemy.KKMCHCNOHMB() < before, "Native flight made no contact damage");
+                    if (Darts(fight).Length > 0) { enemy.ShiftModelPosition(new Vector3f(targetX-enemy.GetPosition().GetX(),0,0),true); return; }
+                    Debug.Log("[ReturnDartUnity] First flight finished: travel="+travel+"; launchX="+launchX+"; frame="+frame+"; cast="+castFrame+"; enemyX="+enemy.GetPosition().GetX()+"; failures="+string.Join("; ",ModRuntime.Scripts.CallbackDiagnostics.RecentFailures.Select(f=>f.Error)));
+                    Check(enemy.GetLife() < before, "Native flight made no contact damage");
                     Check(surface.Read("counts").Text == "Flights: 1 | Hits: 1", "Child damage not attributed to main fighter: " + surface.Read("counts").Text);
                     Check(travel > 30, "Projectile never travelled");
                     foreach (string notification in new[]{"HitPostCrit:player","HitPostCrit:opponent","PostHit:player","PostHit:opponent","DamageDealing:player","DamageResolving:opponent","DamageDealt:player","DamageReceived:opponent"})
                         Check(sourceEvents.Contains(notification),"Missing copied native attack source: "+notification);
-                    Debug.Log("[ReturnDartUnity] Native hit: " + before + " -> " + enemy.KKMCHCNOHMB() + "; sampled travel=" + travel); Next(); break;
+                    Debug.Log("[ReturnDartUnity] Native hit: " + before + " -> " + enemy.GetLife() + "; sampled travel=" + travel); Next(); break;
                 case 4:
                     if (!surface.Read("cast").Enabled) return;
                     Check(frame >= castFrame + 181 && surface.Read("status").Text == "Return Dart ready", "Cooldown elapsed too soon");
                     // Miss intentionally: the opponent is behind the cast-facing path
                     // after launch. Expiry must remove the child without contact.
-                    pos = player.PLBNCDCFPML(); other = enemy.PLBNCDCFPML();
+                    pos = player.GetPosition(); other = enemy.GetPosition();
                     enemy.ShiftModelPosition(new Vector3f(pos.GetX() + 900 - other.GetX(), 0, 0), true);
                     Click(); Next(); break;
                 case 5:
                     children = Darts(fight); if (children.Length == 0 || children[0].GetCurrentAnimation()?.Name != Flight) return;
-                    dart = children.Single(); before = enemy.KKMCHCNOHMB();
+                    dart = children.Single(); before = enemy.GetLife();
                     enemy.ShiftModelPosition(new Vector3f(-1500, 0, 0), true);
-                    castFrame = frame; launchX = dart.PLBNCDCFPML().GetX(); peak = 0; reversed = false; Next(); break;
+                    castFrame = frame; launchX = dart.GetPosition().GetX(); peak = 0; reversed = false; Next(); break;
                 case 6:
-                    if (Darts(fight).Length > 0) { float x = dart.PLBNCDCFPML().GetX(); float distance = Math.Abs(x-launchX); peak = Math.Max(peak, distance); if (peak - distance > 30) reversed = true; return; }
+                    if (Darts(fight).Length > 0) { float x = dart.GetPosition().GetX(); float distance = Math.Abs(x-launchX); peak = Math.Max(peak, distance); if (peak - distance > 30) reversed = true; return; }
                     Check(reversed && peak > 150, "Lua trajectory did not travel out and return");
                     Check(frame > castFrame && frame - castFrame < 120, "Returned projectile cleanup unbounded");
-                    Check(Math.Abs(enemy.KKMCHCNOHMB() - before) < .00001, "Miss caused health damage");
+                    Check(Math.Abs(enemy.GetLife() - before) < .00001, "Miss caused health damage");
                     Check(surface.Read("counts").Text.EndsWith(" | Hits: 1",StringComparison.Ordinal), "Miss counted as hit");
                     Debug.Log("[ReturnDartUnity] Miss turned and returned: outward=" + peak);
                     Next(); break;
                 case 7:
                     var bursts=Bursts(fight);if(bursts.Length!=3||!directApplied)return;
                     Check(casterStarts==2,"Direct spawn restarted the caster animation");
-                    var ordered=bursts.OrderBy(m=>m.PLBNCDCFPML().GetX()).ToArray();
+                    var ordered=bursts.OrderBy(m=>m.GetPosition().GetX()).ToArray();
                     Check(ordered.All(m=>m is WeaponModel&&m.ExplicitBirthAnimationStarted&&m.GetCurrentAnimation()?.Name==Flight&&m.GetRenderObject().activeInHierarchy),"Direct burst did not initialize/render native children");
-                    Check(Math.Abs(ordered[1].PLBNCDCFPML().GetX()-ordered[0].PLBNCDCFPML().GetX()-60)<1&&Math.Abs(ordered[2].PLBNCDCFPML().GetX()-ordered[1].PLBNCDCFPML().GetX()-60)<1,"Direct spawn offsets not preserved");
-                    Check(ordered.All(m=>Math.Abs(m.PLBNCDCFPML().GetY()-ordered[0].PLBNCDCFPML().GetY())<1),"Direct burst vertical positions diverged");
-                    Debug.Log("[ReturnDartUnity] Direct current geometry centers: playerY="+player.PLBNCDCFPML().GetY()+"; childY="+ordered[0].PLBNCDCFPML().GetY());
-                    before=enemy.KKMCHCNOHMB();targetX=ordered[0].PLBNCDCFPML().GetX()-220;
-                    enemy.ShiftModelPosition(new Vector3f(targetX-enemy.PLBNCDCFPML().GetX(),0,0),true);
+                    Check(Math.Abs(ordered[1].GetPosition().GetX()-ordered[0].GetPosition().GetX()-60)<1&&Math.Abs(ordered[2].GetPosition().GetX()-ordered[1].GetPosition().GetX()-60)<1,"Direct spawn offsets not preserved");
+                    Check(ordered.All(m=>Math.Abs(m.GetPosition().GetY()-ordered[0].GetPosition().GetY())<1),"Direct burst vertical positions diverged");
+                    Debug.Log("[ReturnDartUnity] Direct current geometry centers: playerY="+player.GetPosition().GetY()+"; childY="+ordered[0].GetPosition().GetY());
+                    before=enemy.GetLife();targetX=ordered[0].GetPosition().GetX()-220;
+                    enemy.ShiftModelPosition(new Vector3f(targetX-enemy.GetPosition().GetX(),0,0),true);
                     Debug.Log("[ReturnDartUnity] Direct burst: three applied receipts and initialized native actors without caster playback");
                     Next();break;
                 case 8:
-                    if(enemy.KKMCHCNOHMB()>=before){enemy.ShiftModelPosition(new Vector3f(targetX-enemy.PLBNCDCFPML().GetX(),0,0),true);return;}
+                    if(enemy.GetLife()>=before){enemy.ShiftModelPosition(new Vector3f(targetX-enemy.GetPosition().GetX(),0,0),true);return;}
                     Check(Bursts(fight).Length>0,"Direct burst left no live child for teardown proof");
                     Check(ModRuntime.Scripts.CallbackDiagnostics.RecentFailures.Count==0,"Direct spawn callback failures");
                     dart=Bursts(fight)[0];acceptedFight=fight;
-                    Debug.Log("[ReturnDartUnity] Direct native contact damage: "+before+" -> "+enemy.KKMCHCNOHMB());
-                    typeof(Fight).GetMethod("HCNDAFDHACI", Hidden).Invoke(fight,new object[]{GameOverTypes.GAME_OVER_SURRENDER});
+                    Debug.Log("[ReturnDartUnity] Direct native contact damage: "+before+" -> "+enemy.GetLife());
+                    typeof(Fight).GetMethod("AbortFight", Hidden).Invoke(fight,new object[]{GameOverTypes.GAME_OVER_SURRENDER});
                     Check(surface.IsClosed,"Surrender retained HUD");Next();break;
 
             }

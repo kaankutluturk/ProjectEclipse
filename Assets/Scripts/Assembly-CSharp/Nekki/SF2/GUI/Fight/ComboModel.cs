@@ -3,16 +3,16 @@ using UnityEngine;
 
 namespace Nekki.SF2.GUI.Fight
 {
-	public class ComboModel : SFMonoBehaviour<ComboModel.KEDKBADCLOD>
+	public class ComboModel : SFMonoBehaviour<ComboModel.ComboChangeInfo>
 	{
-		public enum HKFFDEOCCIE
+		public enum ComboModelEvent
 		{
 			ON_COMBO_CHANGE = 0
 		}
 
-		public struct KEDKBADCLOD
+		public struct ComboChangeInfo
 		{
-			public int GKAEJDCDMHC;
+			public int ComboCount;
 
 			public ComboTypeEvent Type;
 		}
@@ -23,9 +23,9 @@ namespace Nekki.SF2.GUI.Fight
 
 			public int Count;
 
-			public bool ACMKEEJFLJC;
+			public bool IsSettled;
 
-			public bool MCPGOCBBNIK;
+			public bool IgnoresPause;
 
 			public ComboTypes Type = ComboTypes.TypeCombo;
 		}
@@ -33,39 +33,39 @@ namespace Nekki.SF2.GUI.Fight
 		[SerializeField]
 		private GameObject _comboItemPrefab;
 
-		private ComboStatistic ODOJIOOGLJM = new ComboStatistic();
+		private ComboStatistic comboStatistic = new ComboStatistic();
 
-		private const float APCKONPPGJH = 40f;
+		private const float NodeSpacing = 40f;
 
-		private const float LCPALHECMOF = 30f;
+		private const float NodeMoveSpeed = 30f;
 
-		private const float NNICJDBBIIB = 0f;
+		private const float UnusedOffset = 0f;
 
-		private float OBFPHEHJNDM = 600f;
+		private float spawnX = 600f;
 
-		private float IMJDFEHPIKM = 245f;
+		private float restX = 245f;
 
-		private Vector2 EEDDAHKHDNK;
+		private Vector2 anchorMin;
 
-		private Vector2 DLIMPJAPMOK;
+		private Vector2 anchorMax;
 
-		private readonly Vector2 ALLNKANPNBL = new Vector2(0f, -40f);
+		private readonly Vector2 firstNodePosition = new Vector2(0f, -40f);
 
-		private List<ComboNode> OBKMHFLBGLE = new List<ComboNode>();
+		private List<ComboNode> nodes = new List<ComboNode>();
 
 		private bool _fightPause;
 
-		private int MPAJCNBPGCE;
+		private int comboIdleFrames;
 
-		private int GHJAHHNABOC;
+		private int comboTimeoutFrames;
 
-		private int GHPGBLHFOKB;
+		private int currentComboCount;
 
-		private int MAOHKAOBHKO;
+		private int hotGroundTime;
 
-		private ScreenModel.JEDPGMIGGKK CHNAJMLHHPI;
+		private ScreenModel.ScreenSide modelSide;
 
-		public ComboStatistic JKEGIADAKJG
+		public ComboStatistic Statistics
 		{
 			get
 			{
@@ -79,39 +79,39 @@ namespace Nekki.SF2.GUI.Fight
 
 		public ComboStatistic get_ComboStatistic()
 		{
-			return ODOJIOOGLJM;
+			return comboStatistic;
 		}
 
 		public void set_ComboStatistic(ComboStatistic value)
 		{
-			ODOJIOOGLJM = value;
+			comboStatistic = value;
 		}
 
-		public void Init(ScreenModel.JEDPGMIGGKK NPEAOKLDJHA)
+		public void Init(ScreenModel.ScreenSide NPEAOKLDJHA)
 		{
-			CHNAJMLHHPI = NPEAOKLDJHA;
-			GHJAHHNABOC = KKIIIIKBFAK(ComboTypes.TypeCombo);
-			if (CHNAJMLHHPI == ScreenModel.JEDPGMIGGKK.TYPE_LEFT)
+			modelSide = NPEAOKLDJHA;
+			comboTimeoutFrames = GetDisplayCount(ComboTypes.TypeCombo);
+			if (modelSide == ScreenModel.ScreenSide.TYPE_LEFT)
 			{
-				OBFPHEHJNDM *= -1f;
-				EEDDAHKHDNK = new Vector2(0f, 0.5f);
-				DLIMPJAPMOK = new Vector2(0f, 0.5f);
+				spawnX *= -1f;
+				anchorMin = new Vector2(0f, 0.5f);
+				anchorMax = new Vector2(0f, 0.5f);
 			}
 			else
 			{
-				EEDDAHKHDNK = new Vector2(1f, 0.5f);
-				DLIMPJAPMOK = new Vector2(1f, 0.5f);
+				anchorMin = new Vector2(1f, 0.5f);
+				anchorMax = new Vector2(1f, 0.5f);
 			}
 		}
 
-		private ComboItem BDBLCIILHHH(ComboTypes LFLGCDNKNJI)
+		private ComboItem CreateComboItem(ComboTypes LFLGCDNKNJI)
 		{
 			if (_comboItemPrefab == null)
 			{
 				return null;
 			}
 			ComboItem component = Object.Instantiate(_comboItemPrefab).GetComponent<ComboItem>();
-			component.Init(LFLGCDNKNJI, CHNAJMLHHPI);
+			component.Init(LFLGCDNKNJI, modelSide);
 			// Labels slide 30 units per tick; show the slide smoothly between ticks.
 			Eclipse.Rendering.Interpolation.TickPresentationSmoother.AttachPosition(component.gameObject,
 				Eclipse.Rendering.Interpolation.TickPresentationSmoother.Clock.Camera);
@@ -126,8 +126,8 @@ namespace Nekki.SF2.GUI.Fight
 			{
 				return null;
 			}
-			ODOJIOOGLJM.IGMFLCNOKPA++;
-			return GLJMJOACEIP(BDBLCIILHHH(ComboTypes.TypeCritical));
+			comboStatistic.CriticalCount++;
+			return AddNode(CreateComboItem(ComboTypes.TypeCritical));
 		}
 
 		public ComboNode CreateShock()
@@ -136,8 +136,8 @@ namespace Nekki.SF2.GUI.Fight
 			{
 				return null;
 			}
-			ODOJIOOGLJM.OGMOILIMCOM++;
-			return GLJMJOACEIP(BDBLCIILHHH(ComboTypes.TypeShock));
+			comboStatistic.ShockCount++;
+			return AddNode(CreateComboItem(ComboTypes.TypeShock));
 		}
 
 		public ComboNode CreateFirstStrike()
@@ -146,8 +146,8 @@ namespace Nekki.SF2.GUI.Fight
 			{
 				return null;
 			}
-			ODOJIOOGLJM.MOLDOOIJELI++;
-			return GLJMJOACEIP(BDBLCIILHHH(ComboTypes.TypeFirstStrike));
+			comboStatistic.FirstStrikeCount++;
+			return AddNode(CreateComboItem(ComboTypes.TypeFirstStrike));
 		}
 
 		public ComboNode CreateHeadStrike()
@@ -156,8 +156,8 @@ namespace Nekki.SF2.GUI.Fight
 			{
 				return null;
 			}
-			ODOJIOOGLJM.BAHCDHKAJBB++;
-			return GLJMJOACEIP(BDBLCIILHHH(ComboTypes.TypeHead));
+			comboStatistic.HeadStrikeCount++;
+			return AddNode(CreateComboItem(ComboTypes.TypeHead));
 		}
 
 		public ComboNode CreateComboStrike(int value)
@@ -166,9 +166,9 @@ namespace Nekki.SF2.GUI.Fight
 			{
 				return null;
 			}
-			ComboItem comboItem = BDBLCIILHHH(ComboTypes.TypeCombo);
+			ComboItem comboItem = CreateComboItem(ComboTypes.TypeCombo);
 			comboItem.UpdateCount(value);
-			return GLJMJOACEIP(comboItem);
+			return AddNode(comboItem);
 		}
 
 		public ComboNode CreateHotGroundTimer(int value)
@@ -177,24 +177,24 @@ namespace Nekki.SF2.GUI.Fight
 			{
 				return null;
 			}
-			ComboItem comboItem = BDBLCIILHHH(ComboTypes.TypeHotGroundTimer);
+			ComboItem comboItem = CreateComboItem(ComboTypes.TypeHotGroundTimer);
 			comboItem.UpdateCount(value);
-			return GLJMJOACEIP(comboItem);
+			return AddNode(comboItem);
 		}
 
-		private ComboNode GLJMJOACEIP(ComboItem target)
+		private ComboNode AddNode(ComboItem target)
 		{
-			Vector2 aLLNKANPNBL = ALLNKANPNBL;
+			Vector2 aLLNKANPNBL = firstNodePosition;
 			float x = aLLNKANPNBL.x;
-			Vector2 aLLNKANPNBL2 = ALLNKANPNBL;
+			Vector2 aLLNKANPNBL2 = firstNodePosition;
 			Vector2 vector = new Vector2(x, aLLNKANPNBL2.y);
-			target.get_rectTransform().pivot = ((CHNAJMLHHPI != ScreenModel.JEDPGMIGGKK.TYPE_LEFT) ? new Vector2(1f, 0.5f) : new Vector2(0f, 0.5f));
-			vector.x = OBFPHEHJNDM;
-			target.get_rectTransform().anchorMin = EEDDAHKHDNK;
-			target.get_rectTransform().anchorMax = DLIMPJAPMOK;
-			if (OBKMHFLBGLE.Count > 0)
+			target.get_rectTransform().pivot = ((modelSide != ScreenModel.ScreenSide.TYPE_LEFT) ? new Vector2(1f, 0.5f) : new Vector2(0f, 0.5f));
+			vector.x = spawnX;
+			target.get_rectTransform().anchorMin = anchorMin;
+			target.get_rectTransform().anchorMax = anchorMax;
+			if (nodes.Count > 0)
 			{
-				RectTransform rectTransform = OBKMHFLBGLE[OBKMHFLBGLE.Count - 1].Target.get_rectTransform();
+				RectTransform rectTransform = nodes[nodes.Count - 1].Target.get_rectTransform();
 				RectTransform rectTransform2 = target.get_rectTransform();
 				vector.y = rectTransform.localPosition.y;
 				vector.y -= rectTransform.rect.height * rectTransform.pivot.y;
@@ -204,11 +204,11 @@ namespace Nekki.SF2.GUI.Fight
 			target.transform.SetParent(base.transform, false);
 			target.transform.localPosition = vector;
 			ComboNode iNEGMMHCDGN = new ComboNode();
-			iNEGMMHCDGN.Count = KKIIIIKBFAK(target.get_ComboType());
+			iNEGMMHCDGN.Count = GetDisplayCount(target.get_ComboType());
 			iNEGMMHCDGN.Target = target;
 			iNEGMMHCDGN.Type = target.get_ComboType();
-			iNEGMMHCDGN.MCPGOCBBNIK = target.get_ComboType() == ComboTypes.TypeHotGroundTimer;
-			OBKMHFLBGLE.Add(iNEGMMHCDGN);
+			iNEGMMHCDGN.IgnoresPause = target.get_ComboType() == ComboTypes.TypeHotGroundTimer;
+			nodes.Add(iNEGMMHCDGN);
 			return iNEGMMHCDGN;
 		}
 
@@ -218,8 +218,8 @@ namespace Nekki.SF2.GUI.Fight
 			{
 				return;
 			}
-			ODOJIOOGLJM.BPBDGAPENAK = (FightStatistics.EMKEIEJMONM)Mathf.Max((int)ODOJIOOGLJM.BPBDGAPENAK, value);
-			ODOJIOOGLJM.StatisticCrazyStyleToString = ODOJIOOGLJM.OLONAJAOFOA();
+			comboStatistic.MaxStyle = (FightStatistics.FightStyle)Mathf.Max((int)comboStatistic.MaxStyle, value);
+			comboStatistic.StatisticCrazyStyleToString = comboStatistic.GetCrazyStyleAlias();
 		}
 
 		public void AddPerfect()
@@ -228,17 +228,17 @@ namespace Nekki.SF2.GUI.Fight
 			{
 				return;
 			}
-			ODOJIOOGLJM.JDKFHFOJKPI++;
+			comboStatistic.PerfectCount++;
 		}
 
-		private void BECPPOBCCLO()
+		private void IncrementStatistic()
 		{
-			ODOJIOOGLJM.NFKHLNHIIKH++;
+			comboStatistic.OtherStrikeCount++;
 		}
 
 		public void ResetComboStrike()
 		{
-			GHPGBLHFOKB = 0;
+			currentComboCount = 0;
 		}
 
 		public void UpdateHotGroundTimer(int time)
@@ -247,14 +247,14 @@ namespace Nekki.SF2.GUI.Fight
 			{
 				return;
 			}
-			MAOHKAOBHKO = time;
-			ComboNode iNEGMMHCDGN = OBKMHFLBGLE.Find((ComboNode DHDMNHCIPEH) => DHDMNHCIPEH.Type == ComboTypes.TypeHotGroundTimer);
+			hotGroundTime = time;
+			ComboNode iNEGMMHCDGN = nodes.Find((ComboNode DHDMNHCIPEH) => DHDMNHCIPEH.Type == ComboTypes.TypeHotGroundTimer);
 			if (iNEGMMHCDGN == null)
 			{
-				iNEGMMHCDGN = CreateHotGroundTimer(MAOHKAOBHKO);
+				iNEGMMHCDGN = CreateHotGroundTimer(hotGroundTime);
 			}
-			iNEGMMHCDGN.Count = KKIIIIKBFAK(iNEGMMHCDGN.Type);
-			iNEGMMHCDGN.Target.UpdateCount(MAOHKAOBHKO);
+			iNEGMMHCDGN.Count = GetDisplayCount(iNEGMMHCDGN.Type);
+			iNEGMMHCDGN.Target.UpdateCount(hotGroundTime);
 		}
 
 		public void OnFightPause(bool value)
@@ -268,68 +268,68 @@ namespace Nekki.SF2.GUI.Fight
 			{
 				return;
 			}
-			GHPGBLHFOKB = value;
-			if (GHPGBLHFOKB > 0)
+			currentComboCount = value;
+			if (currentComboCount > 0)
 			{
-				MPAJCNBPGCE = 0;
+				comboIdleFrames = 0;
 			}
-			if (GHPGBLHFOKB >= GameUtils.NPDOLGNNINO())
+			if (currentComboCount >= GameUtils.GetComboMinHits())
 			{
-				ComboNode iNEGMMHCDGN = OBKMHFLBGLE.Find((ComboNode DHDMNHCIPEH) => DHDMNHCIPEH.Type == ComboTypes.TypeCombo);
+				ComboNode iNEGMMHCDGN = nodes.Find((ComboNode DHDMNHCIPEH) => DHDMNHCIPEH.Type == ComboTypes.TypeCombo);
 				bool flag = false;
 				if (iNEGMMHCDGN == null)
 				{
-					iNEGMMHCDGN = CreateComboStrike(GHPGBLHFOKB);
+					iNEGMMHCDGN = CreateComboStrike(currentComboCount);
 					flag = true;
 				}
-				iNEGMMHCDGN.Count = KKIIIIKBFAK(iNEGMMHCDGN.Type, HFMKKLJGPPN);
-				iNEGMMHCDGN.Target.UpdateCount(GHPGBLHFOKB);
-				ODOJIOOGLJM.KKJHBKBMPGN = Mathf.Max(ODOJIOOGLJM.KKJHBKBMPGN, GHPGBLHFOKB);
-				LJNNMGPGDOO((!flag) ? ComboTypeEvent.COMBO_INCREASE : ComboTypeEvent.COMBO_START);
+				iNEGMMHCDGN.Count = GetDisplayCount(iNEGMMHCDGN.Type, HFMKKLJGPPN);
+				iNEGMMHCDGN.Target.UpdateCount(currentComboCount);
+				comboStatistic.MaxCombo = Mathf.Max(comboStatistic.MaxCombo, currentComboCount);
+				RaiseComboEvent((!flag) ? ComboTypeEvent.COMBO_INCREASE : ComboTypeEvent.COMBO_START);
 			}
 		}
 
 		public void RemoveAllCombo()
 		{
-			foreach (ComboNode item in OBKMHFLBGLE)
+			foreach (ComboNode item in nodes)
 			{
 				item.Target.gameObject.SetActive(false);
 				Object.Destroy(item.Target.gameObject);
 			}
-			OBKMHFLBGLE.Clear();
+			nodes.Clear();
 		}
 
-		private void LJNNMGPGDOO(ComboTypeEvent LFLGCDNKNJI)
+		private void RaiseComboEvent(ComboTypeEvent LFLGCDNKNJI)
 		{
-			CallEvent(0, new KEDKBADCLOD
+			CallEvent(0, new ComboChangeInfo
 			{
-				GKAEJDCDMHC = GHPGBLHFOKB,
+				ComboCount = currentComboCount,
 				Type = LFLGCDNKNJI
 			});
 		}
 
-		private int KKIIIIKBFAK(ComboTypes LFLGCDNKNJI, int HFMKKLJGPPN = 0)
+		private int GetDisplayCount(ComboTypes LFLGCDNKNJI, int HFMKKLJGPPN = 0)
 		{
 			switch (LFLGCDNKNJI)
 			{
 			case ComboTypes.TypeCombo:
-				return Mathf.Max(GameUtils.KCBHAMHLGBC() + HFMKKLJGPPN, 0);
+				return Mathf.Max(GameUtils.GetComboTime() + HFMKKLJGPPN, 0);
 			case ComboTypes.TypeHotGroundTimer:
-				return GameUtils.LDHIBCJCHFK();
+				return GameUtils.GetHotGroundTime();
 			default:
-				return GameUtils.MLAHKALHANF();
+				return GameUtils.GetAnnouncementTime();
 			}
 		}
 
-		private bool CBICGICCCOM(ComboNode node)
+		private bool ShouldUpdateNode(ComboNode node)
 		{
-			return node.MCPGOCBBNIK || !_fightPause;
+			return node.IgnoresPause || !_fightPause;
 		}
 
 		public bool MoveTo(ComboItem target, Vector2 IPMPAMAHLJG, float ALCFJHNPDGL)
 		{
 			Vector2 vector = target.transform.localPosition;
-			if (CHNAJMLHHPI == ScreenModel.JEDPGMIGGKK.TYPE_RIGHT)
+			if (modelSide == ScreenModel.ScreenSide.TYPE_RIGHT)
 			{
 				IPMPAMAHLJG.x *= -1f;
 			}
@@ -355,17 +355,17 @@ namespace Nekki.SF2.GUI.Fight
 			return vector == IPMPAMAHLJG;
 		}
 
-		private void BLMPDANIEDN()
+		private void StackNodes()
 		{
-			Vector2 aLLNKANPNBL = ALLNKANPNBL;
+			Vector2 aLLNKANPNBL = firstNodePosition;
 			float x = aLLNKANPNBL.x;
-			Vector2 aLLNKANPNBL2 = ALLNKANPNBL;
+			Vector2 aLLNKANPNBL2 = firstNodePosition;
 			Vector2 iPMPAMAHLJG = new Vector2(x, aLLNKANPNBL2.y);
-			foreach (ComboNode item in OBKMHFLBGLE)
+			foreach (ComboNode item in nodes)
 			{
 				RectTransform rectTransform = item.Target.get_rectTransform();
 				iPMPAMAHLJG.x = rectTransform.localPosition.x;
-				if (item.ACMKEEJFLJC)
+				if (item.IsSettled)
 				{
 					if (iPMPAMAHLJG.y != 0f)
 					{
@@ -384,29 +384,29 @@ namespace Nekki.SF2.GUI.Fight
 			}
 		}
 
-		private void NADGMCEPDAK()
+		private void UpdateNodeMovement()
 		{
 			List<ComboNode> list = new List<ComboNode>();
-			foreach (ComboNode item in OBKMHFLBGLE)
+			foreach (ComboNode item in nodes)
 			{
-				if (!CBICGICCCOM(item))
+				if (!ShouldUpdateNode(item))
 				{
 					continue;
 				}
 				if (item.Count > 0)
 				{
-					item.ACMKEEJFLJC = false;
+					item.IsSettled = false;
 					Vector2 iPMPAMAHLJG = item.Target.transform.localPosition;
-					iPMPAMAHLJG.x = IMJDFEHPIKM;
-					if (MoveTo(item.Target, iPMPAMAHLJG, 30f) && (item.Type != ComboTypes.TypeHotGroundTimer || GameUtils.GGBABPJBGJB() == 1))
+					iPMPAMAHLJG.x = restX;
+					if (MoveTo(item.Target, iPMPAMAHLJG, 30f) && (item.Type != ComboTypes.TypeHotGroundTimer || GameUtils.GetSlowMode() == 1))
 					{
-						item.ACMKEEJFLJC = true;
+						item.IsSettled = true;
 						item.Count--;
 					}
 				}
 				else
 				{
-					item.ACMKEEJFLJC = false;
+					item.IsSettled = false;
 					Vector2 iPMPAMAHLJG2 = item.Target.transform.localPosition;
 					iPMPAMAHLJG2.x = 0f - item.Target.get_rectTransform().rect.width;
 					if (MoveTo(item.Target, iPMPAMAHLJG2, 30f))
@@ -417,7 +417,7 @@ namespace Nekki.SF2.GUI.Fight
 			}
 			foreach (ComboNode item2 in list)
 			{
-				OBKMHFLBGLE.Remove(item2);
+				nodes.Remove(item2);
 				item2.Target.gameObject.SetActive(false);
 				Object.Destroy(item2.Target.gameObject);
 			}
@@ -429,24 +429,24 @@ namespace Nekki.SF2.GUI.Fight
 			{
 				return;
 			}
-			NADGMCEPDAK();
-			BLMPDANIEDN();
-			if (GHPGBLHFOKB <= 0)
+			UpdateNodeMovement();
+			StackNodes();
+			if (currentComboCount <= 0)
 			{
 				return;
 			}
-			if (MPAJCNBPGCE >= GHJAHHNABOC)
+			if (comboIdleFrames >= comboTimeoutFrames)
 			{
-				if (GHPGBLHFOKB >= GameUtils.NPDOLGNNINO())
+				if (currentComboCount >= GameUtils.GetComboMinHits())
 				{
-					LJNNMGPGDOO(ComboTypeEvent.COMBO_STOP);
+					RaiseComboEvent(ComboTypeEvent.COMBO_STOP);
 				}
-				MPAJCNBPGCE = 0;
-				GHPGBLHFOKB = 0;
+				comboIdleFrames = 0;
+				currentComboCount = 0;
 			}
 			else
 			{
-				MPAJCNBPGCE++;
+				comboIdleFrames++;
 			}
 		}
 	}

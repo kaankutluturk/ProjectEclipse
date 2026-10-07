@@ -25,7 +25,7 @@ class GameObject { public bool activeSelf=true; public Transform transform=new()
 class FakeObject { public static GameObject Instantiate(GameObject prefab) { var result=new GameObject(); result.component=new VsScreen { gameObject=result }; return result; } }
 class VsScreen { public GameObject gameObject; public Transform transform=>gameObject.transform; public ModelParameters Left,Right; float duration; public void Init(ModelParameters left,ModelParameters right) { Left=left;Right=right;duration=2.4f; } public float get_AnimationTime()=>duration; }
 class ModelParameters {}
-class FightList { public int RoundsToWin=2; public int PNHLGCBPFIG()=>2; public string GJOAJAIJHOE()=>""; }
+class FightList { public int RoundsToWin=2; public int GetTotalOpponentRounds()=>2; public string GetDescription()=>""; }
 namespace Eclipse.Multiplayer {
  enum VersusMode { Local,Online,Replay,Training,Spectator }
  class LocalVersusSettings { public VersusMode Mode; }
@@ -38,17 +38,17 @@ enum ScreenType { ModuleNone,ModulePreloader,ModuleDojo,ModuleFight }
 static class AtlasCache { public static int Clears; public static void Clear()=>Clears++; }
 class Base { public GameObject gameObject=new(); public Transform transform=>gameObject.transform; public int Coroutines; protected virtual void Init(object data) {} protected void StartCoroutine(object task)=>Coroutines++; }
 class Screen : Base {
- struct Data { public ModelParameters KMMJCHDKBDO; public List<ModelParameters> BDANFHBMIOF; public int BLOOLFFMKFI; }
- Data BBFBFDDDJMJ; public ScreenFightType Type; GameObject vsScreenPrefab=new(); public VsScreen vsScreen;
+ struct Data { public ModelParameters playerModel; public List<ModelParameters> enemyModels; public int enemyIndex; }
+ Data fightSetup; public ScreenFightType Type; GameObject vsScreenPrefab=new(); public VsScreen vsScreen;
  bool customVersusIntro; int maxRounds; string ruleDesc; public float Timer; public bool Paused;
  public void set_Pause(bool v)=>Paused=v; void ClearPictures() {} void StartScreen(float t)=>Timer=t;
- public void Run(FightList definition,ModelParameters left,ModelParameters right) { PreInit(definition); BBFBFDDDJMJ=new Data { KMMJCHDKBDO=left,BDANFHBMIOF=new(){right} }; StartVS(); }
+ public void Run(FightList definition,ModelParameters left,ModelParameters right) { PreInit(definition); fightSetup=new Data { playerModel=left,enemyModels=new(){right} }; StartVS(); }
 '''
 code += method(screen,r'public void PreInit\(') + '\n' + method(screen,r'private void StartVS\(') + '\n}\n'
 code += '''class Loader : Base {
- ScreenType LMGJJNACLFG, previous; public GameObject _LoaderType1=new(), _LoaderType2=new();
- ScreenType get_PrevScene()=>previous; object OBHAPHKNGFE()=>new object();
- public void Run(ScreenType prev,ScreenType next) { previous=prev;LMGJJNACLFG=next;Init(null); }
+ ScreenType nextScene, previous; public GameObject _LoaderType1=new(), _LoaderType2=new();
+ ScreenType get_PrevScene()=>previous; object LoadNextSceneAsync()=>new object();
+ public void Run(ScreenType prev,ScreenType next) { previous=prev;nextScene=next;Init(null); }
 '''
 code += method(loader,r'protected override void Init\(') + '\n}\n'
 code += '''class Program {

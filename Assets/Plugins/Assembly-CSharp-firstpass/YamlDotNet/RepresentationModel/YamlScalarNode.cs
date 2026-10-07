@@ -11,7 +11,7 @@ namespace YamlDotNet.RepresentationModel
 	{
 		public string Value { get; set; }
 
-		public IBEOFCPMMJJ Style { get; set; }
+		public ScalarStyle Style { get; set; }
 
 		public override IEnumerable<YamlNode> AllNodes
 		{
@@ -23,10 +23,10 @@ namespace YamlDotNet.RepresentationModel
 
 		internal YamlScalarNode(EventReader DNBFFLFBDOB, DocumentLoadingState state)
 		{
-			Scalar lEACOCDHICF = DNBFFLFBDOB.DODGGCGJJLL<Scalar>();
+			Scalar lEACOCDHICF = DNBFFLFBDOB.Expect<Scalar>();
 			Load(lEACOCDHICF, state);
-			Value = lEACOCDHICF.OEAKCOHMIHH();
-			Style = lEACOCDHICF.HALCJLMJDII();
+			Value = lEACOCDHICF.GetValue();
+			Style = lEACOCDHICF.GetStyle();
 		}
 
 		public YamlScalarNode()
@@ -38,17 +38,17 @@ namespace YamlDotNet.RepresentationModel
 			Value = value;
 		}
 
-		internal override void GPBMMFCHANP(DocumentLoadingState state)
+		internal override void ResolveAliases(DocumentLoadingState state)
 		{
 			throw new NotSupportedException("Resolving an alias on a scalar node does not make sense");
 		}
 
-		internal override void Emit(NEKGJNOFOFN NPIDIMCLNEM, EmitterState state)
+		internal override void Emit(IEmitter NPIDIMCLNEM, EmitterState state)
 		{
 			NPIDIMCLNEM.Emit(new Scalar(base.Anchor, base.Tag, Value, Style, true, false));
 		}
 
-		public override void GPHIFFOGOGN(IYamlVisitor NKECMANOOEM)
+		public override void Accept(IYamlVisitor NKECMANOOEM)
 		{
 			NKECMANOOEM.Visit(this);
 		}
@@ -61,7 +61,7 @@ namespace YamlDotNet.RepresentationModel
 
 		public override int GetHashCode()
 		{
-			return YamlNode.CombineHashCodes(base.GetHashCode(), YamlNode.AOJHKEDINCA(Value));
+			return YamlNode.CombineHashCodes(base.GetHashCode(), YamlNode.GetHashCodeOrZero(Value));
 		}
 
 		[SpecialName]

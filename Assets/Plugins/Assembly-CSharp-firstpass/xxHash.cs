@@ -1,16 +1,16 @@
 internal class xxHash
 {
-	private const uint HEONDGDDFPN = 2654435761u;
+	private const uint Prime32One = 2654435761u;
 
-	private const uint JJEKEJOIAJF = 2246822519u;
+	private const uint Prime32Two = 2246822519u;
 
-	private const uint DOONLJDKHPD = 3266489917u;
+	private const uint Prime32Three = 3266489917u;
 
-	private const uint DAOIFAOHBLN = 668265263u;
+	private const uint Prime32Four = 668265263u;
 
-	private const uint EGMMKIGHHBP = 374761393u;
+	private const uint Prime32Five = 374761393u;
 
-	public static uint ANPJDDFKNKG(byte[] HLDLIFPJMOA, int JCAJDBOMGOM, uint OKGKLCLEDFN)
+	public static uint CalculateHash(byte[] HLDLIFPJMOA, int JCAJDBOMGOM, uint OKGKLCLEDFN)
 	{
 		int i = 0;
 		uint num7;

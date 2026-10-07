@@ -2,36 +2,36 @@ using System.Xml;
 
 public class QuestActionCurrentVersion : QuestAction
 {
-	private string IGIOOCIDFIN = string.Empty;
+	private string productionExpression = string.Empty;
 
-	private string IBGMIGIFNJM = string.Empty;
+	private string majorExpression = string.Empty;
 
-	private string LDKAECLLDNG = string.Empty;
+	private string minorExpression = string.Empty;
 
-	private string JJCDPPFGPDO = string.Empty;
+	private string dataVersionExpression = string.Empty;
 
 	public override void Parse(XmlNode EPKLCPOEELO)
 	{
 		base.Parse(EPKLCPOEELO);
-		IGIOOCIDFIN = EPKLCPOEELO.Attributes["Production"].CIPOICEEIBK(string.Empty);
-		IBGMIGIFNJM = EPKLCPOEELO.Attributes["Major"].CIPOICEEIBK(string.Empty);
-		LDKAECLLDNG = EPKLCPOEELO.Attributes["Minor"].CIPOICEEIBK(string.Empty);
-		JJCDPPFGPDO = EPKLCPOEELO.Attributes["DataVersion"].CIPOICEEIBK(string.Empty);
+		productionExpression = EPKLCPOEELO.Attributes["Production"].GetStringOrDefault(string.Empty);
+		majorExpression = EPKLCPOEELO.Attributes["Major"].GetStringOrDefault(string.Empty);
+		minorExpression = EPKLCPOEELO.Attributes["Minor"].GetStringOrDefault(string.Empty);
+		dataVersionExpression = EPKLCPOEELO.Attributes["DataVersion"].GetStringOrDefault(string.Empty);
 	}
 
-	public override void DEJMHFMLKIC(QuestParameters GFIHPBCEEOB)
+	public override void Execute(QuestParameters GFIHPBCEEOB)
 	{
-		base.DEJMHFMLKIC(GFIHPBCEEOB);
+		base.Execute(GFIHPBCEEOB);
 		ConditionExtension.CompareResult lNIDLHOIHIM = new ConditionExtension.CompareResult();
 		ConditionExtension.CompareResult lNIDLHOIHIM2 = new ConditionExtension.CompareResult();
 		ConditionExtension.CompareResult lNIDLHOIHIM3 = new ConditionExtension.CompareResult();
 		ConditionExtension.CompareResult lNIDLHOIHIM4 = new ConditionExtension.CompareResult();
 		QuestCondition kKDGLNECFHA = new QuestCondition();
-		kKDGLNECFHA.LIMHBJBEEIA(GFIHPBCEEOB);
-		kKDGLNECFHA.MCPIOGALBMK(IGIOOCIDFIN, lNIDLHOIHIM);
-		kKDGLNECFHA.MCPIOGALBMK(IBGMIGIFNJM, lNIDLHOIHIM2);
-		kKDGLNECFHA.MCPIOGALBMK(LDKAECLLDNG, lNIDLHOIHIM3);
-		kKDGLNECFHA.MCPIOGALBMK(JJCDPPFGPDO, lNIDLHOIHIM4);
+		kKDGLNECFHA.SetParameters(GFIHPBCEEOB);
+		kKDGLNECFHA.SetValue(productionExpression, lNIDLHOIHIM);
+		kKDGLNECFHA.SetValue(majorExpression, lNIDLHOIHIM2);
+		kKDGLNECFHA.SetValue(minorExpression, lNIDLHOIHIM3);
+		kKDGLNECFHA.SetValue(dataVersionExpression, lNIDLHOIHIM4);
 		string empty = string.Empty;
 		empty += lNIDLHOIHIM.ToString();
 		empty += ".";
@@ -40,8 +40,8 @@ public class QuestActionCurrentVersion : QuestAction
 		empty += lNIDLHOIHIM3.ToString();
 		empty += ".";
 		empty += lNIDLHOIHIM4.ToString();
-		SystemProperties.DFJEJKJECBI().SetVersion(empty);
-		ListSF.GetInstance().DLAJNCEILEH(empty);
-		OGIJONMKABB();
+		SystemProperties.GetDataVersion().SetVersion(empty);
+		ListSF.GetInstance().SetDataVersion(empty);
+		FinishAction();
 	}
 }

@@ -6,27 +6,27 @@ public class IntervalAttack : IntervalAnimation
 {
 	public class Factors
 	{
-		public bool FNDCJJNDNJC;
+		public bool IsFactorSet;
 
-		public bool DJGAHEOIHGG;
+		public bool IsMultiplierSet;
 
 		public float Factor;
 
-		public float HJIIIBHAOMJ;
+		public float FactorMultiplier;
 
 		public Factors(float IOGMPFJOCPE = 1f, float BEMFHMKCJOK = 1f, bool BBBPANLHLEM = false, bool LNJNGGBCPFH = false)
 		{
-			FNDCJJNDNJC = BBBPANLHLEM;
-			DJGAHEOIHGG = LNJNGGBCPFH;
+			IsFactorSet = BBBPANLHLEM;
+			IsMultiplierSet = LNJNGGBCPFH;
 			Factor = IOGMPFJOCPE;
-			HJIIIBHAOMJ = BEMFHMKCJOK;
+			FactorMultiplier = BEMFHMKCJOK;
 		}
 
 		public void UpdateFactor()
 		{
-			if (FNDCJJNDNJC && DJGAHEOIHGG)
+			if (IsFactorSet && IsMultiplierSet)
 			{
-				Factor *= HJIIIBHAOMJ;
+				Factor *= FactorMultiplier;
 			}
 		}
 	}
@@ -37,10 +37,10 @@ public class IntervalAttack : IntervalAnimation
 
 		public int Start = -1;
 
-		public int PLHPGFGAGKJ = -1;
+		public int EndFrameValue = -1;
 
 		// best guess for name
-		public int EndFrame => PLHPGFGAGKJ;
+		public int EndFrame => EndFrameValue;
 
 
 		public Reaction()
@@ -51,167 +51,167 @@ public class IntervalAttack : IntervalAnimation
 		{
 			Name = _name;
 			Start = IKJGMFDONPK;
-			PLHPGFGAGKJ = BBFNPCJLJIM;
+			EndFrameValue = BBFNPCJLJIM;
 		}
 	}
 
-	private bool LLCADDDKFKH;
+	private bool ignoresInvulnerable;
 
-	private Factors MHEPKEFOGCP = new Factors();
+	private Factors playerFactors = new Factors();
 
-	private Factors NGDOFKDAIOD = new Factors();
+	private Factors opponentFactors = new Factors();
 
-	private bool DPCBBGHKAMA;
+	private bool hasAttackingParts;
 
-	private bool MMIBGOBLIDF;
+	private bool reservedFlagA;
 
-	private bool HCEACAPBEHG;
+	private bool reservedFlagB;
 
-	private RuleAppliance MPJMABFAJJM;
+	private RuleAppliance appliance;
 
 	private float _Damage;
 
-	private bool DAAIAHEALOC;
+	private bool noCritical;
 
 	private string _BodyPart;
 
-	private Vector3f FCFLHDNEICG = new Vector3f();
+	private Vector3f impulse = new Vector3f();
 
 	private int _ComboTime;
 
-	private List<Reaction> HBLDJNLGILG = new List<Reaction>();
+	private List<Reaction> hitReactions = new List<Reaction>();
 
 	// best guess for name
-	public IReadOnlyList<Reaction> HitReactions => HBLDJNLGILG;
+	public IReadOnlyList<Reaction> HitReactions => hitReactions;
 
 
-	private bool KOJJEJFODEG;
+	private bool hasEffect;
 
-	private bool NPKNOBDPPMC;
+	private bool ignoresBlock;
 
-	private List<string> FODLDCDBJHG;
+	private List<string> ignoredBlockNames;
 
-	private List<string> IBANLECAADN;
+	private List<string> ignoredInvulnerableNames;
 
-	private List<string> IHCJJKDOGGL;
+	private List<string> reservedListA;
 
-	private List<string> OBNBCOLPNDF;
+	private List<string> reservedListB;
 
-	private List<string> KAFFLGLEKPG = new List<string>();
+	private List<string> attackingParts = new List<string>();
 
-	private List<global::Pair<string, float>> AJNCNCFDLKL = new List<global::Pair<string, float>>();
+	private List<global::Pair<string, float>> damageAttributes = new List<global::Pair<string, float>>();
 
-	private List<string> OJPDIHOCDGO = new List<string>();
+	private List<string> defenseTypes = new List<string>();
 
-	public bool KPDHBAPFMDB
+	public bool IgnoresInvulnerable
 	{
 		get
 		{
-			return MOILKOLCNBP();
+			return GetIgnoresInvulnerable();
 		}
 	}
 
-	public bool FHHPPFJGEIP
+	public bool HasAttackingParts
 	{
 		get
 		{
-			return CFADPGIEKDN();
+			return GetHasAttackingParts();
 		}
 	}
 
-	public RuleAppliance AFPHMCDIFIO
+	public RuleAppliance Appliance
 	{
 		get
 		{
-			return JLNCBPPNPCI();
+			return GetAppliance();
 		}
 		set
 		{
-			JMBPMOIBLDF(value);
+			SetAppliance(value);
 		}
 	}
 
-	public float KFMJMBANIGF
+	public float Damage
 	{
 		get
 		{
-			return GHGGNMBCMNM();
+			return GetDamage();
 		}
 	}
 
-	public bool JHAJPODLMEH
+	public bool NoCritical
 	{
 		get
 		{
-			return HPLOFLKCLHG();
+			return GetNoCritical();
 		}
 	}
 
-	public string EMMANKFGLLL
+	public string BodyPart
 	{
 		get
 		{
-			return ELHIBCEADCG();
+			return GetBodyPart();
 		}
 	}
 
-	public Vector3f LEHLBAGKMKH
+	public Vector3f Impulse
 	{
 		get
 		{
-			return GIFLLJFAJCO();
+			return GetImpulse();
 		}
 	}
 
-	public int HIGBAPPOOKJ
+	public int ComboTime
 	{
 		get
 		{
-			return KCBHAMHLGBC();
+			return GetComboTime();
 		}
 	}
 
-	public bool FIEBIONJCCI
+	public bool HasEffect
 	{
 		get
 		{
-			return PIKCMLIAFOI();
+			return GetHasEffect();
 		}
 	}
 
-	public bool HHFIEAABPAA
+	public bool IgnoresBlock
 	{
 		get
 		{
-			return NPHDDMAIGKN();
+			return GetIgnoresBlock();
 		}
 	}
 
-	public List<string> OKHHAPIKBII
+	public List<string> IgnoredBlockNames
 	{
 		get
 		{
-			return KBENFIOADCG();
+			return GetIgnoredBlockNames();
 		}
 	}
 
-	public List<string> PKDFDIICGFK
+	public List<string> IgnoredInvulnerableNames
 	{
 		get
 		{
-			return DNPLIFOABPB();
+			return GetIgnoredInvulnerableNames();
 		}
 	}
 
-	public List<string> MHNFFFIOIDH
+	public List<string> AttackingParts
 	{
 		get
 		{
-			return IKPJJAEIOCG();
+			return GetAttackingParts();
 		}
 	}
 
-	public List<global::Pair<string, float>> ILFHIDLMHFB
+	public List<global::Pair<string, float>> DamageAttributes
 	{
 		get
 		{
@@ -219,106 +219,106 @@ public class IntervalAttack : IntervalAnimation
 		}
 	}
 
-	public List<string> CKJBFNJEDHH
+	public List<string> DefenseTypes
 	{
 		get
 		{
-			return DONAJGIBKCC();
+			return GetDefenseTypes();
 		}
 	}
 
 	public IntervalAttack()
-		: base(NGAJJDIEDGF.INTERVAL_ATTACK)
+		: base(IntervalType.INTERVAL_ATTACK)
 	{
 	}
 
-	public bool MOILKOLCNBP()
+	public bool GetIgnoresInvulnerable()
 	{
-		return LLCADDDKFKH;
+		return ignoresInvulnerable;
 	}
 
-	public bool CFADPGIEKDN()
+	public bool GetHasAttackingParts()
 	{
-		return DPCBBGHKAMA;
+		return hasAttackingParts;
 	}
 
-	public RuleAppliance JLNCBPPNPCI()
+	public RuleAppliance GetAppliance()
 	{
-		return MPJMABFAJJM;
+		return appliance;
 	}
 
-	public void JMBPMOIBLDF(RuleAppliance value)
+	public void SetAppliance(RuleAppliance value)
 	{
-		MPJMABFAJJM = value;
+		appliance = value;
 	}
 
-	public float GHGGNMBCMNM()
+	public float GetDamage()
 	{
 		return _Damage;
 	}
 
-	public bool HPLOFLKCLHG()
+	public bool GetNoCritical()
 	{
-		return DAAIAHEALOC;
+		return noCritical;
 	}
 
-	public string ELHIBCEADCG()
+	public string GetBodyPart()
 	{
 		return _BodyPart;
 	}
 
-	public Vector3f GIFLLJFAJCO()
+	public Vector3f GetImpulse()
 	{
-		return FCFLHDNEICG;
+		return impulse;
 	}
 
-	public int KCBHAMHLGBC()
+	public int GetComboTime()
 	{
 		return _ComboTime;
 	}
 
-	public bool PIKCMLIAFOI()
+	public bool GetHasEffect()
 	{
-		return KOJJEJFODEG;
+		return hasEffect;
 	}
 
-	public bool NPHDDMAIGKN()
+	public bool GetIgnoresBlock()
 	{
-		return NPKNOBDPPMC;
+		return ignoresBlock;
 	}
 
-	public List<string> KBENFIOADCG()
+	public List<string> GetIgnoredBlockNames()
 	{
-		return FODLDCDBJHG;
+		return ignoredBlockNames;
 	}
 
-	public List<string> DNPLIFOABPB()
+	public List<string> GetIgnoredInvulnerableNames()
 	{
-		return IBANLECAADN;
+		return ignoredInvulnerableNames;
 	}
 
-	public List<string> IKPJJAEIOCG()
+	public List<string> GetAttackingParts()
 	{
-		return KAFFLGLEKPG;
+		return attackingParts;
 	}
 
 	// best guess for name
 	public List<global::Pair<string, float>> GetDamageAttributes()
 	{
-		return AJNCNCFDLKL;
+		return damageAttributes;
 	}
 
-	public List<string> DONAJGIBKCC()
+	public List<string> GetDefenseTypes()
 	{
-		return OJPDIHOCDGO;
+		return defenseTypes;
 	}
 
 	public string GetReactionName(int BJNCGLPAMMF)
 	{
-		foreach (Reaction item in HBLDJNLGILG)
+		foreach (Reaction item in hitReactions)
 		{
 			int bOPAEEBGFAN = item.Start;
-			int pLHPGFGAGKJ = item.PLHPGFGAGKJ;
+			int pLHPGFGAGKJ = item.EndFrameValue;
 			if (bOPAEEBGFAN <= BJNCGLPAMMF && BJNCGLPAMMF <= pLHPGFGAGKJ)
 			{
 				return item.Name;
@@ -337,14 +337,14 @@ public class IntervalAttack : IntervalAnimation
 		switch (EJPOJJKKICO)
 		{
 		case RuleAppliance.AppliancePlayer:
-			MHEPKEFOGCP.UpdateFactor();
+			playerFactors.UpdateFactor();
 			break;
 		case RuleAppliance.ApplianceOpponent:
-			NGDOFKDAIOD.UpdateFactor();
+			opponentFactors.UpdateFactor();
 			break;
 		case RuleAppliance.ApplianceAll:
-			MHEPKEFOGCP.UpdateFactor();
-			NGDOFKDAIOD.UpdateFactor();
+			playerFactors.UpdateFactor();
+			opponentFactors.UpdateFactor();
 			break;
 		}
 	}
@@ -354,75 +354,75 @@ public class IntervalAttack : IntervalAnimation
 		switch (EJPOJJKKICO)
 		{
 		case RuleAppliance.AppliancePlayer:
-			return MHEPKEFOGCP;
+			return playerFactors;
 		case RuleAppliance.ApplianceOpponent:
-			return NGDOFKDAIOD;
+			return opponentFactors;
 		default:
-			return NGDOFKDAIOD;
+			return opponentFactors;
 		}
 	}
 
 	protected override void ParseInside()
 	{
-		KOJJEJFODEG = !NodeInterval.Attributes["NoEffect"].ParseBool();
+		hasEffect = !NodeInterval.Attributes["NoEffect"].ParseBool();
 		XmlNode xmlNode = NodeInterval["IgnoresBlock"];
 		if (xmlNode != null)
 		{
-			NPKNOBDPPMC = true;
-			string text = xmlNode.Attributes["Name"].CIPOICEEIBK(string.Empty);
+			ignoresBlock = true;
+			string text = xmlNode.Attributes["Name"].GetStringOrDefault(string.Empty);
 			// Model.Strike uses an empty list to bypass every block interval.
 			// Splitting an absent Name into [""] instead targets a nonexistent guard.
-			FODLDCDBJHG = new List<string>(text.Split(new[] { '|' }, System.StringSplitOptions.RemoveEmptyEntries));
+			ignoredBlockNames = new List<string>(text.Split(new[] { '|' }, System.StringSplitOptions.RemoveEmptyEntries));
 		}
 		XmlNode xmlNode2 = NodeInterval["IgnoresInvulnerable"];
 		if (xmlNode2 != null)
 		{
-			LLCADDDKFKH = true;
-			string text2 = xmlNode2.Attributes["Name"].CIPOICEEIBK(string.Empty);
+			ignoresInvulnerable = true;
+			string text2 = xmlNode2.Attributes["Name"].GetStringOrDefault(string.Empty);
 			// An empty native list bypasses every invulnerability interval, just as
 			// the adjacent IgnoresBlock parser does for an absent Name attribute.
-			IBANLECAADN = new List<string>(text2.Split(new[] { '|' }, System.StringSplitOptions.RemoveEmptyEntries));
+			ignoredInvulnerableNames = new List<string>(text2.Split(new[] { '|' }, System.StringSplitOptions.RemoveEmptyEntries));
 		}
 		XmlNode xmlNode3 = NodeInterval["AttackingParts"];
 		if (xmlNode3 != null)
 		{
 			foreach (XmlNode childNode in xmlNode3.ChildNodes)
 			{
-				string item = childNode.Attributes["Name"].CIPOICEEIBK(string.Empty);
-				KAFFLGLEKPG.Add(item);
+				string item = childNode.Attributes["Name"].GetStringOrDefault(string.Empty);
+				attackingParts.Add(item);
 			}
 		}
-		DPCBBGHKAMA = KAFFLGLEKPG.Count > 0;
+		hasAttackingParts = attackingParts.Count > 0;
 		foreach (XmlNode childNode2 in NodeInterval.ChildNodes)
 		{
 			if (childNode2.Name == "Hit")
 			{
-				string text3 = childNode2.Attributes["Name"].CIPOICEEIBK(string.Empty);
+				string text3 = childNode2.Attributes["Name"].GetStringOrDefault(string.Empty);
 				int num = childNode2.Attributes["Start"].ParseInt(Start);
-				int num2 = childNode2.Attributes["End"].ParseInt(GEJLNPIEDPF);
-				if (num < Start || GEJLNPIEDPF < num)
+				int num2 = childNode2.Attributes["End"].ParseInt(EndFrameValue);
+				if (num < Start || EndFrameValue < num)
 				{
-					LLLOJBFMONN.Error("StartFrame ({0}) is outside of attack interval ({1}-{2}) - {3}", num, Start, GEJLNPIEDPF, text3);
+					GameLog.Error("StartFrame ({0}) is outside of attack interval ({1}-{2}) - {3}", num, Start, EndFrameValue, text3);
 				}
-				if (num2 < Start || GEJLNPIEDPF < num2)
+				if (num2 < Start || EndFrameValue < num2)
 				{
-					LLLOJBFMONN.Error("EndFrame ({0}) is outside of attack interval ({1}-{2}) - {3}", num2, Start, GEJLNPIEDPF, text3);
+					GameLog.Error("EndFrame ({0}) is outside of attack interval ({1}-{2}) - {3}", num2, Start, EndFrameValue, text3);
 				}
 				Reaction item2 = new Reaction(text3, num, num2);
-				HBLDJNLGILG.Add(item2);
+				hitReactions.Add(item2);
 			}
 		}
 		if (NodeInterval["Impulse"] != null)
 		{
-			FCFLHDNEICG.SetX(NodeInterval["Impulse"].Attributes["X"].ParseFloat());
-			FCFLHDNEICG.SetY(NodeInterval["Impulse"].Attributes["Y"].ParseFloat());
-			FCFLHDNEICG.SetZ(NodeInterval["Impulse"].Attributes["Z"].ParseFloat());
+			impulse.SetX(NodeInterval["Impulse"].Attributes["X"].ParseFloat());
+			impulse.SetY(NodeInterval["Impulse"].Attributes["Y"].ParseFloat());
+			impulse.SetZ(NodeInterval["Impulse"].Attributes["Z"].ParseFloat());
 		}
 		_ComboTime = ((NodeInterval["Combo"] != null) ? NodeInterval["Combo"].Attributes["Time"].ParseInt() : 0);
 		XmlNode xmlNode6 = NodeInterval["Damage"];
 		_Damage = xmlNode6.Attributes["Value"].ParseFloat();
-		DAAIAHEALOC = xmlNode6.Attributes["NoCritical"].ParseBool();
-		_BodyPart = xmlNode6.Attributes["BodyPart"].CIPOICEEIBK(string.Empty);
+		noCritical = xmlNode6.Attributes["NoCritical"].ParseBool();
+		_BodyPart = xmlNode6.Attributes["BodyPart"].GetStringOrDefault(string.Empty);
 		ParseFactorAndDefenseItems(xmlNode6);
 	}
 
@@ -431,26 +431,26 @@ public class IntervalAttack : IntervalAnimation
 		foreach (XmlNode childNode in KPOOAIGIDPL.ChildNodes)
 		{
 			string name = childNode.Name;
-			string text = childNode.Attributes["Type"].CIPOICEEIBK(string.Empty);
+			string text = childNode.Attributes["Type"].GetStringOrDefault(string.Empty);
 			float pOFHDGJAFMP = childNode.Attributes["Shift"].ParseFloat();
 			if (name == "Damage")
 			{
-				AJNCNCFDLKL.Add(new global::Pair<string, float>(text, pOFHDGJAFMP));
+				damageAttributes.Add(new global::Pair<string, float>(text, pOFHDGJAFMP));
 				// Ranged and magic damage remain unblockable even in cast/follow-up
 				// intervals that omit IgnoresBlock. Ordinary melee keeps its XML rules.
-				if (!NPKNOBDPPMC && (text == "RangedDamage" || text == "MagicDamage"))
+				if (!ignoresBlock && (text == "RangedDamage" || text == "MagicDamage"))
 				{
-					NPKNOBDPPMC = true;
-					FODLDCDBJHG = new List<string>();
+					ignoresBlock = true;
+					ignoredBlockNames = new List<string>();
 				}
 				continue;
 			}
 			if (name == "Defense")
 			{
-				OJPDIHOCDGO.Add(text);
+				defenseTypes.Add(text);
 				continue;
 			}
-			LLLOJBFMONN.Error("Strange node name xml {0}", name);
+			GameLog.Error("Strange node name xml {0}", name);
 		}
 	}
 }

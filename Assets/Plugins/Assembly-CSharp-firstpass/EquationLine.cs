@@ -1,22 +1,22 @@
 public class EquationLine
 {
-	public float LHBNIMGFKIB;
+	public float A;
 
-	public float AAOIAEJJINO;
+	public float CoefficientB;
 
-	public float ILHDJDNPFKH;
+	public float ConstantC;
 
 	public EquationLine()
 	{
-		LHBNIMGFKIB = 0f;
-		AAOIAEJJINO = 0f;
-		ILHDJDNPFKH = 0f;
+		A = 0f;
+		CoefficientB = 0f;
+		ConstantC = 0f;
 	}
 
 	public EquationLine(float LHBNIMGFKIB, float AAOIAEJJINO = 0f, float ILHDJDNPFKH = 0f)
 	{
-		this.LHBNIMGFKIB = LHBNIMGFKIB;
-		this.AAOIAEJJINO = AAOIAEJJINO;
-		this.ILHDJDNPFKH = ILHDJDNPFKH;
+		this.A = LHBNIMGFKIB;
+		this.CoefficientB = AAOIAEJJINO;
+		this.ConstantC = ILHDJDNPFKH;
 	}
 }

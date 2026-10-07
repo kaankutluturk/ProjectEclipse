@@ -9,11 +9,11 @@ namespace Nekki.Yaml
 	[Serializable]
 	public class Scalar : Node
 	{
-		public delegate void GALGMABOBDE();
+		public delegate void TextUpdateHandler();
 
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
 		[CompilerGenerated]
-		private static GALGMABOBDE TextUpdate;
+		private static TextUpdateHandler TextUpdate;
 
 		private YamlScalarNode _scalar;
 
@@ -25,15 +25,15 @@ namespace Nekki.Yaml
 			}
 		}
 
-		public static event GALGMABOBDE NIFBLBEKKBE
+		public static event TextUpdateHandler OnTextUpdate
 		{
 			add
 			{
-				HPDAACEPGKP(value);
+				AddTextUpdateHandler(value);
 			}
 			remove
 			{
-				KLFNNKDLIKA(value);
+				RemoveTextUpdateHandler(value);
 			}
 		}
 
@@ -53,43 +53,43 @@ namespace Nekki.Yaml
 			_scalar = (YamlScalarNode)base.value;
 		}
 
-		public static void HPDAACEPGKP(GALGMABOBDE value)
+		public static void AddTextUpdateHandler(TextUpdateHandler value)
 		{
-			GALGMABOBDE gALGMABOBDE = TextUpdate;
-			GALGMABOBDE gALGMABOBDE2;
+			TextUpdateHandler gALGMABOBDE = TextUpdate;
+			TextUpdateHandler gALGMABOBDE2;
 			do
 			{
 				gALGMABOBDE2 = gALGMABOBDE;
-				gALGMABOBDE = Interlocked.CompareExchange(ref TextUpdate, (GALGMABOBDE)Delegate.Combine(gALGMABOBDE2, value), gALGMABOBDE);
+				gALGMABOBDE = Interlocked.CompareExchange(ref TextUpdate, (TextUpdateHandler)Delegate.Combine(gALGMABOBDE2, value), gALGMABOBDE);
 			}
 			while ((object)gALGMABOBDE != gALGMABOBDE2);
 		}
 
-		public static void KLFNNKDLIKA(GALGMABOBDE value)
+		public static void RemoveTextUpdateHandler(TextUpdateHandler value)
 		{
-			GALGMABOBDE gALGMABOBDE = TextUpdate;
-			GALGMABOBDE gALGMABOBDE2;
+			TextUpdateHandler gALGMABOBDE = TextUpdate;
+			TextUpdateHandler gALGMABOBDE2;
 			do
 			{
 				gALGMABOBDE2 = gALGMABOBDE;
-				gALGMABOBDE = Interlocked.CompareExchange(ref TextUpdate, (GALGMABOBDE)Delegate.Remove(gALGMABOBDE2, value), gALGMABOBDE);
+				gALGMABOBDE = Interlocked.CompareExchange(ref TextUpdate, (TextUpdateHandler)Delegate.Remove(gALGMABOBDE2, value), gALGMABOBDE);
 			}
 			while ((object)gALGMABOBDE != gALGMABOBDE2);
 		}
 
-		private static void FIAKCFNHJFC()
+		private static void RaiseTextUpdate()
 		{
-			GALGMABOBDE textUpdate = TextUpdate;
+			TextUpdateHandler textUpdate = TextUpdate;
 			if (textUpdate != null)
 			{
 				textUpdate();
 			}
 		}
 
-		public void NBGHLFJPOGM(string NFICJMLCGEO)
+		public void SetText(string NFICJMLCGEO)
 		{
 			_scalar.Value = NFICJMLCGEO;
-			FIAKCFNHJFC();
+			RaiseTextUpdate();
 		}
 
 		public string GetText()

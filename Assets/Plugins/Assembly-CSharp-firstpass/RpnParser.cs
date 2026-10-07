@@ -5,26 +5,26 @@ using System.Globalization;
 
 public class RpnParser
 {
-	public enum BLELIIJLLEB
+	public enum ItemKind
 	{
 		Operator = 0,
 		Operand = 1
 	}
 
-	public enum NKMIEOOPJHP
+	public enum OperandType
 	{
 		None = 0,
 		Constant = 1,
 		Variable = 2
 	}
 
-	public delegate double POMKCMMOEGH(List<double> arguments);
+	public delegate double OperatorDelegate(List<double> arguments);
 
-	public delegate object PHNLIHEJEPK();
+	public delegate object VariableDelegate();
 
 	public delegate object ParameterDelegate(List<object> BPLIHEIIBFP);
 
-	public enum EGLAAMKIAHG
+	public enum OperatorArgCount
 	{
 		OperatorAddArgCount = 2,
 		OperatorSubArgCount = OperatorAddArgCount,
@@ -48,7 +48,7 @@ public class RpnParser
 		OperatorComparisonArgCount = OperatorAddArgCount
 	}
 
-	public enum DMMCIDPIFMK
+	public enum OperatorPriority
 	{
 		OperatorAddPrior = 1,
 		OperatorSubPrior = OperatorAddPrior,
@@ -72,13 +72,13 @@ public class RpnParser
 		OperatorComparisonPrior = OperatorSinPrior
 	}
 
-	public enum DPEHBGCOPJM
+	public enum Direction
 	{
 		DirectionRight = 0,
 		DirectionLeft = 1
 	}
 
-	public enum IKHBAIDMOHC
+	public enum OperatorDirection
 	{
 		OperatorAddDirect = 0,
 		OperatorSubDirect = OperatorAddDirect,
@@ -102,25 +102,25 @@ public class RpnParser
 		OperatorComparisonDirect = OperatorAddDirect
 	}
 
-	private class IMOIKMFBGDH
+	private class OperatorInfo
 	{
-		public DMMCIDPIFMK NNCOAODDCOD;
+		public OperatorPriority Priority;
 
-		public POMKCMMOEGH GDLNLMPIKMO;
+		public OperatorDelegate Function;
 
-		public EGLAAMKIAHG FABCLOGBCJM;
+		public OperatorArgCount ArgCount;
 
-		public IKHBAIDMOHC JBBJEBCAAEG;
+		public OperatorDirection Direction;
 
-		public IMOIKMFBGDH(DMMCIDPIFMK DBNEBOIBILM, POMKCMMOEGH NGOJAJIKFBA, EGLAAMKIAHG MPOEHCOADGE, IKHBAIDMOHC PCBCFHJBODO)
+		public OperatorInfo(OperatorPriority DBNEBOIBILM, OperatorDelegate NGOJAJIKFBA, OperatorArgCount MPOEHCOADGE, OperatorDirection PCBCFHJBODO)
 		{
-			NNCOAODDCOD = DBNEBOIBILM;
-			GDLNLMPIKMO = NGOJAJIKFBA;
-			FABCLOGBCJM = MPOEHCOADGE;
-			JBBJEBCAAEG = PCBCFHJBODO;
+			Priority = DBNEBOIBILM;
+			Function = NGOJAJIKFBA;
+			ArgCount = MPOEHCOADGE;
+			Direction = PCBCFHJBODO;
 		}
 
-		public static double ICPPFFICMJH(List<double> arguments)
+		public static double Add(List<double> arguments)
 		{
 			if (arguments.Count != 2)
 			{
@@ -129,7 +129,7 @@ public class RpnParser
 			return arguments[0] + arguments[1];
 		}
 
-		public static double BPBNMAPGJAE(List<double> arguments)
+		public static double Subtract(List<double> arguments)
 		{
 			if (arguments.Count != 2)
 			{
@@ -138,7 +138,7 @@ public class RpnParser
 			return arguments[0] - arguments[1];
 		}
 
-		public static double BEOCEMLPKDD(List<double> arguments)
+		public static double Multiply(List<double> arguments)
 		{
 			if (arguments.Count != 2)
 			{
@@ -147,7 +147,7 @@ public class RpnParser
 			return arguments[0] * arguments[1];
 		}
 
-		public static double JONIACGMPPF(List<double> arguments)
+		public static double Divide(List<double> arguments)
 		{
 			if (arguments.Count != 2)
 			{
@@ -160,7 +160,7 @@ public class RpnParser
 			return 0.0;
 		}
 
-		public static double EEMILHABJID(List<double> arguments)
+		public static double Modulo(List<double> arguments)
 		{
 			if (arguments.Count != 2)
 			{
@@ -169,7 +169,7 @@ public class RpnParser
 			return (int)arguments[0] % (int)arguments[1];
 		}
 
-		public static double IPCEIGHPABJ(List<double> arguments)
+		public static double Power(List<double> arguments)
 		{
 			if (arguments.Count != 2)
 			{
@@ -178,7 +178,7 @@ public class RpnParser
 			return Math.Pow(arguments[0], arguments[1]);
 		}
 
-		public static double AIJAPKDMBFD(List<double> arguments)
+		public static double Or(List<double> arguments)
 		{
 			if (arguments.Count != 2)
 			{
@@ -187,7 +187,7 @@ public class RpnParser
 			return Convert.ToDouble(Convert.ToBoolean(arguments[0]) | Convert.ToBoolean(arguments[1]));
 		}
 
-		public static double CDANHLLHEMG(List<double> arguments)
+		public static double Sin(List<double> arguments)
 		{
 			if (arguments.Count != 1)
 			{
@@ -196,7 +196,7 @@ public class RpnParser
 			return Math.Sin(arguments[0]);
 		}
 
-		public static double PBMKAPABCFN(List<double> arguments)
+		public static double Cos(List<double> arguments)
 		{
 			if (arguments.Count != 1)
 			{
@@ -205,7 +205,7 @@ public class RpnParser
 			return Math.Cos(arguments[0]);
 		}
 
-		public static double ANEAGFECEFM(List<double> arguments)
+		public static double Max(List<double> arguments)
 		{
 			if (arguments.Count != 2)
 			{
@@ -214,7 +214,7 @@ public class RpnParser
 			return Math.Max(arguments[0], arguments[1]);
 		}
 
-		public static double NKHACLLAANI(List<double> arguments)
+		public static double Min(List<double> arguments)
 		{
 			if (arguments.Count != 2)
 			{
@@ -223,7 +223,7 @@ public class RpnParser
 			return Math.Min(arguments[0], arguments[1]);
 		}
 
-		public static double JCPIFEGOAFN(List<double> arguments)
+		public static double Sqrt(List<double> arguments)
 		{
 			if (arguments.Count != 1)
 			{
@@ -232,7 +232,7 @@ public class RpnParser
 			return Math.Sqrt(arguments[0]);
 		}
 
-		public static double PDEFPKGHIMD(List<double> arguments)
+		public static double Abs(List<double> arguments)
 		{
 			if (arguments.Count != 1)
 			{
@@ -241,7 +241,7 @@ public class RpnParser
 			return Math.Abs(arguments[0]);
 		}
 
-		public static double IIAKACBAOIB(List<double> arguments)
+		public static double Ln(List<double> arguments)
 		{
 			if (arguments.Count != 1)
 			{
@@ -250,7 +250,7 @@ public class RpnParser
 			return Math.Log(arguments[0], Math.E);
 		}
 
-		public static double JHEBIJIIFHE(List<double> arguments)
+		public static double Lg(List<double> arguments)
 		{
 			if (arguments.Count != 1)
 			{
@@ -259,7 +259,7 @@ public class RpnParser
 			return Math.Log10(arguments[0]);
 		}
 
-		public static double CIDBJOJNPIO(List<double> arguments)
+		public static double Log(List<double> arguments)
 		{
 			if (arguments.Count != 2)
 			{
@@ -268,7 +268,7 @@ public class RpnParser
 			return Math.Log(arguments[0], arguments[1]);
 		}
 
-		public static double DOJHPLNIEKJ(List<double> arguments)
+		public static double Exp(List<double> arguments)
 		{
 			if (arguments.Count != 1)
 			{
@@ -277,7 +277,7 @@ public class RpnParser
 			return Math.Exp(arguments[0]);
 		}
 
-		public static double GKDIKKHOAPH(List<double> arguments)
+		public static double Greater(List<double> arguments)
 		{
 			if (arguments.Count != 2)
 			{
@@ -286,7 +286,7 @@ public class RpnParser
 			return (arguments[0] > arguments[1]) ? 1 : 0;
 		}
 
-		public static double ODGIFGPIGEK(List<double> arguments)
+		public static double Less(List<double> arguments)
 		{
 			if (arguments.Count != 2)
 			{
@@ -295,7 +295,7 @@ public class RpnParser
 			return (arguments[0] < arguments[1]) ? 1 : 0;
 		}
 
-		public static double PBCFPODKOLL(List<double> arguments)
+		public static double GreaterOrEqual(List<double> arguments)
 		{
 			if (arguments.Count != 2)
 			{
@@ -304,7 +304,7 @@ public class RpnParser
 			return (arguments[0] >= arguments[1]) ? 1 : 0;
 		}
 
-		public static double JPNDCHMCBAL(List<double> arguments)
+		public static double LessOrEqual(List<double> arguments)
 		{
 			if (arguments.Count != 2)
 			{
@@ -313,7 +313,7 @@ public class RpnParser
 			return (arguments[0] <= arguments[1]) ? 1 : 0;
 		}
 
-		public static double LLLCNFLNBIO(List<double> arguments)
+		public static double Equal(List<double> arguments)
 		{
 			if (arguments.Count != 2)
 			{
@@ -322,7 +322,7 @@ public class RpnParser
 			return (arguments[0] == arguments[1]) ? 1 : 0;
 		}
 
-		public static double LGIIDGAEAGN(List<double> arguments)
+		public static double NotEqual(List<double> arguments)
 		{
 			if (arguments.Count != 2)
 			{
@@ -332,105 +332,105 @@ public class RpnParser
 		}
 	}
 
-	private class FAOBBBMHEBL
+	private class Operand
 	{
 		[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-		private NKMIEOOPJHP KAHHEBMBCFA;
+		private OperandType type;
 
-		public FAOBBBMHEBL()
+		public Operand()
 		{
-			set_Type(NKMIEOOPJHP.None);
+			set_Type(OperandType.None);
 		}
 
-		public NKMIEOOPJHP get_Type()
+		public OperandType get_Type()
 		{
-			return KAHHEBMBCFA;
+			return type;
 		}
 
-		public void set_Type(NKMIEOOPJHP value)
+		public void set_Type(OperandType value)
 		{
-			KAHHEBMBCFA = value;
+			type = value;
 		}
 
-		public virtual object OAGPELOHACM()
+		public virtual object GetValue()
 		{
 			return null;
 		}
 	}
 
-	private class ANCMPDAEGDN : FAOBBBMHEBL
+	private class ConstantOperand : Operand
 	{
 		private object _value;
 
-		public ANCMPDAEGDN(object value)
+		public ConstantOperand(object value)
 		{
 			_value = value;
-			set_Type(NKMIEOOPJHP.Constant);
+			set_Type(OperandType.Constant);
 		}
 
-		public override object OAGPELOHACM()
+		public override object GetValue()
 		{
 			return _value;
 		}
 	}
 
-	private class AAGFMFHOGDN : FAOBBBMHEBL
+	private class VariableOperand : Operand
 	{
-		private PHNLIHEJEPK CDIHDPDEOOF;
+		private VariableDelegate getter;
 
-		public AAGFMFHOGDN(PHNLIHEJEPK NFDJONMIEFL)
+		public VariableOperand(VariableDelegate NFDJONMIEFL)
 		{
-			CDIHDPDEOOF = NFDJONMIEFL;
-			set_Type(NKMIEOOPJHP.Variable);
+			getter = NFDJONMIEFL;
+			set_Type(OperandType.Variable);
 		}
 
-		public override object OAGPELOHACM()
+		public override object GetValue()
 		{
-			return CDIHDPDEOOF();
+			return getter();
 		}
 	}
 
-	private class KPOPDKMFMNK : FAOBBBMHEBL
+	private class FunctionOperand : Operand
 	{
-		private ParameterDelegate KCNIKBNOJKN;
+		private ParameterDelegate function;
 
-		private List<FAOBBBMHEBL> DLNJFPNNBKO;
+		private List<Operand> argumentList;
 
-		public KPOPDKMFMNK(List<FAOBBBMHEBL> arguments, ParameterDelegate JKAELOIBLFJ)
+		public FunctionOperand(List<Operand> arguments, ParameterDelegate JKAELOIBLFJ)
 		{
-			DLNJFPNNBKO = arguments;
-			KCNIKBNOJKN = JKAELOIBLFJ;
+			argumentList = arguments;
+			function = JKAELOIBLFJ;
 		}
 
-		public override object OAGPELOHACM()
+		public override object GetValue()
 		{
 			List<object> list = new List<object>(1);
-			foreach (FAOBBBMHEBL item in DLNJFPNNBKO)
+			foreach (Operand item in argumentList)
 			{
-				list.Add(item.OAGPELOHACM());
+				list.Add(item.GetValue());
 			}
-			return KCNIKBNOJKN(list);
+			return function(list);
 		}
 	}
 
-	private class BAELOMEILMK
+	private class FormulaItem
 	{
-		public BLELIIJLLEB LFLGCDNKNJI;
+		public ItemKind Kind;
 
-		public IMOIKMFBGDH IMGAKPOBGBP;
+		public OperatorInfo Operator;
 
-		public FAOBBBMHEBL LMENIMNKNHP;
+		public Operand Operand;
 	}
 
 	public class Formula
 	{
-		private List<BAELOMEILMK> _items = new List<BAELOMEILMK>();
+		private List<FormulaItem> _items = new List<FormulaItem>();
 
-		public int DOOJLEBPJCK
+		public int VariableCount
 		{
 			get
 			{
-				return OJEHEKMJJBL();
+				return GetVariableCount();
 			}
 		}
 
@@ -440,98 +440,98 @@ public class RpnParser
 			{
 				throw new Exception("RpnParser is not inited!");
 			}
-			_items = OCJPEOLCPCC(HBICLHKEIEI);
+			_items = ParseFormula(HBICLHKEIEI);
 		}
 
-		public int OJEHEKMJJBL()
+		public int GetVariableCount()
 		{
-			return _items.FindAll((BAELOMEILMK DHDMNHCIPEH) => DHDMNHCIPEH.LMENIMNKNHP != null && DHDMNHCIPEH.LMENIMNKNHP.get_Type() == NKMIEOOPJHP.Variable).Count;
+			return _items.FindAll((FormulaItem DHDMNHCIPEH) => DHDMNHCIPEH.Operand != null && DHDMNHCIPEH.Operand.get_Type() == OperandType.Variable).Count;
 		}
 
-		public object ODHJHHMEEOI()
+		public object Calculate()
 		{
-			return RpnParser.ODHJHHMEEOI(_items);
+			return RpnParser.Calculate(_items);
 		}
 	}
 
-	private static Dictionary<string, IMOIKMFBGDH> JHNBIMFAIMP;
+	private static Dictionary<string, OperatorInfo> _operators;
 
-	private static Dictionary<string, PHNLIHEJEPK> FNBONMPOPKH;
+	private static Dictionary<string, VariableDelegate> _variables;
 
-	private static Dictionary<string, ParameterDelegate> JNNPIBLANAD;
+	private static Dictionary<string, ParameterDelegate> _functions;
 
 	private static bool _isInited;
 
-	private const string HEDFGBBGEBL = "+-*^()|/&#";
+	private const string OperatorSymbols = "+-*^()|/&#";
 
-	public const char MOCCDHDIKPB = '?';
+	public const char FunctionPrefix = '?';
 
-	public const char MOIFICCGIMN = '.';
+	public const char MemberSeparator = '.';
 
-	public const char BAMMMBAOMFA = '$';
+	public const char VariablePrefix = '$';
 
-	public const char GEFMPKBNGJA = ',';
+	public const char ArgumentSeparator = ',';
 
-	public static void init(Dictionary<string, PHNLIHEJEPK> PPEABEJMCPI, Dictionary<string, ParameterDelegate> GIOGAJGIGMO)
+	public static void init(Dictionary<string, VariableDelegate> PPEABEJMCPI, Dictionary<string, ParameterDelegate> GIOGAJGIGMO)
 	{
 		if (!_isInited)
 		{
-			GOALNBNMFKH();
-			FNBONMPOPKH = PPEABEJMCPI;
-			JNNPIBLANAD = GIOGAJGIGMO;
+			InitOperators();
+			_variables = PPEABEJMCPI;
+			_functions = GIOGAJGIGMO;
 			_isInited = true;
 		}
 	}
 
-	private static void GOALNBNMFKH()
+	private static void InitOperators()
 	{
-		if (JHNBIMFAIMP == null)
+		if (_operators == null)
 		{
-			JHNBIMFAIMP = new Dictionary<string, IMOIKMFBGDH>(18);
-			JHNBIMFAIMP["+"] = new IMOIKMFBGDH(DMMCIDPIFMK.OperatorAddPrior, IMOIKMFBGDH.ICPPFFICMJH, EGLAAMKIAHG.OperatorAddArgCount, IKHBAIDMOHC.OperatorAddDirect);
-			JHNBIMFAIMP["-"] = new IMOIKMFBGDH(DMMCIDPIFMK.OperatorAddPrior, IMOIKMFBGDH.BPBNMAPGJAE, EGLAAMKIAHG.OperatorAddArgCount, IKHBAIDMOHC.OperatorAddDirect);
-			JHNBIMFAIMP["*"] = new IMOIKMFBGDH(DMMCIDPIFMK.OperatorMultPrior, IMOIKMFBGDH.BEOCEMLPKDD, EGLAAMKIAHG.OperatorAddArgCount, IKHBAIDMOHC.OperatorAddDirect);
-			JHNBIMFAIMP["/"] = new IMOIKMFBGDH(DMMCIDPIFMK.OperatorMultPrior, IMOIKMFBGDH.JONIACGMPPF, EGLAAMKIAHG.OperatorAddArgCount, IKHBAIDMOHC.OperatorAddDirect);
-			JHNBIMFAIMP["%"] = new IMOIKMFBGDH(DMMCIDPIFMK.OperatorMultPrior, IMOIKMFBGDH.EEMILHABJID, EGLAAMKIAHG.OperatorAddArgCount, IKHBAIDMOHC.OperatorAddDirect);
-			JHNBIMFAIMP["^"] = new IMOIKMFBGDH(DMMCIDPIFMK.OperatorPowPrior, IMOIKMFBGDH.IPCEIGHPABJ, EGLAAMKIAHG.OperatorAddArgCount, IKHBAIDMOHC.OperatorPowDirect);
-			JHNBIMFAIMP["|"] = new IMOIKMFBGDH(DMMCIDPIFMK.OperatorPowPrior, IMOIKMFBGDH.AIJAPKDMBFD, EGLAAMKIAHG.OperatorAddArgCount, IKHBAIDMOHC.OperatorAddDirect);
-			JHNBIMFAIMP["("] = new IMOIKMFBGDH(DMMCIDPIFMK.OperatorBrackLPrior, null, EGLAAMKIAHG.OperatorBrackLArgCount, IKHBAIDMOHC.OperatorAddDirect);
-			JHNBIMFAIMP[")"] = new IMOIKMFBGDH(DMMCIDPIFMK.OperatorBrackLPrior, null, EGLAAMKIAHG.OperatorBrackLArgCount, IKHBAIDMOHC.OperatorAddDirect);
-			JHNBIMFAIMP["sin"] = new IMOIKMFBGDH(DMMCIDPIFMK.OperatorSinPrior, IMOIKMFBGDH.CDANHLLHEMG, EGLAAMKIAHG.OperatorSinArgCount, IKHBAIDMOHC.OperatorPowDirect);
-			JHNBIMFAIMP["cos"] = new IMOIKMFBGDH(DMMCIDPIFMK.OperatorSinPrior, IMOIKMFBGDH.PBMKAPABCFN, EGLAAMKIAHG.OperatorSinArgCount, IKHBAIDMOHC.OperatorPowDirect);
-			JHNBIMFAIMP["max"] = new IMOIKMFBGDH(DMMCIDPIFMK.OperatorSinPrior, IMOIKMFBGDH.ANEAGFECEFM, EGLAAMKIAHG.OperatorAddArgCount, IKHBAIDMOHC.OperatorPowDirect);
-			JHNBIMFAIMP["min"] = new IMOIKMFBGDH(DMMCIDPIFMK.OperatorSinPrior, IMOIKMFBGDH.NKHACLLAANI, EGLAAMKIAHG.OperatorAddArgCount, IKHBAIDMOHC.OperatorPowDirect);
-			JHNBIMFAIMP["pow"] = new IMOIKMFBGDH(DMMCIDPIFMK.OperatorPowPrior, IMOIKMFBGDH.IPCEIGHPABJ, EGLAAMKIAHG.OperatorAddArgCount, IKHBAIDMOHC.OperatorPowDirect);
-			JHNBIMFAIMP["sqrt"] = new IMOIKMFBGDH(DMMCIDPIFMK.OperatorPowPrior, IMOIKMFBGDH.JCPIFEGOAFN, EGLAAMKIAHG.OperatorSinArgCount, IKHBAIDMOHC.OperatorPowDirect);
-			JHNBIMFAIMP["abs"] = new IMOIKMFBGDH(DMMCIDPIFMK.OperatorSinPrior, IMOIKMFBGDH.PDEFPKGHIMD, EGLAAMKIAHG.OperatorSinArgCount, IKHBAIDMOHC.OperatorPowDirect);
-			JHNBIMFAIMP["ln"] = new IMOIKMFBGDH(DMMCIDPIFMK.OperatorSinPrior, IMOIKMFBGDH.IIAKACBAOIB, EGLAAMKIAHG.OperatorSinArgCount, IKHBAIDMOHC.OperatorPowDirect);
-			JHNBIMFAIMP["lg"] = new IMOIKMFBGDH(DMMCIDPIFMK.OperatorSinPrior, IMOIKMFBGDH.JHEBIJIIFHE, EGLAAMKIAHG.OperatorSinArgCount, IKHBAIDMOHC.OperatorPowDirect);
-			JHNBIMFAIMP["log"] = new IMOIKMFBGDH(DMMCIDPIFMK.OperatorSinPrior, IMOIKMFBGDH.CIDBJOJNPIO, EGLAAMKIAHG.OperatorAddArgCount, IKHBAIDMOHC.OperatorPowDirect);
-			JHNBIMFAIMP["exp"] = new IMOIKMFBGDH(DMMCIDPIFMK.OperatorSinPrior, IMOIKMFBGDH.DOJHPLNIEKJ, EGLAAMKIAHG.OperatorSinArgCount, IKHBAIDMOHC.OperatorPowDirect);
-			JHNBIMFAIMP[">"] = new IMOIKMFBGDH(DMMCIDPIFMK.OperatorSinPrior, IMOIKMFBGDH.GKDIKKHOAPH, EGLAAMKIAHG.OperatorAddArgCount, IKHBAIDMOHC.OperatorAddDirect);
-			JHNBIMFAIMP["<"] = new IMOIKMFBGDH(DMMCIDPIFMK.OperatorSinPrior, IMOIKMFBGDH.ODGIFGPIGEK, EGLAAMKIAHG.OperatorAddArgCount, IKHBAIDMOHC.OperatorAddDirect);
-			JHNBIMFAIMP["=>"] = new IMOIKMFBGDH(DMMCIDPIFMK.OperatorSinPrior, IMOIKMFBGDH.PBCFPODKOLL, EGLAAMKIAHG.OperatorAddArgCount, IKHBAIDMOHC.OperatorAddDirect);
-			JHNBIMFAIMP["=<"] = new IMOIKMFBGDH(DMMCIDPIFMK.OperatorSinPrior, IMOIKMFBGDH.JPNDCHMCBAL, EGLAAMKIAHG.OperatorAddArgCount, IKHBAIDMOHC.OperatorAddDirect);
-			JHNBIMFAIMP["=="] = new IMOIKMFBGDH(DMMCIDPIFMK.OperatorSinPrior, IMOIKMFBGDH.LLLCNFLNBIO, EGLAAMKIAHG.OperatorAddArgCount, IKHBAIDMOHC.OperatorAddDirect);
-			JHNBIMFAIMP["!="] = new IMOIKMFBGDH(DMMCIDPIFMK.OperatorSinPrior, IMOIKMFBGDH.LGIIDGAEAGN, EGLAAMKIAHG.OperatorAddArgCount, IKHBAIDMOHC.OperatorAddDirect);
+			_operators = new Dictionary<string, OperatorInfo>(18);
+			_operators["+"] = new OperatorInfo(OperatorPriority.OperatorAddPrior, OperatorInfo.Add, OperatorArgCount.OperatorAddArgCount, OperatorDirection.OperatorAddDirect);
+			_operators["-"] = new OperatorInfo(OperatorPriority.OperatorAddPrior, OperatorInfo.Subtract, OperatorArgCount.OperatorAddArgCount, OperatorDirection.OperatorAddDirect);
+			_operators["*"] = new OperatorInfo(OperatorPriority.OperatorMultPrior, OperatorInfo.Multiply, OperatorArgCount.OperatorAddArgCount, OperatorDirection.OperatorAddDirect);
+			_operators["/"] = new OperatorInfo(OperatorPriority.OperatorMultPrior, OperatorInfo.Divide, OperatorArgCount.OperatorAddArgCount, OperatorDirection.OperatorAddDirect);
+			_operators["%"] = new OperatorInfo(OperatorPriority.OperatorMultPrior, OperatorInfo.Modulo, OperatorArgCount.OperatorAddArgCount, OperatorDirection.OperatorAddDirect);
+			_operators["^"] = new OperatorInfo(OperatorPriority.OperatorPowPrior, OperatorInfo.Power, OperatorArgCount.OperatorAddArgCount, OperatorDirection.OperatorPowDirect);
+			_operators["|"] = new OperatorInfo(OperatorPriority.OperatorPowPrior, OperatorInfo.Or, OperatorArgCount.OperatorAddArgCount, OperatorDirection.OperatorAddDirect);
+			_operators["("] = new OperatorInfo(OperatorPriority.OperatorBrackLPrior, null, OperatorArgCount.OperatorBrackLArgCount, OperatorDirection.OperatorAddDirect);
+			_operators[")"] = new OperatorInfo(OperatorPriority.OperatorBrackLPrior, null, OperatorArgCount.OperatorBrackLArgCount, OperatorDirection.OperatorAddDirect);
+			_operators["sin"] = new OperatorInfo(OperatorPriority.OperatorSinPrior, OperatorInfo.Sin, OperatorArgCount.OperatorSinArgCount, OperatorDirection.OperatorPowDirect);
+			_operators["cos"] = new OperatorInfo(OperatorPriority.OperatorSinPrior, OperatorInfo.Cos, OperatorArgCount.OperatorSinArgCount, OperatorDirection.OperatorPowDirect);
+			_operators["max"] = new OperatorInfo(OperatorPriority.OperatorSinPrior, OperatorInfo.Max, OperatorArgCount.OperatorAddArgCount, OperatorDirection.OperatorPowDirect);
+			_operators["min"] = new OperatorInfo(OperatorPriority.OperatorSinPrior, OperatorInfo.Min, OperatorArgCount.OperatorAddArgCount, OperatorDirection.OperatorPowDirect);
+			_operators["pow"] = new OperatorInfo(OperatorPriority.OperatorPowPrior, OperatorInfo.Power, OperatorArgCount.OperatorAddArgCount, OperatorDirection.OperatorPowDirect);
+			_operators["sqrt"] = new OperatorInfo(OperatorPriority.OperatorPowPrior, OperatorInfo.Sqrt, OperatorArgCount.OperatorSinArgCount, OperatorDirection.OperatorPowDirect);
+			_operators["abs"] = new OperatorInfo(OperatorPriority.OperatorSinPrior, OperatorInfo.Abs, OperatorArgCount.OperatorSinArgCount, OperatorDirection.OperatorPowDirect);
+			_operators["ln"] = new OperatorInfo(OperatorPriority.OperatorSinPrior, OperatorInfo.Ln, OperatorArgCount.OperatorSinArgCount, OperatorDirection.OperatorPowDirect);
+			_operators["lg"] = new OperatorInfo(OperatorPriority.OperatorSinPrior, OperatorInfo.Lg, OperatorArgCount.OperatorSinArgCount, OperatorDirection.OperatorPowDirect);
+			_operators["log"] = new OperatorInfo(OperatorPriority.OperatorSinPrior, OperatorInfo.Log, OperatorArgCount.OperatorAddArgCount, OperatorDirection.OperatorPowDirect);
+			_operators["exp"] = new OperatorInfo(OperatorPriority.OperatorSinPrior, OperatorInfo.Exp, OperatorArgCount.OperatorSinArgCount, OperatorDirection.OperatorPowDirect);
+			_operators[">"] = new OperatorInfo(OperatorPriority.OperatorSinPrior, OperatorInfo.Greater, OperatorArgCount.OperatorAddArgCount, OperatorDirection.OperatorAddDirect);
+			_operators["<"] = new OperatorInfo(OperatorPriority.OperatorSinPrior, OperatorInfo.Less, OperatorArgCount.OperatorAddArgCount, OperatorDirection.OperatorAddDirect);
+			_operators["=>"] = new OperatorInfo(OperatorPriority.OperatorSinPrior, OperatorInfo.GreaterOrEqual, OperatorArgCount.OperatorAddArgCount, OperatorDirection.OperatorAddDirect);
+			_operators["=<"] = new OperatorInfo(OperatorPriority.OperatorSinPrior, OperatorInfo.LessOrEqual, OperatorArgCount.OperatorAddArgCount, OperatorDirection.OperatorAddDirect);
+			_operators["=="] = new OperatorInfo(OperatorPriority.OperatorSinPrior, OperatorInfo.Equal, OperatorArgCount.OperatorAddArgCount, OperatorDirection.OperatorAddDirect);
+			_operators["!="] = new OperatorInfo(OperatorPriority.OperatorSinPrior, OperatorInfo.NotEqual, OperatorArgCount.OperatorAddArgCount, OperatorDirection.OperatorAddDirect);
 		}
 	}
 
-	private static List<BAELOMEILMK> OCJPEOLCPCC(string DPABILBDPFF)
+	private static List<FormulaItem> ParseFormula(string DPABILBDPFF)
 	{
-		List<BAELOMEILMK> list = new List<BAELOMEILMK>();
+		List<FormulaItem> list = new List<FormulaItem>();
 		if (DPABILBDPFF == string.Empty)
 		{
 			throw new Exception("Formula can not be empty");
 		}
-		DPABILBDPFF = DPCKBFHACAC(DPABILBDPFF);
-		DPABILBDPFF = OAFPFEKLOFO(DPABILBDPFF);
-		List<BAELOMEILMK> list2 = LMGMFLGHNGJ(DPABILBDPFF);
-		if (!KDHHNEOBBCA(list2))
+		DPABILBDPFF = RemoveSpaces(DPABILBDPFF);
+		DPABILBDPFF = InsertUnaryZeros(DPABILBDPFF);
+		List<FormulaItem> list2 = Tokenize(DPABILBDPFF);
+		if (!AreBracketsBalanced(list2))
 		{
 			throw new Exception("Formula can not be empty");
 		}
-		list = CNOJALPFLLC(list2);
+		list = ToPostfix(list2);
 		if (list.Count == 0)
 		{
 			throw new Exception("Formula has no items");
@@ -539,7 +539,7 @@ public class RpnParser
 		return list;
 	}
 
-	private static object ODHJHHMEEOI(List<BAELOMEILMK> HELFDCAIJNE)
+	private static object Calculate(List<FormulaItem> HELFDCAIJNE)
 	{
 		if (HELFDCAIJNE == null || HELFDCAIJNE.Count == 0)
 		{
@@ -547,25 +547,25 @@ public class RpnParser
 			// Treat that expression as zero instead of breaking combat every hit.
 			return 0.0;
 		}
-		if (HELFDCAIJNE.Count == 1 && HELFDCAIJNE[0].LFLGCDNKNJI == BLELIIJLLEB.Operand)
+		if (HELFDCAIJNE.Count == 1 && HELFDCAIJNE[0].Kind == ItemKind.Operand)
 		{
-			return HELFDCAIJNE[0].LMENIMNKNHP.OAGPELOHACM();
+			return HELFDCAIJNE[0].Operand.GetValue();
 		}
 		List<object> list = new List<object>(2);
 		for (int i = 0; i != HELFDCAIJNE.Count; i++)
 		{
-			if (HELFDCAIJNE[i].LFLGCDNKNJI == BLELIIJLLEB.Operand)
+			if (HELFDCAIJNE[i].Kind == ItemKind.Operand)
 			{
-				list.Add(HELFDCAIJNE[i].LMENIMNKNHP.OAGPELOHACM());
+				list.Add(HELFDCAIJNE[i].Operand.GetValue());
 			}
 			else
 			{
-				if (HELFDCAIJNE[i].LFLGCDNKNJI != BLELIIJLLEB.Operator)
+				if (HELFDCAIJNE[i].Kind != ItemKind.Operator)
 				{
 					continue;
 				}
 				List<double> list2 = new List<double>();
-				int num = (int)(list.Count - HELFDCAIJNE[i].IMGAKPOBGBP.FABCLOGBCJM);
+				int num = (int)(list.Count - HELFDCAIJNE[i].Operator.ArgCount);
 				if (num < 0)
 				{
 					return 0.0;
@@ -579,15 +579,15 @@ public class RpnParser
 					}
 					list2.Add(result);
 				}
-				double num2 = HELFDCAIJNE[i].IMGAKPOBGBP.GDLNLMPIKMO(list2);
-				list.RemoveRange(num, (int)HELFDCAIJNE[i].IMGAKPOBGBP.FABCLOGBCJM);
+				double num2 = HELFDCAIJNE[i].Operator.Function(list2);
+				list.RemoveRange(num, (int)HELFDCAIJNE[i].Operator.ArgCount);
 				list.Add(num2);
 			}
 		}
 		return ((list.Count == 0) ? 0.0 : list[0]);
 	}
 
-	private static string OAFPFEKLOFO(string DPABILBDPFF)
+	private static string InsertUnaryZeros(string DPABILBDPFF)
 	{
 		for (int i = 0; i < DPABILBDPFF.Length; i++)
 		{
@@ -599,12 +599,12 @@ public class RpnParser
 		return DPABILBDPFF;
 	}
 
-	private static string DPCKBFHACAC(string DPABILBDPFF)
+	private static string RemoveSpaces(string DPABILBDPFF)
 	{
 		return DPABILBDPFF.Replace(" ", string.Empty);
 	}
 
-	public static bool MHPHPJEMDNH(string symbol)
+	public static bool IsOperatorSymbol(string symbol)
 	{
 		if (!"+-*^()|/&#".Contains(symbol))
 		{
@@ -613,18 +613,18 @@ public class RpnParser
 		return true;
 	}
 
-	public static bool MHPHPJEMDNH(char symbol)
+	public static bool IsOperatorSymbol(char symbol)
 	{
 		return "+-*^()|/&#".IndexOf(symbol) != -1;
 	}
 
-	private static bool EEEMOIBDBEA(string IGGFGLLIGCG)
+	private static bool IsOperator(string IGGFGLLIGCG)
 	{
 		string key = IGGFGLLIGCG.ToLower();
-		return JHNBIMFAIMP.ContainsKey(key);
+		return _operators.ContainsKey(key);
 	}
 
-	private static bool MBEKDNOJCOP(string IGGFGLLIGCG)
+	private static bool IsFunction(string IGGFGLLIGCG)
 	{
 		if (IGGFGLLIGCG[0] == '?')
 		{
@@ -640,7 +640,7 @@ public class RpnParser
 		return false;
 	}
 
-	private static bool BNDLKPGCJBM(string IGGFGLLIGCG)
+	private static bool IsVariable(string IGGFGLLIGCG)
 	{
 		if (IGGFGLLIGCG[0] == '$')
 		{
@@ -649,14 +649,14 @@ public class RpnParser
 		return false;
 	}
 
-	private static List<BAELOMEILMK> LMGMFLGHNGJ(string DPABILBDPFF)
+	private static List<FormulaItem> Tokenize(string DPABILBDPFF)
 	{
-		List<BAELOMEILMK> list = new List<BAELOMEILMK>();
+		List<FormulaItem> list = new List<FormulaItem>();
 		int i = 0;
 		int length = DPABILBDPFF.Length;
 		while (i < length)
 		{
-			BAELOMEILMK bAELOMEILMK = new BAELOMEILMK();
+			FormulaItem bAELOMEILMK = new FormulaItem();
 			if (char.IsDigit(DPABILBDPFF[i]))
 			{
 				string text = string.Empty;
@@ -678,8 +678,8 @@ public class RpnParser
 					text += c2;
 				}
 				double num = Convert.ToDouble(text, CultureInfo.InvariantCulture);
-				bAELOMEILMK.LFLGCDNKNJI = BLELIIJLLEB.Operand;
-				bAELOMEILMK.LMENIMNKNHP = new ANCMPDAEGDN(num);
+				bAELOMEILMK.Kind = ItemKind.Operand;
+				bAELOMEILMK.Operand = new ConstantOperand(num);
 			}
 			else if (!char.IsDigit(DPABILBDPFF[i]))
 			{
@@ -689,25 +689,25 @@ public class RpnParser
 					continue;
 				}
 				string text2 = string.Empty;
-				while (i < length && (!MHPHPJEMDNH(DPABILBDPFF[i].ToString()) || !CPLOMAEDDEK(text2) || text2.Length == 0))
+				while (i < length && (!IsOperatorSymbol(DPABILBDPFF[i].ToString()) || !AreSquareBracketsBalanced(text2) || text2.Length == 0))
 				{
 					text2 += DPABILBDPFF[i];
 					i++;
-					if (EEEMOIBDBEA(text2))
+					if (IsOperator(text2))
 					{
 						break;
 					}
 				}
-				if (EEEMOIBDBEA(text2))
+				if (IsOperator(text2))
 				{
-					bAELOMEILMK.LFLGCDNKNJI = BLELIIJLLEB.Operator;
+					bAELOMEILMK.Kind = ItemKind.Operator;
 					string key = text2.ToLower();
-					bAELOMEILMK.IMGAKPOBGBP = JHNBIMFAIMP[key];
+					bAELOMEILMK.Operator = _operators[key];
 				}
 				else
 				{
-					bAELOMEILMK.LFLGCDNKNJI = BLELIIJLLEB.Operand;
-					bAELOMEILMK.LMENIMNKNHP = KDEOLIEBNKA(text2);
+					bAELOMEILMK.Kind = ItemKind.Operand;
+					bAELOMEILMK.Operand = ParseOperand(text2);
 				}
 			}
 			list.Add(bAELOMEILMK);
@@ -715,7 +715,7 @@ public class RpnParser
 		return list;
 	}
 
-	private static bool CPLOMAEDDEK(string IGGFGLLIGCG)
+	private static bool AreSquareBracketsBalanced(string IGGFGLLIGCG)
 	{
 		int num = 0;
 		int num2 = 0;
@@ -734,71 +734,71 @@ public class RpnParser
 		return num == num2;
 	}
 
-	private static KPOPDKMFMNK AFJIEEOFIAA(string IGGFGLLIGCG)
+	private static FunctionOperand ParseFunction(string IGGFGLLIGCG)
 	{
 		int num = IGGFGLLIGCG.IndexOf("[");
 		string text = IGGFGLLIGCG.Substring(0, num);
 		string dJIONFCICFC = IGGFGLLIGCG.Substring(num + 1, IGGFGLLIGCG.Length - num - 2);
 		string text2 = text.Substring(1, text.Length - 1);
-		if (!JNNPIBLANAD.ContainsKey(text2))
+		if (!_functions.ContainsKey(text2))
 		{
 			throw new Exception("Unknown function name " + text2);
 		}
-		List<FAOBBBMHEBL> mAABDFKMACJ = FNMPBFKFALB(dJIONFCICFC);
-		return new KPOPDKMFMNK(mAABDFKMACJ, JNNPIBLANAD[text2]);
+		List<Operand> mAABDFKMACJ = ParseArguments(dJIONFCICFC);
+		return new FunctionOperand(mAABDFKMACJ, _functions[text2]);
 	}
 
-	private static FAOBBBMHEBL KDEOLIEBNKA(string EBDLDPIBIEO)
+	private static Operand ParseOperand(string EBDLDPIBIEO)
 	{
-		FAOBBBMHEBL fAOBBBMHEBL = null;
-		if (MBEKDNOJCOP(EBDLDPIBIEO))
+		Operand fAOBBBMHEBL = null;
+		if (IsFunction(EBDLDPIBIEO))
 		{
-			EBDLDPIBIEO = NABNCPFHCLB(EBDLDPIBIEO);
-			fAOBBBMHEBL = AFJIEEOFIAA(EBDLDPIBIEO);
+			EBDLDPIBIEO = ExpandMemberAccess(EBDLDPIBIEO);
+			fAOBBBMHEBL = ParseFunction(EBDLDPIBIEO);
 		}
 		else if (char.IsDigit(EBDLDPIBIEO[0]))
 		{
 			double num = Convert.ToDouble(EBDLDPIBIEO);
-			fAOBBBMHEBL = new ANCMPDAEGDN(num);
+			fAOBBBMHEBL = new ConstantOperand(num);
 		}
-		else if (BNDLKPGCJBM(EBDLDPIBIEO))
+		else if (IsVariable(EBDLDPIBIEO))
 		{
 			string text = EBDLDPIBIEO.Substring(1, EBDLDPIBIEO.Length - 1);
-			if (!FNBONMPOPKH.ContainsKey(text))
+			if (!_variables.ContainsKey(text))
 			{
 				throw new Exception("Unknown variable " + text);
 			}
-			fAOBBBMHEBL = new AAGFMFHOGDN(FNBONMPOPKH[text]);
+			fAOBBBMHEBL = new VariableOperand(_variables[text]);
 		}
 		else
 		{
-			fAOBBBMHEBL = new ANCMPDAEGDN(EBDLDPIBIEO);
-			fAOBBBMHEBL.set_Type(NKMIEOOPJHP.Variable);
+			fAOBBBMHEBL = new ConstantOperand(EBDLDPIBIEO);
+			fAOBBBMHEBL.set_Type(OperandType.Variable);
 		}
 		return fAOBBBMHEBL;
 	}
 
-	private static List<FAOBBBMHEBL> FNMPBFKFALB(string DJIONFCICFC)
+	private static List<Operand> ParseArguments(string DJIONFCICFC)
 	{
 		if (DJIONFCICFC.Length == 0)
 		{
-			List<FAOBBBMHEBL> list = new List<FAOBBBMHEBL>();
-			list.Add(new FAOBBBMHEBL());
+			List<Operand> list = new List<Operand>();
+			list.Add(new Operand());
 			return list;
 		}
-		List<FAOBBBMHEBL> list2 = new List<FAOBBBMHEBL>();
+		List<Operand> list2 = new List<Operand>();
 		DJIONFCICFC = DJIONFCICFC.Trim();
-		string[] array = KGBAOFMDKOL(DJIONFCICFC, ',');
+		string[] array = SplitArguments(DJIONFCICFC, ',');
 		string[] array2 = array;
 		foreach (string eBDLDPIBIEO in array2)
 		{
-			FAOBBBMHEBL item = KDEOLIEBNKA(eBDLDPIBIEO);
+			Operand item = ParseOperand(eBDLDPIBIEO);
 			list2.Add(item);
 		}
 		return list2;
 	}
 
-	private static string[] KGBAOFMDKOL(string CGJGACJABDF, char EPJDMLMAOII)
+	private static string[] SplitArguments(string CGJGACJABDF, char EPJDMLMAOII)
 	{
 		List<string> list = new List<string>();
 		int num = 0;
@@ -852,16 +852,16 @@ public class RpnParser
 		return num - 1;
 	}
 
-	private static string NABNCPFHCLB(string IGGFGLLIGCG)
+	private static string ExpandMemberAccess(string IGGFGLLIGCG)
 	{
 		while (IGGFGLLIGCG.Contains("."))
 		{
-			IGGFGLLIGCG = BOENCMHMLGA(IGGFGLLIGCG);
+			IGGFGLLIGCG = ConvertMemberAccess(IGGFGLLIGCG);
 		}
 		return IGGFGLLIGCG;
 	}
 
-	private static string BOENCMHMLGA(string IGGFGLLIGCG)
+	private static string ConvertMemberAccess(string IGGFGLLIGCG)
 	{
 		int num = IGGFGLLIGCG.IndexOf('.');
 		string text = IGGFGLLIGCG.Substring(0, num);
@@ -870,19 +870,19 @@ public class RpnParser
 		return IGGFGLLIGCG;
 	}
 
-	private static bool KDHHNEOBBCA(List<BAELOMEILMK> HELFDCAIJNE)
+	private static bool AreBracketsBalanced(List<FormulaItem> HELFDCAIJNE)
 	{
 		int num = 0;
 		int num2 = 0;
 		for (int i = 0; i != HELFDCAIJNE.Count; i++)
 		{
-			if (HELFDCAIJNE[i].LFLGCDNKNJI == BLELIIJLLEB.Operator)
+			if (HELFDCAIJNE[i].Kind == ItemKind.Operator)
 			{
-				if (HELFDCAIJNE[i].IMGAKPOBGBP == JHNBIMFAIMP["("])
+				if (HELFDCAIJNE[i].Operator == _operators["("])
 				{
 					num++;
 				}
-				else if (HELFDCAIJNE[i].IMGAKPOBGBP == JHNBIMFAIMP[")"])
+				else if (HELFDCAIJNE[i].Operator == _operators[")"])
 				{
 					num2++;
 				}
@@ -891,34 +891,34 @@ public class RpnParser
 		return num == num2;
 	}
 
-	private static List<BAELOMEILMK> CNOJALPFLLC(List<BAELOMEILMK> JEFEGDICJJC)
+	private static List<FormulaItem> ToPostfix(List<FormulaItem> JEFEGDICJJC)
 	{
-		List<BAELOMEILMK> list = new List<BAELOMEILMK>();
-		List<BAELOMEILMK> list2 = new List<BAELOMEILMK>();
+		List<FormulaItem> list = new List<FormulaItem>();
+		List<FormulaItem> list2 = new List<FormulaItem>();
 		int num = 0;
 		while (num != JEFEGDICJJC.Count)
 		{
-			if (JEFEGDICJJC[num].LFLGCDNKNJI == BLELIIJLLEB.Operand)
+			if (JEFEGDICJJC[num].Kind == ItemKind.Operand)
 			{
 				list.Add(JEFEGDICJJC[num]);
 				num++;
 			}
-			else if (JEFEGDICJJC[num].IMGAKPOBGBP == JHNBIMFAIMP["("])
+			else if (JEFEGDICJJC[num].Operator == _operators["("])
 			{
 				list2.Add(JEFEGDICJJC[num]);
 				num++;
 			}
-			else if (JEFEGDICJJC[num].IMGAKPOBGBP == JHNBIMFAIMP[")"])
+			else if (JEFEGDICJJC[num].Operator == _operators[")"])
 			{
-				while (list2.Count != 0 && list2[list2.Count - 1].IMGAKPOBGBP != JHNBIMFAIMP["("])
+				while (list2.Count != 0 && list2[list2.Count - 1].Operator != _operators["("])
 				{
 					list.Add(list2[list2.Count - 1]);
 					list2.RemoveAt(list2.Count - 1);
 				}
-				if (list2.Count != 0 && list2[list2.Count - 1].IMGAKPOBGBP == JHNBIMFAIMP["("])
+				if (list2.Count != 0 && list2[list2.Count - 1].Operator == _operators["("])
 				{
 					list2.RemoveAt(list2.Count - 1);
-					if (list2.Count != 0 && list2[list2.Count - 1].IMGAKPOBGBP.JBBJEBCAAEG == IKHBAIDMOHC.OperatorPowDirect)
+					if (list2.Count != 0 && list2[list2.Count - 1].Operator.Direction == OperatorDirection.OperatorPowDirect)
 					{
 						list.Add(list2[list2.Count - 1]);
 						list2.RemoveAt(list2.Count - 1);
@@ -931,12 +931,12 @@ public class RpnParser
 				list2.Add(JEFEGDICJJC[num]);
 				num++;
 			}
-			else if ((JEFEGDICJJC[num].IMGAKPOBGBP.JBBJEBCAAEG == IKHBAIDMOHC.OperatorAddDirect && list2[list2.Count - 1].IMGAKPOBGBP.NNCOAODDCOD < JEFEGDICJJC[num].IMGAKPOBGBP.NNCOAODDCOD) || (JEFEGDICJJC[num].IMGAKPOBGBP.JBBJEBCAAEG == IKHBAIDMOHC.OperatorPowDirect && list2[list2.Count - 1].IMGAKPOBGBP.NNCOAODDCOD <= JEFEGDICJJC[num].IMGAKPOBGBP.NNCOAODDCOD))
+			else if ((JEFEGDICJJC[num].Operator.Direction == OperatorDirection.OperatorAddDirect && list2[list2.Count - 1].Operator.Priority < JEFEGDICJJC[num].Operator.Priority) || (JEFEGDICJJC[num].Operator.Direction == OperatorDirection.OperatorPowDirect && list2[list2.Count - 1].Operator.Priority <= JEFEGDICJJC[num].Operator.Priority))
 			{
 				list2.Add(JEFEGDICJJC[num]);
 				num++;
 			}
-			else if ((JEFEGDICJJC[num].IMGAKPOBGBP.JBBJEBCAAEG == IKHBAIDMOHC.OperatorAddDirect && list2[list2.Count - 1].IMGAKPOBGBP.NNCOAODDCOD >= JEFEGDICJJC[num].IMGAKPOBGBP.NNCOAODDCOD) || (JEFEGDICJJC[num].IMGAKPOBGBP.JBBJEBCAAEG == IKHBAIDMOHC.OperatorPowDirect && list2[list2.Count - 1].IMGAKPOBGBP.NNCOAODDCOD > JEFEGDICJJC[num].IMGAKPOBGBP.NNCOAODDCOD))
+			else if ((JEFEGDICJJC[num].Operator.Direction == OperatorDirection.OperatorAddDirect && list2[list2.Count - 1].Operator.Priority >= JEFEGDICJJC[num].Operator.Priority) || (JEFEGDICJJC[num].Operator.Direction == OperatorDirection.OperatorPowDirect && list2[list2.Count - 1].Operator.Priority > JEFEGDICJJC[num].Operator.Priority))
 			{
 				list.Add(list2[list2.Count - 1]);
 				list2.RemoveAt(list2.Count - 1);

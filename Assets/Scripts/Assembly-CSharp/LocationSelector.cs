@@ -4,24 +4,24 @@ using UnityEngine;
 
 public class LocationSelector
 {
-	public enum OPHMHHMDKOB
+	public enum LayerType
 	{
 		LayerBG = 1,
 		LayerGame = 2,
 		LayerStatic = 3
 	}
 
-	private List<ChangingSprite> KGPMIOGBFKM = new List<ChangingSprite>();
+	private List<ChangingSprite> effects = new List<ChangingSprite>();
 
-	private float OPIKNCNBCKJ;
+	private float unusedFloatA;
 
-	private float BNBMHDOMCCA;
+	private float unusedFloatB;
 
-	private bool BFPBLBEIKCI;
+	private bool unusedFlag;
 
-	private const float CLLKKNDDECD = -0.01f;
+	private const float DepthStep = -0.01f;
 
-	private float BAOMCHDJHON;
+	private float nextChildDepth;
 
 	private GameObject _UnityObject;
 
@@ -29,33 +29,33 @@ public class LocationSelector
 
 	private int _type;
 
-	private float IOGMPFJOCPE;
+	private float factor;
 
 	private string Atlas;
 
-	public int AOCHPHIHPIA;
+	public int layerDepth;
 
-	private CocosAnimationData DMKGOFGGFPJ;
+	private CocosAnimationData animationData;
 
-	private List<GameObject> CDMAEGHDKCP = new List<GameObject>();
+	private List<GameObject> unusedObjects = new List<GameObject>();
 
-	public GameObject ICDCIANNAAI
+	public GameObject LayerObject
 	{
 		get
 		{
-			return MJNPBMOAFML();
+			return GetLayerObject();
 		}
 	}
 
-	public bool AFPAINNBOAI
+	public bool ScalingEnabled
 	{
 		get
 		{
-			return OGBJCBMNJKC();
+			return GetScalingEnabled();
 		}
 		set
 		{
-			NLJHHPCLMBI(value);
+			SetScalingEnabled(value);
 		}
 	}
 
@@ -63,23 +63,23 @@ public class LocationSelector
 	{
 		get
 		{
-			return JLBBJEELMGG();
+			return GetFactor();
 		}
 		set
 		{
-			FPFLDAMPALH(value);
+			SetFactor(value);
 		}
 	}
 
-	public string LMABGLLMHKH
+	public string AtlasName
 	{
 		get
 		{
-			return EMNJEHHOBKG();
+			return GetAtlasName();
 		}
 		set
 		{
-			LHPOLNGGAFA(value);
+			SetAtlasName(value);
 		}
 	}
 
@@ -87,41 +87,41 @@ public class LocationSelector
 	{
 		get
 		{
-			return ALLFLLFJIGC();
+			return GetCocosAnimationData();
 		}
 		set
 		{
-			NJPBFGMGCFC(value);
+			SetCocosAnimationData(value);
 		}
 	}
 
-	public bool EICGCNJOMMI
+	public bool IsGameLayer
 	{
 		get
 		{
-			return BBELALLBKHH();
+			return GetIsGameLayer();
 		}
 	}
 
 	public LocationSelector(int DFIDNHKKNMB)
 	{
-		AOCHPHIHPIA = DFIDNHKKNMB;
+		layerDepth = DFIDNHKKNMB;
 		_UnityObject = new GameObject("Layer");
 		_UnityObject.transform.localPosition = new Vector3(0f, 0f, DFIDNHKKNMB);
 		_UnityObject.transform.localScale = new Vector3(1f, 1f, 1f);
 	}
 
-	public GameObject MJNPBMOAFML()
+	public GameObject GetLayerObject()
 	{
 		return _UnityObject;
 	}
 
-	public bool OGBJCBMNJKC()
+	public bool GetScalingEnabled()
 	{
 		return Scaling;
 	}
 
-	public void NLJHHPCLMBI(bool value)
+	public void SetScalingEnabled(bool value)
 	{
 		Scaling = value;
 	}
@@ -136,98 +136,98 @@ public class LocationSelector
 		_type = value;
 	}
 
-	public float JLBBJEELMGG()
+	public float GetFactor()
 	{
-		return IOGMPFJOCPE;
+		return factor;
 	}
 
-	public void FPFLDAMPALH(float value)
+	public void SetFactor(float value)
 	{
-		IOGMPFJOCPE = value;
+		factor = value;
 	}
 
-	public string EMNJEHHOBKG()
+	public string GetAtlasName()
 	{
 		return Atlas;
 	}
 
-	public void LHPOLNGGAFA(string value)
+	public void SetAtlasName(string value)
 	{
 		Atlas = value;
 	}
 
-	public CocosAnimationData ALLFLLFJIGC()
+	public CocosAnimationData GetCocosAnimationData()
 	{
-		return DMKGOFGGFPJ;
+		return animationData;
 	}
 
-	public void NJPBFGMGCFC(CocosAnimationData value)
+	public void SetCocosAnimationData(CocosAnimationData value)
 	{
-		DMKGOFGGFPJ = value;
+		animationData = value;
 	}
 
-	public bool BBELALLBKHH()
+	public bool GetIsGameLayer()
 	{
 		return _type == 2;
 	}
 
-	public void GDEDCJGMFDK(GameObject CJBKCEPFIAM, int EELGIMCJLAI)
+	public void AddImage(GameObject CJBKCEPFIAM, int EELGIMCJLAI)
 	{
 		CJBKCEPFIAM.transform.SetParent(_UnityObject.transform, false);
 		Vector3 localPosition = CJBKCEPFIAM.transform.localPosition;
-		localPosition.z = BAOMCHDJHON;
+		localPosition.z = nextChildDepth;
 		CJBKCEPFIAM.transform.localPosition = localPosition;
-		BAOMCHDJHON += -0.01f;
+		nextChildDepth += -0.01f;
 	}
 
-	public void IFAMCLKHNMA(ChangingSprite CJBKCEPFIAM, int EELGIMCJLAI)
+	public void AddSimpleEffect(ChangingSprite CJBKCEPFIAM, int EELGIMCJLAI)
 	{
-		if (!(CJBKCEPFIAM.NJKCDEJGJLF == null))
+		if (!(CJBKCEPFIAM.SpriteObject == null))
 		{
-			CJBKCEPFIAM.NJKCDEJGJLF.transform.SetParent(_UnityObject.transform, false);
-			KGPMIOGBFKM.Add(CJBKCEPFIAM);
-			Vector3 localPosition = CJBKCEPFIAM.NJKCDEJGJLF.transform.localPosition;
-			localPosition.z = BAOMCHDJHON;
-			CJBKCEPFIAM.NJKCDEJGJLF.transform.localPosition = localPosition;
-			BAOMCHDJHON += -0.01f;
+			CJBKCEPFIAM.SpriteObject.transform.SetParent(_UnityObject.transform, false);
+			effects.Add(CJBKCEPFIAM);
+			Vector3 localPosition = CJBKCEPFIAM.SpriteObject.transform.localPosition;
+			localPosition.z = nextChildDepth;
+			CJBKCEPFIAM.SpriteObject.transform.localPosition = localPosition;
+			nextChildDepth += -0.01f;
 		}
 	}
 
-	public void MHCEMJOAPCA(ChangingSprite DDMFNILHHMD, int EELGIMCJLAI)
+	public void AddParticleEffect(ChangingSprite DDMFNILHHMD, int EELGIMCJLAI)
 	{
-		DDMFNILHHMD.FOECAMJDAOI.transform.SetParent(_UnityObject.transform, false);
-		KGPMIOGBFKM.Add(DDMFNILHHMD);
-		Vector3 localPosition = DDMFNILHHMD.FOECAMJDAOI.transform.localPosition;
-		localPosition.z = BAOMCHDJHON;
-		DDMFNILHHMD.FOECAMJDAOI.transform.localPosition = localPosition;
-		BAOMCHDJHON += -0.099999994f;
+		DDMFNILHHMD.Particles.transform.SetParent(_UnityObject.transform, false);
+		effects.Add(DDMFNILHHMD);
+		Vector3 localPosition = DDMFNILHHMD.Particles.transform.localPosition;
+		localPosition.z = nextChildDepth;
+		DDMFNILHHMD.Particles.transform.localPosition = localPosition;
+		nextChildDepth += -0.099999994f;
 	}
 
-	public void KGACPCKOHBC(ChangingSprite DDMFNILHHMD, int EELGIMCJLAI)
+	public void AddChangingSprite(ChangingSprite DDMFNILHHMD, int EELGIMCJLAI)
 	{
-		DDMFNILHHMD.NJKCDEJGJLF.transform.SetParent(_UnityObject.transform, false);
-		KGPMIOGBFKM.Add(DDMFNILHHMD);
-		Vector3 localPosition = DDMFNILHHMD.NJKCDEJGJLF.transform.localPosition;
-		localPosition.z = BAOMCHDJHON;
-		DDMFNILHHMD.NJKCDEJGJLF.transform.localPosition = localPosition;
-		BAOMCHDJHON += -0.01f;
+		DDMFNILHHMD.SpriteObject.transform.SetParent(_UnityObject.transform, false);
+		effects.Add(DDMFNILHHMD);
+		Vector3 localPosition = DDMFNILHHMD.SpriteObject.transform.localPosition;
+		localPosition.z = nextChildDepth;
+		DDMFNILHHMD.SpriteObject.transform.localPosition = localPosition;
+		nextChildDepth += -0.01f;
 	}
 
-	public void AJAEMLEHCCH(ChangingSprite DLGLPGBABHC)
+	public void RemoveChangingSprite(ChangingSprite DLGLPGBABHC)
 	{
 		if (DLGLPGBABHC != null)
 		{
-			KGPMIOGBFKM.Remove(DLGLPGBABHC);
-			UnityEngine.Object.Destroy(DLGLPGBABHC.NJKCDEJGJLF.gameObject);
+			effects.Remove(DLGLPGBABHC);
+			UnityEngine.Object.Destroy(DLGLPGBABHC.SpriteObject.gameObject);
 		}
 	}
 
 	public void Render()
 	{
 		int i = 0;
-		for (int count = KGPMIOGBFKM.Count; i < count; i++)
+		for (int count = effects.Count; i < count; i++)
 		{
-			KGPMIOGBFKM[i].Render(1f / (float)GameUtils.GGBABPJBGJB());
+			effects[i].Render(1f / (float)GameUtils.GetSlowMode());
 		}
 	}
 

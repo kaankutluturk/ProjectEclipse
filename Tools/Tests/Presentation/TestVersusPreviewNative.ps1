@@ -23,7 +23,7 @@ PlayerSettings:
 @'
 using UnityEngine;
 public class ModelParameters { }
-public static class StageType { public enum FDBBPEGEGMK { STAGE_SHOP_START } }
+public static class StageType { public enum Stage { STAGE_SHOP_START } }
 namespace Eclipse.Multiplayer {
  public class VersusLoadout { }
  public static class LocalVersusMatch {
@@ -36,7 +36,7 @@ namespace Nekki.SF2.Core.Fights {
   Renderer bodyRenderer;
   Color baseColor;
   public void Init() { }
-  public void ShowParameters(ModelParameters parameters,StageType.FDBBPEGEGMK stage,string screen,Color tint) {
+  public void ShowParameters(ModelParameters parameters,StageType.Stage stage,string screen,Color tint) {
    var body=GameObject.CreatePrimitive(PrimitiveType.Quad);
    body.transform.SetParent(transform,false);
    var material=new Material(Shader.Find("Unlit/Color"));

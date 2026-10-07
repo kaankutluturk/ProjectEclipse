@@ -5,49 +5,49 @@ public class ActionCreateModel : ActionAnimation
 {
 	public class ActionStruct
 	{
-		public string BOJPMNJDKJL;
+		public string ItemType;
 
 		public string ModelName;
 
-		public List<CopyItemInfo> OJIAKDDCGLB;
+		public List<CopyItemInfo> CopyItems;
 
 		public ActionStruct(string OLAAAIPEBBF, List<CopyItemInfo> _items, string _name = "")
 		{
-			BOJPMNJDKJL = OLAAAIPEBBF;
+			ItemType = OLAAAIPEBBF;
 			ModelName = _name;
-			OJIAKDDCGLB = _items;
+			CopyItems = _items;
 		}
 	}
 
 	private string _Name;
 
-	private string KLFLBKIIAOP;
+	private string _ItemType;
 
 	private string _StartAnimation;
 
-	private List<CopyItemInfo> IOHGFGNNCFA = new List<CopyItemInfo>();
+	private List<CopyItemInfo> _CopyItems = new List<CopyItemInfo>();
 
 	public string ModelName
 	{
 		get
 		{
-			return AEGHBDJDPNA();
+			return GetModelName();
 		}
 	}
 
-	public string BOJPMNJDKJL
+	public string ItemType
 	{
 		get
 		{
-			return BNNBPLIJDGH();
+			return GetItemType();
 		}
 	}
 
-	public List<CopyItemInfo> OJIAKDDCGLB
+	public List<CopyItemInfo> CopyItems
 	{
 		get
 		{
-			return DJBOFEEKJMP();
+			return GetCopyItems();
 		}
 	}
 
@@ -60,29 +60,29 @@ public class ActionCreateModel : ActionAnimation
 	}
 
 	public ActionCreateModel(XmlNode node)
-		: base(FADAJCEEKIO.CREATE_MODEL)
+		: base(ActionType.CREATE_MODEL)
 	{
 		Parse(node);
 	}
 
-	public string AEGHBDJDPNA()
+	public string GetModelName()
 	{
 		return _Name;
 	}
 
-	public string BNNBPLIJDGH()
+	public string GetItemType()
 	{
-		return KLFLBKIIAOP;
+		return _ItemType;
 	}
 
-	public List<CopyItemInfo> DJBOFEEKJMP()
+	public List<CopyItemInfo> GetCopyItems()
 	{
-		return IOHGFGNNCFA;
+		return _CopyItems;
 	}
 
 	public override void Visit(Model ACENLMONNPA)
 	{
-		ACENLMONNPA.OPPIKLBKMPN(this);
+		ACENLMONNPA.StartAction(this);
 	}
 
 	protected override void Parse(XmlNode node)
@@ -92,14 +92,14 @@ public class ActionCreateModel : ActionAnimation
         EclipseProjectileLifetime = Eclipse.Modding.ModProjectileLimits.DefaultLifetimeFrames;
         if (int.TryParse(((XmlElement)node).GetAttribute("EclipseProjectileLifetime"), out var lifetime))
             EclipseProjectileLifetime = lifetime;
-		_Name = node.Attributes["Name"].CIPOICEEIBK(string.Empty);
-		_StartAnimation = node.Attributes["StartAnimation"].CIPOICEEIBK(string.Empty);
+		_Name = node.Attributes["Name"].GetStringOrDefault(string.Empty);
+		_StartAnimation = node.Attributes["StartAnimation"].GetStringOrDefault(string.Empty);
 		XmlElement xmlElement = node["Model"];
-		KLFLBKIIAOP = ((xmlElement == null) ? null : xmlElement.Attributes["ItemType"].CIPOICEEIBK(string.Empty));
+		_ItemType = ((xmlElement == null) ? null : xmlElement.Attributes["ItemType"].GetStringOrDefault(string.Empty));
 		foreach (XmlNode childNode in node.ChildNodes)
 		{
-			CopyItemInfo item = new CopyItemInfo(childNode, childNode.Attributes["CopyParentType"].CIPOICEEIBK(string.Empty), childNode.Attributes["CopyParentSubtype"].CIPOICEEIBK(string.Empty));
-			IOHGFGNNCFA.Add(item);
+			CopyItemInfo item = new CopyItemInfo(childNode, childNode.Attributes["CopyParentType"].GetStringOrDefault(string.Empty), childNode.Attributes["CopyParentSubtype"].GetStringOrDefault(string.Empty));
+			_CopyItems.Add(item);
 		}
 	}
 }

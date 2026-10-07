@@ -2,7 +2,7 @@ public struct GiveItemLogin
 {
 	public string Name;
 
-	public int AKKLOMFOLNO;
+	public int UpgradeLevel;
 
 	public int Count;
 

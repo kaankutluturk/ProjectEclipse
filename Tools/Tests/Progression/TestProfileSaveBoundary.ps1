@@ -9,8 +9,8 @@ function Read-Method($file,$signature) {
  return $match.Value
 }
 $save=Read-Method 'Assets/Scripts/Assembly-CSharp/ListSF.cs' 'public void OnAuthenticate('
-$write=Read-Method 'Assets/Scripts/Assembly-CSharp/XmlUtils.cs' 'public static void ONLDJNLKKAL('
-$read=Read-Method 'Assets/Scripts/Assembly-CSharp/XmlUtils.cs' 'public static XmlDocument AIFIAKNJMHG('
+$write=Read-Method 'Assets/Scripts/Assembly-CSharp/XmlUtils.cs' 'public static void SaveDocumentWithHash('
+$read=Read-Method 'Assets/Scripts/Assembly-CSharp/XmlUtils.cs' 'public static XmlDocument LoadDocumentWithHashCheck('
 $runtime=Get-Content -Raw -LiteralPath (Join-Path $root 'Assets/Scripts/Eclipse/Modding/ModRuntime.cs')
 $adapters=@('internal static bool DeferProfileSave','internal static bool IsProfileSnapshotPath','internal static bool TryWriteProfileSnapshot','internal static void RecoverProfileSnapshot','private static void ValidateProfileSnapshot') | ForEach-Object {
  $match=[regex]::Match($runtime,'(?ms)^        '+[regex]::Escape($_)+'\(.*?^        \}')
@@ -23,13 +23,13 @@ using System.Text;
 using System.Xml;
 namespace UnityEngine {public static class Debug {public static void LogException(Exception e){throw e;}}}
 namespace Nekki.SF2.Core.Exceptions {public class HackDetectedException:Exception {public HackDetectedException(string s):base(s){}}}
-static class SystemProperties {public static string GLLJKPBHELE()=>"fixture-device";}
-static class GameSettings {public static bool Hashes;public static bool HCAJHNKLLGB()=>Hashes;}
+static class SystemProperties {public static string GetDeviceId()=>"fixture-device";}
+static class GameSettings {public static bool Hashes;public static bool IsUserDataValidationEnabled()=>Hashes;}
 static class SF2Paths {public static string Folder;public static string GetUserDataDirectory()=>Folder;}
-static class Constants {public const string OJMIJINKBPJ="users.xml",GHKPPHAAMBL="users_backup.xml";}
+static class Constants {public const string UsersFileName="users.xml",UsersBackupFileName="users_backup.xml";}
 static class XmlUtils {
- public enum EBLFEPIOMOL {Normal,ForcedExternal,ForcedResourced}
- public static XmlDocument OpenXMLDocument(string directory,string name,EBLFEPIOMOL mode,bool flag){var doc=new XmlDocument();doc.Load(string.IsNullOrEmpty(name)?directory:Path.Combine(directory,name));return doc;}
+ public enum XmlSourceMode {Normal,ForcedExternal,ForcedResourced}
+ public static XmlDocument OpenXMLDocument(string directory,string name,XmlSourceMode mode,bool flag){var doc=new XmlDocument();doc.Load(string.IsNullOrEmpty(name)?directory:Path.Combine(directory,name));return doc;}
  /* WRITE */
  /* READ */
 }
@@ -37,8 +37,8 @@ namespace Eclipse.Modding {static class ModRuntime {static int _profileMutationS
 namespace Eclipse.Multiplayer {public static class LocalVersusSession {public static bool IsActive;}}
 class Program {
  private bool _localVersusProfile;
- public bool GJEJCLBAPMP=true;public XmlDocument IEDEFCBFJAD;
- public Program CCDKHLAMKKO()=>this;public void KGFJPLKOABI(){} public void PMIIHIFGIIN(){}
+ public bool isSaveRequested=true;public XmlDocument userDocument;
+ public Program GetRoster()=>this;public void SaveCounterItems(){} public void SavePaymentOrders(){}
  /* SAVE */
  static int checks;
  static void Check(bool value,string message){checks++;if(!value)throw new Exception(message);}
@@ -46,25 +46,25 @@ class Program {
  static XmlDocument Load(string path){var d=new XmlDocument();d.Load(path);return d;}
  static void Fail(Action action){try{action();}catch(IOException){checks++;return;}throw new Exception("Expected disk sharing failure");}
  static void Main(string[] args){
-  SF2Paths.Folder=args[0];var primary=Path.Combine(args[0],Constants.OJMIJINKBPJ);var backup=Path.Combine(args[0],Constants.GHKPPHAAMBL);
+  SF2Paths.Folder=args[0];var primary=Path.Combine(args[0],Constants.UsersFileName);var backup=Path.Combine(args[0],Constants.UsersBackupFileName);
   foreach(bool hashes in new[]{false,true}){
-   GameSettings.Hashes=hashes;var p=new Program{IEDEFCBFJAD=Doc("prepared")};p.OnAuthenticate();
-   Check(!p.GJEJCLBAPMP&&Load(primary).OuterXml==Load(backup).OuterXml,"Normal save did not finish both copies");
-   p.IEDEFCBFJAD=Doc("claimed");p.GJEJCLBAPMP=true;
+   GameSettings.Hashes=hashes;var p=new Program{userDocument=Doc("prepared")};p.OnAuthenticate();
+   Check(!p.isSaveRequested&&Load(primary).OuterXml==Load(backup).OuterXml,"Normal save did not finish both copies");
+   p.userDocument=Doc("claimed");p.isSaveRequested=true;
    using(var locked=new FileStream(backup,FileMode.Open,FileAccess.Read,FileShare.None)) Fail(()=>p.OnAuthenticate());
-   Check(p.GJEJCLBAPMP,"Failed second write cleared dirty flag");
+   Check(p.isSaveRequested,"Failed second write cleared dirty flag");
    Check(Load(primary).OuterXml==Doc("claimed").OuterXml&&Load(backup).OuterXml==Doc("prepared").OuterXml,"Expected split primary/backup generations");
-   p.OnAuthenticate();Check(!p.GJEJCLBAPMP&&Load(backup).OuterXml==Load(primary).OuterXml,"Explicit retry did not repair second copy");
+   p.OnAuthenticate();Check(!p.isSaveRequested&&Load(backup).OuterXml==Load(primary).OuterXml,"Explicit retry did not repair second copy");
   }
-  GameSettings.Hashes=true;var q=new Program{IEDEFCBFJAD=Doc("prepared")};q.OnAuthenticate();q.GJEJCLBAPMP=true;q.IEDEFCBFJAD=Doc("claimed");
+  GameSettings.Hashes=true;var q=new Program{userDocument=Doc("prepared")};q.OnAuthenticate();q.isSaveRequested=true;q.userDocument=Doc("claimed");
   using(var locked=new FileStream(primary+".hash",FileMode.Open,FileAccess.Read,FileShare.None)) Fail(()=>q.OnAuthenticate());
-  Check(q.GJEJCLBAPMP&&Load(primary).OuterXml==Doc("claimed").OuterXml,"Hash failure did not expose new XML with dirty state");
+  Check(q.isSaveRequested&&Load(primary).OuterXml==Doc("claimed").OuterXml,"Hash failure did not expose new XML with dirty state");
   bool rejected=false;try{UserDataValidator.CheckFileHash(Load(primary),primary);}catch(Nekki.SF2.Core.Exceptions.HackDetectedException){rejected=true;}
   Check(rejected,"Mismatched XML/hash accepted");
   Check(UserDataValidator.CheckFileHash(Load(backup),backup)&&Load(backup).OuterXml==Doc("prepared").OuterXml,"Previous backup lost during primary hash failure");
-  var recovered=XmlUtils.AIFIAKNJMHG(args[0],Constants.OJMIJINKBPJ);
+  var recovered=XmlUtils.LoadDocumentWithHashCheck(args[0],Constants.UsersFileName);
   Check(UserDataValidator.CheckFileHash(recovered,primary)&&recovered.OuterXml==Doc("claimed").OuterXml&&!File.Exists(primary+".eclipse-write"),"Production reader failed to recover pair before hash validation");
-  q.OnAuthenticate();Check(UserDataValidator.CheckFileHash(Load(primary),primary)&&!q.GJEJCLBAPMP,"Explicit retry failed to restore hash consistency");
+  q.OnAuthenticate();Check(UserDataValidator.CheckFileHash(Load(primary),primary)&&!q.isSaveRequested,"Explicit retry failed to restore hash consistency");
   Check(!Eclipse.Modding.ModRuntime.IsProfileSnapshotPath(Path.Combine(args[0],"settings.xml")),"Unrelated XML routed through profile journal");
   Console.WriteLine("PASS: "+checks+" save-boundary characterization checks; actual disk writes, production save methods and hash implementation. Roster serialization/device/settings controlled; no crash recovery claim.");
  }

@@ -3,31 +3,31 @@ using UnityEngine;
 
 public static class GUIHelper
 {
-	private static GUIStyle PINOMKNHNLE;
+	private static GUIStyle centerAlignedLabel;
 
-	private static GUIStyle NEDJJLIEPBA;
+	private static GUIStyle rightAlignedLabel;
 
 	public static Rect ClientArea;
 
-	private static void PAINOJOIGMC()
+	private static void Setup()
 	{
-		if (PINOMKNHNLE == null)
+		if (centerAlignedLabel == null)
 		{
-			PINOMKNHNLE = new GUIStyle(GUI.skin.label);
-			PINOMKNHNLE.alignment = TextAnchor.MiddleCenter;
-			NEDJJLIEPBA = new GUIStyle(GUI.skin.label);
-			NEDJJLIEPBA.alignment = TextAnchor.MiddleRight;
+			centerAlignedLabel = new GUIStyle(GUI.skin.label);
+			centerAlignedLabel.alignment = TextAnchor.MiddleCenter;
+			rightAlignedLabel = new GUIStyle(GUI.skin.label);
+			rightAlignedLabel.alignment = TextAnchor.MiddleRight;
 		}
 	}
 
-	public static void ECMOBPFHNPN(Rect FKAFENMANAB, bool CDKGMDNIECB, Action IBODMPMJELJ)
+	public static void DrawArea(Rect FKAFENMANAB, bool CDKGMDNIECB, Action IBODMPMJELJ)
 	{
-		PAINOJOIGMC();
+		Setup();
 		GUI.Box(FKAFENMANAB, string.Empty);
 		GUILayout.BeginArea(FKAFENMANAB);
 		if (CDKGMDNIECB)
 		{
-			GECFPNNDHHJ(SampleSelector.SelectedSample.IFBOMKBDANN());
+			DrawCenteredText(SampleSelector.SelectedSample.GetDisplayName());
 			GUILayout.Space(5f);
 		}
 		if (IBODMPMJELJ != null)
@@ -37,23 +37,23 @@ public static class GUIHelper
 		GUILayout.EndArea();
 	}
 
-	public static void GECFPNNDHHJ(string CKEHOEGLMBM)
+	public static void DrawCenteredText(string CKEHOEGLMBM)
 	{
-		PAINOJOIGMC();
+		Setup();
 		GUILayout.BeginHorizontal();
 		GUILayout.FlexibleSpace();
-		GUILayout.Label(CKEHOEGLMBM, PINOMKNHNLE);
+		GUILayout.Label(CKEHOEGLMBM, centerAlignedLabel);
 		GUILayout.FlexibleSpace();
 		GUILayout.EndHorizontal();
 	}
 
-	public static void IDPAKMFLODB(string KGBGENDIMBC, string value)
+	public static void DrawRow(string KGBGENDIMBC, string value)
 	{
-		PAINOJOIGMC();
+		Setup();
 		GUILayout.BeginHorizontal();
 		GUILayout.Label(KGBGENDIMBC);
 		GUILayout.FlexibleSpace();
-		GUILayout.Label(value, NEDJJLIEPBA);
+		GUILayout.Label(value, rightAlignedLabel);
 		GUILayout.FlexibleSpace();
 		GUILayout.EndHorizontal();
 	}

@@ -4,77 +4,77 @@ using System.Xml;
 public class PerkActionSetHit : PerkAction
 {
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private int KKHEAOHOGDP;
+	private int _critical;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private int ABJLFNMMLHF;
+	private int _block;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private int OMKJAOPJECB;
+	private int _shock;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private int FCHMLCFNHFF;
+	private int _disarm;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private FunctionExtension OEHJODCCHNB;
+	private FunctionExtension _damage;
 
-	public int DNGKOMPMPCD
+	public int Critical
 	{
 		get
 		{
-			return LFJCOGGNFHL();
+			return GetCritical();
 		}
 		protected set
 		{
-			LHLIHHMEBKM(value);
+			SetCritical(value);
 		}
 	}
 
-	public int DFOHNJEBDED
+	public int Block
 	{
 		get
 		{
-			return IOAHLEKLBLE();
+			return GetBlock();
 		}
 		protected set
 		{
-			ECLHIGBMCLK(value);
+			SetBlock(value);
 		}
 	}
 
-	public int APCAKCCOMLO
+	public int Shock
 	{
 		get
 		{
-			return JEIAJBMLIBP();
+			return GetShock();
 		}
 		protected set
 		{
-			BPLDKHPHCON(value);
+			SetShock(value);
 		}
 	}
 
-	public int NIKPBGPPFEP
+	public int Disarm
 	{
 		get
 		{
-			return NALPADHBLNH();
+			return GetDisarm();
 		}
 		protected set
 		{
-			MLJCJOFKENH(value);
+			SetDisarm(value);
 		}
 	}
 
-	public FunctionExtension KFMJMBANIGF
+	public FunctionExtension DamageFunction
 	{
 		get
 		{
-			return GHGGNMBCMNM();
+			return GetDamage();
 		}
 		protected set
 		{
-			PJEADIKBIGL(value);
+			SetDamage(value);
 		}
 	}
 
@@ -85,80 +85,80 @@ public class PerkActionSetHit : PerkAction
 	public PerkActionSetHit(PerkActionSetHit NOLFMPDGCOC)
 		: base(NOLFMPDGCOC)
 	{
-		LHLIHHMEBKM(NOLFMPDGCOC.LFJCOGGNFHL());
-		ECLHIGBMCLK(NOLFMPDGCOC.IOAHLEKLBLE());
-		BPLDKHPHCON(NOLFMPDGCOC.JEIAJBMLIBP());
-		MLJCJOFKENH(NOLFMPDGCOC.NALPADHBLNH());
-		PJEADIKBIGL(NOLFMPDGCOC.GHGGNMBCMNM());
+		SetCritical(NOLFMPDGCOC.GetCritical());
+		SetBlock(NOLFMPDGCOC.GetBlock());
+		SetShock(NOLFMPDGCOC.GetShock());
+		SetDisarm(NOLFMPDGCOC.GetDisarm());
+		SetDamage(NOLFMPDGCOC.GetDamage());
 	}
 
-	public int LFJCOGGNFHL()
+	public int GetCritical()
 	{
-		return KKHEAOHOGDP;
+		return _critical;
 	}
 
-	protected void LHLIHHMEBKM(int value)
+	protected void SetCritical(int value)
 	{
-		KKHEAOHOGDP = value;
+		_critical = value;
 	}
 
-	public int IOAHLEKLBLE()
+	public int GetBlock()
 	{
-		return ABJLFNMMLHF;
+		return _block;
 	}
 
-	protected void ECLHIGBMCLK(int value)
+	protected void SetBlock(int value)
 	{
-		ABJLFNMMLHF = value;
+		_block = value;
 	}
 
-	public int JEIAJBMLIBP()
+	public int GetShock()
 	{
-		return OMKJAOPJECB;
+		return _shock;
 	}
 
-	protected void BPLDKHPHCON(int value)
+	protected void SetShock(int value)
 	{
-		OMKJAOPJECB = value;
+		_shock = value;
 	}
 
-	public int NALPADHBLNH()
+	public int GetDisarm()
 	{
-		return FCHMLCFNHFF;
+		return _disarm;
 	}
 
-	protected void MLJCJOFKENH(int value)
+	protected void SetDisarm(int value)
 	{
-		FCHMLCFNHFF = value;
+		_disarm = value;
 	}
 
-	public FunctionExtension GHGGNMBCMNM()
+	public FunctionExtension GetDamage()
 	{
-		return OEHJODCCHNB;
+		return _damage;
 	}
 
-	protected void PJEADIKBIGL(FunctionExtension value)
+	protected void SetDamage(FunctionExtension value)
 	{
-		OEHJODCCHNB = value;
+		_damage = value;
 	}
 
 	public override void Parse(XmlNode node)
 	{
 		base.Parse(node);
 		set_Type(ActionType.ACTION_SET_HIT);
-		LHLIHHMEBKM(node.Attributes["Critical"].ParseInt(-1));
-		ECLHIGBMCLK(node.Attributes["Block"].ParseInt(-1));
-		BPLDKHPHCON(node.Attributes["Shock"].ParseInt(-1));
-		MLJCJOFKENH(node.Attributes["Disarm"].ParseInt(-1));
-		PJEADIKBIGL(null);
-		string text = node.Attributes["Damage"].CIPOICEEIBK(string.Empty);
+		SetCritical(node.Attributes["Critical"].ParseInt(-1));
+		SetBlock(node.Attributes["Block"].ParseInt(-1));
+		SetShock(node.Attributes["Shock"].ParseInt(-1));
+		SetDisarm(node.Attributes["Disarm"].ParseInt(-1));
+		SetDamage(null);
+		string text = node.Attributes["Damage"].GetStringOrDefault(string.Empty);
 		if (text != null && text != string.Empty)
 		{
-			PJEADIKBIGL(new FunctionExtension());
-			GHGGNMBCMNM().Parse(text);
-			GHGGNMBCMNM().PBPBNENGLPA(JMDLAMHAJLN().HJFEFJIEINN);
-			GHGGNMBCMNM().DMPCFMACDJM(JMDLAMHAJLN().OKPFNCJFLDL);
-			GHGGNMBCMNM().set_Target(this);
+			SetDamage(new FunctionExtension());
+			GetDamage().Parse(text);
+			GetDamage().SetFunctionCallback(GetPerk().EvaluateFunctionCallback);
+			GetDamage().SetVariableCallback(GetPerk().OnFunctionPreCallback);
+			GetDamage().set_Target(this);
 		}
 	}
 }

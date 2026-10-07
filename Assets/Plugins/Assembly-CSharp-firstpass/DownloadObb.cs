@@ -4,29 +4,29 @@ public class DownloadObb : MonoBehaviour
 {
 	private void Awake()
 	{
-		if (!FGIMNEGFGPM.FEDMOFPKEEL())
+		if (!GooglePlayDownloader.RunningOnAndroid())
 		{
-			KJBHHFGDCJE("not android");
+			LoadFirstLevel("not android");
 			return;
 		}
-		string text = FGIMNEGFGPM.AFKEFCHKEOP();
+		string text = GooglePlayDownloader.GetExpansionFilePath();
 		if (string.IsNullOrEmpty(text))
 		{
-			KJBHHFGDCJE("no obb file");
+			LoadFirstLevel("no obb file");
 			return;
 		}
-		string text2 = FGIMNEGFGPM.CKKGPFLGBEJ(text);
-		string text3 = FGIMNEGFGPM.OOMFLCBNPID(text);
+		string text2 = GooglePlayDownloader.GetMainOBBPath(text);
+		string text3 = GooglePlayDownloader.GetPatchOBBPath(text);
 		if (text2 == null || text3 == null)
 		{
-			FGIMNEGFGPM.GPGEEIADAJI();
-			KJBHHFGDCJE("all done");
+			GooglePlayDownloader.FetchOBB();
+			LoadFirstLevel("all done");
 		}
 	}
 
-	private void KJBHHFGDCJE(string NEPOLDCKNJL)
+	private void LoadFirstLevel(string NEPOLDCKNJL)
 	{
-		AdvLog.LOPHFKMOPAA(NEPOLDCKNJL);
+		AdvLog.LogWarning(NEPOLDCKNJL);
 		Application.LoadLevel(1);
 	}
 }

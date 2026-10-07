@@ -5,21 +5,21 @@ using UnityEngine;
 
 public class TricksController : ITableViewDataSource, ITableViewDelegate
 {
-	private List<Trick> NDOEDIPFMDP = new List<Trick>();
+	private List<Trick> _tricks = new List<Trick>();
 
-	private TableView FEFDHNFOJLF;
+	private TableView _tableView;
 
 	public TricksController(TableView OIDFBEAABBA, GameObject CGLPIDAECLH)
 	{
-		FEFDHNFOJLF = OIDFBEAABBA;
-		PHNMANPDPKG();
+		_tableView = OIDFBEAABBA;
+		LoadTricks();
 		OIDFBEAABBA.set_CellPrefab(CGLPIDAECLH);
 		OIDFBEAABBA.Init(this, this);
 	}
 
 	public int NumberOfRowsInTableView(TableView OIDFBEAABBA)
 	{
-		return NDOEDIPFMDP.Count;
+		return _tricks.Count;
 	}
 
 	public float SizeForRowInTableView(TableView OIDFBEAABBA, int IBAKGENOEPH)
@@ -29,7 +29,7 @@ public class TricksController : ITableViewDataSource, ITableViewDelegate
 
 	public TableViewCell CellForRowInTableView(TableView OIDFBEAABBA, int IBAKGENOEPH)
 	{
-		Trick kPKPFFGEFGI = NDOEDIPFMDP[IBAKGENOEPH];
+		Trick kPKPFFGEFGI = _tricks[IBAKGENOEPH];
 		TableViewCell tableViewCell = OIDFBEAABBA.ReusableCellForRow(IBAKGENOEPH);
 		TrickCell component = tableViewCell.GetComponent<TrickCell>();
 		component.Init(kPKPFFGEFGI, IBAKGENOEPH);
@@ -42,29 +42,29 @@ public class TricksController : ITableViewDataSource, ITableViewDelegate
 
 	public void TableViewDidSelectCellForRow(TableView OIDFBEAABBA, int IBAKGENOEPH)
 	{
-		FEFDHNFOJLF.ScrollToCell(IBAKGENOEPH, 0.5f);
+		_tableView.ScrollToCell(IBAKGENOEPH, 0.5f);
 	}
 
-	private void PHNMANPDPKG()
+	private void LoadTricks()
 	{
-		NDOEDIPFMDP.Clear();
-		NDOEDIPFMDP = GameUtils.KLLGJKHALGH(SceneTypes.SceneProfile);
-		NDOEDIPFMDP.Sort((Trick KOOLDHKJHNH, Trick MHFCMOONCHB) => KOOLDHKJHNH.Rank.CompareTo(MHFCMOONCHB.Rank));
+		_tricks.Clear();
+		_tricks = GameUtils.GetPlayerTricks(SceneTypes.SceneProfile);
+		_tricks.Sort((Trick KOOLDHKJHNH, Trick MHFCMOONCHB) => KOOLDHKJHNH.Rank.CompareTo(MHFCMOONCHB.Rank));
 	}
 
-	public void LLIMHAHIMML()
+	public void Reload()
 	{
-		PHNMANPDPKG();
-		FEFDHNFOJLF.ReloadData();
+		LoadTricks();
+		_tableView.ReloadData();
 	}
 
-	public void FEKDKAPJDCJ(string JGEKHJIHNMF)
+	public void SelectTrickByName(string JGEKHJIHNMF)
 	{
 		int num = -1;
 		int i = 0;
-		for (int count = NDOEDIPFMDP.Count; i < count; i++)
+		for (int count = _tricks.Count; i < count; i++)
 		{
-			string mENAJEAJJBE = NDOEDIPFMDP[i].Name;
+			string mENAJEAJJBE = _tricks[i].Name;
 			if (mENAJEAJJBE == JGEKHJIHNMF)
 			{
 				num = i;
@@ -73,22 +73,22 @@ public class TricksController : ITableViewDataSource, ITableViewDelegate
 		}
 		if (num > -1)
 		{
-			FEFDHNFOJLF.ScrollToCell(num);
-			ProfileCell profileCell = (ProfileCell)FEFDHNFOJLF.get_visibleCells().GetCellAtIndex(num);
+			_tableView.ScrollToCell(num);
+			ProfileCell profileCell = (ProfileCell)_tableView.get_visibleCells().GetCellAtIndex(num);
 			profileCell.GetFirstIcon().Choose();
 		}
 	}
 
-	public void ADDALEKEMCD()
+	public void ScrollToNewTrick()
 	{
-		List<string> list = ListSF.CCDKHLAMKKO().AMAELLHKNDJ();
+		List<string> list = ListSF.GetRoster().GetOpenTricks();
 		bool flag = false;
 		int num = -1;
-		for (int i = 0; i < NDOEDIPFMDP.Count; i++)
+		for (int i = 0; i < _tricks.Count; i++)
 		{
 			for (int j = 0; j < list.Count; j++)
 			{
-				if (NDOEDIPFMDP[i].Name == list[j])
+				if (_tricks[i].Name == list[j])
 				{
 					num = i;
 					flag = true;
@@ -100,9 +100,9 @@ public class TricksController : ITableViewDataSource, ITableViewDelegate
 				break;
 			}
 		}
-		if (num >= 0 && num < NDOEDIPFMDP.Count)
+		if (num >= 0 && num < _tricks.Count)
 		{
-			FEFDHNFOJLF.ScrollToCell(num, 0.5f);
+			_tableView.ScrollToCell(num, 0.5f);
 		}
 	}
 }

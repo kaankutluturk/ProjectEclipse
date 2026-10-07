@@ -9,10 +9,10 @@ using System;
 using System.Collections.Generic;
 public class QuestStage : IComparable<QuestStage>
 {
-    public enum HPOLGFKCOOE { QUEST_UNCOMPLETE, QUEST_ACTIONS, QUEST_COMPLETE }
-    public HPOLGFKCOOE State;
-    public int DEFHBAPNPHI;
-    public HPOLGFKCOOE MHFPGCBLGIP() { return State; }
+    public enum QuestState { QUEST_UNCOMPLETE, QUEST_ACTIONS, QUEST_COMPLETE }
+    public QuestState State;
+    public int priority;
+    public QuestState GetState() { return State; }
     /* COMPARER */
 }
 public static class QuestStageSortRegression
@@ -24,9 +24,9 @@ public static class QuestStageSortRegression
     public static void Run()
     {
         var stages = new List<QuestStage>();
-        foreach (QuestStage.HPOLGFKCOOE state in Enum.GetValues(typeof(QuestStage.HPOLGFKCOOE)))
+        foreach (QuestStage.QuestState state in Enum.GetValues(typeof(QuestStage.QuestState)))
             foreach (int priority in new[] { int.MinValue, -9, 0, 0, 15, int.MaxValue })
-                stages.Add(new QuestStage { State = state, DEFHBAPNPHI = priority });
+                stages.Add(new QuestStage { State = state, priority = priority });
         foreach (var a in stages)
         {
             Check(a.CompareTo(a) == 0, "A quest must compare equal to itself");
@@ -55,10 +55,10 @@ public static class QuestStageSortRegression
             QuestStage previous = null;
             foreach (var stage in queue)
             {
-                bool running = stage.State == QuestStage.HPOLGFKCOOE.QUEST_ACTIONS;
+                bool running = stage.State == QuestStage.QuestState.QUEST_ACTIONS;
                 Check(!runningSeen || running, "Pending quest sorted behind running quest");
                 if (previous != null && running == runningSeen)
-                    Check(previous.DEFHBAPNPHI >= stage.DEFHBAPNPHI, "Priority must descend within each group");
+                    Check(previous.priority >= stage.priority, "Priority must descend within each group");
                 runningSeen = running;
                 previous = stage;
             }

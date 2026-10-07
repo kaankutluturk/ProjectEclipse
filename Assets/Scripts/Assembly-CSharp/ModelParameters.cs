@@ -5,33 +5,33 @@ using UnityEngine;
 
 public partial class ModelParameters
 {
-	public enum EGDGFNAFELM
+	public enum EstimationType
 	{
 		EstimationTypeNone = 0,
 		EstimationTypeShowDifficulty = 1,
 		EstimationTypeAttributesAlign = 2
 	}
 
-	public enum IHFKGJLIPGH
+	public enum DifficultyFilter
 	{
 		DFHard = 0,
 		DFNormal = 1,
 		DFBoth = 2
 	}
 
-	private static HashSet<GroupModel> AKMJJHALCNJ = new HashSet<GroupModel>();
+	private static HashSet<GroupModel> groupModels = new HashSet<GroupModel>();
 
-	private static List<RatingEvaluation> PPNILGFDOLN = new List<RatingEvaluation>();
+	private static List<RatingEvaluation> ratingEvaluations = new List<RatingEvaluation>();
 
-	private static float GOLHPEBMEDB;
+	private static float impossibleRatio;
 
-	private static float GGKLECFGBOP;
+	private static float easyRatio;
 
-	private static string PCLCPAMGMLF;
+	private static string perkAspectParameter;
 
-	public List<GroupModel> KFKKHACFDPH = new List<GroupModel>();
+	public List<GroupModel> GroupModels = new List<GroupModel>();
 
-	public SceneTypes IBBALIJOJMC;
+	public SceneTypes SceneType;
 
 	// best guess for name
 	public List<AttributesAlign> AttributeAlignments = new List<AttributesAlign>();
@@ -39,21 +39,21 @@ public partial class ModelParameters
 	// best guess for name
 	public List<string> ModelDocuments = new List<string>();
 
-	public List<ItemInfo> HEKILHEHMMH = new List<ItemInfo>();
+	public List<ItemInfo> DecorateItems = new List<ItemInfo>();
 
-	public List<ItemInfo> OJIAKDDCGLB = new List<ItemInfo>();
+	public List<ItemInfo> ConditionItems = new List<ItemInfo>();
 
-	public List<int> IAIHFLGBIPB = new List<int>();
+	public List<int> MoveIds = new List<int>();
 
-	public List<string> DANNKMJOOOH = new List<string>();
+	public List<string> ExcludedMoveNames = new List<string>();
 
-	public List<string> KOELCOMEJMI = new List<string>();
+	public List<string> ExcludedPerkNames = new List<string>();
 
-	public int PEBKEBIBAFA;
+	public int OpponentCount;
 
-	public float MEECPNMPFPG;
+	public float AutoTuneFactor;
 
-	public bool PMHHMDAIOGL;
+	public bool NoDoubles;
 
 	public bool IsPlayer;
 
@@ -63,24 +63,24 @@ public partial class ModelParameters
 	// best guess for name
 	public bool UserControlled;
 
-	public bool HGHDBNPIFEJ;
+	public bool UnknownFlag;
 
-	public List<int> JCMFKLGCEOG = new List<int>();
+	public List<int> ControlKeys = new List<int>();
 
-	public Vector3f JJCKADKCDIF;
+	public Vector3f SpawnPosition;
 
-	public string HHKODEICDNP;
+	public string GroupName;
 
-	public int FLGGADFNNDK;
+	public int OpponentIndex;
 
-	public int EHFNCDPPIAF;
+	public int RandomValue;
 
 	// best guess for name
 	public string Voice;
 
 	public XmlNode Node;
 
-	public bool KKFBCOKMNDF;
+	public bool HasSourceNode;
 
 	// best guess for name
 	public ItemInfo Skeleton;
@@ -103,9 +103,9 @@ public partial class ModelParameters
 	// best guess for name
 	public ItemInfo Magic;
 
-	public ItemInfo KKJJONOBHKI;
+	public ItemInfo Seal;
 
-	public float KDHBBGLCGIL;
+	public float SavedLife;
 
 	// best guess for name
 	public float MaxLife;
@@ -117,30 +117,30 @@ public partial class ModelParameters
 
 	public bool IsWinner;
 
-	public bool BHHLEBHLBLH;
+	public bool RoundEnded;
 
-	public bool PCALDKCJGCK;
+	public bool IsDead;
 
-	public bool DKAHKGBFJMG;
+	public bool RewardsEnabled;
 
-	public bool HKJFJHBHMND;
+	public bool AnimationEnabled;
 
-	public bool KMNLACDHAFE;
+	public bool BeginnerCheat;
 
-	public bool ABLMGLAKJBL;
+	public bool IsUntouched;
 
-	public bool EAJHPCJJCDI;
+	public bool MovesInitialized;
 
-	public bool IDPHHPNCFED;
+	public bool UnusedRoundFlag;
 
 	// best guess for name
 	public int RoundsWon;
 
-	public int HJNOICKOFDL;
+	public int RoundTotal;
 
-	public int AKLPHMOAIGK;
+	public int Dan;
 
-	public int FPIMGHKNHMO;
+	public int WarriorPower;
 
 	// Total one-bar health pools authored by the raid template/warrior.
 	public int ShieldTotal;
@@ -176,7 +176,7 @@ public partial class ModelParameters
 	{
 		get
 		{
-			double bars = System.Math.Max(0d, System.Math.Min(1d, HABJPOFCIHA())) * HealthBarCount;
+			double bars = System.Math.Max(0d, System.Math.Min(1d, GetLifeRatio())) * HealthBarCount;
 			double rounded = System.Math.Round(bars);
 			// Repeated float damage must not leave a phantom, almost-empty bar.
 			return rounded > 0d && System.Math.Abs(bars - rounded) < 0.0001d ? rounded : bars;
@@ -192,19 +192,19 @@ public partial class ModelParameters
 		}
 	}
 
-	public int ALCFNGIKCCB;
+	public int RatingCorrection;
 
 	public uint LotteryLevel;
 
-	public float KFMJMBANIGF;
+	public float Damage;
 
-	public float EHBHNGOGCKO;
+	public float Difficulty;
 
-	public string BMFLPBLAFLK;
+	public string FirstName;
 
-	public string FMOKLKFCCKF;
+	public string LastName;
 
-	public string HNKFHGOOKEG;
+	public string Avatar;
 
 	// best guess for name
 	public string DisplayName;
@@ -218,69 +218,69 @@ public partial class ModelParameters
 	// best guess for name
 	public List<PerkInfoItem> LearnedPerks = new List<PerkInfoItem>();
 
-	public Attributes MAGFMAFCHLP;
+	public Attributes BaseAttributes;
 
-	public Attributes IBLHIAHECLK;
+	public Attributes FinalAttributes;
 
-	private float CHACMOJKLAB;
+	private float playerRating;
 
-	private float PJGDPCJBLMA;
+	private float enemyRating;
 
-	private float MEHKADPAHKP;
+	private float playerRatingMagic;
 
-	private float PIBJOEMLEGF;
+	private float enemyRatingMagic;
 
-	private float NFENFPMIBFD;
+	private float playerRatingRanged;
 
-	private float CEFONNONAKG;
+	private float enemyRatingRanged;
 
-	public Tactic HBFMBOHLKPJ;
+	public Tactic FightTactic;
 
-	private ObscuredInt CMOKGMKBGBB;
+	private ObscuredInt level;
 
 	private ObscuredFloat _CurrentLife;
 
-	private ObscuredInt DEGCGHDAMDA;
+	private ObscuredInt baseHealth;
 
-	private ObscuredInt KBPOKMKFIAD;
+	private ObscuredInt obscuredValueA;
 
-	private ObscuredInt AFHOBFEEHPL;
+	private ObscuredInt obscuredValueB;
 
-	private bool LNHMCKNCGDP;
+	private bool isImmortalityEnabled;
 
 	public ObscuredInt Level
 	{
 		get
 		{
-			return PINDEKDNCNL();
+			return GetLevel();
 		}
 		set
 		{
-			DLDMOHEGENM(value);
+			SetLevel(value);
 		}
 	}
 
-	public ObscuredFloat GPKALMFLOPP
+	public ObscuredFloat CurrentLife
 	{
 		get
 		{
-			return KKMCHCNOHMB();
+			return GetCurrentLife();
 		}
 	}
 
-	public ObscuredInt OBJAIHDENNM
+	public ObscuredInt BaseHealth
 	{
 		get
 		{
-			return OJLKDEHMIAC();
+			return GetBaseHealth();
 		}
 	}
 
-	public List<PerkInfoItem> FDAHAAFFGCA
+	public List<PerkInfoItem> AllPerks
 	{
 		get
 		{
-			return JBIOECDAAKP();
+			return GetAllPerks();
 		}
 	}
 
@@ -288,15 +288,15 @@ public partial class ModelParameters
 	{
 		get
 		{
-			return IJKINPHBHCF();
+			return GetIsGroup();
 		}
 	}
 
-	public bool INPPKAHEHEL
+	public bool ImmortalityEnabled
 	{
 		get
 		{
-			return AGICDDJBPLB();
+			return GetIsImmortalityEnabled();
 		}
 		set
 		{
@@ -304,124 +304,124 @@ public partial class ModelParameters
 		}
 	}
 
-	public float MEMMPHBHIMM
+	public float LifeRatio
 	{
 		get
 		{
-			return HABJPOFCIHA();
+			return GetLifeRatio();
 		}
 	}
 
-	public bool ICICCLIHNEH
+	public bool LifeDepleted
 	{
 		get
 		{
-			return OJMIFOAHKBK();
+			return GetLifeDepleted();
 		}
 	}
 
-	private bool MCKBGFPLDFM
+	private bool HasWonAllRounds
 	{
 		get
 		{
-			return FDDBPFJBHEB();
+			return GetHasWonAllRounds();
 		}
 	}
 
-	private float EJMOKAICKNF
+	private float ImpossibleRatio
 	{
 		get
 		{
-			return MONFIEOOICJ();
+			return GetImpossibleRatio();
 		}
 	}
 
-	private float LDPFDOKPPJL
+	private float EasyRatio
 	{
 		get
 		{
-			return ENBCGBBGFIK();
+			return GetEasyRatio();
 		}
 	}
 
-	public float DKNKIMMFAIM
+	public float PlayerRating
 	{
 		get
 		{
-			return PMHIIOJPDLO();
+			return GetPlayerRating();
 		}
 		set
 		{
-			FOPCCNDPFOE(value);
+			SetPlayerRating(value);
 		}
 	}
 
-	public float HDBCEDKMGBB
+	public float EnemyRating
 	{
 		get
 		{
-			return CEKIBEJELBM();
+			return GetEnemyRating();
 		}
 		set
 		{
-			KCLCLMNOIDJ(value);
+			SetEnemyRating(value);
 		}
 	}
 
-	public float OCLAMKEGKAN
+	public float PlayerRatingRanged
 	{
 		get
 		{
-			return GBKEKEDPBIB();
+			return GetPlayerRatingRanged();
 		}
 		set
 		{
-			JPOCPFLJKDC(value);
+			SetPlayerRatingRanged(value);
 		}
 	}
 
-	public float HMIEHGJGMIF
+	public float EnemyRatingRanged
 	{
 		get
 		{
-			return GCEDCHHBJGM();
+			return GetEnemyRatingRanged();
 		}
 		set
 		{
-			AJLEAGJFKPD(value);
+			SetEnemyRatingRanged(value);
 		}
 	}
 
-	public float JJNLCJIDFIP
+	public float PlayerRatingMagic
 	{
 		get
 		{
-			return FLLKBDGJIKO();
+			return GetPlayerRatingMagic();
 		}
 		set
 		{
-			LEIPGKLCKOP(value);
+			SetPlayerRatingMagic(value);
 		}
 	}
 
-	public float JLCCEHKHEPI
+	public float EnemyRatingMagic
 	{
 		get
 		{
-			return GGIOPHOMCCL();
+			return GetEnemyRatingMagic();
 		}
 		set
 		{
-			NHPLLBNKOAF(value);
+			SetEnemyRatingMagic(value);
 		}
 	}
 
 	public ModelParameters()
 	{
 		Perks = new List<PerkInfoItem>();
-		IBLHIAHECLK = new Attributes();
-		MAGFMAFCHLP = new Attributes();
-		HNKFHGOOKEG = string.Empty;
+		FinalAttributes = new Attributes();
+		BaseAttributes = new Attributes();
+		Avatar = string.Empty;
 		Skeleton = null;
 		Weapon = null;
 		Armor = null;
@@ -432,47 +432,47 @@ public partial class ModelParameters
 		AiControlled = true;
 		UserControlled = false;
 		IsWinner = false;
-		BHHLEBHLBLH = false;
-		PCALDKCJGCK = false;
-		DKAHKGBFJMG = true;
-		HKJFJHBHMND = true;
+		RoundEnded = false;
+		IsDead = false;
+		RewardsEnabled = true;
+		AnimationEnabled = true;
 		EndRoundType = EndRoundType.EndRoundTypeNone;
-		PEBKEBIBAFA = 1;
-		KDHBBGLCGIL = 0f;
+		OpponentCount = 1;
+		SavedLife = 0f;
 		MaxLife = 0f;
 		RoundsWon = 0;
-		HJNOICKOFDL = 0;
-		AKLPHMOAIGK = 0;
-		FPIMGHKNHMO = 0;
-		ALCFNGIKCCB = 0;
+		RoundTotal = 0;
+		Dan = 0;
+		WarriorPower = 0;
+		RatingCorrection = 0;
 		LotteryLevel = 0u;
-		KFMJMBANIGF = 0f;
-		EHBHNGOGCKO = 0f;
-		FLGGADFNNDK = 0;
-		KMNLACDHAFE = false;
-		HGHDBNPIFEJ = false;
+		Damage = 0f;
+		Difficulty = 0f;
+		OpponentIndex = 0;
+		BeginnerCheat = false;
+		UnknownFlag = false;
 		Voice = string.Empty;
-		PMHHMDAIOGL = false;
-		HBFMBOHLKPJ = null;
-		KKFBCOKMNDF = false;
-		IDPHHPNCFED = false;
-		MEECPNMPFPG = 0f;
-		JJCKADKCDIF = Vector3f.op_Implicit(new Vector3(-100f, -100f, -100f));
-		EHFNCDPPIAF = 0;
-		KKJJONOBHKI = null;
-		ABLMGLAKJBL = false;
-		EAJHPCJJCDI = false;
-		IBBALIJOJMC = SceneTypes.SceneNone;
-		CHACMOJKLAB = -1f;
-		PJGDPCJBLMA = -1f;
-		MEHKADPAHKP = -1f;
-		PIBJOEMLEGF = -1f;
-		NFENFPMIBFD = -1f;
-		CEFONNONAKG = -1f;
+		NoDoubles = false;
+		FightTactic = null;
+		HasSourceNode = false;
+		UnusedRoundFlag = false;
+		AutoTuneFactor = 0f;
+		SpawnPosition = Vector3f.op_Implicit(new Vector3(-100f, -100f, -100f));
+		RandomValue = 0;
+		Seal = null;
+		IsUntouched = false;
+		MovesInitialized = false;
+		SceneType = SceneTypes.SceneNone;
+		playerRating = -1f;
+		enemyRating = -1f;
+		playerRatingMagic = -1f;
+		enemyRatingMagic = -1f;
+		playerRatingRanged = -1f;
+		enemyRatingRanged = -1f;
 		_CurrentLife = (ObscuredFloat)(0f);
-		DEGCGHDAMDA = (ObscuredInt)(-1);
-		KBPOKMKFIAD = (ObscuredInt)(-1);
-		AFHOBFEEHPL = (ObscuredInt)(-1);
+		baseHealth = (ObscuredInt)(-1);
+		obscuredValueA = (ObscuredInt)(-1);
+		obscuredValueB = (ObscuredInt)(-1);
 	}
 
 	public ModelParameters(ModelParameters NBMGOEMJJAF)
@@ -480,11 +480,11 @@ public partial class ModelParameters
 		Perks = new List<PerkInfoItem>(NBMGOEMJJAF.Perks);
 		WarriorPerks = new List<PerkInfoItem>(NBMGOEMJJAF.WarriorPerks);
 		LearnedPerks = new List<PerkInfoItem>(NBMGOEMJJAF.LearnedPerks);
-		IBLHIAHECLK = new Attributes(NBMGOEMJJAF.IBLHIAHECLK);
-		MAGFMAFCHLP = new Attributes(NBMGOEMJJAF.MAGFMAFCHLP);
-		DLDMOHEGENM(NBMGOEMJJAF.PINDEKDNCNL());
-		BMFLPBLAFLK = NBMGOEMJJAF.BMFLPBLAFLK;
-		HNKFHGOOKEG = NBMGOEMJJAF.HNKFHGOOKEG;
+		FinalAttributes = new Attributes(NBMGOEMJJAF.FinalAttributes);
+		BaseAttributes = new Attributes(NBMGOEMJJAF.BaseAttributes);
+		SetLevel(NBMGOEMJJAF.GetLevel());
+		FirstName = NBMGOEMJJAF.FirstName;
+		Avatar = NBMGOEMJJAF.Avatar;
 		Skeleton = NBMGOEMJJAF.Skeleton;
         EclipseBodyModel = NBMGOEMJJAF.EclipseBodyModel;
         EclipseCharacterId = NBMGOEMJJAF.EclipseCharacterId;
@@ -500,138 +500,138 @@ public partial class ModelParameters
 		Ranged = NBMGOEMJJAF.Ranged;
 		Magic = NBMGOEMJJAF.Magic;
 		ModelDocuments.AddRange(NBMGOEMJJAF.ModelDocuments);
-		DANNKMJOOOH.AddRange(NBMGOEMJJAF.DANNKMJOOOH);
-		KOELCOMEJMI.AddRange(NBMGOEMJJAF.KOELCOMEJMI);
+		ExcludedMoveNames.AddRange(NBMGOEMJJAF.ExcludedMoveNames);
+		ExcludedPerkNames.AddRange(NBMGOEMJJAF.ExcludedPerkNames);
 		IsPlayer = NBMGOEMJJAF.IsPlayer;
 		AiControlled = NBMGOEMJJAF.AiControlled;
 		UserControlled = NBMGOEMJJAF.UserControlled;
 		IsWinner = NBMGOEMJJAF.IsWinner;
-		BHHLEBHLBLH = NBMGOEMJJAF.BHHLEBHLBLH;
-		PCALDKCJGCK = NBMGOEMJJAF.PCALDKCJGCK;
-		DKAHKGBFJMG = NBMGOEMJJAF.DKAHKGBFJMG;
-		HKJFJHBHMND = NBMGOEMJJAF.HKJFJHBHMND;
+		RoundEnded = NBMGOEMJJAF.RoundEnded;
+		IsDead = NBMGOEMJJAF.IsDead;
+		RewardsEnabled = NBMGOEMJJAF.RewardsEnabled;
+		AnimationEnabled = NBMGOEMJJAF.AnimationEnabled;
 		EndRoundType = NBMGOEMJJAF.EndRoundType;
-		PEBKEBIBAFA = NBMGOEMJJAF.PEBKEBIBAFA;
-		KDHBBGLCGIL = NBMGOEMJJAF.KDHBBGLCGIL;
+		OpponentCount = NBMGOEMJJAF.OpponentCount;
+		SavedLife = NBMGOEMJJAF.SavedLife;
 		MaxLife = NBMGOEMJJAF.MaxLife;
 		RoundsWon = NBMGOEMJJAF.RoundsWon;
-		HJNOICKOFDL = NBMGOEMJJAF.HJNOICKOFDL;
-		AKLPHMOAIGK = NBMGOEMJJAF.AKLPHMOAIGK;
-		FPIMGHKNHMO = NBMGOEMJJAF.FPIMGHKNHMO;
+		RoundTotal = NBMGOEMJJAF.RoundTotal;
+		Dan = NBMGOEMJJAF.Dan;
+		WarriorPower = NBMGOEMJJAF.WarriorPower;
 		ShieldTotal = NBMGOEMJJAF.ShieldTotal;
 		HasShieldTotalOverride = NBMGOEMJJAF.HasShieldTotalOverride;
-		ALCFNGIKCCB = NBMGOEMJJAF.ALCFNGIKCCB;
+		RatingCorrection = NBMGOEMJJAF.RatingCorrection;
 		LotteryLevel = NBMGOEMJJAF.LotteryLevel;
-		KFMJMBANIGF = NBMGOEMJJAF.KFMJMBANIGF;
-		EHBHNGOGCKO = NBMGOEMJJAF.EHBHNGOGCKO;
-		FLGGADFNNDK = NBMGOEMJJAF.FLGGADFNNDK;
-		KMNLACDHAFE = NBMGOEMJJAF.KMNLACDHAFE;
-		HGHDBNPIFEJ = NBMGOEMJJAF.KMNLACDHAFE;
+		Damage = NBMGOEMJJAF.Damage;
+		Difficulty = NBMGOEMJJAF.Difficulty;
+		OpponentIndex = NBMGOEMJJAF.OpponentIndex;
+		BeginnerCheat = NBMGOEMJJAF.BeginnerCheat;
+		UnknownFlag = NBMGOEMJJAF.BeginnerCheat;
 		Voice = NBMGOEMJJAF.Voice;
-		PMHHMDAIOGL = NBMGOEMJJAF.PMHHMDAIOGL;
-		HBFMBOHLKPJ = NBMGOEMJJAF.HBFMBOHLKPJ;
-		KKFBCOKMNDF = NBMGOEMJJAF.KKFBCOKMNDF;
+		NoDoubles = NBMGOEMJJAF.NoDoubles;
+		FightTactic = NBMGOEMJJAF.FightTactic;
+		HasSourceNode = NBMGOEMJJAF.HasSourceNode;
 		Node = NBMGOEMJJAF.Node;
-		IDPHHPNCFED = NBMGOEMJJAF.IDPHHPNCFED;
-		MEECPNMPFPG = NBMGOEMJJAF.MEECPNMPFPG;
-		JJCKADKCDIF = new Vector3f(NBMGOEMJJAF.JJCKADKCDIF);
-		EHFNCDPPIAF = NBMGOEMJJAF.EHFNCDPPIAF;
-		KKJJONOBHKI = NBMGOEMJJAF.KKJJONOBHKI;
-		ABLMGLAKJBL = NBMGOEMJJAF.ABLMGLAKJBL;
-		EAJHPCJJCDI = NBMGOEMJJAF.EAJHPCJJCDI;
-		IBBALIJOJMC = NBMGOEMJJAF.IBBALIJOJMC;
-		CHACMOJKLAB = NBMGOEMJJAF.CHACMOJKLAB;
-		PJGDPCJBLMA = NBMGOEMJJAF.PJGDPCJBLMA;
-		MEHKADPAHKP = NBMGOEMJJAF.MEHKADPAHKP;
-		PIBJOEMLEGF = NBMGOEMJJAF.PIBJOEMLEGF;
-		NFENFPMIBFD = NBMGOEMJJAF.NFENFPMIBFD;
-		CEFONNONAKG = NBMGOEMJJAF.CEFONNONAKG;
+		UnusedRoundFlag = NBMGOEMJJAF.UnusedRoundFlag;
+		AutoTuneFactor = NBMGOEMJJAF.AutoTuneFactor;
+		SpawnPosition = new Vector3f(NBMGOEMJJAF.SpawnPosition);
+		RandomValue = NBMGOEMJJAF.RandomValue;
+		Seal = NBMGOEMJJAF.Seal;
+		IsUntouched = NBMGOEMJJAF.IsUntouched;
+		MovesInitialized = NBMGOEMJJAF.MovesInitialized;
+		SceneType = NBMGOEMJJAF.SceneType;
+		playerRating = NBMGOEMJJAF.playerRating;
+		enemyRating = NBMGOEMJJAF.enemyRating;
+		playerRatingMagic = NBMGOEMJJAF.playerRatingMagic;
+		enemyRatingMagic = NBMGOEMJJAF.enemyRatingMagic;
+		playerRatingRanged = NBMGOEMJJAF.playerRatingRanged;
+		enemyRatingRanged = NBMGOEMJJAF.enemyRatingRanged;
 		_CurrentLife = NBMGOEMJJAF._CurrentLife;
 		RecoverableLife = NBMGOEMJJAF.RecoverableLife;
-		DEGCGHDAMDA = NBMGOEMJJAF.DEGCGHDAMDA;
-		KBPOKMKFIAD = NBMGOEMJJAF.KBPOKMKFIAD;
-		AFHOBFEEHPL = NBMGOEMJJAF.AFHOBFEEHPL;
+		baseHealth = NBMGOEMJJAF.baseHealth;
+		obscuredValueA = NBMGOEMJJAF.obscuredValueA;
+		obscuredValueB = NBMGOEMJJAF.obscuredValueB;
 		AttributeAlignments = new List<AttributesAlign>(NBMGOEMJJAF.AttributeAlignments);
 	}
 
-	public ObscuredInt PINDEKDNCNL()
+	public ObscuredInt GetLevel()
 	{
-		return CMOKGMKBGBB;
+		return level;
 	}
 
-	public void DLDMOHEGENM(ObscuredInt value)
+	public void SetLevel(ObscuredInt value)
 	{
-		CMOKGMKBGBB = value;
+		level = value;
 	}
 
-	public ObscuredFloat KKMCHCNOHMB()
+	public ObscuredFloat GetCurrentLife()
 	{
 		return _CurrentLife;
 	}
 
-	public ObscuredInt OJLKDEHMIAC()
+	public ObscuredInt GetBaseHealth()
 	{
-		return DEGCGHDAMDA;
+		return baseHealth;
 	}
 
 	public void RandomizeObscuredVars()
 	{
-		CMOKGMKBGBB.GMCADPGOCHM();
-		_CurrentLife.GMCADPGOCHM();
-		DEGCGHDAMDA.GMCADPGOCHM();
-		KBPOKMKFIAD.GMCADPGOCHM();
-		AFHOBFEEHPL.GMCADPGOCHM();
+		level.RandomizeCryptoKey();
+		_CurrentLife.RandomizeCryptoKey();
+		baseHealth.RandomizeCryptoKey();
+		obscuredValueA.RandomizeCryptoKey();
+		obscuredValueB.RandomizeCryptoKey();
 	}
 
-	public void PFNDNOMGFBC(ItemInfo item)
+	public void AddConditionItem(ItemInfo item)
 	{
-		OJIAKDDCGLB.AddIfNotExist(item);
+		ConditionItems.AddIfNotExist(item);
 	}
 
-	public void LHLEIAKJANI(PerkInfoItem AEFFHJGMNFI)
+	public void AddWarriorPerk(PerkInfoItem AEFFHJGMNFI)
 	{
 		WarriorPerks.AddIfNotExist(AEFFHJGMNFI);
 	}
 
-	public List<ItemInfo> DGMDEDKLGMB()
+	public List<ItemInfo> GetEquippedItemsByType()
 	{
 		List<ItemInfo> list = new List<ItemInfo>();
-		ItemInfo dJKEECEOCJB = KDABEFBJMOD("Skeleton");
+		ItemInfo dJKEECEOCJB = GetItemByType("Skeleton");
 		if (dJKEECEOCJB != null)
 		{
 			list.Add(dJKEECEOCJB);
 		}
-		dJKEECEOCJB = KDABEFBJMOD("Weapon");
+		dJKEECEOCJB = GetItemByType("Weapon");
 		if (dJKEECEOCJB != null)
 		{
 			list.Add(dJKEECEOCJB);
 		}
-		dJKEECEOCJB = KDABEFBJMOD("Ranged");
+		dJKEECEOCJB = GetItemByType("Ranged");
 		if (dJKEECEOCJB != null)
 		{
 			list.Add(dJKEECEOCJB);
 		}
-		dJKEECEOCJB = KDABEFBJMOD("Magic");
+		dJKEECEOCJB = GetItemByType("Magic");
 		if (dJKEECEOCJB != null)
 		{
 			list.Add(dJKEECEOCJB);
 		}
-		dJKEECEOCJB = KDABEFBJMOD("RaidConsumable");
+		dJKEECEOCJB = GetItemByType("RaidConsumable");
 		if (dJKEECEOCJB != null)
 		{
 			list.Add(dJKEECEOCJB);
 		}
-		dJKEECEOCJB = KDABEFBJMOD("Armor");
+		dJKEECEOCJB = GetItemByType("Armor");
 		if (dJKEECEOCJB != null)
 		{
 			list.Add(dJKEECEOCJB);
 		}
-		dJKEECEOCJB = KDABEFBJMOD("Helm");
+		dJKEECEOCJB = GetItemByType("Helm");
 		if (dJKEECEOCJB != null)
 		{
 			list.Add(dJKEECEOCJB);
 		}
-		dJKEECEOCJB = KDABEFBJMOD("Cheat");
+		dJKEECEOCJB = GetItemByType("Cheat");
 		if (dJKEECEOCJB != null)
 		{
 			list.Add(dJKEECEOCJB);
@@ -639,7 +639,7 @@ public partial class ModelParameters
 		return list;
 	}
 
-	public List<ItemInfo> PJNJIJIODHE()
+	public List<ItemInfo> GetEquippedItems()
 	{
 		List<ItemInfo> list = new List<ItemInfo>();
 		if (Skeleton != null)
@@ -669,7 +669,7 @@ public partial class ModelParameters
 		return list;
 	}
 
-	public ItemInfo KDABEFBJMOD(string LMNNBBKHMEI)
+	public ItemInfo GetItemByType(string LMNNBBKHMEI)
 	{
 		switch (LMNNBBKHMEI)
 		{
@@ -690,7 +690,7 @@ public partial class ModelParameters
 		}
 	}
 
-	public void OLLNIKFPMKE(string LMNNBBKHMEI, ItemInfo item)
+	public void SetItemByType(string LMNNBBKHMEI, ItemInfo item)
 	{
 		switch (LMNNBBKHMEI)
 		{
@@ -715,7 +715,7 @@ public partial class ModelParameters
 		}
 	}
 
-	private string HNLFPEOANFA(string LMNNBBKHMEI)
+	private string GetItemNameByAttribute(string LMNNBBKHMEI)
 	{
 		switch (LMNNBBKHMEI)
 		{
@@ -736,7 +736,7 @@ public partial class ModelParameters
 		}
 	}
 
-	private ItemInfo JELHKJHBNMF(string LMNNBBKHMEI)
+	private ItemInfo GetItemByAttribute(string LMNNBBKHMEI)
 	{
 		switch (LMNNBBKHMEI)
 		{
@@ -757,51 +757,51 @@ public partial class ModelParameters
 		}
 	}
 
-	public void PPFDLIBLNDG()
+	public void BuildModelDocuments()
 	{
 		ModelDocuments.Clear();
         // A chosen player look replaces armor/helmet geometry only; their stats stay.
         bool eclipseLook = ResolveEclipseAppearance();
         if (!string.IsNullOrEmpty(EclipseBodyModel))
-            ModelDocuments.Add(EclipseBodyModel.EndsWith(".xml",System.StringComparison.OrdinalIgnoreCase) ? EclipseBodyModel : OKALHAKMOLI(EclipseBodyModel));
+            ModelDocuments.Add(EclipseBodyModel.EndsWith(".xml",System.StringComparison.OrdinalIgnoreCase) ? EclipseBodyModel : ToXmlFileName(EclipseBodyModel));
 		else if (Skeleton != null && !string.IsNullOrEmpty(Skeleton.ModelFileName))
 		{
-			ModelDocuments.Add(OKALHAKMOLI(Skeleton.ModelFileName));
+			ModelDocuments.Add(ToXmlFileName(Skeleton.ModelFileName));
 		}
 		if (Weapon != null && !string.IsNullOrEmpty(Weapon.ModelFileName))
 		{
-			ModelDocuments.Add(OKALHAKMOLI(Weapon.ModelFileName));
+			ModelDocuments.Add(ToXmlFileName(Weapon.ModelFileName));
 		}
 		// Under a look, armor and helmet still load (same nodes, edges and physics) but
 		// their figures are not drawn unless the player shows armor.
 		bool eclipseHideArmor = eclipseLook && !Eclipse.Modding.PlayerAppearance.ShowArmor;
 		if (Armor != null && !string.IsNullOrEmpty(Armor.ModelFileName))
 		{
-			string path = OKALHAKMOLI(Armor.ModelFileName);
+			string path = ToXmlFileName(Armor.ModelFileName);
 			ModelDocuments.Add(eclipseHideArmor ? HideEclipseFigures(path) : path);
 		}
 		if (Helm != null && !string.IsNullOrEmpty(Helm.ModelFileName))
 		{
-			string path = OKALHAKMOLI(Helm.ModelFileName);
+			string path = ToXmlFileName(Helm.ModelFileName);
 			ModelDocuments.Add(eclipseHideArmor ? HideEclipseFigures(path) : path);
 		}
-		for (int i = 0; i < HEKILHEHMMH.Count; i++)
+		for (int i = 0; i < DecorateItems.Count; i++)
 		{
-			ModelDocuments.Add(OKALHAKMOLI(HEKILHEHMMH[i].ModelFileName));
+			ModelDocuments.Add(ToXmlFileName(DecorateItems[i].ModelFileName));
 		}
         foreach (var skin in EclipseSkinModels)
-            ModelDocuments.Add(skin.EndsWith(".xml",System.StringComparison.OrdinalIgnoreCase) ? skin : OKALHAKMOLI(skin));
+            ModelDocuments.Add(skin.EndsWith(".xml",System.StringComparison.OrdinalIgnoreCase) ? skin : ToXmlFileName(skin));
         foreach (var skin in _eclipseAppearanceSkins)
             ModelDocuments.Add(EclipseModelPath(skin));
 	}
 
-	public int DGLDFMCEDDO(string name, ref bool GMEMHMOHFGG)
+	public int SumItemAttribute(string name, ref bool GMEMHMOHFGG)
 	{
-		List<ItemInfo> hELFDCAIJNE = PJNJIJIODHE();
-		return DGLDFMCEDDO(name, hELFDCAIJNE, ref GMEMHMOHFGG);
+		List<ItemInfo> hELFDCAIJNE = GetEquippedItems();
+		return SumItemAttribute(name, hELFDCAIJNE, ref GMEMHMOHFGG);
 	}
 
-	public int DGLDFMCEDDO(string name, List<ItemInfo> HELFDCAIJNE, ref bool GMEMHMOHFGG)
+	public int SumItemAttribute(string name, List<ItemInfo> HELFDCAIJNE, ref bool GMEMHMOHFGG)
 	{
 		GMEMHMOHFGG = false;
 		int num = 0;
@@ -817,13 +817,13 @@ public partial class ModelParameters
 		return num;
 	}
 
-	private int LGJAHBCFMCF(string name, ref bool GMEMHMOHFGG)
+	private int SumPerkAttribute(string name, ref bool GMEMHMOHFGG)
 	{
 		int num = 0;
 		for (int i = 0; i < Perks.Count; i++)
 		{
 			int OEMALIFPGPO = 0;
-			if (Perks[i].IBLHIAHECLK.Get(name, ref OEMALIFPGPO))
+			if (Perks[i].AttributeValues.Get(name, ref OEMALIFPGPO))
 			{
 				GMEMHMOHFGG = true;
 				num += OEMALIFPGPO;
@@ -832,129 +832,129 @@ public partial class ModelParameters
 		return num;
 	}
 
-	public void NOBKKLBJFIL()
+	public void CalculateAttributes()
 	{
-		KELCMMKNHEH();
-		List<ItemInfo> hELFDCAIJNE = PJNJIJIODHE();
-		List<WarriorAttribute> iBLHIAHECLK = GameUtils.BGENALLCKII.IBLHIAHECLK;
+		ClearAttributes();
+		List<ItemInfo> hELFDCAIJNE = GetEquippedItems();
+		List<WarriorAttribute> iBLHIAHECLK = GameUtils.WarriorAttributeList.AttributeList;
 		for (int i = 0; i < iBLHIAHECLK.Count; i++)
 		{
 			string text = iBLHIAHECLK[i].get_Name();
 			int OEMALIFPGPO = 0;
-			if (MAGFMAFCHLP.Get(text, ref OEMALIFPGPO))
+			if (BaseAttributes.Get(text, ref OEMALIFPGPO))
 			{
-				IBLHIAHECLK.Set(text, OEMALIFPGPO, true);
+				FinalAttributes.Set(text, OEMALIFPGPO, true);
 				continue;
 			}
 			int num = 0;
 			bool GMEMHMOHFGG = false;
-			num += DGLDFMCEDDO(text, hELFDCAIJNE, ref GMEMHMOHFGG);
-			num += LGJAHBCFMCF(text, ref GMEMHMOHFGG);
+			num += SumItemAttribute(text, hELFDCAIJNE, ref GMEMHMOHFGG);
+			num += SumPerkAttribute(text, ref GMEMHMOHFGG);
 			int OEMALIFPGPO2 = 0;
-			if (GameUtils.KJJBEHBGKMK.KGMDIGIONNB.Get(text, ref OEMALIFPGPO2))
+			if (GameUtils.StartingAttributes.Gains.Get(text, ref OEMALIFPGPO2))
 			{
 				num += OEMALIFPGPO2;
 				GMEMHMOHFGG = true;
 			}
 			int OEMALIFPGPO3 = 0;
-			if (GameUtils.MKHOLKGKNID.KGMDIGIONNB.Get(text, ref OEMALIFPGPO3))
+			if (GameUtils.LevelAttributeGains.Gains.Get(text, ref OEMALIFPGPO3))
 			{
-				num += (ObscuredInt)(CMOKGMKBGBB) * OEMALIFPGPO3;
+				num += (ObscuredInt)(level) * OEMALIFPGPO3;
 				GMEMHMOHFGG = true;
 			}
-			if (GMEMHMOHFGG || !iBLHIAHECLK[i].GMPLHIHNHMD)
+			if (GMEMHMOHFGG || !iBLHIAHECLK[i].UnusedFlag)
 			{
-				IBLHIAHECLK.Set(text, num, true);
+				FinalAttributes.Set(text, num, true);
 			}
 		}
 	}
 
-	public List<PerkInfoItem> JBIOECDAAKP()
+	public List<PerkInfoItem> GetAllPerks()
 	{
 		List<PerkInfoItem> list = new List<PerkInfoItem>();
 		list.AddRange(Perks);
 		list.AddRange(WarriorPerks);
 		list.AddRange(LearnedPerks);
-		List<ItemInfo> list2 = PJNJIJIODHE();
+		List<ItemInfo> list2 = GetEquippedItems();
 		foreach (ItemInfo item in list2)
 		{
 			bool bAINMLLIKOL = item.Type == "Weapon";
 			foreach (PerkInfoItem item2 in item.InnatePerks)
 			{
-				item2.HILDOOOKHGN(bAINMLLIKOL);
+				item2.SetIsWeaponPerk(bAINMLLIKOL);
 				list.Add(item2);
 			}
 			if (item.IgnoreInventoryEnchantments || !IsPlayer)
 			{
 				continue;
 			}
-			UserItem dKCHDHMLKHN = ListSF.CCDKHLAMKKO().KHCNHPCPFII().CMGOCLGHNLH(item);
+			UserItem dKCHDHMLKHN = ListSF.GetRoster().GetInventory().FindItem(item);
 			if (dKCHDHMLKHN == null)
 			{
 				continue;
 			}
-			List<PerkInfoItem> list3 = ListSF.KJBMBFHCEIM(item, IsPlayer);
+			List<PerkInfoItem> list3 = ListSF.GetItemEnchantmentsForSide(item, IsPlayer);
 			foreach (PerkInfoItem item3 in list3)
 			{
-				if (item3.LELHEEDNMBP == PerkInfoItem.DNPGIEGCGKH.COMBO)
+				if (item3.Kind == PerkInfoItem.PerkKind.COMBO)
 				{
-					if (item.Type == "Weapon" && GameUtils.ILFJCODGINO(item3))
+					if (item.Type == "Weapon" && GameUtils.IsPerkCompatibleWithEquipment(item3))
 					{
-						item3.HILDOOOKHGN(bAINMLLIKOL);
+						item3.SetIsWeaponPerk(bAINMLLIKOL);
 						list.Add(item3);
 					}
 				}
 				else
 				{
-					item3.HILDOOOKHGN(bAINMLLIKOL);
+					item3.SetIsWeaponPerk(bAINMLLIKOL);
 					list.Add(item3);
 				}
 			}
 		}
-		JEJPEJFLDJC(list, KOELCOMEJMI);
+		RemovePerksByNames(list, ExcludedPerkNames);
 		return list;
 	}
 
-	public void AJFGKPFJJNL()
+	public void RefreshPerks()
 	{
 		Perks.Clear();
-		Perks.AddRange(JBIOECDAAKP());
-		JEJPEJFLDJC(Perks, KOELCOMEJMI);
+		Perks.AddRange(GetAllPerks());
+		RemovePerksByNames(Perks, ExcludedPerkNames);
 	}
 
-	private string OKALHAKMOLI(string name)
+	private string ToXmlFileName(string name)
 	{
 		return string.Format("{0}.xml", name);
 	}
 
 	public override string ToString()
 	{
-		return string.Format("User ID='{0}' SilhouetteItemID='{1}' WeaponID='{2}' Dan='{3}' Damage='{4}' Difficulty='{5}' FirstName='{6}' LastName='{7}'  Level='{8}' LotteryLevel='{9}' ", 0, Armor.NLMDNOBHHKP, (Weapon != null) ? Weapon.NLMDNOBHHKP : 0, AKLPHMOAIGK, KFMJMBANIGF, EHBHNGOGCKO, BMFLPBLAFLK, FMOKLKFCCKF, CMOKGMKBGBB, LotteryLevel);
+		return string.Format("User ID='{0}' SilhouetteItemID='{1}' WeaponID='{2}' Dan='{3}' Damage='{4}' Difficulty='{5}' FirstName='{6}' LastName='{7}'  Level='{8}' LotteryLevel='{9}' ", 0, Armor.ItemId, (Weapon != null) ? Weapon.ItemId : 0, Dan, Damage, Difficulty, FirstName, LastName, level, LotteryLevel);
 	}
 
-	public static void DPIDOBMONPA(XmlNode AFHNINCKJEE)
+	public static void ParseRatingConfig(XmlNode AFHNINCKJEE)
 	{
-		GOLHPEBMEDB = XmlUtils.ParseFloat(AFHNINCKJEE.Attributes["ImpossibleRatio"]);
-		GGKLECFGBOP = XmlUtils.ParseFloat(AFHNINCKJEE.Attributes["EasyRatio"]);
-		PPNILGFDOLN.Clear();
-		PCLCPAMGMLF = XmlUtils.ParseString(AFHNINCKJEE.Attributes["PerkAspectParameter"]);
+		impossibleRatio = XmlUtils.ParseFloat(AFHNINCKJEE.Attributes["ImpossibleRatio"]);
+		easyRatio = XmlUtils.ParseFloat(AFHNINCKJEE.Attributes["EasyRatio"]);
+		ratingEvaluations.Clear();
+		perkAspectParameter = XmlUtils.ParseString(AFHNINCKJEE.Attributes["PerkAspectParameter"]);
 		foreach (XmlNode childNode in AFHNINCKJEE.ChildNodes)
 		{
 			RatingEvaluation dCAFHLLHFJO = new RatingEvaluation();
-			PPNILGFDOLN.Add(dCAFHLLHFJO);
-			dCAFHLLHFJO.DNKAJNCEGKF = childNode.Name;
-			dCAFHLLHFJO.AOAPDHDACPJ = XmlUtils.ParseString(childNode.Attributes["Name"]);
-			Evaluation.ParseAttributes(childNode, dCAFHLLHFJO.IBLHIAHECLK);
-			Evaluation.BEFJGPEAJCF(childNode, dCAFHLLHFJO);
-			Evaluation.MNFPBOPIHDE(childNode, dCAFHLLHFJO);
-			dCAFHLLHFJO.GMODDPGBGHM = XmlUtils.ParseString(childNode.Attributes["CancellingItem"]);
-			Defense.Parse(childNode, dCAFHLLHFJO.CKJBFNJEDHH);
+			ratingEvaluations.Add(dCAFHLLHFJO);
+			dCAFHLLHFJO.nodeName = childNode.Name;
+			dCAFHLLHFJO.evaluationName = XmlUtils.ParseString(childNode.Attributes["Name"]);
+			Evaluation.ParseAttributes(childNode, dCAFHLLHFJO.evaluations);
+			Evaluation.ParseAverageQuantity(childNode, dCAFHLLHFJO);
+			Evaluation.ParseAverageDamageAndRecharge(childNode, dCAFHLLHFJO);
+			dCAFHLLHFJO.cancellingItem = XmlUtils.ParseString(childNode.Attributes["CancellingItem"]);
+			Defense.Parse(childNode, dCAFHLLHFJO.defenses);
 		}
 	}
 
-	private void CPLONGFFFBJ(float ratio)
+	private void EvaluateAttributeAlignment(float ratio)
 	{
-		float num = (0f - GameUtils.BGJPLNFFEOB) * (Mathf.Log10(ratio) / Mathf.Log10(2f)) / 2f;
+		float num = (0f - GameUtils.DamageDoublingRange) * (Mathf.Log10(ratio) / Mathf.Log10(2f)) / 2f;
 		float num2 = float.MinValue;
 		foreach (AttributesAlign item in AttributeAlignments)
 		{
@@ -969,7 +969,7 @@ public partial class ModelParameters
 	private float GetParametersValue(string name)
 	{
 		int OEMALIFPGPO = 0;
-		if (IBLHIAHECLK.Get(name, ref OEMALIFPGPO))
+		if (FinalAttributes.Get(name, ref OEMALIFPGPO))
 		{
 			return OEMALIFPGPO;
 		}
@@ -983,7 +983,7 @@ public partial class ModelParameters
 		foreach (string item in NIKHAICFGNM)
 		{
 			int OEMALIFPGPO = 0;
-			if (IBLHIAHECLK.Get(item, ref OEMALIFPGPO) && num < (float)OEMALIFPGPO)
+			if (FinalAttributes.Get(item, ref OEMALIFPGPO) && num < (float)OEMALIFPGPO)
 			{
 				num = OEMALIFPGPO;
 			}
@@ -995,7 +995,7 @@ public partial class ModelParameters
 		return num;
 	}
 
-	private float JKCCFHJHHII(List<Evaluation> EKJDIGGGEBH, ModelParameters JCICKLIMBEF)
+	private float GetMaxEvaluationValue(List<Evaluation> EKJDIGGGEBH, ModelParameters JCICKLIMBEF)
 	{
 		float num = float.MinValue;
 		foreach (Evaluation item in EKJDIGGGEBH)
@@ -1009,93 +1009,93 @@ public partial class ModelParameters
 		return num;
 	}
 
-	public float DJOIGHCCMJG(ModelParameters AKBNKDBHCEO, List<global::Pair<string, float>> PNLMJFLBGMA)
+	public float CalculateDamageRating(ModelParameters AKBNKDBHCEO, List<global::Pair<string, float>> PNLMJFLBGMA)
 	{
 		float num = 0f;
 		List<global::Pair<string, float>> list = new List<global::Pair<string, float>>();
-		foreach (RatingEvaluation item in PPNILGFDOLN)
+		foreach (RatingEvaluation item in ratingEvaluations)
 		{
-			if (!(item.DNKAJNCEGKF == "Damage"))
+			if (!(item.nodeName == "Damage"))
 			{
 				continue;
 			}
 			RatingEvaluation dCAFHLLHFJO = item;
-			if (HasItem(dCAFHLLHFJO.GMODDPGBGHM))
+			if (HasItem(dCAFHLLHFJO.cancellingItem))
 			{
 				continue;
 			}
-			float cDCIEOFCKNO = dCAFHLLHFJO.CDCIEOFCKNO;
+			float cDCIEOFCKNO = dCAFHLLHFJO.averageBaseDamage;
 			list.Clear();
-			AIHCLEKCBPF(list, dCAFHLLHFJO.IBLHIAHECLK);
-			BKMGIJHCMPI(list, PNLMJFLBGMA);
-			List<Defense> cKJBFNJEDHH = dCAFHLLHFJO.CKJBFNJEDHH;
-			BIAFHJKHFGE(AKBNKDBHCEO, cKJBFNJEDHH, PNLMJFLBGMA);
+			CollectEvaluationAttributes(list, dCAFHLLHFJO.evaluations);
+			AddShiftsToPairs(list, PNLMJFLBGMA);
+			List<Defense> cKJBFNJEDHH = dCAFHLLHFJO.defenses;
+			ApplyDefenseShiftsToOpponent(AKBNKDBHCEO, cKJBFNJEDHH, PNLMJFLBGMA);
 			float num2 = 0f;
 			foreach (Defense item2 in cKJBFNJEDHH)
 			{
-				if (item2.IBLHIAHECLK.Count != 1)
+				if (item2.Evaluations.Count != 1)
 				{
 					Debug.LogError("Count of DefenseAttribute != 1");
 				}
-				if (HasItem(item2.GMODDPGBGHM))
+				if (HasItem(item2.CancellingItem))
 				{
 					continue;
 				}
-				float num3 = GameUtils.GetAttributesHitMultiplier(IsPlayer, this, AKBNKDBHCEO, list, item2.IBLHIAHECLK[0].Name);
+				float num3 = GameUtils.GetAttributesHitMultiplier(IsPlayer, this, AKBNKDBHCEO, list, item2.Evaluations[0].Name);
 				num3 = Mathf.Min(1f, cDCIEOFCKNO * num3);
-				List<PerkInfoItem> list2 = JBIOECDAAKP();
+				List<PerkInfoItem> list2 = GetAllPerks();
 				foreach (PerkInfoItem item3 in list2)
 				{
-					List<Rating> mLMLENHGNDJ = item3.MLMLENHGNDJ;
+					List<Rating> mLMLENHGNDJ = item3.Ratings;
 					if (mLMLENHGNDJ.Count == 0)
 					{
 						continue;
 					}
 					foreach (Rating item4 in mLMLENHGNDJ)
 					{
-						if (!(item4.IHJJBIDMEMB != "Me") && (string.IsNullOrEmpty(item4.KFMJMBANIGF) || item4.KFMJMBANIGF == dCAFHLLHFJO.AOAPDHDACPJ) && (string.IsNullOrEmpty(item4.GBOKABKLCFM) || item4.GBOKABKLCFM == item2.AOAPDHDACPJ))
+						if (!(item4.player != "Me") && (string.IsNullOrEmpty(item4.damageType) || item4.damageType == dCAFHLLHFJO.evaluationName) && (string.IsNullOrEmpty(item4.defenseType) || item4.defenseType == item2.DefenseName))
 						{
 							float num4 = 0f;
-							if (!string.IsNullOrEmpty(PCLCPAMGMLF))
+							if (!string.IsNullOrEmpty(perkAspectParameter))
 							{
-								string s = item3.NGNJGOJJPLD(PCLCPAMGMLF);
+								string s = item3.GetSetValue(perkAspectParameter);
 								num4 = float.Parse(s);
 							}
-							num3 *= 1f + (item4.Multiplier - 1f) * PerkInfoItem.DODDEPEMBMC(num4 - AKBNKDBHCEO.GetParametersValue(item4.BIOIOGIBCOE));
+							num3 *= 1f + (item4.Multiplier - 1f) * PerkInfoItem.AspectToMultiplier(num4 - AKBNKDBHCEO.GetParametersValue(item4.enemyAttribute));
 						}
 					}
 				}
-				List<PerkInfoItem> list3 = AKBNKDBHCEO.JBIOECDAAKP();
+				List<PerkInfoItem> list3 = AKBNKDBHCEO.GetAllPerks();
 				foreach (PerkInfoItem item5 in list3)
 				{
-					List<Rating> mLMLENHGNDJ2 = item5.MLMLENHGNDJ;
+					List<Rating> mLMLENHGNDJ2 = item5.Ratings;
 					if (mLMLENHGNDJ2.Count == 0)
 					{
 						continue;
 					}
 					foreach (Rating item6 in mLMLENHGNDJ2)
 					{
-						if (!(item6.IHJJBIDMEMB != "Enemy") && (string.IsNullOrEmpty(item6.KFMJMBANIGF) || item6.KFMJMBANIGF == dCAFHLLHFJO.AOAPDHDACPJ) && (string.IsNullOrEmpty(item6.GBOKABKLCFM) || item6.GBOKABKLCFM == item2.AOAPDHDACPJ))
+						if (!(item6.player != "Enemy") && (string.IsNullOrEmpty(item6.damageType) || item6.damageType == dCAFHLLHFJO.evaluationName) && (string.IsNullOrEmpty(item6.defenseType) || item6.defenseType == item2.DefenseName))
 						{
 							float num5 = 0f;
-							if (!string.IsNullOrEmpty(PCLCPAMGMLF))
+							if (!string.IsNullOrEmpty(perkAspectParameter))
 							{
-								string s2 = item5.NGNJGOJJPLD(PCLCPAMGMLF);
+								string s2 = item5.GetSetValue(perkAspectParameter);
 								num5 = float.Parse(s2);
 							}
-							num3 /= 1f + (item6.Multiplier - 1f) * PerkInfoItem.DODDEPEMBMC(num5 - AKBNKDBHCEO.GetParametersValue(item6.BIOIOGIBCOE));
+							num3 /= 1f + (item6.Multiplier - 1f) * PerkInfoItem.AspectToMultiplier(num5 - AKBNKDBHCEO.GetParametersValue(item6.enemyAttribute));
 						}
 					}
 				}
 				num2 += item2.Weight * num3;
 			}
-			if (dCAFHLLHFJO.OFHGAJDLIDB > 0f)
+			if (dCAFHLLHFJO.magicRechargeRate > 0f)
 			{
-				float oFHGAJDLIDB = dCAFHLLHFJO.OFHGAJDLIDB;
-				float num6 = GameUtils.DILKHIFCCGD.JGHFCAPPDED();
-				float num7 = GameUtils.DILKHIFCCGD.HOOBFKANPEK();
-				float num8 = GameUtils.DILKHIFCCGD.MPIOONCNFOK(this);
-				float num9 = GameUtils.DILKHIFCCGD.LLKJJLOMNID(this);
+				float oFHGAJDLIDB = dCAFHLLHFJO.magicRechargeRate;
+				float num6 = GameUtils.MagicConfig.GetPainRecharge();
+				float num7 = GameUtils.MagicConfig.GetDamageRecharge();
+				float num8 = GameUtils.MagicConfig.GetPainRecharge(this);
+				float num9 = GameUtils.MagicConfig.GetDamageRecharge(this);
 				num2 *= oFHGAJDLIDB * (num6 * num8 + num7 * num9);
 			}
 			num += num2;
@@ -1105,7 +1105,7 @@ public partial class ModelParameters
 
 	private bool HasItem(string OHCGEEEKEJH)
 	{
-		List<ItemInfo> list = PJNJIJIODHE();
+		List<ItemInfo> list = GetEquippedItems();
 		foreach (ItemInfo item in list)
 		{
 			if (item.Name == OHCGEEEKEJH)
@@ -1116,7 +1116,7 @@ public partial class ModelParameters
 		return false;
 	}
 
-	private void BKMGIJHCMPI(List<global::Pair<string, float>> FFJLHDENIEB, List<global::Pair<string, float>> PNLMJFLBGMA)
+	private void AddShiftsToPairs(List<global::Pair<string, float>> FFJLHDENIEB, List<global::Pair<string, float>> PNLMJFLBGMA)
 	{
 		if (PNLMJFLBGMA == null)
 		{
@@ -1137,7 +1137,7 @@ public partial class ModelParameters
 		}
 	}
 
-	private void BIAFHJKHFGE(ModelParameters AKBNKDBHCEO, List<Defense> PLPANBKKOEN, List<global::Pair<string, float>> PNLMJFLBGMA)
+	private void ApplyDefenseShiftsToOpponent(ModelParameters AKBNKDBHCEO, List<Defense> PLPANBKKOEN, List<global::Pair<string, float>> PNLMJFLBGMA)
 	{
 		if (PNLMJFLBGMA == null)
 		{
@@ -1149,26 +1149,26 @@ public partial class ModelParameters
 			float nFNBFHCDEGG = item.Second;
 			for (int i = 0; i < PLPANBKKOEN.Count; i++)
 			{
-				foreach (Evaluation item2 in PLPANBKKOEN[i].IBLHIAHECLK)
+				foreach (Evaluation item2 in PLPANBKKOEN[i].Evaluations)
 				{
 					if (item2.Name == lLHEDBIEHAA)
 					{
 						int OEMALIFPGPO = 0;
-						AKBNKDBHCEO.IBLHIAHECLK.Get(lLHEDBIEHAA, ref OEMALIFPGPO);
-						AKBNKDBHCEO.IBLHIAHECLK.Set(lLHEDBIEHAA, (int)((float)OEMALIFPGPO + nFNBFHCDEGG));
+						AKBNKDBHCEO.FinalAttributes.Get(lLHEDBIEHAA, ref OEMALIFPGPO);
+						AKBNKDBHCEO.FinalAttributes.Set(lLHEDBIEHAA, (int)((float)OEMALIFPGPO + nFNBFHCDEGG));
 					}
 				}
 			}
 		}
 	}
 
-	public void JEJPEJFLDJC(List<PerkInfoItem> JOGBKOJCINM, List<string> NIKHAICFGNM)
+	public void RemovePerksByNames(List<PerkInfoItem> JOGBKOJCINM, List<string> NIKHAICFGNM)
 	{
 		foreach (string item in NIKHAICFGNM)
 		{
 			for (int num = JOGBKOJCINM.Count - 1; num >= 0; num--)
 			{
-				if (ILAFHEDMNNL(JOGBKOJCINM[num], item))
+				if (IsPerkInNames(JOGBKOJCINM[num], item))
 				{
 					JOGBKOJCINM.RemoveAt(num);
 				}
@@ -1176,7 +1176,7 @@ public partial class ModelParameters
 		}
 	}
 
-	private bool ILAFHEDMNNL(PerkInfoItem AEFFHJGMNFI, string name)
+	private bool IsPerkInNames(PerkInfoItem AEFFHJGMNFI, string name)
 	{
 		if (AEFFHJGMNFI == null)
 		{
@@ -1187,33 +1187,33 @@ public partial class ModelParameters
 
 	public bool UpdateLife(float DLEDDPFNPOH)
 	{
-		GEACPINOAAN(DLEDDPFNPOH);
-		if (OJMIFOAHKBK())
+		ChangeLife(DLEDDPFNPOH);
+		if (GetLifeDepleted())
 		{
-			PCALDKCJGCK = true;
+			IsDead = true;
 		}
-		return PCALDKCJGCK;
+		return IsDead;
 	}
 
-	public bool IJKINPHBHCF()
+	public bool GetIsGroup()
 	{
-		return KFKKHACFDPH.Count > 0;
+		return GroupModels.Count > 0;
 	}
 
-	public bool AGICDDJBPLB()
+	public bool GetIsImmortalityEnabled()
 	{
-		return LNHMCKNCGDP;
+		return isImmortalityEnabled;
 	}
 
 	public void set_IsImmortalityEnabled(bool value)
 	{
-		LNHMCKNCGDP = value;
+		isImmortalityEnabled = value;
 	}
 
 	// best guess for name
 	public void SetCurrentLife(float value)
 	{
-		if (AGICDDJBPLB())
+		if (GetIsImmortalityEnabled())
 		{
 			_CurrentLife = (ObscuredFloat)(MaxLife);
 		}
@@ -1232,7 +1232,7 @@ public partial class ModelParameters
 		RecoverableLife = (float)_CurrentLife <= 0f ? 0f : Mathf.Clamp(RecoverableLife, 0f, Mathf.Max(0f, MaxLife - (float)_CurrentLife));
 	}
 
-	public void GEACPINOAAN(float value)
+	public void ChangeLife(float value)
 	{
 		float next = (ObscuredFloat)(_CurrentLife) + value / HealthBarCount;
 		// Float subtraction across many shields can leave a microscopic last
@@ -1242,16 +1242,16 @@ public partial class ModelParameters
 		SetCurrentLife(next);
 	}
 
-	private int AIHCLEKCBPF(string name, List<string> OEMALIFPGPO)
+	private int CollectEvaluationAttributes(string name, List<string> OEMALIFPGPO)
 	{
 		int count = OEMALIFPGPO.Count;
-		foreach (RatingEvaluation item in PPNILGFDOLN)
+		foreach (RatingEvaluation item in ratingEvaluations)
 		{
-			if (!(item.DNKAJNCEGKF == name))
+			if (!(item.nodeName == name))
 			{
 				continue;
 			}
-			foreach (Evaluation item2 in item.IBLHIAHECLK)
+			foreach (Evaluation item2 in item.evaluations)
 			{
 				OEMALIFPGPO.AddIfNotExist(item2.Name);
 			}
@@ -1259,18 +1259,18 @@ public partial class ModelParameters
 		return OEMALIFPGPO.Count - count;
 	}
 
-	private int FIIIOBACJBJ(string name, List<string> OEMALIFPGPO)
+	private int CollectDefenseAttributes(string name, List<string> OEMALIFPGPO)
 	{
 		int count = OEMALIFPGPO.Count;
-		foreach (RatingEvaluation item in PPNILGFDOLN)
+		foreach (RatingEvaluation item in ratingEvaluations)
 		{
-			if (!(item.DNKAJNCEGKF == name))
+			if (!(item.nodeName == name))
 			{
 				continue;
 			}
-			foreach (Defense item2 in item.CKJBFNJEDHH)
+			foreach (Defense item2 in item.defenses)
 			{
-				foreach (Evaluation item3 in item2.IBLHIAHECLK)
+				foreach (Evaluation item3 in item2.Evaluations)
 				{
 					OEMALIFPGPO.AddIfNotExist(item3.Name);
 				}
@@ -1279,7 +1279,7 @@ public partial class ModelParameters
 		return OEMALIFPGPO.Count - count;
 	}
 
-	private int AIHCLEKCBPF(List<global::Pair<string, float>> OEMALIFPGPO, List<Evaluation> JMMIKHLIKOE)
+	private int CollectEvaluationAttributes(List<global::Pair<string, float>> OEMALIFPGPO, List<Evaluation> JMMIKHLIKOE)
 	{
 		int count = OEMALIFPGPO.Count;
 		foreach (Evaluation item in JMMIKHLIKOE)
@@ -1289,52 +1289,52 @@ public partial class ModelParameters
 		return OEMALIFPGPO.Count - count;
 	}
 
-	private int DMPKOKPEDBA(List<string> OEMALIFPGPO)
+	private int CollectDamageAttributes(List<string> OEMALIFPGPO)
 	{
-		return AIHCLEKCBPF("Damage", OEMALIFPGPO);
+		return CollectEvaluationAttributes("Damage", OEMALIFPGPO);
 	}
 
-	private int AEPOPABPMHB(List<string> OEMALIFPGPO)
+	private int CollectMagicAttributes(List<string> OEMALIFPGPO)
 	{
-		return AIHCLEKCBPF("Magic", OEMALIFPGPO);
+		return CollectEvaluationAttributes("Magic", OEMALIFPGPO);
 	}
 
-	private int APPNAJNKMJM(List<string> OEMALIFPGPO)
+	private int CollectRangedAttributes(List<string> OEMALIFPGPO)
 	{
-		return AIHCLEKCBPF("Ranged", OEMALIFPGPO);
+		return CollectEvaluationAttributes("Ranged", OEMALIFPGPO);
 	}
 
-	private int OMEDOHGAAHA(List<string> OEMALIFPGPO)
+	private int CollectDamageDefenseAttributes(List<string> OEMALIFPGPO)
 	{
-		return FIIIOBACJBJ("Damage", OEMALIFPGPO);
+		return CollectDefenseAttributes("Damage", OEMALIFPGPO);
 	}
 
-	private int PEBDHELFHMJ(List<string> OEMALIFPGPO)
+	private int CollectMagicDefenseAttributes(List<string> OEMALIFPGPO)
 	{
-		return FIIIOBACJBJ("Magic", OEMALIFPGPO);
+		return CollectDefenseAttributes("Magic", OEMALIFPGPO);
 	}
 
-	private int BFEMIDCPJMH(List<string> OEMALIFPGPO)
+	private int CollectRangedDefenseAttributes(List<string> OEMALIFPGPO)
 	{
-		return FIIIOBACJBJ("Ranged", OEMALIFPGPO);
+		return CollectDefenseAttributes("Ranged", OEMALIFPGPO);
 	}
 
-	public void HGLJEBABMIH()
+	public void SaveCurrentLife()
 	{
-		KDHBBGLCGIL = (ObscuredFloat)(_CurrentLife);
+		SavedLife = (ObscuredFloat)(_CurrentLife);
 	}
 
-	public float HABJPOFCIHA()
+	public float GetLifeRatio()
 	{
 		return MaxLife > 0f ? (ObscuredFloat)(_CurrentLife) / MaxLife : 0f;
 	}
 
-	public bool OJMIFOAHKBK()
+	public bool GetLifeDepleted()
 	{
 		return (ObscuredFloat)(_CurrentLife) <= 0f;
 	}
 
-	public void ALNNLCAKCAF(float AOGLLMEFEJB = 1f)
+	public void AddLife(float AOGLLMEFEJB = 1f)
 	{
 		float num = (ObscuredFloat)(_CurrentLife);
 		num += AOGLLMEFEJB;
@@ -1343,14 +1343,14 @@ public partial class ModelParameters
 		SetCurrentLife(num);
 	}
 
-	public void BCLGFKDDNKH()
+	public void RestoreFullLife()
 	{
 		SetCurrentLife(MaxLife);
 	}
 
-	private bool FDDBPFJBHEB()
+	private bool GetHasWonAllRounds()
 	{
-		return RoundsWon >= HJNOICKOFDL;
+		return RoundsWon >= RoundTotal;
 	}
 
 	public ModelParameters Clone()
@@ -1358,54 +1358,54 @@ public partial class ModelParameters
 		return new ModelParameters(this);
 	}
 
-	private void KELCMMKNHEH()
+	private void ClearAttributes()
 	{
-		IBLHIAHECLK.Clear();
+		FinalAttributes.Clear();
 	}
 
 	private void SetAttributes(ModelParameters IHEFAMAFBIA)
 	{
-		IBLHIAHECLK = IHEFAMAFBIA.IBLHIAHECLK;
+		FinalAttributes = IHEFAMAFBIA.FinalAttributes;
 	}
 
-	public void ALBOCOGOBCN(EquippedItemsStruct HELFDCAIJNE)
+	public void CopyEquippedItemsTo(EquippedItemsStruct HELFDCAIJNE)
 	{
-		HELFDCAIJNE.LKKFNMBCCDB = Armor;
-		HELFDCAIJNE.FKMOLBBLKDA = Helm;
-		HELFDCAIJNE.KKJJONOBHKI = KKJJONOBHKI;
-		HELFDCAIJNE.PILJCAOFAED = Skeleton;
-		HELFDCAIJNE.JGMLKIPCFII = Weapon;
-		HELFDCAIJNE.ADBKGIBBNHJ = Magic;
-		HELFDCAIJNE.LGHMILECPLA = Ranged;
+		HELFDCAIJNE.Armor = Armor;
+		HELFDCAIJNE.Helm = Helm;
+		HELFDCAIJNE.Seal = Seal;
+		HELFDCAIJNE.Skeleton = Skeleton;
+		HELFDCAIJNE.Weapon = Weapon;
+		HELFDCAIJNE.Magic = Magic;
+		HELFDCAIJNE.Ranged = Ranged;
 	}
 
-	public void ALGDEEKFPKK(EquippedItemsStruct HELFDCAIJNE)
+	public void SetEquippedItemsFrom(EquippedItemsStruct HELFDCAIJNE)
 	{
-		Armor = HELFDCAIJNE.LKKFNMBCCDB;
-		Helm = HELFDCAIJNE.FKMOLBBLKDA;
-		KKJJONOBHKI = HELFDCAIJNE.KKJJONOBHKI;
-		Skeleton = HELFDCAIJNE.PILJCAOFAED;
-		Weapon = HELFDCAIJNE.JGMLKIPCFII;
-		Magic = HELFDCAIJNE.ADBKGIBBNHJ;
-		Ranged = HELFDCAIJNE.LGHMILECPLA;
+		Armor = HELFDCAIJNE.Armor;
+		Helm = HELFDCAIJNE.Helm;
+		Seal = HELFDCAIJNE.Seal;
+		Skeleton = HELFDCAIJNE.Skeleton;
+		Weapon = HELFDCAIJNE.Weapon;
+		Magic = HELFDCAIJNE.Magic;
+		Ranged = HELFDCAIJNE.Ranged;
 	}
 
-	private float MONFIEOOICJ()
+	private float GetImpossibleRatio()
 	{
-		return GOLHPEBMEDB;
+		return impossibleRatio;
 	}
 
-	private float ENBCGBBGFIK()
+	private float GetEasyRatio()
 	{
-		return GGKLECFGBOP;
+		return easyRatio;
 	}
 
-	private void FIBHNFMDBMH()
+	private void ClearRatingEvaluations()
 	{
-		PPNILGFDOLN.Clear();
+		ratingEvaluations.Clear();
 	}
 
-	private void IPLKCNEGLKM()
+	private void LogAttributes()
 	{
 		float num = GetParametersValue("WeaponDamage");
 		float num2 = GetParametersValue("UnarmedDamage");
@@ -1414,148 +1414,148 @@ public partial class ModelParameters
 		float num5 = GetParametersValue("RangedDamage");
 		float num6 = GetParametersValue("MagicDamage");
 		float num7 = GetParametersValue("RangedQuantity");
-		LLLOJBFMONN.Write("- WeaponDamage:   {0}", num);
-		LLLOJBFMONN.Write("- UnarmedDamage:  {0}", num2);
-		LLLOJBFMONN.Write("- BodyDefense:    {0}", num3);
-		LLLOJBFMONN.Write("- HeadDefense:    {0}", num4);
-		LLLOJBFMONN.Write("- RangedDamage:   {0}", num5);
-		LLLOJBFMONN.Write("- MagicDamage:    {0}", num6);
-		LLLOJBFMONN.Write("- RangedQuantity: {0}", num7);
+		GameLog.Write("- WeaponDamage:   {0}", num);
+		GameLog.Write("- UnarmedDamage:  {0}", num2);
+		GameLog.Write("- BodyDefense:    {0}", num3);
+		GameLog.Write("- HeadDefense:    {0}", num4);
+		GameLog.Write("- RangedDamage:   {0}", num5);
+		GameLog.Write("- MagicDamage:    {0}", num6);
+		GameLog.Write("- RangedQuantity: {0}", num7);
 	}
 
-	public void KMPACCIOOLE(List<ItemRule> GEEJLFGCKNJ, bool FFBFPLODJME, int round = 0)
+	public void SetItemsFromRules(List<ItemRule> GEEJLFGCKNJ, bool FFBFPLODJME, int round = 0)
 	{
-		Roster nKGLHEGIKKP = ListSF.CCDKHLAMKKO();
+		Roster nKGLHEGIKKP = ListSF.GetRoster();
 		foreach (ItemRule item in GEEJLFGCKNJ)
 		{
-			if (round > 0 && !item.HAKHBAOJBON(round))
+			if (round > 0 && !item.AppliesToRound(round))
 			{
 				continue;
 			}
 			UserItem dKCHDHMLKHN = item.get_Item();
 			if (dKCHDHMLKHN == null)
 			{
-				LLLOJBFMONN.Error(" ModelParameters::setItemsFromRules - UserItem not found ");
+				GameLog.Error(" ModelParameters::setItemsFromRules - UserItem not found ");
 				continue;
 			}
-			ItemInfo dJKEECEOCJB = dKCHDHMLKHN.BHKHOJPANHE();
+			ItemInfo dJKEECEOCJB = dKCHDHMLKHN.GetInfo();
 			string text = dKCHDHMLKHN.get_Name();
 			if (string.IsNullOrEmpty(text))
 			{
 				continue;
 			}
-			UserItem dKCHDHMLKHN2 = nKGLHEGIKKP.KHCNHPCPFII().CMGOCLGHNLH(text);
+			UserItem dKCHDHMLKHN2 = nKGLHEGIKKP.GetInventory().FindItem(text);
 			dJKEECEOCJB = null;
 			if (dKCHDHMLKHN2 == null)
 			{
 				dJKEECEOCJB = ListSF.GetItems().GetItemByName(text);
 				if (dJKEECEOCJB == null)
 				{
-					LLLOJBFMONN.Error(" Model::equipRulesItems - item not found \"{0}\"", text);
+					GameLog.Error(" Model::equipRulesItems - item not found \"{0}\"", text);
 					continue;
 				}
 			}
 			else
 			{
-				dJKEECEOCJB = dKCHDHMLKHN2.BHKHOJPANHE();
+				dJKEECEOCJB = dKCHDHMLKHN2.GetInfo();
 			}
-			if ((dJKEECEOCJB == null || !nKGLHEGIKKP.KHCNHPCPFII().MHMFKLLIFEJ(dJKEECEOCJB)) && !item.KIGLIADCMHK())
+			if ((dJKEECEOCJB == null || !nKGLHEGIKKP.GetInventory().HasItem(dJKEECEOCJB)) && !item.GetIsEquipRule())
 			{
 				dJKEECEOCJB = null;
 			}
-			if (dJKEECEOCJB != null && (!FFBFPLODJME || !item.DCFMEDKNIDI()))
+			if (dJKEECEOCJB != null && (!FFBFPLODJME || !item.GetNoAttributeChange()))
 			{
-				ItemInfo dJKEECEOCJB2 = KDABEFBJMOD(dJKEECEOCJB.Type);
+				ItemInfo dJKEECEOCJB2 = GetItemByType(dJKEECEOCJB.Type);
 				ItemInfo dJKEECEOCJB3 = dJKEECEOCJB.Clone();
 				dJKEECEOCJB3.IgnoreInventoryEnchantments = true;
-				OLLNIKFPMKE(dJKEECEOCJB.Type, dJKEECEOCJB3);
+				SetItemByType(dJKEECEOCJB.Type, dJKEECEOCJB3);
 			}
 		}
 	}
 
-	public float PMHIIOJPDLO()
+	public float GetPlayerRating()
 	{
-		return CHACMOJKLAB;
+		return playerRating;
 	}
 
-	public void FOPCCNDPFOE(float value)
+	public void SetPlayerRating(float value)
 	{
-		CHACMOJKLAB = value;
+		playerRating = value;
 	}
 
-	public float CEKIBEJELBM()
+	public float GetEnemyRating()
 	{
-		return PJGDPCJBLMA;
+		return enemyRating;
 	}
 
-	public void KCLCLMNOIDJ(float value)
+	public void SetEnemyRating(float value)
 	{
-		PJGDPCJBLMA = value;
+		enemyRating = value;
 	}
 
-	public float GBKEKEDPBIB()
+	public float GetPlayerRatingRanged()
 	{
-		return NFENFPMIBFD;
+		return playerRatingRanged;
 	}
 
-	public void JPOCPFLJKDC(float value)
+	public void SetPlayerRatingRanged(float value)
 	{
-		NFENFPMIBFD = value;
+		playerRatingRanged = value;
 	}
 
-	public float GCEDCHHBJGM()
+	public float GetEnemyRatingRanged()
 	{
-		return CEFONNONAKG;
+		return enemyRatingRanged;
 	}
 
-	public void AJLEAGJFKPD(float value)
+	public void SetEnemyRatingRanged(float value)
 	{
-		CEFONNONAKG = value;
+		enemyRatingRanged = value;
 	}
 
-	public void LEIPGKLCKOP(float value)
+	public void SetPlayerRatingMagic(float value)
 	{
-		MEHKADPAHKP = value;
+		playerRatingMagic = value;
 	}
 
-	public float FLLKBDGJIKO()
+	public float GetPlayerRatingMagic()
 	{
-		return MEHKADPAHKP;
+		return playerRatingMagic;
 	}
 
-	public void NHPLLBNKOAF(float value)
+	public void SetEnemyRatingMagic(float value)
 	{
-		PIBJOEMLEGF = value;
+		enemyRatingMagic = value;
 	}
 
-	public float GGIOPHOMCCL()
+	public float GetEnemyRatingMagic()
 	{
-		return PIBJOEMLEGF;
+		return enemyRatingMagic;
 	}
 
-	public void AHMMOKMGICA()
+	public void DisableActivePerks()
 	{
 		foreach (PerkInfoItem item in Perks)
 		{
-			if (item.DLEAKGFKDBH())
+			if (item.GetIsWeaponPerk())
 			{
-				item.DLDANNALFEA(false);
+				item.SetIsEnabled(false);
 			}
 		}
 	}
 
-	public void HANOHOBGGJF()
+	public void EnableAllPerks()
 	{
 		foreach (PerkInfoItem item in Perks)
 		{
 			if (item != null)
 			{
-				item.DLDANNALFEA(true);
+				item.SetIsEnabled(true);
 			}
 		}
 	}
 
-	public void GPOIKJNPDIO(List<global::Pair<string, float>> LHGAKDLAPJB)
+	public void AddAttributeShifts(List<global::Pair<string, float>> LHGAKDLAPJB)
 	{
 		int i = 0;
 		for (int count = LHGAKDLAPJB.Count; i < count; i++)
@@ -1564,9 +1564,9 @@ public partial class ModelParameters
 			string lLHEDBIEHAA = cCKLNOPEKHO.First;
 			float nFNBFHCDEGG = cCKLNOPEKHO.Second;
 			int OEMALIFPGPO = 0;
-			if (IBLHIAHECLK.Get(lLHEDBIEHAA, ref OEMALIFPGPO))
+			if (FinalAttributes.Get(lLHEDBIEHAA, ref OEMALIFPGPO))
 			{
-				IBLHIAHECLK.Set(lLHEDBIEHAA, (int)((float)OEMALIFPGPO + nFNBFHCDEGG));
+				FinalAttributes.Set(lLHEDBIEHAA, (int)((float)OEMALIFPGPO + nFNBFHCDEGG));
 			}
 		}
 	}

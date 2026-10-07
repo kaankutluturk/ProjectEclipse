@@ -5,7 +5,7 @@ using System.Text;
 
 public sealed class Packet
 {
-	private enum LHHBMJEGIOF : byte
+	private enum PayloadType : byte
 	{
 		Textual = 0,
 		Binary = 1
@@ -14,67 +14,67 @@ public sealed class Packet
 	private const string Placeholder = "_placeholder";
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private HJDLGPHLPNF MHIBOFNNPIM;
+	private TransportEventTypes transportEvent;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private ECDAJBEFCAH BMNMAGPDJMO;
+	private SocketIOEventType socketIOEvent;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private int EHPCKDIJKIB;
+	private int attachmentCount;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private int DGDIGIMFGMI;
+	private int id;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private string HCHALPNMNMK;
+	private string packetNamespace;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private string BALMFJPGGLO;
+	private string payload;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private string KADNOPPLDGD;
+	private string eventName;
 
 	private List<byte[]> attachments;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private bool JIEAFKJJKKF;
+	private bool isDecoded;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private object[] MECKGDHKLCA;
+	private object[] decodedArgs;
 
-	public HJDLGPHLPNF CFKMFAGNEGL
+	public TransportEventTypes TransportEvent
 	{
 		get
 		{
-			return FFJBNPEOAHI();
+			return GetTransportEvent();
 		}
 		private set
 		{
-			EMGACMELDFH(value);
+			SetTransportEvent(value);
 		}
 	}
 
-	public ECDAJBEFCAH NEBKEFEEEPI
+	public SocketIOEventType SocketIOEvent
 	{
 		get
 		{
-			return CMEHGNCCCIN();
+			return GetSocketIOEvent();
 		}
 		private set
 		{
-			MLNKJLNGJPD(value);
+			SetSocketIOEvent(value);
 		}
 	}
 
-	public int ELIDDCBKCMA
+	public int AttachmentCount
 	{
 		get
 		{
-			return AIHPGOGLBCE();
+			return GetAttachmentCount();
 		}
 		private set
 		{
-			NEMGKBJKDGO(value);
+			SetAttachmentCount(value);
 		}
 	}
 
@@ -82,43 +82,43 @@ public sealed class Packet
 	{
 		get
 		{
-			return IMMIJJCLPBO();
+			return GetPacketId();
 		}
 		private set
 		{
-			MKAMABIPHEN(value);
+			SetId(value);
 		}
 	}
 
-	public string LBAMJPCNCNK
+	public string Payload
 	{
 		get
 		{
-			return NLHGDFGNIHB();
+			return GetPayload();
 		}
 		private set
 		{
-			ODECIOLOGDP(value);
+			SetPayload(value);
 		}
 	}
 
-	public string PEKKADLJCLG
+	public string EventName
 	{
 		get
 		{
-			return EJPGPOEEPFD();
+			return GetEventName();
 		}
 		private set
 		{
-			HIJPAHJJIIF(value);
+			SetEventName(value);
 		}
 	}
 
-	public List<byte[]> ECGBGPOFLFD
+	public List<byte[]> AttachmentList
 	{
 		get
 		{
-			return BINAPGLGAGE();
+			return GetAttachments();
 		}
 		set
 		{
@@ -126,19 +126,19 @@ public sealed class Packet
 		}
 	}
 
-	public bool AIONADLFOLM
+	public bool HasAllAttachment
 	{
 		get
 		{
-			return DGDMLLFEAME();
+			return GetHasAllAttachment();
 		}
 	}
 
-	public bool EMABMILBMFO
+	public bool Decoded
 	{
 		get
 		{
-			return KJFDJLNHKJI();
+			return GetIsDecoded();
 		}
 		private set
 		{
@@ -146,11 +146,11 @@ public sealed class Packet
 		}
 	}
 
-	public object[] OJNPBCNPKDN
+	public object[] DecodedArguments
 	{
 		get
 		{
-			return BHLHOEIDGME();
+			return GetDecodedArgs();
 		}
 		private set
 		{
@@ -160,9 +160,9 @@ public sealed class Packet
 
 	internal Packet()
 	{
-		EMGACMELDFH(HJDLGPHLPNF.Unknown);
-		MLNKJLNGJPD(ECDAJBEFCAH.Unknown);
-		ODECIOLOGDP(string.Empty);
+		SetTransportEvent(TransportEventTypes.Unknown);
+		SetSocketIOEvent(SocketIOEventType.Unknown);
+		SetPayload(string.Empty);
 	}
 
 	internal Packet(string IOFHCAAOELD)
@@ -170,87 +170,87 @@ public sealed class Packet
 		Parse(IOFHCAAOELD);
 	}
 
-	internal Packet(HJDLGPHLPNF JODJHEDGFDK, ECDAJBEFCAH MANDEJPGHBK, string JBALIKEKHGL, string OIINBGMDJKE, int MGOCOLCDIMG = 0, int OKNNNLIPODI = 0)
+	internal Packet(TransportEventTypes JODJHEDGFDK, SocketIOEventType MANDEJPGHBK, string JBALIKEKHGL, string OIINBGMDJKE, int MGOCOLCDIMG = 0, int OKNNNLIPODI = 0)
 	{
-		EMGACMELDFH(JODJHEDGFDK);
-		MLNKJLNGJPD(MANDEJPGHBK);
+		SetTransportEvent(JODJHEDGFDK);
+		SetSocketIOEvent(MANDEJPGHBK);
 		set_Namespace(JBALIKEKHGL);
-		ODECIOLOGDP(OIINBGMDJKE);
-		NEMGKBJKDGO(MGOCOLCDIMG);
-		MKAMABIPHEN(OKNNNLIPODI);
+		SetPayload(OIINBGMDJKE);
+		SetAttachmentCount(MGOCOLCDIMG);
+		SetId(OKNNNLIPODI);
 	}
 
-	public HJDLGPHLPNF FFJBNPEOAHI()
+	public TransportEventTypes GetTransportEvent()
 	{
-		return MHIBOFNNPIM;
+		return transportEvent;
 	}
 
-	private void EMGACMELDFH(HJDLGPHLPNF value)
+	private void SetTransportEvent(TransportEventTypes value)
 	{
-		MHIBOFNNPIM = value;
+		transportEvent = value;
 	}
 
-	public ECDAJBEFCAH CMEHGNCCCIN()
+	public SocketIOEventType GetSocketIOEvent()
 	{
-		return BMNMAGPDJMO;
+		return socketIOEvent;
 	}
 
-	private void MLNKJLNGJPD(ECDAJBEFCAH value)
+	private void SetSocketIOEvent(SocketIOEventType value)
 	{
-		BMNMAGPDJMO = value;
+		socketIOEvent = value;
 	}
 
-	public int AIHPGOGLBCE()
+	public int GetAttachmentCount()
 	{
-		return EHPCKDIJKIB;
+		return attachmentCount;
 	}
 
-	private void NEMGKBJKDGO(int value)
+	private void SetAttachmentCount(int value)
 	{
-		EHPCKDIJKIB = value;
+		attachmentCount = value;
 	}
 
-	public int IMMIJJCLPBO()
+	public int GetPacketId()
 	{
-		return DGDIGIMFGMI;
+		return id;
 	}
 
-	private void MKAMABIPHEN(int value)
+	private void SetId(int value)
 	{
-		DGDIGIMFGMI = value;
+		id = value;
 	}
 
-	public string IONIEDIPEGB()
+	public string GetNamespace()
 	{
-		return HCHALPNMNMK;
+		return packetNamespace;
 	}
 
 	private void set_Namespace(string value)
 	{
-		HCHALPNMNMK = value;
+		packetNamespace = value;
 	}
 
-	public string NLHGDFGNIHB()
+	public string GetPayload()
 	{
-		return BALMFJPGGLO;
+		return payload;
 	}
 
-	private void ODECIOLOGDP(string value)
+	private void SetPayload(string value)
 	{
-		BALMFJPGGLO = value;
+		payload = value;
 	}
 
-	public string EJPGPOEEPFD()
+	public string GetEventName()
 	{
-		return KADNOPPLDGD;
+		return eventName;
 	}
 
-	private void HIJPAHJJIIF(string value)
+	private void SetEventName(string value)
 	{
-		KADNOPPLDGD = value;
+		eventName = value;
 	}
 
-	public List<byte[]> BINAPGLGAGE()
+	public List<byte[]> GetAttachments()
 	{
 		return attachments;
 	}
@@ -258,49 +258,49 @@ public sealed class Packet
 	public void set_Attachments(List<byte[]> value)
 	{
 		attachments = value;
-		NEMGKBJKDGO((attachments != null) ? attachments.Count : 0);
+		SetAttachmentCount((attachments != null) ? attachments.Count : 0);
 	}
 
-	public bool DGDMLLFEAME()
+	public bool GetHasAllAttachment()
 	{
-		return BINAPGLGAGE() != null && BINAPGLGAGE().Count == AIHPGOGLBCE();
+		return GetAttachments() != null && GetAttachments().Count == GetAttachmentCount();
 	}
 
-	public bool KJFDJLNHKJI()
+	public bool GetIsDecoded()
 	{
-		return JIEAFKJJKKF;
+		return isDecoded;
 	}
 
 	private void set_IsDecoded(bool value)
 	{
-		JIEAFKJJKKF = value;
+		isDecoded = value;
 	}
 
-	public object[] BHLHOEIDGME()
+	public object[] GetDecodedArgs()
 	{
-		return MECKGDHKLCA;
+		return decodedArgs;
 	}
 
 	private void set_DecodedArgs(object[] value)
 	{
-		MECKGDHKLCA = value;
+		decodedArgs = value;
 	}
 
-	public object[] Decode(OOINGNLNJGM GLOJHMAIFOK)
+	public object[] Decode(ISocketJsonEncoder GLOJHMAIFOK)
 	{
-		if (KJFDJLNHKJI() || GLOJHMAIFOK == null)
+		if (GetIsDecoded() || GLOJHMAIFOK == null)
 		{
-			return BHLHOEIDGME();
+			return GetDecodedArgs();
 		}
 		set_IsDecoded(true);
-		if (string.IsNullOrEmpty(NLHGDFGNIHB()))
+		if (string.IsNullOrEmpty(GetPayload()))
 		{
-			return BHLHOEIDGME();
+			return GetDecodedArgs();
 		}
-		List<object> list = GLOJHMAIFOK.Decode(NLHGDFGNIHB());
+		List<object> list = GLOJHMAIFOK.Decode(GetPayload());
 		if (list != null && list.Count > 0)
 		{
-			if (CMEHGNCCCIN() == ECDAJBEFCAH.Ack || CMEHGNCCCIN() == ECDAJBEFCAH.BinaryAck)
+			if (GetSocketIOEvent() == SocketIOEventType.Ack || GetSocketIOEvent() == SocketIOEventType.BinaryAck)
 			{
 				set_DecodedArgs(list.ToArray());
 			}
@@ -310,71 +310,71 @@ public sealed class Packet
 				set_DecodedArgs(list.ToArray());
 			}
 		}
-		return BHLHOEIDGME();
+		return GetDecodedArgs();
 	}
 
-	public string EFJKNHMALOL()
+	public string DecodeEventName()
 	{
-		if (!string.IsNullOrEmpty(EJPGPOEEPFD()))
+		if (!string.IsNullOrEmpty(GetEventName()))
 		{
-			return EJPGPOEEPFD();
+			return GetEventName();
 		}
-		if (string.IsNullOrEmpty(NLHGDFGNIHB()))
+		if (string.IsNullOrEmpty(GetPayload()))
 		{
 			return string.Empty;
 		}
-		if (NLHGDFGNIHB()[0] != '[')
+		if (GetPayload()[0] != '[')
 		{
 			return string.Empty;
 		}
 		int i;
-		for (i = 1; NLHGDFGNIHB().Length > i && NLHGDFGNIHB()[i] != '"' && NLHGDFGNIHB()[i] != '\''; i++)
+		for (i = 1; GetPayload().Length > i && GetPayload()[i] != '"' && GetPayload()[i] != '\''; i++)
 		{
 		}
-		if (NLHGDFGNIHB().Length <= i)
+		if (GetPayload().Length <= i)
 		{
 			return string.Empty;
 		}
 		int num = ++i;
-		for (; NLHGDFGNIHB().Length > i && NLHGDFGNIHB()[i] != '"' && NLHGDFGNIHB()[i] != '\''; i++)
+		for (; GetPayload().Length > i && GetPayload()[i] != '"' && GetPayload()[i] != '\''; i++)
 		{
 		}
-		if (NLHGDFGNIHB().Length <= i)
+		if (GetPayload().Length <= i)
 		{
 			return string.Empty;
 		}
-		string text = NLHGDFGNIHB().Substring(num, i - num);
-		HIJPAHJJIIF(text);
+		string text = GetPayload().Substring(num, i - num);
+		SetEventName(text);
 		return text;
 	}
 
 	public string RemoveEventName(bool KGECPDKNJNN)
 	{
-		if (string.IsNullOrEmpty(NLHGDFGNIHB()))
+		if (string.IsNullOrEmpty(GetPayload()))
 		{
 			return string.Empty;
 		}
-		if (NLHGDFGNIHB()[0] != '[')
+		if (GetPayload()[0] != '[')
 		{
 			return string.Empty;
 		}
 		int i;
-		for (i = 1; NLHGDFGNIHB().Length > i && NLHGDFGNIHB()[i] != '"' && NLHGDFGNIHB()[i] != '\''; i++)
+		for (i = 1; GetPayload().Length > i && GetPayload()[i] != '"' && GetPayload()[i] != '\''; i++)
 		{
 		}
-		if (NLHGDFGNIHB().Length <= i)
+		if (GetPayload().Length <= i)
 		{
 			return string.Empty;
 		}
 		int num = i;
-		for (; NLHGDFGNIHB().Length > i && NLHGDFGNIHB()[i] != ',' && NLHGDFGNIHB()[i] != ']'; i++)
+		for (; GetPayload().Length > i && GetPayload()[i] != ',' && GetPayload()[i] != ']'; i++)
 		{
 		}
-		if (NLHGDFGNIHB().Length <= ++i)
+		if (GetPayload().Length <= ++i)
 		{
 			return string.Empty;
 		}
-		string text = NLHGDFGNIHB().Remove(num, i - num);
+		string text = GetPayload().Remove(num, i - num);
 		if (KGECPDKNJNN)
 		{
 			text = text.Substring(1, text.Length - 2);
@@ -382,26 +382,26 @@ public sealed class Packet
 		return text;
 	}
 
-	public bool FBBPHOCINHN()
+	public bool ReconstructAttachmentAsIndex()
 	{
 		return PlaceholderReplacer((string EMDHMHOKGFP, Dictionary<string, object> AOMLCBHAJJH) =>
 		{
 			int num = Convert.ToInt32(AOMLCBHAJJH["num"]);
-			ODECIOLOGDP(NLHGDFGNIHB().Replace(EMDHMHOKGFP, num.ToString()));
+			SetPayload(GetPayload().Replace(EMDHMHOKGFP, num.ToString()));
 			set_IsDecoded(false);
 		});
 	}
 
-	public bool NDMDFFCGINF()
+	public bool ReconstructAttachmentAsBase64()
 	{
-		if (!DGDMLLFEAME())
+		if (!GetHasAllAttachment())
 		{
 			return false;
 		}
 		return PlaceholderReplacer((string EMDHMHOKGFP, Dictionary<string, object> AOMLCBHAJJH) =>
 		{
 			int index = Convert.ToInt32(AOMLCBHAJJH["num"]);
-			ODECIOLOGDP(NLHGDFGNIHB().Replace(EMDHMHOKGFP, string.Format("\"{0}\"", Convert.ToBase64String(BINAPGLGAGE()[index]))));
+			SetPayload(GetPayload().Replace(EMDHMHOKGFP, string.Format("\"{0}\"", Convert.ToBase64String(GetAttachments()[index]))));
 			set_IsDecoded(false);
 		});
 	}
@@ -409,16 +409,16 @@ public sealed class Packet
 	internal void Parse(string IOFHCAAOELD)
 	{
 		int i = 0;
-		EMGACMELDFH((HJDLGPHLPNF)char.GetNumericValue(IOFHCAAOELD, i++));
+		SetTransportEvent((TransportEventTypes)char.GetNumericValue(IOFHCAAOELD, i++));
 		if (IOFHCAAOELD.Length > i && char.GetNumericValue(IOFHCAAOELD, i) >= 0.0)
 		{
-			MLNKJLNGJPD((ECDAJBEFCAH)char.GetNumericValue(IOFHCAAOELD, i++));
+			SetSocketIOEvent((SocketIOEventType)char.GetNumericValue(IOFHCAAOELD, i++));
 		}
 		else
 		{
-			MLNKJLNGJPD(ECDAJBEFCAH.Unknown);
+			SetSocketIOEvent(SocketIOEventType.Unknown);
 		}
-		if (CMEHGNCCCIN() == ECDAJBEFCAH.BinaryEvent || CMEHGNCCCIN() == ECDAJBEFCAH.BinaryAck)
+		if (GetSocketIOEvent() == SocketIOEventType.BinaryEvent || GetSocketIOEvent() == SocketIOEventType.BinaryAck)
 		{
 			int num = IOFHCAAOELD.IndexOf('-', i);
 			if (num == -1)
@@ -427,7 +427,7 @@ public sealed class Packet
 			}
 			int result = 0;
 			int.TryParse(IOFHCAAOELD.Substring(i, num - i), out result);
-			NEMGKBJKDGO(result);
+			SetAttachmentCount(result);
 			i = num + 1;
 		}
 		if (IOFHCAAOELD.Length > i && IOFHCAAOELD[i] == '/')
@@ -452,98 +452,98 @@ public sealed class Packet
 			}
 			int result2 = 0;
 			int.TryParse(IOFHCAAOELD.Substring(num3, i - num3), out result2);
-			MKAMABIPHEN(result2);
+			SetId(result2);
 		}
 		if (IOFHCAAOELD.Length > i)
 		{
-			ODECIOLOGDP(IOFHCAAOELD.Substring(i));
+			SetPayload(IOFHCAAOELD.Substring(i));
 		}
 		else
 		{
-			ODECIOLOGDP(string.Empty);
+			SetPayload(string.Empty);
 		}
 	}
 
 	internal string Encode()
 	{
 		StringBuilder stringBuilder = new StringBuilder();
-		if (FFJBNPEOAHI() == HJDLGPHLPNF.Unknown && AIHPGOGLBCE() > 0)
+		if (GetTransportEvent() == TransportEventTypes.Unknown && GetAttachmentCount() > 0)
 		{
-			EMGACMELDFH(HJDLGPHLPNF.Message);
+			SetTransportEvent(TransportEventTypes.Message);
 		}
-		if (FFJBNPEOAHI() != HJDLGPHLPNF.Unknown)
+		if (GetTransportEvent() != TransportEventTypes.Unknown)
 		{
-			stringBuilder.Append(((int)FFJBNPEOAHI()/*cast due to constrained. prefix*/).ToString());
+			stringBuilder.Append(((int)GetTransportEvent()/*cast due to constrained. prefix*/).ToString());
 		}
-		if (CMEHGNCCCIN() == ECDAJBEFCAH.Unknown && AIHPGOGLBCE() > 0)
+		if (GetSocketIOEvent() == SocketIOEventType.Unknown && GetAttachmentCount() > 0)
 		{
-			MLNKJLNGJPD(ECDAJBEFCAH.BinaryEvent);
+			SetSocketIOEvent(SocketIOEventType.BinaryEvent);
 		}
-		if (CMEHGNCCCIN() != ECDAJBEFCAH.Unknown)
+		if (GetSocketIOEvent() != SocketIOEventType.Unknown)
 		{
-			stringBuilder.Append(((int)CMEHGNCCCIN()/*cast due to constrained. prefix*/).ToString());
+			stringBuilder.Append(((int)GetSocketIOEvent()/*cast due to constrained. prefix*/).ToString());
 		}
-		if (CMEHGNCCCIN() == ECDAJBEFCAH.BinaryEvent || CMEHGNCCCIN() == ECDAJBEFCAH.BinaryAck)
+		if (GetSocketIOEvent() == SocketIOEventType.BinaryEvent || GetSocketIOEvent() == SocketIOEventType.BinaryAck)
 		{
-			stringBuilder.Append(AIHPGOGLBCE().ToString());
+			stringBuilder.Append(GetAttachmentCount().ToString());
 			stringBuilder.Append("-");
 		}
 		bool flag = false;
-		if (IONIEDIPEGB() != "/")
+		if (GetNamespace() != "/")
 		{
-			stringBuilder.Append(IONIEDIPEGB());
+			stringBuilder.Append(GetNamespace());
 			flag = true;
 		}
-		if (IMMIJJCLPBO() != 0)
+		if (GetPacketId() != 0)
 		{
 			if (flag)
 			{
 				stringBuilder.Append(",");
 				flag = false;
 			}
-			stringBuilder.Append(IMMIJJCLPBO().ToString());
+			stringBuilder.Append(GetPacketId().ToString());
 		}
-		if (!string.IsNullOrEmpty(NLHGDFGNIHB()))
+		if (!string.IsNullOrEmpty(GetPayload()))
 		{
 			if (flag)
 			{
 				stringBuilder.Append(",");
 				flag = false;
 			}
-			stringBuilder.Append(NLHGDFGNIHB());
+			stringBuilder.Append(GetPayload());
 		}
 		return stringBuilder.ToString();
 	}
 
-	internal byte[] KOLJHOEKHLI()
+	internal byte[] EncodeBinary()
 	{
-		if (AIHPGOGLBCE() != 0 || (BINAPGLGAGE() != null && BINAPGLGAGE().Count != 0))
+		if (GetAttachmentCount() != 0 || (GetAttachments() != null && GetAttachments().Count != 0))
 		{
-			if (BINAPGLGAGE() == null)
+			if (GetAttachments() == null)
 			{
 				throw new ArgumentException("packet.Attachments are null!");
 			}
-			if (AIHPGOGLBCE() != BINAPGLGAGE().Count)
+			if (GetAttachmentCount() != GetAttachments().Count)
 			{
 				throw new ArgumentException("packet.AttachmentCount != packet.Attachments.Count. Use the packet.AddAttachment function to add data to a packet!");
 			}
 		}
 		string s = Encode();
 		byte[] bytes = Encoding.UTF8.GetBytes(s);
-		byte[] array = MHFBCMFOBPN(bytes, LHHBMJEGIOF.Textual, null);
-		if (AIHPGOGLBCE() != 0)
+		byte[] array = EncodeData(bytes, PayloadType.Textual, null);
+		if (GetAttachmentCount() != 0)
 		{
 			int num = array.Length;
-			List<byte[]> list = new List<byte[]>(AIHPGOGLBCE());
+			List<byte[]> list = new List<byte[]>(GetAttachmentCount());
 			int num2 = 0;
-			for (int i = 0; i < AIHPGOGLBCE(); i++)
+			for (int i = 0; i < GetAttachmentCount(); i++)
 			{
-				byte[] array2 = MHFBCMFOBPN(BINAPGLGAGE()[i], LHHBMJEGIOF.Binary, new byte[1] { 4 });
+				byte[] array2 = EncodeData(GetAttachments()[i], PayloadType.Binary, new byte[1] { 4 });
 				list.Add(array2);
 				num2 += array2.Length;
 			}
 			Array.Resize(ref array, array.Length + num2);
-			for (int j = 0; j < AIHPGOGLBCE(); j++)
+			for (int j = 0; j < GetAttachmentCount(); j++)
 			{
 				byte[] array3 = list[j];
 				Array.Copy(array3, 0, array, num, array3.Length);
@@ -559,20 +559,20 @@ public sealed class Packet
 		{
 			if (attachments == null)
 			{
-				attachments = new List<byte[]>(AIHPGOGLBCE());
+				attachments = new List<byte[]>(GetAttachmentCount());
 			}
 			if (FEEFOCCJIML)
 			{
-				BINAPGLGAGE().Add(data);
+				GetAttachments().Add(data);
 				return;
 			}
 			byte[] array = new byte[data.Length - 1];
 			Array.Copy(data, 1, array, 0, data.Length - 1);
-			BINAPGLGAGE().Add(array);
+			GetAttachments().Add(array);
 		}
 	}
 
-	private byte[] MHFBCMFOBPN(byte[] data, LHHBMJEGIOF LFLGCDNKNJI, byte[] BGFJJKCBOJI)
+	private byte[] EncodeData(byte[] data, PayloadType LFLGCDNKNJI, byte[] BGFJJKCBOJI)
 	{
 		int num = ((BGFJJKCBOJI != null) ? BGFJJKCBOJI.Length : 0);
 		string text = (data.Length + num).ToString();
@@ -600,26 +600,26 @@ public sealed class Packet
 
 	private bool PlaceholderReplacer(Action<string, Dictionary<string, object>> FOACGDMKGNH)
 	{
-		if (string.IsNullOrEmpty(NLHGDFGNIHB()))
+		if (string.IsNullOrEmpty(GetPayload()))
 		{
 			return false;
 		}
-		for (int num = NLHGDFGNIHB().IndexOf("_placeholder"); num >= 0; num = NLHGDFGNIHB().IndexOf("_placeholder"))
+		for (int num = GetPayload().IndexOf("_placeholder"); num >= 0; num = GetPayload().IndexOf("_placeholder"))
 		{
 			int num2 = num;
-			while (NLHGDFGNIHB()[num2] != '{')
+			while (GetPayload()[num2] != '{')
 			{
 				num2--;
 			}
 			int i;
-			for (i = num; NLHGDFGNIHB().Length > i && NLHGDFGNIHB()[i] != '}'; i++)
+			for (i = num; GetPayload().Length > i && GetPayload()[i] != '}'; i++)
 			{
 			}
-			if (NLHGDFGNIHB().Length <= i)
+			if (GetPayload().Length <= i)
 			{
 				return false;
 			}
-			string text = NLHGDFGNIHB().Substring(num2, i - num2 + 1);
+			string text = GetPayload().Substring(num2, i - num2 + 1);
 			bool IBFAPIMOMBA = false;
 			Dictionary<string, object> dictionary = Json.Decode(text, ref IBFAPIMOMBA) as Dictionary<string, object>;
 			if (!IBFAPIMOMBA)
@@ -642,14 +642,14 @@ public sealed class Packet
 
 	public override string ToString()
 	{
-		return NLHGDFGNIHB();
+		return GetPayload();
 	}
 
 	internal Packet Clone()
 	{
-		Packet cMPKPLIGKLC = new Packet(FFJBNPEOAHI(), CMEHGNCCCIN(), IONIEDIPEGB(), NLHGDFGNIHB(), 0, IMMIJJCLPBO());
-		cMPKPLIGKLC.HIJPAHJJIIF(EJPGPOEEPFD());
-		cMPKPLIGKLC.NEMGKBJKDGO(AIHPGOGLBCE());
+		Packet cMPKPLIGKLC = new Packet(GetTransportEvent(), GetSocketIOEvent(), GetNamespace(), GetPayload(), 0, GetPacketId());
+		cMPKPLIGKLC.SetEventName(GetEventName());
+		cMPKPLIGKLC.SetAttachmentCount(GetAttachmentCount());
 		cMPKPLIGKLC.attachments = attachments;
 		return cMPKPLIGKLC;
 	}

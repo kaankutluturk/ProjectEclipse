@@ -3,43 +3,43 @@ using System.Xml;
 
 public class Trick : IComparable<Trick>
 {
-	public string NHKMCLPOMFK;
+	public string Icon;
 
 	public string Name;
 
 	public string DisplayName { get; private set; }
 
-	public string COJPEGLPGDF;
+	public string KeysDescription;
 
-	public string HIAMFGEIGDP;
+	public string EffectDescription;
 
 	public int Rank;
 
 	public bool IsNew;
 
-	public InfoAnimation KJHMOGGECBN;
+	public InfoAnimation Animation;
 
 	public Trick(XmlNode BHBHAOJHABE, InfoAnimation KJHGIKMFJOB)
 	{
-		NHKMCLPOMFK = BHBHAOJHABE.Attributes["Icon"].CIPOICEEIBK(string.Empty);
+		Icon = BHBHAOJHABE.Attributes["Icon"].GetStringOrDefault(string.Empty);
 		Rank = BHBHAOJHABE.Attributes["Rank"].ParseInt();
-		COJPEGLPGDF = BHBHAOJHABE.Attributes["KeysDescription"].CIPOICEEIBK(string.Empty);
-		HIAMFGEIGDP = BHBHAOJHABE.Attributes["EffectDescription"].CIPOICEEIBK(string.Empty);
+		KeysDescription = BHBHAOJHABE.Attributes["KeysDescription"].GetStringOrDefault(string.Empty);
+		EffectDescription = BHBHAOJHABE.Attributes["EffectDescription"].GetStringOrDefault(string.Empty);
 		Name = KJHGIKMFJOB.Name;
-		DisplayName = BHBHAOJHABE.Attributes["DisplayName"].CIPOICEEIBK(Name);
-		KJHMOGGECBN = KJHGIKMFJOB;
+		DisplayName = BHBHAOJHABE.Attributes["DisplayName"].GetStringOrDefault(Name);
+		Animation = KJHGIKMFJOB;
 		IsNew = false;
 	}
 
 	public Trick(string NCKCDCODNHA, string _name, InfoAnimation KJHGIKMFJOB, int HEIBENBPNLN, string PHDCIEGEKBC, string LDKAELDNKGH)
 	{
-		NHKMCLPOMFK = NCKCDCODNHA;
+		Icon = NCKCDCODNHA;
 		Name = _name;
 		DisplayName = _name;
-		KJHMOGGECBN = KJHGIKMFJOB;
+		Animation = KJHGIKMFJOB;
 		Rank = HEIBENBPNLN;
-		COJPEGLPGDF = PHDCIEGEKBC;
-		HIAMFGEIGDP = LDKAELDNKGH;
+		KeysDescription = PHDCIEGEKBC;
+		EffectDescription = LDKAELDNKGH;
 		IsNew = false;
 	}
 

@@ -5,7 +5,7 @@ namespace Nekki.SF2.GUI.Menu
 {
 	public class MenuExpPanel : SFMonoBehaviour<object>
 	{
-		public enum MKGNLOJGOEA
+		public enum MenuExpPanelEvent
 		{
 			onLevelHintBtnClicked = 0
 		}
@@ -31,31 +31,31 @@ namespace Nekki.SF2.GUI.Menu
 		[SerializeField]
 		private GameObject _hintRootGO;
 
-		private int IAGHIGDNCGO;
+		private int hintFrameDelay;
 
 		public void ShowHint(string HCPNFPMHFCM)
 		{
 			_hintRootGO.SetActive(true);
 			_hintText.text = HCPNFPMHFCM;
-			IAGHIGDNCGO = 1;
+			hintFrameDelay = 1;
 		}
 
 		public void HideHint()
 		{
-			IAGHIGDNCGO = 0;
+			hintFrameDelay = 0;
 			_hintRootGO.SetActive(false);
 		}
 
 		public void Init()
 		{
-			Font font = LocalizationManager.MBPJIKFOEBJ();
+			Font font = LocalizationManager.GetContentFont();
 			if (_hintText != null && font != null)
 			{
 				_hintText.font = font;
 			}
 			_levelHintButton.onClick.AddListener(() =>
 			{
-				OAEKFDFEKCL();
+				OnLevelHintClicked();
 			});
 			_barExp.Init();
 			_barExp.SetValueBorders(0f, 1f);
@@ -66,27 +66,27 @@ namespace Nekki.SF2.GUI.Menu
 
 		private void Update()
 		{
-			if (IAGHIGDNCGO <= 0 && Eclipse.Input.EclipseInput.anyKeyDown)
+			if (hintFrameDelay <= 0 && Eclipse.Input.EclipseInput.anyKeyDown)
 			{
 				HideHint();
 			}
 			else
 			{
-				IAGHIGDNCGO--;
+				hintFrameDelay--;
 			}
 		}
 
-		private void CHILAIJNEHG()
+		private void RemoveListeners()
 		{
 			_levelHintButton.onClick.RemoveListener(() =>
 			{
-				OAEKFDFEKCL();
+				OnLevelHintClicked();
 			});
 		}
 
 		public void UpdateLevel()
 		{
-			string text = ListSF.CCDKHLAMKKO().PINDEKDNCNL().ToString();
+			string text = ListSF.GetRoster().GetLevel().ToString();
 			_labelLevel.text = text;
 		}
 
@@ -98,41 +98,41 @@ namespace Nekki.SF2.GUI.Menu
 			}
 			_barExp.SetValueBorders(0f, KAEPJHHLLPK);
 			_barExp.SetValue(OBLEMIHLFII);
-			int num = ListSF.CCDKHLAMKKO().PINDEKDNCNL();
-			int count = GameUtils.HHONBOCJBLB.PEDIMBMABIG.Count;
+			int num = ListSF.GetRoster().GetLevel();
+			int count = GameUtils.LevelThresholdTable.Thresholds.Count;
 			if (count != 0)
 			{
-				global::Pair<int, uint> cCKLNOPEKHO = GameUtils.HHONBOCJBLB.PEDIMBMABIG[count - 1];
+				global::Pair<int, uint> cCKLNOPEKHO = GameUtils.LevelThresholdTable.Thresholds[count - 1];
 				int lLHEDBIEHAA = cCKLNOPEKHO.First;
 				if (num >= lLHEDBIEHAA)
 				{
 					_iconMaxLevel.gameObject.SetActive(true);
 					_barExp.gameObject.SetActive(false);
-					_levelHintButton.OFPNNIBBNCE(NFOGOFFAPPP.HHGPKAJENGF.PressInactive);
+					_levelHintButton.SetPressType(ButtonStateExtensions.ButtonPressType.PressInactive);
 				}
 				else
 				{
 					_iconMaxLevel.gameObject.SetActive(false);
 					_barExp.gameObject.SetActive(true);
-					_levelHintButton.OFPNNIBBNCE(NFOGOFFAPPP.HHGPKAJENGF.PressNormal);
+					_levelHintButton.SetPressType(ButtonStateExtensions.ButtonPressType.PressNormal);
 				}
 			}
 		}
 
-		private void OAEKFDFEKCL()
+		private void OnLevelHintClicked()
 		{
 			CallEvent(0, 0);
 		}
 
-		public void SetHintBtnPressType(NFOGOFFAPPP.HHGPKAJENGF LFLGCDNKNJI, bool GHJGPAEDIHG)
+		public void SetHintBtnPressType(ButtonStateExtensions.ButtonPressType LFLGCDNKNJI, bool GHJGPAEDIHG)
 		{
 			if (_iconMaxLevel.gameObject.activeSelf)
 			{
-				_levelHintButton.OFPNNIBBNCE(NFOGOFFAPPP.HHGPKAJENGF.PressInactive);
+				_levelHintButton.SetPressType(ButtonStateExtensions.ButtonPressType.PressInactive);
 			}
 			else
 			{
-				_levelHintButton.OFPNNIBBNCE(LFLGCDNKNJI, GHJGPAEDIHG);
+				_levelHintButton.SetPressType(LFLGCDNKNJI, GHJGPAEDIHG);
 			}
 		}
 

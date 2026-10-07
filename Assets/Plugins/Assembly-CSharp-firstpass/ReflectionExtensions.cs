@@ -4,29 +4,29 @@ using System.Reflection;
 
 internal static class ReflectionExtensions
 {
-	private static readonly FieldInfo AFBAONHELLO = typeof(Exception).GetField("_remoteStackTraceString", BindingFlags.Instance | BindingFlags.NonPublic);
+	private static readonly FieldInfo remoteStackTraceField = typeof(Exception).GetField("_remoteStackTraceString", BindingFlags.Instance | BindingFlags.NonPublic);
 
-	public static bool KLAAGAMNBOB(this Type LFLGCDNKNJI)
+	public static bool IsValueTypeCheck(this Type LFLGCDNKNJI)
 	{
 		return LFLGCDNKNJI.IsValueType;
 	}
 
-	public static bool DOGPNFBHJAC(this Type LFLGCDNKNJI)
+	public static bool IsGenericTypeCheck(this Type LFLGCDNKNJI)
 	{
 		return LFLGCDNKNJI.IsGenericType;
 	}
 
-	public static bool EDALBNGKHAD(this Type LFLGCDNKNJI)
+	public static bool IsInterfaceCheck(this Type LFLGCDNKNJI)
 	{
 		return LFLGCDNKNJI.IsInterface;
 	}
 
-	public static bool LCAJNDEBEFB(this Type LFLGCDNKNJI)
+	public static bool IsEnumCheck(this Type LFLGCDNKNJI)
 	{
 		return LFLGCDNKNJI.IsEnum;
 	}
 
-	public static bool HNJLMKINHHM(this Type LFLGCDNKNJI)
+	public static bool HasDefaultConstructor(this Type LFLGCDNKNJI)
 	{
 		return LFLGCDNKNJI.IsValueType || LFLGCDNKNJI.GetConstructor(BindingFlags.Instance | BindingFlags.Public, null, Type.EmptyTypes, null) != null;
 	}
@@ -46,7 +46,7 @@ internal static class ReflectionExtensions
 		return LFLGCDNKNJI.GetMethods(BindingFlags.Static | BindingFlags.Public);
 	}
 
-	public static MethodInfo HBBFJLHBHPF(this Type LFLGCDNKNJI, string name, params Type[] PEECGJDIAIK)
+	public static MethodInfo GetPublicStaticMethod(this Type LFLGCDNKNJI, string name, params Type[] PEECGJDIAIK)
 	{
 		return LFLGCDNKNJI.GetMethod(name, BindingFlags.Static | BindingFlags.Public, null, PEECGJDIAIK, null);
 	}
@@ -54,9 +54,9 @@ internal static class ReflectionExtensions
 	public static Exception Unwrap(this TargetInvocationException MPFFFAOGBJE)
 	{
 		Exception innerException = MPFFFAOGBJE.InnerException;
-		if (AFBAONHELLO != null)
+		if (remoteStackTraceField != null)
 		{
-			AFBAONHELLO.SetValue(MPFFFAOGBJE.InnerException, MPFFFAOGBJE.InnerException.StackTrace + "\r\n");
+			remoteStackTraceField.SetValue(MPFFFAOGBJE.InnerException, MPFFFAOGBJE.InnerException.StackTrace + "\r\n");
 		}
 		return innerException;
 	}

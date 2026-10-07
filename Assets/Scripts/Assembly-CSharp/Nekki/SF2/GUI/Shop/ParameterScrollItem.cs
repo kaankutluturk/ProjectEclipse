@@ -6,7 +6,7 @@ namespace Nekki.SF2.GUI.Shop
 {
 	public class ParameterScrollItem : BaseScrollItem
 	{
-		public enum JDEIHDIBFOP
+		public enum BarColor
 		{
 			ORANGE = 0,
 			GREEN = 1,
@@ -28,43 +28,43 @@ namespace Nekki.SF2.GUI.Shop
 		[SerializeField]
 		protected LayoutElement _layoutElement;
 
-		private string BJNGHILDLDB = "Attributes.";
+		private string atlasName = "Attributes.";
 
-		protected string LIPDIOBCMBC = "Linear";
+		protected string linearTypeName = "Linear";
 
-		protected string MLENIKFEMAO = "Exp";
+		protected string expTypeName = "Exp";
 
-		protected float FMHFHOLIFEB;
+		protected float defaultPower;
 
-		protected float BDIIMJGEEJI;
+		protected float defaultMinPercent;
 
-		protected string DMCABMCOKGB;
+		protected string attributeName;
 
-		protected string KJPICMNJFGA;
+		protected string barScaleName;
 
 		protected string _type;
 
-		protected float NHFCOJNLMOI;
+		protected float lowerLimit;
 
-		protected float DANEDLPLBAG;
+		protected float upperLimit;
 
-		protected float AMNKPEFDEEO;
+		protected float levelMultiplier;
 
 		protected float _power;
 
-		protected float DPODKOHAPGP;
+		protected float minPercent;
 
-		protected int HAOPIJJPNBD;
+		protected int levelShift;
 
-		protected int CCLCIIOEAGN;
+		protected int displayedValue;
 
-		protected int LOMGCFPCHGH;
+		protected int displayedBonusValue;
 
-		protected Tween FNAKFEMPAOL;
+		protected Tween valueTween;
 
-		protected Tween ANMLMAEBNFA;
+		protected Tween additionalValueTween;
 
-		public ResolutionImage MJBPMLCLMFN
+		public ResolutionImage IconImage
 		{
 			get
 			{
@@ -72,7 +72,7 @@ namespace Nekki.SF2.GUI.Shop
 			}
 		}
 
-		public float BKLMHPPPPGH
+		public float ItemMinWidth
 		{
 			get
 			{
@@ -84,7 +84,7 @@ namespace Nekki.SF2.GUI.Shop
 			}
 		}
 
-		public float FFKGEMEMCAK
+		public float ItemMinHeight
 		{
 			get
 			{
@@ -96,7 +96,7 @@ namespace Nekki.SF2.GUI.Shop
 			}
 		}
 
-		public string COJMGDDNDEF
+		public string SpriteAtlasName
 		{
 			get
 			{
@@ -108,7 +108,7 @@ namespace Nekki.SF2.GUI.Shop
 			}
 		}
 
-		public string DNMENKJBHFE
+		public string ParameterName
 		{
 			get
 			{
@@ -116,7 +116,7 @@ namespace Nekki.SF2.GUI.Shop
 			}
 		}
 
-		public float OBGGBMDABAD
+		public float LeftLimitValue
 		{
 			get
 			{
@@ -124,7 +124,7 @@ namespace Nekki.SF2.GUI.Shop
 			}
 		}
 
-		public float NGPJDHKOEJC
+		public float RightLimitValue
 		{
 			get
 			{
@@ -173,35 +173,35 @@ namespace Nekki.SF2.GUI.Shop
 
 		public string get_AtlasName()
 		{
-			return BJNGHILDLDB;
+			return atlasName;
 		}
 
 		public void set_AtlasName(string value)
 		{
-			BJNGHILDLDB = value;
+			atlasName = value;
 		}
 
 		public string get_AttributeName()
 		{
-			return DMCABMCOKGB;
+			return attributeName;
 		}
 
 		public float get_LeftLimit()
 		{
-			if (NHFCOJNLMOI >= 0f && DANEDLPLBAG >= 0f)
+			if (lowerLimit >= 0f && upperLimit >= 0f)
 			{
-				return NHFCOJNLMOI;
+				return lowerLimit;
 			}
-			return (float)ListSF.CCDKHLAMKKO().PINDEKDNCNL() * AMNKPEFDEEO + (float)HAOPIJJPNBD;
+			return (float)ListSF.GetRoster().GetLevel() * levelMultiplier + (float)levelShift;
 		}
 
 		public float get_RightLimit()
 		{
-			if (NHFCOJNLMOI >= 0f && DANEDLPLBAG >= 0f)
+			if (lowerLimit >= 0f && upperLimit >= 0f)
 			{
-				return DANEDLPLBAG;
+				return upperLimit;
 			}
-			return (float)ListSF.CCDKHLAMKKO().PINDEKDNCNL() * AMNKPEFDEEO + (float)HAOPIJJPNBD;
+			return (float)ListSF.GetRoster().GetLevel() * levelMultiplier + (float)levelShift;
 		}
 
 		public void Init(string name, string ADONPNOBBDE, int value, int OKEFHDDPMEC, bool EIAKNKDEEKA, string MMOBJGKHPNA = null)
@@ -213,7 +213,7 @@ namespace Nekki.SF2.GUI.Shop
 			}
 			if (_icon != null)
 			{
-				_icon.set_SpriteName(BJNGHILDLDB + ADONPNOBBDE);
+				_icon.set_SpriteName(atlasName + ADONPNOBBDE);
 			}
 			SetValue(value, OKEFHDDPMEC);
 		}
@@ -226,45 +226,45 @@ namespace Nekki.SF2.GUI.Shop
 
 		public void SetTextValue(int value, int OKEFHDDPMEC, float _Duration = 0f)
 		{
-			BKJGPPDJMBJ(value, _Duration);
+			TweenValueText(value, _Duration);
 			int bAINMLLIKOL = OKEFHDDPMEC - value;
-			KKIEENKPEGC(bAINMLLIKOL, _Duration);
+			TweenAdditionalValue(bAINMLLIKOL, _Duration);
 		}
 
-		protected void BKJGPPDJMBJ(int value, float _Duration)
+		protected void TweenValueText(int value, float _Duration)
 		{
 			if (!(_value == null))
 			{
-				KillTween(ref FNAKFEMPAOL);
-				FNAKFEMPAOL = DOTween.To(() => CCLCIIOEAGN, (int DHDMNHCIPEH) =>
+				KillTween(ref valueTween);
+				valueTween = DOTween.To(() => displayedValue, (int DHDMNHCIPEH) =>
 				{
-					CCLCIIOEAGN = DHDMNHCIPEH;
-					_value.set_text(CCLCIIOEAGN.ToString());
+					displayedValue = DHDMNHCIPEH;
+					_value.set_text(displayedValue.ToString());
 				}, value, _Duration);
 			}
 		}
 
-		protected void KKIEENKPEGC(int value, float _Duration = 0f)
+		protected void TweenAdditionalValue(int value, float _Duration = 0f)
 		{
 			if (_additionalValue == null)
 			{
 				return;
 			}
-			KillTween(ref ANMLMAEBNFA);
+			KillTween(ref additionalValueTween);
 			if (_Duration == 0f)
 			{
-				HPBCEGEACFF(value);
+				SetAdditionalValueText(value);
 				return;
 			}
-			ANMLMAEBNFA = DOTween.To(() => LOMGCFPCHGH, HPBCEGEACFF, value, _Duration);
+			additionalValueTween = DOTween.To(() => displayedBonusValue, SetAdditionalValueText, value, _Duration);
 		}
 
-		protected void HPBCEGEACFF(int value)
+		protected void SetAdditionalValueText(int value)
 		{
-			LOMGCFPCHGH = value;
-			_additionalValue.set_text(string.Format((LOMGCFPCHGH <= 0) ? "({0})" : "(+{0})", LOMGCFPCHGH));
-			_additionalValue.color = ((LOMGCFPCHGH <= 0) ? Constants.GJKMPOAJDCF : Constants.NHHLHLAMFMO);
-			bool active = LOMGCFPCHGH != 0;
+			displayedBonusValue = value;
+			_additionalValue.set_text(string.Format((displayedBonusValue <= 0) ? "({0})" : "(+{0})", displayedBonusValue));
+			_additionalValue.color = ((displayedBonusValue <= 0) ? Constants.NegativeValueColor : Constants.PositiveValueColor);
+			bool active = displayedBonusValue != 0;
 			_additionalValue.gameObject.SetActive(active);
 		}
 
@@ -281,15 +281,15 @@ namespace Nekki.SF2.GUI.Shop
 		{
 			if (OKEFHDDPMEC < MCOIPKLENOC)
 			{
-				MCPIOGALBMK(OKEFHDDPMEC, JDEIHDIBFOP.ORANGE, _Duration);
-				MCPIOGALBMK(MCOIPKLENOC, JDEIHDIBFOP.RED, _Duration);
-				MCPIOGALBMK(OKEFHDDPMEC, JDEIHDIBFOP.GREEN, _Duration);
+				SetBarSegment(OKEFHDDPMEC, BarColor.ORANGE, _Duration);
+				SetBarSegment(MCOIPKLENOC, BarColor.RED, _Duration);
+				SetBarSegment(OKEFHDDPMEC, BarColor.GREEN, _Duration);
 			}
 			else
 			{
-				MCPIOGALBMK(MCOIPKLENOC, JDEIHDIBFOP.ORANGE, _Duration);
-				MCPIOGALBMK(OKEFHDDPMEC, JDEIHDIBFOP.GREEN, _Duration);
-				MCPIOGALBMK(MCOIPKLENOC, JDEIHDIBFOP.RED, _Duration);
+				SetBarSegment(MCOIPKLENOC, BarColor.ORANGE, _Duration);
+				SetBarSegment(OKEFHDDPMEC, BarColor.GREEN, _Duration);
+				SetBarSegment(MCOIPKLENOC, BarColor.RED, _Duration);
 			}
 		}
 
@@ -312,47 +312,47 @@ namespace Nekki.SF2.GUI.Shop
 
 		private void InitVariables(string CEELFMIPAII, bool EIAKNKDEEKA, string MMOBJGKHPNA = null)
 		{
-			DMCABMCOKGB = CEELFMIPAII;
-			KJPICMNJFGA = MMOBJGKHPNA;
-			if (string.IsNullOrEmpty(KJPICMNJFGA))
+			attributeName = CEELFMIPAII;
+			barScaleName = MMOBJGKHPNA;
+			if (string.IsNullOrEmpty(barScaleName))
 			{
-				WarriorAttribute bCNOAOPGAEI = GameUtils.BGENALLCKII.NGNDIGFKKHE(DMCABMCOKGB);
-				KJPICMNJFGA = ((bCNOAOPGAEI == null) ? DMCABMCOKGB : bCNOAOPGAEI.HCCKLLOEPJN);
+				WarriorAttribute bCNOAOPGAEI = GameUtils.WarriorAttributeList.GetAttribute(attributeName);
+				barScaleName = ((bCNOAOPGAEI == null) ? attributeName : bCNOAOPGAEI.BarScale);
 			}
-			if (string.IsNullOrEmpty(KJPICMNJFGA))
+			if (string.IsNullOrEmpty(barScaleName))
 			{
-				NHFCOJNLMOI = -1f;
-				DANEDLPLBAG = -1f;
-				AMNKPEFDEEO = 1f;
-				HAOPIJJPNBD = 0;
+				lowerLimit = -1f;
+				upperLimit = -1f;
+				levelMultiplier = 1f;
+				levelShift = 0;
 				return;
 			}
-			BarScale bABKPEHINKF = GameUtils.NPHEOMBNOLK.HNECOCDPENN(KJPICMNJFGA);
+			BarScale bABKPEHINKF = GameUtils.BarScaleTable.GetScaleByName(barScaleName);
 			if (bABKPEHINKF == null)
 			{
-				LLLOJBFMONN.Error("Needed barScale not exist.");
+				GameLog.Error("Needed barScale not exist.");
 				return;
 			}
-			Limit pEKGEPHFCMN = ((!EIAKNKDEEKA) ? bABKPEHINKF.GPBFMLDPOKH(ListSF.CCDKHLAMKKO().PINDEKDNCNL()) : bABKPEHINKF.EHKJEKAIDFF(ListSF.CCDKHLAMKKO().PINDEKDNCNL()));
+			Limit pEKGEPHFCMN = ((!EIAKNKDEEKA) ? bABKPEHINKF.GetAttributeLimitForLevel(ListSF.GetRoster().GetLevel()) : bABKPEHINKF.GetItemLimitForLevel(ListSF.GetRoster().GetLevel()));
 			if (pEKGEPHFCMN == null)
 			{
-				pEKGEPHFCMN = ((!EIAKNKDEEKA) ? bABKPEHINKF.IKEBHGKBGHO() : bABKPEHINKF.NMMHOKHKFEE());
+				pEKGEPHFCMN = ((!EIAKNKDEEKA) ? bABKPEHINKF.GetDefaultAttributeLimit() : bABKPEHINKF.GetDefaultItemLimit());
 			}
-			NHFCOJNLMOI = 0f;
-			DANEDLPLBAG = 0f;
+			lowerLimit = 0f;
+			upperLimit = 0f;
 			if (pEKGEPHFCMN != null)
 			{
-				NHFCOJNLMOI = pEKGEPHFCMN.OBGGBMDABAD;
-				DANEDLPLBAG = pEKGEPHFCMN.NGPJDHKOEJC;
-				AMNKPEFDEEO = pEKGEPHFCMN.LevelMultiplier;
-				HAOPIJJPNBD = pEKGEPHFCMN.Shift;
+				lowerLimit = pEKGEPHFCMN.LeftLimit;
+				upperLimit = pEKGEPHFCMN.RightLimit;
+				levelMultiplier = pEKGEPHFCMN.LevelMultiplier;
+				levelShift = pEKGEPHFCMN.Shift;
 			}
-			_power = ((!(bABKPEHINKF.MFGLDPKEDJB < 0f)) ? bABKPEHINKF.MFGLDPKEDJB : FMHFHOLIFEB);
-			DPODKOHAPGP = ((!(bABKPEHINKF.DPGMCKCDMBC < 0f)) ? bABKPEHINKF.DPGMCKCDMBC : BDIIMJGEEJI);
-			_type = ((!string.IsNullOrEmpty(bABKPEHINKF.Type)) ? bABKPEHINKF.Type : LIPDIOBCMBC);
+			_power = ((!(bABKPEHINKF.Power < 0f)) ? bABKPEHINKF.Power : defaultPower);
+			minPercent = ((!(bABKPEHINKF.MinPower < 0f)) ? bABKPEHINKF.MinPower : defaultMinPercent);
+			_type = ((!string.IsNullOrEmpty(bABKPEHINKF.Type)) ? bABKPEHINKF.Type : linearTypeName);
 		}
 
-		protected virtual void MCPIOGALBMK(int value, JDEIHDIBFOP index = JDEIHDIBFOP.ORANGE, float _Duration = 0f)
+		protected virtual void SetBarSegment(int value, BarColor index = BarColor.ORANGE, float _Duration = 0f)
 		{
 			float oKEFHDDPMEC = GetPercentFromValue(value);
 			if (_progressBar != null)
@@ -365,13 +365,13 @@ namespace Nekki.SF2.GUI.Shop
 		{
 			float rightLimit = get_RightLimit();
 			float num;
-			if (!string.IsNullOrEmpty(_type) && _type.Equals(LIPDIOBCMBC))
+			if (!string.IsNullOrEmpty(_type) && _type.Equals(linearTypeName))
 			{
 				num = Mathf.Pow(value / rightLimit, _power);
 			}
 			else
 			{
-				float bGJPLNFFEOB = GameUtils.BGJPLNFFEOB;
+				float bGJPLNFFEOB = GameUtils.DamageDoublingRange;
 				num = Mathf.Pow(2f, (value - rightLimit) * _power / bGJPLNFFEOB);
 			}
 			if (num < 0f)
@@ -382,7 +382,7 @@ namespace Nekki.SF2.GUI.Shop
 			{
 				num = 1f;
 			}
-			return Mathf.Max(num, DPODKOHAPGP);
+			return Mathf.Max(num, minPercent);
 		}
 	}
 }

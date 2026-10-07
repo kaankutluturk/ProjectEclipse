@@ -2,24 +2,24 @@ using System.Xml;
 
 public class DamageRule : InFightRule
 {
-	protected bool BACMFNLDDMM;
+	protected bool isNoDamage;
 
-	public DamageRule(XmlNode node, RuleAppliance EJPOJJKKICO, BCBLLMPAMLP LFLGCDNKNJI)
+	public DamageRule(XmlNode node, RuleAppliance EJPOJJKKICO, RuleType LFLGCDNKNJI)
 		: base(LFLGCDNKNJI, EJPOJJKKICO, node)
 	{
-		BACMFNLDDMM = false;
-		EBJIKKBLBEM(FightEvent.DamageCheckEvent);
+		isNoDamage = false;
+		SubscribeEvent(FightEvent.DamageCheckEvent);
 	}
 
-	public bool BKEAKKCDMMN()
+	public bool IsNoDamage()
 	{
-		return BACMFNLDDMM;
+		return isNoDamage;
 	}
 
 	public override void InitRule(object data)
 	{
 		RuleInitData oIFPCFEGFOB = (RuleInitData)data;
-		Compare(oIFPCFEGFOB.KNKNPEADHOF);
+		Compare(oIFPCFEGFOB.FightData);
 	}
 
 	protected override bool CompareSingle(object data)
@@ -29,28 +29,28 @@ public class DamageRule : InFightRule
 
 	protected virtual bool CheckIsNoDamageChange(bool EGDPHJKMGAB)
 	{
-		bool result = BACMFNLDDMM != EGDPHJKMGAB;
-		BACMFNLDDMM = EGDPHJKMGAB;
+		bool result = isNoDamage != EGDPHJKMGAB;
+		isNoDamage = EGDPHJKMGAB;
 		return result;
 	}
 
-	protected virtual void GGBCFJJPOAB()
+	protected virtual void SwapAppliance()
 	{
-		if (NDBMMPENJNJ == RuleAppliance.AppliancePlayer)
+		if (appliance == RuleAppliance.AppliancePlayer)
 		{
-			NDBMMPENJNJ = RuleAppliance.ApplianceOpponent;
+			appliance = RuleAppliance.ApplianceOpponent;
 		}
-		else if (NDBMMPENJNJ == RuleAppliance.ApplianceOpponent)
+		else if (appliance == RuleAppliance.ApplianceOpponent)
 		{
-			NDBMMPENJNJ = RuleAppliance.AppliancePlayer;
+			appliance = RuleAppliance.AppliancePlayer;
 		}
 	}
 
 	public override InFightRule Copy()
 	{
 		InFightRule aAJIFBJLJOA = null;
-		RuleAppliance eJPOJJKKICO = EDAKADCHOLE();
-		XmlNode hKPPBKPJOEO = GIFDJEEGCJI().IOJIGDNFCFL();
+		RuleAppliance eJPOJJKKICO = GetAppliance();
+		XmlNode hKPPBKPJOEO = GetXmlSource().GetNode();
 		aAJIFBJLJOA = new DamageRule(hKPPBKPJOEO, eJPOJJKKICO, _type);
 		aAJIFBJLJOA.IsRandom = IsRandom;
 		return aAJIFBJLJOA;

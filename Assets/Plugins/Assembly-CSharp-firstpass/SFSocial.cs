@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 public class SFSocial : global::EventDispatcher<object>
 {
-	public class DDANIONNBLJ
+	public class Achievement
 	{
 		public string name;
 
@@ -10,14 +10,14 @@ public class SFSocial : global::EventDispatcher<object>
 
 		public bool complete;
 
-		public DDANIONNBLJ()
+		public Achievement()
 		{
 			name = string.Empty;
 			progress = 0;
 			complete = false;
 		}
 
-		public DDANIONNBLJ(string _name, int JLHFNCKLMDI)
+		public Achievement(string _name, int JLHFNCKLMDI)
 		{
 			name = _name;
 			progress = JLHFNCKLMDI;
@@ -25,7 +25,7 @@ public class SFSocial : global::EventDispatcher<object>
 		}
 	}
 
-	public enum NKFIPJOGFEK
+	public enum SocialEvent
 	{
 		EVENT_AUTHORIZE_FINISH = 0,
 		EVENT_AUTHORIZE_CANCEL = 1,
@@ -34,7 +34,7 @@ public class SFSocial : global::EventDispatcher<object>
 		EVENT_REQUEST_VERIFICATION_DATA_FAILED = 4
 	}
 
-	public enum JMPNJFMJJAI
+	public enum SocialType
 	{
 		SOCIAL_NONE = 0,
 		SOCIAL_NEKKI = 1,
@@ -42,86 +42,86 @@ public class SFSocial : global::EventDispatcher<object>
 		SOCIAL_GAME_CENTER = 3
 	}
 
-	private static SFSocial EDAPJLKMFPC;
+	private static SFSocial instance;
 
-	private static SFSocial FOJDAIHBAJP;
+	private static SFSocial secondaryInstance;
 
-	public static void OFEBIPBOBPC(SFSocial ENMMMPLLLCD)
+	public static void SetInstance(SFSocial ENMMMPLLLCD)
 	{
-		EDAPJLKMFPC = ENMMMPLLLCD;
+		instance = ENMMMPLLLCD;
 	}
 
-	public static void PENFENANIMC(SFSocial ENMMMPLLLCD)
+	public static void SetSecondaryInstance(SFSocial ENMMMPLLLCD)
 	{
-		FOJDAIHBAJP = ENMMMPLLLCD;
+		secondaryInstance = ENMMMPLLLCD;
 	}
 
-	public static SFSocial GBPBIPFIOJH()
+	public static SFSocial GetInstance()
 	{
-		EDAPJLKMFPC = new SFSocial();
-		return EDAPJLKMFPC;
+		instance = new SFSocial();
+		return instance;
 	}
 
-	public virtual void DIKPCDIONOJ()
+	public virtual void Authorize()
 	{
 		CallEvent(0, 0);
 	}
 
-	public virtual void DNEAALKFIPC()
+	public virtual void Login()
 	{
-		DIKPCDIONOJ();
+		Authorize();
 	}
 
-	public virtual string HBPJFLOFIJO()
+	public virtual string GetPlayerId()
 	{
 		return string.Empty;
 	}
 
-	public virtual string EOBBEMNEIOA()
+	public virtual string GetSecondaryPlayerId()
 	{
-		if (FOJDAIHBAJP != null)
+		if (secondaryInstance != null)
 		{
-			return FOJDAIHBAJP.HBPJFLOFIJO();
+			return secondaryInstance.GetPlayerId();
 		}
 		return string.Empty;
 	}
 
-	public virtual void FLJILJDHNLJ(List<DDANIONNBLJ> CIMGCGDDKCE)
+	public virtual void PostAchievements(List<Achievement> CIMGCGDDKCE)
 	{
 	}
 
-	public virtual void MMGHEKOEHDB()
+	public virtual void ResetAchievements()
 	{
 	}
 
-	public virtual bool CMOOANCABOG()
+	public virtual bool IsAuthorized()
 	{
 		return true;
 	}
 
-	public virtual void BEBEFJHBBFL()
+	public virtual void ShowAchievements()
 	{
 	}
 
-	public virtual void FJJDHDEGJGE()
+	public virtual void ShowLeaderboards()
 	{
 	}
 
-	public virtual bool GEJNIMAILDA()
+	public virtual bool IsAvailable()
 	{
 		return false;
 	}
 
-	public virtual string APJHLLAHHHP()
+	public virtual string GetPlayerName()
 	{
 		return string.Empty;
 	}
 
-	public virtual void HMLPAADACAM()
+	public virtual void RequestVerificationData()
 	{
 	}
 
-	protected void CFNPOHHLNKM(DDANIONNBLJ PGAGNLJABIE)
+	protected void OnPostAchievementFailed(Achievement PGAGNLJABIE)
 	{
 		CallEvent(2, PGAGNLJABIE);
 	}

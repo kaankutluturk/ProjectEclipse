@@ -4,13 +4,13 @@ using UnityEngine;
 
 public class CurrentEffect
 {
-	public Model ACENLMONNPA;
+	public Model Owner;
 
-	public ActionEffect LLOLBKJMKNC;
+	public ActionEffect Effect;
 
-	public GameObject EGJHGBCEPHO;
+	public GameObject EffectObject;
 
-	public CocosAnimation BHHCMELOEJF;
+	public CocosAnimation Animation;
 
 	public bool stopFollowEffect;
 
@@ -20,43 +20,43 @@ public class CurrentEffect
 
 	public CurrentEffect(Model GIAMLEDNFJD, ActionEffect FNNOHPEMKMB, GameObject GHDAPMGLICD, CocosAnimation EDMCLHEOJGD)
 	{
-		ACENLMONNPA = GIAMLEDNFJD;
-		LLOLBKJMKNC = FNNOHPEMKMB;
-		EGJHGBCEPHO = GHDAPMGLICD;
-		BHHCMELOEJF = EDMCLHEOJGD;
+		Owner = GIAMLEDNFJD;
+		Effect = FNNOHPEMKMB;
+		EffectObject = GHDAPMGLICD;
+		Animation = EDMCLHEOJGD;
 		stopFollowEffect = false;
-		if (LLOLBKJMKNC.DIGCODDLDAD())
+		if (Effect.GetIsFollowObject())
 		{
-			_Interpolation = EGJHGBCEPHO.GetComponent<FightTransformInterpolation>();
+			_Interpolation = EffectObject.GetComponent<FightTransformInterpolation>();
 			if (_Interpolation == null)
 			{
-				_Interpolation = EGJHGBCEPHO.AddComponent<FightTransformInterpolation>();
+				_Interpolation = EffectObject.AddComponent<FightTransformInterpolation>();
 			}
-			_Interpolation.Snap(EGJHGBCEPHO.transform.localPosition, EGJHGBCEPHO.transform.localRotation);
+			_Interpolation.Snap(EffectObject.transform.localPosition, EffectObject.transform.localRotation);
 		}
 	}
 
-	public void HJGPLENNFCK()
+	public void UpdateFollow()
 	{
-		if (LLOLBKJMKNC.Attachment != null)
+		if (Effect.Attachment != null)
 		{
 			Vector3 position;
 			Quaternion attachmentRotation;
-			if (LLOLBKJMKNC.Attachment.TryGetTransform(ACENLMONNPA, out position, out attachmentRotation))
+			if (Effect.Attachment.TryGetTransform(Owner, out position, out attachmentRotation))
 			{
-				if (LLOLBKJMKNC.JNAALMFCPCN()) position.z += 0.1f;
+				if (Effect.GetIsOnBackground()) position.z += 0.1f;
 				_Interpolation.Push(position, attachmentRotation);
 			}
 			return;
 		}
-		int num = ACENLMONNPA.KFCNPADAMHA();
-		ModelConditions kDOGKKGDOBK = ACENLMONNPA.EBABHGHPLFK();
-		Vector3f eMAFACPEPDK = Vector3f.op_Implicit(LLOLBKJMKNC.ECJPLFFAMJO().EMGKDOAMBOH(kDOGKKGDOBK));
+		int num = Owner.GetFacingSign();
+		ModelConditions kDOGKKGDOBK = Owner.GetConditions();
+		Vector3f eMAFACPEPDK = Vector3f.op_Implicit(Effect.GetPosition().GetPosition(kDOGKKGDOBK));
 		Vector3 anchor = new Vector3(eMAFACPEPDK.GetX(), eMAFACPEPDK.GetY(), eMAFACPEPDK.GetZ());
-		if (LLOLBKJMKNC.JNAALMFCPCN()) anchor.z += 0.1f;
-		_Diagnostics.Observe(ACENLMONNPA, LLOLBKJMKNC, anchor, num);
+		if (Effect.GetIsOnBackground()) anchor.z += 0.1f;
+		_Diagnostics.Observe(Owner, Effect, anchor, num);
 		Quaternion rotation = _Interpolation.CurrentRotation;
-		Vector2f hEJKLMNOLLG = LLOLBKJMKNC.MABFDDNEOGO().HLBBNCBJHGB(kDOGKKGDOBK);
+		Vector2f hEJKLMNOLLG = Effect.GetVector().GetVector(kDOGKKGDOBK);
 		if (hEJKLMNOLLG.GetX() != 0f || hEJKLMNOLLG.GetY() != 0f)
 		{
 			hEJKLMNOLLG.SetX(hEJKLMNOLLG.GetX() * (float)num);

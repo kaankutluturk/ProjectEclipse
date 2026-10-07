@@ -2,7 +2,7 @@ using Nekki.SF2.GUI.Menu;
 
 public static class MenuController
 {
-	public static void KGACOEJKEBP()
+	public static void RefreshMenu()
 	{
 		MainMenu instance = MainMenu.get_Instance();
 		if (instance != null)
@@ -11,7 +11,7 @@ public static class MenuController
 		}
 	}
 
-	public static void IAMGKKOINFC()
+	public static void RefreshMoney()
 	{
 		MainMenu instance = MainMenu.get_Instance();
 		if (instance != null)
@@ -20,7 +20,7 @@ public static class MenuController
 		}
 	}
 
-	public static void CFGIJDFFLLA()
+	public static void RefreshEnergyBar()
 	{
 		MainMenu instance = MainMenu.get_Instance();
 		if (instance != null)
@@ -29,7 +29,7 @@ public static class MenuController
 		}
 	}
 
-	public static void ADPMENDMMKJ()
+	public static void RefreshEnergyView()
 	{
 		MainMenu instance = MainMenu.get_Instance();
 		if (instance != null)
@@ -38,7 +38,7 @@ public static class MenuController
 		}
 	}
 
-	public static void BEMOBLOBCHN()
+	public static void RefreshRubySale()
 	{
 		MainMenu instance = MainMenu.get_Instance();
 		if (instance != null)
@@ -47,7 +47,7 @@ public static class MenuController
 		}
 	}
 
-	public static void BGFJOFOLGDH(bool DGNLFEPIANN)
+	public static void SetNormalViewMode(bool DGNLFEPIANN)
 	{
 		MainMenu instance = MainMenu.get_Instance();
 		if (instance != null)
@@ -56,7 +56,7 @@ public static class MenuController
 		}
 	}
 
-	public static void OPPMFDNNBDE()
+	public static void RecreateMoney()
 	{
 		MainMenu instance = MainMenu.get_Instance();
 		if (instance != null)

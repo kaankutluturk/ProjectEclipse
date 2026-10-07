@@ -5,18 +5,18 @@ namespace Nekki.SF2.GUI.Profile
 {
 	public class AchievementContent : Content
 	{
-		public enum FICFDHMCGAP
+		public enum AchievementContentLayer
 		{
 			zText = 0
 		}
 
-		private const int BFGKMIDOEFC = 88;
+		private const int HEADER_FONT_SIZE = 88;
 
-		private const int CKJIDMCICGK = 70;
+		private const int TEXT_FONT_SIZE = 70;
 
-		private const int ODGMAFLNGME = -294;
+		private const int REWARD_LABEL_Y = -294;
 
-		private const int IBJPMNIGOMJ = 83;
+		private const int REWARD_FONT_SIZE = 83;
 
 		[SerializeField]
 		protected LabelAlias _textLabel;
@@ -27,102 +27,102 @@ namespace Nekki.SF2.GUI.Profile
 		[SerializeField]
 		protected SFButton _takeButton;
 
-		protected Action<object> FNOECGMEKGL;
+		protected Action<object> takeCallback;
 
 		protected string _text;
 
-		protected int PIGOGFLFMMH;
+		protected int rewardMoney;
 
-		protected int ALGBFOBNPFO;
+		protected int rewardRubies;
 
-		protected bool BODCOGFGHAD;
+		protected bool showReward;
 
-		protected bool DPJOPMHPGKG;
+		protected bool isCompleted;
 
-		protected bool OBGMJMBNMME;
+		protected bool hasUpBorder;
 
-		protected float ECCMHGEEFLE;
+		protected float upBorder;
 
 		private void Start()
 		{
-			_takeButton.AddEventListener(2, BFJAKDPGLIB);
+			_takeButton.AddEventListener(2, OnTakeButtonClicked);
 		}
 
 		public void Init(string HCPNFPMHFCM, int PABLCLGLPBB = 0, int GNDNEONJDKG = 0, Action<object> ODDEOFKLIAG = null, bool DJGOCCEOAKD = false, bool NNEHNDILGDP = false)
 		{
 			_takeButton.gameObject.SetActive(false);
 			_text = HCPNFPMHFCM;
-			PIGOGFLFMMH = PABLCLGLPBB;
-			ALGBFOBNPFO = GNDNEONJDKG;
-			FNOECGMEKGL = ODDEOFKLIAG;
-			BODCOGFGHAD = DJGOCCEOAKD;
-			DPJOPMHPGKG = NNEHNDILGDP;
+			rewardMoney = PABLCLGLPBB;
+			rewardRubies = GNDNEONJDKG;
+			takeCallback = ODDEOFKLIAG;
+			showReward = DJGOCCEOAKD;
+			isCompleted = NNEHNDILGDP;
 			HeaderFontSize = 88;
-			AJNMAKEIDMH();
-			EADJKKIOIHA();
-			IBIKJHNOFDH();
-			BNMLMGGOMGN();
+			InitTextLabel();
+			InitRewardLabel();
+			InitTakeButton();
+			CenterTextLabel();
 		}
 
 		public override void SetUpBorder(float BGEEALIPKCC)
 		{
-			ECCMHGEEFLE = BGEEALIPKCC;
-			OBGMJMBNMME = true;
-			BNMLMGGOMGN();
+			upBorder = BGEEALIPKCC;
+			hasUpBorder = true;
+			CenterTextLabel();
 		}
 
-		protected void AJNMAKEIDMH()
+		protected void InitTextLabel()
 		{
-			_textLabel.color = Constants.PJJIMHMJPAL;
+			_textLabel.color = Constants.DialogTextColor;
 			_textLabel.set_LabelFontSize(70);
 			_textLabel.set_Alias(_text);
 		}
 
-		protected void EADJKKIOIHA()
+		protected void InitRewardLabel()
 		{
 			_rewardLabel.gameObject.SetActive(false);
-			if (BODCOGFGHAD)
+			if (showReward)
 			{
 				_rewardLabel.gameObject.SetActive(true);
-				_rewardLabel.transform.BGNJGIACJBG(-294f);
-				_rewardLabel.color = Constants.PJJIMHMJPAL;
+				_rewardLabel.transform.SetLocalY(-294f);
+				_rewardLabel.color = Constants.DialogTextColor;
 				_rewardLabel.set_LabelFontSize(83);
-				string text = ((PIGOGFLFMMH <= 0) ? "MiscSprites.ruby" : ListSF.CCDKHLAMKKO().OGJBDMNBMLJ());
-				int num = ((PIGOGFLFMMH <= 0) ? ALGBFOBNPFO : PIGOGFLFMMH);
+				string text = ((rewardMoney <= 0) ? "MiscSprites.ruby" : ListSF.GetRoster().GetCoinIcon());
+				int num = ((rewardMoney <= 0) ? rewardRubies : rewardMoney);
 				string text2 = LocalizationManager.GetString("achievementReward") + "<quad name=" + text + " size=88 width=1 /> " + num;
 				_rewardLabel.set_text(text2);
-				bool flag = PIGOGFLFMMH > 0 || ALGBFOBNPFO > 0;
-				_rewardLabel.gameObject.SetActive(flag && BODCOGFGHAD);
+				bool flag = rewardMoney > 0 || rewardRubies > 0;
+				_rewardLabel.gameObject.SetActive(flag && showReward);
 			}
 		}
 
-		protected void IBIKJHNOFDH()
+		protected void InitTakeButton()
 		{
-			bool flag = PIGOGFLFMMH > 0 || ALGBFOBNPFO > 0;
-			if (DPJOPMHPGKG && BODCOGFGHAD && flag)
+			bool flag = rewardMoney > 0 || rewardRubies > 0;
+			if (isCompleted && showReward && flag)
 			{
 				float y = _rewardLabel.transform.transform.localPosition.y;
-				_takeButton.transform.BGNJGIACJBG(y - 20f);
-				_rewardLabel.transform.BGNJGIACJBG(y + 80f);
-				_takeButton.gameObject.SetActive(BODCOGFGHAD);
+				_takeButton.transform.SetLocalY(y - 20f);
+				_rewardLabel.transform.SetLocalY(y + 80f);
+				_takeButton.gameObject.SetActive(showReward);
 			}
 		}
 
-		protected void BFJAKDPGLIB(object data)
+		protected void OnTakeButtonClicked(object data)
 		{
-			if (FNOECGMEKGL != null)
+			if (takeCallback != null)
 			{
-				FNOECGMEKGL(data);
+				takeCallback(data);
 			}
 		}
 
-		protected void BNMLMGGOMGN()
+		protected void CenterTextLabel()
 		{
-			if (OBGMJMBNMME && _rewardLabel != null && _textLabel != null)
+			if (hasUpBorder && _rewardLabel != null && _textLabel != null)
 			{
 				float num = _rewardLabel.transform.localPosition.y + _rewardLabel.rectTransform.rect.height / 2f;
-				float bAINMLLIKOL = ECCMHGEEFLE - (ECCMHGEEFLE - num) / 2f;
-				_textLabel.transform.BGNJGIACJBG(bAINMLLIKOL);
+				float bAINMLLIKOL = upBorder - (upBorder - num) / 2f;
+				_textLabel.transform.SetLocalY(bAINMLLIKOL);
 			}
 		}
 	}

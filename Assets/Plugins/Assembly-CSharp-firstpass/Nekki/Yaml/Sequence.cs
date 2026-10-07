@@ -21,7 +21,7 @@ namespace Nekki.Yaml
 			nodesInside = new List<Node>();
 			foreach (YamlNode item in _sequence)
 			{
-				nodesInside.Add(Node.AGFNPDIMEDI(base.key, item));
+				nodesInside.Add(Node.CreateNode(base.key, item));
 			}
 		}
 
@@ -32,10 +32,10 @@ namespace Nekki.Yaml
 			base.value = new YamlSequenceNode(new YamlNode[0]);
 			_sequence = (YamlSequenceNode)base.value;
 			nodesInside = new List<Node>();
-			HCPJPEGIJIK(node);
+			Add(node);
 			foreach (YamlNode item in _sequence)
 			{
-				nodesInside.Add(Node.AGFNPDIMEDI(base.key, item));
+				nodesInside.Add(Node.CreateNode(base.key, item));
 			}
 		}
 
@@ -55,7 +55,7 @@ namespace Nekki.Yaml
 			base.typeNode = "Sequence";
 		}
 
-		public void HPLACOBNDLN(int index, Node PHEPOJIKDPN)
+		public void ReplaceAt(int index, Node PHEPOJIKDPN)
 		{
 			_sequence.UpdateNode(nodesInside[index].value, PHEPOJIKDPN.value);
 			nodesInside[index] = PHEPOJIKDPN;
@@ -80,7 +80,7 @@ namespace Nekki.Yaml
 			nodesInside.Remove(PHEPOJIKDPN);
 		}
 
-		public void HCPJPEGIJIK(Node PHEPOJIKDPN)
+		public void Add(Node PHEPOJIKDPN)
 		{
 			_sequence.Add(PHEPOJIKDPN.value);
 			nodesInside.Add(PHEPOJIKDPN);
@@ -104,7 +104,7 @@ namespace Nekki.Yaml
 			}
 		}
 
-		public int NMALBAPGAFM()
+		public int GetCount()
 		{
 			return nodesInside.Count;
 		}
@@ -118,7 +118,7 @@ namespace Nekki.Yaml
 			return null;
 		}
 
-		public List<Node> DBPKFJFFKPC()
+		public List<Node> GetNodes()
 		{
 			return nodesInside;
 		}

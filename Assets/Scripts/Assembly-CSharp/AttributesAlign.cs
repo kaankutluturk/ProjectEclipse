@@ -8,14 +8,14 @@ public class AttributesAlign
 
 	public int Priority;
 
-	public ModelParameters.IHFKGJLIPGH KONCHIPGFGO;
+	public ModelParameters.DifficultyFilter DifficultyFilter;
 
 	public AttributesAlign()
 	{
 		Factor = 0f;
 		Shift = 0f;
 		Priority = 0;
-		KONCHIPGFGO = ModelParameters.IHFKGJLIPGH.DFBoth;
+		DifficultyFilter = ModelParameters.DifficultyFilter.DFBoth;
 	}
 
 	public AttributesAlign(AttributesAlign NBMGOEMJJAF)
@@ -23,10 +23,10 @@ public class AttributesAlign
 		Factor = NBMGOEMJJAF.Factor;
 		Shift = NBMGOEMJJAF.Shift;
 		Priority = NBMGOEMJJAF.Priority;
-		KONCHIPGFGO = NBMGOEMJJAF.KONCHIPGFGO;
+		DifficultyFilter = NBMGOEMJJAF.DifficultyFilter;
 	}
 
-	public static int HDNMKKBMKLN(List<AttributesAlign> JPJIIDGEODE)
+	public static int GetMaxPriority(List<AttributesAlign> JPJIIDGEODE)
 	{
 		int num = int.MinValue;
 		for (int i = 0; i < JPJIIDGEODE.Count; i++)
@@ -39,10 +39,10 @@ public class AttributesAlign
 		return num;
 	}
 
-	public static int GGBAGGMLFHE(List<AttributesAlign> MHDPIEJEKIP, List<AttributesAlign> PNKJPOHEOJB)
+	public static int AppendHighestPriority(List<AttributesAlign> MHDPIEJEKIP, List<AttributesAlign> PNKJPOHEOJB)
 	{
 		int count = PNKJPOHEOJB.Count;
-		int num = HDNMKKBMKLN(MHDPIEJEKIP);
+		int num = GetMaxPriority(MHDPIEJEKIP);
 		for (int i = 0; i < MHDPIEJEKIP.Count; i++)
 		{
 			if (MHDPIEJEKIP[i].Priority == num)

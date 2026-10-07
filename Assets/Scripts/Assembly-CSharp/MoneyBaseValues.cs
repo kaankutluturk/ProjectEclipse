@@ -3,26 +3,26 @@ using System.Xml;
 
 public class MoneyBaseValues
 {
-	private List<CharProgLevel> JINJHDABECD = new List<CharProgLevel>();
+	private List<CharProgLevel> levels = new List<CharProgLevel>();
 
 	public void Parse(XmlNode node)
 	{
-		JINJHDABECD.Clear();
+		levels.Clear();
 		foreach (XmlNode childNode in node.ChildNodes)
 		{
 			if (childNode.Name == "Level")
 			{
 				CharProgLevel item = new CharProgLevel(childNode);
-				JINJHDABECD.Add(item);
+				levels.Add(item);
 			}
 		}
 	}
 
 	public long GetBaseValue(int OMHDLKNHNMJ)
 	{
-		foreach (CharProgLevel item in JINJHDABECD)
+		foreach (CharProgLevel item in levels)
 		{
-			if (OMHDLKNHNMJ >= item.LHNCHOAEGEA && OMHDLKNHNMJ <= item.KAEPJHHLLPK)
+			if (OMHDLKNHNMJ >= item.Min && OMHDLKNHNMJ <= item.Max)
 			{
 				return item.value;
 			}

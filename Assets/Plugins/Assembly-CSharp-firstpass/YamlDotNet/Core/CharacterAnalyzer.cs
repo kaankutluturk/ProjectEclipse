@@ -38,41 +38,41 @@ namespace YamlDotNet.Core
 			buffer.Skip(BDBOAEGELMC);
 		}
 
-		public bool KJGBACCEGND(int IPCOBJBKNAO = 0)
+		public bool IsAlphaNumericDashOrUnderscore(int IPCOBJBKNAO = 0)
 		{
 			char c = buffer.Peek(IPCOBJBKNAO);
 			return (c >= '0' && c <= '9') || (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || c == '_' || c == '-';
 		}
 
-		public bool EAMJHPLDDLE(int IPCOBJBKNAO = 0)
+		public bool IsAscii(int IPCOBJBKNAO = 0)
 		{
 			return buffer.Peek(IPCOBJBKNAO) <= '\u007f';
 		}
 
-		public bool IGNGBDLCMGB(int IPCOBJBKNAO = 0)
+		public bool IsPrintable(int IPCOBJBKNAO = 0)
 		{
 			char c = buffer.Peek(IPCOBJBKNAO);
 			return c == '\t' || c == '\n' || c == '\r' || (c >= ' ' && c <= '~') || c == '\u0085' || (c >= '\u00a0' && c <= '\ud7ff') || (c >= '\ue000' && c <= '\ufffd');
 		}
 
-		public bool DDINBPOLPJP(int IPCOBJBKNAO = 0)
+		public bool IsDigit(int IPCOBJBKNAO = 0)
 		{
 			char c = buffer.Peek(IPCOBJBKNAO);
 			return c >= '0' && c <= '9';
 		}
 
-		public int MDEJLGGFDCP(int IPCOBJBKNAO = 0)
+		public int AsDigit(int IPCOBJBKNAO = 0)
 		{
 			return buffer.Peek(IPCOBJBKNAO) - 48;
 		}
 
-		public bool EMFKOPNCOFA(int IPCOBJBKNAO)
+		public bool IsHex(int IPCOBJBKNAO)
 		{
 			char c = buffer.Peek(IPCOBJBKNAO);
 			return (c >= '0' && c <= '9') || (c >= 'A' && c <= 'F') || (c >= 'a' && c <= 'f');
 		}
 
-		public int IGACACHGIGK(int IPCOBJBKNAO)
+		public int AsHex(int IPCOBJBKNAO)
 		{
 			char c = buffer.Peek(IPCOBJBKNAO);
 			if (c <= '9')
@@ -86,44 +86,44 @@ namespace YamlDotNet.Core
 			return c - 97 + 10;
 		}
 
-		public bool NBLLOLGNFGM(int IPCOBJBKNAO = 0)
+		public bool IsSpace(int IPCOBJBKNAO = 0)
 		{
 			return Check(' ', IPCOBJBKNAO);
 		}
 
-		public bool AJCHNKGPEJB(int IPCOBJBKNAO = 0)
+		public bool IsZero(int IPCOBJBKNAO = 0)
 		{
 			return Check('\0', IPCOBJBKNAO);
 		}
 
-		public bool BPBEHGMHHGP(int IPCOBJBKNAO = 0)
+		public bool IsTab(int IPCOBJBKNAO = 0)
 		{
 			return Check('\t', IPCOBJBKNAO);
 		}
 
-		public bool MIGPEDGKJEG(int IPCOBJBKNAO = 0)
+		public bool IsWhite(int IPCOBJBKNAO = 0)
 		{
-			return NBLLOLGNFGM(IPCOBJBKNAO) || BPBEHGMHHGP(IPCOBJBKNAO);
+			return IsSpace(IPCOBJBKNAO) || IsTab(IPCOBJBKNAO);
 		}
 
-		public bool JCPPGIPDMBK(int IPCOBJBKNAO = 0)
+		public bool IsBreak(int IPCOBJBKNAO = 0)
 		{
 			return Check("\r\n\u0085\u2028\u2029", IPCOBJBKNAO);
 		}
 
-		public bool DHPOAOIAGPE(int IPCOBJBKNAO = 0)
+		public bool IsCrLf(int IPCOBJBKNAO = 0)
 		{
 			return Check('\r', IPCOBJBKNAO) && Check('\n', IPCOBJBKNAO + 1);
 		}
 
-		public bool PDOIBEFPDEB(int IPCOBJBKNAO = 0)
+		public bool IsBreakOrZero(int IPCOBJBKNAO = 0)
 		{
-			return JCPPGIPDMBK(IPCOBJBKNAO) || AJCHNKGPEJB(IPCOBJBKNAO);
+			return IsBreak(IPCOBJBKNAO) || IsZero(IPCOBJBKNAO);
 		}
 
-		public bool MKOKPKHBDMD(int IPCOBJBKNAO = 0)
+		public bool IsWhiteBreakOrZero(int IPCOBJBKNAO = 0)
 		{
-			return MIGPEDGKJEG(IPCOBJBKNAO) || PDOIBEFPDEB(IPCOBJBKNAO);
+			return IsWhite(IPCOBJBKNAO) || IsBreakOrZero(IPCOBJBKNAO);
 		}
 
 		public bool Check(char EFCPGPEFNJI, int IPCOBJBKNAO = 0)

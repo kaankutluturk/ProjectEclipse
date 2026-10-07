@@ -2,40 +2,40 @@ using System.Collections.Generic;
 
 public class Attributes
 {
-	private Dictionary<string, int> JMMIKHLIKOE;
+	private Dictionary<string, int> values;
 
 	public int Count
 	{
 		get
 		{
-			return OFOPFCJNEBL();
+			return GetCount();
 		}
 	}
 
 	public Attributes()
 	{
-		JMMIKHLIKOE = new Dictionary<string, int>();
+		values = new Dictionary<string, int>();
 	}
 
 	public Attributes(Attributes NOLFMPDGCOC)
 	{
-		JMMIKHLIKOE = new Dictionary<string, int>();
-		foreach (KeyValuePair<string, int> item in NOLFMPDGCOC.JMMIKHLIKOE)
+		values = new Dictionary<string, int>();
+		foreach (KeyValuePair<string, int> item in NOLFMPDGCOC.values)
 		{
-			JMMIKHLIKOE.Add(item.Key, item.Value);
+			values.Add(item.Key, item.Value);
 		}
 	}
 
-	public int OFOPFCJNEBL()
+	public int GetCount()
 	{
-		return JMMIKHLIKOE.Count;
+		return values.Count;
 	}
 
 	public void AddRange(Attributes NOLFMPDGCOC)
 	{
-		foreach (KeyValuePair<string, int> item in NOLFMPDGCOC.JMMIKHLIKOE)
+		foreach (KeyValuePair<string, int> item in NOLFMPDGCOC.values)
 		{
-			JMMIKHLIKOE[item.Key] = item.Value;
+			values[item.Key] = item.Value;
 		}
 	}
 
@@ -43,27 +43,27 @@ public class Attributes
 	{
 		if (OMHMHCLDBFA)
 		{
-			Aspect hOHAPDGFMHL = GameUtils.MGDCJKKGKAB(KGBGENDIMBC);
+			Aspect hOHAPDGFMHL = GameUtils.GetAspectByName(KGBGENDIMBC);
 			if (hOHAPDGFMHL != null)
 			{
-				return Get(hOHAPDGFMHL.EJPCHOLGGJJ(), ref OEMALIFPGPO, PIDPHPGMLOD, OMHMHCLDBFA);
+				return Get(hOHAPDGFMHL.GetAttribute(), ref OEMALIFPGPO, PIDPHPGMLOD, OMHMHCLDBFA);
 			}
 		}
-		if (KGBGENDIMBC != null && JMMIKHLIKOE.ContainsKey(KGBGENDIMBC))
+		if (KGBGENDIMBC != null && values.ContainsKey(KGBGENDIMBC))
 		{
-			int num = JMMIKHLIKOE[KGBGENDIMBC];
+			int num = values[KGBGENDIMBC];
 			if (PIDPHPGMLOD)
 			{
-				Aspect hOHAPDGFMHL2 = GameUtils.MGDCJKKGKAB(KGBGENDIMBC);
+				Aspect hOHAPDGFMHL2 = GameUtils.GetAspectByName(KGBGENDIMBC);
 				if (hOHAPDGFMHL2 != null)
 				{
-					int gNLOCMLBNHF = ListSF.CCDKHLAMKKO().PINDEKDNCNL();
-					int bIJKNKAJBHH = GameUtils.HBDECHDPLCA().MAIPAOKJMED();
-					float num2 = GameUtils.HBDECHDPLCA().OEAKCOHMIHH();
+					int gNLOCMLBNHF = ListSF.GetRoster().GetLevel();
+					int bIJKNKAJBHH = GameUtils.GetAspectDoublingRange().GetLevelStep();
+					float num2 = GameUtils.GetAspectDoublingRange().GetValue();
 					OEMALIFPGPO = hOHAPDGFMHL2.GetValue(num, gNLOCMLBNHF, bIJKNKAJBHH, num2);
-					if (JMMIKHLIKOE.ContainsKey(hOHAPDGFMHL2.EJPCHOLGGJJ()))
+					if (values.ContainsKey(hOHAPDGFMHL2.GetAttribute()))
 					{
-						num = JMMIKHLIKOE[hOHAPDGFMHL2.EJPCHOLGGJJ()];
+						num = values[hOHAPDGFMHL2.GetAttribute()];
 						OEMALIFPGPO += num;
 					}
 					return true;
@@ -79,19 +79,19 @@ public class Attributes
 	{
 		if (OMHMHCLDBFA)
 		{
-			Aspect hOHAPDGFMHL = GameUtils.MGDCJKKGKAB(KGBGENDIMBC);
+			Aspect hOHAPDGFMHL = GameUtils.GetAspectByName(KGBGENDIMBC);
 			if (hOHAPDGFMHL != null)
 			{
-				string key = hOHAPDGFMHL.EJPCHOLGGJJ();
-				JMMIKHLIKOE[key] = value;
+				string key = hOHAPDGFMHL.GetAttribute();
+				values[key] = value;
 				return;
 			}
 		}
-		JMMIKHLIKOE[KGBGENDIMBC] = value;
+		values[KGBGENDIMBC] = value;
 	}
 
 	public void Clear()
 	{
-		JMMIKHLIKOE.Clear();
+		values.Clear();
 	}
 }

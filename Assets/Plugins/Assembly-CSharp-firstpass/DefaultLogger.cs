@@ -5,172 +5,172 @@ using UnityEngine;
 public class DefaultLogger : ILogger
 {
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private BFNKPHDJNII HGNLPOMKHHK;
+	private Loglevels level;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private string BIJJOEGAEBA;
+	private string formatVerbose;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private string KFEBBIEFCEK;
+	private string formatInfo;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private string BOFOACNAHFL;
+	private string formatWarn;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private string ANALMINIJND;
+	private string formatErr;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private string EDENEHELCIH;
+	private string formatEx;
 
-	public BFNKPHDJNII Level
+	public Loglevels Level
 	{
 		get
 		{
-			return PINDEKDNCNL();
+			return GetLevel();
 		}
 		set
 		{
-			DLDMOHEGENM(value);
+			SetLevel(value);
 		}
 	}
 
-	public string LEGHIOADBJC
+	public string FormatVerbose
 	{
 		get
 		{
-			return IOPJBEOJMLD();
+			return GetFormatVerbose();
 		}
 		set
 		{
-			FDKNEECBIBB(value);
+			SetFormatVerbose(value);
 		}
 	}
 
-	public string LNIJFMFOIDN
+	public string FormatInfo
 	{
 		get
 		{
-			return AHDNMMFOFLB();
+			return GetFormatInfo();
 		}
 		set
 		{
-			MIKLLLHHECB(value);
+			SetFormatInfo(value);
 		}
 	}
 
-	public string LHGJKHCPGBM
+	public string FormatWarn
 	{
 		get
 		{
-			return KBKEJHEPJEN();
+			return GetFormatWarn();
 		}
 		set
 		{
-			LLDEKAOFIGL(value);
+			SetFormatWarn(value);
 		}
 	}
 
-	public string BJDEHEABJGA
+	public string FormatErr
 	{
 		get
 		{
-			return DJACEMPJGGF();
+			return GetFormatErr();
 		}
 		set
 		{
-			IMHLPLJCJGK(value);
+			SetFormatErr(value);
 		}
 	}
 
-	public string FOGIBNCFGJJ
+	public string FormatEx
 	{
 		get
 		{
-			return ACMJHFAHMIM();
+			return GetFormatEx();
 		}
 		set
 		{
-			HHNFNCJGEKP(value);
+			SetFormatEx(value);
 		}
 	}
 
 	public DefaultLogger()
 	{
-		FDKNEECBIBB("I [{0}]: {1}");
-		MIKLLLHHECB("I [{0}]: {1}");
-		LLDEKAOFIGL("W [{0}]: {1}");
-		IMHLPLJCJGK("Err [{0}]: {1}");
-		HHNFNCJGEKP("Ex [{0}]: {1} - Message: {2}  StackTrace: {3}");
-		DLDMOHEGENM((!UnityEngine.Debug.isDebugBuild) ? BFNKPHDJNII.Error : BFNKPHDJNII.Warning);
+		SetFormatVerbose("I [{0}]: {1}");
+		SetFormatInfo("I [{0}]: {1}");
+		SetFormatWarn("W [{0}]: {1}");
+		SetFormatErr("Err [{0}]: {1}");
+		SetFormatEx("Ex [{0}]: {1} - Message: {2}  StackTrace: {3}");
+		SetLevel((!UnityEngine.Debug.isDebugBuild) ? Loglevels.Error : Loglevels.Warning);
 	}
 
-	public BFNKPHDJNII PINDEKDNCNL()
+	public Loglevels GetLevel()
 	{
-		return HGNLPOMKHHK;
+		return level;
 	}
 
-	public void DLDMOHEGENM(BFNKPHDJNII value)
+	public void SetLevel(Loglevels value)
 	{
-		HGNLPOMKHHK = value;
+		level = value;
 	}
 
-	public string IOPJBEOJMLD()
+	public string GetFormatVerbose()
 	{
-		return BIJJOEGAEBA;
+		return formatVerbose;
 	}
 
-	public void FDKNEECBIBB(string value)
+	public void SetFormatVerbose(string value)
 	{
-		BIJJOEGAEBA = value;
+		formatVerbose = value;
 	}
 
-	public string AHDNMMFOFLB()
+	public string GetFormatInfo()
 	{
-		return KFEBBIEFCEK;
+		return formatInfo;
 	}
 
-	public void MIKLLLHHECB(string value)
+	public void SetFormatInfo(string value)
 	{
-		KFEBBIEFCEK = value;
+		formatInfo = value;
 	}
 
-	public string KBKEJHEPJEN()
+	public string GetFormatWarn()
 	{
-		return BOFOACNAHFL;
+		return formatWarn;
 	}
 
-	public void LLDEKAOFIGL(string value)
+	public void SetFormatWarn(string value)
 	{
-		BOFOACNAHFL = value;
+		formatWarn = value;
 	}
 
-	public string DJACEMPJGGF()
+	public string GetFormatErr()
 	{
-		return ANALMINIJND;
+		return formatErr;
 	}
 
-	public void IMHLPLJCJGK(string value)
+	public void SetFormatErr(string value)
 	{
-		ANALMINIJND = value;
+		formatErr = value;
 	}
 
-	public string ACMJHFAHMIM()
+	public string GetFormatEx()
 	{
-		return EDENEHELCIH;
+		return formatEx;
 	}
 
-	public void HHNFNCJGEKP(string value)
+	public void SetFormatEx(string value)
 	{
-		EDENEHELCIH = value;
+		formatEx = value;
 	}
 
-	public void JMHHKELODIO(string HMHPCGBCNGI, string POOAFNBCFHM)
+	public void Verbose(string HMHPCGBCNGI, string POOAFNBCFHM)
 	{
-		if (PINDEKDNCNL() <= BFNKPHDJNII.All)
+		if (GetLevel() <= Loglevels.All)
 		{
 			try
 			{
-				AdvLog.Log(string.Format(IOPJBEOJMLD(), HMHPCGBCNGI, POOAFNBCFHM));
+				AdvLog.Log(string.Format(GetFormatVerbose(), HMHPCGBCNGI, POOAFNBCFHM));
 			}
 			catch
 			{
@@ -178,13 +178,13 @@ public class DefaultLogger : ILogger
 		}
 	}
 
-	public void KDAFBLAKBMI(string HMHPCGBCNGI, string EMBBNNBFODN)
+	public void Information(string HMHPCGBCNGI, string EMBBNNBFODN)
 	{
-		if (PINDEKDNCNL() <= BFNKPHDJNII.Information)
+		if (GetLevel() <= Loglevels.Information)
 		{
 			try
 			{
-				AdvLog.Log(string.Format(AHDNMMFOFLB(), HMHPCGBCNGI, EMBBNNBFODN));
+				AdvLog.Log(string.Format(GetFormatInfo(), HMHPCGBCNGI, EMBBNNBFODN));
 			}
 			catch
 			{
@@ -192,13 +192,13 @@ public class DefaultLogger : ILogger
 		}
 	}
 
-	public void GLCKHLCAPIN(string HMHPCGBCNGI, string EPMNBLHHAHF)
+	public void Warning(string HMHPCGBCNGI, string EPMNBLHHAHF)
 	{
-		if (PINDEKDNCNL() <= BFNKPHDJNII.Warning)
+		if (GetLevel() <= Loglevels.Warning)
 		{
 			try
 			{
-				AdvLog.LOPHFKMOPAA(string.Format(KBKEJHEPJEN(), HMHPCGBCNGI, EPMNBLHHAHF));
+				AdvLog.LogWarning(string.Format(GetFormatWarn(), HMHPCGBCNGI, EPMNBLHHAHF));
 			}
 			catch
 			{
@@ -208,11 +208,11 @@ public class DefaultLogger : ILogger
 
 	public void Error(string HMHPCGBCNGI, string KEPBNIIECPN)
 	{
-		if (PINDEKDNCNL() <= BFNKPHDJNII.Error)
+		if (GetLevel() <= Loglevels.Error)
 		{
 			try
 			{
-				AdvLog.CCOFFJPPAKC(string.Format(DJACEMPJGGF(), HMHPCGBCNGI, KEPBNIIECPN));
+				AdvLog.LogError(string.Format(GetFormatErr(), HMHPCGBCNGI, KEPBNIIECPN));
 			}
 			catch
 			{
@@ -220,13 +220,13 @@ public class DefaultLogger : ILogger
 		}
 	}
 
-	public void COHEDILAHFD(string HMHPCGBCNGI, string CKEHOEGLMBM, Exception MPFFFAOGBJE)
+	public void Exception(string HMHPCGBCNGI, string CKEHOEGLMBM, Exception MPFFFAOGBJE)
 	{
-		if (PINDEKDNCNL() <= BFNKPHDJNII.Exception)
+		if (GetLevel() <= Loglevels.Exception)
 		{
 			try
 			{
-				AdvLog.CCOFFJPPAKC(string.Format(ACMJHFAHMIM(), HMHPCGBCNGI, CKEHOEGLMBM, (MPFFFAOGBJE == null) ? "null" : MPFFFAOGBJE.Message, (MPFFFAOGBJE == null) ? "null" : MPFFFAOGBJE.StackTrace));
+				AdvLog.LogError(string.Format(GetFormatEx(), HMHPCGBCNGI, CKEHOEGLMBM, (MPFFFAOGBJE == null) ? "null" : MPFFFAOGBJE.Message, (MPFFFAOGBJE == null) ? "null" : MPFFFAOGBJE.StackTrace));
 			}
 			catch
 			{

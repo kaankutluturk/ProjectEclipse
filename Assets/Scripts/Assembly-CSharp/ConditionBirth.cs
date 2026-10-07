@@ -7,7 +7,7 @@ public class ConditionBirth : ConditionAnimation
 	public ConditionBirth(XmlNode node)
 		: base(ConditionType.BIRTH)
 	{
-		_Name = node.Attributes["Name"].CIPOICEEIBK(string.Empty);
+		_Name = node.Attributes["Name"].GetStringOrDefault(string.Empty);
 	}
 
 	public override bool IsEqual(ModelConditions conditions)

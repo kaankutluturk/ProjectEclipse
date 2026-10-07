@@ -14,7 +14,7 @@ namespace Eclipse.Modding
         private bool disposed;
 
         internal ModQuestLotteryAction(QuestAction action, string fightName, Action complete)
-            : this(ModRuntime.PrepareQuestLotteryClaim(action.NOFNJFOCIMK(), action.Index,
+            : this(ModRuntime.PrepareQuestLotteryClaim(action.GetStage(), action.Index,
                 fightName, Math.Min(UnityEngine.Random.value, 0.9999999999999999)), complete)
         { }
 
@@ -25,8 +25,8 @@ namespace Eclipse.Modding
             module = Module.GetInstance();
             if (claim != null)
             {
-                module.AddEventListener((int)Module.FKHIMIAOCJL.OnOpenScene, OnOpenScene);
-                module.AddEventListener((int)Module.FKHIMIAOCJL.OnCloseScene, OnCloseScene);
+                module.AddEventListener((int)Module.ModuleEvent.OnOpenScene, OnOpenScene);
+                module.AddEventListener((int)Module.ModuleEvent.OnCloseScene, OnCloseScene);
             }
         }
 
@@ -57,8 +57,8 @@ namespace Eclipse.Modding
         {
             if (disposed) return;
             disposed = true;
-            module.RemoveEventListener((int)Module.FKHIMIAOCJL.OnOpenScene, OnOpenScene);
-            module.RemoveEventListener((int)Module.FKHIMIAOCJL.OnCloseScene, OnCloseScene);
+            module.RemoveEventListener((int)Module.ModuleEvent.OnOpenScene, OnOpenScene);
+            module.RemoveEventListener((int)Module.ModuleEvent.OnCloseScene, OnCloseScene);
             dialog?.Dispose();
         }
     }

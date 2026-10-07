@@ -8,18 +8,18 @@ namespace Nekki.SF2.GUI.Menu
 {
 	public class MenuMoneyPanel : SFMonoBehaviour<object>
 	{
-		public enum HGPAPGPHFFH
+		public enum MenuMoneyPanelEvent
 		{
 			onRubyBtnClicked = 0
 		}
 
-		public enum BGOFFGFBDEJ
+		public enum ValuesSource
 		{
 			LocalValues = 0,
 			ServerValues = 1
 		}
 
-		private enum GDGGJGEMEHE
+		private enum MoneyViewMode
 		{
 			NormalView = 0,
 			ForgeView = 1
@@ -29,13 +29,13 @@ namespace Nekki.SF2.GUI.Menu
 
 		public const float SALE_ANIM_PAUSE = 5f;
 
-		private GDGGJGEMEHE LBOOAELPANA;
+		private MoneyViewMode viewMode;
 
-		private long PLBBEIGAJEP = -1L;
+		private long rubyCount = -1L;
 
-		private float MLLLPDIIIHN;
+		private float rubyChangeStep;
 
-		private float MALGIPGEANF;
+		private float rubyChangeRemaining;
 
 		[SerializeField]
 		private Text _infoCoins;
@@ -61,23 +61,23 @@ namespace Nekki.SF2.GUI.Menu
 		[SerializeField]
 		private ImageAnimation _picRubySale;
 
-		private long INLLPDEFCGI = -1L;
+		private long saleEndTime = -1L;
 
-		private BGOFFGFBDEJ FNKPJFAMLEH;
+		private ValuesSource valuesSource;
 
 		public void Init()
 		{
-			IPMGLHLKLHK();
-			bool flag = SystemProperties.DBBOCENKMGD();
+			InitRubyButtons();
+			bool flag = SystemProperties.IsDebug();
 			bool flag2 = false;
 			if (flag || flag2)
 			{
 				_btnServerValues.onClick.AddListener(() =>
 				{
-					IJDLFOINEIF();
+					ToggleValuesSource();
 				});
 			}
-			KPKHFKNGAMJ();
+			UpdateCoinsIcon();
 		}
 
 		public void ConfigureCompactTopBar()
@@ -86,55 +86,55 @@ namespace Nekki.SF2.GUI.Menu
 				_iconCoins.rectTransform, _infoCoins.rectTransform, _iconBonus.rectTransform, _infoBonus.rectTransform);
 		}
 
-		private void CHILAIJNEHG()
+		private void RemoveListeners()
 		{
 			_btnServerValues.onClick.RemoveListener(() =>
 			{
-				IJDLFOINEIF();
+				ToggleValuesSource();
 			});
 		}
 
-		private void KPKHFKNGAMJ()
+		private void UpdateCoinsIcon()
 		{
-			if (_iconCoins != null && _iconCoins.get_SpriteName() != ListSF.CCDKHLAMKKO().OGJBDMNBMLJ())
+			if (_iconCoins != null && _iconCoins.get_SpriteName() != ListSF.GetRoster().GetCoinIcon())
 			{
-				_iconCoins.set_SpriteName(ListSF.CCDKHLAMKKO().OGJBDMNBMLJ());
+				_iconCoins.set_SpriteName(ListSF.GetRoster().GetCoinIcon());
 			}
 		}
 
 		public void UpdateValues()
 		{
-			KPKHFKNGAMJ();
-			long num = ListSF.CCDKHLAMKKO().BFBOEGMAMNF();
+			UpdateCoinsIcon();
+			long num = ListSF.GetRoster().GetMoney();
 			_infoCoins.text = num.ToString();
-			long pLBBEIGAJEP = PLBBEIGAJEP;
-			PLBBEIGAJEP = ListSF.CCDKHLAMKKO().EHFJHFDACMP();
-			if (FNKPJFAMLEH != BGOFFGFBDEJ.ServerValues)
+			long pLBBEIGAJEP = rubyCount;
+			rubyCount = ListSF.GetRoster().GetBonus();
+			if (valuesSource != ValuesSource.ServerValues)
 			{
-				_infoBonus.text = PLBBEIGAJEP.ToString();
+				_infoBonus.text = rubyCount.ToString();
 			}
 		}
 
 		public void UpdateRuby()
 		{
 			string empty = string.Empty;
-			if (FNKPJFAMLEH == BGOFFGFBDEJ.LocalValues)
+			if (valuesSource == ValuesSource.LocalValues)
 			{
-				if (MALGIPGEANF != 0f)
+				if (rubyChangeRemaining != 0f)
 				{
-					if (Math.Abs(MALGIPGEANF) > Math.Abs(MLLLPDIIIHN))
+					if (Math.Abs(rubyChangeRemaining) > Math.Abs(rubyChangeStep))
 					{
-						MALGIPGEANF -= MLLLPDIIIHN;
+						rubyChangeRemaining -= rubyChangeStep;
 					}
 					else
 					{
-						MALGIPGEANF = 0f;
+						rubyChangeRemaining = 0f;
 					}
-					empty = ((int)((float)PLBBEIGAJEP - MALGIPGEANF)/*cast due to constrained. prefix*/).ToString();
+					empty = ((int)((float)rubyCount - rubyChangeRemaining)/*cast due to constrained. prefix*/).ToString();
 				}
 				else
 				{
-					empty = PLBBEIGAJEP.ToString();
+					empty = rubyCount.ToString();
 				}
 			}
 			else
@@ -160,26 +160,26 @@ namespace Nekki.SF2.GUI.Menu
 			SetSaleEndTime(bAINMLLIKOL);
 		}
 
-		public void SetRubyBtnPressType(NFOGOFFAPPP.HHGPKAJENGF LFLGCDNKNJI, bool GHJGPAEDIHG)
+		public void SetRubyBtnPressType(ButtonStateExtensions.ButtonPressType LFLGCDNKNJI, bool GHJGPAEDIHG)
 		{
-			_btnRuby.OFPNNIBBNCE(LFLGCDNKNJI, GHJGPAEDIHG);
+			_btnRuby.SetPressType(LFLGCDNKNJI, GHJGPAEDIHG);
 		}
 
-		public void SetServerValuesBtnPressType(NFOGOFFAPPP.HHGPKAJENGF LFLGCDNKNJI, bool GHJGPAEDIHG)
+		public void SetServerValuesBtnPressType(ButtonStateExtensions.ButtonPressType LFLGCDNKNJI, bool GHJGPAEDIHG)
 		{
-			_btnServerValues.OFPNNIBBNCE(LFLGCDNKNJI, GHJGPAEDIHG);
+			_btnServerValues.SetPressType(LFLGCDNKNJI, GHJGPAEDIHG);
 		}
 
 		public void SetNormalViewMode()
 		{
-			LBOOAELPANA = GDGGJGEMEHE.NormalView;
+			viewMode = MoneyViewMode.NormalView;
 			_iconCoins.gameObject.SetActive(true);
 			_infoCoins.gameObject.SetActive(true);
 		}
 
 		public void SetForgeViewMode()
 		{
-			LBOOAELPANA = GDGGJGEMEHE.ForgeView;
+			viewMode = MoneyViewMode.ForgeView;
 			_iconCoins.gameObject.SetActive(false);
 			_infoCoins.gameObject.SetActive(false);
 		}
@@ -203,53 +203,53 @@ namespace Nekki.SF2.GUI.Menu
 			return _btnServerValues;
 		}
 
-		public BGOFFGFBDEJ GetValuesSource()
+		public ValuesSource GetValuesSource()
 		{
-			return FNKPJFAMLEH;
+			return valuesSource;
 		}
 
-		public void SetValuesSource(BGOFFGFBDEJ PPJEFKEKAAC)
+		public void SetValuesSource(ValuesSource PPJEFKEKAAC)
 		{
-			FNKPJFAMLEH = PPJEFKEKAAC;
+			valuesSource = PPJEFKEKAAC;
 			UpdateValues();
 		}
 
-		private void IPMGLHLKLHK()
+		private void InitRubyButtons()
 		{
-			_btnRuby.onClick.AddListener(FANJLLMEOEJ);
-			_btnGoToShop.onClick.AddListener(FANJLLMEOEJ);
+			_btnRuby.onClick.AddListener(OnRubyButtonClicked);
+			_btnGoToShop.onClick.AddListener(OnRubyButtonClicked);
 		}
 
-		private void FANJLLMEOEJ()
+		private void OnRubyButtonClicked()
 		{
 			_btnRuby.enabled = false;
-			MainMenu.BGGGJCMEGPH bGGGJCMEGPH = MainMenu.BGGGJCMEGPH.MENU_MONEY;
+			MainMenu.MenuButtonType bGGGJCMEGPH = MainMenu.MenuButtonType.MENU_MONEY;
 			CallEvent(0, bGGGJCMEGPH);
 		}
 
-		private void IJDLFOINEIF()
+		private void ToggleValuesSource()
 		{
-			if (FNKPJFAMLEH == BGOFFGFBDEJ.LocalValues)
+			if (valuesSource == ValuesSource.LocalValues)
 			{
-				SetValuesSource(BGOFFGFBDEJ.ServerValues);
+				SetValuesSource(ValuesSource.ServerValues);
 			}
 			else
 			{
-				SetValuesSource(BGOFFGFBDEJ.LocalValues);
+				SetValuesSource(ValuesSource.LocalValues);
 			}
 			UpdateRubySale();
 		}
 
 		private void SetSaleEndTime(long value)
 		{
-			if (INLLPDEFCGI != value)
+			if (saleEndTime != value)
 			{
-				INLLPDEFCGI = value;
+				saleEndTime = value;
 				bool flag = false;
 			}
 		}
 
-		private void FLICCNJBGDH(float data)
+		private void OnSaleAnimationUpdate(float data)
 		{
 		}
 	}

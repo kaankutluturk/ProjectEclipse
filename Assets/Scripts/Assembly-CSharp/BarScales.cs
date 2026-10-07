@@ -3,31 +3,31 @@ using System.Xml;
 
 public class BarScales
 {
-	public List<BarScale> JLIHKBCLKFH = new List<BarScale>();
+	public List<BarScale> Scales = new List<BarScale>();
 
 	public void Parse(XmlNode node)
 	{
-		JLIHKBCLKFH.Clear();
+		Scales.Clear();
 		foreach (XmlNode childNode in node.ChildNodes)
 		{
 			BarScale bABKPEHINKF = new BarScale();
-			bABKPEHINKF.Name = childNode.Attributes["Name"].CIPOICEEIBK();
+			bABKPEHINKF.Name = childNode.Attributes["Name"].GetStringOrDefault();
 			XmlNode oEOOHNMCBOC = childNode["AttributeLimits"];
-			bABKPEHINKF.LIJGBNNAMKK(oEOOHNMCBOC, bABKPEHINKF.PJGDPHKNCIG);
+			bABKPEHINKF.ParseLimits(oEOOHNMCBOC, bABKPEHINKF.AttributeLimits);
 			XmlNode oEOOHNMCBOC2 = childNode["ItemLimits"];
-			bABKPEHINKF.LIJGBNNAMKK(oEOOHNMCBOC2, bABKPEHINKF.PBMLLNANNKA);
+			bABKPEHINKF.ParseLimits(oEOOHNMCBOC2, bABKPEHINKF.ItemLimits);
 			XmlAttribute cJBEMNNNHDM = childNode.Attributes["Power"];
-			bABKPEHINKF.MFGLDPKEDJB = cJBEMNNNHDM.ParseFloat(-1f);
+			bABKPEHINKF.Power = cJBEMNNNHDM.ParseFloat(-1f);
 			XmlAttribute cJBEMNNNHDM2 = childNode.Attributes["Min"];
-			bABKPEHINKF.DPGMCKCDMBC = cJBEMNNNHDM2.ParseFloat(-1f);
+			bABKPEHINKF.MinPower = cJBEMNNNHDM2.ParseFloat(-1f);
 			XmlAttribute cJBEMNNNHDM3 = childNode.Attributes["Type"];
-			bABKPEHINKF.Type = cJBEMNNNHDM3.CIPOICEEIBK();
-			JLIHKBCLKFH.Add(bABKPEHINKF);
+			bABKPEHINKF.Type = cJBEMNNNHDM3.GetStringOrDefault();
+			Scales.Add(bABKPEHINKF);
 		}
 	}
 
-	public BarScale HNECOCDPENN(string name)
+	public BarScale GetScaleByName(string name)
 	{
-		return JLIHKBCLKFH.Find((BarScale DHDMNHCIPEH) => DHDMNHCIPEH.Name.Equals(name));
+		return Scales.Find((BarScale DHDMNHCIPEH) => DHDMNHCIPEH.Name.Equals(name));
 	}
 }

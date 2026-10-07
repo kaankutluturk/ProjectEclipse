@@ -16,12 +16,12 @@ namespace YamlDotNet.Core
 			}
 		}
 
-		public void JFGNCJCOCJA(T item)
+		public void Enqueue(T item)
 		{
 			items.Add(item);
 		}
 
-		public T HBPLGGGBDAB()
+		public T Dequeue()
 		{
 			if (Count == 0)
 			{

@@ -2,29 +2,29 @@ using System.Xml;
 
 public class DescriptionRule : Rule
 {
-	private string NBJPNBAGMDD = string.Empty;
+	private string _alias = string.Empty;
 
-	public string HBCNKNFPAIM
+	public string DescriptionAlias
 	{
 		get
 		{
-			return MIDPFGENBCF();
+			return GetDescriptionAlias();
 		}
 	}
 
 	public DescriptionRule(XmlNode node)
-		: base(BCBLLMPAMLP.RuleDescription, node)
+		: base(RuleType.RuleDescription, node)
 	{
 		Parse(node);
 	}
 
-	public string MIDPFGENBCF()
+	public string GetDescriptionAlias()
 	{
-		return NBJPNBAGMDD;
+		return _alias;
 	}
 
 	protected override void Parse(XmlNode node)
 	{
-		NBJPNBAGMDD = node.Attributes["Alias"].CIPOICEEIBK(string.Empty);
+		_alias = node.Attributes["Alias"].GetStringOrDefault(string.Empty);
 	}
 }

@@ -27,25 +27,25 @@ namespace BestHTTP
 			}
 			catch
 			{
-				HTTPManager.MBBMPNDDPIH().Error("HTTPUpdateDelegator", "Please call the BestHTTP.HTTPManager.Setup() from one of Unity's event(eg. awake, start) before you send any request!");
+				HTTPManager.GetLogger().Error("HTTPUpdateDelegator", "Please call the BestHTTP.HTTPManager.Setup() from one of Unity's event(eg. awake, start) before you send any request!");
 			}
 		}
 
 		private void Awake()
 		{
-			HTTPCacheService.KDACPEKJHPP();
-			CookieJar.ELIJOFFHEBP();
+			HTTPCacheService.SetupCacheFolder();
+			CookieJar.SetupFolder();
 			CookieJar.Load();
 		}
 
 		private void Update()
 		{
-			HTTPManager.LCNANNAJNGG();
+			HTTPManager.OnUpdate();
 		}
 
 		private void OnApplicationQuit()
 		{
-			HTTPManager.HIGDMAPIOON();
+			HTTPManager.OnQuit();
 		}
 	}
 }

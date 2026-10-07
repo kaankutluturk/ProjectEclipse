@@ -2,25 +2,25 @@ using System.Xml;
 
 public class ConditionCounter
 {
-	public enum FELOFIAKFCO
+	public enum CounterConditionType
 	{
 		NONE = 0,
 		BATTLE = 1,
 		OPERATOR = 2
 	}
 
-	protected FELOFIAKFCO OPKOJKOCIDJ;
+	protected CounterConditionType _conditionType;
 
 	protected bool _isNot;
 
-	public ConditionCounter(FELOFIAKFCO LFLGCDNKNJI)
+	public ConditionCounter(CounterConditionType LFLGCDNKNJI)
 	{
-		OPKOJKOCIDJ = LFLGCDNKNJI;
+		_conditionType = LFLGCDNKNJI;
 	}
 
 	public virtual bool IsEqual(CounterConditions conditions)
 	{
-		LLLOJBFMONN.Error("ERROR: Unknown condition type checked: %i", OPKOJKOCIDJ);
+		GameLog.Error("ERROR: Unknown condition type checked: %i", _conditionType);
 		return false;
 	}
 
@@ -29,7 +29,7 @@ public class ConditionCounter
 		return _isNot ? (!DCJLKCFKCOM) : DCJLKCFKCOM;
 	}
 
-	public virtual void AEPHNNABOEK()
+	public virtual void Initialize()
 	{
 	}
 

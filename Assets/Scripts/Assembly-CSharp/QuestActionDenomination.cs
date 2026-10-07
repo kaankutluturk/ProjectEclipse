@@ -2,37 +2,37 @@ using System.Xml;
 
 public class QuestActionDenomination : QuestAction
 {
-	private int CFNNEGHPCMN;
+	private int denominationDigits;
 
-	private string NBBNANIILBL = "MiscSprites.gold";
+	private string coinIcon = "MiscSprites.gold";
 
 	public override void Parse(XmlNode EPKLCPOEELO)
 	{
 		base.Parse(EPKLCPOEELO);
-		CFNNEGHPCMN = EPKLCPOEELO.Attributes["DenominationDigits"].ParseInt(-1);
-		NBBNANIILBL = EPKLCPOEELO.Attributes["CoinIcon"].CIPOICEEIBK(string.Empty);
+		denominationDigits = EPKLCPOEELO.Attributes["DenominationDigits"].ParseInt(-1);
+		coinIcon = EPKLCPOEELO.Attributes["CoinIcon"].GetStringOrDefault(string.Empty);
 	}
 
-	public override void DEJMHFMLKIC(QuestParameters GFIHPBCEEOB)
+	public override void Execute(QuestParameters GFIHPBCEEOB)
 	{
-		base.DEJMHFMLKIC(GFIHPBCEEOB);
-		int nPFOBKBJAOB = ListSF.CCDKHLAMKKO().NPGECMDDNFO();
-		ListSF.CCDKHLAMKKO().KGEHCFADNLI(CFNNEGHPCMN);
-		ListSF.CCDKHLAMKKO().HEIPPEGBOCK(NBBNANIILBL);
-		JEGCABAHHHJ(nPFOBKBJAOB);
-		MenuController.OPPMFDNNBDE();
-		ScreenType iPKNDMINFMJ = Module.GetInstance().DMCJGOMOJEF.ScreenType;
+		base.Execute(GFIHPBCEEOB);
+		int nPFOBKBJAOB = ListSF.GetRoster().GetDenominationDigits();
+		ListSF.GetRoster().SetDenominationDigits(denominationDigits);
+		ListSF.GetRoster().SetCoinIcon(coinIcon);
+		ApplyDenomination(nPFOBKBJAOB);
+		MenuController.RecreateMoney();
+		ScreenType iPKNDMINFMJ = Module.GetInstance().ScreenInfo.ScreenType;
 		if (iPKNDMINFMJ != ScreenType.ModuleFight)
 		{
-			Module.DLOKJOHNDID(iPKNDMINFMJ);
+			Module.OpenScreen(iPKNDMINFMJ);
 		}
 		ListSF.GetInstance().OnAuthenticate(true);
-		OGIJONMKABB();
+		FinishAction();
 	}
 
-	private void JEGCABAHHHJ(int NPFOBKBJAOB)
+	private void ApplyDenomination(int NPFOBKBJAOB)
 	{
 		ItemInfo.DenominateItems(NPFOBKBJAOB);
-		ListSF.CCDKHLAMKKO().FHCPEIGMGMK(NPFOBKBJAOB);
+		ListSF.GetRoster().RescaleCurrencyDenomination(NPFOBKBJAOB);
 	}
 }

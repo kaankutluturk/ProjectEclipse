@@ -7,7 +7,7 @@ namespace Nekki.SF2.GUI.Menu
 {
 	public class MenuScroll : SFMonoBehaviour<object>, IEventSystemHandler, IBeginDragHandler, IDragHandler, IEndDragHandler
 	{
-		public enum HOIFAHAFGAN
+		public enum MenuScrollEvent
 		{
 			OnOpen = 0,
 			OnClose = 1,
@@ -16,13 +16,13 @@ namespace Nekki.SF2.GUI.Menu
 			OnTouch = 4
 		}
 
-		public enum GLLGENPACJB
+		public enum ScrollOrientation
 		{
 			Horizontal = 0,
 			Vertical = 1
 		}
 
-		public enum ANJKEGGALAG
+		public enum ScrollState
 		{
 			ScrollNone = 0,
 			ScrollOpen = 1,
@@ -31,7 +31,7 @@ namespace Nekki.SF2.GUI.Menu
 			ScrollClosinig = 4
 		}
 
-		private enum BMGEOPAACDB
+		private enum MenuScrollLayer
 		{
 			ZBackground = 0,
 			ZPaper = 1,
@@ -47,15 +47,15 @@ namespace Nekki.SF2.GUI.Menu
 
 		public bool IsOpen;
 
-		public ANJKEGGALAG CurScrollState;
+		public ScrollState CurScrollState;
 
-		private float LNINNFMPDBN;
+		private float unusedFloat;
 
-		private float AFBEKDGHAJB;
+		private float expandedLength;
 
-		private float DBPDGHMCCIH = 10f;
+		private float dragThresholdPercent = 10f;
 
-		private GLLGENPACJB _type;
+		private ScrollOrientation _type;
 
 		[SerializeField]
 		private Button _wheel;
@@ -66,73 +66,73 @@ namespace Nekki.SF2.GUI.Menu
 		[SerializeField]
 		private Image _background;
 
-		private float KHDCPBMEMIE = 1f;
+		private float backgroundAlphaScale = 1f;
 
 		private Vector2 _touchPoint;
 
-		private bool EDMOOGBMKNA;
+		private bool isExpanded;
 
-		private bool IHMDFGALDOA;
+		private bool isDragging;
 
-		private bool MNKJBHOHCFL;
+		private bool allowRolling;
 
-		private bool BMGKBJEFDJG;
+		private bool closeOnBackgroundClick;
 
 		private Tween _tween;
 
-		public void Init(GLLGENPACJB LFLGCDNKNJI = GLLGENPACJB.Vertical)
+		public void Init(ScrollOrientation LFLGCDNKNJI = ScrollOrientation.Vertical)
 		{
 			_type = LFLGCDNKNJI;
-			AFBEKDGHAJB = GetCurrentLength();
-			MNKJBHOHCFL = true;
+			expandedLength = GetCurrentLength();
+			allowRolling = true;
 			IsOpen = false;
-			BMGKBJEFDJG = true;
-			IHMDFGALDOA = false;
-			CurScrollState = ANJKEGGALAG.ScrollNone;
+			closeOnBackgroundClick = true;
+			isDragging = false;
+			CurScrollState = ScrollState.ScrollNone;
 			float a = _background.color.a;
-			KHDCPBMEMIE = 255f / a;
+			backgroundAlphaScale = 255f / a;
 			Collapse(0f);
 		}
 
 		public void Expand(float _Duration)
 		{
-			EDMOOGBMKNA = true;
-			NKIIGBBMNNL(AFBEKDGHAJB, _Duration);
+			isExpanded = true;
+			AnimateToLength(expandedLength, _Duration);
 		}
 
 		public void Collapse(float _Duration)
 		{
-			EDMOOGBMKNA = false;
-			NKIIGBBMNNL(0f, _Duration);
+			isExpanded = false;
+			AnimateToLength(0f, _Duration);
 		}
 
-		private void NKIIGBBMNNL(float GGAIEIDOEAD, float _Duration)
+		private void AnimateToLength(float GGAIEIDOEAD, float _Duration)
 		{
 			KillTween();
 			if (_Duration <= 0f)
 			{
-				HNNCMDONLMO(GGAIEIDOEAD);
+				SetLength(GGAIEIDOEAD);
 				return;
 			}
 			_tween = DOTween.To(() => GetCurrentLength(), (float ECHIHNECKFK) =>
 			{
-				HNNCMDONLMO(ECHIHNECKFK);
+				SetLength(ECHIHNECKFK);
 			}, GGAIEIDOEAD, _Duration);
 		}
 
 		public bool IsExpanded()
 		{
-			return EDMOOGBMKNA;
+			return isExpanded;
 		}
 
 		public void SetOutsideTouchProperties(bool NEHLEJGGCIE)
 		{
-			BMGKBJEFDJG = NEHLEJGGCIE;
+			closeOnBackgroundClick = NEHLEJGGCIE;
 		}
 
 		public float GetCurrentLength()
 		{
-			if (_type == GLLGENPACJB.Vertical)
+			if (_type == ScrollOrientation.Vertical)
 			{
 				return base.gameObject.GetComponent<RectTransform>().rect.height;
 			}
@@ -141,12 +141,12 @@ namespace Nekki.SF2.GUI.Menu
 
 		public void SetAllowRolling(bool value)
 		{
-			MNKJBHOHCFL = value;
+			allowRolling = value;
 		}
 
 		public bool GetAllowRolling()
 		{
-			return MNKJBHOHCFL;
+			return allowRolling;
 		}
 
 		public Button GetButton()
@@ -158,15 +158,15 @@ namespace Nekki.SF2.GUI.Menu
 		{
 		}
 
-		private void HNNCMDONLMO(float BDBOAEGELMC)
+		private void SetLength(float BDBOAEGELMC)
 		{
 			if (BDBOAEGELMC < 0f)
 			{
 				BDBOAEGELMC = 0f;
 			}
 			bool flag = BDBOAEGELMC == 0f;
-			bool flag2 = Mathf.Abs(BDBOAEGELMC) == Mathf.Abs(AFBEKDGHAJB);
-			if (_type == GLLGENPACJB.Vertical)
+			bool flag2 = Mathf.Abs(BDBOAEGELMC) == Mathf.Abs(expandedLength);
+			if (_type == ScrollOrientation.Vertical)
 			{
 				base.gameObject.GetComponent<RectTransform>().sizeDelta = new Vector2(base.gameObject.GetComponent<RectTransform>().rect.width, BDBOAEGELMC);
 			}
@@ -174,29 +174,29 @@ namespace Nekki.SF2.GUI.Menu
 			{
 				base.gameObject.GetComponent<RectTransform>().sizeDelta = new Vector2(BDBOAEGELMC, base.gameObject.GetComponent<RectTransform>().rect.height);
 			}
-			EAGCKGDFILH();
-			if (flag && CurScrollState != ANJKEGGALAG.ScrollClose)
+			UpdateBackgroundAlpha();
+			if (flag && CurScrollState != ScrollState.ScrollClose)
 			{
-				CurScrollState = ANJKEGGALAG.ScrollClose;
+				CurScrollState = ScrollState.ScrollClose;
 				CallEvent(2, false);
 				CallEvent(1, 0);
 			}
-			else if (flag2 && CurScrollState != ANJKEGGALAG.ScrollOpen)
+			else if (flag2 && CurScrollState != ScrollState.ScrollOpen)
 			{
-				CurScrollState = ANJKEGGALAG.ScrollOpen;
+				CurScrollState = ScrollState.ScrollOpen;
 				CallEvent(2, true);
 				CallEvent(0, 0);
 			}
 			else if (!flag && !flag2)
 			{
-				CurScrollState = ANJKEGGALAG.ScrollNone;
+				CurScrollState = ScrollState.ScrollNone;
 			}
 			CallEvent(3, CurScrollState);
 		}
 
 		public void OnMenuBtnClick()
 		{
-			if (EDMOOGBMKNA)
+			if (isExpanded)
 			{
 				Collapse(0.3f);
 			}
@@ -208,16 +208,16 @@ namespace Nekki.SF2.GUI.Menu
 
 		public void OnBackgroundClick()
 		{
-			if (BMGKBJEFDJG)
+			if (closeOnBackgroundClick)
 			{
 				Collapse(0.3f);
 			}
 		}
 
-		private void EAGCKGDFILH()
+		private void UpdateBackgroundAlpha()
 		{
-			float num = Mathf.Abs(GetCurrentLength() / AFBEKDGHAJB) * 255f;
-			float num2 = num / KHDCPBMEMIE;
+			float num = Mathf.Abs(GetCurrentLength() / expandedLength) * 255f;
+			float num2 = num / backgroundAlphaScale;
 			_background.color = new Color(_background.color.r, _background.color.g, _background.color.b, num2);
 			if (num2 == 0f && _background.raycastTarget)
 			{
@@ -238,10 +238,10 @@ namespace Nekki.SF2.GUI.Menu
 		{
 			Vector2 localPoint;
 			RectTransformUtility.ScreenPointToLocalPointInRectangle(GetComponent<RectTransform>(), BHOLFGOGPCP.position, BHOLFGOGPCP.pressEventCamera, out localPoint);
-			if (MNKJBHOHCFL || IsTouchOnWheel(localPoint))
+			if (allowRolling || IsTouchOnWheel(localPoint))
 			{
 				_touchPoint = localPoint;
-				IHMDFGALDOA = true;
+				isDragging = true;
 				KillTween();
 				CallEvent(4, 0);
 			}
@@ -251,23 +251,23 @@ namespace Nekki.SF2.GUI.Menu
 		{
 			Vector2 localPoint;
 			RectTransformUtility.ScreenPointToLocalPointInRectangle(GetComponent<RectTransform>(), BHOLFGOGPCP.position, BHOLFGOGPCP.pressEventCamera, out localPoint);
-			if (IHMDFGALDOA)
+			if (isDragging)
 			{
 				float num = _touchPoint.x - localPoint.x;
 				float num2 = _touchPoint.y - localPoint.y;
-				float a = GetCurrentLength() + ((_type != GLLGENPACJB.Vertical) ? num : num2);
-				HNNCMDONLMO(Mathf.Min(a, AFBEKDGHAJB));
+				float a = GetCurrentLength() + ((_type != ScrollOrientation.Vertical) ? num : num2);
+				SetLength(Mathf.Min(a, expandedLength));
 				_touchPoint = localPoint;
 			}
 		}
 
 		public void OnEndDrag(PointerEventData BHOLFGOGPCP)
 		{
-			IHMDFGALDOA = false;
-			float num = ((!EDMOOGBMKNA) ? GetCurrentLength() : (AFBEKDGHAJB - GetCurrentLength()));
-			bool flag = num > AFBEKDGHAJB * DBPDGHMCCIH / 100f;
-			bool flag2 = EDMOOGBMKNA != flag;
-			float dFNBHOEGAHO = ((!flag2) ? GetCurrentLength() : (AFBEKDGHAJB - GetCurrentLength())) / AFBEKDGHAJB * 0.3f;
+			isDragging = false;
+			float num = ((!isExpanded) ? GetCurrentLength() : (expandedLength - GetCurrentLength()));
+			bool flag = num > expandedLength * dragThresholdPercent / 100f;
+			bool flag2 = isExpanded != flag;
+			float dFNBHOEGAHO = ((!flag2) ? GetCurrentLength() : (expandedLength - GetCurrentLength())) / expandedLength * 0.3f;
 			if (flag2)
 			{
 				Expand(dFNBHOEGAHO);

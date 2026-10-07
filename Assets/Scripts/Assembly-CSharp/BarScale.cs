@@ -3,39 +3,39 @@ using System.Xml;
 
 public class BarScale
 {
-	public List<Limit> PJGDPHKNCIG = new List<Limit>();
+	public List<Limit> AttributeLimits = new List<Limit>();
 
-	public List<Limit> PBMLLNANNKA = new List<Limit>();
+	public List<Limit> ItemLimits = new List<Limit>();
 
 	public string Name;
 
 	public string Type;
 
-	public float MFGLDPKEDJB;
+	public float Power;
 
-	public float DPGMCKCDMBC;
+	public float MinPower;
 
-	public Limit EHKJEKAIDFF(int GNLOCMLBNHF)
+	public Limit GetItemLimitForLevel(int GNLOCMLBNHF)
 	{
-		return PBMLLNANNKA.Find((Limit DHDMNHCIPEH) => DHDMNHCIPEH.Levels.Contains(GNLOCMLBNHF));
+		return ItemLimits.Find((Limit DHDMNHCIPEH) => DHDMNHCIPEH.Levels.Contains(GNLOCMLBNHF));
 	}
 
-	public Limit NMMHOKHKFEE()
+	public Limit GetDefaultItemLimit()
 	{
-		return PBMLLNANNKA.Find((Limit DHDMNHCIPEH) => DHDMNHCIPEH.Levels.Count == 0);
+		return ItemLimits.Find((Limit DHDMNHCIPEH) => DHDMNHCIPEH.Levels.Count == 0);
 	}
 
-	public Limit GPBFMLDPOKH(int GNLOCMLBNHF)
+	public Limit GetAttributeLimitForLevel(int GNLOCMLBNHF)
 	{
-		return PJGDPHKNCIG.Find((Limit DHDMNHCIPEH) => DHDMNHCIPEH.Levels.Contains(GNLOCMLBNHF));
+		return AttributeLimits.Find((Limit DHDMNHCIPEH) => DHDMNHCIPEH.Levels.Contains(GNLOCMLBNHF));
 	}
 
-	public Limit IKEBHGKBGHO()
+	public Limit GetDefaultAttributeLimit()
 	{
-		return PJGDPHKNCIG.Find((Limit DHDMNHCIPEH) => DHDMNHCIPEH.Levels.Count == 0);
+		return AttributeLimits.Find((Limit DHDMNHCIPEH) => DHDMNHCIPEH.Levels.Count == 0);
 	}
 
-	public void LIJGBNNAMKK(XmlNode OEOOHNMCBOC, List<Limit> AJKECEDPPDC)
+	public void ParseLimits(XmlNode OEOOHNMCBOC, List<Limit> AJKECEDPPDC)
 	{
 		if (OEOOHNMCBOC == null)
 		{
@@ -49,11 +49,11 @@ public class BarScale
 			XmlAttribute xmlAttribute = childNode.Attributes["Level"];
 			XmlAttribute cJBEMNNNHDM3 = childNode.Attributes["LevelMultiplier"];
 			XmlAttribute cJBEMNNNHDM4 = childNode.Attributes["Shift"];
-			pEKGEPHFCMN.OBGGBMDABAD = cJBEMNNNHDM.ParseInt(-1);
-			pEKGEPHFCMN.NGPJDHKOEJC = cJBEMNNNHDM2.ParseInt(-1);
+			pEKGEPHFCMN.LeftLimit = cJBEMNNNHDM.ParseInt(-1);
+			pEKGEPHFCMN.RightLimit = cJBEMNNNHDM2.ParseInt(-1);
 			if (xmlAttribute != null)
 			{
-				string text = xmlAttribute.CIPOICEEIBK();
+				string text = xmlAttribute.GetStringOrDefault();
 				if (!string.IsNullOrEmpty(text))
 				{
 					string[] array = text.Split('|');

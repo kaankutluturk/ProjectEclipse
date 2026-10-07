@@ -3,32 +3,32 @@ using System.Xml;
 
 public class ConditionInterval : ConditionAnimation
 {
-	private IntervalAnimation.NGAJJDIEDGF KCIIELDOBOM;
+	private IntervalAnimation.IntervalType _intervalType;
 
 	private string _Name;
 
 	public ConditionInterval(XmlNode node)
 		: base(ConditionType.CURRENT_INTERVAL)
 	{
-		_Name = node.Attributes["Name"].CIPOICEEIBK(string.Empty);
+		_Name = node.Attributes["Name"].GetStringOrDefault(string.Empty);
 		if (node.Attributes["Type"] != null)
 		{
-			switch (node.Attributes["Type"].CIPOICEEIBK(string.Empty))
+			switch (node.Attributes["Type"].GetStringOrDefault(string.Empty))
 			{
 			case "Attack":
-				KCIIELDOBOM = IntervalAnimation.NGAJJDIEDGF.INTERVAL_ATTACK;
+				_intervalType = IntervalAnimation.IntervalType.INTERVAL_ATTACK;
 				break;
 			case "Block":
-				KCIIELDOBOM = IntervalAnimation.NGAJJDIEDGF.INTERVAL_BLOCK;
+				_intervalType = IntervalAnimation.IntervalType.INTERVAL_BLOCK;
 				break;
 			case "Invulnerable":
-				KCIIELDOBOM = IntervalAnimation.NGAJJDIEDGF.INTERVAL_INVULNERABLE;
+				_intervalType = IntervalAnimation.IntervalType.INTERVAL_INVULNERABLE;
 				break;
 			}
 		}
 		else
 		{
-			KCIIELDOBOM = IntervalAnimation.NGAJJDIEDGF.INTERVAL_NONE;
+			_intervalType = IntervalAnimation.IntervalType.INTERVAL_NONE;
 		}
 	}
 
@@ -40,7 +40,7 @@ public class ConditionInterval : ConditionAnimation
 		{
 			foreach (IntervalAnimation item in cAANBJEPGAA)
 			{
-				if ((KCIIELDOBOM == IntervalAnimation.NGAJJDIEDGF.INTERVAL_NONE || KCIIELDOBOM == item.Type) && (_Name == string.Empty || item.Name == _Name))
+				if ((_intervalType == IntervalAnimation.IntervalType.INTERVAL_NONE || _intervalType == item.Type) && (_Name == string.Empty || item.Name == _Name))
 				{
 					flag = true;
 					break;
@@ -52,16 +52,16 @@ public class ConditionInterval : ConditionAnimation
 
 	private List<IntervalAnimation> GetIntervals(ModelConditions conditions)
 	{
-		switch (OOFFOILONLO)
+		switch (_targetModelType)
 		{
-		case ModelType.KEIDBIOIFGA.MODEL_THIS:
+		case ModelType.ModelTargetType.MODEL_THIS:
 			return conditions.Intervals;
-		case ModelType.KEIDBIOIFGA.MODEL_OTHER:
-			return conditions.FJFOIEFFMEM;
-		case ModelType.KEIDBIOIFGA.MODEL_PARENT:
-			return conditions.JLCFPNDDGCJ;
+		case ModelType.ModelTargetType.MODEL_OTHER:
+			return conditions.OtherIntervals;
+		case ModelType.ModelTargetType.MODEL_PARENT:
+			return conditions.ParentIntervals;
 		default:
-			LLLOJBFMONN.Error("ConditionCurrentAnimation: getAnimationNames - wrong type: {0}", OOFFOILONLO.ToString());
+			GameLog.Error("ConditionCurrentAnimation: getAnimationNames - wrong type: {0}", _targetModelType.ToString());
 			return conditions.Intervals;
 		}
 	}

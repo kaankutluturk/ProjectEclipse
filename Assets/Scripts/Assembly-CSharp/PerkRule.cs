@@ -2,36 +2,36 @@ using System.Xml;
 
 public class PerkRule : InFightRule
 {
-	private PerkInfoItem ILJJPHHDIJI;
+	private PerkInfoItem perk;
 
 	public PerkRule(XmlNode node, RuleAppliance EJPOJJKKICO)
-		: base(BCBLLMPAMLP.RulePerk, EJPOJJKKICO, node)
+		: base(RuleType.RulePerk, EJPOJJKKICO, node)
 	{
-		ILJJPHHDIJI = null;
+		perk = null;
 		Parse(node);
 	}
 
-	public PerkInfoItem GNIICEKAJKC()
+	public PerkInfoItem GetPerk()
 	{
-		return ILJJPHHDIJI;
+		return perk;
 	}
 
 	protected override void Parse(XmlNode node)
 	{
 		base.Parse(node);
-		string gOHIIMFFFJI = node.Attributes["Name"].CIPOICEEIBK(string.Empty);
-		ILJJPHHDIJI = GameUtils.FDEJIIDIPBI.ABAGJKMKCBA(gOHIIMFFFJI);
-		if (ILJJPHHDIJI != null)
+		string gOHIIMFFFJI = node.Attributes["Name"].GetStringOrDefault(string.Empty);
+		perk = GameUtils.PerkItemList.FindBasePerk(gOHIIMFFFJI);
+		if (perk != null)
 		{
-			ILJJPHHDIJI = ILJJPHHDIJI.Clone(node["Set"], node["RatingEvaluation"]);
+			perk = perk.Clone(node["Set"], node["RatingEvaluation"]);
 		}
 	}
 
 	public override InFightRule Copy()
 	{
 		InFightRule aAJIFBJLJOA = null;
-		RuleAppliance eJPOJJKKICO = EDAKADCHOLE();
-		XmlNode hKPPBKPJOEO = GIFDJEEGCJI().IOJIGDNFCFL();
+		RuleAppliance eJPOJJKKICO = GetAppliance();
+		XmlNode hKPPBKPJOEO = GetXmlSource().GetNode();
 		aAJIFBJLJOA = new PerkRule(hKPPBKPJOEO, eJPOJJKKICO);
 		aAJIFBJLJOA.IsRandom = IsRandom;
 		return aAJIFBJLJOA;

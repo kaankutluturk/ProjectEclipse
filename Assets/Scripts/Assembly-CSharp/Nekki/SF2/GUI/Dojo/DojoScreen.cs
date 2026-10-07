@@ -7,19 +7,19 @@ namespace Nekki.SF2.GUI.Dojo
 			base.Init();
 		}
 
-		protected override void PJNFHNFLNNO()
+		protected override void OnModuleShutdown()
 		{
-			base.PJNFHNFLNNO();
+			base.OnModuleShutdown();
 		}
 
-		protected override void FKEGAGCFPNI()
+		protected override void OnModuleActivatedHook()
 		{
-			base.FKEGAGCFPNI();
+			base.OnModuleActivatedHook();
 		}
 
-		protected override void FKJHCGLMGLF()
+		protected override void OnModuleDeactivatedHook()
 		{
-			base.FKJHCGLMGLF();
+			base.OnModuleDeactivatedHook();
 		}
 	}
 }

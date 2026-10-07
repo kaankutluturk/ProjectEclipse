@@ -2,32 +2,32 @@ public class SwitchForm
 {
 	public string IDString;
 
-	public EGGHFJMOPCE Type;
+	public SwitchType Type;
 
 	public bool Multi;
 
-	public int DJIJIHHBHHP;
+	public int MinLen;
 
-	public int BEIECNAFPJJ;
+	public int MaxLen;
 
-	public string HKJPFMBPOJO;
+	public string PostCharSet;
 
-	public SwitchForm(string FBEJCDFPDLD, EGGHFJMOPCE LFLGCDNKNJI, bool IJMDFIKBJAG, int GNKCLPKOEBL, int FJLKBBJCLHD, string PHBJBABMEPL)
+	public SwitchForm(string FBEJCDFPDLD, SwitchType LFLGCDNKNJI, bool IJMDFIKBJAG, int GNKCLPKOEBL, int FJLKBBJCLHD, string PHBJBABMEPL)
 	{
 		IDString = FBEJCDFPDLD;
 		Type = LFLGCDNKNJI;
 		Multi = IJMDFIKBJAG;
-		DJIJIHHBHHP = GNKCLPKOEBL;
-		BEIECNAFPJJ = FJLKBBJCLHD;
-		HKJPFMBPOJO = PHBJBABMEPL;
+		MinLen = GNKCLPKOEBL;
+		MaxLen = FJLKBBJCLHD;
+		PostCharSet = PHBJBABMEPL;
 	}
 
-	public SwitchForm(string FBEJCDFPDLD, EGGHFJMOPCE LFLGCDNKNJI, bool IJMDFIKBJAG, int GNKCLPKOEBL)
+	public SwitchForm(string FBEJCDFPDLD, SwitchType LFLGCDNKNJI, bool IJMDFIKBJAG, int GNKCLPKOEBL)
 		: this(FBEJCDFPDLD, LFLGCDNKNJI, IJMDFIKBJAG, GNKCLPKOEBL, 0, string.Empty)
 	{
 	}
 
-	public SwitchForm(string FBEJCDFPDLD, EGGHFJMOPCE LFLGCDNKNJI, bool IJMDFIKBJAG)
+	public SwitchForm(string FBEJCDFPDLD, SwitchType LFLGCDNKNJI, bool IJMDFIKBJAG)
 		: this(FBEJCDFPDLD, LFLGCDNKNJI, IJMDFIKBJAG, 0)
 	{
 	}

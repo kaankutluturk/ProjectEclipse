@@ -7,13 +7,13 @@ public static class StringExtension
 {
 	private static class FnvConstants
 	{
-		public static readonly uint HCGLGCKEPNP = 16777619u;
+		public static readonly uint Prime32 = 16777619u;
 
-		public static readonly ulong FAHGEEOAIAE = 1099511628211uL;
+		public static readonly ulong Prime64 = 1099511628211uL;
 
-		public static readonly uint CAKLNAJCHEO = 2166136261u;
+		public static readonly uint OffsetBasis32 = 2166136261u;
 
-		public static readonly ulong MGNHGGHADPL = 14695981039346656037uL;
+		public static readonly ulong OffsetBasis64 = 14695981039346656037uL;
 	}
 
 	public static int ToInt(this string IGGFGLLIGCG, int AGADEMLBJGJ = 0)
@@ -46,7 +46,7 @@ public static class StringExtension
 		return AGADEMLBJGJ;
 	}
 
-	public static double ELKAHEHCBAE(this string IGGFGLLIGCG, double AGADEMLBJGJ = 0.0)
+	public static double ToDouble(this string IGGFGLLIGCG, double AGADEMLBJGJ = 0.0)
 	{
 		double result;
 		if (IGGFGLLIGCG != null && double.TryParse(IGGFGLLIGCG, out result))
@@ -56,12 +56,12 @@ public static class StringExtension
 		return AGADEMLBJGJ;
 	}
 
-	public static T DPJBMPMFEFI<T>(this string LIAILCGJBDK)
+	public static T ToEnum<T>(this string LIAILCGJBDK)
 	{
-		return LIAILCGJBDK.DPJBMPMFEFI((T)Enum.GetValues(typeof(T)).GetValue(0));
+		return LIAILCGJBDK.ToEnum((T)Enum.GetValues(typeof(T)).GetValue(0));
 	}
 
-	public static T DPJBMPMFEFI<T>(this string LIAILCGJBDK, T JEALBOJLKFM)
+	public static T ToEnum<T>(this string LIAILCGJBDK, T JEALBOJLKFM)
 	{
 		try
 		{
@@ -79,7 +79,7 @@ public static class StringExtension
 		return Encoding.UTF8.GetString(bytes);
 	}
 
-	public static uint BJPLJICEBGH(this string EMIAKCGJNHP, bool HHOEINLMDAB = false)
+	public static uint GetFnv1aHash(this string EMIAKCGJNHP, bool HHOEINLMDAB = false)
 	{
 		IEnumerable<byte> enumerable = ((!HHOEINLMDAB) ? EMIAKCGJNHP.ToCharArray().Select(Convert.ToByte) : (from ILHDJDNPFKH in EMIAKCGJNHP.ToCharArray()
 			select new byte[2]
@@ -87,11 +87,11 @@ public static class StringExtension
 				(byte)(ILHDJDNPFKH - (byte)ILHDJDNPFKH >> 8),
 				(byte)ILHDJDNPFKH
 			}).SelectMany((byte[] ILHDJDNPFKH) => ILHDJDNPFKH));
-		uint num = FnvConstants.CAKLNAJCHEO;
+		uint num = FnvConstants.OffsetBasis32;
 		foreach (byte item in enumerable)
 		{
 			num ^= item;
-			num *= FnvConstants.HCGLGCKEPNP;
+			num *= FnvConstants.Prime32;
 		}
 		return num;
 	}

@@ -5,43 +5,43 @@ using System.Xml;
 public class PerkAction : PerkObject
 {
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private string HKGHEJDKCPI;
+	private string _name;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private string IHIPCGBIEDI;
+	private string _elementName;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private string HCHALPNMNMK;
+	private string _namespace;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private ActionType KAHHEBMBCFA;
+	private ActionType _type;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private bool IJEKABFBKLF;
+	private bool _modificator;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private PerkTrigger MIDNGGPKKFL;
+	private PerkTrigger _trigger;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private FunctionExtension PJKLJNAGNCJ;
+	private FunctionExtension _frames;
 
-	public string JPHFMOHOPHM
+	public string ElementName
 	{
 		get
 		{
-			return FDEKGNPKJFL();
+			return GetElementName();
 		}
 		protected set
 		{
-			IHMGKCPKCDD(value);
+			SetElementName(value);
 		}
 	}
 
-	public bool FEAHANGDAMK
+	public bool IsModificatorAction
 	{
 		get
 		{
-			return NKAEEFNNBEN();
+			return GetModificator();
 		}
 		protected set
 		{
@@ -49,23 +49,23 @@ public class PerkAction : PerkObject
 		}
 	}
 
-	public PerkTrigger KOMFMPAHNCO
+	public PerkTrigger ActionTrigger
 	{
 		get
 		{
-			return GNDAFILBLIB();
+			return GetTrigger();
 		}
 		protected set
 		{
-			CONNEMFGHMM(value);
+			SetTrigger(value);
 		}
 	}
 
-	public FunctionExtension OCFKLCDIEBF
+	public FunctionExtension FramesFunction
 	{
 		get
 		{
-			return BFJEFNHKPJI();
+			return GetFrames();
 		}
 		protected set
 		{
@@ -81,108 +81,108 @@ public class PerkAction : PerkObject
 		: base(NOLFMPDGCOC)
 	{
 		set_Name(NOLFMPDGCOC.get_Name());
-		IHMGKCPKCDD(NOLFMPDGCOC.FDEKGNPKJFL());
-		set_Namespace(NOLFMPDGCOC.IONIEDIPEGB());
+		SetElementName(NOLFMPDGCOC.GetElementName());
+		set_Namespace(NOLFMPDGCOC.GetNamespace());
 		set_Type(NOLFMPDGCOC.get_Type());
-		set_Modificator(NOLFMPDGCOC.NKAEEFNNBEN());
-		CONNEMFGHMM(NOLFMPDGCOC.GNDAFILBLIB());
-		set_Frames(NOLFMPDGCOC.BFJEFNHKPJI());
+		set_Modificator(NOLFMPDGCOC.GetModificator());
+		SetTrigger(NOLFMPDGCOC.GetTrigger());
+		set_Frames(NOLFMPDGCOC.GetFrames());
 	}
 
 	public string get_Name()
 	{
-		return HKGHEJDKCPI;
+		return _name;
 	}
 
 	protected void set_Name(string value)
 	{
-		HKGHEJDKCPI = value;
+		_name = value;
 	}
 
-	public string FDEKGNPKJFL()
+	public string GetElementName()
 	{
-		return IHIPCGBIEDI;
+		return _elementName;
 	}
 
-	protected void IHMGKCPKCDD(string value)
+	protected void SetElementName(string value)
 	{
-		IHIPCGBIEDI = value;
+		_elementName = value;
 	}
 
-	public string IONIEDIPEGB()
+	public string GetNamespace()
 	{
-		return HCHALPNMNMK;
+		return _namespace;
 	}
 
 	protected void set_Namespace(string value)
 	{
-		HCHALPNMNMK = value;
+		_namespace = value;
 	}
 
 	public ActionType get_Type()
 	{
-		return KAHHEBMBCFA;
+		return _type;
 	}
 
 	protected void set_Type(ActionType value)
 	{
-		KAHHEBMBCFA = value;
+		_type = value;
 	}
 
-	public bool NKAEEFNNBEN()
+	public bool GetModificator()
 	{
-		return IJEKABFBKLF;
+		return _modificator;
 	}
 
 	protected void set_Modificator(bool value)
 	{
-		IJEKABFBKLF = value;
+		_modificator = value;
 	}
 
-	public PerkTrigger GNDAFILBLIB()
+	public PerkTrigger GetTrigger()
 	{
-		return MIDNGGPKKFL;
+		return _trigger;
 	}
 
-	protected void CONNEMFGHMM(PerkTrigger value)
+	protected void SetTrigger(PerkTrigger value)
 	{
-		MIDNGGPKKFL = value;
+		_trigger = value;
 	}
 
-	public FunctionExtension BFJEFNHKPJI()
+	public FunctionExtension GetFrames()
 	{
-		return PJKLJNAGNCJ;
+		return _frames;
 	}
 
 	protected void set_Frames(FunctionExtension value)
 	{
-		PJKLJNAGNCJ = value;
+		_frames = value;
 	}
 
 	public override void Parse(XmlNode node)
 	{
 		base.Parse(node);
-		IHMGKCPKCDD(node.Name);
-		set_Name(node.Attributes["Name"].CIPOICEEIBK(string.Empty));
-		string text = node.Attributes["Frames"].CIPOICEEIBK(string.Empty);
+		SetElementName(node.Name);
+		set_Name(node.Attributes["Name"].GetStringOrDefault(string.Empty));
+		string text = node.Attributes["Frames"].GetStringOrDefault(string.Empty);
 		if (text != null && !text.Equals(string.Empty))
 		{
 			set_Frames(new FunctionExtension());
-			BFJEFNHKPJI().Parse(text);
-			BFJEFNHKPJI().PBPBNENGLPA(JMDLAMHAJLN().HJFEFJIEINN);
-			BFJEFNHKPJI().DMPCFMACDJM(JMDLAMHAJLN().OKPFNCJFLDL);
-			BFJEFNHKPJI().set_Target(this);
+			GetFrames().Parse(text);
+			GetFrames().SetFunctionCallback(GetPerk().EvaluateFunctionCallback);
+			GetFrames().SetVariableCallback(GetPerk().OnFunctionPreCallback);
+			GetFrames().set_Target(this);
 		}
-		set_Namespace(node.Attributes["Namespace"].CIPOICEEIBK(string.Empty));
+		set_Namespace(node.Attributes["Namespace"].GetStringOrDefault(string.Empty));
 	}
 
-	public Model NKLMKGFAGFG(Model ACENLMONNPA)
+	public Model ResolveTargetModel(Model ACENLMONNPA)
 	{
-		if (IHJJBIDMEMB == PlayerType.PLAYER_ME)
+		if (TargetPlayer == PlayerType.PLAYER_ME)
 		{
 			return ACENLMONNPA;
 		}
-		if (IHJJBIDMEMB == PlayerType.PLAYER_ENEMY)
+		if (TargetPlayer == PlayerType.PLAYER_ENEMY)
 		{
 			return ACENLMONNPA.GetCombatTarget();
 		}
@@ -294,8 +294,8 @@ public class PerkAction : PerkObject
 			}
 			if (nPEKHPDCPPO != null)
 			{
-				nPEKHPDCPPO.JMOIMIHPBOM(AEFFHJGMNFI);
-				nPEKHPDCPPO.CONNEMFGHMM(CPBHKJFPFJB);
+				nPEKHPDCPPO.SetPerk(AEFFHJGMNFI);
+				nPEKHPDCPPO.SetTrigger(CPBHKJFPFJB);
 				nPEKHPDCPPO.Parse(childNode);
 				list.Add(nPEKHPDCPPO);
 			}
@@ -399,13 +399,13 @@ public class PerkAction : PerkObject
 			nPEKHPDCPPO = new PerkActionStealMagic((PerkActionStealMagic)IBODMPMJELJ);
 			break;
 		default:
-			LLLOJBFMONN.Error("PerkAction.Clone PerkAction type is ActionType.ACTION_NONE");
+			GameLog.Error("PerkAction.Clone PerkAction type is ActionType.ACTION_NONE");
 			break;
 		}
 		if (nPEKHPDCPPO != null)
 		{
-			nPEKHPDCPPO.JMOIMIHPBOM(AEFFHJGMNFI);
-			nPEKHPDCPPO.CONNEMFGHMM(CPBHKJFPFJB);
+			nPEKHPDCPPO.SetPerk(AEFFHJGMNFI);
+			nPEKHPDCPPO.SetTrigger(CPBHKJFPFJB);
 		}
 		return nPEKHPDCPPO;
 	}
@@ -422,7 +422,7 @@ public class PerkActionChangeModelColor : PerkActionModificator
 	{
 		base.Parse(node);
 		set_Type(ActionType.ACTION_CHANGE_MODEL_COLOR);
-		string value = node.Attributes["Color"].CIPOICEEIBK("#FFFFFFFF").TrimStart('#');
+		string value = node.Attributes["Color"].GetStringOrDefault("#FFFFFFFF").TrimStart('#');
 		uint packed;
 		if (uint.TryParse(value, System.Globalization.NumberStyles.HexNumber,
 			System.Globalization.CultureInfo.InvariantCulture, out packed))
@@ -502,8 +502,8 @@ public class PerkActionSwitch : PerkAction
 	{
 		FunctionExtension function = new FunctionExtension();
 		function.Parse(expression);
-		function.PBPBNENGLPA(JMDLAMHAJLN().HJFEFJIEINN);
-		function.DMPCFMACDJM(JMDLAMHAJLN().OKPFNCJFLDL);
+		function.SetFunctionCallback(GetPerk().EvaluateFunctionCallback);
+		function.SetVariableCallback(GetPerk().OnFunctionPreCallback);
 		function.set_Target(this);
 		return function;
 	}
@@ -512,29 +512,29 @@ public class PerkActionSwitch : PerkAction
 	{
 		base.Parse(node);
 		set_Type(ActionType.ACTION_SWITCH);
-		Value = ParseFunction(node.Attributes["Value"].CIPOICEEIBK("0"));
+		Value = ParseFunction(node.Attributes["Value"].GetStringOrDefault("0"));
 		foreach (XmlNode branchNode in node.ChildNodes)
 		{
 			if (branchNode.Name == "Case")
 			{
 				Branch branch = new Branch();
-				branch.Value = ParseFunction(branchNode.Attributes["Value"].CIPOICEEIBK("0"));
-				branch.Actions = Create(branchNode, JMDLAMHAJLN(), GNDAFILBLIB());
+				branch.Value = ParseFunction(branchNode.Attributes["Value"].GetStringOrDefault("0"));
+				branch.Actions = Create(branchNode, GetPerk(), GetTrigger());
 				Cases.Add(branch);
 			}
 			else if (branchNode.Name == "Default")
 			{
-				DefaultActions = Create(branchNode, JMDLAMHAJLN(), GNDAFILBLIB());
+				DefaultActions = Create(branchNode, GetPerk(), GetTrigger());
 			}
 		}
 	}
 
 	public List<PerkAction> SelectActions()
 	{
-		string actual = Value.IBCPKBBAFNH().DCJLKCFKCOM;
+		string actual = Value.Calculate().Value;
 		foreach (Branch branch in Cases)
 		{
-			string expected = branch.Value.IBCPKBBAFNH().DCJLKCFKCOM;
+			string expected = branch.Value.Calculate().Value;
 			float actualNumber;
 			float expectedNumber;
 			if ((float.TryParse(actual, out actualNumber) && float.TryParse(expected, out expectedNumber) &&
@@ -563,12 +563,12 @@ public class PerkActionArea : PerkActionModificator
 		base.Parse(node);
 		set_Type(ActionType.ACTION_PERK_AREA);
 		Width = node.Attributes["Width"].ParseFloat(400f);
-		FileName = node.Attributes["FileName"].CIPOICEEIBK(string.Empty);
+		FileName = node.Attributes["FileName"].GetStringOrDefault(string.Empty);
 		ShiftY = node.Attributes["ShiftY"].ParseFloat();
 		PositionX = new FunctionExtension();
-		PositionX.Parse(node.Attributes["PositionX"].CIPOICEEIBK("0"));
-		PositionX.PBPBNENGLPA(JMDLAMHAJLN().HJFEFJIEINN);
-		PositionX.DMPCFMACDJM(JMDLAMHAJLN().OKPFNCJFLDL);
+		PositionX.Parse(node.Attributes["PositionX"].GetStringOrDefault("0"));
+		PositionX.SetFunctionCallback(GetPerk().EvaluateFunctionCallback);
+		PositionX.SetVariableCallback(GetPerk().OnFunctionPreCallback);
 		PositionX.set_Target(this);
 	}
 }
@@ -583,9 +583,9 @@ public class PerkActionMoveModel : PerkAction
 		base.Parse(node);
 		set_Type(ActionType.ACTION_MOVE_MODEL);
 		OffsetX = new FunctionExtension();
-		OffsetX.Parse(node.Attributes["PositionOffsetX"].CIPOICEEIBK("0"));
-		OffsetX.PBPBNENGLPA(JMDLAMHAJLN().HJFEFJIEINN);
-		OffsetX.DMPCFMACDJM(JMDLAMHAJLN().OKPFNCJFLDL);
+		OffsetX.Parse(node.Attributes["PositionOffsetX"].GetStringOrDefault("0"));
+		OffsetX.SetFunctionCallback(GetPerk().EvaluateFunctionCallback);
+		OffsetX.SetVariableCallback(GetPerk().OnFunctionPreCallback);
 		OffsetX.set_Target(this);
 	}
 }
@@ -598,12 +598,12 @@ public class PerkActionSetMovesVariable : PerkAction
 	public override void Parse(XmlNode node)
 	{
 		base.Parse(node);
-		set_Name(node.Attributes["Variable"].CIPOICEEIBK(string.Empty));
+		set_Name(node.Attributes["Variable"].GetStringOrDefault(string.Empty));
 		set_Type(ActionType.ACTION_SET_MOVES_VARIABLE);
 		Value = new FunctionExtension();
-		Value.Parse(node.Attributes["Value"].CIPOICEEIBK("0"));
-		Value.PBPBNENGLPA(JMDLAMHAJLN().HJFEFJIEINN);
-		Value.DMPCFMACDJM(JMDLAMHAJLN().OKPFNCJFLDL);
+		Value.Parse(node.Attributes["Value"].GetStringOrDefault("0"));
+		Value.SetFunctionCallback(GetPerk().EvaluateFunctionCallback);
+		Value.SetVariableCallback(GetPerk().OnFunctionPreCallback);
 		Value.set_Target(this);
 	}
 }
@@ -618,9 +618,9 @@ public class PerkActionStealMagic : PerkActionModificator
 		base.Parse(node);
 		set_Type(ActionType.ACTION_STEAL_MAGIC);
 		MagicName = new FunctionExtension();
-		MagicName.Parse(node.Attributes["MagicName"].CIPOICEEIBK(string.Empty));
-		MagicName.PBPBNENGLPA(JMDLAMHAJLN().HJFEFJIEINN);
-		MagicName.DMPCFMACDJM(JMDLAMHAJLN().OKPFNCJFLDL);
+		MagicName.Parse(node.Attributes["MagicName"].GetStringOrDefault(string.Empty));
+		MagicName.SetFunctionCallback(GetPerk().EvaluateFunctionCallback);
+		MagicName.SetVariableCallback(GetPerk().OnFunctionPreCallback);
 		MagicName.set_Target(this);
 	}
 }

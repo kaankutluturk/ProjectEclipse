@@ -2,37 +2,37 @@ using System;
 
 public class LoginModule : LoadingModule
 {
-	private bool IADDNBMPDGL;
+	private bool loginStarted;
 
 	public override void Start()
 	{
 		base.Start();
-		IADDNBMPDGL = false;
+		loginStarted = false;
 	}
 
-	public override void JLPMOKPFECK()
+	public override void ProcessStep()
 	{
-		if (!CHIHBINEGFL && !IADDNBMPDGL)
+		if (!isFinished && !loginStarted)
 		{
 			if (Eclipse.Multiplayer.LocalVersusSession.IsActive)
 			{
-				IADDNBMPDGL = CHIHBINEGFL = true;
+				loginStarted = isFinished = true;
 				Eclipse.Multiplayer.LocalVersusSession.DataReady();
 				return;
 			}
-			GameUtils.CGFHDKDJCPL();
-			NetworkController fDJHFPIFMIK = NetworkController.ELEBLBJKDBI();
+			GameUtils.NotifyApplicationStart();
+			NetworkController fDJHFPIFMIK = NetworkController.GetInstance();
 			fDJHFPIFMIK.OnLoginComplete = (Action<object>)Delegate.Combine(fDJHFPIFMIK.OnLoginComplete, new Action<object>(OnLoginComplete));
-			ListSF.GetInstance().IAAELKAKHPN();
-			IADDNBMPDGL = true;
+			ListSF.GetInstance().RestartServerAuthorization();
+			loginStarted = true;
 		}
 	}
 
 	private void OnLoginComplete(object data)
 	{
-		NetworkController fDJHFPIFMIK = NetworkController.ELEBLBJKDBI();
+		NetworkController fDJHFPIFMIK = NetworkController.GetInstance();
 		fDJHFPIFMIK.OnLoginComplete = (Action<object>)Delegate.Remove(fDJHFPIFMIK.OnLoginComplete, new Action<object>(OnLoginComplete));
-		GameUtils.OBJEKOBDMOE = true;
-		CHIHBINEGFL = true;
+		GameUtils.IsLoginComplete = true;
+		isFinished = true;
 	}
 }

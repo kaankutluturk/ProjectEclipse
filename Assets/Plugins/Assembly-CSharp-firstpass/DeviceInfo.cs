@@ -1,51 +1,51 @@
 public class DeviceInfo
 {
-	public SystemProperties.LOHALAKNGFB ACHKMBJANGN;
+	public SystemProperties.PathType GuiResolution;
 
-	public SystemProperties.LOHALAKNGFB BLIOAMODNOH;
+	public SystemProperties.PathType LocationResolution;
 
-	public SystemProperties.LOHALAKNGFB IELABOBIDMC;
+	public SystemProperties.PathType DefaultResolution;
 
 	public float InverseLocationScale;
 
-	public bool JGLKJECFHED;
+	public bool IsTablet;
 
-	public bool ODDGLIEHGFK;
+	public bool IsEditor;
 
-	public bool PPHNHLODNIN;
+	public bool IsWindowsEditor;
 
 	public string Id;
 
-	public string DHPGNIFEOPI;
+	public string Os;
 
-	public string MDPBKNDOGKJ;
+	public string OsName;
 
-	public string OAPHJAPMKJG;
+	public string Locale;
 
-	public string DFIPKAIDIDE;
+	public string UniqueId;
 
-	public string CJPJNFFJNGN;
+	public string CustomUniqueId;
 
-	public string FFNCAFDPLPL;
+	public string SocialPlayerId;
 
-	public int LBKMKDKDFJF;
+	public int DisplayWidth;
 
-	public int LLFOGEMDMJD;
+	public int DisplayHeight;
 
-	public int MOMPODBNJNE;
+	public int CpuCount;
 
-	public int AOJLHDILEBJ;
+	public int TotalRam;
 
-	public int LGEEAANABHH;
+	public int FreeRam;
 
 	public VersionContainer Version = new VersionContainer();
 
-	public VersionContainer OGMKHOHOGPD = new VersionContainer();
+	public VersionContainer DataVersion = new VersionContainer();
 
 	public string QualityCondition;
 
-	public string OHCHKFMFDKM()
+	public string GetLanguage()
 	{
-		return PreciseLocale.PBPAPAFAMJB();
+		return PreciseLocale.GetLanguage();
 	}
 }

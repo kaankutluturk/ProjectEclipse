@@ -5,24 +5,24 @@ namespace Nekki.SF2.GUI.Profile
 {
 	public class TrickSubItem : SubItem
 	{
-		public enum KHPHEEBBCPI
+		public enum TrickSubItemEvent
 		{
 			onTrickShow = 12
 		}
 
-		private const int BIOPJCPBOCK = 110;
+		private const int KEY_ICON_SPACING = 110;
 
-		private const int GMIGELNEIBI = 100;
+		private const int KEYS_OFFSET_X = 100;
 
-		private const int IMDHKABNOKK = 110;
+		private const int KEY_ICON_WIDTH = 110;
 
-		protected Trick DGDDKFKEDNO;
+		protected Trick trick;
 
-		private InfoAnimation BJONHDGCNFE;
+		private InfoAnimation infoAnimation;
 
-		private TrickInfo NFJICFOAOPH;
+		private TrickInfo trickInfo;
 
-		private bool MIIEANDEPHO;
+		private bool isNew;
 
 		[SerializeField]
 		private LabelAlias _keysDescription;
@@ -35,29 +35,29 @@ namespace Nekki.SF2.GUI.Profile
 			Init(OKNNNLIPODI);
 			_keys.gameObject.SetActive(false);
 			_keysDescription.gameObject.SetActive(false);
-			DGDDKFKEDNO = JECLDALKMKA;
-			GJPJJHACOJJ = KHPKDMGDMAB;
-			BHKAAODJMJF = ProfileGUI.OJEAKFALOGE.EBDBPJNBHGI / 255f;
-			CDNOKAKOLMP = ProfileGUI.OJEAKFALOGE.DPGMCKCDMBC / 255f;
-			MIIEANDEPHO = DGDDKFKEDNO != null && DGDDKFKEDNO.IsNew;
-			BJONHDGCNFE = JECLDALKMKA.KJHMOGGECBN;
-			NFJICFOAOPH = new TrickInfo(DGDDKFKEDNO.DisplayName, JECLDALKMKA.KJHMOGGECBN, KNLJDIPLOIA(), NFNAOFAKEJK, DGDDKFKEDNO.HIAMFGEIGDP);
-			Data = NFJICFOAOPH;
+			trick = JECLDALKMKA;
+			spriteName = KHPKDMGDMAB;
+			iconMaxOpacity = ProfileGUI.PerkOpacity.Max / 255f;
+			iconMinOpacity = ProfileGUI.PerkOpacity.Min / 255f;
+			isNew = trick != null && trick.IsNew;
+			infoAnimation = JECLDALKMKA.Animation;
+			trickInfo = new TrickInfo(trick.DisplayName, JECLDALKMKA.Animation, GetAttackDamages(), OnShowCallback, trick.EffectDescription);
+			Data = trickInfo;
 			UpdateIcon();
 			SetActive(true);
-			DECAGHCLJJI();
-			HDBAJGJBBKA();
+			InitKeyIcons();
+			InitKeysDescription();
 			UpdatePositions();
 		}
 
 		public Trick GetTrick()
 		{
-			return DGDDKFKEDNO;
+			return trick;
 		}
 
 		public void ShowTrick()
 		{
-			if (BJONHDGCNFE != null && BJONHDGCNFE.NHNEJKIBPJG)
+			if (infoAnimation != null && infoAnimation.ShowInTricks)
 			{
 				CallEvent(12, this);
 			}
@@ -72,7 +72,7 @@ namespace Nekki.SF2.GUI.Profile
 				{
 					num += _icon.transform.localPosition.x + _icon.rectTransform.rect.width / 2f;
 				}
-				_keys.transform.OKHPLHPBPKJ(num);
+				_keys.transform.SetLocalX(num);
 			}
 			if (_keysDescription.gameObject.activeSelf)
 			{
@@ -82,32 +82,32 @@ namespace Nekki.SF2.GUI.Profile
 					num2 += _icon.transform.localPosition.x + _icon.rectTransform.rect.width / 2f;
 				}
 				num2 += 100f - _keysDescription.rectTransform.rect.width / 2f;
-				_keysDescription.transform.OKHPLHPBPKJ(num2);
+				_keysDescription.transform.SetLocalX(num2);
 			}
 			if (_keys.gameObject.activeSelf && _keysDescription.gameObject.activeSelf)
 			{
-				_keys.transform.BGNJGIACJBG(55f);
-				_keysDescription.transform.BGNJGIACJBG(-55f);
+				_keys.transform.SetLocalY(55f);
+				_keysDescription.transform.SetLocalY(-55f);
 			}
 			else
 			{
-				_keys.transform.BGNJGIACJBG(0f);
-				_keysDescription.transform.BGNJGIACJBG(0f);
+				_keys.transform.SetLocalY(0f);
+				_keysDescription.transform.SetLocalY(0f);
 			}
 		}
 
 		public override void UpdateState()
 		{
-			MIIEANDEPHO = DGDDKFKEDNO != null && DGDDKFKEDNO.IsNew;
+			isNew = trick != null && trick.IsNew;
 		}
 
-		protected void DECAGHCLJJI()
+		protected void InitKeyIcons()
 		{
 			foreach (Transform item in _keys.transform)
 			{
 				Object.Destroy(item.gameObject);
 			}
-			ConditionKeys bHDEBDIHDFM = DGDDKFKEDNO.KJHMOGGECBN.ILBCHANCOBP();
+			ConditionKeys bHDEBDIHDFM = trick.Animation.GetFirstKeysCondition();
 			if (bHDEBDIHDFM == null)
 			{
 				return;
@@ -115,17 +115,17 @@ namespace Nekki.SF2.GUI.Profile
 			_keys.gameObject.SetActive(true);
 			float num = 0f;
 			KeyData fONEJOKEIEN = bHDEBDIHDFM.RequiredKeys;
-			for (int i = 0; i < fONEJOKEIEN.CEPODJDDLBF.Count; i++)
+			for (int i = 0; i < fONEJOKEIEN.AdditionalKeys.Count; i++)
 			{
-				ResolutionImage keyIcon = PerkContent.GetKeyIcon(fONEJOKEIEN.CEPODJDDLBF[i]);
+				ResolutionImage keyIcon = PerkContent.GetKeyIcon(fONEJOKEIEN.AdditionalKeys[i]);
 				if (keyIcon != null)
 				{
 					keyIcon.transform.SetParent(_keys.transform, false);
-					keyIcon.transform.OKHPLHPBPKJ(num);
+					keyIcon.transform.SetLocalX(num);
 					num += 110f;
 				}
 			}
-			if (fONEJOKEIEN.CEPODJDDLBF.Count > 0)
+			if (fONEJOKEIEN.AdditionalKeys.Count > 0)
 			{
 				GameObject gameObject = new GameObject("KeyIcon");
 				ResolutionImage resolutionImage = gameObject.AddComponent<ResolutionImage>();
@@ -133,59 +133,59 @@ namespace Nekki.SF2.GUI.Profile
 				resolutionImage.SetNativeSize();
 				resolutionImage.raycastTarget = false;
 				resolutionImage.transform.SetParent(_keys.transform, false);
-				resolutionImage.transform.OKHPLHPBPKJ(num);
+				resolutionImage.transform.SetLocalX(num);
 				num += 110f;
 			}
-			for (int j = 0; j < fONEJOKEIEN.IGEEOAGOMEM.Count; j++)
+			for (int j = 0; j < fONEJOKEIEN.StarterKeys.Count; j++)
 			{
-				ResolutionImage keyIcon2 = PerkContent.GetKeyIcon(fONEJOKEIEN.IGEEOAGOMEM[j]);
+				ResolutionImage keyIcon2 = PerkContent.GetKeyIcon(fONEJOKEIEN.StarterKeys[j]);
 				if (keyIcon2 != null)
 				{
 					keyIcon2.transform.SetParent(_keys.transform, false);
-					keyIcon2.transform.OKHPLHPBPKJ(num);
+					keyIcon2.transform.SetLocalX(num);
 					num += 110f;
 				}
 			}
 		}
 
-		protected void HDBAJGJBBKA()
+		protected void InitKeysDescription()
 		{
-			if (DGDDKFKEDNO != null && !(DGDDKFKEDNO.COJPEGLPGDF == string.Empty))
+			if (trick != null && !(trick.KeysDescription == string.Empty))
 			{
 				_keysDescription.gameObject.SetActive(true);
 				_keysDescription.set_LabelFontSize(104);
-				_keysDescription.color = Constants.PJJIMHMJPAL;
-				_keysDescription.set_Alias(DGDDKFKEDNO.COJPEGLPGDF);
+				_keysDescription.color = Constants.DialogTextColor;
+				_keysDescription.set_Alias(trick.KeysDescription);
 			}
 		}
 
-		protected override void FGICHADOEHF()
+		protected override void UpdateSelectedFlash()
 		{
-			base.FGICHADOEHF();
-			if (MIIEANDEPHO)
+			base.UpdateSelectedFlash();
+			if (isNew)
 			{
-				AJGODMIMDDP();
+				UpdateIconFlash();
 			}
 		}
 
-		private List<float> KNLJDIPLOIA()
+		private List<float> GetAttackDamages()
 		{
 			List<float> list = new List<float>();
-			if (BJONHDGCNFE != null)
+			if (infoAnimation != null)
 			{
-				List<IntervalAnimation> cAANBJEPGAA = BJONHDGCNFE.MoveData.Intervals;
+				List<IntervalAnimation> cAANBJEPGAA = infoAnimation.MoveData.Intervals;
 				for (int i = 0; i < cAANBJEPGAA.Count; i++)
 				{
-					if (cAANBJEPGAA[i].Type == IntervalAnimation.NGAJJDIEDGF.INTERVAL_ATTACK)
+					if (cAANBJEPGAA[i].Type == IntervalAnimation.IntervalType.INTERVAL_ATTACK)
 					{
-						list.Add(((IntervalAttack)cAANBJEPGAA[i]).GHGGNMBCMNM());
+						list.Add(((IntervalAttack)cAANBJEPGAA[i]).GetDamage());
 					}
 				}
 			}
 			return list;
 		}
 
-		private void NFNAOFAKEJK(object data)
+		private void OnShowCallback(object data)
 		{
 			ShowTrick();
 		}

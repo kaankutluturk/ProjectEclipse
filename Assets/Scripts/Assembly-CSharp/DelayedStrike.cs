@@ -1,6 +1,6 @@
 public class DelayedStrike
 {
-	public ItemInfo DLKPBAJDHBO;
+	public ItemInfo Item;
 
 	public SliderType SliderType;
 
@@ -8,7 +8,7 @@ public class DelayedStrike
 
 	public DelayedStrike(SliderType _type, ItemInfo KLIDPJCCAME = null, bool OEBJCEMHBON = false)
 	{
-		DLKPBAJDHBO = KLIDPJCCAME;
+		Item = KLIDPJCCAME;
 		SliderType = _type;
 		IsStrikeResult = OEBJCEMHBON;
 	}

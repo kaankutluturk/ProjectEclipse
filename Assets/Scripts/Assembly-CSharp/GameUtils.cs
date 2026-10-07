@@ -14,7 +14,7 @@ using UnityEngine;
 
 public static class GameUtils
 {
-	public enum FGOILIHAKKD
+	public enum TutorialDialogStep
 	{
 		STEP_DIALOGS_NONE = 0,
 		STEP_DIALOGS_WIN_BODYGARD_1 = 1,
@@ -41,7 +41,7 @@ public static class GameUtils
 		STEP_DIALOGS_TUTORIAL_END = 22
 	}
 
-	public enum LMIELHAGGFI
+	public enum DayRelation
 	{
 		NEXT_DAY = 0,
 		AFTER_NEXT_DAY = 1,
@@ -51,58 +51,58 @@ public static class GameUtils
 
 	public class ZoomEffect
 	{
-		public int OFJCKMNLAEP;
+		public int EffectTime;
 
-		public int BJDFMKOCNBN;
+		public int ElapsedFrames;
 
-		public float AFBPPNDBMEC;
+		public float StartScale;
 
-		public float ALOKJEILMLK;
+		public float CurrentScale;
 
-		public float JCNPAOMNJCL;
+		public float TargetScale;
 	}
 
 	public class HitEffect
 	{
 		public string Type;
 
-		public int NHKPODHHDPF;
+		public int PauseTime;
 
-		public int OFJCKMNLAEP;
+		public int EffectTime;
 
-		public float FMICELIGLPG;
+		public float AmplitudeX;
 
-		public float PPKAMOILNLN;
+		public float AmplitudeY;
 
-		public float KFEMKHHANDC;
+		public float FrequencyX;
 
-		public float GGJBPLHAHFH;
+		public float FrequencyY;
 	}
 
 	public class HitEffects
 	{
-		public List<HitEffect> EOPFGIDLHKP = new List<HitEffect>();
+		public List<HitEffect> Effects = new List<HitEffect>();
 
 		public void Parse(XmlNode node)
 		{
-			EOPFGIDLHKP.Clear();
+			Effects.Clear();
 			foreach (XmlNode childNode in node.ChildNodes)
 			{
 				HitEffect pIHIIMOOICM = new HitEffect();
-				pIHIIMOOICM.Type = childNode.Attributes["Type"].CIPOICEEIBK(string.Empty);
-				pIHIIMOOICM.NHKPODHHDPF = childNode.Attributes["PauseTime"].ParseInt();
-				pIHIIMOOICM.OFJCKMNLAEP = childNode.Attributes["EffectTime"].ParseInt();
-				pIHIIMOOICM.FMICELIGLPG = childNode.Attributes["AmplitudeX"].ParseFloat();
-				pIHIIMOOICM.PPKAMOILNLN = childNode.Attributes["AmplitudeY"].ParseFloat();
-				pIHIIMOOICM.KFEMKHHANDC = childNode.Attributes["FrequencyX"].ParseFloat();
-				pIHIIMOOICM.GGJBPLHAHFH = childNode.Attributes["FrequencyY"].ParseFloat();
-				EOPFGIDLHKP.Add(pIHIIMOOICM);
+				pIHIIMOOICM.Type = childNode.Attributes["Type"].GetStringOrDefault(string.Empty);
+				pIHIIMOOICM.PauseTime = childNode.Attributes["PauseTime"].ParseInt();
+				pIHIIMOOICM.EffectTime = childNode.Attributes["EffectTime"].ParseInt();
+				pIHIIMOOICM.AmplitudeX = childNode.Attributes["AmplitudeX"].ParseFloat();
+				pIHIIMOOICM.AmplitudeY = childNode.Attributes["AmplitudeY"].ParseFloat();
+				pIHIIMOOICM.FrequencyX = childNode.Attributes["FrequencyX"].ParseFloat();
+				pIHIIMOOICM.FrequencyY = childNode.Attributes["FrequencyY"].ParseFloat();
+				Effects.Add(pIHIIMOOICM);
 			}
 		}
 
-		public HitEffect PCGEIDLBEJM(string LFLGCDNKNJI)
+		public HitEffect GetEffectByType(string LFLGCDNKNJI)
 		{
-			foreach (HitEffect item in EOPFGIDLHKP)
+			foreach (HitEffect item in Effects)
 			{
 				if (item.Type == LFLGCDNKNJI)
 				{
@@ -121,7 +121,7 @@ public static class GameUtils
 
 		public static float GetValue(string name)
 		{
-			return GetValue(FPIDOGKOPGC, name);
+			return GetValue(AlignTargetAttributes, name);
 		}
 
 		public static float GetValue(List<AlignTargetAttribute> BBNKIBKPBLO, string name)
@@ -157,23 +157,23 @@ public static class GameUtils
 
 	public class CameraSettigs
 	{
-		public string MEIHGLKHLFC;
+		public string CameraNode;
 
-		public string MNDFNOCCOKI;
+		public string BindingNode;
 
-		public float PHKGOBGNDEC;
+		public float BindingLength;
 
-		public float KKPKKIJFFMP;
+		public float MaxWidthDelta;
 
-		public float IMHPAHJDAFP;
+		public float MaxWidth;
 
 		public void Parse(XmlNode node)
 		{
-			MEIHGLKHLFC = node["CameraSettings"].Attributes["CameraNode"].CIPOICEEIBK("COM");
-			MNDFNOCCOKI = node["CameraSettings"].Attributes["BindingNode"].CIPOICEEIBK("NPivot");
-			PHKGOBGNDEC = node["CameraSettings"].Attributes["BindingLength"].ParseFloat();
-			IMHPAHJDAFP = node["CameraSettings"].Attributes["MaxWidth"].ParseFloat(-1f);
-			KKPKKIJFFMP = node["CameraSettings"].Attributes["MaxWidthDelta"].ParseFloat();
+			CameraNode = node["CameraSettings"].Attributes["CameraNode"].GetStringOrDefault("COM");
+			BindingNode = node["CameraSettings"].Attributes["BindingNode"].GetStringOrDefault("NPivot");
+			BindingLength = node["CameraSettings"].Attributes["BindingLength"].ParseFloat();
+			MaxWidth = node["CameraSettings"].Attributes["MaxWidth"].ParseFloat(-1f);
+			MaxWidthDelta = node["CameraSettings"].Attributes["MaxWidthDelta"].ParseFloat();
 		}
 	}
 
@@ -185,12 +185,12 @@ public static class GameUtils
 
 		public void Parse(XmlNode node)
 		{
-			Attribute = node.Attributes["Attribute"].CIPOICEEIBK("COM");
+			Attribute = node.Attributes["Attribute"].GetStringOrDefault("COM");
 			Base = node.Attributes["Base"].ParseFloat();
 		}
 	}
 
-	public class KDFMEPMFMEE
+	public class SupportLink
 	{
 		public string Name = string.Empty;
 
@@ -199,23 +199,23 @@ public static class GameUtils
 
 	public class SupportChoiceStruct
 	{
-		public List<KDFMEPMFMEE> NOCABEGBMCN = new List<KDFMEPMFMEE>();
+		public List<SupportLink> Links = new List<SupportLink>();
 
 		public void Parse(XmlNode IKGBGEEMPCD)
 		{
-			NOCABEGBMCN.Clear();
+			Links.Clear();
 			foreach (XmlNode childNode in IKGBGEEMPCD.ChildNodes)
 			{
-				KDFMEPMFMEE kDFMEPMFMEE = new KDFMEPMFMEE();
-				kDFMEPMFMEE.Name = childNode.Attributes["Name"].CIPOICEEIBK(string.Empty);
-				kDFMEPMFMEE.Url = childNode.Attributes["Url"].CIPOICEEIBK(string.Empty);
-				NOCABEGBMCN.Add(kDFMEPMFMEE);
+				SupportLink kDFMEPMFMEE = new SupportLink();
+				kDFMEPMFMEE.Name = childNode.Attributes["Name"].GetStringOrDefault(string.Empty);
+				kDFMEPMFMEE.Url = childNode.Attributes["Url"].GetStringOrDefault(string.Empty);
+				Links.Add(kDFMEPMFMEE);
 			}
 		}
 
-		public KDFMEPMFMEE IBEAICDEEBB(string name)
+		public SupportLink FindLink(string name)
 		{
-			foreach (KDFMEPMFMEE item in NOCABEGBMCN)
+			foreach (SupportLink item in Links)
 			{
 				if (item.Name == name)
 				{
@@ -225,12 +225,12 @@ public static class GameUtils
 			return null;
 		}
 
-		public string EBCODADFJLB(string name, string JAGNJBDLEMF)
+		public string GetUrl(string name, string JAGNJBDLEMF)
 		{
-			KDFMEPMFMEE kDFMEPMFMEE = IBEAICDEEBB(name);
+			SupportLink kDFMEPMFMEE = FindLink(name);
 			if (kDFMEPMFMEE == null)
 			{
-				kDFMEPMFMEE = IBEAICDEEBB(JAGNJBDLEMF);
+				kDFMEPMFMEE = FindLink(JAGNJBDLEMF);
 			}
 			return (kDFMEPMFMEE == null) ? string.Empty : kDFMEPMFMEE.Url;
 		}
@@ -238,17 +238,17 @@ public static class GameUtils
 
 	public class SlidersIndexStruct
 	{
-		public Dictionary<string, int> NPJKGNIKDGP = new Dictionary<string, int>();
+		public Dictionary<string, int> sliderIndices = new Dictionary<string, int>();
 
-		public void KJIGJEBMILC(string name, int index)
+		public void SetIndex(string name, int index)
 		{
-			NPJKGNIKDGP[name] = index;
+			sliderIndices[name] = index;
 		}
 
-		public int MILAHFHNIIP(string name)
+		public int GetIndex(string name)
 		{
 			int result = -1;
-			foreach (KeyValuePair<string, int> item in NPJKGNIKDGP)
+			foreach (KeyValuePair<string, int> item in sliderIndices)
 			{
 				if (item.Key == name)
 				{
@@ -270,49 +270,49 @@ public static class GameUtils
 
 	public class Currencies
 	{
-		private List<GameCurrency> DNPGEMMDPNN = new List<GameCurrency>();
+		private List<GameCurrency> currencies = new List<GameCurrency>();
 
 		public void Parse(XmlNode node)
 		{
-			DNPGEMMDPNN.Clear();
+			currencies.Clear();
 			foreach (XmlNode childNode in node.ChildNodes)
 			{
 				GameCurrency item = new GameCurrency(childNode);
-				DNPGEMMDPNN.Add(item);
+				currencies.Add(item);
 			}
 		}
 
-		public void NIHPGJACOFM(XmlNode node)
+		public void AddOrUpdateCurrency(XmlNode node)
 		{
 			GameCurrency cJJOFMHLFFM = new GameCurrency(node);
 			bool flag = true;
-			foreach (GameCurrency item in DNPGEMMDPNN)
+			foreach (GameCurrency item in currencies)
 			{
 				if (item.Name == cJJOFMHLFFM.Name)
 				{
-					item.DHCNGGCOONP(cJJOFMHLFFM);
+					item.CopyFrom(cJJOFMHLFFM);
 					flag = false;
 				}
 			}
 			if (flag)
 			{
-				DNPGEMMDPNN.Add(cJJOFMHLFFM);
+				currencies.Add(cJJOFMHLFFM);
 			}
 		}
 
-		public void FCDLIEFIIGG(GameCurrency KHBNGFMPEBG)
+		public void AddCurrency(GameCurrency KHBNGFMPEBG)
 		{
-			DNPGEMMDPNN.Add(KHBNGFMPEBG);
+			currencies.Add(KHBNGFMPEBG);
 		}
 
-		public List<GameCurrency> IIAPDCECFCN()
+		public List<GameCurrency> GetCurrencies()
 		{
-			return DNPGEMMDPNN;
+			return currencies;
 		}
 
-		public GameCurrency ICFINJLNCPM(string name)
+		public GameCurrency GetCurrencyByName(string name)
 		{
-			foreach (GameCurrency item in DNPGEMMDPNN)
+			foreach (GameCurrency item in currencies)
 			{
 				if (item.Name == name)
 				{
@@ -323,36 +323,36 @@ public static class GameUtils
 		}
 	}
 
-	public class AALKFCCIGJJ
+	public class ResistanceList
 	{
-		private List<GameResistance> OEJCIFGACNG = new List<GameResistance>();
+		private List<GameResistance> resistances = new List<GameResistance>();
 
-		public List<GameResistance> KMBOBPOLEJL
+		public List<GameResistance> Resistances
 		{
 			get
 			{
-				return DALPGLAFJNJ();
+				return GetResistances();
 			}
 		}
 
-		public List<GameResistance> DALPGLAFJNJ()
+		public List<GameResistance> GetResistances()
 		{
-			return OEJCIFGACNG;
+			return resistances;
 		}
 
 		public void Parse(XmlNode EBLIGDMALEA)
 		{
-			OEJCIFGACNG.Clear();
+			resistances.Clear();
 			foreach (XmlNode childNode in EBLIGDMALEA.ChildNodes)
 			{
 				GameResistance item = new GameResistance(childNode);
-				OEJCIFGACNG.Add(item);
+				resistances.Add(item);
 			}
 		}
 
-		public GameResistance NDMEGBEFBPJ(string name)
+		public GameResistance GetResistanceByName(string name)
 		{
-			foreach (GameResistance item in OEJCIFGACNG)
+			foreach (GameResistance item in resistances)
 			{
 				if (item.Name == name)
 				{
@@ -365,78 +365,78 @@ public static class GameUtils
 
 	public class AchievementCounters
 	{
-		public Dictionary<string, Counter> LLMLCLKNAAN = new Dictionary<string, Counter>();
+		public Dictionary<string, Counter> AllCounters = new Dictionary<string, Counter>();
 
-		public Dictionary<string, Counter> HCNBIOHIMKD = new Dictionary<string, Counter>();
+		public Dictionary<string, Counter> NormalModeCounters = new Dictionary<string, Counter>();
 
-		public Dictionary<string, Counter> DJLALLBICPB = new Dictionary<string, Counter>();
+		public Dictionary<string, Counter> EclipseModeCounters = new Dictionary<string, Counter>();
 
-		public Dictionary<string, Counter> EJBPPKHILBF = new Dictionary<string, Counter>();
+		public Dictionary<string, Counter> RaidModeCounters = new Dictionary<string, Counter>();
 
 		public void Parse(XmlNode EBLIGDMALEA)
 		{
-			LLMLCLKNAAN.Clear();
-			HCNBIOHIMKD.Clear();
-			DJLALLBICPB.Clear();
-			EJBPPKHILBF.Clear();
+			AllCounters.Clear();
+			NormalModeCounters.Clear();
+			EclipseModeCounters.Clear();
+			RaidModeCounters.Clear();
 			foreach (XmlNode childNode in EBLIGDMALEA.ChildNodes)
 			{
 				Counter jLOIMNNHFKH = new Counter(childNode);
-				LLMLCLKNAAN[jLOIMNNHFKH.Name] = jLOIMNNHFKH;
-				switch (jLOIMNNHFKH.NHDPMIGHKPF)
+				AllCounters[jLOIMNNHFKH.Name] = jLOIMNNHFKH;
+				switch (jLOIMNNHFKH.Mode)
 				{
-				case Counter.NENOEMHAEFH.ECLIPSE_MODE:
-					DJLALLBICPB[jLOIMNNHFKH.Name] = jLOIMNNHFKH;
+				case Counter.CounterMode.ECLIPSE_MODE:
+					EclipseModeCounters[jLOIMNNHFKH.Name] = jLOIMNNHFKH;
 					break;
-				case Counter.NENOEMHAEFH.NORMAL_MODE:
-					HCNBIOHIMKD[jLOIMNNHFKH.Name] = jLOIMNNHFKH;
+				case Counter.CounterMode.NORMAL_MODE:
+					NormalModeCounters[jLOIMNNHFKH.Name] = jLOIMNNHFKH;
 					break;
-				case Counter.NENOEMHAEFH.RAID_MODE:
-					EJBPPKHILBF[jLOIMNNHFKH.Name] = jLOIMNNHFKH;
+				case Counter.CounterMode.RAID_MODE:
+					RaidModeCounters[jLOIMNNHFKH.Name] = jLOIMNNHFKH;
 					break;
-				case Counter.NENOEMHAEFH.NONE_MODE:
-					DJLALLBICPB[jLOIMNNHFKH.Name] = jLOIMNNHFKH;
-					HCNBIOHIMKD[jLOIMNNHFKH.Name] = jLOIMNNHFKH;
+				case Counter.CounterMode.NONE_MODE:
+					EclipseModeCounters[jLOIMNNHFKH.Name] = jLOIMNNHFKH;
+					NormalModeCounters[jLOIMNNHFKH.Name] = jLOIMNNHFKH;
 					break;
 				}
 			}
 		}
 
-		public void AEPHNNABOEK()
+		public void InitConditions()
 		{
-			foreach (KeyValuePair<string, Counter> item in LLMLCLKNAAN)
+			foreach (KeyValuePair<string, Counter> item in AllCounters)
 			{
-				item.Value.AEPHNNABOEK();
+				item.Value.Initialize();
 			}
 		}
 
-		public Dictionary<string, Counter> ECMIANLOLHM(Counter.NENOEMHAEFH NMMPBADCFHK)
+		public Dictionary<string, Counter> GetCountersByMode(Counter.CounterMode NMMPBADCFHK)
 		{
 			switch (NMMPBADCFHK)
 			{
-			case Counter.NENOEMHAEFH.ECLIPSE_MODE:
-				return DJLALLBICPB;
-			case Counter.NENOEMHAEFH.RAID_MODE:
-				return EJBPPKHILBF;
+			case Counter.CounterMode.ECLIPSE_MODE:
+				return EclipseModeCounters;
+			case Counter.CounterMode.RAID_MODE:
+				return RaidModeCounters;
 			default:
-				return HCNBIOHIMKD;
+				return NormalModeCounters;
 			}
 		}
 
-		public Dictionary<string, Counter> ECMIANLOLHM(FightList KGKDKENMAOA)
+		public Dictionary<string, Counter> GetCountersForFight(FightList KGKDKENMAOA)
 		{
 			if (KGKDKENMAOA != null && KGKDKENMAOA.get_Type() == BattleType.FightRaid)
 			{
-				return EJBPPKHILBF;
+				return RaidModeCounters;
 			}
-			Counter.NENOEMHAEFH nMMPBADCFHK = ((!ListSF.CCDKHLAMKKO().IsEclipseMode()) ? Counter.NENOEMHAEFH.NORMAL_MODE : Counter.NENOEMHAEFH.ECLIPSE_MODE);
-			return ECMIANLOLHM(nMMPBADCFHK);
+			Counter.CounterMode nMMPBADCFHK = ((!ListSF.GetRoster().IsEclipseMode()) ? Counter.CounterMode.NORMAL_MODE : Counter.CounterMode.ECLIPSE_MODE);
+			return GetCountersByMode(nMMPBADCFHK);
 		}
 
-		public Dictionary<string, Counter> EFMDONOJJNH(string LFLGCDNKNJI, Counter.NENOEMHAEFH NMMPBADCFHK)
+		public Dictionary<string, Counter> GetCountersByType(string LFLGCDNKNJI, Counter.CounterMode NMMPBADCFHK)
 		{
 			Dictionary<string, Counter> dictionary = new Dictionary<string, Counter>();
-			Dictionary<string, Counter> dictionary2 = ECMIANLOLHM(NMMPBADCFHK);
+			Dictionary<string, Counter> dictionary2 = GetCountersByMode(NMMPBADCFHK);
 			foreach (KeyValuePair<string, Counter> item in dictionary2)
 			{
 				Counter value = item.Value;
@@ -448,21 +448,21 @@ public static class GameUtils
 			return dictionary;
 		}
 
-		public Counter CBGAEFLNGAC(string LMBBKNMNKOB)
+		public Counter FindCounterByAchievement(string LMBBKNMNKOB)
 		{
 			for (int i = 0; i < 3; i++)
 			{
-				Counter.NENOEMHAEFH nMMPBADCFHK = (Counter.NENOEMHAEFH)i;
-				Dictionary<string, Counter> dictionary = ECMIANLOLHM(nMMPBADCFHK);
+				Counter.CounterMode nMMPBADCFHK = (Counter.CounterMode)i;
+				Dictionary<string, Counter> dictionary = GetCountersByMode(nMMPBADCFHK);
 				foreach (KeyValuePair<string, Counter> item in dictionary)
 				{
 					Counter value = item.Value;
-					AchievCounter iFDAFNGCIBP = HHLEKNNJGMJ.KJPLIHEMLJL(value.Name);
+					AchievCounter iFDAFNGCIBP = AchievementDefinitions.GetCounterByName(value.Name);
 					if (iFDAFNGCIBP == null)
 					{
 						continue;
 					}
-					List<Achievement> fOICCCGPCMJ = iFDAFNGCIBP.FOICCCGPCMJ;
+					List<Achievement> fOICCCGPCMJ = iFDAFNGCIBP.Achievements;
 					bool flag = false;
 					for (int j = 0; j < fOICCCGPCMJ.Count; j++)
 					{
@@ -486,21 +486,21 @@ public static class GameUtils
 
 	public class AchievCounters
 	{
-		public List<AchievCounter> MDNKEAFGAOB = new List<AchievCounter>();
+		public List<AchievCounter> Counters = new List<AchievCounter>();
 
 		public void Parse(XmlNode EBLIGDMALEA)
 		{
-			MDNKEAFGAOB.Clear();
+			Counters.Clear();
 			foreach (XmlNode childNode in EBLIGDMALEA.ChildNodes)
 			{
 				AchievCounter item = new AchievCounter(childNode);
-				MDNKEAFGAOB.Add(item);
+				Counters.Add(item);
 			}
 		}
 
-		public AchievCounter KJPLIHEMLJL(string name)
+		public AchievCounter GetCounterByName(string name)
 		{
-			foreach (AchievCounter item in MDNKEAFGAOB)
+			foreach (AchievCounter item in Counters)
 			{
 				if (item.Name == name)
 				{
@@ -510,11 +510,11 @@ public static class GameUtils
 			return null;
 		}
 
-		public Achievement ABNAODNDHDM(string name)
+		public Achievement GetAchievementByName(string name)
 		{
-			foreach (AchievCounter item in MDNKEAFGAOB)
+			foreach (AchievCounter item in Counters)
 			{
-				foreach (Achievement item2 in item.FOICCCGPCMJ)
+				foreach (Achievement item2 in item.Achievements)
 				{
 					if (item2.Name == name)
 					{
@@ -525,25 +525,25 @@ public static class GameUtils
 			return null;
 		}
 
-		public List<global::Pair<Achievement, int>> DLACNJLPKBK(List<string> EAHPNCOEHJG)
+		public List<global::Pair<Achievement, int>> GetUnlockableAchievements(List<string> EAHPNCOEHJG)
 		{
 			List<global::Pair<Achievement, int>> list = new List<global::Pair<Achievement, int>>();
 			foreach (string item in EAHPNCOEHJG)
 			{
-				AchievCounter iFDAFNGCIBP = HHLEKNNJGMJ.KJPLIHEMLJL(item);
-				RosterAchievCounter cKJBHGKBPPM = ListSF.CCDKHLAMKKO().KJNPJKEHGLE().KJPLIHEMLJL(item);
+				AchievCounter iFDAFNGCIBP = AchievementDefinitions.GetCounterByName(item);
+				RosterAchievCounter cKJBHGKBPPM = ListSF.GetRoster().GetAchievements().FindCounter(item);
 				if (iFDAFNGCIBP == null || cKJBHGKBPPM == null)
 				{
 					continue;
 				}
-				int num = cKJBHGKBPPM.MCIPEJBLIDC();
-				foreach (Achievement item2 in iFDAFNGCIBP.FOICCCGPCMJ)
+				int num = cKJBHGKBPPM.GetCounter();
+				foreach (Achievement item2 in iFDAFNGCIBP.Achievements)
 				{
-					if (!IEPPDHFHEIC(item2.Name))
+					if (!IsAchievementUnlocked(item2.Name))
 					{
 						list.Add(new global::Pair<Achievement, int>(item2, num));
 					}
-					if (num < item2.EOGLBDCLMBM)
+					if (num < item2.CounterValue)
 					{
 						break;
 					}
@@ -552,24 +552,24 @@ public static class GameUtils
 			return list;
 		}
 
-		public List<Achievement> NMHMFCKBMKN()
+		public List<Achievement> GetEarnedAchievements()
 		{
 			List<Achievement> list = new List<Achievement>();
-			List<RosterAchievCounter> list2 = ListSF.CCDKHLAMKKO().KJNPJKEHGLE().HOBHAAAEELG();
+			List<RosterAchievCounter> list2 = ListSF.GetRoster().GetAchievements().GetCounters();
 			for (int i = 0; i < list2.Count; i++)
 			{
 				RosterAchievCounter cKJBHGKBPPM = list2[i];
 				string gOHIIMFFFJI = cKJBHGKBPPM.get_Name();
-				AchievCounter iFDAFNGCIBP = HHLEKNNJGMJ.KJPLIHEMLJL(gOHIIMFFFJI);
+				AchievCounter iFDAFNGCIBP = AchievementDefinitions.GetCounterByName(gOHIIMFFFJI);
 				if (iFDAFNGCIBP == null)
 				{
 					continue;
 				}
-				List<Achievement> fOICCCGPCMJ = iFDAFNGCIBP.FOICCCGPCMJ;
+				List<Achievement> fOICCCGPCMJ = iFDAFNGCIBP.Achievements;
 				for (int j = 0; j < fOICCCGPCMJ.Count; j++)
 				{
 					Achievement jNPIOKEKMII = fOICCCGPCMJ[j];
-					if (cKJBHGKBPPM.MCIPEJBLIDC() >= jNPIOKEKMII.EOGLBDCLMBM)
+					if (cKJBHGKBPPM.GetCounter() >= jNPIOKEKMII.CounterValue)
 					{
 						list.Add(jNPIOKEKMII);
 					}
@@ -581,11 +581,11 @@ public static class GameUtils
 
 	public class TutorSettingsStruct
 	{
-		public string CDNCPBKAHKJ = string.Empty;
+		public string TutorialWeapon = string.Empty;
 
-		public string HGEAENEHEFI = string.Empty;
+		public string TutorialBoss = string.Empty;
 
-		public string KDKJKOICKJG = string.Empty;
+		public string TutorialTournament = string.Empty;
 
 		public float DefaultTutorialStepTimeout;
 
@@ -593,15 +593,15 @@ public static class GameUtils
 
 		public void Parse(XmlNode node)
 		{
-			CDNCPBKAHKJ = node["TutorialWeapon"].Attributes["Name"].CIPOICEEIBK("WEAPON_KNIVES");
-			HGEAENEHEFI = node["TutorialBoss"].Attributes["Name"].CIPOICEEIBK("ZONE_1|BOSS_LYNX|1");
-			KDKJKOICKJG = node["TutorialTournament"].Attributes["Name"].CIPOICEEIBK("ZONE_1|Tournament|1");
+			TutorialWeapon = node["TutorialWeapon"].Attributes["Name"].GetStringOrDefault("WEAPON_KNIVES");
+			TutorialBoss = node["TutorialBoss"].Attributes["Name"].GetStringOrDefault("ZONE_1|BOSS_LYNX|1");
+			TutorialTournament = node["TutorialTournament"].Attributes["Name"].GetStringOrDefault("ZONE_1|Tournament|1");
 			DefaultTutorialStepTimeout = node["TutorialStepTimeout"].Attributes["Value"].ParseFloat();
 			foreach (XmlNode childNode in node["StepsNames"].ChildNodes)
 			{
 				if ("Step" == childNode.Name)
 				{
-					StepsNames.Add(childNode.Attributes["Name"].CIPOICEEIBK());
+					StepsNames.Add(childNode.Attributes["Name"].GetStringOrDefault());
 				}
 			}
 		}
@@ -612,286 +612,286 @@ public static class GameUtils
 		}
 	}
 
-	public struct INGFODOLNDB
+	public struct DebugLogSettings
 	{
-		public bool CJGACJBAFLB;
+		public bool Enabled;
 
-		public bool GLHICPIHDKA;
+		public bool LogQuests;
 
-		public bool ACNLGBKEKNA;
+		public bool LogQuestActions;
 
-		public bool CHDBPGDJLIL;
+		public bool LogAnimations;
 
-		public bool LLNGIKNDILO;
+		public bool LogHits;
 
-		public bool IOLEMKNCHOC;
+		public bool LogHitDamage;
 
-		public bool LGAFEIJMKGL;
+		public bool LogHitStyle;
 
-		public bool AEMOAEPCCMM;
+		public bool LogTactics;
 
-		public bool JHMKINJHFGM;
+		public bool LogPerks;
 
 		private void Parse(XmlNode node)
 		{
-			CJGACJBAFLB = false;
-			GLHICPIHDKA = false;
-			ACNLGBKEKNA = false;
-			CHDBPGDJLIL = false;
-			LLNGIKNDILO = false;
-			IOLEMKNCHOC = false;
-			LGAFEIJMKGL = false;
-			AEMOAEPCCMM = false;
-			JHMKINJHFGM = false;
-			CJGACJBAFLB = node.PNJPEDPDMCP().ParseBool();
-			if (CJGACJBAFLB)
+			Enabled = false;
+			LogQuests = false;
+			LogQuestActions = false;
+			LogAnimations = false;
+			LogHits = false;
+			LogHitDamage = false;
+			LogHitStyle = false;
+			LogTactics = false;
+			LogPerks = false;
+			Enabled = node.FirstAttribute().ParseBool();
+			if (Enabled)
 			{
-				GLHICPIHDKA = node["Quests"].PNJPEDPDMCP().ParseBool();
-				if (GLHICPIHDKA)
+				LogQuests = node["Quests"].FirstAttribute().ParseBool();
+				if (LogQuests)
 				{
-					ACNLGBKEKNA = node["Quests"]["Actions"].PNJPEDPDMCP().ParseBool();
+					LogQuestActions = node["Quests"]["Actions"].FirstAttribute().ParseBool();
 				}
-				CHDBPGDJLIL = node["Animations"].PNJPEDPDMCP().ParseBool();
-				AEMOAEPCCMM = node["Tactics"].PNJPEDPDMCP().ParseBool();
-				JHMKINJHFGM = node["Perks"].PNJPEDPDMCP().ParseBool();
-				LLNGIKNDILO = node["Hits"].PNJPEDPDMCP().ParseBool();
-				if (LLNGIKNDILO)
+				LogAnimations = node["Animations"].FirstAttribute().ParseBool();
+				LogTactics = node["Tactics"].FirstAttribute().ParseBool();
+				LogPerks = node["Perks"].FirstAttribute().ParseBool();
+				LogHits = node["Hits"].FirstAttribute().ParseBool();
+				if (LogHits)
 				{
-					IOLEMKNCHOC = node["Hits"]["Damage"].PNJPEDPDMCP().ParseBool();
-					LGAFEIJMKGL = node["Hits"]["Style"].PNJPEDPDMCP().ParseBool();
+					LogHitDamage = node["Hits"]["Damage"].FirstAttribute().ParseBool();
+					LogHitStyle = node["Hits"]["Style"].FirstAttribute().ParseBool();
 				}
 			}
 		}
 	}
 
-	public static WarriorAttributes BGENALLCKII = new WarriorAttributes();
+	public static WarriorAttributes WarriorAttributeList = new WarriorAttributes();
 
-	public static LevelAttributeGain KJJBEHBGKMK = new LevelAttributeGain();
+	public static LevelAttributeGain StartingAttributes = new LevelAttributeGain();
 
-	public static LevelAttributeGain MKHOLKGKNID = new LevelAttributeGain();
+	public static LevelAttributeGain LevelAttributeGains = new LevelAttributeGain();
 
-	public static List<AlignTargetAttribute> FPIDOGKOPGC = new List<AlignTargetAttribute>();
+	public static List<AlignTargetAttribute> AlignTargetAttributes = new List<AlignTargetAttribute>();
 
-	public static ModifiedAlignFormula KMDIKMNMAOG = new ModifiedAlignFormula();
+	public static ModifiedAlignFormula ModifiedAlign = new ModifiedAlignFormula();
 
-	public static MagicSettings DILKHIFCCGD = new MagicSettings();
+	public static MagicSettings MagicConfig = new MagicSettings();
 
-	public static RandomTactic BJACOFCAHPD = new RandomTactic();
+	public static RandomTactic RandomTactics = new RandomTactic();
 
-	public static Shock APCAKCCOMLO = new Shock();
+	public static Shock ShockSettings = new Shock();
 
-	public static CritialDefault HHCEIEOOHCJ = new CritialDefault();
+	public static CritialDefault CriticalHitDefaults = new CritialDefault();
 
-	public static PerkItems FDEJIIDIPBI = new PerkItems();
+	public static PerkItems PerkItemList = new PerkItems();
 
-	public static OutdateLevels HPEBEOMLHKF = new OutdateLevels();
+	public static OutdateLevels OutdateLevelTable = new OutdateLevels();
 
-	public static StyleLevels NIPBIAGMAOD = new StyleLevels();
+	public static StyleLevels StyleLevelTable = new StyleLevels();
 
-	public static RewardsPrize AAKJKANGFMJ = new RewardsPrize();
+	public static RewardsPrize RewardsPrizeSettings = new RewardsPrize();
 
-	private static AspectConstants HBDIIFNOHPF = new AspectConstants();
+	private static AspectConstants aspectConstants = new AspectConstants();
 
-	private static List<Aspect> OKMEHFCEPIK = new List<Aspect>();
+	private static List<Aspect> aspects = new List<Aspect>();
 
-	private static AspectDoublingRange MCBAAGKCDOE = new AspectDoublingRange();
+	private static AspectDoublingRange aspectDoublingRange = new AspectDoublingRange();
 
-	public static float BGJPLNFFEOB = 0f;
+	public static float DamageDoublingRange = 0f;
 
-	public static bool GLHMHHIADMK = false;
+	public static bool AlwaysMagicMode = false;
 
-	public static LevelThresholds HHONBOCJBLB = new LevelThresholds();
+	public static LevelThresholds LevelThresholdTable = new LevelThresholds();
 
-	public static float LHHKFKLELMK = 0f;
+	public static float MenuBackgroundHeight = 0f;
 
-	public static float FPDINCCPGMO = 0f;
+	public static float MenuBackgroundPadding = 0f;
 
-	private static float JNNKGKOJBEI = 0f;
+	private static float leftWall = 0f;
 
-	private static float IGJGNFHKEKC = 0f;
+	private static float rightWall = 0f;
 
-	private static int NJDEBAFKGID = 1;
+	private static int slowMode = 1;
 
-	private static int DPIFMDPNEGL = 5;
+	private static int maxPower = 5;
 
-	private static float LKINJCDJPJD = 0f;
+	private static float damageFactorBase = 0f;
 
-	private static string FEBHHIHDLBK = string.Empty;
+	private static string damageFactorAttribute = string.Empty;
 
-	private static float BPMFKLKMIGH = 20000f;
+	private static float damageFactorMaxValue = 20000f;
 
 	private static int _ComboTime = 0;
 
-	private static int IHLGIDMENOP = 0;
+	private static int comboMinHits = 0;
 
-	private static int OEKIEIDCGML = 0;
+	private static int announcementTime = 0;
 
-	private static int MIBLCOOGPHB = 0;
+	private static int hotGroundTime = 0;
 
-	public static Currencies AJDKHINLIDI = new Currencies();
+	public static Currencies GameCurrencies = new Currencies();
 
-	public static AALKFCCIGJJ JNIMKHKGPHE = new AALKFCCIGJJ();
+	public static ResistanceList GameResistances = new ResistanceList();
 
-	public static int CDILOOACLKK = 60;
+	public static int FrameRate = 60;
 
-	public static int MAEBANCIBOP = 2;
+	public static int FpsReductionDivisor = 2;
 
-	public static AchievCounters HHLEKNNJGMJ = new AchievCounters();
+	public static AchievCounters AchievementDefinitions = new AchievCounters();
 
-	public static SlidersIndexStruct LMGAGBOKCFC = new SlidersIndexStruct();
+	public static SlidersIndexStruct SliderIndices = new SlidersIndexStruct();
 
-	public static CurrencyBaseValues KIGEPCLPEIE = new CurrencyBaseValues();
+	public static CurrencyBaseValues CurrencyBaseValueTable = new CurrencyBaseValues();
 
-	public static MoneyBaseValues NFJEPNHJPEE = new MoneyBaseValues();
+	public static MoneyBaseValues MoneyBaseValueTable = new MoneyBaseValues();
 
-	public static BarScales NPHEOMBNOLK = new BarScales();
+	public static BarScales BarScaleTable = new BarScales();
 
-	public static AchievementCounters OJNHPHEPFLI = new AchievementCounters();
+	public static AchievementCounters ModeCounters = new AchievementCounters();
 
-	public static ShopOverrideConteyner JNDLCLLIMMM = new ShopOverrideConteyner();
+	public static ShopOverrideConteyner ShopOverrides = new ShopOverrideConteyner();
 
-	public static int JOODENKAECE = 0;
+	public static int CounterPunches = 0;
 
-	public static int DIJOCFEFHAK = 0;
+	public static int PowerMaxTime = 0;
 
-	private static float FECMKFKDLIJ;
+	private static float lifeBarValue;
 
-	private static bool FPMDHBHDGKK = false;
+	private static bool extraFlag = false;
 
-	public static bool GCDIGFODNFO = true;
+	public static bool ShowNews = true;
 
-	public static bool LJOJHDOIFLN = false;
+	public static bool HackDetected = false;
 
-	public static SupportChoiceStruct JOEMCCADMON = new SupportChoiceStruct();
+	public static SupportChoiceStruct SupportChoices = new SupportChoiceStruct();
 
-	private static HitEffects ILMELNHPLDF = new HitEffects();
+	private static HitEffects hitEffects = new HitEffects();
 
-	private static CameraSettigs FCMOMOGKAOH = new CameraSettigs();
+	private static CameraSettigs cameraSettings = new CameraSettigs();
 
-	private static BaseSettigs GJJDNKGFJAN = new BaseSettigs();
+	private static BaseSettigs blockDamageFactor = new BaseSettigs();
 
-	private static BaseSettigs LOBNDKMHFOM = new BaseSettigs();
+	private static BaseSettigs criticalHitDamage = new BaseSettigs();
 
-	private static BaseSettigs BODMJLIADGC = new BaseSettigs();
+	private static BaseSettigs regeneration = new BaseSettigs();
 
-	private static BaseSettigs KIKPMJLNDNM = new BaseSettigs();
+	private static BaseSettigs lifesteal = new BaseSettigs();
 
-	private static float AGKNPNBOHKC;
+	private static float resistanceDoublingRange;
 
-	private static float KIBGGBKKPFK = 0f;
+	private static float greatMaxHealth = 0f;
 
-	public static bool OBJEKOBDMOE = false;
+	public static bool IsLoginComplete = false;
 
-	public static int AJAFNEIPOJB = 10;
+	public static int SlowModeSpeed = 10;
 
-	public static bool DAOBANIOMAN;
+	public static bool UnusedFlag;
 
-	private static string BFNACAJCOJI = string.Empty;
+	private static string slowMotionDefense = string.Empty;
 
-	private static string MIMENKMIOMI = string.Empty;
+	private static string blockDefenseAttribute = string.Empty;
 
-	private static string ABMGNMFBDID = string.Empty;
+	private static string startingMagicAttribute = string.Empty;
 
-	public static bool KJNOABODHMG = false;
+	public static bool IsFightTransitioning = false;
 
-	public static TutorSettingsStruct AKPBNLKFONO = new TutorSettingsStruct();
+	public static TutorSettingsStruct TutorialSettings = new TutorSettingsStruct();
 
-	public static string KEFHKHCNBOK = string.Empty;
+	public static string PivotNodeName = string.Empty;
 
-	public static float FPBFDNBDDIE = 1f;
+	public static float SellPriceFactor = 1f;
 
-	private static string EOKAPIGANEE = string.Empty;
+	private static string defaultAvatar = string.Empty;
 
-	private static string MODJMLNMBJH = string.Empty;
+	private static string defaultSkeleton = string.Empty;
 
-	public const int FFEMNONLAMD = 1;
+	public const int UnusedConstant = 1;
 
-	public const int OHPGOLBBHON = 172800;
+	public const int DefaultPushRetentionTime = 172800;
 
-	public static int LJNCELBEHGN = 172800;
+	public static int PushRetentionTime = 172800;
 
-	public static uint JNOGEPFLLDM = 30000000u;
+	public static uint MaximumExperience = 30000000u;
 
-	public static bool GKOEGHLGPPE = false;
+	public static bool DailyDebugMode = false;
 
 	public static long DailyDebugTime = 0L;
 
-	public static bool LDBMFAMEMPF = false;
+	public static bool ReduceFps = false;
 
-	public static bool LEEIGNICAMN = false;
+	public static bool ParticlesDisabled = false;
 
-	public static bool GBCMHICHIOI = false;
+	public static bool SequencesDisabled = false;
 
 	[DebuggerBrowsable(DebuggerBrowsableState.Never)]
-	private static bool IBCOLFJCDNG;
+	private static bool fightFlag;
 
-	public static Dictionary<SliderType, string> IPFBLJOALBN = new Dictionary<SliderType, string>();
+	public static Dictionary<SliderType, string> SliderNames = new Dictionary<SliderType, string>();
 
-	public static bool HHKHINLNCJB = false;
+	public static bool AutoWinPending = false;
 
-	public static string NFBKHONMMDL = string.Empty;
+	public static string AutoWinFightKey = string.Empty;
 
-	public static INGFODOLNDB IEJDNMPFLPP;
+	public static DebugLogSettings LogSettings;
 
-	public static Dictionary<RaidTutorialStepCode, string> HEJIFIHLLJF = new Dictionary<RaidTutorialStepCode, string>();
+	public static Dictionary<RaidTutorialStepCode, string> RaidTutorialStepNames = new Dictionary<RaidTutorialStepCode, string>();
 
-	private static int LCBOCBHCBNP = 28800;
+	private static int EightHoursSeconds = 28800;
 
-	private static bool NIDLHHCCDFJ = false;
+	private static bool ShowRatePrompt = false;
 
 	private static List<string> _notShowRateFights = new List<string>();
 
-	public static string NIPABEEAMHJ = string.Empty;
+	public static string DefaultLocation = string.Empty;
 
-	private static List<global::Pair<string, string>> GMKKGOHMEOM = new List<global::Pair<string, string>>();
+	private static List<global::Pair<string, string>> defaultItems = new List<global::Pair<string, string>>();
 
-	private static List<Achievement> CCNGPMBGNAC = new List<Achievement>();
+	private static List<Achievement> pendingAchievements = new List<Achievement>();
 
-	public static AspectConstants BDHJDKGHIEA
+	public static AspectConstants AspectConstantSettings
 	{
 		get
 		{
-			return JDHBJMHAJOG();
+			return GetAspectConstants();
 		}
 	}
 
-	public static List<Aspect> DILEMPDIJLG
+	public static List<Aspect> AspectList
 	{
 		get
 		{
-			return IGHPKGCJGHM();
+			return GetAspects();
 		}
 	}
 
-	public static AspectDoublingRange FAEGGMGHOJB
+	public static AspectDoublingRange AspectDoublingRangeSettings
 	{
 		get
 		{
-			return HBDECHDPLCA();
+			return GetAspectDoublingRange();
 		}
 	}
 
-	public static float HEJEOMEBHGL
+	public static float LeftWall
 	{
 		get
 		{
-			return CKOPPGCIHPL();
+			return GetLeftWall();
 		}
 		set
 		{
-			OKIEEBMCGHE(value);
+			SetLeftWall(value);
 		}
 	}
 
-	public static float JCAKIBIACFC
+	public static float RightWall
 	{
 		get
 		{
-			return FBOGLADLJML();
+			return GetRightWall();
 		}
 		set
 		{
-			MJAPCKDDAMK(value);
+			SetRightWall(value);
 		}
 	}
 
@@ -899,263 +899,263 @@ public static class GameUtils
 	{
 		get
 		{
-			return GGBABPJBGJB();
+			return GetSlowMode();
 		}
 		set
 		{
-			CEPJBBGGMDP(value);
+			SetSlowMode(value);
 		}
 	}
 
-	public static int OGLHGFJKMCO
+	public static int MaxPower
 	{
 		get
 		{
-			return NAMEDMHAFKA();
+			return GetMaxPower();
 		}
 		set
 		{
-			PFBPLLNHLFB(value);
+			SetMaxPower(value);
 		}
 	}
 
-	public static float MIAONGMCEDA
+	public static float DamageFactorBase
 	{
 		get
 		{
-			return MGPIOCMLCLF();
+			return GetDamageFactorBase();
 		}
 		set
 		{
-			MEPHOOCEOCI(value);
+			SetDamageFactorBase(value);
 		}
 	}
 
-	public static string MCBCMFGLCBJ
+	public static string DamageFactorAttribute
 	{
 		get
 		{
-			return CJMOJMKCLMJ();
+			return GetDamageFactorAttribute();
 		}
 		set
 		{
-			OKMDBKGNGBJ(value);
+			SetDamageFactorAttribute(value);
 		}
 	}
 
-	public static float GIDNINANMCC
+	public static float DamageFactorMaxValue
 	{
 		get
 		{
-			return PCDIBMDDAEF();
+			return GetDamageFactorMaxValue();
 		}
 		set
 		{
-			KMOPHHBPOLM(value);
+			SetDamageFactorMaxValue(value);
 		}
 	}
 
-	public static int HIGBAPPOOKJ
+	public static int ComboTime
 	{
 		get
 		{
-			return KCBHAMHLGBC();
+			return GetComboTime();
 		}
 		set
 		{
-			LKAJIAEEFDL(value);
+			SetComboTime(value);
 		}
 	}
 
-	public static int GKAEJDCDMHC
+	public static int ComboMinHits
 	{
 		get
 		{
-			return NPDOLGNNINO();
+			return GetComboMinHits();
 		}
 		set
 		{
-			BOGEEJGMHON(value);
+			SetComboMinHits(value);
 		}
 	}
 
-	public static int BKDJLFBHHHE
+	public static int AnnouncementTime
 	{
 		get
 		{
-			return MLAHKALHANF();
+			return GetAnnouncementTime();
 		}
 		set
 		{
-			BBBPHLNOOPN(value);
+			SetAnnouncementTime(value);
 		}
 	}
 
-	public static int MJFAGPDIPFH
+	public static int HotGroundTime
 	{
 		get
 		{
-			return LDHIBCJCHFK();
+			return GetHotGroundTime();
 		}
 		set
 		{
-			NCADEABFAFF(value);
+			SetHotGroundTime(value);
 		}
 	}
 
-	public static float HMNBNIFBDFD
+	public static float LifeBarValue
 	{
 		get
 		{
-			return KNAFNPGCLFP();
+			return GetLifeBarValue();
 		}
 		set
 		{
-			LJGHIDNLJHC(value);
+			SetLifeBarValue(value);
 		}
 	}
 
-	public static bool CODLJKAMGLL
+	public static bool ExtraFlag
 	{
 		get
 		{
-			return JJIHFNGBPEM();
+			return GetExtraFlag();
 		}
 		set
 		{
-			ECBGGDNBKJC(value);
+			SetExtraFlag(value);
 		}
 	}
 
-	public static HitEffects NMBBOEHHKNK
+	public static HitEffects HitEffectSettings
 	{
 		get
 		{
-			return OCMEOOKALHM();
+			return GetHitEffects();
 		}
 	}
 
-	public static CameraSettigs DJELPPGNJEH
+	public static CameraSettigs CameraConfig
 	{
 		get
 		{
-			return LEPANPKBBKI();
+			return GetCameraSettings();
 		}
 	}
 
-	public static BaseSettigs LKLFLAKKFPC
+	public static BaseSettigs BlockDamageFactor
 	{
 		get
 		{
-			return DAMKDJINILI();
+			return GetBlockDamageFactor();
 		}
 	}
 
-	public static BaseSettigs GKIKBPMJPAC
+	public static BaseSettigs CriticalHitDamage
 	{
 		get
 		{
-			return IOGOPCABLON();
+			return GetCriticalHitDamage();
 		}
 	}
 
-	public static BaseSettigs GIEINANKIIA
+	public static BaseSettigs RegenerationSettings
 	{
 		get
 		{
-			return DMLPOANHHFI();
+			return GetRegeneration();
 		}
 	}
 
-	public static BaseSettigs AHAKPJINJBL
+	public static BaseSettigs LifestealSettings
 	{
 		get
 		{
-			return PPAEHBGNDNF();
+			return GetLifesteal();
 		}
 	}
 
-	public static float LPMGOFOGINJ
+	public static float ResistanceDoublingRange
 	{
 		get
 		{
-			return CHOGPMPEDIC();
+			return GetResistanceDoublingRange();
 		}
 		set
 		{
-			ENMCFJCNKIG(value);
+			SetResistanceDoublingRange(value);
 		}
 	}
 
-	public static float ICFLAENKNDI
+	public static float GreatMaxHealth
 	{
 		get
 		{
-			return EBMNPGEKENM();
+			return GetGreatMaxHealth();
 		}
 		set
 		{
-			FJNOCJPPJPF(value);
+			SetGreatMaxHealth(value);
 		}
 	}
 
-	public static string FDIJEJHPNOG
+	public static string SlowMotionDefense
 	{
 		get
 		{
-			return HLBPBLMMPCB();
+			return GetSlowMotionDefense();
 		}
 		set
 		{
-			JMFEGEGENII(value);
+			SetSlowMotionDefense(value);
 		}
 	}
 
-	public static string IEFIJKENPMP
+	public static string BlockDefenseAttribute
 	{
 		get
 		{
-			return IIFHFGAENMH();
+			return GetBlockDefenseAttribute();
 		}
 		set
 		{
-			FNCAJMBJJBN(value);
+			SetBlockDefenseAttribute(value);
 		}
 	}
 
-	public static string CJDFKNHEJDE
+	public static string StartingMagicAttribute
 	{
 		get
 		{
-			return LBIMBGDGNNL();
+			return GetStartingMagicAttribute();
 		}
 		set
 		{
-			LIHCDMIOKKM(value);
+			SetStartingMagicAttribute(value);
 		}
 	}
 
-	public static ModelParameters DPIKLENNPEF
+	public static ModelParameters DefaultModelParameters
 	{
 		get
 		{
-			return LBMPHBNJMGG();
+			return GetPlayerModelParameters();
 		}
 	}
 
-	public static string PDJHEIKDHEC
+	public static string DefaultAvatar
 	{
 		get
 		{
-			return BGGMLFLFONJ();
+			return GetDefaultAvatar();
 		}
 		set
 		{
-			PALADCEPDNI(value);
+			SetDefaultAvatar(value);
 		}
 	}
 
-	public static string MMGEIOGCBAO
+	public static string DefaultSkeletonName
 	{
 		get
 		{
@@ -1163,175 +1163,175 @@ public static class GameUtils
 		}
 		set
 		{
-			NCGINDFMIFB(value);
+			SetDefaultSkeleton(value);
 		}
 	}
 
-	public static bool NFAGLALCFLD
+	public static bool FightFlag
 	{
 		get
 		{
-			return NMODJEJFFNC();
+			return GetFightFlag();
 		}
 		set
 		{
-			FBEHNHNOKKO(value);
+			SetFightFlag(value);
 		}
 	}
 
-	public static AspectConstants JDHBJMHAJOG()
+	public static AspectConstants GetAspectConstants()
 	{
-		return HBDIIFNOHPF;
+		return aspectConstants;
 	}
 
-	public static List<Aspect> IGHPKGCJGHM()
+	public static List<Aspect> GetAspects()
 	{
-		return OKMEHFCEPIK;
+		return aspects;
 	}
 
-	public static AspectDoublingRange HBDECHDPLCA()
+	public static AspectDoublingRange GetAspectDoublingRange()
 	{
-		return MCBAAGKCDOE;
+		return aspectDoublingRange;
 	}
 
-	public static float CKOPPGCIHPL()
+	public static float GetLeftWall()
 	{
-		return JNNKGKOJBEI;
+		return leftWall;
 	}
 
-	public static void OKIEEBMCGHE(float value)
+	public static void SetLeftWall(float value)
 	{
-		JNNKGKOJBEI = value;
+		leftWall = value;
 	}
 
-	public static float FBOGLADLJML()
+	public static float GetRightWall()
 	{
-		return IGJGNFHKEKC;
+		return rightWall;
 	}
 
-	public static void MJAPCKDDAMK(float value)
+	public static void SetRightWall(float value)
 	{
-		IGJGNFHKEKC = value;
+		rightWall = value;
 	}
 
-	public static int GGBABPJBGJB()
+	public static int GetSlowMode()
 	{
-		return NJDEBAFKGID;
+		return slowMode;
 	}
 
-	public static void CEPJBBGGMDP(int value)
+	public static void SetSlowMode(int value)
 	{
-		NJDEBAFKGID = value;
+		slowMode = value;
 	}
 
-	public static int NAMEDMHAFKA()
+	public static int GetMaxPower()
 	{
-		return DPIFMDPNEGL;
+		return maxPower;
 	}
 
-	public static void PFBPLLNHLFB(int value)
+	public static void SetMaxPower(int value)
 	{
-		DPIFMDPNEGL = value;
+		maxPower = value;
 	}
 
-	public static float MGPIOCMLCLF()
+	public static float GetDamageFactorBase()
 	{
-		return LKINJCDJPJD;
+		return damageFactorBase;
 	}
 
-	public static void MEPHOOCEOCI(float value)
+	public static void SetDamageFactorBase(float value)
 	{
-		LKINJCDJPJD = value;
+		damageFactorBase = value;
 	}
 
-	public static string CJMOJMKCLMJ()
+	public static string GetDamageFactorAttribute()
 	{
-		return FEBHHIHDLBK;
+		return damageFactorAttribute;
 	}
 
-	public static void OKMDBKGNGBJ(string value)
+	public static void SetDamageFactorAttribute(string value)
 	{
-		FEBHHIHDLBK = value;
+		damageFactorAttribute = value;
 	}
 
-	public static float PCDIBMDDAEF()
+	public static float GetDamageFactorMaxValue()
 	{
-		return BPMFKLKMIGH;
+		return damageFactorMaxValue;
 	}
 
-	public static void KMOPHHBPOLM(float value)
+	public static void SetDamageFactorMaxValue(float value)
 	{
-		BPMFKLKMIGH = value;
+		damageFactorMaxValue = value;
 	}
 
-	public static int KCBHAMHLGBC()
+	public static int GetComboTime()
 	{
 		return _ComboTime;
 	}
 
-	public static void LKAJIAEEFDL(int value)
+	public static void SetComboTime(int value)
 	{
 		_ComboTime = value;
 	}
 
-	public static int NPDOLGNNINO()
+	public static int GetComboMinHits()
 	{
-		return IHLGIDMENOP;
+		return comboMinHits;
 	}
 
-	public static void BOGEEJGMHON(int value)
+	public static void SetComboMinHits(int value)
 	{
-		IHLGIDMENOP = value;
+		comboMinHits = value;
 	}
 
-	public static int MLAHKALHANF()
+	public static int GetAnnouncementTime()
 	{
-		return OEKIEIDCGML;
+		return announcementTime;
 	}
 
-	public static void BBBPHLNOOPN(int value)
+	public static void SetAnnouncementTime(int value)
 	{
-		OEKIEIDCGML = value;
+		announcementTime = value;
 	}
 
-	public static int LDHIBCJCHFK()
+	public static int GetHotGroundTime()
 	{
-		return MIBLCOOGPHB;
+		return hotGroundTime;
 	}
 
-	public static void NCADEABFAFF(int value)
+	public static void SetHotGroundTime(int value)
 	{
-		MIBLCOOGPHB = value;
+		hotGroundTime = value;
 	}
 
-	public static Achievement EKBBPLEHGHD(Counter EPJGLECOIBG, int value)
+	public static Achievement FindReachedAchievement(Counter EPJGLECOIBG, int value)
 	{
 		Achievement jNPIOKEKMII = null;
-		AchievCounter iFDAFNGCIBP = HHLEKNNJGMJ.KJPLIHEMLJL(EPJGLECOIBG.Name);
+		AchievCounter iFDAFNGCIBP = AchievementDefinitions.GetCounterByName(EPJGLECOIBG.Name);
 		if (iFDAFNGCIBP == null)
 		{
 			return null;
 		}
-		RosterAchievCounter cKJBHGKBPPM = ListSF.CCDKHLAMKKO().KJNPJKEHGLE().KJPLIHEMLJL(EPJGLECOIBG.Name);
-		int num = ((cKJBHGKBPPM != null) ? cKJBHGKBPPM.MCIPEJBLIDC() : 0);
-		List<Achievement> fOICCCGPCMJ = iFDAFNGCIBP.FOICCCGPCMJ;
+		RosterAchievCounter cKJBHGKBPPM = ListSF.GetRoster().GetAchievements().FindCounter(EPJGLECOIBG.Name);
+		int num = ((cKJBHGKBPPM != null) ? cKJBHGKBPPM.GetCounter() : 0);
+		List<Achievement> fOICCCGPCMJ = iFDAFNGCIBP.Achievements;
 		int num2 = num + value;
 		for (int i = 0; i < fOICCCGPCMJ.Count; i++)
 		{
 			Achievement jNPIOKEKMII2 = fOICCCGPCMJ[i];
-			if (jNPIOKEKMII2.EOGLBDCLMBM >= num && jNPIOKEKMII2.EOGLBDCLMBM <= num2 && !jNPIOKEKMII2.HGMHEOGJDMM)
+			if (jNPIOKEKMII2.CounterValue >= num && jNPIOKEKMII2.CounterValue <= num2 && !jNPIOKEKMII2.IsUnlocked)
 			{
 				jNPIOKEKMII = jNPIOKEKMII2;
 				if (!EPJGLECOIBG.IsFightEnd)
 				{
-					jNPIOKEKMII.HGMHEOGJDMM = true;
+					jNPIOKEKMII.IsUnlocked = true;
 				}
 				else
 				{
-					CCNGPMBGNAC.Add(jNPIOKEKMII);
+					pendingAchievements.Add(jNPIOKEKMII);
 				}
 			}
-			else if (jNPIOKEKMII2.EOGLBDCLMBM >= num && jNPIOKEKMII2.EOGLBDCLMBM >= num2)
+			else if (jNPIOKEKMII2.CounterValue >= num && jNPIOKEKMII2.CounterValue >= num2)
 			{
 				break;
 			}
@@ -1339,92 +1339,92 @@ public static class GameUtils
 		return jNPIOKEKMII;
 	}
 
-	public static Achievement POFHBHOIMAI(string name)
+	public static Achievement GiveAchievement(string name)
 	{
-		Achievement jNPIOKEKMII = HHLEKNNJGMJ.ABNAODNDHDM(name);
+		Achievement jNPIOKEKMII = AchievementDefinitions.GetAchievementByName(name);
 		if (jNPIOKEKMII == null)
 		{
 			return null;
 		}
-		if (!jNPIOKEKMII.HGMHEOGJDMM)
+		if (!jNPIOKEKMII.IsUnlocked)
 		{
-			jNPIOKEKMII.HGMHEOGJDMM = true;
+			jNPIOKEKMII.IsUnlocked = true;
 		}
-		RosterAchievement pMGCOHHMIIC = ListSF.CCDKHLAMKKO().KJNPJKEHGLE().JABBCCJLOOC(name);
+		RosterAchievement pMGCOHHMIIC = ListSF.GetRoster().GetAchievements().FindAchievement(name);
 		if (pMGCOHHMIIC == null)
 		{
-			Counter jLOIMNNHFKH = OJNHPHEPFLI.CBGAEFLNGAC(name);
+			Counter jLOIMNNHFKH = ModeCounters.FindCounterByAchievement(name);
 			if (jLOIMNNHFKH != null && jLOIMNNHFKH.CompleteValue <= 0)
 			{
 				jLOIMNNHFKH.CompleteValue = 1;
 			}
 		}
-		ListSF.CCDKHLAMKKO().KJNPJKEHGLE().BFCLLIKOJGD();
+		ListSF.GetRoster().GetAchievements().ApplyPendingCounters();
 		return jNPIOKEKMII;
 	}
 
-	public static void NKGCBJAAJMA(List<global::Pair<Achievement, int>> CIMGCGDDKCE)
+	public static void UnlockAchievements(List<global::Pair<Achievement, int>> CIMGCGDDKCE)
 	{
-		Roster nKGLHEGIKKP = ListSF.CCDKHLAMKKO();
+		Roster nKGLHEGIKKP = ListSF.GetRoster();
 		List<SocialAchievement> list = new List<SocialAchievement>();
 		List<string> list2 = new List<string>();
 		for (int i = 0; i < CIMGCGDDKCE.Count; i++)
 		{
 			Achievement lLHEDBIEHAA = CIMGCGDDKCE[i].First;
 			int nFNBFHCDEGG = CIMGCGDDKCE[i].Second;
-			SocialAchievement iFLOCBJBEGL = new SocialAchievement(lLHEDBIEHAA.EIEBHLJCOKE, nFNBFHCDEGG, lLHEDBIEHAA.EOGLBDCLMBM);
-			if (nFNBFHCDEGG >= lLHEDBIEHAA.EOGLBDCLMBM)
+			SocialAchievement iFLOCBJBEGL = new SocialAchievement(lLHEDBIEHAA.PlatformId, nFNBFHCDEGG, lLHEDBIEHAA.CounterValue);
+			if (nFNBFHCDEGG >= lLHEDBIEHAA.CounterValue)
 			{
-				nKGLHEGIKKP.KJNPJKEHGLE().POKNGJJAHAL(lLHEDBIEHAA, false);
-				iFLOCBJBEGL.value = lLHEDBIEHAA.EOGLBDCLMBM;
+				nKGLHEGIKKP.GetAchievements().UnlockAchievement(lLHEDBIEHAA, false);
+				iFLOCBJBEGL.value = lLHEDBIEHAA.CounterValue;
 			}
 			list.Add(iFLOCBJBEGL);
 			list2.Add(lLHEDBIEHAA.Name);
 		}
-		if (InternetController.DHDGLNKILPM())
+		if (InternetController.IsPostAchievementsEnabled())
 		{
-			if (SystemProperties.PKLFCFBEIIG() && GameCenterController.OBDJPKOJADA())
+			if (SystemProperties.CheckConnection() && GameCenterController.GetIsAuthenticated())
 			{
-				GameCenterController.FLJILJDHNLJ(list);
+				GameCenterController.SyncAchievements(list);
 			}
 			else
 			{
-				ListSF.CCDKHLAMKKO().KJNPJKEHGLE().AddRepostAchievements(list2);
+				ListSF.GetRoster().GetAchievements().AddRepostAchievements(list2);
 			}
 		}
 	}
 
-	public static void HGJCGOPPNBI()
+	public static void RecountAchievements()
 	{
-		List<RosterAchievement> list = ListSF.CCDKHLAMKKO().KJNPJKEHGLE().NOJKMMJJPHF();
+		List<RosterAchievement> list = ListSF.GetRoster().GetAchievements().GetAchievements();
 		List<SocialAchievement> list2 = new List<SocialAchievement>();
 		List<string> list3 = new List<string>();
 		for (int i = 0; i < list.Count; i++)
 		{
-			Achievement jNPIOKEKMII = HHLEKNNJGMJ.ABNAODNDHDM(list[i].get_Name());
+			Achievement jNPIOKEKMII = AchievementDefinitions.GetAchievementByName(list[i].get_Name());
 			// Local mod achievements have no platform achievement identity.
-			if (jNPIOKEKMII != null && !string.IsNullOrEmpty(jNPIOKEKMII.EIEBHLJCOKE))
+			if (jNPIOKEKMII != null && !string.IsNullOrEmpty(jNPIOKEKMII.PlatformId))
 			{
-				list2.Add(new SocialAchievement(jNPIOKEKMII.EIEBHLJCOKE, jNPIOKEKMII.EOGLBDCLMBM, jNPIOKEKMII.EOGLBDCLMBM));
+				list2.Add(new SocialAchievement(jNPIOKEKMII.PlatformId, jNPIOKEKMII.CounterValue, jNPIOKEKMII.CounterValue));
 				list3.Add(jNPIOKEKMII.Name);
 			}
 		}
-		if (InternetController.DHDGLNKILPM())
+		if (InternetController.IsPostAchievementsEnabled())
 		{
-			if (SystemProperties.PKLFCFBEIIG() && GameCenterController.OBDJPKOJADA())
+			if (SystemProperties.CheckConnection() && GameCenterController.GetIsAuthenticated())
 			{
-				GameCenterController.FLJILJDHNLJ(list2);
+				GameCenterController.SyncAchievements(list2);
 			}
 			else
 			{
-				ListSF.CCDKHLAMKKO().KJNPJKEHGLE().AddRepostAchievements(list3);
+				ListSF.GetRoster().GetAchievements().AddRepostAchievements(list3);
 			}
 		}
 	}
 
-	private static bool IEPPDHFHEIC(string name)
+	private static bool IsAchievementUnlocked(string name)
 	{
-		List<RosterAchievement> list = ListSF.CCDKHLAMKKO().KJNPJKEHGLE().NOJKMMJJPHF();
+		List<RosterAchievement> list = ListSF.GetRoster().GetAchievements().GetAchievements();
 		for (int i = 0; i < list.Count; i++)
 		{
 			if (list[i].get_Name() == name)
@@ -1435,154 +1435,154 @@ public static class GameUtils
 		return false;
 	}
 
-	public static void DKBINLMJIJG()
+	public static void SendRepostedAchievements()
 	{
-		if (!InternetController.DHDGLNKILPM() || !SystemProperties.PKLFCFBEIIG() || !GameCenterController.OBDJPKOJADA())
+		if (!InternetController.IsPostAchievementsEnabled() || !SystemProperties.CheckConnection() || !GameCenterController.GetIsAuthenticated())
 		{
 			return;
 		}
-		List<RepostAchievement> list = ListSF.CCDKHLAMKKO().KJNPJKEHGLE().NEEDPAEIOLH();
+		List<RepostAchievement> list = ListSF.GetRoster().GetAchievements().GetRepostAchievements();
 		List<SocialAchievement> list2 = new List<SocialAchievement>();
-		List<AchievCounter> mDNKEAFGAOB = HHLEKNNJGMJ.MDNKEAFGAOB;
+		List<AchievCounter> mDNKEAFGAOB = AchievementDefinitions.Counters;
 		for (int i = 0; i < list.Count; i++)
 		{
 			for (int j = 0; j < mDNKEAFGAOB.Count; j++)
 			{
-				RosterAchievCounter cKJBHGKBPPM = ListSF.CCDKHLAMKKO().KJNPJKEHGLE().KJPLIHEMLJL(mDNKEAFGAOB[j].Name);
+				RosterAchievCounter cKJBHGKBPPM = ListSF.GetRoster().GetAchievements().FindCounter(mDNKEAFGAOB[j].Name);
 				if (cKJBHGKBPPM == null)
 				{
 					continue;
 				}
-				List<Achievement> fOICCCGPCMJ = mDNKEAFGAOB[j].FOICCCGPCMJ;
+				List<Achievement> fOICCCGPCMJ = mDNKEAFGAOB[j].Achievements;
 				for (int k = 0; k < fOICCCGPCMJ.Count; k++)
 				{
-					if (fOICCCGPCMJ[k].Name == list[i].get_Name() && !string.IsNullOrEmpty(fOICCCGPCMJ[k].EIEBHLJCOKE))
+					if (fOICCCGPCMJ[k].Name == list[i].get_Name() && !string.IsNullOrEmpty(fOICCCGPCMJ[k].PlatformId))
 					{
-						if (fOICCCGPCMJ[k].EOGLBDCLMBM == 0)
+						if (fOICCCGPCMJ[k].CounterValue == 0)
 						{
-							LLLOJBFMONN.Write("Error - counter == 0");
+							GameLog.Write("Error - counter == 0");
 						}
-						SocialAchievement item = new SocialAchievement(fOICCCGPCMJ[k].EIEBHLJCOKE, cKJBHGKBPPM.MCIPEJBLIDC(), fOICCCGPCMJ[k].EOGLBDCLMBM);
+						SocialAchievement item = new SocialAchievement(fOICCCGPCMJ[k].PlatformId, cKJBHGKBPPM.GetCounter(), fOICCCGPCMJ[k].CounterValue);
 						list2.Add(item);
 					}
 				}
 			}
 		}
-		GameCenterController.FLJILJDHNLJ(list2);
-		ListSF.CCDKHLAMKKO().KJNPJKEHGLE().PEBJNEJLONK(list);
+		GameCenterController.SyncAchievements(list2);
+		ListSF.GetRoster().GetAchievements().RemoveRepostAchievements(list);
 	}
 
-	public static bool CJKKIOIMGAC(string FHLFEBDNIFF)
+	public static bool AvatarExists(string FHLFEBDNIFF)
 	{
-		string path = string.Format("{0}{1}", SF2Paths.BHCPOOOJAAK(), FHLFEBDNIFF);
+		string path = string.Format("{0}{1}", SF2Paths.GetUsersUiPath(), FHLFEBDNIFF);
 		UnityEngine.Object obj = Resources.Load(path);
 		return obj != null;
 	}
 
-	public static float KNAFNPGCLFP()
+	public static float GetLifeBarValue()
 	{
-		return FECMKFKDLIJ;
+		return lifeBarValue;
 	}
 
-	public static void LJGHIDNLJHC(float value)
+	public static void SetLifeBarValue(float value)
 	{
-		FECMKFKDLIJ = value;
+		lifeBarValue = value;
 	}
 
-	public static bool JJIHFNGBPEM()
+	public static bool GetExtraFlag()
 	{
-		return FPMDHBHDGKK;
+		return extraFlag;
 	}
 
-	public static void ECBGGDNBKJC(bool value)
+	public static void SetExtraFlag(bool value)
 	{
-		FPMDHBHDGKK = value;
+		extraFlag = value;
 	}
 
-	public static HitEffects OCMEOOKALHM()
+	public static HitEffects GetHitEffects()
 	{
-		return ILMELNHPLDF;
+		return hitEffects;
 	}
 
-	public static CameraSettigs LEPANPKBBKI()
+	public static CameraSettigs GetCameraSettings()
 	{
-		return FCMOMOGKAOH;
+		return cameraSettings;
 	}
 
-	public static BaseSettigs DAMKDJINILI()
+	public static BaseSettigs GetBlockDamageFactor()
 	{
-		return GJJDNKGFJAN;
+		return blockDamageFactor;
 	}
 
-	public static BaseSettigs IOGOPCABLON()
+	public static BaseSettigs GetCriticalHitDamage()
 	{
-		return LOBNDKMHFOM;
+		return criticalHitDamage;
 	}
 
-	public static BaseSettigs DMLPOANHHFI()
+	public static BaseSettigs GetRegeneration()
 	{
-		return BODMJLIADGC;
+		return regeneration;
 	}
 
-	public static BaseSettigs PPAEHBGNDNF()
+	public static BaseSettigs GetLifesteal()
 	{
-		return KIKPMJLNDNM;
+		return lifesteal;
 	}
 
-	public static float CHOGPMPEDIC()
+	public static float GetResistanceDoublingRange()
 	{
-		return AGKNPNBOHKC;
+		return resistanceDoublingRange;
 	}
 
-	public static void ENMCFJCNKIG(float value)
+	public static void SetResistanceDoublingRange(float value)
 	{
-		AGKNPNBOHKC = value;
+		resistanceDoublingRange = value;
 	}
 
-	public static bool HILEAHAAFIC(string MJMEBBCLHII)
+	public static bool IsAlignTargetAttribute(string MJMEBBCLHII)
 	{
-		AlignTargetAttribute kDDAFBJDOMN = FPIDOGKOPGC.Find((AlignTargetAttribute DHDMNHCIPEH) => DHDMNHCIPEH.Name.Equals(MJMEBBCLHII));
+		AlignTargetAttribute kDDAFBJDOMN = AlignTargetAttributes.Find((AlignTargetAttribute DHDMNHCIPEH) => DHDMNHCIPEH.Name.Equals(MJMEBBCLHII));
 		return kDDAFBJDOMN != null;
 	}
 
-	public static float EBMNPGEKENM()
+	public static float GetGreatMaxHealth()
 	{
-		return KIBGGBKKPFK;
+		return greatMaxHealth;
 	}
 
-	public static void FJNOCJPPJPF(float value)
+	public static void SetGreatMaxHealth(float value)
 	{
-		KIBGGBKKPFK = value;
+		greatMaxHealth = value;
 	}
 
-	public static string HLBPBLMMPCB()
+	public static string GetSlowMotionDefense()
 	{
-		return BFNACAJCOJI;
+		return slowMotionDefense;
 	}
 
-	public static void JMFEGEGENII(string value)
+	public static void SetSlowMotionDefense(string value)
 	{
-		BFNACAJCOJI = value;
+		slowMotionDefense = value;
 	}
 
-	public static string IIFHFGAENMH()
+	public static string GetBlockDefenseAttribute()
 	{
-		return MIMENKMIOMI;
+		return blockDefenseAttribute;
 	}
 
-	public static void FNCAJMBJJBN(string value)
+	public static void SetBlockDefenseAttribute(string value)
 	{
-		MIMENKMIOMI = value;
+		blockDefenseAttribute = value;
 	}
 
-	public static string LBIMBGDGNNL()
+	public static string GetStartingMagicAttribute()
 	{
-		return ABMGNMFBDID;
+		return startingMagicAttribute;
 	}
 
-	public static void LIHCDMIOKKM(string value)
+	public static void SetStartingMagicAttribute(string value)
 	{
-		ABMGNMFBDID = value;
+		startingMagicAttribute = value;
 	}
 
 	public static bool IsProbality(float value)
@@ -1590,29 +1590,29 @@ public static class GameUtils
 		return NekkiMath.randomChance(value * 100f);
 	}
 
-	public static float MPNBGBIMEIP(FightList KGKDKENMAOA)
+	public static float GetFightDifficulty(FightList KGKDKENMAOA)
 	{
 		return 0f;
 	}
 
-	public static float MBPNHCGKKGJ(bool GHFKMONMAJG, ModelParameters DPLNMPKPOJD, ModelParameters JEHPCONLCMI, List<global::Pair<string, float>> CHLLJCFCGHO, string KLIIDDMHNOL, ref float AJEDGBBFGDF, ref float DGILKKFKPAL, ref float ILGBEJNHNMH)
+	public static float CalculateAttributesAlignment(bool GHFKMONMAJG, ModelParameters DPLNMPKPOJD, ModelParameters JEHPCONLCMI, List<global::Pair<string, float>> CHLLJCFCGHO, string KLIIDDMHNOL, ref float AJEDGBBFGDF, ref float DGILKKFKPAL, ref float ILGBEJNHNMH)
 	{
 		float num = AlignTargetAttribute.GetValue(KLIIDDMHNOL);
 		float num2 = 0f - num;
 		float num3 = 0f;
 		float num4 = 0f;
 		int OEMALIFPGPO = 0;
-		JEHPCONLCMI.IBLHIAHECLK.Get(KLIIDDMHNOL, ref OEMALIFPGPO);
+		JEHPCONLCMI.FinalAttributes.Get(KLIIDDMHNOL, ref OEMALIFPGPO);
 		float num5 = OEMALIFPGPO;
 		float num6 = float.MinValue;
 		ModelParameters kIKOGDEPGHB = ((!GHFKMONMAJG) ? DPLNMPKPOJD : JEHPCONLCMI);
 		List<AttributesAlign> list = new List<AttributesAlign>();
-		int num7 = AttributesAlign.GGBAGGMLFHE(kIKOGDEPGHB.AttributeAlignments, list);
+		int num7 = AttributesAlign.AppendHighestPriority(kIKOGDEPGHB.AttributeAlignments, list);
 		for (int i = 0; i < CHLLJCFCGHO.Count; i++)
 		{
 			string lLHEDBIEHAA = CHLLJCFCGHO[i].First;
 			OEMALIFPGPO = 0;
-			DPLNMPKPOJD.IBLHIAHECLK.Get(lLHEDBIEHAA, ref OEMALIFPGPO);
+			DPLNMPKPOJD.FinalAttributes.Get(lLHEDBIEHAA, ref OEMALIFPGPO);
 			float num8 = OEMALIFPGPO;
 			float num9 = num8 + CHLLJCFCGHO[i].Second;
 			float num10 = AlignTargetAttribute.GetValue(lLHEDBIEHAA);
@@ -1622,9 +1622,9 @@ public static class GameUtils
 				num11 = float.MaxValue;
 				foreach (AttributesAlign item in list)
 				{
-					bool flag = ListSF.CCDKHLAMKKO().IsEclipseMode();
-					bool flag2 = QuestUtils.DPLFDKODKIC().NCPKGHDFOFL();
-					if ((flag && item.KONCHIPGFGO == ModelParameters.IHFKGJLIPGH.DFHard) || (!flag && item.KONCHIPGFGO == ModelParameters.IHFKGJLIPGH.DFNormal) || item.KONCHIPGFGO == ModelParameters.IHFKGJLIPGH.DFBoth || flag2)
+					bool flag = ListSF.GetRoster().IsEclipseMode();
+					bool flag2 = QuestUtils.GetDifficultyOptions().GetOverrideAllDifficulties();
+					if ((flag && item.DifficultyFilter == ModelParameters.DifficultyFilter.DFHard) || (!flag && item.DifficultyFilter == ModelParameters.DifficultyFilter.DFNormal) || item.DifficultyFilter == ModelParameters.DifficultyFilter.DFBoth || flag2)
 					{
 						float oNMMKLDMHJD = item.Factor;
 						float fJAHKFNFNCK = item.Shift;
@@ -1643,9 +1643,9 @@ public static class GameUtils
 				num11 = float.MinValue;
 				foreach (AttributesAlign item2 in list)
 				{
-					bool flag3 = ListSF.CCDKHLAMKKO().IsEclipseMode();
-					bool flag4 = QuestUtils.DPLFDKODKIC().NCPKGHDFOFL();
-					if ((flag3 && item2.KONCHIPGFGO == ModelParameters.IHFKGJLIPGH.DFHard) || (!flag3 && item2.KONCHIPGFGO == ModelParameters.IHFKGJLIPGH.DFNormal) || item2.KONCHIPGFGO == ModelParameters.IHFKGJLIPGH.DFBoth || flag4)
+					bool flag3 = ListSF.GetRoster().IsEclipseMode();
+					bool flag4 = QuestUtils.GetDifficultyOptions().GetOverrideAllDifficulties();
+					if ((flag3 && item2.DifficultyFilter == ModelParameters.DifficultyFilter.DFHard) || (!flag3 && item2.DifficultyFilter == ModelParameters.DifficultyFilter.DFNormal) || item2.DifficultyFilter == ModelParameters.DifficultyFilter.DFBoth || flag4)
 					{
 						float oNMMKLDMHJD2 = item2.Factor;
 						float fJAHKFNFNCK2 = item2.Shift;
@@ -1659,17 +1659,17 @@ public static class GameUtils
 					}
 				}
 			}
-			ModifiedAlignFormula.DamageAttribute jNLEHBPFPBN = KMDIKMNMAOG.NOADKFMGODA(lLHEDBIEHAA);
+			ModifiedAlignFormula.DamageAttribute jNLEHBPFPBN = ModifiedAlign.FindDamageAttribute(lLHEDBIEHAA);
 			if (jNLEHBPFPBN != null)
 			{
-				float gFHOHECBODM = jNLEHBPFPBN.GFHOHECBODM;
-				string kLAIAPBONFM = jNLEHBPFPBN.KLAIAPBONFM;
+				float gFHOHECBODM = jNLEHBPFPBN.MinAttributeDifference;
+				string kLAIAPBONFM = jNLEHBPFPBN.ApplyTo;
 				bool flag5 = kLAIAPBONFM == "Player";
 				if (num11 >= gFHOHECBODM && GHFKMONMAJG == flag5)
 				{
-					float bGJPLNFFEOB = BGJPLNFFEOB;
-					float bPPJAMCGICA = jNLEHBPFPBN.BPPJAMCGICA;
-					float oPHGJJGKIHE = jNLEHBPFPBN.OPHGJJGKIHE;
+					float bGJPLNFFEOB = DamageDoublingRange;
+					float bPPJAMCGICA = jNLEHBPFPBN.NetDamage;
+					float oPHGJJGKIHE = jNLEHBPFPBN.DamageMultiplier;
 					num11 = bGJPLNFFEOB * Mathf.Log((1f - (1f - bPPJAMCGICA) * Mathf.Pow(oPHGJJGKIHE, (0f - num11) / bGJPLNFFEOB)) / bPPJAMCGICA) / Mathf.Log(2f);
 				}
 			}
@@ -1690,22 +1690,22 @@ public static class GameUtils
 		float AJEDGBBFGDF = 0f;
 		float DGILKKFKPAL = 0f;
 		float ILGBEJNHNMH = 0f;
-		float eEPAABANDBL = MBPNHCGKKGJ(GHFKMONMAJG, DPLNMPKPOJD, JEHPCONLCMI, CHLLJCFCGHO, KLIIDDMHNOL, ref AJEDGBBFGDF, ref DGILKKFKPAL, ref ILGBEJNHNMH);
+		float eEPAABANDBL = CalculateAttributesAlignment(GHFKMONMAJG, DPLNMPKPOJD, JEHPCONLCMI, CHLLJCFCGHO, KLIIDDMHNOL, ref AJEDGBBFGDF, ref DGILKKFKPAL, ref ILGBEJNHNMH);
 		return GetAttributesHitMultiplier(eEPAABANDBL);
 	}
 
 	public static float GetAttributesHitMultiplier(float EEPAABANDBL)
 	{
-		float bGJPLNFFEOB = BGJPLNFFEOB;
+		float bGJPLNFFEOB = DamageDoublingRange;
 		return Mathf.Pow(2f, EEPAABANDBL / bGJPLNFFEOB);
 	}
 
-	public static List<ModelParameters> IGNNMAKHBFF(List<ModelParameters> JCICKLIMBEF)
+	public static List<ModelParameters> CreateOpponentParameters(List<ModelParameters> JCICKLIMBEF)
 	{
 		List<ModelParameters> list = new List<ModelParameters>();
 		foreach (ModelParameters item2 in JCICKLIMBEF)
 		{
-			List<ModelParameters> list2 = ListSF.GetInstance().APOACOEFALC(item2, item2.PEBKEBIBAFA);
+			List<ModelParameters> list2 = ListSF.GetInstance().CreateOpponentParameters(item2, item2.OpponentCount);
 			foreach (ModelParameters item3 in list2)
 			{
 				ModelParameters item = InitializeCombatParameters(item3);
@@ -1715,21 +1715,21 @@ public static class GameUtils
 		return list;
 	}
 
-	public static ModelParameters LBMPHBNJMGG()
+	public static ModelParameters GetPlayerModelParameters()
 	{
-		ModelParameters kIKOGDEPGHB = ListSF.GAMMAIGEIOB();
-		List<ItemInfo> list = kIKOGDEPGHB.DGMDEDKLGMB();
-		Roster nKGLHEGIKKP = ListSF.CCDKHLAMKKO();
+		ModelParameters kIKOGDEPGHB = ListSF.GetPlayerParameters();
+		List<ItemInfo> list = kIKOGDEPGHB.GetEquippedItemsByType();
+		Roster nKGLHEGIKKP = ListSF.GetRoster();
 		int i = 0;
 		for (int count = list.Count; i < count; i++)
 		{
 			ItemInfo dJKEECEOCJB = list[i];
 			if (dJKEECEOCJB != null)
 			{
-				UserItem dKCHDHMLKHN = nKGLHEGIKKP.KHCNHPCPFII().CMGOCLGHNLH(dJKEECEOCJB.Name);
-				if (dKCHDHMLKHN != null && dKCHDHMLKHN.JBCOAMLEBFG())
+				UserItem dKCHDHMLKHN = nKGLHEGIKKP.GetInventory().FindItem(dJKEECEOCJB.Name);
+				if (dKCHDHMLKHN != null && dKCHDHMLKHN.GetHasUpgradedItem())
 				{
-					kIKOGDEPGHB.OLLNIKFPMKE(list[i].Type, dKCHDHMLKHN.AKKBIFEFDCI());
+					kIKOGDEPGHB.SetItemByType(list[i].Type, dKCHDHMLKHN.GetCurrentUpgradeItem());
 				}
 			}
 		}
@@ -1791,7 +1791,7 @@ public static class GameUtils
 		}
 		JCICKLIMBEF.RoundsWon = 0;
 		JCICKLIMBEF.IsPlayer = false;
-		int num = (ObscuredInt)(JCICKLIMBEF.OJLKDEHMIAC());
+		int num = (ObscuredInt)(JCICKLIMBEF.GetBaseHealth());
 		if (num > 0)
 		{
 			JCICKLIMBEF.MaxLife = num;
@@ -1800,26 +1800,26 @@ public static class GameUtils
 		{
 			JCICKLIMBEF.MaxLife = 1f;
 		}
-		JCICKLIMBEF.EAJHPCJJCDI = false;
-		JCICKLIMBEF.ABLMGLAKJBL = true;
-		JCICKLIMBEF.BCLGFKDDNKH();
-		JCICKLIMBEF.IAIHFLGBIPB = LoadMoves(AnimationData.DJDLCMCLOJN());
-		JCICKLIMBEF.PPFDLIBLNDG();
-		JCICKLIMBEF.NOBKKLBJFIL();
+		JCICKLIMBEF.MovesInitialized = false;
+		JCICKLIMBEF.IsUntouched = true;
+		JCICKLIMBEF.RestoreFullLife();
+		JCICKLIMBEF.MoveIds = LoadMoves(AnimationData.GetAnimationCount());
+		JCICKLIMBEF.BuildModelDocuments();
+		JCICKLIMBEF.CalculateAttributes();
 		return JCICKLIMBEF;
 	}
 
-	public static void FMICOICLCNL(bool LLOLBKJMKNC = true)
+	public static void LockInput(bool LLOLBKJMKNC = true)
 	{
-		Module.GetInstance().JJFFNDJDNAJ(true, LLOLBKJMKNC);
+		Module.GetInstance().SetGameInputLock(true, LLOLBKJMKNC);
 	}
 
-	public static void KKNGFGMJKHG()
+	public static void UnlockInput()
 	{
-		Module.GetInstance().JJFFNDJDNAJ(false);
+		Module.GetInstance().SetGameInputLock(false);
 	}
 
-	public static void BKFMHANNIEF()
+	public static void ResetScenes()
 	{
 		SceneManagerSF.Reset();
 	}
@@ -1834,7 +1834,7 @@ public static class GameUtils
 		return list;
 	}
 
-	public static FightList GKBHKJNGNPO(Battle DPOOIONCEOA)
+	public static FightList GetOpenFight(Battle DPOOIONCEOA)
 	{
 		if (Eclipse.Modding.ModModeRuntime.TryCurrent(DPOOIONCEOA, out var modeFight)) return modeFight;
 		if (DPOOIONCEOA != null)
@@ -1851,7 +1851,7 @@ public static class GameUtils
 		return null;
 	}
 
-	public static FightList JGDLLEAGBBD(Battle DPOOIONCEOA)
+	public static FightList GetLastFight(Battle DPOOIONCEOA)
 	{
 		if (DPOOIONCEOA != null)
 		{
@@ -1864,28 +1864,28 @@ public static class GameUtils
 		return null;
 	}
 
-		public static Fight ABAIHGFPHMO(object data, PreFight preFight = null, GameController LPGANKOAPJL = null)
+		public static Fight CreateFight(object data, PreFight preFight = null, GameController LPGANKOAPJL = null)
 		{
 			if (data is Eclipse.Multiplayer.LocalVersusMatch localMatch)
 				return localMatch.CreateFight(preFight, LPGANKOAPJL);
 		FightList jDIPBIHBGPF = (FightList)data;
 		ModelParameters kIKOGDEPGHB = null;
-		kIKOGDEPGHB = Eclipse.Modding.ModRuntime.BuildFightPlayerParameters(jDIPBIHBGPF) ?? LBMPHBNJMGG().Clone();
+		kIKOGDEPGHB = Eclipse.Modding.ModRuntime.BuildFightPlayerParameters(jDIPBIHBGPF) ?? GetPlayerModelParameters().Clone();
 		List<ModelParameters> list = new List<ModelParameters>();
 		BattleType pJMEMGHKKBM = jDIPBIHBGPF.get_Type();
 		if (pJMEMGHKKBM == BattleType.FightPeriodic)
 		{
-			if (!jDIPBIHBGPF.FLKFFDLLBKA().HasRandomSeeds)
+			if (!jDIPBIHBGPF.GetRosterFight().HasRandomSeeds)
 			{
-				jDIPBIHBGPF.FLKFFDLLBKA().BABOCEFFPII();
+				jDIPBIHBGPF.GetRosterFight().RandomizeSeeds();
 			}
-			NekkiMath.KACCBCCEPGB(jDIPBIHBGPF.FLKFFDLLBKA().PFJKCOPFNHB());
-			list = IGNNMAKHBFF(jDIPBIHBGPF.OFKJMHPMCCD());
-			NekkiMath.KACCBCCEPGB();
+			NekkiMath.SetSeed(jDIPBIHBGPF.GetRosterFight().GetRandomGroupSeed());
+			list = CreateOpponentParameters(jDIPBIHBGPF.GetOpponents());
+			NekkiMath.SetSeed();
 		}
 		else
 		{
-			list = IGNNMAKHBFF(jDIPBIHBGPF.OFKJMHPMCCD());
+			list = CreateOpponentParameters(jDIPBIHBGPF.GetOpponents());
 		}
 		if (list.Count == 0)
 		{
@@ -1894,7 +1894,7 @@ public static class GameUtils
 			// this is the final safety net for future unsupported stage shapes.
 			ModelParameters fallbackEnemy = InitializeCombatParameters(kIKOGDEPGHB.Clone());
 			fallbackEnemy.IsPlayer = false;
-			fallbackEnemy.HNKFHGOOKEG = "man_fist";
+			fallbackEnemy.Avatar = "man_fist";
 			list.Add(fallbackEnemy);
 			UnityEngine.Debug.LogError("[Fight] '" + jDIPBIHBGPF.Name +
 				"' contained no usable enemies; using a player-equipment compatibility opponent.");
@@ -1904,14 +1904,14 @@ public static class GameUtils
 		return new Fight(jDIPBIHBGPF, kIKOGDEPGHB, list, preFight, LPGANKOAPJL);
 	}
 
-	public static void MHMGONPIPKG(Battle DPOOIONCEOA)
+	public static void OnFightPrepared(Battle DPOOIONCEOA)
 	{
 	}
 
-	public static FightList HIPIGHPMBIJ(FightList KGKDKENMAOA)
+	public static FightList GetFinalFight(FightList KGKDKENMAOA)
 	{
-		Roster nKGLHEGIKKP = ListSF.CCDKHLAMKKO();
-		if (nKGLHEGIKKP.BGBFBIDOECK() > 0)
+		Roster nKGLHEGIKKP = ListSF.GetRoster();
+		if (nKGLHEGIKKP.GetDiscipleMode() > 0)
 		{
 			Battle cNAOMDMIGLJ = KGKDKENMAOA.Battle;
 			List<FightList> list = cNAOMDMIGLJ.GetFights();
@@ -1920,40 +1920,40 @@ public static class GameUtils
 		return KGKDKENMAOA;
 	}
 
-	public static bool KBHDKPAMOJN(ItemInfo item, ItemAction LFLGCDNKNJI, int count = 1, Action<object> callback = null)
+	public static bool ApplyItemAction(ItemInfo item, ItemAction LFLGCDNKNJI, int count = 1, Action<object> callback = null)
 	{
-		UserItem nDMCFNGEPOA = ListSF.CMGOCLGHNLH(item.Name);
-		return KBHDKPAMOJN(item, nDMCFNGEPOA, LFLGCDNKNJI, count, callback);
+		UserItem nDMCFNGEPOA = ListSF.GetUserItem(item.Name);
+		return ApplyItemAction(item, nDMCFNGEPOA, LFLGCDNKNJI, count, callback);
 	}
 
-	private static bool KBHDKPAMOJN(ItemInfo item, UserItem NDMCFNGEPOA, ItemAction LFLGCDNKNJI, int count = 1, Action<object> callback = null)
+	private static bool ApplyItemAction(ItemInfo item, UserItem NDMCFNGEPOA, ItemAction LFLGCDNKNJI, int count = 1, Action<object> callback = null)
 	{
-		QuestParameters hHKLFIIBIFF = ListSF.GetInstance().BNMLDPNCMLB();
-		hHKLFIIBIFF.OOFHDANMCJB = string.Empty;
+		QuestParameters hHKLFIIBIFF = ListSF.GetInstance().GetQuestParameters();
+		hHKLFIIBIFF.purchaseFailureReason = string.Empty;
 		ListSF.CheckItems bJEBPDNMNAE = new ListSF.CheckItems();
 		if (LFLGCDNKNJI == ItemAction.Item_Buy_Gold || LFLGCDNKNJI == ItemAction.Item_Buy_Ruby || LFLGCDNKNJI == ItemAction.Item_Buy_Real || LFLGCDNKNJI == ItemAction.Item_Upgrade_Gold || LFLGCDNKNJI == ItemAction.Item_Upgrade_Ruby || LFLGCDNKNJI == ItemAction.Item_Delivery_Ruby || LFLGCDNKNJI == ItemAction.Item_Recipe || LFLGCDNKNJI == ItemAction.Item_Recipe_Delivery_Ruby || LFLGCDNKNJI == ItemAction.Item_Consumable)
 		{
-			bJEBPDNMNAE = ListSF.CLKECIFEMNB(item, LFLGCDNKNJI, count);
+			bJEBPDNMNAE = ListSF.CheckItemPurchase(item, LFLGCDNKNJI, count);
 			if (bJEBPDNMNAE.Value == -1)
 			{
 				if (LFLGCDNKNJI == ItemAction.Item_Recipe)
 				{
-					GGKPADOGDCG(item, bJEBPDNMNAE.Type);
+					NotifyEnchantmentUnsuccessful(item, bJEBPDNMNAE.Type);
 				}
 				else
 				{
-					EEKHDNNBDCH(item, bJEBPDNMNAE.Type);
+					NotifyPurchaseUnsuccessful(item, bJEBPDNMNAE.Type);
 				}
 				return false;
 			}
 		}
-		if ((item.EHKNIKHPGDN == 0 && (LFLGCDNKNJI == ItemAction.Item_Buy_Gold || LFLGCDNKNJI == ItemAction.Item_Upgrade_Gold)) || (NDMCFNGEPOA != null && NDMCFNGEPOA.GKGIKMCMCPB()) || LFLGCDNKNJI == ItemAction.Item_Buy_Ruby || LFLGCDNKNJI == ItemAction.Item_Equip || LFLGCDNKNJI == ItemAction.Item_Upgrade_Ruby || LFLGCDNKNJI == ItemAction.Item_Delivery_Ruby)
+		if ((item.DeliveryTime == 0 && (LFLGCDNKNJI == ItemAction.Item_Buy_Gold || LFLGCDNKNJI == ItemAction.Item_Upgrade_Gold)) || (NDMCFNGEPOA != null && NDMCFNGEPOA.GetIsOwned()) || LFLGCDNKNJI == ItemAction.Item_Buy_Ruby || LFLGCDNKNJI == ItemAction.Item_Equip || LFLGCDNKNJI == ItemAction.Item_Upgrade_Ruby || LFLGCDNKNJI == ItemAction.Item_Delivery_Ruby)
 		{
-			ListSF.FAAAGBACKAE(item);
+			ListSF.UnequipOtherItemsOfType(item);
 		}
-		if (NDMCFNGEPOA != null && NDMCFNGEPOA.EFMFGEPDAOP() && LFLGCDNKNJI == ItemAction.Item_Unequip)
+		if (NDMCFNGEPOA != null && NDMCFNGEPOA.GetIsEquipped() && LFLGCDNKNJI == ItemAction.Item_Unequip)
 		{
-			ListSF.GetInstance().OOLIADKLGLJ(item);
+			ListSF.GetInstance().EquipDefaultItem(item);
 		}
 		bool flag = false;
 		bool flag2 = false;
@@ -1969,21 +1969,21 @@ public static class GameUtils
 		case ItemAction.Item_Delivery_Ruby:
 		case ItemAction.Item_Free:
 		case ItemAction.Item_Consumable:
-			result = ListSF.KCBCGDFKNME(item, LFLGCDNKNJI, bJEBPDNMNAE.Value, count, callback);
+			result = ListSF.BuyItem(item, LFLGCDNKNJI, bJEBPDNMNAE.Value, count, callback);
 			break;
 		case ItemAction.Item_Recipe_Delivery_Ruby:
 			flag2 = true;
 			flag3 = true;
-			result = ListSF.KCBCGDFKNME(item, LFLGCDNKNJI, bJEBPDNMNAE.Value, count, callback);
+			result = ListSF.BuyItem(item, LFLGCDNKNJI, bJEBPDNMNAE.Value, count, callback);
 			break;
 		case ItemAction.Item_Equip:
-			result = ListSF.AFGHCIDFAHB(NDMCFNGEPOA, true);
+			result = ListSF.UseItem(NDMCFNGEPOA, true);
 			break;
 		case ItemAction.Item_Unequip:
-			result = ListSF.AFGHCIDFAHB(NDMCFNGEPOA, false);
+			result = ListSF.UseItem(NDMCFNGEPOA, false);
 			break;
 		case ItemAction.Item_Delivery_End:
-			result = ListSF.IMLFOOIBLJA(item);
+			result = ListSF.GiveItemUnequipped(item);
 			break;
 		case ItemAction.Item_Update:
 			result = true;
@@ -1992,7 +1992,7 @@ public static class GameUtils
 		{
 			flag = true;
 			RecipeItemInfo mBIJKDIEFIF2 = (RecipeItemInfo)item;
-			NIANNOBAHMH("enchantment_notification", mBIJKDIEFIF2);
+			ScheduleEnchantmentNotification("enchantment_notification", mBIJKDIEFIF2);
 			break;
 		}
 		case ItemAction.Item_Recipe_Delivery_End:
@@ -2000,160 +2000,160 @@ public static class GameUtils
 			flag2 = true;
 			flag3 = true;
 			RecipeItemInfo mBIJKDIEFIF = (RecipeItemInfo)item;
-			FBINMBCCMHA("enchantment_notification", mBIJKDIEFIF);
+			CancelEnchantmentNotification("enchantment_notification", mBIJKDIEFIF);
 			break;
 		}
 		}
-		UserItem dKCHDHMLKHN = ListSF.CMGOCLGHNLH(item.Name);
+		UserItem dKCHDHMLKHN = ListSF.GetUserItem(item.Name);
 		if (flag3)
 		{
 		}
-		if (dKCHDHMLKHN != null && dKCHDHMLKHN.IJGAOHJNLAH() > 0)
+		if (dKCHDHMLKHN != null && dKCHDHMLKHN.GetDeliveryTimestamp() > 0)
 		{
-			DMBJCCFNFKK("item_notification", dKCHDHMLKHN);
+			ScheduleItemNotification("item_notification", dKCHDHMLKHN);
 		}
-		else if (dKCHDHMLKHN != null && dKCHDHMLKHN.IJGAOHJNLAH() == 0)
+		else if (dKCHDHMLKHN != null && dKCHDHMLKHN.GetDeliveryTimestamp() == 0)
 		{
-			NELKFJJHFDC("item_notification", dKCHDHMLKHN);
+			CancelItemNotification("item_notification", dKCHDHMLKHN);
 		}
 		return result;
 	}
 
-	public static void EEKHDNNBDCH(ItemInfo item, ListSF.BKDHBIDPKLK DDEDNPLHOJH)
+	public static void NotifyPurchaseUnsuccessful(ItemInfo item, ListSF.CheckItemType DDEDNPLHOJH)
 	{
-		QuestParameters hHKLFIIBIFF = ListSF.GetInstance().BNMLDPNCMLB();
-		hHKLFIIBIFF.DLKPBAJDHBO = item;
+		QuestParameters hHKLFIIBIFF = ListSF.GetInstance().GetQuestParameters();
+		hHKLFIIBIFF.purchasedItem = item;
 		switch (DDEDNPLHOJH)
 		{
-		case ListSF.BKDHBIDPKLK.CHECK_ITEM_MONEY:
-			hHKLFIIBIFF.OOFHDANMCJB = "Coins";
+		case ListSF.CheckItemType.CHECK_ITEM_MONEY:
+			hHKLFIIBIFF.purchaseFailureReason = "Coins";
 			break;
-		case ListSF.BKDHBIDPKLK.CHECK_ITEM_BONUS:
-			hHKLFIIBIFF.OOFHDANMCJB = "Ruby";
+		case ListSF.CheckItemType.CHECK_ITEM_BONUS:
+			hHKLFIIBIFF.purchaseFailureReason = "Ruby";
 			break;
-		case ListSF.BKDHBIDPKLK.CHECK_ITEM_NO_NETWORK:
-			hHKLFIIBIFF.OOFHDANMCJB = "Connection";
+		case ListSF.CheckItemType.CHECK_ITEM_NO_NETWORK:
+			hHKLFIIBIFF.purchaseFailureReason = "Connection";
 			break;
 		}
-		if (ListSF.GetInstance().FFBAJNGHGGD(QuestEvent.PMDPDMFLCIJ.QUEST_EVENT_PURCHASE_UNSUCCESSFUL))
+		if (ListSF.GetInstance().RaiseQuestEvent(QuestEvent.QuestEventType.QUEST_EVENT_PURCHASE_UNSUCCESSFUL))
 		{
-			ListSF.GetInstance().MHHNIPBJNAD();
+			ListSF.GetInstance().RunQuestActions();
 		}
-		OFOKPNFGDMD("Insufficient Currency");
+		TrackEvent("Insufficient Currency");
 	}
 
-	private static void GGKPADOGDCG(ItemInfo item, ListSF.BKDHBIDPKLK DDEDNPLHOJH)
+	private static void NotifyEnchantmentUnsuccessful(ItemInfo item, ListSF.CheckItemType DDEDNPLHOJH)
 	{
-		QuestParameters hHKLFIIBIFF = ListSF.GetInstance().BNMLDPNCMLB();
+		QuestParameters hHKLFIIBIFF = ListSF.GetInstance().GetQuestParameters();
 		RecipeItemInfo bNJOCBKNPMG = (RecipeItemInfo)item;
-		hHKLFIIBIFF.DPLEGFCHOCE.OHCGEEEKEJH = bNJOCBKNPMG.MFEAIEJFDAM().get_Name();
-		hHKLFIIBIFF.DPLEGFCHOCE.FHELNNCGCGC = bNJOCBKNPMG.OIMGNCLBPHD().Name;
-		long num = ListSF.BLBNJKJKMBM();
-		long bMNFPNBAMAF = num + bNJOCBKNPMG.ADAJKDEOAAG().EHKNIKHPGDN;
-		hHKLFIIBIFF.DPLEGFCHOCE.BMNFPNBAMAF = bMNFPNBAMAF;
-		hHKLFIIBIFF.DPLEGFCHOCE.MECEADEKGJB = "Materials";
-		if (ListSF.GetInstance().FFBAJNGHGGD(QuestEvent.PMDPDMFLCIJ.QUEST_EVENT_ENCHANTMENT_UNSUCCESSFUL))
+		hHKLFIIBIFF.enchantment.itemName = bNJOCBKNPMG.GetUserItem().get_Name();
+		hHKLFIIBIFF.enchantment.recipeName = bNJOCBKNPMG.GetRecipe().Name;
+		long num = ListSF.GetServerTime();
+		long bMNFPNBAMAF = num + bNJOCBKNPMG.GetPrice().DeliveryTimeSeconds;
+		hHKLFIIBIFF.enchantment.endTimestamp = bMNFPNBAMAF;
+		hHKLFIIBIFF.enchantment.costType = "Materials";
+		if (ListSF.GetInstance().RaiseQuestEvent(QuestEvent.QuestEventType.QUEST_EVENT_ENCHANTMENT_UNSUCCESSFUL))
 		{
-			ListSF.GetInstance().MHHNIPBJNAD();
+			ListSF.GetInstance().RunQuestActions();
 		}
 	}
 
-	public static bool MKADBAEEMFA(SliderType OFEMKBGPNBH, SliderType CFDMHKKBGIN)
+	public static bool NotifyTabChanged(SliderType OFEMKBGPNBH, SliderType CFDMHKKBGIN)
 	{
-		QuestParameters hHKLFIIBIFF = ListSF.GetInstance().BNMLDPNCMLB();
-		hHKLFIIBIFF.HJGNGBHONCP = IPFBLJOALBN[OFEMKBGPNBH];
-		hHKLFIIBIFF.KBKAGDKOGNJ = IPFBLJOALBN[CFDMHKKBGIN];
-		if (ListSF.GetInstance().FFBAJNGHGGD(QuestEvent.PMDPDMFLCIJ.QUEST_EVENT_CHANGE_TAB))
+		QuestParameters hHKLFIIBIFF = ListSF.GetInstance().GetQuestParameters();
+		hHKLFIIBIFF.tabFrom = SliderNames[OFEMKBGPNBH];
+		hHKLFIIBIFF.tabTo = SliderNames[CFDMHKKBGIN];
+		if (ListSF.GetInstance().RaiseQuestEvent(QuestEvent.QuestEventType.QUEST_EVENT_CHANGE_TAB))
 		{
-			ListSF.GetInstance().MHHNIPBJNAD();
+			ListSF.GetInstance().RunQuestActions();
 			return true;
 		}
 		return false;
 	}
 
-	public static bool OIGPBEKELCP(ScreenType JPDNPODKKJP)
+	public static bool NotifyShopOpened(ScreenType JPDNPODKKJP)
 	{
 		if (JPDNPODKKJP == ScreenType.ModuleShop &&
-			ListSF.GetInstance().FFBAJNGHGGD(QuestEvent.PMDPDMFLCIJ.QUEST_EVENT_SHOP_BUTTON_PRESS))
+			ListSF.GetInstance().RaiseQuestEvent(QuestEvent.QuestEventType.QUEST_EVENT_SHOP_BUTTON_PRESS))
 		{
-			ListSF.GetInstance().MHHNIPBJNAD();
+			ListSF.GetInstance().RunQuestActions();
 			// The migrated quest graph observes this event but does not always issue
 			// its own scene transition.  Continue the user's requested navigation.
 			return false;
 		}
-		if (JPDNPODKKJP == ScreenType.ModuleShop && ListSF.GetInstance().FFBAJNGHGGD(QuestEvent.PMDPDMFLCIJ.QUEST_EVENT_SHOP_ENTER))
+		if (JPDNPODKKJP == ScreenType.ModuleShop && ListSF.GetInstance().RaiseQuestEvent(QuestEvent.QuestEventType.QUEST_EVENT_SHOP_ENTER))
 		{
-			ListSF.GetInstance().MHHNIPBJNAD();
+			ListSF.GetInstance().RunQuestActions();
 			return false;
 		}
 		return false;
 	}
 
-	public static void PGLIKMEJBPK()
+	public static void ExitApplication()
 	{
-		LLLOJBFMONN.Write("exitApplication() called, quiting");
-		OFOKPNFGDMD("App Close");
+		GameLog.Write("exitApplication() called, quiting");
+		TrackEvent("App Close");
 		ApplicationController.Quit();
 	}
 
-	public static uint IBNHPCFKGOH(FightList KGKDKENMAOA, bool FFIBGBMOMPD)
+	public static uint GetFightExpReward(FightList KGKDKENMAOA, bool FFIBGBMOMPD)
 	{
 		FightResult nHIDAJFLHJN = new FightResult();
-		nHIDAJFLHJN.LFLGCDNKNJI = KGKDKENMAOA.get_Type();
-		nHIDAJFLHJN.DIAIIPCBMFL = KGKDKENMAOA.FightId;
+		nHIDAJFLHJN.FightType = KGKDKENMAOA.get_Type();
+		nHIDAJFLHJN.FightId = KGKDKENMAOA.FightId;
 		int num = KGKDKENMAOA.RewardIndex;
 		if (FFIBGBMOMPD)
 		{
 			num++;
 		}
-		if (KGKDKENMAOA.CBJOENICLAF())
+		if (KGKDKENMAOA.HasMultipleOpponentsAndRounds())
 		{
 			num = (FFIBGBMOMPD ? 1 : 0);
 		}
-		RewardStruct lGDIIADDFLH = KGKDKENMAOA.OOOBLJIHBEP(num);
-		nHIDAJFLHJN.FCKFOPMNFOF(lGDIIADDFLH, null, null, KGKDKENMAOA);
-		return nHIDAJFLHJN.PMIHPJFAJIO.exp;
+		RewardStruct lGDIIADDFLH = KGKDKENMAOA.GetRewardAt(num);
+		nHIDAJFLHJN.CalculateRewards(lGDIIADDFLH, null, null, KGKDKENMAOA);
+		return nHIDAJFLHJN.Prize.exp;
 	}
 
-	public static void FKMEIHGOFDD(FightResult HEIADONEACH)
+	public static void HandleSurrender(FightResult HEIADONEACH)
 	{
-		KJNOABODHMG = true;
-		KJNOABODHMG = false;
-		Module.DLOKJOHNDID(ScreenType.ModuleMap);
+		IsFightTransitioning = true;
+		IsFightTransitioning = false;
+		Module.OpenScreen(ScreenType.ModuleMap);
 	}
 
 	public static void EndFight(ComboStatistic AIOMDIAFHGB, FightList KGKDKENMAOA, ModelParameters ABKBEJBICOA, ModelParameters LEBLJJCFKOP, GameOverTypes MHNEKAEGNBO, ComboStatistic MOJHPBGGNAH = null, float OEIFGEHDHLE = 0f, int JEGCHOOLDLB = 0, float PIFMOMMPFFM = 0f, int JEDPGMGCJGA = 0)
 	{
 		bool flag = LEBLJJCFKOP == null && MOJHPBGGNAH == null;
 		bool flag2 = KGKDKENMAOA == null || MHNEKAEGNBO == GameOverTypes.GAME_OVER_SURRENDER;
-		Roster nKGLHEGIKKP = ListSF.CCDKHLAMKKO();
-		KGKDKENMAOA = ((KGKDKENMAOA == null) ? ListSF.CHMCKGCDGCM(nKGLHEGIKKP.HEBDMAIEAPM()) : KGKDKENMAOA);
+		Roster nKGLHEGIKKP = ListSF.GetRoster();
+		KGKDKENMAOA = ((KGKDKENMAOA == null) ? ListSF.GetFightById(nKGLHEGIKKP.GetFightIds()) : KGKDKENMAOA);
 		if (KGKDKENMAOA == null)
 		{
-			LLLOJBFMONN.Error("0 == fightList");
+			GameLog.Error("0 == fightList");
 		}
 		if (!Eclipse.Modding.ModModeRuntime.CanResolve(KGKDKENMAOA)) return;
 		var eclipseStoryEncounter = KGKDKENMAOA.EclipseStoryEncounter;
 		if (!Eclipse.Modding.ModRuntime.StoryEvents.TryBeginEncounterResult(eclipseStoryEncounter)) eclipseStoryEncounter = null;
 		var eclipseStoryResult = eclipseStoryEncounter == null ? null : Eclipse.Modding.ModRuntime.CaptureBattleResult(nKGLHEGIKKP, KGKDKENMAOA, MHNEKAEGNBO, ABKBEJBICOA, LEBLJJCFKOP);
 		FightResult nHIDAJFLHJN = new FightResult();
-		nHIDAJFLHJN.KGKDKENMAOA = KGKDKENMAOA;
-		nHIDAJFLHJN.LFLGCDNKNJI = KGKDKENMAOA.get_Type();
-		nHIDAJFLHJN.DIAIIPCBMFL = new FightIDS(KGKDKENMAOA.FightId);
-		nHIDAJFLHJN.ABKBEJBICOA = ABKBEJBICOA;
-		nHIDAJFLHJN.LEBLJJCFKOP = LEBLJJCFKOP;
-		nHIDAJFLHJN.MHNEKAEGNBO = MHNEKAEGNBO;
+		nHIDAJFLHJN.FightDefinition = KGKDKENMAOA;
+		nHIDAJFLHJN.FightType = KGKDKENMAOA.get_Type();
+		nHIDAJFLHJN.FightId = new FightIDS(KGKDKENMAOA.FightId);
+		nHIDAJFLHJN.PlayerParameters = ABKBEJBICOA;
+		nHIDAJFLHJN.OpponentParameters = LEBLJJCFKOP;
+		nHIDAJFLHJN.GameOverType = MHNEKAEGNBO;
 		int num = KGKDKENMAOA.RewardIndex;
 		if (nHIDAJFLHJN.IsWinner())
 		{
 			num++;
 		}
-		if (KGKDKENMAOA.CBJOENICLAF())
+		if (KGKDKENMAOA.HasMultipleOpponentsAndRounds())
 		{
 			num = (nHIDAJFLHJN.IsWinner() ? 1 : 0);
 		}
-		RewardStruct lGDIIADDFLH = KGKDKENMAOA.OOOBLJIHBEP(num);
-		nHIDAJFLHJN.FCKFOPMNFOF(lGDIIADDFLH, AIOMDIAFHGB, MOJHPBGGNAH, KGKDKENMAOA);
+		RewardStruct lGDIIADDFLH = KGKDKENMAOA.GetRewardAt(num);
+		nHIDAJFLHJN.CalculateRewards(lGDIIADDFLH, AIOMDIAFHGB, MOJHPBGGNAH, KGKDKENMAOA);
 		if (!flag)
 		{
 			ArgsDict kEMMIFBFDPK = new ArgsDict();
@@ -2162,97 +2162,97 @@ public static class GameUtils
 			kEMMIFBFDPK.Add("avgFps", OEIFGEHDHLE);
 			kEMMIFBFDPK.Add("fightList", KGKDKENMAOA);
 			kEMMIFBFDPK.Add("fightTimeElapsed", PIFMOMMPFFM);
-			StatisticsCollector.BPDGOKGHDHB(StatisticsEvent.JDNFFHILFAF.Fight_End, kEMMIFBFDPK);
+			StatisticsCollector.LogEvent(StatisticsEvent.EventType.Fight_End, kEMMIFBFDPK);
 		}
 		bool flag3 = false;
 		if (!flag2)
 		{
-			KGKDKENMAOA.Battle.EMFABIGKAHC(KGKDKENMAOA, nHIDAJFLHJN.IsWinner());
+			KGKDKENMAOA.Battle.UpdateRosterFight(KGKDKENMAOA, nHIDAJFLHJN.IsWinner());
 			if (KGKDKENMAOA.get_Type() == BattleType.FightPeriodic)
 			{
 				if (nHIDAJFLHJN.IsWinner())
 				{
-					KGKDKENMAOA.Battle.JLPMOKPFECK(ListSF.IDMJOMOMDOJ());
-					KGKDKENMAOA.FLKFFDLLBKA().BABOCEFFPII();
+					KGKDKENMAOA.Battle.UpdateByTime(ListSF.GetCurrentTime());
+					KGKDKENMAOA.GetRosterFight().RandomizeSeeds();
 				}
-				OKHLHAMGLOE(KGKDKENMAOA, nHIDAJFLHJN.IsWinner());
+				SchedulePeriodicFightNotification(KGKDKENMAOA, nHIDAJFLHJN.IsWinner());
 			}
 			BattleType pJMEMGHKKBM = KGKDKENMAOA.get_Type();
 			if (pJMEMGHKKBM == BattleType.FightReplayable || pJMEMGHKKBM == BattleType.FightBossesReplayable || pJMEMGHKKBM == BattleType.FightFinalReplayable)
 			{
 				BattleReplayable bKKPCBGAEHC = (BattleReplayable)KGKDKENMAOA.Battle;
-				if (bKKPCBGAEHC.MNHLGELMOEJ() == ConditionStatus.StatusComplete)
+				if (bKKPCBGAEHC.GetStatus() == ConditionStatus.StatusComplete)
 				{
-					ListSF.KNCECPAINLI(bKKPCBGAEHC);
+					ListSF.RegisterReplayableBattle(bKKPCBGAEHC);
 				}
 			}
-			flag3 = ListSF.GetInstance().IMDGMNFHFCN(nHIDAJFLHJN);
+			flag3 = ListSF.GetInstance().ApplyFightRewards(nHIDAJFLHJN);
 		}
 		Eclipse.Modding.ModModeRuntime.Complete(KGKDKENMAOA, !flag2 && nHIDAJFLHJN.IsWinner());
         if (Eclipse.Modding.ModModeRuntime.IsRaid(KGKDKENMAOA)) Eclipse.Modding.ModModeRuntime.SetRaidResult(nHIDAJFLHJN);
-		QuestParameters hHKLFIIBIFF = ListSF.GetInstance().BNMLDPNCMLB();
+		QuestParameters hHKLFIIBIFF = ListSF.GetInstance().GetQuestParameters();
 		if (KGKDKENMAOA.get_Type() == BattleType.FightAscension)
 		{
-			Battle cGJCGEBPCAF = ListSF.MKHAAGMJOPG(KGKDKENMAOA.FightId);
+			Battle cGJCGEBPCAF = ListSF.GetBattleById(KGKDKENMAOA.FightId);
 			BattleAscension bGFLODNGLPK = (BattleAscension)cGJCGEBPCAF;
 			if (flag2 || !nHIDAJFLHJN.IsWinner())
 			{
-				bGFLODNGLPK.LAGLOEEPGIO(1);
-				ListSF.KNCECPAINLI(bGFLODNGLPK);
-				hHKLFIIBIFF.JLGLBLDPAAF = KGKDKENMAOA.FightId;
-				if (ListSF.GetInstance().FFBAJNGHGGD(QuestEvent.PMDPDMFLCIJ.QUEST_EVENT_RESET_ASCENSION))
+				bGFLODNGLPK.SetAscensionLevel(1);
+				ListSF.RegisterReplayableBattle(bGFLODNGLPK);
+				hHKLFIIBIFF.fightIds = KGKDKENMAOA.FightId;
+				if (ListSF.GetInstance().RaiseQuestEvent(QuestEvent.QuestEventType.QUEST_EVENT_RESET_ASCENSION))
 				{
-					ListSF.GetInstance().MHHNIPBJNAD();
+					ListSF.GetInstance().RunQuestActions();
 				}
 			}
 			else
 			{
-				bGFLODNGLPK.IDLDHJBJEII(KGKDKENMAOA);
-				if (bGFLODNGLPK.NNPNEABKHPP() != null && bGFLODNGLPK.NNPNEABKHPP().PHCFNACJAAJ() > bGFLODNGLPK.KCIKELGFHOA())
+				bGFLODNGLPK.AdvanceAscensionAfterFight(KGKDKENMAOA);
+				if (bGFLODNGLPK.GetRosterBattle() != null && bGFLODNGLPK.GetRosterBattle().GetAscensionLevel() > bGFLODNGLPK.GetFightCount())
 				{
-					bGFLODNGLPK.LAGLOEEPGIO(1);
-					ListSF.KNCECPAINLI(bGFLODNGLPK);
+					bGFLODNGLPK.SetAscensionLevel(1);
+					ListSF.RegisterReplayableBattle(bGFLODNGLPK);
 				}
 			}
-			bGFLODNGLPK.FLMLLDJIHMD();
+			bGFLODNGLPK.RefreshAllFightStatuses();
 		}
-		hHKLFIIBIFF.JLGLBLDPAAF = KGKDKENMAOA.FightId;
-		hHKLFIIBIFF.HEIADONEACH = (nHIDAJFLHJN.IsWinner() ? "Win" : ((!flag2) ? "Loss" : "Surrender"));
-		hHKLFIIBIFF.BJIDALJIKNC = (flag3 ? 1 : 0);
+		hHKLFIIBIFF.fightIds = KGKDKENMAOA.FightId;
+		hHKLFIIBIFF.fightResult = (nHIDAJFLHJN.IsWinner() ? "Win" : ((!flag2) ? "Loss" : "Surrender"));
+		hHKLFIIBIFF.levelUp = (flag3 ? 1 : 0);
 		hHKLFIIBIFF.fightAvgFps = OEIFGEHDHLE;
 		if (KGKDKENMAOA.get_Type() == BattleType.FightRaid)
 		{
-			hHKLFIIBIFF.OHPHPJBMNLH = KGKDKENMAOA.FightId.CPHDPCAECJN();
+			hHKLFIIBIFF.raidId = KGKDKENMAOA.FightId.GetBattle();
 		}
         Eclipse.Modding.ModModeRuntime.NotifyResult(KGKDKENMAOA);
 		// Use this result's already composed reward. Scanning all reward scopes
 		// can defer a normal win because another win count contains a lottery,
 		// and re-evaluates reward expressions after progression/level-up changes.
-		bool flag4 = !flag2 && nHIDAJFLHJN.PMIHPJFAJIO.FAPDEKOMOGH != null;
+		bool flag4 = !flag2 && nHIDAJFLHJN.Prize.Lottery != null;
 		if (flag4 && nHIDAJFLHJN.IsWinner())
 		{
-			ListSF.GetInstance().HAOHNNFLOGK = hHKLFIIBIFF;
-			Eclipse.Modding.ModRuntime.PrepareBattleLottery(nHIDAJFLHJN.PMIHPJFAJIO.FAPDEKOMOGH, hHKLFIIBIFF,
+			ListSF.GetInstance().LotteryQuestParameters = hHKLFIIBIFF;
+			Eclipse.Modding.ModRuntime.PrepareBattleLottery(nHIDAJFLHJN.Prize.Lottery, hHKLFIIBIFF,
 				KGKDKENMAOA.get_Type() == BattleType.FightRaid, KGKDKENMAOA.EclipseStoryEncounter?.Id);
 		}
-		if ((!flag4 || !nHIDAJFLHJN.IsWinner()) && ((KGKDKENMAOA.get_Type() != BattleType.FightRaid && ListSF.GetInstance().FFBAJNGHGGD(QuestEvent.PMDPDMFLCIJ.QUEST_EVENT_FIGHT_END)) || (KGKDKENMAOA.get_Type() == BattleType.FightRaid && ListSF.GetInstance().FFBAJNGHGGD(QuestEvent.PMDPDMFLCIJ.QUEST_EVENT_RAID_FIGHT_END))) && flag)
+		if ((!flag4 || !nHIDAJFLHJN.IsWinner()) && ((KGKDKENMAOA.get_Type() != BattleType.FightRaid && ListSF.GetInstance().RaiseQuestEvent(QuestEvent.QuestEventType.QUEST_EVENT_FIGHT_END)) || (KGKDKENMAOA.get_Type() == BattleType.FightRaid && ListSF.GetInstance().RaiseQuestEvent(QuestEvent.QuestEventType.QUEST_EVENT_RAID_FIGHT_END))) && flag)
 		{
-			ListSF.GetInstance().MHHNIPBJNAD();
+			ListSF.GetInstance().RunQuestActions();
 		}
-		ListSF.GetInstance().EJANJEEGOOE();
-		MenuController.IAMGKKOINFC();
-		if (LEDKPLCIEBP(KGKDKENMAOA.FightId.ToString()) && nHIDAJFLHJN.IsWinner() && (KGKDKENMAOA.get_Type() == BattleType.FightBosses || KGKDKENMAOA.get_Type() == BattleType.FightFinalTitan || KGKDKENMAOA.get_Type() == BattleType.FightBossesReplayable || KGKDKENMAOA.get_Type() == BattleType.FightTournament || KGKDKENMAOA.get_Type() == BattleType.FightAscension))
+		ListSF.GetInstance().RequestSave();
+		MenuController.RefreshMoney();
+		if (CanShowRatePrompt(KGKDKENMAOA.FightId.ToString()) && nHIDAJFLHJN.IsWinner() && (KGKDKENMAOA.get_Type() == BattleType.FightBosses || KGKDKENMAOA.get_Type() == BattleType.FightFinalTitan || KGKDKENMAOA.get_Type() == BattleType.FightBossesReplayable || KGKDKENMAOA.get_Type() == BattleType.FightTournament || KGKDKENMAOA.get_Type() == BattleType.FightAscension))
 		{
-			NIDLHHCCDFJ = true;
+			ShowRatePrompt = true;
 		}
-		MenuController.KGACOEJKEBP();
+		MenuController.RefreshMenu();
 		if (!flag)
 		{
 			if (KGKDKENMAOA.get_Type() == BattleType.FightRaid && !Eclipse.Modding.ModModeRuntime.IsRaid(KGKDKENMAOA))
 			{
 				int num2 = 0;
 				ModelParameters kIKOGDEPGHB = ((!ABKBEJBICOA.IsPlayer) ? ABKBEJBICOA : LEBLJJCFKOP);
-				float num3 = (ObscuredFloat)(kIKOGDEPGHB.KKMCHCNOHMB());
+				float num3 = (ObscuredFloat)(kIKOGDEPGHB.GetCurrentLife());
 				float num4 = (float)num2 - num3;
 				float num5 = 0f;
 				if (num5 > num4)
@@ -2264,39 +2264,39 @@ public static class GameUtils
 				{
 					num6 = (float)num2 - num5;
 				}
-				KAOPLEPILDH kAOPLEPILDH = ((!ABKBEJBICOA.IsPlayer) ? LEBLJJCFKOP : ABKBEJBICOA) as KAOPLEPILDH;
+				RaidModelParameters kAOPLEPILDH = ((!ABKBEJBICOA.IsPlayer) ? LEBLJJCFKOP : ABKBEJBICOA) as RaidModelParameters;
 				if (JEGCHOOLDLB > 0 && kAOPLEPILDH == null)
 				{
 				}
 			}
 			else if (flag2)
 			{
-				FKMEIHGOFDD(nHIDAJFLHJN);
+				HandleSurrender(nHIDAJFLHJN);
 			}
 			else if (Fight.GetCurrentFight() != null)
 			{
 				if (Eclipse.Modding.ModModeRuntime.IsRaid(KGKDKENMAOA)) Eclipse.Modding.ModModeRuntime.ShowRaidResult();
-                else Fight.GetCurrentFight().BCFBHJOLGNL(nHIDAJFLHJN);
+                else Fight.GetCurrentFight().ShowEndFightScreen(nHIDAJFLHJN);
 			}
 		}
 		if (nHIDAJFLHJN.IsWinner())
 		{
-			OFOKPNFGDMD("Stage Complete");
+			TrackEvent("Stage Complete");
 		}
 		else
 		{
-			OFOKPNFGDMD("Stage Failed");
+			TrackEvent("Stage Failed");
 		}
 		if (Eclipse.Modding.ModRuntime.StoryEvents.TryCompleteEncounterResult(eclipseStoryEncounter) && eclipseStoryResult != null)
 			Eclipse.Modding.ModRuntime.StoryEvents.Publish(eclipseStoryResult);
 		Eclipse.Modding.ModRuntime.ShowPendingBattleLottery();
 	}
 
-	public static void CGFHDKDJCPL()
+	public static void NotifyApplicationStart()
 	{
-		if (ListSF.GetInstance().FFBAJNGHGGD(QuestEvent.PMDPDMFLCIJ.QUEST_EVENT_START_APPLICATION))
+		if (ListSF.GetInstance().RaiseQuestEvent(QuestEvent.QuestEventType.QUEST_EVENT_START_APPLICATION))
 		{
-			ListSF.GetInstance().MHHNIPBJNAD();
+			ListSF.GetInstance().RunQuestActions();
 		}
 	}
 
@@ -2304,7 +2304,7 @@ public static class GameUtils
 	{
 		if (KGKDKENMAOA == null)
 		{
-			LLLOJBFMONN.Error("GameUtils::StartFight(..) Error! FightList is empty!");
+			GameLog.Error("GameUtils::StartFight(..) Error! FightList is empty!");
 			return false;
 		}
         if (Eclipse.Modding.ModRuntime.HasPendingLottery)
@@ -2330,31 +2330,31 @@ public static class GameUtils
 		{
 			return false;
 		}
-		Roster nKGLHEGIKKP = ListSF.CCDKHLAMKKO();
+		Roster nKGLHEGIKKP = ListSF.GetRoster();
 		RosterFight pIGKOIFBOME = nKGLHEGIKKP.FindSavedFightRecord(KGKDKENMAOA.FightId);
 		if (pIGKOIFBOME == null)
 		{
-			pIGKOIFBOME = nKGLHEGIKKP.OBAFPDGJHNN(KGKDKENMAOA.FightId);
+			pIGKOIFBOME = nKGLHEGIKKP.CreateFight(KGKDKENMAOA.FightId);
 		}
 		KGKDKENMAOA.SetRosterFight(pIGKOIFBOME);
 		Battle cNAOMDMIGLJ = KGKDKENMAOA.Battle;
 		if (cNAOMDMIGLJ.get_Type() != BattleType.FightUnregister)
 		{
-			ListSF.CCDKHLAMKKO().MICFFKODJME(KGKDKENMAOA.FightId);
+			ListSF.GetRoster().SetFightIds(KGKDKENMAOA.FightId);
 		}
 		if (IINNCMDDLGE)
 		{
-			QuestParameters hHKLFIIBIFF = ListSF.GetInstance().BNMLDPNCMLB();
-			hHKLFIIBIFF.JLGLBLDPAAF = KGKDKENMAOA.FightId;
-			hHKLFIIBIFF.HEIADONEACH = string.Empty;
-			hHKLFIIBIFF.AIEHNBBFNPF = string.Empty;
+			QuestParameters hHKLFIIBIFF = ListSF.GetInstance().GetQuestParameters();
+			hHKLFIIBIFF.fightIds = KGKDKENMAOA.FightId;
+			hHKLFIIBIFF.fightResult = string.Empty;
+			hHKLFIIBIFF.raidResult = string.Empty;
 			if (KGKDKENMAOA.get_Type() == BattleType.FightRaid)
 			{
-				hHKLFIIBIFF.OHPHPJBMNLH = KGKDKENMAOA.FightId.CPHDPCAECJN();
+				hHKLFIIBIFF.raidId = KGKDKENMAOA.FightId.GetBattle();
 			}
-			if ((KGKDKENMAOA.get_Type() != BattleType.FightRaid && ListSF.GetInstance().FFBAJNGHGGD(QuestEvent.PMDPDMFLCIJ.QUEST_EVENT_FIGHT_ENTER)) || (KGKDKENMAOA.get_Type() == BattleType.FightRaid && ListSF.GetInstance().FFBAJNGHGGD(QuestEvent.PMDPDMFLCIJ.QUEST_EVENT_RAID_FIGHT_ENTER)))
+			if ((KGKDKENMAOA.get_Type() != BattleType.FightRaid && ListSF.GetInstance().RaiseQuestEvent(QuestEvent.QuestEventType.QUEST_EVENT_FIGHT_ENTER)) || (KGKDKENMAOA.get_Type() == BattleType.FightRaid && ListSF.GetInstance().RaiseQuestEvent(QuestEvent.QuestEventType.QUEST_EVENT_RAID_FIGHT_ENTER)))
 			{
-				ListSF.GetInstance().MHHNIPBJNAD();
+				ListSF.GetInstance().RunQuestActions();
 				return true;
 			}
 		}
@@ -2363,25 +2363,25 @@ public static class GameUtils
 		KGKDKENMAOA.EclipseStoryEncounter = eclipseStoryEncounter;
 		if (KGKDKENMAOA.get_Type() != BattleType.FightPeriodic)
 		{
-			KGKDKENMAOA.FLKFFDLLBKA().CKJFJFPBIFF(ListSF.BLBNJKJKMBM());
+			KGKDKENMAOA.GetRosterFight().SetCompletionTimestamp(ListSF.GetServerTime());
 		}
 		if (KGKDKENMAOA.get_Type() == BattleType.FightAscension)
 		{
 		}
-		ListSF.GetInstance().EJANJEEGOOE();
+		ListSF.GetInstance().RequestSave();
 		if (CDFICPGIBEE)
 		{
-			Sound.IFKCCDAIADF("snd_gong");
-			KJNOABODHMG = false;
+			Sound.PlaySound("snd_gong");
+			IsFightTransitioning = false;
 		}
 		MapScene current = Scene<MapScene>.get_Current();
-		if (!HHKHINLNCJB || (!(NFBKHONMMDL == KGKDKENMAOA.Location + KGKDKENMAOA.Battle.get_Name() + KGKDKENMAOA.Name) && !(KGKDKENMAOA.FightId.CPHDPCAECJN() == "QuestBattle")))
+		if (!AutoWinPending || (!(AutoWinFightKey == KGKDKENMAOA.Location + KGKDKENMAOA.Battle.get_Name() + KGKDKENMAOA.Name) && !(KGKDKENMAOA.FightId.GetBattle() == "QuestBattle")))
 		{
 			if (current != null)
 			{
 				current.EnableMapButtons(false);
 			}
-			if (!Module.DLOKJOHNDID(ScreenType.ModuleFight, KGKDKENMAOA))
+			if (!Module.OpenScreen(ScreenType.ModuleFight, KGKDKENMAOA))
 			{
                 if (current != null) current.EnableMapButtons(true);
                 Eclipse.Modding.ModModeRuntime.CancelLaunch(KGKDKENMAOA);
@@ -2391,21 +2391,21 @@ public static class GameUtils
 		}
 		else
 		{
-			HHKHINLNCJB = false;
+			AutoWinPending = false;
 			RosterFight pIGKOIFBOME2 = nKGLHEGIKKP.FindSavedFightRecord(KGKDKENMAOA.FightId);
 			if (pIGKOIFBOME2 == null)
 			{
-				pIGKOIFBOME2 = nKGLHEGIKKP.OBAFPDGJHNN(KGKDKENMAOA.FightId);
+				pIGKOIFBOME2 = nKGLHEGIKKP.CreateFight(KGKDKENMAOA.FightId);
 			}
 			KGKDKENMAOA.SetRosterFight(pIGKOIFBOME2);
-			int num = KGKDKENMAOA.APKPCGDBMEP().Count - 2;
+			int num = KGKDKENMAOA.GetRewards().Count - 2;
 			if (num < 0)
 			{
 				num = 0;
 			}
 			KGKDKENMAOA.RewardIndex = num;
 			ComboStatistic aIOMDIAFHGB = new ComboStatistic();
-			EndFight(aIOMDIAFHGB, KGKDKENMAOA, ListSF.CCDKHLAMKKO().get_Parameters(), null, GameOverTypes.GAME_OVER_WIN);
+			EndFight(aIOMDIAFHGB, KGKDKENMAOA, ListSF.GetRoster().get_Parameters(), null, GameOverTypes.GAME_OVER_WIN);
 			if (current != null)
 			{
 				current.GetInfoBattle().UpdateBattleInfo(current.GetInfoBattle().GetCurrentBattle());
@@ -2416,57 +2416,57 @@ public static class GameUtils
 		return true;
 	}
 
-	public static void MGBPBNNNLLO()
+	public static void GrantEnergyAndRefreshNotifications()
 	{
 		ListSF.ChangeEnergy(10);
-		ListSF.GetInstance().EJANJEEGOOE();
-		LocalNotificationManager.ELEBLBJKDBI().OHMBBMKPAHD();
-		LocalNotificationManager.ELEBLBJKDBI().GONAFNDNGHK();
+		ListSF.GetInstance().RequestSave();
+		LocalNotificationManager.GetInstance().CancelEnergy();
+		LocalNotificationManager.GetInstance().CancelEnergyFull();
 	}
 
-	public static void MIKJIBPCLLF()
+	public static void OpenProfileScreen()
 	{
-		Module.DLOKJOHNDID(ScreenType.ModuleProfile, 0);
+		Module.OpenScreen(ScreenType.ModuleProfile, 0);
 	}
 
-	public static string BGGMLFLFONJ()
+	public static string GetDefaultAvatar()
 	{
-		return EOKAPIGANEE;
+		return defaultAvatar;
 	}
 
-	public static void PALADCEPDNI(string value)
+	public static void SetDefaultAvatar(string value)
 	{
-		EOKAPIGANEE = value;
+		defaultAvatar = value;
 	}
 
 	// best guess for name
 	public static string GetDefaultSkeleton()
 	{
-		return MODJMLNMBJH;
+		return defaultSkeleton;
 	}
 
-	public static void NCGINDFMIFB(string value)
+	public static void SetDefaultSkeleton(string value)
 	{
-		MODJMLNMBJH = value;
+		defaultSkeleton = value;
 	}
 
-	public static void EBNJAECDDIM(XmlNode AFHNINCKJEE)
+	public static void ParseDefaultItems(XmlNode AFHNINCKJEE)
 	{
-		GMKKGOHMEOM.Clear();
+		defaultItems.Clear();
 		foreach (XmlNode childNode in AFHNINCKJEE.ChildNodes)
 		{
 			if ("Item" == childNode.Name)
 			{
-				string gBCLEDJAOBM = childNode.Attributes["Type"].CIPOICEEIBK(string.Empty);
-				string pOFHDGJAFMP = childNode.Attributes["Name"].CIPOICEEIBK(string.Empty);
-				GMKKGOHMEOM.Add(new global::Pair<string, string>(gBCLEDJAOBM, pOFHDGJAFMP));
+				string gBCLEDJAOBM = childNode.Attributes["Type"].GetStringOrDefault(string.Empty);
+				string pOFHDGJAFMP = childNode.Attributes["Name"].GetStringOrDefault(string.Empty);
+				defaultItems.Add(new global::Pair<string, string>(gBCLEDJAOBM, pOFHDGJAFMP));
 			}
 		}
 	}
 
 	public static string GetDefaultItem(string CNKBLODAFDO)
 	{
-		foreach (global::Pair<string, string> item in GMKKGOHMEOM)
+		foreach (global::Pair<string, string> item in defaultItems)
 		{
 			if (item.First == CNKBLODAFDO)
 			{
@@ -2476,21 +2476,21 @@ public static class GameUtils
 		return string.Empty;
 	}
 
-	public static long ECCPJAPIABG()
+	public static long GetCurrentTime()
 	{
-		return ListSF.IDMJOMOMDOJ();
+		return ListSF.GetCurrentTime();
 	}
 
 	public static long GetLeftTime(long time)
 	{
-		long num = ECCPJAPIABG();
+		long num = GetCurrentTime();
 		return (time <= num) ? 0 : (time - num);
 	}
 
-	public static void OEKOKKCILAG()
+	public static void ScheduleStartupNotifications()
 	{
-		LocalNotificationManager.ELEBLBJKDBI().ECNMCOKOEBF();
-		LocalNotificationManager.ELEBLBJKDBI().IMABAABEIOI(LJNCELBEHGN);
+		LocalNotificationManager.GetInstance().CancelRetention();
+		LocalNotificationManager.GetInstance().ScheduleRetention(PushRetentionTime);
 	}
 
 	public static void ShowEnterScreen(string HCPNFPMHFCM, Action FLHKCGAMDJJ)
@@ -2505,22 +2505,22 @@ public static class GameUtils
 		enterScreen.Init(IGLEKOAILHD, FLHKCGAMDJJ);
 	}
 
-	public static Trick NMNIGIDFKOA(string name)
+	public static Trick GetTrickByName(string name)
 	{
-		return KLLGJKHALGH().Find((Trick GNAONAPDDLD) => GNAONAPDDLD.Name == name);
+		return GetPlayerTricks().Find((Trick GNAONAPDDLD) => GNAONAPDDLD.Name == name);
 	}
 
-	public static List<Trick> KLLGJKHALGH(SceneTypes MHOCFOODLLL = SceneTypes.SceneFight)
+	public static List<Trick> GetPlayerTricks(SceneTypes MHOCFOODLLL = SceneTypes.SceneFight)
 	{
 		List<Trick> list = new List<Trick>();
-		List<ItemInfo> hELFDCAIJNE = LBMPHBNJMGG().PJNJIJIODHE();
-		List<PerkInfoItem> jOGBKOJCINM = LBMPHBNJMGG().JBIOECDAAKP();
+		List<ItemInfo> hELFDCAIJNE = GetPlayerModelParameters().GetEquippedItems();
+		List<PerkInfoItem> jOGBKOJCINM = GetPlayerModelParameters().GetAllPerks();
 		bool aBGINCCBACK = false;
-		AnimationData.PHNMANPDPKG(list, hELFDCAIJNE, aBGINCCBACK, null, jOGBKOJCINM, MHOCFOODLLL);
+		AnimationData.CollectAvailableTricks(list, hELFDCAIJNE, aBGINCCBACK, null, jOGBKOJCINM, MHOCFOODLLL);
 		return list;
 	}
 
-	private static bool LEDKPLCIEBP(string DIAIIPCBMFL)
+	private static bool CanShowRatePrompt(string DIAIIPCBMFL)
 	{
 		int count = _notShowRateFights.Count;
 		for (int i = 0; i < count; i++)
@@ -2533,70 +2533,70 @@ public static class GameUtils
 		return true;
 	}
 
-	public static void LFKOMCMPKKC(ItemInfo item, ItemAction LFLGCDNKNJI, int count, long BMNFPNBAMAF)
+	public static void TrackItemAction(ItemInfo item, ItemAction LFLGCDNKNJI, int count, long BMNFPNBAMAF)
 	{
 	}
 
-	public static void PKMIJDBNNFK(string CPMFDAEAHAM)
+	public static void TrackDelivery(string CPMFDAEAHAM)
 	{
 	}
 
-	private static void NIANNOBAHMH(string LOKLDPLAPOL, RecipeItemInfo item)
+	private static void ScheduleEnchantmentNotification(string LOKLDPLAPOL, RecipeItemInfo item)
 	{
-		if (item != null && item.MFEAIEJFDAM() != null)
+		if (item != null && item.GetUserItem() != null)
 		{
-			string text = item.MFEAIEJFDAM().get_Name();
+			string text = item.GetUserItem().get_Name();
 			string lIOGIBJBHAH = LocalizationManager.GetString(LOKLDPLAPOL, "1", text);
-			long num = item.HGDELDFDFNH() - ECCPJAPIABG();
+			long num = item.GetDeliveryEndTime() - GetCurrentTime();
 			if (num > 0)
 			{
-				LocalNotificationManager.ELEBLBJKDBI().EGOMGODAMFF(lIOGIBJBHAH, num);
+				LocalNotificationManager.GetInstance().ScheduleRecipe(lIOGIBJBHAH, num);
 			}
 		}
 	}
 
-	private static void FBINMBCCMHA(string LOKLDPLAPOL, RecipeItemInfo item)
+	private static void CancelEnchantmentNotification(string LOKLDPLAPOL, RecipeItemInfo item)
 	{
-		if (item != null && item.MFEAIEJFDAM() != null)
+		if (item != null && item.GetUserItem() != null)
 		{
-			LocalNotificationManager.ELEBLBJKDBI().ENAFDJHIDJJ();
+			LocalNotificationManager.GetInstance().CancelRecipe();
 		}
 	}
 
-	private static void DMBJCCFNFKK(string LOKLDPLAPOL, UserItem item)
+	private static void ScheduleItemNotification(string LOKLDPLAPOL, UserItem item)
 	{
 		if (item != null)
 		{
 			string text = LocalizationManager.GetString(item.get_Name());
 			string lIOGIBJBHAH = LocalizationManager.GetString(LOKLDPLAPOL, "1", text);
-			long num = item.IJGAOHJNLAH() - ECCPJAPIABG();
+			long num = item.GetDeliveryTimestamp() - GetCurrentTime();
 			if (num > 0)
 			{
-				LocalNotificationManager.ELEBLBJKDBI().HGOKJEIHKPE(lIOGIBJBHAH, num);
+				LocalNotificationManager.GetInstance().ScheduleItem(lIOGIBJBHAH, num);
 			}
 		}
 	}
 
-	private static void NELKFJJHFDC(string LOKLDPLAPOL, UserItem item)
+	private static void CancelItemNotification(string LOKLDPLAPOL, UserItem item)
 	{
 		if (item != null)
 		{
-			LocalNotificationManager.ELEBLBJKDBI().DJNHJBNKBIB();
+			LocalNotificationManager.GetInstance().CancelItem();
 		}
 	}
 
-	private static void OKHLHAMGLOE(FightList KGKDKENMAOA, bool EEEJJGMOKDF)
+	private static void SchedulePeriodicFightNotification(FightList KGKDKENMAOA, bool EEEJJGMOKDF)
 	{
 		if (KGKDKENMAOA.get_Type() == BattleType.FightPeriodic)
 		{
-			RosterFight pIGKOIFBOME = KGKDKENMAOA.FLKFFDLLBKA();
-			long iHDMLLNEGIK = ((!EEEJJGMOKDF) ? (pIGKOIFBOME.FDAEBPDIEEE() + KGKDKENMAOA.RepeatTime - ListSF.IDMJOMOMDOJ()) : (pIGKOIFBOME.ILBNPNIPEHO() + KGKDKENMAOA.RepeatTime - ListSF.IDMJOMOMDOJ()));
-			LocalNotificationManager.ELEBLBJKDBI().AHLFKAGBLEN();
-			LocalNotificationManager.ELEBLBJKDBI().HPCBBNCDPEB(iHDMLLNEGIK);
+			RosterFight pIGKOIFBOME = KGKDKENMAOA.GetRosterFight();
+			long iHDMLLNEGIK = ((!EEEJJGMOKDF) ? (pIGKOIFBOME.GetRandomizeTimestamp() + KGKDKENMAOA.RepeatTime - ListSF.GetCurrentTime()) : (pIGKOIFBOME.GetCompletionTimestamp() + KGKDKENMAOA.RepeatTime - ListSF.GetCurrentTime()));
+			LocalNotificationManager.GetInstance().CancelPeriodic();
+			LocalNotificationManager.GetInstance().SchedulePeriodic(iHDMLLNEGIK);
 		}
 	}
 
-	public static void PIHNKCIDDJB()
+	public static void UpdateShopNewItemsCounters()
 	{
 		ShopScene current = Scene<ShopScene>.get_Current();
 		if (current != null)
@@ -2605,31 +2605,31 @@ public static class GameUtils
 		}
 	}
 
-	public static void FBEHNHNOKKO(bool value)
+	public static void SetFightFlag(bool value)
 	{
-		IBCOLFJCDNG = value;
+		fightFlag = value;
 	}
 
-	public static bool NMODJEJFFNC()
+	public static bool GetFightFlag()
 	{
-		return IBCOLFJCDNG;
+		return fightFlag;
 	}
 
-	public static float FCMBGDFIBPK()
+	public static float GetDialogContentWidth()
 	{
 		return 650f;
 	}
 
 	public static void InitVariables()
 	{
-		LDBMFAMEMPF = false;
-		LEEIGNICAMN = false;
-		GBCMHICHIOI = false;
+		ReduceFps = false;
+		ParticlesDisabled = false;
+		SequencesDisabled = false;
 	}
 
-	public static SliderType NAMBCLFLNIN(string LIKHBAFOEND)
+	public static SliderType GetSliderTypeByName(string LIKHBAFOEND)
 	{
-		foreach (KeyValuePair<SliderType, string> item in IPFBLJOALBN)
+		foreach (KeyValuePair<SliderType, string> item in SliderNames)
 		{
 			if (item.Value == LIKHBAFOEND)
 			{
@@ -2639,20 +2639,20 @@ public static class GameUtils
 		return SliderType.SliderNone;
 	}
 
-	public static float JEILJMPPEGL(FightList fight)
+	public static float CalculateFightDifficulty(FightList fight)
 	{
-		List<ModelParameters> list = IGNNMAKHBFF(fight.OFKJMHPMCCD());
-		ModelParameters kIKOGDEPGHB = Eclipse.Modding.ModRuntime.BuildFightPlayerParameters(fight) ?? LBMPHBNJMGG().Clone();
-		kIKOGDEPGHB.KMPACCIOOLE(fight.EHGIKANKJNJ(), true);
-		kIKOGDEPGHB.NOBKKLBJFIL();
-		float result = fight.MPNBGBIMEIP(kIKOGDEPGHB, list);
+		List<ModelParameters> list = CreateOpponentParameters(fight.GetOpponents());
+		ModelParameters kIKOGDEPGHB = Eclipse.Modding.ModRuntime.BuildFightPlayerParameters(fight) ?? GetPlayerModelParameters().Clone();
+		kIKOGDEPGHB.SetItemsFromRules(fight.GetItemRules(), true);
+		kIKOGDEPGHB.CalculateAttributes();
+		float result = fight.CalculateDifficultyVsLastOpponent(kIKOGDEPGHB, list);
 		list.Clear();
 		return result;
 	}
 
 	public static int ParseAspects(XmlNode AFHNINCKJEE)
 	{
-		OKMEHFCEPIK.Clear();
+		aspects.Clear();
 		int num = 0;
 		foreach (XmlNode childNode in AFHNINCKJEE.ChildNodes)
 		{
@@ -2660,37 +2660,37 @@ public static class GameUtils
 			{
 				Aspect hOHAPDGFMHL = new Aspect();
 				hOHAPDGFMHL.Parse(childNode);
-				OKMEHFCEPIK.Add(hOHAPDGFMHL);
+				aspects.Add(hOHAPDGFMHL);
 				num++;
 			}
 		}
 		return num;
 	}
 
-	public static void CFHKBAEOOBK(XmlNode AFHNINCKJEE)
+	public static void ParseAspectConstants(XmlNode AFHNINCKJEE)
 	{
-		JDHBJMHAJOG().LFIPMCAHODJ = AFHNINCKJEE.Attributes["Antilimit"].ParseFloat();
-		JDHBJMHAJOG().JHJAFHLMOBJ = AFHNINCKJEE.Attributes["DoublingRange"].ParseFloat();
-		JDHBJMHAJOG().GPEPDPOJJLM = AFHNINCKJEE.Attributes["Limit"].ParseFloat();
+		GetAspectConstants().Antilimit = AFHNINCKJEE.Attributes["Antilimit"].ParseFloat();
+		GetAspectConstants().DoublingRange = AFHNINCKJEE.Attributes["DoublingRange"].ParseFloat();
+		GetAspectConstants().Limit = AFHNINCKJEE.Attributes["Limit"].ParseFloat();
 	}
 
-	public static void KLHOKMCALFM()
+	public static void RegisterAspectAttributes()
 	{
-		foreach (Aspect item in IGHPKGCJGHM())
+		foreach (Aspect item in GetAspects())
 		{
 			WarriorAttribute bCNOAOPGAEI = new WarriorAttribute();
 			bCNOAOPGAEI.set_Name(item.get_Name());
-			bCNOAOPGAEI.GDCBBAHKCIE = true;
-			bCNOAOPGAEI.GDECIAJAFHH = true;
-			bCNOAOPGAEI.KDKHPMHNPCN = true;
-			bCNOAOPGAEI.GMPLHIHNHMD = true;
-			BGENALLCKII.IBLHIAHECLK.Add(bCNOAOPGAEI);
+			bCNOAOPGAEI.IsHidden = true;
+			bCNOAOPGAEI.IsShopHidden = true;
+			bCNOAOPGAEI.IsProfileHidden = true;
+			bCNOAOPGAEI.UnusedFlag = true;
+			WarriorAttributeList.AttributeList.Add(bCNOAOPGAEI);
 		}
 	}
 
-	public static Aspect MGDCJKKGKAB(string name)
+	public static Aspect GetAspectByName(string name)
 	{
-		List<Aspect> list = IGHPKGCJGHM();
+		List<Aspect> list = GetAspects();
 		foreach (Aspect item in list)
 		{
 			if (item.get_Name().Equals(name))
@@ -2701,42 +2701,42 @@ public static class GameUtils
 		return null;
 	}
 
-	public static void MEBABPEMMBE()
+	public static void InitSliderNames()
 	{
-		IPFBLJOALBN[SliderType.SliderNone] = "Default";
-		IPFBLJOALBN[SliderType.SliderWeapon] = "Weapon";
-		IPFBLJOALBN[SliderType.SliderArmor] = "Armor";
-		IPFBLJOALBN[SliderType.SliderHelmet] = "Helm";
-		IPFBLJOALBN[SliderType.SliderMissile] = "Ranged";
-		IPFBLJOALBN[SliderType.SliderMagic] = "Magic";
-		IPFBLJOALBN[SliderType.SliderRuby] = "Ruby";
-		IPFBLJOALBN[SliderType.SliderFree] = "Free";
-		IPFBLJOALBN[SliderType.SliderCheat] = "Cheat";
-		IPFBLJOALBN[SliderType.SliderPerks] = "Perks";
-		IPFBLJOALBN[SliderType.SliderTricks] = "Moves";
-		IPFBLJOALBN[SliderType.SliderAchievements] = "Achievements";
-		IPFBLJOALBN[SliderType.SliderSeals] = "QuestItems";
-		IPFBLJOALBN[SliderType.SliderCount] = "Count";
-		IPFBLJOALBN[SliderType.SliderRaidItemPack] = "RaidConsumable";
-		IPFBLJOALBN[SliderType.SliderRaidMap] = "RaidMapStage";
-		IPFBLJOALBN[SliderType.SliderStoryMap] = "StoryMapStage";
+		SliderNames[SliderType.SliderNone] = "Default";
+		SliderNames[SliderType.SliderWeapon] = "Weapon";
+		SliderNames[SliderType.SliderArmor] = "Armor";
+		SliderNames[SliderType.SliderHelmet] = "Helm";
+		SliderNames[SliderType.SliderMissile] = "Ranged";
+		SliderNames[SliderType.SliderMagic] = "Magic";
+		SliderNames[SliderType.SliderRuby] = "Ruby";
+		SliderNames[SliderType.SliderFree] = "Free";
+		SliderNames[SliderType.SliderCheat] = "Cheat";
+		SliderNames[SliderType.SliderPerks] = "Perks";
+		SliderNames[SliderType.SliderTricks] = "Moves";
+		SliderNames[SliderType.SliderAchievements] = "Achievements";
+		SliderNames[SliderType.SliderSeals] = "QuestItems";
+		SliderNames[SliderType.SliderCount] = "Count";
+		SliderNames[SliderType.SliderRaidItemPack] = "RaidConsumable";
+		SliderNames[SliderType.SliderRaidMap] = "RaidMapStage";
+		SliderNames[SliderType.SliderStoryMap] = "StoryMapStage";
 	}
 
-	public static void LGEPJJPDNOO()
+	public static void InitRaidTutorialStepNames()
 	{
-		HEJIFIHLLJF[RaidTutorialStepCode.RaidTutNotStarted] = "NotStarted";
-		HEJIFIHLLJF[RaidTutorialStepCode.RaidTutToggleButton] = "RaidButtonTutorial";
-		HEJIFIHLLJF[RaidTutorialStepCode.RaidTutGiveKey] = "RaidGiveKeyTutorial";
-		HEJIFIHLLJF[RaidTutorialStepCode.RaidTutFirstRaidEnter] = "FirstRaidEnterTutorial";
-		HEJIFIHLLJF[RaidTutorialStepCode.RaidTutFinalFight] = "RaidFinalFightTutorial";
-		HEJIFIHLLJF[RaidTutorialStepCode.RaidTutLeagueWindow] = "LeagueWindowTutorial";
-		HEJIFIHLLJF[RaidTutorialStepCode.RaidTutShopNotification] = "RaidShopNotification";
-		HEJIFIHLLJF[RaidTutorialStepCode.RaidTutComplete] = "TutorialComplete";
+		RaidTutorialStepNames[RaidTutorialStepCode.RaidTutNotStarted] = "NotStarted";
+		RaidTutorialStepNames[RaidTutorialStepCode.RaidTutToggleButton] = "RaidButtonTutorial";
+		RaidTutorialStepNames[RaidTutorialStepCode.RaidTutGiveKey] = "RaidGiveKeyTutorial";
+		RaidTutorialStepNames[RaidTutorialStepCode.RaidTutFirstRaidEnter] = "FirstRaidEnterTutorial";
+		RaidTutorialStepNames[RaidTutorialStepCode.RaidTutFinalFight] = "RaidFinalFightTutorial";
+		RaidTutorialStepNames[RaidTutorialStepCode.RaidTutLeagueWindow] = "LeagueWindowTutorial";
+		RaidTutorialStepNames[RaidTutorialStepCode.RaidTutShopNotification] = "RaidShopNotification";
+		RaidTutorialStepNames[RaidTutorialStepCode.RaidTutComplete] = "TutorialComplete";
 	}
 
-	public static RaidTutorialStepCode PHHOCKCCGMM(string NOFMEBBEDKK)
+	public static RaidTutorialStepCode GetRaidTutorialStepByName(string NOFMEBBEDKK)
 	{
-		foreach (KeyValuePair<RaidTutorialStepCode, string> item in HEJIFIHLLJF)
+		foreach (KeyValuePair<RaidTutorialStepCode, string> item in RaidTutorialStepNames)
 		{
 			if (item.Value == NOFMEBBEDKK)
 			{
@@ -2746,43 +2746,43 @@ public static class GameUtils
 		return RaidTutorialStepCode.RaidTutNotStarted;
 	}
 
-	public static void AHJGPLGCNGI()
+	public static void CommitPendingAchievements()
 	{
-		foreach (Achievement item in CCNGPMBGNAC)
+		foreach (Achievement item in pendingAchievements)
 		{
-			item.HGMHEOGJDMM = true;
+			item.IsUnlocked = true;
 		}
-		CCNGPMBGNAC.Clear();
+		pendingAchievements.Clear();
 	}
 
 	public static long GetDenominatedValue(long value, int NPFOBKBJAOB = 0)
 	{
-		int num = ListSF.CCDKHLAMKKO().NPGECMDDNFO();
+		int num = ListSF.GetRoster().GetDenominationDigits();
 		float f = (float)value / Mathf.Pow(10f, num - NPFOBKBJAOB);
 		return (long)Mathf.Ceil(f);
 	}
 
-	public static bool DJCDFEAMPDA(FightList KGKDKENMAOA)
+	public static bool HasEnoughCurrencyForFight(FightList KGKDKENMAOA)
 	{
-		List<CurrencyCostRule> list = KGKDKENMAOA.LBGNOMEFLBA();
+		List<CurrencyCostRule> list = KGKDKENMAOA.GetCurrencyCostRules();
 		if (list.Count == 0)
 		{
 			return true;
 		}
 		foreach (CurrencyCostRule item in list)
 		{
-			string text = item.JFDCHNBPPNH();
+			string text = item.GetCurrencyName();
 			if (!(text != string.Empty))
 			{
 				continue;
 			}
-			int num = ListSF.CCDKHLAMKKO().GetCurrencyCount(text);
+			int num = ListSF.GetRoster().GetCurrencyCount(text);
 			int num2 = 0;
 			foreach (CurrencyCostRule item2 in list)
 			{
-				if (item2.JFDCHNBPPNH() == text)
+				if (item2.GetCurrencyName() == text)
 				{
-					int num3 = item2.LHNHLANLHMN();
+					int num3 = item2.GetCurrencyValue();
 					num2 += num3;
 				}
 			}
@@ -2794,16 +2794,16 @@ public static class GameUtils
 		return true;
 	}
 
-	public static void OFOKPNFGDMD(string DOPHKKGNAEF)
+	public static void TrackEvent(string DOPHKKGNAEF)
 	{
 	}
 
-	public static bool ILFJCODGINO(PerkInfoItem AEFFHJGMNFI)
+	public static bool IsPerkCompatibleWithEquipment(PerkInfoItem AEFFHJGMNFI)
 	{
-		List<UserItem> list = ListSF.CCDKHLAMKKO().KHCNHPCPFII().JCMOHPFKPBO();
+		List<UserItem> list = ListSF.GetRoster().GetInventory().GetEquippedItems();
 		for (int i = 0; i < list.Count; i++)
 		{
-			if (COLBOMHLHBB(list[i].BHKHOJPANHE()) && !list[i].OJNNHFNPNEM(AEFFHJGMNFI))
+			if (IsEquipmentItem(list[i].GetInfo()) && !list[i].HasEnchantment(AEFFHJGMNFI))
 			{
 				return false;
 			}
@@ -2811,7 +2811,7 @@ public static class GameUtils
 		return true;
 	}
 
-	private static bool COLBOMHLHBB(ItemInfo item)
+	private static bool IsEquipmentItem(ItemInfo item)
 	{
 		// Newer vanilla lists can legitimately omit historical/seasonal item
 		// definitions still present in an existing local save. Such UserItems
@@ -2834,13 +2834,13 @@ public static class GameUtils
 		}
 	}
 
-	public static void ICAEEDLKGEF()
+	public static void PrintTextureCache()
 	{
-		if (AssemblyController.BNIHABLDELL())
+		if (AssemblyController.GetCacheTexturesLog())
 		{
-			LLLOJBFMONN.INNGABABJPC(string.Empty);
-			LLLOJBFMONN.INNGABABJPC("------------------------------Print texture cache ------------------------------");
-			LLLOJBFMONN.INNGABABJPC("------------------------------Screen: " + Module.INIOOEKJIDI(Module.GetInstance().GetCurrentScreenType()) + " ------------------------------");
+			GameLog.Info(string.Empty);
+			GameLog.Info("------------------------------Print texture cache ------------------------------");
+			GameLog.Info("------------------------------Screen: " + Module.GetScreenName(Module.GetInstance().GetCurrentScreenType()) + " ------------------------------");
 		}
 	}
 }
